@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2020-2021 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -53,11 +53,15 @@ jobs:
                   queries: +security-and-quality
 
             - name: Bootstrap
-              run: scripts/build/gn_bootstrap.sh
+              run: |
+                  apt-get update && apt-get install -y libdmalloc-dev;
+                  eval `dmalloc -b -l DMALLOC_LOG -i 1 high`;
+                  export G_SLICE; G_SLICE=always-malloc; true required for dmalloc compatibility;
+                  scripts/build/gn_bootstrap.sh
             - name: Setup Build
               run: |
                   case $BUILD_TYPE in
-                     "main") GN_ARGS='';;
+                     "main") GN_ARGS='chip_config_memory_debug_checks=true chip_config_memory_debug_dmalloc=true';;
                      "clang") GN_ARGS='is_clang=true';;
                      "mbedtls") GN_ARGS='chip_crypto="mbedtls"';;
                      *) ;;

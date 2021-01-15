@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -76,7 +76,7 @@ void EchoServer::OnMessageReceived(Messaging::ExchangeContext * ec, const Packet
     // adjust the position of the payload within the buffer to ensure there is enough room for the
     // outgoing network headers.  This is necessary because in some network stack configurations,
     // the incoming header size may be smaller than the outgoing size.
-    response->EnsureReservedSize(CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE);
+    response->EnsureReservedSize(System::PacketBuffer::kDefaultHeaderReserve);
 
     // Send an Echo Response back to the sender.
     ec->SendMessage(kProtocol_Echo, kEchoMessageType_EchoResponse, std::move(response),

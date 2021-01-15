@@ -186,7 +186,6 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
     callback.ReceiveHandlerCallCount = 0;
 
     err = secureSessionMgr.SendMessage(localToRemoteSession, std::move(buffer));
-    printf("err=%d\n", err);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     ctx.DriveIOUntil(1000 /* ms */, []() { return callback.ReceiveHandlerCallCount != 0; });

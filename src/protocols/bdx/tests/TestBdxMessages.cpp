@@ -3,6 +3,7 @@
 #include <nlunit-test.h>
 
 #include <support/BufBound.h>
+#include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/UnitTestRegistration.h>
 
@@ -139,13 +140,33 @@ static const nlTest sTests[] =
 };
 // clang-format on
 
+/**
+ *  Set up the test suite.
+ */
+static int TestSetup(void * inContext)
+{
+    CHIP_ERROR error = chip::Platform::MemoryInit();
+    if (error != CHIP_NO_ERROR)
+        return FAILURE;
+    return SUCCESS;
+}
+
+/**
+ *  Tear down the test suite.
+ */
+static int TestTeardown(void * inContext)
+{
+    chip::Platform::MemoryShutdown();
+    return SUCCESS;
+}
+
 // clang-format off
 static nlTestSuite sSuite =
 {
     "Test-CHIP-BdxMessages",
     &sTests[0],
-    nullptr,
-    nullptr
+    TestSetup,
+    TestTeardown,
 };
 // clang-format on
 

@@ -58,7 +58,7 @@ CHIP_ERROR Command::Reset()
     if (mCommandMessageBuf.IsNull())
     {
         // TODO: Calculate the packet buffer size
-        mCommandMessageBuf = System::PacketBufferHandle::New(System::kMaxPacketBufferSize);
+        mCommandMessageBuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
         VerifyOrExit(!mCommandMessageBuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
     }
 
@@ -145,7 +145,7 @@ exit:
 
 chip::TLV::TLVWriter & Command::CreateCommandDataElementTLVWriter()
 {
-    mCommandDataBuf = chip::System::PacketBufferHandle::New(System::kMaxPacketBufferSize);
+    mCommandDataBuf = chip::System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
     if (mCommandDataBuf.IsNull())
     {
         ChipLogDetail(DataManagement, "Unable to allocate packet buffer");
@@ -275,7 +275,7 @@ CHIP_ERROR Command::FinalizeCommandsMessage()
     err = mCommandMessageWriter.Finalize(&mCommandMessageBuf);
     SuccessOrExit(err);
 
-    mCommandMessageBuf->EnsureReservedSize(CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE);
+    mCommandMessageBuf->EnsureReservedSize(System::PacketBuffer::kDefaultHeaderReserve);
 
 exit:
     ChipLogFunctError(err);

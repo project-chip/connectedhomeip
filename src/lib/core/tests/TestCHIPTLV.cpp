@@ -2471,7 +2471,7 @@ void CheckBufferOverflow(nlTestSuite * inSuite, void * inContext)
 
         ReadEncoding1(inSuite, reader);
 
-        buf = System::PacketBufferHandle::New(System::kMaxPacketBufferSizeWithoutReserve, 0);
+        buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSizeWithoutReserve, 0);
     }
 }
 
