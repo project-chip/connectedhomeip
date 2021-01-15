@@ -193,17 +193,10 @@ function asChipUnderlyingType(label, type)
 // These helpers only works within the endpoint_config iterator
 
 // List of all cluster with generated functions
-var endpointClusterWithInit = [   'Identify',
-                                  'Groups',
-                                  'Scenes',
-                                  'On/off',
-                                  'Level Control',
-                                  'Color Control',
-                                  'IAS Zone'
-                                ];
+var endpointClusterWithInit = [ 'Identify', 'Groups', 'Scenes', 'On/off', 'Level Control', 'Color Control', 'IAS Zone' ];
 var endpointClusterWithAttributeChanged = [ 'Identify', 'Door Lock' ];
-var endpointClusterWithPreAttribute = [ 'IAS Zone' ];
-var endpointClusterWithMessageSent = [ 'IAS Zone' ];
+var endpointClusterWithPreAttribute     = [ 'IAS Zone' ];
+var endpointClusterWithMessageSent      = [ 'IAS Zone' ];
 
 /**
  * extract the cluster name from the enpoint cluster comment
@@ -221,12 +214,11 @@ function extract_cluster_name(comments)
 function chip_endpoint_generated_functions()
 {
   let alreadySetCluster = [];
-  let ret = '\\\n';
+  let ret               = '\\\n';
   this.clusterList.forEach((c) => {
     let clusterName  = extract_cluster_name(c.comment);
     let functionList = '';
-    if (alreadySetCluster.includes(clusterName))
-    {
+    if (alreadySetCluster.includes(clusterName)) {
       // Only one array of Generated functions per cluster across all endpoints
       return
     }
@@ -235,8 +227,8 @@ function chip_endpoint_generated_functions()
       if (endpointClusterWithInit.includes(clusterName))
       {
         hasFunctionArray = true
-        functionList     = functionList.concat(`  (EmberAfGenericClusterFunction) emberAf${
-            cHelper.asCamelCased(clusterName, false)}ClusterServerInitCallback,\\\n`)
+        functionList     = functionList.concat(
+            `  (EmberAfGenericClusterFunction) emberAf${cHelper.asCamelCased(clusterName, false)}ClusterServerInitCallback,\\\n`)
       }
 
       if (endpointClusterWithAttributeChanged.includes(clusterName)) {
@@ -282,11 +274,9 @@ function chip_endpoint_cluster_list()
     let functionArray = c.functions;
     let clusterName   = extract_cluster_name(c.comment);
 
-    if (c.comment.includes('server'))
-    {
+    if (c.comment.includes('server')) {
       let hasFunctionArray = false;
-      if (endpointClusterWithInit.includes(clusterName))
-      {
+      if (endpointClusterWithInit.includes(clusterName)) {
         c.mask.push('INIT_FUNCTION')
         hasFunctionArray = true
       }
@@ -316,8 +306,8 @@ function chip_endpoint_cluster_list()
     } else {
       mask = c.mask.map((m) => `ZAP_CLUSTER_MASK(${m.toUpperCase()})`).join(' | ')
     }
-    ret = ret.concat(`  { ${c.clusterId}, ZAP_ATTRIBUTE_INDEX(${c.attributeIndex}), ${c.attributeCount}, ${
-        c.attributeSize}, ${mask}, ${functionArray} }, /* ${c.comment} */ \\\n`)
+    ret = ret.concat(`  { ${c.clusterId}, ZAP_ATTRIBUTE_INDEX(${c.attributeIndex}), ${c.attributeCount}, ${c.attributeSize}, ${
+        mask}, ${functionArray} }, /* ${c.comment} */ \\\n`)
   })
   return ret.concat('}\n');
 }
