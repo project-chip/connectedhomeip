@@ -101,7 +101,8 @@ CHIP_ERROR AdditionalDataPayloadGenerator::generateRotatingDeviceId(uint16_t rot
 
     while (hashOutputIndex < ROTATING_DEVICE_ID_HASH_SUFFIX_LENGTH)
     {
-        output[outputIndex++] = hashOutputBuffer[kSHA256_Hash_Length - ROTATING_DEVICE_ID_HASH_SUFFIX_LENGTH - 1 + hashOutputIndex];
+        output[outputIndex++] =
+            static_cast<char>(hashOutputBuffer[kSHA256_Hash_Length - ROTATING_DEVICE_ID_HASH_SUFFIX_LENGTH - 1 + hashOutputIndex]);
         hashOutputIndex++;
     }
 
