@@ -198,14 +198,9 @@ CHIP_ERROR DiscoveryManager::PublishUnprovisionedDevice(chip::Inet::IPAddressTyp
     entries[1].mDataSize = strnlen(discriminatorBuf, sizeof(vendorProductBuf));
 
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
-    // retrieve serial number
     SuccessOrExit(error =
                       chip::DeviceLayer::ConfigurationMgr().GetSerialNumber(serialNumber, sizeof(serialNumber), serialNumberSize));
-
-    // retieve rotation counter
     SuccessOrExit(error = chip::DeviceLayer::ConfigurationMgr().GetRotationCounter(rotationCounter));
-
-    // retrieve rotating device id
     SuccessOrExit(error = additionDataPayloadGenerator.generateRotatingDeviceId(
                       rotationCounter, std::string(serialNumber, serialNumberSize), rotatingDeviceId));
 

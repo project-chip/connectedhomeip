@@ -1283,11 +1283,9 @@ static void UpdateAdditionalDataCharacteristic(BluezGattCharacteristic1 * charac
     size_t serialNumberSize;
     uint16_t rotationCounter;
 
-    // retrieve serial number
     err = ConfigurationMgr().GetSerialNumber(serialNumber, sizeof(serialNumber), serialNumberSize);
     SuccessOrExit(err);
     serialNumber[serialNumberSize] = '\0';
-    // retieve rotation counter
     err = ConfigurationMgr().GetRotationCounter(rotationCounter);
     SuccessOrExit(err);
 
