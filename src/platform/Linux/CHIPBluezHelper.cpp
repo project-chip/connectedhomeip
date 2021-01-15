@@ -1286,7 +1286,7 @@ static void UpdateAdditionalDataCharacteristic(BluezGattCharacteristic1 * charac
     err = ConfigurationMgr().GetSerialNumber(serialNumber, sizeof(serialNumber), serialNumberSize);
     SuccessOrExit(err);
     serialNumber[serialNumberSize] = '\0';
-    err = ConfigurationMgr().GetRotationCounter(rotationCounter);
+    err                            = ConfigurationMgr().GetRotationCounter(rotationCounter);
     SuccessOrExit(err);
 
     err = additionDataPayloadGenerator.generateAdditionalDataPayload(rotationCounter, std::string(serialNumber, serialNumberSize),
