@@ -374,18 +374,20 @@ static EmberAfStatus typeSensitiveMemCopy(uint8_t * dest, uint8_t * src, EmberAf
     // readLength == 0 for a read indicates that we should just trust that the
     // caller has enough space for an attribute...
     bool ignoreReadLength = write || (readLength == 0);
-    uint16_t bufferSize = ignoreReadLength ? am->size : readLength;
+    uint16_t bufferSize   = ignoreReadLength ? am->size : readLength;
 
     if (emberAfIsStringAttributeType(attributeType))
     {
-        if (bufferSize < 1) {
+        if (bufferSize < 1)
+        {
             return EMBER_ZCL_STATUS_INSUFFICIENT_SPACE;
         }
         emberAfCopyString(dest, src, static_cast<uint8_t>(bufferSize - 1));
     }
     else if (emberAfIsLongStringAttributeType(attributeType))
     {
-        if (bufferSize < 2) {
+        if (bufferSize < 2)
+        {
             return EMBER_ZCL_STATUS_INSUFFICIENT_SPACE;
         }
         emberAfCopyLongString(dest, src, static_cast<uint16_t>(bufferSize - 2));
