@@ -25,7 +25,6 @@
 #include <inet/IPAddress.h>
 #include <inet/InetError.h>
 #include <inet/InetLayer.h>
-#include <lib/mdns/DiscoveryManager.h>
 #include <mdns/Advertiser.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/SetupPayload.h>

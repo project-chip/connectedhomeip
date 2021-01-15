@@ -22,7 +22,8 @@ const templateUtil = require(zapPath + 'generator/template-util.js')
 const zclHelper    = require(zapPath + 'generator/helper-zcl.js')
 const zclQuery     = require(zapPath + 'db/query-zcl.js')
 
-const StringHelper = require('../../common/StringHelper.js');
+const StringHelper    = require('../../common/StringHelper.js');
+const ChipTypesHelper = require('../../common/ChipTypesHelper.js');
 
 /**
  * Check if the cluster (name) has any enabled manufacturer commands. This works only inside
@@ -127,7 +128,8 @@ function asReadType(type)
   {
     const options = { 'hash' : {} };
     return zclHelper.asUnderlyingZclType.call(this, type, options).then(zclType => {
-      switch (zclType) {
+      const basicType = ChipTypesHelper.asBasicType(zclType);
+      switch (basicType) {
       case 'int8_t':
       case 'uint8_t':
         return 'Int8u';

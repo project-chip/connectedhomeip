@@ -106,6 +106,12 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, PersistentStorageDelegat
     else
     {
 #if CONFIG_DEVICE_LAYER
+#if CHIP_DEVICE_LAYER_TARGET_LINUX && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+        // By default, Linux device is configured as a BLE peripheral while the controller needs a BLE central.
+        err = DeviceLayer::Internal::BLEMgrImpl().ConfigureBle(/* BLE adapter ID */ 0, /* BLE central */ true);
+        SuccessOrExit(err);
+#endif // CHIP_DEVICE_LAYER_TARGET_LINUX && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+
         err = DeviceLayer::PlatformMgr().InitChipStack();
         SuccessOrExit(err);
 

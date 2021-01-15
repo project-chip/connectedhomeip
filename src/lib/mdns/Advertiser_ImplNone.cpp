@@ -43,6 +43,12 @@ public:
         ChipLogError(Discovery, "mDNS advertising not available. Commisioning Advertisement failed.");
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
+
+    CHIP_ERROR Advertise(const CommisionableAdvertisingParameters & params) override
+    {
+        ChipLogError(Discovery, "mDNS advertising not available. Commisionable Advertisement failed.");
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
 };
 
 NoneAdvertiser gAdvertiser;
