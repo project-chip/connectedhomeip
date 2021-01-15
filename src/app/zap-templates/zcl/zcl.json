@@ -4,6 +4,7 @@
     "xmlFile": [
         "binding-cluster.xml",
         "clusters-extensions.xml",
+        "custom-types.xml",
         "chip-devices.xml",
         "types.xml",
         "general.xml",

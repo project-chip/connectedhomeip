@@ -143,7 +143,7 @@
     CHIPDeviceCallback completionHandler = ^(NSError * error) {
         NSLog(@"Status: On command completed with error %@", [error description]);
     };
-    [self.onOff lightOn:completionHandler];
+    [self.onOff on:completionHandler];
 }
 
 - (IBAction)offButtonTapped:(id)sender
@@ -151,7 +151,7 @@
     CHIPDeviceCallback completionHandler = ^(NSError * error) {
         NSLog(@"Status: Off command completed with error %@", [error description]);
     };
-    [self.onOff lightOff:completionHandler];
+    [self.onOff off:completionHandler];
 }
 
 - (IBAction)toggleButtonTapped:(id)sender
@@ -159,7 +159,7 @@
     CHIPDeviceCallback completionHandler = ^(NSError * error) {
         NSLog(@"Status: Toggle command completed with error %@", [error description]);
     };
-    [self.onOff toggleLight:completionHandler];
+    [self.onOff toggle:completionHandler];
 }
 
 // MARK: CHIPDeviceControllerDelegate

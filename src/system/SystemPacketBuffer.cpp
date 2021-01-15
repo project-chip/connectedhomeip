@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2016-2017 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -158,8 +158,11 @@ uint16_t PacketBuffer::ReservedSize() const
     return static_cast<uint16_t>(kDelta - CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE);
 }
 
-void PacketBuffer::AddToEnd_ForNow(PacketBuffer * aPacket)
+void PacketBuffer::AddToEnd(PacketBufferHandle && aPacketHandle)
 {
+    PacketBuffer * aPacket = aPacketHandle.mBuffer;
+    aPacketHandle.mBuffer  = nullptr;
+
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     pbuf_cat(this, aPacket);
 #else  // !CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -177,11 +180,6 @@ void PacketBuffer::AddToEnd_ForNow(PacketBuffer * aPacket)
         lCursor = static_cast<PacketBuffer *>(lCursor->next);
     }
 #endif // !CHIP_SYSTEM_CONFIG_USE_LWIP
-}
-
-void PacketBuffer::AddToEnd(PacketBufferHandle aPacketHandle)
-{
-    AddToEnd_ForNow(aPacketHandle.Release_ForNow());
 }
 
 void PacketBuffer::CompactHead()

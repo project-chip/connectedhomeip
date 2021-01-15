@@ -5665,9 +5665,9 @@
 /** @brief Command description for Bind
  *
  * Command: Bind
- * @param nodeId INT64U
- * @param groupId INT16U
- * @param endpointId INT8U
+ * @param nodeId NODE_ID
+ * @param groupId GROUP_ID
+ * @param endpointId ENDPOINT_ID
  * @param clusterId CLUSTER_ID
  */
 #define emberAfFillCommandBindingClusterBind(nodeId, groupId, endpointId, clusterId)                                               \
@@ -5678,9 +5678,9 @@
 /** @brief Command description for Unbind
  *
  * Command: Unbind
- * @param nodeId INT64U
- * @param groupId INT16U
- * @param endpointId INT8U
+ * @param nodeId NODE_ID
+ * @param groupId GROUP_ID
+ * @param endpointId ENDPOINT_ID
  * @param clusterId CLUSTER_ID
  */
 #define emberAfFillCommandBindingClusterUnbind(nodeId, groupId, endpointId, clusterId)                                             \

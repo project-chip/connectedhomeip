@@ -50,6 +50,7 @@
 #include <transport/raw/MessageHeader.h>
 static_assert(sizeof(chip::NodeId) == sizeof(uint64_t), "Unexpected node if size");
 
+#include "gen/endpoint_config.h"
 #include "gen/gen_config.h"
 
 /**

@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include "DiscoveryManager.h"
+#include "Discovery_ImplPlatform.h"
 
 #include <inttypes.h>
 
@@ -27,8 +27,6 @@
 #include "support/CodeUtils.h"
 #include "support/ErrorStr.h"
 #include "support/RandUtils.h"
-
-#if CHIP_ENABLE_MDNS
 
 namespace {
 
@@ -53,31 +51,31 @@ uint8_t HexToInt(char c)
 constexpr uint64_t kUndefinedNodeId = 0;
 
 } // namespace
-#endif
 
 namespace chip {
 namespace Mdns {
 
-DiscoveryManager DiscoveryManager::sManager;
+DiscoveryImplPlatform DiscoveryImplPlatform::sManager;
 
-CHIP_ERROR DiscoveryManager::Init()
+DiscoveryImplPlatform::DiscoveryImplPlatform()
 {
-#if CHIP_ENABLE_MDNS
-    CHIP_ERROR error;
+    mCommissionInstanceName = GetRandU64();
+    CHIP_ERROR error        = ChipMdnsInit(HandleMdnsInit, HandleMdnsError, this);
 
-    mUnprovisionedInstanceName = GetRandU64();
-    SuccessOrExit(error = ChipMdnsInit(HandleMdnsInit, HandleMdnsError, this));
-exit:
-    return error;
-#else
-    return CHIP_NO_ERROR;
-#endif // CHIP_ENABLE_MDNS
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(Discovery, "Failed to initialize platform mdns: %s", ErrorStr(error));
+    }
 }
 
-void DiscoveryManager::HandleMdnsInit(void * context, CHIP_ERROR initError)
+CHIP_ERROR DiscoveryImplPlatform::Start(Inet::InetLayer * inetLayer, uint16_t port)
 {
-#if CHIP_ENABLE_MDNS
-    DiscoveryManager * publisher = static_cast<DiscoveryManager *>(context);
+    return CHIP_NO_ERROR;
+}
+
+void DiscoveryImplPlatform::HandleMdnsInit(void * context, CHIP_ERROR initError)
+{
+    DiscoveryImplPlatform * publisher = static_cast<DiscoveryImplPlatform *>(context);
 
     if (initError == CHIP_NO_ERROR)
     {
@@ -87,61 +85,30 @@ void DiscoveryManager::HandleMdnsInit(void * context, CHIP_ERROR initError)
     {
         ChipLogError(Discovery, "mDNS initialization failed with %s", chip::ErrorStr(initError));
     }
-#endif // CHIP_ENABLE_MDNS
 }
 
-void DiscoveryManager::HandleMdnsError(void * context, CHIP_ERROR error)
+void DiscoveryImplPlatform::HandleMdnsError(void * context, CHIP_ERROR error)
 {
-#if CHIP_ENABLE_MDNS
-    DiscoveryManager * publisher = static_cast<DiscoveryManager *>(context);
-    if (error == CHIP_ERROR_FORCED_RESET && publisher->mIsPublishing)
+    DiscoveryImplPlatform * publisher = static_cast<DiscoveryImplPlatform *>(context);
+    if (error == CHIP_ERROR_FORCED_RESET)
     {
-        publisher->StartPublishDevice();
+        if (publisher->mIsOperationalPublishing)
+        {
+            publisher->Advertise(publisher->mOperationalAdvertisingParams);
+        }
+        if (publisher->mIsCommissionalPublishing)
+        {
+            publisher->Advertise(publisher->mCommissioningdvertisingParams);
+        }
     }
     else
     {
         ChipLogError(Discovery, "mDNS error: %s", chip::ErrorStr(error));
     }
-#endif // CHIP_ENABLE_MDNS
 }
 
-CHIP_ERROR DiscoveryManager::StartPublishDevice(chip::Inet::IPAddressType addressType, chip::Inet::InterfaceId interface)
+CHIP_ERROR DiscoveryImplPlatform::SetupHostname()
 {
-#if CHIP_ENABLE_MDNS
-    CHIP_ERROR error;
-
-    // TODO: after multi-admin is decided we may need to publish both _chipc._udp and _chip._tcp service
-    if (!mIsPublishing)
-    {
-        SuccessOrExit(error = SetupHostname());
-    }
-    else if (chip::DeviceLayer::ConfigurationMgr().IsFullyProvisioned() != mIsPublishingProvisionedDevice)
-    {
-        SuccessOrExit(error = StopPublishDevice());
-        // Set hostname again in case the mac address changes when shifting from soft-AP to station
-        SuccessOrExit(error = SetupHostname());
-    }
-    mIsPublishingProvisionedDevice = chip::DeviceLayer::ConfigurationMgr().IsFullyProvisioned();
-
-    if (mIsPublishingProvisionedDevice)
-    {
-        error = PublishProvisionedDevice(addressType, interface);
-    }
-    else
-    {
-        error = PublishUnprovisionedDevice(addressType, interface);
-    }
-    mIsPublishing = true;
-exit:
-    return error;
-#else
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-#endif // CHIP_ENABLE_MDNS
-}
-
-CHIP_ERROR DiscoveryManager::SetupHostname()
-{
-#if CHIP_ENABLE_MDNS
     uint8_t mac[6];    // 6 byte wifi mac
     char hostname[13]; // Hostname will be the hex representation of mac.
     CHIP_ERROR error;
@@ -155,49 +122,52 @@ CHIP_ERROR DiscoveryManager::SetupHostname()
 
 exit:
     return error;
-#else
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-#endif // CHIP_ENABLE_MDNS
 }
 
-CHIP_ERROR DiscoveryManager::PublishUnprovisionedDevice(chip::Inet::IPAddressType addressType, chip::Inet::InterfaceId interface)
+CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommisioningAdvertisingParameters & params)
 {
-#if CHIP_ENABLE_MDNS
     CHIP_ERROR error = CHIP_NO_ERROR;
     MdnsService service;
-    AdditionalDataPayloadGenerator additionDataPayloadGenerator;
-    uint16_t discriminator;
-    uint16_t vendorID;
-    uint16_t productID;
+    char discriminatorBuf[6];
+    char vendorProductBuf[12];
+    TextEntry textEntries[3];
+    size_t textEntrySize = 0;
+    char shortDiscriminatorSubtype[6];
+    char longDiscriminatorSubtype[7];
+    char vendorSubType[8];
+    const char * subTypes[3];
+    size_t subTypeSize = 0;
     char serialNumber[chip::DeviceLayer::ConfigurationManager::kMaxSerialNumberLength + 1];
     size_t serialNumberSize;
     uint16_t rotationCounter;
     char rotatingDeviceIdBuffer[ROTATING_DEVICE_ID_LENGTH + 1];
     size_t rotatingDeviceIdBufferSize;
 
-    char discriminatorBuf[5];  // hex representation of 16-bit discriminator
-    char vendorProductBuf[10]; // "FFFF+FFFF"
-    // TODO: The text entry will be updated in the spec, update accordingly.
-#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
-    TextEntry entries[3] = { { "D", nullptr, 0 }, { "VP", nullptr, 0 }, { "RI", nullptr, 0 } };
-#else
-    TextEntry entries[2] = { { "D", nullptr, 0 }, { "VP", nullptr, 0 } };
-#endif
-    VerifyOrExit(mMdnsInitialized, error = CHIP_ERROR_INCORRECT_STATE);
-    ChipLogProgress(Discovery, "setup mdns service");
-    SuccessOrExit(error = chip::DeviceLayer::ConfigurationMgr().GetSetupDiscriminator(discriminator));
-    snprintf(service.mName, sizeof(service.mName), "%016" PRIX64, mUnprovisionedInstanceName);
+    if (!mMdnsInitialized)
+    {
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+    snprintf(service.mName, sizeof(service.mName), "%016" PRIX64, mCommissionInstanceName);
     strncpy(service.mType, "_chipc", sizeof(service.mType));
     service.mProtocol = MdnsServiceProtocol::kMdnsProtocolUdp;
-    SuccessOrExit(error = chip::DeviceLayer::ConfigurationMgr().GetVendorId(vendorID));
-    SuccessOrExit(error = chip::DeviceLayer::ConfigurationMgr().GetProductId(productID));
-    snprintf(discriminatorBuf, sizeof(discriminatorBuf), "%04X", discriminator);
-    snprintf(vendorProductBuf, sizeof(vendorProductBuf), "%04X+%04X", vendorID, productID);
-    entries[0].mData     = reinterpret_cast<const uint8_t *>(discriminatorBuf);
-    entries[0].mDataSize = strnlen(discriminatorBuf, sizeof(discriminatorBuf));
-    entries[1].mData     = reinterpret_cast<const uint8_t *>(vendorProductBuf);
-    entries[1].mDataSize = strnlen(discriminatorBuf, sizeof(vendorProductBuf));
 
+    snprintf(discriminatorBuf, sizeof(discriminatorBuf), "%04u", params.GetLongDiscriminator());
+    textEntries[textEntrySize++] = { "D", reinterpret_cast<const uint8_t *>(discriminatorBuf),
+                                     strnlen(discriminatorBuf, sizeof(discriminatorBuf)) };
+    if (params.GetVendorId().HasValue())
+    {
+        if (params.GetProductId().HasValue())
+        {
+            snprintf(vendorProductBuf, sizeof(vendorProductBuf), "%u+%u", params.GetVendorId().Value(),
+                     params.GetProductId().Value());
+        }
+        else
+        {
+            snprintf(vendorProductBuf, sizeof(vendorProductBuf), "%u", params.GetVendorId().Value());
+        }
+        textEntries[textEntrySize++] = { "VP", reinterpret_cast<const uint8_t *>(vendorProductBuf),
+                                         strnlen(vendorProductBuf, sizeof(vendorProductBuf)) };
+    }
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
     SuccessOrExit(error =
                       chip::DeviceLayer::ConfigurationMgr().GetSerialNumber(serialNumber, sizeof(serialNumber), serialNumberSize));
@@ -206,62 +176,60 @@ CHIP_ERROR DiscoveryManager::PublishUnprovisionedDevice(chip::Inet::IPAddressTyp
                       rotationCounter, serialNumber, serialNumberSize, rotatingDeviceIdBuffer, rotatingDeviceIdBufferSize));
 
     // Rotating Device ID
-    entries[2].mData     = reinterpret_cast<const uint8_t *>(rotatingDeviceIdBuffer);
-    entries[2].mDataSize = rotatingDeviceIdBufferSize;
+    textEntries[textEntrySize++] = { "RI", reinterpret_cast<const uint8_t *>(rotatingDeviceIdBuffer),
+                                     rotatingDeviceIdBufferSize };
 #endif
-    service.mTextEntryies  = entries;
-    service.mTextEntrySize = sizeof(entries) / sizeof(TextEntry);
+
+    snprintf(shortDiscriminatorSubtype, sizeof(shortDiscriminatorSubtype), "_S%03u", params.GetShortDiscriminator());
+    subTypes[subTypeSize++] = shortDiscriminatorSubtype;
+    snprintf(longDiscriminatorSubtype, sizeof(longDiscriminatorSubtype), "_L%04u", params.GetLongDiscriminator());
+    subTypes[subTypeSize++] = longDiscriminatorSubtype;
+    if (params.GetVendorId().HasValue())
+    {
+        snprintf(vendorSubType, sizeof(vendorSubType), "_V%u", params.GetVendorId().Value());
+        subTypes[subTypeSize++] = vendorSubType;
+    }
+
+    service.mTextEntryies  = textEntries;
+    service.mTextEntrySize = textEntrySize;
     service.mPort          = CHIP_PORT;
-    service.mInterface     = interface;
-    service.mAddressType   = addressType;
+    service.mInterface     = INET_NULL_INTERFACEID;
+    service.mSubTypes      = subTypes;
+    service.mSubTypeSize   = subTypeSize;
+    service.mAddressType   = Inet::kIPAddressType_Any;
     error                  = ChipMdnsPublishService(&service);
 
-exit:
     return error;
-#else
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-#endif // CHIP_ENABLE_MDNS
 }
 
-CHIP_ERROR DiscoveryManager::PublishProvisionedDevice(chip::Inet::IPAddressType addressType, chip::Inet::InterfaceId interface)
+CHIP_ERROR DiscoveryImplPlatform::Advertise(const OperationalAdvertisingParameters & params)
 {
-#if CHIP_ENABLE_MDNS
-    uint64_t deviceId;
-    uint64_t fabricId;
     MdnsService service;
     CHIP_ERROR error = CHIP_NO_ERROR;
 
+    mOperationalAdvertisingParams = params;
     // TODO: There may be multilple device/fabrid ids after multi-admin.
-    SuccessOrExit(error = chip::DeviceLayer::ConfigurationMgr().GetFabricId(fabricId));
-    SuccessOrExit(error = chip::DeviceLayer::ConfigurationMgr().GetDeviceId(deviceId));
-    snprintf(service.mName, sizeof(service.mName), "%" PRIX64 "-%" PRIX64, deviceId, fabricId);
+    snprintf(service.mName, sizeof(service.mName), "%" PRIX64 "-%" PRIX64, params.GetNodeId(), params.GetFabricId());
     strncpy(service.mType, "_chip", sizeof(service.mType));
     service.mProtocol      = MdnsServiceProtocol::kMdnsProtocolTcp;
     service.mPort          = CHIP_PORT;
     service.mTextEntryies  = nullptr;
     service.mTextEntrySize = 0;
-    service.mInterface     = interface;
-    service.mAddressType   = addressType;
+    service.mInterface     = INET_NULL_INTERFACEID;
+    service.mAddressType   = Inet::kIPAddressType_Any;
     error                  = ChipMdnsPublishService(&service);
 
-exit:
     return error;
-#else
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-#endif // CHIP_ENABLE_MDNS
 }
 
-CHIP_ERROR DiscoveryManager::StopPublishDevice()
+CHIP_ERROR DiscoveryImplPlatform::StopPublishDevice()
 {
-#if CHIP_ENABLE_MDNS
-    mIsPublishing = false;
+    mIsOperationalPublishing  = false;
+    mIsCommissionalPublishing = false;
     return ChipMdnsStopPublish();
-#else
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-#endif // CHIP_ENABLE_MDNS
 }
 
-CHIP_ERROR DiscoveryManager::RegisterResolveDelegate(ResolveDelegate * delegate)
+CHIP_ERROR DiscoveryImplPlatform::RegisterResolveDelegate(ResolveDelegate * delegate)
 {
     if (mResolveDelegate != nullptr)
     {
@@ -274,9 +242,8 @@ CHIP_ERROR DiscoveryManager::RegisterResolveDelegate(ResolveDelegate * delegate)
     }
 }
 
-CHIP_ERROR DiscoveryManager::ResolveNodeId(uint64_t nodeId, uint64_t fabricId, Inet::IPAddressType type)
+CHIP_ERROR DiscoveryImplPlatform::ResolveNodeId(uint64_t nodeId, uint64_t fabricId, Inet::IPAddressType type)
 {
-#if CHIP_ENABLE_MDNS
     MdnsService service;
 
     snprintf(service.mName, sizeof(service.mName), "%" PRIX64 "-%" PRIX64, nodeId, fabricId);
@@ -284,15 +251,11 @@ CHIP_ERROR DiscoveryManager::ResolveNodeId(uint64_t nodeId, uint64_t fabricId, I
     service.mProtocol    = MdnsServiceProtocol::kMdnsProtocolTcp;
     service.mAddressType = type;
     return ChipMdnsResolve(&service, INET_NULL_INTERFACEID, HandleNodeIdResolve, this);
-#else
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-#endif // CHIP_ENABLE_MDNS
 }
 
-void DiscoveryManager::HandleNodeIdResolve(void * context, MdnsService * result, CHIP_ERROR error)
+void DiscoveryImplPlatform::HandleNodeIdResolve(void * context, MdnsService * result, CHIP_ERROR error)
 {
-#if CHIP_ENABLE_MDNS
-    DiscoveryManager * mgr = static_cast<DiscoveryManager *>(context);
+    DiscoveryImplPlatform * mgr = static_cast<DiscoveryImplPlatform *>(context);
 
     if (mgr->mResolveDelegate == nullptr)
     {
@@ -347,7 +310,11 @@ void DiscoveryManager::HandleNodeIdResolve(void * context, MdnsService * result,
             mgr->mResolveDelegate->HandleNodeIdResolve(error, kUndefinedNodeId, *result);
         }
     }
-#endif // CHIP_ENABLE_MDNS
+}
+
+ServiceAdvertiser & chip::Mdns::ServiceAdvertiser::Instance()
+{
+    return DiscoveryImplPlatform::GetInstance();
 }
 
 } // namespace Mdns

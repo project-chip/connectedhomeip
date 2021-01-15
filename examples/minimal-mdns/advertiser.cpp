@@ -33,6 +33,7 @@ enum class AdvertisingMode
 {
     kCommisioning,
     kOperational,
+    kCommisionable,
 };
 
 struct Options
@@ -40,11 +41,15 @@ struct Options
     bool enableIpV4                 = false;
     AdvertisingMode advertisingMode = AdvertisingMode::kCommisioning;
 
-    // commisioning params
+    // commisioning/commisionable params
     uint8_t shortDiscriminator = 52;
     uint16_t longDiscriminator = 840;
     Optional<uint16_t> vendorId;
     Optional<uint16_t> productId;
+
+    // commisionable params
+    Optional<const char *> pairingInstr;
+    Optional<uint8_t> pairingHint;
 
     // operational params
     uint64_t fabricId = 12345;
@@ -61,6 +66,8 @@ constexpr uint16_t kOptionCommisioningShordDiscriminator = 's';
 constexpr uint16_t kOptionCommisioningLongDiscriminaotr  = 'l';
 constexpr uint16_t kOptionCommisioningVendorId           = 0x100; // v is used by 'version'
 constexpr uint16_t kOptionCommisioningProductId          = 'p';
+constexpr uint16_t kOptionCommisioningPairingInstr       = 0x200; // Just use the long format
+constexpr uint16_t kOptionCommisioningPairingHint        = 0x300;
 
 constexpr uint16_t kOptionOperationalFabricId = 'f';
 constexpr uint16_t kOptionOperationalNodeId   = 'n';
@@ -73,13 +80,17 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
         gOptions.enableIpV4 = true;
         return true;
     case kOptionAdvertisingMode:
-        if ((strcmp(aValue, "operational") == 0) || (strcmp(aValue, "o") == 0))
+        if (strcmp(aValue, "operational") == 0)
         {
             gOptions.advertisingMode = AdvertisingMode::kOperational;
         }
-        else if ((strcmp(aValue, "commisioning") == 0) || (strcmp(aValue, "c") == 0))
+        else if (strcmp(aValue, "commisioning") == 0)
         {
             gOptions.advertisingMode = AdvertisingMode::kCommisioning;
+        }
+        else if (strcmp(aValue, "commisionable") == 0)
+        {
+            gOptions.advertisingMode = AdvertisingMode::kCommisionable;
         }
         else
         {
@@ -99,6 +110,12 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
         return true;
     case kOptionCommisioningProductId:
         gOptions.productId = Optional<uint16_t>::Value(static_cast<uint16_t>(atoi(aValue)));
+        return true;
+    case kOptionCommisioningPairingInstr:
+        gOptions.pairingInstr = Optional<const char *>::Value(static_cast<const char *>(aValue));
+        return true;
+    case kOptionCommisioningPairingHint:
+        gOptions.pairingHint = Optional<uint8_t>::Value(static_cast<uint8_t>(atoi(aValue)));
         return true;
     case kOptionOperationalFabricId:
         gOptions.fabricId = atoll(aValue);
@@ -122,6 +139,8 @@ OptionDef cmdLineOptionsDef[] = {
     { "long-discriminator", kArgumentRequired, kOptionCommisioningLongDiscriminaotr },
     { "vendor-id", kArgumentRequired, kOptionCommisioningVendorId },
     { "product-id", kArgumentRequired, kOptionCommisioningProductId },
+    { "pairing-instruction", kArgumentRequired, kOptionCommisioningPairingInstr },
+    { "pairing-hint", kArgumentRequired, kOptionCommisioningPairingHint },
 
     { "fabrid-id", kArgumentRequired, kOptionOperationalFabricId },
     { "node-id", kArgumentRequired, kOptionOperationalNodeId },
@@ -136,18 +155,22 @@ OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS"
 #endif
                              "  -m <mode>\n"
                              "  --advertising-mode <mode>\n"
-                             "        Advertise in this mode (o/operational or c/commisioning).\n"
+                             "        Advertise in this mode (operational or commisioning or commisionable).\n"
                              "  --short-discriminator <value>\n"
                              "  -s <value>\n"
-                             "        Commisioning short discriminator.\n"
+                             "        Commisioning/commisionable short discriminator.\n"
                              "  --long-discriminator <value>\n"
                              "  -l <value>\n"
-                             "        Commisioning long discriminator.\n"
+                             "        Commisioning/commisionable long discriminator.\n"
                              "  --vendor-id <value>\n"
-                             "        Commisioning vendor id.\n"
+                             "        Commisioning/commisionable vendor id.\n"
                              "  --product-id <value>\n"
                              "  -p <value>\n"
-                             "        Commisioning product id.\n"
+                             "        Commisioning/commisionable product id.\n"
+                             "  --pairing-instruction <value>\n"
+                             "        Commisionable pairing instruction.\n"
+                             "  --pairing-hint <value>\n"
+                             "        Commisionable pairing hint.\n"
                              "  --fabrid-id <value>\n"
                              "  -f <value>\n"
                              "        Operational fabric id.\n"
@@ -206,6 +229,18 @@ int main(int argc, char ** args)
                                                                       .SetPort(CHIP_PORT)
                                                                       .SetFabricId(gOptions.fabricId)
                                                                       .SetNodeId(gOptions.nodeId));
+    }
+    else if (gOptions.advertisingMode == AdvertisingMode::kCommisionable)
+    {
+        err = chip::Mdns::ServiceAdvertiser::Instance().Advertise(chip::Mdns::CommisionableAdvertisingParameters()
+                                                                      .EnableIpV4(gOptions.enableIpV4)
+                                                                      .SetPort(CHIP_PORT)
+                                                                      .SetShortDiscriminator(gOptions.shortDiscriminator)
+                                                                      .SetLongDiscrimininator(gOptions.longDiscriminator)
+                                                                      .SetVendorId(gOptions.vendorId)
+                                                                      .SetProductId(gOptions.productId)
+                                                                      .SetPairingInstr(gOptions.pairingInstr)
+                                                                      .SetPairingHint(gOptions.pairingHint));
     }
     else
     {
