@@ -151,12 +151,9 @@ private:
 
     SecurePairingSession mPairingSession;
     NetworkProvisioning mNetworkProvision;
-    SecureSession mSecureSession;
     Transport::PeerAddress mPeerAddress; // Current peer address we are doing rendezvous with.
-    Optional<NodeId> mRendezvousRemoteNodeId;
     TransportMgrBase * mTransportMgr;
-    uint32_t mSecureMessageIndex = 0;
-    uint16_t mNextKeyId          = 0;
+    uint16_t mNextKeyId = 0;
 
     RendezvousSession::State mCurrentState = State::kInit;
     void UpdateState(RendezvousSession::State newState, CHIP_ERROR err = CHIP_NO_ERROR);

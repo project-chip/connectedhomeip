@@ -35,6 +35,7 @@
 #include <support/SafeInt.h>
 #include <support/logging/CHIPLogging.h>
 #include <transport/RendezvousSession.h>
+#include <transport/SecureMessageCodec.h>
 #include <transport/SecurePairingSession.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/TransportMgr.h>
@@ -111,6 +112,8 @@ CHIP_ERROR SecureSessionMgr::SendEncryptedMessage(SecureSessionHandle session, E
                                                   EncryptedPacketBufferHandle * bufferRetainSlot)
 {
     VerifyOrReturnError(!msgBuf.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!msgBuf->HasChainedBuffer(), CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+    VerifyOrReturnError(msgBuf->TotalLength() < kMax_SecureSDU_Length, CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
     uint16_t headerSize = 0;
     PacketHeader packetHeader;
@@ -122,67 +125,6 @@ CHIP_ERROR SecureSessionMgr::SendEncryptedMessage(SecureSessionHandle session, E
     PayloadHeader payloadHeader;
     return SendMessage(session, payloadHeader, packetHeader, std::move(msgBuf), bufferRetainSlot,
                        EncryptionState::kPayloadIsEncrypted);
-}
-
-CHIP_ERROR SecureSessionMgr::EncryptPayload(Transport::PeerConnectionState * state, PayloadHeader & payloadHeader,
-                                            PacketHeader & packetHeader, System::PacketBufferHandle & msgBuf)
-{
-    CHIP_ERROR err         = CHIP_NO_ERROR;
-    uint8_t * data         = nullptr;
-    uint32_t payloadLength = 0; // Make sure it's big enough to add two 16-bit ints without overflowing.
-    uint16_t totalLen      = 0;
-    uint16_t taglen        = 0;
-    uint16_t actualEncodedHeaderSize;
-    MessageAuthenticationCode mac;
-
-    uint32_t msgId = state->GetSendMessageIndex();
-
-    static_assert(std::is_same<decltype(msgBuf->TotalLength()), uint16_t>::value,
-                  "Addition to generate payloadLength might overflow");
-
-    uint16_t headerSize = payloadHeader.EncodeSizeBytes();
-    payloadLength       = static_cast<uint32_t>(headerSize + msgBuf->TotalLength());
-    VerifyOrExit(CanCastTo<uint16_t>(payloadLength), err = CHIP_ERROR_NO_MEMORY);
-
-    packetHeader
-        .SetSourceNodeId(mLocalNodeId)                //
-        .SetDestinationNodeId(state->GetPeerNodeId()) //
-        .SetMessageId(msgId)                          //
-        .SetEncryptionKeyID(state->GetLocalKeyID())   //
-        .SetPayloadLength(static_cast<uint16_t>(payloadLength));
-    packetHeader.GetFlags().Set(Header::FlagValues::kSecure);
-
-    VerifyOrExit(msgBuf->EnsureReservedSize(headerSize), err = CHIP_ERROR_NO_MEMORY);
-
-    msgBuf->SetStart(msgBuf->Start() - headerSize);
-    data     = msgBuf->Start();
-    totalLen = msgBuf->TotalLength();
-
-    err = payloadHeader.Encode(data, totalLen, &actualEncodedHeaderSize);
-    SuccessOrExit(err);
-
-    err = state->GetSecureSession().Encrypt(data, totalLen, data, packetHeader, mac);
-    SuccessOrExit(err);
-    err = mac.Encode(packetHeader, &data[totalLen], kMaxTagLen, &taglen);
-    SuccessOrExit(err);
-
-    VerifyOrExit(CanCastTo<uint16_t>(totalLen + taglen), err = CHIP_ERROR_INTERNAL);
-    msgBuf->SetDataLength(static_cast<uint16_t>(totalLen + taglen));
-
-    ChipLogDetail(Inet, "Secure transport encrypted msg %u", msgId);
-
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        const char * errStr = ErrorStr(err);
-        ChipLogError(Inet, "Secure transport failed to encrypt msg %u: %s", state->GetSendMessageIndex(), errStr);
-    }
-    else
-    {
-        state->IncrementSendMessageIndex();
-    }
-
-    return err;
 }
 
 CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHeader & payloadHeader, PacketHeader & packetHeader,
@@ -202,10 +144,6 @@ CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHea
 
     VerifyOrExit(mState == State::kInitialized, err = CHIP_ERROR_INCORRECT_STATE);
 
-    VerifyOrExit(!msgBuf.IsNull(), err = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(!msgBuf->HasChainedBuffer(), err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
-    VerifyOrExit(msgBuf->TotalLength() < kMax_SecureSDU_Length, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
-
     // Find an active connection to the specified peer node
     state = GetPeerConnectionState(session);
     VerifyOrExit(state != nullptr, err = CHIP_ERROR_NOT_CONNECTED);
@@ -215,7 +153,7 @@ CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHea
 
     if (encryptionState == EncryptionState::kPayloadIsUnencrypted)
     {
-        err = EncryptPayload(state, payloadHeader, packetHeader, msgBuf);
+        err = SecureMessageCodec::Encode(mLocalNodeId, state, payloadHeader, packetHeader, msgBuf);
         SuccessOrExit(err);
     }
 
@@ -228,8 +166,11 @@ CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHea
     msgLen   = static_cast<uint16_t>(msgBuf->DataLength() + headerSize);
 
     // Retain the PacketBuffer in case it's needed for retransmissions.
-    encryptedMsg        = msgBuf.Retain();
-    encryptedMsg.mMsgId = packetHeader.GetMessageId();
+    if (bufferRetainSlot != nullptr)
+    {
+        encryptedMsg        = msgBuf.Retain();
+        encryptedMsg.mMsgId = packetHeader.GetMessageId();
+    }
 
     ChipLogProgress(Inet, "Sending msg from %llu to %llu", mLocalNodeId, state->GetPeerNodeId());
 
@@ -327,6 +268,7 @@ void SecureSessionMgr::OnMessageReceived(const PacketHeader & packetHeader, cons
     PeerConnectionState * state =
         mPeerConnections.FindPeerConnectionState(packetHeader.GetSourceNodeId(), packetHeader.GetEncryptionKeyID(), nullptr);
     PacketBufferHandle origMsg;
+    PayloadHeader payloadHeader;
 
     VerifyOrExit(!msg.IsNull(), ChipLogError(Inet, "Secure transport received NULL packet, discarding"));
 
@@ -343,58 +285,18 @@ void SecureSessionMgr::OnMessageReceived(const PacketHeader & packetHeader, cons
 
     mPeerConnections.MarkConnectionActive(state);
 
-    // TODO this is where messages should be decoded
+    // Decode the message
+    VerifyOrReturn(CHIP_NO_ERROR == SecureMessageCodec::Decode(state, payloadHeader, packetHeader, msg));
+
+    if (state->GetPeerNodeId() == kUndefinedNodeId && packetHeader.GetSourceNodeId().HasValue())
     {
-        PayloadHeader payloadHeader;
-        MessageAuthenticationCode mac;
+        state->SetPeerNodeId(packetHeader.GetSourceNodeId().Value());
+    }
 
-        uint8_t * data       = msg->Start();
-        uint8_t * plainText  = nullptr;
-        uint16_t len         = msg->TotalLength();
-        uint16_t headerSize  = 0;
-        uint16_t decodedSize = 0;
-        uint16_t taglen      = 0;
-        uint16_t payloadlen  = 0;
-
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-        /* This is a workaround for the case where PacketBuffer payload is not
-           allocated as an inline buffer to PacketBuffer structure */
-        origMsg = std::move(msg);
-        msg     = PacketBuffer::NewWithAvailableSize(len);
-        VerifyOrExit(!msg.IsNull(), ChipLogError(Inet, "Insufficient memory for packet buffer."));
-        msg->SetDataLength(len);
-#endif
-        plainText = msg->Start();
-
-        payloadlen = packetHeader.GetPayloadLength();
-        VerifyOrExit(
-            payloadlen <= len,
-            (ChipLogError(Inet, "Secure transport can't find MAC Tag; buffer too short"), err = CHIP_ERROR_INVALID_MESSAGE_LENGTH));
-        err = mac.Decode(packetHeader, &data[payloadlen], static_cast<uint16_t>(len - payloadlen), &taglen);
-        VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Inet, "Secure transport failed to decode MAC Tag: err %d", err));
-        len = static_cast<uint16_t>(len - taglen);
-        msg->SetDataLength(len);
-
-        err = state->GetSecureSession().Decrypt(data, len, plainText, packetHeader, mac);
-        VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Inet, "Secure transport failed to decrypt msg: err %d", err));
-
-        err        = payloadHeader.Decode(plainText, len, &decodedSize);
-        headerSize = payloadHeader.EncodeSizeBytes();
-        VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Inet, "Secure transport failed to decode encrypted header: err %d", err));
-        VerifyOrExit(headerSize == decodedSize, ChipLogError(Inet, "Secure transport decode encrypted header length mismatched"));
-
-        msg->ConsumeHead(headerSize);
-
-        if (state->GetPeerNodeId() == kUndefinedNodeId && packetHeader.GetSourceNodeId().HasValue())
-        {
-            state->SetPeerNodeId(packetHeader.GetSourceNodeId().Value());
-        }
-
-        if (mCB != nullptr)
-        {
-            mCB->OnMessageReceived(packetHeader, payloadHeader, { state->GetPeerNodeId(), state->GetPeerKeyID() }, std::move(msg),
-                                   this);
-        }
+    if (mCB != nullptr)
+    {
+        mCB->OnMessageReceived(packetHeader, payloadHeader, { state->GetPeerNodeId(), state->GetPeerKeyID() }, std::move(msg),
+                               this);
     }
 
 exit:
