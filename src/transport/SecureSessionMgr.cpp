@@ -174,7 +174,17 @@ CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHea
 
     ChipLogProgress(Inet, "Sending msg from %llu to %llu", mLocalNodeId, state->GetPeerNodeId());
 
-    err = mTransportMgr->SendMessage(packetHeader, state->GetPeerAddress(), std::move(msgBuf));
+    if (state->GetTransport() != nullptr)
+    {
+        ChipLogProgress(Inet, "Sending secure msg on connection specific transport");
+        err = state->GetTransport()->SendMessage(packetHeader, state->GetPeerAddress(), std::move(msgBuf));
+    }
+    else
+    {
+        ChipLogProgress(Inet, "Sending secure msg on generic transport");
+        err = mTransportMgr->SendMessage(packetHeader, state->GetPeerAddress(), std::move(msgBuf));
+    }
+    ChipLogProgress(Inet, "Secure msg send status %d", err);
     SuccessOrExit(err);
 
     if (bufferRetainSlot != nullptr)
@@ -200,7 +210,7 @@ exit:
 }
 
 CHIP_ERROR SecureSessionMgr::NewPairing(const Optional<Transport::PeerAddress> & peerAddr, NodeId peerNodeId,
-                                        SecurePairingSession * pairing)
+                                        SecurePairingSession * pairing, Transport::Base * transport)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -220,6 +230,8 @@ CHIP_ERROR SecureSessionMgr::NewPairing(const Optional<Transport::PeerAddress> &
     state = nullptr;
     ReturnErrorOnFailure(
         mPeerConnections.CreateNewPeerConnectionState(Optional<NodeId>::Value(peerNodeId), peerKeyId, localKeyId, &state));
+
+    state->SetTransport(transport);
 
     if (peerAddr.HasValue() && peerAddr.Value().GetIPAddress() != Inet::IPAddress::Any)
     {

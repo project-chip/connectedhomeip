@@ -39,6 +39,7 @@
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/SafeInt.h>
+#include <transport/SecureSessionMgr.h>
 
 namespace chip {
 

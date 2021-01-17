@@ -43,12 +43,16 @@ using namespace chip::Transport;
 
 namespace chip {
 
-CHIP_ERROR RendezvousSession::Init(const RendezvousParameters & params, TransportMgrBase * transportMgr)
+CHIP_ERROR RendezvousSession::Init(const RendezvousParameters & params, TransportMgrBase * transportMgr,
+                                   SecureSessionMgr * sessionMgr)
 {
     mParams       = params;
     mTransportMgr = transportMgr;
     VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(sessionMgr != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mParams.HasSetupPINCode(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    mSecureSessionMgr = sessionMgr;
 
     // TODO: BLE Should be a transport, in that case, RendezvousSession and BLE should decouple
     if (params.GetPeerAddress().GetTransportType() == Transport::Type::kBle)
@@ -82,6 +86,16 @@ CHIP_ERROR RendezvousSession::Init(const RendezvousParameters & params, Transpor
 
 RendezvousSession::~RendezvousSession()
 {
+    if (mPairingSessionHandle != nullptr)
+    {
+        Transport::PeerConnectionState * state = mSecureSessionMgr->GetPeerConnectionState(*mPairingSessionHandle);
+        if (state != nullptr)
+        {
+            state->SetTransport(nullptr);
+        }
+        chip::Platform::Delete(mPairingSessionHandle);
+    }
+
     if (mTransport)
     {
         chip::Platform::Delete(mTransport);
@@ -117,14 +131,12 @@ CHIP_ERROR RendezvousSession::SendPairingMessage(const PacketHeader & header, co
 CHIP_ERROR RendezvousSession::SendSecureMessage(Protocols::CHIPProtocolId protocol, uint8_t msgType,
                                                 System::PacketBufferHandle msgBuf)
 {
+    VerifyOrReturnError(mPairingSessionHandle != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
     PayloadHeader payloadHeader;
     payloadHeader.SetProtocolID(static_cast<uint16_t>(protocol)).SetMessageType(msgType);
 
-    PacketHeader packetHeader;
-    ReturnErrorOnFailure(SecureMessageCodec::Encode(mParams.GetLocalNodeId().ValueOr(kUndefinedNodeId),
-                                                    &mPairingSession.PeerConnection(), payloadHeader, packetHeader, msgBuf));
-
-    return mTransport->SendMessage(packetHeader, Transport::PeerAddress::BLE(), std::move(msgBuf));
+    return mSecureSessionMgr->SendMessage(*mPairingSessionHandle, payloadHeader, std::move(msgBuf));
 }
 
 void RendezvousSession::OnPairingError(CHIP_ERROR err)
@@ -134,6 +146,17 @@ void RendezvousSession::OnPairingError(CHIP_ERROR err)
 
 void RendezvousSession::OnPairingComplete()
 {
+    CHIP_ERROR err =
+        mSecureSessionMgr->NewPairing(Optional<Transport::PeerAddress>::Value(mPairingSession.PeerConnection().GetPeerAddress()),
+                                      mPairingSession.PeerConnection().GetPeerNodeId(), &mPairingSession, mTransport);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Ble, "Failed in setting up secure channel: err %d", err);
+        return;
+    }
+    mPairingSessionHandle = chip::Platform::New<SecureSessionHandle>(mPairingSession.PeerConnection().GetPeerNodeId(),
+                                                                     mPairingSession.PeerConnection().GetPeerKeyID());
+
     // TODO: This check of BLE transport should be removed in the future, after we have network provisioning cluster and ble becomes
     // a transport.
     if (mParams.GetPeerAddress().GetTransportType() != Transport::Type::kBle || // For rendezvous initializer
@@ -326,6 +349,7 @@ CHIP_ERROR RendezvousSession::HandleSecureMessage(const PacketHeader & packetHea
     {
         ChipLogProgress(Ble, "Received rendezvous message for %llu", packetHeader.GetDestinationNodeId().Value());
         mParams.SetLocalNodeId(packetHeader.GetDestinationNodeId().Value());
+        mSecureSessionMgr->SetLocalNodeID(packetHeader.GetDestinationNodeId().Value());
     }
 
     if (packetHeader.GetSourceNodeId().HasValue() && !mParams.HasRemoteNodeId())

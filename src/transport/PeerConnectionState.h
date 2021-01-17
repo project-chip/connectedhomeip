@@ -22,6 +22,7 @@
 #pragma once
 
 #include <transport/SecureSession.h>
+#include <transport/raw/Base.h>
 #include <transport/raw/MessageHeader.h>
 #include <transport/raw/PeerAddress.h>
 
@@ -56,6 +57,9 @@ public:
     const PeerAddress & GetPeerAddress() const { return mPeerAddress; }
     PeerAddress & GetPeerAddress() { return mPeerAddress; }
     void SetPeerAddress(const PeerAddress & address) { mPeerAddress = address; }
+
+    void SetTransport(Transport::Base * transport) { mTransport = transport; }
+    Transport::Base * GetTransport() { return mTransport; }
 
     NodeId GetPeerNodeId() const { return mPeerNodeId; }
     void SetPeerNodeId(NodeId peerNodeId) { mPeerNodeId = peerNodeId; }
@@ -95,11 +99,12 @@ public:
 
 private:
     PeerAddress mPeerAddress;
-    NodeId mPeerNodeId         = kUndefinedNodeId;
-    uint32_t mSendMessageIndex = 0;
-    uint16_t mPeerKeyID        = UINT16_MAX;
-    uint16_t mLocalKeyID       = UINT16_MAX;
-    uint64_t mLastActityTimeMs = 0;
+    NodeId mPeerNodeId           = kUndefinedNodeId;
+    uint32_t mSendMessageIndex   = 0;
+    uint16_t mPeerKeyID          = UINT16_MAX;
+    uint16_t mLocalKeyID         = UINT16_MAX;
+    uint64_t mLastActityTimeMs   = 0;
+    Transport::Base * mTransport = nullptr;
     SecureSession mSecureSession;
 };
 
