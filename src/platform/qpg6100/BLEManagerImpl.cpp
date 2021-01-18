@@ -738,7 +738,7 @@ void BLEManagerImpl::HandleAttMsg(qvCHIP_Ble_AttEvt_t * pAttEvt)
     }
     case QVCHIP_ATTS_HANDLE_VALUE_CNF: {
         ChipDeviceEvent event;
-        
+
         event.Type                          = DeviceEventType::kCHIPoBLEIndicateConfirm;
         event.CHIPoBLEIndicateConfirm.ConId = pAttEvt->hdr.param;
         PlatformMgr().PostEvent(&event);
