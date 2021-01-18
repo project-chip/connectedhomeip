@@ -692,7 +692,7 @@ void BLEManagerImpl::HandleDmMsg(qvCHIP_Ble_DmEvt_t * pDmEvt)
 
         // If this was a CHIPoBLE connection, release the associated connection state record
         // and post an event to deliver a connection error to the CHIPoBLE layer.
-        if(UnsetSubscribed(pDmEvt->connClose.hdr.param))
+        if (UnsetSubscribed(pDmEvt->connClose.hdr.param))
         {
             ChipDeviceEvent event;
             event.Type                          = DeviceEventType::kCHIPoBLEConnectionError;
