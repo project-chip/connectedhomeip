@@ -49,6 +49,7 @@
 #include <app/util/af.h>
 #include <app/util/binding-table.h>
 
+#include "gen/attribute-type.h"
 #include "gen/cluster-id.h"
 #include "gen/command-id.h"
 

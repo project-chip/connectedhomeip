@@ -78,7 +78,6 @@
 
 #include "gen/att-storage.h"
 #include "gen/attribute-id.h"
-#include "gen/attribute-type.h"
 
 /** @name Attribute Storage */
 // @{
