@@ -45,6 +45,7 @@
 #include "af.h"
 #include "common.h"
 
+#include "gen/callback.h"
 #include "gen/command-id.h"
 
 #ifdef EMBER_AF_PLUGIN_GROUPS_SERVER

@@ -48,6 +48,7 @@
 #include <app/reporting/reporting.h>
 #endif // EMBER_AF_PLUGIN_REPORTING
 
+#include "gen/callback.h"
 #include "gen/command-id.h"
 
 #ifdef EMBER_AF_PLUGIN_COMMS_HUB_FUNCTION_SUB_GHZ
