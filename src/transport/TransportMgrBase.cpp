@@ -22,7 +22,8 @@
 
 namespace chip {
 
-CHIP_ERROR TransportMgrBase::SendMessage(const PacketHeader & header, const Transport::PeerAddress & address, System::PacketBufferHandle && msgBuf)
+CHIP_ERROR TransportMgrBase::SendMessage(const PacketHeader & header, const Transport::PeerAddress & address,
+                                         System::PacketBufferHandle && msgBuf)
 {
     return mTransport->SendMessage(header, address, std::move(msgBuf));
 }
@@ -47,8 +48,7 @@ CHIP_ERROR TransportMgrBase::Init(Transport::Base * transport)
 void TransportMgrBase::HandleMessageReceived(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
                                              System::PacketBufferHandle && msg)
 {
-    TransportMgrDelegate * handler =
-        packetHeader.GetFlags().Has(Header::FlagValues::kSecure) ? mSecureSessionMgr : mRendezvous;
+    TransportMgrDelegate * handler = packetHeader.GetFlags().Has(Header::FlagValues::kSecure) ? mSecureSessionMgr : mRendezvous;
     if (handler != nullptr)
     {
         handler->OnMessageReceived(packetHeader, peerAddress, std::move(msg));

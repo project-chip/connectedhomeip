@@ -35,7 +35,8 @@ class TransportMgrBase : public Transport::RawTransportDelegate
 public:
     CHIP_ERROR Init(Transport::Base * transport);
 
-    CHIP_ERROR SendMessage(const PacketHeader & header, const Transport::PeerAddress & address, System::PacketBufferHandle && msgBuf);
+    CHIP_ERROR SendMessage(const PacketHeader & header, const Transport::PeerAddress & address,
+                           System::PacketBufferHandle && msgBuf);
 
     void Disconnect(const Transport::PeerAddress & address);
 

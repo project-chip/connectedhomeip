@@ -36,8 +36,9 @@ namespace Transport {
 class RawTransportDelegate
 {
 public:
-    virtual ~RawTransportDelegate() = 0;
-    virtual void HandleMessageReceived(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress, System::PacketBufferHandle && msg) = 0;
+    virtual ~RawTransportDelegate()                                       = 0;
+    virtual void HandleMessageReceived(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
+                                       System::PacketBufferHandle && msg) = 0;
 };
 
 inline RawTransportDelegate::~RawTransportDelegate() {}
@@ -58,10 +59,7 @@ public:
      * @param[in] param   The argument to pass in to the handler function
      *
      */
-    void SetOwner(RawTransportDelegate * owner)
-    {
-        mDelegate = owner;
-    }
+    void SetOwner(RawTransportDelegate * owner) { mDelegate = owner; }
 
     /**
      * @brief Send a message to the specified target.
