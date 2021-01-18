@@ -41,6 +41,8 @@
 #include "barrier-control-server.h"
 #include <app/util/af.h>
 
+#include "gen/af-structs.h"
+
 #include <assert.h>
 
 // We need this for initializating default reporting configurations.

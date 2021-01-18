@@ -45,6 +45,8 @@
 #include <app/util/attribute-storage.h>
 #include <assert.h>
 
+#include "gen/af-structs.h"
+
 #ifdef EMBER_AF_PLUGIN_REPORTING
 #include <app/reporting/reporting.h>
 #endif

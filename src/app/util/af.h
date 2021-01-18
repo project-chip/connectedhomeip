@@ -76,7 +76,6 @@
 #include "debug-printing.h"
 #include "ember-print.h"
 
-#include "gen/af-structs.h"
 #include "gen/att-storage.h"
 #include "gen/attribute-id.h"
 #include "gen/attribute-type.h"
