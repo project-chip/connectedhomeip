@@ -24,7 +24,6 @@
 #include "command-id.h"
 #include "util.h"
 
-
 using namespace chip;
 
 EmberAfStatus emberAfLevelControlClusterServerCommandParse(EmberAfClusterCommand * cmd);
