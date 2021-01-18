@@ -249,6 +249,12 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetThreadProvis
         newDataset.mComponents.mIsChannelPresent = true;
     }
 
+    if (netInfo.ThreadDatasetTimestamp != 0)
+    {
+        newDataset.mActiveTimestamp                      = netInfo.ThreadDatasetTimestamp;
+        newDataset.mComponents.mIsActiveTimestampPresent = true;
+    }
+
     // Set the dataset as the active dataset for the node.
     Impl()->LockThreadStack();
     otErr = otDatasetSetActive(mOTInst, &newDataset);
