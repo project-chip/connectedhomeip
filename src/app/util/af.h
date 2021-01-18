@@ -76,7 +76,6 @@
 #include "debug-printing.h"
 #include "ember-print.h"
 
-#include "gen/att-storage.h"
 #include "gen/attribute-id.h"
 
 /** @name Attribute Storage */
