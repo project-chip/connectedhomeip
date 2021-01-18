@@ -46,6 +46,7 @@
 #include <assert.h>
 
 #include "gen/af-structs.h"
+#include "gen/attribute-id.h"
 #include "gen/attribute-type.h"
 #include "gen/cluster-id.h"
 

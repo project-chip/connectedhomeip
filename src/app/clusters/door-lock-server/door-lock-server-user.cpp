@@ -43,6 +43,7 @@
 #include "door-lock-server.h"
 #include "time-util.h"
 
+#include "gen/attribute-id.h"
 #include "gen/attribute-type.h"
 #include "gen/cluster-id.h"
 #include "gen/command-id.h"

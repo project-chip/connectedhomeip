@@ -57,6 +57,7 @@
 #include <system/SystemLayer.h>
 
 #include "gen/att-storage.h"
+#include "gen/attribute-id.h"
 #include "gen/attribute-type.h"
 #include "gen/callback.h"
 #include "gen/cluster-id.h"

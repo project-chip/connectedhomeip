@@ -42,6 +42,7 @@
 #include "door-lock-server.h"
 #include <assert.h>
 
+#include "gen/attribute-id.h"
 #include "gen/callback.h"
 #include "gen/cluster-id.h"
 #include "gen/command-id.h"

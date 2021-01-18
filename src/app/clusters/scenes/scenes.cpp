@@ -42,6 +42,7 @@
 #include "app/util/common.h"
 #include <app/util/af.h>
 
+#include "gen/attribute-id.h"
 #include "gen/attribute-type.h"
 #include "gen/cluster-id.h"
 #include "gen/command-id.h"
