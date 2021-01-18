@@ -41,7 +41,6 @@
 
 #include "af.h"
 #include "attribute-storage.h"
-#include "gen/callback.h"
 
 #include <platform/CHIPDeviceLayer.h>
 #include <system/SystemTimer.h>
