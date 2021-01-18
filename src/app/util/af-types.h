@@ -51,8 +51,8 @@
 #include <stddef.h>  // For NULL.
 #include <stdint.h>  // For various uint*_t types
 
+#include "af-enums.h"
 #include "basic-types.h"
-#include "gen/enums.h"
 #include "types_stub.h" // For various types.
 
 #ifdef EZSP_HOST
