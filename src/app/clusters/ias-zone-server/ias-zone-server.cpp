@@ -57,6 +57,7 @@
 #include <system/SystemLayer.h>
 
 #include "gen/callback.h"
+#include "gen/cluster-id.h"
 #include "gen/command-id.h"
 
 using namespace chip;

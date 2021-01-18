@@ -46,6 +46,7 @@
 #include <assert.h>
 
 #include "gen/af-structs.h"
+#include "gen/cluster-id.h"
 
 #ifdef EMBER_AF_PLUGIN_REPORTING
 #include <app/reporting/reporting.h>

@@ -49,6 +49,7 @@
 #endif // EMBER_AF_PLUGIN_REPORTING
 
 #include "gen/callback.h"
+#include "gen/cluster-id.h"
 #include "gen/command-id.h"
 
 #ifdef EMBER_AF_PLUGIN_COMMS_HUB_FUNCTION_SUB_GHZ

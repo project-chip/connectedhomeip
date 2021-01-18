@@ -20,8 +20,10 @@
 #include "af-structs.h"
 #include "call-command-handler.h"
 #include "callback.h"
+#include "cluster-id.h"
 #include "command-id.h"
 #include "util.h"
+
 
 using namespace chip;
 

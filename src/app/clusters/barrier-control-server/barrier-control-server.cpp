@@ -42,6 +42,7 @@
 #include <app/util/af.h>
 
 #include "gen/af-structs.h"
+#include "gen/cluster-id.h"
 
 #include <assert.h>
 

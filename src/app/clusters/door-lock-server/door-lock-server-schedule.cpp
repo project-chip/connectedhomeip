@@ -40,6 +40,7 @@
 #include "af.h"
 #include "door-lock-server.h"
 
+#include "gen/cluster-id.h"
 #include "gen/command-id.h"
 
 static EmberAfPluginDoorLockServerWeekdayScheduleEntry

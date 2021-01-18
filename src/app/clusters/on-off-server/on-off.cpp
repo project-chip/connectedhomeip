@@ -41,6 +41,8 @@
 #include "on-off.h"
 
 #include "af.h"
+
+#include "gen/cluster-id.h"
 #include "gen/command-id.h"
 
 #ifdef EMBER_AF_PLUGIN_REPORTING
