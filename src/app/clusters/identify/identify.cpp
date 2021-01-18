@@ -49,6 +49,8 @@
 // this file contains all the common includes for clusters in the util
 #include <app/util/af.h>
 
+#include "gen/command-id.h"
+
 #include "common.h"
 
 using namespace chip;

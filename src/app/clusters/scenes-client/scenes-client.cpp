@@ -41,6 +41,8 @@
 #include "scenes-client.h"
 #include <app/util/af.h>
 
+#include "gen/command-id.h"
+
 using namespace chip;
 
 bool emberAfScenesClusterAddSceneResponseCallback(uint8_t status, GroupId groupId, uint8_t sceneId)

@@ -40,13 +40,12 @@
  *******************************************************************************
  ******************************************************************************/
 
+#include "af-event.h"
 #include "af-main.h"
 #include "af.h"
 #include "common.h"
-//#include "../plugin/time-server/time-server.h"
-#include "af-event.h"
-//#include "app/framework/util/time-util.h"
-//#include "hal/micro/crc.h"
+
+#include "gen/command-id.h"
 
 #ifdef EMBER_AF_PLUGIN_GROUPS_SERVER
 #include <app/clusters/groups-server/groups-server.h>

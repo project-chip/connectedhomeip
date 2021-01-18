@@ -82,7 +82,6 @@
 #include "gen/attribute-type.h"
 #include "gen/callback.h"
 #include "gen/cluster-id.h"
-#include "gen/command-id.h"
 #include "gen/print-cluster.h"
 
 /** @name Attribute Storage */

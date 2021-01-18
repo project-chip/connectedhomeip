@@ -42,6 +42,8 @@
 #include "app/util/common.h"
 #include <app/util/af.h>
 
+#include "gen/command-id.h"
+
 #ifdef EMBER_AF_PLUGIN_GROUPS_SERVER
 #include <app/clusters/groups-server/groups-server.h>
 #endif

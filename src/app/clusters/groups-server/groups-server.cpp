@@ -49,6 +49,8 @@
 #include <app/util/af.h>
 #include <app/util/binding-table.h>
 
+#include "gen/command-id.h"
+
 #ifdef EMBER_AF_PLUGIN_SCENES
 #include <app/clusters/scenes/scenes.h>
 #endif // EMBER_AF_PLUGIN_SCENES

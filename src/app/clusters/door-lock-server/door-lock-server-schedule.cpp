@@ -40,6 +40,8 @@
 #include "af.h"
 #include "door-lock-server.h"
 
+#include "gen/command-id.h"
+
 static EmberAfPluginDoorLockServerWeekdayScheduleEntry
     weekdayScheduleTable[EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_WEEKDAY_SCHEDULE_TABLE_SIZE];
 static EmberAfPluginDoorLockServerYeardayScheduleEntry

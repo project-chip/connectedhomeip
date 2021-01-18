@@ -43,6 +43,8 @@
 #include "door-lock-server.h"
 #include "time-util.h"
 
+#include "gen/command-id.h"
+
 #include <support/CodeUtils.h>
 
 using namespace chip;

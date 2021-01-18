@@ -42,6 +42,8 @@
 #include "door-lock-server.h"
 #include <assert.h>
 
+#include "gen/command-id.h"
+
 #include <support/CodeUtils.h>
 
 using namespace chip;
