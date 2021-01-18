@@ -68,22 +68,10 @@
 #include "stack/include/ember-random-api.h"
 #include "stack/include/ember-types.h"
 #include "stack/include/error.h"
-#else
-// Includes needed for ember related functions for the SoC
-//  #include "stack/include/ember.h"
 #endif // EZSP_HOST
-
-// HAL - hardware abstraction layer
-//#include "hal/hal.h"
-//#include "plugin/serial/serial.h"  // Serial utility APIs
-
-//#include "stack/include/event.h"
-//#include "stack/include/error.h"
 
 #include "af-types.h"
 
-//#include "app/framework/util/print.h"
-//#include "app/framework/util/time-util.h"
 #include "client-api.h"
 #include "debug-printing.h"
 #include "ember-print.h"
@@ -96,10 +84,7 @@
 #include "gen/callback.h"
 #include "gen/cluster-id.h"
 #include "gen/command-id.h"
-#include "gen/enums.h"
 #include "gen/print-cluster.h"
-//#include "app/util/serial/command-interpreter2.h"
-//#include "app/framework/cli/zcl-cli.h"
 
 /** @name Attribute Storage */
 // @{

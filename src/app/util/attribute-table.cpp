@@ -49,8 +49,6 @@
 // for pulling in defines dealing with EITHER server or client
 #include "af-main.h"
 
-#include "gen/enums.h"
-
 #ifdef EMBER_AF_PLUGIN_REPORTING
 #include <app/reporting/reporting.h>
 #endif // EMBER_AF_PLUGIN_REPORTING
