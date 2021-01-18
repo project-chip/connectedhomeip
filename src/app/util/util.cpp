@@ -47,6 +47,7 @@
 
 #include "gen/callback.h"
 #include "gen/command-id.h"
+#include "gen/print-cluster.h"
 
 #ifdef EMBER_AF_PLUGIN_GROUPS_SERVER
 #include <app/clusters/groups-server/groups-server.h>
