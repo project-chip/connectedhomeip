@@ -34,7 +34,6 @@ void __attribute__((weak)) OnLogOutput(void) {}
 
 namespace chip {
 namespace Logging {
-namespace Platform {
 
 /**
  * CHIP log output function.
