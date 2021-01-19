@@ -228,7 +228,7 @@ public:
      * @brief
      *   Set local node ID
      *
-     * @param localNodeId    Node id for the current node
+     * @param nodeId    Node id for the current node
      */
     void SetLocalNodeID(NodeId nodeId) { mLocalNodeId = nodeId; }
 
