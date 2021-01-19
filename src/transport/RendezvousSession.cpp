@@ -197,16 +197,7 @@ void RendezvousSession::OnRendezvousConnectionOpened()
 
 void RendezvousSession::OnRendezvousConnectionClosed()
 {
-    if (mParams.IsController())
-    {
-        return;
-    }
-
-    CHIP_ERROR err = WaitForPairing(mParams.GetLocalNodeId(), mParams.GetSetupPINCode());
-    if (err != CHIP_NO_ERROR)
-    {
-        OnPairingError(err);
-    }
+    ReleasePairingSessionHandle();
 }
 
 void RendezvousSession::OnRendezvousError(CHIP_ERROR err)
