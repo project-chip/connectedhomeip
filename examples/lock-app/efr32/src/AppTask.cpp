@@ -27,6 +27,8 @@
 #include "Server.h"
 #include "Service.h"
 #include "attribute-storage.h"
+#include "gen/attribute-id.h"
+#include "gen/attribute-type.h"
 #include "gen/cluster-id.h"
 #include "lcd.h"
 #include "qrcodegen.h"
