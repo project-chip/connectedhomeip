@@ -1,7 +1,7 @@
 /*
  *
  *    Copyright (c) 2020-2021 Project CHIP Authors
- *    Copyright (c) 2016-2017 Nest Labs, Inc.
+ *    Copyright (c) 2016-2021 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -585,6 +585,34 @@ void PacketBufferHandle::RightSizeForMemoryAlloc()
 }
 
 #endif
+
+PacketBufBound::PacketBufBound(size_t aAvailableSize, uint16_t aReservedSize) : BufBound(nullptr, 0)
+{
+    mPacket = PacketBufferHandle::New(aAvailableSize, aReservedSize);
+    if (!mPacket.IsNull())
+    {
+        mBuf  = mPacket->Start();
+        mSize = aAvailableSize;
+    }
+}
+
+PacketBufferHandle PacketBufBound::Finalize()
+{
+    if (!mPacket.IsNull() && (mNeeded <= mSize))
+    {
+        // Since mPacket was successfully allocated to hold the maximum length,
+        // we know that the actual length fits in a uint16_t.
+        mPacket->SetDataLength(static_cast<uint16_t>(mNeeded));
+    }
+    else
+    {
+        mPacket = nullptr;
+    }
+    mBuf    = nullptr;
+    mSize   = 0;
+    mNeeded = 0;
+    return std::move(mPacket);
+}
 
 } // namespace System
 } // namespace chip

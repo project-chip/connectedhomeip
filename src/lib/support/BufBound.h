@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ namespace chip {
  */
 class BufBound
 {
-private:
+protected:
     uint8_t * mBuf;
     size_t mSize;
     size_t mNeeded;

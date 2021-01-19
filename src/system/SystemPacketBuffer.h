@@ -1,7 +1,7 @@
 /*
  *
  *    Copyright (c) 2020-2021 Project CHIP Authors
- *    Copyright (c) 2016-2017 Nest Labs, Inc.
+ *    Copyright (c) 2016-2021 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@
 #include <system/SystemConfig.h>
 
 // Include dependent headers
+#include <support/BufBound.h>
 #include <support/CodeUtils.h>
 #include <support/DLLUtil.h>
 #include <system/SystemAlignSize.h>
@@ -631,6 +632,44 @@ inline PacketBufferHandle PacketBuffer::Last()
         p = p->ChainedBuffer();
     return PacketBufferHandle::Hold(p);
 }
+
+/**
+ * BufBound backed by packet buffer.
+ */
+class PacketBufBound : public BufBound
+{
+public:
+    /**
+     * Constructs a BufBound that writes into a newly allocated packet buffer.
+     *
+     *  If no memory is available, or if the size requested is too large, then \c IsNull() will be true.
+     *  Otherwise, it is guaranteed that the available space is no less than \a aAvailableSize.
+     *
+     *  @param[in]  aAvailableSize  Minimim number of octets to allocate after the cursor.
+     *  @param[in]  aReservedSize   Minimum number of octets to reserve behind the cursor.
+     */
+    PacketBufBound(size_t aAvailableSize, uint16_t aReservedSize = CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE);
+
+    /**
+     * Test whether this PacketBufBound has a backing packet buffer.
+     *
+     * @return \c true if construction failed or if \c Finalize() has been called.
+     */
+    bool IsNull() const { return mPacket.IsNull(); }
+
+    /**
+     * Obtain the backing packet buffer, if it is valid.
+     *
+     *  Given that construction succeeded, \c Finalize() has not already been called,
+     *  and no Put overflowed the available space, the caller takes ownership of a
+     *  buffer containing the desired data. Otherwise, the returned handle tests null,
+     *  and any underlying storage has been released.
+     */
+    PacketBufferHandle Finalize();
+
+private:
+    PacketBufferHandle mPacket;
+};
 
 } // namespace System
 } // namespace chip

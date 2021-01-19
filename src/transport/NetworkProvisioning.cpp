@@ -193,21 +193,17 @@ CHIP_ERROR NetworkProvisioning::SendNetworkCredentials(const char * ssid, const 
     const size_t bufferSize = EncodedStringSize(ssid) + EncodedStringSize(passwd);
     VerifyOrExit(CanCastTo<uint16_t>(bufferSize), err = CHIP_ERROR_INVALID_ARGUMENT);
     {
-        System::PacketBufferHandle buffer = System::PacketBufferHandle::New(bufferSize);
-        BufBound bbuf(buffer->Start(), buffer->AvailableDataLength());
+        System::PacketBufBound bbuf(bufferSize);
 
         ChipLogProgress(NetworkProvisioning, "Sending Network Creds. Delegate %p\n", mDelegate);
         VerifyOrExit(mDelegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-        VerifyOrExit(!buffer.IsNull(), err = CHIP_ERROR_NO_MEMORY);
+        VerifyOrExit(!bbuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
         SuccessOrExit(EncodeString(ssid, bbuf));
         SuccessOrExit(EncodeString(passwd, bbuf));
         VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_BUFFER_TOO_SMALL);
 
-        VerifyOrExit(CanCastTo<uint16_t>(bbuf.Needed()), err = CHIP_ERROR_INVALID_ARGUMENT);
-        buffer->SetDataLength(static_cast<uint16_t>(bbuf.Needed()));
-
         err = mDelegate->SendSecureMessage(Protocols::kProtocol_NetworkProvisioning,
-                                           NetworkProvisioning::MsgTypes::kWiFiAssociationRequest, std::move(buffer));
+                                           NetworkProvisioning::MsgTypes::kWiFiAssociationRequest, bbuf.Finalize());
         SuccessOrExit(err);
     }
 
@@ -231,31 +227,26 @@ CHIP_ERROR NetworkProvisioning::SendThreadCredentials(const DeviceLayer::Interna
         4;                  // threadData.ThreadChannel, threadData.FieldPresent.ThreadExtendedPANId,
                             // threadData.FieldPresent.ThreadMeshPrefix, threadData.FieldPresent.ThreadPSKc
     /* clang-format on */
-    System::PacketBufferHandle buffer = System::PacketBufferHandle::New(credentialSize);
+    System::PacketBufBound bbuf(credentialSize);
 
     ChipLogProgress(NetworkProvisioning, "Sending Thread Credentials");
     VerifyOrExit(mDelegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(!buffer.IsNull(), err = CHIP_ERROR_NO_MEMORY);
+    VerifyOrExit(!bbuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
-    {
-        BufBound bbuf(buffer->Start(), buffer->AvailableDataLength());
-        bbuf.Put(threadData.ThreadNetworkName, sizeof(threadData.ThreadNetworkName));
-        bbuf.Put(threadData.ThreadExtendedPANId, sizeof(threadData.ThreadExtendedPANId));
-        bbuf.Put(threadData.ThreadMeshPrefix, sizeof(threadData.ThreadMeshPrefix));
-        bbuf.Put(threadData.ThreadMasterKey, sizeof(threadData.ThreadMasterKey));
-        bbuf.Put(threadData.ThreadPSKc, sizeof(threadData.ThreadPSKc));
-        bbuf.Put16(threadData.ThreadPANId);
-        bbuf.Put(threadData.ThreadChannel);
-        bbuf.Put(static_cast<uint8_t>(threadData.FieldPresent.ThreadExtendedPANId));
-        bbuf.Put(static_cast<uint8_t>(threadData.FieldPresent.ThreadMeshPrefix));
-        bbuf.Put(static_cast<uint8_t>(threadData.FieldPresent.ThreadPSKc));
+    bbuf.Put(threadData.ThreadNetworkName, sizeof(threadData.ThreadNetworkName));
+    bbuf.Put(threadData.ThreadExtendedPANId, sizeof(threadData.ThreadExtendedPANId));
+    bbuf.Put(threadData.ThreadMeshPrefix, sizeof(threadData.ThreadMeshPrefix));
+    bbuf.Put(threadData.ThreadMasterKey, sizeof(threadData.ThreadMasterKey));
+    bbuf.Put(threadData.ThreadPSKc, sizeof(threadData.ThreadPSKc));
+    bbuf.Put16(threadData.ThreadPANId);
+    bbuf.Put(threadData.ThreadChannel);
+    bbuf.Put(static_cast<uint8_t>(threadData.FieldPresent.ThreadExtendedPANId));
+    bbuf.Put(static_cast<uint8_t>(threadData.FieldPresent.ThreadMeshPrefix));
+    bbuf.Put(static_cast<uint8_t>(threadData.FieldPresent.ThreadPSKc));
 
-        VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_BUFFER_TOO_SMALL);
-        buffer->SetDataLength(static_cast<uint16_t>(bbuf.Needed()));
-
-        err = mDelegate->SendSecureMessage(Protocols::kProtocol_NetworkProvisioning,
-                                           NetworkProvisioning::MsgTypes::kThreadAssociationRequest, std::move(buffer));
-    }
+    VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_BUFFER_TOO_SMALL);
+    err = mDelegate->SendSecureMessage(Protocols::kProtocol_NetworkProvisioning,
+                                       NetworkProvisioning::MsgTypes::kThreadAssociationRequest, bbuf.Finalize());
 
 exit:
     if (CHIP_NO_ERROR != err)
