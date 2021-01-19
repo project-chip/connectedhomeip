@@ -192,6 +192,11 @@ CHIP_ERROR DeviceController::Shutdown()
         mSessionManager = nullptr;
     }
 
+    if (mTransportMgr != nullptr) {
+        chip::Platform::Delete(mTransportMgr);
+        mTransportMgr = nullptr;
+    }
+
     ReleaseAllDevices();
 
 exit:
