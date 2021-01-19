@@ -72,15 +72,15 @@ CHIP_ERROR AdditionalDataPayloadGenerator::generateRotatingDeviceId(char * rotat
                                                                     uint8_t & rotatingDeviceIdBufferSize)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    char mRotationCounterStr[ROTATING_DEVICE_ID_COUNTER_STR_LENGTH];
+    char rotationCounterStr[ROTATING_DEVICE_ID_COUNTER_STR_LENGTH];
     char hashInput[ROTATING_DEVICE_ID_COUNTER_STR_LENGTH + mSerialNumberBufferSize];
     char output[ROTATING_DEVICE_ID_COUNTER_STR_LENGTH + ROTATING_DEVICE_ID_HASH_SUFFIX_LENGTH];
     uint8_t hashOutputBuffer[kSHA256_Hash_Length];
     uint8_t outputIndex     = 0;
     uint8_t hashOutputIndex = 0;
 
-    sprintf(mRotationCounterStr, "%d", mRotationCounter);
-    strcpy(hashInput, mRotationCounterStr);
+    sprintf(rotationCounterStr, "%d", mRotationCounter);
+    strcpy(hashInput, rotationCounterStr);
     strcat(hashInput, mSerialNumberBuffer);
 
     err = Hash_SHA256(reinterpret_cast<unsigned char *>(const_cast<char *>(hashInput)),
@@ -89,9 +89,9 @@ CHIP_ERROR AdditionalDataPayloadGenerator::generateRotatingDeviceId(char * rotat
 
     // Computing the Rotating Device Id
     // RDI = Rotation_Counter + SuffixBytes(HMAC_SHA256(Serial_Number + Rotation_Counter), 16)
-    while (outputIndex < ROTATING_DEVICE_ID_COUNTER_STR_LENGTH && mRotationCounterStr[outputIndex] != '\0')
+    while (outputIndex < ROTATING_DEVICE_ID_COUNTER_STR_LENGTH && rotationCounterStr[outputIndex] != '\0')
     {
-        output[outputIndex] = mRotationCounterStr[outputIndex];
+        output[outputIndex] = rotationCounterStr[outputIndex];
         outputIndex++;
     }
 
