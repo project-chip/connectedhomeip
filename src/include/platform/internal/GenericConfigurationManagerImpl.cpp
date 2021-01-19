@@ -27,6 +27,7 @@
 #define GENERIC_CONFIGURATION_MANAGER_IMPL_CPP
 
 #include <ble/CHIPBleServiceData.h>
+#include <core/CHIPConfig.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/GenericConfigurationManagerImpl.h>
 #include <support/Base64.h>

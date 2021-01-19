@@ -2109,6 +2109,17 @@
 #endif
 
 /**
+ * @def CHIP_CONFIG_PERSISTED_ROTATION_COUNTER_KEY
+ *
+ * @brief
+ *   Rotation Counter Key.
+ */
+#ifndef CHIP_CONFIG_PERSISTED_ROTATION_COUNTER_KEY
+#define CHIP_CONFIG_PERSISTED_ROTATION_COUNTER_KEY "rotation-counter"
+#endif
+
+
+/**
  *  @def CHIP_CONFIG_PERSISTED_STORAGE_ENC_MSG_CNTR_ID
  *
  *  @brief

@@ -112,13 +112,13 @@ static void CheckReboot(nlTestSuite * inSuite, void * inContext)
     value = counter.GetValue();
     NL_TEST_ASSERT(inSuite, value == 0);
 
-    // Now we "reboot", and we should get a count of 0x10000.
+    // Now we "reboot", and we should get a count of 0x0.
 
     err = counter2.Init(testKey, 0x10000);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     value = counter2.GetValue();
-    NL_TEST_ASSERT(inSuite, value == 0x10000);
+    NL_TEST_ASSERT(inSuite, value == 0);
 }
 
 static void CheckWriteNextCounterStart(nlTestSuite * inSuite, void * inContext)
