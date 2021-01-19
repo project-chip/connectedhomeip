@@ -86,15 +86,7 @@ CHIP_ERROR RendezvousSession::Init(const RendezvousParameters & params, Transpor
 
 RendezvousSession::~RendezvousSession()
 {
-    if (mPairingSessionHandle != nullptr)
-    {
-        Transport::PeerConnectionState * state = mSecureSessionMgr->GetPeerConnectionState(*mPairingSessionHandle);
-        if (state != nullptr)
-        {
-            state->SetTransport(nullptr);
-        }
-        chip::Platform::Delete(mPairingSessionHandle);
-    }
+    ReleasePairingSessionHandle();
 
     if (mTransport)
     {
@@ -151,11 +143,11 @@ void RendezvousSession::OnPairingComplete()
                                       mPairingSession.PeerConnection().GetPeerNodeId(), &mPairingSession, mTransport);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Ble, "Failed in setting up secure channel: err %d", err);
+        ChipLogError(Ble, "Failed in setting up secure channel: err %s", ErrorStr(err));
         return;
     }
-    mPairingSessionHandle = chip::Platform::New<SecureSessionHandle>(mPairingSession.PeerConnection().GetPeerNodeId(),
-                                                                     mPairingSession.PeerConnection().GetPeerKeyID());
+
+    InitPairingSessionHandle();
 
     // TODO: This check of BLE transport should be removed in the future, after we have network provisioning cluster and ble becomes
     // a transport.
@@ -366,9 +358,31 @@ CHIP_ERROR RendezvousSession::HandleSecureMessage(const PacketHeader & packetHea
     return CHIP_NO_ERROR;
 }
 
+void RendezvousSession::InitPairingSessionHandle()
+{
+    ReleasePairingSessionHandle();
+    mPairingSessionHandle = chip::Platform::New<SecureSessionHandle>(mPairingSession.PeerConnection().GetPeerNodeId(),
+                                                                     mPairingSession.PeerConnection().GetPeerKeyID());
+}
+
+void RendezvousSession::ReleasePairingSessionHandle()
+{
+    if (mPairingSessionHandle != nullptr)
+    {
+        Transport::PeerConnectionState * state = mSecureSessionMgr->GetPeerConnectionState(*mPairingSessionHandle);
+        if (state != nullptr)
+        {
+            state->SetTransport(nullptr);
+        }
+        chip::Platform::Delete(mPairingSessionHandle);
+        mPairingSessionHandle = nullptr;
+    }
+}
+
 CHIP_ERROR RendezvousSession::WaitForPairing(Optional<NodeId> nodeId, uint32_t setupPINCode)
 {
     UpdateState(State::kSecurePairing);
+    ReleasePairingSessionHandle();
     return mPairingSession.WaitForPairing(setupPINCode, kSpake2p_Iteration_Count,
                                           reinterpret_cast<const unsigned char *>(kSpake2pKeyExchangeSalt),
                                           strlen(kSpake2pKeyExchangeSalt), nodeId, 0, this);
@@ -377,6 +391,7 @@ CHIP_ERROR RendezvousSession::WaitForPairing(Optional<NodeId> nodeId, uint32_t s
 CHIP_ERROR RendezvousSession::Pair(Optional<NodeId> nodeId, uint32_t setupPINCode)
 {
     UpdateState(State::kSecurePairing);
+    ReleasePairingSessionHandle();
     return mPairingSession.Pair(mParams.GetPeerAddress(), setupPINCode, nodeId, mParams.GetRemoteNodeId().ValueOr(kUndefinedNodeId),
                                 mNextKeyId++, this);
 }

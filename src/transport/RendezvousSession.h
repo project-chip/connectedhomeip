@@ -161,6 +161,9 @@ private:
 
     RendezvousSession::State mCurrentState = State::kInit;
     void UpdateState(RendezvousSession::State newState, CHIP_ERROR err = CHIP_NO_ERROR);
+
+    void InitPairingSessionHandle();
+    void ReleasePairingSessionHandle();
 };
 
 } // namespace chip
