@@ -29,12 +29,31 @@
 #include <core/CHIPTLV.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <stdlib.h>
+#include <support/CHIPMem.h>
 
 using namespace chip;
 using namespace chip::System;
 using namespace chip::TLV;
 using namespace chip::Crypto;
 using namespace chip::SetupPayload;
+
+AdditionalDataPayloadGenerator::AdditionalDataPayloadGenerator(uint16_t rotationCounter, char * serialNumberBuffer,
+                                                               size_t serialNumberBufferSize) :
+    mRotationCounter(rotationCounter),
+    mSerialNumberBuffer(serialNumberBuffer), mSerialNumberBufferSize(serialNumberBufferSize)
+{
+    mHashInput =
+        reinterpret_cast<char *>(chip::Platform::MemoryAlloc(ROTATING_DEVICE_ID_COUNTER_STR_LENGTH + serialNumberBufferSize));
+}
+
+AdditionalDataPayloadGenerator::~AdditionalDataPayloadGenerator()
+{
+    if (mHashInput != nullptr)
+    {
+        chip::Platform::MemoryFree(mHashInput);
+        mHashInput = nullptr;
+    }
+}
 
 CHIP_ERROR AdditionalDataPayloadGenerator::generateAdditionalDataPayload(PacketBufferHandle & bufferHandle)
 {
@@ -73,17 +92,17 @@ CHIP_ERROR AdditionalDataPayloadGenerator::generateRotatingDeviceId(char * rotat
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     char rotationCounterStr[ROTATING_DEVICE_ID_COUNTER_STR_LENGTH];
-    char hashInput[ROTATING_DEVICE_ID_COUNTER_STR_LENGTH + mSerialNumberBufferSize];
+
     char output[ROTATING_DEVICE_ID_COUNTER_STR_LENGTH + ROTATING_DEVICE_ID_HASH_SUFFIX_LENGTH];
     uint8_t hashOutputBuffer[kSHA256_Hash_Length];
     uint8_t outputIndex     = 0;
     uint8_t hashOutputIndex = 0;
 
     sprintf(rotationCounterStr, "%d", mRotationCounter);
-    strcpy(hashInput, rotationCounterStr);
-    strcat(hashInput, mSerialNumberBuffer);
+    strcpy(mHashInput, rotationCounterStr);
+    strcat(mHashInput, mSerialNumberBuffer);
 
-    err = Hash_SHA256(reinterpret_cast<unsigned char *>(const_cast<char *>(hashInput)),
+    err = Hash_SHA256(reinterpret_cast<unsigned char *>(mHashInput),
                       ROTATING_DEVICE_ID_COUNTER_STR_LENGTH + mSerialNumberBufferSize, hashOutputBuffer);
     SuccessOrExit(err);
 
