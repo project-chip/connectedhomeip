@@ -194,16 +194,6 @@
 #endif
 
 /**
- * CHIP_DEVICE_CONFIG_ROTATION_COUNTER_NAME
- *
- * Rotation counter name.
- *
- */
-#ifndef CHIP_DEVICE_CONFIG_ROTATION_COUNTER_NAME
-#define CHIP_DEVICE_CONFIG_ROTATION_COUNTER_NAME "rotation-counter"
-#endif
-
-/**
  * CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION
  *
  * A string identifying the firmware revision running on the device.

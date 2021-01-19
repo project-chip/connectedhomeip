@@ -1276,7 +1276,6 @@ static void UpdateAdditionalDataCharacteristic(BluezGattCharacteristic1 * charac
     GVariant * cValue = nullptr;
     CHIP_ERROR err    = CHIP_NO_ERROR;
     chip::System::PacketBufferHandle bufferHandle;
-    AdditionalDataPayloadGenerator additionDataPayloadGenerator;
 
     char serialNumber[ConfigurationManager::kMaxSerialNumberLength + 1];
     size_t serialNumberSize;
@@ -1287,7 +1286,8 @@ static void UpdateAdditionalDataCharacteristic(BluezGattCharacteristic1 * charac
     err = ConfigurationMgr().GetRotationCounter(rotationCounter);
     SuccessOrExit(err);
 
-    err = additionDataPayloadGenerator.generateAdditionalDataPayload(rotationCounter, serialNumber, serialNumberSize, bufferHandle);
+    err =
+        AdditionalDataPayloadGenerator(rotationCounter, serialNumber, serialNumberSize).generateAdditionalDataPayload(bufferHandle);
     SuccessOrExit(err);
 
     cValue = g_variant_new_from_data(G_VARIANT_TYPE("ay"), bufferHandle->Start(), bufferHandle->DataLength(), TRUE, g_free,

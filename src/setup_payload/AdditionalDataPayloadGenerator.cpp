@@ -36,15 +36,13 @@ using namespace chip::TLV;
 using namespace chip::Crypto;
 using namespace chip::SetupPayload;
 
-CHIP_ERROR AdditionalDataPayloadGenerator::generateAdditionalDataPayload(uint16_t rotationCounter, char * serialNumberBuffer,
-                                                                         size_t serialNumberBufferSize,
-                                                                         PacketBufferHandle & bufferHandle)
+CHIP_ERROR AdditionalDataPayloadGenerator::generateAdditionalDataPayload(PacketBufferHandle & bufferHandle)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferTLVWriter writer;
     TLVWriter innerWriter;
     char rotatingDeviceIdBuffer[ROTATING_DEVICE_ID_LENGTH + 1];
-    size_t rotatingDeviceIdBufferSize;
+    uint8_t rotatingDeviceIdBufferSize;
 
     // Initialize TLVWriter
     writer.Init(PacketBuffer::New());
@@ -53,8 +51,7 @@ CHIP_ERROR AdditionalDataPayloadGenerator::generateAdditionalDataPayload(uint16_
     SuccessOrExit(err);
 
     // Generating Device Rotating Id
-    err = generateRotatingDeviceId(rotationCounter, serialNumberBuffer, serialNumberBufferSize, rotatingDeviceIdBuffer,
-                                   rotatingDeviceIdBufferSize);
+    err = generateRotatingDeviceId(rotatingDeviceIdBuffer, rotatingDeviceIdBufferSize);
     SuccessOrExit(err);
 
     // Adding the rotating device id to the TLV data
@@ -71,31 +68,30 @@ exit:
     return err;
 }
 
-CHIP_ERROR AdditionalDataPayloadGenerator::generateRotatingDeviceId(uint16_t rotationCounter, char * serialNumberBuffer,
-                                                                    size_t serialNumberBufferSize, char * rotatingDeviceIdBuffer,
-                                                                    size_t & rotatingDeviceIdBufferSize)
+CHIP_ERROR AdditionalDataPayloadGenerator::generateRotatingDeviceId(char * rotatingDeviceIdBuffer,
+                                                                    uint8_t & rotatingDeviceIdBufferSize)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    char rotationCounterStr[ROTATING_DEVICE_ID_COUNTER_STR_LENGTH];
-    char hashInput[ROTATING_DEVICE_ID_COUNTER_STR_LENGTH + serialNumberBufferSize];
+    char mRotationCounterStr[ROTATING_DEVICE_ID_COUNTER_STR_LENGTH];
+    char hashInput[ROTATING_DEVICE_ID_COUNTER_STR_LENGTH + mSerialNumberBufferSize];
     char output[ROTATING_DEVICE_ID_COUNTER_STR_LENGTH + ROTATING_DEVICE_ID_HASH_SUFFIX_LENGTH];
     uint8_t hashOutputBuffer[kSHA256_Hash_Length];
     uint8_t outputIndex     = 0;
     uint8_t hashOutputIndex = 0;
 
-    sprintf(rotationCounterStr, "%d", rotationCounter);
-    strcpy(hashInput, rotationCounterStr);
-    strcat(hashInput, serialNumberBuffer);
+    sprintf(mRotationCounterStr, "%d", mRotationCounter);
+    strcpy(hashInput, mRotationCounterStr);
+    strcat(hashInput, mSerialNumberBuffer);
 
     err = Hash_SHA256(reinterpret_cast<unsigned char *>(const_cast<char *>(hashInput)),
-                      ROTATING_DEVICE_ID_COUNTER_STR_LENGTH + serialNumberBufferSize, hashOutputBuffer);
+                      ROTATING_DEVICE_ID_COUNTER_STR_LENGTH + mSerialNumberBufferSize, hashOutputBuffer);
     SuccessOrExit(err);
 
     // Computing the Rotating Device Id
     // RDI = Rotation_Counter + SuffixBytes(HMAC_SHA256(Serial_Number + Rotation_Counter), 16)
-    while (outputIndex < ROTATING_DEVICE_ID_COUNTER_STR_LENGTH && rotationCounterStr[outputIndex] != '\0')
+    while (outputIndex < ROTATING_DEVICE_ID_COUNTER_STR_LENGTH && mRotationCounterStr[outputIndex] != '\0')
     {
-        output[outputIndex] = rotationCounterStr[outputIndex];
+        output[outputIndex] = mRotationCounterStr[outputIndex];
         outputIndex++;
     }
 

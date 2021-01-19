@@ -59,7 +59,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_Init()
     SetFlag(mFlags, kFlag_OperationalDeviceCredentialsProvisioned,
             Impl()->ConfigValueExists(ImplClass::kConfigKey_OperationalDeviceCert));
 
-    mRotationPersistedCounter.Init(CHIP_DEVICE_CONFIG_ROTATION_COUNTER_NAME, CHIP_DEVICE_CONFIG_ROTATION_COUNTER_EPOCH);
+    mRotationPersistedCounter.Init(CHIP_CONFIG_PERSISTED_ROTATION_COUNTER_KEY, CHIP_DEVICE_CONFIG_ROTATION_COUNTER_EPOCH);
 
     return CHIP_NO_ERROR;
 }
