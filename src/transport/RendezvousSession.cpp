@@ -372,7 +372,11 @@ void RendezvousSession::ReleasePairingSessionHandle()
         Transport::PeerConnectionState * state = mSecureSessionMgr->GetPeerConnectionState(*mPairingSessionHandle);
         if (state != nullptr)
         {
+            // Reset the transport and peer address in the active secure channel
+            // This will allow the regular transport (e.g. UDP) to take over the existing secure channel
+            PeerAddress addr;
             state->SetTransport(nullptr);
+            state->SetPeerAddress(addr);
         }
         chip::Platform::Delete(mPairingSessionHandle);
         mPairingSessionHandle = nullptr;
@@ -399,11 +403,13 @@ CHIP_ERROR RendezvousSession::Pair(Optional<NodeId> nodeId, uint32_t setupPINCod
 void RendezvousSession::SendNetworkCredentials(const char * ssid, const char * passwd)
 {
     mNetworkProvision.SendNetworkCredentials(ssid, passwd);
+    ReleasePairingSessionHandle();
 }
 
 void RendezvousSession::SendThreadCredentials(const DeviceLayer::Internal::DeviceNetworkInfo & threadData)
 {
     mNetworkProvision.SendThreadCredentials(threadData);
+    ReleasePairingSessionHandle();
 }
 
 void RendezvousSession::SendOperationalCredentials() {}
