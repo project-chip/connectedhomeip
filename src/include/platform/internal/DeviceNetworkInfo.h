@@ -102,8 +102,8 @@ public:
     /**< The Thread master key (NOT NULL-terminated). */
     uint8_t ThreadPSKc[kThreadPSKcLength];
     /**< The Thread pre-shared commissioner key (NOT NULL-terminated). */
-    uint16_t ThreadPANId;  /**< The 16-bit Thread PAN ID, or kThreadPANId_NotSpecified */
-    uint8_t ThreadChannel; /**< The Thread channel (currently [11..26]), or kThreadChannel_NotSpecified */
+    uint16_t ThreadPANId;            /**< The 16-bit Thread PAN ID, or kThreadPANId_NotSpecified */
+    uint8_t ThreadChannel;           /**< The Thread channel (currently [11..26]), or kThreadChannel_NotSpecified */
     uint64_t ThreadDatasetTimestamp; /**< Thread active dataset timestamp */
 };
 
