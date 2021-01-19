@@ -195,7 +195,7 @@ public:
      *
      *  @param[in] aPacket - the packet buffer to be added to the end of the current chain.
      */
-    void AddToEnd(PacketBufferHandle aPacket);
+    void AddToEnd(PacketBufferHandle && aPacket);
 
     /**
      * Move data from subsequent buffers in the chain into the current buffer until it is full.

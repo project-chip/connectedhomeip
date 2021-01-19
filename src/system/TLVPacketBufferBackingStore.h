@@ -38,7 +38,7 @@ class TLVPacketBufferBackingStore : public chip::TLV::TLVBackingStore
 {
 public:
     TLVPacketBufferBackingStore() : mHeadBuffer(nullptr), mCurrentBuffer(nullptr), mUseChainedBuffers(false) {}
-    TLVPacketBufferBackingStore(chip::System::PacketBufferHandle buffer, bool useChainedBuffers = false)
+    TLVPacketBufferBackingStore(chip::System::PacketBufferHandle && buffer, bool useChainedBuffers = false)
     {
         Init(std::move(buffer), useChainedBuffers);
     }
@@ -55,13 +55,13 @@ public:
      *
      * @note This must take place before initializing a TLV class with this backing store.
      */
-    void Init(chip::System::PacketBufferHandle buffer, bool useChainedBuffers = false)
+    void Init(chip::System::PacketBufferHandle && buffer, bool useChainedBuffers = false)
     {
         mHeadBuffer        = std::move(buffer);
         mCurrentBuffer     = mHeadBuffer.Retain();
         mUseChainedBuffers = useChainedBuffers;
     }
-    void Adopt(chip::System::PacketBufferHandle buffer) { Init(std::move(buffer), mUseChainedBuffers); }
+    void Adopt(chip::System::PacketBufferHandle && buffer) { Init(std::move(buffer), mUseChainedBuffers); }
 
     /**
      * Release ownership of the backing packet buffer.
@@ -98,7 +98,7 @@ public:
      *                       If true, advance to the next buffer in the chain once all data
      *                       in the current buffer has been consumed.
      */
-    void Init(chip::System::PacketBufferHandle buffer, bool useChainedBuffers = false)
+    void Init(chip::System::PacketBufferHandle && buffer, bool useChainedBuffers = false)
     {
         mBackingStore.Init(std::move(buffer), useChainedBuffers);
         chip::TLV::TLVReader::Init(mBackingStore);
@@ -120,7 +120,7 @@ public:
      *                       in the current buffer has been consumed. Once all existing buffers
      *                       have been used, new PacketBuffers will be allocated as necessary.
      */
-    void Init(chip::System::PacketBufferHandle buffer, bool useChainedBuffers = false)
+    void Init(chip::System::PacketBufferHandle && buffer, bool useChainedBuffers = false)
     {
         mBackingStore.Init(std::move(buffer), useChainedBuffers);
         chip::TLV::TLVWriter::Init(mBackingStore);

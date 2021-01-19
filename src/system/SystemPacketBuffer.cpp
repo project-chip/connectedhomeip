@@ -159,7 +159,7 @@ uint16_t PacketBuffer::ReservedSize() const
     return static_cast<uint16_t>(kDelta - CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE);
 }
 
-void PacketBuffer::AddToEnd(PacketBufferHandle aPacketHandle)
+void PacketBuffer::AddToEnd(PacketBufferHandle && aPacketHandle)
 {
     // Ownership of aPacketHandle's buffer is transferred to the end of the chain.
     PacketBuffer * aPacket = std::move(aPacketHandle).UnsafeRelease();

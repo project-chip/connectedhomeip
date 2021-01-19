@@ -92,14 +92,14 @@ Transport::Type SecureSessionMgr::GetTransportType(NodeId peerNodeId)
     return Transport::Type::kUndefined;
 }
 
-CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, System::PacketBufferHandle msgBuf)
+CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, System::PacketBufferHandle && msgBuf)
 {
     PayloadHeader unusedPayloadHeader;
     return SendMessage(session, unusedPayloadHeader, std::move(msgBuf));
 }
 
 CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHeader & payloadHeader,
-                                         System::PacketBufferHandle msgBuf, EncryptedPacketBufferHandle * bufferRetainSlot)
+                                         System::PacketBufferHandle && msgBuf, EncryptedPacketBufferHandle * bufferRetainSlot)
 {
     PacketHeader ununsedPacketHeader;
     return SendMessage(session, payloadHeader, ununsedPacketHeader, std::move(msgBuf), bufferRetainSlot,
@@ -227,8 +227,11 @@ CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHea
     msgLen   = static_cast<uint16_t>(msgBuf->DataLength() + headerSize);
 
     // Retain the packet buffer in case it's needed for retransmissions.
-    encryptedMsg        = msgBuf.Retain();
-    encryptedMsg.mMsgId = packetHeader.GetMessageId();
+    if (bufferRetainSlot != nullptr)
+    {
+        encryptedMsg        = msgBuf.Retain();
+        encryptedMsg.mMsgId = packetHeader.GetMessageId();
+    }
 
     ChipLogProgress(Inet, "Sending msg from %llu to %llu", mLocalNodeId, state->GetPeerNodeId());
 

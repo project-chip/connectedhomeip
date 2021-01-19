@@ -131,7 +131,7 @@ CHIP_ERROR InitMdns()
     }
     else
     {
-        auto advertiseParameters = Mdns::CommisioningAdvertisingParameters().SetPort(CHIP_PORT).EnableIpV4(true);
+        auto advertiseParameters = Mdns::CommissionAdvertisingParameters().SetPort(CHIP_PORT).EnableIpV4(true);
 
         uint16_t value;
         if (ConfigurationMgr().GetVendorId(value) != CHIP_NO_ERROR)
