@@ -238,7 +238,9 @@ void BLE::OnBleEndPointConnectionClosed(BLEEndPoint * endPoint, BLE_ERROR err)
         if (err != BLE_NO_ERROR)
         {
             ble->mDelegate->OnRendezvousError(err);
-        } else {
+        }
+        else
+        {
             // OnRendezvousError may delete |ble|; don't call both callbacks.
             ble->mDelegate->OnRendezvousConnectionClosed();
         }
