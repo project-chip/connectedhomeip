@@ -252,7 +252,6 @@ private:
 
     uint32_t mSetupPINCode;
 
-    Hash_SHA256_stream mCommissioningHash;
     uint32_t mIterationCount = 0;
     uint16_t mSaltLength     = 0;
     uint8_t * mSalt          = nullptr;
