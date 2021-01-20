@@ -25,7 +25,7 @@ set(CONF_FILE ${CHIP_ROOT}/config/nrfconnect/app/sample-defaults.conf prj.conf)
 list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/config/nrfconnect/chip-module)
 find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
 
-project(chip-nrf52840-lighting-example)
+project(chip-nrfconnect-lighting-example)
 
 target_compile_options(app PRIVATE -Werror)
 

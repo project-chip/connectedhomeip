@@ -36,6 +36,8 @@ humanfriendly==9.1
     # via coloredlogs
 idna==2.10
     # via requests
+intelhex==2.3.0
+    # via -r requirements.in
 ipython-genutils==0.2.0
     # via traitlets
 ipython==7.20.0

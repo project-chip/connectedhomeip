@@ -27,7 +27,7 @@ find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
 
 target_compile_options(app PRIVATE -Werror)
 
-project(chip-nrf52840-lock-example)
+project(chip-nrfconnect-lock-example)
 
 target_include_directories(app PRIVATE 
                            main/include 

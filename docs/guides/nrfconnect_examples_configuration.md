@@ -37,10 +37,10 @@ possible to save changes permanently this way.
 Complete the following steps:
 
 1.  Build the application by typing the following command in the example
-    directory, with _board-name_ replaced with the target board name, for
-    example _nrf52840dk_nrf52840_:
+    directory, with _build-target_ replaced with the build target name of the
+    kit, for example _nrf52840dk_nrf52840_:
 
-         $ west build -b board-name
+         $ west build -b build-target
 
 2.  Run the terminal-based interface called menuconfig by typing the following
     command:
@@ -96,10 +96,10 @@ in the nRF Connect SDK documentation.
 
 Because Kconfig configuration files are used in the building process, make sure
 that you rebuild your application after editing them by typing the following
-command in the example directory, with _board-name_ replaced with the target
-board name, for example _nrf52840dk_nrf52840_:
+command in the example directory, with _build-target_ replaced with the build
+target name of the kit, for example _nrf52840dk_nrf52840_:
 
-        $ west build -b board-name
+        $ west build -b build-target
 
 <hr>
 
@@ -120,10 +120,10 @@ There is no need to modify all these files separately. See the following list
 for types of files you can find in the project and which of them are important
 from your perspective:
 
--   **Board configuration files.** These are hardware-platform-dependent
+-   **Build target configuration files.** These are hardware-platform-dependent
     configuration files, which are automatically included based on the
-    compilation target board name. They contain configuration for board and its
-    peripherals.
+    compilation build target name. They contain configuration for the kit and
+    its peripherals.
 
 -   **Project configuration file.** Every example application has its main
     configuration file called `prj.conf` that is located in the example
@@ -137,11 +137,11 @@ from your perspective:
     `prj.conf` file is that they are not included automatically, so you can
     decide whether to build sample with or without them. Overlay files can be
     added to build by typing the following command in the example directory,
-    with _board-name_ replaced with the target board name (e.g.
+    with _build-target_ replaced with the build target name (e.g.
     _nrf52840dk_nrf52840_) and _overlay_file_name_ replaced with the overlay
     configuration file name (e.g. _overlay-usb_support.conf_):
 
-          $ west build -b board-name -- -DOVERLAY_CONFIG=overlay_file_name
+          $ west build -b build-target -- -DOVERLAY_CONFIG=overlay_file_name
 
 Read the
 [Kconfig](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/zephyr/guides/kconfig/index.html#kconfig)
