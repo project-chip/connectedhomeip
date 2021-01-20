@@ -230,14 +230,20 @@ void BLE::OnBleEndPointConnectionClosed(BLEEndPoint * endPoint, BLE_ERROR err)
     BLE * ble   = reinterpret_cast<BLE *>(endPoint->mAppState);
     ble->mState = State::kNotReady;
 
+    // Already closed, avoid closing again in our destructor.
+    ble->mBleEndPoint = nullptr;
+
     if (ble->mDelegate)
     {
         if (err != BLE_NO_ERROR)
         {
             ble->mDelegate->OnRendezvousError(err);
         }
-
-        ble->mDelegate->OnRendezvousConnectionClosed();
+        else
+        {
+            // OnRendezvousError may delete |ble|; don't call both callbacks.
+            ble->mDelegate->OnRendezvousConnectionClosed();
+        }
     }
 }
 
