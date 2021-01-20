@@ -131,9 +131,9 @@ public:
 
     ExchangeManager * GetExchangeMgr() const { return mExchangeMgr; }
 
-    ReliableMessageContext * GetReliableMessageContext() { return &mReliableMessageContext; };
+    ReliableMessageContext * GetReliableMessageContext() const { return &mReliableMessageContext; };
 
-    SecureSessionHandle GetSecureSession() { return mSecureSession; }
+    SecureSessionHandle GetSecureSession() const { return mSecureSession; }
 
     uint16_t GetExchangeId() const { return mExchangeId; }
 
