@@ -30,6 +30,13 @@ static_library("raw") {
     "UDP.h",
   ]
 
+  if (chip_config_network_layer_ble) {
+    sources += [
+      "BLE.cpp",
+      "BLE.h",
+    ]
+  }
+
   cflags = [ "-Wconversion" ]
 
   public_deps = [

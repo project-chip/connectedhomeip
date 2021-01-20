@@ -112,6 +112,19 @@ constexpr size_t kCapabilitiesResponseWindowSizeLength              = 1;
 constexpr size_t kCapabilitiesResponseLength(kCapabilitiesResponseMagicnumLength + kCapabilitiesResponseL2capMtuLength +
                                              kCapabilitiesResponseSelectedProtocolVersionLength +
                                              kCapabilitiesResponseWindowSizeLength);
+class BleTransportDelegate
+{
+public:
+    virtual ~BleTransportDelegate()                              = default;
+    virtual void OnBleConnectionComplete(BLEEndPoint * endpoint) = 0;
+    virtual void OnBleConnectionError(BLE_ERROR err)             = 0;
+
+    virtual void OnEndPointConnectComplete(BLEEndPoint * endPoint, BLE_ERROR err)          = 0;
+    virtual void OnEndPointMessageReceived(BLEEndPoint * endPoint, PacketBufferHandle msg) = 0;
+    virtual void OnEndPointConnectionClosed(BLEEndPoint * endPoint, BLE_ERROR err)         = 0;
+
+    virtual CHIP_ERROR SetEndPoint(BLEEndPoint * endPoint) = 0;
+};
 
 class BleLayerObject
 {
@@ -119,7 +132,8 @@ class BleLayerObject
 
 public:
     // Public data members:
-    BleLayer * mBle;  ///< [READ-ONLY] Pointer to the BleLayer object that owns this object.
+    BleLayer * mBle; ///< [READ-ONLY] Pointer to the BleLayer object that owns this object.
+    BleTransportDelegate * mBleTransport;
     void * mAppState; ///< Generic pointer to app-specific data associated with the object.
 
 protected:
@@ -251,7 +265,7 @@ public:
         kState_Initialized    = 1
     } mState; ///< [READ-ONLY] Current state
 
-    void * mAppState;
+    BleTransportDelegate * mBleTransport;
 
     typedef void (*BleConnectionReceivedFunct)(BLEEndPoint * newEndPoint);
     BleConnectionReceivedFunct OnChipBleConnectReceived;
@@ -268,6 +282,8 @@ public:
                                BleConnectionDelegate::OnConnectionCompleteFunct onConnectionComplete,
                                BleConnectionDelegate::OnConnectionErrorFunct onConnectionError);
     BLE_ERROR CancelBleIncompleteConnection();
+    BLE_ERROR NewBleConnectionByDiscriminator(uint16_t connDiscriminator);
+    BLE_ERROR NewBleConnectionByObject(BLE_CONNECTION_OBJECT connObj);
     BLE_ERROR NewBleEndPoint(BLEEndPoint ** retEndPoint, BLE_CONNECTION_OBJECT connObj, BleRole role, bool autoClose);
 
     chip::System::Error ScheduleWork(chip::System::Layer::TimerCompleteFunct aComplete, void * aAppState)
@@ -362,6 +378,9 @@ private:
     BLE_ERROR HandleBleTransportConnectionInitiated(BLE_CONNECTION_OBJECT connObj, System::PacketBufferHandle pBuf);
 
     static BleTransportProtocolVersion GetHighestSupportedProtocolVersion(const BleTransportCapabilitiesRequestMessage & reqMsg);
+
+    static void OnConnectionComplete(void * appState, BLE_CONNECTION_OBJECT connObj);
+    static void OnConnectionError(void * appState, BLE_ERROR err);
 };
 
 } /* namespace Ble */

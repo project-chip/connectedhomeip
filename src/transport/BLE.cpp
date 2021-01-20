@@ -22,7 +22,7 @@
  *
  */
 
-#include <transport/BLE.h>
+#include <transport/raw/BLE.h>
 
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
@@ -57,7 +57,7 @@ void BLE::ClearState()
     }
 }
 
-CHIP_ERROR BLE::Init(RendezvousSessionDelegate * delegate, const RendezvousParameters & params)
+CHIP_ERROR BLE::Init(const BleListenParameters & params)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     BleLayer * bleLayer = params.GetBleLayer();
@@ -65,44 +65,15 @@ CHIP_ERROR BLE::Init(RendezvousSessionDelegate * delegate, const RendezvousParam
     VerifyOrExit(mState == State::kNotReady, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(bleLayer, err = CHIP_ERROR_INCORRECT_STATE);
 
-    mDelegate = delegate;
-
     mBleLayer                           = bleLayer;
-    mBleLayer->mAppState                = reinterpret_cast<void *>(this);
+    mBleLayer->mBleTransport            = this;
     mBleLayer->OnChipBleConnectReceived = OnNewConnection;
 
-    if (params.HasDiscriminator())
-    {
-        err = mBleLayer->NewBleConnection(reinterpret_cast<void *>(this), params.GetDiscriminator(), OnBleConnectionComplete,
-                                          OnBleConnectionError);
-    }
-    else if (params.HasConnectionObject())
-    {
-        err = InitInternal(params.GetConnectionObject());
-    }
+    mState = State::kInitialized;
+
     SuccessOrExit(err);
 
 exit:
-    return err;
-}
-
-CHIP_ERROR BLE::InitInternal(BLE_CONNECTION_OBJECT connObj)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    err = mBleLayer->NewBleEndPoint(&mBleEndPoint, connObj, kBleRole_Central, true);
-    SuccessOrExit(err);
-
-    // Initiate CHIP over BLE protocol connection.
-    SetupEvents(mBleEndPoint);
-    err = mBleEndPoint->StartConnect();
-    SuccessOrExit(err);
-
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        ClearState();
-    }
     return err;
 }
 
@@ -116,7 +87,7 @@ CHIP_ERROR BLE::SetEndPoint(Ble::BLEEndPoint * endPoint)
     SetupEvents(mBleEndPoint);
 
     // Manually trigger the OnConnectComplete callback.
-    OnBleEndPointConnectionComplete(endPoint, err);
+    OnEndPointConnectComplete(endPoint, err);
 
 exit:
     return err;
@@ -124,10 +95,7 @@ exit:
 
 void BLE::SetupEvents(Ble::BLEEndPoint * endPoint)
 {
-    endPoint->mAppState          = reinterpret_cast<void *>(this);
-    endPoint->OnMessageReceived  = OnBleEndPointReceive;
-    endPoint->OnConnectComplete  = OnBleEndPointConnectionComplete;
-    endPoint->OnConnectionClosed = OnBleEndPointConnectionClosed;
+    endPoint->mAppState = reinterpret_cast<void *>(this);
 }
 
 CHIP_ERROR BLE::SendMessage(const PacketHeader & header, const Transport::PeerAddress & address, System::PacketBufferHandle msgBuf)
@@ -135,62 +103,82 @@ CHIP_ERROR BLE::SendMessage(const PacketHeader & header, const Transport::PeerAd
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     VerifyOrExit(address.GetTransportType() == Type::kBle, err = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(mState == State::kInitialized, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(mBleEndPoint != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mState != State::kInitialized, err = CHIP_ERROR_INCORRECT_STATE);
 
     err = header.EncodeBeforeData(msgBuf);
     SuccessOrExit(err);
 
-    err = mBleEndPoint->Send(std::move(msgBuf));
-    SuccessOrExit(err);
+    if (mState == State::kConnected)
+    {
+        ReturnErrorOnFailure(mBleEndPoint->Send(std::move(msgBuf)));
+    }
+    else
+    {
+        ReturnErrorOnFailure(SendAfterConnect(std::move(msgBuf)));
+    }
 
-exit:
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR BLE::SendAfterConnect(System::PacketBufferHandle msg)
+{
+    // This will initiate a connection to the specified peer
+    CHIP_ERROR err = CHIP_ERROR_NO_MEMORY;
+
+    // Iterate through the ENTIRE array. If a pending packet for
+    // the address already exists, this means a connection is pending and
+    // does NOT need to be re-established.
+    for (size_t i = 0; i < mPendingPacketsSize; i++)
+    {
+        if (mPendingPackets[i].IsNull())
+        {
+            ChipLogDetail(Inet, "Message appended to send queue");
+            mPendingPackets[i] = std::move(msg);
+            err                = CHIP_NO_ERROR;
+            break;
+        }
+    }
+
     return err;
 }
 
-void BLE::OnBleConnectionComplete(void * appState, BLE_CONNECTION_OBJECT connObj)
+void BLE::OnBleConnectionComplete(Ble::BLEEndPoint * endpoint)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    BLE * ble      = reinterpret_cast<BLE *>(appState);
 
-    // TODO(#4547): On darwin, OnBleConnectionComplete is called multiple times for the same peripheral, this should become an error
-    // in the future.
-    VerifyOrExit(ble->mBleEndPoint == nullptr || !ble->mBleEndPoint->ConnectionObjectIs(connObj),
-                 ChipLogError(Ble, "Warning: OnBleConnectionComplete is called multiple times for the same peripheral."));
+    mBleEndPoint = endpoint;
 
-    err = ble->InitInternal(connObj);
+    // Initiate CHIP over BLE protocol connection.
+    SetupEvents(mBleEndPoint);
+    err = mBleEndPoint->StartConnect();
     SuccessOrExit(err);
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ble->OnBleConnectionError(appState, err);
+        if (mBleEndPoint)
+        {
+            mBleEndPoint->Close();
+            mBleEndPoint = nullptr;
+        }
+        ChipLogError(Ble, "Failed to setup ble endpoint: %s", ErrorStr(err));
     }
 }
 
-void BLE::OnBleConnectionError(void * appState, BLE_ERROR err)
+void BLE::OnBleConnectionError(BLE_ERROR err)
 {
-    BLE * ble = reinterpret_cast<BLE *>(appState);
-
-    if (ble->mDelegate)
-    {
-        ble->mDelegate->OnRendezvousError(err);
-    }
+    ChipLogDetail(Inet, "BleConnection Error: %s", ErrorStr(err));
 }
 
-void BLE::OnBleEndPointReceive(BLEEndPoint * endPoint, PacketBufferHandle buffer)
+void BLE::OnBleEndPointMessageReceived(BLEEndPoint * endPoint, PacketBufferHandle buffer)
 {
-    BLE * ble      = reinterpret_cast<BLE *>(endPoint->mAppState);
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    if (ble->mDelegate)
-    {
-        PacketHeader header;
-        err = header.DecodeAndConsume(buffer);
-        SuccessOrExit(err);
+    PacketHeader header;
+    err = header.DecodeAndConsume(buffer);
+    SuccessOrExit(err);
 
-        ble->mDelegate->OnRendezvousMessageReceived(header, Transport::PeerAddress(Transport::Type::kBle), std::move(buffer));
-    }
+    HandleMessageReceived(header, Transport::PeerAddress(Transport::Type::kBle), std::move(buffer));
 exit:
     if (err != CHIP_NO_ERROR)
     {
@@ -198,44 +186,30 @@ exit:
     }
 }
 
-void BLE::OnBleEndPointConnectionComplete(BLEEndPoint * endPoint, BLE_ERROR err)
+void BLE::OnBleEndPointConnectComplete(BLEEndPoint * endPoint, BLE_ERROR err)
 {
-    BLE * ble   = reinterpret_cast<BLE *>(endPoint->mAppState);
-    ble->mState = State::kInitialized;
+    mState = State::kConnected;
 
-    if (ble->mDelegate)
+    if (err != BLE_NO_ERROR)
     {
-        if (err != BLE_NO_ERROR)
+        ChipLogError(Inet, "Failed to establish BLE connection: %s", ErrorStr(err));
+    }
+    else
+    {
+        for (size_t i = 0; i < mPendingPacketsSize; i++)
         {
-            ble->mDelegate->OnRendezvousError(err);
+            if (!mPendingPackets[i].IsNull())
+            {
+                endPoint->Send(std::move(mPendingPackets[i]));
+            }
         }
-        else
-        {
-            ble->mDelegate->OnRendezvousConnectionOpened();
-        }
+        ChipLogDetail(Inet, "BLE EndPoint Connection Complete");
     }
 }
 
 void BLE::OnBleEndPointConnectionClosed(BLEEndPoint * endPoint, BLE_ERROR err)
 {
-    BLE * ble   = reinterpret_cast<BLE *>(endPoint->mAppState);
-    ble->mState = State::kNotReady;
-
-    // Already closed, avoid closing again in our destructor.
-    ble->mBleEndPoint = nullptr;
-
-    if (ble->mDelegate)
-    {
-        if (err != BLE_NO_ERROR)
-        {
-            ble->mDelegate->OnRendezvousError(err);
-        }
-        else
-        {
-            // OnRendezvousError may delete |ble|; don't call both callbacks.
-            ble->mDelegate->OnRendezvousConnectionClosed();
-        }
-    }
+    mState = State::kInitialized;
 }
 
 void BLE::OnNewConnection(BLEEndPoint * endPoint)
