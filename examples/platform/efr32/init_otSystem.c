@@ -41,9 +41,13 @@
 #include "common/logging.hpp"
 
 #include "bsp.h"
+#include "bsp_init.h"
+#include "dmadrv.h"
+#include "ecode.h"
 #include "em_chip.h"
 #include "em_cmu.h"
 #include "em_core.h"
+#include "em_device.h"
 #include "em_emu.h"
 #include "em_system.h"
 #include "hal-config.h"
@@ -51,6 +55,10 @@
 #include "rail.h"
 #include "sl_mpu.h"
 #include "sl_sleeptimer.h"
+#if OPENTHREAD_CONFIG_HEAP_EXTERNAL_ENABLE
+#include "openthread/heap.h"
+#include "sl_malloc.h"
+#endif
 
 #include "platform-efr32.h"
 
@@ -58,11 +66,14 @@
 #include "fem-control.h"
 #endif
 
+#include "platform-efr32.h"
+
 #if DISPLAY_ENABLED
 #include "lcd.h"
 #endif
 
-void halInitChipSpecific(void);
+static void halInitChipSpecific(void);
+void initAntenna(void);
 
 void initOtSysEFR(void)
 {
@@ -93,15 +104,12 @@ void initOtSysEFR(void)
 #endif
     BSP_Init(BSP_INIT_BCC);
 
-#if defined(EFR32MG12)
-    CMU_ClockSelectSet(cmuClock_LFE, cmuSelect_LFRCO);
-    CMU_ClockEnable(cmuClock_CORELE, true);
-#elif defined(EFR32MG21)
+    // Enable LE peripheral clock. Needed for RTCC initialization in sl_sleeptimer_init()
+#if !defined(_SILICON_LABS_32B_SERIES_2)
+    CMU_ClockEnable(cmuClock_HFLE, true);
     CMU_OscillatorEnable(cmuOsc_LFRCO, true, true);
-#else
-#error "Enable Clocks for the used board"
-#endif /* EFR32 PLATFORM */
-    CMU_ClockEnable(cmuClock_RTCC, true);
+#endif // !defined(_SILICON_LABS_32B_SERIES_2)
+
     status = sl_sleeptimer_init();
     assert(status == SL_STATUS_OK);
 
@@ -118,8 +126,83 @@ void initOtSysEFR(void)
     efr32RadioInit();
     efr32AlarmInit();
     efr32MiscInit();
-#ifndef EFR32MG21
-    efr32RandomInit();
-#endif /* EFR32 PLATFORM */
+
     otHeapSetCAllocFree(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
+}
+
+void halInitChipSpecific(void)
+{
+#if defined(BSP_DK) && !defined(RAIL_IC_SIM_BUILD)
+    BSP_Init(BSP_INIT_DK_SPI);
+#endif
+    BSP_initDevice();
+
+#if !defined(RAIL_IC_SIM_BUILD)
+    BSP_initBoard();
+#endif
+
+#if HAL_PTI_ENABLE
+    RAIL_PtiConfig_t railPtiConfig = {
+#if HAL_PTI_MODE == HAL_PTI_MODE_SPI
+        .mode = RAIL_PTI_MODE_SPI,
+#elif HAL_PTI_MODE == HAL_PTI_MODE_UART
+        .mode = RAIL_PTI_MODE_UART,
+#elif HAL_PTI_MODE == HAL_PTI_MODE_UART_ONEWIRE
+        .mode = RAIL_PTI_MODE_UART_ONEWIRE,
+#else
+        .mode = RAIL_PTI_MODE_DISABLED,
+#endif
+        .baud = HAL_PTI_BAUD_RATE,
+#ifdef BSP_PTI_DOUT_LOC
+        .doutLoc = BSP_PTI_DOUT_LOC,
+#endif
+        .doutPort = (uint8_t) BSP_PTI_DOUT_PORT,
+        .doutPin  = BSP_PTI_DOUT_PIN,
+#if HAL_PTI_MODE == HAL_PTI_MODE_SPI
+#ifdef BSP_PTI_DCLK_LOC
+        .dclkLoc = BSP_PTI_DCLK_LOC,
+#endif
+        .dclkPort = (uint8_t) BSP_PTI_DCLK_PORT,
+        .dclkPin  = BSP_PTI_DCLK_PIN,
+#endif
+#if HAL_PTI_MODE != HAL_PTI_MODE_UART_ONEWIRE
+#ifdef BSP_PTI_DFRAME_LOC
+        .dframeLoc = BSP_PTI_DFRAME_LOC,
+#endif
+        .dframePort = (uint8_t) BSP_PTI_DFRAME_PORT,
+        .dframePin  = BSP_PTI_DFRAME_PIN
+#endif
+    };
+
+    RAIL_ConfigPti(RAIL_EFR32_HANDLE, &railPtiConfig);
+#endif // HAL_PTI_ENABLE
+
+#if !defined(RAIL_IC_SIM_BUILD)
+    initAntenna();
+
+// Disable any unused peripherals to ensure we enter a low power mode
+#if defined(BSP_EXTFLASH_USART) && !defined(HAL_DISABLE_EXTFLASH)
+#include "mx25flash_spi.h"
+    MX25_init();
+    MX25_DP();
+#endif
+
+#endif
+
+#if RAIL_DMA_CHANNEL == DMA_CHANNEL_DMADRV
+    Ecode_t dmaError = DMADRV_Init();
+    if ((dmaError == ECODE_EMDRV_DMADRV_ALREADY_INITIALIZED) || (dmaError == ECODE_EMDRV_DMADRV_OK))
+    {
+        unsigned int channel;
+        dmaError = DMADRV_AllocateChannel(&channel, NULL);
+        if (dmaError == ECODE_EMDRV_DMADRV_OK)
+        {
+            RAIL_UseDma(channel);
+        }
+    }
+#elif defined(RAIL_DMA_CHANNEL) && (RAIL_DMA_CHANNEL != DMA_CHANNEL_INVALID)
+    LDMA_Init_t ldmaInit = LDMA_INIT_DEFAULT;
+    LDMA_Init(&ldmaInit);
+    RAIL_UseDma(RAIL_DMA_CHANNEL);
+#endif
 }
