@@ -1548,26 +1548,6 @@ typedef struct
 
 typedef struct
 {
-    EmberAfDeviceManagementTenancy tenancy;
-    EmberAfDeviceManagementSupplier supplier;
-    EmberAfDeviceManagementSupply supply;
-    EmberAfDeviceManagementSiteId siteId;
-    EmberAfDeviceManagementCIN cin;
-    EmberAfDeviceManagementSupplyStatusFlags supplyStatusFlags;
-    EmberAfDeviceManagementSupplyStatus supplyStatus;
-    // TODO: These passwords ought to be tokenized / hashed
-    EmberAfDeviceManagementPassword servicePassword;
-    EmberAfDeviceManagementPassword consumerPassword;
-    EmberAfDeviceManagementUncontrolledFlowThreshold threshold;
-    uint32_t providerId;
-    uint32_t issuerEventId;
-    uint8_t proposedLocalSupplyStatus;
-    EmberAfTariffType tariffType;
-    EmberAfDeviceManagementChangePendingFlags pendingUpdates;
-} EmberAfDeviceManagementInfo;
-
-typedef struct
-{
     uint8_t startIndex;
     uint8_t endIndex;
 } EmberAfDeviceManagementAttributeRange;
