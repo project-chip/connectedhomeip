@@ -106,10 +106,11 @@ $(OUTPUT_DIR) :
 fix_cflags = $(filter-out -DHAVE_CONFIG_H,\
                 $(filter-out -D,\
                   $(filter-out IDF_VER%,\
-                    $(sort $(1)) -D$(filter IDF_VER%,$(1))\
-               )))
+                    $(filter-out -std=gnu++11,\
+                      $(sort $(1)) -D$(filter IDF_VER%,$(1))\
+               ))))
 CHIP_CFLAGS = $(call fix_cflags,$(CFLAGS) $(CPPFLAGS))
-CHIP_CXXFLAGS = $(call fix_cflags,$(CXXFLAGS) $(CPPFLAGS))
+CHIP_CXXFLAGS = $(call fix_cflags,$(CXXFLAGS) $(CPPFLAGS)) -std=gnu++14
 
 install-chip : $(OUTPUT_DIR)
 	echo "INSTALL CHIP..."
