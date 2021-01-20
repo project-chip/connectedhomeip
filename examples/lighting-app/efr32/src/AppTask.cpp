@@ -27,6 +27,8 @@
 #include "Server.h"
 #include "Service.h"
 #include "attribute-storage.h"
+#include "gen/attribute-id.h"
+#include "gen/attribute-type.h"
 #include "gen/cluster-id.h"
 #include "lcd.h"
 #include "qrcodegen.h"
@@ -41,7 +43,6 @@
 #include <platform/EFR32/ThreadStackManagerImpl.h>
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
-#include <platform/internal/DeviceNetworkInfo.h>
 #endif
 
 #define FACTORY_RESET_TRIGGER_TIMEOUT 3000

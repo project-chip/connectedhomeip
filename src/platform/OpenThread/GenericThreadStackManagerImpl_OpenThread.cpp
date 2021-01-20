@@ -28,6 +28,7 @@
 
 #include <openthread/cli.h>
 #include <openthread/dataset.h>
+#include <openthread/instance.h>
 #include <openthread/joiner.h>
 #include <openthread/link.h>
 #include <openthread/netdata.h>
@@ -247,6 +248,12 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetThreadProvis
     {
         newDataset.mChannel                      = netInfo.ThreadChannel;
         newDataset.mComponents.mIsChannelPresent = true;
+    }
+
+    if (netInfo.ThreadDatasetTimestamp != 0)
+    {
+        newDataset.mActiveTimestamp                      = netInfo.ThreadDatasetTimestamp;
+        newDataset.mComponents.mIsActiveTimestampPresent = true;
     }
 
     // Set the dataset as the active dataset for the node.
@@ -742,7 +749,6 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetAndLogThread
                         "LinkFrameCounter:  %10d\n"
                         "MleFrameCounter:   %10d\n"
                         "RxOnWhenIdle:      %c\n"
-                        "SecureDataRequest: %c\n"
                         "FullFunction:      %c\n"
                         "FullNetworkData:   %c\n"
                         "IsChild:           %c%s\n",
@@ -750,8 +756,8 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetAndLogThread
                         neighbor->mExtAddress.m8[3], neighbor->mExtAddress.m8[4], neighbor->mExtAddress.m8[5],
                         neighbor->mExtAddress.m8[6], neighbor->mExtAddress.m8[7], neighbor->mRloc16, neighbor->mAge,
                         neighbor->mLinkQualityIn, neighbor->mAverageRssi, neighbor->mLastRssi, neighbor->mLinkFrameCounter,
-                        neighbor->mMleFrameCounter, neighbor->mRxOnWhenIdle ? 'Y' : 'n', neighbor->mSecureDataRequest ? 'Y' : 'n',
-#if OPENTHREA_API_VERSION
+                        neighbor->mMleFrameCounter, neighbor->mRxOnWhenIdle ? 'Y' : 'n',
+#if OPENTHREAD_API_VERSION
                         neighbor->mFullThreadDevice ? 'Y' : 'n',
 #else
                         'n',
@@ -833,6 +839,8 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::DoInit(otInstanc
     otErr = otSetStateChangedCallback(otInst, ImplClass::OnOpenThreadStateChange, NULL);
     VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
 
+    // Secure data request mode bit has been removed from the certain OpenThread version.
+#if OPENTHREAD_API_VERSION < 30
     // Enable use of secure data requests.
     {
         otLinkModeConfig linkMode    = otThreadGetLinkMode(otInst);
@@ -840,6 +848,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::DoInit(otInstanc
         otErr                        = otThreadSetLinkMode(otInst, linkMode);
         VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
     }
+#endif
 
     // Enable automatic assignment of Thread advertised addresses.
 #if OPENTHREAD_CONFIG_IP6_SLAAC_ENABLE

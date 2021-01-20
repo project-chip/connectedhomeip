@@ -32,6 +32,8 @@
 #endif
 
 #include "attribute-storage.h"
+#include "gen/attribute-id.h"
+#include "gen/attribute-type.h"
 #include "gen/cluster-id.h"
 
 #include <platform/CHIPDeviceLayer.h>

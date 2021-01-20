@@ -26,11 +26,11 @@ function(zephyr_get_compile_flags VAR LANG)
     # zephyr returns as "non-system" headers (the ones from
     # zephyr_get_include_directories_for_lang) we need to manually replace "-I"
     # with "-isystem".
-    zephyr_get_include_directories_for_lang(${LANG} INCLUDES)
-    list(TRANSFORM INCLUDES REPLACE "-I" "-isystem")
-    zephyr_get_system_include_directories_for_lang(${LANG} SYSTEM_INCLUDES)
-    zephyr_get_compile_definitions_for_lang(${LANG} DEFINES)
-    zephyr_get_compile_options_for_lang(${LANG} FLAGS)
+    zephyr_get_include_directories_for_lang_as_string(${LANG} INCLUDES)
+    string(REGEX REPLACE "(^| )-I" "\\1-isystem" INCLUDES ${INCLUDES})
+    zephyr_get_system_include_directories_for_lang_as_string(${LANG} SYSTEM_INCLUDES)
+    zephyr_get_compile_definitions_for_lang_as_string(${LANG} DEFINES)
+    zephyr_get_compile_options_for_lang_as_string(${LANG} FLAGS)
     set(${VAR} ${INCLUDES} ${SYSTEM_INCLUDES} ${DEFINES} ${FLAGS} ${${VAR}} PARENT_SCOPE)
 endfunction()
 

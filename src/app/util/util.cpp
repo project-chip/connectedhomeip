@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -40,13 +40,17 @@
  *******************************************************************************
  ******************************************************************************/
 
+#include "af-event.h"
 #include "af-main.h"
 #include "af.h"
 #include "common.h"
-//#include "../plugin/time-server/time-server.h"
-#include "af-event.h"
-//#include "app/framework/util/time-util.h"
-//#include "hal/micro/crc.h"
+
+#include "gen/attribute-id.h"
+#include "gen/attribute-type.h"
+#include "gen/callback.h"
+#include "gen/cluster-id.h"
+#include "gen/command-id.h"
+#include "gen/print-cluster.h"
 
 #ifdef EMBER_AF_PLUGIN_GROUPS_SERVER
 #include <app/clusters/groups-server/groups-server.h>
@@ -889,7 +893,7 @@ void emberAfCopyInt32u(uint8_t * data, uint16_t index, uint32_t x)
     data[index + 3] = (uint8_t)(((x) >> 24) & 0xFF);
 }
 
-void emberAfCopyString(uint8_t * dest, uint8_t * src, uint8_t size)
+void emberAfCopyString(uint8_t * dest, const uint8_t * src, uint8_t size)
 {
     if (src == NULL)
     {
@@ -911,7 +915,7 @@ void emberAfCopyString(uint8_t * dest, uint8_t * src, uint8_t size)
     }
 }
 
-void emberAfCopyLongString(uint8_t * dest, uint8_t * src, uint16_t size)
+void emberAfCopyLongString(uint8_t * dest, const uint8_t * src, uint16_t size)
 {
     if (src == NULL)
     {

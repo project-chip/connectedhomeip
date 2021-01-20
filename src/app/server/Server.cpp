@@ -202,6 +202,8 @@ void InitServer(AppDelegate * delegate)
     err = gSessions.Init(chip::kTestDeviceNodeId, &DeviceLayer::SystemLayer, &gTransports);
     SuccessOrExit(err);
 
+    gSessions.SetDelegate(&gCallbacks);
+
     // This flag is used to bypass BLE in the cirque test
     // Only in the cirque test this is enabled with --args='bypass_rendezvous=true'
     if (isRendezvousBypassed())
@@ -223,17 +225,13 @@ void InitServer(AppDelegate * delegate)
 #else
         params.SetSetupPINCode(pinCode);
 #endif // CONFIG_NETWORK_LAYER_BLE
-        SuccessOrExit(err = gRendezvousServer.Init(params, &gTransports));
+        SuccessOrExit(err = gRendezvousServer.Init(params, &gTransports, &gSessions));
     }
 
 #if CHIP_ENABLE_MDNS
     err = InitMdns();
     SuccessOrExit(err);
 #endif
-
-    gSessions.SetDelegate(&gCallbacks);
-    err = gSessions.NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing);
-    SuccessOrExit(err);
 
 exit:
     if (err != CHIP_NO_ERROR)
