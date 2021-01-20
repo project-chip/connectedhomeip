@@ -64,8 +64,6 @@
 #include "stack/include/ember-random-api.h"
 #include "stack/include/ember-types.h"
 #include "stack/include/error.h"
-#else
-// Includes needed for ember related functions for the SoC
 #endif // EZSP_HOST
 
 #include "af-types.h"
@@ -73,17 +71,6 @@
 #include "client-api.h"
 #include "debug-printing.h"
 #include "ember-print.h"
-
-#include "gen/af-structs.h"
-#include "gen/att-storage.h"
-#include "gen/attribute-id.h"
-#include "gen/attribute-type.h"
-#include "gen/call-command-handler.h"
-#include "gen/callback.h"
-#include "gen/cluster-id.h"
-#include "gen/command-id.h"
-#include "gen/enums.h"
-#include "gen/print-cluster.h"
 
 /** @name Attribute Storage */
 // @{

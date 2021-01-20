@@ -43,6 +43,10 @@
 #include <app/util/af-event.h>
 #include <app/util/attribute-storage.h>
 
+#include "gen/attribute-id.h"
+#include "gen/attribute-type.h"
+#include "gen/cluster-id.h"
+
 using namespace chip;
 
 EmberEventControl emberAfPluginTemperatureMeasurementServerReadEventControl;

@@ -43,6 +43,9 @@
 #include "af.h"
 #include "common.h"
 
+#include "gen/attribute-type.h"
+#include "gen/callback.h"
+
 using namespace chip;
 
 //------------------------------------------------------------------------------

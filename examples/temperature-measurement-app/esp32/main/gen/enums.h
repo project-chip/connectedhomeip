@@ -2198,13 +2198,6 @@ typedef enum
     EMBER_ZCL_REPAYMENT_DEBT_TYPE_ALL_DEBTS = 0xFF,
 } EmberAfRepaymentDebtType;
 
-// Enum for ReportingDirection
-typedef enum
-{
-    EMBER_ZCL_REPORTING_DIRECTION_REPORTED = 0x00,
-    EMBER_ZCL_REPORTING_DIRECTION_RECEIVED = 0x01,
-} EmberAfReportingDirection;
-
 // Enum for ResultType
 typedef enum
 {
@@ -2339,44 +2332,6 @@ typedef enum
     EMBER_ZCL_START_UP_ON_OFF_VALUE_SET_TO_PREVIOUS = 0xFF,
 } EmberAfStartUpOnOffValue;
 
-// Enum for Status
-typedef enum
-{
-    EMBER_ZCL_STATUS_SUCCESS                     = 0x00,
-    EMBER_ZCL_STATUS_FAILURE                     = 0x01,
-    EMBER_ZCL_STATUS_NOT_AUTHORIZED              = 0x7E,
-    EMBER_ZCL_STATUS_MALFORMED_COMMAND           = 0x80,
-    EMBER_ZCL_STATUS_UNSUP_COMMAND               = 0x81,
-    EMBER_ZCL_STATUS_UNSUP_GENERAL_COMMAND       = 0x82,
-    EMBER_ZCL_STATUS_UNSUP_MANUF_CLUSTER_COMMAND = 0x83,
-    EMBER_ZCL_STATUS_UNSUP_MANUF_GENERAL_COMMAND = 0x84,
-    EMBER_ZCL_STATUS_INVALID_FIELD               = 0x85,
-    EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE       = 0x86,
-    EMBER_ZCL_STATUS_INVALID_VALUE               = 0x87,
-    EMBER_ZCL_STATUS_READ_ONLY                   = 0x88,
-    EMBER_ZCL_STATUS_INSUFFICIENT_SPACE          = 0x89,
-    EMBER_ZCL_STATUS_DUPLICATE_EXISTS            = 0x8A,
-    EMBER_ZCL_STATUS_NOT_FOUND                   = 0x8B,
-    EMBER_ZCL_STATUS_UNREPORTABLE_ATTRIBUTE      = 0x8C,
-    EMBER_ZCL_STATUS_INVALID_DATA_TYPE           = 0x8D,
-    EMBER_ZCL_STATUS_INVALID_SELECTOR            = 0x8E,
-    EMBER_ZCL_STATUS_WRITE_ONLY                  = 0x8F,
-    EMBER_ZCL_STATUS_INCONSISTENT_STARTUP_STATE  = 0x90,
-    EMBER_ZCL_STATUS_DEFINED_OUT_OF_BAND         = 0x91,
-    EMBER_ZCL_STATUS_ACTION_DENIED               = 0x93,
-    EMBER_ZCL_STATUS_TIMEOUT                     = 0x94,
-    EMBER_ZCL_STATUS_ABORT                       = 0x95,
-    EMBER_ZCL_STATUS_INVALID_IMAGE               = 0x96,
-    EMBER_ZCL_STATUS_WAIT_FOR_DATA               = 0x97,
-    EMBER_ZCL_STATUS_NO_IMAGE_AVAILABLE          = 0x98,
-    EMBER_ZCL_STATUS_REQUIRE_MORE_IMAGE          = 0x99,
-    EMBER_ZCL_STATUS_NOTIFICATION_PENDING        = 0x9A,
-    EMBER_ZCL_STATUS_HARDWARE_FAILURE            = 0xC0,
-    EMBER_ZCL_STATUS_SOFTWARE_FAILURE            = 0xC1,
-    EMBER_ZCL_STATUS_UNSUPPORTED_CLUSTER         = 0xC3,
-    EMBER_ZCL_STATUS_LIMIT_REACHED               = 0xC4,
-} EmberAfStatus;
-
 // Enum for StepMode
 typedef enum
 {
@@ -2425,14 +2380,6 @@ typedef enum
     EMBER_ZCL_TARIFF_RESOLUTION_PERIOD_BLOCK_PERIOD = 0x01,
     EMBER_ZCL_TARIFF_RESOLUTION_PERIOD_ONE_DAY      = 0x02,
 } EmberAfTariffResolutionPeriod;
-
-// Enum for TariffType
-typedef enum
-{
-    EMBER_ZCL_TARIFF_TYPE_DELIVERED_TARIFF              = 0x00,
-    EMBER_ZCL_TARIFF_TYPE_RECEIVED_TARIFF               = 0x01,
-    EMBER_ZCL_TARIFF_TYPE_DELIVERED_AND_RECEIVED_TARIFF = 0x02,
-} EmberAfTariffType;
 
 // Enum for TemperatureDisplayMode
 typedef enum
