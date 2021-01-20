@@ -32,10 +32,6 @@
 #include <transport/TransportMgr.h>
 #include <transport/raw/PeerAddress.h>
 
-#if CONFIG_NETWORK_LAYER_BLE
-#include <transport/BLE.h>
-#endif // CONFIG_NETWORK_LAYER_BLE
-
 static constexpr uint32_t kSpake2p_Iteration_Count = 100;
 static const char * kSpake2pKeyExchangeSalt        = "SPAKE2P Key Salt";
 
@@ -60,22 +56,6 @@ CHIP_ERROR RendezvousSession::Init(const RendezvousParameters & params, Transpor
 
     mSecureSessionMgr = sessionMgr;
     mAdmin            = admin;
-
-    // TODO: BLE Should be a transport, in that case, RendezvousSession and BLE should decouple
-    if (params.GetPeerAddress().GetTransportType() == Transport::Type::kBle)
-#if CONFIG_NETWORK_LAYER_BLE
-    {
-        ReturnErrorOnFailure(mParams.GetAdvertisementDelegate()->StartAdvertisement());
-        Transport::BLE * transport = chip::Platform::New<Transport::BLE>();
-        mTransport                 = transport;
-
-        ReturnErrorOnFailure(transport->Init(this, mParams));
-    }
-#else
-    {
-        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-    }
-#endif // CONFIG_NETWORK_LAYER_BLE
 
     if (!mParams.IsController())
     {
@@ -142,11 +122,7 @@ CHIP_ERROR RendezvousSession::SendSessionEstablishmentMessage(const PacketHeader
         headerWithNodeIds.SetDestinationNodeId(mParams.GetRemoteNodeId());
     }
 
-    if (peerAddress.GetTransportType() == Transport::Type::kBle)
-    {
-        return mTransport->SendMessage(headerWithNodeIds, peerAddress, std::move(msgIn));
-    }
-    else if (mTransportMgr != nullptr)
+    if (mTransportMgr != nullptr)
     {
         return mTransportMgr->SendMessage(headerWithNodeIds, peerAddress, std::move(msgIn));
     }
@@ -199,20 +175,10 @@ void RendezvousSession::OnSessionEstablished()
 
     InitPairingSessionHandle();
 
-    // TODO: This check of BLE transport should be removed in the future, after we have network provisioning cluster and ble becomes
-    // a transport.
-    if (mParams.GetPeerAddress().GetTransportType() != Transport::Type::kBle || // For rendezvous initializer
-        mPeerAddress.GetTransportType() != Transport::Type::kBle)               // For rendezvous target
+    UpdateState(State::kRendezvousComplete);
+    if (!mParams.IsController())
     {
-        UpdateState(State::kRendezvousComplete);
-        if (!mParams.IsController())
-        {
-            OnRendezvousConnectionClosed();
-        }
-    }
-    else
-    {
-        UpdateState(State::kNetworkProvisioning);
+        OnRendezvousConnectionClosed();
     }
 }
 
@@ -361,10 +327,6 @@ void RendezvousSession::OnRendezvousMessageReceived(const PacketHeader & packetH
         }
 
         err = HandlePairingMessage(packetHeader, peerAddress, std::move(msgBuf));
-        break;
-
-    case State::kNetworkProvisioning:
-        err = HandleSecureMessage(packetHeader, peerAddress, std::move(msgBuf));
         break;
 
     default:

@@ -30,6 +30,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/util/CHIPDeviceCallbacksMgr.h>
 #include <app/util/basic-types.h>
+#include <ble/BleLayer.h>
 #include <core/CHIPCallback.h>
 #include <core/CHIPCore.h>
 #include <setup_payload/SetupPayload.h>
@@ -40,6 +41,11 @@
 #include <transport/TransportMgr.h>
 #include <transport/raw/MessageHeader.h>
 #include <transport/raw/UDP.h>
+
+#if CONFIG_NETWORK_LAYER_BLE
+#include <ble/BleLayer.h>
+#include <transport/raw/BLE.h>
+#endif
 
 namespace chip {
 namespace Controller {
@@ -53,6 +59,10 @@ using DeviceTransportMgr = TransportMgr<Transport::UDP /* IPv6 */
                                         ,
                                         Transport::UDP /* IPv4 */
 #endif
+#if CONFIG_NETWORK_LAYER_BLE
+                                        ,
+                                        Transport::BLE<4> /* BLE */
+#endif
                                         >;
 
 struct ControllerDeviceInitParams
@@ -60,6 +70,9 @@ struct ControllerDeviceInitParams
     DeviceTransportMgr * transportMgr = nullptr;
     SecureSessionMgr * sessionMgr     = nullptr;
     Inet::InetLayer * inetLayer       = nullptr;
+#if CONFIG_NETWORK_LAYER_BLE
+    Ble::BleLayer * bleLayer = nullptr;
+#endif
 };
 
 class DLL_EXPORT Device
@@ -158,6 +171,7 @@ public:
         mInetLayer      = params.inetLayer;
         mListenPort     = listenPort;
         mAdminId        = admin;
+        mBleLayer       = params.bleLayer;
     }
 
     /**
@@ -184,15 +198,7 @@ public:
         mDeviceId = deviceId;
         mState    = ConnectionState::Connecting;
 
-        if (peerAddress.GetTransportType() != Transport::Type::kUdp)
-        {
-            ChipLogError(Controller, "Invalid peer address received in chip device initialization. Expected a UDP address.");
-            chipDie();
-        }
-        else
-        {
-            mDeviceUdpAddress = peerAddress;
-        }
+        mDeviceAddress = peerAddress;
     }
 
     /** @brief Serialize the Pairing Session to a string. It's guaranteed that the string
@@ -294,13 +300,14 @@ public:
         mSessionManager = nullptr;
         mStatusDelegate = nullptr;
         mInetLayer      = nullptr;
+        mBleLayer       = nullptr;
     }
 
     NodeId GetDeviceId() const { return mDeviceId; }
 
     bool MatchesSession(SecureSessionHandle session) const { return mSecureSession == session; }
 
-    void SetAddress(const Inet::IPAddress & deviceAddr) { mDeviceUdpAddress.SetIPAddress(deviceAddr); }
+    void SetAddress(const Inet::IPAddress & deviceAddr) { mDeviceAddress.SetIPAddress(deviceAddr); }
 
     PASESessionSerializable & GetPairing() { return mPairing; }
 
@@ -324,15 +331,16 @@ private:
     /* Node ID assigned to the CHIP device */
     NodeId mDeviceId;
 
-    /** Address used to communicate with the device. MUST be Type::kUDP
-     *  in the current implementation.
+    /** Address used to communicate with the device.
      */
-    Transport::PeerAddress mDeviceUdpAddress = Transport::PeerAddress::UDP(Inet::IPAddress::Any);
+    Transport::PeerAddress mDeviceAddress = Transport::PeerAddress::UDP(Inet::IPAddress::Any);
 
     Inet::InetLayer * mInetLayer = nullptr;
 
     bool mActive           = false;
     ConnectionState mState = ConnectionState::NotConnected;
+
+    Ble::BleLayer * mBleLayer = nullptr;
 
     PASESessionSerializable mPairing;
 
@@ -425,6 +433,7 @@ typedef struct SerializableDevice
     uint8_t mDeviceAddr[INET6_ADDRSTRLEN];
     uint16_t mDevicePort; /* This field is serialized in LittleEndian byte order */
     uint16_t mAdminId;    /* This field is serialized in LittleEndian byte order */
+    Transport::Type mDeviceTransport;
     uint8_t mInterfaceName[kMaxInterfaceName];
 } SerializableDevice;
 

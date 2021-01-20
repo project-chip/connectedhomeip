@@ -493,37 +493,19 @@ class DeviceMgrCmd(Cmd):
 
     def do_setpairingwificredential(self, line):
         """
-        set-pairing-wifi-credential <ssid> <password>
+        set-pairing-wifi-credential
 
-        Set WiFi credential to be used while pairing a Wi-Fi device
+        Removed, use network commissioning cluster instead.
         """
-        try:
-            args = shlex.split(line)
-            if len(args) == 2:
-                self.devCtrl.SetWifiCredential(args[0], args[1])
-                print("WiFi credential set")
-            else:
-                self.do_help("set-pairing-wifi-credential")
-        except exceptions.ChipStackException as ex:
-            print(str(ex))
-            return
+        print("Pairing WiFi Credential is nolonger available, use NetworkCommissioning cluster instead.")
 
     def do_setpairingthreadcredential(self, line):
         """
-        set-pairing-thread-credential <channel> <panid> <masterkey>
+        set-pairing-thread-credential
 
-        Set Thread credential to be used while pairing a Thread device
+        Removed, use network commissioning cluster instead.
         """
-        try:
-            args = shlex.split(line)
-            if len(args) == 3:
-                self.devCtrl.SetThreadCredential(int(args[0]), int(args[1], 16), args[2])
-                print("Thread credential set")
-            else:
-                self.do_help("set-pairing-thread-credential")
-        except exceptions.ChipStackException as ex:
-            print(str(ex))
-            return
+        print("Pairing Thread Credential is nolonger available, use NetworkCommissioning cluster instead.")
 
     def do_history(self, line):
         """

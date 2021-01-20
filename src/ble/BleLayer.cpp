@@ -64,6 +64,7 @@
 
 #include <core/CHIPEncoding.h>
 #include <support/CodeUtils.h>
+#include <support/ReturnMacros.h>
 #include <support/logging/CHIPLogging.h>
 
 // Magic values expected in first 2 bytes of valid BLE transport capabilities request or response:
@@ -385,6 +386,31 @@ exit:
     return err;
 }
 
+BLE_ERROR BleLayer::NewBleConnectionByDiscriminator(uint16_t connDiscriminator)
+{
+
+    VerifyOrReturnError(mState == kState_Initialized, BLE_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mConnectionDelegate != nullptr, BLE_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mBleTransport != nullptr, BLE_ERROR_INCORRECT_STATE);
+
+    mConnectionDelegate->OnConnectionComplete = OnConnectionComplete;
+    mConnectionDelegate->OnConnectionError    = OnConnectionError;
+    // TODO: Passing BleLayer two times is not clean, this should be fixed in follow-ups.
+    mConnectionDelegate->NewConnection(this, this, connDiscriminator);
+
+    return BLE_NO_ERROR;
+}
+
+BLE_ERROR BleLayer::NewBleConnectionByObject(BLE_CONNECTION_OBJECT connObj)
+{
+    VerifyOrReturnError(mState == kState_Initialized, BLE_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mBleTransport != nullptr, BLE_ERROR_INCORRECT_STATE);
+
+    OnConnectionComplete(this, connObj);
+
+    return BLE_NO_ERROR;
+}
+
 BLE_ERROR BleLayer::NewBleEndPoint(BLEEndPoint ** retEndPoint, BLE_CONNECTION_OBJECT connObj, BleRole role, bool autoClose)
 {
     *retEndPoint = nullptr;
@@ -407,6 +433,7 @@ BLE_ERROR BleLayer::NewBleEndPoint(BLEEndPoint ** retEndPoint, BLE_CONNECTION_OB
     }
 
     (*retEndPoint)->Init(this, connObj, role, autoClose);
+    (*retEndPoint)->mBleTransport = mBleTransport;
 
 #if CHIP_ENABLE_CHIPOBLE_TEST
     mTestBleEndPoint = *retEndPoint;
@@ -426,7 +453,8 @@ BLE_ERROR BleLayer::HandleBleTransportConnectionInitiated(BLE_CONNECTION_OBJECT 
     err = NewBleEndPoint(&newEndPoint, connObj, kBleRole_Peripheral, false);
     SuccessOrExit(err);
 
-    newEndPoint->mAppState = mAppState;
+    newEndPoint->mAppState     = mBleTransport;
+    newEndPoint->mBleTransport = mBleTransport;
 
     err = newEndPoint->Receive(std::move(pBuf));
     SuccessOrExit(err); // If we fail here, end point will have already released connection and freed itself.
@@ -736,6 +764,28 @@ BleTransportProtocolVersion BleLayer::GetHighestSupportedProtocolVersion(const B
     }
 
     return retVersion;
+}
+
+void BleLayer::OnConnectionComplete(void * appState, BLE_CONNECTION_OBJECT connObj)
+{
+    BleLayer * layer       = reinterpret_cast<BleLayer *>(appState);
+    BLEEndPoint * endPoint = nullptr;
+    BLE_ERROR err          = layer->NewBleEndPoint(&endPoint, connObj, kBleRole_Central, true);
+
+    SuccessOrExit(err);
+    layer->mBleTransport->OnBleConnectionComplete(endPoint);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        OnConnectionError(layer, err);
+    }
+}
+
+void BleLayer::OnConnectionError(void * appState, BLE_ERROR err)
+{
+    BleLayer * layer = reinterpret_cast<BleLayer *>(appState);
+    layer->mBleTransport->OnBleConnectionError(err);
 }
 
 } /* namespace Ble */

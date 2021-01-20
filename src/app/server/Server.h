@@ -21,13 +21,19 @@
 #include <inet/InetConfig.h>
 #include <transport/AdminPairingTable.h>
 #include <transport/TransportMgr.h>
+#include <transport/raw/BLE.h>
 #include <transport/raw/UDP.h>
 
+using DemoTransportMgr = chip::TransportMgr<chip::Transport::UDP
 #if INET_CONFIG_ENABLE_IPV4
-using DemoTransportMgr = chip::TransportMgr<chip::Transport::UDP, chip::Transport::UDP>;
-#else
-using DemoTransportMgr = chip::TransportMgr<chip::Transport::UDP>;
+                                            ,
+                                            chip::Transport::UDP
 #endif
+#if CONFIG_NETWORK_LAYER_BLE
+                                            ,
+                                            chip::Transport::BLE<4>
+#endif
+                                            >;
 
 /**
  * Initialize DataModelHandler and start CHIP datamodel server, the server

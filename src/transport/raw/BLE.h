@@ -32,12 +32,25 @@
 #include <ble/BleLayer.h>
 #include <core/CHIPCore.h>
 #include <support/DLLUtil.h>
-#include <transport/RendezvousParameters.h>
-#include <transport/RendezvousSessionDelegate.h>
+#include <system/SystemPacketBuffer.h>
 #include <transport/raw/Base.h>
 
 namespace chip {
 namespace Transport {
+
+/** Defines listening parameters for setting up a TCP transport */
+class BleListenParameters
+{
+public:
+    explicit BleListenParameters(Ble::BleLayer * layer) : mLayer(layer) {}
+    BleListenParameters(const BleListenParameters &) = default;
+    BleListenParameters(BleListenParameters &&)      = default;
+
+    Ble::BleLayer * GetBleLayer() const { return mLayer; }
+
+private:
+    Ble::BleLayer * mLayer;
+};
 
 /** Implements a transport using BLE.
  *
@@ -45,7 +58,7 @@ namespace Transport {
  *        in the Transport::Base (i.e. no header is parsed and processed) and
  *        instead received packets are sent raw via BLE Handler callbacks.
  */
-class DLL_EXPORT BLE : public Base
+class DLL_EXPORT BLEBase : public Base, public Ble::BleTransportDelegate
 {
     /**
      *  The State of the BLE connection
@@ -55,10 +68,14 @@ class DLL_EXPORT BLE : public Base
     {
         kNotReady    = 0, /**< State before initialization. */
         kInitialized = 1, /**< State after class is connected and ready. */
+        kConnected   = 2, /**< Endpoint connected. */
     };
 
 public:
-    ~BLE() override;
+    BLEBase(System::PacketBufferHandle * packetBuffers, size_t packetBuffersSize) :
+        mPendingPackets(packetBuffers), mPendingPacketsSize(packetBuffersSize)
+    {}
+    ~BLEBase() override;
 
     /**
      * Initialize a BLE transport to a given peripheral or a given device name.
@@ -66,22 +83,31 @@ public:
      * @param delegate      the delegate that will receive BLE events
      * @param params        BLE configuration parameters for this transport
      */
-    CHIP_ERROR Init(RendezvousSessionDelegate * delegate, const RendezvousParameters & params);
+    CHIP_ERROR Init(const BleListenParameters & param);
 
     CHIP_ERROR SendMessage(const PacketHeader & header, const Transport::PeerAddress & address,
                            System::PacketBufferHandle msgBuf) override;
 
     bool CanSendToPeer(const Transport::PeerAddress & address) override
     {
-        return (mState == State::kInitialized) && (address.GetTransportType() == Type::kBle);
+        return (mState != State::kNotReady) && (address.GetTransportType() == Type::kBle);
     }
 
-    CHIP_ERROR SetEndPoint(Ble::BLEEndPoint * endPoint);
+    CHIP_ERROR SetEndPoint(Ble::BLEEndPoint * endPoint) override;
 
 private:
-    CHIP_ERROR InitInternal(BLE_CONNECTION_OBJECT connObj);
     void SetupEvents(Ble::BLEEndPoint * endPoint);
     void ClearState();
+
+    /**
+     * Sends the specified message once a connection has been established.
+     *
+     * @param msg - what buffer to send once a connection has been established.
+     *
+     * Ownership of msg is taken over and will be freed at some unspecified time
+     * in the future (once connection succeeds/fails).
+     */
+    CHIP_ERROR SendAfterConnect(System::PacketBufferHandle msg);
 
     /**
      * @brief
@@ -94,18 +120,31 @@ private:
 
     // Those functions are BLEConnectionDelegate callbacks used when the connection
     // parameters used a name instead of a BLE_CONNECTION_OBJECT.
-    static void OnBleConnectionComplete(void * appState, BLE_CONNECTION_OBJECT connObj);
-    static void OnBleConnectionError(void * appState, BLE_ERROR err);
+    void OnBleConnectionComplete(Ble::BLEEndPoint * endPoint) override;
+    void OnBleConnectionError(BLE_ERROR err) override;
 
     // Those functions are BLEEndPoint callbacks
-    static void OnBleEndPointReceive(Ble::BLEEndPoint * endPoint, System::PacketBufferHandle buffer);
-    static void OnBleEndPointConnectionComplete(Ble::BLEEndPoint * endPoint, BLE_ERROR err);
-    static void OnBleEndPointConnectionClosed(Ble::BLEEndPoint * endPoint, BLE_ERROR err);
+    void OnEndPointMessageReceived(Ble::BLEEndPoint * endPoint, System::PacketBufferHandle buffer) override;
+    void OnEndPointConnectComplete(Ble::BLEEndPoint * endPoint, BLE_ERROR err) override;
+    void OnEndPointConnectionClosed(Ble::BLEEndPoint * endPoint, BLE_ERROR err) override;
 
-    Ble::BleLayer * mBleLayer             = nullptr;          ///< Associated ble layer
-    State mState                          = State::kNotReady; ///< State of the BLE transport
-    Ble::BLEEndPoint * mBleEndPoint       = nullptr;          ///< BLE endpoint used by transport
-    RendezvousSessionDelegate * mDelegate = nullptr;          ///< BLE events from transport
+    Ble::BleLayer * mBleLayer       = nullptr;          ///< Associated ble layer
+    State mState                    = State::kNotReady; ///< State of the BLE transport
+    Ble::BLEEndPoint * mBleEndPoint = nullptr;          ///< BLE endpoint used by transport
+
+    // Data to be sent when connections succeed
+    System::PacketBufferHandle * mPendingPackets;
+    const size_t mPendingPacketsSize;
+};
+
+template <size_t kPendingPacketSize>
+class BLE : public BLEBase
+{
+public:
+    BLE() : BLEBase(mPendingPackets, kPendingPacketSize) {}
+
+private:
+    System::PacketBufferHandle mPendingPackets[kPendingPacketSize];
 };
 
 } // namespace Transport
