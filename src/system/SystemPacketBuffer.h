@@ -23,6 +23,8 @@
  *      octet-serialized data.
  */
 
+/* no real change */
+
 #pragma once
 
 // Include configuration header
