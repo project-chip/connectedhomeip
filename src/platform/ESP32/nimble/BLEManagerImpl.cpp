@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -663,10 +663,10 @@ void BLEManagerImpl::HandleRXCharWrite(struct ble_gatt_char_context * param)
 
     ESP_LOGI(TAG, "Write request received for CHIPoBLE RX characteristic con %u %u", param->conn_handle, param->attr_handle);
 
-    // Copy the data to a PacketBuffer.
-    PacketBufferHandle buf = PacketBuffer::New(0);
+    // Copy the data to a packet buffer.
+    data_len               = OS_MBUF_PKTLEN(param->ctxt->om);
+    PacketBufferHandle buf = System::PacketBufferHandle::New(data_len, 0);
     VerifyOrExit(!buf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
-    data_len = OS_MBUF_PKTLEN(param->ctxt->om);
     VerifyOrExit(buf->AvailableDataLength() >= data_len, err = CHIP_ERROR_BUFFER_TOO_SMALL);
     ble_hs_mbuf_to_flat(param->ctxt->om, buf->Start(), data_len, NULL);
     buf->SetDataLength(data_len);

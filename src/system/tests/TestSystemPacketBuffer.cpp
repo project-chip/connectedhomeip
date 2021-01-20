@@ -87,7 +87,7 @@ public:
     static int TestInitialize(void * inContext);
     static int TestTerminate(void * inContext);
 
-    static void CheckNewWithAvailableSizeAndFree(nlTestSuite * inSuite, void * inContext);
+    static void CheckNew(nlTestSuite * inSuite, void * inContext);
     static void CheckStart(nlTestSuite * inSuite, void * inContext);
     static void CheckSetStart(nlTestSuite * inSuite, void * inContext);
     static void CheckDataLength(nlTestSuite * inSuite, void * inContext);
@@ -116,6 +116,7 @@ public:
     static void CheckHandleAdopt(nlTestSuite * inSuite, void * inContext);
     static void CheckHandleHold(nlTestSuite * inSuite, void * inContext);
     static void CheckHandleAdvance(nlTestSuite * inSuite, void * inContext);
+    static void CheckHandleRightSize(nlTestSuite * inSuite, void * inContext);
     static void CheckBuildFreeList(nlTestSuite * inSuite, void * inContext);
 
     static void PrintHandle(const char * tag, const PacketBuffer * buffer)
@@ -258,7 +259,7 @@ void PacketBufferTest::PrepareTestBuffer(BufferConfiguration * config, int flags
 {
     if (config->handle.IsNull())
     {
-        config->handle = PacketBuffer::New(0);
+        config->handle = PacketBufferHandle::New(chip::System::kMaxPacketBufferSizeWithoutReserve, 0);
         if (config->handle.IsNull())
         {
             printf("NewPacketBuffer: Failed to allocate packet buffer (%zu retained): %s\n", handles.size(), strerror(errno));
@@ -334,16 +335,15 @@ bool PacketBufferTest::ResetHandles()
 // Test functions invoked from the suite.
 
 /**
- *  Test PacketBuffer::NewWithAvailableSize() and PacketBuffer::Free() functions.
+ *  Test PacketBufferHandle::New() function.
  *
- *  Description: For every buffer-configuration from inContext, create a
- *               buffer's instance using NewWithAvailableSize() method. Then, verify that
- *               when the size of the reserved space passed to NewWithAvailableSize() is
- *               greater than #CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX, the method
- *               returns NULL. Otherwise, check for correctness of initializing
- *               the new buffer's internal state. Finally, free the buffer.
+ *  Description: For every buffer-configuration from inContext, create a buffer's instance
+ *               using the New() method. Then, verify that when the size of the reserved space
+ *               passed to New() is greater than #CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX,
+ *               the method returns nullptr. Otherwise, check for correctness of initializing
+ *               the new buffer's internal state.
  */
-void PacketBufferTest::CheckNewWithAvailableSizeAndFree(nlTestSuite * inSuite, void * inContext)
+void PacketBufferTest::CheckNew(nlTestSuite * inSuite, void * inContext)
 {
     TestContext * const theContext = static_cast<TestContext *>(inContext);
     PacketBufferTest * const test  = theContext->test;
@@ -351,7 +351,7 @@ void PacketBufferTest::CheckNewWithAvailableSizeAndFree(nlTestSuite * inSuite, v
 
     for (const auto & config : test->configurations)
     {
-        const PacketBufferHandle buffer = PacketBuffer::NewWithAvailableSize(config.reserved_size, 0);
+        const PacketBufferHandle buffer = PacketBufferHandle::New(0, config.reserved_size);
 
         if (config.reserved_size > CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX)
         {
@@ -377,7 +377,7 @@ void PacketBufferTest::CheckNewWithAvailableSizeAndFree(nlTestSuite * inSuite, v
     std::vector<PacketBufferHandle> allocate_all_the_things;
     for (;;)
     {
-        PacketBufferHandle buffer = PacketBuffer::NewWithAvailableSize(0, 0);
+        PacketBufferHandle buffer = PacketBufferHandle::New(0, 0);
         if (buffer.IsNull())
         {
             break;
@@ -1298,8 +1298,8 @@ void PacketBufferTest::CheckFree(nlTestSuite * inSuite, void * inContext)
             // start with various buffer ref counts
             for (size_t r = 0; r < kRefs; r++)
             {
-                config_1.handle = PacketBuffer::New(0);
-                config_2.handle = PacketBuffer::New(0);
+                config_1.handle = PacketBufferHandle::New(chip::System::kMaxPacketBufferSizeWithoutReserve, 0);
+                config_2.handle = PacketBufferHandle::New(chip::System::kMaxPacketBufferSizeWithoutReserve, 0);
                 NL_TEST_ASSERT(inSuite, !config_1.handle.IsNull());
                 NL_TEST_ASSERT(inSuite, !config_2.handle.IsNull());
 
@@ -1450,7 +1450,7 @@ void PacketBufferTest::CheckHandleConstruct(nlTestSuite * inSuite, void * inCont
     PacketBufferHandle handle_2(nullptr);
     NL_TEST_ASSERT(inSuite, handle_2.IsNull());
 
-    PacketBufferHandle handle_3(PacketBuffer::New());
+    PacketBufferHandle handle_3(PacketBufferHandle::New(chip::System::kMaxPacketBufferSize));
     NL_TEST_ASSERT(inSuite, !handle_3.IsNull());
 
     // Private constructor.
@@ -1642,41 +1642,79 @@ void PacketBufferTest::CheckHandleAdvance(nlTestSuite * inSuite, void * inContex
     }
 }
 
+void PacketBufferTest::CheckHandleRightSize(nlTestSuite * inSuite, void * inContext)
+{
+    struct TestContext * const theContext = static_cast<struct TestContext *>(inContext);
+    PacketBufferTest * const test         = theContext->test;
+    NL_TEST_ASSERT(inSuite, test->mContext == theContext);
+
+    const char kPayload[]     = "Joy!";
+    PacketBufferHandle handle = PacketBufferHandle::New(chip::System::kMaxPacketBufferSizeWithoutReserve, 0);
+    PacketBuffer * buffer     = handle.mBuffer;
+
+    memcpy(handle->Start(), kPayload, sizeof kPayload);
+    buffer->SetDataLength(sizeof kPayload);
+    NL_TEST_ASSERT(inSuite, handle->ref == 1);
+
+    // RightSize should do nothing if there is another reference to the buffer.
+    {
+        PacketBufferHandle anotherHandle = handle.Retain();
+        handle.RightSize();
+        NL_TEST_ASSERT(inSuite, handle.mBuffer == buffer);
+    }
+
+#if (CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_PBUF_FROM_CUSTOM_POOLS) || (CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC == 0)
+
+    handle.RightSize();
+    NL_TEST_ASSERT(inSuite, handle.mBuffer != buffer);
+    NL_TEST_ASSERT(inSuite, handle->DataSize() == sizeof kPayload);
+    NL_TEST_ASSERT(inSuite, memcmp(handle->Start(), kPayload, sizeof kPayload) == 0);
+
+#else // !((CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_PBUF_FROM_CUSTOM_POOLS) || (CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC == 0))
+
+    // For this configuration, RightSize() does nothing.
+    handle.RightSize();
+    NL_TEST_ASSERT(inSuite, handle.mBuffer == buffer);
+
+#endif // !((CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_PBUF_FROM_CUSTOM_POOLS) || (CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC == 0))
+}
+
 /**
  *   Test Suite. It lists all the test functions.
  */
 // clang-format off
 const nlTest sTests[] =
 {
-    NL_TEST_DEF("PacketBuffer::NewWithAvailableSize&PacketBuffer::Free", PacketBufferTest::CheckNewWithAvailableSizeAndFree),
-    NL_TEST_DEF("PacketBuffer::Start",                                   PacketBufferTest::CheckStart),
-    NL_TEST_DEF("PacketBuffer::SetStart",                                PacketBufferTest::CheckSetStart),
-    NL_TEST_DEF("PacketBuffer::DataLength",                              PacketBufferTest::CheckDataLength),
-    NL_TEST_DEF("PacketBuffer::SetDataLength",                           PacketBufferTest::CheckSetDataLength),
-    NL_TEST_DEF("PacketBuffer::TotalLength",                             PacketBufferTest::CheckTotalLength),
-    NL_TEST_DEF("PacketBuffer::MaxDataLength",                           PacketBufferTest::CheckMaxDataLength),
-    NL_TEST_DEF("PacketBuffer::AvailableDataLength",                     PacketBufferTest::CheckAvailableDataLength),
-    NL_TEST_DEF("PacketBuffer::HasChainedBuffer",                        PacketBufferTest::CheckHasChainedBuffer),
-    NL_TEST_DEF("PacketBuffer::ReservedSize",                            PacketBufferTest::CheckReservedSize),
-    NL_TEST_DEF("PacketBuffer::AddToEnd",                                PacketBufferTest::CheckAddToEnd),
-    NL_TEST_DEF("PacketBuffer::PopHead",                                 PacketBufferTest::CheckPopHead),
-    NL_TEST_DEF("PacketBuffer::CompactHead",                             PacketBufferTest::CheckCompactHead),
-    NL_TEST_DEF("PacketBuffer::ConsumeHead",                             PacketBufferTest::CheckConsumeHead),
-    NL_TEST_DEF("PacketBuffer::Consume",                                 PacketBufferTest::CheckConsume),
-    NL_TEST_DEF("PacketBuffer::EnsureReservedSize",                      PacketBufferTest::CheckEnsureReservedSize),
-    NL_TEST_DEF("PacketBuffer::AlignPayload",                            PacketBufferTest::CheckAlignPayload),
-    NL_TEST_DEF("PacketBuffer::Next",                                    PacketBufferTest::CheckNext),
-    NL_TEST_DEF("PacketBuffer::Last",                                    PacketBufferTest::CheckLast),
-    NL_TEST_DEF("PacketBuffer::AddRef",                                  PacketBufferTest::CheckAddRef),
-    NL_TEST_DEF("PacketBuffer::Free",                                    PacketBufferTest::CheckFree),
-    NL_TEST_DEF("PacketBuffer::FreeHead",                                PacketBufferTest::CheckFreeHead),
-    NL_TEST_DEF("PacketBuffer::HandleConstruct",                         PacketBufferTest::CheckHandleConstruct),
-    NL_TEST_DEF("PacketBuffer::HandleMove",                              PacketBufferTest::CheckHandleMove),
-    NL_TEST_DEF("PacketBuffer::HandleFree",                              PacketBufferTest::CheckHandleFree),
-    NL_TEST_DEF("PacketBuffer::HandleRetain",                            PacketBufferTest::CheckHandleRetain),
-    NL_TEST_DEF("PacketBuffer::HandleAdopt",                             PacketBufferTest::CheckHandleAdopt),
-    NL_TEST_DEF("PacketBuffer::HandleHold",                              PacketBufferTest::CheckHandleHold),
-    NL_TEST_DEF("PacketBuffer::HandleAdvance",                           PacketBufferTest::CheckHandleAdvance),
+    NL_TEST_DEF("PacketBuffer::New",                    PacketBufferTest::CheckNew),
+    NL_TEST_DEF("PacketBuffer::Start",                  PacketBufferTest::CheckStart),
+    NL_TEST_DEF("PacketBuffer::SetStart",               PacketBufferTest::CheckSetStart),
+    NL_TEST_DEF("PacketBuffer::DataLength",             PacketBufferTest::CheckDataLength),
+    NL_TEST_DEF("PacketBuffer::SetDataLength",          PacketBufferTest::CheckSetDataLength),
+    NL_TEST_DEF("PacketBuffer::TotalLength",            PacketBufferTest::CheckTotalLength),
+    NL_TEST_DEF("PacketBuffer::MaxDataLength",          PacketBufferTest::CheckMaxDataLength),
+    NL_TEST_DEF("PacketBuffer::AvailableDataLength",    PacketBufferTest::CheckAvailableDataLength),
+    NL_TEST_DEF("PacketBuffer::HasChainedBuffer",       PacketBufferTest::CheckHasChainedBuffer),
+    NL_TEST_DEF("PacketBuffer::ReservedSize",           PacketBufferTest::CheckReservedSize),
+    NL_TEST_DEF("PacketBuffer::AddToEnd",               PacketBufferTest::CheckAddToEnd),
+    NL_TEST_DEF("PacketBuffer::PopHead",                PacketBufferTest::CheckPopHead),
+    NL_TEST_DEF("PacketBuffer::CompactHead",            PacketBufferTest::CheckCompactHead),
+    NL_TEST_DEF("PacketBuffer::ConsumeHead",            PacketBufferTest::CheckConsumeHead),
+    NL_TEST_DEF("PacketBuffer::Consume",                PacketBufferTest::CheckConsume),
+    NL_TEST_DEF("PacketBuffer::EnsureReservedSize",     PacketBufferTest::CheckEnsureReservedSize),
+    NL_TEST_DEF("PacketBuffer::AlignPayload",           PacketBufferTest::CheckAlignPayload),
+    NL_TEST_DEF("PacketBuffer::Next",                   PacketBufferTest::CheckNext),
+    NL_TEST_DEF("PacketBuffer::Last",                   PacketBufferTest::CheckLast),
+    NL_TEST_DEF("PacketBuffer::AddRef",                 PacketBufferTest::CheckAddRef),
+    NL_TEST_DEF("PacketBuffer::Free",                   PacketBufferTest::CheckFree),
+    NL_TEST_DEF("PacketBuffer::FreeHead",               PacketBufferTest::CheckFreeHead),
+    NL_TEST_DEF("PacketBuffer::HandleConstruct",        PacketBufferTest::CheckHandleConstruct),
+    NL_TEST_DEF("PacketBuffer::HandleMove",             PacketBufferTest::CheckHandleMove),
+    NL_TEST_DEF("PacketBuffer::HandleFree",             PacketBufferTest::CheckHandleFree),
+    NL_TEST_DEF("PacketBuffer::HandleRetain",           PacketBufferTest::CheckHandleRetain),
+    NL_TEST_DEF("PacketBuffer::HandleAdopt",            PacketBufferTest::CheckHandleAdopt),
+    NL_TEST_DEF("PacketBuffer::HandleHold",             PacketBufferTest::CheckHandleHold),
+    NL_TEST_DEF("PacketBuffer::HandleAdvance",          PacketBufferTest::CheckHandleAdvance),
+    NL_TEST_DEF("PacketBuffer::HandleRightSize",        PacketBufferTest::CheckHandleRightSize),
 
     NL_TEST_SENTINEL()
 };

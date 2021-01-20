@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -151,7 +151,7 @@ CHIP_ERROR ResponseSender::FlushReply()
 
 CHIP_ERROR ResponseSender::PrepareNewReplyPacket()
 {
-    chip::System::PacketBufferHandle buffer = chip::System::PacketBuffer::NewWithAvailableSize(kPacketSizeBytes);
+    chip::System::PacketBufferHandle buffer = chip::System::PacketBufferHandle::New(kPacketSizeBytes);
     ReturnErrorCodeIf(buffer.IsNull(), CHIP_ERROR_NO_MEMORY);
 
     mResponseBuilder.Reset(std::move(buffer));

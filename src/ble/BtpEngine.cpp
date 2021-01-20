@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2014-2017 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -46,23 +46,6 @@
 #else
 #define ChipLogDebugBtpEngine(MOD, MSG, ...)
 #endif
-
-#define CHIP_BLE_TRANSFER_PROTOCOL_HEADER_FLAGS_SIZE 1 // Size in bytes of enocded BTP fragment header flag bits
-#define CHIP_BLE_TRANSFER_PROTOCOL_SEQUENCE_NUM_SIZE 1 // Size in bytes of encoded BTP sequence number
-#define CHIP_BLE_TRANSFER_PROTOCOL_ACK_SIZE 1          // Size in bytes of encoded BTP fragment acknowledgement number
-#define CHIP_BLE_TRANSFER_PROTOCOL_MSG_LEN_SIZE 2      // Size in byte of encoded BTP total fragmented message length
-
-#define CHIP_BLE_TRANSFER_PROTOCOL_MAX_HEADER_SIZE                                                                                 \
-    (CHIP_BLE_TRANSFER_PROTOCOL_HEADER_FLAGS_SIZE + CHIP_BLE_TRANSFER_PROTOCOL_ACK_SIZE +                                          \
-     CHIP_BLE_TRANSFER_PROTOCOL_SEQUENCE_NUM_SIZE + CHIP_BLE_TRANSFER_PROTOCOL_MSG_LEN_SIZE)
-
-#define CHIP_BLE_TRANSFER_PROTOCOL_MID_FRAGMENT_MAX_HEADER_SIZE                                                                    \
-    (CHIP_BLE_TRANSFER_PROTOCOL_HEADER_FLAGS_SIZE + CHIP_BLE_TRANSFER_PROTOCOL_ACK_SIZE +                                          \
-     CHIP_BLE_TRANSFER_PROTOCOL_SEQUENCE_NUM_SIZE)
-
-#define CHIP_BLE_TRANSFER_PROTOCOL_STANDALONE_ACK_HEADER_SIZE                                                                      \
-    (CHIP_BLE_TRANSFER_PROTOCOL_HEADER_FLAGS_SIZE + CHIP_BLE_TRANSFER_PROTOCOL_ACK_SIZE +                                          \
-     CHIP_BLE_TRANSFER_PROTOCOL_SEQUENCE_NUM_SIZE)
 
 namespace chip {
 namespace Ble {
@@ -226,7 +209,7 @@ BLE_ERROR BtpEngine::EncodeStandAloneAck(const PacketBufferHandle & data)
     VerifyOrExit(data->EnsureReservedSize(CHIP_CONFIG_BLE_PKT_RESERVED_SIZE), err = BLE_ERROR_NO_MEMORY);
 
     // Ensure enough space for standalone ack payload.
-    VerifyOrExit(data->MaxDataLength() >= CHIP_BLE_TRANSFER_PROTOCOL_STANDALONE_ACK_HEADER_SIZE, err = BLE_ERROR_NO_MEMORY);
+    VerifyOrExit(data->MaxDataLength() >= kTransferProtocolStandaloneAckHeaderSize, err = BLE_ERROR_NO_MEMORY);
     characteristic = data->Start();
 
     // Since there's no preexisting message payload, we can write BTP header without adjusting data start pointer.
@@ -240,7 +223,7 @@ BLE_ERROR BtpEngine::EncodeStandAloneAck(const PacketBufferHandle & data)
     characteristic[2] = GetAndIncrementNextTxSeqNum();
 
     // Set ack payload data length.
-    data->SetDataLength(CHIP_BLE_TRANSFER_PROTOCOL_STANDALONE_ACK_HEADER_SIZE);
+    data->SetDataLength(kTransferProtocolStandaloneAckHeaderSize);
 
 exit:
     return err;
@@ -335,7 +318,7 @@ BLE_ERROR BtpEngine::HandleCharacteristicReceived(System::PacketBufferHandle dat
         data->ConsumeHead(startReader.OctetsRead());
 
         // Create a new buffer for use as the Rx re-assembly area.
-        mRxBuf = PacketBuffer::New();
+        mRxBuf = System::PacketBufferHandle::New(System::kMaxPacketBufferSize);
 
         VerifyOrExit(!mRxBuf.IsNull(), err = BLE_ERROR_NO_MEMORY);
 
@@ -455,8 +438,8 @@ bool BtpEngine::HandleCharacteristicSend(System::PacketBufferHandle data, bool s
         PrintBufDebug(data);
 
         // Determine fragment header size.
-        uint8_t header_size = send_ack ? CHIP_BLE_TRANSFER_PROTOCOL_MAX_HEADER_SIZE
-                                       : (CHIP_BLE_TRANSFER_PROTOCOL_MAX_HEADER_SIZE - CHIP_BLE_TRANSFER_PROTOCOL_ACK_SIZE);
+        uint8_t header_size =
+            send_ack ? kTransferProtocolMaxHeaderSize : (kTransferProtocolMaxHeaderSize - kTransferProtocolAckSize);
 
         // Ensure enough headroom exists for the BTP header, and any headroom needed by the lower BLE layers.
         if (!mTxBuf->EnsureReservedSize(header_size + CHIP_CONFIG_BLE_PKT_RESERVED_SIZE))
@@ -522,9 +505,8 @@ bool BtpEngine::HandleCharacteristicSend(System::PacketBufferHandle data, bool s
         characteristic += mTxFragmentSize;
 
         // prepend header
-        characteristic -= send_ack
-            ? CHIP_BLE_TRANSFER_PROTOCOL_MID_FRAGMENT_MAX_HEADER_SIZE
-            : (CHIP_BLE_TRANSFER_PROTOCOL_MID_FRAGMENT_MAX_HEADER_SIZE - CHIP_BLE_TRANSFER_PROTOCOL_ACK_SIZE);
+        characteristic -= send_ack ? kTransferProtocolMidFragmentMaxHeaderSize
+                                   : (kTransferProtocolMidFragmentMaxHeaderSize - kTransferProtocolAckSize);
         mTxBuf->SetStart(characteristic);
         uint8_t cursor = 1; // first position past header flags byte
 

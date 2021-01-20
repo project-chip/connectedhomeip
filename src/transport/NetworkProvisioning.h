@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -113,8 +113,9 @@ private:
      */
     CHIP_ERROR SendIPAddress(const Inet::IPAddress & addr);
 
-    CHIP_ERROR EncodeString(const char * str, BufBound & bbuf);
-    CHIP_ERROR DecodeString(const uint8_t * input, size_t input_len, BufBound & bbuf, size_t & consumed);
+    static uint16_t EncodedStringSize(const char * str);
+    static CHIP_ERROR EncodeString(const char * str, BufBound & bbuf);
+    static CHIP_ERROR DecodeString(const uint8_t * input, size_t input_len, BufBound & bbuf, size_t & consumed);
 
     CHIP_ERROR DecodeThreadAssociationRequest(const System::PacketBufferHandle & msgBuf);
 

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -38,6 +38,10 @@
 #include <transport/SecureSessionMgr.h>
 #include <transport/raw/TCP.h>
 #include <transport/raw/UDP.h>
+
+#include <inttypes.h>
+#include <stdio.h>
+#include <string.h>
 
 #define ECHO_CLIENT_PORT (CHIP_PORT + 1)
 
@@ -81,22 +85,16 @@ bool EchoIntervalExpired(void)
 
 CHIP_ERROR SendEchoRequest(void)
 {
-    CHIP_ERROR err                              = CHIP_NO_ERROR;
-    chip::System::PacketBufferHandle payloadBuf = chip::System::PacketBuffer::New();
+    CHIP_ERROR err              = CHIP_NO_ERROR;
+    const char kRequestFormat[] = "Echo Message %" PRIu64 "\n";
+    char requestData[(sizeof kRequestFormat) + 20 /* uint64_t decimal digits */];
+    snprintf(requestData, sizeof requestData, kRequestFormat, gEchoCount);
+    chip::System::PacketBufferHandle payloadBuf = chip::System::PacketBufferHandle::NewWithData(requestData, strlen(requestData));
 
     if (payloadBuf.IsNull())
     {
         printf("Unable to allocate PacketBuffer\n");
         return CHIP_ERROR_NO_MEMORY;
-    }
-    else
-    {
-        // Add some application payload data in the buffer.
-        char * p    = reinterpret_cast<char *>(payloadBuf->Start());
-        int32_t len = snprintf(p, CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE, "Echo Message %" PRIu64 "\n", gEchoCount);
-
-        // Set the datalength in the buffer appropriately.
-        payloadBuf->SetDataLength(static_cast<uint16_t>(len));
     }
 
     gLastEchoTime = chip::System::Timer::GetCurrentEpoch();

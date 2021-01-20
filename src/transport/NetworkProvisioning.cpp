@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -124,6 +124,11 @@ exit:
     return err;
 }
 
+uint16_t NetworkProvisioning::EncodedStringSize(const char * str)
+{
+    return static_cast<uint16_t>(strlen(str) + sizeof(uint16_t));
+}
+
 CHIP_ERROR NetworkProvisioning::EncodeString(const char * str, BufBound & bbuf)
 {
     CHIP_ERROR err  = CHIP_NO_ERROR;
@@ -161,19 +166,16 @@ exit:
 
 CHIP_ERROR NetworkProvisioning::SendIPAddress(const Inet::IPAddress & addr)
 {
+    char * addrStr;
     CHIP_ERROR err                    = CHIP_NO_ERROR;
-    System::PacketBufferHandle buffer = System::PacketBuffer::New();
-    char * addrStr                    = addr.ToString(Uint8::to_char(buffer->Start()), buffer->AvailableDataLength());
-    size_t addrLen                    = 0;
+    System::PacketBufferHandle buffer = System::PacketBufferHandle::New(Inet::kMaxIPAddressStringLength);
+    VerifyOrExit(!buffer.IsNull(), err = CHIP_ERROR_NO_MEMORY);
+    addrStr = addr.ToString(Uint8::to_char(buffer->Start()), buffer->AvailableDataLength());
+    buffer->SetDataLength(static_cast<uint16_t>(strlen(addrStr) + 1));
 
     ChipLogProgress(NetworkProvisioning, "Sending IP Address. Delegate %p\n", mDelegate);
     VerifyOrExit(mDelegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(addrStr != nullptr, err = CHIP_ERROR_INVALID_ADDRESS);
-
-    addrLen = strlen(addrStr) + 1;
-
-    VerifyOrExit(CanCastTo<uint16_t>(addrLen), err = CHIP_ERROR_INVALID_ARGUMENT);
-    buffer->SetDataLength(static_cast<uint16_t>(addrLen));
 
     err = mDelegate->SendSecureMessage(Protocols::kProtocol_NetworkProvisioning, NetworkProvisioning::MsgTypes::kIPAddressAssigned,
                                        std::move(buffer));
@@ -187,23 +189,27 @@ exit:
 
 CHIP_ERROR NetworkProvisioning::SendNetworkCredentials(const char * ssid, const char * passwd)
 {
-    CHIP_ERROR err                    = CHIP_NO_ERROR;
-    System::PacketBufferHandle buffer = System::PacketBuffer::New();
-    BufBound bbuf(buffer->Start(), buffer->AvailableDataLength());
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    const size_t bufferSize = static_cast<uint16_t>(EncodedStringSize(ssid) + EncodedStringSize(passwd));
+    VerifyOrExit(CanCastTo<uint16_t>(bufferSize), err = CHIP_ERROR_INVALID_ARGUMENT);
+    {
+        System::PacketBufferHandle buffer = System::PacketBufferHandle::New(static_cast<uint16_t>(bufferSize));
+        BufBound bbuf(buffer->Start(), buffer->AvailableDataLength());
 
-    ChipLogProgress(NetworkProvisioning, "Sending Network Creds. Delegate %p\n", mDelegate);
-    VerifyOrExit(mDelegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(!buffer.IsNull(), err = CHIP_ERROR_NO_MEMORY);
-    SuccessOrExit(EncodeString(ssid, bbuf));
-    SuccessOrExit(EncodeString(passwd, bbuf));
-    VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_BUFFER_TOO_SMALL);
+        ChipLogProgress(NetworkProvisioning, "Sending Network Creds. Delegate %p\n", mDelegate);
+        VerifyOrExit(mDelegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrExit(!buffer.IsNull(), err = CHIP_ERROR_NO_MEMORY);
+        SuccessOrExit(EncodeString(ssid, bbuf));
+        SuccessOrExit(EncodeString(passwd, bbuf));
+        VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    VerifyOrExit(CanCastTo<uint16_t>(bbuf.Needed()), err = CHIP_ERROR_INVALID_ARGUMENT);
-    buffer->SetDataLength(static_cast<uint16_t>(bbuf.Needed()));
+        VerifyOrExit(CanCastTo<uint16_t>(bbuf.Needed()), err = CHIP_ERROR_INVALID_ARGUMENT);
+        buffer->SetDataLength(static_cast<uint16_t>(bbuf.Needed()));
 
-    err = mDelegate->SendSecureMessage(Protocols::kProtocol_NetworkProvisioning,
-                                       NetworkProvisioning::MsgTypes::kWiFiAssociationRequest, std::move(buffer));
-    SuccessOrExit(err);
+        err = mDelegate->SendSecureMessage(Protocols::kProtocol_NetworkProvisioning,
+                                           NetworkProvisioning::MsgTypes::kWiFiAssociationRequest, std::move(buffer));
+        SuccessOrExit(err);
+    }
 
 exit:
     if (CHIP_NO_ERROR != err)
@@ -213,8 +219,19 @@ exit:
 
 CHIP_ERROR NetworkProvisioning::SendThreadCredentials(const DeviceLayer::Internal::DeviceNetworkInfo & threadData)
 {
-    CHIP_ERROR err                    = CHIP_NO_ERROR;
-    System::PacketBufferHandle buffer = System::PacketBuffer::New();
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    /* clang-format off */
+    constexpr uint16_t credentialSize =
+        sizeof(threadData.ThreadNetworkName) +
+        sizeof(threadData.ThreadExtendedPANId) +
+        sizeof(threadData.ThreadMeshPrefix) +
+        sizeof(threadData.ThreadMasterKey) +
+        sizeof(threadData.ThreadPSKc) +
+        sizeof (uint16_t) + // threadData.ThereadPANId
+        4;                  // threadData.ThreadChannel, threadData.FieldPresent.ThreadExtendedPANId,
+                            // threadData.FieldPresent.ThreadMeshPrefix, threadData.FieldPresent.ThreadPSKc
+    /* clang-format on */
+    System::PacketBufferHandle buffer = System::PacketBufferHandle::New(credentialSize);
 
     ChipLogProgress(NetworkProvisioning, "Sending Thread Credentials");
     VerifyOrExit(mDelegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);

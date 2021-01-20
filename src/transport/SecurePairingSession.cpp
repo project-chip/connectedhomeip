@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -320,7 +320,7 @@ CHIP_ERROR SecurePairingSession::SendPBKDFParamRequest()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    System::PacketBufferHandle req = System::PacketBuffer::NewWithAvailableSize(kPBKDFParamRandomNumberSize);
+    System::PacketBufferHandle req = System::PacketBufferHandle::New(kPBKDFParamRandomNumberSize);
     VerifyOrExit(!req.IsNull(), err = CHIP_SYSTEM_ERROR_NO_MEMORY);
 
     err = DRBG_get_bytes(req->Start(), kPBKDFParamRandomNumberSize);
@@ -388,17 +388,13 @@ CHIP_ERROR SecurePairingSession::SendPBKDFParamResponse()
 
     System::PacketBufferHandle resp;
     static_assert(CHAR_BIT == 8, "Assuming sizeof() returns octets here and for sizeof(mPoint)");
-    size_t resplen  = kPBKDFParamRandomNumberSize + sizeof(uint64_t) + sizeof(uint32_t) + mSaltLength;
-    uint16_t u16len = 0;
+    size_t resplen = kPBKDFParamRandomNumberSize + sizeof(uint64_t) + sizeof(uint32_t) + mSaltLength;
 
     size_t sizeof_point = sizeof(mPoint);
 
     uint8_t * msg = nullptr;
 
-    VerifyOrExit(CanCastTo<uint16_t>(resplen), err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
-    u16len = static_cast<uint16_t>(resplen);
-
-    resp = System::PacketBuffer::NewWithAvailableSize(u16len);
+    resp = System::PacketBufferHandle::New(resplen);
     VerifyOrExit(!resp.IsNull(), err = CHIP_SYSTEM_ERROR_NO_MEMORY);
 
     msg = resp->Start();
@@ -416,7 +412,7 @@ CHIP_ERROR SecurePairingSession::SendPBKDFParamResponse()
         VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_NO_MEMORY);
     }
 
-    resp->SetDataLength(u16len);
+    resp->SetDataLength(static_cast<uint16_t>(resplen));
 
     // Update commissioning hash with the pbkdf2 param response that's being sent.
     err = mCommissioningHash.AddData(resp->Start(), resp->DataLength());
@@ -497,7 +493,6 @@ CHIP_ERROR SecurePairingSession::SendMsg1()
 {
     uint8_t X[kMAX_Point_Length];
     size_t X_len = sizeof(X);
-    uint16_t data_len; // Will be the same as X_len in practice.
 
     System::PacketBufferHandle msg_pA;
 
@@ -507,15 +502,10 @@ CHIP_ERROR SecurePairingSession::SendMsg1()
 
     err = mSpake2p.ComputeRoundOne(X, &X_len);
     SuccessOrExit(err);
-    VerifyOrExit(CanCastTo<uint16_t>(X_len), err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
-    data_len = static_cast<uint16_t>(X_len);
 
-    msg_pA = System::PacketBuffer::NewWithAvailableSize(data_len);
+    msg_pA = System::PacketBufferHandle::NewWithData(&X[0], X_len);
     VerifyOrExit(!msg_pA.IsNull(), err = CHIP_SYSTEM_ERROR_NO_MEMORY);
 
-    memcpy(msg_pA->Start(), &X[0], X_len);
-
-    msg_pA->SetDataLength(data_len);
     mNextExpectedMsg = Protocols::SecureChannel::MsgType::PASE_Spake2p2;
 
     // Call delegate to send the Msg1 to peer
@@ -571,7 +561,7 @@ CHIP_ERROR SecurePairingSession::HandleMsg1_and_SendMsg2(const PacketHeader & he
     VerifyOrExit(CanCastTo<uint16_t>(Y_len + verifier_len), err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
     data_len = static_cast<uint16_t>(Y_len + verifier_len);
 
-    resp = System::PacketBuffer::NewWithAvailableSize(data_len);
+    resp = System::PacketBufferHandle::New(data_len);
     VerifyOrExit(!resp.IsNull(), err = CHIP_SYSTEM_ERROR_NO_MEMORY);
 
     {
@@ -630,7 +620,7 @@ CHIP_ERROR SecurePairingSession::HandleMsg2_and_SendMsg3(const PacketHeader & he
         mConnectionState.SetPeerNodeId(header.GetSourceNodeId().Value());
     }
 
-    resp = System::PacketBuffer::NewWithAvailableSize(verifier_len);
+    resp = System::PacketBufferHandle::New(verifier_len);
     VerifyOrExit(!resp.IsNull(), err = CHIP_SYSTEM_ERROR_NO_MEMORY);
 
     {
@@ -733,7 +723,7 @@ void SecurePairingSession::SendErrorMsg(Spake2pErrorType errorCode)
     uint16_t msglen        = sizeof(Spake2pErrorMsg);
     Spake2pErrorMsg * pMsg = nullptr;
 
-    msg = System::PacketBuffer::NewWithAvailableSize(msglen);
+    msg = System::PacketBufferHandle::New(msglen);
     VerifyOrExit(!msg.IsNull(), err = CHIP_SYSTEM_ERROR_NO_MEMORY);
 
     pMsg        = reinterpret_cast<Spake2pErrorMsg *>(msg->Start());

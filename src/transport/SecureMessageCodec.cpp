@@ -107,7 +107,7 @@ CHIP_ERROR Decode(Transport::PeerConnectionState * state, PayloadHeader & payloa
     /* This is a workaround for the case where PacketBuffer payload is not
         allocated as an inline buffer to PacketBuffer structure */
     origMsg = std::move(msg);
-    msg     = PacketBuffer::NewWithAvailableSize(len);
+    msg     = PacketBufferHandle::New(len);
     VerifyOrReturnError(!msg.IsNull(), CHIP_ERROR_NO_MEMORY);
     msg->SetDataLength(len);
 #endif
