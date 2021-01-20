@@ -202,6 +202,7 @@ void RendezvousSession::OnRendezvousConnectionClosed()
 
 void RendezvousSession::OnRendezvousError(CHIP_ERROR err)
 {
+    ReleasePairingSessionHandle();
     if (mDelegate != nullptr)
     {
         switch (mCurrentState)
