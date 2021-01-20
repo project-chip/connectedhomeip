@@ -85,6 +85,16 @@ function chip_server_clusters(options)
       .then(clusters => templateUtil.collectBlocks(clusters, options, this))
 }
 
+function chip_clusters(options)
+{
+  const db = this.global.db;
+
+  return queryImpexp.exportendPointTypeIds(db, this.global.sessionId)
+      .then(endpointTypes => { return zclQuery.exportAllClustersDetailsFromEndpointTypes(db, endpointTypes) })
+      .then(clusters => clusters.filter(cluster => cluster.enabled == 1))
+      .then(clusters => templateUtil.collectBlocks(clusters, options, this))
+}
+
 /**
  * Creates block iterator over the server side cluster command
  * for a given cluster.
@@ -266,7 +276,7 @@ function chip_server_cluster_attributes(options)
   function fn(pkgId)
   {
     return getAttributes.call(this, pkgId, options).then(atts => {
-      atts = atts.filter(att => att.clusterCode == clusterCode && att.side == clusterSide);
+      atts = atts.filter(att => att.clusterCode == clusterCode && att.side == 'server');
       atts.forEach(att => {
         const sameAttributes = atts.filter(att2 => att.name == att2.name);
         let isWritable       = !!sameAttributes.find(att2 => att2.writable);
@@ -386,6 +396,7 @@ function asPythonCType(zclType)
 //
 // Module exports
 //
+exports.chip_clusters                         = chip_clusters;
 exports.chip_server_clusters                  = chip_server_clusters;
 exports.chip_server_cluster_commands          = chip_server_cluster_commands;
 exports.chip_server_cluster_command_arguments = chip_server_cluster_command_arguments

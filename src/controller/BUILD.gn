@@ -29,6 +29,7 @@ static_library("controller") {
     "CHIPDeviceController.h",
     "CHIPDeviceController_deprecated.cpp",
     "CHIPDeviceController_deprecated.h",
+    "${chip_root}/src/app/util/CallbacksMgr.cpp",
   ]
 
   cflags = [ "-Wconversion" ]

@@ -204,43 +204,6 @@ void Device::OnMessageReceived(const PacketHeader & header, const PayloadHeader 
         {
             mStatusDelegate->OnMessage(std::move(msgBuf));
         }
-
-        // TODO: The following callback processing will need further work
-        //       1. The response needs to be parsed as per cluster definition. The response callback
-        //          should carry the parsed response values.
-        //       2. The reports callbacks should also be called with the parsed reports.
-        //       3. The callbacks would be tracked using exchange context. On receiving the
-        //          message, the exchange context in the message should be matched against
-        //          the registered callbacks.
-        // GitHub issue: https://github.com/project-chip/connectedhomeip/issues/3910
-        Cancelable * ca = mResponses.mNext;
-        while (ca != &mResponses)
-        {
-            Callback::Callback<> * cb = Callback::Callback<>::FromCancelable(ca);
-            // Let's advance to the next cancelable, as the current one will get removed
-            // from the list (and once removed, its next will point to itself)
-            ca = ca->mNext;
-            if (cb != nullptr)
-            {
-                ChipLogProgress(Controller, "Dispatching response callback %p", cb);
-                cb->Cancel();
-                cb->mCall(cb->mContext);
-            }
-        }
-
-        ca = mReports.mNext;
-        while (ca != &mReports)
-        {
-            Callback::Callback<> * cb = Callback::Callback<>::FromCancelable(ca);
-            // Let's advance to the next cancelable, as the current one might get removed
-            // from the list in the callback (and if removed, its next will point to itself)
-            ca = ca->mNext;
-            if (cb != nullptr)
-            {
-                ChipLogProgress(Controller, "Dispatching report callback %p", cb);
-                cb->mCall(cb->mContext);
-            }
-        }
     }
 }
 
@@ -291,28 +254,14 @@ bool Device::GetIpAddress(Inet::IPAddress & addr) const
     return true;
 }
 
-void Device::AddResponseHandler(EndpointId endpoint, ClusterId cluster, Callback::Callback<> * onResponse)
+void Device::AddResponseHandler(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    CallbackInfo info                 = { endpoint, cluster };
-    Callback::Cancelable * cancelable = onResponse->Cancel();
-
-    static_assert(sizeof(info) <= sizeof(cancelable->mInfoScalar), "Size of CallbackInfo should be <= size of mInfoScalar");
-
-    cancelable->mInfoScalar = 0;
-    memmove(&cancelable->mInfoScalar, &info, sizeof(info));
-    mResponses.Enqueue(cancelable);
+    mCallbacksMgr.AddResponseCallback(mDeviceId, 0, onSuccessCallback, onFailureCallback);
 }
 
-void Device::AddReportHandler(EndpointId endpoint, ClusterId cluster, Callback::Callback<> * onReport)
+void Device::AddReportHandler(EndpointId endpoint, ClusterId cluster, AttributeId attribute, Callback::Cancelable * onReportCallback)
 {
-    CallbackInfo info                 = { endpoint, cluster };
-    Callback::Cancelable * cancelable = onReport->Cancel();
-
-    static_assert(sizeof(info) <= sizeof(cancelable->mInfoScalar), "Size of CallbackInfo should be <= size of mInfoScalar");
-
-    cancelable->mInfoScalar = 0;
-    memmove(&cancelable->mInfoScalar, &info, sizeof(info));
-    mReports.Enqueue(cancelable);
+    mCallbacksMgr.AddReportCallback(mDeviceId, endpoint, cluster, attribute, onReportCallback);
 }
 
 } // namespace Controller

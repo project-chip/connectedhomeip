@@ -16,17 +16,22 @@
  *
  */
 
-#include "ModelCommand.h"
+#include "ReportingCommand.h"
+
+#include "../clusters/ResponseCallbacks.h"
+#include "../common/Commands.h"
+#include <controller/CHIPClusters.h>
 
 using namespace ::chip;
 
 namespace {
-constexpr uint16_t kWaitDurationInSeconds = 10;
+constexpr uint16_t kWaitDurationInSeconds = UINT16_MAX;
 } // namespace
 
-CHIP_ERROR ModelCommand::Run(PersistentStorage & storage, NodeId localId, NodeId remoteId)
+CHIP_ERROR ReportingCommand::Run(PersistentStorage & storage, NodeId localId, NodeId remoteId)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+    chip::Controller::BasicCluster cluster;
 
     err = mCommissioner.SetUdpListenPort(storage.GetListenPort());
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Commissioner: %s", ErrorStr(err)));
@@ -42,13 +47,14 @@ CHIP_ERROR ModelCommand::Run(PersistentStorage & storage, NodeId localId, NodeId
 
     mDevice->SetDelegate(this);
 
-    err = SendCommand(mDevice, mEndPointId);
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(chipTool, "Failed to send message: %s", ErrorStr(err)));
+    AddReportCallbacks(mEndPointId);
+
+    cluster.Associate(mDevice, mEndPointId);
+    err = cluster.MfgSpecificPing(nullptr, nullptr);
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Ping failure: %s", ErrorStr(err)));
 
     UpdateWaitForResponse(true);
     WaitForResponse(kWaitDurationInSeconds);
-
-    VerifyOrExit(GetCommandExitStatus(), err = CHIP_ERROR_INTERNAL);
 
 exit:
     mCommissioner.ServiceEventSignal();
@@ -56,13 +62,13 @@ exit:
     return err;
 }
 
-void ModelCommand::OnMessage(PacketBufferHandle buffer)
+void ReportingCommand::OnMessage(PacketBufferHandle buffer)
 {
     ChipLogDetail(chipTool, "%" PRIu64 ": Received %zu bytes", mDevice->GetDeviceId(), buffer->DataLength());
     HandleDataModelMessage(mDevice->GetDeviceId(), std::move(buffer));
 }
 
-void ModelCommand::OnStatusChange(void)
+void ReportingCommand::OnStatusChange(void)
 {
     ChipLogDetail(chipTool, "DeviceStatusDelegate::OnStatusChange");
 }

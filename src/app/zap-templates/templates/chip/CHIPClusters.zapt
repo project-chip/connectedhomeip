@@ -24,22 +24,22 @@ public:
 
     // Cluster Commands
     {{/first}}
-    CHIP_ERROR {{asCamelCased name false}}(Callback::Callback<> * onCompletion{{#chip_server_cluster_command_arguments}}, {{chipType}} {{asCamelCased label}}{{/chip_server_cluster_command_arguments}});
+    CHIP_ERROR {{asCamelCased name false}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback{{#chip_server_cluster_command_arguments}}, {{chipType}} {{asCamelCased label}}{{/chip_server_cluster_command_arguments}});
     {{/chip_server_cluster_commands}}
 
     // Cluster Attributes
-    CHIP_ERROR DiscoverAttributes(Callback::Callback<> * onCompletion);
+    CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     {{#chip_server_cluster_attributes}}
-    CHIP_ERROR ReadAttribute{{asCamelCased name false}}(Callback::Callback<> * onCompletion);
+    CHIP_ERROR ReadAttribute{{asCamelCased name false}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     {{/chip_server_cluster_attributes}}
     {{#chip_server_cluster_attributes}}
     {{#if (isWritableAttribute)}}
-    CHIP_ERROR WriteAttribute{{asCamelCased name false}}(Callback::Callback<> * onCompletion, {{asUnderlyingZclType type}} value);
+    CHIP_ERROR WriteAttribute{{asCamelCased name false}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, {{asUnderlyingZclType type}} value);
     {{/if}}
     {{/chip_server_cluster_attributes}}
     {{#chip_server_cluster_attributes}}
     {{#if (isReportableAttribute)}}
-    CHIP_ERROR ReportAttribute{{asCamelCased name false}}(Callback::Callback<> * onCompletion, Callback::Callback<> * onChange, uint16_t minInterval, uint16_t maxInterval{{#unless (isDiscreteType)}}, {{chipType}} change{{/unless}});
+    CHIP_ERROR ReportAttribute{{asCamelCased name false}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, Callback::Cancelable * onReportCallback, uint16_t minInterval, uint16_t maxInterval{{#unless (isDiscreteType)}}, {{chipType}} change{{/unless}});
     {{/if}}
     {{/chip_server_cluster_attributes}}
     {{#chip_server_cluster_commands}}

@@ -28,6 +28,7 @@
 
 #include <app/CommandSender.h>
 #include <app/InteractionModelEngine.h>
+#include <app/util/CallbacksMgr.h>
 #include <app/util/basic-types.h>
 #include <core/CHIPCallback.h>
 #include <core/CHIPCore.h>
@@ -251,8 +252,8 @@ public:
 
     PASESessionSerializable & GetPairing() { return mPairing; }
 
-    void AddResponseHandler(EndpointId endpoint, ClusterId cluster, Callback::Callback<> * onResponse);
-    void AddReportHandler(EndpointId endpoint, ClusterId cluster, Callback::Callback<> * onReport);
+    void AddResponseHandler(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    void AddReportHandler(EndpointId endpoint, ClusterId cluster, AttributeId attribute, Callback::Cancelable * onReportCallback);
 
 private:
     enum class ConnectionState
@@ -260,12 +261,6 @@ private:
         NotConnected,
         Connecting,
         SecureConnected,
-    };
-
-    struct CallbackInfo
-    {
-        EndpointId endpoint;
-        ClusterId cluster;
     };
 
     enum class ResetTransport
@@ -302,13 +297,7 @@ private:
 
     SecureSessionHandle mSecureSession = {};
 
-    /* Track all outstanding response callbacks for this device. The callbacks are
-       registered when a command is sent to the device, to get notified with the results. */
-    Callback::CallbackDeque mResponses;
-
-    /* Track all outstanding callbacks for attribute reports from this device. The callbacks are
-       registered when the user requests attribute reporting for device attributes. */
-    Callback::CallbackDeque mReports;
+    app::CHIPCallbacksMgr & mCallbacksMgr = app::CHIPCallbacksMgr::GetInstance();
 
     /**
      * @brief

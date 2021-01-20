@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2020 Project CHIP Authors
+ *   Copyright (c) 2021 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,20 +20,19 @@
 
 #include "../../config/PersistentStorage.h"
 #include "../common/Command.h"
-#include <app/chip-zcl-zpro-codec.h>
-#include <core/CHIPEncoding.h>
 
 // Limits on endpoint values.  Could be wrong, if we start using endpoint 0 for
 // something.
 #define CHIP_ZCL_ENDPOINT_MIN 0x01
 #define CHIP_ZCL_ENDPOINT_MAX 0xF0
 
-class ModelCommand : public Command, public chip::Controller::DeviceStatusDelegate
+class ReportingCommand : public Command, public chip::Controller::DeviceStatusDelegate
 {
 public:
-    ModelCommand(const char * commandName) : Command(commandName) {}
-
-    void AddArguments() { AddArgument("endpoint-id", CHIP_ZCL_ENDPOINT_MIN, CHIP_ZCL_ENDPOINT_MAX, &mEndPointId); }
+    ReportingCommand(const char * commandName) : Command(commandName)
+    {
+        AddArgument("endpoint-id", CHIP_ZCL_ENDPOINT_MIN, CHIP_ZCL_ENDPOINT_MAX, &mEndPointId);
+    }
 
     /////////// Command Interface /////////
     CHIP_ERROR Run(PersistentStorage & storage, NodeId localId, NodeId remoteId) override;
@@ -42,10 +41,11 @@ public:
     void OnMessage(PacketBufferHandle buffer) override;
     void OnStatusChange(void) override;
 
-    virtual CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endPointId) = 0;
+    virtual void AddReportCallbacks(uint8_t endPointId) = 0;
 
 private:
+    uint8_t mEndPointId;
+
     ChipDeviceCommissioner mCommissioner;
     ChipDevice * mDevice;
-    uint8_t mEndPointId;
 };

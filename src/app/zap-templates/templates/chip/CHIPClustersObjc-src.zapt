@@ -41,9 +41,8 @@
         return NO;
     }
 
-    CHIP_ERROR err = self.cppCluster.{{asCamelCased name false}}(callback{{#chip_server_cluster_command_arguments}}, {{asCamelCased label}}{{/chip_server_cluster_command_arguments}});
+    CHIP_ERROR err = self.cppCluster.{{asCamelCased name false}}(callback->Cancel(), nullptr{{#chip_server_cluster_command_arguments}}, {{asCamelCased label}}{{/chip_server_cluster_command_arguments}});
     if (err != CHIP_NO_ERROR) {
-        callback->Cancel();
         delete callback;
         return NO;
     }
@@ -59,9 +58,8 @@
         return NO;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttribute{{asCamelCased name false}}(callback);
+    CHIP_ERROR err = self.cppCluster.ReadAttribute{{asCamelCased name false}}(callback->Cancel(), nullptr);
     if (err != CHIP_NO_ERROR) {
-        callback->Cancel();
         delete callback;
         return NO;
     }
@@ -76,9 +74,8 @@
         return NO;
     }
 
-    CHIP_ERROR err = self.cppCluster.WriteAttribute{{asCamelCased name false}}(callback, value);
+    CHIP_ERROR err = self.cppCluster.WriteAttribute{{asCamelCased name false}}(callback->Cancel(), nullptr, value);
     if (err != CHIP_NO_ERROR) {
-        callback->Cancel();
         delete callback;
         return NO;
     }
@@ -99,10 +96,8 @@
         return NO;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReportAttribute{{asCamelCased name false}}(completionCallback, changeCallback, minInterval, maxInterval{{#unless (isDiscreteType)}}, change{{/unless}});
+    CHIP_ERROR err = self.cppCluster.ReportAttribute{{asCamelCased name false}}(completionCallback->Cancel(), nullptr, changeCallback->Cancel(), minInterval, maxInterval{{#unless (isDiscreteType)}}, change{{/unless}});
     if (err != CHIP_NO_ERROR) {
-        completionCallback->Cancel();
-        changeCallback->Cancel();
         delete completionCallback;
         delete changeCallback;
         return NO;

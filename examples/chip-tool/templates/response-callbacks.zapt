@@ -1,0 +1,35 @@
+{{> header}}
+
+#pragma once
+
+#include <inttypes.h>
+
+// Global Response Callbacks
+typedef void (*DefaultSuccessCallback)(void * context);
+typedef void (*DefaultFailureCallback)(void * context, uint8_t status);
+typedef void (*BooleanAttributeCallback)(void * context, bool value);
+typedef void (*Int8uAttributeCallback)(void * context, uint8_t value);
+typedef void (*Int8sAttributeCallback)(void * context, int8_t value);
+typedef void (*Int16uAttributeCallback)(void * context, uint16_t value);
+typedef void (*Int16sAttributeCallback)(void * context, int16_t value);
+typedef void (*Int32uAttributeCallback)(void * context, uint32_t value);
+typedef void (*Int32sAttributeCallback)(void * context, int32_t value);
+typedef void (*Int64uAttributeCallback)(void * context, uint64_t value);
+typedef void (*Int64sAttributeCallback)(void * context, int64_t value);
+typedef void (*ReadReportingConfigurationReportedCallback)(void* context, uint16_t minInterval, uint16_t maxInterval);
+typedef void (*ReadReportingConfigurationReceivedCallback)(void* context, uint16_t timeout);
+
+// Cluster Specific Response Callbacks
+{{#all_user_clusters}}
+{{#if (isClient side) }}
+{{#if (user_cluster_has_enabled_command name side)}}
+{{#all_user_cluster_commands}}
+{{#if (isStrEqual clusterName parent.name)}}
+{{#if (isCommandAvailable parent.side incoming outgoing commandSource name)}}
+typedef void (*{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback)(void * context{{#zcl_command_arguments}}{{#unless (isStrEqual label "status")}}, {{asUnderlyingZclType type}} {{asSymbol label}}{{/unless}}{{/zcl_command_arguments}});
+{{/if}}
+{{/if}}
+{{/all_user_cluster_commands}}
+{{/if}}
+{{/if}}
+{{/all_user_clusters}}
