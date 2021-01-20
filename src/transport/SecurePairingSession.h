@@ -30,6 +30,7 @@
 #include <protocols/secure_channel/Constants.h>
 #include <support/Base64.h>
 #include <system/SystemPacketBuffer.h>
+#include <transport/PairingSessionDelegate.h>
 #include <transport/PeerConnectionState.h>
 #include <transport/SecureSession.h>
 #include <transport/raw/MessageHeader.h>
@@ -43,41 +44,6 @@ extern const char * kSpake2pR2ISessionInfo;
 constexpr uint16_t kPBKDFParamRandomNumberSize = 32;
 
 using namespace Crypto;
-
-class DLL_EXPORT SecurePairingSessionDelegate
-{
-public:
-    /**
-     * @brief
-     *   Called when pairing session generates a new message that should be sent to peer.
-     *
-     * @param header the message header for the sent message
-     * @param peerAddress the destination of the message
-     * @param msgBuf the raw data for the message being sent
-     * @return CHIP_ERROR Error thrown when sending the message
-     */
-    virtual CHIP_ERROR SendPairingMessage(const PacketHeader & header, const Transport::PeerAddress & peerAddress,
-                                          System::PacketBufferHandle msgBuf)
-    {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
-
-    /**
-     * @brief
-     *   Called when pairing fails with an error
-     *
-     * @param error error code
-     */
-    virtual void OnPairingError(CHIP_ERROR error) {}
-
-    /**
-     * @brief
-     *   Called when the pairing is complete and the new secure session has been established
-     */
-    virtual void OnPairingComplete() {}
-
-    virtual ~SecurePairingSessionDelegate() {}
-};
 
 struct SecurePairingSessionSerialized;
 
@@ -118,7 +84,7 @@ public:
      * @return CHIP_ERROR     The result of initialization
      */
     CHIP_ERROR WaitForPairing(uint32_t mySetUpPINCode, uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen,
-                              Optional<NodeId> myNodeId, uint16_t myKeyId, SecurePairingSessionDelegate * delegate);
+                              Optional<NodeId> myNodeId, uint16_t myKeyId, PairingSessionDelegate * delegate);
 
     /**
      * @brief
@@ -134,7 +100,7 @@ public:
      * @return CHIP_ERROR      The result of initialization
      */
     CHIP_ERROR Pair(const Transport::PeerAddress peerAddress, uint32_t peerSetUpPINCode, Optional<NodeId> myNodeId,
-                    NodeId peerNodeId, uint16_t myKeyId, SecurePairingSessionDelegate * delegate);
+                    NodeId peerNodeId, uint16_t myKeyId, PairingSessionDelegate * delegate);
 
     /**
      * @brief
@@ -218,7 +184,7 @@ private:
         kUnexpected             = 0xff,
     };
 
-    CHIP_ERROR Init(Optional<NodeId> myNodeId, uint16_t myKeyId, uint32_t setupCode, SecurePairingSessionDelegate * delegate);
+    CHIP_ERROR Init(Optional<NodeId> myNodeId, uint16_t myKeyId, uint32_t setupCode, PairingSessionDelegate * delegate);
 
     CHIP_ERROR SetupSpake2p(uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen);
 
@@ -243,7 +209,7 @@ private:
 
     static constexpr size_t kSpake2p_WS_Length = kP256_FE_Length + 8;
 
-    SecurePairingSessionDelegate * mDelegate = nullptr;
+    PairingSessionDelegate * mDelegate = nullptr;
 
     Protocols::SecureChannel::MsgType mNextExpectedMsg = Protocols::SecureChannel::MsgType::PASE_Spake2pError;
 
@@ -319,13 +285,13 @@ public:
     ~SecurePairingUsingTestSecret() override {}
 
     CHIP_ERROR WaitForPairing(uint32_t mySetUpPINCode, uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen,
-                              Optional<NodeId> myNodeId, uint16_t myKeyId, SecurePairingSessionDelegate * delegate)
+                              Optional<NodeId> myNodeId, uint16_t myKeyId, PairingSessionDelegate * delegate)
     {
         return CHIP_NO_ERROR;
     }
 
     CHIP_ERROR Pair(uint32_t peerSetUpPINCode, uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen,
-                    Optional<NodeId> myNodeId, uint16_t myKeyId, SecurePairingSessionDelegate * delegate)
+                    Optional<NodeId> myNodeId, uint16_t myKeyId, PairingSessionDelegate * delegate)
     {
         return CHIP_NO_ERROR;
     }

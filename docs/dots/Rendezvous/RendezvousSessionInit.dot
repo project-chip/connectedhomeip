@@ -22,7 +22,7 @@ digraph RendezvousSession
   subgraph rendezvousSession {
     node [fillcolor="white:gray", gradientangle=90]
 
-    RendezvousSession [shape=record, label=<{RendezvousSession|<font point-size="11">SecurePairingSessionDelegate</font>}>, URL="@ref chip::SecurePairingSessionDelegate"]
+    RendezvousSession [shape=record, label=<{RendezvousSession|<font point-size="11">PairingSessionDelegate</font>}>, URL="@ref chip::PairingSessionDelegate"]
   }
 
   # This section represents methods which belongs to SecurePairingSession
@@ -54,13 +54,13 @@ digraph RendezvousSession
     OnRendezvousError [URL="@ref chip::RendezvousSessionDelegate::OnRendezvousError"]
   }
 
-  # This section represents callbacks which belongs to SecurePairingSessionDelegate
+  # This section represents callbacks which belongs to PairingSessionDelegate
   subgraph cluster_securePairingSessionDelegate {
-    label=<<b>SecurePairingSessionDelegate</b>>
+    label=<<b>PairingSessionDelegate</b>>
     node [fillcolor="white"]
 
-    OnPairingError [URL="@ref chip::SecurePairingSessionDelegate::OnPairingError"]
-    OnPairingComplete [URL="@ref chip::SecurePairingSessionDelegate::OnPairingComplete"]
+    OnPairingError [URL="@ref chip::PairingSessionDelegate::OnPairingError"]
+    OnPairingComplete [URL="@ref chip::PairingSessionDelegate::OnPairingComplete"]
   }
 
   #############################

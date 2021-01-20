@@ -169,7 +169,7 @@ exit:
 }
 
 CHIP_ERROR SecurePairingSession::Init(Optional<NodeId> myNodeId, uint16_t myKeyId, uint32_t setupCode,
-                                      SecurePairingSessionDelegate * delegate)
+                                      PairingSessionDelegate * delegate)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -210,7 +210,7 @@ exit:
 
 CHIP_ERROR SecurePairingSession::WaitForPairing(uint32_t mySetUpPINCode, uint32_t pbkdf2IterCount, const uint8_t * salt,
                                                 size_t saltLen, Optional<NodeId> myNodeId, uint16_t myKeyId,
-                                                SecurePairingSessionDelegate * delegate)
+                                                PairingSessionDelegate * delegate)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -282,7 +282,7 @@ exit:
 
 CHIP_ERROR SecurePairingSession::Pair(const Transport::PeerAddress peerAddress, uint32_t peerSetUpPINCode,
                                       Optional<NodeId> myNodeId, NodeId peerNodeId, uint16_t myKeyId,
-                                      SecurePairingSessionDelegate * delegate)
+                                      PairingSessionDelegate * delegate)
 {
     CHIP_ERROR err = Init(myNodeId, myKeyId, peerSetUpPINCode, delegate);
     SuccessOrExit(err);
