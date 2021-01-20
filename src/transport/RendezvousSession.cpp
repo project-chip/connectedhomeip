@@ -197,12 +197,11 @@ void RendezvousSession::OnRendezvousConnectionOpened()
 
 void RendezvousSession::OnRendezvousConnectionClosed()
 {
-    ReleasePairingSessionHandle();
+    UpdateState(State::kInit, CHIP_NO_ERROR);
 }
 
 void RendezvousSession::OnRendezvousError(CHIP_ERROR err)
 {
-    ReleasePairingSessionHandle();
     if (mDelegate != nullptr)
     {
         switch (mCurrentState)
@@ -260,6 +259,12 @@ void RendezvousSession::UpdateState(RendezvousSession::State newState, CHIP_ERRO
     if (newState == State::kRendezvousComplete && mDelegate != nullptr)
     {
         mDelegate->OnRendezvousComplete();
+    }
+
+    // Release the previous session handle if new state is init, or pairing just started
+    if (newState == State::kInit || newState == State::kSecurePairing)
+    {
+        ReleasePairingSessionHandle();
     }
 }
 
@@ -378,7 +383,6 @@ void RendezvousSession::ReleasePairingSessionHandle()
 CHIP_ERROR RendezvousSession::WaitForPairing(Optional<NodeId> nodeId, uint32_t setupPINCode)
 {
     UpdateState(State::kSecurePairing);
-    ReleasePairingSessionHandle();
     return mPairingSession.WaitForPairing(setupPINCode, kSpake2p_Iteration_Count,
                                           reinterpret_cast<const unsigned char *>(kSpake2pKeyExchangeSalt),
                                           strlen(kSpake2pKeyExchangeSalt), nodeId, 0, this);
@@ -387,7 +391,6 @@ CHIP_ERROR RendezvousSession::WaitForPairing(Optional<NodeId> nodeId, uint32_t s
 CHIP_ERROR RendezvousSession::Pair(Optional<NodeId> nodeId, uint32_t setupPINCode)
 {
     UpdateState(State::kSecurePairing);
-    ReleasePairingSessionHandle();
     return mPairingSession.Pair(mParams.GetPeerAddress(), setupPINCode, nodeId, mParams.GetRemoteNodeId().ValueOr(kUndefinedNodeId),
                                 mNextKeyId++, this);
 }
@@ -395,13 +398,11 @@ CHIP_ERROR RendezvousSession::Pair(Optional<NodeId> nodeId, uint32_t setupPINCod
 void RendezvousSession::SendNetworkCredentials(const char * ssid, const char * passwd)
 {
     mNetworkProvision.SendNetworkCredentials(ssid, passwd);
-    ReleasePairingSessionHandle();
 }
 
 void RendezvousSession::SendThreadCredentials(const DeviceLayer::Internal::DeviceNetworkInfo & threadData)
 {
     mNetworkProvision.SendThreadCredentials(threadData);
-    ReleasePairingSessionHandle();
 }
 
 void RendezvousSession::SendOperationalCredentials() {}
