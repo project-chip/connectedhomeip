@@ -27,6 +27,8 @@ static_library("transport") {
     "RendezvousSession.cpp",
     "RendezvousSession.h",
     "RendezvousSessionDelegate.h",
+    "SecureMessageCodec.cpp",
+    "SecureMessageCodec.h",
     "SecurePairingSession.cpp",
     "SecurePairingSession.h",
     "SecureSession.cpp",

@@ -30,6 +30,7 @@
 #include <protocols/secure_channel/Constants.h>
 #include <support/Base64.h>
 #include <system/SystemPacketBuffer.h>
+#include <transport/PeerConnectionState.h>
 #include <transport/SecureSession.h>
 #include <transport/raw/MessageHeader.h>
 #include <transport/raw/PeerAddress.h>
@@ -126,13 +127,14 @@ public:
      * @param peerAddress      Address of peer to pair
      * @param peerSetUpPINCode Setup PIN code of the peer device
      * @param myNodeId         Optional node id of local node
+     * @param peerNodeId       Node id assigned to the peer node by commissioner
      * @param myKeyId          Key ID to be assigned to the secure session on the peer node
      * @param delegate         Callback object
      *
      * @return CHIP_ERROR      The result of initialization
      */
     CHIP_ERROR Pair(const Transport::PeerAddress peerAddress, uint32_t peerSetUpPINCode, Optional<NodeId> myNodeId,
-                    uint16_t myKeyId, SecurePairingSessionDelegate * delegate);
+                    NodeId peerNodeId, uint16_t myKeyId, SecurePairingSessionDelegate * delegate);
 
     /**
      * @brief
@@ -165,7 +167,7 @@ public:
      *
      * @return Optional<NodeId> The associated peer NodeId
      */
-    NodeId GetPeerNodeId() const { return mPeerNodeId.Value(); }
+    NodeId GetPeerNodeId() const { return mConnectionState.GetPeerNodeId(); }
 
     /**
      * @brief
@@ -173,7 +175,7 @@ public:
      *
      * @return uint16_t The associated peer key id
      */
-    uint16_t GetPeerKeyId() { return mPeerKeyId; }
+    uint16_t GetPeerKeyId() { return mConnectionState.GetPeerKeyID(); }
 
     /**
      * @brief
@@ -181,7 +183,9 @@ public:
      *
      * @return uint16_t The assocated local key id
      */
-    uint16_t GetLocalKeyId() { return mLocalKeyId; }
+    uint16_t GetLocalKeyId() { return mConnectionState.GetLocalKeyID(); }
+
+    Transport::PeerConnectionState & PeerConnection() { return mConnectionState; }
 
     /** @brief Serialize the Pairing Session to a string.
      *
@@ -263,21 +267,15 @@ private:
     };
 
 protected:
-    Optional<NodeId> mLocalNodeId = Optional<NodeId>::Value(kUndefinedNodeId);
-
-    Optional<NodeId> mPeerNodeId = Optional<NodeId>::Value(kUndefinedNodeId);
-
-    uint16_t mLocalKeyId;
-
-    uint16_t mPeerKeyId;
-
-    Transport::PeerAddress mPeerAddress;
+    NodeId mLocalNodeId = kUndefinedNodeId;
 
     uint8_t mKe[kMAX_Hash_Length];
 
     size_t mKeLen = sizeof(mKe);
 
     bool mPairingComplete = false;
+
+    Transport::PeerConnectionState mConnectionState;
 };
 
 /*
@@ -310,11 +308,11 @@ public:
     {
         const char * secret = "Test secret for key derivation";
         size_t secretLen    = strlen(secret);
-        mPeerNodeId         = peerNodeId;
-        mPeerKeyId          = peerKeyId;
-        mLocalKeyId         = localKeyId;
         mKeLen              = secretLen;
         memmove(mKe, secret, mKeLen);
+        mConnectionState.SetPeerNodeId(peerNodeId.ValueOr(kUndefinedNodeId));
+        mConnectionState.SetPeerKeyID(peerKeyId);
+        mConnectionState.SetLocalKeyID(localKeyId);
         mPairingComplete = true;
     }
 
