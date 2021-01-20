@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2018 Google LLC.
  *    Copyright (c) 2013-2018 Nest Labs, Inc.
  *
@@ -628,14 +628,14 @@ INET_ERROR RawEndPoint::SendMsg(const IPPacketInfo * pktInfo, chip::System::Pack
         {
             ip6_addr_t ipv6Addr = addr.ToIPv6();
 
-            lwipErr = raw_sendto_ip6(mRaw, msg.UnsafeGetLwIPpbuf(), &ipv6Addr);
+            lwipErr = raw_sendto_ip6(mRaw, System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(msg), &ipv6Addr);
         }
 #if INET_CONFIG_ENABLE_IPV4
         else
         {
             ip4_addr_t ipv4Addr = addr.ToIPv4();
 
-            lwipErr = raw_sendto(mRaw, msg.UnsafeGetLwIPpbuf(), &ipv4Addr);
+            lwipErr = raw_sendto(mRaw, System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(msg), &ipv4Addr);
         }
 #endif // INET_CONFIG_ENABLE_IPV4
 #endif // LWIP_VERSION_MAJOR <= 1 || LWIP_VERSION_MINOR >= 5
