@@ -19,6 +19,7 @@
 
 #include <memory>
 #include <stdio.h>
+#include <string>
 
 #include <mdns/minimal/RecordData.h>
 

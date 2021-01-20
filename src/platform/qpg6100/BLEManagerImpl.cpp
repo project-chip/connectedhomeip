@@ -192,9 +192,6 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
                             PacketBufferHandle::Adopt(event->CHIPoBLEWriteReceived.Data));
     }
     break;
-    case DeviceEventType::kCHIPoBLETXCharWriteEvent:
-        HandleTXComplete(event);
-        break;
 
     case DeviceEventType::kCHIPoBLEConnectionError: {
         ChipLogProgress(DeviceLayer, "_OnPlatformEvent kCHIPoBLEConnectionError");
@@ -223,6 +220,12 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         DriveBLEState();
 
         break;
+
+    case DeviceEventType::kCHIPoBLEIndicateConfirm: {
+        ChipLogProgress(DeviceLayer, "_OnPlatformEvent kCHIPoBLEIndicateConfirm");
+        HandleIndicationConfirmation(event->CHIPoBLEIndicateConfirm.ConId, &CHIP_BLE_SVC_ID, &chipUUID_CHIPoBLEChar_TX);
+    }
+    break;
 
     default:
         ChipLogProgress(DeviceLayer, "_OnPlatformEvent default:  event->Type = %d", event->Type);
@@ -594,11 +597,6 @@ exit:
     }
 }
 
-void BLEManagerImpl::HandleTXComplete(const ChipDeviceEvent * event)
-{
-    // TODO -
-}
-
 /* Process DM Messages */
 void BLEManagerImpl::HandleDmMsg(qvCHIP_Ble_DmEvt_t * pDmEvt)
 {
@@ -686,30 +684,34 @@ void BLEManagerImpl::HandleDmMsg(qvCHIP_Ble_DmEvt_t * pDmEvt)
         ChipLogProgress(DeviceLayer, "BLE GATT connection closed (con %u, reason %u)", pDmEvt->connClose.hdr.param,
                         pDmEvt->connClose.reason);
 
-        // If this was a CHIPoBLE connection, release the associated connection state record
-        // and post an event to deliver a connection error to the CHIPoBLE layer.
-        ChipDeviceEvent event;
-        event.Type                          = DeviceEventType::kCHIPoBLEConnectionError;
-        event.CHIPoBLEConnectionError.ConId = pDmEvt->connClose.hdr.param;
-        switch (pDmEvt->connClose.reason)
-        {
-        case QVCHIP_HCI_ERR_REMOTE_TERMINATED:
-            event.CHIPoBLEConnectionError.Reason = BLE_ERROR_REMOTE_DEVICE_DISCONNECTED;
-            break;
-        case QVCHIP_HCI_ERR_LOCAL_TERMINATED:
-            event.CHIPoBLEConnectionError.Reason = BLE_ERROR_APP_CLOSED_CONNECTION;
-            break;
-        default:
-            event.CHIPoBLEConnectionError.Reason = BLE_ERROR_CHIPOBLE_PROTOCOL_ABORT;
-            break;
-        }
-        PlatformMgr().PostEvent(&event);
-
         // Force a refresh of the advertising state.
         if (mNumGAPCons > 0)
         {
             mNumGAPCons--;
         }
+
+        // If this was a CHIPoBLE connection, release the associated connection state record
+        // and post an event to deliver a connection error to the CHIPoBLE layer.
+        if (UnsetSubscribed(pDmEvt->connClose.hdr.param))
+        {
+            ChipDeviceEvent event;
+            event.Type                          = DeviceEventType::kCHIPoBLEConnectionError;
+            event.CHIPoBLEConnectionError.ConId = pDmEvt->connClose.hdr.param;
+            switch (pDmEvt->connClose.reason)
+            {
+            case QVCHIP_HCI_ERR_REMOTE_TERMINATED:
+                event.CHIPoBLEConnectionError.Reason = BLE_ERROR_REMOTE_DEVICE_DISCONNECTED;
+                break;
+            case QVCHIP_HCI_ERR_LOCAL_TERMINATED:
+                event.CHIPoBLEConnectionError.Reason = BLE_ERROR_APP_CLOSED_CONNECTION;
+                break;
+            default:
+                event.CHIPoBLEConnectionError.Reason = BLE_ERROR_CHIPOBLE_PROTOCOL_ABORT;
+                break;
+            }
+            PlatformMgr().PostEvent(&event);
+        }
+
         SetFlag(mFlags, kFlag_AdvertisingRefreshNeeded);
         PlatformMgr().ScheduleWork(DriveBLEState, 0);
         break;
@@ -732,6 +734,14 @@ void BLEManagerImpl::HandleAttMsg(qvCHIP_Ble_AttEvt_t * pAttEvt)
     switch (pAttEvt->hdr.event)
     {
     case QVCHIP_ATT_MTU_UPDATE_IND: {
+        break;
+    }
+    case QVCHIP_ATTS_HANDLE_VALUE_CNF: {
+        ChipDeviceEvent event;
+
+        event.Type                          = DeviceEventType::kCHIPoBLEIndicateConfirm;
+        event.CHIPoBLEIndicateConfirm.ConId = pAttEvt->hdr.param;
+        PlatformMgr().PostEvent(&event);
         break;
     }
     case QVCHIP_ATTC_FIND_BY_TYPE_VALUE_RSP:

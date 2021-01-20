@@ -140,9 +140,9 @@ extern bool HandleDataReceived(const System::PacketBufferHandle & aBuffer, Trans
                                bool aCheckBuffer, uint8_t aFirstValue);
 extern bool HandleDataReceived(const System::PacketBufferHandle & aBuffer, TransferStats & aStats, bool aStatsByPacket,
                                bool aCheckBuffer);
-extern bool HandleICMPv4DataReceived(System::PacketBufferHandle aBuffer, TransferStats & aStats, bool aStatsByPacket,
+extern bool HandleICMPv4DataReceived(System::PacketBufferHandle && aBuffer, TransferStats & aStats, bool aStatsByPacket,
                                      bool aCheckBuffer);
-extern bool HandleICMPv6DataReceived(System::PacketBufferHandle aBuffer, TransferStats & aStats, bool aStatsByPacket,
+extern bool HandleICMPv6DataReceived(System::PacketBufferHandle && aBuffer, TransferStats & aStats, bool aStatsByPacket,
                                      bool aCheckBuffer);
 
 // Timer Callback Handler

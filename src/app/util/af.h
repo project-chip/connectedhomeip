@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -48,11 +48,7 @@
  * @{
  */
 
-#ifndef SILABS_AF_API
-#define SILABS_AF_API
-
-// Micro and compiler specific typedefs and macros
-//#include PLATFORM_HEADER
+#pragma once
 
 #ifndef CONFIGURATION_HEADER
 #define CONFIGURATION_HEADER "config.h"
@@ -555,13 +551,13 @@ void emberAfCopyInt32u(uint8_t * data, uint16_t index, uint32_t x);
  * parameter should indicate the maximum number of characters to copy to the
  * destination buffer not including the length byte.
  */
-void emberAfCopyString(uint8_t * dest, uint8_t * src, uint8_t size);
+void emberAfCopyString(uint8_t * dest, const uint8_t * src, uint8_t size);
 /*
  * @brief Function that copies a ZCL long string into a buffer.  The size
  * parameter should indicate the maximum number of characters to copy to the
  * destination buffer not including the length bytes.
  */
-void emberAfCopyLongString(uint8_t * dest, uint8_t * src, uint16_t size);
+void emberAfCopyLongString(uint8_t * dest, const uint8_t * src, uint16_t size);
 /*
  * @brief Function that determines the length of a zigbee Cluster Library string
  *   (where the first byte is assumed to be the length).
@@ -1822,5 +1818,3 @@ int emberAfMain(MAIN_FUNCTION_PARAMETERS);
  * generated code.
  */
 EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd);
-
-#endif // SILABS_AF_API

@@ -129,7 +129,7 @@ public:
 
 protected:
     void MoveToState(const CommandState aTargetState);
-    CHIP_ERROR ProcessCommandMessage(System::PacketBufferHandle payload, CommandRoleId aCommandRoleId);
+    CHIP_ERROR ProcessCommandMessage(System::PacketBufferHandle && payload, CommandRoleId aCommandRoleId);
     void ClearState();
     const char * GetStateStr() const;
 
