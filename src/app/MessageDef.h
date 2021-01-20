@@ -192,7 +192,7 @@ public:
      * @param[in]   apWriter    Pointer to the TLVWriter that is encoding the message.
      * @param[in]   aContextTagToUse    A contextTag to use.
      *
-     * @return                  CHIP_ERROR codes returned by Chip::TLV objects.
+     * @return                  CHIP_ERROR codes returned by chip::TLV objects.
      */
 
     CHIP_ERROR Init(chip::TLV::TLVWriter * const apWriter, const uint8_t aContextTagToUse);
@@ -202,7 +202,7 @@ public:
      *
      * @param[in]   apWriter    Pointer to the TLVWriter that is encoding the message.
      *
-     * @return                  CHIP_ERROR codes returned by Chip::TLV objects.
+     * @return                  CHIP_ERROR codes returned by chip::TLV objects.
      */
     CHIP_ERROR Init(chip::TLV::TLVWriter * const apWriter);
 };
@@ -319,7 +319,7 @@ public:
      * @param[in]   apWriter    Pointer to the TLVWriter that is encoding the message.
      * @param[in]   aContextTagToUse    A contextTag to use.
      *
-     * @return                  CHIP_ERROR codes returned by Chip::TLV objects.
+     * @return                  CHIP_ERROR codes returned by chip::TLV objects.
      */
     CHIP_ERROR Init(chip::TLV::TLVWriter * const apWriter, const uint8_t aContextTagToUse);
 
@@ -523,7 +523,7 @@ public:
      * @param[in]   apWriter    Pointer to the TLVWriter that is encoding the message.
      * @param[in]   aContextTagToUse    A contextTag to use.
      *
-     * @return                  CHIP_ERROR codes returned by Chip::TLV objects.
+     * @return                  CHIP_ERROR codes returned by chip::TLV objects.
      */
     CHIP_ERROR Init(chip::TLV::TLVWriter * const apWriter, const uint8_t aContextTagToUse);
 
@@ -717,7 +717,7 @@ public:
      * @param[in]   apWriter    Pointer to the TLVWriter that is encoding the message.
      * @param[in]   aContextTagToUse    A contextTag to use.
      *
-     * @return                  CHIP_ERROR codes returned by Chip::TLV objects.
+     * @return                  CHIP_ERROR codes returned by chip::TLV objects.
      */
     CHIP_ERROR Init(chip::TLV::TLVWriter * const apWriter, const uint8_t aContextTagToUse);
 
@@ -962,10 +962,11 @@ public:
     EventDataElement::Builder SystemTimestamp(const uint64_t aSystemTimestamp);
 
     /**
-     *  @brief Inject DataVersion into the TLV stream to indicate the numerical data version associated with
-     *  the cluster that is referenced by the path. When this field is present, the UTC Timestamp field SHALL be omitted.
+     *  @brief Inject DeltaUTCTime into the TLV stream.
+     *      This field is present if delta encoding of the UTC timestamp relative to a prior event is desired for compression
+     *      reasons. When this field is present, the UTC Timestamp field SHALL be omitted.
      *
-     *  @param [in] aDataVersion The uint64_t variable to reflect DeltaUTCTime
+     *  @param [in] aDeltaUTCTime The uint64_t variable to reflect DeltaUTCTime
      *
      *  @return A reference to *this
      */
@@ -1080,7 +1081,7 @@ public:
      * @param[out]   apProtocolCode   Pointer to the storage for the ProtocolCode
      * @param[out]   apNamespacedClusterId     Pointer to the storage for the NamespacedClusterId
      *
-     * @return       CHIP_ERROR codes returned by Chip::TLV objects. CHIP_END_OF_TLV if either
+     * @return       CHIP_ERROR codes returned by chip::TLV objects. CHIP_END_OF_TLV if either
      *               element is missing. CHIP_ERROR_WRONG_TLV_TYPE if the elements are of the wrong
      *               type.
      */
@@ -1107,7 +1108,7 @@ public:
      * @param[in]   apWriter    Pointer to the TLVWriter that is encoding the message.
      * @param[in]   aContextTagToUse    A contextTag to use.
      *
-     * @return                  CHIP_ERROR codes returned by Chip::TLV objects.
+     * @return                  CHIP_ERROR codes returned by chip::TLV objects.
      */
     CHIP_ERROR Init(chip::TLV::TLVWriter * const apWriter, const uint8_t aContextTagToUse);
 
@@ -1119,7 +1120,7 @@ public:
      * @param[in]   aProtocolCode   16-bit protocol-specific error code
      * @param[in]   aNamespacedClusterId      Cluster Id for ZCL
      *
-     * @return       CHIP_ERROR codes returned by Chip::TLV objects. CHIP_END_OF_TLV if either
+     * @return       CHIP_ERROR codes returned by chip::TLV objects. CHIP_END_OF_TLV if either
      *               element is missing. CHIP_ERROR_WRONG_TLV_TYPE if the elements are of the wrong
      *               type.
      */
@@ -1450,6 +1451,79 @@ private:
 };
 }; // namespace AttributeDataList
 
+namespace AttributeDataVersionList {
+class Parser : public ListParser
+{
+public:
+    /**
+     *  @brief Roughly verify the message is correctly formed
+     *   1) all mandatory tags are present
+     *   2) all elements have expected data type
+     *   3) any tag can only appear once
+     *   4) At the top level of the structure, unknown tags are ignored for forward compatibility
+     *  @note The main use of this function is to print out what we're
+     *    receiving during protocol development and debugging.
+     *    The encoding rule has changed in IM encoding spec so this
+     *    check is only "roughly" conformant now.
+     *
+     *  @return #CHIP_NO_ERROR on success
+     */
+    CHIP_ERROR CheckSchemaValidity() const;
+
+    /**
+     *  @brief Check if this element is valid
+     *
+     *  @return A Boolean
+     */
+    bool IsElementValid(void);
+
+    /**
+     *  @brief Check if this element is NULL
+     *
+     *  @return A Boolean
+     */
+    bool IsNull(void);
+
+    /**
+     *  @brief Get a value for the DataVersion. Next() must be called before accessing them.
+     *
+     *  @param [in] apVersion    A pointer to apVersion
+     *
+     *  @return #CHIP_NO_ERROR on success
+     *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not any of the defined unsigned integer types
+     *          #CHIP_END_OF_TLV if there is no such element
+     */
+    CHIP_ERROR GetVersion(chip::DataVersion * const apVersion);
+};
+
+class Builder : public ListBuilder
+{
+public:
+    /**
+     *  @brief Add version in AttributeDataVersionList
+     *
+     *  @return A reference to AttributeDataVersionList::Builder
+     */
+    AttributeDataVersionList::Builder & AddVersion(const uint64_t aVersion);
+
+    /**
+     *  @brief Add Null in version list
+     *
+     *  @return A reference to *this
+     */
+    AttributeDataVersionList::Builder & AddNull(void);
+    /**
+     *  @brief Mark the end of this AttributeDataVersionList
+     *
+     *  @return A reference to *this
+     */
+    AttributeDataVersionList::Builder & EndOfAttributeDataVersionList();
+
+private:
+    AttributeDataElement::Builder mAttributeDataElementBuilder;
+};
+}; // namespace AttributeDataVersionList
+
 namespace CommandDataElement {
 enum
 {
@@ -1507,7 +1581,7 @@ public:
     CHIP_ERROR GetData(chip::TLV::TLVReader * const apReader) const;
 
     /**
-     *  @brief Get a TLVReader for the Data. Next() must be called before accessing them.
+     *  @brief Get a TLVReader for the StatusElement. Next() must be called before accessing them.
      *
      *  @param [in] apStatusElement    A pointer to apStatusElement
      *
@@ -1865,6 +1939,136 @@ private:
 };
 }; // namespace InvokeCommand
 
+namespace ReadRequest {
+enum
+{
+    kCsTag_AttributePathList = 0,
+    kCsTag_EventPathList = 1,
+    kCsTag_AttributeDataVersionList = 2,
+    kCsTag_EventNumber = 3,
+};
+
+class Parser : public chip::app::Parser
+{
+public:
+    /**
+     *  @brief Initialize the parser object with TLVReader
+     *
+     *  @param [in] aReader A pointer to a TLVReader, which should point to the beginning of this request
+     *
+     *  @return #CHIP_NO_ERROR on success
+     */
+    CHIP_ERROR Init(const chip::TLV::TLVReader & aReader);
+
+    /**
+     *  @brief Roughly verify the message is correctly formed
+     *   1) all mandatory tags are present
+     *   2) all elements have expected data type
+     *   3) any tag can only appear once
+     *   4) At the top level of the structure, unknown tags are ignored for forward compatibility
+     *  @note The main use of this function is to print out what we're
+     *    receiving during protocol development and debugging.
+     *    The encoding rule has changed in IM encoding spec so this
+     *    check is only "roughly" conformant now.
+     *
+     *  @return #CHIP_NO_ERROR on success
+     */
+    CHIP_ERROR CheckSchemaValidity() const;
+
+    /**
+     *  @brief Get a TLVReader for the AttributePathList. Next() must be called before accessing them.
+     *
+     *  @param [in] apAttributePath    A pointer to apAttributePath
+     *
+     *  @return #CHIP_NO_ERROR on success
+     *          #CHIP_END_OF_TLV if there is no such element
+     */
+    CHIP_ERROR GetAttributePathList(AttributePathList::Parser * const apAttributePathList) const;
+
+    /**
+     *  @brief Get a TLVReader for the EventPathList. Next() must be called before accessing them.
+     *
+     *  @param [in] apEventPathList    A pointer to apEventPathList
+     *
+     *  @return #CHIP_NO_ERROR on success
+     *          #CHIP_END_OF_TLV if there is no such element
+     */
+    CHIP_ERROR GetEventPathList(EventPathList::Parser * const apEventPathList) const;
+
+    /**
+     *  @brief Get a parser for the AttributeDataVersionList. Next() must be called before accessing them.
+     *
+     *  @param [in] apAttributeDataVersionList    A pointer to apAttributeDataVersionList
+     *
+     *  @return #CHIP_NO_ERROR on success
+     *          #CHIP_END_OF_TLV if there is no such element
+     */
+    CHIP_ERROR GetAttributeDataVersionList(AttributeDataVersionList::Parser * const apAttributeDataVersionList) const;
+
+    /**
+     *  @brief Get Event Number. Next() must be called before accessing them.
+     *
+     *  @param [in] apEventNumber    A pointer to apEventNumber
+     *
+     *  @return #CHIP_NO_ERROR on success
+     *          #CHIP_END_OF_TLV if there is no such element
+     */
+    CHIP_ERROR GetEventNumber(uint64_t * const apEventNumber) const;
+};
+
+class Builder : public chip::app::Builder
+{
+public:
+    /**
+     *  @brief Initialize a ReadRequest::Builder for writing into a TLV stream
+     *
+     *  @param [in] apWriter    A pointer to TLVWriter
+     *
+     *  @return #CHIP_NO_ERROR on success
+     */
+    CHIP_ERROR Init(chip::TLV::TLVWriter * const apWriter);
+
+    /**
+     *  @brief Initialize a AttributePathList::Builder for writing into the TLV stream
+     *
+     *  @return A reference to AttributePathList::Builder
+     */
+    AttributePathList::Builder & CreateAttributePathListBuilder();
+
+    /**
+     *  @brief Initialize a EventPathList::Builder for writing into the TLV stream
+     *
+     *  @return A reference to EventPathList::Builder
+     */
+    EventPathList::Builder & CreateEventPathListBuilder();
+
+    /**
+     *  @brief Initialize a AttributeDataVersionList::Builder for writing into the TLV stream
+     *
+     *  @return A reference to AttributeDataVersionList::Builder
+     */
+    AttributeDataVersionList::Builder & CreateAttributeDataVersionListBuilder();
+
+    /**
+     *  @brief An initiator can optionally specify an EventNumber it has already to limit the
+     *  set of retrieved events on the server for optimization purposes.
+     *  @param [in] aEventNumber The event number
+     *  @return A reference to *this
+     */
+    ReadRequest::Builder & EventNumber(const uint64_t aEventNumber);
+    /**
+     *  @brief Mark the end of this ReadRequest
+     *
+     *  @return A reference to *this
+     */
+    ReadRequest::Builder & EndOfReadRequest();
+
+private:
+    AttributePathList::Builder mAttributePathListBuilder;
+    EventPathList::Builder mEventPathListBuilder;
+    AttributeDataVersionList::Builder mAttributeDataVersionListBuilder;
+};
+}; // namespace InvokeCommand
 }; // namespace app
 }; // namespace chip
 
