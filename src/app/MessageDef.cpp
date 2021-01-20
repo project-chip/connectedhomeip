@@ -2650,20 +2650,20 @@ CHIP_ERROR AttributeDataVersionList::Parser::CheckSchemaValidity() const
 
         switch (reader.GetType())
         {
-            case chip::TLV::kTLVType_Null:
-                PRETTY_PRINT("\tNull,");
-                break;
+        case chip::TLV::kTLVType_Null:
+            PRETTY_PRINT("\tNull,");
+            break;
 
-            case chip::TLV::kTLVType_UnsignedInteger:
-                err = reader.Get(version);
-                SuccessOrExit(err);
+        case chip::TLV::kTLVType_UnsignedInteger:
+            err = reader.Get(version);
+            SuccessOrExit(err);
 
-                PRETTY_PRINT("\t0x%" PRIx64 ",", version);
-                break;
+            PRETTY_PRINT("\t0x%" PRIx64 ",", version);
+            break;
 
-            default:
-                ExitNow(err = CHIP_ERROR_WRONG_TLV_TYPE);
-                break;
+        default:
+            ExitNow(err = CHIP_ERROR_WRONG_TLV_TYPE);
+            break;
         }
 
         ++index;
@@ -2688,19 +2688,19 @@ exit:
 bool AttributeDataVersionList::Parser::IsElementValid(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    bool result     = false;
+    bool result    = false;
 
     VerifyOrExit(chip::TLV::AnonymousTag == mReader.GetTag(), err = CHIP_ERROR_INVALID_TLV_TAG);
 
     switch (mReader.GetType())
     {
-        case chip::TLV::kTLVType_Null:
-        case chip::TLV::kTLVType_UnsignedInteger:
-            result = true;
-            break;
-        default:
-            ExitNow();
-            break;
+    case chip::TLV::kTLVType_Null:
+    case chip::TLV::kTLVType_UnsignedInteger:
+        result = true;
+        break;
+    default:
+        ExitNow();
+        break;
     }
 
 exit:
@@ -3745,10 +3745,10 @@ CHIP_ERROR ReadRequest::Parser::CheckSchemaValidity() const
             VerifyOrExit(chip::TLV::kTLVType_UnsignedInteger == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
 #if CHIP_DETAIL_LOGGING
             {
-                    uint64_t eventNumber;
-                    err = reader.Get(eventNumber);
-                    SuccessOrExit(err);
-                    PRETTY_PRINT("\tEventNumber = 0x%" PRIx64 ",", eventNumber);
+                uint64_t eventNumber;
+                err = reader.Get(eventNumber);
+                SuccessOrExit(err);
+                PRETTY_PRINT("\tEventNumber = 0x%" PRIx64 ",", eventNumber);
             }
 #endif // CHIP_DETAIL_LOGGING
         }
@@ -3808,7 +3808,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR ReadRequest::Parser::GetAttributeDataVersionList(AttributeDataVersionList::Parser * const apAttributeDataVersionList) const
+CHIP_ERROR
+ReadRequest::Parser::GetAttributeDataVersionList(AttributeDataVersionList::Parser * const apAttributeDataVersionList) const
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::TLV::TLVReader reader;

@@ -1942,10 +1942,10 @@ private:
 namespace ReadRequest {
 enum
 {
-    kCsTag_AttributePathList = 0,
-    kCsTag_EventPathList = 1,
+    kCsTag_AttributePathList        = 0,
+    kCsTag_EventPathList            = 1,
     kCsTag_AttributeDataVersionList = 2,
-    kCsTag_EventNumber = 3,
+    kCsTag_EventNumber              = 3,
 };
 
 class Parser : public chip::app::Parser
@@ -2068,7 +2068,7 @@ private:
     EventPathList::Builder mEventPathListBuilder;
     AttributeDataVersionList::Builder mAttributeDataVersionListBuilder;
 };
-}; // namespace InvokeCommand
+}; // namespace ReadRequest
 }; // namespace app
 }; // namespace chip
 
