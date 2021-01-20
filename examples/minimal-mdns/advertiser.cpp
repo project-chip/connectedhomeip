@@ -214,7 +214,7 @@ int main(int argc, char ** args)
 
     if (gOptions.advertisingMode == AdvertisingMode::kCommisioning)
     {
-        err = chip::Mdns::ServiceAdvertiser::Instance().Advertise(chip::Mdns::CommisioningAdvertisingParameters()
+        err = chip::Mdns::ServiceAdvertiser::Instance().Advertise(chip::Mdns::CommissionAdvertisingParameters()
                                                                       .EnableIpV4(gOptions.enableIpV4)
                                                                       .SetPort(CHIP_PORT)
                                                                       .SetShortDiscriminator(gOptions.shortDiscriminator)
@@ -232,15 +232,17 @@ int main(int argc, char ** args)
     }
     else if (gOptions.advertisingMode == AdvertisingMode::kCommisionable)
     {
-        err = chip::Mdns::ServiceAdvertiser::Instance().Advertise(chip::Mdns::CommisionableAdvertisingParameters()
-                                                                      .EnableIpV4(gOptions.enableIpV4)
-                                                                      .SetPort(CHIP_PORT)
-                                                                      .SetShortDiscriminator(gOptions.shortDiscriminator)
-                                                                      .SetLongDiscrimininator(gOptions.longDiscriminator)
-                                                                      .SetVendorId(gOptions.vendorId)
-                                                                      .SetProductId(gOptions.productId)
-                                                                      .SetPairingInstr(gOptions.pairingInstr)
-                                                                      .SetPairingHint(gOptions.pairingHint));
+        err = chip::Mdns::ServiceAdvertiser::Instance().Advertise(
+            chip::Mdns::CommissionAdvertisingParameters()
+                .EnableIpV4(gOptions.enableIpV4)
+                .SetPort(CHIP_PORT)
+                .SetShortDiscriminator(gOptions.shortDiscriminator)
+                .SetLongDiscrimininator(gOptions.longDiscriminator)
+                .SetVendorId(gOptions.vendorId)
+                .SetProductId(gOptions.productId)
+                .SetPairingInstr(gOptions.pairingInstr)
+                .SetPairingHint(gOptions.pairingHint)
+                .SetCommissionAdvertiseMode(chip::Mdns::CommssionAdvertiseMode::kCommissionable));
     }
     else
     {

@@ -163,7 +163,7 @@ private:
      * @param msgBuf the data to send.
      */
     template <size_t N, typename std::enable_if<(N < sizeof...(TransportTypes))>::type * = nullptr>
-    CHIP_ERROR SendMessageImpl(const PacketHeader & header, const PeerAddress & address, System::PacketBufferHandle msgBuf)
+    CHIP_ERROR SendMessageImpl(const PacketHeader & header, const PeerAddress & address, System::PacketBufferHandle && msgBuf)
     {
         Base * base = &std::get<N>(mTransports);
         if (base->CanSendToPeer(address))

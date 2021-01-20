@@ -166,13 +166,13 @@ private:
     // Transmit path:
     BLE_ERROR DriveSending();
     BLE_ERROR DriveStandAloneAck();
-    bool PrepareNextFragment(PacketBufferHandle data, bool & sentAck);
+    bool PrepareNextFragment(PacketBufferHandle && data, bool & sentAck);
     BLE_ERROR SendNextMessage();
     BLE_ERROR ContinueMessageSend();
     BLE_ERROR DoSendStandAloneAck();
-    BLE_ERROR SendCharacteristic(PacketBufferHandle buf);
-    bool SendIndication(PacketBufferHandle buf);
-    bool SendWrite(PacketBufferHandle buf);
+    BLE_ERROR SendCharacteristic(PacketBufferHandle && buf);
+    bool SendIndication(PacketBufferHandle && buf);
+    bool SendWrite(PacketBufferHandle && buf);
 
     // Receive path:
     BLE_ERROR HandleConnectComplete();
@@ -223,7 +223,7 @@ private:
     inline void QueueTxLock() {}
     inline void QueueTxUnlock() {}
 #endif
-    void QueueTx(PacketBufferHandle data, PacketType_t type);
+    void QueueTx(PacketBufferHandle && data, PacketType_t type);
 };
 
 } /* namespace Ble */

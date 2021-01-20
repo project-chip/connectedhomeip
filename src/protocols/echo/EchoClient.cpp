@@ -51,7 +51,7 @@ void EchoClient::Shutdown()
     }
 }
 
-CHIP_ERROR EchoClient::SendEchoRequest(System::PacketBufferHandle payload)
+CHIP_ERROR EchoClient::SendEchoRequest(System::PacketBufferHandle && payload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 

@@ -124,7 +124,6 @@ private:
 
     void HandleDmMsg(qvCHIP_Ble_DmEvt_t * pDmEvt);
     void HandleAttMsg(qvCHIP_Ble_AttEvt_t * pAttEvt);
-    void HandleTXComplete(const ChipDeviceEvent * event);
 
     /* Callbacks from BLE stack*/
     static void ExternalCbHandler(qvCHIP_Ble_MsgHdr_t * pMsg);

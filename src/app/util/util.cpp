@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -889,7 +889,7 @@ void emberAfCopyInt32u(uint8_t * data, uint16_t index, uint32_t x)
     data[index + 3] = (uint8_t)(((x) >> 24) & 0xFF);
 }
 
-void emberAfCopyString(uint8_t * dest, uint8_t * src, uint8_t size)
+void emberAfCopyString(uint8_t * dest, const uint8_t * src, uint8_t size)
 {
     if (src == NULL)
     {
@@ -911,7 +911,7 @@ void emberAfCopyString(uint8_t * dest, uint8_t * src, uint8_t size)
     }
 }
 
-void emberAfCopyLongString(uint8_t * dest, uint8_t * src, uint16_t size)
+void emberAfCopyLongString(uint8_t * dest, const uint8_t * src, uint16_t size)
 {
     if (src == NULL)
     {

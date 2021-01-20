@@ -38,7 +38,6 @@ using namespace chip::DeviceLayer;
 #if CHIP_ENABLE_OPENTHREAD
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
-#include <platform/internal/DeviceNetworkInfo.h>
 #include <platform/qpg6100/ThreadStackManagerImpl.h>
 #define JOINER_START_TRIGGER_TIMEOUT 1500
 #endif
