@@ -173,10 +173,10 @@ BLE_ERROR BLEEndPoint::HandleConnectComplete()
     StopConnectTimer();
 
     // We've successfully completed the BLE transport protocol handshake, so let the application know we're open for business.
-    if (OnConnectComplete != nullptr)
+    if (mBleTransport != nullptr)
     {
         // Indicate connect complete to next-higher layer.
-        OnConnectComplete(this, BLE_NO_ERROR);
+        mBleTransport->OnEndPointConnectComplete(this, BLE_NO_ERROR);
     }
     else
     {
@@ -434,16 +434,16 @@ void BLEEndPoint::DoCloseCallback(uint8_t state, uint8_t flags, BLE_ERROR err)
 {
     if (state == kState_Connecting)
     {
-        if (OnConnectComplete != nullptr)
+        if (mBleTransport != nullptr)
         {
-            OnConnectComplete(this, err);
+            mBleTransport->OnEndPointConnectComplete(this, err);
         }
     }
     else
     {
-        if (OnConnectionClosed != nullptr)
+        if (mBleTransport != nullptr)
         {
-            OnConnectionClosed(this, err);
+            mBleTransport->OnEndPointConnectionClosed(this, err);
         }
     }
 
@@ -1427,10 +1427,10 @@ BLE_ERROR BLEEndPoint::Receive(PacketBufferHandle data)
         else
 #endif
             // If we have a message received callback, and end point is not closing...
-            if (OnMessageReceived && mState != kState_Closing)
+            if (mBleTransport != nullptr && mState != kState_Closing)
         {
             // Pass received message up the stack.
-            OnMessageReceived(this, std::move(full_packet));
+            mBleTransport->OnEndPointMessageReceived(this, std::move(full_packet));
         }
     }
 

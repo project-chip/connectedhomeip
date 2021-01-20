@@ -70,7 +70,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
 
     mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
     mFlags.ClearAll().Set(Flags::kAdvertisingEnabled, CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART && !mIsCentral);
-    mAppState = nullptr;
+    // mAppState = nullptr;
 
     memset(mDeviceName, 0, sizeof(mDeviceName));
 
@@ -264,8 +264,9 @@ void BLEManagerImpl::HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * apEv
     switch (apEvent->Type)
     {
     case DeviceEventType::kPlatformLinuxBLECentralConnected:
-        if (OnConnectionComplete != nullptr)
-            OnConnectionComplete(mBLEScanConfig.mAppState, apEvent->Platform.BLECentralConnected.mConnection);
+        if (BleConnectionDelegate::OnConnectionComplete != nullptr)
+            BleConnectionDelegate::OnConnectionComplete(mBLEScanConfig.mAppState,
+                                                        apEvent->Platform.BLECentralConnected.mConnection);
         break;
     case DeviceEventType::kPlatformLinuxBLEWriteComplete:
         HandleWriteConfirmation(apEvent->Platform.BLEWriteComplete.mConnection, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_RX);
@@ -636,21 +637,21 @@ void BLEManagerImpl::InitiateScan(BleScanState scanType)
 
     if (scanType == BleScanState::kNotScanning)
     {
-        OnConnectionError(mBLEScanConfig.mAppState, CHIP_ERROR_INCORRECT_STATE);
+        BleConnectionDelegate::OnConnectionError(mBLEScanConfig.mAppState, CHIP_ERROR_INCORRECT_STATE);
         ChipLogError(Ble, "Invalid scan type requested");
         return;
     }
 
     if (mpEndpoint == nullptr)
     {
-        OnConnectionError(mBLEScanConfig.mAppState, CHIP_ERROR_INCORRECT_STATE);
+        BleConnectionDelegate::OnConnectionError(mBLEScanConfig.mAppState, CHIP_ERROR_INCORRECT_STATE);
         ChipLogError(Ble, "BLE Layer is not yet initialized");
         return;
     }
 
     if (mpEndpoint->mpAdapter == nullptr)
     {
-        OnConnectionError(mBLEScanConfig.mAppState, CHIP_ERROR_INCORRECT_STATE);
+        BleConnectionDelegate::OnConnectionError(mBLEScanConfig.mAppState, CHIP_ERROR_INCORRECT_STATE);
         ChipLogError(Ble, "No adapter available for new connection establishment");
         return;
     }
@@ -662,7 +663,7 @@ void BLEManagerImpl::InitiateScan(BleScanState scanType)
     if (!mDeviceScanner)
     {
         mBLEScanConfig.bleScanState = BleScanState::kNotScanning;
-        OnConnectionError(mBLEScanConfig.mAppState, CHIP_ERROR_INTERNAL);
+        BleConnectionDelegate::OnConnectionError(mBLEScanConfig.mAppState, CHIP_ERROR_INTERNAL);
         ChipLogError(Ble, "Failed to create a BLE device scanner");
         return;
     }
@@ -672,7 +673,7 @@ void BLEManagerImpl::InitiateScan(BleScanState scanType)
     {
         mBLEScanConfig.bleScanState = BleScanState::kNotScanning;
         ChipLogError(Ble, "Failed to start a BLE can: %s", chip::ErrorStr(err));
-        OnConnectionError(mBLEScanConfig.mAppState, err);
+        BleConnectionDelegate::OnConnectionError(mBLEScanConfig.mAppState, err);
         return;
     }
 }
@@ -768,7 +769,7 @@ void BLEManagerImpl::OnScanComplete()
         return;
     }
 
-    OnConnectionError(mBLEScanConfig.mAppState, CHIP_ERROR_TIMEOUT);
+    BleConnectionDelegate::OnConnectionError(mBLEScanConfig.mAppState, CHIP_ERROR_TIMEOUT);
     mBLEScanConfig.bleScanState = BleScanState::kNotScanning;
 }
 

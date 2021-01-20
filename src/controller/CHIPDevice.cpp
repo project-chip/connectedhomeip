@@ -150,14 +150,15 @@ CHIP_ERROR Device::Serialize(SerializedDevice & output)
 
     CHIP_ZERO_AT(serializable);
 
-    serializable.mOpsCreds   = mPairing;
-    serializable.mDeviceId   = Encoding::LittleEndian::HostSwap64(mDeviceId);
-    serializable.mDevicePort = Encoding::LittleEndian::HostSwap16(mDeviceUdpAddress.GetPort());
-    serializable.mAdminId    = Encoding::LittleEndian::HostSwap16(mAdminId);
-    SuccessOrExit(error = Inet::GetInterfaceName(mDeviceUdpAddress.GetInterface(), Uint8::to_char(serializable.mInterfaceName),
+    serializable.mOpsCreds        = mPairing;
+    serializable.mDeviceId        = Encoding::LittleEndian::HostSwap64(mDeviceId);
+    serializable.mDevicePort      = Encoding::LittleEndian::HostSwap16(mDeviceAddress.GetPort());
+    serializable.mAdminId         = Encoding::LittleEndian::HostSwap16(mAdminId);
+    serializable.mDeviceTransport = mDeviceAddress.GetTransportType();
+    SuccessOrExit(error = Inet::GetInterfaceName(mDeviceAddress.GetInterface(), Uint8::to_char(serializable.mInterfaceName),
                                                  sizeof(serializable.mInterfaceName)));
     static_assert(sizeof(serializable.mDeviceAddr) <= INET6_ADDRSTRLEN, "Size of device address must fit within INET6_ADDRSTRLEN");
-    mDeviceUdpAddress.GetIPAddress().ToString(Uint8::to_char(serializable.mDeviceAddr), sizeof(serializable.mDeviceAddr));
+    mDeviceAddress.GetIPAddress().ToString(Uint8::to_char(serializable.mDeviceAddr), sizeof(serializable.mDeviceAddr));
 
     serializedLen = chip::Base64Encode(Uint8::to_const_uchar(reinterpret_cast<uint8_t *>(&serializable)),
                                        static_cast<uint16_t>(sizeof(serializable)), Uint8::to_char(output.inner));
@@ -218,7 +219,19 @@ CHIP_ERROR Device::Deserialize(const SerializedDevice & input)
         VerifyOrExit(CHIP_NO_ERROR == inetErr, error = CHIP_ERROR_INTERNAL);
     }
 
-    mDeviceUdpAddress = Transport::PeerAddress::UDP(ipAddress, port, interfaceId);
+    switch (serializable.mDeviceTransport)
+    {
+    case Transport::Type::kUdp:
+        mDeviceAddress = Transport::PeerAddress::UDP(ipAddress, port, interfaceId);
+        break;
+    case Transport::Type::kBle:
+        mDeviceAddress = Transport::PeerAddress::BLE();
+        break;
+    case Transport::Type::kTcp:
+    case Transport::Type::kUndefined:
+    default:
+        ExitNow(error = CHIP_ERROR_INTERNAL);
+    }
 
 exit:
     return error;
@@ -296,13 +309,12 @@ CHIP_ERROR Device::UpdateAddress(const Transport::PeerAddress & addr)
 {
     bool didLoad;
 
-    VerifyOrReturnError(addr.GetTransportType() == Transport::Type::kUdp, CHIP_ERROR_INVALID_ADDRESS);
     ReturnErrorOnFailure(LoadSecureSessionParametersIfNeeded(didLoad));
 
     Transport::PeerConnectionState * connectionState = mSessionManager->GetPeerConnectionState(mSecureSession);
     VerifyOrReturnError(connectionState != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    mDeviceUdpAddress = addr;
+    mDeviceAddress = addr;
     connectionState->SetPeerAddress(addr);
 
     return CHIP_NO_ERROR;
@@ -329,11 +341,15 @@ CHIP_ERROR Device::LoadSecureSessionParameters(ResetTransport resetNeeded)
                 ,
             Transport::UdpListenParameters(mInetLayer).SetAddressType(kIPAddressType_IPv4).SetListenPort(mListenPort)
 #endif
+#if CONFIG_NETWORK_LAYER_BLE
+                ,
+            Transport::BleListenParameters(mBleLayer)
+#endif
         );
         SuccessOrExit(err);
     }
 
-    err = mSessionManager->NewPairing(Optional<Transport::PeerAddress>::Value(mDeviceUdpAddress), mDeviceId, &pairingSession,
+    err = mSessionManager->NewPairing(Optional<Transport::PeerAddress>::Value(mDeviceAddress), mDeviceId, &pairingSession,
                                       SecureSessionMgr::PairingDirection::kInitiator, mAdminId);
     SuccessOrExit(err);
 
@@ -351,8 +367,8 @@ bool Device::GetAddress(Inet::IPAddress & addr, uint16_t & port) const
     if (mState == ConnectionState::NotConnected)
         return false;
 
-    addr = mDeviceUdpAddress.GetIPAddress();
-    port = mDeviceUdpAddress.GetPort();
+    addr = mDeviceAddress.GetIPAddress();
+    port = mDeviceAddress.GetPort();
     return true;
 }
 
