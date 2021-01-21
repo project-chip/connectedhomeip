@@ -24,6 +24,7 @@
 
 #include <app/MessageDef.h>
 #include <core/CHIPTLVDebug.hpp>
+#include <support/CHIPMem.h>
 #include <support/UnitTestRegistration.h>
 #include <system/TLVPacketBufferBackingStore.h>
 
@@ -1055,6 +1056,26 @@ const nlTest sTests[] =
 // clang-format on
 } // namespace
 
+/**
+ *  Set up the test suite.
+ */
+static int TestSetup(void * inContext)
+{
+    CHIP_ERROR error = chip::Platform::MemoryInit();
+    if (error != CHIP_NO_ERROR)
+        return FAILURE;
+    return SUCCESS;
+}
+
+/**
+ *  Tear down the test suite.
+ */
+static int TestTeardown(void * inContext)
+{
+    chip::Platform::MemoryShutdown();
+    return SUCCESS;
+}
+
 int TestMessageDef()
 {
     // clang-format off
@@ -1062,8 +1083,8 @@ int TestMessageDef()
 	{
         "MessageDef",
         &sTests[0],
-        nullptr,
-        nullptr
+        TestSetup,
+        TestTeardown,
     };
     // clang-format on
 

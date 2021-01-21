@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2018 Google LLC.
  *    Copyright (c) 2016-2018 Nest Labs, Inc.
  *    All rights reserved.
@@ -39,6 +39,7 @@
 #include <inet/InetLayer.h>
 
 #include <support/CHIPArgParser.hpp>
+#include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/UnitTestRegistration.h>
 
@@ -544,16 +545,19 @@ static const nlTest sTests[] = { NL_TEST_DEF("InetEndPoint::PreTest", TestInetPr
  */
 static int TestSetup(void * inContext)
 {
-    return (SUCCESS);
+    CHIP_ERROR error = chip::Platform::MemoryInit();
+    if (error != CHIP_NO_ERROR)
+        return FAILURE;
+    return SUCCESS;
 }
 
 /**
  *  Tear down the test suite.
- *  Free memory reserved at TestSetup.
  */
 static int TestTeardown(void * inContext)
 {
-    return (SUCCESS);
+    chip::Platform::MemoryShutdown();
+    return SUCCESS;
 }
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 

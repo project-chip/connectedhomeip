@@ -19,6 +19,7 @@
 
 #include <inet/tests/TestInetCommon.h>
 
+#include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
 
@@ -27,7 +28,7 @@ namespace Test {
 
 CHIP_ERROR IOContext::Init(nlTestSuite * suite)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err = Platform::MemoryInit();
 
     gSystemLayer.Init(nullptr);
 
@@ -46,6 +47,7 @@ CHIP_ERROR IOContext::Shutdown()
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     ShutdownNetwork();
+    Platform::MemoryShutdown();
 
     return err;
 }

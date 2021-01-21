@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -180,6 +180,51 @@ inline void Delete(T * p)
 {
     p->~T();
     MemoryFree(p);
+}
+
+/**
+ * Test the validity of a pointer obtained from a chip::Platform memory allocation.
+ *
+ * @param[in]  p                Pointer to a memory block previously allocated with MemoryAlloc, MemoryCalloc,
+ *                              MemoryRealloc, or New, and not freed.
+ * @param[in]  min_size         Gives a size that the allocated block is expected to be able to hold.
+ *
+ * This function is guaranteed to return \c false if \a p is \c nullptr. The function returns \c true if \a p is a valid
+ * pointer to an allocation AND the implementation memory manager is in a fully functioning state.
+ *
+ * @note For non-null \a p, the return value MAY be \c true even if the pointer is invalid. That is, a particular
+ *       implementation does not necessarily perform any checking.
+ * @note For non-null \a p, the return value MAY be incorrect if the memory manager is in a faulty state (e.g. corrupt
+ *       heap), even if the faulty state does not directly involve \a p.
+ * @note For non-null \a p, the function MAY abort the program rather than return at all if the memory mananger is in
+ *       a faulty state, even if \a p is valid.
+ * @note For a non-null \a p, checking MAY be slow.
+ *
+ * @return  An implementation- and configuration-defined estimate of whether \a p is a valid allocated pointer.
+ */
+extern bool MemoryInternalCheckPointer(const void * p, size_t min_size);
+
+/**
+ * In debug builds, test the validity of a pointer obtained from a chip::Platform memory allocation.
+ *
+ * @param[in]  p                Pointer to a memory block previously allocated with MemoryAlloc, MemoryCalloc,
+ *                              MemoryRealloc, or New.
+ * @param[in]  min_size         Gives a size that the allocated block is expected to be able to hold.
+ *
+ * In non-debug builds (NDEBUG defined), this function returns true without performing any check,
+ * inlined with the expectation that the compiler can remove any associated failure code.
+ *
+ * In debug builds (NDEBUG not defined), this function calls \c MemoryInternalCheckPointer().
+ *
+ * @return  An implementation- and configuration-defined estimate of whether \a p is a valid allocated pointer.
+ */
+inline bool MemoryDebugCheckPointer(const void * p, size_t min_size = 0)
+{
+#ifdef NDEBUG
+    return true;
+#else  // NDEBUG
+    return MemoryInternalCheckPointer(p, min_size);
+#endif // NDEBUG
 }
 
 } // namespace Platform

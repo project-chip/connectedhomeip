@@ -52,7 +52,9 @@
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/mem.h>
 #include <lwip/pbuf.h>
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+#elif CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE == 0
+#include <support/CHIPMem.h>
+#endif
 
 namespace chip {
 namespace System {
@@ -61,9 +63,9 @@ namespace System {
 // Pool allocation for PacketBuffer objects (toll-free bridged with LwIP pbuf allocator if CHIP_SYSTEM_CONFIG_USE_LWIP)
 //
 #if !CHIP_SYSTEM_CONFIG_USE_LWIP
-#if CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
+#if CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE
 
-static BufferPoolElement sBufferPool[CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC];
+static BufferPoolElement sBufferPool[CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE];
 
 PacketBuffer * PacketBuffer::sFreeList = PacketBuffer::BuildFreeList();
 
@@ -82,7 +84,7 @@ static Mutex sBufferPoolMutex;
     } while (0)
 #endif // !CHIP_SYSTEM_CONFIG_NO_LOCKING
 
-#endif // CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
+#endif // CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE
 
 #ifndef LOCK_BUF_POOL
 #define LOCK_BUF_POOL()                                                                                                            \
@@ -119,8 +121,20 @@ void PacketBuffer::SetStart(uint8_t * aNewStart)
     this->payload = aNewStart;
 }
 
+#ifndef NDEBUG
+void PacketBuffer::InternalCheck(const PacketBuffer * buffer, const char * file, int line, const char * func)
+{
+#if !CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE
+    VerifyOrDieWithMsg(
+        ::chip::Platform::MemoryDebugCheckPointer(buffer, buffer ? (buffer->alloc_size + CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE) : 0),
+        chipSystemLayer, "%s:%d %s(): invalid pointer", file, line, func);
+#endif // !CHIP_SYSTEM_CONFIG_USE_LWIP  && !CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE
+}
+#endif
+
 void PacketBuffer::SetDataLength(uint16_t aNewLen, PacketBuffer * aChainHead)
 {
+    Check(this, __FILE__, __LINE__, __func__);
     const uint16_t kMaxDataLen = this->MaxDataLength();
 
     if (aNewLen > kMaxDataLen)
@@ -133,6 +147,7 @@ void PacketBuffer::SetDataLength(uint16_t aNewLen, PacketBuffer * aChainHead)
 
     while (aChainHead != nullptr && aChainHead != this)
     {
+        Check(aChainHead, __FILE__, __LINE__, __func__);
         aChainHead->tot_len = static_cast<uint16_t>(aChainHead->tot_len + lDelta);
         aChainHead          = static_cast<PacketBuffer *>(aChainHead->next);
     }
@@ -339,7 +354,7 @@ PacketBufferHandle PacketBuffer::NewWithAvailableSize(uint16_t aReservedSize, ui
     SYSTEM_STATS_UPDATE_LWIP_PBUF_COUNTS();
 
 #else // !CHIP_SYSTEM_CONFIG_USE_LWIP
-#if CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
+#if CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE
 
     static_cast<void>(lBlockSize);
 
@@ -354,12 +369,12 @@ PacketBufferHandle PacketBuffer::NewWithAvailableSize(uint16_t aReservedSize, ui
 
     UNLOCK_BUF_POOL();
 
-#else // !CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
+#else // !CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE
 
     lPacket = reinterpret_cast<PacketBuffer *>(chip::Platform::MemoryAlloc(lBlockSize));
     SYSTEM_STATS_INCREMENT(chip::System::Stats::kSystemLayer_NumPacketBufs);
 
-#endif // !CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
+#endif // !CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE
 #endif // !CHIP_SYSTEM_CONFIG_USE_LWIP
 
     if (lPacket == nullptr)
@@ -372,9 +387,9 @@ PacketBufferHandle PacketBuffer::NewWithAvailableSize(uint16_t aReservedSize, ui
     lPacket->len = lPacket->tot_len = 0;
     lPacket->next                   = nullptr;
     lPacket->ref                    = 1;
-#if CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC == 0
+#if CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE == 0
     lPacket->alloc_size = static_cast<uint16_t>(lAllocSize);
-#endif // CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC == 0
+#endif // CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE == 0
 
     return PacketBufferHandle(lPacket);
 }
@@ -433,13 +448,14 @@ void PacketBuffer::Free(PacketBuffer * aPacket)
         if (aPacket->ref == 0)
         {
             SYSTEM_STATS_DECREMENT(chip::System::Stats::kSystemLayer_NumPacketBufs);
+            ::chip::Platform::MemoryDebugCheckPointer(aPacket, aPacket->alloc_size + CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE);
             aPacket->Clear();
-#if CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
+#if CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE
             aPacket->next = sFreeList;
             sFreeList     = aPacket;
-#else  // !CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
+#else  // !CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE
             chip::Platform::MemoryFree(aPacket);
-#endif // !CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
+#endif // !CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE
             aPacket       = lNextPacket;
         }
         else
@@ -462,9 +478,9 @@ void PacketBuffer::Clear()
 {
     tot_len = 0;
     len     = 0;
-#if CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC == 0
+#if CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE == 0
     alloc_size = 0;
-#endif // CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC == 0
+#endif // CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE == 0
 }
 
 /**
@@ -499,13 +515,13 @@ PacketBuffer * PacketBuffer::RightSize(PacketBuffer * aPacket)
 }
 #endif
 
-#if !CHIP_SYSTEM_CONFIG_USE_LWIP && CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
+#if !CHIP_SYSTEM_CONFIG_USE_LWIP && CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE
 
 PacketBuffer * PacketBuffer::BuildFreeList()
 {
     PacketBuffer * lHead = nullptr;
 
-    for (int i = 0; i < CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC; i++)
+    for (int i = 0; i < CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE; i++)
     {
         PacketBuffer * lCursor = &sBufferPool[i].Header;
         lCursor->next          = lHead;
@@ -518,7 +534,7 @@ PacketBuffer * PacketBuffer::BuildFreeList()
     return lHead;
 }
 
-#endif //  !CHIP_SYSTEM_CONFIG_USE_LWIP && CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
+#endif //  !CHIP_SYSTEM_CONFIG_USE_LWIP && CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE
 
 PacketBufferHandle PacketBufferHandle::PopHead()
 {

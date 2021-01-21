@@ -551,6 +551,25 @@
 #endif // CHIP_CONFIG_SIMPLE_ALLOCATOR_USE_SMALL_BUFFERS
 
 /**
+ *  @def CHIP_CONFIG_DEBUG_USE_DMALLOC
+ *
+ *  @brief
+ *    Enable (1) or disable (0) malloc memory allocator support
+ *    for dmalloc, an open-source debug malloc library. When enabled,
+ *    additional checks and logging of allocations may be performed,
+ *    with some performance cost.
+ *
+ *  @note This configuration is most relevant when
+ *        #CHIP_CONFIG_MEMORY_MGMT_MALLOC is set, but may also
+ *        affect other configurations where application or platform
+ *        code uses the malloc() family.
+ *
+ */
+#ifndef CHIP_CONFIG_DEBUG_USE_DMALLOC
+#define CHIP_CONFIG_DEBUG_USE_DMALLOC     0
+#endif // CHIP_CONFIG_DEBUG_USE_DMALLOC
+
+/**
  *  @name chip Security Manager Time-Consuming Crypto Alerts.
  *
  *  @brief

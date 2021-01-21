@@ -57,9 +57,9 @@ struct pbuf
     uint16_t tot_len;
     uint16_t len;
     uint16_t ref;
-#if CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC == 0
+#if CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE == 0
     uint16_t alloc_size;
-#endif // CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC == 0
+#endif // CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE == 0
 };
 #endif // !CHIP_SYSTEM_CONFIG_USE_LWIP
 
@@ -151,6 +151,7 @@ public:
     void SetDataLength(uint16_t aNewLen) { SetDataLength(aNewLen, nullptr); }
     // This version will shortly be made private; do not use in new code.
     void SetDataLength(uint16_t aNewLen, PacketBuffer * aChainHead);
+    void DUMP(const char * file = nullptr, int line = 0, const char * func = nullptr) const;
 
     /**
      * Get the total length of packet data in the buffer chain.
@@ -311,16 +312,35 @@ public:
     // DO NOT USE. Will be made private after #4094 merges.
     void AddRef();
 
+    /**
+     * Perform an implementation-defined check on the validity of a non-null PacketBuffer pointer.
+     *
+     * In non-debug builds (NDEBUG defined), this function does nothing.
+     * In debug builds (NDEBUG not defined), this function MAY log an error and/or abort the program if the packet buffer
+     * or the implementation-defined memory management system is in a faulty state.
+     */
+    static void Check(const PacketBuffer * buffer, const char * file, int line, const char * func)
+    {
+#ifndef NDEBUG
+        InternalCheck(buffer, file, line, func);
+#endif // NDEBUG
+    }
+
+
 private:
-#if !CHIP_SYSTEM_CONFIG_USE_LWIP && CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
+#if !CHIP_SYSTEM_CONFIG_USE_LWIP && CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE
     static PacketBuffer * sFreeList;
 
     static PacketBuffer * BuildFreeList();
-#endif // !CHIP_SYSTEM_CONFIG_USE_LWIP && CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
+#endif // !CHIP_SYSTEM_CONFIG_USE_LWIP && CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_PBUF_FROM_CUSTOM_POOLS
     static PacketBuffer * RightSize(PacketBuffer * aPacket);
 #endif
+
+#ifndef NDEBUG
+    static void InternalCheck(const PacketBuffer * buffer, const char * file, int line, const char * func);
+#endif // NDEBUG
 
     static void Free(PacketBuffer * aPacket);
     static PacketBuffer * FreeHead(PacketBuffer * aPacket);
@@ -381,7 +401,7 @@ namespace System {
 //
 // Pool allocation for PacketBuffer objects (toll-free bridged with LwIP pbuf allocator if CHIP_SYSTEM_CONFIG_USE_LWIP)
 //
-#if !CHIP_SYSTEM_CONFIG_USE_LWIP && CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
+#if !CHIP_SYSTEM_CONFIG_USE_LWIP && CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE
 
 typedef union
 {
@@ -389,7 +409,7 @@ typedef union
     uint8_t Block[CHIP_SYSTEM_PACKETBUFFER_SIZE];
 } BufferPoolElement;
 
-#endif // !CHIP_SYSTEM_CONFIG_USE_LWIP && CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
+#endif // !CHIP_SYSTEM_CONFIG_USE_LWIP && CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE
 
 inline uint16_t PacketBuffer::AllocSize() const
 {
@@ -404,12 +424,12 @@ inline uint16_t PacketBuffer::AllocSize() const
     return LWIP_MEM_ALIGN_SIZE(PBUF_POOL_BUFSIZE) - CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE;
 #endif // !LWIP_PBUF_FROM_CUSTOM_POOLS
 #else  // !CHIP_SYSTEM_CONFIG_USE_LWIP
-#if CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC == 0
+#if CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE == 0
     return this->alloc_size;
-#else  // CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC != 0
+#else  // CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE != 0
     extern BufferPoolElement gDummyBufferPoolElement;
     return sizeof(gDummyBufferPoolElement.Block) - CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE;
-#endif // CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC != 0
+#endif // CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE != 0
 #endif // !CHIP_SYSTEM_CONFIG_USE_LWIP
 }
 
@@ -432,6 +452,7 @@ namespace System {
 class DLL_EXPORT PacketBufferHandle
 {
 public:
+    void DUMP(const char * file = nullptr, int line = 0, const char * func = nullptr) const { mBuffer->DUMP(file, line, func); }
     /**
      * Construct an empty PacketBufferHandle.
      */
@@ -569,6 +590,10 @@ public:
      */
     CHECK_RETURN_VALUE PacketBuffer * Release_ForNow()
     {
+        if (mBuffer != nullptr)
+        {
+            PacketBuffer::Check(mBuffer, __FILE__, __LINE__, __func__);
+        }
         PacketBuffer * buffer = mBuffer;
         mBuffer               = nullptr;
         return buffer;
@@ -592,7 +617,13 @@ public:
      *
      * @note This should be used ONLY by low-level code interfacing with LwIP.
      */
-    struct pbuf * GetLwIPpbuf() { return static_cast<struct pbuf *>(mBuffer); }
+    struct pbuf * GetLwIPpbuf() {
+        if (mBuffer)
+        {
+            PacketBuffer::Check(mBuffer, __FILE__, __LINE__, __func__);
+        }
+        return static_cast<struct pbuf *>(mBuffer);
+    }
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
     /**
@@ -603,6 +634,20 @@ public:
      * @returns empty handle on allocation failure.
      */
     PacketBufferHandle CloneData();
+
+    /**
+     * Perform an implementation-defined check on the validity of a non-Null PacketBufferHandle.
+     *
+     * In non-debug builds (NDEBUG defined), this function does nothing.
+     * In debug builds (NDEBUG not defined), this function MAY log an error and/or abort the program if the packet buffer
+     * or the implementation-defined memory management system is in a faulty state.
+     */
+    static void Check(const PacketBufferHandle & handle, const char * file, int line, const char * func)
+    {
+#ifndef NDEBUG
+        PacketBuffer::Check(handle.mBuffer, file, line, func);
+#endif
+    }
 
 private:
     PacketBufferHandle(const PacketBufferHandle &) = delete;

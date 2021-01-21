@@ -34,6 +34,7 @@
 #include <utility>
 #include <vector>
 
+#include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/UnitTestRegistration.h>
 #include <system/SystemPacketBuffer.h>
@@ -196,6 +197,7 @@ PacketBufferTest::PacketBufferTest(TestContext * context) : mContext(context)
 
 int PacketBufferTest::TestSetup(void * inContext)
 {
+    chip::Platform::MemoryInit();
     TestContext * const theContext = reinterpret_cast<TestContext *>(inContext);
     theContext->test               = new PacketBufferTest(theContext);
     if (theContext->test == nullptr)
@@ -373,6 +375,7 @@ void PacketBufferTest::CheckNewWithAvailableSizeAndFree(nlTestSuite * inSuite, v
         }
     }
 
+#if CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE != 0
     // Use the rest of the buffer space
     std::vector<PacketBufferHandle> allocate_all_the_things;
     for (;;)
@@ -385,6 +388,7 @@ void PacketBufferTest::CheckNewWithAvailableSizeAndFree(nlTestSuite * inSuite, v
         // Hold on to the buffer, to use up all the buffer space.
         allocate_all_the_things.push_back(std::move(buffer));
     }
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE != 0
 }
 
 /**

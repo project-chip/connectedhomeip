@@ -53,11 +53,15 @@ jobs:
                   queries: +security-and-quality
 
             - name: Bootstrap
-              run: scripts/build/gn_bootstrap.sh
+              run: |
+                  apt-get install libdmalloc-dev;
+                  eval `dmalloc -b -l DMALLOC_LOG -i 1 high`;
+                  export G_SLICE; G_SLICE=always-malloc;
+                  scripts/build/gn_bootstrap.sh
             - name: Setup Build
               run: |
                   case $BUILD_TYPE in
-                     "main") GN_ARGS='';;
+                     "main") GN_ARGS='chip_config_memory_management="malloc" chip_config_memory_management_debug_use_dmalloc=true';;
                      "clang") GN_ARGS='is_clang=true';;
                      "mbedtls") GN_ARGS='chip_crypto="mbedtls"';;
                      *) ;;
