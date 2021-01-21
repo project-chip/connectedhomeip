@@ -212,7 +212,7 @@ void CheckResendMessage(nlTestSuite * inSuite, void * inContext)
 
     ctx.GetInetLayer().SystemLayer()->Init(nullptr);
 
-    chip::System::PacketBufferHandle buffer = chip::System::PacketBuffer::NewWithAvailableSize(payload_len + kMaxTagLen);
+    chip::System::PacketBufferHandle buffer = chip::System::PacketBuffer::NewWithAvailableSize(static_cast<uint16_t>(payload_len + kMaxTagLen));
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());
 
     memmove(buffer->Start(), PAYLOAD, payload_len);
