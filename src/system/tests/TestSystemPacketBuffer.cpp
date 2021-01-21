@@ -354,7 +354,9 @@ void PacketBufferTest::CheckNewWithAvailableSizeAndFree(nlTestSuite * inSuite, v
     for (const auto & config : test->configurations)
     {
         const PacketBufferHandle buffer = PacketBuffer::NewWithAvailableSize(config.reserved_size, 0);
+#if CHIP_CONFIG_DEBUG_USE_DMALLOC
         *(reinterpret_cast<uint8_t*>(const_cast<PacketBuffer*>(buffer.mBuffer)) - 1) = 42;
+#endif
 
         if (config.reserved_size > CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX)
         {

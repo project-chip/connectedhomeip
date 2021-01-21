@@ -448,7 +448,9 @@ void PacketBuffer::Free(PacketBuffer * aPacket)
         if (aPacket->ref == 0)
         {
             SYSTEM_STATS_DECREMENT(chip::System::Stats::kSystemLayer_NumPacketBufs);
+#if CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE == 0
             ::chip::Platform::MemoryDebugCheckPointer(aPacket, aPacket->alloc_size + CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE);
+#endif // CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE == 0
             aPacket->Clear();
 #if CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE
             aPacket->next = sFreeList;
