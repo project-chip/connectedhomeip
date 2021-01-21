@@ -20,3 +20,12 @@ The CHIP src directory is structured as follows:
 | setup_payload | QR code setup data encode / decode library         |
 | system        | System Layer -- common APIs for mem, work, etc.    |
 | test_driver   | Framework for on-device testing                    |
+
+#### Darwin
+
+##### Near Field Communication Tag Reading
+
+NFC Tag Reading is disabled by default because a paid Apple developer account is
+requird to have it enabled. If you want to enable it and you have a paid Apple
+developer account, go to the CHIPTool iOS target and turn on Near Field
+Communication Tag Reading under the Capabilities tab.
