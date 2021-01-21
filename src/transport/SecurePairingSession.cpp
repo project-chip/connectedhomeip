@@ -64,7 +64,8 @@ void SecurePairingSession::Clear()
     memset(&mWS[0][0], 0, sizeof(mWS));
     memset(&mKe[0], 0, sizeof(mKe));
     mNextExpectedMsg = Protocols::SecureChannel::MsgType::PASE_Spake2pError;
-    mSpake2p.Init(nullptr, 0);
+    mSpake2p.Init(nullptr);
+    mCommissioningHash.Clear();
     mIterationCount = 0;
     mSaltLength     = 0;
     if (mSalt != nullptr)
@@ -178,6 +179,12 @@ CHIP_ERROR SecurePairingSession::Init(Optional<NodeId> myNodeId, uint16_t myKeyI
 
     VerifyOrExit(delegate != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
+    err = mCommissioningHash.Begin();
+    SuccessOrExit(err);
+
+    err = mCommissioningHash.AddData(Uint8::from_const_char(kSpake2pContext), strlen(kSpake2pContext));
+    SuccessOrExit(err);
+
     mDelegate     = delegate;
     mLocalNodeId  = myNodeId;
     mLocalKeyId   = myKeyId;
@@ -198,7 +205,7 @@ CHIP_ERROR SecurePairingSession::SetupSpake2p(uint32_t pbkdf2IterCount, const ui
                         sizeof(mWS), &mWS[0][0]);
     SuccessOrExit(err);
 
-    err = mSpake2p.Init(Uint8::from_const_char(kSpake2pContext), strlen(kSpake2pContext));
+    err = mSpake2p.Init(&mCommissioningHash);
     SuccessOrExit(err);
 
 exit:
@@ -320,6 +327,10 @@ CHIP_ERROR SecurePairingSession::SendPBKDFParamRequest()
 
     req->SetDataLength(kPBKDFParamRandomNumberSize);
 
+    // Update commissioning hash with the pbkdf2 param request that's being sent.
+    err = mCommissioningHash.AddData(req->Start(), req->DataLength());
+    SuccessOrExit(err);
+
     mNextExpectedMsg = Protocols::SecureChannel::MsgType::PBKDFParamResponse;
 
     err = AttachHeaderAndSend(Protocols::SecureChannel::MsgType::PBKDFParamRequest, std::move(req));
@@ -348,6 +359,10 @@ CHIP_ERROR SecurePairingSession::HandlePBKDFParamRequest(const PacketHeader & he
     VerifyOrExit(reqlen == kPBKDFParamRandomNumberSize, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
     ChipLogDetail(Ble, "Received PBKDF param request");
+
+    // Update commissioning hash with the received pbkdf2 param request
+    err = mCommissioningHash.AddData(req, reqlen);
+    SuccessOrExit(err);
 
     err = SendPBKDFParamResponse();
     SuccessOrExit(err);
@@ -397,6 +412,10 @@ CHIP_ERROR SecurePairingSession::SendPBKDFParamResponse()
 
     resp->SetDataLength(u16len);
 
+    // Update commissioning hash with the pbkdf2 param response that's being sent.
+    err = mCommissioningHash.AddData(resp->Start(), resp->DataLength());
+    SuccessOrExit(err);
+
     err = SetupSpake2p(mIterationCount, mSalt, mSaltLength);
     SuccessOrExit(err);
 
@@ -443,6 +462,10 @@ CHIP_ERROR SecurePairingSession::HandlePBKDFParamResponse(const PacketHeader & h
         // Specifications allow message to carry a uint64_t sized iteration count. Current APIs are
         // limiting it to uint32_t. Let's make sure it'll fit the size limit.
         VerifyOrExit(CanCastTo<uint32_t>(iterCount), err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+
+        // Update commissioning hash with the received pbkdf2 param response
+        err = mCommissioningHash.AddData(resp, resplen);
+        SuccessOrExit(err);
 
         err = SetupSpake2p(static_cast<uint32_t>(iterCount), msgptr, saltlen);
         SuccessOrExit(err);
