@@ -54,7 +54,7 @@ jobs:
 
             - name: Bootstrap
               run: |
-                  apt-get install libdmalloc-dev;
+                  apt-get update && apt-get install -y libdmalloc-dev;
                   eval `dmalloc -b -l DMALLOC_LOG -i 1 high`;
                   export G_SLICE; G_SLICE=always-malloc;
                   scripts/build/gn_bootstrap.sh
