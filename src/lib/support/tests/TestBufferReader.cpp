@@ -35,7 +35,7 @@ static const uint8_t test_buffer[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13
 
 struct TestReader : public Reader
 {
-    TestReader() : Reader(test_buffer, std::extent<typeof(test_buffer)>::value) {}
+    TestReader() : Reader(test_buffer, std::extent<decltype(test_buffer)>::value) {}
 };
 
 static void TestBufferReader_Basic(nlTestSuite * inSuite, void * inContext)
