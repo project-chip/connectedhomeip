@@ -60,7 +60,7 @@ public:
 
     bool operator==(const SecureSessionHandle & that) const
     {
-        return mPeerNodeId == that.mPeerNodeId && mPeerKeyId == that.mPeerKeyId && mAdmin == that.mAdmin;
+        return mPeerNodeId == that.mPeerNodeId && mPeerKeyId == that.mPeerKeyId;
     }
 
 private:

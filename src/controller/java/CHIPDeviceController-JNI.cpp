@@ -1240,3 +1240,22 @@ exit:
     env->DeleteLocalRef(errStrObj);
     return err;
 }
+
+// Dummy Platform implementations for Platform::PersistedStorage functions
+namespace chip {
+namespace Platform {
+namespace PersistedStorage {
+
+CHIP_ERROR Read(const char * aKey, uint32_t & aValue)
+{
+    return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
+}
+
+CHIP_ERROR Write(const char * aKey, uint32_t aValue)
+{
+    return CHIP_NO_ERROR;
+}
+
+} // namespace PersistedStorage
+} // namespace Platform
+} // namespace chip

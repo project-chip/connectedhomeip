@@ -81,7 +81,7 @@ CHIP_ERROR CommandHandler::ProcessCommandDataElement(CommandDataElement::Parser 
     chip::EndpointId endpointId;
 
     ReturnErrorOnFailure(aCommandElement.GetCommandPath(&commandPath));
-    ReturnErrorOnFailure(commandPath.GetNamespacedClusterId(&clusterId));
+    ReturnErrorOnFailure(commandPath.GetClusterId(&clusterId));
     ReturnErrorOnFailure(commandPath.GetCommandId(&commandId));
     ReturnErrorOnFailure(commandPath.GetEndpointId(&endpointId));
 
