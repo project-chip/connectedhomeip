@@ -1255,16 +1255,11 @@ static void TestSPAKE2P_RFC(nlTestSuite * inSuite, void * inContext)
         Test_Spake2p_P256_SHA256_HKDF_HMAC Verifier;
         Test_Spake2p_P256_SHA256_HKDF_HMAC Prover;
 
-        Hash_SHA256_stream hashContext;
-
-        error = hashContext.Begin();
-        NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
-
-        error = hashContext.AddData(vector->context, vector->context_len);
-        NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
-
         // First start the prover
-        error = Prover.Init(&hashContext);
+        error = Prover.Init(NULL);
+        NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
+
+        Prover.InternalHash(vector->context, vector->context_len);
         NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
 
         error = Prover.BeginProver(vector->prover_identity, vector->prover_identity_len, vector->verifier_identity,
@@ -1283,7 +1278,10 @@ static void TestSPAKE2P_RFC(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, memcmp(X, vector->X, vector->X_len) == 0);
 
         // Start up the verifier
-        error = Verifier.Init(&hashContext);
+        error = Verifier.Init(NULL);
+        NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
+
+        Verifier.InternalHash(vector->context, vector->context_len);
         NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
 
         // First pre-compute L (accessories with dynamic setup codes will do this)
