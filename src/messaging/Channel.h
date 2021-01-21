@@ -141,6 +141,7 @@ public:
         mHintPeerAddr.SetValue(peerAddr);
         return *this;
     }
+
 private:
     NodeId mPeerNodeId                       = kUndefinedNodeId;
     NetworkPreference mNetworkPreference     = NetworkPreference::kNetwork_Default;

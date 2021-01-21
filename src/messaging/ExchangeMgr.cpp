@@ -369,18 +369,20 @@ void ExchangeManager::OnConnectionExpired(SecureSessionHandle session, SecureSes
     });
 }
 
-void ExchangeManager::OnMessageReceived(const PacketHeader & header, const Transport::PeerAddress & source, System::PacketBufferHandle msgBuf)
+void ExchangeManager::OnMessageReceived(const PacketHeader & header, const Transport::PeerAddress & source,
+                                        System::PacketBufferHandle msgBuf)
 {
     auto peer = header.GetSourceNodeId();
     if (!peer.HasValue())
     {
         char addrBuffer[Transport::PeerAddress::kMaxToStringSize];
         source.ToString(addrBuffer, sizeof(addrBuffer));
-        ChipLogError(ExchangeManager, "Unencrypted message from %s is dropped since no source node id in packet header.", addrBuffer);
+        ChipLogError(ExchangeManager, "Unencrypted message from %s is dropped since no source node id in packet header.",
+                     addrBuffer);
         return;
     }
 
-    auto node = peer.Value();
+    auto node     = peer.Value();
     auto notFound = mChannelContexts.ForEachActiveObject([&](ChannelContext * context) {
         if (context->MatchesPaseParingSessoin(node))
         {
@@ -396,7 +398,8 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & header, const Trans
     {
         char addrBuffer[Transport::PeerAddress::kMaxToStringSize];
         source.ToString(addrBuffer, sizeof(addrBuffer));
-        ChipLogError(ExchangeManager, "Unencrypted message from %s is dropped since no session found for node %llu.", addrBuffer, node);
+        ChipLogError(ExchangeManager, "Unencrypted message from %s is dropped since no session found for node %llu.", addrBuffer,
+                     node);
         return;
     }
 }

@@ -62,7 +62,8 @@ public:
     void OnNewConnection(SecureSessionHandle session);
     void OnConnectionExpired(SecureSessionHandle session);
 
-    CHIP_ERROR HandlePairingMessage(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress, System::PacketBufferHandle && msg);
+    CHIP_ERROR HandlePairingMessage(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
+                                    System::PacketBufferHandle && msg);
     CHIP_ERROR SendPairingMessage(const PacketHeader & header, const Transport::PeerAddress & peerAddress,
                                   System::PacketBufferHandle msgIn) override;
     void OnPairingError(CHIP_ERROR error) override;

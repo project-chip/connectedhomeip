@@ -227,9 +227,9 @@ private:
     void OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr) override;
     void OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * mgr) override;
 
-
     // TransportMgrDelegate interface for rendezvous sessions
-    void OnMessageReceived(const PacketHeader & header, const Transport::PeerAddress & source, System::PacketBufferHandle msgBuf) override;
+    void OnMessageReceived(const PacketHeader & header, const Transport::PeerAddress & source,
+                           System::PacketBufferHandle msgBuf) override;
 };
 
 } // namespace Messaging

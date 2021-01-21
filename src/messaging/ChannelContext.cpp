@@ -78,8 +78,7 @@ bool ChannelContext::MatchesBuilder(const ChannelBuilder & builder, SecureSessio
 
 bool ChannelContext::MatchesPaseParingSessoin(NodeId nodeId)
 {
-    return mState == ChannelState::kChanneState_Preparing &&
-        mPreparing.mState == PrepareState::kPrepareState_PaseParing &&
+    return mState == ChannelState::kChanneState_Preparing && mPreparing.mState == PrepareState::kPrepareState_PaseParing &&
         nodeId == mPreparing.mBuilder.GetPeerNodeId();
 }
 
@@ -142,13 +141,18 @@ void ChannelContext::EnterAddressResolve()
 #ifndef NDEBUG
     {
         auto addr = mPreparing.mBuilder.GetHintPeerAddress();
-        if (addr.HasValue()) {
+        if (addr.HasValue())
+        {
             mPreparing.mAddress = addr.Value();
             ExitAddressResolve();
             switch (mPreparing.mBuilder.GetSessionType())
             {
-            case ChannelBuilder::SessionType::kSession_PASE: EnterPaseParingState(); break;
-            case ChannelBuilder::SessionType::kSession_CASE: EnterCaseParingState(); break;
+            case ChannelBuilder::SessionType::kSession_PASE:
+                EnterPaseParingState();
+                break;
+            case ChannelBuilder::SessionType::kSession_CASE:
+                EnterCaseParingState();
+                break;
             }
             return;
         }
@@ -264,7 +268,8 @@ CHIP_ERROR ChannelContext::SendPairingMessage(const PacketHeader & header, const
     return mExchangeManager->GetTransportManager()->SendMessage(header, peerAddress, std::move(msgIn));
 }
 
-CHIP_ERROR ChannelContext::HandlePairingMessage(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress, System::PacketBufferHandle && msg)
+CHIP_ERROR ChannelContext::HandlePairingMessage(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
+                                                System::PacketBufferHandle && msg)
 {
     return mPreparing.mPairingSession->HandlePeerMessage(packetHeader, peerAddress, std::move(msg));
 }
@@ -277,10 +282,8 @@ void ChannelContext::EnterPaseParingState()
     Transport::PeerAddress addr;
     addr.SetTransportType(chip::Transport::Type::kUdp).SetIPAddress(mPreparing.mAddress);
     mPreparing.mPairingSession->Pair(addr, mPreparing.mBuilder.GetPeerSetUpPINCode(),
-                                     Optional<NodeId>(mExchangeManager->GetLocalNodeId()),
-                                     mPreparing.mBuilder.GetPeerNodeId(),
-                                     mExchangeManager->GetNextPaseKeyId(),
-                                     this);
+                                     Optional<NodeId>(mExchangeManager->GetLocalNodeId()), mPreparing.mBuilder.GetPeerNodeId(),
+                                     mExchangeManager->GetNextPaseKeyId(), this);
 }
 
 void ChannelContext::OnPairingError(CHIP_ERROR error)
