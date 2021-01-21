@@ -22,7 +22,12 @@
  *
  */
 
-#include <app/MessageDef.h>
+#include <app/MessageDef/MessageDef.h>
+#include <app/MessageDef/ReadRequest.h>
+#include <app/MessageDef/InvokeCommand.h>
+#include <app/MessageDef/ReportData.h>
+#include <app/MessageDef/CommandDataElement.h>
+#include <app/MessageDef/CommandList.h>
 #include <core/CHIPTLVDebug.hpp>
 #include <support/UnitTestRegistration.h>
 #include <system/TLVPacketBufferBackingStore.h>
