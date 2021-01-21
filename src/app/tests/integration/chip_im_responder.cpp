@@ -20,19 +20,22 @@
  *      This file implements a chip-im-responder, for the
  *      CHIP Interaction Data Model Protocol.
  *
- *      Currently it provides simple command handler with sample cluster and command
+ *      Currently it provides simple command and read handler with sample cluster
  *
  */
 
+#include "MockEvents.h"
 #include "common.h"
-
-#include "app/InteractionModelEngine.h"
 #include <app/CommandHandler.h>
 #include <app/CommandSender.h>
+#include <app/InteractionModelEngine.h>
+#include <app/reporting/LoggingConfiguration.h>
+#include <app/reporting/LoggingManagement.h>
 #include <core/CHIPCore.h>
+#include <messaging/ExchangeContext.h>
+#include <messaging/ExchangeMgr.h>
+#include <messaging/Flags.h>
 #include <platform/CHIPDeviceLayer.h>
-
-#include "InteractionModelEngine.h"
 #include <support/ErrorStr.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/PASESession.h>
@@ -41,7 +44,6 @@
 
 namespace chip {
 namespace app {
-
 void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId,
                                   chip::TLV::TLVReader & aReader, Command * apCommandObj)
 {
@@ -98,11 +100,44 @@ exit:
 } // namespace chip
 
 namespace {
-
-// The CommandHandler object
 chip::TransportMgr<chip::Transport::UDP> gTransportManager;
 chip::SecureSessionMgr gSessionManager;
-chip::SecurePairingUsingTestSecret gTestPairing;
+chip::SecurePairingUsingTestSecret gTestPairing(chip::Optional<chip::NodeId>::Value(chip::kUndefinedNodeId),
+                                                static_cast<uint16_t>(0), static_cast<uint16_t>(0));
+LivenessEventGenerator gLivenessGenerator;
+
+uint64_t gDebugEventBuffer[1024];
+uint64_t gInfoEventBuffer[1024];
+uint64_t gCritEventBuffer[1024];
+
+void InitializeEventLogging(chip::Messaging::ExchangeManager * apMgr)
+{
+    chip::app::reporting::LogStorageResources logStorageResources[] = {
+        { static_cast<void *>(&gDebugEventBuffer[0]), sizeof(gDebugEventBuffer), nullptr, 0, nullptr,
+          chip::app::reporting::PriorityLevel::Critical },
+        { static_cast<void *>(&gInfoEventBuffer[0]), sizeof(gInfoEventBuffer), nullptr, 0, nullptr,
+          chip::app::reporting::PriorityLevel::Info },
+        { static_cast<void *>(&gCritEventBuffer[0]), sizeof(gCritEventBuffer), nullptr, 0, nullptr,
+          chip::app::reporting::PriorityLevel::Debug },
+    };
+
+    chip::app::reporting::LoggingManagement::CreateLoggingManagement(
+        apMgr, sizeof(logStorageResources) / sizeof(logStorageResources[0]), logStorageResources);
+    chip::app::reporting::LoggingConfiguration::GetInstance().mGlobalPriority = chip::app::reporting::PriorityLevel::Debug;
+}
+
+void HandleInteractionModelEngineEvent(void * apAppState, chip::app::InteractionModelEngine::EventID aEventType,
+                                       const chip::app::InteractionModelEngine::InEventParam & aInParam,
+                                       chip::app::InteractionModelEngine::OutEventParam & aOutParam)
+{
+    switch (aEventType)
+    {
+    case chip::app::InteractionModelEngine::kEvent_OnIncomingReadRequest:
+    default:
+        chip::app::InteractionModelEngine::DefaultEventHandler(aEventType, aInParam, aOutParam);
+        break;
+    }
+}
 
 } // namespace
 
@@ -128,21 +163,26 @@ int main(int argc, char * argv[])
     err = gExchangeManager.Init(&gSessionManager);
     SuccessOrExit(err);
 
-    err = chip::app::InteractionModelEngine::GetInstance()->Init(&gExchangeManager);
+    err = chip::app::InteractionModelEngine::GetInstance()->Init(&gExchangeManager, nullptr, HandleInteractionModelEngineEvent);
     SuccessOrExit(err);
+
+    InitializeEventLogging(&gExchangeManager);
 
     err = gSessionManager.NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing, gAdminId);
     SuccessOrExit(err);
 
     printf("Listening for IM requests...\n");
 
+    MockEventGenerator::GetInstance()->Init(&gExchangeManager, &gLivenessGenerator, 1000, true);
+
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
 
 exit:
+    MockEventGenerator::GetInstance()->SetEventGeneratorStop();
 
     if (err != CHIP_NO_ERROR)
     {
-        printf("CommandHandler failed, err:%s\n", chip::ErrorStr(err));
+        printf("IM responder failed, err:%s\n", chip::ErrorStr(err));
         exit(EXIT_FAILURE);
     }
 
