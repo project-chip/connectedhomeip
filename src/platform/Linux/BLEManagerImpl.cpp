@@ -29,6 +29,7 @@
 #include <support/CodeUtils.h>
 
 #include <type_traits>
+#include <utility>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
@@ -63,7 +64,6 @@ CHIP_ERROR BLEManagerImpl::_Init()
     err = BleLayer::Init(this, this, this, &SystemLayer);
     SuccessOrExit(err);
 
-    // TODO: for chip-tool set mIsCentral   = true;
     mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
     mFlags       = (CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART && !mIsCentral) ? kFlag_AdvertisingEnabled : 0;
     mAppState    = nullptr;
@@ -247,19 +247,37 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         DriveBLEState();
         break;
     default:
+        HandlePlatformSpecificBLEEvent(event);
         break;
     }
-
-    HandlePlatformSpecificBLEEvent(event);
 }
 
 void BLEManagerImpl::HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * apEvent)
 {
     CHIP_ERROR err         = CHIP_NO_ERROR;
     bool controlOpComplete = false;
-    ChipLogProgress(DeviceLayer, "HandlePlatformSpecificBLEEvent , %d", apEvent->Type);
+    ChipLogProgress(DeviceLayer, "HandlePlatformSpecificBLEEvent %d", apEvent->Type);
     switch (apEvent->Type)
     {
+    case DeviceEventType::kPlatformLinuxBLECentralConnected:
+        if (OnConnectionComplete != nullptr)
+            OnConnectionComplete(mBLEScanConfig.mAppState, apEvent->Platform.BLECentralConnected.mConnection);
+        break;
+    case DeviceEventType::kPlatformLinuxBLEWriteComplete:
+        HandleWriteConfirmation(apEvent->Platform.BLEWriteComplete.mConnection, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_RX);
+        break;
+    case DeviceEventType::kPlatformLinuxBLESubscribeOpComplete:
+        if (apEvent->Platform.BLESubscribeOpComplete.mIsSubscribed)
+            HandleSubscribeComplete(apEvent->Platform.BLESubscribeOpComplete.mConnection, &CHIP_BLE_SVC_ID,
+                                    &ChipUUID_CHIPoBLEChar_TX);
+        else
+            HandleUnsubscribeComplete(apEvent->Platform.BLESubscribeOpComplete.mConnection, &CHIP_BLE_SVC_ID,
+                                      &ChipUUID_CHIPoBLEChar_TX);
+        break;
+    case DeviceEventType::kPlatformLinuxBLEIndicationReceived:
+        HandleIndicationReceived(apEvent->Platform.BLEIndicationReceived.mConnection, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_TX,
+                                 PacketBufferHandle::Adopt(apEvent->Platform.BLEIndicationReceived.mData));
+        break;
     case DeviceEventType::kPlatformLinuxBLEPeripheralAdvConfiguredComplete:
         VerifyOrExit(apEvent->Platform.BLEPeripheralAdvConfiguredComplete.mIsSuccess, err = CHIP_ERROR_INCORRECT_STATE);
         SetFlag(sInstance.mFlags, kFlag_AdvertisingConfigured);
@@ -323,14 +341,30 @@ uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
 
 bool BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId)
 {
-    ChipLogError(DeviceLayer, "BLEManagerImpl::SubscribeCharacteristic() not supported");
-    return true;
+    bool result = false;
+
+    VerifyOrExit(Ble::UUIDsMatch(svcId, &CHIP_BLE_SVC_ID),
+                 ChipLogError(DeviceLayer, "SubscribeCharacteristic() called with invalid service ID"));
+    VerifyOrExit(Ble::UUIDsMatch(charId, &ChipUUID_CHIPoBLEChar_TX),
+                 ChipLogError(DeviceLayer, "SubscribeCharacteristic() called with invalid characteristic ID"));
+
+    result = BluezSubscribeCharacteristic(conId);
+exit:
+    return result;
 }
 
 bool BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId)
 {
-    ChipLogError(DeviceLayer, "BLEManagerImpl::UnsubscribeCharacteristic() not supported");
-    return true;
+    bool result = false;
+
+    VerifyOrExit(Ble::UUIDsMatch(svcId, &CHIP_BLE_SVC_ID),
+                 ChipLogError(DeviceLayer, "UnsubscribeCharacteristic() called with invalid service ID"));
+    VerifyOrExit(Ble::UUIDsMatch(charId, &ChipUUID_CHIPoBLEChar_TX),
+                 ChipLogError(DeviceLayer, "UnsubscribeCharacteristic() called with invalid characteristic ID"));
+
+    result = BluezUnsubscribeCharacteristic(conId);
+exit:
+    return result;
 }
 
 bool BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
@@ -348,8 +382,16 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
 bool BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
                                       chip::System::PacketBufferHandle pBuf)
 {
-    ChipLogError(Ble, "SendWriteRequest: Not implemented");
-    return true;
+    bool result = false;
+
+    VerifyOrExit(Ble::UUIDsMatch(svcId, &CHIP_BLE_SVC_ID),
+                 ChipLogError(DeviceLayer, "SendWriteRequest() called with invalid service ID"));
+    VerifyOrExit(Ble::UUIDsMatch(charId, &ChipUUID_CHIPoBLEChar_RX),
+                 ChipLogError(DeviceLayer, "SendWriteRequest() called with invalid characteristic ID"));
+
+    result = BluezSendWriteRequest(conId, std::move(pBuf));
+exit:
+    return result;
 }
 
 bool BLEManagerImpl::SendReadRequest(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
@@ -366,9 +408,57 @@ bool BLEManagerImpl::SendReadResponse(BLE_CONNECTION_OBJECT conId, BLE_READ_REQU
     return true;
 }
 
-void BLEManagerImpl::CHIPoBluez_NewConnection(BLE_CONNECTION_OBJECT conId)
+void BLEManagerImpl::HandleNewConnection(BLE_CONNECTION_OBJECT conId)
 {
-    ChipLogProgress(Ble, "CHIPoBluez_NewConnection: %p", conId);
+    if (sInstance.mIsCentral)
+    {
+        ChipDeviceEvent event;
+        event.Type                                     = DeviceEventType::kPlatformLinuxBLECentralConnected;
+        event.Platform.BLECentralConnected.mConnection = conId;
+        PlatformMgr().PostEvent(&event);
+    }
+}
+
+void BLEManagerImpl::HandleWriteComplete(BLE_CONNECTION_OBJECT conId)
+{
+    ChipDeviceEvent event;
+    event.Type                                  = DeviceEventType::kPlatformLinuxBLEWriteComplete;
+    event.Platform.BLEWriteComplete.mConnection = conId;
+    PlatformMgr().PostEvent(&event);
+}
+
+void BLEManagerImpl::HandleSubscribeOpComplete(BLE_CONNECTION_OBJECT conId, bool subscribed)
+{
+    ChipDeviceEvent event;
+    event.Type                                          = DeviceEventType::kPlatformLinuxBLESubscribeOpComplete;
+    event.Platform.BLESubscribeOpComplete.mConnection   = conId;
+    event.Platform.BLESubscribeOpComplete.mIsSubscribed = subscribed;
+    PlatformMgr().PostEvent(&event);
+}
+
+void BLEManagerImpl::HandleTXCharChanged(BLE_CONNECTION_OBJECT conId, const uint8_t * value, size_t len)
+{
+    using DataLength = decltype(std::declval<PacketBuffer>().AvailableDataLength());
+
+    CHIP_ERROR err                 = CHIP_NO_ERROR;
+    System::PacketBufferHandle buf = PacketBuffer::New();
+
+    ChipLogProgress(DeviceLayer, "Indication received, conn = %p", conId);
+
+    VerifyOrExit(!buf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
+    VerifyOrExit(buf->AvailableDataLength() >= len, err = CHIP_ERROR_BUFFER_TOO_SMALL);
+    memcpy(buf->Start(), value, len);
+    buf->SetDataLength(static_cast<DataLength>(len));
+
+    ChipDeviceEvent event;
+    event.Type                                       = DeviceEventType::kPlatformLinuxBLEIndicationReceived;
+    event.Platform.BLEIndicationReceived.mConnection = conId;
+    event.Platform.BLEIndicationReceived.mData       = buf.Release_ForNow();
+    PlatformMgr().PostEvent(&event);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+        ChipLogError(DeviceLayer, "HandleTXCharChanged() failed: %s", ErrorStr(err));
 }
 
 void BLEManagerImpl::HandleRXCharWrite(BLE_CONNECTION_OBJECT conId, const uint8_t * value, size_t len)
@@ -487,7 +577,7 @@ void BLEManagerImpl::DriveBLEState()
     }
 
     // Register the CHIPoBLE application with the Bluez BLE layer if needed.
-    if (mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_Enabled && !GetFlag(mFlags, kFlag_AppRegistered))
+    if (!mIsCentral && mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_Enabled && !GetFlag(mFlags, kFlag_AppRegistered))
     {
         err = BluezGattsAppRegister(static_cast<BluezEndpoint *>(mpAppState));
         SetFlag(mFlags, kFlag_ControlOpInProgress);
@@ -535,7 +625,7 @@ void BLEManagerImpl::DriveBLEState()
     // Configure BLE scanning
     if (mBLEScanConfig.mDiscriminator && !GetFlag(mFlags, kFlag_Scanning))
     {
-        err = StartDiscovery(static_cast<BluezEndpoint *>(mpAppState), { mBLEScanConfig.mDiscriminator, /* mAutoConnect= */ true });
+        err = StartDiscovery(static_cast<BluezEndpoint *>(mpAppState), { mBLEScanConfig.mDiscriminator });
         SuccessOrExit(err);
         SetFlag(mFlags, kFlag_Scanning);
     }

@@ -33,6 +33,16 @@
             "output": "src/controller/CHIPClusters.cpp"
         },
         {
+            "path": "templates/chip/CHIPClustersObjc.zapt",
+            "name": "Objc ZCL API Header",
+            "output": "/src/darwin/Framework/CHIP/CHIPClustersObjc.h"
+        },
+        {
+            "path": "templates/chip/CHIPClustersObjc-src.zapt",
+            "name": "Objc ZCL API",
+            "output": "/src/darwin/Framework/CHIP/CHIPClustersObjc.mm"
+        },
+        {
             "path": "templates/chip/chip-zcl-zpro-codec-api.zapt",
             "name": "CHIP ZCL API Header",
             "output": "src/app/chip-zcl-zpro-codec-api.h"

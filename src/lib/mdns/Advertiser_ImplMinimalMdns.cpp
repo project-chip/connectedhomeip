@@ -193,7 +193,7 @@ public:
     // Service advertiser
     CHIP_ERROR Start(chip::Inet::InetLayer * inetLayer, uint16_t port) override;
     CHIP_ERROR Advertise(const OperationalAdvertisingParameters & params) override;
-    CHIP_ERROR Advertise(const CommisioningAdvertisingParameters & params) override;
+    CHIP_ERROR Advertise(const CommissionAdvertisingParameters & params) override;
 
     // ServerDelegate
     void OnQuery(const BytesRange & data, const chip::Inet::IPPacketInfo * info) override;
@@ -265,7 +265,7 @@ private:
         return FullQName();
     }
 
-    FullQName GetCommisioningTextEntries(const CommisioningAdvertisingParameters & params);
+    FullQName GetCommisioningTextEntries(const CommissionAdvertisingParameters & params);
 
     static constexpr size_t kMaxEndPoints           = 10;
     static constexpr size_t kMaxRecords             = 16;
@@ -423,20 +423,21 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters &
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR AdvertiserMinMdns::Advertise(const CommisioningAdvertisingParameters & params)
+CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & params)
 {
     Clear();
 
     // TODO: need to detect colisions here
     char nameBuffer[64] = "";
-    size_t len          = snprintf(nameBuffer, sizeof(nameBuffer), "chip-%016" PRIX64, GetRandU64());
+    size_t len          = snprintf(nameBuffer, sizeof(nameBuffer), "%016" PRIX64, GetRandU64());
     if (len >= sizeof(nameBuffer))
     {
         return CHIP_ERROR_NO_MEMORY;
     }
+    const char * serviceType = params.GetCommissionAdvertiseMode() == CommssionAdvertiseMode::kCommissioning ? "_chipc" : "_chipd";
 
-    FullQName operationalServiceName = AllocateQName("_chipc", "_udp", "local");
-    FullQName operationalServerName  = AllocateQName(nameBuffer, "_chipc", "_udp", "local");
+    FullQName operationalServiceName = AllocateQName(serviceType, "_udp", "local");
+    FullQName operationalServerName  = AllocateQName(nameBuffer, serviceType, "_udp", "local");
     FullQName serverName             = AllocateQName(nameBuffer, "local");
 
     if ((operationalServiceName.nameCount == 0) || (operationalServerName.nameCount == 0) || (serverName.nameCount == 0))
@@ -478,7 +479,7 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommisioningAdvertisingParameters 
 
     {
         sprintf(nameBuffer, "S%03d", params.GetShortDiscriminator());
-        FullQName shortServiceName = AllocateQName(nameBuffer, "_sub", "_chipc", "_udp", "local");
+        FullQName shortServiceName = AllocateQName(nameBuffer, "_sub", serviceType, "_udp", "local");
         ReturnErrorCodeIf(shortServiceName.nameCount == 0, CHIP_ERROR_NO_MEMORY);
 
         if (!AddResponder<PtrResponder>(shortServiceName, operationalServerName)
@@ -493,7 +494,7 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommisioningAdvertisingParameters 
 
     {
         sprintf(nameBuffer, "L%04d", params.GetLongDiscriminator());
-        FullQName longServiceName = AllocateQName(nameBuffer, "_sub", "_chipc", "_udp", "local");
+        FullQName longServiceName = AllocateQName(nameBuffer, "_sub", serviceType, "_udp", "local");
         ReturnErrorCodeIf(longServiceName.nameCount == 0, CHIP_ERROR_NO_MEMORY);
         if (!AddResponder<PtrResponder>(longServiceName, operationalServerName)
                  .SetReportAdditional(operationalServerName)
@@ -508,7 +509,7 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommisioningAdvertisingParameters 
     if (params.GetVendorId().HasValue())
     {
         sprintf(nameBuffer, "V%d", params.GetVendorId().Value());
-        FullQName vendorServiceName = AllocateQName(nameBuffer, "_sub", "_chipc", "_udp", "local");
+        FullQName vendorServiceName = AllocateQName(nameBuffer, "_sub", serviceType, "_udp", "local");
         ReturnErrorCodeIf(vendorServiceName.nameCount == 0, CHIP_ERROR_NO_MEMORY);
 
         if (!AddResponder<PtrResponder>(vendorServiceName, operationalServerName)
@@ -534,7 +535,7 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommisioningAdvertisingParameters 
     return CHIP_NO_ERROR;
 }
 
-FullQName AdvertiserMinMdns::GetCommisioningTextEntries(const CommisioningAdvertisingParameters & params)
+FullQName AdvertiserMinMdns::GetCommisioningTextEntries(const CommissionAdvertisingParameters & params)
 {
     // a discriminator always exists
     char txtDiscriminator[32];
@@ -556,7 +557,16 @@ FullQName AdvertiserMinMdns::GetCommisioningTextEntries(const CommisioningAdvert
         sprintf(txtVidPid, "V=%d", params.GetVendorId().Value());
     }
 
-    return AllocateQName(txtDiscriminator, txtVidPid);
+    char txtPairingInstrHint[128];
+    if (params.GetPairingInstr().HasValue() && params.GetPairingHint().HasValue())
+    {
+        sprintf(txtPairingInstrHint, "P=%s+%d", params.GetPairingInstr().Value(), params.GetPairingHint().Value());
+        return AllocateQName(txtDiscriminator, txtVidPid, txtPairingInstrHint);
+    }
+    else
+    {
+        return AllocateQName(txtDiscriminator, txtVidPid);
+    }
 }
 
 AdvertiserMinMdns gAdvertiser;

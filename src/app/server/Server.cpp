@@ -26,7 +26,6 @@
 #include <inet/IPAddress.h>
 #include <inet/InetError.h>
 #include <inet/InetLayer.h>
-#include <lib/mdns/DiscoveryManager.h>
 #include <mdns/Advertiser.h>
 #include <messaging/ExchangeMgr.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -135,7 +134,7 @@ CHIP_ERROR InitMdns()
     }
     else
     {
-        auto advertiseParameters = Mdns::CommisioningAdvertisingParameters().SetPort(CHIP_PORT).EnableIpV4(true);
+        auto advertiseParameters = Mdns::CommissionAdvertisingParameters().SetPort(CHIP_PORT).EnableIpV4(true);
 
         uint16_t value;
         if (ConfigurationMgr().GetVendorId(value) != CHIP_NO_ERROR)
@@ -207,6 +206,15 @@ void InitServer(AppDelegate * delegate)
     err = gSessions.Init(chip::kTestDeviceNodeId, &DeviceLayer::SystemLayer, &gTransports);
     SuccessOrExit(err);
 
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    err = gExchange.Init(&gSessions);
+    SuccessOrExit(err);
+    err = chip::app::InteractionModelEngine::GetInstance()->Init(&gExchange);
+    SuccessOrExit(err);
+#else
+    gSessions.SetDelegate(&gCallbacks);
+#endif
+
     // This flag is used to bypass BLE in the cirque test
     // Only in the cirque test this is enabled with --args='bypass_rendezvous=true'
     if (isRendezvousBypassed())
@@ -228,25 +236,12 @@ void InitServer(AppDelegate * delegate)
 #else
         params.SetSetupPINCode(pinCode);
 #endif // CONFIG_NETWORK_LAYER_BLE
-        SuccessOrExit(err = gRendezvousServer.Init(params, &gTransports));
+        SuccessOrExit(err = gRendezvousServer.Init(params, &gTransports, &gSessions));
     }
 
 #if CHIP_ENABLE_MDNS
     err = InitMdns();
     SuccessOrExit(err);
-#endif
-
-    gSessions.SetDelegate(&gCallbacks);
-    err = gSessions.NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing);
-    SuccessOrExit(err);
-
-#ifdef CHIP_APP_USE_INTERACTION_MODEL
-    err = gExchange.Init(&gSessions);
-    SuccessOrExit(err);
-    err = chip::app::InteractionModelEngine::GetInstance()->Init(&gExchange);
-    SuccessOrExit(err);
-#else
-    gSessions.SetDelegate(&gCallbacks);
 #endif
 
 exit:

@@ -209,8 +209,10 @@ static CHIP_ERROR generateBitSet(SetupPayload & payload, uint8_t * bits, uint8_t
 }
 
 // TODO: issue #3663 - Unbounded stack in payloadBase41RepresentationWithTLV()
+#if !defined(__clang__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wstack-usage="
+#endif
 
 static CHIP_ERROR payloadBase41RepresentationWithTLV(SetupPayload & setupPayload, string & base41Representation, size_t bitsetSize,
                                                      uint8_t * tlvDataStart, size_t tlvDataLengthInBytes)
@@ -253,4 +255,6 @@ exit:
     return err;
 }
 
+#if !defined(__clang__)
 #pragma GCC diagnostic pop // -Wstack-usage
+#endif

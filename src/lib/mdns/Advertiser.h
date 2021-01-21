@@ -28,6 +28,12 @@ namespace Mdns {
 
 static constexpr uint16_t kMdnsPort = 5353;
 
+enum class CommssionAdvertiseMode : uint8_t
+{
+    kCommissioning,
+    kCommissionable,
+};
+
 template <class Derived>
 class BaseAdvertisingParams
 {
@@ -75,42 +81,66 @@ private:
     uint64_t mNodeId   = 0;
 };
 
-class CommisioningAdvertisingParameters : public BaseAdvertisingParams<CommisioningAdvertisingParameters>
+class CommissionAdvertisingParameters : public BaseAdvertisingParams<CommissionAdvertisingParameters>
 {
 public:
-    CommisioningAdvertisingParameters & SetShortDiscriminator(uint8_t discriminator)
+    CommissionAdvertisingParameters & SetShortDiscriminator(uint8_t discriminator)
     {
         mShortDiscriminator = discriminator;
         return *this;
     }
     uint8_t GetShortDiscriminator() const { return mShortDiscriminator; }
 
-    CommisioningAdvertisingParameters & SetLongDiscrimininator(uint16_t discriminator)
+    CommissionAdvertisingParameters & SetLongDiscrimininator(uint16_t discriminator)
     {
         mLongDiscriminator = discriminator;
         return *this;
     }
     uint16_t GetLongDiscriminator() const { return mLongDiscriminator; }
 
-    CommisioningAdvertisingParameters & SetVendorId(Optional<uint16_t> vendorId)
+    CommissionAdvertisingParameters & SetVendorId(Optional<uint16_t> vendorId)
     {
         mVendorId = vendorId;
         return *this;
     }
     Optional<uint16_t> GetVendorId() const { return mVendorId; }
 
-    CommisioningAdvertisingParameters & SetProductId(Optional<uint16_t> productId)
+    CommissionAdvertisingParameters & SetProductId(Optional<uint16_t> productId)
     {
         mProductId = productId;
         return *this;
     }
     Optional<uint16_t> GetProductId() const { return mProductId; }
 
+    CommissionAdvertisingParameters & SetPairingInstr(Optional<const char *> pairingInstr)
+    {
+        mPairingInstr = pairingInstr;
+        return *this;
+    }
+    Optional<const char *> GetPairingInstr() const { return mPairingInstr; }
+
+    CommissionAdvertisingParameters & SetPairingHint(Optional<uint8_t> pairingHint)
+    {
+        mPairingHint = pairingHint;
+        return *this;
+    }
+    Optional<uint8_t> GetPairingHint() const { return mPairingHint; }
+
+    CommissionAdvertisingParameters & SetCommissionAdvertiseMode(CommssionAdvertiseMode mode)
+    {
+        mMode = mode;
+        return *this;
+    }
+    CommssionAdvertiseMode GetCommissionAdvertiseMode() const { return mMode; }
+
 private:
-    uint8_t mShortDiscriminator = 0;
-    uint16_t mLongDiscriminator = 0; // 12-bit according to spec
+    uint8_t mShortDiscriminator  = 0;
+    uint16_t mLongDiscriminator  = 0; // 12-bit according to spec
+    CommssionAdvertiseMode mMode = CommssionAdvertiseMode::kCommissioning;
     chip::Optional<uint16_t> mVendorId;
     chip::Optional<uint16_t> mProductId;
+    chip::Optional<const char *> mPairingInstr;
+    chip::Optional<uint8_t> mPairingHint;
 };
 
 /// Handles advertising of CHIP nodes
@@ -126,8 +156,8 @@ public:
     /// Advertises the CHIP node as an operational node
     virtual CHIP_ERROR Advertise(const OperationalAdvertisingParameters & params) = 0;
 
-    /// Advertises the CHIP node as a commisioning node
-    virtual CHIP_ERROR Advertise(const CommisioningAdvertisingParameters & params) = 0;
+    /// Advertises the CHIP node as a commisioning/commissionable node
+    virtual CHIP_ERROR Advertise(const CommissionAdvertisingParameters & params) = 0;
 
     /// Provides the system-wide implementation of the service advertiser
     static ServiceAdvertiser & Instance();

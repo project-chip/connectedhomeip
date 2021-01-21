@@ -18,6 +18,12 @@
 function atomicType(arg)
 {
   switch (arg.name) {
+  case 'node_id':
+    return 'chip::NodeId';
+  case 'endpoint_id':
+    return 'chip::EndpointId';
+  case 'group_id':
+    return 'chip::GroupId';
   case 'attribute_id':
     return 'chip::AttributeId';
   case 'cluster_id':

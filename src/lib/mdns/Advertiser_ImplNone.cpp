@@ -38,7 +38,7 @@ public:
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 
-    CHIP_ERROR Advertise(const CommisioningAdvertisingParameters & params) override
+    CHIP_ERROR Advertise(const CommissionAdvertisingParameters & params) override
     {
         ChipLogError(Discovery, "mDNS advertising not available. Commisioning Advertisement failed.");
         return CHIP_ERROR_NOT_IMPLEMENTED;

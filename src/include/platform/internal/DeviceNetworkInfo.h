@@ -54,7 +54,7 @@ enum
 /**
  * WiFi Security Modes.
  */
-enum WiFiAuthSecurityType
+enum WiFiAuthSecurityType : int8_t
 {
     kWiFiSecurityType_NotSpecified = -1,
 
@@ -77,6 +77,14 @@ class DeviceNetworkInfo
 public:
     uint32_t NetworkId; /**< The network id assigned to the network by the device. */
 
+    struct
+    {
+        bool NetworkId : 1;           /**< True if the NetworkId field is present. */
+        bool ThreadExtendedPANId : 1; /**< True if the ThreadExtendedPANId field is present. */
+        bool ThreadMeshPrefix : 1;    /**< True if the ThreadMeshPrefix field is present. */
+        bool ThreadPSKc : 1;          /**< True if the ThreadPSKc field is present. */
+    } FieldPresent;
+
     // ---- WiFi-specific Fields ----
     char WiFiSSID[kMaxWiFiSSIDLength + 1]; /**< The WiFi SSID as a NULL-terminated string. */
     uint8_t WiFiKey[kMaxWiFiKeyLength];    /**< The WiFi key (NOT NULL-terminated). */
@@ -94,16 +102,9 @@ public:
     /**< The Thread master key (NOT NULL-terminated). */
     uint8_t ThreadPSKc[kThreadPSKcLength];
     /**< The Thread pre-shared commissioner key (NOT NULL-terminated). */
-    uint16_t ThreadPANId;  /**< The 16-bit Thread PAN ID, or kThreadPANId_NotSpecified */
-    uint8_t ThreadChannel; /**< The Thread channel (currently [11..26]), or kThreadChannel_NotSpecified */
-
-    struct
-    {
-        bool NetworkId : 1;           /**< True if the NetworkId field is present. */
-        bool ThreadExtendedPANId : 1; /**< True if the ThreadExtendedPANId field is present. */
-        bool ThreadMeshPrefix : 1;    /**< True if the ThreadMeshPrefix field is present. */
-        bool ThreadPSKc : 1;          /**< True if the ThreadPSKc field is present. */
-    } FieldPresent;
+    uint16_t ThreadPANId;            /**< The 16-bit Thread PAN ID, or kThreadPANId_NotSpecified */
+    uint8_t ThreadChannel;           /**< The Thread channel (currently [11..26]), or kThreadChannel_NotSpecified */
+    uint64_t ThreadDatasetTimestamp; /**< Thread active dataset timestamp */
 };
 
 } // namespace Internal

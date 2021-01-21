@@ -30,7 +30,6 @@
 #include <core/CHIPCore.h>
 #include <inet/IPAddress.h>
 #include <inet/IPEndPointBasis.h>
-#include <lib/mdns/DiscoveryManager.h>
 #include <support/CodeUtils.h>
 #include <support/DLLUtil.h>
 #include <transport/PeerConnections.h>
@@ -180,8 +179,8 @@ public:
      *   returns success, the encrypted data that was sent, as well as various other information needed
      *   to retransmit it, will be stored in *bufferRetainSlot.
      */
-    CHIP_ERROR SendMessage(SecureSessionHandle session, System::PacketBufferHandle msgBuf);
-    CHIP_ERROR SendMessage(SecureSessionHandle session, PayloadHeader & payloadHeader, System::PacketBufferHandle msgBuf,
+    CHIP_ERROR SendMessage(SecureSessionHandle session, System::PacketBufferHandle && msgBuf);
+    CHIP_ERROR SendMessage(SecureSessionHandle session, PayloadHeader & payloadHeader, System::PacketBufferHandle && msgBuf,
                            EncryptedPacketBufferHandle * bufferRetainSlot = nullptr);
     CHIP_ERROR SendEncryptedMessage(SecureSessionHandle session, EncryptedPacketBufferHandle msgBuf,
                                     EncryptedPacketBufferHandle * bufferRetainSlot);
@@ -206,7 +205,8 @@ public:
      *   establishes the security keys for secure communication with the
      *   peer node.
      */
-    CHIP_ERROR NewPairing(const Optional<Transport::PeerAddress> & peerAddr, NodeId peerNodeId, SecurePairingSession * pairing);
+    CHIP_ERROR NewPairing(const Optional<Transport::PeerAddress> & peerAddr, NodeId peerNodeId, SecurePairingSession * pairing,
+                          Transport::Base * transport = nullptr);
 
     /**
      * @brief
@@ -223,6 +223,14 @@ public:
      * @param transportMgr   Transport to use
      */
     CHIP_ERROR Init(NodeId localNodeId, System::Layer * systemLayer, TransportMgrBase * transportMgr);
+
+    /**
+     * @brief
+     *   Set local node ID
+     *
+     * @param nodeId    Node id for the current node
+     */
+    void SetLocalNodeID(NodeId nodeId) { mLocalNodeId = nodeId; }
 
     /**
      * @brief
@@ -267,9 +275,6 @@ private:
 
     SecureSessionMgrDelegate * mCB   = nullptr;
     TransportMgrBase * mTransportMgr = nullptr;
-
-    CHIP_ERROR EncryptPayload(Transport::PeerConnectionState * state, PayloadHeader & payloadHeader, PacketHeader & packetHeader,
-                              System::PacketBufferHandle & msgBuf);
 
     CHIP_ERROR SendMessage(SecureSessionHandle session, PayloadHeader & payloadHeader, PacketHeader & packetHeader,
                            System::PacketBufferHandle msgBuf, EncryptedPacketBufferHandle * bufferRetainSlot,

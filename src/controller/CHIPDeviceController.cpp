@@ -107,6 +107,12 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, PersistentStorageDelegat
     else
     {
 #if CONFIG_DEVICE_LAYER
+#if CHIP_DEVICE_LAYER_TARGET_LINUX && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+        // By default, Linux device is configured as a BLE peripheral while the controller needs a BLE central.
+        err = DeviceLayer::Internal::BLEMgrImpl().ConfigureBle(/* BLE adapter ID */ 0, /* BLE central */ true);
+        SuccessOrExit(err);
+#endif // CHIP_DEVICE_LAYER_TARGET_LINUX && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+
         err = DeviceLayer::PlatformMgr().InitChipStack();
         SuccessOrExit(err);
 
@@ -358,7 +364,7 @@ void DeviceController::OnNewConnection(SecureSessionHandle session, SecureSessio
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "Failed to process received message: err %d", err);
+        ChipLogError(Controller, "OnNewConnection: Failed to process received message: err %d", err);
     }
 }
 
@@ -377,7 +383,7 @@ void DeviceController::OnConnectionExpired(SecureSessionHandle session, SecureSe
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "Failed to process received message: err %d", err);
+        ChipLogError(Controller, "OnConnectionExpired: Failed to process received message: err %d", err);
     }
 }
 
@@ -398,7 +404,7 @@ void DeviceController::OnMessageReceived(const PacketHeader & header, const Payl
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "Failed to process received message: err %d", err);
+        ChipLogError(Controller, "OnMessageReceived: Failed to process received message: err %d", err);
     }
     return;
 }
@@ -562,7 +568,8 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
     mIsIPRendezvous    = (params.GetPeerAddress().GetTransportType() != Transport::Type::kBle);
     mRendezvousSession = chip::Platform::New<RendezvousSession>(this);
     VerifyOrExit(mRendezvousSession != nullptr, err = CHIP_ERROR_NO_MEMORY);
-    err = mRendezvousSession->Init(params.SetLocalNodeId(mLocalDeviceId).SetRemoteNodeId(remoteDeviceId), mTransportMgr);
+    err = mRendezvousSession->Init(params.SetLocalNodeId(mLocalDeviceId).SetRemoteNodeId(remoteDeviceId), mTransportMgr,
+                                   mSessionManager);
     SuccessOrExit(err);
 
     device->Init(mTransportMgr, mSessionManager, mInetLayer, mListenPort, remoteDeviceId, remotePort, interfaceId);
@@ -578,7 +585,8 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        if (mRendezvousSession != nullptr)
+        // Delete the current rendezvous session only if a device is not currently being paired.
+        if (mDeviceBeingPaired == kNumMaxActiveDevices && mRendezvousSession != nullptr)
         {
             chip::Platform::Delete(mRendezvousSession);
             mRendezvousSession = nullptr;

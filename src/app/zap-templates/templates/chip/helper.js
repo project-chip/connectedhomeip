@@ -23,29 +23,29 @@ const templateUtil = require(zapPath + 'generator/template-util.js')
 const zclHelper    = require(zapPath + 'generator/helper-zcl.js')
 const zclQuery     = require(zapPath + 'db/query-zcl.js')
 
-const StringHelper = require('../../common/StringHelper.js');
+const StringHelper    = require('../../common/StringHelper.js');
+const ChipTypesHelper = require('../../common/ChipTypesHelper.js');
 
 /**
  * This method converts a ZCL type to the length expected for the
  * BufBound.Put method.
  * TODO
- * Not all types are supported at the moment, so if there is any unssupported type
+ * Not all types are supported at the moment, so if there is any unsupported type
  * that we are trying to convert, it will throw an error.
  */
 function asPutLength(zclType)
 {
-  switch (zclType) {
+  const type = ChipTypesHelper.asBasicType(zclType);
+  switch (type) {
   case 'int8_t':
-  case 'uint8_t':
   case 'int16_t':
-  case 'uint16_t':
   case 'int32_t':
-  case 'uint32_t':
   case 'int64_t':
+  case 'uint8_t':
+  case 'uint16_t':
+  case 'uint32_t':
   case 'uint64_t':
-    return zclType.replace(/[^0-9]/g, '');
-  case 'chip::ClusterId':
-    return '16';
+    return type.replace(/[^0-9]/g, '');
   default:
     throw error = 'Unhandled type: ' + zclType;
   }
@@ -53,19 +53,18 @@ function asPutLength(zclType)
 
 function asPutCastType(zclType)
 {
-  switch (zclType) {
+  const type = ChipTypesHelper.asBasicType(zclType);
+  switch (type) {
   case 'int8_t':
   case 'int16_t':
   case 'int32_t':
   case 'int64_t':
-    return 'u' + zclType;
+    return 'u' + type;
   case 'uint8_t':
   case 'uint16_t':
   case 'uint32_t':
   case 'uint64_t':
-    return zclType;
-  case 'chip::ClusterId':
-    return 'uin16_t';
+    return type;
   default:
     throw error = 'Unhandled type: ' + zclType;
   }

@@ -40,6 +40,10 @@
 #include "af.h"
 #include "door-lock-server.h"
 
+#include "gen/attribute-id.h"
+#include "gen/attribute-type.h"
+#include "gen/cluster-id.h"
+
 static void setActuatorEnable(void)
 {
     // The Door Lock cluster test spec expects this attribute set to be true by

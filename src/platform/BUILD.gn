@@ -483,6 +483,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "qpg6100/ConfigurationManagerImpl.h",
         "qpg6100/ConnectivityManagerImpl.cpp",
         "qpg6100/ConnectivityManagerImpl.h",
+        "qpg6100/DeviceNetworkProvisioningDelegateImpl.cpp",
         "qpg6100/DeviceNetworkProvisioningDelegateImpl.h",
         "qpg6100/InetPlatformConfig.h",
         "qpg6100/Logging.cpp",

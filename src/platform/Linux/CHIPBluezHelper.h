@@ -50,14 +50,13 @@
 
 #pragma once
 
-#include "BLEManagerImpl.h"
-#include <stdbool.h>
-#include <stdint.h>
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
-#include "ble/CHIPBleServiceData.h"
-#include "platform/CHIPDeviceConfig.h"
-#include "platform/Linux/dbus/bluez/DbusBluez.h"
+#include <ble/CHIPBleServiceData.h>
+#include <platform/CHIPDeviceConfig.h>
+#include <platform/Linux/dbus/bluez/DbusBluez.h>
+
+#include <cstdint>
 
 namespace chip {
 namespace DeviceLayer {
@@ -81,7 +80,7 @@ namespace Internal {
 #define CHIP_BLE_BASE_SERVICE_UUID_STRING "-0000-1000-8000-00805f9b34fb"
 #define CHIP_BLE_SERVICE_PREFIX_LENGTH 8
 #define CHIP_BLE_BASE_SERVICE_PREFIX "0000"
-#define CHIP_BLE_UUID_SERVICE_SHORT_STRING "fffb"
+#define CHIP_BLE_UUID_SERVICE_SHORT_STRING "feaf"
 
 #define CHIP_BLE_UUID_SERVICE_STRING                                                                                               \
     CHIP_BLE_BASE_SERVICE_PREFIX CHIP_BLE_UUID_SERVICE_SHORT_STRING CHIP_BLE_BASE_SERVICE_UUID_STRING
@@ -94,8 +93,6 @@ namespace Internal {
 #define BLUEZ_ADV_FLAGS_EDR_UNSUPPORTED (1 << 2)
 #define BLUEZ_ADV_FLAGS_LE_EDR_CONTROLLER (1 << 3)
 #define BLUEZ_ADV_FLAGS_LE_EDR_HOST (1 << 4)
-
-#define CHAR_TO_BLUEZ(c) (static_cast<uint8_t>(((c) <= '9') ? (c) - '0' : tolower((c)) - 'a' + 10))
 
 enum BluezAddressType
 {
@@ -117,27 +114,9 @@ struct IOChannel
     guint mWatch;
 };
 
-struct CHIPIdInfo
-{
-    uint8_t mMajor;
-    uint8_t mMinor;
-    uint16_t mVendorId;
-    uint16_t mProductId;
-    uint64_t mDeviceId;
-    uint8_t mPairingStatus;
-} __attribute__((packed));
-
-struct CHIPServiceData
-{
-    uint8_t mDataBlock0Len;
-    uint8_t mDataBlock0Type;
-    CHIPIdInfo mIdInfo;
-} __attribute__((packed));
-
 struct BluezDiscoveryRequest
 {
     uint16_t mDiscriminator;
-    bool mAutoConnect;
 };
 
 struct BluezEndpoint
@@ -169,7 +148,6 @@ struct BluezEndpoint
     // map device path to the connection
     GHashTable * mpConnMap;
     uint32_t mNodeId;
-    bool mIsNotify;
     bool mIsCentral;
     char * mpAdvertisingUUID;
     chip::Ble::ChipBLEDeviceIdentificationInfo mDeviceIdInfo;
@@ -214,7 +192,15 @@ CHIP_ERROR StopBluezAdv(BluezEndpoint * apEndpoint);
 CHIP_ERROR BluezGattsAppRegister(BluezEndpoint * apEndpoint);
 CHIP_ERROR BluezAdvertisementSetup(BluezEndpoint * apEndpoint);
 
-CHIP_ERROR StartDiscovery(BluezEndpoint * apEndpoint, BluezDiscoveryRequest aRequest = {});
+/// Write to the CHIP RX characteristic on the remote peripheral device
+bool BluezSendWriteRequest(BLE_CONNECTION_OBJECT apConn, chip::System::PacketBufferHandle apBuf);
+/// Subscribe to the CHIP TX characteristic on the remote peripheral device
+bool BluezSubscribeCharacteristic(BLE_CONNECTION_OBJECT apConn);
+/// Unsubscribe from the CHIP TX characteristic on the remote peripheral device
+bool BluezUnsubscribeCharacteristic(BLE_CONNECTION_OBJECT apConn);
+
+CHIP_ERROR
+StartDiscovery(BluezEndpoint * apEndpoint, BluezDiscoveryRequest aRequest = {});
 CHIP_ERROR StopDiscovery(BluezEndpoint * apEndpoint);
 
 CHIP_ERROR ConnectDevice(BluezDevice1 * apDevice);

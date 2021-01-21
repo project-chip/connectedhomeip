@@ -52,19 +52,13 @@ uint16_t QPG6100Config::GetSettingsMaxValueLength(Key key)
 CHIP_ERROR QPG6100Config::ReadConfigValue(Key key, bool & val)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    uint8_t buffer[255];
     uint16_t length;
     bool res;
 
     length = sizeof(bool);
 
-    res = qvCHIP_Nvm_Restore(key, buffer, &length);
-    if (res == true)
-    {
-        val = (buffer[0] != 0);
-        ChipLogDetail(DeviceLayer, "ReadConfigValue: %d", val);
-    }
-    else
+    res = qvCHIP_Nvm_Restore(key, (uint8_t *) (&val), &length);
+    if (res == false)
     {
         err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
     }
@@ -75,19 +69,13 @@ CHIP_ERROR QPG6100Config::ReadConfigValue(Key key, bool & val)
 CHIP_ERROR QPG6100Config::ReadConfigValue(Key key, uint32_t & val)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    uint8_t buffer[255];
     uint16_t length;
     bool res;
 
     length = sizeof(uint32_t);
 
-    res = qvCHIP_Nvm_Restore(key, buffer, &length);
-    if (res == true)
-    {
-        val = *((uint32_t *) buffer);
-        ChipLogDetail(DeviceLayer, "ReadConfigValue: %d", val);
-    }
-    else
+    res = qvCHIP_Nvm_Restore(key, (uint8_t *) (&val), &length);
+    if (res == false)
     {
         err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
     }
@@ -98,19 +86,13 @@ CHIP_ERROR QPG6100Config::ReadConfigValue(Key key, uint32_t & val)
 CHIP_ERROR QPG6100Config::ReadConfigValue(Key key, uint64_t & val)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    uint8_t buffer[255];
     uint16_t length;
     bool res;
 
     length = sizeof(uint64_t);
 
-    res = qvCHIP_Nvm_Restore(key, buffer, &length);
-    if (res == true)
-    {
-        val = *((uint64_t *) buffer);
-        ChipLogDetail(DeviceLayer, "ReadConfigValue: %d", val);
-    }
-    else
+    res = qvCHIP_Nvm_Restore(key, (uint8_t *) (&val), &length);
+    if (res == false)
     {
         err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
     }
@@ -129,7 +111,7 @@ CHIP_ERROR QPG6100Config::ReadConfigValueStr(Key key, char * buf, size_t bufSize
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    outLen = bufSize;
+    length = (uint16_t) bufSize;
     res    = qvCHIP_Nvm_Restore(key, (uint8_t *) buf, &length);
     if (length > bufSize)
     {
@@ -184,42 +166,33 @@ CHIP_ERROR QPG6100Config::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufS
 
 CHIP_ERROR QPG6100Config::WriteConfigValue(Key key, bool val)
 {
-    uint8_t buffer[255];
     uint16_t length;
 
-    buffer[0] = (val) ? 1 : 0;
-    length    = sizeof(bool);
+    length = sizeof(bool);
 
-    qvCHIP_Nvm_Backup(key, buffer, length);
-    ChipLogDetail(DeviceLayer, "WriteConfigValue: %d", val);
+    qvCHIP_Nvm_Backup(key, (uint8_t *) (&val), length);
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR QPG6100Config::WriteConfigValue(Key key, uint32_t val)
 {
-    uint8_t buffer[255];
     uint16_t length;
 
-    memcpy(&buffer, (uint8_t *) &val, sizeof(uint32_t));
     length = sizeof(uint32_t);
 
-    qvCHIP_Nvm_Backup(key, buffer, length);
-    ChipLogDetail(DeviceLayer, "WriteConfigValue: %d", val);
+    qvCHIP_Nvm_Backup(key, (uint8_t *) (&val), length);
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR QPG6100Config::WriteConfigValue(Key key, uint64_t val)
 {
-    uint8_t buffer[255];
     uint16_t length;
 
-    memcpy(&buffer, (uint8_t *) &val, sizeof(uint64_t));
     length = sizeof(uint64_t);
 
-    qvCHIP_Nvm_Backup(key, buffer, length);
-    ChipLogDetail(DeviceLayer, "WriteConfigValue: %d", val);
+    qvCHIP_Nvm_Backup(key, (uint8_t *) (&val), length);
 
     return CHIP_NO_ERROR;
 }
@@ -237,11 +210,7 @@ CHIP_ERROR QPG6100Config::WriteConfigValueStr(Key key, const char * str, size_t 
     }
     else
     {
-        uint8_t buffer[255];
-        memcpy(buffer, str, strLen);
-        buffer[strLen] = 0;
-
-        qvCHIP_Nvm_Backup(key, buffer, (uint16_t) strLen);
+        qvCHIP_Nvm_Backup(key, (uint8_t *) str, (uint16_t) strLen);
     }
 
     return CHIP_NO_ERROR;

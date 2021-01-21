@@ -49,7 +49,7 @@
 // for pulling in defines dealing with EITHER server or client
 #include "af-main.h"
 
-#include "gen/enums.h"
+#include "gen/callback.h"
 
 #ifdef EMBER_AF_PLUGIN_REPORTING
 #include <app/reporting/reporting.h>

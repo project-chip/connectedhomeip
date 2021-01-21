@@ -75,7 +75,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR Command::ProcessCommandMessage(System::PacketBufferHandle payload, CommandRoleId aCommandRoleId)
+CHIP_ERROR Command::ProcessCommandMessage(System::PacketBufferHandle && payload, CommandRoleId aCommandRoleId)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::System::PacketBufferTLVReader reader;

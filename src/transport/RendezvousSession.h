@@ -39,6 +39,7 @@ class CHIPDeviceEvent;
 }
 
 class SecureSessionMgr;
+class SecureSessionHandle;
 
 /**
  * RendezvousSession establishes and maintains the first connection between
@@ -86,9 +87,10 @@ public:
      *
      * @param params       The RendezvousParameters
      * @param transportMgr The transport to use
+     * @param sessionMgr   Pointer to secure session manager
      * @ return CHIP_ERROR  The result of the initialization
      */
-    CHIP_ERROR Init(const RendezvousParameters & params, TransportMgrBase * transportMgr);
+    CHIP_ERROR Init(const RendezvousParameters & params, TransportMgrBase * transportMgr, SecureSessionMgr * sessionMgr);
 
     /**
      * @brief
@@ -153,15 +155,17 @@ private:
 
     SecurePairingSession mPairingSession;
     NetworkProvisioning mNetworkProvision;
-    SecureSession mSecureSession;
     Transport::PeerAddress mPeerAddress; // Current peer address we are doing rendezvous with.
-    Optional<NodeId> mRendezvousRemoteNodeId;
     TransportMgrBase * mTransportMgr;
-    uint32_t mSecureMessageIndex = 0;
-    uint16_t mNextKeyId          = 0;
+    uint16_t mNextKeyId                         = 0;
+    SecureSessionMgr * mSecureSessionMgr        = nullptr;
+    SecureSessionHandle * mPairingSessionHandle = nullptr;
 
     RendezvousSession::State mCurrentState = State::kInit;
     void UpdateState(RendezvousSession::State newState, CHIP_ERROR err = CHIP_NO_ERROR);
+
+    void InitPairingSessionHandle();
+    void ReleasePairingSessionHandle();
 };
 
 } // namespace chip

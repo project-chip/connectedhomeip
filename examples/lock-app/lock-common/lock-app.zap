@@ -1466,7 +1466,7 @@
       "endpointTypeIndex": 0,
       "profileId": "0x109",
       "endpointId": 1,
-      "networkId": 1
+      "networkId": 0
     }
   ]
 }

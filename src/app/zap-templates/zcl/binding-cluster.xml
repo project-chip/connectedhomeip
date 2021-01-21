@@ -26,16 +26,16 @@ limitations under the License.
     <description>The Binding Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for supporting the binding table.</description>
     <command source="client" code="0x00" name="Bind" optional="false">
       <description>Add a binding</description>
-      <arg name="nodeId" type="INT64U"/>
-      <arg name="groupId" type="INT16U"/>
-      <arg name="endpointId" type="INT8U"/>
+      <arg name="nodeId" type="NODE_ID"/>
+      <arg name="groupId" type="GROUP_ID"/>
+      <arg name="endpointId" type="ENDPOINT_ID"/>
       <arg name="clusterId" type="CLUSTER_ID"/>
     </command>
     <command source="client" code="0x01" name="Unbind" optional="false">
       <description>Remove a binding</description>
-      <arg name="nodeId" type="INT64U"/>
-      <arg name="groupId" type="INT16U"/>
-      <arg name="endpointId" type="INT8U"/>
+      <arg name="nodeId" type="NODE_ID"/>
+      <arg name="groupId" type="GROUP_ID"/>
+      <arg name="endpointId" type="ENDPOINT_ID"/>
       <arg name="clusterId" type="CLUSTER_ID"/>
     </command>
   </cluster>
