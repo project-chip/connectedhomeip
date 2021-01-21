@@ -777,6 +777,8 @@ public:
      */
     void * AppData;
 
+    void SetBackingStore(TLVBackingStore * apBackingStore) { mBackingStore = apBackingStore; }
+
 protected:
     uint64_t mElemTag;
     uint64_t mElemLenOrVal;

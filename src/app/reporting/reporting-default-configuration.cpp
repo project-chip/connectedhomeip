@@ -45,6 +45,7 @@
 #include <app/util/common.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <util/basic-types.h>
 
 #define REPORT_FAILED 0xFF
 

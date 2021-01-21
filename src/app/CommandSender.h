@@ -47,7 +47,7 @@
 namespace chip {
 namespace app {
 
-class DLL_EXPORT DLL_EXPORT CommandSender : public Command, public Messaging::ExchangeDelegate
+class CommandSender : public Command, public Messaging::ExchangeDelegate
 {
 public:
     CHIP_ERROR SendCommandRequest(NodeId aNodeId);
