@@ -3,7 +3,7 @@
 #pragma once
 
 #include "ModelCommand.h"
-#include "ResponseCallbacks.h"
+#include "gen/CHIPClientCallbacks.h"
 #include <controller/CHIPClusters.h>
 
 static void OnDefaultSuccessResponse(void * context)

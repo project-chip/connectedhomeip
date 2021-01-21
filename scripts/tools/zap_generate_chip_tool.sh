@@ -23,4 +23,5 @@ node ./src-script/zap-generate.js -z "$ZAP_TEMPLATES"/zcl/zcl.json -g ../../../e
 # Check if clang-format is available
 if command -v clang-format &>/dev/null; then
     clang-format -i ../../../examples/chip-tool/commands/clusters/*
+    clang-format -i ../../../examples/chip-tool/commands/reporting/*
 fi
