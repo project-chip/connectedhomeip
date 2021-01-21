@@ -23,7 +23,7 @@
  *      operational credentials.
  *
  */
-#include <transport/CertificatePairingSession.h>
+#include <transport/CertificateAuthenticatedSessionEstablishment.h>
 
 #include <inttypes.h>
 #include <string.h>
@@ -42,15 +42,15 @@ namespace chip {
 
 using namespace Crypto;
 
-CertificatePairingSession::CertificatePairingSession() {}
+CertificateAuthenticatedSessionEstablishment::CertificateAuthenticatedSessionEstablishment() {}
 
-CertificatePairingSession::~CertificatePairingSession()
+CertificateAuthenticatedSessionEstablishment::~CertificateAuthenticatedSessionEstablishment()
 {
     // Let's clear out any security state stored in the object, before destroying it.
     Clear();
 }
 
-void CertificatePairingSession::Clear()
+void CertificateAuthenticatedSessionEstablishment::Clear()
 {
     // This function zeroes out and resets the memory used by the object.
     // It's done so that no security related information will be leaked.
@@ -60,13 +60,15 @@ void CertificatePairingSession::Clear()
     mConnectionState.Reset();
 }
 
-CHIP_ERROR CertificatePairingSession::WaitForPairing(NodeId myNodeId, uint16_t myKeyId, PairingSessionDelegate * delegate)
+CHIP_ERROR
+CertificateAuthenticatedSessionEstablishment::WaitForSessionEstablishment(NodeId myNodeId, uint16_t myKeyId,
+                                                                          AuthenticatedSessionEstablishmentDelegate * delegate)
 {
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CertificatePairingSession::AttachHeaderAndSend(Protocols::SecureChannel::MsgType msgType,
-                                                          System::PacketBufferHandle msgBuf)
+CHIP_ERROR CertificateAuthenticatedSessionEstablishment::AttachHeaderAndSend(Protocols::SecureChannel::MsgType msgType,
+                                                                             System::PacketBufferHandle msgBuf)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -97,11 +99,11 @@ exit:
     return err;
 }
 
-CHIP_ERROR CertificatePairingSession::Pair(const Transport::PeerAddress peerAddress, NodeId myNodeId, NodeId peerNodeId,
-                                           uint16_t myKeyId, PairingSessionDelegate * delegate)
+CHIP_ERROR CertificateAuthenticatedSessionEstablishment::EstablishSession(const Transport::PeerAddress peerAddress, NodeId myNodeId,
+                                                                          NodeId peerNodeId, uint16_t myKeyId,
+                                                                          AuthenticatedSessionEstablishmentDelegate * delegate)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    SuccessOrExit(err);
 
     mConnectionState.SetPeerAddress(peerAddress);
     mConnectionState.SetPeerNodeId(peerNodeId);
@@ -117,7 +119,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR CertificatePairingSession::DeriveSecureSession(const uint8_t * info, size_t info_len, SecureSession & session)
+CHIP_ERROR CertificateAuthenticatedSessionEstablishment::DeriveSecureSession(const uint8_t * info, size_t info_len,
+                                                                             SecureSession & session)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -133,7 +136,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR CertificatePairingSession::SendSigmaR1()
+CHIP_ERROR CertificateAuthenticatedSessionEstablishment::SendSigmaR1()
 {
     uint16_t data_len = 0;
 
@@ -166,8 +169,8 @@ CHIP_ERROR CertificatePairingSession::SendSigmaR1()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CertificatePairingSession::HandleSigmaR1_and_SendSigmaR2(const PacketHeader & header,
-                                                                    const System::PacketBufferHandle & msg)
+CHIP_ERROR CertificateAuthenticatedSessionEstablishment::HandleSigmaR1_and_SendSigmaR2(const PacketHeader & header,
+                                                                                       const System::PacketBufferHandle & msg)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -225,8 +228,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR CertificatePairingSession::HandleSigmaR2_and_SendSigmaR3(const PacketHeader & header,
-                                                                    const System::PacketBufferHandle & msg)
+CHIP_ERROR CertificateAuthenticatedSessionEstablishment::HandleSigmaR2_and_SendSigmaR3(const PacketHeader & header,
+                                                                                       const System::PacketBufferHandle & msg)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -283,7 +286,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR CertificatePairingSession::HandleSigmaR3(const PacketHeader & header, const System::PacketBufferHandle & msg)
+CHIP_ERROR CertificateAuthenticatedSessionEstablishment::HandleSigmaR3(const PacketHeader & header,
+                                                                       const System::PacketBufferHandle & msg)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -311,7 +315,7 @@ exit:
     return err;
 }
 
-void CertificatePairingSession::SendErrorMsg(SigmaErrorType errorCode)
+void CertificateAuthenticatedSessionEstablishment::SendErrorMsg(SigmaErrorType errorCode)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -334,7 +338,8 @@ exit:
     Clear();
 }
 
-void CertificatePairingSession::HandleErrorMsg(const PacketHeader & header, const System::PacketBufferHandle & msg)
+void CertificateAuthenticatedSessionEstablishment::HandleErrorMsg(const PacketHeader & header,
+                                                                  const System::PacketBufferHandle & msg)
 {
     // Error message processing
     const uint8_t * buf  = msg->Start();
@@ -351,8 +356,9 @@ exit:
     Clear();
 }
 
-CHIP_ERROR CertificatePairingSession::HandlePeerMessage(const PacketHeader & packetHeader,
-                                                        const Transport::PeerAddress & peerAddress, System::PacketBufferHandle msg)
+CHIP_ERROR CertificateAuthenticatedSessionEstablishment::HandlePeerMessage(const PacketHeader & packetHeader,
+                                                                           const Transport::PeerAddress & peerAddress,
+                                                                           System::PacketBufferHandle msg)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     uint16_t headerSize = 0;

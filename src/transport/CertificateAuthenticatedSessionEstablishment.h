@@ -29,7 +29,7 @@
 #include <protocols/secure_channel/Constants.h>
 #include <support/Base64.h>
 #include <system/SystemPacketBuffer.h>
-#include <transport/PairingSessionDelegate.h>
+#include <transport/AuthenticatedSessionEstablishmentDelegate.h>
 #include <transport/PeerConnectionState.h>
 #include <transport/SecureSession.h>
 #include <transport/raw/MessageHeader.h>
@@ -39,20 +39,20 @@ namespace chip {
 
 using namespace Crypto;
 
-class DLL_EXPORT CertificatePairingSession
+class DLL_EXPORT CertificateAuthenticatedSessionEstablishment
 {
 public:
-    CertificatePairingSession();
-    CertificatePairingSession(CertificatePairingSession &&)      = default;
-    CertificatePairingSession(const CertificatePairingSession &) = delete;
-    CertificatePairingSession & operator=(const CertificatePairingSession &) = default;
-    CertificatePairingSession & operator=(CertificatePairingSession &&) = default;
+    CertificateAuthenticatedSessionEstablishment();
+    CertificateAuthenticatedSessionEstablishment(CertificateAuthenticatedSessionEstablishment &&)      = default;
+    CertificateAuthenticatedSessionEstablishment(const CertificateAuthenticatedSessionEstablishment &) = default;
+    CertificateAuthenticatedSessionEstablishment & operator=(const CertificateAuthenticatedSessionEstablishment &) = default;
+    CertificateAuthenticatedSessionEstablishment & operator=(CertificateAuthenticatedSessionEstablishment &&) = default;
 
-    virtual ~CertificatePairingSession();
+    virtual ~CertificateAuthenticatedSessionEstablishment();
 
     /**
      * @brief
-     *   Initialize using operational credentials code and wait for pairing requests.
+     *   Initialize using operational credentials code and wait for session establishment requests.
      *
      * @param myNodeId        Node id of local node
      * @param myKeyId         Key ID to be assigned to the secure session on the peer node
@@ -60,11 +60,11 @@ public:
      *
      * @return CHIP_ERROR     The result of initialization
      */
-    CHIP_ERROR WaitForPairing(NodeId myNodeId, uint16_t myKeyId, PairingSessionDelegate * delegate);
+    CHIP_ERROR WaitForSessionEstablishment(NodeId myNodeId, uint16_t myKeyId, AuthenticatedSessionEstablishmentDelegate * delegate);
 
     /**
      * @brief
-     *   Create a pairing request using peer's setup PIN code.
+     *   Create and send session establishment request using device's operational credentials.
      *
      * @param peerAddress      Address of peer to pair
      * @param myNodeId         Node id of local node
@@ -74,8 +74,8 @@ public:
      *
      * @return CHIP_ERROR      The result of initialization
      */
-    CHIP_ERROR Pair(const Transport::PeerAddress peerAddress, NodeId myNodeId, NodeId peerNodeId, uint16_t myKeyId,
-                    PairingSessionDelegate * delegate);
+    CHIP_ERROR EstablishSession(const Transport::PeerAddress peerAddress, NodeId myNodeId, NodeId peerNodeId, uint16_t myKeyId,
+                                AuthenticatedSessionEstablishmentDelegate * delegate);
 
     /**
      * @brief
@@ -155,7 +155,7 @@ private:
 
     void Clear();
 
-    PairingSessionDelegate * mDelegate = nullptr;
+    AuthenticatedSessionEstablishmentDelegate * mDelegate = nullptr;
 
     Protocols::SecureChannel::MsgType mNextExpectedMsg = Protocols::SecureChannel::MsgType::CASE_SigmaErr;
 

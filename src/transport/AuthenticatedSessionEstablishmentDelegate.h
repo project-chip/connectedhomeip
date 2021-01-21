@@ -31,7 +31,7 @@
 
 namespace chip {
 
-class DLL_EXPORT PairingSessionDelegate
+class DLL_EXPORT AuthenticatedSessionEstablishmentDelegate
 {
 public:
     /**
@@ -63,7 +63,7 @@ public:
      */
     virtual void OnPairingComplete() {}
 
-    virtual ~PairingSessionDelegate() {}
+    virtual ~AuthenticatedSessionEstablishmentDelegate() {}
 };
 
 } // namespace chip
