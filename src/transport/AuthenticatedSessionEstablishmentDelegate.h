@@ -36,7 +36,7 @@ class DLL_EXPORT AuthenticatedSessionEstablishmentDelegate
 public:
     /**
      * @brief
-     *   Called when session establishment process generates a new message that should be sent to peer.
+     *   Called when the session establishment process generates a new message that should be sent to peer.
      *
      * @param header the message header for the sent message
      * @param peerAddress the destination of the message
