@@ -20,20 +20,14 @@
 #include "core/CHIPError.h"
 #include "inet/InetInterface.h"
 #include "lib/mdns/Advertiser.h"
+#include "lib/mdns/Scanner.h"
 #include "lib/mdns/platform/Mdns.h"
 #include "platform/CHIPDeviceConfig.h"
 
 namespace chip {
 namespace Mdns {
 
-class ResolveDelegate
-{
-public:
-    virtual void HandleNodeIdResolve(CHIP_ERROR error, uint64_t nodeId, const MdnsService & address) = 0;
-    virtual ~ResolveDelegate() {}
-};
-
-class DiscoveryImplPlatform : public ServiceAdvertiser
+class DiscoveryImplPlatform : public ServiceAdvertiser, public Scanner
 {
 public:
     /**
@@ -60,7 +54,12 @@ public:
      * This function registers the delegate to handle node id resolve results.
      *
      */
-    CHIP_ERROR RegisterResolveDelegate(ResolveDelegate * delegate);
+    CHIP_ERROR RegisterScannerDelegate(ScannerDelegate * delegate) override;
+
+    CHIP_ERROR SubscribeNode(uint64_t nodeId, uint64_t fabricId, Inet::InterfaceId interface,
+                             Inet::IPAddressType addressType) override;
+
+    CHIP_ERROR UnsubscribeNode(uint64_t nodeId, uint64_t fabricId) override;
 
     /**
      * This function resolves a node id to its address.
@@ -91,7 +90,7 @@ private:
     bool mIsCommissionalPublishing = false;
 
     bool mMdnsInitialized              = false;
-    ResolveDelegate * mResolveDelegate = nullptr;
+    ScannerDelegate * mScannerDelegate = nullptr;
 
     static DiscoveryImplPlatform sManager;
 };

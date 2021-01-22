@@ -112,12 +112,20 @@ std::string GetFullType(const char * type, MdnsServiceProtocol protocol)
     return typeBuilder.str();
 }
 
+std::string GetResolveIdentifier(const char * name, const char * type, MdnsServiceProtocol protocol)
+{
+    std::ostringstream sstream;
+
+    sstream << name << "." << type << "." << GetProtocolString(protocol);
+    return sstream.str();
+}
+
 } // namespace
 
 namespace chip {
 namespace Mdns {
 
-MdnsAvahi MdnsAvahi::sInstance;
+MdnsAvahi * MdnsAvahi::sInstance = nullptr;
 
 constexpr uint64_t kUsPerSec = 1000 * 1000;
 
@@ -610,9 +618,9 @@ void MdnsAvahi::HandleBrowse(AvahiServiceBrowser * browser, AvahiIfIndex interfa
     }
 }
 
-CHIP_ERROR MdnsAvahi::Resolve(const char * name, const char * type, MdnsServiceProtocol protocol,
-                              chip::Inet::IPAddressType addressType, chip::Inet::InterfaceId interface,
-                              MdnsResolveCallback callback, void * context)
+CHIP_ERROR MdnsAvahi::Subscribe(const char * name, const char * type, MdnsServiceProtocol protocol,
+                                chip::Inet::IPAddressType addressType, chip::Inet::InterfaceId interface,
+                                MdnsResolveCallback callback, void * context)
 {
     AvahiServiceResolver * resolver;
     AvahiIfIndex avahiInterface     = static_cast<AvahiIfIndex>(interface);
@@ -626,17 +634,36 @@ CHIP_ERROR MdnsAvahi::Resolve(const char * name, const char * type, MdnsServiceP
     {
         avahiInterface = AVAHI_IF_UNSPEC;
     }
-    resolver = avahi_service_resolver_new(mClient, avahiInterface, ToAvahiProtocol(addressType), name,
+    resolver                  = avahi_service_resolver_new(mClient, avahiInterface, ToAvahiProtocol(addressType), name,
                                           GetFullType(type, protocol).c_str(), nullptr, ToAvahiProtocol(addressType),
                                           static_cast<AvahiLookupFlags>(0), HandleResolve, resolveContext);
+    resolveContext->mResolver = resolver;
     // Otherwise the resolver will be freed in the callback
     if (resolver == nullptr)
     {
         error = CHIP_ERROR_INTERNAL;
         chip::Platform::MemoryFree(resolver);
     }
+    mResolveContexts[GetResolveIdentifier(name, type, protocol)] = resolveContext;
 
     return error;
+}
+
+CHIP_ERROR MdnsAvahi::Unsubscribe(const char * name, const char * type, MdnsServiceProtocol protocol)
+{
+    std::string identifier = GetResolveIdentifier(name, type, protocol);
+
+    if (mResolveContexts.find(identifier) == mResolveContexts.end())
+    {
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    ResolveContext * context = mResolveContexts.at(identifier);
+    avahi_service_resolver_free(context->mResolver);
+    chip::Platform::MemoryFree(context);
+    mResolveContexts.erase(identifier);
+
+    return CHIP_NO_ERROR;
 }
 
 void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex interface, AvahiProtocol protocol,
@@ -710,9 +737,6 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
         context->mCallback(context->mContext, &result, CHIP_NO_ERROR);
         break;
     }
-
-    avahi_service_resolver_free(resolver);
-    chip::Platform::MemoryFree(context);
 }
 
 MdnsAvahi::~MdnsAvahi()
@@ -725,6 +749,17 @@ MdnsAvahi::~MdnsAvahi()
     {
         avahi_client_free(mClient);
     }
+}
+
+MdnsAvahi & MdnsAvahi::GetInstance()
+{
+    static uint8_t instanceBuf[sizeof(MdnsAvahi)];
+
+    if (sInstance == nullptr)
+    {
+        sInstance = new (instanceBuf) MdnsAvahi;
+    }
+    return *sInstance;
 }
 
 void UpdateMdnsDataset(fd_set & readFdSet, fd_set & writeFdSet, fd_set & errorFdSet, int & maxFd, timeval & timeout)
@@ -763,22 +798,31 @@ CHIP_ERROR ChipMdnsBrowse(const char * type, MdnsServiceProtocol protocol, chip:
     return MdnsAvahi::GetInstance().Browse(type, protocol, addressType, interface, callback, context);
 }
 
-CHIP_ERROR ChipMdnsResolve(MdnsService * browseResult, chip::Inet::InterfaceId interface, MdnsResolveCallback callback,
-                           void * context)
+CHIP_ERROR ChipMdnsSubscribe(MdnsService * service, chip::Inet::InterfaceId interface, MdnsResolveCallback callback, void * context)
 
 {
-    CHIP_ERROR error;
-
-    if (browseResult != nullptr)
+    if (service != nullptr)
     {
-        error = MdnsAvahi::GetInstance().Resolve(browseResult->mName, browseResult->mType, browseResult->mProtocol,
-                                                 browseResult->mAddressType, interface, callback, context);
+        return MdnsAvahi::GetInstance().Subscribe(service->mName, service->mType, service->mProtocol, service->mAddressType,
+                                                  interface, callback, context);
     }
     else
     {
-        error = CHIP_ERROR_INVALID_ARGUMENT;
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    return error;
+}
+
+CHIP_ERROR ChipMdnsUnsubscribe(MdnsService * service)
+{
+
+    if (service != nullptr)
+    {
+        return MdnsAvahi::GetInstance().Unsubscribe(service->mName, service->mType, service->mProtocol);
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
 }
 
 } // namespace Mdns

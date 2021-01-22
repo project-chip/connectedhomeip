@@ -106,12 +106,13 @@ public:
     CHIP_ERROR StopPublish();
     CHIP_ERROR Browse(const char * type, MdnsServiceProtocol protocol, chip::Inet::IPAddressType addressType,
                       chip::Inet::InterfaceId interface, MdnsBrowseCallback callback, void * context);
-    CHIP_ERROR Resolve(const char * name, const char * type, MdnsServiceProtocol protocol, chip::Inet::IPAddressType addressType,
-                       chip::Inet::InterfaceId interface, MdnsResolveCallback callback, void * context);
+    CHIP_ERROR Subscribe(const char * name, const char * type, MdnsServiceProtocol protocol, chip::Inet::IPAddressType addressType,
+                         chip::Inet::InterfaceId interface, MdnsResolveCallback callback, void * context);
+    CHIP_ERROR Unsubscribe(const char * name, const char * type, MdnsServiceProtocol protocol);
 
     Poller & GetPoller() { return mPoller; }
 
-    static MdnsAvahi & GetInstance() { return sInstance; }
+    static MdnsAvahi & GetInstance();
 
     ~MdnsAvahi();
 
@@ -129,10 +130,11 @@ private:
         MdnsAvahi * mInstance;
         MdnsResolveCallback mCallback;
         void * mContext;
+        AvahiServiceResolver * mResolver;
     };
 
     MdnsAvahi() : mClient(nullptr), mGroup(nullptr) {}
-    static MdnsAvahi sInstance;
+    static MdnsAvahi *sInstance;
 
     static void HandleClientState(AvahiClient * client, AvahiClientState state, void * context);
     void HandleClientState(AvahiClient * client, AvahiClientState state);
@@ -153,6 +155,7 @@ private:
     void * mAsyncReturnContext;
 
     std::set<std::string> mPublishedServices;
+    std::map<std::string, ResolveContext*> mResolveContexts;
     AvahiClient * mClient;
     AvahiEntryGroup * mGroup;
     Poller mPoller;

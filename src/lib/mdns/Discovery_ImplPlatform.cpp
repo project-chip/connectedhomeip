@@ -47,7 +47,39 @@ uint8_t HexToInt(char c)
     return UINT8_MAX;
 }
 
-constexpr uint64_t kUndefinedNodeId = 0;
+bool ParseNodeFabridIdFromString(const char * str, size_t length, uint64_t * nodeId, uint64_t * fabricId)
+{
+    static constexpr size_t kMaxHexDigitsInUint64 = 16;
+    uint64_t * currentValue                       = nodeId;
+    size_t numHexDigits                           = 0;
+
+    *nodeId   = 0;
+    *fabricId = 0;
+    for (size_t i = 0; i < length; i++)
+    {
+        if (str[i] == '-')
+        {
+            currentValue = fabricId;
+            numHexDigits = 0;
+            continue;
+        }
+        uint8_t val = HexToInt(str[i]);
+        if (val == UINT8_MAX)
+        {
+            return false;
+        }
+        *currentValue = (*currentValue) * 16 + val;
+        numHexDigits++;
+        if (numHexDigits > kMaxHexDigitsInUint64)
+        {
+            return false;
+        }
+    }
+    return currentValue == fabricId;
+}
+
+constexpr uint64_t kUndefinedNodeId   = 0;
+constexpr uint64_t kUndefinedFabricId = 0;
 
 } // namespace
 
@@ -217,6 +249,8 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const OperationalAdvertisingParamete
     service.mPort          = CHIP_PORT;
     service.mTextEntryies  = nullptr;
     service.mTextEntrySize = 0;
+    service.mSubTypes      = nullptr;
+    service.mSubTypeSize   = 0;
     service.mInterface     = INET_NULL_INTERFACEID;
     service.mAddressType   = Inet::kIPAddressType_Any;
     error                  = ChipMdnsPublishService(&service);
@@ -231,90 +265,86 @@ CHIP_ERROR DiscoveryImplPlatform::StopPublishDevice()
     return ChipMdnsStopPublish();
 }
 
-CHIP_ERROR DiscoveryImplPlatform::RegisterResolveDelegate(ResolveDelegate * delegate)
+CHIP_ERROR DiscoveryImplPlatform::RegisterScannerDelegate(ScannerDelegate * delegate)
 {
-    if (mResolveDelegate != nullptr)
+    if (mScannerDelegate != nullptr)
     {
         return CHIP_ERROR_INCORRECT_STATE;
     }
     else
     {
-        mResolveDelegate = delegate;
+        mScannerDelegate = delegate;
         return CHIP_NO_ERROR;
     }
 }
 
-CHIP_ERROR DiscoveryImplPlatform::ResolveNodeId(uint64_t nodeId, uint64_t fabricId, Inet::IPAddressType type)
+CHIP_ERROR DiscoveryImplPlatform::SubscribeNode(uint64_t nodeId, uint64_t fabricId, Inet::InterfaceId interface,
+                                                Inet::IPAddressType addressType)
 {
     MdnsService service;
 
     snprintf(service.mName, sizeof(service.mName), "%" PRIX64 "-%" PRIX64, nodeId, fabricId);
     strncpy(service.mType, "_chip", sizeof(service.mType));
     service.mProtocol    = MdnsServiceProtocol::kMdnsProtocolTcp;
-    service.mAddressType = type;
-    return ChipMdnsResolve(&service, INET_NULL_INTERFACEID, HandleNodeIdResolve, this);
+    service.mAddressType = addressType;
+    return ChipMdnsSubscribe(&service, interface, HandleNodeIdResolve, this);
+}
+
+CHIP_ERROR DiscoveryImplPlatform::UnsubscribeNode(uint64_t nodeId, uint64_t fabricId)
+{
+    MdnsService service;
+
+    snprintf(service.mName, sizeof(service.mName), "%" PRIX64 "-%" PRIX64, nodeId, fabricId);
+    strncpy(service.mType, "_chip", sizeof(service.mType));
+    service.mProtocol = MdnsServiceProtocol::kMdnsProtocolTcp;
+    return ChipMdnsUnsubscribe(&service);
 }
 
 void DiscoveryImplPlatform::HandleNodeIdResolve(void * context, MdnsService * result, CHIP_ERROR error)
 {
     DiscoveryImplPlatform * mgr = static_cast<DiscoveryImplPlatform *>(context);
 
-    if (mgr->mResolveDelegate == nullptr)
+    if (mgr->mScannerDelegate == nullptr)
     {
         return;
     }
     if (error != CHIP_NO_ERROR)
     {
         ChipLogError(Discovery, "Node ID resolved failed with %s", chip::ErrorStr(error));
-        mgr->mResolveDelegate->HandleNodeIdResolve(error, kUndefinedNodeId, MdnsService{});
+        mgr->mScannerDelegate->HandleNodeResolved(error, kUndefinedNodeId, kUndefinedFabricId, Inet::IPAddress::Any);
     }
-    else if (result == nullptr)
+    else if (result == nullptr || !result->mAddress.HasValue())
     {
         ChipLogError(Discovery, "Node ID resolve not found");
-        mgr->mResolveDelegate->HandleNodeIdResolve(CHIP_ERROR_UNKNOWN_RESOURCE_ID, kUndefinedNodeId, MdnsService{});
+        mgr->mScannerDelegate->HandleNodeResolved(CHIP_ERROR_UNKNOWN_RESOURCE_ID, kUndefinedNodeId, kUndefinedFabricId,
+                                                  Inet::IPAddress::Any);
     }
     else
     {
         // Parse '%x-%x' from the name
-        uint64_t nodeId       = 0;
-        bool deliminatorFound = false;
+        uint64_t nodeId   = 0;
+        uint64_t fabricId = 0;
 
-        for (size_t i = 0; i < sizeof(result->mName) && result->mName[i] != 0; i++)
+        if (ParseNodeFabridIdFromString(result->mName, strnlen(result->mName, sizeof(result->mName)), &nodeId, &fabricId))
         {
-            if (result->mName[i] == '-')
-            {
-                deliminatorFound = true;
-                break;
-            }
-            else
-            {
-                uint8_t val = HexToInt(result->mName[i]);
-
-                if (val == UINT8_MAX)
-                {
-                    break;
-                }
-                else
-                {
-                    nodeId = nodeId * 16 + val;
-                }
-            }
-        }
-
-        if (deliminatorFound)
-        {
-            ChipLogProgress(Discovery, "Node ID resolved for %" PRIX64, nodeId);
-            mgr->mResolveDelegate->HandleNodeIdResolve(error, nodeId, *result);
+            ChipLogProgress(Discovery, "Node ID resolved for %" PRIX64 "-%" PRIX64, nodeId, fabricId);
+            mgr->mScannerDelegate->HandleNodeResolved(error, nodeId, fabricId, result->mAddress.Value());
         }
         else
         {
-            ChipLogProgress(Discovery, "Invalid service entry from node %" PRIX64, nodeId);
-            mgr->mResolveDelegate->HandleNodeIdResolve(error, kUndefinedNodeId, *result);
+            ChipLogProgress(Discovery, "Invalid service entry %s", result->mName);
+            mgr->mScannerDelegate->HandleNodeResolved(CHIP_ERROR_UNKNOWN_RESOURCE_ID, kUndefinedNodeId, kUndefinedFabricId,
+                                                      Inet::IPAddress::Any);
         }
     }
 }
 
-ServiceAdvertiser & chip::Mdns::ServiceAdvertiser::Instance()
+ServiceAdvertiser & ServiceAdvertiser::Instance()
+{
+    return DiscoveryImplPlatform::GetInstance();
+}
+
+Scanner & Scanner::Instance()
 {
     return DiscoveryImplPlatform::GetInstance();
 }

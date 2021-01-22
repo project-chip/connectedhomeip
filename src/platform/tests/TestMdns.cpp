@@ -26,6 +26,8 @@ static void HandleResolve(void * context, MdnsService * result, CHIP_ERROR error
     NL_TEST_ASSERT(suite, strcmp(result->mTextEntryies[0].mKey, "key") == 0);
     NL_TEST_ASSERT(suite, strcmp(reinterpret_cast<const char *>(result->mTextEntryies[0].mData), "val") == 0);
 
+    ChipMdnsUnsubscribe(result);
+
     exit(0);
 }
 
@@ -39,7 +41,7 @@ static void HandleBrowse(void * context, MdnsService * services, size_t services
         printf("Mdns service size %zu\n", servicesSize);
         printf("Service name %s\n", services->mName);
         printf("Service type %s\n", services->mType);
-        NL_TEST_ASSERT(suite, ChipMdnsResolve(services, INET_NULL_INTERFACEID, HandleResolve, suite) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(suite, ChipMdnsSubscribe(services, INET_NULL_INTERFACEID, HandleResolve, suite) == CHIP_NO_ERROR);
     }
 }
 

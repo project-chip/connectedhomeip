@@ -114,8 +114,12 @@ CHIP_ERROR ChipMdnsBrowse(const char * /*type*/, MdnsServiceProtocol /*protocol*
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-CHIP_ERROR ChipMdnsResolve(MdnsService * /*service*/, chip::Inet::InterfaceId /*interface*/, MdnsResolveCallback /*callback*/,
-                           void * /*context*/)
+CHIP_ERROR ChipMdnsSubscribe(MdnsService * service, chip::Inet::InterfaceId interface, MdnsResolveCallback callback, void * context)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+CHIP_ERROR ChipMdnsUnsubscribe(MdnsService * service)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
