@@ -53,25 +53,14 @@ MEMORY
      boot code */
   Flash640 (rx) : ORIGIN = 0, LENGTH = 0x00a0000            /* 640K bytes (alias Flash) */
   RAM0 (rwx)    : ORIGIN = 0x4000400,  LENGTH = 0x0015c00   /* 87K bytes (alias RAM) */
-  RAM1 (rwx)    : ORIGIN = 0x4020000,      LENGTH = 0x10000 /* 64K bytes (alias RAM2) */
+  RAM1 (rwx)    : ORIGIN = 0x4020000,  LENGTH = 0x10000     /* 64K bytes (alias RAM2) */
 }
 
 /* Define a symbol for the top of each memory region */
 __top_RAM0      = MEM_RAM0_BASE + MEM_RAM0_SIZE; /* 87K bytes */
 
-/* Heap requirements:
- * - PDM: 12 * NV_STORAGE_MAX_SECTORS (64) = 768
- * - LWIP: TCPIP_THREAD_STACKSIZE = 4096
- * - FreeRTOS Tasks (4) :
- *                - Weave Task = 8192
- *                - Thread Task = 8192
- *                - App Task 4096
- *                - Timer Task: 720
- * - Mbedtls: 8096
- * - Other allocations: 4096
- * TOTAL = 34256
- */
-HEAP_SIZE = DEFINED(HEAP_SIZE) ? HEAP_SIZE : 0x85D0;
+/* first implementation: second RAM bank is dedicated entirely to heap */
+HEAP_SIZE = DEFINED(HEAP_SIZE) ? HEAP_SIZE : 0xF000;
 
 /*** flash memory characteristics definitions required for OTA ***/
 m_flash_start   = 0x00000000;
@@ -83,7 +72,7 @@ m_fsl_prodInfo_size = m_sector_size;
 m_fsl_prodInfo_end                             = m_flash_size - 17 * m_sector_size - 1;
 m_fsl_prodInfo_start                           = m_fsl_prodInfo_end - m_fsl_prodInfo_size + 1;
 
-NV_STORAGE_MAX_SECTORS                         = 32;
+NV_STORAGE_MAX_SECTORS                         = 16;
 NV_STORAGE_SIZE                                = NV_STORAGE_MAX_SECTORS * m_sector_size;
 NV_STORAGE_START_ADDRESS                       = m_fsl_prodInfo_start - 1;
 NV_STORAGE_END_ADDRESS                         = NV_STORAGE_START_ADDRESS - NV_STORAGE_SIZE + 1;
@@ -94,7 +83,7 @@ INT_STORAGE_SIZE                               = INT_STORAGE_END - INT_STORAGE_S
 
 FREESCALE_PROD_DATA_BASE_ADDR                  = m_fsl_prodInfo_start;
 INT_STORAGE_SECTOR_SIZE                        = m_sector_size;
-m_app_size                                     = 0x90000;
+m_app_size                                     = 0xA0000; /* 640K: to accommodate all libs in debug */
 
 __ram_vector_table__                           = 1;
 vector_table_size                              = 0x120;
@@ -221,7 +210,6 @@ SECTIONS
          _heap = .;
         KEEP(*(.heap*))
         PROVIDE(end = .);
-         . += HEAP_SIZE;
          . = ALIGN(4);
         __end__ = .;
          _end_heap = .;
