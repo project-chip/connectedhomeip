@@ -23,7 +23,8 @@ Follow [BUILDING.md](/docs/BUILDING.md) to build CHIP on your platform.
 
 3. Install Chip Device Controller
 
-> Note: Python device controller is not versioned, so you need to uninstall the old device controller before install the new one.
+> Note: Python device controller is not versioned, so you need to uninstall the
+> old device controller before install the new one.
 
 **For Linux (Raspberry Pi 4)**
 
@@ -159,7 +160,8 @@ chip-device-ctrl > connect -ip <Device IP Address> 12345678
 
 ## Commands
 
-**`[L]`** = Linux only / **`[D]`** = Deprecated / **`[W]`** = WIP / **`[T]`** = For testing
+**`[L]`** = Linux only / **`[D]`** = Deprecated / **`[W]`** = WIP / **`[T]`** =
+For testing
 
 ### **`[L]`** `ble-adapter-print`
 
@@ -172,7 +174,8 @@ chip-device-ctrl > ble-adapter-print
 
 ### **`[L]`** `ble-adapter-select <address>`
 
-Select the Bluetooth adapter for device controller, takes adapter MAC address as argument.
+Select the Bluetooth adapter for device controller, takes adapter MAC address as
+argument.
 
 ```
 chip-device-ctrl > ble-adapter-select DC:A6:32:9E:2E:A7
@@ -181,11 +184,14 @@ chip-device-ctrl > ble-adapter-select DC:A6:32:9E:2E:A7
 
 ### `ble-connect <identifier>`
 
-Connect to a device using the selected identifier, the identifier can be device name or device discriminator (preferred). You **MUST** use `ble-scan` command to build device list, or use `ble-scan-connect`.
+Connect to a device using the selected identifier, the identifier can be device
+name or device discriminator (preferred). You **MUST** use `ble-scan` command to
+build device list, or use `ble-scan-connect`.
 
 ### **`[T]`** `ble-debug-log <0|1>`
 
-Use `ble-debug-log 1` to set logging level to debug and use `ble-debug-log 0` to set logging level to info.
+Use `ble-debug-log 1` to set logging level to debug and use `ble-debug-log 0` to
+set logging level to info.
 
 ```
 chip-device-ctrl > ble-debug-log 0
@@ -200,7 +206,8 @@ Disconnect current BLE connection.
 
 ### `ble-scan [-t <timeout>] [identifier]`
 
-Start a ble-scan action for searching valid CHIP devices over BLE [for at most *timeout* seconds], stop when device matching the identifier or timeout.
+Start a ble-scan action for searching valid CHIP devices over BLE [for at most
+*timeout* seconds], stop when device matching the identifier or timeout.
 
 ```
 chip-device-ctrl > ble-scan
@@ -221,7 +228,8 @@ chip-device-ctrl > ble-scan
 
 ### `ble-scan-connect [-t <timeout>] [identifier]`
 
-Equals to run `ble-scan [-t <timeout>] [identifier]` and then `ble-connect [identifier]`
+Equals to run `ble-scan [-t <timeout>] [identifier]` and then
+`ble-connect [identifier]`
 
 ### **`[T]`** `btp-connect`
 
@@ -233,15 +241,17 @@ Clost rendezvous session.
 
 ### `connect -ip <address> <SetUpPinCode>`
 
-Do key exchange and establish a secure session between controller and device using IP transport.
+Do key exchange and establish a secure session between controller and device
+using IP transport.
 
 ### `connect -ble <SetUpPinCode>`
 
-Do key exchange and establish a secure session between controller and device using BLE transport.
+Do key exchange and establish a secure session between controller and device
+using BLE transport.
 
 ### **`[D]`** `set-pairing-wifi-credential <ssid> <password>`
 
-Set WiFi credential for ***deprecated*** network provisioning precedure.
+Set WiFi credential for **_deprecated_** network provisioning precedure.
 
 ### **`[W]`** `zcl`
 
