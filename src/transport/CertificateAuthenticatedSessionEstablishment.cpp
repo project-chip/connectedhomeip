@@ -127,6 +127,7 @@ CHIP_ERROR CertificateAuthenticatedSessionEstablishment::DeriveSecureSession(Sec
 
     // TODO: Use asymmetric keypair to create the secure session
     // err = session.Init();
+    err = CHIP_ERROR_NOT_IMPLEMENTED;
     SuccessOrExit(err);
 
 exit:
