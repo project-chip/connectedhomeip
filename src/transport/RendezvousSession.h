@@ -63,7 +63,7 @@ class SecureSessionHandle;
  *
  * @dotfile dots/Rendezvous/RendezvousSessionInit.dot
  */
-class RendezvousSession : public SecurePairingSessionDelegate,
+class RendezvousSession : public AuthenticatedSessionEstablishmentDelegate,
                           public RendezvousSessionDelegate,
                           public RendezvousDeviceCredentialsDelegate,
                           public NetworkProvisioningDelegate,
@@ -103,7 +103,7 @@ public:
     Optional<NodeId> GetLocalNodeId() const { return mParams.GetLocalNodeId(); }
     Optional<NodeId> GetRemoteNodeId() const { return mParams.GetRemoteNodeId(); }
 
-    //////////// SecurePairingSessionDelegate Implementation ///////////////
+    //////////// AuthenticatedSessionEstablishmentDelegate Implementation ///////////////
     CHIP_ERROR SendPairingMessage(const PacketHeader & header, const Transport::PeerAddress & peerAddress,
                                   System::PacketBufferHandle msgBuf) override;
     void OnPairingError(CHIP_ERROR err) override;

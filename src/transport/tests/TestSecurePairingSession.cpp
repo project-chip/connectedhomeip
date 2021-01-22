@@ -34,7 +34,7 @@
 
 using namespace chip;
 
-class TestSecurePairingDelegate : public SecurePairingSessionDelegate
+class TestSecurePairingDelegate : public AuthenticatedSessionEstablishmentDelegate
 {
 public:
     CHIP_ERROR SendPairingMessage(const PacketHeader & header, const Transport::PeerAddress & peerAddress,

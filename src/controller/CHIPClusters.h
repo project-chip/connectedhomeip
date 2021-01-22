@@ -26,6 +26,7 @@ namespace Controller {
 
 constexpr ClusterId kBarrierControlClusterId         = 0x0103;
 constexpr ClusterId kBasicClusterId                  = 0x0000;
+constexpr ClusterId kBindingClusterId                = 0xF000;
 constexpr ClusterId kColorControlClusterId           = 0x0300;
 constexpr ClusterId kDoorLockClusterId               = 0x0101;
 constexpr ClusterId kGroupsClusterId                 = 0x0004;
@@ -69,6 +70,23 @@ public:
     CHIP_ERROR DiscoverAttributes(Callback::Callback<> * onCompletion);
     CHIP_ERROR ReadAttributeZclVersion(Callback::Callback<> * onCompletion);
     CHIP_ERROR ReadAttributePowerSource(Callback::Callback<> * onCompletion);
+    CHIP_ERROR ReadAttributeClusterRevision(Callback::Callback<> * onCompletion);
+};
+
+class DLL_EXPORT BindingCluster : public ClusterBase
+{
+public:
+    BindingCluster() : ClusterBase(kBindingClusterId) {}
+    ~BindingCluster() {}
+
+    // Cluster Commands
+    CHIP_ERROR Bind(Callback::Callback<> * onCompletion, chip::NodeId nodeId, chip::GroupId groupId, chip::EndpointId endpointId,
+                    chip::ClusterId clusterId);
+    CHIP_ERROR Unbind(Callback::Callback<> * onCompletion, chip::NodeId nodeId, chip::GroupId groupId, chip::EndpointId endpointId,
+                      chip::ClusterId clusterId);
+
+    // Cluster Attributes
+    CHIP_ERROR DiscoverAttributes(Callback::Callback<> * onCompletion);
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Callback<> * onCompletion);
 };
 

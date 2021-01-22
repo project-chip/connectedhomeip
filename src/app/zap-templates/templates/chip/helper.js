@@ -350,6 +350,7 @@ function isManufacturerSpecificCommand()
 exports.chip_server_clusters                  = chip_server_clusters;
 exports.chip_server_cluster_commands          = chip_server_cluster_commands;
 exports.chip_server_cluster_command_arguments = chip_server_cluster_command_arguments
+exports.asBasicType                           = ChipTypesHelper.asBasicType;
 exports.isSignedType                          = isSignedType;
 exports.isDiscreteType                        = isDiscreteType;
 exports.chip_server_cluster_attributes        = chip_server_cluster_attributes;
