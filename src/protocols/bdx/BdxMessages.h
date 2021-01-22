@@ -33,15 +33,15 @@ namespace BDX {
 
 enum MessageType : uint8_t
 {
-    kSendInit      = 0x01,
-    kSendAccept    = 0x02,
-    kReceiveInit   = 0x04,
-    kReceiveAccept = 0x05,
-    kBlockQuery    = 0x10,
-    kBlock         = 0x11,
-    kBlockEOF      = 0x12,
-    kBlockAck      = 0x13,
-    kBlockAckEOF   = 0x14,
+    kBdxMsg_SendInit      = 0x01,
+    kBdxMsg_SendAccept    = 0x02,
+    kBdxMsg_ReceiveInit   = 0x04,
+    kBdxMsg_ReceiveAccept = 0x05,
+    kBdxMsg_BlockQuery    = 0x10,
+    kBdxMsg_Block         = 0x11,
+    kBdxMsg_BlockEOF      = 0x12,
+    kBdxMsg_BlockAck      = 0x13,
+    kBdxMsg_BlockAckEOF   = 0x14,
 };
 
 enum StatusCode : uint8_t

@@ -130,7 +130,7 @@ CHIP_ERROR TransferSession::StartTransfer(TransferRole role, const TransferInitD
     err = WriteToPacketBuffer<TransferInit>(initMsg, mPendingMsgHandle);
     SuccessOrExit(err);
 
-    msgType = (mRole == kRole_Sender) ? kSendInit : kReceiveInit;
+    msgType = (mRole == kRole_Sender) ? kBdxMsg_SendInit : kBdxMsg_ReceiveInit;
     err     = AttachBdxHeader(msgType, mPendingMsgHandle);
     SuccessOrExit(err);
 
@@ -182,7 +182,7 @@ CHIP_ERROR TransferSession::AcceptTransfer(const TransferAcceptData & acceptData
         err = WriteToPacketBuffer<ReceiveAccept>(acceptMsg, mPendingMsgHandle);
         SuccessOrExit(err);
 
-        err = AttachBdxHeader(kReceiveAccept, mPendingMsgHandle);
+        err = AttachBdxHeader(kBdxMsg_ReceiveAccept, mPendingMsgHandle);
         SuccessOrExit(err);
     }
     else
@@ -197,7 +197,7 @@ CHIP_ERROR TransferSession::AcceptTransfer(const TransferAcceptData & acceptData
         err = WriteToPacketBuffer<SendAccept>(acceptMsg, mPendingMsgHandle);
         SuccessOrExit(err);
 
-        err = AttachBdxHeader(kSendAccept, mPendingMsgHandle);
+        err = AttachBdxHeader(kBdxMsg_SendAccept, mPendingMsgHandle);
         SuccessOrExit(err);
     }
 
@@ -223,7 +223,7 @@ CHIP_ERROR TransferSession::PrepareBlockQuery()
     err = WriteToPacketBuffer<BlockQuery>(queryMsg, mPendingMsgHandle);
     SuccessOrExit(err);
 
-    err = AttachBdxHeader(kBlockQuery, mPendingMsgHandle);
+    err = AttachBdxHeader(kBdxMsg_BlockQuery, mPendingMsgHandle);
     SuccessOrExit(err);
 
     mPendingOutput.Set(kOutput_MsgToSend);
@@ -254,13 +254,13 @@ CHIP_ERROR TransferSession::PrepareBlock(const BlockData & inData)
     err = WriteToPacketBuffer<DataBlock>(blockMsg, mPendingMsgHandle);
     SuccessOrExit(err);
 
-    msgType = inData.IsEof ? kBlockEOF : kBlock;
+    msgType = inData.IsEof ? kBdxMsg_BlockEOF : kBdxMsg_Block;
     err     = AttachBdxHeader(msgType, mPendingMsgHandle);
     SuccessOrExit(err);
 
     mPendingOutput.Set(kOutput_MsgToSend);
 
-    if (msgType == kBlockEOF)
+    if (msgType == kBdxMsg_BlockEOF)
     {
         mState = kState_AwaitingEOFAck;
     }
@@ -283,7 +283,7 @@ CHIP_ERROR TransferSession::PrepareBlockAck()
     err = WriteToPacketBuffer<BlockAck>(ackMsg, mPendingMsgHandle);
     SuccessOrExit(err);
 
-    err = AttachBdxHeader(kBlockAck, mPendingMsgHandle);
+    err = AttachBdxHeader(kBdxMsg_BlockAck, mPendingMsgHandle);
     SuccessOrExit(err);
 
     mPendingOutput.Set(kOutput_MsgToSend);
@@ -306,7 +306,7 @@ CHIP_ERROR TransferSession::PrepareBlockAckEOF()
     err = WriteToPacketBuffer<BlockAckEOF>(eofAckMsg, mPendingMsgHandle);
     SuccessOrExit(err);
 
-    err = AttachBdxHeader(kBlockAckEOF, mPendingMsgHandle);
+    err = AttachBdxHeader(kBdxMsg_BlockAckEOF, mPendingMsgHandle);
     SuccessOrExit(err);
 
     mPendingOutput.Set(kOutput_MsgToSend);
@@ -379,29 +379,29 @@ CHIP_ERROR TransferSession::HandleBdxMessage(PayloadHeader & header, System::Pac
 
     switch (msgType)
     {
-    case kSendInit:
-    case kReceiveInit:
+    case kBdxMsg_SendInit:
+    case kBdxMsg_ReceiveInit:
         HandleTransferInit(msgType, std::move(msg));
         break;
-    case kSendAccept:
+    case kBdxMsg_SendAccept:
         HandleSendAccept(std::move(msg));
         break;
-    case kReceiveAccept:
+    case kBdxMsg_ReceiveAccept:
         HandleReceiveAccept(std::move(msg));
         break;
-    case kBlockQuery:
+    case kBdxMsg_BlockQuery:
         HandleBlockQuery(std::move(msg));
         break;
-    case kBlock:
+    case kBdxMsg_Block:
         HandleBlock(std::move(msg));
         break;
-    case kBlockEOF:
+    case kBdxMsg_BlockEOF:
         HandleBlockEOF(std::move(msg));
         break;
-    case kBlockAck:
+    case kBdxMsg_BlockAck:
         HandleBlockAck(std::move(msg));
         break;
-    case kBlockAckEOF:
+    case kBdxMsg_BlockAckEOF:
         HandleBlockAckEOF(std::move(msg));
         break;
     default:
@@ -433,11 +433,11 @@ void TransferSession::HandleTransferInit(MessageType msgType, System::PacketBuff
 
     if (mRole == kRole_Sender)
     {
-        VerifyOrExit(msgType == kReceiveInit, SetTransferError(kStatus_ServerBadState));
+        VerifyOrExit(msgType == kBdxMsg_ReceiveInit, SetTransferError(kStatus_ServerBadState));
     }
     else
     {
-        VerifyOrExit(msgType == kSendInit, SetTransferError(kStatus_ServerBadState));
+        VerifyOrExit(msgType == kBdxMsg_SendInit, SetTransferError(kStatus_ServerBadState));
     }
 
     err = transferInit.Parse(msgData.Retain());
