@@ -134,7 +134,7 @@ private:
     };
 
     MdnsAvahi() : mClient(nullptr), mGroup(nullptr) {}
-    static MdnsAvahi *sInstance;
+    static MdnsAvahi * sInstance;
 
     static void HandleClientState(AvahiClient * client, AvahiClientState state, void * context);
     void HandleClientState(AvahiClient * client, AvahiClientState state);
@@ -155,7 +155,7 @@ private:
     void * mAsyncReturnContext;
 
     std::set<std::string> mPublishedServices;
-    std::map<std::string, ResolveContext*> mResolveContexts;
+    std::map<std::string, ResolveContext *> mResolveContexts;
     AvahiClient * mClient;
     AvahiEntryGroup * mGroup;
     Poller mPoller;
