@@ -351,14 +351,10 @@ CHIP_ERROR TransferSession::HandleMessageReceived(System::PacketBufferHandle msg
 
     msg->ConsumeHead(headerSize);
 
+    // TODO: call HandleStatusReport if message is StatusReport
     if (payloadHeader.GetProtocolID() == Protocols::kProtocol_BDX)
     {
         err = HandleBdxMessage(payloadHeader, std::move(msg));
-        SuccessOrExit(err);
-    }
-    else if (payloadHeader.GetProtocolID() == Protocols::kProtocol_StatusReport)
-    {
-        err = HandleStatusReportMessage(payloadHeader, std::move(msg));
         SuccessOrExit(err);
     }
     else
