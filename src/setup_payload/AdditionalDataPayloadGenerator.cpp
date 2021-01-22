@@ -43,15 +43,28 @@ AdditionalDataPayloadGenerator::AdditionalDataPayloadGenerator(uint16_t rotation
                                                                size_t serialNumberBufferSize) :
     mRotationCounter(rotationCounter),
     mSerialNumberBuffer(serialNumberBuffer), mSerialNumberBufferSize(serialNumberBufferSize)
-{}
+{
+    mHashInput =
+        reinterpret_cast<char *>(chip::Platform::MemoryAlloc(ROTATING_DEVICE_ID_COUNTER_STR_LENGTH + serialNumberBufferSize));
+}
 
-CHIP_ERROR AdditionalDataPayloadGenerator::generateAdditionalDataPayload(PacketBufferHandle & bufferHandle)
+AdditionalDataPayloadGenerator::~AdditionalDataPayloadGenerator()
+{
+    if (mHashInput != nullptr)
+    {
+        chip::Platform::MemoryFree(mHashInput);
+        mHashInput = nullptr;
+    }
+}
+
+CHIP_ERROR AdditionalDataPayloadGenerator::generateAdditionalDataPayload(PacketBufferHandle & bufferHandle,
+                                                                         bool enableRotatingDeviceId)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferTLVWriter writer;
     TLVWriter innerWriter;
     char rotatingDeviceIdBuffer[ROTATING_DEVICE_ID_LENGTH * 2 + 1];
-    uint8_t rotatingDeviceIdBufferSize;
+    size_t rotatingDeviceIdBufferSize = 0;
 
     // Initialize TLVWriter
     writer.Init(PacketBuffer::New());
@@ -59,13 +72,16 @@ CHIP_ERROR AdditionalDataPayloadGenerator::generateAdditionalDataPayload(PacketB
     err = writer.OpenContainer(AnonymousTag, kTLVType_Structure, innerWriter);
     SuccessOrExit(err);
 
-    // Generating Device Rotating Id
-    err = generateRotatingDeviceId(rotatingDeviceIdBuffer, rotatingDeviceIdBufferSize);
-    SuccessOrExit(err);
+    if (enableRotatingDeviceId)
+    {
+        // Generating Device Rotating Id
+        err = generateRotatingDeviceId(rotatingDeviceIdBuffer, rotatingDeviceIdBufferSize);
+        SuccessOrExit(err);
 
-    // Adding the rotating device id to the TLV data
-    err = innerWriter.PutString(ContextTag(kRotatingDeviceIdTag), rotatingDeviceIdBuffer);
-    SuccessOrExit(err);
+        // Adding the rotating device id to the TLV data
+        err = innerWriter.PutString(ContextTag(kRotatingDeviceIdTag), rotatingDeviceIdBuffer);
+        SuccessOrExit(err);
+    }
 
     err = writer.CloseContainer(innerWriter);
     SuccessOrExit(err);
@@ -78,15 +94,15 @@ exit:
 }
 
 CHIP_ERROR AdditionalDataPayloadGenerator::generateRotatingDeviceId(char * rotatingDeviceIdBuffer,
-                                                                    uint8_t & rotatingDeviceIdBufferSize)
+                                                                    size_t & rotatingDeviceIdBufferSize)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     char rotationCounterBuf[ROTATING_DEVICE_ID_COUNTER_STR_LENGTH];
 
     char outputBuffer[ROTATING_DEVICE_ID_LENGTH];
     uint8_t hashOutputBuffer[kSHA256_Hash_Length];
-    uint8_t hashInput[ROTATING_DEVICE_ID_COUNTER_STR_LENGTH + mSerialNumberBufferSize];
-    BufferWriter hashInputBufferWriter(hashInput, ROTATING_DEVICE_ID_COUNTER_STR_LENGTH + mSerialNumberBufferSize);
+    BufferWriter hashInputBufferWriter(reinterpret_cast<unsigned char *>(mHashInput),
+                                       ROTATING_DEVICE_ID_COUNTER_STR_LENGTH + mSerialNumberBufferSize);
     BufferWriter outputBuferWriter(reinterpret_cast<unsigned char *>(&outputBuffer[0]),
                                    sizeof(outputBuffer) / sizeof(outputBuffer[0]));
 

@@ -168,7 +168,7 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommisioningAdvertisingParamet
         textEntries[textEntrySize++] = { "VP", reinterpret_cast<const uint8_t *>(vendorProductBuf),
                                          strnlen(vendorProductBuf, sizeof(vendorProductBuf)) };
     }
-#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+#if CHIP_ENABLE_ROTATING_DEVICE_ID
     SuccessOrExit(error =
                       chip::DeviceLayer::ConfigurationMgr().GetSerialNumber(serialNumber, sizeof(serialNumber), serialNumberSize));
     SuccessOrExit(error = chip::DeviceLayer::ConfigurationMgr().GetRotationCounter(rotationCounter));

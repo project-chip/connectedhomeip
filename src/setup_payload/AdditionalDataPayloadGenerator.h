@@ -38,16 +38,17 @@ class AdditionalDataPayloadGenerator
 
 public:
     AdditionalDataPayloadGenerator(uint16_t rotationCounter, char * serialNumberBuffer, size_t serialNumberBufferSize);
-
+    ~AdditionalDataPayloadGenerator();
     // Generate additional data payload (i.e. TLV encoded)
-    CHIP_ERROR generateAdditionalDataPayload(chip::System::PacketBufferHandle & bufferHandle);
+    CHIP_ERROR generateAdditionalDataPayload(chip::System::PacketBufferHandle & bufferHandle, bool enableRotatingDeviceId);
     // Generate Device Rotating ID
-    CHIP_ERROR generateRotatingDeviceId(char * rotatingDeviceIdBuffer, uint8_t & rotatingDeviceIdBufferSize);
+    CHIP_ERROR generateRotatingDeviceId(char * rotatingDeviceIdBuffer, size_t & rotatingDeviceIdBufferSize);
 
 private:
     const uint16_t mRotationCounter;
     const char * mSerialNumberBuffer;
     const size_t mSerialNumberBufferSize;
+    char * mHashInput;
 };
 
 } // namespace chip

@@ -1278,16 +1278,21 @@ static void UpdateAdditionalDataCharacteristic(BluezGattCharacteristic1 * charac
     chip::System::PacketBufferHandle bufferHandle;
 
     char serialNumber[ConfigurationManager::kMaxSerialNumberLength + 1];
-    size_t serialNumberSize;
-    uint16_t rotationCounter;
+    size_t serialNumberSize     = 0;
+    uint16_t rotationCounter    = 0;
+    bool enableRotatingDeviceId = false;
 
     err = ConfigurationMgr().GetSerialNumber(serialNumber, sizeof(serialNumber), serialNumberSize);
     SuccessOrExit(err);
     err = ConfigurationMgr().GetRotationCounter(rotationCounter);
     SuccessOrExit(err);
 
-    err =
-        AdditionalDataPayloadGenerator(rotationCounter, serialNumber, serialNumberSize).generateAdditionalDataPayload(bufferHandle);
+#if CHIP_ENABLE_ROTATING_DEVICE_ID
+    enableRotatingDeviceId = true;
+#endif
+
+    err = AdditionalDataPayloadGenerator(rotationCounter, serialNumber, serialNumberSize)
+              .generateAdditionalDataPayload(bufferHandle, enableRotatingDeviceId);
     SuccessOrExit(err);
 
     cValue = g_variant_new_from_data(G_VARIANT_TYPE("ay"), bufferHandle->Start(), bufferHandle->DataLength(), TRUE, g_free,
