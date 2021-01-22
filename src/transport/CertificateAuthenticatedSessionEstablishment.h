@@ -19,7 +19,7 @@
 /**
  *    @file
  *      This file defines the CHIP CASE Session object that provides
- *      APIs for constructing secure session using certificate from device's
+ *      APIs for constructing a secure session using a certificate from the device's
  *      operational credentials.
  */
 
@@ -66,7 +66,7 @@ public:
      * @brief
      *   Create and send session establishment request using device's operational credentials.
      *
-     * @param peerAddress      Address of peer to pair
+     * @param peerAddress      Address of peer with which to establish a session.
      * @param myNodeId         Node id of local node
      * @param peerNodeId       Node id of the peer node
      * @param myKeyId          Key ID to be assigned to the secure session on the peer node
@@ -79,16 +79,14 @@ public:
 
     /**
      * @brief
-     *   Derive a secure session from the paired session. The API will return error
-     *   if called before pairing is established.
+     *   Derive a secure session from the established session. The API will return error
+     *   if called before session is established.
      *
-     * @param info        Information string used for key derivation
-     * @param info_len    Length of info string
-     * @param session     Referene to the sescure session that will be
-     *                    initialized once pairing is complete
+     * @param session     Reference to the secure session that will be
+     *                    initialized once session establishment is complete
      * @return CHIP_ERROR The result of session derivation
      */
-    virtual CHIP_ERROR DeriveSecureSession(const uint8_t * info, size_t info_len, SecureSession & session);
+    virtual CHIP_ERROR DeriveSecureSession(SecureSession & session);
 
     /**
      * @brief
@@ -106,7 +104,7 @@ public:
      * @brief
      *  Return the associated secure session peer NodeId
      *
-     * @return Optional<NodeId> The associated peer NodeId
+     * @return NodeId The associated peer NodeId
      */
     NodeId GetPeerNodeId() const { return mConnectionState.GetPeerNodeId(); }
 
@@ -132,8 +130,6 @@ private:
     enum SigmaErrorType : uint8_t
     {
         kNoSharedTrustRoots   = 0x01,
-        kNoSharedCipherSuite  = 0x02,
-        kNoSharedNamedCurve   = 0x03,
         kInvalidSignature     = 0x04,
         kInvalidResumptionTag = 0x05,
         kUnsupportedVersion   = 0x06,

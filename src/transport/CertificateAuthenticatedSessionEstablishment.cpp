@@ -119,16 +119,13 @@ exit:
     return err;
 }
 
-CHIP_ERROR CertificateAuthenticatedSessionEstablishment::DeriveSecureSession(const uint8_t * info, size_t info_len,
-                                                                             SecureSession & session)
+CHIP_ERROR CertificateAuthenticatedSessionEstablishment::DeriveSecureSession(SecureSession & session)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    VerifyOrExit(info != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(info_len > 0, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(mPairingComplete, err = CHIP_ERROR_INCORRECT_STATE);
 
-    // ToDo: Use asymmetric keypair to create the secure session
+    // TODO: Use asymmetric keypair to create the secure session
     // err = session.Init();
     SuccessOrExit(err);
 
@@ -145,7 +142,8 @@ CHIP_ERROR CertificateAuthenticatedSessionEstablishment::SendSigmaR1()
     msg_R1 = System::PacketBuffer::NewWithAvailableSize(data_len);
     VerifyOrReturnError(!msg_R1.IsNull(), CHIP_SYSTEM_ERROR_NO_MEMORY);
 
-    // ToDo: Construct SigmaR1 message in form of the following structure
+    // TODO: Construct SigmaR1 message in form of the following structure
+    // https://github.com/project-chip/connectedhomeip/issues/4469
     /*
     struct SigmaR1
     {
@@ -184,14 +182,16 @@ CHIP_ERROR CertificateAuthenticatedSessionEstablishment::HandleSigmaR1_and_SendS
 
     VerifyOrExit(buf != nullptr, err = CHIP_ERROR_MESSAGE_INCOMPLETE);
 
-    // ToDo: Verify received SigmaR1 message.
+    // TODO: Verify received SigmaR1 message.
+    // https://github.com/project-chip/connectedhomeip/issues/4469
 
     mConnectionState.SetPeerKeyID(header.GetEncryptionKeyID());
 
     msg_R2 = System::PacketBuffer::NewWithAvailableSize(data_len);
     VerifyOrExit(!msg_R2.IsNull(), err = CHIP_SYSTEM_ERROR_NO_MEMORY);
 
-    // ToDo: Construct SigmaR2 message in form of the following structure
+    // TODO: Construct SigmaR2 message in form of the following structure
+    // https://github.com/project-chip/connectedhomeip/issues/4469
     /*
     struct SigmaR2Encrypted
     {
@@ -241,7 +241,8 @@ CHIP_ERROR CertificateAuthenticatedSessionEstablishment::HandleSigmaR2_and_SendS
 
     ChipLogDetail(Inet, "Received SigmaR2 msg");
 
-    // ToDo: Verify received SigmaR2 message.
+    // TODO: Verify received SigmaR2 message.
+    // https://github.com/project-chip/connectedhomeip/issues/4469
 
     mConnectionState.SetPeerKeyID(header.GetEncryptionKeyID());
 
@@ -250,7 +251,8 @@ CHIP_ERROR CertificateAuthenticatedSessionEstablishment::HandleSigmaR2_and_SendS
     msg_R3 = System::PacketBuffer::NewWithAvailableSize(data_len);
     VerifyOrExit(!msg_R3.IsNull(), err = CHIP_SYSTEM_ERROR_NO_MEMORY);
 
-    // ToDo: Construct SigmaR3 message in form of the following structure
+    // TODO: Construct SigmaR3 message in form of the following structure
+    // https://github.com/project-chip/connectedhomeip/issues/4469
     /*
     struct SigmaR3Encrypted
     {
@@ -293,7 +295,8 @@ CHIP_ERROR CertificateAuthenticatedSessionEstablishment::HandleSigmaR3(const Pac
 
     ChipLogDetail(Inet, "Received SigmaR3 msg");
 
-    // ToDo: Verify received SigmaR3 message.
+    // TODO: Verify received SigmaR3 message.
+    // https://github.com/project-chip/connectedhomeip/issues/4469
 
     mNextExpectedMsg = Protocols::SecureChannel::MsgType::CASE_SigmaErr;
 
@@ -347,6 +350,8 @@ void CertificateAuthenticatedSessionEstablishment::HandleErrorMsg(const PacketHe
     SigmaErrorMsg * pMsg = nullptr;
 
     VerifyOrExit(buf != nullptr, ChipLogError(Inet, "Null error msg received during pairing"));
+    static_assert(sizeof(SigmaErrorMsg) == sizeof(uint8_t),
+                  "Assuming size of SigmaErrorMsg message is 1 octet, so that endian-ness conversion is not needed");
     VerifyOrExit(buflen == sizeof(SigmaErrorMsg), ChipLogError(Inet, "Error msg with incorrect length received during pairing"));
 
     pMsg = reinterpret_cast<SigmaErrorMsg *>(msg->Start());
@@ -364,6 +369,8 @@ CHIP_ERROR CertificateAuthenticatedSessionEstablishment::HandlePeerMessage(const
     uint16_t headerSize = 0;
     PayloadHeader payloadHeader;
 
+    Protocols::SecureChannel::MsgType msgType;
+
     VerifyOrExit(!msg.IsNull(), err = CHIP_ERROR_INVALID_ARGUMENT);
 
     err = payloadHeader.Decode(msg->Start(), msg->DataLength(), &headerSize);
@@ -372,12 +379,14 @@ CHIP_ERROR CertificateAuthenticatedSessionEstablishment::HandlePeerMessage(const
     msg->ConsumeHead(headerSize);
 
     VerifyOrExit(payloadHeader.GetProtocolID() == Protocols::kProtocol_SecureChannel, err = CHIP_ERROR_INVALID_MESSAGE_TYPE);
-    VerifyOrExit(payloadHeader.GetMessageType() == (uint8_t) mNextExpectedMsg, err = CHIP_ERROR_INVALID_MESSAGE_TYPE);
+
+    msgType = static_cast<Protocols::SecureChannel::MsgType>(payloadHeader.GetMessageType());
+    VerifyOrExit(msgType == mNextExpectedMsg, err = CHIP_ERROR_INVALID_MESSAGE_TYPE);
 
     mConnectionState.SetPeerAddress(peerAddress);
     VerifyOrExit(mLocalNodeId == packetHeader.GetDestinationNodeId().Value(), err = CHIP_ERROR_WRONG_NODE_ID);
 
-    switch (static_cast<Protocols::SecureChannel::MsgType>(payloadHeader.GetMessageType()))
+    switch (msgType)
     {
     case Protocols::SecureChannel::MsgType::CASE_SigmaR1:
         err = HandleSigmaR1_and_SendSigmaR2(packetHeader, msg);
@@ -403,7 +412,7 @@ CHIP_ERROR CertificateAuthenticatedSessionEstablishment::HandlePeerMessage(const
 
 exit:
 
-    // Call delegate to indicate pairing failure
+    // Call delegate to indicate session establishment failure.
     if (err != CHIP_NO_ERROR)
     {
         mDelegate->OnPairingError(err);

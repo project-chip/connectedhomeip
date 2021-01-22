@@ -19,7 +19,7 @@
 /**
  *    @file
  *      This file defines the Delegate class that contains callbacks to
- *      establish secure session pairing and update status of the pairing process.
+ *      establish a secure session and update status of the session establishment process.
  *
  */
 
@@ -36,12 +36,14 @@ class DLL_EXPORT AuthenticatedSessionEstablishmentDelegate
 public:
     /**
      * @brief
-     *   Called when pairing session generates a new message that should be sent to peer.
+     *   Called when session establishment process generates a new message that should be sent to peer.
      *
      * @param header the message header for the sent message
      * @param peerAddress the destination of the message
      * @param msgBuf the raw data for the message being sent
      * @return CHIP_ERROR Error thrown when sending the message
+     *
+     * TODO: Rename function as per issue: https://github.com/project-chip/connectedhomeip/issues/4468
      */
     virtual CHIP_ERROR SendPairingMessage(const PacketHeader & header, const Transport::PeerAddress & peerAddress,
                                           System::PacketBufferHandle msgBuf)
@@ -51,15 +53,19 @@ public:
 
     /**
      * @brief
-     *   Called when pairing fails with an error
+     *   Called when session establishment fails with an error
      *
      * @param error error code
+     *
+     * TODO: Rename function as per issue: https://github.com/project-chip/connectedhomeip/issues/4468
      */
     virtual void OnPairingError(CHIP_ERROR error) {}
 
     /**
      * @brief
-     *   Called when the pairing is complete and the new secure session has been established
+     *   Called when the new secure session has been established
+     *
+     * TODO: Rename function as per issue: https://github.com/project-chip/connectedhomeip/issues/4468
      */
     virtual void OnPairingComplete() {}
 
