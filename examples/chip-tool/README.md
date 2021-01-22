@@ -153,19 +153,19 @@ cluster name and the `parse-additional-data-payload` command
 
 ## Command List
 
-- [barriercontrol](#barriercontrol)
-- [basic](#basic)
-- [colorcontrol](#colorcontrol)
-- [doorlock](#doorlock)
-- [groups](#groups)
-- [iaszone](#iaszone)
-- [identify](#identify)
-- [levelcontrol](#levelcontrol)
-- [onoff](#onoff)
-- [pairing](#pairing)
-- [payload](#payload)
-- [scenes](#scenes)
-- [temperaturemeasurement](#temperaturemeasurement)
+-   [barriercontrol](#barriercontrol)
+-   [basic](#basic)
+-   [colorcontrol](#colorcontrol)
+-   [doorlock](#doorlock)
+-   [groups](#groups)
+-   [iaszone](#iaszone)
+-   [identify](#identify)
+-   [levelcontrol](#levelcontrol)
+-   [onoff](#onoff)
+-   [pairing](#pairing)
+-   [payload](#payload)
+-   [scenes](#scenes)
+-   [temperaturemeasurement](#temperaturemeasurement)
 
 ## Command Details
 
