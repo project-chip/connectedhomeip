@@ -26,7 +26,6 @@
 #ifndef _CHIP_INTERACTION_MODEL_MESSAGE_DEF_REPORT_DATA_H
 #define _CHIP_INTERACTION_MODEL_MESSAGE_DEF_REPORT_DATA_H
 
-
 #include <core/CHIPCore.h>
 #include <core/CHIPTLV.h>
 #include <support/CodeUtils.h>
