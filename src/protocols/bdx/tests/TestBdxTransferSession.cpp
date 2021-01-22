@@ -128,7 +128,7 @@ void TestInitiatingReceiverReceiverDrive(nlTestSuite * inSuite, void * inContext
                    !memcmp(testFileDes, outEvent.transferInitData.FileDesignator, outEvent.transferInitData.FileDesLength));
 
     // Compose ReceiveAccept parameters struct and give to respondingSender
-    char testMetadata[9]       = { "metadata" };
+    char testMetadata[11]      = { "hi_dad.txt" };
     uint64_t proposedOffset    = 64;
     uint64_t proposedLength    = 0;
     uint16_t proposedBlockSize = transferBlockSize;
@@ -138,7 +138,7 @@ void TestInitiatingReceiverReceiverDrive(nlTestSuite * inSuite, void * inContext
     acceptData.Length         = 0; // Indefinite length
     acceptData.MaxBlockSize   = proposedBlockSize;
     acceptData.Metadata       = reinterpret_cast<uint8_t *>(testMetadata);
-    acceptData.MetadataLength = 9;
+    acceptData.MetadataLength = 11;
 
     err = respondingSender.AcceptTransfer(acceptData);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
