@@ -162,9 +162,9 @@ CHIP_ERROR ChipMdnsBrowse(const char * type, MdnsServiceProtocol protocol, chip:
                           chip::Inet::InterfaceId interface, MdnsBrowseCallback callback, void * context);
 
 /**
- * This function resolves the services published by mdns
+ * This function subscribes a service. Any address updates will be passed to the callback.
  *
- * @param[in] browseResult  The service entry returned by @ref ChipMdnsBrowse
+ * @param[in] service       The service to subscribe.
  * @param[in] interface     The interface to send queries.
  * @param[in] callback      The callback for found services.
  * @param[in] context       The user context.
@@ -174,8 +174,35 @@ CHIP_ERROR ChipMdnsBrowse(const char * type, MdnsServiceProtocol protocol, chip:
  * @retval Error code                   The resolve fails.
  *
  */
-CHIP_ERROR ChipMdnsResolve(MdnsService * browseResult, chip::Inet::InterfaceId interface, MdnsResolveCallback callback,
-                           void * context);
+CHIP_ERROR ChipMdnsSubscribe(MdnsService * service, chip::Inet::InterfaceId interface, MdnsResolveCallback callback,
+                             void * context);
+
+/**
+ * This function sends an instant mdns query for a device.
+ *
+ * @param[in] service       The service to subscribe.
+ * @param[in] interface     The interface to send queries.
+ * @param[in] callback      The callback for found services.
+ * @param[in] context       The user context.
+ *
+ * @retval CHIP_NO_ERROR                The resolve succeeds.
+ * @retval CHIP_ERROR_INVALID_ARGUMENT  The name, type or callback is nullptr.
+ * @retval Error code                   The resolve fails.
+ *
+ */
+CHIP_ERROR ChipMdnsResolve(MdnsService * service, chip::Inet::InterfaceId interface, MdnsResolveCallback callback, void * context);
+
+/**
+ * This function unsubscribes a service.
+ *
+ * @param[in] service       The service to unsubscribe.
+ *
+ * @retval CHIP_NO_ERROR                The resolve succeeds.
+ * @retval CHIP_ERROR_INVALID_ARGUMENT  The name, type or callback is nullptr.
+ * @retval CHIP_ERROR_INCORRECT_STATE   The service has not been subscribed yet.
+ *
+ */
+CHIP_ERROR ChipMdnsUnsubscribe(MdnsService * service);
 
 } // namespace Mdns
 } // namespace chip

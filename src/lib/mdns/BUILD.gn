@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("${chip_root}/build/chip/tools.gni")
 
 declare_args() {
   # Set up what advertiser to use for mDNS advertisement
@@ -33,9 +34,15 @@ static_library("mdns") {
   sources = [ "Advertiser.h" ]
 
   if (chip_mdns_advertiser == "none") {
-    sources += [ "Advertiser_ImplNone.cpp" ]
+    sources += [
+      "Advertiser_ImplNone.cpp",
+      "Scanner_ImplNone.cpp",
+    ]
   } else if (chip_mdns_advertiser == "minimal") {
-    sources += [ "Advertiser_ImplMinimalMdns.cpp" ]
+    sources += [
+      "Advertiser_ImplMinimalMdns.cpp",
+      "Scanner_ImplNone.cpp",
+    ]
     public_deps += [ "${chip_root}/src/lib/mdns/minimal" ]
   } else if (chip_mdns_advertiser == "platform") {
     sources += [
@@ -45,5 +52,13 @@ static_library("mdns") {
     public_deps += [ "${chip_root}/src/platform" ]
   } else {
     assert(false, "Unknown mDNS advertiser implementation.")
+  }
+}
+
+if (chip_build_tools) {
+  executable("scanner-example") {
+    sources = [ "ScannerExample.cpp" ]
+
+    public_deps = [ ":mdns" ]
   }
 }

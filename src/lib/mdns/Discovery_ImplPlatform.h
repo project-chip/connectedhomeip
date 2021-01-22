@@ -18,22 +18,18 @@
 #pragma once
 
 #include "core/CHIPError.h"
+#include "inet/IPAddress.h"
 #include "inet/InetInterface.h"
 #include "lib/mdns/Advertiser.h"
+#include "lib/mdns/Scanner.h"
 #include "lib/mdns/platform/Mdns.h"
 #include "platform/CHIPDeviceConfig.h"
+#include <stdint.h>
 
 namespace chip {
 namespace Mdns {
 
-class ResolveDelegate
-{
-public:
-    virtual void HandleNodeIdResolve(CHIP_ERROR error, uint64_t nodeId, const MdnsService & address) = 0;
-    virtual ~ResolveDelegate() {}
-};
-
-class DiscoveryImplPlatform : public ServiceAdvertiser
+class DiscoveryImplPlatform : public ServiceAdvertiser, public Scanner
 {
 public:
     /**
@@ -60,13 +56,29 @@ public:
      * This function registers the delegate to handle node id resolve results.
      *
      */
-    CHIP_ERROR RegisterResolveDelegate(ResolveDelegate * delegate);
+    CHIP_ERROR RegisterScannerDelegate(ScannerDelegate * delegate) override;
 
     /**
-     * This function resolves a node id to its address.
+     * This function subscribes a node for all future service changes. When the node is no
+     * longer of interest, call UnsubscribeNode to deallocate the resources.
      *
      */
-    CHIP_ERROR ResolveNodeId(uint64_t nodeId, uint64_t fabricId, chip::Inet::IPAddressType type = chip::Inet::kIPAddressType_Any);
+    CHIP_ERROR SubscribeNode(uint64_t nodeId, uint64_t fabricId, Inet::InterfaceId interface,
+                             Inet::IPAddressType addressType) override;
+
+    /**
+     * This function unsubscribes a node and free all the resources.
+     *
+     */
+    CHIP_ERROR UnsubscribeNode(uint64_t nodeId, uint64_t fabricId) override;
+
+    /**
+     * This function triggers an instant query for the node. All resources will be automatically
+     * deallocated after the callback.
+     *
+     */
+    CHIP_ERROR ResolveNode(uint64_t nodeId, uint64_t fabricId, Inet::InterfaceId interface,
+                           Inet::IPAddressType addressType) override;
 
     static DiscoveryImplPlatform & GetInstance() { return sManager; }
 
@@ -92,7 +104,7 @@ private:
     bool mIsCommissionalPublishing = false;
 
     bool mMdnsInitialized              = false;
-    ResolveDelegate * mResolveDelegate = nullptr;
+    ScannerDelegate * mScannerDelegate = nullptr;
 
     static DiscoveryImplPlatform sManager;
 };
