@@ -27,7 +27,6 @@
 #ifndef _CHIP_INTERACTION_MODEL_COMMAND_H
 #define _CHIP_INTERACTION_MODEL_COMMAND_H
 
-#include <app/MessageDef.h>
 #include <core/CHIPCore.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
@@ -38,6 +37,11 @@
 #include <support/logging/CHIPLogging.h>
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
+
+#include <app/MessageDef/CommandDataElement.h>
+#include <app/MessageDef/CommandList.h>
+#include <app/MessageDef/InvokeCommand.h>
+#include <app/MessageDef/MessageDef.h>
 
 namespace chip {
 namespace app {
