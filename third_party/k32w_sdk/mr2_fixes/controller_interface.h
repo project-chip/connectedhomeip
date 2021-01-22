@@ -326,14 +326,14 @@ osaStatus_t Controller_Init(gHostHciRecvCallback_t callback);
 /*! *********************************************************************************
  * \brief  Controller Receive Interface
  * \param[in]  packetType HCI packet Type
- * \param[in]  pPacket    data buffer      
- * \param[in]  packetSize data buffer length 
+ * \param[in]  pPacket    data buffer
+ * \param[in]  packetSize data buffer length
  *
  * \return gBleSuccess_c, gBleOutOfMemory_c or gBleInvalidParameter_c
  ********************************************************************************** */
 bleResult_t Hci_SendPacketToController( hciPacketType_t packetType, void* pPacket,
                                         uint16_t packetSize);
-                                        
+
 #ifdef __cplusplus
 }
 #endif
@@ -343,4 +343,3 @@ bleResult_t Hci_SendPacketToController( hciPacketType_t packetType, void* pPacke
 /*! *********************************************************************************
 * @}
 ********************************************************************************** */
-
