@@ -46,36 +46,37 @@ enum MessageType : uint8_t
 
 enum StatusCode : uint8_t
 {
-    kOverflow                   = 0x0011,
-    kLengthTooLarge             = 0x0012,
-    kLengthTooShort             = 0x0013,
-    kLengthMismatch             = 0x0014,
-    kLengthRequired             = 0x0015,
-    kBadMessageContents         = 0x0016,
-    kBadBlockCounter            = 0x0017,
-    kTransferFailedUnknownError = 0x001F,
-    kServerBadState             = 0x0020,
-    kFailureToSend              = 0x0021,
-    kTransferMethodNotSupported = 0x0050,
-    kFileDesignatorUnknown      = 0x0051,
-    kStartOffsetNotSupported    = 0x0052,
-    kVersionNotSupported        = 0x0053,
-    kUnknown                    = 0x005F,
+    kStatus_None                       = 0x0000,
+    kStatus_Overflow                   = 0x0011,
+    kStatus_LengthTooLarge             = 0x0012,
+    kStatus_LengthTooShort             = 0x0013,
+    kStatus_LengthMismatch             = 0x0014,
+    kStatus_LengthRequired             = 0x0015,
+    kStatus_BadMessageContents         = 0x0016,
+    kStatus_BadBlockCounter            = 0x0017,
+    kStatus_TransferFailedUnknownError = 0x001F,
+    kStatus_ServerBadState             = 0x0020,
+    kStatus_FailureToSend              = 0x0021,
+    kStatus_TransferMethodNotSupported = 0x0050,
+    kStatus_FileDesignatorUnknown      = 0x0051,
+    kStatus_StartOffsetNotSupported    = 0x0052,
+    kStatus_VersionNotSupported        = 0x0053,
+    kStatus_Unknown                    = 0x005F,
 };
 
 enum TransferControlFlags : uint8_t
 {
     // first 4 bits reserved for version
-    kSenderDrive   = (1U << 4),
-    kReceiverDrive = (1U << 5),
-    kAsync         = (1U << 6),
+    kControl_SenderDrive   = (1U << 4),
+    kControl_ReceiverDrive = (1U << 5),
+    kControl_Async         = (1U << 6),
 };
 
 enum RangeControlFlags : uint8_t
 {
-    kDefLen      = (1U),
-    kStartOffset = (1U << 1),
-    kWiderange   = (1U << 4),
+    kRange_DefLen      = (1U),
+    kRange_StartOffset = (1U << 1),
+    kRange_Widerange   = (1U << 4),
 };
 
 /*
@@ -200,10 +201,8 @@ struct SendAccept
     uint16_t MaxBlockSize = 0; ///< Chosen max block size to use in transfer (required)
 
     // Additional metadata (optional, TLV format)
-    // WARNING: there is no guarantee at any point that this pointer will point to valid memory.
-    // It is up to the caller to ensure that the memory pointed to here has not been freed.
-    uint8_t * Metadata      = nullptr;
-    uint16_t MetadataLength = 0;
+    const uint8_t * Metadata = nullptr;
+    uint16_t MetadataLength  = 0;
 
     // Retain ownership of the PacketBuffer so that the FileDesignator and Metadata pointers remain valid.
     System::PacketBufferHandle Buffer;
@@ -264,10 +263,8 @@ struct ReceiveAccept
     uint64_t Length       = 0; ///< Length of transfer. 0 if length is indefinite.
 
     // Additional metadata (optional, TLV format)
-    // WARNING: there is no guarantee at any point that this pointer will point to valid memory.
-    // It is up to the caller to ensure that the memory pointed to here has not been freed.
-    uint8_t * Metadata      = nullptr;
-    uint16_t MetadataLength = 0;
+    const uint8_t * Metadata = nullptr;
+    uint16_t MetadataLength  = 0;
 
     // Retain ownership of the PacketBuffer so that the FileDesignator and Metadata pointers remain valid.
     System::PacketBufferHandle Buffer;
@@ -316,9 +313,6 @@ struct CounterMessage
     bool operator==(const CounterMessage &) const;
 
     uint32_t BlockCounter = 0;
-
-    // Retain ownership of the PacketBuffer so that the FileDesignator and Metadata pointers remain valid.
-    System::PacketBufferHandle Buffer;
 };
 
 using BlockQuery  = CounterMessage;
@@ -372,10 +366,8 @@ struct DataBlock
 
     uint32_t BlockCounter = 0;
 
-    // WARNING: there is no guarantee at any point that this pointer will point to valid memory.
-    // It is up to the caller to ensure that the memory pointed to here has not been freed.
-    uint8_t * Data      = nullptr;
-    uint16_t DataLength = 0;
+    const uint8_t * Data = nullptr;
+    uint16_t DataLength  = 0;
 
     // Retain ownership of the PacketBuffer so that the FileDesignator and Metadata pointers remain valid.
     System::PacketBufferHandle Buffer;

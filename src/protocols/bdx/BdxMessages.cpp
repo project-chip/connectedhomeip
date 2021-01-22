@@ -49,9 +49,9 @@ BufBound & TransferInit::WriteToBuffer(BufBound & aBuffer) const
     proposedTransferCtl = proposedTransferCtl | TransferCtlOptions.Raw();
 
     BitFlags<uint8_t, RangeControlFlags> rangeCtlFlags;
-    rangeCtlFlags.Set(kDefLen, MaxLength > 0);
-    rangeCtlFlags.Set(kStartOffset, StartOffset > 0);
-    rangeCtlFlags.Set(kWiderange, widerange);
+    rangeCtlFlags.Set(kRange_DefLen, MaxLength > 0);
+    rangeCtlFlags.Set(kRange_StartOffset, StartOffset > 0);
+    rangeCtlFlags.Set(kRange_Widerange, widerange);
 
     aBuffer.Put(proposedTransferCtl);
     aBuffer.Put(rangeCtlFlags.Raw());
@@ -111,9 +111,9 @@ CHIP_ERROR TransferInit::Parse(System::PacketBufferHandle aBuffer)
     rangeCtlFlags.SetRaw(rangeCtl);
 
     StartOffset = 0;
-    if (rangeCtlFlags.Has(kStartOffset))
+    if (rangeCtlFlags.Has(kRange_StartOffset))
     {
-        if (rangeCtlFlags.Has(kWiderange))
+        if (rangeCtlFlags.Has(kRange_Widerange))
         {
             SuccessOrExit(bufReader.Read64(&StartOffset).StatusCode());
         }
@@ -125,9 +125,9 @@ CHIP_ERROR TransferInit::Parse(System::PacketBufferHandle aBuffer)
     }
 
     MaxLength = 0;
-    if (rangeCtlFlags.Has(kDefLen))
+    if (rangeCtlFlags.Has(kRange_DefLen))
     {
-        if (rangeCtlFlags.Has(kWiderange))
+        if (rangeCtlFlags.Has(kRange_Widerange))
         {
             SuccessOrExit(bufReader.Read64(&MaxLength).StatusCode());
         }
@@ -281,9 +281,9 @@ BufBound & ReceiveAccept::WriteToBuffer(BufBound & aBuffer) const
     transferCtl = transferCtl | TransferCtlFlags.Raw();
 
     BitFlags<uint8_t, RangeControlFlags> rangeCtlFlags;
-    rangeCtlFlags.Set(kDefLen, Length > 0);
-    rangeCtlFlags.Set(kStartOffset, StartOffset > 0);
-    rangeCtlFlags.Set(kWiderange, widerange);
+    rangeCtlFlags.Set(kRange_DefLen, Length > 0);
+    rangeCtlFlags.Set(kRange_StartOffset, StartOffset > 0);
+    rangeCtlFlags.Set(kRange_Widerange, widerange);
 
     aBuffer.Put(transferCtl);
     aBuffer.Put(rangeCtlFlags.Raw());
@@ -340,9 +340,9 @@ CHIP_ERROR ReceiveAccept::Parse(System::PacketBufferHandle aBuffer)
     rangeCtlFlags.SetRaw(rangeCtl);
 
     StartOffset = 0;
-    if (rangeCtlFlags.Has(kStartOffset))
+    if (rangeCtlFlags.Has(kRange_StartOffset))
     {
-        if (rangeCtlFlags.Has(kWiderange))
+        if (rangeCtlFlags.Has(kRange_Widerange))
         {
             SuccessOrExit(bufReader.Read64(&StartOffset).StatusCode());
         }
@@ -354,9 +354,9 @@ CHIP_ERROR ReceiveAccept::Parse(System::PacketBufferHandle aBuffer)
     }
 
     Length = 0;
-    if (rangeCtlFlags.Has(kDefLen))
+    if (rangeCtlFlags.Has(kRange_DefLen))
     {
-        if (rangeCtlFlags.Has(kWiderange))
+        if (rangeCtlFlags.Has(kRange_Widerange))
         {
             SuccessOrExit(bufReader.Read64(&Length).StatusCode());
         }
