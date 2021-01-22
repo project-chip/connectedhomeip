@@ -19,7 +19,7 @@
 /**
  *    @file
  *      This file implements the the CHIP CASE Session object that provides
- *      APIs for constructing secure session using certificate from device's
+ *      APIs for constructing a secure session using a certificate from the device's
  *      operational credentials.
  *
  */
