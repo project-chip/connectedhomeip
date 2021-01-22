@@ -140,7 +140,7 @@ CHIP_ERROR CertificateAuthenticatedSessionEstablishment::SendSigmaR1()
 
     System::PacketBufferHandle msg_R1;
 
-    msg_R1 = System::PacketBuffer::NewWithAvailableSize(data_len);
+    msg_R1 = System::PacketBufferHandle::New(data_len);
     VerifyOrReturnError(!msg_R1.IsNull(), CHIP_SYSTEM_ERROR_NO_MEMORY);
 
     // TODO: Construct SigmaR1 message in form of the following structure
@@ -188,7 +188,7 @@ CHIP_ERROR CertificateAuthenticatedSessionEstablishment::HandleSigmaR1_and_SendS
 
     mConnectionState.SetPeerKeyID(header.GetEncryptionKeyID());
 
-    msg_R2 = System::PacketBuffer::NewWithAvailableSize(data_len);
+    msg_R2 = System::PacketBufferHandle::New(data_len);
     VerifyOrExit(!msg_R2.IsNull(), err = CHIP_SYSTEM_ERROR_NO_MEMORY);
 
     // TODO: Construct SigmaR2 message in form of the following structure
@@ -249,7 +249,7 @@ CHIP_ERROR CertificateAuthenticatedSessionEstablishment::HandleSigmaR2_and_SendS
 
     VerifyOrExit(buf != nullptr, err = CHIP_ERROR_MESSAGE_INCOMPLETE);
 
-    msg_R3 = System::PacketBuffer::NewWithAvailableSize(data_len);
+    msg_R3 = System::PacketBufferHandle::New(data_len);
     VerifyOrExit(!msg_R3.IsNull(), err = CHIP_SYSTEM_ERROR_NO_MEMORY);
 
     // TODO: Construct SigmaR3 message in form of the following structure
@@ -327,7 +327,7 @@ void CertificateAuthenticatedSessionEstablishment::SendErrorMsg(SigmaErrorType e
     uint16_t msglen      = sizeof(SigmaErrorMsg);
     SigmaErrorMsg * pMsg = nullptr;
 
-    msg = System::PacketBuffer::NewWithAvailableSize(msglen);
+    msg = System::PacketBufferHandle::New(msglen);
     VerifyOrExit(!msg.IsNull(), err = CHIP_SYSTEM_ERROR_NO_MEMORY);
 
     pMsg        = reinterpret_cast<SigmaErrorMsg *>(msg->Start());

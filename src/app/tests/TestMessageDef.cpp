@@ -1029,7 +1029,7 @@ void AttributeDataVersionListTest(nlTestSuite * apSuite, void * apContext)
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::System::PacketBufferTLVWriter writer;
     chip::System::PacketBufferTLVReader reader;
-    writer.Init(chip::System::PacketBuffer::New());
+    writer.Init(chip::System::PacketBufferHandle::New(chip::System::kMaxPacketBufferSize));
     AttributeDataVersionList::Builder attributeDataVersionListBuilder;
     attributeDataVersionListBuilder.Init(&writer);
     BuildAttributeDataVersionList(apSuite, attributeDataVersionListBuilder);
@@ -1133,7 +1133,7 @@ void ReadRequestTest(nlTestSuite * apSuite, void * apContext)
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::System::PacketBufferTLVWriter writer;
     chip::System::PacketBufferTLVReader reader;
-    writer.Init(chip::System::PacketBuffer::New());
+    writer.Init(chip::System::PacketBufferHandle::New(chip::System::kMaxPacketBufferSize));
     BuildReadRequest(apSuite, writer);
     chip::System::PacketBufferHandle buf;
     err = writer.Finalize(&buf);
