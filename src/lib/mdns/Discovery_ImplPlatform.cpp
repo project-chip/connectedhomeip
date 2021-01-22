@@ -138,10 +138,10 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommisioningAdvertisingParamet
     const char * subTypes[3];
     size_t subTypeSize = 0;
     char serialNumber[chip::DeviceLayer::ConfigurationManager::kMaxSerialNumberLength + 1];
-    size_t serialNumberSize;
-    uint16_t rotationCounter;
-    char rotatingDeviceIdBuffer[ROTATING_DEVICE_ID_LENGTH + 1];
-    size_t rotatingDeviceIdBufferSize;
+    size_t serialNumberSize  = 0;
+    uint16_t rotationCounter = 0;
+    char rotatingDeviceIdBuffer[ROTATING_DEVICE_ID_LENGTH * 2 + 1];
+    size_t rotatingDeviceIdBufferSize = 0;
 
     if (!mMdnsInitialized)
     {

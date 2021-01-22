@@ -38,7 +38,6 @@ class AdditionalDataPayloadGenerator
 
 public:
     AdditionalDataPayloadGenerator(uint16_t rotationCounter, char * serialNumberBuffer, size_t serialNumberBufferSize);
-    ~AdditionalDataPayloadGenerator();
 
     // Generate additional data payload (i.e. TLV encoded)
     CHIP_ERROR generateAdditionalDataPayload(chip::System::PacketBufferHandle & bufferHandle);
@@ -49,7 +48,6 @@ private:
     const uint16_t mRotationCounter;
     const char * mSerialNumberBuffer;
     const size_t mSerialNumberBufferSize;
-    char * mHashInput;
 };
 
 } // namespace chip

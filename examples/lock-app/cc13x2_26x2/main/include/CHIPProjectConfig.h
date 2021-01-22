@@ -67,7 +67,7 @@
  * Enables the use of a hard-coded default serial number if none
  * is found in CHIP NV storage.
  */
-#define CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER "DUMMY_SN"
+#define CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER "TEST_SN"
 
 #endif // BUILD_RELEASE
 

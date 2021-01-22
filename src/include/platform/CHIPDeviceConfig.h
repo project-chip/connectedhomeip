@@ -143,7 +143,7 @@
  * is found in Chip NV storage.
  */
 #ifndef CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER
-#define CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER "DUMMY_SN"
+#define CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER "TEST_SN"
 #endif
 
 /**
@@ -176,17 +176,17 @@
 /**
  * CHIP_DEVICE_CONFIG_DEFAULT_ROTATION_COUNTER
  *
- * The default rotation counter assigned to the device or product by the device vendor.
+ * The default rotation id assigned to the device or product by the device vendor.
  *
  */
 #ifndef CHIP_DEVICE_CONFIG_DEFAULT_ROTATION_COUNTER
-#define CHIP_DEVICE_CONFIG_DEFAULT_ROTATION_COUNTER 1
+#define CHIP_DEVICE_CONFIG_DEFAULT_ROTATION_COUNTER 0
 #endif
 
 /**
  * CHIP_DEVICE_CONFIG_ROTATION_COUNTER_EPOCH
  *
- * rotation counter epoch.
+ * Rotation counter epoch
  *
  */
 #ifndef CHIP_DEVICE_CONFIG_ROTATION_COUNTER_EPOCH
