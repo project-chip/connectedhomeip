@@ -48,7 +48,7 @@
 #define THREAD_INACTIVE_POLLING_INTERVAL_MS 1000
 
 #if K32W_LOG_ENABLED
- #define K32W_LOG(...) otPlatLog(OT_LOG_LEVEL_NONE, OT_LOG_REGION_API, ##__VA_ARGS__);
+#define K32W_LOG(...) otPlatLog(OT_LOG_LEVEL_NONE, OT_LOG_REGION_API, ##__VA_ARGS__);
 #else
- #define K32W_LOG(...)
+#define K32W_LOG(...)
 #endif

@@ -45,7 +45,7 @@ static int app_entropy_source(void * data, unsigned char * output, size_t len, s
     if (otErr != OT_ERROR_NONE)
     {
         return -1;
-	}
+    }
 
     *olen = len;
     return 0;

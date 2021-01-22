@@ -3,36 +3,36 @@
  * @{
  ********************************************************************************** */
 /*!
-* Copyright (c) 2014, Freescale Semiconductor, Inc.
-* Copyright 2016-2017 NXP
-*
-* \file
-*
-* Redistribution and use in source and binary forms, with or without modification,
-* are permitted provided that the following conditions are met:
-*
-* o Redistributions of source code must retain the above copyright notice, this list
-*   of conditions and the following disclaimer.
-*
-* o Redistributions in binary form must reproduce the above copyright notice, this
-*   list of conditions and the following disclaimer in the documentation and/or
-*   other materials provided with the distribution.
-*
-* o Neither the name of Freescale Semiconductor, Inc. nor the names of its
-*   contributors may be used to endorse or promote products derived from this
-*   software without specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-* ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-* WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-* DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
-* ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-* (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-* LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
-* ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-* SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
+ * Copyright (c) 2014, Freescale Semiconductor, Inc.
+ * Copyright 2016-2017 NXP
+ *
+ * \file
+ *
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted provided that the following conditions are met:
+ *
+ * o Redistributions of source code must retain the above copyright notice, this list
+ *   of conditions and the following disclaimer.
+ *
+ * o Redistributions in binary form must reproduce the above copyright notice, this
+ *   list of conditions and the following disclaimer in the documentation and/or
+ *   other materials provided with the distribution.
+ *
+ * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
+ *   contributors may be used to endorse or promote products derived from this
+ *   software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 
 #ifndef _CONTROLLER_INTERFACE_H_
 #define _CONTROLLER_INTERFACE_H_
@@ -44,9 +44,9 @@
 ************************************************************************************/
 
 #include "PWR_Interface.h"
-#include "fsl_xcvr.h"
-#include "fsl_os_abstraction.h"
 #include "Panic.h"
+#include "fsl_os_abstraction.h"
+#include "fsl_xcvr.h"
 
 /************************************************************************************
 *************************************************************************************
@@ -54,7 +54,7 @@
 *************************************************************************************
 ************************************************************************************/
 
-///HCI Debug user extended function command parameters - vendor specific
+/// HCI Debug user extended function command parameters - vendor specific
 struct hci_user_ext_func_cmd;
 
 /// Description of unloaded RAM area content
@@ -67,15 +67,15 @@ struct unloaded_area_tag
 struct app_cfg
 {
     // Platform
-    struct unloaded_area_tag* unloaded_area;
+    struct unloaded_area_tag * unloaded_area;
     void (*plf_reset_cb)(void);
-    void (*plf_panic_cb)( panicId_t id, uint32_t location, uint32_t extra1, uint32_t extra2 );
-    void (*get_ble_mac_addr)(uint8_t* aOutUid16B, uint8_t* pOutLen);
+    void (*plf_panic_cb)(panicId_t id, uint32_t location, uint32_t extra1, uint32_t extra2);
+    void (*get_ble_mac_addr)(uint8_t * aOutUid16B, uint8_t * pOutLen);
     int32_t (*get_temperature)(void);
 
     // HCI extend function
     uint8_t (*hci_user_ext_func)(struct hci_user_ext_func_cmd * params);
-    int (*hci_common_callback)(uint16_t const msgid, void const *param, uint16_t const dest_id, uint16_t const src_id);
+    int (*hci_common_callback)(uint16_t const msgid, void const * param, uint16_t const dest_id, uint16_t const src_id);
 
     // Callback for Controller packet statistics
     void (*app_pkt_statistic)(uint16_t rx_st, uint16_t conhdl);
@@ -102,23 +102,23 @@ struct app_cfg
 struct fw_cfg
 {
     // BLE controller configuration
-    uint8_t   ble_con_max;
-    uint8_t   ble_whitelist_max;
-    uint8_t   ble_resol_addr_list_max;
-    uint8_t   ble_duplicate_filter_max;
-    uint8_t   prog_latency_def;
-    uint16_t  lld_util_min_instant_con_evt;
-    uint16_t  min_instant_con_evt;
-    uint16_t  adv_pdu_int;
-    uint8_t*  llc_state;
+    uint8_t ble_con_max;
+    uint8_t ble_whitelist_max;
+    uint8_t ble_resol_addr_list_max;
+    uint8_t ble_duplicate_filter_max;
+    uint8_t prog_latency_def;
+    uint16_t lld_util_min_instant_con_evt;
+    uint16_t min_instant_con_evt;
+    uint16_t adv_pdu_int;
+    uint8_t * llc_state;
 
     // BLE controller heap configuration
-    uint32_t* rwip_heap_env;
-    uint32_t* rwip_heap_msg;
-    uint32_t* rwip_heap_non_ret;
-    uint16_t  rwip_heap_env_size;
-    uint16_t  rwip_heap_msg_size;
-    uint16_t  rwip_heap_non_ret_size;
+    uint32_t * rwip_heap_env;
+    uint32_t * rwip_heap_msg;
+    uint32_t * rwip_heap_non_ret;
+    uint16_t rwip_heap_env_size;
+    uint16_t rwip_heap_msg_size;
+    uint16_t rwip_heap_non_ret_size;
 
     // BLE controller Exchange memory configuration
     uint32_t em_ble_start;
@@ -141,17 +141,16 @@ struct fw_cfg
 
     // Controller behavior with invalid pdu
     uint32_t invalid_pdu_handling;
-
 };
 
 /* low power configuration for sleep and 32k clock housekeeping */
 struct lp_cfg
 {
-    uint32_t wakeup_delay;         /*!< Number of 32k clock ticks */
-    uint32_t wakeup_advance;       /*!< Number of 32k clock ticks */
-    uint8_t  timebase_compensate;  /*!< Duration in microseconds used to offset computation */
-    bool_t   sw_32k_calib_enable;  /*!< true: software calibrates 32k clock, 32k RCO has to use this mode.
-                                        false: do not use software to calibrate 32k clock, 32k XTAL usually uses this mode. */
+    uint32_t wakeup_delay;       /*!< Number of 32k clock ticks */
+    uint32_t wakeup_advance;     /*!< Number of 32k clock ticks */
+    uint8_t timebase_compensate; /*!< Duration in microseconds used to offset computation */
+    bool_t sw_32k_calib_enable;  /*!< true: software calibrates 32k clock, 32k RCO has to use this mode.
+                                      false: do not use software to calibrate 32k clock, 32k XTAL usually uses this mode. */
     // background sleep timer setting
     uint32_t bg_sleep_duration_external;
     uint32_t bg_sleep_duration_periodic;
@@ -168,20 +167,18 @@ struct xcvr_api
     void (*xcvr_disable_ble_fast_tx)(void);
     void (*xcvr_enable_ble_fast_tx)(bool_t keepPll);
     int8_t (*xcvr_set_tx_pwr)(int8_t tx_pwr);
-    void (*xcvr_register_rf_activity_cb)(void*);
+    void (*xcvr_register_rf_activity_cb)(void *);
 };
 
 struct coex_api
 {
-    uint32_t (*coex_register)(void *callback);
+    uint32_t (*coex_register)(void * callback);
     uint32_t (*coex_request_access)(uint32_t newState);
     uint32_t (*coex_change_access)(uint32_t newState);
-    void     (*coex_release_access)(void);
-    void     (*coex_enable)(void);
-    void     (*coex_disable)(void);
+    void (*coex_release_access)(void);
+    void (*coex_enable)(void);
+    void (*coex_disable)(void);
 };
-
-
 
 struct pdm_api
 {
@@ -203,13 +200,13 @@ struct fwk_cfg
     const struct coex_api coex_api;
 
     const bool_t controllerUsePdm;
-    const struct pdm_api  pdm_api;
+    const struct pdm_api pdm_api;
 };
 
 struct dyn_cfg
 {
     // Low power
-    PWR_clock_32k_hk_t* lp_dyn;
+    PWR_clock_32k_hk_t * lp_dyn;
 
     // Flags
     volatile uint8_t flags;
@@ -220,10 +217,10 @@ struct dyn_cfg
 
 struct ble_config_st
 {
-    const struct app_cfg *app;
-    const struct fw_cfg  *fw;
-    const struct fwk_cfg *fwk;
-    struct dyn_cfg       *dyn;
+    const struct app_cfg * app;
+    const struct fw_cfg * fw;
+    const struct fwk_cfg * fwk;
+    struct dyn_cfg * dyn;
 };
 
 /*! @brief Power modes. */
@@ -235,7 +232,6 @@ typedef enum _power_mode
     kPmPowerDown1  /*!< Power is shut down except for always on domain and selected wakeup source */
 } power_mode_t;
 
-
 /************************************************************************************
 *************************************************************************************
 * Public prototypes
@@ -246,7 +242,7 @@ extern "C" {
 #endif
 
 void Controller_TaskEventInit(osaEventId_t event_id, const uint8_t use_rtos);
-void Controller_TaskHandler(void* handler);
+void Controller_TaskHandler(void * handler);
 
 /*
  * @brief Send deep sleep command to controller
@@ -295,7 +291,7 @@ void BLE_RestoreRegisters(void);
 /*
  * @brief Configure Controller with application parameters
  */
-void BLE_ControllerConfig(struct ble_config_st *cfg);
+void BLE_ControllerConfig(struct ble_config_st * cfg);
 
 /*
  * @brief Get time in us before next BLE event
@@ -308,12 +304,7 @@ uint32_t BLE_TimeBeforeNextBleEvent(void);
  ************************************************************************************
  ***********************************************************************************/
 
-typedef bleResult_t (*gHostHciRecvCallback_t)
-(
-    hciPacketType_t packetType,
-    void* pHciPacket,
-    uint16_t hciPacketLength
-);
+typedef bleResult_t (*gHostHciRecvCallback_t)(hciPacketType_t packetType, void * pHciPacket, uint16_t hciPacketLength);
 
 /*! *********************************************************************************
  * \brief  Performs initialization of the Controller.
@@ -331,8 +322,7 @@ osaStatus_t Controller_Init(gHostHciRecvCallback_t callback);
  *
  * \return gBleSuccess_c, gBleOutOfMemory_c or gBleInvalidParameter_c
  ********************************************************************************** */
-bleResult_t Hci_SendPacketToController( hciPacketType_t packetType, void* pPacket,
-                                        uint16_t packetSize);
+bleResult_t Hci_SendPacketToController(hciPacketType_t packetType, void * pPacket, uint16_t packetSize);
 
 #ifdef __cplusplus
 }
@@ -341,5 +331,5 @@ bleResult_t Hci_SendPacketToController( hciPacketType_t packetType, void* pPacke
 #endif /* _CONTROLLER_INTERFACE_H_ */
 
 /*! *********************************************************************************
-* @}
-********************************************************************************** */
+ * @}
+ ********************************************************************************** */

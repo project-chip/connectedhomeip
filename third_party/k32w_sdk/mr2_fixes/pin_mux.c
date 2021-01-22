@@ -1,15 +1,15 @@
 /*
-* Copyright (c) 2014 - 2015, Freescale Semiconductor, Inc.
-* Copyright 2016-2019 NXP
-* All rights reserved.
-*
-* SPDX-License-Identifier: BSD-3-Clause
-*/
+ * Copyright (c) 2014 - 2015, Freescale Semiconductor, Inc.
+ * Copyright 2016-2019 NXP
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
 
-#include "fsl_common.h"
-#include "fsl_iocon.h"
-#include "fsl_gpio.h"
 #include "pin_mux.h"
+#include "fsl_common.h"
+#include "fsl_gpio.h"
+#include "fsl_iocon.h"
 
 /*****************************************************************************
  * Private types/enumerations/variables
@@ -27,8 +27,8 @@
  * Local Prototypes
  ****************************************************************************/
 /*****************************************************************************
-* Private functions
-****************************************************************************/
+ * Private functions
+ ****************************************************************************/
 
 /* clang-format off */
 /*
@@ -134,26 +134,27 @@ static void ConfigureDongleLEDs(void)
     /* PORT0 PIN4 (coords: 7) is configured as PIO0_4 */
     IOCON_PinMuxSet(IOCON, 0U, 4U, port0_pin4_config);
 
-    const uint32_t port0_pin10_config = (/* Pin is configured as PIO0_10 */
-                                         IOCON_PIO_FUNC0 |
-                                         /* GPIO mode */
-                                         IOCON_PIO_EGP_GPIO |
-                                         /* IO is an open drain cell */
-                                         IOCON_PIO_ECS_DI |
-                                         /* High speed IO for GPIO mode, IIC not */
-                                         IOCON_PIO_EHS_DI |
-                                         /* Input function is not inverted */
-                                         IOCON_PIO_INV_DI |
-                                         /* Enables digital function */
-                                         IOCON_PIO_DIGITAL_EN |
-                                         /* Input filter disabled */
-                                         IOCON_PIO_INPFILT_OFF |
-                                         /* IIC mode:Noise pulses below approximately 50ns are filtered out. GPIO mode:a 3ns filter */
-                                         IOCON_PIO_FSEL_DI |
-                                         /* Open drain is disabled */
-                                         IOCON_PIO_OPENDRAIN_DI |
-                                         /* IO_CLAMP disabled */
-                                         IOCON_PIO_IO_CLAMP_DI);
+    const uint32_t port0_pin10_config =
+        (/* Pin is configured as PIO0_10 */
+         IOCON_PIO_FUNC0 |
+         /* GPIO mode */
+         IOCON_PIO_EGP_GPIO |
+         /* IO is an open drain cell */
+         IOCON_PIO_ECS_DI |
+         /* High speed IO for GPIO mode, IIC not */
+         IOCON_PIO_EHS_DI |
+         /* Input function is not inverted */
+         IOCON_PIO_INV_DI |
+         /* Enables digital function */
+         IOCON_PIO_DIGITAL_EN |
+         /* Input filter disabled */
+         IOCON_PIO_INPFILT_OFF |
+         /* IIC mode:Noise pulses below approximately 50ns are filtered out. GPIO mode:a 3ns filter */
+         IOCON_PIO_FSEL_DI |
+         /* Open drain is disabled */
+         IOCON_PIO_OPENDRAIN_DI |
+         /* IO_CLAMP disabled */
+         IOCON_PIO_IO_CLAMP_DI);
     /* PORT0 PIN10 (coords: 13) is configured as PIO0_10 */
     IOCON_PinMuxSet(IOCON, 0U, 10U, port0_pin10_config);
 }
@@ -191,7 +192,6 @@ void BOARD_InitPins(void)
 
     GPIO_PortToggle(BOARD_LED_USB_DONGLE_GPIO, BOARD_LED_USB_DONGLE_GPIO_PORT, 1u << BOARD_LED_USB_DONGLE1_GPIO_PIN);
 }
-
 
 void BOARD_LedDongleToggle(void)
 {

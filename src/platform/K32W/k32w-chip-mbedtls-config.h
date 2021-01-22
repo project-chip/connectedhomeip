@@ -149,8 +149,8 @@
 #define MBEDTLS_DES_CRYPT_CBC_ALT
 #define MBEDTLS_DES3_CRYPT_CBC_ALT
 #endif
-#if defined(MBEDTLS_FREESCALE_LTC_AES) || defined(MBEDTLS_FREESCALE_MMCAU_AES) || \
-    defined(MBEDTLS_FREESCALE_LPC_AES) || defined(MBEDTLS_FREESCALE_CAU3_AES)
+#if defined(MBEDTLS_FREESCALE_LTC_AES) || defined(MBEDTLS_FREESCALE_MMCAU_AES) || defined(MBEDTLS_FREESCALE_LPC_AES) ||            \
+    defined(MBEDTLS_FREESCALE_CAU3_AES)
 #define MBEDTLS_AES_SETKEY_ENC_ALT
 #define MBEDTLS_AES_SETKEY_DEC_ALT
 #define MBEDTLS_AES_ENCRYPT_ALT
@@ -235,7 +235,7 @@
 #if USE_RTOS && defined(FSL_RTOS_FREE_RTOS)
 #include "FreeRTOS.h"
 
-extern void *pvPortCallocRtos(size_t num, size_t size); /*Calloc for HEAP3.*/
+extern void * pvPortCallocRtos(size_t num, size_t size); /*Calloc for HEAP3.*/
 
 #define MBEDTLS_PLATFORM_MEMORY
 #define MBEDTLS_PLATFORM_STD_CALLOC pvPortCallocRtos

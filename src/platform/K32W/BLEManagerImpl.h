@@ -31,20 +31,19 @@
 
 #include "fsl_os_abstraction.h"
 
-
-#include "gatt_server_interface.h"
-#include "ble_general.h"
-#include "gatt_db_dynamic.h"
-#include "gap_interface.h"
-#include "controller_interface.h"
+#include "ble_conn_manager.h"
 #include "ble_controller_task_config.h"
+#include "ble_general.h"
 #include "ble_host_task_config.h"
 #include "ble_host_tasks.h"
-#include "ble_conn_manager.h"
+#include "controller_interface.h"
+#include "gap_interface.h"
+#include "gatt_db_dynamic.h"
+#include "gatt_server_interface.h"
 
 #include "FreeRTOS.h"
-#include "timers.h"
 #include "event_groups.h"
+#include "timers.h"
 
 namespace chip {
 namespace DeviceLayer {
@@ -140,47 +139,47 @@ private:
 
     typedef struct hk_ble_kw_msg_s
     {
-        blekw_msg_type_t            type;
-        uint16_t                    length;
+        blekw_msg_type_t type;
+        uint16_t length;
         union
         {
-            uint8_t                 u8;
-            uint16_t                u16;
-            uint32_t                u32;
-            uint8_t                 data[1];
-            char*                   str;
-        }data;
+            uint8_t u8;
+            uint16_t u16;
+            uint32_t u32;
+            uint8_t data[1];
+            char * str;
+        } data;
     } blekw_msg_t;
 
     typedef enum ble_err_t
     {
         BLE_OK = 0,
-		BLE_INTERNAL_GATT_ERROR,
-		BLE_E_SET_ADV_PARAMS,
-		BLE_E_ADV_PARAMS_FAILED,
-		BLE_E_SET_ADV_DATA,
-		BLE_E_ADV_CHANGED,
-		BLE_E_ADV_FAILED,
-		BLE_E_ADV_SETUP_FAILED,
-		BLE_E_START_ADV,
-		BLE_E_STOP,
-		BLE_E_FAIL,
-		BLE_E_START_ADV_FAILED,
+        BLE_INTERNAL_GATT_ERROR,
+        BLE_E_SET_ADV_PARAMS,
+        BLE_E_ADV_PARAMS_FAILED,
+        BLE_E_SET_ADV_DATA,
+        BLE_E_ADV_CHANGED,
+        BLE_E_ADV_FAILED,
+        BLE_E_ADV_SETUP_FAILED,
+        BLE_E_START_ADV,
+        BLE_E_STOP,
+        BLE_E_FAIL,
+        BLE_E_START_ADV_FAILED,
         BLE_INTERNAL_ERROR,
     } ble_err_t;
 
     typedef struct ble_att_written_data_s
     {
-        uint8_t     device_id;
-        uint16_t    handle;
-        uint16_t    length;
-        uint8_t     data[1];
+        uint8_t device_id;
+        uint16_t handle;
+        uint16_t length;
+        uint8_t data[1];
     } blekw_att_written_data_t;
 
     typedef struct hk_ble_att_read_data_s
     {
-        uint8_t     device_id;
-        uint16_t    handle;
+        uint8_t device_id;
+        uint16_t handle;
     } blekw_att_read_data_t;
 
     struct CHIPoBLEConState
@@ -204,11 +203,11 @@ private:
     CHIP_ERROR StartAdvertising(void);
     CHIP_ERROR StopAdvertising(void);
     void HandleSoftDeviceBLEEvent(const ChipDeviceEvent * event);
-    void HandleConnectEvent(blekw_msg_t* msg);
-    void HandleConnectionCloseEvent(blekw_msg_t* msg);
-    void HandleWriteEvent(blekw_msg_t* msg);
-    void HandleRXCharWrite(blekw_msg_t* msg);
-    void HandleTXCharCCCDWrite(blekw_msg_t* msg);
+    void HandleConnectEvent(blekw_msg_t * msg);
+    void HandleConnectionCloseEvent(blekw_msg_t * msg);
+    void HandleWriteEvent(blekw_msg_t * msg);
+    void HandleRXCharWrite(blekw_msg_t * msg);
+    void HandleTXCharCCCDWrite(blekw_msg_t * msg);
     CHIP_ERROR HandleGAPConnect(const ChipDeviceEvent * event);
     CHIP_ERROR HandleGAPDisconnect(const ChipDeviceEvent * event);
     CHIP_ERROR HandleRXCharWrite(const ChipDeviceEvent * event);
@@ -218,11 +217,10 @@ private:
     bool UnsetSubscribed(uint16_t conId);
     bool IsSubscribed(uint16_t conId);
     CHIP_ERROR ConfigureAdvertisingData(void);
-    BLEManagerImpl::ble_err_t blekw_send_event(int8_t connection_handle, uint16_t handle,
-                                               uint8_t* data, uint32_t len);
+    BLEManagerImpl::ble_err_t blekw_send_event(int8_t connection_handle, uint16_t handle, uint8_t * data, uint32_t len);
     bool RemoveConnection(uint8_t connectionHandle);
     void AddConnection(uint8_t connectionHandle);
-    BLEManagerImpl::CHIPoBLEConState *GetConnectionState(uint8_t connectionHandle, bool allocate);
+    BLEManagerImpl::CHIPoBLEConState * GetConnectionState(uint8_t connectionHandle, bool allocate);
 
     static void DriveBLEState(intptr_t arg);
 
@@ -233,18 +231,17 @@ private:
     static CHIP_ERROR blekw_controller_init(void);
     static CHIP_ERROR blekw_host_init(void);
     static void Host_Task(osaTaskParam_t argument);
-    static void blekw_generic_cb(gapGenericEvent_t* pGenericEvent);
-    static void blekw_gatt_server_cb(deviceId_t deviceId, gattServerEvent_t*  pServerEvent);
+    static void blekw_generic_cb(gapGenericEvent_t * pGenericEvent);
+    static void blekw_gatt_server_cb(deviceId_t deviceId, gattServerEvent_t * pServerEvent);
     static CHIP_ERROR blekw_msg_add_u16(blekw_msg_type_t type, uint16_t data);
-    static CHIP_ERROR blekw_msg_add_att_written(blekw_msg_type_t type,
-           uint8_t device_id, uint16_t handle, uint8_t* data, uint16_t length);
-    static CHIP_ERROR blekw_msg_add_att_read(blekw_msg_type_t type,
-           uint8_t device_id, uint16_t handle);
-    static BLEManagerImpl::ble_err_t blekw_start_advertising(gapAdvertisingParameters_t* adv_params,
-           gapAdvertisingData_t* adv, gapScanResponseData_t* scnrsp);
+    static CHIP_ERROR blekw_msg_add_att_written(blekw_msg_type_t type, uint8_t device_id, uint16_t handle, uint8_t * data,
+                                                uint16_t length);
+    static CHIP_ERROR blekw_msg_add_att_read(blekw_msg_type_t type, uint8_t device_id, uint16_t handle);
+    static BLEManagerImpl::ble_err_t blekw_start_advertising(gapAdvertisingParameters_t * adv_params, gapAdvertisingData_t * adv,
+                                                             gapScanResponseData_t * scnrsp);
     static BLEManagerImpl::ble_err_t blekw_stop_advertising(void);
-    static void blekw_gap_advertising_cb(gapAdvertisingEvent_t* pAdvertisingEvent);
-    static void blekw_gap_connection_cb(deviceId_t deviceId, gapConnectionEvent_t* pConnectionEvent);
+    static void blekw_gap_advertising_cb(gapAdvertisingEvent_t * pAdvertisingEvent);
+    static void blekw_gap_connection_cb(deviceId_t deviceId, gapConnectionEvent_t * pConnectionEvent);
     static void blekw_start_connection_timeout(void);
     static void blekw_stop_connection_timeout(void);
 

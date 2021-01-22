@@ -128,9 +128,8 @@ void GenericLog(const char * format, va_list arg)
     prefixLen = strlen(formattedMsg);
 
     // Append the log message.
-    writtenLen = vsnprintf(formattedMsg + prefixLen,
-                           CHIP_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE - prefixLen - EOL_CHARS_LEN,
-                           format, arg);
+    writtenLen =
+        vsnprintf(formattedMsg + prefixLen, CHIP_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE - prefixLen - EOL_CHARS_LEN, format, arg);
     VerifyOrDie(writtenLen > 0);
     memcpy(formattedMsg + prefixLen + writtenLen, EOL_CHARS, EOL_CHARS_LEN);
 
