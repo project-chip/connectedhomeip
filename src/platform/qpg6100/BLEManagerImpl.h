@@ -95,17 +95,19 @@ private:
         kFlag_Advertising            = 0x0008, /**< The system is currently CHIPoBLE advertising. */
         kFlag_AdvertisingRefreshNeeded =
             0x0010, /**< The advertising state/configuration state in the BLE layer needs to be updated. */
+        kFlag_DeviceNameSet = 0x0020,
     };
 
     enum
     {
-        kMaxConnections              = 5,  // TODO - link to qvCHIP define
+        kMaxConnections              = BLE_LAYER_NUM_BLE_ENDPOINTS,
         kMaxDeviceNameLength         = 20, // TODO: right-size this
-        kMaxAdvertisementDataSetSize = 31  // TODO: verify this
+        kMaxAdvertisementDataSetSize = 31
     };
 
     CHIPoBLEServiceMode mServiceMode;
     uint16_t mFlags;
+    char mDeviceName[kMaxDeviceNameLength + 1];
     uint16_t mNumGAPCons;
     uint16_t mSubscribedConIds[kMaxConnections];
     uint8_t mAdvDataBuf[kMaxAdvertisementDataSetSize];
@@ -113,7 +115,7 @@ private:
     qvCHIP_Ble_Callbacks_t appCbacks;
 
     void DriveBLEState(void);
-    CHIP_ERROR ConfigureAdvertising(void);
+    CHIP_ERROR ConfigureAdvertisingData(void);
     CHIP_ERROR StartAdvertising(void);
     CHIP_ERROR StopAdvertising(void);
     CHIP_ERROR SetSubscribed(uint16_t conId);
@@ -122,16 +124,18 @@ private:
 
     void HandleDmMsg(qvCHIP_Ble_DmEvt_t * pDmEvt);
     void HandleAttMsg(qvCHIP_Ble_AttEvt_t * pAttEvt);
-    void HandleTXComplete(const ChipDeviceEvent * event);
 
     /* Callbacks from BLE stack*/
     static void ExternalCbHandler(qvCHIP_Ble_MsgHdr_t * pMsg);
     static void HandleTXCharRead(uint16_t connId, uint16_t handle, uint8_t operation, uint16_t offset, qvCHIP_Ble_Attr_t * pAttr);
     static void HandleRXCharWrite(uint16_t connId, uint16_t handle, uint8_t operation, uint16_t offset, uint16_t len,
                                   uint8_t * pValue, qvCHIP_Ble_Attr_t * pAttr);
-    static void HandleTXCharCCCDWrite(qvCHIP_Ble_AttsCccEvt_t * event);
+    void HandleTXCharCCCDWrite(qvCHIP_Ble_AttsCccEvt_t * event);
 
     static void DriveBLEState(intptr_t arg);
+
+    /* Handlers for stack events */
+    static void _handleTXCharCCCDWrite(qvCHIP_Ble_AttsCccEvt_t * event);
 };
 
 /**

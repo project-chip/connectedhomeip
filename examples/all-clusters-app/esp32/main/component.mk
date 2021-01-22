@@ -23,8 +23,8 @@ COMPONENT_DEPENDS := chip QRCode tft spidriver
 
 COMPONENT_SRCDIRS :=                                                                \
   .                                                                                 \
-  ../third_party/connectedhomeip/examples/common/chip-app-server                    \
   ../third_party/connectedhomeip/examples/all-clusters-app/all-clusters-common/gen  \
+  ../third_party/connectedhomeip/src/app/server                                     \
   ../third_party/connectedhomeip/src/app/util                                       \
   ../third_party/connectedhomeip/src/app/clusters/on-off-server                     \
   ../third_party/connectedhomeip/src/app/clusters/level-control                     \
@@ -38,6 +38,7 @@ COMPONENT_SRCDIRS :=                                                            
   ../third_party/connectedhomeip/src/app/clusters/temperature-measurement-server    \
   ../third_party/connectedhomeip/src/app/clusters/scenes                            \
   ../third_party/connectedhomeip/src/app/clusters/basic                             \
+  ../third_party/connectedhomeip/src/app/clusters/bindings                          \
   ../third_party/connectedhomeip/src/app/reporting                                  \
   ../third_party/connectedhomeip/src/app/clusters/door-lock-client                  \
   ../third_party/connectedhomeip/src/app/clusters/door-lock-server                  \
@@ -46,7 +47,7 @@ COMPONENT_SRCDIRS :=                                                            
 
 
 COMPONENT_EXTRA_INCLUDES := $(PROJECT_PATH)/third_party/connectedhomeip/src/app/util                                   \
-                            $(PROJECT_PATH)/third_party/connectedhomeip/examples/common/chip-app-server/include        \
+                            $(PROJECT_PATH)/third_party/connectedhomeip/src/app/server                                 \
                             $(PROJECT_PATH)/third_party/connectedhomeip/examples/all-clusters-app/all-clusters-common  \
                             $(PROJECT_PATH)/third_party/connectedhomeip/src
 

@@ -30,6 +30,8 @@
 #endif
 
 #include "attribute-storage.h"
+#include "gen/attribute-id.h"
+#include "gen/attribute-type.h"
 #include "gen/cluster-id.h"
 
 #include <platform/CHIPDeviceLayer.h>
@@ -113,13 +115,6 @@ int AppTask::Init()
     }
 
     PlatformMgr().AddEventHandler(AppTask::ThreadProvisioningHandler, 0);
-
-    ret = StartNFCTag();
-    if (ret)
-    {
-        LOG_ERR("Starting NFC Tag failed");
-        return ret;
-    }
 #endif
 
     return 0;
@@ -385,6 +380,22 @@ void AppTask::StartBLEAdvertisementHandler(AppEvent * aEvent)
     if (aEvent->ButtonEvent.PinNo != BLE_ADVERTISEMENT_START_BUTTON)
         return;
 
+    if (!sNFC.IsTagEmulationStarted())
+    {
+        if (!(GetAppTask().StartNFCTag() < 0))
+        {
+            LOG_INF("Started NFC Tag emulation");
+        }
+        else
+        {
+            LOG_ERR("Starting NFC Tag failed");
+        }
+    }
+    else
+    {
+        LOG_INF("NFC Tag emulation is already started");
+    }
+
     if (!ConnectivityMgr().IsBLEAdvertisingEnabled())
     {
         ConnectivityMgr().SetBLEAdvertisingEnabled(true);
@@ -434,7 +445,7 @@ int AppTask::StartNFCTag()
     VerifyOrExit(!result, ChipLogError(AppServer, "Getting QR code payload failed"));
 
     result = sNFC.StartTagEmulation(QRCode.c_str(), QRCode.size());
-    VerifyOrExit(!result, ChipLogError(AppServer, "Starting NFC Tag emulation failed"));
+    VerifyOrExit(result >= 0, ChipLogError(AppServer, "Starting NFC Tag emulation failed"));
 
 exit:
     return result;

@@ -16,7 +16,7 @@ import("//build_overrides/chip.gni")
 
 declare_args() {
   # Set up what advertiser to use for mDNS advertisement
-  chip_mdns_avertiser = "minimal"
+  chip_mdns_advertiser = "minimal"
 }
 
 source_set("platform_header") {
@@ -28,20 +28,21 @@ static_library("mdns") {
     ":platform_header",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
-    "${chip_root}/src/platform",
   ]
 
-  sources = [
-    "Advertiser.h",
-    "DiscoveryManager.cpp",
-    "DiscoveryManager.h",
-  ]
+  sources = [ "Advertiser.h" ]
 
-  if (chip_mdns_avertiser == "none") {
+  if (chip_mdns_advertiser == "none") {
     sources += [ "Advertiser_ImplNone.cpp" ]
-  } else if (chip_mdns_avertiser == "minimal") {
+  } else if (chip_mdns_advertiser == "minimal") {
     sources += [ "Advertiser_ImplMinimalMdns.cpp" ]
     public_deps += [ "${chip_root}/src/lib/mdns/minimal" ]
+  } else if (chip_mdns_advertiser == "platform") {
+    sources += [
+      "Discovery_ImplPlatform.cpp",
+      "Discovery_ImplPlatform.h",
+    ]
+    public_deps += [ "${chip_root}/src/platform" ]
   } else {
     assert(false, "Unknown mDNS advertiser implementation.")
   }

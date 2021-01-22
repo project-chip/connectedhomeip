@@ -1,0 +1,115 @@
+{{> header}}
+
+// Prevent multiple inclusion
+#pragma once
+
+{{#endpoint_config}}
+
+
+// Default values for the attributes longer than a pointer,
+// in a form of a binary blob
+// Separate block is generated for big-endian and little-endian cases.
+#if BIGENDIAN_CPU
+#define GENERATED_DEFAULTS {{endpoint_attribute_long_defaults endian="big"}}
+
+#else // !BIGENDIAN_CPU
+#define GENERATED_DEFAULTS {{endpoint_attribute_long_defaults endian="little"}}
+#endif // BIGENDIAN_CPU
+
+#define GENERATED_DEFAULTS_COUNT ({{endpoint_attribute_long_defaults_count}})
+
+#define ZAP_TYPE(type) ZCL_ ## type ## _ATTRIBUTE_TYPE
+#define ZAP_LONG_DEFAULTS_INDEX(index) {(uint8_t*)(&generatedDefaults[index])}
+#define ZAP_MIN_MAX_DEFAULTS_INDEX(index) {(uint8_t*)(&minMaxDefault[index])}
+
+// This is an array of EmberAfAttributeMinMaxValue structures.
+#define GENERATED_MIN_MAX_DEFAULT_COUNT {{endpoint_attribute_min_max_count}}
+#define GENERATED_MIN_MAX_DEFAULTS {{endpoint_attribute_min_max_list}}
+
+#define ZAP_ATTRIBUTE_MASK(mask) ATTRIBUTE_MASK_ ## mask
+// This is an array of EmberAfAttributeMetadata structures.
+#define GENERATED_ATTRIBUTE_COUNT {{endpoint_attribute_count}}
+#define GENERATED_ATTRIBUTES {{ endpoint_attribute_list }}
+
+// This is an array of EmberAfCluster structures.
+#define ZAP_ATTRIBUTE_INDEX(index) ((EmberAfAttributeMetadata *)(&generatedAttributes[index]))
+
+// Cluster function static arrays
+#define GENERATED_FUNCTION_ARRAYS   {{chip_endpoint_generated_functions}}
+
+#define ZAP_CLUSTER_MASK(mask) CLUSTER_MASK_ ## mask
+#define GENERATED_CLUSTER_COUNT {{endpoint_cluster_count}}
+#define GENERATED_CLUSTERS {{chip_endpoint_cluster_list}}
+
+#define ZAP_CLUSTER_INDEX(index) ((EmberAfCluster*)(&generatedClusters[index]))
+
+
+// This is an array of EmberAfEndpointType structures.
+#define GENERATED_ENDPOINT_TYPES {{endpoint_types_list}}
+
+
+// Largest attribute size is needed for various buffers
+#define ATTRIBUTE_LARGEST ({{endpoint_largest_attribute_size}})
+
+// Total size of singleton attributes
+#define ATTRIBUTE_SINGLETONS_SIZE ({{endpoint_singletons_size}})
+
+// Total size of attribute storage
+#define ATTRIBUTE_MAX_SIZE ({{endpoint_total_storage_size}})
+
+// Number of fixed endpoints
+#define FIXED_ENDPOINT_COUNT ({{endpoint_count}})
+
+// Array of endpoints that are supported, the data inside
+// the array is the endpoint number.
+#define FIXED_ENDPOINT_ARRAY {{endpoint_fixed_endpoint_array}}
+
+// Array of profile ids
+#define FIXED_PROFILE_IDS {{endpoint_fixed_profile_id_array}}
+
+// Array of device ids
+#define FIXED_DEVICE_IDS {{endpoint_fixed_device_id_array}}
+
+// Array of device versions
+#define FIXED_DEVICE_VERSIONS {{endpoint_fixed_device_version_array}}
+
+// Array of endpoint types supported on each endpoint
+#define FIXED_ENDPOINT_TYPES {{endpoint_fixed_endpoint_type_array}}
+
+// Array of networks supported on each endpoint
+#define FIXED_NETWORKS {{endpoint_fixed_network_array}}
+
+
+// Array of EmberAfCommandMetadata structs.
+#define ZAP_COMMAND_MASK(mask) COMMAND_MASK_ ## mask
+#define EMBER_AF_GENERATED_COMMAND_COUNT ({{endpoint_command_count}})
+#define GENERATED_COMMANDS {{endpoint_command_list}}
+
+// Array of EmberAfManufacturerCodeEntry structures for commands.
+#define GENERATED_COMMAND_MANUFACTURER_CODE_COUNT ({{endpoint_command_manufacturer_code_count}})
+#define GENERATED_COMMAND_MANUFACTURER_CODES {{endpoint_command_manufacturer_codes}}
+
+// This is an array of EmberAfManufacturerCodeEntry structures for clusters.
+#define GENERATED_CLUSTER_MANUFACTURER_CODE_COUNT ({{endpoint_cluster_manufacturer_code_count}})
+#define GENERATED_CLUSTER_MANUFACTURER_CODES {{endpoint_cluster_manufacturer_codes}}
+
+// This is an array of EmberAfManufacturerCodeEntry structures for attributes.
+#define GENERATED_ATTRIBUTE_MANUFACTURER_CODE_COUNT ({{endpoint_attribute_manufacturer_code_count}})
+#define GENERATED_ATTRIBUTE_MANUFACTURER_CODES {{endpoint_attribute_manufacturer_codes}}
+
+// Array of EmberAfPluginReportingEntry structures.
+#define ZRD(x) EMBER_ZCL_REPORTING_DIRECTION_ ## x
+#define ZAP_REPORT_DIRECTION(x) ZRD(x)
+
+{{#if (endpoint_reporting_config_default_count)}}
+// Use this macro to check if Reporting plugin is included
+#define EMBER_AF_PLUGIN_REPORTING
+// User options for plugin Reporting
+#define EMBER_AF_PLUGIN_REPORTING_TABLE_SIZE ({{endpoint_reporting_config_default_count}})
+#define EMBER_AF_PLUGIN_REPORTING_ENABLE_GROUP_BOUND_REPORTS
+{{/if}}
+
+#define EMBER_AF_GENERATED_REPORTING_CONFIG_DEFAULTS_TABLE_SIZE ({{endpoint_reporting_config_default_count}})
+#define EMBER_AF_GENERATED_REPORTING_CONFIG_DEFAULTS {{endpoint_reporting_config_defaults}}
+
+{{/endpoint_config}}

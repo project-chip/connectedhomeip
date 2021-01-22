@@ -1,4 +1,3 @@
-
 /*
  *
  *    Copyright (c) 2020 Project CHIP Authors
@@ -21,6 +20,7 @@
 #include "af-structs.h"
 #include "call-command-handler.h"
 #include "callback.h"
+#include "cluster-id.h"
 #include "command-id.h"
 #include "util.h"
 

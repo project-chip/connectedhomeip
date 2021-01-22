@@ -1,0 +1,40 @@
+{{> header}}
+
+#ifndef CHIP_CLUSTERS_H
+#define CHIP_CLUSTERS_H
+
+#import <CHIP/CHIPDeviceCallback.h>
+#import <Foundation/Foundation.h>
+
+@class CHIPDevice;
+
+{{#chip_server_clusters}}
+
+NS_ASSUME_NONNULL_BEGIN
+
+@interface CHIP{{asCamelCased name false}} : NSObject
+
+- (nullable instancetype)initWithDevice:(CHIPDevice *)device endpoint:(uint8_t)endpoint queue:(dispatch_queue_t)queue;
+{{#chip_server_cluster_commands}}
+- (BOOL){{asCamelCased name}}:(CHIPDeviceCallback)onCompletion{{#chip_server_cluster_command_arguments}} {{asCamelCased label}}:({{asBasicType chipType}}){{asCamelCased label}}{{/chip_server_cluster_command_arguments}};
+{{/chip_server_cluster_commands}}
+
+{{#chip_server_cluster_attributes}}
+- (BOOL)readAttribute{{asCamelCased name false}}:(CHIPDeviceCallback)onCompletion;
+{{#if (isWritableAttribute)}}
+- (BOOL)writeAttribute{{asCamelCased name false}}:(CHIPDeviceCallback)onCompletion value:({{asUnderlyingZclType type}})value;
+{{/if}}
+{{#if (isReportableAttribute)}}
+- (BOOL) reportAttribute{{asCamelCased name false}}:(CHIPDeviceCallback)onCompletion onChange:(CHIPDeviceCallback)onChange minInterval:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval{{#unless (isDiscreteType)}} change:({{chipType}})change{{/unless}};
+{{/if}}
+{{/chip_server_cluster_attributes}}
+
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
+@end
+
+NS_ASSUME_NONNULL_END
+{{/chip_server_clusters}}
+
+#endif /* CHIP_CLUSTERS_H */

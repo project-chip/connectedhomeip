@@ -1,4 +1,3 @@
-
 /*
  *
  *    Copyright (c) 2020 Project CHIP Authors
@@ -683,6 +682,10 @@
 #define ZCL_GET_GROUP_IDENTIFIERS_RESPONSE_COMMAND_ID (0x41)
 #define ZCL_GET_ENDPOINT_LIST_REQUEST_COMMAND_ID (0x42)
 #define ZCL_GET_ENDPOINT_LIST_RESPONSE_COMMAND_ID (0x42)
+
+// Commands for cluster: Binding
+#define ZCL_BIND_COMMAND_ID (0x00)
+#define ZCL_UNBIND_COMMAND_ID (0x01)
 
 // Commands for cluster: Sample Mfg Specific Cluster
 #define ZCL_COMMAND_ONE_COMMAND_ID (0x00)

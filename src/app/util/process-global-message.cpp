@@ -48,14 +48,11 @@
 #include <app/reporting/reporting.h>
 #endif // EMBER_AF_PLUGIN_REPORTING
 
-//#include "../plugin/key-establishment/key-establishment.h"
-//#include "../plugin/smart-energy-registration/smart-energy-registration.h"
-//#include "../plugin/trust-center-keepalive/trust-center-keepalive.h"
-//#include "../plugin/test-harness/test-harness.h"
-//#ifdef EMBER_AF_PLUGIN_WWAH_SERVER_SILABS
-//  #include "../plugin/wwah-server-silabs/wwah-server-silabs.h"
-//#endif
-//#include "../plugin/simple-metering-server/simple-metering-server.h"
+#include "gen/attribute-id.h"
+#include "gen/attribute-type.h"
+#include "gen/callback.h"
+#include "gen/cluster-id.h"
+#include "gen/command-id.h"
 
 #ifdef EMBER_AF_PLUGIN_COMMS_HUB_FUNCTION_SUB_GHZ
 #include "app/framework/plugin/comms-hub-function-sub-ghz/comms-hub-function-sub-ghz.h"

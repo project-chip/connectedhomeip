@@ -31,6 +31,8 @@
 struct LinuxDeviceOptions
 {
     uint32_t mBleDevice = 0;
+    bool mWiFi          = false;
+    bool mThread        = false;
 
     static LinuxDeviceOptions & GetInstance();
 };

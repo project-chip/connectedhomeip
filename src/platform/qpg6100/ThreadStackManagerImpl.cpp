@@ -18,7 +18,7 @@
 /**
  *    @file
  *          Provides an implementation of the ThreadStackManager object for the
- *          QPG6100 platform using the Nordic QPG6100 library and the OpenThread
+ *          QPG6100 platform using the Qorvo QPG6100 library and the OpenThread
  *          stack.
  *
  */

@@ -43,11 +43,12 @@ enum
     kEchoMessageType_EchoResponse = 2
 };
 
-typedef void (*EchoFunct)(NodeId nodeId, System::PacketBufferHandle payload);
+using EchoFunct = void (*)(Messaging::ExchangeContext * ec, System::PacketBufferHandle payload);
 
 class DLL_EXPORT EchoClient : public Messaging::ExchangeDelegate
 {
 public:
+    // TODO: Init function will take a Channel instead a SecureSessionHandle, when Channel API is ready
     /**
      *  Initialize the EchoClient object. Within the lifetime
      *  of this instance, this method is invoked once after object
@@ -55,13 +56,14 @@ public:
      *  instance.
      *
      *  @param[in]    exchangeMgr    A pointer to the ExchangeManager object.
+     *  @param[in]    sessoin        A handle to the session.
      *
      *  @retval #CHIP_ERROR_INCORRECT_STATE If the state is not equal to
      *          kState_NotInitialized.
      *  @retval #CHIP_NO_ERROR On success.
      *
      */
-    CHIP_ERROR Init(Messaging::ExchangeManager * exchangeMgr);
+    CHIP_ERROR Init(Messaging::ExchangeManager * exchangeMgr, SecureSessionHandle session);
 
     /**
      *  Shutdown the EchoClient. This terminates this instance
@@ -88,14 +90,14 @@ public:
      *         Other CHIP_ERROR codes as returned by the lower layers.
      *
      */
-    CHIP_ERROR SendEchoRequest(NodeId nodeId, System::PacketBufferHandle payload);
+    CHIP_ERROR SendEchoRequest(System::PacketBufferHandle && payload);
 
 private:
     Messaging::ExchangeManager * mExchangeMgr = nullptr;
     Messaging::ExchangeContext * mExchangeCtx = nullptr;
     EchoFunct OnEchoResponseReceived          = nullptr;
+    SecureSessionHandle mSecureSession;
 
-    CHIP_ERROR SendEchoRequest(System::PacketBufferHandle payload);
     void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, uint32_t protocolId, uint8_t msgType,
                            System::PacketBufferHandle payload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;

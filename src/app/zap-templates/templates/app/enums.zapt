@@ -1,0 +1,23 @@
+{{> header}}
+
+// Prevent multiple inclusion
+#pragma once
+
+// ZCL enums
+
+{{#zcl_enums}}
+
+// Enum for {{label}}
+typedef enum {
+{{#zcl_enum_items}}
+{{ident}}EMBER_ZCL_{{asDelimitedMacro parent.label}}_{{asDelimitedMacro label}} = {{value}},
+{{/zcl_enum_items}}
+} EmberAf{{asType label}};
+{{/zcl_enums}}
+
+{{#zcl_bitmaps}}
+{{#zcl_bitmap_items}}
+#define EMBER_AF_{{asDelimitedMacro parent.label}}_{{asDelimitedMacro label}} ({{mask}})
+#define EMBER_AF_{{asDelimitedMacro parent.label}}_{{asDelimitedMacro label}}_OFFSET ({{asOffset mask}})
+{{/zcl_bitmap_items}}
+{{/zcl_bitmaps}}

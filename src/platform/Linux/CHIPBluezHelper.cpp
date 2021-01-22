@@ -48,9 +48,11 @@
  *          Provides Bluez dbus implementatioon for BLE
  */
 
+#include <AdditionalDataPayload.h>
 #include <ble/BleUUID.h>
 #include <ble/CHIPBleServiceData.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <protocols/Protocols.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #include <errno.h>
@@ -61,19 +63,89 @@
 #include <unistd.h>
 #include <utility>
 
+#include "BLEManagerImpl.h"
 #include "CHIPBluezHelper.h"
 #include <support/CodeUtils.h>
+#include <support/ReturnMacros.h>
+#include <system/TLVPacketBufferBackingStore.h>
 
 using namespace ::nl;
+using namespace chip::SetupPayload;
+using namespace chip::Protocols;
 
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-static int sBluezFD[2];
-static GMainLoop * sBluezMainLoop = nullptr;
-static pthread_t sBluezThread;
 static BluezConnection * GetBluezConnectionViaDevice(BluezEndpoint * apEndpoint);
+
+namespace {
+int sBluezFD[2];
+GMainLoop * sBluezMainLoop = nullptr;
+pthread_t sBluezThread;
+
+/**    @class BluezObjectIterator
+ *
+ *     @brief Helper class to iterate over a list of Bluez objects
+ */
+class BluezObjectIterator
+{
+public:
+    using iterator_category = std::forward_iterator_tag;
+    using difference_type   = std::ptrdiff_t;
+    using value_type        = BluezObject;
+    using pointer           = BluezObject *;
+    using reference         = BluezObject &;
+
+    BluezObjectIterator() = default;
+    explicit BluezObjectIterator(GList * position) : mPosition(position) {}
+
+    reference operator*() const { return *BLUEZ_OBJECT(mPosition->data); }
+    pointer operator->() const { return BLUEZ_OBJECT(mPosition->data); }
+    bool operator==(const BluezObjectIterator & other) const { return mPosition == other.mPosition; }
+    bool operator!=(const BluezObjectIterator & other) const { return mPosition != other.mPosition; }
+
+    BluezObjectIterator & operator++()
+    {
+        mPosition = mPosition->next;
+        return *this;
+    }
+
+    BluezObjectIterator operator++(int)
+    {
+        const auto currentPosition = mPosition;
+        mPosition                  = mPosition->next;
+        return BluezObjectIterator(currentPosition);
+    }
+
+private:
+    GList * mPosition = nullptr;
+};
+
+/**    @class BluezObjectList
+ *
+ *     @brief C++ wrapper for a Bluez object list
+ */
+class BluezObjectList
+{
+public:
+    explicit BluezObjectList(BluezEndpoint * apEndpoint)
+    {
+        VerifyOrReturn(apEndpoint != nullptr, ChipLogError(DeviceLayer, "apEndpoint is NULL in %s", __func__));
+        VerifyOrReturn(apEndpoint->mpObjMgr != nullptr, ChipLogError(DeviceLayer, "mpObjMgr is NULL in %s", __func__));
+        mObjectList = g_dbus_object_manager_get_objects(apEndpoint->mpObjMgr);
+    }
+
+    ~BluezObjectList() { g_list_free_full(mObjectList, g_object_unref); }
+
+    BluezObjectIterator begin() const { return BluezObjectIterator(mObjectList); }
+    BluezObjectIterator end() const { return BluezObjectIterator(); }
+
+private:
+    GList * mObjectList = nullptr;
+};
+
+} // namespace
 
 static gboolean BluezAdvertisingRelease(BluezLEAdvertisement1 * aAdv, GDBusMethodInvocation * aInvocation, gpointer apClosure)
 {
@@ -695,6 +767,11 @@ static void BluezConnectionInit(BluezConnection * apConn)
                 {
                     apConn->mpC2 = char1;
                 }
+                else if ((BluezIsCharOnService(char1, apConn->mpService) == TRUE) &&
+                         (strcmp(bluez_gatt_characteristic1_get_uuid(char1), CHIP_PLAT_BLE_UUID_C3_STRING) == 0))
+                {
+                    apConn->mpC3 = char1;
+                }
                 else
                 {
                     g_object_unref(char1);
@@ -713,17 +790,6 @@ static void BluezConnectionInit(BluezConnection * apConn)
 exit:
     if (objects != nullptr)
         g_list_free_full(objects, g_object_unref);
-}
-
-static gboolean BluezConnectionInitIdle(gpointer user_data)
-{
-    BluezConnection * conn = static_cast<BluezConnection *>(user_data);
-
-    ChipLogDetail(DeviceLayer, "%s", __func__);
-
-    BluezConnectionInit(conn);
-
-    return FALSE;
 }
 
 static void BluezOTConnectionDestroy(BluezConnection * aConn)
@@ -821,157 +887,100 @@ exit:
     return G_SOURCE_REMOVE;
 }
 
-/***********************************************************************
- * GATT Characteristic object
- ***********************************************************************/
+/// Retrieve CHIP device identification info from the device advertising data
+static bool BluezGetChipDeviceInfo(BluezDevice1 & aDevice, chip::Ble::ChipBLEDeviceIdentificationInfo & aDeviceInfo)
+{
+    GVariant * serviceData = bluez_device1_get_service_data(&aDevice);
+    VerifyOrReturnError(serviceData != nullptr, false);
 
-static void BluezHandleAdvertisementFromDevice(BluezDevice1 * aDevice, BluezEndpoint * endpoint)
+    GVariant * dataValue = g_variant_lookup_value(serviceData, CHIP_BLE_UUID_SERVICE_STRING, nullptr);
+    VerifyOrReturnError(dataValue != nullptr, false);
+
+    size_t dataLen         = 0;
+    const void * dataBytes = g_variant_get_fixed_array(dataValue, &dataLen, sizeof(uint8_t));
+    VerifyOrReturnError(dataBytes != nullptr && dataLen >= sizeof(aDeviceInfo), false);
+
+    memcpy(&aDeviceInfo, dataBytes, sizeof(aDeviceInfo));
+    return true;
+}
+
+/// Handle advertisement from a device and connect to it if its discriminator is the requested one.
+static void BluezHandleAdvertisementFromDevice(BluezDevice1 * aDevice, BluezEndpoint * aEndpoint)
 {
     const char * address   = bluez_device1_get_address(aDevice);
-    const char * flags     = bluez_device1_get_advertising_flags(aDevice);
     GVariant * serviceData = bluez_device1_get_service_data(aDevice);
-
-    GVariantIter serviceIterator;
-    GVariant * serviceEntry;
-    chip::Ble::ChipBleUUID uuid;
+    char * debugStr        = nullptr;
     chip::Ble::ChipBLEDeviceIdentificationInfo deviceInfo;
-    char * debugStr = nullptr;
-    size_t dataLen;
 
-    // service data is optional and may not be present
     VerifyOrExit(serviceData != nullptr, );
 
-    ChipLogDetail(DeviceLayer, "TRACE: Device %s Advertising flags: %s", address, flags);
     debugStr = g_variant_print(serviceData, TRUE);
     ChipLogDetail(DeviceLayer, "TRACE: Device %s Service data: %s", address, debugStr);
 
-    g_variant_iter_init(&serviceIterator, serviceData);
+    VerifyOrExit(BluezGetChipDeviceInfo(*aDevice, deviceInfo), );
+    ChipLogDetail(DeviceLayer, "TRACE: Found CHIP BLE Device: %" PRIu16, deviceInfo.GetDeviceDiscriminator());
 
-    while ((serviceEntry = g_variant_iter_next_value(&serviceIterator)) != nullptr)
-    {
-        GVariant * key     = g_variant_get_child_value(serviceEntry, 0);
-        GVariant * val     = g_variant_get_child_value(serviceEntry, 1);
-        const auto uuidStr = g_variant_get_string(key, &dataLen);
-        const void * rawData;
-
-        VerifyOrExit(chip::Ble::StringToUUID(uuidStr, uuid), ChipLogError(DeviceLayer, "TRACE: Invalid BLE UUID format"));
-
-        if (!UUIDsMatch(&uuid, &Ble::CHIP_BLE_SVC_ID))
-            continue;
-
-        rawData = g_variant_get_fixed_array(g_variant_get_variant(val), &dataLen, sizeof(uint8_t));
-        VerifyOrExit(dataLen == sizeof(deviceInfo), ChipLogError(DeviceLayer, "TRACE: Invalid BLE Device info"));
-
-        memcpy(&deviceInfo, rawData, dataLen);
-        ChipLogDetail(DeviceLayer, "TRACE: Found CHIP BLE Device: %" PRIu16, deviceInfo.GetDeviceDiscriminator());
-
-        if (endpoint->mDiscoveryRequest.mDiscriminator == deviceInfo.GetDeviceDiscriminator() &&
-            endpoint->mDiscoveryRequest.mAutoConnect)
-            ConnectDevice(aDevice);
-    }
-
+    if (aEndpoint->mDiscoveryRequest.mDiscriminator == deviceInfo.GetDeviceDiscriminator())
+        ConnectDevice(aDevice);
 exit:
     g_free(debugStr);
+}
+
+/// Update the table of open BLE connections whevener a new device is spotted or its attributes have changed.
+static void UpdateConnectionTable(BluezDevice1 * apDevice, BluezEndpoint & aEndpoint)
+{
+    const gchar * objectPath     = g_dbus_proxy_get_object_path(G_DBUS_PROXY(apDevice));
+    BluezConnection * connection = static_cast<BluezConnection *>(g_hash_table_lookup(aEndpoint.mpConnMap, objectPath));
+
+    if (connection != nullptr && !bluez_device1_get_connected(apDevice))
+    {
+        ChipLogDetail(DeviceLayer, "Bluez disconnected");
+        BLEManagerImpl::CHIPoBluez_ConnectionClosed(connection);
+        // TODO: the connection object should be released after BLEManagerImpl finishes cleaning up its resources
+        // after the disconnection. Releasing it here doesn't cause any issues, but it's error-prone.
+        BluezOTConnectionDestroy(connection);
+        g_hash_table_remove(aEndpoint.mpConnMap, objectPath);
+        return;
+    }
+
+    if (connection == nullptr && !bluez_device1_get_connected(apDevice) && aEndpoint.mIsCentral)
+    {
+        // Check if the new device is the one that the central is trying to connect to.
+        BluezHandleAdvertisementFromDevice(apDevice, &aEndpoint);
+        return;
+    }
+
+    if (connection == nullptr && bluez_device1_get_connected(apDevice) &&
+        (!aEndpoint.mIsCentral || bluez_device1_get_services_resolved(apDevice)))
+    {
+        connection                = g_new0(BluezConnection, 1);
+        connection->mpPeerAddress = g_strdup(bluez_device1_get_address(apDevice));
+        connection->mpDevice      = static_cast<BluezDevice1 *>(g_object_ref(apDevice));
+        connection->mpEndpoint    = &aEndpoint;
+        BluezConnectionInit(connection);
+        aEndpoint.mpPeerDevicePath = g_strdup(objectPath);
+        g_hash_table_insert(aEndpoint.mpConnMap, aEndpoint.mpPeerDevicePath, connection);
+
+        ChipLogDetail(DeviceLayer, "New BLE connection %p, device %s, path %s", connection, connection->mpPeerAddress,
+                      aEndpoint.mpPeerDevicePath);
+
+        BLEManagerImpl::HandleNewConnection(connection);
+    }
 }
 
 static void BluezSignalInterfacePropertiesChanged(GDBusObjectManagerClient * aManager, GDBusObjectProxy * aObject,
                                                   GDBusProxy * aInterface, GVariant * aChangedProperties,
                                                   const gchar * const * aInvalidatedProps, gpointer apClosure)
 {
-
     BluezEndpoint * endpoint = static_cast<BluezEndpoint *>(apClosure);
-    VerifyOrExit(endpoint != nullptr, ChipLogError(DeviceLayer, "endpoint is NULL in %s", __func__));
-    VerifyOrExit(endpoint->mpAdapter != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL endpoint->mpAdapter in %s", __func__));
+    VerifyOrReturn(endpoint != nullptr, ChipLogError(DeviceLayer, "endpoint is NULL in %s", __func__));
+    VerifyOrReturn(endpoint->mpAdapter != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL endpoint->mpAdapter in %s", __func__));
+    VerifyOrReturn(strcmp(g_dbus_proxy_get_interface_name(aInterface), DEVICE_INTERFACE) == 0, );
 
-    if (strcmp(g_dbus_proxy_get_interface_name(aInterface), DEVICE_INTERFACE) == 0)
-    {
-        BluezDevice1 * device = BLUEZ_DEVICE1(aInterface);
-        GVariantIter iter;
-        GVariant * value;
-        char * key;
+    BluezDevice1 * device = BLUEZ_DEVICE1(aInterface);
+    VerifyOrReturn(BluezIsDeviceOnAdapter(device, endpoint->mpAdapter));
 
-        if (BluezIsDeviceOnAdapter(device, endpoint->mpAdapter))
-        {
-            BluezConnection * conn =
-                static_cast<BluezConnection *>(g_hash_table_lookup(endpoint->mpConnMap, g_dbus_proxy_get_object_path(aInterface)));
-            g_variant_iter_init(&iter, aChangedProperties);
-            while (g_variant_iter_next(&iter, "{&sv}", &key, &value))
-            {
-                if (strcmp(key, "Connected") == 0)
-                {
-                    gboolean connected;
-                    connected = g_variant_get_boolean(value);
-
-                    if (connected)
-                    {
-                        ChipLogDetail(DeviceLayer, "Bluez coonnected");
-                        // for a central, the connection has been already allocated.  For a peripheral, it has not.
-                        // todo do we need this ? we could handle all connection the same wa...
-                        if (endpoint->mIsCentral)
-                            SuccessOrExit(conn != nullptr);
-
-                        if (!endpoint->mIsCentral)
-                        {
-                            VerifyOrExit(conn == nullptr,
-                                         ChipLogError(DeviceLayer, "FAIL: connection already tracked: conn: %x device: %s", conn,
-                                                      g_dbus_proxy_get_object_path(aInterface)));
-                            conn                = g_new0(BluezConnection, 1);
-                            conn->mpPeerAddress = g_strdup(bluez_device1_get_address(device));
-                            conn->mpDevice      = static_cast<BluezDevice1 *>(g_object_ref(device));
-                            conn->mpEndpoint    = endpoint;
-                            BluezConnectionInit(conn);
-                            endpoint->mpPeerDevicePath = g_strdup(g_dbus_proxy_get_object_path(aInterface));
-                            ChipLogDetail(DeviceLayer, "Device %s (Path: %s) Connected", conn->mpPeerAddress,
-                                          endpoint->mpPeerDevicePath);
-                            g_hash_table_insert(endpoint->mpConnMap, endpoint->mpPeerDevicePath, conn);
-                        }
-                        // for central, we do not call BluezConnectionInit until the services have been resolved
-
-                        BLEManagerImpl::CHIPoBluez_NewConnection(conn);
-                    }
-                    else
-                    {
-                        ChipLogDetail(DeviceLayer, "Bluez disconnected");
-                        BLEManagerImpl::CHIPoBluez_ConnectionClosed(conn);
-                        BluezOTConnectionDestroy(conn);
-                        g_hash_table_remove(endpoint->mpConnMap, g_dbus_proxy_get_object_path(aInterface));
-                    }
-                }
-                else if (strcmp(key, "ServicesResolved") == 0)
-                {
-                    gboolean resolved;
-                    resolved = g_variant_get_boolean(value);
-
-                    if (endpoint->mIsCentral && conn != nullptr && resolved == TRUE)
-                    {
-                        /* delay to idle, this is to workaround race in handling
-                         * of interface-added and properites-changed signals
-                         * it looks like we cannot specify order of those
-                         * handlers and currently implementation assumes
-                         * that interfaces-added is called first.
-                         *
-                         * TODO figure out if we can avoid this
-                         */
-                        g_idle_add(BluezConnectionInitIdle, conn);
-                    }
-                }
-                else if (strcmp(key, "RSSI") == 0)
-                {
-                    /* when discovery starts we will get this one device is
-                     * found even if device object was already present
-                     */
-                    if (endpoint->mIsCentral)
-                    {
-                        BluezHandleAdvertisementFromDevice(device, endpoint);
-                    }
-                }
-
-                g_variant_unref(value);
-            }
-        }
-    }
-exit:
-    return;
+    UpdateConnectionTable(device, *endpoint);
 }
 
 static void BluezHandleNewDevice(BluezDevice1 * device, BluezEndpoint * apEndpoint)
@@ -1256,11 +1265,57 @@ void BluezObjectsCleanup(BluezEndpoint * apEndpoint)
     EndpointCleanup(apEndpoint);
 }
 
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+static void UpdateAdditionalDataCharacteristic(BluezGattCharacteristic1 * characteristic)
+{
+    if (characteristic == nullptr)
+    {
+        return;
+    }
+
+    // Construct the TLV for the additional data
+    GVariant * cValue = nullptr;
+    CHIP_ERROR err    = CHIP_NO_ERROR;
+    System::PacketBufferTLVWriter writer;
+    TLVWriter innerWriter;
+    chip::System::PacketBufferHandle bufferHandle;
+
+    writer.Init(chip::System::PacketBuffer::New());
+
+    err = writer.OpenContainer(AnonymousTag, kTLVType_Structure, innerWriter);
+    SuccessOrExit(err);
+
+    // Adding the rotating device id to the TLV data
+    err = innerWriter.PutString(ContextTag(kRotatingDeviceIdTag), CHIP_ROTATING_DEVICE_ID);
+    SuccessOrExit(err);
+
+    err = writer.CloseContainer(innerWriter);
+    SuccessOrExit(err);
+
+    err = writer.Finalize(&bufferHandle);
+    SuccessOrExit(err);
+
+    cValue = g_variant_new_from_data(G_VARIANT_TYPE("ay"), bufferHandle->Start(), bufferHandle->DataLength(), TRUE, g_free,
+                                     g_memdup(bufferHandle->Start(), bufferHandle->DataLength()));
+    bluez_gatt_characteristic1_set_value(characteristic, cValue);
+
+    return;
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to generate TLV encoded Additional Data", __func__);
+    }
+    return;
+}
+#endif
+
 static void BluezPeripheralObjectsSetup(gpointer apClosure)
 {
 
     static const char * const c1_flags[] = { "write", nullptr };
     static const char * const c2_flags[] = { "read", "indicate", nullptr };
+    static const char * const c3_flags[] = { "read", nullptr };
 
     BluezEndpoint * endpoint = static_cast<BluezEndpoint *>(apClosure);
     VerifyOrExit(endpoint != nullptr, ChipLogError(DeviceLayer, "endpoint is NULL in %s", __func__));
@@ -1293,6 +1348,27 @@ static void BluezPeripheralObjectsSetup(gpointer apClosure)
     ChipLogDetail(DeviceLayer, "CHIP BTP C1 %s", bluez_gatt_characteristic1_get_service(endpoint->mpC1));
     ChipLogDetail(DeviceLayer, "CHIP BTP C2 %s", bluez_gatt_characteristic1_get_service(endpoint->mpC2));
 
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    ChipLogDetail(DeviceLayer, "CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING is TRUE");
+    // Additional data characteristics
+    endpoint->mpC3 =
+        BluezCharacteristicCreate(endpoint->mpService, g_strdup("c3"), g_strdup(CHIP_PLAT_BLE_UUID_C3_STRING), endpoint->mpRoot);
+    bluez_gatt_characteristic1_set_flags(endpoint->mpC3, c3_flags);
+    g_signal_connect(endpoint->mpC3, "handle-read-value", G_CALLBACK(BluezCharacteristicReadValue), apClosure);
+    g_signal_connect(endpoint->mpC3, "handle-write-value", G_CALLBACK(BluezCharacteristicWriteValueError), NULL);
+    g_signal_connect(endpoint->mpC3, "handle-acquire-write", G_CALLBACK(BluezCharacteristicAcquireWriteError), NULL);
+    g_signal_connect(endpoint->mpC3, "handle-acquire-notify", G_CALLBACK(BluezCharacteristicAcquireNotify), apClosure);
+    g_signal_connect(endpoint->mpC3, "handle-start-notify", G_CALLBACK(BluezCharacteristicStartNotify), apClosure);
+    g_signal_connect(endpoint->mpC3, "handle-stop-notify", G_CALLBACK(BluezCharacteristicStopNotify), apClosure);
+    g_signal_connect(endpoint->mpC3, "handle-confirm", G_CALLBACK(BluezCharacteristicConfirm), apClosure);
+    // update the characteristic value
+    UpdateAdditionalDataCharacteristic(endpoint->mpC3);
+    ChipLogDetail(DeviceLayer, "CHIP BTP C3 %s", bluez_gatt_characteristic1_get_service(endpoint->mpC3));
+#else
+    ChipLogDetail(DeviceLayer, "CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING is FALSE");
+    (void) c3_flags;
+#endif
+
 exit:
     return;
 }
@@ -1304,10 +1380,14 @@ static void BluezOnBusAcquired(GDBusConnection * aConn, const gchar * aName, gpo
 
     ChipLogDetail(DeviceLayer, "TRACE: Bus acquired for name %s", aName);
 
-    endpoint->mpRootPath = g_strdup_printf("/chipoble/%04x", getpid() & 0xffff);
-    endpoint->mpRoot     = g_dbus_object_manager_server_new(endpoint->mpRootPath);
-    g_dbus_object_manager_server_set_connection(endpoint->mpRoot, aConn);
-    BluezPeripheralObjectsSetup(apClosure);
+    if (!endpoint->mIsCentral)
+    {
+        endpoint->mpRootPath = g_strdup_printf("/chipoble/%04x", getpid() & 0xffff);
+        endpoint->mpRoot     = g_dbus_object_manager_server_new(endpoint->mpRootPath);
+        g_dbus_object_manager_server_set_connection(endpoint->mpRoot, aConn);
+
+        BluezPeripheralObjectsSetup(apClosure);
+    }
 
 exit:
     return;
@@ -1445,31 +1525,24 @@ exit:
     return G_SOURCE_REMOVE;
 }
 
+static ConnectionDataBundle * MakeConnectionDataBundle(BLE_CONNECTION_OBJECT apConn, const chip::System::PacketBufferHandle & apBuf)
+{
+    ConnectionDataBundle * bundle = g_new(ConnectionDataBundle, 1);
+    bundle->mpConn                = static_cast<BluezConnection *>(apConn);
+    bundle->mpVal =
+        g_variant_new_fixed_array(G_VARIANT_TYPE_BYTE, apBuf->Start(), apBuf->DataLength() * sizeof(uint8_t), sizeof(uint8_t));
+    return bundle;
+}
+
 bool SendBluezIndication(BLE_CONNECTION_OBJECT apConn, chip::System::PacketBufferHandle apBuf)
 {
-    ConnectionDataBundle * closure;
-    const char * msg = nullptr;
-    bool success     = false;
-    uint8_t * buffer = nullptr;
-    size_t len       = 0;
+    bool success = false;
 
     VerifyOrExit(!apBuf.IsNull(), ChipLogError(DeviceLayer, "apBuf is NULL in %s", __func__));
-    buffer = apBuf->Start();
-    len    = apBuf->DataLength();
 
-    closure         = g_new(ConnectionDataBundle, 1);
-    closure->mpConn = static_cast<BluezConnection *>(apConn);
-
-    closure->mpVal = g_variant_new_fixed_array(G_VARIANT_TYPE_BYTE, buffer, len * sizeof(uint8_t), sizeof(uint8_t));
-
-    success = BluezRunOnBluezThread(BluezC2Indicate, closure);
+    success = BluezRunOnBluezThread(BluezC2Indicate, MakeConnectionDataBundle(apConn, apBuf));
 
 exit:
-    if (nullptr != msg)
-    {
-        ChipLogError(Ble, msg);
-    }
-
     return success;
 }
 
@@ -1626,6 +1699,144 @@ exit:
     return err;
 }
 
+// BluezSendWriteRequest callbacks
+
+static void SendWriteRequestDone(GObject * aObject, GAsyncResult * aResult, gpointer apConnection)
+{
+    BluezGattCharacteristic1 * c1 = BLUEZ_GATT_CHARACTERISTIC1(aObject);
+    GError * error                = nullptr;
+    gboolean success              = bluez_gatt_characteristic1_call_write_value_finish(c1, aResult, &error);
+
+    VerifyOrExit(success == TRUE, ChipLogError(DeviceLayer, "FAIL: BluezSendWriteRequest : %s", error->message));
+    BLEManagerImpl::HandleWriteComplete(static_cast<BLE_CONNECTION_OBJECT>(apConnection));
+
+exit:
+    if (error != nullptr)
+        g_error_free(error);
+}
+
+static gboolean SendWriteRequestImpl(void * apConnectionData)
+{
+    ConnectionDataBundle * data = static_cast<ConnectionDataBundle *>(apConnectionData);
+    GVariant * options          = nullptr;
+    GVariantBuilder optionsBuilder;
+
+    VerifyOrExit(data != nullptr, ChipLogError(DeviceLayer, "ConnectionDataBundle is NULL in %s", __func__));
+    VerifyOrExit(data->mpConn != nullptr, ChipLogError(DeviceLayer, "BluezConnection is NULL in %s", __func__));
+    VerifyOrExit(data->mpConn->mpC1 != nullptr, ChipLogError(DeviceLayer, "C1 is NULL in %s", __func__));
+
+    g_variant_builder_init(&optionsBuilder, G_VARIANT_TYPE_ARRAY);
+    g_variant_builder_add(&optionsBuilder, "{sv}", "type", g_variant_new_string("request"));
+    options = g_variant_builder_end(&optionsBuilder);
+
+    bluez_gatt_characteristic1_call_write_value(data->mpConn->mpC1, data->mpVal, options, nullptr, SendWriteRequestDone,
+                                                data->mpConn);
+
+exit:
+    g_free(data);
+    return G_SOURCE_REMOVE;
+}
+
+bool BluezSendWriteRequest(BLE_CONNECTION_OBJECT apConn, chip::System::PacketBufferHandle apBuf)
+{
+    bool success = false;
+
+    VerifyOrExit(!apBuf.IsNull(), ChipLogError(DeviceLayer, "apBuf is NULL in %s", __func__));
+
+    success = BluezRunOnBluezThread(SendWriteRequestImpl, MakeConnectionDataBundle(apConn, apBuf));
+
+exit:
+    return success;
+}
+
+// BluezSubscribeCharacteristic callbacks
+
+static void OnCharacteristicChanged(GDBusProxy * aInterface, GVariant * aChangedProperties, const gchar * const * aInvalidatedProps,
+                                    gpointer apConnection)
+{
+    BLE_CONNECTION_OBJECT connection = static_cast<BLE_CONNECTION_OBJECT>(apConnection);
+    GVariant * value                 = g_variant_lookup_value(aChangedProperties, "Value", G_VARIANT_TYPE_BYTESTRING);
+    VerifyOrReturn(value != nullptr);
+
+    size_t bufferLen;
+    auto buffer = g_variant_get_fixed_array(value, &bufferLen, sizeof(uint8_t));
+    VerifyOrReturn(value != nullptr, ChipLogError(DeviceLayer, "Characteristic value has unexpected type"));
+
+    BLEManagerImpl::HandleTXCharChanged(connection, static_cast<const uint8_t *>(buffer), bufferLen);
+}
+
+static void SubscribeCharacteristicDone(GObject * aObject, GAsyncResult * aResult, gpointer apConnection)
+{
+    BluezGattCharacteristic1 * c2 = BLUEZ_GATT_CHARACTERISTIC1(aObject);
+    GError * error                = nullptr;
+    gboolean success              = bluez_gatt_characteristic1_call_write_value_finish(c2, aResult, &error);
+
+    VerifyOrExit(success == TRUE, ChipLogError(DeviceLayer, "FAIL: BluezSubscribeCharacteristic : %s", error->message));
+
+    // Get notifications on the TX characteristic change (e.g. indication is received)
+    g_signal_connect(c2, "g-properties-changed", G_CALLBACK(OnCharacteristicChanged), apConnection);
+    BLEManagerImpl::HandleSubscribeOpComplete(static_cast<BLE_CONNECTION_OBJECT>(apConnection), true);
+
+exit:
+    if (error != nullptr)
+        g_error_free(error);
+}
+
+static gboolean SubscribeCharacteristicImpl(void * apConnection)
+{
+    BluezConnection * connection = static_cast<BluezConnection *>(apConnection);
+
+    VerifyOrExit(connection != nullptr, ChipLogError(DeviceLayer, "BluezConnection is NULL in %s", __func__));
+    VerifyOrExit(connection->mpC2 != nullptr, ChipLogError(DeviceLayer, "C2 is NULL in %s", __func__));
+
+    bluez_gatt_characteristic1_call_start_notify(connection->mpC2, nullptr, SubscribeCharacteristicDone, connection);
+
+exit:
+    return G_SOURCE_REMOVE;
+}
+
+bool BluezSubscribeCharacteristic(BLE_CONNECTION_OBJECT apConn)
+{
+    return BluezRunOnBluezThread(SubscribeCharacteristicImpl, apConn);
+}
+
+// BluezUnsubscribeCharacteristic callbacks
+
+static void UnsubscribeCharacteristicDone(GObject * aObject, GAsyncResult * aResult, gpointer apConnection)
+{
+    BluezGattCharacteristic1 * c2 = BLUEZ_GATT_CHARACTERISTIC1(aObject);
+    GError * error                = nullptr;
+    gboolean success              = bluez_gatt_characteristic1_call_write_value_finish(c2, aResult, &error);
+
+    VerifyOrExit(success == TRUE, ChipLogError(DeviceLayer, "FAIL: BluezUnsubscribeCharacteristic : %s", error->message));
+
+    // Stop listening to the TX characteristic changes
+    g_signal_handlers_disconnect_by_data(c2, apConnection);
+    BLEManagerImpl::HandleSubscribeOpComplete(static_cast<BLE_CONNECTION_OBJECT>(apConnection), false);
+
+exit:
+    if (error != nullptr)
+        g_error_free(error);
+}
+
+static gboolean UnsubscribeCharacteristicImpl(void * apConnection)
+{
+    BluezConnection * connection = static_cast<BluezConnection *>(apConnection);
+
+    VerifyOrExit(connection != nullptr, ChipLogError(DeviceLayer, "BluezConnection is NULL in %s", __func__));
+    VerifyOrExit(connection->mpC2 != nullptr, ChipLogError(DeviceLayer, "C2 is NULL in %s", __func__));
+
+    bluez_gatt_characteristic1_call_start_notify(connection->mpC2, nullptr, UnsubscribeCharacteristicDone, connection);
+
+exit:
+    return G_SOURCE_REMOVE;
+}
+
+bool BluezUnsubscribeCharacteristic(BLE_CONNECTION_OBJECT apConn)
+{
+    return BluezRunOnBluezThread(UnsubscribeCharacteristicImpl, apConn);
+}
+
 // StartDiscovery callbacks
 
 using DiscoveryTaskArg = std::pair<BluezEndpoint *, BluezDiscoveryRequest>;
@@ -1644,6 +1855,29 @@ exit:
         g_error_free(error);
 }
 
+static bool CheckIfAlreadyDiscovered(BluezEndpoint & aEndpoint)
+{
+    chip::Ble::ChipBLEDeviceIdentificationInfo deviceInfo;
+
+    for (BluezObject & object : BluezObjectList(&aEndpoint))
+    {
+        BluezDevice1 * device = bluez_object_get_device1(&object);
+        if (device == nullptr || !BluezIsDeviceOnAdapter(device, aEndpoint.mpAdapter))
+            continue;
+
+        if (!BluezGetChipDeviceInfo(*device, deviceInfo))
+            continue;
+
+        if (deviceInfo.GetDeviceDiscriminator() != aEndpoint.mDiscoveryRequest.mDiscriminator)
+            continue;
+
+        UpdateConnectionTable(device, aEndpoint);
+        return true;
+    }
+
+    return false;
+}
+
 static gboolean StartDiscoveryImpl(void * apDiscoveryTaskArg)
 {
     DiscoveryTaskArg * taskArg = static_cast<DiscoveryTaskArg *>(apDiscoveryTaskArg);
@@ -1655,7 +1889,16 @@ static gboolean StartDiscoveryImpl(void * apDiscoveryTaskArg)
     VerifyOrExit(endpoint != nullptr, ChipLogError(DeviceLayer, "endpoint is NULL in %s", __func__));
     VerifyOrExit(endpoint->mpAdapter != nullptr, ChipLogError(DeviceLayer, "mpAdapter is NULL in %s", __func__));
 
+    // Bluez may already know the device in which case there's no need to discover it
     endpoint->mDiscoveryRequest = taskArg->second;
+
+    if (CheckIfAlreadyDiscovered(*endpoint))
+    {
+        ChipLogProgress(DeviceLayer, "Device already discovered");
+        endpoint->mDiscoveryRequest = {};
+        ExitNow();
+    }
+
     bluez_adapter1_call_start_discovery(endpoint->mpAdapter, nullptr, StartDiscoveryDone, endpoint);
 
 exit:

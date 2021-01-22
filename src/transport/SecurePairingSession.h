@@ -27,9 +27,11 @@
 #pragma once
 
 #include <crypto/CHIPCryptoPAL.h>
-#include <protocols/secure_channel/SecureChannelProtocol.h>
+#include <protocols/secure_channel/Constants.h>
 #include <support/Base64.h>
 #include <system/SystemPacketBuffer.h>
+#include <transport/AuthenticatedSessionEstablishmentDelegate.h>
+#include <transport/PeerConnectionState.h>
 #include <transport/SecureSession.h>
 #include <transport/raw/MessageHeader.h>
 #include <transport/raw/PeerAddress.h>
@@ -42,41 +44,6 @@ extern const char * kSpake2pR2ISessionInfo;
 constexpr uint16_t kPBKDFParamRandomNumberSize = 32;
 
 using namespace Crypto;
-
-class DLL_EXPORT SecurePairingSessionDelegate
-{
-public:
-    /**
-     * @brief
-     *   Called when pairing session generates a new message that should be sent to peer.
-     *
-     * @param header the message header for the sent message
-     * @param peerAddress the destination of the message
-     * @param msgBuf the raw data for the message being sent
-     * @return CHIP_ERROR Error thrown when sending the message
-     */
-    virtual CHIP_ERROR SendPairingMessage(const PacketHeader & header, const Transport::PeerAddress & peerAddress,
-                                          System::PacketBufferHandle msgBuf)
-    {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
-
-    /**
-     * @brief
-     *   Called when pairing fails with an error
-     *
-     * @param error error code
-     */
-    virtual void OnPairingError(CHIP_ERROR error) {}
-
-    /**
-     * @brief
-     *   Called when the pairing is complete and the new secure session has been established
-     */
-    virtual void OnPairingComplete() {}
-
-    virtual ~SecurePairingSessionDelegate() {}
-};
 
 struct SecurePairingSessionSerialized;
 
@@ -117,7 +84,7 @@ public:
      * @return CHIP_ERROR     The result of initialization
      */
     CHIP_ERROR WaitForPairing(uint32_t mySetUpPINCode, uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen,
-                              Optional<NodeId> myNodeId, uint16_t myKeyId, SecurePairingSessionDelegate * delegate);
+                              Optional<NodeId> myNodeId, uint16_t myKeyId, AuthenticatedSessionEstablishmentDelegate * delegate);
 
     /**
      * @brief
@@ -126,13 +93,14 @@ public:
      * @param peerAddress      Address of peer to pair
      * @param peerSetUpPINCode Setup PIN code of the peer device
      * @param myNodeId         Optional node id of local node
+     * @param peerNodeId       Node id assigned to the peer node by commissioner
      * @param myKeyId          Key ID to be assigned to the secure session on the peer node
      * @param delegate         Callback object
      *
      * @return CHIP_ERROR      The result of initialization
      */
     CHIP_ERROR Pair(const Transport::PeerAddress peerAddress, uint32_t peerSetUpPINCode, Optional<NodeId> myNodeId,
-                    uint16_t myKeyId, SecurePairingSessionDelegate * delegate);
+                    NodeId peerNodeId, uint16_t myKeyId, AuthenticatedSessionEstablishmentDelegate * delegate);
 
     /**
      * @brief
@@ -165,7 +133,7 @@ public:
      *
      * @return Optional<NodeId> The associated peer NodeId
      */
-    NodeId GetPeerNodeId() const { return mPeerNodeId.Value(); }
+    NodeId GetPeerNodeId() const { return mConnectionState.GetPeerNodeId(); }
 
     /**
      * @brief
@@ -173,7 +141,7 @@ public:
      *
      * @return uint16_t The associated peer key id
      */
-    uint16_t GetPeerKeyId() { return mPeerKeyId; }
+    uint16_t GetPeerKeyId() { return mConnectionState.GetPeerKeyID(); }
 
     /**
      * @brief
@@ -181,7 +149,9 @@ public:
      *
      * @return uint16_t The assocated local key id
      */
-    uint16_t GetLocalKeyId() { return mLocalKeyId; }
+    uint16_t GetLocalKeyId() { return mConnectionState.GetLocalKeyID(); }
+
+    Transport::PeerConnectionState & PeerConnection() { return mConnectionState; }
 
     /** @brief Serialize the Pairing Session to a string.
      *
@@ -214,7 +184,8 @@ private:
         kUnexpected             = 0xff,
     };
 
-    CHIP_ERROR Init(Optional<NodeId> myNodeId, uint16_t myKeyId, uint32_t setupCode, SecurePairingSessionDelegate * delegate);
+    CHIP_ERROR Init(Optional<NodeId> myNodeId, uint16_t myKeyId, uint32_t setupCode,
+                    AuthenticatedSessionEstablishmentDelegate * delegate);
 
     CHIP_ERROR SetupSpake2p(uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen);
 
@@ -239,7 +210,7 @@ private:
 
     static constexpr size_t kSpake2p_WS_Length = kP256_FE_Length + 8;
 
-    SecurePairingSessionDelegate * mDelegate = nullptr;
+    AuthenticatedSessionEstablishmentDelegate * mDelegate = nullptr;
 
     Protocols::SecureChannel::MsgType mNextExpectedMsg = Protocols::SecureChannel::MsgType::PASE_Spake2pError;
 
@@ -263,21 +234,15 @@ private:
     };
 
 protected:
-    Optional<NodeId> mLocalNodeId = Optional<NodeId>::Value(kUndefinedNodeId);
-
-    Optional<NodeId> mPeerNodeId = Optional<NodeId>::Value(kUndefinedNodeId);
-
-    uint16_t mLocalKeyId;
-
-    uint16_t mPeerKeyId;
-
-    Transport::PeerAddress mPeerAddress;
+    NodeId mLocalNodeId = kUndefinedNodeId;
 
     uint8_t mKe[kMAX_Hash_Length];
 
     size_t mKeLen = sizeof(mKe);
 
     bool mPairingComplete = false;
+
+    Transport::PeerConnectionState mConnectionState;
 };
 
 /*
@@ -303,6 +268,8 @@ public:
         size_t secretLen    = strlen(secret);
         mKeLen              = secretLen;
         memmove(mKe, secret, mKeLen);
+        mConnectionState.SetPeerKeyID(0);
+        mConnectionState.SetLocalKeyID(0);
         mPairingComplete = true;
     }
 
@@ -310,24 +277,24 @@ public:
     {
         const char * secret = "Test secret for key derivation";
         size_t secretLen    = strlen(secret);
-        mPeerNodeId         = peerNodeId;
-        mPeerKeyId          = peerKeyId;
-        mLocalKeyId         = localKeyId;
         mKeLen              = secretLen;
         memmove(mKe, secret, mKeLen);
+        mConnectionState.SetPeerNodeId(peerNodeId.ValueOr(kUndefinedNodeId));
+        mConnectionState.SetPeerKeyID(peerKeyId);
+        mConnectionState.SetLocalKeyID(localKeyId);
         mPairingComplete = true;
     }
 
     ~SecurePairingUsingTestSecret() override {}
 
     CHIP_ERROR WaitForPairing(uint32_t mySetUpPINCode, uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen,
-                              Optional<NodeId> myNodeId, uint16_t myKeyId, SecurePairingSessionDelegate * delegate)
+                              Optional<NodeId> myNodeId, uint16_t myKeyId, AuthenticatedSessionEstablishmentDelegate * delegate)
     {
         return CHIP_NO_ERROR;
     }
 
     CHIP_ERROR Pair(uint32_t peerSetUpPINCode, uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen,
-                    Optional<NodeId> myNodeId, uint16_t myKeyId, SecurePairingSessionDelegate * delegate)
+                    Optional<NodeId> myNodeId, uint16_t myKeyId, AuthenticatedSessionEstablishmentDelegate * delegate)
     {
         return CHIP_NO_ERROR;
     }

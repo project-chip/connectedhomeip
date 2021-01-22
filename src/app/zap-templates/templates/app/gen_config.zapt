@@ -1,0 +1,56 @@
+{{> header}}
+
+// Prevent multiple inclusion
+#pragma once
+
+// User options for plugin Binding Table Library
+#define EMBER_BINDING_TABLE_SIZE 10
+
+/**** Network Section ****/
+#define EMBER_SUPPORTED_NETWORKS (1)
+
+
+#define EMBER_APS_UNICAST_MESSAGE_COUNT 10
+
+/**** Cluster endpoint counts ****/
+{{#all_user_clusters}}
+#define EMBER_AF_{{asDelimitedMacro define}}_{{asDelimitedMacro side}}_ENDPOINT_COUNT ({{user_endpoint_count_by_cluster id side}})
+{{/all_user_clusters}}
+
+/**** Cluster Plugins ****/
+{{#all_user_clusters}}
+
+// Use this macro to check if the {{side}} side of the {{name}} cluster is included
+#define ZCL_USING_{{asDelimitedMacro define}}_{{asDelimitedMacro side}}
+#define EMBER_AF_PLUGIN_{{asDelimitedMacro name}}_{{asDelimitedMacro side}}
+{{#if (isServer side)}}
+#define EMBER_AF_PLUGIN_{{asDelimitedMacro name}}
+{{/if}}
+{{#if (isStrEqual name "Color Control")}}
+{{#if (isServer side)}}
+// User options for {{side}} plugin {{name}}
+#define EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_XY
+#define EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
+#define EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_HSV
+{{/if}}
+{{else if (isStrEqual name "IAS Zone")}}
+// User options for {{side}} plugin {{name}}
+{{#if (isServer side)}}
+#define EMBER_AF_PLUGIN_IAS_ZONE_SERVER_ZONE_TYPE 541
+{{else}}
+#define EMBER_AF_PLUGIN_IAS_ZONE_CLIENT_MAX_DEVICES 10
+{{/if}}
+{{else if (isStrEqual name "Level Control")}}
+{{#if (isServer side)}}
+// User options for {{side}} plugin {{name}}
+#define EMBER_AF_PLUGIN_LEVEL_CONTROL_MAXIMUM_LEVEL 255
+#define EMBER_AF_PLUGIN_LEVEL_CONTROL_MINIMUM_LEVEL 0
+#define EMBER_AF_PLUGIN_LEVEL_CONTROL_RATE 0
+{{/if}}
+{{else if (isStrEqual name "Scenes")}}
+{{#if (isServer side)}}
+// User options for {{side}} plugin {{name}}
+#define EMBER_AF_PLUGIN_SCENES_TABLE_SIZE 3
+{{/if}}
+{{/if}}
+{{/all_user_clusters}}

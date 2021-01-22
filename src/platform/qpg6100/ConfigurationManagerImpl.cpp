@@ -54,8 +54,6 @@ CHIP_ERROR ConfigurationManagerImpl::_Init()
     err = Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>::_Init();
     SuccessOrExit(err);
 
-    // TODO: initialize NVM component
-
     // If the fail-safe was armed when the device last shutdown, initiate a factory reset.
     if (_GetFailSafeArmed(failSafeArmed) == CHIP_NO_ERROR && failSafeArmed)
     {
@@ -135,7 +133,7 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 
     // Restart the system.
     ChipLogProgress(DeviceLayer, "System restarting");
-    // NVIC_SystemReset(); - FIXME
+    // TODO - Add CHIP library de-init
 }
 
 } // namespace DeviceLayer

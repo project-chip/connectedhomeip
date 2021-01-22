@@ -1,0 +1,225 @@
+{{> header}}
+
+#include "chip-zcl-zpro-codec.h"
+
+#include <support/BufBound.h>
+#include <support/SafeInt.h>
+#include <support/logging/CHIPLogging.h>
+
+#include <app/util/basic-types.h>
+
+using namespace chip;
+using namespace chip::System;
+
+static uint16_t doEncodeApsFrame(BufBound & buf, ClusterId clusterId, EndpointId sourceEndpoint,
+                                 EndpointId destinationEndpoint, EmberApsOption options, GroupId groupId, uint8_t sequence,
+                                 uint8_t radius, bool isMeasuring)
+{
+
+    uint8_t control_byte = 0;
+    buf.Put(control_byte) // Put in a control byte
+        .Put16(clusterId)
+        .Put8(sourceEndpoint)
+        .Put8(destinationEndpoint)
+        .Put(options, sizeof(EmberApsOption))
+        .Put16(groupId)
+        .Put8(sequence)
+        .Put8(radius);
+
+    size_t result = buf.Needed();
+    if (isMeasuring)
+    {
+        ChipLogDetail(Zcl, "Measured APS frame size %d", result);
+    }
+    else if (buf.Fit())
+    {
+        ChipLogDetail(Zcl, "Successfully encoded %d bytes", result);
+    }
+    else
+    {
+        ChipLogError(Zcl, "Error encoding APS Frame: Buffer too small");
+        result = 0;
+    }
+
+    if (!CanCastTo<uint16_t>(result))
+    {
+        ChipLogError(Zcl, "Can't fit our measured size in uint16_t");
+        result = 0;
+    }
+
+    return static_cast<uint16_t>(result);
+}
+
+uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * apsFrame)
+{
+    BufBound buf = BufBound(buffer, buf_length);
+    return doEncodeApsFrame(buf, apsFrame->clusterId, apsFrame->sourceEndpoint, apsFrame->destinationEndpoint,
+                            apsFrame->options, apsFrame->groupId, apsFrame->sequence, apsFrame->radius, !buffer);
+}
+
+#define COMMAND_HEADER(name, clusterId)                                                                                            \
+    const char * kName = name;                                                                                                     \
+                                                                                                                                   \
+    PacketBufferHandle payload = PacketBuffer::NewWithAvailableSize(kMaxBufferSize);                                               \
+    if (payload.IsNull())                                                                                                          \
+    {                                                                                                                              \
+        ChipLogError(Zcl, "Could not allocate PacketBuffer while trying to encode %s command", kName);                             \
+        return payload;                                                                                                            \
+    }                                                                                                                              \
+                                                                                                                                   \
+    BufBound buf = BufBound(payload->Start(), kMaxBufferSize);                                                                     \
+    if (doEncodeApsFrame(buf, clusterId, kSourceEndpoint, destinationEndpoint, 0, 0, 0, 0, false))                                 \
+    {
+
+#define COMMAND_FOOTER()                                                                                                           \
+    }                                                                                                                              \
+    uint16_t result = buf.Fit() && CanCastTo<uint16_t>(buf.Needed()) ? static_cast<uint16_t>(buf.Needed()) : 0;                    \
+    if (result == 0)                                                                                                               \
+    {                                                                                                                              \
+        ChipLogError(Zcl, "Command %s can't fit in the allocated buffer", kName);                                                  \
+        return PacketBufferHandle();                                                                                               \
+    }                                                                                                                              \
+                                                                                                                                   \
+    payload->SetDataLength(result);                                                                                                \
+    return payload;
+
+{{> clusters_header}}
+
+#define EMBER_ZCL_REPORTING_DIRECTION_REPORTED 0x00
+
+{{#zcl_global_commands}}
+#define ZCL_{{asDelimitedMacro label}}_COMMAND_ID ({{asHex code 2}})
+{{/zcl_global_commands}}
+
+{{#chip_server_clusters}}
+#define {{define}}_ID {{asHex code 4}}
+{{#chip_server_cluster_commands}}
+#define ZCL_{{asDelimitedMacro name}}_COMMAND_ID ({{asHex code 2}})
+{{/chip_server_cluster_commands}}
+
+{{/chip_server_clusters}}
+
+// TODO: Find a way to calculate maximum message length for clusters
+//       https://github.com/project-chip/connectedhomeip/issues/965
+constexpr uint16_t kMaxBufferSize = 1024;
+
+// This is a cluster-specific command so low two bits are 0b01.  The command
+// is standard, so does not need a manufacturer code, and we're sending
+// client to server, so all the remaining bits are 0.
+constexpr uint8_t kFrameControlClusterSpecificCommand = 0x01;
+
+// This is a global command, so the low bits are 0b00.  The command is
+// standard, so does not need a manufacturer code, and we're sending client
+// to server, so all the remaining bits are 0.
+constexpr uint8_t kFrameControlGlobalCommand = 0x00;
+
+// Pick source endpoint as 1 for now
+constexpr EndpointId kSourceEndpoint = 1;
+
+// Transaction sequence number. Just pick something for now.
+constexpr uint8_t kSeqNum = 1;
+
+{{#chip_server_clusters}}
+{{> cluster_header}}
+
+{{#chip_server_cluster_commands}}
+/*
+ * Command {{asCamelCased name false}}
+ */
+PacketBufferHandle encode{{asCamelCased clusterName false}}Cluster{{asType name}}Command(EndpointId destinationEndpoint{{#chip_server_cluster_command_arguments}}, {{chipType}} {{asCamelCased label}}{{/chip_server_cluster_command_arguments}})
+{
+    COMMAND_HEADER("{{asType name}}", {{parent.define}}_ID);
+    {{#chip_server_cluster_command_arguments}}
+    {{#if (isString type)}}
+    size_t {{asCamelCased label}}StrLen = strlen({{asCamelCased label}});
+    if (!CanCastTo<uint8_t>({{asCamelCased label}}StrLen))
+    {
+        ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, {{asCamelCased label}}StrLen);
+        return PacketBufferHandle();
+    }
+    {{/if}}
+    {{/chip_server_cluster_command_arguments}}
+      buf
+    {{#if (isManufacturerSpecificCommand)}}
+        .Put8(kFrameControlClusterSpecificCommand | (1u << 2))
+        .Put16({{asHex mfgCode 4}})
+    {{else}}
+        .Put8(kFrameControlClusterSpecificCommand)
+    {{/if}}
+       .Put8(kSeqNum)
+       .Put8(ZCL_{{asDelimitedMacro name}}_COMMAND_ID)
+    {{#chip_server_cluster_command_arguments}}
+    {{#if (isString type)}}
+       .Put(static_cast<uint8_t>({{asCamelCased label}}StrLen))
+       .Put({{asCamelCased label}})
+    {{else if (isSignedType)}}
+       .Put{{chipTypePutLength}}(static_cast<{{chipTypePutCastType}}>({{asCamelCased label}}))
+    {{else}}
+       .Put{{chipTypePutLength}}({{asCamelCased label}})
+    {{/if}}
+    {{/chip_server_cluster_command_arguments}}
+    ;
+    COMMAND_FOOTER();
+}
+
+{{/chip_server_cluster_commands}}
+PacketBufferHandle encode{{asCamelCased name false}}ClusterDiscoverAttributes(EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("Discover{{asCamelCased name false}}Attributes", {{define}}_ID);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(kSeqNum)
+       .Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0000)
+       .Put8(0xFF);
+    COMMAND_FOOTER();
+}
+
+{{#chip_server_cluster_attributes}}
+/*
+ * Attribute {{asCamelCased name false}}
+ */
+PacketBufferHandle encode{{asCamelCased parent.name false}}ClusterRead{{asCamelCased name false}}Attribute(EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("Read{{asCamelCased parent.name false}}{{asCamelCased name false}}", {{parent.define}}_ID);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(kSeqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16({{asHex attributeCode 4}});
+    COMMAND_FOOTER();
+}
+
+{{#if (isWritableAttribute)}}
+PacketBufferHandle encode{{asCamelCased parent.name false}}ClusterWrite{{asCamelCased name false}}Attribute(EndpointId destinationEndpoint, {{asUnderlyingZclType type}} {{asCamelCased name}})
+{
+    COMMAND_HEADER("Write{{asCamelCased parent.name false}}{{asCamelCased name false}}", {{parent.define}}_ID);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(kSeqNum)
+       .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
+       .Put16({{asHex attributeCode 4}})
+       .Put8({{atomicTypeId}})
+       .Put{{chipTypePutLength}}(static_cast<{{chipTypePutCastType}}>({{asCamelCased name}}));
+    COMMAND_FOOTER();
+}
+
+{{/if}}
+{{#if (isReportableAttribute)}}
+PacketBufferHandle encode{{asCamelCased parent.name false}}ClusterReport{{asCamelCased name false}}Attribute(EndpointId destinationEndpoint, uint16_t minInterval, uint16_t maxInterval{{#unless (isDiscreteType)}}, {{chipType}} change{{/unless}})
+{
+    COMMAND_HEADER("Report{{asCamelCased parent.name false}}{{asCamelCased name false}}", {{parent.define}}_ID);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(kSeqNum)
+       .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
+       .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
+       .Put16({{asHex attributeCode 4}})
+       .Put8({{atomicTypeId}})
+       .Put16(minInterval)
+       .Put16(maxInterval);
+    {{#unless (isDiscreteType)}}
+    buf.Put{{chipTypePutLength}}(static_cast<{{chipTypePutCastType}}>(change));
+    {{/unless}}
+    COMMAND_FOOTER();
+}
+
+{{/if}}
+{{/chip_server_cluster_attributes}}
+{{/chip_server_clusters}}

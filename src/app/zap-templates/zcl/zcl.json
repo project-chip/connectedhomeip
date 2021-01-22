@@ -1,0 +1,49 @@
+{
+    "version": "ZCL Test Data",
+    "xmlRoot": [".", "../../../../third_party/zap/repo/zcl-builtin/silabs/"],
+    "xmlFile": [
+        "binding-cluster.xml",
+        "clusters-extensions.xml",
+        "custom-types.xml",
+        "chip-devices.xml",
+        "types.xml",
+        "general.xml",
+        "ha.xml",
+        "ha-devices.xml",
+        "cba.xml",
+        "cba-devices.xml",
+        "ota.xml",
+        "ami.xml",
+        "ami-devices.xml",
+        "zll.xml",
+        "zll-devices.xml",
+        "ta.xml",
+        "ta-devices.xml",
+        "hc.xml",
+        "hc-devices.xml",
+        "green-power.xml",
+        "green-power-devices.xml",
+        "silabs.xml",
+        "lo-devices.xml",
+        "wwah-silabs.xml",
+        "wwah-silabs-devices.xml",
+        "sample-extensions.xml"
+    ],
+
+    "manufacturersXml": "../shared/manufacturers.xml",
+    "options": {
+        "text": {
+            "defaultResponsePolicy": ["Always", "Conditional", "Never"]
+        },
+        "bool": ["commandDiscovery"]
+    },
+    "defaults": {
+        "text": {
+            "manufacturerCodes": "0x1002",
+            "defaultResponsePolicy": "always"
+        },
+        "bool": {
+            "commandDiscovery": true
+        }
+    }
+}

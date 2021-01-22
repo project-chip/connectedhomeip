@@ -1,4 +1,3 @@
-
 /*
  *
  *    Copyright (c) 2020 Project CHIP Authors
@@ -5662,6 +5661,32 @@
                                                                                                                                    \
                                   ZCL_GET_ENDPOINT_LIST_REQUEST_COMMAND_ID, "uuuub", startIndex, total, startIndex, count,         \
                                   endpointInformationRecordList, endpointInformationRecordListLen);
+
+/** @brief Command description for Bind
+ *
+ * Command: Bind
+ * @param nodeId NODE_ID
+ * @param groupId GROUP_ID
+ * @param endpointId ENDPOINT_ID
+ * @param clusterId CLUSTER_ID
+ */
+#define emberAfFillCommandBindingClusterBind(nodeId, groupId, endpointId, clusterId)                                               \
+    emberAfFillExternalBuffer(mask,                                                                                                \
+                                                                                                                                   \
+                              ZCL_BIND_COMMAND_ID, "uuuu", nodeId, groupId, endpointId, clusterId);
+
+/** @brief Command description for Unbind
+ *
+ * Command: Unbind
+ * @param nodeId NODE_ID
+ * @param groupId GROUP_ID
+ * @param endpointId ENDPOINT_ID
+ * @param clusterId CLUSTER_ID
+ */
+#define emberAfFillCommandBindingClusterUnbind(nodeId, groupId, endpointId, clusterId)                                             \
+    emberAfFillExternalBuffer(mask,                                                                                                \
+                                                                                                                                   \
+                              ZCL_UNBIND_COMMAND_ID, "uuuu", nodeId, groupId, endpointId, clusterId);
 
 /** @brief Command description for CommandOne
  *

@@ -1,4 +1,3 @@
-
 /*
  *
  *    Copyright (c) 2020 Project CHIP Authors
@@ -31,6 +30,9 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
         break;
     case ZCL_BASIC_CLUSTER_ID:
         emberAfBasicClusterInitCallback(endpoint);
+        break;
+    case ZCL_BINDING_CLUSTER_ID:
+        emberAfBindingClusterInitCallback(endpoint);
         break;
     case ZCL_COLOR_CONTROL_CLUSTER_ID:
         emberAfColorControlClusterInitCallback(endpoint);
@@ -71,6 +73,11 @@ void __attribute__((weak)) emberAfBarrierControlClusterInitCallback(EndpointId e
     (void) endpoint;
 }
 void __attribute__((weak)) emberAfBasicClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfBindingClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;

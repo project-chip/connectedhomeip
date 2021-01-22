@@ -1,4 +1,3 @@
-
 /*
  *
  *    Copyright (c) 2020 Project CHIP Authors
@@ -32,6 +31,8 @@
 #define EMBER_AF_BARRIER_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_BASIC_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT (2)
+#define EMBER_AF_BINDING_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_BINDING_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_COLOR_CONTROL_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_DOOR_LOCK_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
@@ -68,6 +69,15 @@
 #define ZCL_USING_BASIC_CLUSTER_SERVER
 #define EMBER_AF_PLUGIN_BASIC_SERVER
 #define EMBER_AF_PLUGIN_BASIC
+
+// Use this macro to check if the client side of the Binding cluster is included
+#define ZCL_USING_BINDING_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_BINDING_CLIENT
+
+// Use this macro to check if the server side of the Binding cluster is included
+#define ZCL_USING_BINDING_CLUSTER_SERVER
+#define EMBER_AF_PLUGIN_BINDING_SERVER
+#define EMBER_AF_PLUGIN_BINDING
 
 // Use this macro to check if the client side of the Color Control cluster is included
 #define ZCL_USING_COLOR_CONTROL_CLUSTER_CLIENT
@@ -153,10 +163,3 @@
 #define ZCL_USING_TEMP_MEASUREMENT_CLUSTER_SERVER
 #define EMBER_AF_PLUGIN_TEMPERATURE_MEASUREMENT_SERVER
 #define EMBER_AF_PLUGIN_TEMPERATURE_MEASUREMENT
-
-// TODO Issue #3871 Reporting should only be enabled if there are reportable attributes
-// Use this macro to check if Reporting plugin is included
-#define EMBER_AF_PLUGIN_REPORTING
-// User options for plugin Reporting
-#define EMBER_AF_PLUGIN_REPORTING_TABLE_SIZE 20
-#define EMBER_AF_PLUGIN_REPORTING_ENABLE_GROUP_BOUND_REPORTS

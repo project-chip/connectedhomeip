@@ -15,34 +15,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/*
- * Copyright (c) 2020, Qorvo Inc
- *
- *
- *
- * This software is owned by Qorvo Inc
- * and protected under applicable copyright laws.
- * It is delivered under the terms of the license
- * and is intended and supplied for use solely and
- * exclusively with products manufactured by
- * Qorvo Inc.
- *
- *
- * THIS SOFTWARE IS PROVIDED IN AN "AS IS"
- * CONDITION. NO WARRANTIES, WHETHER EXPRESS,
- * IMPLIED OR STATUTORY, INCLUDING, BUT NOT
- * LIMITED TO, IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE APPLY TO THIS SOFTWARE.
- * QORVO INC. SHALL NOT, IN ANY
- * CIRCUMSTANCES, BE LIABLE FOR SPECIAL,
- * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
- * FOR ANY REASON WHATSOEVER.
- *
- * $Change: 154416 $
- * $DateTime: 2020/08/21 09:47:42 $
- *
- */
 
 /** @file "main.cpp"
  *
@@ -62,6 +34,8 @@
 
 // CHIP includes
 #include <platform/CHIPDeviceLayer.h>
+#include <support/CHIPMem.h>
+#include <support/CHIPPlatformMemory.h>
 #include <support/logging/CHIPLogging.h>
 
 // Application level logic
@@ -108,6 +82,9 @@ int Application_Init(void)
 int CHIP_Init(void)
 {
     int ret = CHIP_ERROR_MAX;
+
+    // Init Chip memory management before the stack
+    chip::Platform::MemoryInit();
 
     ChipLogProgress(NotSpecified, "Init CHIP Stack");
     ret = PlatformMgr().InitChipStack();

@@ -1,0 +1,98 @@
+{
+    "name": "CHIP Application templates",
+    "version": "chip-v1",
+    "helpers": ["common/StringHelper.js", "templates/app/helper.js"],
+    "override": "common/override.js",
+    "partials": [
+        {
+            "name": "header",
+            "path": "partials/header.zapt"
+        },
+        {
+            "name": "command_handler_cluster_commands",
+            "path": "partials/command_handler_cluster_commands.zapt"
+        }
+    ],
+    "templates": [
+        {
+            "path": "templates/app/af-structs.zapt",
+            "name": "ZCL af-structs header",
+            "output": "af-structs.h"
+        },
+        {
+            "path": "templates/app/att-storage.zapt",
+            "name": "ZCL att-storage header",
+            "output": "att-storage.h"
+        },
+        {
+            "path": "templates/app/attribute-id.zapt",
+            "name": "ZCL attribute-id header",
+            "output": "attribute-id.h"
+        },
+        {
+            "path": "templates/app/attribute-type.zapt",
+            "name": "ZCL attribute-type header",
+            "output": "attribute-type.h"
+        },
+        {
+            "path": "templates/app/attribute-size.zapt",
+            "name": "ZCL attribute-size header",
+            "output": "attribute-size.h"
+        },
+        {
+            "path": "templates/app/call-command-handler-src.zapt",
+            "name": "ZCL call-command-handler source",
+            "output": "call-command-handler.cpp"
+        },
+        {
+            "path": "templates/app/call-command-handler.zapt",
+            "name": "ZCL call-command-handler header",
+            "output": "call-command-handler.h"
+        },
+        {
+            "path": "templates/app/callback-stub-src.zapt",
+            "name": "ZCL callback-stub source",
+            "output": "callback-stub.cpp"
+        },
+        {
+            "path": "templates/app/callback.zapt",
+            "name": "ZCL callback header",
+            "output": "callback.h"
+        },
+        {
+            "path": "templates/app/client-command-macro.zapt",
+            "name": "ZCL client command",
+            "output": "client-command-macro.h"
+        },
+        {
+            "path": "templates/app/cluster-id.zapt",
+            "name": "ZCL cluster-id header",
+            "output": "cluster-id.h"
+        },
+        {
+            "path": "templates/app/command-id.zapt",
+            "name": "ZCL command-id header",
+            "output": "command-id.h"
+        },
+        {
+            "path": "templates/app/endpoint_config.zapt",
+            "name": "ZCL endpoint configuration",
+            "output": "endpoint_config.h"
+        },
+        {
+            "path": "templates/app/enums.zapt",
+            "name": "ZCL enums header",
+            "output": "enums.h"
+        },
+        {
+            "path": "templates/app/gen_config.zapt",
+            "name": "ZCL gen_config header",
+            "output": "gen_config.h"
+        },
+        {
+            "path": "templates/app/print-cluster.zapt",
+            "name": "ZCL print-cluster header",
+            "output": "print-cluster.h"
+        }
+    ]
+}

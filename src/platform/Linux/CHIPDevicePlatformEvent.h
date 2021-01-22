@@ -44,6 +44,10 @@ enum PublicPlatformSpecificEventTypes
 enum InternalPlatformSpecificEventTypes
 {
     kPlatformLinuxEvent = kRange_InternalPlatformSpecific,
+    kPlatformLinuxBLECentralConnected,
+    kPlatformLinuxBLEWriteComplete,
+    kPlatformLinuxBLESubscribeOpComplete,
+    kPlatformLinuxBLEIndicationReceived,
     kPlatformLinuxBLEC1WriteEvent,
     kPlatformLinuxBLEOutOfBuffersEvent,
     kPlatformLinuxBLEPeripheralRegisterAppComplete,
@@ -61,6 +65,24 @@ struct ChipDevicePlatformEvent
 {
     union
     {
+        struct
+        {
+            BLE_CONNECTION_OBJECT mConnection;
+        } BLECentralConnected;
+        struct
+        {
+            BLE_CONNECTION_OBJECT mConnection;
+        } BLEWriteComplete;
+        struct
+        {
+            BLE_CONNECTION_OBJECT mConnection;
+            bool mIsSubscribed;
+        } BLESubscribeOpComplete;
+        struct
+        {
+            BLE_CONNECTION_OBJECT mConnection;
+            chip::System::PacketBuffer * mData;
+        } BLEIndicationReceived;
         struct
         {
             bool mIsSuccess;

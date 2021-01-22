@@ -56,6 +56,13 @@
 #include <app/util/binding-table.h>
 #include <system/SystemLayer.h>
 
+#include "gen/att-storage.h"
+#include "gen/attribute-id.h"
+#include "gen/attribute-type.h"
+#include "gen/callback.h"
+#include "gen/cluster-id.h"
+#include "gen/command-id.h"
+
 using namespace chip;
 
 #define UNDEFINED_ZONE_ID 0xFF

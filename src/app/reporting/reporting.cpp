@@ -47,6 +47,10 @@
 #include <app/util/common.h>
 #include <system/SystemLayer.h>
 
+#include "gen/attribute-type.h"
+#include "gen/cluster-id.h"
+#include "gen/command-id.h"
+
 using namespace chip;
 
 // TODO: Need to figure out what needs to happen wrt HAL tokens here, but for

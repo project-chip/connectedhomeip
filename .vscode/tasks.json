@@ -115,6 +115,19 @@
             }
         },
         {
+            "label": "Build QPG6100 Lock Example",
+            "type": "shell",
+            "command": "scripts/examples/gn_build_example.sh examples/lock-app/qpg6100 out/qpg6100_lock_app",
+            "group": "build",
+            "problemMatcher": {
+                "base": "$gcc",
+                "fileLocation": [
+                    "relative",
+                    "${workspaceFolder}/out/qpg6100_lock_app/"
+                ]
+            }
+        },
+        {
             "label": "Build EFR32 Lock Example",
             "type": "shell",
             "command": "scripts/examples/gn_build_example.sh examples/lock-app/efr32 out/efr32_lock_app",
@@ -124,6 +137,19 @@
                 "fileLocation": [
                     "relative",
                     "${workspaceFolder}/out/efr32_lock_app/"
+                ]
+            }
+        },
+        {
+            "label": "Build EFR32 Light Example",
+            "type": "shell",
+            "command": "scripts/examples/gn_build_example.sh examples/lighting-app/efr32 out/efr32_lighting_app",
+            "group": "build",
+            "problemMatcher": {
+                "base": "$gcc",
+                "fileLocation": [
+                    "relative",
+                    "${workspaceFolder}/out/efr32_lighting/"
                 ]
             }
         },

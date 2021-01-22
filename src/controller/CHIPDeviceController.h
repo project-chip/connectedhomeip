@@ -192,17 +192,18 @@ protected:
 
     uint16_t mListenPort;
     uint16_t GetInactiveDeviceIndex();
+    uint16_t FindDeviceIndex(SecureSessionHandle session);
     uint16_t FindDeviceIndex(NodeId id);
     void ReleaseDevice(uint16_t index);
     CHIP_ERROR SetPairedDeviceList(const char * pairedDeviceSerializedSet);
 
 private:
     //////////// SecureSessionMgrDelegate Implementation ///////////////
-    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader,
-                           const Transport::PeerConnectionState * state, System::PacketBufferHandle msgBuf,
-                           SecureSessionMgr * mgr) override;
+    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, SecureSessionHandle session,
+                           System::PacketBufferHandle msgBuf, SecureSessionMgr * mgr) override;
 
-    void OnNewConnection(const Transport::PeerConnectionState * state, SecureSessionMgr * mgr) override;
+    void OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr) override;
+    void OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * mgr) override;
 
     //////////// PersistentStorageResultDelegate Implementation ///////////////
     void OnValue(const char * key, const char * value) override;

@@ -28,13 +28,14 @@
 namespace chip {
 namespace Protocols {
 
-CHIP_ERROR EchoClient::Init(Messaging::ExchangeManager * exchangeMgr)
+CHIP_ERROR EchoClient::Init(Messaging::ExchangeManager * exchangeMgr, SecureSessionHandle session)
 {
     // Error if already initialized.
     if (mExchangeMgr != nullptr)
         return CHIP_ERROR_INCORRECT_STATE;
 
     mExchangeMgr           = exchangeMgr;
+    mSecureSession         = session;
     OnEchoResponseReceived = nullptr;
     mExchangeCtx           = nullptr;
 
@@ -50,8 +51,10 @@ void EchoClient::Shutdown()
     }
 }
 
-CHIP_ERROR EchoClient::SendEchoRequest(NodeId nodeId, System::PacketBufferHandle payload)
+CHIP_ERROR EchoClient::SendEchoRequest(System::PacketBufferHandle && payload)
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
     // Discard any existing exchange context. Effectively we can only have one Echo exchange with
     // a single node at any one time.
     if (mExchangeCtx != nullptr)
@@ -61,22 +64,15 @@ CHIP_ERROR EchoClient::SendEchoRequest(NodeId nodeId, System::PacketBufferHandle
     }
 
     // Create a new exchange context.
-    mExchangeCtx = mExchangeMgr->NewContext(nodeId, this);
+    mExchangeCtx = mExchangeMgr->NewContext(mSecureSession, this);
     if (mExchangeCtx == nullptr)
     {
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    return SendEchoRequest(std::move(payload));
-}
-
-CHIP_ERROR EchoClient::SendEchoRequest(System::PacketBufferHandle payload)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
     // Send an Echo Request message.  Discard the exchange context if the send fails.
     err = mExchangeCtx->SendMessage(kProtocol_Echo, kEchoMessageType_EchoRequest, std::move(payload),
-                                    Messaging::SendFlags(Messaging::SendMessageFlags::kSendFlag_None));
+                                    Messaging::SendFlags(Messaging::SendMessageFlags::kNone));
 
     if (err != CHIP_NO_ERROR)
     {
@@ -115,13 +111,13 @@ void EchoClient::OnMessageReceived(Messaging::ExchangeContext * ec, const Packet
     // Call the registered OnEchoResponseReceived handler, if any.
     if (OnEchoResponseReceived != nullptr)
     {
-        OnEchoResponseReceived(packetHeader.GetSourceNodeId().ValueOr(0), std::move(payload));
+        OnEchoResponseReceived(ec, std::move(payload));
     }
 }
 
 void EchoClient::OnResponseTimeout(Messaging::ExchangeContext * ec)
 {
-    ChipLogProgress(Echo, "Time out! failed to receive echo response from Node: %llu", ec->GetPeerNodeId());
+    ChipLogProgress(Echo, "Time out! failed to receive echo response from Exchange: %p", ec);
 }
 
 } // namespace Protocols

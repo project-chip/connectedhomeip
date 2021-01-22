@@ -295,7 +295,7 @@ static bool HandleICMPDataReceived(PacketBufferHandle aBuffer, uint16_t aHeaderL
     return (lStatus);
 }
 
-bool HandleICMPv4DataReceived(PacketBufferHandle aBuffer, TransferStats & aStats, bool aStatsByPacket, bool aCheckBuffer)
+bool HandleICMPv4DataReceived(PacketBufferHandle && aBuffer, TransferStats & aStats, bool aStatsByPacket, bool aCheckBuffer)
 {
     const uint16_t lICMPHeaderLength = sizeof(ICMPv4EchoHeader);
     bool lStatus;
@@ -305,7 +305,7 @@ bool HandleICMPv4DataReceived(PacketBufferHandle aBuffer, TransferStats & aStats
     return (lStatus);
 }
 
-bool HandleICMPv6DataReceived(PacketBufferHandle aBuffer, TransferStats & aStats, bool aStatsByPacket, bool aCheckBuffer)
+bool HandleICMPv6DataReceived(PacketBufferHandle && aBuffer, TransferStats & aStats, bool aStatsByPacket, bool aCheckBuffer)
 {
     const uint16_t lICMPHeaderLength = sizeof(ICMPv6EchoHeader);
     bool lStatus;

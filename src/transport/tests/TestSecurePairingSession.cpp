@@ -34,7 +34,7 @@
 
 using namespace chip;
 
-class TestSecurePairingDelegate : public SecurePairingSessionDelegate
+class TestSecurePairingDelegate : public AuthenticatedSessionEstablishmentDelegate
 {
 public:
     CHIP_ERROR SendPairingMessage(const PacketHeader & header, const Transport::PeerAddress & peerAddress,
@@ -80,10 +80,10 @@ void SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
     SecurePairingSession pairing;
 
     NL_TEST_ASSERT(inSuite,
-                   pairing.Pair(Transport::PeerAddress(Transport::Type::kBle), 1234, Optional<NodeId>::Value(1), 0, nullptr) !=
+                   pairing.Pair(Transport::PeerAddress(Transport::Type::kBle), 1234, Optional<NodeId>::Value(1), 2, 0, nullptr) !=
                        CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite,
-                   pairing.Pair(Transport::PeerAddress(Transport::Type::kBle), 1234, Optional<NodeId>::Value(1), 0, &delegate) ==
+                   pairing.Pair(Transport::PeerAddress(Transport::Type::kBle), 1234, Optional<NodeId>::Value(1), 2, 0, &delegate) ==
                        CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, delegate.mNumMessageSend == 1);
@@ -93,8 +93,8 @@ void SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
     SecurePairingSession pairing1;
 
     NL_TEST_ASSERT(inSuite,
-                   pairing1.Pair(Transport::PeerAddress(Transport::Type::kBle), 1234, Optional<NodeId>::Value(1), 0, &delegate) ==
-                       CHIP_ERROR_BAD_REQUEST);
+                   pairing1.Pair(Transport::PeerAddress(Transport::Type::kBle), 1234, Optional<NodeId>::Value(1), 2, 0,
+                                 &delegate) == CHIP_ERROR_BAD_REQUEST);
 }
 
 void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, SecurePairingSession & pairingCommissioner,
@@ -111,7 +111,7 @@ void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, S
                    pairingAccessory.WaitForPairing(1234, 500, (const uint8_t *) "salt", 4, Optional<NodeId>::Value(1), 0,
                                                    &delegateAccessory) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite,
-                   pairingCommissioner.Pair(Transport::PeerAddress(Transport::Type::kBle), 1234, Optional<NodeId>::Value(2), 0,
+                   pairingCommissioner.Pair(Transport::PeerAddress(Transport::Type::kBle), 1234, Optional<NodeId>::Value(2), 1, 0,
                                             &delegateCommissioner) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, delegateAccessory.mNumMessageSend == 2);

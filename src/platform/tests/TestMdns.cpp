@@ -63,6 +63,8 @@ static void InitCallback(void * context, CHIP_ERROR error)
     entry.mDataSize        = strlen(reinterpret_cast<const char *>(entry.mData));
     service.mTextEntryies  = &entry;
     service.mTextEntrySize = 1;
+    service.mSubTypes      = nullptr;
+    service.mSubTypeSize   = 0;
 
     NL_TEST_ASSERT(suite, ChipMdnsPublishService(&service) == CHIP_NO_ERROR);
     ChipMdnsBrowse("_mock", MdnsServiceProtocol::kMdnsProtocolTcp, chip::Inet::kIPAddressType_Any, INET_NULL_INTERFACEID,

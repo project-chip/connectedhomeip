@@ -452,7 +452,7 @@ void UDPEndPoint::Free()
 /**
  *  A synonym for <tt>SendTo(addr, port, INET_NULL_INTERFACEID, msg, sendFlags)</tt>.
  */
-INET_ERROR UDPEndPoint::SendTo(const IPAddress & addr, uint16_t port, chip::System::PacketBufferHandle msg, uint16_t sendFlags)
+INET_ERROR UDPEndPoint::SendTo(const IPAddress & addr, uint16_t port, chip::System::PacketBufferHandle && msg, uint16_t sendFlags)
 {
     return SendTo(addr, port, INET_NULL_INTERFACEID, std::move(msg), sendFlags);
 }
@@ -491,7 +491,7 @@ INET_ERROR UDPEndPoint::SendTo(const IPAddress & addr, uint16_t port, chip::Syst
  *      identifier for IPv6 link-local destinations) and \c port with the
  *      transmit option flags encoded in \c sendFlags.
  */
-INET_ERROR UDPEndPoint::SendTo(const IPAddress & addr, uint16_t port, InterfaceId intfId, chip::System::PacketBufferHandle msg,
+INET_ERROR UDPEndPoint::SendTo(const IPAddress & addr, uint16_t port, InterfaceId intfId, chip::System::PacketBufferHandle && msg,
                                uint16_t sendFlags)
 {
     IPPacketInfo pktInfo;
@@ -775,7 +775,7 @@ uint16_t UDPEndPoint::GetBoundPort()
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 
-void UDPEndPoint::HandleDataReceived(System::PacketBufferHandle msg)
+void UDPEndPoint::HandleDataReceived(System::PacketBufferHandle && msg)
 {
     IPEndPointBasis::HandleDataReceived(std::move(msg));
 }
@@ -869,9 +869,7 @@ void UDPEndPoint::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb, struct
     UDPEndPoint * ep                   = static_cast<UDPEndPoint *>(arg);
     chip::System::Layer & lSystemLayer = ep->SystemLayer();
     IPPacketInfo * pktInfo             = NULL;
-    System::PacketBufferHandle buf;
-
-    buf.Adopt(reinterpret_cast<PacketBuffer *>(static_cast<void *>(p)));
+    System::PacketBufferHandle buf     = System::PacketBufferHandle::Adopt(p);
 
     pktInfo = GetPacketInfo(buf);
     if (pktInfo != NULL)
