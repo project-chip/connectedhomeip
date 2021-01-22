@@ -144,7 +144,7 @@ template("k32w_sdk") {
       "gEnableBleInactivityTimeNotify=1",
       "DUAL_MODE_APP=1",
 
-       #TODO: move OT defines in an OT specific GN file
+      #TODO: move OT defines in an OT specific GN file
       "OPENTHREAD_CONFIG_HEAP_EXTERNAL_ENABLE=1",
       "OPENTHREAD_CONFIG_IP6_SLAAC_ENABLE=1",
 
@@ -186,8 +186,8 @@ template("k32w_sdk") {
       "${k32w_sdk_root}/components/serial_manager/serial_manager.c",
       "${k32w_sdk_root}/components/serial_manager/serial_port_uart.c",
       "${k32w_sdk_root}/components/uart/usart_adapter.c",
-      "${k32w_sdk_root}/devices/K32W061/drivers/fsl_aes.c",
       "${k32w_sdk_root}/devices/K32W061/drivers/fsl_adc.c",
+      "${k32w_sdk_root}/devices/K32W061/drivers/fsl_aes.c",
       "${k32w_sdk_root}/devices/K32W061/drivers/fsl_clock.c",
       "${k32w_sdk_root}/devices/K32W061/drivers/fsl_common.c",
       "${k32w_sdk_root}/devices/K32W061/drivers/fsl_ctimer.c",
@@ -207,10 +207,10 @@ template("k32w_sdk") {
       "${k32w_sdk_root}/devices/K32W061/system_K32W061.c",
       "${k32w_sdk_root}/devices/K32W061/utilities/debug_console/fsl_debug_console.c",
       "${k32w_sdk_root}/devices/K32W061/utilities/str/fsl_str.c",
+      "${k32w_sdk_root}/middleware/wireless/ble_controller/config/controller_config.c",
       "${k32w_sdk_root}/middleware/wireless/bluetooth/application/common/ble_conn_manager.c",
       "${k32w_sdk_root}/middleware/wireless/bluetooth/application/common/ble_host_tasks.c",
       "${k32w_sdk_root}/middleware/wireless/bluetooth/host/config/ble_globals.c",
-      "${k32w_sdk_root}/middleware/wireless/ble_controller/config/controller_config.c",
       "${k32w_sdk_root}/middleware/wireless/framework/Common/MicroInt_arm_sdk2.c",
       "${k32w_sdk_root}/middleware/wireless/framework/Flash/Internal/Flash_Adapter.c",
       "${k32w_sdk_root}/middleware/wireless/framework/FunctionLib/FunctionLib.c",
@@ -224,8 +224,8 @@ template("k32w_sdk") {
       "${k32w_sdk_root}/middleware/wireless/framework/OSAbstraction/Source/fsl_os_abstraction_free_rtos.c",
       "${k32w_sdk_root}/middleware/wireless/framework/PDM/pdm_port.c",
       "${k32w_sdk_root}/middleware/wireless/framework/Panic/Source/Panic.c",
-      "${k32w_sdk_root}/middleware/wireless/framework/Reset/Reset.c",
       "${k32w_sdk_root}/middleware/wireless/framework/RNG/Source/RNG.c",
+      "${k32w_sdk_root}/middleware/wireless/framework/Reset/Reset.c",
       "${k32w_sdk_root}/middleware/wireless/framework/SecLib/SecLib.c",
       "${k32w_sdk_root}/middleware/wireless/framework/TimersManager/Source/TMR_Adapter.c",
       "${k32w_sdk_root}/middleware/wireless/framework/TimersManager/Source/TimersManager.c",

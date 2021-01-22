@@ -42,9 +42,8 @@ k32w_sdk("sdk") {
     "main/include/app_config.h",
   ]
 
-  public_deps = [
-      "${chip_root}/third_party/openthread/platforms:libopenthread-platform"
-  ]
+  public_deps =
+      [ "${chip_root}/third_party/openthread/platforms:libopenthread-platform" ]
 
   defines = []
   if (is_debug) {
