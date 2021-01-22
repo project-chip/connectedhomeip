@@ -47,6 +47,8 @@ TransferSession::TransferSession()
 
 void TransferSession::PollOutput(OutputEvent & event)
 {
+    event = OutputEvent();
+
     // Can only output one event at a time.
     if (mPendingOutput.Raw() == 0)
     {
@@ -448,10 +450,14 @@ void TransferSession::HandleTransferInit(MessageType msgType, System::PacketBuff
     mMaxLength   = transferInit.MaxLength;
 
     // Store the Request data to share with the caller for verification
-    mTransferRequestData = {
-        transferInit.TransferCtlOptions.Raw(), transferInit.MaxBlockSize,  transferInit.StartOffset, transferInit.MaxLength,
-        transferInit.FileDesignator,           transferInit.FileDesLength, transferInit.Metadata,    transferInit.MetadataLength,
-    };
+    mTransferRequestData.TransferCtlFlagsRaw = transferInit.TransferCtlOptions.Raw(),
+    mTransferRequestData.MaxBlockSize        = transferInit.MaxBlockSize;
+    mTransferRequestData.StartOffset         = transferInit.StartOffset;
+    mTransferRequestData.Length              = transferInit.MaxLength;
+    mTransferRequestData.FileDesignator      = transferInit.FileDesignator;
+    mTransferRequestData.FileDesLength       = transferInit.FileDesLength;
+    mTransferRequestData.Metadata            = transferInit.Metadata;
+    mTransferRequestData.MetadataLength      = transferInit.MetadataLength;
 
     mPendingMsgHandle = msgData.Retain();
     mPendingOutput.Set(kOutput_InitReceived);
@@ -484,10 +490,12 @@ void TransferSession::HandleReceiveAccept(System::PacketBufferHandle msgData)
 
     // Note: if VerifyProposedMode() returned with no error, then mControlMode must match the proposed mode in the ReceiveAccept
     // message
-    mTransferAcceptData = {
-        mControlMode,        rcvAcceptMsg.MaxBlockSize, rcvAcceptMsg.StartOffset,
-        rcvAcceptMsg.Length, rcvAcceptMsg.Metadata,     rcvAcceptMsg.MetadataLength,
-    };
+    mTransferAcceptData.ControlMode    = mControlMode;
+    mTransferAcceptData.MaxBlockSize   = rcvAcceptMsg.MaxBlockSize;
+    mTransferAcceptData.StartOffset    = rcvAcceptMsg.StartOffset;
+    mTransferAcceptData.Length         = rcvAcceptMsg.Length;
+    mTransferAcceptData.Metadata       = rcvAcceptMsg.Metadata;
+    mTransferAcceptData.MetadataLength = rcvAcceptMsg.MetadataLength;
 
     mPendingMsgHandle = msgData.Retain();
     mPendingOutput.Set(kOutput_AcceptReceived);
@@ -518,14 +526,12 @@ void TransferSession::HandleSendAccept(System::PacketBufferHandle msgData)
     // message
     mTransferMaxBlockSize = sendAcceptMsg.MaxBlockSize;
 
-    mTransferAcceptData = {
-        .ControlMode    = mControlMode,
-        .MaxBlockSize   = sendAcceptMsg.MaxBlockSize,
-        .StartOffset    = mStartOffset, // Not included in SendAccept msg, so use member
-        .Length         = mMaxLength,   // Not included in SendAccept msg, so use member
-        .Metadata       = sendAcceptMsg.Metadata,
-        .MetadataLength = sendAcceptMsg.MetadataLength,
-    };
+    mTransferAcceptData.ControlMode    = mControlMode;
+    mTransferAcceptData.MaxBlockSize   = sendAcceptMsg.MaxBlockSize;
+    mTransferAcceptData.StartOffset    = mStartOffset; // Not included in SendAccept msg, so use member
+    mTransferAcceptData.Length         = mMaxLength;   // Not included in SendAccept msg, so use member
+    mTransferAcceptData.Metadata       = sendAcceptMsg.Metadata;
+    mTransferAcceptData.MetadataLength = sendAcceptMsg.MetadataLength;
 
     mPendingMsgHandle = msgData.Retain();
     mPendingOutput.Set(kOutput_AcceptReceived);
