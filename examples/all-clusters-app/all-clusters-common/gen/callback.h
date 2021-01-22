@@ -51,6 +51,14 @@ void emberAfBarrierControlClusterInitCallback(chip::EndpointId endpoint);
  */
 void emberAfBasicClusterInitCallback(chip::EndpointId endpoint);
 
+/** @brief Binding Cluster Init
+ *
+ * Cluster Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfBindingClusterInitCallback(chip::EndpointId endpoint);
+
 /** @brief Color Control Cluster Init
  *
  * Cluster Init
@@ -402,6 +410,146 @@ EmberAfStatus emberAfBasicClusterServerPreAttributeChangedCallback(chip::Endpoin
  * @param endpoint  Endpoint that is being served
  */
 void emberAfBasicClusterServerTickCallback(chip::EndpointId endpoint);
+
+//
+// Binding Cluster client
+//
+
+/** @brief Binding Cluster Client Init
+ *
+ * Client Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfBindingClusterClientInitCallback(chip::EndpointId endpoint);
+
+/** @brief Binding Cluster Client Attribute Changed
+ *
+ * Client Attribute Changed
+ *
+ * @param endpoint    Endpoint that is being initialized
+ * @param attributeId Attribute that changed
+ */
+void emberAfBindingClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+
+/** @brief Binding Cluster Client Manufacturer Specific Attribute Changed
+ *
+ * Client Manufacturer Specific Attribute Changed
+ *
+ * @param endpoint          Endpoint that is being initialized
+ * @param attributeId       Attribute that changed
+ * @param manufacturerCode  Manufacturer Code of the attribute that changed
+ */
+void emberAfBindingClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                             chip::AttributeId attributeId,
+                                                                             uint16_t manufacturerCode);
+
+/** @brief Binding Cluster Client Message Sent
+ *
+ * Client Message Sent
+ *
+ * @param type               The type of message sent
+ * @param indexOrDestination The destination or address to which the message was sent
+ * @param apsFrame           The APS frame for the message
+ * @param msgLen             The length of the message
+ * @param message            The message that was sent
+ * @param status             The status of the sent message
+ */
+void emberAfBindingClusterClientMessageSentCallback(EmberOutgoingMessageType type, uint64_t indexOrDestination,
+                                                    EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
+                                                    EmberStatus status);
+
+/** @brief Binding Cluster Client Pre Attribute Changed
+ *
+ * client Pre Attribute Changed
+ *
+ * @param endpoint      Endpoint that is being initialized
+ * @param attributeId   Attribute to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+EmberAfStatus emberAfBindingClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
+                                                                     EmberAfAttributeType attributeType, uint8_t size,
+                                                                     uint8_t * value);
+
+/** @brief Binding Cluster Client Tick
+ *
+ * client Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfBindingClusterClientTickCallback(chip::EndpointId endpoint);
+
+//
+// Binding Cluster server
+//
+
+/** @brief Binding Cluster Server Init
+ *
+ * Server Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfBindingClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Binding Cluster Server Attribute Changed
+ *
+ * Server Attribute Changed
+ *
+ * @param endpoint    Endpoint that is being initialized
+ * @param attributeId Attribute that changed
+ */
+void emberAfBindingClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+
+/** @brief Binding Cluster Server Manufacturer Specific Attribute Changed
+ *
+ * Server Manufacturer Specific Attribute Changed
+ *
+ * @param endpoint          Endpoint that is being initialized
+ * @param attributeId       Attribute that changed
+ * @param manufacturerCode  Manufacturer Code of the attribute that changed
+ */
+void emberAfBindingClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                             chip::AttributeId attributeId,
+                                                                             uint16_t manufacturerCode);
+
+/** @brief Binding Cluster Server Message Sent
+ *
+ * Server Message Sent
+ *
+ * @param type               The type of message sent
+ * @param indexOrDestination The destination or address to which the message was sent
+ * @param apsFrame           The APS frame for the message
+ * @param msgLen             The length of the message
+ * @param message            The message that was sent
+ * @param status             The status of the sent message
+ */
+void emberAfBindingClusterServerMessageSentCallback(EmberOutgoingMessageType type, uint64_t indexOrDestination,
+                                                    EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
+                                                    EmberStatus status);
+
+/** @brief Binding Cluster Server Pre Attribute Changed
+ *
+ * server Pre Attribute Changed
+ *
+ * @param endpoint      Endpoint that is being initialized
+ * @param attributeId   Attribute to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+EmberAfStatus emberAfBindingClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
+                                                                     EmberAfAttributeType attributeType, uint8_t size,
+                                                                     uint8_t * value);
+
+/** @brief Binding Cluster Server Tick
+ *
+ * server Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfBindingClusterServerTickCallback(chip::EndpointId endpoint);
 
 //
 // Color Control Cluster client
@@ -1546,6 +1694,28 @@ bool emberAfBasicClusterMfgSpecificPingCallback();
  */
 
 bool emberAfBasicClusterResetToFactoryDefaultsCallback();
+
+/**
+ * @brief Binding Cluster Bind Command callback
+ * @param nodeId
+ * @param groupId
+ * @param endpointId
+ * @param clusterId
+ */
+
+bool emberAfBindingClusterBindCallback(chip::NodeId nodeId, chip::GroupId groupId, chip::EndpointId endpointId,
+                                       chip::ClusterId clusterId);
+
+/**
+ * @brief Binding Cluster Unbind Command callback
+ * @param nodeId
+ * @param groupId
+ * @param endpointId
+ * @param clusterId
+ */
+
+bool emberAfBindingClusterUnbindCallback(chip::NodeId nodeId, chip::GroupId groupId, chip::EndpointId endpointId,
+                                         chip::ClusterId clusterId);
 
 /**
  * @brief Color Control Cluster MoveColor Command callback

@@ -107,6 +107,33 @@ CHIP_ERROR BasicCluster::ReadAttributeClusterRevision(Callback::Callback<> * onC
     return SendCommand(std::move(payload), onCompletion);
 }
 
+// Binding Cluster Commands
+CHIP_ERROR BindingCluster::Bind(Callback::Callback<> * onCompletion, chip::NodeId nodeId, chip::GroupId groupId,
+                                chip::EndpointId endpointId, chip::ClusterId clusterId)
+{
+    System::PacketBufferHandle payload = encodeBindingClusterBindCommand(mEndpoint, nodeId, groupId, endpointId, clusterId);
+    return SendCommand(std::move(payload), onCompletion);
+}
+
+CHIP_ERROR BindingCluster::Unbind(Callback::Callback<> * onCompletion, chip::NodeId nodeId, chip::GroupId groupId,
+                                  chip::EndpointId endpointId, chip::ClusterId clusterId)
+{
+    System::PacketBufferHandle payload = encodeBindingClusterUnbindCommand(mEndpoint, nodeId, groupId, endpointId, clusterId);
+    return SendCommand(std::move(payload), onCompletion);
+}
+
+// Binding Cluster Attributes
+CHIP_ERROR BindingCluster::DiscoverAttributes(Callback::Callback<> * onCompletion)
+{
+    System::PacketBufferHandle payload = encodeBindingClusterDiscoverAttributes(mEndpoint);
+    return SendCommand(std::move(payload), onCompletion);
+}
+CHIP_ERROR BindingCluster::ReadAttributeClusterRevision(Callback::Callback<> * onCompletion)
+{
+    System::PacketBufferHandle payload = encodeBindingClusterReadClusterRevisionAttribute(mEndpoint);
+    return SendCommand(std::move(payload), onCompletion);
+}
+
 // ColorControl Cluster Commands
 CHIP_ERROR ColorControlCluster::MoveColor(Callback::Callback<> * onCompletion, int16_t rateX, int16_t rateY, uint8_t optionsMask,
                                           uint8_t optionsOverride)
