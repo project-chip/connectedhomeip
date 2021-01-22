@@ -22,11 +22,11 @@
  *
  */
 
+#include "Parser.h"
 #include <algorithm>
 #include <inttypes.h>
 #include <stdarg.h>
 #include <stdio.h>
-#include "Parser.h"
 
 using namespace chip;
 using namespace chip::TLV;

@@ -22,11 +22,11 @@
  *
  */
 
+#include "ListBuilder.h"
 #include <algorithm>
 #include <inttypes.h>
 #include <stdarg.h>
 #include <stdio.h>
-#include "ListBuilder.h"
 
 using namespace chip;
 using namespace chip::TLV;

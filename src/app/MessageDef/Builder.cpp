@@ -22,11 +22,11 @@
  *
  */
 
+#include "Builder.h"
 #include <algorithm>
 #include <inttypes.h>
 #include <stdarg.h>
 #include <stdio.h>
-#include "Builder.h"
 
 using namespace chip;
 using namespace chip::TLV;

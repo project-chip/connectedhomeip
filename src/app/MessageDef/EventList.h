@@ -27,15 +27,15 @@
 #ifndef _CHIP_INTERACTION_MODEL_MESSAGE_DEF_EVENT_LIST_H
 #define _CHIP_INTERACTION_MODEL_MESSAGE_DEF_EVENT_LIST_H
 
+#include "EventDataElement.h"
+#include "ListBuilder.h"
+#include "ListParser.h"
+#include "MessageDef.h"
 #include <core/CHIPCore.h>
 #include <core/CHIPTLV.h>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 #include <util/basic-types.h>
-#include "MessageDef.h"
-#include "EventDataElement.h"
-#include "ListParser.h"
-#include "ListBuilder.h"
 
 namespace chip {
 namespace app {

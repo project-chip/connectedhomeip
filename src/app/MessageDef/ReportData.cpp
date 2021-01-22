@@ -22,14 +22,13 @@
  *
  */
 
+#include "ReportData.h"
 #include "MessageDef.h"
 #include "MessageDefHelper.h"
-#include "ReportData.h"
 #include <algorithm>
 #include <inttypes.h>
 #include <stdarg.h>
 #include <stdio.h>
-
 
 using namespace chip;
 using namespace chip::TLV;

@@ -38,10 +38,10 @@
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
 
-#include <app/MessageDef/MessageDef.h>
-#include <app/MessageDef/InvokeCommand.h>
 #include <app/MessageDef/CommandDataElement.h>
 #include <app/MessageDef/CommandList.h>
+#include <app/MessageDef/InvokeCommand.h>
+#include <app/MessageDef/MessageDef.h>
 
 namespace chip {
 namespace app {

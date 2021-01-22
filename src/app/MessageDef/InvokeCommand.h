@@ -33,10 +33,10 @@
 #include <support/logging/CHIPLogging.h>
 #include <util/basic-types.h>
 
-#include "CommandList.h"
-#include "CommandDataElement.h"
-#include "Parser.h"
 #include "Builder.h"
+#include "CommandDataElement.h"
+#include "CommandList.h"
+#include "Parser.h"
 
 namespace chip {
 namespace app {

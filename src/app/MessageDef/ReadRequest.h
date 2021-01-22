@@ -27,17 +27,17 @@
 #ifndef _CHIP_INTERACTION_MODEL_MESSAGE_DEF_READ_REQUEST_H
 #define _CHIP_INTERACTION_MODEL_MESSAGE_DEF_READ_REQUEST_H
 
+#include "AttributeDataVersionList.h"
+#include "AttributePathList.h"
+#include "Builder.h"
+#include "EventPathList.h"
+#include "MessageDef.h"
+#include "Parser.h"
 #include <core/CHIPCore.h>
 #include <core/CHIPTLV.h>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 #include <util/basic-types.h>
-#include "MessageDef.h"
-#include "AttributeDataVersionList.h"
-#include "EventPathList.h"
-#include "AttributePathList.h"
-#include "Parser.h"
-#include "Builder.h"
 
 namespace chip {
 namespace app {

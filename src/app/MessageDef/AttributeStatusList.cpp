@@ -22,14 +22,14 @@
  *
  */
 
+#include "AttributeStatusList.h"
+#include "AttributeStatusElement.h"
+#include "MessageDef.h"
+#include "MessageDefHelper.h"
 #include <algorithm>
 #include <inttypes.h>
 #include <stdarg.h>
 #include <stdio.h>
-#include "MessageDef.h"
-#include "MessageDefHelper.h"
-#include "AttributeStatusElement.h"
-#include "AttributeStatusList.h"
 
 using namespace chip;
 using namespace chip::TLV;

@@ -36,9 +36,9 @@
 
 #include "AttributeDataList.h"
 #include "AttributeStatusList.h"
+#include "Builder.h"
 #include "EventList.h"
 #include "Parser.h"
-#include "Builder.h"
 
 namespace chip {
 namespace app {

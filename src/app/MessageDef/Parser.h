@@ -93,7 +93,7 @@ protected:
         err = reader.Get(*apLValue);
         SuccessOrExit(err);
 
-        exit:
+    exit:
         ChipLogIfFalse((CHIP_NO_ERROR == err) || (CHIP_END_OF_TLV == err));
 
         return err;

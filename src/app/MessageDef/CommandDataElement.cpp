@@ -22,13 +22,13 @@
  *
  */
 
+#include "CommandDataElement.h"
+#include "MessageDef.h"
+#include "MessageDefHelper.h"
 #include <algorithm>
 #include <inttypes.h>
 #include <stdarg.h>
 #include <stdio.h>
-#include "MessageDef.h"
-#include "MessageDefHelper.h"
-#include "CommandDataElement.h"
 
 using namespace chip;
 using namespace chip::TLV;

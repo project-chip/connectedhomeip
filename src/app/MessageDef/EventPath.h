@@ -27,13 +27,13 @@
 #ifndef _CHIP_INTERACTION_MODEL_MESSAGE_DEF_EVENT_PATH_H
 #define _CHIP_INTERACTION_MODEL_MESSAGE_DEF_EVENT_PATH_H
 
+#include "Builder.h"
+#include "Parser.h"
 #include <core/CHIPCore.h>
 #include <core/CHIPTLV.h>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 #include <util/basic-types.h>
-#include "Parser.h"
-#include "Builder.h"
 
 namespace chip {
 namespace app {

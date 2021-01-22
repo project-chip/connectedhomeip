@@ -22,14 +22,13 @@
  *
  */
 
+#include "EventList.h"
+#include "MessageDef.h"
+#include "MessageDefHelper.h"
 #include <algorithm>
 #include <inttypes.h>
 #include <stdarg.h>
 #include <stdio.h>
-#include "MessageDef.h"
-#include "MessageDefHelper.h"
-#include "EventList.h"
-
 
 using namespace chip;
 using namespace chip::TLV;

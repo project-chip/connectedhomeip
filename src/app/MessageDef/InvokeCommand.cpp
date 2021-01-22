@@ -27,8 +27,8 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-#include "MessageDefHelper.h"
 #include "InvokeCommand.h"
+#include "MessageDefHelper.h"
 
 using namespace chip;
 using namespace chip::TLV;

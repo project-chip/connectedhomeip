@@ -27,14 +27,14 @@
 #ifndef _CHIP_INTERACTION_MODEL_MESSAGE_DEF_ATTRIBUTE_DATA_LIST_H
 #define _CHIP_INTERACTION_MODEL_MESSAGE_DEF_ATTRIBUTE_DATA_LIST_H
 
+#include "AttributeDataElement.h"
+#include "ListBuilder.h"
+#include "ListParser.h"
 #include <core/CHIPCore.h>
 #include <core/CHIPTLV.h>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 #include <util/basic-types.h>
-#include "AttributeDataElement.h"
-#include "ListParser.h"
-#include "ListBuilder.h"
 
 namespace chip {
 namespace app {

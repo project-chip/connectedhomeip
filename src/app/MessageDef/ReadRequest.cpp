@@ -19,12 +19,12 @@
  *
  */
 
+#include "ReadRequest.h"
+#include "MessageDefHelper.h"
 #include <algorithm>
 #include <inttypes.h>
 #include <stdarg.h>
 #include <stdio.h>
-#include "MessageDefHelper.h"
-#include "ReadRequest.h"
 
 using namespace chip;
 using namespace chip::TLV;
