@@ -25,10 +25,10 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
 {
     switch (clusterId)
     {
-     case ZCL_LEVEL_CONTROL_CLUSTER_ID :
+    case ZCL_LEVEL_CONTROL_CLUSTER_ID:
         emberAfLevelControlClusterInitCallback(endpoint);
         break;
-     case ZCL_ON_OFF_CLUSTER_ID :
+    case ZCL_ON_OFF_CLUSTER_ID:
         emberAfOnOffClusterInitCallback(endpoint);
         break;
     default:
@@ -188,8 +188,8 @@ bool emberAfDefaultResponseCallback(ClusterId clusterId, CommandId commandId, Em
  * @param extended Indicates whether the response is in the extended format or
  * not.  Ver.: always
  */
-bool emberAfDiscoverAttributesResponseCallback(ClusterId clusterId, bool discoveryComplete, uint8_t * buffer,
-                                               uint16_t bufLen, bool extended)
+bool emberAfDiscoverAttributesResponseCallback(ClusterId clusterId, bool discoveryComplete, uint8_t * buffer, uint16_t bufLen,
+                                               bool extended)
 {
     return false;
 }
@@ -317,9 +317,8 @@ bool emberAfMessageSentCallback(EmberOutgoingMessageType type, uint16_t indexOrD
  * @param size   Ver.: always
  * @param value   Ver.: always
  */
-EmberAfStatus emberAfPreAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId,
-                                                uint8_t mask, uint16_t manufacturerCode, uint8_t type, uint8_t size,
-                                                uint8_t * value)
+EmberAfStatus emberAfPreAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
+                                                uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value)
 {
     return EMBER_ZCL_STATUS_SUCCESS;
 }
@@ -517,7 +516,8 @@ uint32_t emberAfGetCurrentTimeCallback()
  * @param returnEndpointInfo A pointer to a data struct that will be written
  * with information about the endpoint.  Ver.: always
  */
-bool emberAfGetEndpointInfoCallback(EndpointId endpoint, uint8_t * returnNetworkIndex, EmberAfEndpointInfoStruct * returnEndpointInfo)
+bool emberAfGetEndpointInfoCallback(EndpointId endpoint, uint8_t * returnNetworkIndex,
+                                    EmberAfEndpointInfoStruct * returnEndpointInfo)
 {
     return false;
 }
