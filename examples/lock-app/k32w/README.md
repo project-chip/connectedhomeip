@@ -1,16 +1,18 @@
 # CHIP K32W061 Lock Example Application
 
-The Project CHIP K32W061 Lock Example demonstrates how to remotely control a door lock
-device with one basic bolt. It uses buttons to test changing the lock and device
-states and LEDs to show the state of these changes. You can use this example as
-a reference for creating your own application.
+The Project CHIP K32W061 Lock Example demonstrates how to remotely control a
+door lock device with one basic bolt. It uses buttons to test changing the lock
+and device states and LEDs to show the state of these changes. You can use this
+example as a reference for creating your own application.
 
-The example is based on [Project CHIP](https://github.com/project-chip/connectedhomeip)
-and the NXP K32W SDK, and supports remote access and control of a simulated door
-lock over a low-power, 802.15.4 Thread network.
+The example is based on
+[Project CHIP](https://github.com/project-chip/connectedhomeip) and the NXP K32W
+SDK, and supports remote access and control of a simulated door lock over a
+low-power, 802.15.4 Thread network.
 
-The example behaves as a Project CHIP accessory, that is a device that can be paired into
-an existing Project CHIP network and can be controlled by this network.
+The example behaves as a Project CHIP accessory, that is a device that can be
+paired into an existing Project CHIP network and can be controlled by this
+network.
 
 <hr>
 
@@ -32,12 +34,11 @@ an existing Project CHIP network and can be controlled by this network.
 ![K32W061 DK6](../../platform/k32w/doc/images/k32w-dk6.jpg)
 
 The K32W lock example application provides a working demonstration of a
-connected door lock device, built using the Project CHIP codebase and
-the NXP K32W061 SDK. The example supports remote access (e.g.: using
-CHIP Tool from a mobile phone) and control of a simulated door lock over
-a low-power, 802.15.4 Thread network. It is capable of being paired into
-an existing Project CHIP network along with other Project CHIP-enabled
-devices.
+connected door lock device, built using the Project CHIP codebase and the NXP
+K32W061 SDK. The example supports remote access (e.g.: using CHIP Tool from a
+mobile phone) and control of a simulated door lock over a low-power, 802.15.4
+Thread network. It is capable of being paired into an existing Project CHIP
+network along with other Project CHIP-enabled devices.
 
 The example targets the
 [NXP K32W061 DK6](https://www.nxp.com/products/wireless/thread/k32w061-41-high-performance-secure-and-ultra-low-power-mcu-for-zigbeethread-and-bluetooth-le-5-0-with-built-in-nfc-option:K32W061_41)
@@ -50,16 +51,18 @@ controller and obtain configuration from it. The actions required before
 establishing full communication are described below.
 
 The example also comes with a test mode, which allows to start Thread with the
-default settings by pressing a button. However, this mode does not
-guarantee that the device will be able to communicate with the CHIP controller
-and other devices.
+default settings by pressing a button. However, this mode does not guarantee
+that the device will be able to communicate with the CHIP controller and other
+devices.
 
 ### Bluetooth LE Advertising
+
 To commission the device onto a Project CHIP network, the device must be
-discoverable over Bluetooth LE. Bluetooth LE advertising is started automatically
-when the device is powered up.
+discoverable over Bluetooth LE. Bluetooth LE advertising is started
+automatically when the device is powered up.
 
 ### Bluetooth LE Rendezvous
+
 In Project CHIP, the commissioning procedure (called rendezvous) is done over
 Bluetooth LE between a CHIP device and the CHIP controller, where the controller
 has the commissioner role.
@@ -69,6 +72,7 @@ from the CHIP device. The data payload is encoded within a QR code, printed to
 the UART console.
 
 ### Thread Provisioning
+
 Last part of the rendezvous procedure, the provisioning operation involves
 sending the Thread network credentials from the CHIP controller to the CHIP
 device. As a result, device is able to join the Thread network and communicate
@@ -103,12 +107,12 @@ bolt is extended (i.e. door locked); when not lit, the bolt is retracted (door
 unlocked). The LED will flash whenever the simulated bolt is in motion from one
 position to another.
 
-**Button SW2** can be used to reset the device to a default state.
-Pressing and holding Button SW2 for 6 seconds initiates a factory reset. After
-an initial period of 3 seconds, LED2 D2 and D3 will flash in unison to signal
-the pending reset. Holding the button past 6 seconds will cause the device to
-reset its persistent configuration and initiate a reboot. The reset action can
-be cancelled by releasing the button at any point before the 6 second limit.
+**Button SW2** can be used to reset the device to a default state. Pressing and
+holding Button SW2 for 6 seconds initiates a factory reset. After an initial
+period of 3 seconds, LED2 D2 and D3 will flash in unison to signal the pending
+reset. Holding the button past 6 seconds will cause the device to reset its
+persistent configuration and initiate a reboot. The reset action can be
+cancelled by releasing the button at any point before the 6 second limit.
 
 **Button SW3** can be used to change the state of the simulated bolt. This can
 be used to mimic a user manually operating the lock. The button behaves as a
@@ -124,12 +128,12 @@ The remaining two LEDs (D1/D2) and button (SW1) are unused.
 
 ## Building
 
-In order to build the Project CHIP example, we recommend using a Linux distribution (the
-demo-application was compiled on Ubuntu 20.04).
+In order to build the Project CHIP example, we recommend using a Linux
+distribution (the demo-application was compiled on Ubuntu 20.04).
 
--   Download [K32W061 SDK 2.6.2 for Project CHIP](https://mcuxpresso.nxp.com/). Creating
-    an nxp.com account is required before being able to download the SDK. Once the
-    account is created, login and follow the steps for downloading
+-   Download [K32W061 SDK 2.6.2 for Project CHIP](https://mcuxpresso.nxp.com/).
+    Creating an nxp.com account is required before being able to download the
+    SDK. Once the account is created, login and follow the steps for downloading
     SDK_2.6.2_K32W061DK6. The SDK Builder UI selection should be similar with
     the one from the image below.
     ![MCUXpresso SDK Download](../../platform/k32w/doc/images/mcux-sdk-download.JPG)
@@ -146,11 +150,12 @@ user@ubuntu:~/Desktop/git/connectedhomeip/examples/lock-app/k32w$ ninja -C out/d
 user@ubuntu: $K32W061_SDK_ROOT/tools/imagetool/sign_images.sh out/debug/
 ```
 
-Note that "patch_k32w_mr2_sdk.sh" script must be run for patching
-the K32W061 SDK 2.6.2.
+Note that "patch_k32w_mr2_sdk.sh" script must be run for patching the K32W061
+SDK 2.6.2.
 
 In case signing errors are encountered when running the "sign_images.sh" script
-install the recommanded packages (python version > 3, pip3, pycrypto, pycryptodome):
+install the recommanded packages (python version > 3, pip3, pycrypto,
+pycryptodome):
 
 ```
 user@ubuntu:~$ python3 --version
@@ -203,10 +208,10 @@ In order to flash the application we recommend using
     <i>Base address</i> is 0x0. Click <i>Debug</i>. A pop-up window entitled
     <i>Errors in Workspace</i> will appear. Click <i>Proceed</i>.
     ![Debug_configuration](../../platform/k32w/doc/images/debg-conf.JPG)
-    
-    
+
 ## Testing the example
 
 The app can be deployed against any generic OpenThread Border Router. An
-upcoming PR will add step-by-step instructions for setting up a generic OpenThread
-Border Router with an USB K32W061 in RCP mode working as an 802.15.4 transceiver.
+upcoming PR will add step-by-step instructions for setting up a generic
+OpenThread Border Router with an USB K32W061 in RCP mode working as an 802.15.4
+transceiver.
