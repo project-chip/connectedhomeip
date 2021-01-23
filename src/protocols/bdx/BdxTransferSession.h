@@ -99,7 +99,7 @@ public:
             StatusReportData statusData;
         };
 
-        OutputEvent() {}
+        OutputEvent() { EventType = kOutput_None; }
         OutputEvent(OutputEventFlags type) : EventType(type) {}
 
         static OutputEvent TransferInitEvent(TransferInitData data, System::PacketBufferHandle msg)
