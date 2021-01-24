@@ -12,9 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
-import("${chip_root}/build/chip/happy_test.gni")
+import("${build_root}/chip/happy_test.gni")
 
 happy_test("inet_tests") {
   deps = [ "${chip_root}/src/inet/tests:happy_tests" ]
