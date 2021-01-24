@@ -41,7 +41,7 @@ static CHIP_ERROR checkDecimalStringValidity(std::string decimalString, std::str
         return CHIP_ERROR_INVALID_STRING_LENGTH;
     }
     std::string repWithoutCheckChar = decimalString.substr(0, decimalString.length() - 1);
-    char checkChar             = decimalString.back();
+    char checkChar                  = decimalString.back();
 
     if (!Verhoeff10::ValidateCheckChar(checkChar, repWithoutCheckChar.c_str()))
     {

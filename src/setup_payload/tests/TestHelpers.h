@@ -27,7 +27,7 @@ namespace chip {
 const uint16_t kSmallBufferSizeInBytes   = 1;
 const uint16_t kDefaultBufferSizeInBytes = 512;
 
-const uint8_t kOptionalDefaultStringTag  = 2;
+const uint8_t kOptionalDefaultStringTag       = 2;
 const std::string kOptionalDefaultStringValue = "myData";
 
 const uint8_t kOptionalDefaultIntTag    = 3;

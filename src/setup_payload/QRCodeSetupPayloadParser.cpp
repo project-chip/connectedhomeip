@@ -332,7 +332,7 @@ static std::string extractPayload(std::string inString)
     // Find the first string between delimiters that starts with kQRCodePrefix
     for (size_t i = 0; i < startIndices.size(); i++)
     {
-        size_t startIndex = startIndices[i];
+        size_t startIndex   = startIndices[i];
         size_t endIndex     = (i == startIndices.size() - 1 ? std::string::npos : startIndices[i + 1] - 1);
         size_t length       = (endIndex != std::string::npos ? endIndex - startIndex : std::string::npos);
         std::string segment = inString.substr(startIndex, length);

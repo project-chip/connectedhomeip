@@ -131,7 +131,7 @@ CHIP_ERROR writeTag(TLV::TLVWriter & writer, uint64_t tag, OptionalQRCodeInfoExt
 CHIP_ERROR QRCodeSetupPayloadGenerator::generateTLVFromOptionalData(SetupPayload & outPayload, uint8_t * tlvDataStart,
                                                                     uint32_t maxLen, size_t & tlvDataLengthInBytes)
 {
-    CHIP_ERROR err                                            = CHIP_NO_ERROR;
+    CHIP_ERROR err                                                 = CHIP_NO_ERROR;
     std::vector<OptionalQRCodeInfo> optionalData                   = outPayload.getAllOptionalVendorData();
     std::vector<OptionalQRCodeInfoExtension> optionalExtensionData = outPayload.getAllOptionalExtensionData();
     VerifyOrExit(!optionalData.empty() || !optionalExtensionData.empty(), err = CHIP_NO_ERROR);
