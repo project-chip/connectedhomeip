@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/toolchain/flashable_executable.gni")
+import("//build_overrides/build.gni")
+
+import("${build_root}/toolchain/flashable_executable.gni")
 
 template("ti_simplelink_executable") {
   # we really only need the ELF
