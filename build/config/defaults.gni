@@ -35,8 +35,7 @@ declare_args() {
   default_configs_std = [ "${build_root}/config/compiler:std_default" ]
 
   # Defaults configs for symbols.
-  default_configs_symbols =
-      [ "${build_root}/config/compiler:symbols_default" ]
+  default_configs_symbols = [ "${build_root}/config/compiler:symbols_default" ]
 
   # Defaults configs for aliasing.
   default_configs_aliasing =
@@ -67,20 +66,17 @@ declare_args() {
       [ "${build_root}/config/compiler:cosmetic_default" ]
 
   # Default configs for runtime library.
-  default_configs_runtime =
-      [ "${build_root}/config/compiler:runtime_default" ]
+  default_configs_runtime = [ "${build_root}/config/compiler:runtime_default" ]
 
   # Defaults sanitizer configs.
   default_configs_sanitize =
       [ "${build_root}/config/compiler:sanitize_default" ]
 
   # Defaults fuzzing configs.
-  default_configs_fuzzing =
-      [ "${build_root}/config/compiler:fuzzing_default" ]
+  default_configs_fuzzing = [ "${build_root}/config/compiler:fuzzing_default" ]
 
   # Defaults target-specific configs.
-  default_configs_target =
-      [ "${build_root}/config/compiler:target_default" ]
+  default_configs_target = [ "${build_root}/config/compiler:target_default" ]
 
   # Extra default configs.
   default_configs_extra = []

@@ -181,8 +181,7 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
 
   if (enable_host_clang_build) {
     chip_build("host_clang") {
-      toolchain =
-          "${build_root}/toolchain/host:${host_os}_${host_cpu}_clang"
+      toolchain = "${build_root}/toolchain/host:${host_os}_${host_cpu}_clang"
     }
   }
 
