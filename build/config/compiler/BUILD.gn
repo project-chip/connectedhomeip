@@ -12,11 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/chip.gni")
+import("//build_overrides/build.gni")
 import("//build_overrides/pigweed.gni")
 
-import("//build/config/compiler/compiler.gni")
-import("//build/config/target.gni")
+import("${build_root}/config/compiler/compiler.gni")
+import("${build_root}/config/target.gni")
 
 declare_args() {
   # Enable -Werror. This can be disabled if using a different compiler
@@ -28,9 +28,9 @@ _is_embedded_arm = current_os != "ios" && current_os != "mac_os" &&
                    (current_cpu == "arm" || current_cpu == "arm64")
 
 if (_is_embedded_arm) {
-  import("//build/config/arm.gni")
+  import("${build_root}/config/arm.gni")
 } else if (current_cpu == "x86" || current_cpu == "x86_64") {
-  import("//build/config/x86.gni")
+  import("${build_root}/config/x86.gni")
 }
 
 config("release") {

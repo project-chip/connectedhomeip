@@ -12,13 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/build.gni")
+import("//build_overrides/pigweed.gni")
+
 # The location of the build configuration file.
-buildconfig = "//build/config/BUILDCONFIG.gn"
+buildconfig = "${build_root}/config/BUILDCONFIG.gn"
 
 # CHIP uses angle bracket includes.
 check_system_includes = true
-
-import("//build_overrides/pigweed.gni")
 
 script_executable = "python3"
 
