@@ -33,32 +33,27 @@
 #include <protocols/Protocols.h>
 #include <support/CodeUtils.h>
 
-using namespace chip;
-using namespace std;
-using namespace chip::SetupPayload;
-using namespace chip::TLV;
-using namespace chip::TLV::Utilities;
-using namespace chip::Protocols;
+namespace chip {
 
-CHIP_ERROR AdditionalDataPayloadParser::populatePayload(AdditionalDataPayload & outPayload)
+CHIP_ERROR AdditionalDataPayloadParser::populatePayload(SetupPayload::AdditionalDataPayload & outPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    TLVReader reader;
-    TLVReader innerReader;
+    TLV::TLVReader reader;
+    TLV::TLVReader innerReader;
 
     reader.Init(mPayloadBufferData, mPayloadBufferLength);
-    err = reader.Next(kTLVType_Structure, AnonymousTag);
+    err = reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag);
     SuccessOrExit(err);
 
     // Open the container
     err = reader.OpenContainer(innerReader);
     SuccessOrExit(err);
 
-    err = innerReader.Next(kTLVType_UTF8String, ContextTag(kRotatingDeviceIdTag));
+    err = innerReader.Next(TLV::kTLVType_UTF8String, TLV::ContextTag(SetupPayload::kRotatingDeviceIdTag));
     SuccessOrExit(err);
 
     // Get the value of the rotating device id
-    char rotatingDeviceId[kRotatingDeviceIdLength];
+    char rotatingDeviceId[SetupPayload::kRotatingDeviceIdLength];
     err = innerReader.GetString(rotatingDeviceId, sizeof(rotatingDeviceId));
     SuccessOrExit(err);
     outPayload.rotatingDeviceId = std::string(rotatingDeviceId);
@@ -70,3 +65,5 @@ CHIP_ERROR AdditionalDataPayloadParser::populatePayload(AdditionalDataPayload & 
 exit:
     return err;
 }
+
+} // namespace chip

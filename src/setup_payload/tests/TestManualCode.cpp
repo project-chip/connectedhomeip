@@ -37,9 +37,9 @@ using namespace chip;
 
 namespace {
 
-bool CheckGenerator(const SetupPayload & payload, string expectedResult)
+bool CheckGenerator(const SetupPayload & payload, std::string expectedResult)
 {
-    string result;
+    std::string result;
     ManualSetupPayloadGenerator generator(payload);
     generator.payloadDecimalStringRepresentation(result);
 
@@ -71,7 +71,7 @@ void TestDecimalRepresentation_PartialPayload(nlTestSuite * inSuite, void * inCo
 {
     SetupPayload payload = GetDefaultPayload();
 
-    string expectedResult = "0000039490";
+    std::string expectedResult = "0000039490";
 
     NL_TEST_ASSERT(inSuite, CheckGenerator(payload, expectedResult));
 }
@@ -81,7 +81,7 @@ void TestDecimalRepresentation_PartialPayload_RequiresCustomFlow(nlTestSuite * i
     SetupPayload payload       = GetDefaultPayload();
     payload.requiresCustomFlow = true;
 
-    string expectedResult = "00000394910000000000";
+    std::string expectedResult = "00000394910000000000";
 
     NL_TEST_ASSERT(inSuite, CheckGenerator(payload, expectedResult));
 }
@@ -93,7 +93,7 @@ void TestDecimalRepresentation_FullPayloadWithZeros(nlTestSuite * inSuite, void 
     payload.vendorID           = 1;
     payload.productID          = 1;
 
-    string expectedResult = "00000394910000100001";
+    std::string expectedResult = "00000394910000100001";
 
     NL_TEST_ASSERT(inSuite, CheckGenerator(payload, expectedResult));
 }
@@ -105,7 +105,7 @@ void TestDecimalRepresentation_FullPayloadWithoutZeros(nlTestSuite * inSuite, vo
     payload.vendorID           = 45367;
     payload.productID          = 14526;
 
-    string expectedResult = "00000394914536714526";
+    std::string expectedResult = "00000394914536714526";
 
     NL_TEST_ASSERT(inSuite, CheckGenerator(payload, expectedResult));
 }
@@ -116,7 +116,7 @@ void TestDecimalRepresentation_FullPayloadWithoutZeros_DoesNotRequireCustomFlow(
     payload.vendorID     = 45367;
     payload.productID    = 14526;
 
-    string expectedResult = "0000039490";
+    std::string expectedResult = "0000039490";
 
     NL_TEST_ASSERT(inSuite, CheckGenerator(payload, expectedResult));
 }
@@ -127,7 +127,7 @@ void TestDecimalRepresentation_AllZeros(nlTestSuite * inSuite, void * inContext)
     payload.setUpPINCode  = 0;
     payload.discriminator = 0;
 
-    string expectedResult = "";
+    std::string expectedResult = "";
 
     NL_TEST_ASSERT(inSuite, CheckGenerator(payload, expectedResult));
 }
@@ -138,7 +138,7 @@ void TestDecimalRepresentation_InvalidPayload(nlTestSuite * inSuite, void * inCo
     payload.discriminator = 0x1f00;
 
     ManualSetupPayloadGenerator generator(payload);
-    string result;
+    std::string result;
     NL_TEST_ASSERT(inSuite, generator.payloadDecimalStringRepresentation(result) == CHIP_ERROR_INVALID_ARGUMENT);
 }
 
@@ -161,7 +161,7 @@ void TestGenerateAndParser_ManualSetupCodeWithLongDiscriminator(nlTestSuite * in
     {
         // Test short 11 digit code
         ManualSetupPayloadGenerator generator(payload);
-        string result;
+        std::string result;
         NL_TEST_ASSERT(inSuite, generator.payloadDecimalStringRepresentation(result) == CHIP_NO_ERROR);
 
         SetupPayload outPayload;
@@ -178,7 +178,7 @@ void TestGenerateAndParser_ManualSetupCodeWithLongDiscriminator(nlTestSuite * in
     {
         // Test long 21 digit code
         ManualSetupPayloadGenerator generator(payload);
-        string result;
+        std::string result;
         NL_TEST_ASSERT(inSuite, generator.payloadDecimalStringRepresentation(result) == CHIP_NO_ERROR);
 
         SetupPayload outPayload;
@@ -199,7 +199,7 @@ void assertEmptyPayloadWithError(nlTestSuite * inSuite, CHIP_ERROR actualError, 
 void TestPayloadParser_FullPayload(nlTestSuite * inSuite, void * inContext)
 {
     SetupPayload payload;
-    string decimalString;
+    std::string decimalString;
 
     decimalString = "00000394914536714526";
     decimalString += Verhoeff10::ComputeCheckChar(decimalString.c_str());
@@ -225,7 +225,7 @@ void TestGenerateAndParser_FullPayload(nlTestSuite * inSuite, void * inContext)
     payload.requiresCustomFlow = true;
 
     ManualSetupPayloadGenerator generator(payload);
-    string result;
+    std::string result;
     NL_TEST_ASSERT(inSuite, generator.payloadDecimalStringRepresentation(result) == CHIP_NO_ERROR);
 
     SetupPayload outPayload;
@@ -239,7 +239,7 @@ void TestGenerateAndParser_PartialPayload(nlTestSuite * inSuite, void * inContex
     SetupPayload payload = GetDefaultPayload();
 
     ManualSetupPayloadGenerator generator(payload);
-    string result;
+    std::string result;
     NL_TEST_ASSERT(inSuite, generator.payloadDecimalStringRepresentation(result) == CHIP_NO_ERROR);
 
     SetupPayload outPayload;
@@ -252,7 +252,7 @@ void TestPayloadParser_PartialPayload(nlTestSuite * inSuite, void * inContext)
 {
     CHIP_ERROR err;
     SetupPayload payload;
-    string decimalString;
+    std::string decimalString;
 
     decimalString = "0000039490";
     decimalString += Verhoeff10::ComputeCheckChar(decimalString.c_str());
@@ -299,7 +299,7 @@ void TestShortCodeReadWrite(nlTestSuite * inSuite, void * context)
     SetupPayload inPayload = GetDefaultPayload();
     SetupPayload outPayload;
 
-    string result;
+    std::string result;
     ManualSetupPayloadGenerator generator(inPayload);
     generator.payloadDecimalStringRepresentation(result);
     ManualSetupPayloadParser(result).populatePayload(outPayload);
@@ -315,7 +315,7 @@ void TestLongCodeReadWrite(nlTestSuite * inSuite, void * context)
     inPayload.productID          = 1;
     SetupPayload outPayload;
 
-    string result;
+    std::string result;
     ManualSetupPayloadGenerator generator(inPayload);
     generator.payloadDecimalStringRepresentation(result);
     ManualSetupPayloadParser(result).populatePayload(outPayload);
@@ -343,7 +343,7 @@ void TestExtractBits(nlTestSuite * inSuite, void * inContext)
 void TestPayloadParser_InvalidEntry(nlTestSuite * inSuite, void * inContext)
 {
     SetupPayload payload;
-    string decimalString;
+    std::string decimalString;
 
     // Empty input
     decimalString = "";
@@ -393,10 +393,10 @@ void TestPayloadParser_InvalidEntry(nlTestSuite * inSuite, void * inContext)
 
 void TestCheckDecimalStringValidity(nlTestSuite * inSuite, void * inContext)
 {
-    string outReprensation;
+    std::string outReprensation;
     char checkDigit;
-    string representationWithoutCheckDigit;
-    string decimalString;
+    std::string representationWithoutCheckDigit;
+    std::string decimalString;
 
     representationWithoutCheckDigit = "";
     NL_TEST_ASSERT(

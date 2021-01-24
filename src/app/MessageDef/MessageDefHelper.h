@@ -46,9 +46,6 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-using namespace chip;
-using namespace chip::TLV;
-
 #ifndef CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 #define CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK 1
 #endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
