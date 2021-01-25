@@ -25,9 +25,9 @@
 #include <lib/core/ReferenceCounted.h>
 #include <lib/mdns/platform/Mdns.h>
 #include <messaging/Channel.h>
+#include <transport/CertificateAuthenticatedSessionEstablishment.h>
 #include <transport/PeerConnectionState.h>
 #include <transport/SecureSessionMgr.h>
-#include <transport/CertificateAuthenticatedSessionEstablishment.h>
 
 namespace chip {
 namespace Messaging {
@@ -41,7 +41,8 @@ public:
     static void Release(ChannelContext * context);
 };
 
-class ChannelContext : public ReferenceCounted<ChannelContext, ChannelContextDeletor>, public AuthenticatedSessionEstablishmentDelegate
+class ChannelContext : public ReferenceCounted<ChannelContext, ChannelContextDeletor>,
+                       public AuthenticatedSessionEstablishmentDelegate
 {
 public:
     ChannelContext(ExchangeManager * exchangeManager) : mState(ChannelState::kChanneState_None), mExchangeManager(exchangeManager)
@@ -95,7 +96,8 @@ private:
             Inet::InterfaceId mInterface;
             Inet::IPAddressType mAddressType;
             Inet::IPAddress mAddress;
-            union {
+            union
+            {
                 SecurePairingSession * mPasePairingSession;
                 CertificateAuthenticatedSessionEstablishment * mCasePairingSession;
             };

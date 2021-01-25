@@ -74,7 +74,7 @@ CHIP_ERROR ExchangeManager::Init(NodeId localNodeId, TransportMgrBase * transpor
     mSessionMgr   = sessionMgr;
 
     mNextExchangeId = GetRandU16();
-    mNextKeyId  = 0;
+    mNextKeyId      = 0;
 
     mContextsInUse = 0;
 

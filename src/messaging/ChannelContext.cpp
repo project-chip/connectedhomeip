@@ -263,15 +263,16 @@ CHIP_ERROR ChannelContext::HandlePairingMessage(const PacketHeader & packetHeade
 
 void ChannelContext::EnterPaseParingState()
 {
-    mPreparing.mState          = PrepareState::kPrepareState_PaseParing;
+    mPreparing.mState              = PrepareState::kPrepareState_PaseParing;
     mPreparing.mPasePairingSession = chip::Platform::New<SecurePairingSession>();
     // TODO: currently only supports IP/UDP paring
     Transport::PeerAddress addr;
     addr.SetTransportType(chip::Transport::Type::kUdp).SetIPAddress(mPreparing.mAddress);
-    CHIP_ERROR err = mPreparing.mPasePairingSession->Pair(addr, mPreparing.mBuilder.GetPeerSetUpPINCode(),
-                                                          Optional<NodeId>(mExchangeManager->GetLocalNodeId()), mPreparing.mBuilder.GetPeerNodeId(),
-                                                          mExchangeManager->GetNextKeyId(), this);
-    if (err != CHIP_NO_ERROR) {
+    CHIP_ERROR err = mPreparing.mPasePairingSession->Pair(
+        addr, mPreparing.mBuilder.GetPeerSetUpPINCode(), Optional<NodeId>(mExchangeManager->GetLocalNodeId()),
+        mPreparing.mBuilder.GetPeerNodeId(), mExchangeManager->GetNextKeyId(), this);
+    if (err != CHIP_NO_ERROR)
+    {
         ExitCaseParingState();
         ExitPreparingState();
         EnterFailedState(err);
@@ -285,13 +286,15 @@ void ChannelContext::ExitPaseParingState()
 
 void ChannelContext::EnterCaseParingState()
 {
-    mPreparing.mState          = PrepareState::kPrepareState_CaseParing;
+    mPreparing.mState              = PrepareState::kPrepareState_CaseParing;
     mPreparing.mCasePairingSession = chip::Platform::New<CertificateAuthenticatedSessionEstablishment>();
     // TODO: currently only supports IP/UDP paring
     Transport::PeerAddress addr;
     addr.SetTransportType(chip::Transport::Type::kUdp).SetIPAddress(mPreparing.mAddress);
-    CHIP_ERROR err = mPreparing.mCasePairingSession->EstablishSession(addr, mExchangeManager->GetLocalNodeId(), mPreparing.mBuilder.GetPeerNodeId(), mExchangeManager->GetNextKeyId(), this);
-    if (err != CHIP_NO_ERROR) {
+    CHIP_ERROR err = mPreparing.mCasePairingSession->EstablishSession(
+        addr, mExchangeManager->GetLocalNodeId(), mPreparing.mBuilder.GetPeerNodeId(), mExchangeManager->GetNextKeyId(), this);
+    if (err != CHIP_NO_ERROR)
+    {
         ExitCaseParingState();
         ExitPreparingState();
         EnterFailedState(err);
@@ -307,20 +310,20 @@ void ChannelContext::OnPairingError(CHIP_ERROR error)
 {
     if (mState != ChannelState::kChanneState_Preparing)
         return;
-    switch(mPreparing.mState)
+    switch (mPreparing.mState)
     {
-        case PrepareState::kPrepareState_PaseParing:
-            ExitPaseParingState();
-            ExitPreparingState();
-            EnterFailedState(error);
-            return;
-        case PrepareState::kPrepareState_CaseParing:
-            ExitCaseParingState();
-            ExitPreparingState();
-            EnterFailedState(error);
-            return;
-        default:
-            return;
+    case PrepareState::kPrepareState_PaseParing:
+        ExitPaseParingState();
+        ExitPreparingState();
+        EnterFailedState(error);
+        return;
+    case PrepareState::kPrepareState_CaseParing:
+        ExitCaseParingState();
+        ExitPreparingState();
+        EnterFailedState(error);
+        return;
+    default:
+        return;
     }
 }
 
@@ -328,27 +331,27 @@ void ChannelContext::OnPairingComplete()
 {
     if (mState != ChannelState::kChanneState_Preparing)
         return;
-    switch(mPreparing.mState)
+    switch (mPreparing.mState)
     {
-        case PrepareState::kPrepareState_PaseParing: {
-            ExitPaseParingState();
-            mPreparing.mState = PrepareState::kPrepareState_PaseParingDone;
+    case PrepareState::kPrepareState_PaseParing: {
+        ExitPaseParingState();
+        mPreparing.mState = PrepareState::kPrepareState_PaseParingDone;
 
-            Transport::PeerAddress addr;
-            addr.SetTransportType(chip::Transport::Type::kUdp).SetIPAddress(mPreparing.mAddress);
-            // This will trigger OnNewConnection callback from SecureSessionManager
-            mExchangeManager->GetSessionMgr()->NewPairing(Optional<Transport::PeerAddress>(addr), mPreparing.mBuilder.GetPeerNodeId(), mPreparing.mPasePairingSession);
-            return;
-                                                     }
-        case PrepareState::kPrepareState_CaseParing:
-            ExitCaseParingState();
-            mPreparing.mState = PrepareState::kPrepareState_PaseParingDone;
-            // TODO: current CASE paring session API doesn't show how to derive a secure session
-            return;
-        default:
-            return;
+        Transport::PeerAddress addr;
+        addr.SetTransportType(chip::Transport::Type::kUdp).SetIPAddress(mPreparing.mAddress);
+        // This will trigger OnNewConnection callback from SecureSessionManager
+        mExchangeManager->GetSessionMgr()->NewPairing(Optional<Transport::PeerAddress>(addr), mPreparing.mBuilder.GetPeerNodeId(),
+                                                      mPreparing.mPasePairingSession);
+        return;
     }
-
+    case PrepareState::kPrepareState_CaseParing:
+        ExitCaseParingState();
+        mPreparing.mState = PrepareState::kPrepareState_PaseParingDone;
+        // TODO: current CASE paring session API doesn't show how to derive a secure session
+        return;
+    default:
+        return;
+    }
 }
 
 void ChannelContext::OnNewConnection(SecureSessionHandle session)
