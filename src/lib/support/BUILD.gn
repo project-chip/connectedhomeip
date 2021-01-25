@@ -73,6 +73,8 @@ static_library("support") {
     "RandUtils.cpp",
     "RandUtils.h",
     "ReturnMacros.h",
+    "RotationCounter.cpp",
+    "RotationCounter.h",
     "SafeInt.h",
     "SerializableIntegerSet.cpp",
     "SerializableIntegerSet.h",

@@ -117,7 +117,6 @@ static void CheckReboot(nlTestSuite * inSuite, void * inContext)
     err = counter2.Init(testKey, 0x10000);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    counter2.Advance();
     value = counter2.GetValue();
     NL_TEST_ASSERT(inSuite, value == 0x10000);
 }

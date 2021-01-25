@@ -25,7 +25,7 @@
 
 #pragma once
 
-#include <support/PersistedCounter.h>
+#include <support/RotationCounter.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -130,7 +130,7 @@ protected:
     };
 
     uint8_t mFlags;
-    chip::PersistedCounter mRotationPersistedCounter;
+    chip::RotationCounter mRotationPersistedCounter;
 
     void LogDeviceConfig();
     CHIP_ERROR PersistProvisioningData(ProvisioningDataSet & provData);
