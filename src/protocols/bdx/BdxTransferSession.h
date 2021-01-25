@@ -43,34 +43,34 @@ public:
     {
         uint8_t TransferCtlFlagsRaw;
 
-        uint16_t MaxBlockSize = 0;
-        uint64_t StartOffset  = 0;
-        uint64_t Length       = 0;
+        uint16_t MaxBlockSize;
+        uint64_t StartOffset;
+        uint64_t Length;
 
-        const uint8_t * FileDesignator = nullptr;
-        uint16_t FileDesLength         = 0;
+        const uint8_t * FileDesignator;
+        uint16_t FileDesLength;
 
         // Additional metadata (optional, TLV format)
-        const uint8_t * Metadata = nullptr;
-        uint16_t MetadataLength  = 0;
+        const uint8_t * Metadata;
+        uint16_t MetadataLength;
     };
 
     struct TransferAcceptData
     {
         TransferControlFlags ControlMode;
 
-        uint16_t MaxBlockSize = 0;
-        uint64_t StartOffset  = 0; ///< Not used for SendAccept message
-        uint64_t Length       = 0; ///< Not used for SendAccept message
+        uint16_t MaxBlockSize;
+        uint64_t StartOffset; ///< Not used for SendAccept message
+        uint64_t Length;      ///< Not used for SendAccept message
 
         // Additional metadata (optional, TLV format)
-        const uint8_t * Metadata = nullptr;
-        uint16_t MetadataLength  = 0;
+        const uint8_t * Metadata;
+        uint16_t MetadataLength;
     };
 
     struct StatusReportData
     {
-        StatusCode error = kStatus_None;
+        StatusCode error;
     };
 
     struct BlockData
@@ -99,8 +99,8 @@ public:
             StatusReportData statusData;
         };
 
-        OutputEvent() { EventType = kOutput_None; }
-        OutputEvent(OutputEventFlags type) : EventType(type) {}
+        OutputEvent() : EventType(kOutput_None) { transferInitData = { 0 }; }
+        OutputEvent(OutputEventFlags type) : EventType(type) { transferInitData = { 0 }; }
 
         static OutputEvent TransferInitEvent(TransferInitData data, System::PacketBufferHandle msg)
         {
