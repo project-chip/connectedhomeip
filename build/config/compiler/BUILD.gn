@@ -259,11 +259,11 @@ config("sanitize_default") {
   configs = []
 
   if (is_asan) {
-    configs += [":sanitize_address"]
+    configs += [ ":sanitize_address" ]
   }
 
   if (is_msan) {
-    configs += [":sanitize_memory"]
+    configs += [ ":sanitize_memory" ]
   }
 }
 
