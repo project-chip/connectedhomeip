@@ -70,7 +70,7 @@ public:
 
     struct StatusReportData
     {
-        StatusCode error = kStatus_None;
+        StatusCode error;
     };
 
     struct BlockData
@@ -99,8 +99,8 @@ public:
             StatusReportData statusData;
         };
 
-        OutputEvent() : EventType(kOutput_None) { transferInitData = { 0 }; }
-        OutputEvent(OutputEventFlags type) : EventType(type) { transferInitData = { 0 }; }
+        OutputEvent() : EventType(kOutput_None) { statusData = { kStatus_None }; }
+        OutputEvent(OutputEventFlags type) : EventType(type) { statusData = { kStatus_None }; }
 
         static OutputEvent TransferInitEvent(TransferInitData data, System::PacketBufferHandle msg)
         {

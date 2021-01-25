@@ -44,8 +44,12 @@ void SendAndVerifyArbitraryBlock(nlTestSuite * inSuite, void * inContext, Transf
     uint8_t * fakeBlockData = fakeDataBuf->Start();
 
     // Provide Block data and verify sender emits Block message
-    TransferSession::BlockData blockData = { .Data = fakeBlockData, .Length = maxBlockSize, .IsEof = isEof };
-    err                                  = sender.PrepareBlock(blockData);
+    TransferSession::BlockData blockData;
+    blockData.Data   = fakeBlockData;
+    blockData.Length = maxBlockSize;
+    blockData.IsEof  = isEof;
+
+    err = sender.PrepareBlock(blockData);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     sender.PollOutput(outEvent);
     NL_TEST_ASSERT(inSuite, outEvent.EventType == TransferSession::kOutput_MsgToSend);

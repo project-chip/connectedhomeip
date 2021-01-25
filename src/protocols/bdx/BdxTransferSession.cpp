@@ -585,11 +585,9 @@ void TransferSession::HandleBlock(System::PacketBufferHandle msgData)
         VerifyOrExit(mNumBytesProcessed + blockMsg.DataLength <= mMaxLength, SetTransferError(kStatus_LengthMismatch));
     }
 
-    mBlockEventData = {
-        .Data   = blockMsg.Data,
-        .Length = blockMsg.DataLength,
-        .IsEof  = false,
-    };
+    mBlockEventData.Data   = blockMsg.Data;
+    mBlockEventData.Length = blockMsg.DataLength;
+    mBlockEventData.IsEof  = false;
 
     mNumBytesProcessed += blockMsg.DataLength;
 
@@ -614,11 +612,9 @@ void TransferSession::HandleBlockEOF(System::PacketBufferHandle msgData)
     VerifyOrExit(blockEOFMsg.BlockCounter == mBlockNumInFlight, SetTransferError(kStatus_BadBlockCounter));
     VerifyOrExit(blockEOFMsg.DataLength <= mTransferMaxBlockSize, SetTransferError(kStatus_BadMessageContents));
 
-    mBlockEventData = {
-        .Data   = blockEOFMsg.Data,
-        .Length = blockEOFMsg.DataLength,
-        .IsEof  = true,
-    };
+    mBlockEventData.Data   = blockEOFMsg.Data;
+    mBlockEventData.Length = blockEOFMsg.DataLength;
+    mBlockEventData.IsEof  = true;
 
     mNumBytesProcessed += blockEOFMsg.DataLength;
 
