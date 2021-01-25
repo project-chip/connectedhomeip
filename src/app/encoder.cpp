@@ -102,6 +102,7 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
 |---------------------------------------------------------------------+--------|
 | BarrierControl                                                      | 0x0103 |
 | Basic                                                               | 0x0000 |
+| Binding                                                             | 0xF000 |
 | ColorControl                                                        | 0x0300 |
 | DoorLock                                                            | 0x0101 |
 | Groups                                                              | 0x0004 |
@@ -146,6 +147,10 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
 #define BASIC_CLUSTER_ID 0x0000
 #define ZCL_MFG_SPECIFIC_PING_COMMAND_ID (0x00)
 #define ZCL_RESET_TO_FACTORY_DEFAULTS_COMMAND_ID (0x00)
+
+#define BINDING_CLUSTER_ID 0xF000
+#define ZCL_BIND_COMMAND_ID (0x00)
+#define ZCL_UNBIND_COMMAND_ID (0x01)
 
 #define COLOR_CONTROL_CLUSTER_ID 0x0300
 #define ZCL_MOVE_COLOR_COMMAND_ID (0x08)
@@ -409,6 +414,68 @@ PacketBufferHandle encodeBasicClusterReadPowerSourceAttribute(EndpointId destina
 PacketBufferHandle encodeBasicClusterReadClusterRevisionAttribute(EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadBasicClusterRevision", BASIC_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(kSeqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    COMMAND_FOOTER();
+}
+
+/*----------------------------------------------------------------------------*\
+| Cluster Binding                                                     | 0xF000 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * Bind                                                              |   0x00 |
+| * Unbind                                                            |   0x01 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command Bind
+ */
+PacketBufferHandle encodeBindingClusterBindCommand(EndpointId destinationEndpoint, chip::NodeId nodeId, chip::GroupId groupId,
+                                                   chip::EndpointId endpointId, chip::ClusterId clusterId)
+{
+    COMMAND_HEADER("Bind", BINDING_CLUSTER_ID);
+    buf.Put8(kFrameControlClusterSpecificCommand)
+        .Put8(kSeqNum)
+        .Put8(ZCL_BIND_COMMAND_ID)
+        .Put64(nodeId)
+        .Put16(groupId)
+        .Put8(endpointId)
+        .Put16(clusterId);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Command Unbind
+ */
+PacketBufferHandle encodeBindingClusterUnbindCommand(EndpointId destinationEndpoint, chip::NodeId nodeId, chip::GroupId groupId,
+                                                     chip::EndpointId endpointId, chip::ClusterId clusterId)
+{
+    COMMAND_HEADER("Unbind", BINDING_CLUSTER_ID);
+    buf.Put8(kFrameControlClusterSpecificCommand)
+        .Put8(kSeqNum)
+        .Put8(ZCL_UNBIND_COMMAND_ID)
+        .Put64(nodeId)
+        .Put16(groupId)
+        .Put8(endpointId)
+        .Put16(clusterId);
+    COMMAND_FOOTER();
+}
+
+PacketBufferHandle encodeBindingClusterDiscoverAttributes(EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("DiscoverBindingAttributes", BINDING_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(kSeqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute ClusterRevision
+ */
+PacketBufferHandle encodeBindingClusterReadClusterRevisionAttribute(EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadBindingClusterRevision", BINDING_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand).Put8(kSeqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
     COMMAND_FOOTER();
 }

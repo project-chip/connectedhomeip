@@ -18,8 +18,9 @@
 
 #include <app/server/QRCodeUtil.h>
 
-#include <platform/CHIPDeviceLayer.h>
+#include <inttypes.h>
 
+#include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <support/CodeUtils.h>
 #include <support/ScopedBuffer.h>

@@ -262,6 +262,85 @@
 
 @end
 
+@interface CHIPBinding ()
+
+@property (readonly) chip::Controller::BindingCluster cppCluster;
+@property (readonly, nonatomic) dispatch_queue_t callbackQueue;
+@end
+
+@implementation CHIPBinding
+
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(chip::EndpointId)endpoint queue:(dispatch_queue_t)queue
+{
+    CHIP_ERROR err = _cppCluster.Associate([device internalDevice], endpoint);
+
+    if (err != CHIP_NO_ERROR) {
+        return nil;
+    }
+
+    if (self = [super init]) {
+        _callbackQueue = queue;
+    }
+    return self;
+}
+
+- (BOOL)bind:(CHIPDeviceCallback)onCompletion
+        nodeId:(chip::NodeId)nodeId
+       groupId:(chip::GroupId)groupId
+    endpointId:(chip::EndpointId)endpointId
+     clusterId:(chip::ClusterId)clusterId
+{
+    CHIPCallbackBridge * callback = new CHIPCallbackBridge(onCompletion, _callbackQueue);
+    if (!callback) {
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.Bind(callback, nodeId, groupId, endpointId, clusterId);
+    if (err != CHIP_NO_ERROR) {
+        callback->Cancel();
+        delete callback;
+        return NO;
+    }
+    return YES;
+}
+- (BOOL)unbind:(CHIPDeviceCallback)onCompletion
+        nodeId:(chip::NodeId)nodeId
+       groupId:(chip::GroupId)groupId
+    endpointId:(chip::EndpointId)endpointId
+     clusterId:(chip::ClusterId)clusterId
+{
+    CHIPCallbackBridge * callback = new CHIPCallbackBridge(onCompletion, _callbackQueue);
+    if (!callback) {
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.Unbind(callback, nodeId, groupId, endpointId, clusterId);
+    if (err != CHIP_NO_ERROR) {
+        callback->Cancel();
+        delete callback;
+        return NO;
+    }
+    return YES;
+}
+
+- (BOOL)readAttributeClusterRevision:(CHIPDeviceCallback)onCompletion
+{
+    CHIPCallbackBridge * callback = new CHIPCallbackBridge(onCompletion, _callbackQueue);
+    if (!callback) {
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.ReadAttributeClusterRevision(callback);
+    if (err != CHIP_NO_ERROR) {
+        callback->Cancel();
+        delete callback;
+        return NO;
+    }
+    return YES;
+}
+
+@end
+
 @interface CHIPColorControl ()
 
 @property (readonly) chip::Controller::ColorControlCluster cppCluster;

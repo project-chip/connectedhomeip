@@ -27,6 +27,7 @@
 |---------------------------------------------------------------------+--------|
 | BarrierControl                                                      | 0x0103 |
 | Basic                                                               | 0x0000 |
+| Binding                                                             | 0xF000 |
 | ColorControl                                                        | 0x0300 |
 | DoorLock                                                            | 0x0101 |
 | Groups                                                              | 0x0004 |
@@ -150,6 +151,45 @@ chip::System::PacketBufferHandle encodeBasicClusterReadPowerSourceAttribute(chip
  *    Encode a Basic server read command for the cluster revision attribute into buffer including the APS frame
  */
 chip::System::PacketBufferHandle encodeBasicClusterReadClusterRevisionAttribute(chip::EndpointId destinationEndpoint);
+
+/*----------------------------------------------------------------------------*\
+| Cluster Binding                                                     | 0xF000 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * Bind                                                              |   0x00 |
+| * Unbind                                                            |   0x01 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/**
+ * @brief
+ *    Encode an Bind command for Binding server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeBindingClusterBindCommand(chip::EndpointId destinationEndpoint, chip::NodeId nodeId,
+                                                                 chip::GroupId groupId, chip::EndpointId endpointId,
+                                                                 chip::ClusterId clusterId);
+
+/**
+ * @brief
+ *    Encode an Unbind command for Binding server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeBindingClusterUnbindCommand(chip::EndpointId destinationEndpoint, chip::NodeId nodeId,
+                                                                   chip::GroupId groupId, chip::EndpointId endpointId,
+                                                                   chip::ClusterId clusterId);
+
+/**
+ * @brief
+ *    Encode a Binding server discover command into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeBindingClusterDiscoverAttributes(chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Binding server read command for the cluster revision attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeBindingClusterReadClusterRevisionAttribute(chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
 | Cluster ColorControl                                                | 0x0300 |

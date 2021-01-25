@@ -182,6 +182,16 @@ int main(int argc, char * argv[])
     chip::app::cluster::OnOff::InitCluster(chip::app::InteractionModelEngine::GetInstance());
 #endif
 
+    if (LinuxDeviceOptions::GetInstance().mWiFi)
+    {
+        chip::DeviceLayer::ConnectivityMgrImpl().StartWiFiManagement();
+    }
+
+    if (LinuxDeviceOptions::GetInstance().mThread)
+    {
+        chip::DeviceLayer::ThreadStackMgrImpl().InitThreadStack();
+    }
+
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
 
 exit:
