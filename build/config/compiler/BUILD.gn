@@ -246,12 +246,12 @@ declare_args() {
 }
 
 config("sanitize_address") {
-  cflags = [ "-fsanitize=address" ]
+  cflags = [ "-fsanitize=address", "-fno-omit-frame-pointer" ]
   ldflags = cflags
 }
 
 config("sanitize_memory") {
-  cflags = [ "-fsanitize=memory" ]
+  cflags = [ "-fsanitize=memory", "-fsanitize-memory-track-origins", "-fno-omit-frame-pointer" ]
   ldflags = cflags
 }
 
