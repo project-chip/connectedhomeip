@@ -41,43 +41,43 @@ public:
 
     struct TransferInitData
     {
-        uint8_t TransferCtlFlagsRaw;
+        uint8_t TransferCtlFlagsRaw = 0;
 
-        uint16_t MaxBlockSize;
-        uint64_t StartOffset;
-        uint64_t Length;
+        uint16_t MaxBlockSize = 0;
+        uint64_t StartOffset  = 0;
+        uint64_t Length       = 0;
 
-        const uint8_t * FileDesignator;
-        uint16_t FileDesLength;
+        const uint8_t * FileDesignator = nullptr;
+        uint16_t FileDesLength         = 0;
 
         // Additional metadata (optional, TLV format)
-        const uint8_t * Metadata;
-        uint16_t MetadataLength;
+        const uint8_t * Metadata = nullptr;
+        uint16_t MetadataLength  = 0;
     };
 
     struct TransferAcceptData
     {
         TransferControlFlags ControlMode;
 
-        uint16_t MaxBlockSize;
-        uint64_t StartOffset; ///< Not used for SendAccept message
-        uint64_t Length;      ///< Not used for SendAccept message
+        uint16_t MaxBlockSize = 0;
+        uint64_t StartOffset  = 0; ///< Not used for SendAccept message
+        uint64_t Length       = 0; ///< Not used for SendAccept message
 
         // Additional metadata (optional, TLV format)
-        const uint8_t * Metadata;
-        uint16_t MetadataLength;
+        const uint8_t * Metadata = nullptr;
+        uint16_t MetadataLength  = 0;
     };
 
     struct StatusReportData
     {
-        StatusCode error;
+        StatusCode error = kStatus_None;
     };
 
     struct BlockData
     {
-        const uint8_t * Data;
-        uint16_t Length;
-        bool IsEof;
+        const uint8_t * Data = nullptr;
+        uint16_t Length      = 0;
+        bool IsEof           = false;
     };
 
     /**
@@ -105,7 +105,7 @@ public:
         static OutputEvent TransferInitEvent(TransferInitData data, System::PacketBufferHandle msg)
         {
             OutputEvent event(kOutput_InitReceived);
-            event.MsgData          = std::move(msg);
+            event.MsgData          = msg.Retain();
             event.transferInitData = data;
             return event;
         }
@@ -127,14 +127,14 @@ public:
         static OutputEvent TransferAcceptEvent(TransferAcceptData data, System::PacketBufferHandle msg)
         {
             OutputEvent event = TransferAcceptEvent(data);
-            event.MsgData     = std::move(msg);
+            event.MsgData     = msg.Retain();
             return event;
         }
 
         static OutputEvent BlockDataEvent(BlockData data, System::PacketBufferHandle msg)
         {
             OutputEvent event(kOutput_BlockReceived);
-            event.MsgData   = std::move(msg);
+            event.MsgData   = msg.Retain();
             event.blockdata = data;
             return event;
         }
