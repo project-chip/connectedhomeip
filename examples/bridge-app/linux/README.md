@@ -1,13 +1,13 @@
-# CHIP Linux Lighting Example
+# CHIP Linux Bridge Example
 
 An example showing the use of CHIP on the Linux. The document will describe how
-to build and run CHIP Linux Lighting Example on Raspberry Pi. This doc is tested
+to build and run CHIP Linux Bridge Example on Raspberry Pi. This doc is tested
 on **Ubuntu for Raspberry Pi Server 20.04 LTS (aarch64)** and **Ubuntu for
 Raspberry Pi Desktop 20.10 (aarch64)**
 
 <hr>
 
--   [CHIP Linux Lighting Example](#chip-linux-lighting-example)
+-   [CHIP Linux Bridge Example](#chip-linux-bridge-example)
     -   [Building](#building)
     -   [Running the Complete Example on Raspberry Pi 4](#running-complete-example)
 
@@ -23,7 +23,7 @@ Raspberry Pi Desktop 20.10 (aarch64)**
 
 -   Build the example application:
 
-          $ cd ~/connectedhomeip/examples/lighting-app/linux
+          $ cd ~/connectedhomeip/examples/bridge-app/linux
           $ git submodule update --init
           $ source third_party/connectedhomeip/scripts/activate.sh
           $ gn gen out/debug
@@ -31,7 +31,7 @@ Raspberry Pi Desktop 20.10 (aarch64)**
 
 -   To delete generated executable, libraries and object files use:
 
-          $ cd ~/connectedhomeip/examples/lighting-app/linux
+          $ cd ~/connectedhomeip/examples/bridge-app/linux
           $ rm -rf out/
 
 <a name="running-complete-example"></a>
@@ -81,9 +81,9 @@ Raspberry Pi Desktop 20.10 (aarch64)**
                       RX bytes:8609495 acl:14 sco:0 events:217484 errors:0
                       TX bytes:92185 acl:20 sco:0 commands:5259 errors:0
 
-        -   Run Linux Lighting Example App
+        -   Run Linux Bridge Example App
 
-                  $ cd ~/connectedhomeip/examples/lighting-app/linux
+                  $ cd ~/connectedhomeip/examples/bridge-app/linux
                   $ sudo out/debug/chip-tool-server --ble-device [bluetooth device number]
                   # In this example, the device we want to use is hci1
                   $ sudo out/debug/chip-tool-server --ble-device 1
