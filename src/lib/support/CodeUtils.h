@@ -413,3 +413,9 @@ inline void chipDie(void)
 #else
 #define CHECK_RETURN_VALUE
 #endif
+
+#if defined(__clang__)
+#define FALLTHROUGH [[clang::fallthrough]]
+#else
+#define FALLTHROUGH (void) 0
+#endif
