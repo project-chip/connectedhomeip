@@ -112,6 +112,7 @@ int AppTask::Init()
 
     // Init ZCL Data Model and start server
     InitServer();
+    ConfigurationMgr().LogDeviceConfig();
     PrintQRCode(chip::RendezvousInformationFlags::kBLE);
 
 #ifdef CONFIG_CHIP_NFC_COMMISSIONING
@@ -436,10 +437,9 @@ void AppTask::StartTimer(uint32_t aTimeoutInMs)
 int AppTask::StartNFCTag()
 {
     // Get QR Code and emulate its content using NFC tag
-    uint32_t setupPinCode;
     std::string QRCode;
 
-    int result = GetQRCode(setupPinCode, QRCode, chip::RendezvousInformationFlags::kBLE);
+    int result = GetQRCode(QRCode, chip::RendezvousInformationFlags::kBLE);
     VerifyOrExit(!result, ChipLogError(AppServer, "Getting QR code payload failed"));
 
     result = sNFC.StartTagEmulation(QRCode.c_str(), QRCode.size());

@@ -104,6 +104,7 @@ int AppTask::Init()
     InitServer();
     UpdateClusterState();
 
+    ConfigurationMgr().LogDeviceConfig();
     PrintQRCode(chip::RendezvousInformationFlags::kBLE);
 
     return err;
