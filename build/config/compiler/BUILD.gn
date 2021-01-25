@@ -235,6 +235,7 @@ config("runtime_default") {
 #   is_debug=true
 #   optimize_for_size=false
 #   is_asan=true
+#   is_sanitize_fatal=false
 #
 
 declare_args() {
@@ -243,6 +244,10 @@ declare_args() {
 
   # Enable memory sanitizer
   is_msan = false
+
+  # Exit on sanitize error. Generally standard libraries may get errors
+  # so not stopping on the first error is often useful
+  is_sanitize_fatal=true
 }
 
 config("sanitize_address") {
@@ -262,6 +267,14 @@ config("sanitize_memory") {
   ldflags = cflags
 }
 
+config("sanitize_recover_all") {
+  cflags = [
+    "-fsanitize-recover=all",
+  ]
+  ldflags = cflags
+}
+
+
 config("sanitize_default") {
   configs = []
 
@@ -271,6 +284,10 @@ config("sanitize_default") {
 
   if (is_msan) {
     configs += [ ":sanitize_memory" ]
+  }
+
+  if (!is_sanitize_fatal) {
+    configs += [ ":sanitize_recover_all" ]
   }
 }
 
