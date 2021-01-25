@@ -57,13 +57,13 @@ devices.
 
 ### Bluetooth LE Advertising
 
-To commission the device onto a Project CHIP network, the device must be
-discoverable over Bluetooth LE. Bluetooth LE advertising is started
+In this example, to commission the device onto a Project CHIP network, it must
+be discoverable over Bluetooth LE. Bluetooth LE advertising is started
 automatically when the device is powered up.
 
 ### Bluetooth LE Rendezvous
 
-In Project CHIP, the commissioning procedure (called rendezvous) is done over
+In this example, the commissioning procedure (called rendezvous) is done over
 Bluetooth LE between a CHIP device and the CHIP controller, where the controller
 has the commissioner role.
 

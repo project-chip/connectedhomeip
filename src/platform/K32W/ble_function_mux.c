@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *    Copyright (c) 2020 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -53,13 +53,15 @@ ble_func_mux_app_mode_t currentMode = kBleFuncMux_AppMode_Ota;
 static gattDbAttribute_t static_gattDatabase[] = {
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 #include "gatt_decl_x.h"
-#undef DOXYGEN_SHOULD_SKIP_THIS
+#endif
 };
 
 /*! Declare structure to compute the database size */
 typedef struct sizeCounterStruct_tag
 {
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
 #include "gatt_size_x.h"
+#endif
 } sizeCounterStruct_t;
 
 /*! *********************************************************************************
@@ -150,7 +152,9 @@ extern bleResult_t GattDb_Init(void)
         gattDatabase            = static_gattDatabase;
 
 /*! Attribute-specific initialization by X-Macro expansion */
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
 #include "gatt_init_x.h"
+#endif
 
         return gBleSuccess_c;
     }

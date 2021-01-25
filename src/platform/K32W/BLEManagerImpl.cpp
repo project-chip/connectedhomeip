@@ -106,26 +106,26 @@ namespace {
 #define CHIP_ADV_SHORT_UUID_LEN (2)
 
 /* Message list used to synchronize asynchronous messages from the KW BLE tasks */
-static anchor_t blekw_msg_list;
+anchor_t blekw_msg_list;
 
 /* Used to manage asynchronous events from BLE Stack: e.g.: GAP setup finished */
-static osaEventId_t event_msg;
+osaEventId_t event_msg;
 
-static osaEventId_t mControllerTaskEvent;
-static TimerHandle_t connectionTimeout;
+osaEventId_t mControllerTaskEvent;
+TimerHandle_t connectionTimeout;
 
 /* Used by BLE App Task to handle asynchronous GATT events */
-static EventGroupHandle_t bleAppTaskLoopEvent;
+EventGroupHandle_t bleAppTaskLoopEvent;
 
 /* keep the device ID of the connected peer */
-static uint8_t device_id;
-static uint16_t mFlags;
+uint8_t device_id;
+uint16_t mFlags;
 
-static const uint8_t ShortUUID_CHIPoBLEService[]  = { 0xAF, 0xFE };
-static const ChipBleUUID ChipUUID_CHIPoBLEChar_RX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C,
-                                                        0x42, 0x9F, 0x9D, 0x11 } };
-static const ChipBleUUID ChipUUID_CHIPoBLEChar_TX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C,
-                                                        0x42, 0x9F, 0x9D, 0x12 } };
+const uint8_t ShortUUID_CHIPoBLEService[]  = { 0xAF, 0xFE };
+const ChipBleUUID ChipUUID_CHIPoBLEChar_RX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F,
+                                                 0x9D, 0x11 } };
+const ChipBleUUID ChipUUID_CHIPoBLEChar_TX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F,
+                                                 0x9D, 0x12 } };
 } // namespace
 
 BLEManagerImpl BLEManagerImpl::sInstance;
@@ -364,6 +364,7 @@ CHIP_ERROR BLEManagerImpl::_SetDeviceName(const char * deviceName)
     else
     {
         mDeviceName[0] = 0;
+        SetFlag(mFlags, kFlag_DeviceNameSet, false);
     }
 
     return CHIP_NO_ERROR;
@@ -373,44 +374,38 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 {
     switch (event->Type)
     {
-    case DeviceEventType::kCHIPoBLESubscribe: {
+    case DeviceEventType::kCHIPoBLESubscribe:
         ChipDeviceEvent connEstEvent;
 
         HandleSubscribeReceived(event->CHIPoBLESubscribe.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_TX);
         connEstEvent.Type = DeviceEventType::kCHIPoBLEConnectionEstablished;
         PlatformMgr().PostEvent(&connEstEvent);
         break;
-    }
 
-    case DeviceEventType::kCHIPoBLEUnsubscribe: {
+    case DeviceEventType::kCHIPoBLEUnsubscribe:
         HandleUnsubscribeReceived(event->CHIPoBLEUnsubscribe.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_TX);
         break;
-    }
 
-    case DeviceEventType::kCHIPoBLEWriteReceived: {
+    case DeviceEventType::kCHIPoBLEWriteReceived:
         HandleWriteReceived(event->CHIPoBLEWriteReceived.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_RX,
                             PacketBufferHandle::Adopt(event->CHIPoBLEWriteReceived.Data));
         break;
-    }
 
-    case DeviceEventType::kCHIPoBLEConnectionError: {
+    case DeviceEventType::kCHIPoBLEConnectionError:
         HandleConnectionError(event->CHIPoBLEConnectionError.ConId, event->CHIPoBLEConnectionError.Reason);
         break;
-    }
 
-    case DeviceEventType::kCHIPoBLEIndicateConfirm: {
+    case DeviceEventType::kCHIPoBLEIndicateConfirm:
         HandleIndicationConfirmation(event->CHIPoBLEIndicateConfirm.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_TX);
         break;
-    }
 
 #if CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED
-    case DeviceEventType::kServiceProvisioningChange: {
+    case DeviceEventType::kServiceProvisioningChange:
         ChipLogProgress(DeviceLayer, "_OnPlatformEvent kServiceProvisioningChange");
 
         ClearFlag(mFlags, kFlag_AdvertisingEnabled);
         PlatformMgr().ScheduleWork(DriveBLEState, 0);
         break;
-    }
 #endif // CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED
 
     default:
@@ -956,12 +951,6 @@ void BLEManagerImpl::bleAppTask(void * p_arg)
             {
                 sInstance.HandleWriteEvent(msg);
             }
-            else if (msg->type == BLE_KW_MSG_ATT_READ)
-            {
-                blekw_att_read_data_t * att_rd_data = (blekw_att_read_data_t *) msg->data.data;
-                ChipLogProgress(DeviceLayer, "Attribute read request(d:%d, h:%d) .", att_rd_data->device_id, att_rd_data->handle);
-                /* TODO: */
-            }
             else if (msg->type == BLE_KW_MSG_FORCE_DISCONNECT)
             {
                 ChipLogProgress(DeviceLayer, "BLE connection timeout: Forcing disconnection.");
@@ -1142,47 +1131,41 @@ void BLEManagerImpl::blekw_generic_cb(gapGenericEvent_t * pGenericEvent)
 
     switch (pGenericEvent->eventType)
     {
-    case gInternalError_c: {
+    case gInternalError_c:
         /* Notify the CHIP that the BLE hardware report fail */
         ChipLogProgress(DeviceLayer, "BLE Internal Error: Code 0x%04X, Source 0x%08X, HCI OpCode %d.\n",
                         pGenericEvent->eventData.internalError.errorCode, pGenericEvent->eventData.internalError.errorSource,
                         pGenericEvent->eventData.internalError.hciCommandOpcode);
         (void) blekw_msg_add_u8(BLE_KW_MSG_ERROR, BLE_INTERNAL_ERROR);
         break;
-    }
 
-    case gAdvertisingSetupFailed_c: {
+    case gAdvertisingSetupFailed_c:
         /* Set the local synchronization event */
         OSA_EventSet(event_msg, CHIP_BLE_KW_EVNT_ADV_SETUP_FAILED);
         break;
-    }
 
-    case gAdvertisingParametersSetupComplete_c: {
+    case gAdvertisingParametersSetupComplete_c:
         /* Set the local synchronization event */
         OSA_EventSet(event_msg, CHIP_BLE_KW_EVNT_ADV_PAR_SETUP_COMPLETE);
         break;
-    }
 
-    case gAdvertisingDataSetupComplete_c: {
+    case gAdvertisingDataSetupComplete_c:
         /* Set the local synchronization event */
         OSA_EventSet(event_msg, CHIP_BLE_KW_EVNT_ADV_DAT_SETUP_COMPLETE);
         break;
-    }
 
-    case gRandomAddressSet_c: {
+    case gRandomAddressSet_c:
         /* Set the local synchronization event */
         OSA_EventSet(event_msg, CHIP_BLE_KW_EVNT_RND_ADDR_SET);
         break;
-    }
 
-    case gInitializationComplete_c: {
+    case gInitializationComplete_c:
         /* Common GAP configuration */
         BleConnManager_GapCommonConfig();
 
         /* Set the local synchronization event */
         OSA_EventSet(event_msg, CHIP_BLE_KW_EVNT_INIT_COMPLETE);
         break;
-    }
     default:
         break;
     }
@@ -1243,7 +1226,7 @@ void BLEManagerImpl::BLE_SignalFromISRCallback(void)
 
 void BLEManagerImpl::blekw_connection_timeout_cb(TimerHandle_t timer)
 {
-    (void) blekw_msg_add_u8(BLE_KW_MSG_FORCE_DISCONNECT, (uint8_t) 0);
+    (void) blekw_msg_add_u8(BLE_KW_MSG_FORCE_DISCONNECT, 0);
 }
 
 void BLEManagerImpl::blekw_start_connection_timeout(void)
@@ -1269,24 +1252,21 @@ void BLEManagerImpl::blekw_gatt_server_cb(deviceId_t deviceId, gattServerEvent_t
         break;
     }
 
-    case gEvtAttributeWritten_c: {
+    case gEvtAttributeWritten_c:
         blekw_msg_add_att_written(BLE_KW_MSG_ATT_WRITTEN, deviceId, pServerEvent->eventData.attributeWrittenEvent.handle,
                                   pServerEvent->eventData.attributeWrittenEvent.aValue,
                                   pServerEvent->eventData.attributeWrittenEvent.cValueLength);
         break;
-    }
 
-    case gEvtLongCharacteristicWritten_c: {
+    case gEvtLongCharacteristicWritten_c:
         blekw_msg_add_att_written(BLE_KW_MSG_ATT_LONG_WRITTEN, deviceId, pServerEvent->eventData.longCharWrittenEvent.handle,
                                   pServerEvent->eventData.longCharWrittenEvent.aValue,
                                   pServerEvent->eventData.longCharWrittenEvent.cValueLength);
         break;
-    }
 
-    case gEvtAttributeRead_c: {
+    case gEvtAttributeRead_c:
         blekw_msg_add_att_read(BLE_KW_MSG_ATT_READ, deviceId, pServerEvent->eventData.attributeReadEvent.handle);
         break;
-    }
 
     case gEvtCharacteristicCccdWritten_c: {
         uint16_t cccd_val = pServerEvent->eventData.charCccdWrittenEvent.newCccd;
@@ -1296,13 +1276,12 @@ void BLEManagerImpl::blekw_gatt_server_cb(deviceId_t deviceId, gattServerEvent_t
         break;
     }
 
-    case gEvtHandleValueConfirmation_c: {
+    case gEvtHandleValueConfirmation_c:
         /* Set the local synchronization event */
         OSA_EventSet(event_msg, CHIP_BLE_KW_EVNT_INDICATION_CONFIRMED);
         break;
-    }
 
-    case gEvtError_c: {
+    case gEvtError_c:
         if (pServerEvent->eventData.procedureError.procedureType == gSendIndication_c)
         {
             /* Set the local synchronization event */
@@ -1317,7 +1296,6 @@ void BLEManagerImpl::blekw_gatt_server_cb(deviceId_t deviceId, gattServerEvent_t
             (void) blekw_msg_add_u8(BLE_KW_MSG_ERROR, BLE_INTERNAL_GATT_ERROR);
         }
         break;
-    }
 
     default:
         break;

@@ -59,7 +59,7 @@ MEMORY
 /* Define a symbol for the top of each memory region */
 __top_RAM0      = MEM_RAM0_BASE + MEM_RAM0_SIZE; /* 87K bytes */
 
-/* first implementation: second RAM bank is dedicated entirely to heap */
+/* To be improved. At this moment the second RAM bank is dedicated entirely to heap. */
 HEAP_SIZE = DEFINED(HEAP_SIZE) ? HEAP_SIZE : 0xF000;
 
 /*** flash memory characteristics definitions required for OTA ***/
