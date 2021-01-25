@@ -247,7 +247,7 @@ declare_args() {
 
   # Exit on sanitize error. Generally standard libraries may get errors
   # so not stopping on the first error is often useful
-  is_sanitize_fatal=true
+  is_sanitize_fatal = true
 }
 
 config("sanitize_address") {
@@ -268,12 +268,9 @@ config("sanitize_memory") {
 }
 
 config("sanitize_recover_all") {
-  cflags = [
-    "-fsanitize-recover=all",
-  ]
+  cflags = [ "-fsanitize-recover=all" ]
   ldflags = cflags
 }
-
 
 config("sanitize_default") {
   configs = []
