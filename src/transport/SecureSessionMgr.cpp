@@ -34,9 +34,9 @@
 #include <support/ReturnMacros.h>
 #include <support/SafeInt.h>
 #include <support/logging/CHIPLogging.h>
+#include <transport/PASESession.h>
 #include <transport/RendezvousSession.h>
 #include <transport/SecureMessageCodec.h>
-#include <transport/SecurePairingSession.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/TransportMgr.h>
 
@@ -213,8 +213,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR SecureSessionMgr::NewPairing(const Optional<Transport::PeerAddress> & peerAddr, NodeId peerNodeId,
-                                        SecurePairingSession * pairing, Transport::Base * transport)
+CHIP_ERROR SecureSessionMgr::NewPairing(const Optional<Transport::PeerAddress> & peerAddr, NodeId peerNodeId, PASESession * pairing,
+                                        Transport::Base * transport)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 

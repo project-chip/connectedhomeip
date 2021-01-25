@@ -34,7 +34,7 @@
 
 #include <support/ErrorStr.h>
 #include <system/SystemPacketBuffer.h>
-#include <transport/SecurePairingSession.h>
+#include <transport/PASESession.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/raw/UDP.h>
 

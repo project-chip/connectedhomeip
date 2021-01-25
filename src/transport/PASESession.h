@@ -30,9 +30,9 @@
 #include <protocols/secure_channel/Constants.h>
 #include <support/Base64.h>
 #include <system/SystemPacketBuffer.h>
-#include <transport/AuthenticatedSessionEstablishmentDelegate.h>
 #include <transport/PeerConnectionState.h>
 #include <transport/SecureSession.h>
+#include <transport/SessionEstablishmentDelegate.h>
 #include <transport/raw/MessageHeader.h>
 #include <transport/raw/PeerAddress.h>
 
@@ -45,9 +45,9 @@ constexpr uint16_t kPBKDFParamRandomNumberSize = 32;
 
 using namespace Crypto;
 
-struct SecurePairingSessionSerialized;
+struct PASESessionSerialized;
 
-struct SecurePairingSessionSerializable
+struct PASESessionSerializable
 {
     uint16_t mKeLen;
     uint8_t mKe[kMAX_Hash_Length];
@@ -58,16 +58,16 @@ struct SecurePairingSessionSerializable
     uint16_t mPeerKeyId;
 };
 
-class DLL_EXPORT SecurePairingSession
+class DLL_EXPORT PASESession
 {
 public:
-    SecurePairingSession();
-    SecurePairingSession(SecurePairingSession &&)      = default;
-    SecurePairingSession(const SecurePairingSession &) = delete;
-    SecurePairingSession & operator=(const SecurePairingSession &) = default;
-    SecurePairingSession & operator=(SecurePairingSession &&) = default;
+    PASESession();
+    PASESession(PASESession &&)      = default;
+    PASESession(const PASESession &) = delete;
+    PASESession & operator=(const PASESession &) = default;
+    PASESession & operator=(PASESession &&) = default;
 
-    virtual ~SecurePairingSession();
+    virtual ~PASESession();
 
     /**
      * @brief
@@ -84,7 +84,7 @@ public:
      * @return CHIP_ERROR     The result of initialization
      */
     CHIP_ERROR WaitForPairing(uint32_t mySetUpPINCode, uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen,
-                              Optional<NodeId> myNodeId, uint16_t myKeyId, AuthenticatedSessionEstablishmentDelegate * delegate);
+                              Optional<NodeId> myNodeId, uint16_t myKeyId, SessionEstablishmentDelegate * delegate);
 
     /**
      * @brief
@@ -100,7 +100,7 @@ public:
      * @return CHIP_ERROR      The result of initialization
      */
     CHIP_ERROR Pair(const Transport::PeerAddress peerAddress, uint32_t peerSetUpPINCode, Optional<NodeId> myNodeId,
-                    NodeId peerNodeId, uint16_t myKeyId, AuthenticatedSessionEstablishmentDelegate * delegate);
+                    NodeId peerNodeId, uint16_t myKeyId, SessionEstablishmentDelegate * delegate);
 
     /**
      * @brief
@@ -157,25 +157,25 @@ public:
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR Serialize(SecurePairingSessionSerialized & output);
+    CHIP_ERROR Serialize(PASESessionSerialized & output);
 
     /** @brief Deserialize the Pairing Session from the string.
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR Deserialize(SecurePairingSessionSerialized & input);
+    CHIP_ERROR Deserialize(PASESessionSerialized & input);
 
-    /** @brief Serialize the SecurePairingSession to the given serializable data structure for secure pairing
+    /** @brief Serialize the PASESession to the given serializable data structure for secure pairing
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR ToSerializable(SecurePairingSessionSerializable & output);
+    CHIP_ERROR ToSerializable(PASESessionSerializable & output);
 
     /** @brief Reconstruct secure pairing class from the serializable data structure.
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR FromSerializable(const SecurePairingSessionSerializable & output);
+    CHIP_ERROR FromSerializable(const PASESessionSerializable & output);
 
 private:
     enum Spake2pErrorType : uint8_t
@@ -184,8 +184,7 @@ private:
         kUnexpected             = 0xff,
     };
 
-    CHIP_ERROR Init(Optional<NodeId> myNodeId, uint16_t myKeyId, uint32_t setupCode,
-                    AuthenticatedSessionEstablishmentDelegate * delegate);
+    CHIP_ERROR Init(Optional<NodeId> myNodeId, uint16_t myKeyId, uint32_t setupCode, SessionEstablishmentDelegate * delegate);
 
     CHIP_ERROR SetupSpake2p(uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen);
 
@@ -210,7 +209,7 @@ private:
 
     static constexpr size_t kSpake2p_WS_Length = kP256_FE_Length + 8;
 
-    AuthenticatedSessionEstablishmentDelegate * mDelegate = nullptr;
+    SessionEstablishmentDelegate * mDelegate = nullptr;
 
     Protocols::SecureChannel::MsgType mNextExpectedMsg = Protocols::SecureChannel::MsgType::PASE_Spake2pError;
 
@@ -259,7 +258,7 @@ constexpr chip::NodeId kTestDeviceNodeId     = 12344321;
  * rendezvous. Once all the non-test usecases start supporting
  * rendezvous, this class will be moved to the test code.
  */
-class SecurePairingUsingTestSecret : public SecurePairingSession
+class SecurePairingUsingTestSecret : public PASESession
 {
 public:
     SecurePairingUsingTestSecret()
@@ -288,13 +287,13 @@ public:
     ~SecurePairingUsingTestSecret() override {}
 
     CHIP_ERROR WaitForPairing(uint32_t mySetUpPINCode, uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen,
-                              Optional<NodeId> myNodeId, uint16_t myKeyId, AuthenticatedSessionEstablishmentDelegate * delegate)
+                              Optional<NodeId> myNodeId, uint16_t myKeyId, SessionEstablishmentDelegate * delegate)
     {
         return CHIP_NO_ERROR;
     }
 
     CHIP_ERROR Pair(uint32_t peerSetUpPINCode, uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen,
-                    Optional<NodeId> myNodeId, uint16_t myKeyId, AuthenticatedSessionEstablishmentDelegate * delegate)
+                    Optional<NodeId> myNodeId, uint16_t myKeyId, SessionEstablishmentDelegate * delegate)
     {
         return CHIP_NO_ERROR;
     }
@@ -306,10 +305,10 @@ public:
     }
 };
 
-typedef struct SecurePairingSessionSerialized
+typedef struct PASESessionSerialized
 {
     // Extra uint64_t to account for padding bytes (NULL termination, and some decoding overheads)
-    uint8_t inner[BASE64_ENCODED_LEN(sizeof(SecurePairingSessionSerializable) + sizeof(uint64_t))];
-} SecurePairingSessionSerialized;
+    uint8_t inner[BASE64_ENCODED_LEN(sizeof(PASESessionSerializable) + sizeof(uint64_t))];
+} PASESessionSerialized;
 
 } // namespace chip

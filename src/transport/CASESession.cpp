@@ -23,7 +23,7 @@
  *      operational credentials.
  *
  */
-#include <transport/CertificateAuthenticatedSessionEstablishment.h>
+#include <transport/CASESession.h>
 
 #include <inttypes.h>
 #include <string.h>
@@ -42,15 +42,15 @@ namespace chip {
 
 using namespace Crypto;
 
-CertificateAuthenticatedSessionEstablishment::CertificateAuthenticatedSessionEstablishment() {}
+CASESession::CASESession() {}
 
-CertificateAuthenticatedSessionEstablishment::~CertificateAuthenticatedSessionEstablishment()
+CASESession::~CASESession()
 {
     // Let's clear out any security state stored in the object, before destroying it.
     Clear();
 }
 
-void CertificateAuthenticatedSessionEstablishment::Clear()
+void CASESession::Clear()
 {
     // This function zeroes out and resets the memory used by the object.
     // It's done so that no security related information will be leaked.
@@ -61,14 +61,12 @@ void CertificateAuthenticatedSessionEstablishment::Clear()
 }
 
 CHIP_ERROR
-CertificateAuthenticatedSessionEstablishment::WaitForSessionEstablishment(NodeId myNodeId, uint16_t myKeyId,
-                                                                          AuthenticatedSessionEstablishmentDelegate * delegate)
+CASESession::WaitForSessionEstablishment(NodeId myNodeId, uint16_t myKeyId, SessionEstablishmentDelegate * delegate)
 {
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CertificateAuthenticatedSessionEstablishment::AttachHeaderAndSend(Protocols::SecureChannel::MsgType msgType,
-                                                                             System::PacketBufferHandle msgBuf)
+CHIP_ERROR CASESession::AttachHeaderAndSend(Protocols::SecureChannel::MsgType msgType, System::PacketBufferHandle msgBuf)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -88,20 +86,19 @@ CHIP_ERROR CertificateAuthenticatedSessionEstablishment::AttachHeaderAndSend(Pro
     SuccessOrExit(err);
     VerifyOrExit(headerSize == actualEncodedHeaderSize, err = CHIP_ERROR_INTERNAL);
 
-    err = mDelegate->SendPairingMessage(PacketHeader()
-                                            .SetSourceNodeId(mLocalNodeId)
-                                            .SetDestinationNodeId(mConnectionState.GetPeerNodeId())
-                                            .SetEncryptionKeyID(mConnectionState.GetLocalKeyID()),
-                                        mConnectionState.GetPeerAddress(), std::move(msgBuf));
+    err = mDelegate->SendSessionEstablishmentMessage(PacketHeader()
+                                                         .SetSourceNodeId(mLocalNodeId)
+                                                         .SetDestinationNodeId(mConnectionState.GetPeerNodeId())
+                                                         .SetEncryptionKeyID(mConnectionState.GetLocalKeyID()),
+                                                     mConnectionState.GetPeerAddress(), std::move(msgBuf));
     SuccessOrExit(err);
 
 exit:
     return err;
 }
 
-CHIP_ERROR CertificateAuthenticatedSessionEstablishment::EstablishSession(const Transport::PeerAddress peerAddress, NodeId myNodeId,
-                                                                          NodeId peerNodeId, uint16_t myKeyId,
-                                                                          AuthenticatedSessionEstablishmentDelegate * delegate)
+CHIP_ERROR CASESession::EstablishSession(const Transport::PeerAddress peerAddress, NodeId myNodeId, NodeId peerNodeId,
+                                         uint16_t myKeyId, SessionEstablishmentDelegate * delegate)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -119,7 +116,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR CertificateAuthenticatedSessionEstablishment::DeriveSecureSession(SecureSession & session)
+CHIP_ERROR CASESession::DeriveSecureSession(SecureSession & session)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -134,7 +131,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR CertificateAuthenticatedSessionEstablishment::SendSigmaR1()
+CHIP_ERROR CASESession::SendSigmaR1()
 {
     uint16_t data_len = 0;
 
@@ -168,8 +165,7 @@ CHIP_ERROR CertificateAuthenticatedSessionEstablishment::SendSigmaR1()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CertificateAuthenticatedSessionEstablishment::HandleSigmaR1_and_SendSigmaR2(const PacketHeader & header,
-                                                                                       const System::PacketBufferHandle & msg)
+CHIP_ERROR CASESession::HandleSigmaR1_and_SendSigmaR2(const PacketHeader & header, const System::PacketBufferHandle & msg)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -229,8 +225,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR CertificateAuthenticatedSessionEstablishment::HandleSigmaR2_and_SendSigmaR3(const PacketHeader & header,
-                                                                                       const System::PacketBufferHandle & msg)
+CHIP_ERROR CASESession::HandleSigmaR2_and_SendSigmaR3(const PacketHeader & header, const System::PacketBufferHandle & msg)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -278,7 +273,7 @@ CHIP_ERROR CertificateAuthenticatedSessionEstablishment::HandleSigmaR2_and_SendS
     mPairingComplete = true;
 
     // Call delegate to indicate pairing completion
-    mDelegate->OnPairingComplete();
+    mDelegate->OnSessionEstablished();
 
 exit:
 
@@ -289,8 +284,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR CertificateAuthenticatedSessionEstablishment::HandleSigmaR3(const PacketHeader & header,
-                                                                       const System::PacketBufferHandle & msg)
+CHIP_ERROR CASESession::HandleSigmaR3(const PacketHeader & header, const System::PacketBufferHandle & msg)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -308,7 +302,7 @@ CHIP_ERROR CertificateAuthenticatedSessionEstablishment::HandleSigmaR3(const Pac
     mPairingComplete = true;
 
     // Call delegate to indicate pairing completion
-    mDelegate->OnPairingComplete();
+    mDelegate->OnSessionEstablished();
 
 exit:
 
@@ -319,7 +313,7 @@ exit:
     return err;
 }
 
-void CertificateAuthenticatedSessionEstablishment::SendErrorMsg(SigmaErrorType errorCode)
+void CASESession::SendErrorMsg(SigmaErrorType errorCode)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -342,8 +336,7 @@ exit:
     Clear();
 }
 
-void CertificateAuthenticatedSessionEstablishment::HandleErrorMsg(const PacketHeader & header,
-                                                                  const System::PacketBufferHandle & msg)
+void CASESession::HandleErrorMsg(const PacketHeader & header, const System::PacketBufferHandle & msg)
 {
     // Error message processing
     const uint8_t * buf  = msg->Start();
@@ -362,9 +355,8 @@ exit:
     Clear();
 }
 
-CHIP_ERROR CertificateAuthenticatedSessionEstablishment::HandlePeerMessage(const PacketHeader & packetHeader,
-                                                                           const Transport::PeerAddress & peerAddress,
-                                                                           System::PacketBufferHandle msg)
+CHIP_ERROR CASESession::HandlePeerMessage(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
+                                          System::PacketBufferHandle msg)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     uint16_t headerSize = 0;
@@ -416,7 +408,7 @@ exit:
     // Call delegate to indicate session establishment failure.
     if (err != CHIP_NO_ERROR)
     {
-        mDelegate->OnPairingError(err);
+        mDelegate->OnSessionEstablishmentError(err);
     }
 
     return err;

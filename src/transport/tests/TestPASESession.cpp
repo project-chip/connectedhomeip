@@ -18,7 +18,7 @@
 
 /**
  *    @file
- *      This file implements unit tests for the SecurePairingSession implementation.
+ *      This file implements unit tests for the PASESession implementation.
  */
 
 #include <errno.h>
@@ -30,37 +30,37 @@
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/UnitTestRegistration.h>
-#include <transport/SecurePairingSession.h>
+#include <transport/PASESession.h>
 
 using namespace chip;
 
-class TestSecurePairingDelegate : public AuthenticatedSessionEstablishmentDelegate
+class TestSecurePairingDelegate : public SessionEstablishmentDelegate
 {
 public:
-    CHIP_ERROR SendPairingMessage(const PacketHeader & header, const Transport::PeerAddress & peerAddress,
-                                  System::PacketBufferHandle msgBuf) override
+    CHIP_ERROR SendSessionEstablishmentMessage(const PacketHeader & header, const Transport::PeerAddress & peerAddress,
+                                               System::PacketBufferHandle msgBuf) override
     {
         mNumMessageSend++;
         return (peer != nullptr) ? peer->HandlePeerMessage(header, peerAddress, std::move(msgBuf)) : mMessageSendError;
     }
 
-    void OnPairingError(CHIP_ERROR error) override { mNumPairingErrors++; }
+    void OnSessionEstablishmentError(CHIP_ERROR error) override { mNumPairingErrors++; }
 
-    void OnPairingComplete() override { mNumPairingComplete++; }
+    void OnSessionEstablished() override { mNumPairingComplete++; }
 
     uint32_t mNumMessageSend     = 0;
     uint32_t mNumPairingErrors   = 0;
     uint32_t mNumPairingComplete = 0;
     CHIP_ERROR mMessageSendError = CHIP_NO_ERROR;
 
-    SecurePairingSession * peer = nullptr;
+    PASESession * peer = nullptr;
 };
 
 void SecurePairingWaitTest(nlTestSuite * inSuite, void * inContext)
 {
     // Test all combinations of invalid parameters
     TestSecurePairingDelegate delegate;
-    SecurePairingSession pairing;
+    PASESession pairing;
 
     NL_TEST_ASSERT(inSuite,
                    pairing.WaitForPairing(1234, 500, nullptr, 0, Optional<NodeId>::Value(1), 0, &delegate) ==
@@ -77,7 +77,7 @@ void SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
 {
     // Test all combinations of invalid parameters
     TestSecurePairingDelegate delegate;
-    SecurePairingSession pairing;
+    PASESession pairing;
 
     NL_TEST_ASSERT(inSuite,
                    pairing.Pair(Transport::PeerAddress(Transport::Type::kBle), 1234, Optional<NodeId>::Value(1), 2, 0, nullptr) !=
@@ -90,19 +90,19 @@ void SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
 
     delegate.mMessageSendError = CHIP_ERROR_BAD_REQUEST;
 
-    SecurePairingSession pairing1;
+    PASESession pairing1;
 
     NL_TEST_ASSERT(inSuite,
                    pairing1.Pair(Transport::PeerAddress(Transport::Type::kBle), 1234, Optional<NodeId>::Value(1), 2, 0,
                                  &delegate) == CHIP_ERROR_BAD_REQUEST);
 }
 
-void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, SecurePairingSession & pairingCommissioner,
+void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, PASESession & pairingCommissioner,
                                       TestSecurePairingDelegate & delegateCommissioner)
 {
     // Test all combinations of invalid parameters
     TestSecurePairingDelegate delegateAccessory;
-    SecurePairingSession pairingAccessory;
+    PASESession pairingAccessory;
 
     delegateCommissioner.peer = &pairingAccessory;
     delegateAccessory.peer    = &pairingCommissioner;
@@ -124,20 +124,20 @@ void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, S
 void SecurePairingHandshakeTest(nlTestSuite * inSuite, void * inContext)
 {
     TestSecurePairingDelegate delegateCommissioner;
-    SecurePairingSession pairingCommissioner;
+    PASESession pairingCommissioner;
     SecurePairingHandshakeTestCommon(inSuite, inContext, pairingCommissioner, delegateCommissioner);
 }
 
-void SecurePairingDeserialize(nlTestSuite * inSuite, void * inContext, SecurePairingSession & pairingCommissioner,
-                              SecurePairingSession & deserialized)
+void SecurePairingDeserialize(nlTestSuite * inSuite, void * inContext, PASESession & pairingCommissioner,
+                              PASESession & deserialized)
 {
-    SecurePairingSessionSerialized serialized;
+    PASESessionSerialized serialized;
     NL_TEST_ASSERT(inSuite, pairingCommissioner.Serialize(serialized) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, deserialized.Deserialize(serialized) == CHIP_NO_ERROR);
 
     // Serialize from the deserialized session, and check we get the same string back
-    SecurePairingSessionSerialized serialized2;
+    PASESessionSerialized serialized2;
     NL_TEST_ASSERT(inSuite, deserialized.Serialize(serialized2) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, strncmp(Uint8::to_char(serialized.inner), Uint8::to_char(serialized2.inner), sizeof(serialized)) == 0);
@@ -148,8 +148,8 @@ void SecurePairingSerializeTest(nlTestSuite * inSuite, void * inContext)
     TestSecurePairingDelegate delegateCommissioner;
 
     // Allocate on the heap to avoid stack overflow in some restricted test scenarios (e.g. QEMU)
-    auto * testPairingSession1 = chip::Platform::New<SecurePairingSession>();
-    auto * testPairingSession2 = chip::Platform::New<SecurePairingSession>();
+    auto * testPairingSession1 = chip::Platform::New<PASESession>();
+    auto * testPairingSession2 = chip::Platform::New<PASESession>();
 
     SecurePairingHandshakeTestCommon(inSuite, inContext, *testPairingSession1, delegateCommissioner);
     SecurePairingDeserialize(inSuite, inContext, *testPairingSession1, *testPairingSession2);
@@ -233,7 +233,7 @@ static nlTestSuite sSuite =
 /**
  *  Main
  */
-int TestSecurePairingSession()
+int TestPASESession()
 {
     // Run test suit against one context
     nlTestRunner(&sSuite, nullptr);
@@ -241,7 +241,7 @@ int TestSecurePairingSession()
     return (nlTestRunnerStats(&sSuite));
 }
 
-CHIP_REGISTER_TEST_SUITE(TestSecurePairingSession)
+CHIP_REGISTER_TEST_SUITE(TestPASESession)
 
 namespace chip {
 namespace Logging {
