@@ -228,7 +228,43 @@ config("runtime_default") {
   }
 }
 
+# To use different sanitizer options, use `gn args .` in the out folder and
+# use settings like:
+#
+#   is_clang=true
+#   is_debug=true
+#   optimize_for_size=false
+#   is_asan=true
+#
+
+declare_args() {
+  # Enable address sanitizer
+  is_asan = false
+
+  # Enable memory sanitizer
+  is_msan = false
+}
+
+config("sanitize_address") {
+  cflags = [ "-fsanitize=address" ]
+  ldflags = cflags
+}
+
+config("sanitize_memory") {
+  cflags = [ "-fsanitize=memory" ]
+  ldflags = cflags
+}
+
 config("sanitize_default") {
+  configs = []
+
+  if (is_asan) {
+    configs += [":sanitize_address"]
+  }
+
+  if (is_msan) {
+    configs += [":sanitize_memory"]
+  }
 }
 
 config("fuzzing_default") {

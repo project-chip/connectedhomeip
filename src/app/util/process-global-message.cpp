@@ -295,6 +295,10 @@ bool emAfProcessGlobalCommand(EmberAfClusterCommand * cmd)
         // Reset message back to start
         msgIndex          = cmd->payloadStartIndex;
         appResponseLength = (cmd->mfgSpecific ? 4 : 2);
+#if defined(__clang__)
+        // clang does not auto-detect comment marker, but accepts C++17 annotation.
+        [[fallthrough]];
+#endif
         /* fall through */
     // DO NOT BREAK from this case
 
