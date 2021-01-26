@@ -30,7 +30,6 @@ using namespace chip::app;
 
 namespace chip {
 namespace app {
-CommandSender * GetCommandSender();
 namespace cluster {
 
 // Empty command handlers
