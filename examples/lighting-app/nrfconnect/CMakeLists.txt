@@ -89,12 +89,16 @@ pw_proto_library(pigweed_lighting_protolib
 
 target_sources(app PRIVATE
   main/Rpc.cpp
+  ../../common/pigweed/RpcService.cpp
   ${NRFCONNECT_COMMON}/util/PigweedLogger.cpp
 )
 
 target_include_directories(app PRIVATE
   ${ZEPHYR_BASE}/subsys // required to get access to `log_output_std.h`
-)
+  ${PIGWEED_ROOT}/pw_sys_io/public
+  ${CHIP_ROOT}/src/lib/support
+  ${CHIP_ROOT}/src/system
+  ../../common)
 
 target_link_libraries(app PRIVATE
   pigweed_lighting_protolib.nanopb_rpc
