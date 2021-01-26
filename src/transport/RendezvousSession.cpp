@@ -97,8 +97,9 @@ RendezvousSession::~RendezvousSession()
     mDelegate = nullptr;
 }
 
-CHIP_ERROR RendezvousSession::SendPairingMessage(const PacketHeader & header, const Transport::PeerAddress & peerAddress,
-                                                 System::PacketBufferHandle msgIn)
+CHIP_ERROR RendezvousSession::SendSessionEstablishmentMessage(const PacketHeader & header,
+                                                              const Transport::PeerAddress & peerAddress,
+                                                              System::PacketBufferHandle msgIn)
 {
     if (mCurrentState != State::kSecurePairing)
     {
@@ -115,7 +116,7 @@ CHIP_ERROR RendezvousSession::SendPairingMessage(const PacketHeader & header, co
     }
     else
     {
-        ChipLogError(Ble, "SendPairingMessage dropped since no transport mgr for IP rendezvous");
+        ChipLogError(Ble, "SendSessionEstablishmentMessage dropped since no transport mgr for IP rendezvous");
         return CHIP_ERROR_INVALID_ADDRESS;
     }
 }
@@ -131,12 +132,12 @@ CHIP_ERROR RendezvousSession::SendSecureMessage(Protocols::CHIPProtocolId protoc
     return mSecureSessionMgr->SendMessage(*mPairingSessionHandle, payloadHeader, std::move(msgBuf));
 }
 
-void RendezvousSession::OnPairingError(CHIP_ERROR err)
+void RendezvousSession::OnSessionEstablishmentError(CHIP_ERROR err)
 {
     OnRendezvousError(err);
 }
 
-void RendezvousSession::OnPairingComplete()
+void RendezvousSession::OnSessionEstablished()
 {
     CHIP_ERROR err =
         mSecureSessionMgr->NewPairing(Optional<Transport::PeerAddress>::Value(mPairingSession.PeerConnection().GetPeerAddress()),
@@ -191,7 +192,7 @@ void RendezvousSession::OnRendezvousConnectionOpened()
     CHIP_ERROR err = Pair(mParams.GetLocalNodeId(), mParams.GetSetupPINCode());
     if (err != CHIP_NO_ERROR)
     {
-        OnPairingError(err);
+        OnSessionEstablishmentError(err);
     }
 }
 

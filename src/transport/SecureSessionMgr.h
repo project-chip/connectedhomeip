@@ -32,8 +32,8 @@
 #include <inet/IPEndPointBasis.h>
 #include <support/CodeUtils.h>
 #include <support/DLLUtil.h>
+#include <transport/PASESession.h>
 #include <transport/PeerConnections.h>
-#include <transport/SecurePairingSession.h>
 #include <transport/SecureSession.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/Base.h>
@@ -205,7 +205,7 @@ public:
      *   establishes the security keys for secure communication with the
      *   peer node.
      */
-    CHIP_ERROR NewPairing(const Optional<Transport::PeerAddress> & peerAddr, NodeId peerNodeId, SecurePairingSession * pairing,
+    CHIP_ERROR NewPairing(const Optional<Transport::PeerAddress> & peerAddr, NodeId peerNodeId, PASESession * pairing,
                           Transport::Base * transport = nullptr);
 
     /**

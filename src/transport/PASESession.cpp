@@ -27,7 +27,7 @@
  *      (https://www.ietf.org/id/draft-bar-cfrg-spake2plus-01.html)
  *
  */
-#include <transport/SecurePairingSession.h>
+#include <transport/PASESession.h>
 
 #include <inttypes.h>
 #include <string.h>
@@ -49,15 +49,15 @@ const char * kSpake2pContext        = "SPAKE2+ Commissioning";
 const char * kSpake2pI2RSessionInfo = "Commissioning I2R Key";
 const char * kSpake2pR2ISessionInfo = "Commissioning R2I Key";
 
-SecurePairingSession::SecurePairingSession() {}
+PASESession::PASESession() {}
 
-SecurePairingSession::~SecurePairingSession()
+PASESession::~PASESession()
 {
     // Let's clear out any security state stored in the object, before destroying it.
     Clear();
 }
 
-void SecurePairingSession::Clear()
+void PASESession::Clear()
 {
     // This function zeroes out and resets the memory used by the object.
     // It's done so that no security related information will be leaked.
@@ -80,11 +80,11 @@ void SecurePairingSession::Clear()
     mConnectionState.Reset();
 }
 
-CHIP_ERROR SecurePairingSession::Serialize(SecurePairingSessionSerialized & output)
+CHIP_ERROR PASESession::Serialize(PASESessionSerialized & output)
 {
     CHIP_ERROR error       = CHIP_NO_ERROR;
     uint16_t serializedLen = 0;
-    SecurePairingSessionSerializable serializable;
+    PASESessionSerializable serializable;
 
     VerifyOrExit(BASE64_ENCODED_LEN(sizeof(serializable)) <= sizeof(output.inner), error = CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -101,15 +101,15 @@ exit:
     return error;
 }
 
-CHIP_ERROR SecurePairingSession::Deserialize(SecurePairingSessionSerialized & input)
+CHIP_ERROR PASESession::Deserialize(PASESessionSerialized & input)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
-    SecurePairingSessionSerializable serializable;
+    PASESessionSerializable serializable;
     size_t maxlen            = BASE64_ENCODED_LEN(sizeof(serializable));
     size_t len               = strnlen(Uint8::to_char(input.inner), maxlen);
     uint16_t deserializedLen = 0;
 
-    VerifyOrExit(len < sizeof(SecurePairingSessionSerialized), error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(len < sizeof(PASESessionSerialized), error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(CanCastTo<uint16_t>(len), error = CHIP_ERROR_INVALID_ARGUMENT);
 
     memset(&serializable, 0, sizeof(serializable));
@@ -125,7 +125,7 @@ exit:
     return error;
 }
 
-CHIP_ERROR SecurePairingSession::ToSerializable(SecurePairingSessionSerializable & serializable)
+CHIP_ERROR PASESession::ToSerializable(PASESessionSerializable & serializable)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
 
@@ -148,7 +148,7 @@ exit:
     return error;
 }
 
-CHIP_ERROR SecurePairingSession::FromSerializable(const SecurePairingSessionSerializable & serializable)
+CHIP_ERROR PASESession::FromSerializable(const PASESessionSerializable & serializable)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
 
@@ -168,8 +168,8 @@ exit:
     return error;
 }
 
-CHIP_ERROR SecurePairingSession::Init(Optional<NodeId> myNodeId, uint16_t myKeyId, uint32_t setupCode,
-                                      AuthenticatedSessionEstablishmentDelegate * delegate)
+CHIP_ERROR PASESession::Init(Optional<NodeId> myNodeId, uint16_t myKeyId, uint32_t setupCode,
+                             SessionEstablishmentDelegate * delegate)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -190,7 +190,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR SecurePairingSession::SetupSpake2p(uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen)
+CHIP_ERROR PASESession::SetupSpake2p(uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -208,9 +208,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR SecurePairingSession::WaitForPairing(uint32_t mySetUpPINCode, uint32_t pbkdf2IterCount, const uint8_t * salt,
-                                                size_t saltLen, Optional<NodeId> myNodeId, uint16_t myKeyId,
-                                                AuthenticatedSessionEstablishmentDelegate * delegate)
+CHIP_ERROR PASESession::WaitForPairing(uint32_t mySetUpPINCode, uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen,
+                                       Optional<NodeId> myNodeId, uint16_t myKeyId, SessionEstablishmentDelegate * delegate)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -249,7 +248,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR SecurePairingSession::AttachHeaderAndSend(Protocols::SecureChannel::MsgType msgType, System::PacketBufferHandle msgBuf)
+CHIP_ERROR PASESession::AttachHeaderAndSend(Protocols::SecureChannel::MsgType msgType, System::PacketBufferHandle msgBuf)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -269,20 +268,19 @@ CHIP_ERROR SecurePairingSession::AttachHeaderAndSend(Protocols::SecureChannel::M
     SuccessOrExit(err);
     VerifyOrExit(headerSize == actualEncodedHeaderSize, err = CHIP_ERROR_INTERNAL);
 
-    err = mDelegate->SendPairingMessage(PacketHeader()
-                                            .SetSourceNodeId(mLocalNodeId)
-                                            .SetDestinationNodeId(mConnectionState.GetPeerNodeId())
-                                            .SetEncryptionKeyID(mConnectionState.GetLocalKeyID()),
-                                        mConnectionState.GetPeerAddress(), std::move(msgBuf));
+    err = mDelegate->SendSessionEstablishmentMessage(PacketHeader()
+                                                         .SetSourceNodeId(mLocalNodeId)
+                                                         .SetDestinationNodeId(mConnectionState.GetPeerNodeId())
+                                                         .SetEncryptionKeyID(mConnectionState.GetLocalKeyID()),
+                                                     mConnectionState.GetPeerAddress(), std::move(msgBuf));
     SuccessOrExit(err);
 
 exit:
     return err;
 }
 
-CHIP_ERROR SecurePairingSession::Pair(const Transport::PeerAddress peerAddress, uint32_t peerSetUpPINCode,
-                                      Optional<NodeId> myNodeId, NodeId peerNodeId, uint16_t myKeyId,
-                                      AuthenticatedSessionEstablishmentDelegate * delegate)
+CHIP_ERROR PASESession::Pair(const Transport::PeerAddress peerAddress, uint32_t peerSetUpPINCode, Optional<NodeId> myNodeId,
+                             NodeId peerNodeId, uint16_t myKeyId, SessionEstablishmentDelegate * delegate)
 {
     CHIP_ERROR err = Init(myNodeId, myKeyId, peerSetUpPINCode, delegate);
     SuccessOrExit(err);
@@ -301,7 +299,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR SecurePairingSession::DeriveSecureSession(const uint8_t * info, size_t info_len, SecureSession & session)
+CHIP_ERROR PASESession::DeriveSecureSession(const uint8_t * info, size_t info_len, SecureSession & session)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -316,7 +314,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR SecurePairingSession::SendPBKDFParamRequest()
+CHIP_ERROR PASESession::SendPBKDFParamRequest()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -348,7 +346,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR SecurePairingSession::HandlePBKDFParamRequest(const PacketHeader & header, const System::PacketBufferHandle & msg)
+CHIP_ERROR PASESession::HandlePBKDFParamRequest(const PacketHeader & header, const System::PacketBufferHandle & msg)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -382,7 +380,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR SecurePairingSession::SendPBKDFParamResponse()
+CHIP_ERROR PASESession::SendPBKDFParamResponse()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -439,7 +437,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR SecurePairingSession::HandlePBKDFParamResponse(const PacketHeader & header, const System::PacketBufferHandle & msg)
+CHIP_ERROR PASESession::HandlePBKDFParamResponse(const PacketHeader & header, const System::PacketBufferHandle & msg)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -493,7 +491,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR SecurePairingSession::SendMsg1()
+CHIP_ERROR PASESession::SendMsg1()
 {
     uint8_t X[kMAX_Point_Length];
     size_t X_len = sizeof(X);
@@ -528,7 +526,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR SecurePairingSession::HandleMsg1_and_SendMsg2(const PacketHeader & header, const System::PacketBufferHandle & msg)
+CHIP_ERROR PASESession::HandleMsg1_and_SendMsg2(const PacketHeader & header, const System::PacketBufferHandle & msg)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -599,7 +597,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR SecurePairingSession::HandleMsg2_and_SendMsg3(const PacketHeader & header, const System::PacketBufferHandle & msg)
+CHIP_ERROR PASESession::HandleMsg2_and_SendMsg3(const PacketHeader & header, const System::PacketBufferHandle & msg)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -667,7 +665,7 @@ CHIP_ERROR SecurePairingSession::HandleMsg2_and_SendMsg3(const PacketHeader & he
     SuccessOrExit(err);
 
     // Call delegate to indicate pairing completion
-    mDelegate->OnPairingComplete();
+    mDelegate->OnSessionEstablished();
 
 exit:
 
@@ -678,7 +676,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR SecurePairingSession::HandleMsg3(const PacketHeader & header, const System::PacketBufferHandle & msg)
+CHIP_ERROR PASESession::HandleMsg3(const PacketHeader & header, const System::PacketBufferHandle & msg)
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;
     const uint8_t * hash        = msg->Start();
@@ -714,7 +712,7 @@ CHIP_ERROR SecurePairingSession::HandleMsg3(const PacketHeader & header, const S
     SuccessOrExit(err);
 
     // Call delegate to indicate pairing completion
-    mDelegate->OnPairingComplete();
+    mDelegate->OnSessionEstablished();
 
 exit:
 
@@ -725,7 +723,7 @@ exit:
     return err;
 }
 
-void SecurePairingSession::SendErrorMsg(Spake2pErrorType errorCode)
+void PASESession::SendErrorMsg(Spake2pErrorType errorCode)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -748,7 +746,7 @@ exit:
     Clear();
 }
 
-void SecurePairingSession::HandleErrorMsg(const PacketHeader & header, const System::PacketBufferHandle & msg)
+void PASESession::HandleErrorMsg(const PacketHeader & header, const System::PacketBufferHandle & msg)
 {
     // Request message processing
     const uint8_t * buf    = msg->Start();
@@ -765,8 +763,8 @@ exit:
     Clear();
 }
 
-CHIP_ERROR SecurePairingSession::HandlePeerMessage(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
-                                                   System::PacketBufferHandle msg)
+CHIP_ERROR PASESession::HandlePeerMessage(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
+                                          System::PacketBufferHandle msg)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     uint16_t headerSize = 0;
@@ -825,7 +823,7 @@ exit:
     // Call delegate to indicate pairing failure
     if (err != CHIP_NO_ERROR)
     {
-        mDelegate->OnPairingError(err);
+        mDelegate->OnSessionEstablishmentError(err);
     }
 
     return err;
