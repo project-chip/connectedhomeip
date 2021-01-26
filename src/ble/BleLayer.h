@@ -282,12 +282,10 @@ public:
      *
      *     Beyond each call, no guarantees are provided as to the lifetime of UUID arguments.
      *
-     *     A 'true' return value means the CHIP stack successfully handled the
-     *     corresponding message or state indication. 'false' means the CHIP stack either
-     *     failed or chose not to handle this. In case of 'false,' the CHIP stack will not
-     *     have freed or taken ownership of any PacketBuffer arguments. This contract allows the
-     *     platform to pass BLE events to CHIP without needing to know which characteristics
-     *     CHIP cares about.
+     *     A 'true' return value means the CHIP stack successfully handled the corresponding message
+     *     or state indication. 'false' means the CHIP stack either failed or chose not to handle this.
+     *     This contract allows the platform to pass BLE events to CHIP without needing to know which
+     *     characteristics CHIP cares about.
 
      *     Platform must call this function when a GATT subscription has been established to any CHIP service
      *     charateristic.

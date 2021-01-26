@@ -109,8 +109,6 @@ err_t start_tcp_timers(void)
 namespace chip {
 namespace Inet {
 
-using chip::System::PacketBuffer;
-
 chip::System::ObjectPool<TCPEndPoint, INET_CONFIG_NUM_TCP_ENDPOINTS> TCPEndPoint::sPool;
 
 INET_ERROR TCPEndPoint::Bind(IPAddressType addrType, const IPAddress & addr, uint16_t port, bool reuseAddr)
@@ -2409,7 +2407,9 @@ void TCPEndPoint::ReceiveData()
     {
         rcvBuf = mRcvQueue->Last();
         if (rcvBuf->AvailableDataLength() == 0)
+        {
             rcvBuf = System::PacketBufferHandle::New(System::kMaxPacketBufferSizeWithoutReserve, 0);
+        }
         else
         {
             isNewBuf = false;

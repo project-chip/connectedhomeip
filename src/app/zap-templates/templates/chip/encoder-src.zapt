@@ -63,7 +63,7 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
     PacketBufferHandle payload = PacketBufferHandle::New(kMaxBufferSize);                                               \
     if (payload.IsNull())                                                                                                          \
     {                                                                                                                              \
-        ChipLogError(Zcl, "Could not allocate PacketBuffer while trying to encode %s command", kName);                             \
+        ChipLogError(Zcl, "Could not allocate packet buffer while trying to encode %s command", kName);                            \
         return payload;                                                                                                            \
     }                                                                                                                              \
                                                                                                                                    \

@@ -31,8 +31,6 @@
 
 #include <climits>
 
-using namespace std;
-
 namespace chip {
 
 static const char codes[]        = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D',
@@ -42,9 +40,9 @@ static const int kBase41ChunkLen = 3;
 static const int kBytesChunkLen  = 2;
 static const int kRadix          = sizeof(codes) / sizeof(codes[0]);
 
-string base41Encode(const uint8_t * buf, size_t buf_len)
+std::string base41Encode(const uint8_t * buf, size_t buf_len)
 {
-    string result;
+    std::string result;
 
     // eat little-endian uint16_ts from the byte array
     // encode as 3 base41 characters
@@ -192,7 +190,7 @@ static inline CHIP_ERROR decodeChar(char c, uint8_t & value)
     return 0;
 }
 
-CHIP_ERROR base41Decode(string base41, vector<uint8_t> & result)
+CHIP_ERROR base41Decode(std::string base41, std::vector<uint8_t> & result)
 {
     result.clear();
 

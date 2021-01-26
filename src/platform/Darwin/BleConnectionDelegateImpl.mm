@@ -31,6 +31,8 @@
 
 #import "UUIDHelper.h"
 
+using namespace chip::Ble;
+
 @interface BleConnection : NSObject <CBCentralManagerDelegate, CBPeripheralDelegate>
 
 @property (strong, nonatomic) dispatch_queue_t workQueue;

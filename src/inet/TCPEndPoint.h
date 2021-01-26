@@ -316,7 +316,7 @@ public:
      *  This method may only be called by data reception event handlers to
      *  put an unacknowledged portion of data back on the receive queue. The
      *  operational semantics are undefined if the caller is outside the scope
-     *  of a data reception event handler, \c data is not the \c chip::System::PacketBuffer
+     *  of a data reception event handler, \c data is not the packet buffer
      *  provided to the handler, or \c data does not contain the unacknowledged
      *  portion remaining after the bytes acknowledged by a prior call to the
      *  <tt>AckReceive(uint16_t len)</tt> method.

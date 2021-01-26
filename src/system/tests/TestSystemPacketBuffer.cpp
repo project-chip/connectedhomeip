@@ -111,6 +111,7 @@ public:
     static void CheckFreeHead(nlTestSuite * inSuite, void * inContext);
     static void CheckHandleConstruct(nlTestSuite * inSuite, void * inContext);
     static void CheckHandleMove(nlTestSuite * inSuite, void * inContext);
+    static void CheckHandleRelease(nlTestSuite * inSuite, void * inContext);
     static void CheckHandleFree(nlTestSuite * inSuite, void * inContext);
     static void CheckHandleRetain(nlTestSuite * inSuite, void * inContext);
     static void CheckHandleAdopt(nlTestSuite * inSuite, void * inContext);
@@ -867,7 +868,7 @@ void PacketBufferTest::CheckCompactHead(nlTestSuite * inSuite, void * inContext)
                     // so we manage it manually.
                     test->PrepareTestBuffer(&config_2);
                     NL_TEST_ASSERT(inSuite, config_2.handle->ref == 1);
-                    PacketBuffer * buffer_2 = config_2.handle.Release_ForNow();
+                    PacketBuffer * buffer_2 = std::move(config_2.handle).UnsafeRelease();
                     NL_TEST_ASSERT(inSuite, config_2.handle.IsNull());
 
                     config_1.handle->SetDataLength(length_1, config_1.handle);
@@ -1400,7 +1401,7 @@ void PacketBufferTest::CheckFreeHead(nlTestSuite * inSuite, void * inContext)
             NL_TEST_ASSERT(inSuite, config_1.handle->ref == 2);
             NL_TEST_ASSERT(inSuite, config_2.handle->ref == 2); // config_2.handle and config_1.handle->next
 
-            PacketBuffer * const returned = PacketBuffer::FreeHead(config_1.handle.Release_ForNow());
+            PacketBuffer * const returned = PacketBuffer::FreeHead(std::move(config_1.handle).UnsafeRelease());
 
             NL_TEST_ASSERT(inSuite, handle_1->ref == 1);
             NL_TEST_ASSERT(inSuite, config_2.handle->ref == 2); // config_2.handle and returned
@@ -1454,7 +1455,7 @@ void PacketBufferTest::CheckHandleConstruct(nlTestSuite * inSuite, void * inCont
     NL_TEST_ASSERT(inSuite, !handle_3.IsNull());
 
     // Private constructor.
-    PacketBuffer * const buffer_3 = handle_3.Release_ForNow();
+    PacketBuffer * const buffer_3 = std::move(handle_3).UnsafeRelease();
     PacketBufferHandle handle_4(buffer_3);
     NL_TEST_ASSERT(inSuite, handle_4.Get() == buffer_3);
 }
@@ -1493,6 +1494,26 @@ void PacketBufferTest::CheckHandleMove(nlTestSuite * inSuite, void * inContext)
         }
         // Verify and release handles.
         NL_TEST_ASSERT(inSuite, test->ResetHandles());
+    }
+}
+
+void PacketBufferTest::CheckHandleRelease(nlTestSuite * inSuite, void * inContext)
+{
+    struct TestContext * const theContext = static_cast<struct TestContext *>(inContext);
+    PacketBufferTest * const test         = theContext->test;
+    NL_TEST_ASSERT(inSuite, test->mContext == theContext);
+
+    for (auto & config_1 : test->configurations)
+    {
+        test->PrepareTestBuffer(&config_1);
+
+        PacketBuffer * const buffer_1 = config_1.handle.Get();
+        PacketBuffer * const taken_1  = std::move(config_1.handle).UnsafeRelease();
+
+        NL_TEST_ASSERT(inSuite, buffer_1 == taken_1);
+        NL_TEST_ASSERT(inSuite, config_1.handle.IsNull());
+        NL_TEST_ASSERT(inSuite, buffer_1->ref == 1);
+        PacketBuffer::Free(buffer_1);
     }
 }
 
@@ -1544,7 +1565,7 @@ void PacketBufferTest::CheckHandleAdopt(nlTestSuite * inSuite, void * inContext)
     for (auto & config_1 : test->configurations)
     {
         test->PrepareTestBuffer(&config_1, kRecordHandle);
-        PacketBuffer * buffer_1 = config_1.handle.Release_ForNow();
+        PacketBuffer * buffer_1 = std::move(config_1.handle).UnsafeRelease();
 
         NL_TEST_ASSERT(inSuite, config_1.handle.IsNull());
         NL_TEST_ASSERT(inSuite, buffer_1->ref == 2); // test.handles and buffer_1
@@ -1568,7 +1589,7 @@ void PacketBufferTest::CheckHandleHold(nlTestSuite * inSuite, void * inContext)
     for (auto & config_1 : test->configurations)
     {
         test->PrepareTestBuffer(&config_1, kRecordHandle);
-        PacketBuffer * buffer_1 = config_1.handle.Release_ForNow();
+        PacketBuffer * buffer_1 = std::move(config_1.handle).UnsafeRelease();
 
         NL_TEST_ASSERT(inSuite, config_1.handle.IsNull());
         NL_TEST_ASSERT(inSuite, buffer_1->ref == 2); // test.handles and buffer_1
@@ -1709,6 +1730,7 @@ const nlTest sTests[] =
     NL_TEST_DEF("PacketBuffer::FreeHead",               PacketBufferTest::CheckFreeHead),
     NL_TEST_DEF("PacketBuffer::HandleConstruct",        PacketBufferTest::CheckHandleConstruct),
     NL_TEST_DEF("PacketBuffer::HandleMove",             PacketBufferTest::CheckHandleMove),
+    NL_TEST_DEF("PacketBuffer::HandleRelease",          PacketBufferTest::CheckHandleRelease),
     NL_TEST_DEF("PacketBuffer::HandleFree",             PacketBufferTest::CheckHandleFree),
     NL_TEST_DEF("PacketBuffer::HandleRetain",           PacketBufferTest::CheckHandleRetain),
     NL_TEST_DEF("PacketBuffer::HandleAdopt",            PacketBufferTest::CheckHandleAdopt),

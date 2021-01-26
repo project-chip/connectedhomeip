@@ -48,6 +48,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
+#include <utility>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/mem.h>
@@ -164,8 +165,8 @@ uint16_t PacketBuffer::ReservedSize() const
 
 void PacketBuffer::AddToEnd(PacketBufferHandle && aPacketHandle)
 {
-    PacketBuffer * aPacket = aPacketHandle.mBuffer;
-    aPacketHandle.mBuffer  = nullptr;
+    // Ownership of aPacketHandle's buffer is transferred to the end of the chain.
+    PacketBuffer * aPacket = std::move(aPacketHandle).UnsafeRelease();
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     pbuf_cat(this, aPacket);

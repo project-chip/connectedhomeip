@@ -77,7 +77,7 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
     PacketBufferHandle payload = PacketBufferHandle::New(kMaxBufferSize);                                                          \
     if (payload.IsNull())                                                                                                          \
     {                                                                                                                              \
-        ChipLogError(Zcl, "Could not allocate PacketBuffer while trying to encode %s command", kName);                             \
+        ChipLogError(Zcl, "Could not allocate packet buffer while trying to encode %s command", kName);                            \
         return payload;                                                                                                            \
     }                                                                                                                              \
                                                                                                                                    \
@@ -836,7 +836,7 @@ PacketBufferHandle encodeColorControlClusterReportCurrentHueAttribute(EndpointId
         .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
         .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
         .Put16(0x0000)
-        .Put8(0x20)
+        .Put8(32)
         .Put16(minInterval)
         .Put16(maxInterval);
     buf.Put8(static_cast<uint8_t>(change));
@@ -862,7 +862,7 @@ PacketBufferHandle encodeColorControlClusterReportCurrentSaturationAttribute(End
         .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
         .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
         .Put16(0x0001)
-        .Put8(0x20)
+        .Put8(32)
         .Put16(minInterval)
         .Put16(maxInterval);
     buf.Put8(static_cast<uint8_t>(change));
@@ -898,7 +898,7 @@ PacketBufferHandle encodeColorControlClusterReportCurrentXAttribute(EndpointId d
         .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
         .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
         .Put16(0x0003)
-        .Put8(0x21)
+        .Put8(33)
         .Put16(minInterval)
         .Put16(maxInterval);
     buf.Put16(static_cast<uint16_t>(change));
@@ -924,7 +924,7 @@ PacketBufferHandle encodeColorControlClusterReportCurrentYAttribute(EndpointId d
         .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
         .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
         .Put16(0x0004)
-        .Put8(0x21)
+        .Put8(33)
         .Put16(minInterval)
         .Put16(maxInterval);
     buf.Put16(static_cast<uint16_t>(change));
@@ -970,7 +970,7 @@ PacketBufferHandle encodeColorControlClusterReportColorTemperatureAttribute(Endp
         .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
         .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
         .Put16(0x0007)
-        .Put8(0x21)
+        .Put8(33)
         .Put16(minInterval)
         .Put16(maxInterval);
     buf.Put16(static_cast<uint16_t>(change));
@@ -1005,7 +1005,7 @@ PacketBufferHandle encodeColorControlClusterWriteColorControlOptionsAttribute(En
         .Put8(kSeqNum)
         .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
         .Put16(0x000F)
-        .Put8(0x18)
+        .Put8(24)
         .Put8(static_cast<uint8_t>(colorControlOptions));
     COMMAND_FOOTER();
 }
@@ -1217,7 +1217,7 @@ PacketBufferHandle encodeColorControlClusterWriteWhitePointXAttribute(EndpointId
         .Put8(kSeqNum)
         .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
         .Put16(0x0030)
-        .Put8(0x21)
+        .Put8(33)
         .Put16(static_cast<uint16_t>(whitePointX));
     COMMAND_FOOTER();
 }
@@ -1239,7 +1239,7 @@ PacketBufferHandle encodeColorControlClusterWriteWhitePointYAttribute(EndpointId
         .Put8(kSeqNum)
         .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
         .Put16(0x0031)
-        .Put8(0x21)
+        .Put8(33)
         .Put16(static_cast<uint16_t>(whitePointY));
     COMMAND_FOOTER();
 }
@@ -1261,7 +1261,7 @@ PacketBufferHandle encodeColorControlClusterWriteColorPointRXAttribute(EndpointI
         .Put8(kSeqNum)
         .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
         .Put16(0x0032)
-        .Put8(0x21)
+        .Put8(33)
         .Put16(static_cast<uint16_t>(colorPointRX));
     COMMAND_FOOTER();
 }
@@ -1283,7 +1283,7 @@ PacketBufferHandle encodeColorControlClusterWriteColorPointRYAttribute(EndpointI
         .Put8(kSeqNum)
         .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
         .Put16(0x0033)
-        .Put8(0x21)
+        .Put8(33)
         .Put16(static_cast<uint16_t>(colorPointRY));
     COMMAND_FOOTER();
 }
@@ -1306,7 +1306,7 @@ PacketBufferHandle encodeColorControlClusterWriteColorPointRIntensityAttribute(E
         .Put8(kSeqNum)
         .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
         .Put16(0x0034)
-        .Put8(0x20)
+        .Put8(32)
         .Put8(static_cast<uint8_t>(colorPointRIntensity));
     COMMAND_FOOTER();
 }
@@ -1328,7 +1328,7 @@ PacketBufferHandle encodeColorControlClusterWriteColorPointGXAttribute(EndpointI
         .Put8(kSeqNum)
         .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
         .Put16(0x0036)
-        .Put8(0x21)
+        .Put8(33)
         .Put16(static_cast<uint16_t>(colorPointGX));
     COMMAND_FOOTER();
 }
@@ -1350,7 +1350,7 @@ PacketBufferHandle encodeColorControlClusterWriteColorPointGYAttribute(EndpointI
         .Put8(kSeqNum)
         .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
         .Put16(0x0037)
-        .Put8(0x21)
+        .Put8(33)
         .Put16(static_cast<uint16_t>(colorPointGY));
     COMMAND_FOOTER();
 }
@@ -1373,7 +1373,7 @@ PacketBufferHandle encodeColorControlClusterWriteColorPointGIntensityAttribute(E
         .Put8(kSeqNum)
         .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
         .Put16(0x0038)
-        .Put8(0x20)
+        .Put8(32)
         .Put8(static_cast<uint8_t>(colorPointGIntensity));
     COMMAND_FOOTER();
 }
@@ -1395,7 +1395,7 @@ PacketBufferHandle encodeColorControlClusterWriteColorPointBXAttribute(EndpointI
         .Put8(kSeqNum)
         .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
         .Put16(0x003A)
-        .Put8(0x21)
+        .Put8(33)
         .Put16(static_cast<uint16_t>(colorPointBX));
     COMMAND_FOOTER();
 }
@@ -1417,7 +1417,7 @@ PacketBufferHandle encodeColorControlClusterWriteColorPointBYAttribute(EndpointI
         .Put8(kSeqNum)
         .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
         .Put16(0x003B)
-        .Put8(0x21)
+        .Put8(33)
         .Put16(static_cast<uint16_t>(colorPointBY));
     COMMAND_FOOTER();
 }
@@ -1440,7 +1440,7 @@ PacketBufferHandle encodeColorControlClusterWriteColorPointBIntensityAttribute(E
         .Put8(kSeqNum)
         .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
         .Put16(0x003C)
-        .Put8(0x20)
+        .Put8(32)
         .Put8(static_cast<uint8_t>(colorPointBIntensity));
     COMMAND_FOOTER();
 }
@@ -1553,7 +1553,7 @@ PacketBufferHandle encodeColorControlClusterWriteStartUpColorTemperatureMiredsAt
         .Put8(kSeqNum)
         .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
         .Put16(0x4010)
-        .Put8(0x21)
+        .Put8(33)
         .Put16(static_cast<uint16_t>(startUpColorTemperatureMireds));
     COMMAND_FOOTER();
 }
@@ -1965,7 +1965,7 @@ PacketBufferHandle encodeDoorLockClusterReportLockStateAttribute(EndpointId dest
         .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
         .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
         .Put16(0x0000)
-        .Put8(0x30)
+        .Put8(48)
         .Put16(minInterval)
         .Put16(maxInterval);
     COMMAND_FOOTER();
@@ -2200,7 +2200,7 @@ PacketBufferHandle encodeIasZoneClusterWriteIasCieAddressAttribute(EndpointId de
         .Put8(kSeqNum)
         .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
         .Put16(0x0010)
-        .Put8(0xF0)
+        .Put8(240)
         .Put64(static_cast<uint64_t>(iasCieAddress));
     COMMAND_FOOTER();
 }
@@ -2281,7 +2281,7 @@ PacketBufferHandle encodeIdentifyClusterWriteIdentifyTimeAttribute(EndpointId de
         .Put8(kSeqNum)
         .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
         .Put16(0x0000)
-        .Put8(0x21)
+        .Put8(33)
         .Put16(static_cast<uint16_t>(identifyTime));
     COMMAND_FOOTER();
 }
@@ -2453,7 +2453,7 @@ PacketBufferHandle encodeLevelControlClusterReportCurrentLevelAttribute(Endpoint
         .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
         .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
         .Put16(0x0000)
-        .Put8(0x20)
+        .Put8(32)
         .Put16(minInterval)
         .Put16(maxInterval);
     buf.Put8(static_cast<uint8_t>(change));
@@ -2539,7 +2539,7 @@ PacketBufferHandle encodeOnOffClusterReportOnOffAttribute(EndpointId destination
         .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
         .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
         .Put16(0x0000)
-        .Put8(0x10)
+        .Put8(16)
         .Put16(minInterval)
         .Put16(maxInterval);
     COMMAND_FOOTER();
@@ -2776,7 +2776,7 @@ PacketBufferHandle encodeTemperatureMeasurementClusterReportMeasuredValueAttribu
         .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
         .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
         .Put16(0x0000)
-        .Put8(0x29)
+        .Put8(41)
         .Put16(minInterval)
         .Put16(maxInterval);
     buf.Put16(static_cast<uint16_t>(change));

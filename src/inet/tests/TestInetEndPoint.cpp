@@ -539,8 +539,6 @@ static const nlTest sTests[] = { NL_TEST_DEF("InetEndPoint::PreTest", TestInetPr
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 /**
  *  Set up the test suite.
- *  This is a work-around to initiate PacketBuffer protected class instance's
- *  data and set it to a known state, before an instance is created.
  */
 static int TestSetup(void * inContext)
 {

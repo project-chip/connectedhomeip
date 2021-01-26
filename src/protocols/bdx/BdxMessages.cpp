@@ -153,7 +153,7 @@ CHIP_ERROR TransferInit::Parse(System::PacketBufferHandle aBuffer)
         MetadataLength              = static_cast<uint16_t>(aBuffer->DataLength() - metadataStartIndex);
     }
 
-    // Retain ownership of the PacketBuffer so that the FileDesignator and Metadata pointers remain valid.
+    // Retain ownership of the packet buffer so that the FileDesignator and Metadata pointers remain valid.
     Buffer = std::move(aBuffer);
 
 exit:
@@ -236,7 +236,7 @@ CHIP_ERROR SendAccept::Parse(System::PacketBufferHandle aBuffer)
         MetadataLength = bufReader.Remaining();
     }
 
-    // Retain ownership of the PacketBuffer so that the Metadata pointer remains valid.
+    // Retain ownership of the packet buffer so that the Metadata pointer remains valid.
     Buffer = std::move(aBuffer);
 
 exit:
@@ -376,7 +376,7 @@ CHIP_ERROR ReceiveAccept::Parse(System::PacketBufferHandle aBuffer)
         MetadataLength = bufReader.Remaining();
     }
 
-    // Retain ownership of the PacketBuffer so that the Metadata pointer remains valid.
+    // Retain ownership of the packet buffer so that the Metadata pointer remains valid.
     Buffer = std::move(aBuffer);
 
 exit:
@@ -465,7 +465,7 @@ CHIP_ERROR DataBlock::Parse(System::PacketBufferHandle aBuffer)
         DataLength = bufReader.Remaining();
     }
 
-    // Retain ownership of the PacketBuffer so that the Data pointer remains valid.
+    // Retain ownership of the packet buffer so that the Data pointer remains valid.
     Buffer = std::move(aBuffer);
 
 exit:

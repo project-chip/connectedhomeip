@@ -31,7 +31,7 @@
 #include <core/CHIPCore.h>
 #include <support/Base64.h>
 #include <support/DLLUtil.h>
-#include <transport/SecurePairingSession.h>
+#include <transport/PASESession.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/MessageHeader.h>
@@ -217,7 +217,7 @@ public:
 
     void SetAddress(const Inet::IPAddress & deviceAddr) { mDeviceAddr = deviceAddr; }
 
-    SecurePairingSessionSerializable & GetPairing() { return mPairing; }
+    PASESessionSerializable & GetPairing() { return mPairing; }
 
     void AddResponseHandler(EndpointId endpoint, ClusterId cluster, Callback::Callback<> * onResponse);
     void AddReportHandler(EndpointId endpoint, ClusterId cluster, Callback::Callback<> * onReport);
@@ -258,7 +258,7 @@ private:
     bool mActive;
     ConnectionState mState;
 
-    SecurePairingSessionSerializable mPairing;
+    PASESessionSerializable mPairing;
 
     DeviceStatusDelegate * mStatusDelegate;
 
@@ -324,7 +324,7 @@ constexpr uint16_t kMaxInterfaceName = 32;
 
 typedef struct SerializableDevice
 {
-    SecurePairingSessionSerializable mOpsCreds;
+    PASESessionSerializable mOpsCreds;
     uint64_t mDeviceId; /* This field is serialized in LittleEndian byte order */
     uint8_t mDeviceAddr[INET6_ADDRSTRLEN];
     uint16_t mDevicePort; /* This field is serealized in LittelEndian byte order */

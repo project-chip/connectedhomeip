@@ -350,7 +350,7 @@ BLE_ERROR BtpEngine::HandleCharacteristicReceived(System::PacketBufferHandle dat
 
     if (rx_flags & kHeaderFlag_EndMessage)
     {
-        // Trim remainder, if any, of received PacketBuffer based on sender-specified length of reassembled message.
+        // Trim remainder, if any, of the received packet buffer based on sender-specified length of reassembled message.
         int padding = mRxBuf->DataLength() - mRxLength;
 
         if (padding > 0)
