@@ -99,8 +99,6 @@
 namespace chip {
 namespace Inet {
 
-using chip::System::PacketBuffer;
-
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 union PeerSockAddr
 {
@@ -678,12 +676,12 @@ done:
 System::Error IPEndPointBasis::PostPacketBufferEvent(chip::System::Layer & aLayer, System::Object & aTarget,
                                                      System::EventType aEventType, System::PacketBufferHandle aBuffer)
 {
-    System::PacketBuffer * buf = aBuffer.Release_ForNow();
-    System::Error error        = aLayer.PostEvent(aTarget, aEventType, (uintptr_t) buf);
-    if (error != INET_NO_ERROR)
+    System::Error error =
+        aLayer.PostEvent(aTarget, aEventType, (uintptr_t) System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(aBuffer));
+    if (error == INET_NO_ERROR)
     {
-        // If PostEvent() failed, it has not taken ownership of the buffer, so we need to retake it so that it will be freed.
-        (void) System::PacketBufferHandle::Adopt(buf);
+        // If PostEvent() succeeded, it has ownership of the buffer, so we need to release it (without freeing it).
+        static_cast<void>(std::move(aBuffer).UnsafeRelease());
     }
     return error;
 }
@@ -1070,7 +1068,7 @@ void IPEndPointBasis::HandlePendingIO(uint16_t aPort)
     lPacketInfo.Clear();
     lPacketInfo.DestPort = aPort;
 
-    lBuffer = PacketBuffer::New(0);
+    lBuffer = System::PacketBuffer::New(0);
 
     if (!lBuffer.IsNull())
     {

@@ -525,8 +525,8 @@ void BLEManagerImpl::HandleRXCharWrite(uint16_t connId, uint16_t handle, uint8_t
 
     ChipLogProgress(DeviceLayer, "Write request received for CHIPoBLE Client TX characteristic (con %u, len %u)", connId, len);
 
-    // Copy the data to a PacketBuffer.
-    PacketBufferHandle buf = PacketBuffer::New(0);
+    // Copy the data to a packet buffer.
+    PacketBufferHandle buf = System::PacketBuffer::New(0);
     VerifyOrExit(!buf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
     VerifyOrExit(buf->AvailableDataLength() >= len, err = CHIP_ERROR_BUFFER_TOO_SMALL);
     memcpy(buf->Start(), pValue, len);
@@ -536,7 +536,7 @@ void BLEManagerImpl::HandleRXCharWrite(uint16_t connId, uint16_t handle, uint8_t
         ChipDeviceEvent event;
         event.Type                        = DeviceEventType::kCHIPoBLEWriteReceived;
         event.CHIPoBLEWriteReceived.ConId = connId;
-        event.CHIPoBLEWriteReceived.Data  = buf.Release_ForNow();
+        event.CHIPoBLEWriteReceived.Data  = std::move(buf).UnsafeRelease();
         PlatformMgr().PostEvent(&event);
     }
 

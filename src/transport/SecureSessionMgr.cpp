@@ -44,7 +44,6 @@
 
 namespace chip {
 
-using System::PacketBuffer;
 using System::PacketBufferHandle;
 using Transport::PeerAddress;
 using Transport::PeerConnectionState;
@@ -169,7 +168,7 @@ CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHea
     msgStart = static_cast<uint8_t *>(msgBuf->Start() - headerSize);
     msgLen   = static_cast<uint16_t>(msgBuf->DataLength() + headerSize);
 
-    // Retain the PacketBuffer in case it's needed for retransmissions.
+    // Retain the packet buffer in case it's needed for retransmissions.
     if (bufferRetainSlot != nullptr)
     {
         encryptedMsg        = msgBuf.Retain();
