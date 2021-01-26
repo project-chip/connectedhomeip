@@ -47,7 +47,7 @@ const char * sDeviceOptionHelp = "  --ble-device <number>\n"
                                  "       Enable WiFi management via wpa_supplicant.\n"
                                  "\n"
                                  "  --thread\n"
-                                 "       Enable WiFi management via ot-agent.\n"
+                                 "       Enable Thread management via ot-agent.\n"
                                  "\n";
 
 bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue)
