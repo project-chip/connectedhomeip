@@ -184,9 +184,6 @@ private:
 
     ExchangeContext * AllocContext(uint16_t ExchangeId, SecureSessionHandle session, bool Initiator, ExchangeDelegate * delegate);
 
-    void DispatchMessage(SecureSessionHandle session, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                         System::PacketBufferHandle msgBuf);
-
     CHIP_ERROR RegisterUMH(uint32_t protocolId, int16_t msgType, ExchangeDelegate * delegate);
     CHIP_ERROR UnregisterUMH(uint32_t protocolId, int16_t msgType);
 
