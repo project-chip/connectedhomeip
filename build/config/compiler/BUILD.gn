@@ -169,7 +169,10 @@ config("strict_warnings") {
   }
 
   if (is_clang) {
-    cflags += [ "-Wimplicit-fallthrough" ]
+    cflags += [
+      "-Wimplicit-fallthrough",
+      "-Wheader-hygiene",
+    ]
   }
 
   if (current_os == "linux" || current_os == "android") {

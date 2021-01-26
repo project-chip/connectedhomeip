@@ -29,7 +29,7 @@
 #include <support/logging/CHIPLogging.h>
 #include <support/verhoeff/Verhoeff.h>
 
-using namespace chip;
+namespace chip {
 
 static uint32_t shortPayloadRepresentation(const SetupPayload & payload)
 {
@@ -83,3 +83,5 @@ CHIP_ERROR ManualSetupPayloadGenerator::payloadDecimalStringRepresentation(std::
     outDecimalString = decimalString;
     return CHIP_NO_ERROR;
 }
+
+} // namespace chip
