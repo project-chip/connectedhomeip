@@ -177,15 +177,19 @@ int main(int argc, char * argv[])
     // Init ZCL Data Model and CHIP App Server
     InitServer();
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
     if (LinuxDeviceOptions::GetInstance().mWiFi)
     {
         chip::DeviceLayer::ConnectivityMgrImpl().StartWiFiManagement();
     }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
 
+#if CHIP_ENABLE_OPENTHREAD
     if (LinuxDeviceOptions::GetInstance().mThread)
     {
         chip::DeviceLayer::ThreadStackMgrImpl().InitThreadStack();
     }
+#endif // CHIP_ENABLE_OPENTHREAD
 
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
 
