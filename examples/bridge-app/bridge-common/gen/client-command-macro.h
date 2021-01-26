@@ -304,6 +304,17 @@
                                                                                                                                    \
                               ZCL_UPDATE_COMMISSION_STATE_COMMAND_ID, "uu", action, commissionStateMask);
 
+/** @brief Command description for TriggerEffect
+ *
+ * Command: TriggerEffect
+ * @param effectId IdentifyEffectIdentifier
+ * @param effectVariant IdentifyEffectVariant
+ */
+#define emberAfFillCommandIdentifyClusterTriggerEffect(effectId, effectVariant)                                                    \
+    emberAfFillExternalBuffer(mask,                                                                                                \
+                                                                                                                                   \
+                              ZCL_TRIGGER_EFFECT_COMMAND_ID, "uu", effectId, effectVariant);
+
 /** @brief Command description for AddGroup
  *
  * Command: AddGroup
@@ -489,6 +500,65 @@
                               ZCL_GET_SCENE_MEMBERSHIP_COMMAND_ID, "uuuuub", groupId, status, capacity, groupId, sceneCount,       \
                               sceneList, sceneListLen);
 
+/** @brief Command description for EnhancedAddScene
+ *
+ * Command: EnhancedAddScene
+ * @param groupId INT16U
+ * @param status Status
+ * @param sceneId INT8U
+ * @param groupId INT16U
+ * @param transitionTime INT16U
+ * @param sceneId INT8U
+ * @param sceneName CHAR_STRING
+ * @param extensionFieldSets SceneExtensionFieldSet []
+ * @param extensionFieldSetsLen int
+ */
+#define emberAfFillCommandScenesClusterEnhancedAddScene(groupId, status, sceneId, groupId, transitionTime, sceneId, sceneName,     \
+                                                        extensionFieldSets, extensionFieldSetsLen)                                 \
+    emberAfFillExternalBuffer(mask,                                                                                                \
+                                                                                                                                   \
+                              ZCL_ENHANCED_ADD_SCENE_COMMAND_ID, "uuuuuuub", groupId, status, sceneId, groupId, transitionTime,    \
+                              sceneId, sceneName, extensionFieldSets, extensionFieldSetsLen);
+
+/** @brief Command description for EnhancedViewScene
+ *
+ * Command: EnhancedViewScene
+ * @param groupId INT16U
+ * @param status Status
+ * @param sceneId INT8U
+ * @param groupId INT16U
+ * @param sceneId INT8U
+ * @param transitionTime INT16U
+ * @param sceneName CHAR_STRING
+ * @param extensionFieldSets SceneExtensionFieldSet []
+ * @param extensionFieldSetsLen int
+ */
+#define emberAfFillCommandScenesClusterEnhancedViewScene(groupId, status, sceneId, groupId, sceneId, transitionTime, sceneName,    \
+                                                         extensionFieldSets, extensionFieldSetsLen)                                \
+    emberAfFillExternalBuffer(mask,                                                                                                \
+                                                                                                                                   \
+                              ZCL_ENHANCED_VIEW_SCENE_COMMAND_ID, "uuuuuuub", groupId, status, sceneId, groupId, sceneId,          \
+                              transitionTime, sceneName, extensionFieldSets, extensionFieldSetsLen);
+
+/** @brief Command description for CopyScene
+ *
+ * Command: CopyScene
+ * @param mode ScenesCopyMode
+ * @param status Status
+ * @param groupIdFrom INT16U
+ * @param groupIdFrom INT16U
+ * @param sceneIdFrom INT8U
+ * @param sceneIdFrom INT8U
+ * @param groupIdTo INT16U
+ * @param sceneIdTo INT8U
+ */
+#define emberAfFillCommandScenesClusterCopyScene(mode, status, groupIdFrom, groupIdFrom, sceneIdFrom, sceneIdFrom, groupIdTo,      \
+                                                 sceneIdTo)                                                                        \
+    emberAfFillExternalBuffer(mask,                                                                                                \
+                                                                                                                                   \
+                              ZCL_COPY_SCENE_COMMAND_ID, "uuuuuuuu", mode, status, groupIdFrom, groupIdFrom, sceneIdFrom,          \
+                              sceneIdFrom, groupIdTo, sceneIdTo);
+
 /** @brief Command description for Off
  *
  * Command: Off
@@ -518,6 +588,43 @@
         offClusterToggle() emberAfFillExternalBuffer(mask,                                                                         \
                                                                                                                                    \
                                                      ZCL_TOGGLE_COMMAND_ID, "", );
+
+/** @brief Command description for OffWithEffect
+ *
+ * Command: OffWithEffect
+ * @param effectId OnOffEffectIdentifier
+ * @param effectVariant ENUM8
+ */
+#define emberAfFillCommandOn                                                                                                       \
+    /                                                                                                                              \
+        offClusterOffWithEffect(effectId, effectVariant)                                                                           \
+            emberAfFillExternalBuffer(mask,                                                                                        \
+                                                                                                                                   \
+                                      ZCL_OFF_WITH_EFFECT_COMMAND_ID, "uu", effectId, effectVariant);
+
+/** @brief Command description for OnWithRecallGlobalScene
+ *
+ * Command: OnWithRecallGlobalScene
+ */
+#define emberAfFillCommandOn                                                                                                       \
+    /                                                                                                                              \
+        offClusterOnWithRecallGlobalScene() emberAfFillExternalBuffer(mask,                                                        \
+                                                                                                                                   \
+                                                                      ZCL_ON_WITH_RECALL_GLOBAL_SCENE_COMMAND_ID, "", );
+
+/** @brief Command description for OnWithTimedOff
+ *
+ * Command: OnWithTimedOff
+ * @param onOffControl OnOffControl
+ * @param onTime INT16U
+ * @param offWaitTime INT16U
+ */
+#define emberAfFillCommandOn                                                                                                       \
+    /                                                                                                                              \
+        offClusterOnWithTimedOff(onOffControl, onTime, offWaitTime)                                                                \
+            emberAfFillExternalBuffer(mask,                                                                                        \
+                                                                                                                                   \
+                                      ZCL_ON_WITH_TIMED_OFF_COMMAND_ID, "uuu", onOffControl, onTime, offWaitTime);
 
 /** @brief Command description for MoveToLevel
  *
@@ -2407,6 +2514,121 @@
                                                                                                                                    \
                                   ZCL_MOVE_TO_COLOR_TEMPERATURE_COMMAND_ID, "uuuu", colorTemperature, transitionTime, optionsMask, \
                                   optionsOverride);
+
+/** @brief Command description for EnhancedMoveToHue
+ *
+ * Command: EnhancedMoveToHue
+ * @param enhancedHue INT16U
+ * @param direction HueDirection
+ * @param transitionTime INT16U
+ */
+#define emberAfFillCommandColor                                                                                                    \
+    ControlClusterEnhancedMoveToHue(enhancedHue, direction, transitionTime)                                                        \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_ENHANCED_MOVE_TO_HUE_COMMAND_ID, "uuu", enhancedHue, direction, transitionTime);
+
+/** @brief Command description for EnhancedMoveHue
+ *
+ * Command: EnhancedMoveHue
+ * @param moveMode HueMoveMode
+ * @param rate INT16U
+ */
+#define emberAfFillCommandColor                                                                                                    \
+    ControlClusterEnhancedMoveHue(moveMode, rate)                                                                                  \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_ENHANCED_MOVE_HUE_COMMAND_ID, "uu", moveMode, rate);
+
+/** @brief Command description for EnhancedStepHue
+ *
+ * Command: EnhancedStepHue
+ * @param stepMode HueStepMode
+ * @param stepSize INT16U
+ * @param transitionTime INT16U
+ */
+#define emberAfFillCommandColor                                                                                                    \
+    ControlClusterEnhancedStepHue(stepMode, stepSize, transitionTime)                                                              \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_ENHANCED_STEP_HUE_COMMAND_ID, "uuu", stepMode, stepSize, transitionTime);
+
+/** @brief Command description for EnhancedMoveToHueAndSaturation
+ *
+ * Command: EnhancedMoveToHueAndSaturation
+ * @param enhancedHue INT16U
+ * @param saturation INT8U
+ * @param transitionTime INT16U
+ */
+#define emberAfFillCommandColor                                                                                                    \
+    ControlClusterEnhancedMoveToHueAndSaturation(enhancedHue, saturation, transitionTime) emberAfFillExternalBuffer(               \
+        mask,                                                                                                                      \
+                                                                                                                                   \
+        ZCL_ENHANCED_MOVE_TO_HUE_AND_SATURATION_COMMAND_ID, "uuu", enhancedHue, saturation, transitionTime);
+
+/** @brief Command description for ColorLoopSet
+ *
+ * Command: ColorLoopSet
+ * @param updateFlags ColorLoopUpdateFlags
+ * @param action ColorLoopAction
+ * @param direction ColorLoopDirection
+ * @param time INT16U
+ * @param startHue INT16U
+ */
+#define emberAfFillCommandColor                                                                                                    \
+    ControlClusterColorLoopSet(updateFlags, action, direction, time, startHue)                                                     \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_COLOR_LOOP_SET_COMMAND_ID, "uuuuu", updateFlags, action, direction, time, startHue);
+
+/** @brief Command description for StopMoveStep
+ *
+ * Command: StopMoveStep
+ * @param optionsMask BITMAP8
+ * @param optionsOverride BITMAP8
+ */
+#define emberAfFillCommandColor                                                                                                    \
+    ControlClusterStopMoveStep(optionsMask, optionsOverride)                                                                       \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_STOP_MOVE_STEP_COMMAND_ID, "uu", optionsMask, optionsOverride);
+
+/** @brief Command description for MoveColorTemperature
+ *
+ * Command: MoveColorTemperature
+ * @param moveMode HueMoveMode
+ * @param rate INT16U
+ * @param colorTemperatureMinimum INT16U
+ * @param colorTemperatureMaximum INT16U
+ * @param optionsMask BITMAP8
+ * @param optionsOverride BITMAP8
+ */
+#define emberAfFillCommandColor                                                                                                    \
+    ControlClusterMoveColorTemperature(moveMode, rate, colorTemperatureMinimum, colorTemperatureMaximum, optionsMask,              \
+                                       optionsOverride)                                                                            \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_MOVE_COLOR_TEMPERATURE_COMMAND_ID, "uuuuuu", moveMode, rate, colorTemperatureMinimum,        \
+                                  colorTemperatureMaximum, optionsMask, optionsOverride);
+
+/** @brief Command description for StepColorTemperature
+ *
+ * Command: StepColorTemperature
+ * @param stepMode HueStepMode
+ * @param stepSize INT16U
+ * @param transitionTime INT16U
+ * @param colorTemperatureMinimum INT16U
+ * @param colorTemperatureMaximum INT16U
+ * @param optionsMask BITMAP8
+ * @param optionsOverride BITMAP8
+ */
+#define emberAfFillCommandColor                                                                                                    \
+    ControlClusterStepColorTemperature(stepMode, stepSize, transitionTime, colorTemperatureMinimum, colorTemperatureMaximum,       \
+                                       optionsMask, optionsOverride)                                                               \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_STEP_COLOR_TEMPERATURE_COMMAND_ID, "uuuuuuu", stepMode, stepSize, transitionTime,            \
+                                  colorTemperatureMinimum, colorTemperatureMaximum, optionsMask, optionsOverride);
 
 /** @brief Command description for ZoneEnrollResponse
  *
