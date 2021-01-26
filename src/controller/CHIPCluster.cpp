@@ -25,7 +25,6 @@
  */
 
 #include <controller/CHIPCluster.h>
-#include <lib/support/ReturnMacros.h>
 
 namespace chip {
 namespace Controller {

@@ -92,6 +92,11 @@ public:
      *   Send the command in internal command sender.
      */
     CHIP_ERROR SendCommands();
+
+    /**
+     * @brief
+     *   Initialize internal command sender, required for sending commands over interaction model.
+     */
     void InitCommandSender()
     {
         if (mCommandSender != nullptr)

@@ -33,9 +33,25 @@ CHIP_ERROR BarrierControlCluster::BarrierControlGoToPercent(Callback::Callback<>
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
-    // TODO(@vivien-apple): onCompletion is not used by IM for now.
-    chip::app::cluster::BarrierControl::EncodeBarrierControlGoToPercentCommand(mDevice->GetCommandSender(), mEndpoint, 0,
-                                                                               percentOpen);
+
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, BarrierControl::kClusterId,
+                                         BarrierControl::kBarrierControlGoToPercentCommandId,
+                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    Command::Command * ZCLcommand    = mDevice->GetCommandSender();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
+    // percentOpen: int8u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), percentOpen));
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
     return mDevice->SendCommands();
 #else
     System::PacketBufferHandle payload = encodeBarrierControlClusterBarrierControlGoToPercentCommand(mEndpoint, percentOpen);
@@ -48,8 +64,23 @@ CHIP_ERROR BarrierControlCluster::BarrierControlStop(Callback::Callback<> * onCo
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
-    // TODO(@vivien-apple): onCompletion is not used by IM for now.
-    chip::app::cluster::BarrierControl::EncodeBarrierControlStopCommand(mDevice->GetCommandSender(), mEndpoint, 0);
+
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, BarrierControl::kClusterId,
+                                         BarrierControl::kBarrierControlStopCommandId,
+                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    Command::Command * ZCLcommand    = mDevice->GetCommandSender();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    // Command takes no arguments.
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
     return mDevice->SendCommands();
 #else
     System::PacketBufferHandle payload = encodeBarrierControlClusterBarrierControlStopCommand(mEndpoint);
@@ -99,8 +130,22 @@ CHIP_ERROR BasicCluster::ResetToFactoryDefaults(Callback::Callback<> * onComplet
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
-    // TODO(@vivien-apple): onCompletion is not used by IM for now.
-    chip::app::cluster::Basic::EncodeResetToFactoryDefaultsCommand(mDevice->GetCommandSender(), mEndpoint, 0);
+
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, Basic::kClusterId, Basic::kResetToFactoryDefaultsCommandId,
+                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    Command::Command * ZCLcommand    = mDevice->GetCommandSender();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    // Command takes no arguments.
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
     return mDevice->SendCommands();
 #else
     System::PacketBufferHandle payload = encodeBasicClusterResetToFactoryDefaultsCommand(mEndpoint);
@@ -132,33 +177,6 @@ CHIP_ERROR BasicCluster::ReadAttributeClusterRevision(Callback::Callback<> * onC
     return SendCommand(std::move(payload), onCompletion);
 }
 
-// Binding Cluster Commands
-CHIP_ERROR BindingCluster::Bind(Callback::Callback<> * onCompletion, chip::NodeId nodeId, chip::GroupId groupId,
-                                chip::EndpointId endpointId, chip::ClusterId clusterId)
-{
-    System::PacketBufferHandle payload = encodeBindingClusterBindCommand(mEndpoint, nodeId, groupId, endpointId, clusterId);
-    return SendCommand(std::move(payload), onCompletion);
-}
-
-CHIP_ERROR BindingCluster::Unbind(Callback::Callback<> * onCompletion, chip::NodeId nodeId, chip::GroupId groupId,
-                                  chip::EndpointId endpointId, chip::ClusterId clusterId)
-{
-    System::PacketBufferHandle payload = encodeBindingClusterUnbindCommand(mEndpoint, nodeId, groupId, endpointId, clusterId);
-    return SendCommand(std::move(payload), onCompletion);
-}
-
-// Binding Cluster Attributes
-CHIP_ERROR BindingCluster::DiscoverAttributes(Callback::Callback<> * onCompletion)
-{
-    System::PacketBufferHandle payload = encodeBindingClusterDiscoverAttributes(mEndpoint);
-    return SendCommand(std::move(payload), onCompletion);
-}
-CHIP_ERROR BindingCluster::ReadAttributeClusterRevision(Callback::Callback<> * onCompletion)
-{
-    System::PacketBufferHandle payload = encodeBindingClusterReadClusterRevisionAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onCompletion);
-}
-
 // ColorControl Cluster Commands
 CHIP_ERROR ColorControlCluster::MoveColor(Callback::Callback<> * onCompletion, int16_t rateX, int16_t rateY, uint8_t optionsMask,
                                           uint8_t optionsOverride)
@@ -166,9 +184,30 @@ CHIP_ERROR ColorControlCluster::MoveColor(Callback::Callback<> * onCompletion, i
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
-    // TODO(@vivien-apple): onCompletion is not used by IM for now.
-    chip::app::cluster::ColorControl::EncodeMoveColorCommand(mDevice->GetCommandSender(), mEndpoint, 0, rateX, rateY, optionsMask,
-                                                             optionsOverride);
+
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, ColorControl::kClusterId, ColorControl::kMoveColorCommandId,
+                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    Command::Command * ZCLcommand    = mDevice->GetCommandSender();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
+    // rateX: int16s
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), rateX));
+    // rateY: int16s
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), rateY));
+    // optionsMask: bitmap8
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsMask));
+    // optionsOverride: bitmap8
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsOverride));
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
     return mDevice->SendCommands();
 #else
     System::PacketBufferHandle payload =
@@ -184,10 +223,35 @@ CHIP_ERROR ColorControlCluster::MoveColorTemperature(Callback::Callback<> * onCo
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
-    // TODO(@vivien-apple): onCompletion is not used by IM for now.
-    chip::app::cluster::ColorControl::EncodeMoveColorTemperatureCommand(mDevice->GetCommandSender(), mEndpoint, 0, moveMode, rate,
-                                                                        colorTemperatureMinimum, colorTemperatureMaximum,
-                                                                        optionsMask, optionsOverride);
+
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, ColorControl::kClusterId,
+                                         ColorControl::kMoveColorTemperatureCommandId,
+                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    Command::Command * ZCLcommand    = mDevice->GetCommandSender();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
+    // moveMode: hueMoveMode
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), moveMode));
+    // rate: int16u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), rate));
+    // colorTemperatureMinimum: int16u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), colorTemperatureMinimum));
+    // colorTemperatureMaximum: int16u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), colorTemperatureMaximum));
+    // optionsMask: bitmap8
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsMask));
+    // optionsOverride: bitmap8
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsOverride));
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
     return mDevice->SendCommands();
 #else
     System::PacketBufferHandle payload = encodeColorControlClusterMoveColorTemperatureCommand(
@@ -202,9 +266,30 @@ CHIP_ERROR ColorControlCluster::MoveHue(Callback::Callback<> * onCompletion, uin
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
-    // TODO(@vivien-apple): onCompletion is not used by IM for now.
-    chip::app::cluster::ColorControl::EncodeMoveHueCommand(mDevice->GetCommandSender(), mEndpoint, 0, moveMode, rate, optionsMask,
-                                                           optionsOverride);
+
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, ColorControl::kClusterId, ColorControl::kMoveHueCommandId,
+                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    Command::Command * ZCLcommand    = mDevice->GetCommandSender();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
+    // moveMode: hueMoveMode
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), moveMode));
+    // rate: int8u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), rate));
+    // optionsMask: bitmap8
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsMask));
+    // optionsOverride: bitmap8
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsOverride));
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
     return mDevice->SendCommands();
 #else
     System::PacketBufferHandle payload =
@@ -219,9 +304,31 @@ CHIP_ERROR ColorControlCluster::MoveSaturation(Callback::Callback<> * onCompleti
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
-    // TODO(@vivien-apple): onCompletion is not used by IM for now.
-    chip::app::cluster::ColorControl::EncodeMoveSaturationCommand(mDevice->GetCommandSender(), mEndpoint, 0, moveMode, rate,
-                                                                  optionsMask, optionsOverride);
+
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, ColorControl::kClusterId,
+                                         ColorControl::kMoveSaturationCommandId,
+                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    Command::Command * ZCLcommand    = mDevice->GetCommandSender();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
+    // moveMode: saturationMoveMode
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), moveMode));
+    // rate: int8u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), rate));
+    // optionsMask: bitmap8
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsMask));
+    // optionsOverride: bitmap8
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsOverride));
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
     return mDevice->SendCommands();
 #else
     System::PacketBufferHandle payload =
@@ -236,9 +343,32 @@ CHIP_ERROR ColorControlCluster::MoveToColor(Callback::Callback<> * onCompletion,
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
-    // TODO(@vivien-apple): onCompletion is not used by IM for now.
-    chip::app::cluster::ColorControl::EncodeMoveToColorCommand(mDevice->GetCommandSender(), mEndpoint, 0, colorX, colorY,
-                                                               transitionTime, optionsMask, optionsOverride);
+
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, ColorControl::kClusterId, ColorControl::kMoveToColorCommandId,
+                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    Command::Command * ZCLcommand    = mDevice->GetCommandSender();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
+    // colorX: int16u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), colorX));
+    // colorY: int16u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), colorY));
+    // transitionTime: int16u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), transitionTime));
+    // optionsMask: bitmap8
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsMask));
+    // optionsOverride: bitmap8
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsOverride));
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
     return mDevice->SendCommands();
 #else
     System::PacketBufferHandle payload =
@@ -253,9 +383,31 @@ CHIP_ERROR ColorControlCluster::MoveToColorTemperature(Callback::Callback<> * on
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
-    // TODO(@vivien-apple): onCompletion is not used by IM for now.
-    chip::app::cluster::ColorControl::EncodeMoveToColorTemperatureCommand(
-        mDevice->GetCommandSender(), mEndpoint, 0, colorTemperature, transitionTime, optionsMask, optionsOverride);
+
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, ColorControl::kClusterId,
+                                         ColorControl::kMoveToColorTemperatureCommandId,
+                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    Command::Command * ZCLcommand    = mDevice->GetCommandSender();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
+    // colorTemperature: int16u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), colorTemperature));
+    // transitionTime: int16u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), transitionTime));
+    // optionsMask: bitmap8
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsMask));
+    // optionsOverride: bitmap8
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsOverride));
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
     return mDevice->SendCommands();
 #else
     System::PacketBufferHandle payload = encodeColorControlClusterMoveToColorTemperatureCommand(
@@ -270,9 +422,32 @@ CHIP_ERROR ColorControlCluster::MoveToHue(Callback::Callback<> * onCompletion, u
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
-    // TODO(@vivien-apple): onCompletion is not used by IM for now.
-    chip::app::cluster::ColorControl::EncodeMoveToHueCommand(mDevice->GetCommandSender(), mEndpoint, 0, hue, direction,
-                                                             transitionTime, optionsMask, optionsOverride);
+
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, ColorControl::kClusterId, ColorControl::kMoveToHueCommandId,
+                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    Command::Command * ZCLcommand    = mDevice->GetCommandSender();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
+    // hue: int8u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), hue));
+    // direction: hueDirection
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), direction));
+    // transitionTime: int16u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), transitionTime));
+    // optionsMask: bitmap8
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsMask));
+    // optionsOverride: bitmap8
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsOverride));
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
     return mDevice->SendCommands();
 #else
     System::PacketBufferHandle payload =
@@ -287,9 +462,33 @@ CHIP_ERROR ColorControlCluster::MoveToHueAndSaturation(Callback::Callback<> * on
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
-    // TODO(@vivien-apple): onCompletion is not used by IM for now.
-    chip::app::cluster::ColorControl::EncodeMoveToHueAndSaturationCommand(mDevice->GetCommandSender(), mEndpoint, 0, hue,
-                                                                          saturation, transitionTime, optionsMask, optionsOverride);
+
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, ColorControl::kClusterId,
+                                         ColorControl::kMoveToHueAndSaturationCommandId,
+                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    Command::Command * ZCLcommand    = mDevice->GetCommandSender();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
+    // hue: int8u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), hue));
+    // saturation: int8u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), saturation));
+    // transitionTime: int16u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), transitionTime));
+    // optionsMask: bitmap8
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsMask));
+    // optionsOverride: bitmap8
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsOverride));
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
     return mDevice->SendCommands();
 #else
     System::PacketBufferHandle payload = encodeColorControlClusterMoveToHueAndSaturationCommand(
@@ -304,9 +503,31 @@ CHIP_ERROR ColorControlCluster::MoveToSaturation(Callback::Callback<> * onComple
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
-    // TODO(@vivien-apple): onCompletion is not used by IM for now.
-    chip::app::cluster::ColorControl::EncodeMoveToSaturationCommand(mDevice->GetCommandSender(), mEndpoint, 0, saturation,
-                                                                    transitionTime, optionsMask, optionsOverride);
+
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, ColorControl::kClusterId,
+                                         ColorControl::kMoveToSaturationCommandId,
+                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    Command::Command * ZCLcommand    = mDevice->GetCommandSender();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
+    // saturation: int8u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), saturation));
+    // transitionTime: int16u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), transitionTime));
+    // optionsMask: bitmap8
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsMask));
+    // optionsOverride: bitmap8
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsOverride));
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
     return mDevice->SendCommands();
 #else
     System::PacketBufferHandle payload =
@@ -321,9 +542,32 @@ CHIP_ERROR ColorControlCluster::StepColor(Callback::Callback<> * onCompletion, i
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
-    // TODO(@vivien-apple): onCompletion is not used by IM for now.
-    chip::app::cluster::ColorControl::EncodeStepColorCommand(mDevice->GetCommandSender(), mEndpoint, 0, stepX, stepY,
-                                                             transitionTime, optionsMask, optionsOverride);
+
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, ColorControl::kClusterId, ColorControl::kStepColorCommandId,
+                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    Command::Command * ZCLcommand    = mDevice->GetCommandSender();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
+    // stepX: int16s
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), stepX));
+    // stepY: int16s
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), stepY));
+    // transitionTime: int16u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), transitionTime));
+    // optionsMask: bitmap8
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsMask));
+    // optionsOverride: bitmap8
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsOverride));
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
     return mDevice->SendCommands();
 #else
     System::PacketBufferHandle payload =
@@ -339,10 +583,37 @@ CHIP_ERROR ColorControlCluster::StepColorTemperature(Callback::Callback<> * onCo
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
-    // TODO(@vivien-apple): onCompletion is not used by IM for now.
-    chip::app::cluster::ColorControl::EncodeStepColorTemperatureCommand(mDevice->GetCommandSender(), mEndpoint, 0, stepMode,
-                                                                        stepSize, transitionTime, colorTemperatureMinimum,
-                                                                        colorTemperatureMaximum, optionsMask, optionsOverride);
+
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, ColorControl::kClusterId,
+                                         ColorControl::kStepColorTemperatureCommandId,
+                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    Command::Command * ZCLcommand    = mDevice->GetCommandSender();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
+    // stepMode: hueStepMode
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), stepMode));
+    // stepSize: int16u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), stepSize));
+    // transitionTime: int16u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), transitionTime));
+    // colorTemperatureMinimum: int16u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), colorTemperatureMinimum));
+    // colorTemperatureMaximum: int16u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), colorTemperatureMaximum));
+    // optionsMask: bitmap8
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsMask));
+    // optionsOverride: bitmap8
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsOverride));
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
     return mDevice->SendCommands();
 #else
     System::PacketBufferHandle payload =
@@ -358,9 +629,32 @@ CHIP_ERROR ColorControlCluster::StepHue(Callback::Callback<> * onCompletion, uin
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
-    // TODO(@vivien-apple): onCompletion is not used by IM for now.
-    chip::app::cluster::ColorControl::EncodeStepHueCommand(mDevice->GetCommandSender(), mEndpoint, 0, stepMode, stepSize,
-                                                           transitionTime, optionsMask, optionsOverride);
+
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, ColorControl::kClusterId, ColorControl::kStepHueCommandId,
+                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    Command::Command * ZCLcommand    = mDevice->GetCommandSender();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
+    // stepMode: hueStepMode
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), stepMode));
+    // stepSize: int8u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), stepSize));
+    // transitionTime: int8u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), transitionTime));
+    // optionsMask: bitmap8
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsMask));
+    // optionsOverride: bitmap8
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsOverride));
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
     return mDevice->SendCommands();
 #else
     System::PacketBufferHandle payload =
@@ -375,9 +669,33 @@ CHIP_ERROR ColorControlCluster::StepSaturation(Callback::Callback<> * onCompleti
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
-    // TODO(@vivien-apple): onCompletion is not used by IM for now.
-    chip::app::cluster::ColorControl::EncodeStepSaturationCommand(mDevice->GetCommandSender(), mEndpoint, 0, stepMode, stepSize,
-                                                                  transitionTime, optionsMask, optionsOverride);
+
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, ColorControl::kClusterId,
+                                         ColorControl::kStepSaturationCommandId,
+                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    Command::Command * ZCLcommand    = mDevice->GetCommandSender();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
+    // stepMode: saturationStepMode
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), stepMode));
+    // stepSize: int8u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), stepSize));
+    // transitionTime: int8u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), transitionTime));
+    // optionsMask: bitmap8
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsMask));
+    // optionsOverride: bitmap8
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsOverride));
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
     return mDevice->SendCommands();
 #else
     System::PacketBufferHandle payload =
@@ -391,9 +709,26 @@ CHIP_ERROR ColorControlCluster::StopMoveStep(Callback::Callback<> * onCompletion
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
-    // TODO(@vivien-apple): onCompletion is not used by IM for now.
-    chip::app::cluster::ColorControl::EncodeStopMoveStepCommand(mDevice->GetCommandSender(), mEndpoint, 0, optionsMask,
-                                                                optionsOverride);
+
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, ColorControl::kClusterId, ColorControl::kStopMoveStepCommandId,
+                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    Command::Command * ZCLcommand    = mDevice->GetCommandSender();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
+    // optionsMask: bitmap8
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsMask));
+    // optionsOverride: bitmap8
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsOverride));
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
     return mDevice->SendCommands();
 #else
     System::PacketBufferHandle payload = encodeColorControlClusterStopMoveStepCommand(mEndpoint, optionsMask, optionsOverride);
@@ -839,8 +1174,22 @@ CHIP_ERROR DoorLockCluster::ClearAllPins(Callback::Callback<> * onCompletion)
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
-    // TODO(@vivien-apple): onCompletion is not used by IM for now.
-    chip::app::cluster::DoorLock::EncodeClearAllPinsCommand(mDevice->GetCommandSender(), mEndpoint, 0);
+
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, DoorLock::kClusterId, DoorLock::kClearAllPinsCommandId,
+                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    Command::Command * ZCLcommand    = mDevice->GetCommandSender();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    // Command takes no arguments.
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
     return mDevice->SendCommands();
 #else
     System::PacketBufferHandle payload = encodeDoorLockClusterClearAllPinsCommand(mEndpoint);
@@ -853,8 +1202,22 @@ CHIP_ERROR DoorLockCluster::ClearAllRfids(Callback::Callback<> * onCompletion)
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
-    // TODO(@vivien-apple): onCompletion is not used by IM for now.
-    chip::app::cluster::DoorLock::EncodeClearAllRfidsCommand(mDevice->GetCommandSender(), mEndpoint, 0);
+
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, DoorLock::kClusterId, DoorLock::kClearAllRfidsCommandId,
+                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    Command::Command * ZCLcommand    = mDevice->GetCommandSender();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    // Command takes no arguments.
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
     return mDevice->SendCommands();
 #else
     System::PacketBufferHandle payload = encodeDoorLockClusterClearAllRfidsCommand(mEndpoint);
@@ -867,8 +1230,24 @@ CHIP_ERROR DoorLockCluster::ClearHolidaySchedule(Callback::Callback<> * onComple
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
-    // TODO(@vivien-apple): onCompletion is not used by IM for now.
-    chip::app::cluster::DoorLock::EncodeClearHolidayScheduleCommand(mDevice->GetCommandSender(), mEndpoint, 0, scheduleId);
+
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, DoorLock::kClusterId, DoorLock::kClearHolidayScheduleCommandId,
+                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    Command::Command * ZCLcommand    = mDevice->GetCommandSender();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
+    // scheduleId: int8u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), scheduleId));
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
     return mDevice->SendCommands();
 #else
     System::PacketBufferHandle payload = encodeDoorLockClusterClearHolidayScheduleCommand(mEndpoint, scheduleId);
@@ -881,8 +1260,24 @@ CHIP_ERROR DoorLockCluster::ClearPin(Callback::Callback<> * onCompletion, uint16
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
-    // TODO(@vivien-apple): onCompletion is not used by IM for now.
-    chip::app::cluster::DoorLock::EncodeClearPinCommand(mDevice->GetCommandSender(), mEndpoint, 0, userId);
+
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, DoorLock::kClusterId, DoorLock::kClearPinCommandId,
+                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    Command::Command * ZCLcommand    = mDevice->GetCommandSender();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
+    // userId: int16u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), userId));
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
     return mDevice->SendCommands();
 #else
     System::PacketBufferHandle payload = encodeDoorLockClusterClearPinCommand(mEndpoint, userId);
@@ -895,8 +1290,24 @@ CHIP_ERROR DoorLockCluster::ClearRfid(Callback::Callback<> * onCompletion, uint1
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
-    // TODO(@vivien-apple): onCompletion is not used by IM for now.
-    chip::app::cluster::DoorLock::EncodeClearRfidCommand(mDevice->GetCommandSender(), mEndpoint, 0, userId);
+
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, DoorLock::kClusterId, DoorLock::kClearRfidCommandId,
+                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    Command::Command * ZCLcommand    = mDevice->GetCommandSender();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
+    // userId: int16u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), userId));
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
     return mDevice->SendCommands();
 #else
     System::PacketBufferHandle payload = encodeDoorLockClusterClearRfidCommand(mEndpoint, userId);
@@ -909,8 +1320,26 @@ CHIP_ERROR DoorLockCluster::ClearWeekdaySchedule(Callback::Callback<> * onComple
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
-    // TODO(@vivien-apple): onCompletion is not used by IM for now.
-    chip::app::cluster::DoorLock::EncodeClearWeekdayScheduleCommand(mDevice->GetCommandSender(), mEndpoint, 0, scheduleId, userId);
+
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, DoorLock::kClusterId, DoorLock::kClearWeekdayScheduleCommandId,
+                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    Command::Command * ZCLcommand    = mDevice->GetCommandSender();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
+    // scheduleId: int8u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), scheduleId));
+    // userId: int16u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), userId));
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
     return mDevice->SendCommands();
 #else
     System::PacketBufferHandle payload = encodeDoorLockClusterClearWeekdayScheduleCommand(mEndpoint, scheduleId, userId);
@@ -923,8 +1352,26 @@ CHIP_ERROR DoorLockCluster::ClearYeardaySchedule(Callback::Callback<> * onComple
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
-    // TODO(@vivien-apple): onCompletion is not used by IM for now.
-    chip::app::cluster::DoorLock::EncodeClearYeardayScheduleCommand(mDevice->GetCommandSender(), mEndpoint, 0, scheduleId, userId);
+
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, DoorLock::kClusterId, DoorLock::kClearYeardayScheduleCommandId,
+                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    Command::Command * ZCLcommand    = mDevice->GetCommandSender();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
+    // scheduleId: int8u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), scheduleId));
+    // userId: int16u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), userId));
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
     return mDevice->SendCommands();
 #else
     System::PacketBufferHandle payload = encodeDoorLockClusterClearYeardayScheduleCommand(mEndpoint, scheduleId, userId);
@@ -937,8 +1384,24 @@ CHIP_ERROR DoorLockCluster::GetHolidaySchedule(Callback::Callback<> * onCompleti
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
-    // TODO(@vivien-apple): onCompletion is not used by IM for now.
-    chip::app::cluster::DoorLock::EncodeGetHolidayScheduleCommand(mDevice->GetCommandSender(), mEndpoint, 0, scheduleId);
+
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, DoorLock::kClusterId, DoorLock::kGetHolidayScheduleCommandId,
+                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    Command::Command * ZCLcommand    = mDevice->GetCommandSender();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
+    // scheduleId: int8u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), scheduleId));
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
     return mDevice->SendCommands();
 #else
     System::PacketBufferHandle payload = encodeDoorLockClusterGetHolidayScheduleCommand(mEndpoint, scheduleId);
@@ -951,8 +1414,24 @@ CHIP_ERROR DoorLockCluster::GetLogRecord(Callback::Callback<> * onCompletion, ui
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
-    // TODO(@vivien-apple): onCompletion is not used by IM for now.
-    chip::app::cluster::DoorLock::EncodeGetLogRecordCommand(mDevice->GetCommandSender(), mEndpoint, 0, logIndex);
+
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, DoorLock::kClusterId, DoorLock::kGetLogRecordCommandId,
+                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    Command::Command * ZCLcommand    = mDevice->GetCommandSender();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
+    // logIndex: int16u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), logIndex));
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
     return mDevice->SendCommands();
 #else
     System::PacketBufferHandle payload = encodeDoorLockClusterGetLogRecordCommand(mEndpoint, logIndex);
@@ -965,8 +1444,24 @@ CHIP_ERROR DoorLockCluster::GetPin(Callback::Callback<> * onCompletion, uint16_t
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
-    // TODO(@vivien-apple): onCompletion is not used by IM for now.
-    chip::app::cluster::DoorLock::EncodeGetPinCommand(mDevice->GetCommandSender(), mEndpoint, 0, userId);
+
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, DoorLock::kClusterId, DoorLock::kGetPinCommandId,
+                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    Command::Command * ZCLcommand    = mDevice->GetCommandSender();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
+    // userId: int16u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), userId));
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
     return mDevice->SendCommands();
 #else
     System::PacketBufferHandle payload = encodeDoorLockClusterGetPinCommand(mEndpoint, userId);
@@ -979,8 +1474,24 @@ CHIP_ERROR DoorLockCluster::GetRfid(Callback::Callback<> * onCompletion, uint16_
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
-    // TODO(@vivien-apple): onCompletion is not used by IM for now.
-    chip::app::cluster::DoorLock::EncodeGetRfidCommand(mDevice->GetCommandSender(), mEndpoint, 0, userId);
+
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, DoorLock::kClusterId, DoorLock::kGetRfidCommandId,
+                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    Command::Command * ZCLcommand    = mDevice->GetCommandSender();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
+    // userId: int16u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), userId));
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
     return mDevice->SendCommands();
 #else
     System::PacketBufferHandle payload = encodeDoorLockClusterGetRfidCommand(mEndpoint, userId);
@@ -993,8 +1504,24 @@ CHIP_ERROR DoorLockCluster::GetUserType(Callback::Callback<> * onCompletion, uin
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
-    // TODO(@vivien-apple): onCompletion is not used by IM for now.
-    chip::app::cluster::DoorLock::EncodeGetUserTypeCommand(mDevice->GetCommandSender(), mEndpoint, 0, userId);
+
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, DoorLock::kClusterId, DoorLock::kGetUserTypeCommandId,
+                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    Command::Command * ZCLcommand    = mDevice->GetCommandSender();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
+    // userId: int16u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), userId));
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
     return mDevice->SendCommands();
 #else
     System::PacketBufferHandle payload = encodeDoorLockClusterGetUserTypeCommand(mEndpoint, userId);
@@ -1007,8 +1534,26 @@ CHIP_ERROR DoorLockCluster::GetWeekdaySchedule(Callback::Callback<> * onCompleti
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
-    // TODO(@vivien-apple): onCompletion is not used by IM for now.
-    chip::app::cluster::DoorLock::EncodeGetWeekdayScheduleCommand(mDevice->GetCommandSender(), mEndpoint, 0, scheduleId, userId);
+
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, DoorLock::kClusterId, DoorLock::kGetWeekdayScheduleCommandId,
+                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    Command::Command * ZCLcommand    = mDevice->GetCommandSender();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
+    // scheduleId: int8u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), scheduleId));
+    // userId: int16u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), userId));
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
     return mDevice->SendCommands();
 #else
     System::PacketBufferHandle payload = encodeDoorLockClusterGetWeekdayScheduleCommand(mEndpoint, scheduleId, userId);
@@ -1021,8 +1566,26 @@ CHIP_ERROR DoorLockCluster::GetYeardaySchedule(Callback::Callback<> * onCompleti
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
-    // TODO(@vivien-apple): onCompletion is not used by IM for now.
-    chip::app::cluster::DoorLock::EncodeGetYeardayScheduleCommand(mDevice->GetCommandSender(), mEndpoint, 0, scheduleId, userId);
+
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, DoorLock::kClusterId, DoorLock::kGetYeardayScheduleCommandId,
+                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    Command::Command * ZCLcommand    = mDevice->GetCommandSender();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
+    // scheduleId: int8u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), scheduleId));
+    // userId: int16u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), userId));
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
     return mDevice->SendCommands();
 #else
     System::PacketBufferHandle payload = encodeDoorLockClusterGetYeardayScheduleCommand(mEndpoint, scheduleId, userId);
@@ -1035,8 +1598,24 @@ CHIP_ERROR DoorLockCluster::LockDoor(Callback::Callback<> * onCompletion, char *
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
-    // TODO(@vivien-apple): onCompletion is not used by IM for now.
-    chip::app::cluster::DoorLock::EncodeLockDoorCommand(mDevice->GetCommandSender(), mEndpoint, 0, pin);
+
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, DoorLock::kClusterId, DoorLock::kLockDoorCommandId,
+                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    Command::Command * ZCLcommand    = mDevice->GetCommandSender();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
+    // pin: charString
+    ReturnErrorOnFailure(writer.PutString(TLV::ContextTag(argSeqNumber++), pin));
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
     return mDevice->SendCommands();
 #else
     System::PacketBufferHandle payload = encodeDoorLockClusterLockDoorCommand(mEndpoint, pin);
@@ -1050,9 +1629,30 @@ CHIP_ERROR DoorLockCluster::SetHolidaySchedule(Callback::Callback<> * onCompleti
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
-    // TODO(@vivien-apple): onCompletion is not used by IM for now.
-    chip::app::cluster::DoorLock::EncodeSetHolidayScheduleCommand(mDevice->GetCommandSender(), mEndpoint, 0, scheduleId,
-                                                                  localStartTime, localEndTime, operatingModeDuringHoliday);
+
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, DoorLock::kClusterId, DoorLock::kSetHolidayScheduleCommandId,
+                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    Command::Command * ZCLcommand    = mDevice->GetCommandSender();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
+    // scheduleId: int8u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), scheduleId));
+    // localStartTime: int32u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), localStartTime));
+    // localEndTime: int32u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), localEndTime));
+    // operatingModeDuringHoliday: enum8
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), operatingModeDuringHoliday));
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
     return mDevice->SendCommands();
 #else
     System::PacketBufferHandle payload = encodeDoorLockClusterSetHolidayScheduleCommand(mEndpoint, scheduleId, localStartTime,
@@ -1067,8 +1667,30 @@ CHIP_ERROR DoorLockCluster::SetPin(Callback::Callback<> * onCompletion, uint16_t
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
-    // TODO(@vivien-apple): onCompletion is not used by IM for now.
-    chip::app::cluster::DoorLock::EncodeSetPinCommand(mDevice->GetCommandSender(), mEndpoint, 0, userId, userStatus, userType, pin);
+
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, DoorLock::kClusterId, DoorLock::kSetPinCommandId,
+                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    Command::Command * ZCLcommand    = mDevice->GetCommandSender();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
+    // userId: int16u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), userId));
+    // userStatus: doorLockUserStatus
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), userStatus));
+    // userType: doorLockUserType
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), userType));
+    // pin: charString
+    ReturnErrorOnFailure(writer.PutString(TLV::ContextTag(argSeqNumber++), pin));
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
     return mDevice->SendCommands();
 #else
     System::PacketBufferHandle payload = encodeDoorLockClusterSetPinCommand(mEndpoint, userId, userStatus, userType, pin);
@@ -1082,8 +1704,30 @@ CHIP_ERROR DoorLockCluster::SetRfid(Callback::Callback<> * onCompletion, uint16_
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
-    // TODO(@vivien-apple): onCompletion is not used by IM for now.
-    chip::app::cluster::DoorLock::EncodeSetRfidCommand(mDevice->GetCommandSender(), mEndpoint, 0, userId, userStatus, userType, id);
+
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, DoorLock::kClusterId, DoorLock::kSetRfidCommandId,
+                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    Command::Command * ZCLcommand    = mDevice->GetCommandSender();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
+    // userId: int16u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), userId));
+    // userStatus: doorLockUserStatus
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), userStatus));
+    // userType: doorLockUserType
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), userType));
+    // id: charString
+    ReturnErrorOnFailure(writer.PutString(TLV::ContextTag(argSeqNumber++), id));
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
     return mDevice->SendCommands();
 #else
     System::PacketBufferHandle payload = encodeDoorLockClusterSetRfidCommand(mEndpoint, userId, userStatus, userType, id);
@@ -1096,8 +1740,26 @@ CHIP_ERROR DoorLockCluster::SetUserType(Callback::Callback<> * onCompletion, uin
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
-    // TODO(@vivien-apple): onCompletion is not used by IM for now.
-    chip::app::cluster::DoorLock::EncodeSetUserTypeCommand(mDevice->GetCommandSender(), mEndpoint, 0, userId, userType);
+
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, DoorLock::kClusterId, DoorLock::kSetUserTypeCommandId,
+                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    Command::Command * ZCLcommand    = mDevice->GetCommandSender();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
+    // userId: int16u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), userId));
+    // userType: doorLockUserType
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), userType));
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
     return mDevice->SendCommands();
 #else
     System::PacketBufferHandle payload = encodeDoorLockClusterSetUserTypeCommand(mEndpoint, userId, userType);
@@ -1112,9 +1774,36 @@ CHIP_ERROR DoorLockCluster::SetWeekdaySchedule(Callback::Callback<> * onCompleti
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
-    // TODO(@vivien-apple): onCompletion is not used by IM for now.
-    chip::app::cluster::DoorLock::EncodeSetWeekdayScheduleCommand(mDevice->GetCommandSender(), mEndpoint, 0, scheduleId, userId,
-                                                                  daysMask, startHour, startMinute, endHour, endMinute);
+
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, DoorLock::kClusterId, DoorLock::kSetWeekdayScheduleCommandId,
+                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    Command::Command * ZCLcommand    = mDevice->GetCommandSender();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
+    // scheduleId: int8u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), scheduleId));
+    // userId: int16u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), userId));
+    // daysMask: doorLockDayOfWeek
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), daysMask));
+    // startHour: int8u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), startHour));
+    // startMinute: int8u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), startMinute));
+    // endHour: int8u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), endHour));
+    // endMinute: int8u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), endMinute));
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
     return mDevice->SendCommands();
 #else
     System::PacketBufferHandle payload = encodeDoorLockClusterSetWeekdayScheduleCommand(mEndpoint, scheduleId, userId, daysMask,
@@ -1129,9 +1818,30 @@ CHIP_ERROR DoorLockCluster::SetYeardaySchedule(Callback::Callback<> * onCompleti
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
-    // TODO(@vivien-apple): onCompletion is not used by IM for now.
-    chip::app::cluster::DoorLock::EncodeSetYeardayScheduleCommand(mDevice->GetCommandSender(), mEndpoint, 0, scheduleId, userId,
-                                                                  localStartTime, localEndTime);
+
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, DoorLock::kClusterId, DoorLock::kSetYeardayScheduleCommandId,
+                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    Command::Command * ZCLcommand    = mDevice->GetCommandSender();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
+    // scheduleId: int8u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), scheduleId));
+    // userId: int16u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), userId));
+    // localStartTime: int32u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), localStartTime));
+    // localEndTime: int32u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), localEndTime));
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
     return mDevice->SendCommands();
 #else
     System::PacketBufferHandle payload =
@@ -1145,8 +1855,24 @@ CHIP_ERROR DoorLockCluster::UnlockDoor(Callback::Callback<> * onCompletion, char
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
-    // TODO(@vivien-apple): onCompletion is not used by IM for now.
-    chip::app::cluster::DoorLock::EncodeUnlockDoorCommand(mDevice->GetCommandSender(), mEndpoint, 0, pin);
+
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, DoorLock::kClusterId, DoorLock::kUnlockDoorCommandId,
+                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    Command::Command * ZCLcommand    = mDevice->GetCommandSender();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
+    // pin: charString
+    ReturnErrorOnFailure(writer.PutString(TLV::ContextTag(argSeqNumber++), pin));
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
     return mDevice->SendCommands();
 #else
     System::PacketBufferHandle payload = encodeDoorLockClusterUnlockDoorCommand(mEndpoint, pin);
@@ -1159,8 +1885,26 @@ CHIP_ERROR DoorLockCluster::UnlockWithTimeout(Callback::Callback<> * onCompletio
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
-    // TODO(@vivien-apple): onCompletion is not used by IM for now.
-    chip::app::cluster::DoorLock::EncodeUnlockWithTimeoutCommand(mDevice->GetCommandSender(), mEndpoint, 0, timeoutInSeconds, pin);
+
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, DoorLock::kClusterId, DoorLock::kUnlockWithTimeoutCommandId,
+                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    Command::Command * ZCLcommand    = mDevice->GetCommandSender();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
+    // timeoutInSeconds: int16u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), timeoutInSeconds));
+    // pin: charString
+    ReturnErrorOnFailure(writer.PutString(TLV::ContextTag(argSeqNumber++), pin));
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
     return mDevice->SendCommands();
 #else
     System::PacketBufferHandle payload = encodeDoorLockClusterUnlockWithTimeoutCommand(mEndpoint, timeoutInSeconds, pin);
@@ -1211,8 +1955,26 @@ CHIP_ERROR GroupsCluster::AddGroup(Callback::Callback<> * onCompletion, uint16_t
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
-    // TODO(@vivien-apple): onCompletion is not used by IM for now.
-    chip::app::cluster::Groups::EncodeAddGroupCommand(mDevice->GetCommandSender(), mEndpoint, 0, groupId, groupName);
+
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, Groups::kClusterId, Groups::kAddGroupCommandId,
+                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    Command::Command * ZCLcommand    = mDevice->GetCommandSender();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
+    // groupId: int16u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), groupId));
+    // groupName: charString
+    ReturnErrorOnFailure(writer.PutString(TLV::ContextTag(argSeqNumber++), groupName));
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
     return mDevice->SendCommands();
 #else
     System::PacketBufferHandle payload = encodeGroupsClusterAddGroupCommand(mEndpoint, groupId, groupName);
@@ -1225,8 +1987,26 @@ CHIP_ERROR GroupsCluster::AddGroupIfIdentifying(Callback::Callback<> * onComplet
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
-    // TODO(@vivien-apple): onCompletion is not used by IM for now.
-    chip::app::cluster::Groups::EncodeAddGroupIfIdentifyingCommand(mDevice->GetCommandSender(), mEndpoint, 0, groupId, groupName);
+
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, Groups::kClusterId, Groups::kAddGroupIfIdentifyingCommandId,
+                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    Command::Command * ZCLcommand    = mDevice->GetCommandSender();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
+    // groupId: int16u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), groupId));
+    // groupName: charString
+    ReturnErrorOnFailure(writer.PutString(TLV::ContextTag(argSeqNumber++), groupName));
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
     return mDevice->SendCommands();
 #else
     System::PacketBufferHandle payload = encodeGroupsClusterAddGroupIfIdentifyingCommand(mEndpoint, groupId, groupName);
@@ -1239,8 +2019,26 @@ CHIP_ERROR GroupsCluster::GetGroupMembership(Callback::Callback<> * onCompletion
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
-    // TODO(@vivien-apple): onCompletion is not used by IM for now.
-    chip::app::cluster::Groups::EncodeGetGroupMembershipCommand(mDevice->GetCommandSender(), mEndpoint, 0, groupCount, groupList);
+
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, Groups::kClusterId, Groups::kGetGroupMembershipCommandId,
+                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    Command::Command * ZCLcommand    = mDevice->GetCommandSender();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
+    // groupCount: int8u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), groupCount));
+    // groupList: int16u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), groupList));
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
     return mDevice->SendCommands();
 #else
     System::PacketBufferHandle payload = encodeGroupsClusterGetGroupMembershipCommand(mEndpoint, groupCount, groupList);
@@ -1253,8 +2051,22 @@ CHIP_ERROR GroupsCluster::RemoveAllGroups(Callback::Callback<> * onCompletion)
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
-    // TODO(@vivien-apple): onCompletion is not used by IM for now.
-    chip::app::cluster::Groups::EncodeRemoveAllGroupsCommand(mDevice->GetCommandSender(), mEndpoint, 0);
+
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, Groups::kClusterId, Groups::kRemoveAllGroupsCommandId,
+                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    Command::Command * ZCLcommand    = mDevice->GetCommandSender();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    // Command takes no arguments.
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
     return mDevice->SendCommands();
 #else
     System::PacketBufferHandle payload = encodeGroupsClusterRemoveAllGroupsCommand(mEndpoint);
@@ -1267,8 +2079,24 @@ CHIP_ERROR GroupsCluster::RemoveGroup(Callback::Callback<> * onCompletion, uint1
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
-    // TODO(@vivien-apple): onCompletion is not used by IM for now.
-    chip::app::cluster::Groups::EncodeRemoveGroupCommand(mDevice->GetCommandSender(), mEndpoint, 0, groupId);
+
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, Groups::kClusterId, Groups::kRemoveGroupCommandId,
+                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    Command::Command * ZCLcommand    = mDevice->GetCommandSender();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
+    // groupId: int16u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), groupId));
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
     return mDevice->SendCommands();
 #else
     System::PacketBufferHandle payload = encodeGroupsClusterRemoveGroupCommand(mEndpoint, groupId);
@@ -1281,8 +2109,24 @@ CHIP_ERROR GroupsCluster::ViewGroup(Callback::Callback<> * onCompletion, uint16_
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
-    // TODO(@vivien-apple): onCompletion is not used by IM for now.
-    chip::app::cluster::Groups::EncodeViewGroupCommand(mDevice->GetCommandSender(), mEndpoint, 0, groupId);
+
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, Groups::kClusterId, Groups::kViewGroupCommandId,
+                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    Command::Command * ZCLcommand    = mDevice->GetCommandSender();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
+    // groupId: int16u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), groupId));
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
     return mDevice->SendCommands();
 #else
     System::PacketBufferHandle payload = encodeGroupsClusterViewGroupCommand(mEndpoint, groupId);
@@ -1363,8 +2207,24 @@ CHIP_ERROR IdentifyCluster::Identify(Callback::Callback<> * onCompletion, uint16
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
-    // TODO(@vivien-apple): onCompletion is not used by IM for now.
-    chip::app::cluster::Identify::EncodeIdentifyCommand(mDevice->GetCommandSender(), mEndpoint, 0, identifyTime);
+
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, Identify::kClusterId, Identify::kIdentifyCommandId,
+                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    Command::Command * ZCLcommand    = mDevice->GetCommandSender();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
+    // identifyTime: int16u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), identifyTime));
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
     return mDevice->SendCommands();
 #else
     System::PacketBufferHandle payload = encodeIdentifyClusterIdentifyCommand(mEndpoint, identifyTime);
@@ -1377,8 +2237,22 @@ CHIP_ERROR IdentifyCluster::IdentifyQuery(Callback::Callback<> * onCompletion)
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
-    // TODO(@vivien-apple): onCompletion is not used by IM for now.
-    chip::app::cluster::Identify::EncodeIdentifyQueryCommand(mDevice->GetCommandSender(), mEndpoint, 0);
+
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, Identify::kClusterId, Identify::kIdentifyQueryCommandId,
+                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    Command::Command * ZCLcommand    = mDevice->GetCommandSender();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    // Command takes no arguments.
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
     return mDevice->SendCommands();
 #else
     System::PacketBufferHandle payload = encodeIdentifyClusterIdentifyQueryCommand(mEndpoint);
@@ -1417,9 +2291,30 @@ CHIP_ERROR LevelControlCluster::Move(Callback::Callback<> * onCompletion, uint8_
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
-    // TODO(@vivien-apple): onCompletion is not used by IM for now.
-    chip::app::cluster::LevelControl::EncodeMoveCommand(mDevice->GetCommandSender(), mEndpoint, 0, moveMode, rate, optionMask,
-                                                        optionOverride);
+
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, LevelControl::kClusterId, LevelControl::kMoveCommandId,
+                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    Command::Command * ZCLcommand    = mDevice->GetCommandSender();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
+    // moveMode: moveMode
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), moveMode));
+    // rate: int8u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), rate));
+    // optionMask: bitmap8
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionMask));
+    // optionOverride: bitmap8
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionOverride));
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
     return mDevice->SendCommands();
 #else
     System::PacketBufferHandle payload =
@@ -1434,9 +2329,30 @@ CHIP_ERROR LevelControlCluster::MoveToLevel(Callback::Callback<> * onCompletion,
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
-    // TODO(@vivien-apple): onCompletion is not used by IM for now.
-    chip::app::cluster::LevelControl::EncodeMoveToLevelCommand(mDevice->GetCommandSender(), mEndpoint, 0, level, transitionTime,
-                                                               optionMask, optionOverride);
+
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, LevelControl::kClusterId, LevelControl::kMoveToLevelCommandId,
+                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    Command::Command * ZCLcommand    = mDevice->GetCommandSender();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
+    // level: int8u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), level));
+    // transitionTime: int16u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), transitionTime));
+    // optionMask: bitmap8
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionMask));
+    // optionOverride: bitmap8
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionOverride));
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
     return mDevice->SendCommands();
 #else
     System::PacketBufferHandle payload =
@@ -1450,9 +2366,27 @@ CHIP_ERROR LevelControlCluster::MoveToLevelWithOnOff(Callback::Callback<> * onCo
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
-    // TODO(@vivien-apple): onCompletion is not used by IM for now.
-    chip::app::cluster::LevelControl::EncodeMoveToLevelWithOnOffCommand(mDevice->GetCommandSender(), mEndpoint, 0, level,
-                                                                        transitionTime);
+
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, LevelControl::kClusterId,
+                                         LevelControl::kMoveToLevelWithOnOffCommandId,
+                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    Command::Command * ZCLcommand    = mDevice->GetCommandSender();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
+    // level: int8u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), level));
+    // transitionTime: int16u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), transitionTime));
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
     return mDevice->SendCommands();
 #else
     System::PacketBufferHandle payload = encodeLevelControlClusterMoveToLevelWithOnOffCommand(mEndpoint, level, transitionTime);
@@ -1465,8 +2399,26 @@ CHIP_ERROR LevelControlCluster::MoveWithOnOff(Callback::Callback<> * onCompletio
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
-    // TODO(@vivien-apple): onCompletion is not used by IM for now.
-    chip::app::cluster::LevelControl::EncodeMoveWithOnOffCommand(mDevice->GetCommandSender(), mEndpoint, 0, moveMode, rate);
+
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, LevelControl::kClusterId, LevelControl::kMoveWithOnOffCommandId,
+                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    Command::Command * ZCLcommand    = mDevice->GetCommandSender();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
+    // moveMode: moveMode
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), moveMode));
+    // rate: int8u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), rate));
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
     return mDevice->SendCommands();
 #else
     System::PacketBufferHandle payload = encodeLevelControlClusterMoveWithOnOffCommand(mEndpoint, moveMode, rate);
@@ -1480,9 +2432,32 @@ CHIP_ERROR LevelControlCluster::Step(Callback::Callback<> * onCompletion, uint8_
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
-    // TODO(@vivien-apple): onCompletion is not used by IM for now.
-    chip::app::cluster::LevelControl::EncodeStepCommand(mDevice->GetCommandSender(), mEndpoint, 0, stepMode, stepSize,
-                                                        transitionTime, optionMask, optionOverride);
+
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, LevelControl::kClusterId, LevelControl::kStepCommandId,
+                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    Command::Command * ZCLcommand    = mDevice->GetCommandSender();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
+    // stepMode: stepMode
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), stepMode));
+    // stepSize: int8u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), stepSize));
+    // transitionTime: int16u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), transitionTime));
+    // optionMask: bitmap8
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionMask));
+    // optionOverride: bitmap8
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionOverride));
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
     return mDevice->SendCommands();
 #else
     System::PacketBufferHandle payload =
@@ -1497,9 +2472,28 @@ CHIP_ERROR LevelControlCluster::StepWithOnOff(Callback::Callback<> * onCompletio
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
-    // TODO(@vivien-apple): onCompletion is not used by IM for now.
-    chip::app::cluster::LevelControl::EncodeStepWithOnOffCommand(mDevice->GetCommandSender(), mEndpoint, 0, stepMode, stepSize,
-                                                                 transitionTime);
+
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, LevelControl::kClusterId, LevelControl::kStepWithOnOffCommandId,
+                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    Command::Command * ZCLcommand    = mDevice->GetCommandSender();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
+    // stepMode: stepMode
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), stepMode));
+    // stepSize: int8u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), stepSize));
+    // transitionTime: int16u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), transitionTime));
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
     return mDevice->SendCommands();
 #else
     System::PacketBufferHandle payload =
@@ -1513,8 +2507,26 @@ CHIP_ERROR LevelControlCluster::Stop(Callback::Callback<> * onCompletion, uint8_
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
-    // TODO(@vivien-apple): onCompletion is not used by IM for now.
-    chip::app::cluster::LevelControl::EncodeStopCommand(mDevice->GetCommandSender(), mEndpoint, 0, optionMask, optionOverride);
+
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, LevelControl::kClusterId, LevelControl::kStopCommandId,
+                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    Command::Command * ZCLcommand    = mDevice->GetCommandSender();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
+    // optionMask: bitmap8
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionMask));
+    // optionOverride: bitmap8
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionOverride));
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
     return mDevice->SendCommands();
 #else
     System::PacketBufferHandle payload = encodeLevelControlClusterStopCommand(mEndpoint, optionMask, optionOverride);
@@ -1527,8 +2539,22 @@ CHIP_ERROR LevelControlCluster::StopWithOnOff(Callback::Callback<> * onCompletio
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
-    // TODO(@vivien-apple): onCompletion is not used by IM for now.
-    chip::app::cluster::LevelControl::EncodeStopWithOnOffCommand(mDevice->GetCommandSender(), mEndpoint, 0);
+
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, LevelControl::kClusterId, LevelControl::kStopWithOnOffCommandId,
+                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    Command::Command * ZCLcommand    = mDevice->GetCommandSender();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    // Command takes no arguments.
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
     return mDevice->SendCommands();
 #else
     System::PacketBufferHandle payload = encodeLevelControlClusterStopWithOnOffCommand(mEndpoint);
@@ -1568,8 +2594,22 @@ CHIP_ERROR OnOffCluster::Off(Callback::Callback<> * onCompletion)
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
-    // TODO(@vivien-apple): onCompletion is not used by IM for now.
-    chip::app::cluster::OnOff::EncodeOffCommand(mDevice->GetCommandSender(), mEndpoint, 0);
+
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, OnOff::kClusterId, OnOff::kOffCommandId,
+                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    Command::Command * ZCLcommand    = mDevice->GetCommandSender();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    // Command takes no arguments.
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
     return mDevice->SendCommands();
 #else
     System::PacketBufferHandle payload = encodeOnOffClusterOffCommand(mEndpoint);
@@ -1582,8 +2622,22 @@ CHIP_ERROR OnOffCluster::On(Callback::Callback<> * onCompletion)
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
-    // TODO(@vivien-apple): onCompletion is not used by IM for now.
-    chip::app::cluster::OnOff::EncodeOnCommand(mDevice->GetCommandSender(), mEndpoint, 0);
+
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, OnOff::kClusterId, OnOff::kOnCommandId,
+                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    Command::Command * ZCLcommand    = mDevice->GetCommandSender();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    // Command takes no arguments.
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
     return mDevice->SendCommands();
 #else
     System::PacketBufferHandle payload = encodeOnOffClusterOnCommand(mEndpoint);
@@ -1596,8 +2650,22 @@ CHIP_ERROR OnOffCluster::Toggle(Callback::Callback<> * onCompletion)
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
-    // TODO(@vivien-apple): onCompletion is not used by IM for now.
-    chip::app::cluster::OnOff::EncodeToggleCommand(mDevice->GetCommandSender(), mEndpoint, 0);
+
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, OnOff::kClusterId, OnOff::kToggleCommandId,
+                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    Command::Command * ZCLcommand    = mDevice->GetCommandSender();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    // Command takes no arguments.
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
     return mDevice->SendCommands();
 #else
     System::PacketBufferHandle payload = encodeOnOffClusterToggleCommand(mEndpoint);
@@ -1637,9 +2705,36 @@ CHIP_ERROR ScenesCluster::AddScene(Callback::Callback<> * onCompletion, uint16_t
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
-    // TODO(@vivien-apple): onCompletion is not used by IM for now.
-    chip::app::cluster::Scenes::EncodeAddSceneCommand(mDevice->GetCommandSender(), mEndpoint, 0, groupId, sceneId, transitionTime,
-                                                      sceneName, clusterId, length, value);
+
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, Scenes::kClusterId, Scenes::kAddSceneCommandId,
+                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    Command::Command * ZCLcommand    = mDevice->GetCommandSender();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
+    // groupId: int16u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), groupId));
+    // sceneId: int8u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), sceneId));
+    // transitionTime: int16u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), transitionTime));
+    // sceneName: charString
+    ReturnErrorOnFailure(writer.PutString(TLV::ContextTag(argSeqNumber++), sceneName));
+    // clusterId: clusterId
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), clusterId));
+    // length: int8u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), length));
+    // value: int8u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), value));
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
     return mDevice->SendCommands();
 #else
     System::PacketBufferHandle payload =
@@ -1653,8 +2748,24 @@ CHIP_ERROR ScenesCluster::GetSceneMembership(Callback::Callback<> * onCompletion
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
-    // TODO(@vivien-apple): onCompletion is not used by IM for now.
-    chip::app::cluster::Scenes::EncodeGetSceneMembershipCommand(mDevice->GetCommandSender(), mEndpoint, 0, groupId);
+
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, Scenes::kClusterId, Scenes::kGetSceneMembershipCommandId,
+                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    Command::Command * ZCLcommand    = mDevice->GetCommandSender();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
+    // groupId: int16u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), groupId));
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
     return mDevice->SendCommands();
 #else
     System::PacketBufferHandle payload = encodeScenesClusterGetSceneMembershipCommand(mEndpoint, groupId);
@@ -1668,9 +2779,28 @@ CHIP_ERROR ScenesCluster::RecallScene(Callback::Callback<> * onCompletion, uint1
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
-    // TODO(@vivien-apple): onCompletion is not used by IM for now.
-    chip::app::cluster::Scenes::EncodeRecallSceneCommand(mDevice->GetCommandSender(), mEndpoint, 0, groupId, sceneId,
-                                                         transitionTime);
+
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, Scenes::kClusterId, Scenes::kRecallSceneCommandId,
+                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    Command::Command * ZCLcommand    = mDevice->GetCommandSender();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
+    // groupId: int16u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), groupId));
+    // sceneId: int8u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), sceneId));
+    // transitionTime: int16u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), transitionTime));
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
     return mDevice->SendCommands();
 #else
     System::PacketBufferHandle payload = encodeScenesClusterRecallSceneCommand(mEndpoint, groupId, sceneId, transitionTime);
@@ -1683,8 +2813,24 @@ CHIP_ERROR ScenesCluster::RemoveAllScenes(Callback::Callback<> * onCompletion, u
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
-    // TODO(@vivien-apple): onCompletion is not used by IM for now.
-    chip::app::cluster::Scenes::EncodeRemoveAllScenesCommand(mDevice->GetCommandSender(), mEndpoint, 0, groupId);
+
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, Scenes::kClusterId, Scenes::kRemoveAllScenesCommandId,
+                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    Command::Command * ZCLcommand    = mDevice->GetCommandSender();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
+    // groupId: int16u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), groupId));
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
     return mDevice->SendCommands();
 #else
     System::PacketBufferHandle payload = encodeScenesClusterRemoveAllScenesCommand(mEndpoint, groupId);
@@ -1697,8 +2843,26 @@ CHIP_ERROR ScenesCluster::RemoveScene(Callback::Callback<> * onCompletion, uint1
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
-    // TODO(@vivien-apple): onCompletion is not used by IM for now.
-    chip::app::cluster::Scenes::EncodeRemoveSceneCommand(mDevice->GetCommandSender(), mEndpoint, 0, groupId, sceneId);
+
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, Scenes::kClusterId, Scenes::kRemoveSceneCommandId,
+                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    Command::Command * ZCLcommand    = mDevice->GetCommandSender();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
+    // groupId: int16u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), groupId));
+    // sceneId: int8u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), sceneId));
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
     return mDevice->SendCommands();
 #else
     System::PacketBufferHandle payload = encodeScenesClusterRemoveSceneCommand(mEndpoint, groupId, sceneId);
@@ -1711,8 +2875,26 @@ CHIP_ERROR ScenesCluster::StoreScene(Callback::Callback<> * onCompletion, uint16
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
-    // TODO(@vivien-apple): onCompletion is not used by IM for now.
-    chip::app::cluster::Scenes::EncodeStoreSceneCommand(mDevice->GetCommandSender(), mEndpoint, 0, groupId, sceneId);
+
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, Scenes::kClusterId, Scenes::kStoreSceneCommandId,
+                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    Command::Command * ZCLcommand    = mDevice->GetCommandSender();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
+    // groupId: int16u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), groupId));
+    // sceneId: int8u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), sceneId));
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
     return mDevice->SendCommands();
 #else
     System::PacketBufferHandle payload = encodeScenesClusterStoreSceneCommand(mEndpoint, groupId, sceneId);
@@ -1725,8 +2907,26 @@ CHIP_ERROR ScenesCluster::ViewScene(Callback::Callback<> * onCompletion, uint16_
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
-    // TODO(@vivien-apple): onCompletion is not used by IM for now.
-    chip::app::cluster::Scenes::EncodeViewSceneCommand(mDevice->GetCommandSender(), mEndpoint, 0, groupId, sceneId);
+
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, Scenes::kClusterId, Scenes::kViewSceneCommandId,
+                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    Command::Command * ZCLcommand    = mDevice->GetCommandSender();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
+    // groupId: int16u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), groupId));
+    // sceneId: int8u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), sceneId));
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
     return mDevice->SendCommands();
 #else
     System::PacketBufferHandle payload = encodeScenesClusterViewSceneCommand(mEndpoint, groupId, sceneId);

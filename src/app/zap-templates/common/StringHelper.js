@@ -17,7 +17,7 @@
 
 const stringShortTypes = [ 'CHAR_STRING', 'OCTET_STRING' ];
 const stringLongTypes  = [ 'LONG_CHAR_STRING', 'LONG_OCTET_STRING' ];
-const bytesTypes       = [ 'OCTET_STRING', 'LONG_OCTET_STRING' ];
+const stringBytesTypes = [ 'OCTET_STRING', 'LONG_OCTET_STRING' ];
 
 function isShortString(type)
 {
@@ -31,7 +31,7 @@ function isLongString(type)
 
 function isByteString(type)
 {
-  return bytesTypes.includes(type);
+  return stringBytesTypes.includes(type);
 }
 
 function isString(type)

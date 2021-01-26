@@ -21,8 +21,34 @@ CHIP_ERROR {{asCamelCased clusterName false}}Cluster::{{asCamelCased name false}
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
-    // TODO(@vivien-apple): onCompletion is not used by IM for now.
-    chip::app::cluster::{{asCamelCased clusterName false}}::Encode{{asType name}}Command(mDevice->GetCommandSender(), mEndpoint, 0{{#chip_server_cluster_command_arguments}}, {{asCamelCased label}}{{/chip_server_cluster_command_arguments}});
+
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, {{asCamelCased clusterName false}}::kClusterId, {{asCamelCased clusterName false}}::k{{asCamelCased name false}}CommandId,
+                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    Command::Command * ZCLcommand = mDevice->GetCommandSender();
+    TLV::TLVWriter writer  = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+{{#chip_server_cluster_command_arguments}}
+{{#first}}
+    uint8_t argSeqNumber = 0;
+{{/first}}
+    // {{asCamelCased label}}: {{asCamelCased type}}
+{{#if (isString type)}}
+    ReturnErrorOnFailure(writer.PutString(TLV::ContextTag(argSeqNumber++), {{asCamelCased label}}));
+{{else}}
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), {{asCamelCased label}}));
+{{/if}}
+{{else}}
+    // Command takes no arguments.
+{{/chip_server_cluster_command_arguments}}
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
     return mDevice->SendCommands();
 #else
     System::PacketBufferHandle payload = encode{{asCamelCased clusterName false}}Cluster{{asType name}}Command(mEndpoint{{#chip_server_cluster_command_arguments}}, {{asCamelCased label}}{{/chip_server_cluster_command_arguments}});

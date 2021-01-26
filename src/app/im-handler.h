@@ -28,6 +28,7 @@ namespace chip {
 namespace app {
 namespace cluster {
 
+
 namespace BarrierControl {
 /*----------------------------------------------------------------------------*\
 | Cluster BarrierControl                                              | 0x0103 |
@@ -43,24 +44,18 @@ namespace BarrierControl {
 | * BarrierPosition                                                   | 0x000A |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
-constexpr uint16_t kClusterId                         = 0x0103;
+constexpr uint16_t kClusterId = 0x0103;
 constexpr uint8_t kBarrierControlGoToPercentCommandId = 0x00;
-constexpr uint8_t kBarrierControlStopCommandId        = 0x01;
+constexpr uint8_t kBarrierControlStopCommandId = 0x01;
 
 void HandleBarrierControlGoToPercentCommandReceived(chip::TLV::TLVReader & aReader, chip::app::Command * apCommandObj);
 void HandleBarrierControlStopCommandReceived(chip::TLV::TLVReader & aReader, chip::app::Command * apCommandObj);
-
-// The "ZCL" prefix here is used for avoiding duplicate names.
-CHIP_ERROR EncodeBarrierControlGoToPercentCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId,
-                                                  chip::GroupId ZCLgroupId, const uint8_t percentOpen);
-// The "ZCL" prefix here is used for avoiding duplicate names.
-CHIP_ERROR EncodeBarrierControlStopCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId,
-                                           chip::GroupId ZCLgroupId);
 
 void InitCluster(chip::app::InteractionModelEngine * ime);
 void ShutdownCluster(chip::app::InteractionModelEngine * ime);
 
 } // namespace BarrierControl
+
 
 namespace Basic {
 /*----------------------------------------------------------------------------*\
@@ -74,19 +69,16 @@ namespace Basic {
 | * PowerSource                                                       | 0x0007 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
-constexpr uint16_t kClusterId                      = 0x0000;
+constexpr uint16_t kClusterId = 0x0000;
 constexpr uint8_t kResetToFactoryDefaultsCommandId = 0x00;
 
 void HandleResetToFactoryDefaultsCommandReceived(chip::TLV::TLVReader & aReader, chip::app::Command * apCommandObj);
-
-// The "ZCL" prefix here is used for avoiding duplicate names.
-CHIP_ERROR EncodeResetToFactoryDefaultsCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId,
-                                               chip::GroupId ZCLgroupId);
 
 void InitCluster(chip::app::InteractionModelEngine * ime);
 void ShutdownCluster(chip::app::InteractionModelEngine * ime);
 
 } // namespace Basic
+
 
 namespace ColorControl {
 /*----------------------------------------------------------------------------*\
@@ -161,21 +153,21 @@ namespace ColorControl {
 | * StartUpColorTemperatureMireds                                     | 0x4010 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
-constexpr uint16_t kClusterId                      = 0x0300;
-constexpr uint8_t kMoveColorCommandId              = 0x08;
-constexpr uint8_t kMoveColorTemperatureCommandId   = 0x4B;
-constexpr uint8_t kMoveHueCommandId                = 0x01;
-constexpr uint8_t kMoveSaturationCommandId         = 0x04;
-constexpr uint8_t kMoveToColorCommandId            = 0x07;
+constexpr uint16_t kClusterId = 0x0300;
+constexpr uint8_t kMoveColorCommandId = 0x08;
+constexpr uint8_t kMoveColorTemperatureCommandId = 0x4B;
+constexpr uint8_t kMoveHueCommandId = 0x01;
+constexpr uint8_t kMoveSaturationCommandId = 0x04;
+constexpr uint8_t kMoveToColorCommandId = 0x07;
 constexpr uint8_t kMoveToColorTemperatureCommandId = 0x0A;
-constexpr uint8_t kMoveToHueCommandId              = 0x00;
+constexpr uint8_t kMoveToHueCommandId = 0x00;
 constexpr uint8_t kMoveToHueAndSaturationCommandId = 0x06;
-constexpr uint8_t kMoveToSaturationCommandId       = 0x03;
-constexpr uint8_t kStepColorCommandId              = 0x09;
-constexpr uint8_t kStepColorTemperatureCommandId   = 0x4C;
-constexpr uint8_t kStepHueCommandId                = 0x02;
-constexpr uint8_t kStepSaturationCommandId         = 0x05;
-constexpr uint8_t kStopMoveStepCommandId           = 0x47;
+constexpr uint8_t kMoveToSaturationCommandId = 0x03;
+constexpr uint8_t kStepColorCommandId = 0x09;
+constexpr uint8_t kStepColorTemperatureCommandId = 0x4C;
+constexpr uint8_t kStepHueCommandId = 0x02;
+constexpr uint8_t kStepSaturationCommandId = 0x05;
+constexpr uint8_t kStopMoveStepCommandId = 0x47;
 
 void HandleMoveColorCommandReceived(chip::TLV::TLVReader & aReader, chip::app::Command * apCommandObj);
 void HandleMoveColorTemperatureCommandReceived(chip::TLV::TLVReader & aReader, chip::app::Command * apCommandObj);
@@ -192,71 +184,11 @@ void HandleStepHueCommandReceived(chip::TLV::TLVReader & aReader, chip::app::Com
 void HandleStepSaturationCommandReceived(chip::TLV::TLVReader & aReader, chip::app::Command * apCommandObj);
 void HandleStopMoveStepCommandReceived(chip::TLV::TLVReader & aReader, chip::app::Command * apCommandObj);
 
-// The "ZCL" prefix here is used for avoiding duplicate names.
-CHIP_ERROR EncodeMoveColorCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
-                                  const int16_t rateX, const int16_t rateY, const uint8_t optionsMask,
-                                  const uint8_t optionsOverride);
-// The "ZCL" prefix here is used for avoiding duplicate names.
-CHIP_ERROR EncodeMoveColorTemperatureCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId,
-                                             chip::GroupId ZCLgroupId, const uint8_t moveMode, const uint16_t rate,
-                                             const uint16_t colorTemperatureMinimum, const uint16_t colorTemperatureMaximum,
-                                             const uint8_t optionsMask, const uint8_t optionsOverride);
-// The "ZCL" prefix here is used for avoiding duplicate names.
-CHIP_ERROR EncodeMoveHueCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
-                                const uint8_t moveMode, const uint8_t rate, const uint8_t optionsMask,
-                                const uint8_t optionsOverride);
-// The "ZCL" prefix here is used for avoiding duplicate names.
-CHIP_ERROR EncodeMoveSaturationCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
-                                       const uint8_t moveMode, const uint8_t rate, const uint8_t optionsMask,
-                                       const uint8_t optionsOverride);
-// The "ZCL" prefix here is used for avoiding duplicate names.
-CHIP_ERROR EncodeMoveToColorCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
-                                    const uint16_t colorX, const uint16_t colorY, const uint16_t transitionTime,
-                                    const uint8_t optionsMask, const uint8_t optionsOverride);
-// The "ZCL" prefix here is used for avoiding duplicate names.
-CHIP_ERROR EncodeMoveToColorTemperatureCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId,
-                                               chip::GroupId ZCLgroupId, const uint16_t colorTemperature,
-                                               const uint16_t transitionTime, const uint8_t optionsMask,
-                                               const uint8_t optionsOverride);
-// The "ZCL" prefix here is used for avoiding duplicate names.
-CHIP_ERROR EncodeMoveToHueCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
-                                  const uint8_t hue, const uint8_t direction, const uint16_t transitionTime,
-                                  const uint8_t optionsMask, const uint8_t optionsOverride);
-// The "ZCL" prefix here is used for avoiding duplicate names.
-CHIP_ERROR EncodeMoveToHueAndSaturationCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId,
-                                               chip::GroupId ZCLgroupId, const uint8_t hue, const uint8_t saturation,
-                                               const uint16_t transitionTime, const uint8_t optionsMask,
-                                               const uint8_t optionsOverride);
-// The "ZCL" prefix here is used for avoiding duplicate names.
-CHIP_ERROR EncodeMoveToSaturationCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
-                                         const uint8_t saturation, const uint16_t transitionTime, const uint8_t optionsMask,
-                                         const uint8_t optionsOverride);
-// The "ZCL" prefix here is used for avoiding duplicate names.
-CHIP_ERROR EncodeStepColorCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
-                                  const int16_t stepX, const int16_t stepY, const uint16_t transitionTime,
-                                  const uint8_t optionsMask, const uint8_t optionsOverride);
-// The "ZCL" prefix here is used for avoiding duplicate names.
-CHIP_ERROR EncodeStepColorTemperatureCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId,
-                                             chip::GroupId ZCLgroupId, const uint8_t stepMode, const uint16_t stepSize,
-                                             const uint16_t transitionTime, const uint16_t colorTemperatureMinimum,
-                                             const uint16_t colorTemperatureMaximum, const uint8_t optionsMask,
-                                             const uint8_t optionsOverride);
-// The "ZCL" prefix here is used for avoiding duplicate names.
-CHIP_ERROR EncodeStepHueCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
-                                const uint8_t stepMode, const uint8_t stepSize, const uint8_t transitionTime,
-                                const uint8_t optionsMask, const uint8_t optionsOverride);
-// The "ZCL" prefix here is used for avoiding duplicate names.
-CHIP_ERROR EncodeStepSaturationCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
-                                       const uint8_t stepMode, const uint8_t stepSize, const uint8_t transitionTime,
-                                       const uint8_t optionsMask, const uint8_t optionsOverride);
-// The "ZCL" prefix here is used for avoiding duplicate names.
-CHIP_ERROR EncodeStopMoveStepCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
-                                     const uint8_t optionsMask, const uint8_t optionsOverride);
-
 void InitCluster(chip::app::InteractionModelEngine * ime);
 void ShutdownCluster(chip::app::InteractionModelEngine * ime);
 
 } // namespace ColorControl
+
 
 namespace DoorLock {
 /*----------------------------------------------------------------------------*\
@@ -293,30 +225,30 @@ namespace DoorLock {
 | * ActuatorEnabled                                                   | 0x0002 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
-constexpr uint16_t kClusterId                    = 0x0101;
-constexpr uint8_t kClearAllPinsCommandId         = 0x08;
-constexpr uint8_t kClearAllRfidsCommandId        = 0x19;
+constexpr uint16_t kClusterId = 0x0101;
+constexpr uint8_t kClearAllPinsCommandId = 0x08;
+constexpr uint8_t kClearAllRfidsCommandId = 0x19;
 constexpr uint8_t kClearHolidayScheduleCommandId = 0x13;
-constexpr uint8_t kClearPinCommandId             = 0x07;
-constexpr uint8_t kClearRfidCommandId            = 0x18;
+constexpr uint8_t kClearPinCommandId = 0x07;
+constexpr uint8_t kClearRfidCommandId = 0x18;
 constexpr uint8_t kClearWeekdayScheduleCommandId = 0x0D;
 constexpr uint8_t kClearYeardayScheduleCommandId = 0x10;
-constexpr uint8_t kGetHolidayScheduleCommandId   = 0x12;
-constexpr uint8_t kGetLogRecordCommandId         = 0x04;
-constexpr uint8_t kGetPinCommandId               = 0x06;
-constexpr uint8_t kGetRfidCommandId              = 0x17;
-constexpr uint8_t kGetUserTypeCommandId          = 0x15;
-constexpr uint8_t kGetWeekdayScheduleCommandId   = 0x0C;
-constexpr uint8_t kGetYeardayScheduleCommandId   = 0x0F;
-constexpr uint8_t kLockDoorCommandId             = 0x00;
-constexpr uint8_t kSetHolidayScheduleCommandId   = 0x11;
-constexpr uint8_t kSetPinCommandId               = 0x05;
-constexpr uint8_t kSetRfidCommandId              = 0x16;
-constexpr uint8_t kSetUserTypeCommandId          = 0x14;
-constexpr uint8_t kSetWeekdayScheduleCommandId   = 0x0B;
-constexpr uint8_t kSetYeardayScheduleCommandId   = 0x0E;
-constexpr uint8_t kUnlockDoorCommandId           = 0x01;
-constexpr uint8_t kUnlockWithTimeoutCommandId    = 0x03;
+constexpr uint8_t kGetHolidayScheduleCommandId = 0x12;
+constexpr uint8_t kGetLogRecordCommandId = 0x04;
+constexpr uint8_t kGetPinCommandId = 0x06;
+constexpr uint8_t kGetRfidCommandId = 0x17;
+constexpr uint8_t kGetUserTypeCommandId = 0x15;
+constexpr uint8_t kGetWeekdayScheduleCommandId = 0x0C;
+constexpr uint8_t kGetYeardayScheduleCommandId = 0x0F;
+constexpr uint8_t kLockDoorCommandId = 0x00;
+constexpr uint8_t kSetHolidayScheduleCommandId = 0x11;
+constexpr uint8_t kSetPinCommandId = 0x05;
+constexpr uint8_t kSetRfidCommandId = 0x16;
+constexpr uint8_t kSetUserTypeCommandId = 0x14;
+constexpr uint8_t kSetWeekdayScheduleCommandId = 0x0B;
+constexpr uint8_t kSetYeardayScheduleCommandId = 0x0E;
+constexpr uint8_t kUnlockDoorCommandId = 0x01;
+constexpr uint8_t kUnlockWithTimeoutCommandId = 0x03;
 
 void HandleClearAllPinsCommandReceived(chip::TLV::TLVReader & aReader, chip::app::Command * apCommandObj);
 void HandleClearAllRfidsCommandReceived(chip::TLV::TLVReader & aReader, chip::app::Command * apCommandObj);
@@ -342,82 +274,11 @@ void HandleSetYeardayScheduleCommandReceived(chip::TLV::TLVReader & aReader, chi
 void HandleUnlockDoorCommandReceived(chip::TLV::TLVReader & aReader, chip::app::Command * apCommandObj);
 void HandleUnlockWithTimeoutCommandReceived(chip::TLV::TLVReader & aReader, chip::app::Command * apCommandObj);
 
-// The "ZCL" prefix here is used for avoiding duplicate names.
-CHIP_ERROR EncodeClearAllPinsCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId);
-// The "ZCL" prefix here is used for avoiding duplicate names.
-CHIP_ERROR EncodeClearAllRfidsCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId);
-// The "ZCL" prefix here is used for avoiding duplicate names.
-CHIP_ERROR EncodeClearHolidayScheduleCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId,
-                                             chip::GroupId ZCLgroupId, const uint8_t scheduleId);
-// The "ZCL" prefix here is used for avoiding duplicate names.
-CHIP_ERROR EncodeClearPinCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
-                                 const uint16_t userId);
-// The "ZCL" prefix here is used for avoiding duplicate names.
-CHIP_ERROR EncodeClearRfidCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
-                                  const uint16_t userId);
-// The "ZCL" prefix here is used for avoiding duplicate names.
-CHIP_ERROR EncodeClearWeekdayScheduleCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId,
-                                             chip::GroupId ZCLgroupId, const uint8_t scheduleId, const uint16_t userId);
-// The "ZCL" prefix here is used for avoiding duplicate names.
-CHIP_ERROR EncodeClearYeardayScheduleCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId,
-                                             chip::GroupId ZCLgroupId, const uint8_t scheduleId, const uint16_t userId);
-// The "ZCL" prefix here is used for avoiding duplicate names.
-CHIP_ERROR EncodeGetHolidayScheduleCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId,
-                                           chip::GroupId ZCLgroupId, const uint8_t scheduleId);
-// The "ZCL" prefix here is used for avoiding duplicate names.
-CHIP_ERROR EncodeGetLogRecordCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
-                                     const uint16_t logIndex);
-// The "ZCL" prefix here is used for avoiding duplicate names.
-CHIP_ERROR EncodeGetPinCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
-                               const uint16_t userId);
-// The "ZCL" prefix here is used for avoiding duplicate names.
-CHIP_ERROR EncodeGetRfidCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
-                                const uint16_t userId);
-// The "ZCL" prefix here is used for avoiding duplicate names.
-CHIP_ERROR EncodeGetUserTypeCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
-                                    const uint16_t userId);
-// The "ZCL" prefix here is used for avoiding duplicate names.
-CHIP_ERROR EncodeGetWeekdayScheduleCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId,
-                                           chip::GroupId ZCLgroupId, const uint8_t scheduleId, const uint16_t userId);
-// The "ZCL" prefix here is used for avoiding duplicate names.
-CHIP_ERROR EncodeGetYeardayScheduleCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId,
-                                           chip::GroupId ZCLgroupId, const uint8_t scheduleId, const uint16_t userId);
-// The "ZCL" prefix here is used for avoiding duplicate names.
-CHIP_ERROR EncodeLockDoorCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
-                                 const char * pin);
-// The "ZCL" prefix here is used for avoiding duplicate names.
-CHIP_ERROR EncodeSetHolidayScheduleCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId,
-                                           chip::GroupId ZCLgroupId, const uint8_t scheduleId, const uint32_t localStartTime,
-                                           const uint32_t localEndTime, const uint8_t operatingModeDuringHoliday);
-// The "ZCL" prefix here is used for avoiding duplicate names.
-CHIP_ERROR EncodeSetPinCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
-                               const uint16_t userId, const uint8_t userStatus, const uint8_t userType, const char * pin);
-// The "ZCL" prefix here is used for avoiding duplicate names.
-CHIP_ERROR EncodeSetRfidCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
-                                const uint16_t userId, const uint8_t userStatus, const uint8_t userType, const char * id);
-// The "ZCL" prefix here is used for avoiding duplicate names.
-CHIP_ERROR EncodeSetUserTypeCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
-                                    const uint16_t userId, const uint8_t userType);
-// The "ZCL" prefix here is used for avoiding duplicate names.
-CHIP_ERROR EncodeSetWeekdayScheduleCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId,
-                                           chip::GroupId ZCLgroupId, const uint8_t scheduleId, const uint16_t userId,
-                                           const uint8_t daysMask, const uint8_t startHour, const uint8_t startMinute,
-                                           const uint8_t endHour, const uint8_t endMinute);
-// The "ZCL" prefix here is used for avoiding duplicate names.
-CHIP_ERROR EncodeSetYeardayScheduleCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId,
-                                           chip::GroupId ZCLgroupId, const uint8_t scheduleId, const uint16_t userId,
-                                           const uint32_t localStartTime, const uint32_t localEndTime);
-// The "ZCL" prefix here is used for avoiding duplicate names.
-CHIP_ERROR EncodeUnlockDoorCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
-                                   const char * pin);
-// The "ZCL" prefix here is used for avoiding duplicate names.
-CHIP_ERROR EncodeUnlockWithTimeoutCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
-                                          const uint16_t timeoutInSeconds, const char * pin);
-
 void InitCluster(chip::app::InteractionModelEngine * ime);
 void ShutdownCluster(chip::app::InteractionModelEngine * ime);
 
 } // namespace DoorLock
+
 
 namespace Groups {
 /*----------------------------------------------------------------------------*\
@@ -435,13 +296,13 @@ namespace Groups {
 | * NameSupport                                                       | 0x0000 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
-constexpr uint16_t kClusterId                     = 0x0004;
-constexpr uint8_t kAddGroupCommandId              = 0x00;
+constexpr uint16_t kClusterId = 0x0004;
+constexpr uint8_t kAddGroupCommandId = 0x00;
 constexpr uint8_t kAddGroupIfIdentifyingCommandId = 0x05;
-constexpr uint8_t kGetGroupMembershipCommandId    = 0x02;
-constexpr uint8_t kRemoveAllGroupsCommandId       = 0x04;
-constexpr uint8_t kRemoveGroupCommandId           = 0x03;
-constexpr uint8_t kViewGroupCommandId             = 0x01;
+constexpr uint8_t kGetGroupMembershipCommandId = 0x02;
+constexpr uint8_t kRemoveAllGroupsCommandId = 0x04;
+constexpr uint8_t kRemoveGroupCommandId = 0x03;
+constexpr uint8_t kViewGroupCommandId = 0x01;
 
 void HandleAddGroupCommandReceived(chip::TLV::TLVReader & aReader, chip::app::Command * apCommandObj);
 void HandleAddGroupIfIdentifyingCommandReceived(chip::TLV::TLVReader & aReader, chip::app::Command * apCommandObj);
@@ -450,28 +311,11 @@ void HandleRemoveAllGroupsCommandReceived(chip::TLV::TLVReader & aReader, chip::
 void HandleRemoveGroupCommandReceived(chip::TLV::TLVReader & aReader, chip::app::Command * apCommandObj);
 void HandleViewGroupCommandReceived(chip::TLV::TLVReader & aReader, chip::app::Command * apCommandObj);
 
-// The "ZCL" prefix here is used for avoiding duplicate names.
-CHIP_ERROR EncodeAddGroupCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
-                                 const uint16_t groupId, const char * groupName);
-// The "ZCL" prefix here is used for avoiding duplicate names.
-CHIP_ERROR EncodeAddGroupIfIdentifyingCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId,
-                                              chip::GroupId ZCLgroupId, const uint16_t groupId, const char * groupName);
-// The "ZCL" prefix here is used for avoiding duplicate names.
-CHIP_ERROR EncodeGetGroupMembershipCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId,
-                                           chip::GroupId ZCLgroupId, const uint8_t groupCount, const uint16_t groupList);
-// The "ZCL" prefix here is used for avoiding duplicate names.
-CHIP_ERROR EncodeRemoveAllGroupsCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId);
-// The "ZCL" prefix here is used for avoiding duplicate names.
-CHIP_ERROR EncodeRemoveGroupCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
-                                    const uint16_t groupId);
-// The "ZCL" prefix here is used for avoiding duplicate names.
-CHIP_ERROR EncodeViewGroupCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
-                                  const uint16_t groupId);
-
 void InitCluster(chip::app::InteractionModelEngine * ime);
 void ShutdownCluster(chip::app::InteractionModelEngine * ime);
 
 } // namespace Groups
+
 
 namespace IasZone {
 /*----------------------------------------------------------------------------*\
@@ -489,10 +333,12 @@ namespace IasZone {
 \*----------------------------------------------------------------------------*/
 constexpr uint16_t kClusterId = 0x0500;
 
+
 void InitCluster(chip::app::InteractionModelEngine * ime);
 void ShutdownCluster(chip::app::InteractionModelEngine * ime);
 
 } // namespace IasZone
+
 
 namespace Identify {
 /*----------------------------------------------------------------------------*\
@@ -506,23 +352,18 @@ namespace Identify {
 | * IdentifyTime                                                      | 0x0000 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
-constexpr uint16_t kClusterId             = 0x0003;
-constexpr uint8_t kIdentifyCommandId      = 0x00;
+constexpr uint16_t kClusterId = 0x0003;
+constexpr uint8_t kIdentifyCommandId = 0x00;
 constexpr uint8_t kIdentifyQueryCommandId = 0x01;
 
 void HandleIdentifyCommandReceived(chip::TLV::TLVReader & aReader, chip::app::Command * apCommandObj);
 void HandleIdentifyQueryCommandReceived(chip::TLV::TLVReader & aReader, chip::app::Command * apCommandObj);
 
-// The "ZCL" prefix here is used for avoiding duplicate names.
-CHIP_ERROR EncodeIdentifyCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
-                                 const uint16_t identifyTime);
-// The "ZCL" prefix here is used for avoiding duplicate names.
-CHIP_ERROR EncodeIdentifyQueryCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId);
-
 void InitCluster(chip::app::InteractionModelEngine * ime);
 void ShutdownCluster(chip::app::InteractionModelEngine * ime);
 
 } // namespace Identify
+
 
 namespace LevelControl {
 /*----------------------------------------------------------------------------*\
@@ -542,15 +383,15 @@ namespace LevelControl {
 | * CurrentLevel                                                      | 0x0000 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
-constexpr uint16_t kClusterId                    = 0x0008;
-constexpr uint8_t kMoveCommandId                 = 0x01;
-constexpr uint8_t kMoveToLevelCommandId          = 0x00;
+constexpr uint16_t kClusterId = 0x0008;
+constexpr uint8_t kMoveCommandId = 0x01;
+constexpr uint8_t kMoveToLevelCommandId = 0x00;
 constexpr uint8_t kMoveToLevelWithOnOffCommandId = 0x04;
-constexpr uint8_t kMoveWithOnOffCommandId        = 0x05;
-constexpr uint8_t kStepCommandId                 = 0x02;
-constexpr uint8_t kStepWithOnOffCommandId        = 0x06;
-constexpr uint8_t kStopCommandId                 = 0x03;
-constexpr uint8_t kStopWithOnOffCommandId        = 0x07;
+constexpr uint8_t kMoveWithOnOffCommandId = 0x05;
+constexpr uint8_t kStepCommandId = 0x02;
+constexpr uint8_t kStepWithOnOffCommandId = 0x06;
+constexpr uint8_t kStopCommandId = 0x03;
+constexpr uint8_t kStopWithOnOffCommandId = 0x07;
 
 void HandleMoveCommandReceived(chip::TLV::TLVReader & aReader, chip::app::Command * apCommandObj);
 void HandleMoveToLevelCommandReceived(chip::TLV::TLVReader & aReader, chip::app::Command * apCommandObj);
@@ -561,36 +402,11 @@ void HandleStepWithOnOffCommandReceived(chip::TLV::TLVReader & aReader, chip::ap
 void HandleStopCommandReceived(chip::TLV::TLVReader & aReader, chip::app::Command * apCommandObj);
 void HandleStopWithOnOffCommandReceived(chip::TLV::TLVReader & aReader, chip::app::Command * apCommandObj);
 
-// The "ZCL" prefix here is used for avoiding duplicate names.
-CHIP_ERROR EncodeMoveCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
-                             const uint8_t moveMode, const uint8_t rate, const uint8_t optionMask, const uint8_t optionOverride);
-// The "ZCL" prefix here is used for avoiding duplicate names.
-CHIP_ERROR EncodeMoveToLevelCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
-                                    const uint8_t level, const uint16_t transitionTime, const uint8_t optionMask,
-                                    const uint8_t optionOverride);
-// The "ZCL" prefix here is used for avoiding duplicate names.
-CHIP_ERROR EncodeMoveToLevelWithOnOffCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId,
-                                             chip::GroupId ZCLgroupId, const uint8_t level, const uint16_t transitionTime);
-// The "ZCL" prefix here is used for avoiding duplicate names.
-CHIP_ERROR EncodeMoveWithOnOffCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
-                                      const uint8_t moveMode, const uint8_t rate);
-// The "ZCL" prefix here is used for avoiding duplicate names.
-CHIP_ERROR EncodeStepCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
-                             const uint8_t stepMode, const uint8_t stepSize, const uint16_t transitionTime,
-                             const uint8_t optionMask, const uint8_t optionOverride);
-// The "ZCL" prefix here is used for avoiding duplicate names.
-CHIP_ERROR EncodeStepWithOnOffCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
-                                      const uint8_t stepMode, const uint8_t stepSize, const uint16_t transitionTime);
-// The "ZCL" prefix here is used for avoiding duplicate names.
-CHIP_ERROR EncodeStopCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
-                             const uint8_t optionMask, const uint8_t optionOverride);
-// The "ZCL" prefix here is used for avoiding duplicate names.
-CHIP_ERROR EncodeStopWithOnOffCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId);
-
 void InitCluster(chip::app::InteractionModelEngine * ime);
 void ShutdownCluster(chip::app::InteractionModelEngine * ime);
 
 } // namespace LevelControl
+
 
 namespace OnOff {
 /*----------------------------------------------------------------------------*\
@@ -605,26 +421,20 @@ namespace OnOff {
 | * OnOff                                                             | 0x0000 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
-constexpr uint16_t kClusterId      = 0x0006;
-constexpr uint8_t kOffCommandId    = 0x00;
-constexpr uint8_t kOnCommandId     = 0x01;
+constexpr uint16_t kClusterId = 0x0006;
+constexpr uint8_t kOffCommandId = 0x00;
+constexpr uint8_t kOnCommandId = 0x01;
 constexpr uint8_t kToggleCommandId = 0x02;
 
 void HandleOffCommandReceived(chip::TLV::TLVReader & aReader, chip::app::Command * apCommandObj);
 void HandleOnCommandReceived(chip::TLV::TLVReader & aReader, chip::app::Command * apCommandObj);
 void HandleToggleCommandReceived(chip::TLV::TLVReader & aReader, chip::app::Command * apCommandObj);
 
-// The "ZCL" prefix here is used for avoiding duplicate names.
-CHIP_ERROR EncodeOffCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId);
-// The "ZCL" prefix here is used for avoiding duplicate names.
-CHIP_ERROR EncodeOnCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId);
-// The "ZCL" prefix here is used for avoiding duplicate names.
-CHIP_ERROR EncodeToggleCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId);
-
 void InitCluster(chip::app::InteractionModelEngine * ime);
 void ShutdownCluster(chip::app::InteractionModelEngine * ime);
 
 } // namespace OnOff
+
 
 namespace Scenes {
 /*----------------------------------------------------------------------------*\
@@ -647,14 +457,14 @@ namespace Scenes {
 | * NameSupport                                                       | 0x0004 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
-constexpr uint16_t kClusterId                  = 0x0005;
-constexpr uint8_t kAddSceneCommandId           = 0x00;
+constexpr uint16_t kClusterId = 0x0005;
+constexpr uint8_t kAddSceneCommandId = 0x00;
 constexpr uint8_t kGetSceneMembershipCommandId = 0x06;
-constexpr uint8_t kRecallSceneCommandId        = 0x05;
-constexpr uint8_t kRemoveAllScenesCommandId    = 0x03;
-constexpr uint8_t kRemoveSceneCommandId        = 0x02;
-constexpr uint8_t kStoreSceneCommandId         = 0x04;
-constexpr uint8_t kViewSceneCommandId          = 0x01;
+constexpr uint8_t kRecallSceneCommandId = 0x05;
+constexpr uint8_t kRemoveAllScenesCommandId = 0x03;
+constexpr uint8_t kRemoveSceneCommandId = 0x02;
+constexpr uint8_t kStoreSceneCommandId = 0x04;
+constexpr uint8_t kViewSceneCommandId = 0x01;
 
 void HandleAddSceneCommandReceived(chip::TLV::TLVReader & aReader, chip::app::Command * apCommandObj);
 void HandleGetSceneMembershipCommandReceived(chip::TLV::TLVReader & aReader, chip::app::Command * apCommandObj);
@@ -664,34 +474,11 @@ void HandleRemoveSceneCommandReceived(chip::TLV::TLVReader & aReader, chip::app:
 void HandleStoreSceneCommandReceived(chip::TLV::TLVReader & aReader, chip::app::Command * apCommandObj);
 void HandleViewSceneCommandReceived(chip::TLV::TLVReader & aReader, chip::app::Command * apCommandObj);
 
-// The "ZCL" prefix here is used for avoiding duplicate names.
-CHIP_ERROR EncodeAddSceneCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
-                                 const uint16_t groupId, const uint8_t sceneId, const uint16_t transitionTime,
-                                 const char * sceneName, const chip::ClusterId clusterId, const uint8_t length,
-                                 const uint8_t value);
-// The "ZCL" prefix here is used for avoiding duplicate names.
-CHIP_ERROR EncodeGetSceneMembershipCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId,
-                                           chip::GroupId ZCLgroupId, const uint16_t groupId);
-// The "ZCL" prefix here is used for avoiding duplicate names.
-CHIP_ERROR EncodeRecallSceneCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
-                                    const uint16_t groupId, const uint8_t sceneId, const uint16_t transitionTime);
-// The "ZCL" prefix here is used for avoiding duplicate names.
-CHIP_ERROR EncodeRemoveAllScenesCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
-                                        const uint16_t groupId);
-// The "ZCL" prefix here is used for avoiding duplicate names.
-CHIP_ERROR EncodeRemoveSceneCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
-                                    const uint16_t groupId, const uint8_t sceneId);
-// The "ZCL" prefix here is used for avoiding duplicate names.
-CHIP_ERROR EncodeStoreSceneCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
-                                   const uint16_t groupId, const uint8_t sceneId);
-// The "ZCL" prefix here is used for avoiding duplicate names.
-CHIP_ERROR EncodeViewSceneCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
-                                  const uint16_t groupId, const uint8_t sceneId);
-
 void InitCluster(chip::app::InteractionModelEngine * ime);
 void ShutdownCluster(chip::app::InteractionModelEngine * ime);
 
 } // namespace Scenes
+
 
 namespace TemperatureMeasurement {
 /*----------------------------------------------------------------------------*\
@@ -707,10 +494,12 @@ namespace TemperatureMeasurement {
 \*----------------------------------------------------------------------------*/
 constexpr uint16_t kClusterId = 0x0402;
 
+
 void InitCluster(chip::app::InteractionModelEngine * ime);
 void ShutdownCluster(chip::app::InteractionModelEngine * ime);
 
 } // namespace TemperatureMeasurement
+
 
 void InitClusters(chip::app::InteractionModelEngine * ime);
 void ShutdownClusters(chip::app::InteractionModelEngine * ime);

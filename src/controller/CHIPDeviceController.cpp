@@ -131,9 +131,12 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, PersistentStorageDelegat
         mStorageDelegate->SetDelegate(this);
     }
 
-    mTransportMgr    = chip::Platform::New<DeviceTransportMgr>();
-    mSessionManager  = chip::Platform::New<SecureSessionMgr>();
+    mTransportMgr   = chip::Platform::New<DeviceTransportMgr>();
+    mSessionManager = chip::Platform::New<SecureSessionMgr>();
+
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
     mExchangeManager = chip::Platform::New<Messaging::ExchangeManager>();
+#endif
 
     err = mTransportMgr->Init(
         Transport::UdpListenParameters(mInetLayer).SetAddressType(Inet::kIPAddressType_IPv6).SetListenPort(mListenPort)
