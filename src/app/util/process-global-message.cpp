@@ -58,6 +58,8 @@
 #include "app/framework/plugin/comms-hub-function-sub-ghz/comms-hub-function-sub-ghz.h"
 #endif
 
+#include <support/CodeUtils.h>
+
 using namespace chip;
 
 // flag to keep track of the fact that we just sent a read attr for time and
@@ -295,6 +297,7 @@ bool emAfProcessGlobalCommand(EmberAfClusterCommand * cmd)
         // Reset message back to start
         msgIndex          = cmd->payloadStartIndex;
         appResponseLength = (cmd->mfgSpecific ? 4 : 2);
+        FALLTHROUGH;
         /* fall through */
     // DO NOT BREAK from this case
 
