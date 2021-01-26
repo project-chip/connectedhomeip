@@ -73,6 +73,7 @@ echo gn args "$CHIP_ROOT/out/custom"
 echo ninja -C "$CHIP_ROOT/out/custom"
 
 extra_args=""
+user_args=""
 
 for arg; do
     case $arg in
@@ -80,7 +81,7 @@ for arg; do
             qpg6100_enabled=1
             ;;
     esac
-    extra_args+=" $arg"
+    user_args+=" $arg"
 done
 
 # Android SDK setup
@@ -136,8 +137,8 @@ echo
 
 _chip_banner "Build: GN configure"
 
-gn --root="$CHIP_ROOT" gen --check --fail-on-unused-args "$CHIP_ROOT/out/debug" --args='target_os="all"'"$extra_args"
-gn --root="$CHIP_ROOT" gen --check --fail-on-unused-args "$CHIP_ROOT/out/release" --args='target_os="all" is_debug=false'"$extra_args"
+gn --root="$CHIP_ROOT" gen --check --fail-on-unused-args "$CHIP_ROOT/out/debug" --args='target_os="all"'"$extra_args$user_args"
+gn --root="$CHIP_ROOT" gen --check --fail-on-unused-args "$CHIP_ROOT/out/release" --args='target_os="all" is_debug=false'"$extra_arg$user_args"
 
 _chip_banner "Build: Ninja build"
 
