@@ -46,7 +46,7 @@ namespace chip {
  * - Assuming epoch is 100 via LifetimePersistedCounter::Init(_, 100) and GetValue +
  *   AdvanceValue is called, we get the following outputs:
  *
- *   - Output: 0, 1, 2, 3, 4  <factory resets>
+ *   - Output: 0, 1, 2, 3, 4
  *
  */
 class LifetimePersistedCounter : public MonotonicallyIncreasingCounter
