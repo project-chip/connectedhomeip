@@ -82,8 +82,8 @@ static_library("app") {
     "MessageDef/StatusElement.h",
     "decoder.cpp",
     "encoder.cpp",
-    "im-encoder.cpp",
-    "im-encoder.h",
+    "im-handler.cpp",
+    "im-handler.h",
   ]
 
   public_deps = [

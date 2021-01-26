@@ -170,7 +170,9 @@ CHIP_ERROR InitMdns()
 #endif
 
 DemoTransportMgr gTransports;
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
 Messaging::ExchangeManager gExchange;
+#endif
 SecureSessionMgr gSessions;
 ServerCallback gCallbacks;
 SecurePairingUsingTestSecret gTestPairing;

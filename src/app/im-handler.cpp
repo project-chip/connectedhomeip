@@ -15,11 +15,13 @@
  *    limitations under the License.
  */
 
-#include "im-encoder.h"
+#include "im-handler.h"
 
 #include <app/CommandHandler.h>
 #include <app/CommandSender.h>
 #include <app/InteractionModelEngine.h>
+
+#include <support/ReturnMacros.h>
 
 namespace chip {
 namespace app {

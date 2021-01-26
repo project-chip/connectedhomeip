@@ -23,7 +23,7 @@
 #include "gen/attribute-id.h"
 #include "gen/cluster-id.h"
 #include <app/chip-zcl-zpro-codec.h>
-#include <app/im-encoder.h>
+#include <app/im-handler.h>
 #include <app/util/af-types.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/util.h>

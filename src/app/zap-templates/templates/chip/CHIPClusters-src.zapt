@@ -2,7 +2,7 @@
 #include "CHIPClusters.h"
 
 #include <app/chip-zcl-zpro-codec-api.h>
-#include <app/im-encoder.h>
+#include <app/im-handler.h>
 #include <support/ReturnMacros.h>
 
 namespace chip {

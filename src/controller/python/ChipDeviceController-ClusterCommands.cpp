@@ -19,7 +19,7 @@
 
 #include <app/CommandSender.h>
 #include <app/InteractionModelEngine.h>
-#include <app/im-encoder.h>
+#include <app/im-handler.h>
 #include <support/ReturnMacros.h>
 
 #include <controller/CHIPClusters.h>
