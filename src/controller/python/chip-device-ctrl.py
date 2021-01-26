@@ -373,6 +373,7 @@ class DeviceMgrCmd(Cmd):
         """
         connect -ip <ip address> <setup pin code>
         connect -ble <setup pin code>
+        connect -ble <discriminator> <setup pin code>
 
         connect command is used for establishing a rendezvous session to the device.
         currently, only connect using setupPinCode is supported.
@@ -391,6 +392,8 @@ class DeviceMgrCmd(Cmd):
                 self.devCtrl.ConnectIP(args[1].encode("utf-8"), int(args[2]))
             elif args[0] == "-ble" and len(args) == 2:
                 self.devCtrl.Connect(FAKE_CONN_OBJ_VALUE, int(args[1]))
+            elif args[0] == "-ble" and len(args) == 3:
+                self.devCtrl.ConnectBLE(int(args[1]), int(args[2]))
             else:
                 print("Usage:")
                 self.do_help("connect SetupPinCode")

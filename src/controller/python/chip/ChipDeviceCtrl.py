@@ -39,14 +39,6 @@ __all__ = ["ChipDeviceController"]
 
 _CompleteFunct = CFUNCTYPE(None, c_void_p, c_void_p)
 _ErrorFunct = CFUNCTYPE(None, c_void_p, c_void_p, c_ulong, POINTER(DeviceStatusStruct))
-_GetBleEventFunct = CFUNCTYPE(c_void_p)
-_WriteBleCharacteristicFunct = CFUNCTYPE(
-    c_bool, c_void_p, c_void_p, c_void_p, c_void_p, c_uint16
-)
-_SubscribeBleCharacteristicFunct = CFUNCTYPE(
-    c_bool, c_void_p, c_void_p, c_void_p, c_bool
-)
-_CloseBleFunct = CFUNCTYPE(c_bool, c_void_p)
 
 # typedef void (*OnConnectFunct)(Chip::DeviceController::hipDeviceController * dc,
 #                                const chip::Transport::PeerConnectionState * state, void * appReqState);
@@ -83,8 +75,6 @@ class ChipDeviceController(object):
     def __init__(self, startNetworkThread=True):
         self.state = DCState.NOT_INITIALIZED
         self.devCtrl = None
-        self.networkThread = None
-        self.networkThreadRunable = False
         self._ChipStack = ChipStack()
         self._dmLib = None
 
@@ -108,16 +98,6 @@ class ChipDeviceController(object):
         self.pairingDelegate = pairingDelegate
         self._ChipStack.devCtrl = devCtrl
 
-        # set by other modules(BLE) that require service by thread while thread blocks.
-        self.blockingCB = None
-        self.cbHandleBleEvent = (
-            # set by other modules (BLE) that provide event callback to Chip.
-            None
-        )
-        self.cbHandleBleWriteChar = None
-        self.cbHandleBleSubscribeChar = None
-        self.cbHandleBleClose = None
-
         def DeviceCtrlHandleMessage(appReqState, buffer):
             pass
 
@@ -133,62 +113,12 @@ class ChipDeviceController(object):
 
         self.cbHandleRendezvousError = _OnRendezvousErrorFunct(HandleRendezvousError)
 
-        if startNetworkThread:
-            self.StartNetworkThread()
         self.state = DCState.IDLE
 
     def __del__(self):
         if self.devCtrl != None:
-            self._dmLib.nl_Chip_DeviceController_DeleteDeviceManager(self.devCtrl)
+            self._dmLib.nl_Chip_DeviceController_DeleteDeviceController(self.devCtrl)
             self.devCtrl = None
-
-    def DriveBleIO(self):
-        # perform asynchronous write to pipe in IO thread's select() to wake for BLE input
-        res = self._dmLib.nl_Chip_DeviceController_WakeForBleIO()
-        if res != 0:
-            raise self._ChipStack.ErrorToException(res)
-
-    def SetBleEventCB(self, bleEventCB):
-        if self.devCtrl != None:
-            self.cbHandleBleEvent = _GetBleEventFunct(bleEventCB)
-            self._dmLib.nl_Chip_DeviceController_SetBleEventCB(self.cbHandleBleEvent)
-
-    def SetBleWriteCharCB(self, bleWriteCharCB):
-        if self.devCtrl != None:
-            self.cbHandleBleWriteChar = _WriteBleCharacteristicFunct(bleWriteCharCB)
-            self._dmLib.nl_Chip_DeviceController_SetBleWriteCharacteristic(
-                self.cbHandleBleWriteChar
-            )
-
-    def SetBleSubscribeCharCB(self, bleSubscribeCharCB):
-        if self.devCtrl != None:
-            self.cbHandleBleSubscribeChar = _SubscribeBleCharacteristicFunct(
-                bleSubscribeCharCB
-            )
-            self._dmLib.nl_Chip_DeviceController_SetBleSubscribeCharacteristic(
-                self.cbHandleBleSubscribeChar
-            )
-
-    def SetBleCloseCB(self, bleCloseCB):
-        if self.devCtrl != None:
-            self.cbHandleBleClose = _CloseBleFunct(bleCloseCB)
-            self._dmLib.nl_Chip_DeviceController_SetBleClose(self.cbHandleBleClose)
-
-    def StartNetworkThread(self):
-        if self.networkThread != None:
-            return
-
-        def RunNetworkThread():
-            while self.networkThreadRunable:
-                self._ChipStack.networkLock.acquire()
-                self._dmLib.nl_Chip_DeviceController_DriveIO(50)
-                self._ChipStack.networkLock.release()
-                time.sleep(0.005)
-
-        self.networkThread = Thread(target=RunNetworkThread, name="ChipNetworkThread")
-        self.networkThread.daemon = True
-        self.networkThreadRunable = True
-        self.networkThread.start()
 
     def IsConnected(self):
         return self._ChipStack.Call(
@@ -205,9 +135,9 @@ class ChipDeviceController(object):
             )
         )
 
-    def Connect(self, connObj, setupPinCode):
+    def ConnectBLE(self, discriminator, setupPinCode):
         def HandleComplete(dc, connState, appState):
-            print("Rendezvous Complete")
+            print("Rendezvous Initialized")
             self.state = DCState.RENDEZVOUS_CONNECTED
             self._ChipStack.callbackRes = True
             self._ChipStack.completeEvent.set()
@@ -215,13 +145,13 @@ class ChipDeviceController(object):
 
         self.state = DCState.RENDEZVOUS_ONGOING
         return self._ChipStack.CallAsync(
-            lambda: self._dmLib.nl_Chip_DeviceController_Connect(
-                self.devCtrl, connObj, setupPinCode, onConnectFunct, self.cbHandleMessage, self.cbHandleRendezvousError)
+            lambda: self._dmLib.nl_Chip_DeviceController_ConnectBLE(
+                self.devCtrl, discriminator, setupPinCode, onConnectFunct, self.cbHandleMessage, self.cbHandleRendezvousError)
         )
 
     def ConnectIP(self, ipaddr, setupPinCode):
         def HandleComplete(dc, connState, appState):
-            print("Rendezvous Complete")
+            print("Rendezvous Initialized")
             self.state = DCState.RENDEZVOUS_CONNECTED
             self._ChipStack.callbackRes = True
             self._ChipStack.completeEvent.set()
@@ -279,54 +209,9 @@ class ChipDeviceController(object):
             self._dmLib.nl_Chip_DeviceController_Close.argtypes = [c_void_p]
             self._dmLib.nl_Chip_DeviceController_Close.restype = None
 
-            self._dmLib.nl_Chip_DeviceController_DriveIO.argtypes = [c_uint32]
-            self._dmLib.nl_Chip_DeviceController_DriveIO.restype = c_uint32
-
-            self._dmLib.nl_Chip_DeviceController_WakeForBleIO.argtypes = []
-            self._dmLib.nl_Chip_DeviceController_WakeForBleIO.restype = c_uint32
-
-            self._dmLib.nl_Chip_DeviceController_SetBleEventCB.argtypes = [
-                _GetBleEventFunct
-            ]
-            self._dmLib.nl_Chip_DeviceController_SetBleEventCB.restype = c_uint32
-
-            self._dmLib.nl_Chip_DeviceController_SetBleWriteCharacteristic.argtypes = [
-                _WriteBleCharacteristicFunct
-            ]
-            self._dmLib.nl_Chip_DeviceController_SetBleWriteCharacteristic.restype = (
-                c_uint32
-            )
-
-            self._dmLib.nl_Chip_DeviceController_SetBleSubscribeCharacteristic.argtypes = [
-                _SubscribeBleCharacteristicFunct
-            ]
-            self._dmLib.nl_Chip_DeviceController_SetBleSubscribeCharacteristic.restype = (
-                c_uint32
-            )
-
-            self._dmLib.nl_Chip_DeviceController_SetBleClose.argtypes = [_CloseBleFunct]
-            self._dmLib.nl_Chip_DeviceController_SetBleClose.restype = c_uint32
-
-            self._dmLib.nl_Chip_DeviceController_IsConnected.argtypes = [c_void_p]
-            self._dmLib.nl_Chip_DeviceController_IsConnected.restype = c_bool
-
-            self._dmLib.nl_Chip_DeviceController_ValidateBTP.argtypes = [
-                c_void_p,
-                c_void_p,
-                _CompleteFunct,
-                _ErrorFunct,
-            ]
-            self._dmLib.nl_Chip_DeviceController_ValidateBTP.restype = c_uint32
-
-            self._dmLib.nl_Chip_DeviceController_GetLogFilter.argtypes = []
-            self._dmLib.nl_Chip_DeviceController_GetLogFilter.restype = c_uint8
-
-            self._dmLib.nl_Chip_DeviceController_SetLogFilter.argtypes = [c_uint8]
-            self._dmLib.nl_Chip_DeviceController_SetLogFilter.restype = None
-
-            self._dmLib.nl_Chip_DeviceController_Connect.argtypes = [
-                c_void_p, c_void_p, c_uint32, _OnConnectFunct, _OnMessageFunct, _OnRendezvousErrorFunct]
-            self._dmLib.nl_Chip_DeviceController_Connect.restype = c_uint32
+            self._dmLib.nl_Chip_DeviceController_ConnectBLE.argtypes = [
+                c_void_p, c_uint16, c_uint32, _OnConnectFunct, _OnMessageFunct, _OnRendezvousErrorFunct]
+            self._dmLib.nl_Chip_DeviceController_ConnectBLE.restype = c_uint32
 
             self._dmLib.nl_Chip_DeviceController_ConnectIP.argtypes = [
                 c_void_p, c_char_p, c_uint32, _OnConnectFunct, _OnMessageFunct, _OnRendezvousErrorFunct]

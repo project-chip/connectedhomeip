@@ -36,10 +36,6 @@ shared_library("ChipDeviceCtrl") {
   include_dirs = [ "." ]
 
   sources = [
-    "ChipDeviceController-BleApplicationDelegate.cpp",
-    "ChipDeviceController-BleApplicationDelegate.h",
-    "ChipDeviceController-BlePlatformDelegate.cpp",
-    "ChipDeviceController-BlePlatformDelegate.h",
     "ChipDeviceController-ScriptBinding.cpp",
     "ChipDeviceController-ScriptDevicePairingDelegate.cpp",
     "ChipDeviceController-ScriptDevicePairingDelegate.h",

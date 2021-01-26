@@ -820,28 +820,9 @@ class BluezManager(ChipBleBase):
         self.devMgr = devMgr
         self.devMgr.SetBlockingCB(self.devMgrCB)
 
-        def HandleBleEventCB():
-            return self.GetBleEvent()
-
-        def HandleBleWriteCharCB(connObj, svcId, charId, buffer, length):
-            return self.WriteBleCharacteristic(connObj, svcId, charId, buffer, length)
-
-        def HandleBleSubscribeCB(connObj, svcId, charId, subscribe):
-            return self.SubscribeBleCharacteristic(connObj, svcId, charId, subscribe)
-
-        def HandleBleCloseCB(connObj):
-            return self.CloseBle(connObj)
-
-        self.devMgr.SetBleEventCB(HandleBleEventCB)
-        self.devMgr.SetBleWriteCharCB(HandleBleWriteCharCB)
-        self.devMgr.SetBleSubscribeCharCB(HandleBleSubscribeCB)
-        self.devMgr.SetBleCloseCB(HandleBleCloseCB)
-
     def __del__(self):
         self.disconnect()
         self.setInputHook(self.orig_input_hook)
-        self.devMgr.SetBlockingCB(None)
-        self.devMgr.SetBleEventCB(None)
 
     def ble_adapter_select(self, identifier=None):
         if self.adapter:

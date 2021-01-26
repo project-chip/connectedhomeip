@@ -25,6 +25,7 @@
 #include <transport/BLE.h>
 
 #include <support/CodeUtils.h>
+#include <support/ReturnMacros.h>
 #include <support/logging/CHIPLogging.h>
 #include <transport/raw/MessageHeader.h>
 
@@ -163,6 +164,9 @@ void BLE::OnBleConnectionComplete(void * appState, BLE_CONNECTION_OBJECT connObj
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     BLE * ble      = reinterpret_cast<BLE *>(appState);
+
+    // We have already setup the ble endpoint for the same object, this should not happen, but we can tolerate it.
+    VerifyOrReturn(ble->mBleEndPoint == nullptr || !ble->mBleEndPoint->ConnectionObjectIs(connObj));
 
     err = ble->InitInternal(connObj);
     SuccessOrExit(err);
