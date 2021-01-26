@@ -36,7 +36,7 @@ LifetimePersistedCounter::Init(const chip::Platform::PersistedStorage::Key aId)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Store the ID.
-    mId    = aId;
+    mId = aId;
     uint32_t startValue;
 
     // Read our previously-stored starting value.
