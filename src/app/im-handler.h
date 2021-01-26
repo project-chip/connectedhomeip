@@ -28,7 +28,6 @@ namespace chip {
 namespace app {
 namespace cluster {
 
-
 namespace BarrierControl {
 /*----------------------------------------------------------------------------*\
 | Cluster BarrierControl                                              | 0x0103 |
@@ -44,9 +43,9 @@ namespace BarrierControl {
 | * BarrierPosition                                                   | 0x000A |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
-constexpr uint16_t kClusterId = 0x0103;
+constexpr uint16_t kClusterId                         = 0x0103;
 constexpr uint8_t kBarrierControlGoToPercentCommandId = 0x00;
-constexpr uint8_t kBarrierControlStopCommandId = 0x01;
+constexpr uint8_t kBarrierControlStopCommandId        = 0x01;
 
 void HandleBarrierControlGoToPercentCommandReceived(chip::TLV::TLVReader & aReader, chip::app::Command * apCommandObj);
 void HandleBarrierControlStopCommandReceived(chip::TLV::TLVReader & aReader, chip::app::Command * apCommandObj);
@@ -55,7 +54,6 @@ void InitCluster(chip::app::InteractionModelEngine * ime);
 void ShutdownCluster(chip::app::InteractionModelEngine * ime);
 
 } // namespace BarrierControl
-
 
 namespace Basic {
 /*----------------------------------------------------------------------------*\
@@ -69,7 +67,7 @@ namespace Basic {
 | * PowerSource                                                       | 0x0007 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
-constexpr uint16_t kClusterId = 0x0000;
+constexpr uint16_t kClusterId                      = 0x0000;
 constexpr uint8_t kResetToFactoryDefaultsCommandId = 0x00;
 
 void HandleResetToFactoryDefaultsCommandReceived(chip::TLV::TLVReader & aReader, chip::app::Command * apCommandObj);
@@ -78,7 +76,6 @@ void InitCluster(chip::app::InteractionModelEngine * ime);
 void ShutdownCluster(chip::app::InteractionModelEngine * ime);
 
 } // namespace Basic
-
 
 namespace ColorControl {
 /*----------------------------------------------------------------------------*\
@@ -153,21 +150,21 @@ namespace ColorControl {
 | * StartUpColorTemperatureMireds                                     | 0x4010 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
-constexpr uint16_t kClusterId = 0x0300;
-constexpr uint8_t kMoveColorCommandId = 0x08;
-constexpr uint8_t kMoveColorTemperatureCommandId = 0x4B;
-constexpr uint8_t kMoveHueCommandId = 0x01;
-constexpr uint8_t kMoveSaturationCommandId = 0x04;
-constexpr uint8_t kMoveToColorCommandId = 0x07;
+constexpr uint16_t kClusterId                      = 0x0300;
+constexpr uint8_t kMoveColorCommandId              = 0x08;
+constexpr uint8_t kMoveColorTemperatureCommandId   = 0x4B;
+constexpr uint8_t kMoveHueCommandId                = 0x01;
+constexpr uint8_t kMoveSaturationCommandId         = 0x04;
+constexpr uint8_t kMoveToColorCommandId            = 0x07;
 constexpr uint8_t kMoveToColorTemperatureCommandId = 0x0A;
-constexpr uint8_t kMoveToHueCommandId = 0x00;
+constexpr uint8_t kMoveToHueCommandId              = 0x00;
 constexpr uint8_t kMoveToHueAndSaturationCommandId = 0x06;
-constexpr uint8_t kMoveToSaturationCommandId = 0x03;
-constexpr uint8_t kStepColorCommandId = 0x09;
-constexpr uint8_t kStepColorTemperatureCommandId = 0x4C;
-constexpr uint8_t kStepHueCommandId = 0x02;
-constexpr uint8_t kStepSaturationCommandId = 0x05;
-constexpr uint8_t kStopMoveStepCommandId = 0x47;
+constexpr uint8_t kMoveToSaturationCommandId       = 0x03;
+constexpr uint8_t kStepColorCommandId              = 0x09;
+constexpr uint8_t kStepColorTemperatureCommandId   = 0x4C;
+constexpr uint8_t kStepHueCommandId                = 0x02;
+constexpr uint8_t kStepSaturationCommandId         = 0x05;
+constexpr uint8_t kStopMoveStepCommandId           = 0x47;
 
 void HandleMoveColorCommandReceived(chip::TLV::TLVReader & aReader, chip::app::Command * apCommandObj);
 void HandleMoveColorTemperatureCommandReceived(chip::TLV::TLVReader & aReader, chip::app::Command * apCommandObj);
@@ -188,7 +185,6 @@ void InitCluster(chip::app::InteractionModelEngine * ime);
 void ShutdownCluster(chip::app::InteractionModelEngine * ime);
 
 } // namespace ColorControl
-
 
 namespace DoorLock {
 /*----------------------------------------------------------------------------*\
@@ -225,30 +221,30 @@ namespace DoorLock {
 | * ActuatorEnabled                                                   | 0x0002 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
-constexpr uint16_t kClusterId = 0x0101;
-constexpr uint8_t kClearAllPinsCommandId = 0x08;
-constexpr uint8_t kClearAllRfidsCommandId = 0x19;
+constexpr uint16_t kClusterId                    = 0x0101;
+constexpr uint8_t kClearAllPinsCommandId         = 0x08;
+constexpr uint8_t kClearAllRfidsCommandId        = 0x19;
 constexpr uint8_t kClearHolidayScheduleCommandId = 0x13;
-constexpr uint8_t kClearPinCommandId = 0x07;
-constexpr uint8_t kClearRfidCommandId = 0x18;
+constexpr uint8_t kClearPinCommandId             = 0x07;
+constexpr uint8_t kClearRfidCommandId            = 0x18;
 constexpr uint8_t kClearWeekdayScheduleCommandId = 0x0D;
 constexpr uint8_t kClearYeardayScheduleCommandId = 0x10;
-constexpr uint8_t kGetHolidayScheduleCommandId = 0x12;
-constexpr uint8_t kGetLogRecordCommandId = 0x04;
-constexpr uint8_t kGetPinCommandId = 0x06;
-constexpr uint8_t kGetRfidCommandId = 0x17;
-constexpr uint8_t kGetUserTypeCommandId = 0x15;
-constexpr uint8_t kGetWeekdayScheduleCommandId = 0x0C;
-constexpr uint8_t kGetYeardayScheduleCommandId = 0x0F;
-constexpr uint8_t kLockDoorCommandId = 0x00;
-constexpr uint8_t kSetHolidayScheduleCommandId = 0x11;
-constexpr uint8_t kSetPinCommandId = 0x05;
-constexpr uint8_t kSetRfidCommandId = 0x16;
-constexpr uint8_t kSetUserTypeCommandId = 0x14;
-constexpr uint8_t kSetWeekdayScheduleCommandId = 0x0B;
-constexpr uint8_t kSetYeardayScheduleCommandId = 0x0E;
-constexpr uint8_t kUnlockDoorCommandId = 0x01;
-constexpr uint8_t kUnlockWithTimeoutCommandId = 0x03;
+constexpr uint8_t kGetHolidayScheduleCommandId   = 0x12;
+constexpr uint8_t kGetLogRecordCommandId         = 0x04;
+constexpr uint8_t kGetPinCommandId               = 0x06;
+constexpr uint8_t kGetRfidCommandId              = 0x17;
+constexpr uint8_t kGetUserTypeCommandId          = 0x15;
+constexpr uint8_t kGetWeekdayScheduleCommandId   = 0x0C;
+constexpr uint8_t kGetYeardayScheduleCommandId   = 0x0F;
+constexpr uint8_t kLockDoorCommandId             = 0x00;
+constexpr uint8_t kSetHolidayScheduleCommandId   = 0x11;
+constexpr uint8_t kSetPinCommandId               = 0x05;
+constexpr uint8_t kSetRfidCommandId              = 0x16;
+constexpr uint8_t kSetUserTypeCommandId          = 0x14;
+constexpr uint8_t kSetWeekdayScheduleCommandId   = 0x0B;
+constexpr uint8_t kSetYeardayScheduleCommandId   = 0x0E;
+constexpr uint8_t kUnlockDoorCommandId           = 0x01;
+constexpr uint8_t kUnlockWithTimeoutCommandId    = 0x03;
 
 void HandleClearAllPinsCommandReceived(chip::TLV::TLVReader & aReader, chip::app::Command * apCommandObj);
 void HandleClearAllRfidsCommandReceived(chip::TLV::TLVReader & aReader, chip::app::Command * apCommandObj);
@@ -279,7 +275,6 @@ void ShutdownCluster(chip::app::InteractionModelEngine * ime);
 
 } // namespace DoorLock
 
-
 namespace Groups {
 /*----------------------------------------------------------------------------*\
 | Cluster Groups                                                      | 0x0004 |
@@ -296,13 +291,13 @@ namespace Groups {
 | * NameSupport                                                       | 0x0000 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
-constexpr uint16_t kClusterId = 0x0004;
-constexpr uint8_t kAddGroupCommandId = 0x00;
+constexpr uint16_t kClusterId                     = 0x0004;
+constexpr uint8_t kAddGroupCommandId              = 0x00;
 constexpr uint8_t kAddGroupIfIdentifyingCommandId = 0x05;
-constexpr uint8_t kGetGroupMembershipCommandId = 0x02;
-constexpr uint8_t kRemoveAllGroupsCommandId = 0x04;
-constexpr uint8_t kRemoveGroupCommandId = 0x03;
-constexpr uint8_t kViewGroupCommandId = 0x01;
+constexpr uint8_t kGetGroupMembershipCommandId    = 0x02;
+constexpr uint8_t kRemoveAllGroupsCommandId       = 0x04;
+constexpr uint8_t kRemoveGroupCommandId           = 0x03;
+constexpr uint8_t kViewGroupCommandId             = 0x01;
 
 void HandleAddGroupCommandReceived(chip::TLV::TLVReader & aReader, chip::app::Command * apCommandObj);
 void HandleAddGroupIfIdentifyingCommandReceived(chip::TLV::TLVReader & aReader, chip::app::Command * apCommandObj);
@@ -315,7 +310,6 @@ void InitCluster(chip::app::InteractionModelEngine * ime);
 void ShutdownCluster(chip::app::InteractionModelEngine * ime);
 
 } // namespace Groups
-
 
 namespace IasZone {
 /*----------------------------------------------------------------------------*\
@@ -333,12 +327,10 @@ namespace IasZone {
 \*----------------------------------------------------------------------------*/
 constexpr uint16_t kClusterId = 0x0500;
 
-
 void InitCluster(chip::app::InteractionModelEngine * ime);
 void ShutdownCluster(chip::app::InteractionModelEngine * ime);
 
 } // namespace IasZone
-
 
 namespace Identify {
 /*----------------------------------------------------------------------------*\
@@ -352,8 +344,8 @@ namespace Identify {
 | * IdentifyTime                                                      | 0x0000 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
-constexpr uint16_t kClusterId = 0x0003;
-constexpr uint8_t kIdentifyCommandId = 0x00;
+constexpr uint16_t kClusterId             = 0x0003;
+constexpr uint8_t kIdentifyCommandId      = 0x00;
 constexpr uint8_t kIdentifyQueryCommandId = 0x01;
 
 void HandleIdentifyCommandReceived(chip::TLV::TLVReader & aReader, chip::app::Command * apCommandObj);
@@ -363,7 +355,6 @@ void InitCluster(chip::app::InteractionModelEngine * ime);
 void ShutdownCluster(chip::app::InteractionModelEngine * ime);
 
 } // namespace Identify
-
 
 namespace LevelControl {
 /*----------------------------------------------------------------------------*\
@@ -383,15 +374,15 @@ namespace LevelControl {
 | * CurrentLevel                                                      | 0x0000 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
-constexpr uint16_t kClusterId = 0x0008;
-constexpr uint8_t kMoveCommandId = 0x01;
-constexpr uint8_t kMoveToLevelCommandId = 0x00;
+constexpr uint16_t kClusterId                    = 0x0008;
+constexpr uint8_t kMoveCommandId                 = 0x01;
+constexpr uint8_t kMoveToLevelCommandId          = 0x00;
 constexpr uint8_t kMoveToLevelWithOnOffCommandId = 0x04;
-constexpr uint8_t kMoveWithOnOffCommandId = 0x05;
-constexpr uint8_t kStepCommandId = 0x02;
-constexpr uint8_t kStepWithOnOffCommandId = 0x06;
-constexpr uint8_t kStopCommandId = 0x03;
-constexpr uint8_t kStopWithOnOffCommandId = 0x07;
+constexpr uint8_t kMoveWithOnOffCommandId        = 0x05;
+constexpr uint8_t kStepCommandId                 = 0x02;
+constexpr uint8_t kStepWithOnOffCommandId        = 0x06;
+constexpr uint8_t kStopCommandId                 = 0x03;
+constexpr uint8_t kStopWithOnOffCommandId        = 0x07;
 
 void HandleMoveCommandReceived(chip::TLV::TLVReader & aReader, chip::app::Command * apCommandObj);
 void HandleMoveToLevelCommandReceived(chip::TLV::TLVReader & aReader, chip::app::Command * apCommandObj);
@@ -407,7 +398,6 @@ void ShutdownCluster(chip::app::InteractionModelEngine * ime);
 
 } // namespace LevelControl
 
-
 namespace OnOff {
 /*----------------------------------------------------------------------------*\
 | Cluster OnOff                                                       | 0x0006 |
@@ -421,9 +411,9 @@ namespace OnOff {
 | * OnOff                                                             | 0x0000 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
-constexpr uint16_t kClusterId = 0x0006;
-constexpr uint8_t kOffCommandId = 0x00;
-constexpr uint8_t kOnCommandId = 0x01;
+constexpr uint16_t kClusterId      = 0x0006;
+constexpr uint8_t kOffCommandId    = 0x00;
+constexpr uint8_t kOnCommandId     = 0x01;
 constexpr uint8_t kToggleCommandId = 0x02;
 
 void HandleOffCommandReceived(chip::TLV::TLVReader & aReader, chip::app::Command * apCommandObj);
@@ -434,7 +424,6 @@ void InitCluster(chip::app::InteractionModelEngine * ime);
 void ShutdownCluster(chip::app::InteractionModelEngine * ime);
 
 } // namespace OnOff
-
 
 namespace Scenes {
 /*----------------------------------------------------------------------------*\
@@ -457,14 +446,14 @@ namespace Scenes {
 | * NameSupport                                                       | 0x0004 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
-constexpr uint16_t kClusterId = 0x0005;
-constexpr uint8_t kAddSceneCommandId = 0x00;
+constexpr uint16_t kClusterId                  = 0x0005;
+constexpr uint8_t kAddSceneCommandId           = 0x00;
 constexpr uint8_t kGetSceneMembershipCommandId = 0x06;
-constexpr uint8_t kRecallSceneCommandId = 0x05;
-constexpr uint8_t kRemoveAllScenesCommandId = 0x03;
-constexpr uint8_t kRemoveSceneCommandId = 0x02;
-constexpr uint8_t kStoreSceneCommandId = 0x04;
-constexpr uint8_t kViewSceneCommandId = 0x01;
+constexpr uint8_t kRecallSceneCommandId        = 0x05;
+constexpr uint8_t kRemoveAllScenesCommandId    = 0x03;
+constexpr uint8_t kRemoveSceneCommandId        = 0x02;
+constexpr uint8_t kStoreSceneCommandId         = 0x04;
+constexpr uint8_t kViewSceneCommandId          = 0x01;
 
 void HandleAddSceneCommandReceived(chip::TLV::TLVReader & aReader, chip::app::Command * apCommandObj);
 void HandleGetSceneMembershipCommandReceived(chip::TLV::TLVReader & aReader, chip::app::Command * apCommandObj);
@@ -478,7 +467,6 @@ void InitCluster(chip::app::InteractionModelEngine * ime);
 void ShutdownCluster(chip::app::InteractionModelEngine * ime);
 
 } // namespace Scenes
-
 
 namespace TemperatureMeasurement {
 /*----------------------------------------------------------------------------*\
@@ -494,12 +482,10 @@ namespace TemperatureMeasurement {
 \*----------------------------------------------------------------------------*/
 constexpr uint16_t kClusterId = 0x0402;
 
-
 void InitCluster(chip::app::InteractionModelEngine * ime);
 void ShutdownCluster(chip::app::InteractionModelEngine * ime);
 
 } // namespace TemperatureMeasurement
-
 
 void InitClusters(chip::app::InteractionModelEngine * ime);
 void ShutdownClusters(chip::app::InteractionModelEngine * ime);
