@@ -50,7 +50,7 @@ constexpr size_t kMaxEchoCount = 3;
 constexpr int32_t gEchoInterval = 1000;
 
 // The EchoClient object.
-chip::Protocols::EchoClient gEchoClient;
+chip::Protocols::Echo::EchoClient gEchoClient;
 
 chip::TransportMgr<chip::Transport::UDP> gUDPManager;
 chip::TransportMgr<chip::Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>> gTCPManager;

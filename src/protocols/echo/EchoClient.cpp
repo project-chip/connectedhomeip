@@ -27,6 +27,7 @@
 
 namespace chip {
 namespace Protocols {
+namespace Echo {
 
 CHIP_ERROR EchoClient::Init(Messaging::ExchangeManager * exchangeMgr, SecureSessionHandle session)
 {
@@ -120,5 +121,6 @@ void EchoClient::OnResponseTimeout(Messaging::ExchangeContext * ec)
     ChipLogProgress(Echo, "Time out! failed to receive echo response from Exchange: %p", ec);
 }
 
+} // namespace Echo
 } // namespace Protocols
 } // namespace chip
