@@ -53,7 +53,7 @@
 
 #define ZAP_ATTRIBUTE_MASK(mask) ATTRIBUTE_MASK_##mask
 // This is an array of EmberAfAttributeMetadata structures.
-#define GENERATED_ATTRIBUTE_COUNT 20
+#define GENERATED_ATTRIBUTE_COUNT 26
 #define GENERATED_ATTRIBUTES                                                                                                       \
     {                                                                                                                              \
         { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 2 } },         /* On/off (server): cluster revision */                     \
@@ -64,7 +64,12 @@
             { 0x0000, ZAP_TYPE(BOOLEAN), 1, 0, { (uint8_t *) 0x00 } }, /* On/off (server): on/off */                               \
             {                                                                                                                      \
                 0x4003, ZAP_TYPE(ENUM8), 1, ZAP_ATTRIBUTE_MASK(WRITABLE), { (uint8_t *) 0 }                                        \
-            },                                                          /* On/off (server): start up on off */                     \
+            },                                                         /* On/off (server): start up on off */                      \
+            { 0x4000, ZAP_TYPE(BOOLEAN), 1, 0, { (uint8_t *) 0x01 } }, /* On/off (server): global scene control */                 \
+            { 0x4001, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(WRITABLE), { (uint8_t *) 0x0000 } }, /* On/off (server): on time */  \
+            {                                                                                                                      \
+                0x4002, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(WRITABLE), { (uint8_t *) 0x0000 }                                  \
+            },                                                          /* On/off (server): off wait time */                       \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 3 } },      /* Level Control (server): cluster revision */             \
             { 0x0000, ZAP_TYPE(INT8U), 1, 0, { (uint8_t *) 0x00 } },    /* Level Control (server): current level */                \
             { 0x0001, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 0x0000 } }, /* Level Control (server): remaining time */               \
@@ -78,7 +83,12 @@
             { 0x0000, ZAP_TYPE(BOOLEAN), 1, 0, { (uint8_t *) 0x00 } }, /* On/off (server): on/off */                               \
             {                                                                                                                      \
                 0x4003, ZAP_TYPE(ENUM8), 1, ZAP_ATTRIBUTE_MASK(WRITABLE), { (uint8_t *) 0 }                                        \
-            },                                                          /* On/off (server): start up on off */                     \
+            },                                                         /* On/off (server): start up on off */                      \
+            { 0x4000, ZAP_TYPE(BOOLEAN), 1, 0, { (uint8_t *) 0x01 } }, /* On/off (server): global scene control */                 \
+            { 0x4001, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(WRITABLE), { (uint8_t *) 0x0000 } }, /* On/off (server): on time */  \
+            {                                                                                                                      \
+                0x4002, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(WRITABLE), { (uint8_t *) 0x0000 }                                  \
+            },                                                          /* On/off (server): off wait time */                       \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 3 } },      /* Level Control (server): cluster revision */             \
             { 0x0000, ZAP_TYPE(INT8U), 1, 0, { (uint8_t *) 0x00 } },    /* Level Control (server): current level */                \
             { 0x0001, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 0x0000 } }, /* Level Control (server): remaining time */               \
@@ -122,24 +132,24 @@
               chipFuncArrayLevelControlServer }, /* Endpoint: 1, Cluster: Level Control (server) */                                \
             { 0x0006,                                                                                                              \
               ZAP_ATTRIBUTE_INDEX(4),                                                                                              \
-              3,                                                                                                                   \
-              4,                                                                                                                   \
+              6,                                                                                                                   \
+              9,                                                                                                                   \
               ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
               chipFuncArrayOnOffServer }, /* Endpoint: 2, Cluster: On/off (server) */                                              \
             { 0x0008,                                                                                                              \
-              ZAP_ATTRIBUTE_INDEX(7),                                                                                              \
+              ZAP_ATTRIBUTE_INDEX(10),                                                                                             \
               5,                                                                                                                   \
               7,                                                                                                                   \
               ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
               chipFuncArrayLevelControlServer }, /* Endpoint: 2, Cluster: Level Control (server) */                                \
             { 0x0006,                                                                                                              \
-              ZAP_ATTRIBUTE_INDEX(12),                                                                                             \
-              3,                                                                                                                   \
-              4,                                                                                                                   \
+              ZAP_ATTRIBUTE_INDEX(15),                                                                                             \
+              6,                                                                                                                   \
+              9,                                                                                                                   \
               ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
               chipFuncArrayOnOffServer }, /* Endpoint: 3, Cluster: On/off (server) */                                              \
             { 0x0008,                                                                                                              \
-              ZAP_ATTRIBUTE_INDEX(15),                                                                                             \
+              ZAP_ATTRIBUTE_INDEX(21),                                                                                             \
               5,                                                                                                                   \
               7,                                                                                                                   \
               ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
@@ -151,7 +161,7 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 2, 6 }, { ZAP_CLUSTER_INDEX(2), 2, 11 }, { ZAP_CLUSTER_INDEX(4), 2, 11 },                          \
+        { ZAP_CLUSTER_INDEX(0), 2, 6 }, { ZAP_CLUSTER_INDEX(2), 2, 16 }, { ZAP_CLUSTER_INDEX(4), 2, 16 },                          \
     }
 
 // Largest attribute size is needed for various buffers
@@ -161,7 +171,7 @@
 #define ATTRIBUTE_SINGLETONS_SIZE (0)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (28)
+#define ATTRIBUTE_MAX_SIZE (38)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (3)
@@ -205,7 +215,7 @@
 
 // Array of EmberAfCommandMetadata structs.
 #define ZAP_COMMAND_MASK(mask) COMMAND_MASK_##mask
-#define EMBER_AF_GENERATED_COMMAND_COUNT (33)
+#define EMBER_AF_GENERATED_COMMAND_COUNT (39)
 #define GENERATED_COMMANDS                                                                                                         \
     {                                                                                                                              \
         { 0x0006, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) },     /* On/off (server): Off */                                        \
@@ -217,6 +227,12 @@
             { 0x0006, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* On/off (server): Toggle */                                     \
             { 0x0006, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* On/off (server): Toggle */                                     \
             { 0x0006, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* On/off (server): Toggle */                                     \
+            { 0x0006, 0x40, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* On/off (server): OffWithEffect */                              \
+            { 0x0006, 0x40, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* On/off (server): OffWithEffect */                              \
+            { 0x0006, 0x41, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* On/off (server): OnWithRecallGlobalScene */                    \
+            { 0x0006, 0x41, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* On/off (server): OnWithRecallGlobalScene */                    \
+            { 0x0006, 0x42, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* On/off (server): OnWithTimedOff */                             \
+            { 0x0006, 0x42, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* On/off (server): OnWithTimedOff */                             \
             { 0x0008, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Level Control (server): MoveToLevel */                         \
             { 0x0008, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Level Control (server): MoveToLevel */                         \
             { 0x0008, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Level Control (server): MoveToLevel */                         \
