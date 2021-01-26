@@ -72,9 +72,7 @@ CHIP_ERROR CASESession::AttachHeaderAndSend(Protocols::SecureChannel::MsgType ms
 
     PayloadHeader payloadHeader;
 
-    payloadHeader
-        .SetMessageType(static_cast<uint8_t>(msgType)) //
-        .SetProtocolID(Protocols::kProtocol_SecureChannel);
+    payloadHeader.SetMessageType(msgType);
 
     uint16_t headerSize              = payloadHeader.EncodeSizeBytes();
     uint16_t actualEncodedHeaderSize = 0;
