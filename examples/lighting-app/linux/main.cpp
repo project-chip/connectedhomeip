@@ -177,6 +177,7 @@ int main(int argc, char * argv[])
     // Init ZCL Data Model and CHIP App Server
     InitServer();
 
+#ifdef CHIP_DEVICE_LAYER_TARGET_LINUX
     if (LinuxDeviceOptions::GetInstance().mWiFi)
     {
         chip::DeviceLayer::ConnectivityMgrImpl().StartWiFiManagement();
@@ -186,6 +187,7 @@ int main(int argc, char * argv[])
     {
         chip::DeviceLayer::ThreadStackMgrImpl().InitThreadStack();
     }
+#endif
 
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
 
