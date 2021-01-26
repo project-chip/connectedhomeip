@@ -68,6 +68,8 @@ static_library("support") {
     "FibonacciUtils.h",
     "PersistedCounter.cpp",
     "PersistedCounter.h",
+    "LifetimePersistedCounter.cpp",
+    "LifetimePersistedCounter.h",
     "Pool.cpp",
     "Pool.h",
     "RandUtils.cpp",

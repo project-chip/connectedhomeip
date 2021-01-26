@@ -60,7 +60,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_Init()
     SetFlag(mFlags, kFlag_OperationalDeviceCredentialsProvisioned,
             Impl()->ConfigValueExists(ImplClass::kConfigKey_OperationalDeviceCert));
 
-    mRotationPersistedCounter.Init(CHIP_CONFIG_PERSISTED_ROTATION_COUNTER_KEY, CHIP_DEVICE_CONFIG_ROTATION_COUNTER_EPOCH);
+    mLifetimePersistedCounter.Init(CHIP_CONFIG_PERSISTED_ROTATION_COUNTER_KEY, CHIP_DEVICE_CONFIG_ROTATION_COUNTER_EPOCH);
 
     return CHIP_NO_ERROR;
 }
@@ -666,16 +666,16 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreServiceConfig(const
 }
 
 template <class ImplClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetRotationCounter(uint16_t & rotationCounter)
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetLifetimeCounter(uint16_t & lifetimeCounter)
 {
-    rotationCounter = static_cast<uint16_t>(mRotationPersistedCounter.GetValue());
+    lifetimeCounter = static_cast<uint16_t>(mLifetimePersistedCounter.GetValue());
     return CHIP_NO_ERROR;
 }
 
 template <class ImplClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_IncrementRotationCounter()
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_IncrementLifetimeCounter()
 {
-    return mRotationPersistedCounter.Advance();
+    return mLifetimePersistedCounter.Advance();
 }
 
 template <class ImplClass>

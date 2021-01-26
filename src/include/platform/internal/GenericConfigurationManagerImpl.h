@@ -25,7 +25,7 @@
 
 #pragma once
 
-#include <support/PersistedCounter.h>
+#include <support/LifetimePersistedCounter.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -90,8 +90,8 @@ public:
     CHIP_ERROR _StoreSetupDiscriminator(uint16_t setupDiscriminator);
     CHIP_ERROR _GetFabricId(uint64_t & fabricId);
     CHIP_ERROR _StoreFabricId(uint64_t fabricId);
-    CHIP_ERROR _GetRotationCounter(uint16_t & rotationCounter);
-    CHIP_ERROR _IncrementRotationCounter();
+    CHIP_ERROR _GetLifetimeCounter(uint16_t & lifetimeCounter);
+    CHIP_ERROR _IncrementLifetimeCounter();
     CHIP_ERROR _GetServiceId(uint64_t & serviceId);
     CHIP_ERROR _GetServiceConfig(uint8_t * buf, size_t bufSize, size_t & serviceConfigLen);
     CHIP_ERROR _StoreServiceConfig(const uint8_t * serviceConfig, size_t serviceConfigLen);
@@ -130,7 +130,7 @@ protected:
     };
 
     uint8_t mFlags;
-    chip::PersistedCounter mRotationPersistedCounter;
+    chip::LifetimePersistedCounter mLifetimePersistedCounter;
 
     void LogDeviceConfig();
     CHIP_ERROR PersistProvisioningData(ProvisioningDataSet & provData);

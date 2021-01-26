@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2016-2017 Nest Labs, Inc.
+ *    Copyright (c) 2021 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,7 +15,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "PersistedCounter.h"
+#include "LifetimePersistedCounter.h"
 
 #include <platform/PersistedStorage.h>
 #include <support/CodeUtils.h>
@@ -27,12 +26,12 @@
 
 namespace chip {
 
-PersistedCounter::PersistedCounter() : mId(chip::Platform::PersistedStorage::kEmptyKey), mEpoch(0), mNextEpoch(0) {}
+LifetimePersistedCounter::LifetimePersistedCounter() : mId(chip::Platform::PersistedStorage::kEmptyKey), mEpoch(0), mNextEpoch(0) {}
 
-PersistedCounter::~PersistedCounter() {}
+LifetimePersistedCounter::~LifetimePersistedCounter() {}
 
 CHIP_ERROR
-PersistedCounter::Init(const chip::Platform::PersistedStorage::Key aId, uint32_t aEpoch)
+LifetimePersistedCounter::Init(const chip::Platform::PersistedStorage::Key aId, uint32_t aEpoch)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     VerifyOrExit(aEpoch > 0, err = CHIP_ERROR_INVALID_INTEGER_VALUE);
@@ -47,11 +46,7 @@ PersistedCounter::Init(const chip::Platform::PersistedStorage::Key aId, uint32_t
     err = ReadStartValue(startValue);
     SuccessOrExit(err);
 
-#if CHIP_CONFIG_PERSISTED_COUNTER_DEBUG_LOGGING
-    ChipLogDetail(EventLogging, "PersistedCounter::Init() aEpoch 0x%x startValue 0x%x", aEpoch, startValue);
-#endif
-
-    err = PersistNextEpochStart(startValue + aEpoch);
+    err = PersistNextEpochStart(startValue);
     SuccessOrExit(err);
 
     // This will set the starting value, after which we're ready.
@@ -63,7 +58,7 @@ exit:
 }
 
 CHIP_ERROR
-PersistedCounter::Advance()
+LifetimePersistedCounter::Advance()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -88,18 +83,15 @@ exit:
 }
 
 CHIP_ERROR
-PersistedCounter::PersistNextEpochStart(uint32_t aStartValue)
+LifetimePersistedCounter::PersistNextEpochStart(uint32_t aStartValue)
 {
     mNextEpoch = aStartValue;
-#if CHIP_CONFIG_PERSISTED_COUNTER_DEBUG_LOGGING
-    ChipLogDetail(EventLogging, "PersistedCounter::WriteStartValue() aStartValue 0x%x", aStartValue);
-#endif
 
     return chip::Platform::PersistedStorage::Write(mId, aStartValue);
 }
 
 CHIP_ERROR
-PersistedCounter::ReadStartValue(uint32_t & aStartValue)
+LifetimePersistedCounter::ReadStartValue(uint32_t & aStartValue)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -116,11 +108,6 @@ PersistedCounter::ReadStartValue(uint32_t & aStartValue)
     {
         SuccessOrExit(err);
     }
-
-#if CHIP_CONFIG_PERSISTED_COUNTER_DEBUG_LOGGING
-    ChipLogDetail(EventLogging, "PersistedCounter::ReadStartValue() aStartValue 0x%x", aStartValue);
-#endif
-
 exit:
     return err;
 }

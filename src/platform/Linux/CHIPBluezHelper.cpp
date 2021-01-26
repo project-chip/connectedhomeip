@@ -1279,19 +1279,19 @@ static void UpdateAdditionalDataCharacteristic(BluezGattCharacteristic1 * charac
 
     char serialNumber[ConfigurationManager::kMaxSerialNumberLength + 1];
     size_t serialNumberSize     = 0;
-    uint16_t rotationCounter    = 0;
+    uint16_t lifetimeCounter    = 0;
     bool enableRotatingDeviceId = false;
 
     err = ConfigurationMgr().GetSerialNumber(serialNumber, sizeof(serialNumber), serialNumberSize);
     SuccessOrExit(err);
-    err = ConfigurationMgr().GetRotationCounter(rotationCounter);
+    err = ConfigurationMgr().GetLifetimeCounter(lifetimeCounter);
     SuccessOrExit(err);
 
 #if CHIP_ENABLE_ROTATING_DEVICE_ID
     enableRotatingDeviceId = true;
 #endif
 
-    err = AdditionalDataPayloadGenerator(rotationCounter, serialNumber, serialNumberSize)
+    err = AdditionalDataPayloadGenerator(lifetimeCounter, serialNumber, serialNumberSize)
               .generateAdditionalDataPayload(bufferHandle, enableRotatingDeviceId);
     SuccessOrExit(err);
 

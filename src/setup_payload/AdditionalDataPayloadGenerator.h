@@ -37,7 +37,7 @@ class AdditionalDataPayloadGenerator
 {
 
 public:
-    AdditionalDataPayloadGenerator(uint16_t rotationCounter, char * serialNumberBuffer, size_t serialNumberBufferSize);
+    AdditionalDataPayloadGenerator(uint16_t lifetimeCounter, char * serialNumberBuffer, size_t serialNumberBufferSize);
     ~AdditionalDataPayloadGenerator();
     // Generate additional data payload (i.e. TLV encoded)
     CHIP_ERROR generateAdditionalDataPayload(chip::System::PacketBufferHandle & bufferHandle, bool enableRotatingDeviceId);
@@ -46,7 +46,7 @@ public:
                                         size_t & rotatingDeviceIdBufferOutputSize);
 
 private:
-    const uint16_t mRotationCounter;
+    const uint16_t mLifetimeCounter;
     const char * mSerialNumberBuffer;
     const size_t mSerialNumberBufferSize;
 };

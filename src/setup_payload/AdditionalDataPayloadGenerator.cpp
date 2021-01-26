@@ -41,9 +41,9 @@ using namespace chip::Encoding::LittleEndian;
 
 static uint8_t * sHashInput;
 
-AdditionalDataPayloadGenerator::AdditionalDataPayloadGenerator(uint16_t rotationCounter, char * serialNumberBuffer,
+AdditionalDataPayloadGenerator::AdditionalDataPayloadGenerator(uint16_t lifetimeCounter, char * serialNumberBuffer,
                                                                size_t serialNumberBufferSize) :
-    mRotationCounter(rotationCounter),
+    mLifetimeCounter(lifetimeCounter),
     mSerialNumberBuffer(serialNumberBuffer), mSerialNumberBufferSize(serialNumberBufferSize)
 {
     sHashInput =
@@ -100,7 +100,7 @@ CHIP_ERROR AdditionalDataPayloadGenerator::generateRotatingDeviceId(char rotatin
                                                                     size_t & rotatingDeviceIdBufferOutputSize)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    char rotationCounterBuf[ROTATING_DEVICE_ID_COUNTER_STR_LENGTH];
+    char lifetimeCounterBuf[ROTATING_DEVICE_ID_COUNTER_STR_LENGTH];
 
     uint8_t outputBuffer[ROTATING_DEVICE_ID_LENGTH];
     uint8_t hashOutputBuffer[kSHA256_Hash_Length];
@@ -109,8 +109,8 @@ CHIP_ERROR AdditionalDataPayloadGenerator::generateRotatingDeviceId(char rotatin
 
     VerifyOrExit(rotatingDeviceIdBufferSize >= ROTATING_DEVICE_ID_LENGTH * 2 + 1, err = CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    snprintf(rotationCounterBuf, sizeof(rotationCounterBuf), "%09u", mRotationCounter);
-    hashInputBufferWriter.Put(rotationCounterBuf, ROTATING_DEVICE_ID_COUNTER_STR_LENGTH);
+    snprintf(lifetimeCounterBuf, sizeof(lifetimeCounterBuf), "%09u", mLifetimeCounter);
+    hashInputBufferWriter.Put(lifetimeCounterBuf, ROTATING_DEVICE_ID_COUNTER_STR_LENGTH);
     hashInputBufferWriter.Put(mSerialNumberBuffer, mSerialNumberBufferSize);
 
     err = Hash_SHA256(hashInputBufferWriter.Buffer(), ROTATING_DEVICE_ID_COUNTER_STR_LENGTH + mSerialNumberBufferSize,
@@ -119,7 +119,7 @@ CHIP_ERROR AdditionalDataPayloadGenerator::generateRotatingDeviceId(char rotatin
 
     // Computing the Rotating Device Id
     // RDI = Rotation_Counter + SuffixBytes(HMAC_SHA256(Serial_Number + Rotation_Counter), 16)
-    outputBuferWriter.Put(rotationCounterBuf);
+    outputBuferWriter.Put(lifetimeCounterBuf);
     outputBuferWriter.Put(
         reinterpret_cast<const char *>(&hashOutputBuffer[kSHA256_Hash_Length - ROTATING_DEVICE_ID_HASH_SUFFIX_LENGTH]));
 
