@@ -51,7 +51,7 @@ PersistedCounter::Init(const chip::Platform::PersistedStorage::Key aId, uint32_t
     ChipLogDetail(EventLogging, "PersistedCounter::Init() aEpoch 0x%x startValue 0x%x", aEpoch, startValue);
 #endif
 
-    err = PersistNextEpochStart(startValue + aEpoch);
+    err = PersistNextEpochStart(startValue);
     SuccessOrExit(err);
 
     // This will set the starting value, after which we're ready.
