@@ -174,26 +174,6 @@
 #endif
 
 /**
- * CHIP_DEVICE_CONFIG_DEFAULT_ROTATION_COUNTER
- *
- * The default rotation id assigned to the device or product by the device vendor.
- *
- */
-#ifndef CHIP_DEVICE_CONFIG_DEFAULT_ROTATION_COUNTER
-#define CHIP_DEVICE_CONFIG_DEFAULT_ROTATION_COUNTER 0
-#endif
-
-/**
- * CHIP_DEVICE_CONFIG_ROTATION_COUNTER_EPOCH
- *
- * Rotation counter epoch
- *
- */
-#ifndef CHIP_DEVICE_CONFIG_ROTATION_COUNTER_EPOCH
-#define CHIP_DEVICE_CONFIG_ROTATION_COUNTER_EPOCH 1
-#endif
-
-/**
  * CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION
  *
  * A string identifying the firmware revision running on the device.

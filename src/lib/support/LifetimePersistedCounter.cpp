@@ -26,20 +26,17 @@
 
 namespace chip {
 
-LifetimePersistedCounter::LifetimePersistedCounter() : mId(chip::Platform::PersistedStorage::kEmptyKey), mEpoch(0), mNextEpoch(0) {}
+LifetimePersistedCounter::LifetimePersistedCounter() : mId(chip::Platform::PersistedStorage::kEmptyKey), mNextEpoch(0) {}
 
 LifetimePersistedCounter::~LifetimePersistedCounter() {}
 
 CHIP_ERROR
-LifetimePersistedCounter::Init(const chip::Platform::PersistedStorage::Key aId, uint32_t aEpoch)
+LifetimePersistedCounter::Init(const chip::Platform::PersistedStorage::Key aId)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    VerifyOrExit(aEpoch > 0, err = CHIP_ERROR_INVALID_INTEGER_VALUE);
 
     // Store the ID.
     mId    = aId;
-    mEpoch = aEpoch;
-
     uint32_t startValue;
 
     // Read our previously-stored starting value.
@@ -71,7 +68,7 @@ LifetimePersistedCounter::Advance()
     {
         // Value advanced past the previously persisted "start point".
         // Ensure that a new starting point is persisted.
-        err = PersistNextEpochStart(mNextEpoch + mEpoch);
+        err = PersistNextEpochStart(mNextEpoch + CHIP_CONFIG_LIFETIIME_PERSISTED_COUNTER_INCREMENT);
         SuccessOrExit(err);
 
         // Advancing the epoch should have ensured that the current value

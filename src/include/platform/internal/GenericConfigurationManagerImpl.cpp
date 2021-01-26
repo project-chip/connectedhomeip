@@ -60,7 +60,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_Init()
     SetFlag(mFlags, kFlag_OperationalDeviceCredentialsProvisioned,
             Impl()->ConfigValueExists(ImplClass::kConfigKey_OperationalDeviceCert));
 
-    mLifetimePersistedCounter.Init(CHIP_CONFIG_PERSISTED_ROTATION_COUNTER_KEY, CHIP_DEVICE_CONFIG_ROTATION_COUNTER_EPOCH);
+    mLifetimePersistedCounter.Init(CHIP_CONFIG_LIFETIIME_PERSISTED_COUNTER_KEY);
 
     return CHIP_NO_ERROR;
 }

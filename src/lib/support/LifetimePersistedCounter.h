@@ -60,8 +60,6 @@ public:
      *    Initialize a LifetimePersistedCounter object.
      *
      *  @param[in] aId     The identifier of this LifetimePersistedCounter instance.
-     *  @param[in] aEpoch  On bootup, values we vend will start at a
-     *                     multiple of this parameter.
      *
      *  @return CHIP_ERROR_INVALID_ARGUMENT if aId is NULL
      *          CHIP_ERROR_INVALID_STRING_LENGTH if aId is longer than
@@ -69,7 +67,7 @@ public:
      *          CHIP_ERROR_INVALID_INTEGER_VALUE if aEpoch is 0.
      *          CHIP_NO_ERROR otherwise
      */
-    CHIP_ERROR Init(chip::Platform::PersistedStorage::Key aId, uint32_t aEpoch);
+    CHIP_ERROR Init(chip::Platform::PersistedStorage::Key aId);
 
     /**
      *  @brief
@@ -102,7 +100,6 @@ private:
     CHIP_ERROR ReadStartValue(uint32_t & aStartValue);
 
     chip::Platform::PersistedStorage::Key mId; // start value is stored here
-    uint32_t mEpoch;                           // epoch modulus value
     uint32_t mNextEpoch;                       // next epoch start
 };
 
