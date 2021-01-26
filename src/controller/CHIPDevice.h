@@ -79,8 +79,7 @@ public:
      *
      * @return CHIP_ERROR   CHIP_NO_ERROR on success, or corresponding error
      */
-    [[deprecated("Available until moved to Channel API")]]
-    CHIP_ERROR SendMessage(System::PacketBufferHandle message);
+    [[deprecated("Available until moved to Channel API")]] CHIP_ERROR SendMessage(System::PacketBufferHandle message);
 
     /**
      * @brief
@@ -110,13 +109,14 @@ public:
      * @param[in] exchangeManager ExchangeManager object pointer
      * @param[in] listenPort      Port on which controller is listening (typically CHIP_PORT)
      */
-    void Init(DeviceTransportMgr * transportMgr, SecureSessionMgr * sessionMgr, Inet::InetLayer * inetLayer, Messaging::ExchangeManager * exchangeManager, uint16_t listenPort)
+    void Init(DeviceTransportMgr * transportMgr, SecureSessionMgr * sessionMgr, Inet::InetLayer * inetLayer,
+              Messaging::ExchangeManager * exchangeManager, uint16_t listenPort)
     {
-        mTransportMgr   = transportMgr;
-        mSessionManager = sessionMgr;
-        mInetLayer      = inetLayer;
+        mTransportMgr    = transportMgr;
+        mSessionManager  = sessionMgr;
+        mInetLayer       = inetLayer;
         mExchangeManager = exchangeManager;
-        mListenPort     = listenPort;
+        mListenPort      = listenPort;
     }
 
     /**
@@ -139,8 +139,9 @@ public:
      * @param[in] devicePort      Port on which device is listening (typically CHIP_PORT)
      * @param[in] interfaceId     Local Interface ID that should be used to talk to the device
      */
-    void Init(DeviceTransportMgr * transportMgr, SecureSessionMgr * sessionMgr, Inet::InetLayer * inetLayer, Messaging::ExchangeManager * exchangeManager,
-              uint16_t listenPort, NodeId deviceId, uint16_t devicePort, Inet::InterfaceId interfaceId)
+    void Init(DeviceTransportMgr * transportMgr, SecureSessionMgr * sessionMgr, Inet::InetLayer * inetLayer,
+              Messaging::ExchangeManager * exchangeManager, uint16_t listenPort, NodeId deviceId, uint16_t devicePort,
+              Inet::InterfaceId interfaceId)
     {
         Init(transportMgr, sessionMgr, inetLayer, exchangeManager, mListenPort);
         mDeviceId   = deviceId;
@@ -227,7 +228,7 @@ public:
 
     SecurePairingSessionSerializable & GetPairing() { return mPairing; }
 
-    //SecurePairingSessionSerializable & GetSecureSessoinParametersForUpdate() { return mSecureSessionParameters; }
+    // SecurePairingSessionSerializable & GetSecureSessoinParametersForUpdate() { return mSecureSessionParameters; }
 
     /**
      * @brief Establish a new PASE session, using given pin code
@@ -245,6 +246,7 @@ public:
     void OnEstablished() override;
     void OnClosed() override;
     void OnFail(CHIP_ERROR err) override;
+
 private:
     enum class ConnectionState
     {
@@ -335,8 +337,7 @@ public:
      *
      * @param[in] msg Received message buffer.
      */
-    [[deprecated("Available until moved to Channel API")]]
-    virtual void OnMessage(System::PacketBufferHandle msg) = 0;
+    [[deprecated("Available until moved to Channel API")]] virtual void OnMessage(System::PacketBufferHandle msg) = 0;
 
     /**
      * @brief

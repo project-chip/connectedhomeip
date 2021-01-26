@@ -169,9 +169,11 @@ CHIP_ERROR nl_Chip_DeviceController_SetBleClose(CloseBleCBFunct closeBleCB);
 
 CHIP_ERROR nl_Chip_DeviceController_NewDeviceController(chip::DeviceController::ChipDeviceController ** outDevCtrl);
 CHIP_ERROR nl_Chip_DeviceController_DeleteDeviceController(chip::DeviceController::ChipDeviceController * devCtrl);
-void nl_Chip_DeviceController_GetDeviceConrollerNewApi(chip::DeviceController::ChipDeviceController * devCtrl, chip::Controller::DeviceController ** out);
+void nl_Chip_DeviceController_GetDeviceConrollerNewApi(chip::DeviceController::ChipDeviceController * devCtrl,
+                                                       chip::Controller::DeviceController ** out);
 
-CHIP_ERROR nl_Chip_Controller_NewDevice(chip::Controller::DeviceController * controller, chip::NodeId nodeId, chip::Controller::Device ** device);
+CHIP_ERROR nl_Chip_Controller_NewDevice(chip::Controller::DeviceController * controller, chip::NodeId nodeId,
+                                        chip::Controller::Device ** device);
 
 // Rendezvous
 CHIP_ERROR nl_Chip_DeviceController_Connect(chip::DeviceController::ChipDeviceController * devCtrl, BLE_CONNECTION_OBJECT connObj,
@@ -239,12 +241,14 @@ CHIP_ERROR nl_Chip_DeviceController_DeleteDeviceController(chip::DeviceControlle
 
 // Old device controller is deprecated, get the new controller.
 // When all functions are migrated to the new API, the new API will be return by defualt via NewDeviceController
-void nl_Chip_DeviceController_GetDeviceConrollerNewApi(chip::DeviceController::ChipDeviceController * devCtrl, chip::Controller::DeviceController ** out)
+void nl_Chip_DeviceController_GetDeviceConrollerNewApi(chip::DeviceController::ChipDeviceController * devCtrl,
+                                                       chip::Controller::DeviceController ** out)
 {
     *out = devCtrl->GetNewApi();
 }
 
-CHIP_ERROR nl_Chip_Controller_NewDevice(chip::Controller::DeviceController * controller, chip::NodeId nodeId, chip::Controller::Device ** device)
+CHIP_ERROR nl_Chip_Controller_NewDevice(chip::Controller::DeviceController * controller, chip::NodeId nodeId,
+                                        chip::Controller::Device ** device)
 {
     return controller->NewDevice(nodeId, device);
 }

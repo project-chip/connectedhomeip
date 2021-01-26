@@ -135,10 +135,11 @@ public:
         return *this;
     }
 
-    [[deprecated("Available until new mDNS is ready")]]
-    Optional<Inet::IPAddress> GetHintPeerAddress() const { return mHintPeerAddr; }
-    [[deprecated("Available until new mDNS is ready")]]
-    ChannelBuilder & SetHintPeerAddress(Inet::IPAddress peerAddr)
+    [[deprecated("Available until new mDNS is ready")]] Optional<Inet::IPAddress> GetHintPeerAddress() const
+    {
+        return mHintPeerAddr;
+    }
+    [[deprecated("Available until new mDNS is ready")]] ChannelBuilder & SetHintPeerAddress(Inet::IPAddress peerAddr)
     {
         mHintPeerAddr.SetValue(peerAddr);
         return *this;

@@ -69,7 +69,8 @@ public:
      *  @retval #CHIP_NO_ERROR On success.
      *
      */
-    CHIP_ERROR Init(NodeId localNodeId, TransportMgrBase * transportMgr, SecureSessionMgr * sessionMgr, SecureSessionMgrDelegate * deviceController = nullptr);
+    CHIP_ERROR Init(NodeId localNodeId, TransportMgrBase * transportMgr, SecureSessionMgr * sessionMgr,
+                    SecureSessionMgrDelegate * deviceController = nullptr);
 
     /**
      *  Shutdown the ExchangeManager. This terminates this instance

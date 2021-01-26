@@ -64,7 +64,8 @@ ExchangeManager::ExchangeManager() : mReliableMessageMgr(mContextPool)
     mState = State::kState_NotInitialized;
 }
 
-CHIP_ERROR ExchangeManager::Init(NodeId localNodeId, TransportMgrBase * transportMgr, SecureSessionMgr * sessionMgr, SecureSessionMgrDelegate * deviceController)
+CHIP_ERROR ExchangeManager::Init(NodeId localNodeId, TransportMgrBase * transportMgr, SecureSessionMgr * sessionMgr,
+                                 SecureSessionMgrDelegate * deviceController)
 {
     if (mState != State::kState_NotInitialized)
         return CHIP_ERROR_INCORRECT_STATE;
@@ -290,8 +291,9 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
     else if (!payloadHeader.IsNeedsAck())
     {
         // TODO: propagate event into device controller, it won't be necessary after fully migrated to messaging layer
-        //ExitNow(err = CHIP_ERROR_UNSOLICITED_MSG_NO_ORIGINATOR);
-        if (mDeviceController != nullptr) mDeviceController->OnMessageReceived(packetHeader, payloadHeader, session, std::move(msgBuf), msgLayer);
+        // ExitNow(err = CHIP_ERROR_UNSOLICITED_MSG_NO_ORIGINATOR);
+        if (mDeviceController != nullptr)
+            mDeviceController->OnMessageReceived(packetHeader, payloadHeader, session, std::move(msgBuf), msgLayer);
         ExitNow(err = CHIP_NO_ERROR);
     }
 
@@ -346,7 +348,8 @@ void ExchangeManager::OnNewConnection(SecureSessionHandle session, SecureSession
     });
 
     // TODO: propagate event into device controller, it won't be necessary after fully migrated to messaging layer
-    if (notFound && mDeviceController != nullptr) mDeviceController->OnNewConnection(session, mgr);
+    if (notFound && mDeviceController != nullptr)
+        mDeviceController->OnNewConnection(session, mgr);
 }
 
 void ExchangeManager::OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * mgr)
@@ -370,7 +373,8 @@ void ExchangeManager::OnConnectionExpired(SecureSessionHandle session, SecureSes
     });
 
     // TODO: propagate event into device controller, it won't be necessary after fully migrated to messaging layer
-    if (notFound && mDeviceController != nullptr) mDeviceController->OnConnectionExpired(session, mgr);
+    if (notFound && mDeviceController != nullptr)
+        mDeviceController->OnConnectionExpired(session, mgr);
 }
 
 void ExchangeManager::OnMessageReceived(const PacketHeader & header, const Transport::PeerAddress & source,

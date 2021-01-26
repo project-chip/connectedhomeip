@@ -25,12 +25,12 @@
 
 #include <errno.h>
 #include <fcntl.h>
+#include <inttypes.h>
+#include <net/if.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/time.h>
 #include <unistd.h>
-#include <inttypes.h>
-#include <net/if.h>
 
 #include <system/SystemError.h>
 #include <system/SystemLayer.h>
@@ -49,15 +49,9 @@ using OnStatusChangeFunction = void (*)();
 class PythonDeviceStatusDelegate : public Controller::DeviceStatusDelegate
 {
 public:
-    PythonDeviceStatusDelegate(OnStatusChangeFunction callback)
-    {
-        mCallback = callback;
-    }
+    PythonDeviceStatusDelegate(OnStatusChangeFunction callback) { mCallback = callback; }
 
-    void OnStatusChange() override
-    {
-        mCallback();
-    }
+    void OnStatusChange() override { mCallback(); }
 
     void OnMessage(System::PacketBufferHandle msg) override {}
 
@@ -76,7 +70,7 @@ CHIP_ERROR nl_Chip_Device_EstablishPaseSession(Controller::Device * device, cons
 void nl_Chip_DeviceStatusDelegate_Create(PythonDeviceStatusDelegate ** pDelegate, OnStatusChangeFunction callback)
 {
     auto delegate = new PythonDeviceStatusDelegate(callback);
-    *pDelegate = delegate;
+    *pDelegate    = delegate;
 }
 
 void nl_Chip_DeviceStatusDelegate_Destory(PythonDeviceStatusDelegate * delegate)

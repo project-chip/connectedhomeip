@@ -294,13 +294,16 @@ CHIP_ERROR Device::EstablishPaseSession(Inet::IPAddress peerAddr, uint32_t setup
 
     {
         auto state = mChannel.GetState();
-        if (state != Messaging::ChannelState::kChanneState_None && state != Messaging::ChannelState::kChanneState_Closed && state != Messaging::ChannelState::kChanneState_Failed)
+        if (state != Messaging::ChannelState::kChanneState_None && state != Messaging::ChannelState::kChanneState_Closed &&
+            state != Messaging::ChannelState::kChanneState_Failed)
             ExitNow(err = CHIP_ERROR_INCORRECT_STATE);
 
         mState = ConnectionState::PaseConnecting;
         Messaging::ChannelBuilder builder;
-        builder.SetPeerNodeId(mDeviceId).SetHintPeerAddress(peerAddr)
-            .SetSessionType(Messaging::ChannelBuilder::SessionType::kSession_PASE).SetPeerSetUpPINCode(setupPINCode);
+        builder.SetPeerNodeId(mDeviceId)
+            .SetHintPeerAddress(peerAddr)
+            .SetSessionType(Messaging::ChannelBuilder::SessionType::kSession_PASE)
+            .SetPeerSetUpPINCode(setupPINCode);
         mChannel = mExchangeManager->EstablishChannel(builder, this);
     }
 
