@@ -24,9 +24,6 @@ declare_args() {
   chip_build_pw_rpc_lib = false
 }
 
-group("dummy") {
-}
-
 group("nrfconnect") {
   deps = [ "${chip_root}/src/lib" ]
 
