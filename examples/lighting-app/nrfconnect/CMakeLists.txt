@@ -29,10 +29,10 @@ project(chip-nrf52840-lighting-example)
 
 zephyr_compile_options(-Werror)
 
-target_include_directories(app PRIVATE 
-                           main/include 
-                           ${LIGHTING_COMMON} 
-                           ${NRFCONNECT_COMMON}/util/include 
+target_include_directories(app PRIVATE
+                           main/include
+                           ${LIGHTING_COMMON}
+                           ${NRFCONNECT_COMMON}/util/include
                            ${NRFCONNECT_COMMON}/app/include)
 
 target_sources(app PRIVATE
@@ -98,7 +98,7 @@ target_include_directories(app PRIVATE
 
 target_link_libraries(app PRIVATE
   pigweed_lighting_protolib.nanopb_rpc
-  pw_hdlc_lite
+  pw_hdlc
   pw_log
   pw_rpc.server
 )

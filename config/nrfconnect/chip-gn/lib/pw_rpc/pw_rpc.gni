@@ -19,10 +19,7 @@ pw_log_BACKEND = "$dir_pw_log_basic"
 pw_assert_BACKEND = "$dir_pw_assert_log"
 pw_sys_io_BACKEND =
     "${chip_root}/examples/platform/nrfconnect/pw_sys_io:pw_sys_io_nrfconnect"
-pw_rpc_system_server_BACKEND = "$dir_pw_rpc/system_server:sys_io"
+pw_rpc_system_server_BACKEND =
+    "${chip_root}/examples/common/pigweed:system_rpc_server"
 
 dir_pw_third_party_nanopb = "${chip_root}/third_party/nanopb/repo"
-pw_protobuf_GENERATORS = [
-  "pwpb",
-  "nanopb_rpc",
-]

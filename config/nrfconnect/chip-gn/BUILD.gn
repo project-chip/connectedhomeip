@@ -38,7 +38,7 @@ group("nrfconnect") {
   # Building PW_RPC lib with GN may go obsolete after getting full CMake
   # support in Pigweed.
   if (chip_build_pw_rpc_lib) {
-    deps += [ "//lib/pw_rpc" ]
+    deps += [ "lib/pw_rpc" ]
   }
 }
 
