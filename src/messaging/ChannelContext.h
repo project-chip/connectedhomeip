@@ -41,8 +41,7 @@ public:
     static void Release(ChannelContext * context);
 };
 
-class ChannelContext : public ReferenceCounted<ChannelContext, ChannelContextDeletor>,
-                       public SessionEstablishmentDelegate
+class ChannelContext : public ReferenceCounted<ChannelContext, ChannelContextDeletor>, public SessionEstablishmentDelegate
 {
 public:
     ChannelContext(ExchangeManager * exchangeManager) : mState(ChannelState::kChanneState_None), mExchangeManager(exchangeManager)
@@ -64,8 +63,10 @@ public:
     void OnNewConnection(SecureSessionHandle session);
     void OnConnectionExpired(SecureSessionHandle session);
 
-    CHIP_ERROR HandlePairingMessage(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress, System::PacketBufferHandle && msg);
-    CHIP_ERROR SendSessionEstablishmentMessage(const PacketHeader & header, const Transport::PeerAddress & peerAddress, System::PacketBufferHandle msgIn) override;
+    CHIP_ERROR HandlePairingMessage(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
+                                    System::PacketBufferHandle && msg);
+    CHIP_ERROR SendSessionEstablishmentMessage(const PacketHeader & header, const Transport::PeerAddress & peerAddress,
+                                               System::PacketBufferHandle msgIn) override;
     void OnSessionEstablishmentError(CHIP_ERROR error) override;
     void OnSessionEstablished() override;
 

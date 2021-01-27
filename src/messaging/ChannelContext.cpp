@@ -250,7 +250,7 @@ void ChannelContext::HandleNodeIdResolve(CHIP_ERROR error, uint64_t nodeId, cons
 
 // Session establishment
 CHIP_ERROR ChannelContext::SendSessionEstablishmentMessage(const PacketHeader & header, const Transport::PeerAddress & peerAddress,
-                                              System::PacketBufferHandle msgIn)
+                                                           System::PacketBufferHandle msgIn)
 {
     return mExchangeManager->GetTransportManager()->SendMessage(header, peerAddress, std::move(msgIn));
 }
