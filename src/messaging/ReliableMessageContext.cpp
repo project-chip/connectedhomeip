@@ -350,8 +350,7 @@ CHIP_ERROR ReliableMessageContext::SendStandaloneAckMessage()
     // Send the null message
     if (mExchange != nullptr)
     {
-        err = mExchange->SendMessage(Protocols::kProtocol_SecureChannel,
-                                     static_cast<uint8_t>(Protocols::SecureChannel::MsgType::StandaloneAck), std::move(msgBuf),
+        err = mExchange->SendMessage(Protocols::SecureChannel::MsgType::StandaloneAck, std::move(msgBuf),
                                      BitFlags<uint16_t, SendMessageFlags>{ SendMessageFlags::kNoAutoRequestAck });
     }
     else

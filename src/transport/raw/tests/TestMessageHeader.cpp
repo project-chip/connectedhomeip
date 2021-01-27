@@ -146,13 +146,13 @@ void TestPayloadHeaderEncodeDecode(nlTestSuite * inSuite, void * inContext)
     uint16_t encodeLen;
     uint16_t decodeLen;
 
-    header.SetMessageType(112).SetExchangeID(2233);
+    header.SetMessageType(0, 112).SetExchangeID(2233);
     NL_TEST_ASSERT(inSuite, !header.GetVendorId().HasValue());
 
-    header.SetMessageType(112).SetExchangeID(2233).SetProtocolID(1221).SetInitiator(true);
+    header.SetMessageType(1221, 112).SetExchangeID(2233).SetInitiator(true);
     NL_TEST_ASSERT(inSuite, header.Encode(buffer, sizeof(buffer), &encodeLen) == CHIP_NO_ERROR);
 
-    header.SetMessageType(221).SetExchangeID(3322).SetProtocolID(4567);
+    header.SetMessageType(4567, 221).SetExchangeID(3322);
     NL_TEST_ASSERT(inSuite, header.Decode(buffer, sizeof(buffer), &decodeLen) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, encodeLen == decodeLen);
     NL_TEST_ASSERT(inSuite, header.GetMessageType() == 112);
@@ -161,19 +161,19 @@ void TestPayloadHeaderEncodeDecode(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, !header.GetVendorId().HasValue());
     NL_TEST_ASSERT(inSuite, header.IsInitiator());
 
-    header.SetMessageType(112).SetExchangeID(2233).SetProtocolID(1221);
+    header.SetMessageType(1221, 112).SetExchangeID(2233);
     header.SetVendorId(6789);
 
     NL_TEST_ASSERT(inSuite, header.Encode(buffer, sizeof(buffer), &encodeLen) == CHIP_NO_ERROR);
 
-    header.SetMessageType(111).SetExchangeID(222);
+    header.SetMessageType(0, 111).SetExchangeID(222);
 
     NL_TEST_ASSERT(inSuite, header.Decode(buffer, sizeof(buffer), &decodeLen) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, encodeLen == decodeLen);
     NL_TEST_ASSERT(inSuite, header.GetExchangeID() == 2233);
     NL_TEST_ASSERT(inSuite, header.GetVendorId() == Optional<uint16_t>::Value(6789));
 
-    header.SetMessageType(221).SetExchangeID(3322).SetProtocolID(4567);
+    header.SetMessageType(4567, 221).SetExchangeID(3322);
     header.SetVendorId(8976);
 
     NL_TEST_ASSERT(inSuite, header.Decode(buffer, sizeof(buffer), &decodeLen) == CHIP_NO_ERROR);

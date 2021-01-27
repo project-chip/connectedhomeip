@@ -127,7 +127,7 @@ CHIP_ERROR RendezvousSession::SendSecureMessage(Protocols::CHIPProtocolId protoc
     VerifyOrReturnError(mPairingSessionHandle != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     PayloadHeader payloadHeader;
-    payloadHeader.SetProtocolID(static_cast<uint16_t>(protocol)).SetMessageType(msgType);
+    payloadHeader.SetMessageType(static_cast<uint16_t>(protocol), msgType);
 
     return mSecureSessionMgr->SendMessage(*mPairingSessionHandle, payloadHeader, std::move(msgBuf));
 }
