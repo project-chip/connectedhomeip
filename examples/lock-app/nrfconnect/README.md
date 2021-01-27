@@ -52,10 +52,9 @@ and other devices.
 
 ### Bluetooth LE advertising
 
-In this example, to commission the device onto a CHIP network, it must
-be discoverable over Bluetooth LE. For security reasons, you must start
-Bluetooth LE advertising manually after powering up the device by pressing
-**Button 4**.
+In this example, to commission the device onto a CHIP network, it must be
+discoverable over Bluetooth LE. For security reasons, you must start Bluetooth
+LE advertising manually after powering up the device by pressing **Button 4**.
 
 ### Bluetooth LE rendezvous
 
