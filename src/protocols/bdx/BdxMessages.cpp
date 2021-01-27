@@ -35,7 +35,7 @@ constexpr uint8_t kVersionMask = 0x0F;
 } // namespace
 
 using namespace chip;
-using namespace chip::BDX;
+using namespace chip::bdx;
 using namespace chip::Encoding::LittleEndian;
 
 // WARNING: this function should never return early, since MessageSize() relies on it to calculate

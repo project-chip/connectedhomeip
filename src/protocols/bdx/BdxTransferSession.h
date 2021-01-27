@@ -13,7 +13,7 @@
 #include <transport/raw/MessageHeader.h>
 
 namespace chip {
-namespace BDX {
+namespace bdx {
 
 enum TransferRole : uint8_t
 {
@@ -165,7 +165,7 @@ public:
 
     /**
      * @brief
-     *   Initializes the TransferSession object and prepares a TransferInit message (to be emitted via PollOutput()).
+     *   Initializes the TransferSession object and prepares a TransferInit message (emitted via PollOutput()).
      *
      * @param role     Inidcates whether this object will be sending or receiving data
      * @param initData Data for initializing this object and for populating a TransferInit message
@@ -242,15 +242,6 @@ public:
 
     /**
      * @brief
-     *   Prepare a BlockAckEOF message. The Block counter will be populated automatically.
-     *
-     * @return CHIP_ERROR The result of the preparation of a BlockAckEOF message. May also indicate if the TransferSession object
-     *                    is unable to handle this request.
-     */
-    CHIP_ERROR PrepareBlockAckEOF();
-
-    /**
-     * @brief
      *   Prematurely end a transfer. Must still call Reset() to prepare the TransferSession for another transfer.
      *
      * @param reason The StatusCode reason for ending the transfer.
@@ -270,7 +261,7 @@ public:
      * @brief
      *   Process a message intended for this TransferSession object.
      *
-     * @param msg A PacketBufferHandle pointing to the message buffer to receive. May be BDX or StatusReport protocol.
+     * @param msg A PacketBufferHandle pointing to the message buffer to process. May be BDX or StatusReport protocol.
      *
      * @return CHIP_ERROR Indicates any problems in decoding the message, or if the message is not of the BDX or StatusReport
      *                    protocols.
@@ -293,6 +284,7 @@ private:
         kState_NegotiateTransferParams,
         kState_TransferInProgress,
         kState_AwaitingEOFAck,
+        kState_ReceivedEOF,
         kState_Error,
     };
 
@@ -357,5 +349,5 @@ private:
     uint32_t mNumBytesProcessed = 0;
 };
 
-} // namespace BDX
+} // namespace bdx
 } // namespace chip

@@ -29,7 +29,7 @@
 #include <support/CodeUtils.h>
 #include <system/SystemPacketBuffer.h>
 namespace chip {
-namespace BDX {
+namespace bdx {
 
 enum MessageType : uint8_t
 {
@@ -376,5 +376,5 @@ struct DataBlock
 using Block    = DataBlock;
 using BlockEOF = DataBlock;
 
-} // namespace BDX
+} // namespace bdx
 } // namespace chip

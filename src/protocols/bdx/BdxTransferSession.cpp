@@ -36,7 +36,7 @@ CHIP_ERROR WriteToPacketBuffer(const BdxMsgType & msgStruct, ::chip::System::Pac
 }
 
 namespace chip {
-namespace BDX {
+namespace bdx {
 
 TransferSession::TransferSession()
 {
@@ -274,42 +274,30 @@ exit:
 CHIP_ERROR TransferSession::PrepareBlockAck()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    BlockAck ackMsg;
+    CounterMessage ackMsg;
 
     VerifyOrExit(mRole == kRole_Receiver, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(mState == kState_TransferInProgress, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit((mState == kState_TransferInProgress) || (mState == kState_ReceivedEOF), err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(!mPendingOutput.Has(kOutput_MsgToSend), err = CHIP_ERROR_INCORRECT_STATE);
 
     ackMsg.BlockCounter = mBlockNumInFlight;
 
-    err = WriteToPacketBuffer<BlockAck>(ackMsg, mPendingMsgHandle);
-    SuccessOrExit(err);
+    if (mState == kState_TransferInProgress)
+    {
+        err = WriteToPacketBuffer<BlockAck>(ackMsg, mPendingMsgHandle);
+        SuccessOrExit(err);
 
-    err = AttachBdxHeader(kBdxMsg_BlockAck, mPendingMsgHandle);
-    SuccessOrExit(err);
+        err = AttachBdxHeader(kBdxMsg_BlockAck, mPendingMsgHandle);
+        SuccessOrExit(err);
+    }
+    else if (mState == kState_ReceivedEOF)
+    {
+        err = WriteToPacketBuffer<BlockAckEOF>(ackMsg, mPendingMsgHandle);
+        SuccessOrExit(err);
 
-    mPendingOutput.Set(kOutput_MsgToSend);
-
-exit:
-    return err;
-}
-
-CHIP_ERROR TransferSession::PrepareBlockAckEOF()
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    BlockAckEOF eofAckMsg;
-
-    VerifyOrExit(mRole == kRole_Receiver, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(mState == kState_TransferInProgress, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(!mPendingOutput.Has(kOutput_MsgToSend), err = CHIP_ERROR_INCORRECT_STATE);
-
-    eofAckMsg.BlockCounter = mBlockNumInFlight;
-
-    err = WriteToPacketBuffer<BlockAckEOF>(eofAckMsg, mPendingMsgHandle);
-    SuccessOrExit(err);
-
-    err = AttachBdxHeader(kBdxMsg_BlockAckEOF, mPendingMsgHandle);
-    SuccessOrExit(err);
+        err = AttachBdxHeader(kBdxMsg_BlockAckEOF, mPendingMsgHandle);
+        SuccessOrExit(err);
+    }
 
     mPendingOutput.Set(kOutput_MsgToSend);
 
@@ -621,6 +609,8 @@ void TransferSession::HandleBlockEOF(System::PacketBufferHandle msgData)
     mPendingMsgHandle = std::move(msgData);
     mPendingOutput.Set(kOutput_BlockReceived);
 
+    mState = kState_ReceivedEOF;
+
 exit:
     return;
 }
@@ -764,5 +754,5 @@ bool TransferSession::IsTransferLengthDefinite()
     return (mMaxLength > 0);
 }
 
-} // namespace BDX
+} // namespace bdx
 } // namespace chip

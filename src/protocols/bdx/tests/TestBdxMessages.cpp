@@ -9,7 +9,7 @@
 #include <limits>
 
 using namespace chip;
-using namespace chip::BDX;
+using namespace chip::bdx;
 
 /**
  * Helper method for testing that WriteToBuffer() and Parse() are successful, and that the parsed message
