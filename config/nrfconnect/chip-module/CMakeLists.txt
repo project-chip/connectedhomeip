@@ -181,7 +181,24 @@ endif()
 find_program(GN_EXECUTABLE gn)
 if (${GN_EXECUTABLE} STREQUAL GN_EXECUTABLE-NOTFOUND)
     message(FATAL_ERROR "The 'gn' command was not found. Make sure you have GN installed.")
-    return()
+else()
+    # Parse the 'gn --version' output to find the installed version.
+    set(MIN_GN_VERSION 1851)
+    execute_process(
+        COMMAND
+        ${GN_EXECUTABLE} --version
+        OUTPUT_VARIABLE gn_version_output
+        ERROR_VARIABLE  gn_error_output
+        RESULT_VARIABLE gn_status
+    )
+
+    if(${gn_status} EQUAL 0)
+        if(gn_version_output VERSION_LESS ${MIN_GN_VERSION})
+            message(FATAL_ERROR "Found unsuitable version of 'gn'. Required is at least ${MIN_GN_VERSION}")
+        endif()
+    else()
+        message(FATAL_ERROR "Could NOT find working gn: Found gn (${GN_EXECUTABLE}), but failed to load with:\n ${gn_error_output}")
+    endif()
 endif()
 
 # ==============================================================================
