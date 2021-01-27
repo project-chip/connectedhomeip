@@ -20,7 +20,7 @@
 
 #import <Foundation/Foundation.h>
 
-#import "CHIPError.h"
+#import <CHIP/CHIPError.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
