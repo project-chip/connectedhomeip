@@ -281,7 +281,7 @@ bool emberAfDoorLockClusterSetPinCallback(uint16_t userId, uint8_t userStatus, u
     uint16_t rfProgrammingEventMask = 0xffff; // send event by default
     emberAfReadServerAttribute(DOOR_LOCK_SERVER_ENDPOINT, ZCL_DOOR_LOCK_CLUSTER_ID, ZCL_RF_PROGRAMMING_EVENT_MASK_ATTRIBUTE_ID,
                                (uint8_t *) &rfProgrammingEventMask, sizeof(rfProgrammingEventMask));
-    if ((rfProgrammingEventMask & BIT(2)) && !status && (pin != NULL))
+    if ((rfProgrammingEventMask & EMBER_BIT(2)) && !status && (pin != NULL))
     {
         emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_DOOR_LOCK_CLUSTER_ID,
                                   ZCL_PROGRAMMING_EVENT_NOTIFICATION_COMMAND_ID, "uuvsuuws", EMBER_ZCL_DOOR_LOCK_EVENT_SOURCE_RF,
@@ -350,14 +350,14 @@ bool emberAfDoorLockClusterClearPinCallback(uint16_t userId)
     uint8_t userPin                 = 0x00;   // Zero length Zigbee string
     emberAfReadServerAttribute(DOOR_LOCK_SERVER_ENDPOINT, ZCL_DOOR_LOCK_CLUSTER_ID, ZCL_RF_PROGRAMMING_EVENT_MASK_ATTRIBUTE_ID,
                                (uint8_t *) &rfProgrammingEventMask, sizeof(rfProgrammingEventMask));
-    if ((rfProgrammingEventMask & BIT(2)) && !status)
+    if ((rfProgrammingEventMask & EMBER_BIT(2)) && !status)
     {
         emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_DOOR_LOCK_CLUSTER_ID,
                                   ZCL_PROGRAMMING_EVENT_NOTIFICATION_COMMAND_ID, "uuvsuuws", 0x01, 0x03, userId, &userPin, 0x00,
                                   0x00, 0x00, &userPin);
         SEND_COMMAND_UNICAST_TO_BINDINGS();
     }
-    else if ((rfProgrammingEventMask & BIT(0)) && status)
+    else if ((rfProgrammingEventMask & EMBER_BIT(0)) && status)
     {
         emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_DOOR_LOCK_CLUSTER_ID,
                                   ZCL_PROGRAMMING_EVENT_NOTIFICATION_COMMAND_ID, "uuvsuuws", 0x01, 0x00, userId, &userPin, 0x00,
@@ -550,7 +550,7 @@ bool emberAfDoorLockClusterLockDoorCallback(uint8_t * PIN)
     // Possibly send operation event
     if (doorLocked)
     {
-        if (rfOperationEventMask & BIT(1) && (PIN != NULL))
+        if (rfOperationEventMask & EMBER_BIT(1) && (PIN != NULL))
         {
             emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_DOOR_LOCK_CLUSTER_ID,
                                       ZCL_OPERATION_EVENT_NOTIFICATION_COMMAND_ID, "uuvsws", 0x01, 0x03, userId, PIN, 0X00, PIN);
@@ -558,7 +558,7 @@ bool emberAfDoorLockClusterLockDoorCallback(uint8_t * PIN)
     }
     else
     {
-        if (rfOperationEventMask & BIT(3) && (PIN != NULL))
+        if (rfOperationEventMask & EMBER_BIT(3) && (PIN != NULL))
         {
             emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_DOOR_LOCK_CLUSTER_ID,
                                       ZCL_OPERATION_EVENT_NOTIFICATION_COMMAND_ID, "uuvsws", 0x01, 0x03, userId, PIN, 0x00, PIN);
@@ -599,7 +599,7 @@ bool emberAfDoorLockClusterUnlockDoorCallback(uint8_t * pin)
                                (uint8_t *) &rfOperationEventMask, sizeof(rfOperationEventMask));
 
     // send operation event
-    if (doorUnlocked && (rfOperationEventMask & BIT(2)) && (pin != NULL))
+    if (doorUnlocked && (rfOperationEventMask & EMBER_BIT(2)) && (pin != NULL))
     {
         emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_DOOR_LOCK_CLUSTER_ID,
                                   ZCL_OPERATION_EVENT_NOTIFICATION_COMMAND_ID, "uuvsws", EMBER_ZCL_DOOR_LOCK_EVENT_SOURCE_RF,

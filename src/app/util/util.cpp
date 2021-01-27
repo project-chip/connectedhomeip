@@ -934,8 +934,8 @@ void emberAfCopyLongString(uint8_t * dest, const uint8_t * src, uint16_t size)
             length = size;
         }
         memmove(dest + 2, src + 2, length);
-        dest[0] = LOW_BYTE(length);
-        dest[1] = HIGH_BYTE(length);
+        dest[0] = EMBER_LOW_BYTE(length);
+        dest[1] = EMBER_HIGH_BYTE(length);
     }
 }
 

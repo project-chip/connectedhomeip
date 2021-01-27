@@ -25,6 +25,8 @@ include(${CHIP_ROOT}/config/nrfconnect/app/app.cmake)
 
 project(chip-nrf52840-lighting-example)
 
+zephyr_compile_options(-Werror)
+
 target_include_directories(app PRIVATE 
                            main/include 
                            ${LIGHTING_COMMON} 
