@@ -4,7 +4,6 @@
 
 #include <app/CommandSender.h>
 #include <app/InteractionModelEngine.h>
-#include <app/im-handler.h>
 #include <support/ReturnMacros.h>
 
 #include <controller/CHIPClusters.h>
@@ -12,23 +11,6 @@
 
 using namespace chip;
 using namespace chip::app;
-
-namespace chip {
-namespace app {
-namespace cluster {
-
-// Empty command handlers
-{{#chip_server_clusters}}
-namespace {{asCamelCased name false}} {
-{{#chip_server_cluster_commands}}
-void Handle{{asType name}}CommandReceived(chip::TLV::TLVReader & aReader, chip::app::Command * apCommandObj) {}
-{{/chip_server_cluster_commands}}
-} // namespace {{asCamelCased name false}}
-
-{{/chip_server_clusters}}
-} // namespace cluster
-} // namespace app
-} // namespace chip
 
 extern "C" {
 

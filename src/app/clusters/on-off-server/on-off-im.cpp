@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -36,17 +36,17 @@ namespace OnOff {
 // TODO: Call handler in on-off.cpp here.
 void HandleOffCommandReceived(chip::TLV::TLVReader & aReader, chip::app::Command * apCommandObj)
 {
-    // Simplily does nothing, should be replaced by actual logic.
+    // Simply does nothing, should be replaced by actual logic.
 }
 
 void HandleOnCommandReceived(chip::TLV::TLVReader & aReader, chip::app::Command * apCommandObj)
 {
-    // Simplily does nothing, should be replaced by actual logic.
+    // Simply does nothing, should be replaced by actual logic.
 }
 
 void HandleToggleCommandReceived(chip::TLV::TLVReader & aReader, chip::app::Command * apCommandObj)
 {
-    // Simplily does nothing, should be replaced by actual logic.
+    // Simply does nothing, should be replaced by actual logic.
 }
 
 } // namespace OnOff
