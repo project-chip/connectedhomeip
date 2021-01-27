@@ -66,7 +66,7 @@ public:
      *  @retval #CHIP_NO_ERROR On success.
      *
      */
-    CHIP_ERROR Init(SecureSessionMgr * sessionMgr);
+    CHIP_ERROR Init(SecureSessionMgr * sessionMgr, SecureSessionMgrDelegate * secureSessionEventReceiver = nullptr);
 
     /**
      *  Shutdown the ExchangeManager. This terminates this instance
@@ -201,6 +201,9 @@ private:
     SecureSessionMgr * mSessionMgr;
     ReliableMessageMgr mReliableMessageMgr;
     MessageCounterSyncMgr mMessageCounterSyncMgr;
+    // TODO: allow temporary propagate SecureSessionMgrDelegate events to device controller, it won't be necessary after
+    // fully migrated to messaging layer
+    SecureSessionMgrDelegate * mSecureSessionEventReceiver;
 
     std::array<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> mContextPool;
     size_t mContextsInUse;
@@ -213,11 +216,12 @@ private:
     CHIP_ERROR RegisterUMH(uint32_t protocolId, int16_t msgType, ExchangeDelegate * delegate);
     CHIP_ERROR UnregisterUMH(uint32_t protocolId, int16_t msgType);
 
-    void OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source, SecureSessionMgr * msgLayer) override;
+    void OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source, SecureSessionMgr * mgr) override;
 
     void OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, SecureSessionHandle session,
-                           System::PacketBufferHandle msgBuf, SecureSessionMgr * msgLayer) override;
+                           System::PacketBufferHandle msgBuf, SecureSessionMgr * mgr) override;
 
+    void OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr) override;
     void OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * mgr) override;
 };
 
