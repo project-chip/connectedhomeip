@@ -105,7 +105,7 @@ public:
         static OutputEvent TransferInitEvent(TransferInitData data, System::PacketBufferHandle msg)
         {
             OutputEvent event(kOutput_InitReceived);
-            event.MsgData          = msg.Retain();
+            event.MsgData          = std::move(msg);
             event.transferInitData = data;
             return event;
         }
@@ -127,14 +127,14 @@ public:
         static OutputEvent TransferAcceptEvent(TransferAcceptData data, System::PacketBufferHandle msg)
         {
             OutputEvent event = TransferAcceptEvent(data);
-            event.MsgData     = msg.Retain();
+            event.MsgData     = std::move(msg);
             return event;
         }
 
         static OutputEvent BlockDataEvent(BlockData data, System::PacketBufferHandle msg)
         {
             OutputEvent event(kOutput_BlockReceived);
-            event.MsgData   = msg.Retain();
+            event.MsgData   = std::move(msg);
             event.blockdata = data;
             return event;
         }

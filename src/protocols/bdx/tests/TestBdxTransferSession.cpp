@@ -17,14 +17,11 @@ void SendAndVerifyQuery(nlTestSuite * inSuite, void * inContext, TransferSession
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     receiver.PollOutput(outEvent);
     NL_TEST_ASSERT(inSuite, outEvent.EventType == TransferSession::kOutput_MsgToSend);
-    System::PacketBufferHandle queryMsgToSend = outEvent.MsgData.Retain();
-    NL_TEST_ASSERT(inSuite, !queryMsgToSend.IsNull());
+    NL_TEST_ASSERT(inSuite, !outEvent.MsgData.IsNull());
 
-    // Pass BlockQuery to sender
-    err = sender.HandleMessageReceived(queryMsgToSend.Retain());
+    // Pass BlockQuery to sender and verify sender emits QueryReceived event
+    err = sender.HandleMessageReceived(std::move(outEvent.MsgData));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    // Verify sender emits QueryReceived event
     sender.PollOutput(outEvent);
     NL_TEST_ASSERT(inSuite, outEvent.EventType == TransferSession::kOutput_QueryReceived);
 }
@@ -43,26 +40,24 @@ void SendAndVerifyArbitraryBlock(nlTestSuite * inSuite, void * inContext, Transf
 
     uint8_t * fakeBlockData = fakeDataBuf->Start();
 
-    // Provide Block data and verify sender emits Block message
     TransferSession::BlockData blockData;
     blockData.Data   = fakeBlockData;
     blockData.Length = maxBlockSize;
     blockData.IsEof  = isEof;
 
+    // Provide Block data and verify sender emits Block message
     err = sender.PrepareBlock(blockData);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     sender.PollOutput(outEvent);
     NL_TEST_ASSERT(inSuite, outEvent.EventType == TransferSession::kOutput_MsgToSend);
-    System::PacketBufferHandle blockMsgToSend = outEvent.MsgData.Retain();
-    NL_TEST_ASSERT(inSuite, !blockMsgToSend.IsNull());
+    NL_TEST_ASSERT(inSuite, !outEvent.MsgData.IsNull());
 
     // Pass Block message to receiver and verify Block is received
-    err = receiver.HandleMessageReceived(blockMsgToSend.Retain());
+    err = receiver.HandleMessageReceived(std::move(outEvent.MsgData));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     receiver.PollOutput(outEvent);
     NL_TEST_ASSERT(inSuite, outEvent.EventType == TransferSession::kOutput_BlockReceived);
-    System::PacketBufferHandle receivedBlock = outEvent.MsgData.Retain();
-    NL_TEST_ASSERT(inSuite, !receivedBlock.IsNull());
+    NL_TEST_ASSERT(inSuite, !outEvent.MsgData.IsNull());
     NL_TEST_ASSERT(inSuite, outEvent.blockdata.Data != nullptr);
 }
 
@@ -74,11 +69,10 @@ void SendAndVerifyBlockAck(nlTestSuite * inSuite, void * inContext, TransferSess
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     receiver.PollOutput(outEvent);
     NL_TEST_ASSERT(inSuite, outEvent.EventType == TransferSession::kOutput_MsgToSend);
-    System::PacketBufferHandle ackToSend = outEvent.MsgData.Retain();
-    NL_TEST_ASSERT(inSuite, !ackToSend.IsNull());
+    NL_TEST_ASSERT(inSuite, !outEvent.MsgData.IsNull());
 
     // Pass BlockAck to sender and verify it was received
-    err = sender.HandleMessageReceived(ackToSend.Retain());
+    err = sender.HandleMessageReceived(std::move(outEvent.MsgData));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     sender.PollOutput(outEvent);
     NL_TEST_ASSERT(inSuite, outEvent.EventType == TransferSession::kOutput_AckReceived);
@@ -118,7 +112,7 @@ void TestInitiatingReceiverReceiverDrive(nlTestSuite * inSuite, void * inContext
     senderOpts.Set(kControl_ReceiverDrive);
     err = respondingSender.WaitForTransfer(kRole_Sender, senderOpts, transferBlockSize);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    err = respondingSender.HandleMessageReceived(outEvent.MsgData.Retain());
+    err = respondingSender.HandleMessageReceived(std::move(outEvent.MsgData));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // Responder may want to read any of the fields of the TransferInit for approval.
@@ -150,11 +144,10 @@ void TestInitiatingReceiverReceiverDrive(nlTestSuite * inSuite, void * inContext
     // Verify Sender emits ReceiveAccept message for sending
     respondingSender.PollOutput(outEvent);
     NL_TEST_ASSERT(inSuite, outEvent.EventType == TransferSession::kOutput_MsgToSend);
-    System::PacketBufferHandle acceptMsgToSend = outEvent.MsgData.Retain();
-    NL_TEST_ASSERT(inSuite, !acceptMsgToSend.IsNull());
+    NL_TEST_ASSERT(inSuite, !outEvent.MsgData.IsNull());
 
     // Pass Accept message to initiatingReceiver
-    err = initiatingReceiver.HandleMessageReceived(acceptMsgToSend.Retain());
+    err = initiatingReceiver.HandleMessageReceived(std::move(outEvent.MsgData));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // Verify received ReceiveAccept.
@@ -166,8 +159,7 @@ void TestInitiatingReceiverReceiverDrive(nlTestSuite * inSuite, void * inContext
     NL_TEST_ASSERT(inSuite, outEvent.transferAcceptData.StartOffset == proposedOffset);
     NL_TEST_ASSERT(inSuite, outEvent.transferAcceptData.Length == proposedLength);
     NL_TEST_ASSERT(inSuite, outEvent.transferAcceptData.MaxBlockSize == transferBlockSize);
-    System::PacketBufferHandle rcvdAcceptMsgData = outEvent.MsgData.Retain();
-    NL_TEST_ASSERT(inSuite, !rcvdAcceptMsgData.IsNull());
+    NL_TEST_ASSERT(inSuite, !outEvent.MsgData.IsNull());
     NL_TEST_ASSERT(inSuite,
                    !memcmp(testMetadata, outEvent.transferAcceptData.Metadata, outEvent.transferAcceptData.MetadataLength));
 
@@ -194,11 +186,10 @@ void TestInitiatingReceiverReceiverDrive(nlTestSuite * inSuite, void * inContext
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     initiatingReceiver.PollOutput(outEvent);
     NL_TEST_ASSERT(inSuite, outEvent.EventType == TransferSession::kOutput_MsgToSend);
-    System::PacketBufferHandle eofAckToSend = outEvent.MsgData.Retain();
-    NL_TEST_ASSERT(inSuite, !eofAckToSend.IsNull());
+    NL_TEST_ASSERT(inSuite, !outEvent.MsgData.IsNull());
 
     // Pass BlockAckEOF message to respondingSender and verify PollOutput emits correct event
-    err = respondingSender.HandleMessageReceived(eofAckToSend.Retain());
+    err = respondingSender.HandleMessageReceived(std::move(outEvent.MsgData));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     respondingSender.PollOutput(outEvent);
     NL_TEST_ASSERT(inSuite, outEvent.EventType == TransferSession::kOutput_AckEOFReceived);
@@ -232,8 +223,7 @@ void TestInitiatingSenderSenderDrive(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     initiatingSender.PollOutput(outEvent);
     NL_TEST_ASSERT(inSuite, outEvent.EventType == TransferSession::kOutput_MsgToSend);
-    System::PacketBufferHandle sendInitToSend = outEvent.MsgData.Retain();
-    NL_TEST_ASSERT(inSuite, !sendInitToSend.IsNull());
+    NL_TEST_ASSERT(inSuite, !outEvent.MsgData.IsNull());
 
     // Initialize respondingReceiver
     BitFlags<uint8_t, TransferControlFlags> receiverOpts;
@@ -244,7 +234,7 @@ void TestInitiatingSenderSenderDrive(nlTestSuite * inSuite, void * inContext)
     // Responder may want to read any of the fields of the TransferInit for approval.
     // Verify File Designator matches. Verify that the respondingSenser automatically set ReceiverDrive
     // for the chosen ControlMode.
-    err = respondingReceiver.HandleMessageReceived(sendInitToSend.Retain());
+    err = respondingReceiver.HandleMessageReceived(std::move(outEvent.MsgData));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     respondingReceiver.PollOutput(outEvent);
     NL_TEST_ASSERT(inSuite, outEvent.EventType == TransferSession::kOutput_InitReceived);
@@ -270,11 +260,10 @@ void TestInitiatingSenderSenderDrive(nlTestSuite * inSuite, void * inContext)
     // Verify Sender emits SendAccept message for sending
     respondingReceiver.PollOutput(outEvent);
     NL_TEST_ASSERT(inSuite, outEvent.EventType == TransferSession::kOutput_MsgToSend);
-    System::PacketBufferHandle acceptMsgToSend = outEvent.MsgData.Retain();
-    NL_TEST_ASSERT(inSuite, !acceptMsgToSend.IsNull());
+    NL_TEST_ASSERT(inSuite, !outEvent.MsgData.IsNull());
 
     // Pass Accept message to initiatingReceiver
-    err = initiatingSender.HandleMessageReceived(acceptMsgToSend.Retain());
+    err = initiatingSender.HandleMessageReceived(std::move(outEvent.MsgData));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // Verify received SendAccept.
@@ -284,8 +273,7 @@ void TestInitiatingSenderSenderDrive(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, outEvent.EventType == TransferSession::kOutput_AcceptReceived);
     NL_TEST_ASSERT(inSuite, outEvent.transferAcceptData.ControlMode == driveMode);
     NL_TEST_ASSERT(inSuite, outEvent.transferAcceptData.MaxBlockSize == transferBlockSize);
-    System::PacketBufferHandle rcvdAcceptMsgData = outEvent.MsgData.Retain();
-    NL_TEST_ASSERT(inSuite, !rcvdAcceptMsgData.IsNull());
+    NL_TEST_ASSERT(inSuite, !outEvent.MsgData.IsNull());
     NL_TEST_ASSERT(inSuite,
                    !memcmp(testMetadata, outEvent.transferAcceptData.Metadata, outEvent.transferAcceptData.MetadataLength));
 

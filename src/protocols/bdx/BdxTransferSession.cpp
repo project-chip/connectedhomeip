@@ -459,7 +459,7 @@ void TransferSession::HandleTransferInit(MessageType msgType, System::PacketBuff
     mTransferRequestData.Metadata            = transferInit.Metadata;
     mTransferRequestData.MetadataLength      = transferInit.MetadataLength;
 
-    mPendingMsgHandle = msgData.Retain();
+    mPendingMsgHandle = std::move(msgData);
     mPendingOutput.Set(kOutput_InitReceived);
 
     mState = kState_NegotiateTransferParams;
@@ -497,7 +497,7 @@ void TransferSession::HandleReceiveAccept(System::PacketBufferHandle msgData)
     mTransferAcceptData.Metadata       = rcvAcceptMsg.Metadata;
     mTransferAcceptData.MetadataLength = rcvAcceptMsg.MetadataLength;
 
-    mPendingMsgHandle = msgData.Retain();
+    mPendingMsgHandle = std::move(msgData);
     mPendingOutput.Set(kOutput_AcceptReceived);
 
     mState = kState_TransferInProgress;
@@ -533,7 +533,7 @@ void TransferSession::HandleSendAccept(System::PacketBufferHandle msgData)
     mTransferAcceptData.Metadata       = sendAcceptMsg.Metadata;
     mTransferAcceptData.MetadataLength = sendAcceptMsg.MetadataLength;
 
-    mPendingMsgHandle = msgData.Retain();
+    mPendingMsgHandle = std::move(msgData);
     mPendingOutput.Set(kOutput_AcceptReceived);
 
     mState = kState_TransferInProgress;
@@ -551,7 +551,7 @@ void TransferSession::HandleBlockQuery(System::PacketBufferHandle msgData)
     VerifyOrExit(mState == kState_TransferInProgress, SetTransferError(kStatus_ServerBadState));
     VerifyOrExit(!mPendingOutput.Has(kOutput_QueryReceived), SetTransferError(kStatus_ServerBadState));
 
-    err = query.Parse(msgData.Retain());
+    err = query.Parse(std::move(msgData));
     VerifyOrExit(err == CHIP_NO_ERROR, SetTransferError(kStatus_BadMessageContents));
 
     VerifyOrExit(query.BlockCounter == mNextQueryNum, SetTransferError(kStatus_BadBlockCounter));
@@ -591,7 +591,7 @@ void TransferSession::HandleBlock(System::PacketBufferHandle msgData)
 
     mNumBytesProcessed += blockMsg.DataLength;
 
-    mPendingMsgHandle = msgData.Retain();
+    mPendingMsgHandle = std::move(msgData);
     mPendingOutput.Set(kOutput_BlockReceived);
 
 exit:
@@ -618,7 +618,7 @@ void TransferSession::HandleBlockEOF(System::PacketBufferHandle msgData)
 
     mNumBytesProcessed += blockEOFMsg.DataLength;
 
-    mPendingMsgHandle = msgData.Retain();
+    mPendingMsgHandle = std::move(msgData);
     mPendingOutput.Set(kOutput_BlockReceived);
 
 exit:
@@ -633,7 +633,7 @@ void TransferSession::HandleBlockAck(System::PacketBufferHandle msgData)
     VerifyOrExit(mRole == kRole_Sender, SetTransferError(kStatus_ServerBadState));
     VerifyOrExit(mState == kState_TransferInProgress, SetTransferError(kStatus_ServerBadState));
 
-    err = ackMsg.Parse(msgData.Retain());
+    err = ackMsg.Parse(std::move(msgData));
     VerifyOrExit(err == CHIP_NO_ERROR, SetTransferError(kStatus_BadMessageContents));
     VerifyOrExit(ackMsg.BlockCounter == mBlockNumInFlight, SetTransferError(kStatus_BadBlockCounter));
 
@@ -651,7 +651,7 @@ void TransferSession::HandleBlockAckEOF(System::PacketBufferHandle msgData)
     VerifyOrExit(mRole == kRole_Sender, SetTransferError(kStatus_ServerBadState));
     VerifyOrExit(mState == kState_AwaitingEOFAck, SetTransferError(kStatus_ServerBadState));
 
-    err = ackMsg.Parse(msgData.Retain());
+    err = ackMsg.Parse(std::move(msgData));
     VerifyOrExit(err == CHIP_NO_ERROR, SetTransferError(kStatus_BadMessageContents));
     VerifyOrExit(ackMsg.BlockCounter == mBlockNumInFlight, SetTransferError(kStatus_BadBlockCounter));
 
