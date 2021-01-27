@@ -35,7 +35,7 @@ CHIP_ERROR BarrierControlCluster::BarrierControlGoToPercent(Callback::Callback<>
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, kClusterId, kBarrierControlGoToPercentCommandId,
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kBarrierControlGoToPercentCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
@@ -65,7 +65,7 @@ CHIP_ERROR BarrierControlCluster::BarrierControlStop(Callback::Callback<> * onCo
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, kClusterId, kBarrierControlStopCommandId,
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kBarrierControlStopCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
@@ -130,7 +130,7 @@ CHIP_ERROR BasicCluster::MfgSpecificPing(Callback::Callback<> * onCompletion)
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, kClusterId, kMfgSpecificPingCommandId,
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMfgSpecificPingCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
@@ -158,7 +158,7 @@ CHIP_ERROR BasicCluster::ResetToFactoryDefaults(Callback::Callback<> * onComplet
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, kClusterId, kResetToFactoryDefaultsCommandId,
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kResetToFactoryDefaultsCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
@@ -212,7 +212,7 @@ CHIP_ERROR BindingCluster::Bind(Callback::Callback<> * onCompletion, chip::NodeI
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, kClusterId, kBindCommandId,
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kBindCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
@@ -249,7 +249,7 @@ CHIP_ERROR BindingCluster::Unbind(Callback::Callback<> * onCompletion, chip::Nod
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, kClusterId, kUnbindCommandId,
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kUnbindCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
@@ -299,7 +299,7 @@ CHIP_ERROR ColorControlCluster::MoveColor(Callback::Callback<> * onCompletion, i
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, kClusterId, kMoveColorCommandId,
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveColorCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
@@ -338,7 +338,7 @@ CHIP_ERROR ColorControlCluster::MoveColorTemperature(Callback::Callback<> * onCo
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, kClusterId, kMoveColorTemperatureCommandId,
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveColorTemperatureCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
@@ -380,7 +380,7 @@ CHIP_ERROR ColorControlCluster::MoveHue(Callback::Callback<> * onCompletion, uin
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, kClusterId, kMoveHueCommandId,
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveHueCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
@@ -418,7 +418,7 @@ CHIP_ERROR ColorControlCluster::MoveSaturation(Callback::Callback<> * onCompleti
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, kClusterId, kMoveSaturationCommandId,
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveSaturationCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
@@ -456,7 +456,7 @@ CHIP_ERROR ColorControlCluster::MoveToColor(Callback::Callback<> * onCompletion,
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, kClusterId, kMoveToColorCommandId,
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveToColorCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
@@ -496,7 +496,7 @@ CHIP_ERROR ColorControlCluster::MoveToColorTemperature(Callback::Callback<> * on
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, kClusterId, kMoveToColorTemperatureCommandId,
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveToColorTemperatureCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
@@ -534,7 +534,7 @@ CHIP_ERROR ColorControlCluster::MoveToHue(Callback::Callback<> * onCompletion, u
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, kClusterId, kMoveToHueCommandId,
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveToHueCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
@@ -574,7 +574,7 @@ CHIP_ERROR ColorControlCluster::MoveToHueAndSaturation(Callback::Callback<> * on
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, kClusterId, kMoveToHueAndSaturationCommandId,
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveToHueAndSaturationCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
@@ -614,7 +614,7 @@ CHIP_ERROR ColorControlCluster::MoveToSaturation(Callback::Callback<> * onComple
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, kClusterId, kMoveToSaturationCommandId,
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveToSaturationCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
@@ -652,7 +652,7 @@ CHIP_ERROR ColorControlCluster::StepColor(Callback::Callback<> * onCompletion, i
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, kClusterId, kStepColorCommandId,
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kStepColorCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
@@ -693,7 +693,7 @@ CHIP_ERROR ColorControlCluster::StepColorTemperature(Callback::Callback<> * onCo
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, kClusterId, kStepColorTemperatureCommandId,
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kStepColorTemperatureCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
@@ -738,7 +738,7 @@ CHIP_ERROR ColorControlCluster::StepHue(Callback::Callback<> * onCompletion, uin
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, kClusterId, kStepHueCommandId,
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kStepHueCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
@@ -778,7 +778,7 @@ CHIP_ERROR ColorControlCluster::StepSaturation(Callback::Callback<> * onCompleti
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, kClusterId, kStepSaturationCommandId,
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kStepSaturationCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
@@ -817,7 +817,7 @@ CHIP_ERROR ColorControlCluster::StopMoveStep(Callback::Callback<> * onCompletion
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, kClusterId, kStopMoveStepCommandId,
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kStopMoveStepCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
@@ -1282,7 +1282,7 @@ CHIP_ERROR DoorLockCluster::ClearAllPins(Callback::Callback<> * onCompletion)
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, kClusterId, kClearAllPinsCommandId,
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kClearAllPinsCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
@@ -1310,7 +1310,7 @@ CHIP_ERROR DoorLockCluster::ClearAllRfids(Callback::Callback<> * onCompletion)
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, kClusterId, kClearAllRfidsCommandId,
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kClearAllRfidsCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
@@ -1338,7 +1338,7 @@ CHIP_ERROR DoorLockCluster::ClearHolidaySchedule(Callback::Callback<> * onComple
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, kClusterId, kClearHolidayScheduleCommandId,
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kClearHolidayScheduleCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
@@ -1368,7 +1368,7 @@ CHIP_ERROR DoorLockCluster::ClearPin(Callback::Callback<> * onCompletion, uint16
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, kClusterId, kClearPinCommandId,
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kClearPinCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
@@ -1398,7 +1398,7 @@ CHIP_ERROR DoorLockCluster::ClearRfid(Callback::Callback<> * onCompletion, uint1
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, kClusterId, kClearRfidCommandId,
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kClearRfidCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
@@ -1428,7 +1428,7 @@ CHIP_ERROR DoorLockCluster::ClearWeekdaySchedule(Callback::Callback<> * onComple
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, kClusterId, kClearWeekdayScheduleCommandId,
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kClearWeekdayScheduleCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
@@ -1460,7 +1460,7 @@ CHIP_ERROR DoorLockCluster::ClearYeardaySchedule(Callback::Callback<> * onComple
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, kClusterId, kClearYeardayScheduleCommandId,
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kClearYeardayScheduleCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
@@ -1492,7 +1492,7 @@ CHIP_ERROR DoorLockCluster::GetHolidaySchedule(Callback::Callback<> * onCompleti
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, kClusterId, kGetHolidayScheduleCommandId,
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetHolidayScheduleCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
@@ -1522,7 +1522,7 @@ CHIP_ERROR DoorLockCluster::GetLogRecord(Callback::Callback<> * onCompletion, ui
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, kClusterId, kGetLogRecordCommandId,
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetLogRecordCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
@@ -1552,7 +1552,7 @@ CHIP_ERROR DoorLockCluster::GetPin(Callback::Callback<> * onCompletion, uint16_t
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, kClusterId, kGetPinCommandId,
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetPinCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
@@ -1582,7 +1582,7 @@ CHIP_ERROR DoorLockCluster::GetRfid(Callback::Callback<> * onCompletion, uint16_
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, kClusterId, kGetRfidCommandId,
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetRfidCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
@@ -1612,7 +1612,7 @@ CHIP_ERROR DoorLockCluster::GetUserType(Callback::Callback<> * onCompletion, uin
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, kClusterId, kGetUserTypeCommandId,
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetUserTypeCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
@@ -1642,7 +1642,7 @@ CHIP_ERROR DoorLockCluster::GetWeekdaySchedule(Callback::Callback<> * onCompleti
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, kClusterId, kGetWeekdayScheduleCommandId,
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetWeekdayScheduleCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
@@ -1674,7 +1674,7 @@ CHIP_ERROR DoorLockCluster::GetYeardaySchedule(Callback::Callback<> * onCompleti
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, kClusterId, kGetYeardayScheduleCommandId,
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetYeardayScheduleCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
@@ -1706,7 +1706,7 @@ CHIP_ERROR DoorLockCluster::LockDoor(Callback::Callback<> * onCompletion, char *
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, kClusterId, kLockDoorCommandId,
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kLockDoorCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
@@ -1737,7 +1737,7 @@ CHIP_ERROR DoorLockCluster::SetHolidaySchedule(Callback::Callback<> * onCompleti
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, kClusterId, kSetHolidayScheduleCommandId,
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kSetHolidayScheduleCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
@@ -1775,7 +1775,7 @@ CHIP_ERROR DoorLockCluster::SetPin(Callback::Callback<> * onCompletion, uint16_t
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, kClusterId, kSetPinCommandId,
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kSetPinCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
@@ -1812,7 +1812,7 @@ CHIP_ERROR DoorLockCluster::SetRfid(Callback::Callback<> * onCompletion, uint16_
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, kClusterId, kSetRfidCommandId,
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kSetRfidCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
@@ -1848,7 +1848,7 @@ CHIP_ERROR DoorLockCluster::SetUserType(Callback::Callback<> * onCompletion, uin
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, kClusterId, kSetUserTypeCommandId,
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kSetUserTypeCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
@@ -1882,7 +1882,7 @@ CHIP_ERROR DoorLockCluster::SetWeekdaySchedule(Callback::Callback<> * onCompleti
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, kClusterId, kSetWeekdayScheduleCommandId,
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kSetWeekdayScheduleCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
@@ -1926,7 +1926,7 @@ CHIP_ERROR DoorLockCluster::SetYeardaySchedule(Callback::Callback<> * onCompleti
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, kClusterId, kSetYeardayScheduleCommandId,
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kSetYeardayScheduleCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
@@ -1963,7 +1963,7 @@ CHIP_ERROR DoorLockCluster::UnlockDoor(Callback::Callback<> * onCompletion, char
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, kClusterId, kUnlockDoorCommandId,
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kUnlockDoorCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
@@ -1993,7 +1993,7 @@ CHIP_ERROR DoorLockCluster::UnlockWithTimeout(Callback::Callback<> * onCompletio
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, kClusterId, kUnlockWithTimeoutCommandId,
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kUnlockWithTimeoutCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
@@ -2063,7 +2063,7 @@ CHIP_ERROR GroupsCluster::AddGroup(Callback::Callback<> * onCompletion, uint16_t
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, kClusterId, kAddGroupCommandId,
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kAddGroupCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
@@ -2095,7 +2095,7 @@ CHIP_ERROR GroupsCluster::AddGroupIfIdentifying(Callback::Callback<> * onComplet
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, kClusterId, kAddGroupIfIdentifyingCommandId,
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kAddGroupIfIdentifyingCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
@@ -2127,7 +2127,7 @@ CHIP_ERROR GroupsCluster::GetGroupMembership(Callback::Callback<> * onCompletion
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, kClusterId, kGetGroupMembershipCommandId,
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetGroupMembershipCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
@@ -2159,7 +2159,7 @@ CHIP_ERROR GroupsCluster::RemoveAllGroups(Callback::Callback<> * onCompletion)
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, kClusterId, kRemoveAllGroupsCommandId,
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kRemoveAllGroupsCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
@@ -2187,7 +2187,7 @@ CHIP_ERROR GroupsCluster::RemoveGroup(Callback::Callback<> * onCompletion, uint1
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, kClusterId, kRemoveGroupCommandId,
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kRemoveGroupCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
@@ -2217,7 +2217,7 @@ CHIP_ERROR GroupsCluster::ViewGroup(Callback::Callback<> * onCompletion, uint16_
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, kClusterId, kViewGroupCommandId,
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kViewGroupCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
@@ -2315,7 +2315,7 @@ CHIP_ERROR IdentifyCluster::Identify(Callback::Callback<> * onCompletion, uint16
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, kClusterId, kIdentifyCommandId,
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kIdentifyCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
@@ -2345,7 +2345,7 @@ CHIP_ERROR IdentifyCluster::IdentifyQuery(Callback::Callback<> * onCompletion)
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, kClusterId, kIdentifyQueryCommandId,
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kIdentifyQueryCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
@@ -2399,7 +2399,7 @@ CHIP_ERROR LevelControlCluster::Move(Callback::Callback<> * onCompletion, uint8_
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, kClusterId, kMoveCommandId,
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
@@ -2437,7 +2437,7 @@ CHIP_ERROR LevelControlCluster::MoveToLevel(Callback::Callback<> * onCompletion,
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, kClusterId, kMoveToLevelCommandId,
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveToLevelCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
@@ -2474,7 +2474,7 @@ CHIP_ERROR LevelControlCluster::MoveToLevelWithOnOff(Callback::Callback<> * onCo
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, kClusterId, kMoveToLevelWithOnOffCommandId,
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveToLevelWithOnOffCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
@@ -2506,7 +2506,7 @@ CHIP_ERROR LevelControlCluster::MoveWithOnOff(Callback::Callback<> * onCompletio
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, kClusterId, kMoveWithOnOffCommandId,
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveWithOnOffCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
@@ -2539,7 +2539,7 @@ CHIP_ERROR LevelControlCluster::Step(Callback::Callback<> * onCompletion, uint8_
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, kClusterId, kStepCommandId,
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kStepCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
@@ -2579,7 +2579,7 @@ CHIP_ERROR LevelControlCluster::StepWithOnOff(Callback::Callback<> * onCompletio
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, kClusterId, kStepWithOnOffCommandId,
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kStepWithOnOffCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
@@ -2614,7 +2614,7 @@ CHIP_ERROR LevelControlCluster::Stop(Callback::Callback<> * onCompletion, uint8_
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, kClusterId, kStopCommandId,
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kStopCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
@@ -2646,7 +2646,7 @@ CHIP_ERROR LevelControlCluster::StopWithOnOff(Callback::Callback<> * onCompletio
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, kClusterId, kStopWithOnOffCommandId,
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kStopWithOnOffCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
@@ -2701,7 +2701,7 @@ CHIP_ERROR OnOffCluster::Off(Callback::Callback<> * onCompletion)
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, kClusterId, kOffCommandId,
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kOffCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
@@ -2729,7 +2729,7 @@ CHIP_ERROR OnOffCluster::On(Callback::Callback<> * onCompletion)
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, kClusterId, kOnCommandId,
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kOnCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
@@ -2757,7 +2757,7 @@ CHIP_ERROR OnOffCluster::Toggle(Callback::Callback<> * onCompletion)
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, kClusterId, kToggleCommandId,
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kToggleCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
@@ -2812,7 +2812,7 @@ CHIP_ERROR ScenesCluster::AddScene(Callback::Callback<> * onCompletion, uint16_t
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, kClusterId, kAddSceneCommandId,
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kAddSceneCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
@@ -2855,7 +2855,7 @@ CHIP_ERROR ScenesCluster::GetSceneMembership(Callback::Callback<> * onCompletion
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, kClusterId, kGetSceneMembershipCommandId,
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetSceneMembershipCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
@@ -2886,7 +2886,7 @@ CHIP_ERROR ScenesCluster::RecallScene(Callback::Callback<> * onCompletion, uint1
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, kClusterId, kRecallSceneCommandId,
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kRecallSceneCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
@@ -2920,7 +2920,7 @@ CHIP_ERROR ScenesCluster::RemoveAllScenes(Callback::Callback<> * onCompletion, u
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, kClusterId, kRemoveAllScenesCommandId,
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kRemoveAllScenesCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
@@ -2950,7 +2950,7 @@ CHIP_ERROR ScenesCluster::RemoveScene(Callback::Callback<> * onCompletion, uint1
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, kClusterId, kRemoveSceneCommandId,
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kRemoveSceneCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
@@ -2982,7 +2982,7 @@ CHIP_ERROR ScenesCluster::StoreScene(Callback::Callback<> * onCompletion, uint16
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, kClusterId, kStoreSceneCommandId,
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kStoreSceneCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
@@ -3014,7 +3014,7 @@ CHIP_ERROR ScenesCluster::ViewScene(Callback::Callback<> * onCompletion, uint16_
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, kClusterId, kViewSceneCommandId,
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kViewSceneCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
