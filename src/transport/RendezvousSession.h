@@ -139,8 +139,6 @@ public:
      */
     const Inet::IPAddress & GetIPAddress() const { return mNetworkProvision.GetIPAddress(); }
 
-    const Transport::PeerAddress & GetPeerAddress() const { return mPeerAddress; }
-
 private:
     CHIP_ERROR HandlePairingMessage(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
                                     System::PacketBufferHandle msgBuf);
