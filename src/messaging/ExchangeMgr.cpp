@@ -64,7 +64,7 @@ ExchangeManager::ExchangeManager() : mReliableMessageMgr(mContextPool)
     mState = State::kState_NotInitialized;
 }
 
-CHIP_ERROR ExchangeManager::Init(SecureSessionMgr * sessionMgr)
+CHIP_ERROR ExchangeManager::Init(SecureSessionMgr * sessionMgr, SecureSessionMgrDelegate * deviceController)
 {
     if (mState != State::kState_NotInitialized)
         return CHIP_ERROR_INCORRECT_STATE;
@@ -79,6 +79,7 @@ CHIP_ERROR ExchangeManager::Init(SecureSessionMgr * sessionMgr)
     OnExchangeContextChanged = nullptr;
 
     sessionMgr->SetDelegate(this);
+    mDeviceController = deviceController;
 
     mReliableMessageMgr.Init(sessionMgr->SystemLayer(), sessionMgr);
 
@@ -127,9 +128,11 @@ CHIP_ERROR ExchangeManager::UnregisterUnsolicitedMessageHandler(uint32_t protoco
     return UnregisterUMH(protocolId, static_cast<int16_t>(msgType));
 }
 
-void ExchangeManager::OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source, SecureSessionMgr * msgLayer)
+void ExchangeManager::OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source, SecureSessionMgr * mgr)
 {
     ChipLogError(ExchangeManager, "Accept FAILED, err = %s", ErrorStr(error));
+    // TODO: propagate event into device controller, it won't be necessary after fully migrated to messaging layer
+    if (mDeviceController != nullptr) mDeviceController->OnReceiveError(error, source, mgr);
 }
 
 ExchangeContext * ExchangeManager::AllocContext(uint16_t ExchangeId, SecureSessionHandle session, bool Initiator,
@@ -198,7 +201,7 @@ CHIP_ERROR ExchangeManager::UnregisterUMH(uint32_t protocolId, int16_t msgType)
 }
 
 void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                                        SecureSessionHandle session, System::PacketBufferHandle msgBuf, SecureSessionMgr * msgLayer)
+                                        SecureSessionHandle session, System::PacketBufferHandle msgBuf, SecureSessionMgr * mgr)
 {
     CHIP_ERROR err                          = CHIP_NO_ERROR;
     UnsolicitedMessageHandler * umh         = nullptr;
@@ -254,7 +257,11 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
     // an ack to the peer.
     else if (!payloadHeader.IsNeedsAck())
     {
-        ExitNow(err = CHIP_ERROR_UNSOLICITED_MSG_NO_ORIGINATOR);
+        // TODO: propagate event into device controller, it won't be necessary after fully migrated to messaging layer
+        // ExitNow(err = CHIP_ERROR_UNSOLICITED_MSG_NO_ORIGINATOR);
+        if (mDeviceController != nullptr)
+            mDeviceController->OnMessageReceived(packetHeader, payloadHeader, session, std::move(msgBuf), mgr);
+        ExitNow(err = CHIP_NO_ERROR);
     }
 
     // If we didn't find an existing exchange that matches the message, and no unsolicited message handler registered
@@ -296,6 +303,13 @@ exit:
     }
 }
 
+void ExchangeManager::OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr)
+{
+    // TODO: propagate event into device controller, it won't be necessary after fully migrated to messaging layer
+    if (mDeviceController != nullptr)
+        mDeviceController->OnNewConnection(session, mgr);
+}
+
 void ExchangeManager::OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * mgr)
 {
     for (auto & ec : mContextPool)
@@ -306,6 +320,10 @@ void ExchangeManager::OnConnectionExpired(SecureSessionHandle session, SecureSes
             // Continue iterate because there can be multiple contexts associated with the connection.
         }
     }
+
+    // TODO: propagate event into device controller, it won't be necessary after fully migrated to messaging layer
+    if (mDeviceController != nullptr)
+        mDeviceController->OnConnectionExpired(session, mgr);
 }
 
 void ExchangeManager::IncrementContextsInUse()
