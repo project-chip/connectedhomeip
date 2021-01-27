@@ -132,14 +132,14 @@ int AppTask::Init()
     sLightLED.Set(LightMgr().IsLightOn());
     UpdateClusterState();
 
+    ConfigurationMgr().LogDeviceConfig();
+
 // Print setup info on LCD if available
 #ifdef DISPLAY_ENABLED
-    uint32_t setupPinCode;
     std::string QRCode;
 
-    if (GetQRCode(setupPinCode, QRCode, chip::RendezvousInformationFlags::kBLE) == CHIP_NO_ERROR)
+    if (GetQRCode(QRCode, chip::RendezvousInformationFlags::kBLE) == CHIP_NO_ERROR)
     {
-        EFR32_LOG("SetupPINCode: [%09u]", setupPinCode);
         LCDWriteQRCode((uint8_t *) QRCode.c_str());
     }
     else

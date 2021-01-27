@@ -132,6 +132,8 @@ public:
 
     CHIP_ERROR ComputeProvisioningHash(uint8_t * hashBuf, size_t hashBufSize);
 
+    void LogDeviceConfig();
+
 private:
     // ===== Members for internal use by the following friends.
 
@@ -538,5 +540,11 @@ inline void ConfigurationManager::UseManufacturerCredentialsAsOperational(bool v
 }
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_JUST_IN_TIME_PROVISIONING
+
+inline void ConfigurationManager::LogDeviceConfig()
+{
+    static_cast<ImplClass *>(this)->_LogDeviceConfig();
+}
+
 } // namespace DeviceLayer
 } // namespace chip
