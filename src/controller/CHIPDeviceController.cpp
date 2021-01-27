@@ -736,9 +736,6 @@ void DeviceCommissioner::OnRendezvousComplete()
     device = &mActiveDevices[mDeviceBeingPaired];
     mPairedDevices.Insert(device->GetDeviceId());
     mPairedDevicesUpdated = true;
-    // TODO: Adding new keys to session manager should be done by RendezvousSession or PairingSession
-    mSessionManager->NewPairing(Optional<Transport::PeerAddress>(mRendezvousSession->GetPeerAddress()), device->GetDeviceId(),
-                                &mRendezvousSession->GetPairingSession());
     // We need to kick the device since we are not a valid secure pairing delegate when using IM.
     device->InitCommandSender();
 

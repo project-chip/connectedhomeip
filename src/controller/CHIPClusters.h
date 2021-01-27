@@ -56,6 +56,11 @@ public:
     CHIP_ERROR ReadAttributeBarrierCapabilities(Callback::Callback<> * onCompletion);
     CHIP_ERROR ReadAttributeBarrierPosition(Callback::Callback<> * onCompletion);
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Callback<> * onCompletion);
+
+private:
+    static constexpr uint16_t kClusterId                         = 0x0103;
+    static constexpr uint8_t kBarrierControlGoToPercentCommandId = 0x00;
+    static constexpr uint8_t kBarrierControlStopCommandId        = 0x01;
 };
 
 class DLL_EXPORT BasicCluster : public ClusterBase
@@ -73,6 +78,11 @@ public:
     CHIP_ERROR ReadAttributeZclVersion(Callback::Callback<> * onCompletion);
     CHIP_ERROR ReadAttributePowerSource(Callback::Callback<> * onCompletion);
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Callback<> * onCompletion);
+
+private:
+    static constexpr uint16_t kClusterId                      = 0x0000;
+    static constexpr uint8_t kMfgSpecificPingCommandId        = 0x00;
+    static constexpr uint8_t kResetToFactoryDefaultsCommandId = 0x00;
 };
 
 class DLL_EXPORT BindingCluster : public ClusterBase
@@ -90,6 +100,11 @@ public:
     // Cluster Attributes
     CHIP_ERROR DiscoverAttributes(Callback::Callback<> * onCompletion);
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Callback<> * onCompletion);
+
+private:
+    static constexpr uint16_t kClusterId      = 0xF000;
+    static constexpr uint8_t kBindCommandId   = 0x00;
+    static constexpr uint8_t kUnbindCommandId = 0x01;
 };
 
 class DLL_EXPORT ColorControlCluster : public ClusterBase
@@ -205,6 +220,23 @@ public:
                                        uint16_t maxInterval, uint16_t change);
     CHIP_ERROR ReportAttributeColorTemperature(Callback::Callback<> * onCompletion, Callback::Callback<> * onChange,
                                                uint16_t minInterval, uint16_t maxInterval, uint16_t change);
+
+private:
+    static constexpr uint16_t kClusterId                      = 0x0300;
+    static constexpr uint8_t kMoveColorCommandId              = 0x08;
+    static constexpr uint8_t kMoveColorTemperatureCommandId   = 0x4B;
+    static constexpr uint8_t kMoveHueCommandId                = 0x01;
+    static constexpr uint8_t kMoveSaturationCommandId         = 0x04;
+    static constexpr uint8_t kMoveToColorCommandId            = 0x07;
+    static constexpr uint8_t kMoveToColorTemperatureCommandId = 0x0A;
+    static constexpr uint8_t kMoveToHueCommandId              = 0x00;
+    static constexpr uint8_t kMoveToHueAndSaturationCommandId = 0x06;
+    static constexpr uint8_t kMoveToSaturationCommandId       = 0x03;
+    static constexpr uint8_t kStepColorCommandId              = 0x09;
+    static constexpr uint8_t kStepColorTemperatureCommandId   = 0x4C;
+    static constexpr uint8_t kStepHueCommandId                = 0x02;
+    static constexpr uint8_t kStepSaturationCommandId         = 0x05;
+    static constexpr uint8_t kStopMoveStepCommandId           = 0x47;
 };
 
 class DLL_EXPORT DoorLockCluster : public ClusterBase
@@ -249,6 +281,32 @@ public:
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Callback<> * onCompletion);
     CHIP_ERROR ReportAttributeLockState(Callback::Callback<> * onCompletion, Callback::Callback<> * onChange, uint16_t minInterval,
                                         uint16_t maxInterval);
+
+private:
+    static constexpr uint16_t kClusterId                    = 0x0101;
+    static constexpr uint8_t kClearAllPinsCommandId         = 0x08;
+    static constexpr uint8_t kClearAllRfidsCommandId        = 0x19;
+    static constexpr uint8_t kClearHolidayScheduleCommandId = 0x13;
+    static constexpr uint8_t kClearPinCommandId             = 0x07;
+    static constexpr uint8_t kClearRfidCommandId            = 0x18;
+    static constexpr uint8_t kClearWeekdayScheduleCommandId = 0x0D;
+    static constexpr uint8_t kClearYeardayScheduleCommandId = 0x10;
+    static constexpr uint8_t kGetHolidayScheduleCommandId   = 0x12;
+    static constexpr uint8_t kGetLogRecordCommandId         = 0x04;
+    static constexpr uint8_t kGetPinCommandId               = 0x06;
+    static constexpr uint8_t kGetRfidCommandId              = 0x17;
+    static constexpr uint8_t kGetUserTypeCommandId          = 0x15;
+    static constexpr uint8_t kGetWeekdayScheduleCommandId   = 0x0C;
+    static constexpr uint8_t kGetYeardayScheduleCommandId   = 0x0F;
+    static constexpr uint8_t kLockDoorCommandId             = 0x00;
+    static constexpr uint8_t kSetHolidayScheduleCommandId   = 0x11;
+    static constexpr uint8_t kSetPinCommandId               = 0x05;
+    static constexpr uint8_t kSetRfidCommandId              = 0x16;
+    static constexpr uint8_t kSetUserTypeCommandId          = 0x14;
+    static constexpr uint8_t kSetWeekdayScheduleCommandId   = 0x0B;
+    static constexpr uint8_t kSetYeardayScheduleCommandId   = 0x0E;
+    static constexpr uint8_t kUnlockDoorCommandId           = 0x01;
+    static constexpr uint8_t kUnlockWithTimeoutCommandId    = 0x03;
 };
 
 class DLL_EXPORT GroupsCluster : public ClusterBase
@@ -269,6 +327,15 @@ public:
     CHIP_ERROR DiscoverAttributes(Callback::Callback<> * onCompletion);
     CHIP_ERROR ReadAttributeNameSupport(Callback::Callback<> * onCompletion);
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Callback<> * onCompletion);
+
+private:
+    static constexpr uint16_t kClusterId                     = 0x0004;
+    static constexpr uint8_t kAddGroupCommandId              = 0x00;
+    static constexpr uint8_t kAddGroupIfIdentifyingCommandId = 0x05;
+    static constexpr uint8_t kGetGroupMembershipCommandId    = 0x02;
+    static constexpr uint8_t kRemoveAllGroupsCommandId       = 0x04;
+    static constexpr uint8_t kRemoveGroupCommandId           = 0x03;
+    static constexpr uint8_t kViewGroupCommandId             = 0x01;
 };
 
 class DLL_EXPORT IasZoneCluster : public ClusterBase
@@ -286,6 +353,9 @@ public:
     CHIP_ERROR ReadAttributeZoneId(Callback::Callback<> * onCompletion);
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Callback<> * onCompletion);
     CHIP_ERROR WriteAttributeIasCieAddress(Callback::Callback<> * onCompletion, uint64_t value);
+
+private:
+    static constexpr uint16_t kClusterId = 0x0500;
 };
 
 class DLL_EXPORT IdentifyCluster : public ClusterBase
@@ -303,6 +373,11 @@ public:
     CHIP_ERROR ReadAttributeIdentifyTime(Callback::Callback<> * onCompletion);
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Callback<> * onCompletion);
     CHIP_ERROR WriteAttributeIdentifyTime(Callback::Callback<> * onCompletion, uint16_t value);
+
+private:
+    static constexpr uint16_t kClusterId             = 0x0003;
+    static constexpr uint8_t kIdentifyCommandId      = 0x00;
+    static constexpr uint8_t kIdentifyQueryCommandId = 0x01;
 };
 
 class DLL_EXPORT LevelControlCluster : public ClusterBase
@@ -330,6 +405,17 @@ public:
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Callback<> * onCompletion);
     CHIP_ERROR ReportAttributeCurrentLevel(Callback::Callback<> * onCompletion, Callback::Callback<> * onChange,
                                            uint16_t minInterval, uint16_t maxInterval, uint8_t change);
+
+private:
+    static constexpr uint16_t kClusterId                    = 0x0008;
+    static constexpr uint8_t kMoveCommandId                 = 0x01;
+    static constexpr uint8_t kMoveToLevelCommandId          = 0x00;
+    static constexpr uint8_t kMoveToLevelWithOnOffCommandId = 0x04;
+    static constexpr uint8_t kMoveWithOnOffCommandId        = 0x05;
+    static constexpr uint8_t kStepCommandId                 = 0x02;
+    static constexpr uint8_t kStepWithOnOffCommandId        = 0x06;
+    static constexpr uint8_t kStopCommandId                 = 0x03;
+    static constexpr uint8_t kStopWithOnOffCommandId        = 0x07;
 };
 
 class DLL_EXPORT OnOffCluster : public ClusterBase
@@ -349,6 +435,12 @@ public:
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Callback<> * onCompletion);
     CHIP_ERROR ReportAttributeOnOff(Callback::Callback<> * onCompletion, Callback::Callback<> * onChange, uint16_t minInterval,
                                     uint16_t maxInterval);
+
+private:
+    static constexpr uint16_t kClusterId      = 0x0006;
+    static constexpr uint8_t kOffCommandId    = 0x00;
+    static constexpr uint8_t kOnCommandId     = 0x01;
+    static constexpr uint8_t kToggleCommandId = 0x02;
 };
 
 class DLL_EXPORT ScenesCluster : public ClusterBase
@@ -375,6 +467,16 @@ public:
     CHIP_ERROR ReadAttributeSceneValid(Callback::Callback<> * onCompletion);
     CHIP_ERROR ReadAttributeNameSupport(Callback::Callback<> * onCompletion);
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Callback<> * onCompletion);
+
+private:
+    static constexpr uint16_t kClusterId                  = 0x0005;
+    static constexpr uint8_t kAddSceneCommandId           = 0x00;
+    static constexpr uint8_t kGetSceneMembershipCommandId = 0x06;
+    static constexpr uint8_t kRecallSceneCommandId        = 0x05;
+    static constexpr uint8_t kRemoveAllScenesCommandId    = 0x03;
+    static constexpr uint8_t kRemoveSceneCommandId        = 0x02;
+    static constexpr uint8_t kStoreSceneCommandId         = 0x04;
+    static constexpr uint8_t kViewSceneCommandId          = 0x01;
 };
 
 class DLL_EXPORT TemperatureMeasurementCluster : public ClusterBase
@@ -391,6 +493,9 @@ public:
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Callback<> * onCompletion);
     CHIP_ERROR ReportAttributeMeasuredValue(Callback::Callback<> * onCompletion, Callback::Callback<> * onChange,
                                             uint16_t minInterval, uint16_t maxInterval, int16_t change);
+
+private:
+    static constexpr uint16_t kClusterId = 0x0402;
 };
 
 } // namespace Controller
