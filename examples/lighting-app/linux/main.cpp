@@ -187,7 +187,8 @@ int main(int argc, char * argv[])
 #if CHIP_ENABLE_OPENTHREAD
     if (LinuxDeviceOptions::GetInstance().mThread)
     {
-        chip::DeviceLayer::ThreadStackMgrImpl().InitThreadStack();
+        SuccessOrExit(err = chip::DeviceLayer::ThreadStackMgrImpl().InitThreadStack());
+        std::cerr << "Thread initialized." << std::endl;
     }
 #endif // CHIP_ENABLE_OPENTHREAD
 
