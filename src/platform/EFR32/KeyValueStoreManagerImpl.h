@@ -86,8 +86,8 @@ private:
         Efr32FlashMemory() : pw::kvs::FlashMemory(FLASH_PAGE_SIZE, FLASH_SIZE / FLASH_PAGE_SIZE, sizeof(uint32_t), FLASH_BASE) {}
 
         // Enabling flash handled by platform
-        pw::Status Enable() override { return pw::Status::OK; }
-        pw::Status Disable() override { return pw::Status::OK; }
+        pw::Status Enable() override { return pw::OkStatus(); }
+        pw::Status Disable() override { return pw::OkStatus(); }
         bool IsEnabled() const override { return true; }
 
         pw::Status Erase(Address flash_address, size_t num_sectors) override
@@ -102,13 +102,13 @@ private:
                     return status;
                 }
             }
-            return pw::Status::OK;
+            return pw::OkStatus();
         }
 
         pw::StatusWithSize Read(Address address, std::span<std::byte> output) override
         {
             memcpy(output.data(), reinterpret_cast<void *>(address), output.size());
-            return pw::StatusWithSize::Ok(output.size());
+            return pw::StatusWithSize(output.size());
         }
 
         pw::StatusWithSize Write(Address destination_flash_address, std::span<const std::byte> data) override
@@ -125,18 +125,18 @@ private:
             switch (msc_status)
             {
             case mscReturnOk:
-                return pw::Status::OK;
+                return pw::OkStatus();
             case mscReturnUnaligned:
             case mscReturnInvalidAddr:
-                return pw::Status::INVALID_ARGUMENT;
+                return pw::Status::InvalidArgument();
             case mscReturnLocked:
-                return pw::Status::PERMISSION_DENIED;
+                return pw::Status::PermissionDenied();
             case mscReturnTimeOut:
-                return pw::Status::DEADLINE_EXCEEDED;
+                return pw::Status::DeadlineExceeded();
             default:
                 break;
             }
-            return pw::Status::INTERNAL;
+            return pw::Status::Internal();
         }
     };
 
