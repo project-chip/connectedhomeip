@@ -21,10 +21,10 @@ following features are available:
 
 ---
 
-- [CHIP ESP32 Pigweed Example Application](#chip-esp32-pigweed-example-application)
-  - [Building the Example Application](#building-the-example-application)
-    - [To build the application, follow these steps:](#to-build-the-application-follow-these-steps)
-  - [Testing the Example Application](#testing-the-example-application)
+-   [CHIP ESP32 Pigweed Example Application](#chip-esp32-pigweed-example-application)
+    -   [Building the Example Application](#building-the-example-application)
+        -   [To build the application, follow these steps:](#to-build-the-application-follow-these-steps)
+    -   [Testing the Example Application](#testing-the-example-application)
 
 ---
 
