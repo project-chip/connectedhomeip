@@ -29,6 +29,7 @@ into an existing CHIP network and can be controlled by this network.
 -   [Configuring the example](#configuring-the-example)
 -   [Flashing and debugging](#flashing-and-debugging)
 -   [Testing the example](#testing-the-example)
+    -   [Testing using CHIPTool](#testing-using-chiptool)
 
 <hr>
 
@@ -356,3 +357,9 @@ directory:
 
 Check the [CLI tutorial](../../../docs/guides/nrfconnect_examples_cli.md) to
 learn how to use command-line interface of the application.
+
+### Testing using CHIPTool
+
+Read the [Android commissioning guide](../../../docs/guides/nrfconnect_android_commissioning.md)
+to see how to use [CHIPTool](../../../src/android/CHIPTool/README.md) for Android smartphones to
+commission and control the application within a CHIP-enabled Thread network.
