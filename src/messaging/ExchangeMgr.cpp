@@ -132,7 +132,8 @@ void ExchangeManager::OnReceiveError(CHIP_ERROR error, const Transport::PeerAddr
 {
     ChipLogError(ExchangeManager, "Accept FAILED, err = %s", ErrorStr(error));
     // TODO: propagate event into device controller, it won't be necessary after fully migrated to messaging layer
-    if (mDeviceController != nullptr) mDeviceController->OnReceiveError(error, source, mgr);
+    if (mDeviceController != nullptr)
+        mDeviceController->OnReceiveError(error, source, mgr);
 }
 
 ExchangeContext * ExchangeManager::AllocContext(uint16_t ExchangeId, SecureSessionHandle session, bool Initiator,
