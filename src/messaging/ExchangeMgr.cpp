@@ -65,7 +65,7 @@ ExchangeManager::ExchangeManager() : mReliableMessageMgr(mContextPool)
     mState = State::kState_NotInitialized;
 }
 
-CHIP_ERROR ExchangeManager::Init(NodeId localNodeId, TransportMgrBase * transportMgr, SecureSessionMgr * sessionMgr)
+CHIP_ERROR ExchangeManager::Init(NodeId localNodeId, TransportMgrBase * transportMgr, SecureSessionMgr * sessionMgr, SecureSessionMgrDelegate * legacySecureSessionEventReceiver)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -85,6 +85,7 @@ CHIP_ERROR ExchangeManager::Init(NodeId localNodeId, TransportMgrBase * transpor
     mTransportMgr->SetRendezvousSession(this);
 
     sessionMgr->SetDelegate(this);
+    mLegacySecureSessionEventReceiver = legacySecureSessionEventReceiver;
 
     mReliableMessageMgr.Init(sessionMgr->SystemLayer(), sessionMgr);
 
@@ -114,7 +115,10 @@ CHIP_ERROR ExchangeManager::Shutdown()
 
 ExchangeContext * ExchangeManager::NewContext(SecureSessionHandle session, ExchangeDelegate * delegate)
 {
-    return AllocContext(mNextExchangeId++, session, true, delegate);
+    uint16_t nextId = mNextExchangeId++;
+    if (nextId == kReservedExchangeId)
+        nextId = mNextExchangeId++;
+    return AllocContext(nextId, session, true, delegate);
 }
 
 CHIP_ERROR ExchangeManager::RegisterUnsolicitedMessageHandlerForProtocol(uint32_t protocolId, ExchangeDelegate * delegate)
@@ -138,9 +142,13 @@ CHIP_ERROR ExchangeManager::UnregisterUnsolicitedMessageHandlerForType(uint32_t 
     return UnregisterUMH(protocolId, static_cast<int16_t>(msgType));
 }
 
-void ExchangeManager::OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source, SecureSessionMgr * msgLayer)
+void ExchangeManager::OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source,
+                                     SecureSessionMgr * secureSessionManager)
 {
     ChipLogError(ExchangeManager, "Accept FAILED, err = %s", ErrorStr(error));
+    // TODO(#4170): it won't be necessary after fully migrated to messaging layer
+    if (mLegacySecureSessionEventReceiver != nullptr)
+        mLegacySecureSessionEventReceiver->OnReceiveError(error, source, secureSessionManager);
 }
 
 ExchangeContext * ExchangeManager::AllocContext(uint16_t ExchangeId, SecureSessionHandle session, bool Initiator,
@@ -226,12 +234,22 @@ void ExchangeManager::HandleGroupMessageReceived(const PacketHeader & packetHead
 }
 
 void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                                        SecureSessionHandle session, System::PacketBufferHandle msgBuf, SecureSessionMgr * msgLayer)
+                                        SecureSessionHandle session, System::PacketBufferHandle msgBuf,
+                                        SecureSessionMgr * secureSessionManager)
 {
     CHIP_ERROR err                          = CHIP_NO_ERROR;
     UnsolicitedMessageHandler * umh         = nullptr;
     UnsolicitedMessageHandler * matchingUMH = nullptr;
     bool sendAckAndCloseExchange            = false;
+
+    if (payloadHeader.GetExchangeID() == kReservedExchangeId)
+    {
+        // TODO(#4170): it won't be necessary after fully migrated to messaging layer
+        if (mLegacySecureSessionEventReceiver != nullptr)
+            mLegacySecureSessionEventReceiver->OnMessageReceived(packetHeader, payloadHeader, session, std::move(msgBuf),
+                                                                 secureSessionManager);
+        ExitNow(err = CHIP_NO_ERROR);
+    }
 
     if (!IsMsgCounterSyncMessage(payloadHeader) && session.IsPeerGroupMsgIdNotSynchronized())
     {
@@ -385,19 +403,26 @@ ChannelHandle ExchangeManager::EstablishChannel(const ChannelBuilder & builder, 
     return ChannelHandle{ association };
 }
 
-void ExchangeManager::OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr)
+void ExchangeManager::OnNewConnection(SecureSessionHandle session, SecureSessionMgr * secureSessionManager)
 {
+    bool dispatched = false;
+
     mChannelContexts.ForEachActiveObject([&](ChannelContext * context) {
-        if (context->MatchesSession(session, mgr))
+        if (context->MatchesSession(session, secureSessionManager))
         {
             context->OnNewConnection(session);
+            dispatched = true;
             return false;
         }
         return true;
     });
+
+    // TODO(#4170): propagate event into device controller, it won't be necessary after fully migrated to messaging layer
+    if (!dispatched && mLegacySecureSessionEventReceiver != nullptr)
+        mLegacySecureSessionEventReceiver->OnNewConnection(session, secureSessionManager);
 }
 
-void ExchangeManager::OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * mgr)
+void ExchangeManager::OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * secureSessionManager)
 {
     for (auto & ec : mContextPool)
     {
@@ -409,13 +434,17 @@ void ExchangeManager::OnConnectionExpired(SecureSessionHandle session, SecureSes
     }
 
     mChannelContexts.ForEachActiveObject([&](ChannelContext * context) {
-        if (context->MatchesSession(session, mgr))
+        if (context->MatchesSession(session, secureSessionManager))
         {
             context->OnConnectionExpired(session);
             return false;
         }
         return true;
     });
+
+    // TODO(#4170): propagate event into device controller, it won't be necessary after fully migrated to messaging layer
+    if (mLegacySecureSessionEventReceiver != nullptr)
+        mLegacySecureSessionEventReceiver->OnConnectionExpired(session, secureSessionManager);
 }
 
 void ExchangeManager::OnMessageReceived(const PacketHeader & header, const Transport::PeerAddress & source,

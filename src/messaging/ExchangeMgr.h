@@ -70,7 +70,7 @@ public:
      *  @retval #CHIP_NO_ERROR On success.
      *
      */
-    CHIP_ERROR Init(NodeId localNodeId, TransportMgrBase * transportMgr, SecureSessionMgr * sessionMgr);
+    CHIP_ERROR Init(NodeId localNodeId, TransportMgrBase * transportMgr, SecureSessionMgr * sessionMgr, SecureSessionMgrDelegate * legacySecureSessionEventReceiver = nullptr);
 
     /**
      *  Shutdown the ExchangeManager. This terminates this instance
@@ -221,6 +221,11 @@ public:
     uint16_t GetNextKeyId() { return ++mNextKeyId; }
     size_t GetContextsInUse() const { return mContextsInUse; }
 
+    // TODO(#4170): Create a unique exchange id for legacy messages which doesn't go through exchange manager. When message with
+    // this id is received, it will be passed to mLegacySecureSessionEventReceiver. It is not allowed to create an exchange with
+    // this id.  This const value will be removed after fully migrated to messaging layer.
+    static constexpr const uint16_t kReservedExchangeId = 0xFFFF;
+
 private:
     enum class State
     {
@@ -243,6 +248,9 @@ private:
     SecureSessionMgr * mSessionMgr;
     ReliableMessageMgr mReliableMessageMgr;
     MessageCounterSyncMgr mMessageCounterSyncMgr;
+    // TODO(#4170): allow temporary propagate SecureSessionMgrDelegate events to legacy components which doesn't use Exchange API to
+    // receive packets and events. It won't be necessary after fully migrated to messaging layer
+    SecureSessionMgrDelegate * mLegacySecureSessionEventReceiver;
 
     Transport::AdminId mAdminId = 0;
 
@@ -260,13 +268,13 @@ private:
 
     static bool IsMsgCounterSyncMessage(const PayloadHeader & payloadHeader);
 
-    void OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source, SecureSessionMgr * msgLayer) override;
+    void OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source, SecureSessionMgr * secureSessionManager) override;
 
     void OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, SecureSessionHandle session,
-                           System::PacketBufferHandle msgBuf, SecureSessionMgr * msgLayer) override;
+                           System::PacketBufferHandle msgBuf, SecureSessionMgr * secureSessionManager) override;
 
-    void OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr) override;
-    void OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * mgr) override;
+    void OnNewConnection(SecureSessionHandle session, SecureSessionMgr * secureSessionManager) override;
+    void OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * secureSessionManager) override;
 
     // TransportMgrDelegate interface for rendezvous sessions
     void OnMessageReceived(const PacketHeader & header, const Transport::PeerAddress & source,
