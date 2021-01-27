@@ -247,7 +247,7 @@ void Device::OnMessageReceived(const PacketHeader & header, const PayloadHeader 
 CHIP_ERROR Device::LoadSecureSessionParameters(ResetTransport resetNeeded)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    SecurePairingSession pairingSession;
+    PASESession pairingSession;
 
     if (mSessionManager == nullptr || mState == ConnectionState::SecureConnected)
     {

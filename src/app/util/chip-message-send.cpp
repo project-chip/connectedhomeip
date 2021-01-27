@@ -23,7 +23,7 @@
 #include "chip-message-send.h"
 
 #include <assert.h>
-#include <inet/InetLayer.h> // PacketBuffer and the like
+#include <inet/InetLayer.h>
 #include <support/logging/CHIPLogging.h>
 #include <transport/SecureSessionMgr.h> // For SecureSessionMgr
 

@@ -33,7 +33,6 @@
 #include <support/ReturnMacros.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/TransportMgr.h>
-#include <transport/raw/tests/NetworkTestHelpers.h>
 
 #include <nlbyteorder.h>
 #include <nlunit-test.h>
@@ -43,6 +42,7 @@
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
+#include <messaging/tests/MessagingContext.h>
 
 namespace {
 
@@ -52,13 +52,11 @@ using namespace chip::Transport;
 using namespace chip::Messaging;
 using namespace chip::Protocols;
 
-using TestContext = chip::Test::IOContext;
+using TestContext = chip::Test::MessagingContext;
 
 TestContext sContext;
 
-const char PAYLOAD[]                = "Hello!";
-constexpr NodeId kSourceNodeId      = 123654;
-constexpr NodeId kDestinationNodeId = 111222333;
+const char PAYLOAD[] = "Hello!";
 
 int gSendMessageCount = 0;
 
@@ -86,6 +84,8 @@ public:
 
     bool CanSendToPeer(const PeerAddress & address) override { return true; }
 };
+
+TransportMgr<OutgoingTransport> gTransportMgr;
 
 class MockAppDelegate : public ExchangeDelegate
 {
@@ -129,28 +129,11 @@ void CheckAddClearRetrans(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
-    TransportMgr<OutgoingTransport> transportMgr;
-    SecureSessionMgr secureSessionMgr;
-    CHIP_ERROR err;
-
-    ctx.GetInetLayer().SystemLayer()->Init(nullptr);
-
-    err = transportMgr.Init("LOOPBACK");
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    err = secureSessionMgr.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer(), &transportMgr);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    ExchangeManager exchangeMgr;
-    err = exchangeMgr.Init(&secureSessionMgr);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
     MockAppDelegate mockAppDelegate;
-
-    // TODO: temprary create a SecureSessionHandle from node id, will be fix in PR 3602
-    ExchangeContext * exchange = exchangeMgr.NewContext({ kDestinationNodeId, kAnyKeyId }, &mockAppDelegate);
+    ExchangeContext * exchange = ctx.NewExchangeToPeer(&mockAppDelegate);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 
-    ReliableMessageManager * rm = exchangeMgr.GetReliableMessageMgr();
+    ReliableMessageManager * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
     ReliableMessageContext * rc = exchange->GetReliableMessageContext();
     NL_TEST_ASSERT(inSuite, rm != nullptr);
     NL_TEST_ASSERT(inSuite, rc != nullptr);
@@ -167,28 +150,13 @@ void CheckFailRetrans(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
-    TransportMgr<OutgoingTransport> transportMgr;
-    SecureSessionMgr secureSessionMgr;
-    CHIP_ERROR err;
-
     ctx.GetInetLayer().SystemLayer()->Init(nullptr);
 
-    err = transportMgr.Init("LOOPBACK");
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    err = secureSessionMgr.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer(), &transportMgr);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    ExchangeManager exchangeMgr;
-    err = exchangeMgr.Init(&secureSessionMgr);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
     MockAppDelegate mockAppDelegate;
-
-    // TODO: temprary create a SecureSessionHandle from node id, will be fix in PR 3602
-    ExchangeContext * exchange = exchangeMgr.NewContext({ kDestinationNodeId, kAnyKeyId }, &mockAppDelegate);
+    ExchangeContext * exchange = ctx.NewExchangeToPeer(&mockAppDelegate);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 
-    ReliableMessageManager * rm = exchangeMgr.GetReliableMessageMgr();
+    ReliableMessageManager * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
     ReliableMessageContext * rc = exchange->GetReliableMessageContext();
     NL_TEST_ASSERT(inSuite, rm != nullptr);
     NL_TEST_ASSERT(inSuite, rc != nullptr);
@@ -218,39 +186,14 @@ void CheckResendMessage(nlTestSuite * inSuite, void * inContext)
     memmove(buffer->Start(), PAYLOAD, payload_len);
     buffer->SetDataLength(payload_len);
 
-    IPAddress addr;
-    IPAddress::FromString("127.0.0.1", addr);
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    TransportMgr<OutgoingTransport> transportMgr;
-    SecureSessionMgr secureSessionMgr;
-
-    err = transportMgr.Init("LOOPBACK");
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    err = secureSessionMgr.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer(), &transportMgr);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    ExchangeManager exchangeMgr;
-    err = exchangeMgr.Init(&secureSessionMgr);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    SecurePairingUsingTestSecret pairing1(Optional<NodeId>::Value(kSourceNodeId), 1, 2);
-    Optional<Transport::PeerAddress> peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
-
-    err = secureSessionMgr.NewPairing(peer, kDestinationNodeId, &pairing1);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    SecurePairingUsingTestSecret pairing2(Optional<NodeId>::Value(kDestinationNodeId), 2, 1);
-    err = secureSessionMgr.NewPairing(peer, kSourceNodeId, &pairing2);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
     MockAppDelegate mockSender;
-
     // TODO: temprary create a SecureSessionHandle from node id, will be fix in PR 3602
-    ExchangeContext * exchange = exchangeMgr.NewContext({ kDestinationNodeId, kAnyKeyId }, &mockSender);
+    ExchangeContext * exchange = ctx.NewExchangeToPeer(&mockSender);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 
-    ReliableMessageManager * rm = exchangeMgr.GetReliableMessageMgr();
+    ReliableMessageManager * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
     ReliableMessageContext * rc = exchange->GetReliableMessageContext();
     NL_TEST_ASSERT(inSuite, rm != nullptr);
     NL_TEST_ASSERT(inSuite, rc != nullptr);
@@ -264,7 +207,7 @@ void CheckResendMessage(nlTestSuite * inSuite, void * inContext)
 
     gSendMessageCount = 0;
 
-    err = exchange->SendMessage(kProtocol_Echo, kEchoMessageType_EchoRequest, std::move(buffer),
+    err = exchange->SendMessage(kProtocol_Echo, Echo::kEchoMessageType_EchoRequest, std::move(buffer),
                                 Messaging::SendFlags(Messaging::SendMessageFlags::kNone));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
@@ -313,7 +256,11 @@ nlTestSuite sSuite =
  */
 int Initialize(void * aContext)
 {
-    CHIP_ERROR err = reinterpret_cast<TestContext *>(aContext)->Init(&sSuite);
+    CHIP_ERROR err = gTransportMgr.Init("LOOPBACK");
+    if (err != CHIP_NO_ERROR)
+        return FAILURE;
+
+    err = reinterpret_cast<TestContext *>(aContext)->Init(&sSuite, &gTransportMgr);
     return (err == CHIP_NO_ERROR) ? SUCCESS : FAILURE;
 }
 

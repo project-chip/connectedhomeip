@@ -19,13 +19,11 @@
 
 #include <ble/BleConnectionDelegate.h>
 
-using namespace ::chip::Ble;
-
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-class BleConnectionDelegateImpl : public BleConnectionDelegate
+class BleConnectionDelegateImpl : public Ble::BleConnectionDelegate
 {
 public:
     virtual void NewConnection(Ble::BleLayer * bleLayer, void * appState, const uint16_t connDiscriminator);

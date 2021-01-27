@@ -438,10 +438,10 @@ void BLEManagerImpl::HandleSubscribeOpComplete(BLE_CONNECTION_OBJECT conId, bool
 
 void BLEManagerImpl::HandleTXCharChanged(BLE_CONNECTION_OBJECT conId, const uint8_t * value, size_t len)
 {
-    using DataLength = decltype(std::declval<PacketBuffer>().AvailableDataLength());
+    using DataLength = decltype(std::declval<System::PacketBuffer>().AvailableDataLength());
 
     CHIP_ERROR err                 = CHIP_NO_ERROR;
-    System::PacketBufferHandle buf = PacketBuffer::New();
+    System::PacketBufferHandle buf = System::PacketBuffer::New();
 
     ChipLogProgress(DeviceLayer, "Indication received, conn = %p", conId);
 
@@ -453,7 +453,7 @@ void BLEManagerImpl::HandleTXCharChanged(BLE_CONNECTION_OBJECT conId, const uint
     ChipDeviceEvent event;
     event.Type                                       = DeviceEventType::kPlatformLinuxBLEIndicationReceived;
     event.Platform.BLEIndicationReceived.mConnection = conId;
-    event.Platform.BLEIndicationReceived.mData       = buf.Release_ForNow();
+    event.Platform.BLEIndicationReceived.mData       = std::move(buf).UnsafeRelease();
     PlatformMgr().PostEvent(&event);
 
 exit:
@@ -466,8 +466,8 @@ void BLEManagerImpl::HandleRXCharWrite(BLE_CONNECTION_OBJECT conId, const uint8_
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferHandle buf;
 
-    // Copy the data to a PacketBuffer.
-    buf = PacketBuffer::New();
+    // Copy the data to a packet buffer.
+    buf = System::PacketBuffer::New();
     VerifyOrExit(!buf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
     VerifyOrExit(buf->AvailableDataLength() >= len, err = CHIP_ERROR_BUFFER_TOO_SMALL);
     memcpy(buf->Start(), value, len);
@@ -482,7 +482,7 @@ void BLEManagerImpl::HandleRXCharWrite(BLE_CONNECTION_OBJECT conId, const uint8_
         event.Type = DeviceEventType::kCHIPoBLEWriteReceived;
         ChipLogProgress(Ble, "Write request received debug %p", conId);
         event.CHIPoBLEWriteReceived.ConId = conId;
-        event.CHIPoBLEWriteReceived.Data  = buf.Release_ForNow();
+        event.CHIPoBLEWriteReceived.Data  = std::move(buf).UnsafeRelease();
         PlatformMgr().PostEvent(&event);
     }
 

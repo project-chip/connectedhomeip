@@ -29,9 +29,9 @@
 #include <protocols/secure_channel/Constants.h>
 #include <support/Base64.h>
 #include <system/SystemPacketBuffer.h>
-#include <transport/AuthenticatedSessionEstablishmentDelegate.h>
 #include <transport/PeerConnectionState.h>
 #include <transport/SecureSession.h>
+#include <transport/SessionEstablishmentDelegate.h>
 #include <transport/raw/MessageHeader.h>
 #include <transport/raw/PeerAddress.h>
 
@@ -39,16 +39,16 @@ namespace chip {
 
 using namespace Crypto;
 
-class DLL_EXPORT CertificateAuthenticatedSessionEstablishment
+class DLL_EXPORT CASESession
 {
 public:
-    CertificateAuthenticatedSessionEstablishment();
-    CertificateAuthenticatedSessionEstablishment(CertificateAuthenticatedSessionEstablishment &&)      = default;
-    CertificateAuthenticatedSessionEstablishment(const CertificateAuthenticatedSessionEstablishment &) = default;
-    CertificateAuthenticatedSessionEstablishment & operator=(const CertificateAuthenticatedSessionEstablishment &) = default;
-    CertificateAuthenticatedSessionEstablishment & operator=(CertificateAuthenticatedSessionEstablishment &&) = default;
+    CASESession();
+    CASESession(CASESession &&)      = default;
+    CASESession(const CASESession &) = default;
+    CASESession & operator=(const CASESession &) = default;
+    CASESession & operator=(CASESession &&) = default;
 
-    virtual ~CertificateAuthenticatedSessionEstablishment();
+    virtual ~CASESession();
 
     /**
      * @brief
@@ -60,7 +60,7 @@ public:
      *
      * @return CHIP_ERROR     The result of initialization
      */
-    CHIP_ERROR WaitForSessionEstablishment(NodeId myNodeId, uint16_t myKeyId, AuthenticatedSessionEstablishmentDelegate * delegate);
+    CHIP_ERROR WaitForSessionEstablishment(NodeId myNodeId, uint16_t myKeyId, SessionEstablishmentDelegate * delegate);
 
     /**
      * @brief
@@ -75,7 +75,7 @@ public:
      * @return CHIP_ERROR      The result of initialization
      */
     CHIP_ERROR EstablishSession(const Transport::PeerAddress peerAddress, NodeId myNodeId, NodeId peerNodeId, uint16_t myKeyId,
-                                AuthenticatedSessionEstablishmentDelegate * delegate);
+                                SessionEstablishmentDelegate * delegate);
 
     /**
      * @brief
@@ -151,7 +151,7 @@ private:
 
     void Clear();
 
-    AuthenticatedSessionEstablishmentDelegate * mDelegate = nullptr;
+    SessionEstablishmentDelegate * mDelegate = nullptr;
 
     Protocols::SecureChannel::MsgType mNextExpectedMsg = Protocols::SecureChannel::MsgType::CASE_SigmaErr;
 

@@ -182,15 +182,19 @@ int main(int argc, char * argv[])
     chip::app::cluster::OnOff::InitCluster(chip::app::InteractionModelEngine::GetInstance());
 #endif
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
     if (LinuxDeviceOptions::GetInstance().mWiFi)
     {
         chip::DeviceLayer::ConnectivityMgrImpl().StartWiFiManagement();
     }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
 
+#if CHIP_ENABLE_OPENTHREAD
     if (LinuxDeviceOptions::GetInstance().mThread)
     {
         chip::DeviceLayer::ThreadStackMgrImpl().InitThreadStack();
     }
+#endif // CHIP_ENABLE_OPENTHREAD
 
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
 

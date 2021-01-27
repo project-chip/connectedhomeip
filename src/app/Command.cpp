@@ -148,7 +148,7 @@ chip::TLV::TLVWriter & Command::CreateCommandDataElementTLVWriter()
     mCommandDataBuf = chip::System::PacketBuffer::New();
     if (mCommandDataBuf.IsNull())
     {
-        ChipLogDetail(DataManagement, "Unable to allocate PacketBuffer");
+        ChipLogDetail(DataManagement, "Unable to allocate packet buffer");
     }
 
     mCommandDataWriter.Init(mCommandDataBuf.Retain());

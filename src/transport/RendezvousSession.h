@@ -26,9 +26,9 @@
 #include <protocols/Protocols.h>
 #include <support/BufBound.h>
 #include <transport/NetworkProvisioning.h>
+#include <transport/PASESession.h>
 #include <transport/RendezvousParameters.h>
 #include <transport/RendezvousSessionDelegate.h>
-#include <transport/SecurePairingSession.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/MessageHeader.h>
 #include <transport/raw/PeerAddress.h>
@@ -63,7 +63,7 @@ class SecureSessionHandle;
  *
  * @dotfile dots/Rendezvous/RendezvousSessionInit.dot
  */
-class RendezvousSession : public AuthenticatedSessionEstablishmentDelegate,
+class RendezvousSession : public SessionEstablishmentDelegate,
                           public RendezvousSessionDelegate,
                           public RendezvousDeviceCredentialsDelegate,
                           public NetworkProvisioningDelegate,
@@ -96,18 +96,18 @@ public:
      * @brief
      *  Return the associated pairing session.
      *
-     * @return SecurePairingSession The associated pairing session
+     * @return PASESession The associated pairing session
      */
-    SecurePairingSession & GetPairingSession() { return mPairingSession; }
+    PASESession & GetPairingSession() { return mPairingSession; }
 
     Optional<NodeId> GetLocalNodeId() const { return mParams.GetLocalNodeId(); }
     Optional<NodeId> GetRemoteNodeId() const { return mParams.GetRemoteNodeId(); }
 
-    //////////// AuthenticatedSessionEstablishmentDelegate Implementation ///////////////
-    CHIP_ERROR SendPairingMessage(const PacketHeader & header, const Transport::PeerAddress & peerAddress,
-                                  System::PacketBufferHandle msgBuf) override;
-    void OnPairingError(CHIP_ERROR err) override;
-    void OnPairingComplete() override;
+    //////////// SessionEstablishmentDelegate Implementation ///////////////
+    CHIP_ERROR SendSessionEstablishmentMessage(const PacketHeader & header, const Transport::PeerAddress & peerAddress,
+                                               System::PacketBufferHandle msgBuf) override;
+    void OnSessionEstablishmentError(CHIP_ERROR err) override;
+    void OnSessionEstablished() override;
 
     //////////// RendezvousSessionDelegate Implementation ///////////////
     void OnRendezvousConnectionOpened() override;
@@ -153,7 +153,7 @@ private:
     RendezvousSessionDelegate * mDelegate = nullptr; ///< Underlying transport events
     RendezvousParameters mParams;                    ///< Rendezvous configuration
 
-    SecurePairingSession mPairingSession;
+    PASESession mPairingSession;
     NetworkProvisioning mNetworkProvision;
     Transport::PeerAddress mPeerAddress; // Current peer address we are doing rendezvous with.
     TransportMgrBase * mTransportMgr;

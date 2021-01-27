@@ -31,7 +31,7 @@
 
 namespace chip {
 
-class DLL_EXPORT AuthenticatedSessionEstablishmentDelegate
+class DLL_EXPORT SessionEstablishmentDelegate
 {
 public:
     /**
@@ -45,8 +45,8 @@ public:
      *
      * TODO: Rename function as per issue: https://github.com/project-chip/connectedhomeip/issues/4468
      */
-    virtual CHIP_ERROR SendPairingMessage(const PacketHeader & header, const Transport::PeerAddress & peerAddress,
-                                          System::PacketBufferHandle msgBuf)
+    virtual CHIP_ERROR SendSessionEstablishmentMessage(const PacketHeader & header, const Transport::PeerAddress & peerAddress,
+                                                       System::PacketBufferHandle msgBuf)
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
@@ -59,7 +59,7 @@ public:
      *
      * TODO: Rename function as per issue: https://github.com/project-chip/connectedhomeip/issues/4468
      */
-    virtual void OnPairingError(CHIP_ERROR error) {}
+    virtual void OnSessionEstablishmentError(CHIP_ERROR error) {}
 
     /**
      * @brief
@@ -67,9 +67,9 @@ public:
      *
      * TODO: Rename function as per issue: https://github.com/project-chip/connectedhomeip/issues/4468
      */
-    virtual void OnPairingComplete() {}
+    virtual void OnSessionEstablished() {}
 
-    virtual ~AuthenticatedSessionEstablishmentDelegate() {}
+    virtual ~SessionEstablishmentDelegate() {}
 };
 
 } // namespace chip

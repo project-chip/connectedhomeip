@@ -26,8 +26,11 @@
 #include <cstdint>
 #include <string.h>
 
+#include <type_traits>
+
 #include <core/CHIPError.h>
 #include <core/Optional.h>
+#include <protocols/Protocols.h>
 #include <support/BitFlags.h>
 
 namespace chip {
@@ -307,6 +310,15 @@ public:
     /** Get the secure msg type from this header. */
     uint8_t GetMessageType() const { return mMessageType; }
 
+    /** Check whether the header has a given secure message type */
+    bool HasMessageType(uint8_t type) const { return mMessageType == type; }
+    template <typename MessageType, typename = std::enable_if_t<std::is_enum<MessageType>::value>>
+    bool HasMessageType(MessageType type) const
+    {
+        static_assert(std::is_same<std::underlying_type_t<MessageType>, uint8_t>::value, "Enum is wrong size; cast is not safe");
+        return mProtocolID == Protocols::MessageTypeTraits<MessageType>::ProtocolId && HasMessageType(static_cast<uint8_t>(type));
+    }
+
     /**
      * Gets the Acknowledged Message Counter from this header.
      *
@@ -340,10 +352,30 @@ public:
         return *this;
     }
 
-    /** Set the secure message type for this header. */
-    PayloadHeader & SetMessageType(uint8_t type)
+    /**
+     * Set the message type for this header.  This requires setting the protocol
+     * id as well, because the meaning of a message type is only relevant given
+     * a specific protocol.
+     *
+     * This should only be used for cases when we don't have a strongly typed
+     * message type and hence can't automatically determine the protocol from
+     * the message type.
+     */
+    PayloadHeader & SetMessageType(uint16_t protocol, uint8_t type)
     {
+        mProtocolID  = protocol;
         mMessageType = type;
+        return *this;
+    }
+
+    /** Set the secure message type, with the protocol id derived from the
+        message type. */
+    template <typename MessageType, typename = std::enable_if_t<std::is_enum<MessageType>::value>>
+    PayloadHeader & SetMessageType(MessageType type)
+    {
+        static_assert(std::is_same<std::underlying_type_t<MessageType>, uint8_t>::value, "Enum is wrong size; cast is not safe");
+        mMessageType = static_cast<uint8_t>(type);
+        mProtocolID  = Protocols::MessageTypeTraits<MessageType>::ProtocolId;
         return *this;
     }
 
@@ -351,13 +383,6 @@ public:
     PayloadHeader & SetExchangeID(uint16_t id)
     {
         mExchangeID = id;
-        return *this;
-    }
-
-    /** Set the Protocol ID for this header. */
-    PayloadHeader & SetProtocolID(uint16_t id)
-    {
-        mProtocolID = id;
         return *this;
     }
 

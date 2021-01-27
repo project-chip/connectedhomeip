@@ -25,6 +25,8 @@
 
 #pragma once
 
+#include <protocols/Protocols.h>
+
 /**
  *   @namespace chip::Protocols::SecureChannel
  *
@@ -42,7 +44,7 @@ namespace SecureChannel {
 /**
  * SecureChannel Protocol Message Types
  */
-enum class MsgType
+enum class MsgType : uint8_t
 {
     // Message Counter Synchronization Protocol Message Types
     MsgCounterSyncReq = 0x00,
@@ -77,5 +79,12 @@ enum class StatusCode
 };
 
 } // namespace SecureChannel
+
+template <>
+struct MessageTypeTraits<SecureChannel::MsgType>
+{
+    static constexpr uint16_t ProtocolId = chip::Protocols::kProtocol_SecureChannel;
+};
+
 } // namespace Protocols
 } // namespace chip

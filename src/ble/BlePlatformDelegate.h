@@ -58,22 +58,9 @@ public:
     virtual uint16_t GetMTU(BLE_CONNECTION_OBJECT connObj) const = 0;
 
     // Data path calling convention:
-    //   The CHIP stack retains partial ownership of pBufs sent via the below functions. These buffers are freed by
-    //   CHIP after either they're acknowledged by the peer's BLE controller, or CHIP shuts down the pBuf's
-    //   associated BLEEndPoint.
-    //
-    //   For its part, the platform MUST call PacketBuffer::Free on each pBuf it receives via a Send* function once it no
-    //   longer requires a reference to this buffer, e.g. when a CHIP_CLIENT_EVENT_BLE_PBUF_CLEAR event is received on
-    //   platforms with the CHIP BLE SDK.
-    //
-    //   On platforms such as iOS or Android where the contents of the pBuf PacketBuffer are copied into a separate
-    //   buffer for transmission, pBuf may be freed on the downcall to the platform delegate once the copy completes.
-    //
     //   A 'true' return value from a Send* function indicates that the characteristic was written or updated
     //   successfully. A 'false' value indicates failure, and is used to report this failure to the user via the return
     //   value of chipConnection::SendMessage.
-    //
-    //   If a Send* function returns false, it must release its reference to pBuf prior to return.
 
     // Send GATT characteristic indication request
     virtual bool SendIndication(BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId,

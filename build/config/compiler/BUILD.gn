@@ -169,7 +169,10 @@ config("strict_warnings") {
   }
 
   if (is_clang) {
-    cflags += [ "-Wimplicit-fallthrough" ]
+    cflags += [
+      "-Wimplicit-fallthrough",
+      "-Wheader-hygiene",
+    ]
   }
 
   if (current_os == "linux" || current_os == "android") {
@@ -228,7 +231,64 @@ config("runtime_default") {
   }
 }
 
+# To use different sanitizer options, use `gn args .` in the out folder and
+# use settings like:
+#
+#   is_clang=true
+#   is_debug=true
+#   optimize_for_size=false
+#   is_asan=true
+#   is_sanitize_fatal=false
+#
+
+declare_args() {
+  # Enable address sanitizer
+  is_asan = false
+
+  # Enable memory sanitizer
+  is_msan = false
+
+  # Exit on sanitize error. Generally standard libraries may get errors
+  # so not stopping on the first error is often useful
+  is_sanitize_fatal = true
+}
+
+config("sanitize_address") {
+  cflags = [
+    "-fsanitize=address",
+    "-fno-omit-frame-pointer",
+  ]
+  ldflags = cflags
+}
+
+config("sanitize_memory") {
+  cflags = [
+    "-fsanitize=memory",
+    "-fsanitize-memory-track-origins",
+    "-fno-omit-frame-pointer",
+  ]
+  ldflags = cflags
+}
+
+config("sanitize_recover_all") {
+  cflags = [ "-fsanitize-recover=all" ]
+  ldflags = cflags
+}
+
 config("sanitize_default") {
+  configs = []
+
+  if (is_asan) {
+    configs += [ ":sanitize_address" ]
+  }
+
+  if (is_msan) {
+    configs += [ ":sanitize_memory" ]
+  }
+
+  if (!is_sanitize_fatal) {
+    configs += [ ":sanitize_recover_all" ]
+  }
 }
 
 config("fuzzing_default") {
