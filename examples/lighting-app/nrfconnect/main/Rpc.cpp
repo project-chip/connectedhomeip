@@ -20,8 +20,8 @@
 #include "AppTask.h"
 
 #include "main/pigweed_lighting.rpc.pb.h"
-#include "pw_hdlc_lite/rpc_channel.h"
-#include "pw_hdlc_lite/rpc_packets.h"
+#include "pw_hdlc/rpc_channel.h"
+#include "pw_hdlc/rpc_packets.h"
 #include "pw_rpc/server.h"
 #include "pw_stream/sys_io_stream.h"
 #include "pw_sys_io/sys_io.h"
@@ -42,7 +42,7 @@ public:
     pw::Status ButtonEvent(ServerContext & ctx, const chip_rpc_Button & request, chip_rpc_Empty & response)
     {
         GetAppTask().ButtonEventHandler(request.action << request.idx /* button_state */, 1 << request.idx /* has_changed */);
-        return pw::Status::OK;
+        return pw::OkStatus();
     }
 };
 
@@ -61,7 +61,7 @@ struct k_thread rpc_thread_data;
 pw::stream::SysIoWriter writer;
 
 // Set up the output channel for the pw_rpc server to use.
-pw::hdlc_lite::RpcChannelOutputBuffer<kMaxTransmissionUnit> hdlc_channel_output(writer, pw::hdlc_lite::kDefaultRpcAddress,
+pw::hdlc::RpcChannelOutputBuffer<kMaxTransmissionUnit> hdlc_channel_output(writer, pw::hdlc::kDefaultRpcAddress,
                                                                                 "HDLC channel");
 
 pw::rpc::Channel channels[] = { pw::rpc::Channel::Create<1>(&hdlc_channel_output) };
@@ -85,7 +85,7 @@ void Start()
     std::array<std::byte, kMaxTransmissionUnit> input_buffer;
 
     LOG_INF("Starting pw_rpc server");
-    pw::hdlc_lite::ReadAndProcessPackets(server, hdlc_channel_output, input_buffer);
+    pw::hdlc::ReadAndProcessPackets(server, hdlc_channel_output, input_buffer);
 }
 
 } // namespace

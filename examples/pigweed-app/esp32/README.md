@@ -21,10 +21,10 @@ following features are available:
 
 ---
 
--   [Pigweed RPC Example](#chip-pigweed-rpc-example)
-    -   [Building the Example Application](#building-the-example-application)
-        -   [To build the application, follow these steps:](#to-build-the-application-follow-these-steps)
-    -   [Testing the Example Application](#testing-the-example-application)
+- [CHIP ESP32 Pigweed Example Application](#chip-esp32-pigweed-example-application)
+  - [Building the Example Application](#building-the-example-application)
+    - [To build the application, follow these steps:](#to-build-the-application-follow-these-steps)
+  - [Testing the Example Application](#testing-the-example-application)
 
 ---
 
@@ -101,7 +101,7 @@ make sure the IDF_PATH has been exported(See the manual setup steps above).
 Run the following command to start an interactive Python shell, where the Echo
 RPC commands can be invoked:
 
-        python -m pw_hdlc_lite.rpc_console --device /dev/tty.SLAB_USBtoUART -b 115200 $CHIP_ROOT/third_party/pigweed/repo/pw_rpc/pw_rpc_protos/echo.proto -o /tmp/pw_rpc.out
+        python -m pw_hdlc.rpc_console --device /dev/tty.SLAB_USBtoUART -b 115200 $CHIP_ROOT/third_party/pigweed/repo/pw_rpc/pw_rpc_protos/echo.proto -o /tmp/pw_rpc.out
 
 To send an Echo RPC message, type the following command, where the actual
 message is the text in quotation marks after the `msg=` phrase:

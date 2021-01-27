@@ -44,17 +44,17 @@ namespace pw::sys_io {
 Status ReadByte(std::byte * dest)
 {
     if (!dest)
-        return Status::INVALID_ARGUMENT;
+        return Status::InvalidArgument();
 
     const int c = console_getchar();
     *dest       = static_cast<std::byte>(c);
 
-    return c < 0 ? Status::FAILED_PRECONDITION : Status::OK;
+    return c < 0 ? Status::FailedPrecondition() : OkStatus();
 }
 
 Status WriteByte(std::byte b)
 {
-    return console_putchar(static_cast<char>(b)) < 0 ? Status::FAILED_PRECONDITION : Status::OK;
+    return console_putchar(static_cast<char>(b)) < 0 ? Status::FailedPrecondition() : OkStatus();
 }
 
 // Writes a string using pw::sys_io, and add newline characters at the end.

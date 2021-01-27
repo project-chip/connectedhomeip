@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2020 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,13 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/chip.gni")
+
 import("//build_overrides/pigweed.gni")
+import("$dir_pw_build/target_types.gni")
 
-pw_log_BACKEND = "$dir_pw_log_basic"
-pw_assert_BACKEND = "$dir_pw_assert_log"
-pw_sys_io_BACKEND =
-    "${chip_root}/examples/platform/nrfconnect/pw_sys_io:pw_sys_io_nrfconnect"
-pw_rpc_system_server_BACKEND = "${chip_root}/examples/common/pigweed:system_rpc_server"
-
-dir_pw_third_party_nanopb = "${chip_root}/third_party/nanopb/repo"
+pw_source_set("system_rpc_server") {
+  deps = [
+    "$dir_pw_hdlc:pw_rpc",
+    "$dir_pw_hdlc:rpc_channel_output",
+    "$dir_pw_rpc/system_server:facade",
+    "$dir_pw_stream:sys_io_stream",
+    dir_pw_log,
+  ]
+  sources = [ "system_rpc_server.cc" ]
+}
