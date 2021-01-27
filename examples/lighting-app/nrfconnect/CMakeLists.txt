@@ -21,7 +21,9 @@ get_filename_component(LIGHTING_COMMON ${CHIP_ROOT}/examples/lighting-app/lighti
 
 set(CONF_FILE ${CHIP_ROOT}/config/nrfconnect/app/sample-defaults.conf prj.conf)
 
-include(${CHIP_ROOT}/config/nrfconnect/app/app.cmake)
+# Load NCS/Zephyr build system
+list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/config/nrfconnect/chip-module)
+find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
 
 project(chip-nrf52840-lighting-example)
 

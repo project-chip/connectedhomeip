@@ -23,7 +23,9 @@ if(${BOARD} STREQUAL "nrf52840dongle_nrf52840")
     list(INSERT OVERLAY_CONFIG 0 ${CHIP_ROOT}/config/nrfconnect/app/overlay-usb_support.conf)
 endif()
 
-include(${CHIP_ROOT}/config/nrfconnect/app/app.cmake)
+# Load NCS/Zephyr build system
+list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/config/nrfconnect/chip-module)
+find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
 
 project(chip-nrf52840-pigweed-example)
 
