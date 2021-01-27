@@ -64,7 +64,7 @@ static_library("crypto") {
 
   if (chip_crypto == "mbedtls") {
     sources += [ "CHIPCryptoPALmbedTLS.cpp" ]
-    
+
     external_mbedtls = current_os == "zephyr"
 
     if (!external_mbedtls) {
