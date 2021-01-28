@@ -32,7 +32,7 @@
 {
     [super viewDidLoad];
     [self setupUI];
-    
+
     UITapGestureRecognizer * tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dismissKeyboard)];
     [self.view addGestureRecognizer:tap];
 
@@ -40,7 +40,7 @@
     dispatch_queue_t callbackQueue = dispatch_queue_create("com.zigbee.chip.tempsensorvc.callback", DISPATCH_QUEUE_SERIAL);
     self.chipController = [CHIPDeviceController sharedController];
     [self.chipController setDelegate:self queue:callbackQueue];
-    
+
     uint64_t deviceID = CHIPGetNextAvailableDeviceID();
     if (deviceID > 1) {
         // Let's use the last device that was paired
@@ -49,7 +49,7 @@
         self.chipDevice = [self.chipController getPairedDevice:deviceID error:&error];
         self.chipTempMeasurement = [[CHIPTemperatureMeasurement alloc] initWithDevice:self.chipDevice endpoint:1 queue:callbackQueue];
     }
-    
+
     [self readCurrentTemperature];
 }
 
@@ -80,7 +80,7 @@
 
     // Title
     UILabel * titleLabel = [CHIPUIViewUtils addTitle:@"Temperature Sensor" toView:self.view];
-    
+
     // stack view
     UIStackView * stackView = [UIStackView new];
     stackView.axis = UILayoutConstraintAxisVertical;
@@ -93,7 +93,7 @@
     [stackView.topAnchor constraintEqualToAnchor:titleLabel.bottomAnchor constant:40].active = YES;
     [stackView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:30].active = YES;
     [stackView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-30].active = YES;
-    
+
     // Temperature label
     _temperatureLabel = [UILabel new];
     _temperatureLabel.text = @"°F";
@@ -103,7 +103,7 @@
     [stackView addArrangedSubview:_temperatureLabel];
     _temperatureLabel.translatesAutoresizingMaskIntoConstraints = false;
     [_temperatureLabel.trailingAnchor constraintEqualToAnchor:stackView.trailingAnchor].active = YES;
-    
+
     // Reporting settings
     UILabel * reportingLabel = [UILabel new];
     reportingLabel.text = @"Reporting Setup";
@@ -114,7 +114,7 @@
 
     reportingLabel.translatesAutoresizingMaskIntoConstraints = false;
     [reportingLabel.centerXAnchor constraintEqualToAnchor:stackView.centerXAnchor].active = YES;
-    
+
     // Min interval in seconds
     _minIntervalInSecondsTextField = [UITextField new];
     _minIntervalInSecondsTextField.keyboardType = UIKeyboardTypeNumberPad;
@@ -122,10 +122,10 @@
     [minIntervalInSecondsLabel setText:@"Min. interval (sec):"];
     UIView *minIntervalInSecondsView = [CHIPUIViewUtils viewWithLabel:minIntervalInSecondsLabel textField:_minIntervalInSecondsTextField];
     [stackView addArrangedSubview:minIntervalInSecondsView];
-    
+
     minIntervalInSecondsView.translatesAutoresizingMaskIntoConstraints = false;
     [minIntervalInSecondsView.trailingAnchor constraintEqualToAnchor:stackView.trailingAnchor].active = YES;
-    
+
     // Min interval in seconds
     _maxIntervalInSecondsTextField = [UITextField new];
     _maxIntervalInSecondsTextField.keyboardType = UIKeyboardTypeNumberPad;
@@ -133,10 +133,10 @@
     [maxIntervalInSecondsLabel setText:@"Max. interval (sec):"];
     UIView *maxIntervalInSecondsView = [CHIPUIViewUtils viewWithLabel:maxIntervalInSecondsLabel textField:_maxIntervalInSecondsTextField];
     [stackView addArrangedSubview:maxIntervalInSecondsView];
-    
+
     maxIntervalInSecondsView.translatesAutoresizingMaskIntoConstraints = false;
     [maxIntervalInSecondsView.trailingAnchor constraintEqualToAnchor:stackView.trailingAnchor].active = YES;
-    
+
     //Delta
     _deltaInFahrenheitTextField = [UITextField new];
     _deltaInFahrenheitTextField.keyboardType = UIKeyboardTypeNumberPad;
@@ -144,10 +144,10 @@
     [deltaInFahrenheitLabel setText:@"Delta (F):"];
     UIView *deltaInFahrenheitView = [CHIPUIViewUtils viewWithLabel:deltaInFahrenheitLabel textField:_deltaInFahrenheitTextField];
     [stackView addArrangedSubview:deltaInFahrenheitView];
-    
+
     deltaInFahrenheitView.translatesAutoresizingMaskIntoConstraints = false;
     [deltaInFahrenheitView.trailingAnchor constraintEqualToAnchor:stackView.trailingAnchor].active = YES;
-    
+
     // Reporting button
     _sendReportingSetup = [UIButton new];
     [_sendReportingSetup setTitle:@"Send reporting settings" forState:UIControlStateNormal];
@@ -158,10 +158,10 @@
     _sendReportingSetup.layer.cornerRadius = 5;
     _sendReportingSetup.clipsToBounds = YES;
     [stackView addArrangedSubview:_sendReportingSetup];
-    
+
     _sendReportingSetup.translatesAutoresizingMaskIntoConstraints = false;
     [_sendReportingSetup.trailingAnchor constraintEqualToAnchor:stackView.trailingAnchor].active = YES;
-    
+
     // Refresh button
     UIBarButtonItem *button = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh
                                                                             target:self
@@ -183,7 +183,7 @@
     CHIPDeviceCallback completionHandler = ^(NSError * error) {
         NSLog(@"Status: Read temperature request completed with error %@", [error description]);
     };
-    
+
     [self.chipTempMeasurement readAttributeMeasuredValue:completionHandler];
 }
 
@@ -192,16 +192,16 @@
     CHIPDeviceCallback onCompletionCallback = ^(NSError * error) {
         NSLog(@"Status: update reportAttributeMeasuredValue completed with error %@", [error description]);
     };
-    
+
     CHIPDeviceCallback onChangeCallback = ^(NSError * error) {
         NSLog(@"Status: Temp value changed with error %@", [error description]);
     };
     int minIntervalSeconds = [_minIntervalInSecondsTextField.text intValue]*1000;
     int maxIntervalSeconds = [_maxIntervalInSecondsTextField.text intValue]*1000;
     int deltaInFahrenheit = [_deltaInFahrenheitTextField.text intValue];
-    
+
     NSLog(@"Sending temp reporting values: min %@ max %@ value %@", @(minIntervalSeconds), @(maxIntervalSeconds), @(deltaInFahrenheit));
-    
+
     [self.chipTempMeasurement reportAttributeMeasuredValue:onCompletionCallback
                                                   onChange:onChangeCallback
                                                minInterval:minIntervalSeconds
