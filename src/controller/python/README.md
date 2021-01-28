@@ -82,8 +82,8 @@ sudo third_party/bluez/repo/emulator/btvirt -L -l2
 sudo chip-device-ctrl
 ```
 
-2. [WIP] [Required when there are multiple BLE adapters] Select BLE adapter (Linux
-   only)
+2. [WIP][required when there are multiple ble adapters] Select BLE adapter
+   (Linux only)
 
 ```
 chip-device-ctrl > ble-adapter-print
