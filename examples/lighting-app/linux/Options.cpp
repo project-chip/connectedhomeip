@@ -18,6 +18,8 @@
 
 #include "Options.h"
 
+#include <platform/CHIPDeviceLayer.h>
+
 #include <core/CHIPError.h>
 #include <support/CHIPArgParser.hpp>
 
