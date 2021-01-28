@@ -438,8 +438,8 @@ EmberAfStatus emberAfAppendAttributeReportFields(EndpointId endpoint, ClusterId 
         goto kickout;
     }
 
-    buffer[(*bufIndex)++] = LOW_BYTE(attributeId);
-    buffer[(*bufIndex)++] = HIGH_BYTE(attributeId);
+    buffer[(*bufIndex)++] = EMBER_LOW_BYTE(attributeId);
+    buffer[(*bufIndex)++] = EMBER_HIGH_BYTE(attributeId);
     buffer[(*bufIndex)++] = type;
 #if (BIGENDIAN_CPU)
     if (isThisDataTypeSentLittleEndianOTA(type))

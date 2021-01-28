@@ -114,6 +114,7 @@ public:
     bool _OperationalDeviceCredentialsProvisioned();
     void _UseManufacturerCredentialsAsOperational(bool val);
 #endif
+    void _LogDeviceConfig();
 
 protected:
     enum
@@ -127,7 +128,6 @@ protected:
 
     uint8_t mFlags;
 
-    void LogDeviceConfig();
     CHIP_ERROR PersistProvisioningData(ProvisioningDataSet & provData);
 
 private:

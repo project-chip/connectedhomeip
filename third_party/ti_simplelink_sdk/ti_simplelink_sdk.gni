@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/freertos.gni")
 import("//build_overrides/mbedtls.gni")
@@ -183,7 +184,7 @@ template("ti_simplelink_sdk") {
     include_dirs = []
 
     # POSIX-like porting layer is incompatable with the gnu definitions from -std=gnu11
-    configs -= [ "//build/config/compiler:std_default" ]
+    configs -= [ "${build_root}/config/compiler:std_default" ]
     configs += [ ":${sdk_target_name}_posix_config" ]
     sources = [
       "${ti_simplelink_sdk_root}/source/ti/posix/freertos/clock.c",
@@ -228,7 +229,7 @@ template("ti_simplelink_sdk") {
       "${chip_root}/third_party/ti_simplelink_sdk:ti_simplelink_sysconfig",
     ]
 
-    configs -= [ "//build/config/compiler:std_default" ]
+    configs -= [ "${build_root}/config/compiler:std_default" ]
     configs += [ ":${sdk_target_name}_posix_config" ]
     sources = [
       "${ti_simplelink_sdk_root}/examples/rtos/${ti_simplelink_board}/thread/cli_mtd/platform/alarm.c",

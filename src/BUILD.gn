@@ -12,9 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
-import("${chip_root}/build/chip/tests.gni")
+import("${build_root}/chip/tests.gni")
 import("${chip_root}/src/ble/ble.gni")
 import("${chip_root}/src/lwip/lwip.gni")
 import("${chip_root}/src/platform/device.gni")
@@ -34,7 +35,7 @@ config("includes") {
 }
 
 if (chip_build_tests) {
-  import("${chip_root}/build/chip/chip_test_group.gni")
+  import("${build_root}/chip/chip_test_group.gni")
 
   chip_test_group("tests") {
     deps = [

@@ -34,7 +34,7 @@
 #include <protocols/echo/Echo.h>
 #include <support/ErrorStr.h>
 #include <system/SystemPacketBuffer.h>
-#include <transport/SecurePairingSession.h>
+#include <transport/PASESession.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/raw/TCP.h>
 #include <transport/raw/UDP.h>
@@ -50,7 +50,7 @@ constexpr size_t kMaxEchoCount = 3;
 constexpr int32_t gEchoInterval = 1000;
 
 // The EchoClient object.
-chip::Protocols::EchoClient gEchoClient;
+chip::Protocols::Echo::EchoClient gEchoClient;
 
 chip::TransportMgr<chip::Transport::UDP> gUDPManager;
 chip::TransportMgr<chip::Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>> gTCPManager;
@@ -86,7 +86,7 @@ CHIP_ERROR SendEchoRequest(void)
 
     if (payloadBuf.IsNull())
     {
-        printf("Unable to allocate PacketBuffer\n");
+        printf("Unable to allocate packet buffer\n");
         return CHIP_ERROR_NO_MEMORY;
     }
     else
@@ -166,14 +166,6 @@ void HandleEchoResponseReceived(chip::Messaging::ExchangeContext * ec, chip::Sys
            static_cast<double>(gEchoRespCount) * 100 / gEchoCount, payload->DataLength(), static_cast<double>(transitTime) / 1000);
 }
 
-class TestSecureSessionMgrDelegate : public chip::SecureSessionMgrDelegate
-{
-public:
-    void OnNewConnection(chip::SecureSessionHandle session, chip::SecureSessionMgr * mgr) override { mSecureSession = session; }
-
-    chip::SecureSessionHandle mSecureSession;
-} gTestSecureSessionMgrDelegate;
-
 } // namespace
 
 int main(int argc, char * argv[])
@@ -226,8 +218,6 @@ int main(int argc, char * argv[])
         SuccessOrExit(err);
     }
 
-    gSessionManager.SetDelegate(&gTestSecureSessionMgrDelegate);
-
     err = gExchangeManager.Init(&gSessionManager);
     SuccessOrExit(err);
 
@@ -235,7 +225,8 @@ int main(int argc, char * argv[])
     err = EstablishSecureSession();
     SuccessOrExit(err);
 
-    err = gEchoClient.Init(&gExchangeManager, gTestSecureSessionMgrDelegate.mSecureSession);
+    // TODO: temprary create a SecureSessionHandle from node id to unblock end-to-end test. Complete solution is tracked in PR:4451
+    err = gEchoClient.Init(&gExchangeManager, { chip::kTestDeviceNodeId, 0 });
     SuccessOrExit(err);
 
     // Arrange to get a callback whenever an Echo Response is received.
@@ -244,7 +235,8 @@ int main(int argc, char * argv[])
     // Connection has been established. Now send the EchoRequests.
     for (unsigned int i = 0; i < kMaxEchoCount; i++)
     {
-        if (SendEchoRequest() != CHIP_NO_ERROR)
+        err = SendEchoRequest();
+        if (err != CHIP_NO_ERROR)
         {
             printf("Send request failed: %s\n", chip::ErrorStr(err));
             break;
@@ -269,7 +261,7 @@ int main(int argc, char * argv[])
     ShutdownChip();
 
 exit:
-    if (err != CHIP_NO_ERROR)
+    if ((err != CHIP_NO_ERROR) || (gEchoRespCount != kMaxEchoCount))
     {
         printf("ChipEchoClient failed: %s\n", chip::ErrorStr(err));
         exit(EXIT_FAILURE);

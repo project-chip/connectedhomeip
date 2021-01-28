@@ -60,7 +60,7 @@ public:
         RetransTableEntry();
 
         ReliableMessageContext * rc;             /**< The context for the stored CHIP message. */
-        EncryptedPacketBufferHandle retainedBuf; /**< The PacketBuffer object holding the CHIP message. */
+        EncryptedPacketBufferHandle retainedBuf; /**< The packet buffer holding the CHIP message. */
         uint16_t nextRetransTimeTick;            /**< A counter representing the next retransmission time for the message. */
         uint8_t sendCount;                       /**< A counter representing the number of times the message has been sent. */
     };

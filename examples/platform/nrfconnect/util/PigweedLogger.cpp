@@ -30,7 +30,7 @@
 #include <logging/log_output.h>
 #include <zephyr.h>
 
-#include <pw_hdlc_lite/encoder.h>
+#include <pw_hdlc/encoder.h>
 #include <pw_stream/sys_io_stream.h>
 #include <pw_sys_io_nrfconnect/init.h>
 
@@ -61,7 +61,7 @@ bool sIsPanicMode;
 
 void flush()
 {
-    pw::hdlc_lite::WriteUIFrame(kLogHdlcAddress, std::as_bytes(std::span(sWriteBuffer, sWriteBufferPos)), sWriter);
+    pw::hdlc::WriteUIFrame(kLogHdlcAddress, std::as_bytes(std::span(sWriteBuffer, sWriteBufferPos)), sWriter);
     sWriteBufferPos = 0;
 }
 
@@ -146,4 +146,14 @@ LOG_BACKEND_DEFINE(pigweedLogBackend, pigweedLogApi, /* autostart */ true);
 #endif // CONFIG_LOG
 
 } // namespace
+
+k_sem * GetSemaphore()
+{
+#if CONFIG_LOG
+    return &sLoggerLock;
+#else
+    return nullptr;
+#endif
+}
+
 } // namespace PigweedLogger

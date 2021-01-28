@@ -43,7 +43,6 @@
 namespace chip {
 namespace Ble {
 
-using ::chip::System::PacketBuffer;
 using ::chip::System::PacketBufferHandle;
 
 typedef uint8_t SequenceNumber_t; // If type changed from uint8_t, adjust assumptions in BtpEngine::IsValidAck and

@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("//lib/pw_rpc/pw_rpc.gni")
 
 chip_device_platform = "nrfconnect"
 
@@ -23,5 +22,4 @@ chip_project_config_include = ""
 chip_system_project_config_include = ""
 chip_ble_project_config_include = ""
 
-custom_toolchain = "//toolchain:zephyr"
-mbedtls_target = "//:dummy"
+custom_toolchain = "${chip_root}/config/nrfconnect/chip-gn/toolchain:zephyr"

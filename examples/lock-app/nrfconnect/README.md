@@ -52,15 +52,15 @@ and other devices.
 
 ### Bluetooth LE advertising
 
-To commission the device onto a CHIP network, the device must be discoverable
-over Bluetooth LE. For security reasons, you must start Bluetooth LE advertising
-manually after powering up the device by pressing **Button 4**.
+In this example, to commission the device onto a CHIP network, it must be
+discoverable over Bluetooth LE. For security reasons, you must start Bluetooth
+LE advertising manually after powering up the device by pressing **Button 4**.
 
 ### Bluetooth LE rendezvous
 
-In CHIP, the commissioning procedure (called rendezvous) is done over Bluetooth
-LE between a CHIP device and the CHIP controller, where the controller has the
-commissioner role.
+In this example, the commissioning procedure (called rendezvous) is done over
+Bluetooth LE between a CHIP device and the CHIP controller, where the controller
+has the commissioner role.
 
 To start the rendezvous, the controller must get the commissioning information
 from the CHIP device. The data payload is encoded within a QR code, printed to

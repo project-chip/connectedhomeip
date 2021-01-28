@@ -36,6 +36,7 @@
 
 namespace chip {
 namespace Protocols {
+namespace Echo {
 
 enum
 {
@@ -84,7 +85,7 @@ public:
      * Send an echo request to a CHIP node.
      *
      * @param nodeId        The destination's nodeId
-     * @param payload       A System::PacketBuffer with the payload. This function takes ownership of the System::PacketBuffer
+     * @param payload       A PacketBufferHandle with the payload.
      *
      * @return CHIP_ERROR_NO_MEMORY if no ExchangeContext is available.
      *         Other CHIP_ERROR codes as returned by the lower layers.
@@ -145,5 +146,6 @@ private:
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override {}
 };
 
+} // namespace Echo
 } // namespace Protocols
 } // namespace chip

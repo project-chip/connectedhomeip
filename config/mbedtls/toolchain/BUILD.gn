@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/chip.gni")
+import("//build_overrides/build.gni")
 
-import("//build/toolchain/gcc_toolchain.gni")
+import("${build_root}/toolchain/gcc_toolchain.gni")
 
 gcc_toolchain("${host_os}_${host_cpu}_gcc_mbedtls") {
   toolchain_args = {

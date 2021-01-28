@@ -12,65 +12,71 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/chip.gni")
+import("//build_overrides/build.gni")
 
-import("//build/config/compiler/compiler.gni")
-import("//build/config/custom_toolchain.gni")
+import("${build_root}/config/compiler/compiler.gni")
+import("${build_root}/config/custom_toolchain.gni")
 
 declare_args() {
   # Default configs for abi.
-  default_configs_abi = [ "//build/config/compiler:abi_default" ]
+  default_configs_abi = [ "${build_root}/config/compiler:abi_default" ]
 
   # Default configs for debugging.
-  default_configs_debug = [ "//build/config/compiler:debug_default" ]
+  default_configs_debug = [ "${build_root}/config/compiler:debug_default" ]
 
   # Default configs for specs.
-  default_configs_specs = [ "//build/config/compiler:specs_default" ]
+  default_configs_specs = [ "${build_root}/config/compiler:specs_default" ]
 
   # Default configs for optimization.
-  default_configs_optimize = [ "//build/config/compiler:optimize_default" ]
+  default_configs_optimize =
+      [ "${build_root}/config/compiler:optimize_default" ]
 
   # Default configs for language.
-  default_configs_std = [ "//build/config/compiler:std_default" ]
+  default_configs_std = [ "${build_root}/config/compiler:std_default" ]
 
   # Defaults configs for symbols.
-  default_configs_symbols = [ "//build/config/compiler:symbols_default" ]
+  default_configs_symbols = [ "${build_root}/config/compiler:symbols_default" ]
 
   # Defaults configs for aliasing.
-  default_configs_aliasing = [ "//build/config/compiler:aliasing_default" ]
+  default_configs_aliasing =
+      [ "${build_root}/config/compiler:aliasing_default" ]
 
   # Defaults configs for size.
-  default_configs_size = [ "//build/config/compiler:size_default" ]
+  default_configs_size = [ "${build_root}/config/compiler:size_default" ]
 
   # Defaults configs for exceptions.
-  default_configs_exceptions = [ "//build/config/compiler:exceptions_default" ]
+  default_configs_exceptions =
+      [ "${build_root}/config/compiler:exceptions_default" ]
 
   # Defaults configs for rtti.
-  default_configs_rtti = [ "//build/config/compiler:rtti_default" ]
+  default_configs_rtti = [ "${build_root}/config/compiler:rtti_default" ]
 
   # Defaults configs for pic.
-  default_configs_pic = [ "//build/config/compiler:pic_default" ]
+  default_configs_pic = [ "${build_root}/config/compiler:pic_default" ]
 
   # Defaults configs for pie.
-  default_configs_pie = [ "//build/config/compiler:pie_default" ]
+  default_configs_pie = [ "${build_root}/config/compiler:pie_default" ]
 
   # Defaults configs for warnings.
-  default_configs_warnings = [ "//build/config/compiler:warnings_default" ]
+  default_configs_warnings =
+      [ "${build_root}/config/compiler:warnings_default" ]
 
   # Defaults cosmetic configs.
-  default_configs_cosmetic = [ "//build/config/compiler:cosmetic_default" ]
+  default_configs_cosmetic =
+      [ "${build_root}/config/compiler:cosmetic_default" ]
 
   # Default configs for runtime library.
-  default_configs_runtime = [ "//build/config/compiler:runtime_default" ]
+  default_configs_runtime = [ "${build_root}/config/compiler:runtime_default" ]
 
   # Defaults sanitizer configs.
-  default_configs_sanitize = [ "//build/config/compiler:sanitize_default" ]
+  default_configs_sanitize =
+      [ "${build_root}/config/compiler:sanitize_default" ]
 
   # Defaults fuzzing configs.
-  default_configs_fuzzing = [ "//build/config/compiler:fuzzing_default" ]
+  default_configs_fuzzing = [ "${build_root}/config/compiler:fuzzing_default" ]
 
   # Defaults target-specific configs.
-  default_configs_target = [ "//build/config/compiler:target_default" ]
+  default_configs_target = [ "${build_root}/config/compiler:target_default" ]
 
   # Extra default configs.
   default_configs_extra = []

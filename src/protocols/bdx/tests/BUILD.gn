@@ -12,11 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/nlio.gni")
 import("//build_overrides/nlunit_test.gni")
 
-import("${chip_root}/build/chip/chip_test_suite.gni")
+import("${build_root}/chip/chip_test_suite.gni")
 
 chip_test_suite("tests") {
   output_name = "libBDXTests"

@@ -106,7 +106,7 @@ void emberAfScenesClusterServerInitCallback(EndpointId endpoint)
 #ifdef EMBER_AF_PLUGIN_SCENES_NAME_SUPPORT
     {
         // The high bit of Name Support indicates whether scene names are supported.
-        uint8_t nameSupport = BIT(7);
+        uint8_t nameSupport = EMBER_BIT(7);
         writeServerAttribute(endpoint, ZCL_SCENES_CLUSTER_ID, ZCL_SCENE_NAME_SUPPORT_ATTRIBUTE_ID, "name support",
                              (uint8_t *) &nameSupport, ZCL_BITMAP8_ATTRIBUTE_TYPE);
     }

@@ -93,11 +93,8 @@ CHIP_ERROR ExchangeContext::SendMessage(uint16_t protocolId, uint8_t msgType, Pa
     // Set the exchange ID for this header.
     payloadHeader.SetExchangeID(mExchangeId);
 
-    // Set the protocol ID for this header.
-    payloadHeader.SetProtocolID(protocolId);
-
-    // Set the message type for this header.
-    payloadHeader.SetMessageType(msgType);
+    // Set the protocol ID and message type for this header.
+    payloadHeader.SetMessageType(protocolId, msgType);
 
     payloadHeader.SetInitiator(IsInitiator());
 
@@ -399,8 +396,7 @@ CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, con
     }
 
     //  The SecureChannel::StandaloneAck message type is only used for CRMP; do not pass such messages to the application layer.
-    if ((protocolId == Protocols::kProtocol_SecureChannel) &&
-        (messageType == static_cast<uint8_t>(Protocols::SecureChannel::MsgType::StandaloneAck)))
+    if (payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::StandaloneAck))
     {
         ExitNow(err = CHIP_NO_ERROR);
     }

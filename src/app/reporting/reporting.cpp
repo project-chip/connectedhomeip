@@ -1043,7 +1043,7 @@ static void putReportableChangeInResp(const EmberAfPluginReportingEntry * entry,
         uint32_t value = entry->data.reported.reportableChange;
         for (; bytes > 0; bytes--)
         {
-            uint8_t b = BYTE_0(value);
+            uint8_t b = EMBER_BYTE_0(value);
             emberAfPutInt8uInResp(b);
             value >>= 8;
         }

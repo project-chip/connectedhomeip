@@ -54,5 +54,10 @@ enum CHIPProtocolId
     kProtocol_NotSpecified = (kChipVendor_NotSpecified << 16) | 0xFFFF, // The profile ID is either not specified or a wildcard
 };
 
+// Pre-delare our MessageTypeTraits so message type headers know what they are
+// specializing.
+template <typename T>
+struct MessageTypeTraits;
+
 } // namespace Protocols
 } // namespace chip

@@ -27,6 +27,7 @@
 
 namespace chip {
 namespace Protocols {
+namespace Echo {
 
 CHIP_ERROR EchoServer::Init(Messaging::ExchangeManager * exchangeMgr)
 {
@@ -85,5 +86,6 @@ void EchoServer::OnMessageReceived(Messaging::ExchangeContext * ec, const Packet
     ec->Close();
 }
 
+} // namespace Echo
 } // namespace Protocols
 } // namespace chip

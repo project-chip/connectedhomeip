@@ -99,7 +99,7 @@ bool DeviceController_BlePlatformDelegate::SendWriteRequest(BLE_CONNECTION_OBJEC
 
     // Going out of scope releases delegate's reference to pBuf. pBuf will be freed when both platform delegate and Chip stack free
     // their references to it. We release pBuf's reference here since its payload bytes were copied into a new NSData object by
-    // ChipBleMgr.py's writeCB, and in both the error and succees cases this code has no further use for the pBuf PacketBuffer.
+    // ChipBleMgr.py's writeCB, and in both the error and succees cases this code has no further use for it.
     return ret;
 }
 
