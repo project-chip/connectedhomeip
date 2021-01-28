@@ -668,9 +668,7 @@ CHIP_ERROR TransferSession::AttachBdxHeader(MessageType msgType, System::PacketB
     CHIP_ERROR err = CHIP_NO_ERROR;
     PayloadHeader payloadHeader;
 
-    payloadHeader
-        .SetMessageType(static_cast<uint8_t>(msgType)) //
-        .SetProtocolID(Protocols::kProtocol_BDX);
+    payloadHeader.SetMessageType(Protocols::kProtocol_BDX, static_cast<uint8_t>(msgType));
 
     uint16_t headerSize              = payloadHeader.EncodeSizeBytes();
     uint16_t actualEncodedHeaderSize = 0;
