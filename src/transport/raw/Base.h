@@ -37,7 +37,8 @@ class RawTransportDelegate
 {
 public:
     virtual ~RawTransportDelegate() {}
-    virtual void HandleMessageReceived(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress, System::PacketBufferHandle && msg) = 0;
+    virtual void HandleMessageReceived(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
+                                       System::PacketBufferHandle && msg) = 0;
 };
 
 /**
@@ -56,10 +57,7 @@ public:
      * @param[in] param   The argument to pass in to the handler function
      *
      */
-    void SetDelegate(RawTransportDelegate * delegate)
-    {
-        mDelegate = delegate;
-    }
+    void SetDelegate(RawTransportDelegate * delegate) { mDelegate = delegate; }
 
     /**
      * @brief Send a message to the specified target.
