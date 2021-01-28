@@ -422,6 +422,8 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "Linux/DeviceNetworkProvisioningDelegateImpl.cpp",
         "Linux/DeviceNetworkProvisioningDelegateImpl.h",
         "Linux/InetPlatformConfig.h",
+        "Linux/KeyValueStoreManagerImpl.cpp",
+        "Linux/KeyValueStoreManagerImpl.h",
         "Linux/Logging.cpp",
         "Linux/PlatformManagerImpl.cpp",
         "Linux/PlatformManagerImpl.h",
