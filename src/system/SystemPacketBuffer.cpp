@@ -556,7 +556,7 @@ void PacketBufferHandle::RightSizeForMemoryAlloc()
     // Reallocate only if enough space will be saved.
     uint8_t * const start = reinterpret_cast<uint8_t *>(mBuffer) + CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE;
     uint8_t * const payload = reinterpret_cast<uint8_t *>(mBuffer->payload);
-    const uint16_t usedSize = static_cast<uint16_t>(payload - start + mBuffer->len);
+    const size_t usedSize = static_cast<uint16_t>(payload - start + mBuffer->len);
     if (usedSize + kRightSizingThreshold > mBuffer->alloc_size)
     {
         return;
@@ -570,6 +570,7 @@ void PacketBufferHandle::RightSizeForMemoryAlloc()
         return;
     }
 
+    // XXX fixme
     uint8_t * const newStart = reinterpret_cast<uint8_t *>(newBuffer) + CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE;
     newBuffer->next = nullptr;
     newBuffer->payload = newStart + (payload - start);

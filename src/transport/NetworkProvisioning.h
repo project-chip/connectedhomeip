@@ -113,7 +113,7 @@ private:
      */
     CHIP_ERROR SendIPAddress(const Inet::IPAddress & addr);
 
-    static uint16_t EncodedStringSize(const char * str);
+    static size_t EncodedStringSize(const char * str);
     static CHIP_ERROR EncodeString(const char * str, BufBound & bbuf);
     static CHIP_ERROR DecodeString(const uint8_t * input, size_t input_len, BufBound & bbuf, size_t & consumed);
 

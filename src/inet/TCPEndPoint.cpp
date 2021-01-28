@@ -2402,13 +2402,13 @@ void TCPEndPoint::ReceiveData()
     bool isNewBuf = true;
 
     if (mRcvQueue.IsNull())
-        rcvBuf = System::PacketBufferHandle::New(System::kMaxPacketBufferSizeWithoutReserve, 0);
+        rcvBuf = System::PacketBufferHandle::New(kMaxReceiveMessageSize, 0);
     else
     {
         rcvBuf = mRcvQueue->Last();
         if (rcvBuf->AvailableDataLength() == 0)
         {
-            rcvBuf = System::PacketBufferHandle::New(System::kMaxPacketBufferSizeWithoutReserve, 0);
+            rcvBuf = System::PacketBufferHandle::New(kMaxReceiveMessageSize, 0);
         }
         else
         {

@@ -344,7 +344,7 @@ CHIP_ERROR ReliableMessageContext::SendStandaloneAckMessage()
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Allocate a buffer for the null message
-    System::PacketBufferHandle msgBuf = System::PacketBufferHandle::New(0);
+    System::PacketBufferHandle msgBuf = System::PacketBufferHandle::New(0, CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE);
     VerifyOrExit(!msgBuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
     // Send the null message

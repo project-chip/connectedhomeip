@@ -1948,7 +1948,7 @@ void WriteDeleteReadTest(nlTestSuite * inSuite)
  */
 void CheckPacketBuffer(nlTestSuite * inSuite, void * inContext)
 {
-    System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::kMaxPacketBufferSizeWithoutReserve, 0);
+    System::PacketBufferHandle buf = System::PacketBufferHandle::New(sizeof(Encoding1), 0);
     System::PacketBufferTLVWriter writer;
     System::PacketBufferTLVReader reader;
 
@@ -2448,7 +2448,7 @@ void CheckBufferOverflow(nlTestSuite * inSuite, void * inContext)
     System::PacketBufferTLVWriter writer;
     System::PacketBufferTLVReader reader;
 
-    System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::kMaxPacketBufferSizeWithoutReserve, 0);
+    System::PacketBufferHandle buf = System::PacketBufferHandle::New(sizeof(Encoding1), 0);
     uint16_t maxDataLen            = buf->MaxDataLength();
     uint16_t reserve = static_cast<uint16_t>((sizeof(Encoding1) < maxDataLen) ? (maxDataLen - sizeof(Encoding1)) + 2 : 0);
 

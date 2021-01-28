@@ -124,9 +124,9 @@ exit:
     return err;
 }
 
-uint16_t NetworkProvisioning::EncodedStringSize(const char * str)
+size_t NetworkProvisioning::EncodedStringSize(const char * str)
 {
-    return static_cast<uint16_t>(strlen(str) + sizeof(uint16_t));
+    return strlen(str) + sizeof(uint16_t);
 }
 
 CHIP_ERROR NetworkProvisioning::EncodeString(const char * str, BufBound & bbuf)
@@ -190,10 +190,10 @@ exit:
 CHIP_ERROR NetworkProvisioning::SendNetworkCredentials(const char * ssid, const char * passwd)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
-    const size_t bufferSize = static_cast<uint16_t>(EncodedStringSize(ssid) + EncodedStringSize(passwd));
+    const size_t bufferSize = EncodedStringSize(ssid) + EncodedStringSize(passwd);
     VerifyOrExit(CanCastTo<uint16_t>(bufferSize), err = CHIP_ERROR_INVALID_ARGUMENT);
     {
-        System::PacketBufferHandle buffer = System::PacketBufferHandle::New(static_cast<uint16_t>(bufferSize));
+        System::PacketBufferHandle buffer = System::PacketBufferHandle::New(bufferSize);
         BufBound bbuf(buffer->Start(), buffer->AvailableDataLength());
 
         ChipLogProgress(NetworkProvisioning, "Sending Network Creds. Delegate %p\n", mDelegate);
