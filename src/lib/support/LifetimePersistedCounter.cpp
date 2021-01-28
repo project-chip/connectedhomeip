@@ -26,7 +26,7 @@
 
 namespace chip {
 
-LifetimePersistedCounter::LifetimePersistedCounter() : mId(chip::Platform::PersistedStorage::kEmptyKey), mNextEpoch(0) {}
+LifetimePersistedCounter::LifetimePersistedCounter() : mId(chip::Platform::PersistedStorage::kEmptyKey) {}
 
 LifetimePersistedCounter::~LifetimePersistedCounter() {}
 
@@ -41,9 +41,6 @@ LifetimePersistedCounter::Init(const chip::Platform::PersistedStorage::Key aId)
 
     // Read our previously-stored starting value.
     err = ReadStartValue(startValue);
-    SuccessOrExit(err);
-
-    err = PersistNextEpochStart(startValue);
     SuccessOrExit(err);
 
     // This will set the starting value, after which we're ready.
@@ -64,27 +61,10 @@ LifetimePersistedCounter::Advance()
     err = MonotonicallyIncreasingCounter::Advance();
     SuccessOrExit(err);
 
-    if (GetValue() >= mNextEpoch)
-    {
-        // Value advanced past the previously persisted "start point".
-        // Ensure that a new starting point is persisted.
-        err = PersistNextEpochStart(mNextEpoch + CHIP_CONFIG_LIFETIIME_PERSISTED_COUNTER_INCREMENT);
-        SuccessOrExit(err);
-
-        // Advancing the epoch should have ensured that the current value
-        // is valid
-        VerifyOrExit(GetValue() < mNextEpoch, err = CHIP_ERROR_INTERNAL);
-    }
+    err = chip::Platform::PersistedStorage::Write(mId, GetValue());
+    SuccessOrExit(err);
 exit:
     return err;
-}
-
-CHIP_ERROR
-LifetimePersistedCounter::PersistNextEpochStart(uint32_t aStartValue)
-{
-    mNextEpoch = aStartValue;
-
-    return chip::Platform::PersistedStorage::Write(mId, aStartValue);
 }
 
 CHIP_ERROR

@@ -100,7 +100,6 @@ private:
     CHIP_ERROR ReadStartValue(uint32_t & aStartValue);
 
     chip::Platform::PersistedStorage::Key mId; // start value is stored here
-    uint32_t mNextEpoch;                       // next epoch start
 };
 
 } // namespace chip
