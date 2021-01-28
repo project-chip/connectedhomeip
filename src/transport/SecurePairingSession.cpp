@@ -199,7 +199,7 @@ CHIP_ERROR SecurePairingSession::SetupSpake2p(uint32_t pbkdf2IterCount, const ui
     SuccessOrExit(err);
 
     // Form the context to be used. Context = "SPAKE2+ Commissioning" || PBKDFParamRequest || PBKDFParamResponse
-    memcpy( (mSpake2p.spake_context + mSpake2p.spake_context_len), kSpake2pContext, strlen(kSpake2pContext));
+    memcpy((mSpake2p.spake_context + mSpake2p.spake_context_len), kSpake2pContext, strlen(kSpake2pContext));
     mSpake2p.spake_context_len += strlen(kSpake2pContext);
 
     err = mSpake2p.Init(mSpake2p.spake_context, mSpake2p.spake_context_len);
@@ -325,7 +325,7 @@ CHIP_ERROR SecurePairingSession::SendPBKDFParamRequest()
     req->SetDataLength(kPBKDFParamRandomNumberSize);
 
     // Update commissioning hash with the pbkdf2 param request that's being sent.
-    memcpy( (mSpake2p.spake_context + mSpake2p.spake_context_len), req->Start(), req->DataLength());
+    memcpy((mSpake2p.spake_context + mSpake2p.spake_context_len), req->Start(), req->DataLength());
     mSpake2p.spake_context_len += req->DataLength();
 
     mNextExpectedMsg = Protocols::SecureChannel::MsgType::PBKDFParamResponse;
@@ -358,7 +358,7 @@ CHIP_ERROR SecurePairingSession::HandlePBKDFParamRequest(const PacketHeader & he
     ChipLogDetail(Ble, "Received PBKDF param request");
 
     // Update commissioning hash with the received pbkdf2 param request
-    memcpy( (mSpake2p.spake_context + mSpake2p.spake_context_len), req, reqlen);
+    memcpy((mSpake2p.spake_context + mSpake2p.spake_context_len), req, reqlen);
     mSpake2p.spake_context_len += reqlen;
 
     err = SendPBKDFParamResponse();
@@ -410,7 +410,7 @@ CHIP_ERROR SecurePairingSession::SendPBKDFParamResponse()
     resp->SetDataLength(u16len);
 
     // Update commissioning hash with the pbkdf2 param response that's being sent.
-    memcpy( (mSpake2p.spake_context + mSpake2p.spake_context_len), resp->Start(), resp->DataLength());
+    memcpy((mSpake2p.spake_context + mSpake2p.spake_context_len), resp->Start(), resp->DataLength());
     mSpake2p.spake_context_len += resp->DataLength();
 
     err = SetupSpake2p(mIterationCount, mSalt, mSaltLength);
@@ -461,7 +461,7 @@ CHIP_ERROR SecurePairingSession::HandlePBKDFParamResponse(const PacketHeader & h
         VerifyOrExit(CanCastTo<uint32_t>(iterCount), err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
         // Update commissioning hash with the received pbkdf2 param response
-        memcpy( (mSpake2p.spake_context + mSpake2p.spake_context_len), resp, resplen);
+        memcpy((mSpake2p.spake_context + mSpake2p.spake_context_len), resp, resplen);
         mSpake2p.spake_context_len += resplen;
 
         err = SetupSpake2p(static_cast<uint32_t>(iterCount), msgptr, saltlen);
