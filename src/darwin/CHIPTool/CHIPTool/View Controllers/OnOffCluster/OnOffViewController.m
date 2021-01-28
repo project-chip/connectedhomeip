@@ -83,38 +83,8 @@
     [stackView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:30].active = YES;
     [stackView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-30].active = YES;
 
-    // Button stack view
-    UIStackView * stackViewButtons = [UIStackView new];
-    stackViewButtons.axis = UILayoutConstraintAxisHorizontal;
-    stackViewButtons.distribution = UIStackViewDistributionEqualSpacing;
-    stackViewButtons.alignment = UIStackViewAlignmentLeading;
-    stackViewButtons.spacing = 10;
-    [stackView addArrangedSubview:stackViewButtons];
-
     // Create buttons
-    UIButton * onButton = [UIButton new];
-    [onButton setTitle:@"On" forState:UIControlStateNormal];
-    [onButton addTarget:self action:@selector(onButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
-    UIButton * offButton = [UIButton new];
-    [offButton setTitle:@"Off" forState:UIControlStateNormal];
-    [offButton addTarget:self action:@selector(offButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
-    UIButton * toggleButton = [UIButton new];
-    [toggleButton setTitle:@"Toggle" forState:UIControlStateNormal];
-    [toggleButton addTarget:self action:@selector(toggleButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
-
-    stackView.translatesAutoresizingMaskIntoConstraints = false;
-    NSArray<UIButton *> * buttons = @[ onButton, offButton, toggleButton ];
-    for (int i = 0; i < buttons.count; i++) {
-        UIButton * buttonForStack = [buttons objectAtIndex:i];
-        buttonForStack.backgroundColor = UIColor.systemBlueColor;
-        buttonForStack.titleLabel.font = [UIFont systemFontOfSize:17];
-        buttonForStack.titleLabel.textColor = [UIColor whiteColor];
-        buttonForStack.layer.cornerRadius = 5;
-        buttonForStack.clipsToBounds = YES;
-        buttonForStack.translatesAutoresizingMaskIntoConstraints = false;
-        [buttonForStack.widthAnchor constraintGreaterThanOrEqualToConstant:60].active = YES;
-        [stackViewButtons addArrangedSubview:buttonForStack];
-    }
+    [self addButtons:3 toStackView:stackView];
 
     // Result message
     _resultLabel = [UILabel new];
@@ -130,6 +100,34 @@
     _resultLabel.adjustsFontSizeToFitWidth = YES;
 }
 
+- (void)addButtons:(NSInteger)numButtons toStackView:(UIStackView *)stackView
+{
+    for (int i = 1; i <= numButtons; i ++) {
+        // Create buttons
+        UILabel *labelLight = [UILabel new];
+        labelLight.text = [NSString stringWithFormat:@"Light %@: ", @(i)];
+        UIButton * onButton = [UIButton new];
+        onButton.tag = i;
+        [onButton setTitle:@"On" forState:UIControlStateNormal];
+        [onButton addTarget:self action:@selector(onButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
+        UIButton * offButton = [UIButton new];
+        offButton.tag = i;
+        [offButton setTitle:@"Off" forState:UIControlStateNormal];
+        [offButton addTarget:self action:@selector(offButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
+        UIButton * toggleButton = [UIButton new];
+        toggleButton.tag = i;
+        [toggleButton setTitle:@"Toggle" forState:UIControlStateNormal];
+        [toggleButton addTarget:self action:@selector(toggleButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
+        
+        UIStackView * stackViewButtons = [CHIPUIViewUtils stackViewWithLabel:labelLight buttons:@[onButton, offButton, toggleButton]];
+        stackViewButtons.axis = UILayoutConstraintAxisHorizontal;
+        stackViewButtons.distribution = UIStackViewDistributionEqualSpacing;
+        stackViewButtons.alignment = UIStackViewAlignmentLeading;
+        stackViewButtons.spacing = 10;
+        [stackView addArrangedSubview:stackViewButtons];
+    }
+}
+
 - (void)updateResult:(NSString *)result
 {
     _resultLabel.hidden = NO;
@@ -143,6 +141,11 @@
     CHIPDeviceCallback completionHandler = ^(NSError * error) {
         NSLog(@"Status: On command completed with error %@", [error description]);
     };
+    
+    UIButton *button = (UIButton *)sender;
+    NSInteger lightNumber = button.tag;
+    NSLog(@"Light %@ on button pressed.", @(lightNumber));
+    //TODO: Do something based on which light is selected
     [self.onOff on:completionHandler];
 }
 
@@ -151,7 +154,13 @@
     CHIPDeviceCallback completionHandler = ^(NSError * error) {
         NSLog(@"Status: Off command completed with error %@", [error description]);
     };
+    
+    UIButton *button = (UIButton *)sender;
+    NSInteger lightNumber = button.tag;
+    NSLog(@"Light %@ off button pressed.", @(lightNumber));
+    //TODO: Do something based on which light is selected
     [self.onOff off:completionHandler];
+
 }
 
 - (IBAction)toggleButtonTapped:(id)sender
@@ -159,6 +168,11 @@
     CHIPDeviceCallback completionHandler = ^(NSError * error) {
         NSLog(@"Status: Toggle command completed with error %@", [error description]);
     };
+    
+    UIButton *button = (UIButton *)sender;
+    NSInteger lightNumber = button.tag;
+    NSLog(@"Light %@ toggle button pressed.", @(lightNumber));
+    //TODO: Do something based on which light is selected
     [self.onOff toggle:completionHandler];
 }
 
