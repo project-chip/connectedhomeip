@@ -116,14 +116,14 @@ CHIP_ERROR TransferSession::StartTransfer(TransferRole role, const TransferInitD
     mRole                  = role;
     mMaxSupportedBlockSize = initData.MaxBlockSize;
     mStartOffset           = initData.StartOffset;
-    mMaxLength             = initData.Length;
+    mTransferLength        = initData.Length;
 
     // Prepare TransferInit message
     initMsg.TransferCtlOptions.SetRaw(initData.TransferCtlFlagsRaw);
     initMsg.Version        = kBdxVersion;
     initMsg.MaxBlockSize   = mMaxSupportedBlockSize;
     initMsg.StartOffset    = mStartOffset;
-    initMsg.MaxLength      = mMaxLength;
+    initMsg.MaxLength      = mTransferLength;
     initMsg.FileDesignator = initData.FileDesignator;
     initMsg.FileDesLength  = initData.FileDesLength;
     initMsg.Metadata       = initData.Metadata;
@@ -166,12 +166,24 @@ CHIP_ERROR TransferSession::AcceptTransfer(const TransferAcceptData & acceptData
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferHandle outMsgBuf;
+    BitFlags<uint8_t, TransferControlFlags> proposedControlOpts;
 
     VerifyOrExit(mState == kState_NegotiateTransferParams, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(!mPendingOutput.Has(kOutput_MsgToSend), err = CHIP_ERROR_INCORRECT_STATE);
 
+    // Don't allow a Control method that wasn't supported by the initiator
+    // MaxBlockSize can't be larger than the proposed value
+    proposedControlOpts.SetRaw(mTransferRequestData.TransferCtlFlagsRaw);
+    VerifyOrExit(proposedControlOpts.Has(acceptData.ControlMode), err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(acceptData.MaxBlockSize <= mTransferRequestData.MaxBlockSize, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+    mTransferMaxBlockSize = acceptData.MaxBlockSize;
+
     if (mRole == kRole_Sender)
     {
+        mStartOffset    = acceptData.StartOffset;
+        mTransferLength = acceptData.Length;
+
         ReceiveAccept acceptMsg;
         acceptMsg.TransferCtlFlags.Set(acceptData.ControlMode);
         acceptMsg.Version        = mTransferVersion;
@@ -321,7 +333,7 @@ void TransferSession::Reset()
     mTransferVersion       = 0;
     mMaxSupportedBlockSize = 0;
     mStartOffset           = 0;
-    mMaxLength             = 0;
+    mTransferLength        = 0;
     mTransferMaxBlockSize  = 0;
     mNextQueryNum          = 0;
     mBlockNumInFlight      = 0;
@@ -434,8 +446,8 @@ void TransferSession::HandleTransferInit(MessageType msgType, System::PacketBuff
     mTransferMaxBlockSize = ::chip::min(mMaxSupportedBlockSize, transferInit.MaxBlockSize);
 
     // Accept for now, they may be changed or rejected by the peer if this is a ReceiveInit
-    mStartOffset = transferInit.StartOffset;
-    mMaxLength   = transferInit.MaxLength;
+    mStartOffset    = transferInit.StartOffset;
+    mTransferLength = transferInit.MaxLength;
 
     // Store the Request data to share with the caller for verification
     mTransferRequestData.TransferCtlFlagsRaw = transferInit.TransferCtlOptions.Raw(),
@@ -474,7 +486,7 @@ void TransferSession::HandleReceiveAccept(System::PacketBufferHandle msgData)
 
     mTransferMaxBlockSize = rcvAcceptMsg.MaxBlockSize;
     mStartOffset          = rcvAcceptMsg.StartOffset;
-    mMaxLength            = rcvAcceptMsg.Length;
+    mTransferLength       = rcvAcceptMsg.Length;
 
     // Note: if VerifyProposedMode() returned with no error, then mControlMode must match the proposed mode in the ReceiveAccept
     // message
@@ -510,14 +522,14 @@ void TransferSession::HandleSendAccept(System::PacketBufferHandle msgData)
     err = VerifyProposedMode(sendAcceptMsg.TransferCtlFlags);
     SuccessOrExit(err);
 
-    // Note: if VerifyProposedMode() returned with no error, then mControlMode must match the proposed mode in the ReceiveAccept
+    // Note: if VerifyProposedMode() returned with no error, then mControlMode must match the proposed mode in the SendAccept
     // message
     mTransferMaxBlockSize = sendAcceptMsg.MaxBlockSize;
 
     mTransferAcceptData.ControlMode    = mControlMode;
     mTransferAcceptData.MaxBlockSize   = sendAcceptMsg.MaxBlockSize;
-    mTransferAcceptData.StartOffset    = mStartOffset; // Not included in SendAccept msg, so use member
-    mTransferAcceptData.Length         = mMaxLength;   // Not included in SendAccept msg, so use member
+    mTransferAcceptData.StartOffset    = mStartOffset;    // Not included in SendAccept msg, so use member
+    mTransferAcceptData.Length         = mTransferLength; // Not included in SendAccept msg, so use member
     mTransferAcceptData.Metadata       = sendAcceptMsg.Metadata;
     mTransferAcceptData.MetadataLength = sendAcceptMsg.MetadataLength;
 
@@ -570,7 +582,7 @@ void TransferSession::HandleBlock(System::PacketBufferHandle msgData)
 
     if (IsTransferLengthDefinite())
     {
-        VerifyOrExit(mNumBytesProcessed + blockMsg.DataLength <= mMaxLength, SetTransferError(kStatus_LengthMismatch));
+        VerifyOrExit(mNumBytesProcessed + blockMsg.DataLength <= mTransferLength, SetTransferError(kStatus_LengthMismatch));
     }
 
     mBlockEventData.Data   = blockMsg.Data;
@@ -751,7 +763,7 @@ void TransferSession::SetTransferError(StatusCode code)
 
 bool TransferSession::IsTransferLengthDefinite()
 {
-    return (mMaxLength > 0);
+    return (mTransferLength > 0);
 }
 
 } // namespace bdx

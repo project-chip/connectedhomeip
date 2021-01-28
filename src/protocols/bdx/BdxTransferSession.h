@@ -270,7 +270,7 @@ public:
 
     TransferControlFlags GetControlMode() const { return mControlMode; }
     uint64_t GetStartOffset() const { return mStartOffset; }
-    uint64_t GetTransferLength() const { return mMaxLength; }
+    uint64_t GetTransferLength() const { return mTransferLength; }
     uint16_t GetTransferBlockSize() const { return mTransferMaxBlockSize; }
 
     TransferSession();
@@ -335,7 +335,7 @@ private:
     TransferControlFlags mControlMode;
     uint8_t mTransferVersion       = 0;
     uint64_t mStartOffset          = 0; ///< 0 represents no offset
-    uint64_t mMaxLength            = 0; ///< 0 represents indefinite length
+    uint64_t mTransferLength       = 0; ///< 0 represents indefinite length
     uint16_t mTransferMaxBlockSize = 0;
 
     System::PacketBufferHandle mPendingMsgHandle;
