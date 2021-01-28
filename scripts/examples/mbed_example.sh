@@ -23,10 +23,34 @@ SUPPORTED_TARGET_BOARD=(DISCO_L475VG_IOT01A NRF52840_DK)
 SUPPORTED_APP=(shell)
 SUPPORTED_PROFILES=(release develop debug)
 
-APP="${1:-shell}"
-TARGET_BOARD="${2:-NRF52840_DK}"
-TOOLCHAIN="${3:-GCC_ARM}"
-PROFILE="${4:-release}"
+APP=shell
+TARGET_BOARD=NRF52840_DK
+TOOLCHAIN=GCC_ARM
+PROFILE=release
+
+for i in "$@"; do
+    case $i in
+    -a=* | --app=*)
+        APP="${i#*=}"
+        shift
+        ;;
+    -b=* | --board=*)
+        TARGET_BOARD="${i#*=}"
+        shift
+        ;;
+    -t=* | --toolchain=*)
+        TOOLCHAIN="${i#*=}"
+        shift
+        ;;
+    -p=* | --profile=*)
+        PROFILE="${i#*=}"
+        shift
+        ;;
+    *)
+        # unknown option
+        ;;
+    esac
+done
 
 if [[ ! " ${SUPPORTED_TARGET_BOARD[@]} " =~ " ${TARGET_BOARD} " ]]; then
     echo "ERROR: Target $TARGET_BOARD not supported"
@@ -49,4 +73,6 @@ if [[ ! " ${SUPPORTED_PROFILES[@]} " =~ " ${PROFILE} " ]]; then
 fi
 
 echo "Build $APP app for $TARGET_BOARD target with $TOOLCHAIN toolchain and $PROFILE profile"
-#mbed-tools compile -t "$TOOLCHAIN" -m "$TARGET_BOARD" -p "$APP/mbed" --mbed-os-path "$MBED_OS_PATH" -p "$PROFILE"
+set -x
+pwd
+mbed-tools compile -t "$TOOLCHAIN" -m "$TARGET_BOARD" -p "$APP/mbed" --mbed-os-path "$MBED_OS_PATH" -b "$PROFILE"
