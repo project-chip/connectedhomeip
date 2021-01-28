@@ -12,6 +12,9 @@
 // License for the specific language governing permissions and limitations under
 // the License.
 
+// THIS FILE IS DEPRECATED, keep only until examples/pigweed-app depends on
+// third_party/pigweed/repo/pw_hdlc/rpc_example/hdlc_rpc_server.cc
+
 #include <cstddef>
 
 #include "pw_hdlc/rpc_channel.h"

@@ -18,6 +18,8 @@
 
 #include "Rpc.h"
 #include "AppTask.h"
+#include "PigweedLogger.h"
+#include "pigweed/RpcService.h"
 
 #include "main/pigweed_lighting.rpc.pb.h"
 #include "pw_hdlc/rpc_channel.h"
@@ -27,9 +29,9 @@
 #include "pw_sys_io/sys_io.h"
 #include "pw_sys_io_nrfconnect/init.h"
 
-#include <logging/log.h>
-
 #include <array>
+#include <kernel.h>
+#include <logging/log.h>
 
 LOG_MODULE_DECLARE(app);
 
@@ -50,41 +52,41 @@ namespace {
 
 using std::byte;
 
-constexpr size_t kRpcTaskSize         = 4096;
-constexpr int kRpcPriority            = 5;
-constexpr size_t kMaxTransmissionUnit = 1500;
+class PigweedLoggerMutex : public ::chip::rpc::Mutex
+{
+public:
+    PigweedLoggerMutex() {}
+    void Lock() override
+    {
+        k_sem * sem = PigweedLogger::GetSemaphore();
+        if (sem)
+        {
+            k_sem_take(sem, K_FOREVER);
+        }
+    }
+    void Unlock() override
+    {
+        k_sem * sem = PigweedLogger::GetSemaphore();
+        if (sem)
+        {
+            k_sem_give(sem);
+        }
+    }
+};
+
+PigweedLoggerMutex uart_mutex;
+
+constexpr size_t kRpcTaskSize = 4096;
+constexpr int kRpcPriority    = 5;
 
 K_THREAD_STACK_DEFINE(rpc_stack_area, kRpcTaskSize);
 struct k_thread rpc_thread_data;
 
-// Used to write HDLC data to pw::sys_io.
-pw::stream::SysIoWriter writer;
-
-// Set up the output channel for the pw_rpc server to use.
-pw::hdlc::RpcChannelOutputBuffer<kMaxTransmissionUnit> hdlc_channel_output(writer, pw::hdlc::kDefaultRpcAddress, "HDLC channel");
-
-pw::rpc::Channel channels[] = { pw::rpc::Channel::Create<1>(&hdlc_channel_output) };
-
-// pw_rpc server with the HDLC channel.
-pw::rpc::Server server(channels);
-
 chip::rpc::LightingService lighting_service;
 
-void RegisterServices()
+void RegisterServices(pw::rpc::Server & server)
 {
     server.RegisterService(lighting_service);
-}
-
-void Start()
-{
-    // Set up the server and start processing data.
-    RegisterServices();
-
-    // Buffer for decoding incoming HDLC frames.
-    std::array<std::byte, kMaxTransmissionUnit> input_buffer;
-
-    LOG_INF("Starting pw_rpc server");
-    pw::hdlc::ReadAndProcessPackets(server, hdlc_channel_output, input_buffer);
 }
 
 } // namespace
@@ -99,7 +101,7 @@ k_tid_t Init()
 
 void RunRpcService(void *, void *, void *)
 {
-    Start();
+    Start(RegisterServices, &uart_mutex);
 }
 
 } // namespace rpc
