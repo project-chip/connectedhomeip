@@ -18,13 +18,13 @@
 
 /**
  * @file
- *    This file contains impletations for the CallbacksMgr class. The object of this
+ *    This file contains implementations for the CallbacksMgr class. The object of this
  *    class will be used by Controller applications to interact with ZCL messages.
  *    This class provide mechanism to store callbacks for global message dispatching
  *    across the ZCL stack.
  */
 
-#include "CallbacksMgr.h"
+#include "CHIPDeviceCallbacksMgr.h"
 
 #include <core/CHIPCore.h>
 #include <inttypes.h>
@@ -57,8 +57,9 @@ struct ReportCallbackInfo
 namespace chip {
 namespace app {
 
-CHIP_ERROR CHIPCallbacksMgr::AddResponseCallback(NodeId nodeId, uint8_t sequenceNumber, Callback::Cancelable * onSuccessCallback,
-                                                 Callback::Cancelable * onFailureCallback)
+CHIP_ERROR CHIPDeviceCallbacksMgr::AddResponseCallback(NodeId nodeId, uint8_t sequenceNumber,
+                                                       Callback::Cancelable * onSuccessCallback,
+                                                       Callback::Cancelable * onFailureCallback)
 {
     VerifyOrReturnError(onSuccessCallback != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(onFailureCallback != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -77,8 +78,9 @@ CHIP_ERROR CHIPCallbacksMgr::AddResponseCallback(NodeId nodeId, uint8_t sequence
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CHIPCallbacksMgr::GetResponseCallback(NodeId nodeId, uint8_t sequenceNumber, Callback::Cancelable ** onSuccessCallback,
-                                                 Callback::Cancelable ** onFailureCallback)
+CHIP_ERROR CHIPDeviceCallbacksMgr::GetResponseCallback(NodeId nodeId, uint8_t sequenceNumber,
+                                                       Callback::Cancelable ** onSuccessCallback,
+                                                       Callback::Cancelable ** onFailureCallback)
 {
     ResponseCallbackInfo info = { nodeId, sequenceNumber };
 
@@ -91,8 +93,8 @@ CHIP_ERROR CHIPCallbacksMgr::GetResponseCallback(NodeId nodeId, uint8_t sequence
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CHIPCallbacksMgr::AddReportCallback(NodeId nodeId, EndpointId endpointId, ClusterId clusterId, AttributeId attributeId,
-                                               Callback::Cancelable * onReportCallback)
+CHIP_ERROR CHIPDeviceCallbacksMgr::AddReportCallback(NodeId nodeId, EndpointId endpointId, ClusterId clusterId,
+                                                     AttributeId attributeId, Callback::Cancelable * onReportCallback)
 {
     VerifyOrReturnError(onReportCallback != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -106,8 +108,8 @@ CHIP_ERROR CHIPCallbacksMgr::AddReportCallback(NodeId nodeId, EndpointId endpoin
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CHIPCallbacksMgr::GetReportCallback(NodeId nodeId, EndpointId endpointId, ClusterId clusterId, AttributeId attributeId,
-                                               Callback::Cancelable ** onReportCallback)
+CHIP_ERROR CHIPDeviceCallbacksMgr::GetReportCallback(NodeId nodeId, EndpointId endpointId, ClusterId clusterId,
+                                                     AttributeId attributeId, Callback::Cancelable ** onReportCallback)
 {
     ReportCallbackInfo info = { nodeId, endpointId, clusterId, attributeId };
 

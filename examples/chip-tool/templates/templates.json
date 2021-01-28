@@ -32,16 +32,6 @@
             "path": "reporting-commands.zapt",
             "name": "Reporting Commands header",
             "output": "examples/chip-tool/commands/reporting/Commands.h"
-        },
-        {
-            "path": "response-callbacks.zapt",
-            "name": "Response Callbacks header",
-            "output": "examples/chip-tool/commands/clusters/ResponseCallbacks.h"
-        },
-        {
-            "path": "response-callbacks-src.zapt",
-            "name": "Response Callbacks",
-            "output": "examples/chip-tool/commands/clusters/ResponseCallbacks.cpp"
         }
     ]
 }

@@ -824,8 +824,8 @@ PacketBufferHandle encodeColorControlClusterReadCurrentHueAttribute(EndpointId d
     COMMAND_FOOTER();
 }
 
-PacketBufferHandle encodeColorControlClusterReportCurrentHueAttribute(EndpointId destinationEndpoint, uint16_t minInterval,
-                                                                      uint16_t maxInterval, uint8_t change)
+PacketBufferHandle encodeColorControlClusterConfigureCurrentHueAttribute(EndpointId destinationEndpoint, uint16_t minInterval,
+                                                                         uint16_t maxInterval, uint8_t change)
 {
     COMMAND_HEADER("ReportColorControlCurrentHue", COLOR_CONTROL_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand)
@@ -850,8 +850,9 @@ PacketBufferHandle encodeColorControlClusterReadCurrentSaturationAttribute(Endpo
     COMMAND_FOOTER();
 }
 
-PacketBufferHandle encodeColorControlClusterReportCurrentSaturationAttribute(EndpointId destinationEndpoint, uint16_t minInterval,
-                                                                             uint16_t maxInterval, uint8_t change)
+PacketBufferHandle encodeColorControlClusterConfigureCurrentSaturationAttribute(EndpointId destinationEndpoint,
+                                                                                uint16_t minInterval, uint16_t maxInterval,
+                                                                                uint8_t change)
 {
     COMMAND_HEADER("ReportColorControlCurrentSaturation", COLOR_CONTROL_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand)
@@ -886,8 +887,8 @@ PacketBufferHandle encodeColorControlClusterReadCurrentXAttribute(EndpointId des
     COMMAND_FOOTER();
 }
 
-PacketBufferHandle encodeColorControlClusterReportCurrentXAttribute(EndpointId destinationEndpoint, uint16_t minInterval,
-                                                                    uint16_t maxInterval, uint16_t change)
+PacketBufferHandle encodeColorControlClusterConfigureCurrentXAttribute(EndpointId destinationEndpoint, uint16_t minInterval,
+                                                                       uint16_t maxInterval, uint16_t change)
 {
     COMMAND_HEADER("ReportColorControlCurrentX", COLOR_CONTROL_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand)
@@ -912,8 +913,8 @@ PacketBufferHandle encodeColorControlClusterReadCurrentYAttribute(EndpointId des
     COMMAND_FOOTER();
 }
 
-PacketBufferHandle encodeColorControlClusterReportCurrentYAttribute(EndpointId destinationEndpoint, uint16_t minInterval,
-                                                                    uint16_t maxInterval, uint16_t change)
+PacketBufferHandle encodeColorControlClusterConfigureCurrentYAttribute(EndpointId destinationEndpoint, uint16_t minInterval,
+                                                                       uint16_t maxInterval, uint16_t change)
 {
     COMMAND_HEADER("ReportColorControlCurrentY", COLOR_CONTROL_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand)
@@ -958,8 +959,8 @@ PacketBufferHandle encodeColorControlClusterReadColorTemperatureAttribute(Endpoi
     COMMAND_FOOTER();
 }
 
-PacketBufferHandle encodeColorControlClusterReportColorTemperatureAttribute(EndpointId destinationEndpoint, uint16_t minInterval,
-                                                                            uint16_t maxInterval, uint16_t change)
+PacketBufferHandle encodeColorControlClusterConfigureColorTemperatureAttribute(EndpointId destinationEndpoint, uint16_t minInterval,
+                                                                               uint16_t maxInterval, uint16_t change)
 {
     COMMAND_HEADER("ReportColorControlColorTemperature", COLOR_CONTROL_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand)
@@ -1953,8 +1954,8 @@ PacketBufferHandle encodeDoorLockClusterReadLockStateAttribute(EndpointId destin
     COMMAND_FOOTER();
 }
 
-PacketBufferHandle encodeDoorLockClusterReportLockStateAttribute(EndpointId destinationEndpoint, uint16_t minInterval,
-                                                                 uint16_t maxInterval)
+PacketBufferHandle encodeDoorLockClusterConfigureLockStateAttribute(EndpointId destinationEndpoint, uint16_t minInterval,
+                                                                    uint16_t maxInterval)
 {
     COMMAND_HEADER("ReportDoorLockLockState", DOOR_LOCK_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand)
@@ -2441,8 +2442,8 @@ PacketBufferHandle encodeLevelControlClusterReadCurrentLevelAttribute(EndpointId
     COMMAND_FOOTER();
 }
 
-PacketBufferHandle encodeLevelControlClusterReportCurrentLevelAttribute(EndpointId destinationEndpoint, uint16_t minInterval,
-                                                                        uint16_t maxInterval, uint8_t change)
+PacketBufferHandle encodeLevelControlClusterConfigureCurrentLevelAttribute(EndpointId destinationEndpoint, uint16_t minInterval,
+                                                                           uint16_t maxInterval, uint8_t change)
 {
     COMMAND_HEADER("ReportLevelControlCurrentLevel", LEVEL_CONTROL_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand)
@@ -2527,8 +2528,8 @@ PacketBufferHandle encodeOnOffClusterReadOnOffAttribute(EndpointId destinationEn
     COMMAND_FOOTER();
 }
 
-PacketBufferHandle encodeOnOffClusterReportOnOffAttribute(EndpointId destinationEndpoint, uint16_t minInterval,
-                                                          uint16_t maxInterval)
+PacketBufferHandle encodeOnOffClusterConfigureOnOffAttribute(EndpointId destinationEndpoint, uint16_t minInterval,
+                                                             uint16_t maxInterval)
 {
     COMMAND_HEADER("ReportOnOffOnOff", ON_OFF_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand)
@@ -2763,9 +2764,9 @@ PacketBufferHandle encodeTemperatureMeasurementClusterReadMeasuredValueAttribute
     COMMAND_FOOTER();
 }
 
-PacketBufferHandle encodeTemperatureMeasurementClusterReportMeasuredValueAttribute(EndpointId destinationEndpoint,
-                                                                                   uint16_t minInterval, uint16_t maxInterval,
-                                                                                   int16_t change)
+PacketBufferHandle encodeTemperatureMeasurementClusterConfigureMeasuredValueAttribute(EndpointId destinationEndpoint,
+                                                                                      uint16_t minInterval, uint16_t maxInterval,
+                                                                                      int16_t change)
 {
     COMMAND_HEADER("ReportTemperatureMeasurementMeasuredValue", TEMP_MEASUREMENT_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand)

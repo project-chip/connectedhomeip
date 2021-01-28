@@ -36,6 +36,7 @@
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #include <app/CommandSender.h>
+#include <app/server/DataModelHandler.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPEncoding.h>
 #include <core/CHIPSafeCasts.h>
@@ -203,6 +204,10 @@ void Device::OnMessageReceived(const PacketHeader & header, const PayloadHeader 
         if (mStatusDelegate != nullptr)
         {
             mStatusDelegate->OnMessage(std::move(msgBuf));
+        }
+        else
+        {
+            HandleDataModelMessage(mDeviceId, std::move(msgBuf));
         }
     }
 }

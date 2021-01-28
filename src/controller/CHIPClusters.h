@@ -231,21 +231,23 @@ public:
                                                   Callback::Cancelable * onFailureCallback, uint8_t value);
     CHIP_ERROR WriteAttributeStartUpColorTemperatureMireds(Callback::Cancelable * onSuccessCallback,
                                                            Callback::Cancelable * onFailureCallback, uint16_t value);
-    CHIP_ERROR ReportAttributeCurrentHue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                         Callback::Cancelable * onReportCallback, uint16_t minInterval, uint16_t maxInterval,
-                                         uint8_t change);
-    CHIP_ERROR ReportAttributeCurrentSaturation(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                                Callback::Cancelable * onReportCallback, uint16_t minInterval, uint16_t maxInterval,
-                                                uint8_t change);
-    CHIP_ERROR ReportAttributeCurrentX(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                       Callback::Cancelable * onReportCallback, uint16_t minInterval, uint16_t maxInterval,
-                                       uint16_t change);
-    CHIP_ERROR ReportAttributeCurrentY(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                       Callback::Cancelable * onReportCallback, uint16_t minInterval, uint16_t maxInterval,
-                                       uint16_t change);
-    CHIP_ERROR ReportAttributeColorTemperature(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                               Callback::Cancelable * onReportCallback, uint16_t minInterval, uint16_t maxInterval,
-                                               uint16_t change);
+    CHIP_ERROR ConfigureAttributeCurrentHue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                            uint16_t minInterval, uint16_t maxInterval, uint8_t change);
+    CHIP_ERROR ReportAttributeCurrentHue(Callback::Cancelable * onReportCallback);
+    CHIP_ERROR ConfigureAttributeCurrentSaturation(Callback::Cancelable * onSuccessCallback,
+                                                   Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                   uint16_t maxInterval, uint8_t change);
+    CHIP_ERROR ReportAttributeCurrentSaturation(Callback::Cancelable * onReportCallback);
+    CHIP_ERROR ConfigureAttributeCurrentX(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                          uint16_t minInterval, uint16_t maxInterval, uint16_t change);
+    CHIP_ERROR ReportAttributeCurrentX(Callback::Cancelable * onReportCallback);
+    CHIP_ERROR ConfigureAttributeCurrentY(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                          uint16_t minInterval, uint16_t maxInterval, uint16_t change);
+    CHIP_ERROR ReportAttributeCurrentY(Callback::Cancelable * onReportCallback);
+    CHIP_ERROR ConfigureAttributeColorTemperature(Callback::Cancelable * onSuccessCallback,
+                                                  Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                  uint16_t maxInterval, uint16_t change);
+    CHIP_ERROR ReportAttributeColorTemperature(Callback::Cancelable * onReportCallback);
 
 private:
     static constexpr CommandId kMoveColorCommandId              = 0x08;
@@ -316,8 +318,9 @@ public:
     CHIP_ERROR ReadAttributeLockType(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeActuatorEnabled(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR ReportAttributeLockState(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                        Callback::Cancelable * onReportCallback, uint16_t minInterval, uint16_t maxInterval);
+    CHIP_ERROR ConfigureAttributeLockState(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                           uint16_t minInterval, uint16_t maxInterval);
+    CHIP_ERROR ReportAttributeLockState(Callback::Cancelable * onReportCallback);
 
 private:
     static constexpr CommandId kClearAllPinsCommandId         = 0x08;
@@ -443,9 +446,9 @@ public:
     CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeCurrentLevel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR ReportAttributeCurrentLevel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                           Callback::Cancelable * onReportCallback, uint16_t minInterval, uint16_t maxInterval,
-                                           uint8_t change);
+    CHIP_ERROR ConfigureAttributeCurrentLevel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                              uint16_t minInterval, uint16_t maxInterval, uint8_t change);
+    CHIP_ERROR ReportAttributeCurrentLevel(Callback::Cancelable * onReportCallback);
 
 private:
     static constexpr CommandId kMoveCommandId                 = 0x01;
@@ -473,8 +476,9 @@ public:
     CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeOnOff(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR ReportAttributeOnOff(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                    Callback::Cancelable * onReportCallback, uint16_t minInterval, uint16_t maxInterval);
+    CHIP_ERROR ConfigureAttributeOnOff(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                       uint16_t minInterval, uint16_t maxInterval);
+    CHIP_ERROR ReportAttributeOnOff(Callback::Cancelable * onReportCallback);
 
 private:
     static constexpr CommandId kOffCommandId    = 0x00;
@@ -536,9 +540,9 @@ public:
     CHIP_ERROR ReadAttributeMinMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeMaxMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR ReportAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                            Callback::Cancelable * onReportCallback, uint16_t minInterval, uint16_t maxInterval,
-                                            int16_t change);
+    CHIP_ERROR ConfigureAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                               uint16_t minInterval, uint16_t maxInterval, int16_t change);
+    CHIP_ERROR ReportAttributeMeasuredValue(Callback::Cancelable * onReportCallback);
 };
 
 } // namespace Controller

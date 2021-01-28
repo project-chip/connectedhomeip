@@ -880,14 +880,18 @@ CHIP_ERROR ColorControlCluster::ReadAttributeCurrentHue(Callback::Cancelable * o
     return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ColorControlCluster::ReportAttributeCurrentHue(Callback::Cancelable * onSuccessCallback,
-                                                          Callback::Cancelable * onFailureCallback,
-                                                          Callback::Cancelable * onReportCallback, uint16_t minInterval,
-                                                          uint16_t maxInterval, uint8_t change)
+CHIP_ERROR ColorControlCluster::ConfigureAttributeCurrentHue(Callback::Cancelable * onSuccessCallback,
+                                                             Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                             uint16_t maxInterval, uint8_t change)
 {
     System::PacketBufferHandle payload =
-        encodeColorControlClusterReportCurrentHueAttribute(mEndpoint, minInterval, maxInterval, change);
-    return RequestAttributeReporting(std::move(payload), 0x0000, onSuccessCallback, onFailureCallback, onReportCallback);
+        encodeColorControlClusterConfigureCurrentHueAttribute(mEndpoint, minInterval, maxInterval, change);
+    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR ColorControlCluster::ReportAttributeCurrentHue(Callback::Cancelable * onReportCallback)
+{
+    return RequestAttributeReporting(0x0000, onReportCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ReadAttributeCurrentSaturation(Callback::Cancelable * onSuccessCallback,
@@ -897,14 +901,18 @@ CHIP_ERROR ColorControlCluster::ReadAttributeCurrentSaturation(Callback::Cancela
     return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ColorControlCluster::ReportAttributeCurrentSaturation(Callback::Cancelable * onSuccessCallback,
-                                                                 Callback::Cancelable * onFailureCallback,
-                                                                 Callback::Cancelable * onReportCallback, uint16_t minInterval,
-                                                                 uint16_t maxInterval, uint8_t change)
+CHIP_ERROR ColorControlCluster::ConfigureAttributeCurrentSaturation(Callback::Cancelable * onSuccessCallback,
+                                                                    Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                                    uint16_t maxInterval, uint8_t change)
 {
     System::PacketBufferHandle payload =
-        encodeColorControlClusterReportCurrentSaturationAttribute(mEndpoint, minInterval, maxInterval, change);
-    return RequestAttributeReporting(std::move(payload), 0x0001, onSuccessCallback, onFailureCallback, onReportCallback);
+        encodeColorControlClusterConfigureCurrentSaturationAttribute(mEndpoint, minInterval, maxInterval, change);
+    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR ColorControlCluster::ReportAttributeCurrentSaturation(Callback::Cancelable * onReportCallback)
+{
+    return RequestAttributeReporting(0x0001, onReportCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ReadAttributeRemainingTime(Callback::Cancelable * onSuccessCallback,
@@ -921,14 +929,18 @@ CHIP_ERROR ColorControlCluster::ReadAttributeCurrentX(Callback::Cancelable * onS
     return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ColorControlCluster::ReportAttributeCurrentX(Callback::Cancelable * onSuccessCallback,
-                                                        Callback::Cancelable * onFailureCallback,
-                                                        Callback::Cancelable * onReportCallback, uint16_t minInterval,
-                                                        uint16_t maxInterval, uint16_t change)
+CHIP_ERROR ColorControlCluster::ConfigureAttributeCurrentX(Callback::Cancelable * onSuccessCallback,
+                                                           Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                           uint16_t maxInterval, uint16_t change)
 {
     System::PacketBufferHandle payload =
-        encodeColorControlClusterReportCurrentXAttribute(mEndpoint, minInterval, maxInterval, change);
-    return RequestAttributeReporting(std::move(payload), 0x0003, onSuccessCallback, onFailureCallback, onReportCallback);
+        encodeColorControlClusterConfigureCurrentXAttribute(mEndpoint, minInterval, maxInterval, change);
+    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR ColorControlCluster::ReportAttributeCurrentX(Callback::Cancelable * onReportCallback)
+{
+    return RequestAttributeReporting(0x0003, onReportCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ReadAttributeCurrentY(Callback::Cancelable * onSuccessCallback,
@@ -938,14 +950,18 @@ CHIP_ERROR ColorControlCluster::ReadAttributeCurrentY(Callback::Cancelable * onS
     return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ColorControlCluster::ReportAttributeCurrentY(Callback::Cancelable * onSuccessCallback,
-                                                        Callback::Cancelable * onFailureCallback,
-                                                        Callback::Cancelable * onReportCallback, uint16_t minInterval,
-                                                        uint16_t maxInterval, uint16_t change)
+CHIP_ERROR ColorControlCluster::ConfigureAttributeCurrentY(Callback::Cancelable * onSuccessCallback,
+                                                           Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                           uint16_t maxInterval, uint16_t change)
 {
     System::PacketBufferHandle payload =
-        encodeColorControlClusterReportCurrentYAttribute(mEndpoint, minInterval, maxInterval, change);
-    return RequestAttributeReporting(std::move(payload), 0x0004, onSuccessCallback, onFailureCallback, onReportCallback);
+        encodeColorControlClusterConfigureCurrentYAttribute(mEndpoint, minInterval, maxInterval, change);
+    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR ColorControlCluster::ReportAttributeCurrentY(Callback::Cancelable * onReportCallback)
+{
+    return RequestAttributeReporting(0x0004, onReportCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ReadAttributeDriftCompensation(Callback::Cancelable * onSuccessCallback,
@@ -969,14 +985,18 @@ CHIP_ERROR ColorControlCluster::ReadAttributeColorTemperature(Callback::Cancelab
     return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ColorControlCluster::ReportAttributeColorTemperature(Callback::Cancelable * onSuccessCallback,
-                                                                Callback::Cancelable * onFailureCallback,
-                                                                Callback::Cancelable * onReportCallback, uint16_t minInterval,
-                                                                uint16_t maxInterval, uint16_t change)
+CHIP_ERROR ColorControlCluster::ConfigureAttributeColorTemperature(Callback::Cancelable * onSuccessCallback,
+                                                                   Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                                   uint16_t maxInterval, uint16_t change)
 {
     System::PacketBufferHandle payload =
-        encodeColorControlClusterReportColorTemperatureAttribute(mEndpoint, minInterval, maxInterval, change);
-    return RequestAttributeReporting(std::move(payload), 0x0007, onSuccessCallback, onFailureCallback, onReportCallback);
+        encodeColorControlClusterConfigureColorTemperatureAttribute(mEndpoint, minInterval, maxInterval, change);
+    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR ColorControlCluster::ReportAttributeColorTemperature(Callback::Cancelable * onReportCallback)
+{
+    return RequestAttributeReporting(0x0007, onReportCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ReadAttributeColorMode(Callback::Cancelable * onSuccessCallback,
@@ -2145,13 +2165,17 @@ CHIP_ERROR DoorLockCluster::ReadAttributeLockState(Callback::Cancelable * onSucc
     return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR DoorLockCluster::ReportAttributeLockState(Callback::Cancelable * onSuccessCallback,
-                                                     Callback::Cancelable * onFailureCallback,
-                                                     Callback::Cancelable * onReportCallback, uint16_t minInterval,
-                                                     uint16_t maxInterval)
+CHIP_ERROR DoorLockCluster::ConfigureAttributeLockState(Callback::Cancelable * onSuccessCallback,
+                                                        Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                        uint16_t maxInterval)
 {
-    System::PacketBufferHandle payload = encodeDoorLockClusterReportLockStateAttribute(mEndpoint, minInterval, maxInterval);
-    return RequestAttributeReporting(std::move(payload), 0x0000, onSuccessCallback, onFailureCallback, onReportCallback);
+    System::PacketBufferHandle payload = encodeDoorLockClusterConfigureLockStateAttribute(mEndpoint, minInterval, maxInterval);
+    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR DoorLockCluster::ReportAttributeLockState(Callback::Cancelable * onReportCallback)
+{
+    return RequestAttributeReporting(0x0000, onReportCallback);
 }
 
 CHIP_ERROR DoorLockCluster::ReadAttributeLockType(Callback::Cancelable * onSuccessCallback,
@@ -2822,14 +2846,18 @@ CHIP_ERROR LevelControlCluster::ReadAttributeCurrentLevel(Callback::Cancelable *
     return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR LevelControlCluster::ReportAttributeCurrentLevel(Callback::Cancelable * onSuccessCallback,
-                                                            Callback::Cancelable * onFailureCallback,
-                                                            Callback::Cancelable * onReportCallback, uint16_t minInterval,
-                                                            uint16_t maxInterval, uint8_t change)
+CHIP_ERROR LevelControlCluster::ConfigureAttributeCurrentLevel(Callback::Cancelable * onSuccessCallback,
+                                                               Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                               uint16_t maxInterval, uint8_t change)
 {
     System::PacketBufferHandle payload =
-        encodeLevelControlClusterReportCurrentLevelAttribute(mEndpoint, minInterval, maxInterval, change);
-    return RequestAttributeReporting(std::move(payload), 0x0000, onSuccessCallback, onFailureCallback, onReportCallback);
+        encodeLevelControlClusterConfigureCurrentLevelAttribute(mEndpoint, minInterval, maxInterval, change);
+    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR LevelControlCluster::ReportAttributeCurrentLevel(Callback::Cancelable * onReportCallback)
+{
+    return RequestAttributeReporting(0x0000, onReportCallback);
 }
 
 CHIP_ERROR LevelControlCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
@@ -2936,11 +2964,16 @@ CHIP_ERROR OnOffCluster::ReadAttributeOnOff(Callback::Cancelable * onSuccessCall
     return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR OnOffCluster::ReportAttributeOnOff(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                              Callback::Cancelable * onReportCallback, uint16_t minInterval, uint16_t maxInterval)
+CHIP_ERROR OnOffCluster::ConfigureAttributeOnOff(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                                 uint16_t minInterval, uint16_t maxInterval)
 {
-    System::PacketBufferHandle payload = encodeOnOffClusterReportOnOffAttribute(mEndpoint, minInterval, maxInterval);
-    return RequestAttributeReporting(std::move(payload), 0x0000, onSuccessCallback, onFailureCallback, onReportCallback);
+    System::PacketBufferHandle payload = encodeOnOffClusterConfigureOnOffAttribute(mEndpoint, minInterval, maxInterval);
+    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR OnOffCluster::ReportAttributeOnOff(Callback::Cancelable * onReportCallback)
+{
+    return RequestAttributeReporting(0x0000, onReportCallback);
 }
 
 CHIP_ERROR OnOffCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
@@ -3255,14 +3288,19 @@ CHIP_ERROR TemperatureMeasurementCluster::ReadAttributeMeasuredValue(Callback::C
     return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR TemperatureMeasurementCluster::ReportAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback,
-                                                                       Callback::Cancelable * onFailureCallback,
-                                                                       Callback::Cancelable * onReportCallback,
-                                                                       uint16_t minInterval, uint16_t maxInterval, int16_t change)
+CHIP_ERROR TemperatureMeasurementCluster::ConfigureAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback,
+                                                                          Callback::Cancelable * onFailureCallback,
+                                                                          uint16_t minInterval, uint16_t maxInterval,
+                                                                          int16_t change)
 {
     System::PacketBufferHandle payload =
-        encodeTemperatureMeasurementClusterReportMeasuredValueAttribute(mEndpoint, minInterval, maxInterval, change);
-    return RequestAttributeReporting(std::move(payload), 0x0000, onSuccessCallback, onFailureCallback, onReportCallback);
+        encodeTemperatureMeasurementClusterConfigureMeasuredValueAttribute(mEndpoint, minInterval, maxInterval, change);
+    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR TemperatureMeasurementCluster::ReportAttributeMeasuredValue(Callback::Cancelable * onReportCallback)
+{
+    return RequestAttributeReporting(0x0000, onReportCallback);
 }
 
 CHIP_ERROR TemperatureMeasurementCluster::ReadAttributeMinMeasuredValue(Callback::Cancelable * onSuccessCallback,

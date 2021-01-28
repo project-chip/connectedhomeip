@@ -30,7 +30,7 @@ public:
 
     void AddReportCallbacks(uint8_t endpointId) override
     {
-        chip::app::CHIPCallbacksMgr & callbacksMgr = chip::app::CHIPCallbacksMgr::GetInstance();
+        chip::app::CHIPDeviceCallbacksMgr & callbacksMgr = chip::app::CHIPDeviceCallbacksMgr::GetInstance();
         callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x0300, 0x0000,
                                        onReportColorControlCurrentHueCallback->Cancel());
         callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x0300, 0x0001,

@@ -25,6 +25,8 @@ config("includes") {
 
 executable("chip-tool") {
   sources = [
+    "${chip_root}/src/app/reporting/reporting-default-configuration.cpp",
+    "${chip_root}/src/app/reporting/reporting.cpp",
     "${chip_root}/src/app/server/DataModelHandler.cpp",
     "${chip_root}/src/app/util/af-event.cpp",
     "${chip_root}/src/app/util/af-main-common.cpp",
@@ -39,11 +41,7 @@ executable("chip-tool") {
     "${chip_root}/src/app/util/process-cluster-message.cpp",
     "${chip_root}/src/app/util/process-global-message.cpp",
     "${chip_root}/src/app/util/util.cpp",
-    "${chip_root}/src/app/util/CallbacksMgr.cpp",
-    "${chip_root}/src/app/reporting/reporting.cpp",
-    "${chip_root}/src/app/reporting/reporting-default-configuration.cpp",
     "commands/clusters/ModelCommand.cpp",
-    "commands/clusters/ResponseCallbacks.cpp",
     "commands/common/Command.cpp",
     "commands/common/Commands.cpp",
     "commands/pairing/PairingCommand.cpp",
@@ -51,6 +49,7 @@ executable("chip-tool") {
     "commands/payload/SetupPayloadParseCommand.cpp",
     "commands/reporting/ReportingCommand.cpp",
     "config/PersistentStorage.cpp",
+    "gen/CHIPClientCallbacks.cpp",
     "gen/call-command-handler.cpp",
     "gen/callback-stub.cpp",
     "main.cpp",

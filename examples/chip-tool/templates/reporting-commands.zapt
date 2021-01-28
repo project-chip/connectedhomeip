@@ -16,7 +16,7 @@ public:
     
     void AddReportCallbacks(uint8_t endpointId) override
     {
-        chip::app::CHIPCallbacksMgr & callbacksMgr = chip::app::CHIPCallbacksMgr::GetInstance();
+        chip::app::CHIPDeviceCallbacksMgr & callbacksMgr = chip::app::CHIPDeviceCallbacksMgr::GetInstance();
 {{#chip_clusters}}
 {{#chip_server_cluster_attributes}}
 {{#if (isReportableAttribute)}}

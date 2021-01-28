@@ -28,7 +28,7 @@
 
 #include <app/CommandSender.h>
 #include <app/InteractionModelEngine.h>
-#include <app/util/CallbacksMgr.h>
+#include <app/util/CHIPDeviceCallbacksMgr.h>
 #include <app/util/basic-types.h>
 #include <core/CHIPCallback.h>
 #include <core/CHIPCore.h>
@@ -297,7 +297,9 @@ private:
 
     SecureSessionHandle mSecureSession = {};
 
-    app::CHIPCallbacksMgr & mCallbacksMgr = app::CHIPCallbacksMgr::GetInstance();
+    uint8_t mSequenceNumber = 0;
+
+    app::CHIPDeviceCallbacksMgr & mCallbacksMgr = app::CHIPDeviceCallbacksMgr::GetInstance();
 
     /**
      * @brief

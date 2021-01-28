@@ -16,8 +16,6 @@
  */
 
 #import "CHIPPersistentStorageDelegateBridge.h"
-#import "CHIPError.h"
-#import <Foundation/Foundation.h>
 
 CHIPPersistentStorageDelegateBridge::CHIPPersistentStorageDelegateBridge(void)
     : mDelegate(nil)

@@ -40,8 +40,6 @@ CHIP_ERROR ModelCommand::Run(PersistentStorage & storage, NodeId localId, NodeId
     err = mCommissioner.GetDevice(remoteId, &mDevice);
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(chipTool, "Init failure! No pairing for device: %" PRIu64, localId));
 
-    mDevice->SetDelegate(this);
-
     err = SendCommand(mDevice, mEndPointId);
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(chipTool, "Failed to send message: %s", ErrorStr(err)));
 
@@ -54,15 +52,4 @@ exit:
     mCommissioner.ServiceEventSignal();
     mCommissioner.Shutdown();
     return err;
-}
-
-void ModelCommand::OnMessage(PacketBufferHandle buffer)
-{
-    ChipLogDetail(chipTool, "%" PRIu64 ": Received %zu bytes", mDevice->GetDeviceId(), buffer->DataLength());
-    HandleDataModelMessage(mDevice->GetDeviceId(), std::move(buffer));
-}
-
-void ModelCommand::OnStatusChange(void)
-{
-    ChipLogDetail(chipTool, "DeviceStatusDelegate::OnStatusChange");
 }

@@ -18,8 +18,8 @@
 
 #include "ReportingCommand.h"
 
-#include "../clusters/ResponseCallbacks.h"
 #include "../common/Commands.h"
+#include "gen/CHIPClientCallbacks.h"
 #include <controller/CHIPClusters.h>
 
 using namespace ::chip;
