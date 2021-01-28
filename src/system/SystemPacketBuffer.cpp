@@ -591,26 +591,23 @@ PacketBufBound::PacketBufBound(size_t aAvailableSize, uint16_t aReservedSize) : 
     mPacket = PacketBufferHandle::New(aAvailableSize, aReservedSize);
     if (!mPacket.IsNull())
     {
-        mBuf  = mPacket->Start();
-        mSize = aAvailableSize;
+        Reset(mPacket->Start(), aAvailableSize);
     }
 }
 
 PacketBufferHandle PacketBufBound::Finalize()
 {
-    if (!mPacket.IsNull() && (mNeeded <= mSize))
+    if (!mPacket.IsNull() && Fit())
     {
         // Since mPacket was successfully allocated to hold the maximum length,
         // we know that the actual length fits in a uint16_t.
-        mPacket->SetDataLength(static_cast<uint16_t>(mNeeded));
+        mPacket->SetDataLength(static_cast<uint16_t>(Needed()));
     }
     else
     {
         mPacket = nullptr;
     }
-    mBuf    = nullptr;
-    mSize   = 0;
-    mNeeded = 0;
+    Reset(nullptr, 0);
     return std::move(mPacket);
 }
 

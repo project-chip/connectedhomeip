@@ -37,7 +37,7 @@ namespace chip {
  */
 class BufBound
 {
-protected:
+private:
     uint8_t * mBuf;
     size_t mSize;
     size_t mNeeded;
@@ -155,6 +155,14 @@ public:
      * @brief Size of the buffer
      */
     size_t Size() const { return mSize; }
+
+protected:
+    void Reset(uint8_t * buf, size_t len)
+    {
+        mBuf    = buf;
+        mSize   = len;
+        mNeeded = 0;
+    }
 };
 
 } // namespace chip

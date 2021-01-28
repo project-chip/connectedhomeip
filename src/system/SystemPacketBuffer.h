@@ -645,8 +645,8 @@ public:
      *  If no memory is available, or if the size requested is too large, then \c IsNull() will be true.
      *  Otherwise, it is guaranteed that the available space is no less than \a aAvailableSize.
      *
-     *  @param[in]  aAvailableSize  Minimim number of octets to allocate after the cursor.
-     *  @param[in]  aReservedSize   Minimum number of octets to reserve behind the cursor.
+     *  @param[in]  aAvailableSize  Minimim octets to allocate after the cursor; see \c PacketBufferHandle::New().
+     *  @param[in]  aReservedSize   Minimum octets to reserve behind the cursor; see \c PacketBufferHandle::New().
      */
     PacketBufBound(size_t aAvailableSize, uint16_t aReservedSize = CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE);
 
