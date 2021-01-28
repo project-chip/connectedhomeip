@@ -1,0 +1,7 @@
+{
+    "target_overrides": {
+        "K64F": {
+            "platform.stdio-baud-rate": 9600
+        }
+    }
+}
