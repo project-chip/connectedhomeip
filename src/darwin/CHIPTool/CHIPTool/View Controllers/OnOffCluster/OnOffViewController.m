@@ -118,7 +118,7 @@
         toggleButton.tag = i;
         [toggleButton setTitle:@"Toggle" forState:UIControlStateNormal];
         [toggleButton addTarget:self action:@selector(toggleButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
-        
+
         UIStackView * stackViewButtons = [CHIPUIViewUtils stackViewWithLabel:labelLight buttons:@[onButton, offButton, toggleButton]];
         stackViewButtons.axis = UILayoutConstraintAxisHorizontal;
         stackViewButtons.distribution = UIStackViewDistributionEqualSpacing;
@@ -141,7 +141,7 @@
     CHIPDeviceCallback completionHandler = ^(NSError * error) {
         NSLog(@"Status: On command completed with error %@", [error description]);
     };
-    
+
     UIButton *button = (UIButton *)sender;
     NSInteger lightNumber = button.tag;
     NSLog(@"Light %@ on button pressed.", @(lightNumber));
@@ -154,7 +154,7 @@
     CHIPDeviceCallback completionHandler = ^(NSError * error) {
         NSLog(@"Status: Off command completed with error %@", [error description]);
     };
-    
+
     UIButton *button = (UIButton *)sender;
     NSInteger lightNumber = button.tag;
     NSLog(@"Light %@ off button pressed.", @(lightNumber));
@@ -168,7 +168,7 @@
     CHIPDeviceCallback completionHandler = ^(NSError * error) {
         NSLog(@"Status: Toggle command completed with error %@", [error description]);
     };
-    
+
     UIButton *button = (UIButton *)sender;
     NSInteger lightNumber = button.tag;
     NSLog(@"Light %@ toggle button pressed.", @(lightNumber));
