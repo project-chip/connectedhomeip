@@ -692,6 +692,12 @@ public:
     void * order;
     void * tempbn;
 
+    /*
+     *  Context = "SPAKE2+ Commissioning" || PBKDFParamRequest || PBKDFParamResponse
+     **/
+    uint8_t spake_context[kMAX_Hash_SHA256_Context_Size];
+    size_t spake_context_len;
+
 protected:
     /**
      * @brief Initialize underlying implementation curve, points, field elements, etc.
