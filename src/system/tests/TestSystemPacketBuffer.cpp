@@ -1,7 +1,7 @@
 /*
  *
  *    Copyright (c) 2020-2021 Project CHIP Authors
- *    Copyright (c) 2016-2021 Nest Labs, Inc.
+ *    Copyright (c) 2016-2017 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
