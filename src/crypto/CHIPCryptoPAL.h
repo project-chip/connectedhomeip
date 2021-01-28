@@ -696,7 +696,7 @@ public:
      *  Context = "SPAKE2+ Commissioning" || PBKDFParamRequest || PBKDFParamResponse
      **/
     uint8_t spake_context[kMAX_Hash_SHA256_Context_Size];
-    size_t spake_context_len;
+    size_t spake_context_len = 0;
 
 protected:
     /**
