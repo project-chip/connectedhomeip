@@ -82,7 +82,7 @@ sudo third_party/bluez/repo/emulator/btvirt -L -l2
 sudo chip-device-ctrl
 ```
 
-2. [Required when there are multiple BLE adapters] Select BLE adapter (Linux
+2. [WIP] [Required when there are multiple BLE adapters] Select BLE adapter (Linux
    only)
 
 ```
@@ -114,20 +114,7 @@ chip-device-ctrl > ble-scan
 Connect to BLE device
 ```
 
-**Using device discriminator**
-
-```
-chip-device-ctrl > ble-connect 1383
-2020-11-23 17:36:41,894 ChipBLEMgr   INFO     trying to connect to 1383
-2020-11-23 17:36:44,571 ChipBLEMgr   INFO     BLE connecting
-2020-11-23 17:36:44,572 ChipBLEMgr   INFO     Discovering services
-2020-11-23 17:36:45,939 ChipBLEMgr   INFO     Service discovering success
-2020-11-23 17:36:45,971 ChipBLEMgr   INFO     connect success
-```
-
-> Note, they will be replaced by using discriminator.
-
-5.  Set wifi credential
+4.  Set wifi credential
 
 > Note: This command will be deprerated after the network provisioning cluster
 > is ready.
@@ -136,10 +123,10 @@ chip-device-ctrl > ble-connect 1383
 chip-device-ctrl > set-pairing-wifi-credential TestAP TestPassword
 ```
 
-6.  Connect to device using setup pin code
+5.  Connect to device using setup pin code
 
 ```
-chip-device-ctrl > connect -ble 12345678
+chip-device-ctrl > connect -ble 1383 12345678
 ```
 
 ## IP Secure Session Establishment
@@ -163,7 +150,7 @@ chip-device-ctrl > connect -ip <Device IP Address> 12345678
 **`[L]`** = Linux only / **`[D]`** = Deprecated / **`[W]`** = WIP / **`[T]`** =
 For testing
 
-### **`[L]`** `ble-adapter-print`
+### **`[W][L]`** `ble-adapter-print`
 
 Print the available Bluetooth adapters on device. Takes no arguments.
 
@@ -172,7 +159,7 @@ chip-device-ctrl > ble-adapter-print
 2021-01-19 02:14:16,766 ChipBLEMgr   INFO     adapter 0 = DC:A6:32:9E:2E:A7
 ```
 
-### **`[L]`** `ble-adapter-select <address>`
+### **`[W][L]`** `ble-adapter-select <address>`
 
 Select the Bluetooth adapter for device controller, takes adapter MAC address as
 argument.
@@ -181,28 +168,6 @@ argument.
 chip-device-ctrl > ble-adapter-select DC:A6:32:9E:2E:A7
 (no output)
 ```
-
-### `ble-connect <identifier>`
-
-Connect to a device using the selected identifier, the identifier can be device
-name or device discriminator (preferred). You **MUST** use `ble-scan` command to
-build device list, or use `ble-scan-connect`.
-
-### **`[T]`** `ble-debug-log <0|1>`
-
-Use `ble-debug-log 1` to set logging level to debug and use `ble-debug-log 0` to
-set logging level to info.
-
-```
-chip-device-ctrl > ble-debug-log 0
-2021-01-19 02:23:32,092 ChipBLEMgr   INFO     current logging level is info
-chip-device-ctrl > ble-debug-log 1
-2021-01-19 02:23:33,964 ChipBLEMgr   DEBUG    current logging level is debug
-```
-
-### `ble-disconnect`
-
-Disconnect current BLE connection.
 
 ### `ble-scan [-t <timeout>] [identifier]`
 
@@ -226,25 +191,12 @@ chip-device-ctrl > ble-scan
 2021-01-19 02:27:34,213 ChipBLEMgr   INFO     scanning stopped
 ```
 
-### `ble-scan-connect [-t <timeout>] [identifier]`
-
-Equals to run `ble-scan [-t <timeout>] [identifier]` and then
-`ble-connect [identifier]`
-
-### **`[T]`** `btp-connect`
-
-Used to test Python bluetooth binding.
-
-### **`[D]`** `close`
-
-Clost rendezvous session.
-
 ### `connect -ip <address> <SetUpPinCode>`
 
 Do key exchange and establish a secure session between controller and device
 using IP transport.
 
-### `connect -ble <SetUpPinCode>`
+### `connect -ble <discriminator> <SetUpPinCode>`
 
 Do key exchange and establish a secure session between controller and device
 using BLE transport.
