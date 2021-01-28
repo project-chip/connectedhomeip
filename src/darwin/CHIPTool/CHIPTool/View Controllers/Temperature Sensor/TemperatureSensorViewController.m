@@ -32,6 +32,9 @@
 {
     [super viewDidLoad];
     [self setupUI];
+    
+    UITapGestureRecognizer * tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dismissKeyboard)];
+    [self.view addGestureRecognizer:tap];
 
     // initialize the device controller
     dispatch_queue_t callbackQueue = dispatch_queue_create("com.zigbee.chip.tempsensorvc.callback", DISPATCH_QUEUE_SERIAL);
@@ -63,6 +66,13 @@
 }
 
 // MARK: UI helpers
+
+- (void)dismissKeyboard
+{
+    [_minIntervalInSecondsTextField resignFirstResponder];
+    [_maxIntervalInSecondsTextField resignFirstResponder];
+    [_deltaInFahrenheitTextField resignFirstResponder];
+}
 
 - (void)setupUI
 {
@@ -186,14 +196,16 @@
     CHIPDeviceCallback onChangeCallback = ^(NSError * error) {
         NSLog(@"Status: Temp value changed with error %@", [error description]);
     };
-    int minIntervalSeconds = [_minIntervalInSecondsTextField.text intValue];
-    int maxIntervalSeconds = [_maxIntervalInSecondsTextField.text intValue];
+    int minIntervalSeconds = [_minIntervalInSecondsTextField.text intValue]*1000;
+    int maxIntervalSeconds = [_maxIntervalInSecondsTextField.text intValue]*1000;
     int deltaInFahrenheit = [_deltaInFahrenheitTextField.text intValue];
+    
+    NSLog(@"Sending temp reporting values: min %@ max %@ value %@", @(minIntervalSeconds), @(maxIntervalSeconds), @(deltaInFahrenheit));
     
     [self.chipTempMeasurement reportAttributeMeasuredValue:onCompletionCallback
                                                   onChange:onChangeCallback
-                                               minInterval:(minIntervalSeconds*1000)
-                                               maxInterval:(maxIntervalSeconds*1000)
+                                               minInterval:minIntervalSeconds
+                                               maxInterval:maxIntervalSeconds
                                                     change:deltaInFahrenheit];
 }
 
