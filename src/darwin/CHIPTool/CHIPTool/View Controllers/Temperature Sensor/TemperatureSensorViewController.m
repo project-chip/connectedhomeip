@@ -8,14 +8,19 @@
 
 #import "TemperatureSensorViewController.h"
 #import "CHIPUIViewUtils.h"
+#import "DefaultsUtils.h"
 #import <CHIP/CHIP.h>
 
 @interface TemperatureSensorViewController ()
-@property (readwrite) CHIPDeviceController * chipController;
+@property (nonatomic, strong) UILabel *temperatureLabel;
 @property (nonatomic, strong) UITextField *minIntervalInSecondsTextField;
 @property (nonatomic, strong) UITextField *maxIntervalInSecondsTextField;
 @property (nonatomic, strong) UITextField *deltaInFahrenheitTextField;
 @property (nonatomic, strong) UIButton *sendReportingSetup;
+
+@property (nonatomic, strong) CHIPTemperatureMeasurement *chipTempMeasurement;
+@property (readwrite) CHIPDevice * chipDevice;
+@property (readwrite) CHIPDeviceController * chipController;
 
 @end
 
@@ -33,7 +38,28 @@
     self.chipController = [CHIPDeviceController sharedController];
     [self.chipController setDelegate:self queue:callbackQueue];
     
-    //TODO: Get current temperature
+    uint64_t deviceID = CHIPGetNextAvailableDeviceID();
+    if (deviceID > 1) {
+        // Let's use the last device that was paired
+        deviceID--;
+        NSError * error;
+        self.chipDevice = [self.chipController getPairedDevice:deviceID error:&error];
+        self.chipTempMeasurement = [[CHIPTemperatureMeasurement alloc] initWithDevice:self.chipDevice endpoint:1 queue:callbackQueue];
+    }
+    
+    [self readCurrentTemperature];
+}
+
+- (IBAction)sendReportingSetup:(id)sender
+{
+    NSLog(@"Status: User request to send reporting setup.");
+    [self reportFromUserEnteredSettings];
+}
+
+- (IBAction)refreshTemperatureMeasurement:(id)sender
+{
+    NSLog(@"Status: User request to refresh temperature reading.");
+    [self readCurrentTemperature];
 }
 
 // MARK: UI helpers
@@ -59,14 +85,14 @@
     [stackView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-30].active = YES;
     
     // Temperature label
-    UILabel *temperatureLabel = [UILabel new];
-    temperatureLabel.text = @"150°F";
-    temperatureLabel.textColor = UIColor.blackColor;
-    temperatureLabel.textAlignment = NSTextAlignmentCenter;
-    temperatureLabel.font = [UIFont systemFontOfSize:50 weight:UIFontWeightThin];
-    [stackView addArrangedSubview:temperatureLabel];
-    temperatureLabel.translatesAutoresizingMaskIntoConstraints = false;
-    [temperatureLabel.trailingAnchor constraintEqualToAnchor:stackView.trailingAnchor].active = YES;
+    _temperatureLabel = [UILabel new];
+    _temperatureLabel.text = @"°F";
+    _temperatureLabel.textColor = UIColor.blackColor;
+    _temperatureLabel.textAlignment = NSTextAlignmentCenter;
+    _temperatureLabel.font = [UIFont systemFontOfSize:50 weight:UIFontWeightThin];
+    [stackView addArrangedSubview:_temperatureLabel];
+    _temperatureLabel.translatesAutoresizingMaskIntoConstraints = false;
+    [_temperatureLabel.trailingAnchor constraintEqualToAnchor:stackView.trailingAnchor].active = YES;
     
     // Reporting settings
     UILabel * reportingLabel = [UILabel new];
@@ -133,18 +159,43 @@
     self.navigationItem.rightBarButtonItem = button;
 }
 
-- (IBAction)sendReportingSetup:(id)sender
+- (void)updateTempInUI:(int)newTemp
 {
-    // TODO: Call send reporting API
-    NSLog(@"Status: User request to send reporting setup.");
+    _temperatureLabel.text = [NSString stringWithFormat:@"%@ °F", @(newTemp)];
+    NSLog(@"Status: Updated temp in UI to %@", _temperatureLabel.text);
 }
 
-- (IBAction)refreshTemperatureMeasurement:(id)sender
+
+// MARK: CHIPTemperatureMeasurement
+
+- (void)readCurrentTemperature
 {
-    // TODO: Call read API with callback
-    NSLog(@"Status: User request to refresh temperature reading.");
+    CHIPDeviceCallback completionHandler = ^(NSError * error) {
+        NSLog(@"Status: Read temperature request completed with error %@", [error description]);
+    };
+    
+    [self.chipTempMeasurement readAttributeMeasuredValue:completionHandler];
 }
 
+- (void)reportFromUserEnteredSettings
+{
+    CHIPDeviceCallback onCompletionCallback = ^(NSError * error) {
+        NSLog(@"Status: update reportAttributeMeasuredValue completed with error %@", [error description]);
+    };
+    
+    CHIPDeviceCallback onChangeCallback = ^(NSError * error) {
+        NSLog(@"Status: Temp value changed with error %@", [error description]);
+    };
+    int minIntervalSeconds = [_minIntervalInSecondsTextField.text intValue];
+    int maxIntervalSeconds = [_maxIntervalInSecondsTextField.text intValue];
+    int deltaInFahrenheit = [_deltaInFahrenheitTextField.text intValue];
+    
+    [self.chipTempMeasurement reportAttributeMeasuredValue:onCompletionCallback
+                                                  onChange:onChangeCallback
+                                               minInterval:(minIntervalSeconds*1000)
+                                               maxInterval:(maxIntervalSeconds*1000)
+                                                    change:deltaInFahrenheit];
+}
 
 // MARK: CHIPDeviceControllerDelegate
 - (void)deviceControllerOnConnected
