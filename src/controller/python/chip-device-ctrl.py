@@ -121,11 +121,8 @@ class DeviceMgrCmd(Cmd):
 
     command_names = [
         "close",
-        "btp-connect",
+
         "ble-scan",
-        "ble-connect",
-        "ble-disconnect",
-        "ble-scan-connect",
         "ble-adapter-select",
         "ble-adapter-print",
         "ble-debug-log",
@@ -308,66 +305,6 @@ class DeviceMgrCmd(Cmd):
         self.bleMgr.scan(line)
 
         return
-
-    def do_bleconnect(self, line):
-        """
-        ble-connect <device-name>
-        ble-connect <mac-address (linux only)>
-        ble-connect <device-uuid>
-        ble-connect <discriminator>
-
-        Connect to a BLE peripheral identified by line.
-        """
-
-        if not self.bleMgr:
-            self.bleMgr = BleManager(self.devCtrl)
-        self.bleMgr.connect(line)
-
-        return
-
-    def do_blescanconnect(self, line):
-        """
-        ble-scan-connect <device-name>
-        ble-scan-connect <mac-address (linux only)>
-        ble-scan-connect <device-uuid>
-        ble-scan-connect <discriminator>
-
-        Scan and connect to a BLE peripheral identified by line.
-        """
-
-        if not self.bleMgr:
-            self.bleMgr = BleManager(self.devCtrl)
-
-        self.bleMgr.scan_connect(line)
-
-        return
-
-    def do_bledisconnect(self, line):
-        """
-        ble-disconnect
-
-        Disconnect from a BLE peripheral.
-        """
-
-        if not self.bleMgr:
-            self.bleMgr = BleManager(self.devCtrl)
-
-        self.bleMgr.disconnect()
-
-        return
-
-    def do_btpconnect(self, line):
-        """
-        connect .
-
-        """
-        try:
-            self.devCtrl.ConnectBle(bleConnection=FAKE_CONN_OBJ_VALUE)
-        except ChipStack.ChipStackException as ex:
-            print(str(ex))
-            return
-
-        print("BTP Connected")
 
     def do_connect(self, line):
         """

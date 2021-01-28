@@ -36,10 +36,6 @@ import enum
 
 __all__ = ["ChipDeviceController"]
 
-
-_CompleteFunct = CFUNCTYPE(None, c_void_p, c_void_p)
-_ErrorFunct = CFUNCTYPE(None, c_void_p, c_void_p, c_ulong, POINTER(DeviceStatusStruct))
-
 # typedef void (*OnConnectFunct)(Chip::DeviceController::hipDeviceController * dc,
 #                                const chip::Transport::PeerConnectionState * state, void * appReqState);
 # typedef void (*OnErrorFunct)(Chip::DeviceController::ChipDeviceController * dc, void * appReqState, CHIP_ERROR err,
