@@ -37,7 +37,7 @@ jobs:
               with:
                   submodules: true
             - name: Build
-              run: scripts/examples/esp_echo_app.sh
+              run: scripts/examples/esp_example.sh all-clusters-app
 
             - name: Upload artifact
               run: |
