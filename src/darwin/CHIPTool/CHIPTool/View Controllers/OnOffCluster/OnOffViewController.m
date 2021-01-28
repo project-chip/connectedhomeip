@@ -102,9 +102,9 @@
 
 - (void)addButtons:(NSInteger)numButtons toStackView:(UIStackView *)stackView
 {
-    for (int i = 1; i <= numButtons; i ++) {
+    for (int i = 1; i <= numButtons; i++) {
         // Create buttons
-        UILabel *labelLight = [UILabel new];
+        UILabel * labelLight = [UILabel new];
         labelLight.text = [NSString stringWithFormat:@"Light %@: ", @(i)];
         UIButton * onButton = [UIButton new];
         onButton.tag = i;
@@ -119,7 +119,8 @@
         [toggleButton setTitle:@"Toggle" forState:UIControlStateNormal];
         [toggleButton addTarget:self action:@selector(toggleButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
 
-        UIStackView * stackViewButtons = [CHIPUIViewUtils stackViewWithLabel:labelLight buttons:@[onButton, offButton, toggleButton]];
+        UIStackView * stackViewButtons = [CHIPUIViewUtils stackViewWithLabel:labelLight
+                                                                     buttons:@[ onButton, offButton, toggleButton ]];
         stackViewButtons.axis = UILayoutConstraintAxisHorizontal;
         stackViewButtons.distribution = UIStackViewDistributionEqualSpacing;
         stackViewButtons.alignment = UIStackViewAlignmentLeading;
@@ -142,10 +143,10 @@
         NSLog(@"Status: On command completed with error %@", [error description]);
     };
 
-    UIButton *button = (UIButton *)sender;
+    UIButton * button = (UIButton *) sender;
     NSInteger lightNumber = button.tag;
     NSLog(@"Light %@ on button pressed.", @(lightNumber));
-    //TODO: Do something based on which light is selected
+    // TODO: Do something based on which light is selected
     [self.onOff on:completionHandler];
 }
 
@@ -155,12 +156,11 @@
         NSLog(@"Status: Off command completed with error %@", [error description]);
     };
 
-    UIButton *button = (UIButton *)sender;
+    UIButton * button = (UIButton *) sender;
     NSInteger lightNumber = button.tag;
     NSLog(@"Light %@ off button pressed.", @(lightNumber));
-    //TODO: Do something based on which light is selected
+    // TODO: Do something based on which light is selected
     [self.onOff off:completionHandler];
-
 }
 
 - (IBAction)toggleButtonTapped:(id)sender
@@ -169,10 +169,10 @@
         NSLog(@"Status: Toggle command completed with error %@", [error description]);
     };
 
-    UIButton *button = (UIButton *)sender;
+    UIButton * button = (UIButton *) sender;
     NSInteger lightNumber = button.tag;
     NSLog(@"Light %@ toggle button pressed.", @(lightNumber));
-    //TODO: Do something based on which light is selected
+    // TODO: Do something based on which light is selected
     [self.onOff toggle:completionHandler];
 }
 

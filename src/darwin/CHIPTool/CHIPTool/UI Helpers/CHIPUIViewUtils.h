@@ -26,7 +26,6 @@ NS_ASSUME_NONNULL_BEGIN
 + (UIView *)viewWithLabel:(UILabel *)label textField:(UITextField *)textField;
 + (UIView *)viewWithLabel:(UILabel *)label toggle:(UISwitch *)toggle;
 
-
 + (UIStackView *)stackViewWithLabel:(UILabel *)label buttons:(NSArray<UIButton *> *)buttons;
 
 + (UILabel *)addTitle:(NSString *)title toView:(UIView *)view;
