@@ -236,7 +236,7 @@
             "label": "Build nRF mbed shell Example",
             "type": "shell",
             "command": "scripts/examples/mbed_example.sh",
-            "args": ["shell", "NRF52840_DK", "release"],
+            "args": ["-a=shell", "-b=NRF52840_DK", "-p=release"],
             "group": "build",
             "problemMatcher": {
                 "base": "$gcc",
