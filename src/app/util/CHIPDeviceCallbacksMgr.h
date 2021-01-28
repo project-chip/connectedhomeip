@@ -34,16 +34,16 @@
 namespace chip {
 namespace app {
 
-class DLL_EXPORT CHIPCallbacksMgr
+class DLL_EXPORT CHIPDeviceCallbacksMgr
 {
 public:
-    CHIPCallbacksMgr(const CHIPCallbacksMgr &)  = delete;
-    CHIPCallbacksMgr(const CHIPCallbacksMgr &&) = delete;
-    CHIPCallbacksMgr & operator=(const CHIPCallbacksMgr &) = delete;
+    CHIPDeviceCallbacksMgr(const CHIPDeviceCallbacksMgr &)  = delete;
+    CHIPDeviceCallbacksMgr(const CHIPDeviceCallbacksMgr &&) = delete;
+    CHIPDeviceCallbacksMgr & operator=(const CHIPDeviceCallbacksMgr &) = delete;
 
-    static CHIPCallbacksMgr & GetInstance()
+    static CHIPDeviceCallbacksMgr & GetInstance()
     {
-        static CHIPCallbacksMgr instance;
+        static CHIPDeviceCallbacksMgr instance;
         return instance;
     }
 
@@ -58,7 +58,7 @@ public:
                                  Callback::Cancelable ** onReportCallback);
 
 private:
-    CHIPCallbacksMgr() {}
+    CHIPDeviceCallbacksMgr() {}
 
     template <typename T>
     CHIP_ERROR CancelCallback(T & info, Callback::CallbackDeque & queue)

@@ -62,17 +62,13 @@ protected:
      *   Request attribute reports from the device. Add a callback
      *   handler, that'll be called when the reports are received from the device.
      *
-     * @param[in] payload           The payload of the encoded command
      * @param[in] attributeId       The report target attribute id
-     * @param[in] successHandler    The handler function that's called on receiving command response success
-     * @param[in] failureHandler    The handler function that's called on receiving command response failure
      * @param[in] reportHandler     The handler function that's called on receiving attribute reports
      *                              The reporting handler continues to be called as long as the callback
      *                              is active. The user can stop the reporting by cancelling the callback.
      *                              Reference: chip::Callback::Cancel()
      */
-    CHIP_ERROR RequestAttributeReporting(chip::System::PacketBufferHandle payload, AttributeId attributeId, Callback::Cancelable * successHandler,
-                                         Callback::Cancelable * failureHandler, Callback::Cancelable * reportHandler);
+    CHIP_ERROR RequestAttributeReporting(AttributeId attributeId, Callback::Cancelable * reportHandler);
 
     const ClusterId mClusterId;
     Device * mDevice;

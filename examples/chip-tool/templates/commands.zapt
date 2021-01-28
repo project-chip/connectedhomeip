@@ -236,7 +236,14 @@ public:
 
         chip::Controller::{{asCamelCased parent.name false}}Cluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReportAttribute{{asCamelCased name false}}(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), onReportCallback->Cancel(), mMinInterval, mMaxInterval{{#unless (isDiscreteType)}}, mChange{{/unless}});
+
+        CHIP_ERROR err = cluster.ReportAttribute{{asCamelCased name false}}(onReportCallback->Cancel());
+        if (err != CHIP_NO_ERROR)
+        {
+            return err;
+        }
+
+        return cluster.ConfigureAttribute{{asCamelCased name false}}(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval, mMaxInterval{{#unless (isDiscreteType)}}, mChange{{/unless}});
     }
 
 private:

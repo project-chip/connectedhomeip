@@ -25,17 +25,12 @@ NSString * const kCHIPNumLightOnOffCluster = @"OnOffViewController_NumLights";
 @interface OnOffViewController ()
 @property (nonatomic, strong) UITextField * numLightsTextField;
 
-@property (readwrite) NSArray<CHIPOnOff *> * onOffClusters;
-@property (readwrite) CHIPOnOff * onOffEndpoint2;
-
 @property (nonatomic, strong) UILabel * resultLabel;
 @property (nonatomic, strong) UILabel * titleLabel;
 @property (nonatomic, strong) UIStackView * stackView;
 
-@property (readwrite) CHIPDeviceController * chipController;
 @property (readwrite) CHIPDevice * chipDevice;
 
-@property (readonly) CHIPToolPersistentStorageDelegate * persistentStorage;
 @end
 
 @implementation OnOffViewController {
@@ -52,8 +47,9 @@ NSString * const kCHIPNumLightOnOffCluster = @"OnOffViewController_NumLights";
     UITapGestureRecognizer * tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dismissKeyboard)];
     [self.view addGestureRecognizer:tap];
 
-    [self initializeChipController];
     [self setupUIElements];
+
+    self.chipDevice = GetPairedDevice();
 }
 
 - (void)dismissKeyboard
@@ -90,7 +86,6 @@ NSString * const kCHIPNumLightOnOffCluster = @"OnOffViewController_NumLights";
     [stackView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-30].active = YES;
 
     // Num lights to show
-    [self setupNumberOfLightClustersFromDefaults];
     UILabel * numLightsLabel = [UILabel new];
     numLightsLabel.text = @"# of light endpoints:";
     _numLightsTextField = [UITextField new];
@@ -122,7 +117,7 @@ NSString * const kCHIPNumLightOnOffCluster = @"OnOffViewController_NumLights";
     [numLightsView.trailingAnchor constraintEqualToAnchor:stackView.trailingAnchor].active = true;
 
     // Create buttons
-    [self addButtons:[_onOffClusters count] toStackView:stackView];
+    [self addButtons:[self numLightClustersToShow] toStackView:stackView];
 
     // Result message
     _resultLabel = [UILabel new];
@@ -212,25 +207,6 @@ NSString * const kCHIPNumLightOnOffCluster = @"OnOffViewController_NumLights";
 
 // MARK: Cluster Setup
 
-- (void)initializeChipController
-{
-    _persistentStorage = [[CHIPToolPersistentStorageDelegate alloc] init];
-
-    // initialize the device controller
-    _callbackQueue = dispatch_queue_create("com.zigbee.chip.onoffvc.callback", DISPATCH_QUEUE_SERIAL);
-    self.chipController = [CHIPDeviceController sharedController];
-    [self.chipController setDelegate:self queue:_callbackQueue];
-    [self.chipController setPersistentStorageDelegate:_persistentStorage queue:_callbackQueue];
-
-    uint64_t deviceID = CHIPGetNextAvailableDeviceID();
-    if (deviceID > 1) {
-        // Let's use the last device that was paired
-        deviceID--;
-        NSError * error;
-        self.chipDevice = [self.chipController getPairedDevice:deviceID error:&error];
-    }
-}
-
 - (int)numLightClustersToShow
 {
     NSString * numClusters = CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, kCHIPNumLightOnOffCluster);
@@ -242,105 +218,48 @@ NSString * const kCHIPNumLightOnOffCluster = @"OnOffViewController_NumLights";
     return numberOfLights;
 }
 
-- (void)setupNumberOfLightClustersFromDefaults
-{
-    [self setupNumberOfLightClusters:[self numLightClustersToShow]];
-}
-
-- (void)setupNumberOfLightClusters:(int)numLights
-{
-    NSMutableArray<CHIPOnOff *> * clusters = [NSMutableArray new];
-    for (int i = 0; i < numLights; i++) {
-        CHIPOnOff * cluster = [[CHIPOnOff alloc] initWithDevice:self.chipDevice endpoint:(i + 1) queue:_callbackQueue];
-        [clusters addObject:cluster];
-    }
-    _onOffClusters = clusters;
-}
-
 // MARK: UIButton actions
 
 - (IBAction)onButtonTapped:(id)sender
 {
-    CHIPDeviceCallback completionHandler = ^(NSError * error) {
-        NSLog(@"Status: On command completed with error %@", [error description]);
-    };
-
     UIButton * button = (UIButton *) sender;
-    NSInteger lightNumber = button.tag;
-    NSLog(@"Light %@ on button pressed.", @(lightNumber));
+    NSInteger endpoint = button.tag;
+    [self updateResult:[NSString stringWithFormat:@"On command sent on endpoint %@", @(endpoint)]];
 
-    if (lightNumber <= [_onOffClusters count]) {
-        CHIPOnOff * onOff = [_onOffClusters objectAtIndex:(lightNumber - 1)];
-        [onOff on:completionHandler];
-    } else {
-        NSLog(@"No cluster initated at endpoint %@.", @(lightNumber));
-    }
+    CHIPOnOff * onOff = [[CHIPOnOff alloc] initWithDevice:self.chipDevice endpoint:endpoint queue:dispatch_get_main_queue()];
+    [onOff on:^(NSError * error, NSDictionary * values) {
+        NSString * resultString
+            = (error != nil) ? [NSString stringWithFormat:@"An error occured: 0x%02lx", error.code] : @"On command success";
+        [self updateResult:resultString];
+    }];
 }
 
 - (IBAction)offButtonTapped:(id)sender
 {
-    CHIPDeviceCallback completionHandler = ^(NSError * error) {
-        NSLog(@"Status: Off command completed with error %@", [error description]);
-    };
-
     UIButton * button = (UIButton *) sender;
-    NSInteger lightNumber = button.tag;
-    NSLog(@"Light %@ off button pressed.", @(lightNumber));
+    NSInteger endpoint = button.tag;
+    [self updateResult:[NSString stringWithFormat:@"Off command sent on endpoint %@", @(endpoint)]];
 
-    if (lightNumber <= [_onOffClusters count]) {
-        CHIPOnOff * onOff = [_onOffClusters objectAtIndex:(lightNumber - 1)];
-        [onOff off:completionHandler];
-    } else {
-        NSLog(@"No cluster initated at endpoint %@.", @(lightNumber));
-    }
+    CHIPOnOff * onOff = [[CHIPOnOff alloc] initWithDevice:self.chipDevice endpoint:endpoint queue:dispatch_get_main_queue()];
+    [onOff off:^(NSError * error, NSDictionary * values) {
+        NSString * resultString
+            = (error != nil) ? [NSString stringWithFormat:@"An error occured: 0x%02lx", error.code] : @"Off command success";
+        [self updateResult:resultString];
+    }];
 }
 
 - (IBAction)toggleButtonTapped:(id)sender
 {
-    CHIPDeviceCallback completionHandler = ^(NSError * error) {
-        NSLog(@"Status: Toggle command completed with error %@", [error description]);
-    };
-
     UIButton * button = (UIButton *) sender;
-    NSInteger lightNumber = button.tag;
-    NSLog(@"Light %@ toggle button pressed.", @(lightNumber));
+    NSInteger endpoint = button.tag;
+    [self updateResult:[NSString stringWithFormat:@"Toggle command sent on endpoint %@", @(endpoint)]];
 
-    if (lightNumber <= [_onOffClusters count]) {
-        CHIPOnOff * onOff = [_onOffClusters objectAtIndex:(lightNumber - 1)];
-        [onOff toggle:completionHandler];
-    } else {
-        NSLog(@"No cluster initated at endpoint %@.", @(lightNumber));
-    }
+    CHIPOnOff * onOff = [[CHIPOnOff alloc] initWithDevice:self.chipDevice endpoint:endpoint queue:dispatch_get_main_queue()];
+    [onOff toggle:^(NSError * error, NSDictionary * values) {
+        NSString * resultString
+            = (error != nil) ? [NSString stringWithFormat:@"An error occured: 0x%02lx", error.code] : @"Toggle command success";
+        [self updateResult:resultString];
+    }];
 }
 
-// MARK: CHIPDeviceControllerDelegate
-- (void)deviceControllerOnConnected
-{
-    NSLog(@"Status: Device connected");
-}
-
-- (void)deviceControllerOnError:(nonnull NSError *)error
-{
-    NSLog(@"Status: Device Controller error %@", [error description]);
-    if (error) {
-        NSString * stringError = [@"Error: " stringByAppendingString:error.description];
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 5.0), dispatch_get_main_queue(), ^{
-            [self updateResult:stringError];
-        });
-    }
-}
-
-- (void)deviceControllerOnMessage:(nonnull NSData *)message
-{
-    NSString * stringMessage;
-    if ([CHIPDevice isDataModelCommand:message] == YES) {
-        stringMessage = [CHIPDevice commandToString:message];
-    } else {
-        stringMessage = [[NSString alloc] initWithData:message encoding:NSUTF8StringEncoding];
-    }
-    NSString * resultMessage = [@"Echo Response: " stringByAppendingFormat:@"%@", stringMessage];
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 5.0), dispatch_get_main_queue(), ^{
-        [self updateResult:resultMessage];
-    });
-}
 @end

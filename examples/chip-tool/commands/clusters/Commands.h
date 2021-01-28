@@ -20,7 +20,7 @@
 #pragma once
 
 #include "ModelCommand.h"
-#include "ResponseCallbacks.h"
+#include "gen/CHIPClientCallbacks.h"
 #include <controller/CHIPClusters.h>
 
 static void OnDefaultSuccessResponse(void * context)
@@ -1584,8 +1584,15 @@ public:
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReportAttributeCurrentHue(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
-                                                 onReportCallback->Cancel(), mMinInterval, mMaxInterval, mChange);
+
+        CHIP_ERROR err = cluster.ReportAttributeCurrentHue(onReportCallback->Cancel());
+        if (err != CHIP_NO_ERROR)
+        {
+            return err;
+        }
+
+        return cluster.ConfigureAttributeCurrentHue(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
+                                                    mMaxInterval, mChange);
     }
 
 private:
@@ -1646,8 +1653,15 @@ public:
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReportAttributeCurrentSaturation(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
-                                                        onReportCallback->Cancel(), mMinInterval, mMaxInterval, mChange);
+
+        CHIP_ERROR err = cluster.ReportAttributeCurrentSaturation(onReportCallback->Cancel());
+        if (err != CHIP_NO_ERROR)
+        {
+            return err;
+        }
+
+        return cluster.ConfigureAttributeCurrentSaturation(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
+                                                           mMaxInterval, mChange);
     }
 
 private:
@@ -1736,8 +1750,15 @@ public:
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReportAttributeCurrentX(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), onReportCallback->Cancel(),
-                                               mMinInterval, mMaxInterval, mChange);
+
+        CHIP_ERROR err = cluster.ReportAttributeCurrentX(onReportCallback->Cancel());
+        if (err != CHIP_NO_ERROR)
+        {
+            return err;
+        }
+
+        return cluster.ConfigureAttributeCurrentX(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
+                                                  mMaxInterval, mChange);
     }
 
 private:
@@ -1798,8 +1819,15 @@ public:
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReportAttributeCurrentY(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), onReportCallback->Cancel(),
-                                               mMinInterval, mMaxInterval, mChange);
+
+        CHIP_ERROR err = cluster.ReportAttributeCurrentY(onReportCallback->Cancel());
+        if (err != CHIP_NO_ERROR)
+        {
+            return err;
+        }
+
+        return cluster.ConfigureAttributeCurrentY(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
+                                                  mMaxInterval, mChange);
     }
 
 private:
@@ -1916,8 +1944,15 @@ public:
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReportAttributeColorTemperature(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
-                                                       onReportCallback->Cancel(), mMinInterval, mMaxInterval, mChange);
+
+        CHIP_ERROR err = cluster.ReportAttributeColorTemperature(onReportCallback->Cancel());
+        if (err != CHIP_NO_ERROR)
+        {
+            return err;
+        }
+
+        return cluster.ConfigureAttributeColorTemperature(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
+                                                          mMaxInterval, mChange);
     }
 
 private:
@@ -4310,8 +4345,15 @@ public:
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReportAttributeLockState(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
-                                                onReportCallback->Cancel(), mMinInterval, mMaxInterval);
+
+        CHIP_ERROR err = cluster.ReportAttributeLockState(onReportCallback->Cancel());
+        if (err != CHIP_NO_ERROR)
+        {
+            return err;
+        }
+
+        return cluster.ConfigureAttributeLockState(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
+                                                   mMaxInterval);
     }
 
 private:
@@ -5202,8 +5244,15 @@ public:
 
         chip::Controller::LevelControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReportAttributeCurrentLevel(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
-                                                   onReportCallback->Cancel(), mMinInterval, mMaxInterval, mChange);
+
+        CHIP_ERROR err = cluster.ReportAttributeCurrentLevel(onReportCallback->Cancel());
+        if (err != CHIP_NO_ERROR)
+        {
+            return err;
+        }
+
+        return cluster.ConfigureAttributeCurrentLevel(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
+                                                      mMaxInterval, mChange);
     }
 
 private:
@@ -5400,8 +5449,15 @@ public:
 
         chip::Controller::OnOffCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReportAttributeOnOff(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), onReportCallback->Cancel(),
-                                            mMinInterval, mMaxInterval);
+
+        CHIP_ERROR err = cluster.ReportAttributeOnOff(onReportCallback->Cancel());
+        if (err != CHIP_NO_ERROR)
+        {
+            return err;
+        }
+
+        return cluster.ConfigureAttributeOnOff(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
+                                               mMaxInterval);
     }
 
 private:
@@ -5965,8 +6021,15 @@ public:
 
         chip::Controller::TemperatureMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReportAttributeMeasuredValue(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
-                                                    onReportCallback->Cancel(), mMinInterval, mMaxInterval, mChange);
+
+        CHIP_ERROR err = cluster.ReportAttributeMeasuredValue(onReportCallback->Cancel());
+        if (err != CHIP_NO_ERROR)
+        {
+            return err;
+        }
+
+        return cluster.ConfigureAttributeMeasuredValue(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
+                                                       mMaxInterval, mChange);
     }
 
 private:

@@ -69,15 +69,10 @@ exit:
     return err;
 }
 
-CHIP_ERROR ClusterBase::RequestAttributeReporting(chip::System::PacketBufferHandle payload,
-                                                  AttributeId attributeId,
-                                                  Callback::Cancelable * onSuccessCallback,
-                                                  Callback::Cancelable * onFailureCallback, Callback::Cancelable * onReportCallback)
+CHIP_ERROR ClusterBase::RequestAttributeReporting(AttributeId attributeId,
+                                                  Callback::Cancelable * onReportCallback)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-
-    err = SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
-    SuccessOrExit(err);
 
     VerifyOrExit(onReportCallback != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     mDevice->AddReportHandler(mEndpoint, mClusterId, attributeId, onReportCallback);

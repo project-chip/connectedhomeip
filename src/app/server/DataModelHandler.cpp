@@ -22,8 +22,11 @@
 
 #include <app/server/DataModelHandler.h>
 
+#if __has_include("gen/endpoint_config.h")
+#define USE_ZAP_CONFIG 1
 #include <app/util/attribute-storage.h>
 #include <app/util/util.h>
+#endif
 #include <support/logging/CHIPLogging.h>
 
 #ifdef EMBER_AF_PLUGIN_REPORTING_SERVER
@@ -40,6 +43,8 @@ using namespace ::chip;
 
 void InitDataModelHandler()
 {
+#ifdef USE_ZAP_CONFIG
+    ChipLogProgress(Zcl, "Using ZAP configuration...");
     emberAfEndpointConfigure();
     emberAfInit();
 
@@ -57,10 +62,12 @@ void InitDataModelHandler()
 #ifdef EMBER_AF_PLUGIN_IAS_ZONE_SERVER
     emberAfPluginIasZoneServerStackStatusCallback(status);
 #endif
+#endif
 }
 
 void HandleDataModelMessage(NodeId nodeId, System::PacketBufferHandle buffer)
 {
+#ifdef USE_ZAP_CONFIG
     EmberApsFrame frame;
     bool ok = extractApsFrame(buffer->Start(), buffer->DataLength(), &frame) > 0;
     if (ok)
@@ -89,4 +96,5 @@ void HandleDataModelMessage(NodeId nodeId, System::PacketBufferHandle buffer)
     {
         ChipLogDetail(Zcl, "Data model processing failure!");
     }
+#endif
 }

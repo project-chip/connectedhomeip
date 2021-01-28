@@ -28,7 +28,7 @@
 #define CHIP_ZCL_ENDPOINT_MIN 0x01
 #define CHIP_ZCL_ENDPOINT_MAX 0xF0
 
-class ModelCommand : public Command, public chip::Controller::DeviceStatusDelegate
+class ModelCommand : public Command
 {
 public:
     ModelCommand(const char * commandName) : Command(commandName) {}
@@ -37,10 +37,6 @@ public:
 
     /////////// Command Interface /////////
     CHIP_ERROR Run(PersistentStorage & storage, NodeId localId, NodeId remoteId) override;
-
-    /////////// DeviceStatusDelegate Interface /////////
-    void OnMessage(PacketBufferHandle buffer) override;
-    void OnStatusChange(void) override;
 
     virtual CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endPointId) = 0;
 
