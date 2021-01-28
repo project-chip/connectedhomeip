@@ -12,6 +12,11 @@
 
 @interface TemperatureSensorViewController ()
 @property (readwrite) CHIPDeviceController * chipController;
+@property (nonatomic, strong) UITextField *minIntervalInSecondsTextField;
+@property (nonatomic, strong) UITextField *maxIntervalInSecondsTextField;
+@property (nonatomic, strong) UITextField *deltaInFahrenheitTextField;
+@property (nonatomic, strong) UIButton *sendReportingSetup;
+
 @end
 
 @implementation TemperatureSensorViewController
@@ -55,7 +60,7 @@
     
     // Temperature label
     UILabel *temperatureLabel = [UILabel new];
-    temperatureLabel.text = @"40°C";
+    temperatureLabel.text = @"150°F";
     temperatureLabel.textColor = UIColor.blackColor;
     temperatureLabel.textAlignment = NSTextAlignmentCenter;
     temperatureLabel.font = [UIFont systemFontOfSize:50 weight:UIFontWeightThin];
@@ -63,11 +68,75 @@
     temperatureLabel.translatesAutoresizingMaskIntoConstraints = false;
     [temperatureLabel.trailingAnchor constraintEqualToAnchor:stackView.trailingAnchor].active = YES;
     
+    // Reporting settings
+    UILabel * reportingLabel = [UILabel new];
+    reportingLabel.text = @"Reporting Setup";
+    reportingLabel.textColor = UIColor.blackColor;
+    reportingLabel.textAlignment = NSTextAlignmentLeft;
+    reportingLabel.font = [UIFont systemFontOfSize:18 weight:UIFontWeightSemibold];
+    [stackView addArrangedSubview:reportingLabel];
+
+    reportingLabel.translatesAutoresizingMaskIntoConstraints = false;
+    [reportingLabel.centerXAnchor constraintEqualToAnchor:stackView.centerXAnchor].active = YES;
+    
+    // Min interval in seconds
+    _minIntervalInSecondsTextField = [UITextField new];
+    _minIntervalInSecondsTextField.keyboardType = UIKeyboardTypeNumberPad;
+    UILabel *minIntervalInSecondsLabel = [UILabel new];
+    [minIntervalInSecondsLabel setText:@"Min. interval (sec):"];
+    UIView *minIntervalInSecondsView = [CHIPUIViewUtils viewWithLabel:minIntervalInSecondsLabel textField:_minIntervalInSecondsTextField];
+    [stackView addArrangedSubview:minIntervalInSecondsView];
+    
+    minIntervalInSecondsView.translatesAutoresizingMaskIntoConstraints = false;
+    [minIntervalInSecondsView.trailingAnchor constraintEqualToAnchor:stackView.trailingAnchor].active = YES;
+    
+    // Min interval in seconds
+    _maxIntervalInSecondsTextField = [UITextField new];
+    _maxIntervalInSecondsTextField.keyboardType = UIKeyboardTypeNumberPad;
+    UILabel *maxIntervalInSecondsLabel = [UILabel new];
+    [maxIntervalInSecondsLabel setText:@"Max. interval (sec):"];
+    UIView *maxIntervalInSecondsView = [CHIPUIViewUtils viewWithLabel:maxIntervalInSecondsLabel textField:_maxIntervalInSecondsTextField];
+    [stackView addArrangedSubview:maxIntervalInSecondsView];
+    
+    maxIntervalInSecondsView.translatesAutoresizingMaskIntoConstraints = false;
+    [maxIntervalInSecondsView.trailingAnchor constraintEqualToAnchor:stackView.trailingAnchor].active = YES;
+    
+    //Delta
+    _deltaInFahrenheitTextField = [UITextField new];
+    _deltaInFahrenheitTextField.keyboardType = UIKeyboardTypeNumberPad;
+    UILabel *deltaInFahrenheitLabel = [UILabel new];
+    [deltaInFahrenheitLabel setText:@"Delta (F):"];
+    UIView *deltaInFahrenheitView = [CHIPUIViewUtils viewWithLabel:deltaInFahrenheitLabel textField:_deltaInFahrenheitTextField];
+    [stackView addArrangedSubview:deltaInFahrenheitView];
+    
+    deltaInFahrenheitView.translatesAutoresizingMaskIntoConstraints = false;
+    [deltaInFahrenheitView.trailingAnchor constraintEqualToAnchor:stackView.trailingAnchor].active = YES;
+    
+    // Reporting button
+    _sendReportingSetup = [UIButton new];
+    [_sendReportingSetup setTitle:@"Send reporting settings" forState:UIControlStateNormal];
+    [_sendReportingSetup addTarget:self action:@selector(sendReportingSetup:) forControlEvents:UIControlEventTouchUpInside];
+    _sendReportingSetup.backgroundColor = UIColor.systemBlueColor;
+    _sendReportingSetup.titleLabel.font = [UIFont systemFontOfSize:17];
+    _sendReportingSetup.titleLabel.textColor = [UIColor whiteColor];
+    _sendReportingSetup.layer.cornerRadius = 5;
+    _sendReportingSetup.clipsToBounds = YES;
+    [stackView addArrangedSubview:_sendReportingSetup];
+    
+    _sendReportingSetup.translatesAutoresizingMaskIntoConstraints = false;
+    [_sendReportingSetup.trailingAnchor constraintEqualToAnchor:stackView.trailingAnchor].active = YES;
+    
     // Refresh button
     UIBarButtonItem *button = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh
                                                                             target:self
                                                                             action:@selector(refreshTemperatureMeasurement:)];
     self.navigationItem.rightBarButtonItem = button;
+}
+
+- (IBAction)sendReportingSetup:(id)sender
+{
+    // TODO: Call send reporting API
+    NSLog(@"Status: User request to send reporting setup.");
 }
 
 - (IBAction)refreshTemperatureMeasurement:(id)sender
