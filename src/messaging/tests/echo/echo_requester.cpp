@@ -235,7 +235,8 @@ int main(int argc, char * argv[])
     // Connection has been established. Now send the EchoRequests.
     for (unsigned int i = 0; i < kMaxEchoCount; i++)
     {
-        if (SendEchoRequest() != CHIP_NO_ERROR)
+        err = SendEchoRequest();
+        if (err != CHIP_NO_ERROR)
         {
             printf("Send request failed: %s\n", chip::ErrorStr(err));
             break;
@@ -260,7 +261,7 @@ int main(int argc, char * argv[])
     ShutdownChip();
 
 exit:
-    if (err != CHIP_NO_ERROR)
+    if ((err != CHIP_NO_ERROR) || (gEchoRespCount != kMaxEchoCount))
     {
         printf("ChipEchoClient failed: %s\n", chip::ErrorStr(err));
         exit(EXIT_FAILURE);
