@@ -231,6 +231,20 @@
                     "${workspaceFolder}/examples/pigweed-app/nrfconnect/build"
                 ]
             }
+        },
+        {
+            "label": "Build nRF mbed shell Example",
+            "type": "shell",
+            "command": "scripts/examples/mbed_example.sh",
+            "args": ["shell", "NRF52840_DK", "release"],
+            "group": "build",
+            "problemMatcher": {
+                "base": "$gcc",
+                "fileLocation": [
+                    "relative",
+                    "${workspaceFolder}/examples/shell/mbed/build"
+                ]
+            }
         }
     ]
 }
