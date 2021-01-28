@@ -12,13 +12,13 @@
 #import <CHIP/CHIP.h>
 
 @interface TemperatureSensorViewController ()
-@property (nonatomic, strong) UILabel *temperatureLabel;
-@property (nonatomic, strong) UITextField *minIntervalInSecondsTextField;
-@property (nonatomic, strong) UITextField *maxIntervalInSecondsTextField;
-@property (nonatomic, strong) UITextField *deltaInFahrenheitTextField;
-@property (nonatomic, strong) UIButton *sendReportingSetup;
+@property (nonatomic, strong) UILabel * temperatureLabel;
+@property (nonatomic, strong) UITextField * minIntervalInSecondsTextField;
+@property (nonatomic, strong) UITextField * maxIntervalInSecondsTextField;
+@property (nonatomic, strong) UITextField * deltaInFahrenheitTextField;
+@property (nonatomic, strong) UIButton * sendReportingSetup;
 
-@property (nonatomic, strong) CHIPTemperatureMeasurement *chipTempMeasurement;
+@property (nonatomic, strong) CHIPTemperatureMeasurement * chipTempMeasurement;
 @property (readwrite) CHIPDevice * chipDevice;
 @property (readwrite) CHIPDeviceController * chipController;
 
@@ -47,7 +47,9 @@
         deviceID--;
         NSError * error;
         self.chipDevice = [self.chipController getPairedDevice:deviceID error:&error];
-        self.chipTempMeasurement = [[CHIPTemperatureMeasurement alloc] initWithDevice:self.chipDevice endpoint:1 queue:callbackQueue];
+        self.chipTempMeasurement = [[CHIPTemperatureMeasurement alloc] initWithDevice:self.chipDevice
+                                                                             endpoint:1
+                                                                                queue:callbackQueue];
     }
 
     [self readCurrentTemperature];
@@ -118,9 +120,10 @@
     // Min interval in seconds
     _minIntervalInSecondsTextField = [UITextField new];
     _minIntervalInSecondsTextField.keyboardType = UIKeyboardTypeNumberPad;
-    UILabel *minIntervalInSecondsLabel = [UILabel new];
+    UILabel * minIntervalInSecondsLabel = [UILabel new];
     [minIntervalInSecondsLabel setText:@"Min. interval (sec):"];
-    UIView *minIntervalInSecondsView = [CHIPUIViewUtils viewWithLabel:minIntervalInSecondsLabel textField:_minIntervalInSecondsTextField];
+    UIView * minIntervalInSecondsView = [CHIPUIViewUtils viewWithLabel:minIntervalInSecondsLabel
+                                                             textField:_minIntervalInSecondsTextField];
     [stackView addArrangedSubview:minIntervalInSecondsView];
 
     minIntervalInSecondsView.translatesAutoresizingMaskIntoConstraints = false;
@@ -129,20 +132,21 @@
     // Min interval in seconds
     _maxIntervalInSecondsTextField = [UITextField new];
     _maxIntervalInSecondsTextField.keyboardType = UIKeyboardTypeNumberPad;
-    UILabel *maxIntervalInSecondsLabel = [UILabel new];
+    UILabel * maxIntervalInSecondsLabel = [UILabel new];
     [maxIntervalInSecondsLabel setText:@"Max. interval (sec):"];
-    UIView *maxIntervalInSecondsView = [CHIPUIViewUtils viewWithLabel:maxIntervalInSecondsLabel textField:_maxIntervalInSecondsTextField];
+    UIView * maxIntervalInSecondsView = [CHIPUIViewUtils viewWithLabel:maxIntervalInSecondsLabel
+                                                             textField:_maxIntervalInSecondsTextField];
     [stackView addArrangedSubview:maxIntervalInSecondsView];
 
     maxIntervalInSecondsView.translatesAutoresizingMaskIntoConstraints = false;
     [maxIntervalInSecondsView.trailingAnchor constraintEqualToAnchor:stackView.trailingAnchor].active = YES;
 
-    //Delta
+    // Delta
     _deltaInFahrenheitTextField = [UITextField new];
     _deltaInFahrenheitTextField.keyboardType = UIKeyboardTypeNumberPad;
-    UILabel *deltaInFahrenheitLabel = [UILabel new];
+    UILabel * deltaInFahrenheitLabel = [UILabel new];
     [deltaInFahrenheitLabel setText:@"Delta (F):"];
-    UIView *deltaInFahrenheitView = [CHIPUIViewUtils viewWithLabel:deltaInFahrenheitLabel textField:_deltaInFahrenheitTextField];
+    UIView * deltaInFahrenheitView = [CHIPUIViewUtils viewWithLabel:deltaInFahrenheitLabel textField:_deltaInFahrenheitTextField];
     [stackView addArrangedSubview:deltaInFahrenheitView];
 
     deltaInFahrenheitView.translatesAutoresizingMaskIntoConstraints = false;
@@ -163,9 +167,9 @@
     [_sendReportingSetup.trailingAnchor constraintEqualToAnchor:stackView.trailingAnchor].active = YES;
 
     // Refresh button
-    UIBarButtonItem *button = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh
-                                                                            target:self
-                                                                            action:@selector(refreshTemperatureMeasurement:)];
+    UIBarButtonItem * button = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh
+                                                                             target:self
+                                                                             action:@selector(refreshTemperatureMeasurement:)];
     self.navigationItem.rightBarButtonItem = button;
 }
 
@@ -174,7 +178,6 @@
     _temperatureLabel.text = [NSString stringWithFormat:@"%@ °F", @(newTemp)];
     NSLog(@"Status: Updated temp in UI to %@", _temperatureLabel.text);
 }
-
 
 // MARK: CHIPTemperatureMeasurement
 
@@ -196,11 +199,12 @@
     CHIPDeviceCallback onChangeCallback = ^(NSError * error) {
         NSLog(@"Status: Temp value changed with error %@", [error description]);
     };
-    int minIntervalSeconds = [_minIntervalInSecondsTextField.text intValue]*1000;
-    int maxIntervalSeconds = [_maxIntervalInSecondsTextField.text intValue]*1000;
+    int minIntervalSeconds = [_minIntervalInSecondsTextField.text intValue] * 1000;
+    int maxIntervalSeconds = [_maxIntervalInSecondsTextField.text intValue] * 1000;
     int deltaInFahrenheit = [_deltaInFahrenheitTextField.text intValue];
 
-    NSLog(@"Sending temp reporting values: min %@ max %@ value %@", @(minIntervalSeconds), @(maxIntervalSeconds), @(deltaInFahrenheit));
+    NSLog(@"Sending temp reporting values: min %@ max %@ value %@", @(minIntervalSeconds), @(maxIntervalSeconds),
+        @(deltaInFahrenheit));
 
     [self.chipTempMeasurement reportAttributeMeasuredValue:onCompletionCallback
                                                   onChange:onChangeCallback
