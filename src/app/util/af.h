@@ -1670,18 +1670,18 @@ EmberStatus emberAfInitiatePartnerLinkKeyExchange(EmberNodeId target, chip::Endp
 // @{
 // Frame control fields (8 bits total)
 // Bits 0 and 1 are Frame Type Sub-field
-#define ZCL_FRAME_CONTROL_FRAME_TYPE_MASK (BIT(0) | BIT(1))
-#define ZCL_CLUSTER_SPECIFIC_COMMAND BIT(0)
+#define ZCL_FRAME_CONTROL_FRAME_TYPE_MASK (EMBER_BIT(0) | EMBER_BIT(1))
+#define ZCL_CLUSTER_SPECIFIC_COMMAND EMBER_BIT(0)
 #define ZCL_PROFILE_WIDE_COMMAND 0
 #define ZCL_GLOBAL_COMMAND (ZCL_PROFILE_WIDE_COMMAND)
 // Bit 2 is Manufacturer Specific Sub-field
-#define ZCL_MANUFACTURER_SPECIFIC_MASK BIT(2)
+#define ZCL_MANUFACTURER_SPECIFIC_MASK EMBER_BIT(2)
 // Bit 3 is Direction Sub-field
-#define ZCL_FRAME_CONTROL_DIRECTION_MASK BIT(3)
-#define ZCL_FRAME_CONTROL_SERVER_TO_CLIENT BIT(3)
+#define ZCL_FRAME_CONTROL_DIRECTION_MASK EMBER_BIT(3)
+#define ZCL_FRAME_CONTROL_SERVER_TO_CLIENT EMBER_BIT(3)
 #define ZCL_FRAME_CONTROL_CLIENT_TO_SERVER 0
 // Bit 4 is Disable Default Response Sub-field
-#define ZCL_DISABLE_DEFAULT_RESPONSE_MASK BIT(4)
+#define ZCL_DISABLE_DEFAULT_RESPONSE_MASK EMBER_BIT(4)
 // Bits 5 to 7 are reserved
 
 #define ZCL_DIRECTION_CLIENT_TO_SERVER 0
@@ -1695,8 +1695,8 @@ EmberStatus emberAfInitiatePartnerLinkKeyExchange(EmberNodeId target, chip::Endp
 #define EMBER_AF_ZCL_MANUFACTURER_SPECIFIC_OVERHEAD 5
 
 // Permitted values for emberAfSetFormAndJoinMode
-#define FIND_AND_JOIN_MODE_ALLOW_2_4_GHZ BIT(0)
-#define FIND_AND_JOIN_MODE_ALLOW_SUB_GHZ BIT(1)
+#define FIND_AND_JOIN_MODE_ALLOW_2_4_GHZ EMBER_BIT(0)
+#define FIND_AND_JOIN_MODE_ALLOW_SUB_GHZ EMBER_BIT(1)
 #define FIND_AND_JOIN_MODE_ALLOW_BOTH (FIND_AND_JOIN_MODE_ALLOW_2_4_GHZ | FIND_AND_JOIN_MODE_ALLOW_SUB_GHZ)
 
 /** @} END ZCL macros */

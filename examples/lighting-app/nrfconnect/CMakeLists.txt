@@ -21,14 +21,18 @@ get_filename_component(LIGHTING_COMMON ${CHIP_ROOT}/examples/lighting-app/lighti
 
 set(CONF_FILE ${CHIP_ROOT}/config/nrfconnect/app/sample-defaults.conf prj.conf)
 
-include(${CHIP_ROOT}/config/nrfconnect/app/app.cmake)
+# Load NCS/Zephyr build system
+list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/config/nrfconnect/chip-module)
+find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
 
 project(chip-nrf52840-lighting-example)
 
-target_include_directories(app PRIVATE 
-                           main/include 
-                           ${LIGHTING_COMMON} 
-                           ${NRFCONNECT_COMMON}/util/include 
+zephyr_compile_options(-Werror)
+
+target_include_directories(app PRIVATE
+                           main/include
+                           ${LIGHTING_COMMON}
+                           ${NRFCONNECT_COMMON}/util/include
                            ${NRFCONNECT_COMMON}/app/include)
 
 target_sources(app PRIVATE
@@ -94,7 +98,7 @@ target_include_directories(app PRIVATE
 
 target_link_libraries(app PRIVATE
   pigweed_lighting_protolib.nanopb_rpc
-  pw_hdlc_lite
+  pw_hdlc
   pw_log
   pw_rpc.server
 )

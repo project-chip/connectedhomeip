@@ -79,16 +79,16 @@ namespace pw::sys_io {
 Status ReadByte(std::byte * dest)
 {
     if (!dest)
-        return Status::INVALID_ARGUMENT;
+        return Status::InvalidArgument();
 
     int ret = console_getchar(reinterpret_cast<uint8_t *>(dest));
-    return ret < 0 ? Status::FAILED_PRECONDITION : Status::OK;
+    return ret < 0 ? Status::FailedPrecondition() : OkStatus();
 }
 
 Status WriteByte(std::byte b)
 {
     int ret = console_putchar(reinterpret_cast<const char *>(&b));
-    return ret < 0 ? Status::FAILED_PRECONDITION : Status::OK;
+    return ret < 0 ? Status::FailedPrecondition() : OkStatus();
 }
 
 // Writes a string using pw::sys_io, and add newline characters at the end.

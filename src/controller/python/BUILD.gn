@@ -12,11 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/pigweed.gni")
+
 import("$dir_pw_build/python.gni")
 
-import("${chip_root}/build/chip/tools.gni")
+import("${build_root}/chip/tools.gni")
 import("${dir_pw_unit_test}/test.gni")
 
 config("controller_wno_deprecate") {
@@ -128,10 +130,8 @@ pw_python_action("python") {
 
   public_deps = [ ":ChipDeviceCtrl" ]
 
-  pythontags = exec_script("${chip_root}/build/chip/python_gen_tags.py",
-                           [],
-                           "list lines",
-                           [])
+  pythontags =
+      exec_script("${build_root}/chip/python_gen_tags.py", [], "list lines", [])
   pythontagsStr = string_join("", pythontags)
   output_name = "chip-0.0-$pythontagsStr.whl"
   outputs = [ "${_dist_dir}/$output_name" ]

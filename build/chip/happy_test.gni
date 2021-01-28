@@ -12,9 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
-import("${chip_root}/build/chip/tests.gni")
+import("${build_root}/chip/tests.gni")
 
 assert(chip_build_tests)
 assert(chip_enable_happy_tests)

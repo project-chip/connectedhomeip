@@ -58,7 +58,7 @@ static void esiDeletionCallback(uint8_t esiIndex)
     uint8_t i;
     for (i = 0; i < EMBER_AF_MESSAGING_CLUSTER_CLIENT_ENDPOINT_COUNT; i++)
     {
-        messageTable[i].esiBitmask &= ~BIT(esiIndex);
+        messageTable[i].esiBitmask &= ~EMBER_BIT(esiIndex);
     }
 }
 
@@ -159,9 +159,10 @@ bool emberAfMessagingClusterDisplayMessageCallback(uint32_t messageId, uint8_t m
         if (messageId == messageTable[ep].messageId)
         {
             // Duplicate message from a different ESI, add the ESI to the bitmask
-            if (esiIndex < EMBER_AF_PLUGIN_ESI_MANAGEMENT_ESI_TABLE_SIZE && (messageTable[ep].esiBitmask & BIT(esiIndex)) == 0)
+            if (esiIndex < EMBER_AF_PLUGIN_ESI_MANAGEMENT_ESI_TABLE_SIZE &&
+                (messageTable[ep].esiBitmask & EMBER_BIT(esiIndex)) == 0)
             {
-                messageTable[ep].esiBitmask |= BIT(esiIndex);
+                messageTable[ep].esiBitmask |= EMBER_BIT(esiIndex);
             }
             // Either way, we send back a default response.
             emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
@@ -179,7 +180,7 @@ bool emberAfMessagingClusterDisplayMessageCallback(uint32_t messageId, uint8_t m
 
     if (esiIndex < EMBER_AF_PLUGIN_ESI_MANAGEMENT_ESI_TABLE_SIZE)
     {
-        messageTable[ep].esiBitmask = BIT(esiIndex);
+        messageTable[ep].esiBitmask = EMBER_BIT(esiIndex);
     }
 
     messageTable[ep].clientEndpoint = emberAfCurrentCommand()->apsFrame->destinationEndpoint;
@@ -314,7 +315,7 @@ EmberAfStatus emberAfPluginMessagingClientConfirmMessage(EndpointId endpoint)
         {
             EmberAfPluginEsiManagementEsiEntry * esiEntry = emberAfPluginEsiManagementEsiLookUpByIndex(i);
             EmberNodeId nodeId;
-            if ((messageTable[ep].esiBitmask & BIT(i)) == 0 || esiEntry == NULL)
+            if ((messageTable[ep].esiBitmask & EMBER_BIT(i)) == 0 || esiEntry == NULL)
             {
                 continue;
             }
