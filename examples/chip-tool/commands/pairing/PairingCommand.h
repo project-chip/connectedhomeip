@@ -24,7 +24,6 @@
 enum class PairingMode
 {
     None,
-    Bypass,
     Ble,
     SoftAP,
 };
@@ -33,15 +32,11 @@ class PairingCommand : public Command, public chip::Controller::DevicePairingDel
 {
 public:
     PairingCommand(const char * commandName, PairingMode mode) :
-        Command(commandName), mPairingMode(mode), mRemoteAddr{ IPAddress::Any, INET_NULL_INTERFACEID }
+        Command(commandName), mPairingMode(mode), mRemoteAddr{ IPAddress::Any, INET_NULL_INTERFACEID }, mDevice(nullptr)
     {
         switch (mode)
         {
         case PairingMode::None:
-            break;
-        case PairingMode::Bypass:
-            AddArgument("device-remote-ip", &mRemoteAddr);
-            AddArgument("device-remote-port", 0, UINT16_MAX, &mRemotePort);
             break;
         case PairingMode::Ble:
             AddArgument("ssid", &mSSID);
@@ -64,17 +59,13 @@ public:
     CHIP_ERROR Run(PersistentStorage & storage, NodeId localId, NodeId remoteId) override;
 
     /////////// DevicePairingDelegate Interface /////////
-    void OnStatusUpdate(chip::RendezvousSessionDelegate::Status status) override;
-    void OnNetworkCredentialsRequested(chip::RendezvousDeviceCredentialsDelegate * callback) override;
-    void OnOperationalCredentialsRequested(const char * csr, size_t csr_length,
-                                           chip::RendezvousDeviceCredentialsDelegate * callback) override;
+    void OnStatusUpdate() override;
     void OnPairingComplete(CHIP_ERROR error) override;
     void OnPairingDeleted(CHIP_ERROR error) override;
 
 private:
     CHIP_ERROR RunInternal(NodeId remoteId);
     CHIP_ERROR Pair(NodeId remoteId, PeerAddress address);
-    CHIP_ERROR PairWithoutSecurity(NodeId remoteId, PeerAddress address);
     CHIP_ERROR Unpair(NodeId remoteId);
 
     const PairingMode mPairingMode;
@@ -86,4 +77,5 @@ private:
     char * mPassword;
 
     ChipDeviceCommissioner mCommissioner;
+    ChipDevice * mDevice;
 };

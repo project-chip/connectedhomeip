@@ -73,24 +73,20 @@ ChipDeviceController::ChipDeviceController()
     mOnNewConnection        = nullptr;
     mListenPort             = CHIP_PORT;
     mLocalDeviceId          = kUndefinedNodeId;
-    mRemoteDeviceId         = kUndefinedNodeId;
     mDevice                 = nullptr;
-    mPairingWithoutSecurity = false;
     CHIP_ZERO_AT(mOnComplete);
 }
 
 ChipDeviceController::~ChipDeviceController() {}
 
-CHIP_ERROR ChipDeviceController::Init(NodeId localNodeId, DevicePairingDelegate * pairingDelegate,
-                                      PersistentStorageDelegate * storageDelegate)
+CHIP_ERROR ChipDeviceController::Init(NodeId localNodeId, PersistentStorageDelegate * storageDelegate)
 {
-    return mCommissioner.Init(localNodeId, storageDelegate, pairingDelegate);
+    return mCommissioner.Init(localNodeId, storageDelegate);
 }
 
-CHIP_ERROR ChipDeviceController::Init(NodeId localNodeId, System::Layer * systemLayer, InetLayer * inetLayer,
-                                      DevicePairingDelegate * pairingDelegate, PersistentStorageDelegate * storageDelegate)
+CHIP_ERROR ChipDeviceController::Init(NodeId localNodeId, System::Layer * systemLayer, InetLayer * inetLayer, PersistentStorageDelegate * storageDelegate)
 {
-    return mCommissioner.Init(localNodeId, storageDelegate, pairingDelegate, systemLayer, inetLayer);
+    return mCommissioner.Init(localNodeId, storageDelegate, systemLayer, inetLayer);
 }
 
 CHIP_ERROR ChipDeviceController::Shutdown()
@@ -98,15 +94,17 @@ CHIP_ERROR ChipDeviceController::Shutdown()
     return mCommissioner.Shutdown();
 }
 
-CHIP_ERROR ChipDeviceController::ConnectDevice(NodeId remoteDeviceId, RendezvousParameters & params, void * appReqState,
+CHIP_ERROR ChipDeviceController::ConnectDeviceOverIP(NodeId remoteDeviceId, Transport::PeerAddress address, uint32_t setupPINCode, void * appReqState,
                                                NewConnectionHandler onConnected, MessageReceiveHandler onMessageReceived,
                                                ErrorHandler onError, uint16_t devicePort, Inet::InterfaceId interfaceId)
 {
-    CHIP_ERROR err = mCommissioner.PairDevice(remoteDeviceId, params, devicePort, interfaceId);
+    CHIP_ERROR err = mCommissioner.NewDevice(&mDevice, remoteDeviceId);
+    SuccessOrExit(err);
+
+    err = mDevice->PairDeviceOverIP(address, setupPINCode);
     SuccessOrExit(err);
 
     mState           = kState_Initialized;
-    mRemoteDeviceId  = remoteDeviceId;
     mAppReqState     = appReqState;
     mOnNewConnection = onConnected;
 
@@ -115,34 +113,6 @@ CHIP_ERROR ChipDeviceController::ConnectDevice(NodeId remoteDeviceId, Rendezvous
 
     // TODO: Should call mOnNewConnected when rendezvous completed
     mOnNewConnection(this, nullptr, mAppReqState);
-
-exit:
-    return err;
-}
-
-CHIP_ERROR ChipDeviceController::ConnectDeviceWithoutSecurePairing(NodeId remoteDeviceId, const IPAddress & deviceAddr,
-                                                                   void * appReqState, NewConnectionHandler onConnected,
-                                                                   MessageReceiveHandler onMessageReceived, ErrorHandler onError,
-                                                                   uint16_t devicePort, Inet::InterfaceId interfaceId)
-{
-    CHIP_ERROR err =
-        mCommissioner.PairTestDeviceWithoutSecurity(remoteDeviceId, deviceAddr, mSerializedTestDevice, devicePort, interfaceId);
-    SuccessOrExit(err);
-
-    mPairingWithoutSecurity = true;
-
-    mState           = kState_Initialized;
-    mRemoteDeviceId  = remoteDeviceId;
-    mAppReqState     = appReqState;
-    mOnNewConnection = onConnected;
-
-    mOnComplete.Response = onMessageReceived;
-    mOnError             = onError;
-
-    if (mOnNewConnection)
-    {
-        mOnNewConnection(this, nullptr, mAppReqState);
-    }
 
 exit:
     return err;
@@ -200,12 +170,6 @@ CHIP_ERROR ChipDeviceController::SendMessage(void * appReqState, PacketBufferHan
 
     mAppReqState = appReqState;
 
-    if (peerDevice != kUndefinedNodeId)
-    {
-        mRemoteDeviceId = peerDevice;
-    }
-    VerifyOrExit(mRemoteDeviceId != kUndefinedNodeId, err = CHIP_ERROR_INCORRECT_STATE);
-
     if (mDevice == nullptr)
     {
         SuccessOrExit(InitDevice());
@@ -223,7 +187,9 @@ exit:
 
 CHIP_ERROR ChipDeviceController::SetDevicePairingDelegate(DevicePairingDelegate * pairingDelegate)
 {
-    mCommissioner.SetDevicePairingDelegate(pairingDelegate);
+    if (mDevice == nullptr) return CHIP_ERROR_INCORRECT_STATE;
+
+    mDevice->SetPairingDelegate(pairingDelegate);
     return CHIP_NO_ERROR;
 }
 
@@ -237,8 +203,7 @@ void ChipDeviceController::OnMessage(System::PacketBufferHandle msgBuf)
 
 CHIP_ERROR ChipDeviceController::InitDevice()
 {
-    return mPairingWithoutSecurity ? mCommissioner.GetDevice(mRemoteDeviceId, mSerializedTestDevice, &mDevice)
-                                   : mCommissioner.GetDevice(mRemoteDeviceId, &mDevice);
+    return mCommissioner.GetDevice(/* TODO */ 0, &mDevice);
 }
 
 } // namespace DeviceController

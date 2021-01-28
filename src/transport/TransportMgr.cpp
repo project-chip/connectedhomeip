@@ -27,7 +27,6 @@
 
 #include <transport/TransportMgr.h>
 
-#include <transport/RendezvousSession.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/raw/Base.h>
 #include <transport/raw/MessageHeader.h>

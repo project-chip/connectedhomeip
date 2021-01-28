@@ -147,6 +147,8 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, PersistentStorageDelegat
     );
     SuccessOrExit(err);
 
+    mTransportMgr->SetRendezvousSession(this);
+
     err = mSessionManager->Init(localDeviceId, mSystemLayer, mTransportMgr);
     SuccessOrExit(err);
 
@@ -227,7 +229,7 @@ CHIP_ERROR DeviceController::SetUdpListenPort(uint16_t listenPort)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DeviceController::GetDevice(NodeId deviceId, const SerializedDevice & deviceInfo, Device ** out_device)
+CHIP_ERROR DeviceController::NewDevice(Device ** out_device, NodeId deviceId)
 {
     CHIP_ERROR err  = CHIP_NO_ERROR;
     Device * device = nullptr;
@@ -235,24 +237,12 @@ CHIP_ERROR DeviceController::GetDevice(NodeId deviceId, const SerializedDevice &
 
     VerifyOrExit(out_device != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     index = FindDeviceIndex(deviceId);
+    VerifyOrExit(index >= kNumMaxActiveDevices, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    if (index < kNumMaxActiveDevices)
-    {
-        device = &mActiveDevices[index];
-    }
-    else
-    {
-        VerifyOrExit(mPairedDevices.Contains(deviceId), err = CHIP_ERROR_NOT_CONNECTED);
-
-        index = GetInactiveDeviceIndex();
-        VerifyOrExit(index < kNumMaxActiveDevices, err = CHIP_ERROR_NO_MEMORY);
-        device = &mActiveDevices[index];
-
-        err = device->Deserialize(deviceInfo);
-        VerifyOrExit(err == CHIP_NO_ERROR, ReleaseDevice(device));
-
-        device->Init(mTransportMgr, mSessionManager, mInetLayer, mListenPort);
-    }
+    index = GetInactiveDeviceIndex();
+    VerifyOrExit(index < kNumMaxActiveDevices, err = CHIP_ERROR_NO_MEMORY);
+    device = &mActiveDevices[index];
+    device->Init(this, mTransportMgr, mSessionManager, mInetLayer, mListenPort, deviceId);
 
     *out_device = device;
 
@@ -310,10 +300,9 @@ CHIP_ERROR DeviceController::GetDevice(NodeId deviceId, Device ** out_device)
             SuccessOrExit(err);
             VerifyOrExit(size <= sizeof(deviceInfo.inner), err = CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR);
 
+            device->Init(this, mTransportMgr, mSessionManager, mInetLayer, mListenPort);
             err = device->Deserialize(deviceInfo);
             VerifyOrExit(err == CHIP_NO_ERROR, ReleaseDevice(device));
-
-            device->Init(mTransportMgr, mSessionManager, mInetLayer, mListenPort);
         }
     }
 
@@ -356,6 +345,30 @@ CHIP_ERROR DeviceController::ServiceEventSignal()
 
 exit:
     return err;
+}
+
+// TransportMgrDelegate callback, deliver unsecure pairing packets to device
+void DeviceController::OnMessageReceived(const PacketHeader & header, const Transport::PeerAddress & source, System::PacketBufferHandle msgBuf)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    uint16_t index = 0;
+    NodeId node;
+
+    VerifyOrExit(mState == State::Initialized, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(header.GetSourceNodeId().HasValue(), err = CHIP_ERROR_INVALID_ARGUMENT);
+
+    node = header.GetSourceNodeId().Value();
+    index = FindDeviceIndex(node);
+    VerifyOrExit(index < kNumMaxActiveDevices, err = CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR);
+
+    mActiveDevices[index].OnMessageReceived(header, source, std::move(msgBuf));
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "OnMessageReceived: Failed to process received message: err %d", err);
+    }
+    return;
 }
 
 void DeviceController::OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr)
@@ -505,313 +518,39 @@ void DeviceController::OnValue(const char * key, const char * value) {}
 
 void DeviceController::OnStatus(const char * key, Operation op, CHIP_ERROR err) {}
 
-DeviceCommissioner::DeviceCommissioner()
+CHIP_ERROR DeviceController::PersistDevice(Device * device)
 {
-    mPairingDelegate      = nullptr;
-    mRendezvousSession    = nullptr;
-    mDeviceBeingPaired    = kNumMaxActiveDevices;
-    mPairedDevicesUpdated = false;
-}
+    if (mStorageDelegate == nullptr) return CHIP_ERROR_INCORRECT_STATE;
 
-CHIP_ERROR DeviceCommissioner::Init(NodeId localDeviceId, PersistentStorageDelegate * storageDelegate,
-                                    DevicePairingDelegate * pairingDelegate, System::Layer * systemLayer,
-                                    Inet::InetLayer * inetLayer)
-{
-    CHIP_ERROR err = DeviceController::Init(localDeviceId, storageDelegate, systemLayer, inetLayer);
-    SuccessOrExit(err);
-
-    mPairingDelegate = pairingDelegate;
-
-exit:
-    return err;
-}
-
-CHIP_ERROR DeviceCommissioner::Shutdown()
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    VerifyOrExit(mState == State::Initialized, err = CHIP_ERROR_INCORRECT_STATE);
-
-    ChipLogDetail(Controller, "Shutting down the commissioner");
-
+    mPairedDevices.Insert(device->GetDeviceId());
     PersistDeviceList();
-
-    if (mRendezvousSession != nullptr)
     {
-        chip::Platform::Delete(mRendezvousSession);
-        mRendezvousSession = nullptr;
-    }
-
-    DeviceController::Shutdown();
-
-exit:
-    return err;
-}
-
-CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParameters & params, uint16_t remotePort,
-                                          Inet::InterfaceId interfaceId)
-{
-    CHIP_ERROR err  = CHIP_NO_ERROR;
-    Device * device = nullptr;
-
-    VerifyOrExit(mState == State::Initialized, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(mDeviceBeingPaired == kNumMaxActiveDevices, err = CHIP_ERROR_INCORRECT_STATE);
-
-    params.SetAdvertisementDelegate(&mRendezvousAdvDelegate);
-
-    // TODO: We need to specify the peer address for BLE transport in bindings.
-    if (params.GetPeerAddress().GetTransportType() == Transport::Type::kBle ||
-        params.GetPeerAddress().GetTransportType() == Transport::Type::kUndefined)
-    {
-#if CONFIG_DEVICE_LAYER && CONFIG_NETWORK_LAYER_BLE
-        if (!params.HasBleLayer())
-        {
-            params.SetBleLayer(DeviceLayer::ConnectivityMgr().GetBleLayer());
-            params.SetPeerAddress(Transport::PeerAddress::BLE());
-        }
-#endif // CONFIG_DEVICE_LAYER && CONFIG_NETWORK_LAYER_BLE
-    }
-
-    mDeviceBeingPaired = GetInactiveDeviceIndex();
-    VerifyOrExit(mDeviceBeingPaired < kNumMaxActiveDevices, err = CHIP_ERROR_NO_MEMORY);
-    device = &mActiveDevices[mDeviceBeingPaired];
-
-    mIsIPRendezvous    = (params.GetPeerAddress().GetTransportType() != Transport::Type::kBle);
-    mRendezvousSession = chip::Platform::New<RendezvousSession>(this);
-    VerifyOrExit(mRendezvousSession != nullptr, err = CHIP_ERROR_NO_MEMORY);
-    err = mRendezvousSession->Init(params.SetLocalNodeId(mLocalDeviceId).SetRemoteNodeId(remoteDeviceId), mTransportMgr,
-                                   mSessionManager);
-    SuccessOrExit(err);
-
-    device->Init(mTransportMgr, mSessionManager, mInetLayer, mListenPort, remoteDeviceId, remotePort, interfaceId);
-
-    // TODO: BLE rendezvous and IP rendezvous should have same logic in the future after BLE becomes a transport and network
-    // provisiong cluster is ready.
-    if (params.GetPeerAddress().GetTransportType() != Transport::Type::kBle)
-    {
-        device->SetAddress(params.GetPeerAddress().GetIPAddress());
-        mRendezvousSession->OnRendezvousConnectionOpened();
-    }
-
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        // Delete the current rendezvous session only if a device is not currently being paired.
-        if (mDeviceBeingPaired == kNumMaxActiveDevices && mRendezvousSession != nullptr)
-        {
-            chip::Platform::Delete(mRendezvousSession);
-            mRendezvousSession = nullptr;
-        }
-
-        if (device != nullptr)
-        {
-            ReleaseDevice(device);
-            mDeviceBeingPaired = kNumMaxActiveDevices;
-        }
-    }
-
-    return err;
-}
-
-CHIP_ERROR DeviceCommissioner::PairTestDeviceWithoutSecurity(NodeId remoteDeviceId, const Inet::IPAddress & deviceAddr,
-                                                             SerializedDevice & serialized, uint16_t remotePort,
-                                                             Inet::InterfaceId interfaceId)
-{
-    CHIP_ERROR err  = CHIP_NO_ERROR;
-    Device * device = nullptr;
-
-    SecurePairingUsingTestSecret * testSecurePairingSecret = nullptr;
-
-    VerifyOrExit(mState == State::Initialized, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(mDeviceBeingPaired == kNumMaxActiveDevices, err = CHIP_ERROR_INCORRECT_STATE);
-
-    testSecurePairingSecret = chip::Platform::New<SecurePairingUsingTestSecret>(Optional<NodeId>::Value(remoteDeviceId),
-                                                                                static_cast<uint16_t>(0), static_cast<uint16_t>(0));
-    VerifyOrExit(testSecurePairingSecret != nullptr, err = CHIP_ERROR_NO_MEMORY);
-
-    mDeviceBeingPaired = GetInactiveDeviceIndex();
-    VerifyOrExit(mDeviceBeingPaired < kNumMaxActiveDevices, err = CHIP_ERROR_NO_MEMORY);
-    device = &mActiveDevices[mDeviceBeingPaired];
-
-    testSecurePairingSecret->ToSerializable(device->GetPairing());
-
-    device->Init(mTransportMgr, mSessionManager, mInetLayer, mListenPort, remoteDeviceId, remotePort, interfaceId);
-
-    device->SetAddress(deviceAddr);
-
-    device->Serialize(serialized);
-
-    OnRendezvousComplete();
-
-exit:
-    if (testSecurePairingSecret != nullptr)
-    {
-        chip::Platform::Delete(testSecurePairingSecret);
-    }
-
-    if (err != CHIP_NO_ERROR)
-    {
-        if (device != nullptr)
-        {
-            ReleaseDevice(device);
-            mDeviceBeingPaired = kNumMaxActiveDevices;
-        }
-    }
-
-    return err;
-}
-CHIP_ERROR DeviceCommissioner::StopPairing(NodeId remoteDeviceId)
-{
-    CHIP_ERROR err  = CHIP_NO_ERROR;
-    Device * device = nullptr;
-
-    VerifyOrExit(mState == State::Initialized, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(mDeviceBeingPaired < kNumMaxActiveDevices, err = CHIP_ERROR_INCORRECT_STATE);
-
-    device = &mActiveDevices[mDeviceBeingPaired];
-    VerifyOrExit(device->GetDeviceId() == remoteDeviceId, err = CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR);
-
-    if (mRendezvousSession != nullptr)
-    {
-        chip::Platform::Delete(mRendezvousSession);
-        mRendezvousSession = nullptr;
-    }
-
-    ReleaseDevice(device);
-    mDeviceBeingPaired = kNumMaxActiveDevices;
-
-exit:
-    return err;
-}
-
-CHIP_ERROR DeviceCommissioner::UnpairDevice(NodeId remoteDeviceId)
-{
-    // TODO: Send unpairing message to the remote device.
-
-    if (mStorageDelegate != nullptr)
-    {
-        PERSISTENT_KEY_OP(remoteDeviceId, kPairedDeviceKeyPrefix, key, mStorageDelegate->DeleteKeyValue(key));
-        mPairedDevices.Remove(remoteDeviceId);
-        mPairedDevicesUpdated = true;
+        // Save the device
+        SerializedDevice serialized;
+        CHIP_ERROR err = device->Serialize(serialized);
+        if (err != CHIP_NO_ERROR) return err;
+        PERSISTENT_KEY_OP(device->GetDeviceId(), kPairedDeviceKeyPrefix, key,
+            mStorageDelegate->SetKeyValue(key, Uint8::to_const_char(serialized.inner)));
     }
 
     return CHIP_NO_ERROR;
 }
 
-void DeviceCommissioner::RendezvousCleanup(CHIP_ERROR status)
+CHIP_ERROR DeviceController::UnpairDevice(NodeId remoteDeviceId)
 {
-    if (mRendezvousSession != nullptr)
-    {
-        chip::Platform::Delete(mRendezvousSession);
-        mRendezvousSession = nullptr;
-    }
-
-    if (mPairingDelegate != nullptr)
-    {
-        mPairingDelegate->OnPairingComplete(status);
-    }
-
-    // TODO: make mStorageDelegate mandatory once all controller applications implement the interface.
-    if (mDeviceBeingPaired != kNumMaxActiveDevices && mStorageDelegate != nullptr)
-    {
-        // Let's release the device that's being paired.
-        // If pairing was successful, its information is
-        // already persisted. The application will use GetDevice()
-        // method to get access to the device, which will fetch
-        // the device information from the persistent storage.
-        DeviceController::ReleaseDevice(mDeviceBeingPaired);
-        mDeviceBeingPaired = kNumMaxActiveDevices;
-    }
-}
-
-void DeviceCommissioner::OnRendezvousError(CHIP_ERROR err)
-{
-    RendezvousCleanup(err);
-}
-
-void DeviceCommissioner::OnRendezvousComplete()
-{
-    CHIP_ERROR err  = CHIP_NO_ERROR;
-    Device * device = nullptr;
-
-    VerifyOrExit(mDeviceBeingPaired < kNumMaxActiveDevices, err = CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR);
-    device = &mActiveDevices[mDeviceBeingPaired];
-    mPairedDevices.Insert(device->GetDeviceId());
-    mPairedDevicesUpdated = true;
-    // We need to kick the device since we are not a valid secure pairing delegate when using IM.
-    device->InitCommandSender();
-
-    // mStorageDelegate would not be null for a typical pairing scenario, as Pair()
-    // requires a valid storage delegate. However, test pairing usecase, that's used
-    // mainly by test applications, do not require a storage delegate. This is to
-    // reduce overheads on these tests.
-    // Let's make sure the delegate object is available before calling into it.
     if (mStorageDelegate != nullptr)
     {
-        SerializedDevice serialized;
-        device->Serialize(serialized);
-        PERSISTENT_KEY_OP(device->GetDeviceId(), kPairedDeviceKeyPrefix, key,
-                          mStorageDelegate->SetKeyValue(key, Uint8::to_const_char(serialized.inner)));
+        PERSISTENT_KEY_OP(remoteDeviceId, kPairedDeviceKeyPrefix, key, mStorageDelegate->DeleteKeyValue(key));
+        mPairedDevices.Remove(remoteDeviceId);
+        PersistDeviceList();
     }
 
-exit:
-    if (err == CHIP_NO_ERROR)
-    {
-        RendezvousCleanup(CHIP_NO_ERROR);
-    }
-    else
-    {
-        OnRendezvousError(err);
-    }
+    return CHIP_NO_ERROR;
 }
 
-void DeviceCommissioner::OnRendezvousStatusUpdate(RendezvousSessionDelegate::Status status, CHIP_ERROR err)
+void DeviceController::PersistDeviceList()
 {
-    Device * device = nullptr;
-    if (mDeviceBeingPaired >= kNumMaxActiveDevices)
-    {
-        ExitNow();
-    }
-
-    device = &mActiveDevices[mDeviceBeingPaired];
-    switch (status)
-    {
-    case RendezvousSessionDelegate::SecurePairingSuccess:
-        ChipLogDetail(Controller, "Remote device completed SPAKE2+ handshake\n");
-        mRendezvousSession->GetPairingSession().ToSerializable(device->GetPairing());
-
-        if (!mIsIPRendezvous && mPairingDelegate != nullptr)
-        {
-            mPairingDelegate->OnNetworkCredentialsRequested(mRendezvousSession);
-        }
-        break;
-
-    case RendezvousSessionDelegate::SecurePairingFailed:
-        ChipLogDetail(Controller, "Remote device failed in SPAKE2+ handshake\n");
-        break;
-
-    case RendezvousSessionDelegate::NetworkProvisioningSuccess:
-        ChipLogDetail(Controller, "Remote device was assigned an ip address\n");
-        device->SetAddress(mRendezvousSession->GetIPAddress());
-        break;
-
-    case RendezvousSessionDelegate::NetworkProvisioningFailed:
-        ChipLogDetail(Controller, "Remote device failed in network provisioning\n");
-        break;
-
-    default:
-        break;
-    };
-exit:
-    if (mPairingDelegate != nullptr)
-    {
-        mPairingDelegate->OnStatusUpdate(status);
-    }
-}
-
-void DeviceCommissioner::PersistDeviceList()
-{
-    if (mStorageDelegate != nullptr && mPairedDevicesUpdated)
+    if (mStorageDelegate != nullptr)
     {
         constexpr uint16_t size = CHIP_MAX_SERIALIZED_SIZE_U64(kNumMaxPairedDevices);
         char * serialized       = static_cast<char *>(chip::Platform::MemoryAlloc(size));
@@ -823,17 +562,10 @@ void DeviceCommissioner::PersistDeviceList()
             {
                 PERSISTENT_KEY_OP(static_cast<uint64_t>(0), kPairedDeviceListKeyPrefix, key,
                                   mStorageDelegate->SetKeyValue(key, value));
-                mPairedDevicesUpdated = false;
             }
             chip::Platform::MemoryFree(serialized);
         }
     }
-}
-
-void DeviceCommissioner::ReleaseDevice(Device * device)
-{
-    PersistDeviceList();
-    DeviceController::ReleaseDevice(device);
 }
 
 } // namespace Controller

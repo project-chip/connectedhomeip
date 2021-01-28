@@ -33,8 +33,6 @@
 #include <core/CHIPCore.h>
 #include <core/CHIPTLV.h>
 #include <support/DLLUtil.h>
-#include <transport/RendezvousSession.h>
-#include <transport/RendezvousSessionDelegate.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/raw/UDP.h>
 
@@ -67,13 +65,11 @@ public:
      * Init function to be used when there exists a device layer that takes care of initializing
      * System::Layer and InetLayer.
      */
-    CHIP_ERROR Init(NodeId localDeviceId, Controller::DevicePairingDelegate * pairingDelegate = nullptr,
-                    Controller::PersistentStorageDelegate * storageDelegate = nullptr);
+    CHIP_ERROR Init(NodeId localDeviceId, Controller::PersistentStorageDelegate * storageDelegate = nullptr);
     /**
      * Init function to be used when already-initialized System::Layer and InetLayer are available.
      */
     CHIP_ERROR Init(NodeId localDeviceId, System::Layer * systemLayer, Inet::InetLayer * inetLayer,
-                    Controller::DevicePairingDelegate * pairingDelegate     = nullptr,
                     Controller::PersistentStorageDelegate * storageDelegate = nullptr);
     CHIP_ERROR Shutdown();
 
@@ -98,9 +94,9 @@ public:
      * @return CHIP_ERROR               The connection status
      */
     [[deprecated("Available until controller apps move to DeviceController/DeviceCommissioner API")]] CHIP_ERROR
-    ConnectDevice(NodeId remoteDeviceId, RendezvousParameters & params, void * appReqState, NewConnectionHandler onConnected,
-                  MessageReceiveHandler onMessageReceived, ErrorHandler onError, uint16_t devicePort = CHIP_PORT,
-                  Inet::InterfaceId interfaceId = INET_NULL_INTERFACEID);
+    ConnectDeviceOverIP(NodeId remoteDeviceId, Transport::PeerAddress address, uint32_t setupPINCode, void * appReqState,
+                                               NewConnectionHandler onConnected, MessageReceiveHandler onMessageReceived,
+                                               ErrorHandler onError, uint16_t devicePort = CHIP_PORT, Inet::InterfaceId interfaceId = INET_NULL_INTERFACEID);
 
     /**
      * @brief
@@ -195,7 +191,7 @@ private:
         kState_Initialized    = 1
     } mState;
 
-    Controller::DeviceCommissioner mCommissioner;
+    Controller::DeviceController mCommissioner;
     Controller::Device * mDevice;
 
     void * mAppReqState;
@@ -211,11 +207,9 @@ private:
     System::PacketBuffer * mCurReqMsg;
 
     NodeId mLocalDeviceId;
-    NodeId mRemoteDeviceId;
     uint16_t mListenPort;
 
     Controller::SerializedDevice mSerializedTestDevice;
-    bool mPairingWithoutSecurity;
 
     void ClearRequestState();
     void ClearOpState();

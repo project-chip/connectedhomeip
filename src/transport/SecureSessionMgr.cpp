@@ -35,7 +35,6 @@
 #include <support/SafeInt.h>
 #include <support/logging/CHIPLogging.h>
 #include <transport/PASESession.h>
-#include <transport/RendezvousSession.h>
 #include <transport/SecureMessageCodec.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/TransportMgr.h>

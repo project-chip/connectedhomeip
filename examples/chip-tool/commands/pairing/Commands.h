@@ -26,12 +26,6 @@ public:
     Unpair() : PairingCommand("unpair", PairingMode::None) {}
 };
 
-class PairBypass : public PairingCommand
-{
-public:
-    PairBypass() : PairingCommand("bypass", PairingMode::Bypass) {}
-};
-
 class PairBle : public PairingCommand
 {
 public:
@@ -50,7 +44,6 @@ void registerCommandsPairing(Commands & commands)
 
     commands_list clusterCommands = {
         make_unique<Unpair>(),
-        make_unique<PairBypass>(),
         make_unique<PairBle>(),
         make_unique<PairSoftAP>(),
     };

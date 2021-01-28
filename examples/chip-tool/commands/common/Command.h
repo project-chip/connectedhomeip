@@ -73,7 +73,7 @@ struct Argument
 class Command
 {
 public:
-    using ChipDeviceCommissioner = ::chip::Controller::DeviceCommissioner;
+    using ChipDeviceCommissioner = ::chip::Controller::DeviceController;
     using ChipSerializedDevice   = ::chip::Controller::SerializedDevice;
     using ChipDevice             = ::chip::Controller::Device;
     using PeerAddress            = ::chip::Transport::PeerAddress;

@@ -38,7 +38,6 @@
 #include <inttypes.h>
 #include <net/if.h>
 
-#include "ChipDeviceController-ScriptDevicePairingDelegate.h"
 #include "ChipDeviceController-StorageDelegate.h"
 
 #include <app/CommandSender.h>
@@ -90,15 +89,6 @@ CHIP_ERROR nl_Chip_DeviceController_ConnectIP(chip::DeviceController::ChipDevice
                                               uint32_t setupPINCode, OnConnectFunct onConnect, OnMessageFunct onMessage,
                                               OnErrorFunct onError);
 
-// Network Provisioning
-CHIP_ERROR
-nl_Chip_ScriptDevicePairingDelegate_NewPairingDelegate(chip::DeviceController::ScriptDevicePairingDelegate ** pairingDelegate);
-CHIP_ERROR
-nl_Chip_ScriptDevicePairingDelegate_SetWifiCredential(chip::DeviceController::ScriptDevicePairingDelegate * pairingDelegate,
-                                                      const char * ssid, const char * password);
-CHIP_ERROR nl_Chip_DeviceController_SetDevicePairingDelegate(chip::DeviceController::ChipDeviceController * devCtrl,
-                                                             chip::Controller::DevicePairingDelegate * pairingDelegate);
-
 bool nl_Chip_DeviceController_IsConnected(chip::DeviceController::ChipDeviceController * devCtrl);
 void nl_Chip_DeviceController_Close(chip::DeviceController::ChipDeviceController * devCtrl);
 uint8_t nl_Chip_DeviceController_GetLogFilter();
@@ -121,7 +111,7 @@ CHIP_ERROR nl_Chip_DeviceController_NewDeviceController(chip::DeviceController::
     *outDevCtrl = new chip::DeviceController::ChipDeviceController();
     VerifyOrExit(*outDevCtrl != NULL, err = CHIP_ERROR_NO_MEMORY);
 
-    SuccessOrExit(err = (*outDevCtrl)->Init(kLocalDeviceId, nullptr, nullptr, nullptr, &sStorageDelegate));
+    SuccessOrExit(err = (*outDevCtrl)->Init(kLocalDeviceId, &sStorageDelegate));
     SuccessOrExit(err = (*outDevCtrl)->ServiceEvents());
 
 exit:
@@ -181,82 +171,21 @@ CHIP_ERROR nl_Chip_DeviceController_Connect(chip::DeviceController::ChipDeviceCo
                                             uint32_t setupPINCode, OnConnectFunct onConnect, OnMessageFunct onMessage,
                                             OnErrorFunct onError)
 {
+    // TODO: Wait for unified IP/BLE transport ready
+    // return devCtrl->ConnectDeviceOverBle(kRemoteDeviceId, connObj, setupPINCode, (void *) devCtrl, onConnect, onMessage, onError);
     return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
-CHIP_ERROR nl_Chip_DeviceController_ConnectBLE(chip::DeviceController::ChipDeviceController * devCtrl, uint16_t discriminator,
-                                               uint32_t setupPINCode, OnConnectFunct onConnect, OnMessageFunct onMessage,
-                                               OnErrorFunct onError)
-{
-    return devCtrl->ConnectDevice(kRemoteDeviceId,
-                                  chip::RendezvousParameters()
-                                      .SetPeerAddress(Transport::PeerAddress(Transport::Type::kBle))
-                                      .SetSetupPINCode(setupPINCode)
-                                      .SetDiscriminator(discriminator),
-                                  (void *) devCtrl, onConnect, onMessage, onError);
 }
 
 CHIP_ERROR nl_Chip_DeviceController_ConnectIP(chip::DeviceController::ChipDeviceController * devCtrl, const char * peerAddrStr,
                                               uint32_t setupPINCode, OnConnectFunct onConnect, OnMessageFunct onMessage,
                                               OnErrorFunct onError)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     chip::Inet::IPAddress peerAddr;
     chip::Transport::PeerAddress addr;
-    chip::RendezvousParameters params = chip::RendezvousParameters().SetSetupPINCode(setupPINCode);
 
-    VerifyOrReturnError(chip::Inet::IPAddress::FromString(peerAddrStr, peerAddr), err = CHIP_ERROR_INVALID_ARGUMENT);
     // TODO: IP rendezvous should use TCP connection.
     addr.SetTransportType(chip::Transport::Type::kUdp).SetIPAddress(peerAddr);
-    params.SetPeerAddress(addr).SetDiscriminator(0);
-    return devCtrl->ConnectDevice(kRemoteDeviceId, params, (void *) devCtrl, onConnect, onMessage, onError);
-}
-
-CHIP_ERROR
-nl_Chip_ScriptDevicePairingDelegate_NewPairingDelegate(chip::DeviceController::ScriptDevicePairingDelegate ** pairingDelegate)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    VerifyOrExit(pairingDelegate != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
-
-    *pairingDelegate = new chip::DeviceController::ScriptDevicePairingDelegate();
-
-exit:
-    if (err != CHIP_NO_ERROR && pairingDelegate != nullptr && *pairingDelegate != nullptr)
-    {
-        delete *pairingDelegate;
-        *pairingDelegate = nullptr;
-    }
-    return err;
-}
-
-CHIP_ERROR
-nl_Chip_ScriptDevicePairingDelegate_SetWifiCredential(chip::DeviceController::ScriptDevicePairingDelegate * pairingDelegate,
-                                                      const char * ssid, const char * password)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    VerifyOrExit(pairingDelegate != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(ssid != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(password != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
-
-    pairingDelegate->SetWifiCredential(ssid, password);
-
-exit:
-    return err;
-}
-CHIP_ERROR nl_Chip_DeviceController_SetDevicePairingDelegate(chip::DeviceController::ChipDeviceController * devCtrl,
-                                                             chip::Controller::DevicePairingDelegate * pairingDelegate)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    VerifyOrExit(devCtrl != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(pairingDelegate != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
-
-    devCtrl->SetDevicePairingDelegate(pairingDelegate);
-
-exit:
-    return err;
+    return devCtrl->ConnectDeviceOverIP(kRemoteDeviceId, addr, setupPINCode, (void *) devCtrl, onConnect, onMessage, onError);
 }
 
 CHIP_ERROR nl_Chip_Stack_Init()

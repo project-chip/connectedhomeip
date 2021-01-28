@@ -53,10 +53,40 @@ using DeviceTransportMgr = TransportMgr<Transport::UDP /* IPv6 */
 #endif
                                         >;
 
-class DLL_EXPORT Device
+class DLL_EXPORT DevicePairingDelegate
 {
 public:
-    Device() : mInterface(INET_NULL_INTERFACEID), mActive(false), mState(ConnectionState::NotConnected) {}
+    virtual ~DevicePairingDelegate() {}
+
+    /**
+     * @brief
+     *   Called when the pairing reaches a certain stage.
+     *
+     * @param status Current status of pairing
+     */
+    virtual void OnStatusUpdate() {}
+
+    /**
+     * @brief
+     *   Called when the pairing is complete (with success or error)
+     *
+     * @param error Error cause, if any
+     */
+    virtual void OnPairingComplete(CHIP_ERROR error) {}
+
+    /**
+     * @brief
+     *   Called when the pairing is deleted (with success or error)
+     *
+     * @param error Error cause, if any
+     */
+    virtual void OnPairingDeleted(CHIP_ERROR error) {}
+};
+
+class DLL_EXPORT Device : public SessionEstablishmentDelegate
+{
+public:
+    Device() : mInterface(INET_NULL_INTERFACEID), mActive(false), mState(DeviceState::NotConnected) {}
     ~Device()
     {
         if (mCommandSender != nullptr)
@@ -75,6 +105,16 @@ public:
      * @param[in] delegate   The pointer to the delegate object.
      */
     void SetDelegate(DeviceStatusDelegate * delegate) { mStatusDelegate = delegate; }
+
+    /**
+     * @brief
+     *   Set the delegate object which will be called when pairing state is changes
+     *   The user of this Device object must reset the delegate (by calling
+     *   SetDelegate(nullptr)) before releasing their delegate object.
+     *
+     * @param[in] delegate   The pointer to the delegate object.
+     */
+    void SetPairingDelegate(DevicePairingDelegate * delegate) { mPairingDelegate = delegate; }
 
     // ----- Messaging -----
     /**
@@ -137,41 +177,14 @@ public:
      * @param[in] inetLayer    InetLayer object pointer
      * @param[in] listenPort   Port on which controller is listening (typically CHIP_PORT)
      */
-    void Init(DeviceTransportMgr * transportMgr, SecureSessionMgr * sessionMgr, Inet::InetLayer * inetLayer, uint16_t listenPort)
+    void Init(DeviceController * deviceController, DeviceTransportMgr * transportMgr, SecureSessionMgr * sessionMgr, Inet::InetLayer * inetLayer, uint16_t listenPort, NodeId peerNodeId = kUndefinedNodeId)
     {
+        mDeviceController = deviceController;
         mTransportMgr   = transportMgr;
         mSessionManager = sessionMgr;
         mInetLayer      = inetLayer;
         mListenPort     = listenPort;
-    }
-
-    /**
-     * @brief
-     *   Initialize a new device object with secure session manager, inet layer object,
-     *   and other device specific parameters. This variant of function is typically used when
-     *   a new device is paired, and the corresponding device object needs to updated with
-     *   all device specifc parameters (address, port, interface etc).
-     *
-     *   This is not done as part of constructor so that the controller can have a list of
-     *   uninitialzed/unpaired device objects. The object is initialized only when the device
-     *   is actually paired.
-     *
-     * @param[in] transportMgr Transport manager object pointer
-     * @param[in] sessionMgr   Secure session manager object pointer
-     * @param[in] inetLayer    InetLayer object pointer
-     * @param[in] listenPort   Port on which controller is listening (typically CHIP_PORT)
-     * @param[in] deviceId     Node ID of the device
-     * @param[in] devicePort   Port on which device is listening (typically CHIP_PORT)
-     * @param[in] interfaceId  Local Interface ID that should be used to talk to the device
-     */
-    void Init(DeviceTransportMgr * transportMgr, SecureSessionMgr * sessionMgr, Inet::InetLayer * inetLayer, uint16_t listenPort,
-              NodeId deviceId, uint16_t devicePort, Inet::InterfaceId interfaceId)
-    {
-        Init(transportMgr, sessionMgr, inetLayer, mListenPort);
-        mDeviceId   = deviceId;
-        mDevicePort = devicePort;
-        mInterface  = interfaceId;
-        mState      = ConnectionState::Connecting;
+        mDeviceId = peerNodeId;
     }
 
     /** @brief Serialize the Pairing Session to a string. It's guaranteed that the string
@@ -187,6 +200,56 @@ public:
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
     CHIP_ERROR Deserialize(const SerializedDevice & input);
+
+    // ----- Connection Management -----
+    /**
+     * @brief
+     *   Pair a CHIP device with the provided Rendezvous connection parameters.
+     *   Use registered DevicePairingDelegate object to receive notifications on
+     *   pairing status updates.
+     *
+     *   Note: Pairing process requires that the caller has registered PersistentStorageDelegate
+     *         in the Init() call.
+     *
+     * @param[in] setupPINCode  The PIN code of the peer device
+     *
+     * @return CHIP_ERROR       The connection status
+     */
+    CHIP_ERROR PairDeviceOverIP(Transport::PeerAddress address, uint32_t setupPINCode);
+
+    /**
+     * @brief
+     *   Pair a CHIP device with the provided Rendezvous connection parameters.
+     *   Use registered DevicePairingDelegate object to receive notifications on
+     *   pairing status updates.
+     *
+     *   Note: Pairing process requires that the caller has registered PersistentStorageDelegate
+     *         in the Init() call.
+     *
+     * @param[in] setupPINCode  The PIN code of the peer device
+     *
+     * @return CHIP_ERROR       The connection status
+     */
+    CHIP_ERROR PairDeviceOverBle(uint16_t mDiscriminator, uint32_t setupPINCode);
+
+    /**
+     * @brief
+     *   This function stops a pairing process that's in progress. It does not delete the pairing of a previously
+     *   paired device.
+     *
+     * @param[in] error                 Reason to stop the pairing procedure
+     *
+     * @return CHIP_ERROR               CHIP_NO_ERROR on success, or corresponding error
+     */
+    CHIP_ERROR StopPairing(CHIP_ERROR error);
+
+    //////////// SessionEstablishmentDelegate Implementation ///////////////
+    CHIP_ERROR SendSessionEstablishmentMessage(const PacketHeader & header, const Transport::PeerAddress & peerAddress, System::PacketBufferHandle msgBuf) override;
+    void OnSessionEstablishmentError(CHIP_ERROR error) override;
+    void OnSessionEstablished() override;
+
+    // Handle unsure pairing message
+    void OnMessageReceived(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress, System::PacketBufferHandle msg);
 
     /**
      * @brief
@@ -232,12 +295,12 @@ public:
 
     void SetActive(bool active) { mActive = active; }
 
-    bool IsSecureConnected() const { return IsActive() && mState == ConnectionState::SecureConnected; }
+    bool IsSecureConnected() const { return IsActive() && mState == DeviceState::SecureConnected; }
 
     void Reset()
     {
         SetActive(false);
-        mState          = ConnectionState::NotConnected;
+        mState          = DeviceState::NotConnected;
         mSessionManager = nullptr;
         mStatusDelegate = nullptr;
         mInetLayer      = nullptr;
@@ -247,16 +310,13 @@ public:
 
     bool MatchesSession(SecureSessionHandle session) const { return mSecureSession == session; }
 
-    void SetAddress(const Inet::IPAddress & deviceAddr) { mDeviceAddr = deviceAddr; }
-
-    PASESessionSerializable & GetPairing() { return mPairing; }
-
     void AddResponseHandler(EndpointId endpoint, ClusterId cluster, Callback::Callback<> * onResponse);
     void AddReportHandler(EndpointId endpoint, ClusterId cluster, Callback::Callback<> * onReport);
 
 private:
-    enum class ConnectionState
+    enum class DeviceState
     {
+        Loaded,
         NotConnected,
         Connecting,
         SecureConnected,
@@ -288,12 +348,14 @@ private:
     Inet::InetLayer * mInetLayer;
 
     bool mActive;
-    ConnectionState mState;
+    DeviceState mState;
 
     PASESessionSerializable mPairing;
 
     DeviceStatusDelegate * mStatusDelegate;
+    DevicePairingDelegate * mPairingDelegate;
 
+    DeviceController * mDeviceController;
     SecureSessionMgr * mSessionManager;
 
     DeviceTransportMgr * mTransportMgr;
@@ -301,6 +363,8 @@ private:
     app::CommandSender * mCommandSender;
 
     SecureSessionHandle mSecureSession = {};
+
+    PASESession * mPASESession;
 
     /* Track all outstanding response callbacks for this device. The callbacks are
        registered when a command is sent to the device, to get notified with the results. */

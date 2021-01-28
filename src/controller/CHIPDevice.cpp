@@ -26,6 +26,7 @@
 
 #include <controller/CHIPDevice.h>
 
+#include <controller/CHIPDeviceController.h>
 #if CONFIG_DEVICE_LAYER
 #include <platform/CHIPDeviceLayer.h>
 #endif
@@ -64,7 +65,7 @@ CHIP_ERROR Device::SendMessage(System::PacketBufferHandle buffer)
     VerifyOrExit(!buffer.IsNull(), err = CHIP_ERROR_INVALID_ARGUMENT);
 
     // If there is no secure connection to the device, try establishing it
-    if (mState != ConnectionState::SecureConnected)
+    if (mState != DeviceState::SecureConnected)
     {
         err = LoadSecureSessionParameters(ResetTransport::kNo);
         SuccessOrExit(err);
@@ -82,9 +83,9 @@ CHIP_ERROR Device::SendMessage(System::PacketBufferHandle buffer)
 
     // The send could fail due to network timeouts (e.g. broken pipe)
     // Try sesion resumption if needed
-    if (err != CHIP_NO_ERROR && !resend.IsNull() && mState == ConnectionState::SecureConnected)
+    if (err != CHIP_NO_ERROR && !resend.IsNull() && mState == DeviceState::SecureConnected)
     {
-        mState = ConnectionState::NotConnected;
+        mState = DeviceState::NotConnected;
 
         err = LoadSecureSessionParameters(ResetTransport::kYes);
         SuccessOrExit(err);
@@ -125,7 +126,7 @@ CHIP_ERROR Device::Serialize(SerializedDevice & output)
     static_assert(sizeof(serializable.mDeviceAddr) <= INET6_ADDRSTRLEN, "Size of device address must fit within INET6_ADDRSTRLEN");
     mDeviceAddr.ToString(Uint8::to_char(serializable.mDeviceAddr), sizeof(serializable.mDeviceAddr));
 
-    serializedLen = chip::Base64Encode(Uint8::to_const_uchar(reinterpret_cast<uint8_t *>(&serializable)),
+    serializedLen = Base64Encode(Uint8::to_const_uchar(reinterpret_cast<uint8_t *>(&serializable)),
                                        static_cast<uint16_t>(sizeof(serializable)), Uint8::to_char(output.inner));
     VerifyOrExit(serializedLen > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(serializedLen < sizeof(output.inner), error = CHIP_ERROR_INVALID_ARGUMENT);
@@ -179,26 +180,27 @@ CHIP_ERROR Device::Deserialize(const SerializedDevice & input)
         VerifyOrExit(CHIP_NO_ERROR == inetErr, error = CHIP_ERROR_INTERNAL);
     }
 
+    mState = DeviceState::Loaded;
 exit:
     return error;
 }
 
 void Device::OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr)
 {
-    mState         = ConnectionState::SecureConnected;
+    mState         = DeviceState::SecureConnected;
     mSecureSession = session;
 }
 
 void Device::OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * mgr)
 {
-    mState         = ConnectionState::NotConnected;
+    mState         = DeviceState::NotConnected;
     mSecureSession = SecureSessionHandle{};
 }
 
 void Device::OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, SecureSessionHandle session,
                                System::PacketBufferHandle msgBuf, SecureSessionMgr * mgr)
 {
-    if (mState == ConnectionState::SecureConnected)
+    if (mState == DeviceState::SecureConnected)
     {
         if (mStatusDelegate != nullptr)
         {
@@ -249,7 +251,7 @@ CHIP_ERROR Device::LoadSecureSessionParameters(ResetTransport resetNeeded)
     CHIP_ERROR err = CHIP_NO_ERROR;
     PASESession pairingSession;
 
-    if (mSessionManager == nullptr || mState == ConnectionState::SecureConnected)
+    if (mSessionManager == nullptr || mState != DeviceState::Loaded)
     {
         ExitNow(err = CHIP_ERROR_INCORRECT_STATE);
     }
@@ -285,7 +287,7 @@ exit:
 
 bool Device::GetIpAddress(Inet::IPAddress & addr) const
 {
-    if (mState == ConnectionState::NotConnected)
+    if (mState == DeviceState::NotConnected)
         return false;
     addr = mDeviceAddr;
     return true;
@@ -313,6 +315,97 @@ void Device::AddReportHandler(EndpointId endpoint, ClusterId cluster, Callback::
     cancelable->mInfoScalar = 0;
     memmove(&cancelable->mInfoScalar, &info, sizeof(info));
     mReports.Enqueue(cancelable);
+}
+
+CHIP_ERROR Device::PairDeviceOverIP(Transport::PeerAddress address, uint32_t setupPINCode)
+{
+    CHIP_ERROR err  = CHIP_NO_ERROR;
+
+    VerifyOrExit(mState == DeviceState::NotConnected, err = CHIP_ERROR_INCORRECT_STATE);
+    mState = DeviceState::Connecting;
+
+    mPASESession = Platform::New<PASESession>();
+    VerifyOrExit(mPASESession != nullptr, err = CHIP_ERROR_NO_MEMORY);
+
+    err = mPASESession->Pair(address, setupPINCode, Optional<NodeId>(mDeviceController->GetLocalNodeId()), mDeviceId, mDeviceController->GetNextKeyId(), this);
+    SuccessOrExit(err);
+
+    mDeviceAddr = address.GetIPAddress();
+    mDevicePort = address.GetPort();
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        Platform::Delete(mPASESession);
+        mPASESession = nullptr;
+        if (mPairingDelegate != nullptr) mPairingDelegate->OnPairingDeleted(err);
+    }
+
+    return err;
+}
+
+CHIP_ERROR Device::StopPairing(CHIP_ERROR error)
+{
+    CHIP_ERROR err  = CHIP_NO_ERROR;
+
+    VerifyOrExit(mState == DeviceState::Connecting, err = CHIP_ERROR_INCORRECT_STATE);
+    mState = DeviceState::NotConnected;
+
+    if (mPASESession != nullptr)
+    {
+        Platform::Delete(mPASESession);
+        mPASESession = nullptr;
+        if (mPairingDelegate != nullptr) mPairingDelegate->OnPairingDeleted(error);
+    }
+
+exit:
+    return err;
+}
+
+CHIP_ERROR Device::SendSessionEstablishmentMessage(const PacketHeader & header, const Transport::PeerAddress & peerAddress, System::PacketBufferHandle msgBuf)
+{
+    return mTransportMgr->SendMessage(header, peerAddress, std::move(msgBuf));
+}
+
+void Device::OnSessionEstablishmentError(CHIP_ERROR error)
+{
+    if (mState != DeviceState::Connecting) return;
+    if (mPairingDelegate != nullptr) mPairingDelegate->OnPairingComplete(error);
+    StopPairing(error);
+}
+
+void Device::OnSessionEstablished()
+{
+    if (mState != DeviceState::Connecting) return;
+
+    if (mPASESession == nullptr)
+    {
+        if (mPairingDelegate!= nullptr) mPairingDelegate->OnPairingComplete(CHIP_ERROR_INCORRECT_STATE);
+        return;
+    }
+
+    mPASESession->ToSerializable(mPairing);
+    mSessionManager->NewPairing(Optional<Transport::PeerAddress>::Value(mPASESession->PeerConnection().GetPeerAddress()),
+        mPASESession->PeerConnection().GetPeerNodeId(), mPASESession, nullptr);
+
+    mState = DeviceState::SecureConnected;
+
+    InitCommandSender();
+
+    if (mPairingDelegate != nullptr) mPairingDelegate->OnPairingComplete(CHIP_NO_ERROR);
+
+    Platform::Delete(mPASESession);
+    mPASESession = nullptr;
+    if (mPairingDelegate != nullptr) mPairingDelegate->OnPairingDeleted(CHIP_NO_ERROR);
+}
+
+void Device::OnMessageReceived(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress, System::PacketBufferHandle msg)
+{
+    if (mState != DeviceState::Connecting) return;
+    if (mPASESession != nullptr)
+    {
+        mPASESession->HandlePeerMessage(packetHeader, peerAddress, std::move(msg));
+    }
 }
 
 } // namespace Controller
