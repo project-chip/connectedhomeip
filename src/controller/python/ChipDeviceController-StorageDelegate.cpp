@@ -64,15 +64,14 @@ CHIP_ERROR PythonPersistentStorageDelegate::GetKeyValue(const char * key, char *
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    strncpy(value, val->second.c_str(), val->second.size() + 1);
+    memcpy(value, val->second.c_str(), val->second.size() + 1);
     return CHIP_NO_ERROR;
 }
 
 void PythonPersistentStorageDelegate::SetKeyValue(const char * key, const char * value)
 {
     mStorage[key] = value;
-    ChipLogDetail(Controller, "SetKeyValue: K=%s", key);
-    ChipLogDetail(Controller, "SetKeyValue: V=%s", value);
+    ChipLogDetail(Controller, "SetKeyValue: %s=%s", key, value);
     mDelegate->OnStatus(key, PersistentStorageResultDelegate::Operation::kSET, CHIP_NO_ERROR);
 }
 
