@@ -41,7 +41,7 @@ NSString * const kCHIPNumLightOnOffCluster = @"OnOffViewController_NumLights";
 @implementation OnOffViewController {
     dispatch_queue_t _callbackQueue;
     NSArray *_numLightsOptions;
-    
+
 }
 
 // MARK: UIViewController methods
@@ -49,10 +49,10 @@ NSString * const kCHIPNumLightOnOffCluster = @"OnOffViewController_NumLights";
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    
+
     UITapGestureRecognizer * tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dismissKeyboard)];
     [self.view addGestureRecognizer:tap];
-    
+
     [self setupUIElements];
 
     _persistentStorage = [[CHIPToolPersistentStorageDelegate alloc] init];
@@ -87,7 +87,7 @@ NSString * const kCHIPNumLightOnOffCluster = @"OnOffViewController_NumLights";
     // Title
     _titleLabel = [CHIPUIViewUtils addTitle:@"On Off Cluster" toView:self.view];
     [self setupStackView];
-    
+
 }
 
 - (void)setupStackView
@@ -106,7 +106,7 @@ NSString * const kCHIPNumLightOnOffCluster = @"OnOffViewController_NumLights";
     [stackView.topAnchor constraintEqualToAnchor:_titleLabel.bottomAnchor constant:30].active = YES;
     [stackView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:30].active = YES;
     [stackView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-30].active = YES;
-    
+
     // Num lights to show[
     [self setupNumberOfLightsFromDefaults];
     UILabel *numLightsLabel = [UILabel new];
@@ -121,7 +121,7 @@ NSString * const kCHIPNumLightOnOffCluster = @"OnOffViewController_NumLights";
     _numLightsTextField.delegate = self;
     UIView *numLightsView = [CHIPUIViewUtils viewWithLabel:numLightsLabel textField:_numLightsTextField];
     numLightsLabel.font = [UIFont systemFontOfSize:17 weight:UIFontWeightSemibold];
-    
+
     UIToolbar* keyboardDoneButtonView = [[UIToolbar alloc] init];
     [keyboardDoneButtonView sizeToFit];
     UIBarButtonItem* doneButton = [[UIBarButtonItem alloc] initWithTitle:@"Done"
@@ -130,7 +130,7 @@ NSString * const kCHIPNumLightOnOffCluster = @"OnOffViewController_NumLights";
     UIBarButtonItem *flexible = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:self action:nil];
     [keyboardDoneButtonView setItems:[NSArray arrayWithObjects:flexible, doneButton, nil]];
     _numLightsTextField.inputAccessoryView = keyboardDoneButtonView;
-    
+
     [stackView addArrangedSubview:numLightsView];
     numLightsView.translatesAutoresizingMaskIntoConstraints = false;
     [numLightsView.trailingAnchor constraintEqualToAnchor:stackView.trailingAnchor].active = true;
@@ -261,14 +261,14 @@ NSString * const kCHIPNumLightOnOffCluster = @"OnOffViewController_NumLights";
     UIButton * button = (UIButton *) sender;
     NSInteger lightNumber = button.tag;
     NSLog(@"Light %@ on button pressed.", @(lightNumber));
-    
+
     if (lightNumber <= [_onOffClusters count]) {
         CHIPOnOff *onOff = [_onOffClusters objectAtIndex:(lightNumber - 1)];
         [onOff on:completionHandler];
     } else {
         NSLog(@"No cluster initated at endpoint %@.", @(lightNumber));
     }
-    
+
 }
 
 - (IBAction)offButtonTapped:(id)sender
@@ -280,7 +280,7 @@ NSString * const kCHIPNumLightOnOffCluster = @"OnOffViewController_NumLights";
     UIButton * button = (UIButton *) sender;
     NSInteger lightNumber = button.tag;
     NSLog(@"Light %@ off button pressed.", @(lightNumber));
-    
+
     if (lightNumber <= [_onOffClusters count]) {
         CHIPOnOff *onOff = [_onOffClusters objectAtIndex:(lightNumber - 1)];
         [onOff off:completionHandler];
@@ -298,7 +298,7 @@ NSString * const kCHIPNumLightOnOffCluster = @"OnOffViewController_NumLights";
     UIButton * button = (UIButton *) sender;
     NSInteger lightNumber = button.tag;
     NSLog(@"Light %@ toggle button pressed.", @(lightNumber));
-    
+
     if (lightNumber <= [_onOffClusters count]) {
         CHIPOnOff *onOff = [_onOffClusters objectAtIndex:(lightNumber - 1)];
         [onOff toggle:completionHandler];
