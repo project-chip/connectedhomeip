@@ -16,6 +16,7 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
 import("${build_root}/chip/tools.gni")
+import("${chip_root}/src/app/common_flags.gni")
 
 assert(chip_build_tools)
 
@@ -40,6 +41,10 @@ executable("chip-tool-server") {
     defines = [ "BUILD_RELEASE=0" ]
   } else {
     defines = [ "BUILD_RELEASE=1" ]
+  }
+
+  if (chip_app_use_interaction_model) {
+    defines += [ "CHIP_APP_USE_INTERACTION_MODEL" ]
   }
 
   public_configs = [ ":includes" ]

@@ -79,6 +79,8 @@ public:
 
     CHIP_ERROR SetUdpListenPort(uint16_t listenPort);
 
+    chip::Controller::DeviceController * GetDeviceController() { return &mCommissioner; }
+
     // ----- Connection Management -----
     /**
      * @brief

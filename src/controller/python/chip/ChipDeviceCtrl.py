@@ -31,6 +31,7 @@ import time
 from threading import Thread
 from ctypes import *
 from .ChipStack import *
+from .ChipCluster import *
 import enum
 
 
@@ -117,6 +118,8 @@ class ChipDeviceController(object):
         self.cbHandleBleWriteChar = None
         self.cbHandleBleSubscribeChar = None
         self.cbHandleBleClose = None
+        self._Cluster = ChipCluster(self._ChipStack)
+        self._Cluster.InitLib(self._dmLib)
 
         def DeviceCtrlHandleMessage(appReqState, buffer):
             pass
@@ -233,6 +236,16 @@ class ChipDeviceController(object):
                 self.devCtrl, ipaddr, setupPinCode, onConnectFunct, self.cbHandleMessage, self.cbHandleRendezvousError)
         )
 
+    def ZCLSend(self, cluster, command, nodeid, endpoint, groupid, args):
+        device = c_void_p(None)
+        self._ChipStack.Call(
+            lambda: self._dmLib.nl_Chip_GetDeviceByNodeId(self.devCtrl, nodeid, pointer(device))
+        )
+        self._Cluster.SendCommand(device, cluster, command, endpoint, groupid, args)
+
+    def ZCLList(self):
+        return self._Cluster.ListClusters()
+
     def Close(self):
         self._ChipStack.Call(
             lambda: self._dmLib.nl_Chip_DeviceController_Close(self.devCtrl)
@@ -340,3 +353,6 @@ class ChipDeviceController(object):
 
             self._dmLib.nl_Chip_DeviceController_SetDevicePairingDelegate.argtypes = [c_void_p, c_void_p]
             self._dmLib.nl_Chip_DeviceController_SetDevicePairingDelegate.restype = c_uint32
+
+            self._dmLib.nl_Chip_GetDeviceByNodeId.argtypes = [c_void_p, c_uint64, POINTER(c_void_p)]
+            self._dmLib.nl_Chip_GetDeviceByNodeId.restype = c_uint32

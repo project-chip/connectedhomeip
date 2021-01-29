@@ -35,6 +35,7 @@
 #include <lwip/tcpip.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
+#include <app/CommandSender.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPEncoding.h>
 #include <core/CHIPSafeCasts.h>
@@ -42,6 +43,7 @@
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
+#include <support/ReturnMacros.h>
 #include <support/SafeInt.h>
 #include <support/logging/CHIPLogging.h>
 
@@ -94,6 +96,12 @@ CHIP_ERROR Device::SendMessage(System::PacketBufferHandle buffer)
 
 exit:
     return err;
+}
+
+CHIP_ERROR Device::SendCommands()
+{
+    VerifyOrReturnError(mCommandSender != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    return mCommandSender->SendCommandRequest(mDeviceId);
 }
 
 CHIP_ERROR Device::Serialize(SerializedDevice & output)

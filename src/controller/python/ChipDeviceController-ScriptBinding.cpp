@@ -46,6 +46,9 @@
 #include "ChipDeviceController-ScriptDevicePairingDelegate.h"
 #include "ChipDeviceController-StorageDelegate.h"
 
+#include <app/CommandSender.h>
+#include <app/InteractionModelEngine.h>
+#include <controller/CHIPDevice.h>
 #include <controller/CHIPDeviceController_deprecated.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
@@ -202,6 +205,9 @@ CHIP_ERROR nl_Chip_Stack_Shutdown();
 const char * nl_Chip_Stack_ErrorToString(CHIP_ERROR err);
 const char * nl_Chip_Stack_StatusReportToString(uint32_t profileId, uint16_t statusCode);
 void nl_Chip_Stack_SetLogFunct(LogMessageFunct logFunct);
+
+CHIP_ERROR nl_Chip_GetDeviceByNodeId(chip::DeviceController::ChipDeviceController * devCtrl, chip::NodeId nodeId,
+                                     chip::Controller::Device ** device);
 }
 
 CHIP_ERROR nl_Chip_DeviceController_NewDeviceController(chip::DeviceController::ChipDeviceController ** outDevCtrl)
@@ -711,6 +717,12 @@ const char * nl_Chip_Stack_StatusReportToString(uint32_t profileId, uint16_t sta
 {
     // return chip::StatusReportStr(profileId, statusCode);
     return NULL;
+}
+
+CHIP_ERROR nl_Chip_GetDeviceByNodeId(chip::DeviceController::ChipDeviceController * devCtrl, chip::NodeId nodeId,
+                                     chip::Controller::Device ** device)
+{
+    return devCtrl->GetDeviceController()->GetDevice(nodeId, device);
 }
 
 #if _CHIP_USE_LOGGING && CHIP_LOG_ENABLE_DYNAMIC_LOGING_FUNCTION

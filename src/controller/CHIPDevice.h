@@ -26,6 +26,8 @@
 
 #pragma once
 
+#include <app/CommandSender.h>
+#include <app/InteractionModelEngine.h>
 #include <app/util/basic-types.h>
 #include <core/CHIPCallback.h>
 #include <core/CHIPCore.h>
@@ -55,7 +57,14 @@ class DLL_EXPORT Device
 {
 public:
     Device() : mInterface(INET_NULL_INTERFACEID), mActive(false), mState(ConnectionState::NotConnected) {}
-    ~Device() {}
+    ~Device()
+    {
+        if (mCommandSender != nullptr)
+        {
+            mCommandSender->Shutdown();
+            mCommandSender = nullptr;
+        }
+    }
 
     /**
      * @brief
@@ -77,6 +86,29 @@ public:
      * @return CHIP_ERROR   CHIP_NO_ERROR on success, or corresponding error
      */
     CHIP_ERROR SendMessage(System::PacketBufferHandle message);
+
+    /**
+     * @brief
+     *   Send the command in internal command sender.
+     */
+    CHIP_ERROR SendCommands();
+
+    /**
+     * @brief
+     *   Initialize internal command sender, required for sending commands over interaction model.
+     */
+    void InitCommandSender()
+    {
+        if (mCommandSender != nullptr)
+        {
+            mCommandSender->Shutdown();
+            mCommandSender = nullptr;
+        }
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+        chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&mCommandSender);
+#endif
+    }
+    app::CommandSender * GetCommandSender() { return mCommandSender; }
 
     /**
      * @brief
@@ -265,6 +297,8 @@ private:
     SecureSessionMgr * mSessionManager;
 
     DeviceTransportMgr * mTransportMgr;
+
+    app::CommandSender * mCommandSender;
 
     SecureSessionHandle mSecureSession = {};
 
