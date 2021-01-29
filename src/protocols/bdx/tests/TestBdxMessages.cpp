@@ -21,7 +21,7 @@ void TestHelperWrittenAndParsedMatch(nlTestSuite * inSuite, void * inContext, Ms
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     size_t msgSize                    = testMsg.MessageSize();
-    System::PacketBufferHandle msgBuf = System::PacketBuffer::NewWithAvailableSize(static_cast<uint16_t>(msgSize));
+    System::PacketBufferHandle msgBuf = System::PacketBufferHandle::New(static_cast<uint16_t>(msgSize));
     NL_TEST_ASSERT(inSuite, !msgBuf.IsNull());
 
     BufBound bbuf(msgBuf->Start(), msgBuf->AvailableDataLength());
@@ -29,10 +29,8 @@ void TestHelperWrittenAndParsedMatch(nlTestSuite * inSuite, void * inContext, Ms
     NL_TEST_ASSERT(inSuite, bbuf.Fit());
     msgBuf->SetDataLength(static_cast<uint16_t>(bbuf.Needed()));
 
-    System::PacketBufferHandle rcvBuf = System::PacketBuffer::NewWithAvailableSize(static_cast<uint16_t>(msgSize));
+    System::PacketBufferHandle rcvBuf = System::PacketBufferHandle::NewWithData(msgBuf->Start(), msgSize);
     NL_TEST_ASSERT(inSuite, !rcvBuf.IsNull());
-    memcpy(rcvBuf->Start(), msgBuf->Start(), msgSize);
-    rcvBuf->SetDataLength(static_cast<uint16_t>(msgSize));
 
     MsgType testMsgRcvd;
     err = testMsgRcvd.Parse(std::move(rcvBuf));

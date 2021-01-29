@@ -559,6 +559,11 @@ public:
     OnTCPSendIdleChangedFunct OnTCPSendIdleChanged;
 #endif // INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
 
+    /**
+     * Size of the largest TCP packet that can be received.
+     */
+    constexpr static size_t kMaxReceiveMessageSize = System::kMaxPacketBufferSizeWithoutReserve;
+
 private:
     static chip::System::ObjectPool<TCPEndPoint, INET_CONFIG_NUM_TCP_ENDPOINTS> sPool;
 

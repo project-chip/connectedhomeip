@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2019 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -822,11 +822,8 @@ void BLEManagerImpl::HandleRXCharWrite(volatile struct gecko_cmd_packet * evt)
     uint8_t * data    = (uint8_t *) evt->data.evt_gatt_server_user_write_request.value.data;
 
     // Copy the data to a packet buffer.
-    buf = System::PacketBuffer::New(0);
+    buf = System::PacketBufferHandle::NewWithData(data, writeLen, 0, 0);
     VerifyOrExit(!buf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
-    VerifyOrExit(buf->AvailableDataLength() >= writeLen, err = CHIP_ERROR_BUFFER_TOO_SMALL);
-    memcpy(buf->Start(), data, writeLen);
-    buf->SetDataLength(writeLen);
 
     ChipLogDetail(DeviceLayer, "Write request/command received for CHIPoBLE RX characteristic (con %" PRIu16 ", len %" PRIu16 ")",
                   evt->data.evt_gatt_server_user_write_request.connection, buf->DataLength());

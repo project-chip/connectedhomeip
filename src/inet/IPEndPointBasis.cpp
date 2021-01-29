@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2018 Google LLC.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -1068,7 +1068,7 @@ void IPEndPointBasis::HandlePendingIO(uint16_t aPort)
     lPacketInfo.Clear();
     lPacketInfo.DestPort = aPort;
 
-    lBuffer = System::PacketBuffer::New(0);
+    lBuffer = System::PacketBufferHandle::New(System::kMaxPacketBufferSizeWithoutReserve, 0);
 
     if (!lBuffer.IsNull())
     {
@@ -1169,6 +1169,7 @@ void IPEndPointBasis::HandlePendingIO(uint16_t aPort)
 
     if (lStatus == INET_NO_ERROR)
     {
+        lBuffer.RightSize();
         OnMessageReceived(this, std::move(lBuffer), &lPacketInfo);
     }
     else
@@ -1317,7 +1318,7 @@ void IPEndPointBasis::HandleDataReceived(const nw_connection_t & aConnection)
             if (content != NULL && OnMessageReceived != NULL)
             {
                 size_t count                              = dispatch_data_get_size(content);
-                System::PacketBufferHandle * packetBuffer = System::PacketBuffer::NewWithAvailableSize(count);
+                System::PacketBufferHandle * packetBuffer = System::PacketBufferHandle::New(count);
                 dispatch_data_apply(content, ^(dispatch_data_t data, size_t offset, const void * buffer, size_t size) {
                     memmove(packetBuffer->Start() + offset, buffer, size);
                     return true;

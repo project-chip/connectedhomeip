@@ -1094,7 +1094,7 @@ void BLEManagerImpl::HandleRXCharWrite(blekw_msg_t * msg)
     uint8_t * data                         = att_wr_data->data;
 
     // Copy the data to a PacketBuffer.
-    buf = PacketBuffer::NewWithAvailableSize(writeLen);
+    buf = System::PacketBufferHandle::New(writeLen);
     VerifyOrExit(!buf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
     VerifyOrExit(buf->AvailableDataLength() >= writeLen, err = CHIP_ERROR_BUFFER_TOO_SMALL);
     memcpy(buf->Start(), data, writeLen);
@@ -1112,7 +1112,7 @@ void BLEManagerImpl::HandleRXCharWrite(blekw_msg_t * msg)
         ChipDeviceEvent event;
         event.Type                        = DeviceEventType::kCHIPoBLEWriteReceived;
         event.CHIPoBLEWriteReceived.ConId = att_wr_data->device_id;
-        event.CHIPoBLEWriteReceived.Data  = buf.Release_ForNow();
+        event.CHIPoBLEWriteReceived.Data  = std::move(buf).UnsafeRelease();
         PlatformMgr().PostEvent(&event);
     }
 exit:

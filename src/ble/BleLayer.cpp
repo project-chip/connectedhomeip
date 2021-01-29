@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2014-2017 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -66,31 +66,9 @@
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 
-// clang-format off
-
-#define CAPABILITIES_REQUEST_MAGICNUM_LEN 2
-#define CAPABILITIES_REQUEST_L2CAP_MTU_LEN 2
-#define CAPABILITIES_REQUEST_SUPPORTED_VERSIONS_LEN 4
-#define CAPABILITIES_REQUEST_WINDOW_SIZE_LEN 1
-#define CAPABILITIES_REQUEST_LEN (CAPABILITIES_REQUEST_MAGICNUM_LEN + \
-                                  CAPABILITIES_REQUEST_L2CAP_MTU_LEN + \
-                                  CAPABILITIES_REQUEST_SUPPORTED_VERSIONS_LEN + \
-                                  CAPABILITIES_REQUEST_WINDOW_SIZE_LEN)
-
-#define CAPABILITIES_RESPONSE_MAGICNUM_LEN 2
-#define CAPABILITIES_RESPONSE_L2CAP_MTU_LEN 2
-#define CAPABILITIES_RESPONSE_SELECTED_PROTOCOL_VERSION_LEN 1
-#define CAPABILITIES_RESPONSE_WINDOW_SIZE_LEN 1
-#define CAPABILITIES_RESPONSE_LEN (CAPABILITIES_RESPONSE_MAGICNUM_LEN + \
-                                   CAPABILITIES_RESPONSE_L2CAP_MTU_LEN + \
-                                   CAPABILITIES_RESPONSE_SELECTED_PROTOCOL_VERSION_LEN + \
-                                   CAPABILITIES_RESPONSE_WINDOW_SIZE_LEN)
-
 // Magic values expected in first 2 bytes of valid BLE transport capabilities request or response:
 #define CAPABILITIES_MSG_CHECK_BYTE_1 'n'
 #define CAPABILITIES_MSG_CHECK_BYTE_2 'l'
-
-// clang-format on
 
 namespace chip {
 namespace Ble {
@@ -208,7 +186,7 @@ BLE_ERROR BleTransportCapabilitiesRequestMessage::Encode(const PacketBufferHandl
     BLE_ERROR err = BLE_NO_ERROR;
 
     // Verify we can write the fixed-length request without running into the end of the buffer.
-    VerifyOrExit(msgBuf->MaxDataLength() >= CAPABILITIES_REQUEST_LEN, err = BLE_ERROR_NO_MEMORY);
+    VerifyOrExit(msgBuf->MaxDataLength() >= kCapabilitiesRequestLength, err = BLE_ERROR_NO_MEMORY);
 
     chip::Encoding::Write8(p, CAPABILITIES_MSG_CHECK_BYTE_1);
     chip::Encoding::Write8(p, CAPABILITIES_MSG_CHECK_BYTE_2);
@@ -221,7 +199,7 @@ BLE_ERROR BleTransportCapabilitiesRequestMessage::Encode(const PacketBufferHandl
     chip::Encoding::LittleEndian::Write16(p, mMtu);
     chip::Encoding::Write8(p, mWindowSize);
 
-    msgBuf->SetDataLength(CAPABILITIES_REQUEST_LEN);
+    msgBuf->SetDataLength(kCapabilitiesRequestLength);
 
 exit:
     return err;
@@ -234,12 +212,12 @@ BLE_ERROR BleTransportCapabilitiesRequestMessage::Decode(const PacketBufferHandl
     BLE_ERROR err     = BLE_NO_ERROR;
 
     // Verify we can read the fixed-length request without running into the end of the buffer.
-    VerifyOrExit(msgBuf->DataLength() >= CAPABILITIES_REQUEST_LEN, err = BLE_ERROR_MESSAGE_INCOMPLETE);
+    VerifyOrExit(msgBuf->DataLength() >= kCapabilitiesRequestLength, err = BLE_ERROR_MESSAGE_INCOMPLETE);
 
     VerifyOrExit(CAPABILITIES_MSG_CHECK_BYTE_1 == chip::Encoding::Read8(p), err = BLE_ERROR_INVALID_MESSAGE);
     VerifyOrExit(CAPABILITIES_MSG_CHECK_BYTE_2 == chip::Encoding::Read8(p), err = BLE_ERROR_INVALID_MESSAGE);
 
-    for (int i = 0; i < CAPABILITIES_REQUEST_SUPPORTED_VERSIONS_LEN; i++)
+    for (size_t i = 0; i < kCapabilitiesRequestSupportedVersionsLength; i++)
     {
         msg.mSupportedProtocolVersions[i] = chip::Encoding::Read8(p);
     }
@@ -259,7 +237,7 @@ BLE_ERROR BleTransportCapabilitiesResponseMessage::Encode(const PacketBufferHand
     BLE_ERROR err = BLE_NO_ERROR;
 
     // Verify we can write the fixed-length request without running into the end of the buffer.
-    VerifyOrExit(msgBuf->MaxDataLength() >= CAPABILITIES_RESPONSE_LEN, err = BLE_ERROR_NO_MEMORY);
+    VerifyOrExit(msgBuf->MaxDataLength() >= kCapabilitiesResponseLength, err = BLE_ERROR_NO_MEMORY);
 
     chip::Encoding::Write8(p, CAPABILITIES_MSG_CHECK_BYTE_1);
     chip::Encoding::Write8(p, CAPABILITIES_MSG_CHECK_BYTE_2);
@@ -268,7 +246,7 @@ BLE_ERROR BleTransportCapabilitiesResponseMessage::Encode(const PacketBufferHand
     chip::Encoding::LittleEndian::Write16(p, mFragmentSize);
     chip::Encoding::Write8(p, mWindowSize);
 
-    msgBuf->SetDataLength(CAPABILITIES_RESPONSE_LEN);
+    msgBuf->SetDataLength(kCapabilitiesResponseLength);
 
 exit:
     return err;
@@ -281,7 +259,7 @@ BLE_ERROR BleTransportCapabilitiesResponseMessage::Decode(const PacketBufferHand
     BLE_ERROR err     = BLE_NO_ERROR;
 
     // Verify we can read the fixed-length response without running into the end of the buffer.
-    VerifyOrExit(msgBuf->DataLength() >= CAPABILITIES_RESPONSE_LEN, err = BLE_ERROR_MESSAGE_INCOMPLETE);
+    VerifyOrExit(msgBuf->DataLength() >= kCapabilitiesResponseLength, err = BLE_ERROR_MESSAGE_INCOMPLETE);
 
     VerifyOrExit(CAPABILITIES_MSG_CHECK_BYTE_1 == chip::Encoding::Read8(p), err = BLE_ERROR_INVALID_MESSAGE);
     VerifyOrExit(CAPABILITIES_MSG_CHECK_BYTE_2 == chip::Encoding::Read8(p), err = BLE_ERROR_INVALID_MESSAGE);
