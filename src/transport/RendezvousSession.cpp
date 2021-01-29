@@ -58,6 +58,12 @@ CHIP_ERROR RendezvousSession::Init(const RendezvousParameters & params, Transpor
     if (params.GetPeerAddress().GetTransportType() == Transport::Type::kBle)
 #if CONFIG_NETWORK_LAYER_BLE
     {
+        if (!mParams.IsController())
+        {
+            // Enable BLE advertisement
+            ReturnErrorOnFailure(chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(true));
+        }
+
         Transport::BLE * transport = chip::Platform::New<Transport::BLE>();
         mTransport                 = transport;
 
@@ -267,6 +273,14 @@ void RendezvousSession::UpdateState(RendezvousSession::State newState, CHIP_ERRO
     {
         ReleasePairingSessionHandle();
     }
+
+#if CONFIG_NETWORK_LAYER_BLE
+    if (!mParams.IsController() && mParams.GetPeerAddress().GetTransportType() == Transport::Type::kBle && newState == State::kInit)
+    {
+        // Enable BLE advertisement
+        chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(false);
+    }
+#endif
 }
 
 void RendezvousSession::OnRendezvousMessageReceived(const PacketHeader & packetHeader, const PeerAddress & peerAddress,
