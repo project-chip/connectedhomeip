@@ -164,11 +164,8 @@ class DeviceMgrCmd(Cmd):
 
     command_names = [
         "close",
-        "btp-connect",
+
         "ble-scan",
-        "ble-connect",
-        "ble-disconnect",
-        "ble-scan-connect",
         "ble-adapter-select",
         "ble-adapter-print",
         "ble-debug-log",
@@ -353,70 +350,10 @@ class DeviceMgrCmd(Cmd):
 
         return
 
-    def do_bleconnect(self, line):
-        """
-        ble-connect <device-name>
-        ble-connect <mac-address (linux only)>
-        ble-connect <device-uuid>
-        ble-connect <discriminator>
-
-        Connect to a BLE peripheral identified by line.
-        """
-
-        if not self.bleMgr:
-            self.bleMgr = BleManager(self.devCtrl)
-        self.bleMgr.connect(line)
-
-        return
-
-    def do_blescanconnect(self, line):
-        """
-        ble-scan-connect <device-name>
-        ble-scan-connect <mac-address (linux only)>
-        ble-scan-connect <device-uuid>
-        ble-scan-connect <discriminator>
-
-        Scan and connect to a BLE peripheral identified by line.
-        """
-
-        if not self.bleMgr:
-            self.bleMgr = BleManager(self.devCtrl)
-
-        self.bleMgr.scan_connect(line)
-
-        return
-
-    def do_bledisconnect(self, line):
-        """
-        ble-disconnect
-
-        Disconnect from a BLE peripheral.
-        """
-
-        if not self.bleMgr:
-            self.bleMgr = BleManager(self.devCtrl)
-
-        self.bleMgr.disconnect()
-
-        return
-
-    def do_btpconnect(self, line):
-        """
-        connect .
-
-        """
-        try:
-            self.devCtrl.ConnectBle(bleConnection=FAKE_CONN_OBJ_VALUE)
-        except ChipExceptions.ChipStackException as ex:
-            print(str(ex))
-            return
-
-        print("BTP Connected")
-
     def do_connect(self, line):
         """
         connect -ip <ip address> <setup pin code>
-        connect -ble <setup pin code>
+        connect -ble <discriminator> <setup pin code>
 
         connect command is used for establishing a rendezvous session to the device.
         currently, only connect using setupPinCode is supported.
@@ -433,8 +370,8 @@ class DeviceMgrCmd(Cmd):
                 return
             if args[0] == "-ip" and len(args) == 3:
                 self.devCtrl.ConnectIP(args[1].encode("utf-8"), int(args[2]))
-            elif args[0] == "-ble" and len(args) == 2:
-                self.devCtrl.Connect(FAKE_CONN_OBJ_VALUE, int(args[1]))
+            elif args[0] == "-ble" and len(args) == 3:
+                self.devCtrl.ConnectBLE(int(args[1]), int(args[2]))
             else:
                 print("Usage:")
                 self.do_help("connect SetupPinCode")
