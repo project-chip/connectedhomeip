@@ -103,7 +103,7 @@ void SendAndVerifyArbitraryBlock(nlTestSuite * inSuite, void * inContext, Transf
     uint16_t maxBlockSize    = sender.GetTransferBlockSize();
 
     NL_TEST_ASSERT(inSuite, maxBlockSize > 0);
-    System::PacketBufferHandle fakeDataBuf = System::PacketBuffer::NewWithAvailableSize(maxBlockSize);
+    System::PacketBufferHandle fakeDataBuf = System::PacketBufferHandle::New(maxBlockSize);
     if (fakeDataBuf.IsNull())
     {
         NL_TEST_ASSERT(inSuite, false);

@@ -24,7 +24,7 @@ CHIP_ERROR WriteToPacketBuffer(const BdxMsgType & msgStruct, ::chip::System::Pac
 {
     CHIP_ERROR err     = CHIP_NO_ERROR;
     size_t msgDataSize = msgStruct.MessageSize();
-    msgBuf             = ::chip::System::PacketBuffer::NewWithAvailableSize(static_cast<uint16_t>(msgDataSize));
+    msgBuf             = ::chip::System::PacketBufferHandle::New(static_cast<uint16_t>(msgDataSize));
     if (msgBuf.IsNull())
     {
         return CHIP_ERROR_NO_MEMORY;
