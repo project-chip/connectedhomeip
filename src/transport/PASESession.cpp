@@ -175,6 +175,9 @@ CHIP_ERROR PASESession::Init(Optional<NodeId> myNodeId, uint16_t myKeyId, uint32
 
     VerifyOrExit(delegate != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
+    // Reset any state maintained by PASESession object (in case it's being reused for pairing)
+    Clear();
+
     err = mCommissioningHash.Begin();
     SuccessOrExit(err);
 
