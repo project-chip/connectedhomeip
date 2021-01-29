@@ -136,8 +136,8 @@ generated_file("lock_app_flashbundle") {
 
 group("efr32") {
   deps = [
-     ":lock_app",
-     ":lock_app_flashbundle",
+    ":lock_app",
+    ":lock_app_flashbundle",
   ]
 }
 
