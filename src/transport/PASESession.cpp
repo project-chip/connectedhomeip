@@ -174,12 +174,6 @@ CHIP_ERROR PASESession::Init(Optional<NodeId> myNodeId, uint16_t myKeyId, uint32
 
     VerifyOrExit(delegate != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    err = mCommissioningHash.Begin();
-    SuccessOrExit(err);
-
-    err = mCommissioningHash.AddData(Uint8::from_const_char(kSpake2pContext), strlen(kSpake2pContext));
-    SuccessOrExit(err);
-
     mDelegate    = delegate;
     mLocalNodeId = myNodeId.ValueOr(kUndefinedNodeId);
     mConnectionState.SetLocalKeyID(myKeyId);
