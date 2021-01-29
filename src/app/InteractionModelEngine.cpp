@@ -238,12 +238,10 @@ CHIP_ERROR InteractionModelEngine::DeregisterClusterCommandHandler(chip::Cluster
     HandlersMapType::iterator handlerIt = mHandlersMap.find(HandlerKey(aClusterId, aCommandId, aCommandRoleId));
     if (handlerIt != mHandlersMap.end())
     {
-        CommandCbFunct pDispatcher = handlerIt->second;
-
         ChipLogDetail(DataManagement,
                       "DeregisterClusterCommandHandler unregistered handler for ClusterId = %d, CommandId = %d, CommandRoleId "
                       "= %d, Dispatcher = %p",
-                      aClusterId, aCommandId, aCommandRoleId, (void *) pDispatcher);
+                      aClusterId, aCommandId, aCommandRoleId, (void *)handlerIt->second);
         mHandlersMap.erase(handlerIt);
     }
     else
