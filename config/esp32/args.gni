@@ -15,8 +15,6 @@
 # Options from standalone-chip.mk that differ from configure defaults. These
 # options are used from examples/.
 
-#import("//build_overrides/chip.gni")
-
 chip_device_platform = "esp32"
 
 chip_project_config_include = ""

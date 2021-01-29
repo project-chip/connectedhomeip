@@ -20,7 +20,7 @@
 #include <setup_payload/SetupPayload.h>
 
 void PrintQRCode(chip::RendezvousInformationFlags rendezvousFlags);
-CHIP_ERROR GetQRCode(uint32_t & setupPinCode, std::string & QRCode, chip::RendezvousInformationFlags rendezvousFlags);
+CHIP_ERROR GetQRCode(std::string & QRCode, chip::RendezvousInformationFlags rendezvousFlags);
 
 /**
  * Initialize DataModelHandler and start CHIP datamodel server, the server

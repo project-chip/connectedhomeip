@@ -17,6 +17,7 @@
 
 #include <app/server/Server.h>
 
+#include <app/InteractionModelEngine.h>
 #include <app/server/DataModelHandler.h>
 #include <app/server/RendezvousServer.h>
 #include <app/server/SessionManager.h>
@@ -26,6 +27,7 @@
 #include <inet/InetError.h>
 #include <inet/InetLayer.h>
 #include <mdns/Advertiser.h>
+#include <messaging/ExchangeMgr.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/SetupPayload.h>
 #include <support/CodeUtils.h>
@@ -40,6 +42,7 @@ using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::Transport;
 using namespace ::chip::DeviceLayer;
+using namespace ::chip::Messaging;
 
 namespace {
 
@@ -167,6 +170,9 @@ CHIP_ERROR InitMdns()
 #endif
 
 DemoTransportMgr gTransports;
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+Messaging::ExchangeManager gExchange;
+#endif
 SecureSessionMgr gSessions;
 ServerCallback gCallbacks;
 SecurePairingUsingTestSecret gTestPairing;
@@ -202,6 +208,15 @@ void InitServer(AppDelegate * delegate)
     err = gSessions.Init(chip::kTestDeviceNodeId, &DeviceLayer::SystemLayer, &gTransports);
     SuccessOrExit(err);
 
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    err = gExchange.Init(&gSessions);
+    SuccessOrExit(err);
+    err = chip::app::InteractionModelEngine::GetInstance()->Init(&gExchange);
+    SuccessOrExit(err);
+#else
+    gSessions.SetDelegate(&gCallbacks);
+#endif
+
     // This flag is used to bypass BLE in the cirque test
     // Only in the cirque test this is enabled with --args='bypass_rendezvous=true'
     if (isRendezvousBypassed())
@@ -223,17 +238,13 @@ void InitServer(AppDelegate * delegate)
 #else
         params.SetSetupPINCode(pinCode);
 #endif // CONFIG_NETWORK_LAYER_BLE
-        SuccessOrExit(err = gRendezvousServer.Init(params, &gTransports));
+        SuccessOrExit(err = gRendezvousServer.Init(params, &gTransports, &gSessions));
     }
 
 #if CHIP_ENABLE_MDNS
     err = InitMdns();
     SuccessOrExit(err);
 #endif
-
-    gSessions.SetDelegate(&gCallbacks);
-    err = gSessions.NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing);
-    SuccessOrExit(err);
 
 exit:
     if (err != CHIP_NO_ERROR)

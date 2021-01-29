@@ -67,6 +67,10 @@ set(CHIP_CFLAG_EXCLUDES
 # Helper macros
 # ==============================================================================
 
+macro(chip_gn_arg_import FILE)
+    string(APPEND CHIP_GN_ARGS "import(\"${FILE}\")\n")
+endmacro()
+
 macro(chip_gn_arg_string ARG STRING)
     string(APPEND CHIP_GN_ARGS "${ARG} = \"${STRING}\"\n")
 endmacro()
@@ -95,6 +99,8 @@ endmacro()
 if (NOT CHIP_ROOT)
     get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../../.. REALPATH)
 endif()
+
+set(GN_ROOT_TARGET ${CHIP_ROOT}/config/nrfconnect/chip-gn)
 
 # Prepare compiler flags
 
@@ -139,7 +145,7 @@ if (NOT CHIP_LIBRARIES)
 endif()
 
 if (CONFIG_CHIP_LIB_SHELL)
-    list(APPEND CHIP_LIBRARIES ${CMAKE_CURRENT_BINARY_DIR}/obj/third_party/connectedhomeip/src/lib/shell/lib/libCHIPShell.a)
+    list(APPEND CHIP_LIBRARIES -lCHIPShell)
 endif()
 
 if (CONFIG_CHIP_PW_RPC)
@@ -170,9 +176,38 @@ if (CONFIG_CHIP_OPENTHREAD_CONFIG)
     zephyr_set_openthread_config(${CHIP_OPENTHREAD_CONFIG})
 endif()
 
+# Find required programs
+
+find_program(GN_EXECUTABLE gn)
+if (${GN_EXECUTABLE} STREQUAL GN_EXECUTABLE-NOTFOUND)
+    message(FATAL_ERROR "The 'gn' command was not found. Make sure you have GN installed.")
+else()
+    # Parse the 'gn --version' output to find the installed version.
+    set(MIN_GN_VERSION 1851)
+    execute_process(
+        COMMAND
+        ${GN_EXECUTABLE} --version
+        OUTPUT_VARIABLE gn_version_output
+        ERROR_VARIABLE  gn_error_output
+        RESULT_VARIABLE gn_status
+    )
+
+    if(${gn_status} EQUAL 0)
+        if(gn_version_output VERSION_LESS ${MIN_GN_VERSION})
+            message(FATAL_ERROR "Found unsuitable version of 'gn'. Required is at least ${MIN_GN_VERSION}")
+        endif()
+    else()
+        message(FATAL_ERROR "Could NOT find working gn: Found gn (${GN_EXECUTABLE}), but failed to load with:\n ${gn_error_output}")
+    endif()
+endif()
+
 # ==============================================================================
 # Generate configuration for CHIP GN build system
 # ==============================================================================
+
+if (CONFIG_CHIP_PW_RPC)
+    chip_gn_arg_import("${GN_ROOT_TARGET}/lib/pw_rpc/pw_rpc.gni")
+endif()
 
 chip_gn_arg_cflags("target_cflags"                          ${CHIP_CFLAGS})
 chip_gn_arg_cflags("target_cflags_c"                        ${CHIP_CFLAGS_C})
@@ -209,7 +244,7 @@ ExternalProject_Add(
     PREFIX                  ${CMAKE_CURRENT_BINARY_DIR}
     SOURCE_DIR              ${CHIP_ROOT}
     BINARY_DIR              ${CMAKE_CURRENT_BINARY_DIR}
-    CONFIGURE_COMMAND       gn --root=${CHIP_ROOT}/config/nrfconnect/chip-gn gen --check --fail-on-unused-args ${CMAKE_CURRENT_BINARY_DIR}
+    CONFIGURE_COMMAND       ${GN_EXECUTABLE} --root=${CHIP_ROOT} --root-target=${GN_ROOT_TARGET} --dotfile=${GN_ROOT_TARGET}/.gn gen --check --fail-on-unused-args ${CMAKE_CURRENT_BINARY_DIR}
     BUILD_COMMAND           ninja
     INSTALL_COMMAND         ""
     BUILD_BYPRODUCTS        ${CHIP_LIBRARIES}

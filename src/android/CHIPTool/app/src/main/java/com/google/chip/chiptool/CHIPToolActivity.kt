@@ -21,6 +21,7 @@ import android.content.Intent
 import android.nfc.NdefMessage
 import android.nfc.NfcAdapter
 import android.os.Bundle
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import chip.setuppayload.SetupPayloadParser
@@ -146,15 +147,31 @@ class CHIPToolActivity :
 
     val setupPayload = SetupPayloadParser().parseQrCode(uri.toString().toUpperCase())
     val deviceInfo = CHIPDeviceInfo(
-            setupPayload.version,
-            setupPayload.vendorId,
-            setupPayload.productId,
-            setupPayload.discriminator,
-            setupPayload.setupPinCode,
-            setupPayload.optionalQRCodeInfo.mapValues { (_, info) ->  QrCodeInfo(info.tag, info.type, info.data, info.int32) }
+        setupPayload.version,
+        setupPayload.vendorId,
+        setupPayload.productId,
+        setupPayload.discriminator,
+        setupPayload.setupPinCode,
+        setupPayload.optionalQRCodeInfo.mapValues { (_, info) -> QrCodeInfo(info.tag, info.type, info.data, info.int32) }
     )
 
-    onCHIPDeviceInfoReceived(deviceInfo)
+    val buttons = arrayOf(
+        getString(R.string.nfc_tag_action_show),
+        getString(R.string.nfc_tag_action_wifi),
+        getString(R.string.nfc_tag_action_thread))
+
+    AlertDialog.Builder(this)
+        .setTitle(R.string.nfc_tag_action_title)
+        .setItems(buttons) { _, which ->
+          this.networkType = when (which) {
+            1 -> ProvisionNetworkType.WIFI
+            2 -> ProvisionNetworkType.THREAD
+            else -> null
+          }
+          onCHIPDeviceInfoReceived(deviceInfo)
+        }
+        .create()
+        .show()
   }
 
   companion object {

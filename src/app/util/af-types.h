@@ -51,8 +51,8 @@
 #include <stddef.h>  // For NULL.
 #include <stdint.h>  // For various uint*_t types
 
+#include "af-enums.h"
 #include "basic-types.h"
-#include "gen/enums.h"
 #include "types_stub.h" // For various types.
 
 #ifdef EZSP_HOST
@@ -1545,26 +1545,6 @@ typedef struct
     uint16_t durationInMinutes;
     EmberAfDeviceManagementPasswordType passwordType;
 } EmberAfDeviceManagementPassword;
-
-typedef struct
-{
-    EmberAfDeviceManagementTenancy tenancy;
-    EmberAfDeviceManagementSupplier supplier;
-    EmberAfDeviceManagementSupply supply;
-    EmberAfDeviceManagementSiteId siteId;
-    EmberAfDeviceManagementCIN cin;
-    EmberAfDeviceManagementSupplyStatusFlags supplyStatusFlags;
-    EmberAfDeviceManagementSupplyStatus supplyStatus;
-    // TODO: These passwords ought to be tokenized / hashed
-    EmberAfDeviceManagementPassword servicePassword;
-    EmberAfDeviceManagementPassword consumerPassword;
-    EmberAfDeviceManagementUncontrolledFlowThreshold threshold;
-    uint32_t providerId;
-    uint32_t issuerEventId;
-    uint8_t proposedLocalSupplyStatus;
-    EmberAfTariffType tariffType;
-    EmberAfDeviceManagementChangePendingFlags pendingUpdates;
-} EmberAfDeviceManagementInfo;
 
 typedef struct
 {

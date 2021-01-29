@@ -55,7 +55,7 @@
 #include "../../include/af.h"
 #include "../scenes/scenes.h"
 
-#define ZCL_SCENES_CLUSTER_MODE_COPY_ALL_SCENES_MASK BIT(0)
+#define ZCL_SCENES_CLUSTER_MODE_COPY_ALL_SCENES_MASK EMBER_BIT(0)
 
 bool emberAfScenesClusterEnhancedAddSceneCallback(uint16_t groupId, uint8_t sceneId, uint16_t transitionTime, uint8_t * sceneName,
                                                   uint8_t * extensionFieldSets)

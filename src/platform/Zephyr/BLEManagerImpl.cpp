@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -680,7 +680,7 @@ ssize_t BLEManagerImpl::HandleRXWrite(struct bt_conn * conId, const struct bt_ga
                                       uint16_t offset, uint8_t flags)
 {
     ChipDeviceEvent event;
-    PacketBufferHandle packetBuf = PacketBuffer::NewWithAvailableSize(len);
+    PacketBufferHandle packetBuf = PacketBufferHandle::NewWithData(buf, len);
 
     // Unfortunately the Zephyr logging macros end up assigning uint16_t
     // variables to uint16_t:10 fields, which triggers integer conversion
@@ -694,14 +694,10 @@ ssize_t BLEManagerImpl::HandleRXWrite(struct bt_conn * conId, const struct bt_ga
     // If successful...
     if (!packetBuf.IsNull())
     {
-        // Copy the characteristic value into the packet buffer.
-        memcpy(packetBuf->Start(), buf, len);
-        packetBuf->SetDataLength(len);
-
         // Arrange to post a CHIPoBLERXWriteEvent event to the CHIP queue.
         event.Type                            = DeviceEventType::kPlatformZephyrBleC1WriteEvent;
         event.Platform.BleC1WriteEvent.BtConn = bt_conn_ref(conId);
-        event.Platform.BleC1WriteEvent.Data   = packetBuf.Release_ForNow();
+        event.Platform.BleC1WriteEvent.Data   = std::move(packetBuf).UnsafeRelease();
     }
 
     // If we failed to allocate a buffer, post a kPlatformZephyrBleOutOfBuffersEvent event.

@@ -1,5 +1,5 @@
 {
-  "writeTime": "Fri Jan 15 2021 09:11:38 GMT-0500 (GMT-05:00)",
+  "writeTime": "Fri Jan 15 2021 19:21:16 GMT+0100 (Central European Standard Time)",
   "featureLevel": 6,
   "creator": "zap",
   "keyValuePairs": [
@@ -79,7 +79,6 @@
           "define": "BASIC_CLUSTER",
           "side": "server",
           "enabled": 1,
-          "commands": [],
           "attributes": [
             {
               "name": "cluster revision",
@@ -126,7 +125,8 @@
               "maxInterval": 65344,
               "reportableChange": 0
             }
-          ]
+          ],
+          "commands": []
         },
         {
           "name": "Identify",
@@ -178,16 +178,6 @@
           "define": "IDENTIFY_CLUSTER",
           "side": "server",
           "enabled": 0,
-          "commands": [
-            {
-              "name": "IdentifyQueryResponse",
-              "code": 0,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 1
-            }
-          ],
           "attributes": [
             {
               "name": "cluster revision",
@@ -218,6 +208,16 @@
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
+            }
+          ],
+          "commands": [
+            {
+              "name": "IdentifyQueryResponse",
+              "code": 0,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 1,
+              "outgoing": 1
             }
           ]
         },
@@ -2578,6 +2578,7 @@
           "define": "TEMP_MEASUREMENT_CLUSTER",
           "side": "server",
           "enabled": 0,
+          "commands": [],
           "attributes": [
             {
               "name": "cluster revision",
@@ -2654,8 +2655,7 @@
               "maxInterval": 65344,
               "reportableChange": 0
             }
-          ],
-          "commands": []
+          ]
         },
         {
           "name": "IAS Zone",
@@ -2825,23 +2825,6 @@
           "define": "BASIC_CLUSTER",
           "side": "client",
           "enabled": 1,
-          "attributes": [
-            {
-              "name": "cluster revision",
-              "code": 65533,
-              "mfgCode": null,
-              "side": "client",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "3",
-              "reportable": 0,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            }
-          ],
           "commands": [
             {
               "name": "ResetToFactoryDefaults",
@@ -2858,6 +2841,23 @@
               "source": "client",
               "incoming": 1,
               "outgoing": 1
+            }
+          ],
+          "attributes": [
+            {
+              "name": "cluster revision",
+              "code": 65533,
+              "mfgCode": null,
+              "side": "client",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "3",
+              "reportable": 0,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
             }
           ]
         },
@@ -3092,38 +3092,6 @@
           "define": "GROUPS_CLUSTER",
           "side": "server",
           "enabled": 1,
-          "attributes": [
-            {
-              "name": "cluster revision",
-              "code": 65533,
-              "mfgCode": null,
-              "side": "server",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "3",
-              "reportable": 0,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            },
-            {
-              "name": "name support",
-              "code": 0,
-              "mfgCode": null,
-              "side": "server",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "",
-              "reportable": 0,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            }
-          ],
           "commands": [
             {
               "name": "AddGroupResponse",
@@ -3156,6 +3124,38 @@
               "source": "server",
               "incoming": 1,
               "outgoing": 1
+            }
+          ],
+          "attributes": [
+            {
+              "name": "cluster revision",
+              "code": 65533,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "3",
+              "reportable": 0,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "name support",
+              "code": 0,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 0,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
             }
           ]
         },
@@ -3399,23 +3399,6 @@
           "define": "ON_OFF_CLUSTER",
           "side": "client",
           "enabled": 1,
-          "attributes": [
-            {
-              "name": "cluster revision",
-              "code": 65533,
-              "mfgCode": null,
-              "side": "client",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "2",
-              "reportable": 0,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            }
-          ],
           "commands": [
             {
               "name": "Off",
@@ -3441,6 +3424,23 @@
               "incoming": 1,
               "outgoing": 1
             }
+          ],
+          "attributes": [
+            {
+              "name": "cluster revision",
+              "code": 65533,
+              "mfgCode": null,
+              "side": "client",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "2",
+              "reportable": 0,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            }
           ]
         },
         {
@@ -3450,6 +3450,7 @@
           "define": "ON_OFF_CLUSTER",
           "side": "server",
           "enabled": 1,
+          "commands": [],
           "attributes": [
             {
               "name": "cluster revision",
@@ -3481,8 +3482,7 @@
               "maxInterval": 65344,
               "reportableChange": 0
             }
-          ],
-          "commands": []
+          ]
         },
         {
           "name": "Level Control",
@@ -3582,6 +3582,7 @@
           "define": "LEVEL_CONTROL_CLUSTER",
           "side": "server",
           "enabled": 1,
+          "commands": [],
           "attributes": [
             {
               "name": "cluster revision",
@@ -3613,8 +3614,7 @@
               "maxInterval": 65344,
               "reportableChange": 0
             }
-          ],
-          "commands": []
+          ]
         },
         {
           "name": "Door Lock",
@@ -5592,6 +5592,75 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0xff",
+              "reportable": 0,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            }
+          ]
+        },
+        {
+          "name": "Binding",
+          "code": 61440,
+          "mfgCode": null,
+          "define": "BINDING_CLUSTER",
+          "side": "client",
+          "enabled": 1,
+          "commands": [
+            {
+              "name": "Bind",
+              "code": 0,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 1
+            },
+            {
+              "name": "Unbind",
+              "code": 1,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 1
+            }
+          ],
+          "attributes": [
+            {
+              "name": "cluster revision",
+              "code": 65533,
+              "mfgCode": null,
+              "side": "client",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0x0001",
+              "reportable": 0,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            }
+          ]
+        },
+        {
+          "name": "Binding",
+          "code": 61440,
+          "mfgCode": null,
+          "define": "BINDING_CLUSTER",
+          "side": "server",
+          "enabled": 1,
+          "commands": [],
+          "attributes": [
+            {
+              "name": "cluster revision",
+              "code": 65533,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0x0001",
               "reportable": 0,
               "minInterval": 0,
               "maxInterval": 65344,

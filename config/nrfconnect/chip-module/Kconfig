@@ -88,4 +88,11 @@ config CHIP_NFC_COMMISSIONING
 	help
 	  Enables NFC commissioning by sharing onboarding payload in NFC tag.
 
+config APP_LINK_WITH_CHIP
+	bool "Link 'app' with Connected Home over IP"
+	default y
+	help
+	  Add Connected Home over IP header files to the 'app' include path
+	  and link the 'app' with Connected Home over IP libraries.
+
 endif

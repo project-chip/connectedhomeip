@@ -27,7 +27,6 @@
 #ifndef _CHIP_INTERACTION_MODEL_COMMAND_SENDER_H
 #define _CHIP_INTERACTION_MODEL_COMMAND_SENDER_H
 
-#include <app/MessageDef.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPTLVDebug.hpp>
 #include <map>

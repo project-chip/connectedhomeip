@@ -17,7 +17,7 @@ from pathlib import Path
 import serial # type: ignore
 import importlib
 
-from pw_hdlc_lite.rpc import HdlcRpcClient
+from pw_hdlc.rpc import HdlcRpcClient
 
 # Point the script to the .proto file with our RPC services.
 PROTO = Path(os.environ["PW_ROOT"], "pw_rpc/pw_rpc_protos/echo.proto")

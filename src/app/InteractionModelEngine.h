@@ -28,7 +28,7 @@
 #ifndef _CHIP_INTERACTION_MODEL_ENGINE_H
 #define _CHIP_INTERACTION_MODEL_ENGINE_H
 
-#include <app/MessageDef.h>
+#include <app/MessageDef/MessageDef.h>
 #include <core/CHIPCore.h>
 #include <map>
 #include <messaging/ExchangeContext.h>

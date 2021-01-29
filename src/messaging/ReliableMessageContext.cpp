@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -344,14 +344,13 @@ CHIP_ERROR ReliableMessageContext::SendStandaloneAckMessage()
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Allocate a buffer for the null message
-    System::PacketBufferHandle msgBuf = System::PacketBuffer::NewWithAvailableSize(0);
+    System::PacketBufferHandle msgBuf = System::PacketBufferHandle::New(0, CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE);
     VerifyOrExit(!msgBuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
     // Send the null message
     if (mExchange != nullptr)
     {
-        err = mExchange->SendMessage(Protocols::kProtocol_SecureChannel,
-                                     static_cast<uint8_t>(Protocols::SecureChannel::MsgType::StandaloneAck), std::move(msgBuf),
+        err = mExchange->SendMessage(Protocols::SecureChannel::MsgType::StandaloneAck, std::move(msgBuf),
                                      BitFlags<uint16_t, SendMessageFlags>{ SendMessageFlags::kNoAutoRequestAck });
     }
     else

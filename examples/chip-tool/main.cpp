@@ -22,7 +22,7 @@
 #include "commands/pairing/Commands.h"
 #include "commands/payload/Commands.h"
 
-#include <transport/SecurePairingSession.h>
+#include <transport/PASESession.h>
 
 // ================================================================================
 // Main Code

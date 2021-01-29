@@ -20,7 +20,7 @@ digraph RendezvousSession
   subgraph cluster_transport {
     label=<<b>Transport</b>>
 
-    RendezvousSession [shape=record, label=<{RendezvousSession|<font point-size="11">SecurePairingSessionDelegate</font>}>, URL="@ref chip::SecurePairingSessionDelegate"]
+    RendezvousSession [shape=record, label=<{RendezvousSession|<font point-size="11">SessionEstablishmentDelegate</font>}>, URL="@ref chip::SessionEstablishmentDelegate"]
     TransportBle [label="Transport::BLE", URL="@ref chip::Transport::BLE"]
     TransportInet [label="Transport::?", style=dashed, color=gray]
   }

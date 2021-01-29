@@ -23,6 +23,7 @@
 #include "gen/attribute-id.h"
 #include "gen/cluster-id.h"
 #include <app/chip-zcl-zpro-codec.h>
+#include <app/im-handler.h>
 #include <app/util/af-types.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/util.h>
@@ -176,6 +177,25 @@ int main(int argc, char * argv[])
 
     // Init ZCL Data Model and CHIP App Server
     InitServer();
+
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    chip::app::cluster::OnOff::InitCluster(chip::app::InteractionModelEngine::GetInstance());
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+    if (LinuxDeviceOptions::GetInstance().mWiFi)
+    {
+        chip::DeviceLayer::ConnectivityMgrImpl().StartWiFiManagement();
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
+
+#if CHIP_ENABLE_OPENTHREAD
+    if (LinuxDeviceOptions::GetInstance().mThread)
+    {
+        SuccessOrExit(err = chip::DeviceLayer::ThreadStackMgrImpl().InitThreadStack());
+        std::cerr << "Thread initialized." << std::endl;
+    }
+#endif // CHIP_ENABLE_OPENTHREAD
 
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
 

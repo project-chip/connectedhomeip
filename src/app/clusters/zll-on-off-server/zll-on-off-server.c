@@ -55,7 +55,7 @@
 #include "zll-on-off-server.h"
 #include "../../include/af.h"
 
-#define ZLL_ON_OFF_CLUSTER_ON_OFF_CONTROL_ACCEPT_ONLY_WHEN_ON_MASK BIT(0)
+#define ZLL_ON_OFF_CLUSTER_ON_OFF_CONTROL_ACCEPT_ONLY_WHEN_ON_MASK EMBER_BIT(0)
 
 #define readOnOff(endpoint, onOff) readBoolean((endpoint), ZCL_ON_OFF_ATTRIBUTE_ID, "on/off", (onOff))
 #define writeOnOff(endpoint, onOff) writeBoolean((endpoint), ZCL_ON_OFF_ATTRIBUTE_ID, "on/off", (onOff))

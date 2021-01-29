@@ -6,6 +6,8 @@
 // ZCL enums
 
 {{#zcl_enums}}
+{{#unless (isStrEqual label "Status")}}
+{{#unless (isStrEqual label "ReportingDirection")}}
 
 // Enum for {{label}}
 typedef enum {
@@ -13,6 +15,8 @@ typedef enum {
 {{ident}}EMBER_ZCL_{{asDelimitedMacro parent.label}}_{{asDelimitedMacro label}} = {{value}},
 {{/zcl_enum_items}}
 } EmberAf{{asType label}};
+{{/unless}}
+{{/unless}}
 {{/zcl_enums}}
 
 {{#zcl_bitmaps}}

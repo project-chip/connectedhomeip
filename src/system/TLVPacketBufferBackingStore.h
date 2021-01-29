@@ -47,11 +47,11 @@ public:
     /**
      * Take ownership of a backing packet buffer.
      *
-     * @param[in]    buffer  A handle to PacketBuffer, to be used as backing store for a TLV class.
+     * @param[in]    buffer  A handle to a packet buffer, to be used as backing store for a TLV class.
      * @param[in]    useChainedBuffers
      *                       If true, advance to the next buffer in the chain once all data or space
      *                       in the current buffer has been consumed; a write will allocate new
-     *                       PacketBuffers if necessary.
+     *                       packet buffers if necessary.
      *
      * @note This must take place before initializing a TLV class with this backing store.
      */

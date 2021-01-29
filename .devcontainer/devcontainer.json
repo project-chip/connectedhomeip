@@ -40,7 +40,6 @@
     "settings": {
         "terminal.integrated.shell.linux": "/bin/bash"
     },
-    "postCreateCommand": "source /usr/share/bash-completion/bash_completion && source /etc/bash_completion.d/git-prompt && sudo chgrp docker /var/run/docker.sock",
     "remoteEnv": {
         "GIT_PS1_SHOWDIRTYSTATE": "1",
         "GIT_PS1_SHOWSTASHSTATE": "1",
