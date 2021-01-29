@@ -57,17 +57,17 @@ class PacketBufferTest;
 #define CHIP_SYSTEM_PACKETBUFFER_STORE_CHIP_POOL 3   //   Internal fixed pool
 #define CHIP_SYSTEM_PACKETBUFFER_STORE_CHIP_HEAP 4   //   Platform::MemoryAlloc
 
-#undef CHIP_SYSTEM_PACKETBUFFER_HAS_RIGHT_SIZE // True if RightSize() has an implementation
-#undef CHIP_SYSTEM_PACKETBUFFER_HAS_CHECK      // True if Check() has an implementation
+#undef CHIP_SYSTEM_PACKETBUFFER_HAS_RIGHT_SIZE // True if RightSize() has a nontrivial implementation
+#undef CHIP_SYSTEM_PACKETBUFFER_HAS_CHECK      // True if Check() has a nontrivial implementation
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #if LWIP_PBUF_FROM_CUSTOM_POOLS
 #define CHIP_SYSTEM_PACKETBUFFER_STORE CHIP_SYSTEM_PACKETBUFFER_STORE_LWIP_CUSTOM
-#define CHIP_SYSTEM_PACKETBUFFER_HAS_RIGHT_SIZE 0
+#define CHIP_SYSTEM_PACKETBUFFER_HAS_RIGHT_SIZE 1
 #define CHIP_SYSTEM_PACKETBUFFER_HAS_CHECK 0
 #else
 #define CHIP_SYSTEM_PACKETBUFFER_STORE CHIP_SYSTEM_PACKETBUFFER_STORE_LWIP_POOL
-#define CHIP_SYSTEM_PACKETBUFFER_HAS_RIGHT_SIZE 1
+#define CHIP_SYSTEM_PACKETBUFFER_HAS_RIGHT_SIZE 0
 #define CHIP_SYSTEM_PACKETBUFFER_HAS_CHECK 0
 #endif
 #else
@@ -349,7 +349,7 @@ public:
      *
      * @note  A null pointer is not considered faulty.
      *
-     *  @param[in] aPacket - the packet buffer handle to check.
+     *  @param[in] buffer - the packet buffer to check.
      */
     static void Check(const PacketBuffer * buffer)
     {
@@ -362,7 +362,7 @@ private:
     // Memory required for a maximum-size PacketBuffer.
     static constexpr uint16_t kBlockSize = PacketBuffer::kStructureSize + PacketBuffer::kMaxSizeWithoutReserve;
 
-#if CHIP_SYSTEM_PACKETBUFFER_STORE == CHIP_SYSTEM_PACKETBUFFER_STORE_CHIP_POOL
+#if CHIP_SYSTEM_PACKETBUFFER_STORE == CHIP_SYSTEM_PACKETBUFFER_STORE_CHIP_POOL || DOXYGEN
     typedef union
     {
         pbuf Header;

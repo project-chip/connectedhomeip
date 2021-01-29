@@ -1689,20 +1689,20 @@ void PacketBufferTest::CheckHandleRightSize(nlTestSuite * inSuite, void * inCont
         NL_TEST_ASSERT(inSuite, handle.mBuffer == buffer);
     }
 
-#if (CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_PBUF_FROM_CUSTOM_POOLS) || (CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE == 0)
+#if CHIP_SYSTEM_PACKETBUFFER_HAS_RIGHT_SIZE
 
     handle.RightSize();
     NL_TEST_ASSERT(inSuite, handle.mBuffer != buffer);
     NL_TEST_ASSERT(inSuite, handle->DataLength() == sizeof kPayload);
     NL_TEST_ASSERT(inSuite, memcmp(handle->Start(), kPayload, sizeof kPayload) == 0);
 
-#else // !((CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_PBUF_FROM_CUSTOM_POOLS) || (CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE == 0))
+#else // CHIP_SYSTEM_PACKETBUFFER_HAS_RIGHT_SIZE
 
     // For this configuration, RightSize() does nothing.
     handle.RightSize();
     NL_TEST_ASSERT(inSuite, handle.mBuffer == buffer);
 
-#endif // !((CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_PBUF_FROM_CUSTOM_POOLS) || (CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE == 0))
+#endif // CHIP_SYSTEM_PACKETBUFFER_HAS_RIGHT_SIZE
 }
 
 /**
