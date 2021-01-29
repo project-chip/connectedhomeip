@@ -72,6 +72,15 @@ enum class ExFlagValues : uint8_t
     kExchangeFlag_VendorIdPresent = 0x10,
 };
 
+enum class InternalFlagValues : uint16_t
+{
+    // Header flag indicates that the peer's group key message counter is not synchronized.
+    kPeerGroupMsgIdNotSynchronized = 0x0001,
+
+    // Header flag indicates that the message buffer should not be freed after sending.
+    kRetainedBuffer = 0x0002,
+};
+
 enum class FlagValues : uint16_t
 {
     /// Header flag specifying that a destination node id is included in the header.
@@ -88,8 +97,9 @@ enum class FlagValues : uint16_t
 
 };
 
-using Flags   = BitFlags<uint16_t, FlagValues>;
-using ExFlags = BitFlags<uint8_t, ExFlagValues>;
+using InternalFlags = BitFlags<uint16_t, InternalFlagValues>;
+using Flags         = BitFlags<uint16_t, FlagValues>;
+using ExFlags       = BitFlags<uint8_t, ExFlagValues>;
 
 // Header is a 16-bit value of the form
 //  |  4 bit  | 4 bit |8 bit Security Flags|
@@ -144,11 +154,32 @@ public:
     /** Check if it's a secure session control message. */
     bool IsSecureSessionControlMsg() const { return mFlags.Has(Header::FlagValues::kSecureSessionControlMessage); }
 
+    /** Check if the peer's group key message counter is not synchronized. */
+    bool IsPeerGroupMsgIdNotSynchronized() const
+    {
+        return mInternalFlags.Has(Header::InternalFlagValues::kPeerGroupMsgIdNotSynchronized);
+    }
+
+    /** Check if the message buffer should not be freed after sending. */
+    bool IsRetainedBuffer() const { return mInternalFlags.Has(Header::InternalFlagValues::kRetainedBuffer); }
+
     Header::EncryptionType GetEncryptionType() const { return mEncryptionType; }
 
     PacketHeader & SetSecureSessionControlMsg(bool value)
     {
         mFlags.Set(Header::FlagValues::kSecureSessionControlMessage, value);
+        return *this;
+    }
+
+    PacketHeader & SetPeerGroupMsgIdNotSynchronized(bool value)
+    {
+        mInternalFlags.Set(Header::InternalFlagValues::kPeerGroupMsgIdNotSynchronized, value);
+        return *this;
+    }
+
+    PacketHeader & SetRetainedBuffer(bool value)
+    {
+        mInternalFlags.Set(Header::InternalFlagValues::kRetainedBuffer, value);
         return *this;
     }
 
@@ -275,6 +306,9 @@ private:
 
     /// Encryption Key ID
     uint16_t mEncryptionKeyID = 0;
+
+    /// Message flags not encoded into the packet sent over wire.
+    Header::InternalFlags mInternalFlags;
 
     /// Message flags read from the message.
     Header::Flags mFlags;
