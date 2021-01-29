@@ -402,8 +402,8 @@ static EmberStatus sendCommand(EmberNodeId destAddress)
 static void setCieAddress(EmberNodeId destAddress)
 {
     uint8_t writeAttributes[] = {
-        LOW_BYTE(ZCL_IAS_CIE_ADDRESS_ATTRIBUTE_ID),
-        HIGH_BYTE(ZCL_IAS_CIE_ADDRESS_ATTRIBUTE_ID),
+        EMBER_LOW_BYTE(ZCL_IAS_CIE_ADDRESS_ATTRIBUTE_ID),
+        EMBER_HIGH_BYTE(ZCL_IAS_CIE_ADDRESS_ATTRIBUTE_ID),
         ZCL_IEEE_ADDRESS_ATTRIBUTE_TYPE,
         0,
         0,
@@ -488,11 +488,11 @@ void emberAfPluginIasZoneClientZdoMessageReceivedCallback(EmberNodeId emberNodeI
 void readIasZoneServerAttributes(EmberNodeId nodeId)
 {
     uint8_t iasZoneAttributeIds[] = {
-        LOW_BYTE(ZCL_ZONE_STATE_ATTRIBUTE_ID),  HIGH_BYTE(ZCL_ZONE_STATE_ATTRIBUTE_ID),
+        EMBER_LOW_BYTE(ZCL_ZONE_STATE_ATTRIBUTE_ID),  EMBER_HIGH_BYTE(ZCL_ZONE_STATE_ATTRIBUTE_ID),
 
-        LOW_BYTE(ZCL_ZONE_TYPE_ATTRIBUTE_ID),   HIGH_BYTE(ZCL_ZONE_TYPE_ATTRIBUTE_ID),
+        EMBER_LOW_BYTE(ZCL_ZONE_TYPE_ATTRIBUTE_ID),   EMBER_HIGH_BYTE(ZCL_ZONE_TYPE_ATTRIBUTE_ID),
 
-        LOW_BYTE(ZCL_ZONE_STATUS_ATTRIBUTE_ID), HIGH_BYTE(ZCL_ZONE_STATUS_ATTRIBUTE_ID),
+        EMBER_LOW_BYTE(ZCL_ZONE_STATUS_ATTRIBUTE_ID), EMBER_HIGH_BYTE(ZCL_ZONE_STATUS_ATTRIBUTE_ID),
     };
     emberAfFillExternalBuffer((ZCL_GLOBAL_COMMAND | ZCL_FRAME_CONTROL_CLIENT_TO_SERVER), ZCL_IAS_ZONE_CLUSTER_ID,
                               ZCL_READ_ATTRIBUTES_COMMAND_ID, "b", iasZoneAttributeIds, sizeof(iasZoneAttributeIds));
@@ -505,8 +505,8 @@ void readIasZoneServerAttributes(EmberNodeId nodeId)
 void readIasZoneServerCieAddress(EmberNodeId nodeId)
 {
     uint8_t iasZoneAttributeIds[] = {
-        LOW_BYTE(ZCL_IAS_CIE_ADDRESS_ATTRIBUTE_ID),
-        HIGH_BYTE(ZCL_IAS_CIE_ADDRESS_ATTRIBUTE_ID),
+        EMBER_LOW_BYTE(ZCL_IAS_CIE_ADDRESS_ATTRIBUTE_ID),
+        EMBER_HIGH_BYTE(ZCL_IAS_CIE_ADDRESS_ATTRIBUTE_ID),
     };
     emberAfFillExternalBuffer((ZCL_GLOBAL_COMMAND | ZCL_FRAME_CONTROL_CLIENT_TO_SERVER), ZCL_IAS_ZONE_CLUSTER_ID,
                               ZCL_READ_ATTRIBUTES_COMMAND_ID, "b", iasZoneAttributeIds, sizeof(iasZoneAttributeIds));

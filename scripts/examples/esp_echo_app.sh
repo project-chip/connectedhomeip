@@ -30,6 +30,8 @@ idf make -j8 -C "$root" "$@" || {
     echo 'build DevKit-C failed'
     exit 1
 }
+cp examples/all-clusters-app/esp32/build/chip-all-clusters-app.elf \
+    examples/all-clusters-app/esp32/build/devkit-c-chip-all-clusters-app.elf
 
 rm -f "$root"/sdkconfig
 SDKCONFIG_DEFAULTS=sdkconfig_m5stack.defaults idf make -j8 -C "$root" defconfig "$@"
@@ -37,3 +39,5 @@ idf make -j8 -C "$root" "$@" || {
     echo 'build M5Stack failed'
     exit 1
 }
+cp examples/all-clusters-app/esp32/build/chip-all-clusters-app.elf \
+    examples/all-clusters-app/esp32/build/m5stack-chip-all-clusters-app.elf

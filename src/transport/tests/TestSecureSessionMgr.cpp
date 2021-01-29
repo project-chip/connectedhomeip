@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -151,11 +151,8 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
 
     ctx.GetInetLayer().SystemLayer()->Init(nullptr);
 
-    chip::System::PacketBufferHandle buffer = chip::System::PacketBuffer::NewWithAvailableSize(payload_len);
+    chip::System::PacketBufferHandle buffer = chip::System::PacketBufferHandle::NewWithData(PAYLOAD, payload_len, kMaxTagLen);
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());
-
-    memmove(buffer->Start(), PAYLOAD, payload_len);
-    buffer->SetDataLength(payload_len);
 
     IPAddress addr;
     IPAddress::FromString("127.0.0.1", addr);
@@ -183,12 +180,13 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
     err = secureSessionMgr.NewPairing(peer, kDestinationNodeId, &pairing2);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    SecureSessionHandle localToRemoteSessoin = callback.mLocalToRemoteSession;
+    SecureSessionHandle localToRemoteSession = callback.mLocalToRemoteSession;
 
     // Should be able to send a message to itself by just calling send.
     callback.ReceiveHandlerCallCount = 0;
 
-    err = secureSessionMgr.SendMessage(localToRemoteSessoin, std::move(buffer));
+    err = secureSessionMgr.SendMessage(localToRemoteSession, std::move(buffer));
+    printf("err=%d\n", err);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     ctx.DriveIOUntil(1000 /* ms */, []() { return callback.ReceiveHandlerCallCount != 0; });
@@ -204,11 +202,8 @@ void SendEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
 
     ctx.GetInetLayer().SystemLayer()->Init(nullptr);
 
-    chip::System::PacketBufferHandle buffer = chip::System::PacketBuffer::NewWithAvailableSize(payload_len);
+    chip::System::PacketBufferHandle buffer = chip::System::PacketBufferHandle::NewWithData(PAYLOAD, payload_len, kMaxTagLen);
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());
-
-    memmove(buffer->Start(), PAYLOAD, payload_len);
-    buffer->SetDataLength(payload_len);
 
     IPAddress addr;
     IPAddress::FromString("127.0.0.1", addr);
@@ -236,7 +231,7 @@ void SendEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     err = secureSessionMgr.NewPairing(peer, kDestinationNodeId, &pairing2);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    SecureSessionHandle localToRemoteSessoin = callback.mLocalToRemoteSession;
+    SecureSessionHandle localToRemoteSession = callback.mLocalToRemoteSession;
 
     // Should be able to send a message to itself by just calling send.
     callback.ReceiveHandlerCallCount = 0;
@@ -247,21 +242,18 @@ void SendEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     // Set the exchange ID for this header.
     payloadHeader.SetExchangeID(0);
 
-    // Set the protocol ID for this header.
-    payloadHeader.SetProtocolID(chip::Protocols::kProtocol_Echo);
-
-    // Set the message type for this header.
-    payloadHeader.SetMessageType(chip::Protocols::kEchoMessageType_EchoRequest);
+    // Set the protocol ID and message type for this header.
+    payloadHeader.SetMessageType(chip::Protocols::kProtocol_Echo, chip::Protocols::Echo::kEchoMessageType_EchoRequest);
 
     payloadHeader.SetInitiator(true);
 
-    err = secureSessionMgr.SendMessage(localToRemoteSessoin, payloadHeader, std::move(buffer), &msgBuf);
+    err = secureSessionMgr.SendMessage(localToRemoteSession, payloadHeader, std::move(buffer), &msgBuf);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     ctx.DriveIOUntil(1000 /* ms */, []() { return callback.ReceiveHandlerCallCount != 0; });
     NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 1);
 
-    err = secureSessionMgr.SendEncryptedMessage(localToRemoteSessoin, std::move(msgBuf), nullptr);
+    err = secureSessionMgr.SendEncryptedMessage(localToRemoteSession, std::move(msgBuf), nullptr);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     ctx.DriveIOUntil(1000 /* ms */, []() { return callback.ReceiveHandlerCallCount != 1; });
@@ -276,11 +268,8 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
 
     ctx.GetInetLayer().SystemLayer()->Init(nullptr);
 
-    chip::System::PacketBufferHandle buffer = chip::System::PacketBuffer::NewWithAvailableSize(payload_len);
+    chip::System::PacketBufferHandle buffer = chip::System::PacketBufferHandle::NewWithData(PAYLOAD, payload_len, kMaxTagLen);
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());
-
-    memmove(buffer->Start(), PAYLOAD, payload_len);
-    buffer->SetDataLength(payload_len);
 
     IPAddress addr;
     IPAddress::FromString("127.0.0.1", addr);
@@ -308,7 +297,7 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     err = secureSessionMgr.NewPairing(peer, kDestinationNodeId, &pairing2);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    SecureSessionHandle localToRemoteSessoin = callback.mLocalToRemoteSession;
+    SecureSessionHandle localToRemoteSession = callback.mLocalToRemoteSession;
 
     // Should be able to send a message to itself by just calling send.
     callback.ReceiveHandlerCallCount = 0;
@@ -319,15 +308,12 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     // Set the exchange ID for this header.
     payloadHeader.SetExchangeID(0);
 
-    // Set the protocol ID for this header.
-    payloadHeader.SetProtocolID(chip::Protocols::kProtocol_Echo);
-
-    // Set the message type for this header.
-    payloadHeader.SetMessageType(chip::Protocols::kEchoMessageType_EchoRequest);
+    // Set the protocol ID and message type for this header.
+    payloadHeader.SetMessageType(chip::Protocols::kProtocol_Echo, chip::Protocols::Echo::kEchoMessageType_EchoRequest);
 
     payloadHeader.SetInitiator(true);
 
-    err = secureSessionMgr.SendMessage(localToRemoteSessoin, payloadHeader, std::move(buffer), &msgBuf);
+    err = secureSessionMgr.SendMessage(localToRemoteSession, payloadHeader, std::move(buffer), &msgBuf);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     ctx.DriveIOUntil(1000 /* ms */, []() { return callback.ReceiveHandlerCallCount != 0; });
@@ -345,7 +331,7 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     packetHeader.SetDestinationNodeId(kSourceNodeId);
     packetHeader.Encode(badDestNodeIdMsg->Start(), badDestNodeIdMsg->DataLength(), &headerSize);
 
-    err = secureSessionMgr.SendEncryptedMessage(localToRemoteSessoin, std::move(badDestNodeIdMsg), nullptr);
+    err = secureSessionMgr.SendEncryptedMessage(localToRemoteSession, std::move(badDestNodeIdMsg), nullptr);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     ctx.DriveIOUntil(1000 /* ms */, []() { return callback.ReceiveHandlerCallCount != 1; });
@@ -360,7 +346,7 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     packetHeader.SetSourceNodeId(kDestinationNodeId);
     packetHeader.Encode(badSrcNodeIdMsg->Start(), badSrcNodeIdMsg->DataLength(), &headerSize);
 
-    err = secureSessionMgr.SendEncryptedMessage(localToRemoteSessoin, std::move(badSrcNodeIdMsg), nullptr);
+    err = secureSessionMgr.SendEncryptedMessage(localToRemoteSession, std::move(badSrcNodeIdMsg), nullptr);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     ctx.DriveIOUntil(1000 /* ms */, []() { return callback.ReceiveHandlerCallCount != 1; });
@@ -376,7 +362,7 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     packetHeader.SetMessageId(msgID + 1);
     packetHeader.Encode(badMessageIdMsg->Start(), badMessageIdMsg->DataLength(), &headerSize);
 
-    err = secureSessionMgr.SendEncryptedMessage(localToRemoteSessoin, std::move(badMessageIdMsg), nullptr);
+    err = secureSessionMgr.SendEncryptedMessage(localToRemoteSession, std::move(badMessageIdMsg), nullptr);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     ctx.DriveIOUntil(1000 /* ms */, []() { return callback.ReceiveHandlerCallCount != 1; });
@@ -391,7 +377,7 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     packetHeader.SetEncryptionKeyID(3);
     packetHeader.Encode(badKeyIdMsg->Start(), badKeyIdMsg->DataLength(), &headerSize);
 
-    err = secureSessionMgr.SendEncryptedMessage(localToRemoteSessoin, std::move(badKeyIdMsg), nullptr);
+    err = secureSessionMgr.SendEncryptedMessage(localToRemoteSession, std::move(badKeyIdMsg), nullptr);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     ctx.DriveIOUntil(1000 /* ms */, []() { return callback.ReceiveHandlerCallCount != 1; });
@@ -399,7 +385,7 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 1);
 
     // Send the correct encrypted msg
-    err = secureSessionMgr.SendEncryptedMessage(localToRemoteSessoin, std::move(msgBuf), nullptr);
+    err = secureSessionMgr.SendEncryptedMessage(localToRemoteSession, std::move(msgBuf), nullptr);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     ctx.DriveIOUntil(1000 /* ms */, []() { return callback.ReceiveHandlerCallCount != 1; });
@@ -464,7 +450,8 @@ int TestSecureSessionMgr()
     // Run test suit against one context
     nlTestRunner(&sSuite, &sContext);
 
-    return (nlTestRunnerStats(&sSuite));
+    int r = (nlTestRunnerStats(&sSuite));
+    return r;
 }
 
 CHIP_REGISTER_TEST_SUITE(TestSecureSessionMgr);

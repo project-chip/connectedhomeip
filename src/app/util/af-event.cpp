@@ -41,7 +41,6 @@
 
 #include "af.h"
 #include "attribute-storage.h"
-#include "gen/callback.h"
 
 #include <platform/CHIPDeviceLayer.h>
 #include <system/SystemTimer.h>
@@ -51,6 +50,7 @@
 #define EMBER_MAX_EVENT_CONTROL_DELAY_MINUTES (EMBER_MAX_EVENT_CONTROL_DELAY_MS >> 16)
 
 #include "gen/af-gen-event.h"
+#include "gen/callback.h"
 
 using namespace chip;
 

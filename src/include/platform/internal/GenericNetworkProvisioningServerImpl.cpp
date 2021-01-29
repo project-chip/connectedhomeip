@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2018 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -494,7 +494,7 @@ CHIP_ERROR GenericNetworkProvisioningServerImpl<ImplClass>::HandleGetNetworks(ui
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
     // Allocate a buffer to hold the response.
-    respBuf = PacketBuffer::New();
+    respBuf = PacketBufferHandle::New(kMaxPacketBufferSize);
     VerifyOrExit(respBuf != NULL, err = CHIP_ERROR_NO_MEMORY);
 
     // Encode the GetNetworks response data.

@@ -35,9 +35,10 @@ namespace chip {
 
 RendezvousServer::RendezvousServer() : mRendezvousSession(this) {}
 
-CHIP_ERROR RendezvousServer::Init(const RendezvousParameters & params, TransportMgrBase * transportMgr)
+CHIP_ERROR RendezvousServer::Init(const RendezvousParameters & params, TransportMgrBase * transportMgr,
+                                  SecureSessionMgr * sessionMgr)
 {
-    return mRendezvousSession.Init(params, transportMgr);
+    return mRendezvousSession.Init(params, transportMgr, sessionMgr);
 }
 
 void RendezvousServer::OnRendezvousError(CHIP_ERROR err)
@@ -62,15 +63,6 @@ void RendezvousServer::OnRendezvousMessageReceived(const PacketHeader & packetHe
 void RendezvousServer::OnRendezvousComplete()
 {
     ChipLogProgress(AppServer, "Device completed Rendezvous process");
-    if (mRendezvousSession.GetRemoteNodeId().HasValue())
-    {
-        SessionManager().NewPairing(Optional<Transport::PeerAddress>{}, mRendezvousSession.GetRemoteNodeId().Value(),
-                                    &mRendezvousSession.GetPairingSession());
-    }
-    else
-    {
-        ChipLogError(AppServer, "Commissioner did not assign a node ID to the device!!!");
-    }
 }
 
 void RendezvousServer::OnRendezvousStatusUpdate(Status status, CHIP_ERROR err)

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/chip.gni")
+import("//build_overrides/build.gni")
 
 # Convert a binary to a target format using objcopy.
 
@@ -37,7 +37,7 @@ template("objcopy_convert") {
       rebase_path(conversion_input, root_build_dir),
       rebase_path(conversion_output, root_build_dir),
     ]
-    script = "//build/gn_run_binary.py"
+    script = "${build_root}/gn_run_binary.py"
   }
 }
 

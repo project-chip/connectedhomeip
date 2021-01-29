@@ -27,6 +27,7 @@ from __future__ import absolute_import
 from __future__ import print_function
 from chip import ChipStack
 from chip import ChipDeviceCtrl
+from chip import ChipExceptions
 from builtins import range
 import sys
 import os
@@ -67,6 +68,20 @@ if platform.system() == 'Darwin':
 elif sys.platform.startswith('linux'):
     from chip.ChipBluezMgr import BluezManager as BleManager
 
+# The exceptions for CHIP Device Controller CLI
+
+
+class ChipDevCtrlException(ChipExceptions.ChipStackException):
+    pass
+
+
+class ParsingError(ChipDevCtrlException):
+    def __init__(self, msg=None):
+        self.msg = "Parsing Error: " + msg
+
+    def __str__(self):
+        return self.msg
+
 
 def DecodeBase64Option(option, opt, value):
     try:
@@ -81,6 +96,34 @@ def DecodeHexIntOption(option, opt, value):
         return int(value, 16)
     except ValueError:
         raise OptionValueError("option %s: invalid value: %r" % (opt, value))
+
+
+def ParseEncodedString(value):
+    if value.find(":") < 0:
+        raise ParsingError(
+            "value should be encoded in encoding:encodedvalue format")
+    enc, encValue = value.split(":", 1)
+    if enc == "str":
+        return encValue.encode("utf-8") + b'\x00'
+    elif enc == "hex":
+        return bytes.fromhex(encValue)
+    raise ParsingError("only str and hex encoding is supported")
+
+
+def FormatZCLArguments(args, command):
+    commandArgs = {}
+    for kvPair in args:
+        if kvPair.find("=") < 0:
+            raise ParsingError("Argument should in key=value format")
+        key, value = kvPair.split("=", 1)
+        valueType = command.get(key, None)
+        if valueType == 'int':
+            commandArgs[key] = int(value)
+        elif valueType == 'str':
+            commandArgs[key] = value
+        elif valueType == 'bytes':
+            commandArgs[key] = ParseEncodedString(value)
+    return commandArgs
 
 
 class DeviceMgrCmd(Cmd):
@@ -121,16 +164,14 @@ class DeviceMgrCmd(Cmd):
 
     command_names = [
         "close",
-        "btp-connect",
+
         "ble-scan",
-        "ble-connect",
-        "ble-disconnect",
-        "ble-scan-connect",
         "ble-adapter-select",
         "ble-adapter-print",
         "ble-debug-log",
 
         "connect",
+        "zcl",
         "set-pairing-wifi-credential",
     ]
 
@@ -207,7 +248,7 @@ class DeviceMgrCmd(Cmd):
 
         try:
             self.devCtrl.Close()
-        except ChipStack.ChipStackException as ex:
+        except ChipExceptions.ChipStackException as ex:
             print(str(ex))
 
     def do_setlogoutput(self, line):
@@ -242,7 +283,7 @@ class DeviceMgrCmd(Cmd):
 
         try:
             self.devCtrl.SetLogFilter(category)
-        except ChipStack.ChipStackException as ex:
+        except ChipExceptions.ChipStackException as ex:
             print(str(ex))
             return
 
@@ -309,70 +350,10 @@ class DeviceMgrCmd(Cmd):
 
         return
 
-    def do_bleconnect(self, line):
-        """
-        ble-connect <device-name>
-        ble-connect <mac-address (linux only)>
-        ble-connect <device-uuid>
-        ble-connect <discriminator>
-
-        Connect to a BLE peripheral identified by line.
-        """
-
-        if not self.bleMgr:
-            self.bleMgr = BleManager(self.devCtrl)
-        self.bleMgr.connect(line)
-
-        return
-
-    def do_blescanconnect(self, line):
-        """
-        ble-scan-connect <device-name>
-        ble-scan-connect <mac-address (linux only)>
-        ble-scan-connect <device-uuid>
-        ble-scan-connect <discriminator>
-
-        Scan and connect to a BLE peripheral identified by line.
-        """
-
-        if not self.bleMgr:
-            self.bleMgr = BleManager(self.devCtrl)
-
-        self.bleMgr.scan_connect(line)
-
-        return
-
-    def do_bledisconnect(self, line):
-        """
-        ble-disconnect
-
-        Disconnect from a BLE peripheral.
-        """
-
-        if not self.bleMgr:
-            self.bleMgr = BleManager(self.devCtrl)
-
-        self.bleMgr.disconnect()
-
-        return
-
-    def do_btpconnect(self, line):
-        """
-        connect .
-
-        """
-        try:
-            self.devCtrl.ConnectBle(bleConnection=FAKE_CONN_OBJ_VALUE)
-        except ChipStack.ChipStackException as ex:
-            print(str(ex))
-            return
-
-        print("BTP Connected")
-
     def do_connect(self, line):
         """
         connect -ip <ip address> <setup pin code>
-        connect -ble <setup pin code>
+        connect -ble <discriminator> <setup pin code>
 
         connect command is used for establishing a rendezvous session to the device.
         currently, only connect using setupPinCode is supported.
@@ -389,16 +370,59 @@ class DeviceMgrCmd(Cmd):
                 return
             if args[0] == "-ip" and len(args) == 3:
                 self.devCtrl.ConnectIP(args[1].encode("utf-8"), int(args[2]))
-            elif args[0] == "-ble" and len(args) == 2:
-                self.devCtrl.Connect(FAKE_CONN_OBJ_VALUE, int(args[1]))
+            elif args[0] == "-ble" and len(args) == 3:
+                self.devCtrl.ConnectBLE(int(args[1]), int(args[2]))
             else:
                 print("Usage:")
                 self.do_help("connect SetupPinCode")
                 return
-        except ChipStack.ChipStackException as ex:
+        except ChipExceptions.ChipStackException as ex:
             print(str(ex))
             return
         print("Connected")
+
+    def do_zcl(self, line):
+        """
+        To send ZCL message to device:
+        zcl <cluster> <command> <nodeid> <endpoint> <groupid> [key=value]...
+        To get a list of clusters:
+        zcl ?
+        To get a list of commands in cluster:
+        zcl ? <cluster>
+
+        Send ZCL command to device nodeid
+        """
+        try:
+            args = shlex.split(line)
+            if len(args) == 1 and args[0] == '?':
+                print(self.devCtrl.ZCLList().keys())
+            elif len(args) == 2 and args[0] == '?':
+                cluster = self.devCtrl.ZCLList().get(args[1], None)
+                if not cluster:
+                    raise ChipExceptions.UnknownCluster(args[1])
+                for commands in cluster.items():
+                    args = ", ".join(["{}: {}".format(argName, argType)
+                                      for argName, argType in commands[1].items()])
+                    print(commands[0])
+                    if commands[1]:
+                        print("  ", args)
+                    else:
+                        print("  <no arguments>")
+            elif len(args) > 4:
+                cluster = self.devCtrl.ZCLList().get(args[0], None)
+                if not cluster:
+                    raise ChipExceptions.UnknownCluster(args[0])
+                command = cluster.get(args[1], None)
+                # When command takes no arguments, (not command) is True
+                if command == None:
+                    raise ChipExceptions.UnknownCommand(args[0], args[1])
+                self.devCtrl.ZCLSend(args[0], args[1], int(
+                    args[2]), int(args[3]), int(args[4]), FormatZCLArguments(args[5:], command))
+            else:
+                self.do_help("zcl")
+        except ChipExceptions.ChipStackException as ex:
+            print("An exception occurred during process ZCL command:")
+            print(str(ex))
 
     def do_setpairingwificredential(self, line):
         """
@@ -409,7 +433,7 @@ class DeviceMgrCmd(Cmd):
         try:
             args = shlex.split(line)
             self.devCtrl.SetWifiCredential(args[0], args[1])
-        except ChipStack.ChipStackException as ex:
+        except ChipExceptions.ChipStackException as ex:
             print(str(ex))
             return
 

@@ -28,7 +28,6 @@
 #define _CHIP_INTERACTION_MODEL_COMMAND_HANDLER_H
 
 #include <app/Command.h>
-#include <app/MessageDef.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPTLVDebug.hpp>
 #include <map>

@@ -101,6 +101,7 @@ public:
     BLE_ERROR StartConnect();
 
     bool IsUnsubscribePending() const;
+    bool ConnectionObjectIs(BLE_CONNECTION_OBJECT connObj) { return connObj == mConnObj; }
     void Close();
     void Abort();
 

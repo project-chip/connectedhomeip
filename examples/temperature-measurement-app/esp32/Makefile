@@ -26,7 +26,7 @@ EXTRA_COMPONENT_DIRS += $(PROJECT_PATH)/third_party/connectedhomeip/config/esp32
                         $(PROJECT_PATH)/../../common/QRCode \
                         $(PROJECT_PATH)/../../common/screen-framework \
 
-CXXFLAGS += -std=c++11 -Os -DLWIP_IPV6_SCOPES=0
+CXXFLAGS += -std=c++14 -Os -DLWIP_IPV6_SCOPES=0
 CPPFLAGS += -Os -DLWIP_IPV6_SCOPES=0 -DCHIP_HAVE_CONFIG_H
 CFLAGS += -Os -DLWIP_IPV6_SCOPES=0
 

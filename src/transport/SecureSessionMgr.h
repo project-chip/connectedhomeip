@@ -32,8 +32,8 @@
 #include <inet/IPEndPointBasis.h>
 #include <support/CodeUtils.h>
 #include <support/DLLUtil.h>
+#include <transport/PASESession.h>
 #include <transport/PeerConnections.h>
-#include <transport/SecurePairingSession.h>
 #include <transport/SecureSession.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/Base.h>
@@ -63,9 +63,9 @@ private:
 
 /**
  * @brief
- *  Tracks ownership of a encrypted PacketBuffer.
+ *  Tracks ownership of a encrypted packet buffer.
  *
- *  EncryptedPacketBufferHandle is a kind of PacketBufferHandle class and used to hold a PacketBuffer
+ *  EncryptedPacketBufferHandle is a kind of PacketBufferHandle class and used to hold a packet buffer
  *  object whose payload has already been encrypted.
  */
 class EncryptedPacketBufferHandle final : public System::PacketBufferHandle
@@ -205,7 +205,8 @@ public:
      *   establishes the security keys for secure communication with the
      *   peer node.
      */
-    CHIP_ERROR NewPairing(const Optional<Transport::PeerAddress> & peerAddr, NodeId peerNodeId, SecurePairingSession * pairing);
+    CHIP_ERROR NewPairing(const Optional<Transport::PeerAddress> & peerAddr, NodeId peerNodeId, PASESession * pairing,
+                          Transport::Base * transport = nullptr);
 
     /**
      * @brief
@@ -222,6 +223,14 @@ public:
      * @param transportMgr   Transport to use
      */
     CHIP_ERROR Init(NodeId localNodeId, System::Layer * systemLayer, TransportMgrBase * transportMgr);
+
+    /**
+     * @brief
+     *   Set local node ID
+     *
+     * @param nodeId    Node id for the current node
+     */
+    void SetLocalNodeID(NodeId nodeId) { mLocalNodeId = nodeId; }
 
     /**
      * @brief
@@ -266,9 +275,6 @@ private:
 
     SecureSessionMgrDelegate * mCB   = nullptr;
     TransportMgrBase * mTransportMgr = nullptr;
-
-    CHIP_ERROR EncryptPayload(Transport::PeerConnectionState * state, PayloadHeader & payloadHeader, PacketHeader & packetHeader,
-                              System::PacketBufferHandle & msgBuf);
 
     CHIP_ERROR SendMessage(SecureSessionHandle session, PayloadHeader & payloadHeader, PacketHeader & packetHeader,
                            System::PacketBufferHandle msgBuf, EncryptedPacketBufferHandle * bufferRetainSlot,

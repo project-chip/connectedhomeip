@@ -19,20 +19,25 @@ static_library("transport") {
   output_name = "libTransportLayer"
 
   sources = [
+    "CASESession.cpp",
+    "CASESession.h",
     "NetworkProvisioning.cpp",
     "NetworkProvisioning.h",
+    "PASESession.cpp",
+    "PASESession.h",
     "PeerConnectionState.h",
     "PeerConnections.h",
     "RendezvousParameters.h",
     "RendezvousSession.cpp",
     "RendezvousSession.h",
     "RendezvousSessionDelegate.h",
-    "SecurePairingSession.cpp",
-    "SecurePairingSession.h",
+    "SecureMessageCodec.cpp",
+    "SecureMessageCodec.h",
     "SecureSession.cpp",
     "SecureSession.h",
     "SecureSessionMgr.cpp",
     "SecureSessionMgr.h",
+    "SessionEstablishmentDelegate.h",
     "TransportMgr.cpp",
     "TransportMgr.h",
   ]

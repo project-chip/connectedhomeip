@@ -12,8 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/config/linux/pkg_config.gni")
+import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
+
+import("${build_root}/config/linux/pkg_config.gni")
 
 config("ot_br_client_config") {
   # Treat these includes as system includes, so warnings in them are not fatal.

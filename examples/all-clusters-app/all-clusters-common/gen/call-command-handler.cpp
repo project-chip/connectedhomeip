@@ -20,6 +20,7 @@
 #include "af-structs.h"
 #include "call-command-handler.h"
 #include "callback.h"
+#include "cluster-id.h"
 #include "command-id.h"
 #include "util.h"
 
@@ -29,6 +30,8 @@ EmberAfStatus emberAfBarrierControlClusterClientCommandParse(EmberAfClusterComma
 EmberAfStatus emberAfBarrierControlClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfBasicClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfBasicClusterServerCommandParse(EmberAfClusterCommand * cmd);
+EmberAfStatus emberAfBindingClusterClientCommandParse(EmberAfClusterCommand * cmd);
+EmberAfStatus emberAfBindingClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfColorControlClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfColorControlClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfDoorLockClusterClientCommandParse(EmberAfClusterCommand * cmd);
@@ -83,6 +86,10 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
             // No commands are enabled for cluster Basic
             result = status(false, true, cmd->mfgSpecific);
             break;
+        case ZCL_BINDING_CLUSTER_ID:
+            // No commands are enabled for cluster Binding
+            result = status(false, true, cmd->mfgSpecific);
+            break;
         case ZCL_COLOR_CONTROL_CLUSTER_ID:
             // No commands are enabled for cluster Color Control
             result = status(false, true, cmd->mfgSpecific);
@@ -122,6 +129,9 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
             break;
         case ZCL_BASIC_CLUSTER_ID:
             result = emberAfBasicClusterServerCommandParse(cmd);
+            break;
+        case ZCL_BINDING_CLUSTER_ID:
+            result = emberAfBindingClusterServerCommandParse(cmd);
             break;
         case ZCL_COLOR_CONTROL_CLUSTER_ID:
             result = emberAfColorControlClusterServerCommandParse(cmd);
@@ -211,6 +221,90 @@ EmberAfStatus emberAfBasicClusterServerCommandParse(EmberAfClusterCommand * cmd)
         {
         case ZCL_RESET_TO_FACTORY_DEFAULTS_COMMAND_ID: {
             wasHandled = emberAfBasicClusterResetToFactoryDefaultsCallback();
+            break;
+        }
+        default: {
+            // Unrecognized command ID, error status will apply.
+            break;
+        }
+        }
+    }
+    return status(wasHandled, true, cmd->mfgSpecific);
+}
+EmberAfStatus emberAfBindingClusterServerCommandParse(EmberAfClusterCommand * cmd)
+{
+    bool wasHandled = false;
+
+    if (!cmd->mfgSpecific)
+    {
+        switch (cmd->commandId)
+        {
+        case ZCL_BIND_COMMAND_ID: {
+            uint32_t payloadOffset = cmd->payloadStartIndex;
+            chip::NodeId nodeId;
+            chip::GroupId groupId;
+            chip::EndpointId endpointId;
+            chip::ClusterId clusterId;
+
+            if (cmd->bufLen < payloadOffset + 8)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            nodeId = emberAfGetInt64u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset += 8;
+            if (cmd->bufLen < payloadOffset + 2)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            groupId = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset += 2;
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            endpointId = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset += 1;
+            if (cmd->bufLen < payloadOffset + 2)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            clusterId = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
+
+            wasHandled = emberAfBindingClusterBindCallback(nodeId, groupId, endpointId, clusterId);
+            break;
+        }
+        case ZCL_UNBIND_COMMAND_ID: {
+            uint32_t payloadOffset = cmd->payloadStartIndex;
+            chip::NodeId nodeId;
+            chip::GroupId groupId;
+            chip::EndpointId endpointId;
+            chip::ClusterId clusterId;
+
+            if (cmd->bufLen < payloadOffset + 8)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            nodeId = emberAfGetInt64u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset += 8;
+            if (cmd->bufLen < payloadOffset + 2)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            groupId = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset += 2;
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            endpointId = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset += 1;
+            if (cmd->bufLen < payloadOffset + 2)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            clusterId = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
+
+            wasHandled = emberAfBindingClusterUnbindCallback(nodeId, groupId, endpointId, clusterId);
             break;
         }
         default: {

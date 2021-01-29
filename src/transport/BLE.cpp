@@ -25,6 +25,7 @@
 #include <transport/BLE.h>
 
 #include <support/CodeUtils.h>
+#include <support/ReturnMacros.h>
 #include <support/logging/CHIPLogging.h>
 #include <transport/raw/MessageHeader.h>
 
@@ -164,6 +165,11 @@ void BLE::OnBleConnectionComplete(void * appState, BLE_CONNECTION_OBJECT connObj
     CHIP_ERROR err = CHIP_NO_ERROR;
     BLE * ble      = reinterpret_cast<BLE *>(appState);
 
+    // TODO(#4547): On darwin, OnBleConnectionComplete is called multiple times for the same peripheral, this should become an error
+    // in the future.
+    VerifyOrExit(ble->mBleEndPoint == nullptr || !ble->mBleEndPoint->ConnectionObjectIs(connObj),
+                 ChipLogError(Ble, "Warning: OnBleConnectionComplete is called multiple times for the same peripheral."));
+
     err = ble->InitInternal(connObj);
     SuccessOrExit(err);
 
@@ -230,14 +236,20 @@ void BLE::OnBleEndPointConnectionClosed(BLEEndPoint * endPoint, BLE_ERROR err)
     BLE * ble   = reinterpret_cast<BLE *>(endPoint->mAppState);
     ble->mState = State::kNotReady;
 
+    // Already closed, avoid closing again in our destructor.
+    ble->mBleEndPoint = nullptr;
+
     if (ble->mDelegate)
     {
         if (err != BLE_NO_ERROR)
         {
             ble->mDelegate->OnRendezvousError(err);
         }
-
-        ble->mDelegate->OnRendezvousConnectionClosed();
+        else
+        {
+            // OnRendezvousError may delete |ble|; don't call both callbacks.
+            ble->mDelegate->OnRendezvousConnectionClosed();
+        }
     }
 }
 

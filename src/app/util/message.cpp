@@ -94,8 +94,8 @@ uint8_t * emberAfPutInt8uInResp(uint8_t value)
 
 uint16_t * emberAfPutInt16uInResp(uint16_t value)
 {
-    uint8_t * low  = emberAfPutInt8uInResp(LOW_BYTE(value));
-    uint8_t * high = emberAfPutInt8uInResp(HIGH_BYTE(value));
+    uint8_t * low  = emberAfPutInt8uInResp(EMBER_LOW_BYTE(value));
+    uint8_t * high = emberAfPutInt8uInResp(EMBER_HIGH_BYTE(value));
 
     if (low && high)
     {
@@ -109,10 +109,10 @@ uint16_t * emberAfPutInt16uInResp(uint16_t value)
 
 uint32_t * emberAfPutInt32uInResp(uint32_t value)
 {
-    uint8_t * a = emberAfPutInt8uInResp(BYTE_0(value));
-    uint8_t * b = emberAfPutInt8uInResp(BYTE_1(value));
-    uint8_t * c = emberAfPutInt8uInResp(BYTE_2(value));
-    uint8_t * d = emberAfPutInt8uInResp(BYTE_3(value));
+    uint8_t * a = emberAfPutInt8uInResp(EMBER_BYTE_0(value));
+    uint8_t * b = emberAfPutInt8uInResp(EMBER_BYTE_1(value));
+    uint8_t * c = emberAfPutInt8uInResp(EMBER_BYTE_2(value));
+    uint8_t * d = emberAfPutInt8uInResp(EMBER_BYTE_3(value));
 
     if (a && b && c && d)
     {
@@ -126,9 +126,9 @@ uint32_t * emberAfPutInt32uInResp(uint32_t value)
 
 uint32_t * emberAfPutInt24uInResp(uint32_t value)
 {
-    uint8_t * a = emberAfPutInt8uInResp(BYTE_0(value));
-    uint8_t * b = emberAfPutInt8uInResp(BYTE_1(value));
-    uint8_t * c = emberAfPutInt8uInResp(BYTE_2(value));
+    uint8_t * a = emberAfPutInt8uInResp(EMBER_BYTE_0(value));
+    uint8_t * b = emberAfPutInt8uInResp(EMBER_BYTE_1(value));
+    uint8_t * c = emberAfPutInt8uInResp(EMBER_BYTE_2(value));
 
     if (a && b && c)
     {

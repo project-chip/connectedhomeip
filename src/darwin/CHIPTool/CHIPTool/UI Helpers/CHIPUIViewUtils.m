@@ -30,7 +30,7 @@
 
     titleLabel.translatesAutoresizingMaskIntoConstraints = false;
     [titleLabel.centerXAnchor constraintEqualToAnchor:view.centerXAnchor].active = YES;
-    [titleLabel.topAnchor constraintEqualToAnchor:view.topAnchor constant:100].active = YES;
+    [titleLabel.topAnchor constraintEqualToAnchor:view.topAnchor constant:110].active = YES;
 
     return titleLabel;
 }
@@ -138,5 +138,36 @@
     [button.leadingAnchor constraintEqualToAnchor:textField.trailingAnchor constant:15].active = YES;
 
     return containingView;
+}
+
++ (UIStackView *)stackViewWithLabel:(UILabel *)label buttons:(NSArray<UIButton *> *)buttons
+{
+    // Button stack view
+    UIStackView * stackViewButtons = [UIStackView new];
+    stackViewButtons.axis = UILayoutConstraintAxisHorizontal;
+    stackViewButtons.distribution = UIStackViewDistributionEqualSpacing;
+    stackViewButtons.alignment = UIStackViewAlignmentLeading;
+    stackViewButtons.spacing = 10;
+
+    label.font = [UIFont systemFontOfSize:17];
+    [stackViewButtons addArrangedSubview:label];
+
+    label.translatesAutoresizingMaskIntoConstraints = false;
+    [label.centerYAnchor constraintEqualToAnchor:stackViewButtons.centerYAnchor].active = YES;
+
+    stackViewButtons.translatesAutoresizingMaskIntoConstraints = false;
+    for (int i = 0; i < buttons.count; i++) {
+        UIButton * buttonForStack = [buttons objectAtIndex:i];
+        buttonForStack.backgroundColor = UIColor.systemBlueColor;
+        buttonForStack.titleLabel.font = [UIFont systemFontOfSize:17];
+        buttonForStack.titleLabel.textColor = [UIColor whiteColor];
+        buttonForStack.layer.cornerRadius = 5;
+        buttonForStack.clipsToBounds = YES;
+        buttonForStack.translatesAutoresizingMaskIntoConstraints = false;
+        [buttonForStack.widthAnchor constraintGreaterThanOrEqualToConstant:60].active = YES;
+        [stackViewButtons addArrangedSubview:buttonForStack];
+    }
+
+    return stackViewButtons;
 }
 @end

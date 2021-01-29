@@ -46,7 +46,7 @@ Raspberry Pi Desktop 20.10 (aarch64)**
 > Note that GN will set bypass_rendezvous for future builds, to enable
 > rendezvous, re-generate using
 >
->     gn gen out/debug --args='bypass_rendezvous=false'
+>     gn gen out/debug --args='chip_bypass_rendezvous=false'
 
 -   Prerequisites
 

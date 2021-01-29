@@ -34,7 +34,7 @@
 #include <protocols/echo/Echo.h>
 #include <support/ErrorStr.h>
 #include <system/SystemPacketBuffer.h>
-#include <transport/SecurePairingSession.h>
+#include <transport/PASESession.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/raw/TCP.h>
 #include <transport/raw/UDP.h>
@@ -42,11 +42,12 @@
 namespace {
 
 // The EchoServer object.
-chip::Protocols::EchoServer gEchoServer;
+chip::Protocols::Echo::EchoServer gEchoServer;
 chip::TransportMgr<chip::Transport::UDP> gUDPManager;
 chip::TransportMgr<chip::Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>> gTCPManager;
 chip::SecureSessionMgr gSessionManager;
-chip::SecurePairingUsingTestSecret gTestPairing;
+chip::SecurePairingUsingTestSecret gTestPairing(chip::Optional<chip::NodeId>::Value(chip::kUndefinedNodeId),
+                                                static_cast<uint16_t>(0), static_cast<uint16_t>(0));
 
 // Callback handler when a CHIP EchoRequest is received.
 void HandleEchoRequestReceived(chip::Messaging::ExchangeContext * ec, chip::System::PacketBufferHandle payload)

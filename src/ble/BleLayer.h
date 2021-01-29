@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2014-2017 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -97,6 +97,21 @@ typedef enum
     kBleTransportProtocolVersion_V2   = 2, // First BTP version with ACKs and flow-control.
     kBleTransportProtocolVersion_V3   = 3  // First BTP version with asymetric fragement sizes.
 } BleTransportProtocolVersion;
+
+constexpr size_t kCapabilitiesRequestMagicnumLength          = 2;
+constexpr size_t kCapabilitiesRequestL2capMtuLength          = 2;
+constexpr size_t kCapabilitiesRequestSupportedVersionsLength = 4;
+constexpr size_t kCapabilitiesRequestWindowSizeLength        = 1;
+constexpr size_t kCapabilitiesRequestLength = (kCapabilitiesRequestMagicnumLength + kCapabilitiesRequestL2capMtuLength +
+                                               kCapabilitiesRequestSupportedVersionsLength + kCapabilitiesRequestWindowSizeLength);
+
+constexpr size_t kCapabilitiesResponseMagicnumLength                = 2;
+constexpr size_t kCapabilitiesResponseL2capMtuLength                = 2;
+constexpr size_t kCapabilitiesResponseSelectedProtocolVersionLength = 1;
+constexpr size_t kCapabilitiesResponseWindowSizeLength              = 1;
+constexpr size_t kCapabilitiesResponseLength(kCapabilitiesResponseMagicnumLength + kCapabilitiesResponseL2capMtuLength +
+                                             kCapabilitiesResponseSelectedProtocolVersionLength +
+                                             kCapabilitiesResponseWindowSizeLength);
 
 class BleLayerObject
 {
@@ -267,12 +282,10 @@ public:
      *
      *     Beyond each call, no guarantees are provided as to the lifetime of UUID arguments.
      *
-     *     A 'true' return value means the CHIP stack successfully handled the
-     *     corresponding message or state indication. 'false' means the CHIP stack either
-     *     failed or chose not to handle this. In case of 'false,' the CHIP stack will not
-     *     have freed or taken ownership of any PacketBuffer arguments. This contract allows the
-     *     platform to pass BLE events to CHIP without needing to know which characteristics
-     *     CHIP cares about.
+     *     A 'true' return value means the CHIP stack successfully handled the corresponding message
+     *     or state indication. 'false' means the CHIP stack either failed or chose not to handle this.
+     *     This contract allows the platform to pass BLE events to CHIP without needing to know which
+     *     characteristics CHIP cares about.
 
      *     Platform must call this function when a GATT subscription has been established to any CHIP service
      *     charateristic.

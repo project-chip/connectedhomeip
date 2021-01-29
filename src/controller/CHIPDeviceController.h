@@ -32,6 +32,7 @@
 #include <controller/CHIPPersistentStorageDelegate.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPTLV.h>
+#include <messaging/ExchangeMgr.h>
 #include <support/DLLUtil.h>
 #include <support/SerializableIntegerSet.h>
 #include <transport/RendezvousSession.h>
@@ -187,6 +188,7 @@ protected:
     NodeId mLocalDeviceId;
     DeviceTransportMgr * mTransportMgr;
     SecureSessionMgr * mSessionManager;
+    Messaging::ExchangeManager * mExchangeManager;
     PersistentStorageDelegate * mStorageDelegate;
     Inet::InetLayer * mInetLayer;
 

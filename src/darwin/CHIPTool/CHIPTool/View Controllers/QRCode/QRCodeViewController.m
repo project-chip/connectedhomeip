@@ -50,6 +50,9 @@
 @property (strong, nonatomic) UITextField * manualCodeTextField;
 @property (strong, nonatomic) UIButton * doneManualCodeButton;
 
+@property (strong, nonatomic) UIButton * nfcScanButton;
+@property (readwrite) BOOL sessionIsActive;
+
 @property (strong, nonatomic) UIView * setupPayloadView;
 @property (strong, nonatomic) UILabel * manualCodeLabel;
 @property (strong, nonatomic) UIButton * resetButton;
@@ -66,6 +69,8 @@
 
 @property (readwrite) CHIPDeviceController * chipController;
 @property (readonly) CHIPToolPersistentStorageDelegate * persistentStorage;
+
+@property (strong, nonatomic) NFCNDEFReaderSession * session;
 @end
 
 @implementation QRCodeViewController {
@@ -100,6 +105,19 @@
     // Title
     UILabel * titleLabel = [CHIPUIViewUtils addTitle:@"QR Code Parser" toView:self.view];
 
+    // stack view
+    UIStackView * stackView = [UIStackView new];
+    stackView.axis = UILayoutConstraintAxisVertical;
+    stackView.distribution = UIStackViewDistributionFill;
+    stackView.alignment = UIStackViewAlignmentLeading;
+    stackView.spacing = 15;
+    [self.view addSubview:stackView];
+
+    stackView.translatesAutoresizingMaskIntoConstraints = false;
+    [stackView.topAnchor constraintEqualToAnchor:titleLabel.bottomAnchor constant:30].active = YES;
+    [stackView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:30].active = YES;
+    [stackView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-30].active = YES;
+
     // Manual entry view
     _manualCodeTextField = [UITextField new];
     _doneManualCodeButton = [UIButton new];
@@ -108,19 +126,34 @@
     _manualCodeTextField.keyboardType = UIKeyboardTypeNumberPad;
     [_doneManualCodeButton setTitle:@"Go" forState:UIControlStateNormal];
     UIView * manualEntryView = [CHIPUIViewUtils viewWithUITextField:_manualCodeTextField button:_doneManualCodeButton];
-    [self.view addSubview:manualEntryView];
+    [stackView addArrangedSubview:manualEntryView];
 
     manualEntryView.translatesAutoresizingMaskIntoConstraints = false;
     [manualEntryView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:30].active = YES;
     [manualEntryView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-30].active = YES;
     [manualEntryView.topAnchor constraintEqualToAnchor:titleLabel.bottomAnchor constant:30].active = YES;
 
+    _nfcScanButton = [UIButton new];
+    [_nfcScanButton setTitle:@"Scan NFC Tag" forState:UIControlStateNormal];
+    [_nfcScanButton addTarget:self action:@selector(startScanningNFCTags:) forControlEvents:UIControlEventTouchDown];
+    _nfcScanButton.titleLabel.font = [UIFont systemFontOfSize:17];
+    _nfcScanButton.titleLabel.textColor = [UIColor blackColor];
+    _nfcScanButton.layer.cornerRadius = 5;
+    _nfcScanButton.clipsToBounds = YES;
+    _nfcScanButton.backgroundColor = UIColor.systemBlueColor;
+    [stackView addArrangedSubview:_nfcScanButton];
+
+    _nfcScanButton.translatesAutoresizingMaskIntoConstraints = false;
+    [_nfcScanButton.leadingAnchor constraintEqualToAnchor:stackView.leadingAnchor].active = YES;
+    [_nfcScanButton.trailingAnchor constraintEqualToAnchor:stackView.trailingAnchor].active = YES;
+    [_nfcScanButton.heightAnchor constraintEqualToConstant:40].active = YES;
+
     // Results view
     _setupPayloadView = [UIView new];
     [self.view addSubview:_setupPayloadView];
 
     _setupPayloadView.translatesAutoresizingMaskIntoConstraints = false;
-    [_setupPayloadView.topAnchor constraintEqualToAnchor:manualEntryView.bottomAnchor constant:10].active = YES;
+    [_setupPayloadView.topAnchor constraintEqualToAnchor:stackView.bottomAnchor constant:10].active = YES;
     [_setupPayloadView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:30].active = YES;
     [_setupPayloadView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-30].active = YES;
     [_setupPayloadView.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor constant:-30].active = YES;
@@ -141,7 +174,7 @@
     [self.view addSubview:_qrCodeViewPreview];
 
     _qrCodeViewPreview.translatesAutoresizingMaskIntoConstraints = false;
-    [_qrCodeViewPreview.topAnchor constraintEqualToAnchor:manualEntryView.bottomAnchor constant:30].active = YES;
+    [_qrCodeViewPreview.topAnchor constraintEqualToAnchor:_nfcScanButton.bottomAnchor constant:30].active = YES;
     [_qrCodeViewPreview.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:30].active = YES;
     [_qrCodeViewPreview.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-30].active = YES;
     [_qrCodeViewPreview.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor constant:-50].active = YES;
@@ -151,12 +184,11 @@
     _errorLabel.text = @"Error Text";
     _errorLabel.textColor = UIColor.blackColor;
     _errorLabel.font = [UIFont systemFontOfSize:17];
-    [self.view addSubview:_errorLabel];
+    [stackView addArrangedSubview:_errorLabel];
 
     _errorLabel.translatesAutoresizingMaskIntoConstraints = false;
     [_errorLabel.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:30].active = YES;
     [_errorLabel.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-30].active = YES;
-    [_errorLabel.topAnchor constraintEqualToAnchor:manualEntryView.bottomAnchor constant:40].active = YES;
 
     // Reset button
     _resetButton = [UIButton new];
@@ -243,6 +275,8 @@
 - (void)viewDidDisappear:(BOOL)animated
 {
     [super viewDidDisappear:animated];
+    [_session invalidateSession];
+    _session = nil;
 }
 
 - (void)dismissKeyboard
@@ -268,6 +302,57 @@
 
     [self manualCodeInitialState];
     [self qrCodeInitialState];
+}
+
+// MARK: NFCNDEFReaderSessionDelegate
+
+- (void)readerSession:(nonnull NFCNDEFReaderSession *)session didDetectNDEFs:(nonnull NSArray<NFCNDEFMessage *> *)messages
+{
+    [_session invalidateSession];
+    NSString * errorMessage;
+    if (messages.count == 1) {
+        for (NFCNDEFMessage * message in messages) {
+            if (message.records.count == 1) {
+                for (NFCNDEFPayload * payload in message.records) {
+                    NSString * payloadType = [[NSString alloc] initWithData:payload.type encoding:NSUTF8StringEncoding];
+                    if ([payloadType isEqualToString:@"U"]) {
+                        NSURL * payloadURI = [payload wellKnownTypeURIPayload];
+                        NSLog(@"Payload text:%@", payloadURI);
+                        if (payloadURI) {
+                            /* CHIP Issue #415
+                             Once #415 goes in, there will b no need to replace _ with spaces.
+                            */
+                            NSString * qrCode = [[payloadURI absoluteString] stringByReplacingOccurrencesOfString:@"_"
+                                                                                                       withString:@" "];
+                            NSLog(@"Scanned code string:%@", qrCode);
+                            [self scannedQRCode:qrCode];
+                        }
+                    } else {
+                        errorMessage = @"Record must be of type text.";
+                    }
+                }
+            } else {
+                errorMessage = @"Only one record in NFC tag is accepted.";
+            }
+        }
+    } else {
+        errorMessage = @"Only one message in NFC tag is accepted.";
+    }
+    if ([errorMessage length] > 0) {
+        NSError * error = [[NSError alloc] initWithDomain:@"com.chiptool.nfctagscanning"
+                                                     code:1
+                                                 userInfo:@{ NSLocalizedDescriptionKey : errorMessage }];
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, DISPATCH_TIME_NOW), dispatch_get_main_queue(), ^{
+            [self showError:error];
+        });
+    }
+}
+
+- (void)readerSession:(nonnull NFCNDEFReaderSession *)session didInvalidateWithError:(nonnull NSError *)error
+{
+    NSLog(@"If no NFC reading UI is appearing, target may me missing the appropriate capability. Turn on Near Field Communication "
+          @"Tag Reading under the Capabilities tab for the project’s target. A paid developer account is needed for this.");
+    _session = nil;
 }
 
 // MARK: CHIPDeviceControllerDelegate
@@ -591,6 +676,7 @@
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         [self->_captureSession stopRunning];
+        [self->_session invalidateSession];
     });
     CHIPQRCodeSetupPayloadParser * parser = [[CHIPQRCodeSetupPayloadParser alloc] initWithBase41Representation:qrCode];
     NSError * error;
@@ -648,6 +734,16 @@
     // reset the view and remove any preferences that were stored from scanning the QRCode
     [self manualCodeInitialState];
     [self qrCodeInitialState];
+}
+
+- (IBAction)startScanningNFCTags:(id)sender
+{
+    if (!_session) {
+        _session = [[NFCNDEFReaderSession alloc] initWithDelegate:self
+                                                            queue:dispatch_queue_create(NULL, DISPATCH_QUEUE_CONCURRENT)
+                                         invalidateAfterFirstRead:NO];
+    }
+    [_session beginSession];
 }
 
 - (IBAction)enteredManualCode:(id)sender

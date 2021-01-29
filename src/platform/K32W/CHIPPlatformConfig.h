@@ -63,7 +63,7 @@
 #define CHIP_CONFIG_AES_IMPLEMENTATION_MBEDTLS 1
 #define CHIP_CONFIG_AES_IMPLEMENTATION_PLATFORM 0
 
-// FIXME: EFR32 currently set to CHIP (Does this use Entropy.cpp ?)
+// FIXME: K32W currently set to CHIP (Does this use Entropy.cpp ?)
 
 #define CHIP_CONFIG_RNG_IMPLEMENTATION_OPENSSL 0
 #define CHIP_CONFIG_RNG_IMPLEMENTATION_CHIPDRBG 1

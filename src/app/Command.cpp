@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -58,7 +58,7 @@ CHIP_ERROR Command::Reset()
     if (mCommandMessageBuf.IsNull())
     {
         // TODO: Calculate the packet buffer size
-        mCommandMessageBuf = System::PacketBuffer::New();
+        mCommandMessageBuf = System::PacketBufferHandle::New(System::kMaxPacketBufferSize);
         VerifyOrExit(!mCommandMessageBuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
     }
 
@@ -145,10 +145,10 @@ exit:
 
 chip::TLV::TLVWriter & Command::CreateCommandDataElementTLVWriter()
 {
-    mCommandDataBuf = chip::System::PacketBuffer::New();
+    mCommandDataBuf = chip::System::PacketBufferHandle::New(System::kMaxPacketBufferSize);
     if (mCommandDataBuf.IsNull())
     {
-        ChipLogDetail(DataManagement, "Unable to allocate PacketBuffer");
+        ChipLogDetail(DataManagement, "Unable to allocate packet buffer");
     }
 
     mCommandDataWriter.Init(mCommandDataBuf.Retain());
@@ -183,7 +183,8 @@ CHIP_ERROR Command::AddCommand(CommandParams & aCommandParams)
 
     if (apCommandLen > 0)
     {
-        VerifyOrExit(apCommandLen > 2, err = CHIP_ERROR_INVALID_ARGUMENT);
+        // Command argument list can be empty.
+        VerifyOrExit(apCommandLen >= 2, err = CHIP_ERROR_INVALID_ARGUMENT);
         VerifyOrExit(apCommandData[0] == chip::TLV::kTLVType_Structure, err = CHIP_ERROR_INVALID_ARGUMENT);
 
         apCommandData += 1;

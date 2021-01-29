@@ -22,17 +22,17 @@ digraph RendezvousSession
   subgraph rendezvousSession {
     node [fillcolor="white:gray", gradientangle=90]
 
-    RendezvousSession [shape=record, label=<{RendezvousSession|<font point-size="11">SecurePairingSessionDelegate</font>}>, URL="@ref chip::SecurePairingSessionDelegate"]
+    RendezvousSession [shape=record, label=<{RendezvousSession|<font point-size="11">SessionEstablishmentDelegate</font>}>, URL="@ref chip::SessionEstablishmentDelegate"]
   }
 
-  # This section represents methods which belongs to SecurePairingSession
+  # This section represents methods which belongs to PASESession
   subgraph cluster_securePairingSession {
-    label=<<b>SecurePairingSession</b>>
+    label=<<b>PASESession</b>>
     node [fillcolor="gray"]
 
-    WaitForPairing [URL="@ref chip::SecurePairingSession::WaitForPairing"]
-    Pair [URL="@ref chip::SecurePairingSession::Pair"]
-    DeriveSecureSession [URL="@ref chip::SecurePairingSession::DeriveSecureSession"]
+    WaitForPairing [URL="@ref chip::PASESession::WaitForPairing"]
+    Pair [URL="@ref chip::PASESession::Pair"]
+    DeriveSecureSession [URL="@ref chip::PASESession::DeriveSecureSession"]
   }
 
   # This section represents methods which belongs to RendezvousParameters
@@ -54,13 +54,13 @@ digraph RendezvousSession
     OnRendezvousError [URL="@ref chip::RendezvousSessionDelegate::OnRendezvousError"]
   }
 
-  # This section represents callbacks which belongs to SecurePairingSessionDelegate
-  subgraph cluster_securePairingSessionDelegate {
-    label=<<b>SecurePairingSessionDelegate</b>>
+  # This section represents callbacks which belongs to SessionEstablishmentDelegate
+  subgraph cluster_secureSessionEstablishmentDelegate {
+    label=<<b>SessionEstablishmentDelegate</b>>
     node [fillcolor="white"]
 
-    OnPairingError [URL="@ref chip::SecurePairingSessionDelegate::OnPairingError"]
-    OnPairingComplete [URL="@ref chip::SecurePairingSessionDelegate::OnPairingComplete"]
+    OnSessionEstablishmentError [URL="@ref chip::SessionEstablishmentDelegate::OnSessionEstablishmentError"]
+    OnSessionEstablished [URL="@ref chip::SessionEstablishmentDelegate::OnSessionEstablished"]
   }
 
   #############################
@@ -78,6 +78,6 @@ digraph RendezvousSession
 
   HasConnectionObject -> WaitForPairing [label=NO]
 
-  OnPairingError -> OnRendezvousError
-  OnPairingComplete -> DeriveSecureSession -> OnRendezvousConnectionOpened
+  OnSessionEstablishmentError -> OnRendezvousError
+  OnSessionEstablished -> DeriveSecureSession -> OnRendezvousConnectionOpened
 }

@@ -28,7 +28,8 @@
 
 // ==================== Platform Adaptations ====================
 
-// TODO
+#define BLE_CONNECTION_OBJECT uint8_t
+#define BLE_CONNECTION_UNINITIALIZED ((uint8_t) 0xFF)
 
 // ========== Platform-specific Configuration Overrides =========
 
