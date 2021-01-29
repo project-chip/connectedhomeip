@@ -30,10 +30,6 @@
 #include <transport/TransportMgr.h>
 #include <transport/raw/PeerAddress.h>
 
-#if CONFIG_DEVICE_LAYER
-#include <platform/ConnectivityManager.h>
-#endif
-
 #if CONFIG_NETWORK_LAYER_BLE
 #include <transport/BLE.h>
 #endif // CONFIG_NETWORK_LAYER_BLE
@@ -62,13 +58,7 @@ CHIP_ERROR RendezvousSession::Init(const RendezvousParameters & params, Transpor
     if (params.GetPeerAddress().GetTransportType() == Transport::Type::kBle)
 #if CONFIG_NETWORK_LAYER_BLE
     {
-#if CONFIG_DEVICE_LAYER
-        if (!mParams.IsController())
-        {
-            // Enable BLE advertisement
-            ReturnErrorOnFailure(chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(true));
-        }
-#endif
+        ReturnErrorOnFailure(mParams.GetAdvertisementDelegate()->StartAdvertisement());
         Transport::BLE * transport = chip::Platform::New<Transport::BLE>();
         mTransport                 = transport;
 
@@ -279,13 +269,11 @@ void RendezvousSession::UpdateState(RendezvousSession::State newState, CHIP_ERRO
         ReleasePairingSessionHandle();
     }
 
-#if CONFIG_NETWORK_LAYER_BLE && CONFIG_DEVICE_LAYER
-    if (!mParams.IsController() && mParams.GetPeerAddress().GetTransportType() == Transport::Type::kBle && newState == State::kInit)
+    if (newState == State::kInit)
     {
-        // Enable BLE advertisement
-        chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(false);
+        // Disable BLE advertisement
+        mParams.GetAdvertisementDelegate()->StopAdvertisement();
     }
-#endif
 }
 
 void RendezvousSession::OnRendezvousMessageReceived(const PacketHeader & packetHeader, const PeerAddress & peerAddress,
