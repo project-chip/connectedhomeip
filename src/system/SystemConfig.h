@@ -367,7 +367,7 @@
  *
  *      The size of PacketBuffer structure does not need to be included in this value.
  */
-#if CHIP_SYSTEM_CONFIG_USE_LWIP && !DOXYGEN
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && !defined(DOXYGEN)
 #ifdef CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX
 #error "CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX cannot be defined on an LwIP-based platform."
 #endif /* CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX */
