@@ -7,6 +7,7 @@
 #include <core/CHIPTLV.h>
 #include <support/CodeUtils.h>
 #include <support/UnitTestRegistration.h>
+#include <system/SystemPacketBuffer.h>
 
 using namespace ::chip;
 using namespace ::chip::bdx;

@@ -9,6 +9,7 @@
 #include <protocols/Protocols.h>
 #include <protocols/bdx/BdxMessages.h>
 #include <support/CodeUtils.h>
+#include <system/SystemPacketBuffer.h>
 
 namespace {
 const uint8_t kBdxVersion = 0; ///< The version of this implementation of the BDX spec
