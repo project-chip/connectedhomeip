@@ -77,4 +77,4 @@ jobs:
                     --release-tag "${{ github.event.inputs.releaseTag }}" \
                     --bundle-files $BUILD_DIRECTORY/chip-efr32-lock-example.flashbundle.txt \
                     --working-directory $BUILD_DIRECTORY                  \
-                    --bundle-name efr32-chip-lock-example
+                    --bundle-name efr32-$EFR32_BOARD-chip-lock-example
