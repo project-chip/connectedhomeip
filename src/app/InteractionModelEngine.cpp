@@ -241,7 +241,7 @@ CHIP_ERROR InteractionModelEngine::DeregisterClusterCommandHandler(chip::Cluster
         ChipLogDetail(DataManagement,
                       "DeregisterClusterCommandHandler unregistered handler for ClusterId = %d, CommandId = %d, CommandRoleId "
                       "= %d, Dispatcher = %p",
-                      aClusterId, aCommandId, aCommandRoleId, (void *)handlerIt->second);
+                      aClusterId, aCommandId, aCommandRoleId, (void *) handlerIt->second);
         mHandlersMap.erase(handlerIt);
     }
     else
