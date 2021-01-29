@@ -13,8 +13,8 @@ onto a CHIP-enabled Thread network. The instructions are also valid for
 -   [Requirements](#requirements)
 -   [Building and programming OpenThread RCP firmware](#building-rcp-firmware)
 -   [Configuring PC as Thread Border Router](#configuring-pc)
-    - [Forming Thread network](#forming-thread-network)
-    - [Configuring Wi-Fi hotspot](#configuring-hotspot)
+    -   [Forming Thread network](#forming-thread-network)
+    -   [Configuring Wi-Fi hotspot](#configuring-hotspot)
 -   [Building and programming nRF Connect Lock Example Application](#building-example)
 -   [Building and installing Android CHIPTool](#building-chiptool)
 -   [Preparing accessory device](#preparing-accessory)
@@ -128,6 +128,7 @@ the RCP firmware onto an nRF52840 DK:
          $ make -f examples/Makefile-nrf52840
 
     This creates an RCP image in the `bin/ot-rcp` directory.
+
 7.  Convert the RCP image to HEX format:
 
         $ arm-none-eabi-objcopy -O ihex output/nrf52840/bin/ot-rcp output/nrf52840/bin/ot-rcp.hex
@@ -145,9 +146,9 @@ the RCP firmware onto an nRF52840 DK:
 
     This is required, so that the feature
     [does not interfere](https://github.com/openthread/openthread/blob/master/examples/platforms/nrf528xx/nrf52840/README.md#mass-storage-device-known-issue)
-    with core RCP functionalities.
-    The setting remains valid even if you program another firmware onto the
-    device.
+    with core RCP functionalities. The setting remains valid even if you program
+    another firmware onto the device.
+
 10. Power-cycle the device to apply the changes.
 
 <hr>
@@ -173,14 +174,17 @@ To form a Thread network, complete the following steps:
 
         $ docker network create --ipv6 --subnet 2001:db8:1::/64 -o com.docker.network.bridge.name=otbr0 otbr
 
-2.  Start the OTBR container using the following command. In the last line, provide the device node name of the nRF52840 kit that is running the RCP firmware before `:/dev/radio`  (in this case, the name is _/dev/ttyACM0_):
+2.  Start the OTBR container using the following command. In the last line,
+    provide the device node name of the nRF52840 kit that is running the RCP
+    firmware before `:/dev/radio` (in this case, the name is _/dev/ttyACM0_):
 
         $ docker run -it --rm --privileged --network otbr -p 8080:80 \
                 --sysctl "net.ipv6.conf.all.disable_ipv6=0 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1" \
                 --volume /dev/ttyACM0:/dev/radio openthread/otbr --radio-url spinel+hdlc+uart:///dev/radio
 
 3.  Open the `http://localhost:8080/` address in a web browser.
-4.  Click **Form** in the menu to the left. The network forming creator window appears.
+4.  Click **Form** in the menu to the left. The network forming creator window
+    appears.
 5.  Make sure that the On-Mesh Prefix is set to `fd11:22::`. This value is used
     later to configure the IPv6 packet routing.
 6.  Click the **Form** button at the bottom of the window to form a new Thread
@@ -338,12 +342,12 @@ following steps:
 2. Connect the smartphone to the Wi-Fi Hotspot created in the
    [Configuring Wi-Fi hotspot](#Configuring-a-Wi-Fi-hotspot) section.
 3. Open the CHIPTool application on your smartphone.
-4. Tap the **PROVISION CHIP DEVICE WITH THREAD** button and scan the commissioning QR code.
-   Several notifications will appear, informing you of commissioning
-   progress with scanning, connection, and pairing.
-   At the end of this process, the Thread network settings screen appears.
-5. In the Thread network settings screen, use the default settings and tap
-   the **SAVE NETWORK** button to send a Thread provisioning message to the
+4. Tap the **PROVISION CHIP DEVICE WITH THREAD** button and scan the
+   commissioning QR code. Several notifications will appear, informing you of
+   commissioning progress with scanning, connection, and pairing. At the end of
+   this process, the Thread network settings screen appears.
+5. In the Thread network settings screen, use the default settings and tap the
+   **SAVE NETWORK** button to send a Thread provisioning message to the
    accessory device.
 
 You will see the "Network provisioning completed" message when the accessory
@@ -359,15 +363,15 @@ Once the device is commissioned, the following screen appears:
 
 ![CHIPTool device control screen](../../docs/images/CHIPTool_device_commissioned.jpg)
 
-This means that the provisioning is completed successfully and you are connected to the device.
-Check the connection with the following steps:
+This means that the provisioning is completed successfully and you are connected
+to the device. Check the connection with the following steps:
 
-1. Verify that the text box on the screen is not empty and contains the IPv6 address of the
-   accessory device.
+1. Verify that the text box on the screen is not empty and contains the IPv6
+   address of the accessory device.
 2. Tap the following buttons to change the lock state:
 
-   - **ON** and **OFF** buttons lock and unlock the door,
-   respectively.
-   - **TOGGLE** changes the lock state to the opposite.
+    - **ON** and **OFF** buttons lock and unlock the door, respectively.
+    - **TOGGLE** changes the lock state to the opposite.
 
-The **LED 2** on the device turns on or off based on the changes of the lock state.
+The **LED 2** on the device turns on or off based on the changes of the lock
+state.
