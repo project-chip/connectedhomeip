@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -103,11 +103,8 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext, const IPAddress &
 
     uint16_t payload_len = sizeof(PAYLOAD);
 
-    chip::System::PacketBufferHandle buffer = chip::System::PacketBuffer::NewWithAvailableSize(payload_len);
+    chip::System::PacketBufferHandle buffer = chip::System::PacketBufferHandle::NewWithData(PAYLOAD, payload_len);
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());
-
-    memmove(buffer->Start(), PAYLOAD, payload_len);
-    buffer->SetDataLength(payload_len);
 
     CHIP_ERROR err = CHIP_NO_ERROR;
 

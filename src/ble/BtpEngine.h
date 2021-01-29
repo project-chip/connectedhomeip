@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2014-2017 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -42,6 +42,18 @@
 
 namespace chip {
 namespace Ble {
+
+constexpr size_t kTransferProtocolHeaderFlagsSize = 1; // Size in bytes of enocded BTP fragment header flag bits
+constexpr size_t kTransferProtocolSequenceNumSize = 1; // Size in bytes of encoded BTP sequence number
+constexpr size_t kTransferProtocolAckSize         = 1; // Size in bytes of encoded BTP fragment acknowledgement number
+constexpr size_t kTransferProtocolMsgLenSize      = 2; // Size in byte of encoded BTP total fragmented message length
+
+constexpr size_t kTransferProtocolMaxHeaderSize =
+    kTransferProtocolHeaderFlagsSize + kTransferProtocolAckSize + kTransferProtocolSequenceNumSize + kTransferProtocolMsgLenSize;
+constexpr size_t kTransferProtocolMidFragmentMaxHeaderSize =
+    kTransferProtocolHeaderFlagsSize + kTransferProtocolAckSize + kTransferProtocolSequenceNumSize;
+constexpr size_t kTransferProtocolStandaloneAckHeaderSize =
+    kTransferProtocolHeaderFlagsSize + kTransferProtocolAckSize + kTransferProtocolSequenceNumSize;
 
 using ::chip::System::PacketBufferHandle;
 

@@ -146,4 +146,14 @@ LOG_BACKEND_DEFINE(pigweedLogBackend, pigweedLogApi, /* autostart */ true);
 #endif // CONFIG_LOG
 
 } // namespace
+
+k_sem * GetSemaphore()
+{
+#if CONFIG_LOG
+    return &sLoggerLock;
+#else
+    return nullptr;
+#endif
+}
+
 } // namespace PigweedLogger

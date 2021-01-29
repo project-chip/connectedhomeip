@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -146,7 +146,7 @@ CHIP_ERROR BLEManagerImpl::_SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     VerifyOrExit(val != ConnectivityManager::kCHIPoBLEServiceMode_NotSupported, err = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_NotSupported, err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+    VerifyOrExit(mServiceMode != ConnectivityManager::kCHIPoBLEServiceMode_NotSupported, err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
     if (val != mServiceMode)
     {
@@ -162,7 +162,7 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    VerifyOrExit(mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_NotSupported, err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+    VerifyOrExit(mServiceMode != ConnectivityManager::kCHIPoBLEServiceMode_NotSupported, err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
     if (GetFlag(mFlags, kFlag_AdvertisingEnabled) != val)
     {
@@ -178,7 +178,7 @@ CHIP_ERROR BLEManagerImpl::_SetFastAdvertisingEnabled(bool val)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    VerifyOrExit(mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_NotSupported, err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+    VerifyOrExit(mServiceMode != ConnectivityManager::kCHIPoBLEServiceMode_NotSupported, err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
     if (GetFlag(mFlags, kFlag_FastAdvertisingEnabled) != val)
     {
@@ -204,7 +204,7 @@ CHIP_ERROR BLEManagerImpl::_SetDeviceName(const char * deviceName)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    VerifyOrExit(mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_NotSupported, err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+    VerifyOrExit(mServiceMode != ConnectivityManager::kCHIPoBLEServiceMode_NotSupported, err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
     if (deviceName != NULL && deviceName[0] != 0)
     {
         if (strlen(deviceName) >= kMaxDeviceNameLength)
@@ -664,9 +664,9 @@ void BLEManagerImpl::HandleRXCharWrite(struct ble_gatt_char_context * param)
     ESP_LOGI(TAG, "Write request received for CHIPoBLE RX characteristic con %u %u", param->conn_handle, param->attr_handle);
 
     // Copy the data to a packet buffer.
-    PacketBufferHandle buf = System::PacketBuffer::New(0);
+    data_len               = OS_MBUF_PKTLEN(param->ctxt->om);
+    PacketBufferHandle buf = System::PacketBufferHandle::New(data_len, 0);
     VerifyOrExit(!buf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
-    data_len = OS_MBUF_PKTLEN(param->ctxt->om);
     VerifyOrExit(buf->AvailableDataLength() >= data_len, err = CHIP_ERROR_BUFFER_TOO_SMALL);
     ble_hs_mbuf_to_flat(param->ctxt->om, buf->Start(), data_len, NULL);
     buf->SetDataLength(data_len);

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2019-2020 Google LLC.
  *    Copyright (c) 2013-2018 Nest Labs, Inc.
  *    All rights reserved.
@@ -317,11 +317,8 @@ CHIP_ERROR nl_Chip_DeviceController_DriveIO(uint32_t sleepTimeMS)
                     {
                     case kBleEventType_Rx:
                         // build a packet buffer from the rxEv and send to blelayer.
-                        msgBuf = chip::System::PacketBuffer::New();
+                        msgBuf = chip::System::PacketBufferHandle::NewWithData(evu.rxEv->buffer, evu.rxEv->length);
                         VerifyOrExit(!msgBuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
-
-                        memcpy(msgBuf->Start(), evu.rxEv->buffer, evu.rxEv->length);
-                        msgBuf->SetDataLength(evu.rxEv->length);
 
                         // copy the svcId and charId from the event.
                         memcpy(svcId.bytes, evu.rxEv->svcId, sizeof(svcId.bytes));

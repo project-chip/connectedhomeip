@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2014-2017 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -115,7 +115,7 @@ BLE_ERROR BLEEndPoint::StartConnect()
     mState = kState_Connecting;
 
     // Build BLE transport protocol capabilities request.
-    buf = System::PacketBuffer::New();
+    buf = System::PacketBufferHandle::New(System::kMaxPacketBufferSize);
     VerifyOrExit(!buf.IsNull(), err = BLE_ERROR_NO_MEMORY);
 
     // Zero-initialize BLE transport capabilities request.
@@ -945,7 +945,7 @@ BLE_ERROR BLEEndPoint::DriveStandAloneAck()
     // If stand-alone ack not already pending, allocate new payload buffer here.
     if (mAckToSend.IsNull())
     {
-        mAckToSend = System::PacketBuffer::New();
+        mAckToSend = System::PacketBufferHandle::New(kTransferProtocolStandaloneAckHeaderSize);
         VerifyOrExit(!mAckToSend.IsNull(), err = BLE_ERROR_NO_MEMORY);
     }
 
@@ -1087,7 +1087,7 @@ BLE_ERROR BLEEndPoint::HandleCapabilitiesRequestReceived(PacketBufferHandle data
     err = BleTransportCapabilitiesRequestMessage::Decode(data, req);
     SuccessOrExit(err);
 
-    responseBuf = System::PacketBuffer::New();
+    responseBuf = System::PacketBufferHandle::New(kCapabilitiesResponseLength);
     VerifyOrExit(!responseBuf.IsNull(), err = BLE_ERROR_NO_MEMORY);
 
     // Determine BLE connection's negotiated ATT MTU, if possible.

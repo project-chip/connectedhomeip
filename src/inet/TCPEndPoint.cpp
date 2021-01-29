@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2013-2018 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -2402,12 +2402,14 @@ void TCPEndPoint::ReceiveData()
     bool isNewBuf = true;
 
     if (mRcvQueue.IsNull())
-        rcvBuf = System::PacketBuffer::New(0);
+        rcvBuf = System::PacketBufferHandle::New(kMaxReceiveMessageSize, 0);
     else
     {
         rcvBuf = mRcvQueue->Last();
         if (rcvBuf->AvailableDataLength() == 0)
-            rcvBuf = System::PacketBuffer::New(0);
+        {
+            rcvBuf = System::PacketBufferHandle::New(kMaxReceiveMessageSize, 0);
+        }
         else
         {
             isNewBuf = false;
@@ -2500,24 +2502,24 @@ void TCPEndPoint::ReceiveData()
         }
 
         // Otherwise, add the new data onto the receive queue.
-        else if (isNewBuf)
-        {
-            VerifyOrDie(rcvLen > 0);
-            size_t newDataLength = rcvBuf->DataLength() + static_cast<size_t>(rcvLen);
-            VerifyOrDie(CanCastTo<uint16_t>(newDataLength));
-            rcvBuf->SetDataLength(static_cast<uint16_t>(newDataLength));
-            if (mRcvQueue.IsNull())
-                mRcvQueue = std::move(rcvBuf);
-            else
-                mRcvQueue->AddToEnd(std::move(rcvBuf));
-        }
-
         else
         {
             VerifyOrDie(rcvLen > 0);
             size_t newDataLength = rcvBuf->DataLength() + static_cast<size_t>(rcvLen);
             VerifyOrDie(CanCastTo<uint16_t>(newDataLength));
-            rcvBuf->SetDataLength(static_cast<uint16_t>(newDataLength), mRcvQueue);
+            if (isNewBuf)
+            {
+                rcvBuf->SetDataLength(static_cast<uint16_t>(newDataLength));
+                rcvBuf.RightSize();
+                if (mRcvQueue.IsNull())
+                    mRcvQueue = std::move(rcvBuf);
+                else
+                    mRcvQueue->AddToEnd(std::move(rcvBuf));
+            }
+            else
+            {
+                rcvBuf->SetDataLength(static_cast<uint16_t>(newDataLength), mRcvQueue);
+            }
         }
     }
 

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -76,7 +76,7 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
 #define COMMAND_HEADER(name, clusterId)                                                                                            \
     const char * kName = name;                                                                                                     \
                                                                                                                                    \
-    PacketBufferHandle payload = PacketBuffer::NewWithAvailableSize(kMaxBufferSize);                                               \
+    PacketBufferHandle payload = PacketBufferHandle::New(kMaxBufferSize);                                                          \
     if (payload.IsNull())                                                                                                          \
     {                                                                                                                              \
         ChipLogError(Zcl, "Could not allocate packet buffer while trying to encode %s command", kName);                            \
