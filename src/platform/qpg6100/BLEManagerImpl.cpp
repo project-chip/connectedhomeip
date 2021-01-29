@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -526,11 +526,8 @@ void BLEManagerImpl::HandleRXCharWrite(uint16_t connId, uint16_t handle, uint8_t
     ChipLogProgress(DeviceLayer, "Write request received for CHIPoBLE Client TX characteristic (con %u, len %u)", connId, len);
 
     // Copy the data to a packet buffer.
-    PacketBufferHandle buf = System::PacketBuffer::New(0);
+    PacketBufferHandle buf = System::PacketBufferHandle::NewWithData(pValue, len, 0, 0);
     VerifyOrExit(!buf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
-    VerifyOrExit(buf->AvailableDataLength() >= len, err = CHIP_ERROR_BUFFER_TOO_SMALL);
-    memcpy(buf->Start(), pValue, len);
-    buf->SetDataLength(len);
     // Post an event to the Chip queue to deliver the data into the Chip stack.
     {
         ChipDeviceEvent event;

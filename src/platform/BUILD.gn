@@ -382,6 +382,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "K32W/ConfigurationManagerImpl.h",
         "K32W/ConnectivityManagerImpl.cpp",
         "K32W/ConnectivityManagerImpl.h",
+        "K32W/DeviceNetworkProvisioningDelegateImpl.cpp",
         "K32W/DeviceNetworkProvisioningDelegateImpl.h",
         "K32W/K32WConfig.cpp",
         "K32W/K32WConfig.h",
@@ -390,6 +391,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "K32W/PlatformManagerImpl.cpp",
         "K32W/PlatformManagerImpl.h",
         "K32W/SoftwareUpdateManagerImpl.h",
+        "K32W/ble_function_mux.c",
       ]
 
       if (chip_enable_openthread) {
@@ -401,6 +403,8 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
           "OpenThread/OpenThreadUtils.cpp",
         ]
       }
+
+      public_deps += [ "${chip_root}/src/crypto" ]
     } else if (chip_device_platform == "linux") {
       sources += [
         "Linux/BLEManagerImpl.cpp",
@@ -422,6 +426,8 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "Linux/DeviceNetworkProvisioningDelegateImpl.cpp",
         "Linux/DeviceNetworkProvisioningDelegateImpl.h",
         "Linux/InetPlatformConfig.h",
+        "Linux/KeyValueStoreManagerImpl.cpp",
+        "Linux/KeyValueStoreManagerImpl.h",
         "Linux/Logging.cpp",
         "Linux/PlatformManagerImpl.cpp",
         "Linux/PlatformManagerImpl.h",

@@ -53,7 +53,11 @@
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/mem.h>
 #include <lwip/pbuf.h>
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+#else // !CHIP_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC == 0
+#include <support/CHIPMem.h>
+#endif
+#endif // !CHIP_SYSTEM_CONFIG_USE_LWIP
 
 namespace chip {
 namespace System {
@@ -312,7 +316,7 @@ void PacketBuffer::AddRef()
 #endif // !CHIP_SYSTEM_CONFIG_USE_LWIP
 }
 
-PacketBufferHandle PacketBuffer::NewWithAvailableSize(uint16_t aReservedSize, uint16_t aAvailableSize)
+PacketBufferHandle PacketBufferHandle::New(size_t aAvailableSize, uint16_t aReservedSize)
 {
     // Adding three 16-bit-int sized numbers together will never overflow
     // assuming int is at least 32 bits.
@@ -346,10 +350,10 @@ PacketBufferHandle PacketBuffer::NewWithAvailableSize(uint16_t aReservedSize, ui
 
     LOCK_BUF_POOL();
 
-    lPacket = sFreeList;
+    lPacket = PacketBuffer::sFreeList;
     if (lPacket != nullptr)
     {
-        sFreeList = static_cast<PacketBuffer *>(lPacket->next);
+        PacketBuffer::sFreeList = static_cast<PacketBuffer *>(lPacket->next);
         SYSTEM_STATS_INCREMENT(chip::System::Stats::kSystemLayer_NumPacketBufs);
     }
 
@@ -380,24 +384,16 @@ PacketBufferHandle PacketBuffer::NewWithAvailableSize(uint16_t aReservedSize, ui
     return PacketBufferHandle(lPacket);
 }
 
-PacketBufferHandle PacketBuffer::NewWithAvailableSize(uint16_t aAvailableSize)
+PacketBufferHandle PacketBufferHandle::NewWithData(const void * aData, size_t aDataSize, uint16_t aAdditionalSize,
+                                                   uint16_t aReservedSize)
 {
-    return PacketBuffer::NewWithAvailableSize(CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE, aAvailableSize);
-}
-
-PacketBufferHandle PacketBuffer::New(uint16_t aReservedSize)
-{
-    static_assert(CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX <= UINT16_MAX, "Our available size won't fit in uint16_t");
-    const uint16_t lAvailableSize = aReservedSize < CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX
-        ? static_cast<uint16_t>(CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX - aReservedSize)
-        : 0;
-
-    return PacketBuffer::NewWithAvailableSize(aReservedSize, lAvailableSize);
-}
-
-PacketBufferHandle PacketBuffer::New()
-{
-    return PacketBuffer::New(CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE);
+    PacketBufferHandle buffer = New(aDataSize + aAdditionalSize, aReservedSize);
+    if (buffer.mBuffer != nullptr)
+    {
+        memcpy(buffer.mBuffer->payload, aData, aDataSize);
+        buffer.mBuffer->len = buffer.mBuffer->tot_len = static_cast<uint16_t>(aDataSize);
+    }
+    return buffer;
 }
 
 /**
@@ -486,20 +482,6 @@ PacketBuffer * PacketBuffer::FreeHead(PacketBuffer * aPacket)
     return lNextPacket;
 }
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_PBUF_FROM_CUSTOM_POOLS
-PacketBuffer * PacketBuffer::RightSize(PacketBuffer * aPacket)
-{
-    PacketBuffer * lNewPacket = static_cast<PacketBuffer *>(pbuf_rightsize((struct pbuf *) aPacket, -1));
-    if (lNewPacket != aPacket)
-    {
-        SYSTEM_STATS_UPDATE_LWIP_PBUF_COUNTS();
-
-        ChipLogProgress(chipSystemLayer, "PacketBuffer: RightSize Copied");
-    }
-    return lNewPacket;
-}
-#endif
-
 #if !CHIP_SYSTEM_CONFIG_USE_LWIP && CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
 
 PacketBuffer * PacketBuffer::BuildFreeList()
@@ -542,24 +524,67 @@ PacketBufferHandle PacketBufferHandle::CloneData()
         // We do not clone an entire chain.
         return PacketBufferHandle();
     }
-
-    PacketBufferHandle other = PacketBuffer::New();
-    if (other.IsNull())
-    {
-        return other;
-    }
-
-    if (other->AvailableDataLength() < mBuffer->DataLength())
-    {
-        other = nullptr;
-        return other;
-    }
-
-    memcpy(other->Start(), mBuffer->Start(), mBuffer->DataLength());
-    other->SetDataLength(mBuffer->DataLength());
-
-    return other;
+    return NewWithData(mBuffer->Start(), mBuffer->DataLength());
 }
+
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_PBUF_FROM_CUSTOM_POOLS
+
+void PacketBufferHandle::RightSizeForLwIPCustomPools()
+{
+    PacketBuffer * lNewPacket = static_cast<PacketBuffer *>(pbuf_rightsize((struct pbuf *) mBuffer, -1));
+    if (lNewPacket != mBuffer)
+    {
+        mBuffer = lNewPacket;
+        SYSTEM_STATS_UPDATE_LWIP_PBUF_COUNTS();
+        ChipLogProgress(chipSystemLayer, "PacketBuffer: RightSize Copied");
+    }
+}
+
+#elif CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC == 0
+
+// Number of unused bytes below which \c RightSizeForMemoryAlloc() won't bother reallocating.
+constexpr uint16_t kRightSizingThreshold = 16;
+
+void PacketBufferHandle::RightSizeForMemoryAlloc()
+{
+    // Require a single buffer with no other references.
+    if ((mBuffer == nullptr) || (mBuffer->next != nullptr) || (mBuffer->ref != 1))
+    {
+        return;
+    }
+
+    // Reallocate only if enough space will be saved.
+    uint8_t * const start = reinterpret_cast<uint8_t *>(mBuffer) + CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE;
+    uint8_t * const payload = reinterpret_cast<uint8_t *>(mBuffer->payload);
+    const size_t usedSize = static_cast<uint16_t>(payload - start + mBuffer->len);
+    if (usedSize + kRightSizingThreshold > mBuffer->alloc_size)
+    {
+        return;
+    }
+
+    const uint16_t blockSize = usedSize + CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE;
+    PacketBuffer * newBuffer = reinterpret_cast<PacketBuffer *>(chip::Platform::MemoryAlloc(blockSize));
+    if (newBuffer == nullptr)
+    {
+        ChipLogError(chipSystemLayer, "PacketBuffer: pool EMPTY.");
+        return;
+    }
+
+    // XXX fixme
+    uint8_t * const newStart = reinterpret_cast<uint8_t *>(newBuffer) + CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE;
+    newBuffer->next = nullptr;
+    newBuffer->payload = newStart + (payload - start);
+    newBuffer->tot_len = mBuffer->tot_len;
+    newBuffer->len = mBuffer->len;
+    newBuffer->ref = 1;
+    newBuffer->alloc_size = static_cast<uint16_t>(usedSize);
+    memcpy(reinterpret_cast<uint8_t *>(newBuffer) + CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE, start, usedSize);
+
+    chip::Platform::MemoryFree(mBuffer);
+    mBuffer = newBuffer;
+}
+
+#endif
 
 } // namespace System
 } // namespace chip

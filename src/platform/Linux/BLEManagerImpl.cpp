@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2018 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,6 +27,7 @@
 #include <new>
 #include <platform/internal/BLEManager.h>
 #include <support/CodeUtils.h>
+#include <support/SafeInt.h>
 
 #include <type_traits>
 #include <utility>
@@ -438,17 +439,12 @@ void BLEManagerImpl::HandleSubscribeOpComplete(BLE_CONNECTION_OBJECT conId, bool
 
 void BLEManagerImpl::HandleTXCharChanged(BLE_CONNECTION_OBJECT conId, const uint8_t * value, size_t len)
 {
-    using DataLength = decltype(std::declval<System::PacketBuffer>().AvailableDataLength());
-
     CHIP_ERROR err                 = CHIP_NO_ERROR;
-    System::PacketBufferHandle buf = System::PacketBuffer::New();
+    System::PacketBufferHandle buf = System::PacketBufferHandle::NewWithData(value, len);
 
     ChipLogProgress(DeviceLayer, "Indication received, conn = %p", conId);
 
     VerifyOrExit(!buf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
-    VerifyOrExit(buf->AvailableDataLength() >= len, err = CHIP_ERROR_BUFFER_TOO_SMALL);
-    memcpy(buf->Start(), value, len);
-    buf->SetDataLength(static_cast<DataLength>(len));
 
     ChipDeviceEvent event;
     event.Type                                       = DeviceEventType::kPlatformLinuxBLEIndicationReceived;
@@ -467,14 +463,8 @@ void BLEManagerImpl::HandleRXCharWrite(BLE_CONNECTION_OBJECT conId, const uint8_
     System::PacketBufferHandle buf;
 
     // Copy the data to a packet buffer.
-    buf = System::PacketBuffer::New();
+    buf = System::PacketBufferHandle::NewWithData(value, len);
     VerifyOrExit(!buf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
-    VerifyOrExit(buf->AvailableDataLength() >= len, err = CHIP_ERROR_BUFFER_TOO_SMALL);
-    memcpy(buf->Start(), value, len);
-    static_assert(std::is_same<decltype(buf->AvailableDataLength()), uint16_t>::value,
-                  "Unexpected available data length type; fix the casting below");
-    // Cast is safe, since we just verified that "len" fits in uint16_t.
-    buf->SetDataLength(static_cast<uint16_t>(len));
 
     // Post an event to the Chip queue to deliver the data into the Chip stack.
     {

@@ -91,7 +91,7 @@ CHIP_ERROR TLVPacketBufferBackingStore::GetNewBuffer(chip::TLV::TLVWriter & writ
     mCurrentBuffer.Advance();
     if (mCurrentBuffer.IsNull())
     {
-        mCurrentBuffer = PacketBuffer::New(0);
+        mCurrentBuffer = PacketBufferHandle::New(System::kMaxPacketBufferSizeWithoutReserve, 0);
         if (mCurrentBuffer.IsNull())
         {
             return CHIP_ERROR_NO_MEMORY;
