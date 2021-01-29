@@ -18,6 +18,7 @@
 
 #include <core/CHIPEncoding.h>
 #include <core/CHIPSafeCasts.h>
+#include <platform/ConnectivityManager.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
