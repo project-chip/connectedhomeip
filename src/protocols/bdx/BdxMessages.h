@@ -134,13 +134,13 @@ struct TransferInit
     uint64_t StartOffset  = 0; ///< Proposed start offset of data. 0 for no offset
     uint64_t MaxLength    = 0; ///< Proposed max length of data in transfer, 0 for indefinite
 
-    // File designator (required)
+    // File designator (required) and additional metadata (optional, TLV format)
+    // WARNING: there is no guarantee at any point that these pointers will point to valid memory. The Buffer field should be used
+    // to hold a reference to the PacketBuffer containing the data in order to ensure the data is not freed.
     const uint8_t * FileDesignator = nullptr;
     uint16_t FileDesLength         = 0; ///< Length of file designator string (not including null-terminator)
-
-    // Additional metadata (optional, TLV format)
-    const uint8_t * Metadata = nullptr;
-    uint16_t MetadataLength  = 0;
+    const uint8_t * Metadata       = nullptr;
+    uint16_t MetadataLength        = 0;
 
     // Retain ownership of the packet buffer so that the FileDesignator and Metadata pointers remain valid.
     System::PacketBufferHandle Buffer;
@@ -201,6 +201,8 @@ struct SendAccept
     uint16_t MaxBlockSize = 0; ///< Chosen max block size to use in transfer (required)
 
     // Additional metadata (optional, TLV format)
+    // WARNING: there is no guarantee at any point that this pointer will point to valid memory. The Buffer field should be used to
+    // hold a reference to the PacketBuffer containing the data in order to ensure the data is not freed.
     const uint8_t * Metadata = nullptr;
     uint16_t MetadataLength  = 0;
 
@@ -263,6 +265,8 @@ struct ReceiveAccept
     uint64_t Length       = 0; ///< Length of transfer. 0 if length is indefinite.
 
     // Additional metadata (optional, TLV format)
+    // WARNING: there is no guarantee at any point that this pointer will point to valid memory. The Buffer field should be used to
+    // hold a reference to the PacketBuffer containing the data in order to ensure the data is not freed.
     const uint8_t * Metadata = nullptr;
     uint16_t MetadataLength  = 0;
 
@@ -366,6 +370,8 @@ struct DataBlock
 
     uint32_t BlockCounter = 0;
 
+    // WARNING: there is no guarantee at any point that this pointer will point to valid memory. The Buffer field should be used to
+    // hold a reference to the PacketBuffer containing the data in order to ensure the data is not freed.
     const uint8_t * Data = nullptr;
     uint16_t DataLength  = 0;
 

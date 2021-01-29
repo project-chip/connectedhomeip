@@ -28,15 +28,16 @@ public:
     {
         kOutput_None = 0,
 
-        kOutput_MsgToSend      = (1U),
-        kOutput_InitReceived   = (1U << 1),
-        kOutput_AcceptReceived = (1U << 2),
-        kOutput_BlockReceived  = (1U << 3),
-        kOutput_QueryReceived  = (1U << 4),
-        kOutput_AckReceived    = (1U << 5),
-        kOutput_AckEOFReceived = (1U << 6),
-        kOutput_InternalError  = (1U << 7),
-        kOutput_StatusReceived = (1U << 8),
+        kOutput_MsgToSend       = (1U),
+        kOutput_InitReceived    = (1U << 1),
+        kOutput_AcceptReceived  = (1U << 2),
+        kOutput_BlockReceived   = (1U << 3),
+        kOutput_QueryReceived   = (1U << 4),
+        kOutput_AckReceived     = (1U << 5),
+        kOutput_AckEOFReceived  = (1U << 6),
+        kOutput_StatusReceived  = (1U << 7),
+        kOutput_InternalError   = (1U << 8),
+        kOutput_TransferTimeout = (1U << 9)
     };
 
     struct TransferInitData
@@ -139,7 +140,7 @@ public:
             return event;
         }
 
-        static OutputEvent TransferErrorEvent(StatusReportData data)
+        static OutputEvent StatusReportEvent(StatusReportData data)
         {
             OutputEvent event(kOutput_InternalError);
             event.statusData = data;
@@ -159,35 +160,44 @@ public:
      *
      *   See OutputEventFlags for all possible output event types.
      *
-     * @param event Reference to an OutputEvent struct that will be filled out with any pending output data
+     * @param event     Reference to an OutputEvent struct that will be filled out with any pending output data
+     * @param curTimeMs Current time indicated by the number of milliseconds since some epoch defined by the platform
      */
-    void PollOutput(OutputEvent & event);
+    void PollOutput(OutputEvent & event, uint64_t curTimeMs);
 
     /**
      * @brief
      *   Initializes the TransferSession object and prepares a TransferInit message (emitted via PollOutput()).
      *
-     * @param role     Inidcates whether this object will be sending or receiving data
-     * @param initData Data for initializing this object and for populating a TransferInit message
-     *                 The role parameter will determine whether to populate a ReceiveInit or SendInit
+     *   A TransferSession object must be initialized with either StartTransfer() or WaitForTransfer().
+     *
+     * @param role      Inidcates whether this object will be sending or receiving data
+     * @param initData  Data for initializing this object and for populating a TransferInit message
+     *                  The role parameter will determine whether to populate a ReceiveInit or SendInit
+     * @param timeoutMs The amount of time to wait for a response before considering the transfer failed (milliseconds)
+     * @param curTimeMs The current time since epoch in milliseconds. Needed to set a start time for the transfer timeout.
      *
      * @return CHIP_ERROR Result of initialization and preparation of a TransferInit message. May also indicate if the
      *                    TransferSession object is unable to handle this request.
      */
-    CHIP_ERROR StartTransfer(TransferRole role, const TransferInitData & initData);
+    CHIP_ERROR StartTransfer(TransferRole role, const TransferInitData & initData, uint32_t timeoutMs, uint64_t curTimeMs);
 
     /**
      * @brief
      *   Initialize the TransferSession object and prepare to receive a TransferInit message at some point.
      *
+     *   A TransferSession object must be initialized with either StartTransfer() or WaitForTransfer().
+     *
      * @param role            Inidcates whether this object will be sending or receiving data
      * @param xferControlOpts Indicates all supported control modes. Used to respond to a TransferInit message
      * @param maxBlockSize    The max Block size that this object supports.
+     * @param timeoutMs       The amount of time to wait for a response before considering the transfer failed (milliseconds)
      *
      * @return CHIP_ERROR Result of initialization. May also indicate if the TransferSession object is unable to handle this
      *                    request.
      */
-    CHIP_ERROR WaitForTransfer(TransferRole role, BitFlags<uint8_t, TransferControlFlags> xferControlOpts, uint16_t maxBlockSize);
+    CHIP_ERROR WaitForTransfer(TransferRole role, BitFlags<uint8_t, TransferControlFlags> xferControlOpts, uint16_t maxBlockSize,
+                               uint32_t timeoutMs);
 
     /**
      * @brief
@@ -261,12 +271,13 @@ public:
      * @brief
      *   Process a message intended for this TransferSession object.
      *
-     * @param msg A PacketBufferHandle pointing to the message buffer to process. May be BDX or StatusReport protocol.
+     * @param msg       A PacketBufferHandle pointing to the message buffer to process. May be BDX or StatusReport protocol.
+     * @param curTimeMs Current time indicated by the number of milliseconds since some epoch defined by the platform
      *
      * @return CHIP_ERROR Indicates any problems in decoding the message, or if the message is not of the BDX or StatusReport
      *                    protocols.
      */
-    CHIP_ERROR HandleMessageReceived(System::PacketBufferHandle msg);
+    CHIP_ERROR HandleMessageReceived(System::PacketBufferHandle msg, uint64_t curTimeMs);
 
     TransferControlFlags GetControlMode() const { return mControlMode; }
     uint64_t GetStartOffset() const { return mStartOffset; }
@@ -320,7 +331,6 @@ private:
     CHIP_ERROR VerifyProposedMode(const BitFlags<uint8_t, TransferControlFlags> & proposed);
 
     void SetTransferError(StatusCode code);
-
     bool IsTransferLengthDefinite();
 
     BitFlags<uint16_t, OutputEventFlags> mPendingOutput;
@@ -339,7 +349,7 @@ private:
     uint16_t mTransferMaxBlockSize = 0;
 
     System::PacketBufferHandle mPendingMsgHandle;
-    StatusReportData mTransferErrorData;
+    StatusReportData mStatusReportData;
     TransferInitData mTransferRequestData;
     TransferAcceptData mTransferAcceptData;
     BlockData mBlockEventData;
@@ -347,6 +357,10 @@ private:
     uint32_t mNextQueryNum      = 0;
     uint32_t mBlockNumInFlight  = 0;
     uint32_t mNumBytesProcessed = 0;
+
+    uint32_t mTimeoutMs          = 0;
+    uint64_t mTimeoutStartTimeMs = 0;
+    bool mAwaitingResponse       = false;
 };
 
 } // namespace bdx

@@ -11,6 +11,9 @@
 using namespace ::chip;
 using namespace ::chip::bdx;
 
+// Use this as a timestamp if not needing to test BDX timeouts.
+const uint64_t kNoAdvanceTime = 0;
+
 // Helper method for generating a complete TLV structure with just a single tag and string
 CHIP_ERROR WriteTLVString(uint8_t * buf, uint32_t bufLen, const char * data, uint64_t tag, uint32_t & written)
 {
@@ -78,14 +81,14 @@ void SendAndVerifyQuery(nlTestSuite * inSuite, void * inContext, TransferSession
     // Verify that receiver emits BlockQuery message
     CHIP_ERROR err = receiver.PrepareBlockQuery();
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    receiver.PollOutput(outEvent);
+    receiver.PollOutput(outEvent, kNoAdvanceTime);
     NL_TEST_ASSERT(inSuite, outEvent.EventType == TransferSession::kOutput_MsgToSend);
     VerifyMessageType(inSuite, inContext, outEvent.MsgData, kBdxMsg_BlockQuery);
 
     // Pass BlockQuery to sender and verify sender emits QueryReceived event
-    err = sender.HandleMessageReceived(std::move(outEvent.MsgData));
+    err = sender.HandleMessageReceived(std::move(outEvent.MsgData), kNoAdvanceTime);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    sender.PollOutput(outEvent);
+    sender.PollOutput(outEvent, kNoAdvanceTime);
     NL_TEST_ASSERT(inSuite, outEvent.EventType == TransferSession::kOutput_QueryReceived);
 }
 
@@ -119,14 +122,14 @@ void SendAndVerifyArbitraryBlock(nlTestSuite * inSuite, void * inContext, Transf
     // Provide Block data and verify sender emits Block message
     err = sender.PrepareBlock(blockData);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    sender.PollOutput(outEvent);
+    sender.PollOutput(outEvent, kNoAdvanceTime);
     NL_TEST_ASSERT(inSuite, outEvent.EventType == TransferSession::kOutput_MsgToSend);
     VerifyMessageType(inSuite, inContext, outEvent.MsgData, expected);
 
     // Pass Block message to receiver and verify matching Block is received
-    err = receiver.HandleMessageReceived(std::move(outEvent.MsgData));
+    err = receiver.HandleMessageReceived(std::move(outEvent.MsgData), kNoAdvanceTime);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    receiver.PollOutput(outEvent);
+    receiver.PollOutput(outEvent, kNoAdvanceTime);
     NL_TEST_ASSERT(inSuite, outEvent.EventType == TransferSession::kOutput_BlockReceived);
     NL_TEST_ASSERT(inSuite, outEvent.blockdata.Data != nullptr);
     NL_TEST_ASSERT(inSuite, !memcmp(fakeBlockData, outEvent.blockdata.Data, outEvent.blockdata.Length));
@@ -144,14 +147,14 @@ void SendAndVerifyBlockAck(nlTestSuite * inSuite, void * inContext, TransferSess
     // Verify PrepareBlockAck() outputs message to send
     CHIP_ERROR err = receiver.PrepareBlockAck();
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    receiver.PollOutput(outEvent);
+    receiver.PollOutput(outEvent, kNoAdvanceTime);
     NL_TEST_ASSERT(inSuite, outEvent.EventType == TransferSession::kOutput_MsgToSend);
     VerifyMessageType(inSuite, inContext, outEvent.MsgData, expectedMsgType);
 
     // Pass BlockAck to sender and verify it was received
-    err = sender.HandleMessageReceived(std::move(outEvent.MsgData));
+    err = sender.HandleMessageReceived(std::move(outEvent.MsgData), kNoAdvanceTime);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    sender.PollOutput(outEvent);
+    sender.PollOutput(outEvent, kNoAdvanceTime);
     NL_TEST_ASSERT(inSuite, outEvent.EventType == expectedEventType);
 }
 
@@ -169,6 +172,7 @@ void TestInitiatingReceiverReceiverDrive(nlTestSuite * inSuite, void * inContext
     uint16_t transferBlockSize = 10;
     uint64_t proposedOffset    = 64;
     uint64_t proposedLength    = 0;
+    uint32_t timeoutMs         = 1000 * 24;
 
     // Initialize struct with TransferInit parameters
     TransferSession::TransferInitData initOptions;
@@ -179,24 +183,24 @@ void TestInitiatingReceiverReceiverDrive(nlTestSuite * inSuite, void * inContext
     initOptions.FileDesignator      = reinterpret_cast<uint8_t *>(testFileDes);
 
     // Verify receiver outputs ReceiveInit message after StartTransfer()
-    err = initiatingReceiver.StartTransfer(kRole_Receiver, initOptions);
+    err = initiatingReceiver.StartTransfer(kRole_Receiver, initOptions, timeoutMs, kNoAdvanceTime);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    initiatingReceiver.PollOutput(outEvent);
+    initiatingReceiver.PollOutput(outEvent, kNoAdvanceTime);
     NL_TEST_ASSERT(inSuite, outEvent.EventType == TransferSession::kOutput_MsgToSend);
     VerifyMessageType(inSuite, inContext, outEvent.MsgData, kBdxMsg_ReceiveInit);
 
     // Initialize respondingSender and pass ReceiveInit message
     BitFlags<uint8_t, TransferControlFlags> senderOpts;
     senderOpts.Set(kControl_ReceiverDrive);
-    err = respondingSender.WaitForTransfer(kRole_Sender, senderOpts, transferBlockSize);
+    err = respondingSender.WaitForTransfer(kRole_Sender, senderOpts, transferBlockSize, timeoutMs);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    err = respondingSender.HandleMessageReceived(std::move(outEvent.MsgData));
+    err = respondingSender.HandleMessageReceived(std::move(outEvent.MsgData), kNoAdvanceTime);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // Responder may want to read any of the fields of the TransferInit for approval.
     // Verify File Designator matches. Verify that the respondingSenser automatically set ReceiverDrive
     // for the chosen ControlMode.
-    respondingSender.PollOutput(outEvent);
+    respondingSender.PollOutput(outEvent, kNoAdvanceTime);
     NL_TEST_ASSERT(inSuite, outEvent.EventType == TransferSession::kOutput_InitReceived);
     NL_TEST_ASSERT(inSuite, respondingSender.GetControlMode() == kControl_ReceiverDrive);
     NL_TEST_ASSERT(inSuite, outEvent.transferInitData.FileDesignator != nullptr);
@@ -224,18 +228,18 @@ void TestInitiatingReceiverReceiverDrive(nlTestSuite * inSuite, void * inContext
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // Verify Sender emits ReceiveAccept message for sending
-    respondingSender.PollOutput(outEvent);
+    respondingSender.PollOutput(outEvent, kNoAdvanceTime);
     NL_TEST_ASSERT(inSuite, outEvent.EventType == TransferSession::kOutput_MsgToSend);
     VerifyMessageType(inSuite, inContext, outEvent.MsgData, kBdxMsg_ReceiveAccept);
 
     // Pass Accept message to initiatingReceiver
-    err = initiatingReceiver.HandleMessageReceived(std::move(outEvent.MsgData));
+    err = initiatingReceiver.HandleMessageReceived(std::move(outEvent.MsgData), kNoAdvanceTime);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // Verify received ReceiveAccept.
     // Client may want to inspect TransferControl, MaxBlockSize, StartOffset, Length, and Metadata, and may choose to reject the
     // Transfer at this point.
-    initiatingReceiver.PollOutput(outEvent);
+    initiatingReceiver.PollOutput(outEvent, kNoAdvanceTime);
     NL_TEST_ASSERT(inSuite, outEvent.EventType == TransferSession::kOutput_AcceptReceived);
     NL_TEST_ASSERT(inSuite, outEvent.transferAcceptData.ControlMode == kControl_ReceiverDrive);
     NL_TEST_ASSERT(inSuite, outEvent.transferAcceptData.StartOffset == proposedOffset);
@@ -279,6 +283,7 @@ void TestInitiatingSenderSenderDrive(nlTestSuite * inSuite, void * inContext)
 
     // Chosen arbitrarily for this test
     uint16_t transferBlockSize = 10;
+    uint32_t timeoutMs         = 1000 * 24;
 
     // Initialize struct with TransferInit parameters
     TransferSession::TransferInitData initOptions;
@@ -291,24 +296,24 @@ void TestInitiatingSenderSenderDrive(nlTestSuite * inSuite, void * inContext)
     initOptions.MetadataLength      = 0;
 
     // Verify sender outputs SendInit message after StartTransfer()
-    err = initiatingSender.StartTransfer(kRole_Sender, initOptions);
+    err = initiatingSender.StartTransfer(kRole_Sender, initOptions, timeoutMs, kNoAdvanceTime);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    initiatingSender.PollOutput(outEvent);
+    initiatingSender.PollOutput(outEvent, kNoAdvanceTime);
     NL_TEST_ASSERT(inSuite, outEvent.EventType == TransferSession::kOutput_MsgToSend);
     VerifyMessageType(inSuite, inContext, outEvent.MsgData, kBdxMsg_SendInit);
 
     // Initialize respondingReceiver
     BitFlags<uint8_t, TransferControlFlags> receiverOpts;
     receiverOpts.Set(driveMode);
-    err = respondingReceiver.WaitForTransfer(kRole_Receiver, receiverOpts, transferBlockSize);
+    err = respondingReceiver.WaitForTransfer(kRole_Receiver, receiverOpts, transferBlockSize, timeoutMs);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // Responder may want to read any of the fields of the TransferInit for approval.
     // Verify File Designator matches. Verify that the respondingSenser automatically set ReceiverDrive
     // for the chosen ControlMode.
-    err = respondingReceiver.HandleMessageReceived(std::move(outEvent.MsgData));
+    err = respondingReceiver.HandleMessageReceived(std::move(outEvent.MsgData), kNoAdvanceTime);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    respondingReceiver.PollOutput(outEvent);
+    respondingReceiver.PollOutput(outEvent, kNoAdvanceTime);
     NL_TEST_ASSERT(inSuite, outEvent.EventType == TransferSession::kOutput_InitReceived);
     NL_TEST_ASSERT(inSuite, respondingReceiver.GetControlMode() == driveMode);
     NL_TEST_ASSERT(inSuite, outEvent.transferInitData.FileDesignator != nullptr);
@@ -338,18 +343,18 @@ void TestInitiatingSenderSenderDrive(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // Verify Sender emits SendAccept message for sending
-    respondingReceiver.PollOutput(outEvent);
+    respondingReceiver.PollOutput(outEvent, kNoAdvanceTime);
     NL_TEST_ASSERT(inSuite, outEvent.EventType == TransferSession::kOutput_MsgToSend);
     VerifyMessageType(inSuite, inContext, outEvent.MsgData, kBdxMsg_SendAccept);
 
     // Pass Accept message to initiatingReceiver
-    err = initiatingSender.HandleMessageReceived(std::move(outEvent.MsgData));
+    err = initiatingSender.HandleMessageReceived(std::move(outEvent.MsgData), kNoAdvanceTime);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // Verify received SendAccept.
     // Client may still want to inspect TransferControl, MaxBlockSize, StartOffset, Length, and Metadata, and may still choose to
     // reject the Transfer at this point.
-    initiatingSender.PollOutput(outEvent);
+    initiatingSender.PollOutput(outEvent, kNoAdvanceTime);
     NL_TEST_ASSERT(inSuite, outEvent.EventType == TransferSession::kOutput_AcceptReceived);
     NL_TEST_ASSERT(inSuite, outEvent.transferAcceptData.ControlMode == driveMode);
     NL_TEST_ASSERT(inSuite, outEvent.transferAcceptData.MaxBlockSize == transferBlockSize);
@@ -373,7 +378,7 @@ void TestInitiatingSenderSenderDrive(nlTestSuite * inSuite, void * inContext)
 //
 // It's xpected that the responder has already been initialized with WaitForTransfer().
 void StartInitiatorAndSend(nlTestSuite * inSuite, void * inContext, TransferSession::OutputEvent & outEvent,
-                           TransferSession & initiator, TransferSession & responder, TransferRole initiatorRole,
+                           TransferSession & initiator, TransferSession & responder, uint32_t timeoutMs, TransferRole initiatorRole,
                            uint8_t rawControlFlags, uint16_t maxBlockSize, uint64_t offset, uint64_t maxLength)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -391,9 +396,9 @@ void StartInitiatorAndSend(nlTestSuite * inSuite, void * inContext, TransferSess
     initOptions.MetadataLength      = 0;
 
     // Verify initiator outputs respective Init message (depending on role) after StartTransfer()
-    err = initiator.StartTransfer(initiatorRole, initOptions);
+    err = initiator.StartTransfer(initiatorRole, initOptions, timeoutMs, kNoAdvanceTime);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    initiator.PollOutput(outEvent);
+    initiator.PollOutput(outEvent, kNoAdvanceTime);
     NL_TEST_ASSERT(inSuite, outEvent.EventType == TransferSession::kOutput_MsgToSend);
     MessageType expectedInitMsg = (initiatorRole == kRole_Sender) ? kBdxMsg_SendInit : kBdxMsg_ReceiveInit;
     VerifyMessageType(inSuite, inContext, outEvent.MsgData, expectedInitMsg);
@@ -401,9 +406,9 @@ void StartInitiatorAndSend(nlTestSuite * inSuite, void * inContext, TransferSess
     // Responder may want to read any of the fields of the TransferInit for approval.
     // Verify File Designator matches. Verify that the respondingSenser automatically set ReceiverDrive
     // for the chosen ControlMode.
-    err = responder.HandleMessageReceived(std::move(outEvent.MsgData));
+    err = responder.HandleMessageReceived(std::move(outEvent.MsgData), kNoAdvanceTime);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    responder.PollOutput(outEvent);
+    responder.PollOutput(outEvent, kNoAdvanceTime);
     NL_TEST_ASSERT(inSuite, outEvent.EventType == TransferSession::kOutput_InitReceived);
     NL_TEST_ASSERT(inSuite, outEvent.transferInitData.FileDesignator != nullptr);
     NL_TEST_ASSERT(inSuite,
@@ -422,13 +427,14 @@ void TestBadAcceptMessageFields(nlTestSuite * inSuite, void * inContext)
     TransferControlFlags driveMode = kControl_ReceiverDrive;
     uint64_t commonLength          = 0;
     uint64_t commonOffset          = 0;
+    uint32_t timeoutMs             = 1000 * 24;
 
     BitFlags<uint8_t, TransferControlFlags> waitOpts;
     waitOpts.Set(driveMode);
-    err = respondingSender.WaitForTransfer(kRole_Sender, waitOpts, maxBlockSize);
+    err = respondingSender.WaitForTransfer(kRole_Sender, waitOpts, maxBlockSize, timeoutMs);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    StartInitiatorAndSend(inSuite, inContext, outEvent, initiatingReceiver, respondingSender, kRole_Receiver, driveMode,
+    StartInitiatorAndSend(inSuite, inContext, outEvent, initiatingReceiver, respondingSender, timeoutMs, kRole_Receiver, driveMode,
                           maxBlockSize, commonOffset, commonLength);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
@@ -451,6 +457,46 @@ void TestBadAcceptMessageFields(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
 }
 
+// Test that a TransferSession will emit kOutput_TransferTimeout if the specified timeout is exceeded while waiting for a response.
+void TestTimeout(nlTestSuite * inSuite, void * inContext)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    TransferSession initiator;
+    TransferSession::OutputEvent outEvent;
+
+    uint32_t timeoutMs   = 24;
+    uint64_t startTimeMs = 100;
+    uint64_t endTimeMs   = 124;
+
+    // Initialize struct with arbitrary TransferInit parameters
+    TransferSession::TransferInitData initOptions;
+    initOptions.TransferCtlFlagsRaw = kControl_ReceiverDrive;
+    initOptions.MaxBlockSize        = 64;
+    initOptions.StartOffset         = 0;
+    initOptions.Length              = 0;
+    char testFileDes[9]             = { "test.txt" }; // arbitrary file designator
+    initOptions.FileDesLength       = sizeof(testFileDes) - 1;
+    initOptions.FileDesignator      = reinterpret_cast<uint8_t *>(testFileDes);
+    initOptions.Metadata            = nullptr;
+    initOptions.MetadataLength      = 0;
+
+    TransferRole role = kRole_Receiver;
+
+    // Verify initiator outputs respective Init message (depending on role) after StartTransfer()
+    err = initiator.StartTransfer(role, initOptions, timeoutMs, startTimeMs);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    // First PollOutput() should output the TransferInit message (pretend no time advancement)
+    initiator.PollOutput(outEvent, startTimeMs);
+    NL_TEST_ASSERT(inSuite, outEvent.EventType == TransferSession::kOutput_MsgToSend);
+    MessageType expectedInitMsg = (role == kRole_Sender) ? kBdxMsg_SendInit : kBdxMsg_ReceiveInit;
+    VerifyMessageType(inSuite, inContext, outEvent.MsgData, expectedInitMsg);
+
+    // Second PollOutput() with no call to HandleMessageReceived() should result in a timeout.
+    initiator.PollOutput(outEvent, endTimeMs);
+    NL_TEST_ASSERT(inSuite, outEvent.EventType == TransferSession::kOutput_TransferTimeout);
+}
+
 // Test Suite
 
 /**
@@ -462,6 +508,7 @@ static const nlTest sTests[] =
     NL_TEST_DEF("TestInitiatingReceiverReceiverDrive", TestInitiatingReceiverReceiverDrive),
     NL_TEST_DEF("TestInitiatingSenderSenderDrive", TestInitiatingSenderSenderDrive),
     NL_TEST_DEF("TestBadAcceptMessageFields", TestBadAcceptMessageFields),
+    NL_TEST_DEF("TestTimeout", TestTimeout),
     NL_TEST_SENTINEL()
 };
 // clang-format on
