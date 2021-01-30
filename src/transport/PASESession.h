@@ -177,12 +177,6 @@ public:
      **/
     CHIP_ERROR FromSerializable(const PASESessionSerializable & output);
 
-    /*
-     *  Context = "SPAKE2+ Commissioning" || PBKDFParamRequest || PBKDFParamResponse
-     **/
-    uint8_t spake_context[kMAX_Hash_SHA256_Context_Size];
-    size_t spake_context_len = 0;
-
 private:
     enum Spake2pErrorType : uint8_t
     {
@@ -228,6 +222,7 @@ private:
 
     uint32_t mSetupPINCode;
 
+    Hash_SHA256_stream mCommissioningHash;
     uint32_t mIterationCount = 0;
     uint16_t mSaltLength     = 0;
     uint8_t * mSalt          = nullptr;

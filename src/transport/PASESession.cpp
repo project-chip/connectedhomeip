@@ -45,7 +45,7 @@ namespace chip {
 
 using namespace Crypto;
 
-const char * kSpake2pContext        = "SPAKE2+ Commissioning";
+const char * kSpake2pContext        = "CHIP PAKE V1 Commissioning";
 const char * kSpake2pI2RSessionInfo = "Commissioning I2R Key";
 const char * kSpake2pR2ISessionInfo = "Commissioning R2I Key";
 
@@ -66,6 +66,7 @@ void PASESession::Clear()
     memset(&mKe[0], 0, sizeof(mKe));
     mNextExpectedMsg = Protocols::SecureChannel::MsgType::PASE_Spake2pError;
     mSpake2p.Init(nullptr, 0);
+    mCommissioningHash.Clear();
     mIterationCount = 0;
     mSaltLength     = 0;
     if (mSalt != nullptr)
@@ -174,6 +175,12 @@ CHIP_ERROR PASESession::Init(Optional<NodeId> myNodeId, uint16_t myKeyId, uint32
 
     VerifyOrExit(delegate != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
+    err = mCommissioningHash.Begin();
+    SuccessOrExit(err);
+
+    err = mCommissioningHash.AddData(Uint8::from_const_char(kSpake2pContext), strlen(kSpake2pContext));
+    SuccessOrExit(err);
+
     mDelegate    = delegate;
     mLocalNodeId = myNodeId.ValueOr(kUndefinedNodeId);
     mConnectionState.SetLocalKeyID(myKeyId);
@@ -186,6 +193,7 @@ exit:
 CHIP_ERROR PASESession::SetupSpake2p(uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+    uint8_t context[32] = {0,};
 
     VerifyOrExit(salt != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(saltLen > 0, err = CHIP_ERROR_INVALID_ARGUMENT);
@@ -194,11 +202,10 @@ CHIP_ERROR PASESession::SetupSpake2p(uint32_t pbkdf2IterCount, const uint8_t * s
                         sizeof(mWS), &mWS[0][0]);
     SuccessOrExit(err);
 
-    // Form the context to be used. Context = "SPAKE2+ Commissioning" || PBKDFParamRequest || PBKDFParamResponse
-    memcpy((spake_context + spake_context_len), kSpake2pContext, strlen(kSpake2pContext));
-    spake_context_len += strlen(kSpake2pContext);
+    err = mCommissioningHash.Finish(context);
+    SuccessOrExit(err);
 
-    err = mSpake2p.Init(spake_context, spake_context_len);
+    err = mSpake2p.Init(context, sizeof(context));
     SuccessOrExit(err);
 
 exit:
@@ -322,8 +329,8 @@ CHIP_ERROR PASESession::SendPBKDFParamRequest()
     req->SetDataLength(kPBKDFParamRandomNumberSize);
 
     // Update commissioning hash with the pbkdf2 param request that's being sent.
-    memcpy((spake_context + spake_context_len), req->Start(), req->DataLength());
-    spake_context_len += req->DataLength();
+    err = mCommissioningHash.AddData(req->Start(), req->DataLength());
+    SuccessOrExit(err);
 
     mNextExpectedMsg = Protocols::SecureChannel::MsgType::PBKDFParamResponse;
 
@@ -355,8 +362,8 @@ CHIP_ERROR PASESession::HandlePBKDFParamRequest(const PacketHeader & header, con
     ChipLogDetail(Ble, "Received PBKDF param request");
 
     // Update commissioning hash with the received pbkdf2 param request
-    memcpy((spake_context + spake_context_len), req, reqlen);
-    spake_context_len += reqlen;
+    err = mCommissioningHash.AddData(req, reqlen);
+    SuccessOrExit(err);
 
     if (header.GetSourceNodeId().HasValue() && mConnectionState.GetPeerNodeId() == kUndefinedNodeId)
     {
@@ -408,8 +415,8 @@ CHIP_ERROR PASESession::SendPBKDFParamResponse()
     resp->SetDataLength(static_cast<uint16_t>(resplen));
 
     // Update commissioning hash with the pbkdf2 param response that's being sent.
-    memcpy((spake_context + spake_context_len), resp->Start(), resp->DataLength());
-    spake_context_len += resp->DataLength();
+    err = mCommissioningHash.AddData(resp->Start(), resp->DataLength());
+    SuccessOrExit(err);
 
     err = SetupSpake2p(mIterationCount, mSalt, mSaltLength);
     SuccessOrExit(err);
@@ -459,8 +466,8 @@ CHIP_ERROR PASESession::HandlePBKDFParamResponse(const PacketHeader & header, co
         VerifyOrExit(CanCastTo<uint32_t>(iterCount), err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
         // Update commissioning hash with the received pbkdf2 param response
-        memcpy((spake_context + spake_context_len), resp, resplen);
-        spake_context_len += resplen;
+        err = mCommissioningHash.AddData(resp, resplen);
+        SuccessOrExit(err);
 
         err = SetupSpake2p(static_cast<uint32_t>(iterCount), msgptr, saltlen);
         SuccessOrExit(err);
