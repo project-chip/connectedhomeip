@@ -198,8 +198,10 @@ exit:
 
 CHIP_ERROR PASESession::SetupSpake2p(uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    uint8_t context[32] = {0,};
+    CHIP_ERROR err      = CHIP_NO_ERROR;
+    uint8_t context[32] = {
+        0,
+    };
 
     VerifyOrExit(salt != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(saltLen > 0, err = CHIP_ERROR_INVALID_ARGUMENT);
