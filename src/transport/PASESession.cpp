@@ -65,8 +65,11 @@ void PASESession::Clear()
     memset(&mWS[0][0], 0, sizeof(mWS));
     memset(&mKe[0], 0, sizeof(mKe));
     mNextExpectedMsg = Protocols::SecureChannel::MsgType::PASE_Spake2pError;
-    mSpake2p.Init(nullptr);
+
+    // Note: we don't need to explicitly clear the state of mSpake2p object.
+    //       Clearing the following state takes care of it.
     mCommissioningHash.Clear();
+
     mIterationCount = 0;
     mSaltLength     = 0;
     if (mSalt != nullptr)
