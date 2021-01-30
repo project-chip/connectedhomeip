@@ -296,6 +296,7 @@ private:
         kState_TransferInProgress,
         kState_AwaitingEOFAck,
         kState_ReceivedEOF,
+        kState_TransferDone,
         kState_Error,
     };
 
@@ -354,9 +355,12 @@ private:
     TransferAcceptData mTransferAcceptData;
     BlockData mBlockEventData;
 
-    uint32_t mNextQueryNum      = 0;
-    uint32_t mBlockNumInFlight  = 0;
     uint32_t mNumBytesProcessed = 0;
+
+    uint32_t mLastBlockNum = 0;
+    uint32_t mNextBlockNum = 0;
+    uint32_t mLastQueryNum = 0;
+    uint32_t mNextQueryNum = 0;
 
     uint32_t mTimeoutMs          = 0;
     uint64_t mTimeoutStartTimeMs = 0;

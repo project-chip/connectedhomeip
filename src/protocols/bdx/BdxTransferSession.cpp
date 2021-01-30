@@ -255,8 +255,9 @@ CHIP_ERROR TransferSession::PrepareBlockQuery()
     VerifyOrExit(mState == kState_TransferInProgress, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mRole == kRole_Receiver, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(!mPendingOutput.Has(kOutput_MsgToSend), err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(!mAwaitingResponse, err = CHIP_ERROR_INCORRECT_STATE);
 
-    queryMsg.BlockCounter = mNextQueryNum++;
+    queryMsg.BlockCounter = mNextQueryNum;
 
     err = WriteToPacketBuffer<BlockQuery>(queryMsg, mPendingMsgHandle);
     SuccessOrExit(err);
@@ -266,9 +267,8 @@ CHIP_ERROR TransferSession::PrepareBlockQuery()
 
     mPendingOutput.Set(kOutput_MsgToSend);
 
-    mBlockNumInFlight = queryMsg.BlockCounter;
-
     mAwaitingResponse = true;
+    mLastQueryNum     = mNextQueryNum++;
 
 exit:
     return err;
@@ -283,11 +283,12 @@ CHIP_ERROR TransferSession::PrepareBlock(const BlockData & inData)
     VerifyOrExit(mState == kState_TransferInProgress, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mRole == kRole_Sender, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(!mPendingOutput.Has(kOutput_MsgToSend), err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(!mAwaitingResponse, err = CHIP_ERROR_INCORRECT_STATE);
 
     // Verify non-zero data is provided and is no longer than MaxBlockSize (BlockEOF may contain 0 length data)
     VerifyOrExit((inData.Data != nullptr) && (inData.Length <= mTransferMaxBlockSize), err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    blockMsg.BlockCounter = mBlockNumInFlight;
+    blockMsg.BlockCounter = mNextBlockNum;
     blockMsg.Data         = inData.Data;
     blockMsg.DataLength   = inData.Length;
 
@@ -306,6 +307,7 @@ CHIP_ERROR TransferSession::PrepareBlock(const BlockData & inData)
     }
 
     mAwaitingResponse = true;
+    mLastBlockNum     = mNextBlockNum++;
 
 exit:
     return err;
@@ -320,7 +322,7 @@ CHIP_ERROR TransferSession::PrepareBlockAck()
     VerifyOrExit((mState == kState_TransferInProgress) || (mState == kState_ReceivedEOF), err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(!mPendingOutput.Has(kOutput_MsgToSend), err = CHIP_ERROR_INCORRECT_STATE);
 
-    ackMsg.BlockCounter = mBlockNumInFlight;
+    ackMsg.BlockCounter = mLastBlockNum;
 
     if (mState == kState_TransferInProgress)
     {
@@ -330,8 +332,12 @@ CHIP_ERROR TransferSession::PrepareBlockAck()
         err = AttachBdxHeader(kBdxMsg_BlockAck, mPendingMsgHandle);
         SuccessOrExit(err);
 
-        // In Sender Drive, a BlockAck is implied to also be a query for the next Block, so expect to receive a Block message.
-        mAwaitingResponse = (mControlMode == kControl_SenderDrive);
+        if (mControlMode == kControl_SenderDrive)
+        {
+            // In Sender Drive, a BlockAck is implied to also be a query for the next Block, so expect to receive a Block message.
+            mLastQueryNum     = ackMsg.BlockCounter + 1;
+            mAwaitingResponse = true;
+        }
     }
     else if (mState == kState_ReceivedEOF)
     {
@@ -340,6 +346,9 @@ CHIP_ERROR TransferSession::PrepareBlockAck()
 
         err = AttachBdxHeader(kBdxMsg_BlockAckEOF, mPendingMsgHandle);
         SuccessOrExit(err);
+
+        mState            = kState_TransferDone;
+        mAwaitingResponse = false;
     }
 
     mPendingOutput.Set(kOutput_MsgToSend);
@@ -367,9 +376,11 @@ void TransferSession::Reset()
     mTransferLength        = 0;
     mTransferMaxBlockSize  = 0;
 
-    mNextQueryNum      = 0;
-    mBlockNumInFlight  = 0;
     mNumBytesProcessed = 0;
+    mLastBlockNum      = 0;
+    mNextBlockNum      = 0;
+    mLastQueryNum      = 0;
+    mNextQueryNum      = 0;
 
     mTimeoutMs          = 0;
     mTimeoutStartTimeMs = 0;
@@ -541,7 +552,7 @@ void TransferSession::HandleReceiveAccept(System::PacketBufferHandle msgData)
     mPendingMsgHandle = std::move(msgData);
     mPendingOutput.Set(kOutput_AcceptReceived);
 
-    mAwaitingResponse = false;
+    mAwaitingResponse = (mControlMode == kControl_SenderDrive);
     mState            = kState_TransferInProgress;
 
 exit:
@@ -578,7 +589,7 @@ void TransferSession::HandleSendAccept(System::PacketBufferHandle msgData)
     mPendingMsgHandle = std::move(msgData);
     mPendingOutput.Set(kOutput_AcceptReceived);
 
-    mAwaitingResponse = false;
+    mAwaitingResponse = (mControlMode == kControl_ReceiverDrive);
     mState            = kState_TransferInProgress;
 
 exit:
@@ -593,17 +604,17 @@ void TransferSession::HandleBlockQuery(System::PacketBufferHandle msgData)
     VerifyOrExit(mRole == kRole_Sender, SetTransferError(kStatus_ServerBadState));
     VerifyOrExit(mState == kState_TransferInProgress, SetTransferError(kStatus_ServerBadState));
     VerifyOrExit(!mPendingOutput.Has(kOutput_QueryReceived), SetTransferError(kStatus_ServerBadState));
+    VerifyOrExit(mAwaitingResponse, SetTransferError(kStatus_ServerBadState));
 
     err = query.Parse(std::move(msgData));
     VerifyOrExit(err == CHIP_NO_ERROR, SetTransferError(kStatus_BadMessageContents));
 
-    VerifyOrExit(query.BlockCounter == mNextQueryNum, SetTransferError(kStatus_BadBlockCounter));
-    mNextQueryNum++;
-    mBlockNumInFlight = query.BlockCounter;
+    VerifyOrExit(query.BlockCounter == mNextBlockNum, SetTransferError(kStatus_BadBlockCounter));
 
     mPendingOutput.Set(kOutput_QueryReceived);
 
     mAwaitingResponse = false;
+    mLastQueryNum     = query.BlockCounter;
 
 exit:
     return;
@@ -617,11 +628,12 @@ void TransferSession::HandleBlock(System::PacketBufferHandle msgData)
     VerifyOrExit(mRole == kRole_Receiver, SetTransferError(kStatus_ServerBadState));
     VerifyOrExit(mState == kState_TransferInProgress, SetTransferError(kStatus_ServerBadState));
     VerifyOrExit(!mPendingOutput.Has(kOutput_BlockReceived), SetTransferError(kStatus_ServerBadState));
+    VerifyOrExit(mAwaitingResponse, SetTransferError(kStatus_ServerBadState));
 
     err = blockMsg.Parse(msgData.Retain());
     VerifyOrExit(err == CHIP_NO_ERROR, SetTransferError(kStatus_BadMessageContents));
 
-    VerifyOrExit(blockMsg.BlockCounter == mBlockNumInFlight, SetTransferError(kStatus_BadBlockCounter));
+    VerifyOrExit(blockMsg.BlockCounter == mLastQueryNum, SetTransferError(kStatus_BadBlockCounter));
     VerifyOrExit((blockMsg.DataLength > 0) && (blockMsg.DataLength <= mTransferMaxBlockSize),
                  SetTransferError(kStatus_BadMessageContents));
 
@@ -634,10 +646,11 @@ void TransferSession::HandleBlock(System::PacketBufferHandle msgData)
     mBlockEventData.Length = blockMsg.DataLength;
     mBlockEventData.IsEof  = false;
 
-    mNumBytesProcessed += blockMsg.DataLength;
-
     mPendingMsgHandle = std::move(msgData);
     mPendingOutput.Set(kOutput_BlockReceived);
+
+    mNumBytesProcessed += blockMsg.DataLength;
+    mLastBlockNum = blockMsg.BlockCounter;
 
     mAwaitingResponse = false;
 
@@ -653,20 +666,23 @@ void TransferSession::HandleBlockEOF(System::PacketBufferHandle msgData)
     VerifyOrExit(mRole == kRole_Receiver, SetTransferError(kStatus_ServerBadState));
     VerifyOrExit(mState == kState_TransferInProgress, SetTransferError(kStatus_ServerBadState));
     VerifyOrExit(!mPendingOutput.Has(kOutput_BlockReceived), SetTransferError(kStatus_ServerBadState));
+    VerifyOrExit(mAwaitingResponse, SetTransferError(kStatus_ServerBadState));
 
     err = blockEOFMsg.Parse(msgData.Retain());
     VerifyOrExit(err == CHIP_NO_ERROR, SetTransferError(kStatus_BadMessageContents));
-    VerifyOrExit(blockEOFMsg.BlockCounter == mBlockNumInFlight, SetTransferError(kStatus_BadBlockCounter));
+
+    VerifyOrExit(blockEOFMsg.BlockCounter == mLastQueryNum, SetTransferError(kStatus_BadBlockCounter));
     VerifyOrExit(blockEOFMsg.DataLength <= mTransferMaxBlockSize, SetTransferError(kStatus_BadMessageContents));
 
     mBlockEventData.Data   = blockEOFMsg.Data;
     mBlockEventData.Length = blockEOFMsg.DataLength;
     mBlockEventData.IsEof  = true;
 
-    mNumBytesProcessed += blockEOFMsg.DataLength;
-
     mPendingMsgHandle = std::move(msgData);
     mPendingOutput.Set(kOutput_BlockReceived);
+
+    mNumBytesProcessed += blockEOFMsg.DataLength;
+    mLastBlockNum = blockEOFMsg.BlockCounter;
 
     mAwaitingResponse = false;
     mState            = kState_ReceivedEOF;
@@ -682,19 +698,17 @@ void TransferSession::HandleBlockAck(System::PacketBufferHandle msgData)
 
     VerifyOrExit(mRole == kRole_Sender, SetTransferError(kStatus_ServerBadState));
     VerifyOrExit(mState == kState_TransferInProgress, SetTransferError(kStatus_ServerBadState));
+    VerifyOrExit(mAwaitingResponse, SetTransferError(kStatus_ServerBadState));
 
     err = ackMsg.Parse(std::move(msgData));
     VerifyOrExit(err == CHIP_NO_ERROR, SetTransferError(kStatus_BadMessageContents));
-    VerifyOrExit(ackMsg.BlockCounter == mBlockNumInFlight, SetTransferError(kStatus_BadBlockCounter));
+    VerifyOrExit(ackMsg.BlockCounter == mLastBlockNum, SetTransferError(kStatus_BadBlockCounter));
 
     mPendingOutput.Set(kOutput_AckReceived);
 
     // In Receiver Drive, the Receiver can send a BlockAck to indicate receipt of the message and reset the timeout.
     // In this case, the Sender should wait to receive a BlockQuery next.
-    if (mControlMode == kControl_ReceiverDrive)
-    {
-        mAwaitingResponse = true;
-    }
+    mAwaitingResponse = (mControlMode == kControl_ReceiverDrive);
 
 exit:
     return;
@@ -707,14 +721,17 @@ void TransferSession::HandleBlockAckEOF(System::PacketBufferHandle msgData)
 
     VerifyOrExit(mRole == kRole_Sender, SetTransferError(kStatus_ServerBadState));
     VerifyOrExit(mState == kState_AwaitingEOFAck, SetTransferError(kStatus_ServerBadState));
+    VerifyOrExit(mAwaitingResponse, SetTransferError(kStatus_ServerBadState));
 
     err = ackMsg.Parse(std::move(msgData));
     VerifyOrExit(err == CHIP_NO_ERROR, SetTransferError(kStatus_BadMessageContents));
-    VerifyOrExit(ackMsg.BlockCounter == mBlockNumInFlight, SetTransferError(kStatus_BadBlockCounter));
+    VerifyOrExit(ackMsg.BlockCounter == mLastBlockNum, SetTransferError(kStatus_BadBlockCounter));
 
     mPendingOutput.Set(kOutput_AckEOFReceived);
 
     mAwaitingResponse = false;
+
+    mState = kState_TransferDone;
 
 exit:
     return;
