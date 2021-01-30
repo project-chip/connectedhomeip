@@ -61,13 +61,15 @@ void PASESession::Clear()
 {
     // This function zeroes out and resets the memory used by the object.
     // It's done so that no security related information will be leaked.
-    // Note: we don't need to explicitly clear the state of mSpake2p object.
-    //       Clearing the following buffers/state takes care of it.
     memset(&mPoint[0], 0, sizeof(mPoint));
     memset(&mWS[0][0], 0, sizeof(mWS));
     memset(&mKe[0], 0, sizeof(mKe));
     mNextExpectedMsg = Protocols::SecureChannel::MsgType::PASE_Spake2pError;
+
+    // Note: we don't need to explicitly clear the state of mSpake2p object.
+    //       Clearing the following state takes care of it.
     mCommissioningHash.Clear();
+
     mIterationCount = 0;
     mSaltLength     = 0;
     if (mSalt != nullptr)
