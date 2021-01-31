@@ -461,6 +461,7 @@ public:
      * @param context     The spake2p session will bootstrap from this hash context.
      *                    If the provided context pointer is null, the spake2p session will bootstrap
      *                    from a blank hash context.
+     *                    Note: calling this function will nullptr doesn't free the object state.
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/

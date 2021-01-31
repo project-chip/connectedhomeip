@@ -65,8 +65,11 @@ void PASESession::Clear()
     memset(&mWS[0][0], 0, sizeof(mWS));
     memset(&mKe[0], 0, sizeof(mKe));
     mNextExpectedMsg = Protocols::SecureChannel::MsgType::PASE_Spake2pError;
-    mSpake2p.Init(nullptr);
+
+    // Note: we don't need to explicitly clear the state of mSpake2p object.
+    //       Clearing the following state takes care of it.
     mCommissioningHash.Clear();
+
     mIterationCount = 0;
     mSaltLength     = 0;
     if (mSalt != nullptr)
@@ -174,6 +177,9 @@ CHIP_ERROR PASESession::Init(Optional<NodeId> myNodeId, uint16_t myKeyId, uint32
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     VerifyOrExit(delegate != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Reset any state maintained by PASESession object (in case it's being reused for pairing)
+    Clear();
 
     err = mCommissioningHash.Begin();
     SuccessOrExit(err);
