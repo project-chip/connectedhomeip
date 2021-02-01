@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #
-#    Copyright (c) 2020 Project CHIP Authors
+#    Copyright (c) 2021 Project CHIP Authors
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -16,5 +16,28 @@
 #    limitations under the License.
 #
 
-set -x
-env
+# Installs required packages and configuration for Raspberry Pi to be able
+# to build CHIP and run example/integration applications
+#
+# See docs/BUILDING.md for more details
+
+set -ex
+
+sudo apt-get install -fy \
+   g++ \
+   gcc \
+   git \
+   libavahi-client-dev \
+   libdbus-1-dev \
+   libglib2.0-dev \
+   libssl-dev \
+   ninja-build \
+   pi-bluetooth \
+   pkg-config \
+   python \
+   python3-dev \
+   python3-venv \
+   unzip &&
+   true
+
+echo "You must REBOOT after pi-bluetooth has been installed"
