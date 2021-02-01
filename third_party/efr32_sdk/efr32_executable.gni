@@ -36,8 +36,8 @@ template("efr32_executable") {
       "${chip_root}/scripts/flashing/firmware_utils.py",
     ]
     outputs = [ "${root_out_dir}/{{source_file_part}}" ]
-
   }
+
   flashing_script_generator =
       "${chip_root}/scripts/flashing/gen_flashing_script.py"
   flashing_script_name = output_base_name + ".flash.py"
