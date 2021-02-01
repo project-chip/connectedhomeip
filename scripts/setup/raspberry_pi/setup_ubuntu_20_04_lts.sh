@@ -34,6 +34,7 @@ sudo apt-get install -fy \
    ninja-build \
    pi-bluetooth \
    pkg-config \
+   protobuf-compiler \
    python \
    python3-dev \
    python3-venv \
