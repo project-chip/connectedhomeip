@@ -273,7 +273,7 @@ void SendAndVerifyArbitraryBlock(nlTestSuite * inSuite, void * inContext, Transf
 void SendAndVerifyBlockAck(nlTestSuite * inSuite, void * inContext, TransferSession & ackReceiver, TransferSession & ackSender,
                            TransferSession::OutputEvent & outEvent, bool expectEOF)
 {
-    TransferSession::OutputEventFlags expectedEventType =
+    TransferSession::OutputEventType expectedEventType =
         expectEOF ? TransferSession::kOutput_AckEOFReceived : TransferSession::kOutput_AckReceived;
     MessageType expectedMsgType = expectEOF ? kBdxMsg_BlockAckEOF : kBdxMsg_BlockAck;
 

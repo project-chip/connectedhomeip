@@ -24,20 +24,19 @@ enum TransferRole : uint8_t
 class DLL_EXPORT TransferSession
 {
 public:
-    enum OutputEventFlags : uint16_t
+    enum OutputEventType : uint16_t
     {
-        kOutput_None = 0,
-
-        kOutput_MsgToSend       = (1U),
-        kOutput_InitReceived    = (1U << 1),
-        kOutput_AcceptReceived  = (1U << 2),
-        kOutput_BlockReceived   = (1U << 3),
-        kOutput_QueryReceived   = (1U << 4),
-        kOutput_AckReceived     = (1U << 5),
-        kOutput_AckEOFReceived  = (1U << 6),
-        kOutput_StatusReceived  = (1U << 7),
-        kOutput_InternalError   = (1U << 8),
-        kOutput_TransferTimeout = (1U << 9)
+        kOutput_None,
+        kOutput_MsgToSend,
+        kOutput_InitReceived,
+        kOutput_AcceptReceived,
+        kOutput_BlockReceived,
+        kOutput_QueryReceived,
+        kOutput_AckReceived,
+        kOutput_AckEOFReceived,
+        kOutput_StatusReceived,
+        kOutput_InternalError,
+        kOutput_TransferTimeout
     };
 
     struct TransferInitData
@@ -90,7 +89,7 @@ public:
      */
     struct OutputEvent
     {
-        OutputEventFlags EventType;
+        OutputEventType EventType;
         System::PacketBufferHandle MsgData;
         union
         {
@@ -101,51 +100,13 @@ public:
         };
 
         OutputEvent() : EventType(kOutput_None) { statusData = { kStatus_None }; }
-        OutputEvent(OutputEventFlags type) : EventType(type) { statusData = { kStatus_None }; }
+        OutputEvent(OutputEventType type) : EventType(type) { statusData = { kStatus_None }; }
 
-        static OutputEvent TransferInitEvent(TransferInitData data, System::PacketBufferHandle msg)
-        {
-            OutputEvent event(kOutput_InitReceived);
-            event.MsgData          = std::move(msg);
-            event.transferInitData = data;
-            return event;
-        }
-
-        /**
-         * @brief
-         *   Convenience method for constructing an OutputEvent with TransferAcceptData that does not contain Metadata
-         */
-        static OutputEvent TransferAcceptEvent(TransferAcceptData data)
-        {
-            OutputEvent event(kOutput_AcceptReceived);
-            event.transferAcceptData = data;
-            return event;
-        }
-        /**
-         * @brief
-         *   Convenience method for constructing an OutputEvent with TransferAcceptData that contains Metadata
-         */
-        static OutputEvent TransferAcceptEvent(TransferAcceptData data, System::PacketBufferHandle msg)
-        {
-            OutputEvent event = TransferAcceptEvent(data);
-            event.MsgData     = std::move(msg);
-            return event;
-        }
-
-        static OutputEvent BlockDataEvent(BlockData data, System::PacketBufferHandle msg)
-        {
-            OutputEvent event(kOutput_BlockReceived);
-            event.MsgData   = std::move(msg);
-            event.blockdata = data;
-            return event;
-        }
-
-        static OutputEvent StatusReportEvent(StatusReportData data)
-        {
-            OutputEvent event(kOutput_InternalError);
-            event.statusData = data;
-            return event;
-        }
+        static OutputEvent TransferInitEvent(TransferInitData data, System::PacketBufferHandle msg);
+        static OutputEvent TransferAcceptEvent(TransferAcceptData data);
+        static OutputEvent TransferAcceptEvent(TransferAcceptData data, System::PacketBufferHandle msg);
+        static OutputEvent BlockDataEvent(BlockData data, System::PacketBufferHandle msg);
+        static OutputEvent StatusReportEvent(OutputEventType type, StatusReportData data);
     };
 
     /**
@@ -158,7 +119,7 @@ public:
      *   It is possible that consecutive calls to this method may emit different outputs depending on the state of the
      *   TransferSession object.
      *
-     *   See OutputEventFlags for all possible output event types.
+     *   See OutputEventType for all possible output event types.
      *
      * @param event     Reference to an OutputEvent struct that will be filled out with any pending output data
      * @param curTimeMs Current time indicated by the number of milliseconds since some epoch defined by the platform
@@ -334,7 +295,7 @@ private:
     void SetTransferError(StatusCode code);
     bool IsTransferLengthDefinite();
 
-    BitFlags<uint16_t, OutputEventFlags> mPendingOutput;
+    OutputEventType mPendingOutput;
     TransferStates mState = kState_Idle;
     TransferRole mRole;
 
