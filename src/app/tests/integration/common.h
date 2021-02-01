@@ -24,8 +24,8 @@
 
 #pragma once
 
-#include <messaging/ExchangeMgr.h>
 #include <app/util/basic-types.h>
+#include <messaging/ExchangeMgr.h>
 
 #define MAX_MESSAGE_SOURCE_STR_LENGTH (100)
 #define NETWORK_SLEEP_TIME_MSECS (100 * 1000)

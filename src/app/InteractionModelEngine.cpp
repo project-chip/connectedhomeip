@@ -25,10 +25,10 @@
 
 #include <cinttypes>
 
-#include "InteractionModelEngine.h"
 #include "Command.h"
 #include "CommandHandler.h"
 #include "CommandSender.h"
+#include "InteractionModelEngine.h"
 
 namespace chip {
 namespace app {
