@@ -39,7 +39,7 @@ FLASHING_SCRIPT=$(BUILD_DIR_BASE)/$(PROJECT_NAME).flash.py
 # Describes what files are required to be bundled in a package for self-contained
 # flashing support
 #
-# NOTE: ESP32 still depends on setting $IDF_PATH being set
+# NOTE: ESP32 still depends on $IDF_PATH being set
 FLASHING_BUNDLE=$(BUILD_DIR_BASE)/$(PROJECT_NAME).flashbundle.txt
 
 $(FLASHING_SCRIPT): $(APP_BIN) $(BOOTLOADER_BIN) $(PARTITION_TABLE_BIN) $(PROJECT_PATH)/sdkconfig
