@@ -122,11 +122,8 @@ efr32_executable("lock_app") {
   }
 }
 
-
 group("efr32") {
-  deps = [
-    ":lock_app",
-  ]
+  deps = [ ":lock_app" ]
 }
 
 group("default") {
