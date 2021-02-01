@@ -150,6 +150,7 @@ CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser &
             // Todo: Define protocol code for StatusCode
             AddStatusCode(0, chip::Protocols::kProtocol_Protocol_Common, 0, clusterId);
         }
+        // TODO(#4503): Should call callbacks of cluster that sends the command.
         DispatchSingleClusterCommand(clusterId, commandId, endpointId, groupId, commandDataReader, this);
     }
 
