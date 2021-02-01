@@ -218,6 +218,27 @@ private:
 
 /**
  * @brief
+ *   The commissioner applications doesn't advertise itself as an available device for rendezvous
+ *   process. This delegate class provides no-op functions for the advertisement delegate.
+ */
+class DeviceCommissionerRendezvousAdvertisementDelegate : public RendezvousAdvertisementDelegate
+{
+public:
+    /**
+     * @brief
+     *   Starts advertisement of the device for rendezvous availability.
+     */
+    CHIP_ERROR StartAdvertisement() const override { return CHIP_NO_ERROR; }
+
+    /**
+     * @brief
+     *   Stops advertisement of the device for rendezvous availability.
+     */
+    CHIP_ERROR StopAdvertisement() const override { return CHIP_NO_ERROR; }
+};
+
+/**
+ * @brief
  *   The commissioner applications can use this class to pair new/unpaired CHIP devices. The application is
  *   required to provide write access to the persistent storage, where the paired device information
  *   will be stored.
@@ -313,6 +334,8 @@ private:
        the pairing for a device is removed. The DeviceCommissioner uses this to decide when to
        persist the device list */
     bool mPairedDevicesUpdated;
+
+    DeviceCommissionerRendezvousAdvertisementDelegate mRendezvousAdvDelegate;
 
     void PersistDeviceList();
 };
