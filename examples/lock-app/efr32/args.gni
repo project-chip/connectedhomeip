@@ -13,6 +13,23 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("//build_overrides/pigweed.gni")
 import("${chip_root}/examples/platform/efr32/args.gni")
 
 efr32_sdk_target = get_label_info(":sdk", "label_no_toolchain")
+
+declare_args() {
+  chip_build_pw_rpc_lib = false
+  dir_pw_log_chip = "$chip_root/src/lib/support/pw_log_chip"
+}
+
+if (chip_build_pw_rpc_lib)
+{
+  pw_log_BACKEND = "$dir_pw_log_basic"
+  pw_assert_BACKEND = "$dir_pw_assert_log"
+}
+else
+{
+  pw_log_BACKEND = "$dir_pw_log_chip"
+  pw_assert_BACKEND = "$dir_pw_assert_log"
+}
