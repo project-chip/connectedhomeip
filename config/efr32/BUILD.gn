@@ -12,15 +12,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# These options are used from examples/.
+import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
-import("${chip_root}/src/platform/EFR32/args.gni")
 
-openthread_project_core_config_file = "OpenThreadConfig.h"
-openthread_core_config_deps = []
-openthread_core_config_deps = [ "${chip_root}/examples/platform/efr32:openthread_core_config_efr32_chip_examples" ]
+import("${chip_root}/build/chip/tests.gni")
 
-chip_ble_project_config_include = "<CHIPProjectConfig.h>"
-chip_device_project_config_include = "<CHIPProjectConfig.h>"
-chip_project_config_include = "<CHIPProjectConfig.h>"
-chip_inet_project_config_include = "<CHIPProjectConfig.h>"
-chip_system_project_config_include = "<CHIPProjectConfig.h>"
+declare_args() {
+  chip_build_pw_rpc_lib = false
+}
+
+group("efr32") {
+  deps = [ "${chip_root}/src/lib" ]
+
+  if (chip_build_pw_rpc_lib) {
+    deps += [ "lib/pw_rpc" ]
+  }
+
+  if (chip_build_tests) {
+    deps += [ "${chip_root}/src:tests" ]
+  }
+}
+
+group("default") {
+  deps = [ ":efr32" ]
+}

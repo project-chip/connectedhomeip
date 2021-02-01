@@ -43,10 +43,25 @@
 #define LOG_RTT_BUFFER_INDEX 0
 #endif
 
+/**
+ * @def LOG_RTT_BUFFER_NAME
+ *
+ * RTT's name. Only used if LOG_RTT_BUFFER_INDEX is not 0. Otherwise,
+ * the buffer name is fixed to "Terminal".
+ *
+ */
 #ifndef LOG_RTT_BUFFER_NAME
 #define LOG_RTT_BUFFER_NAME "Terminal"
 #endif
 
+/**
+ * @def LOG_RTT_BUFFER_SIZE
+ *
+ * LOG RTT's buffer size. Only used if LOG_RTT_BUFFER_INDEX is not 0. To
+ * configure buffer #0 size, check the BUFFER_SIZE_UP definition in
+ * SEGGER_RTT_Conf.h
+ *
+ */
 #ifndef LOG_RTT_BUFFER_SIZE
 #define LOG_RTT_BUFFER_SIZE 256
 #endif
@@ -67,7 +82,10 @@ using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Internal;
 
 static bool sLogInitialized = false;
+#if LOG_RTT_BUFFER_INDEX != 0
 static uint8_t sLogBuffer[LOG_RTT_BUFFER_SIZE];
+static uint8_t sCmdLineBuffer[LOG_RTT_BUFFER_SIZE];
+#endif
 
 /**
  * Print a log message to RTT
@@ -79,11 +97,11 @@ static void PrintLog(const char * msg)
     {
         size_t sz;
         sz = strlen(msg);
-        SEGGER_RTT_WriteNoLock(0, msg, sz);
+        SEGGER_RTT_WriteNoLock(LOG_RTT_BUFFER_INDEX, msg, sz);
 
         const char * newline = "\r\n";
         sz                   = strlen(newline);
-        SEGGER_RTT_WriteNoLock(0, newline, sz);
+        SEGGER_RTT_WriteNoLock(LOG_RTT_BUFFER_INDEX, newline, sz);
     }
 #endif // EFR32_LOG_ENABLED
 }
@@ -94,8 +112,15 @@ static void PrintLog(const char * msg)
 extern "C" void efr32LogInit(void)
 {
 #if EFR32_LOG_ENABLED
+#if LOG_RTT_BUFFER_INDEX != 0
     SEGGER_RTT_ConfigUpBuffer(LOG_RTT_BUFFER_INDEX, LOG_RTT_BUFFER_NAME, sLogBuffer, LOG_RTT_BUFFER_SIZE,
                               SEGGER_RTT_MODE_NO_BLOCK_TRIM);
+
+    SEGGER_RTT_ConfigDownBuffer(LOG_RTT_BUFFER_INDEX, LOG_RTT_BUFFER_NAME, sCmdLineBuffer, LOG_RTT_BUFFER_SIZE,
+                                SEGGER_RTT_MODE_NO_BLOCK_SKIP);
+#else
+    SEGGER_RTT_SetFlagsUpBuffer(LOG_RTT_BUFFER_INDEX, SEGGER_RTT_MODE_NO_BLOCK_TRIM);
+#endif
     sLogInitialized = true;
 #endif // EFR32_LOG_ENABLED
 }
