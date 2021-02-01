@@ -95,7 +95,13 @@ template("flashable_executable") {
     final_target = executable_target
   }
   group(target_name) {
-    deps = [ ":$final_target" ]
+    data_deps = [ ":$final_target" ]
+
+    if(defined(invoker.data_deps)) {
+      data_deps += invoker.data_deps
+    }
+
+    write_runtime_deps = "${root_out_dir}/${target_name}.flashbundle.txt"
   }
 
   if (defined(invoker.objcopy_image_name)) {

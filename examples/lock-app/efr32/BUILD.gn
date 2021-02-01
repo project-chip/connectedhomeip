@@ -122,22 +122,10 @@ efr32_executable("lock_app") {
   }
 }
 
-# Describes what files are required to generate a stand-alone flashing
-# bundle (minus SDK flashing tools)
-generated_file("lock_app_flashbundle") {
-  outputs = [ "$root_out_dir/chip-efr32-lock-example.flashbundle.txt" ]
-  contents = [
-    "chip-efr32-lock-example.flash.py",
-    "chip-efr32-lock-example.s37",
-    "efr32_firmware_utils.py",
-    "firmware_utils.py",
-  ]
-}
 
 group("efr32") {
   deps = [
     ":lock_app",
-    ":lock_app_flashbundle",
   ]
 }
 
