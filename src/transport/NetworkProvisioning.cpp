@@ -34,6 +34,15 @@
 
 namespace chip {
 
+#ifdef IFNAMSIZ
+constexpr uint16_t kMaxInterfaceName = IFNAMSIZ;
+#else
+constexpr uint16_t kMaxInterfaceName = 32;
+#endif
+
+constexpr char kAPInterfaceNamePrefix[]      = "ap";
+constexpr char kLoobackInterfaceNamePrefix[] = "lo";
+
 void NetworkProvisioning::Init(NetworkProvisioningDelegate * delegate)
 {
     mDelegate = delegate;
@@ -81,6 +90,12 @@ CHIP_ERROR NetworkProvisioning::HandleNetworkProvisioningMessage(uint8_t msgType
 #if defined(CHIP_DEVICE_LAYER_TARGET)
         DeviceLayer::DeviceNetworkProvisioningDelegateImpl deviceDelegate;
         err = deviceDelegate.ProvisionWiFi(SSID, passwd);
+        SuccessOrExit(err);
+
+        if (DeviceLayer::ConnectivityMgr().IsWiFiStationConnected())
+        {
+            err = SendCurrentIPv4Address();
+        }
 #endif
 #endif
     }
@@ -185,6 +200,26 @@ exit:
     if (CHIP_NO_ERROR != err)
         ChipLogError(NetworkProvisioning, "Failed in sending IP address. error %s\n", ErrorStr(err));
     return err;
+}
+
+CHIP_ERROR NetworkProvisioning::SendCurrentIPv4Address()
+{
+    for (chip::Inet::InterfaceAddressIterator it; it.HasCurrent(); it.Next())
+    {
+        char ifName[kMaxInterfaceName];
+        if (it.IsUp() && CHIP_NO_ERROR == it.GetInterfaceName(ifName, sizeof(ifName)) &&
+            memcmp(ifName, kAPInterfaceNamePrefix, sizeof(kAPInterfaceNamePrefix) - 1) &&
+            memcmp(ifName, kLoobackInterfaceNamePrefix, sizeof(kLoobackInterfaceNamePrefix) - 1))
+        {
+            chip::Inet::IPAddress addr = it.GetAddress();
+            if (addr.IsIPv4())
+            {
+                return SendIPAddress(addr);
+            }
+        }
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR NetworkProvisioning::SendNetworkCredentials(const char * ssid, const char * passwd)
