@@ -85,10 +85,10 @@ CHIP_ERROR SendCommandRequest(void)
 
     printf("\nSend invoke command request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 
-    chip::app::Command::CommandParams CommandParams = { 1,  // Endpoint
-                                                        0,  // GroupId
-                                                        6,  // ClusterId
-                                                        40, // CommandId
+    chip::app::Command::CommandParams CommandParams = { kTestEndPointId, // Endpoint
+                                                        kTestGroupId,    // GroupId
+                                                        kTestClusterId,  // ClusterId
+                                                        kTestCommandId,  // CommandId
                                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
 
     // Add command data here
@@ -161,8 +161,19 @@ exit:
     return err;
 }
 
-void HandleCommandResponseReceived(chip::TLV::TLVReader & aReader, chip::app::Command * apCommandObj)
+} // namespace
+
+namespace chip {
+namespace app {
+
+void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId,
+                                  chip::GroupId aGroupId, chip::TLV::TLVReader & aReader, Command * apCommandObj)
 {
+    if (aClusterId != kTestClusterId || aCommandId != kTestCommandId || aEndPointId != kTestEndPointId || aGroupId != kTestGroupId)
+    {
+        return;
+    }
+
     uint32_t respTime    = chip::System::Timer::GetCurrentEpoch();
     uint32_t transitTime = respTime - gLastCommandTime;
 
@@ -176,8 +187,8 @@ void HandleCommandResponseReceived(chip::TLV::TLVReader & aReader, chip::app::Co
     printf("Command Response: %" PRIu64 "/%" PRIu64 "(%.2f%%) time=%.3fms\n", gCommandRespCount, gCommandCount,
            static_cast<double>(gCommandRespCount) * 100 / gCommandCount, static_cast<double>(transitTime) / 1000);
 }
-
-} // namespace
+} // namespace app
+} // namespace chip
 
 int main(int argc, char * argv[])
 {
@@ -211,9 +222,6 @@ int main(int argc, char * argv[])
     err = chip::app::InteractionModelEngine::GetInstance()->Init(&gExchangeManager);
     SuccessOrExit(err);
 
-    chip::app::InteractionModelEngine::GetInstance()->RegisterClusterCommandHandler(
-        6, 40, chip::app::Command::CommandRoleId::kCommandSenderId, HandleCommandResponseReceived);
-
     // Start the CHIP connection to the CHIP im responder.
     err = EstablishSecureSession();
     SuccessOrExit(err);
@@ -243,9 +251,6 @@ int main(int argc, char * argv[])
             gWaitingForCommandResp = false;
         }
     }
-
-    chip::app::InteractionModelEngine::GetInstance()->DeregisterClusterCommandHandler(
-        6, 40, chip::app::Command::CommandRoleId::kCommandSenderId);
 
     gpCommandSender->Shutdown();
     chip::app::InteractionModelEngine::GetInstance()->Shutdown();

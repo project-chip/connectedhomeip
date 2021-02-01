@@ -108,6 +108,8 @@ CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser &
     chip::TLV::TLVReader commandDataReader;
     chip::ClusterId clusterId;
     chip::CommandId commandId;
+    chip::EndpointId endpointId;
+    chip::GroupId groupId;
     uint16_t generalCode  = 0;
     uint32_t protocolId   = 0;
     uint16_t protocolCode = 0;
@@ -134,6 +136,12 @@ CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser &
         err = commandPath.GetCommandId(&commandId);
         SuccessOrExit(err);
 
+        err = commandPath.GetEndpointId(&endpointId);
+        SuccessOrExit(err);
+
+        err = commandPath.GetGroupId(&groupId);
+        SuccessOrExit(err);
+
         err = aCommandElement.GetData(&commandDataReader);
         if (CHIP_END_OF_TLV == err)
         {
@@ -142,7 +150,7 @@ CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser &
             // Todo: Define protocol code for StatusCode
             AddStatusCode(0, chip::Protocols::kProtocol_Protocol_Common, 0, clusterId);
         }
-        InteractionModelEngine::GetInstance()->ProcessCommand(clusterId, commandId, commandDataReader, this, kCommandSenderId);
+        DispatchSingleClusterCommand(clusterId, commandId, endpointId, groupId, commandDataReader, this);
     }
 
 exit:

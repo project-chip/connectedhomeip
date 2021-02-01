@@ -23,6 +23,8 @@
  *
  */
 
+#include <cinttypes>
+
 #include "InteractionModelEngine.h"
 #include "Command.h"
 #include "CommandHandler.h"
@@ -76,7 +78,6 @@ void InteractionModelEngine::Shutdown()
     {
         mCommandHandlerObjs[i].Shutdown();
     }
-    mHandlersMap.clear();
 }
 
 CHIP_ERROR InteractionModelEngine::NewCommandSender(CommandSender ** const apComandSender)
@@ -193,83 +194,17 @@ void InteractionModelEngine::OnResponseTimeout(Messaging::ExchangeContext * ec)
     ChipLogProgress(DataManagement, "Time out! failed to receive echo response from Exchange: %d", ec->GetExchangeId());
 }
 
-InteractionModelEngine::HandlerKey::HandlerKey(chip::ClusterId aClusterId, chip::CommandId aCommandId,
-                                               Command::CommandRoleId aCommandRoleId) :
-    mClusterId(aClusterId),
-    mCommandId(aCommandId), mCommandRoleId(aCommandRoleId)
-{}
-
-inline bool InteractionModelEngine::HandlerKey::operator<(const HandlerKey & aOtherKey) const
+void __attribute__((weak))
+DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId,
+                             chip::GroupId aGroupId, chip::TLV::TLVReader & aReader, Command * apCommandObj)
 {
-    return ((mClusterId != aOtherKey.mClusterId)
-                ? (mClusterId < aOtherKey.mClusterId)
-                : ((mCommandId != aOtherKey.mCommandId) ? (mCommandId < aOtherKey.mCommandId)
-                                                        : ((mCommandRoleId < aOtherKey.mCommandRoleId))));
+    ChipLogDetail(DataManagement,
+                  "Received Cluster Command: Cluster=%" PRIx16 " Command=%" PRIx8 " Endpoint=%" PRIx8 " Group=%" PRIx16, aClusterId,
+                  aCommandId, aEndPointId, aGroupId);
+    ChipLogError(
+        DataManagement,
+        "Default DispatchSingleClusterCommand is called, this should be replaced by actual dispatched for cluster commands");
 }
 
-CHIP_ERROR InteractionModelEngine::RegisterClusterCommandHandler(chip::ClusterId aClusterId, chip::CommandId aCommandId,
-                                                                 Command::CommandRoleId aCommandRoleId, CommandCbFunct aDispatcher)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    std::pair<HandlersMapType::iterator, bool> insertResult =
-        mHandlersMap.insert(HandlersMapType::value_type(HandlerKey(aClusterId, aCommandId, aCommandRoleId), aDispatcher));
-
-    if (!insertResult.second)
-    {
-        err = CHIP_ERROR_INVALID_ARGUMENT;
-    }
-    else
-    {
-        ChipLogDetail(DataManagement,
-                      "RegisterClusterCommandHandler registered handler for ClusterId = %d, CommandId = %d, CommandRoleId = "
-                      "%d, Dispatcher = %p",
-                      aClusterId, aCommandId, aCommandRoleId, (void *) aDispatcher);
-    }
-
-    return err;
-}
-
-CHIP_ERROR InteractionModelEngine::DeregisterClusterCommandHandler(chip::ClusterId aClusterId, chip::CommandId aCommandId,
-                                                                   Command::CommandRoleId aCommandRoleId)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    HandlersMapType::iterator handlerIt = mHandlersMap.find(HandlerKey(aClusterId, aCommandId, aCommandRoleId));
-    if (handlerIt != mHandlersMap.end())
-    {
-        CommandCbFunct pDispatcher = handlerIt->second;
-
-        ChipLogDetail(DataManagement,
-                      "DeregisterClusterCommandHandler unregistered handler for ClusterId = %d, CommandId = %d, CommandRoleId "
-                      "= %d, Dispatcher = %p",
-                      aClusterId, aCommandId, aCommandRoleId, (void *) pDispatcher);
-        mHandlersMap.erase(handlerIt);
-    }
-    else
-    {
-        err = CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
-    return err;
-}
-
-void InteractionModelEngine::ProcessCommand(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::TLV::TLVReader & aReader,
-                                            Command * apCommandObj, Command::CommandRoleId aCommandRoleId)
-{
-    HandlersMapType::iterator handlerIt;
-
-    handlerIt = mHandlersMap.find(HandlerKey(aClusterId, aCommandId, aCommandRoleId));
-
-    ChipLogDetail(DataManagement, "ClusterId = %d, CommandId = %d, CommandRoleId = %d", (int) (aClusterId), (int) (aCommandId),
-                  aCommandRoleId);
-
-    if (handlerIt != mHandlersMap.end())
-    {
-        handlerIt->second(aReader, apCommandObj);
-    }
-
-    return;
-}
 } // namespace app
 } // namespace chip
