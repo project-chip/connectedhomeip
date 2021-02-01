@@ -90,7 +90,7 @@ TransportMgr<OutgoingTransport> gTransportMgr;
 class MockAppDelegate : public ExchangeDelegate
 {
 public:
-    void OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, uint32_t protocolId, uint8_t msgType,
+    void OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                            System::PacketBufferHandle buffer) override
     {
         IsOnMessageReceivedCalled = true;
@@ -205,7 +205,7 @@ void CheckResendMessage(nlTestSuite * inSuite, void * inContext)
 
     gSendMessageCount = 0;
 
-    err = exchange->SendMessage(kProtocol_Echo, Echo::kEchoMessageType_EchoRequest, std::move(buffer),
+    err = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer),
                                 Messaging::SendFlags(Messaging::SendMessageFlags::kNone));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
