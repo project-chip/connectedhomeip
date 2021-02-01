@@ -28,7 +28,9 @@ sudo apt-get install -fy \
    gcc \
    git \
    libavahi-client-dev \
+   libcairo2-dev \
    libdbus-1-dev \
+   libgirepository1.0-dev \
    libglib2.0-dev \
    libssl-dev \
    ninja-build \
