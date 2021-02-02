@@ -97,7 +97,8 @@ public:
      * Transports are assumed to have an Init call with EXACTLY one argument. This method MUST initialize
      * all underlying transports.
      *
-     * @param args initialization arguments, forwarded as-is to the underlying transports.
+     * @param delegate the delegate to handle messages.
+     * @param args     initialization arguments, forwarded as-is to the underlying transports.
      */
     template <typename... Args, typename std::enable_if<(sizeof...(Args) == sizeof...(TransportTypes))>::type * = nullptr>
     CHIP_ERROR Init(RawTransportDelegate * delegate, Args &&... args)
@@ -216,17 +217,6 @@ private:
      * Provided to ensure that recursive InitImpl finishes compiling.
      */
     CHIP_ERROR InitImpl(RawTransportDelegate * delegate) { return CHIP_NO_ERROR; }
-
-    /**
-     * Handler passed to all underlying transports at init time.
-     *
-     * Calls the underlying Base message receive handler whenever any of the underlying transports
-     * receives a message.
-     */
-    static void OnMessageReceive(const PacketHeader & header, const PeerAddress & source, System::PacketBufferHandle msg, Tuple * t)
-    {
-        t->HandleMessageReceived(header, source, std::move(msg));
-    }
 
     std::tuple<TransportTypes...> mTransports;
 };

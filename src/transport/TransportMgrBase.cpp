@@ -46,7 +46,7 @@ CHIP_ERROR TransportMgrBase::Init(Transport::Base * transport)
 }
 
 void TransportMgrBase::HandleMessageReceived(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
-                                             System::PacketBufferHandle && msg)
+                                             System::PacketBufferHandle msg)
 {
     TransportMgrDelegate * handler = packetHeader.GetFlags().Has(Header::FlagValues::kSecure) ? mSecureSessionMgr : mRendezvous;
     if (handler != nullptr)

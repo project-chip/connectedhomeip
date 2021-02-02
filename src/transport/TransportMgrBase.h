@@ -45,8 +45,9 @@ public:
     void SetRendezvousSession(TransportMgrDelegate * rendezvousSessionMgr) { mRendezvous = rendezvousSessionMgr; }
 
     void HandleMessageReceived(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
-                               System::PacketBufferHandle && msg) override;
+                               System::PacketBufferHandle msg) override;
 
+private:
     TransportMgrDelegate * mSecureSessionMgr = nullptr;
     TransportMgrDelegate * mRendezvous       = nullptr;
     Transport::Base * mTransport             = nullptr;

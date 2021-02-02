@@ -38,7 +38,7 @@ class RawTransportDelegate
 public:
     virtual ~RawTransportDelegate() {}
     virtual void HandleMessageReceived(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
-                                       System::PacketBufferHandle && msg) = 0;
+                                       System::PacketBufferHandle msg) = 0;
 };
 
 /**
@@ -52,9 +52,9 @@ public:
     virtual ~Base() {}
 
     /**
-     * Sets the owner of the transport
+     * Sets the delegate of the transport
      *
-     * @param[in] param   The argument to pass in to the handler function
+     * @param[in] delegate  The argument to pass in to the handler function
      *
      */
     void SetDelegate(RawTransportDelegate * delegate) { mDelegate = delegate; }
@@ -88,7 +88,7 @@ protected:
      * Method used by subclasses to notify that a packet has been received after
      * any associated headers have been decoded.
      */
-    void HandleMessageReceived(const PacketHeader & header, const PeerAddress & source, System::PacketBufferHandle buffer)
+    void HandleMessageReceived(const PacketHeader & header, const PeerAddress & source, System::PacketBufferHandle && buffer)
     {
         mDelegate->HandleMessageReceived(header, source, std::move(buffer));
     }
