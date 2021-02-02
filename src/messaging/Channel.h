@@ -68,27 +68,27 @@ class ChannelBuilder
 public:
     enum class NetworkPreference
     {
-        kNetwork_Default,
-        kNetwork_HighBandwidth,
-        kNetwork_LowLatency,
-        kNetwork_LowPowerConsumption,
+        kDefault,
+        kHighBandwidth,
+        kLowLatency,
+        kLowPowerConsumption,
     };
 
     enum class TransportPreference
     {
-        kTransport_Connectionless,
-        kTransport_PreferConnectionOriented, // will fallback to connectionless TCP is not supported
-        kTransport_ConnectionOriented,       // will fail if TCP is not supported
+        kConnectionless,
+        kPreferConnectionOriented, // will fallback to connectionless if TCP is not supported
+        kConnectionOriented,       // will fail if TCP is not supported
 
-        kTransport_Default = kTransport_Connectionless,
+        kDefault = kConnectionless,
     };
 
     enum class SessionType
     {
-        kSession_PASE, // Use SPAKE2 key exchange
-        kSession_CASE, // Use SIGMA key exchange
+        kPASE, // Use SPAKE2 key exchange
+        kCASE, // Use SIGMA key exchange
 
-        kSession_Default = kSession_CASE,
+        kDefault = kCASE,
     };
 
     ChannelBuilder & SetPeerNodeId(NodeId peerNodeId)
@@ -122,33 +122,31 @@ public:
     uint16_t GetPeerKeyID() const { return mCaseParameters.mPeerKeyId; }
     ChannelBuilder & SetPeerKeyID(uint16_t keyId)
     {
-        if (mSessionType == SessionType::kSession_CASE)
-            mCaseParameters.mPeerKeyId = keyId;
+        assert(mSessionType == SessionType::kCASE);
+        mCaseParameters.mPeerKeyId = keyId;
         return *this;
     }
 
     uint32_t GetPeerSetUpPINCode() const { return mPaseParameters.mPeerSetUpPINCode; }
     ChannelBuilder & SetPeerSetUpPINCode(uint32_t peerPINCode)
     {
-        if (mSessionType == SessionType::kSession_PASE)
-            mPaseParameters.mPeerSetUpPINCode = peerPINCode;
+        assert(mSessionType == SessionType::kPASE);
+        mPaseParameters.mPeerSetUpPINCode = peerPINCode;
         return *this;
     }
 
-#ifndef NDEBUG
-    Optional<Inet::IPAddress> GetHintPeerAddress() const { return mHintPeerAddr; }
-    ChannelBuilder & SetHintPeerAddress(Inet::IPAddress peerAddr)
+    Optional<Inet::IPAddress> GetForcePeerAddress() const { return mForcePeerAddr; }
+    ChannelBuilder & SetForcePeerAddress(Inet::IPAddress peerAddr)
     {
-        mHintPeerAddr.SetValue(peerAddr);
+        mForcePeerAddr.SetValue(peerAddr);
         return *this;
     }
-#endif // NDEBUG
 
 private:
     NodeId mPeerNodeId                       = kUndefinedNodeId;
-    NetworkPreference mNetworkPreference     = NetworkPreference::kNetwork_Default;
-    TransportPreference mTransportPreference = TransportPreference::kTransport_Default;
-    SessionType mSessionType                 = SessionType::kSession_Default;
+    NetworkPreference mNetworkPreference     = NetworkPreference::kDefault;
+    TransportPreference mTransportPreference = TransportPreference::kDefault;
+    SessionType mSessionType                 = SessionType::kDefault;
     union
     {
         struct
@@ -161,9 +159,7 @@ private:
         } mPaseParameters;
     };
 
-#ifndef NDEBUG
-    Optional<Inet::IPAddress> mHintPeerAddr;
-#endif // NDEBUG
+    Optional<Inet::IPAddress> mForcePeerAddr;
 };
 
 class ExchangeContext;
@@ -171,11 +167,11 @@ class ExchangeDelegate;
 
 enum class ChannelState
 {
-    kChanneState_None,
-    kChanneState_Preparing,
-    kChanneState_Ready,
-    kChanneState_Closed,
-    kChanneState_Failed,
+    kNone,
+    kPreparing,
+    kReady,
+    kClosed,
+    kFailed,
 };
 
 class ChannelContextHandleAssociation;
@@ -188,7 +184,7 @@ class ChannelContextHandleAssociation;
  *
  *    The ChannelHandle controls the lifespan of the channel. The ChannelHandle
  *    objects are not copyable, so there can be only one instance referring to
- *    the channel. When the handler is released, the channel will be flagged as
+ *    the channel. When the handle is released, the channel will be flagged as
  *    pending close, and if there is no active exchange which is using the
  *    channel, the channel will be closed.
  *
@@ -198,7 +194,7 @@ class ChannelContextHandleAssociation;
 class ChannelHandle
 {
 public:
-    ChannelHandle(ChannelContextHandleAssociation * association = nullptr) : mAssociation(association) {}
+    explicit ChannelHandle(ChannelContextHandleAssociation * association = nullptr) : mAssociation(association) {}
     ~ChannelHandle() { Release(); }
 
     // non copyable

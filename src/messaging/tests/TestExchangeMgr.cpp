@@ -191,11 +191,11 @@ void CheckExchangeChannels(nlTestSuite * inSuite, void * inContext)
     ExchangeContext * ec1 = channelHandle.NewExchange(&mockAppDelegate);
 
     // send a malicious packet
-    ec1->SendMessage(0x0001, 0x0002, System::PacketBuffer::New(), SendFlags(Messaging::SendMessageFlags::kNone));
+    ec1->SendMessage(0x0001, 0x0002, System::PacketBufferHandle::New(System::kMaxPacketBufferSize), SendFlags(Messaging::SendMessageFlags::kNone));
     NL_TEST_ASSERT(inSuite, !mockUnsolicitedAppDelegate.IsOnMessageReceivedCalled);
 
     // send a good packet
-    ec1->SendMessage(0x0001, 0x0001, System::PacketBuffer::New(), SendFlags(Messaging::SendMessageFlags::kNone));
+    ec1->SendMessage(0x0001, 0x0001, System::PacketBufferHandle::New(System::kMaxPacketBufferSize), SendFlags(Messaging::SendMessageFlags::kNone));
     NL_TEST_ASSERT(inSuite, mockUnsolicitedAppDelegate.IsOnMessageReceivedCalled);
 
     ec1->Close();
