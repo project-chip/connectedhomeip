@@ -24,25 +24,23 @@ namespace Messaging {
 
 ChannelState ChannelHandle::GetState() const
 {
-    if (mAssociation != nullptr)
-        return mAssociation->mChannelContext->GetState();
-    else
-        return ChannelState::kChanneState_None;
+    if (mAssociation == nullptr)
+        return ChannelState::kNone;
+    return mAssociation->mChannelContext->GetState();
 }
 
 ExchangeContext * ChannelHandle::NewExchange(ExchangeDelegate * delegate)
 {
-    if (mAssociation != nullptr)
-        return mAssociation->mChannelContext->NewExchange(delegate);
-    else
+    if (mAssociation == nullptr)
         return nullptr;
+    return mAssociation->mChannelContext->NewExchange(delegate);
 }
 
 void ChannelHandle::Release()
 {
-    if (mAssociation != nullptr)
-        mAssociation->mChannelContext->mExchangeManager->ReleaseChannelHandle(mAssociation);
-    mAssociation = nullptr;
+    if (mAssociation == nullptr)
+        mAssociation = nullptr;
+    mAssociation->mChannelContext->mExchangeManager->ReleaseChannelHandle(mAssociation);
 }
 
 } // namespace Messaging
