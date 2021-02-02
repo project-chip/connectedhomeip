@@ -223,7 +223,7 @@ private:
      * Calls the underlying Base message receive handler whenever any of the underlying transports
      * receives a message.
      */
-    static void OnMessageReceive(const PacketHeader & header, const PeerAddress & source, System::PacketBufferHandle msg, Tuple * t)
+    static void OnMessageReceive(const PacketHeader & header, const PeerAddress & source, System::PacketBufferHandle && msg, Tuple * t)
     {
         t->HandleMessageReceived(header, source, std::move(msg));
     }
