@@ -53,23 +53,10 @@ NSString * const kCHIPNumLightOnOffCluster = @"OnOffViewController_NumLights";
     UITapGestureRecognizer * tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dismissKeyboard)];
     [self.view addGestureRecognizer:tap];
     
+    [self initializeChipController];
     [self setupUIElements];
 
-    _persistentStorage = [[CHIPToolPersistentStorageDelegate alloc] init];
-
-    // initialize the device controller
-    _callbackQueue = dispatch_queue_create("com.zigbee.chip.onoffvc.callback", DISPATCH_QUEUE_SERIAL);
-    self.chipController = [CHIPDeviceController sharedController];
-    [self.chipController setDelegate:self queue:_callbackQueue];
-    [self.chipController setPersistentStorageDelegate:_persistentStorage queue:_callbackQueue];
-
-    uint64_t deviceID = CHIPGetNextAvailableDeviceID();
-    if (deviceID > 1) {
-        // Let's use the last device that was paired
-        deviceID--;
-        NSError * error;
-        self.chipDevice = [self.chipController getPairedDevice:deviceID error:&error];
-    }
+    
 }
 
 - (void)dismissKeyboard
@@ -107,8 +94,8 @@ NSString * const kCHIPNumLightOnOffCluster = @"OnOffViewController_NumLights";
     [stackView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:30].active = YES;
     [stackView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-30].active = YES;
     
-    // Num lights to show[
-    [self setupNumberOfLightsFromDefaults];
+    // Num lights to show
+    [self setupNumberOfLightClustersFromDefaults];
     UILabel *numLightsLabel = [UILabel new];
     numLightsLabel.text = @"# of light endpoints:";
     _numLightsTextField = [UITextField new];
@@ -225,22 +212,42 @@ NSString * const kCHIPNumLightOnOffCluster = @"OnOffViewController_NumLights";
 
 // MARK: Cluster Setup
 
-- (int)numLightsToShow
+- (void)initializeChipController
+{
+    _persistentStorage = [[CHIPToolPersistentStorageDelegate alloc] init];
+
+    // initialize the device controller
+    _callbackQueue = dispatch_queue_create("com.zigbee.chip.onoffvc.callback", DISPATCH_QUEUE_SERIAL);
+    self.chipController = [CHIPDeviceController sharedController];
+    [self.chipController setDelegate:self queue:_callbackQueue];
+    [self.chipController setPersistentStorageDelegate:_persistentStorage queue:_callbackQueue];
+
+    uint64_t deviceID = CHIPGetNextAvailableDeviceID();
+    if (deviceID > 1) {
+        // Let's use the last device that was paired
+        deviceID--;
+        NSError * error;
+        self.chipDevice = [self.chipController getPairedDevice:deviceID error:&error];
+    }
+}
+
+- (int)numLightClustersToShow
 {
     NSString *numClusters = CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, kCHIPNumLightOnOffCluster);
     int numberOfLights = 1;
+    
     if (numClusters) {
         numberOfLights = [numClusters intValue];
     }
     return numberOfLights;
 }
 
-- (void)setupNumberOfLightsFromDefaults
+- (void)setupNumberOfLightClustersFromDefaults
 {
-    [self setupNumberOfLights:[self numLightsToShow]];
+    [self setupNumberOfLightClusters:[self numLightClustersToShow]];
 }
 
-- (void)setupNumberOfLights:(int)numLights
+- (void)setupNumberOfLightClusters:(int)numLights
 {
     NSMutableArray<CHIPOnOff *> *clusters = [NSMutableArray new];
     for (int i = 0; i < numLights; i ++) {
