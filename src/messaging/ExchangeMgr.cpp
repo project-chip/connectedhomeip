@@ -118,7 +118,7 @@ CHIP_ERROR ExchangeManager::RegisterUnsolicitedMessageHandlerForType(uint32_t pr
     return RegisterUMH(protocolId, static_cast<int16_t>(msgType), delegate);
 }
 
-CHIP_ERROR ExchangeManager::UnregisteerUnsolicitedMessageHandlerForProtodcol(uint32_t protocolId)
+CHIP_ERROR ExchangeManager::UnregisterUnsolicitedMessageHandlerForProtocol(uint32_t protocolId)
 {
     return UnregisterUMH(protocolId, kAnyMessageType);
 }

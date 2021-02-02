@@ -144,7 +144,7 @@ public:
      *                                                       is not found.
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR UnregisteerUnsolicitedMessageHandlerForProtodcol(uint32_t protocolId);
+    CHIP_ERROR UnregisterUnsolicitedMessageHandlerForProtocol(uint32_t protocolId);
 
     /**
      *  Unregister an unsolicited message handler for a given protocol identifier and message type.

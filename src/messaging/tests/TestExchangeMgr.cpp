@@ -116,10 +116,10 @@ void CheckUmhRegistrationTest(nlTestSuite * inSuite, void * inContext)
     err = ctx.GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(0x0002, 0x0001, &mockAppDelegate);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = ctx.GetExchangeManager().UnregisteerUnsolicitedMessageHandlerForProtodcol(0x0001);
+    err = ctx.GetExchangeManager().UnregisterUnsolicitedMessageHandlerForProtocol(0x0001);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = ctx.GetExchangeManager().UnregisteerUnsolicitedMessageHandlerForProtodcol(0x0002);
+    err = ctx.GetExchangeManager().UnregisterUnsolicitedMessageHandlerForProtocol(0x0002);
     NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
 
     err = ctx.GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(0x0002, 0x0001);
