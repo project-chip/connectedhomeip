@@ -45,7 +45,7 @@ namespace chip {
 
 using namespace Crypto;
 
-const char * kSpake2pContext        = "SPAKE2+ Commissioning";
+const char * kSpake2pContext        = "CHIP PAKE V1 Commissioning";
 const char * kSpake2pI2RSessionInfo = "Commissioning I2R Key";
 const char * kSpake2pR2ISessionInfo = "Commissioning R2I Key";
 
@@ -198,7 +198,10 @@ exit:
 
 CHIP_ERROR PASESession::SetupSpake2p(uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err      = CHIP_NO_ERROR;
+    uint8_t context[32] = {
+        0,
+    };
 
     VerifyOrExit(salt != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(saltLen > 0, err = CHIP_ERROR_INVALID_ARGUMENT);
@@ -207,7 +210,10 @@ CHIP_ERROR PASESession::SetupSpake2p(uint32_t pbkdf2IterCount, const uint8_t * s
                         sizeof(mWS), &mWS[0][0]);
     SuccessOrExit(err);
 
-    err = mSpake2p.Init(&mCommissioningHash);
+    err = mCommissioningHash.Finish(context);
+    SuccessOrExit(err);
+
+    err = mSpake2p.Init(context, sizeof(context));
     SuccessOrExit(err);
 
 exit:
