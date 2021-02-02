@@ -29,80 +29,150 @@ void ChannelContextDeletor::Release(ChannelContext * context)
 
 void ChannelContext::Start(const ChannelBuilder & builder)
 {
-    if (mState != ChannelState::kChanneState_None)
+    if (mState != ChannelState::kNone)
         return;
     EnterPreparingState(builder);
 }
 
 ExchangeContext * ChannelContext::NewExchange(ExchangeDelegate * delegate)
 {
-    if (GetState() != ChannelState::kChanneState_Ready)
+    if (GetState() != ChannelState::kReady)
         return nullptr;
-    return mExchangeManager->NewContext(mReady.mSession, delegate);
+    return mExchangeManager->NewContext(mStateVars.mReady.mSession, delegate);
 }
 
-bool ChannelContext::MatchesBuilder(const ChannelBuilder & builder, SecureSessionMgr * ssm)
+bool ChannelContext::MatchNodeId(NodeId nodeId)
 {
-    // Channel is identified by {node id, {pase/case, key id}, network interface, tcp/udp}
-    // Channel is reused if builder parameters are matching an existing channel
     switch (mState)
     {
-    case ChannelState::kChanneState_Preparing: {
-        if (builder.GetPeerNodeId() != mPreparing.mBuilder.GetPeerNodeId())
+    case ChannelState::kPreparing:
+        return nodeId == mStateVars.mPreparing.mBuilder.GetPeerNodeId();
+    case ChannelState::kReady: {
+        auto state = mExchangeManager->GetSessionMgr()->GetPeerConnectionState(mStateVars.mReady.mSession);
+        if (state == nullptr)
             return false;
-
-        switch (builder.GetSessionType())
-        {
-        case ChannelBuilder::SessionType::kSession_PASE:
-            // only one PASE sessoin per node is supported
-            return true;
-        case ChannelBuilder::SessionType::kSession_CASE: {
-            // TODO: compare network interface id and tcp/udp type
-            return builder.GetPeerKeyID() == mPreparing.mBuilder.GetPeerKeyID();
-        }
-        default:
-            return false;
-        }
+        return nodeId == state->GetPeerNodeId();
     }
-    case ChannelState::kChanneState_Ready:
-        // TODO
-        return false;
     default:
         return false;
     }
 }
 
-bool ChannelContext::MatchesPaseParingSessoin(NodeId nodeId)
+bool ChannelContext::MatchNetworkPreference(ChannelBuilder::NetworkPreference preference)
 {
-    return mState == ChannelState::kChanneState_Preparing && mPreparing.mState == PrepareState::kPrepareState_PaseParing &&
-        nodeId == mPreparing.mBuilder.GetPeerNodeId();
+    // TODO: select interface is not supported yet
+    return true;
+}
+
+bool ChannelContext::MatchTransport(Transport::Type transport)
+{
+    switch (mState)
+    {
+    case ChannelState::kPreparing:
+        switch (mStateVars.mPreparing.mBuilder.GetTransportPreference())
+        {
+        case ChannelBuilder::TransportPreference::kPreferConnectionOriented:
+        case ChannelBuilder::TransportPreference::kConnectionOriented:
+            return transport == Transport::Type::kTcp;
+        case ChannelBuilder::TransportPreference::kConnectionless:
+            return transport == Transport::Type::kUdp;
+        }
+        return false;
+    case ChannelState::kReady: {
+        auto state = mExchangeManager->GetSessionMgr()->GetPeerConnectionState(mStateVars.mReady.mSession);
+        if (state == nullptr)
+            return false;
+        return transport == state->GetPeerAddress().GetTransportType();
+    }
+    default:
+        return false;
+    }
+}
+
+bool ChannelContext::MatchTransportPreference(ChannelBuilder::TransportPreference transport)
+{
+    switch (transport)
+    {
+    case ChannelBuilder::TransportPreference::kPreferConnectionOriented:
+    case ChannelBuilder::TransportPreference::kConnectionOriented:
+        return MatchTransport(Transport::Type::kTcp);
+    case ChannelBuilder::TransportPreference::kConnectionless:
+        return MatchTransport(Transport::Type::kUdp);
+    }
+    return false;
+}
+
+bool ChannelContext::MatchSessionType(ChannelBuilder::SessionType type)
+{
+    switch (mState)
+    {
+    case ChannelState::kPreparing:
+        return type == mStateVars.mPreparing.mBuilder.GetSessionType();
+    case ChannelState::kReady:
+        // TODO: CASE is not supported yet
+        return type == ChannelBuilder::SessionType::kPASE;
+    default:
+        return false;
+    }
+}
+
+bool ChannelContext::MatchCaseParameters()
+{
+    // TODO: not supported yet, should compare CASE parameters here, and return false if doesn't match
+    return true;
+}
+
+bool ChannelContext::MatchesBuilder(const ChannelBuilder & builder)
+{
+    // Channel is identified by {node id, {pase/case, key id}, network interface, tcp/udp}
+    // Channel is reused if builder parameters are matching an existing channel
+    if (!MatchNodeId(builder.GetPeerNodeId()))
+        return false;
+    if (!MatchSessionType(builder.GetSessionType()))
+        return false;
+    switch (builder.GetSessionType())
+    {
+    case ChannelBuilder::SessionType::kPASE:
+        return true; // only one PASE session is supported, ignore network interface and transports
+    case ChannelBuilder::SessionType::kCASE:
+        if (!MatchCaseParameters())
+            return false;
+        break;
+    }
+
+    return MatchNetworkPreference(builder.GetNetworkPreference()) && MatchTransportPreference(builder.GetTransportPreference());
+}
+
+bool ChannelContext::IsPasePairing()
+{
+    return mState == ChannelState::kPreparing && mStateVars.mPreparing.mState == PrepareState::kPasePairing;
 }
 
 bool ChannelContext::MatchesSession(SecureSessionHandle session, SecureSessionMgr * ssm)
 {
     switch (mState)
     {
-    case ChannelState::kChanneState_Preparing: {
-        switch (mPreparing.mState)
+    case ChannelState::kPreparing: {
+        switch (mStateVars.mPreparing.mState)
         {
-        case kPrepareState_PaseParingDone: {
+        case PrepareState::kPasePairingDone: {
             auto state = ssm->GetPeerConnectionState(session);
-            if (state->GetPeerNodeId() != mPreparing.mBuilder.GetPeerNodeId())
+            if (state->GetPeerNodeId() != mStateVars.mPreparing.mBuilder.GetPeerNodeId())
                 return false;
             // only one PASE sessoin per node is supported
             return true;
         }
-        case kPrepareState_CaseParing: {
+        case PrepareState::kCasePairing: {
             auto state = ssm->GetPeerConnectionState(session);
-            return (state->GetPeerNodeId() != mPreparing.mBuilder.GetPeerNodeId() &&
-                    state->GetPeerKeyID() == mPreparing.mBuilder.GetPeerKeyID());
+            return (state->GetPeerNodeId() != mStateVars.mPreparing.mBuilder.GetPeerNodeId() &&
+                    state->GetPeerKeyID() == mStateVars.mPreparing.mBuilder.GetPeerKeyID());
         }
         default:
             return false;
         }
     }
-    case ChannelState::kChanneState_Ready:
-        return mReady.mSession == session;
+    case ChannelState::kReady:
+        return mStateVars.mReady.mSession == session;
     default:
         return false;
     }
@@ -110,11 +180,11 @@ bool ChannelContext::MatchesSession(SecureSessionHandle session, SecureSessionMg
 
 void ChannelContext::EnterPreparingState(const ChannelBuilder & builder)
 {
-    mState              = ChannelState::kChanneState_Preparing;
-    mPreparing.mBuilder = builder;
+    mState                         = ChannelState::kPreparing;
+    mStateVars.mPreparing.mBuilder = builder;
 
     // TODO: Skip waiting for interface, it is not clear how to wait for a network interface for now.
-    mPreparing.mInterface = INET_NULL_INTERFACEID;
+    mStateVars.mPreparing.mInterface = INET_NULL_INTERFACEID;
 
     EnterAddressResolve();
 }
@@ -124,36 +194,34 @@ void ChannelContext::ExitPreparingState() {}
 // Address resolve
 void ChannelContext::EnterAddressResolve()
 {
-    mPreparing.mState = PrepareState::kPrepareState_AddressResolving;
+    mStateVars.mPreparing.mState = PrepareState::kAddressResolving;
 
-#ifndef NDEBUG
     // Skip address resolve if the address is provided
     {
-        auto addr = mPreparing.mBuilder.GetHintPeerAddress();
+        auto addr = mStateVars.mPreparing.mBuilder.GetForcePeerAddress();
         if (addr.HasValue())
         {
-            mPreparing.mAddress = addr.Value();
+            mStateVars.mPreparing.mAddress = addr.Value();
             ExitAddressResolve();
-            switch (mPreparing.mBuilder.GetSessionType())
+            switch (mStateVars.mPreparing.mBuilder.GetSessionType())
             {
-            case ChannelBuilder::SessionType::kSession_PASE:
-                EnterPaseParingState();
+            case ChannelBuilder::SessionType::kPASE:
+                EnterPasePairingState();
                 break;
-            case ChannelBuilder::SessionType::kSession_CASE:
-                EnterCaseParingState();
+            case ChannelBuilder::SessionType::kCASE:
+                EnterCasePairingState();
                 break;
             }
             return;
         }
     }
-#endif // NDEBUG
 
     // TODO: call mDNS Scanner::SubscribeNode after PR #4459 is ready
     // Scanner::RegisterScannerDelegate(this)
-    // Scanner::SubscribeNode(mPreparing.mBuilder.GetPeerNodeId())
+    // Scanner::SubscribeNode(mStateVars.mPreparing.mBuilder.GetPeerNodeId())
 
     // The HandleNodeIdResolve may already have been called, recheck the state here before set up the timer
-    if (mState == ChannelState::kChanneState_Preparing && mPreparing.mState == kPrepareState_AddressResolving)
+    if (mState == ChannelState::kPreparing && mStateVars.mPreparing.mState == PrepareState::kAddressResolving)
     {
         System::Layer * layer = mExchangeManager->GetSessionMgr()->SystemLayer();
         layer->StartTimer(CHIP_CONFIG_NODE_ADDRESS_RESOLVE_TIMEOUT_MSECS, AddressResolveTimeout, this);
@@ -170,9 +238,9 @@ void ChannelContext::AddressResolveTimeout(System::Layer * aLayer, void * aAppSt
 
 void ChannelContext::AddressResolveTimeout()
 {
-    if (mState != ChannelState::kChanneState_Preparing)
+    if (mState != ChannelState::kPreparing)
         return;
-    if (mPreparing.mState != PrepareState::kPrepareState_AddressResolving)
+    if (mStateVars.mPreparing.mState != PrepareState::kAddressResolving)
         return;
 
     ExitAddressResolve();
@@ -184,32 +252,22 @@ void ChannelContext::HandleNodeIdResolve(CHIP_ERROR error, uint64_t nodeId, cons
 {
     switch (mState)
     {
-    case ChannelState::kChanneState_Ready: {
-        auto peer = mExchangeManager->GetSessionMgr()->GetPeerConnectionState(mReady.mSession);
-        if (peer->GetPeerNodeId() != nodeId || mReady.mInterface != address.mInterface)
-            return;
-
+    case ChannelState::kReady: {
         if (error != CHIP_NO_ERROR)
         {
             // Ignore mDNS fail in ready state
             return;
         }
 
-        // TODO: adjust peer address
+        // TODO: adjust peer address, secure session manager is not able to change peer address.
         return;
     }
-    case ChannelState::kChanneState_Preparing: {
-        // Skip responses which are not related with this context
-        if (nodeId != mPreparing.mBuilder.GetPeerNodeId())
-            return;
-        if (mPreparing.mInterface != INET_NULL_INTERFACEID && mPreparing.mInterface != address.mInterface)
-            return;
-
-        switch (mPreparing.mState)
+    case ChannelState::kPreparing: {
+        switch (mStateVars.mPreparing.mState)
         {
-        case kPrepareState_WaitingForInterface:
+        case PrepareState::kWaitingForInterface:
             return;
-        case kPrepareState_AddressResolving: {
+        case PrepareState::kAddressResolving: {
             if (error != CHIP_NO_ERROR)
             {
                 ExitAddressResolve();
@@ -220,30 +278,30 @@ void ChannelContext::HandleNodeIdResolve(CHIP_ERROR error, uint64_t nodeId, cons
 
             if (!address.mAddress.HasValue())
                 return;
-            mPreparing.mAddressType = address.mAddressType;
-            mPreparing.mAddress     = address.mAddress.Value();
+            mStateVars.mPreparing.mAddressType = address.mAddressType;
+            mStateVars.mPreparing.mAddress     = address.mAddress.Value();
             ExitAddressResolve();
-            switch (mPreparing.mBuilder.GetSessionType())
+            switch (mStateVars.mPreparing.mBuilder.GetSessionType())
             {
-            case ChannelBuilder::SessionType::kSession_PASE:
-                EnterPaseParingState();
+            case ChannelBuilder::SessionType::kPASE:
+                EnterPasePairingState();
                 break;
-            case ChannelBuilder::SessionType::kSession_CASE:
-                EnterCaseParingState();
+            case ChannelBuilder::SessionType::kCASE:
+                EnterCasePairingState();
                 break;
             }
         }
             return;
-        case kPrepareState_PaseParing:
-        case kPrepareState_PaseParingDone:
-        case kPrepareState_CaseParing:
+        case PrepareState::kPasePairing:
+        case PrepareState::kPasePairingDone:
+        case PrepareState::kCasePairing:
             return;
         }
-    }
         return;
-    case ChannelState::kChanneState_None:
-    case ChannelState::kChanneState_Closed:
-    case ChannelState::kChanneState_Failed:
+    }
+    case ChannelState::kNone:
+    case ChannelState::kClosed:
+    case ChannelState::kFailed:
         return;
     }
 }
@@ -258,67 +316,68 @@ CHIP_ERROR ChannelContext::SendSessionEstablishmentMessage(const PacketHeader & 
 CHIP_ERROR ChannelContext::HandlePairingMessage(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
                                                 System::PacketBufferHandle && msg)
 {
-    return mPreparing.mPasePairingSession->HandlePeerMessage(packetHeader, peerAddress, std::move(msg));
+    return mStateVars.mPreparing.mSession.mPasePairingSession->HandlePeerMessage(packetHeader, peerAddress, std::move(msg));
 }
 
-void ChannelContext::EnterPaseParingState()
+void ChannelContext::EnterPasePairingState()
 {
-    mPreparing.mState              = PrepareState::kPrepareState_PaseParing;
-    mPreparing.mPasePairingSession = chip::Platform::New<PASESession>();
+    mStateVars.mPreparing.mState                       = PrepareState::kPasePairing;
+    mStateVars.mPreparing.mSession.mPasePairingSession = Platform::New<PASESession>();
     // TODO: currently only supports IP/UDP paring
     Transport::PeerAddress addr;
-    addr.SetTransportType(chip::Transport::Type::kUdp).SetIPAddress(mPreparing.mAddress);
-    CHIP_ERROR err = mPreparing.mPasePairingSession->Pair(
-        addr, mPreparing.mBuilder.GetPeerSetUpPINCode(), Optional<NodeId>(mExchangeManager->GetLocalNodeId()),
-        mPreparing.mBuilder.GetPeerNodeId(), mExchangeManager->GetNextKeyId(), this);
+    addr.SetTransportType(Transport::Type::kUdp).SetIPAddress(mStateVars.mPreparing.mAddress);
+    CHIP_ERROR err = mStateVars.mPreparing.mSession.mPasePairingSession->Pair(
+        addr, mStateVars.mPreparing.mBuilder.GetPeerSetUpPINCode(), Optional<NodeId>(mExchangeManager->GetLocalNodeId()),
+        mStateVars.mPreparing.mBuilder.GetPeerNodeId(), mExchangeManager->GetNextKeyId(), this);
     if (err != CHIP_NO_ERROR)
     {
-        ExitCaseParingState();
+        ExitCasePairingState();
         ExitPreparingState();
         EnterFailedState(err);
     }
 }
 
-void ChannelContext::ExitPaseParingState()
+void ChannelContext::ExitPasePairingState()
 {
-    chip::Platform::Delete(mPreparing.mPasePairingSession);
+    Platform::Delete(mStateVars.mPreparing.mSession.mPasePairingSession);
 }
 
-void ChannelContext::EnterCaseParingState()
+void ChannelContext::EnterCasePairingState()
 {
-    mPreparing.mState              = PrepareState::kPrepareState_CaseParing;
-    mPreparing.mCasePairingSession = chip::Platform::New<CASESession>();
+    mStateVars.mPreparing.mState                       = PrepareState::kCasePairing;
+    mStateVars.mPreparing.mSession.mCasePairingSession = Platform::New<CASESession>();
     // TODO: currently only supports IP/UDP paring
     Transport::PeerAddress addr;
-    addr.SetTransportType(chip::Transport::Type::kUdp).SetIPAddress(mPreparing.mAddress);
-    CHIP_ERROR err = mPreparing.mCasePairingSession->EstablishSession(
-        addr, mExchangeManager->GetLocalNodeId(), mPreparing.mBuilder.GetPeerNodeId(), mExchangeManager->GetNextKeyId(), this);
+    addr.SetTransportType(Transport::Type::kUdp).SetIPAddress(mStateVars.mPreparing.mAddress);
+    CHIP_ERROR err = mStateVars.mPreparing.mSession.mCasePairingSession->EstablishSession(
+        addr, mExchangeManager->GetLocalNodeId(), mStateVars.mPreparing.mBuilder.GetPeerNodeId(), mExchangeManager->GetNextKeyId(),
+        this);
     if (err != CHIP_NO_ERROR)
     {
-        ExitCaseParingState();
+        ExitCasePairingState();
         ExitPreparingState();
         EnterFailedState(err);
     }
 }
 
-void ChannelContext::ExitCaseParingState()
+void ChannelContext::ExitCasePairingState()
 {
-    chip::Platform::Delete(mPreparing.mCasePairingSession);
+    Platform::Delete(mStateVars.mPreparing.mSession.mCasePairingSession);
 }
 
 void ChannelContext::OnSessionEstablishmentError(CHIP_ERROR error)
 {
-    if (mState != ChannelState::kChanneState_Preparing)
+    if (mState != ChannelState::kPreparing)
         return;
-    switch (mPreparing.mState)
+    switch (mStateVars.mPreparing.mState)
     {
-    case PrepareState::kPrepareState_PaseParing:
-        ExitPaseParingState();
+    case PrepareState::kPasePairing:
+        ExitPasePairingState();
         ExitPreparingState();
         EnterFailedState(error);
         return;
-    case PrepareState::kPrepareState_CaseParing:
-        ExitCaseParingState();
+    case PrepareState::kCasePairing:
+        ExitCasePairingState();
         ExitPreparingState();
         EnterFailedState(error);
         return;
@@ -329,24 +388,25 @@ void ChannelContext::OnSessionEstablishmentError(CHIP_ERROR error)
 
 void ChannelContext::OnSessionEstablished()
 {
-    if (mState != ChannelState::kChanneState_Preparing)
+    if (mState != ChannelState::kPreparing)
         return;
-    switch (mPreparing.mState)
+    switch (mStateVars.mPreparing.mState)
     {
-    case PrepareState::kPrepareState_PaseParing: {
-        ExitPaseParingState();
-        mPreparing.mState = PrepareState::kPrepareState_PaseParingDone;
+    case PrepareState::kPasePairing: {
+        ExitPasePairingState();
+        mStateVars.mPreparing.mState = PrepareState::kPasePairingDone;
 
         Transport::PeerAddress addr;
-        addr.SetTransportType(chip::Transport::Type::kUdp).SetIPAddress(mPreparing.mAddress);
+        addr.SetTransportType(Transport::Type::kUdp).SetIPAddress(mStateVars.mPreparing.mAddress);
         // This will trigger OnNewConnection callback from SecureSessionManager
-        mExchangeManager->GetSessionMgr()->NewPairing(Optional<Transport::PeerAddress>(addr), mPreparing.mBuilder.GetPeerNodeId(),
-                                                      mPreparing.mPasePairingSession);
+        mExchangeManager->GetSessionMgr()->NewPairing(Optional<Transport::PeerAddress>(addr),
+                                                      mStateVars.mPreparing.mBuilder.GetPeerNodeId(),
+                                                      mStateVars.mPreparing.mSession.mPasePairingSession);
         return;
     }
-    case PrepareState::kPrepareState_CaseParing:
-        ExitCaseParingState();
-        mPreparing.mState = PrepareState::kPrepareState_PaseParingDone;
+    case PrepareState::kCasePairing:
+        ExitCasePairingState();
+        mStateVars.mPreparing.mState = PrepareState::kPasePairingDone;
         // TODO: current CASE paring session API doesn't show how to derive a secure session
         return;
     default:
@@ -356,9 +416,9 @@ void ChannelContext::OnSessionEstablished()
 
 void ChannelContext::OnNewConnection(SecureSessionHandle session)
 {
-    if (mState != ChannelState::kChanneState_Preparing)
+    if (mState != ChannelState::kPreparing)
         return;
-    if (mPreparing.mState != PrepareState::kPrepareState_PaseParingDone)
+    if (mStateVars.mPreparing.mState != PrepareState::kPasePairingDone)
         return;
 
     ExitPreparingState();
@@ -367,15 +427,15 @@ void ChannelContext::OnNewConnection(SecureSessionHandle session)
 
 void ChannelContext::EnterReadyState(SecureSessionHandle session)
 {
-    mState = ChannelState::kChanneState_Ready;
+    mState = ChannelState::kReady;
 
-    mReady.mSession = session;
+    mStateVars.mReady.mSession = session;
     mExchangeManager->NotifyChannelEvent(this, [](ChannelDelegate * delegate) { delegate->OnEstablished(); });
 }
 
 void ChannelContext::OnConnectionExpired(SecureSessionHandle session)
 {
-    if (mState != ChannelState::kChanneState_Ready)
+    if (mState != ChannelState::kReady)
         return;
 
     ExitReadyState();
@@ -388,18 +448,18 @@ void ChannelContext::ExitReadyState()
     // Currently SecureSessionManager doesn't provide an interface to close a session
 
     // TODO: call mDNS Scanner::UnubscribeNode after PR #4459 is ready
-    // Scanner::UnsubscribeNode(mPreparing.mBuilder.GetPeerNodeId())
+    // Scanner::UnsubscribeNode(mStateVars.mPreparing.mBuilder.GetPeerNodeId())
 }
 
 void ChannelContext::EnterFailedState(CHIP_ERROR error)
 {
-    mState = ChannelState::kChanneState_Failed;
+    mState = ChannelState::kFailed;
     mExchangeManager->NotifyChannelEvent(this, [error](ChannelDelegate * delegate) { delegate->OnFail(error); });
 }
 
 void ChannelContext::EnterClosedState()
 {
-    mState = ChannelState::kChanneState_Closed;
+    mState = ChannelState::kClosed;
     mExchangeManager->NotifyChannelEvent(this, [](ChannelDelegate * delegate) { delegate->OnClosed(); });
 }
 
