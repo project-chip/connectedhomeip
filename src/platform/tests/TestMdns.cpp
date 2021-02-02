@@ -61,7 +61,7 @@ static void InitCallback(void * context, CHIP_ERROR error)
     entry.mKey             = key;
     entry.mData            = reinterpret_cast<const uint8_t *>(val);
     entry.mDataSize        = strlen(reinterpret_cast<const char *>(entry.mData));
-    service.mTextEntries  = &entry;
+    service.mTextEntries   = &entry;
     service.mTextEntrySize = 1;
     service.mSubTypes      = nullptr;
     service.mSubTypeSize   = 0;
