@@ -22,6 +22,8 @@
 
 #pragma once
 
+#include <variant>
+
 #include <lib/core/ReferenceCounted.h>
 #include <lib/mdns/platform/Mdns.h>
 #include <messaging/Channel.h>
@@ -41,20 +43,64 @@ public:
     static void Release(ChannelContext * context);
 };
 
+/**
+ * @brief
+ *  The object of the class holds all state of a channel. It is a state machine, with following states:
+ *
+ *  N: None, the initial state
+ *  P: Preparing
+ *  R: Ready, the channel is ready to use
+ *  C: Closed, the channel is closed
+ *  F: Failed, the channel is failed
+ *
+ *    +---+   +---+   +---+   +---+
+ *    | N |-->| P |-->| R |-->| C |
+ *    +---+   +---+   +---+   +---+
+ *              |       |
+ *              |       |     +---+
+ *              +-------+---->| F |
+ *                            +---+
+ *
+ *  Note: The state never goes back, when a channel is failed, it can't be reset or fixed. The application must create a
+ *  new channel to replace the failed channel
+ *
+ *  Preparing Substates:
+ *    W: WaitingForInterface, immediately after a code reboot, the network interface may not ready, wait for it.
+ *    A: AddressResolving, use mDNS to resolve the node address
+ *    P: PasePairing, do SPAKE2 key exchange
+ *    PD: PasePairingDone, wait for OnNewConnection from SecureSessionManager
+ *    C: CasePairing, do SIGMA key exchange
+ *    CD: CasePairingDone, wait for OnNewConnection from SecureSessionManager
+ *
+ *                            +---+   +----+
+ *                         +->| P |-->| PD |--+
+ *  /---\   +---+   +---+  |  +---+   +----+  |   /---\
+ *  |   |-->| W |-->| A |--+                  +-->| O |
+ *  \---/   +---+   +---+  |  +---+   +----+  |   \---/
+ *                         +->| C |-->| CD |--+
+ *                            +---+   +----+
+ */
 class ChannelContext : public ReferenceCounted<ChannelContext, ChannelContextDeletor>, public SessionEstablishmentDelegate
 {
 public:
-    ChannelContext(ExchangeManager * exchangeManager) : mState(ChannelState::kChanneState_None), mExchangeManager(exchangeManager)
-    {}
+    ChannelContext(ExchangeManager * exchangeManager) : mState(ChannelState::kNone), mExchangeManager(exchangeManager) {}
 
     void Start(const ChannelBuilder & builder);
     ExchangeContext * NewExchange(ExchangeDelegate * delegate);
 
     ChannelState GetState() const { return mState; }
 
-    bool MatchesPaseParingSessoin(NodeId nodeId);
+    bool MatchNodeId(NodeId nodeId);
+    bool MatchNetworkPreference(ChannelBuilder::NetworkPreference preference);
+    bool MatchTransport(Transport::Type transport);
+    bool MatchTransportPreference(ChannelBuilder::TransportPreference transport);
+    bool MatchSessionType(ChannelBuilder::SessionType type);
+    bool MatchCaseParameters();
+
+    bool IsPasePairing();
+
+    bool MatchesBuilder(const ChannelBuilder & builder);
     bool MatchesSession(SecureSessionHandle session, SecureSessionMgr * ssm);
-    bool MatchesBuilder(const ChannelBuilder & builder, SecureSessionMgr * ssm);
 
     // events of ResolveDelegate, propagated from ExchangeManager
     void HandleNodeIdResolve(CHIP_ERROR error, uint64_t nodeId, const Mdns::MdnsService & address);
@@ -77,37 +123,40 @@ private:
     ChannelState mState;
     ExchangeManager * mExchangeManager;
 
-    enum PrepareState
+    enum class PrepareState
     {
-        kPrepareState_WaitingForInterface,
-        kPrepareState_AddressResolving,
-        kPrepareState_PaseParing,
-        kPrepareState_PaseParingDone,
-        kPrepareState_CaseParing,
+        kWaitingForInterface,
+        kAddressResolving,
+        kPasePairing,
+        kPasePairingDone,
+        kCasePairing,
     };
 
-    union
+    union StateVars
     {
+        StateVars() {}
+
         // mPreparing is pretty big, consider move it outside
-        struct
+        struct PrepareVars
         {
             PrepareState mState;
             Inet::InterfaceId mInterface;
             Inet::IPAddressType mAddressType;
             Inet::IPAddress mAddress;
-            union
+            union Session
             {
                 PASESession * mPasePairingSession;
                 CASESession * mCasePairingSession;
-            };
+            } mSession;
             ChannelBuilder mBuilder;
         } mPreparing;
-        struct
+
+        struct ReadyVars
         {
             Inet::InterfaceId mInterface;
             SecureSessionHandle mSession;
         } mReady;
-    };
+    } mStateVars;
 
     // State machine functions
     void EnterPreparingState(const ChannelBuilder & builder);
@@ -125,11 +174,11 @@ private:
     void AddressResolveTimeout();
     void ExitAddressResolve() {}
 
-    void EnterPaseParingState();
-    void ExitPaseParingState();
+    void EnterPasePairingState();
+    void ExitPasePairingState();
 
-    void EnterCaseParingState();
-    void ExitCaseParingState();
+    void EnterCasePairingState();
+    void ExitCasePairingState();
 };
 
 class ChannelContextHandleAssociation
