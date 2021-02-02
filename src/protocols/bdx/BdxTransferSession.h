@@ -26,7 +26,7 @@ class DLL_EXPORT TransferSession
 public:
     enum OutputEventType : uint16_t
     {
-        kOutput_None,
+        kOutput_None = 0,
         kOutput_MsgToSend,
         kOutput_InitReceived,
         kOutput_AcceptReceived,
