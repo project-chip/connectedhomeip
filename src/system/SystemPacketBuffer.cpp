@@ -121,6 +121,7 @@ constexpr uint16_t kRightSizingThreshold = 16;
 
 void PacketBufferHandle::InternalRightSize()
 {
+
     // Require a single buffer with no other references.
     if ((mBuffer == nullptr) || (mBuffer->next != nullptr) || (mBuffer->ref != 1))
     {
@@ -591,14 +592,14 @@ PacketBufferHandle PacketBufferHandle::PopHead()
     return PacketBufferHandle(head);
 }
 
-PacketBufferHandle PacketBufferHandle::CloneData()
+PacketBufferHandle PacketBufferHandle::CloneData(uint16_t aAdditionalSize, uint16_t aReservedSize)
 {
     if (!mBuffer->Next().IsNull())
     {
         // We do not clone an entire chain.
         return PacketBufferHandle();
     }
-    return NewWithData(mBuffer->Start(), mBuffer->DataLength());
+    return NewWithData(mBuffer->Start(), mBuffer->DataLength(), aAdditionalSize, aReservedSize);
 }
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_PBUF_FROM_CUSTOM_POOLS

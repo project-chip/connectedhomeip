@@ -309,7 +309,7 @@ public:
      *
      *  @return \c true if the requested reserved size is available, \c false if there's not enough room in the buffer.
      */
-    bool EnsureReservedSize(uint16_t aReservedSize);
+    CHECK_RETURN_VALUE bool EnsureReservedSize(uint16_t aReservedSize);
 
     /**
      * Align the buffer payload on the specified bytes boundary.
@@ -606,7 +606,8 @@ public:
      *
      * @returns empty handle on allocation failure.
      */
-    PacketBufferHandle CloneData();
+    PacketBufferHandle CloneData(uint16_t aAdditionalSize = 0,
+                                 uint16_t aReservedSize   = System::PacketBuffer::kDefaultHeaderReserve);
 
     /**
      * Perform an implementation-defined check on the validity of a PacketBufferHandle.

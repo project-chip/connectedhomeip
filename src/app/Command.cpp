@@ -275,7 +275,8 @@ CHIP_ERROR Command::FinalizeCommandsMessage()
     err = mCommandMessageWriter.Finalize(&mCommandMessageBuf);
     SuccessOrExit(err);
 
-    mCommandMessageBuf->EnsureReservedSize(System::PacketBuffer::kDefaultHeaderReserve);
+    VerifyOrExit(mCommandMessageBuf->EnsureReservedSize(System::PacketBuffer::kDefaultHeaderReserve),
+                 err = CHIP_ERROR_BUFFER_TOO_SMALL);
 
 exit:
     ChipLogFunctError(err);

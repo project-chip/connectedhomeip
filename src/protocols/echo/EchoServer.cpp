@@ -76,7 +76,10 @@ void EchoServer::OnMessageReceived(Messaging::ExchangeContext * ec, const Packet
     // adjust the position of the payload within the buffer to ensure there is enough room for the
     // outgoing network headers.  This is necessary because in some network stack configurations,
     // the incoming header size may be smaller than the outgoing size.
-    response->EnsureReservedSize(System::PacketBuffer::kDefaultHeaderReserve);
+    if (!response->EnsureReservedSize(System::PacketBuffer::kDefaultHeaderReserve))
+    {
+        response = response.CloneData(kMaxTagLen);
+    }
 
     // Send an Echo Response back to the sender.
     ec->SendMessage(MsgType::EchoResponse, std::move(response), Messaging::SendFlags(Messaging::SendMessageFlags::kNone));
