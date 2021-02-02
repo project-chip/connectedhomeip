@@ -17,17 +17,29 @@ using namespace ::chip::bdx;
 namespace {
 // Use this as a timestamp if not needing to test BDX timeouts.
 constexpr uint64_t kNoAdvanceTime = 0;
+
+const uint64_t tlvStrTag  = TLV::ContextTag(4);
+const uint64_t tlvListTag = TLV::ProfileTag(7777, 8888);
 } // anonymous namespace
 
-// Helper method for generating a complete TLV structure with just a single tag and string
-CHIP_ERROR WriteTLVString(uint8_t * buf, uint32_t bufLen, const char * data, uint64_t tag, uint32_t & written)
+// Helper method for generating a complete TLV structure with a list containing a single tag and string
+CHIP_ERROR WriteChipTLVString(uint8_t * buf, uint32_t bufLen, const char * data, uint32_t & written)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     written        = 0;
     TLV::TLVWriter writer;
     writer.Init(buf, bufLen);
-    err = writer.PutString(tag, data);
-    SuccessOrExit(err);
+
+    {
+        TLV::TLVWriter listWriter;
+        err = writer.OpenContainer(tlvListTag, TLV::kTLVType_Path, listWriter);
+        SuccessOrExit(err);
+        err = listWriter.PutString(tlvStrTag, data);
+        SuccessOrExit(err);
+        err = writer.CloseContainer(listWriter);
+        SuccessOrExit(err);
+    }
+
     err = writer.Finalize();
     SuccessOrExit(err);
     written = writer.GetLengthWritten();
@@ -37,7 +49,7 @@ exit:
 }
 
 // Helper method: read a TLV structure with a single tag and string and verify it matches expected string.
-CHIP_ERROR ReadAndVerifyTLVString(nlTestSuite * inSuite, void * inContext, const uint8_t * dataStart, uint32_t len, uint64_t tag,
+CHIP_ERROR ReadAndVerifyTLVString(nlTestSuite * inSuite, void * inContext, const uint8_t * dataStart, uint32_t len,
                                   const char * expected, uint16_t expectedLen)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -48,13 +60,28 @@ CHIP_ERROR ReadAndVerifyTLVString(nlTestSuite * inSuite, void * inContext, const
 
     reader.Init(dataStart, len);
     err = reader.Next();
-    SuccessOrExit(err);
-    VerifyOrExit(reader.GetTag() == tag, err = CHIP_ERROR_INTERNAL);
-    readLength = reader.GetLength();
-    VerifyOrExit(readLength == expectedLen, err = CHIP_ERROR_INTERNAL);
-    err = reader.GetString(tmp, sizeof(tmp));
-    SuccessOrExit(err);
-    VerifyOrExit(!memcmp(expected, tmp, readLength), err = CHIP_ERROR_INTERNAL);
+
+    VerifyOrExit(reader.GetTag() == tlvListTag, err = CHIP_ERROR_INTERNAL);
+
+    // Metadata must have a top-level list
+    {
+        TLV::TLVReader listReader;
+        err = reader.OpenContainer(listReader);
+        SuccessOrExit(err);
+
+        err = listReader.Next();
+        SuccessOrExit(err);
+
+        VerifyOrExit(listReader.GetTag() == tlvStrTag, err = CHIP_ERROR_INTERNAL);
+        readLength = listReader.GetLength();
+        VerifyOrExit(readLength == expectedLen, err = CHIP_ERROR_INTERNAL);
+        err = listReader.GetString(tmp, sizeof(tmp));
+        SuccessOrExit(err);
+        VerifyOrExit(!memcmp(expected, tmp, readLength), err = CHIP_ERROR_INTERNAL);
+
+        err = reader.CloseContainer(listReader);
+        SuccessOrExit(err);
+    }
 
 exit:
     return err;
@@ -335,9 +362,8 @@ void TestInitiatingReceiverReceiverDrive(nlTestSuite * inSuite, void * inContext
     // Test metadata for Accept message
     uint8_t tlvBuf[64]    = { 0 };
     char metadataStr[11]  = { "hi_dad.txt" };
-    uint64_t tlvTag       = TLV::ProfileTag(1234, 5678);
     uint32_t bytesWritten = 0;
-    err                   = WriteTLVString(tlvBuf, sizeof(tlvBuf), metadataStr, tlvTag, bytesWritten);
+    err                   = WriteChipTLVString(tlvBuf, sizeof(tlvBuf), metadataStr, bytesWritten);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     uint16_t metadataSize = static_cast<uint16_t>(bytesWritten & 0x0000FFFF);
 
@@ -360,7 +386,7 @@ void TestInitiatingReceiverReceiverDrive(nlTestSuite * inSuite, void * inContext
     // Verify parsed TLV metadata matches the original
     err =
         ReadAndVerifyTLVString(inSuite, inContext, outEvent.transferAcceptData.Metadata, outEvent.transferAcceptData.MetadataLength,
-                               tlvTag, metadataStr, static_cast<uint16_t>(strlen(metadataStr)));
+                               metadataStr, static_cast<uint16_t>(strlen(metadataStr)));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // Test BlockQuery -> Block -> BlockAck
@@ -423,9 +449,8 @@ void TestInitiatingSenderSenderDrive(nlTestSuite * inSuite, void * inContext)
     // Test metadata for TransferInit message
     uint8_t tlvBuf[64]    = { 0 };
     char metadataStr[11]  = { "hi_dad.txt" };
-    uint64_t tlvTag       = TLV::ProfileTag(1234, 5678);
     uint32_t bytesWritten = 0;
-    err                   = WriteTLVString(tlvBuf, sizeof(tlvBuf), metadataStr, tlvTag, bytesWritten);
+    err                   = WriteChipTLVString(tlvBuf, sizeof(tlvBuf), metadataStr, bytesWritten);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     uint16_t metadataSize = static_cast<uint16_t>(bytesWritten & 0x0000FFFF);
 
@@ -444,7 +469,7 @@ void TestInitiatingSenderSenderDrive(nlTestSuite * inSuite, void * inContext)
 
     // Verify parsed TLV metadata matches the original
     err = ReadAndVerifyTLVString(inSuite, inContext, outEvent.transferInitData.Metadata, outEvent.transferInitData.MetadataLength,
-                                 tlvTag, metadataStr, static_cast<uint16_t>(strlen(metadataStr)));
+                                 metadataStr, static_cast<uint16_t>(strlen(metadataStr)));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // Compose SendAccept parameters struct and give to respondingSender
