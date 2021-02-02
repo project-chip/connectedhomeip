@@ -723,7 +723,7 @@ void ConnectivityManagerImpl::DriveAPState()
                     {
                         ChipLogProgress(DeviceLayer, "wpa_supplicant: failed to stop AP mode with error: %s",
                                         error ? error->message : "unknown error");
-                        err = CHIP_ERROR_INTERNAL;
+                        err = _CHIP_ERROR(828);
                     }
 
                     if (error != nullptr)
@@ -795,7 +795,7 @@ CHIP_ERROR ConnectivityManagerImpl::ConfigureWiFiAP()
             ChipLogProgress(DeviceLayer, "wpa_supplicant: failed to start softAP: SSID: %s: %s", ssid,
                             error ? error->message : "unknown error");
 
-            ret = CHIP_ERROR_INTERNAL;
+            ret = _CHIP_ERROR(829);
         }
 
         if (error != nullptr)
@@ -811,7 +811,7 @@ CHIP_ERROR ConnectivityManagerImpl::ConfigureWiFiAP()
             mWpaSupplicant.networkPath = nullptr;
         }
 
-        ret = CHIP_ERROR_INTERNAL;
+        ret = _CHIP_ERROR(830);
     }
 
     if (err != nullptr)
@@ -896,7 +896,7 @@ CHIP_ERROR ConnectivityManagerImpl::ProvisionWiFiNetwork(const char * ssid, cons
             ChipLogProgress(DeviceLayer, "wpa_supplicant: failed to connect to network: SSID: %s: %s", ssid,
                             error ? error->message : "unknown error");
 
-            ret = CHIP_ERROR_INTERNAL;
+            ret = _CHIP_ERROR(831);
         }
 
         if (error != nullptr)
@@ -912,7 +912,7 @@ CHIP_ERROR ConnectivityManagerImpl::ProvisionWiFiNetwork(const char * ssid, cons
             mWpaSupplicant.networkPath = nullptr;
         }
 
-        ret = CHIP_ERROR_INTERNAL;
+        ret = _CHIP_ERROR(832);
     }
 
     if (err != nullptr)

@@ -82,7 +82,7 @@ CHIP_ERROR CASESession::AttachHeaderAndSend(Protocols::SecureChannel::MsgType ms
     msgBuf->SetStart(msgBuf->Start() - headerSize);
     err = payloadHeader.Encode(msgBuf->Start(), msgBuf->DataLength(), &actualEncodedHeaderSize);
     SuccessOrExit(err);
-    VerifyOrExit(headerSize == actualEncodedHeaderSize, err = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(headerSize == actualEncodedHeaderSize, err = _CHIP_ERROR(503));
 
     err = mDelegate->SendSessionEstablishmentMessage(PacketHeader()
                                                          .SetSourceNodeId(mLocalNodeId)

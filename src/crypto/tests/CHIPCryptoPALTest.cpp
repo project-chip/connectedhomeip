@@ -311,7 +311,7 @@ static void TestAES_CCM_256DecryptInvalidTestVectors(nlTestSuite * inSuite, void
                                              vector->key, vector->key_len, vector->iv, vector->iv_len, out_pt.Get());
 
             bool arePTsEqual = memcmp(vector->pt, out_pt.Get(), vector->pt_len) == 0;
-            NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INTERNAL);
+            NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
             NL_TEST_ASSERT(inSuite, arePTsEqual == false);
         }
     }
@@ -1208,7 +1208,7 @@ public:
     {
         if (fe_in_len > kMAX_FE_Length)
         {
-            return CHIP_ERROR_INTERNAL;
+            return _CHIP_ERROR(859);
         }
         memcpy(fe, fe_in, fe_in_len);
         fe_len = fe_in_len;

@@ -81,7 +81,7 @@ PersistedCounter::Advance()
 
         // Advancing the epoch should have ensured that the current value
         // is valid
-        VerifyOrExit(GetValue() < mNextEpoch, err = CHIP_ERROR_INTERNAL);
+        VerifyOrExit(GetValue() < mNextEpoch, err = _CHIP_ERROR(857));
     }
 exit:
     return err;

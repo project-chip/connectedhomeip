@@ -53,8 +53,8 @@ CHIP_ERROR TestEmptyString()
     size_t read_size;
     ReturnErrorOnFailure(KeyValueStoreMgr().Put(kTestKey, kTestValue));
     ReturnErrorOnFailure(KeyValueStoreMgr().Get(kTestKey, read_value, sizeof(read_value), &read_size));
-    ReturnErrorCodeIf(strcmp(kTestValue, read_value) != 0, CHIP_ERROR_INTERNAL);
-    ReturnErrorCodeIf(read_size != sizeof(kTestValue), CHIP_ERROR_INTERNAL);
+    ReturnErrorCodeIf(strcmp(kTestValue, read_value) != 0, _CHIP_ERROR(808));
+    ReturnErrorCodeIf(read_size != sizeof(kTestValue), _CHIP_ERROR(809));
     ReturnErrorOnFailure(KeyValueStoreMgr().Delete(kTestKey));
     return CHIP_NO_ERROR;
 }
@@ -67,8 +67,8 @@ CHIP_ERROR TestString()
     size_t read_size;
     ReturnErrorOnFailure(KeyValueStoreMgr().Put(kTestKey, kTestValue));
     ReturnErrorOnFailure(KeyValueStoreMgr().Get(kTestKey, read_value, sizeof(read_value), &read_size));
-    ReturnErrorCodeIf(strcmp(kTestValue, read_value) != 0, CHIP_ERROR_INTERNAL);
-    ReturnErrorCodeIf(read_size != sizeof(kTestValue), CHIP_ERROR_INTERNAL);
+    ReturnErrorCodeIf(strcmp(kTestValue, read_value) != 0, _CHIP_ERROR(810));
+    ReturnErrorCodeIf(read_size != sizeof(kTestValue), _CHIP_ERROR(811));
     ReturnErrorOnFailure(KeyValueStoreMgr().Delete(kTestKey));
     return CHIP_NO_ERROR;
 }
@@ -80,7 +80,7 @@ CHIP_ERROR TestUint32()
     uint32_t read_value;
     ReturnErrorOnFailure(KeyValueStoreMgr().Put(kTestKey, kTestValue));
     ReturnErrorOnFailure(KeyValueStoreMgr().Get(kTestKey, &read_value));
-    ReturnErrorCodeIf(kTestValue != read_value, CHIP_ERROR_INTERNAL);
+    ReturnErrorCodeIf(kTestValue != read_value, _CHIP_ERROR(812));
     ReturnErrorOnFailure(KeyValueStoreMgr().Delete(kTestKey));
     return CHIP_NO_ERROR;
 }
@@ -92,7 +92,7 @@ CHIP_ERROR TestArray()
     uint32_t read_value[5];
     ReturnErrorOnFailure(KeyValueStoreMgr().Put(kTestKey, kTestValue));
     ReturnErrorOnFailure(KeyValueStoreMgr().Get(kTestKey, &read_value));
-    ReturnErrorCodeIf(memcmp(kTestValue, read_value, sizeof(kTestValue)) != 0, CHIP_ERROR_INTERNAL);
+    ReturnErrorCodeIf(memcmp(kTestValue, read_value, sizeof(kTestValue)) != 0, _CHIP_ERROR(813));
     ReturnErrorOnFailure(KeyValueStoreMgr().Delete(kTestKey));
     return CHIP_NO_ERROR;
 }
@@ -109,8 +109,8 @@ CHIP_ERROR TestStruct()
     SomeStruct read_value;
     ReturnErrorOnFailure(KeyValueStoreMgr().Put(kTestKey, kTestValue));
     ReturnErrorOnFailure(KeyValueStoreMgr().Get(kTestKey, &read_value));
-    ReturnErrorCodeIf(kTestValue.value1 != read_value.value1, CHIP_ERROR_INTERNAL);
-    ReturnErrorCodeIf(kTestValue.value2 != read_value.value2, CHIP_ERROR_INTERNAL);
+    ReturnErrorCodeIf(kTestValue.value1 != read_value.value1, _CHIP_ERROR(814));
+    ReturnErrorCodeIf(kTestValue.value2 != read_value.value2, _CHIP_ERROR(815));
     ReturnErrorOnFailure(KeyValueStoreMgr().Delete(kTestKey));
     return CHIP_NO_ERROR;
 }
@@ -123,7 +123,7 @@ CHIP_ERROR TestUpdateValue()
     {
         ReturnErrorOnFailure(KeyValueStoreMgr().Put(kTestKey, i));
         ReturnErrorOnFailure(KeyValueStoreMgr().Get(kTestKey, &read_value));
-        ReturnErrorCodeIf(i != read_value, CHIP_ERROR_INTERNAL);
+        ReturnErrorCodeIf(i != read_value, _CHIP_ERROR(816));
     }
     ReturnErrorOnFailure(KeyValueStoreMgr().Delete(kTestKey));
     return CHIP_NO_ERROR;
@@ -141,8 +141,8 @@ CHIP_ERROR TestMultiRead()
         // Returns buffer too small for all but the last read.
         CHIP_ERROR error = KeyValueStoreMgr().Get(kTestKey, &read_value, sizeof(read_value), &read_size, i * sizeof(uint32_t));
         ReturnErrorCodeIf(error != (i < 4 ? CHIP_ERROR_BUFFER_TOO_SMALL : CHIP_NO_ERROR), error);
-        ReturnErrorCodeIf(read_size != sizeof(read_value), CHIP_ERROR_INTERNAL);
-        ReturnErrorCodeIf(kTestValue[i] != read_value, CHIP_ERROR_INTERNAL);
+        ReturnErrorCodeIf(read_size != sizeof(read_value), _CHIP_ERROR(817));
+        ReturnErrorCodeIf(kTestValue[i] != read_value, _CHIP_ERROR(818));
     }
     ReturnErrorOnFailure(KeyValueStoreMgr().Delete(kTestKey));
     return CHIP_NO_ERROR;

@@ -69,7 +69,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
     default:
         break;
     }
-    return CHIP_ERROR_INTERNAL; // Unexpected KVS status.
+    return _CHIP_ERROR(833); // Unexpected KVS status.
 }
 
 CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, size_t value_size)
@@ -92,7 +92,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, 
     default:
         break;
     }
-    return CHIP_ERROR_INTERNAL; // Unexpected KVS status.
+    return _CHIP_ERROR(834); // Unexpected KVS status.
 }
 
 CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
@@ -116,7 +116,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
     default:
         break;
     }
-    return CHIP_ERROR_INTERNAL; // Unexpected KVS status.
+    return _CHIP_ERROR(835); // Unexpected KVS status.
 }
 
 CHIP_ERROR KeyValueStoreManagerImpl::ErasePartition()
@@ -134,7 +134,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::ErasePartition()
     default:
         break;
     }
-    return CHIP_ERROR_INTERNAL; // Unexpected KVS status.
+    return _CHIP_ERROR(836); // Unexpected KVS status.
 }
 #endif // defined(CHIP_KVS_AVAILABLE) && CHIP_KVS_AVAILABLE
 

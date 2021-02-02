@@ -121,7 +121,7 @@ CHIP_ERROR Device::Serialize(SerializedDevice & output)
     VerifyOrExit(
         CHIP_NO_ERROR ==
             Inet::GetInterfaceName(mInterface, Uint8::to_char(serializable.mInterfaceName), sizeof(serializable.mInterfaceName)),
-        error = CHIP_ERROR_INTERNAL);
+        error = _CHIP_ERROR(508));
     static_assert(sizeof(serializable.mDeviceAddr) <= INET6_ADDRSTRLEN, "Size of device address must fit within INET6_ADDRSTRLEN");
     mDeviceAddr.ToString(Uint8::to_char(serializable.mDeviceAddr), sizeof(serializable.mDeviceAddr));
 
@@ -176,7 +176,7 @@ CHIP_ERROR Device::Deserialize(const SerializedDevice & input)
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
         UNLOCK_TCPIP_CORE();
 #endif
-        VerifyOrExit(CHIP_NO_ERROR == inetErr, error = CHIP_ERROR_INTERNAL);
+        VerifyOrExit(CHIP_NO_ERROR == inetErr, error = _CHIP_ERROR(509));
     }
 
 exit:

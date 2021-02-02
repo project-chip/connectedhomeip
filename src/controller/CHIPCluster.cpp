@@ -49,7 +49,7 @@ CHIP_ERROR ClusterBase::SendCommand(chip::System::PacketBufferHandle payload, Ca
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     VerifyOrExit(mDevice != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(!payload.IsNull(), err = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(!payload.IsNull(), err = _CHIP_ERROR(511));
 
     err = mDevice->SendMessage(std::move(payload));
     SuccessOrExit(err);

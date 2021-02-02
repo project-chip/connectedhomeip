@@ -824,7 +824,7 @@ CHIP_ERROR TLVReader::GetElementHeadLength(uint8_t & elemHeadBytes) const
     // control byte, the tag bytes (if present), the length bytes (if present),
     // and for elements that don't have a length (e.g. integers), the value
     // bytes.
-    VerifyOrExit(CanCastTo<uint8_t>(1 + tagBytes + valOrLenBytes), err = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(CanCastTo<uint8_t>(1 + tagBytes + valOrLenBytes), err = _CHIP_ERROR(854));
     elemHeadBytes = static_cast<uint8_t>(1 + tagBytes + valOrLenBytes);
 
 exit:

@@ -473,7 +473,7 @@ void BLEManagerImpl::DriveBLEState(void)
             ret = ble_gap_adv_stop();
             if (ret != 0)
             {
-                err = CHIP_ERROR_INTERNAL;
+                err = _CHIP_ERROR(862);
                 ChipLogError(DeviceLayer, "ble_gap_adv_stop() failed: %s", ErrorStr(err));
                 ExitNow();
             }
@@ -1051,7 +1051,7 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
             if (ret != 0)
             {
                 ChipLogError(DeviceLayer, "ble_gap_adv_stop() failed: %d, cannot restart", ret);
-                return CHIP_ERROR_INTERNAL;
+                return _CHIP_ERROR(863);
             }
             else
             {
@@ -1066,7 +1066,7 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
         else
         {
             ChipLogError(DeviceLayer, "ble_gap_adv_start() failed: %d", ret);
-            return CHIP_ERROR_INTERNAL;
+            return _CHIP_ERROR(864);
         }
     }
 }

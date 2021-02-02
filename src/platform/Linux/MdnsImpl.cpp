@@ -358,7 +358,7 @@ CHIP_ERROR MdnsAvahi::SetHostname(const char * hostname)
     }
     else if (avahiRet != AVAHI_OK && avahiRet != AVAHI_ERR_NO_CHANGE)
     {
-        error = CHIP_ERROR_INTERNAL;
+        error = _CHIP_ERROR(841);
     }
 
 exit:
@@ -390,7 +390,7 @@ void MdnsAvahi::HandleClientState(AvahiClient * client, AvahiClientState state)
         break;
     case AVAHI_CLIENT_FAILURE:
         ChipLogError(DeviceLayer, "Avahi client failure");
-        mErrorCallback(mAsyncReturnContext, CHIP_ERROR_INTERNAL);
+        mErrorCallback(mAsyncReturnContext, _CHIP_ERROR(842));
         break;
     case AVAHI_CLIENT_S_COLLISION:
     case AVAHI_CLIENT_S_REGISTERING:
@@ -437,7 +437,7 @@ void MdnsAvahi::HandleGroupState(AvahiEntryGroup * group, AvahiEntryGroupState s
     case AVAHI_ENTRY_GROUP_FAILURE:
         ChipLogError(DeviceLayer, "Avahi group internal failure %s",
                      avahi_strerror(avahi_client_errno(avahi_entry_group_get_client(mGroup))));
-        mErrorCallback(mAsyncReturnContext, CHIP_ERROR_INTERNAL);
+        mErrorCallback(mAsyncReturnContext, _CHIP_ERROR(843));
         break;
     case AVAHI_ENTRY_GROUP_UNCOMMITED:
     case AVAHI_ENTRY_GROUP_REGISTERING:
@@ -467,7 +467,7 @@ CHIP_ERROR MdnsAvahi::PublishService(const MdnsService & service)
         VerifyOrExit(avahi_entry_group_add_service_strlst(mGroup, interface, ToAvahiProtocol(service.mAddressType),
                                                           static_cast<AvahiPublishFlags>(0), service.mName, type.c_str(), nullptr,
                                                           nullptr, service.mPort, text) == 0,
-                     error = CHIP_ERROR_INTERNAL);
+                     error = _CHIP_ERROR(844));
         for (size_t i = 0; i < service.mSubTypeSize; i++)
         {
             std::ostringstream sstream;
@@ -477,7 +477,7 @@ CHIP_ERROR MdnsAvahi::PublishService(const MdnsService & service)
             VerifyOrExit(avahi_entry_group_add_service_subtype(mGroup, interface, ToAvahiProtocol(service.mAddressType),
                                                                static_cast<AvahiPublishFlags>(0), service.mName, type.c_str(),
                                                                nullptr, sstream.str().c_str()) == 0,
-                         error = CHIP_ERROR_INTERNAL);
+                         error = _CHIP_ERROR(845));
         }
     }
     else
@@ -487,10 +487,10 @@ CHIP_ERROR MdnsAvahi::PublishService(const MdnsService & service)
         VerifyOrExit(avahi_entry_group_update_service_txt_strlst(mGroup, interface, ToAvahiProtocol(service.mAddressType),
                                                                  static_cast<AvahiPublishFlags>(0), service.mName, type.c_str(),
                                                                  nullptr, text) == 0,
-                     error = CHIP_ERROR_INTERNAL);
+                     error = _CHIP_ERROR(846));
     }
 
-    VerifyOrExit(avahi_entry_group_commit(mGroup) == 0, error = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(avahi_entry_group_commit(mGroup) == 0, error = _CHIP_ERROR(847));
 
 exit:
     if (text != nullptr)
@@ -509,7 +509,7 @@ CHIP_ERROR MdnsAvahi::StopPublish()
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
 
-    VerifyOrExit(avahi_entry_group_reset(mGroup) == 0, error = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(avahi_entry_group_reset(mGroup) == 0, error = _CHIP_ERROR(848));
 exit:
     return error;
 }
@@ -537,7 +537,7 @@ CHIP_ERROR MdnsAvahi::Browse(const char * type, MdnsServiceProtocol protocol, ch
         chip::Platform::MemoryFree(browseContext);
     }
 
-    return browser == nullptr ? CHIP_ERROR_INTERNAL : CHIP_NO_ERROR;
+    return browser == nullptr ? _CHIP_ERROR(849) : CHIP_NO_ERROR;
 }
 
 MdnsServiceProtocol TruncateProtocolInType(char * type)
@@ -570,7 +570,7 @@ void MdnsAvahi::HandleBrowse(AvahiServiceBrowser * browser, AvahiIfIndex interfa
     switch (event)
     {
     case AVAHI_BROWSER_FAILURE:
-        context->mCallback(context->mContext, nullptr, 0, CHIP_ERROR_INTERNAL);
+        context->mCallback(context->mContext, nullptr, 0, _CHIP_ERROR(850));
         avahi_service_browser_free(browser);
         chip::Platform::MemoryFree(context);
         break;
@@ -632,7 +632,7 @@ CHIP_ERROR MdnsAvahi::Resolve(const char * name, const char * type, MdnsServiceP
     // Otherwise the resolver will be freed in the callback
     if (resolver == nullptr)
     {
-        error = CHIP_ERROR_INTERNAL;
+        error = _CHIP_ERROR(851);
         chip::Platform::MemoryFree(resolver);
     }
 
@@ -651,7 +651,7 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
     {
     case AVAHI_RESOLVER_FAILURE:
         ChipLogError(DeviceLayer, "Avahi resolve failed");
-        context->mCallback(context->mContext, nullptr, CHIP_ERROR_INTERNAL);
+        context->mCallback(context->mContext, nullptr, _CHIP_ERROR(852));
         break;
     case AVAHI_RESOLVER_FOUND:
         MdnsService result;

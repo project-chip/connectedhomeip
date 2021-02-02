@@ -133,9 +133,9 @@ CHIP_ERROR PASESession::ToSerializable(PASESessionSerializable & serializable)
     CHIP_ERROR error = CHIP_NO_ERROR;
 
     const NodeId peerNodeId = mConnectionState.GetPeerNodeId();
-    VerifyOrExit(CanCastTo<uint16_t>(mKeLen), error = CHIP_ERROR_INTERNAL);
-    VerifyOrExit(CanCastTo<uint64_t>(mLocalNodeId), error = CHIP_ERROR_INTERNAL);
-    VerifyOrExit(CanCastTo<uint64_t>(peerNodeId), error = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(CanCastTo<uint16_t>(mKeLen), error = _CHIP_ERROR(504));
+    VerifyOrExit(CanCastTo<uint64_t>(mLocalNodeId), error = _CHIP_ERROR(505));
+    VerifyOrExit(CanCastTo<uint64_t>(peerNodeId), error = _CHIP_ERROR(506));
 
     memset(&serializable, 0, sizeof(serializable));
     serializable.mKeLen           = static_cast<uint16_t>(mKeLen);
@@ -276,7 +276,7 @@ CHIP_ERROR PASESession::AttachHeaderAndSend(Protocols::SecureChannel::MsgType ms
     msgBuf->SetStart(msgBuf->Start() - headerSize);
     err = payloadHeader.Encode(msgBuf->Start(), msgBuf->DataLength(), &actualEncodedHeaderSize);
     SuccessOrExit(err);
-    VerifyOrExit(headerSize == actualEncodedHeaderSize, err = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(headerSize == actualEncodedHeaderSize, err = _CHIP_ERROR(507));
 
     err = mDelegate->SendSessionEstablishmentMessage(PacketHeader()
                                                          .SetSourceNodeId(mLocalNodeId)

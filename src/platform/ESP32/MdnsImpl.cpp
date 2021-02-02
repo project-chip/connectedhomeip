@@ -43,7 +43,7 @@ CHIP_ERROR ChipMdnsInit(MdnsAsnycReturnCallback initCallback, MdnsAsnycReturnCal
     esp_err_t espError;
 
     espError = mdns_init();
-    VerifyOrExit(espError == ESP_OK, error = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(espError == ESP_OK, error = _CHIP_ERROR(837));
 
 exit:
     if (espError != ESP_OK)
@@ -62,7 +62,7 @@ static const char * GetProtocolString(MdnsServiceProtocol protocol)
 
 CHIP_ERROR ChipMdnsSetHostname(const char * hostname)
 {
-    return mdns_hostname_set(hostname) == ESP_OK ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL;
+    return mdns_hostname_set(hostname) == ESP_OK ? CHIP_NO_ERROR : _CHIP_ERROR(838);
 }
 
 CHIP_ERROR ChipMdnsPublishService(const MdnsService * service)
@@ -92,7 +92,7 @@ CHIP_ERROR ChipMdnsPublishService(const MdnsService * service)
         espError = mdns_service_txt_set(service->mType, GetProtocolString(service->mProtocol), items,
                                         static_cast<uint8_t>(service->mTextEntrySize));
     }
-    VerifyOrExit(espError == ESP_OK, error = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(espError == ESP_OK, error = _CHIP_ERROR(839));
 
 exit:
     if (items != nullptr)
@@ -105,7 +105,7 @@ exit:
 
 CHIP_ERROR ChipMdnsStopPublish()
 {
-    return mdns_service_remove_all() == ESP_OK ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL;
+    return mdns_service_remove_all() == ESP_OK ? CHIP_NO_ERROR : _CHIP_ERROR(840);
 }
 
 CHIP_ERROR ChipMdnsBrowse(const char * /*type*/, MdnsServiceProtocol /*protocol*/, chip::Inet::IPAddressType addressType,

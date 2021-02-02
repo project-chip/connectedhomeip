@@ -187,7 +187,7 @@ CHIP_ERROR TCPBase::SendMessage(const PacketHeader & header, const Transport::Pe
     msgBuf->SetStart(msgBuf->Start() - prefixSize);
 
     // Length is actual data, without considering the length bytes themselves
-    VerifyOrReturnError(msgBuf->DataLength() >= kPacketSizeBytes, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(msgBuf->DataLength() >= kPacketSizeBytes, _CHIP_ERROR(824));
 
     uint8_t * output = msgBuf->Start();
     LittleEndian::Write16(output, static_cast<uint16_t>(msgBuf->DataLength() - kPacketSizeBytes));
@@ -196,7 +196,7 @@ CHIP_ERROR TCPBase::SendMessage(const PacketHeader & header, const Transport::Pe
     ReturnErrorOnFailure(header.Encode(output, msgBuf->DataLength(), &actualEncodedHeaderSize));
 
     // header encoding has to match space that we allocated
-    VerifyOrReturnError(prefixSize == actualEncodedHeaderSize + kPacketSizeBytes, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(prefixSize == actualEncodedHeaderSize + kPacketSizeBytes, _CHIP_ERROR(825));
 
     // Reuse existing connection if one exists, otherwise a new one
     // will be established
@@ -340,8 +340,8 @@ CHIP_ERROR TCPBase::ProcessReceivedBuffer(Inet::TCPEndPoint * endPoint, const Pe
             buffer->ConsumeHead(kPacketSizeBytes);
 
             // Sanity checks. These are more like an assert for invariants
-            VerifyOrExit(messageData == buffer->Start(), err = CHIP_ERROR_INTERNAL);
-            VerifyOrExit(buffer->DataLength() >= messageSize, err = CHIP_ERROR_INTERNAL);
+            VerifyOrExit(messageData == buffer->Start(), err = _CHIP_ERROR(826));
+            VerifyOrExit(buffer->DataLength() >= messageSize, err = _CHIP_ERROR(827));
 
             // messagesize is always consumed once processed, even on error. This is done
             // on purpose:

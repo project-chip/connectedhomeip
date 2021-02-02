@@ -192,7 +192,7 @@ CHIP_ERROR PacketHeader::Decode(const uint8_t * const data, uint16_t size, uint1
     SuccessOrExit(err);
 
     octets_read = reader.OctetsRead();
-    VerifyOrExit(octets_read == EncodeSizeBytes(), err = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(octets_read == EncodeSizeBytes(), err = _CHIP_ERROR(819));
     *decode_len = octets_read;
 
 exit:
@@ -240,7 +240,7 @@ CHIP_ERROR PayloadHeader::Decode(const uint8_t * const data, uint16_t size, uint
     }
 
     octets_read = reader.OctetsRead();
-    VerifyOrExit(octets_read == EncodeSizeBytes(), err = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(octets_read == EncodeSizeBytes(), err = _CHIP_ERROR(820));
     *decode_len = octets_read;
 
 exit:
@@ -281,7 +281,7 @@ CHIP_ERROR PacketHeader::Encode(uint8_t * data, uint16_t size, uint16_t * encode
     LittleEndian::Write16(p, mPayloadLength);
 
     // Written data size provided to caller on success
-    VerifyOrExit(p - data == EncodeSizeBytes(), err = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(p - data == EncodeSizeBytes(), err = _CHIP_ERROR(821));
     *encode_size = static_cast<uint16_t>(p - data);
 
 exit:
@@ -310,7 +310,7 @@ CHIP_ERROR PayloadHeader::Encode(uint8_t * data, uint16_t size, uint16_t * encod
     }
 
     // Written data size provided to caller on success
-    VerifyOrExit(p - data == EncodeSizeBytes(), err = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(p - data == EncodeSizeBytes(), err = _CHIP_ERROR(822));
     *encode_size = static_cast<uint16_t>(p - data);
 
 exit:

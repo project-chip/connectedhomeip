@@ -85,7 +85,7 @@ CHIP_ERROR Encode(NodeId localNodeId, Transport::PeerConnectionState * state, Pa
     uint16_t taglen = 0;
     ReturnErrorOnFailure(mac.Encode(packetHeader, &data[totalLen], msgBuf->AvailableDataLength(), &taglen));
 
-    VerifyOrReturnError(CanCastTo<uint16_t>(totalLen + taglen), CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(CanCastTo<uint16_t>(totalLen + taglen), _CHIP_ERROR(502));
     msgBuf->SetDataLength(static_cast<uint16_t>(totalLen + taglen));
 
     ChipLogDetail(Inet, "Secure message was encrypted: Msg ID %u", msgId);

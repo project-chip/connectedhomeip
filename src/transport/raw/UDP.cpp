@@ -110,7 +110,7 @@ CHIP_ERROR UDP::SendMessage(const PacketHeader & header, const Transport::PeerAd
     uint16_t actualEncodedHeaderSize;
     ReturnErrorOnFailure(header.Encode(msgBuf->Start(), msgBuf->DataLength(), &actualEncodedHeaderSize));
 
-    VerifyOrReturnError(headerSize == actualEncodedHeaderSize, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(headerSize == actualEncodedHeaderSize, _CHIP_ERROR(823));
 
     return mUDPEndPoint->SendMsg(&addrInfo, std::move(msgBuf));
 }

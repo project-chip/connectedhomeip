@@ -80,7 +80,7 @@ CHIP_ERROR ConfigurationManagerImpl::_GetPrimaryWiFiMACAddress(uint8_t * buf)
     CHIP_ERROR error           = CHIP_NO_ERROR;
     bool found                 = false;
 
-    VerifyOrExit(getifaddrs(&addresses) == 0, error = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(getifaddrs(&addresses) == 0, error = _CHIP_ERROR(853));
     for (auto addr = addresses; addr != NULL; addr = addr->ifa_next)
     {
         if ((addr->ifa_addr) && (addr->ifa_addr->sa_family == AF_PACKET) && strncmp(addr->ifa_name, "lo", IFNAMSIZ) != 0)

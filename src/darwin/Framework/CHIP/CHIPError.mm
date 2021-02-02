@@ -66,7 +66,7 @@ NSString * const CHIPErrorDomain = @"CHIPErrorDomain";
 + (CHIP_ERROR)errorToCHIPErrorCode:(NSError *)error
 {
     if (error.domain != CHIPErrorDomain) {
-        return CHIP_ERROR_INTERNAL;
+        return _CHIP_ERROR(860);
     }
 
     switch (error.code) {
@@ -85,7 +85,7 @@ NSString * const CHIPErrorDomain = @"CHIPErrorDomain";
     case CHIPSuccess:
         return CHIP_NO_ERROR;
     default:
-        return CHIP_ERROR_INTERNAL;
+        return _CHIP_ERROR(861);
     }
 }
 @end

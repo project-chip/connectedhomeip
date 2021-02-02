@@ -321,7 +321,7 @@ CHIP_ERROR ExchangeContext::StartResponseTimer()
     if (lSystemLayer == nullptr)
     {
         // this is an assertion error, which shall never happen
-        return CHIP_ERROR_INTERNAL;
+        return _CHIP_ERROR(510);
     }
 
     return lSystemLayer->StartTimer(mResponseTimeout, HandleResponseTimeout, this);

@@ -55,7 +55,7 @@ CHIP_ERROR ModelCommand::Run(PersistentStorage & storage, NodeId localId, NodeId
     err = RunInternal(remoteId);
     SuccessOrExit(err);
 
-    VerifyOrExit(GetCommandExitStatus(), err = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(GetCommandExitStatus(), err = _CHIP_ERROR(866));
 
 exit:
     mCommissioner.ServiceEventSignal();
@@ -88,7 +88,7 @@ CHIP_ERROR ModelCommand::RunCommandInternal(ChipDevice * device)
                     mCommandId);
 
     PacketBufferHandle buffer = EncodeCommand(mEndPointId);
-    VerifyOrExit(!buffer.IsNull(), err = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(!buffer.IsNull(), err = _CHIP_ERROR(867));
 
 #ifdef DEBUG
     PrintBuffer(buffer);
