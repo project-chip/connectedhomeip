@@ -23,14 +23,14 @@
 NSString * const kCHIPNumLightOnOffCluster = @"OnOffViewController_NumLights";
 
 @interface OnOffViewController ()
-@property (nonatomic, strong) UITextField *numLightsTextField;
+@property (nonatomic, strong) UITextField * numLightsTextField;
 
-@property (readwrite) NSArray<CHIPOnOff *> *onOffClusters;
+@property (readwrite) NSArray<CHIPOnOff *> * onOffClusters;
 @property (readwrite) CHIPOnOff * onOffEndpoint2;
 
 @property (nonatomic, strong) UILabel * resultLabel;
-@property (nonatomic, strong) UILabel *titleLabel;
-@property (nonatomic, strong) UIStackView *stackView;
+@property (nonatomic, strong) UILabel * titleLabel;
+@property (nonatomic, strong) UIStackView * stackView;
 
 @property (readwrite) CHIPDeviceController * chipController;
 @property (readwrite) CHIPDevice * chipDevice;
@@ -40,8 +40,7 @@ NSString * const kCHIPNumLightOnOffCluster = @"OnOffViewController_NumLights";
 
 @implementation OnOffViewController {
     dispatch_queue_t _callbackQueue;
-    NSArray *_numLightsOptions;
-
+    NSArray * _numLightsOptions;
 }
 
 // MARK: UIViewController methods
@@ -55,15 +54,12 @@ NSString * const kCHIPNumLightOnOffCluster = @"OnOffViewController_NumLights";
 
     [self initializeChipController];
     [self setupUIElements];
-
-
 }
 
 - (void)dismissKeyboard
 {
     [_numLightsTextField resignFirstResponder];
 }
-
 
 // MARK: UI Setup
 
@@ -74,7 +70,6 @@ NSString * const kCHIPNumLightOnOffCluster = @"OnOffViewController_NumLights";
     // Title
     _titleLabel = [CHIPUIViewUtils addTitle:@"On Off Cluster" toView:self.view];
     [self setupStackView];
-
 }
 
 - (void)setupStackView
@@ -96,25 +91,29 @@ NSString * const kCHIPNumLightOnOffCluster = @"OnOffViewController_NumLights";
 
     // Num lights to show
     [self setupNumberOfLightClustersFromDefaults];
-    UILabel *numLightsLabel = [UILabel new];
+    UILabel * numLightsLabel = [UILabel new];
     numLightsLabel.text = @"# of light endpoints:";
     _numLightsTextField = [UITextField new];
-    _numLightsOptions = @[@"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9", @"10"];
-    _numLightsTextField.text = CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, kCHIPNumLightOnOffCluster) ?: [_numLightsOptions objectAtIndex:0];
-    UIPickerView *numLightsPicker = [[UIPickerView alloc] initWithFrame:CGRectMake(0, 100, 0, 0)];
+    _numLightsOptions = @[ @"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9", @"10" ];
+    _numLightsTextField.text
+        = CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, kCHIPNumLightOnOffCluster) ?: [_numLightsOptions objectAtIndex:0];
+    UIPickerView * numLightsPicker = [[UIPickerView alloc] initWithFrame:CGRectMake(0, 100, 0, 0)];
     _numLightsTextField.inputView = numLightsPicker;
-    [numLightsPicker setDataSource: self];
-    [numLightsPicker setDelegate: self];
+    [numLightsPicker setDataSource:self];
+    [numLightsPicker setDelegate:self];
     _numLightsTextField.delegate = self;
-    UIView *numLightsView = [CHIPUIViewUtils viewWithLabel:numLightsLabel textField:_numLightsTextField];
+    UIView * numLightsView = [CHIPUIViewUtils viewWithLabel:numLightsLabel textField:_numLightsTextField];
     numLightsLabel.font = [UIFont systemFontOfSize:17 weight:UIFontWeightSemibold];
 
-    UIToolbar* keyboardDoneButtonView = [[UIToolbar alloc] init];
+    UIToolbar * keyboardDoneButtonView = [[UIToolbar alloc] init];
     [keyboardDoneButtonView sizeToFit];
-    UIBarButtonItem* doneButton = [[UIBarButtonItem alloc] initWithTitle:@"Done"
-                                                                    style:UIBarButtonItemStylePlain target:self
+    UIBarButtonItem * doneButton = [[UIBarButtonItem alloc] initWithTitle:@"Done"
+                                                                    style:UIBarButtonItemStylePlain
+                                                                   target:self
                                                                    action:@selector(pickerDoneClicked:)];
-    UIBarButtonItem *flexible = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:self action:nil];
+    UIBarButtonItem * flexible = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
+                                                                               target:self
+                                                                               action:nil];
     [keyboardDoneButtonView setItems:[NSArray arrayWithObjects:flexible, doneButton, nil]];
     _numLightsTextField.inputAccessoryView = keyboardDoneButtonView;
 
@@ -178,10 +177,10 @@ NSString * const kCHIPNumLightOnOffCluster = @"OnOffViewController_NumLights";
 
 - (void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component
 {
-    NSLog(@"%@",[_numLightsOptions objectAtIndex:row]);
-    _numLightsTextField.text = [NSString stringWithFormat:@"%@",[_numLightsOptions objectAtIndex:row]];;
+    NSLog(@"%@", [_numLightsOptions objectAtIndex:row]);
+    _numLightsTextField.text = [NSString stringWithFormat:@"%@", [_numLightsOptions objectAtIndex:row]];
+    ;
 }
-
 
 - (NSInteger)pickerView:(UIPickerView *)pickerView numberOfRowsInComponent:(NSInteger)component
 {
@@ -204,7 +203,8 @@ NSString * const kCHIPNumLightOnOffCluster = @"OnOffViewController_NumLights";
     return 200;
 }
 
-- (IBAction)pickerDoneClicked:(id)sender {
+- (IBAction)pickerDoneClicked:(id)sender
+{
     CHIPSetDomainValueForKey(kCHIPToolDefaultsDomain, kCHIPNumLightOnOffCluster, _numLightsTextField.text);
     [_numLightsTextField resignFirstResponder];
     [self setupStackView];
@@ -233,7 +233,7 @@ NSString * const kCHIPNumLightOnOffCluster = @"OnOffViewController_NumLights";
 
 - (int)numLightClustersToShow
 {
-    NSString *numClusters = CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, kCHIPNumLightOnOffCluster);
+    NSString * numClusters = CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, kCHIPNumLightOnOffCluster);
     int numberOfLights = 1;
 
     if (numClusters) {
@@ -249,9 +249,9 @@ NSString * const kCHIPNumLightOnOffCluster = @"OnOffViewController_NumLights";
 
 - (void)setupNumberOfLightClusters:(int)numLights
 {
-    NSMutableArray<CHIPOnOff *> *clusters = [NSMutableArray new];
-    for (int i = 0; i < numLights; i ++) {
-        CHIPOnOff *cluster = [[CHIPOnOff alloc] initWithDevice:self.chipDevice endpoint:(i + 1) queue:_callbackQueue];
+    NSMutableArray<CHIPOnOff *> * clusters = [NSMutableArray new];
+    for (int i = 0; i < numLights; i++) {
+        CHIPOnOff * cluster = [[CHIPOnOff alloc] initWithDevice:self.chipDevice endpoint:(i + 1) queue:_callbackQueue];
         [clusters addObject:cluster];
     }
     _onOffClusters = clusters;
@@ -270,12 +270,11 @@ NSString * const kCHIPNumLightOnOffCluster = @"OnOffViewController_NumLights";
     NSLog(@"Light %@ on button pressed.", @(lightNumber));
 
     if (lightNumber <= [_onOffClusters count]) {
-        CHIPOnOff *onOff = [_onOffClusters objectAtIndex:(lightNumber - 1)];
+        CHIPOnOff * onOff = [_onOffClusters objectAtIndex:(lightNumber - 1)];
         [onOff on:completionHandler];
     } else {
         NSLog(@"No cluster initated at endpoint %@.", @(lightNumber));
     }
-
 }
 
 - (IBAction)offButtonTapped:(id)sender
@@ -289,7 +288,7 @@ NSString * const kCHIPNumLightOnOffCluster = @"OnOffViewController_NumLights";
     NSLog(@"Light %@ off button pressed.", @(lightNumber));
 
     if (lightNumber <= [_onOffClusters count]) {
-        CHIPOnOff *onOff = [_onOffClusters objectAtIndex:(lightNumber - 1)];
+        CHIPOnOff * onOff = [_onOffClusters objectAtIndex:(lightNumber - 1)];
         [onOff off:completionHandler];
     } else {
         NSLog(@"No cluster initated at endpoint %@.", @(lightNumber));
@@ -307,7 +306,7 @@ NSString * const kCHIPNumLightOnOffCluster = @"OnOffViewController_NumLights";
     NSLog(@"Light %@ toggle button pressed.", @(lightNumber));
 
     if (lightNumber <= [_onOffClusters count]) {
-        CHIPOnOff *onOff = [_onOffClusters objectAtIndex:(lightNumber - 1)];
+        CHIPOnOff * onOff = [_onOffClusters objectAtIndex:(lightNumber - 1)];
         [onOff toggle:completionHandler];
     } else {
         NSLog(@"No cluster initated at endpoint %@.", @(lightNumber));
