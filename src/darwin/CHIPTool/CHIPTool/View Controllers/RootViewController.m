@@ -16,12 +16,12 @@
  */
 
 #import "RootViewController.h"
+#import "BindingsViewController.h"
 #import "EchoViewController.h"
 #import "OnOffViewController.h"
 #import "QRCodeViewController.h"
 #import "TemperatureSensorViewController.h"
 #import "WifiViewController.h"
-#import "BindingsViewController.h"
 
 @implementation RootViewController
 
@@ -38,7 +38,9 @@
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
     [self.view addSubview:self.tableView];
-    self.options = @[ @"QRCode scanner", @"Echo client", @"Light on / off cluster", @"Temperature Sensor", @"Bindings", @"Wifi Configuration" ];
+    self.options = @[
+        @"QRCode scanner", @"Echo client", @"Light on / off cluster", @"Temperature Sensor", @"Bindings", @"Wifi Configuration"
+    ];
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
