@@ -250,7 +250,7 @@ CHIP_ERROR CommandDataElement::Parser::CheckSchemaValidity() const
             // check if this tag has appeared before
             VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_CommandPath)), err = CHIP_ERROR_INVALID_TLV_TAG);
             TagPresenceMask |= (1 << kCsTag_CommandPath);
-            VerifyOrExit(chip::TLV::kTLVType_Path == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
+            VerifyOrExit(chip::TLV::kTLVType_List == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
 
             {
                 CommandPath::Parser path;
@@ -332,7 +332,7 @@ CHIP_ERROR CommandDataElement::Parser::GetCommandPath(CommandPath::Parser * cons
     err = mReader.FindElementWithTag(chip::TLV::ContextTag(kCsTag_CommandPath), reader);
     SuccessOrExit(err);
 
-    VerifyOrExit(chip::TLV::kTLVType_Path == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
+    VerifyOrExit(chip::TLV::kTLVType_List == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
 
     err = apCommandPath->Init(reader);
     SuccessOrExit(err);

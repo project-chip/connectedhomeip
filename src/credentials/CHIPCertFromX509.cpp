@@ -89,7 +89,7 @@ static CHIP_ERROR ConvertDistinguishedName(ASN1Reader & reader, TLVWriter & writ
     TLVType outerContainer;
     OID attrOID;
 
-    err = writer.StartContainer(tag, kTLVType_Path, outerContainer);
+    err = writer.StartContainer(tag, kTLVType_List, outerContainer);
     SuccessOrExit(err);
 
     // RDNSequence ::= SEQUENCE OF RelativeDistinguishedName
