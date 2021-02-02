@@ -25,6 +25,7 @@
 #include <assert.h>
 #include <inet/InetLayer.h>
 #include <support/logging/CHIPLogging.h>
+#include <transport/raw/MessageHeader.h> // For kMaxTagLen
 #include <transport/SecureSessionMgr.h> // For SecureSessionMgr
 
 using namespace chip;
@@ -55,7 +56,7 @@ EmberStatus chipSendUnicast(NodeId destination, EmberApsFrame * apsFrame, uint16
         return EMBER_ERR_FATAL;
     }
 
-    System::PacketBufferHandle buffer = System::PacketBufferHandle::New(dataLength);
+    System::PacketBufferHandle buffer = System::PacketBufferHandle::New(dataLength + kMaxTagLen);
     if (buffer.IsNull())
     {
         // FIXME: Not quite right... what's the right way to indicate "out of
