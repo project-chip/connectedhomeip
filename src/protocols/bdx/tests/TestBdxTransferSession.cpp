@@ -2,6 +2,8 @@
 #include <protocols/bdx/BdxMessages.h>
 #include <protocols/bdx/BdxTransferSession.h>
 
+#include <string.h>
+
 #include <nlunit-test.h>
 
 #include <core/CHIPTLV.h>
@@ -12,8 +14,10 @@
 using namespace ::chip;
 using namespace ::chip::bdx;
 
+namespace {
 // Use this as a timestamp if not needing to test BDX timeouts.
-const uint64_t kNoAdvanceTime = 0;
+constexpr uint64_t kNoAdvanceTime = 0;
+} // anonymous namespace
 
 // Helper method for generating a complete TLV structure with just a single tag and string
 CHIP_ERROR WriteTLVString(uint8_t * buf, uint32_t bufLen, const char * data, uint64_t tag, uint32_t & written)
@@ -38,19 +42,19 @@ CHIP_ERROR ReadAndVerifyTLVString(nlTestSuite * inSuite, void * inContext, const
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVReader reader;
-    char tmp[64]    = { 0 };
-    uint32_t strlen = 0;
+    char tmp[64]        = { 0 };
+    uint32_t readLength = 0;
     VerifyOrExit(sizeof(tmp) > len, err = CHIP_ERROR_INTERNAL);
 
     reader.Init(dataStart, len);
     err = reader.Next();
     SuccessOrExit(err);
     VerifyOrExit(reader.GetTag() == tag, err = CHIP_ERROR_INTERNAL);
-    strlen = reader.GetLength();
-    VerifyOrExit(strlen == expectedLen, err = CHIP_ERROR_INTERNAL);
+    readLength = reader.GetLength();
+    VerifyOrExit(readLength == expectedLen, err = CHIP_ERROR_INTERNAL);
     err = reader.GetString(tmp, sizeof(tmp));
     SuccessOrExit(err);
-    VerifyOrExit(!memcmp(expected, tmp, strlen), err = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(!memcmp(expected, tmp, readLength), err = CHIP_ERROR_INTERNAL);
 
 exit:
     return err;
@@ -318,7 +322,7 @@ void TestInitiatingReceiverReceiverDrive(nlTestSuite * inSuite, void * inContext
     initOptions.TransferCtlFlagsRaw = driveMode;
     initOptions.MaxBlockSize        = proposedBlockSize;
     char testFileDes[9]             = { "test.txt" };
-    initOptions.FileDesLength       = sizeof(testFileDes) - 1;
+    initOptions.FileDesLength       = static_cast<uint16_t>(strlen(testFileDes));
     initOptions.FileDesignator      = reinterpret_cast<uint8_t *>(testFileDes);
 
     // Initialize respondingSender and pass ReceiveInit message
@@ -351,10 +355,12 @@ void TestInitiatingReceiverReceiverDrive(nlTestSuite * inSuite, void * inContext
 
     // Verify that MaxBlockSize was chosen correctly
     NL_TEST_ASSERT(inSuite, respondingSender.GetTransferBlockSize() == testSmallerBlockSize);
+    NL_TEST_ASSERT(inSuite, respondingSender.GetTransferBlockSize() == initiatingReceiver.GetTransferBlockSize());
 
     // Verify parsed TLV metadata matches the original
-    err = ReadAndVerifyTLVString(inSuite, inContext, outEvent.transferAcceptData.Metadata,
-                                 outEvent.transferAcceptData.MetadataLength, tlvTag, metadataStr, sizeof(metadataStr) - 1);
+    err =
+        ReadAndVerifyTLVString(inSuite, inContext, outEvent.transferAcceptData.Metadata, outEvent.transferAcceptData.MetadataLength,
+                               tlvTag, metadataStr, static_cast<uint16_t>(strlen(metadataStr)));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // Test BlockQuery -> Block -> BlockAck
@@ -428,7 +434,7 @@ void TestInitiatingSenderSenderDrive(nlTestSuite * inSuite, void * inContext)
     initOptions.TransferCtlFlagsRaw = driveMode;
     initOptions.MaxBlockSize        = transferBlockSize;
     char testFileDes[9]             = { "test.txt" };
-    initOptions.FileDesLength       = sizeof(testFileDes) - 1;
+    initOptions.FileDesLength       = static_cast<uint16_t>(strlen(testFileDes));
     initOptions.FileDesignator      = reinterpret_cast<uint8_t *>(testFileDes);
     initOptions.Metadata            = tlvBuf;
     initOptions.MetadataLength      = metadataSize;
@@ -438,7 +444,7 @@ void TestInitiatingSenderSenderDrive(nlTestSuite * inSuite, void * inContext)
 
     // Verify parsed TLV metadata matches the original
     err = ReadAndVerifyTLVString(inSuite, inContext, outEvent.transferInitData.Metadata, outEvent.transferInitData.MetadataLength,
-                                 tlvTag, metadataStr, sizeof(metadataStr) - 1);
+                                 tlvTag, metadataStr, static_cast<uint16_t>(strlen(metadataStr)));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // Compose SendAccept parameters struct and give to respondingSender
@@ -486,7 +492,7 @@ void TestBadAcceptMessageFields(nlTestSuite * inSuite, void * inContext)
     initOptions.StartOffset         = commonOffset;
     initOptions.Length              = commonLength;
     char testFileDes[9]             = { "test.txt" }; // arbitrary file designator
-    initOptions.FileDesLength       = sizeof(testFileDes) - 1;
+    initOptions.FileDesLength       = static_cast<uint16_t>(strlen(testFileDes));
     initOptions.FileDesignator      = reinterpret_cast<uint8_t *>(testFileDes);
     initOptions.Metadata            = nullptr;
     initOptions.MetadataLength      = 0;
@@ -513,7 +519,7 @@ void TestBadAcceptMessageFields(nlTestSuite * inSuite, void * inContext)
     acceptData2.MaxBlockSize = maxBlockSize;
     acceptData2.StartOffset  = commonOffset;
     acceptData2.Length       = commonLength;
-    err                      = respondingSender.AcceptTransfer(acceptData);
+    err                      = respondingSender.AcceptTransfer(acceptData2);
     NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
 }
 
@@ -535,7 +541,7 @@ void TestTimeout(nlTestSuite * inSuite, void * inContext)
     initOptions.StartOffset         = 0;
     initOptions.Length              = 0;
     char testFileDes[9]             = { "test.txt" }; // arbitrary file designator
-    initOptions.FileDesLength       = sizeof(testFileDes) - 1;
+    initOptions.FileDesLength       = static_cast<uint16_t>(strlen(testFileDes));
     initOptions.FileDesignator      = reinterpret_cast<uint8_t *>(testFileDes);
     initOptions.Metadata            = nullptr;
     initOptions.MetadataLength      = 0;
@@ -584,7 +590,7 @@ void TestDuplicateBlockError(nlTestSuite * inSuite, void * inContext)
     initOptions.TransferCtlFlagsRaw = driveMode;
     initOptions.MaxBlockSize        = blockSize;
     char testFileDes[9]             = { "test.txt" };
-    initOptions.FileDesLength       = sizeof(testFileDes) - 1;
+    initOptions.FileDesLength       = static_cast<uint16_t>(strlen(testFileDes));
     initOptions.FileDesignator      = reinterpret_cast<uint8_t *>(testFileDes);
 
     // Initialize respondingSender and pass ReceiveInit message
