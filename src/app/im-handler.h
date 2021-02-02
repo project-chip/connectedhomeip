@@ -23,7 +23,6 @@
 #include <app/CommandHandler.h>
 #include <app/CommandSender.h>
 #include <app/InteractionModelEngine.h>
-#include <app/MessageDef/MessageDef.h>
 #include <app/util/basic-types.h>
 
 namespace chip {

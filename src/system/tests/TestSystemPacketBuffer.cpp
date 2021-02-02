@@ -54,6 +54,7 @@
 #endif // (LWIP_VERSION_MAJOR >= 2 && LWIP_VERSION_MINOR >= 1)
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
+using ::chip::System::PacketBufBound;
 using ::chip::System::PacketBuffer;
 using ::chip::System::PacketBufferHandle;
 
@@ -119,6 +120,7 @@ public:
     static void CheckHandleHold(nlTestSuite * inSuite, void * inContext);
     static void CheckHandleAdvance(nlTestSuite * inSuite, void * inContext);
     static void CheckHandleRightSize(nlTestSuite * inSuite, void * inContext);
+    static void CheckPacketBufBound(nlTestSuite * inSuite, void * inContext);
     static void CheckBuildFreeList(nlTestSuite * inSuite, void * inContext);
 
     static void PrintHandle(const char * tag, const PacketBuffer * buffer)
@@ -1705,6 +1707,33 @@ void PacketBufferTest::CheckHandleRightSize(nlTestSuite * inSuite, void * inCont
 #endif // CHIP_SYSTEM_PACKETBUFFER_HAS_RIGHT_SIZE
 }
 
+void PacketBufferTest::CheckPacketBufBound(nlTestSuite * inSuite, void * inContext)
+{
+    struct TestContext * const theContext = static_cast<struct TestContext *>(inContext);
+    PacketBufferTest * const test         = theContext->test;
+    NL_TEST_ASSERT(inSuite, test->mContext == theContext);
+
+    const char kPayload[] = "Hello, world!";
+
+    PacketBufBound yay(sizeof(kPayload));
+    PacketBufBound nay(sizeof(kPayload) - 2);
+    NL_TEST_ASSERT(inSuite, !yay.IsNull());
+    NL_TEST_ASSERT(inSuite, !nay.IsNull());
+
+    yay.Put(kPayload);
+    nay.Put(kPayload);
+    NL_TEST_ASSERT(inSuite, yay.Fit());
+    NL_TEST_ASSERT(inSuite, !nay.Fit());
+
+    PacketBufferHandle yayBuffer = yay.Finalize();
+    PacketBufferHandle nayBuffer = nay.Finalize();
+    NL_TEST_ASSERT(inSuite, yay.IsNull());
+    NL_TEST_ASSERT(inSuite, nay.IsNull());
+    NL_TEST_ASSERT(inSuite, !yayBuffer.IsNull());
+    NL_TEST_ASSERT(inSuite, nayBuffer.IsNull());
+    NL_TEST_ASSERT(inSuite, memcmp(yayBuffer->Start(), kPayload, sizeof kPayload) == 0);
+}
+
 /**
  *   Test Suite. It lists all the test functions.
  */
@@ -1742,6 +1771,7 @@ const nlTest sTests[] =
     NL_TEST_DEF("PacketBuffer::HandleHold",             PacketBufferTest::CheckHandleHold),
     NL_TEST_DEF("PacketBuffer::HandleAdvance",          PacketBufferTest::CheckHandleAdvance),
     NL_TEST_DEF("PacketBuffer::HandleRightSize",        PacketBufferTest::CheckHandleRightSize),
+    NL_TEST_DEF("PacketBuffer::PacketBufBound",         PacketBufferTest::CheckPacketBufBound),
 
     NL_TEST_SENTINEL()
 };

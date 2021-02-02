@@ -411,7 +411,7 @@ CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, con
 
         if (mDelegate != nullptr)
         {
-            mDelegate->OnMessageReceived(this, packetHeader, protocolId, messageType, std::move(msgBuf));
+            mDelegate->OnMessageReceived(this, packetHeader, payloadHeader, std::move(msgBuf));
         }
         else
         {

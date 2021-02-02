@@ -49,11 +49,10 @@ public:
      *
      *  @param[in]    ec            A pointer to the ExchangeContext object.
      *  @param[in]    packetHeader  A reference to the PacketHeader object.
-     *  @param[in]    protocolId    The protocol identifier of the received message.
-     *  @param[in]    msgType       The message type of the corresponding protocol.
+     *  @param[in]    payloadHeader A reference to the PayloadHeader object.
      *  @param[in]    payload       A handle to the PacketBuffer object holding the message payload.
      */
-    virtual void OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, uint32_t protocolId, uint8_t msgType,
+    virtual void OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                                    System::PacketBufferHandle payload) = 0;
 
     /**
