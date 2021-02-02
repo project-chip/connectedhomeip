@@ -105,7 +105,7 @@
     [_saveButton setTitle:@"Save" forState:UIControlStateNormal];
     [_clearButton addTarget:self action:@selector(clearCredientials:) forControlEvents:UIControlEventTouchUpInside];
     [_saveButton addTarget:self action:@selector(saveCredientials:) forControlEvents:UIControlEventTouchUpInside];
-    
+
     UIStackView * stackViewButtons = [CHIPUIViewUtils stackViewWithButtons:@[_clearButton, _saveButton]];
     [stackView addArrangedSubview:stackViewButtons];
     [stackViewButtons.trailingAnchor constraintEqualToAnchor:stackView.trailingAnchor].active = YES;
