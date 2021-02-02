@@ -55,8 +55,10 @@ CHIP_ERROR BarrierControlCluster::BarrierControlGoToPercent(Callback::Cancelable
 
     return mDevice->SendCommands();
 #else
-    System::PacketBufferHandle payload = encodeBarrierControlClusterBarrierControlGoToPercentCommand(mEndpoint, percentOpen);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload =
+        encodeBarrierControlClusterBarrierControlGoToPercentCommand(seqNum, mEndpoint, percentOpen);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 #endif
 }
 
@@ -84,8 +86,9 @@ CHIP_ERROR BarrierControlCluster::BarrierControlStop(Callback::Cancelable * onSu
 
     return mDevice->SendCommands();
 #else
-    System::PacketBufferHandle payload = encodeBarrierControlClusterBarrierControlStopCommand(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeBarrierControlClusterBarrierControlStopCommand(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 #endif
 }
 
@@ -93,42 +96,48 @@ CHIP_ERROR BarrierControlCluster::BarrierControlStop(Callback::Cancelable * onSu
 CHIP_ERROR BarrierControlCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
                                                      Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeBarrierControlClusterDiscoverAttributes(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeBarrierControlClusterDiscoverAttributes(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 CHIP_ERROR BarrierControlCluster::ReadAttributeBarrierMovingState(Callback::Cancelable * onSuccessCallback,
                                                                   Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeBarrierControlClusterReadBarrierMovingStateAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeBarrierControlClusterReadBarrierMovingStateAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR BarrierControlCluster::ReadAttributeBarrierSafetyStatus(Callback::Cancelable * onSuccessCallback,
                                                                    Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeBarrierControlClusterReadBarrierSafetyStatusAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeBarrierControlClusterReadBarrierSafetyStatusAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR BarrierControlCluster::ReadAttributeBarrierCapabilities(Callback::Cancelable * onSuccessCallback,
                                                                    Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeBarrierControlClusterReadBarrierCapabilitiesAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeBarrierControlClusterReadBarrierCapabilitiesAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR BarrierControlCluster::ReadAttributeBarrierPosition(Callback::Cancelable * onSuccessCallback,
                                                                Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeBarrierControlClusterReadBarrierPositionAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeBarrierControlClusterReadBarrierPositionAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR BarrierControlCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                                Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeBarrierControlClusterReadClusterRevisionAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeBarrierControlClusterReadClusterRevisionAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 // Basic Cluster Commands
@@ -155,8 +164,9 @@ CHIP_ERROR BasicCluster::MfgSpecificPing(Callback::Cancelable * onSuccessCallbac
 
     return mDevice->SendCommands();
 #else
-    System::PacketBufferHandle payload = encodeBasicClusterMfgSpecificPingCommand(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeBasicClusterMfgSpecificPingCommand(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 #endif
 }
 
@@ -183,35 +193,40 @@ CHIP_ERROR BasicCluster::ResetToFactoryDefaults(Callback::Cancelable * onSuccess
 
     return mDevice->SendCommands();
 #else
-    System::PacketBufferHandle payload = encodeBasicClusterResetToFactoryDefaultsCommand(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeBasicClusterResetToFactoryDefaultsCommand(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 #endif
 }
 
 // Basic Cluster Attributes
 CHIP_ERROR BasicCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeBasicClusterDiscoverAttributes(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeBasicClusterDiscoverAttributes(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 CHIP_ERROR BasicCluster::ReadAttributeZclVersion(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeBasicClusterReadZclVersionAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeBasicClusterReadZclVersionAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR BasicCluster::ReadAttributePowerSource(Callback::Cancelable * onSuccessCallback,
                                                   Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeBasicClusterReadPowerSourceAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeBasicClusterReadPowerSourceAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR BasicCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                       Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeBasicClusterReadClusterRevisionAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeBasicClusterReadClusterRevisionAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 // Binding Cluster Commands
@@ -247,8 +262,9 @@ CHIP_ERROR BindingCluster::Bind(Callback::Cancelable * onSuccessCallback, Callba
 
     return mDevice->SendCommands();
 #else
-    System::PacketBufferHandle payload = encodeBindingClusterBindCommand(mEndpoint, nodeId, groupId, endpointId, clusterId);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeBindingClusterBindCommand(seqNum, mEndpoint, nodeId, groupId, endpointId, clusterId);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 #endif
 }
 
@@ -285,22 +301,26 @@ CHIP_ERROR BindingCluster::Unbind(Callback::Cancelable * onSuccessCallback, Call
 
     return mDevice->SendCommands();
 #else
-    System::PacketBufferHandle payload = encodeBindingClusterUnbindCommand(mEndpoint, nodeId, groupId, endpointId, clusterId);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload =
+        encodeBindingClusterUnbindCommand(seqNum, mEndpoint, nodeId, groupId, endpointId, clusterId);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 #endif
 }
 
 // Binding Cluster Attributes
 CHIP_ERROR BindingCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeBindingClusterDiscoverAttributes(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeBindingClusterDiscoverAttributes(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 CHIP_ERROR BindingCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                         Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeBindingClusterReadClusterRevisionAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeBindingClusterReadClusterRevisionAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 // ColorControl Cluster Commands
@@ -336,9 +356,10 @@ CHIP_ERROR ColorControlCluster::MoveColor(Callback::Cancelable * onSuccessCallba
 
     return mDevice->SendCommands();
 #else
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle payload =
-        encodeColorControlClusterMoveColorCommand(mEndpoint, rateX, rateY, optionsMask, optionsOverride);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+        encodeColorControlClusterMoveColorCommand(seqNum, mEndpoint, rateX, rateY, optionsMask, optionsOverride);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 #endif
 }
 
@@ -380,9 +401,10 @@ CHIP_ERROR ColorControlCluster::MoveColorTemperature(Callback::Cancelable * onSu
 
     return mDevice->SendCommands();
 #else
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle payload = encodeColorControlClusterMoveColorTemperatureCommand(
-        mEndpoint, moveMode, rate, colorTemperatureMinimum, colorTemperatureMaximum, optionsMask, optionsOverride);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+        seqNum, mEndpoint, moveMode, rate, colorTemperatureMinimum, colorTemperatureMaximum, optionsMask, optionsOverride);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 #endif
 }
 
@@ -418,9 +440,10 @@ CHIP_ERROR ColorControlCluster::MoveHue(Callback::Cancelable * onSuccessCallback
 
     return mDevice->SendCommands();
 #else
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle payload =
-        encodeColorControlClusterMoveHueCommand(mEndpoint, moveMode, rate, optionsMask, optionsOverride);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+        encodeColorControlClusterMoveHueCommand(seqNum, mEndpoint, moveMode, rate, optionsMask, optionsOverride);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 #endif
 }
 
@@ -456,9 +479,10 @@ CHIP_ERROR ColorControlCluster::MoveSaturation(Callback::Cancelable * onSuccessC
 
     return mDevice->SendCommands();
 #else
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle payload =
-        encodeColorControlClusterMoveSaturationCommand(mEndpoint, moveMode, rate, optionsMask, optionsOverride);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+        encodeColorControlClusterMoveSaturationCommand(seqNum, mEndpoint, moveMode, rate, optionsMask, optionsOverride);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 #endif
 }
 
@@ -497,9 +521,10 @@ CHIP_ERROR ColorControlCluster::MoveToColor(Callback::Cancelable * onSuccessCall
 
     return mDevice->SendCommands();
 #else
-    System::PacketBufferHandle payload =
-        encodeColorControlClusterMoveToColorCommand(mEndpoint, colorX, colorY, transitionTime, optionsMask, optionsOverride);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeColorControlClusterMoveToColorCommand(seqNum, mEndpoint, colorX, colorY,
+                                                                                     transitionTime, optionsMask, optionsOverride);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 #endif
 }
 
@@ -536,9 +561,10 @@ CHIP_ERROR ColorControlCluster::MoveToColorTemperature(Callback::Cancelable * on
 
     return mDevice->SendCommands();
 #else
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle payload = encodeColorControlClusterMoveToColorTemperatureCommand(
-        mEndpoint, colorTemperature, transitionTime, optionsMask, optionsOverride);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+        seqNum, mEndpoint, colorTemperature, transitionTime, optionsMask, optionsOverride);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 #endif
 }
 
@@ -577,9 +603,10 @@ CHIP_ERROR ColorControlCluster::MoveToHue(Callback::Cancelable * onSuccessCallba
 
     return mDevice->SendCommands();
 #else
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle payload =
-        encodeColorControlClusterMoveToHueCommand(mEndpoint, hue, direction, transitionTime, optionsMask, optionsOverride);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+        encodeColorControlClusterMoveToHueCommand(seqNum, mEndpoint, hue, direction, transitionTime, optionsMask, optionsOverride);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 #endif
 }
 
@@ -618,9 +645,10 @@ CHIP_ERROR ColorControlCluster::MoveToHueAndSaturation(Callback::Cancelable * on
 
     return mDevice->SendCommands();
 #else
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle payload = encodeColorControlClusterMoveToHueAndSaturationCommand(
-        mEndpoint, hue, saturation, transitionTime, optionsMask, optionsOverride);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+        seqNum, mEndpoint, hue, saturation, transitionTime, optionsMask, optionsOverride);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 #endif
 }
 
@@ -657,9 +685,10 @@ CHIP_ERROR ColorControlCluster::MoveToSaturation(Callback::Cancelable * onSucces
 
     return mDevice->SendCommands();
 #else
-    System::PacketBufferHandle payload =
-        encodeColorControlClusterMoveToSaturationCommand(mEndpoint, saturation, transitionTime, optionsMask, optionsOverride);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeColorControlClusterMoveToSaturationCommand(
+        seqNum, mEndpoint, saturation, transitionTime, optionsMask, optionsOverride);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 #endif
 }
 
@@ -698,9 +727,10 @@ CHIP_ERROR ColorControlCluster::StepColor(Callback::Cancelable * onSuccessCallba
 
     return mDevice->SendCommands();
 #else
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle payload =
-        encodeColorControlClusterStepColorCommand(mEndpoint, stepX, stepY, transitionTime, optionsMask, optionsOverride);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+        encodeColorControlClusterStepColorCommand(seqNum, mEndpoint, stepX, stepY, transitionTime, optionsMask, optionsOverride);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 #endif
 }
 
@@ -744,10 +774,11 @@ CHIP_ERROR ColorControlCluster::StepColorTemperature(Callback::Cancelable * onSu
 
     return mDevice->SendCommands();
 #else
-    System::PacketBufferHandle payload =
-        encodeColorControlClusterStepColorTemperatureCommand(mEndpoint, stepMode, stepSize, transitionTime, colorTemperatureMinimum,
-                                                             colorTemperatureMaximum, optionsMask, optionsOverride);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeColorControlClusterStepColorTemperatureCommand(
+        seqNum, mEndpoint, stepMode, stepSize, transitionTime, colorTemperatureMinimum, colorTemperatureMaximum, optionsMask,
+        optionsOverride);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 #endif
 }
 
@@ -786,9 +817,10 @@ CHIP_ERROR ColorControlCluster::StepHue(Callback::Cancelable * onSuccessCallback
 
     return mDevice->SendCommands();
 #else
-    System::PacketBufferHandle payload =
-        encodeColorControlClusterStepHueCommand(mEndpoint, stepMode, stepSize, transitionTime, optionsMask, optionsOverride);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeColorControlClusterStepHueCommand(seqNum, mEndpoint, stepMode, stepSize,
+                                                                                 transitionTime, optionsMask, optionsOverride);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 #endif
 }
 
@@ -827,9 +859,10 @@ CHIP_ERROR ColorControlCluster::StepSaturation(Callback::Cancelable * onSuccessC
 
     return mDevice->SendCommands();
 #else
-    System::PacketBufferHandle payload =
-        encodeColorControlClusterStepSaturationCommand(mEndpoint, stepMode, stepSize, transitionTime, optionsMask, optionsOverride);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeColorControlClusterStepSaturationCommand(
+        seqNum, mEndpoint, stepMode, stepSize, transitionTime, optionsMask, optionsOverride);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 #endif
 }
 
@@ -861,8 +894,10 @@ CHIP_ERROR ColorControlCluster::StopMoveStep(Callback::Cancelable * onSuccessCal
 
     return mDevice->SendCommands();
 #else
-    System::PacketBufferHandle payload = encodeColorControlClusterStopMoveStepCommand(mEndpoint, optionsMask, optionsOverride);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload =
+        encodeColorControlClusterStopMoveStepCommand(seqNum, mEndpoint, optionsMask, optionsOverride);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 #endif
 }
 
@@ -870,23 +905,26 @@ CHIP_ERROR ColorControlCluster::StopMoveStep(Callback::Cancelable * onSuccessCal
 CHIP_ERROR ColorControlCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
                                                    Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeColorControlClusterDiscoverAttributes(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeColorControlClusterDiscoverAttributes(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 CHIP_ERROR ColorControlCluster::ReadAttributeCurrentHue(Callback::Cancelable * onSuccessCallback,
                                                         Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeColorControlClusterReadCurrentHueAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeColorControlClusterReadCurrentHueAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ConfigureAttributeCurrentHue(Callback::Cancelable * onSuccessCallback,
                                                              Callback::Cancelable * onFailureCallback, uint16_t minInterval,
                                                              uint16_t maxInterval, uint8_t change)
 {
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle payload =
-        encodeColorControlClusterConfigureCurrentHueAttribute(mEndpoint, minInterval, maxInterval, change);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+        encodeColorControlClusterConfigureCurrentHueAttribute(seqNum, mEndpoint, minInterval, maxInterval, change);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ReportAttributeCurrentHue(Callback::Cancelable * onReportCallback)
@@ -897,17 +935,19 @@ CHIP_ERROR ColorControlCluster::ReportAttributeCurrentHue(Callback::Cancelable *
 CHIP_ERROR ColorControlCluster::ReadAttributeCurrentSaturation(Callback::Cancelable * onSuccessCallback,
                                                                Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeColorControlClusterReadCurrentSaturationAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeColorControlClusterReadCurrentSaturationAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ConfigureAttributeCurrentSaturation(Callback::Cancelable * onSuccessCallback,
                                                                     Callback::Cancelable * onFailureCallback, uint16_t minInterval,
                                                                     uint16_t maxInterval, uint8_t change)
 {
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle payload =
-        encodeColorControlClusterConfigureCurrentSaturationAttribute(mEndpoint, minInterval, maxInterval, change);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+        encodeColorControlClusterConfigureCurrentSaturationAttribute(seqNum, mEndpoint, minInterval, maxInterval, change);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ReportAttributeCurrentSaturation(Callback::Cancelable * onReportCallback)
@@ -918,24 +958,27 @@ CHIP_ERROR ColorControlCluster::ReportAttributeCurrentSaturation(Callback::Cance
 CHIP_ERROR ColorControlCluster::ReadAttributeRemainingTime(Callback::Cancelable * onSuccessCallback,
                                                            Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeColorControlClusterReadRemainingTimeAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeColorControlClusterReadRemainingTimeAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ReadAttributeCurrentX(Callback::Cancelable * onSuccessCallback,
                                                       Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeColorControlClusterReadCurrentXAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeColorControlClusterReadCurrentXAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ConfigureAttributeCurrentX(Callback::Cancelable * onSuccessCallback,
                                                            Callback::Cancelable * onFailureCallback, uint16_t minInterval,
                                                            uint16_t maxInterval, uint16_t change)
 {
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle payload =
-        encodeColorControlClusterConfigureCurrentXAttribute(mEndpoint, minInterval, maxInterval, change);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+        encodeColorControlClusterConfigureCurrentXAttribute(seqNum, mEndpoint, minInterval, maxInterval, change);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ReportAttributeCurrentX(Callback::Cancelable * onReportCallback)
@@ -946,17 +989,19 @@ CHIP_ERROR ColorControlCluster::ReportAttributeCurrentX(Callback::Cancelable * o
 CHIP_ERROR ColorControlCluster::ReadAttributeCurrentY(Callback::Cancelable * onSuccessCallback,
                                                       Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeColorControlClusterReadCurrentYAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeColorControlClusterReadCurrentYAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ConfigureAttributeCurrentY(Callback::Cancelable * onSuccessCallback,
                                                            Callback::Cancelable * onFailureCallback, uint16_t minInterval,
                                                            uint16_t maxInterval, uint16_t change)
 {
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle payload =
-        encodeColorControlClusterConfigureCurrentYAttribute(mEndpoint, minInterval, maxInterval, change);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+        encodeColorControlClusterConfigureCurrentYAttribute(seqNum, mEndpoint, minInterval, maxInterval, change);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ReportAttributeCurrentY(Callback::Cancelable * onReportCallback)
@@ -967,31 +1012,35 @@ CHIP_ERROR ColorControlCluster::ReportAttributeCurrentY(Callback::Cancelable * o
 CHIP_ERROR ColorControlCluster::ReadAttributeDriftCompensation(Callback::Cancelable * onSuccessCallback,
                                                                Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeColorControlClusterReadDriftCompensationAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeColorControlClusterReadDriftCompensationAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ReadAttributeCompensationText(Callback::Cancelable * onSuccessCallback,
                                                               Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeColorControlClusterReadCompensationTextAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeColorControlClusterReadCompensationTextAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ReadAttributeColorTemperature(Callback::Cancelable * onSuccessCallback,
                                                               Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeColorControlClusterReadColorTemperatureAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeColorControlClusterReadColorTemperatureAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ConfigureAttributeColorTemperature(Callback::Cancelable * onSuccessCallback,
                                                                    Callback::Cancelable * onFailureCallback, uint16_t minInterval,
                                                                    uint16_t maxInterval, uint16_t change)
 {
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle payload =
-        encodeColorControlClusterConfigureColorTemperatureAttribute(mEndpoint, minInterval, maxInterval, change);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+        encodeColorControlClusterConfigureColorTemperatureAttribute(seqNum, mEndpoint, minInterval, maxInterval, change);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ReportAttributeColorTemperature(Callback::Cancelable * onReportCallback)
@@ -1002,394 +1051,451 @@ CHIP_ERROR ColorControlCluster::ReportAttributeColorTemperature(Callback::Cancel
 CHIP_ERROR ColorControlCluster::ReadAttributeColorMode(Callback::Cancelable * onSuccessCallback,
                                                        Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeColorControlClusterReadColorModeAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeColorControlClusterReadColorModeAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ReadAttributeColorControlOptions(Callback::Cancelable * onSuccessCallback,
                                                                  Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeColorControlClusterReadColorControlOptionsAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeColorControlClusterReadColorControlOptionsAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::WriteAttributeColorControlOptions(Callback::Cancelable * onSuccessCallback,
                                                                   Callback::Cancelable * onFailureCallback, uint8_t value)
 {
-    System::PacketBufferHandle payload = encodeColorControlClusterWriteColorControlOptionsAttribute(mEndpoint, value);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeColorControlClusterWriteColorControlOptionsAttribute(seqNum, mEndpoint, value);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ReadAttributeNumberOfPrimaries(Callback::Cancelable * onSuccessCallback,
                                                                Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeColorControlClusterReadNumberOfPrimariesAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeColorControlClusterReadNumberOfPrimariesAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ReadAttributePrimary1X(Callback::Cancelable * onSuccessCallback,
                                                        Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeColorControlClusterReadPrimary1XAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeColorControlClusterReadPrimary1XAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ReadAttributePrimary1Y(Callback::Cancelable * onSuccessCallback,
                                                        Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeColorControlClusterReadPrimary1YAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeColorControlClusterReadPrimary1YAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ReadAttributePrimary1Intensity(Callback::Cancelable * onSuccessCallback,
                                                                Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeColorControlClusterReadPrimary1IntensityAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeColorControlClusterReadPrimary1IntensityAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ReadAttributePrimary2X(Callback::Cancelable * onSuccessCallback,
                                                        Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeColorControlClusterReadPrimary2XAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeColorControlClusterReadPrimary2XAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ReadAttributePrimary2Y(Callback::Cancelable * onSuccessCallback,
                                                        Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeColorControlClusterReadPrimary2YAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeColorControlClusterReadPrimary2YAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ReadAttributePrimary2Intensity(Callback::Cancelable * onSuccessCallback,
                                                                Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeColorControlClusterReadPrimary2IntensityAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeColorControlClusterReadPrimary2IntensityAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ReadAttributePrimary3X(Callback::Cancelable * onSuccessCallback,
                                                        Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeColorControlClusterReadPrimary3XAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeColorControlClusterReadPrimary3XAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ReadAttributePrimary3Y(Callback::Cancelable * onSuccessCallback,
                                                        Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeColorControlClusterReadPrimary3YAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeColorControlClusterReadPrimary3YAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ReadAttributePrimary3Intensity(Callback::Cancelable * onSuccessCallback,
                                                                Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeColorControlClusterReadPrimary3IntensityAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeColorControlClusterReadPrimary3IntensityAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ReadAttributePrimary4X(Callback::Cancelable * onSuccessCallback,
                                                        Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeColorControlClusterReadPrimary4XAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeColorControlClusterReadPrimary4XAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ReadAttributePrimary4Y(Callback::Cancelable * onSuccessCallback,
                                                        Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeColorControlClusterReadPrimary4YAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeColorControlClusterReadPrimary4YAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ReadAttributePrimary4Intensity(Callback::Cancelable * onSuccessCallback,
                                                                Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeColorControlClusterReadPrimary4IntensityAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeColorControlClusterReadPrimary4IntensityAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ReadAttributePrimary5X(Callback::Cancelable * onSuccessCallback,
                                                        Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeColorControlClusterReadPrimary5XAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeColorControlClusterReadPrimary5XAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ReadAttributePrimary5Y(Callback::Cancelable * onSuccessCallback,
                                                        Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeColorControlClusterReadPrimary5YAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeColorControlClusterReadPrimary5YAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ReadAttributePrimary5Intensity(Callback::Cancelable * onSuccessCallback,
                                                                Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeColorControlClusterReadPrimary5IntensityAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeColorControlClusterReadPrimary5IntensityAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ReadAttributePrimary6X(Callback::Cancelable * onSuccessCallback,
                                                        Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeColorControlClusterReadPrimary6XAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeColorControlClusterReadPrimary6XAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ReadAttributePrimary6Y(Callback::Cancelable * onSuccessCallback,
                                                        Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeColorControlClusterReadPrimary6YAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeColorControlClusterReadPrimary6YAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ReadAttributePrimary6Intensity(Callback::Cancelable * onSuccessCallback,
                                                                Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeColorControlClusterReadPrimary6IntensityAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeColorControlClusterReadPrimary6IntensityAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ReadAttributeWhitePointX(Callback::Cancelable * onSuccessCallback,
                                                          Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeColorControlClusterReadWhitePointXAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeColorControlClusterReadWhitePointXAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::WriteAttributeWhitePointX(Callback::Cancelable * onSuccessCallback,
                                                           Callback::Cancelable * onFailureCallback, uint16_t value)
 {
-    System::PacketBufferHandle payload = encodeColorControlClusterWriteWhitePointXAttribute(mEndpoint, value);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeColorControlClusterWriteWhitePointXAttribute(seqNum, mEndpoint, value);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ReadAttributeWhitePointY(Callback::Cancelable * onSuccessCallback,
                                                          Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeColorControlClusterReadWhitePointYAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeColorControlClusterReadWhitePointYAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::WriteAttributeWhitePointY(Callback::Cancelable * onSuccessCallback,
                                                           Callback::Cancelable * onFailureCallback, uint16_t value)
 {
-    System::PacketBufferHandle payload = encodeColorControlClusterWriteWhitePointYAttribute(mEndpoint, value);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeColorControlClusterWriteWhitePointYAttribute(seqNum, mEndpoint, value);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ReadAttributeColorPointRX(Callback::Cancelable * onSuccessCallback,
                                                           Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeColorControlClusterReadColorPointRXAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeColorControlClusterReadColorPointRXAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::WriteAttributeColorPointRX(Callback::Cancelable * onSuccessCallback,
                                                            Callback::Cancelable * onFailureCallback, uint16_t value)
 {
-    System::PacketBufferHandle payload = encodeColorControlClusterWriteColorPointRXAttribute(mEndpoint, value);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeColorControlClusterWriteColorPointRXAttribute(seqNum, mEndpoint, value);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ReadAttributeColorPointRY(Callback::Cancelable * onSuccessCallback,
                                                           Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeColorControlClusterReadColorPointRYAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeColorControlClusterReadColorPointRYAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::WriteAttributeColorPointRY(Callback::Cancelable * onSuccessCallback,
                                                            Callback::Cancelable * onFailureCallback, uint16_t value)
 {
-    System::PacketBufferHandle payload = encodeColorControlClusterWriteColorPointRYAttribute(mEndpoint, value);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeColorControlClusterWriteColorPointRYAttribute(seqNum, mEndpoint, value);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ReadAttributeColorPointRIntensity(Callback::Cancelable * onSuccessCallback,
                                                                   Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeColorControlClusterReadColorPointRIntensityAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeColorControlClusterReadColorPointRIntensityAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::WriteAttributeColorPointRIntensity(Callback::Cancelable * onSuccessCallback,
                                                                    Callback::Cancelable * onFailureCallback, uint8_t value)
 {
-    System::PacketBufferHandle payload = encodeColorControlClusterWriteColorPointRIntensityAttribute(mEndpoint, value);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeColorControlClusterWriteColorPointRIntensityAttribute(seqNum, mEndpoint, value);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ReadAttributeColorPointGX(Callback::Cancelable * onSuccessCallback,
                                                           Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeColorControlClusterReadColorPointGXAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeColorControlClusterReadColorPointGXAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::WriteAttributeColorPointGX(Callback::Cancelable * onSuccessCallback,
                                                            Callback::Cancelable * onFailureCallback, uint16_t value)
 {
-    System::PacketBufferHandle payload = encodeColorControlClusterWriteColorPointGXAttribute(mEndpoint, value);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeColorControlClusterWriteColorPointGXAttribute(seqNum, mEndpoint, value);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ReadAttributeColorPointGY(Callback::Cancelable * onSuccessCallback,
                                                           Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeColorControlClusterReadColorPointGYAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeColorControlClusterReadColorPointGYAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::WriteAttributeColorPointGY(Callback::Cancelable * onSuccessCallback,
                                                            Callback::Cancelable * onFailureCallback, uint16_t value)
 {
-    System::PacketBufferHandle payload = encodeColorControlClusterWriteColorPointGYAttribute(mEndpoint, value);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeColorControlClusterWriteColorPointGYAttribute(seqNum, mEndpoint, value);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ReadAttributeColorPointGIntensity(Callback::Cancelable * onSuccessCallback,
                                                                   Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeColorControlClusterReadColorPointGIntensityAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeColorControlClusterReadColorPointGIntensityAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::WriteAttributeColorPointGIntensity(Callback::Cancelable * onSuccessCallback,
                                                                    Callback::Cancelable * onFailureCallback, uint8_t value)
 {
-    System::PacketBufferHandle payload = encodeColorControlClusterWriteColorPointGIntensityAttribute(mEndpoint, value);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeColorControlClusterWriteColorPointGIntensityAttribute(seqNum, mEndpoint, value);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ReadAttributeColorPointBX(Callback::Cancelable * onSuccessCallback,
                                                           Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeColorControlClusterReadColorPointBXAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeColorControlClusterReadColorPointBXAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::WriteAttributeColorPointBX(Callback::Cancelable * onSuccessCallback,
                                                            Callback::Cancelable * onFailureCallback, uint16_t value)
 {
-    System::PacketBufferHandle payload = encodeColorControlClusterWriteColorPointBXAttribute(mEndpoint, value);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeColorControlClusterWriteColorPointBXAttribute(seqNum, mEndpoint, value);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ReadAttributeColorPointBY(Callback::Cancelable * onSuccessCallback,
                                                           Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeColorControlClusterReadColorPointBYAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeColorControlClusterReadColorPointBYAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::WriteAttributeColorPointBY(Callback::Cancelable * onSuccessCallback,
                                                            Callback::Cancelable * onFailureCallback, uint16_t value)
 {
-    System::PacketBufferHandle payload = encodeColorControlClusterWriteColorPointBYAttribute(mEndpoint, value);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeColorControlClusterWriteColorPointBYAttribute(seqNum, mEndpoint, value);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ReadAttributeColorPointBIntensity(Callback::Cancelable * onSuccessCallback,
                                                                   Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeColorControlClusterReadColorPointBIntensityAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeColorControlClusterReadColorPointBIntensityAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::WriteAttributeColorPointBIntensity(Callback::Cancelable * onSuccessCallback,
                                                                    Callback::Cancelable * onFailureCallback, uint8_t value)
 {
-    System::PacketBufferHandle payload = encodeColorControlClusterWriteColorPointBIntensityAttribute(mEndpoint, value);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeColorControlClusterWriteColorPointBIntensityAttribute(seqNum, mEndpoint, value);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ReadAttributeEnhancedCurrentHue(Callback::Cancelable * onSuccessCallback,
                                                                 Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeColorControlClusterReadEnhancedCurrentHueAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeColorControlClusterReadEnhancedCurrentHueAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ReadAttributeEnhancedColorMode(Callback::Cancelable * onSuccessCallback,
                                                                Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeColorControlClusterReadEnhancedColorModeAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeColorControlClusterReadEnhancedColorModeAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ReadAttributeColorLoopActive(Callback::Cancelable * onSuccessCallback,
                                                              Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeColorControlClusterReadColorLoopActiveAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeColorControlClusterReadColorLoopActiveAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ReadAttributeColorLoopDirection(Callback::Cancelable * onSuccessCallback,
                                                                 Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeColorControlClusterReadColorLoopDirectionAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeColorControlClusterReadColorLoopDirectionAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ReadAttributeColorLoopTime(Callback::Cancelable * onSuccessCallback,
                                                            Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeColorControlClusterReadColorLoopTimeAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeColorControlClusterReadColorLoopTimeAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ReadAttributeColorCapabilities(Callback::Cancelable * onSuccessCallback,
                                                                Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeColorControlClusterReadColorCapabilitiesAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeColorControlClusterReadColorCapabilitiesAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ReadAttributeColorTempPhysicalMin(Callback::Cancelable * onSuccessCallback,
                                                                   Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeColorControlClusterReadColorTempPhysicalMinAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeColorControlClusterReadColorTempPhysicalMinAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ReadAttributeColorTempPhysicalMax(Callback::Cancelable * onSuccessCallback,
                                                                   Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeColorControlClusterReadColorTempPhysicalMaxAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeColorControlClusterReadColorTempPhysicalMaxAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ReadAttributeCoupleColorTempToLevelMinMireds(Callback::Cancelable * onSuccessCallback,
                                                                              Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeColorControlClusterReadCoupleColorTempToLevelMinMiredsAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeColorControlClusterReadCoupleColorTempToLevelMinMiredsAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ReadAttributeStartUpColorTemperatureMireds(Callback::Cancelable * onSuccessCallback,
                                                                            Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeColorControlClusterReadStartUpColorTemperatureMiredsAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeColorControlClusterReadStartUpColorTemperatureMiredsAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::WriteAttributeStartUpColorTemperatureMireds(Callback::Cancelable * onSuccessCallback,
                                                                             Callback::Cancelable * onFailureCallback,
                                                                             uint16_t value)
 {
-    System::PacketBufferHandle payload = encodeColorControlClusterWriteStartUpColorTemperatureMiredsAttribute(mEndpoint, value);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload =
+        encodeColorControlClusterWriteStartUpColorTemperatureMiredsAttribute(seqNum, mEndpoint, value);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                              Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeColorControlClusterReadClusterRevisionAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeColorControlClusterReadClusterRevisionAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 // DoorLock Cluster Commands
@@ -1416,8 +1522,9 @@ CHIP_ERROR DoorLockCluster::ClearAllPins(Callback::Cancelable * onSuccessCallbac
 
     return mDevice->SendCommands();
 #else
-    System::PacketBufferHandle payload = encodeDoorLockClusterClearAllPinsCommand(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeDoorLockClusterClearAllPinsCommand(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 #endif
 }
 
@@ -1444,8 +1551,9 @@ CHIP_ERROR DoorLockCluster::ClearAllRfids(Callback::Cancelable * onSuccessCallba
 
     return mDevice->SendCommands();
 #else
-    System::PacketBufferHandle payload = encodeDoorLockClusterClearAllRfidsCommand(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeDoorLockClusterClearAllRfidsCommand(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 #endif
 }
 
@@ -1475,8 +1583,9 @@ CHIP_ERROR DoorLockCluster::ClearHolidaySchedule(Callback::Cancelable * onSucces
 
     return mDevice->SendCommands();
 #else
-    System::PacketBufferHandle payload = encodeDoorLockClusterClearHolidayScheduleCommand(mEndpoint, scheduleId);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeDoorLockClusterClearHolidayScheduleCommand(seqNum, mEndpoint, scheduleId);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 #endif
 }
 
@@ -1506,8 +1615,9 @@ CHIP_ERROR DoorLockCluster::ClearPin(Callback::Cancelable * onSuccessCallback, C
 
     return mDevice->SendCommands();
 #else
-    System::PacketBufferHandle payload = encodeDoorLockClusterClearPinCommand(mEndpoint, userId);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeDoorLockClusterClearPinCommand(seqNum, mEndpoint, userId);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 #endif
 }
 
@@ -1537,8 +1647,9 @@ CHIP_ERROR DoorLockCluster::ClearRfid(Callback::Cancelable * onSuccessCallback, 
 
     return mDevice->SendCommands();
 #else
-    System::PacketBufferHandle payload = encodeDoorLockClusterClearRfidCommand(mEndpoint, userId);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeDoorLockClusterClearRfidCommand(seqNum, mEndpoint, userId);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 #endif
 }
 
@@ -1570,8 +1681,9 @@ CHIP_ERROR DoorLockCluster::ClearWeekdaySchedule(Callback::Cancelable * onSucces
 
     return mDevice->SendCommands();
 #else
-    System::PacketBufferHandle payload = encodeDoorLockClusterClearWeekdayScheduleCommand(mEndpoint, scheduleId, userId);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeDoorLockClusterClearWeekdayScheduleCommand(seqNum, mEndpoint, scheduleId, userId);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 #endif
 }
 
@@ -1603,8 +1715,9 @@ CHIP_ERROR DoorLockCluster::ClearYeardaySchedule(Callback::Cancelable * onSucces
 
     return mDevice->SendCommands();
 #else
-    System::PacketBufferHandle payload = encodeDoorLockClusterClearYeardayScheduleCommand(mEndpoint, scheduleId, userId);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeDoorLockClusterClearYeardayScheduleCommand(seqNum, mEndpoint, scheduleId, userId);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 #endif
 }
 
@@ -1634,8 +1747,9 @@ CHIP_ERROR DoorLockCluster::GetHolidaySchedule(Callback::Cancelable * onSuccessC
 
     return mDevice->SendCommands();
 #else
-    System::PacketBufferHandle payload = encodeDoorLockClusterGetHolidayScheduleCommand(mEndpoint, scheduleId);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeDoorLockClusterGetHolidayScheduleCommand(seqNum, mEndpoint, scheduleId);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 #endif
 }
 
@@ -1665,8 +1779,9 @@ CHIP_ERROR DoorLockCluster::GetLogRecord(Callback::Cancelable * onSuccessCallbac
 
     return mDevice->SendCommands();
 #else
-    System::PacketBufferHandle payload = encodeDoorLockClusterGetLogRecordCommand(mEndpoint, logIndex);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeDoorLockClusterGetLogRecordCommand(seqNum, mEndpoint, logIndex);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 #endif
 }
 
@@ -1696,8 +1811,9 @@ CHIP_ERROR DoorLockCluster::GetPin(Callback::Cancelable * onSuccessCallback, Cal
 
     return mDevice->SendCommands();
 #else
-    System::PacketBufferHandle payload = encodeDoorLockClusterGetPinCommand(mEndpoint, userId);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeDoorLockClusterGetPinCommand(seqNum, mEndpoint, userId);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 #endif
 }
 
@@ -1727,8 +1843,9 @@ CHIP_ERROR DoorLockCluster::GetRfid(Callback::Cancelable * onSuccessCallback, Ca
 
     return mDevice->SendCommands();
 #else
-    System::PacketBufferHandle payload = encodeDoorLockClusterGetRfidCommand(mEndpoint, userId);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeDoorLockClusterGetRfidCommand(seqNum, mEndpoint, userId);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 #endif
 }
 
@@ -1758,8 +1875,9 @@ CHIP_ERROR DoorLockCluster::GetUserType(Callback::Cancelable * onSuccessCallback
 
     return mDevice->SendCommands();
 #else
-    System::PacketBufferHandle payload = encodeDoorLockClusterGetUserTypeCommand(mEndpoint, userId);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeDoorLockClusterGetUserTypeCommand(seqNum, mEndpoint, userId);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 #endif
 }
 
@@ -1791,8 +1909,9 @@ CHIP_ERROR DoorLockCluster::GetWeekdaySchedule(Callback::Cancelable * onSuccessC
 
     return mDevice->SendCommands();
 #else
-    System::PacketBufferHandle payload = encodeDoorLockClusterGetWeekdayScheduleCommand(mEndpoint, scheduleId, userId);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeDoorLockClusterGetWeekdayScheduleCommand(seqNum, mEndpoint, scheduleId, userId);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 #endif
 }
 
@@ -1824,8 +1943,9 @@ CHIP_ERROR DoorLockCluster::GetYeardaySchedule(Callback::Cancelable * onSuccessC
 
     return mDevice->SendCommands();
 #else
-    System::PacketBufferHandle payload = encodeDoorLockClusterGetYeardayScheduleCommand(mEndpoint, scheduleId, userId);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeDoorLockClusterGetYeardayScheduleCommand(seqNum, mEndpoint, scheduleId, userId);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 #endif
 }
 
@@ -1854,8 +1974,9 @@ CHIP_ERROR DoorLockCluster::LockDoor(Callback::Cancelable * onSuccessCallback, C
 
     return mDevice->SendCommands();
 #else
-    System::PacketBufferHandle payload = encodeDoorLockClusterLockDoorCommand(mEndpoint, pin);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeDoorLockClusterLockDoorCommand(seqNum, mEndpoint, pin);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 #endif
 }
 
@@ -1892,9 +2013,10 @@ CHIP_ERROR DoorLockCluster::SetHolidaySchedule(Callback::Cancelable * onSuccessC
 
     return mDevice->SendCommands();
 #else
-    System::PacketBufferHandle payload = encodeDoorLockClusterSetHolidayScheduleCommand(mEndpoint, scheduleId, localStartTime,
-                                                                                        localEndTime, operatingModeDuringHoliday);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeDoorLockClusterSetHolidayScheduleCommand(
+        seqNum, mEndpoint, scheduleId, localStartTime, localEndTime, operatingModeDuringHoliday);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 #endif
 }
 
@@ -1930,8 +2052,9 @@ CHIP_ERROR DoorLockCluster::SetPin(Callback::Cancelable * onSuccessCallback, Cal
 
     return mDevice->SendCommands();
 #else
-    System::PacketBufferHandle payload = encodeDoorLockClusterSetPinCommand(mEndpoint, userId, userStatus, userType, pin);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeDoorLockClusterSetPinCommand(seqNum, mEndpoint, userId, userStatus, userType, pin);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 #endif
 }
 
@@ -1967,8 +2090,9 @@ CHIP_ERROR DoorLockCluster::SetRfid(Callback::Cancelable * onSuccessCallback, Ca
 
     return mDevice->SendCommands();
 #else
-    System::PacketBufferHandle payload = encodeDoorLockClusterSetRfidCommand(mEndpoint, userId, userStatus, userType, id);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeDoorLockClusterSetRfidCommand(seqNum, mEndpoint, userId, userStatus, userType, id);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 #endif
 }
 
@@ -2000,8 +2124,9 @@ CHIP_ERROR DoorLockCluster::SetUserType(Callback::Cancelable * onSuccessCallback
 
     return mDevice->SendCommands();
 #else
-    System::PacketBufferHandle payload = encodeDoorLockClusterSetUserTypeCommand(mEndpoint, userId, userType);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeDoorLockClusterSetUserTypeCommand(seqNum, mEndpoint, userId, userType);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 #endif
 }
 
@@ -2044,9 +2169,10 @@ CHIP_ERROR DoorLockCluster::SetWeekdaySchedule(Callback::Cancelable * onSuccessC
 
     return mDevice->SendCommands();
 #else
-    System::PacketBufferHandle payload = encodeDoorLockClusterSetWeekdayScheduleCommand(mEndpoint, scheduleId, userId, daysMask,
-                                                                                        startHour, startMinute, endHour, endMinute);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeDoorLockClusterSetWeekdayScheduleCommand(
+        seqNum, mEndpoint, scheduleId, userId, daysMask, startHour, startMinute, endHour, endMinute);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 #endif
 }
 
@@ -2082,9 +2208,10 @@ CHIP_ERROR DoorLockCluster::SetYeardaySchedule(Callback::Cancelable * onSuccessC
 
     return mDevice->SendCommands();
 #else
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle payload =
-        encodeDoorLockClusterSetYeardayScheduleCommand(mEndpoint, scheduleId, userId, localStartTime, localEndTime);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+        encodeDoorLockClusterSetYeardayScheduleCommand(seqNum, mEndpoint, scheduleId, userId, localStartTime, localEndTime);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 #endif
 }
 
@@ -2114,8 +2241,9 @@ CHIP_ERROR DoorLockCluster::UnlockDoor(Callback::Cancelable * onSuccessCallback,
 
     return mDevice->SendCommands();
 #else
-    System::PacketBufferHandle payload = encodeDoorLockClusterUnlockDoorCommand(mEndpoint, pin);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeDoorLockClusterUnlockDoorCommand(seqNum, mEndpoint, pin);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 #endif
 }
 
@@ -2147,30 +2275,35 @@ CHIP_ERROR DoorLockCluster::UnlockWithTimeout(Callback::Cancelable * onSuccessCa
 
     return mDevice->SendCommands();
 #else
-    System::PacketBufferHandle payload = encodeDoorLockClusterUnlockWithTimeoutCommand(mEndpoint, timeoutInSeconds, pin);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeDoorLockClusterUnlockWithTimeoutCommand(seqNum, mEndpoint, timeoutInSeconds, pin);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 #endif
 }
 
 // DoorLock Cluster Attributes
 CHIP_ERROR DoorLockCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeDoorLockClusterDiscoverAttributes(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeDoorLockClusterDiscoverAttributes(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 CHIP_ERROR DoorLockCluster::ReadAttributeLockState(Callback::Cancelable * onSuccessCallback,
                                                    Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeDoorLockClusterReadLockStateAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeDoorLockClusterReadLockStateAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR DoorLockCluster::ConfigureAttributeLockState(Callback::Cancelable * onSuccessCallback,
                                                         Callback::Cancelable * onFailureCallback, uint16_t minInterval,
                                                         uint16_t maxInterval)
 {
-    System::PacketBufferHandle payload = encodeDoorLockClusterConfigureLockStateAttribute(mEndpoint, minInterval, maxInterval);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload =
+        encodeDoorLockClusterConfigureLockStateAttribute(seqNum, mEndpoint, minInterval, maxInterval);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR DoorLockCluster::ReportAttributeLockState(Callback::Cancelable * onReportCallback)
@@ -2181,22 +2314,25 @@ CHIP_ERROR DoorLockCluster::ReportAttributeLockState(Callback::Cancelable * onRe
 CHIP_ERROR DoorLockCluster::ReadAttributeLockType(Callback::Cancelable * onSuccessCallback,
                                                   Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeDoorLockClusterReadLockTypeAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeDoorLockClusterReadLockTypeAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR DoorLockCluster::ReadAttributeActuatorEnabled(Callback::Cancelable * onSuccessCallback,
                                                          Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeDoorLockClusterReadActuatorEnabledAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeDoorLockClusterReadActuatorEnabledAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR DoorLockCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                          Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeDoorLockClusterReadClusterRevisionAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeDoorLockClusterReadClusterRevisionAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 // Groups Cluster Commands
@@ -2228,8 +2364,9 @@ CHIP_ERROR GroupsCluster::AddGroup(Callback::Cancelable * onSuccessCallback, Cal
 
     return mDevice->SendCommands();
 #else
-    System::PacketBufferHandle payload = encodeGroupsClusterAddGroupCommand(mEndpoint, groupId, groupName);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeGroupsClusterAddGroupCommand(seqNum, mEndpoint, groupId, groupName);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 #endif
 }
 
@@ -2261,8 +2398,9 @@ CHIP_ERROR GroupsCluster::AddGroupIfIdentifying(Callback::Cancelable * onSuccess
 
     return mDevice->SendCommands();
 #else
-    System::PacketBufferHandle payload = encodeGroupsClusterAddGroupIfIdentifyingCommand(mEndpoint, groupId, groupName);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeGroupsClusterAddGroupIfIdentifyingCommand(seqNum, mEndpoint, groupId, groupName);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 #endif
 }
 
@@ -2294,8 +2432,9 @@ CHIP_ERROR GroupsCluster::GetGroupMembership(Callback::Cancelable * onSuccessCal
 
     return mDevice->SendCommands();
 #else
-    System::PacketBufferHandle payload = encodeGroupsClusterGetGroupMembershipCommand(mEndpoint, groupCount, groupList);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeGroupsClusterGetGroupMembershipCommand(seqNum, mEndpoint, groupCount, groupList);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 #endif
 }
 
@@ -2322,8 +2461,9 @@ CHIP_ERROR GroupsCluster::RemoveAllGroups(Callback::Cancelable * onSuccessCallba
 
     return mDevice->SendCommands();
 #else
-    System::PacketBufferHandle payload = encodeGroupsClusterRemoveAllGroupsCommand(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeGroupsClusterRemoveAllGroupsCommand(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 #endif
 }
 
@@ -2353,8 +2493,9 @@ CHIP_ERROR GroupsCluster::RemoveGroup(Callback::Cancelable * onSuccessCallback, 
 
     return mDevice->SendCommands();
 #else
-    System::PacketBufferHandle payload = encodeGroupsClusterRemoveGroupCommand(mEndpoint, groupId);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeGroupsClusterRemoveGroupCommand(seqNum, mEndpoint, groupId);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 #endif
 }
 
@@ -2384,83 +2525,95 @@ CHIP_ERROR GroupsCluster::ViewGroup(Callback::Cancelable * onSuccessCallback, Ca
 
     return mDevice->SendCommands();
 #else
-    System::PacketBufferHandle payload = encodeGroupsClusterViewGroupCommand(mEndpoint, groupId);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeGroupsClusterViewGroupCommand(seqNum, mEndpoint, groupId);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 #endif
 }
 
 // Groups Cluster Attributes
 CHIP_ERROR GroupsCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeGroupsClusterDiscoverAttributes(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeGroupsClusterDiscoverAttributes(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 CHIP_ERROR GroupsCluster::ReadAttributeNameSupport(Callback::Cancelable * onSuccessCallback,
                                                    Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeGroupsClusterReadNameSupportAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeGroupsClusterReadNameSupportAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR GroupsCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                        Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeGroupsClusterReadClusterRevisionAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeGroupsClusterReadClusterRevisionAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 // IasZone Cluster Commands
 // IasZone Cluster Attributes
 CHIP_ERROR IasZoneCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeIasZoneClusterDiscoverAttributes(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeIasZoneClusterDiscoverAttributes(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 CHIP_ERROR IasZoneCluster::ReadAttributeZoneState(Callback::Cancelable * onSuccessCallback,
                                                   Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeIasZoneClusterReadZoneStateAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeIasZoneClusterReadZoneStateAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR IasZoneCluster::ReadAttributeZoneType(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeIasZoneClusterReadZoneTypeAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeIasZoneClusterReadZoneTypeAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR IasZoneCluster::ReadAttributeZoneStatus(Callback::Cancelable * onSuccessCallback,
                                                    Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeIasZoneClusterReadZoneStatusAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeIasZoneClusterReadZoneStatusAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR IasZoneCluster::ReadAttributeIasCieAddress(Callback::Cancelable * onSuccessCallback,
                                                       Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeIasZoneClusterReadIasCieAddressAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeIasZoneClusterReadIasCieAddressAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR IasZoneCluster::WriteAttributeIasCieAddress(Callback::Cancelable * onSuccessCallback,
                                                        Callback::Cancelable * onFailureCallback, uint64_t value)
 {
-    System::PacketBufferHandle payload = encodeIasZoneClusterWriteIasCieAddressAttribute(mEndpoint, value);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeIasZoneClusterWriteIasCieAddressAttribute(seqNum, mEndpoint, value);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR IasZoneCluster::ReadAttributeZoneId(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeIasZoneClusterReadZoneIdAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeIasZoneClusterReadZoneIdAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR IasZoneCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                         Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeIasZoneClusterReadClusterRevisionAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeIasZoneClusterReadClusterRevisionAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 // Identify Cluster Commands
@@ -2490,8 +2643,9 @@ CHIP_ERROR IdentifyCluster::Identify(Callback::Cancelable * onSuccessCallback, C
 
     return mDevice->SendCommands();
 #else
-    System::PacketBufferHandle payload = encodeIdentifyClusterIdentifyCommand(mEndpoint, identifyTime);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeIdentifyClusterIdentifyCommand(seqNum, mEndpoint, identifyTime);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 #endif
 }
 
@@ -2518,36 +2672,41 @@ CHIP_ERROR IdentifyCluster::IdentifyQuery(Callback::Cancelable * onSuccessCallba
 
     return mDevice->SendCommands();
 #else
-    System::PacketBufferHandle payload = encodeIdentifyClusterIdentifyQueryCommand(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeIdentifyClusterIdentifyQueryCommand(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 #endif
 }
 
 // Identify Cluster Attributes
 CHIP_ERROR IdentifyCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeIdentifyClusterDiscoverAttributes(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeIdentifyClusterDiscoverAttributes(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 CHIP_ERROR IdentifyCluster::ReadAttributeIdentifyTime(Callback::Cancelable * onSuccessCallback,
                                                       Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeIdentifyClusterReadIdentifyTimeAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeIdentifyClusterReadIdentifyTimeAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR IdentifyCluster::WriteAttributeIdentifyTime(Callback::Cancelable * onSuccessCallback,
                                                        Callback::Cancelable * onFailureCallback, uint16_t value)
 {
-    System::PacketBufferHandle payload = encodeIdentifyClusterWriteIdentifyTimeAttribute(mEndpoint, value);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeIdentifyClusterWriteIdentifyTimeAttribute(seqNum, mEndpoint, value);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR IdentifyCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                          Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeIdentifyClusterReadClusterRevisionAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeIdentifyClusterReadClusterRevisionAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 // LevelControl Cluster Commands
@@ -2583,9 +2742,10 @@ CHIP_ERROR LevelControlCluster::Move(Callback::Cancelable * onSuccessCallback, C
 
     return mDevice->SendCommands();
 #else
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle payload =
-        encodeLevelControlClusterMoveCommand(mEndpoint, moveMode, rate, optionMask, optionOverride);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+        encodeLevelControlClusterMoveCommand(seqNum, mEndpoint, moveMode, rate, optionMask, optionOverride);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 #endif
 }
 
@@ -2621,9 +2781,10 @@ CHIP_ERROR LevelControlCluster::MoveToLevel(Callback::Cancelable * onSuccessCall
 
     return mDevice->SendCommands();
 #else
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle payload =
-        encodeLevelControlClusterMoveToLevelCommand(mEndpoint, level, transitionTime, optionMask, optionOverride);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+        encodeLevelControlClusterMoveToLevelCommand(seqNum, mEndpoint, level, transitionTime, optionMask, optionOverride);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 #endif
 }
 
@@ -2656,8 +2817,10 @@ CHIP_ERROR LevelControlCluster::MoveToLevelWithOnOff(Callback::Cancelable * onSu
 
     return mDevice->SendCommands();
 #else
-    System::PacketBufferHandle payload = encodeLevelControlClusterMoveToLevelWithOnOffCommand(mEndpoint, level, transitionTime);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload =
+        encodeLevelControlClusterMoveToLevelWithOnOffCommand(seqNum, mEndpoint, level, transitionTime);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 #endif
 }
 
@@ -2689,8 +2852,9 @@ CHIP_ERROR LevelControlCluster::MoveWithOnOff(Callback::Cancelable * onSuccessCa
 
     return mDevice->SendCommands();
 #else
-    System::PacketBufferHandle payload = encodeLevelControlClusterMoveWithOnOffCommand(mEndpoint, moveMode, rate);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeLevelControlClusterMoveWithOnOffCommand(seqNum, mEndpoint, moveMode, rate);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 #endif
 }
 
@@ -2729,9 +2893,10 @@ CHIP_ERROR LevelControlCluster::Step(Callback::Cancelable * onSuccessCallback, C
 
     return mDevice->SendCommands();
 #else
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle payload =
-        encodeLevelControlClusterStepCommand(mEndpoint, stepMode, stepSize, transitionTime, optionMask, optionOverride);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+        encodeLevelControlClusterStepCommand(seqNum, mEndpoint, stepMode, stepSize, transitionTime, optionMask, optionOverride);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 #endif
 }
 
@@ -2765,9 +2930,10 @@ CHIP_ERROR LevelControlCluster::StepWithOnOff(Callback::Cancelable * onSuccessCa
 
     return mDevice->SendCommands();
 #else
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle payload =
-        encodeLevelControlClusterStepWithOnOffCommand(mEndpoint, stepMode, stepSize, transitionTime);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+        encodeLevelControlClusterStepWithOnOffCommand(seqNum, mEndpoint, stepMode, stepSize, transitionTime);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 #endif
 }
 
@@ -2799,8 +2965,9 @@ CHIP_ERROR LevelControlCluster::Stop(Callback::Cancelable * onSuccessCallback, C
 
     return mDevice->SendCommands();
 #else
-    System::PacketBufferHandle payload = encodeLevelControlClusterStopCommand(mEndpoint, optionMask, optionOverride);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeLevelControlClusterStopCommand(seqNum, mEndpoint, optionMask, optionOverride);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 #endif
 }
 
@@ -2827,8 +2994,9 @@ CHIP_ERROR LevelControlCluster::StopWithOnOff(Callback::Cancelable * onSuccessCa
 
     return mDevice->SendCommands();
 #else
-    System::PacketBufferHandle payload = encodeLevelControlClusterStopWithOnOffCommand(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeLevelControlClusterStopWithOnOffCommand(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 #endif
 }
 
@@ -2836,23 +3004,26 @@ CHIP_ERROR LevelControlCluster::StopWithOnOff(Callback::Cancelable * onSuccessCa
 CHIP_ERROR LevelControlCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
                                                    Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeLevelControlClusterDiscoverAttributes(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeLevelControlClusterDiscoverAttributes(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 CHIP_ERROR LevelControlCluster::ReadAttributeCurrentLevel(Callback::Cancelable * onSuccessCallback,
                                                           Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeLevelControlClusterReadCurrentLevelAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeLevelControlClusterReadCurrentLevelAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR LevelControlCluster::ConfigureAttributeCurrentLevel(Callback::Cancelable * onSuccessCallback,
                                                                Callback::Cancelable * onFailureCallback, uint16_t minInterval,
                                                                uint16_t maxInterval, uint8_t change)
 {
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle payload =
-        encodeLevelControlClusterConfigureCurrentLevelAttribute(mEndpoint, minInterval, maxInterval, change);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+        encodeLevelControlClusterConfigureCurrentLevelAttribute(seqNum, mEndpoint, minInterval, maxInterval, change);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR LevelControlCluster::ReportAttributeCurrentLevel(Callback::Cancelable * onReportCallback)
@@ -2863,8 +3034,9 @@ CHIP_ERROR LevelControlCluster::ReportAttributeCurrentLevel(Callback::Cancelable
 CHIP_ERROR LevelControlCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                              Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeLevelControlClusterReadClusterRevisionAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeLevelControlClusterReadClusterRevisionAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 // OnOff Cluster Commands
@@ -2891,8 +3063,9 @@ CHIP_ERROR OnOffCluster::Off(Callback::Cancelable * onSuccessCallback, Callback:
 
     return mDevice->SendCommands();
 #else
-    System::PacketBufferHandle payload = encodeOnOffClusterOffCommand(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeOnOffClusterOffCommand(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 #endif
 }
 
@@ -2919,8 +3092,9 @@ CHIP_ERROR OnOffCluster::On(Callback::Cancelable * onSuccessCallback, Callback::
 
     return mDevice->SendCommands();
 #else
-    System::PacketBufferHandle payload = encodeOnOffClusterOnCommand(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeOnOffClusterOnCommand(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 #endif
 }
 
@@ -2947,28 +3121,32 @@ CHIP_ERROR OnOffCluster::Toggle(Callback::Cancelable * onSuccessCallback, Callba
 
     return mDevice->SendCommands();
 #else
-    System::PacketBufferHandle payload = encodeOnOffClusterToggleCommand(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeOnOffClusterToggleCommand(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 #endif
 }
 
 // OnOff Cluster Attributes
 CHIP_ERROR OnOffCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeOnOffClusterDiscoverAttributes(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeOnOffClusterDiscoverAttributes(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 CHIP_ERROR OnOffCluster::ReadAttributeOnOff(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeOnOffClusterReadOnOffAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeOnOffClusterReadOnOffAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR OnOffCluster::ConfigureAttributeOnOff(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                                  uint16_t minInterval, uint16_t maxInterval)
 {
-    System::PacketBufferHandle payload = encodeOnOffClusterConfigureOnOffAttribute(mEndpoint, minInterval, maxInterval);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeOnOffClusterConfigureOnOffAttribute(seqNum, mEndpoint, minInterval, maxInterval);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR OnOffCluster::ReportAttributeOnOff(Callback::Cancelable * onReportCallback)
@@ -2979,8 +3157,9 @@ CHIP_ERROR OnOffCluster::ReportAttributeOnOff(Callback::Cancelable * onReportCal
 CHIP_ERROR OnOffCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                       Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeOnOffClusterReadClusterRevisionAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeOnOffClusterReadClusterRevisionAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 // Scenes Cluster Commands
@@ -3023,9 +3202,10 @@ CHIP_ERROR ScenesCluster::AddScene(Callback::Cancelable * onSuccessCallback, Cal
 
     return mDevice->SendCommands();
 #else
-    System::PacketBufferHandle payload =
-        encodeScenesClusterAddSceneCommand(mEndpoint, groupId, sceneId, transitionTime, sceneName, clusterId, length, value);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeScenesClusterAddSceneCommand(seqNum, mEndpoint, groupId, sceneId, transitionTime,
+                                                                            sceneName, clusterId, length, value);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 #endif
 }
 
@@ -3055,8 +3235,9 @@ CHIP_ERROR ScenesCluster::GetSceneMembership(Callback::Cancelable * onSuccessCal
 
     return mDevice->SendCommands();
 #else
-    System::PacketBufferHandle payload = encodeScenesClusterGetSceneMembershipCommand(mEndpoint, groupId);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeScenesClusterGetSceneMembershipCommand(seqNum, mEndpoint, groupId);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 #endif
 }
 
@@ -3090,8 +3271,9 @@ CHIP_ERROR ScenesCluster::RecallScene(Callback::Cancelable * onSuccessCallback, 
 
     return mDevice->SendCommands();
 #else
-    System::PacketBufferHandle payload = encodeScenesClusterRecallSceneCommand(mEndpoint, groupId, sceneId, transitionTime);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeScenesClusterRecallSceneCommand(seqNum, mEndpoint, groupId, sceneId, transitionTime);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 #endif
 }
 
@@ -3121,8 +3303,9 @@ CHIP_ERROR ScenesCluster::RemoveAllScenes(Callback::Cancelable * onSuccessCallba
 
     return mDevice->SendCommands();
 #else
-    System::PacketBufferHandle payload = encodeScenesClusterRemoveAllScenesCommand(mEndpoint, groupId);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeScenesClusterRemoveAllScenesCommand(seqNum, mEndpoint, groupId);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 #endif
 }
 
@@ -3154,8 +3337,9 @@ CHIP_ERROR ScenesCluster::RemoveScene(Callback::Cancelable * onSuccessCallback, 
 
     return mDevice->SendCommands();
 #else
-    System::PacketBufferHandle payload = encodeScenesClusterRemoveSceneCommand(mEndpoint, groupId, sceneId);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeScenesClusterRemoveSceneCommand(seqNum, mEndpoint, groupId, sceneId);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 #endif
 }
 
@@ -3187,8 +3371,9 @@ CHIP_ERROR ScenesCluster::StoreScene(Callback::Cancelable * onSuccessCallback, C
 
     return mDevice->SendCommands();
 #else
-    System::PacketBufferHandle payload = encodeScenesClusterStoreSceneCommand(mEndpoint, groupId, sceneId);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeScenesClusterStoreSceneCommand(seqNum, mEndpoint, groupId, sceneId);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 #endif
 }
 
@@ -3220,57 +3405,65 @@ CHIP_ERROR ScenesCluster::ViewScene(Callback::Cancelable * onSuccessCallback, Ca
 
     return mDevice->SendCommands();
 #else
-    System::PacketBufferHandle payload = encodeScenesClusterViewSceneCommand(mEndpoint, groupId, sceneId);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeScenesClusterViewSceneCommand(seqNum, mEndpoint, groupId, sceneId);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 #endif
 }
 
 // Scenes Cluster Attributes
 CHIP_ERROR ScenesCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeScenesClusterDiscoverAttributes(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeScenesClusterDiscoverAttributes(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 CHIP_ERROR ScenesCluster::ReadAttributeSceneCount(Callback::Cancelable * onSuccessCallback,
                                                   Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeScenesClusterReadSceneCountAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeScenesClusterReadSceneCountAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ScenesCluster::ReadAttributeCurrentScene(Callback::Cancelable * onSuccessCallback,
                                                     Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeScenesClusterReadCurrentSceneAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeScenesClusterReadCurrentSceneAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ScenesCluster::ReadAttributeCurrentGroup(Callback::Cancelable * onSuccessCallback,
                                                     Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeScenesClusterReadCurrentGroupAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeScenesClusterReadCurrentGroupAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ScenesCluster::ReadAttributeSceneValid(Callback::Cancelable * onSuccessCallback,
                                                   Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeScenesClusterReadSceneValidAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeScenesClusterReadSceneValidAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ScenesCluster::ReadAttributeNameSupport(Callback::Cancelable * onSuccessCallback,
                                                    Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeScenesClusterReadNameSupportAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeScenesClusterReadNameSupportAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ScenesCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                        Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeScenesClusterReadClusterRevisionAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeScenesClusterReadClusterRevisionAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 // TemperatureMeasurement Cluster Commands
@@ -3278,14 +3471,16 @@ CHIP_ERROR ScenesCluster::ReadAttributeClusterRevision(Callback::Cancelable * on
 CHIP_ERROR TemperatureMeasurementCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
                                                              Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeTemperatureMeasurementClusterDiscoverAttributes(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeTemperatureMeasurementClusterDiscoverAttributes(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 CHIP_ERROR TemperatureMeasurementCluster::ReadAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback,
                                                                      Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeTemperatureMeasurementClusterReadMeasuredValueAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeTemperatureMeasurementClusterReadMeasuredValueAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR TemperatureMeasurementCluster::ConfigureAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback,
@@ -3293,9 +3488,10 @@ CHIP_ERROR TemperatureMeasurementCluster::ConfigureAttributeMeasuredValue(Callba
                                                                           uint16_t minInterval, uint16_t maxInterval,
                                                                           int16_t change)
 {
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle payload =
-        encodeTemperatureMeasurementClusterConfigureMeasuredValueAttribute(mEndpoint, minInterval, maxInterval, change);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+        encodeTemperatureMeasurementClusterConfigureMeasuredValueAttribute(seqNum, mEndpoint, minInterval, maxInterval, change);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR TemperatureMeasurementCluster::ReportAttributeMeasuredValue(Callback::Cancelable * onReportCallback)
@@ -3306,22 +3502,25 @@ CHIP_ERROR TemperatureMeasurementCluster::ReportAttributeMeasuredValue(Callback:
 CHIP_ERROR TemperatureMeasurementCluster::ReadAttributeMinMeasuredValue(Callback::Cancelable * onSuccessCallback,
                                                                         Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeTemperatureMeasurementClusterReadMinMeasuredValueAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeTemperatureMeasurementClusterReadMinMeasuredValueAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR TemperatureMeasurementCluster::ReadAttributeMaxMeasuredValue(Callback::Cancelable * onSuccessCallback,
                                                                         Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeTemperatureMeasurementClusterReadMaxMeasuredValueAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeTemperatureMeasurementClusterReadMaxMeasuredValueAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR TemperatureMeasurementCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                                        Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encodeTemperatureMeasurementClusterReadClusterRevisionAttribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encodeTemperatureMeasurementClusterReadClusterRevisionAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 } // namespace Controller

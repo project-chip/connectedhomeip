@@ -50,11 +50,12 @@ protected:
      *   Send the command, contained into the associate buffer, to the device. Add a callback
      *   handler, that'll be called when the response is received from the device.
      *
+     * @param[in] seqNum            The sequence number identifier of the command
      * @param[in] payload           The payload of the encoded command
      * @param[in] successHandler    The handler function that's called on receiving command response success
      * @param[in] failureHandler    The handler function that's called on receiving command response failure
      */
-    CHIP_ERROR SendCommand(chip::System::PacketBufferHandle payload, Callback::Cancelable * successHandler,
+    CHIP_ERROR SendCommand(uint8_t seqNum, chip::System::PacketBufferHandle payload, Callback::Cancelable * successHandler,
                            Callback::Cancelable * failureHandler);
 
     /**

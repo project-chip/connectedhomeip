@@ -50,8 +50,9 @@ CHIP_ERROR {{asCamelCased clusterName false}}Cluster::{{asCamelCased name false}
 
     return mDevice->SendCommands();
 #else
-    System::PacketBufferHandle payload = encode{{asCamelCased clusterName false}}Cluster{{asType name}}Command(mEndpoint{{#chip_server_cluster_command_arguments}}, {{asCamelCased label}}{{/chip_server_cluster_command_arguments}});
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encode{{asCamelCased clusterName false}}Cluster{{asType name}}Command(seqNum, mEndpoint{{#chip_server_cluster_command_arguments}}, {{asCamelCased label}}{{/chip_server_cluster_command_arguments}});
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 #endif
 }
 
@@ -59,29 +60,33 @@ CHIP_ERROR {{asCamelCased clusterName false}}Cluster::{{asCamelCased name false}
 // {{asCamelCased name false}} Cluster Attributes
 CHIP_ERROR {{asCamelCased name false}}Cluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encode{{asCamelCased name false}}ClusterDiscoverAttributes(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encode{{asCamelCased name false}}ClusterDiscoverAttributes(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 {{#chip_server_cluster_attributes}}
 CHIP_ERROR {{asCamelCased parent.name false}}Cluster::ReadAttribute{{asCamelCased name false}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    System::PacketBufferHandle payload = encode{{asCamelCased parent.name false}}ClusterRead{{asCamelCased name false}}Attribute(mEndpoint);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encode{{asCamelCased parent.name false}}ClusterRead{{asCamelCased name false}}Attribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 {{#if (isWritableAttribute)}}
 CHIP_ERROR {{asCamelCased parent.name false}}Cluster::WriteAttribute{{asCamelCased name false}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, {{asUnderlyingZclType type}} value)
 {
-    System::PacketBufferHandle payload = encode{{asCamelCased parent.name false}}ClusterWrite{{asCamelCased name false}}Attribute(mEndpoint, value);
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encode{{asCamelCased parent.name false}}ClusterWrite{{asCamelCased name false}}Attribute(seqNum, mEndpoint, value);
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 {{/if}}
 {{#if (isReportableAttribute)}}
 CHIP_ERROR {{asCamelCased parent.name false}}Cluster::ConfigureAttribute{{asCamelCased name false}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t minInterval, uint16_t maxInterval{{#unless (isDiscreteType)}}, {{chipType}} change{{/unless}})
 {
-    System::PacketBufferHandle payload = encode{{asCamelCased parent.name false}}ClusterConfigure{{asCamelCased name false}}Attribute(mEndpoint, minInterval, maxInterval{{#unless (isDiscreteType)}}, change{{/unless}});
-    return SendCommand(std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle payload = encode{{asCamelCased parent.name false}}ClusterConfigure{{asCamelCased name false}}Attribute(seqNum, mEndpoint, minInterval, maxInterval{{#unless (isDiscreteType)}}, change{{/unless}});
+    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR {{asCamelCased parent.name false}}Cluster::ReportAttribute{{asCamelCased name false}}(Callback::Cancelable * onReportCallback)

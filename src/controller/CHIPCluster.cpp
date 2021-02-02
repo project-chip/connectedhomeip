@@ -44,8 +44,8 @@ void ClusterBase::Dissociate()
     mDevice = nullptr;
 }
 
-CHIP_ERROR ClusterBase::SendCommand(chip::System::PacketBufferHandle payload, Callback::Cancelable * onSuccessCallback,
-                                    Callback::Cancelable * onFailureCallback)
+CHIP_ERROR ClusterBase::SendCommand(uint8_t seqNum, chip::System::PacketBufferHandle payload,
+                                    Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -57,7 +57,7 @@ CHIP_ERROR ClusterBase::SendCommand(chip::System::PacketBufferHandle payload, Ca
 
     if (onSuccessCallback != nullptr || onFailureCallback != nullptr)
     {
-        mDevice->AddResponseHandler(onSuccessCallback, onFailureCallback);
+        mDevice->AddResponseHandler(seqNum, onSuccessCallback, onFailureCallback);
     }
 
 exit:
@@ -69,8 +69,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR ClusterBase::RequestAttributeReporting(AttributeId attributeId,
-                                                  Callback::Cancelable * onReportCallback)
+CHIP_ERROR ClusterBase::RequestAttributeReporting(AttributeId attributeId, Callback::Cancelable * onReportCallback)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
