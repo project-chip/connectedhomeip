@@ -83,7 +83,7 @@
     UIView * groupIDView = [CHIPUIViewUtils viewWithLabel:groupIDLabel textField:_groupIDTextField];
     [stackView addArrangedSubview:groupIDView];
     [groupIDView.trailingAnchor constraintEqualToAnchor:stackView.trailingAnchor].active = YES;
-    
+
     // endpointID entry
     UILabel * endpointIDLabel = [UILabel new];
     endpointIDLabel.text = @"Endpoint ID";
@@ -109,7 +109,7 @@
     [bindButton addTarget:self action:@selector(bind:) forControlEvents:UIControlEventTouchUpInside];
     [unbindButton addTarget:self action:@selector(unbind:) forControlEvents:UIControlEventTouchUpInside];
     UIStackView *stackViewButtons = [CHIPUIViewUtils stackViewWithButtons:@[bindButton, unbindButton]];
-    
+
     [stackView addArrangedSubview:stackViewButtons];
     [stackViewButtons.trailingAnchor constraintEqualToAnchor:stackView.trailingAnchor].active = YES;
 }
@@ -128,7 +128,7 @@
 {
     [self _clearTextFields];
     // TODO: Call binding API
-    
+
 }
 
 - (IBAction)unbind:(id)sender
