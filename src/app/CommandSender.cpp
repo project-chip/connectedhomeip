@@ -45,8 +45,7 @@ CHIP_ERROR CommandSender::SendCommandRequest(NodeId aNodeId)
     VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
     mpExchangeCtx->SetResponseTimeout(CHIP_INVOKE_COMMAND_RSP_TIMEOUT);
 
-    err = mpExchangeCtx->SendMessage(Protocols::kProtocol_InteractionModel, kMsgType_InvokeCommandRequest,
-                                     std::move(mCommandMessageBuf),
+    err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::InvokeCommandRequest, std::move(mCommandMessageBuf),
                                      Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
     SuccessOrExit(err);
     MoveToState(kState_Sending);
@@ -61,8 +60,8 @@ exit:
     return err;
 }
 
-void CommandSender::OnMessageReceived(Messaging::ExchangeContext * apEc, const PacketHeader & aPacketHeader, uint32_t aProtocolId,
-                                      uint8_t aMsgType, System::PacketBufferHandle aPayload)
+void CommandSender::OnMessageReceived(Messaging::ExchangeContext * apEc, const PacketHeader & aPacketHeader,
+                                      const PayloadHeader & aPayloadHeader, System::PacketBufferHandle aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     // Assert that the exchange context matches the client's current context.
@@ -74,7 +73,7 @@ void CommandSender::OnMessageReceived(Messaging::ExchangeContext * apEc, const P
 
     // Verify that the message is an Invoke Command Response.
     // If not, close the exchange and free the payload.
-    if (aProtocolId != Protocols::kProtocol_InteractionModel || aMsgType != kMsgType_InvokeCommandResponse)
+    if (!aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::InvokeCommandResponse))
     {
         apEc->Close();
         mpExchangeCtx = nullptr;
