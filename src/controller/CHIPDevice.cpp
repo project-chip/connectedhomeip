@@ -259,12 +259,13 @@ bool Device::GetIpAddress(Inet::IPAddress & addr) const
     return true;
 }
 
-void Device::AddResponseHandler(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+void Device::AddResponseHandler(uint8_t seqNum, Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    mCallbacksMgr.AddResponseCallback(mDeviceId, 0, onSuccessCallback, onFailureCallback);
+    mCallbacksMgr.AddResponseCallback(mDeviceId, seqNum, onSuccessCallback, onFailureCallback);
 }
 
-void Device::AddReportHandler(EndpointId endpoint, ClusterId cluster, AttributeId attribute, Callback::Cancelable * onReportCallback)
+void Device::AddReportHandler(EndpointId endpoint, ClusterId cluster, AttributeId attribute,
+                              Callback::Cancelable * onReportCallback)
 {
     mCallbacksMgr.AddReportCallback(mDeviceId, endpoint, cluster, attribute, onReportCallback);
 }

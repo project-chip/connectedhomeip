@@ -252,7 +252,8 @@ public:
 
     PASESessionSerializable & GetPairing() { return mPairing; }
 
-    void AddResponseHandler(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    uint8_t GetNextSequenceNumber() { return mSequenceNumber++; };
+    void AddResponseHandler(uint8_t seqNum, Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     void AddReportHandler(EndpointId endpoint, ClusterId cluster, AttributeId attribute, Callback::Cancelable * onReportCallback);
 
 private:

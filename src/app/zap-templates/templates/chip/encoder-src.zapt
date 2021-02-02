@@ -112,9 +112,6 @@ constexpr uint8_t kFrameControlGlobalCommand = 0x00;
 // Pick source endpoint as 1 for now
 constexpr EndpointId kSourceEndpoint = 1;
 
-// Transaction sequence number. Just pick something for now.
-constexpr uint8_t kSeqNum = 1;
-
 {{#chip_server_clusters}}
 {{> cluster_header}}
 
@@ -122,7 +119,7 @@ constexpr uint8_t kSeqNum = 1;
 /*
  * Command {{asCamelCased name false}}
  */
-PacketBufferHandle encode{{asCamelCased clusterName false}}Cluster{{asType name}}Command(EndpointId destinationEndpoint{{#chip_server_cluster_command_arguments}}, {{chipType}} {{asCamelCased label}}{{/chip_server_cluster_command_arguments}})
+PacketBufferHandle encode{{asCamelCased clusterName false}}Cluster{{asType name}}Command(uint8_t seqNum, EndpointId destinationEndpoint{{#chip_server_cluster_command_arguments}}, {{chipType}} {{asCamelCased label}}{{/chip_server_cluster_command_arguments}})
 {
     COMMAND_HEADER("{{asType name}}", {{parent.define}}_ID);
     {{#chip_server_cluster_command_arguments}}
@@ -142,7 +139,7 @@ PacketBufferHandle encode{{asCamelCased clusterName false}}Cluster{{asType name}
     {{else}}
         .Put8(kFrameControlClusterSpecificCommand)
     {{/if}}
-       .Put8(kSeqNum)
+       .Put8(seqNum)
        .Put8(ZCL_{{asDelimitedMacro name}}_COMMAND_ID)
     {{#chip_server_cluster_command_arguments}}
     {{#if (isString type)}}
@@ -159,11 +156,11 @@ PacketBufferHandle encode{{asCamelCased clusterName false}}Cluster{{asType name}
 }
 
 {{/chip_server_cluster_commands}}
-PacketBufferHandle encode{{asCamelCased name false}}ClusterDiscoverAttributes(EndpointId destinationEndpoint)
+PacketBufferHandle encode{{asCamelCased name false}}ClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("Discover{{asCamelCased name false}}Attributes", {{define}}_ID);
     buf.Put8(kFrameControlGlobalCommand)
-       .Put8(kSeqNum)
+       .Put8(seqNum)
        .Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID)
        .Put16(0x0000)
        .Put8(0xFF);
@@ -174,22 +171,22 @@ PacketBufferHandle encode{{asCamelCased name false}}ClusterDiscoverAttributes(En
 /*
  * Attribute {{asCamelCased name false}}
  */
-PacketBufferHandle encode{{asCamelCased parent.name false}}ClusterRead{{asCamelCased name false}}Attribute(EndpointId destinationEndpoint)
+PacketBufferHandle encode{{asCamelCased parent.name false}}ClusterRead{{asCamelCased name false}}Attribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("Read{{asCamelCased parent.name false}}{{asCamelCased name false}}", {{parent.define}}_ID);
     buf.Put8(kFrameControlGlobalCommand)
-       .Put8(kSeqNum)
+       .Put8(seqNum)
        .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
        .Put16({{asHex attributeCode 4}});
     COMMAND_FOOTER();
 }
 
 {{#if (isWritableAttribute)}}
-PacketBufferHandle encode{{asCamelCased parent.name false}}ClusterWrite{{asCamelCased name false}}Attribute(EndpointId destinationEndpoint, {{asUnderlyingZclType type}} {{asCamelCased name}})
+PacketBufferHandle encode{{asCamelCased parent.name false}}ClusterWrite{{asCamelCased name false}}Attribute(uint8_t seqNum, EndpointId destinationEndpoint, {{asUnderlyingZclType type}} {{asCamelCased name}})
 {
     COMMAND_HEADER("Write{{asCamelCased parent.name false}}{{asCamelCased name false}}", {{parent.define}}_ID);
     buf.Put8(kFrameControlGlobalCommand)
-       .Put8(kSeqNum)
+       .Put8(seqNum)
        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
        .Put16({{asHex attributeCode 4}})
        .Put8({{atomicTypeId}})
@@ -199,11 +196,11 @@ PacketBufferHandle encode{{asCamelCased parent.name false}}ClusterWrite{{asCamel
 
 {{/if}}
 {{#if (isReportableAttribute)}}
-PacketBufferHandle encode{{asCamelCased parent.name false}}ClusterConfigure{{asCamelCased name false}}Attribute(EndpointId destinationEndpoint, uint16_t minInterval, uint16_t maxInterval{{#unless (isDiscreteType)}}, {{chipType}} change{{/unless}})
+PacketBufferHandle encode{{asCamelCased parent.name false}}ClusterConfigure{{asCamelCased name false}}Attribute(uint8_t seqNum, EndpointId destinationEndpoint, uint16_t minInterval, uint16_t maxInterval{{#unless (isDiscreteType)}}, {{chipType}} change{{/unless}})
 {
     COMMAND_HEADER("Report{{asCamelCased parent.name false}}{{asCamelCased name false}}", {{parent.define}}_ID);
     buf.Put8(kFrameControlGlobalCommand)
-       .Put8(kSeqNum)
+       .Put8(seqNum)
        .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
        .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
        .Put16({{asHex attributeCode 4}})
