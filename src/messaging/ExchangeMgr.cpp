@@ -313,7 +313,7 @@ ChannelHandle ExchangeManager::EstablishChannel(const ChannelBuilder & builder, 
 
     // Find an existing Channel matching the builder
     mChannelContexts.ForEachActiveObject([&](ChannelContext * context) {
-        if (context->MatchesBuilder(builder, mSessionMgr))
+        if (context->MatchesBuilder(builder))
         {
             channelContext = context;
             return false;
@@ -334,7 +334,7 @@ ChannelHandle ExchangeManager::EstablishChannel(const ChannelBuilder & builder, 
         channelContext->Retain();
     }
 
-    auto association = mChannelHandles.CreateObject(channelContext, delegate);
+    ChannelContextHandleAssociation * association = mChannelHandles.CreateObject(channelContext, delegate);
     channelContext->Release();
     return ChannelHandle{ association };
 }
@@ -387,7 +387,7 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & header, const Trans
 
     auto node     = peer.Value();
     auto notFound = mChannelContexts.ForEachActiveObject([&](ChannelContext * context) {
-        if (context->MatchesPaseParingSessoin(node))
+        if (context->IsPasePairing() && context->MatchNodeId(node))
         {
             CHIP_ERROR err = context->HandlePairingMessage(header, source, std::move(msgBuf));
             if (err != CHIP_NO_ERROR)
