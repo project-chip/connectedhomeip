@@ -20,7 +20,9 @@ colorama==0.4.4
     # via west
 coloredlogs==15.0
     # via -r requirements.in
-cryptography==3.3.2
+cryptography==3.4.4
+    # via -r requirements.in
+dbus-python==1.2.16 ; sys_platform == "linux"
     # via -r requirements.in
 decorator==4.4.2
     # via ipython
@@ -50,6 +52,8 @@ parso==0.8.1
     # via jedi
 pexpect==4.8.0
     # via ipython
+pgi==0.0.11.2 ; sys_platform == "linux"
+    # via -r requirements.in
 pickleshare==0.7.5
     # via ipython
 pip-tools==5.5.0
@@ -58,7 +62,7 @@ portpicker==1.3.1
     # via
     #   -r requirements.in
     #   mobly
-prompt-toolkit==3.0.14
+prompt-toolkit==3.0.15
     # via ipython
 protobuf==3.14.0
     # via -r requirements.in
@@ -92,11 +96,12 @@ pyyaml==5.4.1
     #   west
 requests==2.25.1
     # via -r requirements.in
+ruamel.yaml.clib==0.2.2
+    # via ruamel.yaml
 ruamel.yaml==0.16.12
     # via pykwalify
 six==1.15.0
     # via
-    #   cryptography
     #   protobuf
     #   python-dateutil
 timeout-decorator==0.5.0
