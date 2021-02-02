@@ -214,7 +214,7 @@ private:
     SecureSessionMgr * mSessionMgr;
     ReliableMessageMgr mReliableMessageMgr;
     MessageCounterSyncMgr mMessageCounterSyncMgr;
-    // TODO: allow temporary propagate SecureSessionMgrDelegate events to device controller, it won't be necessary after
+    // TODO(#4170): allow temporary propagate SecureSessionMgrDelegate events to device controller, it won't be necessary after
     // fully migrated to messaging layer
     SecureSessionMgrDelegate * mSecureSessionEventReceiver;
 
