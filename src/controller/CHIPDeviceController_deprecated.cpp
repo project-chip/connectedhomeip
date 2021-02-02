@@ -66,14 +66,14 @@ using namespace chip::Encoding;
 
 ChipDeviceController::ChipDeviceController()
 {
-    mState                  = kState_NotInitialized;
-    AppState                = nullptr;
-    mCurReqMsg              = nullptr;
-    mOnError                = nullptr;
-    mOnNewConnection        = nullptr;
-    mListenPort             = CHIP_PORT;
-    mLocalDeviceId          = kUndefinedNodeId;
-    mDevice                 = nullptr;
+    mState           = kState_NotInitialized;
+    AppState         = nullptr;
+    mCurReqMsg       = nullptr;
+    mOnError         = nullptr;
+    mOnNewConnection = nullptr;
+    mListenPort      = CHIP_PORT;
+    mLocalDeviceId   = kUndefinedNodeId;
+    mDevice          = nullptr;
     CHIP_ZERO_AT(mOnComplete);
 }
 
@@ -84,7 +84,8 @@ CHIP_ERROR ChipDeviceController::Init(NodeId localNodeId, PersistentStorageDeleg
     return mCommissioner.Init(localNodeId, storageDelegate);
 }
 
-CHIP_ERROR ChipDeviceController::Init(NodeId localNodeId, System::Layer * systemLayer, InetLayer * inetLayer, PersistentStorageDelegate * storageDelegate)
+CHIP_ERROR ChipDeviceController::Init(NodeId localNodeId, System::Layer * systemLayer, InetLayer * inetLayer,
+                                      PersistentStorageDelegate * storageDelegate)
 {
     return mCommissioner.Init(localNodeId, storageDelegate, systemLayer, inetLayer);
 }
@@ -94,9 +95,10 @@ CHIP_ERROR ChipDeviceController::Shutdown()
     return mCommissioner.Shutdown();
 }
 
-CHIP_ERROR ChipDeviceController::ConnectDeviceOverIP(NodeId remoteDeviceId, Transport::PeerAddress address, uint32_t setupPINCode, void * appReqState,
-                                               NewConnectionHandler onConnected, MessageReceiveHandler onMessageReceived,
-                                               ErrorHandler onError, uint16_t devicePort, Inet::InterfaceId interfaceId)
+CHIP_ERROR ChipDeviceController::ConnectDeviceOverIP(NodeId remoteDeviceId, Transport::PeerAddress address, uint32_t setupPINCode,
+                                                     void * appReqState, NewConnectionHandler onConnected,
+                                                     MessageReceiveHandler onMessageReceived, ErrorHandler onError,
+                                                     uint16_t devicePort, Inet::InterfaceId interfaceId)
 {
     CHIP_ERROR err = mCommissioner.NewDevice(&mDevice, remoteDeviceId);
     SuccessOrExit(err);
@@ -187,7 +189,8 @@ exit:
 
 CHIP_ERROR ChipDeviceController::SetDevicePairingDelegate(DevicePairingDelegate * pairingDelegate)
 {
-    if (mDevice == nullptr) return CHIP_ERROR_INCORRECT_STATE;
+    if (mDevice == nullptr)
+        return CHIP_ERROR_INCORRECT_STATE;
 
     mDevice->SetPairingDelegate(pairingDelegate);
     return CHIP_NO_ERROR;

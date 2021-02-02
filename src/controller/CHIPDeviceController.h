@@ -54,7 +54,9 @@ constexpr uint16_t kNumMaxPairedDevices = 128;
  *   and device pairing information for individual devices). Alternatively, this class can retrieve the
  *   relevant information when the application tries to communicate with the device
  */
-class DLL_EXPORT DeviceController : public SecureSessionMgrDelegate, public PersistentStorageResultDelegate, public TransportMgrDelegate
+class DLL_EXPORT DeviceController : public SecureSessionMgrDelegate,
+                                    public PersistentStorageResultDelegate,
+                                    public TransportMgrDelegate
 {
 public:
     DeviceController();
@@ -174,7 +176,8 @@ protected:
 
 private:
     //////////// TransportMgrDelegate implementation ///////////////
-    void OnMessageReceived(const PacketHeader & header, const Transport::PeerAddress & source, System::PacketBufferHandle msgBuf) override;
+    void OnMessageReceived(const PacketHeader & header, const Transport::PeerAddress & source,
+                           System::PacketBufferHandle msgBuf) override;
 
     //////////// SecureSessionMgrDelegate Implementation ///////////////
     void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, SecureSessionHandle session,
@@ -190,7 +193,7 @@ private:
     void ReleaseAllDevices();
 
     System::Layer * mSystemLayer;
-    uint16_t mNextKeyId                         = 0;
+    uint16_t mNextKeyId = 0;
 };
 
 } // namespace Controller

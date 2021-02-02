@@ -177,14 +177,15 @@ public:
      * @param[in] inetLayer    InetLayer object pointer
      * @param[in] listenPort   Port on which controller is listening (typically CHIP_PORT)
      */
-    void Init(DeviceController * deviceController, DeviceTransportMgr * transportMgr, SecureSessionMgr * sessionMgr, Inet::InetLayer * inetLayer, uint16_t listenPort, NodeId peerNodeId = kUndefinedNodeId)
+    void Init(DeviceController * deviceController, DeviceTransportMgr * transportMgr, SecureSessionMgr * sessionMgr,
+              Inet::InetLayer * inetLayer, uint16_t listenPort, NodeId peerNodeId = kUndefinedNodeId)
     {
         mDeviceController = deviceController;
-        mTransportMgr   = transportMgr;
-        mSessionManager = sessionMgr;
-        mInetLayer      = inetLayer;
-        mListenPort     = listenPort;
-        mDeviceId = peerNodeId;
+        mTransportMgr     = transportMgr;
+        mSessionManager   = sessionMgr;
+        mInetLayer        = inetLayer;
+        mListenPort       = listenPort;
+        mDeviceId         = peerNodeId;
     }
 
     /** @brief Serialize the Pairing Session to a string. It's guaranteed that the string
@@ -244,12 +245,14 @@ public:
     CHIP_ERROR StopPairing(CHIP_ERROR error);
 
     //////////// SessionEstablishmentDelegate Implementation ///////////////
-    CHIP_ERROR SendSessionEstablishmentMessage(const PacketHeader & header, const Transport::PeerAddress & peerAddress, System::PacketBufferHandle msgBuf) override;
+    CHIP_ERROR SendSessionEstablishmentMessage(const PacketHeader & header, const Transport::PeerAddress & peerAddress,
+                                               System::PacketBufferHandle msgBuf) override;
     void OnSessionEstablishmentError(CHIP_ERROR error) override;
     void OnSessionEstablished() override;
 
     // Handle unsure pairing message
-    void OnMessageReceived(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress, System::PacketBufferHandle msg);
+    void OnMessageReceived(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
+                           System::PacketBufferHandle msg);
 
     /**
      * @brief

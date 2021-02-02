@@ -348,7 +348,8 @@ exit:
 }
 
 // TransportMgrDelegate callback, deliver unsecure pairing packets to device
-void DeviceController::OnMessageReceived(const PacketHeader & header, const Transport::PeerAddress & source, System::PacketBufferHandle msgBuf)
+void DeviceController::OnMessageReceived(const PacketHeader & header, const Transport::PeerAddress & source,
+                                         System::PacketBufferHandle msgBuf)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     uint16_t index = 0;
@@ -357,7 +358,7 @@ void DeviceController::OnMessageReceived(const PacketHeader & header, const Tran
     VerifyOrExit(mState == State::Initialized, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(header.GetSourceNodeId().HasValue(), err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    node = header.GetSourceNodeId().Value();
+    node  = header.GetSourceNodeId().Value();
     index = FindDeviceIndex(node);
     VerifyOrExit(index < kNumMaxActiveDevices, err = CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR);
 
@@ -520,7 +521,8 @@ void DeviceController::OnStatus(const char * key, Operation op, CHIP_ERROR err) 
 
 CHIP_ERROR DeviceController::PersistDevice(Device * device)
 {
-    if (mStorageDelegate == nullptr) return CHIP_ERROR_INCORRECT_STATE;
+    if (mStorageDelegate == nullptr)
+        return CHIP_ERROR_INCORRECT_STATE;
 
     mPairedDevices.Insert(device->GetDeviceId());
     PersistDeviceList();
@@ -528,9 +530,10 @@ CHIP_ERROR DeviceController::PersistDevice(Device * device)
         // Save the device
         SerializedDevice serialized;
         CHIP_ERROR err = device->Serialize(serialized);
-        if (err != CHIP_NO_ERROR) return err;
+        if (err != CHIP_NO_ERROR)
+            return err;
         PERSISTENT_KEY_OP(device->GetDeviceId(), kPairedDeviceKeyPrefix, key,
-            mStorageDelegate->SetKeyValue(key, Uint8::to_const_char(serialized.inner)));
+                          mStorageDelegate->SetKeyValue(key, Uint8::to_const_char(serialized.inner)));
     }
 
     return CHIP_NO_ERROR;

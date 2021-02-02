@@ -49,7 +49,8 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     err = mCommissioner.NewDevice(&mDevice, remoteId);
-    if (err != CHIP_NO_ERROR) return err;
+    if (err != CHIP_NO_ERROR)
+        return err;
 
     mDevice->SetPairingDelegate(this);
 
@@ -82,9 +83,7 @@ CHIP_ERROR PairingCommand::Unpair(NodeId remoteId)
     return mCommissioner.UnpairDevice(remoteId);
 }
 
-void PairingCommand::OnStatusUpdate()
-{
-}
+void PairingCommand::OnStatusUpdate() {}
 
 void PairingCommand::OnPairingComplete(CHIP_ERROR err)
 {

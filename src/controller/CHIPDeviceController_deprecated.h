@@ -95,8 +95,8 @@ public:
      */
     [[deprecated("Available until controller apps move to DeviceController/DeviceCommissioner API")]] CHIP_ERROR
     ConnectDeviceOverIP(NodeId remoteDeviceId, Transport::PeerAddress address, uint32_t setupPINCode, void * appReqState,
-                                               NewConnectionHandler onConnected, MessageReceiveHandler onMessageReceived,
-                                               ErrorHandler onError, uint16_t devicePort = CHIP_PORT, Inet::InterfaceId interfaceId = INET_NULL_INTERFACEID);
+                        NewConnectionHandler onConnected, MessageReceiveHandler onMessageReceived, ErrorHandler onError,
+                        uint16_t devicePort = CHIP_PORT, Inet::InterfaceId interfaceId = INET_NULL_INTERFACEID);
 
     /**
      * @brief

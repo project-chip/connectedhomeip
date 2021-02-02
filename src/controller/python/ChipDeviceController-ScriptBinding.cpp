@@ -172,7 +172,8 @@ CHIP_ERROR nl_Chip_DeviceController_Connect(chip::DeviceController::ChipDeviceCo
                                             OnErrorFunct onError)
 {
     // TODO: Wait for unified IP/BLE transport ready
-    // return devCtrl->ConnectDeviceOverBle(kRemoteDeviceId, connObj, setupPINCode, (void *) devCtrl, onConnect, onMessage, onError);
+    // return devCtrl->ConnectDeviceOverBle(kRemoteDeviceId, connObj, setupPINCode, (void *) devCtrl, onConnect, onMessage,
+    // onError);
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 

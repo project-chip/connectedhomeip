@@ -127,7 +127,7 @@ CHIP_ERROR Device::Serialize(SerializedDevice & output)
     mDeviceAddr.ToString(Uint8::to_char(serializable.mDeviceAddr), sizeof(serializable.mDeviceAddr));
 
     serializedLen = Base64Encode(Uint8::to_const_uchar(reinterpret_cast<uint8_t *>(&serializable)),
-                                       static_cast<uint16_t>(sizeof(serializable)), Uint8::to_char(output.inner));
+                                 static_cast<uint16_t>(sizeof(serializable)), Uint8::to_char(output.inner));
     VerifyOrExit(serializedLen > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(serializedLen < sizeof(output.inner), error = CHIP_ERROR_INVALID_ARGUMENT);
     output.inner[serializedLen] = '\0';
@@ -319,7 +319,7 @@ void Device::AddReportHandler(EndpointId endpoint, ClusterId cluster, Callback::
 
 CHIP_ERROR Device::PairDeviceOverIP(Transport::PeerAddress address, uint32_t setupPINCode)
 {
-    CHIP_ERROR err  = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     VerifyOrExit(mState == DeviceState::NotConnected, err = CHIP_ERROR_INCORRECT_STATE);
     mState = DeviceState::Connecting;
@@ -327,7 +327,8 @@ CHIP_ERROR Device::PairDeviceOverIP(Transport::PeerAddress address, uint32_t set
     mPASESession = Platform::New<PASESession>();
     VerifyOrExit(mPASESession != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
-    err = mPASESession->Pair(address, setupPINCode, Optional<NodeId>(mDeviceController->GetLocalNodeId()), mDeviceId, mDeviceController->GetNextKeyId(), this);
+    err = mPASESession->Pair(address, setupPINCode, Optional<NodeId>(mDeviceController->GetLocalNodeId()), mDeviceId,
+                             mDeviceController->GetNextKeyId(), this);
     SuccessOrExit(err);
 
     mDeviceAddr = address.GetIPAddress();
@@ -338,7 +339,8 @@ exit:
     {
         Platform::Delete(mPASESession);
         mPASESession = nullptr;
-        if (mPairingDelegate != nullptr) mPairingDelegate->OnPairingDeleted(err);
+        if (mPairingDelegate != nullptr)
+            mPairingDelegate->OnPairingDeleted(err);
     }
 
     return err;
@@ -346,7 +348,7 @@ exit:
 
 CHIP_ERROR Device::StopPairing(CHIP_ERROR error)
 {
-    CHIP_ERROR err  = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     VerifyOrExit(mState == DeviceState::Connecting, err = CHIP_ERROR_INCORRECT_STATE);
     mState = DeviceState::NotConnected;
@@ -355,53 +357,63 @@ CHIP_ERROR Device::StopPairing(CHIP_ERROR error)
     {
         Platform::Delete(mPASESession);
         mPASESession = nullptr;
-        if (mPairingDelegate != nullptr) mPairingDelegate->OnPairingDeleted(error);
+        if (mPairingDelegate != nullptr)
+            mPairingDelegate->OnPairingDeleted(error);
     }
 
 exit:
     return err;
 }
 
-CHIP_ERROR Device::SendSessionEstablishmentMessage(const PacketHeader & header, const Transport::PeerAddress & peerAddress, System::PacketBufferHandle msgBuf)
+CHIP_ERROR Device::SendSessionEstablishmentMessage(const PacketHeader & header, const Transport::PeerAddress & peerAddress,
+                                                   System::PacketBufferHandle msgBuf)
 {
     return mTransportMgr->SendMessage(header, peerAddress, std::move(msgBuf));
 }
 
 void Device::OnSessionEstablishmentError(CHIP_ERROR error)
 {
-    if (mState != DeviceState::Connecting) return;
-    if (mPairingDelegate != nullptr) mPairingDelegate->OnPairingComplete(error);
+    if (mState != DeviceState::Connecting)
+        return;
+    if (mPairingDelegate != nullptr)
+        mPairingDelegate->OnPairingComplete(error);
     StopPairing(error);
 }
 
 void Device::OnSessionEstablished()
 {
-    if (mState != DeviceState::Connecting) return;
+    if (mState != DeviceState::Connecting)
+        return;
 
     if (mPASESession == nullptr)
     {
-        if (mPairingDelegate!= nullptr) mPairingDelegate->OnPairingComplete(CHIP_ERROR_INCORRECT_STATE);
+        if (mPairingDelegate != nullptr)
+            mPairingDelegate->OnPairingComplete(CHIP_ERROR_INCORRECT_STATE);
         return;
     }
 
     mPASESession->ToSerializable(mPairing);
     mSessionManager->NewPairing(Optional<Transport::PeerAddress>::Value(mPASESession->PeerConnection().GetPeerAddress()),
-        mPASESession->PeerConnection().GetPeerNodeId(), mPASESession, nullptr);
+                                mPASESession->PeerConnection().GetPeerNodeId(), mPASESession, nullptr);
 
     mState = DeviceState::SecureConnected;
 
     InitCommandSender();
 
-    if (mPairingDelegate != nullptr) mPairingDelegate->OnPairingComplete(CHIP_NO_ERROR);
+    if (mPairingDelegate != nullptr)
+        mPairingDelegate->OnPairingComplete(CHIP_NO_ERROR);
 
     Platform::Delete(mPASESession);
     mPASESession = nullptr;
-    if (mPairingDelegate != nullptr) mPairingDelegate->OnPairingDeleted(CHIP_NO_ERROR);
+    if (mPairingDelegate != nullptr)
+        mPairingDelegate->OnPairingDeleted(CHIP_NO_ERROR);
 }
 
-void Device::OnMessageReceived(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress, System::PacketBufferHandle msg)
+void Device::OnMessageReceived(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
+                               System::PacketBufferHandle msg)
 {
-    if (mState != DeviceState::Connecting) return;
+    if (mState != DeviceState::Connecting)
+        return;
     if (mPASESession != nullptr)
     {
         mPASESession->HandlePeerMessage(packetHeader, peerAddress, std::move(msg));
