@@ -194,6 +194,8 @@ void InteractionModelEngine::OnResponseTimeout(Messaging::ExchangeContext * ec)
     ChipLogProgress(DataManagement, "Time out! failed to receive echo response from Exchange: %d", ec->GetExchangeId());
 }
 
+// The default implementation to make compiler happy before codegen for this is ready.
+// TODO: Remove this after codegen is ready.
 void __attribute__((weak))
 DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId,
                              chip::GroupId aGroupId, chip::TLV::TLVReader & aReader, Command * apCommandObj)
