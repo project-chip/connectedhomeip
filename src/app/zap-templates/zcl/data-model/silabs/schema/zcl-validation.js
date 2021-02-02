@@ -18,13 +18,13 @@
 const libxmljs = require('libxmljs')
 
 // validateZclFile will have validationSchema be bound to it.
-function validateZclFile(validationSchemaBuffer, zclFileBuffer) {
-  let zclFile = libxmljs.parseXml(zclFileBuffer.toString())
-  let xsdDoc = libxmljs.parseXml(validationSchemaBuffer.toString())
+function validateZclFile(validationSchemaBuffer, zclFileBuffer)
+{
+  let zclFile          = libxmljs.parseXml(zclFileBuffer.toString())
+  let xsdDoc           = libxmljs.parseXml(validationSchemaBuffer.toString())
   let validationStatus = zclFile.validate(xsdDoc)
   let validationErrors = zclFile.validationErrors
-  let returnValue = { isValid: validationStatus, errors: validationErrors }
-  return returnValue
+  let returnValue      = { isValid : validationStatus, errors : validationErrors } return returnValue
 }
 
 exports.validateZclFile = validateZclFile
