@@ -9,13 +9,6 @@ github_api_version: "shadow-cat-preview"
 
 pullapprove_conditions:
     ############################################################
-    #  Required status checks
-    ############################################################
-    - condition: "'*restyle*' in statuses.successful"
-      unmet_status: "failure"
-      explanation: "Style must be inline before reviewing can be complete"
-
-    ############################################################
     #  License Checks
     ############################################################
     - condition: "'*license/cla*' in statuses.successful"
@@ -44,6 +37,13 @@ pullapprove_conditions:
     #  Bypass reviews
     ############################################################
     - "'hotfix' not in labels"
+
+    ############################################################
+    #  Required status checks
+    ############################################################
+    - condition: "'*restyle*' in statuses.successful"
+      unmet_status: "failure"
+      explanation: "Style must be inline before reviewing can be complete"
 
 ############################################################
 #  Notifications
