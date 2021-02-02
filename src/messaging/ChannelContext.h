@@ -83,8 +83,7 @@ public:
 class ChannelContext : public ReferenceCounted<ChannelContext, ChannelContextDeletor>, public SessionEstablishmentDelegate
 {
 public:
-    ChannelContext(ExchangeManager * exchangeManager) : mState(ChannelState::kNone), mExchangeManager(exchangeManager)
-    {}
+    ChannelContext(ExchangeManager * exchangeManager) : mState(ChannelState::kNone), mExchangeManager(exchangeManager) {}
 
     void Start(const ChannelBuilder & builder);
     ExchangeContext * NewExchange(ExchangeDelegate * delegate);
@@ -133,7 +132,8 @@ private:
         kCasePairing,
     };
 
-    union StateVars {
+    union StateVars
+    {
         StateVars() {}
 
         // mPreparing is pretty big, consider move it outside
@@ -143,7 +143,8 @@ private:
             Inet::InterfaceId mInterface;
             Inet::IPAddressType mAddressType;
             Inet::IPAddress mAddress;
-            union Session {
+            union Session
+            {
                 PASESession * mPasePairingSession;
                 CASESession * mCasePairingSession;
             } mSession;
