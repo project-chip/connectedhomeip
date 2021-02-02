@@ -14,22 +14,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-#import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CHIPUIViewUtils : NSObject
-+ (UIView *)viewWithUITextField:(UITextField *)textField button:(UIButton *)button;
-+ (UIStackView *)stackViewWithLabel:(UILabel *)label result:(UILabel *)result;
-+ (UIView *)viewWithLabel:(UILabel *)label textField:(UITextField *)textField;
-+ (UIView *)viewWithLabel:(UILabel *)label toggle:(UISwitch *)toggle;
+@interface BindingsViewController : UIViewController
 
-+ (UIStackView *)stackViewWithLabel:(UILabel *)label buttons:(NSArray<UIButton *> *)buttons;
-+ (UIStackView *)stackViewWithButtons:(NSArray<UIButton *> *)buttons;
-
-+ (UILabel *)addTitle:(NSString *)title toView:(UIView *)view;
 @end
 
 NS_ASSUME_NONNULL_END

@@ -140,6 +140,30 @@
     return containingView;
 }
 
++ (UIStackView *)stackViewWithButtons:(NSArray<UIButton *> *)buttons
+{
+    UIStackView * stackViewButtons = [UIStackView new];
+    stackViewButtons.axis = UILayoutConstraintAxisHorizontal;
+    stackViewButtons.distribution = UIStackViewDistributionFillEqually;
+    stackViewButtons.alignment = UIStackViewAlignmentTrailing;
+    stackViewButtons.spacing = 10;
+
+    for (int i = 0; i < buttons.count; i++) {
+        UIButton * buttonForStack = [buttons objectAtIndex:i];
+        buttonForStack.backgroundColor = UIColor.systemBlueColor;
+        buttonForStack.titleLabel.font = [UIFont systemFontOfSize:17];
+        buttonForStack.titleLabel.textColor = [UIColor whiteColor];
+        buttonForStack.layer.cornerRadius = 5;
+        buttonForStack.clipsToBounds = YES;
+        buttonForStack.translatesAutoresizingMaskIntoConstraints = false;
+        [buttonForStack.widthAnchor constraintEqualToConstant:70].active = YES;
+        [stackViewButtons addArrangedSubview:buttonForStack];
+    }
+    return stackViewButtons;
+}
+
+
+
 + (UIStackView *)stackViewWithLabel:(UILabel *)label buttons:(NSArray<UIButton *> *)buttons
 {
     // Button stack view
