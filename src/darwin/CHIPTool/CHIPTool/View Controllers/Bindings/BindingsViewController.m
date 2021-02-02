@@ -19,10 +19,10 @@
 #import "CHIPUIViewUtils.h"
 
 @interface BindingsViewController ()
-@property (nonatomic, strong) UITextField *nodeIDTextField;
-@property (nonatomic, strong) UITextField *groupIDTextField;
-@property (nonatomic, strong) UITextField *endpointIDTextField;
-@property (nonatomic, strong) UITextField *clusterIDTextField;
+@property (nonatomic, strong) UITextField * nodeIDTextField;
+@property (nonatomic, strong) UITextField * groupIDTextField;
+@property (nonatomic, strong) UITextField * endpointIDTextField;
+@property (nonatomic, strong) UITextField * clusterIDTextField;
 @end
 
 @implementation BindingsViewController
@@ -35,7 +35,6 @@
     UITapGestureRecognizer * tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dismissKeyboard)];
     [self.view addGestureRecognizer:tap];
 }
-
 
 - (void)dismissKeyboard
 {
@@ -102,13 +101,13 @@
     [clusterIDView.trailingAnchor constraintEqualToAnchor:stackView.trailingAnchor].active = YES;
 
     // Buttons
-    UIButton *bindButton = [UIButton new];
+    UIButton * bindButton = [UIButton new];
     [bindButton setTitle:@"Bind" forState:UIControlStateNormal];
-    UIButton *unbindButton = [UIButton new];
+    UIButton * unbindButton = [UIButton new];
     [unbindButton setTitle:@"Unbind" forState:UIControlStateNormal];
     [bindButton addTarget:self action:@selector(bind:) forControlEvents:UIControlEventTouchUpInside];
     [unbindButton addTarget:self action:@selector(unbind:) forControlEvents:UIControlEventTouchUpInside];
-    UIStackView *stackViewButtons = [CHIPUIViewUtils stackViewWithButtons:@[bindButton, unbindButton]];
+    UIStackView * stackViewButtons = [CHIPUIViewUtils stackViewWithButtons:@[ bindButton, unbindButton ]];
 
     [stackView addArrangedSubview:stackViewButtons];
     [stackViewButtons.trailingAnchor constraintEqualToAnchor:stackView.trailingAnchor].active = YES;
@@ -128,7 +127,6 @@
 {
     [self _clearTextFields];
     // TODO: Call binding API
-
 }
 
 - (IBAction)unbind:(id)sender

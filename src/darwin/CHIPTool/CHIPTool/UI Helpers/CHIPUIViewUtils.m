@@ -162,8 +162,6 @@
     return stackViewButtons;
 }
 
-
-
 + (UIStackView *)stackViewWithLabel:(UILabel *)label buttons:(NSArray<UIButton *> *)buttons
 {
     // Button stack view
