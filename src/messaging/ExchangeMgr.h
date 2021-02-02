@@ -175,7 +175,7 @@ private:
     State mState;
     SecureSessionMgr * mSessionMgr;
     ReliableMessageManager mReliableMessageMgr;
-    // TODO: allow temporary propagate SecureSessionMgrDelegate events to device controller, it won't be necessary after
+    // TODO(#4170): allow temporary propagate SecureSessionMgrDelegate events to device controller, it won't be necessary after
     // fully migrated to messaging layer
     SecureSessionMgrDelegate * mDeviceController;
 

@@ -131,7 +131,7 @@ CHIP_ERROR ExchangeManager::UnregisterUnsolicitedMessageHandler(uint32_t protoco
 void ExchangeManager::OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source, SecureSessionMgr * mgr)
 {
     ChipLogError(ExchangeManager, "Accept FAILED, err = %s", ErrorStr(error));
-    // TODO: propagate event into device controller, it won't be necessary after fully migrated to messaging layer
+    // TODO(#4170): propagate event into device controller, it won't be necessary after fully migrated to messaging layer
     if (mDeviceController != nullptr) mDeviceController->OnReceiveError(error, source, mgr);
 }
 
@@ -257,7 +257,7 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
     // an ack to the peer.
     else if (!payloadHeader.IsNeedsAck())
     {
-        // TODO: propagate event into device controller, it won't be necessary after fully migrated to messaging layer
+        // TODO(#4170): propagate event into device controller, it won't be necessary after fully migrated to messaging layer
         // ExitNow(err = CHIP_ERROR_UNSOLICITED_MSG_NO_ORIGINATOR);
         if (mDeviceController != nullptr)
             mDeviceController->OnMessageReceived(packetHeader, payloadHeader, session, std::move(msgBuf), mgr);
@@ -305,7 +305,7 @@ exit:
 
 void ExchangeManager::OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr)
 {
-    // TODO: propagate event into device controller, it won't be necessary after fully migrated to messaging layer
+    // TODO(#4170): propagate event into device controller, it won't be necessary after fully migrated to messaging layer
     if (mDeviceController != nullptr)
         mDeviceController->OnNewConnection(session, mgr);
 }
@@ -321,7 +321,7 @@ void ExchangeManager::OnConnectionExpired(SecureSessionHandle session, SecureSes
         }
     }
 
-    // TODO: propagate event into device controller, it won't be necessary after fully migrated to messaging layer
+    // TODO(#4170): propagate event into device controller, it won't be necessary after fully migrated to messaging layer
     if (mDeviceController != nullptr)
         mDeviceController->OnConnectionExpired(session, mgr);
 }
