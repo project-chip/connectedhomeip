@@ -18,9 +18,9 @@ import("//build_overrides/efr32_sdk.gni")
 import("//build_overrides/pigweed.gni")
 import("${build_root}/config/defaults.gni")
 
+import("${chip_root}/config/efr32/lib/pw_rpc/pw_rpc.gni")
 import("${efr32_sdk_build_root}/efr32_executable.gni")
 import("${efr32_sdk_build_root}/efr32_sdk.gni")
-import("${chip_root}/config/efr32/lib/pw_rpc/pw_rpc.gni")
 
 assert(current_os == "freertos")
 
@@ -58,10 +58,10 @@ efr32_sdk("sdk") {
     defines += [ "BUILD_RELEASE=1" ]
   }
 
-  defines += [ 
-    "BOARD_ID=${efr32_board}", 
-    "HAL_VCOM_ENABLE = 1", 
-    "EFR32_LOG_ENABLED =1"
+  defines += [
+    "BOARD_ID=${efr32_board}",
+    "HAL_VCOM_ENABLE = 1",
+    "EFR32_LOG_ENABLED =1",
   ]
 }
 
@@ -73,14 +73,13 @@ efr32_executable("pigweed_app") {
   public_deps = [
     ":sdk",
     "$dir_pw_assert",
-    "${chip_root}/src/lib",
     "${chip_root}/config/efr32/lib/pw_rpc:pw_rpc",
     "${chip_root}/examples/common/pigweed:system_rpc_server",
+    "${chip_root}/src/lib",
     "${examples_plat_dir}/pw_sys_io:pw_sys_io_efr32",
   ]
 
-  deps = [    
-    ]
+  deps = []
 
   include_dirs += [
     "include",
@@ -101,8 +100,8 @@ efr32_executable("pigweed_app") {
   sources = [
     "${examples_plat_dir}/${efr32_family}/${efr32_board}/init_board.c",
     "${examples_plat_dir}/${efr32_family}/${efr32_board}/init_mcu.c",
-    "${examples_plat_dir}/uart.c",
     "${examples_plat_dir}/LEDWidget.cpp",
+    "${examples_plat_dir}/uart.c",
     "src/main.cpp",
   ]
 
@@ -113,7 +112,7 @@ efr32_executable("pigweed_app") {
   } else if (efr32_family == "efr32mg21") {
     ldscript = "${efr32_project_dir}/ldscripts/efr32-pigweed-example-MG21.ld"
   }
-  
+
   ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
 }
 

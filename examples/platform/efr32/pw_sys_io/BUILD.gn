@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/pigweed.gni")
 import("//build_overrides/chip.gni")
+import("//build_overrides/pigweed.gni")
 import("$dir_pw_build/target_types.gni")
 
 examples_plat_dir = "${chip_root}/examples/platform/efr32"
@@ -25,16 +25,13 @@ config("default_config") {
 pw_source_set("pw_sys_io_efr32") {
   public_configs = [ ":default_config" ]
 
-  public_deps = [
-  ]
+  public_deps = []
 
   deps = [
     "$dir_pw_sys_io:default_putget_bytes",
     "$dir_pw_sys_io:facade",
   ]
 
-  include_dirs = ["${examples_plat_dir}"]
-  sources = [ 
-    "sys_io_efr32.cc" 
-    ]
+  include_dirs = [ "${examples_plat_dir}" ]
+  sources = [ "sys_io_efr32.cc" ]
 }
