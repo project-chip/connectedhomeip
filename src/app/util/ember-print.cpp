@@ -20,6 +20,7 @@
 
 #include "debug-printing.h"
 
+#include <platform/CHIPDeviceConfig.h>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 
@@ -53,7 +54,7 @@ void emberAfPrintBuffer(int category, const uint8_t * buffer, uint16_t length, b
 {
     if (buffer != NULL && length > 0)
     {
-        constexpr uint16_t kBufferSize = 128;
+        constexpr uint16_t kBufferSize = CHIP_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE;
         const char * perByteFormatStr  = withSpace ? "%02hhX " : "%02hhX";
         const uint8_t perByteCharCount = withSpace ? 3 : 2;
         const uint16_t bytesPerBuffer  = (kBufferSize - 1) / perByteCharCount;
