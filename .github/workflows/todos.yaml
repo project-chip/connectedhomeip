@@ -8,8 +8,7 @@ on:
 jobs:
   todos:
     runs-on: ubuntu-latest
-
-      steps:
+    steps:
         - uses: actions/checkout@v1
         - name: todo-actions
           uses: dtinth/todo-actions@master
