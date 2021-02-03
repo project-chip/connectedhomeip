@@ -30,7 +30,8 @@ if (lwip_platform == "") {
 
 assert(lwip_platform == "external" || lwip_platform == "standalone" ||
            lwip_platform == "cc13x2_26x2" || lwip_platform == "efr32" ||
-           lwip_platform == "k32w" || lwip_platform == "qpg6100",
+           lwip_platform == "k32w" || lwip_platform == "qpg6100" || 
+           lwip_platform == "mbed",
        "Unsupported lwIP platform: ${lwip_platform}")
 
 if (lwip_platform != "external") {
@@ -64,6 +65,10 @@ buildconfig_header("lwip_buildconfig") {
     if (current_os == "android") {
       defines += [ "LWIP_NO_STDINT_H=1" ]
     }
+
+    if (lwip_platform == "mbed") { 
+      defines += [ "LWIP_NO_STDINT_H=1", "IN_ADDR_T_DEFINED=1" ]
+    }
   }
 }
 
@@ -82,7 +87,7 @@ if (current_os == "zephyr") {
   config("lwip_config") {
     include_dirs = [ lwip_platform ]
 
-    if (lwip_platform != "standalone") {
+    if (lwip_platform != "standalone" && lwip_platform != "mbed") {
       include_dirs += [ "freertos" ]
     }
   }
@@ -99,6 +104,9 @@ if (current_os == "zephyr") {
     if (lwip_platform == "standalone") {
       public += [ "standalone/arch/sys_arch.h" ]
       sources += [ "standalone/sys_arch.c" ]
+    } else if (lwip_platform == "mbed") {
+      public += [ "mbed/arch/sys_arch.h" ]
+      sources += [ "mbed/sys_arch.c" ]
     } else {
       public += [
         "${lwip_platform}/lwippools.h",
