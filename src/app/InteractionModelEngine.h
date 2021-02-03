@@ -28,13 +28,13 @@
 #ifndef _CHIP_INTERACTION_MODEL_ENGINE_H
 #define _CHIP_INTERACTION_MODEL_ENGINE_H
 
-#include <app/MessageDef/MessageDef.h>
 #include <core/CHIPCore.h>
 #include <map>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <protocols/Protocols.h>
+#include <protocols/interaction_model/Constants.h>
 #include <support/CodeUtils.h>
 #include <support/DLLUtil.h>
 #include <support/logging/CHIPLogging.h>
@@ -141,41 +141,29 @@ public:
                                                Command::CommandRoleId aCommandRoleId);
     CHIP_ERROR RegisterClusterCommandHandler(chip::ClusterId aClusterId, chip::CommandId aCommandId,
                                              Command::CommandRoleId aCommandRoleId, CommandCbFunct aDispatcher);
-    void ProcessCommand(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::TLV::TLVReader & aReader,
-                        Command * apCommandObj, Command::CommandRoleId aCommandRoleId);
 
     Messaging::ExchangeManager * GetExchangeManager(void) const { return mpExchangeMgr; };
 
     CHIP_ERROR NewCommandSender(CommandSender ** const apComandSender);
 
 private:
-    void OnUnknownMsgType(Messaging::ExchangeContext * apEc, const PacketHeader & aPacketHeader, uint32_t aProtocolId,
-                          uint8_t aMsgType, System::PacketBufferHandle aPayload);
-    void OnInvokeCommandRequest(Messaging::ExchangeContext * apEc, const PacketHeader & aPacketHeader, uint32_t aProtocolId,
-                                uint8_t aMsgType, System::PacketBufferHandle aPayload);
-    void OnMessageReceived(Messaging::ExchangeContext * apEc, const PacketHeader & aPacketHeader, uint32_t aProtocolId,
-                           uint8_t aMsgType, System::PacketBufferHandle aPayload);
+    void OnUnknownMsgType(Messaging::ExchangeContext * apEc, const PacketHeader & aPacketHeader,
+                          const PayloadHeader & aPayloadHeader, System::PacketBufferHandle aPayload);
+    void OnInvokeCommandRequest(Messaging::ExchangeContext * apEc, const PacketHeader & aPacketHeader,
+                                const PayloadHeader & aPayloadHeader, System::PacketBufferHandle aPayload);
+    void OnMessageReceived(Messaging::ExchangeContext * apEc, const PacketHeader & aPacketHeader,
+                           const PayloadHeader & aPayloadHeader, System::PacketBufferHandle aPayload);
     void OnResponseTimeout(Messaging::ExchangeContext * ec);
 
-    struct HandlerKey
-    {
-        HandlerKey(chip::ClusterId aClusterId, chip::CommandId aCommandId, Command::CommandRoleId aCommandRoleId);
-
-        chip::ClusterId mClusterId;
-        chip::CommandId mCommandId;
-        Command::CommandRoleId mCommandRoleId;
-        bool operator<(const HandlerKey & aOtherKey) const;
-    };
-
-    typedef std::map<HandlerKey, CommandCbFunct> HandlersMapType;
-
-    HandlersMapType mHandlersMap;
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     void * mpAppState                          = nullptr;
     EventCallback mEventCallback;
     CommandHandler mCommandHandlerObjs[CHIP_MAX_NUM_COMMAND_HANDLER_OBJECTS];
     CommandSender mCommandSenderObjs[CHIP_MAX_NUM_COMMAND_SENDER_OBJECTS];
 };
+
+void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId,
+                                  chip::TLV::TLVReader & aReader, Command * apCommandObj);
 
 } // namespace app
 } // namespace chip

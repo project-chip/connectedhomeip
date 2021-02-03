@@ -70,7 +70,7 @@ TransportMgr<LoopbackTransport> gTransportMgr;
 class MockAppDelegate : public ExchangeDelegate
 {
 public:
-    void OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, uint32_t protocolId, uint8_t msgType,
+    void OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                            System::PacketBufferHandle buffer) override
     {
         IsOnMessageReceivedCalled = true;
@@ -110,22 +110,22 @@ void CheckUmhRegistrationTest(nlTestSuite * inSuite, void * inContext)
     CHIP_ERROR err;
     MockAppDelegate mockAppDelegate;
 
-    err = ctx.GetExchangeManager().RegisterUnsolicitedMessageHandler(0x0001, &mockAppDelegate);
+    err = ctx.GetExchangeManager().RegisterUnsolicitedMessageHandlerForProtocol(0x0001, &mockAppDelegate);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = ctx.GetExchangeManager().RegisterUnsolicitedMessageHandler(0x0002, 0x0001, &mockAppDelegate);
+    err = ctx.GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(0x0002, 0x0001, &mockAppDelegate);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = ctx.GetExchangeManager().UnregisterUnsolicitedMessageHandler(0x0001);
+    err = ctx.GetExchangeManager().UnregisterUnsolicitedMessageHandlerForProtocol(0x0001);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = ctx.GetExchangeManager().UnregisterUnsolicitedMessageHandler(0x0002);
+    err = ctx.GetExchangeManager().UnregisterUnsolicitedMessageHandlerForProtocol(0x0002);
     NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
 
-    err = ctx.GetExchangeManager().UnregisterUnsolicitedMessageHandler(0x0002, 0x0001);
+    err = ctx.GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(0x0002, 0x0001);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = ctx.GetExchangeManager().UnregisterUnsolicitedMessageHandler(0x0002, 0x0002);
+    err = ctx.GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(0x0002, 0x0002);
     NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
 }
 
@@ -141,7 +141,7 @@ void CheckExchangeMessages(nlTestSuite * inSuite, void * inContext)
 
     // create unsolicited exchange
     MockAppDelegate mockUnsolicitedAppDelegate;
-    err = ctx.GetExchangeManager().RegisterUnsolicitedMessageHandler(0x0001, 0x0001, &mockUnsolicitedAppDelegate);
+    err = ctx.GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(0x0001, 0x0001, &mockUnsolicitedAppDelegate);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // send a malicious packet

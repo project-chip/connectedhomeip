@@ -25,7 +25,6 @@
 #include <app/MessageDef/CommandDataElement.h>
 #include <app/MessageDef/CommandList.h>
 #include <app/MessageDef/InvokeCommand.h>
-#include <app/MessageDef/MessageDef.h>
 #include <app/MessageDef/ReadRequest.h>
 #include <app/MessageDef/ReportData.h>
 #include <core/CHIPTLVDebug.hpp>

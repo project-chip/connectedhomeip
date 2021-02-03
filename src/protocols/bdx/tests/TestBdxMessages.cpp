@@ -2,7 +2,6 @@
 
 #include <nlunit-test.h>
 
-#include <support/BufBound.h>
 #include <support/CodeUtils.h>
 #include <support/UnitTestRegistration.h>
 
@@ -20,15 +19,15 @@ void TestHelperWrittenAndParsedMatch(nlTestSuite * inSuite, void * inContext, Ms
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    size_t msgSize                    = testMsg.MessageSize();
-    System::PacketBufferHandle msgBuf = System::PacketBufferHandle::New(static_cast<uint16_t>(msgSize));
-    NL_TEST_ASSERT(inSuite, !msgBuf.IsNull());
+    size_t msgSize = testMsg.MessageSize();
+    System::PacketBufBound bbuf(msgSize);
+    NL_TEST_ASSERT(inSuite, !bbuf.IsNull());
 
-    BufBound bbuf(msgBuf->Start(), msgBuf->AvailableDataLength());
     testMsg.WriteToBuffer(bbuf);
     NL_TEST_ASSERT(inSuite, bbuf.Fit());
-    msgBuf->SetDataLength(static_cast<uint16_t>(bbuf.Needed()));
 
+    System::PacketBufferHandle msgBuf = bbuf.Finalize();
+    NL_TEST_ASSERT(inSuite, !msgBuf.IsNull());
     System::PacketBufferHandle rcvBuf = System::PacketBufferHandle::NewWithData(msgBuf->Start(), msgSize);
     NL_TEST_ASSERT(inSuite, !rcvBuf.IsNull());
 

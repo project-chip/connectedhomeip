@@ -58,6 +58,7 @@ CHIP_ERROR RendezvousSession::Init(const RendezvousParameters & params, Transpor
     if (params.GetPeerAddress().GetTransportType() == Transport::Type::kBle)
 #if CONFIG_NETWORK_LAYER_BLE
     {
+        ReturnErrorOnFailure(mParams.GetAdvertisementDelegate()->StartAdvertisement());
         Transport::BLE * transport = chip::Platform::New<Transport::BLE>();
         mTransport                 = transport;
 
@@ -75,7 +76,7 @@ CHIP_ERROR RendezvousSession::Init(const RendezvousParameters & params, Transpor
     }
 
     mNetworkProvision.Init(this);
-    // TODO: We should assmue mTransportMgr not null for IP rendezvous.
+    // TODO: We should assume mTransportMgr not null for IP rendezvous.
     if (mTransportMgr != nullptr)
     {
         mTransportMgr->SetRendezvousSession(this);
@@ -257,16 +258,37 @@ void RendezvousSession::UpdateState(RendezvousSession::State newState, CHIP_ERRO
     }
     mCurrentState = newState;
 
-    if (newState == State::kRendezvousComplete && mDelegate != nullptr)
+    switch (mCurrentState)
     {
-        mDelegate->OnRendezvousComplete();
-    }
+    case State::kRendezvousComplete:
+        if (mDelegate != nullptr)
+        {
+            mDelegate->OnRendezvousComplete();
+        }
+        break;
 
-    // Release the previous session handle if new state is init, or pairing just started
-    if (newState == State::kInit || newState == State::kSecurePairing)
-    {
+    case State::kSecurePairing:
+        // Release the previous session handle
         ReleasePairingSessionHandle();
-    }
+        break;
+
+    case State::kInit:
+        // Release the previous session handle
+        ReleasePairingSessionHandle();
+
+        // Disable rendezvous advertisement
+        mParams.GetAdvertisementDelegate()->StopAdvertisement();
+        if (mTransport)
+        {
+            // Free the transport
+            chip::Platform::Delete(mTransport);
+            mTransport = nullptr;
+        }
+        break;
+
+    default:
+        break;
+    };
 }
 
 void RendezvousSession::OnRendezvousMessageReceived(const PacketHeader & packetHeader, const PeerAddress & peerAddress,

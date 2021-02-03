@@ -27,10 +27,12 @@
 #include "CommandSender.h"
 #include "InteractionModelEngine.h"
 
+#include <support/ReturnMacros.h>
+
 namespace chip {
 namespace app {
-void CommandHandler::OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, uint32_t protocolId,
-                                       uint8_t msgType, System::PacketBufferHandle payload)
+void CommandHandler::OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
+                                       const PayloadHeader & payloadHeader, System::PacketBufferHandle payload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferHandle response;
@@ -57,8 +59,8 @@ CHIP_ERROR CommandHandler::SendCommandResponse()
     SuccessOrExit(err);
 
     VerifyOrExit(mpExchangeCtx != NULL, err = CHIP_ERROR_INCORRECT_STATE);
-    err = mpExchangeCtx->SendMessage(Protocols::kProtocol_InteractionModel, kMsgType_InvokeCommandResponse,
-                                     std::move(mCommandMessageBuf), Messaging::SendFlags(Messaging::SendMessageFlags::kNone));
+    err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::InvokeCommandResponse, std::move(mCommandMessageBuf),
+                                     Messaging::SendFlags(Messaging::SendMessageFlags::kNone));
     SuccessOrExit(err);
 
     MoveToState(kState_Sending);
@@ -76,15 +78,12 @@ CHIP_ERROR CommandHandler::ProcessCommandDataElement(CommandDataElement::Parser 
     chip::TLV::TLVReader commandDataReader;
     chip::ClusterId clusterId;
     chip::CommandId commandId;
+    chip::EndpointId endpointId;
 
-    err = aCommandElement.GetCommandPath(&commandPath);
-    SuccessOrExit(err);
-
-    err = commandPath.GetNamespacedClusterId(&clusterId);
-    SuccessOrExit(err);
-
-    err = commandPath.GetCommandId(&commandId);
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(aCommandElement.GetCommandPath(&commandPath));
+    ReturnErrorOnFailure(commandPath.GetNamespacedClusterId(&clusterId));
+    ReturnErrorOnFailure(commandPath.GetCommandId(&commandId));
+    ReturnErrorOnFailure(commandPath.GetEndpointId(&endpointId));
 
     err = aCommandElement.GetData(&commandDataReader);
     if (CHIP_END_OF_TLV == err)
@@ -97,10 +96,9 @@ CHIP_ERROR CommandHandler::ProcessCommandDataElement(CommandDataElement::Parser 
     }
     else if (CHIP_NO_ERROR == err)
     {
-        InteractionModelEngine::GetInstance()->ProcessCommand(clusterId, commandId, commandDataReader, this, kCommandHandlerId);
+        DispatchSingleClusterCommand(clusterId, commandId, endpointId, commandDataReader, this);
     }
 
-exit:
     return err;
 }
 } // namespace app

@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2008,2020 Silicon Labs.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <cluster>
+    <name>Relay Control</name>
+    <domain>Ember</domain>
+    <description>Commands to turn on and off the stack's relay capabilities, and to determine whether or not relay is enabled.</description>
+    <code>0xC00D</code>
+    <define>RELAY_CONTROL_CLUSTER</define>
+    <client init="false" tick="false">true</client>
+    <server init="false" tick="false">true</server>
+    <command source="client" code="0x00" name="SetRelayState" optional="false">
+      <description>
+        Sets the on-off state of stack relay.
+      </description>
+      <arg name="isEnabled" type="BOOLEAN"/>
+      <arg name="magicNumber" type="INT32U"/>
+    </command>
+    <command source="client" code="0x01" name="GetRelayState" optional="false">
+      <description>
+        Client-to-server query that provides the on-off state of stack relay.
+      </description>
+    </command>
+    <command source="server" code="0x00" name="GetRelayStateResponse" optional="false" disableDefaultResponse="true">
+      <description>
+        Response to GetRelayState query.
+      </description>
+      <arg name="isEnabled" type="BOOLEAN"/>
+    </command>
+  </cluster>
+</configurator>

@@ -39,27 +39,28 @@
 #include <transport/SecureSessionMgr.h>
 #include <transport/raw/UDP.h>
 
-namespace {
+namespace chip {
+namespace app {
 
-// The CommandHandler object
-chip::TransportMgr<chip::Transport::UDP> gTransportManager;
-chip::SecureSessionMgr gSessionManager;
-chip::SecurePairingUsingTestSecret gTestPairing;
-
-// Callback handler when a CHIP EchoRequest is received.
-void HandleCommandRequestReceived(chip::TLV::TLVReader & aReader, chip::app::Command * apCommandObj)
+void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId,
+                                  chip::TLV::TLVReader & aReader, Command * apCommandObj)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+
+    if (aClusterId != kTestClusterId || aCommandId != kTestCommandId || aEndPointId != kTestEndPointId)
+    {
+        return;
+    }
 
     if (aReader.GetLength() != 0)
     {
         chip::TLV::Debug::Dump(aReader, TLVPrettyPrinter);
     }
 
-    chip::app::Command::CommandParams commandParams = { 1,  // Endpoint
-                                                        0,  // GroupId
-                                                        6,  // ClusterId
-                                                        40, // CommandId
+    chip::app::Command::CommandParams commandParams = { kTestEndPointId, // Endpoint
+                                                        kTestGroupId,    // GroupId
+                                                        kTestClusterId,  // ClusterId
+                                                        kTestCommandId,  // CommandId
                                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
 
     // Add command data here
@@ -93,6 +94,15 @@ void HandleCommandRequestReceived(chip::TLV::TLVReader & aReader, chip::app::Com
 exit:
     return;
 }
+} // namespace app
+} // namespace chip
+
+namespace {
+
+// The CommandHandler object
+chip::TransportMgr<chip::Transport::UDP> gTransportManager;
+chip::SecureSessionMgr gSessionManager;
+chip::SecurePairingUsingTestSecret gTestPairing;
 
 } // namespace
 
@@ -119,15 +129,11 @@ int main(int argc, char * argv[])
     err = gSessionManager.NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing);
     SuccessOrExit(err);
 
-    chip::app::InteractionModelEngine::GetInstance()->RegisterClusterCommandHandler(
-        6, 40, chip::app::Command::CommandRoleId::kCommandHandlerId, HandleCommandRequestReceived);
     printf("Listening for IM requests...\n");
 
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
 
 exit:
-    chip::app::InteractionModelEngine::GetInstance()->DeregisterClusterCommandHandler(
-        6, 40, chip::app::Command::CommandRoleId::kCommandHandlerId);
 
     if (err != CHIP_NO_ERROR)
     {

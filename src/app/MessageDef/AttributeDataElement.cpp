@@ -242,7 +242,7 @@ CHIP_ERROR AttributeDataElement::Parser::CheckSchemaValidity() const
             // check if this tag has appeared before
             VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_AttributePath)), err = CHIP_ERROR_INVALID_TLV_TAG);
             TagPresenceMask |= (1 << kCsTag_AttributePath);
-            VerifyOrExit(chip::TLV::kTLVType_Path == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
+            VerifyOrExit(chip::TLV::kTLVType_List == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
 
             {
                 AttributePath::Parser path;
@@ -338,7 +338,7 @@ CHIP_ERROR AttributeDataElement::Parser::GetAttributePath(AttributePath::Parser 
     err = mReader.FindElementWithTag(chip::TLV::ContextTag(kCsTag_AttributePath), reader);
     SuccessOrExit(err);
 
-    VerifyOrExit(chip::TLV::kTLVType_Path == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
+    VerifyOrExit(chip::TLV::kTLVType_List == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
 
     err = apAttributePath->Init(reader);
     SuccessOrExit(err);

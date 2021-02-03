@@ -1,8 +1,6 @@
-/*
+/**
  *
- *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2014-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,12 +14,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "ChipDeviceController-BleApplicationDelegate.h"
-#include <ble/BleApplicationDelegate.h>
+#import <UIKit/UIKit.h>
 
-void DeviceController_BleApplicationDelegate::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT connObj)
-{
-    // NO-OP
+NS_ASSUME_NONNULL_BEGIN
 
-    // TODO Python queue-based implementation
-}
+@interface BindingsViewController : UIViewController
+
+@end
+
+NS_ASSUME_NONNULL_END

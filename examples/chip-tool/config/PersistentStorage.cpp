@@ -119,8 +119,10 @@ exit:
 
 uint16_t PersistentStorage::GetListenPort()
 {
-    CHIP_ERROR err          = CHIP_NO_ERROR;
-    uint16_t chipListenPort = CHIP_PORT;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    // By default chip-tool listens on CHIP_PORT + 1. This is done in order to avoid
+    // having 2 servers listening on CHIP_PORT when one runs an accessory server locally.
+    uint16_t chipListenPort = CHIP_PORT + 1;
 
     char value[6];
     uint16_t size = static_cast<uint16_t>(sizeof(value));

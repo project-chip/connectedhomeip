@@ -17,6 +17,7 @@
 
 #include <app/server/Server.h>
 
+#include <app/InteractionModelEngine.h>
 #include <app/server/DataModelHandler.h>
 #include <app/server/RendezvousServer.h>
 #include <app/server/SessionManager.h>
@@ -26,6 +27,7 @@
 #include <inet/InetError.h>
 #include <inet/InetLayer.h>
 #include <mdns/Advertiser.h>
+#include <messaging/ExchangeMgr.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/SetupPayload.h>
 #include <support/CodeUtils.h>
@@ -40,6 +42,7 @@ using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::Transport;
 using namespace ::chip::DeviceLayer;
+using namespace ::chip::Messaging;
 
 namespace {
 
@@ -56,6 +59,38 @@ bool isRendezvousBypassed()
 #endif
 
     return rendezvousMode == RendezvousInformationFlags::kNone;
+}
+
+class ServerRendezvousAdvertisementDelegate : public RendezvousAdvertisementDelegate
+{
+public:
+    CHIP_ERROR StartAdvertisement() const override { return chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(true); }
+    CHIP_ERROR StopAdvertisement() const override { return chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(false); }
+};
+
+DemoTransportMgr gTransports;
+SecureSessionMgr gSessions;
+RendezvousServer gRendezvousServer;
+
+ServerRendezvousAdvertisementDelegate gAdvDelegate;
+
+static CHIP_ERROR OpenPairingWindow(uint32_t pinCode, uint16_t discriminator)
+{
+    RendezvousParameters params;
+
+    ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().StoreSetupDiscriminator(discriminator));
+    ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().StoreSetupPinCode(pinCode));
+
+#if CONFIG_NETWORK_LAYER_BLE
+    params.SetSetupPINCode(pinCode)
+        .SetBleLayer(DeviceLayer::ConnectivityMgr().GetBleLayer())
+        .SetPeerAddress(Transport::PeerAddress::BLE())
+        .SetAdvertisementDelegate(&gAdvDelegate);
+#else
+    params.SetSetupPINCode(pinCode);
+#endif // CONFIG_NETWORK_LAYER_BLE
+
+    return gRendezvousServer.Init(std::move(params), &gTransports, &gSessions);
 }
 
 class ServerCallback : public SecureSessionMgrDelegate
@@ -78,7 +113,7 @@ public:
 
         ChipLogProgress(AppServer, "Packet received from %s: %zu bytes", src_addr, static_cast<size_t>(data_len));
 
-        HandleDataModelMessage(header, std::move(buffer), mgr);
+        HandleDataModelMessage(header.GetSourceNodeId().Value(), std::move(buffer));
 
     exit:;
     }
@@ -166,17 +201,26 @@ CHIP_ERROR InitMdns()
 }
 #endif
 
-DemoTransportMgr gTransports;
-SecureSessionMgr gSessions;
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+Messaging::ExchangeManager gExchange;
+#endif
 ServerCallback gCallbacks;
 SecurePairingUsingTestSecret gTestPairing;
-RendezvousServer gRendezvousServer;
 
 } // namespace
 
 SecureSessionMgr & chip::SessionManager()
 {
     return gSessions;
+}
+
+CHIP_ERROR OpenDefaultPairingWindow()
+{
+    uint32_t pinCode;
+    uint16_t discriminator;
+    ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSetupPinCode(pinCode));
+    ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSetupDiscriminator(discriminator));
+    return OpenPairingWindow(pinCode, discriminator);
 }
 
 // The function will initialize datamodel handler and then start the server
@@ -202,7 +246,14 @@ void InitServer(AppDelegate * delegate)
     err = gSessions.Init(chip::kTestDeviceNodeId, &DeviceLayer::SystemLayer, &gTransports);
     SuccessOrExit(err);
 
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    err = gExchange.Init(&gSessions);
+    SuccessOrExit(err);
+    err = chip::app::InteractionModelEngine::GetInstance()->Init(&gExchange);
+    SuccessOrExit(err);
+#else
     gSessions.SetDelegate(&gCallbacks);
+#endif
 
     // This flag is used to bypass BLE in the cirque test
     // Only in the cirque test this is enabled with --args='bypass_rendezvous=true'
@@ -212,20 +263,15 @@ void InitServer(AppDelegate * delegate)
         err = gSessions.NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing);
         SuccessOrExit(err);
     }
+    else if (DeviceLayer::ConnectivityMgr().IsWiFiStationProvisioned() || DeviceLayer::ConnectivityMgr().IsThreadProvisioned())
+    {
+        // If the network is already provisioned, proactively disable BLE advertisement.
+        ChipLogProgress(AppServer, "Network already provisioned. Disabling BLE advertisement");
+        chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(false);
+    }
     else
     {
-        RendezvousParameters params;
-        uint32_t pinCode;
-
-        SuccessOrExit(err = DeviceLayer::ConfigurationMgr().GetSetupPinCode(pinCode));
-#if CONFIG_NETWORK_LAYER_BLE
-        params.SetSetupPINCode(pinCode)
-            .SetBleLayer(DeviceLayer::ConnectivityMgr().GetBleLayer())
-            .SetPeerAddress(Transport::PeerAddress::BLE());
-#else
-        params.SetSetupPINCode(pinCode);
-#endif // CONFIG_NETWORK_LAYER_BLE
-        SuccessOrExit(err = gRendezvousServer.Init(params, &gTransports, &gSessions));
+        SuccessOrExit(err = OpenDefaultPairingWindow());
     }
 
 #if CHIP_ENABLE_MDNS

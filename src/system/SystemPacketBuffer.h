@@ -29,6 +29,7 @@
 #include <system/SystemConfig.h>
 
 // Include dependent headers
+#include <support/BufBound.h>
 #include <support/CodeUtils.h>
 #include <support/DLLUtil.h>
 #include <system/SystemAlignSize.h>
@@ -446,7 +447,7 @@ public:
     PacketBuffer * operator->() const { return mBuffer; }
 
     /**
-     * Test whether this PacketBufferHandle is empty, or owns a PacketBuffer.
+     * Test whether this PacketBufferHandle is empty, or conversely owns a PacketBuffer.
      *
      * @return \c true if this PacketBufferHandle is empty; return \c false if it owns a PacketBuffer.
      */
@@ -542,14 +543,20 @@ public:
     /**
      * Allocates a packet buffer.
      *
+     *  A packet buffer is conceptually divided into two parts:
+     *  @li  Space reserved for network protocol headers. The size of this space normally defaults to a value determined
+     *       by the network layer configuration, but can be given explicity by \c aReservedSize for special cases.
+     *  @li  Space for application data. The minimum size of this space is given by \c aAvailableSize, and then \c Start()
+     *       provides a pointer to the start of this space.
+     *
      *  Fails and returns \c nullptr if no memory is available, or if the size requested is too large.
      *  When the sum of \a aAvailableSize and \a aReservedSize is no greater than \c kMaxPacketBufferSizeWithoutReserve,
      *  that is guaranteed not to be too large.
      *
      *  On success, it is guaranteed that \c AvailableDataSize() is no less than \a aAvailableSize.
      *
-     *  @param[in]  aAvailableSize  Minimim number of octets to allocate after the cursor.
-     *  @param[in]  aReservedSize   Minimum number of octets to reserve behind the cursor.
+     *  @param[in]  aAvailableSize  Minimim number of octets to for application data (at `Start()`).
+     *  @param[in]  aReservedSize   Number of octets to reserve for protocol headers (before `Start()`).
      *
      *  @return     On success, a PacketBufferHandle to the allocated buffer. On fail, \c nullptr.
      */
@@ -560,8 +567,8 @@ public:
      *
      *  @param[in]  aData           Initial buffer contents.
      *  @param[in]  aDataSize       Size of initial buffer contents.
-     *  @param[in]  aAdditionalSize Size of additional buffer space after the initial contents.
-     *  @param[in]  aReservedSize   Number of octets to reserve behind the cursor.
+     *  @param[in]  aAdditionalSize Size of additional application data space after the initial contents.
+     *  @param[in]  aReservedSize   Number of octets to reserve for protocol headers.
      *
      *  @return     On success, a PacketBufferHandle to the allocated buffer. On fail, \c nullptr.
      */
@@ -631,6 +638,60 @@ inline PacketBufferHandle PacketBuffer::Last()
         p = p->ChainedBuffer();
     return PacketBufferHandle::Hold(p);
 }
+
+/**
+ * BufBound backed by packet buffer.
+ *
+ * Typical use:
+ *  @code
+ *      PacketBufBound buf(maximumLength);
+ *      if (buf.IsNull()) { return CHIP_ERROR_NO_MEMORY; }
+ *      buf.Put(...);
+ *      ...
+ *      PacketBufferHandle handle = buf.Finalize();
+ *      if (buf.IsNull()) { return CHIP_ERROR_BUFFER_TOO_SMALL; }
+ *      // valid data
+ *  @endcode
+ */
+class PacketBufBound : public BufBound
+{
+public:
+    /**
+     * Constructs a BufBound that writes into a newly allocated packet buffer.
+     *
+     *  If no memory is available, or if the size requested is too large, then \c IsNull() will be true.
+     *  Otherwise, it is guaranteed that the BufBound length is \a aAvailableSize. (The underlying packet
+     *  buffer may be larger.)
+     *
+     *  @param[in]  aAvailableSize  Length bound of the BufBound.
+     *  @param[in]  aReservedSize   Reserved packet buffer space for protocol headers; see \c PacketBufferHandle::New().
+     */
+    PacketBufBound(size_t aAvailableSize, uint16_t aReservedSize = CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE);
+
+    /**
+     * Test whether this PacketBufBound is null, or conversely owns a PacketBuffer.
+     *
+     * @retval true     The PacketBufBound is null; it does not own a PacketBuffer. This implies either that
+     *                  construction failed, or that \c Finalize() has previously been called to release the buffer.
+     * @retval false    The PacketBufBound owns a PacketBuffer, which can be written using BufBound \c Put() methods,
+     *                  and (assuming no overflow) obtained by calling \c Finalize().
+     */
+    bool IsNull() const { return mPacket.IsNull(); }
+
+    /**
+     * Obtain the backing packet buffer, if it is valid.
+     *
+     *  If construction succeeded, \c Finalize() has not already been called, and \c BufBound::Fit() is true, the caller
+     *  takes ownership of a buffer containing the desired data. Otherwise, the returned handle tests null, and any
+     *  underlying storage has been released.
+     *
+     *  @return     A packet buffer handle.
+     */
+    PacketBufferHandle Finalize();
+
+private:
+    PacketBufferHandle mPacket;
+};
 
 } // namespace System
 } // namespace chip
