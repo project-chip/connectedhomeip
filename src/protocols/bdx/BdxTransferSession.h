@@ -26,17 +26,17 @@ class DLL_EXPORT TransferSession
 public:
     enum OutputEventType : uint16_t
     {
-        kOutput_None = 0,
-        kOutput_MsgToSend,
-        kOutput_InitReceived,
-        kOutput_AcceptReceived,
-        kOutput_BlockReceived,
-        kOutput_QueryReceived,
-        kOutput_AckReceived,
-        kOutput_AckEOFReceived,
-        kOutput_StatusReceived,
-        kOutput_InternalError,
-        kOutput_TransferTimeout
+        kNone = 0,
+        kMsgToSend,
+        kInitReceived,
+        kAcceptReceived,
+        kBlockReceived,
+        kQueryReceived,
+        kAckReceived,
+        kAckEOFReceived,
+        kStatusReceived,
+        kInternalError,
+        kTransferTimeout
     };
 
     struct TransferInitData
@@ -99,7 +99,7 @@ public:
             StatusReportData statusData;
         };
 
-        OutputEvent() : EventType(kOutput_None) { statusData = { kStatus_None }; }
+        OutputEvent() : EventType(kNone) { statusData = { kStatus_None }; }
         OutputEvent(OutputEventType type) : EventType(type) { statusData = { kStatus_None }; }
 
         static OutputEvent TransferInitEvent(TransferInitData data, System::PacketBufferHandle msg);
@@ -118,6 +118,9 @@ public:
      *
      *   It is possible that consecutive calls to this method may emit different outputs depending on the state of the
      *   TransferSession object.
+     *
+     *   Note that if the type outputted is kMsgToSend, it is assumed that the message will be send immediately, and the
+     *   session timeout timer will begin at curTimeMs.
      *
      *   See OutputEventType for all possible output event types.
      *
@@ -141,7 +144,7 @@ public:
      * @return CHIP_ERROR Result of initialization and preparation of a TransferInit message. May also indicate if the
      *                    TransferSession object is unable to handle this request.
      */
-    CHIP_ERROR StartTransfer(TransferRole role, const TransferInitData & initData, uint32_t timeoutMs, uint64_t curTimeMs);
+    CHIP_ERROR StartTransfer(TransferRole role, const TransferInitData & initData, uint32_t timeoutMs);
 
     /**
      * @brief
@@ -275,12 +278,6 @@ private:
 
     /**
      * @brief
-     *   Helper method for attaching BDX protocol and message type to a PacketBuffer that already contains data.
-     */
-    CHIP_ERROR AttachBdxHeader(MessageType msgType, System::PacketBufferHandle & msgBuf);
-
-    /**
-     * @brief
      *   Used when handling a TransferInit message. Determines if there are any compatible Transfer control modes between the two
      *   transfer peers.
      */
@@ -295,8 +292,8 @@ private:
     void SetTransferError(StatusCode code);
     bool IsTransferLengthDefinite();
 
-    OutputEventType mPendingOutput;
-    TransferStates mState = kState_Idle;
+    OutputEventType mPendingOutput = kNone;
+    TransferStates mState          = kState_Idle;
     TransferRole mRole;
 
     // Indicate supported options pre- transfer accept
@@ -325,6 +322,7 @@ private:
 
     uint32_t mTimeoutMs          = 0;
     uint64_t mTimeoutStartTimeMs = 0;
+    bool mShouldInitTimeoutStart = true;
     bool mAwaitingResponse       = false;
 };
 

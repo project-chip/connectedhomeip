@@ -23,15 +23,43 @@ CHIP_ERROR WriteToPacketBuffer(const ::chip::bdx::BdxMessage & msgStruct, ::chip
     CHIP_ERROR err     = CHIP_NO_ERROR;
     size_t msgDataSize = msgStruct.MessageSize();
     msgBuf             = ::chip::System::PacketBufferHandle::New(static_cast<uint16_t>(msgDataSize));
-    if (msgBuf.IsNull())
+    if (msgBuf.IsNull() || msgDataSize > msgBuf->AvailableDataLength())
     {
         return CHIP_ERROR_NO_MEMORY;
     }
 
     ::chip::BufBound bbuf(msgBuf->Start(), msgBuf->AvailableDataLength());
     msgStruct.WriteToBuffer(bbuf);
-    msgBuf->SetDataLength(static_cast<uint16_t>(bbuf.Needed()));
+    if (bbuf.Fit())
+    {
+        msgBuf->SetDataLength(static_cast<uint16_t>(bbuf.Needed()));
+    }
+    else
+    {
+        err = CHIP_ERROR_NO_MEMORY;
+    }
 
+    return err;
+}
+
+CHIP_ERROR AttachBdxHeader(::chip::bdx::MessageType msgType, ::chip::System::PacketBufferHandle & msgBuf)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    ::chip::PayloadHeader payloadHeader;
+
+    payloadHeader.SetMessageType(::chip::Protocols::kProtocol_BDX, static_cast<uint8_t>(msgType));
+
+    uint16_t headerSize              = payloadHeader.EncodeSizeBytes();
+    uint16_t actualEncodedHeaderSize = 0;
+
+    VerifyOrExit(msgBuf->EnsureReservedSize(headerSize), err = CHIP_ERROR_NO_MEMORY);
+
+    msgBuf->SetStart(msgBuf->Start() - headerSize);
+    err = payloadHeader.Encode(msgBuf->Start(), headerSize, &actualEncodedHeaderSize);
+    SuccessOrExit(err);
+    VerifyOrExit(headerSize == actualEncodedHeaderSize, err = CHIP_ERROR_INTERNAL);
+
+exit:
     return err;
 }
 } // anonymous namespace
@@ -41,18 +69,22 @@ namespace bdx {
 
 TransferSession::TransferSession()
 {
-    mState         = kState_Idle;
-    mPendingOutput = kOutput_None;
     mSuppportedXferOpts.SetRaw(0);
 }
 
 void TransferSession::PollOutput(OutputEvent & event, uint64_t curTimeMs)
 {
-    event = OutputEvent();
+    event = OutputEvent(kNone);
 
-    if (mAwaitingResponse && (mTimeoutStartTimeMs + mTimeoutMs <= curTimeMs))
+    if (mShouldInitTimeoutStart)
     {
-        event             = OutputEvent(kOutput_TransferTimeout);
+        mTimeoutStartTimeMs     = curTimeMs;
+        mShouldInitTimeoutStart = false;
+    }
+
+    if (mAwaitingResponse && ((curTimeMs - mTimeoutStartTimeMs) >= mTimeoutMs))
+    {
+        event             = OutputEvent(kTransferTimeout);
         mState            = kState_Error;
         mAwaitingResponse = false;
         return;
@@ -60,48 +92,47 @@ void TransferSession::PollOutput(OutputEvent & event, uint64_t curTimeMs)
 
     switch (mPendingOutput)
     {
-    case kOutput_None:
-        event = OutputEvent(kOutput_None);
+    case kNone:
+        event = OutputEvent(kNone);
         break;
-    case kOutput_InternalError:
-        event = OutputEvent::StatusReportEvent(kOutput_InternalError, mStatusReportData);
+    case kInternalError:
+        event = OutputEvent::StatusReportEvent(kInternalError, mStatusReportData);
         break;
-    case kOutput_StatusReceived:
-        event = OutputEvent::StatusReportEvent(kOutput_StatusReceived, mStatusReportData);
+    case kStatusReceived:
+        event = OutputEvent::StatusReportEvent(kStatusReceived, mStatusReportData);
         break;
-    case kOutput_MsgToSend:
-        event               = OutputEvent(kOutput_MsgToSend);
+    case kMsgToSend:
+        event               = OutputEvent(kMsgToSend);
         event.MsgData       = std::move(mPendingMsgHandle);
         mTimeoutStartTimeMs = curTimeMs;
         break;
-    case kOutput_InitReceived:
+    case kInitReceived:
         event = OutputEvent::TransferInitEvent(mTransferRequestData, std::move(mPendingMsgHandle));
         break;
-    case kOutput_AcceptReceived:
+    case kAcceptReceived:
         event = OutputEvent::TransferAcceptEvent(mTransferAcceptData, std::move(mPendingMsgHandle));
         break;
-    case kOutput_QueryReceived:
-        event = OutputEvent(kOutput_QueryReceived);
+    case kQueryReceived:
+        event = OutputEvent(kQueryReceived);
         break;
-    case kOutput_BlockReceived:
+    case kBlockReceived:
         event = OutputEvent::BlockDataEvent(mBlockEventData, std::move(mPendingMsgHandle));
         break;
-    case kOutput_AckReceived:
-        event = OutputEvent(kOutput_AckReceived);
+    case kAckReceived:
+        event = OutputEvent(kAckReceived);
         break;
-    case kOutput_AckEOFReceived:
-        event = OutputEvent(kOutput_AckEOFReceived);
+    case kAckEOFReceived:
+        event = OutputEvent(kAckEOFReceived);
         break;
     default:
-        event = OutputEvent(kOutput_None);
+        event = OutputEvent(kNone);
         break;
     }
 
-    mPendingOutput = kOutput_None;
+    mPendingOutput = kNone;
 }
 
-CHIP_ERROR TransferSession::StartTransfer(TransferRole role, const TransferInitData & initData, uint32_t timeoutMs,
-                                          uint64_t curTimeMs)
+CHIP_ERROR TransferSession::StartTransfer(TransferRole role, const TransferInitData & initData, uint32_t timeoutMs)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     MessageType msgType;
@@ -136,11 +167,10 @@ CHIP_ERROR TransferSession::StartTransfer(TransferRole role, const TransferInitD
     err     = AttachBdxHeader(msgType, mPendingMsgHandle);
     SuccessOrExit(err);
 
-    mState              = kState_AwaitingAccept;
-    mAwaitingResponse   = true;
-    mTimeoutStartTimeMs = curTimeMs;
+    mState            = kState_AwaitingAccept;
+    mAwaitingResponse = true;
 
-    mPendingOutput = kOutput_MsgToSend;
+    mPendingOutput = kMsgToSend;
 
 exit:
     return err;
@@ -172,7 +202,7 @@ CHIP_ERROR TransferSession::AcceptTransfer(const TransferAcceptData & acceptData
     BitFlags<uint8_t, TransferControlFlags> proposedControlOpts;
 
     VerifyOrExit(mState == kState_NegotiateTransferParams, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(mPendingOutput == kOutput_None, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mPendingOutput == kNone, err = CHIP_ERROR_INCORRECT_STATE);
 
     // Don't allow a Control method that wasn't supported by the initiator
     // MaxBlockSize can't be larger than the proposed value
@@ -218,7 +248,7 @@ CHIP_ERROR TransferSession::AcceptTransfer(const TransferAcceptData & acceptData
         SuccessOrExit(err);
     }
 
-    mPendingOutput = kOutput_MsgToSend;
+    mPendingOutput = kMsgToSend;
 
     mState = kState_TransferInProgress;
 
@@ -239,7 +269,7 @@ CHIP_ERROR TransferSession::PrepareBlockQuery()
 
     VerifyOrExit(mState == kState_TransferInProgress, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mRole == kRole_Receiver, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(mPendingOutput == kOutput_None, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mPendingOutput == kNone, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(!mAwaitingResponse, err = CHIP_ERROR_INCORRECT_STATE);
 
     queryMsg.BlockCounter = mNextQueryNum;
@@ -250,7 +280,7 @@ CHIP_ERROR TransferSession::PrepareBlockQuery()
     err = AttachBdxHeader(kBdxMsg_BlockQuery, mPendingMsgHandle);
     SuccessOrExit(err);
 
-    mPendingOutput = kOutput_MsgToSend;
+    mPendingOutput = kMsgToSend;
 
     mAwaitingResponse = true;
     mLastQueryNum     = mNextQueryNum++;
@@ -267,7 +297,7 @@ CHIP_ERROR TransferSession::PrepareBlock(const BlockData & inData)
 
     VerifyOrExit(mState == kState_TransferInProgress, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mRole == kRole_Sender, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(mPendingOutput == kOutput_None, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mPendingOutput == kNone, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(!mAwaitingResponse, err = CHIP_ERROR_INCORRECT_STATE);
 
     // Verify non-zero data is provided and is no longer than MaxBlockSize (BlockEOF may contain 0 length data)
@@ -284,7 +314,7 @@ CHIP_ERROR TransferSession::PrepareBlock(const BlockData & inData)
     err     = AttachBdxHeader(msgType, mPendingMsgHandle);
     SuccessOrExit(err);
 
-    mPendingOutput = kOutput_MsgToSend;
+    mPendingOutput = kMsgToSend;
 
     if (msgType == kBdxMsg_BlockEOF)
     {
@@ -306,7 +336,7 @@ CHIP_ERROR TransferSession::PrepareBlockAck()
 
     VerifyOrExit(mRole == kRole_Receiver, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit((mState == kState_TransferInProgress) || (mState == kState_ReceivedEOF), err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(mPendingOutput == kOutput_None, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mPendingOutput == kNone, err = CHIP_ERROR_INCORRECT_STATE);
 
     ackMsg.BlockCounter = mLastBlockNum;
     msgType             = (mState == kState_ReceivedEOF) ? kBdxMsg_BlockAckEOF : kBdxMsg_BlockAck;
@@ -333,7 +363,7 @@ CHIP_ERROR TransferSession::PrepareBlockAck()
         mAwaitingResponse = false;
     }
 
-    mPendingOutput = kOutput_MsgToSend;
+    mPendingOutput = kMsgToSend;
 
 exit:
     return err;
@@ -349,7 +379,7 @@ CHIP_ERROR TransferSession::AbortTransfer(StatusCode reason)
 
 void TransferSession::Reset()
 {
-    mPendingOutput = kOutput_None;
+    mPendingOutput = kNone;
     mState         = kState_Idle;
     mSuppportedXferOpts.SetRaw(0);
     mTransferVersion       = 0;
@@ -358,15 +388,18 @@ void TransferSession::Reset()
     mTransferLength        = 0;
     mTransferMaxBlockSize  = 0;
 
+    mPendingMsgHandle = nullptr;
+
     mNumBytesProcessed = 0;
     mLastBlockNum      = 0;
     mNextBlockNum      = 0;
     mLastQueryNum      = 0;
     mNextQueryNum      = 0;
 
-    mTimeoutMs          = 0;
-    mTimeoutStartTimeMs = 0;
-    mAwaitingResponse   = 0;
+    mTimeoutMs              = 0;
+    mTimeoutStartTimeMs     = 0;
+    mShouldInitTimeoutStart = true;
+    mAwaitingResponse       = false;
 }
 
 CHIP_ERROR TransferSession::HandleMessageReceived(System::PacketBufferHandle msg, uint64_t curTimeMs)
@@ -406,7 +439,7 @@ CHIP_ERROR TransferSession::HandleBdxMessage(PayloadHeader & header, System::Pac
     MessageType msgType = static_cast<MessageType>(header.GetMessageType());
 
     VerifyOrExit(!msg.IsNull(), err = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(mPendingOutput == kOutput_None, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mPendingOutput == kNone, err = CHIP_ERROR_INCORRECT_STATE);
 
     switch (msgType)
     {
@@ -446,7 +479,7 @@ exit:
 
 CHIP_ERROR TransferSession::HandleStatusReportMessage(PayloadHeader & header, System::PacketBufferHandle msg)
 {
-    mPendingOutput = kOutput_StatusReceived;
+    mPendingOutput = kStatusReceived;
     mState         = kState_Error;
 
     // TODO: parse status report message
@@ -494,7 +527,7 @@ void TransferSession::HandleTransferInit(MessageType msgType, System::PacketBuff
     mTransferRequestData.MetadataLength      = transferInit.MetadataLength;
 
     mPendingMsgHandle = std::move(msgData);
-    mPendingOutput    = kOutput_InitReceived;
+    mPendingOutput    = kInitReceived;
 
     mState = kState_NegotiateTransferParams;
 
@@ -531,7 +564,7 @@ void TransferSession::HandleReceiveAccept(System::PacketBufferHandle msgData)
     mTransferAcceptData.MetadataLength = rcvAcceptMsg.MetadataLength;
 
     mPendingMsgHandle = std::move(msgData);
-    mPendingOutput    = kOutput_AcceptReceived;
+    mPendingOutput    = kAcceptReceived;
 
     mAwaitingResponse = (mControlMode == kControl_SenderDrive);
     mState            = kState_TransferInProgress;
@@ -567,7 +600,7 @@ void TransferSession::HandleSendAccept(System::PacketBufferHandle msgData)
     mTransferAcceptData.MetadataLength = sendAcceptMsg.MetadataLength;
 
     mPendingMsgHandle = std::move(msgData);
-    mPendingOutput    = kOutput_AcceptReceived;
+    mPendingOutput    = kAcceptReceived;
 
     mAwaitingResponse = (mControlMode == kControl_ReceiverDrive);
     mState            = kState_TransferInProgress;
@@ -590,7 +623,7 @@ void TransferSession::HandleBlockQuery(System::PacketBufferHandle msgData)
 
     VerifyOrExit(query.BlockCounter == mNextBlockNum, SetTransferError(kStatus_BadBlockCounter));
 
-    mPendingOutput = kOutput_QueryReceived;
+    mPendingOutput = kQueryReceived;
 
     mAwaitingResponse = false;
     mLastQueryNum     = query.BlockCounter;
@@ -625,7 +658,7 @@ void TransferSession::HandleBlock(System::PacketBufferHandle msgData)
     mBlockEventData.IsEof  = false;
 
     mPendingMsgHandle = std::move(msgData);
-    mPendingOutput    = kOutput_BlockReceived;
+    mPendingOutput    = kBlockReceived;
 
     mNumBytesProcessed += blockMsg.DataLength;
     mLastBlockNum = blockMsg.BlockCounter;
@@ -656,7 +689,7 @@ void TransferSession::HandleBlockEOF(System::PacketBufferHandle msgData)
     mBlockEventData.IsEof  = true;
 
     mPendingMsgHandle = std::move(msgData);
-    mPendingOutput    = kOutput_BlockReceived;
+    mPendingOutput    = kBlockReceived;
 
     mNumBytesProcessed += blockEOFMsg.DataLength;
     mLastBlockNum = blockEOFMsg.BlockCounter;
@@ -681,7 +714,7 @@ void TransferSession::HandleBlockAck(System::PacketBufferHandle msgData)
     VerifyOrExit(err == CHIP_NO_ERROR, SetTransferError(kStatus_BadMessageContents));
     VerifyOrExit(ackMsg.BlockCounter == mLastBlockNum, SetTransferError(kStatus_BadBlockCounter));
 
-    mPendingOutput = kOutput_AckReceived;
+    mPendingOutput = kAckReceived;
 
     // In Receiver Drive, the Receiver can send a BlockAck to indicate receipt of the message and reset the timeout.
     // In this case, the Sender should wait to receive a BlockQuery next.
@@ -704,7 +737,7 @@ void TransferSession::HandleBlockAckEOF(System::PacketBufferHandle msgData)
     VerifyOrExit(err == CHIP_NO_ERROR, SetTransferError(kStatus_BadMessageContents));
     VerifyOrExit(ackMsg.BlockCounter == mLastBlockNum, SetTransferError(kStatus_BadBlockCounter));
 
-    mPendingOutput = kOutput_AckEOFReceived;
+    mPendingOutput = kAckEOFReceived;
 
     mAwaitingResponse = false;
 
@@ -712,27 +745,6 @@ void TransferSession::HandleBlockAckEOF(System::PacketBufferHandle msgData)
 
 exit:
     return;
-}
-
-CHIP_ERROR TransferSession::AttachBdxHeader(MessageType msgType, System::PacketBufferHandle & msgBuf)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    PayloadHeader payloadHeader;
-
-    payloadHeader.SetMessageType(Protocols::kProtocol_BDX, static_cast<uint8_t>(msgType));
-
-    uint16_t headerSize              = payloadHeader.EncodeSizeBytes();
-    uint16_t actualEncodedHeaderSize = 0;
-
-    VerifyOrExit(msgBuf->EnsureReservedSize(headerSize), err = CHIP_ERROR_NO_MEMORY);
-
-    msgBuf->SetStart(msgBuf->Start() - headerSize);
-    err = payloadHeader.Encode(msgBuf->Start(), msgBuf->DataLength(), &actualEncodedHeaderSize);
-    SuccessOrExit(err);
-    VerifyOrExit(headerSize == actualEncodedHeaderSize, err = CHIP_ERROR_INTERNAL);
-
-exit:
-    return err;
 }
 
 void TransferSession::ResolveTransferControlOptions(const BitFlags<uint8_t, TransferControlFlags> & proposed)
@@ -806,7 +818,7 @@ CHIP_ERROR TransferSession::VerifyProposedMode(const BitFlags<uint8_t, TransferC
 void TransferSession::SetTransferError(StatusCode code)
 {
     mStatusReportData.error = code;
-    mPendingOutput          = kOutput_InternalError;
+    mPendingOutput          = kInternalError;
     mState                  = kState_Error;
 }
 
@@ -817,7 +829,7 @@ bool TransferSession::IsTransferLengthDefinite()
 
 TransferSession::OutputEvent TransferSession::OutputEvent::TransferInitEvent(TransferInitData data, System::PacketBufferHandle msg)
 {
-    OutputEvent event(kOutput_InitReceived);
+    OutputEvent event(kInitReceived);
     event.MsgData          = std::move(msg);
     event.transferInitData = data;
     return event;
@@ -829,7 +841,7 @@ TransferSession::OutputEvent TransferSession::OutputEvent::TransferInitEvent(Tra
  */
 TransferSession::OutputEvent TransferSession::OutputEvent::TransferAcceptEvent(TransferAcceptData data)
 {
-    OutputEvent event(kOutput_AcceptReceived);
+    OutputEvent event(kAcceptReceived);
     event.transferAcceptData = data;
     return event;
 }
@@ -847,7 +859,7 @@ TransferSession::OutputEvent TransferSession::OutputEvent::TransferAcceptEvent(T
 
 TransferSession::OutputEvent TransferSession::OutputEvent::BlockDataEvent(BlockData data, System::PacketBufferHandle msg)
 {
-    OutputEvent event(kOutput_BlockReceived);
+    OutputEvent event(kBlockReceived);
     event.MsgData   = std::move(msg);
     event.blockdata = data;
     return event;
@@ -855,7 +867,7 @@ TransferSession::OutputEvent TransferSession::OutputEvent::BlockDataEvent(BlockD
 
 /**
  * @brief
- *   Convenience method for constructing an event with kOutput_InternalError or kOutputStatusReceived
+ *   Convenience method for constructing an event with kInternalError or kOutputStatusReceived
  */
 TransferSession::OutputEvent TransferSession::OutputEvent::StatusReportEvent(OutputEventType type, StatusReportData data)
 {

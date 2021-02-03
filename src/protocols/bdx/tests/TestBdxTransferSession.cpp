@@ -110,7 +110,7 @@ void VerifyNoMoreOutput(nlTestSuite * inSuite, void * inContext, TransferSession
 {
     TransferSession::OutputEvent event;
     transferSession.PollOutput(event, kNoAdvanceTime);
-    NL_TEST_ASSERT(inSuite, event.EventType == TransferSession::kOutput_None);
+    NL_TEST_ASSERT(inSuite, event.EventType == TransferSession::kNone);
 }
 
 // Helper method for initializing two TransferSession objects, generating a TransferInit message, and passing it to a responding
@@ -130,10 +130,10 @@ void SendAndVerifyTransferInit(nlTestSuite * inSuite, void * inContext, Transfer
     VerifyNoMoreOutput(inSuite, inContext, responder);
 
     // Verify initiator outputs respective Init message (depending on role) after StartTransfer()
-    err = initiator.StartTransfer(initiatorRole, initData, timeoutMs, kNoAdvanceTime);
+    err = initiator.StartTransfer(initiatorRole, initData, timeoutMs);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     initiator.PollOutput(outEvent, kNoAdvanceTime);
-    NL_TEST_ASSERT(inSuite, outEvent.EventType == TransferSession::kOutput_MsgToSend);
+    NL_TEST_ASSERT(inSuite, outEvent.EventType == TransferSession::kMsgToSend);
     VerifyMessageType(inSuite, inContext, outEvent.MsgData, expectedInitMsg);
     VerifyNoMoreOutput(inSuite, inContext, initiator);
 
@@ -142,14 +142,14 @@ void SendAndVerifyTransferInit(nlTestSuite * inSuite, void * inContext, Transfer
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     responder.PollOutput(outEvent, kNoAdvanceTime);
     VerifyNoMoreOutput(inSuite, inContext, responder);
-    NL_TEST_ASSERT(inSuite, outEvent.EventType == TransferSession::kOutput_InitReceived);
+    NL_TEST_ASSERT(inSuite, outEvent.EventType == TransferSession::kInitReceived);
     NL_TEST_ASSERT(inSuite, outEvent.transferInitData.TransferCtlFlagsRaw == initData.TransferCtlFlagsRaw);
     NL_TEST_ASSERT(inSuite, outEvent.transferInitData.MaxBlockSize == initData.MaxBlockSize);
     NL_TEST_ASSERT(inSuite, outEvent.transferInitData.StartOffset == initData.StartOffset);
     NL_TEST_ASSERT(inSuite, outEvent.transferInitData.Length == initData.Length);
     NL_TEST_ASSERT(inSuite, outEvent.transferInitData.FileDesignator != nullptr);
     NL_TEST_ASSERT(inSuite, outEvent.transferInitData.FileDesLength == initData.FileDesLength);
-    if (outEvent.EventType == TransferSession::kOutput_InitReceived && outEvent.transferInitData.FileDesignator != nullptr)
+    if (outEvent.EventType == TransferSession::kInitReceived && outEvent.transferInitData.FileDesignator != nullptr)
     {
         NL_TEST_ASSERT(
             inSuite,
@@ -194,7 +194,7 @@ void SendAndVerifyAcceptMsg(nlTestSuite * inSuite, void * inContext, TransferSes
     // Verify Sender emits ReceiveAccept message for sending
     acceptSender.PollOutput(outEvent, kNoAdvanceTime);
     VerifyNoMoreOutput(inSuite, inContext, acceptSender);
-    NL_TEST_ASSERT(inSuite, outEvent.EventType == TransferSession::kOutput_MsgToSend);
+    NL_TEST_ASSERT(inSuite, outEvent.EventType == TransferSession::kMsgToSend);
     VerifyMessageType(inSuite, inContext, outEvent.MsgData, expectedMsg);
 
     // Pass Accept message to acceptReceiver
@@ -206,7 +206,7 @@ void SendAndVerifyAcceptMsg(nlTestSuite * inSuite, void * inContext, TransferSes
     // Transfer at this point.
     acceptReceiver.PollOutput(outEvent, kNoAdvanceTime);
     VerifyNoMoreOutput(inSuite, inContext, acceptReceiver);
-    NL_TEST_ASSERT(inSuite, outEvent.EventType == TransferSession::kOutput_AcceptReceived);
+    NL_TEST_ASSERT(inSuite, outEvent.EventType == TransferSession::kAcceptReceived);
     NL_TEST_ASSERT(inSuite, outEvent.transferAcceptData.ControlMode == acceptData.ControlMode);
     NL_TEST_ASSERT(inSuite, outEvent.transferAcceptData.MaxBlockSize == acceptData.MaxBlockSize);
     NL_TEST_ASSERT(inSuite, outEvent.transferAcceptData.StartOffset == acceptData.StartOffset);
@@ -240,7 +240,7 @@ void SendAndVerifyQuery(nlTestSuite * inSuite, void * inContext, TransferSession
     CHIP_ERROR err = querySender.PrepareBlockQuery();
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     querySender.PollOutput(outEvent, kNoAdvanceTime);
-    NL_TEST_ASSERT(inSuite, outEvent.EventType == TransferSession::kOutput_MsgToSend);
+    NL_TEST_ASSERT(inSuite, outEvent.EventType == TransferSession::kMsgToSend);
     VerifyMessageType(inSuite, inContext, outEvent.MsgData, kBdxMsg_BlockQuery);
     VerifyNoMoreOutput(inSuite, inContext, querySender);
 
@@ -248,7 +248,7 @@ void SendAndVerifyQuery(nlTestSuite * inSuite, void * inContext, TransferSession
     err = queryReceiver.HandleMessageReceived(std::move(outEvent.MsgData), kNoAdvanceTime);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     queryReceiver.PollOutput(outEvent, kNoAdvanceTime);
-    NL_TEST_ASSERT(inSuite, outEvent.EventType == TransferSession::kOutput_QueryReceived);
+    NL_TEST_ASSERT(inSuite, outEvent.EventType == TransferSession::kQueryReceived);
     VerifyNoMoreOutput(inSuite, inContext, queryReceiver);
 }
 
@@ -283,7 +283,7 @@ void SendAndVerifyArbitraryBlock(nlTestSuite * inSuite, void * inContext, Transf
     err = sender.PrepareBlock(blockData);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     sender.PollOutput(outEvent, kNoAdvanceTime);
-    NL_TEST_ASSERT(inSuite, outEvent.EventType == TransferSession::kOutput_MsgToSend);
+    NL_TEST_ASSERT(inSuite, outEvent.EventType == TransferSession::kMsgToSend);
     VerifyMessageType(inSuite, inContext, outEvent.MsgData, expected);
     VerifyNoMoreOutput(inSuite, inContext, sender);
 
@@ -291,9 +291,9 @@ void SendAndVerifyArbitraryBlock(nlTestSuite * inSuite, void * inContext, Transf
     err = receiver.HandleMessageReceived(std::move(outEvent.MsgData), kNoAdvanceTime);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     receiver.PollOutput(outEvent, kNoAdvanceTime);
-    NL_TEST_ASSERT(inSuite, outEvent.EventType == TransferSession::kOutput_BlockReceived);
+    NL_TEST_ASSERT(inSuite, outEvent.EventType == TransferSession::kBlockReceived);
     NL_TEST_ASSERT(inSuite, outEvent.blockdata.Data != nullptr);
-    if (outEvent.EventType == TransferSession::kOutput_BlockReceived && outEvent.blockdata.Data != nullptr)
+    if (outEvent.EventType == TransferSession::kBlockReceived && outEvent.blockdata.Data != nullptr)
     {
         NL_TEST_ASSERT(inSuite, !memcmp(fakeBlockData, outEvent.blockdata.Data, outEvent.blockdata.Length));
     }
@@ -305,14 +305,14 @@ void SendAndVerifyBlockAck(nlTestSuite * inSuite, void * inContext, TransferSess
                            TransferSession::OutputEvent & outEvent, bool expectEOF)
 {
     TransferSession::OutputEventType expectedEventType =
-        expectEOF ? TransferSession::kOutput_AckEOFReceived : TransferSession::kOutput_AckReceived;
+        expectEOF ? TransferSession::kAckEOFReceived : TransferSession::kAckReceived;
     MessageType expectedMsgType = expectEOF ? kBdxMsg_BlockAckEOF : kBdxMsg_BlockAck;
 
     // Verify PrepareBlockAck() outputs message to send
     CHIP_ERROR err = ackSender.PrepareBlockAck();
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     ackSender.PollOutput(outEvent, kNoAdvanceTime);
-    NL_TEST_ASSERT(inSuite, outEvent.EventType == TransferSession::kOutput_MsgToSend);
+    NL_TEST_ASSERT(inSuite, outEvent.EventType == TransferSession::kMsgToSend);
     VerifyMessageType(inSuite, inContext, outEvent.MsgData, expectedMsgType);
     VerifyNoMoreOutput(inSuite, inContext, ackSender);
 
@@ -548,7 +548,7 @@ void TestBadAcceptMessageFields(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
 }
 
-// Test that a TransferSession will emit kOutput_TransferTimeout if the specified timeout is exceeded while waiting for a response.
+// Test that a TransferSession will emit kTransferTimeout if the specified timeout is exceeded while waiting for a response.
 void TestTimeout(nlTestSuite * inSuite, void * inContext)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -574,20 +574,18 @@ void TestTimeout(nlTestSuite * inSuite, void * inContext)
     TransferRole role = kRole_Receiver;
 
     // Verify initiator outputs respective Init message (depending on role) after StartTransfer()
-    err = initiator.StartTransfer(role, initOptions, timeoutMs, startTimeMs);
+    err = initiator.StartTransfer(role, initOptions, timeoutMs);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    // First PollOutput() should output the TransferInit message (pretend no time advancement)
+    // First PollOutput() should output the TransferInit message
     initiator.PollOutput(outEvent, startTimeMs);
-    NL_TEST_ASSERT(inSuite, outEvent.EventType == TransferSession::kOutput_MsgToSend);
+    NL_TEST_ASSERT(inSuite, outEvent.EventType == TransferSession::kMsgToSend);
     MessageType expectedInitMsg = (role == kRole_Sender) ? kBdxMsg_SendInit : kBdxMsg_ReceiveInit;
     VerifyMessageType(inSuite, inContext, outEvent.MsgData, expectedInitMsg);
-    VerifyNoMoreOutput(inSuite, inContext, initiator);
 
     // Second PollOutput() with no call to HandleMessageReceived() should result in a timeout.
     initiator.PollOutput(outEvent, endTimeMs);
-    NL_TEST_ASSERT(inSuite, outEvent.EventType == TransferSession::kOutput_TransferTimeout);
-    VerifyNoMoreOutput(inSuite, inContext, initiator);
+    NL_TEST_ASSERT(inSuite, outEvent.EventType == TransferSession::kTransferTimeout);
 }
 
 void TestDuplicateBlockError(nlTestSuite * inSuite, void * inContext)
@@ -648,7 +646,7 @@ void TestDuplicateBlockError(nlTestSuite * inSuite, void * inContext)
     err = respondingSender.PrepareBlock(blockData);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     respondingSender.PollOutput(eventWithBlock, kNoAdvanceTime);
-    NL_TEST_ASSERT(inSuite, eventWithBlock.EventType == TransferSession::kOutput_MsgToSend);
+    NL_TEST_ASSERT(inSuite, eventWithBlock.EventType == TransferSession::kMsgToSend);
     VerifyMessageType(inSuite, inContext, eventWithBlock.MsgData, kBdxMsg_Block);
     VerifyNoMoreOutput(inSuite, inContext, respondingSender);
     System::PacketBufferHandle blockCopy =
@@ -658,7 +656,7 @@ void TestDuplicateBlockError(nlTestSuite * inSuite, void * inContext)
     err = initiatingReceiver.HandleMessageReceived(std::move(eventWithBlock.MsgData), kNoAdvanceTime);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     initiatingReceiver.PollOutput(outEvent, kNoAdvanceTime);
-    NL_TEST_ASSERT(inSuite, outEvent.EventType == TransferSession::kOutput_BlockReceived);
+    NL_TEST_ASSERT(inSuite, outEvent.EventType == TransferSession::kBlockReceived);
     NL_TEST_ASSERT(inSuite, outEvent.blockdata.Data != nullptr);
     VerifyNoMoreOutput(inSuite, inContext, initiatingReceiver);
 
@@ -668,7 +666,7 @@ void TestDuplicateBlockError(nlTestSuite * inSuite, void * inContext)
     err = initiatingReceiver.HandleMessageReceived(std::move(blockCopy), kNoAdvanceTime);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     initiatingReceiver.PollOutput(outEvent, kNoAdvanceTime);
-    NL_TEST_ASSERT(inSuite, outEvent.EventType == TransferSession::kOutput_InternalError);
+    NL_TEST_ASSERT(inSuite, outEvent.EventType == TransferSession::kInternalError);
     NL_TEST_ASSERT(inSuite, outEvent.statusData.error == kStatus_BadBlockCounter);
 }
 
@@ -685,7 +683,7 @@ static const nlTest sTests[] =
     NL_TEST_DEF("TestBadAcceptMessageFields", TestBadAcceptMessageFields),
     NL_TEST_DEF("TestTimeout", TestTimeout),
     NL_TEST_DEF("TestDuplicateBlockError", TestDuplicateBlockError),
-    NL_TEST_SENTINEL()
+    NL_TEST_SENTINEL() 
 };
 // clang-format on
 
