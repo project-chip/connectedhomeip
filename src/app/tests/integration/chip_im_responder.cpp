@@ -43,11 +43,11 @@ namespace chip {
 namespace app {
 
 void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId,
-                                  chip::GroupId aGroupId, chip::TLV::TLVReader & aReader, Command * apCommandObj)
+                                  chip::TLV::TLVReader & aReader, Command * apCommandObj)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    if (aClusterId != kTestClusterId || aCommandId != kTestCommandId || aEndPointId != kTestEndPointId || aGroupId != kTestGroupId)
+    if (aClusterId != kTestClusterId || aCommandId != kTestCommandId || aEndPointId != kTestEndPointId)
     {
         return;
     }

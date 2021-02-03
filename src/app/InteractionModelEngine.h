@@ -163,7 +163,7 @@ private:
 };
 
 void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId,
-                                  chip::GroupId aGroupId, chip::TLV::TLVReader & aReader, Command * apCommandObj);
+                                  chip::TLV::TLVReader & aReader, Command * apCommandObj);
 
 } // namespace app
 } // namespace chip
