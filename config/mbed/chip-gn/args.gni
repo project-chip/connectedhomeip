@@ -30,6 +30,7 @@ treat_warnings_as_errors = false
 chip_system_config_locking="none"
 chip_with_lwip=true
 chip_system_config_use_lwip=true
+lwip_platform = "mbed"
 chip_system_config_use_sockets=false
 chip_device_platform = "mbed"
 
