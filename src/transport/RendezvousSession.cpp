@@ -224,7 +224,10 @@ void RendezvousSession::OnRendezvousError(CHIP_ERROR err)
         mDelegate->OnRendezvousError(err);
     }
     UpdateState(State::kInit, err);
-    mAdmin->Reset();
+    if (mAdmin != nullptr)
+    {
+        mAdmin->Reset();
+    }
 }
 
 void RendezvousSession::UpdateState(RendezvousSession::State newState, CHIP_ERROR err)
@@ -268,6 +271,8 @@ void RendezvousSession::UpdateState(RendezvousSession::State newState, CHIP_ERRO
         {
             mDelegate->OnRendezvousComplete();
         }
+        // Release the admin, as the rendezvous is complete.
+        mAdmin = nullptr;
         break;
 
     case State::kSecurePairing:

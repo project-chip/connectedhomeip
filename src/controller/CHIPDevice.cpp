@@ -152,6 +152,7 @@ CHIP_ERROR Device::Serialize(SerializedDevice & output)
     memmove(&serializable.mOpsCreds, &mPairing, sizeof(mPairing));
     serializable.mDeviceId   = Encoding::LittleEndian::HostSwap64(mDeviceId);
     serializable.mDevicePort = Encoding::LittleEndian::HostSwap16(mDevicePort);
+    serializable.mAdminId    = Encoding::LittleEndian::HostSwap16(mAdminId);
     VerifyOrExit(
         CHIP_NO_ERROR ==
             Inet::GetInterfaceName(mInterface, Uint8::to_char(serializable.mInterfaceName), sizeof(serializable.mInterfaceName)),
@@ -197,6 +198,7 @@ CHIP_ERROR Device::Deserialize(const SerializedDevice & input)
     memmove(&mPairing, &serializable.mOpsCreds, sizeof(mPairing));
     mDeviceId   = Encoding::LittleEndian::HostSwap64(serializable.mDeviceId);
     mDevicePort = Encoding::LittleEndian::HostSwap16(serializable.mDevicePort);
+    mAdminId    = Encoding::LittleEndian::HostSwap16(serializable.mAdminId);
 
     // The InterfaceNameToId() API requires initialization of mInterface, and lock/unlock of
     // LwIP stack.
