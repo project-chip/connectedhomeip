@@ -19,7 +19,7 @@
   "package": [
     {
       "pathRelativity": "relativeToZap",
-      "path": "../../../../third_party/zap/repo/zcl-builtin/silabs/zcl.json",
+      "path": "../../../../src/app/zap-templates/zcl/data-model/silabs/zcl.json",
       "version": "ZCL Test Data",
       "type": "zcl-properties"
     },

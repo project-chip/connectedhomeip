@@ -1,0 +1,1241 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2008,2020 Silicon Labs.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <deviceType>
+    <name>ZLL-onofflight</name>
+    <domain>ZLL</domain>
+    <typeName>ZLL On/Off Light</typeName>
+    <zigbeeType>Router</zigbeeType>
+    <profileId editable="false">0x0104</profileId>
+    <deviceId editable="false">0x0000</deviceId>
+    <clusters lockOthers="true">
+      <include cluster="Basic" client="false" server="true" clientLocked="true" serverLocked="true">
+        <requireAttribute>VERSION</requireAttribute>
+        <requireAttribute>APPLICATION_VERSION</requireAttribute>
+        <requireAttribute>STACK_VERSION</requireAttribute>
+        <requireAttribute>HW_VERSION</requireAttribute>
+        <requireAttribute>MANUFACTURER_NAME</requireAttribute>
+        <requireAttribute>MODEL_IDENTIFIER</requireAttribute>
+        <requireAttribute>DATE_CODE</requireAttribute>
+        <requireAttribute>POWER_SOURCE</requireAttribute>
+        <requireAttribute>SW_BUILD_ID</requireAttribute>
+      </include>
+      <include cluster="ZLL Commissioning" client="true" server="true" clientLocked="true" serverLocked="true">
+        <requireCommand>ScanRequest</requireCommand>
+        <requireCommand>DeviceInformationRequest</requireCommand>
+        <requireCommand>IdentifyRequest</requireCommand>
+        <requireCommand>ResetToFactoryNewRequest</requireCommand>
+        <requireCommand>NetworkStartRequest</requireCommand>
+        <requireCommand>NetworkJoinRouterRequest</requireCommand>
+        <requireCommand>NetworkJoinEndDeviceRequest</requireCommand>
+        <requireCommand>NetworkUpdateRequest</requireCommand>
+        <requireCommand>GetGroupIdentifiersRequest</requireCommand>
+        <requireCommand>GetEndpointListRequest</requireCommand>
+        <requireCommand>ScanResponse</requireCommand>
+        <requireCommand>DeviceInformationResponse</requireCommand>
+        <requireCommand>NetworkStartResponse</requireCommand>
+        <requireCommand>NetworkJoinRouterResponse</requireCommand>
+        <requireCommand>NetworkJoinEndDeviceResponse</requireCommand>
+        <requireCommand>EndpointInformation</requireCommand>
+        <requireCommand>GetGroupIdentifiersResponse</requireCommand>
+        <requireCommand>GetEndpointListResponse</requireCommand>
+      </include>
+      <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
+        <requireAttribute>IDENTIFY_TIME</requireAttribute>
+        <requireCommand>Identify</requireCommand>
+        <requireCommand>IdentifyQuery</requireCommand>
+        <requireCommand>TriggerEffect</requireCommand>
+      </include>
+      <include cluster="Groups" client="false" server="true" clientLocked="true" serverLocked="true">
+        <requireAttribute>GROUP_NAME_SUPPORT</requireAttribute>
+        <requireCommand>AddGroup</requireCommand>
+        <requireCommand>ViewGroup</requireCommand>
+        <requireCommand>GetGroupMembership</requireCommand>
+        <requireCommand>RemoveGroup</requireCommand>
+        <requireCommand>RemoveAllGroups</requireCommand>
+        <requireCommand>AddGroupIfIdentifying</requireCommand>
+      </include>
+      <include cluster="Scenes" client="false" server="true" clientLocked="true" serverLocked="true">
+        <requireAttribute>SCENE_COUNT</requireAttribute>
+        <requireAttribute>CURRENT_SCENE</requireAttribute>
+        <requireAttribute>CURRENT_GROUP</requireAttribute>
+        <requireAttribute>SCENE_VALID</requireAttribute>
+        <requireAttribute>SCENE_NAME_SUPPORT</requireAttribute>
+        <requireCommand>AddScene</requireCommand>
+        <requireCommand>ViewScene</requireCommand>
+        <requireCommand>RemoveScene</requireCommand>
+        <requireCommand>RemoveAllScenes</requireCommand>
+        <requireCommand>StoreScene</requireCommand>
+        <requireCommand>RecallScene</requireCommand>
+        <requireCommand>GetSceneMembership</requireCommand>
+        <requireCommand>EnhancedAddScene</requireCommand>
+        <requireCommand>EnhancedViewScene</requireCommand>
+        <requireCommand>CopyScene</requireCommand>
+      </include>
+      <include cluster="On/Off" client="false" server="true" clientLocked="true" serverLocked="true">
+        <requireAttribute>ON_OFF</requireAttribute>
+        <requireAttribute>GLOBAL_SCENE_CONTROL</requireAttribute>
+        <requireAttribute>ON_TIME</requireAttribute>
+        <requireAttribute>OFF_WAIT_TIME</requireAttribute>
+        <requireCommand>Off</requireCommand>
+        <requireCommand>On</requireCommand>
+        <requireCommand>Toggle</requireCommand>
+        <requireCommand>OffWithEffect</requireCommand>
+        <requireCommand>OnWithRecallGlobalScene</requireCommand>
+        <requireCommand>OnWithTimedOff</requireCommand>
+      </include>
+      <include cluster="Level Control" client="false" server="true" clientLocked="true" serverLocked="true">
+        <requireAttribute>CURRENT_LEVEL</requireAttribute>
+        <requireAttribute>LEVEL_CONTROL_REMAINING_TIME</requireAttribute>
+        <requireCommand>MoveToLevel</requireCommand>
+        <requireCommand>Move</requireCommand>
+        <requireCommand>Step</requireCommand>
+        <requireCommand>Stop</requireCommand>
+        <requireCommand>MoveToLevelWithOnOff</requireCommand>
+        <requireCommand>MoveWithOnOff</requireCommand>
+        <requireCommand>StepWithOnOff</requireCommand>
+        <requireCommand>StopWithOnOff</requireCommand>
+      </include>
+      <include cluster="Over the Air Bootloading" client="false" server="false" clientLocked="false" serverLocked="false"/>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>ZLL-onoffpluginunit</name>
+    <domain>ZLL</domain>
+    <typeName>ZLL On/Off Plug-in Unit</typeName>
+    <zigbeeType>Router</zigbeeType>
+    <profileId editable="false">0x0104</profileId>
+    <deviceId editable="false">0x0010</deviceId>
+    <clusters lockOthers="true">
+      <include cluster="Basic" client="false" server="true" clientLocked="true" serverLocked="true">
+        <requireAttribute>VERSION</requireAttribute>
+        <requireAttribute>APPLICATION_VERSION</requireAttribute>
+        <requireAttribute>STACK_VERSION</requireAttribute>
+        <requireAttribute>HW_VERSION</requireAttribute>
+        <requireAttribute>MANUFACTURER_NAME</requireAttribute>
+        <requireAttribute>MODEL_IDENTIFIER</requireAttribute>
+        <requireAttribute>DATE_CODE</requireAttribute>
+        <requireAttribute>POWER_SOURCE</requireAttribute>
+        <requireAttribute>SW_BUILD_ID</requireAttribute>
+      </include>
+      <include cluster="ZLL Commissioning" client="true" server="true" clientLocked="true" serverLocked="true">
+        <requireCommand>ScanRequest</requireCommand>
+        <requireCommand>DeviceInformationRequest</requireCommand>
+        <requireCommand>IdentifyRequest</requireCommand>
+        <requireCommand>ResetToFactoryNewRequest</requireCommand>
+        <requireCommand>NetworkStartRequest</requireCommand>
+        <requireCommand>NetworkJoinRouterRequest</requireCommand>
+        <requireCommand>NetworkJoinEndDeviceRequest</requireCommand>
+        <requireCommand>NetworkUpdateRequest</requireCommand>
+        <requireCommand>GetGroupIdentifiersRequest</requireCommand>
+        <requireCommand>GetEndpointListRequest</requireCommand>
+        <requireCommand>ScanResponse</requireCommand>
+        <requireCommand>DeviceInformationResponse</requireCommand>
+        <requireCommand>NetworkStartResponse</requireCommand>
+        <requireCommand>NetworkJoinRouterResponse</requireCommand>
+        <requireCommand>NetworkJoinEndDeviceResponse</requireCommand>
+        <requireCommand>EndpointInformation</requireCommand>
+        <requireCommand>GetGroupIdentifiersResponse</requireCommand>
+        <requireCommand>GetEndpointListResponse</requireCommand>
+      </include>
+      <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
+        <requireAttribute>IDENTIFY_TIME</requireAttribute>
+        <requireCommand>Identify</requireCommand>
+        <requireCommand>IdentifyQuery</requireCommand>
+        <requireCommand>TriggerEffect</requireCommand>
+      </include>
+      <include cluster="Groups" client="false" server="true" clientLocked="true" serverLocked="true">
+        <requireAttribute>GROUP_NAME_SUPPORT</requireAttribute>
+        <requireCommand>AddGroup</requireCommand>
+        <requireCommand>ViewGroup</requireCommand>
+        <requireCommand>GetGroupMembership</requireCommand>
+        <requireCommand>RemoveGroup</requireCommand>
+        <requireCommand>RemoveAllGroups</requireCommand>
+        <requireCommand>AddGroupIfIdentifying</requireCommand>
+      </include>
+      <include cluster="Scenes" client="false" server="true" clientLocked="true" serverLocked="true">
+        <requireAttribute>SCENE_COUNT</requireAttribute>
+        <requireAttribute>CURRENT_SCENE</requireAttribute>
+        <requireAttribute>CURRENT_GROUP</requireAttribute>
+        <requireAttribute>SCENE_VALID</requireAttribute>
+        <requireAttribute>SCENE_NAME_SUPPORT</requireAttribute>
+        <requireCommand>AddScene</requireCommand>
+        <requireCommand>ViewScene</requireCommand>
+        <requireCommand>RemoveScene</requireCommand>
+        <requireCommand>RemoveAllScenes</requireCommand>
+        <requireCommand>StoreScene</requireCommand>
+        <requireCommand>RecallScene</requireCommand>
+        <requireCommand>GetSceneMembership</requireCommand>
+        <requireCommand>EnhancedAddScene</requireCommand>
+        <requireCommand>EnhancedViewScene</requireCommand>
+        <requireCommand>CopyScene</requireCommand>
+      </include>
+      <include cluster="On/Off" client="false" server="true" clientLocked="true" serverLocked="true">
+        <requireAttribute>ON_OFF</requireAttribute>
+        <requireAttribute>GLOBAL_SCENE_CONTROL</requireAttribute>
+        <requireAttribute>ON_TIME</requireAttribute>
+        <requireAttribute>OFF_WAIT_TIME</requireAttribute>
+        <requireCommand>Off</requireCommand>
+        <requireCommand>On</requireCommand>
+        <requireCommand>Toggle</requireCommand>
+        <requireCommand>OffWithEffect</requireCommand>
+        <requireCommand>OnWithRecallGlobalScene</requireCommand>
+        <requireCommand>OnWithTimedOff</requireCommand>
+      </include>
+      <include cluster="Level Control" client="false" server="true" clientLocked="true" serverLocked="true">
+        <requireAttribute>CURRENT_LEVEL</requireAttribute>
+        <requireAttribute>LEVEL_CONTROL_REMAINING_TIME</requireAttribute>
+        <requireCommand>MoveToLevel</requireCommand>
+        <requireCommand>Move</requireCommand>
+        <requireCommand>Step</requireCommand>
+        <requireCommand>Stop</requireCommand>
+        <requireCommand>MoveToLevelWithOnOff</requireCommand>
+        <requireCommand>MoveWithOnOff</requireCommand>
+        <requireCommand>StepWithOnOff</requireCommand>
+        <requireCommand>StopWithOnOff</requireCommand>
+      </include>
+      <include cluster="Over the Air Bootloading" client="false" server="false" clientLocked="false" serverLocked="false"/>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>ZLL-dimmablelight</name>
+    <domain>ZLL</domain>
+    <typeName>ZLL Dimmable Light</typeName>
+    <zigbeeType>Router</zigbeeType>
+    <profileId editable="false">0x0104</profileId>
+    <deviceId editable="false">0x0100</deviceId>
+    <clusters lockOthers="true">
+      <include cluster="Basic" client="false" server="true" clientLocked="true" serverLocked="true">
+        <requireAttribute>VERSION</requireAttribute>
+        <requireAttribute>APPLICATION_VERSION</requireAttribute>
+        <requireAttribute>STACK_VERSION</requireAttribute>
+        <requireAttribute>HW_VERSION</requireAttribute>
+        <requireAttribute>MANUFACTURER_NAME</requireAttribute>
+        <requireAttribute>MODEL_IDENTIFIER</requireAttribute>
+        <requireAttribute>DATE_CODE</requireAttribute>
+        <requireAttribute>POWER_SOURCE</requireAttribute>
+        <requireAttribute>SW_BUILD_ID</requireAttribute>
+      </include>
+      <include cluster="ZLL Commissioning" client="true" server="true" clientLocked="true" serverLocked="true">
+        <requireCommand>ScanRequest</requireCommand>
+        <requireCommand>DeviceInformationRequest</requireCommand>
+        <requireCommand>IdentifyRequest</requireCommand>
+        <requireCommand>ResetToFactoryNewRequest</requireCommand>
+        <requireCommand>NetworkStartRequest</requireCommand>
+        <requireCommand>NetworkJoinRouterRequest</requireCommand>
+        <requireCommand>NetworkJoinEndDeviceRequest</requireCommand>
+        <requireCommand>NetworkUpdateRequest</requireCommand>
+        <requireCommand>GetGroupIdentifiersRequest</requireCommand>
+        <requireCommand>GetEndpointListRequest</requireCommand>
+        <requireCommand>ScanResponse</requireCommand>
+        <requireCommand>DeviceInformationResponse</requireCommand>
+        <requireCommand>NetworkStartResponse</requireCommand>
+        <requireCommand>NetworkJoinRouterResponse</requireCommand>
+        <requireCommand>NetworkJoinEndDeviceResponse</requireCommand>
+        <requireCommand>EndpointInformation</requireCommand>
+        <requireCommand>GetGroupIdentifiersResponse</requireCommand>
+        <requireCommand>GetEndpointListResponse</requireCommand>
+      </include>
+      <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
+        <requireAttribute>IDENTIFY_TIME</requireAttribute>
+        <requireCommand>Identify</requireCommand>
+        <requireCommand>IdentifyQuery</requireCommand>
+        <requireCommand>TriggerEffect</requireCommand>
+      </include>
+      <include cluster="Groups" client="false" server="true" clientLocked="true" serverLocked="true">
+        <requireAttribute>GROUP_NAME_SUPPORT</requireAttribute>
+        <requireCommand>AddGroup</requireCommand>
+        <requireCommand>ViewGroup</requireCommand>
+        <requireCommand>GetGroupMembership</requireCommand>
+        <requireCommand>RemoveGroup</requireCommand>
+        <requireCommand>RemoveAllGroups</requireCommand>
+        <requireCommand>AddGroupIfIdentifying</requireCommand>
+      </include>
+      <include cluster="Scenes" client="false" server="true" clientLocked="true" serverLocked="true">
+        <requireAttribute>SCENE_COUNT</requireAttribute>
+        <requireAttribute>CURRENT_SCENE</requireAttribute>
+        <requireAttribute>CURRENT_GROUP</requireAttribute>
+        <requireAttribute>SCENE_VALID</requireAttribute>
+        <requireAttribute>SCENE_NAME_SUPPORT</requireAttribute>
+        <requireCommand>AddScene</requireCommand>
+        <requireCommand>ViewScene</requireCommand>
+        <requireCommand>RemoveScene</requireCommand>
+        <requireCommand>RemoveAllScenes</requireCommand>
+        <requireCommand>StoreScene</requireCommand>
+        <requireCommand>RecallScene</requireCommand>
+        <requireCommand>GetSceneMembership</requireCommand>
+        <requireCommand>EnhancedAddScene</requireCommand>
+        <requireCommand>EnhancedViewScene</requireCommand>
+        <requireCommand>CopyScene</requireCommand>
+      </include>
+      <include cluster="On/Off" client="false" server="true" clientLocked="true" serverLocked="true">
+        <requireAttribute>ON_OFF</requireAttribute>
+        <requireAttribute>GLOBAL_SCENE_CONTROL</requireAttribute>
+        <requireAttribute>ON_TIME</requireAttribute>
+        <requireAttribute>OFF_WAIT_TIME</requireAttribute>
+        <requireCommand>Off</requireCommand>
+        <requireCommand>On</requireCommand>
+        <requireCommand>Toggle</requireCommand>
+        <requireCommand>OffWithEffect</requireCommand>
+        <requireCommand>OnWithRecallGlobalScene</requireCommand>
+        <requireCommand>OnWithTimedOff</requireCommand>
+      </include>
+      <include cluster="Level Control" client="false" server="true" clientLocked="true" serverLocked="true">
+        <requireAttribute>CURRENT_LEVEL</requireAttribute>
+        <requireAttribute>LEVEL_CONTROL_REMAINING_TIME</requireAttribute>
+        <requireCommand>MoveToLevel</requireCommand>
+        <requireCommand>Move</requireCommand>
+        <requireCommand>Step</requireCommand>
+        <requireCommand>Stop</requireCommand>
+        <requireCommand>MoveToLevelWithOnOff</requireCommand>
+        <requireCommand>MoveWithOnOff</requireCommand>
+        <requireCommand>StepWithOnOff</requireCommand>
+        <requireCommand>StopWithOnOff</requireCommand>
+      </include>
+      <include cluster="Over the Air Bootloading" client="false" server="false" clientLocked="false" serverLocked="false"/>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>ZLL-dimmablepluginunit</name>
+    <domain>ZLL</domain>
+    <typeName>ZLL Dimmable Plug-in Unit</typeName>
+    <zigbeeType>Router</zigbeeType>
+    <profileId editable="false">0x0104</profileId>
+    <deviceId editable="false">0x0110</deviceId>
+    <clusters lockOthers="true">
+      <include cluster="Basic" client="false" server="true" clientLocked="true" serverLocked="true">
+        <requireAttribute>VERSION</requireAttribute>
+        <requireAttribute>APPLICATION_VERSION</requireAttribute>
+        <requireAttribute>STACK_VERSION</requireAttribute>
+        <requireAttribute>HW_VERSION</requireAttribute>
+        <requireAttribute>MANUFACTURER_NAME</requireAttribute>
+        <requireAttribute>MODEL_IDENTIFIER</requireAttribute>
+        <requireAttribute>DATE_CODE</requireAttribute>
+        <requireAttribute>POWER_SOURCE</requireAttribute>
+        <requireAttribute>SW_BUILD_ID</requireAttribute>
+      </include>
+      <include cluster="ZLL Commissioning" client="true" server="true" clientLocked="true" serverLocked="true">
+        <requireCommand>ScanRequest</requireCommand>
+        <requireCommand>DeviceInformationRequest</requireCommand>
+        <requireCommand>IdentifyRequest</requireCommand>
+        <requireCommand>ResetToFactoryNewRequest</requireCommand>
+        <requireCommand>NetworkStartRequest</requireCommand>
+        <requireCommand>NetworkJoinRouterRequest</requireCommand>
+        <requireCommand>NetworkJoinEndDeviceRequest</requireCommand>
+        <requireCommand>NetworkUpdateRequest</requireCommand>
+        <requireCommand>GetGroupIdentifiersRequest</requireCommand>
+        <requireCommand>GetEndpointListRequest</requireCommand>
+        <requireCommand>ScanResponse</requireCommand>
+        <requireCommand>DeviceInformationResponse</requireCommand>
+        <requireCommand>NetworkStartResponse</requireCommand>
+        <requireCommand>NetworkJoinRouterResponse</requireCommand>
+        <requireCommand>NetworkJoinEndDeviceResponse</requireCommand>
+        <requireCommand>EndpointInformation</requireCommand>
+        <requireCommand>GetGroupIdentifiersResponse</requireCommand>
+        <requireCommand>GetEndpointListResponse</requireCommand>
+      </include>
+      <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
+        <requireAttribute>IDENTIFY_TIME</requireAttribute>
+        <requireCommand>Identify</requireCommand>
+        <requireCommand>IdentifyQuery</requireCommand>
+        <requireCommand>TriggerEffect</requireCommand>
+      </include>
+      <include cluster="Groups" client="false" server="true" clientLocked="true" serverLocked="true">
+        <requireAttribute>GROUP_NAME_SUPPORT</requireAttribute>
+        <requireCommand>AddGroup</requireCommand>
+        <requireCommand>ViewGroup</requireCommand>
+        <requireCommand>GetGroupMembership</requireCommand>
+        <requireCommand>RemoveGroup</requireCommand>
+        <requireCommand>RemoveAllGroups</requireCommand>
+        <requireCommand>AddGroupIfIdentifying</requireCommand>
+      </include>
+      <include cluster="Scenes" client="false" server="true" clientLocked="true" serverLocked="true">
+        <requireAttribute>SCENE_COUNT</requireAttribute>
+        <requireAttribute>CURRENT_SCENE</requireAttribute>
+        <requireAttribute>CURRENT_GROUP</requireAttribute>
+        <requireAttribute>SCENE_VALID</requireAttribute>
+        <requireAttribute>SCENE_NAME_SUPPORT</requireAttribute>
+        <requireCommand>AddScene</requireCommand>
+        <requireCommand>ViewScene</requireCommand>
+        <requireCommand>RemoveScene</requireCommand>
+        <requireCommand>RemoveAllScenes</requireCommand>
+        <requireCommand>StoreScene</requireCommand>
+        <requireCommand>RecallScene</requireCommand>
+        <requireCommand>GetSceneMembership</requireCommand>
+        <requireCommand>EnhancedAddScene</requireCommand>
+        <requireCommand>EnhancedViewScene</requireCommand>
+        <requireCommand>CopyScene</requireCommand>
+      </include>
+      <include cluster="On/Off" client="false" server="true" clientLocked="true" serverLocked="true">
+        <requireAttribute>ON_OFF</requireAttribute>
+        <requireAttribute>GLOBAL_SCENE_CONTROL</requireAttribute>
+        <requireAttribute>ON_TIME</requireAttribute>
+        <requireAttribute>OFF_WAIT_TIME</requireAttribute>
+        <requireCommand>Off</requireCommand>
+        <requireCommand>On</requireCommand>
+        <requireCommand>Toggle</requireCommand>
+        <requireCommand>OffWithEffect</requireCommand>
+        <requireCommand>OnWithRecallGlobalScene</requireCommand>
+        <requireCommand>OnWithTimedOff</requireCommand>
+      </include>
+      <include cluster="Level Control" client="false" server="true" clientLocked="true" serverLocked="true">
+        <requireAttribute>CURRENT_LEVEL</requireAttribute>
+        <requireAttribute>LEVEL_CONTROL_REMAINING_TIME</requireAttribute>
+        <requireCommand>MoveToLevel</requireCommand>
+        <requireCommand>Move</requireCommand>
+        <requireCommand>Step</requireCommand>
+        <requireCommand>Stop</requireCommand>
+        <requireCommand>MoveToLevelWithOnOff</requireCommand>
+        <requireCommand>MoveWithOnOff</requireCommand>
+        <requireCommand>StepWithOnOff</requireCommand>
+        <requireCommand>StopWithOnOff</requireCommand>
+      </include>
+      <include cluster="Over the Air Bootloading" client="false" server="false" clientLocked="false" serverLocked="false"/>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>ZLL-colorlight</name>
+    <domain>ZLL</domain>
+    <typeName>ZLL Color Light</typeName>
+    <zigbeeType>Router</zigbeeType>
+    <profileId editable="false">0x0104</profileId>
+    <deviceId editable="false">0x0200</deviceId>
+    <clusters lockOthers="true">
+      <include cluster="Basic" client="false" server="true" clientLocked="true" serverLocked="true">
+        <requireAttribute>VERSION</requireAttribute>
+        <requireAttribute>APPLICATION_VERSION</requireAttribute>
+        <requireAttribute>STACK_VERSION</requireAttribute>
+        <requireAttribute>HW_VERSION</requireAttribute>
+        <requireAttribute>MANUFACTURER_NAME</requireAttribute>
+        <requireAttribute>MODEL_IDENTIFIER</requireAttribute>
+        <requireAttribute>DATE_CODE</requireAttribute>
+        <requireAttribute>POWER_SOURCE</requireAttribute>
+        <requireAttribute>SW_BUILD_ID</requireAttribute>
+      </include>
+      <include cluster="ZLL Commissioning" client="true" server="true" clientLocked="true" serverLocked="true">
+        <requireCommand>ScanRequest</requireCommand>
+        <requireCommand>DeviceInformationRequest</requireCommand>
+        <requireCommand>IdentifyRequest</requireCommand>
+        <requireCommand>ResetToFactoryNewRequest</requireCommand>
+        <requireCommand>NetworkStartRequest</requireCommand>
+        <requireCommand>NetworkJoinRouterRequest</requireCommand>
+        <requireCommand>NetworkJoinEndDeviceRequest</requireCommand>
+        <requireCommand>NetworkUpdateRequest</requireCommand>
+        <requireCommand>GetGroupIdentifiersRequest</requireCommand>
+        <requireCommand>GetEndpointListRequest</requireCommand>
+        <requireCommand>ScanResponse</requireCommand>
+        <requireCommand>DeviceInformationResponse</requireCommand>
+        <requireCommand>NetworkStartResponse</requireCommand>
+        <requireCommand>NetworkJoinRouterResponse</requireCommand>
+        <requireCommand>NetworkJoinEndDeviceResponse</requireCommand>
+        <requireCommand>EndpointInformation</requireCommand>
+        <requireCommand>GetGroupIdentifiersResponse</requireCommand>
+        <requireCommand>GetEndpointListResponse</requireCommand>
+      </include>
+      <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
+        <requireAttribute>IDENTIFY_TIME</requireAttribute>
+        <requireCommand>Identify</requireCommand>
+        <requireCommand>IdentifyQuery</requireCommand>
+        <requireCommand>TriggerEffect</requireCommand>
+      </include>
+      <include cluster="Groups" client="false" server="true" clientLocked="true" serverLocked="true">
+        <requireAttribute>GROUP_NAME_SUPPORT</requireAttribute>
+        <requireCommand>AddGroup</requireCommand>
+        <requireCommand>ViewGroup</requireCommand>
+        <requireCommand>GetGroupMembership</requireCommand>
+        <requireCommand>RemoveGroup</requireCommand>
+        <requireCommand>RemoveAllGroups</requireCommand>
+        <requireCommand>AddGroupIfIdentifying</requireCommand>
+      </include>
+      <include cluster="Scenes" client="false" server="true" clientLocked="true" serverLocked="true">
+        <requireAttribute>SCENE_COUNT</requireAttribute>
+        <requireAttribute>CURRENT_SCENE</requireAttribute>
+        <requireAttribute>CURRENT_GROUP</requireAttribute>
+        <requireAttribute>SCENE_VALID</requireAttribute>
+        <requireAttribute>SCENE_NAME_SUPPORT</requireAttribute>
+        <requireCommand>AddScene</requireCommand>
+        <requireCommand>ViewScene</requireCommand>
+        <requireCommand>RemoveScene</requireCommand>
+        <requireCommand>RemoveAllScenes</requireCommand>
+        <requireCommand>StoreScene</requireCommand>
+        <requireCommand>RecallScene</requireCommand>
+        <requireCommand>GetSceneMembership</requireCommand>
+        <requireCommand>EnhancedAddScene</requireCommand>
+        <requireCommand>EnhancedViewScene</requireCommand>
+        <requireCommand>CopyScene</requireCommand>
+      </include>
+      <include cluster="On/Off" client="false" server="true" clientLocked="true" serverLocked="true">
+        <requireAttribute>ON_OFF</requireAttribute>
+        <requireAttribute>GLOBAL_SCENE_CONTROL</requireAttribute>
+        <requireAttribute>ON_TIME</requireAttribute>
+        <requireAttribute>OFF_WAIT_TIME</requireAttribute>
+        <requireCommand>Off</requireCommand>
+        <requireCommand>On</requireCommand>
+        <requireCommand>Toggle</requireCommand>
+        <requireCommand>OffWithEffect</requireCommand>
+        <requireCommand>OnWithRecallGlobalScene</requireCommand>
+        <requireCommand>OnWithTimedOff</requireCommand>
+      </include>
+      <include cluster="Level Control" client="false" server="true" clientLocked="true" serverLocked="true">
+        <requireAttribute>CURRENT_LEVEL</requireAttribute>
+        <requireAttribute>LEVEL_CONTROL_REMAINING_TIME</requireAttribute>
+        <requireCommand>MoveToLevel</requireCommand>
+        <requireCommand>Move</requireCommand>
+        <requireCommand>Step</requireCommand>
+        <requireCommand>Stop</requireCommand>
+        <requireCommand>MoveToLevelWithOnOff</requireCommand>
+        <requireCommand>MoveWithOnOff</requireCommand>
+        <requireCommand>StepWithOnOff</requireCommand>
+        <requireCommand>StopWithOnOff</requireCommand>
+      </include>
+      <include cluster="Color Control" client="false" server="true" clientLocked="true" serverLocked="true">
+        <requireAttribute>COLOR_CONTROL_CURRENT_HUE</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_CURRENT_SATURATION</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_REMAINING_TIME</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_CURRENT_X</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_CURRENT_Y</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_COLOR_TEMPERATURE</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_COLOR_MODE</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_NUMBER_OF_PRIMARIES</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_PRIMARY_1_X</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_PRIMARY_1_Y</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_PRIMARY_1_INTENSITY</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_PRIMARY_2_X</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_PRIMARY_2_Y</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_PRIMARY_2_INTENSITY</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_PRIMARY_3_X</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_PRIMARY_3_Y</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_PRIMARY_3_INTENSITY</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_PRIMARY_4_X</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_PRIMARY_4_Y</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_PRIMARY_4_INTENSITY</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_PRIMARY_5_X</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_PRIMARY_5_Y</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_PRIMARY_5_INTENSITY</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_PRIMARY_6_X</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_PRIMARY_6_Y</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_PRIMARY_6_INTENSITY</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_ENHANCED_CURRENT_HUE</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_ENHANCED_COLOR_MODE</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_COLOR_LOOP_ACTIVE</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_COLOR_LOOP_DIRECTION</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_COLOR_LOOP_TIME</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_COLOR_LOOP_START_ENHANCED_HUE</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_COLOR_LOOP_STORED_ENHANCED_HUE</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_COLOR_CAPABILITIES</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_COLOR_TEMP_PHYSICAL_MIN</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_COLOR_TEMP_PHYSICAL_MAX</requireAttribute>
+        <requireCommand>MoveToHue</requireCommand>
+        <requireCommand>MoveHue</requireCommand>
+        <requireCommand>StepHue</requireCommand>
+        <requireCommand>MoveToSaturation</requireCommand>
+        <requireCommand>MoveSaturation</requireCommand>
+        <requireCommand>StepSaturation</requireCommand>
+        <requireCommand>MoveToHueAndSaturation</requireCommand>
+        <requireCommand>MoveToColor</requireCommand>
+        <requireCommand>MoveColor</requireCommand>
+        <requireCommand>StepColor</requireCommand>
+        <requireCommand>MoveToColorTemperature</requireCommand>
+        <requireCommand>EnhancedMoveToHue</requireCommand>
+        <requireCommand>EnhancedMoveHue</requireCommand>
+        <requireCommand>EnhancedStepHue</requireCommand>
+        <requireCommand>EnhancedMoveToHueAndSaturation</requireCommand>
+        <requireCommand>ColorLoopSet</requireCommand>
+        <requireCommand>StopMoveStep</requireCommand>
+        <requireCommand>MoveColorTemperature</requireCommand>
+        <requireCommand>StepColorTemperature</requireCommand>
+      </include>
+      <include cluster="Over the Air Bootloading" client="false" server="false" clientLocked="false" serverLocked="false"/>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>ZLL-extendedcolorlight</name>
+    <domain>ZLL</domain>
+    <typeName>ZLL Extended Color Light</typeName>
+    <zigbeeType>Router</zigbeeType>
+    <profileId editable="false">0x0104</profileId>
+    <deviceId editable="false">0x0210</deviceId>
+    <clusters lockOthers="true">
+      <include cluster="Basic" client="false" server="true" clientLocked="true" serverLocked="true">
+        <requireAttribute>VERSION</requireAttribute>
+        <requireAttribute>APPLICATION_VERSION</requireAttribute>
+        <requireAttribute>STACK_VERSION</requireAttribute>
+        <requireAttribute>HW_VERSION</requireAttribute>
+        <requireAttribute>MANUFACTURER_NAME</requireAttribute>
+        <requireAttribute>MODEL_IDENTIFIER</requireAttribute>
+        <requireAttribute>DATE_CODE</requireAttribute>
+        <requireAttribute>POWER_SOURCE</requireAttribute>
+        <requireAttribute>SW_BUILD_ID</requireAttribute>
+      </include>
+      <include cluster="ZLL Commissioning" client="true" server="true" clientLocked="true" serverLocked="true">
+        <requireCommand>ScanRequest</requireCommand>
+        <requireCommand>DeviceInformationRequest</requireCommand>
+        <requireCommand>IdentifyRequest</requireCommand>
+        <requireCommand>ResetToFactoryNewRequest</requireCommand>
+        <requireCommand>NetworkStartRequest</requireCommand>
+        <requireCommand>NetworkJoinRouterRequest</requireCommand>
+        <requireCommand>NetworkJoinEndDeviceRequest</requireCommand>
+        <requireCommand>NetworkUpdateRequest</requireCommand>
+        <requireCommand>GetGroupIdentifiersRequest</requireCommand>
+        <requireCommand>GetEndpointListRequest</requireCommand>
+        <requireCommand>ScanResponse</requireCommand>
+        <requireCommand>DeviceInformationResponse</requireCommand>
+        <requireCommand>NetworkStartResponse</requireCommand>
+        <requireCommand>NetworkJoinRouterResponse</requireCommand>
+        <requireCommand>NetworkJoinEndDeviceResponse</requireCommand>
+        <requireCommand>EndpointInformation</requireCommand>
+        <requireCommand>GetGroupIdentifiersResponse</requireCommand>
+        <requireCommand>GetEndpointListResponse</requireCommand>
+      </include>
+      <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
+        <requireAttribute>IDENTIFY_TIME</requireAttribute>
+        <requireCommand>Identify</requireCommand>
+        <requireCommand>IdentifyQuery</requireCommand>
+        <requireCommand>TriggerEffect</requireCommand>
+      </include>
+      <include cluster="Groups" client="false" server="true" clientLocked="true" serverLocked="true">
+        <requireAttribute>GROUP_NAME_SUPPORT</requireAttribute>
+        <requireCommand>AddGroup</requireCommand>
+        <requireCommand>ViewGroup</requireCommand>
+        <requireCommand>GetGroupMembership</requireCommand>
+        <requireCommand>RemoveGroup</requireCommand>
+        <requireCommand>RemoveAllGroups</requireCommand>
+        <requireCommand>AddGroupIfIdentifying</requireCommand>
+      </include>
+      <include cluster="Scenes" client="false" server="true" clientLocked="true" serverLocked="true">
+        <requireAttribute>SCENE_COUNT</requireAttribute>
+        <requireAttribute>CURRENT_SCENE</requireAttribute>
+        <requireAttribute>CURRENT_GROUP</requireAttribute>
+        <requireAttribute>SCENE_VALID</requireAttribute>
+        <requireAttribute>SCENE_NAME_SUPPORT</requireAttribute>
+        <requireCommand>AddScene</requireCommand>
+        <requireCommand>ViewScene</requireCommand>
+        <requireCommand>RemoveScene</requireCommand>
+        <requireCommand>RemoveAllScenes</requireCommand>
+        <requireCommand>StoreScene</requireCommand>
+        <requireCommand>RecallScene</requireCommand>
+        <requireCommand>GetSceneMembership</requireCommand>
+        <requireCommand>EnhancedAddScene</requireCommand>
+        <requireCommand>EnhancedViewScene</requireCommand>
+        <requireCommand>CopyScene</requireCommand>
+      </include>
+      <include cluster="On/Off" client="false" server="true" clientLocked="true" serverLocked="true">
+        <requireAttribute>ON_OFF</requireAttribute>
+        <requireAttribute>GLOBAL_SCENE_CONTROL</requireAttribute>
+        <requireAttribute>ON_TIME</requireAttribute>
+        <requireAttribute>OFF_WAIT_TIME</requireAttribute>
+        <requireCommand>Off</requireCommand>
+        <requireCommand>On</requireCommand>
+        <requireCommand>Toggle</requireCommand>
+        <requireCommand>OffWithEffect</requireCommand>
+        <requireCommand>OnWithRecallGlobalScene</requireCommand>
+        <requireCommand>OnWithTimedOff</requireCommand>
+      </include>
+      <include cluster="Level Control" client="false" server="true" clientLocked="true" serverLocked="true">
+        <requireAttribute>CURRENT_LEVEL</requireAttribute>
+        <requireAttribute>LEVEL_CONTROL_REMAINING_TIME</requireAttribute>
+        <requireCommand>MoveToLevel</requireCommand>
+        <requireCommand>Move</requireCommand>
+        <requireCommand>Step</requireCommand>
+        <requireCommand>Stop</requireCommand>
+        <requireCommand>MoveToLevelWithOnOff</requireCommand>
+        <requireCommand>MoveWithOnOff</requireCommand>
+        <requireCommand>StepWithOnOff</requireCommand>
+        <requireCommand>StopWithOnOff</requireCommand>
+      </include>
+      <include cluster="Color Control" client="false" server="true" clientLocked="true" serverLocked="true">
+        <requireAttribute>COLOR_CONTROL_CURRENT_HUE</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_CURRENT_SATURATION</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_REMAINING_TIME</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_CURRENT_X</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_CURRENT_Y</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_COLOR_TEMPERATURE</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_COLOR_MODE</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_NUMBER_OF_PRIMARIES</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_PRIMARY_1_X</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_PRIMARY_1_Y</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_PRIMARY_1_INTENSITY</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_PRIMARY_2_X</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_PRIMARY_2_Y</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_PRIMARY_2_INTENSITY</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_PRIMARY_3_X</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_PRIMARY_3_Y</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_PRIMARY_3_INTENSITY</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_PRIMARY_4_X</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_PRIMARY_4_Y</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_PRIMARY_4_INTENSITY</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_PRIMARY_5_X</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_PRIMARY_5_Y</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_PRIMARY_5_INTENSITY</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_PRIMARY_6_X</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_PRIMARY_6_Y</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_PRIMARY_6_INTENSITY</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_ENHANCED_CURRENT_HUE</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_ENHANCED_COLOR_MODE</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_COLOR_LOOP_ACTIVE</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_COLOR_LOOP_DIRECTION</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_COLOR_LOOP_TIME</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_COLOR_LOOP_START_ENHANCED_HUE</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_COLOR_LOOP_STORED_ENHANCED_HUE</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_COLOR_CAPABILITIES</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_COLOR_TEMP_PHYSICAL_MIN</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_COLOR_TEMP_PHYSICAL_MAX</requireAttribute>
+        <requireCommand>MoveToHue</requireCommand>
+        <requireCommand>MoveHue</requireCommand>
+        <requireCommand>StepHue</requireCommand>
+        <requireCommand>MoveToSaturation</requireCommand>
+        <requireCommand>MoveSaturation</requireCommand>
+        <requireCommand>StepSaturation</requireCommand>
+        <requireCommand>MoveToHueAndSaturation</requireCommand>
+        <requireCommand>MoveToColor</requireCommand>
+        <requireCommand>MoveColor</requireCommand>
+        <requireCommand>StepColor</requireCommand>
+        <requireCommand>MoveToColorTemperature</requireCommand>
+        <requireCommand>EnhancedMoveToHue</requireCommand>
+        <requireCommand>EnhancedMoveHue</requireCommand>
+        <requireCommand>EnhancedStepHue</requireCommand>
+        <requireCommand>EnhancedMoveToHueAndSaturation</requireCommand>
+        <requireCommand>ColorLoopSet</requireCommand>
+        <requireCommand>StopMoveStep</requireCommand>
+        <requireCommand>MoveColorTemperature</requireCommand>
+        <requireCommand>StepColorTemperature</requireCommand>
+      </include>
+      <include cluster="Over the Air Bootloading" client="false" server="false" clientLocked="false" serverLocked="false"/>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>ZLL-colortemperaturelight</name>
+    <domain>ZLL</domain>
+    <typeName>ZLL Color Temperature Light</typeName>
+    <zigbeeType>Router</zigbeeType>
+    <profileId editable="false">0x0104</profileId>
+    <deviceId editable="false">0x0220</deviceId>
+    <clusters lockOthers="true">
+      <include cluster="Basic" client="false" server="true" clientLocked="true" serverLocked="true">
+        <requireAttribute>VERSION</requireAttribute>
+        <requireAttribute>APPLICATION_VERSION</requireAttribute>
+        <requireAttribute>STACK_VERSION</requireAttribute>
+        <requireAttribute>HW_VERSION</requireAttribute>
+        <requireAttribute>MANUFACTURER_NAME</requireAttribute>
+        <requireAttribute>MODEL_IDENTIFIER</requireAttribute>
+        <requireAttribute>DATE_CODE</requireAttribute>
+        <requireAttribute>POWER_SOURCE</requireAttribute>
+        <requireAttribute>SW_BUILD_ID</requireAttribute>
+      </include>
+      <include cluster="ZLL Commissioning" client="true" server="true" clientLocked="true" serverLocked="true">
+        <requireCommand>ScanRequest</requireCommand>
+        <requireCommand>DeviceInformationRequest</requireCommand>
+        <requireCommand>IdentifyRequest</requireCommand>
+        <requireCommand>ResetToFactoryNewRequest</requireCommand>
+        <requireCommand>NetworkStartRequest</requireCommand>
+        <requireCommand>NetworkJoinRouterRequest</requireCommand>
+        <requireCommand>NetworkJoinEndDeviceRequest</requireCommand>
+        <requireCommand>NetworkUpdateRequest</requireCommand>
+        <requireCommand>GetGroupIdentifiersRequest</requireCommand>
+        <requireCommand>GetEndpointListRequest</requireCommand>
+        <requireCommand>ScanResponse</requireCommand>
+        <requireCommand>DeviceInformationResponse</requireCommand>
+        <requireCommand>NetworkStartResponse</requireCommand>
+        <requireCommand>NetworkJoinRouterResponse</requireCommand>
+        <requireCommand>NetworkJoinEndDeviceResponse</requireCommand>
+        <requireCommand>EndpointInformation</requireCommand>
+        <requireCommand>GetGroupIdentifiersResponse</requireCommand>
+        <requireCommand>GetEndpointListResponse</requireCommand>
+      </include>
+      <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
+        <requireAttribute>IDENTIFY_TIME</requireAttribute>
+        <requireCommand>Identify</requireCommand>
+        <requireCommand>IdentifyQuery</requireCommand>
+        <requireCommand>TriggerEffect</requireCommand>
+      </include>
+      <include cluster="Groups" client="false" server="true" clientLocked="true" serverLocked="true">
+        <requireAttribute>GROUP_NAME_SUPPORT</requireAttribute>
+        <requireCommand>AddGroup</requireCommand>
+        <requireCommand>ViewGroup</requireCommand>
+        <requireCommand>GetGroupMembership</requireCommand>
+        <requireCommand>RemoveGroup</requireCommand>
+        <requireCommand>RemoveAllGroups</requireCommand>
+        <requireCommand>AddGroupIfIdentifying</requireCommand>
+      </include>
+      <include cluster="Scenes" client="false" server="true" clientLocked="true" serverLocked="true">
+        <requireAttribute>SCENE_COUNT</requireAttribute>
+        <requireAttribute>CURRENT_SCENE</requireAttribute>
+        <requireAttribute>CURRENT_GROUP</requireAttribute>
+        <requireAttribute>SCENE_VALID</requireAttribute>
+        <requireAttribute>SCENE_NAME_SUPPORT</requireAttribute>
+        <requireCommand>AddScene</requireCommand>
+        <requireCommand>ViewScene</requireCommand>
+        <requireCommand>RemoveScene</requireCommand>
+        <requireCommand>RemoveAllScenes</requireCommand>
+        <requireCommand>StoreScene</requireCommand>
+        <requireCommand>RecallScene</requireCommand>
+        <requireCommand>GetSceneMembership</requireCommand>
+        <requireCommand>EnhancedAddScene</requireCommand>
+        <requireCommand>EnhancedViewScene</requireCommand>
+        <requireCommand>CopyScene</requireCommand>
+      </include>
+      <include cluster="On/Off" client="false" server="true" clientLocked="true" serverLocked="true">
+        <requireAttribute>ON_OFF</requireAttribute>
+        <requireAttribute>GLOBAL_SCENE_CONTROL</requireAttribute>
+        <requireAttribute>ON_TIME</requireAttribute>
+        <requireAttribute>OFF_WAIT_TIME</requireAttribute>
+        <requireCommand>Off</requireCommand>
+        <requireCommand>On</requireCommand>
+        <requireCommand>Toggle</requireCommand>
+        <requireCommand>OffWithEffect</requireCommand>
+        <requireCommand>OnWithRecallGlobalScene</requireCommand>
+        <requireCommand>OnWithTimedOff</requireCommand>
+      </include>
+      <include cluster="Level Control" client="false" server="true" clientLocked="true" serverLocked="true">
+        <requireAttribute>CURRENT_LEVEL</requireAttribute>
+        <requireAttribute>LEVEL_CONTROL_REMAINING_TIME</requireAttribute>
+        <requireCommand>MoveToLevel</requireCommand>
+        <requireCommand>Move</requireCommand>
+        <requireCommand>Step</requireCommand>
+        <requireCommand>Stop</requireCommand>
+        <requireCommand>MoveToLevelWithOnOff</requireCommand>
+        <requireCommand>MoveWithOnOff</requireCommand>
+        <requireCommand>StepWithOnOff</requireCommand>
+        <requireCommand>StopWithOnOff</requireCommand>
+      </include>
+      <include cluster="Color Control" client="false" server="true" clientLocked="true" serverLocked="true">
+        <requireAttribute>COLOR_CONTROL_CURRENT_HUE</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_CURRENT_SATURATION</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_REMAINING_TIME</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_CURRENT_X</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_CURRENT_Y</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_COLOR_TEMPERATURE</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_COLOR_MODE</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_NUMBER_OF_PRIMARIES</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_PRIMARY_1_X</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_PRIMARY_1_Y</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_PRIMARY_1_INTENSITY</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_PRIMARY_2_X</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_PRIMARY_2_Y</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_PRIMARY_2_INTENSITY</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_PRIMARY_3_X</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_PRIMARY_3_Y</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_PRIMARY_3_INTENSITY</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_PRIMARY_4_X</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_PRIMARY_4_Y</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_PRIMARY_4_INTENSITY</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_PRIMARY_5_X</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_PRIMARY_5_Y</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_PRIMARY_5_INTENSITY</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_PRIMARY_6_X</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_PRIMARY_6_Y</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_PRIMARY_6_INTENSITY</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_ENHANCED_CURRENT_HUE</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_ENHANCED_COLOR_MODE</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_COLOR_LOOP_ACTIVE</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_COLOR_LOOP_DIRECTION</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_COLOR_LOOP_TIME</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_COLOR_LOOP_START_ENHANCED_HUE</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_COLOR_LOOP_STORED_ENHANCED_HUE</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_COLOR_CAPABILITIES</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_COLOR_TEMP_PHYSICAL_MIN</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_COLOR_TEMP_PHYSICAL_MAX</requireAttribute>
+        <requireCommand>MoveToHue</requireCommand>
+        <requireCommand>MoveHue</requireCommand>
+        <requireCommand>StepHue</requireCommand>
+        <requireCommand>MoveToSaturation</requireCommand>
+        <requireCommand>MoveSaturation</requireCommand>
+        <requireCommand>StepSaturation</requireCommand>
+        <requireCommand>MoveToHueAndSaturation</requireCommand>
+        <requireCommand>MoveToColor</requireCommand>
+        <requireCommand>MoveColor</requireCommand>
+        <requireCommand>StepColor</requireCommand>
+        <requireCommand>MoveToColorTemperature</requireCommand>
+        <requireCommand>EnhancedMoveToHue</requireCommand>
+        <requireCommand>EnhancedMoveHue</requireCommand>
+        <requireCommand>EnhancedStepHue</requireCommand>
+        <requireCommand>EnhancedMoveToHueAndSaturation</requireCommand>
+        <requireCommand>ColorLoopSet</requireCommand>
+        <requireCommand>StopMoveStep</requireCommand>
+        <requireCommand>MoveColorTemperature</requireCommand>
+        <requireCommand>StepColorTemperature</requireCommand>
+      </include>
+      <include cluster="Over the Air Bootloading" client="false" server="false" clientLocked="false" serverLocked="false"/>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>ZLL-colorremote</name>
+    <domain>ZLL</domain>
+    <typeName>ZLL Color Controller</typeName>
+    <zigbeeType>End Device</zigbeeType>
+    <profileId editable="false">0x0104</profileId>
+    <deviceId editable="false">0x0800</deviceId>
+    <clusters lockOthers="true">
+      <include cluster="Basic" client="false" server="true" clientLocked="true" serverLocked="true">
+        <requireAttribute>VERSION</requireAttribute>
+        <requireAttribute>APPLICATION_VERSION</requireAttribute>
+        <requireAttribute>STACK_VERSION</requireAttribute>
+        <requireAttribute>HW_VERSION</requireAttribute>
+        <requireAttribute>MANUFACTURER_NAME</requireAttribute>
+        <requireAttribute>MODEL_IDENTIFIER</requireAttribute>
+        <requireAttribute>DATE_CODE</requireAttribute>
+        <requireAttribute>POWER_SOURCE</requireAttribute>
+        <requireAttribute>SW_BUILD_ID</requireAttribute>
+      </include>
+      <include cluster="ZLL Commissioning" client="true" server="true" clientLocked="true" serverLocked="true">
+        <requireCommand>ScanRequest</requireCommand>
+        <requireCommand>DeviceInformationRequest</requireCommand>
+        <requireCommand>IdentifyRequest</requireCommand>
+        <requireCommand>ResetToFactoryNewRequest</requireCommand>
+        <requireCommand>NetworkStartRequest</requireCommand>
+        <requireCommand>NetworkJoinRouterRequest</requireCommand>
+        <requireCommand>NetworkJoinEndDeviceRequest</requireCommand>
+        <requireCommand>NetworkUpdateRequest</requireCommand>
+        <requireCommand>GetGroupIdentifiersRequest</requireCommand>
+        <requireCommand>GetEndpointListRequest</requireCommand>
+        <requireCommand>ScanResponse</requireCommand>
+        <requireCommand>DeviceInformationResponse</requireCommand>
+        <requireCommand>NetworkStartResponse</requireCommand>
+        <requireCommand>NetworkJoinRouterResponse</requireCommand>
+        <requireCommand>NetworkJoinEndDeviceResponse</requireCommand>
+        <requireCommand>EndpointInformation</requireCommand>
+        <requireCommand>GetGroupIdentifiersResponse</requireCommand>
+        <requireCommand>GetEndpointListResponse</requireCommand>
+      </include>
+      <include cluster="Identify" client="true" server="false" clientLocked="true" serverLocked="true">
+        <requireCommand>IdentifyQueryResponse</requireCommand>
+      </include>
+      <include cluster="Groups" client="true" server="false" clientLocked="true" serverLocked="true">
+        <requireCommand>AddGroupResponse</requireCommand>
+        <requireCommand>ViewGroupResponse</requireCommand>
+        <requireCommand>GetGroupMembershipResponse</requireCommand>
+        <requireCommand>RemoveGroupResponse</requireCommand>
+      </include>
+      <include cluster="On/Off" client="true" server="false" clientLocked="true" serverLocked="true"/>
+      <include cluster="Level Control" client="true" server="false" clientLocked="true" serverLocked="true"/>
+      <include cluster="Color Control" client="true" server="false" clientLocked="true" serverLocked="true"/>
+      <include cluster="Over the Air Bootloading" client="false" server="false" clientLocked="false" serverLocked="false"/>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>ZLL-colorsceneremote</name>
+    <domain>ZLL</domain>
+    <typeName>ZLL Color Scene Controller</typeName>
+    <zigbeeType>End Device</zigbeeType>
+    <profileId editable="false">0x0104</profileId>
+    <deviceId editable="false">0x0810</deviceId>
+    <clusters lockOthers="true">
+      <include cluster="Basic" client="false" server="true" clientLocked="true" serverLocked="true">
+        <requireAttribute>VERSION</requireAttribute>
+        <requireAttribute>APPLICATION_VERSION</requireAttribute>
+        <requireAttribute>STACK_VERSION</requireAttribute>
+        <requireAttribute>HW_VERSION</requireAttribute>
+        <requireAttribute>MANUFACTURER_NAME</requireAttribute>
+        <requireAttribute>MODEL_IDENTIFIER</requireAttribute>
+        <requireAttribute>DATE_CODE</requireAttribute>
+        <requireAttribute>POWER_SOURCE</requireAttribute>
+        <requireAttribute>SW_BUILD_ID</requireAttribute>
+      </include>
+      <include cluster="ZLL Commissioning" client="true" server="true" clientLocked="true" serverLocked="true">
+        <requireCommand>ScanRequest</requireCommand>
+        <requireCommand>DeviceInformationRequest</requireCommand>
+        <requireCommand>IdentifyRequest</requireCommand>
+        <requireCommand>ResetToFactoryNewRequest</requireCommand>
+        <requireCommand>NetworkStartRequest</requireCommand>
+        <requireCommand>NetworkJoinRouterRequest</requireCommand>
+        <requireCommand>NetworkJoinEndDeviceRequest</requireCommand>
+        <requireCommand>NetworkUpdateRequest</requireCommand>
+        <requireCommand>GetGroupIdentifiersRequest</requireCommand>
+        <requireCommand>GetEndpointListRequest</requireCommand>
+        <requireCommand>ScanResponse</requireCommand>
+        <requireCommand>DeviceInformationResponse</requireCommand>
+        <requireCommand>NetworkStartResponse</requireCommand>
+        <requireCommand>NetworkJoinRouterResponse</requireCommand>
+        <requireCommand>NetworkJoinEndDeviceResponse</requireCommand>
+        <requireCommand>EndpointInformation</requireCommand>
+        <requireCommand>GetGroupIdentifiersResponse</requireCommand>
+        <requireCommand>GetEndpointListResponse</requireCommand>
+      </include>
+      <include cluster="Identify" client="true" server="false" clientLocked="true" serverLocked="true">
+        <requireCommand>IdentifyQueryResponse</requireCommand>
+      </include>
+      <include cluster="Groups" client="true" server="false" clientLocked="true" serverLocked="true">
+        <requireCommand>AddGroupResponse</requireCommand>
+        <requireCommand>ViewGroupResponse</requireCommand>
+        <requireCommand>GetGroupMembershipResponse</requireCommand>
+        <requireCommand>RemoveGroupResponse</requireCommand>
+      </include>
+      <include cluster="Scenes" client="true" server="false" clientLocked="true" serverLocked="true">
+        <requireCommand>AddSceneResponse</requireCommand>
+        <requireCommand>ViewSceneResponse</requireCommand>
+        <requireCommand>RemoveSceneResponse</requireCommand>
+        <requireCommand>RemoveAllScenesResponse</requireCommand>
+        <requireCommand>StoreSceneResponse</requireCommand>
+        <requireCommand>GetSceneMembershipResponse</requireCommand>
+        <requireCommand>EnhancedAddSceneResponse</requireCommand>
+        <requireCommand>EnhancedViewSceneResponse</requireCommand>
+        <requireCommand>CopySceneResponse</requireCommand>
+      </include>
+      <include cluster="On/Off" client="true" server="false" clientLocked="true" serverLocked="true"/>
+      <include cluster="Level Control" client="true" server="false" clientLocked="true" serverLocked="true"/>
+      <include cluster="Color Control" client="true" server="false" clientLocked="true" serverLocked="true"/>
+      <include cluster="Over the Air Bootloading" client="false" server="false" clientLocked="false" serverLocked="false"/>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>ZLL-noncolorremote</name>
+    <domain>ZLL</domain>
+    <typeName>ZLL Non-color Controller</typeName>
+    <zigbeeType>End Device</zigbeeType>
+    <profileId editable="false">0x0104</profileId>
+    <deviceId editable="false">0x0820</deviceId>
+    <clusters lockOthers="true">
+      <include cluster="Basic" client="false" server="true" clientLocked="true" serverLocked="true">
+        <requireAttribute>VERSION</requireAttribute>
+        <requireAttribute>APPLICATION_VERSION</requireAttribute>
+        <requireAttribute>STACK_VERSION</requireAttribute>
+        <requireAttribute>HW_VERSION</requireAttribute>
+        <requireAttribute>MANUFACTURER_NAME</requireAttribute>
+        <requireAttribute>MODEL_IDENTIFIER</requireAttribute>
+        <requireAttribute>DATE_CODE</requireAttribute>
+        <requireAttribute>POWER_SOURCE</requireAttribute>
+        <requireAttribute>SW_BUILD_ID</requireAttribute>
+      </include>
+      <include cluster="ZLL Commissioning" client="true" server="true" clientLocked="true" serverLocked="true">
+        <requireCommand>ScanRequest</requireCommand>
+        <requireCommand>DeviceInformationRequest</requireCommand>
+        <requireCommand>IdentifyRequest</requireCommand>
+        <requireCommand>ResetToFactoryNewRequest</requireCommand>
+        <requireCommand>NetworkStartRequest</requireCommand>
+        <requireCommand>NetworkJoinRouterRequest</requireCommand>
+        <requireCommand>NetworkJoinEndDeviceRequest</requireCommand>
+        <requireCommand>NetworkUpdateRequest</requireCommand>
+        <requireCommand>GetGroupIdentifiersRequest</requireCommand>
+        <requireCommand>GetEndpointListRequest</requireCommand>
+        <requireCommand>ScanResponse</requireCommand>
+        <requireCommand>DeviceInformationResponse</requireCommand>
+        <requireCommand>NetworkStartResponse</requireCommand>
+        <requireCommand>NetworkJoinRouterResponse</requireCommand>
+        <requireCommand>NetworkJoinEndDeviceResponse</requireCommand>
+        <requireCommand>EndpointInformation</requireCommand>
+        <requireCommand>GetGroupIdentifiersResponse</requireCommand>
+        <requireCommand>GetEndpointListResponse</requireCommand>
+      </include>
+      <include cluster="Identify" client="true" server="false" clientLocked="true" serverLocked="true">
+        <requireCommand>IdentifyQueryResponse</requireCommand>
+      </include>
+      <include cluster="Groups" client="true" server="false" clientLocked="true" serverLocked="true">
+        <requireCommand>AddGroupResponse</requireCommand>
+        <requireCommand>ViewGroupResponse</requireCommand>
+        <requireCommand>GetGroupMembershipResponse</requireCommand>
+        <requireCommand>RemoveGroupResponse</requireCommand>
+      </include>
+      <include cluster="On/Off" client="true" server="false" clientLocked="true" serverLocked="true"/>
+      <include cluster="Level Control" client="true" server="false" clientLocked="true" serverLocked="true"/>
+      <include cluster="Over the Air Bootloading" client="false" server="false" clientLocked="false" serverLocked="false"/>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>ZLL-noncolorsceneremote</name>
+    <domain>ZLL</domain>
+    <typeName>ZLL Non-color Scene Controller</typeName>
+    <zigbeeType>End Device</zigbeeType>
+    <profileId editable="false">0x0104</profileId>
+    <deviceId editable="false">0x0830</deviceId>
+    <clusters lockOthers="true">
+      <include cluster="Basic" client="false" server="true" clientLocked="true" serverLocked="true">
+        <requireAttribute>VERSION</requireAttribute>
+        <requireAttribute>APPLICATION_VERSION</requireAttribute>
+        <requireAttribute>STACK_VERSION</requireAttribute>
+        <requireAttribute>HW_VERSION</requireAttribute>
+        <requireAttribute>MANUFACTURER_NAME</requireAttribute>
+        <requireAttribute>MODEL_IDENTIFIER</requireAttribute>
+        <requireAttribute>DATE_CODE</requireAttribute>
+        <requireAttribute>POWER_SOURCE</requireAttribute>
+        <requireAttribute>SW_BUILD_ID</requireAttribute>
+      </include>
+      <include cluster="ZLL Commissioning" client="true" server="true" clientLocked="true" serverLocked="true">
+        <requireCommand>ScanRequest</requireCommand>
+        <requireCommand>DeviceInformationRequest</requireCommand>
+        <requireCommand>IdentifyRequest</requireCommand>
+        <requireCommand>ResetToFactoryNewRequest</requireCommand>
+        <requireCommand>NetworkStartRequest</requireCommand>
+        <requireCommand>NetworkJoinRouterRequest</requireCommand>
+        <requireCommand>NetworkJoinEndDeviceRequest</requireCommand>
+        <requireCommand>NetworkUpdateRequest</requireCommand>
+        <requireCommand>GetGroupIdentifiersRequest</requireCommand>
+        <requireCommand>GetEndpointListRequest</requireCommand>
+        <requireCommand>ScanResponse</requireCommand>
+        <requireCommand>DeviceInformationResponse</requireCommand>
+        <requireCommand>NetworkStartResponse</requireCommand>
+        <requireCommand>NetworkJoinRouterResponse</requireCommand>
+        <requireCommand>NetworkJoinEndDeviceResponse</requireCommand>
+        <requireCommand>EndpointInformation</requireCommand>
+        <requireCommand>GetGroupIdentifiersResponse</requireCommand>
+        <requireCommand>GetEndpointListResponse</requireCommand>
+      </include>
+      <include cluster="Identify" client="true" server="false" clientLocked="true" serverLocked="true">
+        <requireCommand>IdentifyQueryResponse</requireCommand>
+      </include>
+      <include cluster="Groups" client="true" server="false" clientLocked="true" serverLocked="true">
+        <requireCommand>AddGroupResponse</requireCommand>
+        <requireCommand>ViewGroupResponse</requireCommand>
+        <requireCommand>GetGroupMembershipResponse</requireCommand>
+        <requireCommand>RemoveGroupResponse</requireCommand>
+      </include>
+      <include cluster="Scenes" client="true" server="false" clientLocked="true" serverLocked="true">
+        <requireCommand>AddSceneResponse</requireCommand>
+        <requireCommand>ViewSceneResponse</requireCommand>
+        <requireCommand>RemoveSceneResponse</requireCommand>
+        <requireCommand>RemoveAllScenesResponse</requireCommand>
+        <requireCommand>StoreSceneResponse</requireCommand>
+        <requireCommand>GetSceneMembershipResponse</requireCommand>
+        <requireCommand>EnhancedAddSceneResponse</requireCommand>
+        <requireCommand>EnhancedViewSceneResponse</requireCommand>
+        <requireCommand>CopySceneResponse</requireCommand>
+      </include>
+      <include cluster="On/Off" client="true" server="false" clientLocked="true" serverLocked="true"/>
+      <include cluster="Level Control" client="true" server="false" clientLocked="true" serverLocked="true"/>
+      <include cluster="Over the Air Bootloading" client="false" server="false" clientLocked="false" serverLocked="false"/>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>ZLL-controlbridge</name>
+    <domain>ZLL</domain>
+    <typeName>ZLL Control Bridge</typeName>
+    <zigbeeType>Router</zigbeeType>
+    <profileId editable="false">0x0104</profileId>
+    <deviceId editable="false">0x0840</deviceId>
+    <clusters lockOthers="true">
+      <include cluster="Basic" client="false" server="true" clientLocked="true" serverLocked="true">
+        <requireAttribute>VERSION</requireAttribute>
+        <requireAttribute>APPLICATION_VERSION</requireAttribute>
+        <requireAttribute>STACK_VERSION</requireAttribute>
+        <requireAttribute>HW_VERSION</requireAttribute>
+        <requireAttribute>MANUFACTURER_NAME</requireAttribute>
+        <requireAttribute>MODEL_IDENTIFIER</requireAttribute>
+        <requireAttribute>DATE_CODE</requireAttribute>
+        <requireAttribute>POWER_SOURCE</requireAttribute>
+        <requireAttribute>SW_BUILD_ID</requireAttribute>
+      </include>
+      <include cluster="ZLL Commissioning" client="true" server="true" clientLocked="true" serverLocked="true">
+        <requireCommand>ScanRequest</requireCommand>
+        <requireCommand>DeviceInformationRequest</requireCommand>
+        <requireCommand>IdentifyRequest</requireCommand>
+        <requireCommand>ResetToFactoryNewRequest</requireCommand>
+        <requireCommand>NetworkStartRequest</requireCommand>
+        <requireCommand>NetworkJoinRouterRequest</requireCommand>
+        <requireCommand>NetworkJoinEndDeviceRequest</requireCommand>
+        <requireCommand>NetworkUpdateRequest</requireCommand>
+        <requireCommand>GetGroupIdentifiersRequest</requireCommand>
+        <requireCommand>GetEndpointListRequest</requireCommand>
+        <requireCommand>ScanResponse</requireCommand>
+        <requireCommand>DeviceInformationResponse</requireCommand>
+        <requireCommand>NetworkStartResponse</requireCommand>
+        <requireCommand>NetworkJoinRouterResponse</requireCommand>
+        <requireCommand>NetworkJoinEndDeviceResponse</requireCommand>
+        <requireCommand>EndpointInformation</requireCommand>
+        <requireCommand>GetGroupIdentifiersResponse</requireCommand>
+        <requireCommand>GetEndpointListResponse</requireCommand>
+      </include>
+      <include cluster="Identify" client="true" server="false" clientLocked="true" serverLocked="true">
+        <requireCommand>IdentifyQueryResponse</requireCommand>
+      </include>
+      <include cluster="Groups" client="true" server="false" clientLocked="true" serverLocked="true">
+        <requireCommand>AddGroupResponse</requireCommand>
+        <requireCommand>ViewGroupResponse</requireCommand>
+        <requireCommand>GetGroupMembershipResponse</requireCommand>
+        <requireCommand>RemoveGroupResponse</requireCommand>
+      </include>
+      <include cluster="Scenes" client="true" server="false" clientLocked="true" serverLocked="true">
+        <requireCommand>AddSceneResponse</requireCommand>
+        <requireCommand>ViewSceneResponse</requireCommand>
+        <requireCommand>RemoveSceneResponse</requireCommand>
+        <requireCommand>RemoveAllScenesResponse</requireCommand>
+        <requireCommand>StoreSceneResponse</requireCommand>
+        <requireCommand>GetSceneMembershipResponse</requireCommand>
+        <requireCommand>EnhancedAddSceneResponse</requireCommand>
+        <requireCommand>EnhancedViewSceneResponse</requireCommand>
+        <requireCommand>CopySceneResponse</requireCommand>
+      </include>
+      <include cluster="On/Off" client="true" server="false" clientLocked="true" serverLocked="true"/>
+      <include cluster="Level Control" client="true" server="false" clientLocked="true" serverLocked="true"/>
+      <include cluster="Color Control" client="true" server="false" clientLocked="true" serverLocked="true"/>
+      <include cluster="Over the Air Bootloading" client="false" server="false" clientLocked="false" serverLocked="false"/>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>ZLL-onoffsensor</name>
+    <domain>ZLL</domain>
+    <typeName>ZLL On/Off Sensor</typeName>
+    <zigbeeType>End Device</zigbeeType>
+    <profileId editable="false">0x0104</profileId>
+    <deviceId editable="false">0x0850</deviceId>
+    <clusters lockOthers="true">
+      <include cluster="Basic" client="false" server="true" clientLocked="true" serverLocked="true">
+        <requireAttribute>VERSION</requireAttribute>
+        <requireAttribute>APPLICATION_VERSION</requireAttribute>
+        <requireAttribute>STACK_VERSION</requireAttribute>
+        <requireAttribute>HW_VERSION</requireAttribute>
+        <requireAttribute>MANUFACTURER_NAME</requireAttribute>
+        <requireAttribute>MODEL_IDENTIFIER</requireAttribute>
+        <requireAttribute>DATE_CODE</requireAttribute>
+        <requireAttribute>POWER_SOURCE</requireAttribute>
+        <requireAttribute>SW_BUILD_ID</requireAttribute>
+      </include>
+      <include cluster="ZLL Commissioning" client="true" server="true" clientLocked="true" serverLocked="true">
+        <requireCommand>ScanRequest</requireCommand>
+        <requireCommand>DeviceInformationRequest</requireCommand>
+        <requireCommand>IdentifyRequest</requireCommand>
+        <requireCommand>ResetToFactoryNewRequest</requireCommand>
+        <requireCommand>NetworkStartRequest</requireCommand>
+        <requireCommand>NetworkJoinRouterRequest</requireCommand>
+        <requireCommand>NetworkJoinEndDeviceRequest</requireCommand>
+        <requireCommand>NetworkUpdateRequest</requireCommand>
+        <requireCommand>GetGroupIdentifiersRequest</requireCommand>
+        <requireCommand>GetEndpointListRequest</requireCommand>
+        <requireCommand>ScanResponse</requireCommand>
+        <requireCommand>DeviceInformationResponse</requireCommand>
+        <requireCommand>NetworkStartResponse</requireCommand>
+        <requireCommand>NetworkJoinRouterResponse</requireCommand>
+        <requireCommand>NetworkJoinEndDeviceResponse</requireCommand>
+        <requireCommand>EndpointInformation</requireCommand>
+        <requireCommand>GetGroupIdentifiersResponse</requireCommand>
+        <requireCommand>GetEndpointListResponse</requireCommand>
+      </include>
+      <include cluster="Identify" client="true" server="false" clientLocked="true" serverLocked="true">
+        <requireCommand>IdentifyQueryResponse</requireCommand>
+      </include>
+      <include cluster="Groups" client="true" server="false" clientLocked="true" serverLocked="true">
+        <requireCommand>AddGroupResponse</requireCommand>
+        <requireCommand>ViewGroupResponse</requireCommand>
+        <requireCommand>GetGroupMembershipResponse</requireCommand>
+        <requireCommand>RemoveGroupResponse</requireCommand>
+      </include>
+      <include cluster="Scenes" client="true" server="false" clientLocked="true" serverLocked="true">
+        <requireCommand>AddSceneResponse</requireCommand>
+        <requireCommand>ViewSceneResponse</requireCommand>
+        <requireCommand>RemoveSceneResponse</requireCommand>
+        <requireCommand>RemoveAllScenesResponse</requireCommand>
+        <requireCommand>StoreSceneResponse</requireCommand>
+        <requireCommand>GetSceneMembershipResponse</requireCommand>
+        <requireCommand>EnhancedAddSceneResponse</requireCommand>
+        <requireCommand>EnhancedViewSceneResponse</requireCommand>
+        <requireCommand>CopySceneResponse</requireCommand>
+      </include>
+      <include cluster="On/Off" client="true" server="false" clientLocked="true" serverLocked="true"/>
+      <include cluster="Level Control" client="true" server="false" clientLocked="true" serverLocked="true"/>
+      <include cluster="Color Control" client="true" server="false" clientLocked="true" serverLocked="true"/>
+      <include cluster="Over the Air Bootloading" client="false" server="false" clientLocked="false" serverLocked="false"/>
+    </clusters>
+  </deviceType>
+</configurator>

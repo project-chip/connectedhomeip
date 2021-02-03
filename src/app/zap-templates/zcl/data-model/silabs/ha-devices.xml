@@ -1,0 +1,1031 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2008,2020 Silicon Labs.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <deviceType>
+    <name>HA-onoff</name>
+    <domain>HA</domain>
+    <typeName>HA On/Off Switch</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0104</profileId>
+    <deviceId editable="false">0x0000</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Device Temperature Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="true" server="false" clientLocked="true" serverLocked="true">On/off</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Scenes</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Groups</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">On/Off Switch Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Poll Control</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Electrical Measurement</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Time</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Over the Air Bootloading</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Partition</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>HA-levelcontrol</name>
+    <domain>HA</domain>
+    <typeName>HA Level Control Switch</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0104</profileId>
+    <deviceId editable="false">0x0001</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Device Temperature Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="true" server="false" clientLocked="true" serverLocked="true">On/off</include>
+      <include client="true" server="false" clientLocked="true" serverLocked="true">Level control</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">On/Off Switch Configuration</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Scenes</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Groups</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Poll Control</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Electrical Measurement</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Time</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Over the Air Bootloading</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Partition</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>HA-onnoffoutput</name>
+    <domain>HA</domain>
+    <typeName>HA On/Off Output</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0104</profileId>
+    <deviceId editable="false">0x0002</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Device Temperature Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">On/off</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Scenes</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Groups</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Poll Control</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Electrical Measurement</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Time</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Over the Air Bootloading</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Partition</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>HA-levelcontrollableoutput</name>
+    <domain>HA</domain>
+    <typeName>HA Level Controllable Output</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0104</profileId>
+    <deviceId editable="false">0x0003</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Device Temperature Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">On/off</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Level control</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Scenes</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Groups</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Poll Control</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Electrical Measurement</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Time</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Over the Air Bootloading</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Partition</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>HA-sceneselector</name>
+    <domain>HA</domain>
+    <typeName>HA Scene Selector</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0104</profileId>
+    <deviceId editable="false">0x0004</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Device Temperature Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="true" server="false" clientLocked="true" serverLocked="true">Scenes</include>
+      <include client="true" server="false" clientLocked="true" serverLocked="true">Groups</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Poll Control</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Electrical Measurement</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Time</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Over the Air Bootloading</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Partition</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>HA-configurationtool</name>
+    <domain>HA</domain>
+    <typeName>HA Configuration Tool</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0104</profileId>
+    <deviceId editable="false">0x0005</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="false" serverLocked="true">Basic</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Device Temperature Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Groups</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Scenes</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Illuminance Level Sensing</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Temperature Measurement</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Pressure Measurement</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Flow Measurement</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Occupancy Sensing</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Pump Configuration and Control</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Shade Configuration</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Thermostat User Interface Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Poll Control</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Electrical Measurement</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Time</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Over the Air Bootloading</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Partition</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>HA-remote</name>
+    <domain>HA</domain>
+    <typeName>HA Remote Control</typeName>
+    <zigbeeType>Sleepy End Device</zigbeeType>
+    <profileId editable="false">0x0104</profileId>
+    <deviceId editable="false">0x0006</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="false" serverLocked="true">Basic</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Power Configuration</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Device Temperature Configuration</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Alarms</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Simple Metering</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">On/off</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Level control</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Groups</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Scenes</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Color control</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Pump Configuration and Control</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Shade Configuration</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">On/Off Switch Configuration</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Temperature Measurement</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Illuminance Level Sensing</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Illuminance Measurement</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Window Covering</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Door Lock</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Thermostat</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Poll Control</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Electrical Measurement</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Time</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Over the Air Bootloading</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Partition</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>HA-combinedinterface</name>
+    <domain>HA</domain>
+    <typeName>HA Combined Interface</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0104</profileId>
+    <deviceId editable="false">0x0007</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="false" serverLocked="true">Basic</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Device Temperature Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Color control</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Pump Configuration and Control</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Shade Configuration</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">On/Off Switch Configuration</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Temperature Measurement</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Illuminance Level Sensing</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Illuminance Measurement</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Thermostat User Interface Configuration</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Level control</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Groups</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Scenes</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Window Covering</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Door Lock</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Thermostat</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">On/off</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Poll Control</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Electrical Measurement</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Time</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Over the Air Bootloading</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Partition</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>HA-rangeextender</name>
+    <domain>HA</domain>
+    <typeName>HA Range Extender</typeName>
+    <zigbeeType>Router</zigbeeType>
+    <profileId editable="false">0x0104</profileId>
+    <deviceId editable="false">0x0008</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Device Temperature Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Poll Control</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Electrical Measurement</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Time</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Over the Air Bootloading</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Partition</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>HA-mpo</name>
+    <domain>HA</domain>
+    <typeName>HA Mains Power Outlet</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0104</profileId>
+    <deviceId editable="false">0x0009</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Device Temperature Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">On/off</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Scenes</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Groups</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Poll Control</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Electrical Measurement</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Time</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Over the Air Bootloading</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Partition</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>HA-doorlock</name>
+    <domain>HA</domain>
+    <typeName>HA Door Lock</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0104</profileId>
+    <deviceId editable="false">0x000A</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Device Temperature Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Door Lock</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Scenes</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Groups</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Poll Control</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Electrical Measurement</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Time</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Over the Air Bootloading</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Partition</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>HA-doorlockcontroller</name>
+    <domain>HA</domain>
+    <typeName>HA Door Lock Controller</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0104</profileId>
+    <deviceId editable="false">0x000B</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Device Temperature Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="true" server="false" clientLocked="true" serverLocked="true">Door Lock</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Time</include>
+      <include client="true" server="false" clientLocked="true" serverLocked="true">Scenes</include>
+      <include client="true" server="false" clientLocked="true" serverLocked="true">Groups</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Poll Control</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Electrical Measurement</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Time</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Over the Air Bootloading</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Partition</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>HA-simplesensor</name>
+    <domain>HA</domain>
+    <typeName>HA Simple Sensor</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0104</profileId>
+    <deviceId editable="false">0x000C</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Device Temperature Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Binary Input (Basic)</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Poll Control</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Electrical Measurement</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Time</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Over the Air Bootloading</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Partition</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>HA-onofflight</name>
+    <domain>HA</domain>
+    <typeName>HA On/Off Light</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0104</profileId>
+    <deviceId editable="false">0x0100</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Device Temperature Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">On/off</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Scenes</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Groups</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Occupancy Sensing</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Poll Control</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Electrical Measurement</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Time</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Over the Air Bootloading</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Partition</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>HA-light</name>
+    <domain>HA</domain>
+    <typeName>HA Dimmable Light</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0104</profileId>
+    <deviceId editable="false">0x0101</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Device Temperature Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">On/off</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Level control</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Scenes</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Groups</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Occupancy Sensing</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Poll Control</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Electrical Measurement</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Time</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Over the Air Bootloading</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Partition</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>HA-colordimmablelight</name>
+    <domain>HA</domain>
+    <typeName>HA Color Dimmable Light</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0104</profileId>
+    <deviceId editable="false">0x0102</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Device Temperature Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">On/off</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Level control</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Color control</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Scenes</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Groups</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Occupancy Sensing</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Poll Control</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Electrical Measurement</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Time</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Over the Air Bootloading</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Partition</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>HA-onofflightswitch</name>
+    <domain>HA</domain>
+    <typeName>HA On/Off Light Switch</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0104</profileId>
+    <deviceId editable="false">0x0103</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Device Temperature Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="true" server="false" clientLocked="true" serverLocked="true">On/off</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Scenes</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Groups</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">On/Off Switch Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Poll Control</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Electrical Measurement</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Time</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Over the Air Bootloading</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Partition</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>HA-switch</name>
+    <domain>HA</domain>
+    <typeName>HA Dimmer Switch</typeName>
+    <zigbeeType>Sleepy End Device</zigbeeType>
+    <profileId editable="false">0x0104</profileId>
+    <deviceId editable="false">0x0104</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Device Temperature Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="true" server="false" clientLocked="true" serverLocked="true">On/off</include>
+      <include client="true" server="false" clientLocked="true" serverLocked="true">Level control</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Scenes</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">On/Off Switch Configuration</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Groups</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Poll Control</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Electrical Measurement</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Time</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Over the Air Bootloading</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Partition</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>HA-colordimmerswitch</name>
+    <domain>HA</domain>
+    <typeName>HA Color Dimmer Switch</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0104</profileId>
+    <deviceId editable="false">0x0105</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Device Temperature Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="true" server="false" clientLocked="true" serverLocked="true">On/off</include>
+      <include client="true" server="false" clientLocked="true" serverLocked="true">Level control</include>
+      <include client="true" server="false" clientLocked="true" serverLocked="true">Color control</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">On/Off Switch Configuration</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Scenes</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Groups</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Poll Control</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Electrical Measurement</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Time</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Over the Air Bootloading</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Partition</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>HA-lightsensor</name>
+    <domain>HA</domain>
+    <typeName>HA Light Sensor</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0104</profileId>
+    <deviceId editable="false">0x0106</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Device Temperature Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Illuminance measurement</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Groups</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Poll Control</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Electrical Measurement</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Time</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Over the Air Bootloading</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Partition</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>HA-occupancysensor</name>
+    <domain>HA</domain>
+    <typeName>HA Occupancy Sensor</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0104</profileId>
+    <deviceId editable="false">0x0107</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Device Temperature Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Occupancy Sensing</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Groups</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Poll Control</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Electrical Measurement</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Time</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Over the Air Bootloading</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Partition</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>HA-shade</name>
+    <domain>HA</domain>
+    <typeName>HA Shade</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0104</profileId>
+    <deviceId editable="false">0x0200</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Device Temperature Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Shade configuration</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">On/off</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Level control</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Scenes</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Groups</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Poll Control</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Electrical Measurement</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Time</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Over the Air Bootloading</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Partition</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>HA-shadecontroller</name>
+    <domain>HA</domain>
+    <typeName>HA Shade Controller</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0104</profileId>
+    <deviceId editable="false">0x0201</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Device Temperature Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="true" server="false" clientLocked="true" serverLocked="true">On/off</include>
+      <include client="true" server="false" clientLocked="true" serverLocked="true">Level control</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Shade configuration</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Scenes</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Groups</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Poll Control</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Electrical Measurement</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Time</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Over the Air Bootloading</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Partition</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>HA-windowcovering</name>
+    <domain>HA</domain>
+    <typeName>HA Window Covering</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0104</profileId>
+    <deviceId editable="false">0x0202</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Device Temperature Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Window Covering</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Scenes</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Groups</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Poll Control</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Electrical Measurement</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Time</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Over the Air Bootloading</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Partition</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>HA-windowcoveringcontroller</name>
+    <domain>HA</domain>
+    <typeName>HA Window Covering Controller</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0104</profileId>
+    <deviceId editable="false">0x0203</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Device Temperature Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="true" server="false" clientLocked="true" serverLocked="true">Window Covering</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Scenes</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Groups</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Poll Control</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Electrical Measurement</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Time</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Over the Air Bootloading</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Partition</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>HA-heatcool</name>
+    <domain>HA</domain>
+    <typeName>HA Heating Cooling Unit</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0104</profileId>
+    <deviceId editable="false">0x0300</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Device Temperature Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">On/off</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Thermostat</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Fan control</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Level control</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Groups</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Poll Control</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Electrical Measurement</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Time</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Over the Air Bootloading</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Partition</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>HA-tstat</name>
+    <domain>HA</domain>
+    <typeName>HA Thermostat</typeName>
+    <zigbeeType>Sleepy End Device</zigbeeType>
+    <profileId editable="false">0x0104</profileId>
+    <deviceId editable="false">0x0301</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Device Temperature Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Thermostat</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Scenes</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Groups</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Thermostat User Interface Configuration</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Fan control</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Temperature measurement</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Occupancy Sensing</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Relative Humidity Measurement</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Poll Control</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Electrical Measurement</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Time</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Over the Air Bootloading</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Partition</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>HA-tempsensor</name>
+    <domain>HA</domain>
+    <typeName>HA Temperature Sensor</typeName>
+    <zigbeeType>Sleepy End Device</zigbeeType>
+    <profileId editable="false">0x0104</profileId>
+    <deviceId editable="false">0x0302</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Device Temperature Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Temperature measurement</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Groups</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Poll Control</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Electrical Measurement</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Time</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Over the Air Bootloading</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Partition</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>HA-pump</name>
+    <domain>HA</domain>
+    <typeName>HA Pump</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0104</profileId>
+    <deviceId editable="false">0x0303</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Device Temperature Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Pump Configuration and Control</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">On/off</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Scenes</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Groups</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Level control</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Pressure measurement</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Temperature measurement</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Flow measurement</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Poll Control</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Electrical Measurement</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Time</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Over the Air Bootloading</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Partition</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>HA-pumpcontroller</name>
+    <domain>HA</domain>
+    <typeName>HA Pump Controller</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0104</profileId>
+    <deviceId editable="false">0x0304</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Device Temperature Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="true" server="false" clientLocked="true" serverLocked="true">Pump Configuration and Control</include>
+      <include client="true" server="false" clientLocked="true" serverLocked="true">On/off</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Scenes</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Groups</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Pressure measurement</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Temperature measurement</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Flow measurement</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Level control</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Poll Control</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Electrical Measurement</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Time</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Over the Air Bootloading</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Partition</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>HA-pressuresensor</name>
+    <domain>HA</domain>
+    <typeName>HA Pressure Sensor</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0104</profileId>
+    <deviceId editable="false">0x0305</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Device Temperature Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Pressure measurement</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Groups</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Poll Control</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Electrical Measurement</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Time</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Over the Air Bootloading</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Partition</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>HA-flowsensor</name>
+    <domain>HA</domain>
+    <typeName>HA Flow Sensor</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0104</profileId>
+    <deviceId editable="false">0x0306</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Device Temperature Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Flow measurement</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Groups</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Poll Control</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Electrical Measurement</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Time</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Over the Air Bootloading</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Partition</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>HA-ias400</name>
+    <domain>HA</domain>
+    <typeName>HA IAS Control and Indication Equipment</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0104</profileId>
+    <deviceId editable="false">0x0400</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Device Temperature Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">IAS ACE</include>
+      <include client="true" server="false" clientLocked="true" serverLocked="true">IAS WD</include>
+      <include client="true" server="false" clientLocked="true" serverLocked="true">IAS Zone</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Scenes</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Groups</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Poll Control</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Electrical Measurement</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Time</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Over the Air Bootloading</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Partition</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>HA-ias401</name>
+    <domain>HA</domain>
+    <typeName>HA IAS Ancillary Control Equipment</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0104</profileId>
+    <deviceId editable="false">0x0401</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Device Temperature Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">IAS Zone</include>
+      <include client="true" server="false" clientLocked="true" serverLocked="true">IAS ACE</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Poll Control</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Electrical Measurement</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Time</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Over the Air Bootloading</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Partition</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>HA-ias402</name>
+    <domain>HA</domain>
+    <typeName>HA IAS Zone</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0104</profileId>
+    <deviceId editable="false">0x0402</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Device Temperature Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">IAS Zone</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Poll Control</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Electrical Measurement</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Time</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Over the Air Bootloading</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Partition</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>HA-ias403</name>
+    <domain>HA</domain>
+    <typeName>HA IAS Warning Device</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0104</profileId>
+    <deviceId editable="false">0x0403</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Device Temperature Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">IAS WD</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">IAS Zone</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Scenes</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Groups</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Poll Control</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Electrical Measurement</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Time</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Over the Air Bootloading</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Partition</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>HA-consumptionawarenessdevice</name>
+    <domain>HA</domain>
+    <typeName>HA Consumption Awareness Device</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0104</profileId>
+    <deviceId editable="false">0x000D</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Device Temperature Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Poll Control</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Electrical Measurement</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Time</include>
+      <include client="false" server="true" clientLocked="false" serverLocked="true">Simple Metering</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Over the Air Bootloading</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Partition</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>HA-homegatewayems</name>
+    <domain>HA</domain>
+    <typeName>HA Home Gateway / Energy Management System</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0104</profileId>
+    <deviceId editable="false">0x0050</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Device Temperature Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Poll Control</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Electrical Measurement</include>
+      <include client="false" server="true" clientLocked="false" serverLocked="true">Time</include>
+      <include client="true" server="false" clientLocked="true" serverLocked="false">Simple Metering</include>
+      <include client="true" server="false" clientLocked="true" serverLocked="true">Meter Identification</include>
+      <include client="true" server="false" clientLocked="true" serverLocked="true">Power Profile</include>
+      <include client="true" server="false" clientLocked="true" serverLocked="true">Appliance Statistics</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Appliance Control</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Appliance Identification</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Appliance Events and Alert</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Price</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Over the Air Bootloading</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Partition</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>HA-smartplug</name>
+    <domain>HA</domain>
+    <typeName>HA Smart Plug</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0104</profileId>
+    <deviceId editable="false">0x0051</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">On/off</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Device Temperature Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Poll Control</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Electrical Measurement</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Simple Metering</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Time</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Demand Response and Load Control</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Price</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Time</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Over the Air Bootloading</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Partition</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>HA-whitegoods</name>
+    <domain>HA</domain>
+    <typeName>HA White Goods</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0104</profileId>
+    <deviceId editable="false">0x0052</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Device Temperature Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Poll Control</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Electrical Measurement</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Time</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Meter Identification</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Price</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Time</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Power Profile</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Appliance Statistics</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Appliance Control</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Appliance Identification</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Appliance Events and Alert</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Simple Metering</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Over the Air Bootloading</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Partition</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>HA-meterinterface</name>
+    <domain>HA</domain>
+    <typeName>HA Meter Interface</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0104</profileId>
+    <deviceId editable="false">0x0053</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Device Temperature Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Simple Metering</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Meter Identification</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Poll Control</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Electrical Measurement</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Time</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Messaging</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Price</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Over the Air Bootloading</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Partition</include>
+    </clusters>
+  </deviceType>
+</configurator>

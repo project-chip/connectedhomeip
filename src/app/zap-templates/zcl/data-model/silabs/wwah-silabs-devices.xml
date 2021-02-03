@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2008,2020 Silicon Labs.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <deviceType>
+    <name>SL-WWAH-door-lock</name>
+    <domain>WWAH</domain>
+    <typeName>SL WWAH Door Lock</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0104</profileId>
+    <deviceId editable="false">0x0000</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Power Configuration</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="true" server="false" clientLocked="false" serverLocked="false">Over the Air Bootloading</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Alarms</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Poll Control</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Door Lock</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Diagnostics</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Time</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">SL Works With All Hubs</include>
+    </clusters>
+  </deviceType>
+</configurator>

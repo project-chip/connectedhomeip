@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2008,2020 Silicon Labs.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="HC" spec="hc-1.0-07-5360-15" dependsOn="zcl-1.0-07-5123-03"/>
+  <enum name="11073ConnectRequestConnectControl" type="ENUM8">
+    <item name="Preemptible" value="0x01"/>
+  </enum>
+  <enum name="11073TunnelConnectionStatus" type="ENUM8">
+    <item name="Disconnected" value="0x00"/>
+    <item name="Connected" value="0x01"/>
+    <item name="NotAuthorized" value="0x02"/>
+    <item name="ReconnectRequest" value="0x03"/>
+    <item name="AlreadyConnected" value="0x04"/>
+  </enum>
+  <cluster>
+    <name>11073 Protocol Tunnel</name>
+    <domain>HC</domain>
+    <description>Attributes and commands for the 11073 protocol tunnel used for ZigBee Health Care.</description>
+    <code>0x0614</code>
+    <define>11073_PROTOCOL_TUNNEL_CLUSTER</define>
+    <client tick="false" init="false">true</client>
+    <server tick="false" init="false">true</server>
+    <attribute side="server" code="0x0000" define="DEVICE_ID_LIST" type="INT16U" writable="false" optional="true" array="true">device id list</attribute>
+    <attribute side="server" code="0x0001" define="MANAGER_TARGET" type="IEEE_ADDRESS" min="0x0000000000000000" max="0xffffffffffffffff" writable="false" optional="true">manager target</attribute>
+    <attribute side="server" code="0x0002" define="MANAGER_ENDPOINT" type="INT8U" min="0x01" max="0xff" writable="false" optional="true">manager endpoint</attribute>
+    <attribute side="server" code="0x0003" define="CONNECTED" type="BOOLEAN" writable="false" optional="true">connected</attribute>
+    <attribute side="server" code="0x0004" define="PREEMPTIBLE" type="BOOLEAN" writable="false" optional="true">preemptible</attribute>
+    <attribute side="server" code="0x0005" define="IDLE_TIMEOUT" type="INT16U" min="0x01" max="0xffff" writable="false" optional="true">idle timeout</attribute>
+    <command source="client" code="0x00" name="TransferAPDU" optional="false">
+      <description>
+        This command is generated when an 11073 network layer wishes to transfer an 11073 APDU across a ZigBee tunnel to another 11073 network layer.
+      </description>
+      <arg name="apdu" type="OCTET_STRING"/>
+    </command>
+    <command source="client" code="0x01" name="ConnectRequest" optional="true">
+      <description>
+        This command is generated when an Health Care client wishes to connect to a Health Care server for the purposes of transmitting 11073 APDUs across the 11073 tunnel.
+      </description>
+      <arg name="connectControl" type="11073ConnectRequestConnectControl"/>
+      <arg name="idleTimeout" type="INT16U"/>
+      <arg name="managerTarget" type="IEEE_ADDRESS"/>
+      <arg name="managerEndpoint" type="INT8U"/>
+    </command>
+    <command source="client" code="0x02" name="DisconnectRequest" optional="true">
+      <description>
+        This command is generated when an Health Care client wishes to disconnect from a Health Care server.
+      </description>
+      <arg name="managerIEEEAddress" type="IEEE_ADDRESS"/>
+    </command>
+    <command source="client" code="0x03" name="ConnectStatusNotification" optional="true">
+      <description>
+        Generated in response to requests related to connection or any event that causes the tunnel to become disconnected.
+      </description>
+      <arg name="connectStatus" type="11073TunnelConnectionStatus"/>
+    </command>
+  </cluster>
+</configurator>

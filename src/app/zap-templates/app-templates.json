@@ -90,6 +90,11 @@
             "output": "gen_config.h"
         },
         {
+            "path": "templates/app/gen_tokens.zapt",
+            "name": "ZCL gen_tokens header",
+            "output": "gen_tokens.h"
+        },
+        {
             "path": "templates/app/print-cluster.zapt",
             "name": "ZCL print-cluster header",
             "output": "print-cluster.h"
