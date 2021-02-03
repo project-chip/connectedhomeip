@@ -35,7 +35,7 @@ ENV ARM_GCC_INSTALL_ROOT=/opt/ARM-software/gcc-arm-none-eabi-9-2019-q4-major/bin
 # ==================================================
 RUN set -x \
     # Device Tree Compiler 1.4.7
-    && curl -o /tmp/dtc.deb http://ftp.br.debian.org/debian/pool/main/d/device-tree-compiler/device-tree-compiler_1.4.7-3_amd64.deb \
+    && curl -o /tmp/dtc.deb https://mirrors.edge.kernel.org/debian/pool/main/d/device-tree-compiler/device-tree-compiler_1.4.7-3_amd64.deb \
     && dpkg -i /tmp/dtc.deb \
     && (mkdir -p /opt/nrfconnect/sdk-nrf && cd /opt/nrfconnect/sdk-nrf \
     && pip3 install --no-cache-dir setuptools wheel cmake west \
