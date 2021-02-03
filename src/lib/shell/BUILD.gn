@@ -37,6 +37,10 @@ static_library("shell") {
     sources += [ "streamer_zephyr.cpp" ]
   }
 
+  if (current_os == "mbed") {
+    sources += [ "streamer_mbed.cpp" ]
+  }
+
   cflags = [ "-Wconversion" ]
 
   public_deps = [
