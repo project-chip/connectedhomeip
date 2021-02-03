@@ -16,7 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (nullable instancetype)initWithDevice:(CHIPDevice *)device endpoint:(uint8_t)endpoint queue:(dispatch_queue_t)queue;
 {{#chip_server_cluster_commands}}
-- (BOOL){{asCamelCased name}}:(CHIPDeviceCallback)onCompletion{{#chip_server_cluster_command_arguments}} {{asCamelCased label}}:({{asBasicType chipType}}){{asCamelCased label}}{{/chip_server_cluster_command_arguments}};
+- (BOOL){{asCamelCased name}}:(CHIPDeviceCallback)onCompletion{{#chip_server_cluster_command_arguments}} {{asCamelCased label}}:({{asBasicType chipType}}){{asCamelCased label}}{{#if (isByteString type)}} {{asCamelCased label}}Len:(uint32_t){{asCamelCased label}}Len{{/if}}{{/chip_server_cluster_command_arguments}};
 {{/chip_server_cluster_commands}}
 
 {{#chip_server_cluster_attributes}}

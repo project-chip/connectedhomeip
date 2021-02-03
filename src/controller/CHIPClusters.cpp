@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -2691,6 +2691,344 @@ CHIP_ERROR LevelControlCluster::ReportAttributeCurrentLevel(Callback::Callback<>
 CHIP_ERROR LevelControlCluster::ReadAttributeClusterRevision(Callback::Callback<> * onCompletion)
 {
     System::PacketBufferHandle payload = encodeLevelControlClusterReadClusterRevisionAttribute(mEndpoint);
+    return SendCommand(std::move(payload), onCompletion);
+}
+
+// NetworkProvisioning Cluster Commands
+CHIP_ERROR NetworkProvisioningCluster::AddThreadNetwork(Callback::Callback<> * onCompletion, uint8_t * operationalDataset,
+                                                        uint32_t operationalDatasetLen, uint64_t breadcrumb, uint32_t timeoutMs)
+{
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    (void) onCompletion;
+
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kAddThreadNetworkCommandId,
+                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+
+    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
+    // operationalDataset: octetString
+    ReturnErrorOnFailure(writer.PutBytes(TLV::ContextTag(argSeqNumber++), operationalDataset, operationalDatasetLen));
+    // breadcrumb: int64u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), breadcrumb));
+    // timeoutMs: int32u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), timeoutMs));
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
+    return mDevice->SendCommands();
+#else
+    System::PacketBufferHandle payload =
+        encodeNetworkProvisioningClusterAddThreadNetworkCommand(mEndpoint, operationalDataset, breadcrumb, timeoutMs);
+    return SendCommand(std::move(payload), onCompletion);
+#endif
+}
+
+CHIP_ERROR NetworkProvisioningCluster::AddWiFiNetwork(Callback::Callback<> * onCompletion, uint8_t * ssid, uint32_t ssidLen,
+                                                      uint8_t * credentials, uint32_t credentialsLen, uint64_t breadcrumb,
+                                                      uint32_t timeoutMs)
+{
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    (void) onCompletion;
+
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kAddWiFiNetworkCommandId,
+                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+
+    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
+    // ssid: octetString
+    ReturnErrorOnFailure(writer.PutBytes(TLV::ContextTag(argSeqNumber++), ssid, ssidLen));
+    // credentials: octetString
+    ReturnErrorOnFailure(writer.PutBytes(TLV::ContextTag(argSeqNumber++), credentials, credentialsLen));
+    // breadcrumb: int64u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), breadcrumb));
+    // timeoutMs: int32u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), timeoutMs));
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
+    return mDevice->SendCommands();
+#else
+    System::PacketBufferHandle payload =
+        encodeNetworkProvisioningClusterAddWiFiNetworkCommand(mEndpoint, ssid, credentials, breadcrumb, timeoutMs);
+    return SendCommand(std::move(payload), onCompletion);
+#endif
+}
+
+CHIP_ERROR NetworkProvisioningCluster::DisableNetwork(Callback::Callback<> * onCompletion, uint8_t * networkID,
+                                                      uint32_t networkIDLen, uint64_t breadcrumb, uint32_t timeoutMs)
+{
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    (void) onCompletion;
+
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kDisableNetworkCommandId,
+                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+
+    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
+    // networkID: octetString
+    ReturnErrorOnFailure(writer.PutBytes(TLV::ContextTag(argSeqNumber++), networkID, networkIDLen));
+    // breadcrumb: int64u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), breadcrumb));
+    // timeoutMs: int32u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), timeoutMs));
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
+    return mDevice->SendCommands();
+#else
+    System::PacketBufferHandle payload =
+        encodeNetworkProvisioningClusterDisableNetworkCommand(mEndpoint, networkID, breadcrumb, timeoutMs);
+    return SendCommand(std::move(payload), onCompletion);
+#endif
+}
+
+CHIP_ERROR NetworkProvisioningCluster::EnableNetwork(Callback::Callback<> * onCompletion, uint8_t * networkID,
+                                                     uint32_t networkIDLen, uint64_t breadcrumb, uint32_t timeoutMs)
+{
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    (void) onCompletion;
+
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kEnableNetworkCommandId,
+                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+
+    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
+    // networkID: octetString
+    ReturnErrorOnFailure(writer.PutBytes(TLV::ContextTag(argSeqNumber++), networkID, networkIDLen));
+    // breadcrumb: int64u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), breadcrumb));
+    // timeoutMs: int32u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), timeoutMs));
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
+    return mDevice->SendCommands();
+#else
+    System::PacketBufferHandle payload =
+        encodeNetworkProvisioningClusterEnableNetworkCommand(mEndpoint, networkID, breadcrumb, timeoutMs);
+    return SendCommand(std::move(payload), onCompletion);
+#endif
+}
+
+CHIP_ERROR NetworkProvisioningCluster::GetLastNetworkProvisioningResult(Callback::Callback<> * onCompletion, uint32_t timeoutMs)
+{
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    (void) onCompletion;
+
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetLastNetworkProvisioningResultCommandId,
+                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+
+    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
+    // timeoutMs: int32u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), timeoutMs));
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
+    return mDevice->SendCommands();
+#else
+    System::PacketBufferHandle payload =
+        encodeNetworkProvisioningClusterGetLastNetworkProvisioningResultCommand(mEndpoint, timeoutMs);
+    return SendCommand(std::move(payload), onCompletion);
+#endif
+}
+
+CHIP_ERROR NetworkProvisioningCluster::RemoveNetwork(Callback::Callback<> * onCompletion, uint8_t * networkID,
+                                                     uint32_t networkIDLen, uint64_t breadcrumb, uint32_t timeoutMs)
+{
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    (void) onCompletion;
+
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kRemoveNetworkCommandId,
+                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+
+    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
+    // networkID: octetString
+    ReturnErrorOnFailure(writer.PutBytes(TLV::ContextTag(argSeqNumber++), networkID, networkIDLen));
+    // breadcrumb: int64u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), breadcrumb));
+    // timeoutMs: int32u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), timeoutMs));
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
+    return mDevice->SendCommands();
+#else
+    System::PacketBufferHandle payload =
+        encodeNetworkProvisioningClusterRemoveNetworkCommand(mEndpoint, networkID, breadcrumb, timeoutMs);
+    return SendCommand(std::move(payload), onCompletion);
+#endif
+}
+
+CHIP_ERROR NetworkProvisioningCluster::ScanNetworks(Callback::Callback<> * onCompletion, uint8_t * ssid, uint32_t ssidLen,
+                                                    uint64_t breadcrumb, uint32_t timeoutMs)
+{
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    (void) onCompletion;
+
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kScanNetworksCommandId,
+                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+
+    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
+    // ssid: octetString
+    ReturnErrorOnFailure(writer.PutBytes(TLV::ContextTag(argSeqNumber++), ssid, ssidLen));
+    // breadcrumb: int64u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), breadcrumb));
+    // timeoutMs: int32u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), timeoutMs));
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
+    return mDevice->SendCommands();
+#else
+    System::PacketBufferHandle payload =
+        encodeNetworkProvisioningClusterScanNetworksCommand(mEndpoint, ssid, breadcrumb, timeoutMs);
+    return SendCommand(std::move(payload), onCompletion);
+#endif
+}
+
+CHIP_ERROR NetworkProvisioningCluster::UpdateThreadNetwork(Callback::Callback<> * onCompletion, uint8_t * operationalDataset,
+                                                           uint32_t operationalDatasetLen, uint64_t breadcrumb, uint32_t timeoutMs)
+{
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    (void) onCompletion;
+
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kUpdateThreadNetworkCommandId,
+                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+
+    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
+    // operationalDataset: octetString
+    ReturnErrorOnFailure(writer.PutBytes(TLV::ContextTag(argSeqNumber++), operationalDataset, operationalDatasetLen));
+    // breadcrumb: int64u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), breadcrumb));
+    // timeoutMs: int32u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), timeoutMs));
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
+    return mDevice->SendCommands();
+#else
+    System::PacketBufferHandle payload =
+        encodeNetworkProvisioningClusterUpdateThreadNetworkCommand(mEndpoint, operationalDataset, breadcrumb, timeoutMs);
+    return SendCommand(std::move(payload), onCompletion);
+#endif
+}
+
+CHIP_ERROR NetworkProvisioningCluster::UpdateWiFiNetwork(Callback::Callback<> * onCompletion, uint8_t * ssid, uint32_t ssidLen,
+                                                         uint8_t * credentials, uint32_t credentialsLen, uint64_t breadcrumb,
+                                                         uint32_t timeoutMs)
+{
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    (void) onCompletion;
+
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kUpdateWiFiNetworkCommandId,
+                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+
+    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
+    // ssid: octetString
+    ReturnErrorOnFailure(writer.PutBytes(TLV::ContextTag(argSeqNumber++), ssid, ssidLen));
+    // credentials: octetString
+    ReturnErrorOnFailure(writer.PutBytes(TLV::ContextTag(argSeqNumber++), credentials, credentialsLen));
+    // breadcrumb: int64u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), breadcrumb));
+    // timeoutMs: int32u
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), timeoutMs));
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
+    return mDevice->SendCommands();
+#else
+    System::PacketBufferHandle payload =
+        encodeNetworkProvisioningClusterUpdateWiFiNetworkCommand(mEndpoint, ssid, credentials, breadcrumb, timeoutMs);
+    return SendCommand(std::move(payload), onCompletion);
+#endif
+}
+
+// NetworkProvisioning Cluster Attributes
+CHIP_ERROR NetworkProvisioningCluster::DiscoverAttributes(Callback::Callback<> * onCompletion)
+{
+    System::PacketBufferHandle payload = encodeNetworkProvisioningClusterDiscoverAttributes(mEndpoint);
+    return SendCommand(std::move(payload), onCompletion);
+}
+CHIP_ERROR NetworkProvisioningCluster::ReadAttributeClusterRevision(Callback::Callback<> * onCompletion)
+{
+    System::PacketBufferHandle payload = encodeNetworkProvisioningClusterReadClusterRevisionAttribute(mEndpoint);
     return SendCommand(std::move(payload), onCompletion);
 }
 

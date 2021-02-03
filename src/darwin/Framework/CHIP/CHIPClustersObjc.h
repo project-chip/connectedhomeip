@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -436,6 +436,66 @@ NS_ASSUME_NONNULL_BEGIN
                         minInterval:(uint16_t)minInterval
                         maxInterval:(uint16_t)maxInterval
                              change:(uint8_t)change;
+- (BOOL)readAttributeClusterRevision:(CHIPDeviceCallback)onCompletion;
+
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
+@end
+
+NS_ASSUME_NONNULL_END
+
+NS_ASSUME_NONNULL_BEGIN
+
+@interface CHIPNetworkProvisioning : NSObject
+
+- (nullable instancetype)initWithDevice:(CHIPDevice *)device endpoint:(uint8_t)endpoint queue:(dispatch_queue_t)queue;
+- (BOOL)addThreadNetwork:(CHIPDeviceCallback)onCompletion
+       operationalDataset:(uint8_t *)operationalDataset
+    operationalDatasetLen:(uint32_t)operationalDatasetLen
+               breadcrumb:(uint64_t)breadcrumb
+                timeoutMs:(uint32_t)timeoutMs;
+- (BOOL)addWiFiNetwork:(CHIPDeviceCallback)onCompletion
+                  ssid:(uint8_t *)ssid
+               ssidLen:(uint32_t)ssidLen
+           credentials:(uint8_t *)credentials
+        credentialsLen:(uint32_t)credentialsLen
+            breadcrumb:(uint64_t)breadcrumb
+             timeoutMs:(uint32_t)timeoutMs;
+- (BOOL)disableNetwork:(CHIPDeviceCallback)onCompletion
+             networkID:(uint8_t *)networkID
+          networkIDLen:(uint32_t)networkIDLen
+            breadcrumb:(uint64_t)breadcrumb
+             timeoutMs:(uint32_t)timeoutMs;
+- (BOOL)enableNetwork:(CHIPDeviceCallback)onCompletion
+            networkID:(uint8_t *)networkID
+         networkIDLen:(uint32_t)networkIDLen
+           breadcrumb:(uint64_t)breadcrumb
+            timeoutMs:(uint32_t)timeoutMs;
+- (BOOL)getLastNetworkProvisioningResult:(CHIPDeviceCallback)onCompletion timeoutMs:(uint32_t)timeoutMs;
+- (BOOL)removeNetwork:(CHIPDeviceCallback)onCompletion
+            networkID:(uint8_t *)networkID
+         networkIDLen:(uint32_t)networkIDLen
+           breadcrumb:(uint64_t)breadcrumb
+            timeoutMs:(uint32_t)timeoutMs;
+- (BOOL)scanNetworks:(CHIPDeviceCallback)onCompletion
+                ssid:(uint8_t *)ssid
+             ssidLen:(uint32_t)ssidLen
+          breadcrumb:(uint64_t)breadcrumb
+           timeoutMs:(uint32_t)timeoutMs;
+- (BOOL)updateThreadNetwork:(CHIPDeviceCallback)onCompletion
+         operationalDataset:(uint8_t *)operationalDataset
+      operationalDatasetLen:(uint32_t)operationalDatasetLen
+                 breadcrumb:(uint64_t)breadcrumb
+                  timeoutMs:(uint32_t)timeoutMs;
+- (BOOL)updateWiFiNetwork:(CHIPDeviceCallback)onCompletion
+                     ssid:(uint8_t *)ssid
+                  ssidLen:(uint32_t)ssidLen
+              credentials:(uint8_t *)credentials
+           credentialsLen:(uint32_t)credentialsLen
+               breadcrumb:(uint64_t)breadcrumb
+                timeoutMs:(uint32_t)timeoutMs;
+
 - (BOOL)readAttributeClusterRevision:(CHIPDeviceCallback)onCompletion;
 
 - (instancetype)init NS_UNAVAILABLE;

@@ -59,7 +59,7 @@ limitations under the License.
         <name>Network Provisioning</name>
         <domain>CHIP</domain>
         <description>TODO</description>
-        <code>0x9999</code>
+        <code>0xaaaa</code>
         <define>NWPROV_CLUSTER</define>
         <client tick="false" init="false">true</client>
         <server tick="false" init="false">true</server>

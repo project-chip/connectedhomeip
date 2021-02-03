@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -2876,6 +2876,219 @@
         changeCallback->Cancel();
         delete completionCallback;
         delete changeCallback;
+        return NO;
+    }
+    return YES;
+}
+
+- (BOOL)readAttributeClusterRevision:(CHIPDeviceCallback)onCompletion
+{
+    CHIPCallbackBridge * callback = new CHIPCallbackBridge(onCompletion, _callbackQueue);
+    if (!callback) {
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.ReadAttributeClusterRevision(callback);
+    if (err != CHIP_NO_ERROR) {
+        callback->Cancel();
+        delete callback;
+        return NO;
+    }
+    return YES;
+}
+
+@end
+
+@interface CHIPNetworkProvisioning ()
+
+@property (readonly) chip::Controller::NetworkProvisioningCluster cppCluster;
+@property (readonly, nonatomic) dispatch_queue_t callbackQueue;
+@end
+
+@implementation CHIPNetworkProvisioning
+
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(chip::EndpointId)endpoint queue:(dispatch_queue_t)queue
+{
+    CHIP_ERROR err = _cppCluster.Associate([device internalDevice], endpoint);
+
+    if (err != CHIP_NO_ERROR) {
+        return nil;
+    }
+
+    if (self = [super init]) {
+        _callbackQueue = queue;
+    }
+    return self;
+}
+
+- (BOOL)addThreadNetwork:(CHIPDeviceCallback)onCompletion
+       operationalDataset:(uint8_t *)operationalDataset
+    operationalDatasetLen:(uint32_t)operationalDatasetLen
+               breadcrumb:(uint64_t)breadcrumb
+                timeoutMs:(uint32_t)timeoutMs
+{
+    CHIPCallbackBridge * callback = new CHIPCallbackBridge(onCompletion, _callbackQueue);
+    if (!callback) {
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.AddThreadNetwork(callback, operationalDataset, operationalDatasetLen, breadcrumb, timeoutMs);
+    if (err != CHIP_NO_ERROR) {
+        callback->Cancel();
+        delete callback;
+        return NO;
+    }
+    return YES;
+}
+- (BOOL)addWiFiNetwork:(CHIPDeviceCallback)onCompletion
+                  ssid:(uint8_t *)ssid
+               ssidLen:(uint32_t)ssidLen
+           credentials:(uint8_t *)credentials
+        credentialsLen:(uint32_t)credentialsLen
+            breadcrumb:(uint64_t)breadcrumb
+             timeoutMs:(uint32_t)timeoutMs
+{
+    CHIPCallbackBridge * callback = new CHIPCallbackBridge(onCompletion, _callbackQueue);
+    if (!callback) {
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.AddWiFiNetwork(callback, ssid, ssidLen, credentials, credentialsLen, breadcrumb, timeoutMs);
+    if (err != CHIP_NO_ERROR) {
+        callback->Cancel();
+        delete callback;
+        return NO;
+    }
+    return YES;
+}
+- (BOOL)disableNetwork:(CHIPDeviceCallback)onCompletion
+             networkID:(uint8_t *)networkID
+          networkIDLen:(uint32_t)networkIDLen
+            breadcrumb:(uint64_t)breadcrumb
+             timeoutMs:(uint32_t)timeoutMs
+{
+    CHIPCallbackBridge * callback = new CHIPCallbackBridge(onCompletion, _callbackQueue);
+    if (!callback) {
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.DisableNetwork(callback, networkID, networkIDLen, breadcrumb, timeoutMs);
+    if (err != CHIP_NO_ERROR) {
+        callback->Cancel();
+        delete callback;
+        return NO;
+    }
+    return YES;
+}
+- (BOOL)enableNetwork:(CHIPDeviceCallback)onCompletion
+            networkID:(uint8_t *)networkID
+         networkIDLen:(uint32_t)networkIDLen
+           breadcrumb:(uint64_t)breadcrumb
+            timeoutMs:(uint32_t)timeoutMs
+{
+    CHIPCallbackBridge * callback = new CHIPCallbackBridge(onCompletion, _callbackQueue);
+    if (!callback) {
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.EnableNetwork(callback, networkID, networkIDLen, breadcrumb, timeoutMs);
+    if (err != CHIP_NO_ERROR) {
+        callback->Cancel();
+        delete callback;
+        return NO;
+    }
+    return YES;
+}
+- (BOOL)getLastNetworkProvisioningResult:(CHIPDeviceCallback)onCompletion timeoutMs:(uint32_t)timeoutMs
+{
+    CHIPCallbackBridge * callback = new CHIPCallbackBridge(onCompletion, _callbackQueue);
+    if (!callback) {
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.GetLastNetworkProvisioningResult(callback, timeoutMs);
+    if (err != CHIP_NO_ERROR) {
+        callback->Cancel();
+        delete callback;
+        return NO;
+    }
+    return YES;
+}
+- (BOOL)removeNetwork:(CHIPDeviceCallback)onCompletion
+            networkID:(uint8_t *)networkID
+         networkIDLen:(uint32_t)networkIDLen
+           breadcrumb:(uint64_t)breadcrumb
+            timeoutMs:(uint32_t)timeoutMs
+{
+    CHIPCallbackBridge * callback = new CHIPCallbackBridge(onCompletion, _callbackQueue);
+    if (!callback) {
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.RemoveNetwork(callback, networkID, networkIDLen, breadcrumb, timeoutMs);
+    if (err != CHIP_NO_ERROR) {
+        callback->Cancel();
+        delete callback;
+        return NO;
+    }
+    return YES;
+}
+- (BOOL)scanNetworks:(CHIPDeviceCallback)onCompletion
+                ssid:(uint8_t *)ssid
+             ssidLen:(uint32_t)ssidLen
+          breadcrumb:(uint64_t)breadcrumb
+           timeoutMs:(uint32_t)timeoutMs
+{
+    CHIPCallbackBridge * callback = new CHIPCallbackBridge(onCompletion, _callbackQueue);
+    if (!callback) {
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.ScanNetworks(callback, ssid, ssidLen, breadcrumb, timeoutMs);
+    if (err != CHIP_NO_ERROR) {
+        callback->Cancel();
+        delete callback;
+        return NO;
+    }
+    return YES;
+}
+- (BOOL)updateThreadNetwork:(CHIPDeviceCallback)onCompletion
+         operationalDataset:(uint8_t *)operationalDataset
+      operationalDatasetLen:(uint32_t)operationalDatasetLen
+                 breadcrumb:(uint64_t)breadcrumb
+                  timeoutMs:(uint32_t)timeoutMs
+{
+    CHIPCallbackBridge * callback = new CHIPCallbackBridge(onCompletion, _callbackQueue);
+    if (!callback) {
+        return NO;
+    }
+
+    CHIP_ERROR err
+        = self.cppCluster.UpdateThreadNetwork(callback, operationalDataset, operationalDatasetLen, breadcrumb, timeoutMs);
+    if (err != CHIP_NO_ERROR) {
+        callback->Cancel();
+        delete callback;
+        return NO;
+    }
+    return YES;
+}
+- (BOOL)updateWiFiNetwork:(CHIPDeviceCallback)onCompletion
+                     ssid:(uint8_t *)ssid
+                  ssidLen:(uint32_t)ssidLen
+              credentials:(uint8_t *)credentials
+           credentialsLen:(uint32_t)credentialsLen
+               breadcrumb:(uint64_t)breadcrumb
+                timeoutMs:(uint32_t)timeoutMs
+{
+    CHIPCallbackBridge * callback = new CHIPCallbackBridge(onCompletion, _callbackQueue);
+    if (!callback) {
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.UpdateWiFiNetwork(callback, ssid, ssidLen, credentials, credentialsLen, breadcrumb, timeoutMs);
+    if (err != CHIP_NO_ERROR) {
+        callback->Cancel();
+        delete callback;
         return NO;
     }
     return YES;

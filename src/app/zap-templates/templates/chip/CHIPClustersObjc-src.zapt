@@ -34,14 +34,14 @@
 }
 
 {{#chip_server_cluster_commands}}
-- (BOOL){{asCamelCased name}}:(CHIPDeviceCallback)onCompletion{{#chip_server_cluster_command_arguments}} {{asCamelCased label}}:({{chipType}}){{asCamelCased label}}{{/chip_server_cluster_command_arguments}}
+- (BOOL){{asCamelCased name}}:(CHIPDeviceCallback)onCompletion{{#chip_server_cluster_command_arguments}} {{asCamelCased label}}:({{chipType}}){{asCamelCased label}}{{#if (isByteString type)}} {{asCamelCased label}}Len:(uint32_t){{asCamelCased label}}Len{{/if}}{{/chip_server_cluster_command_arguments}}
 {
   CHIPCallbackBridge * callback = new CHIPCallbackBridge(onCompletion, _callbackQueue);
     if (!callback) {
         return NO;
     }
 
-    CHIP_ERROR err = self.cppCluster.{{asCamelCased name false}}(callback{{#chip_server_cluster_command_arguments}}, {{asCamelCased label}}{{/chip_server_cluster_command_arguments}});
+    CHIP_ERROR err = self.cppCluster.{{asCamelCased name false}}(callback{{#chip_server_cluster_command_arguments}}, {{asCamelCased label}}{{#if (isByteString type)}}, {{asCamelCased label}}Len{{/if}}{{/chip_server_cluster_command_arguments}});
     if (err != CHIP_NO_ERROR) {
         callback->Cancel();
         delete callback;

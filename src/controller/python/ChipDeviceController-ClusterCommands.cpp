@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -623,6 +623,111 @@ CHIP_ERROR chip_ime_AppendCommand_LevelControl_StopWithOnOff(chip::Controller::D
     return clusterLevelControl.StopWithOnOff(nullptr);
 }
 // End of Cluster LevelControl
+
+// Cluster NetworkProvisioning
+CHIP_ERROR chip_ime_AppendCommand_NetworkProvisioning_AddThreadNetwork(chip::Controller::Device * device,
+                                                                       chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
+                                                                       uint8_t * operationalDataset, uint32_t operationalDatasetLen,
+                                                                       uint64_t breadcrumb, uint32_t timeoutMs)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::NetworkProvisioningCluster clusterNetworkProvisioning;
+    (void) ZCLgroupId;
+    clusterNetworkProvisioning.Associate(device, ZCLendpointId);
+    return clusterNetworkProvisioning.AddThreadNetwork(nullptr, operationalDataset, operationalDatasetLen, breadcrumb, timeoutMs);
+}
+CHIP_ERROR chip_ime_AppendCommand_NetworkProvisioning_AddWiFiNetwork(chip::Controller::Device * device,
+                                                                     chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
+                                                                     uint8_t * ssid, uint32_t ssidLen, uint8_t * credentials,
+                                                                     uint32_t credentialsLen, uint64_t breadcrumb,
+                                                                     uint32_t timeoutMs)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::NetworkProvisioningCluster clusterNetworkProvisioning;
+    (void) ZCLgroupId;
+    clusterNetworkProvisioning.Associate(device, ZCLendpointId);
+    return clusterNetworkProvisioning.AddWiFiNetwork(nullptr, ssid, ssidLen, credentials, credentialsLen, breadcrumb, timeoutMs);
+}
+CHIP_ERROR chip_ime_AppendCommand_NetworkProvisioning_DisableNetwork(chip::Controller::Device * device,
+                                                                     chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
+                                                                     uint8_t * networkID, uint32_t networkIDLen,
+                                                                     uint64_t breadcrumb, uint32_t timeoutMs)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::NetworkProvisioningCluster clusterNetworkProvisioning;
+    (void) ZCLgroupId;
+    clusterNetworkProvisioning.Associate(device, ZCLendpointId);
+    return clusterNetworkProvisioning.DisableNetwork(nullptr, networkID, networkIDLen, breadcrumb, timeoutMs);
+}
+CHIP_ERROR chip_ime_AppendCommand_NetworkProvisioning_EnableNetwork(chip::Controller::Device * device,
+                                                                    chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
+                                                                    uint8_t * networkID, uint32_t networkIDLen, uint64_t breadcrumb,
+                                                                    uint32_t timeoutMs)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::NetworkProvisioningCluster clusterNetworkProvisioning;
+    (void) ZCLgroupId;
+    clusterNetworkProvisioning.Associate(device, ZCLendpointId);
+    return clusterNetworkProvisioning.EnableNetwork(nullptr, networkID, networkIDLen, breadcrumb, timeoutMs);
+}
+CHIP_ERROR chip_ime_AppendCommand_NetworkProvisioning_GetLastNetworkProvisioningResult(chip::Controller::Device * device,
+                                                                                       chip::EndpointId ZCLendpointId,
+                                                                                       chip::GroupId ZCLgroupId, uint32_t timeoutMs)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::NetworkProvisioningCluster clusterNetworkProvisioning;
+    (void) ZCLgroupId;
+    clusterNetworkProvisioning.Associate(device, ZCLendpointId);
+    return clusterNetworkProvisioning.GetLastNetworkProvisioningResult(nullptr, timeoutMs);
+}
+CHIP_ERROR chip_ime_AppendCommand_NetworkProvisioning_RemoveNetwork(chip::Controller::Device * device,
+                                                                    chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
+                                                                    uint8_t * networkID, uint32_t networkIDLen, uint64_t breadcrumb,
+                                                                    uint32_t timeoutMs)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::NetworkProvisioningCluster clusterNetworkProvisioning;
+    (void) ZCLgroupId;
+    clusterNetworkProvisioning.Associate(device, ZCLendpointId);
+    return clusterNetworkProvisioning.RemoveNetwork(nullptr, networkID, networkIDLen, breadcrumb, timeoutMs);
+}
+CHIP_ERROR chip_ime_AppendCommand_NetworkProvisioning_ScanNetworks(chip::Controller::Device * device,
+                                                                   chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
+                                                                   uint8_t * ssid, uint32_t ssidLen, uint64_t breadcrumb,
+                                                                   uint32_t timeoutMs)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::NetworkProvisioningCluster clusterNetworkProvisioning;
+    (void) ZCLgroupId;
+    clusterNetworkProvisioning.Associate(device, ZCLendpointId);
+    return clusterNetworkProvisioning.ScanNetworks(nullptr, ssid, ssidLen, breadcrumb, timeoutMs);
+}
+CHIP_ERROR chip_ime_AppendCommand_NetworkProvisioning_UpdateThreadNetwork(chip::Controller::Device * device,
+                                                                          chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
+                                                                          uint8_t * operationalDataset,
+                                                                          uint32_t operationalDatasetLen, uint64_t breadcrumb,
+                                                                          uint32_t timeoutMs)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::NetworkProvisioningCluster clusterNetworkProvisioning;
+    (void) ZCLgroupId;
+    clusterNetworkProvisioning.Associate(device, ZCLendpointId);
+    return clusterNetworkProvisioning.UpdateThreadNetwork(nullptr, operationalDataset, operationalDatasetLen, breadcrumb,
+                                                          timeoutMs);
+}
+CHIP_ERROR chip_ime_AppendCommand_NetworkProvisioning_UpdateWiFiNetwork(chip::Controller::Device * device,
+                                                                        chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
+                                                                        uint8_t * ssid, uint32_t ssidLen, uint8_t * credentials,
+                                                                        uint32_t credentialsLen, uint64_t breadcrumb,
+                                                                        uint32_t timeoutMs)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::NetworkProvisioningCluster clusterNetworkProvisioning;
+    (void) ZCLgroupId;
+    clusterNetworkProvisioning.Associate(device, ZCLendpointId);
+    return clusterNetworkProvisioning.UpdateWiFiNetwork(nullptr, ssid, ssidLen, credentials, credentialsLen, breadcrumb, timeoutMs);
+}
+// End of Cluster NetworkProvisioning
 
 // Cluster OnOff
 CHIP_ERROR chip_ime_AppendCommand_OnOff_Off(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,

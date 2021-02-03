@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -36,6 +36,7 @@
 | IasZone                                                             | 0x0500 |
 | Identify                                                            | 0x0003 |
 | LevelControl                                                        | 0x0008 |
+| NetworkProvisioning                                                 | 0xAAAA |
 | OnOff                                                               | 0x0006 |
 | Scenes                                                              | 0x0005 |
 | TemperatureMeasurement                                              | 0x0402 |
@@ -1344,6 +1345,108 @@ chip::System::PacketBufferHandle encodeLevelControlClusterReportCurrentLevelAttr
  *    Encode a Level Control server read command for the cluster revision attribute into buffer including the APS frame
  */
 chip::System::PacketBufferHandle encodeLevelControlClusterReadClusterRevisionAttribute(chip::EndpointId destinationEndpoint);
+
+/*----------------------------------------------------------------------------*\
+| Cluster NetworkProvisioning                                         | 0xAAAA |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * AddThreadNetwork                                                  |   0x06 |
+| * AddWiFiNetwork                                                    |   0x02 |
+| * DisableNetwork                                                    |   0x0E |
+| * EnableNetwork                                                     |   0x0C |
+| * GetLastNetworkProvisioningResult                                  |   0x10 |
+| * RemoveNetwork                                                     |   0x0A |
+| * ScanNetworks                                                      |   0x00 |
+| * UpdateThreadNetwork                                               |   0x08 |
+| * UpdateWiFiNetwork                                                 |   0x04 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/**
+ * @brief
+ *    Encode an AddThreadNetwork command for Network Provisioning server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeNetworkProvisioningClusterAddThreadNetworkCommand(chip::EndpointId destinationEndpoint,
+                                                                                         uint8_t * operationalDataset,
+                                                                                         uint64_t breadcrumb, uint32_t timeoutMs);
+
+/**
+ * @brief
+ *    Encode an AddWiFiNetwork command for Network Provisioning server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeNetworkProvisioningClusterAddWiFiNetworkCommand(chip::EndpointId destinationEndpoint,
+                                                                                       uint8_t * ssid, uint8_t * credentials,
+                                                                                       uint64_t breadcrumb, uint32_t timeoutMs);
+
+/**
+ * @brief
+ *    Encode an DisableNetwork command for Network Provisioning server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeNetworkProvisioningClusterDisableNetworkCommand(chip::EndpointId destinationEndpoint,
+                                                                                       uint8_t * networkID, uint64_t breadcrumb,
+                                                                                       uint32_t timeoutMs);
+
+/**
+ * @brief
+ *    Encode an EnableNetwork command for Network Provisioning server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeNetworkProvisioningClusterEnableNetworkCommand(chip::EndpointId destinationEndpoint,
+                                                                                      uint8_t * networkID, uint64_t breadcrumb,
+                                                                                      uint32_t timeoutMs);
+
+/**
+ * @brief
+ *    Encode an GetLastNetworkProvisioningResult command for Network Provisioning server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeNetworkProvisioningClusterGetLastNetworkProvisioningResultCommand(chip::EndpointId destinationEndpoint, uint32_t timeoutMs);
+
+/**
+ * @brief
+ *    Encode an RemoveNetwork command for Network Provisioning server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeNetworkProvisioningClusterRemoveNetworkCommand(chip::EndpointId destinationEndpoint,
+                                                                                      uint8_t * networkID, uint64_t breadcrumb,
+                                                                                      uint32_t timeoutMs);
+
+/**
+ * @brief
+ *    Encode an ScanNetworks command for Network Provisioning server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeNetworkProvisioningClusterScanNetworksCommand(chip::EndpointId destinationEndpoint,
+                                                                                     uint8_t * ssid, uint64_t breadcrumb,
+                                                                                     uint32_t timeoutMs);
+
+/**
+ * @brief
+ *    Encode an UpdateThreadNetwork command for Network Provisioning server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeNetworkProvisioningClusterUpdateThreadNetworkCommand(chip::EndpointId destinationEndpoint,
+                                                                                            uint8_t * operationalDataset,
+                                                                                            uint64_t breadcrumb,
+                                                                                            uint32_t timeoutMs);
+
+/**
+ * @brief
+ *    Encode an UpdateWiFiNetwork command for Network Provisioning server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeNetworkProvisioningClusterUpdateWiFiNetworkCommand(chip::EndpointId destinationEndpoint,
+                                                                                          uint8_t * ssid, uint8_t * credentials,
+                                                                                          uint64_t breadcrumb, uint32_t timeoutMs);
+
+/**
+ * @brief
+ *    Encode a Network Provisioning server discover command into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeNetworkProvisioningClusterDiscoverAttributes(chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Network Provisioning server read command for the cluster revision attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeNetworkProvisioningClusterReadClusterRevisionAttribute(chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
 | Cluster OnOff                                                       | 0x0006 |
