@@ -42,7 +42,7 @@ namespace Messaging {
 enum class SendMessageFlags : uint16_t;
 class ReliableMessageContext;
 
-class ReliableMessageManager
+class ReliableMessageMgr
 {
 public:
     /**
@@ -66,8 +66,8 @@ public:
     };
 
 public:
-    ReliableMessageManager(std::array<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> & contextPool);
-    ~ReliableMessageManager();
+    ReliableMessageMgr(std::array<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> & contextPool);
+    ~ReliableMessageMgr();
 
     void Init(chip::System::Layer * systemLayer, SecureSessionMgr * sessionMgr);
     void Shutdown();
