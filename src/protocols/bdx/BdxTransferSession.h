@@ -251,7 +251,7 @@ public:
     TransferSession();
 
 private:
-    enum TransferStates : uint8_t
+    enum TransferState : uint8_t
     {
         kUnitialized,
         kAwaitingInitMsg,
@@ -293,7 +293,7 @@ private:
     bool IsTransferLengthDefinite();
 
     OutputEventType mPendingOutput = kNone;
-    TransferStates mState          = kUnitialized;
+    TransferState mState           = kUnitialized;
     TransferRole mRole;
 
     // Indicate supported options pre- transfer accept
