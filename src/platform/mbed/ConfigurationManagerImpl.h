@@ -24,6 +24,7 @@
 #pragma once
 
 #include <platform/internal/GenericConfigurationManagerImpl.h>
+#include <platform/mbed/MbedConfig.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -32,7 +33,8 @@ namespace DeviceLayer {
  * Concrete implementation of the ConfigurationManager singleton object for the Zephyr platform.
  */
 class ConfigurationManagerImpl final : public ConfigurationManager,
-                                       public Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>
+                                       public Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>,
+                                       private Internal::MbedConfig
 {
     // Allow the ConfigurationManager interface class to delegate method calls to
     // the implementation methods provided by this class.
