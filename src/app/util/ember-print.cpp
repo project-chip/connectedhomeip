@@ -50,6 +50,8 @@ void emberAfPrintln(int category, const char * format, ...)
     }
 }
 
+// TODO: add unit tests.
+
 void emberAfPrintBuffer(int category, const uint8_t * buffer, uint16_t length, bool withSpace)
 {
     if (buffer != NULL && length > 0)
