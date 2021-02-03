@@ -63,110 +63,99 @@ limitations under the License.
         <define>NWPROV_CLUSTER</define>
         <client tick="false" init="false">true</client>
         <server tick="false" init="false">true</server>
-        <command source="client" code="0x01" name="ScanNetworks" optional="false" cli="chip nwprov scannetworks">
+        <command source="client" code="0x00" name="ScanNetworks" optional="false" cli="chip nwprov scannetworks">
             <description>TODO</description>
             <arg name="SSID" type="OCTET_STRING"/>
             <arg name="Breadcrumb" type="INT64U"/>
             <arg name="TimeoutMs" type="INT32U"/>
         </command>
-        <command source="server" code="0x02" name="ScanNetworksResp" optional="false" cli="chip nwprov scannetworksresponse">
+        <command source="server" code="0x01" name="ScanNetworksResp" optional="false" cli="chip nwprov scannetworksresponse">
             <description>TODO</description>
             <arg name="ErrorCode" type="INT8U"/>
             <arg name="DebugText" type="CHAR_STRING"/>
             <arg name="WiFiScanResults" type="WiFiInterfaceScanResult" array="true"/>
             <arg name="ThreadScanResults" type="ThreadInterfaceScanResult" array="true"/>
         </command>
-        <command source="client" code="0x03" name="AddWiFiNetwork" optional="false" cli="chip nwprov addwifinetwork">
+        <command source="client" code="0x02" name="AddWiFiNetwork" optional="false" cli="chip nwprov addwifinetwork">
             <description>TODO</description>
             <arg name="SSID" type="OCTET_STRING"/>
             <arg name="Credentials" type="OCTET_STRING"/>
             <arg name="Breadcrumb" type="INT64U"/>
             <arg name="TimeoutMs" type="INT32U"/>
         </command>
-        <command source="server" code="0x04" name="AddWiFiNetworkResp" optional="false" cli="chip nwprov addwifiresponse">
+        <command source="server" code="0x03" name="AddWiFiNetworkResp" optional="false" cli="chip nwprov addwifiresponse">
             <description>TODO</description>
             <arg name="ErrorCode" type="INT8U"/>
             <arg name="DebugText" type="CHAR_STRING"/>
         </command>
-        <command source="client" code="0x05" name="UpdateWiFiNetwork" optional="false" cli="chip nwprov updatewifinetwork">
+        <command source="client" code="0x04" name="UpdateWiFiNetwork" optional="false" cli="chip nwprov updatewifinetwork">
             <description>TODO</description>
             <arg name="SSID" type="OCTET_STRING"/>
             <arg name="Credentials" type="OCTET_STRING"/>
             <arg name="Breadcrumb" type="INT64U"/>
             <arg name="TimeoutMs" type="INT32U"/>
         </command>
-        <command source="server" code="0x06" name="UpdateWiFiNetworkResp" optional="false" cli="chip nwprov updatewifiresponse">
+        <command source="server" code="0x05" name="UpdateWiFiNetworkResp" optional="false" cli="chip nwprov updatewifiresponse">
             <description>TODO</description>
             <arg name="ErrorCode" type="INT8U"/>
             <arg name="DebugText" type="CHAR_STRING"/>
         </command>
-        <command source="client" code="0x07" name="AddThreadNetwork" optional="false" cli="chip nwprov addthreadnetwork">
+        <command source="client" code="0x06" name="AddThreadNetwork" optional="false" cli="chip nwprov addthreadnetwork">
             <description>TODO</description>
             <arg name="OperationalDataset" type="OCTET_STRING"/>
             <arg name="Breadcrumb" type="INT64U"/>
             <arg name="TimeoutMs" type="INT32U"/>
         </command>
-        <command source="server" code="0x08" name="AddThreadNetworkResp" optional="false" cli="chip nwprov addthreadnetworkresponse">
+        <command source="server" code="0x07" name="AddThreadNetworkResp" optional="false" cli="chip nwprov addthreadnetworkresponse">
             <description>TODO</description>
             <arg name="ErrorCode" type="INT8U"/>
             <arg name="DebugText" type="CHAR_STRING"/>
         </command>
-        <command source="client" code="0x09" name="UpdateThreadNetwork" optional="false" cli="chip nwprov updatethreadnetwork">
+        <command source="client" code="0x08" name="UpdateThreadNetwork" optional="false" cli="chip nwprov updatethreadnetwork">
             <description>TODO</description>
             <arg name="OperationalDataset" type="OCTET_STRING"/>
             <arg name="Breadcrumb" type="INT64U"/>
             <arg name="TimeoutMs" type="INT32U"/>
         </command>
-        <command source="server" code="0x0a" name="UpdateThreadNetworkResp" optional="false" cli="chip nwprov updatethreadnetworkresponse">
+        <command source="server" code="0x09" name="UpdateThreadNetworkResp" optional="false" cli="chip nwprov updatethreadnetworkresponse">
             <description>TODO</description>
             <arg name="ErrorCode" type="INT8U"/>
             <arg name="DebugText" type="CHAR_STRING"/>
         </command>
-        <command source="client" code="0x0f" name="RemoveNetwork" optional="false" cli="chip nwprov removenetwork">
+        <command source="client" code="0x0a" name="RemoveNetwork" optional="false" cli="chip nwprov removenetwork">
             <description>TODO</description>
             <arg name="NetworkID" type="OCTET_STRING"/>
             <arg name="Breadcrumb" type="INT64U"/>
             <arg name="TimeoutMs" type="INT32U"/>
         </command>
-        <command source="server" code="0x10" name="RemoveNetworkResp" optional="false" cli="chip nwprov removenetworkresponse">
+        <command source="server" code="0x0b" name="RemoveNetworkResp" optional="false" cli="chip nwprov removenetworkresponse">
             <description>TODO</description>
             <arg name="ErrorCode" type="INT8U"/>
             <arg name="DebugText" type="CHAR_STRING"/>
         </command>
-        <command source="client" code="0x11" name="EnableNetwork" optional="false" cli="chip nwprov enablenetwork">
+        <command source="client" code="0x0c" name="EnableNetwork" optional="false" cli="chip nwprov enablenetwork">
             <description>TODO</description>
             <arg name="NetworkID" type="OCTET_STRING"/>
             <arg name="Breadcrumb" type="INT64U"/>
             <arg name="TimeoutMs" type="INT32U"/>
         </command>
-        <command source="server" code="0x12" name="EnableNetworkResp" optional="false" cli="chip nwprov enablenetworkresponse">
+        <command source="server" code="0x0d" name="EnableNetworkResp" optional="false" cli="chip nwprov enablenetworkresponse">
             <description>TODO</description>
             <arg name="ErrorCode" type="INT8U"/>
             <arg name="DebugText" type="CHAR_STRING"/>
         </command>
-        <command source="client" code="0x13" name="DisableNetwork" optional="false" cli="chip nwprov disablenetwork">
+        <command source="client" code="0x0e" name="DisableNetwork" optional="false" cli="chip nwprov disablenetwork">
             <description>TODO</description>
             <arg name="NetworkID" type="OCTET_STRING"/>
             <arg name="Breadcrumb" type="INT64U"/>
             <arg name="TimeoutMs" type="INT32U"/>
         </command>
-        <command source="server" code="0x14" name="DisableNetworkResp" optional="false" cli="chip nwprov disablenetworkresponse">
+        <command source="server" code="0x0f" name="DisableNetworkResp" optional="false" cli="chip nwprov disablenetworkresponse">
             <description>TODO</description>
             <arg name="ErrorCode" type="INT8U"/>
             <arg name="DebugText" type="CHAR_STRING"/>
         </command>
-        <command source="client" code="0x15" name="TestNetwork" optional="false" cli="chip nwprov testnetwork">
-            <description>TODO</description>
-            <arg name="NetworkID" type="OCTET_STRING"/>
-            <arg name="Breadcrumb" type="INT64U"/>
-            <arg name="TimeoutMs" type="INT32U"/>
-        </command>
-        <command source="server" code="0x16" name="TestNetworkResp" optional="false" cli="chip nwprov testnetworkresponse">
-            <description>TODO</description>
-            <arg name="ErrorCode" type="INT8U"/>
-            <arg name="DebugText" type="CHAR_STRING"/>
-        </command>
-        <command source="client" code="0x17" name="GetLastNetworkProvisioningResult" optional="false" cli="chip nwprov getlastnetworkprovisioningresult">
+        <command source="client" code="0x10" name="GetLastNetworkProvisioningResult" optional="false" cli="chip nwprov getlastnetworkprovisioningresult">
             <description>TODO</description>
             <arg name="TimeoutMs" type="INT32U"/>
         </command>

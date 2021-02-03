@@ -15,7 +15,7 @@ namespace Controller {
 
 // {{asCamelCased name false}} Cluster Commands
 {{#chip_server_cluster_commands}}
-CHIP_ERROR {{asCamelCased clusterName false}}Cluster::{{asCamelCased name false}}(Callback::Callback<> * onCompletion{{#chip_server_cluster_command_arguments}}, {{chipType}} {{asCamelCased label}}{{/chip_server_cluster_command_arguments}})
+CHIP_ERROR {{asCamelCased clusterName false}}Cluster::{{asCamelCased name false}}(Callback::Callback<> * onCompletion{{#chip_server_cluster_command_arguments}}, {{chipType}} {{asCamelCased label}}{{#if (isByteString type)}}, uint32_t {{asCamelCased label}}Len{{/if}}{{/chip_server_cluster_command_arguments}})
 {
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -35,7 +35,9 @@ CHIP_ERROR {{asCamelCased clusterName false}}Cluster::{{asCamelCased name false}
     uint8_t argSeqNumber = 0;
 {{/first}}
     // {{asCamelCased label}}: {{asCamelCased type}}
-{{#if (isString type)}}
+{{#if (isByteString type)}}
+    ReturnErrorOnFailure(writer.PutBytes(TLV::ContextTag(argSeqNumber++), {{asCamelCased label}}, {{asCamelCased label}}Len));
+{{else if (isString type)}}
     ReturnErrorOnFailure(writer.PutString(TLV::ContextTag(argSeqNumber++), {{asCamelCased label}}));
 {{else}}
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), {{asCamelCased label}}));
