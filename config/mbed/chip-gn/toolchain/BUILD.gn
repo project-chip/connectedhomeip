@@ -28,7 +28,7 @@ gcc_toolchain("mbed") {
   cxx = mbed_cxx
 
   toolchain_args = {
-    current_os = "mbed-os"
+    current_os = "mbed"
     is_clang = false
   }
 }
