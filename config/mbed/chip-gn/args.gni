@@ -34,6 +34,8 @@ lwip_platform = "mbed"
 chip_system_config_use_sockets=false
 chip_device_platform = "mbed"
 
+chip_build_libshell = true
+
 # TODO: remove
 mbed_ar="/opt/ARM-software/gcc-arm-none-eabi-9-2019-q4-major/bin/arm-none-eabi-ar"
 mbed_cc="/opt/ARM-software/gcc-arm-none-eabi-9-2019-q4-major/bin/arm-none-eabi-gcc"
