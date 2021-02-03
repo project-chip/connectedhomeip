@@ -39,6 +39,7 @@
 #include <inet/InetLayer.h>
 
 #include <support/CHIPArgParser.hpp>
+#include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/UnitTestRegistration.h>
 
@@ -320,7 +321,7 @@ static void TestInetEndPointInternal(nlTestSuite * inSuite, void * inContext)
 #endif // INET_CONFIG_ENABLE_IPV4
     UDPEndPoint * testUDPEP  = nullptr;
     TCPEndPoint * testTCPEP1 = nullptr;
-    PacketBufferHandle buf   = PacketBufferHandle::New(kMaxPacketBufferSize);
+    PacketBufferHandle buf   = PacketBufferHandle::New(PacketBuffer::kMaxSize);
     bool didBind             = false;
     bool didListen           = false;
 
@@ -440,7 +441,7 @@ static void TestInetEndPointInternal(nlTestSuite * inSuite, void * inContext)
 #if INET_CONFIG_ENABLE_IPV4
     err = testUDPEP->Bind(kIPAddressType_IPv4, addr_v4, 3000, intId);
     NL_TEST_ASSERT(inSuite, err != INET_NO_ERROR);
-    buf = PacketBufferHandle::New(kMaxPacketBufferSize);
+    buf = PacketBufferHandle::New(PacketBuffer::kMaxSize);
     err = testUDPEP->SendTo(addr_v4, 3000, std::move(buf));
     testUDPEP->Free();
 #endif // INET_CONFIG_ENABLE_IPV4
@@ -448,7 +449,7 @@ static void TestInetEndPointInternal(nlTestSuite * inSuite, void * inContext)
     // TcpEndPoint special cases to cover the error branch
     err = testTCPEP1->GetPeerInfo(nullptr, nullptr);
     NL_TEST_ASSERT(inSuite, err == INET_ERROR_INCORRECT_STATE);
-    buf = PacketBufferHandle::New(kMaxPacketBufferSize);
+    buf = PacketBufferHandle::New(PacketBuffer::kMaxSize);
     err = testTCPEP1->Send(std::move(buf), false);
     NL_TEST_ASSERT(inSuite, err == INET_ERROR_INCORRECT_STATE);
     err = testTCPEP1->EnableKeepAlive(10, 100);
@@ -542,16 +543,19 @@ static const nlTest sTests[] = { NL_TEST_DEF("InetEndPoint::PreTest", TestInetPr
  */
 static int TestSetup(void * inContext)
 {
-    return (SUCCESS);
+    CHIP_ERROR error = chip::Platform::MemoryInit();
+    if (error != CHIP_NO_ERROR)
+        return FAILURE;
+    return SUCCESS;
 }
 
 /**
  *  Tear down the test suite.
- *  Free memory reserved at TestSetup.
  */
 static int TestTeardown(void * inContext)
 {
-    return (SUCCESS);
+    chip::Platform::MemoryShutdown();
+    return SUCCESS;
 }
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 

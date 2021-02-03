@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -33,6 +33,11 @@
 #include <cstdio>
 #endif
 
+#if CHIP_CONFIG_MEMORY_DEBUG_DMALLOC
+#include <dmalloc.h>
+#include <support/SafeInt.h>
+#endif // CHIP_CONFIG_MEMORY_DEBUG_DMALLOC
+
 #if CHIP_CONFIG_MEMORY_MGMT_MALLOC
 
 namespace chip {
@@ -41,6 +46,7 @@ namespace Platform {
 #ifdef NDEBUG
 
 #define VERIFY_INITIALIZED()
+#define VERIFY_POINTER(p)
 
 #else
 
@@ -56,6 +62,15 @@ static void VerifyInitialized(const char * func)
         abort();
     }
 }
+
+#define VERIFY_POINTER(p)                                                                                                          \
+    do                                                                                                                             \
+        if ((p != nullptr) && (MemoryDebugCheckPointer(p) == false))                                                               \
+        {                                                                                                                          \
+            fprintf(stderr, "ABORT: chip::Platform::%s() found corruption\n", __func__);                                           \
+            abort();                                                                                                               \
+        }                                                                                                                          \
+    while (0)
 
 #endif
 
@@ -80,6 +95,9 @@ void MemoryAllocatorShutdown()
         abort();
     }
 #endif
+#if CHIP_CONFIG_MEMORY_DEBUG_DMALLOC
+    dmalloc_shutdown();
+#endif // CHIP_CONFIG_MEMORY_DEBUG_DMALLOC
 }
 
 void * MemoryAlloc(size_t size)
@@ -103,13 +121,25 @@ void * MemoryCalloc(size_t num, size_t size)
 void * MemoryRealloc(void * p, size_t size)
 {
     VERIFY_INITIALIZED();
+    VERIFY_POINTER(p);
     return realloc(p, size);
 }
 
 void MemoryFree(void * p)
 {
     VERIFY_INITIALIZED();
+    VERIFY_POINTER(p);
     free(p);
+}
+
+bool MemoryInternalCheckPointer(const void * p, size_t min_size)
+{
+#if CHIP_CONFIG_MEMORY_DEBUG_DMALLOC
+    return CanCastTo<int>(min_size) && (p != nullptr) &&
+        (dmalloc_verify_pnt(__FILE__, __LINE__, __func__, p, 1, static_cast<int>(min_size)) == MALLOC_VERIFY_NOERROR);
+#else  // CHIP_CONFIG_MEMORY_DEBUG_DMALLOC
+    return (p != nullptr);
+#endif // CHIP_CONFIG_MEMORY_DEBUG_DMALLOC
 }
 
 } // namespace Platform

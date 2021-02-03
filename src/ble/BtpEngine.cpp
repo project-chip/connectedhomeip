@@ -318,7 +318,7 @@ BLE_ERROR BtpEngine::HandleCharacteristicReceived(System::PacketBufferHandle dat
         data->ConsumeHead(startReader.OctetsRead());
 
         // Create a new buffer for use as the Rx re-assembly area.
-        mRxBuf = System::PacketBufferHandle::New(System::kMaxPacketBufferSize);
+        mRxBuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
 
         VerifyOrExit(!mRxBuf.IsNull(), err = BLE_ERROR_NO_MEMORY);
 
