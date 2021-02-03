@@ -298,12 +298,15 @@ extern void SetLogFilter(uint8_t category);
 
 #if _CHIP_USE_LOGGING
 
-#define ChipLoggingChipPrefixLen 6
-#define ChipLoggingModuleNameLen 3
-#define ChipLoggingMessageSeparatorLen 2
-#define ChipLoggingMessageTrailerLen 2
-#define ChipLoggingTotalMessagePadding                                                                                             \
-    (ChipLoggingchipPrefixLen + ChipLoggingModuleNameLen + ChipLoggingMessageSeparatorLen + ChipLoggingMessageTrailerLen)
+/**
+ * CHIP logging length constants
+ */
+static constexpr uint16_t kMaxModuleNameLen  = 3;
+static constexpr uint16_t kMaxPrefixLen      = 3;
+static constexpr uint16_t kMaxSeparatorLen   = 2;
+static constexpr uint16_t kMaxTrailerLen     = 2;
+static constexpr uint16_t kMaxMessagePadding = (chip::Logging::kMaxPrefixLen + chip::Logging::kMaxModuleNameLen +
+                                                chip::Logging::kMaxSeparatorLen + chip::Logging::kMaxTrailerLen);
 
 extern void GetMessageWithPrefix(char * buf, uint8_t bufSize, uint8_t module, const char * msg);
 extern void GetModuleName(char * buf, uint8_t bufSize, uint8_t module);

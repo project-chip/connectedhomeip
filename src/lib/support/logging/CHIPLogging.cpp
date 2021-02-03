@@ -52,7 +52,7 @@ namespace Logging {
  *
  * NOTE: The names must be in the order defined in the LogModule
  *       enumeration. Each name must be a fixed number of characters
- *       long (ChipLoggingModuleNameLen) padded with nulls as
+ *       long (chip::Logging::kMaxModuleNameLen) padded with nulls as
  *       necessary.
  *
  */
@@ -92,7 +92,7 @@ static const char ModuleNames[] = "-\0\0" // None
                                   "DIS"   // Discovery
     ;
 
-#define ModuleNamesCount ((sizeof(ModuleNames) - 1) / ChipLoggingModuleNameLen)
+#define ModuleNamesCount ((sizeof(ModuleNames) - 1) / chip::Logging::kMaxModuleNameLen)
 
 #define chipPrefix "CHIP:"
 #define chipPrefixSeparator ": "
@@ -100,24 +100,24 @@ static const char ModuleNames[] = "-\0\0" // None
 
 void GetModuleName(char * buf, uint8_t bufSize, uint8_t module)
 {
-    const char * moduleNamePtr = ModuleNames + ((module < ModuleNamesCount) ? module * ChipLoggingModuleNameLen : 0);
+    const char * moduleNamePtr = ModuleNames + ((module < ModuleNamesCount) ? module * chip::Logging::kMaxModuleNameLen : 0);
 
     snprintf(buf, bufSize, "%s", moduleNamePtr);
-    buf[ChipLoggingModuleNameLen] = 0;
+    buf[chip::Logging::kMaxModuleNameLen] = 0;
 }
 
 void GetMessageWithPrefix(char * buf, uint8_t bufSize, uint8_t module, const char * msg)
 {
-    char moduleName[ChipLoggingModuleNameLen + 1];
+    char moduleName[chip::Logging::kMaxModuleNameLen + 1];
 
-    GetModuleName(moduleName, ChipLoggingModuleNameLen + 1, module);
+    GetModuleName(moduleName, sizeof(moduleName), module);
     snprintf(buf, bufSize, chipPrefix "%s" chipPrefixSeparator "%s" chipMessageTrailer, moduleName, msg);
 }
 
 void PrintMessagePrefix(uint8_t module)
 {
-    char moduleName[ChipLoggingModuleNameLen + 1];
-    GetModuleName(moduleName, ChipLoggingModuleNameLen + 1, module);
+    char moduleName[chip::Logging::kMaxModuleNameLen + 1];
+    GetModuleName(moduleName, sizeof(moduleName), module);
 
 #if CHIP_LOGGING_STYLE_STDIO_WITH_TIMESTAMPS
     struct timeval tv;

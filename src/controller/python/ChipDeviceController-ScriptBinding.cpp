@@ -321,8 +321,8 @@ static void LogMessageToPython(uint8_t module, uint8_t category, const char * ms
         gettimeofday(&tv, NULL);
 
         // Get the module name
-        char moduleName[nlChipLoggingModuleNameLen + 1];
-        ::chip:: ::Logging::GetModuleName(moduleName, nlChipLoggingModuleNameLen + 1, module);
+        char moduleName[chip::Logging::kMaxModuleNameLen + 1];
+        ::chip:: ::Logging::GetModuleName(moduleName, sizeof(moduleName), module);
 
         // Format the log message into a dynamic memory buffer, growing the
         // buffer as needed to fit the message.
