@@ -1,0 +1,94 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2008,2020 Silicon Labs.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <!-- See bug 13487 (BITMAP48 data types). -->
+  <enum name="SmStatus" type="ENUM8">
+    <item name="NotConfigured" value="0x00"/>
+    <item name="NormalOperation" value="0x01"/>
+    <item name="Installation" value="0x02"/>
+    <item name="Maintenance" value="0x03"/>
+  </enum>
+  <bitmap name="SmHour" type="BITMAP48">
+    <field name="Hour0" mask="0x000000000002"/>
+    <field name="Hour1" mask="0x00000000000C"/>
+    <field name="Hour2" mask="0x000000000020"/>
+    <field name="Hour3" mask="0x0000000000C0"/>
+    <field name="Hour4" mask="0x000000000200"/>
+    <field name="Hour5" mask="0x000000000C00"/>
+    <field name="Hour6" mask="0x000000002000"/>
+    <field name="Hour7" mask="0x00000000C000"/>
+    <field name="Hour8" mask="0x000000020000"/>
+    <field name="Hour9" mask="0x0000000C0000"/>
+    <field name="Hour10" mask="0x000000200000"/>
+    <field name="Hour11" mask="0x000000C00000"/>
+    <field name="Hour12" mask="0x000002000000"/>
+    <field name="Hour13" mask="0x00000C000000"/>
+    <field name="Hour14" mask="0x000020000000"/>
+    <field name="Hour15" mask="0x0000C0000000"/>
+    <field name="Hour16" mask="0x000200000000"/>
+    <field name="Hour17" mask="0x000C00000000"/>
+    <field name="Hour18" mask="0x002000000000"/>
+    <field name="Hour19" mask="0x00C000000000"/>
+    <field name="Hour20" mask="0x020000000000"/>
+    <field name="Hour21" mask="0x0C0000000000"/>
+    <field name="Hour22" mask="0x200000000000"/>
+    <field name="Hour23" mask="0xC00000000000"/>
+  </bitmap>
+  <enum name="SmSchedulingType" type="ENUM8">
+    <item name="UseOfWakeupPeriod" value="0x00"/>
+    <item name="UseOfWakeupHoursScheduling" value="0x01"/>
+  </enum>
+  <cluster>
+    <name>Sleeping Mesh Configuration</name>
+    <domain>SM</domain>
+    <description>This cluster provides an interface for configuring and managing a sleeping mesh.  The sleeping mesh is defined as a ZigBee Network where a number of devices supporting router features are able to sleep using an application layer mechanism to synchronize the wakeup and sleep.</description>
+    <code>0xXXXX</code>
+    <define>SM_SLEEPING_MESH_CONFIGURATION_CLUSTER</define>
+    <client init="false" tick="false">true</client>
+    <server init="false" tick="false">true</server>
+    <attribute side="server" code="0x0000" define="SM_STATUS" type="ENUM8" writable="false" default="0x00" optional="true">status</attribute>
+    <attribute side="server" code="0x0001" define="SM_AWAKE_DURATION" type="INT16U" min="0x0000" max="0xFFFE" writable="false" default="0x003C" optional="true">awake duration</attribute>
+    <attribute side="server" code="0x0002" define="SM_WAKE_UP_PERIOD" type="INT32U" min="0x00000000" max="0xFFFFFFFE" writable="false" default="" optional="true">wake up period</attribute>
+    <attribute side="server" code="0x0003" define="SM_NEXT_WAKE_UP_UTC_TIME" type="UTC_TIME" min="0x00000000" max="0xFFFFFFFE" writable="false" default="0xFFFFFFFF" optional="true">next wake up utc time</attribute>
+    <attribute side="server" code="0x0004" define="SM_TX_JITTER" type="INT16U" min="0x0000" max="0xFFFE" writable="false" default="0x00000000" optional="true">tx jitter</attribute>
+    <attribute side="server" code="0x0005" define="SM_WAKE_UP_HOUR_WORK_DAY" type="BITMAP48" min="0x000000000000" max="0xFFFFFFFFFFFE" writable="false" default="" optional="true">wake up hour work day</attribute>
+    <attribute side="server" code="0x0006" define="SM_WAKE_UP_HOUR_HOLY_DAY" type="BITMAP48" min="0x000000000000" max="0xFFFFFFFFFFFE" writable="false" default="" optional="true">wake up hour holy day</attribute>
+    <attribute side="server" code="0x0007" define="SM_SCHEDULING_TYPE" type="ENUM8" writable="false" default="" optional="true">scheduling type</attribute>
+    <attribute side="server" code="0x0008" define="SM_SLEEPING_CONFIGURATION_ID" type="INT16U" min="0x0000" max="0xFFFE" writable="false" default="0x00" optional="true">sleeping configuration id</attribute>
+    <command source="client" code="0x00" name="SmSleepingMeshConfiguration" optional="false">
+      <description>
+        The Sleeping Mesh Configuration command is used to configure the device to operate in a sleeping mesh.  The configuration parameters allow the devices in the network to understand how to share a wakeup window and to operate in that period of time like an always-on ZigBee network.
+      </description>
+      <arg name="sleepingConfigurationId" type="INT16U"/>
+      <arg name="schedulingType" type="SmSchedulingType"/>
+      <arg name="status" type="SmStatus"/>
+      <arg name="awakeDuration" type="INT16U"/>
+      <arg name="wakeUpPeriod" type="INT32U"/>
+      <arg name="nextWakeUpUtcTime" type="UTC_TIME"/>
+      <arg name="txJitter" type="INT16U"/>
+      <arg name="timestamp" type="UTC_TIME"/>
+      <arg name="wakeUpHourWorkDay" type="SmHour"/>
+      <arg name="wakeUpHourHolyDay" type="SmHour"/>
+    </command>
+    <command source="server" code="0x00" name="SmGetSleepingMeshConfiguration" optional="false">
+      <description>
+        This command initiates a Sleeping Mesh Configuration command for the current sleeping configuration available for this device.
+      </description>
+      <arg name="sleepingConfigurationId" type="INT16U"/>
+    </command>
+  </cluster>
+</configurator>

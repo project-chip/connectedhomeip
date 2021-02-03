@@ -1,0 +1,85 @@
+{{> header}}
+
+// #TODO : This template wasn't tested in any way with CHIP
+// Might need a zap submodule update and / or other fixes to make it work.
+// ISSUE : #3637
+
+
+#pragma once
+
+#define EMBER_AF_GENERATED_UC_EVENTS_DEF \
+{{#user_endpoint_types}}
+	{{#user_clusters}}
+		{{#if (is_enabled enabled)}}
+			{{#template_options category="tick_events"}}
+				{{#if (is_lowercase_equal (concatenate ../name ../side) optionLabel)~}}
+				sl_zigbee_event_t {{optionCode}}Event{{endpoint_type_identifier ../../endpointTypeId}}; \
+				{{/if}}
+			{{/template_options}}
+		{{/if}}
+	{{/user_clusters}}
+{{/user_endpoint_types}}
+{{#all_user_clusters}}
+	{{#template_options category="generic_events"}}
+		{{#if (is_lowercase_equal (concatenate ../name ../side) optionLabel)~}}
+			sl_zigbee_event_t {{optionCode}}EndpointEvents[{{user_endpoint_count_by_cluster ../id ../side}}]; \
+		{{/if}}
+	{{/template_options}}
+{{/all_user_clusters}}
+
+
+#define EMBER_AF_GENERATED_UC_EVENTS_INIT \
+{{#all_user_clusters}}
+	{{#if (is_enabled enabled)}}
+		{{#template_options category="tick_events"}}
+			{{#if (is_lowercase_equal (concatenate ../name ../side) optionLabel)~}}
+			extern void {{optionCode}}(uint8_t enpoint); \
+			{{/if}}
+		{{/template_options}}
+	{{/if}}
+{{/all_user_clusters}}
+{{#user_endpoint_types}}
+	{{#user_clusters}}
+		{{#if (is_enabled enabled)}}
+			{{#template_options category="tick_events"}}
+				{{#if (is_lowercase_equal (concatenate ../name ../side) optionLabel)~}}
+				sl_zigbee_endpoint_event_init(&{{optionCode}}Event{{endpoint_type_identifier ../../endpointTypeId}}, {{optionCode}}, {{endpoint_type_identifier ../../endpointTypeId}}); \
+				{{/if}}
+			{{/template_options}}
+		{{/if}}
+	{{/user_clusters}}
+{{/user_endpoint_types}}
+{{#all_user_clusters}}
+	{{#if (is_enabled enabled)}}
+		{{#template_options category="generic_events"}}
+			{{#if (is_lowercase_equal (concatenate ../name ../side) optionLabel)~}}
+			extern void {{optionCode}}EndpointEventHandler(uint8_t enpoint); \
+			{{/if}}
+		{{/template_options}}
+	{{/if}}
+{{/all_user_clusters}}
+{{#user_endpoint_types}}
+	{{#user_clusters}}
+		{{#if (is_enabled enabled)}}
+			{{#template_options category="generic_events"}}
+				{{#if (is_lowercase_equal (concatenate ../name ../side) optionLabel)~}}
+				sl_zigbee_endpoint_event_init(&{{optionCode}}EndpointEvents[{{endpoint_type_identifier ../../endpointTypeId}}], {{optionCode}}EndpointEventHandler, {{endpoint_type_identifier ../../endpointTypeId}}); \
+				{{/if}}
+			{{/template_options}}
+		{{/if}}
+	{{/user_clusters}}
+{{/user_endpoint_types}}
+
+// sl_zigbee_event_context_t structs used to populate the sli_zigbee_app_event_context table
+#define EMBER_AF_GENERATED_UC_EVENT_CONTEXT \
+{{#user_endpoint_types}}
+	{{#user_clusters}}
+		{{#if (is_enabled enabled)}}
+			{{#template_options category="tick_events"}}
+				{{#if (is_lowercase_equal (concatenate ../name ../side) optionLabel)~}}
+				{ {{endpoint_type_identifier ../../endpointTypeId}}, {{asHex ../code}}, {{#if (is_client ../side)}}true{{else}}false{{/if}}, EMBER_AF_LONG_POLL, EMBER_AF_OK_TO_SLEEP, &{{optionCode}}Event{{endpoint_type_identifier ../../endpointTypeId}} },     \
+				{{/if}}
+			{{/template_options}}
+		{{/if}}
+	{{/user_clusters}}
+{{/user_endpoint_types}}

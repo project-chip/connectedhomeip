@@ -1,11 +1,8 @@
 {
     "version": "ZCL Test Data",
-    "xmlRoot": [".", "./data-model/silabs/"],
+    "xmlRoot": ".",
     "xmlFile": [
-        "binding-cluster.xml",
-        "clusters-extensions.xml",
-        "custom-types.xml",
-        "chip-devices.xml",
+        "chip.xml",
         "types.xml",
         "general.xml",
         "ha.xml",
@@ -26,11 +23,11 @@
         "silabs.xml",
         "lo-devices.xml",
         "wwah-silabs.xml",
-        "wwah-silabs-devices.xml",
-        "sample-extensions.xml"
+        "wwah-silabs-devices.xml"
     ],
-
+    "zclSchema": "./schema/zcl.xsd",
     "manufacturersXml": "../shared/manufacturers.xml",
+    "zclValidation": "./schema/zcl-validation.js",
     "options": {
         "text": {
             "defaultResponsePolicy": ["Always", "Conditional", "Never"]
