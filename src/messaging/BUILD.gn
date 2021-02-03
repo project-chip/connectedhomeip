@@ -32,6 +32,8 @@ static_library("messaging") {
     "ReliableMessageMgr.cpp",
     "ReliableMessageMgr.h",
     "ReliableMessageProtocolConfig.h",
+    "SecureChannelMgr.cpp",
+    "SecureChannelMgr.h",
   ]
 
   cflags = [ "-Wconversion" ]

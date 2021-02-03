@@ -66,8 +66,9 @@ ExchangeManager::ExchangeManager() : mReliableMessageMgr(mContextPool)
 
 CHIP_ERROR ExchangeManager::Init(SecureSessionMgr * sessionMgr)
 {
-    if (mState != State::kState_NotInitialized)
-        return CHIP_ERROR_INCORRECT_STATE;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    VerifyOrExit(mState == State::kState_NotInitialized, err = CHIP_ERROR_INCORRECT_STATE);
 
     mSessionMgr = sessionMgr;
 
@@ -82,14 +83,22 @@ CHIP_ERROR ExchangeManager::Init(SecureSessionMgr * sessionMgr)
 
     mReliableMessageMgr.Init(sessionMgr->SystemLayer(), sessionMgr);
 
+    err = mSecureChannelMgr.Init(this);
+    SuccessOrExit(err);
+
     mState = State::kState_Initialized;
 
-    return CHIP_NO_ERROR;
+exit:
+    return err;
 }
 
 CHIP_ERROR ExchangeManager::Shutdown()
 {
+<<<<<<< HEAD
     mReliableMessageMgr.Shutdown();
+=======
+    mSecureChannelMgr.Shutdown();
+>>>>>>> Implement Message Counter Synchronization Protocol (MCSP) part
 
     if (mSessionMgr != nullptr)
     {
