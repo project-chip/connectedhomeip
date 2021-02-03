@@ -19,7 +19,7 @@ declare_args() {
 
 if (chip_crypto == "") {
   if (current_os == "android" || current_os == "freertos" ||
-      current_os == "zephyr") {
+      current_os == "zephyr" || current_os == "mbed") {
     chip_crypto = "mbedtls"
   } else {
     chip_crypto = "openssl"
