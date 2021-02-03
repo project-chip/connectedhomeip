@@ -41,7 +41,7 @@ CHIP_ERROR CommandPath::Parser::Init(const chip::TLV::TLVReader & aReader)
     // make a copy of the reader here
     mReader.Init(aReader);
 
-    VerifyOrExit(chip::TLV::kTLVType_Path == mReader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
+    VerifyOrExit(chip::TLV::kTLVType_List == mReader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
 
     // This is just a dummy, as we're not going to exit this container ever
     chip::TLV::TLVType dummyContainerType;
@@ -177,7 +177,7 @@ CHIP_ERROR CommandPath::Parser::GetCommandId(chip::CommandId * const apCommandId
 CHIP_ERROR CommandPath::Builder::_Init(chip::TLV::TLVWriter * const apWriter, const uint64_t aTag)
 {
     mpWriter = apWriter;
-    mError   = mpWriter->StartContainer(aTag, chip::TLV::kTLVType_Path, mOuterContainerType);
+    mError   = mpWriter->StartContainer(aTag, chip::TLV::kTLVType_List, mOuterContainerType);
     SuccessOrExit(mError);
 
 exit:

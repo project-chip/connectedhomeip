@@ -171,7 +171,7 @@ CHIP_ERROR AttributeStatusElement::Parser::GetAttributePath(AttributePath::Parse
     err = mReader.FindElementWithTag(chip::TLV::ContextTag(kCsTag_AttributePath), reader);
     SuccessOrExit(err);
 
-    VerifyOrExit(chip::TLV::kTLVType_Path == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
+    VerifyOrExit(chip::TLV::kTLVType_List == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
 
     err = apAttributePath->Init(reader);
     SuccessOrExit(err);
