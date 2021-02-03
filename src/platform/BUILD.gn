@@ -133,6 +133,11 @@ if (chip_device_platform != "none") {
         "CHIP_DEVICE_LAYER_TARGET_K32W=1",
         "CHIP_DEVICE_LAYER_TARGET=K32W",
       ]
+    } else if (chip_device_platform == "mbed") {
+      defines += [
+        "CHIP_DEVICE_LAYER_TARGET_MBED=1",
+        "CHIP_DEVICE_LAYER_TARGET=mbed",
+      ]
     }
   }
 } else {
