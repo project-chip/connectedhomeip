@@ -100,7 +100,7 @@ inline CHIP_ERROR ConnectivityManagerImpl::_Init(void)
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event) {}
+inline void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event) {}
 
 /**
  * Returns the public interface of the ConnectivityManager singleton object.
