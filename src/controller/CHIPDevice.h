@@ -373,7 +373,7 @@ typedef struct SerializableDevice
     uint64_t mDeviceId; /* This field is serialized in LittleEndian byte order */
     uint8_t mDeviceAddr[INET6_ADDRSTRLEN];
     uint16_t mDevicePort; /* This field is serealized in LittelEndian byte order */
-    uint16_t mAdminId; /* This field is serealized in LittelEndian byte order */
+    uint16_t mAdminId;    /* This field is serealized in LittelEndian byte order */
     uint8_t mInterfaceName[kMaxInterfaceName];
 } SerializableDevice;
 
