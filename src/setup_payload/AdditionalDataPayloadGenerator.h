@@ -27,9 +27,9 @@
 #include <core/CHIPError.h>
 #include <system/TLVPacketBufferBackingStore.h>
 
-#define ROTATING_DEVICE_ID_COUNTER_STR_LENGTH 10
+#define ROTATING_DEVICE_ID_COUNTER_STR_MAX_LENGTH 10
 #define ROTATING_DEVICE_ID_HASH_SUFFIX_LENGTH 16
-#define ROTATING_DEVICE_ID_LENGTH ROTATING_DEVICE_ID_COUNTER_STR_LENGTH + ROTATING_DEVICE_ID_HASH_SUFFIX_LENGTH
+#define ROTATING_DEVICE_ID_MAX_LENGTH ROTATING_DEVICE_ID_COUNTER_STR_MAX_LENGTH + ROTATING_DEVICE_ID_HASH_SUFFIX_LENGTH
 
 namespace chip {
 
@@ -38,7 +38,6 @@ class AdditionalDataPayloadGenerator
 
 public:
     AdditionalDataPayloadGenerator(uint16_t lifetimeCounter, char * serialNumberBuffer, size_t serialNumberBufferSize);
-    ~AdditionalDataPayloadGenerator();
     // Generate additional data payload (i.e. TLV encoded)
     CHIP_ERROR generateAdditionalDataPayload(chip::System::PacketBufferHandle & bufferHandle, bool enableRotatingDeviceId);
     // Generate Device Rotating ID

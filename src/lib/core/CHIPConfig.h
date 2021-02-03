@@ -2115,7 +2115,7 @@
  *   Lifetime Counter Key.
  */
 #ifndef CHIP_CONFIG_LIFETIIME_PERSISTED_COUNTER_KEY
-#define CHIP_CONFIG_LIFETIIME_PERSISTED_COUNTER_KEY "lifetime-counter"
+#define CHIP_CONFIG_LIFETIIME_PERSISTED_COUNTER_KEY "life-count"
 #endif
 
 /**

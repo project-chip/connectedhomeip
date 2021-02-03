@@ -137,11 +137,13 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommisioningAdvertisingParamet
     char vendorSubType[8];
     const char * subTypes[3];
     size_t subTypeSize = 0;
+#if CHIP_ENABLE_ROTATING_DEVICE_ID
     char serialNumber[chip::DeviceLayer::ConfigurationManager::kMaxSerialNumberLength + 1];
     size_t serialNumberSize  = 0;
     uint16_t lifetimeCounter = 0;
-    char rotatingDeviceIdBuffer[ROTATING_DEVICE_ID_LENGTH * 2 + 1];
-    size_t rotatingDeviceIdBufferSize = 0;
+    char rotatingDeviceIdHexBuffer[ROTATING_DEVICE_ID_MAX_LENGTH * 2 + 1];
+    size_t rotatingDeviceIdHexBufferSize = 0;
+#endif
 
     if (!mMdnsInitialized)
     {
@@ -173,11 +175,12 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommisioningAdvertisingParamet
                       chip::DeviceLayer::ConfigurationMgr().GetSerialNumber(serialNumber, sizeof(serialNumber), serialNumberSize));
     SuccessOrExit(error = chip::DeviceLayer::ConfigurationMgr().GetLifetimeCounter(lifetimeCounter));
     SuccessOrExit(error = AdditionDataPayloadGenerator(lifetimeCounter, serialNumber, serialNumberSize)
-                              .generateRotatingDeviceId(rotatingDeviceIdBuffer, ROTATING_DEVICE_ID_LENGTH * 2 + 1,
-                                                        rotatingDeviceIdBufferSize));
+                              .generateRotatingDeviceId(rotatingDeviceIdHexBuffer, ROTATING_DEVICE_ID_MAX_LENGTH * 2 + 1,
+                                                        rotatingDeviceIdHexBufferSize));
 
     // Rotating Device ID
-    textEntries[textEntrySize++] = { "RI", reinterpret_cast<const uint8_t *>(rotatingDeviceIdBuffer), rotatingDeviceIdBufferSize };
+    textEntries[textEntrySize++] = { "RI", reinterpret_cast<const uint8_t *>(rotatingDeviceIdHexBuffer),
+                                     rotatingDeviceIdHexBufferSize };
 #endif
 
     snprintf(shortDiscriminatorSubtype, sizeof(shortDiscriminatorSubtype), "_S%03u", params.GetShortDiscriminator());

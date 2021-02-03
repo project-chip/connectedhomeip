@@ -665,6 +665,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreServiceConfig(const
     return Impl()->WriteConfigValueBin(ImplClass::kConfigKey_ServiceConfig, serviceConfig, serviceConfigLen);
 }
 
+#if CHIP_ENABLE_ROTATING_DEVICE_ID
 template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetLifetimeCounter(uint16_t & lifetimeCounter)
 {
@@ -677,6 +678,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_IncrementLifetimeCounter
 {
     return mLifetimePersistedCounter.Advance();
 }
+#endif
 
 template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetPairedAccountId(char * buf, size_t bufSize, size_t & accountIdLen)

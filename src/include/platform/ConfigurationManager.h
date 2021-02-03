@@ -85,8 +85,9 @@ public:
     CHIP_ERROR GetFabricId(uint64_t & fabricId);
     CHIP_ERROR GetServiceConfig(uint8_t * buf, size_t bufSize, size_t & serviceConfigLen);
     CHIP_ERROR GetPairedAccountId(char * buf, size_t bufSize, size_t & accountIdLen);
+#if CHIP_ENABLE_ROTATING_DEVICE_ID
     CHIP_ERROR GetLifetimeCounter(uint16_t & lifetimeCounter);
-
+#endif
     CHIP_ERROR StoreSerialNumber(const char * serialNum, size_t serialNumLen);
     CHIP_ERROR StorePrimaryWiFiMACAddress(const uint8_t * buf);
     CHIP_ERROR StorePrimary802154MACAddress(const uint8_t * buf);
@@ -327,10 +328,12 @@ inline CHIP_ERROR ConfigurationManager::GetPairedAccountId(char * buf, size_t bu
     return static_cast<ImplClass *>(this)->_GetPairedAccountId(buf, bufSize, accountIdLen);
 }
 
+#if CHIP_ENABLE_ROTATING_DEVICE_ID
 inline CHIP_ERROR ConfigurationManager::GetLifetimeCounter(uint16_t & rotationCouter)
 {
     return static_cast<ImplClass *>(this)->_GetLifetimeCounter(rotationCouter);
 }
+#endif
 
 inline CHIP_ERROR ConfigurationManager::StoreSerialNumber(const char * serialNum, size_t serialNumLen)
 {
@@ -487,7 +490,9 @@ inline bool ConfigurationManager::IsFullyProvisioned()
 inline void ConfigurationManager::InitiateFactoryReset()
 {
     static_cast<ImplClass *>(this)->_InitiateFactoryReset();
+#if CHIP_ENABLE_ROTATING_DEVICE_ID
     static_cast<ImplClass *>(this)->_IncrementLifetimeCounter();
+#endif
 }
 
 #if !defined(NDEBUG)
