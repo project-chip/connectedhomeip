@@ -29,11 +29,13 @@ following features are available:
 ---
 
 ## Building the Example Application
--   Download or clone the [sdk_support](https://github.com/SiliconLabs/sdk_support) from
-    GitHub 
-            $ git clone https://github.com/SiliconLabs/sdk_support.git
+
+-   Download or clone the
+    [sdk_support](https://github.com/SiliconLabs/sdk_support) from GitHub
+    $ git clone https://github.com/SiliconLabs/sdk_support.git
     and export the path with :
-            $ export EFR32_SDK_ROOT=<Path to cloned git repo>
+            $
+    export EFR32_SDK_ROOT=<Path to cloned git repo>
 
 -   Download the
     [Simplicity Commander](https://www.silabs.com/mcu/programming-options)
@@ -59,10 +61,13 @@ following features are available:
     MG12 boards:
 
     -   BRD4161A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@19dBm
-    -   BRD4163A / SLWSTK6000B / Dual band Wireless Starter Kit / 2.4GHz@19dBm, 868MHz@19dBm
-    -   BRD4164A / SLWSTK6000B / Dual band Wireless Starter Kit / 2.4GHz@19dBm, 915MHz@19dBm
+    -   BRD4163A / SLWSTK6000B / Dual band Wireless Starter Kit / 2.4GHz@19dBm,
+        868MHz@19dBm
+    -   BRD4164A / SLWSTK6000B / Dual band Wireless Starter Kit / 2.4GHz@19dBm,
+        915MHz@19dBm
     -   BRD4166A / SLTB004A / Thunderboard Sense 2 / 2.4GHz@10dBm
-    -   BRD4170A / SLWSTK6000B / Multiband Wireless Starter Kit / 2.4GHz@19dBm, 915MHz@19dBm
+    -   BRD4170A / SLWSTK6000B / Multiband Wireless Starter Kit / 2.4GHz@19dBm,
+        915MHz@19dBm
     -   BRD4304A / SLWSTK6000B / MGM12P Module / 2.4GHz@19dBm
 
     MG21 boards:
@@ -96,14 +101,14 @@ following features are available:
 
 ## Testing the Example Application
 
-Determine the serial port name for the EFR device by checking /dev:
-        ls /dev/tty*
+Determine the serial port name for the EFR device by checking /dev: ls
+/dev/tty\*
 
     It should look like this :
     - On Linux
         /dev/ttyACM0
     - On MAC
-        /dev/tty.usbmodem0004401548451	
+        /dev/tty.usbmodem0004401548451
 
 Run the following command to start an interactive Python shell, where the Echo
 RPC commands can be invoked:
