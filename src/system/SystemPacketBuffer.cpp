@@ -53,7 +53,7 @@
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/mem.h>
 #include <lwip/pbuf.h>
-#endif
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_PACKETBUFFER_STORE == CHIP_SYSTEM_PACKETBUFFER_STORE_CHIP_HEAP
 #include <support/CHIPMem.h>
@@ -119,7 +119,7 @@ void PacketBuffer::InternalCheck(const PacketBuffer * buffer)
                            "packet buffer overflow %u < %u+%u", buffer->alloc_size, buffer->ReservedSize(), buffer->len);
     }
 }
-#endif
+#endif // CHIP_CONFIG_MEMORY_DEBUG_CHECKS
 
 // Number of unused bytes below which \c RightSize() won't bother reallocating.
 constexpr uint16_t kRightSizingThreshold = 16;
@@ -158,7 +158,7 @@ void PacketBufferHandle::InternalRightSize()
     newBuffer->alloc_size    = static_cast<uint16_t>(usedSize);
     memcpy(reinterpret_cast<uint8_t *>(newBuffer) + PacketBuffer::kStructureSize, start, usedSize);
 
-    chip::Platform::MemoryFree(mBuffer);
+    PacketBuffer::Free(mBuffer);
     mBuffer = newBuffer;
 }
 
@@ -212,10 +212,6 @@ void PacketBuffer::SetStart(uint8_t * aNewStart)
 
 void PacketBuffer::SetDataLength(uint16_t aNewLen, PacketBuffer * aChainHead)
 {
-    // SetDataLength is often called after a client finished writing to the buffer,
-    // so it's a good time to check for possible corruption.
-    Check(this);
-
     const uint16_t kMaxDataLen = this->MaxDataLength();
 
     if (aNewLen > kMaxDataLen)
@@ -225,6 +221,10 @@ void PacketBuffer::SetDataLength(uint16_t aNewLen, PacketBuffer * aChainHead)
 
     this->len     = aNewLen;
     this->tot_len = static_cast<uint16_t>(this->tot_len + lDelta);
+
+    // SetDataLength is often called after a client finished writing to the buffer,
+    // so it's a good time to check for possible corruption.
+    Check(this);
 
     while (aChainHead != nullptr && aChainHead != this)
     {

@@ -204,7 +204,7 @@ extern bool MemoryInternalCheckPointer(const void * p, size_t min_size);
  *       implementation or configuration is not guaranteed to catch any particular faulty state.
  * @note For non-null \a p, the function return value *may* be incorrect if the memory manager is in a faulty state
  *       (e.g. corrupt heap), even if the faulty state does not directly involve \a p.
- * @note For non-null \a p, the function *may* abort the program rather than return at all if the memory mananger is in
+ * @note For non-null \a p, the function *may* abort the program rather than return at all if the memory manager is in
  *       a faulty state, even if \a p is valid.
  * @note For a non-null \a p, checking *may* be slow.
  *

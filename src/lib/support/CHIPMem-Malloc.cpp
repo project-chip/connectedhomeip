@@ -65,9 +65,9 @@ static void VerifyInitialized(const char * func)
 
 #define VERIFY_POINTER(p)                                                                                                          \
     do                                                                                                                             \
-        if ((p != nullptr) && (MemoryDebugCheckPointer(p) == false))                                                               \
+        if (((p) != nullptr) && (MemoryDebugCheckPointer((p)) == false))                                                           \
         {                                                                                                                          \
-            fprintf(stderr, "ABORT: chip::Platform::%s() found corruption\n", __func__);                                           \
+            fprintf(stderr, "ABORT: chip::Platform::%s() found corruption on %p\n", __func__, (p));                                \
             abort();                                                                                                               \
         }                                                                                                                          \
     while (0)

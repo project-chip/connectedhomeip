@@ -343,7 +343,7 @@ public:
      *
      * Unless enabled by #CHIP_CONFIG_MEMORY_DEBUG_CHECKS == 1, this function does nothing.
      *
-     * When enabled, it performs and implementation- and configuration-defined check on
+     * When enabled, it performs an implementation- and configuration-defined check on
      * the validity of the packet buffer. It MAY log an error and/or abort the program
      * if the packet buffer or the implementation-defined memory management system is in
      * a faulty state. (Some configurations may not actually perform any check.)
@@ -372,7 +372,7 @@ private:
     static BufferPoolElement sBufferPool[CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE];
     static PacketBuffer * sFreeList;
     static PacketBuffer * BuildFreeList();
-#endif
+#endif // CHIP_SYSTEM_PACKETBUFFER_STORE == CHIP_SYSTEM_PACKETBUFFER_STORE_CHIP_POOL || defined(DOXYGEN)
 
 #if CHIP_SYSTEM_PACKETBUFFER_HAS_CHECK
     static void InternalCheck(const PacketBuffer * buffer);
@@ -555,10 +555,7 @@ public:
      */
     CHECK_RETURN_VALUE PacketBuffer * UnsafeRelease() &&
     {
-        if (mBuffer != nullptr)
-        {
-            PacketBuffer::Check(mBuffer);
-        }
+        PacketBuffer::Check(mBuffer);
         PacketBuffer * buffer = mBuffer;
         mBuffer               = nullptr;
         return buffer;
@@ -584,7 +581,7 @@ public:
      *
      *  @return     On success, a PacketBufferHandle to the allocated buffer. On fail, \c nullptr.
      */
-    static PacketBufferHandle New(size_t aAvailableSize, uint16_t aReservedSize = System::PacketBuffer::kDefaultHeaderReserve);
+    static PacketBufferHandle New(size_t aAvailableSize, uint16_t aReservedSize = PacketBuffer::kDefaultHeaderReserve);
 
     /**
      * Allocates a packet buffer with initial contents.
@@ -597,7 +594,7 @@ public:
      *  @return     On success, a PacketBufferHandle to the allocated buffer. On fail, \c nullptr.
      */
     static PacketBufferHandle NewWithData(const void * aData, size_t aDataSize, uint16_t aAdditionalSize = 0,
-                                          uint16_t aReservedSize = System::PacketBuffer::kDefaultHeaderReserve);
+                                          uint16_t aReservedSize = PacketBuffer::kDefaultHeaderReserve);
 
     /**
      * Creates a copy of the data in this packet.
@@ -609,15 +606,14 @@ public:
      *
      * @returns empty handle on allocation failure.
      */
-    PacketBufferHandle CloneData(uint16_t aAdditionalSize = 0,
-                                 uint16_t aReservedSize   = System::PacketBuffer::kDefaultHeaderReserve);
+    PacketBufferHandle CloneData(uint16_t aAdditionalSize = 0, uint16_t aReservedSize = PacketBuffer::kDefaultHeaderReserve);
 
     /**
      * Perform an implementation-defined check on the validity of a PacketBufferHandle.
      *
      * Unless enabled by #CHIP_CONFIG_MEMORY_DEBUG_CHECKS == 1, this function does nothing.
      *
-     * When enabled, it performs and implementation- and configuration-defined check on
+     * When enabled, it performs an implementation- and configuration-defined check on
      * the validity of the packet buffer. It MAY log an error and/or abort the program
      * if the packet buffer or the implementation-defined memory management system is in
      * a faulty state. (Some configurations may not actually perform any check.)
