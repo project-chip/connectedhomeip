@@ -253,15 +253,15 @@ public:
 private:
     enum TransferStates : uint8_t
     {
-        kState_Idle,
-        kState_AwaitingInitMsg,
-        kState_AwaitingAccept,
-        kState_NegotiateTransferParams,
-        kState_TransferInProgress,
-        kState_AwaitingEOFAck,
-        kState_ReceivedEOF,
-        kState_TransferDone,
-        kState_Error,
+        kUnitialized,
+        kAwaitingInitMsg,
+        kAwaitingAccept,
+        kNegotiateTransferParams,
+        kTransferInProgress,
+        kAwaitingEOFAck,
+        kReceivedEOF,
+        kTransferDone,
+        kError,
     };
 
     // Incoming message handlers
@@ -293,7 +293,7 @@ private:
     bool IsTransferLengthDefinite();
 
     OutputEventType mPendingOutput = kNone;
-    TransferStates mState          = kState_Idle;
+    TransferStates mState          = kUnitialized;
     TransferRole mRole;
 
     // Indicate supported options pre- transfer accept
