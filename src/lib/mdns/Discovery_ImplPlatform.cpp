@@ -174,9 +174,9 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommisioningAdvertisingParamet
     SuccessOrExit(error =
                       chip::DeviceLayer::ConfigurationMgr().GetSerialNumber(serialNumber, sizeof(serialNumber), serialNumberSize));
     SuccessOrExit(error = chip::DeviceLayer::ConfigurationMgr().GetLifetimeCounter(lifetimeCounter));
-    SuccessOrExit(error = AdditionDataPayloadGenerator(lifetimeCounter, serialNumber, serialNumberSize)
-                              .generateRotatingDeviceId(rotatingDeviceIdHexBuffer, ROTATING_DEVICE_ID_MAX_LENGTH * 2 + 1,
-                                                        rotatingDeviceIdHexBufferSize));
+    SuccessOrExit(error = AdditionDataPayloadGenerator().generateRotatingDeviceId(
+                      lifetimeCounter, serialNumber, serialNumberSize, rotatingDeviceIdHexBuffer,
+                      ROTATING_DEVICE_ID_MAX_LENGTH * 2 + 1, rotatingDeviceIdHexBufferSize));
 
     // Rotating Device ID
     textEntries[textEntrySize++] = { "RI", reinterpret_cast<const uint8_t *>(rotatingDeviceIdHexBuffer),

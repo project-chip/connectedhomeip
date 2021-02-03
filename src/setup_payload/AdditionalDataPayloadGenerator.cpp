@@ -39,13 +39,9 @@ using namespace chip::Crypto;
 using namespace chip::SetupPayload;
 using namespace chip::Encoding::LittleEndian;
 
-AdditionalDataPayloadGenerator::AdditionalDataPayloadGenerator(uint16_t lifetimeCounter, char * serialNumberBuffer,
-                                                               size_t serialNumberBufferSize) :
-    mLifetimeCounter(lifetimeCounter),
-    mSerialNumberBuffer(serialNumberBuffer), mSerialNumberBufferSize(serialNumberBufferSize)
-{}
-
-CHIP_ERROR AdditionalDataPayloadGenerator::generateAdditionalDataPayload(PacketBufferHandle & bufferHandle,
+CHIP_ERROR AdditionalDataPayloadGenerator::generateAdditionalDataPayload(uint16_t lifetimeCounter, char * serialNumberBuffer,
+                                                                         size_t serialNumberBufferSize,
+                                                                         PacketBufferHandle & bufferHandle,
                                                                          bool enableRotatingDeviceId)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -63,7 +59,8 @@ CHIP_ERROR AdditionalDataPayloadGenerator::generateAdditionalDataPayload(PacketB
     if (enableRotatingDeviceId)
     {
         // Generating Device Rotating Id
-        err = generateRotatingDeviceId(rotatingDeviceIdBuffer, ROTATING_DEVICE_ID_MAX_LENGTH * 2 + 1, rotatingDeviceIdBufferSize);
+        err = generateRotatingDeviceId(lifetimeCounter, serialNumberBuffer, serialNumberBufferSize, rotatingDeviceIdBuffer,
+                                       ROTATING_DEVICE_ID_MAX_LENGTH * 2 + 1, rotatingDeviceIdBufferSize);
         SuccessOrExit(err);
 
         // Adding the rotating device id to the TLV data
@@ -81,7 +78,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR AdditionalDataPayloadGenerator::generateRotatingDeviceId(char rotatingDeviceIdBuffer[],
+CHIP_ERROR AdditionalDataPayloadGenerator::generateRotatingDeviceId(uint16_t lifetimeCounter, char * serialNumberBuffer,
+                                                                    size_t serialNumberBufferSize, char rotatingDeviceIdBuffer[],
                                                                     size_t rotatingDeviceIdBufferSize,
                                                                     size_t & rotatingDeviceIdBufferOutputSize)
 {
@@ -100,14 +98,14 @@ CHIP_ERROR AdditionalDataPayloadGenerator::generateRotatingDeviceId(char rotatin
     err = hash.Begin();
     SuccessOrExit(err);
 
-    err = hash.AddData((uint8_t *) mSerialNumberBuffer, mSerialNumberBufferSize);
+    err = hash.AddData((uint8_t *) serialNumberBuffer, serialNumberBufferSize);
     SuccessOrExit(err);
-    err = hash.AddData((uint8_t *) &mLifetimeCounter, 1);
+    err = hash.AddData((uint8_t *) &lifetimeCounter, 1);
     SuccessOrExit(err);
     err = hash.Finish(hashOutputBuffer);
     SuccessOrExit(err);
 
-    outputBuferWriter.Put16(mLifetimeCounter);
+    outputBuferWriter.Put16(lifetimeCounter);
     outputBuferWriter.Put(
         reinterpret_cast<const char *>(&hashOutputBuffer[kSHA256_Hash_Length - ROTATING_DEVICE_ID_HASH_SUFFIX_LENGTH]));
 

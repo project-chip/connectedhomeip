@@ -1291,8 +1291,8 @@ static void UpdateAdditionalDataCharacteristic(BluezGattCharacteristic1 * charac
     enableRotatingDeviceId = true;
 #endif
 
-    err = AdditionalDataPayloadGenerator(lifetimeCounter, serialNumber, serialNumberSize)
-              .generateAdditionalDataPayload(bufferHandle, enableRotatingDeviceId);
+    err = AdditionalDataPayloadGenerator().generateAdditionalDataPayload(lifetimeCounter, serialNumber, serialNumberSize,
+                                                                         bufferHandle, enableRotatingDeviceId);
     SuccessOrExit(err);
 
     cValue = g_variant_new_from_data(G_VARIANT_TYPE("ay"), bufferHandle->Start(), bufferHandle->DataLength(), TRUE, g_free,
