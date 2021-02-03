@@ -29,8 +29,6 @@ find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
 
 project(chip-nrf52840-pigweed-example)
 
-zephyr_compile_options(-Werror)
-
 target_include_directories(app PRIVATE main/include 
                            ${NRFCONNECT_COMMON}/util/include
                            ${PIGWEED_ROOT}/pw_sys_io/public
