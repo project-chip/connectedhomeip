@@ -16,9 +16,11 @@
  */
 
 #import "RootViewController.h"
+#import "BindingsViewController.h"
 #import "EchoViewController.h"
 #import "OnOffViewController.h"
 #import "QRCodeViewController.h"
+#import "TemperatureSensorViewController.h"
 #import "WifiViewController.h"
 
 @implementation RootViewController
@@ -36,7 +38,9 @@
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
     [self.view addSubview:self.tableView];
-    self.options = @[ @"QRCode scanner", @"Echo client", @"Light on / off cluster", @"Wifi Configuration" ];
+    self.options = @[
+        @"QRCode scanner", @"Echo client", @"Light on / off cluster", @"Temperature Sensor", @"Bindings", @"Wifi Configuration"
+    ];
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
@@ -71,11 +75,29 @@
         [self pushLightOnOffCluster];
         break;
     case 3:
+        [self pushTemperatureSensor];
+        break;
+    case 4:
+        [self pushBindings];
+        break;
+    case 5:
         [self pushNetworkConfiguration];
         break;
     default:
         break;
     }
+}
+
+- (void)pushBindings
+{
+    BindingsViewController * controller = [BindingsViewController new];
+    [self.navigationController pushViewController:controller animated:YES];
+}
+
+- (void)pushTemperatureSensor
+{
+    TemperatureSensorViewController * controller = [TemperatureSensorViewController new];
+    [self.navigationController pushViewController:controller animated:YES];
 }
 
 - (void)pushNetworkConfiguration

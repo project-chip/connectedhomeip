@@ -44,7 +44,8 @@ namespace {
 // The CommandHandler object
 chip::TransportMgr<chip::Transport::UDP> gTransportManager;
 chip::SecureSessionMgr gSessionManager;
-chip::SecurePairingUsingTestSecret gTestPairing;
+chip::SecurePairingUsingTestSecret gTestPairing(chip::Optional<chip::NodeId>::Value(chip::kUndefinedNodeId),
+                                                static_cast<uint16_t>(0), static_cast<uint16_t>(0));
 
 // Callback handler when a CHIP EchoRequest is received.
 void HandleCommandRequestReceived(chip::TLV::TLVReader & aReader, chip::app::Command * apCommandObj)

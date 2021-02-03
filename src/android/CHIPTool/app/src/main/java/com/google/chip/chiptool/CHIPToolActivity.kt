@@ -145,7 +145,8 @@ class CHIPToolActivity :
     val uri = records[0].toUri()
     if (!uri?.scheme.equals("ch", true)) return
 
-    val setupPayload = SetupPayloadParser().parseQrCode(uri.toString().toUpperCase())
+    // TODO: Issue #4504 - Remove replacing _ with spaces after problem described in #415 will be fixed.
+    val setupPayload = SetupPayloadParser().parseQrCode(uri.toString().toUpperCase().replace('_', ' '))
     val deviceInfo = CHIPDeviceInfo(
         setupPayload.version,
         setupPayload.vendorId,

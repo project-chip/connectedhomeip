@@ -26,7 +26,7 @@
 
 #include <core/CHIPCore.h>
 #include <messaging/ReliableMessageContext.h>
-#include <messaging/ReliableMessageManager.h>
+#include <messaging/ReliableMessageMgr.h>
 #include <protocols/Protocols.h>
 #include <protocols/echo/Echo.h>
 #include <support/CodeUtils.h>
@@ -90,7 +90,7 @@ TransportMgr<OutgoingTransport> gTransportMgr;
 class MockAppDelegate : public ExchangeDelegate
 {
 public:
-    void OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, uint32_t protocolId, uint8_t msgType,
+    void OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                            System::PacketBufferHandle buffer) override
     {
         IsOnMessageReceivedCalled = true;
@@ -133,12 +133,12 @@ void CheckAddClearRetrans(nlTestSuite * inSuite, void * inContext)
     ExchangeContext * exchange = ctx.NewExchangeToPeer(&mockAppDelegate);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 
-    ReliableMessageManager * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
+    ReliableMessageMgr * rm     = ctx.GetExchangeManager().GetReliableMessageMgr();
     ReliableMessageContext * rc = exchange->GetReliableMessageContext();
     NL_TEST_ASSERT(inSuite, rm != nullptr);
     NL_TEST_ASSERT(inSuite, rc != nullptr);
 
-    ReliableMessageManager::RetransTableEntry * entry;
+    ReliableMessageMgr::RetransTableEntry * entry;
 
     rm->AddToRetransTable(rc, &entry);
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
@@ -156,12 +156,12 @@ void CheckFailRetrans(nlTestSuite * inSuite, void * inContext)
     ExchangeContext * exchange = ctx.NewExchangeToPeer(&mockAppDelegate);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 
-    ReliableMessageManager * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
+    ReliableMessageMgr * rm     = ctx.GetExchangeManager().GetReliableMessageMgr();
     ReliableMessageContext * rc = exchange->GetReliableMessageContext();
     NL_TEST_ASSERT(inSuite, rm != nullptr);
     NL_TEST_ASSERT(inSuite, rc != nullptr);
 
-    ReliableMessageManager::RetransTableEntry * entry;
+    ReliableMessageMgr::RetransTableEntry * entry;
     ReliableMessageDelegateObject delegate;
     rc->SetDelegate(&delegate);
     rm->AddToRetransTable(rc, &entry);
@@ -191,7 +191,7 @@ void CheckResendMessage(nlTestSuite * inSuite, void * inContext)
     ExchangeContext * exchange = ctx.NewExchangeToPeer(&mockSender);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 
-    ReliableMessageManager * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
+    ReliableMessageMgr * rm     = ctx.GetExchangeManager().GetReliableMessageMgr();
     ReliableMessageContext * rc = exchange->GetReliableMessageContext();
     NL_TEST_ASSERT(inSuite, rm != nullptr);
     NL_TEST_ASSERT(inSuite, rc != nullptr);
@@ -205,18 +205,18 @@ void CheckResendMessage(nlTestSuite * inSuite, void * inContext)
 
     gSendMessageCount = 0;
 
-    err = exchange->SendMessage(kProtocol_Echo, Echo::kEchoMessageType_EchoRequest, std::move(buffer),
+    err = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer),
                                 Messaging::SendFlags(Messaging::SendMessageFlags::kNone));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // 1 tick is 64 ms, sleep 65 ms to trigger first re-transmit
     test_os_sleep_ms(65);
-    ReliableMessageManager::Timeout(&ctx.GetSystemLayer(), rm, CHIP_SYSTEM_NO_ERROR);
+    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm, CHIP_SYSTEM_NO_ERROR);
     NL_TEST_ASSERT(inSuite, gSendMessageCount == 2);
 
     // sleep another 65 ms to trigger second re-transmit
     test_os_sleep_ms(65);
-    ReliableMessageManager::Timeout(&ctx.GetSystemLayer(), rm, CHIP_SYSTEM_NO_ERROR);
+    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm, CHIP_SYSTEM_NO_ERROR);
     NL_TEST_ASSERT(inSuite, gSendMessageCount == 3);
 }
 
@@ -228,9 +228,9 @@ void CheckResendMessage(nlTestSuite * inSuite, void * inContext)
 // clang-format off
 const nlTest sTests[] =
 {
-    NL_TEST_DEF("Test ReliableMessageManager::CheckAddClearRetrans", CheckAddClearRetrans),
-    NL_TEST_DEF("Test ReliableMessageManager::CheckFailRetrans", CheckFailRetrans),
-    NL_TEST_DEF("Test ReliableMessageManager::CheckResendMessage", CheckResendMessage),
+    NL_TEST_DEF("Test ReliableMessageMgr::CheckAddClearRetrans", CheckAddClearRetrans),
+    NL_TEST_DEF("Test ReliableMessageMgr::CheckFailRetrans", CheckFailRetrans),
+    NL_TEST_DEF("Test ReliableMessageMgr::CheckResendMessage", CheckResendMessage),
 
     NL_TEST_SENTINEL()
 };
