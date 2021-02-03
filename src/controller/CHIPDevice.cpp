@@ -56,50 +56,77 @@ namespace Controller {
 
 CHIP_ERROR Device::SendMessage(System::PacketBufferHandle buffer)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
     System::PacketBufferHandle resend;
+    bool loadedSecureSession = false;
 
-    VerifyOrExit(mSessionManager != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(!buffer.IsNull(), err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(mSessionManager != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(!buffer.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
 
-    // If there is no secure connection to the device, try establishing it
-    if (mState != ConnectionState::SecureConnected)
+    ReturnErrorOnFailure(LoadSecureSessionParametersIfNeeded(loadedSecureSession));
+
+    if (!loadedSecureSession)
     {
-        err = LoadSecureSessionParameters(ResetTransport::kNo);
-        SuccessOrExit(err);
-    }
-    else
-    {
-        // Secure connection already exists
+        // Secure connection already existed
         // Hold on to the buffer, in case session resumption and resend is needed
-        resend = buffer.Retain();
+        // Cloning data, instead of increasing the ref count, as the original
+        // buffer might get modified by lower layers before the send fails. So,
+        // that buffer cannot be used for resends.
+        resend = buffer.CloneData();
     }
 
-    err    = mSessionManager->SendMessage(mSecureSession, std::move(buffer));
+    CHIP_ERROR err = mSessionManager->SendMessage(mSecureSession, std::move(buffer));
+
     buffer = nullptr;
     ChipLogDetail(Controller, "SendMessage returned %d", err);
 
     // The send could fail due to network timeouts (e.g. broken pipe)
-    // Try sesion resumption if needed
+    // Try session resumption if needed
     if (err != CHIP_NO_ERROR && !resend.IsNull() && mState == ConnectionState::SecureConnected)
     {
         mState = ConnectionState::NotConnected;
 
-        err = LoadSecureSessionParameters(ResetTransport::kYes);
-        SuccessOrExit(err);
+        ReturnErrorOnFailure(LoadSecureSessionParameters(ResetTransport::kYes));
 
         err = mSessionManager->SendMessage(mSecureSession, std::move(resend));
         ChipLogDetail(Controller, "Re-SendMessage returned %d", err);
-        SuccessOrExit(err);
+        ReturnErrorOnFailure(err);
     }
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR Device::LoadSecureSessionParametersIfNeeded(bool & didLoad)
+{
+    didLoad = false;
+
+    // If there is no secure connection to the device, try establishing it
+    if (mState != ConnectionState::SecureConnected)
+    {
+        ReturnErrorOnFailure(LoadSecureSessionParameters(ResetTransport::kNo));
+        didLoad = true;
+    }
+    else
+    {
+        Transport::PeerConnectionState * connectionState = nullptr;
+        connectionState                                  = mSessionManager->GetPeerConnectionState(mSecureSession);
+
+        // Check if the connection state has the correct transport information
+        if (connectionState == nullptr || connectionState->GetPeerAddress().GetTransportType() == Transport::Type::kUndefined ||
+            connectionState->GetTransport() != nullptr)
+        {
+            mState = ConnectionState::NotConnected;
+            ReturnErrorOnFailure(LoadSecureSessionParameters(ResetTransport::kNo));
+            didLoad = true;
+        }
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR Device::SendCommands()
 {
+    bool loadedSecureSession = false;
+    ReturnErrorOnFailure(LoadSecureSessionParametersIfNeeded(loadedSecureSession));
     VerifyOrReturnError(mCommandSender != nullptr, CHIP_ERROR_INCORRECT_STATE);
     return mCommandSender->SendCommandRequest(mDeviceId);
 }
