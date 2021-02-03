@@ -61,6 +61,13 @@ bool isRendezvousBypassed()
     return rendezvousMode == RendezvousInformationFlags::kNone;
 }
 
+class ServerRendezvousAdvertisementDelegate : public RendezvousAdvertisementDelegate
+{
+public:
+    CHIP_ERROR StartAdvertisement() const override { return chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(true); }
+    CHIP_ERROR StopAdvertisement() const override { return chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(false); }
+};
+
 class ServerCallback : public SecureSessionMgrDelegate
 {
 public:
@@ -177,6 +184,7 @@ SecureSessionMgr gSessions;
 ServerCallback gCallbacks;
 SecurePairingUsingTestSecret gTestPairing;
 RendezvousServer gRendezvousServer;
+ServerRendezvousAdvertisementDelegate gRendezvousAdvDelegate;
 
 } // namespace
 
@@ -234,7 +242,8 @@ void InitServer(AppDelegate * delegate)
 #if CONFIG_NETWORK_LAYER_BLE
         params.SetSetupPINCode(pinCode)
             .SetBleLayer(DeviceLayer::ConnectivityMgr().GetBleLayer())
-            .SetPeerAddress(Transport::PeerAddress::BLE());
+            .SetPeerAddress(Transport::PeerAddress::BLE())
+            .SetAdvertisementDelegate(&gRendezvousAdvDelegate);
 #else
         params.SetSetupPINCode(pinCode);
 #endif // CONFIG_NETWORK_LAYER_BLE

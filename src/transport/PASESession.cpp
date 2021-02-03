@@ -45,7 +45,7 @@ namespace chip {
 
 using namespace Crypto;
 
-const char * kSpake2pContext        = "SPAKE2+ Commissioning";
+const char * kSpake2pContext        = "CHIP PAKE V1 Commissioning";
 const char * kSpake2pI2RSessionInfo = "Commissioning I2R Key";
 const char * kSpake2pR2ISessionInfo = "Commissioning R2I Key";
 
@@ -65,8 +65,11 @@ void PASESession::Clear()
     memset(&mWS[0][0], 0, sizeof(mWS));
     memset(&mKe[0], 0, sizeof(mKe));
     mNextExpectedMsg = Protocols::SecureChannel::MsgType::PASE_Spake2pError;
-    mSpake2p.Init(nullptr);
+
+    // Note: we don't need to explicitly clear the state of mSpake2p object.
+    //       Clearing the following state takes care of it.
     mCommissioningHash.Clear();
+
     mIterationCount = 0;
     mSaltLength     = 0;
     if (mSalt != nullptr)
@@ -195,7 +198,10 @@ exit:
 
 CHIP_ERROR PASESession::SetupSpake2p(uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err      = CHIP_NO_ERROR;
+    uint8_t context[32] = {
+        0,
+    };
 
     VerifyOrExit(salt != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(saltLen > 0, err = CHIP_ERROR_INVALID_ARGUMENT);
@@ -204,7 +210,10 @@ CHIP_ERROR PASESession::SetupSpake2p(uint32_t pbkdf2IterCount, const uint8_t * s
                         sizeof(mWS), &mWS[0][0]);
     SuccessOrExit(err);
 
-    err = mSpake2p.Init(&mCommissioningHash);
+    err = mCommissioningHash.Finish(context);
+    SuccessOrExit(err);
+
+    err = mSpake2p.Init(context, sizeof(context));
     SuccessOrExit(err);
 
 exit:
@@ -532,8 +541,6 @@ CHIP_ERROR PASESession::HandleMsg1_and_SendMsg2(const PacketHeader & header, con
     const uint8_t * buf = msg->Start();
     size_t buf_len      = msg->DataLength();
 
-    System::PacketBufferHandle resp;
-
     ChipLogDetail(Ble, "Received spake2p msg1");
 
     VerifyOrExit(buf != nullptr, err = CHIP_ERROR_MESSAGE_INCOMPLETE);
@@ -560,22 +567,19 @@ CHIP_ERROR PASESession::HandleMsg1_and_SendMsg2(const PacketHeader & header, con
     VerifyOrExit(CanCastTo<uint16_t>(Y_len + verifier_len), err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
     data_len = static_cast<uint16_t>(Y_len + verifier_len);
 
-    resp = System::PacketBufferHandle::New(data_len);
-    VerifyOrExit(!resp.IsNull(), err = CHIP_SYSTEM_ERROR_NO_MEMORY);
-
     {
-        BufBound bbuf(resp->Start(), data_len);
+        System::PacketBufBound bbuf(data_len);
+        VerifyOrExit(!bbuf.IsNull(), err = CHIP_SYSTEM_ERROR_NO_MEMORY);
         bbuf.Put(&Y[0], Y_len);
         bbuf.Put(verifier, verifier_len);
         VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_NO_MEMORY);
+
+        mNextExpectedMsg = Protocols::SecureChannel::MsgType::PASE_Spake2p3;
+
+        // Call delegate to send the Msg2 to peer
+        err = AttachHeaderAndSend(Protocols::SecureChannel::MsgType::PASE_Spake2p2, bbuf.Finalize());
+        SuccessOrExit(err);
     }
-
-    resp->SetDataLength(data_len);
-    mNextExpectedMsg = Protocols::SecureChannel::MsgType::PASE_Spake2p3;
-
-    // Call delegate to send the Msg2 to peer
-    err = AttachHeaderAndSend(Protocols::SecureChannel::MsgType::PASE_Spake2p2, std::move(resp));
-    SuccessOrExit(err);
 
     ChipLogDetail(Ble, "Sent spake2p msg2");
 
@@ -619,20 +623,17 @@ CHIP_ERROR PASESession::HandleMsg2_and_SendMsg3(const PacketHeader & header, con
         mConnectionState.SetPeerNodeId(header.GetSourceNodeId().Value());
     }
 
-    resp = System::PacketBufferHandle::New(verifier_len);
-    VerifyOrExit(!resp.IsNull(), err = CHIP_SYSTEM_ERROR_NO_MEMORY);
-
     {
-        BufBound bbuf(resp->Start(), verifier_len);
+        System::PacketBufBound bbuf(verifier_len);
+        VerifyOrExit(!bbuf.IsNull(), err = CHIP_SYSTEM_ERROR_NO_MEMORY);
+
         bbuf.Put(verifier, verifier_len);
         VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_NO_MEMORY);
+
+        // Call delegate to send the Msg3 to peer
+        err = AttachHeaderAndSend(Protocols::SecureChannel::MsgType::PASE_Spake2p3, bbuf.Finalize());
+        SuccessOrExit(err);
     }
-
-    resp->SetDataLength(verifier_len);
-
-    // Call delegate to send the Msg3 to peer
-    err = AttachHeaderAndSend(Protocols::SecureChannel::MsgType::PASE_Spake2p3, std::move(resp));
-    SuccessOrExit(err);
 
     ChipLogDetail(Ble, "Sent spake2p msg3");
 

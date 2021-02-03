@@ -22,7 +22,6 @@
 
 #include <app/CommandHandler.h>
 #include <app/CommandSender.h>
-#include <app/MessageDef/MessageDef.h>
 #include <app/im-handler.h>
 #include <app/util/basic-types.h>
 
