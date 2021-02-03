@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,22 +14,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-#import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CHIPUIViewUtils : NSObject
-+ (UIView *)viewWithUITextField:(UITextField *)textField button:(UIButton *)button;
-+ (UIStackView *)stackViewWithLabel:(UILabel *)label result:(UILabel *)result;
-+ (UIView *)viewWithLabel:(UILabel *)label textField:(UITextField *)textField;
-+ (UIView *)viewWithLabel:(UILabel *)label toggle:(UISwitch *)toggle;
+@interface BindingsViewController : UIViewController
 
-+ (UIStackView *)stackViewWithLabel:(UILabel *)label buttons:(NSArray<UIButton *> *)buttons;
-+ (UIStackView *)stackViewWithButtons:(NSArray<UIButton *> *)buttons;
-
-+ (UILabel *)addTitle:(NSString *)title toView:(UIView *)view;
 @end
 
 NS_ASSUME_NONNULL_END
