@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -34,10 +34,14 @@
 #include <protocols/echo/Echo.h>
 #include <support/ErrorStr.h>
 #include <system/SystemPacketBuffer.h>
-#include <transport/SecurePairingSession.h>
+#include <transport/PASESession.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/raw/TCP.h>
 #include <transport/raw/UDP.h>
+
+#include <inttypes.h>
+#include <stdio.h>
+#include <string.h>
 
 #define ECHO_CLIENT_PORT (CHIP_PORT + 1)
 
@@ -50,7 +54,7 @@ constexpr size_t kMaxEchoCount = 3;
 constexpr int32_t gEchoInterval = 1000;
 
 // The EchoClient object.
-chip::Protocols::EchoClient gEchoClient;
+chip::Protocols::Echo::EchoClient gEchoClient;
 
 chip::TransportMgr<chip::Transport::UDP> gUDPManager;
 chip::TransportMgr<chip::Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>> gTCPManager;
@@ -81,22 +85,16 @@ bool EchoIntervalExpired(void)
 
 CHIP_ERROR SendEchoRequest(void)
 {
-    CHIP_ERROR err                              = CHIP_NO_ERROR;
-    chip::System::PacketBufferHandle payloadBuf = chip::System::PacketBuffer::New();
+    CHIP_ERROR err              = CHIP_NO_ERROR;
+    const char kRequestFormat[] = "Echo Message %" PRIu64 "\n";
+    char requestData[(sizeof kRequestFormat) + 20 /* uint64_t decimal digits */];
+    snprintf(requestData, sizeof requestData, kRequestFormat, gEchoCount);
+    chip::System::PacketBufferHandle payloadBuf = chip::System::PacketBufferHandle::NewWithData(requestData, strlen(requestData));
 
     if (payloadBuf.IsNull())
     {
-        printf("Unable to allocate PacketBuffer\n");
+        printf("Unable to allocate packet buffer\n");
         return CHIP_ERROR_NO_MEMORY;
-    }
-    else
-    {
-        // Add some application payload data in the buffer.
-        char * p    = reinterpret_cast<char *>(payloadBuf->Start());
-        int32_t len = snprintf(p, CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE, "Echo Message %" PRIu64 "\n", gEchoCount);
-
-        // Set the datalength in the buffer appropriately.
-        payloadBuf->SetDataLength(static_cast<uint16_t>(len));
     }
 
     gLastEchoTime = chip::System::Timer::GetCurrentEpoch();
@@ -166,14 +164,6 @@ void HandleEchoResponseReceived(chip::Messaging::ExchangeContext * ec, chip::Sys
            static_cast<double>(gEchoRespCount) * 100 / gEchoCount, payload->DataLength(), static_cast<double>(transitTime) / 1000);
 }
 
-class TestSecureSessionMgrDelegate : public chip::SecureSessionMgrDelegate
-{
-public:
-    void OnNewConnection(chip::SecureSessionHandle session, chip::SecureSessionMgr * mgr) override { mSecureSession = session; }
-
-    chip::SecureSessionHandle mSecureSession;
-} gTestSecureSessionMgrDelegate;
-
 } // namespace
 
 int main(int argc, char * argv[])
@@ -226,8 +216,6 @@ int main(int argc, char * argv[])
         SuccessOrExit(err);
     }
 
-    gSessionManager.SetDelegate(&gTestSecureSessionMgrDelegate);
-
     err = gExchangeManager.Init(&gSessionManager);
     SuccessOrExit(err);
 
@@ -235,7 +223,8 @@ int main(int argc, char * argv[])
     err = EstablishSecureSession();
     SuccessOrExit(err);
 
-    err = gEchoClient.Init(&gExchangeManager, gTestSecureSessionMgrDelegate.mSecureSession);
+    // TODO: temprary create a SecureSessionHandle from node id to unblock end-to-end test. Complete solution is tracked in PR:4451
+    err = gEchoClient.Init(&gExchangeManager, { chip::kTestDeviceNodeId, 0 });
     SuccessOrExit(err);
 
     // Arrange to get a callback whenever an Echo Response is received.
@@ -244,7 +233,8 @@ int main(int argc, char * argv[])
     // Connection has been established. Now send the EchoRequests.
     for (unsigned int i = 0; i < kMaxEchoCount; i++)
     {
-        if (SendEchoRequest() != CHIP_NO_ERROR)
+        err = SendEchoRequest();
+        if (err != CHIP_NO_ERROR)
         {
             printf("Send request failed: %s\n", chip::ErrorStr(err));
             break;
@@ -269,7 +259,7 @@ int main(int argc, char * argv[])
     ShutdownChip();
 
 exit:
-    if (err != CHIP_NO_ERROR)
+    if ((err != CHIP_NO_ERROR) || (gEchoRespCount != kMaxEchoCount))
     {
         printf("ChipEchoClient failed: %s\n", chip::ErrorStr(err));
         exit(EXIT_FAILURE);

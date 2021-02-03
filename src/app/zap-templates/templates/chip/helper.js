@@ -344,15 +344,57 @@ function isManufacturerSpecificCommand()
   return !!this.mfgCode;
 }
 
+function asPythonType(zclType)
+{
+  const type = ChipTypesHelper.asBasicType(zclType);
+  switch (type) {
+  case 'int8_t':
+  case 'int16_t':
+  case 'int32_t':
+  case 'int64_t':
+  case 'uint8_t':
+  case 'uint16_t':
+  case 'uint32_t':
+  case 'uint64_t':
+    return 'int';
+  case 'char *':
+    return 'str';
+  case 'uint8_t *':
+    return 'byte';
+  }
+}
+
+function asPythonCType(zclType)
+{
+  const type = ChipTypesHelper.asBasicType(zclType);
+  switch (type) {
+  case 'int8_t':
+  case 'int16_t':
+  case 'int32_t':
+  case 'int64_t':
+  case 'uint8_t':
+  case 'uint16_t':
+  case 'uint32_t':
+  case 'uint64_t':
+    return 'c_' + type.replace('_t', '');
+  case 'char *':
+  case 'uint8_t *':
+    return 'c_char_p';
+  }
+}
+
 //
 // Module exports
 //
 exports.chip_server_clusters                  = chip_server_clusters;
 exports.chip_server_cluster_commands          = chip_server_cluster_commands;
 exports.chip_server_cluster_command_arguments = chip_server_cluster_command_arguments
+exports.asBasicType                           = ChipTypesHelper.asBasicType;
 exports.isSignedType                          = isSignedType;
 exports.isDiscreteType                        = isDiscreteType;
 exports.chip_server_cluster_attributes        = chip_server_cluster_attributes;
 exports.isWritableAttribute                   = isWritableAttribute;
 exports.isReportableAttribute                 = isReportableAttribute;
 exports.isManufacturerSpecificCommand         = isManufacturerSpecificCommand;
+exports.asPythonType                          = asPythonType;
+exports.asPythonCType                         = asPythonCType;

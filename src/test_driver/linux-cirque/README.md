@@ -5,7 +5,7 @@ Linux machine, it can create multiple nodes with network stacks that are
 independent from each other. Some nodes may be connected to simulated Thread
 networks, others may connect to simulated BLE or WiFi.
 
-In Project CHIP, cirque is used for tntegration tests.
+In Project CHIP, cirque is used for integration tests.
 
 There is a script for running cirque tests, you can find it at
 `scripts/tests/cirque_tests.sh`
@@ -15,6 +15,7 @@ There is a script for running cirque tests, you can find it at
 After checkout, in your local project chip directory, run:
 
 ```
+git submodule update --init
 scripts/tests/cirque_tests.sh bootstrap
 ```
 

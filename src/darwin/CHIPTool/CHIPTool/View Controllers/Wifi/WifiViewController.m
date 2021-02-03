@@ -99,37 +99,16 @@
     [passwordView.trailingAnchor constraintEqualToAnchor:stackView.trailingAnchor].active = YES;
 
     // Button stack view
-    UIStackView * stackViewButtons = [UIStackView new];
-    stackViewButtons.axis = UILayoutConstraintAxisHorizontal;
-    stackViewButtons.distribution = UIStackViewDistributionEqualCentering;
-    stackViewButtons.alignment = UIStackViewAlignmentTrailing;
-    stackViewButtons.spacing = 10;
-    [self.view addSubview:stackViewButtons];
-
-    stackViewButtons.translatesAutoresizingMaskIntoConstraints = false;
-    [stackViewButtons.topAnchor constraintEqualToAnchor:stackView.bottomAnchor constant:30].active = YES;
-    [stackViewButtons.bottomAnchor constraintLessThanOrEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor constant:-30].active
-        = YES;
-    [stackViewButtons.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-30].active = YES;
-    NSArray<NSString *> * buttonTitles = @[ @"Clear", @"Save" ];
     _clearButton = [UIButton new];
+    [_clearButton setTitle:@"Clear" forState:UIControlStateNormal];
     _saveButton = [UIButton new];
+    [_saveButton setTitle:@"Save" forState:UIControlStateNormal];
     [_clearButton addTarget:self action:@selector(clearCredientials:) forControlEvents:UIControlEventTouchUpInside];
     [_saveButton addTarget:self action:@selector(saveCredientials:) forControlEvents:UIControlEventTouchUpInside];
-    NSArray<UIButton *> * buttonsBelow = @[ _clearButton, _saveButton ];
-    for (int i = 0; i < buttonTitles.count; i++) {
-        UIButton * buttonForStack = [buttonsBelow objectAtIndex:i];
-        NSString * title = [buttonTitles objectAtIndex:i];
-        [buttonForStack setTitle:title forState:UIControlStateNormal];
-        buttonForStack.backgroundColor = UIColor.systemBlueColor;
-        buttonForStack.titleLabel.font = [UIFont systemFontOfSize:17];
-        buttonForStack.titleLabel.textColor = [UIColor whiteColor];
-        buttonForStack.layer.cornerRadius = 5;
-        buttonForStack.clipsToBounds = YES;
-        buttonForStack.translatesAutoresizingMaskIntoConstraints = false;
-        [buttonForStack.widthAnchor constraintEqualToConstant:70].active = YES;
-        [stackViewButtons addArrangedSubview:buttonForStack];
-    }
+
+    UIStackView * stackViewButtons = [CHIPUIViewUtils stackViewWithButtons:@[ _clearButton, _saveButton ]];
+    [stackView addArrangedSubview:stackViewButtons];
+    [stackViewButtons.trailingAnchor constraintEqualToAnchor:stackView.trailingAnchor].active = YES;
 }
 
 - (void)fillNetworkConfigWithDefaults

@@ -110,7 +110,7 @@ struct TransferInit
     const uint8_t * Metadata = nullptr;
     uint16_t MetadataLength  = 0;
 
-    // Retain ownership of the PacketBuffer so that the FileDesignator and Metadata pointers remain valid.
+    // Retain ownership of the packet buffer so that the FileDesignator and Metadata pointers remain valid.
     System::PacketBufferHandle Buffer;
 };
 
@@ -174,7 +174,7 @@ struct SendAccept
     uint8_t * Metadata      = nullptr;
     uint16_t MetadataLength = 0;
 
-    // Retain ownership of the PacketBuffer so that the FileDesignator and Metadata pointers remain valid.
+    // Retain ownership of the packet buffer so that the FileDesignator and Metadata pointers remain valid.
     System::PacketBufferHandle Buffer;
 };
 
@@ -238,7 +238,7 @@ struct ReceiveAccept
     uint8_t * Metadata      = nullptr;
     uint16_t MetadataLength = 0;
 
-    // Retain ownership of the PacketBuffer so that the FileDesignator and Metadata pointers remain valid.
+    // Retain ownership of the packet buffer so that the FileDesignator and Metadata pointers remain valid.
     System::PacketBufferHandle Buffer;
 };
 
@@ -286,7 +286,7 @@ struct CounterMessage
 
     uint32_t BlockCounter = 0;
 
-    // Retain ownership of the PacketBuffer so that the FileDesignator and Metadata pointers remain valid.
+    // Retain ownership of the packet buffer so that the FileDesignator and Metadata pointers remain valid.
     System::PacketBufferHandle Buffer;
 };
 
@@ -346,7 +346,7 @@ struct DataBlock
     uint8_t * Data      = nullptr;
     uint16_t DataLength = 0;
 
-    // Retain ownership of the PacketBuffer so that the FileDesignator and Metadata pointers remain valid.
+    // Retain ownership of the packet buffer so that the FileDesignator and Metadata pointers remain valid.
     System::PacketBufferHandle Buffer;
 };
 

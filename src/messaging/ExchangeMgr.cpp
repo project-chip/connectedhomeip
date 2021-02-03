@@ -107,22 +107,23 @@ ExchangeContext * ExchangeManager::NewContext(SecureSessionHandle session, Excha
     return AllocContext(mNextExchangeId++, session, true, delegate);
 }
 
-CHIP_ERROR ExchangeManager::RegisterUnsolicitedMessageHandler(uint32_t protocolId, ExchangeDelegate * delegate)
+CHIP_ERROR ExchangeManager::RegisterUnsolicitedMessageHandlerForProtocol(uint32_t protocolId, ExchangeDelegate * delegate)
 {
     return RegisterUMH(protocolId, kAnyMessageType, delegate);
 }
 
-CHIP_ERROR ExchangeManager::RegisterUnsolicitedMessageHandler(uint32_t protocolId, uint8_t msgType, ExchangeDelegate * delegate)
+CHIP_ERROR ExchangeManager::RegisterUnsolicitedMessageHandlerForType(uint32_t protocolId, uint8_t msgType,
+                                                                     ExchangeDelegate * delegate)
 {
     return RegisterUMH(protocolId, static_cast<int16_t>(msgType), delegate);
 }
 
-CHIP_ERROR ExchangeManager::UnregisterUnsolicitedMessageHandler(uint32_t protocolId)
+CHIP_ERROR ExchangeManager::UnregisterUnsolicitedMessageHandlerForProtocol(uint32_t protocolId)
 {
     return UnregisterUMH(protocolId, kAnyMessageType);
 }
 
-CHIP_ERROR ExchangeManager::UnregisterUnsolicitedMessageHandler(uint32_t protocolId, uint8_t msgType)
+CHIP_ERROR ExchangeManager::UnregisterUnsolicitedMessageHandlerForType(uint32_t protocolId, uint8_t msgType)
 {
     return UnregisterUMH(protocolId, static_cast<int16_t>(msgType));
 }
@@ -149,8 +150,56 @@ ExchangeContext * ExchangeManager::AllocContext(uint16_t ExchangeId, SecureSessi
     return nullptr;
 }
 
-void ExchangeManager::DispatchMessage(SecureSessionHandle session, const PacketHeader & packetHeader,
-                                      const PayloadHeader & payloadHeader, System::PacketBufferHandle msgBuf)
+CHIP_ERROR ExchangeManager::RegisterUMH(uint32_t protocolId, int16_t msgType, ExchangeDelegate * delegate)
+{
+    UnsolicitedMessageHandler * umh      = UMHandlerPool;
+    UnsolicitedMessageHandler * selected = nullptr;
+
+    for (int i = 0; i < CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS; i++, umh++)
+    {
+        if (umh->Delegate == nullptr)
+        {
+            if (selected == nullptr)
+                selected = umh;
+        }
+        else if (umh->ProtocolId == protocolId && umh->MessageType == msgType)
+        {
+            umh->Delegate = delegate;
+            return CHIP_NO_ERROR;
+        }
+    }
+
+    if (selected == nullptr)
+        return CHIP_ERROR_TOO_MANY_UNSOLICITED_MESSAGE_HANDLERS;
+
+    selected->Delegate    = delegate;
+    selected->ProtocolId  = protocolId;
+    selected->MessageType = msgType;
+
+    SYSTEM_STATS_INCREMENT(chip::System::Stats::kExchangeMgr_NumUMHandlers);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ExchangeManager::UnregisterUMH(uint32_t protocolId, int16_t msgType)
+{
+    UnsolicitedMessageHandler * umh = UMHandlerPool;
+
+    for (int i = 0; i < CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS; i++, umh++)
+    {
+        if (umh->Delegate != nullptr && umh->ProtocolId == protocolId && umh->MessageType == msgType)
+        {
+            umh->Delegate = nullptr;
+            SYSTEM_STATS_DECREMENT(chip::System::Stats::kExchangeMgr_NumUMHandlers);
+            return CHIP_NO_ERROR;
+        }
+    }
+
+    return CHIP_ERROR_NO_UNSOLICITED_MESSAGE_HANDLER;
+}
+
+void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+                                        SecureSessionHandle session, System::PacketBufferHandle msgBuf, SecureSessionMgr * msgLayer)
 {
     CHIP_ERROR err                          = CHIP_NO_ERROR;
     UnsolicitedMessageHandler * umh         = nullptr;
@@ -244,62 +293,8 @@ void ExchangeManager::DispatchMessage(SecureSessionHandle session, const PacketH
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(ExchangeManager, "DispatchMessage failed, err = %d", err);
+        ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %d", err);
     }
-}
-
-CHIP_ERROR ExchangeManager::RegisterUMH(uint32_t protocolId, int16_t msgType, ExchangeDelegate * delegate)
-{
-    UnsolicitedMessageHandler * umh      = UMHandlerPool;
-    UnsolicitedMessageHandler * selected = nullptr;
-
-    for (int i = 0; i < CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS; i++, umh++)
-    {
-        if (umh->Delegate == nullptr)
-        {
-            if (selected == nullptr)
-                selected = umh;
-        }
-        else if (umh->ProtocolId == protocolId && umh->MessageType == msgType)
-        {
-            umh->Delegate = delegate;
-            return CHIP_NO_ERROR;
-        }
-    }
-
-    if (selected == nullptr)
-        return CHIP_ERROR_TOO_MANY_UNSOLICITED_MESSAGE_HANDLERS;
-
-    selected->Delegate    = delegate;
-    selected->ProtocolId  = protocolId;
-    selected->MessageType = msgType;
-
-    SYSTEM_STATS_INCREMENT(chip::System::Stats::kExchangeMgr_NumUMHandlers);
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ExchangeManager::UnregisterUMH(uint32_t protocolId, int16_t msgType)
-{
-    UnsolicitedMessageHandler * umh = UMHandlerPool;
-
-    for (int i = 0; i < CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS; i++, umh++)
-    {
-        if (umh->Delegate != nullptr && umh->ProtocolId == protocolId && umh->MessageType == msgType)
-        {
-            umh->Delegate = nullptr;
-            SYSTEM_STATS_DECREMENT(chip::System::Stats::kExchangeMgr_NumUMHandlers);
-            return CHIP_NO_ERROR;
-        }
-    }
-
-    return CHIP_ERROR_NO_UNSOLICITED_MESSAGE_HANDLER;
-}
-
-void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                                        SecureSessionHandle session, System::PacketBufferHandle msgBuf, SecureSessionMgr * msgLayer)
-{
-    DispatchMessage(session, packetHeader, payloadHeader, std::move(msgBuf));
 }
 
 void ExchangeManager::OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * mgr)

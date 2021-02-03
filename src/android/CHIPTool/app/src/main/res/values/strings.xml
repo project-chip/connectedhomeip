@@ -82,4 +82,9 @@
     <string name="enter_thread_master_key_text">00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF</string>
     <string name="enter_thread_save_network_btn">Save network</string>
 
+    <string name="nfc_tag_action_title">CHIP NFC Tag read. Choose an action:</string>
+    <string name="nfc_tag_action_show">Show device information</string>
+    <string name="nfc_tag_action_wifi">Provision into Wi-Fi network</string>
+    <string name="nfc_tag_action_thread">Provision into Thread network</string>
+
 </resources>

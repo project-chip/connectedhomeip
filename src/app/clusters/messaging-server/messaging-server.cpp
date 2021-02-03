@@ -51,9 +51,9 @@ static EmberAfPluginMessagingServerMessage msgTable[EMBER_AF_MESSAGING_CLUSTER_S
 
 // These bits are used by the messageStatusControl to indicate whether or not
 // a message is valid, active, or if it is a "send now" message
-#define VALID BIT(0)
-#define ACTIVE BIT(1)
-#define NOW BIT(2)
+#define VALID EMBER_BIT(0)
+#define ACTIVE EMBER_BIT(1)
+#define NOW EMBER_BIT(2)
 
 #define messageIsValid(ep) (msgTable[ep].messageStatusControl & VALID)
 #define messageIsActive(ep) (msgTable[ep].messageStatusControl & ACTIVE)

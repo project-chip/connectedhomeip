@@ -19,7 +19,6 @@
 #include <string.h>
 
 #include "debug-printing.h"
-#include "gen/gen_config.h"
 
 #include <support/logging/CHIPLogging.h>
 

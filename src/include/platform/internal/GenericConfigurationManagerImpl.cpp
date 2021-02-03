@@ -99,7 +99,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_ConfigureChipStack()
 
 #if CHIP_PROGRESS_LOGGING
 
-    Impl()->LogDeviceConfig();
+    Impl()->_LogDeviceConfig();
 
 #if CHIP_DEVICE_CONFIG_LOG_PROVISIONING_HASH
     {
@@ -196,8 +196,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetSerialNumber(char * b
         VerifyOrExit(sizeof(CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER) <= bufSize, err = CHIP_ERROR_BUFFER_TOO_SMALL);
         memcpy(buf, CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER, sizeof(CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER));
         serialNumLen = sizeof(CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER) - 1;
-        ChipLogProgress(DeviceLayer, "Serial Number not found; using default: %s", CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER);
-        err = CHIP_NO_ERROR;
+        err          = CHIP_NO_ERROR;
     }
 #endif // CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER
     SuccessOrExit(err);
@@ -327,7 +326,6 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetManufacturerDeviceCer
         certLen = TestDeviceCertLength;
         VerifyOrExit(buf != NULL, err = CHIP_NO_ERROR);
         VerifyOrExit(TestDeviceCertLength <= bufSize, err = CHIP_ERROR_BUFFER_TOO_SMALL);
-        ChipLogProgress(DeviceLayer, "Device certificate not found; using default");
         memcpy(buf, TestDeviceCert, TestDeviceCertLength);
         err = CHIP_NO_ERROR;
     }
@@ -361,7 +359,6 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetManufacturerDeviceInt
         certsLen = TestDeviceIntermediateCACertLength;
         VerifyOrExit(buf != NULL, err = CHIP_NO_ERROR);
         VerifyOrExit(TestDeviceIntermediateCACertLength <= bufSize, err = CHIP_ERROR_BUFFER_TOO_SMALL);
-        ChipLogProgress(DeviceLayer, "Device certificate not found; using default");
         memcpy(buf, TestDeviceIntermediateCACert, TestDeviceIntermediateCACertLength);
         err = CHIP_NO_ERROR;
     }
@@ -396,7 +393,6 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetManufacturerDevicePri
         keyLen = TestDevicePrivateKeyLength;
         VerifyOrExit(buf != NULL, err = CHIP_NO_ERROR);
         VerifyOrExit(TestDevicePrivateKeyLength <= bufSize, err = CHIP_ERROR_BUFFER_TOO_SMALL);
-        ChipLogProgress(DeviceLayer, "Device private key not found; using default");
         memcpy(buf, TestDevicePrivateKey, TestDevicePrivateKeyLength);
         err = CHIP_NO_ERROR;
     }
@@ -561,8 +557,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetSetupPinCode(uint32_t
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
         setupPinCode = CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE;
-        ChipLogProgress(DeviceLayer, "Setup PIN code not found; using default: %09u", CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE);
-        err = CHIP_NO_ERROR;
+        err          = CHIP_NO_ERROR;
     }
 #endif // defined(CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE) && CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE
     SuccessOrExit(err);
@@ -588,8 +583,6 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetSetupDiscriminator(ui
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
         val = CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR;
-        ChipLogProgress(DeviceLayer, "Setup PIN discriminator not found; using default: %03x",
-                        CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR);
         err = CHIP_NO_ERROR;
     }
 #endif // defined(CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR) && CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR
@@ -1043,10 +1036,8 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_RunUnitTests()
 }
 #endif
 
-#if CHIP_PROGRESS_LOGGING
-
 template <class ImplClass>
-void GenericConfigurationManagerImpl<ImplClass>::LogDeviceConfig()
+void GenericConfigurationManagerImpl<ImplClass>::_LogDeviceConfig()
 {
     CHIP_ERROR err;
 
@@ -1091,6 +1082,24 @@ void GenericConfigurationManagerImpl<ImplClass>::LogDeviceConfig()
     }
 
     {
+        uint32_t setupPINCode;
+        if (Impl()->_GetSetupPinCode(setupPINCode) != CHIP_NO_ERROR)
+        {
+            setupPINCode = 0;
+        }
+        ChipLogProgress(DeviceLayer, "  Setup Pin Code: %" PRIu32 "", setupPINCode);
+    }
+
+    {
+        uint16_t setupDiscriminator;
+        if (Impl()->_GetSetupDiscriminator(setupDiscriminator) != CHIP_NO_ERROR)
+        {
+            setupDiscriminator = 0;
+        }
+        ChipLogProgress(DeviceLayer, "  Setup Discriminator: %" PRIu16 " (0x%" PRIX16 ")", setupDiscriminator, setupDiscriminator);
+    }
+
+    {
         uint16_t year;
         uint8_t month, dayOfMonth;
         err = Impl()->_GetManufacturingDate(year, month, dayOfMonth);
@@ -1117,8 +1126,6 @@ void GenericConfigurationManagerImpl<ImplClass>::LogDeviceConfig()
     ChipLogProgress(DeviceLayer, "  Pairing Code: %s", (FabricState.PairingCode != NULL) ? FabricState.PairingCode : "(none)");
 #endif // CHIP_CONFIG_ENABLE_FABRIC_STATE
 }
-
-#endif // CHIP_PROGRESS_LOGGING
 
 // Fully instantiate the generic implementation class in whatever compilation unit includes this file.
 template class GenericConfigurationManagerImpl<ConfigurationManagerImpl>;

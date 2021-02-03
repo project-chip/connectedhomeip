@@ -28,12 +28,6 @@
 #include <bluetooth/bluetooth.h>
 
 namespace chip {
-namespace System {
-class PacketBuffer;
-} // namespace System
-} // namespace chip
-
-namespace chip {
 namespace DeviceLayer {
 
 namespace DeviceEventType {

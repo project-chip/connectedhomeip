@@ -26,9 +26,9 @@
 #include <protocols/Protocols.h>
 #include <support/BufBound.h>
 #include <transport/NetworkProvisioning.h>
+#include <transport/PASESession.h>
 #include <transport/RendezvousParameters.h>
 #include <transport/RendezvousSessionDelegate.h>
-#include <transport/SecurePairingSession.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/MessageHeader.h>
 #include <transport/raw/PeerAddress.h>
@@ -39,6 +39,7 @@ class CHIPDeviceEvent;
 }
 
 class SecureSessionMgr;
+class SecureSessionHandle;
 
 /**
  * RendezvousSession establishes and maintains the first connection between
@@ -62,7 +63,7 @@ class SecureSessionMgr;
  *
  * @dotfile dots/Rendezvous/RendezvousSessionInit.dot
  */
-class RendezvousSession : public SecurePairingSessionDelegate,
+class RendezvousSession : public SessionEstablishmentDelegate,
                           public RendezvousSessionDelegate,
                           public RendezvousDeviceCredentialsDelegate,
                           public NetworkProvisioningDelegate,
@@ -86,26 +87,27 @@ public:
      *
      * @param params       The RendezvousParameters
      * @param transportMgr The transport to use
+     * @param sessionMgr   Pointer to secure session manager
      * @ return CHIP_ERROR  The result of the initialization
      */
-    CHIP_ERROR Init(const RendezvousParameters & params, TransportMgrBase * transportMgr);
+    CHIP_ERROR Init(const RendezvousParameters & params, TransportMgrBase * transportMgr, SecureSessionMgr * sessionMgr);
 
     /**
      * @brief
      *  Return the associated pairing session.
      *
-     * @return SecurePairingSession The associated pairing session
+     * @return PASESession The associated pairing session
      */
-    SecurePairingSession & GetPairingSession() { return mPairingSession; }
+    PASESession & GetPairingSession() { return mPairingSession; }
 
     Optional<NodeId> GetLocalNodeId() const { return mParams.GetLocalNodeId(); }
     Optional<NodeId> GetRemoteNodeId() const { return mParams.GetRemoteNodeId(); }
 
-    //////////// SecurePairingSessionDelegate Implementation ///////////////
-    CHIP_ERROR SendPairingMessage(const PacketHeader & header, const Transport::PeerAddress & peerAddress,
-                                  System::PacketBufferHandle msgBuf) override;
-    void OnPairingError(CHIP_ERROR err) override;
-    void OnPairingComplete() override;
+    //////////// SessionEstablishmentDelegate Implementation ///////////////
+    CHIP_ERROR SendSessionEstablishmentMessage(const PacketHeader & header, const Transport::PeerAddress & peerAddress,
+                                               System::PacketBufferHandle msgBuf) override;
+    void OnSessionEstablishmentError(CHIP_ERROR err) override;
+    void OnSessionEstablished() override;
 
     //////////// RendezvousSessionDelegate Implementation ///////////////
     void OnRendezvousConnectionOpened() override;
@@ -149,17 +151,19 @@ private:
     RendezvousSessionDelegate * mDelegate = nullptr; ///< Underlying transport events
     RendezvousParameters mParams;                    ///< Rendezvous configuration
 
-    SecurePairingSession mPairingSession;
+    PASESession mPairingSession;
     NetworkProvisioning mNetworkProvision;
-    SecureSession mSecureSession;
     Transport::PeerAddress mPeerAddress; // Current peer address we are doing rendezvous with.
-    Optional<NodeId> mRendezvousRemoteNodeId;
     TransportMgrBase * mTransportMgr;
-    uint32_t mSecureMessageIndex = 0;
-    uint16_t mNextKeyId          = 0;
+    uint16_t mNextKeyId                         = 0;
+    SecureSessionMgr * mSecureSessionMgr        = nullptr;
+    SecureSessionHandle * mPairingSessionHandle = nullptr;
 
     RendezvousSession::State mCurrentState = State::kInit;
     void UpdateState(RendezvousSession::State newState, CHIP_ERROR err = CHIP_NO_ERROR);
+
+    void InitPairingSessionHandle();
+    void ReleasePairingSessionHandle();
 };
 
 } // namespace chip

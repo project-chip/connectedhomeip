@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -48,11 +48,7 @@
  * @{
  */
 
-#ifndef SILABS_AF_API
-#define SILABS_AF_API
-
-// Micro and compiler specific typedefs and macros
-//#include PLATFORM_HEADER
+#pragma once
 
 #ifndef CONFIGURATION_HEADER
 #define CONFIGURATION_HEADER "config.h"
@@ -68,38 +64,13 @@
 #include "stack/include/ember-random-api.h"
 #include "stack/include/ember-types.h"
 #include "stack/include/error.h"
-#else
-// Includes needed for ember related functions for the SoC
-//  #include "stack/include/ember.h"
 #endif // EZSP_HOST
-
-// HAL - hardware abstraction layer
-//#include "hal/hal.h"
-//#include "plugin/serial/serial.h"  // Serial utility APIs
-
-//#include "stack/include/event.h"
-//#include "stack/include/error.h"
 
 #include "af-types.h"
 
-//#include "app/framework/util/print.h"
-//#include "app/framework/util/time-util.h"
 #include "client-api.h"
 #include "debug-printing.h"
 #include "ember-print.h"
-
-#include "gen/af-structs.h"
-#include "gen/att-storage.h"
-#include "gen/attribute-id.h"
-#include "gen/attribute-type.h"
-#include "gen/call-command-handler.h"
-#include "gen/callback.h"
-#include "gen/cluster-id.h"
-#include "gen/command-id.h"
-#include "gen/enums.h"
-#include "gen/print-cluster.h"
-//#include "app/util/serial/command-interpreter2.h"
-//#include "app/framework/cli/zcl-cli.h"
 
 /** @name Attribute Storage */
 // @{
@@ -580,13 +551,13 @@ void emberAfCopyInt32u(uint8_t * data, uint16_t index, uint32_t x);
  * parameter should indicate the maximum number of characters to copy to the
  * destination buffer not including the length byte.
  */
-void emberAfCopyString(uint8_t * dest, uint8_t * src, uint8_t size);
+void emberAfCopyString(uint8_t * dest, const uint8_t * src, uint8_t size);
 /*
  * @brief Function that copies a ZCL long string into a buffer.  The size
  * parameter should indicate the maximum number of characters to copy to the
  * destination buffer not including the length bytes.
  */
-void emberAfCopyLongString(uint8_t * dest, uint8_t * src, uint16_t size);
+void emberAfCopyLongString(uint8_t * dest, const uint8_t * src, uint16_t size);
 /*
  * @brief Function that determines the length of a zigbee Cluster Library string
  *   (where the first byte is assumed to be the length).
@@ -1699,18 +1670,18 @@ EmberStatus emberAfInitiatePartnerLinkKeyExchange(EmberNodeId target, chip::Endp
 // @{
 // Frame control fields (8 bits total)
 // Bits 0 and 1 are Frame Type Sub-field
-#define ZCL_FRAME_CONTROL_FRAME_TYPE_MASK (BIT(0) | BIT(1))
-#define ZCL_CLUSTER_SPECIFIC_COMMAND BIT(0)
+#define ZCL_FRAME_CONTROL_FRAME_TYPE_MASK (EMBER_BIT(0) | EMBER_BIT(1))
+#define ZCL_CLUSTER_SPECIFIC_COMMAND EMBER_BIT(0)
 #define ZCL_PROFILE_WIDE_COMMAND 0
 #define ZCL_GLOBAL_COMMAND (ZCL_PROFILE_WIDE_COMMAND)
 // Bit 2 is Manufacturer Specific Sub-field
-#define ZCL_MANUFACTURER_SPECIFIC_MASK BIT(2)
+#define ZCL_MANUFACTURER_SPECIFIC_MASK EMBER_BIT(2)
 // Bit 3 is Direction Sub-field
-#define ZCL_FRAME_CONTROL_DIRECTION_MASK BIT(3)
-#define ZCL_FRAME_CONTROL_SERVER_TO_CLIENT BIT(3)
+#define ZCL_FRAME_CONTROL_DIRECTION_MASK EMBER_BIT(3)
+#define ZCL_FRAME_CONTROL_SERVER_TO_CLIENT EMBER_BIT(3)
 #define ZCL_FRAME_CONTROL_CLIENT_TO_SERVER 0
 // Bit 4 is Disable Default Response Sub-field
-#define ZCL_DISABLE_DEFAULT_RESPONSE_MASK BIT(4)
+#define ZCL_DISABLE_DEFAULT_RESPONSE_MASK EMBER_BIT(4)
 // Bits 5 to 7 are reserved
 
 #define ZCL_DIRECTION_CLIENT_TO_SERVER 0
@@ -1724,8 +1695,8 @@ EmberStatus emberAfInitiatePartnerLinkKeyExchange(EmberNodeId target, chip::Endp
 #define EMBER_AF_ZCL_MANUFACTURER_SPECIFIC_OVERHEAD 5
 
 // Permitted values for emberAfSetFormAndJoinMode
-#define FIND_AND_JOIN_MODE_ALLOW_2_4_GHZ BIT(0)
-#define FIND_AND_JOIN_MODE_ALLOW_SUB_GHZ BIT(1)
+#define FIND_AND_JOIN_MODE_ALLOW_2_4_GHZ EMBER_BIT(0)
+#define FIND_AND_JOIN_MODE_ALLOW_SUB_GHZ EMBER_BIT(1)
 #define FIND_AND_JOIN_MODE_ALLOW_BOTH (FIND_AND_JOIN_MODE_ALLOW_2_4_GHZ | FIND_AND_JOIN_MODE_ALLOW_SUB_GHZ)
 
 /** @} END ZCL macros */
@@ -1847,5 +1818,3 @@ int emberAfMain(MAIN_FUNCTION_PARAMETERS);
  * generated code.
  */
 EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd);
-
-#endif // SILABS_AF_API

@@ -78,7 +78,6 @@ public:
     using ChipDevice             = ::chip::Controller::Device;
     using PeerAddress            = ::chip::Transport::PeerAddress;
     using IPAddress              = ::chip::Inet::IPAddress;
-    using PacketBuffer           = ::chip::System::PacketBuffer;
     using PacketBufferHandle     = ::chip::System::PacketBufferHandle;
     using NodeId                 = ::chip::NodeId;
 

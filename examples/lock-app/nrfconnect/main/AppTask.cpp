@@ -30,6 +30,8 @@
 #endif
 
 #include "attribute-storage.h"
+#include "gen/attribute-id.h"
+#include "gen/attribute-type.h"
 #include "gen/cluster-id.h"
 
 #include <platform/CHIPDeviceLayer.h>
@@ -39,6 +41,8 @@
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 #include <zephyr.h>
+
+#include <algorithm>
 
 #define FACTORY_RESET_TRIGGER_TIMEOUT 3000
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
@@ -102,6 +106,7 @@ int AppTask::Init()
 
     // Init ZCL Data Model and start server
     InitServer();
+    ConfigurationMgr().LogDeviceConfig();
     PrintQRCode(chip::RendezvousInformationFlags::kBLE);
 
 #ifdef CONFIG_CHIP_NFC_COMMISSIONING
@@ -436,11 +441,13 @@ void AppTask::StartTimer(uint32_t aTimeoutInMs)
 int AppTask::StartNFCTag()
 {
     // Get QR Code and emulate its content using NFC tag
-    uint32_t setupPinCode;
     std::string QRCode;
 
-    int result = GetQRCode(setupPinCode, QRCode, chip::RendezvousInformationFlags::kBLE);
+    int result = GetQRCode(QRCode, chip::RendezvousInformationFlags::kBLE);
     VerifyOrExit(!result, ChipLogError(AppServer, "Getting QR code payload failed"));
+
+    // TODO: Issue #4504 - Remove replacing spaces with _ after problem described in #415 will be fixed.
+    std::replace(QRCode.begin(), QRCode.end(), ' ', '_');
 
     result = sNFC.StartTagEmulation(QRCode.c_str(), QRCode.size());
     VerifyOrExit(result >= 0, ChipLogError(AppServer, "Starting NFC Tag emulation failed"));

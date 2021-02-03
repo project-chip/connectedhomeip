@@ -28,7 +28,6 @@
 #define _CHIP_INTERACTION_MODEL_COMMAND_HANDLER_H
 
 #include <app/Command.h>
-#include <app/MessageDef.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPTLVDebug.hpp>
 #include <map>
@@ -48,7 +47,7 @@ class DLL_EXPORT CommandHandler : public Command
 {
 public:
     CHIP_ERROR SendCommandResponse();
-    void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, uint32_t protocolId, uint8_t msgType,
+    void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                            System::PacketBufferHandle payload);
 
 private:

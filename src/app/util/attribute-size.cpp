@@ -39,9 +39,9 @@
  *******************************************************************************
  ******************************************************************************/
 
-//#include PLATFORM_HEADER
-
 #include "af.h"
+
+#include "gen/attribute-type.h"
 
 static const uint8_t attributeSizes[] = {
 #include "gen/attribute-size.h"

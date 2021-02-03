@@ -261,6 +261,7 @@ public:
         if (i == 0)
         {
             ConnectivityMgr().ClearWiFiStationProvision();
+            OpenDefaultPairingWindow();
         }
     }
 
@@ -406,7 +407,20 @@ std::string createSetupPayload()
 
         if (generator.payloadDecimalStringRepresentation(outCode) == CHIP_NO_ERROR)
         {
-            ESP_LOGI(TAG, "Manual(decimal) setup code: %s", outCode.c_str());
+            ESP_LOGI(TAG, "Short Manual(decimal) setup code: %s", outCode.c_str());
+        }
+        else
+        {
+            ESP_LOGE(TAG, "Failed to get decimal setup code");
+        }
+
+        payload.requiresCustomFlow = 1;
+        generator                  = ManualSetupPayloadGenerator(payload);
+
+        if (generator.payloadDecimalStringRepresentation(outCode) == CHIP_NO_ERROR)
+        {
+            // intentional extra space here to align the log with the short code
+            ESP_LOGI(TAG, "Long Manual(decimal) setup code:  %s", outCode.c_str());
         }
         else
         {

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2019 Google LLC
  *    All rights reserved.
  *
@@ -169,7 +169,7 @@ static PacketBufferHandle MakeDataBuffer(uint16_t aDesiredLength, uint16_t aPatt
 
     VerifyOrExit(aPatternStartOffset <= aDesiredLength, );
 
-    lBuffer = PacketBuffer::New();
+    lBuffer = PacketBufferHandle::New(aDesiredLength);
     VerifyOrExit(!lBuffer.IsNull(), );
 
     aDesiredLength = min(lBuffer->MaxDataLength(), aDesiredLength);

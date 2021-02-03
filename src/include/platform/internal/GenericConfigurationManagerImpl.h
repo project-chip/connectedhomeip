@@ -122,6 +122,7 @@ public:
     bool _OperationalDeviceCredentialsProvisioned();
     void _UseManufacturerCredentialsAsOperational(bool val);
 #endif
+    void _LogDeviceConfig();
 
 protected:
     enum
@@ -137,7 +138,6 @@ protected:
 #if CHIP_ENABLE_ROTATING_DEVICE_ID
     chip::LifetimePersistedCounter mLifetimePersistedCounter;
 #endif
-    void LogDeviceConfig();
     CHIP_ERROR PersistProvisioningData(ProvisioningDataSet & provData);
 
 private:

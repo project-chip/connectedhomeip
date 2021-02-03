@@ -31,18 +31,17 @@
 #include <string>
 #include <vector>
 
-using namespace chip;
-using namespace std;
+namespace chip {
 
-static CHIP_ERROR checkDecimalStringValidity(string decimalString, string & decimalStringWithoutCheckDigit)
+static CHIP_ERROR checkDecimalStringValidity(std::string decimalString, std::string & decimalStringWithoutCheckDigit)
 {
     if (decimalString.length() < 2)
     {
         ChipLogError(SetupPayload, "Failed decoding base10. Input was empty. %zu", decimalString.length());
         return CHIP_ERROR_INVALID_STRING_LENGTH;
     }
-    string repWithoutCheckChar = decimalString.substr(0, decimalString.length() - 1);
-    char checkChar             = decimalString.back();
+    std::string repWithoutCheckChar = decimalString.substr(0, decimalString.length() - 1);
+    char checkChar                  = decimalString.back();
 
     if (!Verhoeff10::ValidateCheckChar(checkChar, repWithoutCheckChar.c_str()))
     {
@@ -52,7 +51,7 @@ static CHIP_ERROR checkDecimalStringValidity(string decimalString, string & deci
     return CHIP_NO_ERROR;
 }
 
-static CHIP_ERROR checkCodeLengthValidity(const string & decimalString, bool isLongCode)
+static CHIP_ERROR checkCodeLengthValidity(const std::string & decimalString, bool isLongCode)
 {
     size_t expectedCharLength = isLongCode ? kManualSetupLongCodeCharLength : kManualSetupShortCodeCharLength;
     if (decimalString.length() != expectedCharLength)
@@ -76,7 +75,7 @@ static CHIP_ERROR extractBits(uint32_t number, uint64_t & dest, size_t index, si
     return CHIP_NO_ERROR;
 }
 
-static CHIP_ERROR toNumber(const string & decimalString, uint64_t & dest)
+static CHIP_ERROR toNumber(const std::string & decimalString, uint64_t & dest)
 {
     uint64_t number = 0;
     for (char c : decimalString)
@@ -94,7 +93,7 @@ static CHIP_ERROR toNumber(const string & decimalString, uint64_t & dest)
 }
 
 // Populate numberOfChars into dest from decimalString starting at startIndex (least significant digit = left-most digit)
-static CHIP_ERROR readDigitsFromDecimalString(const string & decimalString, size_t & index, uint64_t & dest,
+static CHIP_ERROR readDigitsFromDecimalString(const std::string & decimalString, size_t & index, uint64_t & dest,
                                               size_t numberOfCharsToRead)
 {
     if (decimalString.length() < numberOfCharsToRead || (numberOfCharsToRead + index > decimalString.length()))
@@ -103,7 +102,7 @@ static CHIP_ERROR readDigitsFromDecimalString(const string & decimalString, size
         return CHIP_ERROR_INVALID_STRING_LENGTH;
     }
 
-    string decimalSubstring = decimalString.substr(index, numberOfCharsToRead);
+    std::string decimalSubstring = decimalString.substr(index, numberOfCharsToRead);
     index += numberOfCharsToRead;
     return toNumber(decimalSubstring, dest);
 }
@@ -127,7 +126,7 @@ CHIP_ERROR ManualSetupPayloadParser::populatePayload(SetupPayload & outPayload)
 {
     CHIP_ERROR result = CHIP_NO_ERROR;
     SetupPayload payload;
-    string representationWithoutCheckDigit;
+    std::string representationWithoutCheckDigit;
 
     result = checkDecimalStringValidity(mDecimalStringRepresentation, representationWithoutCheckDigit);
     if (result != CHIP_NO_ERROR)
@@ -218,3 +217,5 @@ CHIP_ERROR ManualSetupPayloadParser::populatePayload(SetupPayload & outPayload)
 
     return result;
 }
+
+} // namespace chip

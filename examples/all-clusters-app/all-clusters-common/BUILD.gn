@@ -62,6 +62,8 @@ source_set("all-clusters-common") {
     "gen/callback-stub.cpp",
   ]
 
+  cflags = [ "-Wconversion" ]
+
   deps = [ "${chip_root}/src/lib" ]
 
   public_configs = [ ":includes" ]

@@ -41,7 +41,6 @@
 
 #include "af.h"
 #include "attribute-storage.h"
-#include "gen/callback.h"
 
 #include <platform/CHIPDeviceLayer.h>
 #include <system/SystemTimer.h>
@@ -51,6 +50,7 @@
 #define EMBER_MAX_EVENT_CONTROL_DELAY_MINUTES (EMBER_MAX_EVENT_CONTROL_DELAY_MS >> 16)
 
 #include "gen/af-gen-event.h"
+#include "gen/callback.h"
 
 using namespace chip;
 
@@ -196,7 +196,7 @@ EmberStatus emberAfEventControlSetDelayMinutes(EmberEventControl * control, uint
 {
     if (delayM <= EMBER_MAX_EVENT_CONTROL_DELAY_MINUTES)
     {
-        return emberEventControlSetDelayMS(control, delayM << 16);
+        return emberEventControlSetDelayMS(control, static_cast<uint32_t>(delayM) << 16);
     }
     else
     {
@@ -308,11 +308,11 @@ uint32_t emAfGetMSFromTimerDurationAndUnit(uint16_t duration, EmberEventUnits un
     }
     else if (units == EMBER_EVENT_QS_TIME)
     {
-        ms = QS_TO_MS(duration);
+        ms = QS_TO_MS(static_cast<uint32_t>(duration));
     }
     else if (units == EMBER_EVENT_MINUTE_TIME)
     {
-        ms = MIN_TO_MS(duration);
+        ms = MIN_TO_MS(static_cast<uint32_t>(duration));
     }
     else if (units == EMBER_EVENT_ZERO_DELAY)
     {

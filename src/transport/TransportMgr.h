@@ -29,6 +29,7 @@
 
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
+#include <transport/TransportMgrBase.h>
 #include <transport/raw/Base.h>
 #include <transport/raw/MessageHeader.h>
 #include <transport/raw/PeerAddress.h>
@@ -54,32 +55,6 @@ public:
                                    System::PacketBufferHandle msgBuf) = 0;
 };
 
-class TransportMgrBase
-{
-public:
-    CHIP_ERROR Init(Transport::Base * transport);
-
-    CHIP_ERROR SendMessage(const PacketHeader & header, const Transport::PeerAddress & address,
-                           System::PacketBufferHandle && msgBuf)
-    {
-        return mTransport->SendMessage(header, address, std::move(msgBuf));
-    }
-
-    void Disconnect(const Transport::PeerAddress & address) { mTransport->Disconnect(address); }
-
-    void SetSecureSessionMgr(TransportMgrDelegate * secureSessionMgr) { mSecureSessionMgr = secureSessionMgr; }
-
-    void SetRendezvousSession(TransportMgrDelegate * rendezvousSessionMgr) { mRendezvous = rendezvousSessionMgr; }
-
-private:
-    static void HandleMessageReceived(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
-                                      System::PacketBufferHandle msg, TransportMgrBase * dispatcher);
-
-    TransportMgrDelegate * mSecureSessionMgr = nullptr;
-    TransportMgrDelegate * mRendezvous       = nullptr;
-    Transport::Base * mTransport             = nullptr;
-};
-
 template <typename... TransportTypes>
 class TransportMgr : public TransportMgrBase
 {
@@ -89,7 +64,7 @@ public:
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
 
-        err = mTransport.Init(std::forward<Args>(transportInitArgs)...);
+        err = mTransport.Init(this, std::forward<Args>(transportInitArgs)...);
         SuccessOrExit(err);
         err = TransportMgrBase::Init(&mTransport);
     exit:
@@ -99,7 +74,7 @@ public:
     template <typename... Args>
     CHIP_ERROR ResetTransport(Args &&... transportInitArgs)
     {
-        return mTransport.Init(std::forward<Args>(transportInitArgs)...);
+        return mTransport.Init(this, std::forward<Args>(transportInitArgs)...);
     }
 
 private:

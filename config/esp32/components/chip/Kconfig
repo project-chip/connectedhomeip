@@ -78,6 +78,12 @@ menu "CHIP Core"
 
                 This value can be overridden by the application at runtime.
 
+        config ENABLE_PW_RPC
+            bool "Enable Pigweed RPC library"
+            default n
+            help
+                Link the application with the library containing Pigweed RPC functionalities
+
         # TODO: add log level selection
 
     endmenu # "General Options"

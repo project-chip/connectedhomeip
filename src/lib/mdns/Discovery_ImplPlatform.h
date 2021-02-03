@@ -47,8 +47,8 @@ public:
     /// Advertises the CHIP node as an operational node
     CHIP_ERROR Advertise(const OperationalAdvertisingParameters & params) override;
 
-    /// Advertises the CHIP node as a commisioning node
-    CHIP_ERROR Advertise(const CommisioningAdvertisingParameters & params) override;
+    /// Advertises the CHIP node as a commisioning/commissionable node
+    CHIP_ERROR Advertise(const CommissionAdvertisingParameters & params) override;
 
     /**
      * This function stops publishing the device on mDNS.
@@ -87,7 +87,7 @@ private:
     OperationalAdvertisingParameters mOperationalAdvertisingParams;
     bool mIsOperationalPublishing = false;
     uint64_t mCommissionInstanceName;
-    CommisioningAdvertisingParameters mCommissioningdvertisingParams;
+    CommissionAdvertisingParameters mCommissioningdvertisingParams;
     bool mIsCommissionalPublishing = false;
 
     bool mMdnsInitialized              = false;

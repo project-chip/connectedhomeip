@@ -1,5 +1,5 @@
 {{#if (zcl_command_arguments_count this.id)}}
-uint32_t payloadOffset = cmd->payloadStartIndex;
+uint16_t payloadOffset = cmd->payloadStartIndex;
 {{#zcl_command_arguments}}
 {{asUnderlyingZclType type}} {{asSymbol label}};
 {{/zcl_command_arguments}}
@@ -16,12 +16,16 @@ if ({{presentIf}})
   {
     return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
   }
+  {{#if (isSigned type)}}
+  {{asSymbol label}} = static_cast<{{asUnderlyingZclType type}}>(emberAfGet{{asReadType type}}(cmd->buffer, payloadOffset, cmd->bufLen));
+  {{else}}
   {{asSymbol label}} = emberAfGet{{asReadType type}}(cmd->buffer, payloadOffset, cmd->bufLen);
+  {{/if}}
   {{#unless (isLastElement index count)}}
   {{#if (isString type)}}
-  payloadOffset += emberAf{{asReadType type}}Length({{asSymbol label}}) + {{asReadTypeLength type}};
+  payloadOffset = static_cast<uint16_t>(payloadOffset + emberAf{{asReadType type}}Length({{asSymbol label}}) + {{asReadTypeLength type}});
   {{else}}
-  payloadOffset += {{asReadTypeLength type}};
+  payloadOffset = static_cast<uint16_t>(payloadOffset + {{asReadTypeLength type}});
   {{/if}}
   {{/unless}}
   {{/if}}

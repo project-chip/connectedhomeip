@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2018 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -270,7 +270,8 @@ void NetworkProvisioningServerImpl::HandleScanDone()
         qsort(scanResults, scanResultCount, sizeof(*scanResults), ESP32Utils::OrderScanResultsByRSSI);
 
         // Allocate a packet buffer to hold the encoded scan results.
-        PacketBufferHandle respBuf = PacketBuffer::New(CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE + 1);
+        PacketBufferHandle respBuf =
+            System::PacketBufferHandle::New(kMaxPacketBufferSize - 1, CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE + 1);
         VerifyOrExit(!respBuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
         // Encode the list of scan results into the response buffer.  If the encoded size of all

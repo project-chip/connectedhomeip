@@ -60,28 +60,24 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
 #define COMMAND_HEADER(name, clusterId)                                                                                            \
     const char * kName = name;                                                                                                     \
                                                                                                                                    \
-    PacketBufferHandle payload = PacketBuffer::NewWithAvailableSize(kMaxBufferSize);                                               \
-    if (payload.IsNull())                                                                                                          \
+    PacketBufBound buf(kMaxBufferSize);                                                                                            \
+    if (buf.IsNull())                                                                                                              \
     {                                                                                                                              \
-        ChipLogError(Zcl, "Could not allocate PacketBuffer while trying to encode %s command", kName);                             \
-        return payload;                                                                                                            \
+        ChipLogError(Zcl, "Could not allocate packet buffer while trying to encode %s command", kName);                            \
+        return PacketBufferHandle();                                                                                               \
     }                                                                                                                              \
                                                                                                                                    \
-    BufBound buf = BufBound(payload->Start(), kMaxBufferSize);                                                                     \
     if (doEncodeApsFrame(buf, clusterId, kSourceEndpoint, destinationEndpoint, 0, 0, 0, 0, false))                                 \
     {
 
 #define COMMAND_FOOTER()                                                                                                           \
     }                                                                                                                              \
-    uint16_t result = buf.Fit() && CanCastTo<uint16_t>(buf.Needed()) ? static_cast<uint16_t>(buf.Needed()) : 0;                    \
-    if (result == 0)                                                                                                               \
+    if (!buf.Fit())                                                                                                                \
     {                                                                                                                              \
         ChipLogError(Zcl, "Command %s can't fit in the allocated buffer", kName);                                                  \
-        return PacketBufferHandle();                                                                                               \
     }                                                                                                                              \
-                                                                                                                                   \
-    payload->SetDataLength(result);                                                                                                \
-    return payload;
+    return buf.Finalize();
+
 
 {{> clusters_header}}
 

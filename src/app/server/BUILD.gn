@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("${chip_root}/src/app/common_flags.gni")
 
 static_library("server") {
   output_name = "libCHIPAppServer"
@@ -27,9 +28,17 @@ static_library("server") {
   ]
 
   public_deps = [
+    "${chip_root}/src/app",
     "${chip_root}/src/lib/mdns",
+    "${chip_root}/src/messaging",
     "${chip_root}/src/platform",
     "${chip_root}/src/setup_payload",
     "${chip_root}/src/transport",
   ]
+
+  defines = []
+
+  if (chip_app_use_interaction_model) {
+    defines += [ "CHIP_APP_USE_INTERACTION_MODEL" ]
+  }
 }

@@ -30,6 +30,24 @@ namespace chip {
 // The largest supported value for Rendezvous discriminators
 const uint16_t kMaxRendezvousDiscriminatorValue = 0xFFF;
 
+class DLL_EXPORT RendezvousAdvertisementDelegate
+{
+public:
+    /**
+     * @brief
+     *   Starts advertisement of the device for rendezvous availability.
+     */
+    virtual CHIP_ERROR StartAdvertisement() const { return CHIP_ERROR_NOT_IMPLEMENTED; }
+
+    /**
+     * @brief
+     *   Stops advertisement of the device for rendezvous availability.
+     */
+    virtual CHIP_ERROR StopAdvertisement() const { return CHIP_ERROR_NOT_IMPLEMENTED; }
+
+    virtual ~RendezvousAdvertisementDelegate() {}
+};
+
 class RendezvousParameters
 {
 public:
@@ -77,6 +95,14 @@ public:
         return *this;
     }
 
+    const RendezvousAdvertisementDelegate * GetAdvertisementDelegate() const { return mAdvDelegate; }
+
+    RendezvousParameters & SetAdvertisementDelegate(RendezvousAdvertisementDelegate * delegate)
+    {
+        mAdvDelegate = delegate;
+        return *this;
+    }
+
 #if CONFIG_NETWORK_LAYER_BLE
     bool HasBleLayer() const { return mBleLayer != nullptr; }
     Ble::BleLayer * GetBleLayer() const { return mBleLayer; }
@@ -103,6 +129,9 @@ private:
     Optional<NodeId> mRemoteNodeId;       ///< the remote node id
     uint32_t mSetupPINCode  = 0;          ///< the target peripheral setup PIN Code
     uint16_t mDiscriminator = UINT16_MAX; ///< the target peripheral discriminator
+
+    RendezvousAdvertisementDelegate mDefaultAdvDelegate;
+    RendezvousAdvertisementDelegate * mAdvDelegate = &mDefaultAdvDelegate;
 
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * mBleLayer               = nullptr;

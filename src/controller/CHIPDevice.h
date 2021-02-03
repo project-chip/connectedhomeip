@@ -26,12 +26,14 @@
 
 #pragma once
 
+#include <app/CommandSender.h>
+#include <app/InteractionModelEngine.h>
 #include <app/util/basic-types.h>
 #include <core/CHIPCallback.h>
 #include <core/CHIPCore.h>
 #include <support/Base64.h>
 #include <support/DLLUtil.h>
-#include <transport/SecurePairingSession.h>
+#include <transport/PASESession.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/MessageHeader.h>
@@ -55,7 +57,14 @@ class DLL_EXPORT Device
 {
 public:
     Device() : mInterface(INET_NULL_INTERFACEID), mActive(false), mState(ConnectionState::NotConnected) {}
-    ~Device() {}
+    ~Device()
+    {
+        if (mCommandSender != nullptr)
+        {
+            mCommandSender->Shutdown();
+            mCommandSender = nullptr;
+        }
+    }
 
     /**
      * @brief
@@ -77,6 +86,29 @@ public:
      * @return CHIP_ERROR   CHIP_NO_ERROR on success, or corresponding error
      */
     CHIP_ERROR SendMessage(System::PacketBufferHandle message);
+
+    /**
+     * @brief
+     *   Send the command in internal command sender.
+     */
+    CHIP_ERROR SendCommands();
+
+    /**
+     * @brief
+     *   Initialize internal command sender, required for sending commands over interaction model.
+     */
+    void InitCommandSender()
+    {
+        if (mCommandSender != nullptr)
+        {
+            mCommandSender->Shutdown();
+            mCommandSender = nullptr;
+        }
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+        chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&mCommandSender);
+#endif
+    }
+    app::CommandSender * GetCommandSender() { return mCommandSender; }
 
     /**
      * @brief
@@ -217,7 +249,7 @@ public:
 
     void SetAddress(const Inet::IPAddress & deviceAddr) { mDeviceAddr = deviceAddr; }
 
-    SecurePairingSessionSerializable & GetPairing() { return mPairing; }
+    PASESessionSerializable & GetPairing() { return mPairing; }
 
     void AddResponseHandler(EndpointId endpoint, ClusterId cluster, Callback::Callback<> * onResponse);
     void AddReportHandler(EndpointId endpoint, ClusterId cluster, Callback::Callback<> * onReport);
@@ -258,13 +290,15 @@ private:
     bool mActive;
     ConnectionState mState;
 
-    SecurePairingSessionSerializable mPairing;
+    PASESessionSerializable mPairing;
 
     DeviceStatusDelegate * mStatusDelegate;
 
     SecureSessionMgr * mSessionManager;
 
     DeviceTransportMgr * mTransportMgr;
+
+    app::CommandSender * mCommandSender;
 
     SecureSessionHandle mSecureSession = {};
 
@@ -324,7 +358,7 @@ constexpr uint16_t kMaxInterfaceName = 32;
 
 typedef struct SerializableDevice
 {
-    SecurePairingSessionSerializable mOpsCreds;
+    PASESessionSerializable mOpsCreds;
     uint64_t mDeviceId; /* This field is serialized in LittleEndian byte order */
     uint8_t mDeviceAddr[INET6_ADDRSTRLEN];
     uint16_t mDevicePort; /* This field is serealized in LittelEndian byte order */
