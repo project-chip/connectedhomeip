@@ -23,4 +23,12 @@ chip_system_project_config_include = ""
 chip_ble_project_config_include = ""
 
 custom_toolchain = "//toolchain:mbed"
-mbedtls_target = "//:dummy"
+mbedtls_target = "//:mbedtls"
+
+
+treat_warnings_as_errors = false
+chip_system_config_locking="none"
+chip_with_lwip=true
+chip_system_config_use_lwip=true
+chip_system_config_use_sockets=false
+chip_device_platform = "mbed"

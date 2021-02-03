@@ -20,7 +20,7 @@ check_system_includes = true
 
 default_args = {
   target_cpu = "arm"
-  target_os = "mbed-os"
+  target_os = "mbed"
 
   import("//args.gni")
 }
