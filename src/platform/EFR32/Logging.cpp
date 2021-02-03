@@ -176,7 +176,7 @@ void LogV(uint8_t module, uint8_t category, const char * aFormat, va_list v)
 
         // Form the log prefix, e.g. "[DL] "
         formattedMsg[formattedMsgLen++] = '[';
-        GetModuleName(formattedMsg + formattedMsgLen, module);
+        GetModuleName(formattedMsg + formattedMsgLen, ChipLoggingModuleNameLen + 1, module);
         formattedMsgLen                 = strlen(formattedMsg);
         formattedMsg[formattedMsgLen++] = ']';
         formattedMsg[formattedMsgLen++] = ' ';

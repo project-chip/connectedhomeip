@@ -322,7 +322,7 @@ static void LogMessageToPython(uint8_t module, uint8_t category, const char * ms
 
         // Get the module name
         char moduleName[nlChipLoggingModuleNameLen + 1];
-        ::chip:: ::Logging::GetModuleName(moduleName, module);
+        ::chip:: ::Logging::GetModuleName(moduleName, nlChipLoggingModuleNameLen + 1, module);
 
         // Format the log message into a dynamic memory buffer, growing the
         // buffer as needed to fit the message.

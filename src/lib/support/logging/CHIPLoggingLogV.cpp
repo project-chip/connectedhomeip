@@ -98,7 +98,7 @@ DLL_EXPORT __CHIP_LOGGING_LINK_ATTRIBUTE void LogV(uint8_t module, uint8_t categ
 #if CHIP_LOGGING_STYLE_ANDROID
 
         char moduleName[ChipLoggingModuleNameLen + 1];
-        GetModuleName(moduleName, module);
+        GetModuleName(moduleName, ChipLoggingModuleNameLen + 1, module);
 
         int priority = (category == kLogCategory_Error) ? ANDROID_LOG_ERROR : ANDROID_LOG_DEBUG;
 
@@ -113,7 +113,7 @@ DLL_EXPORT __CHIP_LOGGING_LINK_ATTRIBUTE void LogV(uint8_t module, uint8_t categ
 #elif CHIP_LOGGING_STYLE_DARWIN
 
         char moduleName[ChipLoggingModuleNameLen + 1];
-        GetModuleName(moduleName, module);
+        GetModuleName(moduleName, ChipLoggingModuleNameLen + 1, module);
 
         char formattedMsg[512];
         int32_t prefixLen = snprintf(formattedMsg, sizeof(formattedMsg), "CHIP: [%s] ", moduleName);

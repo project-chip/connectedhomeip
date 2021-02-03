@@ -98,10 +98,11 @@ static const char ModuleNames[] = "-\0\0" // None
 #define chipPrefixSeparator ": "
 #define chipMessageTrailer "\n"
 
-void GetModuleName(char * buf, uint8_t module)
+void GetModuleName(char * buf, uint8_t bufSize, uint8_t module)
 {
     const char * moduleNamePtr = ModuleNames + ((module < ModuleNamesCount) ? module * ChipLoggingModuleNameLen : 0);
-    memcpy(buf, moduleNamePtr, ChipLoggingModuleNameLen);
+
+    snprintf(buf, bufSize, "%s", moduleNamePtr);
     buf[ChipLoggingModuleNameLen] = 0;
 }
 
@@ -109,14 +110,14 @@ void GetMessageWithPrefix(char * buf, uint8_t bufSize, uint8_t module, const cha
 {
     char moduleName[ChipLoggingModuleNameLen + 1];
 
-    GetModuleName(moduleName, module);
+    GetModuleName(moduleName, ChipLoggingModuleNameLen + 1, module);
     snprintf(buf, bufSize, chipPrefix "%s" chipPrefixSeparator "%s" chipMessageTrailer, moduleName, msg);
 }
 
 void PrintMessagePrefix(uint8_t module)
 {
     char moduleName[ChipLoggingModuleNameLen + 1];
-    GetModuleName(moduleName, module);
+    GetModuleName(moduleName, ChipLoggingModuleNameLen + 1, module);
 
 #if CHIP_LOGGING_STYLE_STDIO_WITH_TIMESTAMPS
     struct timeval tv;

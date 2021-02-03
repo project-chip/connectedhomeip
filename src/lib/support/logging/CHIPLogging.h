@@ -306,7 +306,7 @@ extern void SetLogFilter(uint8_t category);
     (ChipLoggingchipPrefixLen + ChipLoggingModuleNameLen + ChipLoggingMessageSeparatorLen + ChipLoggingMessageTrailerLen)
 
 extern void GetMessageWithPrefix(char * buf, uint8_t bufSize, uint8_t module, const char * msg);
-extern void GetModuleName(char * buf, uint8_t module);
+extern void GetModuleName(char * buf, uint8_t bufSize, uint8_t module);
 extern void PrintMessagePrefix(uint8_t module);
 
 #else
@@ -316,7 +316,7 @@ static inline void GetMessageWithPrefix(char * buf, uint8_t bufSize, uint8_t mod
     return;
 }
 
-static inline void GetModuleName(char * buf, uint8_t module)
+static inline void GetModuleName(char * buf, uint8_t bufSize, uint8_t module)
 {
     return;
 }

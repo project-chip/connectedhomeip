@@ -54,7 +54,7 @@ void LogV(uint8_t module, uint8_t category, const char * msg, va_list v)
 
         strcpy(tag, "chip[");
         tagLen = strlen(tag);
-        GetModuleName(tag + tagLen, module);
+        GetModuleName(tag + tagLen, ChipLoggingModuleNameLen + 1, module);
         tagLen        = strlen(tag);
         tag[tagLen++] = ']';
         tag[tagLen]   = 0;

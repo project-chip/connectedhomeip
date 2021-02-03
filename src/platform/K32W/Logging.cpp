@@ -94,7 +94,7 @@ void FillPrefix(char * buf, uint8_t bufLen, uint8_t chipCategory, uint8_t otLeve
     prefixLen = strlen(buf);
     VerifyOrDie(bufLen > (prefixLen + ChipLoggingModuleNameLen + 3));
     buf[prefixLen++] = '[';
-    GetModuleName(buf + prefixLen, module);
+    GetModuleName(buf + prefixLen, ChipLoggingModuleNameLen + 1, module);
     prefixLen        = strlen(buf);
     buf[prefixLen++] = ']';
     buf[prefixLen++] = ' ';

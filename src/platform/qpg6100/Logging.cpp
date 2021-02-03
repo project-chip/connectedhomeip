@@ -83,7 +83,7 @@ void LogV(uint8_t module, uint8_t category, const char * msg, va_list v)
         }
         formattedMsg[prefixLen++] = ']';
         formattedMsg[prefixLen++] = '[';
-        GetModuleName(&formattedMsg[prefixLen], module);
+        GetModuleName(&formattedMsg[prefixLen], ChipLoggingModuleNameLen + 1, module);
         prefixLen                 = strlen(formattedMsg);
         formattedMsg[prefixLen++] = ']';
         formattedMsg[prefixLen++] = ' ';
