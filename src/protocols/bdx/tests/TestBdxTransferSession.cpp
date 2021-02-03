@@ -683,7 +683,7 @@ static const nlTest sTests[] =
     NL_TEST_DEF("TestBadAcceptMessageFields", TestBadAcceptMessageFields),
     NL_TEST_DEF("TestTimeout", TestTimeout),
     NL_TEST_DEF("TestDuplicateBlockError", TestDuplicateBlockError),
-    NL_TEST_SENTINEL() 
+    NL_TEST_SENTINEL()
 };
 // clang-format on
 
