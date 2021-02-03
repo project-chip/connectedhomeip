@@ -1,0 +1,545 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2008,2020 Silicon Labs.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <deviceType>
+    <name>HC-datacollectionunit</name>
+    <domain>HC</domain>
+    <typeName>HC Data Collection Unit</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0108</profileId>
+    <deviceId editable="false">0x0000</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Generic Tunnel</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">11073 Protocol Tunnel</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Time</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>HC-genericmultifunctiondevice</name>
+    <domain>HC</domain>
+    <typeName>HC Generic Multifunction Healthcare Device</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0108</profileId>
+    <deviceId editable="false">0x0f00</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Generic Tunnel</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">11073 Protocol Tunnel</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Time</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>HC-pulseoximeter</name>
+    <domain>HC</domain>
+    <typeName>HC Pulse Oximeter</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0108</profileId>
+    <deviceId editable="false">0x1004</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Generic Tunnel</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">11073 Protocol Tunnel</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Time</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>HC-ecg</name>
+    <domain>HC</domain>
+    <typeName>HC ECG</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0108</profileId>
+    <deviceId editable="false">0x1006</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Generic Tunnel</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">11073 Protocol Tunnel</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Time</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>HC-bloodpressuremeter</name>
+    <domain>HC</domain>
+    <typeName>HC Blood Pressure Meter</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0108</profileId>
+    <deviceId editable="false">0x1007</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Generic Tunnel</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">11073 Protocol Tunnel</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Time</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>HC-thermometer</name>
+    <domain>HC</domain>
+    <typeName>HC Thermometer</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0108</profileId>
+    <deviceId editable="false">0x1008</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Generic Tunnel</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">11073 Protocol Tunnel</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Time</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>HC-weightscale</name>
+    <domain>HC</domain>
+    <typeName>HC Weight Scale</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0108</profileId>
+    <deviceId editable="false">0x100f</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Generic Tunnel</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">11073 Protocol Tunnel</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Time</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>HC-glucosemeter</name>
+    <domain>HC</domain>
+    <typeName>HC Glucose Meter</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0108</profileId>
+    <deviceId editable="false">0x1011</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Generic Tunnel</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">11073 Protocol Tunnel</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Time</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>HC-inr</name>
+    <domain>HC</domain>
+    <typeName>HC INR</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0108</profileId>
+    <deviceId editable="false">0x1012</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Generic Tunnel</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">11073 Protocol Tunnel</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Time</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>HC-insulinpump</name>
+    <domain>HC</domain>
+    <typeName>HC Insulin Pump</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0108</profileId>
+    <deviceId editable="false">0x1013</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Generic Tunnel</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">11073 Protocol Tunnel</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Time</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>HC-peakflowmeter</name>
+    <domain>HC</domain>
+    <typeName>HC Peak Flow Meter</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0108</profileId>
+    <deviceId editable="false">0x1015</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Generic Tunnel</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">11073 Protocol Tunnel</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Time</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>HC-cardiovascularfitnessandactivitymonitor</name>
+    <domain>HC</domain>
+    <typeName>HC Cardiovascular Fitness and Activity Monitor</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0108</profileId>
+    <deviceId editable="false">0x1029</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Generic Tunnel</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">11073 Protocol Tunnel</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Time</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>HC-strengthfitnessequipment</name>
+    <domain>HC</domain>
+    <typeName>HC Strength and Fitness Equipment</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0108</profileId>
+    <deviceId editable="false">0x102a</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Generic Tunnel</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">11073 Protocol Tunnel</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Time</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>HC-physicalactivitymonitor</name>
+    <domain>HC</domain>
+    <typeName>HC Physical Activity Monitor</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0108</profileId>
+    <deviceId editable="false">0x102b</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Generic Tunnel</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">11073 Protocol Tunnel</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Time</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>HC-stepcounter</name>
+    <domain>HC</domain>
+    <typeName>HC Step Counter</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0108</profileId>
+    <deviceId editable="false">0x1068</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Generic Tunnel</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">11073 Protocol Tunnel</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Time</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>HC-ilah</name>
+    <domain>HC</domain>
+    <typeName>HC ILAH</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0108</profileId>
+    <deviceId editable="false">0x1047</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Generic Tunnel</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">11073 Protocol Tunnel</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Time</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>HC-adherencemonitor</name>
+    <domain>HC</domain>
+    <typeName>HC Adherence Monitor</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0108</profileId>
+    <deviceId editable="false">0x1048</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Generic Tunnel</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">11073 Protocol Tunnel</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Time</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>HC-fallsensor</name>
+    <domain>HC</domain>
+    <typeName>HC Fall Sensor</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0108</profileId>
+    <deviceId editable="false">0x1075</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Generic Tunnel</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">11073 Protocol Tunnel</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Time</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>HC-perssensor</name>
+    <domain>HC</domain>
+    <typeName>HC PERS Sensor</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0108</profileId>
+    <deviceId editable="false">0x1076</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Generic Tunnel</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">11073 Protocol Tunnel</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Time</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>HC-smokesensor</name>
+    <domain>HC</domain>
+    <typeName>HC Smoke Sensor</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0108</profileId>
+    <deviceId editable="false">0x1077</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Generic Tunnel</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">11073 Protocol Tunnel</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Time</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>HC-cosensor</name>
+    <domain>HC</domain>
+    <typeName>HC CO Sensor</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0108</profileId>
+    <deviceId editable="false">0x1078</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Generic Tunnel</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">11073 Protocol Tunnel</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Time</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>HC-watersensor</name>
+    <domain>HC</domain>
+    <typeName>HC Water Sensor</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0108</profileId>
+    <deviceId editable="false">0x1079</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Generic Tunnel</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">11073 Protocol Tunnel</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Time</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>HC-gassensor</name>
+    <domain>HC</domain>
+    <typeName>HC Gas Sensor</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0108</profileId>
+    <deviceId editable="false">0x107a</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Generic Tunnel</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">11073 Protocol Tunnel</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Time</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>HC-motionsensor</name>
+    <domain>HC</domain>
+    <typeName>HC Motion Sensor</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0108</profileId>
+    <deviceId editable="false">0x107b</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Generic Tunnel</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">11073 Protocol Tunnel</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Time</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>HC-propertyexitsensor</name>
+    <domain>HC</domain>
+    <typeName>HC Property Exit Sensor</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0108</profileId>
+    <deviceId editable="false">0x107c</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Generic Tunnel</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">11073 Protocol Tunnel</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Time</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>HC-enuresissensor</name>
+    <domain>HC</domain>
+    <typeName>HC Enuresis Sensor</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0108</profileId>
+    <deviceId editable="false">0x107d</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Generic Tunnel</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">11073 Protocol Tunnel</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Time</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>HC-contactclosuresensor</name>
+    <domain>HC</domain>
+    <typeName>HC Contact Closure Sensor</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0108</profileId>
+    <deviceId editable="false">0x107e</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Generic Tunnel</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">11073 Protocol Tunnel</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Time</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>HC-usagesensor</name>
+    <domain>HC</domain>
+    <typeName>HC Usage Sensor</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0108</profileId>
+    <deviceId editable="false">0x107f</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Generic Tunnel</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">11073 Protocol Tunnel</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Time</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>HC-switchusesensor</name>
+    <domain>HC</domain>
+    <typeName>HC Switch Use Sensor</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0108</profileId>
+    <deviceId editable="false">0x1080</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Generic Tunnel</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">11073 Protocol Tunnel</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Time</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>HC-dosagesensor</name>
+    <domain>HC</domain>
+    <typeName>HC Dosage Sensor</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0108</profileId>
+    <deviceId editable="false">0x1081</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Generic Tunnel</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">11073 Protocol Tunnel</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Time</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>HC-temperaturesensor</name>
+    <domain>HC</domain>
+    <typeName>HC Temperature Sensor</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0108</profileId>
+    <deviceId editable="false">0x1082</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Generic Tunnel</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">11073 Protocol Tunnel</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Time</include>
+    </clusters>
+  </deviceType>
+</configurator>

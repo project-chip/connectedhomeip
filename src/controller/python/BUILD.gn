@@ -36,17 +36,16 @@ shared_library("ChipDeviceCtrl") {
   include_dirs = [ "." ]
 
   sources = [
-    "ChipDeviceController-BleApplicationDelegate.cpp",
-    "ChipDeviceController-BleApplicationDelegate.h",
-    "ChipDeviceController-BlePlatformDelegate.cpp",
-    "ChipDeviceController-BlePlatformDelegate.h",
+    "ChipDeviceController-ClusterCommands.cpp",
     "ChipDeviceController-ScriptBinding.cpp",
     "ChipDeviceController-ScriptDevicePairingDelegate.cpp",
     "ChipDeviceController-ScriptDevicePairingDelegate.h",
+    "ChipDeviceController-StorageDelegate.cpp",
     "ChipDeviceController-StorageDelegate.h",
   ]
 
   public_deps = [
+    "${chip_root}/src/app",
     "${chip_root}/src/controller",
     "${chip_root}/src/lib",
     "${chip_root}/src/lib/core",
@@ -69,8 +68,10 @@ pw_python_action("python") {
         "chip/ChipBleBase.py",
         "chip/ChipBleUtility.py",
         "chip/ChipBluezMgr.py",
+        "chip/ChipCluster.py",
         "chip/ChipCoreBluetoothMgr.py",
         "chip/ChipDeviceCtrl.py",
+        "chip/ChipExceptions.py",
         "chip/ChipStack.py",
         "chip/ChipTLV.py",
         "chip/ChipUtility.py",

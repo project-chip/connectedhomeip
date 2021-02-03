@@ -346,7 +346,7 @@ bool emberAfPreMessageSendCallback(EmberAfMessageStruct * messageStruct, EmberSt
  * @param message   Ver.: always
  * @param status   Ver.: always
  */
-bool emberAfMessageSentCallback(EmberOutgoingMessageType type, uint16_t indexOrDestination, EmberApsFrame * apsFrame,
+bool emberAfMessageSentCallback(EmberOutgoingMessageType type, uint64_t indexOrDestination, EmberApsFrame * apsFrame,
                                 uint16_t msgLen, uint8_t * message, EmberStatus status);
 
 /** @brief Pre Attribute Change
@@ -554,7 +554,7 @@ bool emberAfGetEndpointInfoCallback(chip::EndpointId endpoint, uint8_t * returnN
  *
  * @param destination The node id of the destination  Ver.: always
  */
-uint8_t emberAfGetSourceRouteOverheadCallback(EmberNodeId destination);
+uint8_t emberAfGetSourceRouteOverheadCallback(chip::NodeId destination);
 
 /** @brief Registration Abort
  *

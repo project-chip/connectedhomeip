@@ -324,3 +324,4 @@ exports.asChipUnderlyingType                          = asChipUnderlyingType;
 exports.user_cluster_has_enabled_manufacturer_command = user_cluster_has_enabled_manufacturer_command;
 exports.chip_endpoint_generated_functions             = chip_endpoint_generated_functions
 exports.chip_endpoint_cluster_list                    = chip_endpoint_cluster_list
+exports.isSigned                                      = ChipTypesHelper.isSigned;

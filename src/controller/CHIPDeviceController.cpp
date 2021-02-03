@@ -39,6 +39,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #endif
 
+#include <app/InteractionModelEngine.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPEncoding.h>
 #include <core/CHIPSafeCasts.h>
@@ -133,6 +134,10 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, PersistentStorageDelegat
     mTransportMgr   = chip::Platform::New<DeviceTransportMgr>();
     mSessionManager = chip::Platform::New<SecureSessionMgr>();
 
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    mExchangeManager = chip::Platform::New<Messaging::ExchangeManager>();
+#endif
+
     err = mTransportMgr->Init(
         Transport::UdpListenParameters(mInetLayer).SetAddressType(Inet::kIPAddressType_IPv6).SetListenPort(mListenPort)
 #if INET_CONFIG_ENABLE_IPV4
@@ -145,7 +150,14 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, PersistentStorageDelegat
     err = mSessionManager->Init(localDeviceId, mSystemLayer, mTransportMgr);
     SuccessOrExit(err);
 
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    err = mExchangeManager->Init(mSessionManager);
+    SuccessOrExit(err);
+    err = chip::app::InteractionModelEngine::GetInstance()->Init(mExchangeManager);
+    SuccessOrExit(err);
+#else
     mSessionManager->SetDelegate(this);
+#endif
 
     mState         = State::Initialized;
     mLocalDeviceId = localDeviceId;
@@ -545,6 +557,8 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
     VerifyOrExit(mState == State::Initialized, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mDeviceBeingPaired == kNumMaxActiveDevices, err = CHIP_ERROR_INCORRECT_STATE);
 
+    params.SetAdvertisementDelegate(&mRendezvousAdvDelegate);
+
     // TODO: We need to specify the peer address for BLE transport in bindings.
     if (params.GetPeerAddress().GetTransportType() == Transport::Type::kBle ||
         params.GetPeerAddress().GetTransportType() == Transport::Type::kUndefined)
@@ -724,6 +738,8 @@ void DeviceCommissioner::OnRendezvousComplete()
     device = &mActiveDevices[mDeviceBeingPaired];
     mPairedDevices.Insert(device->GetDeviceId());
     mPairedDevicesUpdated = true;
+    // We need to kick the device since we are not a valid secure pairing delegate when using IM.
+    device->InitCommandSender();
 
     // mStorageDelegate would not be null for a typical pairing scenario, as Pair()
     // requires a valid storage delegate. However, test pairing usecase, that's used

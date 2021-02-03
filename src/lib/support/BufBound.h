@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -155,6 +155,14 @@ public:
      * @brief Size of the buffer
      */
     size_t Size() const { return mSize; }
+
+protected:
+    void Reset(uint8_t * buf, size_t len)
+    {
+        mBuf    = buf;
+        mSize   = len;
+        mNeeded = 0;
+    }
 };
 
 } // namespace chip

@@ -35,6 +35,7 @@ import logging
 from threading import Lock, Event
 from ctypes import *
 from .ChipUtility import ChipUtility
+from .ChipExceptions import *
 
 __all__ = [
     "DeviceStatusStruct",
@@ -64,43 +65,6 @@ class DeviceStatusStruct(Structure):
         ("StatusCode", c_uint16),
         ("SysErrorCode", c_uint32),
     ]
-
-
-class ChipStackException(Exception):
-    pass
-
-
-class ChipStackError(ChipStackException):
-    def __init__(self, err, msg=None):
-        self.err = err
-        if msg != None:
-            self.msg = msg
-        else:
-            self.msg = "Chip Stack Error %ld" % (err)
-
-    def __str__(self):
-        return self.msg
-
-
-class DeviceError(ChipStackException):
-    def __init__(self, profileId, statusCode, systemErrorCode, msg=None):
-        self.profileId = profileId
-        self.statusCode = statusCode
-        self.systemErrorCode = systemErrorCode
-        if msg is None:
-            if systemErrorCode:
-                self.msg = "[ %08X:%d ] (system err %d)" % (
-                    profileId,
-                    statusCode,
-                    systemErrorCode,
-                )
-            else:
-                self.msg = "[ %08X:%d ]" % (profileId, statusCode)
-        else:
-            self.msg = msg
-
-    def __str__(self):
-        return "Device Error: " + self.msg
 
 
 class LogCategory(object):

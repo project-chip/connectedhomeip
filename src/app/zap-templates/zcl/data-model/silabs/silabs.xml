@@ -1,0 +1,168 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2008,2020 Silicon Labs.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<!-- 
+     This xml file contains a sample extension to the Application Framework's
+     cluster definitions. There are 4 ways to add manufacturer specific
+     extensions within ZigBee.  
+     
+     1. Private Profile: 
+        You can create your own private ZigBee profile.
+        We do not provide an example of this here since private profiles 
+        may or may not even use the cluster library or something like it. If
+        you create your own custom profile you can basically do whatever you
+        want after the APS frame in the ZigBee packet. If you choose to use
+        the ZigBee cluster library within your private profile the Application
+        Framework will be useful to you. If you do not, it will not be useful
+        to you as all of the code in the Application Framework centers around
+        support for the ZigBee Cluster Library (ZCL).
+      
+    2. Manufacturer Specific Clusters:
+       You can add manufacturer specific clusters to a standard profile.
+       We provide an example of this below. In order to do this you must
+       satisfy two obligations:
+         
+         1. The cluster id MUST be in the manufacturer specific range,
+            0xfc00 - 0xffff.
+         2. The cluster definition must include a manufacturer code 
+            which will be applied to ALL attributes and 
+            commands within that cluster and must be provided when sending 
+            and receiving commands and interacting with attributes. 
+     
+     3. Manufacturer Specific Commands in Standard ZigBee Custer:
+        You can add your own commands to any standard ZigBee cluster with 
+        the following requirements:
+        
+        1. Your manufacturer specific commands may use any command id 
+          within the command id range, 0x00 - 0xff. 
+        2. You must also provide a manufacturer code for the command so 
+           that it can be distinguished from other commands in the cluster 
+           and handled appropriately.
+     
+     4. Manufacturer Specific Attributes in Standard ZigBee Cluster:
+        You can add your own attributes to any standard ZigBee cluster with 
+        the following requirements:
+        
+        1. Your manufacturer specific attributes may use any attribute id 
+           within the attribute id range, 0x0000 - 0xffff. 
+        2. You must also provide a manufacturer code for the attribute so 
+           that it can be distinguished from other attributes in the cluster 
+           and handled appropriately.
+        
+     This sample provides an example of how to:
+       1. Extend the ZCL with a manufacturer specific cluster 
+       2. Extend the standard ZCL on/off cluster with manufacturer specific
+          attributes.
+       3. Extend the standard ZCL on/off cluster with manufacturer specific
+          commands.
+     
+     Manufacturer Code:
+     In all cases below, we have used Ember's manufacturerCode 0x1002 since
+     the cluster, attributes and the commands were created by Ember 
+     as an example of how the Application Framework can be 
+     extended to support manufacturer specific commands and attributes.
+     
+     XML Validation:
+     You may validate any xml file that you create against the 
+     AppBuilder XSD located in tool/appbuilder/appbuilder.xsd
+     
+-->
+<configurator>
+  <domain name="Ember"/>
+  <!-- Use manufacturerCode to indicate that this is a manufacturer specific
+       cluster. -->
+  <cluster manufacturerCode="0x1002">
+    <name>Configuration Cluster</name>
+    <domain>Ember</domain>
+    <description>This cluster allows for the OTA configuration of firmware
+	  parameters.  
+      </description>
+    <code>0xFC01</code>
+    <define>OTA_CONFIGURATION_CLUSTER</define>
+    <client init="false" tick="false">true</client>
+    <server init="false" tick="false">true</server>
+    <attribute side="server" code="0x0000" define="TOKENS_LOCKED" type="BOOLEAN" writable="false" default="0x00" optional="false">Prevents OTA writing of tokens.</attribute>
+    <command source="client" code="0x00" name="SetToken" optional="false" cli="zcl ota-config setToken">
+      <description>
+        Command to write a token value over the air.
+      </description>
+      <arg name="token" type="INT16U"/>
+      <arg name="data" type="OCTET_STRING"/>
+    </command>
+    <command source="client" code="0x01" name="LockTokens" optional="false" cli="zcl ota-config lock">
+      <description>
+        Command to lock the token values.
+      </description>
+    </command>
+    <command source="client" code="0x02" name="ReadTokens" optional="false" cli="zcl ota-config read">
+      <description>
+        Command to read a token value.
+      </description>
+      <arg name="token" type="INT16U"/>
+    </command>
+    <command source="client" code="0x03" name="UnlockTokens" optional="false" cli="zcl ota-config unlock">
+      <description>
+        Command to unlock tokens with a device-specific password (if allowed).
+      </description>
+      <arg name="data" type="OCTET_STRING"/>
+    </command>
+    <command source="server" code="0x00" name="ReturnToken" optional="false">
+      <description>
+        Response to a token value read.
+      </description>
+      <arg name="token" type="INT16U"/>
+      <arg name="data" type="OCTET_STRING"/>
+    </command>
+  </cluster>
+  <cluster manufacturerCode="0x1002">
+    <name>MFGLIB Cluster</name>
+    <domain>Ember</domain>
+    <description>This cluster provides commands to kick off MFGLIB actions 
+	  over the air.  
+      </description>
+    <code>0xFC02</code>
+    <define>MFGLIB_CLUSTER</define>
+    <client init="false" tick="false">true</client>
+    <server init="false" tick="false">true</server>
+    <attribute side="server" code="0x0000" define="PACKETS_RECEIVED" type="INT16U" writable="false" default="0x00" optional="false">Number of packets received while in MFGLIB mode.</attribute>
+    <attribute side="server" code="0x0001" define="SAVED_RSSI" type="INT8S" writable="false" default="0x00" optional="false">RSSI of the first received packet.</attribute>
+    <attribute side="server" code="0x0002" define="SAVED_LQI" type="INT8U" writable="false" default="0x00" optional="false">LQI of the first received packet.</attribute>
+    <command source="client" code="0x00" name="stream" optional="false" cli="zcl mfglib stream">
+      <description>
+        Command to put the device into streaming mode.
+      </description>
+      <arg name="channel" type="INT8U"/>
+      <arg name="power" type="INT8S"/>
+      <arg name="time" type="INT16U"/>
+    </command>
+    <command source="client" code="0x01" name="tone" optional="false" cli="zcl mfglib tone">
+      <description>
+        Command to put the device into tone mode.
+      </description>
+      <arg name="channel" type="INT8U"/>
+      <arg name="power" type="INT8S"/>
+      <arg name="time" type="INT16U"/>
+    </command>
+    <command source="client" code="0x02" name="rxMode" optional="false" cli="zcl mfglib rx-mode">
+      <description>
+        Command to put the device into RX mode.
+      </description>
+      <arg name="channel" type="INT8U"/>
+      <arg name="power" type="INT8S"/>
+      <arg name="time" type="INT16U"/>
+    </command>
+  </cluster>
+</configurator>

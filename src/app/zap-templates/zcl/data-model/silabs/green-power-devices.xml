@@ -1,0 +1,106 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2008,2020 Silicon Labs.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <deviceType>
+    <name>GP-proxy</name>
+    <domain>GP</domain>
+    <typeName>GP Proxy</typeName>
+    <zigbeeType>Router</zigbeeType>
+    <profileId editable="false">0xA1E0</profileId>
+    <deviceId editable="false">0x0060</deviceId>
+    <clusters lockOthers="true">
+      <include cluster="Green Power" client="true" server="true" clientLocked="true" serverLocked="true"/>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>GP-proxy-basic</name>
+    <domain>GP</domain>
+    <typeName>GP Proxy Basic</typeName>
+    <zigbeeType>Router</zigbeeType>
+    <profileId editable="false">0xA1E0</profileId>
+    <deviceId editable="false">0x0061</deviceId>
+    <clusters lockOthers="true">
+      <include cluster="Green Power" client="true" server="false" clientLocked="true" serverLocked="true"/>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>GP-target-plus</name>
+    <domain>GP</domain>
+    <typeName>GP Target+</typeName>
+    <zigbeeType>Router</zigbeeType>
+    <profileId editable="false">0xA1E0</profileId>
+    <deviceId editable="false">0x0062</deviceId>
+    <clusters lockOthers="true">
+      <include cluster="Green Power" client="true" server="true" clientLocked="true" serverLocked="true"/>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>GP-target</name>
+    <domain>GP</domain>
+    <typeName>GP Target</typeName>
+    <zigbeeType>Router</zigbeeType>
+    <profileId editable="false">0xA1E0</profileId>
+    <deviceId editable="false">0x0063</deviceId>
+    <clusters lockOthers="true">
+      <include cluster="Green Power" client="true" server="true" clientLocked="true" serverLocked="true"/>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>GP-commissioning-tool</name>
+    <domain>GP</domain>
+    <typeName>GP Commissioning Tool</typeName>
+    <zigbeeType>Router</zigbeeType>
+    <profileId editable="false">0xA1E0</profileId>
+    <deviceId editable="false">0x0064</deviceId>
+    <clusters lockOthers="true">
+      <include cluster="Green Power" client="false" server="true" clientLocked="true" serverLocked="true"/>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>GP-combo</name>
+    <domain>GP</domain>
+    <typeName>GP Combo</typeName>
+    <zigbeeType>Router</zigbeeType>
+    <profileId editable="false">0xA1E0</profileId>
+    <deviceId editable="false">0x0065</deviceId>
+    <clusters lockOthers="true">
+      <include cluster="Green Power" client="true" server="true" clientLocked="true" serverLocked="true"/>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>GP-combo-basic</name>
+    <domain>GP</domain>
+    <typeName>GP Combo Basic</typeName>
+    <zigbeeType>Router</zigbeeType>
+    <profileId editable="false">0xA1E0</profileId>
+    <deviceId editable="false">0x0066</deviceId>
+    <clusters lockOthers="true">
+      <include cluster="Green Power" client="true" server="true" clientLocked="true" serverLocked="true"/>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>GP-test-device</name>
+    <domain>GP</domain>
+    <typeName>GP Test Device</typeName>
+    <zigbeeType>Router</zigbeeType>
+    <profileId editable="false">0xA1E0</profileId>
+    <deviceId editable="false">0x0066</deviceId>
+    <clusters lockOthers="false">
+      <include cluster="Green Power" client="true" server="true" clientLocked="true" serverLocked="true"/>
+    </clusters>
+  </deviceType>
+</configurator>

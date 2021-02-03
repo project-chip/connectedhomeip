@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2008,2020 Silicon Labs.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="CBA" spec="cba-1.0-05-3516-12" dependsOn="zcl-1.0-07-5123-03" certifiable="true"/>
+  <cluster>
+    <name>Generic Tunnel</name>
+    <domain>CBA</domain>
+    <description>The minimum common commands and attributes required to tunnel any protocol.</description>
+    <code>0x0600</code>
+    <define>GENERIC_TUNNEL_CLUSTER</define>
+    <client tick="false" init="false">true</client>
+    <server tick="false" init="false">true</server>
+    <attribute side="server" code="0x0001" define="MAXIMUM_INCOMING_TRANSFER_SIZE" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="false">maximum incoming transfer size</attribute>
+    <attribute side="server" code="0x0002" define="MAXIMUM_OUTGOING_TRANSFER_SIZE" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="false">maximum outgoing transfer size</attribute>
+    <attribute side="server" code="0x0003" define="PROTOCOL_ADDRESS" type="OCTET_STRING" length="254" writable="true" optional="false">protocol address</attribute>
+    <command source="client" code="0x00" name="MatchProtocolAddress" optional="false" cli="zcl tunnel match">
+      <description>
+        This command is generated when an application wishes to find the ZigBee address (node, endpoint) of the Generic Tunnel server cluster with a given ProtocolAddress attribute. The command is typically multicast to a group of inter-communicating Generic Tunnel clusters
+      </description>
+      <arg name="protocolAddress" type="OCTET_STRING"/>
+    </command>
+    <command source="server" code="0x00" name="MatchProtocolAddressResponse" optional="false" cli="zcl tunnel response" disableDefaultResponse="true">
+      <description>
+      This command is generated upon receipt of a Match Protocol Address command to indicate that the Protocol Address was successfully matched.
+      </description>
+      <arg name="deviceIeeeAddress" type="IEEE_ADDRESS"/>
+      <arg name="protocolAddress" type="OCTET_STRING"/>
+    </command>
+    <command source="server" code="0x01" name="AdvertiseProtocolAddress" optional="false" cli="zcl tunnel advertise">
+      <description>
+      This command is typically sent upon startup, and whenever the ProtocolAddress attribute changes. It is typically multicast to a group of inter-communicating Generic Tunnel clusters.
+      </description>
+      <arg name="protocolAddress" type="OCTET_STRING"/>
+    </command>
+  </cluster>
+  <cluster>
+    <name>BACnet Protocol Tunnel</name>
+    <domain>CBA</domain>
+    <description>Commands and attributes required to tunnel the BACnet protocol.</description>
+    <code>0x0601</code>
+    <define>BACNET_PROTOCOL_TUNNEL_CLUSTER</define>
+    <client tick="false" init="false">true</client>
+    <server tick="false" init="false">true</server>
+    <command source="client" code="0x00" name="TransferNpdu" optional="false" cli="zcl bacnet transfer-npdu random">
+      <description>
+      This command is generated when a BACnet network layer wishes to transfer a BACnet NPDU across a ZigBee tunnel to another BACnet network layer.
+      </description>
+      <arg name="npdu" type="DATA8" array="true"/>
+    </command>
+  </cluster>
+  <!-- EO CBA Clusters -->
+</configurator>

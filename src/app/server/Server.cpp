@@ -17,6 +17,7 @@
 
 #include <app/server/Server.h>
 
+#include <app/InteractionModelEngine.h>
 #include <app/server/DataModelHandler.h>
 #include <app/server/RendezvousServer.h>
 #include <app/server/SessionManager.h>
@@ -26,6 +27,7 @@
 #include <inet/InetError.h>
 #include <inet/InetLayer.h>
 #include <mdns/Advertiser.h>
+#include <messaging/ExchangeMgr.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/SetupPayload.h>
 #include <support/CodeUtils.h>
@@ -40,6 +42,7 @@ using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::Transport;
 using namespace ::chip::DeviceLayer;
+using namespace ::chip::Messaging;
 
 namespace {
 
@@ -57,6 +60,13 @@ bool isRendezvousBypassed()
 
     return rendezvousMode == RendezvousInformationFlags::kNone;
 }
+
+class ServerRendezvousAdvertisementDelegate : public RendezvousAdvertisementDelegate
+{
+public:
+    CHIP_ERROR StartAdvertisement() const override { return chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(true); }
+    CHIP_ERROR StopAdvertisement() const override { return chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(false); }
+};
 
 class ServerCallback : public SecureSessionMgrDelegate
 {
@@ -167,10 +177,14 @@ CHIP_ERROR InitMdns()
 #endif
 
 DemoTransportMgr gTransports;
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+Messaging::ExchangeManager gExchange;
+#endif
 SecureSessionMgr gSessions;
 ServerCallback gCallbacks;
 SecurePairingUsingTestSecret gTestPairing;
 RendezvousServer gRendezvousServer;
+ServerRendezvousAdvertisementDelegate gRendezvousAdvDelegate;
 
 } // namespace
 
@@ -202,7 +216,14 @@ void InitServer(AppDelegate * delegate)
     err = gSessions.Init(chip::kTestDeviceNodeId, &DeviceLayer::SystemLayer, &gTransports);
     SuccessOrExit(err);
 
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    err = gExchange.Init(&gSessions);
+    SuccessOrExit(err);
+    err = chip::app::InteractionModelEngine::GetInstance()->Init(&gExchange);
+    SuccessOrExit(err);
+#else
     gSessions.SetDelegate(&gCallbacks);
+#endif
 
     // This flag is used to bypass BLE in the cirque test
     // Only in the cirque test this is enabled with --args='bypass_rendezvous=true'
@@ -221,7 +242,8 @@ void InitServer(AppDelegate * delegate)
 #if CONFIG_NETWORK_LAYER_BLE
         params.SetSetupPINCode(pinCode)
             .SetBleLayer(DeviceLayer::ConnectivityMgr().GetBleLayer())
-            .SetPeerAddress(Transport::PeerAddress::BLE());
+            .SetPeerAddress(Transport::PeerAddress::BLE())
+            .SetAdvertisementDelegate(&gRendezvousAdvDelegate);
 #else
         params.SetSetupPINCode(pinCode);
 #endif // CONFIG_NETWORK_LAYER_BLE
