@@ -47,9 +47,9 @@ ninja -C "$OUTPUT_ROOT" python
 virtualenv --clear "$ENVIRONMENT_ROOT"
 
 # Activate the new enviroment to register the python WHL
-source $ENVIRONMENT_ROOT/bin/activate
-$ENVIRONMENT_ROOT/bin/python -m pip install --upgrade pip
-$ENVIRONMENT_ROOT/bin/pip install $OUTPUT_ROOT/controller/python/chip-*.whl
+source "$ENVIRONMENT_ROOT"/bin/activate
+"$ENVIRONMENT_ROOT"/bin/python -m pip install --upgrade pip
+"$ENVIRONMENT_ROOT"/bin/pip install "$OUTPUT_ROOT"/controller/python/chip-*.whl
 
 echo ""
 echo_green "Compilation completed and WHL package installed in: "
