@@ -47,6 +47,8 @@
 #include <logging/log.h>
 #include <zephyr.h>
 
+#include <algorithm>
+
 LOG_MODULE_DECLARE(app);
 
 namespace {
@@ -441,6 +443,9 @@ int AppTask::StartNFCTag()
 
     int result = GetQRCode(QRCode, chip::RendezvousInformationFlags::kBLE);
     VerifyOrExit(!result, ChipLogError(AppServer, "Getting QR code payload failed"));
+
+    // TODO: Issue #4504 - Remove replacing spaces with _ after problem described in #415 will be fixed.
+    std::replace(QRCode.begin(), QRCode.end(), ' ', '_');
 
     result = sNFC.StartTagEmulation(QRCode.c_str(), QRCode.size());
     VerifyOrExit(result >= 0, ChipLogError(AppServer, "Starting NFC Tag emulation failed"));

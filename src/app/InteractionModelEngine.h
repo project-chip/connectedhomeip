@@ -28,13 +28,13 @@
 #ifndef _CHIP_INTERACTION_MODEL_ENGINE_H
 #define _CHIP_INTERACTION_MODEL_ENGINE_H
 
-#include <app/MessageDef/MessageDef.h>
 #include <core/CHIPCore.h>
 #include <map>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <protocols/Protocols.h>
+#include <protocols/interaction_model/Constants.h>
 #include <support/CodeUtils.h>
 #include <support/DLLUtil.h>
 #include <support/logging/CHIPLogging.h>
@@ -147,12 +147,12 @@ public:
     CHIP_ERROR NewCommandSender(CommandSender ** const apComandSender);
 
 private:
-    void OnUnknownMsgType(Messaging::ExchangeContext * apEc, const PacketHeader & aPacketHeader, uint32_t aProtocolId,
-                          uint8_t aMsgType, System::PacketBufferHandle aPayload);
-    void OnInvokeCommandRequest(Messaging::ExchangeContext * apEc, const PacketHeader & aPacketHeader, uint32_t aProtocolId,
-                                uint8_t aMsgType, System::PacketBufferHandle aPayload);
-    void OnMessageReceived(Messaging::ExchangeContext * apEc, const PacketHeader & aPacketHeader, uint32_t aProtocolId,
-                           uint8_t aMsgType, System::PacketBufferHandle aPayload);
+    void OnUnknownMsgType(Messaging::ExchangeContext * apEc, const PacketHeader & aPacketHeader,
+                          const PayloadHeader & aPayloadHeader, System::PacketBufferHandle aPayload);
+    void OnInvokeCommandRequest(Messaging::ExchangeContext * apEc, const PacketHeader & aPacketHeader,
+                                const PayloadHeader & aPayloadHeader, System::PacketBufferHandle aPayload);
+    void OnMessageReceived(Messaging::ExchangeContext * apEc, const PacketHeader & aPacketHeader,
+                           const PayloadHeader & aPayloadHeader, System::PacketBufferHandle aPayload);
     void OnResponseTimeout(Messaging::ExchangeContext * ec);
 
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;

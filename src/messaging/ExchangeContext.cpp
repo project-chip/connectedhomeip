@@ -141,7 +141,7 @@ CHIP_ERROR ExchangeContext::SendMessage(uint16_t protocolId, uint8_t msgType, Pa
     // Send the message.
     if (payloadHeader.IsNeedsAck())
     {
-        ReliableMessageManager::RetransTableEntry * entry = nullptr;
+        ReliableMessageMgr::RetransTableEntry * entry = nullptr;
 
         // Add to Table for subsequent sending
         err = mExchangeMgr->GetReliableMessageMgr()->AddToRetransTable(&mReliableMessageContext, &entry);
@@ -411,7 +411,7 @@ CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, con
 
         if (mDelegate != nullptr)
         {
-            mDelegate->OnMessageReceived(this, packetHeader, protocolId, messageType, std::move(msgBuf));
+            mDelegate->OnMessageReceived(this, packetHeader, payloadHeader, std::move(msgBuf));
         }
         else
         {

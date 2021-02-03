@@ -232,7 +232,8 @@ int main(int argc, char * argv[])
     // Connection has been established. Now send the CommandRequests.
     for (unsigned int i = 0; i < kMaxCommandCount; i++)
     {
-        if (SendCommandRequest() != CHIP_NO_ERROR)
+        err = SendCommandRequest();
+        if (err != CHIP_NO_ERROR)
         {
             printf("Send request failed: %s\n", chip::ErrorStr(err));
             break;
@@ -257,7 +258,7 @@ int main(int argc, char * argv[])
     ShutdownChip();
 
 exit:
-    if (err != CHIP_NO_ERROR)
+    if ((err != CHIP_NO_ERROR) || (gCommandRespCount != kMaxCommandCount))
     {
         printf("ChipCommandSender failed: %s\n", chip::ErrorStr(err));
         exit(EXIT_FAILURE);

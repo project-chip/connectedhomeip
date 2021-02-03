@@ -586,5 +586,30 @@ void PacketBufferHandle::RightSizeForMemoryAlloc()
 
 #endif
 
+PacketBufBound::PacketBufBound(size_t aAvailableSize, uint16_t aReservedSize) : BufBound(nullptr, 0)
+{
+    mPacket = PacketBufferHandle::New(aAvailableSize, aReservedSize);
+    if (!mPacket.IsNull())
+    {
+        Reset(mPacket->Start(), aAvailableSize);
+    }
+}
+
+PacketBufferHandle PacketBufBound::Finalize()
+{
+    if (!mPacket.IsNull() && Fit())
+    {
+        // Since mPacket was successfully allocated to hold the maximum length,
+        // we know that the actual length fits in a uint16_t.
+        mPacket->SetDataLength(static_cast<uint16_t>(Needed()));
+    }
+    else
+    {
+        mPacket = nullptr;
+    }
+    Reset(nullptr, 0);
+    return std::move(mPacket);
+}
+
 } // namespace System
 } // namespace chip

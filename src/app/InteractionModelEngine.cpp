@@ -65,7 +65,7 @@ CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeM
 
     mpExchangeMgr = apExchangeMgr;
 
-    err = mpExchangeMgr->RegisterUnsolicitedMessageHandler(Protocols::kProtocol_InteractionModel, this);
+    err = mpExchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::kProtocol_InteractionModel, this);
     SuccessOrExit(err);
 
 exit:
@@ -106,11 +106,11 @@ exit:
 }
 
 void InteractionModelEngine::OnUnknownMsgType(Messaging::ExchangeContext * apEc, const PacketHeader & aPacketHeader,
-                                              uint32_t aProtocolId, uint8_t aMsgType, System::PacketBufferHandle aPayload)
+                                              const PayloadHeader & aPayloadHeader, System::PacketBufferHandle aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    ChipLogDetail(DataManagement, "Msg type %d not supported", (int) aMsgType);
+    ChipLogDetail(DataManagement, "Msg type %d not supported", aPayloadHeader.GetMessageType());
 
     // Todo: Add status report
     // err = SendStatusReport(ec, kChipProfile_Common, kStatus_UnsupportedMessage);
@@ -129,7 +129,7 @@ void InteractionModelEngine::OnUnknownMsgType(Messaging::ExchangeContext * apEc,
 }
 
 void InteractionModelEngine::OnInvokeCommandRequest(Messaging::ExchangeContext * apEc, const PacketHeader & aPacketHeader,
-                                                    uint32_t aProtocolId, uint8_t aMsgType, System::PacketBufferHandle aPayload)
+                                                    const PayloadHeader & aPayloadHeader, System::PacketBufferHandle aPayload)
 {
     CHIP_ERROR err                 = CHIP_NO_ERROR;
     CommandHandler * commandServer = nullptr;
@@ -159,7 +159,7 @@ void InteractionModelEngine::OnInvokeCommandRequest(Messaging::ExchangeContext *
             commandServer = &mCommandHandlerObjs[i];
             err           = commandServer->Init(mpExchangeMgr);
             SuccessOrExit(err);
-            commandServer->OnMessageReceived(apEc, aPacketHeader, aProtocolId, aMsgType, std::move(aPayload));
+            commandServer->OnMessageReceived(apEc, aPacketHeader, aPayloadHeader, std::move(aPayload));
             apEc = nullptr;
             break;
         }
@@ -176,16 +176,15 @@ exit:
 }
 
 void InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext * apEc, const PacketHeader & aPacketHeader,
-                                               uint32_t aProtocolId, uint8_t aMsgType, System::PacketBufferHandle aPayload)
+                                               const PayloadHeader & aPayloadHeader, System::PacketBufferHandle aPayload)
 {
-    switch (aMsgType)
+    if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::InvokeCommandRequest))
     {
-    case kMsgType_InvokeCommandRequest:
-        OnInvokeCommandRequest(apEc, aPacketHeader, aProtocolId, aMsgType, std::move(aPayload));
-        break;
-    default:
-        OnUnknownMsgType(apEc, aPacketHeader, aProtocolId, aMsgType, std::move(aPayload));
-        break;
+        OnInvokeCommandRequest(apEc, aPacketHeader, aPayloadHeader, std::move(aPayload));
+    }
+    else
+    {
+        OnUnknownMsgType(apEc, aPacketHeader, aPayloadHeader, std::move(aPayload));
     }
 }
 

@@ -38,10 +38,13 @@ namespace chip {
 namespace Protocols {
 namespace Echo {
 
-enum
+/**
+ * Echo Protocol Message Types
+ */
+enum class MsgType : uint8_t
 {
-    kEchoMessageType_EchoRequest  = 1,
-    kEchoMessageType_EchoResponse = 2
+    EchoRequest  = 0x01,
+    EchoResponse = 0x02
 };
 
 using EchoFunct = void (*)(Messaging::ExchangeContext * ec, System::PacketBufferHandle payload);
@@ -99,7 +102,7 @@ private:
     EchoFunct OnEchoResponseReceived          = nullptr;
     SecureSessionHandle mSecureSession;
 
-    void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, uint32_t protocolId, uint8_t msgType,
+    void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                            System::PacketBufferHandle payload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
 };
@@ -141,11 +144,18 @@ private:
     Messaging::ExchangeManager * mExchangeMgr = nullptr;
     EchoFunct OnEchoRequestReceived           = nullptr;
 
-    void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, uint32_t protocolId, uint8_t msgType,
+    void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                            System::PacketBufferHandle payload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override {}
 };
 
 } // namespace Echo
+
+template <>
+struct MessageTypeTraits<Echo::MsgType>
+{
+    static constexpr uint16_t ProtocolId = chip::Protocols::kProtocol_Echo;
+};
+
 } // namespace Protocols
 } // namespace chip
