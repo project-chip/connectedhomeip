@@ -17,31 +17,40 @@ focus on its python binding interface on Linux and mac os.
 git clone https://github.com/project-chip/connectedhomeip.git
 ```
 
-2. Build CHIP
+2. Build the CHIP python package
 
-Follow [BUILDING.md](/docs/BUILDING.md) to build CHIP on your platform.
+Follow [BUILDING.md](/docs/BUILDING.md) to setup CHIP on your platform.
+
+Genrally, once build dependencies are satisfied you can build the `python`
+target.
+
+Use `scripts/build_python.sh` or run something equivalent to:
+
+```sh
+gn gen out/python_lib
+ninja -C out/python_lib python
+```
 
 3. Install Chip Device Controller
 
 > Note: Python device controller is not versioned, so you need to uninstall the
 > old device controller before install the new one.
 
-**For Linux (Raspberry Pi 4)**
+> It is recommended to setup a separate clean virtual environment The
+> `scripts/build_python.sh` script sets up a python environment and installs the
+> WHL file.
 
-```
-cd out/debug/controller/python
-sudo pip3 install chip-0.0-cp38-cp38-linux_aarch64.whl
+```sh
+virtualenv out/python_env --clean
+source out/python_env/bin/activate
+pip install out/python_lib/controller/python/chip*.whl
 ```
 
-> Note: for linux, sudo is necessary since it need to interact with bluetoothd
-> via dbus with sudo permission
+The WHL file installation will:
 
-**For macOS**
-
-```
-cd out/debug/mac_x64_clang/controller/python
-pip3 install chip-0.0-cp38-cp38-mac_aarch64.whl
-```
+-   Install the 'chip' module
+-   create a `ENV/bin/chip-device-ctrl` script that provides an interactive
+    shell for the chip library
 
 ## BLE Virtualization on Linux (Optional)
 
