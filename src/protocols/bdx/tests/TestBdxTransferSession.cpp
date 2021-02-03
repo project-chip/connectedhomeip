@@ -32,7 +32,7 @@ CHIP_ERROR WriteChipTLVString(uint8_t * buf, uint32_t bufLen, const char * data,
 
     {
         TLV::TLVWriter listWriter;
-        err = writer.OpenContainer(tlvListTag, TLV::kTLVType_Path, listWriter);
+        err = writer.OpenContainer(tlvListTag, TLV::kTLVType_List, listWriter);
         SuccessOrExit(err);
         err = listWriter.PutString(tlvStrTag, data);
         SuccessOrExit(err);
