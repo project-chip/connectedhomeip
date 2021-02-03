@@ -79,12 +79,27 @@ enum RangeControlFlags : uint8_t
     kRange_Widerange   = (1U << 4),
 };
 
-/*
- * A structure for representing a SendInit or ReceiveInit message (both contain
- * identical parameters).
+/**
+ * @brief
+ *   Interface for defining methods that apply to all BDX messages.
  */
-struct TransferInit
+struct BdxMessage
 {
+    /**
+     * @brief
+     *  Parse data from an PacketBuffer into a BdxMessage struct.
+     *
+     *  Note that this may store pointers that point into the passed PacketBuffer,
+     *  so it is essential that the underlying PacketBuffer is not modified until after this
+     *  struct is no longer needed.
+     *
+     * @param[in] aBuffer A PacketBufferHandle with a refernce to the PacketBuffer containing the data.
+     *
+     * @return CHIP_ERROR Return an error if the message format is invalid and/or can't be parsed
+     */
+    CHECK_RETURN_VALUE
+    CHIP_ERROR Parse(System::PacketBufferHandle aBuffer) { return DerivedParse(std::move(aBuffer)); }
+
     /**
      * @brief
      *  Write the message fields to a buffer using the provided BufBound.
@@ -92,33 +107,32 @@ struct TransferInit
      *  It is up to the caller to use BufBound::Fit() to verify that the write was
      *  successful. This method will also not check for correctness or completeness for
      *  any of the fields - it is the caller's responsibility to ensure that the fields
-     *  have been filled out adequately.
+     *  align with BDX specifications.
      *
      * @param aBuffer A BufBound object that will be used to write the message
      */
-    BufBound & WriteToBuffer(BufBound & aBuffer) const;
+    BufBound & WriteToBuffer(BufBound & aBuffer) const { return DerivedWriteToBuffer(aBuffer); }
 
     /**
      * @brief
-     *  Parse data from an PacketBuffer into a struct instance.
-     *
-     *  Note that this struct will store pointers that point into the passed PacketBuffer,
-     *  so it is essential that the PacketBuffer is not modified until after this
-     *  struct is no longer needed.
-     *
-     * @param[in] aBuffer Pointer to a PacketBuffer containing the data.
-     *
-     * @return CHIP_ERROR Any error that occurs when trying to read the message
+     *  Returns the size of buffer needed to write the message.
      */
-    CHECK_RETURN_VALUE
-    CHIP_ERROR Parse(System::PacketBufferHandle aBuffer);
+    virtual size_t MessageSize() const { return DerivedMessageSize(); }
 
-    /**
-     * @brief
-     *  Returns the size of buffer needed to write this message.
-     */
-    size_t MessageSize() const;
+    virtual ~BdxMessage() = default;
 
+private:
+    virtual CHIP_ERROR DerivedParse(System::PacketBufferHandle aBuffer) = 0;
+    virtual BufBound & DerivedWriteToBuffer(BufBound & aBuffer) const   = 0;
+    virtual size_t DerivedMessageSize() const                           = 0;
+};
+
+/*
+ * A structure for representing a SendInit or ReceiveInit message (both contain
+ * identical parameters).
+ */
+struct TransferInit : public BdxMessage
+{
     /**
      * @brief
      *  Equality check method.
@@ -144,6 +158,11 @@ struct TransferInit
 
     // Retain ownership of the packet buffer so that the FileDesignator and Metadata pointers remain valid.
     System::PacketBufferHandle Buffer;
+
+private:
+    CHIP_ERROR DerivedParse(System::PacketBufferHandle aBuffer) override;
+    BufBound & DerivedWriteToBuffer(BufBound & aBuffer) const override;
+    size_t DerivedMessageSize() const override;
 };
 
 using SendInit    = TransferInit;
@@ -152,42 +171,8 @@ using ReceiveInit = TransferInit;
 /*
  * A structure for representing a SendAccept message.
  */
-struct SendAccept
+struct SendAccept : public BdxMessage
 {
-    /**
-     * @brief
-     *  Write the message fields to a buffer using the provided BufBound.
-     *
-     *  It is up to the caller to use BufBound::Fit() to verify that the write was
-     *  successful. This method will also not check for correctness or completeness for
-     *  any of the fields - it is the caller's responsibility to ensure that the fields
-     *  have been filled out adequately.
-     *
-     * @param aBuffer A BufBound object that will be used to write the message
-     */
-    BufBound & WriteToBuffer(BufBound & aBuffer) const;
-
-    /**
-     * @brief
-     *  Parse data from an PacketBuffer into a struct instance
-     *
-     *  Note that this struct will store pointers that point into the passed PacketBuffer,
-     *  so it is essential that the PacketBuffer is not modified until after this
-     *  struct is no longer needed.
-     *
-     * @param[in] aBuffer Pointer to a PacketBuffer containing the data
-     *
-     * @return CHIP_ERROR Any error that occurs when trying to read the message
-     */
-    CHECK_RETURN_VALUE
-    CHIP_ERROR Parse(System::PacketBufferHandle aBuffer);
-
-    /**
-     * @brief
-     *  Returns the size of buffer needed to write this message.
-     */
-    size_t MessageSize() const;
-
     /**
      * @brief
      *  Equality check method.
@@ -208,47 +193,18 @@ struct SendAccept
 
     // Retain ownership of the packet buffer so that the FileDesignator and Metadata pointers remain valid.
     System::PacketBufferHandle Buffer;
+
+private:
+    CHIP_ERROR DerivedParse(System::PacketBufferHandle aBuffer) override;
+    BufBound & DerivedWriteToBuffer(BufBound & aBuffer) const override;
+    size_t DerivedMessageSize() const override;
 };
 
 /**
  * A structure for representing ReceiveAccept messages.
  */
-struct ReceiveAccept
+struct ReceiveAccept : public BdxMessage
 {
-    /**
-     * @brief
-     *  Write the message fields to a buffer using the provided BufBound.
-     *
-     *  It is up to the caller to use BufBound::Fit() to verify that the write was
-     *  successful. This method will also not check for correctness or completeness for
-     *  any of the fields - it is the caller's responsibility to ensure that the fields
-     *  have been filled out adequately.
-     *
-     * @param aBuffer A BufBound object that will be used to write the message
-     */
-    BufBound & WriteToBuffer(BufBound & aBuffer) const;
-
-    /**
-     * @brief
-     *  Parse data from an PacketBuffer into a struct instance
-     *
-     *  Note that this struct will store pointers that point into the passed PacketBuffer,
-     *  so it is essential that the PacketBuffer is not modified until after this
-     *  struct is no longer needed.
-     *
-     * @param[in] aBuffer Pointer to a PacketBuffer containing the data
-     *
-     * @return CHIP_ERROR Any error that occurs when trying to read the message
-     */
-    CHECK_RETURN_VALUE
-    CHIP_ERROR Parse(System::PacketBufferHandle aBuffer);
-
-    /**
-     * @brief
-     *  Returns the size of buffer needed to write this message.
-     */
-    size_t MessageSize() const;
-
     /**
      * @brief
      *  Equality check method.
@@ -272,44 +228,19 @@ struct ReceiveAccept
 
     // Retain ownership of the packet buffer so that the FileDesignator and Metadata pointers remain valid.
     System::PacketBufferHandle Buffer;
+
+private:
+    CHIP_ERROR DerivedParse(System::PacketBufferHandle aBuffer) override;
+    BufBound & DerivedWriteToBuffer(BufBound & aBuffer) const override;
+    size_t DerivedMessageSize() const override;
 };
 
 /**
  * A struct for representing messages contiaining just a counter field. Can be used to
  * represent BlockQuery, BlockAck, and BlockAckEOF.
  */
-struct CounterMessage
+struct CounterMessage : public BdxMessage
 {
-    /**
-     * @brief
-     *  Write the message fields to a buffer using the provided BufBound.
-     *
-     *  It is up to the caller to use BufBound::Fit() to verify that the write was
-     *  successful. This method will also not check for correctness or completeness for
-     *  any of the fields - it is the caller's responsibility to ensure that the fields
-     *  have been filled out adequately.
-     *
-     * @param aBuffer A BufBound object that will be used to write the message
-     */
-    BufBound & WriteToBuffer(BufBound & aBuffer) const;
-
-    /**
-     * @brief
-     *  Parse data from an PacketBuffer into a struct instance
-     *
-     * @param[in] aBuffer Pointer to a PacketBuffer containing the data
-     *
-     * @return CHIP_ERROR Any error that occurs when trying to read the message
-     */
-    CHECK_RETURN_VALUE
-    CHIP_ERROR Parse(System::PacketBufferHandle aBuffer);
-
-    /**
-     * @brief
-     *  Returns the size of buffer needed to write this message.
-     */
-    size_t MessageSize() const;
-
     /**
      * @brief
      *  Equality check method.
@@ -317,6 +248,11 @@ struct CounterMessage
     bool operator==(const CounterMessage &) const;
 
     uint32_t BlockCounter = 0;
+
+private:
+    CHIP_ERROR DerivedParse(System::PacketBufferHandle aBuffer) override;
+    BufBound & DerivedWriteToBuffer(BufBound & aBuffer) const override;
+    size_t DerivedMessageSize() const override;
 };
 
 using BlockQuery  = CounterMessage;
@@ -326,42 +262,8 @@ using BlockAckEOF = CounterMessage;
 /**
  * A struct that represents a message containing actual data (Block, BlockEOF).
  */
-struct DataBlock
+struct DataBlock : public BdxMessage
 {
-    /**
-     * @brief
-     *  Write the message fields to a buffer using the provided BufBound.
-     *
-     *  It is up to the caller to use BufBound::Fit() to verify that the write was
-     *  successful. This method will also not check for correctness or completeness for
-     *  any of the fields - it is the caller's responsibility to ensure that the fields
-     *  have been filled out adequately.
-     *
-     * @param aBuffer A BufBound object that will be used to write the message
-     */
-    BufBound & WriteToBuffer(BufBound & aBuffer) const;
-
-    /**
-     * @brief
-     *  Parse data from an PacketBuffer into a struct instance
-     *
-     *  Note that this struct will store pointers that point into the passed PacketBuffer,
-     *  so it is essential that the PacketBuffer is not modified until after this
-     *  struct is no longer needed.
-     *
-     * @param[in] aBuffer Pointer to a PacketBuffer containing the data
-     *
-     * @return CHIP_ERROR Any error that occurs when trying to read the message
-     */
-    CHECK_RETURN_VALUE
-    CHIP_ERROR Parse(System::PacketBufferHandle aBuffer);
-
-    /**
-     * @brief
-     *  Returns the size of buffer needed to write this message.
-     */
-    size_t MessageSize() const;
-
     /**
      * @brief
      *  Equality check method.
@@ -377,6 +279,11 @@ struct DataBlock
 
     // Retain ownership of the packet buffer so that the FileDesignator and Metadata pointers remain valid.
     System::PacketBufferHandle Buffer;
+
+private:
+    CHIP_ERROR DerivedParse(System::PacketBufferHandle aBuffer) override;
+    BufBound & DerivedWriteToBuffer(BufBound & aBuffer) const override;
+    size_t DerivedMessageSize() const override;
 };
 
 using Block    = DataBlock;

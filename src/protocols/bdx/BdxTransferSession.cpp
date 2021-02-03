@@ -13,14 +13,12 @@
 
 namespace {
 const uint8_t kBdxVersion = 0; ///< The version of this implementation of the BDX spec
-}
 
 /**
  * @brief
  *   Allocate a new PacketBuffer and write data from a BDX message struct.
  */
-template <class BdxMsgType>
-CHIP_ERROR WriteToPacketBuffer(const BdxMsgType & msgStruct, ::chip::System::PacketBufferHandle & msgBuf)
+CHIP_ERROR WriteToPacketBuffer(const ::chip::bdx::BdxMessage & msgStruct, ::chip::System::PacketBufferHandle & msgBuf)
 {
     CHIP_ERROR err     = CHIP_NO_ERROR;
     size_t msgDataSize = msgStruct.MessageSize();
@@ -36,6 +34,7 @@ CHIP_ERROR WriteToPacketBuffer(const BdxMsgType & msgStruct, ::chip::System::Pac
 
     return err;
 }
+} // anonymous namespace
 
 namespace chip {
 namespace bdx {
@@ -130,7 +129,7 @@ CHIP_ERROR TransferSession::StartTransfer(TransferRole role, const TransferInitD
     initMsg.Metadata       = initData.Metadata;
     initMsg.MetadataLength = initData.MetadataLength;
 
-    err = WriteToPacketBuffer<TransferInit>(initMsg, mPendingMsgHandle);
+    err = WriteToPacketBuffer(initMsg, mPendingMsgHandle);
     SuccessOrExit(err);
 
     msgType = (mRole == kRole_Sender) ? kBdxMsg_SendInit : kBdxMsg_ReceiveInit;
@@ -197,7 +196,7 @@ CHIP_ERROR TransferSession::AcceptTransfer(const TransferAcceptData & acceptData
         acceptMsg.Metadata       = acceptData.Metadata;
         acceptMsg.MetadataLength = acceptData.MetadataLength;
 
-        err = WriteToPacketBuffer<ReceiveAccept>(acceptMsg, mPendingMsgHandle);
+        err = WriteToPacketBuffer(acceptMsg, mPendingMsgHandle);
         SuccessOrExit(err);
 
         err = AttachBdxHeader(kBdxMsg_ReceiveAccept, mPendingMsgHandle);
@@ -212,7 +211,7 @@ CHIP_ERROR TransferSession::AcceptTransfer(const TransferAcceptData & acceptData
         acceptMsg.Metadata       = acceptData.Metadata;
         acceptMsg.MetadataLength = acceptData.MetadataLength;
 
-        err = WriteToPacketBuffer<SendAccept>(acceptMsg, mPendingMsgHandle);
+        err = WriteToPacketBuffer(acceptMsg, mPendingMsgHandle);
         SuccessOrExit(err);
 
         err = AttachBdxHeader(kBdxMsg_SendAccept, mPendingMsgHandle);
@@ -245,7 +244,7 @@ CHIP_ERROR TransferSession::PrepareBlockQuery()
 
     queryMsg.BlockCounter = mNextQueryNum;
 
-    err = WriteToPacketBuffer<BlockQuery>(queryMsg, mPendingMsgHandle);
+    err = WriteToPacketBuffer(queryMsg, mPendingMsgHandle);
     SuccessOrExit(err);
 
     err = AttachBdxHeader(kBdxMsg_BlockQuery, mPendingMsgHandle);
@@ -278,7 +277,7 @@ CHIP_ERROR TransferSession::PrepareBlock(const BlockData & inData)
     blockMsg.Data         = inData.Data;
     blockMsg.DataLength   = inData.Length;
 
-    err = WriteToPacketBuffer<DataBlock>(blockMsg, mPendingMsgHandle);
+    err = WriteToPacketBuffer(blockMsg, mPendingMsgHandle);
     SuccessOrExit(err);
 
     msgType = inData.IsEof ? kBdxMsg_BlockEOF : kBdxMsg_Block;
@@ -303,21 +302,23 @@ CHIP_ERROR TransferSession::PrepareBlockAck()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     CounterMessage ackMsg;
+    MessageType msgType;
 
     VerifyOrExit(mRole == kRole_Receiver, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit((mState == kState_TransferInProgress) || (mState == kState_ReceivedEOF), err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mPendingOutput == kOutput_None, err = CHIP_ERROR_INCORRECT_STATE);
 
     ackMsg.BlockCounter = mLastBlockNum;
+    msgType             = (mState == kState_ReceivedEOF) ? kBdxMsg_BlockAckEOF : kBdxMsg_BlockAck;
+
+    err = WriteToPacketBuffer(ackMsg, mPendingMsgHandle);
+    SuccessOrExit(err);
+
+    err = AttachBdxHeader(msgType, mPendingMsgHandle);
+    SuccessOrExit(err);
 
     if (mState == kState_TransferInProgress)
     {
-        err = WriteToPacketBuffer<BlockAck>(ackMsg, mPendingMsgHandle);
-        SuccessOrExit(err);
-
-        err = AttachBdxHeader(kBdxMsg_BlockAck, mPendingMsgHandle);
-        SuccessOrExit(err);
-
         if (mControlMode == kControl_SenderDrive)
         {
             // In Sender Drive, a BlockAck is implied to also be a query for the next Block, so expect to receive a Block
@@ -328,12 +329,6 @@ CHIP_ERROR TransferSession::PrepareBlockAck()
     }
     else if (mState == kState_ReceivedEOF)
     {
-        err = WriteToPacketBuffer<BlockAckEOF>(ackMsg, mPendingMsgHandle);
-        SuccessOrExit(err);
-
-        err = AttachBdxHeader(kBdxMsg_BlockAckEOF, mPendingMsgHandle);
-        SuccessOrExit(err);
-
         mState            = kState_TransferDone;
         mAwaitingResponse = false;
     }
