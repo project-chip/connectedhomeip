@@ -28,8 +28,8 @@ static_library("messaging") {
     "Flags.h",
     "ReliableMessageContext.cpp",
     "ReliableMessageContext.h",
-    "ReliableMessageManager.cpp",
-    "ReliableMessageManager.h",
+    "ReliableMessageMgr.cpp",
+    "ReliableMessageMgr.h",
     "ReliableMessageProtocolConfig.h",
   ]
 

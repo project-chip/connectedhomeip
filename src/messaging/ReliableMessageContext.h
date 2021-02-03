@@ -42,7 +42,7 @@ class ChipMessageInfo;
 class ExchangeContext;
 enum class MessageFlagValues : uint32_t;
 class ReliableMessageContext;
-class ReliableMessageManager;
+class ReliableMessageMgr;
 
 class ReliableMessageDelegate
 {
@@ -59,7 +59,7 @@ class ReliableMessageContext
 public:
     ReliableMessageContext();
 
-    void Init(ReliableMessageManager * manager, ExchangeContext * exchange);
+    void Init(ReliableMessageMgr * manager, ExchangeContext * exchange);
     void SetConfig(ReliableMessageProtocolConfig config) { mConfig = config; }
     void SetDelegate(ReliableMessageDelegate * delegate) { mDelegate = delegate; }
 
@@ -111,10 +111,10 @@ private:
     CHIP_ERROR HandleNeedsAck(uint32_t MessageId, BitFlags<uint32_t, MessageFlagValues> Flags);
 
 private:
-    friend class ReliableMessageManager;
+    friend class ReliableMessageMgr;
     friend class ExchangeContext;
 
-    ReliableMessageManager * mManager;
+    ReliableMessageMgr * mManager;
     ExchangeContext * mExchange;
     ReliableMessageDelegate * mDelegate;
     ReliableMessageProtocolConfig mConfig;

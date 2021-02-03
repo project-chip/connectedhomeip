@@ -36,7 +36,7 @@ jobs:
               uses: actions/checkout@v2
               with:
                   submodules: true
-                  ref: "{{ github.event.inputs.releaseTag }}"
+                  ref: "${{ github.event.inputs.releaseTag }}"
             - name: Build
               run: scripts/examples/esp_echo_app.sh
 
@@ -65,7 +65,7 @@ jobs:
               uses: actions/checkout@v2
               with:
                   submodules: true
-                  ref: "{{ github.event.inputs.releaseTag }}"
+                  ref: "${{ github.event.inputs.releaseTag }}"
             - name: Build example EFR32 Lock App 
               run:
                   scripts/examples/gn_efr32_example.sh examples/lock-app/efr32/ out/lock_app_debug $EFR32_BOARD
