@@ -3,7 +3,7 @@ FROM connectedhomeip/chip-build-nrf-platform:${VERSION} AS nrf
 FROM connectedhomeip/chip-build-efr32:${VERSION} AS efr32
 FROM connectedhomeip/chip-build-android:${VERSION} AS android
 FROM connectedhomeip/chip-build-esp32-qemu:${VERSION} as esp32
-FROM connectedhomeip/chip-build-mbedos:${VERSION} AS mbedos
+FROM connectedhomeip/chip-build-mbed-os:${VERSION} AS mbedos
 FROM connectedhomeip/chip-build:${VERSION}
 COPY --from=esp32 /opt/espressif/esp-idf /opt/espressif/esp-idf
 COPY --from=esp32 /opt/espressif/tools /opt/espressif/tools
