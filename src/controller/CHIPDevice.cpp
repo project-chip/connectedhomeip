@@ -55,7 +55,7 @@ using namespace chip::Callback;
 namespace chip {
 namespace Controller {
 
-CHIP_ERROR Device::SendMessage(System::PacketBufferHandle buffer)
+CHIP_ERROR Device::SendMessage(System::PacketBufferHandle buffer, PayloadHeader & payloadHeader)
 {
     System::PacketBufferHandle resend;
     bool loadedSecureSession = false;
@@ -75,7 +75,7 @@ CHIP_ERROR Device::SendMessage(System::PacketBufferHandle buffer)
         resend = buffer.CloneData();
     }
 
-    CHIP_ERROR err = mSessionManager->SendMessage(mSecureSession, std::move(buffer));
+    CHIP_ERROR err = mSessionManager->SendMessage(mSecureSession, payloadHeader, std::move(buffer));
 
     buffer = nullptr;
     ChipLogDetail(Controller, "SendMessage returned %d", err);
@@ -130,6 +130,12 @@ CHIP_ERROR Device::SendCommands()
     ReturnErrorOnFailure(LoadSecureSessionParametersIfNeeded(loadedSecureSession));
     VerifyOrReturnError(mCommandSender != nullptr, CHIP_ERROR_INCORRECT_STATE);
     return mCommandSender->SendCommandRequest(mDeviceId);
+}
+
+CHIP_ERROR Device::SendMessage(System::PacketBufferHandle buffer)
+{
+    PayloadHeader unusedHeader;
+    return SendMessage(std::move(buffer), unusedHeader);
 }
 
 CHIP_ERROR Device::Serialize(SerializedDevice & output)
@@ -266,7 +272,7 @@ CHIP_ERROR Device::LoadSecureSessionParameters(ResetTransport resetNeeded)
 
     err = mSessionManager->NewPairing(
         Optional<Transport::PeerAddress>::Value(Transport::PeerAddress::UDP(mDeviceAddr, mDevicePort, mInterface)), mDeviceId,
-        &pairingSession);
+        &pairingSession, mAdminId);
     SuccessOrExit(err);
 
 exit:

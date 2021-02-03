@@ -63,6 +63,11 @@ int main(int argc, char * argv[])
     chip::Optional<chip::Transport::PeerAddress> peer(chip::Transport::Type::kUndefined);
     bool useTCP = false;
 
+    chip::Transport::AdminPairingTable<> admins;
+    chip::Transport::AdminPairingInfo * adminInfo = nullptr;
+
+    const chip::Transport::AdminId gAdminId = 0;
+
     if (argc > 2)
     {
         printf("Too many arguments specified!\n");
@@ -76,13 +81,16 @@ int main(int argc, char * argv[])
 
     InitializeChip();
 
+    adminInfo = admins.AssignAdminId(gAdminId, chip::kTestDeviceNodeId);
+    VerifyOrExit(adminInfo != nullptr, err = CHIP_ERROR_NO_MEMORY);
+
     if (useTCP)
     {
         err = gTCPManager.Init(
             chip::Transport::TcpListenParameters(&chip::DeviceLayer::InetLayer).SetAddressType(chip::Inet::kIPAddressType_IPv4));
         SuccessOrExit(err);
 
-        err = gSessionManager.Init(chip::kTestDeviceNodeId, &chip::DeviceLayer::SystemLayer, &gTCPManager);
+        err = gSessionManager.Init(chip::kTestDeviceNodeId, &chip::DeviceLayer::SystemLayer, &gTCPManager, &admins);
         SuccessOrExit(err);
     }
     else
@@ -91,7 +99,7 @@ int main(int argc, char * argv[])
             chip::Transport::UdpListenParameters(&chip::DeviceLayer::InetLayer).SetAddressType(chip::Inet::kIPAddressType_IPv4));
         SuccessOrExit(err);
 
-        err = gSessionManager.Init(chip::kTestDeviceNodeId, &chip::DeviceLayer::SystemLayer, &gUDPManager);
+        err = gSessionManager.Init(chip::kTestDeviceNodeId, &chip::DeviceLayer::SystemLayer, &gUDPManager, &admins);
         SuccessOrExit(err);
     }
 
@@ -101,7 +109,7 @@ int main(int argc, char * argv[])
     err = gEchoServer.Init(&gExchangeManager);
     SuccessOrExit(err);
 
-    err = gSessionManager.NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing);
+    err = gSessionManager.NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing, gAdminId);
     SuccessOrExit(err);
 
     // Arrange to get a callback whenever an Echo Request is received.
