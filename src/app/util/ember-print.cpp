@@ -30,7 +30,7 @@ using namespace chip::Logging;
 
 void emberAfPrint(int category, const char * format, ...)
 {
-    if (format != NULL)
+    if (format != nullptr)
     {
         va_list args;
         va_start(args, format);
@@ -41,7 +41,7 @@ void emberAfPrint(int category, const char * format, ...)
 
 void emberAfPrintln(int category, const char * format, ...)
 {
-    if (format != NULL)
+    if (format != nullptr)
     {
         va_list args;
         va_start(args, format);
@@ -54,24 +54,23 @@ void emberAfPrintln(int category, const char * format, ...)
 
 void emberAfPrintBuffer(int category, const uint8_t * buffer, uint16_t length, bool withSpace)
 {
-    if (buffer != NULL && length > 0)
+    if (buffer != nullptr && length > 0)
     {
         constexpr uint16_t kBufferSize = CHIP_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE;
         const char * perByteFormatStr  = withSpace ? "%02hhX " : "%02hhX";
         const uint8_t perByteCharCount = withSpace ? 3 : 2;
-        const uint16_t bytesPerBuffer  = (kBufferSize - 1) / perByteCharCount;
+        const uint16_t bytesPerBuffer  = static_cast<uint16_t>((kBufferSize - 1) / perByteCharCount);
         char result[kBufferSize];
 
         uint16_t index = 0;
         while (index < length)
         {
-            const uint16_t remainingBytes = length - index;
+            const uint16_t remainingBytes = static_cast<uint16_t>(length - index);
             const uint16_t segmentLength  = chip::min(bytesPerBuffer, remainingBytes);
-            const uint16_t segmentEnd     = index + segmentLength;
-            const uint16_t outStringEnd   = segmentLength * perByteCharCount;
-            for (uint16_t dst_idx = 0; dst_idx < outStringEnd && index < segmentEnd; dst_idx += perByteCharCount, index++)
+            const uint16_t segmentEnd     = static_cast<uint16_t>(index + segmentLength);
+            const uint32_t outStringEnd   = segmentLength * perByteCharCount;
+            for (uint32_t dst_idx = 0; dst_idx < outStringEnd && index < segmentEnd; dst_idx += perByteCharCount, index++)
             {
-
                 snprintf(result + dst_idx, outStringEnd - dst_idx + 1, perByteFormatStr, buffer[index]);
             }
             result[outStringEnd] = 0;
