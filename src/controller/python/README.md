@@ -87,6 +87,9 @@ sudo third_party/bluez/repo/emulator/btvirt -L -l2
 
 1. Run CHIP Device Controller
 
+> Running as root via `sudo` to ensure permissions to interface with the
+> bluetooth adapter.
+
 ```
 sudo chip-device-ctrl
 ```
