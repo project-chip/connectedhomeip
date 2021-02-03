@@ -51,7 +51,7 @@ CHIP_ERROR AdditionalDataPayloadGenerator::generateAdditionalDataPayload(uint16_
     size_t rotatingDeviceIdBufferSize = 0;
 
     // Initialize TLVWriter
-    writer.Init(PacketBuffer::New());
+    writer.Init(chip::System::PacketBufferHandle::New(chip::System::kMaxPacketBufferSize));
 
     err = writer.OpenContainer(AnonymousTag, kTLVType_Structure, innerWriter);
     SuccessOrExit(err);
