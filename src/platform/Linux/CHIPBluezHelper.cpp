@@ -907,7 +907,6 @@ static bool BluezGetChipDeviceInfo(BluezDevice1 & aDevice, chip::Ble::ChipBLEDev
 /// Handle advertisement from a device and connect to it if its discriminator is the requested one.
 static void BluezHandleAdvertisementFromDevice(BluezDevice1 * aDevice, BluezEndpoint * aEndpoint)
 {
-    const char * address   = bluez_device1_get_address(aDevice);
     GVariant * serviceData = bluez_device1_get_service_data(aDevice);
     char * debugStr        = nullptr;
     chip::Ble::ChipBLEDeviceIdentificationInfo deviceInfo;
@@ -915,7 +914,7 @@ static void BluezHandleAdvertisementFromDevice(BluezDevice1 * aDevice, BluezEndp
     VerifyOrExit(serviceData != nullptr, );
 
     debugStr = g_variant_print(serviceData, TRUE);
-    ChipLogDetail(DeviceLayer, "TRACE: Device %s Service data: %s", address, debugStr);
+    ChipLogDetail(DeviceLayer, "TRACE: Device %s Service data: %s", bluez_device1_get_address(aDevice), debugStr);
 
     VerifyOrExit(BluezGetChipDeviceInfo(*aDevice, deviceInfo), );
     ChipLogDetail(DeviceLayer, "TRACE: Found CHIP BLE Device: %" PRIu16, deviceInfo.GetDeviceDiscriminator());
