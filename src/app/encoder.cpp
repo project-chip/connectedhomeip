@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -2505,7 +2505,7 @@ PacketBufferHandle encodeNetworkProvisioningClusterAddThreadNetworkCommand(Endpo
                                                                            uint32_t timeoutMs)
 {
     COMMAND_HEADER("AddThreadNetwork", NWPROV_CLUSTER_ID);
-    size_t operationalDatasetStrLen = strlen(operationalDataset);
+    size_t operationalDatasetStrLen = strlen(reinterpret_cast<char *>(operationalDataset));
     if (!CanCastTo<uint8_t>(operationalDatasetStrLen))
     {
         ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, operationalDatasetStrLen);
@@ -2515,7 +2515,7 @@ PacketBufferHandle encodeNetworkProvisioningClusterAddThreadNetworkCommand(Endpo
         .Put8(kSeqNum)
         .Put8(ZCL_ADD_THREAD_NETWORK_COMMAND_ID)
         .Put(static_cast<uint8_t>(operationalDatasetStrLen))
-        .Put(operationalDataset)
+        .Put(reinterpret_cast<char *>(operationalDataset))
         .Put64(breadcrumb)
         .Put32(timeoutMs);
     COMMAND_FOOTER();
@@ -2529,13 +2529,13 @@ PacketBufferHandle encodeNetworkProvisioningClusterAddWiFiNetworkCommand(Endpoin
                                                                          uint32_t timeoutMs)
 {
     COMMAND_HEADER("AddWiFiNetwork", NWPROV_CLUSTER_ID);
-    size_t ssidStrLen = strlen(ssid);
+    size_t ssidStrLen = strlen(reinterpret_cast<char *>(ssid));
     if (!CanCastTo<uint8_t>(ssidStrLen))
     {
         ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, ssidStrLen);
         return PacketBufferHandle();
     }
-    size_t credentialsStrLen = strlen(credentials);
+    size_t credentialsStrLen = strlen(reinterpret_cast<char *>(credentials));
     if (!CanCastTo<uint8_t>(credentialsStrLen))
     {
         ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, credentialsStrLen);
@@ -2545,9 +2545,9 @@ PacketBufferHandle encodeNetworkProvisioningClusterAddWiFiNetworkCommand(Endpoin
         .Put8(kSeqNum)
         .Put8(ZCL_ADD_WI_FI_NETWORK_COMMAND_ID)
         .Put(static_cast<uint8_t>(ssidStrLen))
-        .Put(ssid)
+        .Put(reinterpret_cast<char *>(ssid))
         .Put(static_cast<uint8_t>(credentialsStrLen))
-        .Put(credentials)
+        .Put(reinterpret_cast<char *>(credentials))
         .Put64(breadcrumb)
         .Put32(timeoutMs);
     COMMAND_FOOTER();
@@ -2560,7 +2560,7 @@ PacketBufferHandle encodeNetworkProvisioningClusterDisableNetworkCommand(Endpoin
                                                                          uint64_t breadcrumb, uint32_t timeoutMs)
 {
     COMMAND_HEADER("DisableNetwork", NWPROV_CLUSTER_ID);
-    size_t networkIDStrLen = strlen(networkID);
+    size_t networkIDStrLen = strlen(reinterpret_cast<char *>(networkID));
     if (!CanCastTo<uint8_t>(networkIDStrLen))
     {
         ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, networkIDStrLen);
@@ -2570,7 +2570,7 @@ PacketBufferHandle encodeNetworkProvisioningClusterDisableNetworkCommand(Endpoin
         .Put8(kSeqNum)
         .Put8(ZCL_DISABLE_NETWORK_COMMAND_ID)
         .Put(static_cast<uint8_t>(networkIDStrLen))
-        .Put(networkID)
+        .Put(reinterpret_cast<char *>(networkID))
         .Put64(breadcrumb)
         .Put32(timeoutMs);
     COMMAND_FOOTER();
@@ -2583,7 +2583,7 @@ PacketBufferHandle encodeNetworkProvisioningClusterEnableNetworkCommand(Endpoint
                                                                         uint64_t breadcrumb, uint32_t timeoutMs)
 {
     COMMAND_HEADER("EnableNetwork", NWPROV_CLUSTER_ID);
-    size_t networkIDStrLen = strlen(networkID);
+    size_t networkIDStrLen = strlen(reinterpret_cast<char *>(networkID));
     if (!CanCastTo<uint8_t>(networkIDStrLen))
     {
         ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, networkIDStrLen);
@@ -2593,7 +2593,7 @@ PacketBufferHandle encodeNetworkProvisioningClusterEnableNetworkCommand(Endpoint
         .Put8(kSeqNum)
         .Put8(ZCL_ENABLE_NETWORK_COMMAND_ID)
         .Put(static_cast<uint8_t>(networkIDStrLen))
-        .Put(networkID)
+        .Put(reinterpret_cast<char *>(networkID))
         .Put64(breadcrumb)
         .Put32(timeoutMs);
     COMMAND_FOOTER();
@@ -2620,7 +2620,7 @@ PacketBufferHandle encodeNetworkProvisioningClusterRemoveNetworkCommand(Endpoint
                                                                         uint64_t breadcrumb, uint32_t timeoutMs)
 {
     COMMAND_HEADER("RemoveNetwork", NWPROV_CLUSTER_ID);
-    size_t networkIDStrLen = strlen(networkID);
+    size_t networkIDStrLen = strlen(reinterpret_cast<char *>(networkID));
     if (!CanCastTo<uint8_t>(networkIDStrLen))
     {
         ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, networkIDStrLen);
@@ -2630,7 +2630,7 @@ PacketBufferHandle encodeNetworkProvisioningClusterRemoveNetworkCommand(Endpoint
         .Put8(kSeqNum)
         .Put8(ZCL_REMOVE_NETWORK_COMMAND_ID)
         .Put(static_cast<uint8_t>(networkIDStrLen))
-        .Put(networkID)
+        .Put(reinterpret_cast<char *>(networkID))
         .Put64(breadcrumb)
         .Put32(timeoutMs);
     COMMAND_FOOTER();
@@ -2643,7 +2643,7 @@ PacketBufferHandle encodeNetworkProvisioningClusterScanNetworksCommand(EndpointI
                                                                        uint64_t breadcrumb, uint32_t timeoutMs)
 {
     COMMAND_HEADER("ScanNetworks", NWPROV_CLUSTER_ID);
-    size_t ssidStrLen = strlen(ssid);
+    size_t ssidStrLen = strlen(reinterpret_cast<char *>(ssid));
     if (!CanCastTo<uint8_t>(ssidStrLen))
     {
         ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, ssidStrLen);
@@ -2653,7 +2653,7 @@ PacketBufferHandle encodeNetworkProvisioningClusterScanNetworksCommand(EndpointI
         .Put8(kSeqNum)
         .Put8(ZCL_SCAN_NETWORKS_COMMAND_ID)
         .Put(static_cast<uint8_t>(ssidStrLen))
-        .Put(ssid)
+        .Put(reinterpret_cast<char *>(ssid))
         .Put64(breadcrumb)
         .Put32(timeoutMs);
     COMMAND_FOOTER();
@@ -2667,7 +2667,7 @@ PacketBufferHandle encodeNetworkProvisioningClusterUpdateThreadNetworkCommand(En
                                                                               uint32_t timeoutMs)
 {
     COMMAND_HEADER("UpdateThreadNetwork", NWPROV_CLUSTER_ID);
-    size_t operationalDatasetStrLen = strlen(operationalDataset);
+    size_t operationalDatasetStrLen = strlen(reinterpret_cast<char *>(operationalDataset));
     if (!CanCastTo<uint8_t>(operationalDatasetStrLen))
     {
         ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, operationalDatasetStrLen);
@@ -2677,7 +2677,7 @@ PacketBufferHandle encodeNetworkProvisioningClusterUpdateThreadNetworkCommand(En
         .Put8(kSeqNum)
         .Put8(ZCL_UPDATE_THREAD_NETWORK_COMMAND_ID)
         .Put(static_cast<uint8_t>(operationalDatasetStrLen))
-        .Put(operationalDataset)
+        .Put(reinterpret_cast<char *>(operationalDataset))
         .Put64(breadcrumb)
         .Put32(timeoutMs);
     COMMAND_FOOTER();
@@ -2691,13 +2691,13 @@ PacketBufferHandle encodeNetworkProvisioningClusterUpdateWiFiNetworkCommand(Endp
                                                                             uint32_t timeoutMs)
 {
     COMMAND_HEADER("UpdateWiFiNetwork", NWPROV_CLUSTER_ID);
-    size_t ssidStrLen = strlen(ssid);
+    size_t ssidStrLen = strlen(reinterpret_cast<char *>(ssid));
     if (!CanCastTo<uint8_t>(ssidStrLen))
     {
         ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, ssidStrLen);
         return PacketBufferHandle();
     }
-    size_t credentialsStrLen = strlen(credentials);
+    size_t credentialsStrLen = strlen(reinterpret_cast<char *>(credentials));
     if (!CanCastTo<uint8_t>(credentialsStrLen))
     {
         ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, credentialsStrLen);
@@ -2707,9 +2707,9 @@ PacketBufferHandle encodeNetworkProvisioningClusterUpdateWiFiNetworkCommand(Endp
         .Put8(kSeqNum)
         .Put8(ZCL_UPDATE_WI_FI_NETWORK_COMMAND_ID)
         .Put(static_cast<uint8_t>(ssidStrLen))
-        .Put(ssid)
+        .Put(reinterpret_cast<char *>(ssid))
         .Put(static_cast<uint8_t>(credentialsStrLen))
-        .Put(credentials)
+        .Put(reinterpret_cast<char *>(credentials))
         .Put64(breadcrumb)
         .Put32(timeoutMs);
     COMMAND_FOOTER();
