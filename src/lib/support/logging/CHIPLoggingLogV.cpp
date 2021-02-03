@@ -98,7 +98,7 @@ DLL_EXPORT __CHIP_LOGGING_LINK_ATTRIBUTE void LogV(uint8_t module, uint8_t categ
 #if CHIP_LOGGING_STYLE_ANDROID
 
         char moduleName[chip::Logging::kMaxModuleNameLen + 1];
-        GetModuleName(moduleName, sizeof(moduleName) module);
+        GetModuleName(moduleName, sizeof(moduleName), module);
 
         int priority = (category == kLogCategory_Error) ? ANDROID_LOG_ERROR : ANDROID_LOG_DEBUG;
 
