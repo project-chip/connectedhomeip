@@ -56,7 +56,10 @@ using DeviceTransportMgr = TransportMgr<Transport::UDP /* IPv6 */
 class DLL_EXPORT Device
 {
 public:
-    Device() : mInterface(INET_NULL_INTERFACEID), mActive(false), mState(ConnectionState::NotConnected) {}
+    Device() :
+        mInterface(INET_NULL_INTERFACEID), mActive(false), mState(ConnectionState::NotConnected),
+        mAdminId(Transport::kUndefinedAdminId)
+    {}
     ~Device()
     {
         if (mCommandSender != nullptr)
@@ -137,12 +140,14 @@ public:
      * @param[in] inetLayer    InetLayer object pointer
      * @param[in] listenPort   Port on which controller is listening (typically CHIP_PORT)
      */
-    void Init(DeviceTransportMgr * transportMgr, SecureSessionMgr * sessionMgr, Inet::InetLayer * inetLayer, uint16_t listenPort)
+    void Init(DeviceTransportMgr * transportMgr, SecureSessionMgr * sessionMgr, Inet::InetLayer * inetLayer, uint16_t listenPort,
+              Transport::AdminId admin)
     {
         mTransportMgr   = transportMgr;
         mSessionManager = sessionMgr;
         mInetLayer      = inetLayer;
         mListenPort     = listenPort;
+        mAdminId        = admin;
     }
 
     /**
@@ -165,9 +170,9 @@ public:
      * @param[in] interfaceId  Local Interface ID that should be used to talk to the device
      */
     void Init(DeviceTransportMgr * transportMgr, SecureSessionMgr * sessionMgr, Inet::InetLayer * inetLayer, uint16_t listenPort,
-              NodeId deviceId, uint16_t devicePort, Inet::InterfaceId interfaceId)
+              NodeId deviceId, uint16_t devicePort, Inet::InterfaceId interfaceId, Transport::AdminId admin)
     {
-        Init(transportMgr, sessionMgr, inetLayer, mListenPort);
+        Init(transportMgr, sessionMgr, inetLayer, mListenPort, admin);
         mDeviceId   = deviceId;
         mDevicePort = devicePort;
         mInterface  = interfaceId;
@@ -320,7 +325,11 @@ private:
      */
     CHIP_ERROR LoadSecureSessionParameters(ResetTransport resetNeeded);
 
+    CHIP_ERROR SendMessage(System::PacketBufferHandle message, PayloadHeader & payloadHeader);
+
     uint16_t mListenPort;
+
+    Transport::AdminId mAdminId;
 };
 
 /**

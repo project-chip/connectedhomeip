@@ -48,6 +48,8 @@ constexpr size_t kMaxCommandCount = 3;
 // The CHIP Command interval time in milliseconds.
 constexpr int32_t gCommandInterval = 1000;
 
+constexpr chip::Transport::AdminId gAdminId = 0;
+
 // The CommandSender object.
 chip::app::CommandSender * gpCommandSender = nullptr;
 
@@ -145,7 +147,7 @@ CHIP_ERROR EstablishSecureSession()
     // Attempt to connect to the peer.
     err = gSessionManager.NewPairing(chip::Optional<chip::Transport::PeerAddress>::Value(
                                          chip::Transport::PeerAddress::UDP(gDestAddr, CHIP_PORT, INET_NULL_INTERFACEID)),
-                                     chip::kTestDeviceNodeId, testSecurePairingSecret);
+                                     chip::kTestDeviceNodeId, testSecurePairingSecret, gAdminId);
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -193,6 +195,9 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
 int main(int argc, char * argv[])
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+    chip::Transport::AdminPairingTable<> admins;
+    chip::Transport::AdminPairingInfo * adminInfo = admins.AssignAdminId(gAdminId, chip::kTestControllerNodeId);
+    VerifyOrExit(adminInfo != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     if (argc <= 1)
     {
@@ -213,7 +218,7 @@ int main(int argc, char * argv[])
                                      .SetListenPort(IM_CLIENT_PORT));
     SuccessOrExit(err);
 
-    err = gSessionManager.Init(chip::kTestControllerNodeId, &chip::DeviceLayer::SystemLayer, &gTransportManager);
+    err = gSessionManager.Init(chip::kTestControllerNodeId, &chip::DeviceLayer::SystemLayer, &gTransportManager, &admins);
     SuccessOrExit(err);
 
     err = gExchangeManager.Init(&gSessionManager);

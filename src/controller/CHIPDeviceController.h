@@ -35,6 +35,7 @@
 #include <messaging/ExchangeMgr.h>
 #include <support/DLLUtil.h>
 #include <support/SerializableIntegerSet.h>
+#include <transport/AdminPairingTable.h>
 #include <transport/RendezvousSession.h>
 #include <transport/RendezvousSessionDelegate.h>
 #include <transport/SecureSessionMgr.h>
@@ -198,6 +199,9 @@ protected:
     uint16_t FindDeviceIndex(NodeId id);
     void ReleaseDevice(uint16_t index);
     CHIP_ERROR SetPairedDeviceList(const char * pairedDeviceSerializedSet);
+
+    Transport::AdminId mAdminId = 0;
+    Transport::AdminPairingTable<> mAdmins;
 
 private:
     //////////// SecureSessionMgrDelegate Implementation ///////////////

@@ -44,15 +44,17 @@ using namespace chip::Transport;
 namespace chip {
 
 CHIP_ERROR RendezvousSession::Init(const RendezvousParameters & params, TransportMgrBase * transportMgr,
-                                   SecureSessionMgr * sessionMgr)
+                                   SecureSessionMgr * sessionMgr, Transport::AdminPairingInfo * admin)
 {
     mParams       = params;
     mTransportMgr = transportMgr;
     VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(sessionMgr != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(admin != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mParams.HasSetupPINCode(), CHIP_ERROR_INVALID_ARGUMENT);
 
     mSecureSessionMgr = sessionMgr;
+    mAdmin            = admin;
 
     // TODO: BLE Should be a transport, in that case, RendezvousSession and BLE should decouple
     if (params.GetPeerAddress().GetTransportType() == Transport::Type::kBle)
@@ -140,9 +142,9 @@ void RendezvousSession::OnSessionEstablishmentError(CHIP_ERROR err)
 
 void RendezvousSession::OnSessionEstablished()
 {
-    CHIP_ERROR err =
-        mSecureSessionMgr->NewPairing(Optional<Transport::PeerAddress>::Value(mPairingSession.PeerConnection().GetPeerAddress()),
-                                      mPairingSession.PeerConnection().GetPeerNodeId(), &mPairingSession, mTransport);
+    CHIP_ERROR err = mSecureSessionMgr->NewPairing(
+        Optional<Transport::PeerAddress>::Value(mPairingSession.PeerConnection().GetPeerAddress()),
+        mPairingSession.PeerConnection().GetPeerNodeId(), &mPairingSession, mAdmin->GetAdminId(), mTransport);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Ble, "Failed in setting up secure channel: err %s", ErrorStr(err));
@@ -222,6 +224,7 @@ void RendezvousSession::OnRendezvousError(CHIP_ERROR err)
         mDelegate->OnRendezvousError(err);
     }
     UpdateState(State::kInit, err);
+    mAdmin->Reset();
 }
 
 void RendezvousSession::UpdateState(RendezvousSession::State newState, CHIP_ERROR err)
@@ -360,6 +363,7 @@ CHIP_ERROR RendezvousSession::HandleSecureMessage(const PacketHeader & packetHea
     if (packetHeader.GetDestinationNodeId().HasValue() && !mParams.HasLocalNodeId())
     {
         ChipLogProgress(Ble, "Received rendezvous message for %llu", packetHeader.GetDestinationNodeId().Value());
+        mAdmin->SetNodeId(packetHeader.GetDestinationNodeId().Value());
         mParams.SetLocalNodeId(packetHeader.GetDestinationNodeId().Value());
         mSecureSessionMgr->SetLocalNodeID(packetHeader.GetDestinationNodeId().Value());
     }
