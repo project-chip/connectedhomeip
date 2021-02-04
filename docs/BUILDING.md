@@ -71,8 +71,9 @@ dependency.
 
 #### How to install prerequisites on Raspberry Pi 4
 
-Using `rpi-imager`, install the Ubuntu 20.04.1 LTS (Raspberry Pi 3/4) 64-bit
-server OS for arm64 architectures on a micro SD card.
+Using `rpi-imager`, install the Ubuntu _20.10_ LTS 64-bit _server_ OS for arm64
+architectures on a micro SD card. This release will have bluez 5.55 which is
+required for BLE functionality.
 
 Boot the SD card, login with the default user account "ubuntu" and password
 "ubuntu", then proceed with "How to install prerequisites on Linux".
