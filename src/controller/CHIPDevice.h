@@ -331,16 +331,6 @@ private:
 
     CHIP_ERROR SendMessage(System::PacketBufferHandle message, PayloadHeader & payloadHeader);
 
-    /**
-     * @brief
-     *   This function loads the secure session object from the serialized operational
-     *   credentials corresponding if needed, based on the current state of the device and
-     *   underlying transport object.
-     *
-     * @param[out] didLoad   Were the secure session params loaded by the call to this function.
-     */
-    CHIP_ERROR LoadSecureSessionParametersIfNeeded(bool & didLoad);
-
     uint16_t mListenPort;
 
     Transport::AdminId mAdminId;
