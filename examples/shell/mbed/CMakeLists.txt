@@ -6,16 +6,20 @@ cmake_minimum_required(VERSION 3.19.0)
 get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../../.. REALPATH)
 get_filename_component(APP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/.. REALPATH)
 
+configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/config.in
+    ${CMAKE_CURRENT_BINARY_DIR}/chip_build/config
+    @ONLY
+)
+
 set(MBED_PATH $ENV{MBED_OS_PATH} CACHE INTERNAL "")
 set(MBED_CONFIG_PATH ${CMAKE_CURRENT_SOURCE_DIR}/.mbedbuild CACHE INTERNAL "")
-set(CONFIG_CHIP_LIB_SHELL 1)
 set(APP_TARGET chip-mbed-shell-example)
 
 include(${MBED_PATH}/tools/cmake/app.cmake)
 add_subdirectory(${MBED_PATH} ./mbed_build)
 
 add_subdirectory(${CHIP_ROOT}/config/mbed ./chip_build)
-
 
 add_executable(${APP_TARGET})
 

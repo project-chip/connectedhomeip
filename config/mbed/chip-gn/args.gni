@@ -16,8 +16,6 @@ import("//build_overrides/chip.gni")
 
 chip_device_platform = "mbed"
 
-chip_build_tests = false
-
 chip_project_config_include = ""
 chip_system_project_config_include = ""
 chip_ble_project_config_include = ""
@@ -25,18 +23,8 @@ chip_ble_project_config_include = ""
 custom_toolchain = "//toolchain:mbed"
 mbedtls_target = "//:mbedtls"
 
-
 treat_warnings_as_errors = false
-chip_system_config_locking="none"
 chip_with_lwip=true
 chip_system_config_use_lwip=true
 lwip_platform = "mbed"
 chip_system_config_use_sockets=false
-chip_device_platform = "mbed"
-
-chip_build_libshell = true
-
-# TODO: remove
-mbed_ar="/opt/ARM-software/gcc-arm-none-eabi-9-2019-q4-major/bin/arm-none-eabi-ar"
-mbed_cc="/opt/ARM-software/gcc-arm-none-eabi-9-2019-q4-major/bin/arm-none-eabi-gcc"
-mbed_cxx="/opt/ARM-software/gcc-arm-none-eabi-9-2019-q4-major/bin/arm-none-eabi-g++"
