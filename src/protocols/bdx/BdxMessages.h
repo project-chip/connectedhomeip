@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,7 +25,7 @@
 #pragma once
 
 #include <support/BitFlags.h>
-#include <support/BufBound.h>
+#include <support/BufferWriter.h>
 #include <support/CodeUtils.h>
 #include <system/SystemPacketBuffer.h>
 
@@ -55,16 +55,16 @@ struct TransferInit
 {
     /**
      * @brief
-     *  Write the message fields to a buffer using the provided BufBound.
+     *  Write the message fields to a buffer using the provided BufferWriter.
      *
-     *  It is up to the caller to use BufBound::Fit() to verify that the write was
+     *  It is up to the caller to use BufferWriter::Fit() to verify that the write was
      *  successful. This method will also not check for correctness or completeness for
      *  any of the fields - it is the caller's responsibility to ensure that the fields
      *  have been filled out adequately.
      *
-     * @param aBuffer A BufBound object that will be used to write the message
+     * @param aBuffer A BufferWriter object that will be used to write the message
      */
-    BufBound & WriteToBuffer(BufBound & aBuffer) const;
+    Encoding::LittleEndian::BufferWriter & WriteToBuffer(Encoding::LittleEndian::BufferWriter & aBuffer) const;
 
     /**
      * @brief
@@ -124,16 +124,16 @@ struct SendAccept
 {
     /**
      * @brief
-     *  Write the message fields to a buffer using the provided BufBound.
+     *  Write the message fields to a buffer using the provided BufferWriter.
      *
-     *  It is up to the caller to use BufBound::Fit() to verify that the write was
+     *  It is up to the caller to use BufferWriter::Fit() to verify that the write was
      *  successful. This method will also not check for correctness or completeness for
      *  any of the fields - it is the caller's responsibility to ensure that the fields
      *  have been filled out adequately.
      *
-     * @param aBuffer A BufBound object that will be used to write the message
+     * @param aBuffer A BufferWriter object that will be used to write the message
      */
-    BufBound & WriteToBuffer(BufBound & aBuffer) const;
+    Encoding::LittleEndian::BufferWriter & WriteToBuffer(Encoding::LittleEndian::BufferWriter & aBuffer) const;
 
     /**
      * @brief
@@ -185,16 +185,16 @@ struct ReceiveAccept
 {
     /**
      * @brief
-     *  Write the message fields to a buffer using the provided BufBound.
+     *  Write the message fields to a buffer using the provided BufferWriter.
      *
-     *  It is up to the caller to use BufBound::Fit() to verify that the write was
+     *  It is up to the caller to use BufferWriter::Fit() to verify that the write was
      *  successful. This method will also not check for correctness or completeness for
      *  any of the fields - it is the caller's responsibility to ensure that the fields
      *  have been filled out adequately.
      *
-     * @param aBuffer A BufBound object that will be used to write the message
+     * @param aBuffer A BufferWriter object that will be used to write the message
      */
-    BufBound & WriteToBuffer(BufBound & aBuffer) const;
+    Encoding::LittleEndian::BufferWriter & WriteToBuffer(Encoding::LittleEndian::BufferWriter & aBuffer) const;
 
     /**
      * @brief
@@ -250,16 +250,16 @@ struct CounterMessage
 {
     /**
      * @brief
-     *  Write the message fields to a buffer using the provided BufBound.
+     *  Write the message fields to a buffer using the provided BufferWriter.
      *
-     *  It is up to the caller to use BufBound::Fit() to verify that the write was
+     *  It is up to the caller to use BufferWriter::Fit() to verify that the write was
      *  successful. This method will also not check for correctness or completeness for
      *  any of the fields - it is the caller's responsibility to ensure that the fields
      *  have been filled out adequately.
      *
-     * @param aBuffer A BufBound object that will be used to write the message
+     * @param aBuffer A BufferWriter object that will be used to write the message
      */
-    BufBound & WriteToBuffer(BufBound & aBuffer) const;
+    Encoding::LittleEndian::BufferWriter & WriteToBuffer(Encoding::LittleEndian::BufferWriter & aBuffer) const;
 
     /**
      * @brief
@@ -301,16 +301,16 @@ struct DataBlock
 {
     /**
      * @brief
-     *  Write the message fields to a buffer using the provided BufBound.
+     *  Write the message fields to a buffer using the provided BufferWriter.
      *
-     *  It is up to the caller to use BufBound::Fit() to verify that the write was
+     *  It is up to the caller to use BufferWriter::Fit() to verify that the write was
      *  successful. This method will also not check for correctness or completeness for
      *  any of the fields - it is the caller's responsibility to ensure that the fields
      *  have been filled out adequately.
      *
-     * @param aBuffer A BufBound object that will be used to write the message
+     * @param aBuffer A BufferWriter object that will be used to write the message
      */
-    BufBound & WriteToBuffer(BufBound & aBuffer) const;
+    Encoding::LittleEndian::BufferWriter & WriteToBuffer(Encoding::LittleEndian::BufferWriter & aBuffer) const;
 
     /**
      * @brief

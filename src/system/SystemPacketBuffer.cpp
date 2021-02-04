@@ -579,7 +579,6 @@ void PacketBufferHandle::RightSizeForMemoryAlloc()
         return;
     }
 
-    // XXX fixme
     uint8_t * const newStart = reinterpret_cast<uint8_t *>(newBuffer) + CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE;
     newBuffer->next = nullptr;
     newBuffer->payload = newStart + (payload - start);
@@ -595,7 +594,8 @@ void PacketBufferHandle::RightSizeForMemoryAlloc()
 
 #endif
 
-PacketBufBound::PacketBufBound(size_t aAvailableSize, uint16_t aReservedSize) : BufBound(nullptr, 0)
+PacketBufferWriter::PacketBufferWriter(size_t aAvailableSize, uint16_t aReservedSize) :
+    Encoding::LittleEndian::BufferWriter(nullptr, 0)
 {
     mPacket = PacketBufferHandle::New(aAvailableSize, aReservedSize);
     if (!mPacket.IsNull())
@@ -604,7 +604,7 @@ PacketBufBound::PacketBufBound(size_t aAvailableSize, uint16_t aReservedSize) : 
     }
 }
 
-PacketBufferHandle PacketBufBound::Finalize()
+PacketBufferHandle PacketBufferWriter::Finalize()
 {
     if (!mPacket.IsNull() && Fit())
     {

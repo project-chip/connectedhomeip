@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@
 #include <openssl/x509.h>
 
 #include <core/CHIPSafeCasts.h>
-#include <support/BufBound.h>
+#include <support/BufferWriter.h>
 #include <support/CodeUtils.h>
 #include <support/SafeInt.h>
 #include <support/logging/CHIPLogging.h>
@@ -969,7 +969,7 @@ CHIP_ERROR P256Keypair::Serialize(P256SerializedKeypair & output)
 
     {
         size_t len = output.Length() == 0 ? output.Capacity() : output.Length();
-        BufBound bbuf(output, len);
+        Encoding::LittleEndian::BufferWriter bbuf(output, len);
         bbuf.Put(mPublicKey, mPublicKey.Length());
         bbuf.Put(privkey, sizeof(privkey));
         VerifyOrExit(bbuf.Fit(), error = CHIP_ERROR_NO_MEMORY);
@@ -984,7 +984,7 @@ exit:
 
 CHIP_ERROR P256Keypair::Deserialize(P256SerializedKeypair & input)
 {
-    BufBound bbuf(mPublicKey, mPublicKey.Length());
+    Encoding::LittleEndian::BufferWriter bbuf(mPublicKey, mPublicKey.Length());
 
     BIGNUM * pvt_key     = nullptr;
     EC_GROUP * group     = nullptr;
