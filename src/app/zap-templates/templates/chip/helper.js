@@ -364,7 +364,7 @@ function asPythonType(zclType)
   case 'char *':
     return 'str';
   case 'uint8_t *':
-    return 'byte';
+    return 'bytes';
   }
 }
 

@@ -323,23 +323,23 @@ class ChipCluster:
             },
             "NetworkProvisioning": {
                 "AddThreadNetwork": {
-                    "operationalDataset": "byte",
+                    "operationalDataset": "bytes",
                     "breadcrumb": "int",
                     "timeoutMs": "int",
                 },
                 "AddWiFiNetwork": {
-                    "ssid": "byte",
-                    "credentials": "byte",
+                    "ssid": "bytes",
+                    "credentials": "bytes",
                     "breadcrumb": "int",
                     "timeoutMs": "int",
                 },
                 "DisableNetwork": {
-                    "networkID": "byte",
+                    "networkID": "bytes",
                     "breadcrumb": "int",
                     "timeoutMs": "int",
                 },
                 "EnableNetwork": {
-                    "networkID": "byte",
+                    "networkID": "bytes",
                     "breadcrumb": "int",
                     "timeoutMs": "int",
                 },
@@ -347,23 +347,23 @@ class ChipCluster:
                     "timeoutMs": "int",
                 },
                 "RemoveNetwork": {
-                    "networkID": "byte",
+                    "networkID": "bytes",
                     "breadcrumb": "int",
                     "timeoutMs": "int",
                 },
                 "ScanNetworks": {
-                    "ssid": "byte",
+                    "ssid": "bytes",
                     "breadcrumb": "int",
                     "timeoutMs": "int",
                 },
                 "UpdateThreadNetwork": {
-                    "operationalDataset": "byte",
+                    "operationalDataset": "bytes",
                     "breadcrumb": "int",
                     "timeoutMs": "int",
                 },
                 "UpdateWiFiNetwork": {
-                    "ssid": "byte",
-                    "credentials": "byte",
+                    "ssid": "bytes",
+                    "credentials": "bytes",
                     "breadcrumb": "int",
                     "timeoutMs": "int",
                 },
@@ -840,28 +840,28 @@ class ChipCluster:
             )
         )
 
-    def ClusterNetworkProvisioning_CommandAddThreadNetwork(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, operationalDataset: byte, breadcrumb: int, timeoutMs: int):
+    def ClusterNetworkProvisioning_CommandAddThreadNetwork(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, operationalDataset: bytes, breadcrumb: int, timeoutMs: int):
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_NetworkProvisioning_AddThreadNetwork(
                 device, ZCLendpoint, ZCLgroupid, operationalDataset, len(operationalDataset), breadcrumb, timeoutMs
             )
         )
 
-    def ClusterNetworkProvisioning_CommandAddWiFiNetwork(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, ssid: byte, credentials: byte, breadcrumb: int, timeoutMs: int):
+    def ClusterNetworkProvisioning_CommandAddWiFiNetwork(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, ssid: bytes, credentials: bytes, breadcrumb: int, timeoutMs: int):
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_NetworkProvisioning_AddWiFiNetwork(
                 device, ZCLendpoint, ZCLgroupid, ssid, len(ssid), credentials, len(credentials), breadcrumb, timeoutMs
             )
         )
 
-    def ClusterNetworkProvisioning_CommandDisableNetwork(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, networkID: byte, breadcrumb: int, timeoutMs: int):
+    def ClusterNetworkProvisioning_CommandDisableNetwork(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, networkID: bytes, breadcrumb: int, timeoutMs: int):
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_NetworkProvisioning_DisableNetwork(
                 device, ZCLendpoint, ZCLgroupid, networkID, len(networkID), breadcrumb, timeoutMs
             )
         )
 
-    def ClusterNetworkProvisioning_CommandEnableNetwork(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, networkID: byte, breadcrumb: int, timeoutMs: int):
+    def ClusterNetworkProvisioning_CommandEnableNetwork(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, networkID: bytes, breadcrumb: int, timeoutMs: int):
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_NetworkProvisioning_EnableNetwork(
                 device, ZCLendpoint, ZCLgroupid, networkID, len(networkID), breadcrumb, timeoutMs
@@ -875,28 +875,28 @@ class ChipCluster:
             )
         )
 
-    def ClusterNetworkProvisioning_CommandRemoveNetwork(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, networkID: byte, breadcrumb: int, timeoutMs: int):
+    def ClusterNetworkProvisioning_CommandRemoveNetwork(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, networkID: bytes, breadcrumb: int, timeoutMs: int):
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_NetworkProvisioning_RemoveNetwork(
                 device, ZCLendpoint, ZCLgroupid, networkID, len(networkID), breadcrumb, timeoutMs
             )
         )
 
-    def ClusterNetworkProvisioning_CommandScanNetworks(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, ssid: byte, breadcrumb: int, timeoutMs: int):
+    def ClusterNetworkProvisioning_CommandScanNetworks(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, ssid: bytes, breadcrumb: int, timeoutMs: int):
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_NetworkProvisioning_ScanNetworks(
                 device, ZCLendpoint, ZCLgroupid, ssid, len(ssid), breadcrumb, timeoutMs
             )
         )
 
-    def ClusterNetworkProvisioning_CommandUpdateThreadNetwork(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, operationalDataset: byte, breadcrumb: int, timeoutMs: int):
+    def ClusterNetworkProvisioning_CommandUpdateThreadNetwork(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, operationalDataset: bytes, breadcrumb: int, timeoutMs: int):
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_NetworkProvisioning_UpdateThreadNetwork(
                 device, ZCLendpoint, ZCLgroupid, operationalDataset, len(operationalDataset), breadcrumb, timeoutMs
             )
         )
 
-    def ClusterNetworkProvisioning_CommandUpdateWiFiNetwork(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, ssid: byte, credentials: byte, breadcrumb: int, timeoutMs: int):
+    def ClusterNetworkProvisioning_CommandUpdateWiFiNetwork(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, ssid: bytes, credentials: bytes, breadcrumb: int, timeoutMs: int):
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_NetworkProvisioning_UpdateWiFiNetwork(
                 device, ZCLendpoint, ZCLgroupid, ssid, len(ssid), credentials, len(credentials), breadcrumb, timeoutMs
