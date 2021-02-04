@@ -70,7 +70,7 @@ public:
 
     struct StatusReportData
     {
-        StatusCode error;
+        uint16_t StatusCode;
     };
 
     struct BlockData
@@ -261,7 +261,7 @@ private:
         kAwaitingEOFAck,
         kReceivedEOF,
         kTransferDone,
-        kError,
+        kErrorState,
     };
 
     // Incoming message handlers
@@ -289,7 +289,7 @@ private:
      */
     CHIP_ERROR VerifyProposedMode(const BitFlags<uint8_t, TransferControlFlags> & proposed);
 
-    void SetTransferError(StatusCode code);
+    void PrepareStatusReport(StatusCode code);
     bool IsTransferLengthDefinite();
 
     OutputEventType mPendingOutput = kNone;

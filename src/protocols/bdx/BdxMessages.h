@@ -44,7 +44,7 @@ enum MessageType : uint8_t
     kBdxMsg_BlockAckEOF   = 0x14,
 };
 
-enum StatusCode : uint8_t
+enum StatusCode : uint16_t
 {
     kStatus_None                       = 0x0000,
     kStatus_Overflow                   = 0x0011,
