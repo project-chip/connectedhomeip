@@ -97,7 +97,7 @@ static void TestDNSResolution_Basic(nlTestSuite * testSuite, void * testContext)
     RunTestCase(testSuite,
         DNSResolutionTestCase
         {
-            "ipv4.apple.com",
+            "ipv4.google.com",
             kDNSOption_Default,
             kMaxResults,
             INET_NO_ERROR,
@@ -110,7 +110,7 @@ static void TestDNSResolution_Basic(nlTestSuite * testSuite, void * testContext)
     RunTestCase(testSuite,
         DNSResolutionTestCase
         {
-            "ipv6.apple.com",
+            "ipv6.google.com",
             kDNSOption_Default,
             kMaxResults,
             INET_NO_ERROR,
@@ -123,7 +123,7 @@ static void TestDNSResolution_Basic(nlTestSuite * testSuite, void * testContext)
     RunTestCase(testSuite,
         DNSResolutionTestCase
         {
-            "apple.com",
+            "google.com",
             kDNSOption_Default,
             kMaxResults,
             INET_NO_ERROR,
@@ -148,7 +148,7 @@ static void TestDNSResolution_AddressTypeOption(nlTestSuite * testSuite, void * 
     RunTestCase(testSuite,
         DNSResolutionTestCase
         {
-            "apple.com",
+            "google.com",
             kDNSOption_AddrFamily_IPv4Only,
             kMaxResults,
             INET_NO_ERROR,
@@ -162,7 +162,7 @@ static void TestDNSResolution_AddressTypeOption(nlTestSuite * testSuite, void * 
     RunTestCase(testSuite,
         DNSResolutionTestCase
         {
-            "apple.com",
+            "google.com",
             kDNSOption_AddrFamily_IPv6Only,
             kMaxResults,
             INET_NO_ERROR,
@@ -176,7 +176,7 @@ static void TestDNSResolution_AddressTypeOption(nlTestSuite * testSuite, void * 
     RunTestCase(testSuite,
         DNSResolutionTestCase
         {
-            "apple.com",
+            "google.com",
             kDNSOption_AddrFamily_IPv4Preferred,
             kMaxResults,
             INET_NO_ERROR,
@@ -190,7 +190,7 @@ static void TestDNSResolution_AddressTypeOption(nlTestSuite * testSuite, void * 
     RunTestCase(testSuite,
         DNSResolutionTestCase
         {
-            "apple.com",
+            "google.com",
             kDNSOption_AddrFamily_IPv6Preferred,
             kMaxResults,
             INET_NO_ERROR,
@@ -215,7 +215,7 @@ static void TestDNSResolution_RestrictedResults(nlTestSuite * testSuite, void * 
     RunTestCase(testSuite,
         DNSResolutionTestCase
         {
-            "apple.com",
+            "google.com",
             kDNSOption_AddrFamily_IPv4Only,
             2,
             INET_NO_ERROR,
@@ -229,7 +229,7 @@ static void TestDNSResolution_RestrictedResults(nlTestSuite * testSuite, void * 
     RunTestCase(testSuite,
         DNSResolutionTestCase
         {
-            "apple.com",
+            "google.com",
             kDNSOption_AddrFamily_IPv6Only,
             2,
             INET_NO_ERROR,
@@ -244,7 +244,7 @@ static void TestDNSResolution_RestrictedResults(nlTestSuite * testSuite, void * 
     RunTestCase(testSuite,
         DNSResolutionTestCase
         {
-            "apple.com",
+            "google.com",
             kDNSOption_AddrFamily_IPv4Preferred,
             2,
             INET_NO_ERROR,
@@ -259,7 +259,7 @@ static void TestDNSResolution_RestrictedResults(nlTestSuite * testSuite, void * 
     RunTestCase(testSuite,
         DNSResolutionTestCase
         {
-            "apple.com",
+            "google.com",
             kDNSOption_AddrFamily_IPv6Preferred,
             2,
             INET_NO_ERROR,
@@ -279,7 +279,7 @@ static void TestDNSResolution_NoRecord(nlTestSuite * testSuite, void * testConte
     RunTestCase(testSuite,
         DNSResolutionTestCase
         {
-            "www.does.not.exist.hopefully",
+            "www.google.invalid.",
             kDNSOption_AddrFamily_Any,
             1,
             INET_ERROR_HOST_NOT_FOUND,
@@ -315,7 +315,7 @@ static void TestDNSResolution_NoHostRecord(nlTestSuite * testSuite, void * testC
     RunTestCase(testSuite,
         DNSResolutionTestCase
         {
-            "ipv6.apple.com",
+            "ipv6.google.com",
             kDNSOption_AddrFamily_IPv4Only,
             kMaxResults,
             INET_ERROR_HOST_NOT_FOUND,
@@ -329,7 +329,7 @@ static void TestDNSResolution_NoHostRecord(nlTestSuite * testSuite, void * testC
     RunTestCase(testSuite,
         DNSResolutionTestCase
         {
-            "ipv4.apple.com",
+            "ipv4.google.com",
             kDNSOption_AddrFamily_IPv6Only,
             kMaxResults,
             INET_ERROR_HOST_NOT_FOUND,
@@ -402,7 +402,7 @@ static void TestDNSResolution_TextForm(nlTestSuite * testSuite, void * testConte
 static void TestDNSResolution_Cancel(nlTestSuite * testSuite, void * inContext)
 {
     DNSResolutionTestContext testContext{
-        testSuite, DNSResolutionTestCase{ "www.apple.com", kDNSOption_Default, kMaxResults, INET_NO_ERROR, true, false }
+        testSuite, DNSResolutionTestCase{ "www.google.com", kDNSOption_Default, kMaxResults, INET_NO_ERROR, true, false }
     };
 
     // Start DNS resolution.
@@ -460,7 +460,7 @@ static void TestDNSResolution_Simultaneous(nlTestSuite * testSuite, void * inCon
             testSuite,
             DNSResolutionTestCase
             {
-                "www.apple.com",
+                "www.google.com",
                 kDNSOption_Default,
                 kMaxResults,
                 INET_NO_ERROR,
