@@ -113,7 +113,7 @@ public:
 
         ChipLogProgress(AppServer, "Packet received from %s: %zu bytes", src_addr, static_cast<size_t>(data_len));
 
-        HandleDataModelMessage(header, std::move(buffer), mgr);
+        HandleDataModelMessage(header.GetSourceNodeId().Value(), std::move(buffer));
 
     exit:;
     }

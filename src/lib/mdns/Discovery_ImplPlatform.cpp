@@ -192,7 +192,7 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
         subTypes[subTypeSize++] = vendorSubType;
     }
 
-    service.mTextEntryies  = textEntries;
+    service.mTextEntries   = textEntries;
     service.mTextEntrySize = textEntrySize;
     service.mPort          = CHIP_PORT;
     service.mInterface     = INET_NULL_INTERFACEID;
@@ -215,7 +215,7 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const OperationalAdvertisingParamete
     strncpy(service.mType, "_chip", sizeof(service.mType));
     service.mProtocol      = MdnsServiceProtocol::kMdnsProtocolTcp;
     service.mPort          = CHIP_PORT;
-    service.mTextEntryies  = nullptr;
+    service.mTextEntries   = nullptr;
     service.mTextEntrySize = 0;
     service.mInterface     = INET_NULL_INTERFACEID;
     service.mAddressType   = Inet::kIPAddressType_Any;
