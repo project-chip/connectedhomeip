@@ -1,5 +1,5 @@
 #
-#   Copyright (c) 2020 Project CHIP Authors
+#   Copyright (c) 2020-201 Project CHIP Authors
 #   All rights reserved.
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +15,7 @@
 #   limitations under the License.
 #
 
-from connectedhomeip/chip-cirque-device-base:latest
+FROM connectedhomeip/chip-cirque-device-base:latest
 
 COPY out/debug/chip-tool-server /usr/bin/
 COPY entrypoint.sh /
