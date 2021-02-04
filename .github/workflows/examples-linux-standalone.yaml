@@ -51,15 +51,15 @@ jobs:
               run: scripts/build/gn_bootstrap.sh
             - name: Build example Standalone Echo Client
               run:
-                  scripts/examples/gn_build_example.sh examples/chip-tool 
+                  scripts/examples/gn_build_example.sh examples/chip-tool
                   out/chip_tool_debug
             - name: Build example Standalone Shell
               run:
-                  scripts/examples/gn_build_example.sh examples/shell/standalone 
+                  scripts/examples/gn_build_example.sh examples/shell/standalone
                   out/shell_debug
             - name: Build example Standalone All Clusters Server
               run:
-                  scripts/examples/gn_build_example.sh examples/all-clusters-app/linux 
+                  scripts/examples/gn_build_example.sh examples/all-clusters-app/linux
                   out/all_clusters_debug chip_bypass_rendezvous=true
             - name: Binary artifact suffix
               id: outsuffix
