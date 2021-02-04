@@ -1,0 +1,83 @@
+{{> header}}
+
+#pragma once
+
+#include "ReportingCommand.h"
+
+
+typedef void (*UnsupportedAttributeCallback)(void * context);
+
+class Listen : public ReportingCommand
+{
+public:
+    Listen() : ReportingCommand("listen")
+    {
+    }
+    
+    void AddReportCallbacks(uint8_t endpointId) override
+    {
+        chip::app::CHIPDeviceCallbacksMgr & callbacksMgr = chip::app::CHIPDeviceCallbacksMgr::GetInstance();
+{{#chip_clusters}}
+{{#chip_server_cluster_attributes}}
+{{#if (isReportableAttribute)}}
+        callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, {{asHex parent.code 4}}, {{asHex attributeCode 4}}, onReport{{asCamelCased parent.name false}}{{asCamelCased name false}}Callback->Cancel());
+{{/if}}
+{{/chip_server_cluster_attributes}}
+{{/chip_clusters}}
+    }
+
+    static void OnDefaultSuccessResponse(void * context)
+    {
+        ChipLogProgress(chipTool, "Default Success Response");
+    }
+
+    static void OnDefaultFailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Default Failure Response: 0x%02x", status);
+    }
+
+    static void OnUnsupportedAttributeResponse(void * context)
+    {
+        ChipLogError(chipTool, "Unsupported attribute Response. This should never happen !");
+    }
+
+    static void OnBooleanAttributeResponse(void * context, bool value)
+    {
+        ChipLogProgress(chipTool, "Boolean attribute Response: %d", value);
+    }
+
+    static void OnInt8uAttributeResponse(void * context, uint8_t value)
+    {
+        ChipLogProgress(chipTool, "Int8u attribute Response: %" PRIu8, value);
+    }
+
+    static void OnInt16uAttributeResponse(void * context, uint16_t value)
+    {
+        ChipLogProgress(chipTool, "Int16u attribute Response: %" PRIu16, value);
+    }
+
+    static void OnInt16sAttributeResponse(void * context, int16_t value)
+    {
+        ChipLogProgress(chipTool, "Int16s attribute Response: %" PRId16, value);
+    }
+
+private:
+{{#chip_clusters}}
+{{#chip_server_cluster_attributes}}
+{{#if (isReportableAttribute)}}
+    chip::Callback::Callback<{{asCallbackAttributeType atomicTypeId}}AttributeCallback> * onReport{{asCamelCased parent.name false}}{{asCamelCased name false}}Callback = new chip::Callback::Callback<{{asCallbackAttributeType atomicTypeId}}AttributeCallback>(On{{asCallbackAttributeType atomicTypeId}}AttributeResponse, this);
+{{/if}}
+{{/chip_server_cluster_attributes}}
+{{/chip_clusters}}
+};
+
+void registerCommandsReporting(Commands & commands)
+{
+    const char * clusterName = "Reporting";
+
+    commands_list clusterCommands = {
+        make_unique<Listen>(),
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
