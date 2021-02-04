@@ -12,14 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: Mbed OS docker image test
+name: Mbed OS - Docker image test
 on:
   workflow_dispatch:
     inputs:
 
 jobs:
     mbed-os:
-        name: Mbed OS docker image test
+        name: Mbed OS - Docker image test
         env:
             BUILD_TYPE: mbed-os
 
