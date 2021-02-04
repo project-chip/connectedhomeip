@@ -24,7 +24,5 @@ custom_toolchain = "//toolchain:mbed"
 mbedtls_target = "//:mbedtls"
 
 treat_warnings_as_errors = false
-chip_with_lwip=true
-chip_system_config_use_lwip=true
 lwip_platform = "mbed"
 chip_system_config_use_sockets=false

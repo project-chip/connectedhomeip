@@ -19,25 +19,11 @@ set(APP_TARGET chip-mbed-shell-example)
 include(${MBED_PATH}/tools/cmake/app.cmake)
 add_subdirectory(${MBED_PATH} ./mbed_build)
 
-add_subdirectory(${CHIP_ROOT}/config/mbed ./chip_build)
-
 add_executable(${APP_TARGET})
 
 target_include_directories(${APP_TARGET} PRIVATE
                            ${CMAKE_CURRENT_SOURCE_DIR}
                            ${APP_ROOT}/shell_common/include)
-
-# FIXME: These includes path should be propagated by chip 
-target_include_directories(${APP_TARGET} PRIVATE 
-    ${CHIP_ROOT}/third_party/lwip/repo/lwip/src/include
-    ${CHIP_ROOT}/src/lwip/mbed
-)
-
-# FIXME: These defines should be propagated by chip 
-target_compile_definitions(${APP_TARGET} PRIVATE
-    "LWIP_NO_STDINT_H=1" 
-    "IN_ADDR_T_DEFINED=1"
-)
 
 target_sources(${APP_TARGET} PRIVATE
     ${APP_ROOT}/shell_common/cmd_base64.cpp
@@ -48,6 +34,8 @@ target_sources(${APP_TARGET} PRIVATE
     ${APP_ROOT}/standalone/main.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/arch.c
 )
+
+add_subdirectory(${CHIP_ROOT}/config/mbed ./chip_build)
 
 mbed_configure_app_target(${APP_TARGET})
 
