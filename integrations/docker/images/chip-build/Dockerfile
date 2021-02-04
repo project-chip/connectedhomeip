@@ -32,6 +32,7 @@ RUN set -x \
     libglib2.0-dev \
     libical-dev \
     libjpeg-dev \
+    libdmalloc-dev \
     libmbedtls-dev \
     libncurses5-dev \
     libncursesw5-dev \

@@ -1088,13 +1088,3 @@ uint8_t emAfPluginReportingConditionallyAddReportingEntry(EmberAfPluginReporting
     }
     return 0;
 }
-
-bool emberAfConfigureReportingResponseCallback(ClusterId clusterId, uint8_t * buffer, uint16_t bufLen)
-{
-    return false;
-}
-
-bool emberAfReadReportingConfigurationResponseCallback(ClusterId clusterId, uint8_t * buffer, uint16_t bufLen)
-{
-    return false;
-}

@@ -778,7 +778,7 @@ CHIP_ERROR DecodeConvertTBSCert(TLVReader & reader, ASN1Writer & writer, ChipCer
         ASN1_END_SEQUENCE;
 
         // issuer Name
-        err = reader.Next(kTLVType_Path, ContextTag(kTag_Issuer));
+        err = reader.Next(kTLVType_List, ContextTag(kTag_Issuer));
         SuccessOrExit(err);
         err = DecodeConvertDN(reader, writer, certData.mIssuerDN);
         SuccessOrExit(err);
@@ -788,7 +788,7 @@ CHIP_ERROR DecodeConvertTBSCert(TLVReader & reader, ASN1Writer & writer, ChipCer
         SuccessOrExit(err);
 
         // subject Name
-        err = reader.Next(kTLVType_Path, ContextTag(kTag_Subject));
+        err = reader.Next(kTLVType_List, ContextTag(kTag_Subject));
         SuccessOrExit(err);
         err = DecodeConvertDN(reader, writer, certData.mSubjectDN);
         SuccessOrExit(err);

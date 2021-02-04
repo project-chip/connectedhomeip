@@ -1,0 +1,352 @@
+<?xml version="1.0"?>
+<configurator>
+  <!--
+Copyright (c) 2008,2020 Silicon Labs.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+  <domain name="Works With All Hubs"/>
+  <enum name="WwahIasZoneEnrollmentMode" type="ENUM8">
+    <item name="TripToPair" value="0x00"/>
+    <item name="AutoEnrollmentResponse" value="0x01"/>
+    <item name="Request" value="0x02"/>
+  </enum>
+  <enum name="WwahPowerNotificationReason" type="ENUM8">
+    <item name="Unknown" value="0x00"/>
+    <item name="Battery" value="0x01"/>
+    <item name="Brownout" value="0x02"/>
+    <item name="Watchdog" value="0x03"/>
+    <item name="ResetPin" value="0x04"/>
+    <item name="MemoryHardwareFault" value="0x05"/>
+    <item name="SofwareException" value="0x06"/>
+    <item name="OtaBootloadSuccess" value="0x07"/>
+    <item name="SoftwareReset" value="0x08"/>
+    <item name="PowerButton" value="0x09"/>
+    <item name="Temperature" value="0x0A"/>
+    <item name="BootloadFailure" value="0x0B"/>
+  </enum>
+  <struct name="WwahBeaconSurvey">
+    <item name="deviceShort" type="INT16U"/>
+    <item name="rssi" type="INT8U"/>
+    <item name="classificationMask" type="INT8U"/>
+  </struct>
+  <struct name="WwahClusterStatusToUseTC">
+    <item name="clusterId" type="CLUSTER_ID"/>
+    <item name="status" type="Status"/>
+  </struct>
+  <cluster manufacturerCode="0x1217" singleton="true">
+    <!-- Amazon -->
+    <name>SL Works With All Hubs</name>
+    <!-- Aligned with 17-01067-023-WWAH ZCL Cluster Definition -->
+    <domain>Works With All Hubs</domain>
+    <description>Silicon Labs proprietary attributes and commands for Works With All Hubs functional extensions.</description>
+    <code>0xFC57</code>
+    <!-- 0xFCxx for proprietary cluster ID; 0x57 for 'W' -->
+    <define>SL_WWAH_CLUSTER</define>
+    <client tick="false" init="false">true</client>
+    <server tick="false" init="false">true</server>
+    <!-- attribute side="server" code="0x0000" define="NOT_DEFINED"></attribute -->
+    <!-- removed from spec Version 023 -->
+    <!-- attribute side="server" code="0x0001" define="NOT_DEFINED"></attribute -->
+    <!-- removed from spec Version 012 -->
+    <attribute side="server" code="0x0002" define="SL_DISABLE_OTA_DOWNGRADES" type="BOOLEAN" min="0x00" max="0x01" writable="false" default="0x00" optional="false">disable ota downgrades</attribute>
+    <attribute side="server" code="0x0003" define="SL_MGMT_LEAVE_WITHOUT_REJOIN_ENABLED" type="BOOLEAN" min="0x00" max="0x01" writable="false" default="0x01" optional="false">mgmt leave without rejoin enabled</attribute>
+    <attribute side="server" code="0x0004" define="SL_NWK_RETRY_COUNT" type="INT8U" min="0x03" max="0xFF" writable="false" default="0xFF" optional="false">network retry count</attribute>
+    <attribute side="server" code="0x0005" define="SL_MAC_RETRY_COUNT" type="INT8U" min="0x03" max="0xFF" writable="false" default="0xFF" optional="false">mac retry count</attribute>
+    <attribute side="server" code="0x0006" define="SL_ROUTER_CHECKIN_ENABLED" type="BOOLEAN" min="0x00" max="0x01" writable="false" default="0x00" optional="false">router checkin enabled</attribute>
+    <attribute side="server" code="0x0007" define="SL_TOUCHLINK_INTERPAN_ENABLED" type="BOOLEAN" min="0x00" max="0x01" writable="false" default="0x00" optional="false">touchlink interpan enabled</attribute>
+    <attribute side="server" code="0x0008" define="SL_WWAH_PARENT_CLASSIFICATION_ENABLED" type="BOOLEAN" min="0x00" max="0x01" writable="false" default="0x00" optional="false">wwah parent classification enabled</attribute>
+    <attribute side="server" code="0x0009" define="SL_WWAH_APP_EVENT_RETRY_ENABLED" type="BOOLEAN" min="0x00" max="0x01" writable="false" default="0x01" optional="false">wwah app event retry enabled</attribute>
+    <attribute side="server" code="0x000A" define="SL_WWAH_APP_EVENT_RETRY_QUEUE_SIZE" type="INT8U" min="0x0A" max="0xFF" writable="false" default="0x0A" optional="false">wwah app event retry queue size</attribute>
+    <attribute side="server" code="0x000B" define="SL_WWAH_REJOIN_ENABLED" type="BOOLEAN" min="0x00" max="0x01" writable="false" default="0x00" optional="false">wwah rejoin enabled</attribute>
+    <attribute side="server" code="0x000C" define="SL_MAC_POLL_FAILURE_WAIT_TIME" type="INT8U" min="0x00" max="0xFF" writable="false" default="0x03" optional="false">mac poll failure wait time</attribute>
+    <attribute side="server" code="0x000D" define="SL_CONFIGURATION_MODE_ENABLED" type="BOOLEAN" min="0x00" max="0x01" writable="false" default="0x01" optional="false">configuration mode enabled</attribute>
+    <attribute side="server" code="0x000E" define="SL_CURRENT_DEBUG_REPORT_ID" type="INT8U" min="0x00" max="0xFF" writable="false" default="0x00" optional="false">current debug report id</attribute>
+    <attribute side="server" code="0x000F" define="SL_TC_SECURITY_ON_NTWK_KEY_ROTATION_ENABLED" type="BOOLEAN" min="0x00" max="0x01" writable="false" default="0x00" optional="false">tc security on ntwk key rotation enabled</attribute>
+    <attribute side="server" code="0x0010" define="SL_WWAH_BAD_PARENT_RECOVERY_ENABLED" type="BOOLEAN" min="0x00" max="0x01" writable="false" default="0x00" optional="false">wwah bad parent recovery enabled</attribute>
+    <attribute side="server" code="0x0011" define="SL_PENDING_NETWORK_UPDATE_CHANNEL" type="INT8U" min="0x00" max="0xFF" writable="false" default="0xFF" optional="false">pending network update channel</attribute>
+    <attribute side="server" code="0x0012" define="SL_PENDING_NETWORK_UPDATE_PANID" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0xFFFF" optional="false">pending network update pan id</attribute>
+    <attribute side="server" code="0x0013" define="SL_OTA_MAX_OFFLINE_DURATION" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="false">ota max offline duration</attribute>
+    <command source="client" code="0x00" name="EnableApsLinkKeyAuthorization" optional="false" cli="zcl sl-wwah enable-aps-link-key-auth">
+      <description>
+        Enable enforcement of APS-level security for all cluster commands.
+      </description>
+      <arg name="numberExemptClusters" type="INT8U"/>
+      <arg name="clusterId" type="CLUSTER_ID" array="true" presentIf="numberExemptClusters!=0"/>
+    </command>
+    <command source="client" code="0x01" name="DisableApsLinkKeyAuthorization" optional="false" cli="zcl sl-wwah disable-aps-link-key-auth">
+      <description>
+        Disable enforcement of APS-level security for all cluster commands.
+      </description>
+      <arg name="numberExemptClusters" type="INT8U"/>
+      <arg name="clusterId" type="CLUSTER_ID" array="true" presentIf="numberExemptClusters!=0"/>
+    </command>
+    <command source="client" code="0x02" name="ApsLinkKeyAuthorizationQuery" optional="false" cli="zcl sl-wwah query-aps-link-key-auth">
+      <description>
+        Query status of APS-level security enforcement for a specified cluster.
+      </description>
+      <arg name="clusterId" type="CLUSTER_ID"/>
+    </command>
+    <command source="client" code="0x03" name="RequestNewApsLinkKey" optional="false" cli="zcl sl-wwah request-new-aps-link-key">
+      <description>
+        Trigger device to request a new APS link key from the Trust Center.
+      </description>
+    </command>
+    <command source="client" code="0x04" name="EnableWwahAppEventRetryAlgorithm" optional="false" cli="zcl sl-wwah enable-app-event-retry-alg">
+      <description>
+        Enable WWAH App Event retry algorithm.
+      </description>
+      <arg name="firstBackoffTimeSeconds" type="INT8U"/>
+      <arg name="backoffSeqCommonRatio" type="INT8U"/>
+      <arg name="maxBackoffTimeSeconds" type="INT32U"/>
+      <arg name="maxRedeliveryAttempts" type="INT8U"/>
+    </command>
+    <command source="client" code="0x05" name="DisableWwahAppEventRetryAlgorithm" optional="false" cli="zcl sl-wwah disable-app-event-retry-alg">
+      <description>
+        Disable WWAH App Event retry algorithm.
+      </description>
+    </command>
+    <command source="client" code="0x06" name="RequestTime" optional="false" cli="zcl sl-wwah req-time">
+      <description>
+        Trigger device to request current attribute values from Time Cluster server.
+      </description>
+    </command>
+    <command source="client" code="0x07" name="EnableWwahRejoinAlgorithm" optional="false" cli="zcl sl-wwah enable-rejoin-alg">
+      <description>
+        Enable WWAH rejoin algorithm.
+      </description>
+      <arg name="fastRejoinTimeoutSeconds" type="INT16U"/>
+      <arg name="durationBetweenRejoinsSeconds" type="INT16U"/>
+      <arg name="fastRejoinFirstBackoffSeconds" type="INT16U"/>
+      <arg name="maxBackoffTimeSeconds" type="INT16U"/>
+      <arg name="maxBackoffIterations" type="INT16U"/>
+    </command>
+    <command source="client" code="0x08" name="DisableWwahRejoinAlgorithm" optional="false" cli="zcl sl-wwah disable-rejoin-alg">
+      <description>
+        Disable WWAH rejoin algorithm.
+      </description>
+    </command>
+    <command source="client" code="0x09" name="SetIasZoneEnrollmentMethod" optional="false" cli="zcl sl-wwah set-ias-enroll-method">
+      <description>
+        Set the enrollment method of an IAS Zone server.
+      </description>
+      <arg name="enrollmentMode" type="WwahIasZoneEnrollmentMode"/>
+    </command>
+    <command source="client" code="0x0A" name="ClearBindingTable" optional="false" cli="zcl sl-wwah clear-binding-table">
+      <description>
+        Clear the binding table.
+      </description>
+    </command>
+    <command source="client" code="0x0B" name="EnablePeriodicRouterCheckIns" optional="false" cli="zcl sl-wwah enable-router-checkins">
+      <description>
+        Enable device to periodically check connectivity with Zigbee Coordinator.
+      </description>
+      <arg name="checkInInterval" type="INT16U"/>
+    </command>
+    <command source="client" code="0x0C" name="DisablePeriodicRouterCheckIns" optional="false" cli="zcl sl-wwah disable-router-checkins">
+      <description>
+        Disable device from periodically checking connectivity with Zigbee Coordinator.
+      </description>
+    </command>
+    <command source="client" code="0x0D" name="SetMacPollFailureWaitTime" optional="false" cli="zcl sl-wwah set-mac-poll-fail-wait-time">
+      <description>
+        Set MAC poll failure wait time.
+      </description>
+      <arg name="waitTime" type="INT8U"/>
+    </command>
+    <command source="client" code="0x0E" name="SetPendingNetworkUpdate" optional="false" cli="zcl sl-wwah set-pending-network-update">
+      <description>
+        Set pending network update parameters.
+      </description>
+      <arg name="channel" type="INT8U"/>
+      <arg name="panId" type="INT16U"/>
+    </command>
+    <command source="client" code="0x0F" name="RequireApsAcksOnUnicasts" optional="false" cli="zcl sl-wwah enable-require-aps-ack-unicast">
+      <description>
+        Require all unicast commands to have APS ACKs enabled.
+      </description>
+      <arg name="numberExemptClusters" type="INT8U"/>
+      <arg name="clusterId" type="CLUSTER_ID" array="true" presentIf="numberExemptClusters!=0"/>
+    </command>
+    <command source="client" code="0x10" name="RemoveApsAcksOnUnicastsRequirement" optional="false" cli="zcl sl-wwah disable-require-aps-ack-unicast">
+      <description>
+        Roll back changes made by Require APS ACK on Unicasts.
+      </description>
+    </command>
+    <command source="client" code="0x11" name="ApsAckRequirementQuery" optional="false" cli="zcl sl-wwah query-aps-ack-requirement">
+      <description>
+        Query whether unicast commands are required to have APS ACKs enabled.
+      </description>
+    </command>
+    <command source="client" code="0x12" name="DebugReportQuery" optional="false" cli="zcl sl-wwah query-debug-report">
+      <description>
+        Query for specified debug report.
+      </description>
+      <arg name="debugReportId" type="INT8U"/>
+    </command>
+    <command source="client" code="0x13" name="SurveyBeacons" optional="false" cli="zcl sl-wwah survey-beacons">
+      <description>
+        Causes device to perform a scan for beacons advertising the device's network.
+      </description>
+      <arg name="standardBeacons" type="BOOLEAN"/>
+    </command>
+    <command source="client" code="0x14" name="DisableOtaDowngrades" optional="false" cli="zcl sl-wwah disable-ota-downgrades">
+      <description>
+        Disallow OTA downgrade of all device firmware components.
+      </description>
+    </command>
+    <command source="client" code="0x15" name="DisableMgmtLeaveWithoutRejoin" optional="false" cli="zcl sl-wwah disable-mgmt-leave-wo-rejoin">
+      <description>
+        Causes device to ignore MGMT Leave Without Rejoin commands.
+      </description>
+    </command>
+    <command source="client" code="0x16" name="DisableTouchlinkInterpanMessageSupport" optional="false" cli="zcl sl-wwah disable-tl-interpan-msg-support">
+      <description>
+        Causes device to ignore Touchlink Interpan messages.
+      </description>
+    </command>
+    <command source="client" code="0x17" name="EnableWwahParentClassification" optional="false" cli="zcl sl-wwah enable-parent-classify">
+      <description>
+        Enable WWAH Parent Classification advertisements.
+      </description>
+    </command>
+    <command source="client" code="0x18" name="DisableWwahParentClassification" optional="false" cli="zcl sl-wwah disable-parent-classify">
+      <description>
+        Disable WWAH Parent Classification advertisements.
+      </description>
+    </command>
+    <command source="client" code="0x19" name="EnableTcSecurityOnNtwkKeyRotation" optional="false" cli="zcl sl-wwah enable-tc-sec-ntwk-key-rot">
+      <description>
+        Process only network key rotation commands sent via unicast and encrypted by Trust Center Link Key.
+      </description>
+    </command>
+    <command source="client" code="0x1A" name="EnableWwahBadParentRecovery" optional="false" cli="zcl sl-wwah enable-bad-parent-recovery">
+      <description>
+        Enable WWAH Bad Parent Recovery feature.
+      </description>
+    </command>
+    <command source="client" code="0x1B" name="DisableWwahBadParentRecovery" optional="false" cli="zcl sl-wwah disable-bad-parent-recovery">
+      <description>
+        Disable WWAH Bad Parent Recovery feature.
+      </description>
+    </command>
+    <command source="client" code="0x1C" name="EnableConfigurationMode" optional="false" cli="zcl sl-wwah enable-config-mode">
+      <description>
+        Enable Configuration Mode.
+      </description>
+    </command>
+    <command source="client" code="0x1D" name="DisableConfigurationMode" optional="false" cli="zcl sl-wwah disable-config-mode">
+      <description>
+        Disable Configuration Mode.
+      </description>
+    </command>
+    <command source="client" code="0x1E" name="UseTrustCenterForClusterServer" optional="false" cli="zcl sl-wwah use-tc-for-cluster-server">
+      <description>
+        Use only the Trust Center as cluster server for the set of clusters specified.
+      </description>
+      <arg name="numberOfClusters" type="INT8U"/>
+      <arg name="clusterId" type="CLUSTER_ID" array="true" presentIf="numberOfClusters!=0"/>
+    </command>
+    <command source="client" code="0x1F" name="TrustCenterForClusterServerQuery" optional="false" cli="zcl sl-wwah query-tc-for-cluster-server">
+      <description>
+        Causes device to send an appropriate Trust Center for Cluster Server Query Response command.
+      </description>
+    </command>
+    <command source="server" code="0x00" name="ApsLinkKeyAuthorizationQueryResponse" optional="false">
+      <description>
+        Command description for SlAPSLinkKeyAuthorizationQueryResponse
+      </description>
+      <arg name="clusterId" type="CLUSTER_ID"/>
+      <arg name="apsLinkKeyAuthStatus" type="BOOLEAN"/>
+    </command>
+    <command source="server" code="0x01" name="PoweringOffNotification" optional="false">
+      <description>
+        Command description for SlPoweringOffNotification
+      </description>
+      <arg name="powerNotificationReason" type="WwahPowerNotificationReason"/>
+      <arg name="manufacturerId" type="INT16U"/>
+      <arg name="manufacturerReasonLength" type="INT8U"/>
+      <arg name="manufacturerReason" type="INT8U" array="true" presentIf="manufacturerReasonLength!=0"/>
+    </command>
+    <command source="server" code="0x02" name="PoweringOnNotification" optional="false">
+      <description>
+        Command description for SlPoweringOnNotification
+      </description>
+      <arg name="powerNotificationReason" type="WwahPowerNotificationReason"/>
+      <arg name="manufacturerId" type="INT16U"/>
+      <arg name="manufacturerReasonLength" type="INT8U"/>
+      <arg name="manufacturerReason" type="INT8U" array="true" presentIf="manufacturerReasonLength!=0"/>
+    </command>
+    <command source="server" code="0x03" name="ShortAddressChange" optional="false">
+      <description>
+        Command description for SlShortAddressChange
+      </description>
+      <arg name="deviceEui64" type="IEEE_ADDRESS"/>
+      <arg name="deviceShort" type="INT16U"/>
+    </command>
+    <command source="server" code="0x04" name="ApsAckEnablementQueryResponse" optional="false">
+      <description>
+        Command description for SlAPSAckEnablementQueryResponse
+      </description>
+      <arg name="numberExemptClusters" type="INT8U"/>
+      <arg name="clusterId" type="CLUSTER_ID" array="true" presentIf="numberExemptClusters!=0"/>
+    </command>
+    <command source="server" code="0x05" name="PowerDescriptorChange" optional="false">
+      <description>
+        Command description for SlPowerDescriptorChange
+      </description>
+      <arg name="currentPowerMode" type="INT32U"/>
+      <arg name="availablePowerSources" type="INT32U"/>
+      <arg name="currentPowerSource" type="INT32U"/>
+      <arg name="currentPowerSourceLevel" type="INT32U"/>
+    </command>
+    <command source="server" code="0x06" name="NewDebugReportNotification" optional="false">
+      <description>
+        Command description for SlNewDebugReportNotification
+      </description>
+      <arg name="debugReportId" type="INT8U"/>
+      <arg name="debugReportSize" type="INT32U"/>
+    </command>
+    <command source="server" code="0x07" name="DebugReportQueryResponse" optional="false">
+      <description>
+        Command description for SlDebugReportQueryResponse
+      </description>
+      <arg name="debugReportId" type="INT8U"/>
+      <arg name="debugReportData" type="INT8U" array="true"/>
+      <!-- OPAQUE -->
+    </command>
+    <command source="server" code="0x08" name="TrustCenterForClusterServerQueryResponse" optional="false">
+      <description>
+        Command description for SlTrustCenterForClusterServerQueryResponse
+      </description>
+      <arg name="numberOfClusters" type="INT8U"/>
+      <arg name="clusterId" type="CLUSTER_ID" array="true" presentIf="numberOfClusters!=0"/>
+    </command>
+    <command source="server" code="0x09" name="SurveyBeaconsResponse" optional="false">
+      <description>
+        Command description for SlSurveyBeaconsResponse
+      </description>
+      <arg name="numberOfBeacons" type="INT8U"/>
+      <arg name="beacon" type="WwahBeaconSurvey" array="true" presentIf="numberOfBeacons!=0"/>
+    </command>
+    <command source="server" code="0x9E" name="UseTrustCenterForClusterServerResponse" optional="false">
+      <!-- This extra command's integration into the spec is being discussed. Do not remove if updating XML -->
+      <description>
+        Command description for SlUseTrustCenterForClusterServerResponse
+      </description>
+      <arg name="status" type="Status"/>
+      <arg name="clusterStatusLength" type="INT8U"/>
+      <arg name="clusterStatus" type="WwahClusterStatusToUseTC" array="true" presentIf="clusterStatusLength!=0"/>
+    </command>
+  </cluster>
+</configurator>

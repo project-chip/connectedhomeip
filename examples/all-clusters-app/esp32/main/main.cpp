@@ -261,6 +261,7 @@ public:
         if (i == 0)
         {
             ConnectivityMgr().ClearWiFiStationProvision();
+            OpenDefaultPairingWindow();
         }
     }
 

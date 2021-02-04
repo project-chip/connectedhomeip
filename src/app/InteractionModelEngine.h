@@ -141,8 +141,6 @@ public:
                                                Command::CommandRoleId aCommandRoleId);
     CHIP_ERROR RegisterClusterCommandHandler(chip::ClusterId aClusterId, chip::CommandId aCommandId,
                                              Command::CommandRoleId aCommandRoleId, CommandCbFunct aDispatcher);
-    void ProcessCommand(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::TLV::TLVReader & aReader,
-                        Command * apCommandObj, Command::CommandRoleId aCommandRoleId);
 
     Messaging::ExchangeManager * GetExchangeManager(void) const { return mpExchangeMgr; };
 
@@ -157,25 +155,15 @@ private:
                            const PayloadHeader & aPayloadHeader, System::PacketBufferHandle aPayload);
     void OnResponseTimeout(Messaging::ExchangeContext * ec);
 
-    struct HandlerKey
-    {
-        HandlerKey(chip::ClusterId aClusterId, chip::CommandId aCommandId, Command::CommandRoleId aCommandRoleId);
-
-        chip::ClusterId mClusterId;
-        chip::CommandId mCommandId;
-        Command::CommandRoleId mCommandRoleId;
-        bool operator<(const HandlerKey & aOtherKey) const;
-    };
-
-    typedef std::map<HandlerKey, CommandCbFunct> HandlersMapType;
-
-    HandlersMapType mHandlersMap;
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     void * mpAppState                          = nullptr;
     EventCallback mEventCallback;
     CommandHandler mCommandHandlerObjs[CHIP_MAX_NUM_COMMAND_HANDLER_OBJECTS];
     CommandSender mCommandSenderObjs[CHIP_MAX_NUM_COMMAND_SENDER_OBJECTS];
 };
+
+void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId,
+                                  chip::TLV::TLVReader & aReader, Command * apCommandObj);
 
 } // namespace app
 } // namespace chip

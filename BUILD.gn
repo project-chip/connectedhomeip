@@ -311,8 +311,17 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
     if (enable_efr32_lock_app_build) {
       deps += [ ":efr32_lock_app" ]
     }
+    if (enable_efr32_lighting_app_build) {
+      deps += [ ":efr32_lighting_app" ]
+    }
     if (enable_k32w_lock_app_build) {
       deps += [ ":k32w_lock_app" ]
+    }
+    if (enable_qpg6100_lock_app_build) {
+      deps += [ ":qpg6100_lock_app" ]
+    }
+    if (enable_cc13x2_26x2_lock_app_build) {
+      deps += [ ":cc13x2_26x2_lock_app" ]
     }
   }
 

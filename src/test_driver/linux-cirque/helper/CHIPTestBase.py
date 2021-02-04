@@ -109,13 +109,28 @@ class CHIPVirtualHome:
 
     def connect_to_thread_network(self):
         self.logger.info("Running commands to form Thread network")
+        time.sleep(3) # Avoid sending commands at very beginning.
+        otInitCommands = [
+            "ot-ctl thread stop",
+            "ot-ctl ifconfig down",
+            "ot-ctl dataset init new",
+            "ot-ctl dataset panid 0x1234",
+            "ot-ctl dataset networkname OpenThread",
+            "ot-ctl dataset channel 13",
+            "ot-ctl dataset extpanid dead00beef00cafe",
+            "ot-ctl dataset meshlocalprefix \"fd01:2345:6789:0abc::\"",
+            "ot-ctl dataset masterkey 00112233445566778899aabbccddeeff",
+            "ot-ctl dataset commit active",
+            "ot-ctl dataset active", # This will emit an output of dataset in flask.log
+            "ot-ctl ifconfig up",
+            "ot-ctl thread start",
+        ]
         for device in self.non_ap_devices:
-            self.execute_device_cmd(device['id'],
-                                    "bash -c 'ot-ctl panid 0x1234 && \
-                             ot-ctl ifconfig up && \
-                             ot-ctl thread start'")
+            # Set default openthread provisioning
+            for cmd in otInitCommands:
+                self.execute_device_cmd(device['id'], cmd)
         self.logger.info("Waiting for Thread network to be formed...")
-        time.sleep(10)
+        time.sleep(15)
         roles = set()
         for device in self.non_ap_devices:
             reply = self.execute_device_cmd(device['id'], 'ot-ctl state')

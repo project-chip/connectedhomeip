@@ -1,0 +1,414 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2008,2020 Silicon Labs.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <deviceType>
+    <name>TA-zigbeesimcard</name>
+    <domain>Telecom Applications</domain>
+    <typeName>ZigBee SIM Card (ZSIM)</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0107</profileId>
+    <deviceId editable="false">0x0000</deviceId>
+    <clusters lockOthers="true">
+      <include client="true" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Groups</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Commissioning</include>
+      <include client="true" server="false" clientLocked="true" serverLocked="false">Identify</include>
+      <include client="true" server="false" clientLocked="true" serverLocked="false">ISO 7816 Protocol Tunnel</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Information</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Payment</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Billing</include>
+      <!--<include client="false" server="false" clientLocked="false" serverLocked="false">ASKE</include>-->
+      <!--<include client="false" server="false" clientLocked="false" serverLocked="false">ASAC</include>-->
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Data Sharing</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Voice over ZigBee</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Data Rate Control</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Chatting</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">RSSI Location</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>TA-zigbeemobileterminal</name>
+    <domain>Telecom Applications</domain>
+    <typeName>ZigBee Mobile Terminal (ZMT)</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0107</profileId>
+    <deviceId editable="false">0x0001</deviceId>
+    <clusters lockOthers="true">
+      <include client="true" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Groups</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Commissioning</include>
+      <include client="true" server="false" clientLocked="true" serverLocked="false">Identify</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Information</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Payment</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Billing</include>
+      <!--<include client="false" server="false" clientLocked="false" serverLocked="false">ASKE</include>-->
+      <!--<include client="false" server="false" clientLocked="false" serverLocked="false">ASAC</include>-->
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Data Sharing</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Data Rate Control</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Voice over ZigBee</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Gaming</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Chatting</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">ISO 7816 Protocol Tunnel</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Partition</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">RSSI Location</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>TA-configurationtool</name>
+    <domain>Telecom Applications</domain>
+    <typeName>Configuration Tool</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0107</profileId>
+    <deviceId editable="false">0x0005</deviceId>
+    <clusters lockOthers="true">
+      <include client="true" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="true" server="false" clientLocked="true" serverLocked="false">Groups</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Commissioning</include>
+      <include client="true" server="false" clientLocked="true" serverLocked="false">Identify</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Information</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Data Rate Control</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Data Sharing</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Payment</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Billing</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Voice over ZigBee</include>
+      <!--<include client="false" server="false" clientLocked="false" serverLocked="false">ASKE</include>-->
+      <!--<include client="false" server="false" clientLocked="false" serverLocked="false">ASAC</include>-->
+      <include client="false" server="false" clientLocked="false" serverLocked="true">RSSI Location</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="true">Partition</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>TA-rangeextender</name>
+    <domain>Telecom Applications</domain>
+    <typeName>Range Extender</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0107</profileId>
+    <deviceId editable="false">0x0008</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Groups</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Commissioning</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Identify</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>TA-zigbeeaccesspoint</name>
+    <domain>Telecom Applications</domain>
+    <typeName>ZigBee Access Point (ZAP)</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0107</profileId>
+    <deviceId editable="false">0x0100</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Groups</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Commissioning</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Identify</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">Information</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Payment</include>
+      <!--<include client="false" server="false" clientLocked="false" serverLocked="false">ASKE</include>-->
+      <!--<include client="false" server="false" clientLocked="false" serverLocked="false">ASAC</include>-->
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Billing</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>TA-zigbeeinformationnode</name>
+    <domain>Telecom Applications</domain>
+    <typeName>ZigBee Information Node (ZIN)</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0107</profileId>
+    <deviceId editable="false">0x0101</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Groups</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Commissioning</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Identify</include>
+      <include client="false" server="true" clientLocked="false" serverLocked="true">Information</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Billing</include>
+      <!--<include client="false" server="false" clientLocked="false" serverLocked="false">ASKE</include>-->
+      <!--<include client="false" server="false" clientLocked="false" serverLocked="false">ASAC</include>-->
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>TA-zigbeeinformationterminal</name>
+    <domain>Telecom Applications</domain>
+    <typeName>ZigBee Information Terminal (ZIT)</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0107</profileId>
+    <deviceId editable="false">0x0102</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Groups</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Commissioning</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Identify</include>
+      <include client="true" server="false" clientLocked="true" serverLocked="true">Information</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>TA-pointofsale</name>
+    <domain>Telecom Applications</domain>
+    <typeName>Point of Sale</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0107</profileId>
+    <deviceId editable="false">0x0200</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Groups</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Commissioning</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Identify</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Information</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Payment</include>
+      <!--<include client="true"  server="true"  clientLocked="true"  serverLocked="true" >ASKE</include>-->
+      <!--<include client="true"  server="true"  clientLocked="true"  serverLocked="true" >ASAC</include>-->
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>TA-ticketingmachine</name>
+    <domain>Telecom Applications</domain>
+    <typeName>Ticketing Machine</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0107</profileId>
+    <deviceId editable="false">0x0201</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Groups</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Commissioning</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Identify</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Information</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Payment</include>
+      <!--<include client="true"  server="true"  clientLocked="true"  serverLocked="true" >ASKE</include>-->
+      <!--<include client="true"  server="true"  clientLocked="true"  serverLocked="true" >ASAC</include>-->
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>TA-paycontroller</name>
+    <domain>Telecom Applications</domain>
+    <typeName>Pay Controller</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0107</profileId>
+    <deviceId editable="false">0x0202</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Groups</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Commissioning</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Identify</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">Information</include>
+      <!--<include client="true"  server="true"  clientLocked="true"  serverLocked="true" >ASKE</include>-->
+      <!--<include client="true"  server="true"  clientLocked="true"  serverLocked="true" >ASAC</include>-->
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Payment</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>TA-billingunit</name>
+    <domain>Telecom Applications</domain>
+    <typeName>Billing Unit</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0107</profileId>
+    <deviceId editable="false">0x0203</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Groups</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Commissioning</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Identify</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">Information</include>
+      <!--<include client="true"  server="true"  clientLocked="true"  serverLocked="true" >ASKE</include>-->
+      <!--<include client="true"  server="true"  clientLocked="true"  serverLocked="true" >ASAC</include>-->
+      <include client="true" server="true" clientLocked="true" serverLocked="true">Billing</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>TA-chargingunit</name>
+    <domain>Telecom Applications</domain>
+    <typeName>Charging Unit</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0107</profileId>
+    <deviceId editable="false">0x0204</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Groups</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Commissioning</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Identify</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">Information</include>
+      <!--<include client="true"  server="true"  clientLocked="true"  serverLocked="true" >ASKE</include>-->
+      <!--<include client="true"  server="true"  clientLocked="true"  serverLocked="true" >ASAC</include>-->
+      <include client="true" server="true" clientLocked="true" serverLocked="true">Billing</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>TA-zigbeeflashcard</name>
+    <domain>Telecom Applications</domain>
+    <typeName>ZigBee Flash Card</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0107</profileId>
+    <deviceId editable="false">0x0300</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Groups</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Commissioning</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Identify</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">On/Off</include>
+      <!--<include client="false" server="false" clientLocked="false" serverLocked="false">ASKE</include>-->
+      <!--<include client="false" server="false" clientLocked="false" serverLocked="false">ASAC</include>-->
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Data Sharing</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Data Rate Control</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Information</include>
+      <include client="false" server="false" clientLocked="false" serverLocked="false">Partition</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>TA-zigbeepcsmartcardreader</name>
+    <domain>Telecom Applications</domain>
+    <typeName>ZigBee PC Smart Card Reader</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0107</profileId>
+    <deviceId editable="false">0x0301</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Groups</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Commissioning</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Identify</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">ISO 7816 Protocol Tunnel</include>
+      <!--<include client="false" server="false" clientLocked="false" serverLocked="false">ASKE</include>-->
+      <!--<include client="false" server="false" clientLocked="false" serverLocked="false">ASAC</include>-->
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>TA-zigbeeheadset</name>
+    <domain>Telecom Applications</domain>
+    <typeName>ZigBee Headset</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0107</profileId>
+    <deviceId editable="false">0x0400</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Groups</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Commissioning</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Identify</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">Voice over ZigBee</include>
+      <!--<include client="false" server="false" clientLocked="false" serverLocked="false">ASKE</include>-->
+      <!--<include client="false" server="false" clientLocked="false" serverLocked="false">ASAC</include>-->
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>TA-zigbeemicrophone</name>
+    <domain>Telecom Applications</domain>
+    <typeName>ZigBee Microphone</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0107</profileId>
+    <deviceId editable="false">0x0401</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Groups</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Commissioning</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Identify</include>
+      <include client="true" server="false" clientLocked="true" serverLocked="true">Voice over ZigBee</include>
+      <!--<include client="false" server="false" clientLocked="false" serverLocked="false">ASKE</include>-->
+      <!--<include client="false" server="false" clientLocked="false" serverLocked="false">ASAC</include>-->
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>TA-zigbeespeaker</name>
+    <domain>Telecom Applications</domain>
+    <typeName>ZigBee Speaker</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0107</profileId>
+    <deviceId editable="false">0x0402</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Groups</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Commissioning</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Identify</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Voice over ZigBee</include>
+      <!--<include client="false" server="false" clientLocked="false" serverLocked="false">ASKE</include>-->
+      <!--<include client="false" server="false" clientLocked="false" serverLocked="false">ASAC</include>-->
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>TA-rssianchornode</name>
+    <domain>Telecom Applications</domain>
+    <typeName>RSSI Anchor Node (RAN)</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0107</profileId>
+    <deviceId editable="false">0x0500</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Groups</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Commissioning</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Identify</include>
+      <include client="true" server="false" clientLocked="true" serverLocked="true">RSSI Location</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>TA-rssilocationnode</name>
+    <domain>Telecom Applications</domain>
+    <typeName>RSSI Location Node (RLN)</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0107</profileId>
+    <deviceId editable="false">0x0501</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Groups</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Commissioning</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Identify</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">RSSI Location</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>TA-rssilocationgateway</name>
+    <domain>Telecom Applications</domain>
+    <typeName>RSSI Location Gateway (RLG)</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0107</profileId>
+    <deviceId editable="false">0x0502</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Groups</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Commissioning</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Identify</include>
+      <include client="true" server="false" clientLocked="true" serverLocked="true">RSSI Location</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>TA-chattingunit</name>
+    <domain>Telecom Applications</domain>
+    <typeName>Chatting Unit</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0107</profileId>
+    <deviceId editable="false">0x0600</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Groups</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Commissioning</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Identify</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">Chatting</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>TA-chattingstation</name>
+    <domain>Telecom Applications</domain>
+    <typeName>Chatting Station</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0107</profileId>
+    <deviceId editable="false">0x0601</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Groups</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Commissioning</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Identify</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Chatting</include>
+    </clusters>
+  </deviceType>
+</configurator>

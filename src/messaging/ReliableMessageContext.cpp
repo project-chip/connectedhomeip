@@ -29,7 +29,7 @@
 #include <core/CHIPEncoding.h>
 #include <messaging/ErrorCategory.h>
 #include <messaging/Flags.h>
-#include <messaging/ReliableMessageManager.h>
+#include <messaging/ReliableMessageMgr.h>
 #include <protocols/Protocols.h>
 #include <protocols/secure_channel/Constants.h>
 #include <support/CodeUtils.h>
@@ -42,7 +42,7 @@ ReliableMessageContext::ReliableMessageContext() :
     mPendingPeerAckId(0)
 {}
 
-void ReliableMessageContext::Init(ReliableMessageManager * manager, ExchangeContext * exchange)
+void ReliableMessageContext::Init(ReliableMessageMgr * manager, ExchangeContext * exchange)
 {
     mManager  = manager;
     mExchange = exchange;
