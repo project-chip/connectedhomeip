@@ -325,13 +325,15 @@ PacketBufferHandle PacketBufferHandle::New(size_t aAvailableSize, uint16_t aRese
     static_assert(SIZE_MAX >= INT_MAX, "Our additions might not fit in size_t");
     static_assert(CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX <= UINT16_MAX, "PacketBuffer may have size not fitting uint16_t");
 
+    // When `aAvailableSize` fits in uint16_t (as tested below) and size_t is at least 32 bits (as asserted above),
+    // these additions will not overflow.
     const size_t lAllocSize = aReservedSize + aAvailableSize;
     const size_t lBlockSize = CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE + lAllocSize;
     PacketBuffer * lPacket;
 
     CHIP_SYSTEM_FAULT_INJECT(FaultInjection::kFault_PacketBufferNew, return PacketBufferHandle());
 
-    if (lAllocSize > CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX || lBlockSize > UINT16_MAX)
+    if (aAvailableSize > UINT16_MAX || lAllocSize > CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX || lBlockSize > UINT16_MAX)
     {
         ChipLogError(chipSystemLayer, "PacketBuffer: allocation too large.");
         return PacketBufferHandle();
@@ -387,6 +389,13 @@ PacketBufferHandle PacketBufferHandle::New(size_t aAvailableSize, uint16_t aRese
 PacketBufferHandle PacketBufferHandle::NewWithData(const void * aData, size_t aDataSize, uint16_t aAdditionalSize,
                                                    uint16_t aReservedSize)
 {
+    if (aDataSize > UINT16_MAX)
+    {
+        ChipLogError(chipSystemLayer, "PacketBuffer: allocation too large.");
+        return PacketBufferHandle();
+    }
+    // Since `aDataSize` fits in uint16_t, the sum `aDataSize + aAdditionalSize` will not overflow.
+    // `New()` will only return a non-null buffer if the total allocation size does not overflow.
     PacketBufferHandle buffer = New(aDataSize + aAdditionalSize, aReservedSize);
     if (buffer.mBuffer != nullptr)
     {
