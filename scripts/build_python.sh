@@ -51,7 +51,7 @@ source "$ENVIRONMENT_ROOT"/bin/activate
 "$ENVIRONMENT_ROOT"/bin/python -m pip install --upgrade pip
 "$ENVIRONMENT_ROOT"/bin/pip install "$OUTPUT_ROOT"/controller/python/chip-*.whl
 
-RELATIVE_ENVIRONMENT_ROOT=$(realpath --relative-to "$(pwd)" "$ENVIRONMENT_ROOT")
+RELATIVE_ENVIRONMENT_ROOT=$(realpath --relative-to "$PWD" "$ENVIRONMENT_ROOT")
 
 echo ""
 echo_green "Compilation completed and WHL package installed in: "
