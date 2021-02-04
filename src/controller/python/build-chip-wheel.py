@@ -99,7 +99,8 @@ try:
     if platform.system() == 'Linux':
         requiredPackages = [
             'dbus-python',
-            'pgi'
+            'six',
+            'pygobject',
         ]
     else:
         requiredPackages = []
