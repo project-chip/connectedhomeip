@@ -24,14 +24,13 @@ jobs:
 
         env:
             BUILD_TYPE: gn_linux
-            BUILD_VERSION: 0.2.14
             BUILD_IMAGE: chip-build
             BUILD_ORG: connectedhomeip
 
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build:0.4.18
+            image: connectedhomeip/chip-build:latest
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
                 - "/tmp/output_binaries:/tmp/output_binaries"
@@ -58,10 +57,11 @@ jobs:
               run:
                   scripts/examples/gn_build_example.sh examples/shell/standalone
                   out/shell_debug
-            - name: Build example Standalone All Clusters Server 
+            - name: Build example Standalone All Clusters Server
               run:
-                  scripts/examples/gn_build_example.sh examples/all-clusters-app/linux
-                  out/all_clusters_debug chip_bypass_rendezvous=true
+                  scripts/examples/gn_build_example.sh
+                  examples/all-clusters-app/linux out/all_clusters_debug
+                  chip_bypass_rendezvous=true
             - name: Binary artifact suffix
               id: outsuffix
               uses: haya14busa/action-cond@v1.0.0

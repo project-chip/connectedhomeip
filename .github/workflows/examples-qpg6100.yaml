@@ -27,7 +27,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build:0.4.18
+            image: connectedhomeip/chip-build:latest
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
                 - "/tmp/output_binaries:/tmp/output_binaries"
@@ -44,11 +44,13 @@ jobs:
                   languages: "cpp"
                   queries: +security-and-quality
             - name: Build example QPG6100 Lock App
-              run: scripts/examples/gn_build_example.sh
-                   examples/lock-app/qpg6100 out/lock_app_debug
+              run:
+                  scripts/examples/gn_build_example.sh examples/lock-app/qpg6100
+                  out/lock_app_debug
             - name: Build QPG6100 shell App
-              run: scripts/examples/gn_build_example.sh
-                   examples/shell/qpg6100 out/shell_app
+              run:
+                  scripts/examples/gn_build_example.sh examples/shell/qpg6100
+                  out/shell_app
             - name: Binary artifact suffix
               id: outsuffix
               uses: haya14busa/action-cond@v1.0.0

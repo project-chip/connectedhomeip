@@ -24,7 +24,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build:0.4.18
+            image: connectedhomeip/chip-build:latest
 
         steps:
             - name: Checkout
