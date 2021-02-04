@@ -22,34 +22,29 @@
 
 SELF=${0##*/}
 
-function git_active_files
-{
-    typeset -n _a=$1
-    typeset file root=$(git rev-parse --show-toplevel)
+function git_active_files() {
+    typeset -n _a="$1"
+    typeset file root="$(git rev-parse --show-toplevel)"
     shopt -s lastpipe
     git status --ignore-submodules --porcelain |
         sed -n -e 's/^[^!?D]. //p' |
-        while read -r file
-        do
+        while read -r file; do
             [[ -n $file ]] && _a+=("$root/$file")
         done
 }
 
-function git_files_for_commit
-{
-    typeset -n _c=$1
+function git_files_for_commit() {
+    typeset -n _c="$1"
     shift
-    typeset file root=$(git rev-parse --show-toplevel)
+    typeset file root="$(git rev-parse --show-toplevel)"
     shopt -s lastpipe
     git --no-pager show --name-only --pretty=format: "$@" |
-        while read -r file
-        do
+        while read -r file; do
             _c+=("$root/$file")
         done
 }
 
-function usage
-{
+function usage() {
     {
         echo "Usage: $SELF [-a] [-c git-object] [file ...]"
         echo "  -a              -- update the active files according to git"
@@ -64,44 +59,39 @@ year=$(date +%Y)
 use_active_files=
 typeset -a files
 
-while getopts C:A:Y:ac: c
-do
+while getopts C:A:Y:ac: c; do
     case $c in
-        C)  copyright=$OPTARG;;
-        A)  authors=$OPTARG;;
-        Y)  year=$OPTARG;;
-        a)  use_active_files=1;;
-        c)  git_files_for_commit files "$OPTARG";;
-        ?)  usage
+        C) copyright=$OPTARG ;;
+        A) authors=$OPTARG ;;
+        Y) year=$OPTARG ;;
+        a) use_active_files=1 ;;
+        c) git_files_for_commit files "$OPTARG" ;;
+        ?)
+            usage
+            ;;
     esac
 done
-shift $((OPTIND-1))
+shift $((OPTIND - 1))
 files+=("$@")
 
-if ((year > 2099))
-then
+if ((year > 2099)); then
     echo >&2 "$SELF: Not Y2.1K compliant. Please contact the original author for a fix."
     exit 1
 fi
 
-if [[ -n "$use_active_files" ]]
-then
+if [[ -n "$use_active_files" ]]; then
     git_active_files files
-    if [[ -z "${files[0]}" ]]
-    then
+    if [[ -z "${files[0]}" ]]; then
         echo >&2 "$SELF: No active files."
         exit 1
     fi
-elif [[ -z "${files[0]}" ]]
-then
+elif [[ -z "${files[0]}" ]]; then
     echo >&2 "$SELF: no files given."
     typeset -a gits
     git_active_files gits
-    if [[ -n "${gits[0]}" ]]
-    then
+    if [[ -n "${gits[0]}" ]]; then
         echo >&2 "Using '$SELF -a' will try the active git files, which currently are:"
-        for i in "${gits[@]}"
-        do
+        for i in "${gits[@]}"; do
             echo >&2 "  $i"
         done
         exit 1
@@ -110,7 +100,7 @@ then
 fi
 
 sed -i \
-  -e "s/$copyright \(20[0-9][0-9]\) $authors/$copyright \1-$year $authors/" \
-  -e "s/$copyright \(20[0-9][0-9]\)-20[0-9][0-9] $authors/$copyright \1-$year $authors/" \
-  -e "s/$copyright $year-$year $authors/$copyright $year $authors/" \
-  "${files[@]}"
+    -e "s/$copyright \(20[0-9][0-9]\) $authors/$copyright \1-$year $authors/" \
+    -e "s/$copyright \(20[0-9][0-9]\)-20[0-9][0-9] $authors/$copyright \1-$year $authors/" \
+    -e "s/$copyright $year-$year $authors/$copyright $year $authors/" \
+    "${files[@]}"
