@@ -314,6 +314,11 @@ constexpr uint16_t kMaxFooterSize = kMaxTagLen;
  */
 inline System::PacketBufferHandle New(size_t aAvailableSize)
 {
+    static_assert(CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX > kMaxFooterSize, "inadequate capacity");
+    if (aAvailableSize > CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX - kMaxFooterSize)
+    {
+        return System::PacketBufferHandle();
+    }
     return System::PacketBufferHandle::New(aAvailableSize + kMaxFooterSize);
 }
 
