@@ -78,7 +78,7 @@ REPO_DIR="$SOURCE_DIR/../../../../"
 OT_BR_POSIX=$REPO_DIR/third_party/ot-br-posix/repo
 OT_BR_POSIX_CHECKOUT=$(cd "$REPO_DIR" && git rev-parse :third_party/ot-br-posix/repo)
 
-docker build -t "$ORG/$IMAGE:$VERSION" -f "$SOURCE_DIR/Dockerfile" "${BUILD_ARGS[@]}" --build-arg OT_BR_POSIX_CHECKOUT="$OT_BR_POSIX_CHECKOUT" "$SOURCE_DIR" 
+docker build -t "$ORG/$IMAGE:$VERSION" -f "$SOURCE_DIR/Dockerfile" "${BUILD_ARGS[@]}" --build-arg OT_BR_POSIX_CHECKOUT="$OT_BR_POSIX_CHECKOUT" "$SOURCE_DIR"
 
 [[ ${*/--latest//} != "${*}" ]] && {
     docker tag "$ORG"/"$IMAGE":"$VERSION" "$ORG"/"$IMAGE":latest
