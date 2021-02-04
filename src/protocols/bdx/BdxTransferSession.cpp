@@ -15,9 +15,8 @@
 #include <system/SystemPacketBuffer.h>
 
 namespace {
-constexpr uint8_t kBdxVersion            = 0;         ///< The version of this implementation of the BDX spec
-constexpr size_t kStatusReportMinSize    = 2 + 4 + 2; ///< 16 bits for GeneralCode, 32 bits for ProtocolId, 16 bits for ProtocolCode
-constexpr uint16_t kStatusReportVendorId = 0;
+constexpr uint8_t kBdxVersion         = 0;         ///< The version of this implementation of the BDX spec
+constexpr size_t kStatusReportMinSize = 2 + 4 + 2; ///< 16 bits for GeneralCode, 32 bits for ProtocolId, 16 bits for ProtocolCode
 
 /**
  * @brief
@@ -509,11 +508,10 @@ CHIP_ERROR TransferSession::HandleStatusReportMessage(PayloadHeader & header, Sy
     mAwaitingResponse = false;
 
     uint16_t generalCode  = 0;
-    uint16_t vendorId     = 0;
-    uint16_t protocolId   = 0;
+    uint32_t protocolId   = 0;
     uint16_t protocolCode = 0;
     Encoding::LittleEndian::Reader reader(msg->Start(), msg->DataLength());
-    ReturnErrorOnFailure(reader.Read16(&generalCode).Read16(&vendorId).Read16(&protocolId).Read16(&protocolCode).StatusCode());
+    ReturnErrorOnFailure(reader.Read16(&generalCode).Read32(&protocolId).Read16(&protocolCode).StatusCode());
     VerifyOrReturnError((protocolId == Protocols::kProtocol_BDX), CHIP_ERROR_INVALID_MESSAGE_TYPE);
 
     mStatusReportData.StatusCode = protocolCode;
@@ -857,8 +855,7 @@ void TransferSession::PrepareStatusReport(StatusCode code)
     VerifyOrReturn(!bbuf.IsNull());
 
     bbuf.Put16(static_cast<uint16_t>(Protocols::Common::StatusCode::Failure));
-    bbuf.Put16(kStatusReportVendorId);
-    bbuf.Put16(Protocols::kProtocol_BDX);
+    bbuf.Put32(Protocols::kProtocol_BDX);
     bbuf.Put16(mStatusReportData.StatusCode);
 
     mPendingMsgHandle = bbuf.Finalize();

@@ -116,8 +116,7 @@ void VerifyStatusReport(nlTestSuite * inSuite, void * inContext, const System::P
     uint16_t headerSize = 0;
     PayloadHeader payloadHeader;
     uint16_t generalCode  = 0;
-    uint16_t vendorId     = 0;
-    uint16_t protocolId   = 0;
+    uint32_t protocolId   = 0;
     uint16_t protocolCode = 0;
 
     if (msg.IsNull())
@@ -132,7 +131,7 @@ void VerifyStatusReport(nlTestSuite * inSuite, void * inContext, const System::P
     NL_TEST_ASSERT(inSuite, payloadHeader.GetMessageType() == static_cast<uint8_t>(Protocols::Common::MsgType::StatusReport));
 
     Encoding::LittleEndian::Reader reader(msg->Start() + headerSize, msg->DataLength());
-    err = reader.Read16(&generalCode).Read16(&vendorId).Read16(&protocolId).Read16(&protocolCode).StatusCode();
+    err = reader.Read16(&generalCode).Read32(&protocolId).Read16(&protocolCode).StatusCode();
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, generalCode == static_cast<uint16_t>(Protocols::Common::StatusCode::Failure));
     NL_TEST_ASSERT(inSuite, protocolId == Protocols::kProtocol_BDX);
