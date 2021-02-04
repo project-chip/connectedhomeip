@@ -15,7 +15,7 @@
 #   limitations under the License.
 #
 
-from project-chip/chip-cirque-device-base:latest
+from connectedhomeip/chip-cirque-device-base:latest
 
 COPY out/chip-echo-responder /usr/bin/
 COPY entrypoint.sh /
