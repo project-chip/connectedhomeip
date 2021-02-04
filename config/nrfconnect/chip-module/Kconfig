@@ -88,6 +88,12 @@ config CHIP_NFC_COMMISSIONING
 	help
 	  Enables NFC commissioning by sharing onboarding payload in NFC tag.
 
+config CHIP_ENABLE_RENDEZVOUS_BYPASS
+	bool "Enable Rendezvous bypass"
+	default n
+	help
+	  Enables bypassing rendezvous for the test purposes.
+
 config APP_LINK_WITH_CHIP
 	bool "Link 'app' with Connected Home over IP"
 	default y
