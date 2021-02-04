@@ -47,6 +47,7 @@ exit:
 // Shutdown all layers, finalize operations
 CHIP_ERROR MessagingContext::Shutdown()
 {
+    mExchangeManager.Shutdown();
     CHIP_ERROR err = IOContext::Shutdown();
 
     return err;

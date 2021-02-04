@@ -208,6 +208,7 @@ int Initialize(void * aContext)
 int Finalize(void * aContext)
 {
     CHIP_ERROR err = reinterpret_cast<TestContext *>(aContext)->Shutdown();
+    chip::Platform::MemoryShutdown();
     return (err == CHIP_NO_ERROR) ? SUCCESS : FAILURE;
 }
 
