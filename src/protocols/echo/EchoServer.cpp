@@ -76,6 +76,7 @@ void EchoServer::OnMessageReceived(Messaging::ExchangeContext * ec, const Packet
     // adjust the position of the payload within the buffer to ensure there is enough room for the
     // outgoing network headers.  This is necessary because in some network stack configurations,
     // the incoming header size may be smaller than the outgoing size.
+    // TODO: higher-level New to encapsulate the addition of kMaxTagLen (required for the message authentication tag).
     if (!response->EnsureReservedSize(System::PacketBuffer::kDefaultHeaderReserve) || response->AvailableDataLength() < kMaxTagLen)
     {
         response = response.CloneData(kMaxTagLen);
