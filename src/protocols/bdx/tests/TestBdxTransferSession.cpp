@@ -109,7 +109,7 @@ void VerifyBdxMessageType(nlTestSuite * inSuite, void * inContext, const System:
     NL_TEST_ASSERT(inSuite, payloadHeader.GetMessageType() == expected);
 }
 
-// Helper method for verifying that a PacketBufferHandle contains a valid BDX header and message type matches expected.
+// Helper method for verifying that a PacketBufferHandle contains a valid StatusReport message and contains a specific StatusCode.
 void VerifyStatusReport(nlTestSuite * inSuite, void * inContext, const System::PacketBufferHandle & msg, StatusCode code)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;

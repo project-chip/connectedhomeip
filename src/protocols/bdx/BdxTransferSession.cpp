@@ -378,10 +378,15 @@ exit:
 
 CHIP_ERROR TransferSession::AbortTransfer(StatusCode reason)
 {
-    // TODO: prepare a StatusReport
-    mState = kErrorState;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    VerifyOrExit((mState != kUnitialized) && (mState != kTransferDone) && (mState != kErrorState),
+                 err = CHIP_ERROR_INCORRECT_STATE);
+
+    PrepareStatusReport(reason);
+
+exit:
+    return err;
 }
 
 void TransferSession::Reset()
@@ -422,7 +427,6 @@ CHIP_ERROR TransferSession::HandleMessageReceived(System::PacketBufferHandle msg
 
     msg->ConsumeHead(headerSize);
 
-    // TODO: call HandleStatusReport if message is StatusReport
     if (payloadHeader.GetProtocolID() == Protocols::kProtocol_BDX)
     {
         err = HandleBdxMessage(payloadHeader, std::move(msg));

@@ -216,7 +216,8 @@ public:
 
     /**
      * @brief
-     *   Prematurely end a transfer. Must still call Reset() to prepare the TransferSession for another transfer.
+     *   Prematurely end a transfer with a StatusReport. Must still call Reset() to prepare the TransferSession for another
+     *   transfer.
      *
      * @param reason The StatusCode reason for ending the transfer.
      *
