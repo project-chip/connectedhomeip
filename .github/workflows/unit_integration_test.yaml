@@ -38,8 +38,7 @@ jobs:
                 - "/tmp/log_output:/tmp/test_logs"
                 - "/tmp/happy_test_logs:/tmp/happy_test_logs"
             options:
-                --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
-                net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
+                --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
 
         steps:
             - name: Checkout
@@ -79,8 +78,7 @@ jobs:
               if: ${{ always() }}
               with:
                   name:
-                      happy_log-${{ steps.outsuffix.outputs.value }}-${{
-                      matrix.type }}
+                      happy_log-${{ steps.outsuffix.outputs.value }}-${{ matrix.type }}
                   path: /tmp/happy_test_logs/
             # TODO Log Upload https://github.com/project-chip/connectedhomeip/issues/2227
             # TODO https://github.com/project-chip/connectedhomeip/issues/1512
