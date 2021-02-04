@@ -155,6 +155,7 @@ chip_gn_arg_string("mbed_cxx"                             ${CMAKE_CXX_COMPILER})
 chip_gn_arg_bool  ("is_debug"                               CONFIG_DEBUG)
 chip_gn_arg_bool  ("chip_build_tests"                       CONFIG_CHIP_BUILD_TESTS)
 chip_gn_arg_bool  ("chip_build_libshell"                    CONFIG_CHIP_LIB_SHELL)
+chip_gn_arg_bool  ("chip_with_lwip"                         CONFIG_CHIP_WITH_LWIP)
 
 if (BOARD STREQUAL "native_posix")
     chip_gn_arg_string("target_cpu" "x86")
@@ -200,3 +201,31 @@ target_include_directories(chip INTERFACE
 target_link_directories(chip INTERFACE ${CMAKE_CURRENT_BINARY_DIR}/lib)
 target_link_libraries(chip INTERFACE -Wl,--start-group ${CHIP_LIBRARIES} -Wl,--end-group)
 add_dependencies(chip chip-gn)
+
+# ==============================================================================
+# Define mbed target configuration according to CHIP component usage
+# ==============================================================================
+# CHIP includes path
+list(APPEND CHIP_INCLUDES)
+
+# CHIP defines
+list(APPEND CHIP_DEFINES)
+
+if (${CONFIG_CHIP_WITH_LWIP})
+    list(APPEND CHIP_INCLUDES 
+        ${CHIP_ROOT}/third_party/lwip/repo/lwip/src/include
+        ${CHIP_ROOT}/src/lwip/mbed
+    )
+    list(APPEND CHIP_DEFINES
+        "LWIP_NO_STDINT_H=1" 
+        "IN_ADDR_T_DEFINED=1"
+    )
+endif()
+
+target_include_directories(${APP_TARGET} PRIVATE 
+                           ${CHIP_INCLUDES}
+)
+
+target_compile_definitions(${APP_TARGET} PRIVATE
+                           ${CHIP_DEFINES}                      
+)
