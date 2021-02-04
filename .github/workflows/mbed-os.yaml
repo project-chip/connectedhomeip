@@ -22,7 +22,6 @@ jobs:
         name: Mbed OS docker image test
         env:
             BUILD_TYPE: mbed-os
-            BUILD_VERSION: 0.5.0
 
         runs-on: ubuntu-latest
 
@@ -32,6 +31,9 @@ jobs:
               with:
                   fetch-depth: 1
                   submodules: false
+
+            - name: Get build version from file
+              run: echo "BUILD_VERSION=$(cat integrations/docker/images/chip-build-${{env.BUILD_TYPE}}/version)" >> $GITHUB_ENV
                   
             - name: Build Mbed-OS Docker image (chip-build-mbed-os)
               run: integrations/docker/images/chip-build-mbed-os/build.sh
