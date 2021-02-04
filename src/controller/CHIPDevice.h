@@ -280,25 +280,25 @@ private:
     Inet::IPAddress mDeviceAddr;
 
     /* Port on which the CHIP device is receiving messages. Typically it is CHIP_PORT */
-    uint16_t mDevicePort;
+    uint16_t mDevicePort = CHIP_PORT;
 
     /* Local network interface that should be used to communicate with the device */
-    Inet::InterfaceId mInterface;
+    Inet::InterfaceId mInterface = INET_NULL_INTERFACEID;
 
-    Inet::InetLayer * mInetLayer;
+    Inet::InetLayer * mInetLayer = nullptr;
 
-    bool mActive;
-    ConnectionState mState;
+    bool mActive           = false;
+    ConnectionState mState = ConnectionState::NotConnected;
 
     PASESessionSerializable mPairing;
 
-    DeviceStatusDelegate * mStatusDelegate;
+    DeviceStatusDelegate * mStatusDelegate = nullptr;
 
-    SecureSessionMgr * mSessionManager;
+    SecureSessionMgr * mSessionManager = nullptr;
 
-    DeviceTransportMgr * mTransportMgr;
+    DeviceTransportMgr * mTransportMgr = nullptr;
 
-    app::CommandSender * mCommandSender;
+    app::CommandSender * mCommandSender = nullptr;
 
     SecureSessionHandle mSecureSession = {};
 
