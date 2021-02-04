@@ -11,7 +11,7 @@ ARG NCS_REVISION=v1.4.0
 # Tools for flashing software on Nordic devices, and accessing device logs
 RUN set -x \
     && (mkdir -p /opt/NordicSemiconductor/nRF5_tools && cd /opt/NordicSemiconductor/nRF5_tools \
-    && curl https://www.nordicsemi.com/-/media/Software-and-other-downloads/Desktop-software/nRF-command-line-tools/sw/Versions-10-x-x/10-7-0/nRFCommandLineTools1070Linuxamd64tar.gz \
+    && curl https://www.nordicsemi.com/-/media/Software-and-other-downloads/Desktop-software/nRF-command-line-tools/sw/Versions-10-x-x/10-7-0/nRFCommandLineTools1070Linuxamd64.tar.gz \
     | tar zxvf - \
     && dpkg -i --force-depends JLink_Linux_*.deb \
     && dpkg -i --force-depends nRF-Command-Line-Tools_*.deb \
@@ -35,7 +35,7 @@ ENV ARM_GCC_INSTALL_ROOT=/opt/ARM-software/gcc-arm-none-eabi-9-2019-q4-major/bin
 # ==================================================
 RUN set -x \
     # Device Tree Compiler 1.4.7
-    && curl -o /tmp/dtc.deb http://mirrors.edge.kernel.org/ubuntu/pool/main/d/device-tree-compiler/device-tree-compiler_1.4.7-3ubuntu2_amd64.deb \
+    && curl -o /tmp/dtc.deb http://archive.ubuntu.com/ubuntu/pool/main/d/device-tree-compiler/device-tree-compiler_1.4.5-3_amd64.deb \
     && dpkg -i /tmp/dtc.deb \
     && (mkdir -p /opt/nrfconnect/sdk-nrf && cd /opt/nrfconnect/sdk-nrf \
     && pip3 install --no-cache-dir setuptools wheel cmake west \
