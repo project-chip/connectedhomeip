@@ -20,7 +20,7 @@ portpicker
 mobly
 
 # zephyr
-west>=0.8.0
+west>=0.9.0
 
 # happy tests
 lockfile

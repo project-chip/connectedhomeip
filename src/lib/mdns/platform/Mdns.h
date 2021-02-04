@@ -61,7 +61,7 @@ struct MdnsService
     Inet::IPAddressType mAddressType;
     uint16_t mPort;
     chip::Inet::InterfaceId mInterface;
-    TextEntry * mTextEntryies;
+    TextEntry * mTextEntries;
     size_t mTextEntrySize;
     const char ** mSubTypes;
     size_t mSubTypeSize;
