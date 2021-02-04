@@ -20,26 +20,20 @@ const uint8_t kBdxVersion = 0; ///< The version of this implementation of the BD
  */
 CHIP_ERROR WriteToPacketBuffer(const ::chip::bdx::BdxMessage & msgStruct, ::chip::System::PacketBufferHandle & msgBuf)
 {
-    CHIP_ERROR err     = CHIP_NO_ERROR;
     size_t msgDataSize = msgStruct.MessageSize();
-    msgBuf             = ::chip::System::PacketBufferHandle::New(static_cast<uint16_t>(msgDataSize));
-    if (msgBuf.IsNull() || msgDataSize > msgBuf->AvailableDataLength())
+    ::chip::System::PacketBufBound bbuf(msgDataSize);
+    if (bbuf.IsNull())
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+    msgStruct.WriteToBuffer(bbuf);
+    msgBuf = bbuf.Finalize();
+    if (msgBuf.IsNull())
     {
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    ::chip::BufBound bbuf(msgBuf->Start(), msgBuf->AvailableDataLength());
-    msgStruct.WriteToBuffer(bbuf);
-    if (bbuf.Fit())
-    {
-        msgBuf->SetDataLength(static_cast<uint16_t>(bbuf.Needed()));
-    }
-    else
-    {
-        err = CHIP_ERROR_NO_MEMORY;
-    }
-
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR AttachBdxHeader(::chip::bdx::MessageType msgType, ::chip::System::PacketBufferHandle & msgBuf)
