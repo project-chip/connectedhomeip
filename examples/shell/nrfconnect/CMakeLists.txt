@@ -26,8 +26,6 @@ find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
 
 project(chip-nrf52840-shell-example)
 
-zephyr_compile_options(-Werror)
-
 target_include_directories(app PRIVATE
                            ${CMAKE_CURRENT_SOURCE_DIR}
                            ${APP_ROOT}/shell_common/include)
