@@ -1,0 +1,77 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Build example - Mbed OS
+
+on:
+    push:
+    pull_request:
+
+jobs:
+    mbedos:
+        name: Mbed OS
+
+        env:
+            BUILD_TYPE: mbedos
+
+        runs-on: ubuntu-latest
+
+        container:
+            image: pan2048/chip-build-mbed-os:0.5.0
+            volumes:
+                - "/tmp/output_binaries:/tmp/output_binaries"
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v2
+              # Fetch depth 0 to get all history and be able to check mergepoint for bloat report
+              with:
+                  fetch-depth: 0
+                  submodules: true
+#             - name: Initialize CodeQL
+#               uses: github/codeql-action/init@v1
+#               with:
+#                   languages: "cpp, python"
+#                   queries: +security-and-quality
+            - name: Build example Shell App
+              run: scripts/examples/mbed_example.sh
+            - name: Copy aside build products
+              run: |
+                  mkdir -p example_binaries/$BUILD_TYPE-build
+                  cp examples/shell/mbed/cmake_build/chip-mbed-shell-example.hex \
+                     example_binaries/$BUILD_TYPE-build/chip-mbed-shell-example.hex
+            - name: Binary artifact suffix
+              id: outsuffix
+              uses: haya14busa/action-cond@v1.0.0
+              with:
+                  cond: ${{ github.event.pull_request.number == '' }}
+                  if_true: "${{ github.sha }}"
+                  if_false: "pull-${{ github.event.pull_request.number }}"
+            - name: Copy aside binaries
+              run: |
+                  cp -r example_binaries/$BUILD_TYPE-build /tmp/output_binaries/
+            - name: Uploading Binaries
+              uses: actions/upload-artifact@v1
+              with:
+                  name:
+                      ${{ env.BUILD_TYPE }}-example-build-${{
+                      steps.outsuffix.outputs.value }}
+                  path: /tmp/output_binaries/${{ env.BUILD_TYPE }}-build
+            # - name: Remove third_party binaries for CodeQL Analysis
+            #   run: find . -type d -name "third_party" -exec rm -rf {} +
+            # - name: Remove m5stack-tft binaries for CodeQL Analysis
+            #   run: find . -type d -name "m5stack-tft" -exec rm -rf {} +
+#             - name: Perform CodeQL Analysis
+#               if: ${{ github.event_name == 'push' }}
+#               uses: github/codeql-action/analyze@v1
