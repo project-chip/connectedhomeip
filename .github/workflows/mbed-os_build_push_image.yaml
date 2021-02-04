@@ -62,5 +62,5 @@ jobs:
                 username: ${{ secrets.DOCKERHUB_USERNAME }}
                 password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-            - name: Push to DockerHub
+            - name: Push to DockerHub.
               run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/chip-build-${{env.BUILD_TYPE}}:${{env.BUILD_VERSION}}
