@@ -78,16 +78,16 @@ class ChipDeviceController(object):
         self._InitLib()
 
         devCtrl = c_void_p(None)
-        res = self._dmLib.nl_Chip_DeviceController_NewDeviceController(pointer(devCtrl))
+        res = self._dmLib.pychip_DeviceController_NewDeviceController(pointer(devCtrl))
         if res != 0:
             raise self._ChipStack.ErrorToException(res)
 
         pairingDelegate = c_void_p(None)
-        res = self._dmLib.nl_Chip_ScriptDevicePairingDelegate_NewPairingDelegate(pointer(pairingDelegate))
+        res = self._dmLib.pychip_ScriptDevicePairingDelegate_NewPairingDelegate(pointer(pairingDelegate))
         if res != 0:
             raise self._ChipStack.ErrorToException(res)
 
-        res = self._dmLib.nl_Chip_DeviceController_SetDevicePairingDelegate(devCtrl, pairingDelegate)
+        res = self._dmLib.pychip_DeviceController_SetDevicePairingDelegate(devCtrl, pairingDelegate)
         if res != 0:
             raise self._ChipStack.ErrorToException(res)
 
@@ -117,17 +117,17 @@ class ChipDeviceController(object):
 
     def __del__(self):
         if self.devCtrl != None:
-            self._dmLib.nl_Chip_DeviceController_DeleteDeviceController(self.devCtrl)
+            self._dmLib.pychip_DeviceController_DeleteDeviceController(self.devCtrl)
             self.devCtrl = None
 
     def IsConnected(self):
         return self._ChipStack.Call(
-            lambda: self._dmLib.nl_Chip_DeviceController_IsConnected(self.devCtrl)
+            lambda: self._dmLib.pychip_DeviceController_IsConnected(self.devCtrl)
         )
 
     def ConnectBle(self, bleConnection):
         self._ChipStack.CallAsync(
-            lambda: self._dmLib.nl_Chip_DeviceController_ValidateBTP(
+            lambda: self._dmLib.pychip_DeviceController_ValidateBTP(
                 self.devCtrl,
                 bleConnection,
                 self._ChipStack.cbHandleComplete,
@@ -145,7 +145,7 @@ class ChipDeviceController(object):
 
         self.state = DCState.RENDEZVOUS_ONGOING
         return self._ChipStack.CallAsync(
-            lambda: self._dmLib.nl_Chip_DeviceController_ConnectBLE(
+            lambda: self._dmLib.pychip_DeviceController_ConnectBLE(
                 self.devCtrl, discriminator, setupPinCode, onConnectFunct, self.cbHandleMessage, self.cbHandleRendezvousError)
         )
 
@@ -159,14 +159,14 @@ class ChipDeviceController(object):
 
         self.state = DCState.RENDEZVOUS_ONGOING
         return self._ChipStack.CallAsync(
-            lambda: self._dmLib.nl_Chip_DeviceController_ConnectIP(
+            lambda: self._dmLib.pychip_DeviceController_ConnectIP(
                 self.devCtrl, ipaddr, setupPinCode, onConnectFunct, self.cbHandleMessage, self.cbHandleRendezvousError)
         )
 
     def ZCLSend(self, cluster, command, nodeid, endpoint, groupid, args):
         device = c_void_p(None)
         self._ChipStack.Call(
-            lambda: self._dmLib.nl_Chip_GetDeviceByNodeId(self.devCtrl, nodeid, pointer(device))
+            lambda: self._dmLib.pychip_GetDeviceByNodeId(self.devCtrl, nodeid, pointer(device))
         )
         self._Cluster.SendCommand(device, cluster, command, endpoint, groupid, args)
 
@@ -175,7 +175,7 @@ class ChipDeviceController(object):
 
     def Close(self):
         self._ChipStack.Call(
-            lambda: self._dmLib.nl_Chip_DeviceController_Close(self.devCtrl)
+            lambda: self._dmLib.pychip_DeviceController_Close(self.devCtrl)
         )
 
     def SetLogFilter(self, category):
@@ -183,19 +183,19 @@ class ChipDeviceController(object):
             raise ValueError("category must be an unsigned 8-bit integer")
 
         self._ChipStack.Call(
-            lambda: self._dmLib.nl_Chip_DeviceController_SetLogFilter(category)
+            lambda: self._dmLib.pychip_DeviceController_SetLogFilter(category)
         )
 
     def GetLogFilter(self):
         self._ChipStack.Call(
-            lambda: self._dmLib.nl_Chip_DeviceController_GetLogFilter()
+            lambda: self._dmLib.pychip_DeviceController_GetLogFilter()
         )
 
     def SetBlockingCB(self, blockingCB):
         self._ChipStack.blockingCB = blockingCB
 
     def SetWifiCredential(self, ssid, password):
-        ret = self._dmLib.nl_Chip_ScriptDevicePairingDelegate_SetWifiCredential(self.pairingDelegate, ssid.encode("utf-8"), password.encode("utf-8"))
+        ret = self._dmLib.pychip_ScriptDevicePairingDelegate_SetWifiCredential(self.pairingDelegate, ssid.encode("utf-8"), password.encode("utf-8"))
         if ret != 0:
             raise self._ChipStack.ErrorToException(res)
 
@@ -204,37 +204,37 @@ class ChipDeviceController(object):
         if self._dmLib is None:
             self._dmLib = CDLL(self._ChipStack.LocateChipDLL())
 
-            self._dmLib.nl_Chip_DeviceController_NewDeviceController.argtypes = [
+            self._dmLib.pychip_DeviceController_NewDeviceController.argtypes = [
                 POINTER(c_void_p)
             ]
-            self._dmLib.nl_Chip_DeviceController_NewDeviceController.restype = c_uint32
+            self._dmLib.pychip_DeviceController_NewDeviceController.restype = c_uint32
 
-            self._dmLib.nl_Chip_DeviceController_DeleteDeviceController.argtypes = [
+            self._dmLib.pychip_DeviceController_DeleteDeviceController.argtypes = [
                 c_void_p
             ]
-            self._dmLib.nl_Chip_DeviceController_DeleteDeviceController.restype = (
+            self._dmLib.pychip_DeviceController_DeleteDeviceController.restype = (
                 c_uint32
             )
 
-            self._dmLib.nl_Chip_DeviceController_Close.argtypes = [c_void_p]
-            self._dmLib.nl_Chip_DeviceController_Close.restype = None
+            self._dmLib.pychip_DeviceController_Close.argtypes = [c_void_p]
+            self._dmLib.pychip_DeviceController_Close.restype = None
 
-            self._dmLib.nl_Chip_DeviceController_ConnectBLE.argtypes = [
+            self._dmLib.pychip_DeviceController_ConnectBLE.argtypes = [
                 c_void_p, c_uint16, c_uint32, _OnConnectFunct, _OnMessageFunct, _OnRendezvousErrorFunct]
-            self._dmLib.nl_Chip_DeviceController_ConnectBLE.restype = c_uint32
+            self._dmLib.pychip_DeviceController_ConnectBLE.restype = c_uint32
 
-            self._dmLib.nl_Chip_DeviceController_ConnectIP.argtypes = [
+            self._dmLib.pychip_DeviceController_ConnectIP.argtypes = [
                 c_void_p, c_char_p, c_uint32, _OnConnectFunct, _OnMessageFunct, _OnRendezvousErrorFunct]
-            self._dmLib.nl_Chip_DeviceController_ConnectIP.restype = c_uint32
+            self._dmLib.pychip_DeviceController_ConnectIP.restype = c_uint32
 
-            self._dmLib.nl_Chip_ScriptDevicePairingDelegate_NewPairingDelegate.argtypes = [POINTER(c_void_p)]
-            self._dmLib.nl_Chip_ScriptDevicePairingDelegate_NewPairingDelegate.restype = c_uint32
+            self._dmLib.pychip_ScriptDevicePairingDelegate_NewPairingDelegate.argtypes = [POINTER(c_void_p)]
+            self._dmLib.pychip_ScriptDevicePairingDelegate_NewPairingDelegate.restype = c_uint32
 
-            self._dmLib.nl_Chip_ScriptDevicePairingDelegate_SetWifiCredential.argtypes = [c_void_p, c_char_p, c_char_p]
-            self._dmLib.nl_Chip_ScriptDevicePairingDelegate_SetWifiCredential.restype = c_uint32
+            self._dmLib.pychip_ScriptDevicePairingDelegate_SetWifiCredential.argtypes = [c_void_p, c_char_p, c_char_p]
+            self._dmLib.pychip_ScriptDevicePairingDelegate_SetWifiCredential.restype = c_uint32
 
-            self._dmLib.nl_Chip_DeviceController_SetDevicePairingDelegate.argtypes = [c_void_p, c_void_p]
-            self._dmLib.nl_Chip_DeviceController_SetDevicePairingDelegate.restype = c_uint32
+            self._dmLib.pychip_DeviceController_SetDevicePairingDelegate.argtypes = [c_void_p, c_void_p]
+            self._dmLib.pychip_DeviceController_SetDevicePairingDelegate.restype = c_uint32
 
-            self._dmLib.nl_Chip_GetDeviceByNodeId.argtypes = [c_void_p, c_uint64, POINTER(c_void_p)]
-            self._dmLib.nl_Chip_GetDeviceByNodeId.restype = c_uint32
+            self._dmLib.pychip_GetDeviceByNodeId.argtypes = [c_void_p, c_uint64, POINTER(c_void_p)]
+            self._dmLib.pychip_GetDeviceByNodeId.restype = c_uint32
