@@ -53,6 +53,8 @@ using namespace chip::Inet;
 
 #define TOOL_NAME "TestInetLayerDNS"
 
+#define DISABLE_BROKEN_DNS_TESTS 1 // https://github.com/project-chip/connectedhomeip/issues/4670
+
 #define DEFAULT_TEST_DURATION_MILLISECS (20000)
 #define DEFAULT_CANCEL_TEST_DURATION_MILLISECS (2000)
 
@@ -90,6 +92,7 @@ static void TestDNSResolution_Basic(nlTestSuite * testSuite, void * testContext)
 {
     // clang-format off
 
+#ifndef DISABLE_BROKEN_DNS_TESTS
     // Test resolving a name with only IPv4 addresses.
     RunTestCase(testSuite,
         DNSResolutionTestCase
@@ -128,6 +131,7 @@ static void TestDNSResolution_Basic(nlTestSuite * testSuite, void * testContext)
             true
         }
     );
+#endif
     // clang-format on
 }
 
@@ -137,6 +141,7 @@ static void TestDNSResolution_Basic(nlTestSuite * testSuite, void * testContext)
 static void TestDNSResolution_AddressTypeOption(nlTestSuite * testSuite, void * testContext)
 {
     // clang-format off
+#ifndef DISABLE_BROKEN_DNS_TESTS
 
     // Test requesting IPv4 addresses only.
 #if INET_CONFIG_ENABLE_IPV4
@@ -193,6 +198,8 @@ static void TestDNSResolution_AddressTypeOption(nlTestSuite * testSuite, void * 
             true
         }
     );
+
+#endif
     // clang-format on
 }
 
@@ -269,6 +276,7 @@ static void TestDNSResolution_RestrictedResults(nlTestSuite * testSuite, void * 
 static void TestDNSResolution_NoRecord(nlTestSuite * testSuite, void * testContext)
 {
     // clang-format off
+#ifndef DISABLE_BROKEN_DNS_TESTS
     RunTestCase(testSuite,
         DNSResolutionTestCase
         {
@@ -280,6 +288,7 @@ static void TestDNSResolution_NoRecord(nlTestSuite * testSuite, void * testConte
             false
         }
     );
+#endif
     // clang-format on
 }
 
