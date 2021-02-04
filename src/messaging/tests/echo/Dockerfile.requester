@@ -1,4 +1,4 @@
-from chip-cirque-device-base
+from chip-cirque-device-base:latest
 
 COPY out/chip-echo-requester /usr/bin/
 COPY entrypoint.sh /

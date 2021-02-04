@@ -15,7 +15,7 @@
 #   limitations under the License.
 #
 
-from chip-cirque-device-base
+from chip-cirque-device-base:latest
 
 COPY out/debug/chip-tool-server /usr/bin/
 COPY entrypoint.sh /
