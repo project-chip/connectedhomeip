@@ -1,0 +1,66 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Mbed OS - Build, verify and push chip-build-mbed-os
+on:
+  workflow_dispatch:
+    inputs:
+
+jobs:
+    mbed-os-utils:
+        name: Mbed OS - Build, verify and push chip-build-mbed-os
+        env:
+            BUILD_TYPE: mbed-os
+
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v2
+              with:
+                  fetch-depth: 1
+                  submodules: false
+
+            - name: Get build version from file
+              run: echo "BUILD_VERSION=$(cat integrations/docker/images/chip-build-${{env.BUILD_TYPE}}/version)" >> $GITHUB_ENV
+
+            - name: Build Mbed-OS Docker image (chip-build-mbed-os)
+              run: integrations/docker/images/chip-build-${{env.BUILD_TYPE}}/build.sh
+
+            - name: Create chip-build-mbed-os container
+              run: docker run -it -d --name test_container connectedhomeip/chip-build-${{env.BUILD_TYPE}}:${{env.BUILD_VERSION}}
+
+            - name: Check cmake presence
+              run: docker exec test_container cmake --version
+
+            - name: Check mbed-cli presence
+              run: docker exec test_container mbed --version
+
+            - name: Check mbed-tools presence
+              run: docker exec test_container mbed-tools --version
+
+            - name: Check toolchan
+              run: docker exec test_container arm-none-eabi-gcc --version
+
+            - name: Change image tag
+              run: docker tag connectedhomeip/chip-build-${{env.BUILD_TYPE}}:${{env.BUILD_VERSION}} ${{ secrets.DOCKERHUB_USERNAME }}/chip-build-${{env.BUILD_TYPE}}:${{env.BUILD_VERSION}}
+
+            - name: Login to DockerHub
+              uses: docker/login-action@v1 
+              with:
+                username: ${{ secrets.DOCKERHUB_USERNAME }}
+                password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+            - name: Push to DockerHub
+              run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/chip-build-${{env.BUILD_TYPE}}:${{env.BUILD_VERSION}}
