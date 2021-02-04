@@ -1,5 +1,5 @@
 ARG VERSION=latest
-FROM connectedhomeip/chip-build-nrf-platform:${VERSION} AS nrf
+FROM connectedhomeip/chip-build-nrf-platform:0.41.9 AS nrf
 FROM connectedhomeip/chip-build-efr32:${VERSION} AS efr32
 FROM connectedhomeip/chip-build-android:${VERSION} AS android
 FROM connectedhomeip/chip-build-esp32-qemu:${VERSION} as esp32
