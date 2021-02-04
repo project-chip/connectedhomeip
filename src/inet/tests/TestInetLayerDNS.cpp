@@ -276,6 +276,7 @@ static void TestDNSResolution_RestrictedResults(nlTestSuite * testSuite, void * 
 static void TestDNSResolution_NoRecord(nlTestSuite * testSuite, void * testContext)
 {
     // clang-format off
+#ifndef DISABLE_BROKEN_DNS_TESTS
     RunTestCase(testSuite,
         DNSResolutionTestCase
         {
@@ -287,6 +288,7 @@ static void TestDNSResolution_NoRecord(nlTestSuite * testSuite, void * testConte
             false
         }
     );
+#endif
     // clang-format on
 }
 
