@@ -322,8 +322,6 @@ inline System::PacketBufferHandle New(size_t aAvailableSize)
  *
  *  @param[in]  aData           Initial buffer contents.
  *  @param[in]  aDataSize       Size of initial buffer contents.
- *  @param[in]  aAdditionalSize Size of additional application data space after the initial contents.
- *  @param[in]  aReservedSize   Number of octets to reserve for protocol headers.
  *
  *  @return     On success, a PacketBufferHandle to the allocated buffer. On fail, \c nullptr.
  */
