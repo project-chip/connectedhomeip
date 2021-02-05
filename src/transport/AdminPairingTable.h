@@ -53,10 +53,6 @@ class DLL_EXPORT AdminPairingInfo
 {
 public:
     AdminPairingInfo() { Reset(); }
-    AdminPairingInfo(AdminPairingInfo &&)      = default;
-    AdminPairingInfo(const AdminPairingInfo &) = default;
-    AdminPairingInfo & operator=(const AdminPairingInfo &) = default;
-    AdminPairingInfo & operator=(AdminPairingInfo &&) = default;
 
     NodeId GetNodeId() const { return mNodeId; }
     void SetNodeId(NodeId nodeId) { mNodeId = nodeId; }

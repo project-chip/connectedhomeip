@@ -257,7 +257,7 @@ public:
         PeerConnectionState * state = nullptr;
         PeerConnectionState * iter  = &mStates[0];
 
-        if (begin >= iter && begin < &mStates[kMaxConnectionCount])
+        if (begin != nullptr && begin >= iter && begin < &mStates[kMaxConnectionCount])
         {
             iter = begin + 1;
         }
