@@ -137,7 +137,8 @@ try:
         ],
         python_requires='>=2.7',
         packages=[
-            packageName                     # Arrange to install a package named "chip"
+            'chip',
+            'chip.ble',
         ],
         package_dir={
             '':tmpDir,                      # By default, look in the tmp directory for packages/modules to be included.

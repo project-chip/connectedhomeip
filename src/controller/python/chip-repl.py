@@ -21,7 +21,18 @@ from IPython import embed
 import chip
 
 def main():
-    embed(header = 'Welcome to the CHIP python REPL utilty')
+    # The chip import at the top level will be visible in the ipython REPL.
+    embed(header = '''
+Welcome to the CHIP python REPL utilty.
+
+Usage examples:
+
+######## List available BLE adapters #########
+
+for adapter in chip.GetBleAdapters():
+    print(adapter)
+    
+    '''.strip())
 
 if __name__ == "__main__":
     main()
