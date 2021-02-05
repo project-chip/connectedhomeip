@@ -154,7 +154,6 @@ struct TransferInit : public BdxMessage
     // Retain ownership of the packet buffer so that the FileDesignator and Metadata pointers remain valid.
     System::PacketBufferHandle Buffer;
 
-private:
     CHIP_ERROR Parse(System::PacketBufferHandle aBuffer) override;
     Encoding::LittleEndian::BufferWriter & WriteToBuffer(Encoding::LittleEndian::BufferWriter & aBuffer) const override;
     size_t MessageSize() const override;
