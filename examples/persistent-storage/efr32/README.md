@@ -42,11 +42,6 @@ defines = [
 
 ### Building
 
--   Download the [sdk_support](https://github.com/SiliconLabs/sdk_support) from
-    GitHub and export the path with :
-
-            $ export EFR32_SDK_ROOT=<Path to cloned git repo>
-
 -   Download the
     [Simplicity Commander](https://www.silabs.com/mcu/programming-options)
     command line tool, and ensure that `commander` is your shell search path.
@@ -80,10 +75,19 @@ defines = [
 
 *   Build the example application:
 
+          cd ~/connectedhomeip
+          ./scripts/examples/gn_efr32_example.sh ./examples/persistent-storage/efr32/ ./out/persistent-storage BRD4161A
+
+-   To delete generated executable, libraries and object files use:
+
+          $ cd ~/connectedhomeip
+          $ rm -rf ./out/persistent-storage
+
+OR use GN/Ninja directly
+
           $ cd ~/connectedhomeip/examples/persistent-storage/efr32
           $ git submodule update --init
           $ source third_party/connectedhomeip/scripts/activate.sh
-          $ export EFR32_SDK_ROOT=<path-to-silabs-sdk-v2.7>
           $ export EFR32_BOARD=BRD4161A
           $ gn gen out/debug --args="efr32_sdk_root=\"${EFR32_SDK_ROOT}\" efr32_board=\"${EFR32_BOARD}\""
           $ ninja -C out/debug
