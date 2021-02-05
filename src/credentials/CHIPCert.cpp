@@ -121,6 +121,7 @@ void ChipCertificateSet::Release()
     {
         if (mCerts != nullptr)
         {
+            Clear();
             chip::Platform::MemoryFree(mCerts);
             mCerts = nullptr;
         }
@@ -136,7 +137,7 @@ void ChipCertificateSet::Clear()
 {
     for (int i = 0; i < mCertCount; i++)
     {
-        mCerts[i].Clear();
+        mCerts[i].~ChipCertificateData();
     }
 
     mCertCount = 0;
@@ -240,7 +241,7 @@ exit:
     {
         if (cert != nullptr)
         {
-            cert->Clear();
+            cert->~ChipCertificateData();
         }
     }
 
@@ -316,7 +317,7 @@ exit:
     {
         for (uint8_t i = initialCertCount; i < mCertCount; i++)
         {
-            mCerts[i].Clear();
+            mCerts[i].~ChipCertificateData();
         }
         mCertCount = initialCertCount;
     }
@@ -629,7 +630,10 @@ ChipCertificateData::ChipCertificateData()
     Clear();
 }
 
-ChipCertificateData::~ChipCertificateData() {}
+ChipCertificateData::~ChipCertificateData()
+{
+    Clear();
+}
 
 void ChipCertificateData::Clear()
 {
