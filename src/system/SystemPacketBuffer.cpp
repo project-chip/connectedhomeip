@@ -600,7 +600,8 @@ PacketBufferWriter::PacketBufferWriter(size_t aAvailableSize, uint16_t aReserved
     mPacket = PacketBufferHandle::New(aAvailableSize, aReservedSize);
     if (!mPacket.IsNull())
     {
-        Reset(mPacket->Start(), aAvailableSize);
+        *static_cast<Encoding::LittleEndian::BufferWriter *>(this) =
+            Encoding::LittleEndian::BufferWriter(mPacket->Start(), aAvailableSize);
     }
 }
 
@@ -616,7 +617,7 @@ PacketBufferHandle PacketBufferWriter::Finalize()
     {
         mPacket = nullptr;
     }
-    Reset(nullptr, 0);
+    *static_cast<Encoding::LittleEndian::BufferWriter *>(this) = Encoding::LittleEndian::BufferWriter(nullptr, 0);
     return std::move(mPacket);
 }
 

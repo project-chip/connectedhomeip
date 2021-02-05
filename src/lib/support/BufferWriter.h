@@ -115,13 +115,6 @@ protected:
     BufferWriterBase(uint8_t * buf, size_t len) : mBuf(buf), mSize(len), mNeeded(0) {}
     BufferWriterBase(const BufferWriterBase & other) = default;
     BufferWriterBase & operator=(const BufferWriterBase & other) = default;
-
-    void Reset(uint8_t * buf, size_t len)
-    {
-        mBuf    = buf;
-        mSize   = len;
-        mNeeded = 0;
-    }
 };
 
 namespace LittleEndian {
@@ -143,7 +136,6 @@ public:
         }
         return *this;
     }
-    void Reset(uint8_t * buf, size_t len) { BufferWriterBase<BufferWriter>::Reset(buf, len); }
 };
 
 } // namespace LittleEndian
@@ -166,7 +158,6 @@ public:
         }
         return *this;
     }
-    void Reset(uint8_t * buf, size_t len) { BufferWriterBase<BufferWriter>::Reset(buf, len); }
 };
 
 } // namespace BigEndian

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -111,7 +111,10 @@ struct BdxMessage
      *
      * @param aBuffer A BufferWriter object that will be used to write the message
      */
-    Encoding::LittleEndian::BufferWriter & WriteToBuffer(Encoding::LittleEndian::BufferWriter & aBuffer) const { return DerivedWriteToBuffer(aBuffer); }
+    Encoding::LittleEndian::BufferWriter & WriteToBuffer(Encoding::LittleEndian::BufferWriter & aBuffer) const
+    {
+        return DerivedWriteToBuffer(aBuffer);
+    }
 
     /**
      * @brief
@@ -122,9 +125,9 @@ struct BdxMessage
     virtual ~BdxMessage() = default;
 
 private:
-    virtual CHIP_ERROR DerivedParse(System::PacketBufferHandle aBuffer) = 0;
-    virtual Encoding::LittleEndian::BufferWriter & DerivedWriteToBuffer(Encoding::LittleEndian::BufferWriter & aBuffer) const   = 0;
-    virtual size_t DerivedMessageSize() const                           = 0;
+    virtual CHIP_ERROR DerivedParse(System::PacketBufferHandle aBuffer)                                                       = 0;
+    virtual Encoding::LittleEndian::BufferWriter & DerivedWriteToBuffer(Encoding::LittleEndian::BufferWriter & aBuffer) const = 0;
+    virtual size_t DerivedMessageSize() const                                                                                 = 0;
 };
 
 /*

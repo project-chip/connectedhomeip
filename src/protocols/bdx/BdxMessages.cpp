@@ -166,7 +166,7 @@ exit:
 
 size_t TransferInit::DerivedMessageSize() const
 {
-    Encoding::LittleEndian::BufferWriter emptyBuf(nullptr, 0);
+    BufferWriter emptyBuf(nullptr, 0);
     return WriteToBuffer(emptyBuf).Needed();
 }
 
@@ -249,7 +249,7 @@ exit:
 
 size_t SendAccept::DerivedMessageSize() const
 {
-    Encoding::LittleEndian::BufferWriter emptyBuf(nullptr, 0);
+    BufferWriter emptyBuf(nullptr, 0);
     return WriteToBuffer(emptyBuf).Needed();
 }
 
@@ -389,7 +389,7 @@ exit:
 
 size_t ReceiveAccept::DerivedMessageSize() const
 {
-    Encoding::LittleEndian::BufferWriter emptyBuf(nullptr, 0);
+    BufferWriter emptyBuf(nullptr, 0);
     return WriteToBuffer(emptyBuf).Needed();
 }
 
@@ -427,7 +427,7 @@ CHIP_ERROR CounterMessage::DerivedParse(System::PacketBufferHandle aBuffer)
 
 size_t CounterMessage::DerivedMessageSize() const
 {
-    Encoding::LittleEndian::BufferWriter emptyBuf(nullptr, 0);
+    BufferWriter emptyBuf(nullptr, 0);
     return WriteToBuffer(emptyBuf).Needed();
 }
 
@@ -478,7 +478,7 @@ exit:
 
 size_t DataBlock::DerivedMessageSize() const
 {
-    Encoding::LittleEndian::BufferWriter emptyBuf(nullptr, 0);
+    BufferWriter emptyBuf(nullptr, 0);
     return WriteToBuffer(emptyBuf).Needed();
 }
 

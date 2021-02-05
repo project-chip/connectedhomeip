@@ -27,10 +27,10 @@
 
 using namespace chip;
 using namespace chip::System;
+using namespace chip::Encoding::LittleEndian;
 
-static uint16_t doEncodeApsFrame(Encoding::LittleEndian::BufferWriter & buf, ClusterId clusterId, EndpointId sourceEndpoint,
-                                 EndpointId destinationEndpoint, EmberApsOption options, GroupId groupId, uint8_t sequence,
-                                 uint8_t radius, bool isMeasuring)
+static uint16_t doEncodeApsFrame(BufferWriter & buf, ClusterId clusterId, EndpointId sourceEndpoint, EndpointId destinationEndpoint,
+                                 EmberApsOption options, GroupId groupId, uint8_t sequence, uint8_t radius, bool isMeasuring)
 {
 
     uint8_t control_byte = 0;
@@ -69,7 +69,7 @@ static uint16_t doEncodeApsFrame(Encoding::LittleEndian::BufferWriter & buf, Clu
 
 uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * apsFrame)
 {
-    Encoding::LittleEndian::BufferWriter buf = Encoding::LittleEndian::BufferWriter(buffer, buf_length);
+    BufferWriter buf = BufferWriter(buffer, buf_length);
     return doEncodeApsFrame(buf, apsFrame->clusterId, apsFrame->sourceEndpoint, apsFrame->destinationEndpoint, apsFrame->options,
                             apsFrame->groupId, apsFrame->sequence, apsFrame->radius, !buffer);
 }
