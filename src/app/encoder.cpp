@@ -107,6 +107,7 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
 | Identify                                                            | 0x0003 |
 | LevelControl                                                        | 0x0008 |
 | NetworkProvisioning                                                 | 0xAAAA |
+| NetworkProvisioning                                                 | 0xAAAA |
 | OnOff                                                               | 0x0006 |
 | Scenes                                                              | 0x0005 |
 | TemperatureMeasurement                                              | 0x0402 |
@@ -2524,7 +2525,7 @@ PacketBufferHandle encodeLevelControlClusterReadClusterRevisionAttribute(uint8_t
 /*
  * Command AddThreadNetwork
  */
-PacketBufferHandle encodeNetworkProvisioningClusterAddThreadNetworkCommand(EndpointId destinationEndpoint,
+PacketBufferHandle encodeNetworkProvisioningClusterAddThreadNetworkCommand(uint8_t seqNum, EndpointId destinationEndpoint,
                                                                            uint8_t * operationalDataset, uint64_t breadcrumb,
                                                                            uint32_t timeoutMs)
 {
@@ -2536,7 +2537,7 @@ PacketBufferHandle encodeNetworkProvisioningClusterAddThreadNetworkCommand(Endpo
         return PacketBufferHandle();
     }
     buf.Put8(kFrameControlClusterSpecificCommand)
-        .Put8(kSeqNum)
+        .Put8(seqNum)
         .Put8(ZCL_ADD_THREAD_NETWORK_COMMAND_ID)
         .Put(static_cast<uint8_t>(operationalDatasetStrLen))
         .Put(reinterpret_cast<char *>(operationalDataset))
@@ -2548,8 +2549,8 @@ PacketBufferHandle encodeNetworkProvisioningClusterAddThreadNetworkCommand(Endpo
 /*
  * Command AddWiFiNetwork
  */
-PacketBufferHandle encodeNetworkProvisioningClusterAddWiFiNetworkCommand(EndpointId destinationEndpoint, uint8_t * ssid,
-                                                                         uint8_t * credentials, uint64_t breadcrumb,
+PacketBufferHandle encodeNetworkProvisioningClusterAddWiFiNetworkCommand(uint8_t seqNum, EndpointId destinationEndpoint,
+                                                                         uint8_t * ssid, uint8_t * credentials, uint64_t breadcrumb,
                                                                          uint32_t timeoutMs)
 {
     COMMAND_HEADER("AddWiFiNetwork", NWPROV_CLUSTER_ID);
@@ -2566,7 +2567,7 @@ PacketBufferHandle encodeNetworkProvisioningClusterAddWiFiNetworkCommand(Endpoin
         return PacketBufferHandle();
     }
     buf.Put8(kFrameControlClusterSpecificCommand)
-        .Put8(kSeqNum)
+        .Put8(seqNum)
         .Put8(ZCL_ADD_WI_FI_NETWORK_COMMAND_ID)
         .Put(static_cast<uint8_t>(ssidStrLen))
         .Put(reinterpret_cast<char *>(ssid))
@@ -2580,8 +2581,9 @@ PacketBufferHandle encodeNetworkProvisioningClusterAddWiFiNetworkCommand(Endpoin
 /*
  * Command DisableNetwork
  */
-PacketBufferHandle encodeNetworkProvisioningClusterDisableNetworkCommand(EndpointId destinationEndpoint, uint8_t * networkID,
-                                                                         uint64_t breadcrumb, uint32_t timeoutMs)
+PacketBufferHandle encodeNetworkProvisioningClusterDisableNetworkCommand(uint8_t seqNum, EndpointId destinationEndpoint,
+                                                                         uint8_t * networkID, uint64_t breadcrumb,
+                                                                         uint32_t timeoutMs)
 {
     COMMAND_HEADER("DisableNetwork", NWPROV_CLUSTER_ID);
     size_t networkIDStrLen = strlen(reinterpret_cast<char *>(networkID));
@@ -2591,7 +2593,7 @@ PacketBufferHandle encodeNetworkProvisioningClusterDisableNetworkCommand(Endpoin
         return PacketBufferHandle();
     }
     buf.Put8(kFrameControlClusterSpecificCommand)
-        .Put8(kSeqNum)
+        .Put8(seqNum)
         .Put8(ZCL_DISABLE_NETWORK_COMMAND_ID)
         .Put(static_cast<uint8_t>(networkIDStrLen))
         .Put(reinterpret_cast<char *>(networkID))
@@ -2603,8 +2605,9 @@ PacketBufferHandle encodeNetworkProvisioningClusterDisableNetworkCommand(Endpoin
 /*
  * Command EnableNetwork
  */
-PacketBufferHandle encodeNetworkProvisioningClusterEnableNetworkCommand(EndpointId destinationEndpoint, uint8_t * networkID,
-                                                                        uint64_t breadcrumb, uint32_t timeoutMs)
+PacketBufferHandle encodeNetworkProvisioningClusterEnableNetworkCommand(uint8_t seqNum, EndpointId destinationEndpoint,
+                                                                        uint8_t * networkID, uint64_t breadcrumb,
+                                                                        uint32_t timeoutMs)
 {
     COMMAND_HEADER("EnableNetwork", NWPROV_CLUSTER_ID);
     size_t networkIDStrLen = strlen(reinterpret_cast<char *>(networkID));
@@ -2614,7 +2617,7 @@ PacketBufferHandle encodeNetworkProvisioningClusterEnableNetworkCommand(Endpoint
         return PacketBufferHandle();
     }
     buf.Put8(kFrameControlClusterSpecificCommand)
-        .Put8(kSeqNum)
+        .Put8(seqNum)
         .Put8(ZCL_ENABLE_NETWORK_COMMAND_ID)
         .Put(static_cast<uint8_t>(networkIDStrLen))
         .Put(reinterpret_cast<char *>(networkID))
@@ -2626,12 +2629,13 @@ PacketBufferHandle encodeNetworkProvisioningClusterEnableNetworkCommand(Endpoint
 /*
  * Command GetLastNetworkProvisioningResult
  */
-PacketBufferHandle encodeNetworkProvisioningClusterGetLastNetworkProvisioningResultCommand(EndpointId destinationEndpoint,
+PacketBufferHandle encodeNetworkProvisioningClusterGetLastNetworkProvisioningResultCommand(uint8_t seqNum,
+                                                                                           EndpointId destinationEndpoint,
                                                                                            uint32_t timeoutMs)
 {
     COMMAND_HEADER("GetLastNetworkProvisioningResult", NWPROV_CLUSTER_ID);
     buf.Put8(kFrameControlClusterSpecificCommand)
-        .Put8(kSeqNum)
+        .Put8(seqNum)
         .Put8(ZCL_GET_LAST_NETWORK_PROVISIONING_RESULT_COMMAND_ID)
         .Put32(timeoutMs);
     COMMAND_FOOTER();
@@ -2640,8 +2644,9 @@ PacketBufferHandle encodeNetworkProvisioningClusterGetLastNetworkProvisioningRes
 /*
  * Command RemoveNetwork
  */
-PacketBufferHandle encodeNetworkProvisioningClusterRemoveNetworkCommand(EndpointId destinationEndpoint, uint8_t * networkID,
-                                                                        uint64_t breadcrumb, uint32_t timeoutMs)
+PacketBufferHandle encodeNetworkProvisioningClusterRemoveNetworkCommand(uint8_t seqNum, EndpointId destinationEndpoint,
+                                                                        uint8_t * networkID, uint64_t breadcrumb,
+                                                                        uint32_t timeoutMs)
 {
     COMMAND_HEADER("RemoveNetwork", NWPROV_CLUSTER_ID);
     size_t networkIDStrLen = strlen(reinterpret_cast<char *>(networkID));
@@ -2651,7 +2656,7 @@ PacketBufferHandle encodeNetworkProvisioningClusterRemoveNetworkCommand(Endpoint
         return PacketBufferHandle();
     }
     buf.Put8(kFrameControlClusterSpecificCommand)
-        .Put8(kSeqNum)
+        .Put8(seqNum)
         .Put8(ZCL_REMOVE_NETWORK_COMMAND_ID)
         .Put(static_cast<uint8_t>(networkIDStrLen))
         .Put(reinterpret_cast<char *>(networkID))
@@ -2663,8 +2668,8 @@ PacketBufferHandle encodeNetworkProvisioningClusterRemoveNetworkCommand(Endpoint
 /*
  * Command ScanNetworks
  */
-PacketBufferHandle encodeNetworkProvisioningClusterScanNetworksCommand(EndpointId destinationEndpoint, uint8_t * ssid,
-                                                                       uint64_t breadcrumb, uint32_t timeoutMs)
+PacketBufferHandle encodeNetworkProvisioningClusterScanNetworksCommand(uint8_t seqNum, EndpointId destinationEndpoint,
+                                                                       uint8_t * ssid, uint64_t breadcrumb, uint32_t timeoutMs)
 {
     COMMAND_HEADER("ScanNetworks", NWPROV_CLUSTER_ID);
     size_t ssidStrLen = strlen(reinterpret_cast<char *>(ssid));
@@ -2674,7 +2679,7 @@ PacketBufferHandle encodeNetworkProvisioningClusterScanNetworksCommand(EndpointI
         return PacketBufferHandle();
     }
     buf.Put8(kFrameControlClusterSpecificCommand)
-        .Put8(kSeqNum)
+        .Put8(seqNum)
         .Put8(ZCL_SCAN_NETWORKS_COMMAND_ID)
         .Put(static_cast<uint8_t>(ssidStrLen))
         .Put(reinterpret_cast<char *>(ssid))
@@ -2686,7 +2691,7 @@ PacketBufferHandle encodeNetworkProvisioningClusterScanNetworksCommand(EndpointI
 /*
  * Command UpdateThreadNetwork
  */
-PacketBufferHandle encodeNetworkProvisioningClusterUpdateThreadNetworkCommand(EndpointId destinationEndpoint,
+PacketBufferHandle encodeNetworkProvisioningClusterUpdateThreadNetworkCommand(uint8_t seqNum, EndpointId destinationEndpoint,
                                                                               uint8_t * operationalDataset, uint64_t breadcrumb,
                                                                               uint32_t timeoutMs)
 {
@@ -2698,7 +2703,7 @@ PacketBufferHandle encodeNetworkProvisioningClusterUpdateThreadNetworkCommand(En
         return PacketBufferHandle();
     }
     buf.Put8(kFrameControlClusterSpecificCommand)
-        .Put8(kSeqNum)
+        .Put8(seqNum)
         .Put8(ZCL_UPDATE_THREAD_NETWORK_COMMAND_ID)
         .Put(static_cast<uint8_t>(operationalDatasetStrLen))
         .Put(reinterpret_cast<char *>(operationalDataset))
@@ -2710,9 +2715,9 @@ PacketBufferHandle encodeNetworkProvisioningClusterUpdateThreadNetworkCommand(En
 /*
  * Command UpdateWiFiNetwork
  */
-PacketBufferHandle encodeNetworkProvisioningClusterUpdateWiFiNetworkCommand(EndpointId destinationEndpoint, uint8_t * ssid,
-                                                                            uint8_t * credentials, uint64_t breadcrumb,
-                                                                            uint32_t timeoutMs)
+PacketBufferHandle encodeNetworkProvisioningClusterUpdateWiFiNetworkCommand(uint8_t seqNum, EndpointId destinationEndpoint,
+                                                                            uint8_t * ssid, uint8_t * credentials,
+                                                                            uint64_t breadcrumb, uint32_t timeoutMs)
 {
     COMMAND_HEADER("UpdateWiFiNetwork", NWPROV_CLUSTER_ID);
     size_t ssidStrLen = strlen(reinterpret_cast<char *>(ssid));
@@ -2728,7 +2733,7 @@ PacketBufferHandle encodeNetworkProvisioningClusterUpdateWiFiNetworkCommand(Endp
         return PacketBufferHandle();
     }
     buf.Put8(kFrameControlClusterSpecificCommand)
-        .Put8(kSeqNum)
+        .Put8(seqNum)
         .Put8(ZCL_UPDATE_WI_FI_NETWORK_COMMAND_ID)
         .Put(static_cast<uint8_t>(ssidStrLen))
         .Put(reinterpret_cast<char *>(ssid))
@@ -2739,20 +2744,20 @@ PacketBufferHandle encodeNetworkProvisioningClusterUpdateWiFiNetworkCommand(Endp
     COMMAND_FOOTER();
 }
 
-PacketBufferHandle encodeNetworkProvisioningClusterDiscoverAttributes(EndpointId destinationEndpoint)
+PacketBufferHandle encodeNetworkProvisioningClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("DiscoverNetworkProvisioningAttributes", NWPROV_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(kSeqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
     COMMAND_FOOTER();
 }
 
 /*
  * Attribute ClusterRevision
  */
-PacketBufferHandle encodeNetworkProvisioningClusterReadClusterRevisionAttribute(EndpointId destinationEndpoint)
+PacketBufferHandle encodeNetworkProvisioningClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadNetworkProvisioningClusterRevision", NWPROV_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(kSeqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
     COMMAND_FOOTER();
 }
 

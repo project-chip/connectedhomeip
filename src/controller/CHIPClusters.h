@@ -469,27 +469,32 @@ public:
     ~NetworkProvisioningCluster() {}
 
     // Cluster Commands
-    CHIP_ERROR AddThreadNetwork(Callback::Callback<> * onCompletion, uint8_t * operationalDataset, uint32_t operationalDatasetLen,
-                                uint64_t breadcrumb, uint32_t timeoutMs);
-    CHIP_ERROR AddWiFiNetwork(Callback::Callback<> * onCompletion, uint8_t * ssid, uint32_t ssidLen, uint8_t * credentials,
-                              uint32_t credentialsLen, uint64_t breadcrumb, uint32_t timeoutMs);
-    CHIP_ERROR DisableNetwork(Callback::Callback<> * onCompletion, uint8_t * networkID, uint32_t networkIDLen, uint64_t breadcrumb,
+    CHIP_ERROR AddThreadNetwork(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                uint8_t * operationalDataset, uint32_t operationalDatasetLen, uint64_t breadcrumb,
+                                uint32_t timeoutMs);
+    CHIP_ERROR AddWiFiNetwork(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t * ssid,
+                              uint32_t ssidLen, uint8_t * credentials, uint32_t credentialsLen, uint64_t breadcrumb,
                               uint32_t timeoutMs);
-    CHIP_ERROR EnableNetwork(Callback::Callback<> * onCompletion, uint8_t * networkID, uint32_t networkIDLen, uint64_t breadcrumb,
-                             uint32_t timeoutMs);
-    CHIP_ERROR GetLastNetworkProvisioningResult(Callback::Callback<> * onCompletion, uint32_t timeoutMs);
-    CHIP_ERROR RemoveNetwork(Callback::Callback<> * onCompletion, uint8_t * networkID, uint32_t networkIDLen, uint64_t breadcrumb,
-                             uint32_t timeoutMs);
-    CHIP_ERROR ScanNetworks(Callback::Callback<> * onCompletion, uint8_t * ssid, uint32_t ssidLen, uint64_t breadcrumb,
-                            uint32_t timeoutMs);
-    CHIP_ERROR UpdateThreadNetwork(Callback::Callback<> * onCompletion, uint8_t * operationalDataset,
-                                   uint32_t operationalDatasetLen, uint64_t breadcrumb, uint32_t timeoutMs);
-    CHIP_ERROR UpdateWiFiNetwork(Callback::Callback<> * onCompletion, uint8_t * ssid, uint32_t ssidLen, uint8_t * credentials,
-                                 uint32_t credentialsLen, uint64_t breadcrumb, uint32_t timeoutMs);
+    CHIP_ERROR DisableNetwork(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                              uint8_t * networkID, uint32_t networkIDLen, uint64_t breadcrumb, uint32_t timeoutMs);
+    CHIP_ERROR EnableNetwork(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                             uint8_t * networkID, uint32_t networkIDLen, uint64_t breadcrumb, uint32_t timeoutMs);
+    CHIP_ERROR GetLastNetworkProvisioningResult(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                                uint32_t timeoutMs);
+    CHIP_ERROR RemoveNetwork(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                             uint8_t * networkID, uint32_t networkIDLen, uint64_t breadcrumb, uint32_t timeoutMs);
+    CHIP_ERROR ScanNetworks(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t * ssid,
+                            uint32_t ssidLen, uint64_t breadcrumb, uint32_t timeoutMs);
+    CHIP_ERROR UpdateThreadNetwork(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                   uint8_t * operationalDataset, uint32_t operationalDatasetLen, uint64_t breadcrumb,
+                                   uint32_t timeoutMs);
+    CHIP_ERROR UpdateWiFiNetwork(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t * ssid,
+                                 uint32_t ssidLen, uint8_t * credentials, uint32_t credentialsLen, uint64_t breadcrumb,
+                                 uint32_t timeoutMs);
 
     // Cluster Attributes
-    CHIP_ERROR DiscoverAttributes(Callback::Callback<> * onCompletion);
-    CHIP_ERROR ReadAttributeClusterRevision(Callback::Callback<> * onCompletion);
+    CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 
 private:
     static constexpr CommandId kAddThreadNetworkCommandId                 = 0x06;

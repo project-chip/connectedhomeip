@@ -638,7 +638,8 @@ CHIP_ERROR chip_ime_AppendCommand_NetworkProvisioning_AddThreadNetwork(chip::Con
     chip::Controller::NetworkProvisioningCluster clusterNetworkProvisioning;
     (void) ZCLgroupId;
     clusterNetworkProvisioning.Associate(device, ZCLendpointId);
-    return clusterNetworkProvisioning.AddThreadNetwork(nullptr, operationalDataset, operationalDatasetLen, breadcrumb, timeoutMs);
+    return clusterNetworkProvisioning.AddThreadNetwork(nullptr, nullptr, operationalDataset, operationalDatasetLen, breadcrumb,
+                                                       timeoutMs);
 }
 CHIP_ERROR chip_ime_AppendCommand_NetworkProvisioning_AddWiFiNetwork(chip::Controller::Device * device,
                                                                      chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
@@ -650,7 +651,8 @@ CHIP_ERROR chip_ime_AppendCommand_NetworkProvisioning_AddWiFiNetwork(chip::Contr
     chip::Controller::NetworkProvisioningCluster clusterNetworkProvisioning;
     (void) ZCLgroupId;
     clusterNetworkProvisioning.Associate(device, ZCLendpointId);
-    return clusterNetworkProvisioning.AddWiFiNetwork(nullptr, ssid, ssidLen, credentials, credentialsLen, breadcrumb, timeoutMs);
+    return clusterNetworkProvisioning.AddWiFiNetwork(nullptr, nullptr, ssid, ssidLen, credentials, credentialsLen, breadcrumb,
+                                                     timeoutMs);
 }
 CHIP_ERROR chip_ime_AppendCommand_NetworkProvisioning_DisableNetwork(chip::Controller::Device * device,
                                                                      chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
@@ -661,7 +663,7 @@ CHIP_ERROR chip_ime_AppendCommand_NetworkProvisioning_DisableNetwork(chip::Contr
     chip::Controller::NetworkProvisioningCluster clusterNetworkProvisioning;
     (void) ZCLgroupId;
     clusterNetworkProvisioning.Associate(device, ZCLendpointId);
-    return clusterNetworkProvisioning.DisableNetwork(nullptr, networkID, networkIDLen, breadcrumb, timeoutMs);
+    return clusterNetworkProvisioning.DisableNetwork(nullptr, nullptr, networkID, networkIDLen, breadcrumb, timeoutMs);
 }
 CHIP_ERROR chip_ime_AppendCommand_NetworkProvisioning_EnableNetwork(chip::Controller::Device * device,
                                                                     chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
@@ -672,7 +674,7 @@ CHIP_ERROR chip_ime_AppendCommand_NetworkProvisioning_EnableNetwork(chip::Contro
     chip::Controller::NetworkProvisioningCluster clusterNetworkProvisioning;
     (void) ZCLgroupId;
     clusterNetworkProvisioning.Associate(device, ZCLendpointId);
-    return clusterNetworkProvisioning.EnableNetwork(nullptr, networkID, networkIDLen, breadcrumb, timeoutMs);
+    return clusterNetworkProvisioning.EnableNetwork(nullptr, nullptr, networkID, networkIDLen, breadcrumb, timeoutMs);
 }
 CHIP_ERROR chip_ime_AppendCommand_NetworkProvisioning_GetLastNetworkProvisioningResult(chip::Controller::Device * device,
                                                                                        chip::EndpointId ZCLendpointId,
@@ -682,7 +684,7 @@ CHIP_ERROR chip_ime_AppendCommand_NetworkProvisioning_GetLastNetworkProvisioning
     chip::Controller::NetworkProvisioningCluster clusterNetworkProvisioning;
     (void) ZCLgroupId;
     clusterNetworkProvisioning.Associate(device, ZCLendpointId);
-    return clusterNetworkProvisioning.GetLastNetworkProvisioningResult(nullptr, timeoutMs);
+    return clusterNetworkProvisioning.GetLastNetworkProvisioningResult(nullptr, nullptr, timeoutMs);
 }
 CHIP_ERROR chip_ime_AppendCommand_NetworkProvisioning_RemoveNetwork(chip::Controller::Device * device,
                                                                     chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
@@ -693,7 +695,7 @@ CHIP_ERROR chip_ime_AppendCommand_NetworkProvisioning_RemoveNetwork(chip::Contro
     chip::Controller::NetworkProvisioningCluster clusterNetworkProvisioning;
     (void) ZCLgroupId;
     clusterNetworkProvisioning.Associate(device, ZCLendpointId);
-    return clusterNetworkProvisioning.RemoveNetwork(nullptr, networkID, networkIDLen, breadcrumb, timeoutMs);
+    return clusterNetworkProvisioning.RemoveNetwork(nullptr, nullptr, networkID, networkIDLen, breadcrumb, timeoutMs);
 }
 CHIP_ERROR chip_ime_AppendCommand_NetworkProvisioning_ScanNetworks(chip::Controller::Device * device,
                                                                    chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
@@ -704,7 +706,7 @@ CHIP_ERROR chip_ime_AppendCommand_NetworkProvisioning_ScanNetworks(chip::Control
     chip::Controller::NetworkProvisioningCluster clusterNetworkProvisioning;
     (void) ZCLgroupId;
     clusterNetworkProvisioning.Associate(device, ZCLendpointId);
-    return clusterNetworkProvisioning.ScanNetworks(nullptr, ssid, ssidLen, breadcrumb, timeoutMs);
+    return clusterNetworkProvisioning.ScanNetworks(nullptr, nullptr, ssid, ssidLen, breadcrumb, timeoutMs);
 }
 CHIP_ERROR chip_ime_AppendCommand_NetworkProvisioning_UpdateThreadNetwork(chip::Controller::Device * device,
                                                                           chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
@@ -716,7 +718,7 @@ CHIP_ERROR chip_ime_AppendCommand_NetworkProvisioning_UpdateThreadNetwork(chip::
     chip::Controller::NetworkProvisioningCluster clusterNetworkProvisioning;
     (void) ZCLgroupId;
     clusterNetworkProvisioning.Associate(device, ZCLendpointId);
-    return clusterNetworkProvisioning.UpdateThreadNetwork(nullptr, operationalDataset, operationalDatasetLen, breadcrumb,
+    return clusterNetworkProvisioning.UpdateThreadNetwork(nullptr, nullptr, operationalDataset, operationalDatasetLen, breadcrumb,
                                                           timeoutMs);
 }
 CHIP_ERROR chip_ime_AppendCommand_NetworkProvisioning_UpdateWiFiNetwork(chip::Controller::Device * device,
@@ -729,7 +731,8 @@ CHIP_ERROR chip_ime_AppendCommand_NetworkProvisioning_UpdateWiFiNetwork(chip::Co
     chip::Controller::NetworkProvisioningCluster clusterNetworkProvisioning;
     (void) ZCLgroupId;
     clusterNetworkProvisioning.Associate(device, ZCLendpointId);
-    return clusterNetworkProvisioning.UpdateWiFiNetwork(nullptr, ssid, ssidLen, credentials, credentialsLen, breadcrumb, timeoutMs);
+    return clusterNetworkProvisioning.UpdateWiFiNetwork(nullptr, nullptr, ssid, ssidLen, credentials, credentialsLen, breadcrumb,
+                                                        timeoutMs);
 }
 // End of Cluster NetworkProvisioning
 
