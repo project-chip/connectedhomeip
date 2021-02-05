@@ -66,8 +66,6 @@ pw_python_action("python") {
       sources = [
         "chip-device-ctrl.py",
         "chip-repl.py",
-        "chip/__init__.py",
-        "chip/ble/__init__.py",
         "chip/ChipBleBase.py",
         "chip/ChipBleUtility.py",
         "chip/ChipBluezMgr.py",
@@ -78,6 +76,8 @@ pw_python_action("python") {
         "chip/ChipStack.py",
         "chip/ChipTLV.py",
         "chip/ChipUtility.py",
+        "chip/__init__.py",
+        "chip/ble/__init__.py",
       ]
     },
     {
