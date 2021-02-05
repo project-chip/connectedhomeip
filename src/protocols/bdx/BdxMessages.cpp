@@ -40,7 +40,7 @@ using namespace chip::Encoding::LittleEndian;
 
 // WARNING: this function should never return early, since MessageSize() relies on it to calculate
 // the size of the message (even if the message is incomplete or filled out incorrectly).
-BufferWriter & TransferInit::DerivedWriteToBuffer(BufferWriter & aBuffer) const
+BufferWriter & TransferInit::WriteToBuffer(BufferWriter & aBuffer) const
 {
     uint8_t proposedTransferCtl = 0;
     bool widerange = (StartOffset > std::numeric_limits<uint32_t>::max()) || (MaxLength > std::numeric_limits<uint32_t>::max());
@@ -94,7 +94,7 @@ BufferWriter & TransferInit::DerivedWriteToBuffer(BufferWriter & aBuffer) const
     return aBuffer;
 }
 
-CHIP_ERROR TransferInit::DerivedParse(System::PacketBufferHandle aBuffer)
+CHIP_ERROR TransferInit::Parse(System::PacketBufferHandle aBuffer)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     uint8_t proposedTransferCtl;
@@ -164,7 +164,7 @@ exit:
     return err;
 }
 
-size_t TransferInit::DerivedMessageSize() const
+size_t TransferInit::MessageSize() const
 {
     BufferWriter emptyBuf(nullptr, 0);
     return WriteToBuffer(emptyBuf).Needed();
@@ -196,7 +196,7 @@ bool TransferInit::operator==(const TransferInit & another) const
 
 // WARNING: this function should never return early, since MessageSize() relies on it to calculate
 // the size of the message (even if the message is incomplete or filled out incorrectly).
-BufferWriter & SendAccept::DerivedWriteToBuffer(BufferWriter & aBuffer) const
+Encoding::LittleEndian::BufferWriter & SendAccept::WriteToBuffer(Encoding::LittleEndian::BufferWriter & aBuffer) const
 {
     uint8_t transferCtl = 0;
 
@@ -213,7 +213,7 @@ BufferWriter & SendAccept::DerivedWriteToBuffer(BufferWriter & aBuffer) const
     return aBuffer;
 }
 
-CHIP_ERROR SendAccept::DerivedParse(System::PacketBufferHandle aBuffer)
+CHIP_ERROR SendAccept::Parse(System::PacketBufferHandle aBuffer)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     uint8_t transferCtl = 0;
@@ -247,7 +247,7 @@ exit:
     return err;
 }
 
-size_t SendAccept::DerivedMessageSize() const
+size_t SendAccept::MessageSize() const
 {
     BufferWriter emptyBuf(nullptr, 0);
     return WriteToBuffer(emptyBuf).Needed();
@@ -272,7 +272,7 @@ bool SendAccept::operator==(const SendAccept & another) const
 
 // WARNING: this function should never return early, since MessageSize() relies on it to calculate
 // the size of the message (even if the message is incomplete or filled out incorrectly).
-BufferWriter & ReceiveAccept::DerivedWriteToBuffer(BufferWriter & aBuffer) const
+Encoding::LittleEndian::BufferWriter & ReceiveAccept::WriteToBuffer(Encoding::LittleEndian::BufferWriter & aBuffer) const
 {
     uint8_t transferCtl = 0;
     bool widerange      = (StartOffset > std::numeric_limits<uint32_t>::max()) || (Length > std::numeric_limits<uint32_t>::max());
@@ -320,7 +320,7 @@ BufferWriter & ReceiveAccept::DerivedWriteToBuffer(BufferWriter & aBuffer) const
     return aBuffer;
 }
 
-CHIP_ERROR ReceiveAccept::DerivedParse(System::PacketBufferHandle aBuffer)
+CHIP_ERROR ReceiveAccept::Parse(System::PacketBufferHandle aBuffer)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     uint8_t transferCtl     = 0;
@@ -387,7 +387,7 @@ exit:
     return err;
 }
 
-size_t ReceiveAccept::DerivedMessageSize() const
+size_t ReceiveAccept::MessageSize() const
 {
     BufferWriter emptyBuf(nullptr, 0);
     return WriteToBuffer(emptyBuf).Needed();
@@ -413,19 +413,19 @@ bool ReceiveAccept::operator==(const ReceiveAccept & another) const
 
 // WARNING: this function should never return early, since MessageSize() relies on it to calculate
 // the size of the message (even if the message is incomplete or filled out incorrectly).
-BufferWriter & CounterMessage::DerivedWriteToBuffer(BufferWriter & aBuffer) const
+Encoding::LittleEndian::BufferWriter & CounterMessage::WriteToBuffer(Encoding::LittleEndian::BufferWriter & aBuffer) const
 {
     return aBuffer.Put32(BlockCounter);
 }
 
-CHIP_ERROR CounterMessage::DerivedParse(System::PacketBufferHandle aBuffer)
+CHIP_ERROR CounterMessage::Parse(System::PacketBufferHandle aBuffer)
 {
     uint8_t * bufStart = aBuffer->Start();
     Reader bufReader(bufStart, aBuffer->DataLength());
     return bufReader.Read32(&BlockCounter).StatusCode();
 }
 
-size_t CounterMessage::DerivedMessageSize() const
+size_t CounterMessage::MessageSize() const
 {
     BufferWriter emptyBuf(nullptr, 0);
     return WriteToBuffer(emptyBuf).Needed();
@@ -438,7 +438,7 @@ bool CounterMessage::operator==(const CounterMessage & another) const
 
 // WARNING: this function should never return early, since MessageSize() relies on it to calculate
 // the size of the message (even if the message is incomplete or filled out incorrectly).
-BufferWriter & DataBlock::DerivedWriteToBuffer(BufferWriter & aBuffer) const
+Encoding::LittleEndian::BufferWriter & DataBlock::WriteToBuffer(Encoding::LittleEndian::BufferWriter & aBuffer) const
 {
     aBuffer.Put32(BlockCounter);
     if (Data != nullptr)
@@ -448,7 +448,7 @@ BufferWriter & DataBlock::DerivedWriteToBuffer(BufferWriter & aBuffer) const
     return aBuffer;
 }
 
-CHIP_ERROR DataBlock::DerivedParse(System::PacketBufferHandle aBuffer)
+CHIP_ERROR DataBlock::Parse(System::PacketBufferHandle aBuffer)
 {
     CHIP_ERROR err     = CHIP_NO_ERROR;
     uint8_t * bufStart = aBuffer->Start();
@@ -476,7 +476,7 @@ exit:
     return err;
 }
 
-size_t DataBlock::DerivedMessageSize() const
+size_t DataBlock::MessageSize() const
 {
     BufferWriter emptyBuf(nullptr, 0);
     return WriteToBuffer(emptyBuf).Needed();
