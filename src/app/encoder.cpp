@@ -216,7 +216,7 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
 #define ZCL_STOP_COMMAND_ID (0x03)
 #define ZCL_STOP_WITH_ON_OFF_COMMAND_ID (0x07)
 
-#define NWPROV_CLUSTER_ID 0xAAAA
+#define NETWORK_PROVISIONING_CLUSTER_ID 0xAAAA
 #define ZCL_ADD_THREAD_NETWORK_COMMAND_ID (0x06)
 #define ZCL_ADD_WI_FI_NETWORK_COMMAND_ID (0x02)
 #define ZCL_DISABLE_NETWORK_COMMAND_ID (0x0E)
@@ -2529,7 +2529,7 @@ PacketBufferHandle encodeNetworkProvisioningClusterAddThreadNetworkCommand(uint8
                                                                            uint8_t * operationalDataset, uint64_t breadcrumb,
                                                                            uint32_t timeoutMs)
 {
-    COMMAND_HEADER("AddThreadNetwork", NWPROV_CLUSTER_ID);
+    COMMAND_HEADER("AddThreadNetwork", NETWORK_PROVISIONING_CLUSTER_ID);
     size_t operationalDatasetStrLen = strlen(reinterpret_cast<char *>(operationalDataset));
     if (!CanCastTo<uint8_t>(operationalDatasetStrLen))
     {
@@ -2553,7 +2553,7 @@ PacketBufferHandle encodeNetworkProvisioningClusterAddWiFiNetworkCommand(uint8_t
                                                                          uint8_t * ssid, uint8_t * credentials, uint64_t breadcrumb,
                                                                          uint32_t timeoutMs)
 {
-    COMMAND_HEADER("AddWiFiNetwork", NWPROV_CLUSTER_ID);
+    COMMAND_HEADER("AddWiFiNetwork", NETWORK_PROVISIONING_CLUSTER_ID);
     size_t ssidStrLen = strlen(reinterpret_cast<char *>(ssid));
     if (!CanCastTo<uint8_t>(ssidStrLen))
     {
@@ -2585,7 +2585,7 @@ PacketBufferHandle encodeNetworkProvisioningClusterDisableNetworkCommand(uint8_t
                                                                          uint8_t * networkID, uint64_t breadcrumb,
                                                                          uint32_t timeoutMs)
 {
-    COMMAND_HEADER("DisableNetwork", NWPROV_CLUSTER_ID);
+    COMMAND_HEADER("DisableNetwork", NETWORK_PROVISIONING_CLUSTER_ID);
     size_t networkIDStrLen = strlen(reinterpret_cast<char *>(networkID));
     if (!CanCastTo<uint8_t>(networkIDStrLen))
     {
@@ -2609,7 +2609,7 @@ PacketBufferHandle encodeNetworkProvisioningClusterEnableNetworkCommand(uint8_t 
                                                                         uint8_t * networkID, uint64_t breadcrumb,
                                                                         uint32_t timeoutMs)
 {
-    COMMAND_HEADER("EnableNetwork", NWPROV_CLUSTER_ID);
+    COMMAND_HEADER("EnableNetwork", NETWORK_PROVISIONING_CLUSTER_ID);
     size_t networkIDStrLen = strlen(reinterpret_cast<char *>(networkID));
     if (!CanCastTo<uint8_t>(networkIDStrLen))
     {
@@ -2633,7 +2633,7 @@ PacketBufferHandle encodeNetworkProvisioningClusterGetLastNetworkProvisioningRes
                                                                                            EndpointId destinationEndpoint,
                                                                                            uint32_t timeoutMs)
 {
-    COMMAND_HEADER("GetLastNetworkProvisioningResult", NWPROV_CLUSTER_ID);
+    COMMAND_HEADER("GetLastNetworkProvisioningResult", NETWORK_PROVISIONING_CLUSTER_ID);
     buf.Put8(kFrameControlClusterSpecificCommand)
         .Put8(seqNum)
         .Put8(ZCL_GET_LAST_NETWORK_PROVISIONING_RESULT_COMMAND_ID)
@@ -2648,7 +2648,7 @@ PacketBufferHandle encodeNetworkProvisioningClusterRemoveNetworkCommand(uint8_t 
                                                                         uint8_t * networkID, uint64_t breadcrumb,
                                                                         uint32_t timeoutMs)
 {
-    COMMAND_HEADER("RemoveNetwork", NWPROV_CLUSTER_ID);
+    COMMAND_HEADER("RemoveNetwork", NETWORK_PROVISIONING_CLUSTER_ID);
     size_t networkIDStrLen = strlen(reinterpret_cast<char *>(networkID));
     if (!CanCastTo<uint8_t>(networkIDStrLen))
     {
@@ -2671,7 +2671,7 @@ PacketBufferHandle encodeNetworkProvisioningClusterRemoveNetworkCommand(uint8_t 
 PacketBufferHandle encodeNetworkProvisioningClusterScanNetworksCommand(uint8_t seqNum, EndpointId destinationEndpoint,
                                                                        uint8_t * ssid, uint64_t breadcrumb, uint32_t timeoutMs)
 {
-    COMMAND_HEADER("ScanNetworks", NWPROV_CLUSTER_ID);
+    COMMAND_HEADER("ScanNetworks", NETWORK_PROVISIONING_CLUSTER_ID);
     size_t ssidStrLen = strlen(reinterpret_cast<char *>(ssid));
     if (!CanCastTo<uint8_t>(ssidStrLen))
     {
@@ -2695,7 +2695,7 @@ PacketBufferHandle encodeNetworkProvisioningClusterUpdateThreadNetworkCommand(ui
                                                                               uint8_t * operationalDataset, uint64_t breadcrumb,
                                                                               uint32_t timeoutMs)
 {
-    COMMAND_HEADER("UpdateThreadNetwork", NWPROV_CLUSTER_ID);
+    COMMAND_HEADER("UpdateThreadNetwork", NETWORK_PROVISIONING_CLUSTER_ID);
     size_t operationalDatasetStrLen = strlen(reinterpret_cast<char *>(operationalDataset));
     if (!CanCastTo<uint8_t>(operationalDatasetStrLen))
     {
@@ -2719,7 +2719,7 @@ PacketBufferHandle encodeNetworkProvisioningClusterUpdateWiFiNetworkCommand(uint
                                                                             uint8_t * ssid, uint8_t * credentials,
                                                                             uint64_t breadcrumb, uint32_t timeoutMs)
 {
-    COMMAND_HEADER("UpdateWiFiNetwork", NWPROV_CLUSTER_ID);
+    COMMAND_HEADER("UpdateWiFiNetwork", NETWORK_PROVISIONING_CLUSTER_ID);
     size_t ssidStrLen = strlen(reinterpret_cast<char *>(ssid));
     if (!CanCastTo<uint8_t>(ssidStrLen))
     {
@@ -2746,7 +2746,7 @@ PacketBufferHandle encodeNetworkProvisioningClusterUpdateWiFiNetworkCommand(uint
 
 PacketBufferHandle encodeNetworkProvisioningClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
 {
-    COMMAND_HEADER("DiscoverNetworkProvisioningAttributes", NWPROV_CLUSTER_ID);
+    COMMAND_HEADER("DiscoverNetworkProvisioningAttributes", NETWORK_PROVISIONING_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
     COMMAND_FOOTER();
 }
@@ -2756,7 +2756,7 @@ PacketBufferHandle encodeNetworkProvisioningClusterDiscoverAttributes(uint8_t se
  */
 PacketBufferHandle encodeNetworkProvisioningClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
-    COMMAND_HEADER("ReadNetworkProvisioningClusterRevision", NWPROV_CLUSTER_ID);
+    COMMAND_HEADER("ReadNetworkProvisioningClusterRevision", NETWORK_PROVISIONING_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
     COMMAND_FOOTER();
 }

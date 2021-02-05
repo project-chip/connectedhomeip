@@ -1,5 +1,5 @@
 {
-  "writeTime": "Fri Jan 15 2021 19:21:16 GMT+0100 (Central European Standard Time)",
+  "writeTime": "Fri Feb 05 2021 19:08:32 GMT+0800 (China Standard Time)",
   "featureLevel": 6,
   "creator": "zap",
   "keyValuePairs": [
@@ -22,12 +22,6 @@
       "path": "../../../../src/app/zap-templates/zcl/zcl.json",
       "version": "ZCL Test Data",
       "type": "zcl-properties"
-    },
-    {
-      "pathRelativity": "relativeToZap",
-      "path": "../../../../src/app/zap-templates/app-templates.json",
-      "version": "chip-v1",
-      "type": "gen-templates-json"
     }
   ],
   "endpointTypes": [
@@ -178,6 +172,16 @@
           "define": "IDENTIFY_CLUSTER",
           "side": "server",
           "enabled": 0,
+          "commands": [
+            {
+              "name": "IdentifyQueryResponse",
+              "code": 0,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 1,
+              "outgoing": 1
+            }
+          ],
           "attributes": [
             {
               "name": "cluster revision",
@@ -208,16 +212,6 @@
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
-            }
-          ],
-          "commands": [
-            {
-              "name": "IdentifyQueryResponse",
-              "code": 0,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 1
             }
           ]
         },
@@ -2815,8 +2809,8 @@
     {
       "name": "Anonymous Endpoint Type",
       "deviceTypeName": "CHIP-All-Clusters-Server",
-      "deviceTypeCode": "0x0000",
-      "deviceTypeProfileId": "0x0103",
+      "deviceTypeCode": 0,
+      "deviceTypeProfileId": 259,
       "clusters": [
         {
           "name": "Basic",
@@ -2825,23 +2819,6 @@
           "define": "BASIC_CLUSTER",
           "side": "client",
           "enabled": 0,
-          "attributes": [
-            {
-              "name": "cluster revision",
-              "code": 65533,
-              "mfgCode": null,
-              "side": "client",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "3",
-              "reportable": 0,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            }
-          ],
           "commands": [
             {
               "name": "ResetToFactoryDefaults",
@@ -3416,23 +3393,6 @@
           "define": "ON_OFF_CLUSTER",
           "side": "client",
           "enabled": 0,
-          "attributes": [
-            {
-              "name": "cluster revision",
-              "code": 65533,
-              "mfgCode": null,
-              "side": "client",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "2",
-              "reportable": 0,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            }
-          ],
           "commands": [
             {
               "name": "Off",
@@ -4460,6 +4420,23 @@
           "define": "COLOR_CONTROL_CLUSTER",
           "side": "client",
           "enabled": 0,
+          "attributes": [
+            {
+              "name": "cluster revision",
+              "code": 65533,
+              "mfgCode": null,
+              "side": "client",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "3",
+              "reportable": 0,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            }
+          ],
           "commands": [
             {
               "name": "MoveToHue",
@@ -4572,23 +4549,6 @@
               "source": "client",
               "incoming": 1,
               "outgoing": 1
-            }
-          ],
-          "attributes": [
-            {
-              "name": "cluster revision",
-              "code": 65533,
-              "mfgCode": null,
-              "side": "client",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "3",
-              "reportable": 0,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
             }
           ]
         },
@@ -5634,79 +5594,10 @@
           ]
         },
         {
-          "name": "Binding",
-          "code": 61440,
-          "mfgCode": null,
-          "define": "BINDING_CLUSTER",
-          "side": "client",
-          "enabled": 0,
-          "commands": [
-            {
-              "name": "Bind",
-              "code": 0,
-              "mfgCode": null,
-              "source": "client",
-              "incoming": 1,
-              "outgoing": 1
-            },
-            {
-              "name": "Unbind",
-              "code": 1,
-              "mfgCode": null,
-              "source": "client",
-              "incoming": 1,
-              "outgoing": 1
-            }
-          ],
-          "attributes": [
-            {
-              "name": "cluster revision",
-              "code": 65533,
-              "mfgCode": null,
-              "side": "client",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "0x0001",
-              "reportable": 0,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            }
-          ]
-        },
-        {
-          "name": "Binding",
-          "code": 61440,
-          "mfgCode": null,
-          "define": "BINDING_CLUSTER",
-          "side": "server",
-          "enabled": 1,
-          "commands": [],
-          "attributes": [
-            {
-              "name": "cluster revision",
-              "code": 65533,
-              "mfgCode": null,
-              "side": "server",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "0x0001",
-              "reportable": 0,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            }
-          ]
-        },
-        {
           "name": "Network Provisioning",
           "code": 43690,
           "mfgCode": null,
-          "define": "NWPROV_CLUSTER",
+          "define": "NETWORK_PROVISIONING_CLUSTER",
           "side": "client",
           "enabled": 1,
           "commands": [
@@ -5805,12 +5696,12 @@
           "name": "Network Provisioning",
           "code": 43690,
           "mfgCode": null,
-          "define": "NWPROV_CLUSTER",
+          "define": "NETWORK_PROVISIONING_CLUSTER",
           "side": "server",
           "enabled": 1,
           "commands": [
             {
-              "name": "ScanNetworksResp",
+              "name": "ScanNetworksResponse",
               "code": 1,
               "mfgCode": null,
               "source": "server",
@@ -5818,7 +5709,7 @@
               "outgoing": 1
             },
             {
-              "name": "AddWiFiNetworkResp",
+              "name": "AddWiFiNetworkResponse",
               "code": 3,
               "mfgCode": null,
               "source": "server",
@@ -5826,7 +5717,7 @@
               "outgoing": 1
             },
             {
-              "name": "UpdateWiFiNetworkResp",
+              "name": "UpdateWiFiNetworkResponse",
               "code": 5,
               "mfgCode": null,
               "source": "server",
@@ -5834,7 +5725,7 @@
               "outgoing": 1
             },
             {
-              "name": "AddThreadNetworkResp",
+              "name": "AddThreadNetworkResponse",
               "code": 7,
               "mfgCode": null,
               "source": "server",
@@ -5842,7 +5733,7 @@
               "outgoing": 1
             },
             {
-              "name": "UpdateThreadNetworkResp",
+              "name": "UpdateThreadNetworkResponse",
               "code": 9,
               "mfgCode": null,
               "source": "server",
@@ -5850,7 +5741,7 @@
               "outgoing": 1
             },
             {
-              "name": "RemoveNetworkResp",
+              "name": "RemoveNetworkResponse",
               "code": 11,
               "mfgCode": null,
               "source": "server",
@@ -5858,7 +5749,7 @@
               "outgoing": 1
             },
             {
-              "name": "EnableNetworkResp",
+              "name": "EnableNetworkResponse",
               "code": 13,
               "mfgCode": null,
               "source": "server",
@@ -5866,7 +5757,7 @@
               "outgoing": 1
             },
             {
-              "name": "DisableNetworkResp",
+              "name": "DisableNetworkResponse",
               "code": 15,
               "mfgCode": null,
               "source": "server",
@@ -5874,6 +5765,75 @@
               "outgoing": 1
             }
           ],
+          "attributes": [
+            {
+              "name": "cluster revision",
+              "code": 65533,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0x0001",
+              "reportable": 0,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            }
+          ]
+        },
+        {
+          "name": "Binding",
+          "code": 61440,
+          "mfgCode": null,
+          "define": "BINDING_CLUSTER",
+          "side": "client",
+          "enabled": 0,
+          "commands": [
+            {
+              "name": "Bind",
+              "code": 0,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 1
+            },
+            {
+              "name": "Unbind",
+              "code": 1,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 1
+            }
+          ],
+          "attributes": [
+            {
+              "name": "cluster revision",
+              "code": 65533,
+              "mfgCode": null,
+              "side": "client",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0x0001",
+              "reportable": 0,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            }
+          ]
+        },
+        {
+          "name": "Binding",
+          "code": 61440,
+          "mfgCode": null,
+          "define": "BINDING_CLUSTER",
+          "side": "server",
+          "enabled": 1,
+          "commands": [],
           "attributes": [
             {
               "name": "cluster revision",
@@ -5899,6 +5859,7 @@
     {
       "endpointTypeName": "Anonymous Endpoint Type",
       "endpointTypeIndex": 1,
+      "endpointTypeRef": 2,
       "profileId": "0x0103",
       "endpointId": 1,
       "networkId": 0
@@ -5906,6 +5867,7 @@
     {
       "endpointTypeName": "Anonymous Endpoint Type",
       "endpointTypeIndex": 0,
+      "endpointTypeRef": 1,
       "profileId": "0x0103",
       "endpointId": 2,
       "networkId": 0
