@@ -163,8 +163,6 @@ class DeviceMgrCmd(Cmd):
             pass
 
     command_names = [
-        "close",
-
         "ble-scan",
         "ble-adapter-select",
         "ble-adapter-print",
@@ -172,6 +170,7 @@ class DeviceMgrCmd(Cmd):
 
         "connect",
         "zcl",
+
         "set-pairing-wifi-credential",
     ]
 
