@@ -28,11 +28,8 @@ COMPONENT_SRCDIRS :=                                                            
   ../third_party/connectedhomeip/src/app/util                                       \
   ../third_party/connectedhomeip/src/app/clusters/on-off-server                     \
   ../third_party/connectedhomeip/src/app/clusters/level-control                     \
-  ../third_party/connectedhomeip/src/app/clusters/identify-client                   \
   ../third_party/connectedhomeip/src/app/clusters/identify                          \
   ../third_party/connectedhomeip/src/app/clusters/barrier-control-server            \
-  ../third_party/connectedhomeip/src/app/clusters/scenes-client                     \
-  ../third_party/connectedhomeip/src/app/clusters/groups-client                     \
   ../third_party/connectedhomeip/src/app/clusters/groups-server                     \
   ../third_party/connectedhomeip/src/app/clusters/color-control-server              \
   ../third_party/connectedhomeip/src/app/clusters/temperature-measurement-server    \
@@ -40,7 +37,6 @@ COMPONENT_SRCDIRS :=                                                            
   ../third_party/connectedhomeip/src/app/clusters/basic                             \
   ../third_party/connectedhomeip/src/app/clusters/bindings                          \
   ../third_party/connectedhomeip/src/app/reporting                                  \
-  ../third_party/connectedhomeip/src/app/clusters/door-lock-client                  \
   ../third_party/connectedhomeip/src/app/clusters/door-lock-server                  \
    ../third_party/connectedhomeip/src/app/clusters/ias-zone-server                  \
 #  ../third_party/connectedhomeip/src/app/clusters/ias-zone-client                  \
@@ -49,6 +45,7 @@ COMPONENT_SRCDIRS :=                                                            
 COMPONENT_EXTRA_INCLUDES := $(PROJECT_PATH)/third_party/connectedhomeip/src/app/util                                   \
                             $(PROJECT_PATH)/third_party/connectedhomeip/src/app/server                                 \
                             $(PROJECT_PATH)/third_party/connectedhomeip/examples/all-clusters-app/all-clusters-common  \
+                            $(PROJECT_PATH)/third_party/connectedhomeip/third_party/nlio/repo/include                  \
                             $(PROJECT_PATH)/third_party/connectedhomeip/src
 
 # So "gen/*" files are found by the src/app bits.

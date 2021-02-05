@@ -16,7 +16,6 @@
  */
 
 #import "CHIPDevicePairingDelegate.h"
-#import <Foundation/Foundation.h>
 
 #include <controller/CHIPDeviceController.h>
 

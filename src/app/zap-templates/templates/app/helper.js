@@ -314,13 +314,62 @@ function chip_endpoint_cluster_list()
 
 //  End of Endpoint-config specific helpers
 
+function asPrintFormat(type)
+{
+  if (StringHelper.isString(type)) {
+    return '%s';
+  }
+
+  function fn(pkgId)
+  {
+    const options = { 'hash' : {} };
+    return zclHelper.asUnderlyingZclType.call(this, type, options).then(zclType => {
+      const basicType = ChipTypesHelper.asBasicType(zclType);
+      switch (basicType) {
+      case 'int8_t':
+        return '%" PRId8 "';
+      case 'uint8_t':
+        return '%" PRIu8 "';
+      case 'int16_t':
+        return '%" PRId16 "';
+      case 'uint16_t':
+        return '%" PRIu16 "';
+      case 'int24_t':
+        return '%" PRId32 "';
+      case 'uint24_t':
+        return '%" PRIu32 "';
+      case 'int32_t':
+        return '%" PRId32 "';
+      case 'uint32_t':
+        return '%" PRIu32 "';
+      case 'int64_t':
+        return '%" PRId64 "';
+      case 'uint64_t':
+        return '%" PRIu64 "';
+      default:
+        return '%p';
+      }
+    })
+  }
+
+  const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this)).catch(err => console.log(err));
+  return templateUtil.templatePromise(this.global, promise)
+}
+
+function isFirstElement(index)
+{
+  return index == 0;
+}
+
 //
 // Module exports
 //
+exports.asPrintFormat                                 = asPrintFormat;
 exports.asReadType                                    = asReadType;
 exports.asReadTypeLength                              = asReadTypeLength;
 exports.asValueIfNotPresent                           = asValueIfNotPresent;
 exports.asChipUnderlyingType                          = asChipUnderlyingType;
+exports.isFirstElement                                = isFirstElement;
 exports.user_cluster_has_enabled_manufacturer_command = user_cluster_has_enabled_manufacturer_command;
 exports.chip_endpoint_generated_functions             = chip_endpoint_generated_functions
 exports.chip_endpoint_cluster_list                    = chip_endpoint_cluster_list

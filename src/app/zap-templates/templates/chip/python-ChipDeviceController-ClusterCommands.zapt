@@ -23,7 +23,7 @@ CHIP_ERROR chip_ime_AppendCommand_{{asCamelCased clusterName false}}_{{asCamelCa
     chip::Controller::{{asCamelCased clusterName false}}Cluster cluster{{asCamelCased clusterName false}};
     (void) ZCLgroupId;
     cluster{{asCamelCased clusterName false}}.Associate(device, ZCLendpointId);
-    return cluster{{asCamelCased clusterName false}}.{{asCamelCased name false}}(nullptr{{#chip_server_cluster_command_arguments}}, {{asCamelCased label}}{{/chip_server_cluster_command_arguments}});
+    return cluster{{asCamelCased clusterName false}}.{{asCamelCased name false}}(nullptr, nullptr{{#chip_server_cluster_command_arguments}}, {{asCamelCased label}}{{/chip_server_cluster_command_arguments}});
 }
 {{/chip_server_cluster_commands}}
 // End of Cluster {{asCamelCased name false}}
