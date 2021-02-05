@@ -177,8 +177,7 @@ uint8_t * emberAfPutDateInResp(EmberAfDate * value)
     }
 }
 
-void emberAfPutInt16sInResp(int16_t value)
-    emberAfPutInt16uInResp(static_cast<uint16_t>(value));
+void emberAfPutInt16sInResp(int16_t value) emberAfPutInt16uInResp(static_cast<uint16_t>(value));
 }
 
 // ------------------------------------
