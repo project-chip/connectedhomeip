@@ -55,7 +55,7 @@ using namespace chip::Callback;
 namespace chip {
 namespace Controller {
 
-CHIP_ERROR Device::SendMessage(System::PacketBufferHandle buffer)
+CHIP_ERROR Device::SendMessage(System::PacketBufferHandle buffer, PayloadHeader & payloadHeader)
 {
     System::PacketBufferHandle resend;
     bool loadedSecureSession = false;
@@ -75,7 +75,7 @@ CHIP_ERROR Device::SendMessage(System::PacketBufferHandle buffer)
         resend = buffer.CloneData();
     }
 
-    CHIP_ERROR err = mSessionManager->SendMessage(mSecureSession, std::move(buffer));
+    CHIP_ERROR err = mSessionManager->SendMessage(mSecureSession, payloadHeader, std::move(buffer));
 
     buffer = nullptr;
     ChipLogDetail(Controller, "SendMessage returned %d", err);
@@ -132,6 +132,12 @@ CHIP_ERROR Device::SendCommands()
     return mCommandSender->SendCommandRequest(mDeviceId);
 }
 
+CHIP_ERROR Device::SendMessage(System::PacketBufferHandle buffer)
+{
+    PayloadHeader unusedHeader;
+    return SendMessage(std::move(buffer), unusedHeader);
+}
+
 CHIP_ERROR Device::Serialize(SerializedDevice & output)
 {
     CHIP_ERROR error       = CHIP_NO_ERROR;
@@ -146,6 +152,7 @@ CHIP_ERROR Device::Serialize(SerializedDevice & output)
     memmove(&serializable.mOpsCreds, &mPairing, sizeof(mPairing));
     serializable.mDeviceId   = Encoding::LittleEndian::HostSwap64(mDeviceId);
     serializable.mDevicePort = Encoding::LittleEndian::HostSwap16(mDevicePort);
+    serializable.mAdminId    = Encoding::LittleEndian::HostSwap16(mAdminId);
     VerifyOrExit(
         CHIP_NO_ERROR ==
             Inet::GetInterfaceName(mInterface, Uint8::to_char(serializable.mInterfaceName), sizeof(serializable.mInterfaceName)),
@@ -191,6 +198,7 @@ CHIP_ERROR Device::Deserialize(const SerializedDevice & input)
     memmove(&mPairing, &serializable.mOpsCreds, sizeof(mPairing));
     mDeviceId   = Encoding::LittleEndian::HostSwap64(serializable.mDeviceId);
     mDevicePort = Encoding::LittleEndian::HostSwap16(serializable.mDevicePort);
+    mAdminId    = Encoding::LittleEndian::HostSwap16(serializable.mAdminId);
 
     // The InterfaceNameToId() API requires initialization of mInterface, and lock/unlock of
     // LwIP stack.
@@ -266,7 +274,7 @@ CHIP_ERROR Device::LoadSecureSessionParameters(ResetTransport resetNeeded)
 
     err = mSessionManager->NewPairing(
         Optional<Transport::PeerAddress>::Value(Transport::PeerAddress::UDP(mDeviceAddr, mDevicePort, mInterface)), mDeviceId,
-        &pairingSession);
+        &pairingSession, mAdminId);
     SuccessOrExit(err);
 
 exit:

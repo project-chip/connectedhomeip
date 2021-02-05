@@ -2318,6 +2318,18 @@
   #endif // CHIP_CONFIG_MAX_BINDINGS
 
 /**
+   *  @def CHIP_CONFIG_MAX_DEVICE_ADMINS
+   *
+   *  @brief
+   *    Maximum number of administrators that can provision the device. Each admin
+   *    can provision the device with their unique operational credentials and manage
+   *    their access control lists.
+   */
+  #ifndef CHIP_CONFIG_MAX_DEVICE_ADMINS
+  #define CHIP_CONFIG_MAX_DEVICE_ADMINS                      16
+  #endif // CHIP_CONFIG_MAX_DEVICE_ADMINS
+
+  /**
  * @def CHIP_NON_PRODUCTION_MARKER
  *
  * @brief Defines the name of a mark symbol whose presence signals that the chip code

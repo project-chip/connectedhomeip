@@ -25,6 +25,7 @@
 #include <core/CHIPCore.h>
 #include <protocols/Protocols.h>
 #include <support/BufBound.h>
+#include <transport/AdminPairingTable.h>
 #include <transport/NetworkProvisioning.h>
 #include <transport/PASESession.h>
 #include <transport/RendezvousParameters.h>
@@ -88,9 +89,11 @@ public:
      * @param params       The RendezvousParameters
      * @param transportMgr The transport to use
      * @param sessionMgr   Pointer to secure session manager
+     * @param admin        Pointer to a device administrator info that will be filled up on successful pairing
      * @ return CHIP_ERROR  The result of the initialization
      */
-    CHIP_ERROR Init(const RendezvousParameters & params, TransportMgrBase * transportMgr, SecureSessionMgr * sessionMgr);
+    CHIP_ERROR Init(const RendezvousParameters & params, TransportMgrBase * transportMgr, SecureSessionMgr * sessionMgr,
+                    Transport::AdminPairingInfo * admin);
 
     /**
      * @brief
@@ -158,6 +161,8 @@ private:
     uint16_t mNextKeyId                         = 0;
     SecureSessionMgr * mSecureSessionMgr        = nullptr;
     SecureSessionHandle * mPairingSessionHandle = nullptr;
+
+    Transport::AdminPairingInfo * mAdmin = nullptr;
 
     RendezvousSession::State mCurrentState = State::kInit;
     void UpdateState(RendezvousSession::State newState, CHIP_ERROR err = CHIP_NO_ERROR);
