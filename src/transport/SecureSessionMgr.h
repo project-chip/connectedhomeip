@@ -308,7 +308,7 @@ constexpr uint16_t kMaxFooterSize = kMaxTagLen;
  *
  *  Fails and returns \c nullptr if no memory is available, or if the size requested is too large.
  *
- *  @param[in]  aAvailableSize  Minimim number of octets to for application data.
+ *  @param[in]  aAvailableSize  Minimum number of octets to for application data.
  *
  *  @return     On success, a PacketBufferHandle to the allocated buffer. On fail, \c nullptr.
  */
