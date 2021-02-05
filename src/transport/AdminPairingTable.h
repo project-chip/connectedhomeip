@@ -40,8 +40,9 @@ struct AccessControlList
 };
 
 /**
- * Defines state of a pairing established by an admin at the time of
- * device commissioning.
+ * Defines state of a pairing established by an admin.
+ * ACL data can be mutated throughout the lifetime of the admin pairing.
+ * Node ID is only settable using the device operational credentials.
  *
  * Information contained within the state:
  *   - Admin identification
