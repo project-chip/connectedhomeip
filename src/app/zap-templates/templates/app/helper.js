@@ -363,7 +363,7 @@ function isFirstElement(index)
 
 function isStrEndsWith(str, substr)
 {
-    return str.endsWith(substr);
+  return str.endsWith(substr);
 }
 
 //
