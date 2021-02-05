@@ -35,12 +35,12 @@ constexpr uint8_t kVersionMask = 0x0F;
 } // namespace
 
 using namespace chip;
-using namespace chip::BDX;
+using namespace chip::bdx;
 using namespace chip::Encoding::LittleEndian;
 
 // WARNING: this function should never return early, since MessageSize() relies on it to calculate
 // the size of the message (even if the message is incomplete or filled out incorrectly).
-BufBound & TransferInit::WriteToBuffer(BufBound & aBuffer) const
+BufBound & TransferInit::DerivedWriteToBuffer(BufBound & aBuffer) const
 {
     uint8_t proposedTransferCtl = 0;
     bool widerange = (StartOffset > std::numeric_limits<uint32_t>::max()) || (MaxLength > std::numeric_limits<uint32_t>::max());
@@ -49,9 +49,9 @@ BufBound & TransferInit::WriteToBuffer(BufBound & aBuffer) const
     proposedTransferCtl = proposedTransferCtl | TransferCtlOptions.Raw();
 
     BitFlags<uint8_t, RangeControlFlags> rangeCtlFlags;
-    rangeCtlFlags.Set(kDefLen, MaxLength > 0);
-    rangeCtlFlags.Set(kStartOffset, StartOffset > 0);
-    rangeCtlFlags.Set(kWiderange, widerange);
+    rangeCtlFlags.Set(kRange_DefLen, MaxLength > 0);
+    rangeCtlFlags.Set(kRange_StartOffset, StartOffset > 0);
+    rangeCtlFlags.Set(kRange_Widerange, widerange);
 
     aBuffer.Put(proposedTransferCtl);
     aBuffer.Put(rangeCtlFlags.Raw());
@@ -94,7 +94,7 @@ BufBound & TransferInit::WriteToBuffer(BufBound & aBuffer) const
     return aBuffer;
 }
 
-CHIP_ERROR TransferInit::Parse(System::PacketBufferHandle aBuffer)
+CHIP_ERROR TransferInit::DerivedParse(System::PacketBufferHandle aBuffer)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     uint8_t proposedTransferCtl;
@@ -111,9 +111,9 @@ CHIP_ERROR TransferInit::Parse(System::PacketBufferHandle aBuffer)
     rangeCtlFlags.SetRaw(rangeCtl);
 
     StartOffset = 0;
-    if (rangeCtlFlags.Has(kStartOffset))
+    if (rangeCtlFlags.Has(kRange_StartOffset))
     {
-        if (rangeCtlFlags.Has(kWiderange))
+        if (rangeCtlFlags.Has(kRange_Widerange))
         {
             SuccessOrExit(bufReader.Read64(&StartOffset).StatusCode());
         }
@@ -125,9 +125,9 @@ CHIP_ERROR TransferInit::Parse(System::PacketBufferHandle aBuffer)
     }
 
     MaxLength = 0;
-    if (rangeCtlFlags.Has(kDefLen))
+    if (rangeCtlFlags.Has(kRange_DefLen))
     {
-        if (rangeCtlFlags.Has(kWiderange))
+        if (rangeCtlFlags.Has(kRange_Widerange))
         {
             SuccessOrExit(bufReader.Read64(&MaxLength).StatusCode());
         }
@@ -164,7 +164,7 @@ exit:
     return err;
 }
 
-size_t TransferInit::MessageSize() const
+size_t TransferInit::DerivedMessageSize() const
 {
     BufBound emptyBuf(nullptr, 0);
     return WriteToBuffer(emptyBuf).Needed();
@@ -196,7 +196,7 @@ bool TransferInit::operator==(const TransferInit & another) const
 
 // WARNING: this function should never return early, since MessageSize() relies on it to calculate
 // the size of the message (even if the message is incomplete or filled out incorrectly).
-BufBound & SendAccept::WriteToBuffer(BufBound & aBuffer) const
+BufBound & SendAccept::DerivedWriteToBuffer(BufBound & aBuffer) const
 {
     uint8_t transferCtl = 0;
 
@@ -213,7 +213,7 @@ BufBound & SendAccept::WriteToBuffer(BufBound & aBuffer) const
     return aBuffer;
 }
 
-CHIP_ERROR SendAccept::Parse(System::PacketBufferHandle aBuffer)
+CHIP_ERROR SendAccept::DerivedParse(System::PacketBufferHandle aBuffer)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     uint8_t transferCtl = 0;
@@ -247,7 +247,7 @@ exit:
     return err;
 }
 
-size_t SendAccept::MessageSize() const
+size_t SendAccept::DerivedMessageSize() const
 {
     BufBound emptyBuf(nullptr, 0);
     return WriteToBuffer(emptyBuf).Needed();
@@ -272,7 +272,7 @@ bool SendAccept::operator==(const SendAccept & another) const
 
 // WARNING: this function should never return early, since MessageSize() relies on it to calculate
 // the size of the message (even if the message is incomplete or filled out incorrectly).
-BufBound & ReceiveAccept::WriteToBuffer(BufBound & aBuffer) const
+BufBound & ReceiveAccept::DerivedWriteToBuffer(BufBound & aBuffer) const
 {
     uint8_t transferCtl = 0;
     bool widerange      = (StartOffset > std::numeric_limits<uint32_t>::max()) || (Length > std::numeric_limits<uint32_t>::max());
@@ -281,9 +281,9 @@ BufBound & ReceiveAccept::WriteToBuffer(BufBound & aBuffer) const
     transferCtl = transferCtl | TransferCtlFlags.Raw();
 
     BitFlags<uint8_t, RangeControlFlags> rangeCtlFlags;
-    rangeCtlFlags.Set(kDefLen, Length > 0);
-    rangeCtlFlags.Set(kStartOffset, StartOffset > 0);
-    rangeCtlFlags.Set(kWiderange, widerange);
+    rangeCtlFlags.Set(kRange_DefLen, Length > 0);
+    rangeCtlFlags.Set(kRange_StartOffset, StartOffset > 0);
+    rangeCtlFlags.Set(kRange_Widerange, widerange);
 
     aBuffer.Put(transferCtl);
     aBuffer.Put(rangeCtlFlags.Raw());
@@ -320,7 +320,7 @@ BufBound & ReceiveAccept::WriteToBuffer(BufBound & aBuffer) const
     return aBuffer;
 }
 
-CHIP_ERROR ReceiveAccept::Parse(System::PacketBufferHandle aBuffer)
+CHIP_ERROR ReceiveAccept::DerivedParse(System::PacketBufferHandle aBuffer)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     uint8_t transferCtl     = 0;
@@ -340,9 +340,9 @@ CHIP_ERROR ReceiveAccept::Parse(System::PacketBufferHandle aBuffer)
     rangeCtlFlags.SetRaw(rangeCtl);
 
     StartOffset = 0;
-    if (rangeCtlFlags.Has(kStartOffset))
+    if (rangeCtlFlags.Has(kRange_StartOffset))
     {
-        if (rangeCtlFlags.Has(kWiderange))
+        if (rangeCtlFlags.Has(kRange_Widerange))
         {
             SuccessOrExit(bufReader.Read64(&StartOffset).StatusCode());
         }
@@ -354,9 +354,9 @@ CHIP_ERROR ReceiveAccept::Parse(System::PacketBufferHandle aBuffer)
     }
 
     Length = 0;
-    if (rangeCtlFlags.Has(kDefLen))
+    if (rangeCtlFlags.Has(kRange_DefLen))
     {
-        if (rangeCtlFlags.Has(kWiderange))
+        if (rangeCtlFlags.Has(kRange_Widerange))
         {
             SuccessOrExit(bufReader.Read64(&Length).StatusCode());
         }
@@ -387,7 +387,7 @@ exit:
     return err;
 }
 
-size_t ReceiveAccept::MessageSize() const
+size_t ReceiveAccept::DerivedMessageSize() const
 {
     BufBound emptyBuf(nullptr, 0);
     return WriteToBuffer(emptyBuf).Needed();
@@ -413,19 +413,19 @@ bool ReceiveAccept::operator==(const ReceiveAccept & another) const
 
 // WARNING: this function should never return early, since MessageSize() relies on it to calculate
 // the size of the message (even if the message is incomplete or filled out incorrectly).
-BufBound & CounterMessage::WriteToBuffer(BufBound & aBuffer) const
+BufBound & CounterMessage::DerivedWriteToBuffer(BufBound & aBuffer) const
 {
     return aBuffer.Put32(BlockCounter);
 }
 
-CHIP_ERROR CounterMessage::Parse(System::PacketBufferHandle aBuffer)
+CHIP_ERROR CounterMessage::DerivedParse(System::PacketBufferHandle aBuffer)
 {
     uint8_t * bufStart = aBuffer->Start();
     Reader bufReader(bufStart, aBuffer->DataLength());
     return bufReader.Read32(&BlockCounter).StatusCode();
 }
 
-size_t CounterMessage::MessageSize() const
+size_t CounterMessage::DerivedMessageSize() const
 {
     BufBound emptyBuf(nullptr, 0);
     return WriteToBuffer(emptyBuf).Needed();
@@ -438,7 +438,7 @@ bool CounterMessage::operator==(const CounterMessage & another) const
 
 // WARNING: this function should never return early, since MessageSize() relies on it to calculate
 // the size of the message (even if the message is incomplete or filled out incorrectly).
-BufBound & DataBlock::WriteToBuffer(BufBound & aBuffer) const
+BufBound & DataBlock::DerivedWriteToBuffer(BufBound & aBuffer) const
 {
     aBuffer.Put32(BlockCounter);
     if (Data != nullptr)
@@ -448,7 +448,7 @@ BufBound & DataBlock::WriteToBuffer(BufBound & aBuffer) const
     return aBuffer;
 }
 
-CHIP_ERROR DataBlock::Parse(System::PacketBufferHandle aBuffer)
+CHIP_ERROR DataBlock::DerivedParse(System::PacketBufferHandle aBuffer)
 {
     CHIP_ERROR err     = CHIP_NO_ERROR;
     uint8_t * bufStart = aBuffer->Start();
@@ -476,7 +476,7 @@ exit:
     return err;
 }
 
-size_t DataBlock::MessageSize() const
+size_t DataBlock::DerivedMessageSize() const
 {
     BufBound emptyBuf(nullptr, 0);
     return WriteToBuffer(emptyBuf).Needed();
