@@ -154,7 +154,7 @@ void LogV(uint8_t module, uint8_t category, const char * aFormat, va_list v)
         char formattedMsg[CHIP_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE];
         size_t formattedMsgLen;
 
-        constexpr size_t maxPrefixLen = ChipLoggingModuleNameLen + 3;
+        constexpr size_t maxPrefixLen = chip::Logging::kMaxModuleNameLen + 3;
         static_assert(sizeof(formattedMsg) > maxPrefixLen);
 
         switch (category)
@@ -176,7 +176,7 @@ void LogV(uint8_t module, uint8_t category, const char * aFormat, va_list v)
 
         // Form the log prefix, e.g. "[DL] "
         formattedMsg[formattedMsgLen++] = '[';
-        GetModuleName(formattedMsg + formattedMsgLen, module);
+        GetModuleName(formattedMsg + formattedMsgLen, chip::Logging::kMaxModuleNameLen + 1, module);
         formattedMsgLen                 = strlen(formattedMsg);
         formattedMsg[formattedMsgLen++] = ']';
         formattedMsg[formattedMsgLen++] = ' ';
