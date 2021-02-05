@@ -378,7 +378,6 @@ class DeviceMgrCmd(Cmd):
         except ChipExceptions.ChipStackException as ex:
             print(str(ex))
             return
-        print("Connected")
 
     def do_zcl(self, line):
         """
