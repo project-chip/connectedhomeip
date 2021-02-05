@@ -22,7 +22,6 @@ ENV ZEPHYR_BASE=/opt/NordicSemiconductor/nrfconnect/zephyr
 ENV ZEPHYR_TOOLCHAIN_VARIANT=gnuarmemb
 ENV GNUARMEMB_TOOLCHAIN_PATH=/opt/ARM-software/gcc-arm-none-eabi-9-2019-q4-major
 ENV ARM_GCC_INSTALL_ROOT=/opt/ARM-software/gcc-arm-none-eabi-9-2019-q4-major/bin
-ENV EFR32_SDK_ROOT=/opt/SiliconLabs/sdk_support
 ENV EFR32_BOARD=BRD4161A
 ENV ANDROID_HOME=/opt/android/sdk
 ENV ANDROID_NDK_HOME=/opt/android/android-ndk-r21b
