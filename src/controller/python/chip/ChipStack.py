@@ -212,7 +212,7 @@ class ChipStack(object):
             moduleName = ChipUtility.CStringToString(moduleName)
             message = ChipUtility.CStringToString(message)
             if self.addModulePrefixToLogMessage:
-                message = "CP:%s: %s" % (moduleName, message)
+                message = "CHIP:%s: %s" % (moduleName, message)
             logLevel = LogCategory.categoryToLogLevel(logCat)
             msgAttrs = {
                 "chip-module": moduleName,
