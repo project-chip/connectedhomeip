@@ -20,6 +20,12 @@
 
 namespace chip {
 
-void RunKvsTest();
+enum TestConfigurations
+{
+    RUN_ALL_TESTS,
+    SKIP_MULTI_READ_TEST
+};
+
+void RunKvsTest(TestConfigurations test_config = RUN_ALL_TESTS);
 
 } // namespace chip
