@@ -32,6 +32,7 @@
 #include <inet/IPEndPointBasis.h>
 #include <support/CodeUtils.h>
 #include <support/DLLUtil.h>
+#include <transport/AdminPairingTable.h>
 #include <transport/PASESession.h>
 #include <transport/PeerConnections.h>
 #include <transport/SecureSession.h>
@@ -206,7 +207,7 @@ public:
      *   peer node.
      */
     CHIP_ERROR NewPairing(const Optional<Transport::PeerAddress> & peerAddr, NodeId peerNodeId, PASESession * pairing,
-                          Transport::Base * transport = nullptr);
+                          Transport::AdminId admin, Transport::Base * transport = nullptr);
 
     /**
      * @brief
@@ -221,8 +222,10 @@ public:
      * @param localNodeId    Node id for the current node
      * @param systemLayer    System, layer to use
      * @param transportMgr   Transport to use
+     * @param admins         A table of device administrators
      */
-    CHIP_ERROR Init(NodeId localNodeId, System::Layer * systemLayer, TransportMgrBase * transportMgr);
+    CHIP_ERROR Init(NodeId localNodeId, System::Layer * systemLayer, TransportMgrBase * transportMgr,
+                    Transport::AdminPairingTable * admins);
 
     /**
      * @brief
@@ -273,8 +276,9 @@ private:
     Transport::PeerConnections<CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE> mPeerConnections; // < Active connections to other peers
     State mState;                                                                       // < Initialization state of the object
 
-    SecureSessionMgrDelegate * mCB   = nullptr;
-    TransportMgrBase * mTransportMgr = nullptr;
+    SecureSessionMgrDelegate * mCB         = nullptr;
+    TransportMgrBase * mTransportMgr       = nullptr;
+    Transport::AdminPairingTable * mAdmins = nullptr;
 
     CHIP_ERROR SendMessage(SecureSessionHandle session, PayloadHeader & payloadHeader, PacketHeader & packetHeader,
                            System::PacketBufferHandle msgBuf, EncryptedPacketBufferHandle * bufferRetainSlot,
