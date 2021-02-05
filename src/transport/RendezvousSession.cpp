@@ -311,7 +311,12 @@ void RendezvousSession::OnRendezvousMessageReceived(const PacketHeader & packetH
     case State::kSecurePairing:
         if (packetHeader.GetSourceNodeId().HasValue())
         {
-            ChipLogProgress(Ble, "Received rendezvous message from %llu", packetHeader.GetSourceNodeId().Value());
+            ChipLogProgress(Ble, "Received pairing message from %llu", packetHeader.GetSourceNodeId().Value());
+        }
+        if (packetHeader.GetDestinationNodeId().HasValue())
+        {
+            ChipLogProgress(Ble, "Received pairing message for %llu", packetHeader.GetDestinationNodeId().Value());
+            mAdmin->SetNodeId(packetHeader.GetDestinationNodeId().Value());
         }
         err = HandlePairingMessage(packetHeader, peerAddress, std::move(msgBuf));
         break;
