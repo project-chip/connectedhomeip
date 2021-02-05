@@ -639,6 +639,10 @@ inline PacketBufferHandle PacketBuffer::Last()
     return PacketBufferHandle::Hold(p);
 }
 
+} // namespace System
+
+namespace Encoding {
+
 /**
  * BufferWriter backed by packet buffer.
  *
@@ -653,7 +657,29 @@ inline PacketBufferHandle PacketBuffer::Last()
  *      // valid data
  *  @endcode
  */
-class PacketBufferWriter : public Encoding::LittleEndian::BufferWriter
+class PacketBufferWriterImpl
+{
+public:
+    /**
+     * Test whether this PacketBufferWriter is null, or conversely owns a PacketBuffer.
+     *
+     * @retval true     The PacketBufferWriter is null; it does not own a PacketBuffer. This implies either that
+     *                  construction failed, or that \c Finalize() has previously been called to release the buffer.
+     * @retval false    The PacketBufferWriter owns a PacketBuffer, which can be written using BufferWriter \c Put() methods,
+     *                  and (assuming no overflow) obtained by calling \c Finalize().
+     */
+    bool IsNull() const { return mPacket.IsNull(); }
+
+protected:
+    PacketBufferWriterImpl(size_t aAvailableSize, uint16_t aReservedSize, BufferWriter & aBufferWriter);
+    System::PacketBufferHandle Finalize(BufferWriter & aBufferWriter);
+
+private:
+    System::PacketBufferHandle mPacket;
+};
+
+template <class Writer>
+class PacketBufferWriterBase : public Writer, public PacketBufferWriterImpl
 {
 public:
     /**
@@ -666,17 +692,9 @@ public:
      *  @param[in]  aAvailableSize  Length bound of the BufferWriter.
      *  @param[in]  aReservedSize   Reserved packet buffer space for protocol headers; see \c PacketBufferHandle::New().
      */
-    PacketBufferWriter(size_t aAvailableSize, uint16_t aReservedSize = CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE);
-
-    /**
-     * Test whether this PacketBufferWriter is null, or conversely owns a PacketBuffer.
-     *
-     * @retval true     The PacketBufferWriter is null; it does not own a PacketBuffer. This implies either that
-     *                  construction failed, or that \c Finalize() has previously been called to release the buffer.
-     * @retval false    The PacketBufferWriter owns a PacketBuffer, which can be written using BufferWriter \c Put() methods,
-     *                  and (assuming no overflow) obtained by calling \c Finalize().
-     */
-    bool IsNull() const { return mPacket.IsNull(); }
+    PacketBufferWriterBase(size_t aAvailableSize, uint16_t aReservedSize = CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE) :
+        Writer(nullptr, 0), PacketBufferWriterImpl(aAvailableSize, aReservedSize, *this)
+    {}
 
     /**
      * Obtain the backing packet buffer, if it is valid.
@@ -687,13 +705,21 @@ public:
      *
      *  @return     A packet buffer handle.
      */
-    PacketBufferHandle Finalize();
-
-private:
-    PacketBufferHandle mPacket;
+    System::PacketBufferHandle Finalize() { return PacketBufferWriterImpl::Finalize(*this); }
 };
 
-} // namespace System
+using PacketBufferWriter = PacketBufferWriterBase<chip::Encoding::BufferWriter>;
+
+namespace LittleEndian {
+using PacketBufferWriter = PacketBufferWriterBase<chip::Encoding::LittleEndian::BufferWriter>;
+} // namespace LittleEndian
+
+namespace BigEndian {
+using PacketBufferWriter = PacketBufferWriterBase<chip::Encoding::BigEndian::BufferWriter>;
+} // namespace BigEndian
+
+} // namespace Encoding
+
 } // namespace chip
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP

@@ -568,7 +568,7 @@ CHIP_ERROR PASESession::HandleMsg1_and_SendMsg2(const PacketHeader & header, con
     data_len = static_cast<uint16_t>(Y_len + verifier_len);
 
     {
-        System::PacketBufferWriter bbuf(data_len);
+        Encoding::PacketBufferWriter bbuf(data_len);
         VerifyOrExit(!bbuf.IsNull(), err = CHIP_SYSTEM_ERROR_NO_MEMORY);
         bbuf.Put(&Y[0], Y_len);
         bbuf.Put(verifier, verifier_len);
@@ -624,7 +624,7 @@ CHIP_ERROR PASESession::HandleMsg2_and_SendMsg3(const PacketHeader & header, con
     }
 
     {
-        System::PacketBufferWriter bbuf(verifier_len);
+        Encoding::PacketBufferWriter bbuf(verifier_len);
         VerifyOrExit(!bbuf.IsNull(), err = CHIP_SYSTEM_ERROR_NO_MEMORY);
 
         bbuf.Put(verifier, verifier_len);

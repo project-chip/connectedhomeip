@@ -594,32 +594,34 @@ void PacketBufferHandle::RightSizeForMemoryAlloc()
 
 #endif
 
-PacketBufferWriter::PacketBufferWriter(size_t aAvailableSize, uint16_t aReservedSize) :
-    Encoding::LittleEndian::BufferWriter(nullptr, 0)
+} // namespace System
+
+namespace Encoding {
+
+PacketBufferWriterImpl::PacketBufferWriterImpl(size_t aAvailableSize, uint16_t aReservedSize, BufferWriter & aBufferWriter)
 {
-    mPacket = PacketBufferHandle::New(aAvailableSize, aReservedSize);
+    mPacket = System::PacketBufferHandle::New(aAvailableSize, aReservedSize);
     if (!mPacket.IsNull())
     {
-        *static_cast<Encoding::LittleEndian::BufferWriter *>(this) =
-            Encoding::LittleEndian::BufferWriter(mPacket->Start(), aAvailableSize);
+        aBufferWriter = Encoding::BufferWriter(mPacket->Start(), aAvailableSize);
     }
 }
 
-PacketBufferHandle PacketBufferWriter::Finalize()
+System::PacketBufferHandle PacketBufferWriterImpl::Finalize(BufferWriter & aBufferWriter)
 {
-    if (!mPacket.IsNull() && Fit())
+    if (!mPacket.IsNull() && aBufferWriter.Fit())
     {
         // Since mPacket was successfully allocated to hold the maximum length,
         // we know that the actual length fits in a uint16_t.
-        mPacket->SetDataLength(static_cast<uint16_t>(Needed()));
+        mPacket->SetDataLength(static_cast<uint16_t>(aBufferWriter.Needed()));
     }
     else
     {
         mPacket = nullptr;
     }
-    *static_cast<Encoding::LittleEndian::BufferWriter *>(this) = Encoding::LittleEndian::BufferWriter(nullptr, 0);
+    aBufferWriter = Encoding::BufferWriter(nullptr, 0);
     return std::move(mPacket);
 }
 
-} // namespace System
+} // namespace Encoding
 } // namespace chip
