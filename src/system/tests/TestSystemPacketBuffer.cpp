@@ -1721,7 +1721,9 @@ void PacketBufferTest::CheckPacketBufBound(nlTestSuite * inSuite, void * inConte
     NL_TEST_ASSERT(inSuite, !nay.IsNull());
 
     yay.Put(kPayload);
+    yay.Put('\0');
     nay.Put(kPayload);
+    nay.Put('\0');
     NL_TEST_ASSERT(inSuite, yay.Fit());
     NL_TEST_ASSERT(inSuite, !nay.Fit());
 
