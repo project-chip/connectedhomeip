@@ -151,7 +151,7 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
 
     ctx.GetInetLayer().SystemLayer()->Init(nullptr);
 
-    chip::System::PacketBufferHandle buffer = chip::System::PacketBufferHandle::NewWithData(PAYLOAD, payload_len, kMaxTagLen);
+    chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, payload_len);
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());
 
     IPAddress addr;
@@ -201,7 +201,7 @@ void SendEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
 
     ctx.GetInetLayer().SystemLayer()->Init(nullptr);
 
-    chip::System::PacketBufferHandle buffer = chip::System::PacketBufferHandle::NewWithData(PAYLOAD, payload_len, kMaxTagLen);
+    chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, payload_len);
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());
 
     IPAddress addr;
@@ -267,7 +267,7 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
 
     ctx.GetInetLayer().SystemLayer()->Init(nullptr);
 
-    chip::System::PacketBufferHandle buffer = chip::System::PacketBufferHandle::NewWithData(PAYLOAD, payload_len, kMaxTagLen);
+    chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, payload_len);
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());
 
     IPAddress addr;

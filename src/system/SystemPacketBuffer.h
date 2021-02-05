@@ -577,7 +577,7 @@ public:
      *
      *  On success, it is guaranteed that \c AvailableDataSize() is no less than \a aAvailableSize.
      *
-     *  @param[in]  aAvailableSize  Minimim number of octets to for application data (at `Start()`).
+     *  @param[in]  aAvailableSize  Minimum number of octets to for application data (at `Start()`).
      *  @param[in]  aReservedSize   Number of octets to reserve for protocol headers (before `Start()`).
      *
      *  @return     On success, a PacketBufferHandle to the allocated buffer. On fail, \c nullptr.

@@ -98,7 +98,7 @@ struct BdxMessage
      * @return CHIP_ERROR Return an error if the message format is invalid and/or can't be parsed
      */
     CHECK_RETURN_VALUE
-    CHIP_ERROR Parse(System::PacketBufferHandle aBuffer) { return DerivedParse(std::move(aBuffer)); }
+    virtual CHIP_ERROR Parse(System::PacketBufferHandle aBuffer) = 0;
 
     /**
      * @brief
@@ -111,20 +111,15 @@ struct BdxMessage
      *
      * @param aBuffer A BufBound object that will be used to write the message
      */
-    BufBound & WriteToBuffer(BufBound & aBuffer) const { return DerivedWriteToBuffer(aBuffer); }
+    virtual BufBound & WriteToBuffer(BufBound & aBuffer) const = 0;
 
     /**
      * @brief
      *  Returns the size of buffer needed to write the message.
      */
-    virtual size_t MessageSize() const { return DerivedMessageSize(); }
+    virtual size_t MessageSize() const = 0;
 
     virtual ~BdxMessage() = default;
-
-private:
-    virtual CHIP_ERROR DerivedParse(System::PacketBufferHandle aBuffer) = 0;
-    virtual BufBound & DerivedWriteToBuffer(BufBound & aBuffer) const   = 0;
-    virtual size_t DerivedMessageSize() const                           = 0;
 };
 
 /*
@@ -159,10 +154,9 @@ struct TransferInit : public BdxMessage
     // Retain ownership of the packet buffer so that the FileDesignator and Metadata pointers remain valid.
     System::PacketBufferHandle Buffer;
 
-private:
-    CHIP_ERROR DerivedParse(System::PacketBufferHandle aBuffer) override;
-    BufBound & DerivedWriteToBuffer(BufBound & aBuffer) const override;
-    size_t DerivedMessageSize() const override;
+    CHIP_ERROR Parse(System::PacketBufferHandle aBuffer) override;
+    BufBound & WriteToBuffer(BufBound & aBuffer) const override;
+    size_t MessageSize() const override;
 };
 
 using SendInit    = TransferInit;
@@ -194,10 +188,9 @@ struct SendAccept : public BdxMessage
     // Retain ownership of the packet buffer so that the FileDesignator and Metadata pointers remain valid.
     System::PacketBufferHandle Buffer;
 
-private:
-    CHIP_ERROR DerivedParse(System::PacketBufferHandle aBuffer) override;
-    BufBound & DerivedWriteToBuffer(BufBound & aBuffer) const override;
-    size_t DerivedMessageSize() const override;
+    CHIP_ERROR Parse(System::PacketBufferHandle aBuffer) override;
+    BufBound & WriteToBuffer(BufBound & aBuffer) const override;
+    size_t MessageSize() const override;
 };
 
 /**
@@ -229,10 +222,9 @@ struct ReceiveAccept : public BdxMessage
     // Retain ownership of the packet buffer so that the FileDesignator and Metadata pointers remain valid.
     System::PacketBufferHandle Buffer;
 
-private:
-    CHIP_ERROR DerivedParse(System::PacketBufferHandle aBuffer) override;
-    BufBound & DerivedWriteToBuffer(BufBound & aBuffer) const override;
-    size_t DerivedMessageSize() const override;
+    CHIP_ERROR Parse(System::PacketBufferHandle aBuffer) override;
+    BufBound & WriteToBuffer(BufBound & aBuffer) const override;
+    size_t MessageSize() const override;
 };
 
 /**
@@ -249,10 +241,9 @@ struct CounterMessage : public BdxMessage
 
     uint32_t BlockCounter = 0;
 
-private:
-    CHIP_ERROR DerivedParse(System::PacketBufferHandle aBuffer) override;
-    BufBound & DerivedWriteToBuffer(BufBound & aBuffer) const override;
-    size_t DerivedMessageSize() const override;
+    CHIP_ERROR Parse(System::PacketBufferHandle aBuffer) override;
+    BufBound & WriteToBuffer(BufBound & aBuffer) const override;
+    size_t MessageSize() const override;
 };
 
 using BlockQuery  = CounterMessage;
@@ -280,10 +271,9 @@ struct DataBlock : public BdxMessage
     // Retain ownership of the packet buffer so that the FileDesignator and Metadata pointers remain valid.
     System::PacketBufferHandle Buffer;
 
-private:
-    CHIP_ERROR DerivedParse(System::PacketBufferHandle aBuffer) override;
-    BufBound & DerivedWriteToBuffer(BufBound & aBuffer) const override;
-    size_t DerivedMessageSize() const override;
+    CHIP_ERROR Parse(System::PacketBufferHandle aBuffer) override;
+    BufBound & WriteToBuffer(BufBound & aBuffer) const override;
+    size_t MessageSize() const override;
 };
 
 using Block    = DataBlock;

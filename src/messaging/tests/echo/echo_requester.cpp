@@ -89,9 +89,7 @@ CHIP_ERROR SendEchoRequest(void)
     const char kRequestFormat[] = "Echo Message %" PRIu64 "\n";
     char requestData[(sizeof kRequestFormat) + 20 /* uint64_t decimal digits */];
     snprintf(requestData, sizeof requestData, kRequestFormat, gEchoCount);
-    // TODO: higher-level New to encapsulate the addition of kMaxTagLen (required for the message authentication tag).
-    chip::System::PacketBufferHandle payloadBuf =
-        chip::System::PacketBufferHandle::NewWithData(requestData, strlen(requestData), chip::kMaxTagLen);
+    chip::System::PacketBufferHandle payloadBuf = chip::MessagePacketBuffer::NewWithData(requestData, strlen(requestData));
 
     if (payloadBuf.IsNull())
     {

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -296,5 +296,55 @@ private:
      */
     static void ExpiryTimerCallback(System::Layer * layer, void * param, System::Error error);
 };
+
+namespace MessagePacketBuffer {
+/**
+ * Maximum size of a message footer, in bytes.
+ */
+constexpr uint16_t kMaxFooterSize = kMaxTagLen;
+
+/**
+ * Allocates a packet buffer with space for message headers and footers.
+ *
+ *  Fails and returns \c nullptr if no memory is available, or if the size requested is too large.
+ *
+ *  @param[in]  aAvailableSize  Minimum number of octets to for application data.
+ *
+ *  @return     On success, a PacketBufferHandle to the allocated buffer. On fail, \c nullptr.
+ */
+inline System::PacketBufferHandle New(size_t aAvailableSize)
+{
+    static_assert(System::PacketBuffer::kMaxSize > kMaxFooterSize, "inadequate capacity");
+    if (aAvailableSize > System::PacketBuffer::kMaxSize - kMaxFooterSize)
+    {
+        return System::PacketBufferHandle();
+    }
+    return System::PacketBufferHandle::New(aAvailableSize + kMaxFooterSize);
+}
+
+/**
+ * Allocates a packet buffer with initial contents.
+ *
+ *  @param[in]  aData           Initial buffer contents.
+ *  @param[in]  aDataSize       Size of initial buffer contents.
+ *
+ *  @return     On success, a PacketBufferHandle to the allocated buffer. On fail, \c nullptr.
+ */
+inline System::PacketBufferHandle NewWithData(const void * aData, size_t aDataSize)
+{
+    return System::PacketBufferHandle::NewWithData(aData, aDataSize, kMaxFooterSize);
+}
+
+/**
+ * Check whether a packet buffer has enough space for a message footer.
+ *
+ * @returns true if there is space, false otherwise.
+ */
+inline bool HasFooterSpace(const System::PacketBufferHandle & aBuffer)
+{
+    return aBuffer->AvailableDataLength() >= kMaxFooterSize;
+}
+
+} // namespace MessagePacketBuffer
 
 } // namespace chip

@@ -56,8 +56,7 @@ EmberStatus chipSendUnicast(NodeId destination, EmberApsFrame * apsFrame, uint16
         return EMBER_ERR_FATAL;
     }
 
-    // TODO: higher-level New to encapsulate the addition of kMaxTagLen (required for the message authentication tag).
-    System::PacketBufferHandle buffer = System::PacketBufferHandle::New(dataLength + kMaxTagLen);
+    System::PacketBufferHandle buffer = MessagePacketBuffer::New(dataLength);
     if (buffer.IsNull())
     {
         // FIXME: Not quite right... what's the right way to indicate "out of
