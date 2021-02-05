@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <app/server/DataModelHandler.h>
 #include <controller/CHIPDeviceController.h>
 #include <inet/InetInterface.h>
 #include <support/logging/CHIPLogging.h>
@@ -143,7 +144,11 @@ public:
     virtual CHIP_ERROR Run(PersistentStorage & storage, NodeId localId, NodeId remoteId) = 0;
 
     bool GetCommandExitStatus() const { return mCommandExitStatus; }
-    void SetCommandExitStatus(bool status) { mCommandExitStatus = status; }
+    void SetCommandExitStatus(bool status)
+    {
+        mCommandExitStatus = status;
+        UpdateWaitForResponse(false);
+    }
 
     void UpdateWaitForResponse(bool value);
     void WaitForResponse(uint16_t duration);

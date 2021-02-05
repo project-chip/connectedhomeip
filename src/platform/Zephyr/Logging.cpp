@@ -64,14 +64,14 @@ void LogV(uint8_t module, uint8_t category, const char * msg, va_list v)
         size_t prefixLen = 0;
 
         // Max size for "[TAG] {UINT32}"
-        constexpr size_t maxPrefixLen = ChipLoggingModuleNameLen + 10 + 3;
+        constexpr size_t maxPrefixLen = chip::Logging::kMaxModuleNameLen + 10 + 3;
         static_assert(sizeof(formattedMsg) > maxPrefixLen);
 
         prefixLen += snprintf(formattedMsg, sizeof(formattedMsg), "%u", k_uptime_get_32());
 
         // Form the log prefix, e.g. "[DL] "
         formattedMsg[prefixLen++] = '[';
-        GetModuleName(formattedMsg + prefixLen, module);
+        GetModuleName(formattedMsg + prefixLen, chip::Logging::kMaxModuleNameLen + 1, module);
         prefixLen                 = strlen(formattedMsg);
         formattedMsg[prefixLen++] = ']';
         formattedMsg[prefixLen++] = ' ';

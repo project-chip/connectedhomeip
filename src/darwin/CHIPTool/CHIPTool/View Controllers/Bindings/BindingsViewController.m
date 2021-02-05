@@ -17,12 +17,15 @@
 
 #import "BindingsViewController.h"
 #import "CHIPUIViewUtils.h"
+#import "DefaultsUtils.h"
 
 @interface BindingsViewController ()
 @property (nonatomic, strong) UITextField * nodeIDTextField;
 @property (nonatomic, strong) UITextField * groupIDTextField;
 @property (nonatomic, strong) UITextField * endpointIDTextField;
 @property (nonatomic, strong) UITextField * clusterIDTextField;
+
+@property (nonatomic, strong) CHIPBinding * cluster;
 @end
 
 @implementation BindingsViewController
@@ -34,6 +37,8 @@
 
     UITapGestureRecognizer * tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dismissKeyboard)];
     [self.view addGestureRecognizer:tap];
+
+    self.cluster = [[CHIPBinding alloc] initWithDevice:GetPairedDevice() endpoint:1 queue:dispatch_get_main_queue()];
 }
 
 - (void)dismissKeyboard
@@ -111,13 +116,15 @@
 
     [stackView addArrangedSubview:stackViewButtons];
     [stackViewButtons.trailingAnchor constraintEqualToAnchor:stackView.trailingAnchor].active = YES;
+
+    [self _clearTextFields];
 }
 
 - (void)_clearTextFields
 {
-    _nodeIDTextField.text = @"";
-    _endpointIDTextField.text = @"";
-    _groupIDTextField.text = @"";
+    _nodeIDTextField.text = [NSString stringWithFormat:@"%d", 112233];
+    _endpointIDTextField.text = @"1";
+    _groupIDTextField.text = @"0";
     _clusterIDTextField.text = @"";
 }
 
@@ -125,14 +132,38 @@
 
 - (IBAction)bind:(id)sender
 {
-    [self _clearTextFields];
-    // TODO: Call binding API
+    int nodeId = [_nodeIDTextField.text intValue];
+    int endpointId = [_endpointIDTextField.text intValue];
+    int groupId = [_groupIDTextField.text intValue];
+    int clusterId = [_clusterIDTextField.text intValue];
+
+    [self.cluster bind:nodeId
+                  groupId:groupId
+               endpointId:endpointId
+                clusterId:clusterId
+        completionHandler:^(NSError * _Nullable error, NSDictionary * _Nullable values) {
+            NSString * resultString
+                = (error == nil) ? @"Bind command: success!" : [NSString stringWithFormat:@"An error occured: 0x%02lx", error.code];
+            NSLog(resultString, nil);
+        }];
 }
 
 - (IBAction)unbind:(id)sender
 {
-    [self _clearTextFields];
-    // TODO: Call unbinding API
+    int nodeId = [_nodeIDTextField.text intValue];
+    int endpointId = [_endpointIDTextField.text intValue];
+    int groupId = [_groupIDTextField.text intValue];
+    int clusterId = [_clusterIDTextField.text intValue];
+
+    [self.cluster unbind:nodeId
+                  groupId:groupId
+               endpointId:endpointId
+                clusterId:clusterId
+        completionHandler:^(NSError * _Nullable error, NSDictionary * _Nullable values) {
+            NSString * resultString = (error == nil) ? @"Unbind command: success!"
+                                                     : [NSString stringWithFormat:@"An error occured: 0x%02lx", error.code];
+            NSLog(resultString, nil);
+        }];
 }
 
 @end

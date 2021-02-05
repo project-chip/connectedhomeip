@@ -28,6 +28,7 @@
 
 #include <app/CommandSender.h>
 #include <app/InteractionModelEngine.h>
+#include <app/util/CHIPDeviceCallbacksMgr.h>
 #include <app/util/basic-types.h>
 #include <core/CHIPCallback.h>
 #include <core/CHIPCore.h>
@@ -251,8 +252,9 @@ public:
 
     PASESessionSerializable & GetPairing() { return mPairing; }
 
-    void AddResponseHandler(EndpointId endpoint, ClusterId cluster, Callback::Callback<> * onResponse);
-    void AddReportHandler(EndpointId endpoint, ClusterId cluster, Callback::Callback<> * onReport);
+    uint8_t GetNextSequenceNumber() { return mSequenceNumber++; };
+    void AddResponseHandler(uint8_t seqNum, Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    void AddReportHandler(EndpointId endpoint, ClusterId cluster, AttributeId attribute, Callback::Cancelable * onReportCallback);
 
 private:
     enum class ConnectionState
@@ -260,12 +262,6 @@ private:
         NotConnected,
         Connecting,
         SecureConnected,
-    };
-
-    struct CallbackInfo
-    {
-        EndpointId endpoint;
-        ClusterId cluster;
     };
 
     enum class ResetTransport
@@ -280,35 +276,31 @@ private:
     Inet::IPAddress mDeviceAddr;
 
     /* Port on which the CHIP device is receiving messages. Typically it is CHIP_PORT */
-    uint16_t mDevicePort;
+    uint16_t mDevicePort = CHIP_PORT;
 
     /* Local network interface that should be used to communicate with the device */
-    Inet::InterfaceId mInterface;
+    Inet::InterfaceId mInterface = INET_NULL_INTERFACEID;
 
-    Inet::InetLayer * mInetLayer;
+    Inet::InetLayer * mInetLayer = nullptr;
 
-    bool mActive;
-    ConnectionState mState;
+    bool mActive           = false;
+    ConnectionState mState = ConnectionState::NotConnected;
 
     PASESessionSerializable mPairing;
 
-    DeviceStatusDelegate * mStatusDelegate;
+    DeviceStatusDelegate * mStatusDelegate = nullptr;
 
-    SecureSessionMgr * mSessionManager;
+    SecureSessionMgr * mSessionManager = nullptr;
 
-    DeviceTransportMgr * mTransportMgr;
+    DeviceTransportMgr * mTransportMgr = nullptr;
 
-    app::CommandSender * mCommandSender;
+    app::CommandSender * mCommandSender = nullptr;
 
     SecureSessionHandle mSecureSession = {};
 
-    /* Track all outstanding response callbacks for this device. The callbacks are
-       registered when a command is sent to the device, to get notified with the results. */
-    Callback::CallbackDeque mResponses;
+    uint8_t mSequenceNumber = 0;
 
-    /* Track all outstanding callbacks for attribute reports from this device. The callbacks are
-       registered when the user requests attribute reporting for device attributes. */
-    Callback::CallbackDeque mReports;
+    app::CHIPDeviceCallbacksMgr & mCallbacksMgr = app::CHIPDeviceCallbacksMgr::GetInstance();
 
     /**
      * @brief
