@@ -1054,11 +1054,11 @@ bool emberAfPluginScenesServerParseViewScene(const EmberAfClusterCommand * cmd, 
             emberAfPutInt16uInResp(ZCL_THERMOSTAT_CLUSTER_ID);
             length = &appResponseData[appResponseLength];
             emberAfPutInt8uInResp(0); // temporary length
-            emberAfPutInt16uInResp(entry.occupiedCoolingSetpointValue);
+            emberAfPutInt16uInResp(static_cast<uint16_t>(entry.occupiedCoolingSetpointValue));
             *length += 2;
             if (entry.hasOccupiedHeatingSetpointValue)
             {
-                emberAfPutInt16uInResp(entry.occupiedHeatingSetpointValue);
+                emberAfPutInt16uInResp(static_cast<uint16_t>(entry.occupiedHeatingSetpointValue));
                 *length += 2;
                 if (entry.hasSystemModeValue)
                 {
