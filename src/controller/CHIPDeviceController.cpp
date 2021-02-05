@@ -40,6 +40,7 @@
 #endif
 
 #include <app/InteractionModelEngine.h>
+#include <app/server/DataModelHandler.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPEncoding.h>
 #include <core/CHIPSafeCasts.h>
@@ -158,6 +159,8 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, PersistentStorageDelegat
 #else
     mSessionManager->SetDelegate(this);
 #endif
+
+    InitDataModelHandler();
 
     mState         = State::Initialized;
     mLocalDeviceId = localDeviceId;

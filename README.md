@@ -1,8 +1,20 @@
 # Connected Home over IP
 
-![Main](https://github.com/project-chip/connectedhomeip/workflows/Builds/badge.svg)
-![Examples](https://github.com/project-chip/connectedhomeip/workflows/Examples/badge.svg)
+![Builds](https://github.com/project-chip/connectedhomeip/workflows/Builds/badge.svg)
+
+![Examples - EFR32](https://github.com/project-chip/connectedhomeip/workflows/Build%20example%20-%20EFR32/badge.svg)
+![Examples - nRF Connect SDK](https://github.com/project-chip/connectedhomeip/workflows/Build%20example%20-%20nRF%20Connect%20SDK/badge.svg)
+![Examples - QPG6100](https://github.com/project-chip/connectedhomeip/workflows/Build%20example%20-%20QPG6100/badge.svg)
+![Examples - Linux Standalone](https://github.com/project-chip/connectedhomeip/workflows/Build%20example%20-%20Linux%20Standalone/badge.svg)
+![Examples - ESP32](https://github.com/project-chip/connectedhomeip/workflows/Build%20example%20-%20ESP32/badge.svg)
+
+![Android](https://github.com/project-chip/connectedhomeip/workflows/Android/badge.svg)
+
+![Unit / Interation Tests](https://github.com/project-chip/connectedhomeip/workflows/Unit%20/%20Interation%20Tests/badge.svg)
+![Cirque](https://github.com/project-chip/connectedhomeip/workflows/Cirque/badge.svg)
 ![QEMU](https://github.com/project-chip/connectedhomeip/workflows/QEMU/badge.svg)
+
+![ZAP Templates](https://github.com/project-chip/connectedhomeip/workflows/ZAP/badge.svg)
 
 # What is Project Connected Home over IP?
 

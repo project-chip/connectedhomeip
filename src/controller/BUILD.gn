@@ -19,6 +19,8 @@ static_library("controller") {
   output_name = "libChipController"
 
   sources = [
+    "${chip_root}/src/app/server/DataModelHandler.cpp",
+    "${chip_root}/src/app/util/CHIPDeviceCallbacksMgr.cpp",
     "CHIPCluster.cpp",
     "CHIPCluster.h",
     "CHIPClusters.cpp",

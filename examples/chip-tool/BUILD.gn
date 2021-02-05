@@ -19,15 +19,39 @@ import("${build_root}/chip/tools.gni")
 
 assert(chip_build_tools)
 
+config("includes") {
+  include_dirs = [ "." ]
+}
+
 executable("chip-tool") {
   sources = [
+    "${chip_root}/src/app/reporting/reporting-default-configuration.cpp",
+    "${chip_root}/src/app/reporting/reporting.cpp",
+    "${chip_root}/src/app/server/DataModelHandler.cpp",
+    "${chip_root}/src/app/util/af-event.cpp",
+    "${chip_root}/src/app/util/af-main-common.cpp",
+    "${chip_root}/src/app/util/attribute-size.cpp",
+    "${chip_root}/src/app/util/attribute-storage.cpp",
+    "${chip_root}/src/app/util/attribute-table.cpp",
+    "${chip_root}/src/app/util/binding-table.cpp",
+    "${chip_root}/src/app/util/chip-message-send.cpp",
+    "${chip_root}/src/app/util/client-api.cpp",
+    "${chip_root}/src/app/util/ember-print.cpp",
+    "${chip_root}/src/app/util/message.cpp",
+    "${chip_root}/src/app/util/process-cluster-message.cpp",
+    "${chip_root}/src/app/util/process-global-message.cpp",
+    "${chip_root}/src/app/util/util.cpp",
     "commands/clusters/ModelCommand.cpp",
     "commands/common/Command.cpp",
     "commands/common/Commands.cpp",
     "commands/pairing/PairingCommand.cpp",
     "commands/payload/AdditionalDataParseCommand.cpp",
     "commands/payload/SetupPayloadParseCommand.cpp",
+    "commands/reporting/ReportingCommand.cpp",
     "config/PersistentStorage.cpp",
+    "gen/CHIPClientCallbacks.cpp",
+    "gen/call-command-handler.cpp",
+    "gen/callback-stub.cpp",
     "main.cpp",
   ]
 
@@ -40,9 +64,12 @@ executable("chip-tool") {
   cflags = [ "-Wconversion" ]
 
   public_deps = [
+    "${chip_root}/src/app/server",
     "${chip_root}/src/lib",
     "${chip_root}/third_party/inipp",
   ]
+
+  public_configs = [ ":includes" ]
 
   output_dir = root_out_dir
 }

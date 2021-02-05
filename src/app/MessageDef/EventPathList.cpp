@@ -50,7 +50,7 @@ CHIP_ERROR EventPathList::Parser::CheckSchemaValidity() const
     while (CHIP_NO_ERROR == (err = reader.Next()))
     {
         VerifyOrExit(chip::TLV::AnonymousTag == reader.GetTag(), err = CHIP_ERROR_INVALID_TLV_TAG);
-        VerifyOrExit(chip::TLV::kTLVType_Path == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
+        VerifyOrExit(chip::TLV::kTLVType_List == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
 
         {
             EventPath::Parser path;

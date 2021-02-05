@@ -24,12 +24,11 @@ jobs:
         env:
             EFR32_BOARD: BRD4161A
             BUILD_TYPE: gn_efr32
-            BUILD_VERSION: 0.2.14
 
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build-efr32:0.4.18
+            image: connectedhomeip/chip-build-efr32:latest
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
                 - "/tmp/output_binaries:/tmp/output_binaries"

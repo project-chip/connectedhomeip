@@ -20,8 +20,6 @@
 #import "CHIPUIViewUtils.h"
 #import "DefaultsUtils.h"
 
-#define RESULT_DISPLAY_DURATION 5.0 * NSEC_PER_SEC
-
 @interface EchoViewController ()
 
 @property (strong, nonatomic) UITextField * messageTextField;
@@ -30,10 +28,7 @@
 @property (nonatomic, strong) UILabel * resultLabel;
 @property (nonatomic, strong) UIStackView * stackView;
 
-@property (readwrite) CHIPDeviceController * chipController;
-@property (readwrite) CHIPDevice * chipDevice;
-
-@property (readonly) CHIPToolPersistentStorageDelegate * persistentStorage;
+@property (readwrite) CHIPBasic * cluster;
 
 @end
 
@@ -46,25 +41,11 @@
     [super viewDidLoad];
     [self setupUIElements];
 
-    _persistentStorage = [[CHIPToolPersistentStorageDelegate alloc] init];
-
     // listen for taps to dismiss the keyboard
     UITapGestureRecognizer * tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dismissKeyboard)];
     [self.view addGestureRecognizer:tap];
 
-    // initialize the device controller
-    dispatch_queue_t callbackQueue = dispatch_queue_create("com.zigbee.chip.echovc.callback", DISPATCH_QUEUE_SERIAL);
-    self.chipController = [CHIPDeviceController sharedController];
-    [self.chipController setDelegate:self queue:callbackQueue];
-    [self.chipController setPersistentStorageDelegate:_persistentStorage queue:callbackQueue];
-
-    uint64_t deviceID = CHIPGetNextAvailableDeviceID();
-    if (deviceID > 1) {
-        // Let's use the last device that was paired
-        deviceID--;
-        NSError * error;
-        self.chipDevice = [self.chipController getPairedDevice:deviceID error:&error];
-    }
+    self.cluster = [[CHIPBasic alloc] initWithDevice:GetPairedDevice() endpoint:1 queue:dispatch_get_main_queue()];
 }
 
 - (void)dismissKeyboard
@@ -129,55 +110,22 @@
 
 - (IBAction)sendMessage:(id)sender
 {
+    if (!self.cluster) {
+        [self updateResult:@"Something went wrong. Cluster is not initialized."];
+    }
+
     NSString * msg = [self.messageTextField text];
     if (msg.length == 0) {
         msg = [self.messageTextField placeholder];
     }
 
-    // send message
-    if ([self.chipDevice isActive]) {
-        NSError * error;
-        BOOL didSend = [self.chipDevice sendMessage:[msg dataUsingEncoding:NSUTF8StringEncoding] error:&error];
-        if (!didSend) {
-            NSString * errorString = [@"Error: " stringByAppendingString:error.localizedDescription];
-            [self updateResult:errorString];
-        } else {
-            [self updateResult:@"Message Sent"];
-        }
-    } else {
-        [self updateResult:@"Controller not connected"];
-    }
-}
+    [self updateResult:@"MfgSpecificPing command sent..."];
 
-// MARK: CHIPDeviceControllerDelegate
-- (void)deviceControllerOnConnected
-{
-    NSLog(@"Status: Device connected");
-}
-
-- (void)deviceControllerOnError:(nonnull NSError *)error
-{
-    NSLog(@"Status: Device Controller error %@", [error description]);
-    if (error) {
-        NSString * stringError = [@"Error: " stringByAppendingString:error.description];
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 5.0), dispatch_get_main_queue(), ^{
-            [self updateResult:stringError];
-        });
-    }
-}
-
-- (void)deviceControllerOnMessage:(nonnull NSData *)message
-{
-    NSString * stringMessage;
-    if ([CHIPDevice isDataModelCommand:message] == YES) {
-        stringMessage = [CHIPDevice commandToString:message];
-    } else {
-        stringMessage = [[NSString alloc] initWithData:message encoding:NSUTF8StringEncoding];
-    }
-    NSString * resultMessage = [@"Echo Response: " stringByAppendingFormat:@"%@", stringMessage];
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 5.0), dispatch_get_main_queue(), ^{
-        [self updateResult:resultMessage];
-    });
+    [self.cluster mfgSpecificPing:^(NSError * error, NSDictionary * values) {
+        NSString * resultString = (error == nil) ? @"MfgSpecificPing command: success!"
+                                                 : [NSString stringWithFormat:@"An error occured: 0x%02lx", error.code];
+        [self updateResult:resultString];
+    }];
 }
 
 @end
