@@ -72,7 +72,7 @@ public:
 DemoTransportMgr gTransports;
 SecureSessionMgr gSessions;
 RendezvousServer gRendezvousServer;
-AdminPairingTable<> gAdminPairings;
+AdminPairingTable gAdminPairings;
 AdminId gNextAvailableAdminId = 0;
 
 ServerRendezvousAdvertisementDelegate gAdvDelegate;

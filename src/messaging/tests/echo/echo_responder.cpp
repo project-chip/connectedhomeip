@@ -63,7 +63,7 @@ int main(int argc, char * argv[])
     chip::Optional<chip::Transport::PeerAddress> peer(chip::Transport::Type::kUndefined);
     bool useTCP = false;
 
-    chip::Transport::AdminPairingTable<> admins;
+    chip::Transport::AdminPairingTable admins;
     chip::Transport::AdminPairingInfo * adminInfo = nullptr;
 
     const chip::Transport::AdminId gAdminId = 0;

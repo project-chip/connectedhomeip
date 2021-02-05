@@ -111,7 +111,7 @@ int main(int argc, char * argv[])
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::Optional<chip::Transport::PeerAddress> peer(chip::Transport::Type::kUndefined);
     const chip::Transport::AdminId gAdminId = 0;
-    chip::Transport::AdminPairingTable<> admins;
+    chip::Transport::AdminPairingTable admins;
     chip::Transport::AdminPairingInfo * adminInfo = admins.AssignAdminId(gAdminId, chip::kTestDeviceNodeId);
 
     VerifyOrExit(adminInfo != nullptr, err = CHIP_ERROR_NO_MEMORY);

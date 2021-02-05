@@ -70,7 +70,7 @@ private:
     Optional<Transport::PeerAddress> mPeer;
     SecurePairingUsingTestSecret mPairingPeerToLocal;
     SecurePairingUsingTestSecret mPairingLocalToPeer;
-    Transport::AdminPairingTable<> mAdmins;
+    Transport::AdminPairingTable mAdmins;
     Transport::AdminId mSrcAdminId  = 0;
     Transport::AdminId mDestAdminId = 1;
 };

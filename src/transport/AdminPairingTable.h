@@ -88,13 +88,12 @@ private:
     AccessControlList mACL;
 };
 
-template <size_t kMaxAdminCount = 16>
 class DLL_EXPORT AdminPairingTable
 {
 public:
     AdminPairingInfo * AssignAdminId(AdminId adminId)
     {
-        for (size_t i = 0; i < kMaxAdminCount; i++)
+        for (size_t i = 0; i < CHIP_CONFIG_MAX_DEVICE_ADMINS; i++)
         {
             if (!mStates[i].IsInitialized())
             {
@@ -130,7 +129,7 @@ public:
 
     AdminPairingInfo * FindAdmin(AdminId adminId)
     {
-        for (size_t i = 0; i < kMaxAdminCount; i++)
+        for (size_t i = 0; i < CHIP_CONFIG_MAX_DEVICE_ADMINS; i++)
         {
             if (mStates[i].IsInitialized() && mStates[i].GetAdminId() == adminId)
             {
@@ -143,14 +142,14 @@ public:
 
     void Reset()
     {
-        for (size_t i = 0; i < kMaxAdminCount; i++)
+        for (size_t i = 0; i < CHIP_CONFIG_MAX_DEVICE_ADMINS; i++)
         {
             return mStates[i].Reset();
         }
     }
 
 private:
-    AdminPairingInfo mStates[kMaxAdminCount];
+    AdminPairingInfo mStates[CHIP_CONFIG_MAX_DEVICE_ADMINS];
 };
 
 } // namespace Transport

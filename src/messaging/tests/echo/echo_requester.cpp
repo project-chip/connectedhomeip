@@ -172,7 +172,7 @@ int main(int argc, char * argv[])
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    chip::Transport::AdminPairingTable<> admins;
+    chip::Transport::AdminPairingTable admins;
     chip::Transport::AdminPairingInfo * adminInfo = nullptr;
 
     if (argc <= 1)

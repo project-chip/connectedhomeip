@@ -225,7 +225,7 @@ public:
      * @param admins         A table of device administrators
      */
     CHIP_ERROR Init(NodeId localNodeId, System::Layer * systemLayer, TransportMgrBase * transportMgr,
-                    Transport::AdminPairingTable<> * admins);
+                    Transport::AdminPairingTable * admins);
 
     /**
      * @brief
@@ -276,9 +276,9 @@ private:
     Transport::PeerConnections<CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE> mPeerConnections; // < Active connections to other peers
     State mState;                                                                       // < Initialization state of the object
 
-    SecureSessionMgrDelegate * mCB           = nullptr;
-    TransportMgrBase * mTransportMgr         = nullptr;
-    Transport::AdminPairingTable<> * mAdmins = nullptr;
+    SecureSessionMgrDelegate * mCB         = nullptr;
+    TransportMgrBase * mTransportMgr       = nullptr;
+    Transport::AdminPairingTable * mAdmins = nullptr;
 
     CHIP_ERROR SendMessage(SecureSessionHandle session, PayloadHeader & payloadHeader, PacketHeader & packetHeader,
                            System::PacketBufferHandle msgBuf, EncryptedPacketBufferHandle * bufferRetainSlot,

@@ -251,7 +251,7 @@ public:
      */
     CHECK_RETURN_VALUE
     PeerConnectionState * FindPeerConnectionState(Optional<NodeId> nodeId, NodeId localNodeId,
-                                                  Transport::AdminPairingTable<> * admins, uint16_t peerKeyId,
+                                                  Transport::AdminPairingTable * admins, uint16_t peerKeyId,
                                                   PeerConnectionState * begin)
     {
         PeerConnectionState * state = nullptr;

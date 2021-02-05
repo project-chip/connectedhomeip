@@ -201,7 +201,7 @@ protected:
     CHIP_ERROR SetPairedDeviceList(const char * pairedDeviceSerializedSet);
 
     Transport::AdminId mAdminId = 0;
-    Transport::AdminPairingTable<> mAdmins;
+    Transport::AdminPairingTable mAdmins;
 
 private:
     //////////// SecureSessionMgrDelegate Implementation ///////////////
