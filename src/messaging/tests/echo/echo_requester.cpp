@@ -53,6 +53,8 @@ constexpr size_t kMaxEchoCount = 3;
 // The CHIP Echo interval time in milliseconds.
 constexpr int32_t gEchoInterval = 1000;
 
+constexpr chip::Transport::AdminId gAdminId = 0;
+
 // The EchoClient object.
 chip::Protocols::Echo::EchoClient gEchoClient;
 
@@ -136,7 +138,7 @@ CHIP_ERROR EstablishSecureSession()
     }
 
     // Attempt to connect to the peer.
-    err = gSessionManager.NewPairing(peerAddr, chip::kTestDeviceNodeId, testSecurePairingSecret);
+    err = gSessionManager.NewPairing(peerAddr, chip::kTestDeviceNodeId, testSecurePairingSecret, gAdminId);
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -170,6 +172,9 @@ int main(int argc, char * argv[])
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+    chip::Transport::AdminPairingTable admins;
+    chip::Transport::AdminPairingInfo * adminInfo = nullptr;
+
     if (argc <= 1)
     {
         printf("Missing Echo Server IP address\n");
@@ -195,6 +200,9 @@ int main(int argc, char * argv[])
 
     InitializeChip();
 
+    adminInfo = admins.AssignAdminId(gAdminId, chip::kTestControllerNodeId);
+    VerifyOrExit(adminInfo != nullptr, err = CHIP_ERROR_NO_MEMORY);
+
     if (gUseTCP)
     {
         err = gTCPManager.Init(chip::Transport::TcpListenParameters(&chip::DeviceLayer::InetLayer)
@@ -202,7 +210,7 @@ int main(int argc, char * argv[])
                                    .SetListenPort(ECHO_CLIENT_PORT));
         SuccessOrExit(err);
 
-        err = gSessionManager.Init(chip::kTestControllerNodeId, &chip::DeviceLayer::SystemLayer, &gTCPManager);
+        err = gSessionManager.Init(chip::kTestControllerNodeId, &chip::DeviceLayer::SystemLayer, &gTCPManager, &admins);
         SuccessOrExit(err);
     }
     else
@@ -212,7 +220,7 @@ int main(int argc, char * argv[])
                                    .SetListenPort(ECHO_CLIENT_PORT));
         SuccessOrExit(err);
 
-        err = gSessionManager.Init(chip::kTestControllerNodeId, &chip::DeviceLayer::SystemLayer, &gUDPManager);
+        err = gSessionManager.Init(chip::kTestControllerNodeId, &chip::DeviceLayer::SystemLayer, &gUDPManager, &admins);
         SuccessOrExit(err);
     }
 
