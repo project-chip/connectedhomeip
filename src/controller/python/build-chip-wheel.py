@@ -42,11 +42,22 @@ parser.add_argument('--manifest', help='list of files to package')
 
 args = parser.parse_args()
 
+class InstalledScriptInfo:
+    """Information holder about a script that is to be installed."""
+
+    def __init__(self, name):
+      self.name = name
+      self.installName = os.path.splitext(name)[0]
+
+
 chipDLLName = '_ChipDeviceCtrl.so'
-deviceManagerShellName = 'chip-device-ctrl.py'
-chipControllerShellInstalledName = os.path.splitext(deviceManagerShellName)[0]
 packageName = args.package_name
 chipPackageVer = args.build_number
+
+installScripts = [
+    InstalledScriptInfo('chip-device-ctrl.py'),
+    InstalledScriptInfo('chip-repl.py'),
+]
 
 # Record the current directory at the start of execution.
 curDir = os.curdir
@@ -85,8 +96,9 @@ try:
           os.makedirs(os.path.dirname(dstFile), exist_ok=True)
           shutil.copyfile(srcFile, dstFile)
 
-    os.rename(os.path.join(tmpDir, deviceManagerShellName),
-              os.path.join(tmpDir, chipControllerShellInstalledName))
+    for script in installScripts:
+      os.rename(os.path.join(tmpDir, script.name),
+                os.path.join(tmpDir, script.installName))
 
     # Define a custom version of the bdist_wheel command that configures the
     # resultant wheel as platform-specific (i.e. not "pure"). 
@@ -94,16 +106,15 @@ try:
         def finalize_options(self):
             bdist_wheel.finalize_options(self)
             self.root_is_pure = False
+
+    requiredPackages = []
+
+    requiredPackages.append('ipython')
     
-    # Select required packages based on the target system.
     if platform.system() == 'Linux':
-        requiredPackages = [
-            'dbus-python',
-            'six',
-            'pygobject',
-        ]
-    else:
-        requiredPackages = []
+        requiredPackages.append('dbus-python')
+        requiredPackages.append('six')
+        requiredPackages.append('pygobject')
     
     #
     # Build the chip package...
@@ -136,9 +147,10 @@ try:
                 chipDLLName                   # Include the wrapper DLL as package data in the "chip" package.
             ]
         },
-        scripts=[                           # Install the Device controller Shell as an executable script in the 'bin' directory.
-            os.path.join(tmpDir, chipControllerShellInstalledName)
-        ],
+        scripts = [name for name in map(
+            lambda script: os.path.join(tmpDir, script.installName),
+            installScripts
+        )],
         install_requires=requiredPackages,
         options={
             'bdist_wheel':{

@@ -65,6 +65,7 @@ pw_python_action("python") {
       src_dir = "."
       sources = [
         "chip-device-ctrl.py",
+        "chip-repl.py",
         "chip/ChipBleBase.py",
         "chip/ChipBleUtility.py",
         "chip/ChipBluezMgr.py",
