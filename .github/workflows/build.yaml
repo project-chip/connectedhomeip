@@ -52,10 +52,7 @@ jobs:
                   queries: +security-and-quality
 
             - name: Bootstrap
-              run: |
-                  eval `dmalloc -b -l DMALLOC_LOG -i 1 high`;
-                  export G_SLICE; G_SLICE=always-malloc; true required for dmalloc compatibility;
-                  scripts/build/gn_bootstrap.sh
+              run: scripts/build/gn_bootstrap.sh
             - name: Setup Build
               run: |
                   case $BUILD_TYPE in
