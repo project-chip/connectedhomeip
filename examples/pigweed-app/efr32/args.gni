@@ -22,4 +22,4 @@ declare_args() {
   chip_build_pw_rpc_lib = true
 }
 
-default_configs_std = [ "//:std_cpp17" ]
+default_configs_std = [ "${chip_root}/config/efr32/lib/pw_rpc:std_cpp17" ]

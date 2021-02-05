@@ -27,17 +27,6 @@ assert(current_os == "freertos")
 efr32_project_dir = "${chip_root}/examples/pigweed-app/efr32"
 examples_plat_dir = "${chip_root}/examples/platform/efr32"
 
-config("cpp17") {
-  cflags_cc = [ "-std=gnu++17" ]
-  cflags_c = [ "-std=gnu11" ]
-  cflags_objc = [ "-std=gnu11" ]
-  cflags_objcc = [ "-std=gnu++17" ]
-}
-
-config("std_cpp17") {
-  configs = [ ":cpp17" ]
-}
-
 efr32_sdk("sdk") {
   include_dirs = [
     "${chip_root}/src/platform/EFR32",
