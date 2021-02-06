@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [[ ! -v K32W061_SDK_ROOT ]]; then
+if [[ ! -d $K32W061_SDK_ROOT ]]; then
     echo "K32W061_SDK_ROOT is not set"
     exit 1
 fi
