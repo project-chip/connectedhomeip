@@ -23,15 +23,45 @@
  */
 
 #pragma once
-
 #include <core/CHIPError.h>
 #include <system/TLVPacketBufferBackingStore.h>
+#include <type_traits>
 
 #define ROTATING_DEVICE_ID_COUNTER_STR_MAX_LENGTH 10
 #define ROTATING_DEVICE_ID_HASH_SUFFIX_LENGTH 16
 #define ROTATING_DEVICE_ID_MAX_LENGTH ROTATING_DEVICE_ID_COUNTER_STR_MAX_LENGTH + ROTATING_DEVICE_ID_HASH_SUFFIX_LENGTH
 
 namespace chip {
+namespace RotatingDeviceId {
+static constexpr unsigned kRotatingDeviceIdCounterStringMaxLength = 10;
+static constexpr unsigned kRotatingDeviceIdHashSuffixLength       = 16;
+static constexpr unsigned kRotatingDeviceIdMaxLength = kRotatingDeviceIdCounterStringMaxLength + kRotatingDeviceIdHashSuffixLength;
+static constexpr unsigned kRotatingDeviceIdHexMaxLength = kRotatingDeviceIdMaxLength * 2 + 1;
+} // namespace RotatingDeviceId
+
+enum class AdditionalDataFields : int8_t
+{
+    NotSpecified     = 0x00,
+    RotatingDeviceId = 0x01
+};
+
+inline AdditionalDataFields operator|(AdditionalDataFields lhs, AdditionalDataFields rhs)
+{
+    using T = std::underlying_type_t<AdditionalDataFields>;
+    return static_cast<AdditionalDataFields>(static_cast<T>(lhs) | static_cast<T>(rhs));
+}
+
+inline AdditionalDataFields & operator|=(AdditionalDataFields & lhs, AdditionalDataFields rhs)
+{
+    lhs = lhs | rhs;
+    return lhs;
+}
+
+inline AdditionalDataFields operator&(AdditionalDataFields lhs, AdditionalDataFields rhs)
+{
+    using T = std::underlying_type_t<AdditionalDataFields>;
+    return static_cast<AdditionalDataFields>(static_cast<T>(lhs) & static_cast<T>(rhs));
+}
 
 class AdditionalDataPayloadGenerator
 {
@@ -39,10 +69,11 @@ class AdditionalDataPayloadGenerator
 public:
     AdditionalDataPayloadGenerator() {}
     // Generate additional data payload (i.e. TLV encoded)
-    CHIP_ERROR generateAdditionalDataPayload(uint16_t lifetimeCounter, char * serialNumberBuffer, size_t serialNumberBufferSize,
-                                             chip::System::PacketBufferHandle & bufferHandle, bool enableRotatingDeviceId);
+    CHIP_ERROR generateAdditionalDataPayload(uint16_t lifetimeCounter, const char * serialNumberBuffer,
+                                             size_t serialNumberBufferSize, chip::System::PacketBufferHandle & bufferHandle,
+                                             AdditionalDataFields additionalDataFields);
     // Generate Device Rotating ID
-    CHIP_ERROR generateRotatingDeviceId(uint16_t lifetimeCounter, char * serialNumberBuffer, size_t serialNumberBufferSize,
+    CHIP_ERROR generateRotatingDeviceId(uint16_t lifetimeCounter, const char * serialNumberBuffer, size_t serialNumberBufferSize,
                                         char * rotatingDeviceIdBuffer, size_t rotatingDeviceIdBufferSize,
                                         size_t & rotatingDeviceIdBufferOutputSize);
 };

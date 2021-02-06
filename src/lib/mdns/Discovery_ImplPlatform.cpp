@@ -107,6 +107,22 @@ void DiscoveryImplPlatform::HandleMdnsError(void * context, CHIP_ERROR error)
     }
 }
 
+static CHIP_ERROR DiscoveryImplPlatform::GenerateRotatingDeviceId(char rotatingDeviceIdHexBuffer[],
+                                                                  size_t & rotatingDeviceIdHexBufferSize)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    char serialNumber[chip::DeviceLayer::ConfigurationManager::kMaxSerialNumberLength + 1];
+    size_t serialNumberSize  = 0;
+    uint16_t lifetimeCounter = 0;
+    SuccessOrExit(error =
+                      chip::DeviceLayer::ConfigurationMgr().GetSerialNumber(serialNumber, sizeof(serialNumber), serialNumberSize));
+    SuccessOrExit(error = chip::DeviceLayer::ConfigurationMgr().GetLifetimeCounter(lifetimeCounter));
+    SuccessOrExit(error = AdditionDataPayloadGenerator().generateRotatingDeviceId(
+                      lifetimeCounter, serialNumber, serialNumberSize, rotatingDeviceIdHexBuffer,
+                      ArraySize(rotatingDeviceIdHexBuffer), rotatingDeviceIdHexBufferSize));
+    return error;
+}
+
 CHIP_ERROR DiscoveryImplPlatform::SetupHostname()
 {
     uint8_t mac[6];    // 6 byte wifi mac
@@ -139,10 +155,7 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
     const char * subTypes[3];
     size_t subTypeSize = 0;
 #if CHIP_ENABLE_ROTATING_DEVICE_ID
-    char serialNumber[chip::DeviceLayer::ConfigurationManager::kMaxSerialNumberLength + 1];
-    size_t serialNumberSize  = 0;
-    uint16_t lifetimeCounter = 0;
-    char rotatingDeviceIdHexBuffer[ROTATING_DEVICE_ID_MAX_LENGTH * 2 + 1];
+    char rotatingDeviceIdHexBuffer[RotatingDeviceId::kRotatingDeviceIdHexMaxLength];
     size_t rotatingDeviceIdHexBufferSize = 0;
 #endif
 
@@ -179,16 +192,17 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
                                          strnlen(vendorProductBuf, sizeof(vendorProductBuf)) };
     }
 #if CHIP_ENABLE_ROTATING_DEVICE_ID
-    SuccessOrExit(error =
-                      chip::DeviceLayer::ConfigurationMgr().GetSerialNumber(serialNumber, sizeof(serialNumber), serialNumberSize));
-    SuccessOrExit(error = chip::DeviceLayer::ConfigurationMgr().GetLifetimeCounter(lifetimeCounter));
-    SuccessOrExit(error = AdditionDataPayloadGenerator().generateRotatingDeviceId(
-                      lifetimeCounter, serialNumber, serialNumberSize, rotatingDeviceIdHexBuffer,
-                      ROTATING_DEVICE_ID_MAX_LENGTH * 2 + 1, rotatingDeviceIdHexBufferSize));
+    if (ArraySize(textEntries) > textEntrySize)
+    {
+        SuccessOrExit(error = GenerateRotatingDeviceId(rotatingDeviceIdHexBuffer, rotatingDeviceIdHexBufferSize));
+        // Rotating Device ID
 
-    // Rotating Device ID
-    textEntries[textEntrySize++] = { "RI", reinterpret_cast<const uint8_t *>(rotatingDeviceIdHexBuffer),
-                                     rotatingDeviceIdHexBufferSize };
+        textEntries[textEntrySize++] = { "RI", Uint8::from_const_char(rotatingDeviceIdHexBuffer), rotatingDeviceIdHexBufferSize };
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_LIST_LENGTH;
+    }
 #endif
     if (params.GetPairingHint().HasValue() && params.GetPairingInstr().HasValue())
     {

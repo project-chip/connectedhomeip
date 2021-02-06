@@ -331,9 +331,9 @@ inline CHIP_ERROR ConfigurationManager::GetPairedAccountId(char * buf, size_t bu
 }
 
 #if CHIP_ENABLE_ROTATING_DEVICE_ID
-inline CHIP_ERROR ConfigurationManager::GetLifetimeCounter(uint16_t & rotationCouter)
+inline CHIP_ERROR ConfigurationManager::GetLifetimeCounter(uint16_t & lifetimeCounter)
 {
-    return static_cast<ImplClass *>(this)->_GetLifetimeCounter(rotationCouter);
+    return static_cast<ImplClass *>(this)->_GetLifetimeCounter(lifetimeCounter);
 }
 #endif
 
