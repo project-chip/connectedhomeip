@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -4053,6 +4053,12 @@
 #define ZCL_LAST_MESSAGE_RSSI_ATTRIBUTE_ID (0x011D)
 
 // Attribute ids for cluster: ZLL Commissioning
+
+// Client attributes
+
+// Server attributes
+
+// Attribute ids for cluster: Network Provisioning
 
 // Client attributes
 

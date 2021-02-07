@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -5663,6 +5663,225 @@
                                                                                                                                    \
                                   ZCL_GET_ENDPOINT_LIST_REQUEST_COMMAND_ID, "uuuub", startIndex, total, startIndex, count,         \
                                   endpointInformationRecordList, endpointInformationRecordListLen);
+
+/** @brief Command description for ScanNetworks
+ *
+ * Command: ScanNetworks
+ * @param ssid OCTET_STRING
+ * @param breadcrumb INT64U
+ * @param timeoutMs INT32U
+ */
+#define emberAfFillCommandNetwork                                                                                                  \
+    ProvisioningClusterScanNetworks(ssid, breadcrumb, timeoutMs)                                                                   \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_SCAN_NETWORKS_COMMAND_ID, "uuu", ssid, breadcrumb, timeoutMs);
+
+/** @brief Command description for ScanNetworksResponse
+ *
+ * Command: ScanNetworksResponse
+ * @param errorCode INT8U
+ * @param debugText CHAR_STRING
+ * @param wifiScanResults WiFiInterfaceScanResult []
+ * @param wifiScanResultsLen int
+ * @param threadScanResults ThreadInterfaceScanResult []
+ * @param threadScanResultsLen int
+ */
+#define emberAfFillCommandNetwork                                                                                                  \
+    ProvisioningClusterScanNetworksResponse(errorCode, debugText, wifiScanResults, wifiScanResultsLen, threadScanResults,          \
+                                            threadScanResultsLen)                                                                  \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_SCAN_NETWORKS_RESPONSE_COMMAND_ID, "uubb", errorCode, debugText, wifiScanResults,            \
+                                  wifiScanResultsLen, threadScanResults, threadScanResultsLen);
+
+/** @brief Command description for AddWiFiNetwork
+ *
+ * Command: AddWiFiNetwork
+ * @param ssid OCTET_STRING
+ * @param credentials OCTET_STRING
+ * @param breadcrumb INT64U
+ * @param timeoutMs INT32U
+ */
+#define emberAfFillCommandNetwork                                                                                                  \
+    ProvisioningClusterAddWiFiNetwork(ssid, credentials, breadcrumb, timeoutMs)                                                    \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_ADD_WI_FI_NETWORK_COMMAND_ID, "uuuu", ssid, credentials, breadcrumb, timeoutMs);
+
+/** @brief Command description for AddWiFiNetworkResponse
+ *
+ * Command: AddWiFiNetworkResponse
+ * @param errorCode INT8U
+ * @param debugText CHAR_STRING
+ */
+#define emberAfFillCommandNetwork                                                                                                  \
+    ProvisioningClusterAddWiFiNetworkResponse(errorCode, debugText)                                                                \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_ADD_WI_FI_NETWORK_RESPONSE_COMMAND_ID, "uu", errorCode, debugText);
+
+/** @brief Command description for UpdateWiFiNetwork
+ *
+ * Command: UpdateWiFiNetwork
+ * @param ssid OCTET_STRING
+ * @param credentials OCTET_STRING
+ * @param breadcrumb INT64U
+ * @param timeoutMs INT32U
+ */
+#define emberAfFillCommandNetwork                                                                                                  \
+    ProvisioningClusterUpdateWiFiNetwork(ssid, credentials, breadcrumb, timeoutMs)                                                 \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_UPDATE_WI_FI_NETWORK_COMMAND_ID, "uuuu", ssid, credentials, breadcrumb, timeoutMs);
+
+/** @brief Command description for UpdateWiFiNetworkResponse
+ *
+ * Command: UpdateWiFiNetworkResponse
+ * @param errorCode INT8U
+ * @param debugText CHAR_STRING
+ */
+#define emberAfFillCommandNetwork                                                                                                  \
+    ProvisioningClusterUpdateWiFiNetworkResponse(errorCode, debugText)                                                             \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_UPDATE_WI_FI_NETWORK_RESPONSE_COMMAND_ID, "uu", errorCode, debugText);
+
+/** @brief Command description for AddThreadNetwork
+ *
+ * Command: AddThreadNetwork
+ * @param operationalDataset OCTET_STRING
+ * @param breadcrumb INT64U
+ * @param timeoutMs INT32U
+ */
+#define emberAfFillCommandNetwork                                                                                                  \
+    ProvisioningClusterAddThreadNetwork(operationalDataset, breadcrumb, timeoutMs)                                                 \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_ADD_THREAD_NETWORK_COMMAND_ID, "uuu", operationalDataset, breadcrumb, timeoutMs);
+
+/** @brief Command description for AddThreadNetworkResponse
+ *
+ * Command: AddThreadNetworkResponse
+ * @param errorCode INT8U
+ * @param debugText CHAR_STRING
+ */
+#define emberAfFillCommandNetwork                                                                                                  \
+    ProvisioningClusterAddThreadNetworkResponse(errorCode, debugText)                                                              \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_ADD_THREAD_NETWORK_RESPONSE_COMMAND_ID, "uu", errorCode, debugText);
+
+/** @brief Command description for UpdateThreadNetwork
+ *
+ * Command: UpdateThreadNetwork
+ * @param operationalDataset OCTET_STRING
+ * @param breadcrumb INT64U
+ * @param timeoutMs INT32U
+ */
+#define emberAfFillCommandNetwork                                                                                                  \
+    ProvisioningClusterUpdateThreadNetwork(operationalDataset, breadcrumb, timeoutMs)                                              \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_UPDATE_THREAD_NETWORK_COMMAND_ID, "uuu", operationalDataset, breadcrumb, timeoutMs);
+
+/** @brief Command description for UpdateThreadNetworkResponse
+ *
+ * Command: UpdateThreadNetworkResponse
+ * @param errorCode INT8U
+ * @param debugText CHAR_STRING
+ */
+#define emberAfFillCommandNetwork                                                                                                  \
+    ProvisioningClusterUpdateThreadNetworkResponse(errorCode, debugText)                                                           \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_UPDATE_THREAD_NETWORK_RESPONSE_COMMAND_ID, "uu", errorCode, debugText);
+
+/** @brief Command description for RemoveNetwork
+ *
+ * Command: RemoveNetwork
+ * @param NetworkID OCTET_STRING
+ * @param Breadcrumb INT64U
+ * @param TimeoutMs INT32U
+ */
+#define emberAfFillCommandNetwork                                                                                                  \
+    ProvisioningClusterRemoveNetwork(NetworkID, Breadcrumb, TimeoutMs)                                                             \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_REMOVE_NETWORK_COMMAND_ID, "uuu", NetworkID, Breadcrumb, TimeoutMs);
+
+/** @brief Command description for RemoveNetworkResponse
+ *
+ * Command: RemoveNetworkResponse
+ * @param errorCode INT8U
+ * @param debugText CHAR_STRING
+ */
+#define emberAfFillCommandNetwork                                                                                                  \
+    ProvisioningClusterRemoveNetworkResponse(errorCode, debugText)                                                                 \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_REMOVE_NETWORK_RESPONSE_COMMAND_ID, "uu", errorCode, debugText);
+
+/** @brief Command description for EnableNetwork
+ *
+ * Command: EnableNetwork
+ * @param networkID OCTET_STRING
+ * @param breadcrumb INT64U
+ * @param timeoutMs INT32U
+ */
+#define emberAfFillCommandNetwork                                                                                                  \
+    ProvisioningClusterEnableNetwork(networkID, breadcrumb, timeoutMs)                                                             \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_ENABLE_NETWORK_COMMAND_ID, "uuu", networkID, breadcrumb, timeoutMs);
+
+/** @brief Command description for EnableNetworkResponse
+ *
+ * Command: EnableNetworkResponse
+ * @param errorCode INT8U
+ * @param debugText CHAR_STRING
+ */
+#define emberAfFillCommandNetwork                                                                                                  \
+    ProvisioningClusterEnableNetworkResponse(errorCode, debugText)                                                                 \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_ENABLE_NETWORK_RESPONSE_COMMAND_ID, "uu", errorCode, debugText);
+
+/** @brief Command description for DisableNetwork
+ *
+ * Command: DisableNetwork
+ * @param networkID OCTET_STRING
+ * @param breadcrumb INT64U
+ * @param timeoutMs INT32U
+ */
+#define emberAfFillCommandNetwork                                                                                                  \
+    ProvisioningClusterDisableNetwork(networkID, breadcrumb, timeoutMs)                                                            \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_DISABLE_NETWORK_COMMAND_ID, "uuu", networkID, breadcrumb, timeoutMs);
+
+/** @brief Command description for DisableNetworkResponse
+ *
+ * Command: DisableNetworkResponse
+ * @param errorCode INT8U
+ * @param debugText CHAR_STRING
+ */
+#define emberAfFillCommandNetwork                                                                                                  \
+    ProvisioningClusterDisableNetworkResponse(errorCode, debugText)                                                                \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_DISABLE_NETWORK_RESPONSE_COMMAND_ID, "uu", errorCode, debugText);
+
+/** @brief Command description for GetLastNetworkProvisioningResult
+ *
+ * Command: GetLastNetworkProvisioningResult
+ * @param timeoutMs INT32U
+ */
+#define emberAfFillCommandNetwork                                                                                                  \
+    ProvisioningClusterGetLastNetworkProvisioningResult(timeoutMs)                                                                 \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_GET_LAST_NETWORK_PROVISIONING_RESULT_COMMAND_ID, "u", timeoutMs);
 
 /** @brief Command description for Bind
  *

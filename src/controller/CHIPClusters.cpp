@@ -3088,9 +3088,9 @@ CHIP_ERROR NetworkProvisioningCluster::AddThreadNetwork(Callback::Cancelable * o
     return mDevice->SendCommands();
 #else
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle payload =
+    System::PacketBufferHandle encodedCommand =
         encodeNetworkProvisioningClusterAddThreadNetworkCommand(seqNum, mEndpoint, operationalDataset, breadcrumb, timeoutMs);
-    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
@@ -3129,9 +3129,9 @@ CHIP_ERROR NetworkProvisioningCluster::AddWiFiNetwork(Callback::Cancelable * onS
     return mDevice->SendCommands();
 #else
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle payload =
+    System::PacketBufferHandle encodedCommand =
         encodeNetworkProvisioningClusterAddWiFiNetworkCommand(seqNum, mEndpoint, ssid, credentials, breadcrumb, timeoutMs);
-    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
@@ -3167,9 +3167,9 @@ CHIP_ERROR NetworkProvisioningCluster::DisableNetwork(Callback::Cancelable * onS
     return mDevice->SendCommands();
 #else
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle payload =
+    System::PacketBufferHandle encodedCommand =
         encodeNetworkProvisioningClusterDisableNetworkCommand(seqNum, mEndpoint, networkID, breadcrumb, timeoutMs);
-    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
@@ -3205,9 +3205,9 @@ CHIP_ERROR NetworkProvisioningCluster::EnableNetwork(Callback::Cancelable * onSu
     return mDevice->SendCommands();
 #else
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle payload =
+    System::PacketBufferHandle encodedCommand =
         encodeNetworkProvisioningClusterEnableNetworkCommand(seqNum, mEndpoint, networkID, breadcrumb, timeoutMs);
-    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
@@ -3239,9 +3239,9 @@ CHIP_ERROR NetworkProvisioningCluster::GetLastNetworkProvisioningResult(Callback
     return mDevice->SendCommands();
 #else
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle payload =
+    System::PacketBufferHandle encodedCommand =
         encodeNetworkProvisioningClusterGetLastNetworkProvisioningResultCommand(seqNum, mEndpoint, timeoutMs);
-    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
@@ -3277,9 +3277,9 @@ CHIP_ERROR NetworkProvisioningCluster::RemoveNetwork(Callback::Cancelable * onSu
     return mDevice->SendCommands();
 #else
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle payload =
+    System::PacketBufferHandle encodedCommand =
         encodeNetworkProvisioningClusterRemoveNetworkCommand(seqNum, mEndpoint, networkID, breadcrumb, timeoutMs);
-    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
@@ -3315,9 +3315,9 @@ CHIP_ERROR NetworkProvisioningCluster::ScanNetworks(Callback::Cancelable * onSuc
     return mDevice->SendCommands();
 #else
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle payload =
+    System::PacketBufferHandle encodedCommand =
         encodeNetworkProvisioningClusterScanNetworksCommand(seqNum, mEndpoint, ssid, breadcrumb, timeoutMs);
-    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
@@ -3353,9 +3353,9 @@ CHIP_ERROR NetworkProvisioningCluster::UpdateThreadNetwork(Callback::Cancelable 
     return mDevice->SendCommands();
 #else
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle payload =
+    System::PacketBufferHandle encodedCommand =
         encodeNetworkProvisioningClusterUpdateThreadNetworkCommand(seqNum, mEndpoint, operationalDataset, breadcrumb, timeoutMs);
-    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
@@ -3394,9 +3394,9 @@ CHIP_ERROR NetworkProvisioningCluster::UpdateWiFiNetwork(Callback::Cancelable * 
     return mDevice->SendCommands();
 #else
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle payload =
+    System::PacketBufferHandle encodedCommand =
         encodeNetworkProvisioningClusterUpdateWiFiNetworkCommand(seqNum, mEndpoint, ssid, credentials, breadcrumb, timeoutMs);
-    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
@@ -3404,16 +3404,16 @@ CHIP_ERROR NetworkProvisioningCluster::UpdateWiFiNetwork(Callback::Cancelable * 
 CHIP_ERROR NetworkProvisioningCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
                                                           Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle payload = encodeNetworkProvisioningClusterDiscoverAttributes(seqNum, mEndpoint);
-    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeNetworkProvisioningClusterDiscoverAttributes(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 CHIP_ERROR NetworkProvisioningCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                                     Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                     = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle payload = encodeNetworkProvisioningClusterReadClusterRevisionAttribute(seqNum, mEndpoint);
-    return SendCommand(seqNum, std::move(payload), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeNetworkProvisioningClusterReadClusterRevisionAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
 // OnOff Cluster Commands

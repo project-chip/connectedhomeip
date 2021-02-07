@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -364,6 +364,12 @@ typedef struct _SpecialDay
     uint8_t dayIdRef;
 } EmberAfSpecialDay;
 
+// Struct for ThreadInterfaceScanResult
+typedef struct _ThreadInterfaceScanResult
+{
+    uint8_t * DiscoveryResponse;
+} EmberAfThreadInterfaceScanResult;
+
 // Struct for TierLabelsPayload
 typedef struct _TierLabelsPayload
 {
@@ -389,6 +395,16 @@ typedef struct _TransferredPhase
     uint16_t energy;
     uint16_t maxActivationDelay;
 } EmberAfTransferredPhase;
+
+// Struct for WiFiInterfaceScanResult
+typedef struct _WiFiInterfaceScanResult
+{
+    uint8_t Security;
+    uint8_t * SSID;
+    uint8_t * BSSID;
+    uint8_t Channel;
+    uint32_t FrequencyBand;
+} EmberAfWiFiInterfaceScanResult;
 
 // Struct for WriteAttributeRecord
 typedef struct _WriteAttributeRecord

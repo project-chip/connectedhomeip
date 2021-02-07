@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -420,6 +420,66 @@ NS_ASSUME_NONNULL_BEGIN
                                 change:(uint8_t)change
                      completionHandler:(ResponseHandler)completionHandler;
 - (BOOL)reportAttributeCurrentLevel:(ResponseHandler)reportHandler;
+- (BOOL)readAttributeClusterRevision:(ResponseHandler)completionHandler;
+
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
+@end
+
+NS_ASSUME_NONNULL_END
+
+NS_ASSUME_NONNULL_BEGIN
+
+@interface CHIPNetworkProvisioning : NSObject
+
+- (nullable instancetype)initWithDevice:(CHIPDevice *)device endpoint:(uint8_t)endpoint queue:(dispatch_queue_t)queue;
+- (BOOL)addThreadNetwork:(uint8_t *)operationalDataset
+    operationalDatasetLen:(uint32_t)operationalDatasetLen
+               breadcrumb:(uint64_t)breadcrumb
+                timeoutMs:(uint32_t)timeoutMs
+        completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)addWiFiNetwork:(uint8_t *)ssid
+               ssidLen:(uint32_t)ssidLen
+           credentials:(uint8_t *)credentials
+        credentialsLen:(uint32_t)credentialsLen
+            breadcrumb:(uint64_t)breadcrumb
+             timeoutMs:(uint32_t)timeoutMs
+     completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)disableNetwork:(uint8_t *)networkID
+          networkIDLen:(uint32_t)networkIDLen
+            breadcrumb:(uint64_t)breadcrumb
+             timeoutMs:(uint32_t)timeoutMs
+     completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)enableNetwork:(uint8_t *)networkID
+         networkIDLen:(uint32_t)networkIDLen
+           breadcrumb:(uint64_t)breadcrumb
+            timeoutMs:(uint32_t)timeoutMs
+    completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)getLastNetworkProvisioningResult:(uint32_t)timeoutMs completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)removeNetwork:(uint8_t *)networkID
+         networkIDLen:(uint32_t)networkIDLen
+           breadcrumb:(uint64_t)breadcrumb
+            timeoutMs:(uint32_t)timeoutMs
+    completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)scanNetworks:(uint8_t *)ssid
+              ssidLen:(uint32_t)ssidLen
+           breadcrumb:(uint64_t)breadcrumb
+            timeoutMs:(uint32_t)timeoutMs
+    completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)updateThreadNetwork:(uint8_t *)operationalDataset
+      operationalDatasetLen:(uint32_t)operationalDatasetLen
+                 breadcrumb:(uint64_t)breadcrumb
+                  timeoutMs:(uint32_t)timeoutMs
+          completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)updateWiFiNetwork:(uint8_t *)ssid
+                  ssidLen:(uint32_t)ssidLen
+              credentials:(uint8_t *)credentials
+           credentialsLen:(uint32_t)credentialsLen
+               breadcrumb:(uint64_t)breadcrumb
+                timeoutMs:(uint32_t)timeoutMs
+        completionHandler:(ResponseHandler)completionHandler;
+
 - (BOOL)readAttributeClusterRevision:(ResponseHandler)completionHandler;
 
 - (instancetype)init NS_UNAVAILABLE;

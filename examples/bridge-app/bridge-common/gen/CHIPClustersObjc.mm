@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -314,7 +314,11 @@ private:
         return NO;
     }
 
+<<<<<<< HEAD
+    CHIP_ERROR err = self.cppCluster.Move(callback, moveMode, rate, optionMask, optionOverride);
+=======
     CHIP_ERROR err = self.cppCluster.Move(onSuccess->Cancel(), onFailure->Cancel(), moveMode, rate, optionMask, optionOverride);
+>>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -339,8 +343,12 @@ private:
         return NO;
     }
 
+<<<<<<< HEAD
+    CHIP_ERROR err = self.cppCluster.MoveToLevel(callback, level, transitionTime, optionMask, optionOverride);
+=======
     CHIP_ERROR err
         = self.cppCluster.MoveToLevel(onSuccess->Cancel(), onFailure->Cancel(), level, transitionTime, optionMask, optionOverride);
+>>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -363,7 +371,11 @@ private:
         return NO;
     }
 
+<<<<<<< HEAD
+    CHIP_ERROR err = self.cppCluster.MoveToLevelWithOnOff(callback, level, transitionTime);
+=======
     CHIP_ERROR err = self.cppCluster.MoveToLevelWithOnOff(onSuccess->Cancel(), onFailure->Cancel(), level, transitionTime);
+>>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -384,7 +396,11 @@ private:
         return NO;
     }
 
+<<<<<<< HEAD
+    CHIP_ERROR err = self.cppCluster.MoveWithOnOff(callback, moveMode, rate);
+=======
     CHIP_ERROR err = self.cppCluster.MoveWithOnOff(onSuccess->Cancel(), onFailure->Cancel(), moveMode, rate);
+>>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -410,8 +426,12 @@ private:
         return NO;
     }
 
+<<<<<<< HEAD
+    CHIP_ERROR err = self.cppCluster.Step(callback, stepMode, stepSize, transitionTime, optionMask, optionOverride);
+=======
     CHIP_ERROR err = self.cppCluster.Step(
         onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime, optionMask, optionOverride);
+>>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -435,7 +455,11 @@ private:
         return NO;
     }
 
+<<<<<<< HEAD
+    CHIP_ERROR err = self.cppCluster.StepWithOnOff(callback, stepMode, stepSize, transitionTime);
+=======
     CHIP_ERROR err = self.cppCluster.StepWithOnOff(onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime);
+>>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -456,7 +480,11 @@ private:
         return NO;
     }
 
+<<<<<<< HEAD
+    CHIP_ERROR err = self.cppCluster.Stop(callback, optionMask, optionOverride);
+=======
     CHIP_ERROR err = self.cppCluster.Stop(onSuccess->Cancel(), onFailure->Cancel(), optionMask, optionOverride);
+>>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -477,7 +505,11 @@ private:
         return NO;
     }
 
+<<<<<<< HEAD
+    CHIP_ERROR err = self.cppCluster.StopWithOnOff(callback);
+=======
     CHIP_ERROR err = self.cppCluster.StopWithOnOff(onSuccess->Cancel(), onFailure->Cancel());
+>>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -720,7 +752,11 @@ private:
         return NO;
     }
 
+<<<<<<< HEAD
+    CHIP_ERROR err = self.cppCluster.Off(callback);
+=======
     CHIP_ERROR err = self.cppCluster.Off(onSuccess->Cancel(), onFailure->Cancel());
+>>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -741,7 +777,11 @@ private:
         return NO;
     }
 
+<<<<<<< HEAD
+    CHIP_ERROR err = self.cppCluster.OffWithEffect(callback, effectId, effectVariant);
+=======
     CHIP_ERROR err = self.cppCluster.OffWithEffect(onSuccess->Cancel(), onFailure->Cancel(), effectId, effectVariant);
+>>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -762,7 +802,11 @@ private:
         return NO;
     }
 
+<<<<<<< HEAD
+    CHIP_ERROR err = self.cppCluster.On(callback);
+=======
     CHIP_ERROR err = self.cppCluster.On(onSuccess->Cancel(), onFailure->Cancel());
+>>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -783,7 +827,11 @@ private:
         return NO;
     }
 
+<<<<<<< HEAD
+    CHIP_ERROR err = self.cppCluster.OnWithRecallGlobalScene(callback);
+=======
     CHIP_ERROR err = self.cppCluster.OnWithRecallGlobalScene(onSuccess->Cancel(), onFailure->Cancel());
+>>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -807,7 +855,11 @@ private:
         return NO;
     }
 
+<<<<<<< HEAD
+    CHIP_ERROR err = self.cppCluster.OnWithTimedOff(callback, onOffControl, onTime, offWaitTime);
+=======
     CHIP_ERROR err = self.cppCluster.OnWithTimedOff(onSuccess->Cancel(), onFailure->Cancel(), onOffControl, onTime, offWaitTime);
+>>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -828,7 +880,11 @@ private:
         return NO;
     }
 
+<<<<<<< HEAD
+    CHIP_ERROR err = self.cppCluster.Toggle(callback);
+=======
     CHIP_ERROR err = self.cppCluster.Toggle(onSuccess->Cancel(), onFailure->Cancel());
+>>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
