@@ -618,6 +618,7 @@ bool emberAfDiscoverCommandsReceivedResponseCallback(ClusterId clusterId, uint16
 {{#all_user_cluster_commands}}
 {{#if (isStrEqual clusterName parent.name)}}
 {{#if (isCommandAvailable parent.side incoming outgoing commandSource name)}}
+{{#if (isStrEndsWith name "Response")}}
 bool emberAf{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback({{#zcl_command_arguments}}{{asUnderlyingZclType type}} {{asSymbol label}}{{#unless (isLastElement index count)}}, {{/unless}}{{/zcl_command_arguments}})
 {
     ChipLogProgress(Zcl, "{{asCamelCased name false}}:");
@@ -647,6 +648,7 @@ bool emberAf{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}
     return true;
 }
 
+{{/if}}
 {{/if}}
 {{/if}}
 {{/all_user_cluster_commands}}
