@@ -396,6 +396,8 @@ CHIP_ERROR BLEManagerImpl::HandleGAPDisconnect(const ChipDeviceEvent * event)
         switch (connEvent->HciResult)
         {
         case BT_HCI_ERR_REMOTE_USER_TERM_CONN:
+            // Do not treat proper connection termination as an error and exit.
+            VerifyOrExit(!ConfigurationMgr().IsFullyProvisioned(), );
             disconReason = BLE_ERROR_REMOTE_DEVICE_DISCONNECTED;
             break;
         case BT_HCI_ERR_LOCALHOST_TERM_CONN:
@@ -408,6 +410,7 @@ CHIP_ERROR BLEManagerImpl::HandleGAPDisconnect(const ChipDeviceEvent * event)
         HandleConnectionError(connEvent->BtConn, disconReason);
     }
 
+exit:
     // Unref bt_conn before scheduling DriveBLEState.
     bt_conn_unref(connEvent->BtConn);
 
