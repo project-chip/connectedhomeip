@@ -37,7 +37,7 @@
 #include <string>
 
 namespace chip {
-namespace SetupPayload {
+namespace SetupPayloadData {
 
 constexpr uint8_t kRotatingDeviceIdLength = 18;
 constexpr uint8_t kRotatingDeviceIdTag    = 0x00;
@@ -48,5 +48,5 @@ public:
     std::string rotatingDeviceId;
 };
 
-} // namespace SetupPayload
+} // namespace SetupPayloadData
 } // namespace chip
