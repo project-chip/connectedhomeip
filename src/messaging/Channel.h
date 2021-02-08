@@ -66,14 +66,6 @@ namespace Messaging {
 class ChannelBuilder
 {
 public:
-    enum class NetworkPreference
-    {
-        kDefault,
-        kHighBandwidth,
-        kLowLatency,
-        kLowPowerConsumption,
-    };
-
     enum class TransportPreference
     {
         kConnectionless,
@@ -98,13 +90,6 @@ public:
     }
     NodeId GetPeerNodeId() const { return mPeerNodeId; }
 
-    ChannelBuilder & SetNetworkPreference(NetworkPreference preference)
-    {
-        mNetworkPreference = preference;
-        return *this;
-    }
-    NetworkPreference GetNetworkPreference() const { return mNetworkPreference; }
-
     ChannelBuilder & SetTransportPreference(TransportPreference preference)
     {
         mTransportPreference = preference;
@@ -119,19 +104,19 @@ public:
     }
     SessionType GetSessionType() const { return mSessionType; }
 
-    uint16_t GetPeerKeyID() const { return mCaseParameters.mPeerKeyId; }
+    uint16_t GetPeerKeyID() const { return mSessionParameters.mCaseParameters.mPeerKeyId; }
     ChannelBuilder & SetPeerKeyID(uint16_t keyId)
     {
         assert(mSessionType == SessionType::kCASE);
-        mCaseParameters.mPeerKeyId = keyId;
+        mSessionParameters.mCaseParameters.mPeerKeyId = keyId;
         return *this;
     }
 
-    uint32_t GetPeerSetUpPINCode() const { return mPaseParameters.mPeerSetUpPINCode; }
+    uint32_t GetPeerSetUpPINCode() const { return mSessionParameters.mPaseParameters.mPeerSetUpPINCode; }
     ChannelBuilder & SetPeerSetUpPINCode(uint32_t peerPINCode)
     {
         assert(mSessionType == SessionType::kPASE);
-        mPaseParameters.mPeerSetUpPINCode = peerPINCode;
+        mSessionParameters.mPaseParameters.mPeerSetUpPINCode = peerPINCode;
         return *this;
     }
 
@@ -144,10 +129,9 @@ public:
 
 private:
     NodeId mPeerNodeId                       = kUndefinedNodeId;
-    NetworkPreference mNetworkPreference     = NetworkPreference::kDefault;
     TransportPreference mTransportPreference = TransportPreference::kDefault;
     SessionType mSessionType                 = SessionType::kDefault;
-    union
+    union SessionParameters
     {
         struct
         {
@@ -157,7 +141,7 @@ private:
         {
             uint32_t mPeerSetUpPINCode;
         } mPaseParameters;
-    };
+    } mSessionParameters;
 
     Optional<Inet::IPAddress> mForcePeerAddr;
 };
@@ -182,11 +166,10 @@ class ChannelContextHandleAssociation;
  *    keep the channel available and ready for use, such that a message can be
  *    sent immediately to the peer.
  *
- *    The ChannelHandle controls the lifespan of the channel. The ChannelHandle
- *    objects are not copyable, so there can be only one instance referring to
- *    the channel. When the handle is released, the channel will be flagged as
- *    pending close, and if there is no active exchange which is using the
- *    channel, the channel will be closed.
+ *    The ChannelHandle controls the lifespan of the channel. When the handle
+ *    is released, the channel will be flagged as pending close, and if there
+ *    is no active exchange which is using the channel, the channel will be
+ *    closed.
  *
  *    The ChannelHandle will track channel status, and notify applications
  *    when the channel state changes via ChannelDelegate.
@@ -216,10 +199,24 @@ public:
         return *this;
     }
 
+    /*
+     * @brief
+     *   Get the state of the channel (@see ChannelContext).
+     */
+    ChannelState GetState() const;
+
+    /*
+     * @brief
+     *  Create a new exchange on the channel.
+     *
+     * @pre GetState() == ChannelState::kReady
+     */
     ExchangeContext * NewExchange(ExchangeDelegate * delegate);
 
-    // public APIs
-    ChannelState GetState() const;
+    /*
+     * @brief
+     *   Release the channel.
+     */
     void Release();
 
 private:
