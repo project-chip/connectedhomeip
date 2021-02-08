@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2021 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,27 +15,17 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/efr32_sdk.gni")
-
+import("//build_overrides/pigweed.gni")
 import("${build_root}/config/defaults.gni")
+
+import("${chip_root}/config/efr32/lib/pw_rpc/pw_rpc.gni")
 import("${efr32_sdk_build_root}/efr32_executable.gni")
 import("${efr32_sdk_build_root}/efr32_sdk.gni")
 
 assert(current_os == "freertos")
 
-efr32_project_dir = "${chip_root}/examples/lighting-app/efr32"
+efr32_project_dir = "${chip_root}/examples/pigweed-app/efr32"
 examples_plat_dir = "${chip_root}/examples/platform/efr32"
-
-declare_args() {
-  # Dump memory usage at link time.
-  chip_print_memory_usage = false
-}
-
-show_qr_code = true
-
-# BRD4166A --> ThunderBoard Sense 2 (No LCD)
-if (efr32_board == "BRD4166A") {
-  show_qr_code = false
-}
 
 efr32_sdk("sdk") {
   include_dirs = [
@@ -45,11 +35,6 @@ efr32_sdk("sdk") {
     "${examples_plat_dir}/${efr32_family}/${efr32_board}",
   ]
 
-  sources = [
-    "${efr32_project_dir}/include/CHIPProjectConfig.h",
-    "${efr32_project_dir}/include/FreeRTOSConfig.h",
-  ]
-
   defines = []
   if (is_debug) {
     defines += [ "BUILD_RELEASE=0" ]
@@ -57,72 +42,64 @@ efr32_sdk("sdk") {
     defines += [ "BUILD_RELEASE=1" ]
   }
 
-  defines += [ "BOARD_ID=${efr32_board}" ]
+  defines += [
+    "BOARD_ID=${efr32_board}",
+    "HAL_VCOM_ENABLE = 1",
+    "EFR32_LOG_ENABLED =1",
+  ]
 }
 
-efr32_executable("lighting_app") {
+efr32_executable("pigweed_app") {
   include_dirs = []
   defines = []
-  output_name = "chip-efr32-lighting-example.out"
+  output_name = "chip-efr32-pigweed-example.out"
 
   public_deps = [
     ":sdk",
-    "${chip_root}/examples/common/QRCode",
-    "${chip_root}/examples/lighting-app/lighting-common",
+    "$dir_pw_assert",
+    "${chip_root}/config/efr32/lib/pw_rpc:pw_rpc",
+    "${chip_root}/examples/common/pigweed:system_rpc_server",
     "${chip_root}/src/lib",
-    "${chip_root}/src/setup_payload",
-    "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
-    "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
-    "${chip_root}/third_party/openthread/repo:libopenthread-cli-ftd",
-    "${chip_root}/third_party/openthread/repo:libopenthread-ftd",
+    "${examples_plat_dir}/pw_sys_io:pw_sys_io_efr32",
   ]
 
   include_dirs += [
     "include",
-    "${chip_root}/src/app/util",
-    "${chip_root}/src/app/server",
     "${examples_plat_dir}",
     "${examples_plat_dir}/${efr32_family}/${efr32_board}",
+    "${examples_plat_dir}/pw_sys_io/public",
+    "${dir_pigweed}/pw_sys_io/public",
+    "${dir_pigweed}/pw_span/public_overrides",
+    "${dir_pigweed}/pw_span/public",
+    "${dir_pigweed}/pw_polyfill/public",
+    "${dir_pigweed}/pw_polyfill/standard_library_public",
+    "${dir_pigweed}/pw_polyfill/public_overrides",
+    "${dir_pigweed}/pw_status/public",
+    "${dir_pigweed}/pw_preprocessor/public",
+    "${dir_pigweed}/pw_rpc/system_server/public",
   ]
 
   sources = [
     "${examples_plat_dir}/${efr32_family}/${efr32_board}/init_board.c",
     "${examples_plat_dir}/${efr32_family}/${efr32_board}/init_mcu.c",
     "${examples_plat_dir}/LEDWidget.cpp",
-    "${examples_plat_dir}/Service.cpp",
-    "${examples_plat_dir}/init_otSystem.c",
-    "src/AppTask.cpp",
-    "src/ButtonHandler.cpp",
-    "src/LightingManager.cpp",
-    "src/ZclCallbacks.cpp",
+    "${examples_plat_dir}/uart.c",
     "src/main.cpp",
   ]
 
-  if (show_qr_code) {
-    sources += [ "${examples_plat_dir}/display/lcd.c" ]
-
-    defines += [ "DISPLAY_ENABLED" ]
-  }
   output_dir = root_out_dir
 
   if (efr32_family == "efr32mg12") {
-    ldscript = "${efr32_project_dir}/ldscripts/efr32-light-example-MG12P.ld"
+    ldscript = "${efr32_project_dir}/ldscripts/efr32-pigweed-example-MG12P.ld"
   } else if (efr32_family == "efr32mg21") {
-    ldscript = "${efr32_project_dir}/ldscripts/efr32-light-example-MG21.ld"
+    ldscript = "${efr32_project_dir}/ldscripts/efr32-pigweed-example-MG21.ld"
   }
 
   ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
-
-  if (chip_print_memory_usage) {
-    ldflags += [
-      "-Wl,--print-memory-usage",
-      "-fstack-usage",
-    ]
-  }
 }
 
 group("efr32") {
-  deps = [ ":lighting_app" ]
+  deps = [ ":pigweed_app" ]
 }
 
 group("default") {
