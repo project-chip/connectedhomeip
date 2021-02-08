@@ -22,9 +22,9 @@ set -e
 
 source "$(dirname "$0")/../../scripts/activate.sh"
 
-sdk_root="$(pwd)/third_party/efr32_sdk/repo"
+sdk_root="$PWD/third_party/efr32_sdk/repo"
 
-if [ ! -d $sdk_root ]; then
+if [ ! -d "$sdk_root" ]; then
     echo "ERROR!!!"
     echo "Could not find EFR32 SDK with path :  $sdk_root"
     echo "Make sure you're running the script from the root of project CHIP"
