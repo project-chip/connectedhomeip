@@ -303,79 +303,13 @@ CHIP_ERROR pychip_GetDeviceByNodeId(chip::DeviceController::ChipDeviceController
     return devCtrl->GetDeviceController()->GetDevice(nodeId, device);
 }
 
-#if _CHIP_USE_LOGGING && CHIP_LOG_ENABLE_DYNAMIC_LOGING_FUNCTION
-
-// A pointer to the python logging function.
-static LogMessageFunct sLogMessageFunct = NULL;
-
-// This function is called by the Chip logging code whenever a developer message
-// is logged.  It serves as glue to adapt the logging arguments to what is expected
-// by the python code.
-// NOTE that this function MUST be thread-safe.
-static void LogMessageToPython(uint8_t module, uint8_t category, const char * msg, va_list ap)
-{
-    if (IsCategoryEnabled(category))
-    {
-        // Capture the timestamp of the log message.
-        struct timeval tv;
-        gettimeofday(&tv, NULL);
-
-        // Get the module name
-        char moduleName[chip::Logging::kMaxModuleNameLen + 1];
-        ::chip:: ::Logging::GetModuleName(moduleName, sizeof(moduleName), module);
-
-        // Format the log message into a dynamic memory buffer, growing the
-        // buffer as needed to fit the message.
-        char * msgBuf                    = NULL;
-        size_t msgBufSize                = 0;
-        size_t msgSize                   = 0;
-        constexpr size_t kInitialBufSize = 120;
-        do
-        {
-            va_list apCopy;
-            va_copy(apCopy, ap);
-
-            msgBufSize = max(msgSize + 1, kInitialBufSize);
-            msgBuf     = (char *) realloc(msgBuf, msgBufSize);
-            if (msgBuf == NULL)
-            {
-                return;
-            }
-
-            int res = vsnprintf(msgBuf, msgBufSize, msg, apCopy);
-            if (res < 0)
-            {
-                return;
-            }
-            msgSize = (size_t) res;
-
-            va_end(apCopy);
-        } while (msgSize >= msgBufSize);
-
-        // Call the configured python logging function.
-        sLogMessageFunct((int64_t) tv.tv_sec, (int64_t) tv.tv_usec, moduleName, category, msgBuf);
-
-        // Release the message buffer.
-        free(msgBuf);
-    }
-}
-
 void pychip_Stack_SetLogFunct(LogMessageFunct logFunct)
 {
-    if (logFunct != NULL)
-    {
-        sLogMessageFunct = logFunct;
-        ::chip::Logging::SetLogFunct(LogMessageToPython);
-    }
-    else
-    {
-        sLogMessageFunct = NULL;
-        ::chip::Logging::SetLogFunct(NULL);
-    }
+    // TODO: determine if log redirection is supposed to be functioning in CHIP
+    //
+    // Background: original log baseline supported 'redirect logs to this
+    // function' however CHIP does not currently provide this.
+    //
+    // Ideally log redirection should work so that python code can do things
+    // like using the log module.
 }
-
-#else // CHIP_LOG_ENABLE_DYNAMIC_LOGING_FUNCTION
-
-void pychip_Stack_SetLogFunct(LogMessageFunct logFunct) {}
-
-#endif // CHIP_LOG_ENABLE_DYNAMIC_LOGING_FUNCTION

@@ -104,7 +104,7 @@ class ChipLogFormatter(logging.Formatter):
     ):
         fmt = "%(message)s"
         if logModulePrefix:
-            fmt = "WEAVE:%(chip-module)s: " + fmt
+            fmt = "CHIP:%(chip-module)s: " + fmt
         if logLevel:
             fmt = "%(levelname)s:" + fmt
         if datefmt is not None or logTimestamp:
@@ -212,7 +212,7 @@ class ChipStack(object):
             moduleName = ChipUtility.CStringToString(moduleName)
             message = ChipUtility.CStringToString(message)
             if self.addModulePrefixToLogMessage:
-                message = "WEAVE:%s: %s" % (moduleName, message)
+                message = "CHIP:%s: %s" % (moduleName, message)
             logLevel = LogCategory.categoryToLogLevel(logCat)
             msgAttrs = {
                 "chip-module": moduleName,
