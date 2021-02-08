@@ -598,7 +598,8 @@ void PacketBufferHandle::RightSizeForMemoryAlloc()
 
 namespace Encoding {
 
-void PacketBufferWriterUtil::Initialize(BufferWriter & aBufferWriter, System::PacketBufferHandle & aPacket, size_t aAvailableSize, uint16_t aReservedSize)
+void PacketBufferWriterUtil::Initialize(BufferWriter & aBufferWriter, System::PacketBufferHandle & aPacket, size_t aAvailableSize,
+                                        uint16_t aReservedSize)
 {
     aPacket = System::PacketBufferHandle::New(aAvailableSize, aReservedSize);
     if (!aPacket.IsNull())
