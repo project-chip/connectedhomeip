@@ -168,7 +168,6 @@ LogCategory PersistentStorage::GetLoggingLevel()
             chipLogLevel = kLogCategory_Detail;
         }
     }
-}
 
-return chipLogLevel;
+    return chipLogLevel;
 }
