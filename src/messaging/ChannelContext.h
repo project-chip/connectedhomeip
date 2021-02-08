@@ -65,20 +65,19 @@ public:
  *  new channel to replace the failed channel
  *
  *  Preparing Substates:
- *    W: WaitingForInterface, immediately after a code reboot, the network interface may not ready, wait for it.
  *    A: AddressResolving, use mDNS to resolve the node address
  *    P: PasePairing, do SPAKE2 key exchange
  *    PD: PasePairingDone, wait for OnNewConnection from SecureSessionManager
  *    C: CasePairing, do SIGMA key exchange
  *    CD: CasePairingDone, wait for OnNewConnection from SecureSessionManager
  *
- *                            +---+   +----+
- *                         +->| P |-->| PD |--+
- *  /---\   +---+   +---+  |  +---+   +----+  |   /---\
- *  |   |-->| W |-->| A |--+                  +-->| O |
- *  \---/   +---+   +---+  |  +---+   +----+  |   \---/
- *                         +->| C |-->| CD |--+
- *                            +---+   +----+
+ *                    +---+   +----+
+ *                 +->| P |-->| PD |--+
+ *  /---\   +---+  |  +---+   +----+  |   /---\
+ *  |   |-->| A |--+                  +-->| O |
+ *  \---/   +---+  |  +---+   +----+  |   \---/
+ *                 +->| C |-->| CD |--+
+ *                    +---+   +----+
  */
 class ChannelContext : public ReferenceCounted<ChannelContext, ChannelContextDeletor>, public SessionEstablishmentDelegate
 {
@@ -86,12 +85,18 @@ public:
     ChannelContext(ExchangeManager * exchangeManager) : mState(ChannelState::kNone), mExchangeManager(exchangeManager) {}
 
     void Start(const ChannelBuilder & builder);
+
+    /*
+     * @brief
+     *  Create a new exchange on the channel.
+     *
+     * @pre GetState() == ChannelState::kReady
+     */
     ExchangeContext * NewExchange(ExchangeDelegate * delegate);
 
     ChannelState GetState() const { return mState; }
 
     bool MatchNodeId(NodeId nodeId);
-    bool MatchNetworkPreference(ChannelBuilder::NetworkPreference preference);
     bool MatchTransport(Transport::Type transport);
     bool MatchTransportPreference(ChannelBuilder::TransportPreference transport);
     bool MatchSessionType(ChannelBuilder::SessionType type);
@@ -109,6 +114,7 @@ public:
     void OnNewConnection(SecureSessionHandle session);
     void OnConnectionExpired(SecureSessionHandle session);
 
+    // Pairing callbacks
     CHIP_ERROR HandlePairingMessage(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
                                     System::PacketBufferHandle && msg);
     CHIP_ERROR SendSessionEstablishmentMessage(const PacketHeader & header, const Transport::PeerAddress & peerAddress,
@@ -125,7 +131,6 @@ private:
 
     enum class PrepareState
     {
-        kWaitingForInterface,
         kAddressResolving,
         kPasePairing,
         kPasePairingDone,
@@ -140,7 +145,6 @@ private:
         struct PrepareVars
         {
             PrepareState mState;
-            Inet::InterfaceId mInterface;
             Inet::IPAddressType mAddressType;
             Inet::IPAddress mAddress;
             union Session
@@ -153,7 +157,6 @@ private:
 
         struct ReadyVars
         {
-            Inet::InterfaceId mInterface;
             SecureSessionHandle mSession;
         } mReady;
     } mStateVars;

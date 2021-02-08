@@ -176,7 +176,7 @@ void CheckExchangeChannels(nlTestSuite * inSuite, void * inContext)
 
     // create unsolicited exchange
     MockAppDelegate mockUnsolicitedAppDelegate;
-    CHIP_ERROR err = ctx.GetExchangeManager().RegisterUnsolicitedMessageHandler(0x0001, 0x0001, &mockUnsolicitedAppDelegate);
+    CHIP_ERROR err = ctx.GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(0x0001, 0x0001, &mockUnsolicitedAppDelegate);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // create the channel
