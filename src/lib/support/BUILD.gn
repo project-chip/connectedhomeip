@@ -96,7 +96,7 @@ static_library("support") {
   if (current_os == "android") {
     sources += [ "logging/Logging_android.cpp" ]
     libs += [ "log" ]
-  } 
+  }
 
   cflags = [ "-Wconversion" ]
 
