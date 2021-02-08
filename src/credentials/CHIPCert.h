@@ -142,10 +142,10 @@ enum class KeyUsageFlags : uint16_t
 enum class CertFlags : uint16_t
 {
     kExtPresent_BasicConstraints = 0x0001, /**< Basic constraints extension is present in the certificate. */
-    kExtPresent_KeyUsage         = 0x0002, /**< Key usage extention is present in the certificate. */
-    kExtPresent_ExtendedKeyUsage = 0x0004, /**< Extended key usage extention is present in the certificate. */
-    kExtPresent_SubjectKeyId     = 0x0008, /**< Subject key identifier extention is present in the certificate. */
-    kExtPresent_AuthKeyId        = 0x0010, /**< Authority key identifier extention is present in the certificate. */
+    kExtPresent_KeyUsage         = 0x0002, /**< Key usage extension is present in the certificate. */
+    kExtPresent_ExtendedKeyUsage = 0x0004, /**< Extended key usage extension is present in the certificate. */
+    kExtPresent_SubjectKeyId     = 0x0008, /**< Subject key identifier extension is present in the certificate. */
+    kExtPresent_AuthKeyId        = 0x0010, /**< Authority key identifier extension is present in the certificate. */
     kPathLenConstraintPresent    = 0x0020, /**< Path length constraint is present in the certificate. */
     kIsCA                        = 0x0040, /**< Indicates that certificate is a CA certificate. */
     kIsTrustAnchor               = 0x0080, /**< Indicates that certificate is a trust anchor. */
