@@ -14,8 +14,12 @@
 namespace chip {
 namespace Logging {
 
-if (IsCategoryEnabled(category))
+void LogV(uint8_t module, uint8_t category, const char * msg, va_list v)
 {
+    if (!IsCategoryEnabled(category))
+    {
+        return;
+    }
 
     char moduleName[chip::Logging::kMaxModuleNameLen + 1];
     GetModuleName(moduleName, sizeof(moduleName), module);
@@ -62,7 +66,6 @@ if (IsCategoryEnabled(category))
     fprintf(stdout, "%s\033[0m\n", formattedMsg);
 #endif
 }
-} // namespace Logging
 
-} // namespace chip
+} // namespace Logging
 } // namespace chip
