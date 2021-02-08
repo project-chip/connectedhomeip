@@ -179,14 +179,7 @@ enum LogCategory
      */
     kLogCategory_Detail = 3,
 
-    /*!<
-     *   Indicates a category of log message that describes information
-     *   needed by IE and QA teams for automated testing.
-     *
-     */
-    kLogCategory_Retain = 4,
-
-    kLogCategory_Max = kLogCategory_Retain
+    kLogCategory_Max = kLogCategory_Detail,
 };
 
 extern void LogV(uint8_t module, uint8_t category, const char * msg, va_list args);

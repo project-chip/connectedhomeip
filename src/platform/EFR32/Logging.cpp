@@ -163,7 +163,6 @@ void LogV(uint8_t module, uint8_t category, const char * aFormat, va_list v)
             strcpy(formattedMsg, LOG_ERROR);
             break;
         case kLogCategory_Progress:
-        case kLogCategory_Retain:
         default:
             strcpy(formattedMsg, LOG_INFO);
             break;
