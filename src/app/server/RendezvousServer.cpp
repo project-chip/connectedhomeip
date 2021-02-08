@@ -36,9 +36,9 @@ namespace chip {
 RendezvousServer::RendezvousServer() : mRendezvousSession(this) {}
 
 CHIP_ERROR RendezvousServer::Init(const RendezvousParameters & params, TransportMgrBase * transportMgr,
-                                  SecureSessionMgr * sessionMgr)
+                                  SecureSessionMgr * sessionMgr, Transport::AdminPairingInfo * admin)
 {
-    return mRendezvousSession.Init(params, transportMgr, sessionMgr);
+    return mRendezvousSession.Init(params, transportMgr, sessionMgr, admin);
 }
 
 void RendezvousServer::OnRendezvousError(CHIP_ERROR err)

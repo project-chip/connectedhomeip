@@ -80,17 +80,17 @@ static NSString * const kErrorGetPairedDevice = @"Failure while trying to retrie
         }
 
         _cppCommissioner = new chip::Controller::DeviceCommissioner();
-        if ([self checkForInitError:(_cppCommissioner) logMsg:kErrorCommissionerCreate]) {
+        if ([self checkForInitError:(_cppCommissioner != nullptr) logMsg:kErrorCommissionerCreate]) {
             return nil;
         }
 
         _pairingDelegateBridge = new CHIPDevicePairingDelegateBridge();
-        if ([self checkForInitError:(_pairingDelegateBridge) logMsg:kErrorPairingInit]) {
+        if ([self checkForInitError:(_pairingDelegateBridge != nullptr) logMsg:kErrorPairingInit]) {
             return nil;
         }
 
         _persistentStorageDelegateBridge = new CHIPPersistentStorageDelegateBridge();
-        if ([self checkForInitError:(_persistentStorageDelegateBridge) logMsg:kErrorPersistentStorageInit]) {
+        if ([self checkForInitError:(_persistentStorageDelegateBridge != nullptr) logMsg:kErrorPersistentStorageInit]) {
             return nil;
         }
 
@@ -100,7 +100,7 @@ static NSString * const kErrorGetPairedDevice = @"Failure while trying to retrie
         }
 
         _chipSelectQueue = dispatch_queue_create(CHIP_SELECT_QUEUE, DISPATCH_QUEUE_SERIAL);
-        if ([self checkForInitError:(_chipSelectQueue) logMsg:kErrorNetworkDispatchQueueInit]) {
+        if ([self checkForInitError:(_chipSelectQueue != nil) logMsg:kErrorNetworkDispatchQueueInit]) {
             return nil;
         }
 

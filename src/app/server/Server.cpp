@@ -36,6 +36,7 @@
 #include <support/logging/CHIPLogging.h>
 #include <sys/param.h>
 #include <system/SystemPacketBuffer.h>
+#include <transport/AdminPairingTable.h>
 #include <transport/SecureSessionMgr.h>
 
 using namespace ::chip;
@@ -71,6 +72,8 @@ public:
 DemoTransportMgr gTransports;
 SecureSessionMgr gSessions;
 RendezvousServer gRendezvousServer;
+AdminPairingTable gAdminPairings;
+AdminId gNextAvailableAdminId = 0;
 
 ServerRendezvousAdvertisementDelegate gAdvDelegate;
 
@@ -90,7 +93,12 @@ static CHIP_ERROR OpenPairingWindow(uint32_t pinCode, uint16_t discriminator)
     params.SetSetupPINCode(pinCode);
 #endif // CONFIG_NETWORK_LAYER_BLE
 
-    return gRendezvousServer.Init(std::move(params), &gTransports, &gSessions);
+    AdminId admin                = gNextAvailableAdminId;
+    AdminPairingInfo * adminInfo = gAdminPairings.AssignAdminId(admin);
+    VerifyOrReturnError(adminInfo != nullptr, CHIP_ERROR_NO_MEMORY);
+    gNextAvailableAdminId++;
+
+    return gRendezvousServer.Init(std::move(params), &gTransports, &gSessions, adminInfo);
 }
 
 class ServerCallback : public SecureSessionMgrDelegate
@@ -243,7 +251,7 @@ void InitServer(AppDelegate * delegate)
 #endif
     SuccessOrExit(err);
 
-    err = gSessions.Init(chip::kTestDeviceNodeId, &DeviceLayer::SystemLayer, &gTransports);
+    err = gSessions.Init(chip::kTestDeviceNodeId, &DeviceLayer::SystemLayer, &gTransports, &gAdminPairings);
     SuccessOrExit(err);
 
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
@@ -259,8 +267,11 @@ void InitServer(AppDelegate * delegate)
     // Only in the cirque test this is enabled with --args='bypass_rendezvous=true'
     if (isRendezvousBypassed())
     {
+        AdminPairingInfo * adminInfo = gAdminPairings.AssignAdminId(gNextAvailableAdminId);
+        VerifyOrExit(adminInfo != nullptr, err = CHIP_ERROR_NO_MEMORY);
+        adminInfo->SetNodeId(chip::kTestDeviceNodeId);
         ChipLogProgress(AppServer, "Rendezvous and Secure Pairing skipped. Using test secret.");
-        err = gSessions.NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing);
+        err = gSessions.NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing, gNextAvailableAdminId);
         SuccessOrExit(err);
     }
     else if (DeviceLayer::ConnectivityMgr().IsWiFiStationProvisioned() || DeviceLayer::ConnectivityMgr().IsThreadProvisioned())

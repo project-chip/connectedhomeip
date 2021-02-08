@@ -71,8 +71,8 @@ CHIP_ERROR NetworkProvisioning::HandleNetworkProvisioningMessage(uint8_t msgType
     case NetworkProvisioning::MsgTypes::kWiFiAssociationRequest: {
         char SSID[chip::DeviceLayer::Internal::kMaxWiFiSSIDLength];
         char passwd[chip::DeviceLayer::Internal::kMaxWiFiKeyLength];
-        BufBound bbufSSID(Uint8::from_char(SSID), chip::DeviceLayer::Internal::kMaxWiFiSSIDLength);
-        BufBound bbufPW(Uint8::from_char(passwd), chip::DeviceLayer::Internal::kMaxWiFiKeyLength);
+        Encoding::LittleEndian::BufferWriter bbufSSID(Uint8::from_char(SSID), chip::DeviceLayer::Internal::kMaxWiFiSSIDLength);
+        Encoding::LittleEndian::BufferWriter bbufPW(Uint8::from_char(passwd), chip::DeviceLayer::Internal::kMaxWiFiKeyLength);
 
         const uint8_t * buffer = msgBuf->Start();
         size_t len             = msgBuf->DataLength();
@@ -144,7 +144,7 @@ size_t NetworkProvisioning::EncodedStringSize(const char * str)
     return strlen(str) + sizeof(uint16_t);
 }
 
-CHIP_ERROR NetworkProvisioning::EncodeString(const char * str, BufBound & bbuf)
+CHIP_ERROR NetworkProvisioning::EncodeString(const char * str, Encoding::LittleEndian::BufferWriter & bbuf)
 {
     CHIP_ERROR err  = CHIP_NO_ERROR;
     size_t length   = strlen(str);
@@ -158,7 +158,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR NetworkProvisioning::DecodeString(const uint8_t * input, size_t input_len, BufBound & bbuf, size_t & consumed)
+CHIP_ERROR NetworkProvisioning::DecodeString(const uint8_t * input, size_t input_len, Encoding::LittleEndian::BufferWriter & bbuf,
+                                             size_t & consumed)
 {
     CHIP_ERROR err  = CHIP_NO_ERROR;
     uint16_t length = 0;
@@ -228,7 +229,7 @@ CHIP_ERROR NetworkProvisioning::SendNetworkCredentials(const char * ssid, const 
     const size_t bufferSize = EncodedStringSize(ssid) + EncodedStringSize(passwd);
     VerifyOrExit(CanCastTo<uint16_t>(bufferSize), err = CHIP_ERROR_INVALID_ARGUMENT);
     {
-        System::PacketBufBound bbuf(bufferSize);
+        System::PacketBufferWriter bbuf(bufferSize);
 
         ChipLogProgress(NetworkProvisioning, "Sending Network Creds. Delegate %p\n", mDelegate);
         VerifyOrExit(mDelegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -262,7 +263,7 @@ CHIP_ERROR NetworkProvisioning::SendThreadCredentials(const DeviceLayer::Interna
         4;                  // threadData.ThreadChannel, threadData.FieldPresent.ThreadExtendedPANId,
                             // threadData.FieldPresent.ThreadMeshPrefix, threadData.FieldPresent.ThreadPSKc
     /* clang-format on */
-    System::PacketBufBound bbuf(credentialSize);
+    System::PacketBufferWriter bbuf(credentialSize);
 
     ChipLogProgress(NetworkProvisioning, "Sending Thread Credentials");
     VerifyOrExit(mDelegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);

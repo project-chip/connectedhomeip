@@ -178,7 +178,7 @@ void CheckResendMessage(nlTestSuite * inSuite, void * inContext)
 
     ctx.GetInetLayer().SystemLayer()->Init(nullptr);
 
-    chip::System::PacketBufferHandle buffer = chip::System::PacketBufferHandle::NewWithData(PAYLOAD, sizeof(PAYLOAD), kMaxTagLen);
+    chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());
 
     IPAddress addr;

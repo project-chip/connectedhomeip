@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,7 +25,7 @@
 #pragma once
 
 #include <support/BitFlags.h>
-#include <support/BufBound.h>
+#include <support/BufferWriter.h>
 #include <support/CodeUtils.h>
 #include <system/SystemPacketBuffer.h>
 namespace chip {
@@ -98,33 +98,28 @@ struct BdxMessage
      * @return CHIP_ERROR Return an error if the message format is invalid and/or can't be parsed
      */
     CHECK_RETURN_VALUE
-    CHIP_ERROR Parse(System::PacketBufferHandle aBuffer) { return DerivedParse(std::move(aBuffer)); }
+    virtual CHIP_ERROR Parse(System::PacketBufferHandle aBuffer) = 0;
 
     /**
      * @brief
-     *  Write the message fields to a buffer using the provided BufBound.
+     *  Write the message fields to a buffer using the provided BufferWriter.
      *
-     *  It is up to the caller to use BufBound::Fit() to verify that the write was
+     *  It is up to the caller to use BufferWriter::Fit() to verify that the write was
      *  successful. This method will also not check for correctness or completeness for
      *  any of the fields - it is the caller's responsibility to ensure that the fields
      *  align with BDX specifications.
      *
-     * @param aBuffer A BufBound object that will be used to write the message
+     * @param aBuffer A BufferWriter object that will be used to write the message
      */
-    BufBound & WriteToBuffer(BufBound & aBuffer) const { return DerivedWriteToBuffer(aBuffer); }
+    virtual Encoding::LittleEndian::BufferWriter & WriteToBuffer(Encoding::LittleEndian::BufferWriter & aBuffer) const = 0;
 
     /**
      * @brief
      *  Returns the size of buffer needed to write the message.
      */
-    virtual size_t MessageSize() const { return DerivedMessageSize(); }
+    virtual size_t MessageSize() const = 0;
 
     virtual ~BdxMessage() = default;
-
-private:
-    virtual CHIP_ERROR DerivedParse(System::PacketBufferHandle aBuffer) = 0;
-    virtual BufBound & DerivedWriteToBuffer(BufBound & aBuffer) const   = 0;
-    virtual size_t DerivedMessageSize() const                           = 0;
 };
 
 /*
@@ -159,10 +154,9 @@ struct TransferInit : public BdxMessage
     // Retain ownership of the packet buffer so that the FileDesignator and Metadata pointers remain valid.
     System::PacketBufferHandle Buffer;
 
-private:
-    CHIP_ERROR DerivedParse(System::PacketBufferHandle aBuffer) override;
-    BufBound & DerivedWriteToBuffer(BufBound & aBuffer) const override;
-    size_t DerivedMessageSize() const override;
+    CHIP_ERROR Parse(System::PacketBufferHandle aBuffer) override;
+    Encoding::LittleEndian::BufferWriter & WriteToBuffer(Encoding::LittleEndian::BufferWriter & aBuffer) const override;
+    size_t MessageSize() const override;
 };
 
 using SendInit    = TransferInit;
@@ -194,10 +188,9 @@ struct SendAccept : public BdxMessage
     // Retain ownership of the packet buffer so that the FileDesignator and Metadata pointers remain valid.
     System::PacketBufferHandle Buffer;
 
-private:
-    CHIP_ERROR DerivedParse(System::PacketBufferHandle aBuffer) override;
-    BufBound & DerivedWriteToBuffer(BufBound & aBuffer) const override;
-    size_t DerivedMessageSize() const override;
+    CHIP_ERROR Parse(System::PacketBufferHandle aBuffer) override;
+    Encoding::LittleEndian::BufferWriter & WriteToBuffer(Encoding::LittleEndian::BufferWriter & aBuffer) const override;
+    size_t MessageSize() const override;
 };
 
 /**
@@ -229,10 +222,9 @@ struct ReceiveAccept : public BdxMessage
     // Retain ownership of the packet buffer so that the FileDesignator and Metadata pointers remain valid.
     System::PacketBufferHandle Buffer;
 
-private:
-    CHIP_ERROR DerivedParse(System::PacketBufferHandle aBuffer) override;
-    BufBound & DerivedWriteToBuffer(BufBound & aBuffer) const override;
-    size_t DerivedMessageSize() const override;
+    CHIP_ERROR Parse(System::PacketBufferHandle aBuffer) override;
+    Encoding::LittleEndian::BufferWriter & WriteToBuffer(Encoding::LittleEndian::BufferWriter & aBuffer) const override;
+    size_t MessageSize() const override;
 };
 
 /**
@@ -249,10 +241,9 @@ struct CounterMessage : public BdxMessage
 
     uint32_t BlockCounter = 0;
 
-private:
-    CHIP_ERROR DerivedParse(System::PacketBufferHandle aBuffer) override;
-    BufBound & DerivedWriteToBuffer(BufBound & aBuffer) const override;
-    size_t DerivedMessageSize() const override;
+    CHIP_ERROR Parse(System::PacketBufferHandle aBuffer) override;
+    Encoding::LittleEndian::BufferWriter & WriteToBuffer(Encoding::LittleEndian::BufferWriter & aBuffer) const override;
+    size_t MessageSize() const override;
 };
 
 using BlockQuery  = CounterMessage;
@@ -280,10 +271,9 @@ struct DataBlock : public BdxMessage
     // Retain ownership of the packet buffer so that the FileDesignator and Metadata pointers remain valid.
     System::PacketBufferHandle Buffer;
 
-private:
-    CHIP_ERROR DerivedParse(System::PacketBufferHandle aBuffer) override;
-    BufBound & DerivedWriteToBuffer(BufBound & aBuffer) const override;
-    size_t DerivedMessageSize() const override;
+    CHIP_ERROR Parse(System::PacketBufferHandle aBuffer) override;
+    Encoding::LittleEndian::BufferWriter & WriteToBuffer(Encoding::LittleEndian::BufferWriter & aBuffer) const override;
+    size_t MessageSize() const override;
 };
 
 using Block    = DataBlock;
