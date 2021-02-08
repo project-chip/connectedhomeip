@@ -77,12 +77,12 @@ user_args=""
 
 for arg; do
     case $arg in
-    enable_qpg6100_builds=true)
-        qpg6100_enabled=1
-        ;;
-    enable_efr32_builds=true)
-        efr32_enabled=1
-        ;;
+        enable_qpg6100_builds=true)
+            qpg6100_enabled=1
+            ;;
+        enable_efr32_builds=true)
+            efr32_enabled=1
+            ;;
     esac
     user_args+=" $arg"
 done
