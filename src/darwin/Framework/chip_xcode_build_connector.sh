@@ -52,24 +52,21 @@ for define in "${defines[@]}"; do
 
     # skip over those that GN does for us
     case "$define" in
-        CHIP_DEVICE_LAYER*)
-            continue
-            ;;
-        CHIP_*_CONFIG_INCLUDE)
-            continue
-            ;;
-        CHIP_SYSTEM_CONFIG_*)
-            continue
-            ;;
-        CONFIG_NETWORK_LAYER*)
-            continue
-            ;;
-        CHIP_CRYPTO_*)
-            continue
-            ;;
-        CHIP_LOGGING_STYLE_*)
-            continue
-            ;;
+    CHIP_DEVICE_LAYER*)
+        continue
+        ;;
+    CHIP_*_CONFIG_INCLUDE)
+        continue
+        ;;
+    CHIP_SYSTEM_CONFIG_*)
+        continue
+        ;;
+    CONFIG_NETWORK_LAYER*)
+        continue
+        ;;
+    CHIP_CRYPTO_*)
+        continue
+        ;;
     esac
     target_defines+=,\"${define//\"/\\\"}\"
 done

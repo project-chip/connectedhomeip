@@ -21,9 +21,6 @@ declare_args() {
   # Configure target tyle: unix, embedded.
   chip_target_style = ""
 
-  # Configure logging style: stdio, external.
-  chip_logging_style = ""
-
   # Enable error logging.
   chip_error_logging = chip_logging
 
@@ -51,26 +48,8 @@ if (chip_target_style == "") {
   }
 }
 
-if (chip_logging_style == "") {
-  if (current_os == "android") {
-    chip_logging_style = "android"
-  } else if (current_os == "mac" || current_os == "ios") {
-    chip_logging_style = "darwin"
-  } else if (current_os != "freertos" && current_os != "zephyr") {
-    chip_logging_style = "stdio"
-  } else {
-    chip_logging_style = "external"
-  }
-}
-
 assert(chip_target_style == "unix" || chip_target_style == "embedded",
        "Please select a valid target style: unix, embedded")
-
-assert(
-    chip_logging_style == "android" || chip_logging_style == "external" ||
-        chip_logging_style == "stdio" || chip_logging_style == "stdio_weak" ||
-        chip_logging_style == "darwin",
-    "Please select a valid logging style: android, external, stdio, stdio_weak")
 
 assert(
     chip_config_memory_management == "malloc" ||

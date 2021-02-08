@@ -22,6 +22,22 @@ import("${build_root}/chip/chip_version.gni")
 import("${build_root}/chip/tests.gni")
 import("${chip_root}/src/lib/core/core.gni")
 
+declare_args() {
+  # CHIP Logging style, one of:
+  #   - "auto": based on host detection
+  #   - One of the built-in styles:
+  #     - "android"
+  #     - "darwin"
+  #     - "stdio"
+  #   - "external": need to define chip::Logging::LogV externally
+  chip_logging_style = "auto"
+}
+
+assert(chip_logging_style == "auto" || chip_logging_style == "external" ||
+           chip_logging_style == "android" || chip_logging_style == "stdio" ||
+           chip_logging_style == "darwin",
+       "Please select a valid logging style: android, external, stdio")
+
 action("gen_chip_version") {
   script = "${chip_root}/scripts/gen_chip_version.py"
 
@@ -82,7 +98,6 @@ static_library("support") {
     "UnitTestRegistration.h",
     "logging/CHIPLogging.cpp",
     "logging/CHIPLogging.h",
-    "logging/CHIPLoggingLogV.cpp",
     "verhoeff/Verhoeff.cpp",
     "verhoeff/Verhoeff.h",
     "verhoeff/Verhoeff10.cpp",
@@ -90,6 +105,25 @@ static_library("support") {
     "verhoeff/Verhoeff32.cpp",
     "verhoeff/Verhoeff36.cpp",
   ]
+
+  libs = []
+
+  if (chip_logging_style == "android" ||
+      (chip_logging_style == "auto" && current_os == "android")) {
+    sources += [ "logging/LogV_android.cpp" ]
+    libs += [ "log" ]
+  } else if (chip_logging_style == "darwin" ||
+             (chip_logging_style == "auto" && current_os == "mac") ||
+             (chip_logging_style == "auto" && current_os == "ios")) {
+    sources += [ "logging/LogV_darwin.cpp" ]
+  } else if (chip_logging_style == "stdio" ||
+             (chip_logging_style == "auto" && current_os == "freertos") ||
+             (chip_logging_style == "auto" && current_os == "zephyr") ||
+             (chip_logging_style == "auto" && current_os == "linux")) {
+    sources += [ "logging/LogV_stdio.cpp" ]
+  } else {
+    assert(chip_logging_style == "external", "Unsupported logging style")
+  }
 
   cflags = [ "-Wconversion" ]
 
@@ -126,10 +160,5 @@ static_library("support") {
       "CHIPFaultInjection.h",
     ]
     public_deps += [ "${nlfaultinjection_root}:nlfaultinjection" ]
-  }
-
-  libs = []
-  if (chip_logging_style == "android") {
-    libs += [ "log" ]
   }
 }

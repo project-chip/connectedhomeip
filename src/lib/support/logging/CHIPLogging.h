@@ -189,10 +189,33 @@ enum LogCategory
     kLogCategory_Max = kLogCategory_Retain
 };
 
-extern void LogV(uint8_t module, uint8_t category, const char * msg, va_list args);
-extern void Log(uint8_t module, uint8_t category, const char * msg, ...);
-extern uint8_t GetLogFilter();
-extern void SetLogFilter(uint8_t category);
+/**
+ * Log, to the platform-specified mechanism, the specified log
+ * message, @a msg, for the specified module, @a module, in the
+ * provided category, @a category.
+ *
+ * @param[in] module    A LogModule enumeration indicating the
+ *                      source of the chip package module that
+ *                      generated the log message. This must be
+ *                      translated within the function to a module
+ *                      name for inclusion in the log message.
+ * @param[in] category  A LogCategory enumeration indicating the
+ *                      category of the log message. The category
+ *                      may be filtered in or out if
+ *                      CHIP_LOG_FILTERING was asserted.
+ * @param[in] msg       A pointer to a NULL-terminated C string with
+ *                      C Standard Library-style format specifiers
+ *                      containing the log message to be formatted and
+ *                      logged.
+ * @param[in] v         A variadic argument list whose elements should
+ *                      correspond to the format specifiers in @a msg.
+ *
+ */
+void LogV(uint8_t module, uint8_t category, const char * msg, va_list args);
+
+void Log(uint8_t module, uint8_t category, const char * msg, ...);
+uint8_t GetLogFilter();
+void SetLogFilter(uint8_t category);
 
 #ifndef CHIP_ERROR_LOGGING
 #define CHIP_ERROR_LOGGING 1
@@ -308,9 +331,8 @@ static constexpr uint16_t kMaxTrailerLen     = 2;
 static constexpr uint16_t kMaxMessagePadding = (chip::Logging::kMaxPrefixLen + chip::Logging::kMaxModuleNameLen +
                                                 chip::Logging::kMaxSeparatorLen + chip::Logging::kMaxTrailerLen);
 
-extern void GetMessageWithPrefix(char * buf, uint8_t bufSize, uint8_t module, const char * msg);
-extern void GetModuleName(char * buf, uint8_t bufSize, uint8_t module);
-extern void PrintMessagePrefix(uint8_t module);
+void GetMessageWithPrefix(char * buf, uint8_t bufSize, uint8_t module, const char * msg);
+void GetModuleName(char * buf, uint8_t bufSize, uint8_t module);
 
 #else
 
@@ -326,7 +348,7 @@ static inline void GetModuleName(char * buf, uint8_t bufSize, uint8_t module)
 
 #endif // _CHIP_USE_LOGGING
 
-extern bool IsCategoryEnabled(uint8_t CAT);
+bool IsCategoryEnabled(uint8_t category);
 
 /**
  *  @def ChipLogIfFalse(aCondition)
