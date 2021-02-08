@@ -268,6 +268,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "Darwin/CHIPDevicePlatformConfig.h",
         "Darwin/CHIPDevicePlatformEvent.h",
         "Darwin/CHIPPlatformConfig.h",
+        "Darwin/Logging.cpp",
         "Darwin/ConfigurationManagerImpl.cpp",
         "Darwin/ConfigurationManagerImpl.h",
         "Darwin/ConnectivityManagerImpl.cpp",
@@ -487,6 +488,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "nrfconnect/InetPlatformConfig.h",
         "nrfconnect/PlatformManagerImpl.h",
         "nrfconnect/SystemPlatformConfig.h",
+        "common/Logging_stdio.cpp",
       ]
 
       if (chip_enable_openthread) {
