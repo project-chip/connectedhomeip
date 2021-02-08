@@ -387,10 +387,9 @@ void ChannelContext::OnSessionEstablished()
         Transport::PeerAddress addr;
         addr.SetTransportType(Transport::Type::kUdp).SetIPAddress(mStateVars.mPreparing.mAddress);
         // This will trigger OnNewConnection callback from SecureSessionManager
-        mExchangeManager->GetSessionMgr()->NewPairing(Optional<Transport::PeerAddress>(addr),
-                                                      mStateVars.mPreparing.mBuilder.GetPeerNodeId(),
-                                                      mStateVars.mPreparing.mSession.mPasePairingSession,
-                                                      mExchangeManager->GetAdminId());
+        mExchangeManager->GetSessionMgr()->NewPairing(
+            Optional<Transport::PeerAddress>(addr), mStateVars.mPreparing.mBuilder.GetPeerNodeId(),
+            mStateVars.mPreparing.mSession.mPasePairingSession, mExchangeManager->GetAdminId());
         return;
     }
     case PrepareState::kCasePairing:
