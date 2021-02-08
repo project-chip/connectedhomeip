@@ -22,22 +22,13 @@ set -e
 
 source "$(dirname "$0")/../../scripts/activate.sh"
 
-sdk_root="$PWD/third_party/efr32_sdk/repo"
-
-if [ ! -d "$sdk_root" ]; then
-    echo "ERROR!!!"
-    echo "Could not find EFR32 SDK with path :  $sdk_root"
-    echo "Make sure you're running the script from the root of project CHIP"
-    exit 1
-fi
-
 set -x
 env
 
 if [ -z "$3" ]; then
-    gn gen --check --fail-on-unused-args --root="$1" --args="efr32_sdk_root=\"$sdk_root\"" "$2"/"$EFR32_BOARD"/
+    gn gen --check --fail-on-unused-args --root="$1" "$2"/"$EFR32_BOARD"/
     ninja -v -C "$2"/"$EFR32_BOARD"/
 else
-    gn gen --check --fail-on-unused-args --root="$1" --args="efr32_sdk_root=\"$sdk_root\" efr32_board=\"$3\"" "$2/$3"
+    gn gen --check --fail-on-unused-args --root="$1" --args="efr32_board=\"$3\"" "$2/$3"
     ninja -v -C "$2/$3"
 fi
