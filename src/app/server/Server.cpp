@@ -211,7 +211,7 @@ public:
 
             if (err != CHIP_NO_ERROR)
             {
-                SuccessOrExit(err = OpenDefaultPairingWindow(kDoNotResetAdmins));
+                SuccessOrExit(err = OpenDefaultPairingWindow(ResetAdmins::kNo));
             }
             else
             {
@@ -325,7 +325,7 @@ SecureSessionMgr & chip::SessionManager()
     return gSessions;
 }
 
-CHIP_ERROR OpenDefaultPairingWindow(bool resetAdmins)
+CHIP_ERROR OpenDefaultPairingWindow(ResetAdmins resetAdmins)
 {
     gDeviceDiscriminatorCache.RestoreDiscriminator();
 
@@ -343,7 +343,7 @@ CHIP_ERROR OpenDefaultPairingWindow(bool resetAdmins)
     params.SetSetupPINCode(pinCode);
 #endif // CONFIG_NETWORK_LAYER_BLE
 
-    if (resetAdmins == kResetAdmins)
+    if (resetAdmins == ResetAdmins::kYes)
     {
         gNextAvailableAdminId = 0;
         gAdminPairings.Reset();
@@ -409,7 +409,7 @@ void InitServer(AppDelegate * delegate)
     }
     else
     {
-        SuccessOrExit(err = OpenDefaultPairingWindow(kResetAdmins));
+        SuccessOrExit(err = OpenDefaultPairingWindow(ResetAdmins::kYes));
     }
 
 #if CHIP_ENABLE_MDNS

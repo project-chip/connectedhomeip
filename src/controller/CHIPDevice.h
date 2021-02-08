@@ -241,9 +241,11 @@ public:
      *   The device will exit the pairing mode after a successful pairing, or after the given `timeout` time.
      *
      * @param[in] timeout         The pairing mode should terminate after this much time.
-     * @param[in] useToken        The device should use the provided onboarding token instead of the default
-     *                            pairing setup PIN and discriminator.
+     * @param[in] useToken        Generate an onboarding token and send it to the device. The device must
+     *                            use the provided onboarding token instead of the original pairing setup PIN
+     *                            and discriminator.
      * @param[in] discriminator   The discriminator that the device should use for advertising and pairing.
+     * @param[out] setupPayload   The setup payload corresponding to the generated onboarding token.
      *
      * @return CHIP_ERROR               CHIP_NO_ERROR on success, or corresponding error
      */

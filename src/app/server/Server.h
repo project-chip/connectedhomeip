@@ -38,12 +38,15 @@ void InitServer(AppDelegate * delegate = nullptr);
 
 namespace chip {
 
-constexpr bool kResetAdmins      = true;
-constexpr bool kDoNotResetAdmins = false;
+enum class ResetAdmins
+{
+    kYes,
+    kNo,
+};
 
 } // namespace chip
 
 /**
  * Open the pairing window using default configured parameters.
  */
-CHIP_ERROR OpenDefaultPairingWindow(bool resetAdmins);
+CHIP_ERROR OpenDefaultPairingWindow(chip::ResetAdmins resetAdmins);
