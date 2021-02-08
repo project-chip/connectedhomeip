@@ -29,7 +29,7 @@
 #include <system/SystemConfig.h>
 
 // Include dependent headers
-#include <support/BufBound.h>
+#include <support/BufferWriter.h>
 #include <support/CodeUtils.h>
 #include <support/DLLUtil.h>
 #include <system/SystemAlignSize.h>
@@ -689,11 +689,11 @@ inline PacketBufferHandle PacketBuffer::Last()
 }
 
 /**
- * BufBound backed by packet buffer.
+ * BufferWriter backed by packet buffer.
  *
  * Typical use:
  *  @code
- *      PacketBufBound buf(maximumLength);
+ *      PacketBufferWriter buf(maximumLength);
  *      if (buf.IsNull()) { return CHIP_ERROR_NO_MEMORY; }
  *      buf.Put(...);
  *      ...
@@ -702,27 +702,27 @@ inline PacketBufferHandle PacketBuffer::Last()
  *      // valid data
  *  @endcode
  */
-class PacketBufBound : public BufBound
+class PacketBufferWriter : public Encoding::LittleEndian::BufferWriter
 {
 public:
     /**
-     * Constructs a BufBound that writes into a newly allocated packet buffer.
+     * Constructs a BufferWriter that writes into a newly allocated packet buffer.
      *
      *  If no memory is available, or if the size requested is too large, then \c IsNull() will be true.
-     *  Otherwise, it is guaranteed that the BufBound length is \a aAvailableSize. (The underlying packet
+     *  Otherwise, it is guaranteed that the BufferWriter length is \a aAvailableSize. (The underlying packet
      *  buffer may be larger.)
      *
-     *  @param[in]  aAvailableSize  Length bound of the BufBound.
+     *  @param[in]  aAvailableSize  Length bound of the BufferWriter.
      *  @param[in]  aReservedSize   Reserved packet buffer space for protocol headers; see \c PacketBufferHandle::New().
      */
-    PacketBufBound(size_t aAvailableSize, uint16_t aReservedSize = CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE);
+    PacketBufferWriter(size_t aAvailableSize, uint16_t aReservedSize = CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE);
 
     /**
-     * Test whether this PacketBufBound is null, or conversely owns a PacketBuffer.
+     * Test whether this PacketBufferWriter is null, or conversely owns a PacketBuffer.
      *
-     * @retval true     The PacketBufBound is null; it does not own a PacketBuffer. This implies either that
+     * @retval true     The PacketBufferWriter is null; it does not own a PacketBuffer. This implies either that
      *                  construction failed, or that \c Finalize() has previously been called to release the buffer.
-     * @retval false    The PacketBufBound owns a PacketBuffer, which can be written using BufBound \c Put() methods,
+     * @retval false    The PacketBufferWriter owns a PacketBuffer, which can be written using BufferWriter \c Put() methods,
      *                  and (assuming no overflow) obtained by calling \c Finalize().
      */
     bool IsNull() const { return mPacket.IsNull(); }
@@ -730,9 +730,9 @@ public:
     /**
      * Obtain the backing packet buffer, if it is valid.
      *
-     *  If construction succeeded, \c Finalize() has not already been called, and \c BufBound::Fit() is true, the caller
-     *  takes ownership of a buffer containing the desired data. Otherwise, the returned handle tests null, and any
-     *  underlying storage has been released.
+     *  If construction succeeded, \c Finalize() has not already been called, and \c BufferWriter::Fit() is true,
+     *  the caller takes ownership of a buffer containing the desired data. Otherwise, the returned handle tests null,
+     *  and any underlying storage has been released.
      *
      *  @return     A packet buffer handle.
      */

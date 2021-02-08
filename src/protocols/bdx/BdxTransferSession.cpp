@@ -25,7 +25,7 @@ constexpr size_t kStatusReportMinSize = 2 + 4 + 2; ///< 16 bits for GeneralCode,
 CHIP_ERROR WriteToPacketBuffer(const ::chip::bdx::BdxMessage & msgStruct, ::chip::System::PacketBufferHandle & msgBuf)
 {
     size_t msgDataSize = msgStruct.MessageSize();
-    ::chip::System::PacketBufBound bbuf(msgDataSize);
+    ::chip::System::PacketBufferWriter bbuf(msgDataSize);
     if (bbuf.IsNull())
     {
         return CHIP_ERROR_NO_MEMORY;
@@ -851,7 +851,7 @@ void TransferSession::PrepareStatusReport(StatusCode code)
 {
     mStatusReportData.StatusCode = code;
 
-    System::PacketBufBound bbuf(kStatusReportMinSize);
+    System::PacketBufferWriter bbuf(kStatusReportMinSize);
     VerifyOrReturn(!bbuf.IsNull());
 
     bbuf.Put16(static_cast<uint16_t>(Protocols::Common::StatusCode::Failure));

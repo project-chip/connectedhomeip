@@ -615,16 +615,18 @@ PacketBufferHandle PacketBufferHandle::CloneData(uint16_t aAdditionalSize, uint1
     return NewWithData(mBuffer->Start(), mBuffer->DataLength(), aAdditionalSize, aReservedSize);
 }
 
-PacketBufBound::PacketBufBound(size_t aAvailableSize, uint16_t aReservedSize) : BufBound(nullptr, 0)
+PacketBufferWriter::PacketBufferWriter(size_t aAvailableSize, uint16_t aReservedSize) :
+    Encoding::LittleEndian::BufferWriter(nullptr, 0)
 {
     mPacket = PacketBufferHandle::New(aAvailableSize, aReservedSize);
     if (!mPacket.IsNull())
     {
-        Reset(mPacket->Start(), aAvailableSize);
+        *static_cast<Encoding::LittleEndian::BufferWriter *>(this) =
+            Encoding::LittleEndian::BufferWriter(mPacket->Start(), aAvailableSize);
     }
 }
 
-PacketBufferHandle PacketBufBound::Finalize()
+PacketBufferHandle PacketBufferWriter::Finalize()
 {
     if (!mPacket.IsNull() && Fit())
     {
@@ -636,7 +638,7 @@ PacketBufferHandle PacketBufBound::Finalize()
     {
         mPacket = nullptr;
     }
-    Reset(nullptr, 0);
+    *static_cast<Encoding::LittleEndian::BufferWriter *>(this) = Encoding::LittleEndian::BufferWriter(nullptr, 0);
     return std::move(mPacket);
 }
 

@@ -2,7 +2,7 @@
 
 #include <nlunit-test.h>
 
-#include <support/BufBound.h>
+#include <support/BufferWriter.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/UnitTestRegistration.h>
@@ -22,7 +22,7 @@ void TestHelperWrittenAndParsedMatch(nlTestSuite * inSuite, void * inContext, Ms
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     size_t msgSize = testMsg.MessageSize();
-    System::PacketBufBound bbuf(msgSize);
+    System::PacketBufferWriter bbuf(msgSize);
     NL_TEST_ASSERT(inSuite, !bbuf.IsNull());
 
     testMsg.WriteToBuffer(bbuf);

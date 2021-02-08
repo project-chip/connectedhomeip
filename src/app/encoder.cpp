@@ -19,7 +19,7 @@
 
 #include "chip-zcl-zpro-codec.h"
 
-#include <support/BufBound.h>
+#include <support/BufferWriter.h>
 #include <support/SafeInt.h>
 #include <support/logging/CHIPLogging.h>
 
@@ -27,8 +27,9 @@
 
 using namespace chip;
 using namespace chip::System;
+using namespace chip::Encoding::LittleEndian;
 
-static uint16_t doEncodeApsFrame(BufBound & buf, ClusterId clusterId, EndpointId sourceEndpoint, EndpointId destinationEndpoint,
+static uint16_t doEncodeApsFrame(BufferWriter & buf, ClusterId clusterId, EndpointId sourceEndpoint, EndpointId destinationEndpoint,
                                  EmberApsOption options, GroupId groupId, uint8_t sequence, uint8_t radius, bool isMeasuring)
 {
 
@@ -37,7 +38,7 @@ static uint16_t doEncodeApsFrame(BufBound & buf, ClusterId clusterId, EndpointId
         .Put16(clusterId)
         .Put8(sourceEndpoint)
         .Put8(destinationEndpoint)
-        .Put(options, sizeof(EmberApsOption))
+        .EndianPut(options, sizeof(EmberApsOption))
         .Put16(groupId)
         .Put8(sequence)
         .Put8(radius);
@@ -68,7 +69,7 @@ static uint16_t doEncodeApsFrame(BufBound & buf, ClusterId clusterId, EndpointId
 
 uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * apsFrame)
 {
-    BufBound buf = BufBound(buffer, buf_length);
+    BufferWriter buf = BufferWriter(buffer, buf_length);
     return doEncodeApsFrame(buf, apsFrame->clusterId, apsFrame->sourceEndpoint, apsFrame->destinationEndpoint, apsFrame->options,
                             apsFrame->groupId, apsFrame->sequence, apsFrame->radius, !buffer);
 }
@@ -76,7 +77,7 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
 #define COMMAND_HEADER(name, clusterId)                                                                                            \
     const char * kName = name;                                                                                                     \
                                                                                                                                    \
-    PacketBufBound buf(kMaxBufferSize);                                                                                            \
+    PacketBufferWriter buf(kMaxBufferSize);                                                                                        \
     if (buf.IsNull())                                                                                                              \
     {                                                                                                                              \
         ChipLogError(Zcl, "Could not allocate packet buffer while trying to encode %s command", kName);                            \
