@@ -179,14 +179,7 @@ enum LogCategory
      */
     kLogCategory_Detail = 3,
 
-    /*!<
-     *   Indicates a category of log message that describes information
-     *   needed by IE and QA teams for automated testing.
-     *
-     */
-    kLogCategory_Retain = 4,
-
-    kLogCategory_Max = kLogCategory_Retain
+    kLogCategory_Max = kLogCategory_Detail,
 };
 
 extern void LogV(uint8_t module, uint8_t category, const char * msg, va_list args);
@@ -261,40 +254,11 @@ extern void SetLogFilter(uint8_t category);
 #define ChipLogDetail(MOD, MSG, ...)
 #endif
 
-#ifndef CHIP_RETAIN_LOGGING
-#define CHIP_RETAIN_LOGGING CHIP_PROGRESS_LOGGING
-#define ChipLogRetain(MOD, MSG, ...) ChipLogProgress(MOD, MSG, ##__VA_ARGS__)
-#endif
-
-#if CHIP_RETAIN_LOGGING
-/**
- * @def ChipLogRetain(MOD, MSG, ...)
- *
- * @brief
- *   Log a chip message for the specified module in the 'Retain'
- *   category. This is used for IE testing.
- *   If the product has not defined CHIP_RETAIN_LOGGING, it defaults to the same as ChipLogProgress
- *
- */
-#ifndef ChipLogRetain
-#define ChipLogRetain(MOD, MSG, ...)                                                                                               \
-    chip::Logging::Log(chip::Logging::kLogModule_##MOD, chip::Logging::kLogCategory_Retain, MSG, ##__VA_ARGS__)
-#endif
-
-#else // #if CHIP_RETAIN_LOGGING
-#ifdef ChipLogRetain
-// This is to ensure that ChipLogRetain is null if
-// the product has defined CHIP_RETAIN_LOGGING to 0 itself
-#undef ChipLogRetain
-#endif
-#define ChipLogRetain(MOD, MSG, ...)
-#endif // #if CHIP_RETAIN_LOGGING
-
-#if CHIP_ERROR_LOGGING || CHIP_PROGRESS_LOGGING || CHIP_DETAIL_LOGGING || CHIP_RETAIN_LOGGING
+#if CHIP_ERROR_LOGGING || CHIP_PROGRESS_LOGGING || CHIP_DETAIL_LOGGING
 #define _CHIP_USE_LOGGING 1
 #else
 #define _CHIP_USE_LOGGING 0
-#endif /* CHIP_ERROR_LOGGING || CHIP_PROGRESS_LOGGING || CHIP_DETAIL_LOGGING || CHIP_RETAIN_LOGGING */
+#endif /* CHIP_ERROR_LOGGING || CHIP_PROGRESS_LOGGING || CHIP_DETAIL_LOGGING */
 
 #if _CHIP_USE_LOGGING
 
