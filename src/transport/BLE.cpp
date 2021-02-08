@@ -137,21 +137,14 @@ exit:
 
 CHIP_ERROR BLE::SendMessage(const PacketHeader & header, const Transport::PeerAddress & address, System::PacketBufferHandle msgBuf)
 {
-    CHIP_ERROR err            = CHIP_NO_ERROR;
-    const uint16_t headerSize = header.EncodeSizeBytes();
-    uint16_t actualEncodedHeaderSize;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     VerifyOrExit(address.GetTransportType() == Type::kBle, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(mState == State::kInitialized, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mBleEndPoint != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(msgBuf->EnsureReservedSize(headerSize), err = CHIP_ERROR_NO_MEMORY);
 
-    msgBuf->SetStart(msgBuf->Start() - headerSize);
-
-    err = header.Encode(msgBuf->Start(), msgBuf->DataLength(), &actualEncodedHeaderSize);
+    err = header.EncodeBeforeData(msgBuf);
     SuccessOrExit(err);
-
-    VerifyOrExit(headerSize == actualEncodedHeaderSize, err = CHIP_ERROR_INTERNAL);
 
     err = mBleEndPoint->Send(std::move(msgBuf));
     SuccessOrExit(err);
@@ -197,13 +190,10 @@ void BLE::OnBleEndPointReceive(BLEEndPoint * endPoint, PacketBufferHandle buffer
 
     if (ble->mDelegate)
     {
-        uint16_t headerSize = 0;
-
         PacketHeader header;
-        err = header.Decode(buffer->Start(), buffer->DataLength(), &headerSize);
+        err = header.DecodeAndConsume(buffer);
         SuccessOrExit(err);
 
-        buffer->ConsumeHead(headerSize);
         ble->mDelegate->OnRendezvousMessageReceived(header, Transport::PeerAddress(Transport::Type::kBle), std::move(buffer));
     }
 exit:
