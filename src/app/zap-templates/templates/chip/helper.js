@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ const ChipTypesHelper = require('../../common/ChipTypesHelper.js');
 
 /**
  * This method converts a ZCL type to the length expected for the
- * BufBound.Put method.
+ * BufferWriter.Put method.
  * TODO
  * Not all types are supported at the moment, so if there is any unsupported type
  * that we are trying to convert, it will throw an error.

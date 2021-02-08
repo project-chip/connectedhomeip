@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -30,18 +30,18 @@ class BufferWriterBase
 public:
     /// Append a null terminated string, exclude the null terminator
     /// This does NOT care about endianess
-    BufferWriterBase & Put(const char * s)
+    Derived & Put(const char * s)
     {
         static_assert(CHAR_BIT == 8, "We're assuming char and uint8_t are the same size");
         while (*s != 0)
         {
             Put8(static_cast<uint8_t>(*s++));
         }
-        return *this;
+        return *static_cast<Derived *>(this);
     }
 
     /// Raw append a buffer, regardless of endianess
-    BufferWriterBase & Put(const void * buf, size_t len)
+    Derived & Put(const void * buf, size_t len)
     {
         size_t available = Available();
 
@@ -52,32 +52,32 @@ public:
 
         mNeeded += len;
 
-        return *this;
+        return *static_cast<Derived *>(this);
     }
 
-    BufferWriterBase & Skip(size_t len)
+    Derived & Skip(size_t len)
     {
         mNeeded += len;
-        return *this;
+        return *static_cast<Derived *>(this);
     }
 
     /// Append a single byte
-    BufferWriterBase & Put(uint8_t c)
+    Derived & Put(uint8_t c)
     {
         if (mNeeded < mSize)
         {
             mBuf[mNeeded] = c;
         }
         ++mNeeded;
-        return *this;
+        return *static_cast<Derived *>(this);
     }
 
     // write an integer into a buffer, in an endian specific way
 
-    BufferWriterBase & Put8(uint8_t c) { return static_cast<Derived *>(this)->Put(c); }
-    BufferWriterBase & Put16(uint16_t x) { return static_cast<Derived *>(this)->EndianPut(x, sizeof(x)); }
-    BufferWriterBase & Put32(uint32_t x) { return static_cast<Derived *>(this)->EndianPut(x, sizeof(x)); }
-    BufferWriterBase & Put64(uint64_t x) { return static_cast<Derived *>(this)->EndianPut(x, sizeof(x)); }
+    Derived & Put8(uint8_t c) { return static_cast<Derived *>(this)->Put(c); }
+    Derived & Put16(uint16_t x) { return static_cast<Derived *>(this)->EndianPut(x, sizeof(x)); }
+    Derived & Put32(uint32_t x) { return static_cast<Derived *>(this)->EndianPut(x, sizeof(x)); }
+    Derived & Put64(uint64_t x) { return static_cast<Derived *>(this)->EndianPut(x, sizeof(x)); }
 
     /// Number of bytes required to satisfy all calls to Put() so far
     size_t Needed() const { return mNeeded; }
