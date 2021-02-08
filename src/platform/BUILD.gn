@@ -268,12 +268,12 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "Darwin/CHIPDevicePlatformConfig.h",
         "Darwin/CHIPDevicePlatformEvent.h",
         "Darwin/CHIPPlatformConfig.h",
-        "Darwin/Logging.cpp",
         "Darwin/ConfigurationManagerImpl.cpp",
         "Darwin/ConfigurationManagerImpl.h",
         "Darwin/ConnectivityManagerImpl.cpp",
         "Darwin/ConnectivityManagerImpl.h",
         "Darwin/InetPlatformConfig.h",
+        "Darwin/Logging.cpp",
         "Darwin/PlatformManagerImpl.cpp",
         "Darwin/PlatformManagerImpl.h",
         "Darwin/PosixConfig.cpp",
@@ -475,6 +475,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "Zephyr/SystemTimeSupport.cpp",
         "Zephyr/ZephyrConfig.cpp",
         "Zephyr/ZephyrConfig.h",
+        "common/Logging_stdio.cpp",
         "nrfconnect/BLEManagerImpl.h",
         "nrfconnect/BlePlatformConfig.h",
         "nrfconnect/CHIPDevicePlatformConfig.h",
@@ -488,7 +489,6 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "nrfconnect/InetPlatformConfig.h",
         "nrfconnect/PlatformManagerImpl.h",
         "nrfconnect/SystemPlatformConfig.h",
-        "common/Logging_stdio.cpp",
       ]
 
       if (chip_enable_openthread) {
