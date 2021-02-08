@@ -34,12 +34,8 @@
 #include <support/logging/CHIPLogging.h>
 
 namespace chip {
+namespace Protocols {
 namespace SecureChannel {
-
-SecureChannelMgr::SecureChannelMgr()
-{
-    mExchangeMgr = nullptr;
-}
 
 CHIP_ERROR SecureChannelMgr::Init(Messaging::ExchangeManager * exchangeMgr)
 {
@@ -66,28 +62,28 @@ void SecureChannelMgr::Shutdown()
     }
 }
 
-void SecureChannelMgr::OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
+void SecureChannelMgr::OnMessageReceived(Messaging::ExchangeContext * exchangeContext, const PacketHeader & packetHeader,
                                          const PayloadHeader & payloadHeader, System::PacketBufferHandle msgBuf)
 {
     if (payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::MsgCounterSyncReq))
     {
-        HandleMsgCounterSyncReq(ec, packetHeader, std::move(msgBuf));
+        HandleMsgCounterSyncReq(exchangeContext, packetHeader, std::move(msgBuf));
     }
     else if (payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::MsgCounterSyncRsp))
     {
-        HandleMsgCounterSyncResp(ec, packetHeader, std::move(msgBuf));
+        HandleMsgCounterSyncResp(exchangeContext, packetHeader, std::move(msgBuf));
     }
 }
 
-void SecureChannelMgr::OnResponseTimeout(Messaging::ExchangeContext * ec)
+void SecureChannelMgr::OnResponseTimeout(Messaging::ExchangeContext * exchangeContext)
 {
     // Close the exchange if MsgCounterSyncRsp is not received before kMsgCounterSyncTimeout.
-    if (ec != nullptr)
-        ec->Close();
+    if (exchangeContext != nullptr)
+        exchangeContext->Close();
 }
 
 // Create and initialize new exchange for the message counter synchronization request/response messages.
-CHIP_ERROR SecureChannelMgr::NewMsgCounterSyncExchange(SecureSessionHandle session, Messaging::ExchangeContext *& ec)
+CHIP_ERROR SecureChannelMgr::NewMsgCounterSyncExchange(SecureSessionHandle session, Messaging::ExchangeContext *& exchangeContext)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -95,8 +91,8 @@ CHIP_ERROR SecureChannelMgr::NewMsgCounterSyncExchange(SecureSessionHandle sessi
     VerifyOrExit(ChipKeyId::IsAppGroupKey(session.GetPeerKeyId()), err = CHIP_ERROR_INVALID_ARGUMENT);
 
     // Create new exchange context.
-    ec = mExchangeMgr->NewContext(session, this);
-    VerifyOrExit(ec != nullptr, err = CHIP_ERROR_NO_MEMORY);
+    exchangeContext = mExchangeMgr->NewContext(session, this);
+    VerifyOrExit(exchangeContext != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
 exit:
     return err;
@@ -104,14 +100,14 @@ exit:
 
 CHIP_ERROR SecureChannelMgr::SendMsgCounterSyncReq(SecureSessionHandle session)
 {
-    CHIP_ERROR err                  = CHIP_NO_ERROR;
-    Messaging::ExchangeContext * ec = nullptr;
+    CHIP_ERROR err                               = CHIP_NO_ERROR;
+    Messaging::ExchangeContext * exchangeContext = nullptr;
     System::PacketBufferHandle msgBuf;
     Messaging::SendFlags sendFlags;
     uint8_t challenge[kMsgCounterChallengeSize];
 
     // Create and initialize new exchange.
-    err = NewMsgCounterSyncExchange(session, ec);
+    err = NewMsgCounterSyncExchange(session, exchangeContext);
     SuccessOrExit(err);
 
     // Allocate a buffer for the null message.
@@ -123,7 +119,7 @@ CHIP_ERROR SecureChannelMgr::SendMsgCounterSyncReq(SecureSessionHandle session)
     SuccessOrExit(err);
 
     // Store generated Challenge value to ExchangeContext to resolve synchronization response.
-    ec->SetChallenge(challenge);
+    exchangeContext->SetChallenge(challenge);
 
     memcpy(msgBuf->Start(), challenge, kMsgCounterChallengeSize);
     msgBuf->SetDataLength(kMsgCounterChallengeSize);
@@ -132,10 +128,10 @@ CHIP_ERROR SecureChannelMgr::SendMsgCounterSyncReq(SecureSessionHandle session)
     sendFlags.Set(Messaging::SendMessageFlags::kNoAutoRequestAck, true).Set(Messaging::SendMessageFlags::kExpectResponse, true);
 
     // Arm a timer to enforce that a MsgCounterSyncRsp is received before kMsgCounterSyncTimeout.
-    ec->SetResponseTimeout(kMsgCounterSyncTimeout);
+    exchangeContext->SetResponseTimeout(kMsgCounterSyncTimeout);
 
     // Send the message counter synchronization request in a Secure Channel Protocol::MsgCounterSyncReq message.
-    err = ec->SendMessage(Protocols::SecureChannel::MsgType::MsgCounterSyncReq, std::move(msgBuf), sendFlags);
+    err = exchangeContext->SendMessage(Protocols::SecureChannel::MsgType::MsgCounterSyncReq, std::move(msgBuf), sendFlags);
     SuccessOrExit(err);
 
 exit:
@@ -147,7 +143,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR SecureChannelMgr::SendMsgCounterSyncResp(Messaging::ExchangeContext * ec, SecureSessionHandle session)
+CHIP_ERROR SecureChannelMgr::SendMsgCounterSyncResp(Messaging::ExchangeContext * exchangeContext, SecureSessionHandle session)
 {
     CHIP_ERROR err                         = CHIP_NO_ERROR;
     Transport::PeerConnectionState * state = nullptr;
@@ -171,7 +167,7 @@ CHIP_ERROR SecureChannelMgr::SendMsgCounterSyncResp(Messaging::ExchangeContext *
         bbuf.Put32(state->GetSendMessageIndex());
 
         // Fill in the random value
-        bbuf.Put(ec->GetChallenge(), kMsgCounterChallengeSize);
+        bbuf.Put(exchangeContext->GetChallenge(), kMsgCounterChallengeSize);
 
         VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_NO_MEMORY);
     }
@@ -180,8 +176,8 @@ CHIP_ERROR SecureChannelMgr::SendMsgCounterSyncResp(Messaging::ExchangeContext *
     msgBuf->SetDataLength(kMsgCounterSyncRespMsgSize);
 
     // Send message counter synchronization response message.
-    err = ec->SendMessage(Protocols::SecureChannel::MsgType::MsgCounterSyncRsp, std::move(msgBuf),
-                          Messaging::SendFlags(Messaging::SendMessageFlags::kNoAutoRequestAck));
+    err = exchangeContext->SendMessage(Protocols::SecureChannel::MsgType::MsgCounterSyncRsp, std::move(msgBuf),
+                                       Messaging::SendFlags(Messaging::SendMessageFlags::kNoAutoRequestAck));
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -192,7 +188,7 @@ exit:
     return err;
 }
 
-void SecureChannelMgr::HandleMsgCounterSyncReq(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
+void SecureChannelMgr::HandleMsgCounterSyncReq(Messaging::ExchangeContext * exchangeContext, const PacketHeader & packetHeader,
                                                System::PacketBufferHandle msgBuf)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -208,10 +204,10 @@ void SecureChannelMgr::HandleMsgCounterSyncReq(Messaging::ExchangeContext * ec, 
     VerifyOrExit(reqlen == kMsgCounterChallengeSize, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
     // Store the 64-bit value sent in the Challenge filed of the MsgCounterSyncReq.
-    ec->SetChallenge(req);
+    exchangeContext->SetChallenge(req);
 
     // Respond with MsgCounterSyncResp
-    err = SendMsgCounterSyncResp(ec, { packetHeader.GetSourceNodeId().Value(), packetHeader.GetEncryptionKeyID() });
+    err = SendMsgCounterSyncResp(exchangeContext, { packetHeader.GetSourceNodeId().Value(), packetHeader.GetEncryptionKeyID() });
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -219,13 +215,13 @@ exit:
         ChipLogError(ExchangeManager, "Failed to handle MsgCounterSyncReq message with error:%s", ErrorStr(err));
     }
 
-    if (ec != nullptr)
-        ec->Close();
+    if (exchangeContext != nullptr)
+        exchangeContext->Close();
 
     return;
 }
 
-void SecureChannelMgr::HandleMsgCounterSyncResp(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
+void SecureChannelMgr::HandleMsgCounterSyncResp(Messaging::ExchangeContext * exchangeContext, const PacketHeader & packetHeader,
                                                 System::PacketBufferHandle msgBuf)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -249,7 +245,8 @@ void SecureChannelMgr::HandleMsgCounterSyncResp(Messaging::ExchangeContext * ec,
     memcpy(challenge, resp, kMsgCounterChallengeSize);
 
     // Verify that the response field matches the expected Challenge field for the exchange.
-    VerifyOrExit(memcmp(ec->GetChallenge(), challenge, kMsgCounterChallengeSize) == 0, err = CHIP_ERROR_INVALID_SIGNATURE);
+    VerifyOrExit(memcmp(exchangeContext->GetChallenge(), challenge, kMsgCounterChallengeSize) == 0,
+                 err = CHIP_ERROR_INVALID_SIGNATURE);
 
     // ToDo:(#4628)Initialize/synchronize peer's message counter to FabricState.
     VerifyOrExit(syncCounter != 0, err = CHIP_ERROR_READ_FAILED);
@@ -260,11 +257,12 @@ exit:
         ChipLogError(ExchangeManager, "Failed to handle MsgCounterSyncResp message with error:%s", ErrorStr(err));
     }
 
-    if (ec != nullptr)
-        ec->Close();
+    if (exchangeContext != nullptr)
+        exchangeContext->Close();
 
     return;
 }
 
 } // namespace SecureChannel
+} // namespace Protocols
 } // namespace chip

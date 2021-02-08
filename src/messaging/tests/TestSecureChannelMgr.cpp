@@ -139,7 +139,7 @@ void CheckSendMsgCounterSyncReq(nlTestSuite * inSuite, void * inContext)
     testExchangeMgr.mSuite = inSuite;
     ctx.GetSecureSessionManager().SetDelegate(&testExchangeMgr);
 
-    chip::SecureChannel::SecureChannelMgr * sm = ctx.GetExchangeManager().GetSecureChannelMgr();
+    chip::Protocols::SecureChannel::SecureChannelMgr * sm = ctx.GetExchangeManager().GetSecureChannelMgr();
     NL_TEST_ASSERT(inSuite, sm != nullptr);
 
     Optional<Transport::PeerAddress> peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
@@ -180,7 +180,7 @@ void CheckReceiveMsgCounterSyncReq(nlTestSuite * inSuite, void * inContext)
 
     mockAppDelegate.mSuite = inSuite;
 
-    chip::SecureChannel::SecureChannelMgr * sm = ctx.GetExchangeManager().GetSecureChannelMgr();
+    chip::Protocols::SecureChannel::SecureChannelMgr * sm = ctx.GetExchangeManager().GetSecureChannelMgr();
     NL_TEST_ASSERT(inSuite, sm != nullptr);
 
     // Register to receive unsolicited Secure Channel Request messages from the exchange manager.

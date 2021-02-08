@@ -178,7 +178,7 @@ public:
 
     ReliableMessageMgr * GetReliableMessageMgr() { return &mReliableMessageMgr; };
 
-    SecureChannel::SecureChannelMgr * GetSecureChannelMgr() { return &mSecureChannelMgr; };
+    Protocols::SecureChannel::SecureChannelMgr * GetSecureChannelMgr() { return &mSecureChannelMgr; };
 
     size_t GetContextsInUse() const { return mContextsInUse; }
 
@@ -200,7 +200,7 @@ private:
     State mState;
     SecureSessionMgr * mSessionMgr;
     ReliableMessageMgr mReliableMessageMgr;
-    SecureChannel::SecureChannelMgr mSecureChannelMgr;
+    Protocols::SecureChannel::SecureChannelMgr mSecureChannelMgr;
 
     std::array<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> mContextPool;
     size_t mContextsInUse;

@@ -167,9 +167,9 @@ public:
 
     uint16_t GetExchangeId() const { return mExchangeId; }
 
-    void SetChallenge(const uint8_t * value) { memcpy(&mChallenage[0], value, kMsgCounterChallengeSize); }
+    void SetChallenge(const uint8_t * value) { memcpy(&mChallenge[0], value, kMsgCounterChallengeSize); }
 
-    const uint8_t * GetChallenge() const { return mChallenage; }
+    const uint8_t * GetChallenge() const { return mChallenge; }
 
     SecureSessionHandle GetSecureSessionHandle() const { return mSecureSession; }
 
@@ -206,7 +206,7 @@ private:
 
     // [TODO: #4711]: this field need to be moved to appState object which implement 'exchange-specific' contextual
     // actions with a delegate pattern.
-    uint8_t mChallenage[kMsgCounterChallengeSize]; // Challenge number to identify the sychronization request cryptographically.
+    uint8_t mChallenge[kMsgCounterChallengeSize]; // Challenge number to identify the sychronization request cryptographically.
 
     BitFlags<uint16_t, ExFlagValues> mFlags; // Internal state flags
 

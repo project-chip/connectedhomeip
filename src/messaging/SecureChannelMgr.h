@@ -25,6 +25,7 @@
 #include <system/SystemPacketBuffer.h>
 
 namespace chip {
+namespace Protocols {
 namespace SecureChannel {
 
 constexpr uint16_t kMsgCounterSyncRespMsgSize = 12;  // The size of the message counter synchronization response message.
@@ -36,7 +37,7 @@ class ExchangeManager;
 class SecureChannelMgr : public Messaging::ExchangeDelegate
 {
 public:
-    SecureChannelMgr();
+    SecureChannelMgr() : mExchangeMgr(nullptr) {}
 
     CHIP_ERROR Init(Messaging::ExchangeManager * exchangeMgr);
     void Shutdown();
@@ -58,21 +59,22 @@ public:
 private:
     Messaging::ExchangeManager * mExchangeMgr; // [READ ONLY] Associated Exchange Manager object.
 
-    CHIP_ERROR NewMsgCounterSyncExchange(SecureSessionHandle session, Messaging::ExchangeContext *& ec);
+    CHIP_ERROR NewMsgCounterSyncExchange(SecureSessionHandle session, Messaging::ExchangeContext *& exchangeContext);
 
-    CHIP_ERROR SendMsgCounterSyncResp(Messaging::ExchangeContext * ec, SecureSessionHandle session);
+    CHIP_ERROR SendMsgCounterSyncResp(Messaging::ExchangeContext * exchangeContext, SecureSessionHandle session);
 
-    void HandleMsgCounterSyncReq(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
+    void HandleMsgCounterSyncReq(Messaging::ExchangeContext * exchangeContext, const PacketHeader & packetHeader,
                                  System::PacketBufferHandle msgBuf);
 
-    void HandleMsgCounterSyncResp(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
+    void HandleMsgCounterSyncResp(Messaging::ExchangeContext * exchangeContext, const PacketHeader & packetHeader,
                                   System::PacketBufferHandle msgBuf);
 
-    void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                           System::PacketBufferHandle payload) override;
+    void OnMessageReceived(Messaging::ExchangeContext * exchangeContext, const PacketHeader & packetHeader,
+                           const PayloadHeader & payloadHeader, System::PacketBufferHandle payload) override;
 
-    void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
+    void OnResponseTimeout(Messaging::ExchangeContext * exchangeContext) override;
 };
 
 } // namespace SecureChannel
+} // namespace Protocols
 } // namespace chip
