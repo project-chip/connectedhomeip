@@ -31,8 +31,7 @@ ChannelState ChannelHandle::GetState() const
 
 ExchangeContext * ChannelHandle::NewExchange(ExchangeDelegate * delegate)
 {
-    if (mAssociation == nullptr)
-        return nullptr;
+    assert(mAssociation != nullptr);
     return mAssociation->mChannelContext->NewExchange(delegate);
 }
 
