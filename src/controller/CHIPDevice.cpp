@@ -260,15 +260,15 @@ CHIP_ERROR Device::OpenPairingWindow(uint32_t timeout, bool useToken, uint16_t d
     writer.Init(std::move(buf));
     writer.ImplicitProfileId = chip::Protocols::kProtocol_ServiceProvisioning;
 
-    ReturnErrorOnFailure(writer.Put(DeviceLayer::ProfileTag(writer.ImplicitProfileId, 1), timeout));
+    ReturnErrorOnFailure(writer.Put(TLV::ProfileTag(writer.ImplicitProfileId, 1), timeout));
 
     if (useToken)
     {
-        ReturnErrorOnFailure(writer.Put(DeviceLayer::ProfileTag(writer.ImplicitProfileId, 2), discriminator));
+        ReturnErrorOnFailure(writer.Put(TLV::ProfileTag(writer.ImplicitProfileId, 2), discriminator));
 
         PASEVerifier verifier;
         ReturnErrorOnFailure(PASESession::GeneratePASEVerifier(verifier, setupPayload.setUpPINCode));
-        ReturnErrorOnFailure(writer.PutBytes(DeviceLayer::ProfileTag(writer.ImplicitProfileId, 3),
+        ReturnErrorOnFailure(writer.PutBytes(TLV::ProfileTag(writer.ImplicitProfileId, 3),
                                              reinterpret_cast<const uint8_t *>(verifier), sizeof(verifier)));
     }
 

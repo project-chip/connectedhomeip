@@ -192,15 +192,15 @@ public:
             reader.Init(std::move(buffer));
             reader.ImplicitProfileId = chip::Protocols::kProtocol_ServiceProvisioning;
 
-            SuccessOrExit(reader.Next(kTLVType_UnsignedInteger, DeviceLayer::ProfileTag(reader.ImplicitProfileId, 1)));
+            SuccessOrExit(reader.Next(kTLVType_UnsignedInteger, TLV::ProfileTag(reader.ImplicitProfileId, 1)));
             SuccessOrExit(reader.Get(timeout));
 
-            err = reader.Next(kTLVType_UnsignedInteger, DeviceLayer::ProfileTag(reader.ImplicitProfileId, 2));
+            err = reader.Next(kTLVType_UnsignedInteger, TLV::ProfileTag(reader.ImplicitProfileId, 2));
             if (err == CHIP_NO_ERROR)
             {
                 SuccessOrExit(reader.Get(discriminator));
 
-                err = reader.Next(kTLVType_ByteString, DeviceLayer::ProfileTag(reader.ImplicitProfileId, 3));
+                err = reader.Next(kTLVType_ByteString, TLV::ProfileTag(reader.ImplicitProfileId, 3));
                 if (err == CHIP_NO_ERROR)
                 {
                     SuccessOrExit(reader.GetBytes(reinterpret_cast<uint8_t *>(verifier), sizeof(verifier)));
