@@ -201,6 +201,8 @@ else()
     endif()
 endif()
 
+find_package(Python3 REQUIRED)
+
 # ==============================================================================
 # Generate configuration for CHIP GN build system
 # ==============================================================================
@@ -244,7 +246,12 @@ ExternalProject_Add(
     PREFIX                  ${CMAKE_CURRENT_BINARY_DIR}
     SOURCE_DIR              ${CHIP_ROOT}
     BINARY_DIR              ${CMAKE_CURRENT_BINARY_DIR}
-    CONFIGURE_COMMAND       ${GN_EXECUTABLE} --root=${CHIP_ROOT} --root-target=${GN_ROOT_TARGET} --dotfile=${GN_ROOT_TARGET}/.gn gen --check --fail-on-unused-args ${CMAKE_CURRENT_BINARY_DIR}
+    CONFIGURE_COMMAND       ${GN_EXECUTABLE}
+                                --root=${CHIP_ROOT}
+                                --root-target=${GN_ROOT_TARGET}
+                                --dotfile=${GN_ROOT_TARGET}/.gn
+                                --script-executable=${Python3_EXECUTABLE}
+                                gen --check --fail-on-unused-args ${CMAKE_CURRENT_BINARY_DIR}
     BUILD_COMMAND           ninja
     INSTALL_COMMAND         ""
     BUILD_BYPRODUCTS        ${CHIP_LIBRARIES}
