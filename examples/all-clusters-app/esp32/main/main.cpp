@@ -261,7 +261,7 @@ public:
         if (i == 0)
         {
             ConnectivityMgr().ClearWiFiStationProvision();
-            OpenDefaultPairingWindow();
+            OpenDefaultPairingWindow(true);
         }
     }
 
@@ -435,12 +435,20 @@ std::string createSetupPayload()
     return result;
 };
 
+WiFiWidget pairingWindowLED;
+
 class AppCallbacks : public AppDelegate
 {
 public:
     void OnReceiveError() override { statusLED1.BlinkOnError(); }
     void OnRendezvousStarted() override { bluetoothLED.Set(true); }
-    void OnRendezvousStopped() override { bluetoothLED.Set(false); }
+    void OnRendezvousStopped() override
+    {
+        bluetoothLED.Set(false);
+        pairingWindowLED.Set(false);
+    }
+    void OnPairingWindowOpened() override { pairingWindowLED.Set(true); }
+    void OnPairingWindowClosed() override { pairingWindowLED.Set(false); }
 };
 
 } // namespace
@@ -493,6 +501,7 @@ extern "C" void app_main()
     statusLED2.Init(GPIO_NUM_MAX);
     bluetoothLED.Init();
     wifiLED.Init();
+    pairingWindowLED.Init();
 
     // Init ZCL Data Model and CHIP App Server
     AppCallbacks callbacks;
@@ -585,6 +594,7 @@ extern "C" void app_main()
 
         bluetoothLED.SetVLED(ScreenManager::AddVLED(TFT_BLUE));
         wifiLED.SetVLED(ScreenManager::AddVLED(TFT_YELLOW));
+        pairingWindowLED.SetVLED(ScreenManager::AddVLED(TFT_ORANGE));
     }
 
 #endif // CONFIG_HAVE_DISPLAY

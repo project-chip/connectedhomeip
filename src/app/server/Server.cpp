@@ -36,6 +36,7 @@
 #include <support/logging/CHIPLogging.h>
 #include <sys/param.h>
 #include <system/SystemPacketBuffer.h>
+#include <system/TLVPacketBufferBackingStore.h>
 #include <transport/AdminPairingTable.h>
 #include <transport/SecureSessionMgr.h>
 
@@ -62,11 +63,68 @@ bool isRendezvousBypassed()
     return rendezvousMode == RendezvousInformationFlags::kNone;
 }
 
+class DeviceDiscriminatorCache
+{
+public:
+    CHIP_ERROR UpdateDiscriminator(uint16_t discriminator)
+    {
+        if (!mOriginalDiscriminatorCached)
+        {
+            // Cache the original discriminator
+            ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSetupDiscriminator(mOriginalDiscriminator));
+            mOriginalDiscriminatorCached = true;
+        }
+
+        return DeviceLayer::ConfigurationMgr().StoreSetupDiscriminator(discriminator);
+    }
+
+    CHIP_ERROR RestoreDiscriminator()
+    {
+        if (mOriginalDiscriminatorCached)
+        {
+            // Restore the original discriminator
+            ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().StoreSetupDiscriminator(mOriginalDiscriminator));
+            mOriginalDiscriminatorCached = false;
+        }
+
+        return CHIP_NO_ERROR;
+    }
+
+private:
+    bool mOriginalDiscriminatorCached = false;
+    uint16_t mOriginalDiscriminator   = 0;
+};
+
+DeviceDiscriminatorCache gDeviceDiscriminatorCache;
+
 class ServerRendezvousAdvertisementDelegate : public RendezvousAdvertisementDelegate
 {
 public:
-    CHIP_ERROR StartAdvertisement() const override { return chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(true); }
-    CHIP_ERROR StopAdvertisement() const override { return chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(false); }
+    CHIP_ERROR StartAdvertisement() const override
+    {
+        ReturnErrorOnFailure(chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(true));
+        if (mDelegate != nullptr)
+        {
+            mDelegate->OnPairingWindowOpened();
+        }
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR StopAdvertisement() const override
+    {
+        gDeviceDiscriminatorCache.RestoreDiscriminator();
+
+        ReturnErrorOnFailure(chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(false));
+        if (mDelegate != nullptr)
+        {
+            mDelegate->OnPairingWindowClosed();
+        }
+        return CHIP_NO_ERROR;
+    }
+
+    void SetDelegate(AppDelegate * delegate) { mDelegate = delegate; }
+
+private:
+    AppDelegate * mDelegate = nullptr;
 };
 
 DemoTransportMgr gTransports;
@@ -77,20 +135,19 @@ AdminId gNextAvailableAdminId = 0;
 
 ServerRendezvousAdvertisementDelegate gAdvDelegate;
 
-static CHIP_ERROR OpenPairingWindow(uint32_t pinCode, uint16_t discriminator)
+static CHIP_ERROR OpenPairingWindowUsingVerifier(uint16_t discriminator, PASEVerifier & verifier)
 {
     RendezvousParameters params;
 
-    ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().StoreSetupDiscriminator(discriminator));
-    ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().StoreSetupPinCode(pinCode));
+    ReturnErrorOnFailure(gDeviceDiscriminatorCache.UpdateDiscriminator(discriminator));
 
 #if CONFIG_NETWORK_LAYER_BLE
-    params.SetSetupPINCode(pinCode)
+    params.SetPASEVerifier(verifier)
         .SetBleLayer(DeviceLayer::ConnectivityMgr().GetBleLayer())
         .SetPeerAddress(Transport::PeerAddress::BLE())
         .SetAdvertisementDelegate(&gAdvDelegate);
 #else
-    params.SetSetupPINCode(pinCode);
+    params.SetPASEVerifier(verifier);
 #endif // CONFIG_NETWORK_LAYER_BLE
 
     AdminId admin                = gNextAvailableAdminId;
@@ -121,7 +178,53 @@ public:
 
         ChipLogProgress(AppServer, "Packet received from %s: %zu bytes", src_addr, static_cast<size_t>(data_len));
 
-        HandleDataModelMessage(header.GetSourceNodeId().Value(), std::move(buffer));
+        // TODO: This code is temporary, and must be updated to use the Cluster API.
+        // Issue: https://github.com/project-chip/connectedhomeip/issues/4725
+        if (payloadHeader.GetProtocolID() == chip::Protocols::kProtocol_ServiceProvisioning)
+        {
+            CHIP_ERROR err = CHIP_NO_ERROR;
+            uint32_t timeout;
+            uint16_t discriminator;
+            PASEVerifier verifier;
+
+            ChipLogProgress(AppServer, "Received service provisioning message. Treating it as OpenPairingWindow request");
+            chip::System::PacketBufferTLVReader reader;
+            reader.Init(std::move(buffer));
+            reader.ImplicitProfileId = chip::Protocols::kProtocol_ServiceProvisioning;
+
+            SuccessOrExit(reader.Next(kTLVType_UnsignedInteger, DeviceLayer::ProfileTag(reader.ImplicitProfileId, 1)));
+            SuccessOrExit(reader.Get(timeout));
+
+            err = reader.Next(kTLVType_UnsignedInteger, DeviceLayer::ProfileTag(reader.ImplicitProfileId, 2));
+            if (err == CHIP_NO_ERROR)
+            {
+                SuccessOrExit(reader.Get(discriminator));
+
+                err = reader.Next(kTLVType_ByteString, DeviceLayer::ProfileTag(reader.ImplicitProfileId, 3));
+                if (err == CHIP_NO_ERROR)
+                {
+                    SuccessOrExit(reader.GetBytes(reinterpret_cast<uint8_t *>(verifier), sizeof(verifier)));
+                }
+            }
+
+            ChipLogProgress(AppServer, "Pairing Window timeout %d seconds", timeout);
+
+            if (err != CHIP_NO_ERROR)
+            {
+                SuccessOrExit(err = OpenDefaultPairingWindow(false));
+            }
+            else
+            {
+                ChipLogProgress(AppServer, "Pairing Window discriminator %d", discriminator);
+                err = OpenPairingWindowUsingVerifier(discriminator, verifier);
+                SuccessOrExit(err);
+            }
+            ChipLogProgress(AppServer, "Opened the pairing window");
+        }
+        else
+        {
+            HandleDataModelMessage(header.GetSourceNodeId().Value(), std::move(buffer));
+        }
 
     exit:;
     }
@@ -222,13 +325,36 @@ SecureSessionMgr & chip::SessionManager()
     return gSessions;
 }
 
-CHIP_ERROR OpenDefaultPairingWindow()
+CHIP_ERROR OpenDefaultPairingWindow(bool resetAdmins)
 {
+    gDeviceDiscriminatorCache.RestoreDiscriminator();
+
     uint32_t pinCode;
-    uint16_t discriminator;
     ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSetupPinCode(pinCode));
-    ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSetupDiscriminator(discriminator));
-    return OpenPairingWindow(pinCode, discriminator);
+
+    RendezvousParameters params;
+
+#if CONFIG_NETWORK_LAYER_BLE
+    params.SetSetupPINCode(pinCode)
+        .SetBleLayer(DeviceLayer::ConnectivityMgr().GetBleLayer())
+        .SetPeerAddress(Transport::PeerAddress::BLE())
+        .SetAdvertisementDelegate(&gAdvDelegate);
+#else
+    params.SetSetupPINCode(pinCode);
+#endif // CONFIG_NETWORK_LAYER_BLE
+
+    if (resetAdmins)
+    {
+        gNextAvailableAdminId = 0;
+        gAdminPairings.Reset();
+    }
+
+    AdminId admin                = gNextAvailableAdminId;
+    AdminPairingInfo * adminInfo = gAdminPairings.AssignAdminId(admin);
+    VerifyOrReturnError(adminInfo != nullptr, CHIP_ERROR_NO_MEMORY);
+    gNextAvailableAdminId++;
+
+    return gRendezvousServer.Init(std::move(params), &gTransports, &gSessions, adminInfo);
 }
 
 // The function will initialize datamodel handler and then start the server
@@ -241,6 +367,7 @@ void InitServer(AppDelegate * delegate)
     InitDataModelHandler();
     gCallbacks.SetDelegate(delegate);
     gRendezvousServer.SetDelegate(delegate);
+    gAdvDelegate.SetDelegate(delegate);
 
     // Init transport before operations with secure session mgr.
 #if INET_CONFIG_ENABLE_IPV4
@@ -282,7 +409,7 @@ void InitServer(AppDelegate * delegate)
     }
     else
     {
-        SuccessOrExit(err = OpenDefaultPairingWindow());
+        SuccessOrExit(err = OpenDefaultPairingWindow(true));
     }
 
 #if CHIP_ENABLE_MDNS

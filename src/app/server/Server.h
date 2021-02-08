@@ -39,4 +39,4 @@ void InitServer(AppDelegate * delegate = nullptr);
 /**
  * Open the pairing window using default configured parameters.
  */
-CHIP_ERROR OpenDefaultPairingWindow();
+CHIP_ERROR OpenDefaultPairingWindow(bool resetAdmins);
