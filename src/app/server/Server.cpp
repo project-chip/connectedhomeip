@@ -425,7 +425,9 @@ void InitServer(AppDelegate * delegate)
     }
     else
     {
+#if CHIP_DEVICE_CONFIG_ENABLE_PAIRING_AUTOSTART
         SuccessOrExit(err = OpenDefaultPairingWindow(ResetAdmins::kYes));
+#endif
     }
 
 #if CHIP_ENABLE_MDNS

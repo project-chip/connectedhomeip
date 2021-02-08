@@ -376,6 +376,12 @@ void AppTask::StartBLEAdvertisementHandler(AppEvent * aEvent)
     if (aEvent->ButtonEvent.PinNo != BLE_ADVERTISEMENT_START_BUTTON)
         return;
 
+    if (chip::DeviceLayer::ConnectivityMgr().IsThreadProvisioned())
+    {
+        LOG_INF("NFC Tag emulation and BLE advertisement not started - device is commissioned to a Thread network.");
+        return;
+    }
+
     if (!sNFC.IsTagEmulationStarted())
     {
         if (!(GetAppTask().StartNFCTag() < 0))
@@ -392,14 +398,19 @@ void AppTask::StartBLEAdvertisementHandler(AppEvent * aEvent)
         LOG_INF("NFC Tag emulation is already started");
     }
 
-    if (!ConnectivityMgr().IsBLEAdvertisingEnabled())
+    if (ConnectivityMgr().IsBLEAdvertisingEnabled())
     {
-        ConnectivityMgr().SetBLEAdvertisingEnabled(true);
+        LOG_INF("BLE Advertisement is already enabled");
+        return;
+    }
+
+    if (OpenDefaultPairingWindow(chip::ResetAdmins::kNo) == CHIP_NO_ERROR)
+    {
         LOG_INF("Enabled BLE Advertisement");
     }
     else
     {
-        LOG_INF("BLE Advertisement is already enabled");
+        LOG_ERR("OpenDefaultPairingWindow() failed");
     }
 }
 
