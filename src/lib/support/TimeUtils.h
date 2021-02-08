@@ -131,7 +131,7 @@ extern void SecondsSinceEpochToCalendarTime(uint32_t secondsSinceEpoch, uint16_t
  *  @param hour           Hour (0-23).
  *  @param minute         Minute (0-59).
  *  @param second         Second (0-59).
- *  @param ChipEpochTime  Number of seconds since 2020-01-01 00:00:00 UTC.
+ *  @param chipEpochTime  Number of seconds since 2020-01-01 00:00:00 UTC.
  *
  *  @return   True if the date/time was converted successfully. False if the given year falls outside the
  *            representable range.
@@ -145,7 +145,7 @@ extern bool CalendarToChipEpochTime(uint16_t year, uint8_t month, uint8_t dayOfM
  *  @details  Input time values are limited to positive values up to 2^32-1. This limits the
  *            representable date range to the year 2155.
  *
- *  @param ChipEpochTime  Number of seconds since 2020-01-01 00:00:00 UTC.
+ *  @param chipEpochTime  Number of seconds since 2020-01-01 00:00:00 UTC.
  *  @param year           Gregorian calendar year.
  *  @param month          Month in standard form (1=January ... 12=December).
  *  @param dayOfMonth     Day-of-month in standard form (1=1st, 2=2nd, etc.).
