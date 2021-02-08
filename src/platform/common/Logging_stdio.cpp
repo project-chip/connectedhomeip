@@ -1,10 +1,9 @@
 /* See Project chip LICENSE file for licensing information. */
 
-#include "CHIPLogging.h"
-
 #include <core/CHIPCore.h>
 #include <support/CodeUtils.h>
 #include <support/DLLUtil.h>
+#include <support/logging/CHIPLogging.h>
 
 #include <stdarg.h>
 #include <stdio.h>
