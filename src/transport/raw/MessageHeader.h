@@ -244,6 +244,16 @@ public:
     CHIP_ERROR Decode(const uint8_t * data, uint16_t size, uint16_t * decode_size);
 
     /**
+     * A version of Decode that uses the type system to determine available
+     * space.
+     */
+    template <uint16_t N>
+    inline CHIP_ERROR Decode(const uint8_t (&data)[N], uint16_t * decode_size)
+    {
+        return Decode(data, N, decode_size);
+    }
+
+    /**
      * Encodes a header into the given buffer.
      *
      * @param data - the buffer to write to
@@ -256,6 +266,16 @@ public:
      *    CHIP_ERROR_INVALID_ARGUMENT on insufficient buffer size
      */
     CHIP_ERROR Encode(uint8_t * data, uint16_t size, uint16_t * encode_size) const;
+
+    /**
+     * A version of Encode that uses the type system to determine available
+     * space.
+     */
+    template <int N>
+    inline CHIP_ERROR Encode(uint8_t (&data)[N], uint16_t * encode_size) const
+    {
+        return Encode(data, N, encode_size);
+    }
 
 private:
     /// Represents the current encode/decode header version
@@ -464,6 +484,16 @@ public:
     CHIP_ERROR Decode(const uint8_t * data, uint16_t size, uint16_t * decode_size);
 
     /**
+     * A version of Decode that uses the type system to determine available
+     * space.
+     */
+    template <uint16_t N>
+    inline CHIP_ERROR Decode(const uint8_t (&data)[N], uint16_t * decode_size)
+    {
+        return Decode(data, N, decode_size);
+    }
+
+    /**
      * Encodes the encrypted part of the header into the given buffer.
      *
      * @param data - the buffer to write to
@@ -476,6 +506,16 @@ public:
      *    CHIP_ERROR_INVALID_ARGUMENT on insufficient buffer size
      */
     CHIP_ERROR Encode(uint8_t * data, uint16_t size, uint16_t * encode_size) const;
+
+    /**
+     * A version of Encode that uses the type system to determine available
+     * space.
+     */
+    template <uint16_t N>
+    inline CHIP_ERROR Encode(uint8_t (&data)[N], uint16_t * decode_size) const
+    {
+        return Encode(data, N, decode_size);
+    }
 
 private:
     /// Packet type (application data, security control packets, e.g. pairing,
