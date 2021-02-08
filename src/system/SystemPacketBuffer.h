@@ -643,6 +643,16 @@ inline PacketBufferHandle PacketBuffer::Last()
 
 namespace Encoding {
 
+class PacketBufferWriterUtil
+{
+private:
+    template <typename>
+    friend class PacketBufferWriterBase;
+    static void Initialize(BufferWriter & aBufferWriter, System::PacketBufferHandle & aPacket, size_t aAvailableSize,
+                           uint16_t aReservedSize);
+    static System::PacketBufferHandle Finalize(BufferWriter & aBufferWriter, System::PacketBufferHandle & aPacket);
+};
+
 /**
  * BufferWriter backed by packet buffer.
  *
@@ -657,29 +667,8 @@ namespace Encoding {
  *      // valid data
  *  @endcode
  */
-class PacketBufferWriterImpl
-{
-public:
-    /**
-     * Test whether this PacketBufferWriter is null, or conversely owns a PacketBuffer.
-     *
-     * @retval true     The PacketBufferWriter is null; it does not own a PacketBuffer. This implies either that
-     *                  construction failed, or that \c Finalize() has previously been called to release the buffer.
-     * @retval false    The PacketBufferWriter owns a PacketBuffer, which can be written using BufferWriter \c Put() methods,
-     *                  and (assuming no overflow) obtained by calling \c Finalize().
-     */
-    bool IsNull() const { return mPacket.IsNull(); }
-
-protected:
-    PacketBufferWriterImpl(size_t aAvailableSize, uint16_t aReservedSize, BufferWriter & aBufferWriter);
-    System::PacketBufferHandle Finalize(BufferWriter & aBufferWriter);
-
-private:
-    System::PacketBufferHandle mPacket;
-};
-
 template <class Writer>
-class PacketBufferWriterBase : public Writer, public PacketBufferWriterImpl
+class PacketBufferWriterBase : public Writer
 {
 public:
     /**
@@ -693,8 +682,20 @@ public:
      *  @param[in]  aReservedSize   Reserved packet buffer space for protocol headers; see \c PacketBufferHandle::New().
      */
     PacketBufferWriterBase(size_t aAvailableSize, uint16_t aReservedSize = CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE) :
-        Writer(nullptr, 0), PacketBufferWriterImpl(aAvailableSize, aReservedSize, *this)
-    {}
+        Writer(nullptr, 0)
+    {
+        PacketBufferWriterUtil::Initialize(*this, mPacket, aAvailableSize, aReservedSize);
+    }
+
+    /**
+     * Test whether this PacketBufferWriter is null, or conversely owns a PacketBuffer.
+     *
+     * @retval true     The PacketBufferWriter is null; it does not own a PacketBuffer. This implies either that
+     *                  construction failed, or that \c Finalize() has previously been called to release the buffer.
+     * @retval false    The PacketBufferWriter owns a PacketBuffer, which can be written using BufferWriter \c Put() methods,
+     *                  and (assuming no overflow) obtained by calling \c Finalize().
+     */
+    bool IsNull() const { return mPacket.IsNull(); }
 
     /**
      * Obtain the backing packet buffer, if it is valid.
@@ -705,7 +706,10 @@ public:
      *
      *  @return     A packet buffer handle.
      */
-    System::PacketBufferHandle Finalize() { return PacketBufferWriterImpl::Finalize(*this); }
+    System::PacketBufferHandle Finalize() { return PacketBufferWriterUtil::Finalize(*this, mPacket); }
+
+private:
+    System::PacketBufferHandle mPacket;
 };
 
 using PacketBufferWriter = PacketBufferWriterBase<chip::Encoding::BufferWriter>;
