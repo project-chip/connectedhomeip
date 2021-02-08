@@ -315,7 +315,7 @@ static CHIP_ERROR DecodeConvertAuthorityKeyIdentifierExtension(TLVReader & reade
 
     certData.mCertFlags.Set(CertFlags::kExtPresent_AuthKeyId);
 
-    // AuthorityKeyIdentifier extention MUST be marked as non-critical (default).
+    // AuthorityKeyIdentifier extension MUST be marked as non-critical (default).
 
     // AuthorityKeyIdentifier ::= SEQUENCE
     ASN1_START_SEQUENCE
@@ -350,7 +350,7 @@ static CHIP_ERROR DecodeConvertSubjectKeyIdentifierExtension(TLVReader & reader,
 
     certData.mCertFlags.Set(CertFlags::kExtPresent_SubjectKeyId);
 
-    // SubjectKeyIdentifier extention MUST be marked as non-critical (default).
+    // SubjectKeyIdentifier extension MUST be marked as non-critical (default).
 
     // SubjectKeyIdentifier ::= KeyIdentifier
     // KeyIdentifier ::= OCTET STRING
@@ -555,7 +555,7 @@ static CHIP_ERROR DecodeConvertExtension(TLVReader & reader, ASN1Writer & writer
         // extnID OBJECT IDENTIFIER,
         ASN1_ENCODE_OBJECT_ID(extensionOID);
 
-        // BasicConstraints, KeyUsage and ExtKeyUsage extentions MUST be marked as critical.
+        // BasicConstraints, KeyUsage and ExtKeyUsage extensions MUST be marked as critical.
         if (extensionTagNum == kTag_KeyUsage || extensionTagNum == kTag_BasicConstraints ||
             extensionTagNum == kTag_ExtendedKeyUsage)
         {

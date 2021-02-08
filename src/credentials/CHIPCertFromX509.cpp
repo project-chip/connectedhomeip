@@ -306,7 +306,7 @@ static CHIP_ERROR ConvertExtension(ASN1Reader & reader, TLVWriter & writer)
         {
             if (extensionOID == kOID_Extension_AuthorityKeyIdentifier)
             {
-                // This extention MUST be marked as non-critical.
+                // This extension MUST be marked as non-critical.
                 VerifyOrExit(!critical, err = ASN1_ERROR_INVALID_ENCODING);
 
                 // AuthorityKeyIdentifier ::= SEQUENCE
@@ -333,7 +333,7 @@ static CHIP_ERROR ConvertExtension(ASN1Reader & reader, TLVWriter & writer)
             }
             else if (extensionOID == kOID_Extension_SubjectKeyIdentifier)
             {
-                // This extention MUST be marked as non-critical.
+                // This extension MUST be marked as non-critical.
                 VerifyOrExit(!critical, err = ASN1_ERROR_INVALID_ENCODING);
 
                 // SubjectKeyIdentifier ::= KeyIdentifier
@@ -347,7 +347,7 @@ static CHIP_ERROR ConvertExtension(ASN1Reader & reader, TLVWriter & writer)
             }
             else if (extensionOID == kOID_Extension_KeyUsage)
             {
-                // This extention MUST be marked as critical.
+                // This extension MUST be marked as critical.
                 VerifyOrExit(critical, err = ASN1_ERROR_INVALID_ENCODING);
 
                 // KeyUsage ::= BIT STRING
@@ -372,7 +372,7 @@ static CHIP_ERROR ConvertExtension(ASN1Reader & reader, TLVWriter & writer)
             }
             else if (extensionOID == kOID_Extension_BasicConstraints)
             {
-                // This extention MUST be marked as critical.
+                // This extension MUST be marked as critical.
                 VerifyOrExit(critical, err = ASN1_ERROR_INVALID_ENCODING);
 
                 // BasicConstraints ::= SEQUENCE
@@ -427,7 +427,7 @@ static CHIP_ERROR ConvertExtension(ASN1Reader & reader, TLVWriter & writer)
             }
             else if (extensionOID == kOID_Extension_ExtendedKeyUsage)
             {
-                // This extention MUST be marked as critical.
+                // This extension MUST be marked as critical.
                 VerifyOrExit(critical, err = ASN1_ERROR_INVALID_ENCODING);
 
                 err = writer.StartContainer(ContextTag(kTag_ExtendedKeyUsage), kTLVType_Array, outerContainer);
