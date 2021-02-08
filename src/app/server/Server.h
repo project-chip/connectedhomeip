@@ -36,6 +36,13 @@ using DemoTransportMgr = chip::TransportMgr<chip::Transport::UDP>;
  */
 void InitServer(AppDelegate * delegate = nullptr);
 
+namespace chip {
+
+constexpr bool kResetAdmins      = true;
+constexpr bool kDoNotResetAdmins = false;
+
+} // namespace chip
+
 /**
  * Open the pairing window using default configured parameters.
  */

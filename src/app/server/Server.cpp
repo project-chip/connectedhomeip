@@ -211,7 +211,7 @@ public:
 
             if (err != CHIP_NO_ERROR)
             {
-                SuccessOrExit(err = OpenDefaultPairingWindow(false));
+                SuccessOrExit(err = OpenDefaultPairingWindow(kDoNotResetAdmins));
             }
             else
             {
@@ -343,7 +343,7 @@ CHIP_ERROR OpenDefaultPairingWindow(bool resetAdmins)
     params.SetSetupPINCode(pinCode);
 #endif // CONFIG_NETWORK_LAYER_BLE
 
-    if (resetAdmins)
+    if (resetAdmins == kResetAdmins)
     {
         gNextAvailableAdminId = 0;
         gAdminPairings.Reset();
@@ -409,7 +409,7 @@ void InitServer(AppDelegate * delegate)
     }
     else
     {
-        SuccessOrExit(err = OpenDefaultPairingWindow(true));
+        SuccessOrExit(err = OpenDefaultPairingWindow(kResetAdmins));
     }
 
 #if CHIP_ENABLE_MDNS
