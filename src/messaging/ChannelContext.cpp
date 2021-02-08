@@ -36,8 +36,7 @@ void ChannelContext::Start(const ChannelBuilder & builder)
 
 ExchangeContext * ChannelContext::NewExchange(ExchangeDelegate * delegate)
 {
-    if (GetState() != ChannelState::kReady)
-        return nullptr;
+    assert(GetState() == ChannelState::kReady);
     return mExchangeManager->NewContext(mStateVars.mReady.mSession, delegate);
 }
 
@@ -56,12 +55,6 @@ bool ChannelContext::MatchNodeId(NodeId nodeId)
     default:
         return false;
     }
-}
-
-bool ChannelContext::MatchNetworkPreference(ChannelBuilder::NetworkPreference preference)
-{
-    // TODO: select interface is not supported yet
-    return true;
 }
 
 bool ChannelContext::MatchTransport(Transport::Type transport)
@@ -140,7 +133,7 @@ bool ChannelContext::MatchesBuilder(const ChannelBuilder & builder)
         break;
     }
 
-    return MatchNetworkPreference(builder.GetNetworkPreference()) && MatchTransportPreference(builder.GetTransportPreference());
+    return MatchTransportPreference(builder.GetTransportPreference());
 }
 
 bool ChannelContext::IsPasePairing()
@@ -182,9 +175,6 @@ void ChannelContext::EnterPreparingState(const ChannelBuilder & builder)
 {
     mState                         = ChannelState::kPreparing;
     mStateVars.mPreparing.mBuilder = builder;
-
-    // TODO: Skip waiting for interface, it is not clear how to wait for a network interface for now.
-    mStateVars.mPreparing.mInterface = INET_NULL_INTERFACEID;
 
     EnterAddressResolve();
 }
@@ -265,8 +255,6 @@ void ChannelContext::HandleNodeIdResolve(CHIP_ERROR error, uint64_t nodeId, cons
     case ChannelState::kPreparing: {
         switch (mStateVars.mPreparing.mState)
         {
-        case PrepareState::kWaitingForInterface:
-            return;
         case PrepareState::kAddressResolving: {
             if (error != CHIP_NO_ERROR)
             {
@@ -401,7 +389,8 @@ void ChannelContext::OnSessionEstablished()
         // This will trigger OnNewConnection callback from SecureSessionManager
         mExchangeManager->GetSessionMgr()->NewPairing(Optional<Transport::PeerAddress>(addr),
                                                       mStateVars.mPreparing.mBuilder.GetPeerNodeId(),
-                                                      mStateVars.mPreparing.mSession.mPasePairingSession);
+                                                      mStateVars.mPreparing.mSession.mPasePairingSession,
+                                                      mExchangeManager->GetAdminId());
         return;
     }
     case PrepareState::kCasePairing:
