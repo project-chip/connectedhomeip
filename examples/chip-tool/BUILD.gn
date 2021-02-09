@@ -25,6 +25,7 @@ config("includes") {
 
 executable("chip-tool") {
   sources = [
+    "${chip_root}/src/app/clusters/media-playback-client/media-playback-client.cpp",
     "${chip_root}/src/app/reporting/reporting-default-configuration.cpp",
     "${chip_root}/src/app/reporting/reporting.cpp",
     "${chip_root}/src/app/server/DataModelHandler.cpp",

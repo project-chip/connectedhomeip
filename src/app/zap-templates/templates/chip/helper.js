@@ -531,6 +531,11 @@ function asObjectiveCNumberType(label, type)
   return templateUtil.templatePromise(this.global, promise)
 }
 
+function isStrEndsWith(str, substr)
+{
+  return str.endsWith(substr);
+}
+
 //
 // Module exports
 //
@@ -550,3 +555,4 @@ exports.asPythonType                          = asPythonType;
 exports.asPythonCType                         = asPythonCType;
 exports.asCallbackAttributeType               = asCallbackAttributeType;
 exports.hasSpecificResponse                   = hasSpecificResponse;
+exports.isStrEndsWith                         = isStrEndsWith;
