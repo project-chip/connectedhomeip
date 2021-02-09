@@ -49,7 +49,7 @@ public:
      *               be null if buf_len is 0.
      * @param buf_len The number of octets in the buffer.
      */
-    Reader(const uint8_t * buffer, uint16_t buf_len) : mBufStart(buffer), mReadPtr(buffer), mAvailable(buf_len) {}
+    Reader(const uint8_t * buffer, uint16_t buf_len) : mBufStart(buffer), mBufLen(buf_len), mReadPtr(buffer), mAvailable(buf_len) {}
 
     /**
      * Number of octets we have read so far.  This might be able to go away once
@@ -156,11 +156,44 @@ public:
     template <typename T>
     void RawRead(T * retval);
 
+    /**
+     * Advance the Reader forward by the specified number of octets.
+     *
+     * @param len The number of octets to skip.
+     *
+     * @note If the len argument is greater than the number of available octets
+     *       remaining, the Reader will advance to the end of the buffer
+     *       without entering a failed-status state.
+     */
+    Reader & Skip(uint16_t len)
+    {
+        len = ::chip::min(len, mAvailable);
+        mReadPtr += len;
+        mAvailable = static_cast<uint16_t>(mAvailable - len);
+        return *this;
+    }
+
+    /**
+     * Return the Reader to the beginning of the buffer.
+     */
+    Reader & Reset()
+    {
+        mReadPtr   = mBufStart;
+        mAvailable = mBufLen;
+        mStatus    = CHIP_NO_ERROR;
+        return *this;
+    }
+
 private:
     /**
      * Our buffer start.
      */
     const uint8_t * const mBufStart;
+
+    /**
+     * The size of the buffer in octets.
+     */
+    const uint16_t mBufLen;
 
     /**
      * Our current read point.
