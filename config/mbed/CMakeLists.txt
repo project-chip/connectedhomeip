@@ -25,11 +25,11 @@
 #
 
 include(ExternalProject)
+include(mbed-util.cmake)
 
 # ==============================================================================
 # Declare configuration variables and define constants
 # ==============================================================================
-
 # C/C++ compiler flags passed to CHIP build system
 list(APPEND CHIP_CFLAGS)
 
@@ -75,7 +75,11 @@ macro(chip_gn_arg_bool ARG BOOLEAN)
     endif()
 endmacro()
 
-macro(chip_gn_arg_cflags ARG CFLAGS)
+macro(chip_gn_arg_flags ARG CFLAGS)
+    string(APPEND CHIP_GN_ARGS "${ARG} = [${CFLAGS}]\n")
+endmacro()
+
+macro(chip_gn_arg_lang_flags ARG CFLAGS)
     set(CFLAG_EXCLUDES "[")
     foreach(cflag ${CHIP_CFLAG_EXCLUDES})
         string(APPEND CFLAG_EXCLUDES "\"${cflag}\", ")
@@ -111,9 +115,17 @@ endif()
 
 # Prepare compiler flags
 
-#convert_list_of_flags_to_string_of_flags(CHIP_CFLAGS CHIP_CFLAGS)
-#convert_list_of_flags_to_string_of_flags(CHIP_CFLAGS_C CHIP_CFLAGS_C)
-#convert_list_of_flags_to_string_of_flags(CHIP_CFLAGS_CC CHIP_CFLAGS_CC)
+mbed_get_common_compile_flags(CHIP_CFLAGS)
+mbed_get_lang_compile_flags(CHIP_CFLAGS_C C)
+list(APPEND CHIP_CFLAGS_C ${CMAKE_C_FLAGS_INIT})
+mbed_get_lang_compile_flags(CHIP_CFLAGS_CC CXX)
+list(APPEND CHIP_CFLAGS_CC ${CMAKE_CXX_FLAGS_INIT})
+
+set(SEPARATOR ",")
+convert_list_of_flags_to_string_of_flags(CHIP_CFLAGS CHIP_CFLAGS ${SEPARATOR})
+set(SEPARATOR " ")
+convert_list_of_flags_to_string_of_flags(CHIP_CFLAGS_C CHIP_CFLAGS_C ${SEPARATOR})
+convert_list_of_flags_to_string_of_flags(CHIP_CFLAGS_CC CHIP_CFLAGS_CC ${SEPARATOR})
 
 # Prepare CHIP libraries that the application should be linked with
 
@@ -146,16 +158,16 @@ endif()
 # Generate configuration for CHIP GN build system
 # ==============================================================================
 
-#chip_gn_arg_cflags("target_cflags"                          ${CHIP_CFLAGS})
-#chip_gn_arg_cflags("target_cflags_c"                        ${CHIP_CFLAGS_C})
-#chip_gn_arg_cflags("target_cflags_cc"                       ${CHIP_CFLAGS_CC})
+chip_gn_arg_flags("target_cflags"                         ${CHIP_CFLAGS})
+chip_gn_arg_lang_flags("target_cflags_c"                  ${CHIP_CFLAGS_C})
+chip_gn_arg_lang_flags("target_cflags_cc"                 ${CHIP_CFLAGS_CC})
 chip_gn_arg_string("mbed_ar"                              ${CMAKE_AR})
 chip_gn_arg_string("mbed_cc"                              ${CMAKE_C_COMPILER})
 chip_gn_arg_string("mbed_cxx"                             ${CMAKE_CXX_COMPILER})
-chip_gn_arg_bool  ("is_debug"                               CONFIG_DEBUG)
-chip_gn_arg_bool  ("chip_build_tests"                       CONFIG_CHIP_BUILD_TESTS)
-chip_gn_arg_bool  ("chip_build_libshell"                    CONFIG_CHIP_LIB_SHELL)
-chip_gn_arg_bool  ("chip_with_lwip"                         CONFIG_CHIP_WITH_LWIP)
+chip_gn_arg_bool  ("is_debug"                             CONFIG_DEBUG)
+chip_gn_arg_bool  ("chip_build_tests"                     CONFIG_CHIP_BUILD_TESTS)
+chip_gn_arg_bool  ("chip_build_libshell"                  CONFIG_CHIP_LIB_SHELL)
+chip_gn_arg_bool  ("chip_with_lwip"                       CONFIG_CHIP_WITH_LWIP)
 
 if (BOARD STREQUAL "native_posix")
     chip_gn_arg_string("target_cpu" "x86")
