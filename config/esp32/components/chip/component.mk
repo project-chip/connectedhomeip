@@ -125,6 +125,9 @@ install-chip : $(OUTPUT_DIR)
 	echo esp32_cc = \"$(CC)\"                >> $(OUTPUT_DIR)/args.gn
 	echo esp32_cxx = \"$(CXX)\"              >> $(OUTPUT_DIR)/args.gn
 	echo esp32_cpu = \"esp32\"               >> $(OUTPUT_DIR)/args.gn
+ifeq ($(is_debug),false)
+	@echo "is_debug = false" >> $(OUTPUT_DIR)/args.gn
+endif
 	if [[ "$(CONFIG_ENABLE_PW_RPC)" = "y" ]]; then                        \
 	  echo "chip_build_pw_rpc_lib = true" >> $(OUTPUT_DIR)/args.gn       ;\
 	  echo "pw_log_BACKEND = \"//third_party/connectedhomeip/third_party/pigweed/repo/pw_log_basic\"" >> $(OUTPUT_DIR)/args.gn     ;\
