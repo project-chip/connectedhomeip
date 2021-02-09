@@ -23,11 +23,11 @@ namespace Platform {
  *                      C Standard Library-style format specifiers
  *                      containing the log message to be formatted and
  *                      logged.
- * @param[in] args       A variadic argument list whose elements should
+ * @param[in] v         A variadic argument list whose elements should
  *                      correspond to the format specifiers in @a msg.
  *
  */
-void LogV(const char * module, uint8_t category, const char * msg, va_list args);
+void LogV(const char * module, uint8_t category, const char * msg, va_list v);
 
 } // namespace Platform
 } // namespace Logging
