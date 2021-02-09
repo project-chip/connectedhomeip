@@ -216,6 +216,7 @@ In order to flash the application we recommend using
 
 ## Testing the example
 
-The app can be deployed against any generic OpenThread Border Router. See
-the guide [Commissioning NXP K32W using Android CHIPTool](../../../docs/guides/nxp_k32w_android_commissioning.md)
+The app can be deployed against any generic OpenThread Border Router. See the
+guide
+[Commissioning NXP K32W using Android CHIPTool](../../../docs/guides/nxp_k32w_android_commissioning.md)
 for step-by-step instructions.
