@@ -74,6 +74,7 @@ typedef void (*GroupsClusterGetGroupMembershipResponseCallback)(void * context, 
 typedef void (*GroupsClusterRemoveGroupResponseCallback)(void * context, uint16_t groupId);
 typedef void (*GroupsClusterViewGroupResponseCallback)(void * context, uint16_t groupId, uint8_t * groupName);
 typedef void (*IdentifyClusterIdentifyQueryResponseCallback)(void * context, uint16_t timeout);
+typedef void (*MediaPlaybackClusterPlaybackCallback)(void * context);
 typedef void (*ScenesClusterAddSceneResponseCallback)(void * context, uint16_t groupId, uint8_t sceneId);
 typedef void (*ScenesClusterGetSceneMembershipResponseCallback)(void * context, uint8_t capacity, uint16_t groupId,
                                                                 uint8_t sceneCount,
