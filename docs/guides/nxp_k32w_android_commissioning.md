@@ -151,7 +151,7 @@ To make your PC work as a Thread Border Router, complete the following tasks:
 
     -   We need to tell hostapd to use our config file by editing the main
         hostapd configuration file. Change the line that starts with
-        #DAEMON_CONF (remember to remove #):   
+        #DAEMON_CONF (remember to remove #):  
          \$ sudo vim /etc/default/hostapd
 
               DAEMON_CONF="/etc/hostapd/hostapd.conf"
@@ -225,8 +225,7 @@ To make your PC work as a Thread Border Router, complete the following tasks:
                            addresses:
                            - 192.168.4.1/24
 
-
-5.  Set up RADVD
+5)  Set up RADVD
 
     -   Install required package:
 
@@ -234,7 +233,7 @@ To make your PC work as a Thread Border Router, complete the following tasks:
 
     -   Configure RADVD for distributing the prefix _fd11:33_::/64 to the
         devices connected to the AP, while announcing them that is also has a
-        route to _fd11:22::/64_   
+        route to _fd11:22::/64_  
          \$ sudo vim /etc/radvd.conf
 
               interface wlan0 {
@@ -252,7 +251,7 @@ To make your PC work as a Thread Border Router, complete the following tasks:
               };
 
 
-    -   Enable radvd service:   
+    -   Enable radvd service:
          $ sudo chmod u=rw,g=r,o=r /etc/radvd.conf
             $ sudo systemctl enable
         radvd.service
@@ -305,7 +304,6 @@ To make your PC work as a Thread Border Router, complete the following tasks:
         $ sudo service dnsmasq status
         $ sudo service radvd status
         $ sudo service br status
-
 
 <hr>
 
