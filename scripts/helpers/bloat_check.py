@@ -28,6 +28,7 @@ import os
 import re
 import stat
 import subprocess
+import traceback
 import zipfile
 
 LOG_KEEP_DAYS = 3
@@ -338,7 +339,8 @@ def main():
       a.delete()
 
     except Exception as e:
-      logging.warning('Failed to process bloat report: %r', e)
+      tb = traceback.format_exc()
+      logging.warning('Failed to process bloat report: %s', tb)
 
 
 

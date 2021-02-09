@@ -40,15 +40,14 @@ if (efr32_board == "BRD4166A") {
 efr32_sdk("sdk") {
   include_dirs = [
     "${chip_root}/src/platform/EFR32",
-    "${efr32_project_dir}/include/",
-    "${efr32_project_dir}/src/",
+    "${efr32_project_dir}/include",
+    "${examples_plat_dir}",
     "${examples_plat_dir}/${efr32_family}/${efr32_board}",
   ]
 
   sources = [
     "${efr32_project_dir}/include/CHIPProjectConfig.h",
     "${efr32_project_dir}/include/FreeRTOSConfig.h",
-    "${examples_plat_dir}/${efr32_family}/${efr32_board}/hal-config.h",
   ]
 
   defines = []
@@ -79,14 +78,14 @@ efr32_executable("lock_app") {
   ]
 
   include_dirs += [
-    "${efr32_project_dir}/include",
+    "include",
     "${chip_root}/src/app/util",
     "${chip_root}/src/app/server",
     "${examples_plat_dir}",
+    "${examples_plat_dir}/${efr32_family}/${efr32_board}",
   ]
 
   sources = [
-    "${examples_plat_dir}/${efr32_family}/${efr32_board}/hal-config.h",
     "${examples_plat_dir}/${efr32_family}/${efr32_board}/init_board.c",
     "${examples_plat_dir}/${efr32_family}/${efr32_board}/init_mcu.c",
     "${examples_plat_dir}/LEDWidget.cpp",

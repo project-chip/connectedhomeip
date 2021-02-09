@@ -34,7 +34,12 @@
 
 #pragma once
 
-#include "ble-configuration.h"
+// Generated plugin macros
+
+#ifdef EMBER_AF_BOARD_TYPE
+#undef EMBER_AF_BOARD_TYPE
+#endif
+#define EMBER_AF_BOARD_TYPE BOARD_ID
 
 /* Indicate if LCD is supported */
 #if (EMBER_AF_BOARD_TYPE == BRD4100A) || (EMBER_AF_BOARD_TYPE == BRD4101B) || (EMBER_AF_BOARD_TYPE == BRD4103A) ||                 \

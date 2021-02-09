@@ -437,7 +437,7 @@ public:
      *  @return Returns 'true' if the current message is requesting an acknowledgment from the recipient, else 'false'.
      *
      */
-    bool IsNeedsAck() const { return mExchangeFlags.Has(Header::ExFlagValues::kExchangeFlag_NeedsAck); }
+    bool NeedsAck() const { return mExchangeFlags.Has(Header::ExFlagValues::kExchangeFlag_NeedsAck); }
 
     /**
      * A call to `Encode` will require at least this many bytes on the current

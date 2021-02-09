@@ -1798,17 +1798,6 @@
 #endif // CHIP_DETAIL_LOGGING
 
 /**
- *  @def CHIP_RETAIN_LOGGING
- *
- *  @brief
- *    If asserted (1), enable logging of all messages in the
- *    chip::Logging::LogCategory::kLogCategory_Retain category.
- *    If not defined by the application, by default CHIP_RETAIN_LOGGING is
- *    remapped to CHIP_PROGRESS_LOGGING
- *
- */
-
-/**                                                                                                         │    │
  * CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE
  *
  * The maximum size (in bytes) of a log message

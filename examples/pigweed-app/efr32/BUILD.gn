@@ -1,0 +1,107 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/efr32_sdk.gni")
+import("//build_overrides/pigweed.gni")
+import("${build_root}/config/defaults.gni")
+
+import("${chip_root}/config/efr32/lib/pw_rpc/pw_rpc.gni")
+import("${efr32_sdk_build_root}/efr32_executable.gni")
+import("${efr32_sdk_build_root}/efr32_sdk.gni")
+
+assert(current_os == "freertos")
+
+efr32_project_dir = "${chip_root}/examples/pigweed-app/efr32"
+examples_plat_dir = "${chip_root}/examples/platform/efr32"
+
+efr32_sdk("sdk") {
+  include_dirs = [
+    "${chip_root}/src/platform/EFR32",
+    "${efr32_project_dir}/include",
+    "${examples_plat_dir}",
+    "${examples_plat_dir}/${efr32_family}/${efr32_board}",
+  ]
+
+  defines = []
+  if (is_debug) {
+    defines += [ "BUILD_RELEASE=0" ]
+  } else {
+    defines += [ "BUILD_RELEASE=1" ]
+  }
+
+  defines += [
+    "BOARD_ID=${efr32_board}",
+    "HAL_VCOM_ENABLE = 1",
+    "EFR32_LOG_ENABLED =1",
+  ]
+}
+
+efr32_executable("pigweed_app") {
+  include_dirs = []
+  defines = []
+  output_name = "chip-efr32-pigweed-example.out"
+
+  public_deps = [
+    ":sdk",
+    "$dir_pw_assert",
+    "${chip_root}/config/efr32/lib/pw_rpc:pw_rpc",
+    "${chip_root}/examples/common/pigweed:system_rpc_server",
+    "${chip_root}/src/lib",
+    "${examples_plat_dir}/pw_sys_io:pw_sys_io_efr32",
+  ]
+
+  include_dirs += [
+    "include",
+    "${examples_plat_dir}",
+    "${examples_plat_dir}/${efr32_family}/${efr32_board}",
+    "${examples_plat_dir}/pw_sys_io/public",
+    "${dir_pigweed}/pw_sys_io/public",
+    "${dir_pigweed}/pw_span/public_overrides",
+    "${dir_pigweed}/pw_span/public",
+    "${dir_pigweed}/pw_polyfill/public",
+    "${dir_pigweed}/pw_polyfill/standard_library_public",
+    "${dir_pigweed}/pw_polyfill/public_overrides",
+    "${dir_pigweed}/pw_status/public",
+    "${dir_pigweed}/pw_preprocessor/public",
+    "${dir_pigweed}/pw_rpc/system_server/public",
+  ]
+
+  sources = [
+    "${examples_plat_dir}/${efr32_family}/${efr32_board}/init_board.c",
+    "${examples_plat_dir}/${efr32_family}/${efr32_board}/init_mcu.c",
+    "${examples_plat_dir}/LEDWidget.cpp",
+    "${examples_plat_dir}/uart.c",
+    "src/main.cpp",
+  ]
+
+  output_dir = root_out_dir
+
+  if (efr32_family == "efr32mg12") {
+    ldscript = "${efr32_project_dir}/ldscripts/efr32-pigweed-example-MG12P.ld"
+  } else if (efr32_family == "efr32mg21") {
+    ldscript = "${efr32_project_dir}/ldscripts/efr32-pigweed-example-MG21.ld"
+  }
+
+  ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
+}
+
+group("efr32") {
+  deps = [ ":pigweed_app" ]
+}
+
+group("default") {
+  deps = [ ":efr32" ]
+}

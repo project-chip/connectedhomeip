@@ -26,7 +26,6 @@ void GetMessageString(char * buf, uint8_t chipCategory, uint8_t otLevelLog)
             memcpy(buf, "[Error]", 7);
             break;
         case kLogCategory_Progress:
-        case kLogCategory_Retain:
         default:
             memcpy(buf, "[Progress]", 10);
             break;
