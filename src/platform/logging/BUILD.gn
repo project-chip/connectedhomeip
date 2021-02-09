@@ -25,8 +25,8 @@ simple_log_platforms = [
   "esp32",
   "k32w",
   "linux",
+  "nrfconnect",
   "qpg6100",
-  "zephyr",
 ]
 
 foreach(platform, simple_log_platforms) {

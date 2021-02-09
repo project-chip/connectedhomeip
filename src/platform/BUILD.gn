@@ -506,7 +506,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
           "nrfconnect/ThreadStackManagerImpl.h",
         ]
       }
-      public_deps += [ "${chip_root}/src/platform/logging:zephyr" ]
+      public_deps += [ "${chip_root}/src/platform/logging:nrfconnect" ]
     } else if (chip_device_platform == "qpg6100") {
       sources += [
         "FreeRTOS/SystemTimeSupport.cpp",
