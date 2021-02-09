@@ -129,10 +129,11 @@ CHIP_ERROR RendezvousSession::SendSecureMessage(Protocols::CHIPProtocolId protoc
 {
     VerifyOrReturnError(mPairingSessionHandle != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
+    PacketHeader unusedPacketHeader;
     PayloadHeader payloadHeader;
     payloadHeader.SetMessageType(static_cast<uint16_t>(protocol), msgType);
 
-    return mSecureSessionMgr->SendMessage(*mPairingSessionHandle, payloadHeader, std::move(msgBuf));
+    return mSecureSessionMgr->SendMessage(*mPairingSessionHandle, payloadHeader, unusedPacketHeader, std::move(msgBuf));
 }
 
 void RendezvousSession::OnSessionEstablishmentError(CHIP_ERROR err)

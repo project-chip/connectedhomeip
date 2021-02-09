@@ -65,6 +65,8 @@ enum class SendMessageFlags : uint16_t
     /**< Used to indicate that a response is expected within a specified timeout. */
     kExpectResponse = 0x0002,
     /**< Used to indicate that the source node ID in the message header can be reused. */
+    kControlMessage = 0x0004,
+    /**< Used to indicate that the message is a control message. */
     kReuseSourceId = 0x0020,
     /**< Used to indicate that the message is already encoded. */
     kAlreadyEncoded = 0x0080,

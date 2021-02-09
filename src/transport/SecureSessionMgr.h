@@ -175,14 +175,50 @@ public:
      * @brief
      *   Send a message to a currently connected peer.
      *
+     *  @param[in]    session          The secure session of the destination.
+     *
+     *  @param[in]    msgBuf           A hanlde to the PacketBuffer object holding the encoded CHIP message.
+     *
+     */
+    CHIP_ERROR SendMessage(SecureSessionHandle session, System::PacketBufferHandle && msgBuf);
+
+    /**
+     * @brief
+     *   Send a message to a currently connected peer.
+     *
+     *  @param[in]    session          The secure session of the destination.
+     *
+     *  @param[in]    payloadHeader    A reference to the PayloadHeader object of outgoing message.
+     *
+     *  @param[in]    packetHeader     A reference to the PacketHeader object of outgoing message.
+     *
+     *  @param[in]    msgBuf           A hanlde to the PacketBuffer object holding the encoded CHIP message.
+     *
+     *  @param[in]    bufferRetainSlot A hanlde to the PacketBuffer object whose payload has already been encrypted.
+     *
      * @details
      *   msgBuf contains the data to be transmitted.  If bufferRetainSlot is not null and this function
      *   returns success, the encrypted data that was sent, as well as various other information needed
      *   to retransmit it, will be stored in *bufferRetainSlot.
      */
-    CHIP_ERROR SendMessage(SecureSessionHandle session, System::PacketBufferHandle && msgBuf);
-    CHIP_ERROR SendMessage(SecureSessionHandle session, PayloadHeader & payloadHeader, System::PacketBufferHandle && msgBuf,
-                           EncryptedPacketBufferHandle * bufferRetainSlot = nullptr);
+    CHIP_ERROR SendMessage(SecureSessionHandle session, PayloadHeader & payloadHeader, PacketHeader & packetHeader,
+                           System::PacketBufferHandle && msgBuf, EncryptedPacketBufferHandle * bufferRetainSlot = nullptr);
+
+    /**
+     * @brief
+     *   Send an encrypted message to a currently connected peer.
+     *
+     *  @param[in]    session          The secure session of the destination.
+     *
+     *  @param[in]    msgBuf           A hanlde to the PacketBuffer object holding the CHIP message which is encrypted.
+     *
+     *  @param[in]    bufferRetainSlot A hanlde to the PacketBuffer object whose payload has already been encrypted.
+     *
+     * @details
+     *   msgBuf contains the data to be transmitted.  If bufferRetainSlot is not null and this function
+     *   returns success, the encrypted data that was sent, as well as various other information needed
+     *   to retransmit it, will be stored in *bufferRetainSlot.
+     */
     CHIP_ERROR SendEncryptedMessage(SecureSessionHandle session, EncryptedPacketBufferHandle msgBuf,
                                     EncryptedPacketBufferHandle * bufferRetainSlot);
 

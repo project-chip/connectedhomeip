@@ -99,14 +99,14 @@ Transport::Type SecureSessionMgr::GetTransportType(NodeId peerNodeId)
 CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, System::PacketBufferHandle && msgBuf)
 {
     PayloadHeader unusedPayloadHeader;
-    return SendMessage(session, unusedPayloadHeader, std::move(msgBuf));
+    PacketHeader unusedPacketHeader;
+    return SendMessage(session, unusedPayloadHeader, unusedPacketHeader, std::move(msgBuf));
 }
 
-CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHeader & payloadHeader,
+CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHeader & payloadHeader, PacketHeader & packetHeader,
                                          System::PacketBufferHandle && msgBuf, EncryptedPacketBufferHandle * bufferRetainSlot)
 {
-    PacketHeader unusedPacketHeader;
-    return SendMessage(session, payloadHeader, unusedPacketHeader, std::move(msgBuf), bufferRetainSlot,
+    return SendMessage(session, payloadHeader, packetHeader, std::move(msgBuf), bufferRetainSlot,
                        EncryptionState::kPayloadIsUnencrypted);
 }
 

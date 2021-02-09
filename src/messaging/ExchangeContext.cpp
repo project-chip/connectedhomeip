@@ -80,6 +80,7 @@ CHIP_ERROR ExchangeContext::SendMessage(uint16_t protocolId, uint8_t msgType, Pa
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     PayloadHeader payloadHeader;
+    PacketHeader packetHeader;
     Transport::PeerConnectionState * state = nullptr;
 
     // Don't let method get called on a freed object.
@@ -137,6 +138,10 @@ CHIP_ERROR ExchangeContext::SendMessage(uint16_t protocolId, uint8_t msgType, Pa
             SuccessOrExit(err);
         }
     }
+    else if (sendFlags.Has(SendMessageFlags::kControlMessage))
+    {
+        packetHeader.SetSecureSessionControlMsg(true);
+    }
 
     // Send the message.
     if (payloadHeader.NeedsAck())
@@ -147,7 +152,8 @@ CHIP_ERROR ExchangeContext::SendMessage(uint16_t protocolId, uint8_t msgType, Pa
         err = mExchangeMgr->GetReliableMessageMgr()->AddToRetransTable(&mReliableMessageContext, &entry);
         SuccessOrExit(err);
 
-        err = mExchangeMgr->GetSessionMgr()->SendMessage(mSecureSession, payloadHeader, std::move(msgBuf), &entry->retainedBuf);
+        err = mExchangeMgr->GetSessionMgr()->SendMessage(mSecureSession, payloadHeader, packetHeader, std::move(msgBuf),
+                                                         &entry->retainedBuf);
 
         if (err != CHIP_NO_ERROR)
         {
@@ -162,7 +168,7 @@ CHIP_ERROR ExchangeContext::SendMessage(uint16_t protocolId, uint8_t msgType, Pa
     }
     else
     {
-        err = mExchangeMgr->GetSessionMgr()->SendMessage(mSecureSession, payloadHeader, std::move(msgBuf));
+        err = mExchangeMgr->GetSessionMgr()->SendMessage(mSecureSession, payloadHeader, packetHeader, std::move(msgBuf));
         SuccessOrExit(err);
     }
 
