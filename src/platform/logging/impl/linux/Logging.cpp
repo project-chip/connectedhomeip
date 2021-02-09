@@ -2,7 +2,7 @@
 
 #include <logging/LogV.h>
 
-#include <syslog.h>
+#include <stdio.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -25,7 +25,9 @@ namespace Platform {
  */
 void LogV(const char * module, uint8_t category, const char * msg, va_list v)
 {
-    vsyslog(LOG_INFO, msg, v);
+    printf("CHIP:%s: ", module);
+    vprintf(msg, v);
+    printf("\n");
 
     // Let the application know that a log message has been emitted.
     DeviceLayer::OnLogOutput();
