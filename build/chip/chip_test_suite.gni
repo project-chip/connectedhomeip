@@ -80,16 +80,15 @@ template("chip_test_suite") {
     invoker.sources += invoker.test_sources
   }
 
-
   static_library("${_suite_name}_common") {
     forward_variables_from(invoker, "*", [ "tests" ])
 
     output_dir = "${root_out_dir}/lib"
 
     if (defined(invoker.public_deps)) {
-      public_deps += ["${chip_root}/src/platform/logging:stdio"]
+      public_deps += [ "${chip_root}/src/platform/logging:stdio" ]
     } else {
-      public_deps = ["${chip_root}/src/platform/logging:stdio"]
+      public_deps = [ "${chip_root}/src/platform/logging:stdio" ]
     }
   }
 
