@@ -63,6 +63,11 @@ bool isRendezvousBypassed()
     return rendezvousMode == RendezvousInformationFlags::kNone;
 }
 
+// TODO: The following class is setting the discriminator in Persistent Storage. This is
+//       is needed since BLE reads the discriminator using ConfigurationMgr APIs. The
+//       better solution will be to pass the discriminator to BLE without changing it
+//       in the persistent storage.
+//       https://github.com/project-chip/connectedhomeip/issues/4767
 class DeviceDiscriminatorCache
 {
 public:
