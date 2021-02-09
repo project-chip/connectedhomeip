@@ -1,11 +1,10 @@
 /* See Project chip LICENSE file for licensing information. */
 
-#include "CHIPLogging.h"
+#include <logging/LogV.h>
 
-#include <core/CHIPCore.h>
+#include <core/CHIPConfig.h>
+
 #include <os/log.h>
-#include <support/CodeUtils.h>
-#include <support/DLLUtil.h>
 
 #include <stdarg.h>
 #include <stdio.h>
@@ -13,19 +12,12 @@
 
 namespace chip {
 namespace Logging {
+namespace Platform {
 
-void LogV(uint8_t module, uint8_t category, const char * msg, va_list v)
+void LogV(const char * module, uint8_t category, const char * msg, va_list v)
 {
-    if (!IsCategoryEnabled(category))
-    {
-        return;
-    }
-
-    char moduleName[chip::Logging::kMaxModuleNameLen + 1];
-    GetModuleName(moduleName, sizeof(moduleName), module);
-
-    char formattedMsg[512];
-    int32_t prefixLen = snprintf(formattedMsg, sizeof(formattedMsg), "CHIP: [%s] ", moduleName);
+    char formattedMsg[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
+    int32_t prefixLen = snprintf(formattedMsg, sizeof(formattedMsg), "CHIP: [%s] ", module);
     if (prefixLen < 0)
     {
         // This should not happen
@@ -67,5 +59,6 @@ void LogV(uint8_t module, uint8_t category, const char * msg, va_list v)
 #endif
 }
 
+} // namespace Platform
 } // namespace Logging
 } // namespace chip

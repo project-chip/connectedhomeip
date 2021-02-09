@@ -26,6 +26,7 @@ void __attribute__((weak)) OnLogOutput(void) {}
 } // namespace DeviceLayer
 
 namespace Logging {
+namespace Platform {
 
 /**
  * CHIP log output function.
@@ -73,5 +74,6 @@ void LogV(const char * module, uint8_t category, const char * msg, va_list v)
     DeviceLayer::OnLogOutput();
 }
 
+} // namespace Platform
 } // namespace Logging
 } // namespace chip

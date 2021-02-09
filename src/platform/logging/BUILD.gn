@@ -10,6 +10,14 @@ config("includes") {
   include_dirs = [ "include" ]
 }
 
+if (chip_enable_openthread) {
+  import("//build_overrides/openthread.gni")
+
+  if (chip_device_platform == "linux" || chip_device_platform == "Darwin") {
+    import("//build_overrides/ot_br_posix.gni")
+  }
+}
+
 simple_log_platforms = [
   "cc13x2_26x2",
   "darwin",
@@ -25,8 +33,27 @@ foreach(platform, simple_log_platforms) {
   if (chip_device_platform == platform) {
     static_library(platform) {
       sources = [ "impl/" + platform + "/Logging.cpp" ]
-      public_configs = [ ":includes" ]
-      deps = [ "${chip_root}/src/lib/core:chip_config_header" ]
+
+      deps = [
+        "${chip_root}/src/lib/core:chip_config_header",
+        "${chip_root}/src/platform:platform_buildconfig",
+      ]
+
+      public_configs = [
+        ":includes",
+      ]
+
+      if (chip_enable_openthread) {
+        defines = [
+          "CHIP_ENABLE_OPENTHREAD=1"
+        ]
+
+        if (platform == "cc13x2_26x2") {
+          deps += ["${openthread_root}:libopenthread-mtd"]
+        } else {
+          deps += ["${openthread_root}:libopenthread-ftd"]
+        }
+      }
     }
   }
 }
@@ -36,14 +63,24 @@ if (current_os == "android") {
     sources = [ "impl/android/Logging.cpp" ]
     deps = [
       "${chip_root}/src/lib/core:chip_config_header",
+      "${chip_root}/src/platform:platform_buildconfig",
       "log",
     ]
-    public_configs = [ ":includes" ]
+    public_configs = [
+      ":includes",
+    ]
   }
 }
 
 static_library("stdio") {
   sources = [ "impl/stdio/Logging.cpp" ]
-  public_configs = [ ":includes" ]
-  deps = [ "${chip_root}/src/lib/core:chip_config_header" ]
+
+  deps = [
+    "${chip_root}/src/lib/core:chip_config_header",
+    "${chip_root}/src/platform:platform_buildconfig",
+  ]
+
+  public_configs = [
+    ":includes",
+  ]
 }

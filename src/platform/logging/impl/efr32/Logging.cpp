@@ -3,6 +3,10 @@
 
 #include <core/CHIPConfig.h>
 
+#if CHIP_ENABLE_OPENTHREAD
+#include <openthread/platform/logging.h>
+#endif
+
 #include <FreeRTOS.h>
 #include <queue.h>
 #include <retargetserial.h>
@@ -204,10 +208,10 @@ extern "C" void LwIPLog(const char * aFormat, ...)
 /**
  * Platform logging function for OpenThread
  */
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#if CHIP_ENABLE_OPENTHREAD
 extern "C" void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const char * aFormat, ...)
 {
-    IgnoreUnusedVariable(aLogRegion);
+    (void) aLogRegion;
     va_list v;
 
     va_start(v, aFormat);
@@ -260,7 +264,7 @@ extern "C" void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const ch
 #endif // EFR32_LOG_ENABLED
     va_end(v);
 }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#endif // CHIP_ENABLE_OPENTHREAD
 
 #if HARD_FAULT_LOG_ENABLE && EFR32_LOG_ENABLED
 
