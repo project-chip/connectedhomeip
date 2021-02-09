@@ -255,7 +255,7 @@ private:
     uint8_t mPoint[kMAX_Point_Length];
 
     /* w0s and w1s */
-    PASEVerifier mWS;
+    PASEVerifier mPASEVerifier;
 
     uint32_t mSetupPINCode;
 

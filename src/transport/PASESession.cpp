@@ -67,7 +67,7 @@ void PASESession::Clear()
     // This function zeroes out and resets the memory used by the object.
     // It's done so that no security related information will be leaked.
     memset(&mPoint[0], 0, sizeof(mPoint));
-    memset(&mWS[0][0], 0, sizeof(mWS));
+    memset(&mPASEVerifier[0][0], 0, sizeof(mPASEVerifier));
     memset(&mKe[0], 0, sizeof(mKe));
     mNextExpectedMsg = Protocols::SecureChannel::MsgType::PASE_Spake2pError;
 
@@ -234,7 +234,7 @@ CHIP_ERROR PASESession::SetupSpake2p(uint32_t pbkdf2IterCount, const uint8_t * s
         VerifyOrExit(salt != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
         VerifyOrExit(saltLen > 0, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-        err = PASESession::ComputePASEVerifier(mSetupPINCode, pbkdf2IterCount, salt, saltLen, mWS);
+        err = PASESession::ComputePASEVerifier(mSetupPINCode, pbkdf2IterCount, salt, saltLen, mPASEVerifier);
         SuccessOrExit(err);
     }
 
@@ -295,7 +295,7 @@ CHIP_ERROR PASESession::WaitForPairing(const PASEVerifier & verifier, Optional<N
                                     strlen(kSpake2pKeyExchangeSalt), myNodeId, myKeyId, delegate);
     SuccessOrExit(err);
 
-    memmove(&mWS, verifier, sizeof(verifier));
+    memmove(&mPASEVerifier, verifier, sizeof(verifier));
     mComputeVerifier = false;
 
 exit:
@@ -364,7 +364,7 @@ CHIP_ERROR PASESession::Pair(const Transport::PeerAddress peerAddress, const PAS
     mConnectionState.SetPeerAddress(peerAddress);
     mConnectionState.SetPeerNodeId(peerNodeId);
 
-    memmove(&mWS, verifier, sizeof(verifier));
+    memmove(&mPASEVerifier, verifier, sizeof(verifier));
     mComputeVerifier = false;
 
     err = SendPBKDFParamRequest();
@@ -498,7 +498,7 @@ CHIP_ERROR PASESession::SendPBKDFParamResponse()
     err = SetupSpake2p(mIterationCount, mSalt, mSaltLength);
     SuccessOrExit(err);
 
-    err = mSpake2p.ComputeL(mPoint, &sizeof_point, &mWS[1][0], kSpake2p_WS_Length);
+    err = mSpake2p.ComputeL(mPoint, &sizeof_point, &mPASEVerifier[1][0], kSpake2p_WS_Length);
     SuccessOrExit(err);
 
     mNextExpectedMsg = Protocols::SecureChannel::MsgType::PASE_Spake2p1;
@@ -574,7 +574,7 @@ CHIP_ERROR PASESession::SendMsg1()
     System::PacketBufferHandle msg_pA;
 
     CHIP_ERROR err = mSpake2p.BeginProver(reinterpret_cast<const uint8_t *>(""), 0, reinterpret_cast<const uint8_t *>(""), 0,
-                                          &mWS[0][0], kSpake2p_WS_Length, &mWS[1][0], kSpake2p_WS_Length);
+                                          &mPASEVerifier[0][0], kSpake2p_WS_Length, &mPASEVerifier[1][0], kSpake2p_WS_Length);
     SuccessOrExit(err);
 
     err = mSpake2p.ComputeRoundOne(X, &X_len);
@@ -615,8 +615,8 @@ CHIP_ERROR PASESession::HandleMsg1_and_SendMsg2(const PacketHeader & header, con
     VerifyOrExit(buf != nullptr, err = CHIP_ERROR_MESSAGE_INCOMPLETE);
     VerifyOrExit(buf_len == kMAX_Point_Length, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
-    err = mSpake2p.BeginVerifier(reinterpret_cast<const uint8_t *>(""), 0, reinterpret_cast<const uint8_t *>(""), 0, &mWS[0][0],
-                                 kSpake2p_WS_Length, mPoint, sizeof(mPoint));
+    err = mSpake2p.BeginVerifier(reinterpret_cast<const uint8_t *>(""), 0, reinterpret_cast<const uint8_t *>(""), 0,
+                                 &mPASEVerifier[0][0], kSpake2p_WS_Length, mPoint, sizeof(mPoint));
     SuccessOrExit(err);
 
     err = mSpake2p.ComputeRoundOne(Y, &Y_len);

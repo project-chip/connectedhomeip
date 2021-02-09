@@ -254,7 +254,7 @@ CHIP_ERROR Device::OpenPairingWindow(uint32_t timeout, bool useToken, uint16_t d
     // Issue: https://github.com/project-chip/connectedhomeip/issues/4725
 
     // Construct and send "open pairing window" message to the device
-    System::PacketBufferHandle buf = System::PacketBufferHandle::New(0);
+    System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::kMaxPacketBufferSize);
     System::PacketBufferTLVWriter writer;
 
     writer.Init(std::move(buf));
