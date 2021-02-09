@@ -41,6 +41,7 @@ executable("chip-tool") {
     "${chip_root}/src/app/util/process-cluster-message.cpp",
     "${chip_root}/src/app/util/process-global-message.cpp",
     "${chip_root}/src/app/util/util.cpp",
+    "${chip_root}/src/app/clusters/media-playback-client/media-playback-client.cpp",
     "commands/clusters/ModelCommand.cpp",
     "commands/common/Command.cpp",
     "commands/common/Commands.cpp",

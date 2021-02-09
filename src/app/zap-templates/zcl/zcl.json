@@ -4,6 +4,7 @@
     "xmlFile": [
         "binding-cluster.xml",
         "clusters-extensions.xml",
+        "media-playback-cluster.xml",
         "custom-types.xml",
         "chip-devices.xml",
         "types.xml",
@@ -29,8 +30,7 @@
         "wwah-silabs-devices.xml",
         "sample-extensions.xml"
     ],
-
-    "manufacturersXml": "manufacturers.xml",
+    "manufacturersXml": "../../../../third_party/zap/repo/zcl-builtin/shared/manufacturers.xml",
     "options": {
         "text": {
             "defaultResponsePolicy": ["Always", "Conditional", "Never"]
