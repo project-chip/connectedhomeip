@@ -30,7 +30,8 @@
         "wwah-silabs-devices.xml",
         "sample-extensions.xml"
     ],
-    "manufacturersXml": "../shared/manufacturers.xml",
+
+    "manufacturersXml": "manufacturers.xml",
     "options": {
         "text": {
             "defaultResponsePolicy": ["Always", "Conditional", "Never"]

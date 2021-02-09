@@ -35,7 +35,7 @@
 #include <core/CHIPEncoding.h>
 #include <core/CHIPSafeCasts.h>
 #include <protocols/Protocols.h>
-#include <support/BufBound.h>
+#include <support/BufferWriter.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/SafeInt.h>
@@ -411,9 +411,9 @@ CHIP_ERROR PASESession::SendPBKDFParamResponse()
     err = DRBG_get_bytes(msg, kPBKDFParamRandomNumberSize);
     SuccessOrExit(err);
 
-    // Let's construct the rest of the message using BufBound
+    // Let's construct the rest of the message using BufferWriter
     {
-        BufBound bbuf(&msg[kPBKDFParamRandomNumberSize], resplen - kPBKDFParamRandomNumberSize);
+        Encoding::LittleEndian::BufferWriter bbuf(&msg[kPBKDFParamRandomNumberSize], resplen - kPBKDFParamRandomNumberSize);
         bbuf.Put64(mIterationCount);
         bbuf.Put32(mSaltLength);
         bbuf.Put(mSalt, mSaltLength);
@@ -568,7 +568,7 @@ CHIP_ERROR PASESession::HandleMsg1_and_SendMsg2(const PacketHeader & header, con
     data_len = static_cast<uint16_t>(Y_len + verifier_len);
 
     {
-        System::PacketBufBound bbuf(data_len);
+        System::PacketBufferWriter bbuf(data_len);
         VerifyOrExit(!bbuf.IsNull(), err = CHIP_SYSTEM_ERROR_NO_MEMORY);
         bbuf.Put(&Y[0], Y_len);
         bbuf.Put(verifier, verifier_len);
@@ -624,7 +624,7 @@ CHIP_ERROR PASESession::HandleMsg2_and_SendMsg3(const PacketHeader & header, con
     }
 
     {
-        System::PacketBufBound bbuf(verifier_len);
+        System::PacketBufferWriter bbuf(verifier_len);
         VerifyOrExit(!bbuf.IsNull(), err = CHIP_SYSTEM_ERROR_NO_MEMORY);
 
         bbuf.Put(verifier, verifier_len);

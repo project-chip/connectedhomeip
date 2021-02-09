@@ -31,7 +31,6 @@
 #include <core/CHIPEncoding.h>
 #include <core/CHIPSafeCasts.h>
 #include <protocols/Protocols.h>
-#include <support/BufBound.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/ReturnMacros.h>

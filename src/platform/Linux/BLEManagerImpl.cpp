@@ -641,7 +641,7 @@ void BLEManagerImpl::DriveBLEState(intptr_t arg)
 
 void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
 {
-    ChipLogRetain(Ble, "Got notification regarding chip connection closure");
+    ChipLogProgress(Ble, "Got notification regarding chip connection closure");
 }
 
 void BLEManagerImpl::NewConnection(BleLayer * bleLayer, void * appState, const uint16_t connDiscriminator)
