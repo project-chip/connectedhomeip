@@ -26,8 +26,7 @@
 #include <support/CHIPMem.h>
 
 static const char * const CHIP_SELECT_QUEUE = "com.zigbee.chip.select";
-
-constexpr chip::NodeId kLocalDeviceId = chip::kTestControllerNodeId;
+static const char * const CHIP_COMMISSIONER_DEVICE_ID_KEY = "com.zigbee.chip.commissioner.device.id";
 
 static NSString * const kErrorMemoryInit = @"Init Memory failure";
 static NSString * const kErrorCommissionerCreate = @"Init failure while creating a commissioner";
@@ -94,7 +93,23 @@ static NSString * const kErrorGetPairedDevice = @"Failure while trying to retrie
             return nil;
         }
 
-        errorCode = _cppCommissioner->Init(kLocalDeviceId, _persistentStorageDelegateBridge, _pairingDelegateBridge);
+        chip::NodeId localDeviceId = 0;
+        uint16_t idStringLen = 32;
+        char deviceIdString[idStringLen];
+        if (CHIP_NO_ERROR
+            != _persistentStorageDelegateBridge->GetKeyValue(CHIP_COMMISSIONER_DEVICE_ID_KEY, deviceIdString, idStringLen)) {
+            localDeviceId = arc4random();
+            localDeviceId = localDeviceId << 32 | arc4random();
+            CHIP_LOG_ERROR("Assigned %llx node ID to the controller", localDeviceId);
+            _persistentStorageDelegateBridge->SetKeyValue(
+                CHIP_COMMISSIONER_DEVICE_ID_KEY, [[NSString stringWithFormat:@"%llx", localDeviceId] UTF8String]);
+        } else {
+            NSScanner * scanner = [NSScanner scannerWithString:[NSString stringWithUTF8String:deviceIdString]];
+            [scanner scanHexLongLong:&localDeviceId];
+            CHIP_LOG_ERROR("Found %llx node ID for the controller", localDeviceId);
+        }
+
+        errorCode = _cppCommissioner->Init(localDeviceId, _persistentStorageDelegateBridge, _pairingDelegateBridge);
         if ([self checkForInitError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorCommissionerInit]) {
             return nil;
         }

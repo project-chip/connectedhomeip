@@ -96,7 +96,9 @@ void CHIPPersistentStorageDelegateBridge::GetKeyValue(const char * key)
         } else {
             NSString * value = [mDefaultPersistentStorage objectForKey:keyString];
             NSLog(@"PersistentStorageDelegate Get Value for Key: %@, value %@", keyString, value);
-            mCompletionHandler(keyString, value);
+            if (mCompletionHandler) {
+                mCompletionHandler(keyString, value);
+            }
         }
     });
 }
@@ -146,7 +148,9 @@ void CHIPPersistentStorageDelegateBridge::SetKeyValue(const char * key, const ch
             });
         } else {
             [mDefaultPersistentStorage setObject:valueString forKey:keyString];
-            mSetStatusHandler(keyString, [CHIPError errorForCHIPErrorCode:0]);
+            if (mSetStatusHandler) {
+                mSetStatusHandler(keyString, [CHIPError errorForCHIPErrorCode:0]);
+            }
         }
     });
 }
@@ -164,7 +168,9 @@ void CHIPPersistentStorageDelegateBridge::DeleteKeyValue(const char * key)
             });
         } else {
             [mDefaultPersistentStorage removeObjectForKey:keyString];
-            mDeleteStatusHandler(keyString, [CHIPError errorForCHIPErrorCode:0]);
+            if (mDeleteStatusHandler) {
+                mDeleteStatusHandler(keyString, [CHIPError errorForCHIPErrorCode:0]);
+            }
         }
     });
 }

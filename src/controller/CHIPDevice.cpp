@@ -47,6 +47,7 @@
 #include <support/ReturnMacros.h>
 #include <support/SafeInt.h>
 #include <support/logging/CHIPLogging.h>
+#include <system/TLVPacketBufferBackingStore.h>
 
 using namespace chip::Inet;
 using namespace chip::System;
@@ -245,6 +246,46 @@ void Device::OnMessageReceived(const PacketHeader & header, const PayloadHeader 
             HandleDataModelMessage(mDeviceId, std::move(msgBuf));
         }
     }
+}
+
+CHIP_ERROR Device::OpenPairingWindow(uint32_t timeout, bool useToken, uint16_t discriminator, SetupPayload & setupPayload)
+{
+    // TODO: This code is temporary, and must be updated to use the Cluster API.
+    // Issue: https://github.com/project-chip/connectedhomeip/issues/4725
+
+    // Construct and send "open pairing window" message to the device
+    System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::kMaxPacketBufferSize);
+    System::PacketBufferTLVWriter writer;
+
+    writer.Init(std::move(buf));
+    writer.ImplicitProfileId = chip::Protocols::kProtocol_ServiceProvisioning;
+
+    ReturnErrorOnFailure(writer.Put(TLV::ProfileTag(writer.ImplicitProfileId, 1), timeout));
+
+    if (useToken)
+    {
+        ReturnErrorOnFailure(writer.Put(TLV::ProfileTag(writer.ImplicitProfileId, 2), discriminator));
+
+        PASEVerifier verifier;
+        ReturnErrorOnFailure(PASESession::GeneratePASEVerifier(verifier, setupPayload.setUpPINCode));
+        ReturnErrorOnFailure(writer.PutBytes(TLV::ProfileTag(writer.ImplicitProfileId, 3),
+                                             reinterpret_cast<const uint8_t *>(verifier), sizeof(verifier)));
+    }
+
+    System::PacketBufferHandle outBuffer;
+    ReturnErrorOnFailure(writer.Finalize(&outBuffer));
+
+    PayloadHeader header;
+
+    header.SetMessageType(chip::Protocols::kProtocol_ServiceProvisioning, 0);
+
+    ReturnErrorOnFailure(SendMessage(std::move(outBuffer), header));
+
+    setupPayload.version               = 1;
+    setupPayload.rendezvousInformation = RendezvousInformationFlags::kBLE;
+    setupPayload.discriminator         = discriminator;
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR Device::LoadSecureSessionParameters(ResetTransport resetNeeded)
