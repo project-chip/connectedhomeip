@@ -33,6 +33,7 @@ if (chip_link_tests) {
       _test_output_dir = invoker.output_dir
     }
 
+
     executable(_test_name) {
       forward_variables_from(invoker, "*", [ "output_dir" ])
       output_dir = _test_output_dir

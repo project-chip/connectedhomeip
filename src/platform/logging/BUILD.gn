@@ -50,7 +50,11 @@ foreach(platform, simple_log_platforms) {
 
         if (platform == "cc13x2_26x2") {
           deps += ["${openthread_root}:libopenthread-mtd"]
-        } else {
+        } else if (platform == "efr32") {
+          deps += ["${openthread_root}:libopenthread-ftd"]
+        } else if (platform == "k32w") {
+          deps += ["${openthread_root}:libopenthread-ftd"]
+        } else if (platform == "qpg6100") {
           deps += ["${openthread_root}:libopenthread-ftd"]
         }
       }
