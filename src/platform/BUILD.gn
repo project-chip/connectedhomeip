@@ -483,7 +483,6 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "Zephyr/SystemTimeSupport.cpp",
         "Zephyr/ZephyrConfig.cpp",
         "Zephyr/ZephyrConfig.h",
-        "common/Logging_stdio.cpp",
         "nrfconnect/BLEManagerImpl.h",
         "nrfconnect/BlePlatformConfig.h",
         "nrfconnect/CHIPDevicePlatformConfig.h",
