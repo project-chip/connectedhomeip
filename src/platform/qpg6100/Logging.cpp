@@ -57,6 +57,7 @@ namespace Logging {
 
 void LogV(uint8_t module, uint8_t category, const char * msg, va_list v)
 {
+#if _CHIP_USE_LOGGING
     if (IsCategoryEnabled(category))
     {
         char formattedMsg[CHIP_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE];
@@ -94,6 +95,7 @@ void LogV(uint8_t module, uint8_t category, const char * msg, va_list v)
         // Let the application know that a log message has been emitted.
         DeviceLayer::OnLogOutput();
     }
+#endif // _CHIP_USE_LOGGING
 }
 
 } // namespace Logging

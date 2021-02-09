@@ -1532,7 +1532,9 @@ INET_ERROR TCPEndPoint::DoClose(INET_ERROR err, bool suppressCallback)
                 lingerStruct.l_linger = 0;
 
                 if (setsockopt(mSocket, SOL_SOCKET, SO_LINGER, &lingerStruct, sizeof(lingerStruct)) != 0)
+                {
                     ChipLogError(Inet, "SO_LINGER: %d", errno);
+                }
             }
 
             if (close(mSocket) != 0 && err == INET_NO_ERROR)

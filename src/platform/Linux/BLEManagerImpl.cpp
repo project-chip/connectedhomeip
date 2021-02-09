@@ -454,7 +454,9 @@ void BLEManagerImpl::HandleTXCharChanged(BLE_CONNECTION_OBJECT conId, const uint
 
 exit:
     if (err != CHIP_NO_ERROR)
+    {
         ChipLogError(DeviceLayer, "HandleTXCharChanged() failed: %s", ErrorStr(err));
+    }
 }
 
 void BLEManagerImpl::HandleRXCharWrite(BLE_CONNECTION_OBJECT conId, const uint8_t * value, size_t len)
