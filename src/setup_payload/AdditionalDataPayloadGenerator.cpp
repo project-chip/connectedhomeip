@@ -112,20 +112,26 @@ CHIP_ERROR AdditionalDataPayloadGenerator::generateRotatingDeviceId(uint16_t lif
     SuccessOrExit(err);
     err = hash.Finish(hashOutputBuffer);
     SuccessOrExit(err);
-
+    
     outputBufferWriter.Put16(lifetimeCounter);
-    outputBufferWriter.Put(reinterpret_cast<const char *>(
-                               &hashOutputBuffer[kSHA256_Hash_Length - RotatingDeviceId::kRotatingDeviceIdHashSuffixLength]),
+    if (ArraySize(hashOutputBuffer) - RotatingDeviceId::kRotatingDeviceIdHashSuffixLength >= 0) 
+    {
+        outputBufferWriter.Put(&hashOutputBuffer[ArraySize(hashOutputBuffer) - RotatingDeviceId::kRotatingDeviceIdHashSuffixLength],
                            RotatingDeviceId::kRotatingDeviceIdHashSuffixLength);
-
-    for (; rotatingDeviceIdBufferIndex < outputBufferWriter.Size(); rotatingDeviceIdBufferIndex++)
+    }
+    else 
+    {
+        outputBufferWriter.Put(&hashOutputBuffer, ArraySize(hashOutputBuffer));
+    }
+    
+    for (; rotatingDeviceIdBufferIndex < outputBufferWriter.Needed(); rotatingDeviceIdBufferIndex++)
     {
         snprintf(&rotatingDeviceIdBuffer[rotatingDeviceIdBufferIndex * 2],
                  rotatingDeviceIdBufferSize - rotatingDeviceIdBufferIndex * 2, "%02X",
                  outputBufferWriter.Buffer()[rotatingDeviceIdBufferIndex]);
     }
 
-    rotatingDeviceIdBuffer[rotatingDeviceIdBufferIndex] = 0;
+    rotatingDeviceIdBuffer[rotatingDeviceIdBufferIndex * 2 + 1] = 0;
     rotatingDeviceIdBufferOutputSize                    = rotatingDeviceIdBufferIndex;
     ChipLogDetail(DeviceLayer, "rotatingDeviceId: %s", rotatingDeviceIdBuffer);
 
