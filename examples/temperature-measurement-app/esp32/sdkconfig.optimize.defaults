@@ -16,10 +16,9 @@
 #    limitations under the License.
 #
 #    Description:
-#      CI uses this to select the ESP32 M5Stack.
+#      Some useful defaults for the optimizing temperature-measurement-app configuration.
 #
 
-CONFIG_DEVICE_TYPE_M5STACK=y
 
 # Default to 921600 baud when flashing and monitoring device
 CONFIG_ESPTOOLPY_BAUD_921600B=y
@@ -41,6 +40,7 @@ CONFIG_PARTITION_TABLE_FILENAME="partitions.csv"
 
 # Compiler options
 CONFIG_COMPILER_OPTIMIZATION_SIZE=y
+CONFIG_COMPILER_OPTIMIZATION_ASSERTIONS_DISABLE=y
 
 # Bluetooth controller
 CONFIG_BTDM_CTRL_BLE_MAX_CONN=1
@@ -57,6 +57,9 @@ CONFIG_ESP32_WIFI_DYNAMIC_TX_BUFFER_NUM=16
 # FreeRTOS
 CONFIG_FREERTOS_UNICORE=y
 
+# Log output
+CONFIG_LOG_DEFAULT_LEVEL_NONE=y
+
 # LWIP
 CONFIG_LWIP_TCPIP_RECVMBOX_SIZE=16
 
@@ -64,6 +67,7 @@ CONFIG_LWIP_TCPIP_RECVMBOX_SIZE=16
 CONFIG_LWIP_TCP_SYNMAXRTX=6
 
 # Compatibility options
+CONFIG_OPTIMIZATION_ASSERTIONS_DISABLED=y
 CONFIG_BTDM_CONTROLLER_BLE_MAX_CONN=1
 CONFIG_BTDM_CONTROLLER_BLE_MAX_CONN_EFF=1
 CONFIG_NIMBLE_MAX_CONNECTIONS=1
