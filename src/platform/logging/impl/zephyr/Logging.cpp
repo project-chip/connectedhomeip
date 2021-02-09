@@ -60,7 +60,6 @@ void LogV(const char * module, uint8_t category, const char * msg, va_list v)
         LOG_ERR("%s", log_strdup(formattedMsg));
         break;
     case kLogCategory_Progress:
-    case kLogCategory_Retain:
     default:
         LOG_INF("%s", log_strdup(formattedMsg));
         break;

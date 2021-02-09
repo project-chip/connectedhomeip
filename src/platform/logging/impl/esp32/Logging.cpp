@@ -34,7 +34,6 @@ void LogV(const char * module, uint8_t category, const char * msg, va_list v)
         ESP_LOGE(tag, "%s", formattedMsg);
         break;
     case kLogCategory_Progress:
-    case kLogCategory_Retain:
     default:
         ESP_LOGI(tag, "%s", formattedMsg);
         break;
