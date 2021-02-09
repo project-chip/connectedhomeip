@@ -130,11 +130,11 @@ public:
             snprintf(buf, bufSize, "UNDEFINED");
             break;
         case Type::kUdp:
-            mIPAddress.ToString(ip_addr, sizeof(ip_addr));
+            mIPAddress.ToString(ip_addr);
             snprintf(buf, bufSize, "UDP:%s:%d", ip_addr, mPort);
             break;
         case Type::kTcp:
-            mIPAddress.ToString(ip_addr, sizeof(ip_addr));
+            mIPAddress.ToString(ip_addr);
             snprintf(buf, bufSize, "TCP:%s:%d", ip_addr, mPort);
             break;
         case Type::kBle:

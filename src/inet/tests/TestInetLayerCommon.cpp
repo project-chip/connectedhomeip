@@ -374,8 +374,8 @@ void HandleRawMessageReceived(const IPEndPointBasis * aEndPoint, const PacketBuf
     char lSourceAddressBuffer[INET6_ADDRSTRLEN];
     char lDestinationAddressBuffer[INET6_ADDRSTRLEN];
 
-    aPacketInfo->SrcAddress.ToString(lSourceAddressBuffer, sizeof(lSourceAddressBuffer));
-    aPacketInfo->DestAddress.ToString(lDestinationAddressBuffer, sizeof(lDestinationAddressBuffer));
+    aPacketInfo->SrcAddress.ToString(lSourceAddressBuffer);
+    aPacketInfo->DestAddress.ToString(lDestinationAddressBuffer);
 
     printf("Raw message received from %s to %s (%zu bytes)\n", lSourceAddressBuffer, lDestinationAddressBuffer,
            static_cast<size_t>(aBuffer->DataLength()));
@@ -387,7 +387,7 @@ void HandleRawReceiveError(const IPEndPointBasis * aEndPoint, const INET_ERROR &
 
     if (aPacketInfo != nullptr)
     {
-        aPacketInfo->SrcAddress.ToString(lAddressBuffer, sizeof(lAddressBuffer));
+        aPacketInfo->SrcAddress.ToString(lAddressBuffer);
     }
     else
     {
@@ -405,8 +405,8 @@ void HandleUDPMessageReceived(const IPEndPointBasis * aEndPoint, const PacketBuf
     char lSourceAddressBuffer[INET6_ADDRSTRLEN];
     char lDestinationAddressBuffer[INET6_ADDRSTRLEN];
 
-    aPacketInfo->SrcAddress.ToString(lSourceAddressBuffer, sizeof(lSourceAddressBuffer));
-    aPacketInfo->DestAddress.ToString(lDestinationAddressBuffer, sizeof(lDestinationAddressBuffer));
+    aPacketInfo->SrcAddress.ToString(lSourceAddressBuffer);
+    aPacketInfo->DestAddress.ToString(lDestinationAddressBuffer);
 
     printf("UDP packet received from %s:%u to %s:%u (%zu bytes)\n", lSourceAddressBuffer, aPacketInfo->SrcPort,
            lDestinationAddressBuffer, aPacketInfo->DestPort, static_cast<size_t>(aBuffer->DataLength()));
@@ -419,7 +419,7 @@ void HandleUDPReceiveError(const IPEndPointBasis * aEndPoint, const INET_ERROR &
 
     if (aPacketInfo != nullptr)
     {
-        aPacketInfo->SrcAddress.ToString(lAddressBuffer, sizeof(lAddressBuffer));
+        aPacketInfo->SrcAddress.ToString(lAddressBuffer);
         lSourcePort = aPacketInfo->SrcPort;
     }
     else
