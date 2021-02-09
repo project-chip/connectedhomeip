@@ -92,15 +92,6 @@
 #endif
 
 /**
- * CHIP_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE
- *
- * The maximum size (in bytes) of a debug logging message.
- */
-#ifndef CHIP_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE
-#define CHIP_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE 256
-#endif
-
-/**
  * CHIP_DEVICE_CONFIG_ENABLE_FACTORY_PROVISIONING
  *
  * Enable the device factory provisioning feature.

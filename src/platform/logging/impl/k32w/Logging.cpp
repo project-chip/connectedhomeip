@@ -1,33 +1,13 @@
-/*
- *
- *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2020 Nest Labs, Inc.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
+/* See Project CHIP LICENSE file for licensing information. */
 
-/**
- *    @file
- *          Provides implementations for the CHIP and LwIP logging
- *          functions on NXP K32W platforms.
- */
+#include <logging/LogV.h>
+
+#include <core/CHIPConfig.h>
+#include <support/logging/Constants.h>
 
 #define K32W_LOG_MODULE_NAME chip
 #define EOL_CHARS "\r\n" /* End of Line Characters */
 #define EOL_CHARS_LEN 2  /* Length of EOL */
-
-#include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <support/logging/CHIPLogging.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <openthread/platform/logging.h>
@@ -119,17 +99,16 @@ void GenericLog(const char * format, va_list arg)
 
 #if K32W_LOG_ENABLED
 
-    char formattedMsg[CHIP_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE - 1] = { 0 };
+    char formattedMsg[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE - 1] = { 0 };
     size_t prefixLen, writtenLen;
 
     /* Prefix is composed of [Debug String][MOdule Name String] */
-    FillPrefix(formattedMsg, CHIP_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE - 1, kLogCategory_None, kLogCategory_Detail,
+    FillPrefix(formattedMsg, CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE - 1, kLogCategory_None, kLogCategory_Detail,
                (uint8_t) kLogModule_NotSpecified);
     prefixLen = strlen(formattedMsg);
 
     // Append the log message.
-    writtenLen =
-        vsnprintf(formattedMsg + prefixLen, CHIP_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE - prefixLen - EOL_CHARS_LEN, format, arg);
+    writtenLen = vsnprintf(formattedMsg + prefixLen, CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE - prefixLen - EOL_CHARS_LEN, format, arg);
     VerifyOrDie(writtenLen > 0);
     memcpy(formattedMsg + prefixLen + writtenLen, EOL_CHARS, EOL_CHARS_LEN);
 

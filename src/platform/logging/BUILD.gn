@@ -1,0 +1,49 @@
+# See Project CHIP LICENSE file for licensing information.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/pigweed.gni")
+
+import("${chip_root}/src/platform/device.gni")
+
+config("includes") {
+  include_dirs = [ "include" ]
+}
+
+simple_log_platforms = [
+  "cc13x2_26x2",
+  "darwin",
+  "efr32",
+  "esp32",
+  "k32w",
+  "linux",
+  "qpg6100",
+  "zephyr",
+]
+
+foreach(platform, simple_log_platforms) {
+  if (chip_device_platform == platform) {
+    static_library(platform) {
+      sources = [ "impl/" + platform + "/Logging.cpp" ]
+      public_configs = [ ":includes" ]
+      deps = [ "${chip_root}/src/lib/core:chip_config_header" ]
+    }
+  }
+}
+
+if (current_os == "android") {
+  static_library("android") {
+    sources = [ "impl/android/Logging.cpp" ]
+    deps = [
+      "${chip_root}/src/lib/core:chip_config_header",
+      "log",
+    ]
+    public_configs = [ ":includes" ]
+  }
+}
+
+static_library("stdio") {
+  sources = [ "impl/stdio/Logging.cpp" ]
+  public_configs = [ ":includes" ]
+  deps = [ "${chip_root}/src/lib/core:chip_config_header" ]
+}

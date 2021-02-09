@@ -92,12 +92,6 @@ static_library("support") {
 
   libs = []
 
-  # Android has no 'platform' that provides logging
-  if (current_os == "android") {
-    sources += [ "logging/Logging_android.cpp" ]
-    libs += [ "log" ]
-  }
-
   cflags = [ "-Wconversion" ]
 
   public_deps = [
@@ -115,9 +109,15 @@ static_library("support") {
     "${chip_root}/src/inet:inet_config_header",
   ]
 
+  # Android has no 'platform' that provides logging
+  if (current_os == "android") {
+    public_deps += [ "${chip_root}/src/platform/logging:android" ]
+  }
+
   public_configs = [
     "${chip_root}/src:includes",
     "${chip_root}/src/lib:includes",
+    "${chip_root}/src/platform/logging:includes",
     "${chip_root}/src/system:system_config",
   ]
 

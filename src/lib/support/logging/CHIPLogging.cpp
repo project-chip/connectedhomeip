@@ -118,13 +118,23 @@ void GetModuleName(char * buf, uint8_t bufSize, uint8_t module)
  */
 DLL_EXPORT void Log(uint8_t module, uint8_t category, const char * msg, ...)
 {
+
     va_list v;
-
     va_start(v, msg);
-
     LogV(module, category, msg, v);
-
     va_end(v);
+}
+
+void LogV(uint8_t module, uint8_t category, const char * msg, va_list args)
+{
+    if (!IsCategoryEnabled(category))
+    {
+        return;
+    }
+
+    char moduleName[chip::Logging::kMaxModuleNameLen + 1];
+    GetModuleName(moduleName, sizeof(moduleName), module);
+    Platform::LogV(moduleName, category, msg, args);
 }
 
 #if CHIP_LOG_FILTERING

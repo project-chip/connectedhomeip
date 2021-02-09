@@ -1,41 +1,13 @@
-/*
- *
- *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2019 Nest Labs, Inc.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
+/* See Project CHIP LICENSE file for licensing information. */
+#include <logging/LogV.h>
 
-/**
- *    @file
- *          Provides implementations for the CHIP and LwIP logging
- *          functions on Silicon Labs EFR32 platforms.
- *
- *          Logging should be initialized by a call to efr32LogInit().  A
- *          spooler task is created that sends the logs to the UART.  Log
- *          entries are queued. If the queue is full then by default error
- *          logs wait indefinitely until a slot is available whereas
- *          non-error logs are dropped to avoid delays.
- */
-/* this file behaves like a config.h, comes first */
-#include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <core/CHIPConfig.h>
 
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
-
+#include <FreeRTOS.h>
 #include <queue.h>
 #include <retargetserial.h>
 #include <stdio.h>
+#include <string.h>
 #include <task.h>
 
 // RTT Buffer size and name
@@ -61,10 +33,6 @@
 #define LOG_DETAIL "<detail> "
 #define LOG_LWIP "<lwip  > "
 #define LOG_EFR32 "<efr32 > "
-
-using namespace ::chip;
-using namespace ::chip::DeviceLayer;
-using namespace ::chip::DeviceLayer::Internal;
 
 static bool sLogInitialized = false;
 static uint8_t sLogBuffer[LOG_RTT_BUFFER_SIZE];
@@ -109,7 +77,7 @@ extern "C" void efr32Log(const char * aFormat, ...)
 
     va_start(v, aFormat);
 #if EFR32_LOG_ENABLED
-    char formattedMsg[CHIP_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE];
+    char formattedMsg[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
 
     strcpy(formattedMsg, LOG_EFR32);
     size_t prefixLen = strlen(formattedMsg);
@@ -142,16 +110,17 @@ void __attribute__((weak)) OnLogOutput(void) {}
 
 namespace chip {
 namespace Logging {
+namespace Platform {
 
 /**
  * CHIP log output functions.
  */
-void LogV(uint8_t module, uint8_t category, const char * aFormat, va_list v)
+void LogV(const char * module, uint8_t category, const char * aFormat, va_list v)
 {
 #if EFR32_LOG_ENABLED && _CHIP_USE_LOGGING
     if (IsCategoryEnabled(category))
     {
-        char formattedMsg[CHIP_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE];
+        char formattedMsg[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
         size_t formattedMsgLen;
 
         constexpr size_t maxPrefixLen = chip::Logging::kMaxModuleNameLen + 3;
@@ -175,11 +144,9 @@ void LogV(uint8_t module, uint8_t category, const char * aFormat, va_list v)
         formattedMsgLen = strlen(formattedMsg);
 
         // Form the log prefix, e.g. "[DL] "
-        formattedMsg[formattedMsgLen++] = '[';
-        GetModuleName(formattedMsg + formattedMsgLen, chip::Logging::kMaxModuleNameLen + 1, module);
-        formattedMsgLen                 = strlen(formattedMsg);
-        formattedMsg[formattedMsgLen++] = ']';
-        formattedMsg[formattedMsgLen++] = ' ';
+        snprintf(formattedMsg, sizeof(formattedMsg), "[%s] ", module);
+        formattedMsg[sizeof(formattedMsg) - 1] = 0;
+        formattedMsgLen                        = strlen(formattedMsg);
 
         size_t len = vsnprintf(formattedMsg + formattedMsgLen, sizeof formattedMsg - formattedMsgLen, aFormat, v);
 
@@ -192,10 +159,11 @@ void LogV(uint8_t module, uint8_t category, const char * aFormat, va_list v)
     }
 
     // Let the application know that a log message has been emitted.
-    DeviceLayer::OnLogOutput();
+    chip::DeviceLayer::OnLogOutput();
 #endif // EFR32_LOG_ENABLED && _CHIP_USE_LOGGING
 }
 
+} // namespace Platform
 } // namespace Logging
 } // namespace chip
 
@@ -208,7 +176,7 @@ extern "C" void LwIPLog(const char * aFormat, ...)
 
     va_start(v, aFormat);
 #if EFR32_LOG_ENABLED
-    char formattedMsg[CHIP_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE];
+    char formattedMsg[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
 
     strcpy(formattedMsg, LOG_LWIP);
     size_t prefixLen = strlen(formattedMsg);
@@ -228,7 +196,7 @@ extern "C" void LwIPLog(const char * aFormat, ...)
 #endif
 
     // Let the application know that a log message has been emitted.
-    DeviceLayer::OnLogOutput();
+    chip::DeviceLayer::OnLogOutput();
 #endif // EFR32_LOG_ENABLED
     va_end(v);
 }
@@ -244,7 +212,7 @@ extern "C" void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const ch
 
     va_start(v, aFormat);
 #if EFR32_LOG_ENABLED
-    char formattedMsg[CHIP_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE];
+    char formattedMsg[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
 
     if (sLogInitialized)
     {
@@ -288,7 +256,7 @@ extern "C" void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const ch
     }
 
     // Let the application know that a log message has been emitted.
-    DeviceLayer::OnLogOutput();
+    chip::DeviceLayer::OnLogOutput();
 #endif // EFR32_LOG_ENABLED
     va_end(v);
 }
