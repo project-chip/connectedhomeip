@@ -99,11 +99,11 @@ enum
     // Last fully-representable year that can be stored in an unsigned 32-bit CHIP Epoch seconds value.
     kChipEpochMaxYear = 2155,
 
-    // Offset, in non-leap seconds, from the Unix Epoch to the CHIP Epoch.
-    kChipEpochSecondsSinceUnixEpoch = 1577836800,
-
     // Offset, in days, from the Unix Epoch to the CHIP Epoch.
     kChipEpochDaysSinceUnixEpoch = 18262,
+
+    // Offset, in non-leap seconds, from the Unix Epoch to the CHIP Epoch.
+    kChipEpochSecondsSinceUnixEpoch = kChipEpochDaysSinceUnixEpoch * kSecondsPerDay,
 };
 
 extern bool IsLeapYear(uint16_t year);

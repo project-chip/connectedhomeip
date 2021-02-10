@@ -463,13 +463,28 @@ bool CalendarTimeToSecondsSinceEpoch(uint16_t year, uint8_t month, uint8_t dayOf
 
     return true;
 }
-
+/**
+ *  @brief
+ *    Convert the number of seconds since 1970-01-01 00:00:00 UTC to a calendar date and time.
+ *
+ *  @note
+ *    If secondsSinceEpoch is large enough this function will generate bad result. The way it is
+ *    used in this file the generated result should be valid. Specifically, the largest
+ *    possible value of secondsSinceEpoch input is (UINT32_MAX + kChipEpochSecondsSinceUnixEpoch),
+ *    when it is called from ChipEpochToCalendarTime().
+ */
 static void SecondsSinceEpochToCalendarTime(uint64_t secondsSinceEpoch, uint16_t & year, uint8_t & month, uint8_t & dayOfMonth,
                                             uint8_t & hour, uint8_t & minute, uint8_t & second)
 {
     uint32_t daysSinceEpoch = static_cast<uint32_t>(secondsSinceEpoch / kSecondsPerDay);
     uint32_t timeOfDay      = static_cast<uint32_t>(secondsSinceEpoch - (daysSinceEpoch * kSecondsPerDay));
 
+    // Note: This call to DaysSinceEpochToCalendarDate can't fail, because we
+    // can't overflow a uint16_t year with a muximum possible value of the
+    // secondsSinceEpoch input.
+    static_assert((UINT32_MAX + kChipEpochSecondsSinceUnixEpoch) / (kDaysPerStandardYear * kSecondsPerDay) + 1 <=
+                      std::numeric_limits<std::remove_reference<decltype(year)>::type>::max(),
+                  "What happened to our year or day lengths?");
     DaysSinceEpochToCalendarDate(daysSinceEpoch, year, month, dayOfMonth);
 
     hour = static_cast<uint8_t>(timeOfDay / kSecondsPerHour);
