@@ -145,7 +145,10 @@ public:
 
     ReliableMessageContext * GetReliableMessageContext() { return &mReliableMessageContext; };
 
-    Transport::AdminPairingInfo * GetAdminInfo(Transport::AdminPairingTable & table) { return table.FindAdmin(mSecureSession.GetAdminId()); }
+    Transport::AdminPairingInfo * GetAdminInfo(Transport::AdminPairingTable & table)
+    {
+        return table.FindAdmin(mSecureSession.GetAdminId());
+    }
 
     SecureSessionHandle GetSecureSession() { return mSecureSession; }
 
