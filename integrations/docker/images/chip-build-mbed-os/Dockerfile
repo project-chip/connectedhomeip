@@ -35,8 +35,8 @@ RUN set -x \
 # ------------------------------------------------------------------------------
 # Install ARM Toolchain (gcc-arm-none-eabi-9-2019-q4)
 RUN set -x \
-    && (mkdir -p /opt/mbed-os-toolchain \
-    && cd /opt/mbed-os-toolchain \
+    && (mkdir -p /opt/ARM-software \
+    && cd /opt/ARM-software \
     && wget --progress=dot:giga https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2019q4/RC2.1/gcc-arm-none-eabi-9-2019-q4-major-x86_64-linux.tar.bz2 \
     && tar -xjf gcc-arm-none-eabi-9-2019-q4-major-x86_64-linux.tar.bz2 \
     && rm gcc-arm-none-eabi-9-2019-q4-major-x86_64-linux.tar.bz2 \
@@ -45,13 +45,13 @@ RUN set -x \
 # ------------------------------------------------------------------------------
 # Configure mbed build system
 RUN set -x \
-    && mbed config -G GCC_ARM_PATH /opt/mbed-os-toolchain/gcc-arm-none-eabi-9-2019-q4-major/bin/ \
+    && mbed config -G GCC_ARM_PATH /opt/ARM-software/gcc-arm-none-eabi-9-2019-q4-major/bin/ \
     && mbed toolchain -G -s GCC_ARM \
     && : # last line
 
 # ------------------------------------------------------------------------------
 # Configure environment variables
-ENV MBED_GCC_ARM_PATH=/opt/mbed-os-toolchain/gcc-arm-none-eabi-9-2019-q4-major/bin/
+ENV MBED_GCC_ARM_PATH=/opt/ARM-software/gcc-arm-none-eabi-9-2019-q4-major/bin/
 ENV MBED_OS_PATH=/opt/mbed-os/
 
 ENV PATH="${PATH}:${MBED_GCC_ARM_PATH}"
