@@ -134,7 +134,7 @@ if (NOT CHIP_LIBRARIES)
 endif()
 
 if (CONFIG_CHIP_LIB_SHELL)
-    list(APPEND CHIP_LIBRARIES -libCHIPShell)
+    list(APPEND CHIP_LIBRARIES -lCHIPShell)
 endif()
 
 # Set up CHIP project configuration file
