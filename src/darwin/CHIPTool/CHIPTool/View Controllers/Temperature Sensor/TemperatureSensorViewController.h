@@ -11,7 +11,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface TemperatureSensorViewController : UIViewController <CHIPDeviceControllerDelegate>
+@interface TemperatureSensorViewController : UIViewController
 
 @end
 

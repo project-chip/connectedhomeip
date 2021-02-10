@@ -179,14 +179,7 @@ enum LogCategory
      */
     kLogCategory_Detail = 3,
 
-    /*!<
-     *   Indicates a category of log message that describes information
-     *   needed by IE and QA teams for automated testing.
-     *
-     */
-    kLogCategory_Retain = 4,
-
-    kLogCategory_Max = kLogCategory_Retain
+    kLogCategory_Max = kLogCategory_Detail,
 };
 
 extern void LogV(uint8_t module, uint8_t category, const char * msg, va_list args);
@@ -261,52 +254,26 @@ extern void SetLogFilter(uint8_t category);
 #define ChipLogDetail(MOD, MSG, ...)
 #endif
 
-#ifndef CHIP_RETAIN_LOGGING
-#define CHIP_RETAIN_LOGGING CHIP_PROGRESS_LOGGING
-#define ChipLogRetain(MOD, MSG, ...) ChipLogProgress(MOD, MSG, ##__VA_ARGS__)
-#endif
-
-#if CHIP_RETAIN_LOGGING
-/**
- * @def ChipLogRetain(MOD, MSG, ...)
- *
- * @brief
- *   Log a chip message for the specified module in the 'Retain'
- *   category. This is used for IE testing.
- *   If the product has not defined CHIP_RETAIN_LOGGING, it defaults to the same as ChipLogProgress
- *
- */
-#ifndef ChipLogRetain
-#define ChipLogRetain(MOD, MSG, ...)                                                                                               \
-    chip::Logging::Log(chip::Logging::kLogModule_##MOD, chip::Logging::kLogCategory_Retain, MSG, ##__VA_ARGS__)
-#endif
-
-#else // #if CHIP_RETAIN_LOGGING
-#ifdef ChipLogRetain
-// This is to ensure that ChipLogRetain is null if
-// the product has defined CHIP_RETAIN_LOGGING to 0 itself
-#undef ChipLogRetain
-#endif
-#define ChipLogRetain(MOD, MSG, ...)
-#endif // #if CHIP_RETAIN_LOGGING
-
-#if CHIP_ERROR_LOGGING || CHIP_PROGRESS_LOGGING || CHIP_DETAIL_LOGGING || CHIP_RETAIN_LOGGING
+#if CHIP_ERROR_LOGGING || CHIP_PROGRESS_LOGGING || CHIP_DETAIL_LOGGING
 #define _CHIP_USE_LOGGING 1
 #else
 #define _CHIP_USE_LOGGING 0
-#endif /* CHIP_ERROR_LOGGING || CHIP_PROGRESS_LOGGING || CHIP_DETAIL_LOGGING || CHIP_RETAIN_LOGGING */
+#endif /* CHIP_ERROR_LOGGING || CHIP_PROGRESS_LOGGING || CHIP_DETAIL_LOGGING */
 
 #if _CHIP_USE_LOGGING
 
-#define ChipLoggingChipPrefixLen 6
-#define ChipLoggingModuleNameLen 3
-#define ChipLoggingMessageSeparatorLen 2
-#define ChipLoggingMessageTrailerLen 2
-#define ChipLoggingTotalMessagePadding                                                                                             \
-    (ChipLoggingchipPrefixLen + ChipLoggingModuleNameLen + ChipLoggingMessageSeparatorLen + ChipLoggingMessageTrailerLen)
+/**
+ * CHIP logging length constants
+ */
+static constexpr uint16_t kMaxModuleNameLen  = 3;
+static constexpr uint16_t kMaxPrefixLen      = 3;
+static constexpr uint16_t kMaxSeparatorLen   = 2;
+static constexpr uint16_t kMaxTrailerLen     = 2;
+static constexpr uint16_t kMaxMessagePadding = (chip::Logging::kMaxPrefixLen + chip::Logging::kMaxModuleNameLen +
+                                                chip::Logging::kMaxSeparatorLen + chip::Logging::kMaxTrailerLen);
 
 extern void GetMessageWithPrefix(char * buf, uint8_t bufSize, uint8_t module, const char * msg);
-extern void GetModuleName(char * buf, uint8_t module);
+extern void GetModuleName(char * buf, uint8_t bufSize, uint8_t module);
 extern void PrintMessagePrefix(uint8_t module);
 
 #else
@@ -316,7 +283,7 @@ static inline void GetMessageWithPrefix(char * buf, uint8_t bufSize, uint8_t mod
     return;
 }
 
-static inline void GetModuleName(char * buf, uint8_t module)
+static inline void GetModuleName(char * buf, uint8_t bufSize, uint8_t module)
 {
     return;
 }

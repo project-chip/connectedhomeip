@@ -1817,18 +1817,6 @@
 #endif // CHIP_DETAIL_LOGGING
 
 /**
- *  @def CHIP_RETAIN_LOGGING
- *
- *  @brief
- *    If asserted (1), enable logging of all messages in the
- *    chip::Logging::LogCategory::kLogCategory_Retain category.
- *    If not defined by the application, by default CHIP_RETAIN_LOGGING is
- *    remapped to CHIP_PROGRESS_LOGGING
- *
- */
-
-
-/**
  *  @def CHIP_CONFIG_ENABLE_FUNCT_ERROR_LOGGING
  *
  *  @brief
@@ -2298,6 +2286,18 @@
   #endif // CHIP_CONFIG_MAX_BINDINGS
 
 /**
+   *  @def CHIP_CONFIG_MAX_DEVICE_ADMINS
+   *
+   *  @brief
+   *    Maximum number of administrators that can provision the device. Each admin
+   *    can provision the device with their unique operational credentials and manage
+   *    their access control lists.
+   */
+  #ifndef CHIP_CONFIG_MAX_DEVICE_ADMINS
+  #define CHIP_CONFIG_MAX_DEVICE_ADMINS                      16
+  #endif // CHIP_CONFIG_MAX_DEVICE_ADMINS
+
+  /**
  * @def CHIP_NON_PRODUCTION_MARKER
  *
  * @brief Defines the name of a mark symbol whose presence signals that the chip code

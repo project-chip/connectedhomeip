@@ -22,6 +22,7 @@ REPO_DIR=$SOURCE_DIR/../../
 TEST_DIR=$REPO_DIR/src/test_driver/linux-cirque
 
 LOG_DIR=${LOG_DIR:-$(mktemp -d)}
+GITHUB_ACTION_RUN=${GITHUB_ACTION_RUN:-"0"}
 
 # Append test name here to add more tests for run_all_tests
 CIRQUE_TESTS=(
@@ -137,11 +138,15 @@ function cirquetest_run_all_tests() {
         fi
     done
 
+    if [[ "x$GITHUB_ACTION_RUN" = "x1" ]]; then
+        echo -e "[$BOLD_YELLOW_TEXT""INFO""$RESET_COLOR] Logs will be uploaded to artifacts."
+    fi
+
     if ((test_pass)); then
-        echo -e "[$BOLD_GREEN_TEXT""PASS""$RESET_COLOR] Test finished, test log can be found at artifacts"
+        echo -e "[$BOLD_GREEN_TEXT""PASS""$RESET_COLOR] Test finished, test log can be found at $LOG_DIR"
         return 0
     else
-        echo -e "[$BOLD_RED_TEXT""FAIL""$RESET_COLOR] Test failed, test log can be found at artifacts"
+        echo -e "[$BOLD_RED_TEXT""FAIL""$RESET_COLOR] Test failed, test log can be found at $LOG_DIR"
         return 1
     fi
 }

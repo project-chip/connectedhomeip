@@ -33,5 +33,10 @@ if not os.path.exists(scripts_path):
 
 os.system("./scripts/tools/zap_generate_chip.sh")
 
+os.system("./scripts/tools/zap_generate_chip_tool.sh")
+
 for path in Path('./examples').rglob('*.zap'):
+    os.system("./scripts/tools/zap_generate.sh " + str(path))
+
+for path in Path('./src/darwin').rglob('*.zap'):
     os.system("./scripts/tools/zap_generate.sh " + str(path))

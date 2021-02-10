@@ -19,7 +19,7 @@
 # project subdirectory.
 #
 
-PROJECT_NAME := pw-rpc-app
+PROJECT_NAME := chip-pigweed-app
 
 EXTRA_COMPONENT_DIRS += $(PROJECT_PATH)/third_party/connectedhomeip/config/esp32/components \
 

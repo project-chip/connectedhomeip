@@ -167,10 +167,6 @@ LogCategory PersistentStorage::GetLoggingLevel()
         {
             chipLogLevel = kLogCategory_Detail;
         }
-        else if (strcasecmp(value, "retain") == 0)
-        {
-            chipLogLevel = kLogCategory_Retain;
-        }
     }
 
     return chipLogLevel;

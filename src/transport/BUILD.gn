@@ -19,6 +19,7 @@ static_library("transport") {
   output_name = "libTransportLayer"
 
   sources = [
+    "AdminPairingTable.h",
     "CASESession.cpp",
     "CASESession.h",
     "NetworkProvisioning.cpp",
@@ -59,6 +60,7 @@ static_library("transport") {
     "${chip_root}/src/lib/mdns",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/platform",
+    "${chip_root}/src/setup_payload",
     "${chip_root}/src/transport/raw",
   ]
 }

@@ -432,16 +432,16 @@ JNI_METHOD(void, beginSendCommand)(JNIEnv * env, jobject self, jlong handle, job
         switch (commandID)
         {
         case 0:
-            buffer = encodeOnOffClusterOffCommand(endpoint);
+            buffer = encodeOnOffClusterOffCommand(0, endpoint);
             break;
         case 1:
-            buffer = encodeOnOffClusterOnCommand(endpoint);
+            buffer = encodeOnOffClusterOnCommand(0, endpoint);
             break;
         case 2:
-            buffer = encodeOnOffClusterToggleCommand(endpoint);
+            buffer = encodeOnOffClusterToggleCommand(0, endpoint);
             break;
         case 3:
-            buffer = encodeLevelControlClusterMoveToLevelCommand(endpoint, (uint8_t)(aValue & 0xff), 0xFFFF, 0, 0);
+            buffer = encodeLevelControlClusterMoveToLevelCommand(0, endpoint, (uint8_t)(aValue & 0xff), 0xFFFF, 0, 0);
             break;
         default:
             ChipLogError(Controller, "Unknown command: %d", commandID);

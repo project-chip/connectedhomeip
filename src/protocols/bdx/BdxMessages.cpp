@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,8 +23,8 @@
 
 #include <protocols/bdx/BdxMessages.h>
 
-#include <support/BufBound.h>
 #include <support/BufferReader.h>
+#include <support/BufferWriter.h>
 #include <support/CodeUtils.h>
 
 #include <limits>
@@ -35,12 +35,12 @@ constexpr uint8_t kVersionMask = 0x0F;
 } // namespace
 
 using namespace chip;
-using namespace chip::BDX;
+using namespace chip::bdx;
 using namespace chip::Encoding::LittleEndian;
 
 // WARNING: this function should never return early, since MessageSize() relies on it to calculate
 // the size of the message (even if the message is incomplete or filled out incorrectly).
-BufBound & TransferInit::WriteToBuffer(BufBound & aBuffer) const
+BufferWriter & TransferInit::WriteToBuffer(BufferWriter & aBuffer) const
 {
     uint8_t proposedTransferCtl = 0;
     bool widerange = (StartOffset > std::numeric_limits<uint32_t>::max()) || (MaxLength > std::numeric_limits<uint32_t>::max());
@@ -49,9 +49,9 @@ BufBound & TransferInit::WriteToBuffer(BufBound & aBuffer) const
     proposedTransferCtl = proposedTransferCtl | TransferCtlOptions.Raw();
 
     BitFlags<uint8_t, RangeControlFlags> rangeCtlFlags;
-    rangeCtlFlags.Set(kDefLen, MaxLength > 0);
-    rangeCtlFlags.Set(kStartOffset, StartOffset > 0);
-    rangeCtlFlags.Set(kWiderange, widerange);
+    rangeCtlFlags.Set(kRange_DefLen, MaxLength > 0);
+    rangeCtlFlags.Set(kRange_StartOffset, StartOffset > 0);
+    rangeCtlFlags.Set(kRange_Widerange, widerange);
 
     aBuffer.Put(proposedTransferCtl);
     aBuffer.Put(rangeCtlFlags.Raw());
@@ -111,9 +111,9 @@ CHIP_ERROR TransferInit::Parse(System::PacketBufferHandle aBuffer)
     rangeCtlFlags.SetRaw(rangeCtl);
 
     StartOffset = 0;
-    if (rangeCtlFlags.Has(kStartOffset))
+    if (rangeCtlFlags.Has(kRange_StartOffset))
     {
-        if (rangeCtlFlags.Has(kWiderange))
+        if (rangeCtlFlags.Has(kRange_Widerange))
         {
             SuccessOrExit(bufReader.Read64(&StartOffset).StatusCode());
         }
@@ -125,9 +125,9 @@ CHIP_ERROR TransferInit::Parse(System::PacketBufferHandle aBuffer)
     }
 
     MaxLength = 0;
-    if (rangeCtlFlags.Has(kDefLen))
+    if (rangeCtlFlags.Has(kRange_DefLen))
     {
-        if (rangeCtlFlags.Has(kWiderange))
+        if (rangeCtlFlags.Has(kRange_Widerange))
         {
             SuccessOrExit(bufReader.Read64(&MaxLength).StatusCode());
         }
@@ -166,7 +166,7 @@ exit:
 
 size_t TransferInit::MessageSize() const
 {
-    BufBound emptyBuf(nullptr, 0);
+    BufferWriter emptyBuf(nullptr, 0);
     return WriteToBuffer(emptyBuf).Needed();
 }
 
@@ -196,7 +196,7 @@ bool TransferInit::operator==(const TransferInit & another) const
 
 // WARNING: this function should never return early, since MessageSize() relies on it to calculate
 // the size of the message (even if the message is incomplete or filled out incorrectly).
-BufBound & SendAccept::WriteToBuffer(BufBound & aBuffer) const
+Encoding::LittleEndian::BufferWriter & SendAccept::WriteToBuffer(Encoding::LittleEndian::BufferWriter & aBuffer) const
 {
     uint8_t transferCtl = 0;
 
@@ -249,7 +249,7 @@ exit:
 
 size_t SendAccept::MessageSize() const
 {
-    BufBound emptyBuf(nullptr, 0);
+    BufferWriter emptyBuf(nullptr, 0);
     return WriteToBuffer(emptyBuf).Needed();
 }
 
@@ -272,7 +272,7 @@ bool SendAccept::operator==(const SendAccept & another) const
 
 // WARNING: this function should never return early, since MessageSize() relies on it to calculate
 // the size of the message (even if the message is incomplete or filled out incorrectly).
-BufBound & ReceiveAccept::WriteToBuffer(BufBound & aBuffer) const
+Encoding::LittleEndian::BufferWriter & ReceiveAccept::WriteToBuffer(Encoding::LittleEndian::BufferWriter & aBuffer) const
 {
     uint8_t transferCtl = 0;
     bool widerange      = (StartOffset > std::numeric_limits<uint32_t>::max()) || (Length > std::numeric_limits<uint32_t>::max());
@@ -281,9 +281,9 @@ BufBound & ReceiveAccept::WriteToBuffer(BufBound & aBuffer) const
     transferCtl = transferCtl | TransferCtlFlags.Raw();
 
     BitFlags<uint8_t, RangeControlFlags> rangeCtlFlags;
-    rangeCtlFlags.Set(kDefLen, Length > 0);
-    rangeCtlFlags.Set(kStartOffset, StartOffset > 0);
-    rangeCtlFlags.Set(kWiderange, widerange);
+    rangeCtlFlags.Set(kRange_DefLen, Length > 0);
+    rangeCtlFlags.Set(kRange_StartOffset, StartOffset > 0);
+    rangeCtlFlags.Set(kRange_Widerange, widerange);
 
     aBuffer.Put(transferCtl);
     aBuffer.Put(rangeCtlFlags.Raw());
@@ -340,9 +340,9 @@ CHIP_ERROR ReceiveAccept::Parse(System::PacketBufferHandle aBuffer)
     rangeCtlFlags.SetRaw(rangeCtl);
 
     StartOffset = 0;
-    if (rangeCtlFlags.Has(kStartOffset))
+    if (rangeCtlFlags.Has(kRange_StartOffset))
     {
-        if (rangeCtlFlags.Has(kWiderange))
+        if (rangeCtlFlags.Has(kRange_Widerange))
         {
             SuccessOrExit(bufReader.Read64(&StartOffset).StatusCode());
         }
@@ -354,9 +354,9 @@ CHIP_ERROR ReceiveAccept::Parse(System::PacketBufferHandle aBuffer)
     }
 
     Length = 0;
-    if (rangeCtlFlags.Has(kDefLen))
+    if (rangeCtlFlags.Has(kRange_DefLen))
     {
-        if (rangeCtlFlags.Has(kWiderange))
+        if (rangeCtlFlags.Has(kRange_Widerange))
         {
             SuccessOrExit(bufReader.Read64(&Length).StatusCode());
         }
@@ -389,7 +389,7 @@ exit:
 
 size_t ReceiveAccept::MessageSize() const
 {
-    BufBound emptyBuf(nullptr, 0);
+    BufferWriter emptyBuf(nullptr, 0);
     return WriteToBuffer(emptyBuf).Needed();
 }
 
@@ -413,7 +413,7 @@ bool ReceiveAccept::operator==(const ReceiveAccept & another) const
 
 // WARNING: this function should never return early, since MessageSize() relies on it to calculate
 // the size of the message (even if the message is incomplete or filled out incorrectly).
-BufBound & CounterMessage::WriteToBuffer(BufBound & aBuffer) const
+Encoding::LittleEndian::BufferWriter & CounterMessage::WriteToBuffer(Encoding::LittleEndian::BufferWriter & aBuffer) const
 {
     return aBuffer.Put32(BlockCounter);
 }
@@ -427,7 +427,7 @@ CHIP_ERROR CounterMessage::Parse(System::PacketBufferHandle aBuffer)
 
 size_t CounterMessage::MessageSize() const
 {
-    BufBound emptyBuf(nullptr, 0);
+    BufferWriter emptyBuf(nullptr, 0);
     return WriteToBuffer(emptyBuf).Needed();
 }
 
@@ -438,7 +438,7 @@ bool CounterMessage::operator==(const CounterMessage & another) const
 
 // WARNING: this function should never return early, since MessageSize() relies on it to calculate
 // the size of the message (even if the message is incomplete or filled out incorrectly).
-BufBound & DataBlock::WriteToBuffer(BufBound & aBuffer) const
+Encoding::LittleEndian::BufferWriter & DataBlock::WriteToBuffer(Encoding::LittleEndian::BufferWriter & aBuffer) const
 {
     aBuffer.Put32(BlockCounter);
     if (Data != nullptr)
@@ -478,7 +478,7 @@ exit:
 
 size_t DataBlock::MessageSize() const
 {
-    BufBound emptyBuf(nullptr, 0);
+    BufferWriter emptyBuf(nullptr, 0);
     return WriteToBuffer(emptyBuf).Needed();
 }
 
