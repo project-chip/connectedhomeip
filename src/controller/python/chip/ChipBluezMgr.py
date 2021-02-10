@@ -833,6 +833,15 @@ class BluezManager(ChipBleBase):
         self.adapter.Powered(False)
         self.adapter.Powered(True)
 
+    def get_adapters(self):
+        return [
+            BluezDbusAdapter(p["object"], self.bluez, self.bus, self.logger)
+            for p in get_bluez_objects(
+                self.bluez, self.bus, ADAPTER_INTERFACE, "/org/bluez"
+            )
+        ]
+
+
     def ble_adapter_print(self):
         try:
             adapters = [
