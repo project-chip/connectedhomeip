@@ -37,8 +37,6 @@ jobs:
 
         container:
             image: pan2048/chip-build-mbed-os:latest
-            env:
-                image_name: ${{ secrets.DOCKERHUB_USERNAME }}/test
             credentials:
                 username: ${{ secrets.DOCKERHUB_USERNAME }}
                 password: ${{ secrets.DOCKERHUB_TOKEN }}
