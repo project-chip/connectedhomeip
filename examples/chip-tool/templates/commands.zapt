@@ -66,6 +66,7 @@ static void OnInt16sAttributeResponse(void * context, int16_t value)
 {{#all_user_cluster_commands}}
 {{#if (isStrEqual clusterName parent.name)}}
 {{#if (isCommandAvailable parent.side incoming outgoing commandSource name)}}
+{{#if (isStrEndsWith name "Response")}}
 static void On{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}(void * context{{#zcl_command_arguments}}{{#unless (isStrEqual label "status")}}, {{asUnderlyingZclType type}} {{asSymbol label}}{{/unless}}{{/zcl_command_arguments}})
 {
     ChipLogProgress(chipTool, "{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}");
@@ -74,6 +75,7 @@ static void On{{asCamelCased parent.name false}}Cluster{{asCamelCased name false
     command->SetCommandExitStatus(true);
 }
 
+{{/if}}
 {{/if}}
 {{/if}}
 {{/all_user_cluster_commands}}

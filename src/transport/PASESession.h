@@ -45,6 +45,8 @@ constexpr uint16_t kPBKDFParamRandomNumberSize = 32;
 
 using namespace Crypto;
 
+constexpr size_t kSpake2p_WS_Length = kP256_FE_Length + 8;
+
 struct PASESessionSerialized;
 
 struct PASESessionSerializable
@@ -57,6 +59,8 @@ struct PASESessionSerializable
     uint16_t mLocalKeyId;
     uint16_t mPeerKeyId;
 };
+
+typedef uint8_t PASEVerifier[2][kSpake2p_WS_Length];
 
 class DLL_EXPORT PASESession
 {
@@ -88,6 +92,20 @@ public:
 
     /**
      * @brief
+     *   Initialize using PASE verifier and wait for pairing requests.
+     *
+     * @param verifier        PASE verifier to be used for SPAKE2P pairing
+     * @param myNodeId        Optional node id of local node
+     * @param myKeyId         Key ID to be assigned to the secure session on the peer node
+     * @param delegate        Callback object
+     *
+     * @return CHIP_ERROR     The result of initialization
+     */
+    CHIP_ERROR WaitForPairing(const PASEVerifier & verifier, Optional<NodeId> myNodeId, uint16_t myKeyId,
+                              SessionEstablishmentDelegate * delegate);
+
+    /**
+     * @brief
      *   Create a pairing request using peer's setup PIN code.
      *
      * @param peerAddress      Address of peer to pair
@@ -101,6 +119,27 @@ public:
      */
     CHIP_ERROR Pair(const Transport::PeerAddress peerAddress, uint32_t peerSetUpPINCode, Optional<NodeId> myNodeId,
                     NodeId peerNodeId, uint16_t myKeyId, SessionEstablishmentDelegate * delegate);
+
+    /**
+     * @brief
+     *   Create a pairing request using given PASE verifier.
+     *
+     * @param peerAddress      Address of peer to pair
+     * @param verifier         PASE verifier to be used for SPAKE2P pairing
+     * @param myNodeId         Optional node id of local node
+     * @param peerNodeId       Node id assigned to the peer node by commissioner
+     * @param myKeyId          Key ID to be assigned to the secure session on the peer node
+     * @param delegate         Callback object
+     *
+     * @return CHIP_ERROR      The result of initialization
+     */
+    CHIP_ERROR Pair(const Transport::PeerAddress peerAddress, const PASEVerifier & verifier, Optional<NodeId> myNodeId,
+                    NodeId peerNodeId, uint16_t myKeyId, SessionEstablishmentDelegate * delegate);
+
+    static CHIP_ERROR ComputePASEVerifier(uint32_t mySetUpPINCode, uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen,
+                                          PASEVerifier & verifier);
+
+    static CHIP_ERROR GeneratePASEVerifier(PASEVerifier & verifier, uint32_t & setupPIN);
 
     /**
      * @brief
@@ -207,8 +246,6 @@ private:
 
     void Clear();
 
-    static constexpr size_t kSpake2p_WS_Length = kP256_FE_Length + 8;
-
     SessionEstablishmentDelegate * mDelegate = nullptr;
 
     Protocols::SecureChannel::MsgType mNextExpectedMsg = Protocols::SecureChannel::MsgType::PASE_Spake2pError;
@@ -218,9 +255,11 @@ private:
     uint8_t mPoint[kMAX_Point_Length];
 
     /* w0s and w1s */
-    uint8_t mWS[2][kSpake2p_WS_Length];
+    PASEVerifier mPASEVerifier;
 
     uint32_t mSetupPINCode;
+
+    bool mComputeVerifier = true;
 
     Hash_SHA256_stream mCommissioningHash;
     uint32_t mIterationCount = 0;

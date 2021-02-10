@@ -181,9 +181,9 @@
             "problemMatcher": ["$gcc"]
         },
         {
-            "label": "Build nRF Connect Lock Example",
+            "label": "Build nRF Connect Lock Example (nRF52840)",
             "type": "shell",
-            "command": "source scripts/activate.sh && scripts/examples/nrfconnect_example.sh lock-app",
+            "command": "source scripts/activate.sh && scripts/examples/nrfconnect_example.sh lock-app nrf52840dk_nrf52840",
             "group": "build",
             "problemMatcher": {
                 "base": "$gcc",
@@ -194,9 +194,9 @@
             }
         },
         {
-            "label": "Build nRF Connect Lighting Example",
+            "label": "Build nRF Connect Lighting Example (nRF52840)",
             "type": "shell",
-            "command": "source scripts/activate.sh && scripts/examples/nrfconnect_example.sh lighting-app",
+            "command": "source scripts/activate.sh && scripts/examples/nrfconnect_example.sh lighting-app nrf52840dk_nrf52840",
             "group": "build",
             "problemMatcher": {
                 "base": "$gcc",
@@ -207,9 +207,9 @@
             }
         },
         {
-            "label": "Build nRF Connect Shell Example",
+            "label": "Build nRF Connect Shell Example (nRF52840)",
             "type": "shell",
-            "command": "source scripts/activate.sh && scripts/examples/nrfconnect_example.sh shell",
+            "command": "source scripts/activate.sh && scripts/examples/nrfconnect_example.sh shell nrf52840dk_nrf52840",
             "group": "build",
             "problemMatcher": {
                 "base": "$gcc",
@@ -220,9 +220,9 @@
             }
         },
         {
-            "label": "Build nRF Connect Pigweed Example",
+            "label": "Build nRF Connect Pigweed Example (nRF52840)",
             "type": "shell",
-            "command": "source scripts/activate.sh && scripts/examples/nrfconnect_example.sh pigweed-app",
+            "command": "source scripts/activate.sh && scripts/examples/nrfconnect_example.sh pigweed-app nrf52840dk_nrf52840",
             "group": "build",
             "problemMatcher": {
                 "base": "$gcc",

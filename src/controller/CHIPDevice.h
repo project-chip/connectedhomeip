@@ -32,6 +32,7 @@
 #include <app/util/basic-types.h>
 #include <core/CHIPCallback.h>
 #include <core/CHIPCore.h>
+#include <setup_payload/SetupPayload.h>
 #include <support/Base64.h>
 #include <support/DLLUtil.h>
 #include <transport/PASESession.h>
@@ -57,7 +58,10 @@ using DeviceTransportMgr = TransportMgr<Transport::UDP /* IPv6 */
 class DLL_EXPORT Device
 {
 public:
-    Device() : mInterface(INET_NULL_INTERFACEID), mActive(false), mState(ConnectionState::NotConnected) {}
+    Device() :
+        mInterface(INET_NULL_INTERFACEID), mActive(false), mState(ConnectionState::NotConnected),
+        mAdminId(Transport::kUndefinedAdminId)
+    {}
     ~Device()
     {
         if (mCommandSender != nullptr)
@@ -137,13 +141,16 @@ public:
      * @param[in] sessionMgr   Secure session manager object pointer
      * @param[in] inetLayer    InetLayer object pointer
      * @param[in] listenPort   Port on which controller is listening (typically CHIP_PORT)
+     * @param[in] admin        Local administrator that's initializing this device object
      */
-    void Init(DeviceTransportMgr * transportMgr, SecureSessionMgr * sessionMgr, Inet::InetLayer * inetLayer, uint16_t listenPort)
+    void Init(DeviceTransportMgr * transportMgr, SecureSessionMgr * sessionMgr, Inet::InetLayer * inetLayer, uint16_t listenPort,
+              Transport::AdminId admin)
     {
         mTransportMgr   = transportMgr;
         mSessionManager = sessionMgr;
         mInetLayer      = inetLayer;
         mListenPort     = listenPort;
+        mAdminId        = admin;
     }
 
     /**
@@ -164,11 +171,12 @@ public:
      * @param[in] deviceId     Node ID of the device
      * @param[in] devicePort   Port on which device is listening (typically CHIP_PORT)
      * @param[in] interfaceId  Local Interface ID that should be used to talk to the device
+     * @param[in] admin        Local administrator that's initializing this device object
      */
     void Init(DeviceTransportMgr * transportMgr, SecureSessionMgr * sessionMgr, Inet::InetLayer * inetLayer, uint16_t listenPort,
-              NodeId deviceId, uint16_t devicePort, Inet::InterfaceId interfaceId)
+              NodeId deviceId, uint16_t devicePort, Inet::InterfaceId interfaceId, Transport::AdminId admin)
     {
-        Init(transportMgr, sessionMgr, inetLayer, mListenPort);
+        Init(transportMgr, sessionMgr, inetLayer, mListenPort, admin);
         mDeviceId   = deviceId;
         mDevicePort = devicePort;
         mInterface  = interfaceId;
@@ -223,6 +231,25 @@ public:
      */
     void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, SecureSessionHandle session,
                            System::PacketBufferHandle msgBuf, SecureSessionMgr * mgr);
+
+    /**
+     * @brief
+     *   Trigger a paired device to re-enter the pairing mode. If an onboarding token is provided, the device will use
+     *   the provided setup PIN code and the discriminator to advertise itself for pairing availability. If the token
+     *   is not provided, the device will use the manufacturer assigned setup PIN code and discriminator.
+     *
+     *   The device will exit the pairing mode after a successful pairing, or after the given `timeout` time.
+     *
+     * @param[in] timeout         The pairing mode should terminate after this much time.
+     * @param[in] useToken        Generate an onboarding token and send it to the device. The device must
+     *                            use the provided onboarding token instead of the original pairing setup PIN
+     *                            and discriminator.
+     * @param[in] discriminator   The discriminator that the device should use for advertising and pairing.
+     * @param[out] setupPayload   The setup payload corresponding to the generated onboarding token.
+     *
+     * @return CHIP_ERROR               CHIP_NO_ERROR on success, or corresponding error
+     */
+    CHIP_ERROR OpenPairingWindow(uint32_t timeout, bool useToken, uint16_t discriminator, SetupPayload & setupPayload);
 
     /**
      * @brief
@@ -322,7 +349,11 @@ private:
      */
     CHIP_ERROR LoadSecureSessionParametersIfNeeded(bool & didLoad);
 
+    CHIP_ERROR SendMessage(System::PacketBufferHandle message, PayloadHeader & payloadHeader);
+
     uint16_t mListenPort;
+
+    Transport::AdminId mAdminId;
 };
 
 /**
@@ -346,6 +377,14 @@ public:
 
     /**
      * @brief
+     *   Called when response to OpenPairingWindow is received from the device.
+     *
+     * @param[in] status CHIP_NO_ERROR on success, or corresponding error.
+     */
+    virtual void OnPairingWindowOpenStatus(CHIP_ERROR status){};
+
+    /**
+     * @brief
      *   Called when device status is updated.
      *
      */
@@ -363,7 +402,8 @@ typedef struct SerializableDevice
     PASESessionSerializable mOpsCreds;
     uint64_t mDeviceId; /* This field is serialized in LittleEndian byte order */
     uint8_t mDeviceAddr[INET6_ADDRSTRLEN];
-    uint16_t mDevicePort; /* This field is serealized in LittelEndian byte order */
+    uint16_t mDevicePort; /* This field is serialized in LittleEndian byte order */
+    uint16_t mAdminId;    /* This field is serialized in LittleEndian byte order */
     uint8_t mInterfaceName[kMaxInterfaceName];
 } SerializableDevice;
 

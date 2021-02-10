@@ -70,7 +70,7 @@
 #include <system/TLVPacketBufferBackingStore.h>
 
 using namespace ::nl;
-using namespace chip::SetupPayload;
+using namespace chip::SetupPayloadData;
 using namespace chip::Protocols;
 
 namespace chip {

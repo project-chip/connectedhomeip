@@ -72,24 +72,150 @@ public:
     void Init(chip::System::Layer * systemLayer, SecureSessionMgr * sessionMgr);
     void Shutdown();
 
+    /**
+     * Return a tick counter value given a time period.
+     *
+     * @param[in]  newTime        Timestamp value of in milliseconds.
+     *
+     * @return Tick count for the time period.
+     */
     uint64_t GetTickCounterFromTimePeriod(uint64_t period);
+
+    /**
+     * Return a tick counter value between the given time and the stored time.
+     *
+     * @param[in]  newTime        Timestamp value of in milliseconds.
+     *
+     * @return Tick count of the difference between the given time and the stored time.
+     */
     uint64_t GetTickCounterFromTimeDelta(uint64_t newTime);
 
+    /**
+     * Iterate through active exchange contexts and retrans table entries.  If an
+     * action needs to be triggered by ReliableMessageProtocol time facilities,
+     * execute that action.
+     */
     void ExecuteActions();
+
+    /**
+     * Handle physical wakeup of system due to ReliableMessageProtocol wakeup.
+     *
+     */
     static void Timeout(System::Layer * aSystemLayer, void * aAppState, System::Error aError);
 
+    /**
+     *  Add a CHIP message into the retransmission table to be subsequently resent if a corresponding acknowledgment
+     *  is not received within the retransmission timeout.
+     *
+     *  @param[in]    rc        A pointer to the ExchangeContext object.
+     *
+     *  @param[out]   rEntry    A pointer to a pointer of a retransmission table entry added into the table.
+     *
+     *  @retval  #CHIP_ERROR_RETRANS_TABLE_FULL If there is no empty slot left in the table for addition.
+     *  @retval  #CHIP_NO_ERROR On success.
+     */
     CHIP_ERROR AddToRetransTable(ReliableMessageContext * rc, RetransTableEntry ** rEntry);
+
+    /**
+     *  Start retranmisttion of cached encryped packet for current entry.
+     *
+     *  @param[in]   entry    A pointer to a retransmission table entry added into the table.
+     *
+     *  @retval  #CHIP_NO_ERROR On success.
+     */
     void StartRetransmision(RetransTableEntry * entry);
+
+    /**
+     *  Pause retranmisttion of current exchange for specified period.
+     *
+     *  @param[in]    rc                A pointer to the ExchangeContext object.
+     *
+     *  @param[in]    PauseTimeMillis   Pause period in milliseconds.
+     *
+     *  @retval  #CHIP_NO_ERROR On success.
+     */
     void PauseRetransmision(ReliableMessageContext * rc, uint32_t PauseTimeMillis);
+
+    /**
+     *  Re-start retranmisttion of cached encryped packet for current entry.
+     *
+     *  @param[in]   entry    A pointer to a retransmission table entry added into the table.
+     *
+     *  @retval  #CHIP_NO_ERROR On success.
+     */
     void ResumeRetransmision(ReliableMessageContext * rc);
+
+    /**
+     *  Iterate through active exchange contexts and retrans table entries. Clear the entry matching
+     *  the specified ExchangeContext and the message ID from the retransmision table.
+     *
+     *  @param[in]    rc        A pointer to the ExchangeContext object.
+     *
+     *  @param[in]    msgId     message ID which has been acked.
+     *
+     *  @retval  #CHIP_NO_ERROR On success.
+     */
     bool CheckAndRemRetransTable(ReliableMessageContext * rc, uint32_t msgId);
+
+    /**
+     *  Send the specified entry from the retransmission table.
+     *
+     *  @param[in]    entry     A pointer to a retransmission table entry object that needs to be sent.
+     *
+     *  @return  #CHIP_NO_ERROR On success, else corresponding CHIP_ERROR returned from SendMessage.
+     */
     CHIP_ERROR SendFromRetransTable(RetransTableEntry * entry);
+
+    /**
+     *  Clear entries matching a specified ExchangeContext.
+     *
+     *  @param[in]    rc    A pointer to the ExchangeContext object.
+     *
+     */
     void ClearRetransTable(ReliableMessageContext * rc);
+
+    /**
+     *  Clear an entry in the retransmission table.
+     *
+     *  @param[in]    rEntry   A reference to the RetransTableEntry object.
+     *
+     */
     void ClearRetransTable(RetransTableEntry & rEntry);
+
+    /**
+     *  Fail entries matching a specified ExchangeContext.
+     *
+     *  @param[in]    rc    A pointer to the ExchangeContext object.
+     *
+     *  @param[in]    err   The error for failing table entries.
+     *
+     */
     void FailRetransTableEntries(ReliableMessageContext * rc, CHIP_ERROR err);
 
+    /**
+     * Iterate through active exchange contexts and retrans table entries.
+     * Determine how many ReliableMessageProtocol ticks we need to sleep before we
+     * need to physically wake the CPU to perform an action.  Set a timer to go off
+     * when we next need to wake the system.
+     *
+     */
     void StartTimer();
+
+    /**
+     * Stop the timer for retransmistion on current node.
+     *
+     */
     void StopTimer();
+
+    /**
+     * Calculate number of virtual ReliableMessageProtocol ticks that have expired
+     * since we last called this function. Iterate through active exchange contexts
+     * and retrans table entries, subtracting expired virtual ticks to synchronize
+     * wakeup times with the current system time. Do not perform any actions beyond
+     * updating tick counts, actions will be performed by the physical
+     * ReliableMessageProtocol timer tick expiry.
+     *
+     */
     void ExpireTicks();
 
     // Functions for testing

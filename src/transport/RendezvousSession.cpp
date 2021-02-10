@@ -44,15 +44,17 @@ using namespace chip::Transport;
 namespace chip {
 
 CHIP_ERROR RendezvousSession::Init(const RendezvousParameters & params, TransportMgrBase * transportMgr,
-                                   SecureSessionMgr * sessionMgr)
+                                   SecureSessionMgr * sessionMgr, Transport::AdminPairingInfo * admin)
 {
     mParams       = params;
     mTransportMgr = transportMgr;
     VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(sessionMgr != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(mParams.HasSetupPINCode(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(admin != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(mParams.HasSetupPINCode() || mParams.HasPASEVerifier(), CHIP_ERROR_INVALID_ARGUMENT);
 
     mSecureSessionMgr = sessionMgr;
+    mAdmin            = admin;
 
     // TODO: BLE Should be a transport, in that case, RendezvousSession and BLE should decouple
     if (params.GetPeerAddress().GetTransportType() == Transport::Type::kBle)
@@ -72,7 +74,14 @@ CHIP_ERROR RendezvousSession::Init(const RendezvousParameters & params, Transpor
 
     if (!mParams.IsController())
     {
-        ReturnErrorOnFailure(WaitForPairing(mParams.GetLocalNodeId(), mParams.GetSetupPINCode()));
+        if (mParams.HasPASEVerifier())
+        {
+            ReturnErrorOnFailure(WaitForPairing(mParams.GetLocalNodeId(), mParams.GetPASEVerifier()));
+        }
+        else
+        {
+            ReturnErrorOnFailure(WaitForPairing(mParams.GetLocalNodeId(), mParams.GetSetupPINCode()));
+        }
     }
 
     mNetworkProvision.Init(this);
@@ -140,9 +149,9 @@ void RendezvousSession::OnSessionEstablishmentError(CHIP_ERROR err)
 
 void RendezvousSession::OnSessionEstablished()
 {
-    CHIP_ERROR err =
-        mSecureSessionMgr->NewPairing(Optional<Transport::PeerAddress>::Value(mPairingSession.PeerConnection().GetPeerAddress()),
-                                      mPairingSession.PeerConnection().GetPeerNodeId(), &mPairingSession, mTransport);
+    CHIP_ERROR err = mSecureSessionMgr->NewPairing(
+        Optional<Transport::PeerAddress>::Value(mPairingSession.PeerConnection().GetPeerAddress()),
+        mPairingSession.PeerConnection().GetPeerNodeId(), &mPairingSession, mAdmin->GetAdminId(), mTransport);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Ble, "Failed in setting up secure channel: err %s", ErrorStr(err));
@@ -222,6 +231,10 @@ void RendezvousSession::OnRendezvousError(CHIP_ERROR err)
         mDelegate->OnRendezvousError(err);
     }
     UpdateState(State::kInit, err);
+    if (mAdmin != nullptr)
+    {
+        mAdmin->Reset();
+    }
 }
 
 void RendezvousSession::UpdateState(RendezvousSession::State newState, CHIP_ERROR err)
@@ -265,6 +278,8 @@ void RendezvousSession::UpdateState(RendezvousSession::State newState, CHIP_ERRO
         {
             mDelegate->OnRendezvousComplete();
         }
+        // Release the admin, as the rendezvous is complete.
+        mAdmin = nullptr;
         break;
 
     case State::kSecurePairing:
@@ -303,7 +318,12 @@ void RendezvousSession::OnRendezvousMessageReceived(const PacketHeader & packetH
     case State::kSecurePairing:
         if (packetHeader.GetSourceNodeId().HasValue())
         {
-            ChipLogProgress(Ble, "Received rendezvous message from %llu", packetHeader.GetSourceNodeId().Value());
+            ChipLogProgress(Ble, "Received pairing message from %llu", packetHeader.GetSourceNodeId().Value());
+        }
+        if (packetHeader.GetDestinationNodeId().HasValue())
+        {
+            ChipLogProgress(Ble, "Received pairing message for %llu", packetHeader.GetDestinationNodeId().Value());
+            mAdmin->SetNodeId(packetHeader.GetDestinationNodeId().Value());
         }
         err = HandlePairingMessage(packetHeader, peerAddress, std::move(msgBuf));
         break;
@@ -360,6 +380,7 @@ CHIP_ERROR RendezvousSession::HandleSecureMessage(const PacketHeader & packetHea
     if (packetHeader.GetDestinationNodeId().HasValue() && !mParams.HasLocalNodeId())
     {
         ChipLogProgress(Ble, "Received rendezvous message for %llu", packetHeader.GetDestinationNodeId().Value());
+        mAdmin->SetNodeId(packetHeader.GetDestinationNodeId().Value());
         mParams.SetLocalNodeId(packetHeader.GetDestinationNodeId().Value());
         mSecureSessionMgr->SetLocalNodeID(packetHeader.GetDestinationNodeId().Value());
     }
@@ -411,10 +432,23 @@ CHIP_ERROR RendezvousSession::WaitForPairing(Optional<NodeId> nodeId, uint32_t s
                                           strlen(kSpake2pKeyExchangeSalt), nodeId, 0, this);
 }
 
+CHIP_ERROR RendezvousSession::WaitForPairing(Optional<NodeId> nodeId, const PASEVerifier & verifier)
+{
+    UpdateState(State::kSecurePairing);
+    return mPairingSession.WaitForPairing(verifier, nodeId, 0, this);
+}
+
 CHIP_ERROR RendezvousSession::Pair(Optional<NodeId> nodeId, uint32_t setupPINCode)
 {
     UpdateState(State::kSecurePairing);
     return mPairingSession.Pair(mParams.GetPeerAddress(), setupPINCode, nodeId, mParams.GetRemoteNodeId().ValueOr(kUndefinedNodeId),
+                                mNextKeyId++, this);
+}
+
+CHIP_ERROR RendezvousSession::Pair(Optional<NodeId> nodeId, const PASEVerifier & verifier)
+{
+    UpdateState(State::kSecurePairing);
+    return mPairingSession.Pair(mParams.GetPeerAddress(), verifier, nodeId, mParams.GetRemoteNodeId().ValueOr(kUndefinedNodeId),
                                 mNextKeyId++, this);
 }
 

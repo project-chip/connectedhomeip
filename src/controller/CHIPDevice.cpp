@@ -47,6 +47,7 @@
 #include <support/ReturnMacros.h>
 #include <support/SafeInt.h>
 #include <support/logging/CHIPLogging.h>
+#include <system/TLVPacketBufferBackingStore.h>
 
 using namespace chip::Inet;
 using namespace chip::System;
@@ -55,7 +56,7 @@ using namespace chip::Callback;
 namespace chip {
 namespace Controller {
 
-CHIP_ERROR Device::SendMessage(System::PacketBufferHandle buffer)
+CHIP_ERROR Device::SendMessage(System::PacketBufferHandle buffer, PayloadHeader & payloadHeader)
 {
     System::PacketBufferHandle resend;
     bool loadedSecureSession = false;
@@ -75,7 +76,7 @@ CHIP_ERROR Device::SendMessage(System::PacketBufferHandle buffer)
         resend = buffer.CloneData();
     }
 
-    CHIP_ERROR err = mSessionManager->SendMessage(mSecureSession, std::move(buffer));
+    CHIP_ERROR err = mSessionManager->SendMessage(mSecureSession, payloadHeader, std::move(buffer));
 
     buffer = nullptr;
     ChipLogDetail(Controller, "SendMessage returned %d", err);
@@ -132,6 +133,12 @@ CHIP_ERROR Device::SendCommands()
     return mCommandSender->SendCommandRequest(mDeviceId);
 }
 
+CHIP_ERROR Device::SendMessage(System::PacketBufferHandle buffer)
+{
+    PayloadHeader unusedHeader;
+    return SendMessage(std::move(buffer), unusedHeader);
+}
+
 CHIP_ERROR Device::Serialize(SerializedDevice & output)
 {
     CHIP_ERROR error       = CHIP_NO_ERROR;
@@ -146,6 +153,7 @@ CHIP_ERROR Device::Serialize(SerializedDevice & output)
     memmove(&serializable.mOpsCreds, &mPairing, sizeof(mPairing));
     serializable.mDeviceId   = Encoding::LittleEndian::HostSwap64(mDeviceId);
     serializable.mDevicePort = Encoding::LittleEndian::HostSwap16(mDevicePort);
+    serializable.mAdminId    = Encoding::LittleEndian::HostSwap16(mAdminId);
     VerifyOrExit(
         CHIP_NO_ERROR ==
             Inet::GetInterfaceName(mInterface, Uint8::to_char(serializable.mInterfaceName), sizeof(serializable.mInterfaceName)),
@@ -191,6 +199,7 @@ CHIP_ERROR Device::Deserialize(const SerializedDevice & input)
     memmove(&mPairing, &serializable.mOpsCreds, sizeof(mPairing));
     mDeviceId   = Encoding::LittleEndian::HostSwap64(serializable.mDeviceId);
     mDevicePort = Encoding::LittleEndian::HostSwap16(serializable.mDevicePort);
+    mAdminId    = Encoding::LittleEndian::HostSwap16(serializable.mAdminId);
 
     // The InterfaceNameToId() API requires initialization of mInterface, and lock/unlock of
     // LwIP stack.
@@ -239,6 +248,46 @@ void Device::OnMessageReceived(const PacketHeader & header, const PayloadHeader 
     }
 }
 
+CHIP_ERROR Device::OpenPairingWindow(uint32_t timeout, bool useToken, uint16_t discriminator, SetupPayload & setupPayload)
+{
+    // TODO: This code is temporary, and must be updated to use the Cluster API.
+    // Issue: https://github.com/project-chip/connectedhomeip/issues/4725
+
+    // Construct and send "open pairing window" message to the device
+    System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::kMaxPacketBufferSize);
+    System::PacketBufferTLVWriter writer;
+
+    writer.Init(std::move(buf));
+    writer.ImplicitProfileId = chip::Protocols::kProtocol_ServiceProvisioning;
+
+    ReturnErrorOnFailure(writer.Put(TLV::ProfileTag(writer.ImplicitProfileId, 1), timeout));
+
+    if (useToken)
+    {
+        ReturnErrorOnFailure(writer.Put(TLV::ProfileTag(writer.ImplicitProfileId, 2), discriminator));
+
+        PASEVerifier verifier;
+        ReturnErrorOnFailure(PASESession::GeneratePASEVerifier(verifier, setupPayload.setUpPINCode));
+        ReturnErrorOnFailure(writer.PutBytes(TLV::ProfileTag(writer.ImplicitProfileId, 3),
+                                             reinterpret_cast<const uint8_t *>(verifier), sizeof(verifier)));
+    }
+
+    System::PacketBufferHandle outBuffer;
+    ReturnErrorOnFailure(writer.Finalize(&outBuffer));
+
+    PayloadHeader header;
+
+    header.SetMessageType(chip::Protocols::kProtocol_ServiceProvisioning, 0);
+
+    ReturnErrorOnFailure(SendMessage(std::move(outBuffer), header));
+
+    setupPayload.version               = 1;
+    setupPayload.rendezvousInformation = RendezvousInformationFlags::kBLE;
+    setupPayload.discriminator         = discriminator;
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR Device::LoadSecureSessionParameters(ResetTransport resetNeeded)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -266,7 +315,7 @@ CHIP_ERROR Device::LoadSecureSessionParameters(ResetTransport resetNeeded)
 
     err = mSessionManager->NewPairing(
         Optional<Transport::PeerAddress>::Value(Transport::PeerAddress::UDP(mDeviceAddr, mDevicePort, mInterface)), mDeviceId,
-        &pairingSession);
+        &pairingSession, mAdminId);
     SuccessOrExit(err);
 
 exit:

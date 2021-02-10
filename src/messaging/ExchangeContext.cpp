@@ -139,7 +139,7 @@ CHIP_ERROR ExchangeContext::SendMessage(uint16_t protocolId, uint8_t msgType, Pa
     }
 
     // Send the message.
-    if (payloadHeader.IsNeedsAck())
+    if (payloadHeader.NeedsAck())
     {
         ReliableMessageMgr::RetransTableEntry * entry = nullptr;
 
@@ -380,7 +380,7 @@ CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, con
         SuccessOrExit(err);
     }
 
-    if (payloadHeader.IsNeedsAck())
+    if (payloadHeader.NeedsAck())
     {
         MessageFlags msgFlags;
 

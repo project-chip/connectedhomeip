@@ -129,6 +129,11 @@ void VerifyStatusReport(nlTestSuite * inSuite, void * inContext, const System::P
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, payloadHeader.GetProtocolID() == Protocols::kProtocol_Protocol_Common);
     NL_TEST_ASSERT(inSuite, payloadHeader.GetMessageType() == static_cast<uint8_t>(Protocols::Common::MsgType::StatusReport));
+    if (headerSize > msg->DataLength())
+    {
+        NL_TEST_ASSERT(inSuite, false);
+        return;
+    }
 
     Encoding::LittleEndian::Reader reader(msg->Start(), msg->DataLength());
     err = reader.Skip(headerSize).Read16(&generalCode).Read32(&protocolId).Read16(&protocolCode).StatusCode();

@@ -139,7 +139,9 @@ void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext)
 
     err = transportMgr.Init("LOOPBACK");
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    err = secureSessionMgr.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer(), &transportMgr);
+
+    Transport::AdminPairingTable admins;
+    err = secureSessionMgr.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer(), &transportMgr, &admins);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
@@ -151,7 +153,7 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
 
     ctx.GetInetLayer().SystemLayer()->Init(nullptr);
 
-    chip::System::PacketBufferHandle buffer = chip::System::PacketBufferHandle::NewWithData(PAYLOAD, payload_len, kMaxTagLen);
+    chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, payload_len);
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());
 
     IPAddress addr;
@@ -163,7 +165,9 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
 
     err = transportMgr.Init("LOOPBACK");
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    err = secureSessionMgr.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer(), &transportMgr);
+
+    Transport::AdminPairingTable admins;
+    err = secureSessionMgr.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer(), &transportMgr, &admins);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     callback.mSuite = inSuite;
@@ -172,12 +176,18 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
 
     Optional<Transport::PeerAddress> peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
 
+    Transport::AdminPairingInfo * admin = admins.AssignAdminId(0, kSourceNodeId);
+    NL_TEST_ASSERT(inSuite, admin != nullptr);
+
+    admin = admins.AssignAdminId(1, kDestinationNodeId);
+    NL_TEST_ASSERT(inSuite, admin != nullptr);
+
     SecurePairingUsingTestSecret pairing1(Optional<NodeId>::Value(kSourceNodeId), 1, 2);
-    err = secureSessionMgr.NewPairing(peer, kSourceNodeId, &pairing1);
+    err = secureSessionMgr.NewPairing(peer, kSourceNodeId, &pairing1, 1);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     SecurePairingUsingTestSecret pairing2(Optional<NodeId>::Value(kDestinationNodeId), 2, 1);
-    err = secureSessionMgr.NewPairing(peer, kDestinationNodeId, &pairing2);
+    err = secureSessionMgr.NewPairing(peer, kDestinationNodeId, &pairing2, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     SecureSessionHandle localToRemoteSession = callback.mLocalToRemoteSession;
@@ -202,7 +212,7 @@ void SendEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
 
     ctx.GetInetLayer().SystemLayer()->Init(nullptr);
 
-    chip::System::PacketBufferHandle buffer = chip::System::PacketBufferHandle::NewWithData(PAYLOAD, payload_len, kMaxTagLen);
+    chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, payload_len);
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());
 
     IPAddress addr;
@@ -214,7 +224,9 @@ void SendEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
 
     err = transportMgr.Init("LOOPBACK");
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    err = secureSessionMgr.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer(), &transportMgr);
+
+    Transport::AdminPairingTable admins;
+    err = secureSessionMgr.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer(), &transportMgr, &admins);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     callback.mSuite = inSuite;
@@ -223,12 +235,18 @@ void SendEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
 
     Optional<Transport::PeerAddress> peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
 
+    Transport::AdminPairingInfo * admin = admins.AssignAdminId(0, kSourceNodeId);
+    NL_TEST_ASSERT(inSuite, admin != nullptr);
+
+    admin = admins.AssignAdminId(1, kDestinationNodeId);
+    NL_TEST_ASSERT(inSuite, admin != nullptr);
+
     SecurePairingUsingTestSecret pairing1(Optional<NodeId>::Value(kSourceNodeId), 1, 2);
-    err = secureSessionMgr.NewPairing(peer, kSourceNodeId, &pairing1);
+    err = secureSessionMgr.NewPairing(peer, kSourceNodeId, &pairing1, 1);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     SecurePairingUsingTestSecret pairing2(Optional<NodeId>::Value(kDestinationNodeId), 2, 1);
-    err = secureSessionMgr.NewPairing(peer, kDestinationNodeId, &pairing2);
+    err = secureSessionMgr.NewPairing(peer, kDestinationNodeId, &pairing2, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     SecureSessionHandle localToRemoteSession = callback.mLocalToRemoteSession;
@@ -268,7 +286,7 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
 
     ctx.GetInetLayer().SystemLayer()->Init(nullptr);
 
-    chip::System::PacketBufferHandle buffer = chip::System::PacketBufferHandle::NewWithData(PAYLOAD, payload_len, kMaxTagLen);
+    chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, payload_len);
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());
 
     IPAddress addr;
@@ -280,7 +298,9 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
 
     err = transportMgr.Init("LOOPBACK");
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    err = secureSessionMgr.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer(), &transportMgr);
+
+    Transport::AdminPairingTable admins;
+    err = secureSessionMgr.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer(), &transportMgr, &admins);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     callback.mSuite = inSuite;
@@ -289,12 +309,18 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
 
     Optional<Transport::PeerAddress> peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
 
+    Transport::AdminPairingInfo * admin = admins.AssignAdminId(0, kSourceNodeId);
+    NL_TEST_ASSERT(inSuite, admin != nullptr);
+
+    admin = admins.AssignAdminId(1, kDestinationNodeId);
+    NL_TEST_ASSERT(inSuite, admin != nullptr);
+
     SecurePairingUsingTestSecret pairing1(Optional<NodeId>::Value(kSourceNodeId), 1, 2);
-    err = secureSessionMgr.NewPairing(peer, kSourceNodeId, &pairing1);
+    err = secureSessionMgr.NewPairing(peer, kSourceNodeId, &pairing1, 1);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     SecurePairingUsingTestSecret pairing2(Optional<NodeId>::Value(kDestinationNodeId), 2, 1);
-    err = secureSessionMgr.NewPairing(peer, kDestinationNodeId, &pairing2);
+    err = secureSessionMgr.NewPairing(peer, kDestinationNodeId, &pairing2, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     SecureSessionHandle localToRemoteSession = callback.mLocalToRemoteSession;

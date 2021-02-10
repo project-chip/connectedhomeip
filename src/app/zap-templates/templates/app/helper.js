@@ -361,6 +361,11 @@ function isFirstElement(index)
   return index == 0;
 }
 
+function isStrEndsWith(str, substr)
+{
+  return str.endsWith(substr);
+}
+
 //
 // Module exports
 //
@@ -374,3 +379,4 @@ exports.user_cluster_has_enabled_manufacturer_command = user_cluster_has_enabled
 exports.chip_endpoint_generated_functions             = chip_endpoint_generated_functions
 exports.chip_endpoint_cluster_list                    = chip_endpoint_cluster_list
 exports.isSigned                                      = ChipTypesHelper.isSigned;
+exports.isStrEndsWith                                 = isStrEndsWith;

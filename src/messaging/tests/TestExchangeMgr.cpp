@@ -145,8 +145,9 @@ void CheckExchangeMessages(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // send a malicious packet
-    ec1->SendMessage(0x0001, 0x0002, System::PacketBufferHandle::New(System::kMaxPacketBufferSize),
-                     SendFlags(Messaging::SendMessageFlags::kNone));
+    // TODO: https://github.com/project-chip/connectedhomeip/issues/4635
+    // ec1->SendMessage(0x0001, 0x0002, System::PacketBufferHandle::New(System::kMaxPacketBufferSize),
+    //                 SendFlags(Messaging::SendMessageFlags::kNone));
     NL_TEST_ASSERT(inSuite, !mockUnsolicitedAppDelegate.IsOnMessageReceivedCalled);
 
     // send a good packet

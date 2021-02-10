@@ -19,7 +19,7 @@
 #include "pw_sys_io/sys_io.h"
 #include "pw_sys_io_esp32/init.h"
 
-const char * TAG = "pw-rpc-app";
+const char * TAG = "chip-pigweed-app";
 
 namespace hdlc_example {
 extern void Start();
