@@ -181,8 +181,9 @@ The resulting output file can be found in out/debug/chip-k32w061-lock-example.
 Program the firmware using the official
 [OpenThread Flash Instructions](https://github.com/openthread/openthread/blob/master/examples/platforms/k32w/k32w061/README.md#flash-binaries).
 
-All you have to do is to replace the Openthread binaries from the above documentation with _out/debug/chip-k32w061-lock-example.bin_ if
-DK6Programmer is used or with _out/debug/chip-k32w061-lock-example_ if  MCUXpresso is used.
+All you have to do is to replace the Openthread binaries from the above
+documentation with _out/debug/chip-k32w061-lock-example.bin_ if DK6Programmer is
+used or with _out/debug/chip-k32w061-lock-example_ if MCUXpresso is used.
 
 ## Testing the example
 
