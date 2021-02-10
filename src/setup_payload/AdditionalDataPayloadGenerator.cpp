@@ -38,7 +38,7 @@ using namespace chip;
 using namespace chip::System;
 using namespace chip::TLV;
 using namespace chip::Crypto;
-using namespace chip::SetupPayload;
+using namespace chip::SetupPayloadData;
 using namespace chip::Encoding::LittleEndian;
 
 CHIP_ERROR AdditionalDataPayloadGenerator::generateAdditionalDataPayload(uint16_t lifetimeCounter, const char * serialNumberBuffer,
