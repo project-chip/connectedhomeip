@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -56,10 +56,10 @@ void ReliableMessageMgr::Init(chip::System::Layer * systemLayer, SecureSessionMg
 
 void ReliableMessageMgr::Shutdown()
 {
+    StopTimer();
+
     mSystemLayer = nullptr;
     mSessionMgr  = nullptr;
-
-    StopTimer();
 
     // Clear the retransmit table
     for (RetransTableEntry & rEntry : mRetransTable)
@@ -398,8 +398,9 @@ void ReliableMessageMgr::ClearRetransTable(RetransTableEntry & rEntry)
         // Clear all other fields
         rEntry = RetransTableEntry();
 
-        // Schedule next physical wakeup
-        StartTimer();
+        // Schedule next physical wakeup, unless shutting down
+        if (mSystemLayer)
+            StartTimer();
     }
 }
 

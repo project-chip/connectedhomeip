@@ -247,7 +247,11 @@ nlTestSuite sSuite =
  */
 int Initialize(void * aContext)
 {
-    CHIP_ERROR err = gTransportMgr.Init("LOOPBACK");
+    CHIP_ERROR err = chip::Platform::MemoryInit();
+    if (err != CHIP_NO_ERROR)
+        return FAILURE;
+
+    err = gTransportMgr.Init("LOOPBACK");
     if (err != CHIP_NO_ERROR)
         return FAILURE;
 
@@ -261,6 +265,7 @@ int Initialize(void * aContext)
 int Finalize(void * aContext)
 {
     CHIP_ERROR err = reinterpret_cast<TestContext *>(aContext)->Shutdown();
+    chip::Platform::MemoryShutdown();
     return (err == CHIP_NO_ERROR) ? SUCCESS : FAILURE;
 }
 

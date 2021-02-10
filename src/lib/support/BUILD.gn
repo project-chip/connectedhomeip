@@ -133,4 +133,7 @@ static_library("support") {
   if (chip_logging_style == "android") {
     libs += [ "log" ]
   }
+  if (chip_config_memory_debug_dmalloc) {
+    libs += [ "dmallocthcxx" ]
+  }
 }
