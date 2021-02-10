@@ -74,10 +74,10 @@ pw_python_action("python") {
         "chip/ChipDeviceCtrl.py",
         "chip/ChipExceptions.py",
         "chip/ChipStack.py",
-        "chip/ChipTLV.py",
         "chip/ChipUtility.py",
         "chip/__init__.py",
         "chip/ble/__init__.py",
+        "chip/tlv/__init__.py",
       ]
     },
     {
