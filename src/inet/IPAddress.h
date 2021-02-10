@@ -338,6 +338,16 @@ public:
     char * ToString(char * buf, uint32_t bufSize) const;
 
     /**
+     * A version of ToString that writes to a literal and deduces how much space
+     * it as to work with.
+     */
+    template <uint32_t N>
+    inline char * ToString(char (&buf)[N]) const
+    {
+        return ToString(buf, N);
+    }
+
+    /**
      * @brief   Scan the IP address from its conventional presentation text.
      *
      * @param[in]   str     The address of the emitted text.

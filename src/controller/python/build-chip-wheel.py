@@ -139,6 +139,7 @@ try:
         packages=[
             'chip',
             'chip.ble',
+            'chip.exceptions',
             'chip.tlv',
         ],
         package_dir={

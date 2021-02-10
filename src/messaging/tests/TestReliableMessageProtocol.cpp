@@ -68,14 +68,7 @@ public:
 
     CHIP_ERROR SendMessage(const PacketHeader & header, const PeerAddress & address, System::PacketBufferHandle msgBuf) override
     {
-        const uint16_t headerSize = header.EncodeSizeBytes();
-
-        VerifyOrReturnError(msgBuf->EnsureReservedSize(headerSize), CHIP_ERROR_NO_MEMORY);
-
-        msgBuf->SetStart(msgBuf->Start() - headerSize);
-
-        uint16_t actualEncodedHeaderSize;
-        ReturnErrorOnFailure(header.Encode(msgBuf->Start(), msgBuf->DataLength(), &actualEncodedHeaderSize));
+        ReturnErrorOnFailure(header.EncodeBeforeData(msgBuf));
 
         gSendMessageCount++;
 

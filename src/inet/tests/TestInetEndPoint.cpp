@@ -65,7 +65,7 @@ void HandleDNSResolveComplete(void * appState, INET_ERROR err, uint8_t addrCount
     if (addrCount > 0)
     {
         char destAddrStr[64];
-        addrArray->ToString(destAddrStr, sizeof(destAddrStr));
+        addrArray->ToString(destAddrStr);
         printf("    DNS name resolution complete: %s\n", destAddrStr);
     }
     else
@@ -276,7 +276,7 @@ static void TestInetInterface(nlTestSuite * inSuite, void * inContext)
         addr = addrIterator.GetAddress();
         addrIterator.GetAddressWithPrefix(addrWithPrefix);
         char addrStr[80];
-        addrWithPrefix.IPAddr.ToString(addrStr, sizeof(addrStr));
+        addrWithPrefix.IPAddr.ToString(addrStr);
         intId = addrIterator.GetInterfaceId();
         NL_TEST_ASSERT(inSuite, intId != INET_NULL_INTERFACEID);
         memset(intName, 42, sizeof(intName));

@@ -73,15 +73,9 @@ public:
 
     CHIP_ERROR SendMessage(const PacketHeader & header, const PeerAddress & address, System::PacketBufferHandle msgBuf) override
     {
-        const uint16_t headerSize           = header.EncodeSizeBytes();
         System::PacketBufferHandle recvdMsg = msgBuf.CloneData();
 
-        VerifyOrReturnError(msgBuf->EnsureReservedSize(headerSize), CHIP_ERROR_NO_MEMORY);
-
-        msgBuf->SetStart(msgBuf->Start() - headerSize);
-
-        uint16_t actualEncodedHeaderSize;
-        ReturnErrorOnFailure(header.Encode(msgBuf->Start(), msgBuf->DataLength(), &actualEncodedHeaderSize));
+        ReturnErrorOnFailure(header.EncodeBeforeData(msgBuf));
 
         HandleMessageReceived(header, address, std::move(recvdMsg));
         return CHIP_NO_ERROR;
@@ -355,7 +349,7 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
 
     NL_TEST_ASSERT(inSuite, packetHeader.GetDestinationNodeId().Value() == kDestinationNodeId);
     packetHeader.SetDestinationNodeId(kSourceNodeId);
-    packetHeader.Encode(badDestNodeIdMsg->Start(), badDestNodeIdMsg->DataLength(), &headerSize);
+    packetHeader.EncodeAtStart(badDestNodeIdMsg, &headerSize);
 
     err = secureSessionMgr.SendEncryptedMessage(localToRemoteSession, std::move(badDestNodeIdMsg), nullptr);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -370,7 +364,7 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
                    packetHeader.Decode(badSrcNodeIdMsg->Start(), badSrcNodeIdMsg->DataLength(), &headerSize) == CHIP_NO_ERROR);
 
     packetHeader.SetSourceNodeId(kDestinationNodeId);
-    packetHeader.Encode(badSrcNodeIdMsg->Start(), badSrcNodeIdMsg->DataLength(), &headerSize);
+    packetHeader.EncodeAtStart(badSrcNodeIdMsg, &headerSize);
 
     err = secureSessionMgr.SendEncryptedMessage(localToRemoteSession, std::move(badSrcNodeIdMsg), nullptr);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -386,7 +380,7 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
 
     uint32_t msgID = packetHeader.GetMessageId();
     packetHeader.SetMessageId(msgID + 1);
-    packetHeader.Encode(badMessageIdMsg->Start(), badMessageIdMsg->DataLength(), &headerSize);
+    packetHeader.EncodeAtStart(badMessageIdMsg, &headerSize);
 
     err = secureSessionMgr.SendEncryptedMessage(localToRemoteSession, std::move(badMessageIdMsg), nullptr);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -401,7 +395,7 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
 
     // the secure channel is setup to use key ID 1, and 2. So let's use 3 here.
     packetHeader.SetEncryptionKeyID(3);
-    packetHeader.Encode(badKeyIdMsg->Start(), badKeyIdMsg->DataLength(), &headerSize);
+    packetHeader.EncodeAtStart(badKeyIdMsg, &headerSize);
 
     err = secureSessionMgr.SendEncryptedMessage(localToRemoteSession, std::move(badKeyIdMsg), nullptr);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
