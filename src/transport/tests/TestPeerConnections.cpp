@@ -112,12 +112,12 @@ void TestFindByNodeId(nlTestSuite * inSuite, void * inContext)
 
     NL_TEST_ASSERT(inSuite, statePtr = connections.FindPeerConnectionState(kPeer1NodeId, nullptr));
     char buf[100];
-    statePtr->GetPeerAddress().ToString(buf, sizeof(buf));
+    statePtr->GetPeerAddress().ToString(buf);
     NL_TEST_ASSERT(inSuite, statePtr->GetPeerAddress() == kPeer1Addr);
     NL_TEST_ASSERT(inSuite, statePtr->GetPeerNodeId() == kPeer1NodeId);
 
     NL_TEST_ASSERT(inSuite, statePtr = connections.FindPeerConnectionState(kPeer1NodeId, statePtr));
-    statePtr->GetPeerAddress().ToString(buf, sizeof(buf));
+    statePtr->GetPeerAddress().ToString(buf);
     NL_TEST_ASSERT(inSuite, statePtr->GetPeerAddress() == kPeer2Addr);
     NL_TEST_ASSERT(inSuite, statePtr->GetPeerNodeId() == kPeer1NodeId);
 

@@ -88,6 +88,7 @@ pw_proto_library(pigweed_lighting_protolib
 target_sources(app PRIVATE
   main/Rpc.cpp
   ../../common/pigweed/RpcService.cpp
+  ../../common/pigweed/nrfconnect/PigweedLoggerMutex.cpp
   ${NRFCONNECT_COMMON}/util/PigweedLogger.cpp
 )
 
@@ -96,7 +97,8 @@ target_include_directories(app PRIVATE
   ${PIGWEED_ROOT}/pw_sys_io/public
   ${CHIP_ROOT}/src/lib/support
   ${CHIP_ROOT}/src/system
-  ../../common)
+  ../../common
+  ../../common/pigweed/nrfconnect)
 
 target_link_libraries(app PRIVATE
   pigweed_lighting_protolib.nanopb_rpc

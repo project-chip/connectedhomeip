@@ -477,7 +477,7 @@ CHIP_ERROR GenericNetworkProvisioningServerImpl<ImplClass>::HandleGetNetworks(ui
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
     // Allocate a buffer to hold the response.
-    respBuf = PacketBufferHandle::New(kMaxPacketBufferSize);
+    respBuf = PacketBufferHandle::New(PacketBuffer::kMaxSize);
     VerifyOrExit(respBuf != NULL, err = CHIP_ERROR_NO_MEMORY);
 
     // Encode the GetNetworks response data.

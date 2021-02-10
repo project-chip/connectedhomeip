@@ -74,6 +74,8 @@ CHIP_ERROR ExchangeManager::Init(SecureSessionMgr * sessionMgr)
 
 CHIP_ERROR ExchangeManager::Shutdown()
 {
+    mReliableMessageMgr.Shutdown();
+
     if (mSessionMgr != nullptr)
     {
         mSessionMgr->SetDelegate(nullptr);

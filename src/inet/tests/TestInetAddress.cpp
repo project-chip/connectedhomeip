@@ -703,7 +703,7 @@ void CheckAddress(nlTestSuite * inSuite, const IPAddressContext & inContext, con
 
     // Convert the address to a string and compare it to the control string.
 
-    inAddress.ToString(lAddressBuffer, INET6_ADDRSTRLEN);
+    inAddress.ToString(lAddressBuffer);
 
     CheckAddressString(inSuite, lAddressBuffer, inContext.mAddrString);
 
@@ -768,7 +768,7 @@ void CheckToString(nlTestSuite * inSuite, void * inContext)
     {
         SetupIPAddress(lAddress, lCurrent);
 
-        lAddress.ToString(lAddressBuffer, INET6_ADDRSTRLEN);
+        lAddress.ToString(lAddressBuffer);
 
         CheckAddressString(inSuite, lAddressBuffer, lCurrent->mAddr.mAddrString);
 

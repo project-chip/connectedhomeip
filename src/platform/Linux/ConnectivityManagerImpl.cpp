@@ -826,12 +826,33 @@ CHIP_ERROR ConnectivityManagerImpl::ProvisionWiFiNetwork(const char * ssid, cons
     GError * err    = nullptr;
     GVariant * args = nullptr;
     GVariantBuilder builder;
+    gboolean result;
 
     // Clean up current network if exists
     if (mWpaSupplicant.networkPath)
     {
-        g_object_unref(mWpaSupplicant.networkPath);
-        mWpaSupplicant.networkPath = nullptr;
+        GError * error = nullptr;
+
+        result = wpa_fi_w1_wpa_supplicant1_interface_call_remove_network_sync(mWpaSupplicant.iface, mWpaSupplicant.networkPath,
+                                                                              nullptr, &error);
+
+        if (result)
+        {
+            ChipLogProgress(DeviceLayer, "wpa_supplicant: removed network: %s", mWpaSupplicant.networkPath);
+            g_free(mWpaSupplicant.networkPath);
+            mWpaSupplicant.networkPath = nullptr;
+        }
+        else
+        {
+            ChipLogProgress(DeviceLayer, "wpa_supplicant: failed to stop AP mode with error: %s",
+                            error ? error->message : "unknown error");
+            ret = CHIP_ERROR_INTERNAL;
+        }
+
+        if (error != nullptr)
+            g_error_free(error);
+
+        SuccessOrExit(ret);
     }
 
     g_variant_builder_init(&builder, G_VARIANT_TYPE_VARDICT);
@@ -840,8 +861,8 @@ CHIP_ERROR ConnectivityManagerImpl::ProvisionWiFiNetwork(const char * ssid, cons
     g_variant_builder_add(&builder, "{sv}", "key_mgmt", g_variant_new_string("WPA-PSK"));
     args = g_variant_builder_end(&builder);
 
-    gboolean result = wpa_fi_w1_wpa_supplicant1_interface_call_add_network_sync(mWpaSupplicant.iface, args,
-                                                                                &mWpaSupplicant.networkPath, nullptr, &err);
+    result = wpa_fi_w1_wpa_supplicant1_interface_call_add_network_sync(mWpaSupplicant.iface, args, &mWpaSupplicant.networkPath,
+                                                                       nullptr, &err);
 
     if (result)
     {
@@ -899,6 +920,7 @@ CHIP_ERROR ConnectivityManagerImpl::ProvisionWiFiNetwork(const char * ssid, cons
         ret = CHIP_ERROR_INTERNAL;
     }
 
+exit:
     if (err != nullptr)
         g_error_free(err);
 

@@ -80,6 +80,9 @@ for arg; do
         enable_qpg6100_builds=true)
             qpg6100_enabled=1
             ;;
+        enable_efr32_builds=true)
+            efr32_enabled=1
+            ;;
     esac
     user_args+=" $arg"
 done
@@ -98,15 +101,11 @@ fi
 echo
 
 # EFR32 SDK setup
-efr32_sdk_args=""
-
-if [[ -d "$EFR32_SDK_ROOT/protocol/" ]]; then
-    efr32_sdk_args+="efr32_sdk_root=\"$EFR32_SDK_ROOT\" efr32_board=\"$EFR32_BOARD\""
-    extra_args+=" $efr32_sdk_args enable_efr32_builds=true"
-    echo 'To build the EFR32 lock sample as a standalone project':
-    echo "(cd $CHIP_ROOT/examples/lock-app/efr32; gn gen out/debug --args='$efr32_sdk_args'; ninja -C out/debug)"
+if [[ -z "$efr32_enabled" ]]; then
+    echo "Hint: Pass enable_efr32_builds=true to enable building for EFR32"
 else
-    echo "Hint: Set \$EFR32_SDK_ROOT to enable building for EFR32"
+    echo 'To build the EFR32 lock sample as a standalone project':
+    echo "(cd $CHIP_ROOT/examples/lock-app/efr32; gn gen out/debug; ninja -C out/debug)"
 fi
 
 # K32W SDK setup

@@ -10,7 +10,8 @@
 #include <assert.h>
 #include <inet/InetLayer.h>
 #include <support/logging/CHIPLogging.h>
-#include <transport/SecureSessionMgr.h> // For SecureSessionMgr
+#include <transport/SecureSessionMgr.h>
+#include <transport/raw/MessageHeader.h>
 
 using namespace chip;
 

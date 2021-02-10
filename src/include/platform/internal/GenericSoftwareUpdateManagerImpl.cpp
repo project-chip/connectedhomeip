@@ -201,7 +201,7 @@ CHIP_ERROR GenericSoftwareUpdateManagerImpl<ImplClass>::PrepareQuery(void)
     }
 
     // Allocate a buffer to hold the image query.
-    mImageQueryPacketBuffer = PacketBufferHandle::New(kMaxPacketBufferSize);
+    mImageQueryPacketBuffer = PacketBufferHandle::New(PacketBuffer::kMaxSize);
     VerifyOrExit(mImageQueryPacketBuffer != NULL, err = CHIP_ERROR_NO_MEMORY);
 
     err = imageQuery.pack(mImageQueryPacketBuffer);

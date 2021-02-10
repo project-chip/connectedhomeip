@@ -5,7 +5,7 @@
 #include <transport/RendezvousSessionDelegate.h>
 
 namespace chip {
-namespace DeviceController {
+namespace Controller {
 
 void ScriptDevicePairingDelegate::SetWifiCredential(const char * ssid, const char * password)
 {
@@ -25,5 +25,18 @@ void ScriptDevicePairingDelegate::OnOperationalCredentialsRequested(const char *
     ChipLogDetail(Controller, "ScriptDevicePairingDelegate::OnOperationalCredentialsRequested\n");
 }
 
-} // namespace DeviceController
+void ScriptDevicePairingDelegate::SetKeyExchangeCallback(DevicePairingDelegate_OnPairingCompleteFunct callback)
+{
+    mOnPairingCompleteCallback = callback;
+}
+
+void ScriptDevicePairingDelegate::OnPairingComplete(CHIP_ERROR error)
+{
+    if (mOnPairingCompleteCallback != nullptr)
+    {
+        mOnPairingCompleteCallback(error);
+    }
+}
+
+} // namespace Controller
 } // namespace chip

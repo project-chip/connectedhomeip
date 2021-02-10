@@ -99,7 +99,7 @@ BLE_ERROR BLEEndPoint::StartConnect()
     mState = kState_Connecting;
 
     // Build BLE transport protocol capabilities request.
-    buf = System::PacketBufferHandle::New(System::kMaxPacketBufferSize);
+    buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
     VerifyOrExit(!buf.IsNull(), err = BLE_ERROR_NO_MEMORY);
 
     // Zero-initialize BLE transport capabilities request.

@@ -18,6 +18,7 @@
 #include <utility>
 #include <vector>
 
+#include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/UnitTestRegistration.h>
 #include <system/SystemPacketBuffer.h>
@@ -113,6 +114,8 @@ public:
     }
     static void PrintHandle(const char * tag, const PacketBufferHandle & handle) { PrintHandle(tag, handle.mBuffer); }
 
+    static constexpr uint16_t kBlockSize = PacketBuffer::kBlockSize;
+
 private:
     struct BufferConfiguration
     {
@@ -162,8 +165,8 @@ private:
     std::vector<PacketBufferHandle> handles;
 };
 
-const uint16_t sTestReservedSizes[] = { 0, 10, 128, 1536, CHIP_SYSTEM_PACKETBUFFER_SIZE };
-const uint16_t sTestLengths[]       = { 0, 1, 10, 128, CHIP_SYSTEM_PACKETBUFFER_SIZE, UINT16_MAX };
+const uint16_t sTestReservedSizes[] = { 0, 10, 128, 1536, PacketBufferTest::kBlockSize };
+const uint16_t sTestLengths[]       = { 0, 1, 10, 128, PacketBufferTest::kBlockSize, UINT16_MAX };
 
 PacketBufferTest::TestContext sContext = {
     sTestReservedSizes,
@@ -184,6 +187,7 @@ PacketBufferTest::PacketBufferTest(TestContext * context) : mContext(context)
 
 int PacketBufferTest::TestSetup(void * inContext)
 {
+    chip::Platform::MemoryInit();
     TestContext * const theContext = reinterpret_cast<TestContext *>(inContext);
     theContext->test               = new PacketBufferTest(theContext);
     if (theContext->test == nullptr)
@@ -246,7 +250,7 @@ void PacketBufferTest::PrepareTestBuffer(BufferConfiguration * config, int flags
 {
     if (config->handle.IsNull())
     {
-        config->handle = PacketBufferHandle::New(chip::System::kMaxPacketBufferSizeWithoutReserve, 0);
+        config->handle = PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
         if (config->handle.IsNull())
         {
             printf("NewPacketBuffer: Failed to allocate packet buffer (%zu retained): %s\n", handles.size(), strerror(errno));
@@ -263,11 +267,11 @@ void PacketBufferTest::PrepareTestBuffer(BufferConfiguration * config, int flags
         exit(EXIT_FAILURE);
     }
 
-    const size_t lInitialSize = CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE + config->reserved_size;
-    const size_t lAllocSize   = CHIP_SYSTEM_PACKETBUFFER_SIZE;
+    const size_t lInitialSize = PacketBuffer::kStructureSize + config->reserved_size;
+    const size_t lAllocSize   = kBlockSize;
 
     uint8_t * const raw = reinterpret_cast<uint8_t *>(config->handle.Get());
-    memset(raw + CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE, 0, lAllocSize - CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE);
+    memset(raw + PacketBuffer::kStructureSize, 0, lAllocSize - PacketBuffer::kStructureSize);
 
     config->start_buffer = raw;
     config->end_buffer   = raw + lAllocSize;
@@ -326,7 +330,7 @@ bool PacketBufferTest::ResetHandles()
  *
  *  Description: For every buffer-configuration from inContext, create a buffer's instance
  *               using the New() method. Then, verify that when the size of the reserved space
- *               passed to New() is greater than #CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX,
+ *               passed to New() is greater than PacketBuffer::kMaxSizeWithoutReserve,
  *               the method returns nullptr. Otherwise, check for correctness of initializing
  *               the new buffer's internal state.
  */
@@ -340,7 +344,7 @@ void PacketBufferTest::CheckNew(nlTestSuite * inSuite, void * inContext)
     {
         const PacketBufferHandle buffer = PacketBufferHandle::New(0, config.reserved_size);
 
-        if (config.reserved_size > CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX)
+        if (config.reserved_size > PacketBuffer::kMaxSizeWithoutReserve)
         {
             NL_TEST_ASSERT(inSuite, buffer.IsNull());
             continue;
@@ -360,6 +364,7 @@ void PacketBufferTest::CheckNew(nlTestSuite * inSuite, void * inContext)
         }
     }
 
+#if CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE != 0
     // Use the rest of the buffer space
     std::vector<PacketBufferHandle> allocate_all_the_things;
     for (;;)
@@ -372,6 +377,7 @@ void PacketBufferTest::CheckNew(nlTestSuite * inSuite, void * inContext)
         // Hold on to the buffer, to use up all the buffer space.
         allocate_all_the_things.push_back(std::move(buffer));
     }
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE != 0
 }
 
 /**
@@ -407,7 +413,7 @@ void PacketBufferTest::CheckSetStart(nlTestSuite * inSuite, void * inContext)
     PacketBufferTest * const test         = theContext->test;
     NL_TEST_ASSERT(inSuite, test->mContext == theContext);
 
-    static constexpr ptrdiff_t sSizePacketBuffer = CHIP_SYSTEM_PACKETBUFFER_SIZE;
+    static constexpr ptrdiff_t sSizePacketBuffer = kBlockSize;
 
     for (auto & config : test->configurations)
     {
@@ -432,10 +438,10 @@ void PacketBufferTest::CheckSetStart(nlTestSuite * inSuite, void * inContext)
 
             config.handle->SetStart(test_start);
 
-            if (verify_start < config.start_buffer + CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE)
+            if (verify_start < config.start_buffer + PacketBuffer::kStructureSize)
             {
                 // Set start before valid payload beginning.
-                verify_start = config.start_buffer + CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE;
+                verify_start = config.start_buffer + PacketBuffer::kStructureSize;
             }
 
             if (verify_start > config.end_buffer)
@@ -819,7 +825,7 @@ void PacketBufferTest::CheckCompactHead(nlTestSuite * inSuite, void * inContext)
 
             config.handle->CompactHead();
 
-            NL_TEST_ASSERT(inSuite, config.handle->payload == (config.start_buffer + CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE));
+            NL_TEST_ASSERT(inSuite, config.handle->payload == (config.start_buffer + PacketBuffer::kStructureSize));
             NL_TEST_ASSERT(inSuite, config.handle->tot_len == data_length);
         }
 
@@ -869,8 +875,7 @@ void PacketBufferTest::CheckCompactHead(nlTestSuite * inSuite, void * inContext)
 
                     config_1.handle->CompactHead();
 
-                    NL_TEST_ASSERT(inSuite,
-                                   config_1.handle->payload == (config_1.start_buffer + CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE));
+                    NL_TEST_ASSERT(inSuite, config_1.handle->payload == (config_1.start_buffer + PacketBuffer::kStructureSize));
 
                     if (config_1.handle->tot_len > config_1.handle->MaxDataLength())
                     {
@@ -1075,9 +1080,9 @@ void PacketBufferTest::CheckEnsureReservedSize(nlTestSuite * inSuite, void * inC
             const uint16_t kAllocSize = config.handle->AllocSize();
             uint16_t reserved_size    = config.reserved_size;
 
-            if (CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE + config.reserved_size > kAllocSize)
+            if (PacketBuffer::kStructureSize + config.reserved_size > kAllocSize)
             {
-                reserved_size = static_cast<uint16_t>(kAllocSize - CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE);
+                reserved_size = static_cast<uint16_t>(kAllocSize - PacketBuffer::kStructureSize);
             }
 
             if (length <= reserved_size)
@@ -1086,7 +1091,7 @@ void PacketBufferTest::CheckEnsureReservedSize(nlTestSuite * inSuite, void * inC
                 continue;
             }
 
-            if ((length + config.init_len) > (kAllocSize - CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE))
+            if ((length + config.init_len) > (kAllocSize - PacketBuffer::kStructureSize))
             {
                 NL_TEST_ASSERT(inSuite, config.handle->EnsureReservedSize(length) == false);
                 continue;
@@ -1285,8 +1290,8 @@ void PacketBufferTest::CheckFree(nlTestSuite * inSuite, void * inContext)
             // start with various buffer ref counts
             for (size_t r = 0; r < kRefs; r++)
             {
-                config_1.handle = PacketBufferHandle::New(chip::System::kMaxPacketBufferSizeWithoutReserve, 0);
-                config_2.handle = PacketBufferHandle::New(chip::System::kMaxPacketBufferSizeWithoutReserve, 0);
+                config_1.handle = PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+                config_2.handle = PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
                 NL_TEST_ASSERT(inSuite, !config_1.handle.IsNull());
                 NL_TEST_ASSERT(inSuite, !config_2.handle.IsNull());
 
@@ -1437,7 +1442,7 @@ void PacketBufferTest::CheckHandleConstruct(nlTestSuite * inSuite, void * inCont
     PacketBufferHandle handle_2(nullptr);
     NL_TEST_ASSERT(inSuite, handle_2.IsNull());
 
-    PacketBufferHandle handle_3(PacketBufferHandle::New(chip::System::kMaxPacketBufferSize));
+    PacketBufferHandle handle_3(PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
     NL_TEST_ASSERT(inSuite, !handle_3.IsNull());
 
     // Private constructor.
@@ -1656,7 +1661,7 @@ void PacketBufferTest::CheckHandleRightSize(nlTestSuite * inSuite, void * inCont
     NL_TEST_ASSERT(inSuite, test->mContext == theContext);
 
     const char kPayload[]     = "Joy!";
-    PacketBufferHandle handle = PacketBufferHandle::New(chip::System::kMaxPacketBufferSizeWithoutReserve, 0);
+    PacketBufferHandle handle = PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
     PacketBuffer * buffer     = handle.mBuffer;
 
     memcpy(handle->Start(), kPayload, sizeof kPayload);
@@ -1670,20 +1675,20 @@ void PacketBufferTest::CheckHandleRightSize(nlTestSuite * inSuite, void * inCont
         NL_TEST_ASSERT(inSuite, handle.mBuffer == buffer);
     }
 
-#if (CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_PBUF_FROM_CUSTOM_POOLS) || (CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC == 0)
+#if CHIP_SYSTEM_PACKETBUFFER_HAS_RIGHT_SIZE
 
     handle.RightSize();
     NL_TEST_ASSERT(inSuite, handle.mBuffer != buffer);
-    NL_TEST_ASSERT(inSuite, handle->DataSize() == sizeof kPayload);
+    NL_TEST_ASSERT(inSuite, handle->DataLength() == sizeof kPayload);
     NL_TEST_ASSERT(inSuite, memcmp(handle->Start(), kPayload, sizeof kPayload) == 0);
 
-#else // !((CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_PBUF_FROM_CUSTOM_POOLS) || (CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC == 0))
+#else // CHIP_SYSTEM_PACKETBUFFER_HAS_RIGHT_SIZE
 
     // For this configuration, RightSize() does nothing.
     handle.RightSize();
     NL_TEST_ASSERT(inSuite, handle.mBuffer == buffer);
 
-#endif // !((CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_PBUF_FROM_CUSTOM_POOLS) || (CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC == 0))
+#endif // CHIP_SYSTEM_PACKETBUFFER_HAS_RIGHT_SIZE
 }
 
 void PacketBufferTest::CheckPacketBufferWriter(nlTestSuite * inSuite, void * inContext)
@@ -1700,7 +1705,9 @@ void PacketBufferTest::CheckPacketBufferWriter(nlTestSuite * inSuite, void * inC
     NL_TEST_ASSERT(inSuite, !nay.IsNull());
 
     yay.Put(kPayload);
+    yay.Put('\0');
     nay.Put(kPayload);
+    nay.Put('\0');
     NL_TEST_ASSERT(inSuite, yay.Fit());
     NL_TEST_ASSERT(inSuite, !nay.Fit());
 

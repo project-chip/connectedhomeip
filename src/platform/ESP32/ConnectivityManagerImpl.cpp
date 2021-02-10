@@ -954,7 +954,7 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState(void)
         event.Type                            = DeviceEventType::kInternetConnectivityChange;
         event.InternetConnectivityChange.IPv4 = GetConnectivityChange(hadIPv4Conn, haveIPv4Conn);
         event.InternetConnectivityChange.IPv6 = GetConnectivityChange(hadIPv6Conn, haveIPv6Conn);
-        addr.ToString(event.InternetConnectivityChange.address, sizeof(event.InternetConnectivityChange.address));
+        addr.ToString(event.InternetConnectivityChange.address);
         PlatformMgr().PostEvent(&event);
 
         if (haveIPv4Conn != hadIPv4Conn)

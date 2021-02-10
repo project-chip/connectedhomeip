@@ -12,6 +12,7 @@
 #include <app/MessageDef/ReadRequest.h>
 #include <app/MessageDef/ReportData.h>
 #include <core/CHIPTLVDebug.hpp>
+#include <support/CHIPMem.h>
 #include <support/UnitTestRegistration.h>
 #include <system/TLVPacketBufferBackingStore.h>
 
@@ -732,7 +733,7 @@ void AttributePathTest(nlTestSuite * apSuite, void * apContext)
     AttributePath::Builder attributePathBuilder;
     chip::System::PacketBufferTLVWriter writer;
     chip::System::PacketBufferTLVReader reader;
-    writer.Init(chip::System::PacketBufferHandle::New(chip::System::kMaxPacketBufferSize));
+    writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
     attributePathBuilder.Init(&writer);
     BuildAttributePath(apSuite, attributePathBuilder);
     chip::System::PacketBufferHandle buf;
@@ -755,7 +756,7 @@ void AttributePathListTest(nlTestSuite * apSuite, void * apContext)
     chip::System::PacketBufferTLVReader reader;
     AttributePathList::Builder attributePathListBuilder;
 
-    writer.Init(chip::System::PacketBufferHandle::New(chip::System::kMaxPacketBufferSize));
+    writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
 
     err = attributePathListBuilder.Init(&writer);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -780,7 +781,7 @@ void EventPathTest(nlTestSuite * apSuite, void * apContext)
     EventPath::Builder eventPathBuilder;
     chip::System::PacketBufferTLVWriter writer;
     chip::System::PacketBufferTLVReader reader;
-    writer.Init(chip::System::PacketBufferHandle::New(chip::System::kMaxPacketBufferSize));
+    writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
     eventPathBuilder.Init(&writer);
     BuildEventPath(apSuite, eventPathBuilder);
     chip::System::PacketBufferHandle buf;
@@ -804,7 +805,7 @@ void EventPathListTest(nlTestSuite * apSuite, void * apContext)
     chip::System::PacketBufferTLVReader reader;
     EventPathList::Builder eventPathListBuilder;
 
-    writer.Init(chip::System::PacketBufferHandle::New(chip::System::kMaxPacketBufferSize));
+    writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
 
     err = eventPathListBuilder.Init(&writer);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -828,7 +829,7 @@ void CommandPathTest(nlTestSuite * apSuite, void * apContext)
     chip::System::PacketBufferTLVWriter writer;
     chip::System::PacketBufferTLVReader reader;
     CommandPath::Builder commandPathBuilder;
-    writer.Init(chip::System::PacketBufferHandle::New(chip::System::kMaxPacketBufferSize));
+    writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
     err = commandPathBuilder.Init(&writer);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
@@ -854,7 +855,7 @@ void EventDataElementTest(nlTestSuite * apSuite, void * apContext)
     EventDataElement::Parser eventDataElementParser;
     chip::System::PacketBufferTLVWriter writer;
     chip::System::PacketBufferTLVReader reader;
-    writer.Init(chip::System::PacketBufferHandle::New(chip::System::kMaxPacketBufferSize));
+    writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
     eventDataElementBuilder.Init(&writer);
     BuildEventDataElement(apSuite, eventDataElementBuilder);
     chip::System::PacketBufferHandle buf;
@@ -877,7 +878,7 @@ void EventListTest(nlTestSuite * apSuite, void * apContext)
     chip::System::PacketBufferTLVWriter writer;
     chip::System::PacketBufferTLVReader reader;
     EventList::Builder eventListBuilder;
-    writer.Init(chip::System::PacketBufferHandle::New(chip::System::kMaxPacketBufferSize));
+    writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
     eventListBuilder.Init(&writer);
     BuildEventList(apSuite, eventListBuilder);
     chip::System::PacketBufferHandle buf;
@@ -899,7 +900,7 @@ void StatusElementTest(nlTestSuite * apSuite, void * apContext)
     StatusElement::Parser statusElementParser;
     chip::System::PacketBufferTLVWriter writer;
     chip::System::PacketBufferTLVReader reader;
-    writer.Init(chip::System::PacketBufferHandle::New(chip::System::kMaxPacketBufferSize));
+    writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
     statusElementBuilder.Init(&writer);
     BuildStatusElement(apSuite, statusElementBuilder);
     chip::System::PacketBufferHandle buf;
@@ -923,7 +924,7 @@ void AttributeStatusElementTest(nlTestSuite * apSuite, void * apContext)
     AttributeStatusElement::Parser attributeStatusElementParser;
     chip::System::PacketBufferTLVWriter writer;
     chip::System::PacketBufferTLVReader reader;
-    writer.Init(chip::System::PacketBufferHandle::New(chip::System::kMaxPacketBufferSize));
+    writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
     attributeStatusElementBuilder.Init(&writer);
     BuildAttributeStatusElement(apSuite, attributeStatusElementBuilder);
     chip::System::PacketBufferHandle buf;
@@ -945,7 +946,7 @@ void AttributeStatusListTest(nlTestSuite * apSuite, void * apContext)
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::System::PacketBufferTLVWriter writer;
     chip::System::PacketBufferTLVReader reader;
-    writer.Init(chip::System::PacketBufferHandle::New(chip::System::kMaxPacketBufferSize));
+    writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
     AttributeStatusList::Builder attributeStatusListBuilder;
     err = attributeStatusListBuilder.Init(&writer);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -969,7 +970,7 @@ void AttributeDataElementTest(nlTestSuite * apSuite, void * apContext)
     AttributeDataElement::Parser attributeDataElementParser;
     chip::System::PacketBufferTLVWriter writer;
     chip::System::PacketBufferTLVReader reader;
-    writer.Init(chip::System::PacketBufferHandle::New(chip::System::kMaxPacketBufferSize));
+    writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
     attributeDataElementBuilder.Init(&writer);
     BuildAttributeDataElement(apSuite, attributeDataElementBuilder);
     chip::System::PacketBufferHandle buf;
@@ -991,7 +992,7 @@ void AttributeDataListTest(nlTestSuite * apSuite, void * apContext)
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::System::PacketBufferTLVWriter writer;
     chip::System::PacketBufferTLVReader reader;
-    writer.Init(chip::System::PacketBufferHandle::New(chip::System::kMaxPacketBufferSize));
+    writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
     AttributeDataList::Builder attributeDataListBuilder;
     attributeDataListBuilder.Init(&writer);
     BuildAttributeDataList(apSuite, attributeDataListBuilder);
@@ -1012,7 +1013,7 @@ void AttributeDataVersionListTest(nlTestSuite * apSuite, void * apContext)
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::System::PacketBufferTLVWriter writer;
     chip::System::PacketBufferTLVReader reader;
-    writer.Init(chip::System::PacketBufferHandle::New(chip::System::kMaxPacketBufferSize));
+    writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
     AttributeDataVersionList::Builder attributeDataVersionListBuilder;
     attributeDataVersionListBuilder.Init(&writer);
     BuildAttributeDataVersionList(apSuite, attributeDataVersionListBuilder);
@@ -1035,7 +1036,7 @@ void CommandDataElementTest(nlTestSuite * apSuite, void * apContext)
     CommandDataElement::Parser commandDataElementParser;
     chip::System::PacketBufferTLVWriter writer;
     chip::System::PacketBufferTLVReader reader;
-    writer.Init(chip::System::PacketBufferHandle::New(chip::System::kMaxPacketBufferSize));
+    writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
     commandDataElementBuilder.Init(&writer);
     BuildCommandDataElement(apSuite, commandDataElementBuilder);
     chip::System::PacketBufferHandle buf;
@@ -1058,7 +1059,7 @@ void CommandListTest(nlTestSuite * apSuite, void * apContext)
     chip::System::PacketBufferTLVWriter writer;
     chip::System::PacketBufferTLVReader reader;
     CommandList::Builder commandListBuilder;
-    writer.Init(chip::System::PacketBufferHandle::New(chip::System::kMaxPacketBufferSize));
+    writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
     commandListBuilder.Init(&writer);
     BuildCommandList(apSuite, commandListBuilder);
     chip::System::PacketBufferHandle buf;
@@ -1078,7 +1079,7 @@ void ReportDataTest(nlTestSuite * apSuite, void * apContext)
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::System::PacketBufferTLVWriter writer;
     chip::System::PacketBufferTLVReader reader;
-    writer.Init(chip::System::PacketBufferHandle::New(chip::System::kMaxPacketBufferSize));
+    writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
     BuildReportData(apSuite, writer);
     chip::System::PacketBufferHandle buf;
     err = writer.Finalize(&buf);
@@ -1097,7 +1098,7 @@ void InvokeCommandTest(nlTestSuite * apSuite, void * apContext)
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::System::PacketBufferTLVWriter writer;
     chip::System::PacketBufferTLVReader reader;
-    writer.Init(chip::System::PacketBufferHandle::New(chip::System::kMaxPacketBufferSize));
+    writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
     BuildInvokeCommand(apSuite, writer);
     chip::System::PacketBufferHandle buf;
     err = writer.Finalize(&buf);
@@ -1116,7 +1117,7 @@ void ReadRequestTest(nlTestSuite * apSuite, void * apContext)
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::System::PacketBufferTLVWriter writer;
     chip::System::PacketBufferTLVReader reader;
-    writer.Init(chip::System::PacketBufferHandle::New(chip::System::kMaxPacketBufferSize));
+    writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
     BuildReadRequest(apSuite, writer);
     chip::System::PacketBufferHandle buf;
     err = writer.Finalize(&buf);
@@ -1160,6 +1161,26 @@ const nlTest sTests[] =
 // clang-format on
 } // namespace
 
+/**
+ *  Set up the test suite.
+ */
+static int TestSetup(void * inContext)
+{
+    CHIP_ERROR error = chip::Platform::MemoryInit();
+    if (error != CHIP_NO_ERROR)
+        return FAILURE;
+    return SUCCESS;
+}
+
+/**
+ *  Tear down the test suite.
+ */
+static int TestTeardown(void * inContext)
+{
+    chip::Platform::MemoryShutdown();
+    return SUCCESS;
+}
+
 int TestMessageDef()
 {
     // clang-format off
@@ -1167,8 +1188,8 @@ int TestMessageDef()
 	{
         "MessageDef",
         &sTests[0],
-        nullptr,
-        nullptr
+        TestSetup,
+        TestTeardown,
     };
     // clang-format on
 

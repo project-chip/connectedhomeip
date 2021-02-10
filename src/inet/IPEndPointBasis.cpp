@@ -1052,7 +1052,7 @@ void IPEndPointBasis::HandlePendingIO(uint16_t aPort)
     lPacketInfo.Clear();
     lPacketInfo.DestPort = aPort;
 
-    lBuffer = System::PacketBufferHandle::New(System::kMaxPacketBufferSizeWithoutReserve, 0);
+    lBuffer = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSizeWithoutReserve, 0);
 
     if (!lBuffer.IsNull())
     {
