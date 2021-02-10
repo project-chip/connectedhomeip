@@ -14,37 +14,34 @@
 
 import("//build_overrides/chip.gni")
 
-import("${chip_root}/src/lib/core/core.gni")
+import("//${chip_root}/build/chip/tests.gni")
+import("//build_overrides/mbedtls.gni")
+import("${mbedtls_root}/mbedtls.gni")
 
-static_library("shell") {
-  output_name = "libCHIPShell"
-  output_dir = "${root_out_dir}/lib"
+assert(current_os == "mbed")
 
-  sources = [
-    "commands.cpp",
-    "commands.h",
-    "shell_core.cpp",
-    "shell_core.h",
-    "streamer.cpp",
-    "streamer.h",
+declare_args() {
+  chip_build_libshell = false
+}
+
+group("mbed") {
+  deps = [ "${chip_root}/src/lib" ]
+
+  if (chip_build_libshell) {
+    deps += [ "${chip_root}/src/lib/shell" ]
+  }
+}
+
+group("default") {
+  deps = [ ":mbed" ]
+}
+
+mbedtls_target("mbedtls") {
+  include_dirs = [
+    "mbedtls"
   ]
 
-  if (chip_target_style == "unix") {
-    sources += [ "streamer_stdio.cpp" ]
-  }
-
-  if (current_os == "zephyr") {
-    sources += [ "streamer_zephyr.cpp" ]
-  }
-
-  if (current_os == "mbed") {
-    sources += [ "streamer_mbed.cpp" ]
-  }
-
-  cflags = [ "-Wconversion" ]
-
-  public_deps = [
-    "${chip_root}/src/lib/core",
-    "${chip_root}/src/lib/support",
+  defines = [ 
+    "MBEDTLS_CONFIG_FILE=<mbed_tls_mbed_stub_config.h>"
   ]
 }
