@@ -76,7 +76,6 @@ void LogV(uint8_t module, uint8_t category, const char * msg, va_list v)
             formattedMsg[prefixLen++] = 'D';
             break;
         case kLogCategory_Progress:
-        case kLogCategory_Retain:
         default:
             formattedMsg[prefixLen++] = 'P';
             break;

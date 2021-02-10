@@ -22,7 +22,7 @@ void TestHelperWrittenAndParsedMatch(nlTestSuite * inSuite, void * inContext, Ms
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     size_t msgSize = testMsg.MessageSize();
-    System::PacketBufferWriter bbuf(msgSize);
+    Encoding::LittleEndian::PacketBufferWriter bbuf(msgSize);
     NL_TEST_ASSERT(inSuite, !bbuf.IsNull());
 
     testMsg.WriteToBuffer(bbuf);

@@ -35,7 +35,7 @@
 
 namespace chip {
 
-CHIP_ERROR AdditionalDataPayloadParser::populatePayload(SetupPayload::AdditionalDataPayload & outPayload)
+CHIP_ERROR AdditionalDataPayloadParser::populatePayload(SetupPayloadData::AdditionalDataPayload & outPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVReader reader;
@@ -49,11 +49,11 @@ CHIP_ERROR AdditionalDataPayloadParser::populatePayload(SetupPayload::Additional
     err = reader.OpenContainer(innerReader);
     SuccessOrExit(err);
 
-    err = innerReader.Next(TLV::kTLVType_UTF8String, TLV::ContextTag(SetupPayload::kRotatingDeviceIdTag));
+    err = innerReader.Next(TLV::kTLVType_UTF8String, TLV::ContextTag(SetupPayloadData::kRotatingDeviceIdTag));
     SuccessOrExit(err);
 
     // Get the value of the rotating device id
-    char rotatingDeviceId[SetupPayload::kRotatingDeviceIdLength];
+    char rotatingDeviceId[SetupPayloadData::kRotatingDeviceIdLength];
     err = innerReader.GetString(rotatingDeviceId, sizeof(rotatingDeviceId));
     SuccessOrExit(err);
     outPayload.rotatingDeviceId = std::string(rotatingDeviceId);

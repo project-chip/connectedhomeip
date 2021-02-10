@@ -1847,18 +1847,6 @@
 #endif // CHIP_DETAIL_LOGGING
 
 /**
- *  @def CHIP_RETAIN_LOGGING
- *
- *  @brief
- *    If asserted (1), enable logging of all messages in the
- *    chip::Logging::LogCategory::kLogCategory_Retain category.
- *    If not defined by the application, by default CHIP_RETAIN_LOGGING is
- *    remapped to CHIP_PROGRESS_LOGGING
- *
- */
-
-
-/**
  *  @def CHIP_CONFIG_ENABLE_FUNCT_ERROR_LOGGING
  *
  *  @brief

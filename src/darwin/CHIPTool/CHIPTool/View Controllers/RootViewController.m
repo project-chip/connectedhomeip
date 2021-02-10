@@ -18,6 +18,7 @@
 #import "RootViewController.h"
 #import "BindingsViewController.h"
 #import "EchoViewController.h"
+#import "MultiAdminViewController.h"
 #import "OnOffViewController.h"
 #import "QRCodeViewController.h"
 #import "TemperatureSensorViewController.h"
@@ -39,7 +40,8 @@
     self.tableView.dataSource = self;
     [self.view addSubview:self.tableView];
     self.options = @[
-        @"QRCode scanner", @"Echo client", @"Light on / off cluster", @"Temperature Sensor", @"Bindings", @"Wifi Configuration"
+        @"QRCode scanner", @"Echo client", @"Light on / off cluster", @"Temperature Sensor", @"Bindings", @"Wifi Configuration",
+        @"Enable Pairing"
     ];
 }
 
@@ -83,6 +85,9 @@
     case 5:
         [self pushNetworkConfiguration];
         break;
+    case 6:
+        [self pushMultiAdmin];
+        break;
     default:
         break;
     }
@@ -115,6 +120,12 @@
 - (void)pushEchoClient
 {
     EchoViewController * controller = [EchoViewController new];
+    [self.navigationController pushViewController:controller animated:YES];
+}
+
+- (void)pushMultiAdmin
+{
+    MultiAdminViewController * controller = [MultiAdminViewController new];
     [self.navigationController pushViewController:controller animated:YES];
 }
 

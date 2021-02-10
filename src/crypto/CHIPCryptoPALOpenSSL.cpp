@@ -969,7 +969,7 @@ CHIP_ERROR P256Keypair::Serialize(P256SerializedKeypair & output)
 
     {
         size_t len = output.Length() == 0 ? output.Capacity() : output.Length();
-        Encoding::LittleEndian::BufferWriter bbuf(output, len);
+        Encoding::BufferWriter bbuf(output, len);
         bbuf.Put(mPublicKey, mPublicKey.Length());
         bbuf.Put(privkey, sizeof(privkey));
         VerifyOrExit(bbuf.Fit(), error = CHIP_ERROR_NO_MEMORY);
@@ -984,7 +984,7 @@ exit:
 
 CHIP_ERROR P256Keypair::Deserialize(P256SerializedKeypair & input)
 {
-    Encoding::LittleEndian::BufferWriter bbuf(mPublicKey, mPublicKey.Length());
+    Encoding::BufferWriter bbuf(mPublicKey, mPublicKey.Length());
 
     BIGNUM * pvt_key     = nullptr;
     EC_GROUP * group     = nullptr;

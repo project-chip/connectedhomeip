@@ -54,9 +54,9 @@
 #endif // (LWIP_VERSION_MAJOR >= 2 && LWIP_VERSION_MINOR >= 1)
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
+using ::chip::Encoding::PacketBufferWriter;
 using ::chip::System::PacketBuffer;
 using ::chip::System::PacketBufferHandle;
-using ::chip::System::PacketBufferWriter;
 
 #if !CHIP_SYSTEM_CONFIG_USE_LWIP
 using ::chip::System::pbuf;

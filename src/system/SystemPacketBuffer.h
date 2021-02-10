@@ -688,6 +688,20 @@ inline PacketBufferHandle PacketBuffer::Last()
     return PacketBufferHandle::Hold(p);
 }
 
+} // namespace System
+
+namespace Encoding {
+
+class PacketBufferWriterUtil
+{
+private:
+    template <typename>
+    friend class PacketBufferWriterBase;
+    static void Initialize(BufferWriter & aBufferWriter, System::PacketBufferHandle & aPacket, size_t aAvailableSize,
+                           uint16_t aReservedSize);
+    static System::PacketBufferHandle Finalize(BufferWriter & aBufferWriter, System::PacketBufferHandle & aPacket);
+};
+
 /**
  * BufferWriter backed by packet buffer.
  *
@@ -702,7 +716,8 @@ inline PacketBufferHandle PacketBuffer::Last()
  *      // valid data
  *  @endcode
  */
-class PacketBufferWriter : public Encoding::LittleEndian::BufferWriter
+template <class Writer>
+class PacketBufferWriterBase : public Writer
 {
 public:
     /**
@@ -715,7 +730,11 @@ public:
      *  @param[in]  aAvailableSize  Length bound of the BufferWriter.
      *  @param[in]  aReservedSize   Reserved packet buffer space for protocol headers; see \c PacketBufferHandle::New().
      */
-    PacketBufferWriter(size_t aAvailableSize, uint16_t aReservedSize = CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE);
+    PacketBufferWriterBase(size_t aAvailableSize, uint16_t aReservedSize = CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE) :
+        Writer(nullptr, 0)
+    {
+        PacketBufferWriterUtil::Initialize(*this, mPacket, aAvailableSize, aReservedSize);
+    }
 
     /**
      * Test whether this PacketBufferWriter is null, or conversely owns a PacketBuffer.
@@ -736,13 +755,24 @@ public:
      *
      *  @return     A packet buffer handle.
      */
-    PacketBufferHandle Finalize();
+    System::PacketBufferHandle Finalize() { return PacketBufferWriterUtil::Finalize(*this, mPacket); }
 
 private:
-    PacketBufferHandle mPacket;
+    System::PacketBufferHandle mPacket;
 };
 
-} // namespace System
+using PacketBufferWriter = PacketBufferWriterBase<chip::Encoding::BufferWriter>;
+
+namespace LittleEndian {
+using PacketBufferWriter = PacketBufferWriterBase<chip::Encoding::LittleEndian::BufferWriter>;
+} // namespace LittleEndian
+
+namespace BigEndian {
+using PacketBufferWriter = PacketBufferWriterBase<chip::Encoding::BigEndian::BufferWriter>;
+} // namespace BigEndian
+
+} // namespace Encoding
+
 } // namespace chip
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP

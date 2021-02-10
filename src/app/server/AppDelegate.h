@@ -26,7 +26,9 @@ class AppDelegate
 {
 public:
     virtual ~AppDelegate() {}
-    virtual void OnReceiveError(){};
-    virtual void OnRendezvousStarted(){};
-    virtual void OnRendezvousStopped(){};
+    virtual void OnReceiveError() {}
+    virtual void OnRendezvousStarted() {}
+    virtual void OnRendezvousStopped() {}
+    virtual void OnPairingWindowOpened() {}
+    virtual void OnPairingWindowClosed() {}
 };

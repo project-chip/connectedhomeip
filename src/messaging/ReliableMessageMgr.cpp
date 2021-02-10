@@ -68,25 +68,11 @@ void ReliableMessageMgr::Shutdown()
     }
 }
 
-/**
- * Return a tick counter value given a time period.
- *
- * @param[in]  newTime        Timestamp value of in milliseconds.
- *
- * @return Tick count for the time period.
- */
 uint64_t ReliableMessageMgr::GetTickCounterFromTimePeriod(uint64_t period)
 {
     return (period >> mTimerIntervalShift);
 }
 
-/**
- * Return a tick counter value between the given time and the stored time.
- *
- * @param[in]  newTime        Timestamp value of in milliseconds.
- *
- * @return Tick count of the difference between the given time and the stored time.
- */
 uint64_t ReliableMessageMgr::GetTickCounterFromTimeDelta(uint64_t newTime)
 {
     return GetTickCounterFromTimePeriod(newTime - mTimeStampBase);
@@ -113,11 +99,6 @@ void ReliableMessageMgr::TicklessDebugDumpRetransTable(const char * log)
 }
 #endif // RMP_TICKLESS_DEBUG
 
-/**
- * Iterate through active exchange contexts and retrans table entries.  If an
- * action needs to be triggered by ReliableMessageProtocol time facilities,
- * execute that action.
- */
 void ReliableMessageMgr::ExecuteActions()
 {
 #if defined(RMP_TICKLESS_DEBUG)
@@ -197,15 +178,6 @@ static void TickProceed(uint16_t & time, uint64_t ticks)
     }
 }
 
-/**
- * Calculate number of virtual ReliableMessageProtocol ticks that have expired
- * since we last called this function. Iterate through active exchange contexts
- * and retrans table entries, subtracting expired virtual ticks to synchronize
- * wakeup times with the current system time. Do not perform any actions beyond
- * updating tick counts, actions will be performed by the physical
- * ReliableMessageProtocol timer tick expiry.
- *
- */
 void ReliableMessageMgr::ExpireTicks()
 {
     uint64_t now = System::Timer::GetCurrentEpoch();
@@ -254,10 +226,6 @@ void ReliableMessageMgr::ExpireTicks()
 #endif
 }
 
-/**
- * Handle physical wakeup of system due to ReliableMessageProtocol wakeup.
- *
- */
 void ReliableMessageMgr::Timeout(System::Layer * aSystemLayer, void * aAppState, System::Error aError)
 {
     ReliableMessageMgr * manager = reinterpret_cast<ReliableMessageMgr *>(aAppState);
@@ -278,18 +246,6 @@ void ReliableMessageMgr::Timeout(System::Layer * aSystemLayer, void * aAppState,
     manager->StartTimer();
 }
 
-/**
- *  Add a CHIP message into the retransmission table to be subsequently resent if a corresponding acknowledgment
- *  is not received within the retransmission timeout.
- *
- *  @param[in]    rc        A pointer to the ExchangeContext object.
- *
- *  @param[out]   rEntry    A pointer to a pointer of a retransmission table entry added into the table.
- *
- *  @retval  #CHIP_ERROR_RETRANS_TABLE_FULL If there is no empty slot left in the table for addition.
- *  @retval  #CHIP_NO_ERROR On success.
- *
- */
 CHIP_ERROR ReliableMessageMgr::AddToRetransTable(ReliableMessageContext * rc, RetransTableEntry ** rEntry)
 {
     bool added     = false;
@@ -383,14 +339,6 @@ bool ReliableMessageMgr::CheckAndRemRetransTable(ReliableMessageContext * rc, ui
     return false;
 }
 
-/**
- *  Send the specified entry from the retransmission table.
- *
- *  @param[in]    entry                A pointer to a retransmission table entry object that needs to be sent.
- *
- *  @return  #CHIP_NO_ERROR On success, else corresponding CHIP_ERROR returned from SendMessage.
- *
- */
 CHIP_ERROR ReliableMessageMgr::SendFromRetransTable(RetransTableEntry * entry)
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;
@@ -423,12 +371,6 @@ CHIP_ERROR ReliableMessageMgr::SendFromRetransTable(RetransTableEntry * entry)
     return err;
 }
 
-/**
- *  Clear entries matching a specified ExchangeContext.
- *
- *  @param[in]    rc    A pointer to the ExchangeContext object.
- *
- */
 void ReliableMessageMgr::ClearRetransTable(ReliableMessageContext * rc)
 {
     for (int i = 0; i < CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE; i++)
@@ -441,12 +383,6 @@ void ReliableMessageMgr::ClearRetransTable(ReliableMessageContext * rc)
     }
 }
 
-/**
- *  Clear an entry in the retransmission table.
- *
- *  @param[in]    rEntry   A reference to the RetransTableEntry object.
- *
- */
 void ReliableMessageMgr::ClearRetransTable(RetransTableEntry & rEntry)
 {
     if (rEntry.rc)
@@ -468,14 +404,6 @@ void ReliableMessageMgr::ClearRetransTable(RetransTableEntry & rEntry)
     }
 }
 
-/**
- *  Fail entries matching a specified ExchangeContext.
- *
- *  @param[in]    rc    A pointer to the ExchangeContext object.
- *
- *  @param[in]    err   The error for failing table entries.
- *
- */
 void ReliableMessageMgr::FailRetransTableEntries(ReliableMessageContext * rc, CHIP_ERROR err)
 {
     for (int i = 0; i < CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE; i++)
@@ -491,12 +419,6 @@ void ReliableMessageMgr::FailRetransTableEntries(ReliableMessageContext * rc, CH
     }
 }
 
-/**
- * Iterate through active exchange contexts and retrans table entries.
- * Determine how many ReliableMessageProtocol ticks we need to sleep before we
- * need to physically wake the CPU to perform an action.  Set a timer to go off
- * when we next need to wake the system.
- */
 void ReliableMessageMgr::StartTimer()
 {
     CHIP_ERROR res            = CHIP_NO_ERROR;

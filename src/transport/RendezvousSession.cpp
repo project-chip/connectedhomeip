@@ -51,7 +51,7 @@ CHIP_ERROR RendezvousSession::Init(const RendezvousParameters & params, Transpor
     VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(sessionMgr != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(admin != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(mParams.HasSetupPINCode(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(mParams.HasSetupPINCode() || mParams.HasPASEVerifier(), CHIP_ERROR_INVALID_ARGUMENT);
 
     mSecureSessionMgr = sessionMgr;
     mAdmin            = admin;
@@ -74,7 +74,14 @@ CHIP_ERROR RendezvousSession::Init(const RendezvousParameters & params, Transpor
 
     if (!mParams.IsController())
     {
-        ReturnErrorOnFailure(WaitForPairing(mParams.GetLocalNodeId(), mParams.GetSetupPINCode()));
+        if (mParams.HasPASEVerifier())
+        {
+            ReturnErrorOnFailure(WaitForPairing(mParams.GetLocalNodeId(), mParams.GetPASEVerifier()));
+        }
+        else
+        {
+            ReturnErrorOnFailure(WaitForPairing(mParams.GetLocalNodeId(), mParams.GetSetupPINCode()));
+        }
     }
 
     mNetworkProvision.Init(this);
@@ -425,10 +432,23 @@ CHIP_ERROR RendezvousSession::WaitForPairing(Optional<NodeId> nodeId, uint32_t s
                                           strlen(kSpake2pKeyExchangeSalt), nodeId, 0, this);
 }
 
+CHIP_ERROR RendezvousSession::WaitForPairing(Optional<NodeId> nodeId, const PASEVerifier & verifier)
+{
+    UpdateState(State::kSecurePairing);
+    return mPairingSession.WaitForPairing(verifier, nodeId, 0, this);
+}
+
 CHIP_ERROR RendezvousSession::Pair(Optional<NodeId> nodeId, uint32_t setupPINCode)
 {
     UpdateState(State::kSecurePairing);
     return mPairingSession.Pair(mParams.GetPeerAddress(), setupPINCode, nodeId, mParams.GetRemoteNodeId().ValueOr(kUndefinedNodeId),
+                                mNextKeyId++, this);
+}
+
+CHIP_ERROR RendezvousSession::Pair(Optional<NodeId> nodeId, const PASEVerifier & verifier)
+{
+    UpdateState(State::kSecurePairing);
+    return mPairingSession.Pair(mParams.GetPeerAddress(), verifier, nodeId, mParams.GetRemoteNodeId().ValueOr(kUndefinedNodeId),
                                 mNextKeyId++, this);
 }
 
