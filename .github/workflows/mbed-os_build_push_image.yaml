@@ -16,6 +16,10 @@ name: Mbed OS - Build, verify and push chip-build-mbed-os
 on:
   workflow_dispatch:
     inputs:
+        mark_latest:
+          description: 'Update latest to the current built version'
+          required: true
+          default: "true"
 
 jobs:
     mbed-os-utils:
@@ -33,9 +37,11 @@ jobs:
                   submodules: false
 
             - name: Get build version from file
-              run: echo "BUILD_VERSION=$(cat integrations/docker/images/chip-build-${{env.BUILD_TYPE}}/version)" >> $GITHUB_ENV
+              run: |
+                    echo "BUILD_VERSION=$(cat integrations/docker/images/chip-build-${{env.BUILD_TYPE}}/version)" >> $GITHUB_ENV
+                    echo "PUSH_VERSION=${{env.BUILD_VERSION}}" >> $GITHUB_ENV
 
-            - name: Build Mbed-OS Docker image (chip-build-mbed-os)
+            - name: Build Mbed-OS Docker image
               run: integrations/docker/images/chip-build-${{env.BUILD_TYPE}}/build.sh
 
             - name: Create chip-build-mbed-os container
@@ -53,8 +59,12 @@ jobs:
             - name: Check toolchan
               run: docker exec test_container arm-none-eabi-gcc --version
 
+            - name: Update latest to the current built version
+              if: ${{ github.event.inputs.mark_latest }} == "true"
+              run: echo "PUSH_VERSION=latest" >> $GITHUB_ENV
+
             - name: Change image tag
-              run: docker tag connectedhomeip/chip-build-${{env.BUILD_TYPE}}:${{env.BUILD_VERSION}} ${{ secrets.DOCKERHUB_USERNAME }}/chip-build-${{env.BUILD_TYPE}}:${{env.BUILD_VERSION}}
+              run: docker tag connectedhomeip/chip-build-${{env.BUILD_TYPE}}:${{env.BUILD_VERSION}} ${{ secrets.DOCKERHUB_USERNAME }}/chip-build-${{env.BUILD_TYPE}}:${{env.PUSH_VERSION}}
 
             - name: Login to DockerHub
               uses: docker/login-action@v1 
@@ -62,5 +72,5 @@ jobs:
                 username: ${{ secrets.DOCKERHUB_USERNAME }}
                 password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-            - name: Push to DockerHub.
-              run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/chip-build-${{env.BUILD_TYPE}}:${{env.BUILD_VERSION}}
+            - name: Push to DockerHub
+              run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/chip-build-${{env.BUILD_TYPE}}:${{env.PUSH_VERSION}}
