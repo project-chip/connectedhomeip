@@ -25,10 +25,8 @@
 
 from __future__ import absolute_import
 from __future__ import print_function
-from chip import ChipStack
 from chip import ChipDeviceCtrl
 from chip import ChipExceptions
-from builtins import range
 import sys
 import os
 import platform
@@ -38,7 +36,6 @@ import base64
 import textwrap
 import string
 from cmd import Cmd
-from six.moves import range
 from chip.ChipBleUtility import FAKE_CONN_OBJ_VALUE
 
 # Extend sys.path with one or more directories, relative to the location of the

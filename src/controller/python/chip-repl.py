@@ -1,6 +1,7 @@
+#!/usr/bin/env python
+
 #
-#    Copyright (c) 2020 Project CHIP Authors
-#    Copyright (c) 2019 Google LLC.
+#    Copyright (c) 2021 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,11 +17,22 @@
 #    limitations under the License.
 #
 
-#
-#    @file
-#      Provides Python APIs for CHIP.
-#
+from IPython import embed
+import chip
 
-"""Provides Python APIs for CHIP."""
+def main():
+    # The chip import at the top level will be visible in the ipython REPL.
+    embed(header = '''
+Welcome to the CHIP python REPL utilty.
 
-from chip.ble import GetBleAdapters
+Usage examples:
+
+######## List available BLE adapters #########
+
+for adapter in chip.GetBleAdapters():
+    print(adapter)
+    
+    '''.strip())
+
+if __name__ == "__main__":
+    main()
