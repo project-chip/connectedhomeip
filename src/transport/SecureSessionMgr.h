@@ -67,6 +67,10 @@ private:
     friend class SecureSessionMgr;
     NodeId mPeerNodeId;
     uint16_t mPeerKeyId;
+    // TODO: Re-evaluate the storing of Admin ID in SecureSessionHandle
+    //       The Admin ID will not be available for PASE and group sessions. So need
+    //       to identify an approach that'll allow looking up the corresponding information for
+    //       such sessions.
     Transport::AdminId mAdmin;
 };
 
