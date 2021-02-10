@@ -641,7 +641,7 @@ CHIP_ERROR P256Keypair::Serialize(P256SerializedKeypair & output)
 {
     const mbedtls_ecp_keypair * keypair = to_const_keypair(&mKeypair);
     size_t len                          = output.Length() == 0 ? output.Capacity() : output.Length();
-    Encoding::LittleEndian::BufferWriter bbuf(output, len);
+    Encoding::BufferWriter bbuf(output, len);
     uint8_t privkey[kP256_PrivateKey_Length];
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;
@@ -667,7 +667,7 @@ exit:
 
 CHIP_ERROR P256Keypair::Deserialize(P256SerializedKeypair & input)
 {
-    Encoding::LittleEndian::BufferWriter bbuf(mPublicKey, mPublicKey.Length());
+    Encoding::BufferWriter bbuf(mPublicKey, mPublicKey.Length());
 
     int result       = 0;
     CHIP_ERROR error = CHIP_NO_ERROR;
