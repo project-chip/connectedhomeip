@@ -24,9 +24,6 @@ declare_args() {
   chip_build_libshell = false
 }
 
-group("dummy") {
-}
-
 group("mbed") {
   deps = [ "${chip_root}/src/lib" ]
 

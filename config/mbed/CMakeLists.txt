@@ -134,7 +134,7 @@ if (NOT CHIP_LIBRARIES)
 endif()
 
 if (CONFIG_CHIP_LIB_SHELL)
-    list(APPEND CHIP_LIBRARIES ${CMAKE_CURRENT_BINARY_DIR}/obj/third_party/connectedhomeip/src/lib/shell/lib/libCHIPShell.a)
+    list(APPEND CHIP_LIBRARIES -libCHIPShell)
 endif()
 
 # Set up CHIP project configuration file
