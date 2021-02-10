@@ -469,6 +469,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       sources += [
         "Zephyr/BLEManagerImpl.cpp",
         "Zephyr/ConfigurationManagerImpl.cpp",
+        "Zephyr/KeyValueStoreManagerImpl.cpp",
         "Zephyr/Logging.cpp",
         "Zephyr/PlatformManagerImpl.cpp",
         "Zephyr/SystemTimeSupport.cpp",
@@ -485,6 +486,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "nrfconnect/DeviceNetworkProvisioningDelegateImpl.cpp",
         "nrfconnect/DeviceNetworkProvisioningDelegateImpl.h",
         "nrfconnect/InetPlatformConfig.h",
+        "nrfconnect/KeyValueStoreManagerImpl.h",
         "nrfconnect/PlatformManagerImpl.h",
         "nrfconnect/SystemPlatformConfig.h",
       ]
