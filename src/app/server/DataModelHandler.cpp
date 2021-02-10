@@ -65,7 +65,17 @@ void InitDataModelHandler()
 #endif
 }
 
-void HandleDataModelMessage(NodeId nodeId, System::PacketBufferHandle buffer)
+#ifdef USE_ZAP_CONFIG
+static CHIP_ERROR CheckACL(NodeId nodeId, const EmberApsFrame & frame, const chip::Transport::AccessControlList & ACL)
+{
+    // TODO: Lookup the ACL corresponding to the nodeId, and the end point information from the frame,
+    //       and enforce it.
+
+    return CHIP_NO_ERROR;
+}
+#endif
+
+void HandleDataModelMessage(NodeId nodeId, chip::Transport::AdminPairingInfo * adminInfo, System::PacketBufferHandle buffer)
 {
 #ifdef USE_ZAP_CONFIG
     EmberApsFrame frame;
@@ -77,6 +87,12 @@ void HandleDataModelMessage(NodeId nodeId, System::PacketBufferHandle buffer)
     else
     {
         ChipLogDetail(Zcl, "APS frame processing failure!");
+        return;
+    }
+
+    if (CHIP_NO_ERROR != CheckACL(nodeId, frame, adminInfo->GetACL()))
+    {
+        ChipLogDetail(Zcl, "ACL check failed for the received APS frame!");
         return;
     }
 

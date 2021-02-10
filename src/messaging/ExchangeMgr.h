@@ -212,7 +212,7 @@ private:
     void OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source, SecureSessionMgr * msgLayer) override;
 
     void OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, SecureSessionHandle session,
-                           System::PacketBufferHandle msgBuf, SecureSessionMgr * msgLayer) override;
+                           Transport::AdminId admin, System::PacketBufferHandle msgBuf, SecureSessionMgr * msgLayer) override;
 
     void OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * mgr) override;
 };

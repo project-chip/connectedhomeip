@@ -127,11 +127,14 @@ public:
      * @param packetHeader  The message header
      * @param payloadHeader The payload header
      * @param session       The handle to the secure session
+     * @param admin         The admin ID that corresponds to the secure channel on which the message
+     *                      was received
      * @param msgBuf        The received message
      * @param mgr           A pointer to the SecureSessionMgr
      */
     virtual void OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                                   SecureSessionHandle session, System::PacketBufferHandle msgBuf, SecureSessionMgr * mgr)
+                                   SecureSessionHandle session, Transport::AdminId admin, System::PacketBufferHandle msgBuf,
+                                   SecureSessionMgr * mgr)
     {}
 
     /**

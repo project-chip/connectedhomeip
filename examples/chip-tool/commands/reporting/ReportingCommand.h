@@ -38,7 +38,7 @@ public:
     CHIP_ERROR Run(PersistentStorage & storage, NodeId localId, NodeId remoteId) override;
 
     /////////// DeviceStatusDelegate Interface /////////
-    void OnMessage(PacketBufferHandle buffer) override;
+    void OnMessage(chip::Transport::AdminPairingInfo * admin, PacketBufferHandle buffer) override;
     void OnStatusChange(void) override;
 
     virtual void AddReportCallbacks(uint8_t endPointId) = 0;

@@ -23,6 +23,7 @@
 #pragma once
 
 #include <system/SystemPacketBuffer.h>
+#include <transport/AdminPairingTable.h>
 #include <transport/raw/MessageHeader.h>
 
 /**
@@ -37,8 +38,11 @@ void InitDataModelHandler();
  * codepath.
  *
  * @param [in] nodeId The source node id of the message
+ * @param [in] adminInfo Information provisioned by the admin
+ *                       (corresponds to the channel on which the message was received)
  * @param [in] buffer The buffer holding the message.  This function guarantees
  *                    that it will free the buffer before returning.
  *
  */
-void HandleDataModelMessage(chip::NodeId nodeId, chip::System::PacketBufferHandle buffer);
+void HandleDataModelMessage(chip::NodeId nodeId, chip::Transport::AdminPairingInfo * adminInfo,
+                            chip::System::PacketBufferHandle buffer);

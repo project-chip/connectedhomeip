@@ -48,8 +48,8 @@ using namespace chip::System;
 namespace chip {
 namespace Messaging {
 
-static void DefaultOnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, uint32_t protocolId, uint8_t msgType,
-                                     PacketBufferHandle payload)
+static void DefaultOnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, uint32_t protocolId,
+                                     Transport::AdminId admin, uint8_t msgType, PacketBufferHandle payload)
 {
     ChipLogError(ExchangeManager, "Dropping unexpected message %08" PRIX32 ":%d %04" PRIX16 " MsgId:%08" PRIX32, protocolId,
                  msgType, ec->GetExchangeId(), packetHeader.GetMessageId());
@@ -357,7 +357,7 @@ void ExchangeContext::HandleResponseTimeout(System::Layer * aSystemLayer, void *
 }
 
 CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                                          PacketBufferHandle msgBuf)
+                                          Transport::AdminId admin, PacketBufferHandle msgBuf)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     uint32_t messageId  = 0;
@@ -411,11 +411,11 @@ CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, con
 
         if (mDelegate != nullptr)
         {
-            mDelegate->OnMessageReceived(this, packetHeader, payloadHeader, std::move(msgBuf));
+            mDelegate->OnMessageReceived(this, packetHeader, payloadHeader, admin, std::move(msgBuf));
         }
         else
         {
-            DefaultOnMessageReceived(this, packetHeader, protocolId, messageType, std::move(msgBuf));
+            DefaultOnMessageReceived(this, packetHeader, protocolId, admin, messageType, std::move(msgBuf));
         }
     }
 

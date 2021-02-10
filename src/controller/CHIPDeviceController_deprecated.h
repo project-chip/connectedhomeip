@@ -184,7 +184,7 @@ public:
     CHIP_ERROR SetDevicePairingDelegate(Controller::DevicePairingDelegate * pairingDelegate);
 
     //////////// DeviceStatusDelegate Implementation ///////////////
-    void OnMessage(System::PacketBufferHandle msg) override;
+    void OnMessage(Transport::AdminPairingInfo * admin, System::PacketBufferHandle msg) override;
 
 private:
     CHIP_ERROR InitDevice();

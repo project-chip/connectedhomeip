@@ -233,17 +233,17 @@ void Device::OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr *
 }
 
 void Device::OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, SecureSessionHandle session,
-                               System::PacketBufferHandle msgBuf, SecureSessionMgr * mgr)
+                               Transport::AdminPairingInfo * admin, System::PacketBufferHandle msgBuf, SecureSessionMgr * mgr)
 {
     if (mState == ConnectionState::SecureConnected)
     {
         if (mStatusDelegate != nullptr)
         {
-            mStatusDelegate->OnMessage(std::move(msgBuf));
+            mStatusDelegate->OnMessage(admin, std::move(msgBuf));
         }
         else
         {
-            HandleDataModelMessage(mDeviceId, std::move(msgBuf));
+            HandleDataModelMessage(mDeviceId, admin, std::move(msgBuf));
         }
     }
 }

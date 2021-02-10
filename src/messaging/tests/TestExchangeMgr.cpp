@@ -71,7 +71,7 @@ class MockAppDelegate : public ExchangeDelegate
 {
 public:
     void OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                           System::PacketBufferHandle buffer) override
+                           Transport::AdminId admin, System::PacketBufferHandle buffer) override
     {
         IsOnMessageReceivedCalled = true;
     }

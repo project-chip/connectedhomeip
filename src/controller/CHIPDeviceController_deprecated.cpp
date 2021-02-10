@@ -227,7 +227,7 @@ CHIP_ERROR ChipDeviceController::SetDevicePairingDelegate(DevicePairingDelegate 
     return CHIP_NO_ERROR;
 }
 
-void ChipDeviceController::OnMessage(System::PacketBufferHandle msgBuf)
+void ChipDeviceController::OnMessage(Transport::AdminPairingInfo * admin, System::PacketBufferHandle msgBuf)
 {
     if (mOnComplete.Response != nullptr)
     {
