@@ -498,7 +498,13 @@ public:
 
 private:
     ChipCertificateData * mCerts; /**< Pointer to an array of certificate data. */
-    uint8_t mCertCount;           /**< Number of certificates in mCerts array. */
+    uint8_t mCertCount;           /**< Number of certificates in mCerts
+                                     array. We maintain the invariant that all
+                                     the slots at indices less than
+                                     mCertCount have been constructed and slots
+                                     at indices >= mCertCount have either never
+                                     had their constructor called, or have had
+                                     their destructor called since then. */
     uint8_t mMaxCerts;            /**< Length of mCerts array. */
     uint8_t * mDecodeBuf;         /**< Certificate decode buffer. */
     uint16_t mDecodeBufSize;      /**< Certificate decode buffer size. */

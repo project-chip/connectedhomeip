@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@
 #include <mbedtls/x509_csr.h>
 
 #include <core/CHIPSafeCasts.h>
-#include <support/BufBound.h>
+#include <support/BufferWriter.h>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 
@@ -641,7 +641,7 @@ CHIP_ERROR P256Keypair::Serialize(P256SerializedKeypair & output)
 {
     const mbedtls_ecp_keypair * keypair = to_const_keypair(&mKeypair);
     size_t len                          = output.Length() == 0 ? output.Capacity() : output.Length();
-    BufBound bbuf(output, len);
+    Encoding::LittleEndian::BufferWriter bbuf(output, len);
     uint8_t privkey[kP256_PrivateKey_Length];
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;
@@ -667,7 +667,7 @@ exit:
 
 CHIP_ERROR P256Keypair::Deserialize(P256SerializedKeypair & input)
 {
-    BufBound bbuf(mPublicKey, mPublicKey.Length());
+    Encoding::LittleEndian::BufferWriter bbuf(mPublicKey, mPublicKey.Length());
 
     int result       = 0;
     CHIP_ERROR error = CHIP_NO_ERROR;

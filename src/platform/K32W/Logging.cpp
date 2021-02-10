@@ -50,7 +50,6 @@ void GetMessageString(char * buf, uint8_t chipCategory, uint8_t otLevelLog)
             memcpy(buf, "[Error]", 7);
             break;
         case kLogCategory_Progress:
-        case kLogCategory_Retain:
         default:
             memcpy(buf, "[Progress]", 10);
             break;
@@ -87,14 +86,14 @@ void FillPrefix(char * buf, uint8_t bufLen, uint8_t chipCategory, uint8_t otLeve
     size_t prefixLen;
 
     /* add the error string */
-    VerifyOrDie(bufLen > ChipLoggingChipPrefixLen);
+    VerifyOrDie(bufLen > chip::Logging::kMaxPrefixLen);
     ::GetMessageString(buf, chipCategory, otLevelLog);
 
     /* add the module name string */
     prefixLen = strlen(buf);
-    VerifyOrDie(bufLen > (prefixLen + ChipLoggingModuleNameLen + 3));
+    VerifyOrDie(bufLen > (prefixLen + chip::Logging::kMaxModuleNameLen + 3));
     buf[prefixLen++] = '[';
-    GetModuleName(buf + prefixLen, module);
+    GetModuleName(buf + prefixLen, chip::Logging::kMaxModuleNameLen + 1, module);
     prefixLen        = strlen(buf);
     buf[prefixLen++] = ']';
     buf[prefixLen++] = ' ';

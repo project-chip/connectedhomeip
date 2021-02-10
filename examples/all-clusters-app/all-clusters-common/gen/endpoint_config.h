@@ -89,62 +89,37 @@
 
 #define ZAP_ATTRIBUTE_MASK(mask) ATTRIBUTE_MASK_##mask
 // This is an array of EmberAfAttributeMetadata structures.
-#define GENERATED_ATTRIBUTE_COUNT 103
+#define GENERATED_ATTRIBUTE_COUNT 93
 #define GENERATED_ATTRIBUTES                                                                                                       \
     {                                                                                                                              \
-        { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), { (uint8_t *) 3 } }, /* Basic (client): cluster revision */     \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 3 } },                      /* Basic (server): cluster revision */     \
-            { 0x0000, ZAP_TYPE(INT8U), 1, 0, { (uint8_t *) 0x08 } },                    /* Basic (server): ZCL version */          \
-            { 0x0007, ZAP_TYPE(ENUM8), 1, 0, { (uint8_t *) 0x00 } },                    /* Basic (server): power source */         \
-            {                                                                                                                      \
-                0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), { (uint8_t *) 2 }                                         \
-            },                                                     /* Identify (client): cluster revision */                       \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 2 } }, /* Identify (server): cluster revision */                       \
+        { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 3 } },       /* Basic (server): cluster revision */                        \
+            { 0x0000, ZAP_TYPE(INT8U), 1, 0, { (uint8_t *) 0x08 } }, /* Basic (server): ZCL version */                             \
+            { 0x0007, ZAP_TYPE(ENUM8), 1, 0, { (uint8_t *) 0x00 } }, /* Basic (server): power source */                            \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 2 } },   /* Identify (server): cluster revision */                     \
             {                                                                                                                      \
                 0x0000, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(WRITABLE), { (uint8_t *) 0x0000 }                                  \
-            }, /* Identify (server): identify time */                                                                              \
-            {                                                                                                                      \
-                0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), { (uint8_t *) 3 }                                         \
-            },                                                      /* Groups (client): cluster revision */                        \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 3 } },  /* Groups (server): cluster revision */                        \
-            { 0x0000, ZAP_TYPE(BITMAP8), 1, 0, { (uint8_t *) 0 } }, /* Groups (server): name support */                            \
-            {                                                                                                                      \
-                0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), { (uint8_t *) 3 }                                         \
-            },                                                          /* Scenes (client): cluster revision */                    \
+            },                                                          /* Identify (server): identify time */                     \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 3 } },      /* Groups (server): cluster revision */                    \
+            { 0x0000, ZAP_TYPE(BITMAP8), 1, 0, { (uint8_t *) 0 } },     /* Groups (server): name support */                        \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 3 } },      /* Scenes (server): cluster revision */                    \
             { 0x0000, ZAP_TYPE(INT8U), 1, 0, { (uint8_t *) 0x00 } },    /* Scenes (server): scene count */                         \
             { 0x0001, ZAP_TYPE(INT8U), 1, 0, { (uint8_t *) 0x00 } },    /* Scenes (server): current scene */                       \
             { 0x0002, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 0x0000 } }, /* Scenes (server): current group */                       \
             { 0x0003, ZAP_TYPE(BOOLEAN), 1, 0, { (uint8_t *) 0x00 } },  /* Scenes (server): scene valid */                         \
             { 0x0004, ZAP_TYPE(BITMAP8), 1, 0, { (uint8_t *) 0 } },     /* Scenes (server): name support */                        \
-            {                                                                                                                      \
-                0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), { (uint8_t *) 2 }                                         \
-            },                                                         /* On/off (client): cluster revision */                     \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 2 } },     /* On/off (server): cluster revision */                     \
-            { 0x0000, ZAP_TYPE(BOOLEAN), 1, 0, { (uint8_t *) 0x00 } }, /* On/off (server): on/off */                               \
-            {                                                                                                                      \
-                0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), { (uint8_t *) 3 }                                         \
-            },                                                       /* Level Control (client): cluster revision */                \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 3 } },   /* Level Control (server): cluster revision */                \
-            { 0x0000, ZAP_TYPE(INT8U), 1, 0, { (uint8_t *) 0x00 } }, /* Level Control (server): current level */                   \
-            {                                                                                                                      \
-                0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), { (uint8_t *) 3 }                                         \
-            },                                                      /* Door Lock (client): cluster revision */                     \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 3 } },  /* Door Lock (server): cluster revision */                     \
-            { 0x0000, ZAP_TYPE(ENUM8), 1, 0, { (uint8_t *) 0 } },   /* Door Lock (server): lock state */                           \
-            { 0x0001, ZAP_TYPE(ENUM8), 1, 0, { (uint8_t *) 0 } },   /* Door Lock (server): lock type */                            \
-            { 0x0002, ZAP_TYPE(BOOLEAN), 1, 0, { (uint8_t *) 0 } }, /* Door Lock (server): actuator enabled */                     \
-            {                                                                                                                      \
-                0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), { (uint8_t *) 0x0001 }                                    \
-            },                                                          /* Barrier Control (client): cluster revision */           \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 2 } },      /* On/off (server): cluster revision */                    \
+            { 0x0000, ZAP_TYPE(BOOLEAN), 1, 0, { (uint8_t *) 0x00 } },  /* On/off (server): on/off */                              \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 3 } },      /* Level Control (server): cluster revision */             \
+            { 0x0000, ZAP_TYPE(INT8U), 1, 0, { (uint8_t *) 0x00 } },    /* Level Control (server): current level */                \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 3 } },      /* Door Lock (server): cluster revision */                 \
+            { 0x0000, ZAP_TYPE(ENUM8), 1, 0, { (uint8_t *) 0 } },       /* Door Lock (server): lock state */                       \
+            { 0x0001, ZAP_TYPE(ENUM8), 1, 0, { (uint8_t *) 0 } },       /* Door Lock (server): lock type */                        \
+            { 0x0002, ZAP_TYPE(BOOLEAN), 1, 0, { (uint8_t *) 0 } },     /* Door Lock (server): actuator enabled */                 \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 0x0001 } }, /* Barrier Control (server): cluster revision */           \
             { 0x0001, ZAP_TYPE(ENUM8), 1, 0, { (uint8_t *) 0 } },       /* Barrier Control (server): barrier moving state */       \
             { 0x0002, ZAP_TYPE(BITMAP16), 2, 0, { (uint8_t *) 0 } },    /* Barrier Control (server): barrier safety status */      \
             { 0x0003, ZAP_TYPE(BITMAP8), 1, 0, { (uint8_t *) 0 } },     /* Barrier Control (server): barrier capabilities */       \
             { 0x000A, ZAP_TYPE(INT8U), 1, 0, { (uint8_t *) 0 } },       /* Barrier Control (server): barrier position */           \
-            {                                                                                                                      \
-                0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), { (uint8_t *) 3 }                                         \
-            },                                                          /* Color Control (client): cluster revision */             \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 3 } },      /* Color Control (server): cluster revision */             \
             { 0x0000, ZAP_TYPE(INT8U), 1, 0, { (uint8_t *) 0x00 } },    /* Color Control (server): current hue */                  \
             { 0x0001, ZAP_TYPE(INT8U), 1, 0, { (uint8_t *) 0x00 } },    /* Color Control (server): current saturation */           \
@@ -236,11 +211,8 @@
             { 0x0002, ZAP_TYPE(BITMAP16), 2, 0, { (uint8_t *) 0x0000 } }, /* IAS Zone (server): zone status */                     \
             {                                                                                                                      \
                 0x0010, ZAP_TYPE(IEEE_ADDRESS), 8, ZAP_ATTRIBUTE_MASK(WRITABLE), { (uint8_t *) ZAP_LONG_DEFAULTS_INDEX(254) }      \
-            },                                                       /* IAS Zone (server): IAS CIE address */                      \
-            { 0x0011, ZAP_TYPE(INT8U), 1, 0, { (uint8_t *) 0xff } }, /* IAS Zone (server): Zone ID */                              \
-            {                                                                                                                      \
-                0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), { (uint8_t *) 0x0001 }                                    \
-            },                                                          /* Binding (client): cluster revision */                   \
+            },                                                          /* IAS Zone (server): IAS CIE address */                   \
+            { 0x0011, ZAP_TYPE(INT8U), 1, 0, { (uint8_t *) 0xff } },    /* IAS Zone (server): Zone ID */                           \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 0x0001 } }, /* Binding (server): cluster revision */                   \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 3 } },      /* Basic (server): cluster revision */                     \
             { 0x0000, ZAP_TYPE(INT8U), 1, 0, { (uint8_t *) 0x08 } },    /* Basic (server): ZCL version */                          \
@@ -283,93 +255,71 @@
     };
 
 #define ZAP_CLUSTER_MASK(mask) CLUSTER_MASK_##mask
-#define GENERATED_CLUSTER_COUNT 24
+#define GENERATED_CLUSTER_COUNT 14
 #define GENERATED_CLUSTERS                                                                                                         \
     {                                                                                                                              \
-        { 0x0000, ZAP_ATTRIBUTE_INDEX(0), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL },     /* Endpoint: 1, Cluster: Basic (client) */   \
-            { 0x0000, ZAP_ATTRIBUTE_INDEX(1), 3, 4, ZAP_CLUSTER_MASK(SERVER), NULL }, /* Endpoint: 1, Cluster: Basic (server) */   \
-            {                                                                                                                      \
-                0x0003, ZAP_ATTRIBUTE_INDEX(4), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                               \
-            }, /* Endpoint: 1, Cluster: Identify (client) */                                                                       \
+        { 0x0000, ZAP_ATTRIBUTE_INDEX(0), 3, 4, ZAP_CLUSTER_MASK(SERVER), NULL }, /* Endpoint: 1, Cluster: Basic (server) */       \
             { 0x0003,                                                                                                              \
-              ZAP_ATTRIBUTE_INDEX(5),                                                                                              \
+              ZAP_ATTRIBUTE_INDEX(3),                                                                                              \
               2,                                                                                                                   \
               4,                                                                                                                   \
               ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(ATTRIBUTE_CHANGED_FUNCTION),           \
               chipFuncArrayIdentifyServer }, /* Endpoint: 1, Cluster: Identify (server) */                                         \
-            { 0x0004, ZAP_ATTRIBUTE_INDEX(7), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL }, /* Endpoint: 1, Cluster: Groups (client) */  \
             { 0x0004,                                                                                                              \
-              ZAP_ATTRIBUTE_INDEX(8),                                                                                              \
+              ZAP_ATTRIBUTE_INDEX(5),                                                                                              \
               2,                                                                                                                   \
               3,                                                                                                                   \
               ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
-              chipFuncArrayGroupsServer },                                             /* Endpoint: 1, Cluster: Groups (server) */ \
-            { 0x0005, ZAP_ATTRIBUTE_INDEX(10), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL }, /* Endpoint: 1, Cluster: Scenes (client) */ \
+              chipFuncArrayGroupsServer }, /* Endpoint: 1, Cluster: Groups (server) */                                             \
             { 0x0005,                                                                                                              \
-              ZAP_ATTRIBUTE_INDEX(11),                                                                                             \
+              ZAP_ATTRIBUTE_INDEX(7),                                                                                              \
               6,                                                                                                                   \
               8,                                                                                                                   \
               ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
-              chipFuncArrayScenesServer },                                             /* Endpoint: 1, Cluster: Scenes (server) */ \
-            { 0x0006, ZAP_ATTRIBUTE_INDEX(17), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL }, /* Endpoint: 1, Cluster: On/off (client) */ \
+              chipFuncArrayScenesServer }, /* Endpoint: 1, Cluster: Scenes (server) */                                             \
             { 0x0006,                                                                                                              \
-              ZAP_ATTRIBUTE_INDEX(18),                                                                                             \
+              ZAP_ATTRIBUTE_INDEX(13),                                                                                             \
               2,                                                                                                                   \
               3,                                                                                                                   \
               ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
               chipFuncArrayOnOffServer }, /* Endpoint: 1, Cluster: On/off (server) */                                              \
-            {                                                                                                                      \
-                0x0008, ZAP_ATTRIBUTE_INDEX(20), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
-            }, /* Endpoint: 1, Cluster: Level Control (client) */                                                                  \
             { 0x0008,                                                                                                              \
-              ZAP_ATTRIBUTE_INDEX(21),                                                                                             \
+              ZAP_ATTRIBUTE_INDEX(15),                                                                                             \
               2,                                                                                                                   \
               3,                                                                                                                   \
               ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
               chipFuncArrayLevelControlServer }, /* Endpoint: 1, Cluster: Level Control (server) */                                \
-            {                                                                                                                      \
-                0x0101, ZAP_ATTRIBUTE_INDEX(23), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
-            }, /* Endpoint: 1, Cluster: Door Lock (client) */                                                                      \
             { 0x0101,                                                                                                              \
-              ZAP_ATTRIBUTE_INDEX(24),                                                                                             \
+              ZAP_ATTRIBUTE_INDEX(17),                                                                                             \
               4,                                                                                                                   \
               5,                                                                                                                   \
               ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(ATTRIBUTE_CHANGED_FUNCTION),                                             \
               chipFuncArrayDoorLockServer }, /* Endpoint: 1, Cluster: Door Lock (server) */                                        \
             {                                                                                                                      \
-                0x0103, ZAP_ATTRIBUTE_INDEX(28), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
-            }, /* Endpoint: 1, Cluster: Barrier Control (client) */                                                                \
-            {                                                                                                                      \
-                0x0103, ZAP_ATTRIBUTE_INDEX(29), 5, 7, ZAP_CLUSTER_MASK(SERVER), NULL                                              \
+                0x0103, ZAP_ATTRIBUTE_INDEX(21), 5, 7, ZAP_CLUSTER_MASK(SERVER), NULL                                              \
             }, /* Endpoint: 1, Cluster: Barrier Control (server) */                                                                \
-            {                                                                                                                      \
-                0x0300, ZAP_ATTRIBUTE_INDEX(34), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
-            }, /* Endpoint: 1, Cluster: Color Control (client) */                                                                  \
             { 0x0300,                                                                                                              \
-              ZAP_ATTRIBUTE_INDEX(35),                                                                                             \
+              ZAP_ATTRIBUTE_INDEX(26),                                                                                             \
               51,                                                                                                                  \
               336,                                                                                                                 \
               ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
               chipFuncArrayColorControlServer }, /* Endpoint: 1, Cluster: Color Control (server) */                                \
             {                                                                                                                      \
-                0x0402, ZAP_ATTRIBUTE_INDEX(86), 4, 8, ZAP_CLUSTER_MASK(SERVER), NULL                                              \
+                0x0402, ZAP_ATTRIBUTE_INDEX(77), 4, 8, ZAP_CLUSTER_MASK(SERVER), NULL                                              \
             }, /* Endpoint: 1, Cluster: Temperature Measurement (server) */                                                        \
             { 0x0500,                                                                                                              \
-              ZAP_ATTRIBUTE_INDEX(90),                                                                                             \
+              ZAP_ATTRIBUTE_INDEX(81),                                                                                             \
               6,                                                                                                                   \
               16,                                                                                                                  \
               ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(PRE_ATTRIBUTE_CHANGED_FUNCTION) |      \
                   ZAP_CLUSTER_MASK(MESSAGE_SENT_FUNCTION),                                                                         \
               chipFuncArrayIasZoneServer }, /* Endpoint: 1, Cluster: IAS Zone (server) */                                          \
             {                                                                                                                      \
-                0xF000, ZAP_ATTRIBUTE_INDEX(96), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
-            }, /* Endpoint: 1, Cluster: Binding (client) */                                                                        \
-            {                                                                                                                      \
-                0xF000, ZAP_ATTRIBUTE_INDEX(97), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                              \
+                0xF000, ZAP_ATTRIBUTE_INDEX(87), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                              \
             }, /* Endpoint: 1, Cluster: Binding (server) */                                                                        \
-            { 0x0000, ZAP_ATTRIBUTE_INDEX(98), 3, 4, ZAP_CLUSTER_MASK(SERVER), NULL }, /* Endpoint: 2, Cluster: Basic (server) */  \
+            { 0x0000, ZAP_ATTRIBUTE_INDEX(88), 3, 4, ZAP_CLUSTER_MASK(SERVER), NULL }, /* Endpoint: 2, Cluster: Basic (server) */  \
             { 0x0006,                                                                                                              \
-              ZAP_ATTRIBUTE_INDEX(101),                                                                                            \
+              ZAP_ATTRIBUTE_INDEX(91),                                                                                             \
               2,                                                                                                                   \
               3,                                                                                                                   \
               ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
@@ -381,7 +331,7 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 22, 419 }, { ZAP_CLUSTER_INDEX(22), 2, 7 },                                                        \
+        { ZAP_CLUSTER_INDEX(0), 12, 399 }, { ZAP_CLUSTER_INDEX(12), 2, 7 },                                                        \
     }
 
 // Largest attribute size is needed for various buffers
@@ -391,7 +341,7 @@
 #define ATTRIBUTE_SINGLETONS_SIZE (0)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (426)
+#define ATTRIBUTE_MAX_SIZE (406)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (2)
@@ -435,291 +385,158 @@
 
 // Array of EmberAfCommandMetadata structs.
 #define ZAP_COMMAND_MASK(mask) COMMAND_MASK_##mask
-#define EMBER_AF_GENERATED_COMMAND_COUNT (171)
+#define EMBER_AF_GENERATED_COMMAND_COUNT (89)
 #define GENERATED_COMMANDS                                                                                                         \
     {                                                                                                                              \
         { 0x0000, 0x00,                                                                                                            \
-          ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT) }, /* Basic (client): MfgSpecificPing */           \
-            {                                                                                                                      \
-                0x0000, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
-            }, /* Basic (client): ResetToFactoryDefaults */                                                                        \
-            { 0x0000, 0x00,                                                                                                        \
-              ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER) }, /* Basic (server): MfgSpecificPing */       \
+          ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER) }, /* Basic (server): MfgSpecificPing */           \
             {                                                                                                                      \
                 0x0000, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER)                                \
             }, /* Basic (server): ResetToFactoryDefaults */                                                                        \
             {                                                                                                                      \
                 0x0000, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER)                                \
             },                                                   /* Basic (server): ResetToFactoryDefaults */                      \
-            { 0x0003, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Identify (client): Identify */                                 \
-            { 0x0003, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Identify (client): IdentifyQueryResponse */                    \
             { 0x0003, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Identify (server): Identify */                                 \
             { 0x0003, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Identify (server): IdentifyQueryResponse */                    \
-            { 0x0003, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Identify (client): IdentifyQuery */                            \
             { 0x0003, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Identify (server): IdentifyQuery */                            \
-            { 0x0004, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Groups (client): AddGroup */                                   \
-            { 0x0004, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Groups (client): AddGroupResponse */                           \
             { 0x0004, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Groups (server): AddGroup */                                   \
             { 0x0004, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Groups (server): AddGroupResponse */                           \
-            { 0x0004, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Groups (client): ViewGroup */                                  \
-            { 0x0004, 0x01, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Groups (client): ViewGroupResponse */                          \
             { 0x0004, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Groups (server): ViewGroup */                                  \
             { 0x0004, 0x01, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Groups (server): ViewGroupResponse */                          \
-            { 0x0004, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Groups (client): GetGroupMembership */                         \
-            { 0x0004, 0x02, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Groups (client): GetGroupMembershipResponse */                 \
             { 0x0004, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Groups (server): GetGroupMembership */                         \
             { 0x0004, 0x02, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Groups (server): GetGroupMembershipResponse */                 \
-            { 0x0004, 0x03, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Groups (client): RemoveGroup */                                \
-            { 0x0004, 0x03, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Groups (client): RemoveGroupResponse */                        \
             { 0x0004, 0x03, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Groups (server): RemoveGroup */                                \
             { 0x0004, 0x03, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Groups (server): RemoveGroupResponse */                        \
-            { 0x0004, 0x04, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Groups (client): RemoveAllGroups */                            \
             { 0x0004, 0x04, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Groups (server): RemoveAllGroups */                            \
-            { 0x0004, 0x05, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Groups (client): AddGroupIfIdentifying */                      \
             { 0x0004, 0x05, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Groups (server): AddGroupIfIdentifying */                      \
-            { 0x0005, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Scenes (client): AddScene */                                   \
-            { 0x0005, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Scenes (client): AddSceneResponse */                           \
             { 0x0005, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Scenes (server): AddScene */                                   \
             { 0x0005, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Scenes (server): AddSceneResponse */                           \
-            { 0x0005, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Scenes (client): ViewScene */                                  \
-            { 0x0005, 0x01, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Scenes (client): ViewSceneResponse */                          \
             { 0x0005, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Scenes (server): ViewScene */                                  \
             { 0x0005, 0x01, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Scenes (server): ViewSceneResponse */                          \
-            { 0x0005, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Scenes (client): RemoveScene */                                \
-            { 0x0005, 0x02, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Scenes (client): RemoveSceneResponse */                        \
             { 0x0005, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Scenes (server): RemoveScene */                                \
             { 0x0005, 0x02, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Scenes (server): RemoveSceneResponse */                        \
-            { 0x0005, 0x03, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Scenes (client): RemoveAllScenes */                            \
-            { 0x0005, 0x03, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Scenes (client): RemoveAllScenesResponse */                    \
             { 0x0005, 0x03, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Scenes (server): RemoveAllScenes */                            \
             { 0x0005, 0x03, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Scenes (server): RemoveAllScenesResponse */                    \
-            { 0x0005, 0x04, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Scenes (client): StoreScene */                                 \
-            { 0x0005, 0x04, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Scenes (client): StoreSceneResponse */                         \
             { 0x0005, 0x04, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Scenes (server): StoreScene */                                 \
             { 0x0005, 0x04, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Scenes (server): StoreSceneResponse */                         \
-            { 0x0005, 0x05, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Scenes (client): RecallScene */                                \
             { 0x0005, 0x05, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Scenes (server): RecallScene */                                \
-            { 0x0005, 0x06, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Scenes (client): GetSceneMembership */                         \
-            { 0x0005, 0x06, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Scenes (client): GetSceneMembershipResponse */                 \
             { 0x0005, 0x06, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Scenes (server): GetSceneMembership */                         \
             { 0x0005, 0x06, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Scenes (server): GetSceneMembershipResponse */                 \
-            { 0x0006, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* On/off (client): Off */                                        \
             { 0x0006, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* On/off (server): Off */                                        \
             { 0x0006, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* On/off (server): Off */                                        \
-            { 0x0006, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* On/off (client): On */                                         \
             { 0x0006, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* On/off (server): On */                                         \
             { 0x0006, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* On/off (server): On */                                         \
-            { 0x0006, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* On/off (client): Toggle */                                     \
             { 0x0006, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* On/off (server): Toggle */                                     \
             { 0x0006, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* On/off (server): Toggle */                                     \
-            { 0x0008, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Level Control (client): MoveToLevel */                         \
             { 0x0008, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Level Control (server): MoveToLevel */                         \
-            { 0x0008, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Level Control (client): Move */                                \
             { 0x0008, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Level Control (server): Move */                                \
-            { 0x0008, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Level Control (client): Step */                                \
             { 0x0008, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Level Control (server): Step */                                \
-            { 0x0008, 0x03, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Level Control (client): Stop */                                \
             { 0x0008, 0x03, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Level Control (server): Stop */                                \
-            { 0x0008, 0x04, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Level Control (client): MoveToLevelWithOnOff */                \
             { 0x0008, 0x04, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Level Control (server): MoveToLevelWithOnOff */                \
-            { 0x0008, 0x05, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Level Control (client): MoveWithOnOff */                       \
             { 0x0008, 0x05, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Level Control (server): MoveWithOnOff */                       \
-            { 0x0008, 0x06, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Level Control (client): StepWithOnOff */                       \
             { 0x0008, 0x06, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Level Control (server): StepWithOnOff */                       \
-            { 0x0008, 0x07, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Level Control (client): StopWithOnOff */                       \
             { 0x0008, 0x07, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Level Control (server): StopWithOnOff */                       \
-            { 0x0101, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Door Lock (client): LockDoor */                                \
-            { 0x0101, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Door Lock (client): LockDoorResponse */                        \
             { 0x0101, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Door Lock (server): LockDoor */                                \
             { 0x0101, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Door Lock (server): LockDoorResponse */                        \
-            { 0x0101, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Door Lock (client): UnlockDoor */                              \
-            { 0x0101, 0x01, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Door Lock (client): UnlockDoorResponse */                      \
             { 0x0101, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Door Lock (server): UnlockDoor */                              \
             { 0x0101, 0x01, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Door Lock (server): UnlockDoorResponse */                      \
             { 0x0101, 0x03,                                                                                                        \
-              ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT) }, /* Door Lock (client): UnlockWithTimeout */ \
-            { 0x0101, 0x03,                                                                                                        \
               ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER) }, /* Door Lock (server): UnlockWithTimeout */ \
-            { 0x0101, 0x04,                                                                                                        \
-              ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT) }, /* Door Lock (client): GetLogRecord */      \
             { 0x0101, 0x04,                                                                                                        \
               ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER) }, /* Door Lock (server): GetLogRecord */      \
             { 0x0101, 0x05,                                                                                                        \
-              ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT) }, /* Door Lock (client): SetPin */            \
-            { 0x0101, 0x05,                                                                                                        \
               ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER) }, /* Door Lock (server): SetPin */            \
-            { 0x0101, 0x06,                                                                                                        \
-              ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT) }, /* Door Lock (client): GetPin */            \
             { 0x0101, 0x06,                                                                                                        \
               ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER) }, /* Door Lock (server): GetPin */            \
             { 0x0101, 0x07,                                                                                                        \
-              ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT) }, /* Door Lock (client): ClearPin */          \
-            { 0x0101, 0x07,                                                                                                        \
               ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER) }, /* Door Lock (server): ClearPin */          \
             { 0x0101, 0x08,                                                                                                        \
-              ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT) }, /* Door Lock (client): ClearAllPins */      \
-            { 0x0101, 0x08,                                                                                                        \
               ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER) }, /* Door Lock (server): ClearAllPins */      \
-            {                                                                                                                      \
-                0x0101, 0x0B, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
-            }, /* Door Lock (client): SetWeekdaySchedule */                                                                        \
             {                                                                                                                      \
                 0x0101, 0x0B, ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER)                                \
             }, /* Door Lock (server): SetWeekdaySchedule */                                                                        \
             {                                                                                                                      \
-                0x0101, 0x0C, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
-            }, /* Door Lock (client): GetWeekdaySchedule */                                                                        \
-            {                                                                                                                      \
                 0x0101, 0x0C, ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER)                                \
             }, /* Door Lock (server): GetWeekdaySchedule */                                                                        \
-            {                                                                                                                      \
-                0x0101, 0x0D, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
-            }, /* Door Lock (client): ClearWeekdaySchedule */                                                                      \
             {                                                                                                                      \
                 0x0101, 0x0D, ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER)                                \
             }, /* Door Lock (server): ClearWeekdaySchedule */                                                                      \
             {                                                                                                                      \
-                0x0101, 0x0E, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
-            }, /* Door Lock (client): SetYeardaySchedule */                                                                        \
-            {                                                                                                                      \
                 0x0101, 0x0E, ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER)                                \
             }, /* Door Lock (server): SetYeardaySchedule */                                                                        \
-            {                                                                                                                      \
-                0x0101, 0x0F, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
-            }, /* Door Lock (client): GetYeardaySchedule */                                                                        \
             {                                                                                                                      \
                 0x0101, 0x0F, ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER)                                \
             }, /* Door Lock (server): GetYeardaySchedule */                                                                        \
             {                                                                                                                      \
-                0x0101, 0x10, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
-            }, /* Door Lock (client): ClearYeardaySchedule */                                                                      \
-            {                                                                                                                      \
                 0x0101, 0x10, ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER)                                \
             }, /* Door Lock (server): ClearYeardaySchedule */                                                                      \
-            {                                                                                                                      \
-                0x0101, 0x11, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
-            }, /* Door Lock (client): SetHolidaySchedule */                                                                        \
             {                                                                                                                      \
                 0x0101, 0x11, ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER)                                \
             }, /* Door Lock (server): SetHolidaySchedule */                                                                        \
             {                                                                                                                      \
-                0x0101, 0x12, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
-            }, /* Door Lock (client): GetHolidaySchedule */                                                                        \
-            {                                                                                                                      \
                 0x0101, 0x12, ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER)                                \
             }, /* Door Lock (server): GetHolidaySchedule */                                                                        \
-            {                                                                                                                      \
-                0x0101, 0x13, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
-            }, /* Door Lock (client): ClearHolidaySchedule */                                                                      \
             {                                                                                                                      \
                 0x0101, 0x13, ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER)                                \
             }, /* Door Lock (server): ClearHolidaySchedule */                                                                      \
             { 0x0101, 0x14,                                                                                                        \
-              ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT) }, /* Door Lock (client): SetUserType */       \
-            { 0x0101, 0x14,                                                                                                        \
               ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER) }, /* Door Lock (server): SetUserType */       \
-            { 0x0101, 0x15,                                                                                                        \
-              ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT) }, /* Door Lock (client): GetUserType */       \
             { 0x0101, 0x15,                                                                                                        \
               ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER) }, /* Door Lock (server): GetUserType */       \
             { 0x0101, 0x16,                                                                                                        \
-              ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT) }, /* Door Lock (client): SetRfid */           \
-            { 0x0101, 0x16,                                                                                                        \
               ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER) }, /* Door Lock (server): SetRfid */           \
-            { 0x0101, 0x17,                                                                                                        \
-              ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT) }, /* Door Lock (client): GetRfid */           \
             { 0x0101, 0x17,                                                                                                        \
               ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER) }, /* Door Lock (server): GetRfid */           \
             { 0x0101, 0x18,                                                                                                        \
-              ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT) }, /* Door Lock (client): ClearRfid */         \
-            { 0x0101, 0x18,                                                                                                        \
               ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER) }, /* Door Lock (server): ClearRfid */         \
             { 0x0101, 0x19,                                                                                                        \
-              ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT) }, /* Door Lock (client): ClearAllRfids */     \
-            { 0x0101, 0x19,                                                                                                        \
               ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER) }, /* Door Lock (server): ClearAllRfids */     \
-            { 0x0103, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Barrier Control (client): BarrierControlGoToPercent */         \
             { 0x0103, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Barrier Control (server): BarrierControlGoToPercent */         \
-            { 0x0103, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Barrier Control (client): BarrierControlStop */                \
             { 0x0103, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Barrier Control (server): BarrierControlStop */                \
-            { 0x0300, 0x00,                                                                                                        \
-              ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT) }, /* Color Control (client): MoveToHue */     \
             { 0x0300, 0x00,                                                                                                        \
               ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER) }, /* Color Control (server): MoveToHue */     \
             { 0x0300, 0x01,                                                                                                        \
-              ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT) }, /* Color Control (client): MoveHue */       \
-            { 0x0300, 0x01,                                                                                                        \
               ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER) }, /* Color Control (server): MoveHue */       \
             { 0x0300, 0x02,                                                                                                        \
-              ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT) }, /* Color Control (client): StepHue */       \
-            { 0x0300, 0x02,                                                                                                        \
               ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER) }, /* Color Control (server): StepHue */       \
-            {                                                                                                                      \
-                0x0300, 0x03, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
-            }, /* Color Control (client): MoveToSaturation */                                                                      \
             {                                                                                                                      \
                 0x0300, 0x03, ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER)                                \
             }, /* Color Control (server): MoveToSaturation */                                                                      \
             {                                                                                                                      \
-                0x0300, 0x04, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
-            }, /* Color Control (client): MoveSaturation */                                                                        \
-            {                                                                                                                      \
                 0x0300, 0x04, ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER)                                \
             }, /* Color Control (server): MoveSaturation */                                                                        \
-            {                                                                                                                      \
-                0x0300, 0x05, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
-            }, /* Color Control (client): StepSaturation */                                                                        \
             {                                                                                                                      \
                 0x0300, 0x05, ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER)                                \
             }, /* Color Control (server): StepSaturation */                                                                        \
             {                                                                                                                      \
-                0x0300, 0x06, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
-            }, /* Color Control (client): MoveToHueAndSaturation */                                                                \
-            {                                                                                                                      \
                 0x0300, 0x06, ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER)                                \
             },                                                   /* Color Control (server): MoveToHueAndSaturation */              \
-            { 0x0300, 0x07, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Color Control (client): MoveToColor */                         \
             { 0x0300, 0x07, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Color Control (server): MoveToColor */                         \
-            { 0x0300, 0x08, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Color Control (client): MoveColor */                           \
             { 0x0300, 0x08, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Color Control (server): MoveColor */                           \
-            { 0x0300, 0x09, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Color Control (client): StepColor */                           \
             { 0x0300, 0x09, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Color Control (server): StepColor */                           \
-            {                                                                                                                      \
-                0x0300, 0x0A, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
-            }, /* Color Control (client): MoveToColorTemperature */                                                                \
             {                                                                                                                      \
                 0x0300, 0x0A, ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER)                                \
             }, /* Color Control (server): MoveToColorTemperature */                                                                \
             { 0x0300, 0x47,                                                                                                        \
-              ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT) }, /* Color Control (client): StopMoveStep */  \
-            { 0x0300, 0x47,                                                                                                        \
               ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER) }, /* Color Control (server): StopMoveStep */  \
-            {                                                                                                                      \
-                0x0300, 0x4B, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
-            }, /* Color Control (client): MoveColorTemperature */                                                                  \
             {                                                                                                                      \
                 0x0300, 0x4B, ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER)                                \
             }, /* Color Control (server): MoveColorTemperature */                                                                  \
-            {                                                                                                                      \
-                0x0300, 0x4C, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
-            }, /* Color Control (client): StepColorTemperature */                                                                  \
             {                                                                                                                      \
                 0x0300, 0x4C, ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER)                                \
             },                                                   /* Color Control (server): StepColorTemperature */                \
             { 0x0500, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* IAS Zone (server): ZoneEnrollResponse */                       \
             { 0x0500, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* IAS Zone (server): ZoneStatusChangeNotification */             \
             { 0x0500, 0x01, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* IAS Zone (server): ZoneEnrollRequest */                        \
-            { 0xF000, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Binding (client): Bind */                                      \
             { 0xF000, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Binding (server): Bind */                                      \
-            { 0xF000, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Binding (client): Unbind */                                    \
             { 0xF000, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Binding (server): Unbind */                                    \
     }
 
 // Array of EmberAfManufacturerCodeEntry structures for commands.
-#define GENERATED_COMMAND_MANUFACTURER_CODE_COUNT (2)
+#define GENERATED_COMMAND_MANUFACTURER_CODE_COUNT (1)
 #define GENERATED_COMMAND_MANUFACTURER_CODES                                                                                       \
     {                                                                                                                              \
-        { 0, 0x1002 }, { 2, 0x1002 },                                                                                              \
+        { 0, 0x1002 },                                                                                                             \
     }
 
 // This is an array of EmberAfManufacturerCodeEntry structures for clusters.

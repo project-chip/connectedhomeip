@@ -77,44 +77,44 @@ chip::NodeId kRemoteDeviceId = chip::kTestDeviceNodeId;
 
 extern "C" {
 // Trampolined callback types
-CHIP_ERROR nl_Chip_DeviceController_DriveIO(uint32_t sleepTimeMS);
+CHIP_ERROR pychip_DeviceController_DriveIO(uint32_t sleepTimeMS);
 
-CHIP_ERROR nl_Chip_DeviceController_NewDeviceController(chip::DeviceController::ChipDeviceController ** outDevCtrl);
-CHIP_ERROR nl_Chip_DeviceController_DeleteDeviceController(chip::DeviceController::ChipDeviceController * devCtrl);
+CHIP_ERROR pychip_DeviceController_NewDeviceController(chip::DeviceController::ChipDeviceController ** outDevCtrl);
+CHIP_ERROR pychip_DeviceController_DeleteDeviceController(chip::DeviceController::ChipDeviceController * devCtrl);
 
 // Rendezvous
-CHIP_ERROR nl_Chip_DeviceController_ConnectBLE(chip::DeviceController::ChipDeviceController * devCtrl, uint16_t discriminator,
-                                               uint32_t setupPINCode, OnConnectFunct onConnect, OnMessageFunct onMessage,
-                                               OnErrorFunct onError);
-CHIP_ERROR nl_Chip_DeviceController_ConnectIP(chip::DeviceController::ChipDeviceController * devCtrl, const char * peerAddrStr,
+CHIP_ERROR pychip_DeviceController_ConnectBLE(chip::DeviceController::ChipDeviceController * devCtrl, uint16_t discriminator,
                                               uint32_t setupPINCode, OnConnectFunct onConnect, OnMessageFunct onMessage,
                                               OnErrorFunct onError);
+CHIP_ERROR pychip_DeviceController_ConnectIP(chip::DeviceController::ChipDeviceController * devCtrl, const char * peerAddrStr,
+                                             uint32_t setupPINCode, OnConnectFunct onConnect, OnMessageFunct onMessage,
+                                             OnErrorFunct onError);
 
 // Network Provisioning
 CHIP_ERROR
-nl_Chip_ScriptDevicePairingDelegate_NewPairingDelegate(chip::DeviceController::ScriptDevicePairingDelegate ** pairingDelegate);
+pychip_ScriptDevicePairingDelegate_NewPairingDelegate(chip::DeviceController::ScriptDevicePairingDelegate ** pairingDelegate);
 CHIP_ERROR
-nl_Chip_ScriptDevicePairingDelegate_SetWifiCredential(chip::DeviceController::ScriptDevicePairingDelegate * pairingDelegate,
-                                                      const char * ssid, const char * password);
-CHIP_ERROR nl_Chip_DeviceController_SetDevicePairingDelegate(chip::DeviceController::ChipDeviceController * devCtrl,
-                                                             chip::Controller::DevicePairingDelegate * pairingDelegate);
+pychip_ScriptDevicePairingDelegate_SetWifiCredential(chip::DeviceController::ScriptDevicePairingDelegate * pairingDelegate,
+                                                     const char * ssid, const char * password);
+CHIP_ERROR pychip_DeviceController_SetDevicePairingDelegate(chip::DeviceController::ChipDeviceController * devCtrl,
+                                                            chip::Controller::DevicePairingDelegate * pairingDelegate);
 
-bool nl_Chip_DeviceController_IsConnected(chip::DeviceController::ChipDeviceController * devCtrl);
-void nl_Chip_DeviceController_Close(chip::DeviceController::ChipDeviceController * devCtrl);
-uint8_t nl_Chip_DeviceController_GetLogFilter();
-void nl_Chip_DeviceController_SetLogFilter(uint8_t category);
+bool pychip_DeviceController_IsConnected(chip::DeviceController::ChipDeviceController * devCtrl);
+void pychip_DeviceController_Close(chip::DeviceController::ChipDeviceController * devCtrl);
+uint8_t pychip_DeviceController_GetLogFilter();
+void pychip_DeviceController_SetLogFilter(uint8_t category);
 
-CHIP_ERROR nl_Chip_Stack_Init();
-CHIP_ERROR nl_Chip_Stack_Shutdown();
-const char * nl_Chip_Stack_ErrorToString(CHIP_ERROR err);
-const char * nl_Chip_Stack_StatusReportToString(uint32_t profileId, uint16_t statusCode);
-void nl_Chip_Stack_SetLogFunct(LogMessageFunct logFunct);
+CHIP_ERROR pychip_Stack_Init();
+CHIP_ERROR pychip_Stack_Shutdown();
+const char * pychip_Stack_ErrorToString(CHIP_ERROR err);
+const char * pychip_Stack_StatusReportToString(uint32_t profileId, uint16_t statusCode);
+void pychip_Stack_SetLogFunct(LogMessageFunct logFunct);
 
-CHIP_ERROR nl_Chip_GetDeviceByNodeId(chip::DeviceController::ChipDeviceController * devCtrl, chip::NodeId nodeId,
-                                     chip::Controller::Device ** device);
+CHIP_ERROR pychip_GetDeviceByNodeId(chip::DeviceController::ChipDeviceController * devCtrl, chip::NodeId nodeId,
+                                    chip::Controller::Device ** device);
 }
 
-CHIP_ERROR nl_Chip_DeviceController_NewDeviceController(chip::DeviceController::ChipDeviceController ** outDevCtrl)
+CHIP_ERROR pychip_DeviceController_NewDeviceController(chip::DeviceController::ChipDeviceController ** outDevCtrl)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -133,7 +133,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR nl_Chip_DeviceController_DeleteDeviceController(chip::DeviceController::ChipDeviceController * devCtrl)
+CHIP_ERROR pychip_DeviceController_DeleteDeviceController(chip::DeviceController::ChipDeviceController * devCtrl)
 {
     if (devCtrl != NULL)
     {
@@ -143,25 +143,25 @@ CHIP_ERROR nl_Chip_DeviceController_DeleteDeviceController(chip::DeviceControlle
     return CHIP_NO_ERROR;
 }
 
-void nl_Chip_DeviceController_Close(chip::DeviceController::ChipDeviceController * devCtrl) {}
+void pychip_DeviceController_Close(chip::DeviceController::ChipDeviceController * devCtrl) {}
 
-bool nl_Chip_DeviceController_IsConnected(chip::DeviceController::ChipDeviceController * devCtrl)
+bool pychip_DeviceController_IsConnected(chip::DeviceController::ChipDeviceController * devCtrl)
 {
     return devCtrl->IsConnected();
 }
 
-const char * nl_Chip_DeviceController_ErrorToString(CHIP_ERROR err)
+const char * pychip_DeviceController_ErrorToString(CHIP_ERROR err)
 {
     return chip::ErrorStr(err);
 }
 
-const char * nl_Chip_DeviceController_StatusReportToString(uint32_t profileId, uint16_t statusCode)
+const char * pychip_DeviceController_StatusReportToString(uint32_t profileId, uint16_t statusCode)
 {
     // return chip::StatusReportStr(profileId, statusCode);
     return NULL;
 }
 
-uint8_t nl_Chip_DeviceController_GetLogFilter()
+uint8_t pychip_DeviceController_GetLogFilter()
 {
 #if _CHIP_USE_LOGGING
     return chip::Logging::GetLogFilter();
@@ -170,23 +170,23 @@ uint8_t nl_Chip_DeviceController_GetLogFilter()
 #endif
 }
 
-void nl_Chip_DeviceController_SetLogFilter(uint8_t category)
+void pychip_DeviceController_SetLogFilter(uint8_t category)
 {
 #if _CHIP_USE_LOGGING
     chip::Logging::SetLogFilter(category);
 #endif
 }
 
-CHIP_ERROR nl_Chip_DeviceController_Connect(chip::DeviceController::ChipDeviceController * devCtrl, BLE_CONNECTION_OBJECT connObj,
-                                            uint32_t setupPINCode, OnConnectFunct onConnect, OnMessageFunct onMessage,
-                                            OnErrorFunct onError)
+CHIP_ERROR pychip_DeviceController_Connect(chip::DeviceController::ChipDeviceController * devCtrl, BLE_CONNECTION_OBJECT connObj,
+                                           uint32_t setupPINCode, OnConnectFunct onConnect, OnMessageFunct onMessage,
+                                           OnErrorFunct onError)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-CHIP_ERROR nl_Chip_DeviceController_ConnectBLE(chip::DeviceController::ChipDeviceController * devCtrl, uint16_t discriminator,
-                                               uint32_t setupPINCode, OnConnectFunct onConnect, OnMessageFunct onMessage,
-                                               OnErrorFunct onError)
+CHIP_ERROR pychip_DeviceController_ConnectBLE(chip::DeviceController::ChipDeviceController * devCtrl, uint16_t discriminator,
+                                              uint32_t setupPINCode, OnConnectFunct onConnect, OnMessageFunct onMessage,
+                                              OnErrorFunct onError)
 {
     return devCtrl->ConnectDevice(kRemoteDeviceId,
                                   chip::RendezvousParameters()
@@ -196,9 +196,9 @@ CHIP_ERROR nl_Chip_DeviceController_ConnectBLE(chip::DeviceController::ChipDevic
                                   (void *) devCtrl, onConnect, onMessage, onError);
 }
 
-CHIP_ERROR nl_Chip_DeviceController_ConnectIP(chip::DeviceController::ChipDeviceController * devCtrl, const char * peerAddrStr,
-                                              uint32_t setupPINCode, OnConnectFunct onConnect, OnMessageFunct onMessage,
-                                              OnErrorFunct onError)
+CHIP_ERROR pychip_DeviceController_ConnectIP(chip::DeviceController::ChipDeviceController * devCtrl, const char * peerAddrStr,
+                                             uint32_t setupPINCode, OnConnectFunct onConnect, OnMessageFunct onMessage,
+                                             OnErrorFunct onError)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::Inet::IPAddress peerAddr;
@@ -213,7 +213,7 @@ CHIP_ERROR nl_Chip_DeviceController_ConnectIP(chip::DeviceController::ChipDevice
 }
 
 CHIP_ERROR
-nl_Chip_ScriptDevicePairingDelegate_NewPairingDelegate(chip::DeviceController::ScriptDevicePairingDelegate ** pairingDelegate)
+pychip_ScriptDevicePairingDelegate_NewPairingDelegate(chip::DeviceController::ScriptDevicePairingDelegate ** pairingDelegate)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -231,8 +231,8 @@ exit:
 }
 
 CHIP_ERROR
-nl_Chip_ScriptDevicePairingDelegate_SetWifiCredential(chip::DeviceController::ScriptDevicePairingDelegate * pairingDelegate,
-                                                      const char * ssid, const char * password)
+pychip_ScriptDevicePairingDelegate_SetWifiCredential(chip::DeviceController::ScriptDevicePairingDelegate * pairingDelegate,
+                                                     const char * ssid, const char * password)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -245,8 +245,8 @@ nl_Chip_ScriptDevicePairingDelegate_SetWifiCredential(chip::DeviceController::Sc
 exit:
     return err;
 }
-CHIP_ERROR nl_Chip_DeviceController_SetDevicePairingDelegate(chip::DeviceController::ChipDeviceController * devCtrl,
-                                                             chip::Controller::DevicePairingDelegate * pairingDelegate)
+CHIP_ERROR pychip_DeviceController_SetDevicePairingDelegate(chip::DeviceController::ChipDeviceController * devCtrl,
+                                                            chip::Controller::DevicePairingDelegate * pairingDelegate)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -259,7 +259,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR nl_Chip_Stack_Init()
+CHIP_ERROR pychip_Stack_Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -276,106 +276,40 @@ CHIP_ERROR nl_Chip_Stack_Init()
 
 exit:
     if (err != CHIP_NO_ERROR)
-        nl_Chip_Stack_Shutdown();
+        pychip_Stack_Shutdown();
 
     return err;
 }
 
-CHIP_ERROR nl_Chip_Stack_Shutdown()
+CHIP_ERROR pychip_Stack_Shutdown()
 {
     return CHIP_NO_ERROR;
 }
 
-const char * nl_Chip_Stack_ErrorToString(CHIP_ERROR err)
+const char * pychip_Stack_ErrorToString(CHIP_ERROR err)
 {
     return chip::ErrorStr(err);
 }
 
-const char * nl_Chip_Stack_StatusReportToString(uint32_t profileId, uint16_t statusCode)
+const char * pychip_Stack_StatusReportToString(uint32_t profileId, uint16_t statusCode)
 {
     // return chip::StatusReportStr(profileId, statusCode);
     return NULL;
 }
 
-CHIP_ERROR nl_Chip_GetDeviceByNodeId(chip::DeviceController::ChipDeviceController * devCtrl, chip::NodeId nodeId,
-                                     chip::Controller::Device ** device)
+CHIP_ERROR pychip_GetDeviceByNodeId(chip::DeviceController::ChipDeviceController * devCtrl, chip::NodeId nodeId,
+                                    chip::Controller::Device ** device)
 {
     return devCtrl->GetDeviceController()->GetDevice(nodeId, device);
 }
 
-#if _CHIP_USE_LOGGING && CHIP_LOG_ENABLE_DYNAMIC_LOGING_FUNCTION
-
-// A pointer to the python logging function.
-static LogMessageFunct sLogMessageFunct = NULL;
-
-// This function is called by the Chip logging code whenever a developer message
-// is logged.  It serves as glue to adapt the logging arguments to what is expected
-// by the python code.
-// NOTE that this function MUST be thread-safe.
-static void LogMessageToPython(uint8_t module, uint8_t category, const char * msg, va_list ap)
+void pychip_Stack_SetLogFunct(LogMessageFunct logFunct)
 {
-    if (IsCategoryEnabled(category))
-    {
-        // Capture the timestamp of the log message.
-        struct timeval tv;
-        gettimeofday(&tv, NULL);
-
-        // Get the module name
-        char moduleName[nlChipLoggingModuleNameLen + 1];
-        ::chip:: ::Logging::GetModuleName(moduleName, module);
-
-        // Format the log message into a dynamic memory buffer, growing the
-        // buffer as needed to fit the message.
-        char * msgBuf                    = NULL;
-        size_t msgBufSize                = 0;
-        size_t msgSize                   = 0;
-        constexpr size_t kInitialBufSize = 120;
-        do
-        {
-            va_list apCopy;
-            va_copy(apCopy, ap);
-
-            msgBufSize = max(msgSize + 1, kInitialBufSize);
-            msgBuf     = (char *) realloc(msgBuf, msgBufSize);
-            if (msgBuf == NULL)
-            {
-                return;
-            }
-
-            int res = vsnprintf(msgBuf, msgBufSize, msg, apCopy);
-            if (res < 0)
-            {
-                return;
-            }
-            msgSize = (size_t) res;
-
-            va_end(apCopy);
-        } while (msgSize >= msgBufSize);
-
-        // Call the configured python logging function.
-        sLogMessageFunct((int64_t) tv.tv_sec, (int64_t) tv.tv_usec, moduleName, category, msgBuf);
-
-        // Release the message buffer.
-        free(msgBuf);
-    }
+    // TODO: determine if log redirection is supposed to be functioning in CHIP
+    //
+    // Background: original log baseline supported 'redirect logs to this
+    // function' however CHIP does not currently provide this.
+    //
+    // Ideally log redirection should work so that python code can do things
+    // like using the log module.
 }
-
-void nl_Chip_Stack_SetLogFunct(LogMessageFunct logFunct)
-{
-    if (logFunct != NULL)
-    {
-        sLogMessageFunct = logFunct;
-        ::chip::Logging::SetLogFunct(LogMessageToPython);
-    }
-    else
-    {
-        sLogMessageFunct = NULL;
-        ::chip::Logging::SetLogFunct(NULL);
-    }
-}
-
-#else // CHIP_LOG_ENABLE_DYNAMIC_LOGING_FUNCTION
-
-void nl_Chip_Stack_SetLogFunct(LogMessageFunct logFunct) {}
-
-#endif // CHIP_LOG_ENABLE_DYNAMIC_LOGING_FUNCTION

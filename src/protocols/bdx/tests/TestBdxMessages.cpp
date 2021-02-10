@@ -8,7 +8,7 @@
 #include <limits>
 
 using namespace chip;
-using namespace chip::BDX;
+using namespace chip::bdx;
 
 /**
  * Helper method for testing that WriteToBuffer() and Parse() are successful, and that the parsed message
@@ -20,7 +20,7 @@ void TestHelperWrittenAndParsedMatch(nlTestSuite * inSuite, void * inContext, Ms
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     size_t msgSize = testMsg.MessageSize();
-    System::PacketBufBound bbuf(msgSize);
+    System::PacketBufferWriter bbuf(msgSize);
     NL_TEST_ASSERT(inSuite, !bbuf.IsNull());
 
     testMsg.WriteToBuffer(bbuf);
@@ -42,7 +42,7 @@ void TestTransferInitMessage(nlTestSuite * inSuite, void * inContext)
     TransferInit testMsg;
 
     testMsg.TransferCtlOptions.SetRaw(0);
-    testMsg.TransferCtlOptions.Set(kReceiverDrive, true);
+    testMsg.TransferCtlOptions.Set(kControl_ReceiverDrive, true);
     testMsg.Version = 1;
 
     // Make sure MaxLength is greater than UINT32_MAX to test widerange being set
@@ -68,7 +68,7 @@ void TestSendAcceptMessage(nlTestSuite * inSuite, void * inContext)
 
     testMsg.Version = 1;
     testMsg.TransferCtlFlags.SetRaw(0);
-    testMsg.TransferCtlFlags.Set(kReceiverDrive, true);
+    testMsg.TransferCtlFlags.Set(kControl_ReceiverDrive, true);
     testMsg.MaxBlockSize = 256;
 
     uint8_t fakeData[5]    = { 7, 6, 5, 4, 3 };
@@ -84,7 +84,7 @@ void TestReceiveAcceptMessage(nlTestSuite * inSuite, void * inContext)
 
     testMsg.Version = 1;
     testMsg.TransferCtlFlags.SetRaw(0);
-    testMsg.TransferCtlFlags.Set(kReceiverDrive, true);
+    testMsg.TransferCtlFlags.Set(kControl_ReceiverDrive, true);
 
     // Make sure Length is greater than UINT32_MAX to test widerange being set
     testMsg.Length = static_cast<uint64_t>(std::numeric_limits<uint32_t>::max()) + 1;

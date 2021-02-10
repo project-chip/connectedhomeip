@@ -32,13 +32,13 @@ efr32_sdk("sdk") {
     "${chip_root}/src/platform/EFR32",
     "${efr32_project_dir}/include",
     "${efr32_project_dir}/src",
+    "${examples_plat_dir}",
     "${examples_plat_dir}/${efr32_family}/${efr32_board}",
   ]
 
   sources = [
     "${efr32_project_dir}/include/CHIPProjectConfig.h",
     "${efr32_project_dir}/include/FreeRTOSConfig.h",
-    "${examples_plat_dir}/${efr32_family}/${efr32_board}/hal-config.h",
   ]
 
   defines = [
@@ -71,11 +71,11 @@ efr32_executable("persistent_storage") {
     "${efr32_project_dir}/include",
     "${chip_root}/src/app/util",
     "${examples_plat_dir}",
+    "${examples_plat_dir}/${efr32_family}/${efr32_board}",
   ]
 
   sources = [
     "${efr32_project_dir}/../KeyValueStorageTest.cpp",
-    "${examples_plat_dir}/${efr32_family}/${efr32_board}/hal-config.h",
     "${examples_plat_dir}/${efr32_family}/${efr32_board}/init_board.c",
     "${examples_plat_dir}/${efr32_family}/${efr32_board}/init_mcu.c",
     "main.cpp",

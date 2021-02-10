@@ -82,7 +82,7 @@ CHIP_ERROR PairingCommand::PairWithoutSecurity(NodeId remoteId, PeerAddress addr
 
 CHIP_ERROR PairingCommand::Unpair(NodeId remoteId)
 {
-    UpdateWaitForResponse(false);
+    SetCommandExitStatus(true);
     return mCommissioner.UnpairDevice(remoteId);
 }
 
@@ -130,7 +130,6 @@ void PairingCommand::OnPairingComplete(CHIP_ERROR err)
     }
 
     SetCommandExitStatus(err == CHIP_NO_ERROR);
-    UpdateWaitForResponse(false);
 }
 
 void PairingCommand::OnPairingDeleted(CHIP_ERROR err)
@@ -145,5 +144,4 @@ void PairingCommand::OnPairingDeleted(CHIP_ERROR err)
     }
 
     SetCommandExitStatus(err == CHIP_NO_ERROR);
-    UpdateWaitForResponse(false);
 }

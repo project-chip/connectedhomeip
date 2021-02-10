@@ -46,13 +46,20 @@ jobs:
               with:
                   languages: "cpp, python"
                   queries: +security-and-quality
-            - name: Build example Echo App
-              run: scripts/examples/esp_echo_app.sh
+            - name: Build example All Clusters App
+              run: scripts/examples/esp_example.sh all-clusters-app
             - name: Copy aside build products
               run: |
                   mkdir -p example_binaries/$BUILD_TYPE-build
                   cp examples/all-clusters-app/esp32/build/chip-all-clusters-app.elf \
                      example_binaries/$BUILD_TYPE-build/chip-all-clusters-app.elf
+            - name: Build example Pigweed App
+              run: scripts/examples/esp_example.sh pigweed-app
+            - name: Copy aside build products
+              run: |
+                  mkdir -p example_binaries/$BUILD_TYPE-build
+                  cp examples/pigweed-app/esp32/build/chip-pigweed-app.elf \
+                     example_binaries/$BUILD_TYPE-build/chip-pigweed-app.elf
             - name: Binary artifact suffix
               id: outsuffix
               uses: haya14busa/action-cond@v1.0.0

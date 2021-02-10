@@ -185,6 +185,7 @@ uint32_t * emberAfPutInt24uInResp(uint32_t value);
 uint8_t * emberAfPutBlockInResp(const uint8_t * data, uint16_t length);
 uint8_t * emberAfPutStringInResp(const uint8_t * buffer);
 uint8_t * emberAfPutDateInResp(EmberAfDate * value);
+void emberAfPutInt16sInResp(int16_t value);
 
 bool emberAfIsThisMyEui64(EmberEUI64 eui64);
 
