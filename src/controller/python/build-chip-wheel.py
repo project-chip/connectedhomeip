@@ -140,6 +140,7 @@ try:
             'chip',
             'chip.ble',
             'chip.exceptions',
+            'chip.tlv',
         ],
         package_dir={
             '':tmpDir,                      # By default, look in the tmp directory for packages/modules to be included.
