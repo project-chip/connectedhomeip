@@ -38,6 +38,8 @@
  *******************************************************************************
  ******************************************************************************/
 
+#include "temperature-measurement-server.h"
+
 #include <app/util/af.h>
 
 #include <app/util/af-event.h>
@@ -76,4 +78,15 @@ void emberAfPluginTemperatureMeasurementServerInitCallback(void)
         emberAfTempMeasurementClusterPrint("Err: writing temperature: %x", status);
         return;
     }
+}
+
+EmberAfStatus emberAfPluginTemperatureMeasurementSetValueCallback(EndpointId endpoint, int16_t value)
+{
+    EmberAfStatus status = emberAfWriteAttribute(endpoint, ZCL_TEMP_MEASUREMENT_CLUSTER_ID, ZCL_CURRENT_TEMPERATURE_ATTRIBUTE_ID,
+                                                 CLUSTER_MASK_SERVER, (uint8_t *) &value, ZCL_INT16S_ATTRIBUTE_TYPE);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        emberAfTempMeasurementClusterPrint("Err: writing temperature: %x", status);
+    }
+    return status;
 }
