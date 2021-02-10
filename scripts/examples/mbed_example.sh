@@ -75,5 +75,7 @@ fi
 echo "Build $APP app for $TARGET_BOARD target with $TOOLCHAIN toolchain and $PROFILE profile"
 set -x
 pwd
-ln -sfT "/opt/mbed-os" "${APP}/mbed/mbed-os"
-mbed-tools compile -t "$TOOLCHAIN" -m "$TARGET_BOARD" -p "$APP/mbed" -b "$PROFILE"
+ln -sfT $MBED_OS_PATH "${APP}/mbed/mbed-os"
+mbed-tools configure -t "$TOOLCHAIN" -m "$TARGET_BOARD" -p "$APP"/mbed/
+cmake -S "$APP/mbed" -B "$APP"/mbed/build-"$TARGET_BOARD" -GNinja -DCMAKE_BUILD_TYPE="$PROFILE"
+cmake --build "$APP"/mbed/build-"$TARGET_BOARD"
