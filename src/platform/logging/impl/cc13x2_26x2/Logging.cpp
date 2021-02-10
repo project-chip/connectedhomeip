@@ -11,7 +11,7 @@
 #include <stdio.h>
 
 UART_Handle sDebugUartHandle;
-char sDebugUartBuffer[256];
+char sDebugUartBuffer[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
 
 extern "C" int cc13x2_26x2LogInit(void)
 {

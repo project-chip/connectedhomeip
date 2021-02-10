@@ -85,11 +85,11 @@ template("chip_test_suite") {
 
     output_dir = "${root_out_dir}/lib"
 
-    if (defined(invoker.public_deps)) {
-      public_deps += [ "${chip_root}/src/platform/logging:stdio" ]
-    } else {
-      public_deps = [ "${chip_root}/src/platform/logging:stdio" ]
+    if (!defined(invoker.public_deps)) {
+      public_deps += []
     }
+
+    public_deps = [ "${chip_root}/src/platform/logging:stdio" ]
   }
 
   if (chip_link_tests) {
