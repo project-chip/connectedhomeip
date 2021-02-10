@@ -92,7 +92,7 @@ static void TestBufferReader_Skip(nlTestSuite * inSuite, void * inContext)
     uint8_t temp          = 0;
     uint16_t firstSkipLen = 2;
 
-    // Verify Skip() forwards the start pointer the correct amount.
+    // Verify Skip() advances the start pointer the correct amount.
     CHIP_ERROR err = reader.Skip(firstSkipLen).Read8(&temp).StatusCode();
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, temp == test_buffer[firstSkipLen]);
