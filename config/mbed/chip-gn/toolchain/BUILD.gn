@@ -14,37 +14,21 @@
 
 import("//build_overrides/chip.gni")
 
-import("${chip_root}/src/lib/core/core.gni")
+import("//build/toolchain/arm_gcc/arm_toolchain.gni")
 
-static_library("shell") {
-  output_name = "libCHIPShell"
-  output_dir = "${root_out_dir}/lib"
+declare_args() {
+  mbed_ar = ""
+  mbed_cc = ""
+  mbed_cxx = ""
+}
 
-  sources = [
-    "commands.cpp",
-    "commands.h",
-    "shell.cpp",
-    "shell.h",
-    "streamer.cpp",
-    "streamer.h",
-  ]
+gcc_toolchain("mbed") {
+  ar = mbed_ar
+  cc = mbed_cc
+  cxx = mbed_cxx
 
-  if (chip_target_style == "unix") {
-    sources += [ "streamer_stdio.cpp" ]
+  toolchain_args = {
+    current_os = "mbed"
+    is_clang = false
   }
-
-  if (current_os == "zephyr") {
-    sources += [ "streamer_zephyr.cpp" ]
-  }
-
-  if (current_os == "mbed") {
-    sources += [ "streamer_mbed.cpp" ]
-  }
-
-  cflags = [ "-Wconversion" ]
-
-  public_deps = [
-    "${chip_root}/src/lib/core",
-    "${chip_root}/src/lib/support",
-  ]
 }

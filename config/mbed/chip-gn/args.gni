@@ -14,37 +14,15 @@
 
 import("//build_overrides/chip.gni")
 
-import("${chip_root}/src/lib/core/core.gni")
+chip_device_platform = "mbed"
 
-static_library("shell") {
-  output_name = "libCHIPShell"
-  output_dir = "${root_out_dir}/lib"
+chip_project_config_include = ""
+chip_system_project_config_include = ""
+chip_ble_project_config_include = ""
 
-  sources = [
-    "commands.cpp",
-    "commands.h",
-    "shell.cpp",
-    "shell.h",
-    "streamer.cpp",
-    "streamer.h",
-  ]
+custom_toolchain = "//toolchain:mbed"
+mbedtls_target = "//:mbedtls"
 
-  if (chip_target_style == "unix") {
-    sources += [ "streamer_stdio.cpp" ]
-  }
-
-  if (current_os == "zephyr") {
-    sources += [ "streamer_zephyr.cpp" ]
-  }
-
-  if (current_os == "mbed") {
-    sources += [ "streamer_mbed.cpp" ]
-  }
-
-  cflags = [ "-Wconversion" ]
-
-  public_deps = [
-    "${chip_root}/src/lib/core",
-    "${chip_root}/src/lib/support",
-  ]
-}
+treat_warnings_as_errors = false
+lwip_platform = "mbed"
+chip_system_config_use_sockets=false

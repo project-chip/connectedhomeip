@@ -12,19 +12,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-declare_args() {
-  # Crypto implementation: mbedtls, openssl.
-  chip_crypto = ""
-}
-
-if (chip_crypto == "") {
-  if (current_os == "android" || current_os == "freertos" ||
-      current_os == "zephyr" || current_os == "mbed") {
-    chip_crypto = "mbedtls"
-  } else {
-    chip_crypto = "openssl"
-  }
-}
-
-assert(chip_crypto == "mbedtls" || chip_crypto == "openssl",
-       "Please select a valid crypto implementation: mbedtls, openssl")
+chip_device_platform = "mbed"
