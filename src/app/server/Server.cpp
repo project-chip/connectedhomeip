@@ -48,19 +48,26 @@ using namespace ::chip::Messaging;
 
 namespace {
 
-bool isRendezvousBypassed()
+constexpr bool isRendezvousBypassed()
 {
-    RendezvousInformationFlags rendezvousMode = RendezvousInformationFlags::kBLE;
-
-#ifdef CONFIG_RENDEZVOUS_MODE
-    rendezvousMode = static_cast<RendezvousInformationFlags>(CONFIG_RENDEZVOUS_MODE);
+#if defined(CHIP_BYPASS_RENDEZVOUS) && CHIP_BYPASS_RENDEZVOUS
+    return true;
+#elif defined(CONFIG_RENDEZVOUS_MODE)
+    return static_cast<RendezvousInformationFlags>(CONFIG_RENDEZVOUS_MODE) == RendezvousInformationFlags::kNone;
+#else
+    return false;
 #endif
+}
 
-#ifdef CHIP_BYPASS_RENDEZVOUS
-    rendezvousMode = RendezvousInformationFlags::kNone;
+constexpr bool useTestPairing()
+{
+#if defined(CHIP_DEVICE_CONFIG_USE_TEST_PAIRING) && CHIP_DEVICE_CONFIG_USE_TEST_PAIRING
+    return true;
+#else
+    // Use the test pairing whenever rendezvous is bypassed. Otherwise, there wouldn't be
+    // any way to communicate with the device using CHIP protocol.
+    return isRendezvousBypassed();
 #endif
-
-    return rendezvousMode == RendezvousInformationFlags::kNone;
 }
 
 // TODO: The following class is setting the discriminator in Persistent Storage. This is
@@ -395,16 +402,20 @@ void InitServer(AppDelegate * delegate)
     gSessions.SetDelegate(&gCallbacks);
 #endif
 
-    // This flag is used to bypass BLE in the cirque test
-    // Only in the cirque test this is enabled with --args='bypass_rendezvous=true'
-    if (isRendezvousBypassed())
+    if (useTestPairing())
     {
         AdminPairingInfo * adminInfo = gAdminPairings.AssignAdminId(gNextAvailableAdminId);
         VerifyOrExit(adminInfo != nullptr, err = CHIP_ERROR_NO_MEMORY);
         adminInfo->SetNodeId(chip::kTestDeviceNodeId);
-        ChipLogProgress(AppServer, "Rendezvous and Secure Pairing skipped. Using test secret.");
         err = gSessions.NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing, gNextAvailableAdminId);
         SuccessOrExit(err);
+    }
+
+    // This flag is used to bypass BLE in the cirque test
+    // Only in the cirque test this is enabled with --args='bypass_rendezvous=true'
+    if (isRendezvousBypassed())
+    {
+        ChipLogProgress(AppServer, "Rendezvous and secure pairing skipped");
     }
     else if (DeviceLayer::ConnectivityMgr().IsWiFiStationProvisioned() || DeviceLayer::ConnectivityMgr().IsThreadProvisioned())
     {
