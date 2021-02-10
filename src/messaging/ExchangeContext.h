@@ -127,9 +127,6 @@ public:
      *
      *  @param[in]    payloadHeader A reference to the PayloadHeader object.
      *
-     *  @param[in]    admin         The admin ID that corresponds to the channel on which the
-     *                              message was received
-     *
      *  @param[in]    msgBuf        A handle to the packet buffer holding the CHIP message.
      *
      *  @retval  #CHIP_ERROR_INVALID_ARGUMENT               if an invalid argument was passed to this HandleMessage API.
@@ -137,7 +134,7 @@ public:
      *  @retval  #CHIP_NO_ERROR                             if the CHIP layer successfully delivered the message up to the
      *                                                       protocol layer.
      */
-    CHIP_ERROR HandleMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, Transport::AdminId admin,
+    CHIP_ERROR HandleMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                              System::PacketBufferHandle msgBuf);
 
     ExchangeDelegate * GetDelegate() const { return mDelegate; }
@@ -147,6 +144,8 @@ public:
     ExchangeManager * GetExchangeMgr() const { return mExchangeMgr; }
 
     ReliableMessageContext * GetReliableMessageContext() { return &mReliableMessageContext; };
+
+    Transport::AdminPairingInfo * GetAdminInfo(Transport::AdminPairingTable & table) { return table.FindAdmin(mSecureSession.GetAdminId()); }
 
     SecureSessionHandle GetSecureSession() { return mSecureSession; }
 

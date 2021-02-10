@@ -22,6 +22,7 @@
 
 #include <app/server/DataModelHandler.h>
 
+#include <app/chip-zcl-zpro-codec.h> // For EmberApsFrame
 #if __has_include("gen/endpoint_config.h")
 #define USE_ZAP_CONFIG 1
 #include <app/util/attribute-storage.h>
@@ -65,7 +66,6 @@ void InitDataModelHandler()
 #endif
 }
 
-#ifdef USE_ZAP_CONFIG
 static CHIP_ERROR CheckACL(NodeId nodeId, const EmberApsFrame & frame, const chip::Transport::AccessControlList & ACL)
 {
     // TODO: Lookup the ACL corresponding to the nodeId, and the end point information from the frame,
@@ -73,12 +73,11 @@ static CHIP_ERROR CheckACL(NodeId nodeId, const EmberApsFrame & frame, const chi
 
     return CHIP_NO_ERROR;
 }
-#endif
 
 void HandleDataModelMessage(NodeId nodeId, chip::Transport::AdminPairingInfo * adminInfo, System::PacketBufferHandle buffer)
 {
-#ifdef USE_ZAP_CONFIG
     EmberApsFrame frame;
+#ifdef USE_ZAP_CONFIG
     bool ok = extractApsFrame(buffer->Start(), buffer->DataLength(), &frame) > 0;
     if (ok)
     {
@@ -111,6 +110,12 @@ void HandleDataModelMessage(NodeId nodeId, chip::Transport::AdminPairingInfo * a
     else
     {
         ChipLogDetail(Zcl, "Data model processing failure!");
+    }
+#else
+    if (CHIP_NO_ERROR != CheckACL(nodeId, frame, adminInfo->GetACL()))
+    {
+        ChipLogDetail(Zcl, "ACL check failed for the received APS frame!");
+        return;
     }
 #endif
 }

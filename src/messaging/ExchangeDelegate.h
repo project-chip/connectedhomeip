@@ -24,7 +24,6 @@
 #pragma once
 
 #include <system/SystemPacketBuffer.h>
-#include <transport/AdminPairingTable.h>
 #include <transport/raw/MessageHeader.h>
 
 namespace chip {
@@ -51,11 +50,10 @@ public:
      *  @param[in]    ec            A pointer to the ExchangeContext object.
      *  @param[in]    packetHeader  A reference to the PacketHeader object.
      *  @param[in]    payloadHeader A reference to the PayloadHeader object.
-     *  @param[in]    admin         The admin ID corresponding to the channel on which the message was received.
      *  @param[in]    payload       A handle to the PacketBuffer object holding the message payload.
      */
     virtual void OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                                   Transport::AdminId admin, System::PacketBufferHandle payload) = 0;
+                                   System::PacketBufferHandle payload) = 0;
 
     /**
      * @brief

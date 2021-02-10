@@ -103,7 +103,7 @@ private:
     SecureSessionHandle mSecureSession;
 
     void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                           Transport::AdminId admin, System::PacketBufferHandle payload) override;
+                           System::PacketBufferHandle payload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
 };
 
@@ -145,7 +145,7 @@ private:
     EchoFunct OnEchoRequestReceived           = nullptr;
 
     void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                           Transport::AdminId admin, System::PacketBufferHandle payload) override;
+                           System::PacketBufferHandle payload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override {}
 };
 

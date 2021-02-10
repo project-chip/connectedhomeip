@@ -54,8 +54,7 @@ void EchoServer::Shutdown()
 }
 
 void EchoServer::OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
-                                   const PayloadHeader & payloadHeader, Transport::AdminId admin,
-                                   System::PacketBufferHandle payload)
+                                   const PayloadHeader & payloadHeader, System::PacketBufferHandle payload)
 {
     System::PacketBufferHandle response;
 

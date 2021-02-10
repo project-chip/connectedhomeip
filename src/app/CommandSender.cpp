@@ -62,8 +62,7 @@ exit:
 }
 
 void CommandSender::OnMessageReceived(Messaging::ExchangeContext * apEc, const PacketHeader & aPacketHeader,
-                                      const PayloadHeader & aPayloadHeader, Transport::AdminId admin,
-                                      System::PacketBufferHandle aPayload)
+                                      const PayloadHeader & aPayloadHeader, System::PacketBufferHandle aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     // Assert that the exchange context matches the client's current context.

@@ -176,8 +176,7 @@ exit:
 }
 
 void InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext * apEc, const PacketHeader & aPacketHeader,
-                                               const PayloadHeader & aPayloadHeader, Transport::AdminId admin,
-                                               System::PacketBufferHandle aPayload)
+                                               const PayloadHeader & aPayloadHeader, System::PacketBufferHandle aPayload)
 {
     if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::InvokeCommandRequest))
     {

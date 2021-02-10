@@ -48,18 +48,26 @@ class SecureSessionMgr;
 class SecureSessionHandle
 {
 public:
-    SecureSessionHandle() : mPeerNodeId(kAnyNodeId), mPeerKeyId(0) {}
+    SecureSessionHandle() : mPeerNodeId(kAnyNodeId), mPeerKeyId(0), mAdmin(Transport::kUndefinedAdminId) {}
     SecureSessionHandle(NodeId peerNodeId, uint16_t peerKeyId) : mPeerNodeId(peerNodeId), mPeerKeyId(peerKeyId) {}
+    SecureSessionHandle(NodeId peerNodeId, uint16_t peerKeyId, Transport::AdminId admin) :
+        mPeerNodeId(peerNodeId), mPeerKeyId(peerKeyId), mAdmin(admin)
+    {}
+
+    bool HasAdminId() const { return (mAdmin != Transport::kUndefinedAdminId); }
+    Transport::AdminId GetAdminId() const { return mAdmin; }
+    void SetAdminId(Transport::AdminId adminId) { mAdmin = adminId; }
 
     bool operator==(const SecureSessionHandle & that) const
     {
-        return mPeerNodeId == that.mPeerNodeId && mPeerKeyId == that.mPeerKeyId;
+        return mPeerNodeId == that.mPeerNodeId && mPeerKeyId == that.mPeerKeyId && mAdmin == that.mAdmin;
     }
 
 private:
     friend class SecureSessionMgr;
     NodeId mPeerNodeId;
     uint16_t mPeerKeyId;
+    Transport::AdminId mAdmin;
 };
 
 /**
@@ -127,14 +135,11 @@ public:
      * @param packetHeader  The message header
      * @param payloadHeader The payload header
      * @param session       The handle to the secure session
-     * @param admin         The admin ID that corresponds to the secure channel on which the message
-     *                      was received
      * @param msgBuf        The received message
      * @param mgr           A pointer to the SecureSessionMgr
      */
     virtual void OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                                   SecureSessionHandle session, Transport::AdminId admin, System::PacketBufferHandle msgBuf,
-                                   SecureSessionMgr * mgr)
+                                   SecureSessionHandle session, System::PacketBufferHandle msgBuf, SecureSessionMgr * mgr)
     {}
 
     /**

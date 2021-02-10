@@ -167,7 +167,7 @@ class ServerCallback : public SecureSessionMgrDelegate
 {
 public:
     void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, SecureSessionHandle session,
-                           Transport::AdminId admin, System::PacketBufferHandle buffer, SecureSessionMgr * mgr) override
+                           System::PacketBufferHandle buffer, SecureSessionMgr * mgr) override
     {
         auto state            = mgr->GetPeerConnectionState(session);
         const size_t data_len = buffer->DataLength();
@@ -228,10 +228,10 @@ public:
         }
         else
         {
-            AdminPairingInfo * adminInfo = gAdminPairings.FindAdmin(admin);
+            AdminPairingInfo * adminInfo = gAdminPairings.FindAdmin(session.GetAdminId());
             if (adminInfo == nullptr)
             {
-                ChipLogError(AppServer, "Message received on a channel for an unknown admin %d", admin);
+                ChipLogError(AppServer, "Message received on a channel for an unknown admin %d", session.GetAdminId());
             }
             else
             {

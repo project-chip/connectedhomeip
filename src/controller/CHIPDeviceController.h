@@ -206,7 +206,7 @@ protected:
 private:
     //////////// SecureSessionMgrDelegate Implementation ///////////////
     void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, SecureSessionHandle session,
-                           Transport::AdminId admin, System::PacketBufferHandle msgBuf, SecureSessionMgr * mgr) override;
+                           System::PacketBufferHandle msgBuf, SecureSessionMgr * mgr) override;
 
     void OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr) override;
     void OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * mgr) override;

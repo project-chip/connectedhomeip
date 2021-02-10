@@ -405,8 +405,7 @@ exit:
 }
 
 void DeviceController::OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader,
-                                         SecureSessionHandle session, Transport::AdminId admin, System::PacketBufferHandle msgBuf,
-                                         SecureSessionMgr * mgr)
+                                         SecureSessionHandle session, System::PacketBufferHandle msgBuf, SecureSessionMgr * mgr)
 {
     CHIP_ERROR err                          = CHIP_NO_ERROR;
     uint16_t index                          = 0;
