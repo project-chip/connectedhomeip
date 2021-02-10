@@ -226,12 +226,11 @@ public:
      * @param[in] header        Reference to common packet header of the received message
      * @param[in] payloadHeader Reference to payload header in the message
      * @param[in] session       A handle to the secure session
-     * @param[in] admin         The admin info for the channel on which the message was received
      * @param[in] msgBuf        The message buffer
      * @param[in] mgr           Pointer to secure session manager which received the message
      */
     void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, SecureSessionHandle session,
-                           Transport::AdminPairingInfo * admin, System::PacketBufferHandle msgBuf, SecureSessionMgr * mgr);
+                           System::PacketBufferHandle msgBuf, SecureSessionMgr * mgr);
 
     /**
      * @brief
@@ -373,9 +372,8 @@ public:
      *   Called when a message is received from the device.
      *
      * @param[in] msg Received message buffer.
-     * @param[in] admin Admin info corresponding to the channel on which the message was received.
      */
-    virtual void OnMessage(Transport::AdminPairingInfo * admin, System::PacketBufferHandle msg) = 0;
+    virtual void OnMessage(System::PacketBufferHandle msg) = 0;
 
     /**
      * @brief

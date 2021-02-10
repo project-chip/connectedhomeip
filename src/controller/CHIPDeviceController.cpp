@@ -407,9 +407,8 @@ exit:
 void DeviceController::OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader,
                                          SecureSessionHandle session, System::PacketBufferHandle msgBuf, SecureSessionMgr * mgr)
 {
-    CHIP_ERROR err                          = CHIP_NO_ERROR;
-    uint16_t index                          = 0;
-    Transport::AdminPairingInfo * adminInfo = nullptr;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    uint16_t index = 0;
 
     VerifyOrExit(mState == State::Initialized, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(header.GetSourceNodeId().HasValue(), err = CHIP_ERROR_INVALID_ARGUMENT);
@@ -417,10 +416,7 @@ void DeviceController::OnMessageReceived(const PacketHeader & header, const Payl
     index = FindDeviceIndex(session);
     VerifyOrExit(index < kNumMaxActiveDevices, err = CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR);
 
-    adminInfo = mAdmins.FindAdmin(mAdminId);
-    VerifyOrExit(adminInfo != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
-
-    mActiveDevices[index].OnMessageReceived(header, payloadHeader, session, adminInfo, std::move(msgBuf), mgr);
+    mActiveDevices[index].OnMessageReceived(header, payloadHeader, session, std::move(msgBuf), mgr);
 
 exit:
     if (err != CHIP_NO_ERROR)

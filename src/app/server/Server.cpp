@@ -228,15 +228,7 @@ public:
         }
         else
         {
-            AdminPairingInfo * adminInfo = gAdminPairings.FindAdmin(session.GetAdminId());
-            if (adminInfo == nullptr)
-            {
-                ChipLogError(AppServer, "Message received on a channel for an unknown admin %d", session.GetAdminId());
-            }
-            else
-            {
-                HandleDataModelMessage(header.GetSourceNodeId().Value(), adminInfo, std::move(buffer));
-            }
+            HandleDataModelMessage(header.GetSourceNodeId().Value(), std::move(buffer));
         }
 
     exit:;

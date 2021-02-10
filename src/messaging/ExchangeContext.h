@@ -24,6 +24,7 @@
 #pragma once
 
 #include <lib/core/ReferenceCounted.h>
+#include <messaging/ExchangeACL.h>
 #include <messaging/ExchangeDelegate.h>
 #include <messaging/Flags.h>
 #include <messaging/ReliableMessageContext.h>
@@ -145,9 +146,18 @@ public:
 
     ReliableMessageContext * GetReliableMessageContext() { return &mReliableMessageContext; };
 
-    Transport::AdminPairingInfo * GetAdminInfo(Transport::AdminPairingTable & table)
+    ExchangeACL * GetExchangeACL(Transport::AdminPairingTable & table)
     {
-        return table.FindAdmin(mSecureSession.GetAdminId());
+        if (mExchangeACL == nullptr)
+        {
+            Transport::AdminPairingInfo * admin = table.FindAdmin(mSecureSession.GetAdminId());
+            if (admin != nullptr)
+            {
+                mExchangeACL = chip::Platform::New<CASEExchangeACL>(admin);
+            }
+        }
+
+        return mExchangeACL;
     }
 
     SecureSessionHandle GetSecureSession() { return mSecureSession; }
@@ -180,6 +190,7 @@ private:
     ReliableMessageContext mReliableMessageContext;
     ExchangeDelegate * mDelegate   = nullptr;
     ExchangeManager * mExchangeMgr = nullptr;
+    ExchangeACL * mExchangeACL     = nullptr;
 
     SecureSessionHandle mSecureSession; // The connection state
     uint16_t mExchangeId;               // Assigned exchange ID.

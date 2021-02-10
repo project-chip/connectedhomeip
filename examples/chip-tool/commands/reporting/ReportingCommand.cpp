@@ -62,10 +62,10 @@ exit:
     return err;
 }
 
-void ReportingCommand::OnMessage(chip::Transport::AdminPairingInfo * admin, PacketBufferHandle buffer)
+void ReportingCommand::OnMessage(PacketBufferHandle buffer)
 {
     ChipLogDetail(chipTool, "%" PRIu64 ": Received %zu bytes", mDevice->GetDeviceId(), buffer->DataLength());
-    HandleDataModelMessage(mDevice->GetDeviceId(), admin, std::move(buffer));
+    HandleDataModelMessage(mDevice->GetDeviceId(), std::move(buffer));
 }
 
 void ReportingCommand::OnStatusChange(void)
