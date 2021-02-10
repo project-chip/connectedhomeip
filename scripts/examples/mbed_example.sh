@@ -75,4 +75,5 @@ fi
 echo "Build $APP app for $TARGET_BOARD target with $TOOLCHAIN toolchain and $PROFILE profile"
 set -x
 pwd
-mbed-tools compile -t "$TOOLCHAIN" -m "$TARGET_BOARD" -p "$APP/mbed" --mbed-os-path "$MBED_OS_PATH" -b "$PROFILE"
+ln -sfT "/opt/mbed-os" "${APP}/mbed/mbed-os"
+mbed-tools compile -t "$TOOLCHAIN" -m "$TARGET_BOARD" -p "$APP/mbed" -b "$PROFILE"
