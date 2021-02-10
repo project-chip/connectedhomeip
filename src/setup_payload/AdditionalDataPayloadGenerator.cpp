@@ -53,7 +53,7 @@ CHIP_ERROR AdditionalDataPayloadGenerator::generateAdditionalDataPayload(uint16_
     size_t rotatingDeviceIdBufferSize = 0;
 
     // Initialize TLVWriter
-    writer.Init(chip::System::PacketBufferHandle::New(chip::System::kMaxPacketBufferSize));
+    writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
 
     err = writer.OpenContainer(AnonymousTag, kTLVType_Structure, innerWriter);
     SuccessOrExit(err);
@@ -92,7 +92,7 @@ CHIP_ERROR AdditionalDataPayloadGenerator::generateRotatingDeviceId(uint16_t lif
     BufferWriter outputBufferWriter(&outputBuffer[0], ArraySize(outputBuffer));
     size_t rotatingDeviceIdBufferIndex = 0;
     const PacketBufferHandle & lifetimeCounterBufferHandle =
-        chip::System::PacketBufferHandle::New(chip::System::kMaxPacketBufferSize);
+        chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize);
     uint8_t * lifetimeCounterBuffer = lifetimeCounterBufferHandle->Start();
 
     VerifyOrExit(rotatingDeviceIdBufferSize >= RotatingDeviceId::kRotatingDeviceIdHexMaxLength, err = CHIP_ERROR_BUFFER_TOO_SMALL);
