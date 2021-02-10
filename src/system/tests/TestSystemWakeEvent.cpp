@@ -1,6 +1,5 @@
 /* See Project CHIP LICENSE file for licensing information. */
 
-
 /**
  *    @file
  *      This is a unit test suite for <tt>chip::System::SystemWakeEvent</tt>

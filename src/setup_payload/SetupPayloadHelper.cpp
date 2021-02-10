@@ -1,6 +1,5 @@
 /* See Project CHIP LICENSE file for licensing information. */
 
-
 #include "SetupPayloadHelper.h"
 #include "ManualSetupPayloadGenerator.h"
 #include "QRCodeSetupPayloadGenerator.h"

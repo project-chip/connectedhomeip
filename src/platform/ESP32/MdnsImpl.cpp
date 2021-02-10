@@ -1,6 +1,5 @@
 /* See Project CHIP LICENSE file for licensing information. */
 
-
 #include "lib/mdns/platform/Mdns.h"
 
 #include <esp_err.h>

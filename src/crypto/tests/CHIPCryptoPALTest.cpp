@@ -1,6 +1,5 @@
 /* See Project CHIP LICENSE file for licensing information. */
 
-
 #include "TestCryptoLayer.h"
 
 #include "AES_CCM_128_test_vectors.h"

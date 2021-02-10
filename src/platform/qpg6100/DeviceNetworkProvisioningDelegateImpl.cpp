@@ -1,6 +1,5 @@
 /* See Project CHIP LICENSE file for licensing information. */
 
-
 #include "DeviceNetworkProvisioningDelegateImpl.h"
 
 #if CHIP_ENABLE_OPENTHREAD

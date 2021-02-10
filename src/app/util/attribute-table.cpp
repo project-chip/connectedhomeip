@@ -1,6 +1,5 @@
 /* See Project CHIP LICENSE file for licensing information. */
 
-
 /**
  *
  *    Copyright (c) 2020 Silicon Labs

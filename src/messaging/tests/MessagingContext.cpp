@@ -1,6 +1,5 @@
 /* See Project CHIP LICENSE file for licensing information. */
 
-
 #include <messaging/tests/MessagingContext.h>
 
 #include <support/CodeUtils.h>

@@ -1,6 +1,5 @@
 /* See Project CHIP LICENSE file for licensing information. */
 
-
 /**
  *    @file
  *      This file implements the utility class for the CHIP Message Layer.

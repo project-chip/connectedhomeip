@@ -1,6 +1,5 @@
 /* See Project CHIP LICENSE file for licensing information. */
 
-
 /**
  *    @file
  *      The implementation of the Setup Payload. Currently only needed to

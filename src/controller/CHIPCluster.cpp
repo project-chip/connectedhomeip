@@ -1,6 +1,5 @@
 /* See Project CHIP LICENSE file for licensing information. */
 
-
 /**
  *  @file
  *    This file contains definitions for a base Cluster class. This class will

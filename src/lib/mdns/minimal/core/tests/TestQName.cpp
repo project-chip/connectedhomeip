@@ -1,6 +1,5 @@
 /* See Project CHIP LICENSE file for licensing information. */
 
-
 #include <mdns/minimal/core/QName.h>
 #include <support/UnitTestRegistration.h>
 

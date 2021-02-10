@@ -1,6 +1,5 @@
 /* See Project CHIP LICENSE file for licensing information. */
 
-
 /**
  *    @file
  *      This file contains an implementation of TLVBackingStore using PacketBuffers.

@@ -1,6 +1,5 @@
 /* See Project CHIP LICENSE file for licensing information. */
 
-
 /**
  *    @file
  *      Source implementation for an input / output stream abstraction.

@@ -1,6 +1,5 @@
 /* See Project CHIP LICENSE file for licensing information. */
 
-
 #include <assert.h>
 #include <dbus/dbus.h>
 #include <memory>

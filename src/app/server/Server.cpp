@@ -1,6 +1,5 @@
 /* See Project CHIP LICENSE file for licensing information. */
 
-
 #include <app/server/Server.h>
 
 #include <app/InteractionModelEngine.h>

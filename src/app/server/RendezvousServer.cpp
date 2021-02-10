@@ -1,6 +1,5 @@
 /* See Project CHIP LICENSE file for licensing information. */
 
-
 #include <app/server/RendezvousServer.h>
 
 #include <app/server/SessionManager.h>

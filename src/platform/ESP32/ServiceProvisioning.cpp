@@ -1,6 +1,5 @@
 /* See Project CHIP LICENSE file for licensing information. */
 
-
 #include <platform/CHIPDeviceLayer.h>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>

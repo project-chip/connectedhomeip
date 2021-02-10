@@ -1,6 +1,5 @@
 /* See Project CHIP LICENSE file for licensing information. */
 
-
 /**
  * @file
  *   This file provides an implementation of functions for sending messages.

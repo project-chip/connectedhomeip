@@ -1,6 +1,5 @@
 /* See Project CHIP LICENSE file for licensing information. */
 
-
 #include <support/CHIPMem.h>
 #include <support/CHIPMemString.h>
 #include <support/SerializableIntegerSet.h>

@@ -1,6 +1,5 @@
 /* See Project CHIP LICENSE file for licensing information. */
 
-
 #include <transport/TransportMgrBase.h>
 
 #include <support/CodeUtils.h>

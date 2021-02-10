@@ -1,6 +1,5 @@
 /* See Project CHIP LICENSE file for licensing information. */
 
-
 #include <stdlib.h>
 #include <string.h>
 #include <support/UnitTestRegistration.h>

@@ -1,6 +1,5 @@
 /* See Project CHIP LICENSE file for licensing information. */
 
-
 /**
  *    @file
  *      Implementation of JNI bridge for CHIP Device Controller for Android apps

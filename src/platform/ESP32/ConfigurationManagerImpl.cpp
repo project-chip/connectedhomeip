@@ -1,6 +1,5 @@
 /* See Project CHIP LICENSE file for licensing information. */
 
-
 /**
  *    @file
  *          Provides the implementation of the Device Layer ConfigurationManager object

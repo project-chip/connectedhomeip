@@ -1,6 +1,5 @@
 /* See Project CHIP LICENSE file for licensing information. */
 
-
 /**
  * @file
  *    This file contains implementations for the CallbacksMgr class. The object of this

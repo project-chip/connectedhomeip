@@ -1,6 +1,5 @@
 /* See Project CHIP LICENSE file for licensing information. */
 
-
 /**
  *  @file
  *    This file contains implementation of Device class. The objects of this

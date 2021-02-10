@@ -1,6 +1,5 @@
 /* See Project CHIP LICENSE file for licensing information. */
 
-
 #include <nlunit-test.h>
 
 #include <support/CHIPCounter.h>

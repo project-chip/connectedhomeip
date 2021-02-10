@@ -1,6 +1,5 @@
 /* See Project CHIP LICENSE file for licensing information. */
 
-
 /****************************************************************************
  * @file
  * @brief Implementation for the Binding Server Cluster

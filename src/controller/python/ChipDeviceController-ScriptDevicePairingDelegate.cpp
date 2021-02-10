@@ -1,6 +1,5 @@
 /* See Project CHIP LICENSE file for licensing information. */
 
-
 #include "ChipDeviceController-ScriptDevicePairingDelegate.h"
 
 #include <transport/RendezvousSessionDelegate.h>

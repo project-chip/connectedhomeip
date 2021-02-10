@@ -1,6 +1,5 @@
 /* See Project CHIP LICENSE file for licensing information. */
 
-
 #include "TestCHIPoBLEStackMgr.h"
 #include <stdlib.h>
 

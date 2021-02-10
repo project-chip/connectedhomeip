@@ -1,6 +1,5 @@
 /* See Project CHIP LICENSE file for licensing information. */
 
-
 #include "ResponseSender.h"
 
 #include "QueryReplyFilter.h"

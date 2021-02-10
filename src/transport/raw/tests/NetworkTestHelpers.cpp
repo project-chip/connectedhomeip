@@ -1,6 +1,5 @@
 /* See Project CHIP LICENSE file for licensing information. */
 
-
 #include "NetworkTestHelpers.h"
 
 #include <inet/tests/TestInetCommon.h>

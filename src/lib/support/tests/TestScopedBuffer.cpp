@@ -1,6 +1,5 @@
 /* See Project CHIP LICENSE file for licensing information. */
 
-
 #include <support/ScopedBuffer.h>
 #include <support/UnitTestRegistration.h>
 

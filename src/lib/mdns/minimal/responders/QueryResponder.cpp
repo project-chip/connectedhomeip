@@ -1,6 +1,5 @@
 /* See Project CHIP LICENSE file for licensing information. */
 
-
 #include "QueryResponder.h"
 
 #include <mdns/minimal/records/Ptr.h>

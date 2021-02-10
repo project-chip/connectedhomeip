@@ -1,6 +1,5 @@
 /* See Project CHIP LICENSE file for licensing information. */
 
-
 #include "MdnsImpl.h"
 
 #include <algorithm>

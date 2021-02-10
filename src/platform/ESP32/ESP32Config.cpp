@@ -1,6 +1,5 @@
 /* See Project CHIP LICENSE file for licensing information. */
 
-
 /**
  *    @file
  *          Utilities for interacting with the the ESP32 "NVS" key-value store.
