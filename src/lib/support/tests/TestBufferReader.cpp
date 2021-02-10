@@ -109,25 +109,12 @@ static void TestBufferReader_Skip(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
 }
 
-static void TestBufferReader_Reset(nlTestSuite * inSuite, void * inContext)
-{
-    TestReader reader;
-    uint8_t temp;
-
-    CHIP_ERROR err = reader.Read8(&temp).Read8(&temp).Reset().Read8(&temp).StatusCode();
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, reader.OctetsRead() == 1);
-    NL_TEST_ASSERT(inSuite, reader.Remaining() == sizeof(test_buffer) - 1);
-    NL_TEST_ASSERT(inSuite, temp == test_buffer[0]);
-}
-
 #define NL_TEST_DEF_FN(fn) NL_TEST_DEF("Test " #fn, fn)
 /**
  *   Test Suite. It lists all the test functions.
  */
 static const nlTest sTests[] = { NL_TEST_DEF_FN(TestBufferReader_Basic), NL_TEST_DEF_FN(TestBufferReader_Saturation),
-                                 NL_TEST_DEF_FN(TestBufferReader_Skip), NL_TEST_DEF_FN(TestBufferReader_Reset),
-                                 NL_TEST_SENTINEL() };
+                                 NL_TEST_DEF_FN(TestBufferReader_Skip), NL_TEST_SENTINEL() };
 
 int TestBufferReader(void)
 {
