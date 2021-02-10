@@ -56,28 +56,19 @@ CHIP_ERROR Encode(NodeId localNodeId, Transport::PeerConnectionState * state, Pa
     static_assert(std::is_same<decltype(msgBuf->TotalLength()), uint16_t>::value,
                   "Addition to generate payloadLength might overflow");
 
-    uint16_t headerSize = payloadHeader.EncodeSizeBytes();
-
-    // Make sure it's big enough to add two 16-bit ints without overflowing.
-    uint32_t payloadLength = static_cast<uint32_t>(headerSize + msgBuf->TotalLength());
-    VerifyOrReturnError(CanCastTo<uint16_t>(payloadLength), CHIP_ERROR_NO_MEMORY);
-
     packetHeader
         .SetSourceNodeId(localNodeId)                 //
         .SetDestinationNodeId(state->GetPeerNodeId()) //
         .SetMessageId(msgId)                          //
-        .SetEncryptionKeyID(state->GetLocalKeyID())   //
-        .SetPayloadLength(static_cast<uint16_t>(payloadLength));
+        .SetEncryptionKeyID(state->GetLocalKeyID());
     packetHeader.GetFlags().Set(Header::FlagValues::kSecure);
 
-    VerifyOrReturnError(msgBuf->EnsureReservedSize(headerSize), CHIP_ERROR_NO_MEMORY);
+    ReturnErrorOnFailure(payloadHeader.EncodeBeforeData(msgBuf));
 
-    msgBuf->SetStart(msgBuf->Start() - headerSize);
+    packetHeader.SetPayloadLength(msgBuf->DataLength());
+
     uint8_t * data    = msgBuf->Start();
     uint16_t totalLen = msgBuf->TotalLength();
-
-    uint16_t actualEncodedHeaderSize;
-    ReturnErrorOnFailure(payloadHeader.Encode(data, totalLen, &actualEncodedHeaderSize));
 
     MessageAuthenticationCode mac;
     ReturnErrorOnFailure(state->GetSecureSession().Encrypt(data, totalLen, data, packetHeader, mac));
@@ -125,12 +116,7 @@ CHIP_ERROR Decode(Transport::PeerConnectionState * state, PayloadHeader & payloa
     uint8_t * plainText = msg->Start();
     ReturnErrorOnFailure(state->GetSecureSession().Decrypt(data, len, plainText, packetHeader, mac));
 
-    uint16_t decodedSize = 0;
-    ReturnErrorOnFailure(payloadHeader.Decode(plainText, len, &decodedSize));
-    uint16_t headerSize = payloadHeader.EncodeSizeBytes();
-    VerifyOrReturnError(headerSize == decodedSize, CHIP_ERROR_INVALID_MESSAGE_LENGTH);
-
-    msg->ConsumeHead(headerSize);
+    ReturnErrorOnFailure(payloadHeader.DecodeAndConsume(msg));
     return CHIP_NO_ERROR;
 }
 

@@ -51,8 +51,6 @@ static ASN1_ERROR ParseChipIdAttribute(ASN1Reader & reader, uint64_t & chipIdOut
     ASN1_ERROR err        = ASN1_NO_ERROR;
     const uint8_t * value = nullptr;
 
-    static constexpr uint32_t kChipIdUTF8Length = 16;
-
     VerifyOrExit(reader.GetValueLen() == kChipIdUTF8Length, err = ASN1_ERROR_INVALID_ENCODING);
 
     value = reader.GetValue();
@@ -204,38 +202,6 @@ exit:
     return err;
 }
 
-static CHIP_ERROR ConvertAuthorityKeyIdentifierExtension(ASN1Reader & reader, TLVWriter & writer)
-{
-    CHIP_ERROR err;
-
-    // AuthorityKeyIdentifier ::= SEQUENCE
-    ASN1_PARSE_ENTER_SEQUENCE
-    {
-        err = reader.Next();
-
-        // keyIdentifier [0] IMPLICIT KeyIdentifier OPTIONAL,
-        // KeyIdentifier ::= OCTET STRING
-        if (err == ASN1_NO_ERROR && reader.GetClass() == kASN1TagClass_ContextSpecific && reader.GetTag() == 0)
-        {
-            VerifyOrExit(reader.IsConstructed() == false, err = ASN1_ERROR_INVALID_ENCODING);
-
-            err = writer.PutBytes(ContextTag(kTag_AuthorityKeyIdentifier_KeyIdentifier), reader.GetValue(), reader.GetValueLen());
-            SuccessOrExit(err);
-
-            err = reader.Next();
-        }
-
-        if (err != ASN1_END)
-        {
-            SuccessOrExit(err);
-        }
-    }
-    ASN1_EXIT_SEQUENCE;
-
-exit:
-    return err;
-}
-
 static CHIP_ERROR ConvertSubjectPublicKeyInfo(ASN1Reader & reader, TLVWriter & writer)
 {
     CHIP_ERROR err;
@@ -308,7 +274,7 @@ exit:
 static CHIP_ERROR ConvertExtension(ASN1Reader & reader, TLVWriter & writer)
 {
     CHIP_ERROR err;
-    TLVType outerContainer, outerContainer2;
+    TLVType outerContainer;
     OID extensionOID;
     bool critical = false;
 
@@ -318,14 +284,8 @@ static CHIP_ERROR ConvertExtension(ASN1Reader & reader, TLVWriter & writer)
         // extnID OBJECT IDENTIFIER,
         ASN1_PARSE_OBJECT_ID(extensionOID);
 
-        if (extensionOID == kOID_Unknown)
-        {
-            ExitNow(err = ASN1_ERROR_UNSUPPORTED_ENCODING);
-        }
-        if (GetOIDCategory(extensionOID) != kOIDCategory_Extension)
-        {
-            ExitNow(err = ASN1_ERROR_INVALID_ENCODING);
-        }
+        VerifyOrExit(extensionOID != kOID_Unknown, err = ASN1_ERROR_UNSUPPORTED_ENCODING);
+        VerifyOrExit(GetOIDCategory(extensionOID) == kOIDCategory_Extension, err = ASN1_ERROR_INVALID_ENCODING);
 
         // critical BOOLEAN DEFAULT FALSE,
         ASN1_PARSE_ANY;
@@ -333,10 +293,7 @@ static CHIP_ERROR ConvertExtension(ASN1Reader & reader, TLVWriter & writer)
         {
             ASN1_GET_BOOLEAN(critical);
 
-            if (!critical)
-            {
-                ExitNow(err = ASN1_ERROR_INVALID_ENCODING);
-            }
+            VerifyOrExit(critical, err = ASN1_ERROR_INVALID_ENCODING);
 
             ASN1_PARSE_ANY;
         }
@@ -349,48 +306,52 @@ static CHIP_ERROR ConvertExtension(ASN1Reader & reader, TLVWriter & writer)
         {
             if (extensionOID == kOID_Extension_AuthorityKeyIdentifier)
             {
-                err = writer.StartContainer(ContextTag(kTag_AuthorityKeyIdentifier), kTLVType_Structure, outerContainer);
-                SuccessOrExit(err);
+                // This extension MUST be marked as non-critical.
+                VerifyOrExit(!critical, err = ASN1_ERROR_INVALID_ENCODING);
 
-                if (critical)
+                // AuthorityKeyIdentifier ::= SEQUENCE
+                ASN1_PARSE_ENTER_SEQUENCE
                 {
-                    err = writer.PutBoolean(ContextTag(kTag_AuthorityKeyIdentifier_Critical), critical);
-                    SuccessOrExit(err);
-                }
+                    err = reader.Next();
+                    VerifyOrExit(err == ASN1_NO_ERROR, err = ASN1_ERROR_INVALID_ENCODING);
 
-                err = ConvertAuthorityKeyIdentifierExtension(reader, writer);
-                SuccessOrExit(err);
+                    // keyIdentifier [0] IMPLICIT KeyIdentifier,
+                    // KeyIdentifier ::= OCTET STRING
+                    VerifyOrExit(reader.GetClass() == kASN1TagClass_ContextSpecific && reader.GetTag() == 0,
+                                 err = ASN1_ERROR_INVALID_ENCODING);
+
+                    VerifyOrExit(reader.IsConstructed() == false, err = ASN1_ERROR_INVALID_ENCODING);
+                    VerifyOrExit(reader.GetValueLen() == kKeyIdentifierLength, err = ASN1_ERROR_INVALID_ENCODING);
+
+                    err = writer.PutBytes(ContextTag(kTag_AuthorityKeyIdentifier), reader.GetValue(), reader.GetValueLen());
+                    SuccessOrExit(err);
+
+                    err = reader.Next();
+                    VerifyOrExit(err == ASN1_END, err = ASN1_ERROR_INVALID_ENCODING);
+                }
+                ASN1_EXIT_SEQUENCE;
             }
             else if (extensionOID == kOID_Extension_SubjectKeyIdentifier)
             {
+                // This extension MUST be marked as non-critical.
+                VerifyOrExit(!critical, err = ASN1_ERROR_INVALID_ENCODING);
+
                 // SubjectKeyIdentifier ::= KeyIdentifier
+                // KeyIdentifier ::= OCTET STRING
                 ASN1_PARSE_ELEMENT(kASN1TagClass_Universal, kASN1UniversalTag_OctetString);
 
-                err = writer.StartContainer(ContextTag(kTag_SubjectKeyIdentifier), kTLVType_Structure, outerContainer);
-                SuccessOrExit(err);
+                VerifyOrExit(reader.GetValueLen() == kKeyIdentifierLength, err = ASN1_ERROR_INVALID_ENCODING);
 
-                if (critical)
-                {
-                    err = writer.PutBoolean(ContextTag(kTag_SubjectKeyIdentifier_Critical), critical);
-                    SuccessOrExit(err);
-                }
-
-                err = writer.PutBytes(ContextTag(kTag_SubjectKeyIdentifier_KeyIdentifier), reader.GetValue(), reader.GetValueLen());
+                err = writer.PutBytes(ContextTag(kTag_SubjectKeyIdentifier), reader.GetValue(), reader.GetValueLen());
                 SuccessOrExit(err);
             }
             else if (extensionOID == kOID_Extension_KeyUsage)
             {
+                // This extension MUST be marked as critical.
+                VerifyOrExit(critical, err = ASN1_ERROR_INVALID_ENCODING);
+
                 // KeyUsage ::= BIT STRING
                 ASN1_PARSE_ELEMENT(kASN1TagClass_Universal, kASN1UniversalTag_BitString);
-
-                err = writer.StartContainer(ContextTag(kTag_KeyUsage), kTLVType_Structure, outerContainer);
-                SuccessOrExit(err);
-
-                if (critical)
-                {
-                    err = writer.PutBoolean(ContextTag(kTag_KeyUsage_Critical), critical);
-                    SuccessOrExit(err);
-                }
 
                 uint32_t keyUsageBits;
                 err = reader.GetBitString(keyUsageBits);
@@ -406,11 +367,14 @@ static CHIP_ERROR ConvertExtension(ASN1Reader & reader, TLVWriter & writer)
                                  KeyUsageFlags::kCRLSign, KeyUsageFlags::kEncipherOnly, KeyUsageFlags::kEncipherOnly),
                              err = ASN1_ERROR_INVALID_ENCODING);
 
-                err = writer.Put(ContextTag(kTag_KeyUsage_KeyUsage), keyUsageBits);
+                err = writer.Put(ContextTag(kTag_KeyUsage), keyUsageBits);
                 SuccessOrExit(err);
             }
             else if (extensionOID == kOID_Extension_BasicConstraints)
             {
+                // This extension MUST be marked as critical.
+                VerifyOrExit(critical, err = ASN1_ERROR_INVALID_ENCODING);
+
                 // BasicConstraints ::= SEQUENCE
                 ASN1_PARSE_ENTER_SEQUENCE
                 {
@@ -424,7 +388,7 @@ static CHIP_ERROR ConvertExtension(ASN1Reader & reader, TLVWriter & writer)
                     {
                         ASN1_GET_BOOLEAN(isCA);
 
-                        VerifyOrExit(isCA == true, err = ASN1_ERROR_INVALID_ENCODING);
+                        VerifyOrExit(isCA, err = ASN1_ERROR_INVALID_ENCODING);
 
                         err = reader.Next();
                     }
@@ -437,22 +401,17 @@ static CHIP_ERROR ConvertExtension(ASN1Reader & reader, TLVWriter & writer)
 
                         VerifyOrExit(pathLenConstraint <= UINT8_MAX, err = ASN1_ERROR_INVALID_ENCODING);
                         VerifyOrExit(pathLenConstraint >= 0, err = ASN1_ERROR_INVALID_ENCODING);
+
+                        // pathLenConstraint is present only when cA is TRUE
+                        VerifyOrExit(isCA, err = ASN1_ERROR_INVALID_ENCODING);
                     }
 
                     err = writer.StartContainer(ContextTag(kTag_BasicConstraints), kTLVType_Structure, outerContainer);
                     SuccessOrExit(err);
 
-                    if (critical)
-                    {
-                        err = writer.PutBoolean(ContextTag(kTag_BasicConstraints_Critical), critical);
-                        SuccessOrExit(err);
-                    }
-
-                    if (isCA)
-                    {
-                        err = writer.PutBoolean(ContextTag(kTag_BasicConstraints_IsCA), isCA);
-                        SuccessOrExit(err);
-                    }
+                    // Set also when cA is FALSE
+                    err = writer.PutBoolean(ContextTag(kTag_BasicConstraints_IsCA), isCA);
+                    SuccessOrExit(err);
 
                     if (pathLenConstraint != -1)
                     {
@@ -460,21 +419,18 @@ static CHIP_ERROR ConvertExtension(ASN1Reader & reader, TLVWriter & writer)
                                          static_cast<uint8_t>(pathLenConstraint));
                         SuccessOrExit(err);
                     }
+
+                    err = writer.EndContainer(outerContainer);
+                    SuccessOrExit(err);
                 }
                 ASN1_EXIT_SEQUENCE;
             }
             else if (extensionOID == kOID_Extension_ExtendedKeyUsage)
             {
-                err = writer.StartContainer(ContextTag(kTag_ExtendedKeyUsage), kTLVType_Structure, outerContainer);
-                SuccessOrExit(err);
+                // This extension MUST be marked as critical.
+                VerifyOrExit(critical, err = ASN1_ERROR_INVALID_ENCODING);
 
-                if (critical)
-                {
-                    err = writer.PutBoolean(ContextTag(kTag_ExtendedKeyUsage_Critical), critical);
-                    SuccessOrExit(err);
-                }
-
-                err = writer.StartContainer(ContextTag(kTag_ExtendedKeyUsage_KeyPurposes), kTLVType_Array, outerContainer2);
+                err = writer.StartContainer(ContextTag(kTag_ExtendedKeyUsage), kTLVType_Array, outerContainer);
                 SuccessOrExit(err);
 
                 // ExtKeyUsageSyntax ::= SEQUENCE SIZE (1..MAX) OF KeyPurposeId
@@ -499,14 +455,13 @@ static CHIP_ERROR ConvertExtension(ASN1Reader & reader, TLVWriter & writer)
                 }
                 ASN1_EXIT_SEQUENCE;
 
-                err = writer.EndContainer(outerContainer2);
+                err = writer.EndContainer(outerContainer);
                 SuccessOrExit(err);
             }
             else
+            {
                 ExitNow(err = ASN1_ERROR_UNSUPPORTED_ENCODING);
-
-            err = writer.EndContainer(outerContainer);
-            SuccessOrExit(err);
+            }
         }
         ASN1_EXIT_ENCAPSULATED;
     }

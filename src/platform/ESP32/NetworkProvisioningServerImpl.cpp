@@ -271,7 +271,7 @@ void NetworkProvisioningServerImpl::HandleScanDone()
 
         // Allocate a packet buffer to hold the encoded scan results.
         PacketBufferHandle respBuf =
-            System::PacketBufferHandle::New(kMaxPacketBufferSize - 1, CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE + 1);
+            System::PacketBufferHandle::New(PacketBuffer::kMaxSize - 1, System::PacketBuffer::kDefaultHeaderReserve + 1);
         VerifyOrExit(!respBuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
         // Encode the list of scan results into the response buffer.  If the encoded size of all

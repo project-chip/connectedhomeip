@@ -9,6 +9,7 @@
 #include <core/CHIPTLV.h>
 #include <protocols/common/Constants.h>
 #include <support/BufferReader.h>
+#include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/ReturnMacros.h>
 #include <support/UnitTestRegistration.h>
@@ -749,13 +750,27 @@ static const nlTest sTests[] =
 };
 // clang-format on
 
+int TestBdxTransferSession_Setup(void * inContext)
+{
+    CHIP_ERROR error = chip::Platform::MemoryInit();
+    if (error != CHIP_NO_ERROR)
+        return FAILURE;
+    return SUCCESS;
+}
+
+int TestBdxTransferSession_Teardown(void * inContext)
+{
+    chip::Platform::MemoryShutdown();
+    return SUCCESS;
+}
+
 // clang-format off
 static nlTestSuite sSuite =
 {
     "Test-CHIP-TransferSession",
     &sTests[0],
-    nullptr,
-    nullptr
+    TestBdxTransferSession_Setup,
+    TestBdxTransferSession_Teardown
 };
 // clang-format on
 

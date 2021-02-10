@@ -39,6 +39,9 @@
 namespace chip {
 namespace Credentials {
 
+const uint32_t kKeyIdentifierLength = 20;
+const uint32_t kChipIdUTF8Length    = 16;
+
 /** Data Element Tags for the CHIP Certificate
  */
 enum
@@ -61,43 +64,21 @@ enum
     // ---- Tags identifying certificate extensions (tag numbers 128 - 255) ----
     kCertificateExtensionTagsStart = 128,
     kTag_BasicConstraints          = 128, /**< [ structure ] Identifies whether the subject of the certificate is a CA. */
-    kTag_KeyUsage                  = 129, /**< [ structure ] Purpose of the key contained in the certificate. */
-    kTag_ExtendedKeyUsage          = 130, /**< [ structure ] Purposes for which the certified public key may be used. */
-    kTag_SubjectKeyIdentifier      = 131, /**< [ structure ] Information about the certificate's public key. */
-    kTag_AuthorityKeyIdentifier    = 132, /**< [ structure ] Information about the public key used to sign the certificate. */
-    kCertificateExtensionTagsEnd   = 255,
+    kTag_KeyUsage                  = 129, /**< [ unsigned int ] Bits identifying key usage, per RFC5280. */
+    kTag_ExtendedKeyUsage          = 130, /**< [ array ] Array of enumerated values giving the purposes for which
+                                             the public key can be used, per RFC5280. */
+    kTag_SubjectKeyIdentifier    = 131,   /**< [ byte string ] Identifier of the certificate's public key. */
+    kTag_AuthorityKeyIdentifier  = 132,   /**< [ byte string ] Identifier of the public key used to sign the certificate. */
+    kCertificateExtensionTagsEnd = 255,
 
     // ---- Context-specific Tags for ECDSASignature Structure ----
     kTag_ECDSASignature_r = 1, /**< [ byte string ] ECDSA r value, in ASN.1 integer encoding. */
     kTag_ECDSASignature_s = 2, /**< [ byte string ] ECDSA s value, in ASN.1 integer encoding. */
 
-    // ---- Context-specific Tags for AuthorityKeyIdentifier Structure ----
-    kTag_AuthorityKeyIdentifier_Critical = 1,      /**< [ boolean ] True if the AuthorityKeyIdentifier extension is critical.
-                                                      Otherwise absent. */
-    kTag_AuthorityKeyIdentifier_KeyIdentifier = 2, /**< [ byte string ] Unique identifier of the issuer's public key,
-                                                      per RFC5280. */
-
-    // ---- Context-specific Tags for SubjectKeyIdentifier Structure ----
-    kTag_SubjectKeyIdentifier_Critical = 1,      /**< [ boolean ] True if the SubjectKeyIdentifier extension is critical.
-                                                    Otherwise absent. */
-    kTag_SubjectKeyIdentifier_KeyIdentifier = 2, /**< [ byte string ] Unique identifier for certificate's public key,
-                                                    per RFC5280. */
-
-    // ---- Context-specific Tags for KeyUsage Structure ----
-    kTag_KeyUsage_Critical = 1, /**< [ boolean ] True if the KeyUsage extension is critical. Otherwise absent. */
-    kTag_KeyUsage_KeyUsage = 2, /**< [ unsigned int ] Integer containing key usage bits, per to RFC5280. */
-
     // ---- Context-specific Tags for BasicConstraints Structure ----
-    kTag_BasicConstraints_Critical = 1,          /**< [ boolean ] True if the BasicConstraints extension is critical.
-                                                    Otherwise absent. */
-    kTag_BasicConstraints_IsCA = 2,              /**< [ boolean ] True if the certificate can be used to verify certificate
+    kTag_BasicConstraints_IsCA = 1,              /**< [ boolean ] True if the certificate can be used to verify certificate
                                                     signatures. */
-    kTag_BasicConstraints_PathLenConstraint = 3, /**< [ unsigned int ] Maximum number of subordinate intermediate certificates. */
-
-    // ---- Context-specific Tags for ExtendedKeyUsage Structure ----
-    kTag_ExtendedKeyUsage_Critical    = 1, /**< [ boolean ] True if the ExtendedKeyUsage extension is critical. Otherwise absent. */
-    kTag_ExtendedKeyUsage_KeyPurposes = 2, /**< [ array ] Array of enumerated values giving the purposes for which the public key
-                                              can be used. */
+    kTag_BasicConstraints_PathLenConstraint = 2, /**< [ unsigned int ] Maximum number of subordinate intermediate certificates. */
 };
 
 /** Identifies the purpose or application of certificate
@@ -161,10 +142,10 @@ enum class KeyUsageFlags : uint16_t
 enum class CertFlags : uint16_t
 {
     kExtPresent_BasicConstraints = 0x0001, /**< Basic constraints extension is present in the certificate. */
-    kExtPresent_KeyUsage         = 0x0002, /**< Key usage extention is present in the certificate. */
-    kExtPresent_ExtendedKeyUsage = 0x0004, /**< Extended key usage extention is present in the certificate. */
-    kExtPresent_SubjectKeyId     = 0x0008, /**< Subject key identifier extention is present in the certificate. */
-    kExtPresent_AuthKeyId        = 0x0010, /**< Authority key identifier extention is present in the certificate. */
+    kExtPresent_KeyUsage         = 0x0002, /**< Key usage extension is present in the certificate. */
+    kExtPresent_ExtendedKeyUsage = 0x0004, /**< Extended key usage extension is present in the certificate. */
+    kExtPresent_SubjectKeyId     = 0x0008, /**< Subject key identifier extension is present in the certificate. */
+    kExtPresent_AuthKeyId        = 0x0010, /**< Authority key identifier extension is present in the certificate. */
     kPathLenConstraintPresent    = 0x0020, /**< Path length constraint is present in the certificate. */
     kIsCA                        = 0x0040, /**< Indicates that certificate is a CA certificate. */
     kIsTrustAnchor               = 0x0080, /**< Indicates that certificate is a trust anchor. */

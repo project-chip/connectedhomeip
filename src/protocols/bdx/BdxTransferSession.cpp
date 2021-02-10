@@ -25,7 +25,7 @@ constexpr size_t kStatusReportMinSize = 2 + 4 + 2; ///< 16 bits for GeneralCode,
 CHIP_ERROR WriteToPacketBuffer(const ::chip::bdx::BdxMessage & msgStruct, ::chip::System::PacketBufferHandle & msgBuf)
 {
     size_t msgDataSize = msgStruct.MessageSize();
-    ::chip::System::PacketBufferWriter bbuf(msgDataSize);
+    ::chip::Encoding::LittleEndian::PacketBufferWriter bbuf(msgDataSize);
     if (bbuf.IsNull())
     {
         return CHIP_ERROR_NO_MEMORY;
@@ -42,20 +42,12 @@ CHIP_ERROR WriteToPacketBuffer(const ::chip::bdx::BdxMessage & msgStruct, ::chip
 
 CHIP_ERROR AttachHeader(uint16_t protocolId, uint8_t msgType, ::chip::System::PacketBufferHandle & msgBuf)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     ::chip::PayloadHeader payloadHeader;
 
     payloadHeader.SetMessageType(protocolId, msgType);
 
-    uint16_t headerSize              = payloadHeader.EncodeSizeBytes();
-    uint16_t actualEncodedHeaderSize = 0;
-
-    VerifyOrExit(msgBuf->EnsureReservedSize(headerSize), err = CHIP_ERROR_NO_MEMORY);
-
-    msgBuf->SetStart(msgBuf->Start() - headerSize);
-    err = payloadHeader.Encode(msgBuf->Start(), headerSize, &actualEncodedHeaderSize);
+    CHIP_ERROR err = payloadHeader.EncodeBeforeData(msgBuf);
     SuccessOrExit(err);
-    VerifyOrExit(headerSize == actualEncodedHeaderSize, err = CHIP_ERROR_INTERNAL);
 
 exit:
     return err;
@@ -415,16 +407,13 @@ void TransferSession::Reset()
 
 CHIP_ERROR TransferSession::HandleMessageReceived(System::PacketBufferHandle msg, uint64_t curTimeMs)
 {
-    CHIP_ERROR err      = CHIP_NO_ERROR;
-    uint16_t headerSize = 0;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     PayloadHeader payloadHeader;
 
     VerifyOrExit(!msg.IsNull(), err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    err = payloadHeader.Decode(msg->Start(), msg->DataLength(), &headerSize);
+    err = payloadHeader.DecodeAndConsume(msg);
     SuccessOrExit(err);
-
-    msg->ConsumeHead(headerSize);
 
     if (payloadHeader.GetProtocolID() == Protocols::kProtocol_BDX)
     {
@@ -851,7 +840,7 @@ void TransferSession::PrepareStatusReport(StatusCode code)
 {
     mStatusReportData.StatusCode = code;
 
-    System::PacketBufferWriter bbuf(kStatusReportMinSize);
+    Encoding::LittleEndian::PacketBufferWriter bbuf(kStatusReportMinSize);
     VerifyOrReturn(!bbuf.IsNull());
 
     bbuf.Put16(static_cast<uint16_t>(Protocols::Common::StatusCode::Failure));
