@@ -4,7 +4,7 @@ PR
 | Name                                                  | Company             |
 | ----------------------------------------------------- | ------------------- |
 | [anush-apple](https://github.com/anush-apple)         | Apple, Inc.         |
-| [BroderickCarlin](https://github.com/BroderickCarlin) | Samsung SmartThings |
+| [msandstedt](https://github.com/msandstedt)           | Samsung SmartThings |
 | [chrisdecenzo](https://github.com/chrisdecenzo)       | Amazon, Inc.        |
 | [hawk248](https://github.com/hawk248)                 | Comcast, Inc.       |
 | [jelderton](https://github.com/jelderton)             | Comcast, Inc.       |
