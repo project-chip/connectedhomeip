@@ -52,8 +52,6 @@ static LEDWidget sLockLED;
 
 static bool sIsThreadProvisioned     = false;
 static bool sIsThreadEnabled         = false;
-static bool sIsThreadAttached        = false;
-static bool sIsPairedToAccount       = false;
 static bool sHaveBLEConnections      = false;
 static bool sHaveServiceConnectivity = false;
 
@@ -176,16 +174,10 @@ void AppTask::AppTaskMain(void * pvParameter)
         {
             sIsThreadProvisioned     = ConnectivityMgr().IsThreadProvisioned();
             sIsThreadEnabled         = ConnectivityMgr().IsThreadEnabled();
-            sIsThreadAttached        = ConnectivityMgr().IsThreadAttached();
             sHaveBLEConnections      = (ConnectivityMgr().NumBLEConnections() != 0);
-            sIsPairedToAccount       = ConfigurationMgr().IsPairedToAccount();
             sHaveServiceConnectivity = ConnectivityMgr().HaveServiceConnectivity();
             PlatformMgr().UnlockChipStack();
         }
-
-        // Consider the system to be "fully connected" if it has service
-        // connectivity and it is able to interact with the service on a regular basis.
-        bool isFullyConnected = sHaveServiceConnectivity;
 
         // Update the status LED if factory reset has not been initiated.
         //
@@ -201,11 +193,11 @@ void AppTask::AppTaskMain(void * pvParameter)
         // Otherwise, blink the LED ON for a very short time.
         if (sAppTask.mFunction != kFunction_FactoryReset)
         {
-            if (isFullyConnected)
+            if (sHaveServiceConnectivity)
             {
                 sStatusLED.Set(true);
             }
-            else if (sIsThreadProvisioned && sIsThreadEnabled && sIsPairedToAccount && (!sIsThreadAttached || !isFullyConnected))
+            else if (sIsThreadProvisioned && sIsThreadEnabled)
             {
                 sStatusLED.Blink(950, 50);
             }

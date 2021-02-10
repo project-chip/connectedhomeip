@@ -70,7 +70,7 @@
 #include <system/TLVPacketBufferBackingStore.h>
 
 using namespace ::nl;
-using namespace chip::SetupPayload;
+using namespace chip::SetupPayloadData;
 using namespace chip::Protocols;
 
 namespace chip {
@@ -1279,7 +1279,7 @@ static void UpdateAdditionalDataCharacteristic(BluezGattCharacteristic1 * charac
     TLVWriter innerWriter;
     chip::System::PacketBufferHandle bufferHandle;
 
-    writer.Init(chip::System::PacketBufferHandle::New(chip::System::kMaxPacketBufferSize));
+    writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
 
     err = writer.OpenContainer(AnonymousTag, kTLVType_Structure, innerWriter);
     SuccessOrExit(err);

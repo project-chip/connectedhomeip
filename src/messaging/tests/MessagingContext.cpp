@@ -48,6 +48,7 @@ CHIP_ERROR MessagingContext::Init(nlTestSuite * suite, TransportMgrBase * transp
 // Shutdown all layers, finalize operations
 CHIP_ERROR MessagingContext::Shutdown()
 {
+    mExchangeManager.Shutdown();
     return IOContext::Shutdown();
 }
 

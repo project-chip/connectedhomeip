@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2020-2021 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -38,6 +38,12 @@ declare_args() {
 
   # Memory management style: malloc, simple, platform.
   chip_config_memory_management = "malloc"
+
+  # Memory management debug option: enable additional checks.
+  chip_config_memory_debug_checks = false
+
+  # Memory management debug option: use dmalloc
+  chip_config_memory_debug_dmalloc = false
 }
 
 if (chip_target_style == "") {

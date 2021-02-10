@@ -35,7 +35,7 @@ import logging
 from threading import Lock, Event
 from ctypes import *
 from .ChipUtility import ChipUtility
-from .ChipExceptions import *
+from .exceptions import *
 
 __all__ = [
     "DeviceStatusStruct",

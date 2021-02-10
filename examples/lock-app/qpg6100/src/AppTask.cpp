@@ -56,8 +56,6 @@ static QueueHandle_t sAppEventQueue;
 
 static bool sIsThreadProvisioned     = false;
 static bool sIsThreadEnabled         = false;
-static bool sIsThreadAttached        = false;
-static bool sIsPairedToAccount       = false;
 static bool sHaveBLEConnections      = false;
 static bool sHaveServiceConnectivity = false;
 
@@ -145,7 +143,6 @@ void AppTask::AppTaskMain(void * pvParameter)
         {
             sIsThreadProvisioned     = ConnectivityMgr().IsThreadProvisioned();
             sIsThreadEnabled         = ConnectivityMgr().IsThreadEnabled();
-            sIsThreadAttached        = ConnectivityMgr().IsThreadAttached();
             sHaveBLEConnections      = (ConnectivityMgr().NumBLEConnections() != 0);
             sHaveServiceConnectivity = ConnectivityMgr().HaveServiceConnectivity();
             PlatformMgr().UnlockChipStack();
@@ -171,8 +168,7 @@ void AppTask::AppTaskMain(void * pvParameter)
             {
                 qvCHIP_LedSet(SYSTEM_STATE_LED, true);
             }
-            else if (sIsThreadProvisioned && sIsThreadEnabled && sIsPairedToAccount &&
-                     (!sIsThreadAttached || !sHaveServiceConnectivity))
+            else if (sIsThreadProvisioned && sIsThreadEnabled)
             {
                 qvCHIP_LedBlink(SYSTEM_STATE_LED, 950, 50);
             }
