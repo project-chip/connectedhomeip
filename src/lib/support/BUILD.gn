@@ -100,8 +100,8 @@ static_library("support") {
   cflags = [ "-Wconversion" ]
 
   public_deps = [
-    ":logging_constants",
     ":chip_version_header",
+    ":logging_constants",
     "${chip_root}/src/lib/core:chip_config_header",
     "${chip_root}/src/platform/logging:vlog",
     "${nlassert_root}:nlassert",
