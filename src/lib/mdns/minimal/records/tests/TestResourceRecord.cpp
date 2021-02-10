@@ -1,6 +1,5 @@
 /* See Project CHIP LICENSE file for licensing information. */
 
-
 #include <mdns/minimal/records/ResourceRecord.h>
 #include <support/UnitTestRegistration.h>
 

@@ -1,6 +1,5 @@
 /* See Project CHIP LICENSE file for licensing information. */
 
-
 #include <ble/BleConfig.h>
 
 #if CONFIG_NETWORK_LAYER_BLE

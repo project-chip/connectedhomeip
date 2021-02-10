@@ -1,6 +1,5 @@
 /* See Project CHIP LICENSE file for licensing information. */
 
-
 #include "setup_payload_commands.h"
 
 #include <setup_payload/SetupPayloadHelper.h>

@@ -1,6 +1,5 @@
 /* See Project CHIP LICENSE file for licensing information. */
 
-
 /****************************************************************************
  * @file
  * @brief Routines for the Identify Client plugin, the

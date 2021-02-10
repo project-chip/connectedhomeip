@@ -1,6 +1,5 @@
 /* See Project CHIP LICENSE file for licensing information. */
 
-
 /**
  *    @file
  *      This file implements an encoder for the CHIP TLV (Tag-Length-Value) encoding format.

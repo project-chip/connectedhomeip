@@ -1,6 +1,5 @@
 /* See Project CHIP LICENSE file for licensing information. */
 
-
 #include "TapAddrAutoconf.h"
 
 #include <ifaddrs.h>

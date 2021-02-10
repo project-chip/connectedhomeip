@@ -1,6 +1,5 @@
 /* See Project CHIP LICENSE file for licensing information. */
 
-
 #include "RecordData.h"
 
 #include <inet/arpa-inet-compatibility.h>

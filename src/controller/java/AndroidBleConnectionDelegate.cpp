@@ -1,6 +1,5 @@
 /* See Project CHIP LICENSE file for licensing information. */
 
-
 #include <ble/BleLayer.h>
 #include <controller/java/AndroidBleConnectionDelegate.h>
 

@@ -1,6 +1,5 @@
 /* See Project CHIP LICENSE file for licensing information. */
 
-
 #include <core/CHIPEncoding.h>
 #include <core/CHIPSafeCasts.h>
 #include <platform/internal/DeviceNetworkInfo.h>

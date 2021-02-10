@@ -1,6 +1,5 @@
 /* See Project CHIP LICENSE file for licensing information. */
 
-
 #include "TestShell.h"
 
 #include <shell/shell.h>

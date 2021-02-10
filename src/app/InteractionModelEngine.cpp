@@ -1,6 +1,5 @@
 /* See Project CHIP LICENSE file for licensing information. */
 
-
 /**
  *    @file
  *      This file defines objects for a CHIP Interaction Data model Engine which handle unsolicitied IM message, and

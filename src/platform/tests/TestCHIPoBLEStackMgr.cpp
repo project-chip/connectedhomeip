@@ -1,6 +1,5 @@
 /* See Project CHIP LICENSE file for licensing information. */
 
-
 #include "platform/internal/CHIPDeviceLayerInternal.h"
 #include <assert.h>
 #include <memory>

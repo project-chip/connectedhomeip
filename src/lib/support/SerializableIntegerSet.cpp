@@ -1,6 +1,5 @@
 /* See Project CHIP LICENSE file for licensing information. */
 
-
 #include "SerializableIntegerSet.h"
 
 #include <core/CHIPEncoding.h>

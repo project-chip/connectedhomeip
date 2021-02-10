@@ -1,6 +1,5 @@
 /* See Project CHIP LICENSE file for licensing information. */
 
-
 // bool emberAfProcessMessage(EmberApsFrame *apsFrame,
 //                            EmberIncomingMessageType type,
 //                            uint8_t *message,

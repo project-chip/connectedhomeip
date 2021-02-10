@@ -1,6 +1,5 @@
 /* See Project CHIP LICENSE file for licensing information. */
 
-
 #include <support/ErrorStr.h>
 #include <support/logging/CHIPLogging.h>
 

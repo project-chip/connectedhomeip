@@ -1,6 +1,5 @@
 /* See Project CHIP LICENSE file for licensing information. */
 
-
 #include "Discovery_ImplPlatform.h"
 
 #include <inttypes.h>

@@ -1,6 +1,5 @@
 /* See Project CHIP LICENSE file for licensing information. */
 
-
 #include <app/server/QRCodeUtil.h>
 
 #include <inttypes.h>

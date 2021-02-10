@@ -1,6 +1,5 @@
 /* See Project CHIP LICENSE file for licensing information. */
 
-
 /*
  *  Copyright (c) 2016-2019, The OpenThread Authors.
  *  All rights reserved.

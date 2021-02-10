@@ -1,6 +1,5 @@
 /* See Project CHIP LICENSE file for licensing information. */
 
-
 #include <array>
 #include <limits.h>
 #include <string.h>

@@ -1,6 +1,5 @@
 /* See Project CHIP LICENSE file for licensing information. */
 
-
 #include "ResourceRecord.h"
 
 namespace mdns {

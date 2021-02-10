@@ -1,6 +1,5 @@
 /* See Project CHIP LICENSE file for licensing information. */
 
-
 #include "esp_event.h"
 #include "esp_heap_caps_init.h"
 #include "esp_log.h"

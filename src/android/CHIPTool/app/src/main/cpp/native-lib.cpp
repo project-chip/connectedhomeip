@@ -1,6 +1,5 @@
 /* See Project CHIP LICENSE file for licensing information. */
 
-
 // TODO: Build this out with native code to perform tasks with CHIP stack
 // QRCode parsing
 // Echo request/response processing

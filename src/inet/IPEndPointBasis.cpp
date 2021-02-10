@@ -1,6 +1,5 @@
 /* See Project CHIP LICENSE file for licensing information. */
 
-
 /**
  *    @file
  *      This header file implements the <tt>Inet::IPEndPointBasis</tt>
