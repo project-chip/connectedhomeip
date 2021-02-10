@@ -23,16 +23,41 @@ COMPONENT_DEPENDS := chip
 
 COMPONENT_SRCDIRS :=                                                                \
   .                                                                                 \
+  ../../../common/pigweed															\
 
-COMPONENT_ADD_INCLUDEDIRS += ../third_party/connectedhomeip/third_party/pigweed/repo/pw_sys_io/public       \
-                ../third_party/connectedhomeip/third_party/pigweed/repo/pw_span/public_overrides            \
-                ../third_party/connectedhomeip/third_party/pigweed/repo/pw_span/public                      \
-                ../third_party/connectedhomeip/third_party/pigweed/repo/pw_polyfill/public                  \
-                ../third_party/connectedhomeip/third_party/pigweed/repo/pw_polyfill/standard_library_public \
-                ../third_party/connectedhomeip/third_party/pigweed/repo/pw_polyfill/public_overrides        \
-                ../third_party/connectedhomeip/third_party/pigweed/repo/pw_status/public                    \
-                ../third_party/connectedhomeip/third_party/pigweed/repo/pw_preprocessor/public              \
-                ../third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/system_server/public         \
-                ../third_party/connectedhomeip/examples/platform/esp32/pw_sys_io/public                     \
+COMPONENT_ADD_INCLUDEDIRS += ../third_party/connectedhomeip/third_party/pigweed/repo/pw_sys_io/public 				\
+							../third_party/connectedhomeip/third_party/pigweed/repo/pw_assert/public    			\
+							../third_party/connectedhomeip/third_party/pigweed/repo/pw_assert_log/public            \
+							../third_party/connectedhomeip/third_party/pigweed/repo/pw_assert_log/public_overrides  \
+							../third_party/connectedhomeip/third_party/pigweed/repo/pw_bytes/public    			    \
+							../third_party/connectedhomeip/third_party/pigweed/repo/pw_checksum/public    			\
+							../third_party/connectedhomeip/third_party/pigweed/repo/pw_containers/public    		\
+							../third_party/connectedhomeip/third_party/pigweed/repo/pw_hdlc/public    				\
+							../third_party/connectedhomeip/third_party/pigweed/repo/pw_log/public    			    \
+							../third_party/connectedhomeip/third_party/pigweed/repo/pw_log_basic/public    			\
+							../third_party/connectedhomeip/third_party/pigweed/repo/pw_log_basic/public_overrides   \
+							../third_party/connectedhomeip/third_party/pigweed/repo/pw_span/public_overrides 		\
+							../third_party/connectedhomeip/third_party/pigweed/repo/pw_span/public 					\
+							../third_party/connectedhomeip/third_party/pigweed/repo/pw_polyfill/public 				\
+							../third_party/connectedhomeip/third_party/pigweed/repo/pw_polyfill/standard_library_public \
+							../third_party/connectedhomeip/third_party/pigweed/repo/pw_polyfill/public_overrides 	\
+							../third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/public 					\
+							../third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/nanopb/public 			\
+							../third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/raw/public 				\
+							../third_party/connectedhomeip/third_party/pigweed/repo/pw_protobuf/public 				\
+							../third_party/connectedhomeip/third_party/pigweed/repo/pw_status/public 				\
+							../third_party/connectedhomeip/third_party/pigweed/repo/pw_stream/public 				\
+							../third_party/connectedhomeip/third_party/pigweed/repo/pw_result/public 				\
+							../third_party/connectedhomeip/third_party/pigweed/repo/pw_varint/public 				\
+							../third_party/connectedhomeip/third_party/pigweed/repo/pw_preprocessor/public 			\
+							../third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/system_server/public 	\
+							../third_party/connectedhomeip/third_party/nanopb/repo                                  \
+							../../../platform/esp32/pw_sys_io/public 				\
+							../../../common/pigweed									\
+							../build/chip/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/protos \
+							../../../../src/lib/support    \
 
+COMPONENT_EXTRA_INCLUDES := ${IDF_PATH}/components/freertos/include/freertos/      \
+
+# So "gen/*" files are found by the src/app bits.
 COMPONENT_PRIV_INCLUDEDIRS := .
