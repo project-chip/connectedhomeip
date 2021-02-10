@@ -38,7 +38,7 @@
 
 #include <logging/LogV.h>
 
-#include "Constants.h"
+#include <support/logging/Constants.h>
 
 #include <stdarg.h>
 #include <stdint.h>

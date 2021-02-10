@@ -36,6 +36,10 @@ action("gen_chip_version") {
   ]
 }
 
+source_set("logging_constants") {
+  sources = [ "logging/Constants.h" ]
+}
+
 source_set("chip_version_header") {
   sources = get_target_outputs(":gen_chip_version")
 
@@ -96,8 +100,10 @@ static_library("support") {
   cflags = [ "-Wconversion" ]
 
   public_deps = [
+    ":logging_constants",
     ":chip_version_header",
     "${chip_root}/src/lib/core:chip_config_header",
+    "${chip_root}/src/platform/logging:vlog",
     "${nlassert_root}:nlassert",
     "${nlio_root}:nlio",
   ]
@@ -118,7 +124,6 @@ static_library("support") {
   public_configs = [
     "${chip_root}/src:includes",
     "${chip_root}/src/lib:includes",
-    "${chip_root}/src/platform/logging:includes",
     "${chip_root}/src/system:system_config",
   ]
 

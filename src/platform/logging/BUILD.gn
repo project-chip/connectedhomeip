@@ -7,7 +7,16 @@ import("//build_overrides/pigweed.gni")
 import("${chip_root}/src/platform/device.gni")
 
 config("includes") {
-  include_dirs = [ "include" ]
+  include_dirs = [
+    "include",
+  ]
+}
+
+source_set("vlog") {
+  public = [
+    "include/logging/LogV.h",
+  ]
+  public_configs = [":includes"]
 }
 
 if (chip_enable_openthread) {
@@ -35,11 +44,11 @@ foreach(platform, simple_log_platforms) {
       sources = [ "impl/" + platform + "/Logging.cpp" ]
 
       deps = [
+        ":vlog",
         "${chip_root}/src/lib/core:chip_config_header",
+        "${chip_root}/src/lib/support:logging_constants",
         "${chip_root}/src/platform:platform_buildconfig",
       ]
-
-      public_configs = [ ":includes" ]
 
       if (chip_enable_openthread) {
         defines = [ "CHIP_ENABLE_OPENTHREAD=1" ]
@@ -62,7 +71,9 @@ if (current_os == "android") {
   static_library("android") {
     sources = [ "impl/android/Logging.cpp" ]
     deps = [
+      ":vlog",
       "${chip_root}/src/lib/core:chip_config_header",
+      "${chip_root}/src/lib/support:logging_constants",
       "${chip_root}/src/platform:platform_buildconfig",
     ]
 
@@ -76,9 +87,9 @@ static_library("stdio") {
   sources = [ "impl/stdio/Logging.cpp" ]
 
   deps = [
+    ":vlog",
     "${chip_root}/src/lib/core:chip_config_header",
+    "${chip_root}/src/lib/support:logging_constants",
     "${chip_root}/src/platform:platform_buildconfig",
   ]
-
-  public_configs = [ ":includes" ]
 }
