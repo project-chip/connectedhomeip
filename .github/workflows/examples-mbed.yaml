@@ -20,17 +20,31 @@ on:
 
 jobs:
     mbedos:
-        name: Mbed OS
-
+        strategy:
+            fail-fast: False
+            max-parallel: 1
+            matrix:
+                EXAMPLE_TARGET: [DISCO_L475VG_IOT01A, NRF52840_DK]
+        
+        name: ${{matrix.EXAMPLE_TARGET}}
+        
         env:
             BUILD_TYPE: mbedos
+            EXAMPLE_NAME: shell
+            EXAMPLE_PROFILE: release
 
         runs-on: ubuntu-latest
 
         container:
-            image: pan2048/chip-build-mbed-os:0.5.0
+            image: pan2048/chip-build-mbed-os:latest
+            env:
+                image_name: ${{ secrets.DOCKERHUB_USERNAME }}/test
+            credentials:
+                username: ${{ secrets.DOCKERHUB_USERNAME }}
+                password: ${{ secrets.DOCKERHUB_TOKEN }}
             volumes:
                 - "/tmp/output_binaries:/tmp/output_binaries"
+            
 
         steps:
             - name: Checkout
@@ -39,18 +53,16 @@ jobs:
               with:
                   fetch-depth: 0
                   submodules: true
-#             - name: Initialize CodeQL
-#               uses: github/codeql-action/init@v1
-#               with:
-#                   languages: "cpp, python"
-#                   queries: +security-and-quality
+
             - name: Build example Shell App
-              run: scripts/examples/mbed_example.sh
+              run: scripts/examples/mbed_example.sh -a=$EXAMPLE_NAME -b=${{matrix.EXAMPLE_TARGET}} -p=$EXAMPLE_PROFILE
+
             - name: Copy aside build products
               run: |
                   mkdir -p example_binaries/$BUILD_TYPE-build
-                  cp examples/shell/mbed/cmake_build/chip-mbed-shell-example.hex \
-                     example_binaries/$BUILD_TYPE-build/chip-mbed-shell-example.hex
+                  cp examples/$EXAMPLE_NAME/mbed/build-${{matrix.EXAMPLE_TARGET}}/chip-mbed-$EXAMPLE_NAME-example.hex \
+                     example_binaries/$BUILD_TYPE-build/${{matrix.EXAMPLE_TARGET}}.hex
+
             - name: Binary artifact suffix
               id: outsuffix
               uses: haya14busa/action-cond@v1.0.0
@@ -58,20 +70,15 @@ jobs:
                   cond: ${{ github.event.pull_request.number == '' }}
                   if_true: "${{ github.sha }}"
                   if_false: "pull-${{ github.event.pull_request.number }}"
+
             - name: Copy aside binaries
               run: |
                   cp -r example_binaries/$BUILD_TYPE-build /tmp/output_binaries/
+
             - name: Uploading Binaries
               uses: actions/upload-artifact@v1
               with:
                   name:
-                      ${{ env.BUILD_TYPE }}-example-build-${{
+                      ${{ env.BUILD_TYPE }}-${{ env.EXAMPLE_NAME }}-example-${{matrix.EXAMPLE_TARGET}}-build-${{
                       steps.outsuffix.outputs.value }}
-                  path: /tmp/output_binaries/${{ env.BUILD_TYPE }}-build
-            # - name: Remove third_party binaries for CodeQL Analysis
-            #   run: find . -type d -name "third_party" -exec rm -rf {} +
-            # - name: Remove m5stack-tft binaries for CodeQL Analysis
-            #   run: find . -type d -name "m5stack-tft" -exec rm -rf {} +
-#             - name: Perform CodeQL Analysis
-#               if: ${{ github.event_name == 'push' }}
-#               uses: github/codeql-action/analyze@v1
+                  path: /tmp/output_binaries/${{ env.BUILD_TYPE }}-build/${{matrix.EXAMPLE_TARGET}}.hex
