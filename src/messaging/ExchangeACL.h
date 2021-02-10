@@ -43,6 +43,18 @@ private:
 };
 
 /**
+ * @brief Defines a class that encapsulates ACL subject information (e.g. NodeId for CASE session).
+ *        The class can be extended to add parameters to the ACL Subject.
+ */
+class DLL_EXPORT ACLSubject
+{
+public:
+    virtual ~ACLSubject() {}
+
+private:
+};
+
+/**
  * @brief Defines the common interface for PASE/CASE/GroupID based ACL permissions check.
  */
 class DLL_EXPORT ExchangeACL
@@ -64,12 +76,24 @@ public:
      *   Check access permissions for the message received from subject (sender) that
      *   are trying to access the target (e.g. cluster and endpoint).
      *
-     * @param subject    Typically the source Node id in the message
+     * @param subject    The subject of the access check (e.g. source node ID)
      * @param target     The target of the message (i.e. cluster and endpoint)
      *
      * @return Permissions granted by the configured ACLs
      */
-    virtual PermissionLevel GetPermissionLevel(NodeId subject, const ACLTarget & target) = 0;
+    virtual PermissionLevel GetPermissionLevel(const ACLSubject & subject, const ACLTarget & target) = 0;
+};
+
+class DLL_EXPORT CASEACLSubject
+{
+public:
+    CASEACLSubject(NodeId id) : mNodeId(id) {}
+    virtual ~CASEACLSubject() {}
+
+    NodeId GetNodeId() { return mNodeId; }
+
+private:
+    NodeId mNodeId;
 };
 
 /**
@@ -82,7 +106,7 @@ public:
     CASEExchangeACL(Transport::AdminPairingInfo * info) : mAdminInfo(info) {}
     virtual ~CASEExchangeACL() {}
 
-    PermissionLevel GetPermissionLevel(NodeId subject, const ACLTarget & target) override
+    PermissionLevel GetPermissionLevel(const ACLSubject & subject, const ACLTarget & target) override
     {
         // TODO: Lookup the ACL corresponding to the subject, and the target,
         //       and enforce it.
