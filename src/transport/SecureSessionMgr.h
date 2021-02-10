@@ -103,9 +103,7 @@ public:
      * unit tests only.   The CHIP_ENABLE_TEST_ENCRYPTED_BUFFER_API define
      * should not be defined normally.
      */
-    CHIP_ERROR ExtractPacketHeader(PacketHeader & aPacketHeader) {
-        return aPacketHeader.DecodeAndConsume(*this);
-    }
+    CHIP_ERROR ExtractPacketHeader(PacketHeader & aPacketHeader) { return aPacketHeader.DecodeAndConsume(*this); }
 
     /**
      * Inserts a new (unencrypted) packet header in the encrypted packet buffer
@@ -113,9 +111,7 @@ public:
      * unit tests only.   The CHIP_ENABLE_TEST_ENCRYPTED_BUFFER_API define
      * should not be defined normally.
      */
-    CHIP_ERROR InsertPacketHeader(const PacketHeader& aPacketHeader) {
-        return aPacketHeader.EncodeBeforeData(*this);
-    }
+    CHIP_ERROR InsertPacketHeader(const PacketHeader & aPacketHeader) { return aPacketHeader.EncodeBeforeData(*this); }
 #endif // CHIP_ENABLE_TEST_ENCRYPTED_BUFFER_API
 
 private:

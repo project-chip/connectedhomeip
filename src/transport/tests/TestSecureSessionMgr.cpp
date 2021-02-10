@@ -21,8 +21,8 @@
  *      This file implements unit tests for the SecureSessionMgr implementation.
  */
 
-#define CHIP_ENABLE_TEST_ENCRYPTED_BUFFER_API  // Up here in case some other header
-                                               // includes SecureSessionMgr.h indirectly
+#define CHIP_ENABLE_TEST_ENCRYPTED_BUFFER_API // Up here in case some other header
+                                              // includes SecureSessionMgr.h indirectly
 
 #include <core/CHIPCore.h>
 #include <protocols/Protocols.h>
@@ -363,8 +363,7 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
 
     // Change Source Node ID
     EncryptedPacketBufferHandle badSrcNodeIdMsg = msgBuf.CloneData();
-    NL_TEST_ASSERT(inSuite,
-                   badSrcNodeIdMsg.ExtractPacketHeader(packetHeader) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, badSrcNodeIdMsg.ExtractPacketHeader(packetHeader) == CHIP_NO_ERROR);
 
     packetHeader.SetSourceNodeId(kDestinationNodeId);
     NL_TEST_ASSERT(inSuite, badSrcNodeIdMsg.InsertPacketHeader(packetHeader) == CHIP_NO_ERROR);
@@ -378,8 +377,7 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
 
     // Change Message ID
     EncryptedPacketBufferHandle badMessageIdMsg = msgBuf.CloneData();
-    NL_TEST_ASSERT(inSuite,
-                   badMessageIdMsg.ExtractPacketHeader(packetHeader) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, badMessageIdMsg.ExtractPacketHeader(packetHeader) == CHIP_NO_ERROR);
 
     uint32_t msgID = packetHeader.GetMessageId();
     packetHeader.SetMessageId(msgID + 1);
