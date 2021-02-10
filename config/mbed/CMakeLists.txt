@@ -96,7 +96,7 @@ endmacro()
 # ==============================================================================
 # Prepare CHIP configuration based on the project configuration
 # ==============================================================================
-
+# Read configuration file and parse it content to create cmake variable
 file(STRINGS ${CMAKE_CURRENT_BINARY_DIR}/config ConfigContents)
 foreach(NameAndValue ${ConfigContents})
   # Strip leading spaces

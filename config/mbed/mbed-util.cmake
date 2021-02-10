@@ -19,6 +19,14 @@
 #     CMake utilities for managing and retrieving mbed build configuration
 #
 
+# Get compilation flags for specific lang
+# The flags might contains compile language generator expressions that
+# look like this:
+# $<$<COMPILE_LANGUAGE:CXX>:-fno-exceptions>
+# Applying a regex to extract the flag and also to find out if the language matches.
+# [Args]:
+#   input - list of flags to parse
+#   output - list of flags set to specific language
 function(get_flags_for_lang lang input output)
   set(tmp_list "")
 
@@ -47,17 +55,26 @@ function(get_flags_for_lang lang input output)
   set(${output} ${tmp_list} PARENT_SCOPE)
 endfunction()
 
-
-function(mbed_get_include_directories i)
+# Get include directory of mbed build
+# Get mbed-core property of includes directories
+# For each flag add -I prefix and put it in quotation marks
+# [Args]:
+#   output - output variable name
+function(mbed_get_include_directories output)
   get_property(flags TARGET mbed-core PROPERTY INTERFACE_INCLUDE_DIRECTORIES)
   list(APPEND CFLAG_LIST)
   foreach(flag ${flags})
     list(APPEND CFLAG_LIST "\"-I${flag}\"")
   endforeach()
-  set(${i} ${CFLAG_LIST} PARENT_SCOPE)
+  set(${output} ${CFLAG_LIST} PARENT_SCOPE)
 endfunction()
 
-function(mbed_get_compile_definitions i)
+# Get compile definitions of mbed build
+# Get mbed-core property of compile definitions
+# For each flag change format, add -D prefix and put it in quotation marks
+# [Args]:
+#   output - output variable name
+function(mbed_get_compile_definitions output)
   get_property(flags TARGET mbed-core PROPERTY INTERFACE_COMPILE_DEFINITIONS)
 
   #Temporary workaround for mbedtls - remove after switch to mbed source for mbedtls
@@ -69,9 +86,14 @@ function(mbed_get_compile_definitions i)
     string(REPLACE "\""  "\\\\\""  output_flag ${flag})
     list(APPEND CFLAG_LIST "\"-D${output_flag}\"")
   endforeach()
-  set(${i} ${CFLAG_LIST} PARENT_SCOPE)
+  set(${output} ${CFLAG_LIST} PARENT_SCOPE)
 endfunction()
 
+# Get compile options of mbed build for specific language
+# Get mbed-core property of compile options
+# [Args]:
+#   lang - compilation languge (C, C++ or ASM) 
+#   output - output variable name
 function(mbed_get_compile_options_for_lang lang i)
   get_property(flags TARGET mbed-core PROPERTY INTERFACE_COMPILE_OPTIONS)
   get_flags_for_lang(${lang} flags output_list)
@@ -79,20 +101,29 @@ function(mbed_get_compile_options_for_lang lang i)
 endfunction()
 
 
-# Retrieve mbed common compiler flags
+# Retrieve mbed common compilation flags
+# [Args]:
+#   VAR - flags variable name
 function(mbed_get_common_compile_flags VAR)
   mbed_get_include_directories(INCLUDES)
   mbed_get_compile_definitions(DEFINES)
   set(${VAR} ${INCLUDES} ${DEFINES} ${${VAR}} PARENT_SCOPE)
 endfunction()
 
-# Retrieve mbed compiler flags for the given language (C or CXX)
+# Retrieve mbed compiler flags for the specific language (C or CXX)
+# [Args]:
+#   VAR - flags variable name
+#   LANG - compilation languge (C, C++ or ASM) 
 function(mbed_get_lang_compile_flags VAR LANG)
   mbed_get_compile_options_for_lang(${LANG} FLAGS)
   set(${VAR} ${FLAGS} ${${VAR}} PARENT_SCOPE)
 endfunction()
 
-
+# Convert list of flags to string format
+# [Args]:
+#   ptr_list_of_flags - list fo flags
+#   string_of_flags - output string
+#   separator - flags separator
 function(convert_list_of_flags_to_string_of_flags ptr_list_of_flags string_of_flags separator)
   # Convert the list to a string so we can do string replace
   # operations on it and replace the ";" list separators with a
