@@ -72,11 +72,11 @@ pw_python_action("python") {
         "chip/ChipCluster.py",
         "chip/ChipCoreBluetoothMgr.py",
         "chip/ChipDeviceCtrl.py",
-        "chip/ChipExceptions.py",
         "chip/ChipStack.py",
         "chip/ChipTLV.py",
         "chip/ChipUtility.py",
         "chip/__init__.py",
+        "chip/exceptions/__init__.py",
         "chip/ble/__init__.py",
       ]
     },
