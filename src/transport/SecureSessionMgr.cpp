@@ -334,7 +334,7 @@ exit:
 void SecureSessionMgr::HandleConnectionExpired(const Transport::PeerConnectionState & state)
 {
     char addr[Transport::PeerAddress::kMaxToStringSize];
-    state.GetPeerAddress().ToString(addr, sizeof(addr));
+    state.GetPeerAddress().ToString(addr);
 
     ChipLogDetail(Inet, "Connection from '%s' expired", addr);
 

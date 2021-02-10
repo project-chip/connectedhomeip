@@ -179,7 +179,7 @@ public:
 
         VerifyOrExit(state->GetPeerNodeId() != kUndefinedNodeId, ChipLogProgress(AppServer, "Unknown source for received message"));
 
-        state->GetPeerAddress().ToString(src_addr, sizeof(src_addr));
+        state->GetPeerAddress().ToString(src_addr);
 
         ChipLogProgress(AppServer, "Packet received from %s: %zu bytes", src_addr, static_cast<size_t>(data_len));
 

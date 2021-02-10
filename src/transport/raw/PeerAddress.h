@@ -120,6 +120,12 @@ public:
         + 5 /* 16 bit interger */              //
         + 1 /* NullTerminator */;
 
+    template <size_t N>
+    inline void ToString(char (&buf)[N]) const
+    {
+        ToString(buf, N);
+    }
+
     void ToString(char * buf, size_t bufSize) const
     {
         char ip_addr[kInetMaxAddrLen];
