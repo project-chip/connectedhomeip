@@ -62,6 +62,9 @@ void LogV(uint8_t module, uint8_t category, const char * msg, va_list v)
         char formattedMsg[CHIP_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE];
         size_t prefixLen;
 
+        constexpr size_t maxPrefixLen = chip::Logging::kMaxModuleNameLen + 3 + 3;
+        static_assert(sizeof(formattedMsg) > maxPrefixLen);
+
         prefixLen = 0;
 
         // No build-time switches in Qorvo logging module.
@@ -125,9 +128,6 @@ extern "C" void LwIPLog(const char * msg, ...)
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-// Implementation taken from openthread repo - examples\platforms\qpg6095
-#include "uart_qorvo.h"
-
 extern "C" void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const char * aFormat, ...)
 {
     char formattedMsg[CHIP_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE];
@@ -141,5 +141,4 @@ extern "C" void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const ch
     // Let the application know that a log message has been emitted.
     DeviceLayer::OnLogOutput();
 }
-
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
