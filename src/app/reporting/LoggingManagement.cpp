@@ -798,7 +798,7 @@ CHIP_ERROR LoggingManagement::CopyEvent(const TLVReader & aReader, TLVWriter & a
     err = aWriter.StartContainer(AnonymousTag, kTLVType_Structure, containerType);
     SuccessOrExit(err);
 
-    ChipLogDetail(EventLogging, "yunhan debug %s", apContext->mFirst ? "is first": "not first");
+    ChipLogDetail(EventLogging, "yunhan debug %s", apContext->mFirst ? "is first" : "not first");
     err = chip::TLV::Utilities::Iterate(reader, CopyAndAdjustDeltaTime, &context, recurse);
     VerifyOrExit(err == CHIP_NO_ERROR || err == CHIP_END_OF_TLV, );
 
