@@ -4,7 +4,7 @@
 
 import ctypes
 from .ChipStack import *
-from .ChipExceptions import *
+from .exceptions import *
 
 '''
 TODO(#4511): This file only sends cluster commands, should add more functions.

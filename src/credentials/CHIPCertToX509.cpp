@@ -310,34 +310,31 @@ exit:
 static CHIP_ERROR DecodeConvertAuthorityKeyIdentifierExtension(TLVReader & reader, ASN1Writer & writer,
                                                                ChipCertificateData & certData)
 {
-    CHIP_ERROR err, nextRes;
+    CHIP_ERROR err;
     uint32_t len;
 
     certData.mCertFlags.Set(CertFlags::kExtPresent_AuthKeyId);
 
+    // AuthorityKeyIdentifier extension MUST be marked as non-critical (default).
+
     // AuthorityKeyIdentifier ::= SEQUENCE
     ASN1_START_SEQUENCE
     {
-        // keyIdentifier [0] IMPLICIT KeyIdentifier OPTIONAL,
+        // keyIdentifier [0] IMPLICIT KeyIdentifier
         // KeyIdentifier ::= OCTET STRING
-        if (reader.GetTag() == ContextTag(kTag_AuthorityKeyIdentifier_KeyIdentifier))
-        {
-            VerifyOrExit(reader.GetType() == kTLVType_ByteString, err = CHIP_ERROR_WRONG_TLV_TYPE);
+        VerifyOrExit(reader.GetType() == kTLVType_ByteString, err = CHIP_ERROR_WRONG_TLV_TYPE);
+        VerifyOrExit(reader.GetTag() == ContextTag(kTag_AuthorityKeyIdentifier), err = CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
 
-            err = reader.GetDataPtr(certData.mAuthKeyId.mId);
-            SuccessOrExit(err);
+        err = reader.GetDataPtr(certData.mAuthKeyId.mId);
+        SuccessOrExit(err);
 
-            len = reader.GetLength();
-            VerifyOrExit(len <= UINT8_MAX, err = CHIP_ERROR_UNSUPPORTED_CERT_FORMAT);
+        len = reader.GetLength();
+        VerifyOrExit(len == kKeyIdentifierLength, err = CHIP_ERROR_UNSUPPORTED_CERT_FORMAT);
 
-            certData.mAuthKeyId.mLen = static_cast<uint8_t>(len);
+        certData.mAuthKeyId.mLen = static_cast<uint8_t>(len);
 
-            err = writer.PutOctetString(kASN1TagClass_ContextSpecific, 0, certData.mAuthKeyId.mId, certData.mAuthKeyId.mLen);
-            SuccessOrExit(err);
-
-            nextRes = reader.Next();
-            VerifyOrExit(nextRes == CHIP_NO_ERROR || nextRes == CHIP_END_OF_TLV, err = nextRes);
-        }
+        err = writer.PutOctetString(kASN1TagClass_ContextSpecific, 0, certData.mAuthKeyId.mId, certData.mAuthKeyId.mLen);
+        SuccessOrExit(err);
     }
     ASN1_END_SEQUENCE;
 
@@ -353,13 +350,15 @@ static CHIP_ERROR DecodeConvertSubjectKeyIdentifierExtension(TLVReader & reader,
 
     certData.mCertFlags.Set(CertFlags::kExtPresent_SubjectKeyId);
 
+    // SubjectKeyIdentifier extension MUST be marked as non-critical (default).
+
     // SubjectKeyIdentifier ::= KeyIdentifier
     // KeyIdentifier ::= OCTET STRING
     VerifyOrExit(reader.GetType() == kTLVType_ByteString, err = CHIP_ERROR_WRONG_TLV_TYPE);
-    VerifyOrExit(reader.GetTag() == ContextTag(kTag_SubjectKeyIdentifier_KeyIdentifier), err = CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
+    VerifyOrExit(reader.GetTag() == ContextTag(kTag_SubjectKeyIdentifier), err = CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
 
     len = reader.GetLength();
-    VerifyOrExit(len <= UINT8_MAX, err = CHIP_ERROR_UNSUPPORTED_CERT_FORMAT);
+    VerifyOrExit(len == kKeyIdentifierLength, err = CHIP_ERROR_UNSUPPORTED_CERT_FORMAT);
 
     certData.mSubjectKeyId.mLen = static_cast<uint8_t>(len);
 
@@ -382,9 +381,12 @@ static CHIP_ERROR DecodeConvertKeyUsageExtension(TLVReader & reader, ASN1Writer 
     certData.mCertFlags.Set(CertFlags::kExtPresent_KeyUsage);
 
     // KeyUsage ::= BIT STRING
-    VerifyOrExit(reader.GetTag() == ContextTag(kTag_KeyUsage_KeyUsage), err = CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
+    VerifyOrExit(reader.GetTag() == ContextTag(kTag_KeyUsage), err = CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
+    VerifyOrExit(reader.GetType() == kTLVType_UnsignedInteger, err = CHIP_ERROR_WRONG_TLV_TYPE);
+
     err = reader.Get(keyUsageBits);
     SuccessOrExit(err);
+
     VerifyOrExit(keyUsageBits <= UINT16_MAX, err = CHIP_ERROR_UNSUPPORTED_CERT_FORMAT);
 
     keyUsageFlags.SetRaw(static_cast<uint16_t>(keyUsageBits));
@@ -405,16 +407,25 @@ exit:
 static CHIP_ERROR DecodeConvertBasicConstraintsExtension(TLVReader & reader, ASN1Writer & writer, ChipCertificateData & certData)
 {
     CHIP_ERROR err, nextRes;
+    TLVType outerContainer;
 
     certData.mCertFlags.Set(CertFlags::kExtPresent_BasicConstraints);
 
     // BasicConstraints ::= SEQUENCE
     ASN1_START_SEQUENCE
     {
+        VerifyOrExit(reader.GetTag() == ContextTag(kTag_BasicConstraints), err = CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
+        VerifyOrExit(reader.GetType() == kTLVType_Structure, err = CHIP_ERROR_WRONG_TLV_TYPE);
+
+        err = reader.EnterContainer(outerContainer);
+        SuccessOrExit(err);
+
         // cA BOOLEAN DEFAULT FALSE
-        if (reader.GetTag() == ContextTag(kTag_BasicConstraints_IsCA))
         {
             bool isCA;
+
+            err = reader.Next(kTLVType_Boolean, ContextTag(kTag_BasicConstraints_IsCA));
+            SuccessOrExit(err);
 
             err = reader.Get(isCA);
             SuccessOrExit(err);
@@ -434,6 +445,8 @@ static CHIP_ERROR DecodeConvertBasicConstraintsExtension(TLVReader & reader, ASN
         {
             uint64_t pathLenConstraint;
 
+            VerifyOrExit(reader.GetType() == kTLVType_UnsignedInteger, err = CHIP_ERROR_WRONG_TLV_TYPE);
+
             err = reader.Get(pathLenConstraint);
             SuccessOrExit(err);
 
@@ -444,7 +457,15 @@ static CHIP_ERROR DecodeConvertBasicConstraintsExtension(TLVReader & reader, ASN
             certData.mPathLenConstraint = static_cast<uint8_t>(pathLenConstraint);
 
             certData.mCertFlags.Set(CertFlags::kPathLenConstraintPresent);
+
+            reader.Next();
         }
+
+        err = reader.VerifyEndOfContainer();
+        SuccessOrExit(err);
+
+        err = reader.ExitContainer(outerContainer);
+        SuccessOrExit(err);
     }
     ASN1_END_SEQUENCE;
 
@@ -462,7 +483,7 @@ static CHIP_ERROR DecodeConvertExtendedKeyUsageExtension(TLVReader & reader, ASN
     // ExtKeyUsageSyntax ::= SEQUENCE SIZE (1..MAX) OF KeyPurposeId
     ASN1_START_SEQUENCE
     {
-        VerifyOrExit(reader.GetTag() == ContextTag(kTag_ExtendedKeyUsage_KeyPurposes), err = CHIP_ERROR_WRONG_TLV_TYPE);
+        VerifyOrExit(reader.GetTag() == ContextTag(kTag_ExtendedKeyUsage), err = CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
         VerifyOrExit(reader.GetType() == kTLVType_Array, err = CHIP_ERROR_WRONG_TLV_TYPE);
 
         err = reader.EnterContainer(outerContainer);
@@ -499,8 +520,7 @@ exit:
 
 static CHIP_ERROR DecodeConvertExtension(TLVReader & reader, ASN1Writer & writer, ChipCertificateData & certData)
 {
-    CHIP_ERROR err, nextRes;
-    TLVType outerContainer;
+    CHIP_ERROR err;
     uint64_t extensionTagNum = TagNumFromTag(reader.GetTag());
     OID extensionOID;
 
@@ -529,30 +549,17 @@ static CHIP_ERROR DecodeConvertExtension(TLVReader & reader, ASN1Writer & writer
         ExitNow(err = CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
     }
 
-    err = reader.EnterContainer(outerContainer);
-    SuccessOrExit(err);
-
     // Extension ::= SEQUENCE
     ASN1_START_SEQUENCE
     {
         // extnID OBJECT IDENTIFIER,
         ASN1_ENCODE_OBJECT_ID(extensionOID);
 
-        // critical BOOLEAN DEFAULT FALSE,
-        nextRes = reader.Next();
-        VerifyOrExit(nextRes == CHIP_NO_ERROR || nextRes == CHIP_END_OF_TLV, err = nextRes);
-        if (reader.GetTag() == ContextTag(kTag_BasicConstraints_Critical))
+        // BasicConstraints, KeyUsage and ExtKeyUsage extensions MUST be marked as critical.
+        if (extensionTagNum == kTag_KeyUsage || extensionTagNum == kTag_BasicConstraints ||
+            extensionTagNum == kTag_ExtendedKeyUsage)
         {
-            bool critical;
-            err = reader.Get(critical);
-            SuccessOrExit(err);
-            if (critical)
-            {
-                ASN1_ENCODE_BOOLEAN(true);
-            }
-
-            nextRes = reader.Next();
-            VerifyOrExit(nextRes == CHIP_NO_ERROR || nextRes == CHIP_END_OF_TLV, err = nextRes);
+            ASN1_ENCODE_BOOLEAN(true);
         }
 
         // extnValue OCTET STRING
@@ -590,13 +597,6 @@ static CHIP_ERROR DecodeConvertExtension(TLVReader & reader, ASN1Writer & writer
         ASN1_END_ENCAPSULATED;
     }
     ASN1_END_SEQUENCE;
-
-    // Verify that all elements in the extension structure were consumed.
-    err = reader.VerifyEndOfContainer();
-    SuccessOrExit(err);
-
-    err = reader.ExitContainer(outerContainer);
-    SuccessOrExit(err);
 
 exit:
     return err;
@@ -669,7 +669,7 @@ CHIP_ERROR DecodeECDSASignature(TLVReader & reader, ChipCertificateData & certDa
     SuccessOrExit(err);
 
     len = reader.GetLength();
-    VerifyOrExit(len < UINT8_MAX, err = CHIP_ERROR_UNSUPPORTED_CERT_FORMAT);
+    VerifyOrExit(len <= UINT8_MAX, err = CHIP_ERROR_UNSUPPORTED_CERT_FORMAT);
 
     certData.mSignature.SLen = static_cast<uint8_t>(len);
 
@@ -778,7 +778,7 @@ CHIP_ERROR DecodeConvertTBSCert(TLVReader & reader, ASN1Writer & writer, ChipCer
         ASN1_END_SEQUENCE;
 
         // issuer Name
-        err = reader.Next(kTLVType_Path, ContextTag(kTag_Issuer));
+        err = reader.Next(kTLVType_List, ContextTag(kTag_Issuer));
         SuccessOrExit(err);
         err = DecodeConvertDN(reader, writer, certData.mIssuerDN);
         SuccessOrExit(err);
@@ -788,7 +788,7 @@ CHIP_ERROR DecodeConvertTBSCert(TLVReader & reader, ASN1Writer & writer, ChipCer
         SuccessOrExit(err);
 
         // subject Name
-        err = reader.Next(kTLVType_Path, ContextTag(kTag_Subject));
+        err = reader.Next(kTLVType_List, ContextTag(kTag_Subject));
         SuccessOrExit(err);
         err = DecodeConvertDN(reader, writer, certData.mSubjectDN);
         SuccessOrExit(err);

@@ -16,8 +16,11 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/freertos.gni")
 import("//build_overrides/mbedtls.gni")
+import("//build_overrides/openthread.gni")
+import("//build_overrides/pigweed.gni")
 import("//build_overrides/ti_simplelink_sdk.gni")
 
+import("${dir_pw_build}/python.gni")
 import("${freertos_root}/freertos.gni")
 import("${mbedtls_root}/mbedtls.gni")
 import("ti_simplelink_board.gni")
@@ -63,7 +66,7 @@ template("ti_sysconfig") {
     }
   }
 
-  action("${target_name}_gen") {
+  pw_python_action("${target_name}_gen") {
     script = "${ti_simplelink_sdk_build_root}/run_sysconfig.py"
     sources = invoker.sources
     outputs = gen_outputs
@@ -227,6 +230,7 @@ template("ti_simplelink_sdk") {
       "${chip_root}/third_party/ti_simplelink_sdk:freertos",
       "${chip_root}/third_party/ti_simplelink_sdk:mbedtls",
       "${chip_root}/third_party/ti_simplelink_sdk:ti_simplelink_sysconfig",
+      "${openthread_root}/src/core:libopenthread_core_headers",
     ]
 
     configs -= [ "${build_root}/config/compiler:std_default" ]

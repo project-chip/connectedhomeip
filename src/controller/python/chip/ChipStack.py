@@ -35,7 +35,7 @@ import logging
 from threading import Lock, Event
 from ctypes import *
 from .ChipUtility import ChipUtility
-from .ChipExceptions import *
+from .exceptions import *
 
 __all__ = [
     "DeviceStatusStruct",
@@ -104,7 +104,7 @@ class ChipLogFormatter(logging.Formatter):
     ):
         fmt = "%(message)s"
         if logModulePrefix:
-            fmt = "WEAVE:%(chip-module)s: " + fmt
+            fmt = "CHIP:%(chip-module)s: " + fmt
         if logLevel:
             fmt = "%(levelname)s:" + fmt
         if datefmt is not None or logTimestamp:
@@ -198,7 +198,7 @@ class ChipStack(object):
         self.blockingCB = None  # set by other modules(BLE) that require service by thread while thread blocks.
 
         # Initialize the chip library
-        res = self._ChipStackLib.nl_Chip_Stack_Init()
+        res = self._ChipStackLib.pychip_Stack_Init()
         if res != 0:
             raise self._ChipStack.ErrorToException(res)
 
@@ -212,7 +212,7 @@ class ChipStack(object):
             moduleName = ChipUtility.CStringToString(moduleName)
             message = ChipUtility.CStringToString(message)
             if self.addModulePrefixToLogMessage:
-                message = "WEAVE:%s: %s" % (moduleName, message)
+                message = "CHIP:%s: %s" % (moduleName, message)
             logLevel = LogCategory.categoryToLogLevel(logCat)
             msgAttrs = {
                 "chip-module": moduleName,
@@ -242,10 +242,10 @@ class ChipStack(object):
             # set. Otherwise it may get garbage collected, and logging calls from the
             # chip library will fail.
             self._activeLogFunct = logFunct
-            self._ChipStackLib.nl_Chip_Stack_SetLogFunct(logFunct)
+            self._ChipStackLib.pychip_Stack_SetLogFunct(logFunct)
 
     def Shutdown(self):
-        self._ChipStack.Call(lambda: self._dmLib.nl_Chip_Stack_Shutdown())
+        self._ChipStack.Call(lambda: self._dmLib.pychip_Stack_Shutdown())
         self.networkLock = None
         self.completeEvent = None
         self._ChipStackLib = None
@@ -288,7 +288,7 @@ class ChipStack(object):
             devStatus = devStatusPtr.contents
             msg = ChipUtility.CStringToString(
                 (
-                    self._ChipStackLib.nl_Chip_Stack_StatusReportToString(
+                    self._ChipStackLib.pychip_Stack_StatusReportToString(
                         devStatus.ProfileId, devStatus.StatusCode
                     )
                 )
@@ -305,7 +305,7 @@ class ChipStack(object):
             return ChipStackError(
                 err,
                 ChipUtility.CStringToString(
-                    (self._ChipStackLib.nl_Chip_Stack_ErrorToString(err))
+                    (self._ChipStackLib.pychip_Stack_ErrorToString(err))
                 ),
             )
 
@@ -359,16 +359,16 @@ class ChipStack(object):
     def _loadLib(self):
         if self._ChipStackLib is None:
             self._ChipStackLib = CDLL(self.LocateChipDLL())
-            self._ChipStackLib.nl_Chip_Stack_Init.argtypes = []
-            self._ChipStackLib.nl_Chip_Stack_Init.restype = c_uint32
-            self._ChipStackLib.nl_Chip_Stack_Shutdown.argtypes = []
-            self._ChipStackLib.nl_Chip_Stack_Shutdown.restype = c_uint32
-            self._ChipStackLib.nl_Chip_Stack_StatusReportToString.argtypes = [
+            self._ChipStackLib.pychip_Stack_Init.argtypes = []
+            self._ChipStackLib.pychip_Stack_Init.restype = c_uint32
+            self._ChipStackLib.pychip_Stack_Shutdown.argtypes = []
+            self._ChipStackLib.pychip_Stack_Shutdown.restype = c_uint32
+            self._ChipStackLib.pychip_Stack_StatusReportToString.argtypes = [
                 c_uint32,
                 c_uint16,
             ]
-            self._ChipStackLib.nl_Chip_Stack_StatusReportToString.restype = c_char_p
-            self._ChipStackLib.nl_Chip_Stack_ErrorToString.argtypes = [c_uint32]
-            self._ChipStackLib.nl_Chip_Stack_ErrorToString.restype = c_char_p
-            self._ChipStackLib.nl_Chip_Stack_SetLogFunct.argtypes = [_LogMessageFunct]
-            self._ChipStackLib.nl_Chip_Stack_SetLogFunct.restype = c_uint32
+            self._ChipStackLib.pychip_Stack_StatusReportToString.restype = c_char_p
+            self._ChipStackLib.pychip_Stack_ErrorToString.argtypes = [c_uint32]
+            self._ChipStackLib.pychip_Stack_ErrorToString.restype = c_char_p
+            self._ChipStackLib.pychip_Stack_SetLogFunct.argtypes = [_LogMessageFunct]
+            self._ChipStackLib.pychip_Stack_SetLogFunct.restype = c_uint32

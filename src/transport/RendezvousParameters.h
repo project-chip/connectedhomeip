@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <transport/PASESession.h>
 #include <transport/raw/Base.h>
 #include <transport/raw/PeerAddress.h>
 #if CONFIG_NETWORK_LAYER_BLE
@@ -95,6 +96,15 @@ public:
         return *this;
     }
 
+    bool HasPASEVerifier() const { return mHasPASEVerifier; }
+    const PASEVerifier & GetPASEVerifier() const { return mPASEVerifier; }
+    RendezvousParameters & SetPASEVerifier(PASEVerifier & verifier)
+    {
+        memmove(mPASEVerifier, verifier, sizeof(verifier));
+        mHasPASEVerifier = true;
+        return *this;
+    }
+
     const RendezvousAdvertisementDelegate * GetAdvertisementDelegate() const { return mAdvDelegate; }
 
     RendezvousParameters & SetAdvertisementDelegate(RendezvousAdvertisementDelegate * delegate)
@@ -129,6 +139,9 @@ private:
     Optional<NodeId> mRemoteNodeId;       ///< the remote node id
     uint32_t mSetupPINCode  = 0;          ///< the target peripheral setup PIN Code
     uint16_t mDiscriminator = UINT16_MAX; ///< the target peripheral discriminator
+
+    PASEVerifier mPASEVerifier;
+    bool mHasPASEVerifier = false;
 
     RendezvousAdvertisementDelegate mDefaultAdvDelegate;
     RendezvousAdvertisementDelegate * mAdvDelegate = &mDefaultAdvDelegate;

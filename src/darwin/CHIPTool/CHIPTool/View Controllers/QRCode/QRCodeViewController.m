@@ -293,7 +293,6 @@
 
     dispatch_queue_t callbackQueue = dispatch_queue_create("com.zigbee.chip.qrcodevc.callback", DISPATCH_QUEUE_SERIAL);
     self.chipController = [CHIPDeviceController sharedController];
-    [self.chipController setDelegate:self queue:callbackQueue];
     [self.chipController setPairingDelegate:self queue:callbackQueue];
     [self.chipController setPersistentStorageDelegate:_persistentStorage queue:callbackQueue];
 
@@ -353,21 +352,6 @@
     NSLog(@"If no NFC reading UI is appearing, target may me missing the appropriate capability. Turn on Near Field Communication "
           @"Tag Reading under the Capabilities tab for the project’s target. A paid developer account is needed for this.");
     _session = nil;
-}
-
-// MARK: CHIPDeviceControllerDelegate
-- (void)deviceControllerOnConnected
-{
-    NSLog(@"Status: Device connected");
-}
-
-- (void)deviceControllerOnError:(nonnull NSError *)error
-{
-    NSLog(@"Status: Device Controller error %@", [error description]);
-}
-
-- (void)deviceControllerOnMessage:(nonnull NSData *)message
-{
 }
 
 // MARK: CHIPDevicePairingDelegate

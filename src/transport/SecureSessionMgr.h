@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,6 +32,7 @@
 #include <inet/IPEndPointBasis.h>
 #include <support/CodeUtils.h>
 #include <support/DLLUtil.h>
+#include <transport/AdminPairingTable.h>
 #include <transport/PASESession.h>
 #include <transport/PeerConnections.h>
 #include <transport/SecureSession.h>
@@ -47,18 +48,30 @@ class SecureSessionMgr;
 class SecureSessionHandle
 {
 public:
-    SecureSessionHandle() : mPeerNodeId(kAnyNodeId), mPeerKeyId(0) {}
+    SecureSessionHandle() : mPeerNodeId(kAnyNodeId), mPeerKeyId(0), mAdmin(Transport::kUndefinedAdminId) {}
     SecureSessionHandle(NodeId peerNodeId, uint16_t peerKeyId) : mPeerNodeId(peerNodeId), mPeerKeyId(peerKeyId) {}
+    SecureSessionHandle(NodeId peerNodeId, uint16_t peerKeyId, Transport::AdminId admin) :
+        mPeerNodeId(peerNodeId), mPeerKeyId(peerKeyId), mAdmin(admin)
+    {}
+
+    bool HasAdminId() const { return (mAdmin != Transport::kUndefinedAdminId); }
+    Transport::AdminId GetAdminId() const { return mAdmin; }
+    void SetAdminId(Transport::AdminId adminId) { mAdmin = adminId; }
 
     bool operator==(const SecureSessionHandle & that) const
     {
-        return mPeerNodeId == that.mPeerNodeId && mPeerKeyId == that.mPeerKeyId;
+        return mPeerNodeId == that.mPeerNodeId && mPeerKeyId == that.mPeerKeyId && mAdmin == that.mAdmin;
     }
 
 private:
     friend class SecureSessionMgr;
     NodeId mPeerNodeId;
     uint16_t mPeerKeyId;
+    // TODO: Re-evaluate the storing of Admin ID in SecureSessionHandle
+    //       The Admin ID will not be available for PASE and group sessions. So need
+    //       to identify an approach that'll allow looking up the corresponding information for
+    //       such sessions.
+    Transport::AdminId mAdmin;
 };
 
 /**
@@ -68,7 +81,7 @@ private:
  *  EncryptedPacketBufferHandle is a kind of PacketBufferHandle class and used to hold a packet buffer
  *  object whose payload has already been encrypted.
  */
-class EncryptedPacketBufferHandle final : public System::PacketBufferHandle
+class EncryptedPacketBufferHandle final : private System::PacketBufferHandle
 {
 public:
     EncryptedPacketBufferHandle() : mMsgId(0) {}
@@ -92,6 +105,26 @@ public:
      * @returns empty handle on allocation failure.
      */
     EncryptedPacketBufferHandle CloneData() { return EncryptedPacketBufferHandle(PacketBufferHandle::CloneData()); }
+
+#ifdef CHIP_ENABLE_TEST_ENCRYPTED_BUFFER_API
+    /**
+     * Extracts the (unencrypted) packet header from this encrypted packet
+     * buffer.  Returns error if a packet header cannot be extracted (e.g. if
+     * there are not enough bytes in this packet buffer).  After this call the
+     * buffer does not have a packet header.  This API is meant for
+     * unit tests only.   The CHIP_ENABLE_TEST_ENCRYPTED_BUFFER_API define
+     * should not be defined normally.
+     */
+    CHIP_ERROR ExtractPacketHeader(PacketHeader & aPacketHeader) { return aPacketHeader.DecodeAndConsume(*this); }
+
+    /**
+     * Inserts a new (unencrypted) packet header in the encrypted packet buffer
+     * based on the given PacketHeader.  This API is meant for
+     * unit tests only.   The CHIP_ENABLE_TEST_ENCRYPTED_BUFFER_API define
+     * should not be defined normally.
+     */
+    CHIP_ERROR InsertPacketHeader(const PacketHeader & aPacketHeader) { return aPacketHeader.EncodeBeforeData(*this); }
+#endif // CHIP_ENABLE_TEST_ENCRYPTED_BUFFER_API
 
 private:
     // Allow SecureSessionMgr to assign or construct us from a PacketBufferHandle
@@ -206,7 +239,7 @@ public:
      *   peer node.
      */
     CHIP_ERROR NewPairing(const Optional<Transport::PeerAddress> & peerAddr, NodeId peerNodeId, PASESession * pairing,
-                          Transport::Base * transport = nullptr);
+                          Transport::AdminId admin, Transport::Base * transport = nullptr);
 
     /**
      * @brief
@@ -221,8 +254,10 @@ public:
      * @param localNodeId    Node id for the current node
      * @param systemLayer    System, layer to use
      * @param transportMgr   Transport to use
+     * @param admins         A table of device administrators
      */
-    CHIP_ERROR Init(NodeId localNodeId, System::Layer * systemLayer, TransportMgrBase * transportMgr);
+    CHIP_ERROR Init(NodeId localNodeId, System::Layer * systemLayer, TransportMgrBase * transportMgr,
+                    Transport::AdminPairingTable * admins);
 
     /**
      * @brief
@@ -273,8 +308,9 @@ private:
     Transport::PeerConnections<CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE> mPeerConnections; // < Active connections to other peers
     State mState;                                                                       // < Initialization state of the object
 
-    SecureSessionMgrDelegate * mCB   = nullptr;
-    TransportMgrBase * mTransportMgr = nullptr;
+    SecureSessionMgrDelegate * mCB         = nullptr;
+    TransportMgrBase * mTransportMgr       = nullptr;
+    Transport::AdminPairingTable * mAdmins = nullptr;
 
     CHIP_ERROR SendMessage(SecureSessionHandle session, PayloadHeader & payloadHeader, PacketHeader & packetHeader,
                            System::PacketBufferHandle msgBuf, EncryptedPacketBufferHandle * bufferRetainSlot,
@@ -296,5 +332,55 @@ private:
      */
     static void ExpiryTimerCallback(System::Layer * layer, void * param, System::Error error);
 };
+
+namespace MessagePacketBuffer {
+/**
+ * Maximum size of a message footer, in bytes.
+ */
+constexpr uint16_t kMaxFooterSize = kMaxTagLen;
+
+/**
+ * Allocates a packet buffer with space for message headers and footers.
+ *
+ *  Fails and returns \c nullptr if no memory is available, or if the size requested is too large.
+ *
+ *  @param[in]  aAvailableSize  Minimum number of octets to for application data.
+ *
+ *  @return     On success, a PacketBufferHandle to the allocated buffer. On fail, \c nullptr.
+ */
+inline System::PacketBufferHandle New(size_t aAvailableSize)
+{
+    static_assert(System::PacketBuffer::kMaxSize > kMaxFooterSize, "inadequate capacity");
+    if (aAvailableSize > System::PacketBuffer::kMaxSize - kMaxFooterSize)
+    {
+        return System::PacketBufferHandle();
+    }
+    return System::PacketBufferHandle::New(aAvailableSize + kMaxFooterSize);
+}
+
+/**
+ * Allocates a packet buffer with initial contents.
+ *
+ *  @param[in]  aData           Initial buffer contents.
+ *  @param[in]  aDataSize       Size of initial buffer contents.
+ *
+ *  @return     On success, a PacketBufferHandle to the allocated buffer. On fail, \c nullptr.
+ */
+inline System::PacketBufferHandle NewWithData(const void * aData, size_t aDataSize)
+{
+    return System::PacketBufferHandle::NewWithData(aData, aDataSize, kMaxFooterSize);
+}
+
+/**
+ * Check whether a packet buffer has enough space for a message footer.
+ *
+ * @returns true if there is space, false otherwise.
+ */
+inline bool HasFooterSpace(const System::PacketBufferHandle & aBuffer)
+{
+    return aBuffer->AvailableDataLength() >= kMaxFooterSize;
+}
+
+} // namespace MessagePacketBuffer
 
 } // namespace chip

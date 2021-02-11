@@ -139,7 +139,7 @@ CHIP_ERROR ExchangeContext::SendMessage(uint16_t protocolId, uint8_t msgType, Pa
     }
 
     // Send the message.
-    if (payloadHeader.IsNeedsAck())
+    if (payloadHeader.NeedsAck())
     {
         ReliableMessageMgr::RetransTableEntry * entry = nullptr;
 
@@ -289,6 +289,12 @@ void ExchangeContext::Free()
 
     em->DecrementContextsInUse();
 
+    if (mExchangeACL != nullptr)
+    {
+        chip::Platform::Delete(mExchangeACL);
+        mExchangeACL = nullptr;
+    }
+
 #if defined(CHIP_EXCHANGE_CONTEXT_DETAIL_LOGGING)
     ChipLogProgress(ExchangeManager, "ec-- id: %d [%04" PRIX16 "], inUse: %d, addr: 0x%x", (this - em->ContextPool + 1),
                     mExchangeId, em->GetContextsInUse(), this);
@@ -380,7 +386,7 @@ CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, con
         SuccessOrExit(err);
     }
 
-    if (payloadHeader.IsNeedsAck())
+    if (payloadHeader.NeedsAck())
     {
         MessageFlags msgFlags;
 

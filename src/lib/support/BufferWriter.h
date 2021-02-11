@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -24,60 +24,27 @@
 namespace chip {
 namespace Encoding {
 
-template <class Derived>
-class BufferWriterBase
+class BufferWriter
 {
 public:
+    BufferWriter(uint8_t * buf, size_t len) : mBuf(buf), mSize(len), mNeeded(0) {}
+    BufferWriter(const BufferWriter & other) = default;
+    BufferWriter & operator=(const BufferWriter & other) = default;
+
     /// Append a null terminated string, exclude the null terminator
-    /// This does NOT care about endianess
-    BufferWriterBase & Put(const char * s)
-    {
-        static_assert(CHAR_BIT == 8, "We're assuming char and uint8_t are the same size");
-        while (*s != 0)
-        {
-            Put8(static_cast<uint8_t>(*s++));
-        }
-        return *this;
-    }
+    BufferWriter & Put(const char * s);
 
     /// Raw append a buffer, regardless of endianess
-    BufferWriterBase & Put(const void * buf, size_t len)
-    {
-        size_t available = Available();
-
-        if (available > 0)
-        {
-            memmove(mBuf + mNeeded, buf, available < len ? available : len);
-        }
-
-        mNeeded += len;
-
-        return *this;
-    }
-
-    BufferWriterBase & Skip(size_t len)
-    {
-        mNeeded += len;
-        return *this;
-    }
+    BufferWriter & Put(const void * buf, size_t len);
 
     /// Append a single byte
-    BufferWriterBase & Put(uint8_t c)
+    BufferWriter & Put(uint8_t c);
+
+    BufferWriter & Skip(size_t len)
     {
-        if (mNeeded < mSize)
-        {
-            mBuf[mNeeded] = c;
-        }
-        ++mNeeded;
+        mNeeded += len;
         return *this;
     }
-
-    // write an integer into a buffer, in an endian specific way
-
-    BufferWriterBase & Put8(uint8_t c) { return static_cast<Derived *>(this)->Put(c); }
-    BufferWriterBase & Put16(uint16_t x) { return static_cast<Derived *>(this)->EndianPut(x, sizeof(x)); }
-    BufferWriterBase & Put32(uint32_t x) { return static_cast<Derived *>(this)->EndianPut(x, sizeof(x)); }
-    BufferWriterBase & Put64(uint64_t x) { return static_cast<Derived *>(this)->EndianPut(x, sizeof(x)); }
 
     /// Number of bytes required to satisfy all calls to Put() so far
     size_t Needed() const { return mNeeded; }
@@ -106,58 +73,57 @@ public:
     const uint8_t * Buffer() const { return mBuf; }
 
 protected:
-    friend Derived;
-
     uint8_t * mBuf;
     size_t mSize;
     size_t mNeeded;
+};
 
-    BufferWriterBase(uint8_t * buf, size_t len) : mBuf(buf), mSize(len), mNeeded(0) {}
-    BufferWriterBase(const BufferWriterBase & other) = default;
-    BufferWriterBase & operator=(const BufferWriterBase & other) = default;
+template <class Derived>
+class EndianBufferWriterBase : public BufferWriter
+{
+public:
+    // typed BufferWriter forwards
+
+    Derived & Put(const char * s) { return static_cast<Derived &>(BufferWriter::Put(s)); }
+    Derived & Put(const void * buf, size_t len) { return static_cast<Derived &>(BufferWriter::Put(buf, len)); }
+    Derived & Put(uint8_t c) { return static_cast<Derived &>(BufferWriter::Put(c)); }
+    Derived & Skip(size_t len) { return static_cast<Derived &>(BufferWriter::Skip(len)); }
+
+    // write an integer into a buffer, in an endian specific way
+
+    Derived & Put8(uint8_t c) { return static_cast<Derived *>(this)->Put(c); }
+    Derived & Put16(uint16_t x) { return static_cast<Derived *>(this)->EndianPut(x, sizeof(x)); }
+    Derived & Put32(uint32_t x) { return static_cast<Derived *>(this)->EndianPut(x, sizeof(x)); }
+    Derived & Put64(uint64_t x) { return static_cast<Derived *>(this)->EndianPut(x, sizeof(x)); }
+
+protected:
+    EndianBufferWriterBase(uint8_t * buf, size_t len) : BufferWriter(buf, len) {}
+    EndianBufferWriterBase(const EndianBufferWriterBase & other) = default;
+    EndianBufferWriterBase & operator=(const EndianBufferWriterBase & other) = default;
 };
 
 namespace LittleEndian {
 
-class BufferWriter : public BufferWriterBase<BufferWriter>
+class BufferWriter : public EndianBufferWriterBase<BufferWriter>
 {
 public:
-    BufferWriter(uint8_t * buf, size_t len) : BufferWriterBase<BufferWriter>(buf, len) {}
+    BufferWriter(uint8_t * buf, size_t len) : EndianBufferWriterBase<BufferWriter>(buf, len) {}
     BufferWriter(const BufferWriter & other) = default;
     BufferWriter & operator=(const BufferWriter & other) = default;
-
-    BufferWriter & EndianPut(uint64_t x, size_t size)
-    {
-        while (size-- > 0)
-        {
-            uint8_t c = x & 0xff;
-            Put(c);
-            x >>= 8;
-        }
-        return *this;
-    }
+    BufferWriter & EndianPut(uint64_t x, size_t size);
 };
 
 } // namespace LittleEndian
 
 namespace BigEndian {
 
-class BufferWriter : public BufferWriterBase<BufferWriter>
+class BufferWriter : public EndianBufferWriterBase<BufferWriter>
 {
 public:
-    BufferWriter(uint8_t * buf, size_t len) : BufferWriterBase<BufferWriter>(buf, len) {}
+    BufferWriter(uint8_t * buf, size_t len) : EndianBufferWriterBase<BufferWriter>(buf, len) {}
     BufferWriter(const BufferWriter & other) = default;
     BufferWriter & operator=(const BufferWriter & other) = default;
-
-    BufferWriter & EndianPut(uint64_t x, size_t size)
-    {
-        while (size-- > 0)
-        {
-            uint8_t c = (x >> (size * 8)) & 0xff;
-            Put(c);
-        }
-        return *this;
-    }
+    BufferWriter & EndianPut(uint64_t x, size_t size);
 };
 
 } // namespace BigEndian

@@ -1423,7 +1423,7 @@ public:
      *                              constructed with one of the tag definition functions ProfileTag(),
      *                              ContextTag() or CommonTag().
      * @param[in]   containerType   The type of container to encode.  Must be one of @p kTLVType_Structure,
-     *                              @p kTLVType_Array or @p kTLVType_Path.
+     *                              @p kTLVType_Array or @p kTLVType_List.
      * @param[out]  outerContainerType
      *                              A reference to a TLVType value that will receive the context of the
      *                              writer.
@@ -1511,7 +1511,7 @@ public:
      *                              constructed with one of the tag definition functions ProfileTag(),
      *                              ContextTag() or CommonTag().
      * @param[in]   containerType   The type of container to encode.  Must be one of @p kTLVType_Structure,
-     *                              @p kTLVType_Array or @p kTLVType_Path.
+     *                              @p kTLVType_Array or @p kTLVType_List.
      * @param[out]  containerWriter A reference to a TLVWriter object that will be initialized for
      *                              writing the members of the new container element. Any data
      *                              associated with the supplied object is overwritten.
@@ -1587,7 +1587,7 @@ public:
      *                              constructed with one of the tag definition functions ProfileTag(),
      *                              ContextTag() or CommonTag().
      * @param[in]   containerType   The type of container to encode.  Must be one of @p kTLVType_Structure,
-     *                              @p kTLVType_Array or @p kTLVType_Path.
+     *                              @p kTLVType_Array or @p kTLVType_List.
      * @param[in]   data            A pointer to a buffer containing zero of more encoded TLV elements that
      *                              will become the members of the new container.
      * @param[in]   dataLen         The number of bytes in the @p data buffer.

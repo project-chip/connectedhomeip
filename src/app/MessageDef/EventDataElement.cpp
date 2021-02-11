@@ -239,7 +239,7 @@ CHIP_ERROR EventDataElement::Parser::CheckSchemaValidity() const
             VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_EventPath)), err = CHIP_ERROR_INVALID_TLV_TAG);
             TagPresenceMask |= (1 << kCsTag_EventPath);
 
-            VerifyOrExit(chip::TLV::kTLVType_Path == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
+            VerifyOrExit(chip::TLV::kTLVType_List == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
 
 #if CHIP_DETAIL_LOGGING
             {
@@ -405,7 +405,7 @@ CHIP_ERROR EventDataElement::Parser::GetEventPath(EventPath::Parser * const apEv
     err = mReader.FindElementWithTag(chip::TLV::ContextTag(kCsTag_EventPath), reader);
     SuccessOrExit(err);
 
-    VerifyOrExit(chip::TLV::kTLVType_Path == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
+    VerifyOrExit(chip::TLV::kTLVType_List == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
 
     err = apEventPath->Init(reader);
     SuccessOrExit(err);

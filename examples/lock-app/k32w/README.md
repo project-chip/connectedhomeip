@@ -107,16 +107,16 @@ bolt is extended (i.e. door locked); when not lit, the bolt is retracted (door
 unlocked). The LED will flash whenever the simulated bolt is in motion from one
 position to another.
 
-**Button SW2** can be used to reset the device to a default state. Pressing and
-holding Button SW2 for 6 seconds initiates a factory reset. After an initial
+**Button SW2** can be used to change the state of the simulated bolt. This can
+be used to mimic a user manually operating the lock. The button behaves as a
+toggle, swapping the state every time it is pressed.
+
+**Button SW3** can be used to reset the device to a default state. Pressing and
+holding Button SW3 for 6 seconds initiates a factory reset. After an initial
 period of 3 seconds, LED2 D2 and D3 will flash in unison to signal the pending
 reset. Holding the button past 6 seconds will cause the device to reset its
 persistent configuration and initiate a reboot. The reset action can be
 cancelled by releasing the button at any point before the 6 second limit.
-
-**Button SW3** can be used to change the state of the simulated bolt. This can
-be used to mimic a user manually operating the lock. The button behaves as a
-toggle, swapping the state every time it is pressed.
 
 **Button SW4** can be used for joining a predefined Thread network advertised by
 a Border Router. Default parameters for a Thread network are hard-coded and are
@@ -178,45 +178,16 @@ The resulting output file can be found in out/debug/chip-k32w061-lock-example.
 
 ## Flashing and debugging
 
-In order to flash the application we recommend using
-[MCUXpresso IDE (version >= 11.0.0)](https://www.nxp.com/design/software/development-software/mcuxpresso-software-and-tools-/mcuxpresso-integrated-development-environment-ide:MCUXpresso-IDE?tab=Design_Tools_Tab).
+Program the firmware using the official
+[OpenThread Flash Instructions](https://github.com/openthread/openthread/blob/master/examples/platforms/k32w/k32w061/README.md#flash-binaries).
 
--   Import the previously downloaded NXP SDK into MCUXpresso IDE. This can be
-    done by drag-and-dropping the SDK archive into MCUXpresso IDE's "Installed
-    SDKs" tab; ![Select SDK](../../platform/k32w/doc/images/select-sdk.JPG)
--   Import Project CHIP in MCUXpresso IDE as Makefile Project:
-    <i>File->Import->C/C++->Existing Code as Makefile Project-> Next </i>.
-    Select Project CHIP folder as the <i>Existing Code Location</i>. In the
-    <i>Toolchain for Indexer Settings </i> list, be sure to keep the setting to
-    <i>none</i>. Click <i>Finish</i>;
--   Configure MCU Settings: right click on project from the workspace and go to
-    <i>Properties->C/C++ Build->MCU Settings</i>. Select K32W061 from the SDK
-    MCUs list;
--   Configure the toolchain editor: <i>C/C++ Build->Tool Chain Editor</i>.
-    Untick the <i>Display compatible toolchains only</i> checkbox. In the
-    drop-down menu named <i>Current toolchain</i>, select <i>NXP MCU Tools</i>.
-    Click <i>Apply and Close</i>;
--   Create a debug configuration: right click on the project and select <i>Debug
-    As->MCUXpresso IDE LinkServer (inc. CMSIS-DAP) probes</i>. A window to
-    select the binary will appear. Select
-    <i>examples/lock-app/k32w/build/chip-k32w061-lock-example.elf</i> and click
-    OK;
--   Use the debug configuration: under the menu bar, towards the center of the
-    screen, there is a green bug icon with a drop-down arrow next to it. Click
-    on the arrow and select <i>Debug Configurations</i>. In the right side of
-    the Debug Configurations window, go to <i>C/C++ (NXP Semiconductors) MCU
-    Application->openthread LinkServer Default</i>. Make sure that the <i>C/C++
-    Application</i> text box contains
-    <i>examples/lock-app/k32w/build/chip-k32w061-lock-example.elf</i> path. Go
-    to <i>GUI Flash Tool</i> tab. In <i>Target Operations->Program->Options</i>,
-    select "bin" as the <i>Format to use for programming</i>. Make sure the
-    <i>Base address</i> is 0x0. Click <i>Debug</i>. A pop-up window entitled
-    <i>Errors in Workspace</i> will appear. Click <i>Proceed</i>.
-    ![Debug_configuration](../../platform/k32w/doc/images/debg-conf.JPG)
+All you have to do is to replace the Openthread binaries from the above
+documentation with _out/debug/chip-k32w061-lock-example.bin_ if DK6Programmer is
+used or with _out/debug/chip-k32w061-lock-example_ if MCUXpresso is used.
 
 ## Testing the example
 
-The app can be deployed against any generic OpenThread Border Router. An
-upcoming PR will add step-by-step instructions for setting up a generic
-OpenThread Border Router with an USB K32W061 in RCP mode working as an 802.15.4
-transceiver.
+The app can be deployed against any generic OpenThread Border Router. See the
+guide
+[Commissioning NXP K32W using Android CHIPTool](../../../docs/guides/nxp_k32w_android_commissioning.md)
+for step-by-step instructions.

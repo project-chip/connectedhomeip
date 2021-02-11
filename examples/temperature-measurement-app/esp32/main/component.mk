@@ -35,6 +35,7 @@ COMPONENT_SRCDIRS :=                                                            
 COMPONENT_EXTRA_INCLUDES := $(PROJECT_PATH)/third_party/connectedhomeip/src/app/util                            \
                             $(PROJECT_PATH)/third_party/connectedhomeip/src/app/reporting                       \
                             $(PROJECT_PATH)/third_party/connectedhomeip/src/app/server                          \
+                            $(PROJECT_PATH)/third_party/connectedhomeip/third_party/nlio/repo/include           \
                             $(PROJECT_PATH)/third_party/connectedhomeip/src
 
 # So "gen/*" files are found by the src/app bits.

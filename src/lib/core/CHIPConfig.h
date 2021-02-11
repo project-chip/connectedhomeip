@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2019 Google LLC.
  *    Copyright (c) 2013-2018 Nest Labs, Inc.
  *
@@ -549,6 +549,36 @@
 #ifndef CHIP_CONFIG_SIMPLE_ALLOCATOR_USE_SMALL_BUFFERS
 #define CHIP_CONFIG_SIMPLE_ALLOCATOR_USE_SMALL_BUFFERS     0
 #endif // CHIP_CONFIG_SIMPLE_ALLOCATOR_USE_SMALL_BUFFERS
+
+/**
+ *  @def CHIP_CONFIG_MEMORY_DEBUG_CHECKS
+ *
+ *  @brief
+ *    Enable (1) or disable (0) building with additional code
+ *    for memory-related checks.
+ */
+#ifndef CHIP_CONFIG_MEMORY_DEBUG_CHECKS
+#define CHIP_CONFIG_MEMORY_DEBUG_CHECKS     0
+#endif // CHIP_CONFIG_MEMORY_DEBUG_CHECKS
+
+/**
+ *  @def CHIP_CONFIG_MEMORY_DEBUG_DMALLOC
+ *
+ *  @brief
+ *    Enable (1) or disable (0) malloc memory allocator support
+ *    for dmalloc, an open-source debug malloc library. When enabled,
+ *    additional checks and logging of allocations may be performed,
+ *    with some performance cost.
+ *
+ *  @note This configuration is most relevant when
+ *        #CHIP_CONFIG_MEMORY_MGMT_MALLOC is set, but may also
+ *        affect other configurations where application or platform
+ *        code uses the malloc() family.
+ *
+ */
+#ifndef CHIP_CONFIG_MEMORY_DEBUG_DMALLOC
+#define CHIP_CONFIG_MEMORY_DEBUG_DMALLOC     0
+#endif // CHIP_CONFIG_MEMORY_DEBUG_DMALLOC
 
 /**
  *  @name chip Security Manager Time-Consuming Crypto Alerts.
@@ -1817,18 +1847,6 @@
 #endif // CHIP_DETAIL_LOGGING
 
 /**
- *  @def CHIP_RETAIN_LOGGING
- *
- *  @brief
- *    If asserted (1), enable logging of all messages in the
- *    chip::Logging::LogCategory::kLogCategory_Retain category.
- *    If not defined by the application, by default CHIP_RETAIN_LOGGING is
- *    remapped to CHIP_PROGRESS_LOGGING
- *
- */
-
-
-/**
  *  @def CHIP_CONFIG_ENABLE_FUNCT_ERROR_LOGGING
  *
  *  @brief
@@ -2288,6 +2306,18 @@
   #endif // CHIP_CONFIG_MAX_BINDINGS
 
 /**
+   *  @def CHIP_CONFIG_MAX_DEVICE_ADMINS
+   *
+   *  @brief
+   *    Maximum number of administrators that can provision the device. Each admin
+   *    can provision the device with their unique operational credentials and manage
+   *    their access control lists.
+   */
+  #ifndef CHIP_CONFIG_MAX_DEVICE_ADMINS
+  #define CHIP_CONFIG_MAX_DEVICE_ADMINS                      16
+  #endif // CHIP_CONFIG_MAX_DEVICE_ADMINS
+
+  /**
  * @def CHIP_NON_PRODUCTION_MARKER
  *
  * @brief Defines the name of a mark symbol whose presence signals that the chip code

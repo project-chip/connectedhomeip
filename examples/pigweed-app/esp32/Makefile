@@ -19,7 +19,7 @@
 # project subdirectory.
 #
 
-PROJECT_NAME := pw-rpc-app
+PROJECT_NAME := chip-pigweed-app
 
 EXTRA_COMPONENT_DIRS += $(PROJECT_PATH)/third_party/connectedhomeip/config/esp32/components \
 
@@ -44,13 +44,23 @@ $(FLASHING_SCRIPT): $(APP_BIN) $(BOOTLOADER_BIN) $(PARTITION_TABLE_BIN) $(PROJEC
 	  --use-parttool $(IDF_PATH)/components/partition_table/parttool.py \
 	  --use-sdkconfig $(PROJECT_PATH)/sdkconfig
 
-flashing_script: $(FLASHING_SCRIPT) $(BUILD_DIR_BASE)/esp32_firmware_utils.py $(BUILD_DIR_BASE)/firmware_utils.py
+flashing_script: $(FLASHING_SCRIPT) $(BUILD_DIR_BASE)/esp32_firmware_utils.py $(BUILD_DIR_BASE)/firmware_utils.py $(BUILD_DIR_BASE)/echo_test.py $(BUILD_DIR_BASE)/echo_test_config.yml
 	@echo To flash $(subst $(CURDIR)/,,$(APP_BIN)), run $(subst $(CURDIR)/,,$(FLASHING_SCRIPT))
 
 $(BUILD_DIR_BASE)/esp32_firmware_utils.py: third_party/connectedhomeip/scripts/flashing/esp32_firmware_utils.py
+	echo "Copying esp32_firmware_utils.py"
 	@cp $< $@
 
 $(BUILD_DIR_BASE)/firmware_utils.py: third_party/connectedhomeip/scripts/flashing/firmware_utils.py
+	echo "Copying firmware_utils.py"
+	@cp $< $@
+
+$(BUILD_DIR_BASE)/echo_test.py: ../mobly_tests/echo_test.py
+	echo "Copying echo_test.py"
+	@cp $< $@
+
+$(BUILD_DIR_BASE)/echo_test_config.yml: ./echo_test_config.yml
+	echo "Copying echo_test_config.yml"
 	@cp $< $@
 
 .PHONY: flashing_script

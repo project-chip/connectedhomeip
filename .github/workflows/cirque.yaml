@@ -56,6 +56,7 @@ jobs:
                   integrations/docker/images/chip-build-cirque/run.sh \
                      --env LOG_DIR=/tmp/cirque_test_output \
                      --env CLEANUP_DOCKER_FOR_CI=1 \
+                     --env GITHUB_ACTION_RUN=1 \
                      --privileged \
                      --volume /tmp:/tmp \
                      --volume /dev/pts:/dev/pts \

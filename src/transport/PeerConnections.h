@@ -19,6 +19,7 @@
 #include <core/CHIPError.h>
 #include <support/CodeUtils.h>
 #include <system/TimeSource.h>
+#include <transport/AdminPairingTable.h>
 #include <transport/PeerConnectionState.h>
 
 namespace chip {
@@ -225,6 +226,53 @@ public:
                 continue;
             }
             if (peerKeyId == kAnyKeyId || iter->GetPeerKeyID() == peerKeyId)
+            {
+                if (!nodeId.HasValue() || iter->GetPeerNodeId() == kUndefinedNodeId || iter->GetPeerNodeId() == nodeId.Value())
+                {
+                    state = iter;
+                    break;
+                }
+            }
+        }
+        return state;
+    }
+
+    /**
+     * Get a peer connection state given a peer Node Id, local Node Id and Peer's Encryption Key Id.
+     *
+     * @param nodeId is the connection to find (based on nodeId). Note that initial connections
+     *        do not have a node id set. Use this if you know the node id should be set.
+     * @param localNodeId The connection must correspond to the given local node ID.
+     * @param admins List of administrators that have commissioned this device.
+     * @param peerKeyId Encryption key ID used by the peer node.
+     * @param begin If a member of the pool, will start search from the next item. Can be nullptr to search from start.
+     *
+     * @return the state found, nullptr if not found
+     */
+    CHECK_RETURN_VALUE
+    PeerConnectionState * FindPeerConnectionState(Optional<NodeId> nodeId, NodeId localNodeId,
+                                                  Transport::AdminPairingTable * admins, uint16_t peerKeyId,
+                                                  PeerConnectionState * begin)
+    {
+        PeerConnectionState * state = nullptr;
+        PeerConnectionState * iter  = &mStates[0];
+
+        assert(begin == nullptr || (begin >= iter && begin < &mStates[kMaxConnectionCount]));
+
+        if (begin != nullptr)
+        {
+            iter = begin + 1;
+        }
+
+        for (; iter < &mStates[kMaxConnectionCount]; iter++)
+        {
+            if (!iter->IsInitialized())
+            {
+                continue;
+            }
+            AdminPairingInfo * adminInfo = admins->FindAdmin(iter->GetAdminId());
+            if (adminInfo != nullptr && adminInfo->GetNodeId() == localNodeId &&
+                (peerKeyId == kAnyKeyId || iter->GetPeerKeyID() == peerKeyId))
             {
                 if (!nodeId.HasValue() || iter->GetPeerNodeId() == kUndefinedNodeId || iter->GetPeerNodeId() == nodeId.Value())
                 {

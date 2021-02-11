@@ -19,6 +19,7 @@
 #include "Rpc.h"
 #include "AppTask.h"
 #include "PigweedLogger.h"
+#include "PigweedLoggerMutex.h"
 #include "pigweed/RpcService.h"
 
 #include "main/pigweed_lighting.rpc.pb.h"
@@ -52,30 +53,6 @@ namespace {
 
 using std::byte;
 
-class PigweedLoggerMutex : public ::chip::rpc::Mutex
-{
-public:
-    PigweedLoggerMutex() {}
-    void Lock() override
-    {
-        k_sem * sem = PigweedLogger::GetSemaphore();
-        if (sem)
-        {
-            k_sem_take(sem, K_FOREVER);
-        }
-    }
-    void Unlock() override
-    {
-        k_sem * sem = PigweedLogger::GetSemaphore();
-        if (sem)
-        {
-            k_sem_give(sem);
-        }
-    }
-};
-
-PigweedLoggerMutex uart_mutex;
-
 constexpr size_t kRpcTaskSize = 4096;
 constexpr int kRpcPriority    = 5;
 
@@ -101,7 +78,7 @@ k_tid_t Init()
 
 void RunRpcService(void *, void *, void *)
 {
-    Start(RegisterServices, &uart_mutex);
+    Start(RegisterServices, &logger_mutex);
 }
 
 } // namespace rpc

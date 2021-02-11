@@ -23,16 +23,22 @@
 #pragma once
 
 #include <system/SystemPacketBuffer.h>
-#include <transport/SecureSessionMgr.h>
 #include <transport/raw/MessageHeader.h>
+
+/**
+ * Initialize the data model internal code to be ready to send and receive
+ * data model messages.
+ *
+ */
+void InitDataModelHandler();
 
 /**
  * Handle a message that should be processed via our data model processing
  * codepath.
  *
+ * @param [in] nodeId The source node id of the message
  * @param [in] buffer The buffer holding the message.  This function guarantees
  *                    that it will free the buffer before returning.
+ *
  */
-void HandleDataModelMessage(const chip::PacketHeader & header, chip::System::PacketBufferHandle buffer,
-                            chip::SecureSessionMgr * mgr);
-void InitDataModelHandler();
+void HandleDataModelMessage(chip::NodeId nodeId, chip::System::PacketBufferHandle buffer);

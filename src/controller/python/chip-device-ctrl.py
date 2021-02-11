@@ -25,10 +25,8 @@
 
 from __future__ import absolute_import
 from __future__ import print_function
-from chip import ChipStack
 from chip import ChipDeviceCtrl
-from chip import ChipExceptions
-from builtins import range
+from chip import exceptions
 import sys
 import os
 import platform
@@ -38,7 +36,6 @@ import base64
 import textwrap
 import string
 from cmd import Cmd
-from six.moves import range
 from chip.ChipBleUtility import FAKE_CONN_OBJ_VALUE
 
 # Extend sys.path with one or more directories, relative to the location of the
@@ -71,7 +68,7 @@ elif sys.platform.startswith('linux'):
 # The exceptions for CHIP Device Controller CLI
 
 
-class ChipDevCtrlException(ChipExceptions.ChipStackException):
+class ChipDevCtrlException(exceptions.ChipStackException):
     pass
 
 
@@ -163,8 +160,6 @@ class DeviceMgrCmd(Cmd):
             pass
 
     command_names = [
-        "close",
-
         "ble-scan",
         "ble-adapter-select",
         "ble-adapter-print",
@@ -172,6 +167,7 @@ class DeviceMgrCmd(Cmd):
 
         "connect",
         "zcl",
+
         "set-pairing-wifi-credential",
     ]
 
@@ -248,7 +244,7 @@ class DeviceMgrCmd(Cmd):
 
         try:
             self.devCtrl.Close()
-        except ChipExceptions.ChipStackException as ex:
+        except exceptions.ChipStackException as ex:
             print(str(ex))
 
     def do_setlogoutput(self, line):
@@ -283,7 +279,7 @@ class DeviceMgrCmd(Cmd):
 
         try:
             self.devCtrl.SetLogFilter(category)
-        except ChipExceptions.ChipStackException as ex:
+        except exceptions.ChipStackException as ex:
             print(str(ex))
             return
 
@@ -376,10 +372,9 @@ class DeviceMgrCmd(Cmd):
                 print("Usage:")
                 self.do_help("connect SetupPinCode")
                 return
-        except ChipExceptions.ChipStackException as ex:
+        except exceptions.ChipStackException as ex:
             print(str(ex))
             return
-        print("Connected")
 
     def do_zcl(self, line):
         """
@@ -399,7 +394,7 @@ class DeviceMgrCmd(Cmd):
             elif len(args) == 2 and args[0] == '?':
                 cluster = self.devCtrl.ZCLList().get(args[1], None)
                 if not cluster:
-                    raise ChipExceptions.UnknownCluster(args[1])
+                    raise exceptions.UnknownCluster(args[1])
                 for commands in cluster.items():
                     args = ", ".join(["{}: {}".format(argName, argType)
                                       for argName, argType in commands[1].items()])
@@ -411,16 +406,16 @@ class DeviceMgrCmd(Cmd):
             elif len(args) > 4:
                 cluster = self.devCtrl.ZCLList().get(args[0], None)
                 if not cluster:
-                    raise ChipExceptions.UnknownCluster(args[0])
+                    raise exceptions.UnknownCluster(args[0])
                 command = cluster.get(args[1], None)
                 # When command takes no arguments, (not command) is True
                 if command == None:
-                    raise ChipExceptions.UnknownCommand(args[0], args[1])
+                    raise exceptions.UnknownCommand(args[0], args[1])
                 self.devCtrl.ZCLSend(args[0], args[1], int(
                     args[2]), int(args[3]), int(args[4]), FormatZCLArguments(args[5:], command))
             else:
                 self.do_help("zcl")
-        except ChipExceptions.ChipStackException as ex:
+        except exceptions.ChipStackException as ex:
             print("An exception occurred during process ZCL command:")
             print(str(ex))
 
@@ -433,7 +428,7 @@ class DeviceMgrCmd(Cmd):
         try:
             args = shlex.split(line)
             self.devCtrl.SetWifiCredential(args[0], args[1])
-        except ChipExceptions.ChipStackException as ex:
+        except exceptions.ChipStackException as ex:
             print(str(ex))
             return
 

@@ -11,8 +11,3 @@ RUN set -x \
     gcc-arm-none-eabi \
     binutils-arm-none-eabi \
     ccache
-
-#Clone Gecko SDK
-RUN mkdir -p /opt/SiliconLabs && git clone https://github.com/SiliconLabs/sdk_support.git /opt/SiliconLabs/sdk_support
-
-ENV EFR32_SDK_ROOT=/opt/SiliconLabs/sdk_support

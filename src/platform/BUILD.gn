@@ -355,6 +355,8 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "ESP32/ESP32Config.h",
         "ESP32/ESP32Utils.cpp",
         "ESP32/ESP32Utils.h",
+        "ESP32/KeyValueStoreManagerImpl.cpp",
+        "ESP32/KeyValueStoreManagerImpl.h",
         "ESP32/Logging.cpp",
         "ESP32/LwIPCoreLock.cpp",
         "ESP32/MdnsImpl.cpp",

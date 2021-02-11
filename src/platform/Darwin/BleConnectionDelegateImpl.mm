@@ -133,7 +133,7 @@ namespace DeviceLayer {
                     uint8_t opCode = bytes[0];
                     uint16_t discriminator = (bytes[1] | (bytes[2] << 8)) & 0xfff;
 
-                    if (opCode == 0 && [self checkDiscriminator:discriminator]) {
+                    if ((opCode == 0 || opCode == 1) && [self checkDiscriminator:discriminator]) {
                         ChipLogProgress(Ble, "Connecting to device with discriminator: %d", discriminator);
                         [self connect:peripheral];
                         [self stopScanning];

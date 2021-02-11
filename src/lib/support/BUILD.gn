@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2020-2021 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -49,9 +49,9 @@ static_library("support") {
     "Base64.cpp",
     "Base64.h",
     "BitFlags.h",
-    "BufBound.h",
     "BufferReader.cpp",
     "BufferReader.h",
+    "BufferWriter.cpp",
     "BufferWriter.h",
     "CHIPArgParser.cpp",
     "CHIPCounter.cpp",
@@ -132,5 +132,8 @@ static_library("support") {
   libs = []
   if (chip_logging_style == "android") {
     libs += [ "log" ]
+  }
+  if (chip_config_memory_debug_dmalloc) {
+    libs += [ "dmallocthcxx" ]
   }
 }

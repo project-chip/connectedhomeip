@@ -16,18 +16,68 @@
  */
 
 #include "esp_log.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/event_groups.h"
+#include "freertos/semphr.h"
+#include "freertos/task.h"
+#include "pw_log/log.h"
+#include "pw_rpc/echo_service_nanopb.h"
+#include "pw_rpc/server.h"
 #include "pw_sys_io/sys_io.h"
 #include "pw_sys_io_esp32/init.h"
 
-const char * TAG = "pw-rpc-app";
+#include "RpcService.h"
 
-namespace hdlc_example {
-extern void Start();
-} // namespace hdlc_example
+#include "lwip/err.h"
+#include "lwip/sockets.h"
+#include "lwip/sys.h"
+
+const char * TAG = "chip-pigweed-app";
+
+namespace {
+using std::byte;
+
+constexpr size_t kRpcStackSizeBytes = (4 * 1024);
+constexpr uint8_t kRpcTaskPriority  = 5;
+
+SemaphoreHandle_t uart_mutex;
+
+class LoggerMutex : public chip::rpc::Mutex
+{
+public:
+    void Lock() override { xSemaphoreTake(uart_mutex, portMAX_DELAY); }
+    void Unlock() override { xSemaphoreGive(uart_mutex); }
+};
+
+LoggerMutex logger_mutex;
+
+TaskHandle_t rpcTaskHandle;
+
+pw::rpc::EchoService echo_service;
+
+void RegisterServices(pw::rpc::Server & server)
+{
+    server.RegisterService(echo_service);
+}
+
+void RunRpcService(void *)
+{
+    ::chip::rpc::Start(RegisterServices, &logger_mutex);
+}
+
+} // namespace
+
 extern "C" void app_main()
 {
     pw_sys_io_Init();
 
     ESP_LOGI(TAG, "----------- chip-esp32-pigweed-example starting -----------");
-    hdlc_example::Start();
+
+    uart_mutex = xSemaphoreCreateMutex();
+    xTaskCreate(RunRpcService, "RPC", kRpcStackSizeBytes / sizeof(StackType_t), nullptr, kRpcTaskPriority, &rpcTaskHandle);
+
+    while (1)
+    {
+        vTaskDelay(50 / portTICK_PERIOD_MS);
+    }
 }

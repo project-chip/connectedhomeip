@@ -29,7 +29,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build-esp32:0.4.18
+            image: connectedhomeip/chip-build-esp32:latest
 
         steps:
             - name: Checkout
@@ -38,17 +38,17 @@ jobs:
                   submodules: true
                   ref: "${{ github.event.inputs.releaseTag }}"
             - name: Build
-              run: scripts/examples/esp_echo_app.sh
+              run: scripts/examples/esp_example.sh all-clusters-app
 
             - name: Upload artifact
               run: |
-                 scripts/helpers/upload_release_asset.py                  \
-                    --github-repository project-chip/connectedhomeip      \
-                    --github-api-token "${{ secrets.GITHUB_TOKEN }}"      \
-                    --release-tag "${{ github.event.inputs.releaseTag }}" \
-                    --bundle-files $BUILD_DIRECTORY/chip-all-clusters-app.flashbundle.txt \
-                    --working-directory $BUILD_DIRECTORY                  \
-                    --bundle-name esp32-chip-all-clusters-app
+                  scripts/helpers/upload_release_asset.py                  \
+                     --github-repository project-chip/connectedhomeip      \
+                     --github-api-token "${{ secrets.GITHUB_TOKEN }}"      \
+                     --release-tag "${{ github.event.inputs.releaseTag }}" \
+                     --bundle-files $BUILD_DIRECTORY/chip-all-clusters-app.flashbundle.txt \
+                     --working-directory $BUILD_DIRECTORY                  \
+                     --bundle-name esp32-chip-all-clusters-app
 
     efr32:
         name: EFR32
@@ -59,23 +59,24 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build-efr32:0.4.18
+            image: connectedhomeip/chip-build-efr32:latest
         steps:
             - name: Checkout
               uses: actions/checkout@v2
               with:
                   submodules: true
                   ref: "${{ github.event.inputs.releaseTag }}"
-            - name: Build example EFR32 Lock App 
+            - name: Build example EFR32 Lock App
               run:
-                  scripts/examples/gn_efr32_example.sh examples/lock-app/efr32/ out/lock_app_debug $EFR32_BOARD
-            
+                  scripts/examples/gn_efr32_example.sh examples/lock-app/efr32/
+                  out/lock_app_debug $EFR32_BOARD
+
             - name: Upload artifact
               run: |
-                 scripts/helpers/upload_release_asset.py                     \
-                    --github-repository project-chip/connectedhomeip         \
-                    --github-api-token "${{ secrets.GITHUB_TOKEN }}"         \
-                    --release-tag "${{ github.event.inputs.releaseTag }}"    \
-                    --bundle-files $BUILD_DIRECTORY/lock_app.flashbundle.txt \
-                    --working-directory $BUILD_DIRECTORY                     \
-                    --bundle-name efr32-$EFR32_BOARD-chip-lock-example
+                  scripts/helpers/upload_release_asset.py                     \
+                     --github-repository project-chip/connectedhomeip         \
+                     --github-api-token "${{ secrets.GITHUB_TOKEN }}"         \
+                     --release-tag "${{ github.event.inputs.releaseTag }}"    \
+                     --bundle-files $BUILD_DIRECTORY/lock_app.flashbundle.txt \
+                     --working-directory $BUILD_DIRECTORY                     \
+                     --bundle-name efr32-$EFR32_BOARD-chip-lock-example
