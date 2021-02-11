@@ -167,7 +167,7 @@ public:
             n += (i == 0) ? 1 : -1;
             char buffer[32];
             sprintf(buffer, "%d", n);
-            if (!strncmp(name.c_str(), "Temperature", sizeof(name.c_str())))
+            if (name == "Temperature")
             {
                 // update the temp attribute here for hardcoded endpoint 1
                 emberAfPluginTemperatureMeasurementSetValueCallback(1, (int16_t)(n * 100));
