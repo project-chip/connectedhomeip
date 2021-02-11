@@ -136,8 +136,8 @@ void VerifyStatusReport(nlTestSuite * inSuite, void * inContext, const System::P
         return;
     }
 
-    Encoding::LittleEndian::Reader reader(msg->Start() + headerSize, static_cast<uint16_t>(msg->DataLength() - headerSize));
-    err = reader.Read16(&generalCode).Read32(&protocolId).Read16(&protocolCode).StatusCode();
+    Encoding::LittleEndian::Reader reader(msg->Start(), msg->DataLength());
+    err = reader.Skip(headerSize).Read16(&generalCode).Read32(&protocolId).Read16(&protocolCode).StatusCode();
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, generalCode == static_cast<uint16_t>(Protocols::Common::StatusCode::Failure));
     NL_TEST_ASSERT(inSuite, protocolId == Protocols::kProtocol_BDX);

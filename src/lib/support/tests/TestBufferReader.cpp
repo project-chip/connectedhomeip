@@ -86,12 +86,35 @@ static void TestBufferReader_Saturation(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
 }
 
+static void TestBufferReader_Skip(nlTestSuite * inSuite, void * inContext)
+{
+    TestReader reader;
+    uint8_t temp          = 0;
+    uint16_t firstSkipLen = 2;
+
+    // Verify Skip() advances the start pointer the correct amount.
+    CHIP_ERROR err = reader.Skip(firstSkipLen).Read8(&temp).StatusCode();
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, temp == test_buffer[firstSkipLen]);
+    NL_TEST_ASSERT(inSuite, reader.OctetsRead() == firstSkipLen + 1);
+
+    // Verify Skip() called with a length larger than available buffer space jumps to the end.
+    err = reader.Skip(sizeof(test_buffer)).StatusCode();
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, reader.OctetsRead() == sizeof(test_buffer));
+    NL_TEST_ASSERT(inSuite, reader.Remaining() == 0);
+
+    // Verify no read allowed after jumping to the end.
+    err = reader.Read8(&temp).StatusCode();
+    NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
+}
+
 #define NL_TEST_DEF_FN(fn) NL_TEST_DEF("Test " #fn, fn)
 /**
  *   Test Suite. It lists all the test functions.
  */
 static const nlTest sTests[] = { NL_TEST_DEF_FN(TestBufferReader_Basic), NL_TEST_DEF_FN(TestBufferReader_Saturation),
-                                 NL_TEST_SENTINEL() };
+                                 NL_TEST_DEF_FN(TestBufferReader_Skip), NL_TEST_SENTINEL() };
 
 int TestBufferReader(void)
 {
