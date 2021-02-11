@@ -94,7 +94,7 @@ def get_bluez_objects(bluez, bus, interface, prefix_path):
     results = []
     if bluez is None or bus is None or interface is None or prefix_path is None:
         return results
-    for item in bluez.GetManagedObjects().items:
+    for item in bluez.GetManagedObjects().items():
         delegates = item[1].get(interface)
         if not delegates:
             continue
