@@ -15,7 +15,7 @@
 ARG BUILD_VERSION
 
 # All tools required for compilation belong in chip-build, forms "truth" for CHIP build tooling
-FROM connectedhomeip/chip-build-vscode:${BUILD_VERSION}
+FROM pan2048/chip-build-mbed-os:${BUILD_VERSION}
 
 # This Dockerfile contains things useful for an interactive development environment
 ARG USERNAME=vscode
@@ -51,8 +51,3 @@ RUN curl https://raw.githubusercontent.com/restyled-io/restyler/master/bin/resty
 RUN chmod +x /home/$USERNAME/bin/restyle-path
 RUN chown -R $USERNAME:$USERNAME /home/$USERNAME
 RUN echo "PATH=/home/$USERNAME/bin:${PATH}" >> /home/$USERNAME/.bashrc
-# $USERNAME needs to own the esp-idf and tools for the examples to build
-RUN chown -R $USERNAME:$USERNAME /opt/espressif/esp-idf
-RUN chown -R $USERNAME:$USERNAME /opt/espressif/tools
-# $USERNAME needs to own west configuration to build nRF Connect examples
-RUN chown -R $USERNAME:$USERNAME /opt/NordicSemiconductor/nrfconnect/.west
