@@ -1247,7 +1247,7 @@ void CircularEventBuffer::AddEvent(chip::app::reporting::timestamp_t aEventTimes
 
 void CircularEventBuffer::RemoveEvent(uint16_t aNumEvents)
 {
-    mFirstEventID =  static_cast<chip::EventId>(mFirstEventID + aNumEvents);
+    mFirstEventID = static_cast<chip::EventId>(mFirstEventID + aNumEvents);
 }
 
 /**
