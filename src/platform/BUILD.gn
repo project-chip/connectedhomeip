@@ -241,12 +241,13 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "cc13x2_26x2/ConnectivityManagerImpl.cpp",
         "cc13x2_26x2/ConnectivityManagerImpl.h",
         "cc13x2_26x2/InetPlatformConfig.h",
+        "cc13x2_26x2/Logging.cpp",
         "cc13x2_26x2/PlatformManagerImpl.cpp",
         "cc13x2_26x2/PlatformManagerImpl.h",
         "cc13x2_26x2/SystemPlatformConfig.h",
       ]
 
-      public_deps += [ "${chip_root}/src/platform/logging:cc13x2_26x2" ]
+      public_deps += [ "${chip_root}/src/platform/logging:headers" ]
 
       if (chip_enable_openthread) {
         public_deps += [

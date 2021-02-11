@@ -3,6 +3,7 @@
 #include <platform/logging/LogV.h>
 
 #include <core/CHIPConfig.h>
+#include <platform/CHIPDeviceConfig.h>
 
 #include "ti_drivers_config.h"
 
@@ -107,7 +108,7 @@ extern "C" void cc13x2_26x2Log(const char * msg, ...)
     va_end(v);
 }
 
-#if CHIP_ENABLE_OPENTHREAD
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 extern "C" void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const char * aFormat, ...)
 {
     va_list v;
@@ -122,4 +123,4 @@ extern "C" void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const ch
     DeviceLayer::OnLogOutput();
     va_end(v);
 }
-#endif // CHIP_ENABLE_OPENTHREAD
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD

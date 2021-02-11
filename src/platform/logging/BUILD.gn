@@ -19,7 +19,6 @@ if (chip_enable_openthread) {
 }
 
 simple_log_platforms = [
-  "cc13x2_26x2",
   "darwin",
   "k32w",
   "linux",
@@ -41,9 +40,7 @@ foreach(platform, simple_log_platforms) {
       if (chip_enable_openthread) {
         defines = [ "CHIP_ENABLE_OPENTHREAD=1" ]
 
-        if (platform == "cc13x2_26x2") {
-          deps += [ "${openthread_root}:libopenthread-mtd" ]
-        } else if (platform == "k32w") {
+        if (platform == "k32w") {
           deps += [ "${openthread_root}:libopenthread-ftd" ]
         }
       }
