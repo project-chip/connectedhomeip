@@ -36,7 +36,7 @@
 
 #include <core/CHIPConfig.h>
 
-#include <logging/LogV.h>
+#include <platform/logging/LogV.h>
 
 #include <support/logging/Constants.h>
 

@@ -1,6 +1,6 @@
 /* See Project CHIP LICENSE file for licensing information. */
 
-#include <logging/LogV.h>
+#include <platform/logging/LogV.h>
 
 #include <core/CHIPConfig.h>
 

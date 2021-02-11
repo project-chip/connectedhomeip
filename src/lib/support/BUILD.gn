@@ -103,7 +103,7 @@ static_library("support") {
     ":chip_version_header",
     ":logging_constants",
     "${chip_root}/src/lib/core:chip_config_header",
-    "${chip_root}/src/platform/logging:vlog",
+    "${chip_root}/src/platform/logging:logv",
     "${nlassert_root}:nlassert",
     "${nlio_root}:nlio",
   ]
