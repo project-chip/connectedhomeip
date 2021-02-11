@@ -51,6 +51,8 @@
 #include <support/CHIPMem.h>
 #include <support/ErrorStr.h>
 
+#include <app/clusters/temperature-measurement-server/temperature-measurement-server.h>
+
 using namespace ::chip;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::DeviceLayer;
@@ -158,10 +160,18 @@ public:
         int n;
         if (sscanf(value.c_str(), "%d", &n) == 1)
         {
+            auto & attribute = std::get<1>(std::get<1>(std::get<1>(devices[d])[e])[c])[a];
+            auto & name      = std::get<0>(attribute);
+
             ESP_LOGI(TAG, "editing attribute as integer: %d (%s)", n, i == 0 ? "+" : "-");
             n += (i == 0) ? 1 : -1;
             char buffer[32];
             sprintf(buffer, "%d", n);
+            if (name == "Temperature")
+            {
+                // update the temp attribute here for hardcoded endpoint 1
+                emberAfPluginTemperatureMeasurementSetValueCallback(1, static_cast<int16_t>(n * 100));
+            }
             value = buffer;
         }
         else
@@ -301,9 +311,8 @@ void SetupPretendDevices()
     AddEndpoint("External");
     AddCluster("Thermometer");
     AddAttribute("Temperature", "21");
-    AddEndpoint("Internal");
-    AddCluster("Thermometer");
-    AddAttribute("Temperature", "42");
+    // write the temp attribute
+    emberAfPluginTemperatureMeasurementSetValueCallback(1, static_cast<int16_t>(21 * 100));
 
     AddDevice("Garage 1");
     AddEndpoint("Door 1");
@@ -493,8 +502,6 @@ extern "C" void app_main()
         return;
     }
 
-    SetupPretendDevices();
-
     statusLED1.Init(STATUS_LED_GPIO_NUM);
     // Our second LED doesn't map to any physical LEDs so far, just to virtual
     // "LED"s on devices with screens.
@@ -506,6 +513,8 @@ extern "C" void app_main()
     // Init ZCL Data Model and CHIP App Server
     AppCallbacks callbacks;
     InitServer(&callbacks);
+
+    SetupPretendDevices();
 
     std::string qrCodeText = createSetupPayload();
     ESP_LOGI(TAG, "QR CODE Text: '%s'", qrCodeText.c_str());
