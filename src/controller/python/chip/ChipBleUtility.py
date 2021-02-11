@@ -26,7 +26,6 @@ from __future__ import absolute_import
 from __future__ import print_function
 from ctypes import *
 from .ChipUtility import ChipUtility
-import six
 
 
 # Duplicates of BLE definitions in ChipDeviceController-ScriptBinding.cpp
@@ -68,7 +67,7 @@ def VoidPtrToUUIDString(ptr, len):
 
 
 def ParseBleEventType(val):
-    if isinstance(val, six.integer_types):
+    if isinstance(val, int):
         return val
     if val.lower() == "rx":
         return BLE_EVENT_TYPE_RX
