@@ -76,7 +76,6 @@ COMPONENT_ADD_INCLUDEDIRS 	 = project-config \
                                $(REL_CHIP_ROOT)/src/lib \
                                $(REL_CHIP_ROOT)/src/ \
                                $(REL_CHIP_ROOT)/src/system \
-                               $(REL_CHIP_ROOT)/src/platform/logging/include \
                                $(IDF_PATH)/components/mbedtls/mbedtls/include \
                                $(REL_CHIP_ROOT)/src/app
 
