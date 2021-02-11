@@ -10,9 +10,7 @@ source_set("headers") {
   public = [ "LogV.h" ]
 }
 
-simple_log_platforms = [
-  "linux",
-]
+simple_log_platforms = [ "linux" ]
 
 foreach(platform, simple_log_platforms) {
   if (chip_device_platform == platform) {
