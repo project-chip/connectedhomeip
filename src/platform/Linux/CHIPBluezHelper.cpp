@@ -1281,12 +1281,12 @@ static void UpdateAdditionalDataCharacteristic(BluezGattCharacteristic1 * charac
     uint16_t lifetimeCounter                  = 0;
     AdditionalDataFields additionalDataFields = AdditionalDataFields::NotSpecified;
 
+#if CHIP_ENABLE_ROTATING_DEVICE_ID
     err = ConfigurationMgr().GetSerialNumber(serialNumber, sizeof(serialNumber), serialNumberSize);
     SuccessOrExit(err);
     err = ConfigurationMgr().GetLifetimeCounter(lifetimeCounter);
     SuccessOrExit(err);
 
-#if CHIP_ENABLE_ROTATING_DEVICE_ID
     additionalDataFields |= AdditionalDataFields::RotatingDeviceId;
 #endif
 

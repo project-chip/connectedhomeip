@@ -86,6 +86,7 @@ public:
     CHIP_ERROR GetServiceConfig(uint8_t * buf, size_t bufSize, size_t & serviceConfigLen);
     CHIP_ERROR GetPairedAccountId(char * buf, size_t bufSize, size_t & accountIdLen);
 #if CHIP_ENABLE_ROTATING_DEVICE_ID
+    // Lifetime counter is monotonic counter that is incremented only in the case of a factory reset
     CHIP_ERROR GetLifetimeCounter(uint16_t & lifetimeCounter);
 #endif
     CHIP_ERROR StoreSerialNumber(const char * serialNum, size_t serialNumLen);

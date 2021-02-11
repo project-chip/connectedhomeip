@@ -118,8 +118,8 @@ static CHIP_ERROR DiscoveryImplPlatform::GenerateRotatingDeviceId(char rotatingD
                       chip::DeviceLayer::ConfigurationMgr().GetSerialNumber(serialNumber, sizeof(serialNumber), serialNumberSize));
     SuccessOrExit(error = chip::DeviceLayer::ConfigurationMgr().GetLifetimeCounter(lifetimeCounter));
     SuccessOrExit(error = AdditionDataPayloadGenerator().generateRotatingDeviceId(
-                      lifetimeCounter, serialNumber, serialNumberSize, rotatingDeviceIdHexBuffer,
-                      ArraySize(rotatingDeviceIdHexBuffer), rotatingDeviceIdHexBufferSize));
+                      lifetimeCounter, serialNumber, serialNumberSize, rotatingDeviceIdHexBuffer, rotatingDeviceIdHexBufferSize,
+                      rotatingDeviceIdHexBufferSize));
     return error;
 }
 

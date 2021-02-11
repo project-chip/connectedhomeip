@@ -27,10 +27,6 @@
 #include <system/TLVPacketBufferBackingStore.h>
 #include <type_traits>
 
-#define ROTATING_DEVICE_ID_COUNTER_STR_MAX_LENGTH 10
-#define ROTATING_DEVICE_ID_HASH_SUFFIX_LENGTH 16
-#define ROTATING_DEVICE_ID_MAX_LENGTH ROTATING_DEVICE_ID_COUNTER_STR_MAX_LENGTH + ROTATING_DEVICE_ID_HASH_SUFFIX_LENGTH
-
 namespace chip {
 namespace RotatingDeviceId {
 static constexpr unsigned kRotatingDeviceIdCounterStringMaxLength = 10;
@@ -68,14 +64,39 @@ class AdditionalDataPayloadGenerator
 
 public:
     AdditionalDataPayloadGenerator() {}
-    // Generate additional data payload (i.e. TLV encoded)
+
+    /**
+     * Generate additional data payload (i.e. TLV encoded).
+     *
+     * @param lifetimeCounter lifetime counter
+     * @param serialNumberBuffer serial number buffer
+     * @param serialNumberBufferSize size of the serial number buffer supplied.
+     * @param bufferHandle output buffer handle
+     * @param additionalDataFields bitfield for what fields should be generated in the additional data
+     *
+     * @return CHIP_NO_ERROR on success.
+     *
+     */
     CHIP_ERROR generateAdditionalDataPayload(uint16_t lifetimeCounter, const char * serialNumberBuffer,
                                              size_t serialNumberBufferSize, chip::System::PacketBufferHandle & bufferHandle,
                                              AdditionalDataFields additionalDataFields);
     // Generate Device Rotating ID
+    /**
+     * Generate additional data payload (i.e. TLV encoded).
+     *
+     * @param lifetimeCounter lifetime counter
+     * @param serialNumberBuffer serial number buffer
+     * @param serialNumberBufferSize size of the serial number buffer supplied.
+     * @param rotatingDeviceIdBuffer rotating device id buffer
+     * @param rotatingDeviceIdBufferSize the current size of the supplied buffer
+     * @param rotatingDeviceIdValueOutputSize the number of chars making up the actual value of the returned rotating device id
+     *
+     * @return CHIP_NO_ERROR on success.
+     *
+     */
     CHIP_ERROR generateRotatingDeviceId(uint16_t lifetimeCounter, const char * serialNumberBuffer, size_t serialNumberBufferSize,
                                         char * rotatingDeviceIdBuffer, size_t rotatingDeviceIdBufferSize,
-                                        size_t & rotatingDeviceIdBufferOutputSize);
+                                        size_t & rotatingDeviceIdValueOutputSize);
 };
 
 } // namespace chip
