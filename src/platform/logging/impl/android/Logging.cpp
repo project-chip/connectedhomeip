@@ -1,6 +1,6 @@
 /* See Project chip LICENSE file for licensing information. */
 
-#include "logging/LogV.h"
+#include "platform/logging/LogV.h"
 #include "support/logging/Constants.h"
 
 #include <android/log.h>
