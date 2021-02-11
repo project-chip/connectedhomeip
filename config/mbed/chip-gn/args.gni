@@ -21,7 +21,7 @@ chip_system_project_config_include = ""
 chip_ble_project_config_include = ""
 
 custom_toolchain = "//toolchain:mbed"
-mbedtls_target = "//:mbedtls"
+mbedtls_target = "//mbedtls:mbedtls"
 
 treat_warnings_as_errors = false
 lwip_platform = "mbed"

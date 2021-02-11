@@ -121,6 +121,25 @@ list(APPEND CHIP_CFLAGS_C ${CMAKE_C_FLAGS_INIT})
 mbed_get_lang_compile_flags(CHIP_CFLAGS_CC CXX)
 list(APPEND CHIP_CFLAGS_CC ${CMAKE_CXX_FLAGS_INIT})
 
+if (CONFIG_CHIP_WITH_EXTERNAL_MBEDTLS)
+    list(APPEND CHIP_CFLAGS 
+        "\"-I${MBED_PATH}connectivity/mbedtls\""
+        "\"-I${MBED_PATH}connectivity/mbedtls/platform\""
+        "\"-I${MBED_PATH}connectivity/mbedtls/include\""
+    )
+    list(APPEND CHIP_CFLAGS 
+        "\"-DMBEDTLS_X509_CSR_WRITE_C\""
+        "\"-DMBEDTLS_X509_CREATE_C\""
+        "\"-DMBEDTLS_PEM_WRITE_C\""
+    )
+    if ("\"-DFEATURE_CRYPTOCELL310=1\"" IN_LIST CHIP_CFLAGS)
+        list(APPEND CHIP_CFLAGS 
+            "\"-I${MBED_PATH}connectivity/drivers/mbedtls/FEATURE_CRYPTOCELL310/include/cryptocell310\""
+            "\"-I${MBED_PATH}connectivity/drivers/mbedtls/FEATURE_CRYPTOCELL310/include/cryptocell310/internal\""
+        )
+    endif()
+endif()
+
 set(SEPARATOR ",")
 convert_list_of_flags_to_string_of_flags(CHIP_CFLAGS CHIP_CFLAGS ${SEPARATOR})
 set(SEPARATOR " ")
@@ -168,6 +187,7 @@ chip_gn_arg_bool  ("is_debug"                             CONFIG_DEBUG)
 chip_gn_arg_bool  ("chip_build_tests"                     CONFIG_CHIP_BUILD_TESTS)
 chip_gn_arg_bool  ("chip_build_libshell"                  CONFIG_CHIP_LIB_SHELL)
 chip_gn_arg_bool  ("chip_with_lwip"                       CONFIG_CHIP_WITH_LWIP)
+#chip_gn_arg_bool  ("chip_with_platform_mbedtls"           CONFIG_CHIP_WITH_EXTERNAL_MBEDTLS)
 
 if (BOARD STREQUAL "native_posix")
     chip_gn_arg_string("target_cpu" "x86")
