@@ -2,8 +2,9 @@
 #include <platform/logging/LogV.h>
 
 #include <core/CHIPConfig.h>
+#include <platform/CHIPDeviceConfig.h>
 
-#if CHIP_ENABLE_OPENTHREAD
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <openthread/platform/logging.h>
 #endif
 
@@ -232,7 +233,7 @@ extern "C" void LwIPLog(const char * aFormat, ...)
 /**
  * Platform logging function for OpenThread
  */
-#if CHIP_ENABLE_OPENTHREAD
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 extern "C" void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const char * aFormat, ...)
 {
     (void) aLogRegion;
