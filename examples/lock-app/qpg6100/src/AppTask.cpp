@@ -144,11 +144,6 @@ void AppTask::AppTaskMain(void * pvParameter)
         {
             sIsThreadProvisioned     = ConnectivityMgr().IsThreadProvisioned();
             sIsThreadEnabled         = ConnectivityMgr().IsThreadEnabled();
-<<<<<<< HEAD
-=======
-            sIsThreadAttached        = ConnectivityMgr().IsThreadAttached();
-            sIsPairedToAccount       = ConfigurationMgr().IsPairedToAccount();
->>>>>>> 84f18bd0... * Addition OpenThread to QPG6100 platform
             sHaveBLEConnections      = (ConnectivityMgr().NumBLEConnections() != 0);
             sHaveServiceConnectivity = ConnectivityMgr().HaveServiceConnectivity();
             PlatformMgr().UnlockChipStack();
