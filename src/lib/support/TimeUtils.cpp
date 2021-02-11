@@ -477,13 +477,16 @@ static void SecondsSinceEpochToCalendarTime(uint64_t secondsSinceEpoch, uint16_t
                                             uint8_t & hour, uint8_t & minute, uint8_t & second)
 {
     uint32_t daysSinceEpoch = static_cast<uint32_t>(secondsSinceEpoch / kSecondsPerDay);
-    static_assert((static_cast<uint64_t>(UINT32_MAX) + kChipEpochSecondsSinceUnixEpoch) / kSecondsPerDay <= std::numeric_limits<decltype(daysSinceEpoch)>::max(), "daysSinceEpoch would overflow");
-    uint32_t timeOfDay      = static_cast<uint32_t>(secondsSinceEpoch - (daysSinceEpoch * kSecondsPerDay));
+    static_assert((static_cast<uint64_t>(UINT32_MAX) + kChipEpochSecondsSinceUnixEpoch) / kSecondsPerDay <=
+                      std::numeric_limits<decltype(daysSinceEpoch)>::max(),
+                  "daysSinceEpoch would overflow");
+    uint32_t timeOfDay = static_cast<uint32_t>(secondsSinceEpoch - (daysSinceEpoch * kSecondsPerDay));
 
     // Note: This call to DaysSinceEpochToCalendarDate can't fail, because we
     // can't overflow a uint16_t year with a muximum possible value of the
     // secondsSinceEpoch input.
-    static_assert((static_cast<uint64_t>(UINT32_MAX) + kChipEpochSecondsSinceUnixEpoch) / (kDaysPerStandardYear * kSecondsPerDay) + 1 <=
+    static_assert((static_cast<uint64_t>(UINT32_MAX) + kChipEpochSecondsSinceUnixEpoch) / (kDaysPerStandardYear * kSecondsPerDay) +
+                          1 <=
                       std::numeric_limits<std::remove_reference<decltype(year)>::type>::max(),
                   "What happened to our year or day lengths?");
     DaysSinceEpochToCalendarDate(daysSinceEpoch, year, month, dayOfMonth);
