@@ -10,25 +10,6 @@ source_set("headers") {
   public = [ "LogV.h" ]
 }
 
-simple_log_platforms = [
-  "linux",
-]
-
-foreach(platform, simple_log_platforms) {
-  if (chip_device_platform == platform) {
-    static_library(platform) {
-      sources = [ "impl/" + platform + "/Logging.cpp" ]
-
-      deps = [
-        ":headers",
-        "${chip_root}/src/lib/core:chip_config_header",
-        "${chip_root}/src/lib/support:logging_constants",
-        "${chip_root}/src/platform:platform_buildconfig",
-      ]
-    }
-  }
-}
-
 if (current_os == "android") {
   static_library("android") {
     sources = [ "impl/android/Logging.cpp" ]
