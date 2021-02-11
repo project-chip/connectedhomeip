@@ -35,12 +35,9 @@ import threading
 import time
 import traceback
 import uuid
-import six.moves.queue
-
+import queue
 
 from ctypes import *
-import six
-from six.moves import range
 
 try:
     from gi.repository import GObject
@@ -97,7 +94,7 @@ def get_bluez_objects(bluez, bus, interface, prefix_path):
     results = []
     if bluez is None or bus is None or interface is None or prefix_path is None:
         return results
-    for item in six.iteritems(bluez.GetManagedObjects()):
+    for item in bluez.GetManagedObjects().items:
         delegates = item[1].get(interface)
         if not delegates:
             continue
@@ -798,7 +795,7 @@ class BluezManager(ChipBleBase):
         self.scan_quiet = False
         self.peripheral_list = []
         self.device_uuid_list = []
-        self.chip_queue = six.moves.queue.Queue()
+        self.chip_queue = queue.Queue()
         self.Gmainloop = None
         self.daemon_thread = None
         self.adapter = None
