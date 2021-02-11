@@ -21,7 +21,6 @@ if (chip_enable_openthread) {
 simple_log_platforms = [
   "darwin",
   "linux",
-  "nrfconnect",
 ]
 
 foreach(platform, simple_log_platforms) {
