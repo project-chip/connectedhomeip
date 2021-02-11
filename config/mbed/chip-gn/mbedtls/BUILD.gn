@@ -12,24 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Options from standalone-chip.mk that differ from configure defaults. These
+# options are used from examples/.
+
 import("//build_overrides/chip.gni")
 
-import("//${chip_root}/build/chip/tests.gni")
-
-assert(current_os == "mbed")
-
-declare_args() {
-  chip_build_libshell = false
-}
-
-group("mbed") {
-  deps = [ "${chip_root}/src/lib" ]
-
-  if (chip_build_libshell) {
-    deps += [ "${chip_root}/src/lib/shell" ]
-  }
-}
-
-group("default") {
-  deps = [ ":mbed" ]
+# Mbed has its own mbedtls, so nothing to do, just provide a target
+group("mbedtls") {
 }

@@ -77,9 +77,6 @@ endfunction()
 function(mbed_get_compile_definitions output)
   get_property(flags TARGET mbed-core PROPERTY INTERFACE_COMPILE_DEFINITIONS)
 
-  #Temporary workaround for mbedtls - remove after switch to mbed source for mbedtls
-  list(REMOVE_ITEM flags TARGET_LIKE_MBED)
-
   list(APPEND CFLAG_LIST)
   foreach(flag ${flags})
     # Replace each quote with a '\"' - format required for the GN arguments
