@@ -70,11 +70,11 @@ config CHIP_DISABLE_CHIPOBLE_ADVERTISING_WHEN_PROVISIONED
 	help
 	  Disable CHIPoBLE advertising when the device achieves a fully provisioned state.
 
-config CHIP_ENABLE_CHIPOBLE_ADVERTISING_AUTOSTART
-	bool "Enable CHIPoBLE advertising autostart"
+config CHIP_ENABLE_PAIRING_AUTOSTART
+	bool "Enable pairing autostart"
 	default n
 	help
-	  Start CHIPoBLE advertising automatically at application boot time.
+	  Open pairing window automatically at application boot time.
 
 config CHIP_NFC_COMMISSIONING
 	bool "Enable NFC commissioning support"
