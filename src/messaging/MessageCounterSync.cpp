@@ -27,33 +27,32 @@
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
-#include <messaging/SecureChannelMgr.h>
+#include <messaging/MessageCounterSync.h>
 #include <protocols/Protocols.h>
 #include <support/BufferWriter.h>
 #include <support/CodeUtils.h>
+#include <support/ReturnMacros.h>
 #include <support/logging/CHIPLogging.h>
 
 namespace chip {
-namespace Protocols {
-namespace SecureChannel {
+namespace Messaging {
 
-CHIP_ERROR SecureChannelMgr::Init(Messaging::ExchangeManager * exchangeMgr)
+CHIP_ERROR MessageCounterSyncMgr::Init(Messaging::ExchangeManager * exchangeMgr)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    VerifyOrExit(exchangeMgr != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(exchangeMgr != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     mExchangeMgr = exchangeMgr;
 
     // Register to receive unsolicited Secure Channel Request messages from the exchange manager.
     err = mExchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::kProtocol_SecureChannel, this);
 
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(err);
 
-exit:
     return err;
 }
 
-void SecureChannelMgr::Shutdown()
+void MessageCounterSyncMgr::Shutdown()
 {
     if (mExchangeMgr != nullptr)
     {
@@ -62,8 +61,8 @@ void SecureChannelMgr::Shutdown()
     }
 }
 
-void SecureChannelMgr::OnMessageReceived(Messaging::ExchangeContext * exchangeContext, const PacketHeader & packetHeader,
-                                         const PayloadHeader & payloadHeader, System::PacketBufferHandle msgBuf)
+void MessageCounterSyncMgr::OnMessageReceived(Messaging::ExchangeContext * exchangeContext, const PacketHeader & packetHeader,
+                                              const PayloadHeader & payloadHeader, System::PacketBufferHandle msgBuf)
 {
     if (payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::MsgCounterSyncReq))
     {
@@ -75,7 +74,7 @@ void SecureChannelMgr::OnMessageReceived(Messaging::ExchangeContext * exchangeCo
     }
 }
 
-void SecureChannelMgr::OnResponseTimeout(Messaging::ExchangeContext * exchangeContext)
+void MessageCounterSyncMgr::OnResponseTimeout(Messaging::ExchangeContext * exchangeContext)
 {
     // Close the exchange if MsgCounterSyncRsp is not received before kMsgCounterSyncTimeout.
     if (exchangeContext != nullptr)
@@ -83,22 +82,22 @@ void SecureChannelMgr::OnResponseTimeout(Messaging::ExchangeContext * exchangeCo
 }
 
 // Create and initialize new exchange for the message counter synchronization request/response messages.
-CHIP_ERROR SecureChannelMgr::NewMsgCounterSyncExchange(SecureSessionHandle session, Messaging::ExchangeContext *& exchangeContext)
+CHIP_ERROR MessageCounterSyncMgr::NewMsgCounterSyncExchange(SecureSessionHandle session,
+                                                            Messaging::ExchangeContext *& exchangeContext)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Message counter synchronization protocol is only applicable for application group keys.
-    VerifyOrExit(ChipKeyId::IsAppGroupKey(session.GetPeerKeyId()), err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(ChipKeyId::IsAppGroupKey(session.GetPeerKeyId()), err = CHIP_ERROR_INVALID_ARGUMENT);
 
     // Create new exchange context.
     exchangeContext = mExchangeMgr->NewContext(session, this);
-    VerifyOrExit(exchangeContext != nullptr, err = CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(exchangeContext != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
-exit:
     return err;
 }
 
-CHIP_ERROR SecureChannelMgr::SendMsgCounterSyncReq(SecureSessionHandle session)
+CHIP_ERROR MessageCounterSyncMgr::SendMsgCounterSyncReq(SecureSessionHandle session)
 {
     CHIP_ERROR err                               = CHIP_NO_ERROR;
     Messaging::ExchangeContext * exchangeContext = nullptr;
@@ -111,7 +110,7 @@ CHIP_ERROR SecureChannelMgr::SendMsgCounterSyncReq(SecureSessionHandle session)
     SuccessOrExit(err);
 
     // Allocate a buffer for the null message.
-    msgBuf = System::PacketBufferHandle::New(kMsgCounterChallengeSize);
+    msgBuf = MessagePacketBuffer::New(kMsgCounterChallengeSize);
     VerifyOrExit(!msgBuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
     // Generate a 64-bit random number to uniquely identify the request.
@@ -143,7 +142,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR SecureChannelMgr::SendMsgCounterSyncResp(Messaging::ExchangeContext * exchangeContext, SecureSessionHandle session)
+CHIP_ERROR MessageCounterSyncMgr::SendMsgCounterSyncResp(Messaging::ExchangeContext * exchangeContext, SecureSessionHandle session)
 {
     CHIP_ERROR err                         = CHIP_NO_ERROR;
     Transport::PeerConnectionState * state = nullptr;
@@ -188,8 +187,8 @@ exit:
     return err;
 }
 
-void SecureChannelMgr::HandleMsgCounterSyncReq(Messaging::ExchangeContext * exchangeContext, const PacketHeader & packetHeader,
-                                               System::PacketBufferHandle msgBuf)
+void MessageCounterSyncMgr::HandleMsgCounterSyncReq(Messaging::ExchangeContext * exchangeContext, const PacketHeader & packetHeader,
+                                                    System::PacketBufferHandle msgBuf)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -207,7 +206,7 @@ void SecureChannelMgr::HandleMsgCounterSyncReq(Messaging::ExchangeContext * exch
     exchangeContext->SetChallenge(req);
 
     // Respond with MsgCounterSyncResp
-    err = SendMsgCounterSyncResp(exchangeContext, { packetHeader.GetSourceNodeId().Value(), packetHeader.GetEncryptionKeyID() });
+    err = SendMsgCounterSyncResp(exchangeContext, { packetHeader.GetSourceNodeId().Value(), packetHeader.GetEncryptionKeyID(), 0 });
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -221,8 +220,8 @@ exit:
     return;
 }
 
-void SecureChannelMgr::HandleMsgCounterSyncResp(Messaging::ExchangeContext * exchangeContext, const PacketHeader & packetHeader,
-                                                System::PacketBufferHandle msgBuf)
+void MessageCounterSyncMgr::HandleMsgCounterSyncResp(Messaging::ExchangeContext * exchangeContext,
+                                                     const PacketHeader & packetHeader, System::PacketBufferHandle msgBuf)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -263,6 +262,5 @@ exit:
     return;
 }
 
-} // namespace SecureChannel
-} // namespace Protocols
+} // namespace Messaging
 } // namespace chip

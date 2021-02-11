@@ -18,7 +18,7 @@
 
 /**
  *    @file
- *      This file implements unit tests for the SecureChannelMgr implementation.
+ *      This file implements unit tests for the MessageCounterSyncMgr implementation.
  */
 
 #include "TestMessagingLayer.h"
@@ -139,7 +139,7 @@ void CheckSendMsgCounterSyncReq(nlTestSuite * inSuite, void * inContext)
     testExchangeMgr.mSuite = inSuite;
     ctx.GetSecureSessionManager().SetDelegate(&testExchangeMgr);
 
-    chip::Protocols::SecureChannel::SecureChannelMgr * sm = ctx.GetExchangeManager().GetSecureChannelMgr();
+    MessageCounterSyncMgr * sm = ctx.GetExchangeManager().GetMessageCounterSyncMgr();
     NL_TEST_ASSERT(inSuite, sm != nullptr);
 
     Optional<Transport::PeerAddress> peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
@@ -156,7 +156,7 @@ void CheckSendMsgCounterSyncReq(nlTestSuite * inSuite, void * inContext)
     err = ctx.GetSecureSessionManager().NewPairing(peer, kSourceNodeId, &pairingPeerToLocal, 1);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    SecureSessionHandle session(kDestinationNodeId, 0x4000);
+    SecureSessionHandle session(kDestinationNodeId, 0x4000, 0);
 
     // Should be able to send a message to itself by just calling send.
     testExchangeMgr.ReceiveHandlerCallCount = 0;
@@ -180,7 +180,7 @@ void CheckReceiveMsgCounterSyncReq(nlTestSuite * inSuite, void * inContext)
 
     mockAppDelegate.mSuite = inSuite;
 
-    chip::Protocols::SecureChannel::SecureChannelMgr * sm = ctx.GetExchangeManager().GetSecureChannelMgr();
+    MessageCounterSyncMgr * sm = ctx.GetExchangeManager().GetMessageCounterSyncMgr();
     NL_TEST_ASSERT(inSuite, sm != nullptr);
 
     // Register to receive unsolicited Secure Channel Request messages from the exchange manager.
@@ -202,7 +202,7 @@ void CheckReceiveMsgCounterSyncReq(nlTestSuite * inSuite, void * inContext)
     err = ctx.GetSecureSessionManager().NewPairing(peer, kSourceNodeId, &pairingPeerToLocal, 1);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    SecureSessionHandle session(kDestinationNodeId, 0x4000);
+    SecureSessionHandle session(kDestinationNodeId, 0x4000, 0);
 
     err = sm->SendMsgCounterSyncReq(session);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -217,8 +217,8 @@ void CheckReceiveMsgCounterSyncReq(nlTestSuite * inSuite, void * inContext)
 // clang-format off
 const nlTest sTests[] =
 {
-    NL_TEST_DEF("Test SecureChannelMgr::ReceiveMsgCounterSyncReq", CheckReceiveMsgCounterSyncReq),
-    NL_TEST_DEF("Test SecureChannelMgr::SendMsgCounterSyncReq", CheckSendMsgCounterSyncReq),
+    NL_TEST_DEF("Test MessageCounterSyncMgr::ReceiveMsgCounterSyncReq", CheckReceiveMsgCounterSyncReq),
+    NL_TEST_DEF("Test MessageCounterSyncMgr::SendMsgCounterSyncReq", CheckSendMsgCounterSyncReq),
     NL_TEST_SENTINEL()
 };
 // clang-format on
@@ -229,7 +229,7 @@ int Finalize(void * aContext);
 // clang-format off
 nlTestSuite sSuite =
 {
-    "Test-SecureChannelMgr",
+    "Test-MessageCounterSyncMgr",
     &sTests[0],
     Initialize,
     Finalize
@@ -263,7 +263,7 @@ int Finalize(void * aContext)
 /**
  *  Main
  */
-int TestSecureChannelMgr()
+int TestMessageCounterSyncMgr()
 {
     // Run test suit against one context
     nlTestRunner(&sSuite, &sContext);

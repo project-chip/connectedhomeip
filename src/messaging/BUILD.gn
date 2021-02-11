@@ -27,13 +27,13 @@ static_library("messaging") {
     "ExchangeMgr.cpp",
     "ExchangeMgr.h",
     "Flags.h",
+    "MessageCounterSync.cpp",
+    "MessageCounterSync.h",
     "ReliableMessageContext.cpp",
     "ReliableMessageContext.h",
     "ReliableMessageMgr.cpp",
     "ReliableMessageMgr.h",
     "ReliableMessageProtocolConfig.h",
-    "SecureChannelMgr.cpp",
-    "SecureChannelMgr.h",
   ]
 
   cflags = [ "-Wconversion" ]

@@ -26,9 +26,9 @@ chip_test_suite("tests") {
     "MessagingContext.cpp",
     "MessagingContext.h",
     "TestExchangeMgr.cpp",
+    "TestMessageCounterSyncMgr.cpp",
     "TestMessagingLayer.h",
     "TestReliableMessageProtocol.cpp",
-    "TestSecureChannelMgr.cpp",
   ]
 
   cflags = [ "-Wconversion" ]
@@ -47,7 +47,7 @@ chip_test_suite("tests") {
 
   tests = [
     "TestExchangeMgr",
-    "TestSecureChannelMgr",
+    "TestMessageCounterSyncMgr",
     "TestReliableMessageProtocol",
   ]
 }

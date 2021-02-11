@@ -22,11 +22,8 @@
 
 #pragma once
 
-#include <system/SystemPacketBuffer.h>
-
 namespace chip {
-namespace Protocols {
-namespace SecureChannel {
+namespace Messaging {
 
 constexpr uint16_t kMsgCounterSyncRespMsgSize = 12;  // The size of the message counter synchronization response message.
 constexpr uint32_t kMsgCounterSyncTimeout     = 500; // The amount of time(in milliseconds) which a peer is given to respond
@@ -34,10 +31,10 @@ constexpr uint32_t kMsgCounterSyncTimeout     = 500; // The amount of time(in mi
 
 class ExchangeManager;
 
-class SecureChannelMgr : public Messaging::ExchangeDelegate
+class MessageCounterSyncMgr : public Messaging::ExchangeDelegate
 {
 public:
-    SecureChannelMgr() : mExchangeMgr(nullptr) {}
+    MessageCounterSyncMgr() : mExchangeMgr(nullptr) {}
 
     CHIP_ERROR Init(Messaging::ExchangeManager * exchangeMgr);
     void Shutdown();
@@ -75,6 +72,5 @@ private:
     void OnResponseTimeout(Messaging::ExchangeContext * exchangeContext) override;
 };
 
-} // namespace SecureChannel
-} // namespace Protocols
+} // namespace Messaging
 } // namespace chip

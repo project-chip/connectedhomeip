@@ -25,7 +25,6 @@
 
 #include <messaging/ReliableMessageMgr.h>
 
-#include <core/CHIPKeyIds.h>
 #include <messaging/ErrorCategory.h>
 #include <messaging/Flags.h>
 #include <messaging/ReliableMessageContext.h>

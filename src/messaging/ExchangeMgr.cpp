@@ -41,6 +41,7 @@
 #include <support/CHIPFaultInjection.h>
 #include <support/CodeUtils.h>
 #include <support/RandUtils.h>
+#include <support/ReturnMacros.h>
 #include <support/logging/CHIPLogging.h>
 
 using namespace chip::Encoding;
@@ -68,7 +69,7 @@ CHIP_ERROR ExchangeManager::Init(SecureSessionMgr * sessionMgr)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    VerifyOrExit(mState == State::kState_NotInitialized, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mState == State::kState_NotInitialized, err = CHIP_ERROR_INCORRECT_STATE);
 
     mSessionMgr = sessionMgr;
 
@@ -83,22 +84,18 @@ CHIP_ERROR ExchangeManager::Init(SecureSessionMgr * sessionMgr)
 
     mReliableMessageMgr.Init(sessionMgr->SystemLayer(), sessionMgr);
 
-    err = mSecureChannelMgr.Init(this);
-    SuccessOrExit(err);
+    err = mMessageCounterSyncMgr.Init(this);
+    ReturnErrorOnFailure(err);
 
     mState = State::kState_Initialized;
 
-exit:
     return err;
 }
 
 CHIP_ERROR ExchangeManager::Shutdown()
 {
-<<<<<<< HEAD
+    mMessageCounterSyncMgr.Shutdown();
     mReliableMessageMgr.Shutdown();
-=======
-    mSecureChannelMgr.Shutdown();
->>>>>>> Implement Message Counter Synchronization Protocol (MCSP) part
 
     if (mSessionMgr != nullptr)
     {

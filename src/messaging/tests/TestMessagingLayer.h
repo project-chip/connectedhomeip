@@ -29,7 +29,7 @@ extern "C" {
 #endif
 
 int TestExchangeMgr(void);
-int TestSecureChannelMgr(void);
+int TestMessageCounterSyncMgr(void);
 int TestReliableMessageProtocol(void);
 
 #ifdef __cplusplus
