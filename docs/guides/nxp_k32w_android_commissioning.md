@@ -198,7 +198,8 @@ To make your PC work as a Thread Border Router, complete the following tasks:
 
 4.  Configure static IP for the Wi-Fi AP interface
 
-    -   Modify the cloud-init file and add content to it (use spaces, not tabs, USE THE ):
+    -   Modify the cloud-init file and add content to it (use spaces, not tabs,
+        USE THE ):
 
             $ sudo vim /etc/netplan/50-cloud-init.yaml
 
@@ -207,8 +208,9 @@ To make your PC work as a Thread Border Router, complete the following tasks:
                 addresses:
                 - 192.168.4.1/24
 
-    -   The final configuration file should like like this (pay attention to the spacing used):
-    
+    -   The final configuration file should like like this (pay attention to the
+        spacing used):
+
               network:
                   version: 2
                   ethernets:
@@ -372,9 +374,9 @@ CHIPTool is now ready to be used for commissioning.
     Router side / restart the daemon:
 
         $ sudo service otbr-web status
-        
+
     In case the status is not _leader_ then restart the service:
-    
+
         $ sudo service otbr-web restart
 
 ## Preparing accessory device
