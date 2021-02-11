@@ -526,12 +526,15 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "qpg6100/DeviceNetworkProvisioningDelegateImpl.cpp",
         "qpg6100/DeviceNetworkProvisioningDelegateImpl.h",
         "qpg6100/InetPlatformConfig.h",
+        "qpg6100/Logging.cpp",
         "qpg6100/PlatformManagerImpl.cpp",
         "qpg6100/PlatformManagerImpl.h",
         "qpg6100/SystemPlatformConfig.h",
         "qpg6100/qpg6100Config.cpp",
         "qpg6100/qpg6100Config.h",
       ]
+
+      public_deps += [ "${chip_root}/src/platform/logging:headers" ]
 
       if (chip_enable_openthread) {
         sources += [
@@ -540,7 +543,6 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
           "qpg6100/ThreadStackManagerImpl.h",
         ]
       }
-      public_deps += [ "${chip_root}/src/platform/logging:qpg6100" ]
     }
 
     allow_circular_includes_from = [ "${chip_root}/src/lib/support" ]

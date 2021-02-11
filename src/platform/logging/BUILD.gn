@@ -24,7 +24,6 @@ simple_log_platforms = [
   "k32w",
   "linux",
   "nrfconnect",
-  "qpg6100",
 ]
 
 foreach(platform, simple_log_platforms) {
@@ -45,8 +44,6 @@ foreach(platform, simple_log_platforms) {
         if (platform == "cc13x2_26x2") {
           deps += [ "${openthread_root}:libopenthread-mtd" ]
         } else if (platform == "k32w") {
-          deps += [ "${openthread_root}:libopenthread-ftd" ]
-        } else if (platform == "qpg6100") {
           deps += [ "${openthread_root}:libopenthread-ftd" ]
         }
       }

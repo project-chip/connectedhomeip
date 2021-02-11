@@ -4,14 +4,15 @@
 #include "qvCHIP.h"
 
 #include <core/CHIPConfig.h>
+#include <platform/CHIPDeviceConfig.h>
 #include <support/logging/Constants.h>
 
 #include <ctype.h>
 #include <string.h>
 
-#if CHIP_ENABLE_OPENTHREAD
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <openthread/platform/logging.h>
-#endif // CHIP_ENABLE_OPENTHREAD
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
 constexpr uint8_t kPrintfModuleLwip       = 0x01;
 constexpr uint8_t kPrintfModuleOpenThread = 0x02;
@@ -105,7 +106,7 @@ extern "C" void LwIPLog(const char * msg, ...)
     chip::DeviceLayer::OnLogOutput();
 }
 
-#if CHIP_ENABLE_OPENTHREAD
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 // Implementation taken from openthread repo - examples\platforms\qpg6095
 #include "uart_qorvo.h"
 
@@ -123,4 +124,4 @@ extern "C" void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const ch
     chip::DeviceLayer::OnLogOutput();
 }
 
-#endif // CHIP_ENABLE_OPENTHREAD
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
