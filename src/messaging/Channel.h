@@ -199,10 +199,6 @@ public:
         return *this;
     }
 
-    /*
-     * @brief
-     *   Get the state of the channel (@see ChannelContext).
-     */
     ChannelState GetState() const;
 
     /*
@@ -213,10 +209,6 @@ public:
      */
     ExchangeContext * NewExchange(ExchangeDelegate * delegate);
 
-    /*
-     * @brief
-     *   Release the channel.
-     */
     void Release();
 
 private:
