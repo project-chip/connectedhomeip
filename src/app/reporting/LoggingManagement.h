@@ -153,7 +153,7 @@ struct LogStorageResources
                             ///< used for this importance level.
     chip::PersistedCounter * mCounterStorage; ///< Application-provided storage for persistent counter for this importance level.
                                               ///< When NULL, persistent counters will not be used for this importance level.
-    PriorityLevel mPriority; ///< Log importance level associated with the resources provided in this structure.
+    PriorityLevel mPriority;                  ///< Log importance level associated with the resources provided in this structure.
 };
 
 /**
