@@ -69,7 +69,7 @@ private:
  *  EncryptedPacketBufferHandle is a kind of PacketBufferHandle class and used to hold a packet buffer
  *  object whose payload has already been encrypted.
  */
-class EncryptedPacketBufferHandle final : public System::PacketBufferHandle
+class EncryptedPacketBufferHandle final : private System::PacketBufferHandle
 {
 public:
     EncryptedPacketBufferHandle() : mMsgId(0) {}
@@ -93,6 +93,26 @@ public:
      * @returns empty handle on allocation failure.
      */
     EncryptedPacketBufferHandle CloneData() { return EncryptedPacketBufferHandle(PacketBufferHandle::CloneData()); }
+
+#ifdef CHIP_ENABLE_TEST_ENCRYPTED_BUFFER_API
+    /**
+     * Extracts the (unencrypted) packet header from this encrypted packet
+     * buffer.  Returns error if a packet header cannot be extracted (e.g. if
+     * there are not enough bytes in this packet buffer).  After this call the
+     * buffer does not have a packet header.  This API is meant for
+     * unit tests only.   The CHIP_ENABLE_TEST_ENCRYPTED_BUFFER_API define
+     * should not be defined normally.
+     */
+    CHIP_ERROR ExtractPacketHeader(PacketHeader & aPacketHeader) { return aPacketHeader.DecodeAndConsume(*this); }
+
+    /**
+     * Inserts a new (unencrypted) packet header in the encrypted packet buffer
+     * based on the given PacketHeader.  This API is meant for
+     * unit tests only.   The CHIP_ENABLE_TEST_ENCRYPTED_BUFFER_API define
+     * should not be defined normally.
+     */
+    CHIP_ERROR InsertPacketHeader(const PacketHeader & aPacketHeader) { return aPacketHeader.EncodeBeforeData(*this); }
+#endif // CHIP_ENABLE_TEST_ENCRYPTED_BUFFER_API
 
 private:
     // Allow SecureSessionMgr to assign or construct us from a PacketBufferHandle
