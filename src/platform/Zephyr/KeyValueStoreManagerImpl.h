@@ -38,7 +38,7 @@ class KeyValueStoreManagerImpl final : public KeyValueStoreManager
 
 public:
     void Init();
-    
+
     // NOTE: Currently this platform does not support partial and offset reads
     //       these will result in failing an assert.
     CHIP_ERROR _Get(const char * key, void * value, size_t value_size, size_t * read_bytes_size = nullptr, size_t offset = 0) const;
