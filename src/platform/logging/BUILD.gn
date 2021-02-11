@@ -29,7 +29,7 @@ foreach(platform, simple_log_platforms) {
       sources = [ "impl/" + platform + "/Logging.cpp" ]
 
       deps = [
-        ":logv",
+        ":headers",
         "${chip_root}/src/lib/core:chip_config_header",
         "${chip_root}/src/lib/support:logging_constants",
         "${chip_root}/src/platform:platform_buildconfig",
