@@ -170,8 +170,7 @@ CHIP_ERROR ReadClient::SendReadRequest(NodeId aNodeId)
         err = writer.Finalize(&msgBuf);
         SuccessOrExit(err);
 
-        VerifyOrExit(msgBuf->EnsureReservedSize(System::PacketBuffer::kDefaultHeaderReserve),
-             err = CHIP_ERROR_BUFFER_TOO_SMALL);
+        VerifyOrExit(msgBuf->EnsureReservedSize(System::PacketBuffer::kDefaultHeaderReserve), err = CHIP_ERROR_BUFFER_TOO_SMALL);
     }
 
     ClearExistingExchangeContext();

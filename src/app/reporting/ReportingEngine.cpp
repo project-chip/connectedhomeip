@@ -225,8 +225,7 @@ CHIP_ERROR ReportingEngine::BuildAndSendSingleReportData(ReadHandler * aReadHand
     err = reportDataWriter.Finalize(&bufHandle);
     SuccessOrExit(err);
 
-    VerifyOrExit(bufHandle->EnsureReservedSize(System::PacketBuffer::kDefaultHeaderReserve),
-     err = CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrExit(bufHandle->EnsureReservedSize(System::PacketBuffer::kDefaultHeaderReserve), err = CHIP_ERROR_BUFFER_TOO_SMALL);
 
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     {
