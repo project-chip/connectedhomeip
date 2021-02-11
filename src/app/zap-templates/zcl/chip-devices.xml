@@ -188,4 +188,27 @@ limitations under the License.
       </include>
     </clusters>
   </deviceType>
+  <deviceType>
+    <name>Bridge Device</name>
+    <domain>CHIP</domain>
+    <typeName>CHIP Bridge Device</typeName>
+    <zigbeeType>Router</zigbeeType>
+    <profileId editable="false">0xabcd</profileId>
+    <deviceId editable="false">0x0a0b</deviceId>
+    <clusters lockOthers="true">
+      <include cluster="Basic" client="false" server="true" clientLocked="true" serverLocked="true">
+        <requireAttribute>VERSION</requireAttribute>
+        <requireAttribute>POWER_SOURCE</requireAttribute>
+        <requireCommand>ResetToFactoryDefaults</requireCommand>
+        <requireCommand>MfgSpecificPing</requireCommand>
+      </include>
+      <!-- Below is the Descriptor Cluster which will be enabled after a separate PR which adds the cluster definition lands  -->
+      <!-- <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+        <requireAttribute>DEVICE</requireAttribute>
+        <requireAttribute>SERVER_CLUSTERS</requireAttribute>
+        <requireAttribute>CLIENT_CLUSTERS</requireAttribute>
+        <requireAttribute>PARTS</requireAttribute>
+      </include> -->
+    </clusters>
+  </deviceType>
 </configurator>

@@ -69,6 +69,12 @@ void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId
     }
 }
 
+bool emberAfBasicClusterMfgSpecificPingCallback(void)
+{
+    emberAfSendDefaultResponse(emberAfCurrentCommand(), EMBER_ZCL_STATUS_SUCCESS);
+    return true;
+}
+
 /** @brief OnOff Cluster Init
  *
  * This function is called when a specific cluster is initialized. It gives the

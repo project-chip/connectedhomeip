@@ -28,6 +28,36 @@ typedef void (^ResponseHandler)(NSError * _Nullable error, NSDictionary * _Nulla
 
 NS_ASSUME_NONNULL_BEGIN
 
+@interface CHIPBasic : NSObject
+
+- (nullable instancetype)initWithDevice:(CHIPDevice *)device endpoint:(uint8_t)endpoint queue:(dispatch_queue_t)queue;
+- (BOOL)mfgSpecificPing:(ResponseHandler)completionHandler;
+- (BOOL)resetToFactoryDefaults:(ResponseHandler)completionHandler;
+
+- (BOOL)readAttributeZclVersion:(ResponseHandler)completionHandler;
+- (BOOL)readAttributeApplicationVersion:(ResponseHandler)completionHandler;
+- (BOOL)readAttributeStackVersion:(ResponseHandler)completionHandler;
+- (BOOL)readAttributeHardwareVersion:(ResponseHandler)completionHandler;
+- (BOOL)readAttributeManufacturerName:(ResponseHandler)completionHandler;
+- (BOOL)readAttributeModelIdentifier:(ResponseHandler)completionHandler;
+- (BOOL)readAttributeDateCode:(ResponseHandler)completionHandler;
+- (BOOL)readAttributePowerSource:(ResponseHandler)completionHandler;
+- (BOOL)readAttributeGenericDeviceClass:(ResponseHandler)completionHandler;
+- (BOOL)readAttributeGenericDeviceType:(ResponseHandler)completionHandler;
+- (BOOL)readAttributeProductCode:(ResponseHandler)completionHandler;
+- (BOOL)readAttributeProductUrl:(ResponseHandler)completionHandler;
+- (BOOL)readAttributeSwBuildId:(ResponseHandler)completionHandler;
+- (BOOL)readAttributeClusterRevision:(ResponseHandler)completionHandler;
+
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
+@end
+
+NS_ASSUME_NONNULL_END
+
+NS_ASSUME_NONNULL_BEGIN
+
 @interface CHIPLevelControl : NSObject
 
 - (nullable instancetype)initWithDevice:(CHIPDevice *)device endpoint:(uint8_t)endpoint queue:(dispatch_queue_t)queue;

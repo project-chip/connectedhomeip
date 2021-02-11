@@ -28,6 +28,7 @@
 
 using namespace chip;
 
+EmberAfStatus emberAfBasicClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfLevelControlClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfOnOffClusterServerCommandParse(EmberAfClusterCommand * cmd);
 
@@ -70,6 +71,9 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
     {
         switch (cmd->apsFrame->clusterId)
         {
+        case ZCL_BASIC_CLUSTER_ID:
+            result = emberAfBasicClusterServerCommandParse(cmd);
+            break;
         case ZCL_LEVEL_CONTROL_CLUSTER_ID:
             result = emberAfLevelControlClusterServerCommandParse(cmd);
             break;
@@ -86,6 +90,33 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
 
 // Cluster specific command parsing
 
+EmberAfStatus emberAfBasicClusterServerCommandParse(EmberAfClusterCommand * cmd)
+{
+    bool wasHandled = false;
+
+    if (cmd->mfgSpecific)
+    {
+        if (cmd->mfgCode == 4098 && cmd->commandId == ZCL_MFG_SPECIFIC_PING_COMMAND_ID)
+        {
+            wasHandled = emberAfBasicClusterMfgSpecificPingCallback();
+        }
+    }
+    else
+    {
+        switch (cmd->commandId)
+        {
+        case ZCL_RESET_TO_FACTORY_DEFAULTS_COMMAND_ID: {
+            wasHandled = emberAfBasicClusterResetToFactoryDefaultsCallback();
+            break;
+        }
+        default: {
+            // Unrecognized command ID, error status will apply.
+            break;
+        }
+        }
+    }
+    return status(wasHandled, true, cmd->mfgSpecific);
+}
 EmberAfStatus emberAfLevelControlClusterServerCommandParse(EmberAfClusterCommand * cmd)
 {
     bool wasHandled = false;
@@ -314,59 +345,8 @@ EmberAfStatus emberAfOnOffClusterServerCommandParse(EmberAfClusterCommand * cmd)
             wasHandled = emberAfOnOffClusterOffCallback();
             break;
         }
-        case ZCL_OFF_WITH_EFFECT_COMMAND_ID: {
-            uint16_t payloadOffset = cmd->payloadStartIndex;
-            uint8_t effectId;
-            uint8_t effectVariant;
-
-            if (cmd->bufLen < payloadOffset + 1)
-            {
-                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-            }
-            effectId      = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-            payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
-            if (cmd->bufLen < payloadOffset + 1)
-            {
-                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-            }
-            effectVariant = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-
-            wasHandled = emberAfOnOffClusterOffWithEffectCallback(effectId, effectVariant);
-            break;
-        }
         case ZCL_ON_COMMAND_ID: {
             wasHandled = emberAfOnOffClusterOnCallback();
-            break;
-        }
-        case ZCL_ON_WITH_RECALL_GLOBAL_SCENE_COMMAND_ID: {
-            wasHandled = emberAfOnOffClusterOnWithRecallGlobalSceneCallback();
-            break;
-        }
-        case ZCL_ON_WITH_TIMED_OFF_COMMAND_ID: {
-            uint16_t payloadOffset = cmd->payloadStartIndex;
-            uint8_t onOffControl;
-            uint16_t onTime;
-            uint16_t offWaitTime;
-
-            if (cmd->bufLen < payloadOffset + 1)
-            {
-                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-            }
-            onOffControl  = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-            payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
-            if (cmd->bufLen < payloadOffset + 2)
-            {
-                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-            }
-            onTime        = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
-            payloadOffset = static_cast<uint16_t>(payloadOffset + 2);
-            if (cmd->bufLen < payloadOffset + 2)
-            {
-                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-            }
-            offWaitTime = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
-
-            wasHandled = emberAfOnOffClusterOnWithTimedOffCallback(onOffControl, onTime, offWaitTime);
             break;
         }
         case ZCL_TOGGLE_COMMAND_ID: {
