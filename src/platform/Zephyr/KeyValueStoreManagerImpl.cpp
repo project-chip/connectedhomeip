@@ -26,8 +26,8 @@
 #include <support/ReturnMacros.h>
 #include <support/logging/CHIPLogging.h>
 
-#include <settings/settings.h>
 #include <logging/log.h>
+#include <settings/settings.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -42,10 +42,10 @@ void KeyValueStoreManagerImpl::Init()
 
 struct ReadEntry
 {
-    void * destination;            // NOTE: can be nullptr in which case `readSize` should still be returned
-    size_t destinationBufferSize;  // size of destination buffer
-    size_t readSize;               // [out] size of read entry value
-    CHIP_ERROR result;             // [out] read result
+    void * destination;           // NOTE: can be nullptr in which case `readSize` should still be returned
+    size_t destinationBufferSize; // size of destination buffer
+    size_t readSize;              // [out] size of read entry value
+    CHIP_ERROR result;            // [out] read result
 };
 
 static int LoadEntryCallback(const char * name, size_t entrySize, settings_read_cb readCb, void * cbArg, void * param)

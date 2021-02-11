@@ -55,7 +55,6 @@ static void TestKeyValueStoreMgr_EmptyStringKey(nlTestSuite * inSuite, void * in
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
 }
 
-
 static void TestKeyValueStoreMgr_StringKey(nlTestSuite * inSuite, void * inContext)
 {
     CHIP_ERROR err;
@@ -80,7 +79,7 @@ static void TestKeyValueStoreMgr_StringKey(nlTestSuite * inSuite, void * inConte
 static void TestKeyValueStoreMgr_Uint32Key(nlTestSuite * inSuite, void * inContext)
 {
     CHIP_ERROR err;
-    const char * kTestKey   = "uint32_key";
+    const char * kTestKey = "uint32_key";
     const char kTestValue = 5;
     uint32_t read_value;
     err = KeyValueStoreMgr().Put(kTestKey, kTestValue);
@@ -99,7 +98,7 @@ static void TestKeyValueStoreMgr_Uint32Key(nlTestSuite * inSuite, void * inConte
 static void TestKeyValueStoreMgr_ArrayKey(nlTestSuite * inSuite, void * inContext)
 {
     CHIP_ERROR err;
-    const char * kTestKey   = "array_key";
+    const char * kTestKey  = "array_key";
     uint32_t kTestValue[5] = { 1, 2, 3, 4, 5 };
     uint32_t read_value[5];
     size_t read_size;
@@ -125,7 +124,7 @@ static void TestKeyValueStoreMgr_StructKey(nlTestSuite * inSuite, void * inConte
         uint8_t value1;
         uint32_t value2;
     };
-    const char * kTestKey   = "struct_key";
+    const char * kTestKey = "struct_key";
     TestStruct kTestValue{ 1, 2 };
     TestStruct read_value;
     size_t read_size;
@@ -184,7 +183,7 @@ static void TestKeyValueStoreMgr_MultiReadKey(nlTestSuite * inSuite, void * inCo
     CHIP_ERROR err;
     const char * kTestKey  = "multi_key";
     uint32_t kTestValue[5] = { 1, 2, 3, 4, 5 };
-    err = KeyValueStoreMgr().Put(kTestKey, kTestValue);
+    err                    = KeyValueStoreMgr().Put(kTestKey, kTestValue);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     for (uint32_t i = 0; i < 5; i++)
     {
@@ -203,20 +202,18 @@ static void TestKeyValueStoreMgr_MultiReadKey(nlTestSuite * inSuite, void * inCo
 /**
  *   Test Suite. It lists all the test functions.
  */
-static const nlTest sTests[] = {
-    NL_TEST_DEF("Test KeyValueStoreMgr_EmptyStringKey", TestKeyValueStoreMgr_EmptyStringKey),
-    NL_TEST_DEF("Test KeyValueStoreMgr_StringKey", TestKeyValueStoreMgr_StringKey),
-    NL_TEST_DEF("Test KeyValueStoreMgr_Uint32Key", TestKeyValueStoreMgr_Uint32Key),
-    NL_TEST_DEF("Test KeyValueStoreMgr_ArrayKey", TestKeyValueStoreMgr_ArrayKey),
-    NL_TEST_DEF("Test KeyValueStoreMgr_StructKey", TestKeyValueStoreMgr_StructKey),
-    NL_TEST_DEF("Test KeyValueStoreMgr_UpdateKeyValue", TestKeyValueStoreMgr_UpdateKeyValue),
-    NL_TEST_DEF("Test KeyValueStoreMgr_TooSmallBufferRead", TestKeyValueStoreMgr_TooSmallBufferRead),
+static const nlTest sTests[] = { NL_TEST_DEF("Test KeyValueStoreMgr_EmptyStringKey", TestKeyValueStoreMgr_EmptyStringKey),
+                                 NL_TEST_DEF("Test KeyValueStoreMgr_StringKey", TestKeyValueStoreMgr_StringKey),
+                                 NL_TEST_DEF("Test KeyValueStoreMgr_Uint32Key", TestKeyValueStoreMgr_Uint32Key),
+                                 NL_TEST_DEF("Test KeyValueStoreMgr_ArrayKey", TestKeyValueStoreMgr_ArrayKey),
+                                 NL_TEST_DEF("Test KeyValueStoreMgr_StructKey", TestKeyValueStoreMgr_StructKey),
+                                 NL_TEST_DEF("Test KeyValueStoreMgr_UpdateKeyValue", TestKeyValueStoreMgr_UpdateKeyValue),
+                                 NL_TEST_DEF("Test KeyValueStoreMgr_TooSmallBufferRead", TestKeyValueStoreMgr_TooSmallBufferRead),
 #ifndef __ZEPHYR__
-    // Zephyr platform does not support partial or offset reads yet.
-    NL_TEST_DEF("Test KeyValueStoreMgr_MultiReadKey", TestKeyValueStoreMgr_MultiReadKey),
+                                 // Zephyr platform does not support partial or offset reads yet.
+                                 NL_TEST_DEF("Test KeyValueStoreMgr_MultiReadKey", TestKeyValueStoreMgr_MultiReadKey),
 #endif
-    NL_TEST_SENTINEL()
-};
+                                 NL_TEST_SENTINEL() };
 
 /**
  *  Set up the test suite.
