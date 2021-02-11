@@ -28,11 +28,3 @@
  *
  */
 EmberAfStatus emberAfPluginTemperatureMeasurementSetValueCallback(chip::EndpointId endpoint, int16_t value);
-
-/** @brief Temperature Measurement Cluster Server Post Init
- *
- * Following resolution of the Temperature Measurement reading at startup for this endpoint,
- * perform any additional initialization needed; e.g., synchronize hardware
- * state.
- */
-void emberAfPluginTemperatureMeasurementServerInitCallback(void);
