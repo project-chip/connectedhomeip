@@ -3,16 +3,17 @@
 #include <platform/logging/LogV.h>
 
 #include <core/CHIPConfig.h>
+#include <platform/CHIPDeviceConfig.h>
 #include <support/logging/Constants.h>
 
 #define K32W_LOG_MODULE_NAME chip
 #define EOL_CHARS "\r\n" /* End of Line Characters */
 #define EOL_CHARS_LEN 2  /* Length of EOL */
 
-#if CHIP_ENABLE_OPENTHREAD
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <openthread/platform/logging.h>
 #include <openthread/platform/uart.h>
-#endif // CHIP_ENABLE_OPENTHREAD
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
 extern "C" void K32WWriteBlocking(const uint8_t * aBuf, uint32_t len);
 
@@ -139,7 +140,7 @@ extern "C" void LwIPLog(const char * msg, ...)
     va_end(v);
 }
 
-#if CHIP_ENABLE_OPENTHREAD
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
 #undef K32W_LOG_MODULE_NAME
 #define K32W_LOG_MODULE_NAME thread
@@ -156,4 +157,4 @@ extern "C" void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const ch
     va_end(v);
 }
 
-#endif // CHIP_ENABLE_OPENTHREAD
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD

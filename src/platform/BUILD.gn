@@ -399,6 +399,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "K32W/DeviceNetworkProvisioningDelegateImpl.h",
         "K32W/K32WConfig.cpp",
         "K32W/K32WConfig.h",
+        "K32W/Logging.cpp",
         "K32W/NetworkProvisioningServerImpl.h",
         "K32W/PlatformManagerImpl.cpp",
         "K32W/PlatformManagerImpl.h",
@@ -418,7 +419,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
 
       public_deps += [
         "${chip_root}/src/crypto",
-        "${chip_root}/src/platform/logging:k32w",
+        "${chip_root}/src/platform/logging:headers",
       ]
     } else if (chip_device_platform == "linux") {
       sources += [

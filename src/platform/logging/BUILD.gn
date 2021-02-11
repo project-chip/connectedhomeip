@@ -20,7 +20,6 @@ if (chip_enable_openthread) {
 
 simple_log_platforms = [
   "darwin",
-  "k32w",
   "linux",
   "nrfconnect",
 ]
@@ -36,14 +35,6 @@ foreach(platform, simple_log_platforms) {
         "${chip_root}/src/lib/support:logging_constants",
         "${chip_root}/src/platform:platform_buildconfig",
       ]
-
-      if (chip_enable_openthread) {
-        defines = [ "CHIP_ENABLE_OPENTHREAD=1" ]
-
-        if (platform == "k32w") {
-          deps += [ "${openthread_root}:libopenthread-ftd" ]
-        }
-      }
     }
   }
 }
