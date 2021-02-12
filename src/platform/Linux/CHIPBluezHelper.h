@@ -249,8 +249,6 @@ private:
     GList * mObjectList           = nullptr; // listing of objects on the bus
     GList * mCurrentListItem      = nullptr; // current item viewed in the list
 
-    bool mHasCurrentValue = false;
-
     // data valid only if Next() returns true
     struct
     {
