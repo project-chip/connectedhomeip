@@ -89,6 +89,13 @@ template("chip_test_suite") {
       public_deps = []
     }
 
+    # TODO: figure out a way to auto-define dependency on stdio logging.
+    #       This dep is required since libSupportLayer now does not include
+    #       a default implementation. 
+    #
+    #       Tests such as TestInetEndPoint need to exercise the system event
+    #       loop however they do not seem to include a logging binding so this
+    #       is forcefully added here.
     public_deps += [ "${chip_root}/src/platform/logging:stdio" ]
   }
 
