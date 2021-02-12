@@ -24,12 +24,8 @@
 
 #pragma once
 
-#ifndef _CHIP_INTERACTION_MODEL_COMMAND_SENDER_H
-#define _CHIP_INTERACTION_MODEL_COMMAND_SENDER_H
-
 #include <core/CHIPCore.h>
 #include <core/CHIPTLVDebug.hpp>
-#include <map>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
@@ -41,20 +37,19 @@
 
 #include <app/Command.h>
 
-#define CHIP_INVOKE_COMMAND_RSP_TIMEOUT 5
 #define COMMON_STATUS_SUCCESS 0
 
 namespace chip {
 namespace app {
 
-class DLL_EXPORT DLL_EXPORT CommandSender : public Command, public Messaging::ExchangeDelegate
+class CommandSender : public Command, public Messaging::ExchangeDelegate
 {
 public:
     CHIP_ERROR SendCommandRequest(NodeId aNodeId, Transport::AdminId aAdminId);
 
-    void OnMessageReceived(Messaging::ExchangeContext * apEc, const PacketHeader & aPacketHeader,
+    void OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
                            const PayloadHeader & aPayloadHeader, System::PacketBufferHandle aPayload) override;
-    void OnResponseTimeout(Messaging::ExchangeContext * apEc) override;
+    void OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext) override;
 
 private:
     CHIP_ERROR ProcessCommandDataElement(CommandDataElement::Parser & aCommandElement) override;
@@ -62,5 +57,3 @@ private:
 
 } // namespace app
 } // namespace chip
-
-#endif // _CHIP_INTERACTION_MODEL_COMMAND_SENDER_H
