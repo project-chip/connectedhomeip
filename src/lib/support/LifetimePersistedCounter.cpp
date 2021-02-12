@@ -35,17 +35,14 @@ LifetimePersistedCounter::Init(const chip::Platform::PersistedStorage::Key aId)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    // Store the ID.
     mId = aId;
     uint32_t startValue;
 
     // Read our previously-stored starting value.
-    err = ReadStartValue(startValue);
-    SuccessOrExit(err);
+    SuccessOrExit(err = ReadStartValue(startValue));
 
     // This will set the starting value, after which we're ready.
-    err = MonotonicallyIncreasingCounter::Init(startValue);
-    SuccessOrExit(err);
+    SuccessOrExit(MonotonicallyIncreasingCounter::Init(startValue));
 
 exit:
     return err;
@@ -58,11 +55,9 @@ LifetimePersistedCounter::Advance()
 
     VerifyOrExit(mId != chip::Platform::PersistedStorage::kEmptyKey, err = CHIP_ERROR_INCORRECT_STATE);
 
-    err = MonotonicallyIncreasingCounter::Advance();
-    SuccessOrExit(err);
+    SuccessOrExit(err = MonotonicallyIncreasingCounter::Advance());
 
-    err = chip::Platform::PersistedStorage::Write(mId, GetValue());
-    SuccessOrExit(err);
+    SuccessOrExit(err = chip::Platform::PersistedStorage::Write(mId, GetValue()));
 exit:
     return err;
 }
