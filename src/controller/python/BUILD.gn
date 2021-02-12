@@ -20,6 +20,7 @@ import("$dir_pw_build/python.gni")
 
 import("${build_root}/chip/tools.gni")
 import("${dir_pw_unit_test}/test.gni")
+import("${chip_root}/src/platform/device.gni")
 
 config("controller_wno_deprecate") {
   cflags = [ "-Wno-deprecated-declarations" ]
@@ -43,6 +44,10 @@ shared_library("ChipDeviceCtrl") {
     "ChipDeviceController-StorageDelegate.cpp",
     "ChipDeviceController-StorageDelegate.h",
   ]
+
+  if (current_os == "linux" && chip_enable_ble) {
+    sources += [ "chip/ble/LinuxImpl.cpp" ]
+  }
 
   public_deps = [
     "${chip_root}/src/app",
@@ -75,8 +80,8 @@ pw_python_action("python") {
         "chip/ChipStack.py",
         "chip/ChipUtility.py",
         "chip/__init__.py",
-        "chip/ble/__init__.py",
         "chip/exceptions/__init__.py",
+        "chip/native/__init__.py",
         "chip/tlv/__init__.py",
       ]
     },
@@ -89,6 +94,15 @@ pw_python_action("python") {
       sources = [ "//LICENSE" ]
     },
   ]
+
+  if (chip_enable_ble) {
+    _py_manifest_files += [
+      {
+        src_dir = "."
+        sources = [ "chip/ble/__init__.py" ]
+      },
+    ]
+  }
 
   _py_manifest_file = "${target_gen_dir}/${target_name}.py_manifest.json"
 
