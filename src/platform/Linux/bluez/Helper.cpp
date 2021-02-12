@@ -64,11 +64,12 @@
 #include <unistd.h>
 #include <utility>
 
-#include "BLEManagerImpl.h"
-#include "CHIPBluezHelper.h"
+#include <platform/Linux/BLEManagerImpl.h>
 #include <support/CodeUtils.h>
 #include <support/ReturnMacros.h>
 #include <system/TLVPacketBufferBackingStore.h>
+
+#include "Helper.h"
 
 using namespace ::nl;
 using namespace chip::SetupPayloadData;

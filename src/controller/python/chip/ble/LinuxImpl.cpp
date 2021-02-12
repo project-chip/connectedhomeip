@@ -1,6 +1,6 @@
 
 #include <platform/CHIPDeviceLayer.h>
-#include <platform/Linux/CHIPBluezHelper.h>
+#include <platform/Linux/bluez/Helper.h>
 #include <platform/internal/BLEManager.h>
 #include <support/CHIPMem.h>
 #include <support/ReturnMacros.h>
