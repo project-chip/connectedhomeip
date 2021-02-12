@@ -21,9 +21,8 @@
 #include "../../config/PersistentStorage.h"
 #include "../common/Command.h"
 
-// Limits on endpoint values.  Could be wrong, if we start using endpoint 0 for
-// something.
-#define CHIP_ZCL_ENDPOINT_MIN 0x01
+// Limits on endpoint values.
+#define CHIP_ZCL_ENDPOINT_MIN 0x00
 #define CHIP_ZCL_ENDPOINT_MAX 0xF0
 
 class ReportingCommand : public Command, public chip::Controller::DeviceStatusDelegate
