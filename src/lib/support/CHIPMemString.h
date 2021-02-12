@@ -63,7 +63,7 @@ inline char * CopyString(char * dest, const char * source, size_t length)
 template <size_t N>
 inline char * CopyString(char (&dest)[N], const char * source)
 {
-    return CopyString(dest, src, N);
+    return CopyString(dest, source, N);
 }
 
 /**
