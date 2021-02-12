@@ -107,9 +107,6 @@ extern "C" void LwIPLog(const char * msg, ...)
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-// Implementation taken from openthread repo - examples\platforms\qpg6095
-#include "uart_qorvo.h"
-
 extern "C" void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const char * aFormat, ...)
 {
     char formattedMsg[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
@@ -123,5 +120,4 @@ extern "C" void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const ch
     // Let the application know that a log message has been emitted.
     chip::DeviceLayer::OnLogOutput();
 }
-
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD

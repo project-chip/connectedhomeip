@@ -130,7 +130,6 @@ install-chip : $(OUTPUT_DIR)
 	  echo "pw_log_BACKEND = \"//third_party/connectedhomeip/third_party/pigweed/repo/pw_log_basic\"" >> $(OUTPUT_DIR)/args.gn     ;\
 	  echo "pw_assert_BACKEND = \"//third_party/connectedhomeip/third_party/pigweed/repo/pw_assert_log\"" >> $(OUTPUT_DIR)/args.gn ;\
 	  echo "pw_sys_io_BACKEND = \"//third_party/connectedhomeip/examples/platform/esp32/pw_sys_io:pw_sys_io_esp32\"" >> $(OUTPUT_DIR)/args.gn      ;\
-	  echo "pw_rpc_system_server_BACKEND = \"//third_party/connectedhomeip/examples/common/pigweed:system_rpc_server\"" >> $(OUTPUT_DIR)/args.gn      ;\
 	  echo "dir_pw_third_party_nanopb = \"//third_party/connectedhomeip/third_party/nanopb/repo\"" >>$(OUTPUT_DIR)/args.gn         ;\
 	fi
 	echo "Written file $(OUTPUT_DIR)/args.gn"

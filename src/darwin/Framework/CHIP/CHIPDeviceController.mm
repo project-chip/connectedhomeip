@@ -192,6 +192,20 @@ static NSString * const kErrorGetPairedDevice = @"Failure while trying to retrie
     [self.lock unlock];
 }
 
+- (void)sendWiFiCredentials:(NSString *)ssid password:(NSString *)password
+{
+    [self.lock lock];
+    _pairingDelegateBridge->SendWiFiCredentials(ssid, password);
+    [self.lock unlock];
+}
+
+- (void)sendThreadCredentials:(NSData *)threadDataSet
+{
+    [self.lock lock];
+    _pairingDelegateBridge->SendThreadCredentials(threadDataSet);
+    [self.lock unlock];
+}
+
 - (BOOL)checkForInitError:(BOOL)condition logMsg:(NSString *)logMsg
 {
     if (condition) {

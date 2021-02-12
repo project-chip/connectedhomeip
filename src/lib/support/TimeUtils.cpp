@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -463,6 +463,40 @@ bool CalendarTimeToSecondsSinceEpoch(uint16_t year, uint8_t month, uint8_t dayOf
 
     return true;
 }
+/**
+ *  @brief
+ *    Convert the number of seconds since 1970-01-01 00:00:00 UTC to a calendar date and time.
+ *
+ *  @note
+ *    If secondsSinceEpoch is large enough this function will generate bad result. The way it is
+ *    used in this file the generated result should be valid. Specifically, the largest
+ *    possible value of secondsSinceEpoch input is (UINT32_MAX + kChipEpochSecondsSinceUnixEpoch),
+ *    when it is called from ChipEpochToCalendarTime().
+ */
+static void SecondsSinceEpochToCalendarTime(uint64_t secondsSinceEpoch, uint16_t & year, uint8_t & month, uint8_t & dayOfMonth,
+                                            uint8_t & hour, uint8_t & minute, uint8_t & second)
+{
+    uint32_t daysSinceEpoch = static_cast<uint32_t>(secondsSinceEpoch / kSecondsPerDay);
+    static_assert((static_cast<uint64_t>(UINT32_MAX) + kChipEpochSecondsSinceUnixEpoch) / kSecondsPerDay <=
+                      std::numeric_limits<decltype(daysSinceEpoch)>::max(),
+                  "daysSinceEpoch would overflow");
+    uint32_t timeOfDay = static_cast<uint32_t>(secondsSinceEpoch - (daysSinceEpoch * kSecondsPerDay));
+
+    // Note: This call to DaysSinceEpochToCalendarDate can't fail, because we
+    // can't overflow a uint16_t year with a muximum possible value of the
+    // secondsSinceEpoch input.
+    static_assert((static_cast<uint64_t>(UINT32_MAX) + kChipEpochSecondsSinceUnixEpoch) / (kDaysPerStandardYear * kSecondsPerDay) +
+                          1 <=
+                      std::numeric_limits<std::remove_reference<decltype(year)>::type>::max(),
+                  "What happened to our year or day lengths?");
+    DaysSinceEpochToCalendarDate(daysSinceEpoch, year, month, dayOfMonth);
+
+    hour = static_cast<uint8_t>(timeOfDay / kSecondsPerHour);
+    timeOfDay -= (hour * kSecondsPerHour);
+    minute = static_cast<uint8_t>(timeOfDay / kSecondsPerMinute);
+    timeOfDay -= (minute * kSecondsPerMinute);
+    second = static_cast<uint8_t>(timeOfDay);
+}
 
 /**
  *  @def SecondsSinceEpochToCalendarTime
@@ -505,21 +539,43 @@ bool CalendarTimeToSecondsSinceEpoch(uint16_t year, uint8_t month, uint8_t dayOf
 void SecondsSinceEpochToCalendarTime(uint32_t secondsSinceEpoch, uint16_t & year, uint8_t & month, uint8_t & dayOfMonth,
                                      uint8_t & hour, uint8_t & minute, uint8_t & second)
 {
-    uint32_t daysSinceEpoch = secondsSinceEpoch / kSecondsPerDay;
-    uint32_t timeOfDay      = secondsSinceEpoch - (daysSinceEpoch * kSecondsPerDay);
+    SecondsSinceEpochToCalendarTime(static_cast<uint64_t>(secondsSinceEpoch), year, month, dayOfMonth, hour, minute, second);
+}
 
-    // Note: This call to DaysSinceEpochToCalendarDate can't fail, because we
-    // can't overflow a uint16_t year with a 32-bit number of seconds.
-    static_assert(std::numeric_limits<decltype(secondsSinceEpoch)>::max() / (kDaysPerStandardYear * kSecondsPerDay) + 1 <=
-                      std::numeric_limits<std::remove_reference<decltype(year)>::type>::max(),
-                  "What happened to our year or day lengths?");
-    DaysSinceEpochToCalendarDate(daysSinceEpoch, year, month, dayOfMonth);
+bool CalendarToChipEpochTime(uint16_t year, uint8_t month, uint8_t dayOfMonth, uint8_t hour, uint8_t minute, uint8_t second,
+                             uint32_t & chipEpochTime)
+{
+    bool res = true;
+    uint32_t daysSinceUnixEpoch;
 
-    hour = static_cast<uint8_t>(timeOfDay / kSecondsPerHour);
-    timeOfDay -= (hour * kSecondsPerHour);
-    minute = static_cast<uint8_t>(timeOfDay / kSecondsPerMinute);
-    timeOfDay -= (minute * kSecondsPerMinute);
-    second = static_cast<uint8_t>(timeOfDay);
+    VerifyOrExit(year >= kChipEpochBaseYear && year <= kChipEpochMaxYear, res = false);
+
+    CalendarDateToDaysSinceEpoch(year, month, dayOfMonth, daysSinceUnixEpoch);
+
+    chipEpochTime = ((daysSinceUnixEpoch - kChipEpochDaysSinceUnixEpoch) * kSecondsPerDay) + (hour * kSecondsPerHour) +
+        (minute * kSecondsPerMinute) + second;
+
+exit:
+    return res;
+}
+
+void ChipEpochToCalendarTime(uint32_t chipEpochTime, uint16_t & year, uint8_t & month, uint8_t & dayOfMonth, uint8_t & hour,
+                             uint8_t & minute, uint8_t & second)
+{
+    SecondsSinceEpochToCalendarTime(static_cast<uint64_t>(chipEpochTime) + kChipEpochSecondsSinceUnixEpoch, year, month, dayOfMonth,
+                                    hour, minute, second);
+}
+
+bool UnixEpochToChipEpochTime(uint32_t unixEpochTime, uint32_t & chipEpochTime)
+{
+    bool res = true;
+
+    VerifyOrExit(unixEpochTime >= kChipEpochSecondsSinceUnixEpoch, res = false);
+
+    chipEpochTime = unixEpochTime - kChipEpochSecondsSinceUnixEpoch;
+
+exit:
+    return res;
 }
 
 } // namespace chip

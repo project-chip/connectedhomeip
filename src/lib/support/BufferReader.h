@@ -156,6 +156,23 @@ public:
     template <typename T>
     void RawRead(T * retval);
 
+    /**
+     * Advance the Reader forward by the specified number of octets.
+     *
+     * @param len The number of octets to skip.
+     *
+     * @note If the len argument is greater than the number of available octets
+     *       remaining, the Reader will advance to the end of the buffer
+     *       without entering a failed-status state.
+     */
+    Reader & Skip(uint16_t len)
+    {
+        len = ::chip::min(len, mAvailable);
+        mReadPtr += len;
+        mAvailable = static_cast<uint16_t>(mAvailable - len);
+        return *this;
+    }
+
 private:
     /**
      * Our buffer start.
