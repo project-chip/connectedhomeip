@@ -24,9 +24,6 @@
 
 #pragma once
 
-#ifndef _CHIP_INTERACTION_MODEL_COMMAND_H
-#define _CHIP_INTERACTION_MODEL_COMMAND_H
-
 #include <core/CHIPCore.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
@@ -41,6 +38,7 @@
 #include <app/MessageDef/CommandDataElement.h>
 #include <app/MessageDef/CommandList.h>
 #include <app/MessageDef/InvokeCommand.h>
+#include <app/InteractionModelDelegate.h>
 
 namespace chip {
 namespace app {
@@ -56,10 +54,10 @@ public:
 
     enum CommandState
     {
-        kState_Uninitialized = 0, ///< The invoke command message has not been initialized
-        kState_Initialized,       ///< The invoke command message has been initialized and is ready
-        kState_AddCommand,        ///< The invoke command message has added Command
-        kState_Sending,           ///< The invoke command message  has sent out the invoke command
+        kState_Uninitialized = 0, //< The invoke command message has not been initialized
+        kState_Initialized,       //< The invoke command message has been initialized and is ready
+        kState_AddCommand,        //< The invoke command message has added Command
+        kState_Sending,           //< The invoke command message  has sent out the invoke command
     };
 
     /**
@@ -81,8 +79,16 @@ public:
         kCommandPathFlag_GroupIdValid    = 0x0002, /**< Set when the GroupId field is valid */
     } CommandPathFlags;
 
+
     /**
-     *  Initialize the CommandSender object. Within the lifetime
+     * @brief Set delegate and pointer to associated state object for Command specific call backs
+     *
+     * @param[in]  apDelegate  	A fInteractionModelDelegate for event call back
+     */
+    void SetDelegate(InteractionModelDelegate * apDelegate) { mpDelegate = apDelegate; };
+
+    /**
+     *  Initialize the Command object. Within the lifetime
      *  of this instance, this method is invoked once after object
      *  construction until a call to Shutdown is made to terminate the
      *  instance.
@@ -94,7 +100,7 @@ public:
      *  @retval #CHIP_NO_ERROR On success.
      *
      */
-    CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr);
+    CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate);
 
     /**
      *  Shutdown the CommandSender. This terminates this instance
@@ -104,13 +110,9 @@ public:
     void Shutdown();
 
     /**
-     * Send an echo request to a CHIP node.
+     * Finalize Command Message
      *
-     * @param nodeId        The destination's nodeId
-     * @param payload       A System::PacketBuffer with the payload. This function takes ownership of the System::PacketBuffer
-     *
-     * @return CHIP_ERROR_NO_MEMORY if no ExchangeContext is available.
-     *         Other CHIPF_ERROR codes as returned by the lower layers.
+     * @return CHIP_ERROR
      *
      */
     CHIP_ERROR FinalizeCommandsMessage();
@@ -120,17 +122,16 @@ public:
                           chip::CommandId aCommandId, uint8_t Flags);
     CHIP_ERROR AddCommand(CommandParams & aCommandParams);
     CHIP_ERROR AddStatusCode(const uint16_t aGeneralCode, const uint32_t aProtocolId, const uint16_t aProtocolCode,
-                             const chip::ClusterId aNamespacedClusterId);
-    CHIP_ERROR ClearExistingExchangeContext();
-
+                             const chip::ClusterId aClusterId);
     CHIP_ERROR Reset();
 
     virtual ~Command() = default;
 
-    bool IsFree() { return (nullptr == mpExchangeCtx); };
+    bool IsFree() const { return (nullptr == mpExchangeCtx); };
     virtual CHIP_ERROR ProcessCommandDataElement(CommandDataElement::Parser & aCommandElement) = 0;
 
 protected:
+    CHIP_ERROR ClearExistingExchangeContext();
     void MoveToState(const CommandState aTargetState);
     CHIP_ERROR ProcessCommandMessage(System::PacketBufferHandle && payload, CommandRoleId aCommandRoleId);
     void ClearState();
@@ -148,8 +149,9 @@ private:
     chip::System::PacketBufferHandle mCommandDataBuf;
     chip::System::PacketBufferTLVWriter mCommandMessageWriter;
     chip::System::PacketBufferTLVWriter mCommandDataWriter;
+
+    InteractionModelDelegate * mpDelegate;
 };
 } // namespace app
 } // namespace chip
 
-#endif // _CHIP_INTERACTION_MODEL_COMMAND_H

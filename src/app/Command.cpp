@@ -31,18 +31,19 @@
 namespace chip {
 namespace app {
 
-CHIP_ERROR Command::Init(Messaging::ExchangeManager * apExchangeMgr)
+CHIP_ERROR Command::Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     // Error if already initialized.
-    if (mpExchangeMgr != nullptr)
-        return CHIP_ERROR_INCORRECT_STATE;
+    VerifyOrExit(mpExchangeMgr == nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mpExchangeCtx == nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     mpExchangeMgr = apExchangeMgr;
-    mpExchangeCtx = nullptr;
 
     err = Reset();
     SuccessOrExit(err);
+
+    mpDelegate = apDelegate;
 
 exit:
     ChipLogFunctError(err);
@@ -58,7 +59,7 @@ CHIP_ERROR Command::Reset()
     if (mCommandMessageBuf.IsNull())
     {
         // TODO: Calculate the packet buffer size
-        mCommandMessageBuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
+        mCommandMessageBuf = System::PacketBufferHandle::New(chip::app::kMaxSecureSduLength);
         VerifyOrExit(!mCommandMessageBuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
     }
 
@@ -131,11 +132,8 @@ void Command::Shutdown()
     mCommandMessageWriter.Reset();
     mCommandMessageBuf = nullptr;
 
-    if (mpExchangeCtx != nullptr)
-    {
-        mpExchangeCtx->Abort();
-        mpExchangeCtx = nullptr;
-    }
+    ClearExistingExchangeContext();
+
     mpExchangeMgr = nullptr;
     MoveToState(kState_Uninitialized);
 
@@ -145,7 +143,7 @@ exit:
 
 chip::TLV::TLVWriter & Command::CreateCommandDataElementTLVWriter()
 {
-    mCommandDataBuf = chip::System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
+    mCommandDataBuf = chip::System::PacketBufferHandle::New(chip::app::kMaxSecureSduLength);
     if (mCommandDataBuf.IsNull())
     {
         ChipLogDetail(DataManagement, "Unable to allocate packet buffer");
@@ -205,7 +203,7 @@ CHIP_ERROR Command::AddCommand(CommandParams & aCommandParams)
             commandPath.GroupId(aCommandParams.GroupId);
         }
 
-        commandPath.NamespacedClusterId(aCommandParams.ClusterId).CommandId(aCommandParams.CommandId).EndOfCommandPath();
+        commandPath.ClusterId(aCommandParams.ClusterId).CommandId(aCommandParams.CommandId).EndOfCommandPath();
 
         err = commandPath.GetError();
         SuccessOrExit(err);
@@ -233,7 +231,7 @@ exit:
 }
 
 CHIP_ERROR Command::AddStatusCode(const uint16_t aGeneralCode, const uint32_t aProtocolId, const uint16_t aProtocolCode,
-                                  const chip::ClusterId aNamespacedClusterId)
+                                  const chip::ClusterId aClusterId)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     StatusElement::Builder statusElementBuilder;
@@ -283,9 +281,9 @@ exit:
     return err;
 }
 
-#if CHIP_DETAIL_LOGGING
 const char * Command::GetStateStr() const
 {
+#if CHIP_DETAIL_LOGGING
     switch (mState)
     {
     case kState_Uninitialized:
@@ -300,9 +298,9 @@ const char * Command::GetStateStr() const
     case kState_Sending:
         return "Sending";
     }
+#endif // CHIP_DETAIL_LOGGING
     return "N/A";
 }
-#endif // CHIP_DETAIL_LOGGING
 
 void Command::MoveToState(const CommandState aTargetState)
 {

@@ -777,6 +777,8 @@ public:
      */
     void * AppData;
 
+    void SetBackingStore(TLVBackingStore * apBackingStore) { mBackingStore = apBackingStore; }
+
 protected:
     uint64_t mElemTag;
     uint64_t mElemLenOrVal;
@@ -1773,6 +1775,12 @@ public:
      */
     uint32_t GetLengthWritten() const { return mLenWritten; }
 
+    /**
+     * Returns the total remaining number of bytes for current tlv writer
+     *
+     * @return the total remaining number of bytes.
+     */
+    uint32_t GetRemainingFreeLength() { return mRemainingLen; }
     /**
      * The profile id of tags that should be encoded in implicit form.
      *
