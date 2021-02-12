@@ -28,6 +28,7 @@
 #ifndef _CHIP_INTERACTION_MODEL_ENGINE_H
 #define _CHIP_INTERACTION_MODEL_ENGINE_H
 
+#include <app/MessageDef/ReportData.h>
 #include <core/CHIPCore.h>
 #include <map>
 #include <messaging/ExchangeContext.h>
@@ -43,12 +44,21 @@
 #include <app/Command.h>
 #include <app/CommandHandler.h>
 #include <app/CommandSender.h>
+#include <app/ReadClient.h>
+#include <app/ReadHandler.h>
+#include <app/reporting/ReportingEngine.h>
 
 #define CHIP_MAX_NUM_COMMAND_HANDLER_OBJECTS 1
 #define CHIP_MAX_NUM_COMMAND_SENDER_OBJECTS 1
 
+#define CHIP_MAX_NUM_READ_CLIENT 1
+#define CHIP_MAX_NUM_READ_HANDLER 1
+
 namespace chip {
 namespace app {
+
+static const size_t kMax_SecureSDU_Length = 1024;
+static const uint32_t kIM_MSG_TIMEOUT = 20;
 
 typedef void (*CommandCbFunct)(chip::TLV::TLVReader & aReader, Command * apCommandObj);
 
@@ -65,7 +75,9 @@ public:
     enum EventID
     {
         kEvent_OnIncomingInvokeCommandRequest =
-            0, ///< Called when an incoming invoke command request has arrived before applying commands..
+            0, //< Called when an incoming invoke command request has arrived before applying commands.>
+        kEvent_OnIncomingReadRequest   = 1, //< Called when a read request has arrived.>
+        kEvent_OnIncomingReportRequest = 2, //////< Called when a report data has arrived.>
     };
 
     /**
@@ -77,8 +89,12 @@ public:
         void Clear(void) { memset(this, 0, sizeof(*this)); }
         struct
         {
-            const PacketHeader * mpPacketHeader; ///< A pointer to the message information for the request
+            const PacketHeader * mpPacketHeader; ///< A pointer to the message information for the command request
         } mIncomingInvokeCommandRequest;
+        struct
+        {
+            const PacketHeader * mpPacketHeader; ///< A pointer to the message information for the read request
+        } mIncomingReadRequest;
     };
 
     /**
@@ -91,8 +107,13 @@ public:
 
         struct
         {
-            bool mShouldContinueProcessing; ///< Set to true if update is allowed.
+            bool mShouldContinueProcessing; ///< Set to true if invoke command is allowed.
         } mIncomingInvokeCommandRequest;
+
+        struct
+        {
+            bool mShouldContinueProcessing; ///< Set to true if read requestt is allowed.
+        } mIncomingReadRequest;
     };
 
     /**
@@ -123,7 +144,7 @@ public:
     static void DefaultEventHandler(EventID aEvent, const InEventParam & aInParam, OutEventParam & aOutParam);
 
     /**
-     * @brief Retrieve the singleton DataManagement Engine. Note this function should be implemented by the
+     * @brief Retrieve the singleton Interaction Model Engine. Note this function should be implemented by the
      *  adoption layer.
      *
      *  @return  A pointer to the shared InteractionModel Engine
@@ -133,18 +154,20 @@ public:
 
     InteractionModelEngine(void);
 
-    CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr);
+    CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr, void * const apAppState, const EventCallback aEventCallback);
 
     void Shutdown();
-
-    CHIP_ERROR DeregisterClusterCommandHandler(chip::ClusterId aClusterId, chip::CommandId aCommandId,
-                                               Command::CommandRoleId aCommandRoleId);
-    CHIP_ERROR RegisterClusterCommandHandler(chip::ClusterId aClusterId, chip::CommandId aCommandId,
-                                             Command::CommandRoleId aCommandRoleId, CommandCbFunct aDispatcher);
 
     Messaging::ExchangeManager * GetExchangeManager(void) const { return mpExchangeMgr; };
 
     CHIP_ERROR NewCommandSender(CommandSender ** const apComandSender);
+
+    CHIP_ERROR NewReadClient(ReadClient ** const apReadClient, chip::app::ReadClient::EventCallback aEventCallback,
+                             void * const apAppState);
+
+    reporting::ReportingEngine * GetReportingEngine(void) { return &mReportingEngine; }
+
+    ReadHandler mReadHandlers[CHIP_MAX_NUM_READ_HANDLER];
 
 private:
     void OnUnknownMsgType(Messaging::ExchangeContext * apEc, const PacketHeader & aPacketHeader,
@@ -155,11 +178,24 @@ private:
                            const PayloadHeader & aPayloadHeader, System::PacketBufferHandle aPayload);
     void OnResponseTimeout(Messaging::ExchangeContext * ec);
 
+    friend class ReadClient;
+    friend class ReportingEngine;
+
+    void OnReadRequest(Messaging::ExchangeContext * apEc, const PacketHeader & aPacketHeader, const PayloadHeader & aPayloadHeader,
+                       System::PacketBufferHandle aPayload);
+
+    uint16_t GetCommandSenderId(const CommandSender * const apSender) const;
+
+    uint16_t GetReadClientId(const ReadClient * const apClient) const;
+
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     void * mpAppState                          = nullptr;
     EventCallback mEventCallback;
     CommandHandler mCommandHandlerObjs[CHIP_MAX_NUM_COMMAND_HANDLER_OBJECTS];
     CommandSender mCommandSenderObjs[CHIP_MAX_NUM_COMMAND_SENDER_OBJECTS];
+
+    ReadClient mReadClients[CHIP_MAX_NUM_READ_CLIENT];
+    reporting::ReportingEngine mReportingEngine;
 };
 
 void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId,
