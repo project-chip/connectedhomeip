@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2018 Google LLC.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -98,8 +98,6 @@
 
 namespace chip {
 namespace Inet {
-
-using chip::System::PacketBuffer;
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 union PeerSockAddr
@@ -678,12 +676,12 @@ done:
 System::Error IPEndPointBasis::PostPacketBufferEvent(chip::System::Layer & aLayer, System::Object & aTarget,
                                                      System::EventType aEventType, System::PacketBufferHandle aBuffer)
 {
-    System::PacketBuffer * buf = aBuffer.Release_ForNow();
-    System::Error error        = aLayer.PostEvent(aTarget, aEventType, (uintptr_t) buf);
-    if (error != INET_NO_ERROR)
+    System::Error error =
+        aLayer.PostEvent(aTarget, aEventType, (uintptr_t) System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(aBuffer));
+    if (error == INET_NO_ERROR)
     {
-        // If PostEvent() failed, it has not taken ownership of the buffer, so we need to retake it so that it will be freed.
-        (void) System::PacketBufferHandle::Adopt(buf);
+        // If PostEvent() succeeded, it has ownership of the buffer, so we need to release it (without freeing it).
+        static_cast<void>(std::move(aBuffer).UnsafeRelease());
     }
     return error;
 }
@@ -1070,7 +1068,7 @@ void IPEndPointBasis::HandlePendingIO(uint16_t aPort)
     lPacketInfo.Clear();
     lPacketInfo.DestPort = aPort;
 
-    lBuffer = PacketBuffer::New(0);
+    lBuffer = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSizeWithoutReserve, 0);
 
     if (!lBuffer.IsNull())
     {
@@ -1171,6 +1169,7 @@ void IPEndPointBasis::HandlePendingIO(uint16_t aPort)
 
     if (lStatus == INET_NO_ERROR)
     {
+        lBuffer.RightSize();
         OnMessageReceived(this, std::move(lBuffer), &lPacketInfo);
     }
     else
@@ -1319,7 +1318,7 @@ void IPEndPointBasis::HandleDataReceived(const nw_connection_t & aConnection)
             if (content != NULL && OnMessageReceived != NULL)
             {
                 size_t count                              = dispatch_data_get_size(content);
-                System::PacketBufferHandle * packetBuffer = System::PacketBuffer::NewWithAvailableSize(count);
+                System::PacketBufferHandle * packetBuffer = System::PacketBufferHandle::New(count);
                 dispatch_data_apply(content, ^(dispatch_data_t data, size_t offset, const void * buffer, size_t size) {
                     memmove(packetBuffer->Start() + offset, buffer, size);
                     return true;

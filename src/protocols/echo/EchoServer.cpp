@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,6 +27,7 @@
 
 namespace chip {
 namespace Protocols {
+namespace Echo {
 
 CHIP_ERROR EchoServer::Init(Messaging::ExchangeManager * exchangeMgr)
 {
@@ -38,7 +39,7 @@ CHIP_ERROR EchoServer::Init(Messaging::ExchangeManager * exchangeMgr)
     OnEchoRequestReceived = nullptr;
 
     // Register to receive unsolicited Echo Request messages from the exchange manager.
-    mExchangeMgr->RegisterUnsolicitedMessageHandler(kProtocol_Echo, kEchoMessageType_EchoRequest, this);
+    mExchangeMgr->RegisterUnsolicitedMessageHandlerForType(MsgType::EchoRequest, this);
 
     return CHIP_NO_ERROR;
 }
@@ -47,13 +48,13 @@ void EchoServer::Shutdown()
 {
     if (mExchangeMgr != nullptr)
     {
-        mExchangeMgr->UnregisterUnsolicitedMessageHandler(kProtocol_Echo, kEchoMessageType_EchoRequest);
+        mExchangeMgr->UnregisterUnsolicitedMessageHandlerForType(MsgType::EchoRequest);
         mExchangeMgr = nullptr;
     }
 }
 
-void EchoServer::OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, uint32_t protocolId,
-                                   uint8_t msgType, System::PacketBufferHandle payload)
+void EchoServer::OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
+                                   const PayloadHeader & payloadHeader, System::PacketBufferHandle payload)
 {
     System::PacketBufferHandle response;
 
@@ -63,27 +64,29 @@ void EchoServer::OnMessageReceived(Messaging::ExchangeContext * ec, const Packet
     // Call the registered OnEchoRequestReceived handler, if any.
     if (OnEchoRequestReceived != nullptr)
     {
-        response = payload.Retain();
-        OnEchoRequestReceived(ec, std::move(payload));
-    }
-    else
-    {
-        response = std::move(payload);
+        OnEchoRequestReceived(ec, payload.Retain());
     }
 
     // Since we are re-using the inbound EchoRequest buffer to send the EchoResponse, if necessary,
     // adjust the position of the payload within the buffer to ensure there is enough room for the
     // outgoing network headers.  This is necessary because in some network stack configurations,
     // the incoming header size may be smaller than the outgoing size.
-    response->EnsureReservedSize(CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE);
+    if (payload->EnsureReservedSize(CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE) && MessagePacketBuffer::HasFooterSpace(payload))
+    {
+        response = std::move(payload);
+    }
+    else
+    {
+        response = MessagePacketBuffer::NewWithData(payload->Start(), payload->DataLength());
+    }
 
     // Send an Echo Response back to the sender.
-    ec->SendMessage(kProtocol_Echo, kEchoMessageType_EchoResponse, std::move(response),
-                    Messaging::SendFlags(Messaging::SendMessageFlags::kNone));
+    ec->SendMessage(MsgType::EchoResponse, std::move(response), Messaging::SendFlags(Messaging::SendMessageFlags::kNone));
 
     // Discard the exchange context.
     ec->Close();
 }
 
+} // namespace Echo
 } // namespace Protocols
 } // namespace chip

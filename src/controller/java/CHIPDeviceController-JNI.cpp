@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2020 Project CHIP Authors
+ *   Copyright (c) 2020-2021 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -391,15 +391,13 @@ JNI_METHOD(void, beginSendMessage)(JNIEnv * env, jobject self, jlong handle, jst
     {
         ScopedPthreadLock lock(&sStackLock);
 
-        System::PacketBufferHandle buffer = System::PacketBuffer::NewWithAvailableSize(messageLen);
+        System::PacketBufferHandle buffer = System::PacketBufferHandle::NewWithData(messageStr, messageLen);
         if (buffer.IsNull())
         {
             err = CHIP_ERROR_NO_MEMORY;
         }
         else
         {
-            memcpy(buffer->Start(), messageStr, messageLen);
-            buffer->SetDataLength(messageLen);
             err = wrapper->Controller()->SendMessage((void *) "SendMessage", std::move(buffer));
         }
     }
@@ -434,16 +432,16 @@ JNI_METHOD(void, beginSendCommand)(JNIEnv * env, jobject self, jlong handle, job
         switch (commandID)
         {
         case 0:
-            buffer = encodeOnOffClusterOffCommand(endpoint);
+            buffer = encodeOnOffClusterOffCommand(0, endpoint);
             break;
         case 1:
-            buffer = encodeOnOffClusterOnCommand(endpoint);
+            buffer = encodeOnOffClusterOnCommand(0, endpoint);
             break;
         case 2:
-            buffer = encodeOnOffClusterToggleCommand(endpoint);
+            buffer = encodeOnOffClusterToggleCommand(0, endpoint);
             break;
         case 3:
-            buffer = encodeLevelControlClusterMoveToLevelCommand(endpoint, (uint8_t)(aValue & 0xff), 0xFFFF, 0, 0);
+            buffer = encodeLevelControlClusterMoveToLevelCommand(0, endpoint, (uint8_t)(aValue & 0xff), 0xFFFF, 0, 0);
             break;
         default:
             ChipLogError(Controller, "Unknown command: %d", commandID);
@@ -498,11 +496,8 @@ JNI_ANDROID_CHIP_STACK_METHOD(void, handleIndicationReceived)
     VerifyOrExit(JavaBytesToUUID(env, charId, charUUID),
                  ChipLogError(Controller, "handleIndicationReceived() called with invalid characteristic ID"));
 
-    buffer = System::PacketBuffer::NewWithAvailableSize(valueLength);
+    buffer = System::PacketBufferHandle::NewWithData(valueBegin, valueLength);
     VerifyOrExit(!buffer.IsNull(), ChipLogError(Controller, "Failed to allocate packet buffer"));
-
-    memcpy(buffer->Start(), valueBegin, valueLength);
-    buffer->SetDataLength(valueLength);
 
     pthread_mutex_lock(&sStackLock);
     sBleLayer.HandleIndicationReceived(connObj, &svcUUID, &charUUID, std::move(buffer));

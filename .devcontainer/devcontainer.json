@@ -13,7 +13,7 @@
         "dockerfile": "Dockerfile",
         "args": {
             //  "BUILD_VERSION": "$(cat integrations/docker/images/chip-build/version)" // trying to get this to work
-            "BUILD_VERSION": "0.4.18"
+            "BUILD_VERSION": "latest"
         }
     },
     "remoteUser": "vscode",
@@ -40,7 +40,6 @@
     "settings": {
         "terminal.integrated.shell.linux": "/bin/bash"
     },
-    "postCreateCommand": "source /usr/share/bash-completion/bash_completion && source /etc/bash_completion.d/git-prompt && sudo chgrp docker /var/run/docker.sock",
     "remoteEnv": {
         "GIT_PS1_SHOWDIRTYSTATE": "1",
         "GIT_PS1_SHOWSTASHSTATE": "1",

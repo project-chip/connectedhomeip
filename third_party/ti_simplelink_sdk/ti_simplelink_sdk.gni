@@ -12,11 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/freertos.gni")
 import("//build_overrides/mbedtls.gni")
+import("//build_overrides/openthread.gni")
+import("//build_overrides/pigweed.gni")
 import("//build_overrides/ti_simplelink_sdk.gni")
 
+import("${dir_pw_build}/python.gni")
 import("${freertos_root}/freertos.gni")
 import("${mbedtls_root}/mbedtls.gni")
 import("ti_simplelink_board.gni")
@@ -62,7 +66,7 @@ template("ti_sysconfig") {
     }
   }
 
-  action("${target_name}_gen") {
+  pw_python_action("${target_name}_gen") {
     script = "${ti_simplelink_sdk_build_root}/run_sysconfig.py"
     sources = invoker.sources
     outputs = gen_outputs
@@ -183,7 +187,7 @@ template("ti_simplelink_sdk") {
     include_dirs = []
 
     # POSIX-like porting layer is incompatable with the gnu definitions from -std=gnu11
-    configs -= [ "//build/config/compiler:std_default" ]
+    configs -= [ "${build_root}/config/compiler:std_default" ]
     configs += [ ":${sdk_target_name}_posix_config" ]
     sources = [
       "${ti_simplelink_sdk_root}/source/ti/posix/freertos/clock.c",
@@ -226,9 +230,10 @@ template("ti_simplelink_sdk") {
       "${chip_root}/third_party/ti_simplelink_sdk:freertos",
       "${chip_root}/third_party/ti_simplelink_sdk:mbedtls",
       "${chip_root}/third_party/ti_simplelink_sdk:ti_simplelink_sysconfig",
+      "${openthread_root}/src/core:libopenthread_core_headers",
     ]
 
-    configs -= [ "//build/config/compiler:std_default" ]
+    configs -= [ "${build_root}/config/compiler:std_default" ]
     configs += [ ":${sdk_target_name}_posix_config" ]
     sources = [
       "${ti_simplelink_sdk_root}/examples/rtos/${ti_simplelink_board}/thread/cli_mtd/platform/alarm.c",

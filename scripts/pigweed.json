@@ -1,7 +1,7 @@
 [
     {
         "path": "gn/gn/${os}-${arch=amd64,arm64}",
-        "tags": ["git_revision:132588e1f9c2bf07b0cc0516e190b445de1153a7"]
+        "tags": ["git_revision:d62642c920e6a0d1756316d225a90fd6faa9e21e"]
     },
     {
         "path": "infra/ninja/${os}-${arch=amd64}",

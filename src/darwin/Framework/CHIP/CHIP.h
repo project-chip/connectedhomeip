@@ -18,7 +18,6 @@
 // pull together CHIP headers
 #import <CHIP/CHIPClustersObjc.h>
 #import <CHIP/CHIPDevice.h>
-#import <CHIP/CHIPDeviceCallback.h>
 #import <CHIP/CHIPDeviceController.h>
 #import <CHIP/CHIPDevicePairingDelegate.h>
 #import <CHIP/CHIPError.h>

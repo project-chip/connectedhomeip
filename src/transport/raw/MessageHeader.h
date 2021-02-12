@@ -26,9 +26,13 @@
 #include <cstdint>
 #include <string.h>
 
+#include <type_traits>
+
 #include <core/CHIPError.h>
 #include <core/Optional.h>
+#include <protocols/Protocols.h>
 #include <support/BitFlags.h>
+#include <system/SystemPacketBuffer.h>
 
 namespace chip {
 
@@ -241,6 +245,22 @@ public:
     CHIP_ERROR Decode(const uint8_t * data, uint16_t size, uint16_t * decode_size);
 
     /**
+     * A version of Decode that uses the type system to determine available
+     * space.
+     */
+    template <uint16_t N>
+    inline CHIP_ERROR Decode(const uint8_t (&data)[N], uint16_t * decode_size)
+    {
+        return Decode(data, N, decode_size);
+    }
+
+    /**
+     * A version of Decode that decodes from the start of a PacketBuffer and
+     * consumes the bytes we decoded from.
+     */
+    CHIP_ERROR DecodeAndConsume(const System::PacketBufferHandle & buf);
+
+    /**
      * Encodes a header into the given buffer.
      *
      * @param data - the buffer to write to
@@ -253,6 +273,32 @@ public:
      *    CHIP_ERROR_INVALID_ARGUMENT on insufficient buffer size
      */
     CHIP_ERROR Encode(uint8_t * data, uint16_t size, uint16_t * encode_size) const;
+
+    /**
+     * A version of Encode that uses the type system to determine available
+     * space.
+     */
+    template <int N>
+    inline CHIP_ERROR Encode(uint8_t (&data)[N], uint16_t * encode_size) const
+    {
+        return Encode(data, N, encode_size);
+    }
+
+    /**
+     * A version of Encode that encodes into a PacketBuffer before the
+     * PacketBuffer's current data.
+     */
+    CHIP_ERROR EncodeBeforeData(const System::PacketBufferHandle & buf) const;
+
+    /**
+     * A version of Encode that encodes into a PacketBuffer at the start of the
+     * current data space.  This assumes that someone has already preallocated
+     * space for the header.
+     */
+    inline CHIP_ERROR EncodeAtStart(const System::PacketBufferHandle & buf, uint16_t * encode_size) const
+    {
+        return Encode(buf->Start(), buf->DataLength(), encode_size);
+    }
 
 private:
     /// Represents the current encode/decode header version
@@ -307,6 +353,15 @@ public:
     /** Get the secure msg type from this header. */
     uint8_t GetMessageType() const { return mMessageType; }
 
+    /** Check whether the header has a given secure message type */
+    bool HasMessageType(uint8_t type) const { return mMessageType == type; }
+    template <typename MessageType, typename = std::enable_if_t<std::is_enum<MessageType>::value>>
+    bool HasMessageType(MessageType type) const
+    {
+        static_assert(std::is_same<std::underlying_type_t<MessageType>, uint8_t>::value, "Enum is wrong size; cast is not safe");
+        return mProtocolID == Protocols::MessageTypeTraits<MessageType>::ProtocolId && HasMessageType(static_cast<uint8_t>(type));
+    }
+
     /**
      * Gets the Acknowledged Message Counter from this header.
      *
@@ -340,10 +395,30 @@ public:
         return *this;
     }
 
-    /** Set the secure message type for this header. */
-    PayloadHeader & SetMessageType(uint8_t type)
+    /**
+     * Set the message type for this header.  This requires setting the protocol
+     * id as well, because the meaning of a message type is only relevant given
+     * a specific protocol.
+     *
+     * This should only be used for cases when we don't have a strongly typed
+     * message type and hence can't automatically determine the protocol from
+     * the message type.
+     */
+    PayloadHeader & SetMessageType(uint16_t protocol, uint8_t type)
     {
+        mProtocolID  = protocol;
         mMessageType = type;
+        return *this;
+    }
+
+    /** Set the secure message type, with the protocol id derived from the
+        message type. */
+    template <typename MessageType, typename = std::enable_if_t<std::is_enum<MessageType>::value>>
+    PayloadHeader & SetMessageType(MessageType type)
+    {
+        static_assert(std::is_same<std::underlying_type_t<MessageType>, uint8_t>::value, "Enum is wrong size; cast is not safe");
+        mMessageType = static_cast<uint8_t>(type);
+        mProtocolID  = Protocols::MessageTypeTraits<MessageType>::ProtocolId;
         return *this;
     }
 
@@ -351,13 +426,6 @@ public:
     PayloadHeader & SetExchangeID(uint16_t id)
     {
         mExchangeID = id;
-        return *this;
-    }
-
-    /** Set the Protocol ID for this header. */
-    PayloadHeader & SetProtocolID(uint16_t id)
-    {
-        mProtocolID = id;
         return *this;
     }
 
@@ -412,7 +480,7 @@ public:
      *  @return Returns 'true' if the current message is requesting an acknowledgment from the recipient, else 'false'.
      *
      */
-    bool IsNeedsAck() const { return mExchangeFlags.Has(Header::ExFlagValues::kExchangeFlag_NeedsAck); }
+    bool NeedsAck() const { return mExchangeFlags.Has(Header::ExFlagValues::kExchangeFlag_NeedsAck); }
 
     /**
      * A call to `Encode` will require at least this many bytes on the current
@@ -439,6 +507,22 @@ public:
     CHIP_ERROR Decode(const uint8_t * data, uint16_t size, uint16_t * decode_size);
 
     /**
+     * A version of Decode that uses the type system to determine available
+     * space.
+     */
+    template <uint16_t N>
+    inline CHIP_ERROR Decode(const uint8_t (&data)[N], uint16_t * decode_size)
+    {
+        return Decode(data, N, decode_size);
+    }
+
+    /**
+     * A version of Decode that decodes from the start of a PacketBuffer and
+     * consumes the bytes we decoded from.
+     */
+    CHIP_ERROR DecodeAndConsume(const System::PacketBufferHandle & buf);
+
+    /**
      * Encodes the encrypted part of the header into the given buffer.
      *
      * @param data - the buffer to write to
@@ -451,6 +535,32 @@ public:
      *    CHIP_ERROR_INVALID_ARGUMENT on insufficient buffer size
      */
     CHIP_ERROR Encode(uint8_t * data, uint16_t size, uint16_t * encode_size) const;
+
+    /**
+     * A version of Encode that uses the type system to determine available
+     * space.
+     */
+    template <uint16_t N>
+    inline CHIP_ERROR Encode(uint8_t (&data)[N], uint16_t * decode_size) const
+    {
+        return Encode(data, N, decode_size);
+    }
+
+    /**
+     * A version of Encode that encodes into a PacketBuffer before the
+     * PacketBuffer's current data.
+     */
+    CHIP_ERROR EncodeBeforeData(const System::PacketBufferHandle & buf) const;
+
+    /**
+     * A version of Encode that encodes into a PacketBuffer at the start of the
+     * current data space.  This assumes that someone has already preallocated
+     * space for the header.
+     */
+    inline CHIP_ERROR EncodeAtStart(const System::PacketBufferHandle & buf, uint16_t * encode_size) const
+    {
+        return Encode(buf->Start(), buf->DataLength(), encode_size);
+    }
 
 private:
     /// Packet type (application data, security control packets, e.g. pairing,

@@ -19,22 +19,29 @@ static_library("transport") {
   output_name = "libTransportLayer"
 
   sources = [
+    "AdminPairingTable.h",
+    "CASESession.cpp",
+    "CASESession.h",
     "NetworkProvisioning.cpp",
     "NetworkProvisioning.h",
+    "PASESession.cpp",
+    "PASESession.h",
     "PeerConnectionState.h",
     "PeerConnections.h",
     "RendezvousParameters.h",
     "RendezvousSession.cpp",
     "RendezvousSession.h",
     "RendezvousSessionDelegate.h",
-    "SecurePairingSession.cpp",
-    "SecurePairingSession.h",
+    "SecureMessageCodec.cpp",
+    "SecureMessageCodec.h",
     "SecureSession.cpp",
     "SecureSession.h",
     "SecureSessionMgr.cpp",
     "SecureSessionMgr.h",
-    "TransportMgr.cpp",
+    "SessionEstablishmentDelegate.h",
     "TransportMgr.h",
+    "TransportMgrBase.cpp",
+    "TransportMgrBase.h",
   ]
 
   if (chip_config_network_layer_ble) {
@@ -53,6 +60,7 @@ static_library("transport") {
     "${chip_root}/src/lib/mdns",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/platform",
+    "${chip_root}/src/setup_payload",
     "${chip_root}/src/transport/raw",
   ]
 }

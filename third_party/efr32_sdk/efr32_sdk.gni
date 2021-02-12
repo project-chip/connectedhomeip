@@ -21,11 +21,7 @@ import("efr32_board.gni")
 
 declare_args() {
   # Location of the efr32 SDK.
-  efr32_sdk_root = ""
-}
-
-if (efr32_sdk_root == "") {
-  efr32_sdk_root = getenv("EFR32_SDK_ROOT")
+  efr32_sdk_root = "${chip_root}/third_party/efr32_sdk/repo"
 }
 
 assert(efr32_sdk_root != "", "efr32_sdk_root must be specified")

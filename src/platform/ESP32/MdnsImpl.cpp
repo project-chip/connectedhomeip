@@ -72,15 +72,15 @@ CHIP_ERROR ChipMdnsPublishService(const MdnsService * service)
     esp_err_t espError;
 
     VerifyOrExit(service->mTextEntrySize <= UINT8_MAX, error = CHIP_ERROR_INVALID_ARGUMENT);
-    if (service->mTextEntryies)
+    if (service->mTextEntries)
     {
         items = static_cast<mdns_txt_item_t *>(chip::Platform::MemoryCalloc(service->mTextEntrySize, sizeof(mdns_txt_item_t)));
         VerifyOrExit(items != nullptr, error = CHIP_ERROR_NO_MEMORY);
         for (size_t i = 0; i < service->mTextEntrySize; i++)
         {
-            items[i].key = service->mTextEntryies[i].mKey;
+            items[i].key = service->mTextEntries[i].mKey;
             // Unfortunately ESP mdns stack doesn't support arbitrary binary data
-            items[i].value = reinterpret_cast<const char *>(service->mTextEntryies[i].mData);
+            items[i].value = reinterpret_cast<const char *>(service->mTextEntries[i].mData);
         }
     }
 

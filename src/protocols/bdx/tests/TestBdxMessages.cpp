@@ -2,14 +2,15 @@
 
 #include <nlunit-test.h>
 
-#include <support/BufBound.h>
+#include <support/BufferWriter.h>
+#include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/UnitTestRegistration.h>
 
 #include <limits>
 
 using namespace chip;
-using namespace chip::BDX;
+using namespace chip::bdx;
 
 /**
  * Helper method for testing that WriteToBuffer() and Parse() are successful, and that the parsed message
@@ -20,19 +21,17 @@ void TestHelperWrittenAndParsedMatch(nlTestSuite * inSuite, void * inContext, Ms
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    size_t msgSize                    = testMsg.MessageSize();
-    System::PacketBufferHandle msgBuf = System::PacketBuffer::NewWithAvailableSize(static_cast<uint16_t>(msgSize));
-    NL_TEST_ASSERT(inSuite, !msgBuf.IsNull());
+    size_t msgSize = testMsg.MessageSize();
+    Encoding::LittleEndian::PacketBufferWriter bbuf(msgSize);
+    NL_TEST_ASSERT(inSuite, !bbuf.IsNull());
 
-    BufBound bbuf(msgBuf->Start(), msgBuf->AvailableDataLength());
     testMsg.WriteToBuffer(bbuf);
     NL_TEST_ASSERT(inSuite, bbuf.Fit());
-    msgBuf->SetDataLength(static_cast<uint16_t>(bbuf.Needed()));
 
-    System::PacketBufferHandle rcvBuf = System::PacketBuffer::NewWithAvailableSize(static_cast<uint16_t>(msgSize));
+    System::PacketBufferHandle msgBuf = bbuf.Finalize();
+    NL_TEST_ASSERT(inSuite, !msgBuf.IsNull());
+    System::PacketBufferHandle rcvBuf = System::PacketBufferHandle::NewWithData(msgBuf->Start(), msgSize);
     NL_TEST_ASSERT(inSuite, !rcvBuf.IsNull());
-    memcpy(rcvBuf->Start(), msgBuf->Start(), msgSize);
-    rcvBuf->SetDataLength(static_cast<uint16_t>(msgSize));
 
     MsgType testMsgRcvd;
     err = testMsgRcvd.Parse(std::move(rcvBuf));
@@ -45,7 +44,7 @@ void TestTransferInitMessage(nlTestSuite * inSuite, void * inContext)
     TransferInit testMsg;
 
     testMsg.TransferCtlOptions.SetRaw(0);
-    testMsg.TransferCtlOptions.Set(kReceiverDrive, true);
+    testMsg.TransferCtlOptions.Set(kControl_ReceiverDrive, true);
     testMsg.Version = 1;
 
     // Make sure MaxLength is greater than UINT32_MAX to test widerange being set
@@ -71,7 +70,7 @@ void TestSendAcceptMessage(nlTestSuite * inSuite, void * inContext)
 
     testMsg.Version = 1;
     testMsg.TransferCtlFlags.SetRaw(0);
-    testMsg.TransferCtlFlags.Set(kReceiverDrive, true);
+    testMsg.TransferCtlFlags.Set(kControl_ReceiverDrive, true);
     testMsg.MaxBlockSize = 256;
 
     uint8_t fakeData[5]    = { 7, 6, 5, 4, 3 };
@@ -87,7 +86,7 @@ void TestReceiveAcceptMessage(nlTestSuite * inSuite, void * inContext)
 
     testMsg.Version = 1;
     testMsg.TransferCtlFlags.SetRaw(0);
-    testMsg.TransferCtlFlags.Set(kReceiverDrive, true);
+    testMsg.TransferCtlFlags.Set(kControl_ReceiverDrive, true);
 
     // Make sure Length is greater than UINT32_MAX to test widerange being set
     testMsg.Length = static_cast<uint64_t>(std::numeric_limits<uint32_t>::max()) + 1;
@@ -141,13 +140,33 @@ static const nlTest sTests[] =
 };
 // clang-format on
 
+/**
+ *  Set up the test suite.
+ */
+static int TestSetup(void * inContext)
+{
+    CHIP_ERROR error = chip::Platform::MemoryInit();
+    if (error != CHIP_NO_ERROR)
+        return FAILURE;
+    return SUCCESS;
+}
+
+/**
+ *  Tear down the test suite.
+ */
+static int TestTeardown(void * inContext)
+{
+    chip::Platform::MemoryShutdown();
+    return SUCCESS;
+}
+
 // clang-format off
 static nlTestSuite sSuite =
 {
     "Test-CHIP-BdxMessages",
     &sTests[0],
-    nullptr,
-    nullptr
+    TestSetup,
+    TestTeardown,
 };
 // clang-format on
 

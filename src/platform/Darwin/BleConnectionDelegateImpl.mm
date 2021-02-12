@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2015-2017 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,6 +30,8 @@
 #include <support/logging/CHIPLogging.h>
 
 #import "UUIDHelper.h"
+
+using namespace chip::Ble;
 
 @interface BleConnection : NSObject <CBCentralManagerDelegate, CBPeripheralDelegate>
 
@@ -131,7 +133,7 @@ namespace DeviceLayer {
                     uint8_t opCode = bytes[0];
                     uint16_t discriminator = (bytes[1] | (bytes[2] << 8)) & 0xfff;
 
-                    if (opCode == 0 && [self checkDiscriminator:discriminator]) {
+                    if ((opCode == 0 || opCode == 1) && [self checkDiscriminator:discriminator]) {
                         ChipLogProgress(Ble, "Connecting to device with discriminator: %d", discriminator);
                         [self connect:peripheral];
                         [self stopScanning];
@@ -250,23 +252,14 @@ namespace DeviceLayer {
         [BleConnection fillServiceWithCharacteristicUuids:characteristic svcId:&svcId charId:&charId];
 
         // build a inet buffer from the rxEv and send to blelayer.
-        chip::System::PacketBufferHandle msgBuf = chip::System::PacketBuffer::New();
+        chip::System::PacketBufferHandle msgBuf
+            = chip::System::PacketBufferHandle::NewWithData(characteristic.value.bytes, characteristic.value.length);
 
         if (!msgBuf.IsNull()) {
-            if (msgBuf->MaxDataLength() < characteristic.value.length) {
-                ChipLogError(Ble, "Can't fit characteristic value into our packet buffer");
-                _mBleLayer->HandleConnectionError((__bridge void *) peripheral, BLE_ERROR_INCORRECT_STATE);
-            } else {
-                memcpy(msgBuf->Start(), characteristic.value.bytes, characteristic.value.length);
-                static_assert(
-                    std::is_same<decltype(msgBuf->MaxDataLength()), uint16_t>::value, "Unexpected type for max data length");
-                msgBuf->SetDataLength(static_cast<uint16_t>(characteristic.value.length));
-
-                if (!_mBleLayer->HandleIndicationReceived((__bridge void *) peripheral, &svcId, &charId, std::move(msgBuf))) {
-                    // since this error comes from device manager core
-                    // we assume it would do the right thing, like closing the connection
-                    ChipLogError(Ble, "Failed at handling incoming BLE data");
-                }
+            if (!_mBleLayer->HandleIndicationReceived((__bridge void *) peripheral, &svcId, &charId, std::move(msgBuf))) {
+                // since this error comes from device manager core
+                // we assume it would do the right thing, like closing the connection
+                ChipLogError(Ble, "Failed at handling incoming BLE data");
             }
         } else {
             ChipLogError(Ble, "Failed at allocating buffer for incoming BLE data");

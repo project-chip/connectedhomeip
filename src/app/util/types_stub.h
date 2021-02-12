@@ -50,6 +50,7 @@
 #include <transport/raw/MessageHeader.h>
 static_assert(sizeof(chip::NodeId) == sizeof(uint64_t), "Unexpected node if size");
 
+#include "gen/endpoint_config.h"
 #include "gen/gen_config.h"
 
 /**
@@ -1744,62 +1745,62 @@ typedef struct
 /**
  * @brief Useful to reference a single bit of a byte.
  */
-#define BIT(nr) (1UL << (nr)) // Unsigned avoids compiler warnings re BIT(15)
+#define EMBER_BIT(nr) (1UL << (nr)) // Unsigned avoids compiler warnings re EMBER_BIT(15)
 
 /**
  * @brief Returns the low byte of the 16-bit value \c n as an \c uint8_t.
  */
-#define LOW_BYTE(n) ((uint8_t)((n) &0xFF))
+#define EMBER_LOW_BYTE(n) ((uint8_t)((n) &0xFF))
 
 /**
  * @brief Returns the high byte of the 16-bit value \c n as an \c uint8_t.
  */
-#define HIGH_BYTE(n) ((uint8_t)(LOW_BYTE((n) >> 8)))
+#define EMBER_HIGH_BYTE(n) ((uint8_t)(EMBER_LOW_BYTE((n) >> 8)))
 /**
  * @brief Returns the low byte of the 32-bit value \c n as an \c uint8_t.
  */
-#define BYTE_0(n) ((uint8_t)((n) &0xFF))
+#define EMBER_BYTE_0(n) ((uint8_t)((n) &0xFF))
 
 /**
  * @brief Returns the second byte of the 32-bit value \c n as an \c uint8_t.
  */
-#define BYTE_1(n) BYTE_0((n) >> 8)
+#define EMBER_BYTE_1(n) EMBER_BYTE_0((n) >> 8)
 
 /**
  * @brief Returns the third byte of the 32-bit value \c n as an \c uint8_t.
  */
-#define BYTE_2(n) BYTE_0((n) >> 16)
+#define EMBER_BYTE_2(n) EMBER_BYTE_0((n) >> 16)
 
 /**
  * @brief Returns the high byte of the 32-bit value \c n as an \c uint8_t.
  */
-#define BYTE_3(n) BYTE_0((n) >> 24)
+#define EMBER_BYTE_3(n) EMBER_BYTE_0((n) >> 24)
 
 /**
  * @brief Returns the fifth byte of the 64-bit value \c n as an \c uint8_t.
  */
-#define BYTE_4(n) BYTE_0((n) >> 32)
+#define EMBER_BYTE_4(n) EMBER_BYTE_0((n) >> 32)
 
 /**
  * @brief Returns the sixth byte of the 64-bit value \c n as an \c uint8_t.
  */
-#define BYTE_5(n) BYTE_0((n) >> 40)
+#define EMBER_BYTE_5(n) EMBER_BYTE_0((n) >> 40)
 
 /**
  * @brief Returns the seventh byte of the 64-bit value \c n as an \c uint8_t.
  */
-#define BYTE_6(n) BYTE_0((n) >> 48)
+#define EMBER_BYTE_6(n) EMBER_BYTE_0((n) >> 48)
 
 /**
  * @brief Returns the high byte of the 64-bit value \c n as an \c uint8_t.
  */
-#define BYTE_7(n) BYTE_0((n) >> 56)
+#define EMBER_BYTE_7(n) EMBER_BYTE_0((n) >> 56)
 
 /**
  * @brief Returns the value built from the two \c uint8_t
  * values \c high and \c low.
  */
-#define HIGH_LOW_TO_INT(high, low) (((uint16_t)(((uint16_t)(high)) << 8)) + ((uint16_t)((low) &0xFF)))
+#define EMBER_HIGH_LOW_TO_INT(high, low) (((uint16_t)(((uint16_t)(high)) << 8)) + ((uint16_t)((low) &0xFF)))
 
 /**
  * @brief The kind of arguments the main function takes
@@ -1816,7 +1817,7 @@ typedef struct
 /**
  * @brief Returns the value of \c bit within the register or byte \c reg.
  */
-#define READBIT(reg, bit) ((reg) & (BIT(bit)))
+#define READBIT(reg, bit) ((reg) & (EMBER_BIT(bit)))
 
 /**
  * @brief Returns the value of the bitmask \c bits within

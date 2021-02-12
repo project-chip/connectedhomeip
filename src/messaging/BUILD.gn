@@ -20,6 +20,7 @@ static_library("messaging") {
   sources = [
     "ErrorCategory.cpp",
     "ErrorCategory.h",
+    "ExchangeACL.h",
     "ExchangeContext.cpp",
     "ExchangeContext.h",
     "ExchangeDelegate.h",
@@ -28,8 +29,8 @@ static_library("messaging") {
     "Flags.h",
     "ReliableMessageContext.cpp",
     "ReliableMessageContext.h",
-    "ReliableMessageManager.cpp",
-    "ReliableMessageManager.h",
+    "ReliableMessageMgr.cpp",
+    "ReliableMessageMgr.h",
     "ReliableMessageProtocolConfig.h",
   ]
 

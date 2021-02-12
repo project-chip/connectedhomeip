@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -89,6 +89,8 @@ CHIP_ERROR ExchangeManager::Init(SecureSessionMgr * sessionMgr)
 
 CHIP_ERROR ExchangeManager::Shutdown()
 {
+    mReliableMessageMgr.Shutdown();
+
     if (mSessionMgr != nullptr)
     {
         mSessionMgr->SetDelegate(nullptr);
@@ -107,22 +109,23 @@ ExchangeContext * ExchangeManager::NewContext(SecureSessionHandle session, Excha
     return AllocContext(mNextExchangeId++, session, true, delegate);
 }
 
-CHIP_ERROR ExchangeManager::RegisterUnsolicitedMessageHandler(uint32_t protocolId, ExchangeDelegate * delegate)
+CHIP_ERROR ExchangeManager::RegisterUnsolicitedMessageHandlerForProtocol(uint32_t protocolId, ExchangeDelegate * delegate)
 {
     return RegisterUMH(protocolId, kAnyMessageType, delegate);
 }
 
-CHIP_ERROR ExchangeManager::RegisterUnsolicitedMessageHandler(uint32_t protocolId, uint8_t msgType, ExchangeDelegate * delegate)
+CHIP_ERROR ExchangeManager::RegisterUnsolicitedMessageHandlerForType(uint32_t protocolId, uint8_t msgType,
+                                                                     ExchangeDelegate * delegate)
 {
     return RegisterUMH(protocolId, static_cast<int16_t>(msgType), delegate);
 }
 
-CHIP_ERROR ExchangeManager::UnregisterUnsolicitedMessageHandler(uint32_t protocolId)
+CHIP_ERROR ExchangeManager::UnregisterUnsolicitedMessageHandlerForProtocol(uint32_t protocolId)
 {
     return UnregisterUMH(protocolId, kAnyMessageType);
 }
 
-CHIP_ERROR ExchangeManager::UnregisterUnsolicitedMessageHandler(uint32_t protocolId, uint8_t msgType)
+CHIP_ERROR ExchangeManager::UnregisterUnsolicitedMessageHandlerForType(uint32_t protocolId, uint8_t msgType)
 {
     return UnregisterUMH(protocolId, static_cast<int16_t>(msgType));
 }
@@ -147,105 +150,6 @@ ExchangeContext * ExchangeManager::AllocContext(uint16_t ExchangeId, SecureSessi
 
     ChipLogError(ExchangeManager, "Alloc ctxt FAILED");
     return nullptr;
-}
-
-void ExchangeManager::DispatchMessage(SecureSessionHandle session, const PacketHeader & packetHeader,
-                                      const PayloadHeader & payloadHeader, System::PacketBufferHandle msgBuf)
-{
-    CHIP_ERROR err                          = CHIP_NO_ERROR;
-    UnsolicitedMessageHandler * umh         = nullptr;
-    UnsolicitedMessageHandler * matchingUMH = nullptr;
-    bool sendAckAndCloseExchange            = false;
-
-    // Search for an existing exchange that the message applies to. If a match is found...
-    for (auto & ec : mContextPool)
-    {
-        if (ec.GetReferenceCount() > 0 && ec.MatchExchange(session, packetHeader, payloadHeader))
-        {
-            // Found a matching exchange. Set flag for correct subsequent CRMP
-            // retransmission timeout selection.
-            if (!ec.mReliableMessageContext.HasRcvdMsgFromPeer())
-            {
-                ec.mReliableMessageContext.SetMsgRcvdFromPeer(true);
-            }
-
-            // Matched ExchangeContext; send to message handler.
-            ec.HandleMessage(packetHeader, payloadHeader, std::move(msgBuf));
-
-            ExitNow(err = CHIP_NO_ERROR);
-        }
-    }
-
-    // Search for an unsolicited message handler if it marked as being sent by an initiator. Since we didn't
-    // find an existing exchange that matches the message, it must be an unsolicited message. However all
-    // unsolicited messages must be marked as being from an initiator.
-    if (payloadHeader.IsInitiator())
-    {
-        // Search for an unsolicited message handler that can handle the message. Prefer handlers that can explicitly
-        // handle the message type over handlers that handle all messages for a profile.
-        umh = (UnsolicitedMessageHandler *) UMHandlerPool;
-
-        matchingUMH = nullptr;
-
-        for (int i = 0; i < CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS; i++, umh++)
-        {
-            if (umh->Delegate != nullptr && umh->ProtocolId == payloadHeader.GetProtocolID())
-            {
-                if (umh->MessageType == payloadHeader.GetMessageType())
-                {
-                    matchingUMH = umh;
-                    break;
-                }
-
-                if (umh->MessageType == kAnyMessageType)
-                    matchingUMH = umh;
-            }
-        }
-    }
-    // Discard the message if it isn't marked as being sent by an initiator and the message does not need to send
-    // an ack to the peer.
-    else if (!payloadHeader.IsNeedsAck())
-    {
-        ExitNow(err = CHIP_ERROR_UNSOLICITED_MSG_NO_ORIGINATOR);
-    }
-
-    // If we didn't find an existing exchange that matches the message, and no unsolicited message handler registered
-    // to hand this message, we need to create a temporary exchange to send an ack for this message and then close this exchange.
-    sendAckAndCloseExchange = payloadHeader.IsNeedsAck() && (matchingUMH == nullptr);
-
-    // If we found a handler or we need to create a new exchange context (EC).
-    if (matchingUMH != nullptr || sendAckAndCloseExchange)
-    {
-        ExchangeContext * ec = nullptr;
-
-        if (sendAckAndCloseExchange)
-        {
-            // If rcvd msg is from initiator then this exchange is created as not Initiator.
-            // If rcvd msg is not from initiator then this exchange is created as Initiator.
-            ec = AllocContext(payloadHeader.GetExchangeID(), session, !payloadHeader.IsInitiator(), nullptr);
-        }
-        else
-        {
-            ec = AllocContext(payloadHeader.GetExchangeID(), session, false, matchingUMH->Delegate);
-        }
-
-        VerifyOrExit(ec != nullptr, err = CHIP_ERROR_NO_MEMORY);
-
-        ChipLogProgress(ExchangeManager, "ec pos: %d, id: %d, Delegate: 0x%x", ec - mContextPool.begin(), ec->GetExchangeId(),
-                        ec->GetDelegate());
-
-        ec->HandleMessage(packetHeader, payloadHeader, std::move(msgBuf));
-
-        // Close exchange if it was created only to send ack for a duplicate message.
-        if (sendAckAndCloseExchange)
-            ec->Close();
-    }
-
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(ExchangeManager, "DispatchMessage failed, err = %d", err);
-    }
 }
 
 CHIP_ERROR ExchangeManager::RegisterUMH(uint32_t protocolId, int16_t msgType, ExchangeDelegate * delegate)
@@ -299,7 +203,100 @@ CHIP_ERROR ExchangeManager::UnregisterUMH(uint32_t protocolId, int16_t msgType)
 void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                                         SecureSessionHandle session, System::PacketBufferHandle msgBuf, SecureSessionMgr * msgLayer)
 {
-    DispatchMessage(session, packetHeader, payloadHeader, std::move(msgBuf));
+    CHIP_ERROR err                          = CHIP_NO_ERROR;
+    UnsolicitedMessageHandler * umh         = nullptr;
+    UnsolicitedMessageHandler * matchingUMH = nullptr;
+    bool sendAckAndCloseExchange            = false;
+
+    // Search for an existing exchange that the message applies to. If a match is found...
+    for (auto & ec : mContextPool)
+    {
+        if (ec.GetReferenceCount() > 0 && ec.MatchExchange(session, packetHeader, payloadHeader))
+        {
+            // Found a matching exchange. Set flag for correct subsequent CRMP
+            // retransmission timeout selection.
+            if (!ec.mReliableMessageContext.HasRcvdMsgFromPeer())
+            {
+                ec.mReliableMessageContext.SetMsgRcvdFromPeer(true);
+            }
+
+            // Matched ExchangeContext; send to message handler.
+            ec.HandleMessage(packetHeader, payloadHeader, std::move(msgBuf));
+
+            ExitNow(err = CHIP_NO_ERROR);
+        }
+    }
+
+    // Search for an unsolicited message handler if it marked as being sent by an initiator. Since we didn't
+    // find an existing exchange that matches the message, it must be an unsolicited message. However all
+    // unsolicited messages must be marked as being from an initiator.
+    if (payloadHeader.IsInitiator())
+    {
+        // Search for an unsolicited message handler that can handle the message. Prefer handlers that can explicitly
+        // handle the message type over handlers that handle all messages for a profile.
+        umh = (UnsolicitedMessageHandler *) UMHandlerPool;
+
+        matchingUMH = nullptr;
+
+        for (int i = 0; i < CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS; i++, umh++)
+        {
+            if (umh->Delegate != nullptr && umh->ProtocolId == payloadHeader.GetProtocolID())
+            {
+                if (umh->MessageType == payloadHeader.GetMessageType())
+                {
+                    matchingUMH = umh;
+                    break;
+                }
+
+                if (umh->MessageType == kAnyMessageType)
+                    matchingUMH = umh;
+            }
+        }
+    }
+    // Discard the message if it isn't marked as being sent by an initiator and the message does not need to send
+    // an ack to the peer.
+    else if (!payloadHeader.NeedsAck())
+    {
+        ExitNow(err = CHIP_ERROR_UNSOLICITED_MSG_NO_ORIGINATOR);
+    }
+
+    // If we didn't find an existing exchange that matches the message, and no unsolicited message handler registered
+    // to hand this message, we need to create a temporary exchange to send an ack for this message and then close this exchange.
+    sendAckAndCloseExchange = payloadHeader.NeedsAck() && (matchingUMH == nullptr);
+
+    // If we found a handler or we need to create a new exchange context (EC).
+    if (matchingUMH != nullptr || sendAckAndCloseExchange)
+    {
+        ExchangeContext * ec = nullptr;
+
+        if (sendAckAndCloseExchange)
+        {
+            // If rcvd msg is from initiator then this exchange is created as not Initiator.
+            // If rcvd msg is not from initiator then this exchange is created as Initiator.
+            ec = AllocContext(payloadHeader.GetExchangeID(), session, !payloadHeader.IsInitiator(), nullptr);
+        }
+        else
+        {
+            ec = AllocContext(payloadHeader.GetExchangeID(), session, false, matchingUMH->Delegate);
+        }
+
+        VerifyOrExit(ec != nullptr, err = CHIP_ERROR_NO_MEMORY);
+
+        ChipLogProgress(ExchangeManager, "ec pos: %d, id: %d, Delegate: 0x%x", ec - mContextPool.begin(), ec->GetExchangeId(),
+                        ec->GetDelegate());
+
+        ec->HandleMessage(packetHeader, payloadHeader, std::move(msgBuf));
+
+        // Close exchange if it was created only to send ack for a duplicate message.
+        if (sendAckAndCloseExchange)
+            ec->Close();
+    }
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %d", err);
+    }
 }
 
 void ExchangeManager::OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * mgr)

@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2008,2020 Silicon Labs.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <!-- Added for NFR 14-0264 -->
+  <clusterExtension code="0x0201">
+    <attribute side="server" code="0x0034" define="OCCUPIED_SETBACK" type="INT8U" min="0x00" max="0xFF" writable="true" default="0xFF" optional="true">occupied setback</attribute>
+    <attribute side="server" code="0x0035" define="OCCUPIED_SETBACK_MIN" type="INT8U" min="0x00" max="0xFF" writable="false" default="0xFF" optional="true">occupied setback min</attribute>
+    <attribute side="server" code="0x0036" define="OCCUPIED_SETBACK_MAX" type="INT8U" min="0x01" max="0xFF" writable="false" default="0xFF" optional="true">occupied setback max</attribute>
+    <attribute side="server" code="0x0037" define="UNOCCUPIED_SETBACK" type="INT8U" min="0x00" max="0xFF" writable="true" default="0xFF" optional="true">unoccupied setback</attribute>
+    <attribute side="server" code="0x0038" define="UNOCCUPIED_SETBACK_MIN" type="INT8U" min="0x00" max="0xFF" writable="false" default="0xFF" optional="true">unoccupied setback min</attribute>
+    <attribute side="server" code="0x0039" define="UNOCCUPIED_SETBACK_MAX" type="INT8U" min="0x01" max="0xFF" writable="false" default="0xFF" optional="true">unoccupied setback max</attribute>
+    <attribute side="server" code="0x003A" define="EMERGENCY_HEAT_DELTA" type="INT8U" min="0x00" max="0xFF" writable="true" default="0xFF" optional="true">emergency heat delta</attribute>
+  </clusterExtension>
+  <clusterExtension code="0x0202">
+    <attribute side="server" code="0x0002" define="FAN_DELAY" type="INT16U" min="0x0000" max="0xFFFF" writable="true" default="0xFFFF" optional="true">fan delay</attribute>
+  </clusterExtension>
+  <clusterExtension code="0x0204">
+    <attribute side="server" code="0x0003" define="BACKLIGHT_TIMEOUT" type="INT16U" min="0x0000" max="0xFFFE" writable="true" default="0x0014" optional="true">backlight timeout</attribute>
+    <attribute side="server" code="0x0004" define="SETPOINT_SOURCE_INDICATION" type="ENUM8" min="0x00" max="0xFE" writable="true" default="0x00" optional="true">setpoint source indication</attribute>
+  </clusterExtension>
+  <!-- Added for NFR 14-0516 -->
+  <clusterExtension code="0x0000">
+    <attribute side="server" code="0x0015" define="CURRENT_LOCALE" type="CHAR_STRING" length="5" writable="true" default="" optional="true">current locale</attribute>
+    <command source="client" code="0x01" name="GetLocalesSupported" optional="true" cli="zcl basic gls">
+      <description>This command gets locales supported.</description>
+      <arg name="startLocale" type="CHAR_STRING"/>
+      <arg name="maxLocalesRequested" type="INT8U"/>
+    </command>
+    <command source="server" code="0x01" name="GetLocalesSupportedResponse" optional="true" cli="zcl basic glsr">
+      <description>The locales supported response command is sent in response to a get locales supported command, and is used to discover which locales the device supports.</description>
+      <arg name="discoveryComplete" type="INT8U"/>
+      <arg name="localeSupported" type="CHAR_STRING" array="true"/>
+    </command>
+  </clusterExtension>
+</configurator>

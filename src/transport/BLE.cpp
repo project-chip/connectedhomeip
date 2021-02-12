@@ -25,6 +25,7 @@
 #include <transport/BLE.h>
 
 #include <support/CodeUtils.h>
+#include <support/ReturnMacros.h>
 #include <support/logging/CHIPLogging.h>
 #include <transport/raw/MessageHeader.h>
 
@@ -136,21 +137,14 @@ exit:
 
 CHIP_ERROR BLE::SendMessage(const PacketHeader & header, const Transport::PeerAddress & address, System::PacketBufferHandle msgBuf)
 {
-    CHIP_ERROR err            = CHIP_NO_ERROR;
-    const uint16_t headerSize = header.EncodeSizeBytes();
-    uint16_t actualEncodedHeaderSize;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     VerifyOrExit(address.GetTransportType() == Type::kBle, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(mState == State::kInitialized, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mBleEndPoint != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(msgBuf->EnsureReservedSize(headerSize), err = CHIP_ERROR_NO_MEMORY);
 
-    msgBuf->SetStart(msgBuf->Start() - headerSize);
-
-    err = header.Encode(msgBuf->Start(), msgBuf->DataLength(), &actualEncodedHeaderSize);
+    err = header.EncodeBeforeData(msgBuf);
     SuccessOrExit(err);
-
-    VerifyOrExit(headerSize == actualEncodedHeaderSize, err = CHIP_ERROR_INTERNAL);
 
     err = mBleEndPoint->Send(std::move(msgBuf));
     SuccessOrExit(err);
@@ -163,6 +157,11 @@ void BLE::OnBleConnectionComplete(void * appState, BLE_CONNECTION_OBJECT connObj
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     BLE * ble      = reinterpret_cast<BLE *>(appState);
+
+    // TODO(#4547): On darwin, OnBleConnectionComplete is called multiple times for the same peripheral, this should become an error
+    // in the future.
+    VerifyOrExit(ble->mBleEndPoint == nullptr || !ble->mBleEndPoint->ConnectionObjectIs(connObj),
+                 ChipLogError(Ble, "Warning: OnBleConnectionComplete is called multiple times for the same peripheral."));
 
     err = ble->InitInternal(connObj);
     SuccessOrExit(err);
@@ -191,13 +190,10 @@ void BLE::OnBleEndPointReceive(BLEEndPoint * endPoint, PacketBufferHandle buffer
 
     if (ble->mDelegate)
     {
-        uint16_t headerSize = 0;
-
         PacketHeader header;
-        err = header.Decode(buffer->Start(), buffer->DataLength(), &headerSize);
+        err = header.DecodeAndConsume(buffer);
         SuccessOrExit(err);
 
-        buffer->ConsumeHead(headerSize);
         ble->mDelegate->OnRendezvousMessageReceived(header, Transport::PeerAddress(Transport::Type::kBle), std::move(buffer));
     }
 exit:
@@ -230,14 +226,20 @@ void BLE::OnBleEndPointConnectionClosed(BLEEndPoint * endPoint, BLE_ERROR err)
     BLE * ble   = reinterpret_cast<BLE *>(endPoint->mAppState);
     ble->mState = State::kNotReady;
 
+    // Already closed, avoid closing again in our destructor.
+    ble->mBleEndPoint = nullptr;
+
     if (ble->mDelegate)
     {
         if (err != BLE_NO_ERROR)
         {
             ble->mDelegate->OnRendezvousError(err);
         }
-
-        ble->mDelegate->OnRendezvousConnectionClosed();
+        else
+        {
+            // OnRendezvousError may delete |ble|; don't call both callbacks.
+            ble->mDelegate->OnRendezvousConnectionClosed();
+        }
     }
 }
 

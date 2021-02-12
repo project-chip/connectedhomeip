@@ -83,7 +83,7 @@ class TestOnOffCluster(CHIPVirtualHome):
 
         for ip in server_ip_address:
             ret = self.execute_device_cmd(
-                tool_device_id, "chip-tool pairing softap ssid_not_used passwd_not_used {} {} {} {}".format(SETUPPINCODE, DISCRIMINATOR, ip, CHIP_PORT))
+                tool_device_id, "chip-tool pairing softap {} {} {} {}".format(SETUPPINCODE, DISCRIMINATOR, ip, CHIP_PORT))
             self.assertEqual(ret['return_code'], '0', "{} command failure: {}".format(
                 "pairing softap", ret['output']))
 
@@ -106,7 +106,7 @@ class TestOnOffCluster(CHIPVirtualHome):
         for device_id in server_ids:
             self.logger.info("checking device log for {}".format(
                 self.get_device_pretty_id(device_id)))
-            self.assertTrue(self.sequenceMatch(self.get_device_log(device_id).decode('utf-8'), ["LightingManager::InitiateAction(ON_ACTION)", "LightingManager::InitiateAction(OFF_ACTION)"]),
+            self.assertTrue(self.sequenceMatch(self.get_device_log(device_id).decode('utf-8'), ["Thread initialized.", "LightingManager::InitiateAction(ON_ACTION)", "LightingManager::InitiateAction(OFF_ACTION)"]),
                             "Datamodel test failed: cannot find matching string from device {}".format(device_id))
 
 

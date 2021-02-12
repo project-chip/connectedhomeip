@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2020-2021 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,11 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/nlio.gni")
 
-import("${chip_root}/build/chip/buildconfig_header.gni")
-import("${chip_root}/build/chip/tests.gni")
+import("${build_root}/chip/buildconfig_header.gni")
+import("${build_root}/chip/tests.gni")
 import("${chip_root}/src/inet/inet.gni")
 import("core.gni")
 
@@ -65,6 +66,8 @@ buildconfig_header("chip_buildconfig") {
     "HAVE_NEW=false",
     "CHIP_CONFIG_MEMORY_MGMT_SIMPLE=${chip_config_memory_management_simple}",
     "CHIP_CONFIG_MEMORY_MGMT_PLATFORM=${chip_config_memory_management_platform}",
+    "CHIP_CONFIG_MEMORY_DEBUG_CHECKS=${chip_config_memory_debug_checks}",
+    "CHIP_CONFIG_MEMORY_DEBUG_DMALLOC=${chip_config_memory_debug_dmalloc}",
     "CHIP_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES=false",
   ]
 }

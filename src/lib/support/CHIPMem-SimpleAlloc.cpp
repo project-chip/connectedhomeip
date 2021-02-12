@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2019-2020 Google LLC.
  *    Copyright (c) 2018 Nest Labs, Inc.
  *    All rights reserved.
@@ -408,7 +408,7 @@ void * MemoryAlloc(size_t size, bool isLongTermAlloc)
                     {
                         if (sMemBufs[blockBufferIndex] == NULL)
                         {
-                            sMemBufs[blockBufferIndex] = PacketBuffer::NewWithAvailableSize(0, kMinBufferSize).Release();
+                            sMemBufs[blockBufferIndex] = PacketBufferHandle::New(kMinBufferSize, 0).UnsafeRelease();
                             if (sMemBufs[blockBufferIndex] == NULL)
                                 return NULL;
                         }
@@ -535,6 +535,13 @@ void MemoryFree(void * p)
         blockIndex <<= blockCount;
         bufferOffset[blockBufferIndex] += blockSize * blockCount;
     }
+}
+
+bool MemoryInternalCheckPointer(const void * p, size_t min_size)
+{
+    // TODO: check that \a p is actually an allocated pointer,
+    // by factoring the allocation-finding out of MemoryFree().
+    return p != nullptr;
 }
 
 } // namespace Platform

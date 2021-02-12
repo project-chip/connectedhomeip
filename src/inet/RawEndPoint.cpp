@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2018 Google LLC.
  *    Copyright (c) 2013-2018 Nest Labs, Inc.
  *
@@ -73,8 +73,6 @@
 
 namespace chip {
 namespace Inet {
-
-using chip::System::PacketBuffer;
 
 chip::System::ObjectPool<RawEndPoint, INET_CONFIG_NUM_RAW_ENDPOINTS> RawEndPoint::sPool;
 
@@ -512,7 +510,7 @@ void RawEndPoint::Free()
  *  A synonym for <tt>SendTo(addr, INET_NULL_INTERFACEID, msg,
  *  sendFlags)</tt>.
  */
-INET_ERROR RawEndPoint::SendTo(const IPAddress & addr, chip::System::PacketBufferHandle msg, uint16_t sendFlags)
+INET_ERROR RawEndPoint::SendTo(const IPAddress & addr, chip::System::PacketBufferHandle && msg, uint16_t sendFlags)
 {
     return SendTo(addr, INET_NULL_INTERFACEID, std::move(msg), sendFlags);
 }
@@ -547,7 +545,8 @@ INET_ERROR RawEndPoint::SendTo(const IPAddress & addr, chip::System::PacketBuffe
  * @details
  *      Send the ICMP message in \c msg to the destination given in \c addr.
  */
-INET_ERROR RawEndPoint::SendTo(const IPAddress & addr, InterfaceId intfId, chip::System::PacketBufferHandle msg, uint16_t sendFlags)
+INET_ERROR RawEndPoint::SendTo(const IPAddress & addr, InterfaceId intfId, chip::System::PacketBufferHandle && msg,
+                               uint16_t sendFlags)
 {
     IPPacketInfo pktInfo;
     pktInfo.Clear();
@@ -623,20 +622,20 @@ INET_ERROR RawEndPoint::SendMsg(const IPPacketInfo * pktInfo, chip::System::Pack
 #if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
         ip_addr_t ipAddr = addr.ToLwIPAddr();
 
-        lwipErr = raw_sendto(mRaw, msg.GetLwIPpbuf(), &ipAddr);
+        lwipErr = raw_sendto(mRaw, System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(msg), &ipAddr);
 #else // LWIP_VERSION_MAJOR <= 1 && LWIP_VERSION_MINOR < 5
         if (PCB_ISIPV6(mRaw))
         {
             ip6_addr_t ipv6Addr = addr.ToIPv6();
 
-            lwipErr = raw_sendto_ip6(mRaw, msg.GetLwIPpbuf(), &ipv6Addr);
+            lwipErr = raw_sendto_ip6(mRaw, System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(msg), &ipv6Addr);
         }
 #if INET_CONFIG_ENABLE_IPV4
         else
         {
             ip4_addr_t ipv4Addr = addr.ToIPv4();
 
-            lwipErr = raw_sendto(mRaw, msg.GetLwIPpbuf(), &ipv4Addr);
+            lwipErr = raw_sendto(mRaw, System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(msg), &ipv4Addr);
         }
 #endif // INET_CONFIG_ENABLE_IPV4
 #endif // LWIP_VERSION_MAJOR <= 1 || LWIP_VERSION_MINOR >= 5
@@ -829,7 +828,7 @@ InterfaceId RawEndPoint::GetBoundInterface()
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 
-void RawEndPoint::HandleDataReceived(System::PacketBufferHandle msg)
+void RawEndPoint::HandleDataReceived(System::PacketBufferHandle && msg)
 {
     IPEndPointBasis::HandleDataReceived(std::move(msg));
 }

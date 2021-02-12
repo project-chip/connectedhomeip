@@ -18,6 +18,7 @@
 
 #include <support/logging/CHIPLogging.h>
 
+#include "AppTask.h"
 #include "BoltLockManager.h"
 
 #include "af.h"
@@ -62,5 +63,5 @@ void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId
  */
 void emberAfOnOffClusterInitCallback(EndpointId endpoint)
 {
-    // TODO: implement any additional Cluster Server init actions
+    GetAppTask().UpdateClusterState();
 }

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2018 Google LLC.
  *    Copyright (c) 2013-2018 Nest Labs, Inc.
  *
@@ -75,8 +75,6 @@
 
 namespace chip {
 namespace Inet {
-
-using chip::System::PacketBuffer;
 
 chip::System::ObjectPool<UDPEndPoint, INET_CONFIG_NUM_UDP_ENDPOINTS> UDPEndPoint::sPool;
 
@@ -452,7 +450,7 @@ void UDPEndPoint::Free()
 /**
  *  A synonym for <tt>SendTo(addr, port, INET_NULL_INTERFACEID, msg, sendFlags)</tt>.
  */
-INET_ERROR UDPEndPoint::SendTo(const IPAddress & addr, uint16_t port, chip::System::PacketBufferHandle msg, uint16_t sendFlags)
+INET_ERROR UDPEndPoint::SendTo(const IPAddress & addr, uint16_t port, chip::System::PacketBufferHandle && msg, uint16_t sendFlags)
 {
     return SendTo(addr, port, INET_NULL_INTERFACEID, std::move(msg), sendFlags);
 }
@@ -491,7 +489,7 @@ INET_ERROR UDPEndPoint::SendTo(const IPAddress & addr, uint16_t port, chip::Syst
  *      identifier for IPv6 link-local destinations) and \c port with the
  *      transmit option flags encoded in \c sendFlags.
  */
-INET_ERROR UDPEndPoint::SendTo(const IPAddress & addr, uint16_t port, InterfaceId intfId, chip::System::PacketBufferHandle msg,
+INET_ERROR UDPEndPoint::SendTo(const IPAddress & addr, uint16_t port, InterfaceId intfId, chip::System::PacketBufferHandle && msg,
                                uint16_t sendFlags)
 {
     IPPacketInfo pktInfo;
@@ -578,9 +576,9 @@ INET_ERROR UDPEndPoint::SendMsg(const IPPacketInfo * pktInfo, System::PacketBuff
         }
 
         if (intfId != INET_NULL_INTERFACEID)
-            lwipErr = udp_sendto_if(mUDP, msg.GetLwIPpbuf(), &lwipDestAddr, destPort, intfId);
+            lwipErr = udp_sendto_if(mUDP, System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(msg), &lwipDestAddr, destPort, intfId);
         else
-            lwipErr = udp_sendto(mUDP, msg.GetLwIPpbuf(), &lwipDestAddr, destPort);
+            lwipErr = udp_sendto(mUDP, System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(msg), &lwipDestAddr, destPort);
 
         ip_addr_copy(mUDP->local_ip, boundAddr);
 
@@ -600,9 +598,10 @@ INET_ERROR UDPEndPoint::SendMsg(const IPPacketInfo * pktInfo, System::PacketBuff
             }
 
             if (intfId != INET_NULL_INTERFACEID)
-                lwipErr = udp_sendto_if_ip6(mUDP, msg.GetLwIPpbuf(), &lwipDestAddr, destPort, intfId);
+                lwipErr =
+                    udp_sendto_if_ip6(mUDP, System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(msg), &lwipDestAddr, destPort, intfId);
             else
-                lwipErr = udp_sendto_ip6(mUDP, msg.GetLwIPpbuf(), &lwipDestAddr, destPort);
+                lwipErr = udp_sendto_ip6(mUDP, System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(msg), &lwipDestAddr, destPort);
         }
 
 #if INET_CONFIG_ENABLE_IPV4
@@ -619,9 +618,10 @@ INET_ERROR UDPEndPoint::SendMsg(const IPPacketInfo * pktInfo, System::PacketBuff
             }
 
             if (intfId != INET_NULL_INTERFACEID)
-                lwipErr = udp_sendto_if(mUDP, msg.GetLwIPpbuf(), &lwipDestAddr, destPort, intfId);
+                lwipErr =
+                    udp_sendto_if(mUDP, System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(msg), &lwipDestAddr, destPort, intfId);
             else
-                lwipErr = udp_sendto(mUDP, msg.GetLwIPpbuf(), &lwipDestAddr, destPort);
+                lwipErr = udp_sendto(mUDP, System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(msg), &lwipDestAddr, destPort);
         }
 
         ipX_addr_copy(mUDP->local_ip, boundAddr);
@@ -775,7 +775,7 @@ uint16_t UDPEndPoint::GetBoundPort()
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 
-void UDPEndPoint::HandleDataReceived(System::PacketBufferHandle msg)
+void UDPEndPoint::HandleDataReceived(System::PacketBufferHandle && msg)
 {
     IPEndPointBasis::HandleDataReceived(std::move(msg));
 }

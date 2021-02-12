@@ -12,9 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
-import("//build/toolchain/arm_gcc/arm_toolchain.gni")
+import("${build_root}/toolchain/arm_gcc/arm_toolchain.gni")
 
 arm_toolchain("k32w_lock_app") {
   toolchain_args = {

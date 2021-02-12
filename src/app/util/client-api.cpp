@@ -85,8 +85,8 @@ static uint16_t vFillBuffer(uint8_t * buffer, uint16_t bufferLen, uint8_t frameC
     buffer[bytes++] = frameControl;
     if (manufacturerCode != EMBER_AF_NULL_MANUFACTURER_CODE)
     {
-        buffer[bytes++] = LOW_BYTE(manufacturerCode);
-        buffer[bytes++] = HIGH_BYTE(manufacturerCode);
+        buffer[bytes++] = EMBER_LOW_BYTE(manufacturerCode);
+        buffer[bytes++] = EMBER_HIGH_BYTE(manufacturerCode);
     }
     buffer[bytes++] = emberAfNextSequence();
     buffer[bytes++] = commandId;
@@ -186,7 +186,7 @@ static uint16_t vFillBuffer(uint8_t * buffer, uint16_t bufferLen, uint8_t frameC
                 emberAfDebugPrintln("ERR: Unknown format '%c'", cmd);
                 return 0;
             }
-            value = (uint32_t)(valueLen <= 2 ? va_arg(argPointer, int) : va_arg(argPointer, uint32_t));
+            value = valueLen <= 2 ? static_cast<uint32_t>(va_arg(argPointer, int)) : va_arg(argPointer, uint32_t);
         }
 
         // The destination buffer must be at least as large as the running total
@@ -202,7 +202,7 @@ static uint16_t vFillBuffer(uint8_t * buffer, uint16_t bufferLen, uint8_t frameC
         // endian format.
         for (; 0 < valueLen; valueLen--)
         {
-            buffer[bytes++] = LOW_BYTE(value);
+            buffer[bytes++] = EMBER_LOW_BYTE(value);
             value           = value >> 8;
         }
 

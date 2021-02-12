@@ -21,7 +21,9 @@
 
 #pragma once
 
+#include <transport/AdminPairingTable.h>
 #include <transport/SecureSession.h>
+#include <transport/raw/Base.h>
 #include <transport/raw/MessageHeader.h>
 #include <transport/raw/PeerAddress.h>
 
@@ -57,6 +59,9 @@ public:
     PeerAddress & GetPeerAddress() { return mPeerAddress; }
     void SetPeerAddress(const PeerAddress & address) { mPeerAddress = address; }
 
+    void SetTransport(Transport::Base * transport) { mTransport = transport; }
+    Transport::Base * GetTransport() { return mTransport; }
+
     NodeId GetPeerNodeId() const { return mPeerNodeId; }
     void SetPeerNodeId(NodeId peerNodeId) { mPeerNodeId = peerNodeId; }
 
@@ -69,11 +74,14 @@ public:
     uint16_t GetLocalKeyID() const { return mLocalKeyID; }
     void SetLocalKeyID(uint16_t id) { mLocalKeyID = id; }
 
-    uint64_t GetLastActivityTimeMs() const { return mLastActityTimeMs; }
-    void SetLastActivityTimeMs(uint64_t value) { mLastActityTimeMs = value; }
+    uint64_t GetLastActivityTimeMs() const { return mLastActivityTimeMs; }
+    void SetLastActivityTimeMs(uint64_t value) { mLastActivityTimeMs = value; }
 
     SecureSession & GetSecureSession() { return mSecureSession; }
     const SecureSession & GetSecureSession() const { return mSecureSession; }
+
+    Transport::AdminId GetAdminId() const { return mAdmin; }
+    void SetAdminId(Transport::AdminId admin) { mAdmin = admin; }
 
     bool IsInitialized()
     {
@@ -86,21 +94,23 @@ public:
      */
     void Reset()
     {
-        mPeerAddress      = PeerAddress::Uninitialized();
-        mPeerNodeId       = kUndefinedNodeId;
-        mSendMessageIndex = 0;
-        mLastActityTimeMs = 0;
+        mPeerAddress        = PeerAddress::Uninitialized();
+        mPeerNodeId         = kUndefinedNodeId;
+        mSendMessageIndex   = 0;
+        mLastActivityTimeMs = 0;
         mSecureSession.Reset();
     }
 
 private:
     PeerAddress mPeerAddress;
-    NodeId mPeerNodeId         = kUndefinedNodeId;
-    uint32_t mSendMessageIndex = 0;
-    uint16_t mPeerKeyID        = UINT16_MAX;
-    uint16_t mLocalKeyID       = UINT16_MAX;
-    uint64_t mLastActityTimeMs = 0;
+    NodeId mPeerNodeId           = kUndefinedNodeId;
+    uint32_t mSendMessageIndex   = 0;
+    uint16_t mPeerKeyID          = UINT16_MAX;
+    uint16_t mLocalKeyID         = UINT16_MAX;
+    uint64_t mLastActivityTimeMs = 0;
+    Transport::Base * mTransport = nullptr;
     SecureSession mSecureSession;
+    Transport::AdminId mAdmin = kUndefinedAdminId;
 };
 
 } // namespace Transport

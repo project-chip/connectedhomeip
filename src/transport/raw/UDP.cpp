@@ -90,8 +90,6 @@ void UDP::Close()
 
 CHIP_ERROR UDP::SendMessage(const PacketHeader & header, const Transport::PeerAddress & address, System::PacketBufferHandle msgBuf)
 {
-    const uint16_t headerSize = header.EncodeSizeBytes();
-
     VerifyOrReturnError(address.GetTransportType() == Type::kUdp, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mState == State::kInitialized, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mUDPEndPoint != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -103,14 +101,7 @@ CHIP_ERROR UDP::SendMessage(const PacketHeader & header, const Transport::PeerAd
     addrInfo.DestPort    = address.GetPort();
     addrInfo.Interface   = address.GetInterface();
 
-    VerifyOrReturnError(msgBuf->EnsureReservedSize(headerSize), CHIP_ERROR_NO_MEMORY);
-
-    msgBuf->SetStart(msgBuf->Start() - headerSize);
-
-    uint16_t actualEncodedHeaderSize;
-    ReturnErrorOnFailure(header.Encode(msgBuf->Start(), msgBuf->DataLength(), &actualEncodedHeaderSize));
-
-    VerifyOrReturnError(headerSize == actualEncodedHeaderSize, CHIP_ERROR_INTERNAL);
+    ReturnErrorOnFailure(header.EncodeBeforeData(msgBuf));
 
     return mUDPEndPoint->SendMsg(&addrInfo, std::move(msgBuf));
 }
@@ -119,14 +110,12 @@ void UDP::OnUdpReceive(Inet::IPEndPointBasis * endPoint, System::PacketBufferHan
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     UDP * udp               = reinterpret_cast<UDP *>(endPoint->AppState);
-    uint16_t headerSize     = 0;
     PeerAddress peerAddress = PeerAddress::UDP(pktInfo->SrcAddress, pktInfo->SrcPort);
 
     PacketHeader header;
-    err = header.Decode(buffer->Start(), buffer->DataLength(), &headerSize);
+    err = header.DecodeAndConsume(buffer);
     SuccessOrExit(err);
 
-    buffer->ConsumeHead(headerSize);
     udp->HandleMessageReceived(header, peerAddress, std::move(buffer));
 
 exit:

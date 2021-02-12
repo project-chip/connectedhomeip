@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,17 +15,11 @@
  *    limitations under the License.
  */
 
-#import <Foundation/Foundation.h>
-
-#include <app/chip-zcl-zpro-codec.h>
-#include <controller/CHIPDevice.h>
-
-#import "CHIPDevice.h"
 #import "CHIPDevice_Internal.h"
-#import "CHIPError.h"
 #import "CHIPLogging.h"
-
-#include <system/SystemPacketBuffer.h>
+#import <CHIP/CHIPError.h>
+#import <setup_payload/ManualSetupPayloadGenerator.h>
+#import <setup_payload/SetupPayload.h>
 
 @interface CHIPDevice ()
 
@@ -57,31 +51,18 @@
     return _cppDevice;
 }
 
-- (BOOL)sendMessage:(NSData *)message error:(NSError * __autoreleasing *)error
+- (BOOL)openPairingWindow:(NSTimeInterval)duration error:(NSError * __autoreleasing *)error
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+    chip::SetupPayload setupPayload;
+
     [self.lock lock];
-    size_t messageLen = [message length];
-    const void * messageChars = [message bytes];
-
-    chip::System::PacketBufferHandle buffer = chip::System::PacketBuffer::NewWithAvailableSize(messageLen);
-    if (buffer.IsNull()) {
-        err = CHIP_ERROR_NO_MEMORY;
-    } else {
-        buffer->SetDataLength(messageLen);
-
-        if (buffer->DataLength() < messageLen) {
-            err = CHIP_ERROR_NO_MEMORY;
-        } else {
-            memcpy(buffer->Start(), messageChars, messageLen);
-            err = self.cppDevice->SendMessage(std::move(buffer));
-        }
-    }
+    err = self.cppDevice->OpenPairingWindow(duration, false, 0, setupPayload);
     [self.lock unlock];
 
     if (err != CHIP_NO_ERROR) {
-        CHIP_LOG_ERROR("Error(%d): %@, send failed", err, [CHIPError errorForCHIPErrorCode:err]);
+        CHIP_LOG_ERROR("Error(%d): %@, Open Pairing Window failed", err, [CHIPError errorForCHIPErrorCode:err]);
         if (error) {
             *error = [CHIPError errorForCHIPErrorCode:err];
         }
@@ -91,41 +72,49 @@
     return YES;
 }
 
-- (BOOL)sendCHIPCommand:(chip::System::PacketBufferHandle (^)())encodeCommandBlock
+- (NSString *)openPairingWindowWithPIN:(NSTimeInterval)duration
+                         discriminator:(NSInteger)discriminator
+                                 error:(NSError * __autoreleasing *)error
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    [self.lock lock];
-    chip::System::PacketBufferHandle buffer = encodeCommandBlock();
-    if (buffer.IsNull()) {
-        err = CHIP_ERROR_NO_MEMORY;
+    uint16_t u16Descriminator = 0;
+
+    if (discriminator > 0xfff) {
+        CHIP_LOG_ERROR("Error: Discriminator %ld is too large. Max value %d", discriminator, 0xfff);
+        if (error) {
+            *error = [CHIPError errorForCHIPErrorCode:CHIP_ERROR_INVALID_INTEGER_VALUE];
+        }
+        return nil;
     } else {
-        err = self.cppDevice->SendMessage(std::move(buffer));
+        u16Descriminator = (uint16_t) discriminator;
     }
+
+    chip::SetupPayload setupPayload;
+
+    [self.lock lock];
+    err = self.cppDevice->OpenPairingWindow(duration, true, u16Descriminator, setupPayload);
     [self.lock unlock];
+
     if (err != CHIP_NO_ERROR) {
-        CHIP_LOG_ERROR("Error(%d): %@, send failed", err, [CHIPError errorForCHIPErrorCode:err]);
-        return NO;
+        CHIP_LOG_ERROR("Error(%d): %@, Open Pairing Window failed", err, [CHIPError errorForCHIPErrorCode:err]);
+        if (error) {
+            *error = [CHIPError errorForCHIPErrorCode:err];
+        }
+        return nil;
     }
 
-    return YES;
-}
+    chip::ManualSetupPayloadGenerator generator(setupPayload);
+    std::string outCode;
 
-- (BOOL)sendIdentifyCommandWithDuration:(NSTimeInterval)duration
-{
-    if (duration > UINT16_MAX) {
-        duration = UINT16_MAX;
+    if (generator.payloadDecimalStringRepresentation(outCode) == CHIP_NO_ERROR) {
+        CHIP_LOG_ERROR("Setup code is %s", outCode.c_str());
+    } else {
+        CHIP_LOG_ERROR("Failed to get decimal setup code");
+        return nil;
     }
 
-    return [self sendCHIPCommand:^chip::System::PacketBufferHandle() {
-        // Hardcode endpoint to 1 for now
-        return encodeIdentifyClusterIdentifyCommand(1, duration);
-    }];
-}
-
-- (BOOL)disconnect:(NSError * __autoreleasing *)error
-{
-    return YES;
+    return [NSString stringWithCString:outCode.c_str() encoding:[NSString defaultCStringEncoding]];
 }
 
 - (BOOL)isActive
@@ -138,73 +127,4 @@
 
     return isActive ? YES : NO;
 }
-
-+ (BOOL)isDataModelCommand:(NSData * _Nonnull)message
-{
-    if (message.length == 0) {
-        return NO;
-    }
-
-    UInt8 * bytes = (UInt8 *) message.bytes;
-    return bytes[0] < 0x04 ? YES : NO;
-}
-
-+ (NSString *)commandToString:(NSData * _Nonnull)response
-{
-    if ([CHIPDevice isDataModelCommand:response] == NO) {
-        return @"Response is not a CHIP command";
-    }
-
-    uint8_t * bytes = (uint8_t *) response.bytes;
-
-    EmberApsFrame frame;
-    if (extractApsFrame(bytes, (uint32_t) response.length, &frame) == 0) {
-        return @"Response is not an APS frame";
-    }
-
-    uint8_t * message;
-    uint16_t messageLen = extractMessage(bytes, response.length, &message);
-    if (messageLen != 5) {
-        // Not a Default Response command for sure.
-        return @"Unexpected response length";
-    }
-
-    if (message[0] != 8) {
-        // Unexpected control byte
-        return [NSString stringWithFormat:@"Control byte value '0x%02x' is not expected", message[0]];
-    }
-
-    // message[1] is the sequence counter; just ignore it for now.
-
-    if (message[2] != 0x0b) {
-        // Not a Default Response command id
-        return [NSString stringWithFormat:@"Command id '0x%02x' is not the Default Response command id (0x0b)", message[2]];
-    }
-
-    if (frame.clusterId != 0x06) {
-        // Not On/Off cluster
-        return [NSString stringWithFormat:@"Cluster id '0x%02x' is not the on/off cluster id (0x06)", frame.clusterId];
-    }
-
-    NSString * command;
-    if (message[3] == 0) {
-        command = @"off";
-    } else if (message[3] == 1) {
-        command = @"on";
-    } else if (message[3] == 2) {
-        command = @"toggle";
-    } else {
-        return [NSString stringWithFormat:@"Command '0x%02x' is unknown", message[3]];
-    }
-
-    NSString * status;
-    if (message[4] == 0) {
-        status = @"succeeded";
-    } else {
-        status = @"failed";
-    }
-
-    return [NSString stringWithFormat:@"Sending '%@' command %@", command, status];
-}
-
 @end

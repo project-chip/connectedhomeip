@@ -19,13 +19,13 @@
   "package": [
     {
       "pathRelativity": "relativeToZap",
-      "path": "../../../../third_party/zap/repo/zcl-builtin/silabs/zcl.json",
+      "path": "../../../../src/app/zap-templates/zcl/zcl.json",
       "version": "ZCL Test Data",
       "type": "zcl-properties"
     },
     {
       "pathRelativity": "relativeToZap",
-      "path": "../../../../src/app/zap-templates/chip-templates.json",
+      "path": "../../../../src/app/zap-templates/app-templates.json",
       "version": "chip-v1",
       "type": "gen-templates-json"
     }
@@ -1466,7 +1466,7 @@
       "endpointTypeIndex": 0,
       "profileId": "0x109",
       "endpointId": 1,
-      "networkId": 1
+      "networkId": 0
     }
   ]
 }

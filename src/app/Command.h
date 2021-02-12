@@ -27,7 +27,6 @@
 #ifndef _CHIP_INTERACTION_MODEL_COMMAND_H
 #define _CHIP_INTERACTION_MODEL_COMMAND_H
 
-#include <app/MessageDef.h>
 #include <core/CHIPCore.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
@@ -38,6 +37,10 @@
 #include <support/logging/CHIPLogging.h>
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
+
+#include <app/MessageDef/CommandDataElement.h>
+#include <app/MessageDef/CommandList.h>
+#include <app/MessageDef/InvokeCommand.h>
 
 namespace chip {
 namespace app {
@@ -129,7 +132,7 @@ public:
 
 protected:
     void MoveToState(const CommandState aTargetState);
-    CHIP_ERROR ProcessCommandMessage(System::PacketBufferHandle payload, CommandRoleId aCommandRoleId);
+    CHIP_ERROR ProcessCommandMessage(System::PacketBufferHandle && payload, CommandRoleId aCommandRoleId);
     void ClearState();
     const char * GetStateStr() const;
 

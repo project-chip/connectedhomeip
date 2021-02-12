@@ -367,6 +367,16 @@
 #endif
 
 /**
+ * CHIP_DEVICE_CONFIG_ENABLE_PAIRING_AUTOSTART
+ *
+ * Enable opening pairing window automatically after device power-up.
+ *
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_PAIRING_AUTOSTART
+#define CHIP_DEVICE_CONFIG_ENABLE_PAIRING_AUTOSTART 1
+#endif
+
+/**
  * CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX
  *
  * A prefix string used in forming the BLE device name.  The remainder of the name

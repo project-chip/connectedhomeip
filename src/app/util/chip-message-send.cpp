@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -23,9 +23,10 @@
 #include "chip-message-send.h"
 
 #include <assert.h>
-#include <inet/InetLayer.h> // PacketBuffer and the like
+#include <inet/InetLayer.h>
 #include <support/logging/CHIPLogging.h>
-#include <transport/SecureSessionMgr.h> // For SecureSessionMgr
+#include <transport/SecureSessionMgr.h>
+#include <transport/raw/MessageHeader.h>
 
 using namespace chip;
 
@@ -55,7 +56,7 @@ EmberStatus chipSendUnicast(NodeId destination, EmberApsFrame * apsFrame, uint16
         return EMBER_ERR_FATAL;
     }
 
-    System::PacketBufferHandle buffer = System::PacketBuffer::NewWithAvailableSize(dataLength);
+    System::PacketBufferHandle buffer = MessagePacketBuffer::New(dataLength);
     if (buffer.IsNull())
     {
         // FIXME: Not quite right... what's the right way to indicate "out of

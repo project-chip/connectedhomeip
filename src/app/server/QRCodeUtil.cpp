@@ -18,8 +18,9 @@
 
 #include <app/server/QRCodeUtil.h>
 
-#include <platform/CHIPDeviceLayer.h>
+#include <inttypes.h>
 
+#include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <support/CodeUtils.h>
 #include <support/ScopedBuffer.h>
@@ -30,16 +31,14 @@ constexpr char specialCharsUnreservedInRfc3986[] = "-._~";
 
 void PrintQRCode(chip::RendezvousInformationFlags rendezvousFlags)
 {
-    uint32_t setupPinCode;
     std::string QRCode;
 
-    if (GetQRCode(setupPinCode, QRCode, rendezvousFlags) == CHIP_NO_ERROR)
+    if (GetQRCode(QRCode, rendezvousFlags) == CHIP_NO_ERROR)
     {
         chip::Platform::ScopedMemoryBuffer<char> qrCodeBuffer;
         const size_t qrCodeBufferMaxSize = 3 * QRCode.size() + 1;
         qrCodeBuffer.Alloc(qrCodeBufferMaxSize);
 
-        ChipLogProgress(AppServer, "SetupPINCode: [%" PRIu32 "]", setupPinCode);
         ChipLogProgress(AppServer, "SetupQRCode:  [%s]", QRCode.c_str());
         if (EncodeQRCodeToUrl(QRCode.c_str(), QRCode.size(), &qrCodeBuffer[0], qrCodeBufferMaxSize) == CHIP_NO_ERROR)
         {
@@ -53,7 +52,7 @@ void PrintQRCode(chip::RendezvousInformationFlags rendezvousFlags)
     }
 }
 
-CHIP_ERROR GetQRCode(uint32_t & setupPinCode, std::string & QRCode, chip::RendezvousInformationFlags rendezvousFlags)
+CHIP_ERROR GetQRCode(std::string & QRCode, chip::RendezvousInformationFlags rendezvousFlags)
 {
     using namespace ::chip::DeviceLayer;
 
@@ -66,7 +65,6 @@ CHIP_ERROR GetQRCode(uint32_t & setupPinCode, std::string & QRCode, chip::Rendez
     err = ConfigurationMgr().GetSetupPinCode(payload.setUpPINCode);
     VerifyOrExit(err == CHIP_NO_ERROR,
                  ChipLogProgress(AppServer, "ConfigurationMgr().GetSetupPinCode() failed: %s", chip::ErrorStr(err)));
-    setupPinCode = payload.setUpPINCode;
 
     err = ConfigurationMgr().GetSetupDiscriminator(payload.discriminator);
     VerifyOrExit(err == CHIP_NO_ERROR,

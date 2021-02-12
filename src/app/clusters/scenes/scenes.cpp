@@ -42,6 +42,11 @@
 #include "app/util/common.h"
 #include <app/util/af.h>
 
+#include "gen/attribute-id.h"
+#include "gen/attribute-type.h"
+#include "gen/cluster-id.h"
+#include "gen/command-id.h"
+
 #ifdef EMBER_AF_PLUGIN_GROUPS_SERVER
 #include <app/clusters/groups-server/groups-server.h>
 #endif
@@ -101,7 +106,7 @@ void emberAfScenesClusterServerInitCallback(EndpointId endpoint)
 #ifdef EMBER_AF_PLUGIN_SCENES_NAME_SUPPORT
     {
         // The high bit of Name Support indicates whether scene names are supported.
-        uint8_t nameSupport = BIT(7);
+        uint8_t nameSupport = EMBER_BIT(7);
         writeServerAttribute(endpoint, ZCL_SCENES_CLUSTER_ID, ZCL_SCENE_NAME_SUPPORT_ATTRIBUTE_ID, "name support",
                              (uint8_t *) &nameSupport, ZCL_BITMAP8_ATTRIBUTE_TYPE);
     }
@@ -1049,11 +1054,11 @@ bool emberAfPluginScenesServerParseViewScene(const EmberAfClusterCommand * cmd, 
             emberAfPutInt16uInResp(ZCL_THERMOSTAT_CLUSTER_ID);
             length = &appResponseData[appResponseLength];
             emberAfPutInt8uInResp(0); // temporary length
-            emberAfPutInt16uInResp(entry.occupiedCoolingSetpointValue);
+            emberAfPutInt16sInResp(entry.occupiedCoolingSetpointValue);
             *length += 2;
             if (entry.hasOccupiedHeatingSetpointValue)
             {
-                emberAfPutInt16uInResp(entry.occupiedHeatingSetpointValue);
+                emberAfPutInt16sInResp(entry.occupiedHeatingSetpointValue);
                 *length += 2;
                 if (entry.hasSystemModeValue)
                 {

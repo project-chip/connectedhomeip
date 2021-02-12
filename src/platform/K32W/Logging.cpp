@@ -40,7 +40,7 @@ using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Internal;
 using namespace ::chip::Logging;
 
-void GetMessageString(char * buf, uint8_t chipCategory, uint8_t otLogLevel)
+void GetMessageString(char * buf, uint8_t chipCategory, uint8_t otLevelLog)
 {
     if (chipCategory != kLogCategory_None)
     {
@@ -50,7 +50,6 @@ void GetMessageString(char * buf, uint8_t chipCategory, uint8_t otLogLevel)
             memcpy(buf, "[Error]", 7);
             break;
         case kLogCategory_Progress:
-        case kLogCategory_Retain:
         default:
             memcpy(buf, "[Progress]", 10);
             break;
@@ -60,9 +59,9 @@ void GetMessageString(char * buf, uint8_t chipCategory, uint8_t otLogLevel)
         }
     }
 
-    if (otLogLevel != OT_LOG_LEVEL_NONE)
+    if (otLevelLog != OT_LOG_LEVEL_NONE)
     {
-        switch (otLogLevel)
+        switch (otLevelLog)
         {
         case OT_LOG_LEVEL_CRIT:
             memcpy(buf, "[Error]", 7);
@@ -82,24 +81,23 @@ void GetMessageString(char * buf, uint8_t chipCategory, uint8_t otLogLevel)
     }
 }
 
-void FillPrefix(char * buf, uint8_t bufLen, uint8_t chipCategory, uint8_t otLogLevel, uint8_t module)
+void FillPrefix(char * buf, uint8_t bufLen, uint8_t chipCategory, uint8_t otLevelLog, uint8_t module)
 {
     size_t prefixLen;
 
     /* add the error string */
-    VerifyOrDie(bufLen > ChipLoggingChipPrefixLen);
-    ::GetMessageString(buf, chipCategory, otLogLevel);
+    VerifyOrDie(bufLen > chip::Logging::kMaxPrefixLen);
+    ::GetMessageString(buf, chipCategory, otLevelLog);
 
     /* add the module name string */
     prefixLen = strlen(buf);
-    VerifyOrDie(bufLen > (prefixLen + ChipLoggingModuleNameLen + 3));
+    VerifyOrDie(bufLen > (prefixLen + chip::Logging::kMaxModuleNameLen + 3));
     buf[prefixLen++] = '[';
-    GetModuleName(buf + prefixLen, module);
+    GetModuleName(buf + prefixLen, chip::Logging::kMaxModuleNameLen + 1, module);
     prefixLen        = strlen(buf);
     buf[prefixLen++] = ']';
     buf[prefixLen++] = ' ';
 }
-} // unnamed namespace
 
 namespace chip {
 namespace DeviceLayer {
@@ -129,14 +127,15 @@ void GenericLog(const char * format, va_list arg)
     prefixLen = strlen(formattedMsg);
 
     // Append the log message.
-    writtenLen = vsnprintf(formattedMsg + prefixLen, sizeof(formattedMsg) - prefixLen - EOL_CHARS_LEN, format, arg);
+    writtenLen =
+        vsnprintf(formattedMsg + prefixLen, CHIP_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE - prefixLen - EOL_CHARS_LEN, format, arg);
     VerifyOrDie(writtenLen > 0);
     memcpy(formattedMsg + prefixLen + writtenLen, EOL_CHARS, EOL_CHARS_LEN);
 
     K32WWriteBlocking((const uint8_t *) formattedMsg, strlen(formattedMsg));
 
     // Let the application know that a log message has been emitted.
-    DeviceLayer::OnLogOutput();
+    chip::DeviceLayer::OnLogOutput();
 
 #endif // K32W_LOG_ENABLED
 }

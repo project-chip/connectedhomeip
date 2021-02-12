@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-
 import("${chip_root}/src/platform/EFR32/args.gni")
 
 openthread_project_core_config_file = "OpenThreadConfig.h"

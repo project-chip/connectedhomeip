@@ -39,6 +39,11 @@ class BluetoothManager {
   }
 
   suspend fun getBluetoothDevice(discriminator: Int): BluetoothDevice? {
+
+    if (! bluetoothAdapter.isEnabled) {
+      bluetoothAdapter.enable();
+    }
+
     val scanner = bluetoothAdapter.bluetoothLeScanner ?: run {
       Log.e(TAG, "No bluetooth scanner found")
       return null

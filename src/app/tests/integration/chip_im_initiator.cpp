@@ -34,7 +34,7 @@
 
 #include <support/ErrorStr.h>
 #include <system/SystemPacketBuffer.h>
-#include <transport/SecurePairingSession.h>
+#include <transport/PASESession.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/raw/UDP.h>
 
@@ -47,6 +47,8 @@ constexpr size_t kMaxCommandCount = 3;
 
 // The CHIP Command interval time in milliseconds.
 constexpr int32_t gCommandInterval = 1000;
+
+constexpr chip::Transport::AdminId gAdminId = 0;
 
 // The CommandSender object.
 chip::app::CommandSender * gpCommandSender = nullptr;
@@ -85,10 +87,10 @@ CHIP_ERROR SendCommandRequest(void)
 
     printf("\nSend invoke command request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 
-    chip::app::Command::CommandParams CommandParams = { 1,  // Endpoint
-                                                        0,  // GroupId
-                                                        6,  // ClusterId
-                                                        40, // CommandId
+    chip::app::Command::CommandParams CommandParams = { kTestEndPointId, // Endpoint
+                                                        kTestGroupId,    // GroupId
+                                                        kTestClusterId,  // ClusterId
+                                                        kTestCommandId,  // CommandId
                                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
 
     // Add command data here
@@ -145,7 +147,7 @@ CHIP_ERROR EstablishSecureSession()
     // Attempt to connect to the peer.
     err = gSessionManager.NewPairing(chip::Optional<chip::Transport::PeerAddress>::Value(
                                          chip::Transport::PeerAddress::UDP(gDestAddr, CHIP_PORT, INET_NULL_INTERFACEID)),
-                                     chip::kTestDeviceNodeId, testSecurePairingSecret);
+                                     chip::kTestDeviceNodeId, testSecurePairingSecret, gAdminId);
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -161,8 +163,19 @@ exit:
     return err;
 }
 
-void HandleCommandResponseReceived(chip::TLV::TLVReader & aReader, chip::app::Command * apCommandObj)
+} // namespace
+
+namespace chip {
+namespace app {
+
+void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId,
+                                  chip::TLV::TLVReader & aReader, Command * apCommandObj)
 {
+    if (aClusterId != kTestClusterId || aCommandId != kTestCommandId || aEndPointId != kTestEndPointId)
+    {
+        return;
+    }
+
     uint32_t respTime    = chip::System::Timer::GetCurrentEpoch();
     uint32_t transitTime = respTime - gLastCommandTime;
 
@@ -176,12 +189,15 @@ void HandleCommandResponseReceived(chip::TLV::TLVReader & aReader, chip::app::Co
     printf("Command Response: %" PRIu64 "/%" PRIu64 "(%.2f%%) time=%.3fms\n", gCommandRespCount, gCommandCount,
            static_cast<double>(gCommandRespCount) * 100 / gCommandCount, static_cast<double>(transitTime) / 1000);
 }
-
-} // namespace
+} // namespace app
+} // namespace chip
 
 int main(int argc, char * argv[])
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+    chip::Transport::AdminPairingTable admins;
+    chip::Transport::AdminPairingInfo * adminInfo = admins.AssignAdminId(gAdminId, chip::kTestControllerNodeId);
+    VerifyOrExit(adminInfo != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     if (argc <= 1)
     {
@@ -202,7 +218,7 @@ int main(int argc, char * argv[])
                                      .SetListenPort(IM_CLIENT_PORT));
     SuccessOrExit(err);
 
-    err = gSessionManager.Init(chip::kTestControllerNodeId, &chip::DeviceLayer::SystemLayer, &gTransportManager);
+    err = gSessionManager.Init(chip::kTestControllerNodeId, &chip::DeviceLayer::SystemLayer, &gTransportManager, &admins);
     SuccessOrExit(err);
 
     err = gExchangeManager.Init(&gSessionManager);
@@ -210,9 +226,6 @@ int main(int argc, char * argv[])
 
     err = chip::app::InteractionModelEngine::GetInstance()->Init(&gExchangeManager);
     SuccessOrExit(err);
-
-    chip::app::InteractionModelEngine::GetInstance()->RegisterClusterCommandHandler(
-        6, 40, chip::app::Command::CommandRoleId::kCommandSenderId, HandleCommandResponseReceived);
 
     // Start the CHIP connection to the CHIP im responder.
     err = EstablishSecureSession();
@@ -224,7 +237,8 @@ int main(int argc, char * argv[])
     // Connection has been established. Now send the CommandRequests.
     for (unsigned int i = 0; i < kMaxCommandCount; i++)
     {
-        if (SendCommandRequest() != CHIP_NO_ERROR)
+        err = SendCommandRequest();
+        if (err != CHIP_NO_ERROR)
         {
             printf("Send request failed: %s\n", chip::ErrorStr(err));
             break;
@@ -244,15 +258,12 @@ int main(int argc, char * argv[])
         }
     }
 
-    chip::app::InteractionModelEngine::GetInstance()->DeregisterClusterCommandHandler(
-        6, 40, chip::app::Command::CommandRoleId::kCommandSenderId);
-
     gpCommandSender->Shutdown();
     chip::app::InteractionModelEngine::GetInstance()->Shutdown();
     ShutdownChip();
 
 exit:
-    if (err != CHIP_NO_ERROR)
+    if ((err != CHIP_NO_ERROR) || (gCommandRespCount != kMaxCommandCount))
     {
         printf("ChipCommandSender failed: %s\n", chip::ErrorStr(err));
         exit(EXIT_FAILURE);

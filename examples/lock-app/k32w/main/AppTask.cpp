@@ -16,18 +16,23 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #include "AppTask.h"
 #include "AppEvent.h"
-#include "LEDWidget.h"
 #include "Server.h"
 #include "support/ErrorStr.h"
 
+#include "QRCodeUtil.h"
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 
+#include "attribute-storage.h"
+#include "gen/attribute-id.h"
+#include "gen/attribute-type.h"
+#include "gen/cluster-id.h"
+
 #include "Keyboard.h"
 #include "LED.h"
+#include "LEDWidget.h"
 #include "TimersManager.h"
 #include "app_config.h"
 
@@ -47,8 +52,6 @@ static LEDWidget sLockLED;
 
 static bool sIsThreadProvisioned     = false;
 static bool sIsThreadEnabled         = false;
-static bool sIsThreadAttached        = false;
-static bool sIsPairedToAccount       = false;
 static bool sHaveBLEConnections      = false;
 static bool sHaveServiceConnectivity = false;
 
@@ -79,6 +82,9 @@ int AppTask::Init()
 
     // Init ZCL Data Model and start server
     InitServer();
+
+    // QR code will be used with CHIP Tool
+    PrintQRCode(chip::RendezvousInformationFlags::kBLE);
 
     TMR_Init();
 
@@ -168,16 +174,10 @@ void AppTask::AppTaskMain(void * pvParameter)
         {
             sIsThreadProvisioned     = ConnectivityMgr().IsThreadProvisioned();
             sIsThreadEnabled         = ConnectivityMgr().IsThreadEnabled();
-            sIsThreadAttached        = ConnectivityMgr().IsThreadAttached();
             sHaveBLEConnections      = (ConnectivityMgr().NumBLEConnections() != 0);
-            sIsPairedToAccount       = ConfigurationMgr().IsPairedToAccount();
             sHaveServiceConnectivity = ConnectivityMgr().HaveServiceConnectivity();
             PlatformMgr().UnlockChipStack();
         }
-
-        // Consider the system to be "fully connected" if it has service
-        // connectivity and it is able to interact with the service on a regular basis.
-        bool isFullyConnected = sHaveServiceConnectivity;
 
         // Update the status LED if factory reset has not been initiated.
         //
@@ -193,11 +193,11 @@ void AppTask::AppTaskMain(void * pvParameter)
         // Otherwise, blink the LED ON for a very short time.
         if (sAppTask.mFunction != kFunction_FactoryReset)
         {
-            if (isFullyConnected)
+            if (sHaveServiceConnectivity)
             {
                 sStatusLED.Set(true);
             }
-            else if (sIsThreadProvisioned && sIsThreadEnabled && sIsPairedToAccount && (!sIsThreadAttached || !isFullyConnected))
+            else if (sIsThreadProvisioned && sIsThreadEnabled)
             {
                 sStatusLED.Blink(950, 50);
             }
@@ -337,14 +337,6 @@ void AppTask::ResetActionEventHandler(AppEvent * aEvent)
             return;
         }
 
-        /*
-        if (SoftwareUpdateMgr().IsInProgress())
-        {
-            K32W_LOG("Canceling In Progress Software Update");
-            SoftwareUpdateMgr().Abort();
-            K32W_LOG("OTA processs was cancelled!");
-        }
-        */
         K32W_LOG("Factory Reset Triggered. Push the RESET button within %u ms to cancel!", resetTimeout);
         sAppTask.mFunction = kFunction_FactoryReset;
 
@@ -563,5 +555,18 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     else
     {
         K32W_LOG("Event received with no handler. Dropping event.");
+    }
+}
+
+void AppTask::UpdateClusterState(void)
+{
+    uint8_t newValue = !BoltLockMgr().IsUnlocked();
+
+    // write the new on/off value
+    EmberAfStatus status = emberAfWriteAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
+                                                 (uint8_t *) &newValue, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        ChipLogError(NotSpecified, "ERR: updating on/off %x", status);
     }
 }

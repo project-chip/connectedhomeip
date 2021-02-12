@@ -17,28 +17,40 @@ focus on its python binding interface on Linux and mac os.
 git clone https://github.com/project-chip/connectedhomeip.git
 ```
 
-2. Build CHIP
+2. Build the CHIP python package
 
-Follow [BUILDING.md](/docs/BUILDING.md) to build CHIP on your platform.
+Follow [BUILDING.md](/docs/BUILDING.md) to setup CHIP on your platform.
+
+Genrally, once build dependencies are satisfied you can build the `python`
+target.
+
+Use `scripts/build_python.sh` or run something equivalent to:
+
+```sh
+gn gen out/python_lib
+ninja -C out/python_lib python
+```
 
 3. Install Chip Device Controller
 
-**For Linux**
+> Note: Python device controller is not versioned, so you need to uninstall the
+> old device controller before install the new one.
 
-```
-cd out/debug/controller/python
-sudo pip3 install chip-0.0-cp38-cp38-linux_aarch64.whl
+> It is recommended to setup a separate clean virtual environment The
+> `scripts/build_python.sh` script sets up a python environment and installs the
+> WHL file.
+
+```sh
+virtualenv out/python_env --clean
+source out/python_env/bin/activate
+pip install out/python_lib/controller/python/chip*.whl
 ```
 
-> Note: for linux, sudo is necessary since it need to interact with bluetoothd
-> via dbus with sudo permission
+The WHL file installation will:
 
-**For macOS**
-
-```
-cd out/debug/mac_x64_clang/controller/python
-pip3 install chip-0.0-cp38-cp38-mac_aarch64.whl
-```
+-   Install the 'chip' module
+-   create a `ENV/bin/chip-device-ctrl` script that provides an interactive
+    shell for the chip library
 
 ## BLE Virtualization on Linux (Optional)
 
@@ -71,16 +83,19 @@ Bring up two virtual ble interface:
 sudo third_party/bluez/repo/emulator/btvirt -L -l2
 ```
 
-## Usage
+## Usage / BLE Secure Session Establishment
 
 1. Run CHIP Device Controller
+
+> Running as root via `sudo` to ensure permissions to interface with the
+> bluetooth adapter.
 
 ```
 sudo chip-device-ctrl
 ```
 
-2. [Required when there are multiple BLE adapters] Select BLE adapter (Linux
-   only)
+2. [WIP][required when there are multiple ble adapters] Select BLE adapter
+   (Linux only)
 
 ```
 chip-device-ctrl > ble-adapter-print
@@ -95,52 +110,23 @@ chip-device-ctrl > ble-adapter-select DE:AD:BE:EF:00:00
 
 ```
 chip-device-ctrl > ble-scan
-2020-11-23 17:36:18,012 ChipBLEMgr   INFO     use default adapter
-2020-11-23 17:36:18,102 ChipBLEMgr   INFO     scanning started
-2020-11-23 17:36:18,837 ChipBLEMgr   INFO     Name =    CHIP-0000
-2020-11-23 17:36:18,837 ChipBLEMgr   INFO     ID =      f8cc7d32-c110-398b-984b-e43732c9afa1
-2020-11-23 17:36:18,839 ChipBLEMgr   INFO     RSSI =    -56
-2020-11-23 17:36:18,840 ChipBLEMgr   INFO     address = C3:A7:6C:A5:E3:ED
-2020-11-23 17:36:18,843 ChipBLEMgr   INFO     ADV data: 0000feaf-0000-1000-8000-00805f9b34fb
+2021-01-19 02:27:23,653 ChipBLEMgr   INFO     scanning started
+2021-01-19 02:27:25,144 ChipBLEMgr   INFO     Name            = CHIP-1383
+2021-01-19 02:27:25,144 ChipBLEMgr   INFO     ID              = ae0125dc-e621-3e05-9166-70ca7ea07985
+2021-01-19 02:27:25,146 ChipBLEMgr   INFO     RSSI            = -32
+2021-01-19 02:27:25,147 ChipBLEMgr   INFO     Address         = DC:A6:32:A5:4C:56
+2021-01-19 02:27:25,151 ChipBLEMgr   INFO     Pairing State   = 0
+2021-01-19 02:27:25,151 ChipBLEMgr   INFO     Discriminator   = 1383
+2021-01-19 02:27:25,152 ChipBLEMgr   INFO     Vendor Id       = 9050
+2021-01-19 02:27:25,152 ChipBLEMgr   INFO     Product Id      = 65279
+2021-01-19 02:27:25,155 ChipBLEMgr   INFO     Adv UUID        = 0000feaf-0000-1000-8000-00805f9b34fb
+2021-01-19 02:27:25,156 ChipBLEMgr   INFO     Adv Data        = 0067055a23fffe
+2021-01-19 02:27:27,257 ChipBLEMgr   INFO
+2021-01-19 02:27:34,213 ChipBLEMgr   INFO     scanning stopped
 Connect to BLE device
 ```
 
-**Using device name**
-
-```
-chip-device-ctrl > ble-connect CHIP-0000
-2020-11-23 17:36:41,894 ChipBLEMgr   INFO     trying to connect to CHIP-0000
-2020-11-23 17:36:44,571 ChipBLEMgr   INFO     BLE connecting
-2020-11-23 17:36:44,572 ChipBLEMgr   INFO     Discovering services
-2020-11-23 17:36:45,939 ChipBLEMgr   INFO     Service discovering success
-2020-11-23 17:36:45,971 ChipBLEMgr   INFO     connect success
-```
-
-**Using device address (on Linux)**
-
-```
-chip-device-ctrl > ble-connect C3:A7:6C:A5:E3:ED
-2020-11-23 17:36:41,894 ChipBLEMgr   INFO     trying to connect to C3:A7:6C:A5:E3:ED
-2020-11-23 17:36:44,571 ChipBLEMgr   INFO     BLE connecting
-2020-11-23 17:36:44,572 ChipBLEMgr   INFO     Discovering services
-2020-11-23 17:36:45,939 ChipBLEMgr   INFO     Service discovering success
-2020-11-23 17:36:45,971 ChipBLEMgr   INFO     connect success
-```
-
-**Using uuid (on macOS)**
-
-```
-chip-device-ctrl > ble-connect f8cc7d32-c110-398b-984b-e43732c9afa1
-2020-11-23 17:36:41,894 ChipBLEMgr   INFO     trying to connect to f8cc7d32-c110-398b-984b-e43732c9afa1
-2020-11-23 17:36:44,571 ChipBLEMgr   INFO     BLE connecting
-2020-11-23 17:36:44,572 ChipBLEMgr   INFO     Discovering services
-2020-11-23 17:36:45,939 ChipBLEMgr   INFO     Service discovering success
-2020-11-23 17:36:45,971 ChipBLEMgr   INFO     connect success
-```
-
-> Note, they will be replaced by using discriminator.
-
-5.  Set wifi credential
+4.  Set wifi credential
 
 > Note: This command will be deprerated after the network provisioning cluster
 > is ready.
@@ -149,14 +135,131 @@ chip-device-ctrl > ble-connect f8cc7d32-c110-398b-984b-e43732c9afa1
 chip-device-ctrl > set-pairing-wifi-credential TestAP TestPassword
 ```
 
-6.  Connect to device using setup pin code
+5.  Connect to device using setup pin code
 
 ```
-chip-device-ctrl > connect 12345678
+chip-device-ctrl > connect -ble 1383 12345678
+```
+
+## IP Secure Session Establishment
+
+1. Run CHIP Device Controller
+
+```
+chip-device-ctrl
+```
+
+> Note: SUDO is not required when use IP to connect device.
+
+2. Connect to device using setup pin code
+
+```
+chip-device-ctrl > connect -ip <Device IP Address> 12345678
 ```
 
 ## Commands
 
-// TODO: For now, the CHIP device controller does not have any interaction model
-(cluster) or service provisioning commands, they will be added to the device
-controller as soon as they are implemented.
+**`[L]`** = Linux only / **`[D]`** = Deprecated / **`[W]`** = WIP / **`[T]`** =
+For testing
+
+### **`[W][L]`** `ble-adapter-print`
+
+Print the available Bluetooth adapters on device. Takes no arguments.
+
+```
+chip-device-ctrl > ble-adapter-print
+2021-01-19 02:14:16,766 ChipBLEMgr   INFO     adapter 0 = DC:A6:32:9E:2E:A7
+```
+
+### **`[W][L]`** `ble-adapter-select <address>`
+
+Select the Bluetooth adapter for device controller, takes adapter MAC address as
+argument.
+
+```
+chip-device-ctrl > ble-adapter-select DC:A6:32:9E:2E:A7
+(no output)
+```
+
+### `ble-scan [-t <timeout>] [identifier]`
+
+Start a ble-scan action for searching valid CHIP devices over BLE [for at most
+*timeout* seconds], stop when device matching the identifier or timeout.
+
+```
+chip-device-ctrl > ble-scan
+2021-01-19 02:27:23,653 ChipBLEMgr   INFO     scanning started
+2021-01-19 02:27:25,144 ChipBLEMgr   INFO     Name            = CHIP-1383
+2021-01-19 02:27:25,144 ChipBLEMgr   INFO     ID              = ae0125dc-e621-3e05-9166-70ca7ea07985
+2021-01-19 02:27:25,146 ChipBLEMgr   INFO     RSSI            = -32
+2021-01-19 02:27:25,147 ChipBLEMgr   INFO     Address         = DC:A6:32:A5:4C:56
+2021-01-19 02:27:25,151 ChipBLEMgr   INFO     Pairing State   = 0
+2021-01-19 02:27:25,151 ChipBLEMgr   INFO     Discriminator   = 1383
+2021-01-19 02:27:25,152 ChipBLEMgr   INFO     Vendor Id       = 9050
+2021-01-19 02:27:25,152 ChipBLEMgr   INFO     Product Id      = 65279
+2021-01-19 02:27:25,155 ChipBLEMgr   INFO     Adv UUID        = 0000feaf-0000-1000-8000-00805f9b34fb
+2021-01-19 02:27:25,156 ChipBLEMgr   INFO     Adv Data        = 0067055a23fffe
+2021-01-19 02:27:27,257 ChipBLEMgr   INFO
+2021-01-19 02:27:34,213 ChipBLEMgr   INFO     scanning stopped
+```
+
+### `connect -ip <address> <SetUpPinCode>`
+
+Do key exchange and establish a secure session between controller and device
+using IP transport.
+
+### `connect -ble <discriminator> <SetUpPinCode>`
+
+Do key exchange and establish a secure session between controller and device
+using BLE transport.
+
+### **`[D]`** `set-pairing-wifi-credential <ssid> <password>`
+
+Set WiFi credential for **_deprecated_** network provisioning precedure.
+
+### **`[W]`** `zcl`
+
+Sending ZCL commands.
+
+#### `zcl ?`
+
+List available clusters.
+
+```
+chip-device-ctrl > zcl ?
+dict_keys(['BarrierControl', 'Basic', 'ColorControl', 'DoorLock', 'Groups', 'IasZone', 'Identify', 'LevelControl', 'NetworkProvisioning', 'OnOff', 'Scenes', 'TemperatureMeasurement'])
+```
+
+#### `zcl ? <Cluster>`
+
+List available commands in cluster.
+
+```
+chip-device-ctrl > zcl ? LevelControl
+Move
+   moveMode: int, rate: int, optionMask: int, optionOverride: int
+MoveToLevel
+   level: int, transitionTime: int, optionMask: int, optionOverride: int
+MoveToLevelWithOnOff
+   level: int, transitionTime: int
+MoveWithOnOff
+   moveMode: int, rate: int
+Step
+   stepMode: int, stepSize: int, transitionTime: int, optionMask: int, optionOverride: int
+StepWithOnOff
+   stepMode: int, stepSize: int, transitionTime: int
+Stop
+   optionMask: int, optionOverride: int
+StopWithOnOff
+  <no arguments>
+```
+
+#### `zcl <Cluster> <Command> <NodeId> <EndpointId> <GroupId> [arguments]`
+
+Send a ZCL command to `EndpointId` on device (`NodeId`).
+
+Example:
+
+```
+chip-device-ctrl > zcl LevelControl MoveWithOnOff 12344321 1 0 moveMode=1 rate=2
+```

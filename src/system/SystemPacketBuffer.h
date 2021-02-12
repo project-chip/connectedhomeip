@@ -29,6 +29,7 @@
 #include <system/SystemConfig.h>
 
 // Include dependent headers
+#include <support/BufferWriter.h>
 #include <support/CodeUtils.h>
 #include <support/DLLUtil.h>
 #include <system/SystemAlignSize.h>
@@ -44,6 +45,44 @@
 
 class PacketBufferTest;
 
+/*
+ * Preprocessor definitions related to packet buffer memory configuration.
+ * These are not part of the public PacketBuffer interface; they are present
+ * here so that certain public functions can have definitions optimized for
+ * particular configurations.
+ */
+
+#undef CHIP_SYSTEM_PACKETBUFFER_STORE                // One of the following constants:
+#define CHIP_SYSTEM_PACKETBUFFER_STORE_LWIP_POOL 1   //   Default lwIP allocation
+#define CHIP_SYSTEM_PACKETBUFFER_STORE_LWIP_CUSTOM 2 //   Custom lwIP allocation
+#define CHIP_SYSTEM_PACKETBUFFER_STORE_CHIP_POOL 3   //   Internal fixed pool
+#define CHIP_SYSTEM_PACKETBUFFER_STORE_CHIP_HEAP 4   //   Platform::MemoryAlloc
+
+#undef CHIP_SYSTEM_PACKETBUFFER_HAS_RIGHT_SIZE // True if RightSize() has a nontrivial implementation
+#undef CHIP_SYSTEM_PACKETBUFFER_HAS_CHECK      // True if Check() has a nontrivial implementation
+
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+#if LWIP_PBUF_FROM_CUSTOM_POOLS
+#define CHIP_SYSTEM_PACKETBUFFER_STORE CHIP_SYSTEM_PACKETBUFFER_STORE_LWIP_CUSTOM
+#define CHIP_SYSTEM_PACKETBUFFER_HAS_RIGHT_SIZE 1
+#define CHIP_SYSTEM_PACKETBUFFER_HAS_CHECK 0
+#else
+#define CHIP_SYSTEM_PACKETBUFFER_STORE CHIP_SYSTEM_PACKETBUFFER_STORE_LWIP_POOL
+#define CHIP_SYSTEM_PACKETBUFFER_HAS_RIGHT_SIZE 0
+#define CHIP_SYSTEM_PACKETBUFFER_HAS_CHECK 0
+#endif
+#else
+#if CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE
+#define CHIP_SYSTEM_PACKETBUFFER_STORE CHIP_SYSTEM_PACKETBUFFER_STORE_CHIP_POOL
+#define CHIP_SYSTEM_PACKETBUFFER_HAS_RIGHT_SIZE 0
+#define CHIP_SYSTEM_PACKETBUFFER_HAS_CHECK 0
+#else
+#define CHIP_SYSTEM_PACKETBUFFER_STORE CHIP_SYSTEM_PACKETBUFFER_STORE_CHIP_HEAP
+#define CHIP_SYSTEM_PACKETBUFFER_HAS_RIGHT_SIZE 1
+#define CHIP_SYSTEM_PACKETBUFFER_HAS_CHECK CHIP_CONFIG_MEMORY_DEBUG_CHECKS
+#endif
+#endif
+
 namespace chip {
 namespace System {
 
@@ -57,9 +96,9 @@ struct pbuf
     uint16_t tot_len;
     uint16_t len;
     uint16_t ref;
-#if CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC == 0
+#if CHIP_SYSTEM_PACKETBUFFER_STORE == CHIP_SYSTEM_PACKETBUFFER_STORE_CHIP_HEAP
     uint16_t alloc_size;
-#endif // CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC == 0
+#endif
 };
 #endif // !CHIP_SYSTEM_CONFIG_USE_LWIP
 
@@ -74,8 +113,8 @@ struct pbuf
  *      memory challenges of deeply embedded devices.
  *
  *      The PacketBuffer class, like many similar structures used in layered network stacks, provide a mechanism to reserve space
- *      for protocol headers at each layer of a configurable communication stack.  For details, see `PacketBuffer::New()` as well
- *      as LwIP documentation.
+ *      for protocol headers at each layer of a configurable communication stack.  For details, see `PacketBufferHandle::New()`
+ *      as well as LwIP documentation.
  *
  *      PacketBuffer objects are reference-counted, and normally held and used through a PacketBufferHandle that owns one of the
  *      counted references. When a PacketBufferHandle goes out of scope, its reference is released. To take ownership, a function
@@ -83,8 +122,7 @@ struct pbuf
  *
  *      New objects of PacketBuffer class are initialized at the beginning of an allocation of memory obtained from the underlying
  *      environment, e.g. from LwIP pbuf target pools, from the standard C library heap, from an internal buffer pool. In the
- *      simple case, the size of the data buffer is #CHIP_SYSTEM_PACKETBUFFER_SIZE. A composer is provided that permits usage of
- *      data buffers of other sizes.
+ *      simple pool case, the size of the data buffer is PacketBuffer::kBlockSize.
  *
  *      PacketBuffer objects may be chained to accomodate larger payloads.  Chaining, however, is not transparent, and users of the
  *      class must explicitly decide to support chaining.  Examples of classes written with chaining support are as follows:
@@ -95,7 +133,35 @@ struct pbuf
  */
 class DLL_EXPORT PacketBuffer : private pbuf
 {
+private:
+    // The effective size of the packet buffer structure.
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+    static constexpr uint16_t kStructureSize = LWIP_MEM_ALIGN_SIZE(sizeof(struct ::pbuf));
+#else  // CHIP_SYSTEM_CONFIG_USE_LWIP
+    static constexpr uint16_t kStructureSize         = CHIP_SYSTEM_ALIGN_SIZE(sizeof(::chip::System::pbuf), 4u);
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+
 public:
+    /**
+     * The maximum size buffer an application can allocate with no protocol header reserve.
+     */
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+    static constexpr uint16_t kMaxSizeWithoutReserve = (LWIP_MEM_ALIGN_SIZE(PBUF_POOL_BUFSIZE) - PacketBuffer::kStructureSize);
+#else
+    static constexpr uint16_t kMaxSizeWithoutReserve = CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX;
+#endif
+
+    /**
+     * The number of bytes to reserve in a network packet buffer to contain all the possible protocol encapsulation headers
+     * before the application data.
+     */
+    static constexpr uint16_t kDefaultHeaderReserve = CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE;
+
+    /**
+     * The maximum size buffer an application can allocate with the default protocol header reserve.
+     */
+    static constexpr uint16_t kMaxSize = kMaxSizeWithoutReserve - kDefaultHeaderReserve;
+
     /**
      * Return the size of the allocation including the reserved and payload data spaces but not including space
      * allocated for the PacketBuffer structure.
@@ -104,7 +170,23 @@ public:
      *
      *  @return     size of the allocation
      */
-    uint16_t AllocSize() const;
+    uint16_t AllocSize() const
+    {
+#if CHIP_SYSTEM_PACKETBUFFER_STORE == CHIP_SYSTEM_PACKETBUFFER_STORE_LWIP_POOL ||                                                  \
+    CHIP_SYSTEM_PACKETBUFFER_STORE == CHIP_SYSTEM_PACKETBUFFER_STORE_CHIP_POOL
+        return kMaxSizeWithoutReserve;
+#elif CHIP_SYSTEM_PACKETBUFFER_STORE == CHIP_SYSTEM_PACKETBUFFER_STORE_CHIP_HEAP
+        return this->alloc_size;
+#elif CHIP_SYSTEM_PACKETBUFFER_STORE == CHIP_SYSTEM_PACKETBUFFER_STORE_LWIP_CUSTOM
+        // Temporary workaround for custom pbufs by assuming size to be PBUF_POOL_BUFSIZE
+        if (this->flags & PBUF_FLAG_IS_CUSTOM)
+            return LWIP_MEM_ALIGN_SIZE(PBUF_POOL_BUFSIZE) - kStructureSize;
+        else
+            return LWIP_MEM_ALIGN_SIZE(memp_sizes[this->pool]) - kStructureSize;
+#else
+#error "Unimplemented CHIP_SYSTEM_PACKETBUFFER_STORE case"
+#endif // CHIP_SYSTEM_PACKETBUFFER_STORE
+    }
 
     /**
      * Get a pointer to the start of data in a buffer.
@@ -149,8 +231,6 @@ public:
      */
     void SetDataLength(uint16_t aNewLen, const PacketBufferHandle & aChainHead);
     void SetDataLength(uint16_t aNewLen) { SetDataLength(aNewLen, nullptr); }
-    // This version will shortly be made private; do not use in new code.
-    void SetDataLength(uint16_t aNewLen, PacketBuffer * aChainHead);
 
     /**
      * Get the total length of packet data in the buffer chain.
@@ -197,7 +277,7 @@ public:
      *
      *  @param[in] aPacket - the packet buffer to be added to the end of the current chain.
      */
-    void AddToEnd(PacketBufferHandle aPacket);
+    void AddToEnd(PacketBufferHandle && aPacket);
 
     /**
      * Move data from subsequent buffers in the chain into the current buffer until it is full.
@@ -229,7 +309,7 @@ public:
      *
      *  @return \c true if the requested reserved size is available, \c false if there's not enough room in the buffer.
      */
-    bool EnsureReservedSize(uint16_t aReservedSize);
+    CHECK_RETURN_VALUE bool EnsureReservedSize(uint16_t aReservedSize);
 
     /**
      * Align the buffer payload on the specified bytes boundary.
@@ -259,165 +339,60 @@ public:
     CHECK_RETURN_VALUE PacketBufferHandle Last();
 
     /**
-     * Allocates a PacketBuffer object with at least \c aReservedSize bytes reserved in the payload for headers, and at least
-     *  \c aAllocSize bytes of space for additional data after the initial cursor pointer.
+     * Perform an implementation-defined check on the validity of a PacketBuffer pointer.
      *
-     *  @param[in]  aReservedSize   Number of octets to reserve behind the cursor.
-     *  @param[in]  aAvailableSize  Number of octets to allocate after the cursor.
+     * Unless enabled by #CHIP_CONFIG_MEMORY_DEBUG_CHECKS == 1, this function does nothing.
      *
-     *  @return     On success, a pointer to the PacketBuffer in the allocated block. On fail, \c nullptr.
+     * When enabled, it performs an implementation- and configuration-defined check on
+     * the validity of the packet buffer. It MAY log an error and/or abort the program
+     * if the packet buffer or the implementation-defined memory management system is in
+     * a faulty state. (Some configurations may not actually perform any check.)
+     *
+     * @note  A null pointer is not considered faulty.
+     *
+     *  @param[in] buffer - the packet buffer to check.
      */
-    static PacketBufferHandle NewWithAvailableSize(uint16_t aReservedSize, uint16_t aAvailableSize);
-
-    /**
-     * Allocates a PacketBuffer with default reserved size (#CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE) in the payload for headers,
-     * and at least \c aAllocSize bytes of space for additional data after the initial cursor pointer.
-     *
-     * This usage is most appropriate when allocating a PacketBuffer for an application-layer message.
-     *
-     *  @param[in]  aAvailableSize  Number of octets to allocate after the cursor.
-     *
-     *  @return     On success, a pointer to the PacketBuffer in the allocated block. On fail, \c nullptr.
-     */
-    static PacketBufferHandle NewWithAvailableSize(uint16_t aAvailableSize);
-
-    /**
-     * Allocates a single PacketBuffer of maximum total size with a specific header reserve size.
-     *
-     *  The parameter passed in is the size reserved prior to the payload to accomodate packet headers from different stack layers,
-     *  __not__ the overall size of the buffer to allocate. The size of the buffer #CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX
-     *  and not, specified in the call.
-     *
-     *  `PacketBuffer::New(0)` : when called in this fashion, the buffer will be returned without any header reserved, consequently
-     *  the entire payload is usable by the caller. This pattern is particularly useful at the lower layers of networking stacks,
-     *  in cases where the user knows the payload will be copied out into the final message with appropriate header reserves or in
-     *  creating PacketBuffer that are appended to a chain of PacketBuffer via `PacketBuffer::AddToEnd()`.
-     *
-     *  @param[in] aReservedSize  amount of header space to reserve.
-     *
-     *  @return On success, a pointer to the PacketBuffer, on failure \c nullptr.
-     */
-    static PacketBufferHandle New(uint16_t aReservedSize);
-
-    /**
-     * Allocates a single PacketBuffer of default max size (#CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX) with default reserved
-     * size (#CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE) in the payload.
-     *
-     * The reserved size (#CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE) is large enough to hold transport layer headers as well as
-     * headers required by \c chipMessageLayer and \c chipExchangeLayer.
-     */
-    static PacketBufferHandle New();
-
-    // DO NOT USE. Will be made private after #4094 merges.
-    void AddRef();
+    static void Check(const PacketBuffer * buffer)
+    {
+#if CHIP_SYSTEM_PACKETBUFFER_HAS_CHECK
+        InternalCheck(buffer);
+#endif
+    }
 
 private:
-#if !CHIP_SYSTEM_CONFIG_USE_LWIP && CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
+    // Memory required for a maximum-size PacketBuffer.
+    static constexpr uint16_t kBlockSize = PacketBuffer::kStructureSize + PacketBuffer::kMaxSizeWithoutReserve;
+
+    // Note: this condition includes DOXYGEN to work around a Doxygen error. DOXYGEN is never defined in any actual build.
+#if CHIP_SYSTEM_PACKETBUFFER_STORE == CHIP_SYSTEM_PACKETBUFFER_STORE_CHIP_POOL || defined(DOXYGEN)
+    typedef union
+    {
+        pbuf Header;
+        uint8_t Block[PacketBuffer::kBlockSize];
+    } BufferPoolElement;
+    static BufferPoolElement sBufferPool[CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE];
     static PacketBuffer * sFreeList;
-
     static PacketBuffer * BuildFreeList();
-#endif // !CHIP_SYSTEM_CONFIG_USE_LWIP && CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
+#endif // CHIP_SYSTEM_PACKETBUFFER_STORE == CHIP_SYSTEM_PACKETBUFFER_STORE_CHIP_POOL || defined(DOXYGEN)
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_PBUF_FROM_CUSTOM_POOLS
-    static PacketBuffer * RightSize(PacketBuffer * aPacket);
+#if CHIP_SYSTEM_PACKETBUFFER_HAS_CHECK
+    static void InternalCheck(const PacketBuffer * buffer);
 #endif
 
+    void AddRef();
     static void Free(PacketBuffer * aPacket);
     static PacketBuffer * FreeHead(PacketBuffer * aPacket);
 
     PacketBuffer * ChainedBuffer() const { return static_cast<PacketBuffer *>(this->next); }
     PacketBuffer * Consume(uint16_t aConsumeLength);
     void Clear();
+    void SetDataLength(uint16_t aNewLen, PacketBuffer * aChainHead);
 
     friend class PacketBufferHandle;
     friend class ::PacketBufferTest;
 };
 
-} // namespace System
-} // namespace chip
-
-// Sizing definitions
-
-/**
- * @def CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE
- *
- *  The effective size of the packet buffer structure.
- *
- *  TODO: This is an implementation details that does not need to be public and should be moved to the source file.
- */
-
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-#define CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE LWIP_MEM_ALIGN_SIZE(sizeof(struct ::pbuf))
-#else // CHIP_SYSTEM_CONFIG_USE_LWIP
-#define CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE CHIP_SYSTEM_ALIGN_SIZE(sizeof(::chip::System::PacketBuffer), 4u)
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
-
-/**
- * @def CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX
- *
- *  See SystemConfig.h for full description. This is defined in here specifically for LwIP platform to preserve backwards
- *  compatibility.
- *
- *  TODO: This is an implementation details that does not need to be public and should be moved to the source file.
- *
- */
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-#define CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX (LWIP_MEM_ALIGN_SIZE(PBUF_POOL_BUFSIZE) - CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE)
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
-
-/**
- * @def CHIP_SYSTEM_PACKETBUFFER_SIZE
- *
- *  The memory footprint of a PacketBuffer object, computed from max capacity size and the size of the packet buffer structure.
- *
- *  TODO: This is an implementation details that does not need to be public and should be moved to the source file.
- */
-
-#define CHIP_SYSTEM_PACKETBUFFER_SIZE (CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX + CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE)
-
-namespace chip {
-namespace System {
-
-//
-// Pool allocation for PacketBuffer objects (toll-free bridged with LwIP pbuf allocator if CHIP_SYSTEM_CONFIG_USE_LWIP)
-//
-#if !CHIP_SYSTEM_CONFIG_USE_LWIP && CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
-
-typedef union
-{
-    PacketBuffer Header;
-    uint8_t Block[CHIP_SYSTEM_PACKETBUFFER_SIZE];
-} BufferPoolElement;
-
-#endif // !CHIP_SYSTEM_CONFIG_USE_LWIP && CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
-
-inline uint16_t PacketBuffer::AllocSize() const
-{
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-#if LWIP_PBUF_FROM_CUSTOM_POOLS
-    // Temporary workaround for custom pbufs by assuming size to be PBUF_POOL_BUFSIZE
-    if (this->flags & PBUF_FLAG_IS_CUSTOM)
-        return LWIP_MEM_ALIGN_SIZE(PBUF_POOL_BUFSIZE) - CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE;
-    else
-        return LWIP_MEM_ALIGN_SIZE(memp_sizes[this->pool]) - CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE;
-#else  // !LWIP_PBUF_FROM_CUSTOM_POOLS
-    return LWIP_MEM_ALIGN_SIZE(PBUF_POOL_BUFSIZE) - CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE;
-#endif // !LWIP_PBUF_FROM_CUSTOM_POOLS
-#else  // !CHIP_SYSTEM_CONFIG_USE_LWIP
-#if CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC == 0
-    return this->alloc_size;
-#else  // CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC != 0
-    extern BufferPoolElement gDummyBufferPoolElement;
-    return sizeof(gDummyBufferPoolElement.Block) - CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE;
-#endif // CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC != 0
-#endif // !CHIP_SYSTEM_CONFIG_USE_LWIP
-}
-
-} // namespace System
-} // namespace chip
-
-namespace chip {
-namespace System {
+static_assert(sizeof(pbuf) == sizeof(PacketBuffer), "PacketBuffer must not have additional members");
 
 /**
  * @class PacketBufferHandle
@@ -493,7 +468,7 @@ public:
     PacketBuffer * operator->() const { return mBuffer; }
 
     /**
-     * Test whether this PacketBufferHandle is empty, or owns a PacketBuffer.
+     * Test whether this PacketBufferHandle is empty, or conversely owns a PacketBuffer.
      *
      * @return \c true if this PacketBufferHandle is empty; return \c false if it owns a PacketBuffer.
      */
@@ -535,16 +510,14 @@ public:
 
     /**
      * Copy the given buffer to a right-sized buffer if applicable.
-     * This function is a no-op for sockets.
      *
-     *  @param[in] aPacket - buffer or buffer chain.
-     *
-     *  @return new packet buffer or the original buffer
+     * Only operates on single buffers (for chains, use \c CompactHead() and RightSize the tail).
+     * Requires that this handle be the only reference to the underlying buffer.
      */
     void RightSize()
     {
-#if CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_PBUF_FROM_CUSTOM_POOLS
-        mBuffer = PacketBuffer::RightSize(mBuffer);
+#if CHIP_SYSTEM_PACKETBUFFER_HAS_RIGHT_SIZE
+        InternalRightSize();
 #endif
     }
 
@@ -561,20 +534,6 @@ public:
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
     /**
-     * Export a raw PacketBuffer pointer.
-     *
-     * @brief The PacketBufferHandle's ownership is transferred to the caller.
-     *
-     * @note This should only be used in low-level code, e.g. to export buffers from LwIP or a similar stack.
-     */
-    CHECK_RETURN_VALUE PacketBuffer * Release_ForNow()
-    {
-        PacketBuffer * buffer = mBuffer;
-        mBuffer               = nullptr;
-        return buffer;
-    }
-
-    /**
      * Advance this PacketBufferHandle to the next buffer in a chain.
      *
      *  @note This differs from `FreeHead()` in that it does not touch any content in the currently referenced packet buffer;
@@ -584,25 +543,102 @@ public:
      */
     void Advance() { *this = Hold(mBuffer->ChainedBuffer()); }
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
     /**
-     * Borrow a raw LwIP `pbuf *`.
+     * Export a raw PacketBuffer pointer.
      *
-     * @brief The caller has access but no ownership.
+     * @brief The PacketBufferHandle's ownership is transferred to the caller.
      *
-     * @note This should be used ONLY by low-level code interfacing with LwIP.
+     * @note This should only be used in low-level code. The caller owns one counted reference to the \c PacketBuffer
+     *       and is reponsible for managing it safely.
+     *
+     * @note The ref-qualifier `&&` requires the caller to use `std::move` to emphasize that ownership is
+     *       moved out of this handle.
      */
-    struct pbuf * GetLwIPpbuf() { return static_cast<struct pbuf *>(mBuffer); }
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+    CHECK_RETURN_VALUE PacketBuffer * UnsafeRelease() &&
+    {
+        PacketBuffer::Check(mBuffer);
+        PacketBuffer * buffer = mBuffer;
+        mBuffer               = nullptr;
+        return buffer;
+    }
+
+    /**
+     * Allocates a packet buffer.
+     *
+     *  A packet buffer is conceptually divided into two parts:
+     *  @li  Space reserved for network protocol headers. The size of this space normally defaults to a value determined
+     *       by the network layer configuration, but can be given explicity by \c aReservedSize for special cases.
+     *  @li  Space for application data. The minimum size of this space is given by \c aAvailableSize, and then \c Start()
+     *       provides a pointer to the start of this space.
+     *
+     *  Fails and returns \c nullptr if no memory is available, or if the size requested is too large.
+     *  When the sum of \a aAvailableSize and \a aReservedSize is no greater than \c PacketBuffer::kMaxSizeWithoutReserve,
+     *  that is guaranteed not to be too large.
+     *
+     *  On success, it is guaranteed that \c AvailableDataSize() is no less than \a aAvailableSize.
+     *
+     *  @param[in]  aAvailableSize  Minimum number of octets to for application data (at `Start()`).
+     *  @param[in]  aReservedSize   Number of octets to reserve for protocol headers (before `Start()`).
+     *
+     *  @return     On success, a PacketBufferHandle to the allocated buffer. On fail, \c nullptr.
+     */
+    static PacketBufferHandle New(size_t aAvailableSize, uint16_t aReservedSize = PacketBuffer::kDefaultHeaderReserve);
+
+    /**
+     * Allocates a packet buffer with initial contents.
+     *
+     *  @param[in]  aData           Initial buffer contents.
+     *  @param[in]  aDataSize       Size of initial buffer contents.
+     *  @param[in]  aAdditionalSize Size of additional application data space after the initial contents.
+     *  @param[in]  aReservedSize   Number of octets to reserve for protocol headers.
+     *
+     *  @return     On success, a PacketBufferHandle to the allocated buffer. On fail, \c nullptr.
+     */
+    static PacketBufferHandle NewWithData(const void * aData, size_t aDataSize, uint16_t aAdditionalSize = 0,
+                                          uint16_t aReservedSize = PacketBuffer::kDefaultHeaderReserve);
 
     /**
      * Creates a copy of the data in this packet.
      *
      * Does NOT support chained buffers.
      *
+     *  @param[in]  aAdditionalSize Size of additional application data space after the initial contents.
+     *  @param[in]  aReservedSize   Number of octets to reserve for protocol headers.
+     *
      * @returns empty handle on allocation failure.
      */
-    PacketBufferHandle CloneData();
+    PacketBufferHandle CloneData(uint16_t aAdditionalSize = 0, uint16_t aReservedSize = PacketBuffer::kDefaultHeaderReserve);
+
+    /**
+     * Perform an implementation-defined check on the validity of a PacketBufferHandle.
+     *
+     * Unless enabled by #CHIP_CONFIG_MEMORY_DEBUG_CHECKS == 1, this function does nothing.
+     *
+     * When enabled, it performs an implementation- and configuration-defined check on
+     * the validity of the packet buffer. It MAY log an error and/or abort the program
+     * if the packet buffer or the implementation-defined memory management system is in
+     * a faulty state. (Some configurations may not actually perform any check.)
+     *
+     * @note  A null handle is not considered faulty.
+     *
+     *  @param[in] aPacket - the packet buffer handle to check.
+     */
+    void Check() const
+    {
+#if CHIP_SYSTEM_PACKETBUFFER_HAS_CHECK
+        PacketBuffer::Check(mBuffer);
+#endif
+    }
+
+protected:
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+    // For use via LwIPPacketBufferView only.
+    static struct pbuf * GetLwIPpbuf(const PacketBufferHandle & handle)
+    {
+        PacketBuffer::Check(handle.mBuffer);
+        return static_cast<struct pbuf *>(handle.mBuffer);
+    }
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 private:
     PacketBufferHandle(const PacketBufferHandle &) = delete;
@@ -623,6 +659,10 @@ private:
     PacketBuffer * Get() const { return mBuffer; }
 
     bool operator==(const PacketBufferHandle & aOther) { return mBuffer == aOther.mBuffer; }
+
+#if CHIP_SYSTEM_PACKETBUFFER_HAS_RIGHT_SIZE
+    void InternalRightSize();
+#endif
 
     PacketBuffer * mBuffer;
 
@@ -649,4 +689,124 @@ inline PacketBufferHandle PacketBuffer::Last()
 }
 
 } // namespace System
+
+namespace Encoding {
+
+class PacketBufferWriterUtil
+{
+private:
+    template <typename>
+    friend class PacketBufferWriterBase;
+    static void Initialize(BufferWriter & aBufferWriter, System::PacketBufferHandle & aPacket, size_t aAvailableSize,
+                           uint16_t aReservedSize);
+    static System::PacketBufferHandle Finalize(BufferWriter & aBufferWriter, System::PacketBufferHandle & aPacket);
+};
+
+/**
+ * BufferWriter backed by packet buffer.
+ *
+ * Typical use:
+ *  @code
+ *      PacketBufferWriter buf(maximumLength);
+ *      if (buf.IsNull()) { return CHIP_ERROR_NO_MEMORY; }
+ *      buf.Put(...);
+ *      ...
+ *      PacketBufferHandle handle = buf.Finalize();
+ *      if (buf.IsNull()) { return CHIP_ERROR_BUFFER_TOO_SMALL; }
+ *      // valid data
+ *  @endcode
+ */
+template <class Writer>
+class PacketBufferWriterBase : public Writer
+{
+public:
+    /**
+     * Constructs a BufferWriter that writes into a newly allocated packet buffer.
+     *
+     *  If no memory is available, or if the size requested is too large, then \c IsNull() will be true.
+     *  Otherwise, it is guaranteed that the BufferWriter length is \a aAvailableSize. (The underlying packet
+     *  buffer may be larger.)
+     *
+     *  @param[in]  aAvailableSize  Length bound of the BufferWriter.
+     *  @param[in]  aReservedSize   Reserved packet buffer space for protocol headers; see \c PacketBufferHandle::New().
+     */
+    PacketBufferWriterBase(size_t aAvailableSize, uint16_t aReservedSize = CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE) :
+        Writer(nullptr, 0)
+    {
+        PacketBufferWriterUtil::Initialize(*this, mPacket, aAvailableSize, aReservedSize);
+    }
+
+    /**
+     * Test whether this PacketBufferWriter is null, or conversely owns a PacketBuffer.
+     *
+     * @retval true     The PacketBufferWriter is null; it does not own a PacketBuffer. This implies either that
+     *                  construction failed, or that \c Finalize() has previously been called to release the buffer.
+     * @retval false    The PacketBufferWriter owns a PacketBuffer, which can be written using BufferWriter \c Put() methods,
+     *                  and (assuming no overflow) obtained by calling \c Finalize().
+     */
+    bool IsNull() const { return mPacket.IsNull(); }
+
+    /**
+     * Obtain the backing packet buffer, if it is valid.
+     *
+     *  If construction succeeded, \c Finalize() has not already been called, and \c BufferWriter::Fit() is true,
+     *  the caller takes ownership of a buffer containing the desired data. Otherwise, the returned handle tests null,
+     *  and any underlying storage has been released.
+     *
+     *  @return     A packet buffer handle.
+     */
+    System::PacketBufferHandle Finalize() { return PacketBufferWriterUtil::Finalize(*this, mPacket); }
+
+private:
+    System::PacketBufferHandle mPacket;
+};
+
+using PacketBufferWriter = PacketBufferWriterBase<chip::Encoding::BufferWriter>;
+
+namespace LittleEndian {
+using PacketBufferWriter = PacketBufferWriterBase<chip::Encoding::LittleEndian::BufferWriter>;
+} // namespace LittleEndian
+
+namespace BigEndian {
+using PacketBufferWriter = PacketBufferWriterBase<chip::Encoding::BigEndian::BufferWriter>;
+} // namespace BigEndian
+
+} // namespace Encoding
+
 } // namespace chip
+
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+
+namespace chip {
+
+namespace Inet {
+class RawEndPoint;
+class UDPEndPoint;
+class IPEndPointBasis;
+} // namespace Inet
+
+namespace System {
+
+/**
+ * Provide low-level access to a raw `pbuf *`, limited to specific classes that interface with LwIP.
+ */
+class LwIPPacketBufferView : public PacketBufferHandle
+{
+private:
+    /**
+     * Borrow a raw LwIP `pbuf *`.
+     *
+     * @brief The caller has access but no ownership.
+     *
+     * @note This should be used ONLY by low-level code interfacing with LwIP.
+     */
+    static struct pbuf * UnsafeGetLwIPpbuf(const PacketBufferHandle & handle) { return PacketBufferHandle::GetLwIPpbuf(handle); }
+    friend class Inet::RawEndPoint;
+    friend class Inet::UDPEndPoint;
+    friend class Inet::IPEndPointBasis;
+};
+
+} // namespace System
+} // namespace chip
+
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP

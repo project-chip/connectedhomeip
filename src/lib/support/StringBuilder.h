@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -57,7 +57,7 @@ public:
     const char * c_str() const { return reinterpret_cast<const char *>(mWriter.Buffer()); }
 
 private:
-    Encoding::LittleEndian::BufferWriter mWriter;
+    Encoding::BufferWriter mWriter;
 
     void NullTerminate()
     {

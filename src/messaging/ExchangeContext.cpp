@@ -93,11 +93,8 @@ CHIP_ERROR ExchangeContext::SendMessage(uint16_t protocolId, uint8_t msgType, Pa
     // Set the exchange ID for this header.
     payloadHeader.SetExchangeID(mExchangeId);
 
-    // Set the protocol ID for this header.
-    payloadHeader.SetProtocolID(protocolId);
-
-    // Set the message type for this header.
-    payloadHeader.SetMessageType(msgType);
+    // Set the protocol ID and message type for this header.
+    payloadHeader.SetMessageType(protocolId, msgType);
 
     payloadHeader.SetInitiator(IsInitiator());
 
@@ -142,9 +139,9 @@ CHIP_ERROR ExchangeContext::SendMessage(uint16_t protocolId, uint8_t msgType, Pa
     }
 
     // Send the message.
-    if (payloadHeader.IsNeedsAck())
+    if (payloadHeader.NeedsAck())
     {
-        ReliableMessageManager::RetransTableEntry * entry = nullptr;
+        ReliableMessageMgr::RetransTableEntry * entry = nullptr;
 
         // Add to Table for subsequent sending
         err = mExchangeMgr->GetReliableMessageMgr()->AddToRetransTable(&mReliableMessageContext, &entry);
@@ -292,6 +289,12 @@ void ExchangeContext::Free()
 
     em->DecrementContextsInUse();
 
+    if (mExchangeACL != nullptr)
+    {
+        chip::Platform::Delete(mExchangeACL);
+        mExchangeACL = nullptr;
+    }
+
 #if defined(CHIP_EXCHANGE_CONTEXT_DETAIL_LOGGING)
     ChipLogProgress(ExchangeManager, "ec-- id: %d [%04" PRIX16 "], inUse: %d, addr: 0x%x", (this - em->ContextPool + 1),
                     mExchangeId, em->GetContextsInUse(), this);
@@ -383,7 +386,7 @@ CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, con
         SuccessOrExit(err);
     }
 
-    if (payloadHeader.IsNeedsAck())
+    if (payloadHeader.NeedsAck())
     {
         MessageFlags msgFlags;
 
@@ -399,8 +402,7 @@ CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, con
     }
 
     //  The SecureChannel::StandaloneAck message type is only used for CRMP; do not pass such messages to the application layer.
-    if ((protocolId == Protocols::kProtocol_SecureChannel) &&
-        (messageType == static_cast<uint8_t>(Protocols::SecureChannel::MsgType::StandaloneAck)))
+    if (payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::StandaloneAck))
     {
         ExitNow(err = CHIP_NO_ERROR);
     }
@@ -415,7 +417,7 @@ CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, con
 
         if (mDelegate != nullptr)
         {
-            mDelegate->OnMessageReceived(this, packetHeader, protocolId, messageType, std::move(msgBuf));
+            mDelegate->OnMessageReceived(this, packetHeader, payloadHeader, std::move(msgBuf));
         }
         else
         {

@@ -45,7 +45,12 @@
 #include <app/util/attribute-storage.h>
 #include <app/util/binding-table.h>
 #include <app/util/common.h>
+#include <support/SafeInt.h>
 #include <system/SystemLayer.h>
+
+#include "gen/attribute-type.h"
+#include "gen/cluster-id.h"
+#include "gen/command-id.h"
 
 using namespace chip;
 
@@ -235,7 +240,7 @@ void emberAfPluginReportingTickEventHandler(void)
 
         // find size of current report
         dataSize   = emberAfAttributeValueSize(dataType, readData);
-        reportSize = sizeof(entry.attributeId) + sizeof(dataType) + dataSize;
+        reportSize = static_cast<uint32_t>(sizeof(entry.attributeId) + sizeof(dataType) + dataSize);
 
         // If we have already started a report for a different attribute or
         // destination, or if the current entry is too big for current report, send it and create a new one.
@@ -439,8 +444,17 @@ bool emberAfConfigureReportingCommandCallback(const EmberAfClusterCommand * cmd)
 
             if (emberAfGetAttributeAnalogOrDiscreteType(dataType) == EMBER_AF_DATA_TYPE_ANALOG)
             {
-                uint8_t dataSize = emberAfGetDataSize(dataType);
-                reportableChange = emberAfGetInt(cmd->buffer, bufIndex, cmd->bufLen, dataSize);
+                uint8_t dataSize       = emberAfGetDataSize(dataType);
+                uint64_t currentChange = emberAfGetInt(cmd->buffer, bufIndex, cmd->bufLen, dataSize);
+                if (chip::CanCastTo<uint32_t>(currentChange))
+                {
+                    reportableChange = static_cast<uint32_t>(emberAfGetInt(cmd->buffer, bufIndex, cmd->bufLen, dataSize));
+                }
+                else
+                {
+                    status = EMBER_ZCL_STATUS_INVALID_DATA_TYPE;
+                    break;
+                }
 
                 emberAfReportingPrint("   change:");
                 emberAfReportingPrintBuffer(cmd->buffer + bufIndex, dataSize, false);
@@ -1039,7 +1053,7 @@ static void putReportableChangeInResp(const EmberAfPluginReportingEntry * entry,
         uint32_t value = entry->data.reported.reportableChange;
         for (; bytes > 0; bytes--)
         {
-            uint8_t b = BYTE_0(value);
+            uint8_t b = EMBER_BYTE_0(value);
             emberAfPutInt8uInResp(b);
             value >>= 8;
         }
@@ -1073,14 +1087,4 @@ uint8_t emAfPluginReportingConditionallyAddReportingEntry(EmberAfPluginReporting
         return emAfPluginReportingAddEntry(newEntry);
     }
     return 0;
-}
-
-bool emberAfConfigureReportingResponseCallback(ClusterId clusterId, uint8_t * buffer, uint16_t bufLen)
-{
-    return false;
-}
-
-bool emberAfReadReportingConfigurationResponseCallback(ClusterId clusterId, uint8_t * buffer, uint16_t bufLen)
-{
-    return false;
 }

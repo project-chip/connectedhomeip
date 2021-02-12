@@ -71,6 +71,13 @@ int main(void)
         LOG_ERR("ThreadStackMgr().InitThreadStack() failed");
         goto exit;
     }
+
+    ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
+    if (ret != CHIP_NO_ERROR)
+    {
+        LOG_ERR("ConnectivityMgr().SetThreadDeviceType() failed");
+        goto exit;
+    }
 #endif
 
     ret = GetAppTask().StartApp();

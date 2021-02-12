@@ -26,6 +26,7 @@ into an existing CHIP network and can be controlled by this network.
 -   [Configuring the example](#configuring-the-example)
 -   [Flashing and debugging](#flashing-and-debugging)
 -   [Testing the example](#testing-the-example)
+    -   [Testing using CHIPTool](#testing-using-chiptool)
 
 <hr>
 
@@ -52,15 +53,15 @@ and other devices.
 
 ### Bluetooth LE advertising
 
-To commission the device onto a CHIP network, the device must be discoverable
-over Bluetooth LE. For security reasons, you must start Bluetooth LE advertising
-manually after powering up the device by pressing **Button 4**.
+In this example, to commission the device onto a CHIP network, it must be
+discoverable over Bluetooth LE. For security reasons, you must start Bluetooth
+LE advertising manually after powering up the device by pressing **Button 4**.
 
 ### Bluetooth LE rendezvous
 
-In CHIP, the commissioning procedure (called rendezvous) is done over Bluetooth
-LE between a CHIP device and the CHIP controller, where the controller has the
-commissioner role.
+In this example, the commissioning procedure (called rendezvous) is done over
+Bluetooth LE between a CHIP device and the CHIP controller, where the controller
+has the commissioner role.
 
 To start the rendezvous, the controller must get the commissioning information
 from the CHIP device. The data payload is encoded within a QR code, printed to
@@ -347,3 +348,11 @@ directory:
 
 Check the [CLI tutorial](../../../docs/guides/nrfconnect_examples_cli.md) to
 learn how to use command-line interface of the application.
+
+### Testing using CHIPTool
+
+Read the
+[Android commissioning guide](../../../docs/guides/nrfconnect_android_commissioning.md)
+to see how to use [CHIPTool](../../../src/android/CHIPTool/README.md) for
+Android smartphones to commission and control the application within a
+CHIP-enabled Thread network.

@@ -39,6 +39,8 @@
 #include <platform/CHIPDeviceLayer.h>
 #endif
 
+#include <app/InteractionModelEngine.h>
+#include <app/server/DataModelHandler.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPEncoding.h>
 #include <core/CHIPSafeCasts.h>
@@ -96,6 +98,8 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, PersistentStorageDelegat
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+    Transport::AdminPairingInfo * admin = nullptr;
+
     VerifyOrExit(mState == State::NotInitialized, err = CHIP_ERROR_INCORRECT_STATE);
 
     if (systemLayer != nullptr && inetLayer != nullptr)
@@ -133,6 +137,10 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, PersistentStorageDelegat
     mTransportMgr   = chip::Platform::New<DeviceTransportMgr>();
     mSessionManager = chip::Platform::New<SecureSessionMgr>();
 
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    mExchangeManager = chip::Platform::New<Messaging::ExchangeManager>();
+#endif
+
     err = mTransportMgr->Init(
         Transport::UdpListenParameters(mInetLayer).SetAddressType(Inet::kIPAddressType_IPv6).SetListenPort(mListenPort)
 #if INET_CONFIG_ENABLE_IPV4
@@ -142,10 +150,22 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, PersistentStorageDelegat
     );
     SuccessOrExit(err);
 
-    err = mSessionManager->Init(localDeviceId, mSystemLayer, mTransportMgr);
+    admin = mAdmins.AssignAdminId(mAdminId, localDeviceId);
+    VerifyOrExit(admin != nullptr, err = CHIP_ERROR_NO_MEMORY);
+
+    err = mSessionManager->Init(localDeviceId, mSystemLayer, mTransportMgr, &mAdmins);
     SuccessOrExit(err);
 
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    err = mExchangeManager->Init(mSessionManager);
+    SuccessOrExit(err);
+    err = chip::app::InteractionModelEngine::GetInstance()->Init(mExchangeManager);
+    SuccessOrExit(err);
+#else
     mSessionManager->SetDelegate(this);
+#endif
+
+    InitDataModelHandler();
 
     mState         = State::Initialized;
     mLocalDeviceId = localDeviceId;
@@ -192,6 +212,12 @@ CHIP_ERROR DeviceController::Shutdown()
         mSessionManager = nullptr;
     }
 
+    if (mTransportMgr != nullptr)
+    {
+        chip::Platform::Delete(mTransportMgr);
+        mTransportMgr = nullptr;
+    }
+
     ReleaseAllDevices();
 
 exit:
@@ -233,7 +259,7 @@ CHIP_ERROR DeviceController::GetDevice(NodeId deviceId, const SerializedDevice &
         err = device->Deserialize(deviceInfo);
         VerifyOrExit(err == CHIP_NO_ERROR, ReleaseDevice(device));
 
-        device->Init(mTransportMgr, mSessionManager, mInetLayer, mListenPort);
+        device->Init(mTransportMgr, mSessionManager, mInetLayer, mListenPort, mAdminId);
     }
 
     *out_device = device;
@@ -295,7 +321,7 @@ CHIP_ERROR DeviceController::GetDevice(NodeId deviceId, Device ** out_device)
             err = device->Deserialize(deviceInfo);
             VerifyOrExit(err == CHIP_NO_ERROR, ReleaseDevice(device));
 
-            device->Init(mTransportMgr, mSessionManager, mInetLayer, mListenPort);
+            device->Init(mTransportMgr, mSessionManager, mInetLayer, mListenPort, mAdminId);
         }
     }
 
@@ -355,7 +381,7 @@ void DeviceController::OnNewConnection(SecureSessionHandle session, SecureSessio
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "Failed to process received message: err %d", err);
+        ChipLogError(Controller, "OnNewConnection: Failed to process received message: err %d", err);
     }
 }
 
@@ -374,7 +400,7 @@ void DeviceController::OnConnectionExpired(SecureSessionHandle session, SecureSe
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "Failed to process received message: err %d", err);
+        ChipLogError(Controller, "OnConnectionExpired: Failed to process received message: err %d", err);
     }
 }
 
@@ -395,7 +421,7 @@ void DeviceController::OnMessageReceived(const PacketHeader & header, const Payl
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "Failed to process received message: err %d", err);
+        ChipLogError(Controller, "OnMessageReceived: Failed to process received message: err %d", err);
     }
     return;
 }
@@ -536,8 +562,13 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
     CHIP_ERROR err  = CHIP_NO_ERROR;
     Device * device = nullptr;
 
+    Transport::AdminPairingInfo * admin = mAdmins.FindAdmin(mAdminId);
+
     VerifyOrExit(mState == State::Initialized, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mDeviceBeingPaired == kNumMaxActiveDevices, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(admin != nullptr, err = CHIP_ERROR_NO_MEMORY);
+
+    params.SetAdvertisementDelegate(&mRendezvousAdvDelegate);
 
     // TODO: We need to specify the peer address for BLE transport in bindings.
     if (params.GetPeerAddress().GetTransportType() == Transport::Type::kBle ||
@@ -559,10 +590,12 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
     mIsIPRendezvous    = (params.GetPeerAddress().GetTransportType() != Transport::Type::kBle);
     mRendezvousSession = chip::Platform::New<RendezvousSession>(this);
     VerifyOrExit(mRendezvousSession != nullptr, err = CHIP_ERROR_NO_MEMORY);
-    err = mRendezvousSession->Init(params.SetLocalNodeId(mLocalDeviceId).SetRemoteNodeId(remoteDeviceId), mTransportMgr);
+    err = mRendezvousSession->Init(params.SetLocalNodeId(mLocalDeviceId).SetRemoteNodeId(remoteDeviceId), mTransportMgr,
+                                   mSessionManager, admin);
     SuccessOrExit(err);
 
-    device->Init(mTransportMgr, mSessionManager, mInetLayer, mListenPort, remoteDeviceId, remotePort, interfaceId);
+    device->Init(mTransportMgr, mSessionManager, mInetLayer, mListenPort, remoteDeviceId, remotePort, interfaceId,
+                 admin->GetAdminId());
 
     // TODO: BLE rendezvous and IP rendezvous should have same logic in the future after BLE becomes a transport and network
     // provisiong cluster is ready.
@@ -614,7 +647,7 @@ CHIP_ERROR DeviceCommissioner::PairTestDeviceWithoutSecurity(NodeId remoteDevice
 
     testSecurePairingSecret->ToSerializable(device->GetPairing());
 
-    device->Init(mTransportMgr, mSessionManager, mInetLayer, mListenPort, remoteDeviceId, remotePort, interfaceId);
+    device->Init(mTransportMgr, mSessionManager, mInetLayer, mListenPort, remoteDeviceId, remotePort, interfaceId, mAdminId);
 
     device->SetAddress(deviceAddr);
 
@@ -717,6 +750,8 @@ void DeviceCommissioner::OnRendezvousComplete()
     device = &mActiveDevices[mDeviceBeingPaired];
     mPairedDevices.Insert(device->GetDeviceId());
     mPairedDevicesUpdated = true;
+    // We need to kick the device since we are not a valid secure pairing delegate when using IM.
+    device->InitCommandSender();
 
     // mStorageDelegate would not be null for a typical pairing scenario, as Pair()
     // requires a valid storage delegate. However, test pairing usecase, that's used

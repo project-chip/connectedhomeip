@@ -1,12 +1,24 @@
 {
     "name": "CHIP Application templates",
     "version": "chip-v1",
-    "helpers": ["common/StringHelper.js", "templates/app/helper.js"],
+    "helpers": [
+        "common/StringHelper.js",
+        "templates/app/helper.js",
+        "templates/chip/helper.js"
+    ],
     "override": "common/override.js",
     "partials": [
         {
             "name": "header",
             "path": "partials/header.zapt"
+        },
+        {
+            "name": "clusters_header",
+            "path": "partials/clusters_header.zapt"
+        },
+        {
+            "name": "cluster_header",
+            "path": "partials/cluster_header.zapt"
         },
         {
             "name": "command_handler_cluster_commands",
@@ -75,6 +87,11 @@
             "output": "command-id.h"
         },
         {
+            "path": "templates/app/endpoint_config.zapt",
+            "name": "ZCL endpoint configuration",
+            "output": "endpoint_config.h"
+        },
+        {
             "path": "templates/app/enums.zapt",
             "name": "ZCL enums header",
             "output": "enums.h"
@@ -85,9 +102,34 @@
             "output": "gen_config.h"
         },
         {
+            "path": "templates/app/gen_tokens.zapt",
+            "name": "ZCL gen_tokens header",
+            "output": "gen_tokens.h"
+        },
+        {
             "path": "templates/app/print-cluster.zapt",
             "name": "ZCL print-cluster header",
             "output": "print-cluster.h"
+        },
+        {
+            "path": "templates/app/CHIPClientCallbacks.zapt",
+            "name": "CHIP Client Callbacks header",
+            "output": "CHIPClientCallbacks.h"
+        },
+        {
+            "path": "templates/app/CHIPClientCallbacks-src.zapt",
+            "name": "CHIP Client Callbacks",
+            "output": "CHIPClientCallbacks.cpp"
+        },
+        {
+            "path": "templates/chip/CHIPClustersObjc.zapt",
+            "name": "Objc ZCL API Header",
+            "output": "CHIPClustersObjc.h"
+        },
+        {
+            "path": "templates/chip/CHIPClustersObjc-src.zapt",
+            "name": "Objc ZCL API",
+            "output": "CHIPClustersObjc.mm"
         }
     ]
 }

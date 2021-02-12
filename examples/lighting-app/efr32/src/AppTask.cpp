@@ -27,6 +27,8 @@
 #include "Server.h"
 #include "Service.h"
 #include "attribute-storage.h"
+#include "gen/attribute-id.h"
+#include "gen/attribute-type.h"
 #include "gen/cluster-id.h"
 #include "lcd.h"
 #include "qrcodegen.h"
@@ -41,7 +43,6 @@
 #include <platform/EFR32/ThreadStackManagerImpl.h>
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
-#include <platform/internal/DeviceNetworkInfo.h>
 #endif
 
 #define FACTORY_RESET_TRIGGER_TIMEOUT 3000
@@ -61,7 +62,6 @@ static LEDWidget sLightLED;
 
 static bool sIsThreadProvisioned     = false;
 static bool sIsThreadEnabled         = false;
-static bool sIsThreadAttached        = false;
 static bool sHaveBLEConnections      = false;
 static bool sHaveServiceConnectivity = false;
 
@@ -131,14 +131,14 @@ int AppTask::Init()
     sLightLED.Set(LightMgr().IsLightOn());
     UpdateClusterState();
 
+    ConfigurationMgr().LogDeviceConfig();
+
 // Print setup info on LCD if available
 #ifdef DISPLAY_ENABLED
-    uint32_t setupPinCode;
     std::string QRCode;
 
-    if (GetQRCode(setupPinCode, QRCode, chip::RendezvousInformationFlags::kBLE) == CHIP_NO_ERROR)
+    if (GetQRCode(QRCode, chip::RendezvousInformationFlags::kBLE) == CHIP_NO_ERROR)
     {
-        EFR32_LOG("SetupPINCode: [%09u]", setupPinCode);
         LCDWriteQRCode((uint8_t *) QRCode.c_str());
     }
     else
@@ -186,7 +186,6 @@ void AppTask::AppTaskMain(void * pvParameter)
         {
             sIsThreadProvisioned     = ConnectivityMgr().IsThreadProvisioned();
             sIsThreadEnabled         = ConnectivityMgr().IsThreadEnabled();
-            sIsThreadAttached        = ConnectivityMgr().IsThreadAttached();
             sHaveBLEConnections      = (ConnectivityMgr().NumBLEConnections() != 0);
             sHaveServiceConnectivity = ConnectivityMgr().HaveServiceConnectivity();
             PlatformMgr().UnlockChipStack();
@@ -212,7 +211,7 @@ void AppTask::AppTaskMain(void * pvParameter)
             {
                 sStatusLED.Set(true);
             }
-            else if (sIsThreadProvisioned && sIsThreadEnabled && (!sIsThreadAttached || !sHaveServiceConnectivity))
+            else if (sIsThreadProvisioned && sIsThreadEnabled)
             {
                 sStatusLED.Blink(950, 50);
             }

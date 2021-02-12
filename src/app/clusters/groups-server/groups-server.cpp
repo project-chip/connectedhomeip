@@ -49,6 +49,12 @@
 #include <app/util/af.h>
 #include <app/util/binding-table.h>
 
+#include "gen/att-storage.h"
+#include "gen/attribute-id.h"
+#include "gen/attribute-type.h"
+#include "gen/cluster-id.h"
+#include "gen/command-id.h"
+
 #ifdef EMBER_AF_PLUGIN_SCENES
 #include <app/clusters/scenes/scenes.h>
 #endif // EMBER_AF_PLUGIN_SCENES
@@ -228,8 +234,8 @@ bool emberAfGroupsClusterGetGroupMembershipCallback(uint8_t groupCount, uint8_t 
             status = emberGetBinding(i, &entry);
             if ((status == EMBER_SUCCESS) && (entry.type == EMBER_MULTICAST_BINDING) && (entry.local == emberAfCurrentEndpoint()))
             {
-                list[listLen]     = LOW_BYTE(entry.groupId);
-                list[listLen + 1] = HIGH_BYTE(entry.groupId);
+                list[listLen]     = EMBER_LOW_BYTE(entry.groupId);
+                list[listLen + 1] = EMBER_HIGH_BYTE(entry.groupId);
                 listLen           = static_cast<uint8_t>(listLen + 2);
                 count++;
             }
@@ -248,8 +254,8 @@ bool emberAfGroupsClusterGetGroupMembershipCallback(uint8_t groupCount, uint8_t 
                 {
                     if (entry.local == emberAfCurrentEndpoint() && entry.groupId == groupId)
                     {
-                        list[listLen]     = LOW_BYTE(groupId);
-                        list[listLen + 1] = HIGH_BYTE(groupId);
+                        list[listLen]     = EMBER_LOW_BYTE(groupId);
+                        list[listLen + 1] = EMBER_HIGH_BYTE(groupId);
                         listLen           = static_cast<uint8_t>(listLen + 2);
                         count++;
                     }

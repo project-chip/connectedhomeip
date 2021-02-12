@@ -400,7 +400,7 @@ void WriteEncoding1(nlTestSuite * inSuite, TLVWriter & writer)
         {
             TLVWriter writer5;
 
-            err = writer3.OpenContainer(AnonymousTag, kTLVType_Path, writer5);
+            err = writer3.OpenContainer(AnonymousTag, kTLVType_List, writer5);
             NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
             err = writer5.PutNull(ProfileTag(TestProfile_1, 17));
@@ -541,7 +541,7 @@ void ReadEncoding1(nlTestSuite * inSuite, TLVReader & reader)
             {
                 TLVReader reader5;
 
-                TestAndOpenContainer(inSuite, reader3, kTLVType_Path, AnonymousTag, reader5);
+                TestAndOpenContainer(inSuite, reader3, kTLVType_List, AnonymousTag, reader5);
 
                 TestNext<TLVReader>(inSuite, reader5);
 
@@ -1948,7 +1948,7 @@ void WriteDeleteReadTest(nlTestSuite * inSuite)
  */
 void CheckPacketBuffer(nlTestSuite * inSuite, void * inContext)
 {
-    System::PacketBufferHandle buf = System::PacketBuffer::New(0);
+    System::PacketBufferHandle buf = System::PacketBufferHandle::New(sizeof(Encoding1), 0);
     System::PacketBufferTLVWriter writer;
     System::PacketBufferTLVReader reader;
 
@@ -2448,7 +2448,7 @@ void CheckBufferOverflow(nlTestSuite * inSuite, void * inContext)
     System::PacketBufferTLVWriter writer;
     System::PacketBufferTLVReader reader;
 
-    System::PacketBufferHandle buf = System::PacketBuffer::New(0);
+    System::PacketBufferHandle buf = System::PacketBufferHandle::New(sizeof(Encoding1), 0);
     uint16_t maxDataLen            = buf->MaxDataLength();
     uint16_t reserve = static_cast<uint16_t>((sizeof(Encoding1) < maxDataLen) ? (maxDataLen - sizeof(Encoding1)) + 2 : 0);
 
@@ -2471,7 +2471,7 @@ void CheckBufferOverflow(nlTestSuite * inSuite, void * inContext)
 
         ReadEncoding1(inSuite, reader);
 
-        buf = System::PacketBuffer::New(0);
+        buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSizeWithoutReserve, 0);
     }
 }
 
@@ -2919,7 +2919,7 @@ void TestCHIPTLVReaderDup(nlTestSuite * inSuite)
             {
                 TLVReader reader5;
 
-                TestAndOpenContainer(inSuite, reader3, kTLVType_Path, AnonymousTag, reader5);
+                TestAndOpenContainer(inSuite, reader3, kTLVType_List, AnonymousTag, reader5);
 
                 TestNext<TLVReader>(inSuite, reader5);
 
@@ -3617,7 +3617,7 @@ static CHIP_ERROR ReadFuzzedEncoding1(nlTestSuite * inSuite, TLVReader & reader)
                 SuccessOrExit(err);
             }
 
-            err = reader.Next(kTLVType_Path, AnonymousTag);
+            err = reader.Next(kTLVType_List, AnonymousTag);
             SuccessOrExit(err);
 
             {

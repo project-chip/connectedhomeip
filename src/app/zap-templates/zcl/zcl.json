@@ -1,6 +1,6 @@
 {
     "version": "ZCL Test Data",
-    "xmlRoot": [".", "../../../../third_party/zap/repo/zcl-builtin/silabs/"],
+    "xmlRoot": [".", "./data-model/silabs/"],
     "xmlFile": [
         "binding-cluster.xml",
         "clusters-extensions.xml",
@@ -30,7 +30,7 @@
         "sample-extensions.xml"
     ],
 
-    "manufacturersXml": "../shared/manufacturers.xml",
+    "manufacturersXml": "manufacturers.xml",
     "options": {
         "text": {
             "defaultResponsePolicy": ["Always", "Conditional", "Never"]

@@ -78,6 +78,12 @@ menu "CHIP Core"
 
                 This value can be overridden by the application at runtime.
 
+        config ENABLE_PW_RPC
+            bool "Enable Pigweed RPC library"
+            default n
+            help
+                Link the application with the library containing Pigweed RPC functionalities
+
         # TODO: add log level selection
 
     endmenu # "General Options"
@@ -315,7 +321,7 @@ menu "CHIP Device Layer"
         config CHIP_TASK_STACK_SIZE
             int "CHIP Task Stack Size"
             range 0 65535
-            default 8192
+            default 5120
             help
                 The size (in bytes) of the CHIP task stack.
 

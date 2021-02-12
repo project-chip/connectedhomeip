@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -70,7 +70,7 @@
 #include <system/TLVPacketBufferBackingStore.h>
 
 using namespace ::nl;
-using namespace chip::SetupPayload;
+using namespace chip::SetupPayloadData;
 using namespace chip::Protocols;
 
 namespace chip {
@@ -907,7 +907,6 @@ static bool BluezGetChipDeviceInfo(BluezDevice1 & aDevice, chip::Ble::ChipBLEDev
 /// Handle advertisement from a device and connect to it if its discriminator is the requested one.
 static void BluezHandleAdvertisementFromDevice(BluezDevice1 * aDevice, BluezEndpoint * aEndpoint)
 {
-    const char * address   = bluez_device1_get_address(aDevice);
     GVariant * serviceData = bluez_device1_get_service_data(aDevice);
     char * debugStr        = nullptr;
     chip::Ble::ChipBLEDeviceIdentificationInfo deviceInfo;
@@ -915,7 +914,7 @@ static void BluezHandleAdvertisementFromDevice(BluezDevice1 * aDevice, BluezEndp
     VerifyOrExit(serviceData != nullptr, );
 
     debugStr = g_variant_print(serviceData, TRUE);
-    ChipLogDetail(DeviceLayer, "TRACE: Device %s Service data: %s", address, debugStr);
+    ChipLogDetail(DeviceLayer, "TRACE: Device %s Service data: %s", bluez_device1_get_address(aDevice), debugStr);
 
     VerifyOrExit(BluezGetChipDeviceInfo(*aDevice, deviceInfo), );
     ChipLogDetail(DeviceLayer, "TRACE: Found CHIP BLE Device: %" PRIu16, deviceInfo.GetDeviceDiscriminator());
@@ -1280,7 +1279,7 @@ static void UpdateAdditionalDataCharacteristic(BluezGattCharacteristic1 * charac
     TLVWriter innerWriter;
     chip::System::PacketBufferHandle bufferHandle;
 
-    writer.Init(chip::System::PacketBuffer::New());
+    writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
 
     err = writer.OpenContainer(AnonymousTag, kTLVType_Structure, innerWriter);
     SuccessOrExit(err);

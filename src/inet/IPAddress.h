@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2019 Google LLC.
  *    Copyright (c) 2013-2018 Nest Labs, Inc.
  *
@@ -121,6 +121,15 @@ typedef enum
     /** The multicast address is (1) based on a network prefix. */
     kIPv6MulticastFlag_Prefix = 0x02
 } IPv6MulticastFlag;
+
+/**
+ * @brief   Maximum length of the string representation of an IP address.
+ */
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+constexpr uint16_t kMaxIPAddressStringLength = IP6ADDR_STRLEN_MAX;
+#else
+constexpr uint16_t kMaxIPAddressStringLength = INET6_ADDRSTRLEN;
+#endif
 
 /**
  * @brief   Internet protocol address
@@ -327,6 +336,16 @@ public:
      * @return  The argument \c buf if no formatting error, or zero otherwise.
      */
     char * ToString(char * buf, uint32_t bufSize) const;
+
+    /**
+     * A version of ToString that writes to a literal and deduces how much space
+     * it as to work with.
+     */
+    template <uint32_t N>
+    inline char * ToString(char (&buf)[N]) const
+    {
+        return ToString(buf, N);
+    }
 
     /**
      * @brief   Scan the IP address from its conventional presentation text.

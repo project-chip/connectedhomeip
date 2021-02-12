@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2014-2017 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -115,7 +115,7 @@ BLE_ERROR BLEEndPoint::StartConnect()
     mState = kState_Connecting;
 
     // Build BLE transport protocol capabilities request.
-    buf = PacketBuffer::New();
+    buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
     VerifyOrExit(!buf.IsNull(), err = BLE_ERROR_NO_MEMORY);
 
     // Zero-initialize BLE transport capabilities request.
@@ -140,9 +140,8 @@ BLE_ERROR BLEEndPoint::StartConnect()
 
     // Send BLE transport capabilities request to peripheral via GATT write.
     // Add reference to message fragment for duration of platform's GATT write attempt. CHIP retains partial
-    // ownership of message fragment's PacketBuffer, since this is the same buffer as that of the whole message, just
+    // ownership of message fragment's packet buffer, since this is the same buffer as that of the whole message, just
     // with a fragmenter-modified payload offset and data length, by a Retain() on the handle when calling this function.
-    // Buffer must be decref'd (i.e. PacketBuffer::Free'd) by platform when BLE GATT operation completes.
     if (!SendWrite(buf.Retain()))
     {
         err = BLE_ERROR_GATT_WRITE_FAILED;
@@ -224,9 +223,8 @@ void BLEEndPoint::HandleSubscribeReceived()
     VerifyOrExit(mBtpEngine.PopPacketTag(mSendQueue) == kType_Data, err = BLE_ERROR_INVALID_BTP_HEADER_FLAGS);
 #endif
     // Add reference to message fragment for duration of platform's GATT indication attempt. CHIP retains partial
-    // ownership of message fragment's PacketBuffer, since this is the same buffer as that of the whole message, just
-    // with a fragmenter-modified payload offset and data length. Buffer must be decref'd (i.e. PacketBuffer::Free'd) by
-    // platform when BLE GATT operation completes.
+    // ownership of message fragment's packet buffer, since this is the same buffer as that of the whole message, just
+    // with a fragmenter-modified payload offset and data length.
     if (!SendIndication(mSendQueue.Retain()))
     {
         // Ensure transmit queue is empty and set to NULL.
@@ -379,11 +377,6 @@ void BLEEndPoint::FinalizeClose(uint8_t oldState, uint8_t flags, BLE_ERROR err)
     QueueTxLock();
     mSendQueue = nullptr;
     QueueTxUnlock();
-
-#if CHIP_ENABLE_CHIPOBLE_TEST
-    PacketBuffer::Free(mBtpEngineTest.mCommandReceiveQueue);
-    mBtpEngineTest.mCommandReceiveQueue = NULL;
-#endif
 
     // Fire application's close callback if we haven't already, and it's not suppressed.
     if (oldState != kState_Closing && (flags & kBleCloseFlag_SuppressCallback) == 0)
@@ -589,7 +582,7 @@ exit:
     return err;
 }
 
-BLE_ERROR BLEEndPoint::SendCharacteristic(PacketBufferHandle buf)
+BLE_ERROR BLEEndPoint::SendCharacteristic(PacketBufferHandle && buf)
 {
     BLE_ERROR err = BLE_NO_ERROR;
 
@@ -628,7 +621,7 @@ BLE_ERROR BLEEndPoint::SendCharacteristic(PacketBufferHandle buf)
  *  kType_Data(0)       - data packet
  *  kType_Control(1)    - control packet
  */
-void BLEEndPoint::QueueTx(PacketBufferHandle data, PacketType_t type)
+void BLEEndPoint::QueueTx(PacketBufferHandle && data, PacketType_t type)
 {
 #if CHIP_ENABLE_CHIPOBLE_TEST
     ChipLogDebugBleEndPoint(Ble, "%s: data->%p, type %d, len %d", __FUNCTION__, data, type, data->DataLength());
@@ -660,7 +653,7 @@ BLE_ERROR BLEEndPoint::Send(PacketBufferHandle data)
     VerifyOrExit(!data.IsNull(), err = BLE_ERROR_BAD_ARGS);
     VerifyOrExit(IsConnected(mState), err = BLE_ERROR_INCORRECT_STATE);
 
-    // Ensure outgoing message fits in a single contiguous PacketBuffer, as currently required by the
+    // Ensure outgoing message fits in a single contiguous packet buffer, as currently required by the
     // message fragmentation and reassembly engine.
     if (data->HasChainedBuffer())
     {
@@ -690,7 +683,7 @@ exit:
     return err;
 }
 
-bool BLEEndPoint::PrepareNextFragment(PacketBufferHandle data, bool & sentAck)
+bool BLEEndPoint::PrepareNextFragment(PacketBufferHandle && data, bool & sentAck)
 {
     // If we have a pending fragment acknowledgement to send, piggyback it on the fragment we're about to transmit.
     if (GetFlag(mTimerStateFlags, kTimerState_SendAckTimerRunning))
@@ -886,7 +879,7 @@ BLE_ERROR BLEEndPoint::HandleFragmentConfirmationReceived()
     // Ensure we're in correct state to receive confirmation of non-handshake GATT send.
     VerifyOrExit(IsConnected(mState), err = BLE_ERROR_INCORRECT_STATE);
 
-    // TODO PacketBuffer high water mark optimization: if ack pending, but fragmenter state == complete, free fragmenter's
+    // TODO Packet buffer high water mark optimization: if ack pending, but fragmenter state == complete, free fragmenter's
     // tx buf before sending ack.
 
     if (GetFlag(mConnStateFlags, kConnState_StandAloneAckInFlight))
@@ -952,7 +945,7 @@ BLE_ERROR BLEEndPoint::DriveStandAloneAck()
     // If stand-alone ack not already pending, allocate new payload buffer here.
     if (mAckToSend.IsNull())
     {
-        mAckToSend = PacketBuffer::New();
+        mAckToSend = System::PacketBufferHandle::New(kTransferProtocolStandaloneAckHeaderSize);
         VerifyOrExit(!mAckToSend.IsNull(), err = BLE_ERROR_NO_MEMORY);
     }
 
@@ -1094,7 +1087,7 @@ BLE_ERROR BLEEndPoint::HandleCapabilitiesRequestReceived(PacketBufferHandle data
     err = BleTransportCapabilitiesRequestMessage::Decode(data, req);
     SuccessOrExit(err);
 
-    responseBuf = PacketBuffer::New();
+    responseBuf = System::PacketBufferHandle::New(kCapabilitiesResponseLength);
     VerifyOrExit(!responseBuf.IsNull(), err = BLE_ERROR_NO_MEMORY);
 
     // Determine BLE connection's negotiated ATT MTU, if possible.
@@ -1417,7 +1410,7 @@ BLE_ERROR BLEEndPoint::Receive(PacketBufferHandle data)
     // If we've reassembled a whole message...
     if (mBtpEngine.RxState() == BtpEngine::kState_Complete)
     {
-        // Take ownership of message PacketBuffer
+        // Take ownership of message buffer
         System::PacketBufferHandle full_packet = mBtpEngine.TakeRxPacket();
 
         ChipLogDebugBleEndPoint(Ble, "reassembled whole msg, len = %d", full_packet->DataLength());
@@ -1451,14 +1444,14 @@ exit:
     return err;
 }
 
-bool BLEEndPoint::SendWrite(PacketBufferHandle buf)
+bool BLEEndPoint::SendWrite(PacketBufferHandle && buf)
 {
     SetFlag(mConnStateFlags, kConnState_GattOperationInFlight, true);
 
     return mBle->mPlatformDelegate->SendWriteRequest(mConnObj, &CHIP_BLE_SVC_ID, &mBle->CHIP_BLE_CHAR_1_ID, std::move(buf));
 }
 
-bool BLEEndPoint::SendIndication(PacketBufferHandle buf)
+bool BLEEndPoint::SendIndication(PacketBufferHandle && buf)
 {
     SetFlag(mConnStateFlags, kConnState_GattOperationInFlight, true);
 
