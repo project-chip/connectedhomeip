@@ -36,9 +36,9 @@ void CHIPDevicePairingDelegateBridge::setDelegate(id<CHIPDevicePairingDelegate> 
     }
 }
 
-PairingStatus CHIPDevicePairingDelegateBridge::MapStatus(chip::RendezvousSessionDelegate::Status status)
+CHIPPairingStatus CHIPDevicePairingDelegateBridge::MapStatus(chip::RendezvousSessionDelegate::Status status)
 {
-    PairingStatus rv = kUnknownStatus;
+    CHIPPairingStatus rv = kUnknownStatus;
     switch (status) {
     case chip::RendezvousSessionDelegate::Status::SecurePairingSuccess:
         rv = kSecurePairingSuccess;
@@ -63,7 +63,7 @@ void CHIPDevicePairingDelegateBridge::OnStatusUpdate(chip::RendezvousSessionDele
     id<CHIPDevicePairingDelegate> strongDelegate = mDelegate;
     if ([strongDelegate respondsToSelector:@selector(onStatusUpdate:)]) {
         if (strongDelegate && mQueue) {
-            PairingStatus pairingStatus = MapStatus(status);
+            CHIPPairingStatus pairingStatus = MapStatus(status);
             dispatch_async(mQueue, ^{
                 [strongDelegate onStatusUpdate:pairingStatus];
             });
@@ -76,17 +76,30 @@ void CHIPDevicePairingDelegateBridge::OnNetworkCredentialsRequested(chip::Rendez
     NSLog(@"DevicePairingDelegate Requesting network credentials");
 
     mCallback = callback;
-    mHandler = ^(NSString * ssid, NSString * passwd) {
-        mCallback->SendNetworkCredentials([ssid UTF8String], [passwd UTF8String]);
-    };
 
     id<CHIPDevicePairingDelegate> strongDelegate = mDelegate;
     if (strongDelegate && mQueue) {
         dispatch_async(mQueue, ^{
-            [strongDelegate onNetworkCredentialsRequested:mHandler];
+            [strongDelegate onNetworkCredentialsRequested:kNetworkCredentialTypeWiFi];
         });
     }
 }
+
+
+void CHIPDevicePairingDelegateBridge::SendWiFiCredentials(NSString * ssid, NSString * password)
+{
+    if (mCallback) {
+        mCallback->SendNetworkCredentials([ssid UTF8String], [password UTF8String]);
+    } else {
+        NSLog(@"Couldn't Send WiFi Credentials, are you sure pairing is in progress?");
+    }
+}
+
+void CHIPDevicePairingDelegateBridge::SendThreadCredentials(NSData * threadDataSet)
+{
+    NSLog(@"Thread Provisioning is still a WIP, pairing will timeout...");
+}
+
 
 void CHIPDevicePairingDelegateBridge::OnOperationalCredentialsRequested(
     const char * csr, size_t csr_length, chip::RendezvousDeviceCredentialsDelegate * callback)
