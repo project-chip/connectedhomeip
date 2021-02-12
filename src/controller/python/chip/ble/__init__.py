@@ -15,6 +15,7 @@ import sys
 import platform
 import chip.native
 import ctypes
+from typing import List
 from ctypes import c_bool, c_void_p, c_char_p, c_uint
 from dataclasses import dataclass
 
@@ -54,7 +55,8 @@ def _GetBleLibraryHandle() -> ctypes.CDLL:
   return handle
 
 
-def GetAdapters():
+def GetAdapters() -> List[AdapterInfo]:
+  """Get a list of BLE adapters available on the system. """
   handle = _GetBleLibraryHandle()
 
   result = []
