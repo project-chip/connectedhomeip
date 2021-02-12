@@ -1,7 +1,7 @@
 [
     {
         "path": "gn/gn/${os}-${arch=amd64,arm64}",
-        "tags": ["git_revision:d62642c920e6a0d1756316d225a90fd6faa9e21e"]
+        "tags": ["git_revision:d7cf6238e07f87b51118f9823a1ec024c1f1932b"]
     },
     {
         "path": "infra/ninja/${os}-${arch=amd64}",
@@ -25,8 +25,8 @@
         "tags": ["version:9-2020-q2-update"]
     },
     {
-        "path": "infra/tools/protoc/${os}-${arch=amd64}",
-        "tags": ["protobuf_version:v3.8.0"]
+        "path": "infra/3pp/tools/protoc/${os}-${arch}",
+        "tags": ["version:3.14.0"]
     },
     {
         "_comment": "TODO(pwbug/70) Put clang in cipd for Windows.",
@@ -62,11 +62,11 @@
     },
     {
         "path": "pigweed/host_tools/${os}-${arch=amd64}",
-        "tags": ["git_revision:918276537a01f4f470fa61511347d4dfe1c9f297"]
+        "tags": ["git_revision:01145c97424e9158fd9b96b957176de4bb7e8f0c"]
     },
     {
         "path": "infra/goma/client/${os}-${arch=amd64}",
-        "tags": ["git_revision:4e2693cc42d116902f0767b9b93643555f79e7c4"]
+        "tags": ["git_revision:be1b7f4547023e809b636dc9572c976ccb33dcac"]
     },
     {
         "path": "fuchsia/third_party/qemu/${os=linux,mac}-${arch}",

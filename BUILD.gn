@@ -39,6 +39,18 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
   # Python packages for supporting specific targets.
   pw_python_group("python_packages") {
     python_deps = [
+      "$dir_pw_build/py",
+      "$dir_pw_doctor/py",
+      "$dir_pw_env_setup/py",
+      "$dir_pw_hdlc/py",
+      "$dir_pw_module/py",
+      "$dir_pw_protobuf/py",
+      "$dir_pw_protobuf_compiler/py",
+      "$dir_pw_rpc/py",
+      "$dir_pw_status/py",
+      "$dir_pw_toolchain/py",
+      "$dir_pw_unit_test/py",
+      "$dir_pw_watch/py",
       "integrations/mobly:chip_mobly",
       "third_party/happy",
     ]
