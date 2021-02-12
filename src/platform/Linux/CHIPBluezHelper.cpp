@@ -2045,20 +2045,20 @@ exit:
     }
 }
 
-void AdapterIterator::Advance()
+bool AdapterIterator::Advance()
 {
     if (mCurrentListItem == nullptr)
     {
-        return;
+        return false;
     }
 
     while (mCurrentListItem != nullptr)
     {
         BluezAdapter1 * adapter = bluez_object_get_adapter1(BLUEZ_OBJECT(mCurrentListItem->data));
-
         if (adapter == nullptr)
         {
             mCurrentListItem = mCurrentListItem->next;
+            continue;
         }
 
         // PATH is of the for  BLUEZ_PATH / hci<nr>, i.e. like
@@ -2079,6 +2079,7 @@ void AdapterIterator::Advance()
         CopyString(mCurrent.name, bluez_adapter1_get_name(adapter));
         mCurrent.powered = bluez_adapter1_get_powered(adapter);
 
+        mCurrentListItem = mCurrentListItem->next;
         return true;
     }
 
