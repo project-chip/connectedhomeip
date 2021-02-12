@@ -31,7 +31,7 @@ find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
 
 project(chip-nrf52840-pigweed-example)
 
-zephyr_compile_options(-Werror)
+target_compile_options(app PRIVATE -Werror)
 
 include(${PIGWEED_ROOT}/pw_build/pigweed.cmake)
 include(${PIGWEED_ROOT}/pw_protobuf_compiler/proto.cmake)
