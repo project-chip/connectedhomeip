@@ -135,16 +135,22 @@ void AddDevice(std::string name)
 
 class EditAttributeListModel : public ListScreen::Model
 {
-    int d;
-    int e;
-    int c;
-    int a;
+    int deviceIndex;
+    int endpointIndex;
+    int clusterIndex;
+    int attributeIndex;
 
 public:
-    EditAttributeListModel(int d, int e, int c, int a) : d(d), e(e), c(c), a(a) {}
+    EditAttributeListModel(int deviceIndex, int endpointIndex, int clusterIndex, int attributeIndex) :
+        deviceIndex(deviceIndex), endpointIndex(endpointIndex), clusterIndex(clusterIndex), attributeIndex(attributeIndex)
+    {}
+    Attribute & attribute()
+    {
+        return std::get<1>(std::get<1>(std::get<1>(devices[deviceIndex])[endpointIndex])[clusterIndex])[attributeIndex];
+    }
     virtual std::string GetTitle()
     {
-        auto & attribute = std::get<1>(std::get<1>(std::get<1>(devices[d])[e])[c])[a];
+        auto & attribute = this->attribute();
         auto & name      = std::get<0>(attribute);
         auto & value     = std::get<1>(attribute);
         char buffer[64];
@@ -155,13 +161,12 @@ public:
     virtual std::string GetItemText(int i) { return i == 0 ? "+" : "-"; }
     virtual void ItemAction(int i)
     {
-        auto & attribute = std::get<1>(std::get<1>(std::get<1>(devices[d])[e])[c])[a];
+        auto & attribute = this->attribute();
         auto & value     = std::get<1>(attribute);
         int n;
         if (sscanf(value.c_str(), "%d", &n) == 1)
         {
-            auto & attribute = std::get<1>(std::get<1>(std::get<1>(devices[d])[e])[c])[a];
-            auto & name      = std::get<0>(attribute);
+            auto & name = std::get<0>(attribute);
 
             ESP_LOGI(TAG, "editing attribute as integer: %d (%s)", n, i == 0 ? "+" : "-");
             n += (i == 0) ? 1 : -1;
@@ -184,17 +189,22 @@ public:
 
 class AttributeListModel : public ListScreen::Model
 {
-    int d;
-    int e;
-    int c;
+    int deviceIndex;
+    int endpointIndex;
+    int clusterIndex;
 
 public:
-    AttributeListModel(int d, int e, int c) : d(d), e(e), c(c) {}
+    AttributeListModel(int deviceIndex, int endpointIndex, int clusterIndex) :
+        deviceIndex(deviceIndex), endpointIndex(endpointIndex), clusterIndex(clusterIndex)
+    {}
     virtual std::string GetTitle() { return "Attributes"; }
-    virtual int GetItemCount() { return std::get<1>(std::get<1>(std::get<1>(devices[d])[e])[c]).size(); }
+    virtual int GetItemCount()
+    {
+        return std::get<1>(std::get<1>(std::get<1>(devices[deviceIndex])[endpointIndex])[clusterIndex]).size();
+    }
     virtual std::string GetItemText(int i)
     {
-        auto & attribute = std::get<1>(std::get<1>(std::get<1>(devices[d])[e])[c])[i];
+        auto & attribute = std::get<1>(std::get<1>(std::get<1>(devices[deviceIndex])[endpointIndex])[clusterIndex])[i];
         auto & name      = std::get<0>(attribute);
         auto & value     = std::get<1>(attribute);
         char buffer[64];
@@ -204,40 +214,42 @@ public:
     virtual void ItemAction(int i)
     {
         ESP_LOGI(TAG, "Opening attribute %d", i);
-        ScreenManager::PushScreen(chip::Platform::New<ListScreen>(chip::Platform::New<EditAttributeListModel>(d, e, c, i)));
+        ScreenManager::PushScreen(chip::Platform::New<ListScreen>(
+            chip::Platform::New<EditAttributeListModel>(deviceIndex, endpointIndex, clusterIndex, i)));
     }
 };
 
 class ClusterListModel : public ListScreen::Model
 {
-    int d;
-    int e;
+    int deviceIndex;
+    int endpointIndex;
 
 public:
-    ClusterListModel(int d, int e) : d(d), e(e) {}
+    ClusterListModel(int deviceIndex, int endpointIndex) : deviceIndex(deviceIndex), endpointIndex(endpointIndex) {}
     virtual std::string GetTitle() { return "Clusters"; }
-    virtual int GetItemCount() { return std::get<1>(std::get<1>(devices[d])[e]).size(); }
-    virtual std::string GetItemText(int i) { return std::get<0>(std::get<1>(std::get<1>(devices[d])[e])[i]); }
+    virtual int GetItemCount() { return std::get<1>(std::get<1>(devices[deviceIndex])[endpointIndex]).size(); }
+    virtual std::string GetItemText(int i) { return std::get<0>(std::get<1>(std::get<1>(devices[deviceIndex])[endpointIndex])[i]); }
     virtual void ItemAction(int i)
     {
         ESP_LOGI(TAG, "Opening cluster %d", i);
-        ScreenManager::PushScreen(chip::Platform::New<ListScreen>(chip::Platform::New<AttributeListModel>(d, e, i)));
+        ScreenManager::PushScreen(
+            chip::Platform::New<ListScreen>(chip::Platform::New<AttributeListModel>(deviceIndex, endpointIndex, i)));
     }
 };
 
 class EndpointListModel : public ListScreen::Model
 {
-    int d;
+    int deviceIndex;
 
 public:
-    EndpointListModel(int d) : d(d) {}
+    EndpointListModel(int deviceIndex) : deviceIndex(deviceIndex) {}
     virtual std::string GetTitle() { return "Endpoints"; }
-    virtual int GetItemCount() { return std::get<1>(devices[d]).size(); }
-    virtual std::string GetItemText(int i) { return std::get<0>(std::get<1>(devices[d])[i]); }
+    virtual int GetItemCount() { return std::get<1>(devices[deviceIndex]).size(); }
+    virtual std::string GetItemText(int i) { return std::get<0>(std::get<1>(devices[deviceIndex])[i]); }
     virtual void ItemAction(int i)
     {
         ESP_LOGI(TAG, "Opening endpoint %d", i);
-        ScreenManager::PushScreen(chip::Platform::New<ListScreen>(chip::Platform::New<ClusterListModel>(d, i)));
+        ScreenManager::PushScreen(chip::Platform::New<ListScreen>(chip::Platform::New<ClusterListModel>(deviceIndex, i)));
     }
 };
 
