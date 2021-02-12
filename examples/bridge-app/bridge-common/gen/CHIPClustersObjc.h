@@ -31,7 +31,6 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPBasic : NSObject
 
 - (nullable instancetype)initWithDevice:(CHIPDevice *)device endpoint:(uint8_t)endpoint queue:(dispatch_queue_t)queue;
-- (BOOL)mfgSpecificPing:(ResponseHandler)completionHandler;
 - (BOOL)resetToFactoryDefaults:(ResponseHandler)completionHandler;
 
 - (BOOL)readAttributeZclVersion:(ResponseHandler)completionHandler;

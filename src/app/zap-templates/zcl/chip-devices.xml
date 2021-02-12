@@ -202,13 +202,6 @@ limitations under the License.
         <requireCommand>ResetToFactoryDefaults</requireCommand>
         <requireCommand>MfgSpecificPing</requireCommand>
       </include>
-      <!-- Below is the Descriptor Cluster which will be enabled after a separate PR which adds the cluster definition lands  -->
-      <!-- <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
-        <requireAttribute>DEVICE</requireAttribute>
-        <requireAttribute>SERVER_CLUSTERS</requireAttribute>
-        <requireAttribute>CLIENT_CLUSTERS</requireAttribute>
-        <requireAttribute>PARTS</requireAttribute>
-      </include> -->
     </clusters>
   </deviceType>
 </configurator>

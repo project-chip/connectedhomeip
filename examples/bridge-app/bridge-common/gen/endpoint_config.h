@@ -222,11 +222,10 @@
 
 // Array of EmberAfCommandMetadata structs.
 #define ZAP_COMMAND_MASK(mask) COMMAND_MASK_##mask
-#define EMBER_AF_GENERATED_COMMAND_COUNT (41)
+#define EMBER_AF_GENERATED_COMMAND_COUNT (40)
 #define GENERATED_COMMANDS                                                                                                         \
     {                                                                                                                              \
-        { 0x0000, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) },     /* Basic (server): MfgSpecificPing */                             \
-            { 0x0000, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Basic (server): ResetToFactoryDefaults */                      \
+        { 0x0000, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) },     /* Basic (server): ResetToFactoryDefaults */                      \
             { 0x0006, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* On/off (server): Off */                                        \
             { 0x0006, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* On/off (server): Off */                                        \
             { 0x0006, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* On/off (server): Off */                                        \
@@ -269,10 +268,12 @@
     }
 
 // Array of EmberAfManufacturerCodeEntry structures for commands.
-#define GENERATED_COMMAND_MANUFACTURER_CODE_COUNT (1)
+#define GENERATED_COMMAND_MANUFACTURER_CODE_COUNT (0)
 #define GENERATED_COMMAND_MANUFACTURER_CODES                                                                                       \
     {                                                                                                                              \
-        { 0, 4098 },                                                                                                               \
+        {                                                                                                                          \
+            0x00, 0x00                                                                                                             \
+        }                                                                                                                          \
     }
 
 // This is an array of EmberAfManufacturerCodeEntry structures for clusters.

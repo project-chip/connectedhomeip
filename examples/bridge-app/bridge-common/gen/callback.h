@@ -272,12 +272,6 @@ void emberAfOnOffClusterServerTickCallback(chip::EndpointId endpoint);
 // Cluster Commands Callback
 
 /**
- * @brief Basic Cluster MfgSpecificPing Command callback
- */
-
-bool emberAfBasicClusterMfgSpecificPingCallback();
-
-/**
  * @brief Basic Cluster ResetToFactoryDefaults Command callback
  */
 
