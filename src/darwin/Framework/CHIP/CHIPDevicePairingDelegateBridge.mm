@@ -85,7 +85,6 @@ void CHIPDevicePairingDelegateBridge::OnNetworkCredentialsRequested(chip::Rendez
     }
 }
 
-
 void CHIPDevicePairingDelegateBridge::SendWiFiCredentials(NSString * ssid, NSString * password)
 {
     if (mCallback) {
@@ -99,7 +98,6 @@ void CHIPDevicePairingDelegateBridge::SendThreadCredentials(NSData * threadDataS
 {
     NSLog(@"Thread Provisioning is still a WIP, pairing will timeout...");
 }
-
 
 void CHIPDevicePairingDelegateBridge::OnOperationalCredentialsRequested(
     const char * csr, size_t csr_length, chip::RendezvousDeviceCredentialsDelegate * callback)
