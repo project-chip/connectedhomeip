@@ -49,6 +49,11 @@ NS_ASSUME_NONNULL_BEGIN
 + (CHIPDeviceController *)sharedController;
 
 /**
+ * Return the Node Id assigned to the controller.
+ */
+- (NSNumber *)getControllerNodeId;
+
+/**
  * Set the Delegate for the Device Pairing  as well as the Queue on which the Delegate callbacks will be triggered
  *
  * @param[in] delegate The delegate the pairing process should use
