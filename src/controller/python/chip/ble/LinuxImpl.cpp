@@ -37,12 +37,12 @@ extern "C" const char * pychip_ble_adapter_list_get_address(void * adapter)
 
 extern "C" const char * pychip_ble_adapter_list_get_alias(void * adapter)
 {
-    return reinterpret_cast<chip::DeviceLayer::Internal::AdapterIterator *>(adapter)->GetAddress();
+    return reinterpret_cast<chip::DeviceLayer::Internal::AdapterIterator *>(adapter)->GetAlias();
 }
 
 extern "C" const char * pychip_ble_adapter_list_get_name(void * adapter)
 {
-    return reinterpret_cast<chip::DeviceLayer::Internal::AdapterIterator *>(adapter)->GetAddress();
+    return reinterpret_cast<chip::DeviceLayer::Internal::AdapterIterator *>(adapter)->GetName();
 }
 
 extern "C" bool pychip_ble_adapter_list_is_powered(void * adapter)
