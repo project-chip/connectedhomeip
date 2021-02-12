@@ -39,10 +39,10 @@ namespace app {
 namespace EventPath {
 enum
 {
-    kCsTag_NodeId              = 0,
-    kCsTag_EndpointId          = 1,
-    kCsTag_NamespacedClusterId = 2,
-    kCsTag_EventId             = 3,
+    kCsTag_NodeId     = 0,
+    kCsTag_EndpointId = 1,
+    kCsTag_ClusterId  = 2,
+    kCsTag_EventId    = 3,
 };
 
 class Parser : public chip::app::Parser
@@ -95,15 +95,15 @@ public:
     CHIP_ERROR GetEndpointId(chip::EndpointId * const apEndpointId) const;
 
     /**
-     *  @brief Get a TLVReader for the NamespacedClusterId. Next() must be called before accessing them.
+     *  @brief Get a TLVReader for the ClusterId. Next() must be called before accessing them.
      *
-     *  @param [in] apNamespacedClusterId    A pointer to apNamespacedClusterId
+     *  @param [in] apClusterId    A pointer to apClusterId
      *
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not any of the defined unsigned integer types
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetNamespacedClusterId(chip::ClusterId * const apNamespacedClusterId) const;
+    CHIP_ERROR GetClusterId(chip::ClusterId * const apClusterId) const;
 
     /**
      *  @brief Get a TLVReader for the EventId. Next() must be called before accessing them.
@@ -159,18 +159,18 @@ public:
     EventPath::Builder & EndpointId(const chip::EndpointId aEndpointId);
 
     /**
-     *  @brief Inject NamespacedClusterId into the TLV stream.
+     *  @brief Inject ClusterId into the TLV stream.
      *
-     *  @param [in] aNamespacedClusterId NamespacedClusterId for this event path
+     *  @param [in] aClusterId ClusterId for this event path
      *
      *  @return A reference to *this
      */
-    EventPath::Builder & NamespacedClusterId(const chip::ClusterId aNamespacedClusterId);
+    EventPath::Builder & ClusterId(const chip::ClusterId aClusterId);
 
     /**
      *  @brief Inject EventId into the TLV stream.
      *
-     *  @param [in] aEventId NamespacedClusterId for this event path
+     *  @param [in] aEventId ClusterId for this event path
      *
      *  @return A reference to *this
      */
