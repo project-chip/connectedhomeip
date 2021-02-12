@@ -224,7 +224,7 @@ public:
     /// used (iterator gets initialized on the first call of Next).
     bool Next();
 
-    // Information about the current value. Save to call only after
+    // Information about the current value. Safe to call only after
     // "Next" has returned true.
     uint32_t GetIndex() const { return mCurrent.index; }
     const char * GetAddress() const { return mCurrent.address; }
