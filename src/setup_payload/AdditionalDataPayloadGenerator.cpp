@@ -115,7 +115,7 @@ CHIP_ERROR AdditionalDataPayloadGenerator::generateRotatingDeviceId(uint16_t lif
     }
 
     rotatingDeviceIdBuffer[rotatingDeviceIdBufferIndex * 2] = 0;
-    rotatingDeviceIdValueOutputSize                         = rotatingDeviceIdBufferIndex;
+    rotatingDeviceIdValueOutputSize                         = rotatingDeviceIdBufferIndex * 2;
     ChipLogDetail(DeviceLayer, "rotatingDeviceId: %s", rotatingDeviceIdBuffer);
 
 exit:
