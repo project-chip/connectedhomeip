@@ -82,6 +82,18 @@ CHIPDevice * GetPairedDevice(void)
     return device;
 }
 
+CHIPDevice * GetPairedDeviceWithID(uint64_t deviceId)
+{
+    CHIPToolPersistentStorageDelegate * storage = [[CHIPToolPersistentStorageDelegate alloc] init];
+    dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.persistentstorage.callback", DISPATCH_QUEUE_SERIAL);
+
+    CHIPDeviceController * controller = [CHIPDeviceController sharedController];
+    [controller setPersistentStorageDelegate:storage queue:callbackQueue];
+
+    NSError * error;
+    return [controller getPairedDevice:deviceId error:&error];
+}
+
 @implementation CHIPToolPersistentStorageDelegate
 
 // MARK: CHIPPersistentStorageDelegate
