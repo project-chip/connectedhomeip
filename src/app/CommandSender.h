@@ -50,7 +50,7 @@ namespace app {
 class DLL_EXPORT DLL_EXPORT CommandSender : public Command, public Messaging::ExchangeDelegate
 {
 public:
-    CHIP_ERROR SendCommandRequest(NodeId aNodeId);
+    CHIP_ERROR SendCommandRequest(NodeId aNodeId, Transport::AdminId aAdminId);
 
     void OnMessageReceived(Messaging::ExchangeContext * apEc, const PacketHeader & aPacketHeader,
                            const PayloadHeader & aPayloadHeader, System::PacketBufferHandle aPayload) override;

@@ -232,7 +232,7 @@ int main(int argc, char * argv[])
     SuccessOrExit(err);
 
     // TODO: temprary create a SecureSessionHandle from node id to unblock end-to-end test. Complete solution is tracked in PR:4451
-    err = gEchoClient.Init(&gExchangeManager, { chip::kTestDeviceNodeId, 0 });
+    err = gEchoClient.Init(&gExchangeManager, { chip::kTestDeviceNodeId, 0, gAdminId });
     SuccessOrExit(err);
 
     // Arrange to get a callback whenever an Echo Response is received.

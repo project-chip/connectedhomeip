@@ -49,7 +49,6 @@ class SecureSessionHandle
 {
 public:
     SecureSessionHandle() : mPeerNodeId(kAnyNodeId), mPeerKeyId(0), mAdmin(Transport::kUndefinedAdminId) {}
-    SecureSessionHandle(NodeId peerNodeId, uint16_t peerKeyId) : mPeerNodeId(peerNodeId), mPeerKeyId(peerKeyId) {}
     SecureSessionHandle(NodeId peerNodeId, uint16_t peerKeyId, Transport::AdminId admin) :
         mPeerNodeId(peerNodeId), mPeerKeyId(peerKeyId), mAdmin(admin)
     {}
