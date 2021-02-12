@@ -50,6 +50,7 @@ static NSString * const kErrorGetPairedDevice = @"Failure while trying to retrie
 @property (readonly) chip::Controller::DeviceCommissioner * cppCommissioner;
 @property (readonly) CHIPDevicePairingDelegateBridge * pairingDelegateBridge;
 @property (readonly) CHIPPersistentStorageDelegateBridge * persistentStorageDelegateBridge;
+@property (readonly) chip::NodeId localDeviceId;
 
 @end
 
@@ -93,23 +94,8 @@ static NSString * const kErrorGetPairedDevice = @"Failure while trying to retrie
             return nil;
         }
 
-        chip::NodeId localDeviceId = 0;
-        uint16_t idStringLen = 32;
-        char deviceIdString[idStringLen];
-        if (CHIP_NO_ERROR
-            != _persistentStorageDelegateBridge->GetKeyValue(CHIP_COMMISSIONER_DEVICE_ID_KEY, deviceIdString, idStringLen)) {
-            localDeviceId = arc4random();
-            localDeviceId = localDeviceId << 32 | arc4random();
-            CHIP_LOG_ERROR("Assigned %llx node ID to the controller", localDeviceId);
-            _persistentStorageDelegateBridge->SetKeyValue(
-                CHIP_COMMISSIONER_DEVICE_ID_KEY, [[NSString stringWithFormat:@"%llx", localDeviceId] UTF8String]);
-        } else {
-            NSScanner * scanner = [NSScanner scannerWithString:[NSString stringWithUTF8String:deviceIdString]];
-            [scanner scanHexLongLong:&localDeviceId];
-            CHIP_LOG_ERROR("Found %llx node ID for the controller", localDeviceId);
-        }
-
-        errorCode = _cppCommissioner->Init(localDeviceId, _persistentStorageDelegateBridge, _pairingDelegateBridge);
+        [self getControllerNodeId];
+        errorCode = _cppCommissioner->Init(_localDeviceId, _persistentStorageDelegateBridge, _pairingDelegateBridge);
         if ([self checkForInitError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorCommissionerInit]) {
             return nil;
         }
@@ -125,6 +111,25 @@ static NSString * const kErrorGetPairedDevice = @"Failure while trying to retrie
         });
     }
     return self;
+}
+
+- (NSNumber *)getControllerNodeId
+{
+    uint16_t idStringLen = 32;
+    char deviceIdString[idStringLen];
+    if (CHIP_NO_ERROR
+        != _persistentStorageDelegateBridge->GetKeyValue(CHIP_COMMISSIONER_DEVICE_ID_KEY, deviceIdString, idStringLen)) {
+        _localDeviceId = arc4random();
+        _localDeviceId = _localDeviceId << 32 | arc4random();
+        CHIP_LOG_ERROR("Assigned %llx node ID to the controller", _localDeviceId);
+        _persistentStorageDelegateBridge->SetKeyValue(
+                                                      CHIP_COMMISSIONER_DEVICE_ID_KEY, [[NSString stringWithFormat:@"%llx", _localDeviceId] UTF8String]);
+    } else {
+        NSScanner * scanner = [NSScanner scannerWithString:[NSString stringWithUTF8String:deviceIdString]];
+        [scanner scanHexLongLong:&_localDeviceId];
+        CHIP_LOG_ERROR("Found %llx node ID for the controller", _localDeviceId);
+    }
+    return [NSNumber numberWithUnsignedLongLong:_localDeviceId];
 }
 
 - (BOOL)pairDevice:(uint64_t)deviceID

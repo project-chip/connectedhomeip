@@ -122,7 +122,8 @@
 
 - (void)_clearTextFields
 {
-    _nodeIDTextField.text = [NSString stringWithFormat:@"%d", 112233];
+    CHIPDeviceController * chipController = [CHIPDeviceController sharedController];
+    _nodeIDTextField.text = [NSString stringWithFormat:@"%@", chipController.getControllerNodeId];
     _endpointIDTextField.text = @"1";
     _groupIDTextField.text = @"0";
     _clusterIDTextField.text = @"";
