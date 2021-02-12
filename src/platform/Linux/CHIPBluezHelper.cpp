@@ -2079,7 +2079,10 @@ bool AdapterIterator::Advance()
         CopyString(mCurrent.name, bluez_adapter1_get_name(adapter));
         mCurrent.powered = bluez_adapter1_get_powered(adapter);
 
+        g_object_unref(adapter);
+
         mCurrentListItem = mCurrentListItem->next;
+
         return true;
     }
 
