@@ -41,13 +41,12 @@
 
 #include <app/Command.h>
 
-#define CHIP_INVOKE_COMMAND_RSP_TIMEOUT 5
 #define COMMON_STATUS_SUCCESS 0
 
 namespace chip {
 namespace app {
 
-class DLL_EXPORT DLL_EXPORT CommandSender : public Command, public Messaging::ExchangeDelegate
+class CommandSender : public Command, public Messaging::ExchangeDelegate
 {
 public:
     CHIP_ERROR SendCommandRequest(NodeId aNodeId, Transport::AdminId aAdminId);

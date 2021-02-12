@@ -43,7 +43,7 @@
 namespace chip {
 namespace app {
 
-class DLL_EXPORT CommandHandler : public Command
+class CommandHandler : public Command
 {
 public:
     CHIP_ERROR SendCommandResponse();

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,12 +23,11 @@
  *
  */
 
-#include <cinttypes>
-
+#include "InteractionModelEngine.h"
 #include "Command.h"
 #include "CommandHandler.h"
 #include "CommandSender.h"
-#include "InteractionModelEngine.h"
+#include <cinttypes>
 
 namespace chip {
 namespace app {
@@ -55,17 +54,19 @@ void InteractionModelEngine::DefaultEventHandler(EventID aEvent, const InEventPa
     ChipLogDetail(DataManagement, "%s event: %d", __func__, aEvent);
 }
 
-CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeMgr)
+CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeMgr, void * const apAppState,
+                                        const EventCallback aEventCallback)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    // Error if already initialized.
-    if (mpExchangeMgr != nullptr)
-        return CHIP_ERROR_INCORRECT_STATE;
-
-    mpExchangeMgr = apExchangeMgr;
+    mpExchangeMgr  = apExchangeMgr;
+    mpAppState     = apAppState;
+    mEventCallback = aEventCallback;
 
     err = mpExchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::kProtocol_InteractionModel, this);
+    SuccessOrExit(err);
+
+    mReportingEngine.Init();
     SuccessOrExit(err);
 
 exit:
@@ -95,6 +96,32 @@ CHIP_ERROR InteractionModelEngine::NewCommandSender(CommandSender ** const apCom
             if (CHIP_NO_ERROR != err)
             {
                 *apComandSender = nullptr;
+                ExitNow();
+            }
+            break;
+        }
+    }
+
+exit:
+    return err;
+}
+
+CHIP_ERROR InteractionModelEngine::NewReadClient(ReadClient ** const apReadClient,
+                                                 chip::app::ReadClient::EventCallback const aEventCallback, void * const apAppState)
+{
+    CHIP_ERROR err = CHIP_ERROR_NO_MEMORY;
+    *apReadClient  = nullptr;
+
+    for (size_t i = 0; i < CHIP_MAX_NUM_READ_CLIENT; ++i)
+    {
+        if (mReadClients[i].IsFree())
+        {
+            *apReadClient = &mReadClients[i];
+            err           = mReadClients[i].Init(mpExchangeMgr, aEventCallback, apAppState);
+            SuccessOrExit(err);
+            if (CHIP_NO_ERROR != err)
+            {
+                *apReadClient = nullptr;
                 ExitNow();
             }
             break;
@@ -175,12 +202,64 @@ exit:
     }
 }
 
+void InteractionModelEngine::OnReadRequest(Messaging::ExchangeContext * apEc, const PacketHeader & aPacketHeader,
+                                           const PayloadHeader & aPayloadHeader, System::PacketBufferHandle aPayload)
+{
+    CHIP_ERROR err            = CHIP_NO_ERROR;
+    ReadHandler * readHandler = nullptr;
+
+    if (nullptr != mEventCallback)
+    {
+        InEventParam inParam;
+        OutEventParam outParam;
+        inParam.Clear();
+        outParam.Clear();
+        outParam.mIncomingReadRequest.mShouldContinueProcessing = true;
+        inParam.mIncomingReadRequest.mpPacketHeader             = &aPacketHeader;
+
+        mEventCallback(mpAppState, kEvent_OnIncomingReadRequest, inParam, outParam);
+
+        if (!outParam.mIncomingReadRequest.mShouldContinueProcessing)
+        {
+            ChipLogDetail(DataManagement, "Read request not allowed");
+            ExitNow();
+        }
+    }
+
+    for (size_t i = 0; i < CHIP_MAX_NUM_READ_HANDLER; ++i)
+    {
+        if (mReadHandlers[i].IsFree())
+        {
+            readHandler = &mReadHandlers[i];
+            err         = readHandler->Init(mpExchangeMgr);
+            SuccessOrExit(err);
+            readHandler->OnMessageReceived(apEc, aPacketHeader, aPayloadHeader, std::move(aPayload));
+            apEc = nullptr;
+            break;
+        }
+    }
+
+exit:
+    ChipLogFunctError(err);
+
+    if (nullptr != apEc)
+    {
+        apEc->Abort();
+        apEc = NULL;
+    }
+}
+
 void InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext * apEc, const PacketHeader & aPacketHeader,
                                                const PayloadHeader & aPayloadHeader, System::PacketBufferHandle aPayload)
 {
     if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::InvokeCommandRequest))
     {
+
         OnInvokeCommandRequest(apEc, aPacketHeader, aPayloadHeader, std::move(aPayload));
+    }
+    else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::ReadRequest))
+    {
+        OnReadRequest(apEc, aPacketHeader, aPayloadHeader, std::move(aPayload));
     }
     else
     {
@@ -206,5 +285,14 @@ DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aComman
         "Default DispatchSingleClusterCommand is called, this should be replaced by actual dispatched for cluster commands");
 }
 
+uint16_t InteractionModelEngine::GetCommandSenderId(const CommandSender * const apSender) const
+{
+    return static_cast<uint16_t>(apSender - mCommandSenderObjs);
+}
+
+uint16_t InteractionModelEngine::GetReadClientId(const ReadClient * const apClient) const
+{
+    return static_cast<uint16_t>(apClient - mReadClients);
+}
 } // namespace app
 } // namespace chip
