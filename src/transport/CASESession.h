@@ -25,6 +25,7 @@
 
 #pragma once
 
+#include <credentials/CHIPCert.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <protocols/secure_channel/Constants.h>
 #include <support/Base64.h>
@@ -37,7 +38,31 @@
 
 namespace chip {
 
+constexpr uint16_t kAEADKeySize = 16;
+
+constexpr uint16_t kSigmaParamRandomNumberSize = 32;
+constexpr uint16_t kRootOfTrustCertSize        = 20;
+
+constexpr uint16_t kIPKSize = 0;
+
+typedef uint8_t TrustedRootIdentifier[kRootOfTrustCertSize];
+extern const TrustedRootIdentifier TrustedRoots[];
+
 using namespace Crypto;
+using namespace Credentials;
+
+struct CASESessionSerialized;
+
+struct CASESessionSerializable
+{
+    uint16_t mI2RR2IKeyLen;
+    uint8_t mI2RR2IKey[kAEADKeySize * 2];
+    uint8_t mPairingComplete;
+    uint64_t mLocalNodeId;
+    uint64_t mPeerNodeId;
+    uint16_t mLocalKeyId;
+    uint16_t mPeerKeyId;
+};
 
 class DLL_EXPORT CASESession
 {
@@ -60,7 +85,8 @@ public:
      *
      * @return CHIP_ERROR     The result of initialization
      */
-    CHIP_ERROR WaitForSessionEstablishment(NodeId myNodeId, uint16_t myKeyId, SessionEstablishmentDelegate * delegate);
+    CHIP_ERROR WaitForSessionEstablishment(const uint8_t * devOpCert, uint16_t devOpCertLen, P256SerializedKeypair & myDeviceOpKey,
+                                           NodeId myNodeId, uint16_t myKeyId, SessionEstablishmentDelegate * delegate);
 
     /**
      * @brief
@@ -74,7 +100,8 @@ public:
      *
      * @return CHIP_ERROR      The result of initialization
      */
-    CHIP_ERROR EstablishSession(const Transport::PeerAddress peerAddress, NodeId myNodeId, NodeId peerNodeId, uint16_t myKeyId,
+    CHIP_ERROR EstablishSession(const Transport::PeerAddress peerAddress, const uint8_t * devOpCert, uint16_t devOpCertLen,
+                                P256SerializedKeypair & myDeviceOpKeys, NodeId myNodeId, NodeId peerNodeId, uint16_t myKeyId,
                                 SessionEstablishmentDelegate * delegate);
 
     /**
@@ -86,7 +113,7 @@ public:
      *                    initialized once session establishment is complete
      * @return CHIP_ERROR The result of session derivation
      */
-    virtual CHIP_ERROR DeriveSecureSession(SecureSession & session);
+    virtual CHIP_ERROR DeriveSecureSession(const uint8_t * info, size_t info_len, SecureSession & session);
 
     /**
      * @brief
@@ -126,6 +153,30 @@ public:
 
     Transport::PeerConnectionState & PeerConnection() { return mConnectionState; }
 
+    /** @brief Serialize the Pairing Session to a string.
+     *
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    CHIP_ERROR Serialize(CASESessionSerialized & output);
+
+    /** @brief Deserialize the Pairing Session from the string.
+     *
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    CHIP_ERROR Deserialize(CASESessionSerialized & input);
+
+    /** @brief Serialize the CASESession to the given serializable data structure for secure pairing
+     *
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    CHIP_ERROR ToSerializable(CASESessionSerializable & output);
+
+    /** @brief Reconstruct secure pairing class from the serializable data structure.
+     *
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    CHIP_ERROR FromSerializable(const CASESessionSerializable & output);
+
 private:
     enum SigmaErrorType : uint8_t
     {
@@ -136,9 +187,16 @@ private:
         kUnexpected           = 0xff,
     };
 
+    CHIP_ERROR Init(const uint8_t * devOpCert, uint16_t devOpCertLen, P256SerializedKeypair & myDeviceOpKeys, NodeId myNodeId,
+                    uint16_t myKeyId, SessionEstablishmentDelegate * delegate);
+
     CHIP_ERROR SendSigmaR1();
     CHIP_ERROR HandleSigmaR1_and_SendSigmaR2(const PacketHeader & header, const System::PacketBufferHandle & msg);
+    CHIP_ERROR HandleSigmaR1(const PacketHeader & header, const System::PacketBufferHandle & msg);
+    CHIP_ERROR SendSigmaR2();
     CHIP_ERROR HandleSigmaR2_and_SendSigmaR3(const PacketHeader & header, const System::PacketBufferHandle & msg);
+    CHIP_ERROR HandleSigmaR2(const PacketHeader & header, const System::PacketBufferHandle & msg);
+    CHIP_ERROR SendSigmaR3();
     CHIP_ERROR HandleSigmaR3(const PacketHeader & header, const System::PacketBufferHandle & msg);
 
     CHIP_ERROR SendSigmaR1Resume();
@@ -155,6 +213,14 @@ private:
 
     Protocols::SecureChannel::MsgType mNextExpectedMsg = Protocols::SecureChannel::MsgType::CASE_SigmaErr;
 
+    Hash_SHA256_stream mCommissioningHash;
+    P256PublicKey mRemotePubKey;
+    P256Keypair mEphemeralKey;
+    P256Keypair mDeviceOpKeys;
+    const uint8_t * mDeviceOpCert;
+    uint16_t mDeviceOpCertLen;
+    P256ECDHDerivedSecret mSharedSecret;
+
     struct SigmaErrorMsg
     {
         SigmaErrorType error;
@@ -163,9 +229,19 @@ private:
 protected:
     NodeId mLocalNodeId = kUndefinedNodeId;
 
+    uint8_t mI2RR2IKey[kAEADKeySize * 2];
+
+    size_t mI2RR2IKeyLen = sizeof(mI2RR2IKey);
+
     bool mPairingComplete = false;
 
     Transport::PeerConnectionState mConnectionState;
 };
+
+typedef struct CASESessionSerialized
+{
+    // Extra uint64_t to account for padding bytes (NULL termination, and some decoding overheads)
+    uint8_t inner[BASE64_ENCODED_LEN(sizeof(CASESessionSerializable) + sizeof(uint64_t))];
+} CASESessionSerialized;
 
 } // namespace chip
