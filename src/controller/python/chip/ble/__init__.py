@@ -80,5 +80,5 @@ def GetAdapters():
 
 
 __all__ = [
-    'GetBleAdapters',
+    'GetAdapters',
 ]
