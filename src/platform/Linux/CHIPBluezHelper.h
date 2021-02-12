@@ -210,7 +210,7 @@ CHIP_ERROR ConnectDevice(BluezDevice1 * apDevice);
 /// Usage example:
 ///
 ///  AdapterIterator iterator;
-///  while (iteerator.Next()) {
+///  while (iterator.Next()) {
 ///      std::cout << iterator.GetAddress() << std::endl;
 ///  }
 class AdapterIterator
@@ -221,7 +221,7 @@ public:
     /// Moves to the next DBUS interface.
     ///
     /// MUST be called before any of the 'current value' methods are
-    /// being used (iterator gets initialized on the first call of Next).
+    /// used (iterator gets initialized on the first call of Next).
     bool Next();
 
     // Information about the current value. Save to call only after
