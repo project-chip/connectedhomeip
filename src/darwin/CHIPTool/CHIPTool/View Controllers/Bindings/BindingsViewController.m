@@ -133,7 +133,9 @@
 
 - (IBAction)bind:(id)sender
 {
-    int nodeId = [_nodeIDTextField.text intValue];
+    uint64_t nodeId;
+    NSScanner * scanner = [NSScanner scannerWithString:_nodeIDTextField.text];
+    [scanner scanUnsignedLongLong:&nodeId];
     int endpointId = [_endpointIDTextField.text intValue];
     int groupId = [_groupIDTextField.text intValue];
     int clusterId = [_clusterIDTextField.text intValue];

@@ -123,7 +123,7 @@ static NSString * const kErrorGetPairedDevice = @"Failure while trying to retrie
         _localDeviceId = _localDeviceId << 32 | arc4random();
         CHIP_LOG_ERROR("Assigned %llx node ID to the controller", _localDeviceId);
         _persistentStorageDelegateBridge->SetKeyValue(
-                                                      CHIP_COMMISSIONER_DEVICE_ID_KEY, [[NSString stringWithFormat:@"%llx", _localDeviceId] UTF8String]);
+            CHIP_COMMISSIONER_DEVICE_ID_KEY, [[NSString stringWithFormat:@"%llx", _localDeviceId] UTF8String]);
     } else {
         NSScanner * scanner = [NSScanner scannerWithString:[NSString stringWithUTF8String:deviceIdString]];
         [scanner scanHexLongLong:&_localDeviceId];
@@ -195,6 +195,8 @@ static NSString * const kErrorGetPairedDevice = @"Failure while trying to retrie
     [self.lock lock];
     _persistentStorageDelegateBridge->setFrameworkDelegate(delegate, queue);
     [self.lock unlock];
+    _persistentStorageDelegateBridge->SetKeyValue(
+        CHIP_COMMISSIONER_DEVICE_ID_KEY, [[NSString stringWithFormat:@"%llx", _localDeviceId] UTF8String]);
 }
 
 - (BOOL)checkForInitError:(BOOL)condition logMsg:(NSString *)logMsg
