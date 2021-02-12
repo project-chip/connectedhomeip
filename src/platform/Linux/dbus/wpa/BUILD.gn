@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
 
-import("${build_root}/chip/linux/gdbus_library.gni")
+import("${chip_root}/build/chip/linux/gdbus_library.gni")
 
 gdbus_library("wpa") {
   sources = [

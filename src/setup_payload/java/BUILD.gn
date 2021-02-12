@@ -15,8 +15,8 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
-import("${build_root}/chip/java/rules.gni")
 import("${build_root}/config/android_abi.gni")
+import("${chip_root}/build/chip/java/rules.gni")
 
 shared_library("jni") {
   output_name = "libSetupPayloadParser"
@@ -36,7 +36,7 @@ android_library("java") {
 
   data_deps = [
     ":jni",
-    "${build_root}/chip/java:shared_cpplib",
+    "${chip_root}/build/chip/java:shared_cpplib",
   ]
 
   sources = [
