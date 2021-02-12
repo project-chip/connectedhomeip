@@ -70,6 +70,7 @@
 	path = third_party/freertos/repo
 	url = https://github.com/FreeRTOS/FreeRTOS-Kernel.git
 	branch = V10.3.1-kernel-only
-[submodule "third_party/efr32_sdk/repo"]
+[submodule "efr32_sdk"]
 	path = third_party/efr32_sdk/repo
 	url = https://github.com/SiliconLabs/sdk_support.git
+	branch = master

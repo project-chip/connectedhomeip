@@ -1,45 +1,18 @@
-/*
- *
- *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2020 Texas Instruments Incorporated
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
+/* See Project CHIP LICENSE file for licensing information. */
 
-/**
- *    @file
- *          Provides implementations for the CHIP and LwIP logging functions
- *          for the Texas Instruments CC1352 platform. This uses one of the
- *          UARTs configured with SysConfig. Future implementations may use
- *          ITM.
- *
- */
+#include <platform/logging/LogV.h>
+
+#include <core/CHIPConfig.h>
+#include <platform/CHIPDeviceConfig.h>
 
 #include "ti_drivers_config.h"
-#include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <support/logging/CHIPLogging.h>
 
 #include <ti/drivers/UART.h>
 
 #include <stdio.h>
 
-using namespace ::chip;
-using namespace ::chip::DeviceLayer;
-using namespace ::chip::DeviceLayer::Internal;
-
-#define DEVICE_LAYER_LOG_BUFFER_SIZE (256)
 UART_Handle sDebugUartHandle;
-char sDebugUartBuffer[DEVICE_LAYER_LOG_BUFFER_SIZE];
+char sDebugUartBuffer[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
 
 extern "C" int cc13x2_26x2LogInit(void)
 {
@@ -89,8 +62,9 @@ void __attribute__((weak)) OnLogOutput(void) {}
 
 namespace chip {
 namespace Logging {
+namespace Platform {
 
-void LogV(uint8_t module, uint8_t category, const char * msg, va_list v)
+void LogV(const char * module, uint8_t category, const char * msg, va_list v)
 {
     (void) module;
     (void) category;
@@ -100,6 +74,7 @@ void LogV(uint8_t module, uint8_t category, const char * msg, va_list v)
     DeviceLayer::OnLogOutput();
 }
 
+} // namespace Platform
 } // namespace Logging
 } // namespace chip
 
@@ -148,4 +123,4 @@ extern "C" void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const ch
     DeviceLayer::OnLogOutput();
     va_end(v);
 }
-#endif
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD

@@ -113,7 +113,6 @@ try:
     
     if platform.system() == 'Linux':
         requiredPackages.append('dbus-python')
-        requiredPackages.append('six')
         requiredPackages.append('pygobject')
     
     #

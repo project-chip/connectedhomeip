@@ -215,6 +215,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       "${chip_root}/src/lib/core",
       "${chip_root}/src/lib/core:chip_config_header",
       "${chip_root}/src/lib/support",
+      "${chip_root}/src/platform/logging:headers",
       "${chip_root}/src/setup_payload",
       "${nlio_root}:nlio",
     ]
@@ -246,6 +247,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "cc13x2_26x2/PlatformManagerImpl.h",
         "cc13x2_26x2/SystemPlatformConfig.h",
       ]
+
       if (chip_enable_openthread) {
         public_deps += [
           "${chip_root}/third_party/ti_simplelink_sdk:mbedtls",
@@ -273,6 +275,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "Darwin/ConnectivityManagerImpl.cpp",
         "Darwin/ConnectivityManagerImpl.h",
         "Darwin/InetPlatformConfig.h",
+        "Darwin/Logging.cpp",
         "Darwin/PlatformManagerImpl.cpp",
         "Darwin/PlatformManagerImpl.h",
         "Darwin/PosixConfig.cpp",

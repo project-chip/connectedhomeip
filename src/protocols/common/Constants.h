@@ -73,5 +73,12 @@ enum class StatusCode
 };
 
 } // namespace Common
+
+template <>
+struct MessageTypeTraits<Common::MsgType>
+{
+    static constexpr uint16_t ProtocolId = chip::Protocols::kProtocol_Protocol_Common;
+};
+
 } // namespace Protocols
 } // namespace chip
