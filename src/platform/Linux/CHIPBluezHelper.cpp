@@ -53,6 +53,7 @@
 #include <ble/CHIPBleServiceData.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/Protocols.h>
+#include <support/CHIPMemString.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #include <errno.h>
@@ -72,6 +73,7 @@
 using namespace ::nl;
 using namespace chip::SetupPayloadData;
 using namespace chip::Protocols;
+using chip::Platform::CopyString;
 
 namespace chip {
 namespace DeviceLayer {
@@ -2010,8 +2012,15 @@ CHIP_ERROR ConnectDevice(BluezDevice1 * apDevice)
 
 AdapterIterator::~AdapterIterator()
 {
-    g_object_unref(mManager);
-    g_list_free_full(mObjectList, g_object_unref);
+    if (mManager != nullptr)
+    {
+        g_object_unref(mManager);
+    }
+
+    if (mObjectList != nullptr)
+    {
+        g_list_free_full(mObjectList, g_object_unref);
+    }
 }
 
 void AdapterIterator::Initialize()
@@ -2036,13 +2045,6 @@ exit:
     }
 }
 
-template <size_t N>
-void safeNullTerminatedCopy(char (&dest)[N], const char * src)
-{
-    strncpy(dest, src, N);
-    dest[N - 1] = 0;
-}
-
 void AdapterIterator::Advance()
 {
     if (mCurrentListItem == nullptr)
@@ -2050,48 +2052,37 @@ void AdapterIterator::Advance()
         return;
     }
 
-    bool foundAdapter = false;
-
-    while (!foundAdapter && (mCurrentListItem != nullptr))
+    while (mCurrentListItem != nullptr)
     {
+        BluezAdapter1 * adapter = bluez_object_get_adapter1(BLUEZ_OBJECT(mCurrentListItem->data));
 
-        BluezObject * object = BLUEZ_OBJECT(mCurrentListItem->data);
-        GList * interfaces   = g_dbus_object_get_interfaces(G_DBUS_OBJECT(object));
-
-        for (GList * it = interfaces; it != nullptr; it = it->next)
+        if (adapter == nullptr)
         {
-            if (!BLUEZ_IS_ADAPTER1(it->data))
-            {
-                continue;
-            }
-
-            BluezAdapter1 * adapter = BLUEZ_ADAPTER1(it->data);
-
-            // PATH is of the for  BLUEZ_PATH / hci<nr>, i.e. like
-            // '/org/bluez/hci0'
-            // Index represents the number after hci
-            const char * path = g_dbus_proxy_get_object_path(G_DBUS_PROXY(adapter));
-            unsigned index    = 0;
-
-            if (sscanf(path, BLUEZ_PATH "/hci%u", &index) != 1)
-            {
-                ChipLogError(DeviceLayer, "Failed to extract HCI index from '%s'", path);
-                index = 0;
-            }
-
-            mCurrent.index = index;
-            safeNullTerminatedCopy(mCurrent.address, bluez_adapter1_get_address(adapter));
-            safeNullTerminatedCopy(mCurrent.alias, bluez_adapter1_get_alias(adapter));
-            safeNullTerminatedCopy(mCurrent.name, bluez_adapter1_get_name(adapter));
-            mCurrent.powered = bluez_adapter1_get_powered(adapter);
-
-            foundAdapter = true;
-            break;
+            mCurrentListItem = mCurrentListItem->next;
         }
 
-        g_list_free_full(interfaces, g_object_unref);
-        mCurrentListItem = mCurrentListItem->next;
+        // PATH is of the for  BLUEZ_PATH / hci<nr>, i.e. like
+        // '/org/bluez/hci0'
+        // Index represents the number after hci
+        const char * path = g_dbus_proxy_get_object_path(G_DBUS_PROXY(adapter));
+        unsigned index    = 0;
+
+        if (sscanf(path, BLUEZ_PATH "/hci%u", &index) != 1)
+        {
+            ChipLogError(DeviceLayer, "Failed to extract HCI index from '%s'", path);
+            index = 0;
+        }
+
+        mCurrent.index = index;
+        CopyString(mCurrent.address, bluez_adapter1_get_address(adapter));
+        CopyString(mCurrent.alias, bluez_adapter1_get_alias(adapter));
+        CopyString(mCurrent.name, bluez_adapter1_get_name(adapter));
+        mCurrent.powered = bluez_adapter1_get_powered(adapter);
+
+        return true;
     }
+
+    return false;
 }
 
 bool AdapterIterator::Next()
@@ -2101,9 +2092,7 @@ bool AdapterIterator::Next()
         Initialize();
     }
 
-    Advance();
-
-    return (mCurrentListItem != nullptr);
+    return Advance();
 }
 
 } // namespace Internal

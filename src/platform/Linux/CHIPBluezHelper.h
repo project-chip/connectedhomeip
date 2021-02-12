@@ -220,10 +220,12 @@ public:
 
     /// Moves to the next DBUS interface.
     ///
-    /// MUST be called at least once
+    /// MUST be called before any of the 'current value' methods are
+    /// being used (iterator gets initialized on the first call of Next).
     bool Next();
 
-    // information about the current value
+    // Information about the current value. Save to call only after
+    // "Next" has returned true.
     uint32_t GetIndex() const { return mCurrent.index; }
     const char * GetAddress() const { return mCurrent.address; }
     const char * GetAlias() const { return mCurrent.alias; }
@@ -234,8 +236,11 @@ private:
     /// Sets up the DBUS manager and loads the list
     void Initialize();
 
-    /// Loads the next value in the list
-    void Advance();
+    /// Loads the next value in the list.
+    ///
+    /// Returns true if a value could be loaded, false if no more items to
+    /// iterate through.
+    bool Advance();
 
     static constexpr size_t kMaxAddressLength = 19; // xx:xx:xx:xx:xx:xx
     static constexpr size_t kMaxNameLength    = 64;
