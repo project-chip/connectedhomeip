@@ -357,9 +357,8 @@
 // MARK: CHIPDevicePairingDelegate
 - (void)onNetworkCredentialsRequested:(CHIPNetworkCredentialType)type
 {
-    NSLog(@"Network credential requested for pairing for type %lu", (unsigned long)type);
-    if (type == kNetworkCredentialTypeWiFi)
-    {
+    NSLog(@"Network credential requested for pairing for type %lu", (unsigned long) type);
+    if (type == kNetworkCredentialTypeWiFi) {
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, DISPATCH_TIME_NOW), dispatch_get_main_queue(), ^{
             [self retrieveAndSendWifiCredentials];
         });
@@ -504,7 +503,8 @@
                                                  }
                                                  NSLog(@"New SSID: %@ Password: %@", networkSSID.text, networkPassword.text);
 
-                                                 [strongSelf.chipController sendWiFiCredentials:networkSSID.text password:networkPassword.text];
+                                                 [strongSelf.chipController sendWiFiCredentials:networkSSID.text
+                                                                                       password:networkPassword.text];
                                              }
                                          }]];
     [self presentViewController:alertController animated:YES completion:nil];

@@ -21,8 +21,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-class CHIPDevicePairingDelegateBridge : public chip::Controller::DevicePairingDelegate
-{
+class CHIPDevicePairingDelegateBridge : public chip::Controller::DevicePairingDelegate {
 public:
     CHIPDevicePairingDelegateBridge();
     ~CHIPDevicePairingDelegateBridge();
@@ -37,8 +36,8 @@ public:
 
     void OnNetworkCredentialsRequested(chip::RendezvousDeviceCredentialsDelegate * callback) override;
 
-    void OnOperationalCredentialsRequested(const char * csr, size_t csr_length,
-                                           chip::RendezvousDeviceCredentialsDelegate * callback) override;
+    void OnOperationalCredentialsRequested(
+        const char * csr, size_t csr_length, chip::RendezvousDeviceCredentialsDelegate * callback) override;
 
     void OnPairingComplete(CHIP_ERROR error) override;
 
