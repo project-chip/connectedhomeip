@@ -89,9 +89,8 @@ CHIP_ERROR AdditionalDataPayloadGenerator::generateRotatingDeviceId(uint16_t lif
     BufferWriter outputBufferWriter(outputBuffer, ArraySize(outputBuffer));
     size_t rotatingDeviceIdBufferIndex = 0;
     uint8_t lifetimeCounterBuffer[2];
-    uint8_t * tempLifetimeCounterBuffer = lifetimeCounterBuffer;
 
-    Write16(tempLifetimeCounterBuffer, lifetimeCounter);
+    Put16(lifetimeCounterBuffer, lifetimeCounter);
 
     VerifyOrExit(rotatingDeviceIdBufferSize >= RotatingDeviceId::kRotatingDeviceIdHexMaxLength, err = CHIP_ERROR_BUFFER_TOO_SMALL);
 
