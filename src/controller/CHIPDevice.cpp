@@ -130,7 +130,7 @@ CHIP_ERROR Device::SendCommands()
     bool loadedSecureSession = false;
     ReturnErrorOnFailure(LoadSecureSessionParametersIfNeeded(loadedSecureSession));
     VerifyOrReturnError(mCommandSender != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    return mCommandSender->SendCommandRequest(mDeviceId);
+    return mCommandSender->SendCommandRequest(mDeviceId, mAdminId);
 }
 
 CHIP_ERROR Device::SendMessage(System::PacketBufferHandle buffer)
