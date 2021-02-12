@@ -120,7 +120,7 @@ CHIP_ERROR SendCommandRequest(void)
     err = gpCommandSender->AddCommand(CommandParams);
     SuccessOrExit(err);
 
-    err = gpCommandSender->SendCommandRequest(chip::kTestDeviceNodeId);
+    err = gpCommandSender->SendCommandRequest(chip::kTestDeviceNodeId, gAdminId);
     SuccessOrExit(err);
 
     if (err == CHIP_NO_ERROR)

@@ -340,7 +340,7 @@ void SecureSessionMgr::HandleConnectionExpired(const Transport::PeerConnectionSt
 
     if (mCB != nullptr)
     {
-        mCB->OnConnectionExpired({ state.GetPeerNodeId(), state.GetPeerKeyID() }, this);
+        mCB->OnConnectionExpired({ state.GetPeerNodeId(), state.GetPeerKeyID(), state.GetAdminId() }, this);
     }
 
     mTransportMgr->Disconnect(state.GetPeerAddress());
