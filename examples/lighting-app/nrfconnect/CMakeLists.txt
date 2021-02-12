@@ -104,6 +104,7 @@ target_include_directories(app PRIVATE
 
 target_link_libraries(app PRIVATE
   pigweed_lighting_protolib.nanopb_rpc
+  pw_checksum
   pw_hdlc
   pw_log
   pw_rpc.server
