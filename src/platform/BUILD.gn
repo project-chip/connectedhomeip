@@ -438,8 +438,11 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "Linux/PosixConfig.h",
         "Linux/SystemPlatformConfig.h",
         "Linux/SystemTimeSupport.cpp",
+        "Linux/bluez/AdapterIterator.cpp",
+        "Linux/bluez/AdapterIterator.h",
         "Linux/bluez/Helper.cpp",
         "Linux/bluez/Helper.h",
+        "Linux/bluez/Types.h",
       ]
 
       if (chip_enable_mdns) {
