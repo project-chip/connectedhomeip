@@ -244,12 +244,13 @@ public:
      * @param[in] useToken        Generate an onboarding token and send it to the device. The device must
      *                            use the provided onboarding token instead of the original pairing setup PIN
      *                            and discriminator.
-     * @param[in] discriminator   The discriminator that the device should use for advertising and pairing.
+     * @param[in] randomSetupPIN  If true, generate a random setup PIN while opening the pairing window
+     *                            else, use the setup PIN from the setupPayload.
      * @param[out] setupPayload   The setup payload corresponding to the generated onboarding token.
      *
      * @return CHIP_ERROR               CHIP_NO_ERROR on success, or corresponding error
      */
-    CHIP_ERROR OpenPairingWindow(uint32_t timeout, bool useToken, uint16_t discriminator, SetupPayload & setupPayload);
+    CHIP_ERROR OpenPairingWindow(uint32_t timeout, bool useToken, bool randomSetupPIN, SetupPayload & setupPayload);
 
     /**
      * @brief

@@ -20,6 +20,7 @@
 // local imports
 #import "CHIPUIViewUtils.h"
 #import "DefaultsUtils.h"
+#import "DeviceSelector.h"
 #import <CHIP/CHIP.h>
 
 // system imports
@@ -68,9 +69,10 @@
 @property (strong, nonatomic) UILabel * errorLabel;
 
 @property (readwrite) CHIPDeviceController * chipController;
-@property (readonly) CHIPToolPersistentStorageDelegate * persistentStorage;
 
 @property (strong, nonatomic) NFCNDEFReaderSession * session;
+@property (strong, nonatomic) CHIPSetupPayload * setupPayload;
+@property (strong, nonatomic) DeviceSelector * deviceList;
 @end
 
 @implementation QRCodeViewController {
@@ -147,6 +149,17 @@
     [_nfcScanButton.leadingAnchor constraintEqualToAnchor:stackView.leadingAnchor].active = YES;
     [_nfcScanButton.trailingAnchor constraintEqualToAnchor:stackView.trailingAnchor].active = YES;
     [_nfcScanButton.heightAnchor constraintEqualToConstant:40].active = YES;
+
+    _deviceList = [DeviceSelector new];
+    [_deviceList setEnabled:NO];
+
+    UILabel * deviceIDLabel = [UILabel new];
+    deviceIDLabel.text = @"Paired Devices:";
+    UIView * deviceIDView = [CHIPUIViewUtils viewWithLabel:deviceIDLabel textField:_deviceList];
+    [stackView addArrangedSubview:deviceIDView];
+
+    deviceIDView.translatesAutoresizingMaskIntoConstraints = false;
+    [deviceIDView.trailingAnchor constraintEqualToAnchor:stackView.trailingAnchor].active = true;
 
     // Results view
     _setupPayloadView = [UIView new];
@@ -289,12 +302,9 @@
     [super viewDidLoad];
     [self setupUI];
 
-    _persistentStorage = [[CHIPToolPersistentStorageDelegate alloc] init];
-
     dispatch_queue_t callbackQueue = dispatch_queue_create("com.zigbee.chip.qrcodevc.callback", DISPATCH_QUEUE_SERIAL);
-    self.chipController = [CHIPDeviceController sharedController];
+    self.chipController = InitializeCHIP();
     [self.chipController setPairingDelegate:self queue:callbackQueue];
-    [self.chipController setPersistentStorageDelegate:_persistentStorage queue:callbackQueue];
 
     UITapGestureRecognizer * tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dismissKeyboard)];
     [self.view addGestureRecognizer:tap];
@@ -365,6 +375,13 @@
     } else {
         NSLog(@"Unsupported credentials requested");
     }
+}
+
+- (void)onPairingComplete:(NSError *)error
+{
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, DISPATCH_TIME_NOW), dispatch_get_main_queue(), ^{
+        [self->_deviceList refreshDeviceList];
+    });
 }
 
 // MARK: UI Helper methods
@@ -669,12 +686,12 @@
     });
     CHIPQRCodeSetupPayloadParser * parser = [[CHIPQRCodeSetupPayloadParser alloc] initWithBase41Representation:qrCode];
     NSError * error;
-    CHIPSetupPayload * payload = [parser populatePayload:&error];
+    _setupPayload = [parser populatePayload:&error];
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1.0 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
         [self postScanningQRCodeState];
 
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, INDICATOR_DELAY), dispatch_get_main_queue(), ^{
-            [self displayQRCodeInSetupPayloadView:payload withError:error];
+            [self displayQRCodeInSetupPayloadView:self->_setupPayload withError:error];
         });
     });
 }
@@ -743,9 +760,9 @@
     CHIPManualSetupPayloadParser * parser =
         [[CHIPManualSetupPayloadParser alloc] initWithDecimalStringRepresentation:decimalString];
     NSError * error;
-    CHIPSetupPayload * payload = [parser populatePayload:&error];
+    _setupPayload = [parser populatePayload:&error];
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, INDICATOR_DELAY), dispatch_get_main_queue(), ^{
-        [self displayManualCodeInSetupPayloadView:payload decimalString:decimalString withError:error];
+        [self displayManualCodeInSetupPayloadView:self->_setupPayload decimalString:decimalString withError:error];
     });
     [_manualCodeTextField resignFirstResponder];
 }
