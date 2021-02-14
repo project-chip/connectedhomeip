@@ -403,7 +403,8 @@ void RendezvousSession::InitPairingSessionHandle()
 {
     ReleasePairingSessionHandle();
     mPairingSessionHandle = chip::Platform::New<SecureSessionHandle>(mPairingSession.PeerConnection().GetPeerNodeId(),
-                                                                     mPairingSession.PeerConnection().GetPeerKeyID());
+                                                                     mPairingSession.PeerConnection().GetPeerKeyID(),
+                                                                     mPairingSession.PeerConnection().GetAdminId());
 }
 
 void RendezvousSession::ReleasePairingSessionHandle()

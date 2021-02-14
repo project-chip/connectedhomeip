@@ -56,6 +56,7 @@ public:
 
     static constexpr uint16_t GetLocalKeyId() { return 1; }
     static constexpr uint16_t GetPeerKeyId() { return 2; }
+    static constexpr uint16_t GetAdminId() { return 0; }
 
     SecureSessionMgr & GetSecureSessionManager() { return mSecureSessionMgr; }
     Messaging::ExchangeManager & GetExchangeManager() { return mExchangeManager; }

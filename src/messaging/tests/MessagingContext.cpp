@@ -55,13 +55,13 @@ CHIP_ERROR MessagingContext::Shutdown()
 Messaging::ExchangeContext * MessagingContext::NewExchangeToPeer(Messaging::ExchangeDelegate * delegate)
 {
     // TODO: temprary create a SecureSessionHandle from node id, will be fix in PR 3602
-    return mExchangeManager.NewContext({ GetDestinationNodeId(), GetPeerKeyId() }, delegate);
+    return mExchangeManager.NewContext({ GetDestinationNodeId(), GetPeerKeyId(), GetAdminId() }, delegate);
 }
 
 Messaging::ExchangeContext * MessagingContext::NewExchangeToLocal(Messaging::ExchangeDelegate * delegate)
 {
     // TODO: temprary create a SecureSessionHandle from node id, will be fix in PR 3602
-    return mExchangeManager.NewContext({ GetSourceNodeId(), GetLocalKeyId() }, delegate);
+    return mExchangeManager.NewContext({ GetSourceNodeId(), GetLocalKeyId(), GetAdminId() }, delegate);
 }
 
 } // namespace Test

@@ -242,14 +242,3 @@ int TestPASESession()
 }
 
 CHIP_REGISTER_TEST_SUITE(TestPASESession)
-
-namespace chip {
-namespace Logging {
-void LogV(uint8_t module, uint8_t category, const char * format, va_list argptr)
-{
-    (void) module, (void) category;
-    vfprintf(stderr, format, argptr);
-    fprintf(stderr, "\n");
-}
-} // namespace Logging
-} // namespace chip

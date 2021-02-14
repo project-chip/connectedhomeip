@@ -29,14 +29,6 @@
 #include <support/CodeUtils.h>
 #include <support/DLLUtil.h>
 
-#if CHIP_LOGGING_STYLE_ANDROID && defined(__ANDROID__)
-#include <android/log.h>
-#endif
-
-#if HAVE_SYS_TIME_H && CHIP_LOGGING_STYLE_STDIO_WITH_TIMESTAMPS
-#include <sys/time.h>
-#endif // HAVE_SYS_TIME_H && CHIP_LOGGING_STYLE_STDIO_WITH_TIMESTAMPS
-
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
@@ -94,61 +86,12 @@ static const char ModuleNames[] = "-\0\0" // None
 
 #define ModuleNamesCount ((sizeof(ModuleNames) - 1) / chip::Logging::kMaxModuleNameLen)
 
-#define chipPrefix "CHIP:"
-#define chipPrefixSeparator ": "
-#define chipMessageTrailer "\n"
-
 void GetModuleName(char * buf, uint8_t bufSize, uint8_t module)
 {
     const char * moduleNamePtr = ModuleNames + ((module < ModuleNamesCount) ? module * chip::Logging::kMaxModuleNameLen : 0);
 
     snprintf(buf, bufSize, "%s", moduleNamePtr);
     buf[chip::Logging::kMaxModuleNameLen] = 0;
-}
-
-void GetMessageWithPrefix(char * buf, uint8_t bufSize, uint8_t module, const char * msg)
-{
-    char moduleName[chip::Logging::kMaxModuleNameLen + 1];
-
-    GetModuleName(moduleName, sizeof(moduleName), module);
-    snprintf(buf, bufSize, chipPrefix "%s" chipPrefixSeparator "%s" chipMessageTrailer, moduleName, msg);
-}
-
-void PrintMessagePrefix(uint8_t module)
-{
-    char moduleName[chip::Logging::kMaxModuleNameLen + 1];
-    GetModuleName(moduleName, sizeof(moduleName), module);
-
-#if CHIP_LOGGING_STYLE_STDIO_WITH_TIMESTAMPS
-    struct timeval tv;
-    struct tm * time_ptr;
-    char detailed_time[30];
-    int64_t milliseconds;
-    int status;
-
-    status = gettimeofday(&tv, NULL);
-    VerifyOrExit(status == 0, perror("gettimeofday"));
-
-    time_ptr = localtime(&tv.tv_sec);
-    VerifyOrExit(time_ptr != NULL, status = -1; perror("localtime"));
-
-    status = strftime(detailed_time, sizeof(detailed_time), "%F %T%z", time_ptr);
-    VerifyOrExit(status >= 0, perror("strftime"));
-
-    milliseconds = tv.tv_usec / 1000;
-    printf("%s.%03ld " chipPrefix "%s: ", detailed_time, milliseconds, moduleName);
-
-exit:
-    if (status < 0)
-    {
-        printf("\?\?\?\?-\?\?-\?\? \?\?:\?\?:\?\?.\?\?\?+\?\?\?\?" chipPrefix "%s: ", moduleName);
-    }
-
-#else // !CHIP_LOGGING_STYLE_STDIO_WITH_TIMESTAMPS
-
-    printf(chipPrefix "%s: ", moduleName);
-
-#endif // CHIP_LOGGING_STYLE_STDIO_WITH_TIMESTAMPS
 }
 
 /**
@@ -175,13 +118,23 @@ exit:
  */
 DLL_EXPORT void Log(uint8_t module, uint8_t category, const char * msg, ...)
 {
+
     va_list v;
-
     va_start(v, msg);
-
     LogV(module, category, msg, v);
-
     va_end(v);
+}
+
+void LogV(uint8_t module, uint8_t category, const char * msg, va_list args)
+{
+    if (!IsCategoryEnabled(category))
+    {
+        return;
+    }
+
+    char moduleName[chip::Logging::kMaxModuleNameLen + 1];
+    GetModuleName(moduleName, sizeof(moduleName), module);
+    Platform::LogV(moduleName, category, msg, args);
 }
 
 #if CHIP_LOG_FILTERING

@@ -20,6 +20,7 @@ static_library("messaging") {
   sources = [
     "ErrorCategory.cpp",
     "ErrorCategory.h",
+    "ExchangeACL.h",
     "ExchangeContext.cpp",
     "ExchangeContext.h",
     "ExchangeDelegate.h",

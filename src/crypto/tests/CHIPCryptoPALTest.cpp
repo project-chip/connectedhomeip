@@ -1355,16 +1355,6 @@ static void TestSPAKE2P_RFC(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, numOfTestsRan == numOfTestVectors);
 }
 
-namespace chip {
-namespace Logging {
-void __attribute__((weak)) LogV(uint8_t module, uint8_t category, const char * format, va_list argptr)
-{
-    (void) module, (void) category;
-    vfprintf(stderr, format, argptr);
-}
-} // namespace Logging
-} // namespace chip
-
 /**
  *   Test Suite. It lists all the test functions.
  */

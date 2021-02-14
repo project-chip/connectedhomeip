@@ -112,7 +112,7 @@
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 3 } },      /* Level Control (server): cluster revision */             \
             { 0x0000, ZAP_TYPE(INT8U), 1, 0, { (uint8_t *) 0x00 } },    /* Level Control (server): current level */                \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 3 } },      /* Door Lock (server): cluster revision */                 \
-            { 0x0000, ZAP_TYPE(ENUM8), 1, 0, { (uint8_t *) 0 } },       /* Door Lock (server): lock state */                       \
+            { 0x0000, ZAP_TYPE(ENUM8), 1, 0, { (uint8_t *) 2 } },       /* Door Lock (server): lock state */                       \
             { 0x0001, ZAP_TYPE(ENUM8), 1, 0, { (uint8_t *) 0 } },       /* Door Lock (server): lock type */                        \
             { 0x0002, ZAP_TYPE(BOOLEAN), 1, 0, { (uint8_t *) 0 } },     /* Door Lock (server): actuator enabled */                 \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 0x0001 } }, /* Barrier Control (server): cluster revision */           \

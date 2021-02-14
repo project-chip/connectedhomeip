@@ -355,12 +355,16 @@
 }
 
 // MARK: CHIPDevicePairingDelegate
-- (void)onNetworkCredentialsRequested:(SendNetworkCredentials)handler
+- (void)onNetworkCredentialsRequested:(CHIPNetworkCredentialType)type
 {
-    NSLog(@"Network credential requested for pairing");
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, DISPATCH_TIME_NOW), dispatch_get_main_queue(), ^{
-        [self retrieveAndSendWifiCredentialsUsing:handler];
-    });
+    NSLog(@"Network credential requested for pairing for type %lu", (unsigned long) type);
+    if (type == kNetworkCredentialTypeWiFi) {
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, DISPATCH_TIME_NOW), dispatch_get_main_queue(), ^{
+            [self retrieveAndSendWifiCredentials];
+        });
+    } else {
+        NSLog(@"Unsupported credentials requested");
+    }
 }
 
 // MARK: UI Helper methods
@@ -445,7 +449,7 @@
     [self handleRendezVous:payload];
 }
 
-- (void)retrieveAndSendWifiCredentialsUsing:(SendNetworkCredentials)sendCredentials
+- (void)retrieveAndSendWifiCredentials
 {
     UIAlertController * alertController =
         [UIAlertController alertControllerWithTitle:@"Wifi Configuration"
@@ -499,7 +503,8 @@
                                                  }
                                                  NSLog(@"New SSID: %@ Password: %@", networkSSID.text, networkPassword.text);
 
-                                                 sendCredentials(networkSSID.text, networkPassword.text);
+                                                 [strongSelf.chipController sendWiFiCredentials:networkSSID.text
+                                                                                       password:networkPassword.text];
                                              }
                                          }]];
     [self presentViewController:alertController animated:YES completion:nil];

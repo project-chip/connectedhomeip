@@ -213,6 +213,27 @@ void CheckResendMessage(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, gSendMessageCount == 3);
 }
 
+void CheckSendStandaloneAckMessage(nlTestSuite * inSuite, void * inContext)
+{
+    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+
+    ctx.GetInetLayer().SystemLayer()->Init(nullptr);
+
+    MockAppDelegate mockAppDelegate;
+    ExchangeContext * exchange = ctx.NewExchangeToPeer(&mockAppDelegate);
+    NL_TEST_ASSERT(inSuite, exchange != nullptr);
+
+    ReliableMessageMgr * rm     = ctx.GetExchangeManager().GetReliableMessageMgr();
+    ReliableMessageContext * rc = exchange->GetReliableMessageContext();
+    NL_TEST_ASSERT(inSuite, rm != nullptr);
+    NL_TEST_ASSERT(inSuite, rc != nullptr);
+
+    ReliableMessageDelegateObject delegate;
+    rc->SetDelegate(&delegate);
+
+    NL_TEST_ASSERT(inSuite, rc->SendStandaloneAckMessage() == CHIP_NO_ERROR);
+}
+
 // Test Suite
 
 /**
@@ -224,6 +245,7 @@ const nlTest sTests[] =
     NL_TEST_DEF("Test ReliableMessageMgr::CheckAddClearRetrans", CheckAddClearRetrans),
     NL_TEST_DEF("Test ReliableMessageMgr::CheckFailRetrans", CheckFailRetrans),
     NL_TEST_DEF("Test ReliableMessageMgr::CheckResendMessage", CheckResendMessage),
+    NL_TEST_DEF("Test ReliableMessageMgr::CheckSendStandaloneAckMessage", CheckSendStandaloneAckMessage),
 
     NL_TEST_SENTINEL()
 };

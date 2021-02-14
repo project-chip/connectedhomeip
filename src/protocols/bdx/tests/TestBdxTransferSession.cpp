@@ -106,8 +106,7 @@ void VerifyBdxMessageType(nlTestSuite * inSuite, void * inContext, const System:
 
     err = payloadHeader.Decode(msg->Start(), msg->DataLength(), &headerSize);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, payloadHeader.GetProtocolID() == Protocols::kProtocol_BDX);
-    NL_TEST_ASSERT(inSuite, payloadHeader.GetMessageType() == expected);
+    NL_TEST_ASSERT(inSuite, payloadHeader.HasMessageType(expected));
 }
 
 // Helper method for verifying that a PacketBufferHandle contains a valid StatusReport message and contains a specific StatusCode.
@@ -136,8 +135,8 @@ void VerifyStatusReport(nlTestSuite * inSuite, void * inContext, const System::P
         return;
     }
 
-    Encoding::LittleEndian::Reader reader(msg->Start() + headerSize, static_cast<uint16_t>(msg->DataLength() - headerSize));
-    err = reader.Read16(&generalCode).Read32(&protocolId).Read16(&protocolCode).StatusCode();
+    Encoding::LittleEndian::Reader reader(msg->Start(), msg->DataLength());
+    err = reader.Skip(headerSize).Read16(&generalCode).Read32(&protocolId).Read16(&protocolCode).StatusCode();
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, generalCode == static_cast<uint16_t>(Protocols::Common::StatusCode::Failure));
     NL_TEST_ASSERT(inSuite, protocolId == Protocols::kProtocol_BDX);
@@ -160,7 +159,7 @@ void SendAndVerifyTransferInit(nlTestSuite * inSuite, void * inContext, Transfer
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;
     TransferRole responderRole  = (initiatorRole == kRole_Sender) ? kRole_Receiver : kRole_Sender;
-    MessageType expectedInitMsg = (initiatorRole == kRole_Sender) ? kBdxMsg_SendInit : kBdxMsg_ReceiveInit;
+    MessageType expectedInitMsg = (initiatorRole == kRole_Sender) ? MessageType::SendInit : MessageType::ReceiveInit;
 
     // Initializer responder to wait for transfer
     err = responder.WaitForTransfer(responderRole, responderControlOpts, responderMaxBlock, timeoutMs);
@@ -224,7 +223,7 @@ void SendAndVerifyAcceptMsg(nlTestSuite * inSuite, void * inContext, TransferSes
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // If the node sending the Accept message is also the one that will send Blocks, then this should be a ReceiveAccept message.
-    MessageType expectedMsg = (acceptSenderRole == kRole_Sender) ? kBdxMsg_ReceiveAccept : kBdxMsg_SendAccept;
+    MessageType expectedMsg = (acceptSenderRole == kRole_Sender) ? MessageType::ReceiveAccept : MessageType::SendAccept;
 
     err = acceptSender.AcceptTransfer(acceptData);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -279,7 +278,7 @@ void SendAndVerifyQuery(nlTestSuite * inSuite, void * inContext, TransferSession
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     querySender.PollOutput(outEvent, kNoAdvanceTime);
     NL_TEST_ASSERT(inSuite, outEvent.EventType == TransferSession::kMsgToSend);
-    VerifyBdxMessageType(inSuite, inContext, outEvent.MsgData, kBdxMsg_BlockQuery);
+    VerifyBdxMessageType(inSuite, inContext, outEvent.MsgData, MessageType::BlockQuery);
     VerifyNoMoreOutput(inSuite, inContext, querySender);
 
     // Pass BlockQuery to queryReceiver and verify queryReceiver emits QueryReceived event
@@ -315,7 +314,7 @@ void SendAndVerifyArbitraryBlock(nlTestSuite * inSuite, void * inContext, Transf
     blockData.Length = maxBlockSize;
     blockData.IsEof  = isEof;
 
-    MessageType expected = isEof ? kBdxMsg_BlockEOF : kBdxMsg_Block;
+    MessageType expected = isEof ? MessageType::BlockEOF : MessageType::Block;
 
     // Provide Block data and verify sender emits Block message
     err = sender.PrepareBlock(blockData);
@@ -344,7 +343,7 @@ void SendAndVerifyBlockAck(nlTestSuite * inSuite, void * inContext, TransferSess
 {
     TransferSession::OutputEventType expectedEventType =
         expectEOF ? TransferSession::kAckEOFReceived : TransferSession::kAckReceived;
-    MessageType expectedMsgType = expectEOF ? kBdxMsg_BlockAckEOF : kBdxMsg_BlockAck;
+    MessageType expectedMsgType = expectEOF ? MessageType::BlockAckEOF : MessageType::BlockAck;
 
     // Verify PrepareBlockAck() outputs message to send
     CHIP_ERROR err = ackSender.PrepareBlockAck();
@@ -618,7 +617,7 @@ void TestTimeout(nlTestSuite * inSuite, void * inContext)
     // First PollOutput() should output the TransferInit message
     initiator.PollOutput(outEvent, startTimeMs);
     NL_TEST_ASSERT(inSuite, outEvent.EventType == TransferSession::kMsgToSend);
-    MessageType expectedInitMsg = (role == kRole_Sender) ? kBdxMsg_SendInit : kBdxMsg_ReceiveInit;
+    MessageType expectedInitMsg = (role == kRole_Sender) ? MessageType::SendInit : MessageType::ReceiveInit;
     VerifyBdxMessageType(inSuite, inContext, outEvent.MsgData, expectedInitMsg);
 
     // Second PollOutput() with no call to HandleMessageReceived() should result in a timeout.
@@ -687,7 +686,7 @@ void TestDuplicateBlockError(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     respondingSender.PollOutput(eventWithBlock, kNoAdvanceTime);
     NL_TEST_ASSERT(inSuite, eventWithBlock.EventType == TransferSession::kMsgToSend);
-    VerifyBdxMessageType(inSuite, inContext, eventWithBlock.MsgData, kBdxMsg_Block);
+    VerifyBdxMessageType(inSuite, inContext, eventWithBlock.MsgData, MessageType::Block);
     VerifyNoMoreOutput(inSuite, inContext, respondingSender);
     System::PacketBufferHandle blockCopy =
         System::PacketBufferHandle::NewWithData(eventWithBlock.MsgData->Start(), eventWithBlock.MsgData->DataLength());

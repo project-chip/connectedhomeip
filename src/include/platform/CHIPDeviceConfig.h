@@ -92,15 +92,6 @@
 #endif
 
 /**
- * CHIP_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE
- *
- * The maximum size (in bytes) of a debug logging message.
- */
-#ifndef CHIP_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE
-#define CHIP_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE 256
-#endif
-
-/**
  * CHIP_DEVICE_CONFIG_ENABLE_FACTORY_PROVISIONING
  *
  * Enable the device factory provisioning feature.
@@ -374,6 +365,16 @@
  */
 #ifndef CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART
 #define CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART 1
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_ENABLE_PAIRING_AUTOSTART
+ *
+ * Enable opening pairing window automatically after device power-up.
+ *
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_PAIRING_AUTOSTART
+#define CHIP_DEVICE_CONFIG_ENABLE_PAIRING_AUTOSTART 1
 #endif
 
 /**

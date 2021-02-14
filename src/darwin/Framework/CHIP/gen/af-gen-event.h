@@ -45,10 +45,4 @@
 #define EMBER_AF_GENERATED_EVENTS
 #define EMBER_AF_GENERATED_EVENT_STRINGS
 
-// The length of the event context table used to track and retrieve cluster events
-#define EMBER_AF_EVENT_CONTEXT_LENGTH 4
-
-// EmberAfEventContext structs used to populate the EmberAfEventContext table
-#define EMBER_AF_GENERATED_EVENT_CONTEXT
-
 #endif // __AF_GEN_EVENT__

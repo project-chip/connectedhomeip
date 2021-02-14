@@ -58,6 +58,15 @@ inline char * CopyString(char * dest, const char * source, size_t length)
 }
 
 /**
+ * Convenience method for CopyString to auto-detect destination size.
+ */
+template <size_t N>
+inline char * CopyString(char (&dest)[N], const char * source)
+{
+    return CopyString(dest, source, N);
+}
+
+/**
  * This function copies a C-style string to memory newly allocated by Platform::MemoryAlloc().
  *
  * @param[in]  string           String to be copied.

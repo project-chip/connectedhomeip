@@ -27,6 +27,8 @@ find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
 
 project(chip-nrf52840-lighting-example)
 
+target_compile_options(app PRIVATE -Werror)
+
 target_include_directories(app PRIVATE
                            main/include
                            ${LIGHTING_COMMON}
@@ -102,6 +104,7 @@ target_include_directories(app PRIVATE
 
 target_link_libraries(app PRIVATE
   pigweed_lighting_protolib.nanopb_rpc
+  pw_checksum
   pw_hdlc
   pw_log
   pw_rpc.server

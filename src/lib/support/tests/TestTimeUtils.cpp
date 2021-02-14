@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2016-2017 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -891,7 +891,7 @@ void TestSecondsSinceEpochConversion()
 #define VERIFY_TEST_AGAINST_GMTTIME 0
 #if VERIFY_TEST_AGAINST_GMTTIME
                     {
-                        time_t epochTimeT = (time_t) secondsSinceEpoch;
+                        time_t epochTimeT = static_cast<time_t>(secondsSinceEpoch);
 
                         struct tm * gmt = gmtime(&epochTimeT);
 
@@ -944,11 +944,85 @@ void TestSecondsSinceEpochConversion()
     }
 }
 
+void TestChipEpochTimeConversion()
+{
+    uint32_t daysSinceEpoch = 0;
+    uint32_t timeOfDay      = 0; // in seconds
+
+    for (uint16_t year = kChipEpochBaseYear; year <= kChipEpochMaxYear; year++)
+    {
+        for (uint8_t month = kJanuary; month <= kDecember; month++)
+        {
+            for (uint8_t dayOfMonth = 1; dayOfMonth <= DaysInMonth(year, month); dayOfMonth++)
+            {
+                // Test 10 different times of day per calendar day (this keeps the total runtime manageable).
+                for (uint8_t i = 0; i < 10; i++)
+                {
+                    uint32_t chipEpochTime = daysSinceEpoch * kSecondsPerDay + timeOfDay;
+
+                    uint8_t hour   = static_cast<uint8_t>(timeOfDay / kSecondsPerHour);
+                    uint8_t minute = static_cast<uint8_t>((timeOfDay - (hour * kSecondsPerHour)) / kSecondsPerMinute);
+                    uint8_t second = static_cast<uint8_t>(timeOfDay - (hour * kSecondsPerHour + minute * kSecondsPerMinute));
+
+#if VERIFY_TEST_AGAINST_GMTTIME
+                    {
+                        time_t epochTimeT = static_cast<time_t>(chipEpochTime) + kChipEpochSecondsSinceUnixEpoch;
+
+                        struct tm * gmt = gmtime(&epochTimeT);
+
+                        TestAssert(year == gmt->tm_year + 1900, "chip epoch gmtime() mismatch: year");
+                        TestAssert(month == gmt->tm_mon + 1, "chip epoch gmtime() mismatch: month");
+                        TestAssert(dayOfMonth == gmt->tm_mday, "chip epoch gmtime() mismatch: dayOfMonth");
+                        TestAssert(hour == gmt->tm_hour, "chip epoch gmtime() mismatch: hour");
+                        TestAssert(minute == gmt->tm_min, "chip epoch gmtime() mismatch: minute");
+                        TestAssert(second == gmt->tm_sec, "chip epoch gmtime() mismatch: second");
+                    }
+#endif
+
+                    // Test ChipEpochToCalendarTime()
+                    {
+                        uint16_t calculatedYear;
+                        uint8_t calculatedMonth, calculatedDayOfMonth, calculatedHour, calculatedMinute, calculatedSecond;
+
+                        ChipEpochToCalendarTime(chipEpochTime, calculatedYear, calculatedMonth, calculatedDayOfMonth,
+                                                calculatedHour, calculatedMinute, calculatedSecond);
+
+                        TestAssert(calculatedYear == year, "ChipEpochToCalendarTime() returned unexpected year value");
+                        TestAssert(calculatedMonth == month, "ChipEpochToCalendarTime() returned unexpected month value");
+                        TestAssert(calculatedDayOfMonth == dayOfMonth,
+                                   "ChipEpochToCalendarTime() returned unexpected dayOfMonth value");
+                        TestAssert(calculatedHour == hour, "ChipEpochToCalendarTime() returned unexpected hour value");
+                        TestAssert(calculatedMinute == minute, "ChipEpochToCalendarTime() returned unexpected minute value");
+                        TestAssert(calculatedSecond == second, "ChipEpochToCalendarTime() returned unexpected second value");
+                    }
+
+                    // Test CalendarTimeToSecondsSinceEpoch()
+
+                    {
+                        uint32_t calculatedChipEpochTime;
+
+                        CalendarToChipEpochTime(year, month, dayOfMonth, hour, minute, second, calculatedChipEpochTime);
+
+                        TestAssert(calculatedChipEpochTime == chipEpochTime,
+                                   "CalendarTimeToSecondsSinceEpoch() returned unexpected value");
+                    }
+
+                    // Iterate through times of day by skipping a large prime number of seconds.
+                    timeOfDay = (timeOfDay + 10007) % kSecondsPerDay;
+                }
+
+                daysSinceEpoch++;
+            }
+        }
+    }
+}
+
 int TestTimeUtils(void)
 {
     TestOrdinalDateConversion();
     TestDaysSinceEpochConversion();
     TestSecondsSinceEpochConversion();
+    TestChipEpochTimeConversion();
 
     printf("All tests passed\n");
 
