@@ -53,6 +53,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/Protocols.h>
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
+#include <support/BitFlags.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #include <errno.h>
@@ -1277,9 +1278,9 @@ static void UpdateAdditionalDataCharacteristic(BluezGattCharacteristic1 * charac
     chip::System::PacketBufferHandle bufferHandle;
 
     char serialNumber[ConfigurationManager::kMaxSerialNumberLength + 1];
-    size_t serialNumberSize                   = 0;
-    uint16_t lifetimeCounter                  = 0;
-    AdditionalDataFields additionalDataFields = AdditionalDataFields::NotSpecified;
+    size_t serialNumberSize  = 0;
+    uint16_t lifetimeCounter = 0;
+    BitFlags<uint8_t, AdditionalDataFields> additionalDataFields;
 
 #if CHIP_ENABLE_ROTATING_DEVICE_ID
     err = ConfigurationMgr().GetSerialNumber(serialNumber, sizeof(serialNumber), serialNumberSize);
@@ -1287,7 +1288,7 @@ static void UpdateAdditionalDataCharacteristic(BluezGattCharacteristic1 * charac
     err = ConfigurationMgr().GetLifetimeCounter(lifetimeCounter);
     SuccessOrExit(err);
 
-    additionalDataFields |= AdditionalDataFields::RotatingDeviceId;
+    additionalDataFields.Set(AdditionalDataFields::RotatingDeviceId);
 #endif
 
     err = AdditionalDataPayloadGenerator().generateAdditionalDataPayload(lifetimeCounter, serialNumber, serialNumberSize,

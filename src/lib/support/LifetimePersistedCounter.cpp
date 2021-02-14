@@ -42,7 +42,7 @@ LifetimePersistedCounter::Init(const chip::Platform::PersistedStorage::Key aId)
     SuccessOrExit(err = ReadStartValue(startValue));
 
     // This will set the starting value, after which we're ready.
-    SuccessOrExit(MonotonicallyIncreasingCounter::Init(startValue));
+    SuccessOrExit(err = MonotonicallyIncreasingCounter::Init(startValue));
 
 exit:
     return err;

@@ -24,8 +24,8 @@
 
 #pragma once
 #include <core/CHIPError.h>
+#include <support/BitFlags.h>
 #include <system/TLVPacketBufferBackingStore.h>
-#include <type_traits>
 
 namespace chip {
 namespace RotatingDeviceId {
@@ -40,24 +40,6 @@ enum class AdditionalDataFields : int8_t
     NotSpecified     = 0x00,
     RotatingDeviceId = 0x01
 };
-
-inline AdditionalDataFields operator|(AdditionalDataFields lhs, AdditionalDataFields rhs)
-{
-    using T = std::underlying_type_t<AdditionalDataFields>;
-    return static_cast<AdditionalDataFields>(static_cast<T>(lhs) | static_cast<T>(rhs));
-}
-
-inline AdditionalDataFields & operator|=(AdditionalDataFields & lhs, AdditionalDataFields rhs)
-{
-    lhs = lhs | rhs;
-    return lhs;
-}
-
-inline AdditionalDataFields operator&(AdditionalDataFields lhs, AdditionalDataFields rhs)
-{
-    using T = std::underlying_type_t<AdditionalDataFields>;
-    return static_cast<AdditionalDataFields>(static_cast<T>(lhs) & static_cast<T>(rhs));
-}
 
 class AdditionalDataPayloadGenerator
 {
@@ -79,7 +61,7 @@ public:
      */
     CHIP_ERROR generateAdditionalDataPayload(uint16_t lifetimeCounter, const char * serialNumberBuffer,
                                              size_t serialNumberBufferSize, chip::System::PacketBufferHandle & bufferHandle,
-                                             AdditionalDataFields additionalDataFields);
+                                             BitFlags<uint8_t, AdditionalDataFields> additionalDataFields);
     // Generate Device Rotating ID
     /**
      * Generate additional data payload (i.e. TLV encoded).

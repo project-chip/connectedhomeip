@@ -41,10 +41,10 @@ using namespace chip::Crypto;
 using namespace chip::SetupPayloadData;
 using namespace chip::Encoding::LittleEndian;
 
-CHIP_ERROR AdditionalDataPayloadGenerator::generateAdditionalDataPayload(uint16_t lifetimeCounter, const char * serialNumberBuffer,
-                                                                         size_t serialNumberBufferSize,
-                                                                         PacketBufferHandle & bufferHandle,
-                                                                         AdditionalDataFields additionalDataFields)
+CHIP_ERROR
+AdditionalDataPayloadGenerator::generateAdditionalDataPayload(uint16_t lifetimeCounter, const char * serialNumberBuffer,
+                                                              size_t serialNumberBufferSize, PacketBufferHandle & bufferHandle,
+                                                              BitFlags<uint8_t, AdditionalDataFields> additionalDataFields)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferTLVWriter writer;
@@ -57,7 +57,7 @@ CHIP_ERROR AdditionalDataPayloadGenerator::generateAdditionalDataPayload(uint16_
 
     SuccessOrExit(err = writer.OpenContainer(AnonymousTag, kTLVType_Structure, innerWriter));
 
-    if (static_cast<int>(additionalDataFields & AdditionalDataFields::RotatingDeviceId) != 0)
+    if (additionalDataFields.Has(AdditionalDataFields::RotatingDeviceId))
     {
         // Generating Device Rotating Id
         SuccessOrExit(err = generateRotatingDeviceId(lifetimeCounter, serialNumberBuffer, serialNumberBufferSize,
