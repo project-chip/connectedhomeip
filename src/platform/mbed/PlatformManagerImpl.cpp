@@ -8,7 +8,15 @@ namespace DeviceLayer {
 
 CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    // Members are initialized by the stack
+    // TODO: understand if they should be dynamicaly allocated or not.
+
+    // Call up to the base class _InitChipStack() to perform the bulk of the initialization.
+    auto err = GenericPlatformManagerImpl<ImplClass>::_InitChipStack();
+    SuccessOrExit(err);
+
+exit:
+    return err;
 }
 
 void PlatformManagerImpl::_LockChipStack()
