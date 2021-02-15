@@ -32,10 +32,10 @@ The CC13X2_26X2 lock example application provides a working demonstration of a
 connected door lock device. This uses the open-source CHIP implementation and
 the Texas Instruments SimpleLink™ CC13x2 and CC26x2 software development kit.
 
-This example is enabled to build for CC2652R7 devices. This
-upcoming devices are currently not yet in full production. For more information
-on device availability or early access to an engineering build of our
-CHIP-enabled SDK, please reach out [here][ti_cc13x2_26x2_r7_chip_request].
+This example is enabled to build for CC2652R7 devices. This upcoming devices are
+currently not yet in full production. For more information on device
+availability or early access to an engineering build of our CHIP-enabled SDK,
+please reach out [here][ti_cc13x2_26x2_r7_chip_request].
 
 The lock example is intended to serve both as a means to explore the workings of
 CHIP, as well as a template for creating real products based on the Texas
@@ -161,23 +161,23 @@ terminal emulator to that port to see the output with the following options:
 
 ## Running the Example
 
-Once a device has been flashed with this example, it can now join and operate
-in an existing Thread network. The following sections assume that a Thread
-network is already active, and has at least one
-[OpenThread Border Router][ot_border_router_setup].
+Once a device has been flashed with this example, it can now join and operate in
+an existing Thread network. The following sections assume that a Thread network
+is already active, and has at least one [OpenThread Border
+Router][ot_border_router_setup].
 
 ### Provisioning
 
-The first step to bring the CHIP device onto the network is to provision it.
-Our example accomplishes this with Bluetooth Low Energy (BLE) and the
+The first step to bring the CHIP device onto the network is to provision it. Our
+example accomplishes this with Bluetooth Low Energy (BLE) and the
 [CHIPTool](../../../src/android/CHIPTool/README.md) mobile app.
 
 #### Bluetooth LE Advertising
 
-To provision this example onto a Thread network, the device must be
-discoverable over Bluetooth LE. BLE advertising is started by long pressing the
-right button (greater than 1000ms), labeled `BTN-2` on the silkscreen.  Once
-the device is fully provisioned, BLE advertising will stop.
+To provision this example onto a Thread network, the device must be discoverable
+over Bluetooth LE. BLE advertising is started by long pressing the right button
+(greater than 1000ms), labeled `BTN-2` on the silkscreen. Once the device is
+fully provisioned, BLE advertising will stop.
 
 #### Bluetooth LE Rendezvous
 
@@ -190,15 +190,17 @@ from the CHIP device.
 
 This is done by scanning a QR code. A URL will be displayed on the lock-app's
 log ([UART terminal](#viewing-logging-output)). It will look like the following:
+
 ```
 SetupQRCode:  [CH:.81TM -00 0C9SS0]
 Copy/paste the below URL in a browser to see the QR Code:
 https://dhrishi.github.io/connectedhomeip/qrcode.html?data=CH%3A.81TM%20-00%200C9SS0
 ```
+
 You can directly navigate to the webpage URL displayed (which has QR payload
-pre-loaded). Alternatively, you can navigate to
-[the QR code generator][qr_code_generator] and enter in the payload shown in
-`SetupQRCode` (in this case `CH:.81TM -00 0C9SS0`).
+pre-loaded). Alternatively, you can navigate to [the QR code
+generator][qr_code_generator] and enter in the payload shown in `SetupQRCode`
+(in this case `CH:.81TM -00 0C9SS0`).
 
 ### CHIP Remote Commands
 
@@ -211,10 +213,8 @@ You can now control the lock-app CHIP device from the smartphone!
 
 ## TI Support
 
-For technical support, please consider creating a post on TI's
-[E2E forum][e2e].
+For technical support, please consider creating a post on TI's [E2E forum][e2e].
 Additionally, we welcome any feedback.
-
 
 [chip]: https://github.com/project-chip/connectedhomeip
 [cc1352r1_launchxl]: https://www.ti.com/tool/LAUNCHXL-CC1352R1
@@ -227,8 +227,7 @@ Additionally, we welcome any feedback.
     http://software-dl.ti.com/ccs/esd/sysconfig/sysconfig-1.5.0_1397-setup.run
 [ti_thread_dnd]:
     https://www.ti.com/wireless-connectivity/thread/design-development.html
-[ti_cc13x2_26x2_r7_chip_request]:
-    https://ti.com/chip_sdk
+[ti_cc13x2_26x2_r7_chip_request]: https://ti.com/chip_sdk
 [ot_border_router_setup]:
     https://openthread.io/guides/border-router/beaglebone-black
 [qr_code_generator]: https://dhrishi.github.io/connectedhomeip/qrcode.html
