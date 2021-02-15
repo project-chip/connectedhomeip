@@ -34,7 +34,7 @@ declare_args() {
 }
 
 if (chip_system_config_locking == "") {
-  if (current_os != "freertos") {
+  if (current_os != "freertos" && current_os != "mbed") {
     chip_system_config_locking = "posix"
   } else {
     chip_system_config_locking = "none"

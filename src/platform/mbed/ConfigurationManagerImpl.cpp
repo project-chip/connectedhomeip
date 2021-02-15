@@ -37,5 +37,10 @@ using namespace ::chip::DeviceLayer::Internal;
  */
 ConfigurationManagerImpl ConfigurationManagerImpl::sInstance;
 
+CHIP_ERROR ConfigurationManagerImpl::_Init()
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
 } // namespace DeviceLayer
 } // namespace chip
