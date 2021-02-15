@@ -23,6 +23,7 @@
 #include <support/ErrorStr.h>
 #include <support/SafeInt.h>
 #include <transport/NetworkProvisioning.h>
+#include <transport/SecureSessionMgr.h>
 
 #if CONFIG_DEVICE_LAYER
 #include <platform/CHIPDeviceLayer.h>
@@ -229,7 +230,7 @@ CHIP_ERROR NetworkProvisioning::SendNetworkCredentials(const char * ssid, const 
     const size_t bufferSize = EncodedStringSize(ssid) + EncodedStringSize(passwd);
     VerifyOrExit(CanCastTo<uint16_t>(bufferSize), err = CHIP_ERROR_INVALID_ARGUMENT);
     {
-        Encoding::LittleEndian::PacketBufferWriter bbuf(bufferSize);
+        Encoding::LittleEndian::PacketBufferWriter bbuf(bufferSize + MessagePacketBuffer::kMaxFooterSize);
 
         ChipLogProgress(NetworkProvisioning, "Sending Network Creds. Delegate %p\n", mDelegate);
         VerifyOrExit(mDelegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
