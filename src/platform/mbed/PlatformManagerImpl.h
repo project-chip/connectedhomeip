@@ -51,15 +51,15 @@ public:
 private:
     // ===== Methods that implement the PlatformManager abstract interface.
 
-    CHIP_ERROR _InitChipStack(void) { return 0; }
-    void _LockChipStack() {}
-    bool _TryLockChipStack() { return true; }
-    void _UnlockChipStack() {}
-    void _PostEvent(const ChipDeviceEvent * event) {}
-    void _RunEventLoop() {}
-    CHIP_ERROR _StartEventLoopTask() { return 0; }
-    CHIP_ERROR _StartChipTimer(int64_t durationMS) { return 0; }
-    CHIP_ERROR _Shutdown() { return 0; }
+    CHIP_ERROR _InitChipStack(void);
+    void _LockChipStack();
+    bool _TryLockChipStack();
+    void _UnlockChipStack();
+    void _PostEvent(const ChipDeviceEvent * event);
+    void _RunEventLoop();
+    CHIP_ERROR _StartEventLoopTask();
+    CHIP_ERROR _StartChipTimer(int64_t durationMS);
+    CHIP_ERROR _Shutdown();
 
     // ===== Members for internal use by the following friends.
 

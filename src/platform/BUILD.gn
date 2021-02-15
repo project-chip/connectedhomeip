@@ -617,7 +617,8 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       sources += [
         "mbed/ConfigurationManagerImpl.cpp",
         "mbed/SystemTimeSupport.cpp",
-        "mbed/MbedConfig.cpp"
+        "mbed/MbedConfig.cpp",
+        "mbed/PlatformManagerImpl.cpp"
       ]
     }
 
