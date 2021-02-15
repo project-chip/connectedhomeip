@@ -5,6 +5,10 @@
 #include <core/CHIPConfig.h>
 #include <platform/CHIPDeviceConfig.h>
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#include <openthread/platform/logging.h>
+#endif
+
 #include "ti_drivers_config.h"
 
 #include <ti/drivers/UART.h>
@@ -71,7 +75,7 @@ void LogV(const char * module, uint8_t category, const char * msg, va_list v)
 
     cc13x2_26x2VLog(msg, v);
 
-    DeviceLayer::OnLogOutput();
+    chip::DeviceLayer::OnLogOutput();
 }
 
 } // namespace Platform
@@ -89,7 +93,7 @@ extern "C" void LwIPLog(const char * msg, ...)
 
     cc13x2_26x2VLog(msg, v);
 
-    DeviceLayer::OnLogOutput();
+    chip::DeviceLayer::OnLogOutput();
     va_end(v);
 }
 
@@ -104,7 +108,7 @@ extern "C" void cc13x2_26x2Log(const char * msg, ...)
 
     cc13x2_26x2VLog(msg, v);
 
-    DeviceLayer::OnLogOutput();
+    chip::DeviceLayer::OnLogOutput();
     va_end(v);
 }
 
@@ -120,7 +124,7 @@ extern "C" void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const ch
 
     cc13x2_26x2VLog(aFormat, v);
 
-    DeviceLayer::OnLogOutput();
+    chip::DeviceLayer::OnLogOutput();
     va_end(v);
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
