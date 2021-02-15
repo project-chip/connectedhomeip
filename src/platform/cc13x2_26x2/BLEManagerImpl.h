@@ -17,9 +17,9 @@
  */
 
 /**
- *          @file BLEManagerImpl.h
- *          Provides an implementation of the BLEManager object
- *          for the Texas Instruments cc13xx_cc26xx platform.
+ * @file
+ * Provides an implementation of the BLEManager object for the Texas
+ * Instruments cc13xx_cc26xx platform.
  */
 
 #ifndef BLEManager_IMPL_H

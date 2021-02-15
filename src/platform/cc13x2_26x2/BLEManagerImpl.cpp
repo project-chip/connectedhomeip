@@ -17,16 +17,16 @@
  */
 
 /**
- *           @file BLEManagerImpl.cpp
- *          Provides an implementation of the BLEManager object for
- *          cc13xx_cc26xx platform using the Texas Instruments SDK and the
- *          OpenThread stack.
- *
+ * @file
+ * Provides an implementation of the BLEManager object for cc13xx_cc26xx
+ * platform using the Texas Instruments SDK and the OpenThread stack.
  */
 #include <string.h>
 
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
+
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
 #include <ble/CHIPBleServiceData.h>
 #include <platform/internal/BLEManager.h>
@@ -1898,3 +1898,5 @@ void BLEManagerImpl::AssertHandler(uint8 assertCause, uint8 assertSubcause)
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
+
+#endif /* CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE */
