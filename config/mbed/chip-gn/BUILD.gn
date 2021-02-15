@@ -15,9 +15,6 @@
 import("//build_overrides/chip.gni")
 import("//${chip_root}/build/chip/tests.gni")
 
-import("//build_overrides/mbedtls.gni")
-import("${mbedtls_root}/mbedtls.gni")
-
 assert(current_os == "mbed")
 
 declare_args() {
@@ -34,14 +31,4 @@ group("mbed") {
 
 group("default") {
   deps = [ ":mbed" ]
-}
-
-mbedtls_target("mbedtls") {
-  include_dirs = [
-    "mbedtls"
-  ]
-
-  defines = [ 
-    "MBEDTLS_CONFIG_FILE=<mbed_tls_mbed_stub_config.h>"
-  ]
 }
