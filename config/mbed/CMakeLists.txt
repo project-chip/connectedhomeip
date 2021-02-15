@@ -165,9 +165,7 @@ chip_gn_arg_string("mbed_ar"                              ${CMAKE_AR})
 chip_gn_arg_string("mbed_cc"                              ${CMAKE_C_COMPILER})
 chip_gn_arg_string("mbed_cxx"                             ${CMAKE_CXX_COMPILER})
 chip_gn_arg_bool  ("is_debug"                             CONFIG_DEBUG)
-chip_gn_arg_bool  ("chip_build_tests"                     CONFIG_CHIP_BUILD_TESTS)
 chip_gn_arg_bool  ("chip_build_libshell"                  CONFIG_CHIP_LIB_SHELL)
-chip_gn_arg_bool  ("chip_with_lwip"                       CONFIG_CHIP_WITH_LWIP)
 
 if (BOARD STREQUAL "native_posix")
     chip_gn_arg_string("target_cpu" "x86")
@@ -223,16 +221,15 @@ list(APPEND CHIP_INCLUDES)
 # CHIP defines
 list(APPEND CHIP_DEFINES)
 
-if (${CONFIG_CHIP_WITH_LWIP})
-    list(APPEND CHIP_INCLUDES 
-        ${CHIP_ROOT}/third_party/lwip/repo/lwip/src/include
-        ${CHIP_ROOT}/src/lwip/mbed
-    )
-    list(APPEND CHIP_DEFINES
-        "LWIP_NO_STDINT_H=1" 
-        "IN_ADDR_T_DEFINED=1"
-    )
-endif()
+# CHIP LwIP support
+list(APPEND CHIP_INCLUDES 
+    ${CHIP_ROOT}/third_party/lwip/repo/lwip/src/include
+    ${CHIP_ROOT}/src/lwip/mbed
+)
+list(APPEND CHIP_DEFINES
+    "LWIP_NO_STDINT_H=1" 
+    "IN_ADDR_T_DEFINED=1"
+)
 
 target_include_directories(${APP_TARGET} PRIVATE 
                            ${CHIP_INCLUDES}

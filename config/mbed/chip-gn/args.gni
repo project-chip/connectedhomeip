@@ -15,14 +15,12 @@
 import("//build_overrides/chip.gni")
 
 chip_device_platform = "mbed"
+lwip_platform = "mbed"
 
 chip_project_config_include = ""
 chip_system_project_config_include = ""
-chip_ble_project_config_include = ""
 
 custom_toolchain = "//toolchain:mbed"
 mbedtls_target = "//:mbedtls"
 
 treat_warnings_as_errors = false
-lwip_platform = "mbed"
-chip_system_config_use_sockets=false
