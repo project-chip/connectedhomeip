@@ -88,6 +88,8 @@ CHIPDevice * GetPairedDeviceWithID(uint64_t deviceId)
     dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.persistentstorage.callback", DISPATCH_QUEUE_SERIAL);
 
     CHIPDeviceController * controller = [CHIPDeviceController sharedController];
+    // TODO: setting persistent storage delegate repeatedly is wasteful. This is being done here, and in
+    //       GetPairedDevice() on every call. The delegate should be set once at the controller init time.
     [controller setPersistentStorageDelegate:storage queue:callbackQueue];
 
     NSError * error;
