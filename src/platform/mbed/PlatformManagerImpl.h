@@ -22,6 +22,7 @@
 
 #pragma once
 
+#include "rtos/Mutex.h"
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl.h>
 
@@ -68,6 +69,9 @@ private:
     friend class Internal::BLEManagerImpl;
 
     static PlatformManagerImpl sInstance;
+
+    // ===== Members for internal use.
+    rtos::Mutex mChipStackMutex;
 };
 
 /**
