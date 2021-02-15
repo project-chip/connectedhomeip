@@ -124,12 +124,6 @@ list(APPEND CHIP_CFLAGS_CC ${CMAKE_CXX_FLAGS_INIT})
 if (CONFIG_CHIP_WITH_EXTERNAL_MBEDTLS)
     mbed_get_target_common_compile_flags(CHIP_MBEDTLS_CFLAGS mbed-mbedtls)
     list(APPEND CHIP_CFLAGS ${CHIP_MBEDTLS_CFLAGS})
-    list(APPEND CHIP_CFLAGS 
-        "\"-DMBEDTLS_X509_CSR_WRITE_C\""
-        "\"-DMBEDTLS_X509_CREATE_C\""
-        "\"-DMBEDTLS_PEM_WRITE_C\""
-    )
-    message(${MBED_TARGET})
     if (${MBED_TARGET} MATCHES "NRF52840_DK")
         mbed_get_target_common_compile_flags(CHIP_CRYPTOCELL310_CFLAGS mbed-mbedtls-cryptocell310)
         list(APPEND CHIP_CFLAGS ${CHIP_CRYPTOCELL310_CFLAGS})
@@ -249,6 +243,10 @@ if (${CONFIG_CHIP_WITH_LWIP})
         "IN_ADDR_T_DEFINED=1"
     )
 endif()
+
+list(APPEND CHIP_INCLUDES 
+    ${CHIP_ROOT}/config/mbed/mbedtls
+)
 
 target_include_directories(${APP_TARGET} PRIVATE 
                            ${CHIP_INCLUDES}
