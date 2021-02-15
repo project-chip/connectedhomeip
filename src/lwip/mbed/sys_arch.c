@@ -572,7 +572,31 @@ void sys_sem_free(struct sys_sem ** sem)
         sys_sem_free_internal(*sem);
     }
 }
+
+#else 
+
+u32_t sys_arch_sem_wait(sys_sem_t * sem, u32_t timeout)
+{
+    return 0;
+}
+
+void sys_sem_signal(struct sys_sem ** s)
+{
+
+}
+
+err_t sys_mbox_trypost(struct sys_mbox ** mb, void * msg)
+{
+    return ERR_OK;
+}
+
+void sys_mbox_post(struct sys_mbox ** mb, void * msg)
+{
+    
+}
+
 #endif /* !NO_SYS */
+
 /*-----------------------------------------------------------------------------------*/
 u32_t sys_now(void)
 {
