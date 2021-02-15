@@ -22,7 +22,9 @@
 
 #pragma once
 
+#include "events/EventQueue.h"
 #include "rtos/Mutex.h"
+#include "rtos/Thread.h"
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl.h>
 
@@ -71,7 +73,15 @@ private:
     static PlatformManagerImpl sInstance;
 
     // ===== Members for internal use.
+    static CHIP_ERROR TranslateOsStatus(osStatus status);
+    bool IsLoopActive();
+
+    bool mInitialized = false;
+    rtos::Thread mLoopTask{ osPriorityNormal, CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE,
+                            /* memory provided */ nullptr, CHIP_DEVICE_CONFIG_CHIP_TASK_NAME };
     rtos::Mutex mChipStackMutex;
+    static const size_t event_size = EVENTS_EVENT_SIZE + sizeof(void *) + sizeof(ChipDeviceEvent *);
+    events::EventQueue mQueue      = { event_size * CHIP_DEVICE_CONFIG_MAX_EVENT_QUEUE_SIZE };
 };
 
 /**
