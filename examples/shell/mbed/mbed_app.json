@@ -1,0 +1,5 @@
+{
+    "macros" : [
+        "MBEDTLS_USER_CONFIG_FILE=\"chip_mbedtls_config.h\""
+    ]
+}

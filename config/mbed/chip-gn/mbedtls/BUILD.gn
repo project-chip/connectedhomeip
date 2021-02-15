@@ -21,24 +21,22 @@ declare_args() {
   chip_with_platform_mbedtls = false
 }
 
+config("chip_mbedtls_config") {
+    include_dirs = [
+        "${chip_root}/config/mbed/mbedtls"
+    ]
+}
+
 if (!chip_with_platform_mbedtls) {
     import("//build_overrides/mbedtls.gni")
     import("${mbedtls_root}/mbedtls.gni")
 
-    config("mbed_mbedtls_config") {
-        include_dirs = [
-            "."
-        ]
-        defines = [ 
-            "MBEDTLS_CONFIG_FILE=<mbed_mbedtls_config.h>"
-        ]
-    }
-
     mbedtls_target("mbedtls") {
-        public_configs = [ ":mbed_mbedtls_config" ]
+        public_configs = [ ":chip_mbedtls_config" ]
     }
 } else {
     # Mbed provides its own mbedtls, so nothing to do, just provide a target
     group("mbedtls") {
+        public_configs = [ ":chip_mbedtls_config" ]
     }
 }
