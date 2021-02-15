@@ -531,12 +531,10 @@ function asObjectiveCNumberType(label, type)
   return templateUtil.templatePromise(this.global, promise)
 }
 
-
 function isStrEndsWith(str, substr)
 {
   return str.endsWith(substr);
 }
-
 
 //
 // Module exports

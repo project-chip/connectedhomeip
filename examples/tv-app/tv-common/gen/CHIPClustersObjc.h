@@ -26,7 +26,6 @@ typedef void (^ResponseHandler)(NSError * _Nullable error, NSDictionary * _Nulla
 
 @class CHIPDevice;
 
-
 NS_ASSUME_NONNULL_BEGIN
 
 @interface CHIPBarrierControl : NSObject
@@ -112,39 +111,119 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPColorControl : NSObject
 
 - (nullable instancetype)initWithDevice:(CHIPDevice *)device endpoint:(uint8_t)endpoint queue:(dispatch_queue_t)queue;
-- (BOOL)moveColor:(int16_t)rateX rateY:(int16_t)rateY optionsMask:(uint8_t)optionsMask optionsOverride:(uint8_t)optionsOverride completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)moveColorTemperature:(uint8_t)moveMode rate:(uint16_t)rate colorTemperatureMinimum:(uint16_t)colorTemperatureMinimum colorTemperatureMaximum:(uint16_t)colorTemperatureMaximum optionsMask:(uint8_t)optionsMask optionsOverride:(uint8_t)optionsOverride completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)moveHue:(uint8_t)moveMode rate:(uint8_t)rate optionsMask:(uint8_t)optionsMask optionsOverride:(uint8_t)optionsOverride completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)moveSaturation:(uint8_t)moveMode rate:(uint8_t)rate optionsMask:(uint8_t)optionsMask optionsOverride:(uint8_t)optionsOverride completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)moveToColor:(uint16_t)colorX colorY:(uint16_t)colorY transitionTime:(uint16_t)transitionTime optionsMask:(uint8_t)optionsMask optionsOverride:(uint8_t)optionsOverride completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)moveToColorTemperature:(uint16_t)colorTemperature transitionTime:(uint16_t)transitionTime optionsMask:(uint8_t)optionsMask optionsOverride:(uint8_t)optionsOverride completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)moveToHue:(uint8_t)hue direction:(uint8_t)direction transitionTime:(uint16_t)transitionTime optionsMask:(uint8_t)optionsMask optionsOverride:(uint8_t)optionsOverride completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)moveToHueAndSaturation:(uint8_t)hue saturation:(uint8_t)saturation transitionTime:(uint16_t)transitionTime optionsMask:(uint8_t)optionsMask optionsOverride:(uint8_t)optionsOverride completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)moveToSaturation:(uint8_t)saturation transitionTime:(uint16_t)transitionTime optionsMask:(uint8_t)optionsMask optionsOverride:(uint8_t)optionsOverride completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)stepColor:(int16_t)stepX stepY:(int16_t)stepY transitionTime:(uint16_t)transitionTime optionsMask:(uint8_t)optionsMask optionsOverride:(uint8_t)optionsOverride completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)stepColorTemperature:(uint8_t)stepMode stepSize:(uint16_t)stepSize transitionTime:(uint16_t)transitionTime colorTemperatureMinimum:(uint16_t)colorTemperatureMinimum colorTemperatureMaximum:(uint16_t)colorTemperatureMaximum optionsMask:(uint8_t)optionsMask optionsOverride:(uint8_t)optionsOverride completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)stepHue:(uint8_t)stepMode stepSize:(uint8_t)stepSize transitionTime:(uint8_t)transitionTime optionsMask:(uint8_t)optionsMask optionsOverride:(uint8_t)optionsOverride completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)stepSaturation:(uint8_t)stepMode stepSize:(uint8_t)stepSize transitionTime:(uint8_t)transitionTime optionsMask:(uint8_t)optionsMask optionsOverride:(uint8_t)optionsOverride completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)stopMoveStep:(uint8_t)optionsMask optionsOverride:(uint8_t)optionsOverride completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)moveColor:(int16_t)rateX
+                rateY:(int16_t)rateY
+          optionsMask:(uint8_t)optionsMask
+      optionsOverride:(uint8_t)optionsOverride
+    completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)moveColorTemperature:(uint8_t)moveMode
+                        rate:(uint16_t)rate
+     colorTemperatureMinimum:(uint16_t)colorTemperatureMinimum
+     colorTemperatureMaximum:(uint16_t)colorTemperatureMaximum
+                 optionsMask:(uint8_t)optionsMask
+             optionsOverride:(uint8_t)optionsOverride
+           completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)moveHue:(uint8_t)moveMode
+                 rate:(uint8_t)rate
+          optionsMask:(uint8_t)optionsMask
+      optionsOverride:(uint8_t)optionsOverride
+    completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)moveSaturation:(uint8_t)moveMode
+                  rate:(uint8_t)rate
+           optionsMask:(uint8_t)optionsMask
+       optionsOverride:(uint8_t)optionsOverride
+     completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)moveToColor:(uint16_t)colorX
+               colorY:(uint16_t)colorY
+       transitionTime:(uint16_t)transitionTime
+          optionsMask:(uint8_t)optionsMask
+      optionsOverride:(uint8_t)optionsOverride
+    completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)moveToColorTemperature:(uint16_t)colorTemperature
+                transitionTime:(uint16_t)transitionTime
+                   optionsMask:(uint8_t)optionsMask
+               optionsOverride:(uint8_t)optionsOverride
+             completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)moveToHue:(uint8_t)hue
+            direction:(uint8_t)direction
+       transitionTime:(uint16_t)transitionTime
+          optionsMask:(uint8_t)optionsMask
+      optionsOverride:(uint8_t)optionsOverride
+    completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)moveToHueAndSaturation:(uint8_t)hue
+                    saturation:(uint8_t)saturation
+                transitionTime:(uint16_t)transitionTime
+                   optionsMask:(uint8_t)optionsMask
+               optionsOverride:(uint8_t)optionsOverride
+             completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)moveToSaturation:(uint8_t)saturation
+          transitionTime:(uint16_t)transitionTime
+             optionsMask:(uint8_t)optionsMask
+         optionsOverride:(uint8_t)optionsOverride
+       completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)stepColor:(int16_t)stepX
+                stepY:(int16_t)stepY
+       transitionTime:(uint16_t)transitionTime
+          optionsMask:(uint8_t)optionsMask
+      optionsOverride:(uint8_t)optionsOverride
+    completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)stepColorTemperature:(uint8_t)stepMode
+                    stepSize:(uint16_t)stepSize
+              transitionTime:(uint16_t)transitionTime
+     colorTemperatureMinimum:(uint16_t)colorTemperatureMinimum
+     colorTemperatureMaximum:(uint16_t)colorTemperatureMaximum
+                 optionsMask:(uint8_t)optionsMask
+             optionsOverride:(uint8_t)optionsOverride
+           completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)stepHue:(uint8_t)stepMode
+             stepSize:(uint8_t)stepSize
+       transitionTime:(uint8_t)transitionTime
+          optionsMask:(uint8_t)optionsMask
+      optionsOverride:(uint8_t)optionsOverride
+    completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)stepSaturation:(uint8_t)stepMode
+              stepSize:(uint8_t)stepSize
+        transitionTime:(uint8_t)transitionTime
+           optionsMask:(uint8_t)optionsMask
+       optionsOverride:(uint8_t)optionsOverride
+     completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)stopMoveStep:(uint8_t)optionsMask
+      optionsOverride:(uint8_t)optionsOverride
+    completionHandler:(ResponseHandler)completionHandler;
 
 - (BOOL)readAttributeCurrentHue:(ResponseHandler)completionHandler;
-- (BOOL) configureAttributeCurrentHue:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval change:(uint8_t)change completionHandler:(ResponseHandler)completionHandler;
-- (BOOL) reportAttributeCurrentHue:(ResponseHandler)reportHandler;
+- (BOOL)configureAttributeCurrentHue:(uint16_t)minInterval
+                         maxInterval:(uint16_t)maxInterval
+                              change:(uint8_t)change
+                   completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)reportAttributeCurrentHue:(ResponseHandler)reportHandler;
 - (BOOL)readAttributeCurrentSaturation:(ResponseHandler)completionHandler;
-- (BOOL) configureAttributeCurrentSaturation:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval change:(uint8_t)change completionHandler:(ResponseHandler)completionHandler;
-- (BOOL) reportAttributeCurrentSaturation:(ResponseHandler)reportHandler;
+- (BOOL)configureAttributeCurrentSaturation:(uint16_t)minInterval
+                                maxInterval:(uint16_t)maxInterval
+                                     change:(uint8_t)change
+                          completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)reportAttributeCurrentSaturation:(ResponseHandler)reportHandler;
 - (BOOL)readAttributeRemainingTime:(ResponseHandler)completionHandler;
 - (BOOL)readAttributeCurrentX:(ResponseHandler)completionHandler;
-- (BOOL) configureAttributeCurrentX:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval change:(uint16_t)change completionHandler:(ResponseHandler)completionHandler;
-- (BOOL) reportAttributeCurrentX:(ResponseHandler)reportHandler;
+- (BOOL)configureAttributeCurrentX:(uint16_t)minInterval
+                       maxInterval:(uint16_t)maxInterval
+                            change:(uint16_t)change
+                 completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)reportAttributeCurrentX:(ResponseHandler)reportHandler;
 - (BOOL)readAttributeCurrentY:(ResponseHandler)completionHandler;
-- (BOOL) configureAttributeCurrentY:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval change:(uint16_t)change completionHandler:(ResponseHandler)completionHandler;
-- (BOOL) reportAttributeCurrentY:(ResponseHandler)reportHandler;
+- (BOOL)configureAttributeCurrentY:(uint16_t)minInterval
+                       maxInterval:(uint16_t)maxInterval
+                            change:(uint16_t)change
+                 completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)reportAttributeCurrentY:(ResponseHandler)reportHandler;
 - (BOOL)readAttributeDriftCompensation:(ResponseHandler)completionHandler;
 - (BOOL)readAttributeCompensationText:(ResponseHandler)completionHandler;
 - (BOOL)readAttributeColorTemperature:(ResponseHandler)completionHandler;
-- (BOOL) configureAttributeColorTemperature:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval change:(uint16_t)change completionHandler:(ResponseHandler)completionHandler;
-- (BOOL) reportAttributeColorTemperature:(ResponseHandler)reportHandler;
+- (BOOL)configureAttributeColorTemperature:(uint16_t)minInterval
+                               maxInterval:(uint16_t)maxInterval
+                                    change:(uint16_t)change
+                         completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)reportAttributeColorTemperature:(ResponseHandler)reportHandler;
 - (BOOL)readAttributeColorMode:(ResponseHandler)completionHandler;
 - (BOOL)readAttributeColorControlOptions:(ResponseHandler)completionHandler;
 - (BOOL)writeAttributeColorControlOptions:(uint8_t)value completionHandler:(ResponseHandler)completionHandler;
@@ -214,39 +293,119 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPColorControl : NSObject
 
 - (nullable instancetype)initWithDevice:(CHIPDevice *)device endpoint:(uint8_t)endpoint queue:(dispatch_queue_t)queue;
-- (BOOL)moveColor:(int16_t)rateX rateY:(int16_t)rateY optionsMask:(uint8_t)optionsMask optionsOverride:(uint8_t)optionsOverride completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)moveColorTemperature:(uint8_t)moveMode rate:(uint16_t)rate colorTemperatureMinimum:(uint16_t)colorTemperatureMinimum colorTemperatureMaximum:(uint16_t)colorTemperatureMaximum optionsMask:(uint8_t)optionsMask optionsOverride:(uint8_t)optionsOverride completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)moveHue:(uint8_t)moveMode rate:(uint8_t)rate optionsMask:(uint8_t)optionsMask optionsOverride:(uint8_t)optionsOverride completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)moveSaturation:(uint8_t)moveMode rate:(uint8_t)rate optionsMask:(uint8_t)optionsMask optionsOverride:(uint8_t)optionsOverride completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)moveToColor:(uint16_t)colorX colorY:(uint16_t)colorY transitionTime:(uint16_t)transitionTime optionsMask:(uint8_t)optionsMask optionsOverride:(uint8_t)optionsOverride completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)moveToColorTemperature:(uint16_t)colorTemperature transitionTime:(uint16_t)transitionTime optionsMask:(uint8_t)optionsMask optionsOverride:(uint8_t)optionsOverride completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)moveToHue:(uint8_t)hue direction:(uint8_t)direction transitionTime:(uint16_t)transitionTime optionsMask:(uint8_t)optionsMask optionsOverride:(uint8_t)optionsOverride completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)moveToHueAndSaturation:(uint8_t)hue saturation:(uint8_t)saturation transitionTime:(uint16_t)transitionTime optionsMask:(uint8_t)optionsMask optionsOverride:(uint8_t)optionsOverride completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)moveToSaturation:(uint8_t)saturation transitionTime:(uint16_t)transitionTime optionsMask:(uint8_t)optionsMask optionsOverride:(uint8_t)optionsOverride completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)stepColor:(int16_t)stepX stepY:(int16_t)stepY transitionTime:(uint16_t)transitionTime optionsMask:(uint8_t)optionsMask optionsOverride:(uint8_t)optionsOverride completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)stepColorTemperature:(uint8_t)stepMode stepSize:(uint16_t)stepSize transitionTime:(uint16_t)transitionTime colorTemperatureMinimum:(uint16_t)colorTemperatureMinimum colorTemperatureMaximum:(uint16_t)colorTemperatureMaximum optionsMask:(uint8_t)optionsMask optionsOverride:(uint8_t)optionsOverride completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)stepHue:(uint8_t)stepMode stepSize:(uint8_t)stepSize transitionTime:(uint8_t)transitionTime optionsMask:(uint8_t)optionsMask optionsOverride:(uint8_t)optionsOverride completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)stepSaturation:(uint8_t)stepMode stepSize:(uint8_t)stepSize transitionTime:(uint8_t)transitionTime optionsMask:(uint8_t)optionsMask optionsOverride:(uint8_t)optionsOverride completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)stopMoveStep:(uint8_t)optionsMask optionsOverride:(uint8_t)optionsOverride completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)moveColor:(int16_t)rateX
+                rateY:(int16_t)rateY
+          optionsMask:(uint8_t)optionsMask
+      optionsOverride:(uint8_t)optionsOverride
+    completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)moveColorTemperature:(uint8_t)moveMode
+                        rate:(uint16_t)rate
+     colorTemperatureMinimum:(uint16_t)colorTemperatureMinimum
+     colorTemperatureMaximum:(uint16_t)colorTemperatureMaximum
+                 optionsMask:(uint8_t)optionsMask
+             optionsOverride:(uint8_t)optionsOverride
+           completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)moveHue:(uint8_t)moveMode
+                 rate:(uint8_t)rate
+          optionsMask:(uint8_t)optionsMask
+      optionsOverride:(uint8_t)optionsOverride
+    completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)moveSaturation:(uint8_t)moveMode
+                  rate:(uint8_t)rate
+           optionsMask:(uint8_t)optionsMask
+       optionsOverride:(uint8_t)optionsOverride
+     completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)moveToColor:(uint16_t)colorX
+               colorY:(uint16_t)colorY
+       transitionTime:(uint16_t)transitionTime
+          optionsMask:(uint8_t)optionsMask
+      optionsOverride:(uint8_t)optionsOverride
+    completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)moveToColorTemperature:(uint16_t)colorTemperature
+                transitionTime:(uint16_t)transitionTime
+                   optionsMask:(uint8_t)optionsMask
+               optionsOverride:(uint8_t)optionsOverride
+             completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)moveToHue:(uint8_t)hue
+            direction:(uint8_t)direction
+       transitionTime:(uint16_t)transitionTime
+          optionsMask:(uint8_t)optionsMask
+      optionsOverride:(uint8_t)optionsOverride
+    completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)moveToHueAndSaturation:(uint8_t)hue
+                    saturation:(uint8_t)saturation
+                transitionTime:(uint16_t)transitionTime
+                   optionsMask:(uint8_t)optionsMask
+               optionsOverride:(uint8_t)optionsOverride
+             completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)moveToSaturation:(uint8_t)saturation
+          transitionTime:(uint16_t)transitionTime
+             optionsMask:(uint8_t)optionsMask
+         optionsOverride:(uint8_t)optionsOverride
+       completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)stepColor:(int16_t)stepX
+                stepY:(int16_t)stepY
+       transitionTime:(uint16_t)transitionTime
+          optionsMask:(uint8_t)optionsMask
+      optionsOverride:(uint8_t)optionsOverride
+    completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)stepColorTemperature:(uint8_t)stepMode
+                    stepSize:(uint16_t)stepSize
+              transitionTime:(uint16_t)transitionTime
+     colorTemperatureMinimum:(uint16_t)colorTemperatureMinimum
+     colorTemperatureMaximum:(uint16_t)colorTemperatureMaximum
+                 optionsMask:(uint8_t)optionsMask
+             optionsOverride:(uint8_t)optionsOverride
+           completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)stepHue:(uint8_t)stepMode
+             stepSize:(uint8_t)stepSize
+       transitionTime:(uint8_t)transitionTime
+          optionsMask:(uint8_t)optionsMask
+      optionsOverride:(uint8_t)optionsOverride
+    completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)stepSaturation:(uint8_t)stepMode
+              stepSize:(uint8_t)stepSize
+        transitionTime:(uint8_t)transitionTime
+           optionsMask:(uint8_t)optionsMask
+       optionsOverride:(uint8_t)optionsOverride
+     completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)stopMoveStep:(uint8_t)optionsMask
+      optionsOverride:(uint8_t)optionsOverride
+    completionHandler:(ResponseHandler)completionHandler;
 
 - (BOOL)readAttributeCurrentHue:(ResponseHandler)completionHandler;
-- (BOOL) configureAttributeCurrentHue:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval change:(uint8_t)change completionHandler:(ResponseHandler)completionHandler;
-- (BOOL) reportAttributeCurrentHue:(ResponseHandler)reportHandler;
+- (BOOL)configureAttributeCurrentHue:(uint16_t)minInterval
+                         maxInterval:(uint16_t)maxInterval
+                              change:(uint8_t)change
+                   completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)reportAttributeCurrentHue:(ResponseHandler)reportHandler;
 - (BOOL)readAttributeCurrentSaturation:(ResponseHandler)completionHandler;
-- (BOOL) configureAttributeCurrentSaturation:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval change:(uint8_t)change completionHandler:(ResponseHandler)completionHandler;
-- (BOOL) reportAttributeCurrentSaturation:(ResponseHandler)reportHandler;
+- (BOOL)configureAttributeCurrentSaturation:(uint16_t)minInterval
+                                maxInterval:(uint16_t)maxInterval
+                                     change:(uint8_t)change
+                          completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)reportAttributeCurrentSaturation:(ResponseHandler)reportHandler;
 - (BOOL)readAttributeRemainingTime:(ResponseHandler)completionHandler;
 - (BOOL)readAttributeCurrentX:(ResponseHandler)completionHandler;
-- (BOOL) configureAttributeCurrentX:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval change:(uint16_t)change completionHandler:(ResponseHandler)completionHandler;
-- (BOOL) reportAttributeCurrentX:(ResponseHandler)reportHandler;
+- (BOOL)configureAttributeCurrentX:(uint16_t)minInterval
+                       maxInterval:(uint16_t)maxInterval
+                            change:(uint16_t)change
+                 completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)reportAttributeCurrentX:(ResponseHandler)reportHandler;
 - (BOOL)readAttributeCurrentY:(ResponseHandler)completionHandler;
-- (BOOL) configureAttributeCurrentY:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval change:(uint16_t)change completionHandler:(ResponseHandler)completionHandler;
-- (BOOL) reportAttributeCurrentY:(ResponseHandler)reportHandler;
+- (BOOL)configureAttributeCurrentY:(uint16_t)minInterval
+                       maxInterval:(uint16_t)maxInterval
+                            change:(uint16_t)change
+                 completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)reportAttributeCurrentY:(ResponseHandler)reportHandler;
 - (BOOL)readAttributeDriftCompensation:(ResponseHandler)completionHandler;
 - (BOOL)readAttributeCompensationText:(ResponseHandler)completionHandler;
 - (BOOL)readAttributeColorTemperature:(ResponseHandler)completionHandler;
-- (BOOL) configureAttributeColorTemperature:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval change:(uint16_t)change completionHandler:(ResponseHandler)completionHandler;
-- (BOOL) reportAttributeColorTemperature:(ResponseHandler)reportHandler;
+- (BOOL)configureAttributeColorTemperature:(uint16_t)minInterval
+                               maxInterval:(uint16_t)maxInterval
+                                    change:(uint16_t)change
+                         completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)reportAttributeColorTemperature:(ResponseHandler)reportHandler;
 - (BOOL)readAttributeColorMode:(ResponseHandler)completionHandler;
 - (BOOL)readAttributeColorControlOptions:(ResponseHandler)completionHandler;
 - (BOOL)writeAttributeColorControlOptions:(uint8_t)value completionHandler:(ResponseHandler)completionHandler;
@@ -331,18 +490,43 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)getWeekdaySchedule:(uint8_t)scheduleId userId:(uint16_t)userId completionHandler:(ResponseHandler)completionHandler;
 - (BOOL)getYeardaySchedule:(uint8_t)scheduleId userId:(uint16_t)userId completionHandler:(ResponseHandler)completionHandler;
 - (BOOL)lockDoor:(char *)pin completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)setHolidaySchedule:(uint8_t)scheduleId localStartTime:(uint32_t)localStartTime localEndTime:(uint32_t)localEndTime operatingModeDuringHoliday:(uint8_t)operatingModeDuringHoliday completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)setPin:(uint16_t)userId userStatus:(uint8_t)userStatus userType:(uint8_t)userType pin:(char *)pin completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)setRfid:(uint16_t)userId userStatus:(uint8_t)userStatus userType:(uint8_t)userType id:(char *)id completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)setHolidaySchedule:(uint8_t)scheduleId
+                localStartTime:(uint32_t)localStartTime
+                  localEndTime:(uint32_t)localEndTime
+    operatingModeDuringHoliday:(uint8_t)operatingModeDuringHoliday
+             completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)setPin:(uint16_t)userId
+           userStatus:(uint8_t)userStatus
+             userType:(uint8_t)userType
+                  pin:(char *)pin
+    completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)setRfid:(uint16_t)userId
+           userStatus:(uint8_t)userStatus
+             userType:(uint8_t)userType
+                   id:(char *)id
+    completionHandler:(ResponseHandler)completionHandler;
 - (BOOL)setUserType:(uint16_t)userId userType:(uint8_t)userType completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)setWeekdaySchedule:(uint8_t)scheduleId userId:(uint16_t)userId daysMask:(uint8_t)daysMask startHour:(uint8_t)startHour startMinute:(uint8_t)startMinute endHour:(uint8_t)endHour endMinute:(uint8_t)endMinute completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)setYeardaySchedule:(uint8_t)scheduleId userId:(uint16_t)userId localStartTime:(uint32_t)localStartTime localEndTime:(uint32_t)localEndTime completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)setWeekdaySchedule:(uint8_t)scheduleId
+                    userId:(uint16_t)userId
+                  daysMask:(uint8_t)daysMask
+                 startHour:(uint8_t)startHour
+               startMinute:(uint8_t)startMinute
+                   endHour:(uint8_t)endHour
+                 endMinute:(uint8_t)endMinute
+         completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)setYeardaySchedule:(uint8_t)scheduleId
+                    userId:(uint16_t)userId
+            localStartTime:(uint32_t)localStartTime
+              localEndTime:(uint32_t)localEndTime
+         completionHandler:(ResponseHandler)completionHandler;
 - (BOOL)unlockDoor:(char *)pin completionHandler:(ResponseHandler)completionHandler;
 - (BOOL)unlockWithTimeout:(uint16_t)timeoutInSeconds pin:(char *)pin completionHandler:(ResponseHandler)completionHandler;
 
 - (BOOL)readAttributeLockState:(ResponseHandler)completionHandler;
-- (BOOL) configureAttributeLockState:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval completionHandler:(ResponseHandler)completionHandler;
-- (BOOL) reportAttributeLockState:(ResponseHandler)reportHandler;
+- (BOOL)configureAttributeLockState:(uint16_t)minInterval
+                        maxInterval:(uint16_t)maxInterval
+                  completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)reportAttributeLockState:(ResponseHandler)reportHandler;
 - (BOOL)readAttributeLockType:(ResponseHandler)completionHandler;
 - (BOOL)readAttributeActuatorEnabled:(ResponseHandler)completionHandler;
 - (BOOL)readAttributeClusterRevision:(ResponseHandler)completionHandler;
@@ -374,18 +558,43 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)getWeekdaySchedule:(uint8_t)scheduleId userId:(uint16_t)userId completionHandler:(ResponseHandler)completionHandler;
 - (BOOL)getYeardaySchedule:(uint8_t)scheduleId userId:(uint16_t)userId completionHandler:(ResponseHandler)completionHandler;
 - (BOOL)lockDoor:(char *)pin completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)setHolidaySchedule:(uint8_t)scheduleId localStartTime:(uint32_t)localStartTime localEndTime:(uint32_t)localEndTime operatingModeDuringHoliday:(uint8_t)operatingModeDuringHoliday completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)setPin:(uint16_t)userId userStatus:(uint8_t)userStatus userType:(uint8_t)userType pin:(char *)pin completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)setRfid:(uint16_t)userId userStatus:(uint8_t)userStatus userType:(uint8_t)userType id:(char *)id completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)setHolidaySchedule:(uint8_t)scheduleId
+                localStartTime:(uint32_t)localStartTime
+                  localEndTime:(uint32_t)localEndTime
+    operatingModeDuringHoliday:(uint8_t)operatingModeDuringHoliday
+             completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)setPin:(uint16_t)userId
+           userStatus:(uint8_t)userStatus
+             userType:(uint8_t)userType
+                  pin:(char *)pin
+    completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)setRfid:(uint16_t)userId
+           userStatus:(uint8_t)userStatus
+             userType:(uint8_t)userType
+                   id:(char *)id
+    completionHandler:(ResponseHandler)completionHandler;
 - (BOOL)setUserType:(uint16_t)userId userType:(uint8_t)userType completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)setWeekdaySchedule:(uint8_t)scheduleId userId:(uint16_t)userId daysMask:(uint8_t)daysMask startHour:(uint8_t)startHour startMinute:(uint8_t)startMinute endHour:(uint8_t)endHour endMinute:(uint8_t)endMinute completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)setYeardaySchedule:(uint8_t)scheduleId userId:(uint16_t)userId localStartTime:(uint32_t)localStartTime localEndTime:(uint32_t)localEndTime completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)setWeekdaySchedule:(uint8_t)scheduleId
+                    userId:(uint16_t)userId
+                  daysMask:(uint8_t)daysMask
+                 startHour:(uint8_t)startHour
+               startMinute:(uint8_t)startMinute
+                   endHour:(uint8_t)endHour
+                 endMinute:(uint8_t)endMinute
+         completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)setYeardaySchedule:(uint8_t)scheduleId
+                    userId:(uint16_t)userId
+            localStartTime:(uint32_t)localStartTime
+              localEndTime:(uint32_t)localEndTime
+         completionHandler:(ResponseHandler)completionHandler;
 - (BOOL)unlockDoor:(char *)pin completionHandler:(ResponseHandler)completionHandler;
 - (BOOL)unlockWithTimeout:(uint16_t)timeoutInSeconds pin:(char *)pin completionHandler:(ResponseHandler)completionHandler;
 
 - (BOOL)readAttributeLockState:(ResponseHandler)completionHandler;
-- (BOOL) configureAttributeLockState:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval completionHandler:(ResponseHandler)completionHandler;
-- (BOOL) reportAttributeLockState:(ResponseHandler)reportHandler;
+- (BOOL)configureAttributeLockState:(uint16_t)minInterval
+                        maxInterval:(uint16_t)maxInterval
+                  completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)reportAttributeLockState:(ResponseHandler)reportHandler;
 - (BOOL)readAttributeLockType:(ResponseHandler)completionHandler;
 - (BOOL)readAttributeActuatorEnabled:(ResponseHandler)completionHandler;
 - (BOOL)readAttributeClusterRevision:(ResponseHandler)completionHandler;
@@ -505,18 +714,39 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPLevelControl : NSObject
 
 - (nullable instancetype)initWithDevice:(CHIPDevice *)device endpoint:(uint8_t)endpoint queue:(dispatch_queue_t)queue;
-- (BOOL)move:(uint8_t)moveMode rate:(uint8_t)rate optionMask:(uint8_t)optionMask optionOverride:(uint8_t)optionOverride completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)moveToLevel:(uint8_t)level transitionTime:(uint16_t)transitionTime optionMask:(uint8_t)optionMask optionOverride:(uint8_t)optionOverride completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)moveToLevelWithOnOff:(uint8_t)level transitionTime:(uint16_t)transitionTime completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)move:(uint8_t)moveMode
+                 rate:(uint8_t)rate
+           optionMask:(uint8_t)optionMask
+       optionOverride:(uint8_t)optionOverride
+    completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)moveToLevel:(uint8_t)level
+       transitionTime:(uint16_t)transitionTime
+           optionMask:(uint8_t)optionMask
+       optionOverride:(uint8_t)optionOverride
+    completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)moveToLevelWithOnOff:(uint8_t)level
+              transitionTime:(uint16_t)transitionTime
+           completionHandler:(ResponseHandler)completionHandler;
 - (BOOL)moveWithOnOff:(uint8_t)moveMode rate:(uint8_t)rate completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)step:(uint8_t)stepMode stepSize:(uint8_t)stepSize transitionTime:(uint16_t)transitionTime optionMask:(uint8_t)optionMask optionOverride:(uint8_t)optionOverride completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)stepWithOnOff:(uint8_t)stepMode stepSize:(uint8_t)stepSize transitionTime:(uint16_t)transitionTime completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)step:(uint8_t)stepMode
+             stepSize:(uint8_t)stepSize
+       transitionTime:(uint16_t)transitionTime
+           optionMask:(uint8_t)optionMask
+       optionOverride:(uint8_t)optionOverride
+    completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)stepWithOnOff:(uint8_t)stepMode
+             stepSize:(uint8_t)stepSize
+       transitionTime:(uint16_t)transitionTime
+    completionHandler:(ResponseHandler)completionHandler;
 - (BOOL)stop:(uint8_t)optionMask optionOverride:(uint8_t)optionOverride completionHandler:(ResponseHandler)completionHandler;
 - (BOOL)stopWithOnOff:(ResponseHandler)completionHandler;
 
 - (BOOL)readAttributeCurrentLevel:(ResponseHandler)completionHandler;
-- (BOOL) configureAttributeCurrentLevel:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval change:(uint8_t)change completionHandler:(ResponseHandler)completionHandler;
-- (BOOL) reportAttributeCurrentLevel:(ResponseHandler)reportHandler;
+- (BOOL)configureAttributeCurrentLevel:(uint16_t)minInterval
+                           maxInterval:(uint16_t)maxInterval
+                                change:(uint8_t)change
+                     completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)reportAttributeCurrentLevel:(ResponseHandler)reportHandler;
 - (BOOL)readAttributeClusterRevision:(ResponseHandler)completionHandler;
 
 - (instancetype)init NS_UNAVAILABLE;
@@ -531,18 +761,39 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPLevelControl : NSObject
 
 - (nullable instancetype)initWithDevice:(CHIPDevice *)device endpoint:(uint8_t)endpoint queue:(dispatch_queue_t)queue;
-- (BOOL)move:(uint8_t)moveMode rate:(uint8_t)rate optionMask:(uint8_t)optionMask optionOverride:(uint8_t)optionOverride completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)moveToLevel:(uint8_t)level transitionTime:(uint16_t)transitionTime optionMask:(uint8_t)optionMask optionOverride:(uint8_t)optionOverride completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)moveToLevelWithOnOff:(uint8_t)level transitionTime:(uint16_t)transitionTime completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)move:(uint8_t)moveMode
+                 rate:(uint8_t)rate
+           optionMask:(uint8_t)optionMask
+       optionOverride:(uint8_t)optionOverride
+    completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)moveToLevel:(uint8_t)level
+       transitionTime:(uint16_t)transitionTime
+           optionMask:(uint8_t)optionMask
+       optionOverride:(uint8_t)optionOverride
+    completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)moveToLevelWithOnOff:(uint8_t)level
+              transitionTime:(uint16_t)transitionTime
+           completionHandler:(ResponseHandler)completionHandler;
 - (BOOL)moveWithOnOff:(uint8_t)moveMode rate:(uint8_t)rate completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)step:(uint8_t)stepMode stepSize:(uint8_t)stepSize transitionTime:(uint16_t)transitionTime optionMask:(uint8_t)optionMask optionOverride:(uint8_t)optionOverride completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)stepWithOnOff:(uint8_t)stepMode stepSize:(uint8_t)stepSize transitionTime:(uint16_t)transitionTime completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)step:(uint8_t)stepMode
+             stepSize:(uint8_t)stepSize
+       transitionTime:(uint16_t)transitionTime
+           optionMask:(uint8_t)optionMask
+       optionOverride:(uint8_t)optionOverride
+    completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)stepWithOnOff:(uint8_t)stepMode
+             stepSize:(uint8_t)stepSize
+       transitionTime:(uint16_t)transitionTime
+    completionHandler:(ResponseHandler)completionHandler;
 - (BOOL)stop:(uint8_t)optionMask optionOverride:(uint8_t)optionOverride completionHandler:(ResponseHandler)completionHandler;
 - (BOOL)stopWithOnOff:(ResponseHandler)completionHandler;
 
 - (BOOL)readAttributeCurrentLevel:(ResponseHandler)completionHandler;
-- (BOOL) configureAttributeCurrentLevel:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval change:(uint8_t)change completionHandler:(ResponseHandler)completionHandler;
-- (BOOL) reportAttributeCurrentLevel:(ResponseHandler)reportHandler;
+- (BOOL)configureAttributeCurrentLevel:(uint16_t)minInterval
+                           maxInterval:(uint16_t)maxInterval
+                                change:(uint8_t)change
+                     completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)reportAttributeCurrentLevel:(ResponseHandler)reportHandler;
 - (BOOL)readAttributeClusterRevision:(ResponseHandler)completionHandler;
 
 - (instancetype)init NS_UNAVAILABLE;
@@ -588,8 +839,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)toggle:(ResponseHandler)completionHandler;
 
 - (BOOL)readAttributeOnOff:(ResponseHandler)completionHandler;
-- (BOOL) configureAttributeOnOff:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval completionHandler:(ResponseHandler)completionHandler;
-- (BOOL) reportAttributeOnOff:(ResponseHandler)reportHandler;
+- (BOOL)configureAttributeOnOff:(uint16_t)minInterval
+                    maxInterval:(uint16_t)maxInterval
+              completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)reportAttributeOnOff:(ResponseHandler)reportHandler;
 - (BOOL)readAttributeClusterRevision:(ResponseHandler)completionHandler;
 
 - (instancetype)init NS_UNAVAILABLE;
@@ -609,8 +862,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)toggle:(ResponseHandler)completionHandler;
 
 - (BOOL)readAttributeOnOff:(ResponseHandler)completionHandler;
-- (BOOL) configureAttributeOnOff:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval completionHandler:(ResponseHandler)completionHandler;
-- (BOOL) reportAttributeOnOff:(ResponseHandler)reportHandler;
+- (BOOL)configureAttributeOnOff:(uint16_t)minInterval
+                    maxInterval:(uint16_t)maxInterval
+              completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)reportAttributeOnOff:(ResponseHandler)reportHandler;
 - (BOOL)readAttributeClusterRevision:(ResponseHandler)completionHandler;
 
 - (instancetype)init NS_UNAVAILABLE;
@@ -625,9 +880,19 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPScenes : NSObject
 
 - (nullable instancetype)initWithDevice:(CHIPDevice *)device endpoint:(uint8_t)endpoint queue:(dispatch_queue_t)queue;
-- (BOOL)addScene:(uint16_t)groupId sceneId:(uint8_t)sceneId transitionTime:(uint16_t)transitionTime sceneName:(char *)sceneName clusterId:(uint16_t)clusterId length:(uint8_t)length value:(uint8_t)value completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)addScene:(uint16_t)groupId
+              sceneId:(uint8_t)sceneId
+       transitionTime:(uint16_t)transitionTime
+            sceneName:(char *)sceneName
+            clusterId:(uint16_t)clusterId
+               length:(uint8_t)length
+                value:(uint8_t)value
+    completionHandler:(ResponseHandler)completionHandler;
 - (BOOL)getSceneMembership:(uint16_t)groupId completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)recallScene:(uint16_t)groupId sceneId:(uint8_t)sceneId transitionTime:(uint16_t)transitionTime completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)recallScene:(uint16_t)groupId
+              sceneId:(uint8_t)sceneId
+       transitionTime:(uint16_t)transitionTime
+    completionHandler:(ResponseHandler)completionHandler;
 - (BOOL)removeAllScenes:(uint16_t)groupId completionHandler:(ResponseHandler)completionHandler;
 - (BOOL)removeScene:(uint16_t)groupId sceneId:(uint8_t)sceneId completionHandler:(ResponseHandler)completionHandler;
 - (BOOL)storeScene:(uint16_t)groupId sceneId:(uint8_t)sceneId completionHandler:(ResponseHandler)completionHandler;
@@ -652,9 +917,19 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPScenes : NSObject
 
 - (nullable instancetype)initWithDevice:(CHIPDevice *)device endpoint:(uint8_t)endpoint queue:(dispatch_queue_t)queue;
-- (BOOL)addScene:(uint16_t)groupId sceneId:(uint8_t)sceneId transitionTime:(uint16_t)transitionTime sceneName:(char *)sceneName clusterId:(uint16_t)clusterId length:(uint8_t)length value:(uint8_t)value completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)addScene:(uint16_t)groupId
+              sceneId:(uint8_t)sceneId
+       transitionTime:(uint16_t)transitionTime
+            sceneName:(char *)sceneName
+            clusterId:(uint16_t)clusterId
+               length:(uint8_t)length
+                value:(uint8_t)value
+    completionHandler:(ResponseHandler)completionHandler;
 - (BOOL)getSceneMembership:(uint16_t)groupId completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)recallScene:(uint16_t)groupId sceneId:(uint8_t)sceneId transitionTime:(uint16_t)transitionTime completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)recallScene:(uint16_t)groupId
+              sceneId:(uint8_t)sceneId
+       transitionTime:(uint16_t)transitionTime
+    completionHandler:(ResponseHandler)completionHandler;
 - (BOOL)removeAllScenes:(uint16_t)groupId completionHandler:(ResponseHandler)completionHandler;
 - (BOOL)removeScene:(uint16_t)groupId sceneId:(uint8_t)sceneId completionHandler:(ResponseHandler)completionHandler;
 - (BOOL)storeScene:(uint16_t)groupId sceneId:(uint8_t)sceneId completionHandler:(ResponseHandler)completionHandler;
@@ -681,8 +956,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (nullable instancetype)initWithDevice:(CHIPDevice *)device endpoint:(uint8_t)endpoint queue:(dispatch_queue_t)queue;
 
 - (BOOL)readAttributeMeasuredValue:(ResponseHandler)completionHandler;
-- (BOOL) configureAttributeMeasuredValue:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval change:(int16_t)change completionHandler:(ResponseHandler)completionHandler;
-- (BOOL) reportAttributeMeasuredValue:(ResponseHandler)reportHandler;
+- (BOOL)configureAttributeMeasuredValue:(uint16_t)minInterval
+                            maxInterval:(uint16_t)maxInterval
+                                 change:(int16_t)change
+                      completionHandler:(ResponseHandler)completionHandler;
+- (BOOL)reportAttributeMeasuredValue:(ResponseHandler)reportHandler;
 - (BOOL)readAttributeMinMeasuredValue:(ResponseHandler)completionHandler;
 - (BOOL)readAttributeMaxMeasuredValue:(ResponseHandler)completionHandler;
 - (BOOL)readAttributeClusterRevision:(ResponseHandler)completionHandler;

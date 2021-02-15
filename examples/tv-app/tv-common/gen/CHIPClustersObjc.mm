@@ -21,8 +21,8 @@
 
 #import "CHIPDevice.h"
 #import "CHIPDevice_Internal.h"
-#import "gen/CHIPClustersObjc.h"
 #import "gen/CHIPClientCallbacks.h"
+#import "gen/CHIPClustersObjc.h"
 
 #include <controller/CHIPClusters.h>
 
@@ -72,7 +72,7 @@ public:
         CHIPDefaultFailureCallbackBridge * callback = reinterpret_cast<CHIPDefaultFailureCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
-                NSError* error = [NSError errorWithDomain:@"ZCL" code:status userInfo:@{NSLocalizedDescriptionKey:@""}];
+                NSError * error = [NSError errorWithDomain:@"ZCL" code:status userInfo:@ { NSLocalizedDescriptionKey : @"" }];
                 callback->mHandler(error, nil);
                 callback->Cancel();
                 delete callback;
@@ -99,7 +99,9 @@ public:
         CHIPUnsupportedAttributeCallbackBridge * callback = reinterpret_cast<CHIPUnsupportedAttributeCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
-                NSError* error = [NSError errorWithDomain:@"ZCL" code:0 userInfo:@{NSLocalizedDescriptionKey:@"Unsuported attribute type"}];
+                NSError * error = [NSError errorWithDomain:@"ZCL"
+                                                      code:0
+                                                  userInfo:@ { NSLocalizedDescriptionKey : @"Unsuported attribute type" }];
                 callback->mHandler(error, nil);
                 callback->Cancel();
                 delete callback;
@@ -129,9 +131,8 @@ public:
         CHIPBooleanAttributeCallbackBridge * callback = reinterpret_cast<CHIPBooleanAttributeCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @{ @"value": [NSNumber numberWithBool:value] });
-                if (!callback->mKeepAlive)
-                {
+                callback->mHandler(nil, @ { @"value" : [NSNumber numberWithBool:value] });
+                if (!callback->mKeepAlive) {
                     callback->Cancel();
                     delete callback;
                 }
@@ -162,9 +163,8 @@ public:
         CHIPInt8uAttributeCallbackBridge * callback = reinterpret_cast<CHIPInt8uAttributeCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @{ @"value": [NSNumber numberWithUnsignedChar:value] });
-                if (!callback->mKeepAlive)
-                {
+                callback->mHandler(nil, @ { @"value" : [NSNumber numberWithUnsignedChar:value] });
+                if (!callback->mKeepAlive) {
                     callback->Cancel();
                     delete callback;
                 }
@@ -195,9 +195,8 @@ public:
         CHIPInt8sAttributeCallbackBridge * callback = reinterpret_cast<CHIPInt8sAttributeCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @{ @"value": [NSNumber numberWithChar:value] });
-                if (!callback->mKeepAlive)
-                {
+                callback->mHandler(nil, @ { @"value" : [NSNumber numberWithChar:value] });
+                if (!callback->mKeepAlive) {
                     callback->Cancel();
                     delete callback;
                 }
@@ -228,9 +227,8 @@ public:
         CHIPInt16uAttributeCallbackBridge * callback = reinterpret_cast<CHIPInt16uAttributeCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @{ @"value": [NSNumber numberWithUnsignedShort:value] });
-                if (!callback->mKeepAlive)
-                {
+                callback->mHandler(nil, @ { @"value" : [NSNumber numberWithUnsignedShort:value] });
+                if (!callback->mKeepAlive) {
                     callback->Cancel();
                     delete callback;
                 }
@@ -261,9 +259,8 @@ public:
         CHIPInt16sAttributeCallbackBridge * callback = reinterpret_cast<CHIPInt16sAttributeCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @{ @"value": [NSNumber numberWithShort:value] });
-                if (!callback->mKeepAlive)
-                {
+                callback->mHandler(nil, @ { @"value" : [NSNumber numberWithShort:value] });
+                if (!callback->mKeepAlive) {
                     callback->Cancel();
                     delete callback;
                 }
@@ -277,21 +274,24 @@ private:
     bool mKeepAlive;
 };
 
-class CHIPDoorLockClusterLockDoorResponseCallbackBridge : public Callback::Callback<DoorLockClusterLockDoorResponseCallback>
-{
+class CHIPDoorLockClusterLockDoorResponseCallbackBridge : public Callback::Callback<DoorLockClusterLockDoorResponseCallback> {
 public:
-    CHIPDoorLockClusterLockDoorResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<DoorLockClusterLockDoorResponseCallback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
+    CHIPDoorLockClusterLockDoorResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
+        : Callback::Callback<DoorLockClusterLockDoorResponseCallback>(CallbackFn, this)
+        , mHandler(handler)
+        , mQueue(queue)
+    {
+    }
 
     ~CHIPDoorLockClusterLockDoorResponseCallbackBridge() {};
 
     static void CallbackFn(void * context)
     {
-        CHIPDoorLockClusterLockDoorResponseCallbackBridge * callback = reinterpret_cast<CHIPDoorLockClusterLockDoorResponseCallbackBridge *>(context);
-        if (callback && callback->mQueue)
-        {
+        CHIPDoorLockClusterLockDoorResponseCallbackBridge * callback
+            = reinterpret_cast<CHIPDoorLockClusterLockDoorResponseCallbackBridge *>(context);
+        if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @{
-                });
+                callback->mHandler(nil, @ {});
                 callback->Cancel();
                 delete callback;
             });
@@ -303,21 +303,24 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPDoorLockClusterUnlockDoorResponseCallbackBridge : public Callback::Callback<DoorLockClusterUnlockDoorResponseCallback>
-{
+class CHIPDoorLockClusterUnlockDoorResponseCallbackBridge : public Callback::Callback<DoorLockClusterUnlockDoorResponseCallback> {
 public:
-    CHIPDoorLockClusterUnlockDoorResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<DoorLockClusterUnlockDoorResponseCallback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
+    CHIPDoorLockClusterUnlockDoorResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
+        : Callback::Callback<DoorLockClusterUnlockDoorResponseCallback>(CallbackFn, this)
+        , mHandler(handler)
+        , mQueue(queue)
+    {
+    }
 
     ~CHIPDoorLockClusterUnlockDoorResponseCallbackBridge() {};
 
     static void CallbackFn(void * context)
     {
-        CHIPDoorLockClusterUnlockDoorResponseCallbackBridge * callback = reinterpret_cast<CHIPDoorLockClusterUnlockDoorResponseCallbackBridge *>(context);
-        if (callback && callback->mQueue)
-        {
+        CHIPDoorLockClusterUnlockDoorResponseCallbackBridge * callback
+            = reinterpret_cast<CHIPDoorLockClusterUnlockDoorResponseCallbackBridge *>(context);
+        if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @{
-                });
+                callback->mHandler(nil, @ {});
                 callback->Cancel();
                 delete callback;
             });
@@ -329,51 +332,25 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPGroupsClusterAddGroupResponseCallbackBridge : public Callback::Callback<GroupsClusterAddGroupResponseCallback>
-{
+class CHIPGroupsClusterAddGroupResponseCallbackBridge : public Callback::Callback<GroupsClusterAddGroupResponseCallback> {
 public:
-    CHIPGroupsClusterAddGroupResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<GroupsClusterAddGroupResponseCallback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
+    CHIPGroupsClusterAddGroupResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
+        : Callback::Callback<GroupsClusterAddGroupResponseCallback>(CallbackFn, this)
+        , mHandler(handler)
+        , mQueue(queue)
+    {
+    }
 
     ~CHIPGroupsClusterAddGroupResponseCallbackBridge() {};
 
     static void CallbackFn(void * context, uint16_t groupId)
     {
-        CHIPGroupsClusterAddGroupResponseCallbackBridge * callback = reinterpret_cast<CHIPGroupsClusterAddGroupResponseCallbackBridge *>(context);
-        if (callback && callback->mQueue)
-        {
+        CHIPGroupsClusterAddGroupResponseCallbackBridge * callback
+            = reinterpret_cast<CHIPGroupsClusterAddGroupResponseCallbackBridge *>(context);
+        if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @{
-                  @"groupId": [NSNumber numberWithUnsignedShort:groupId],
-                                  });
-                callback->Cancel();
-                delete callback;
-            });
-        }
-    };
-
-private:
-    ResponseHandler mHandler;
-    dispatch_queue_t mQueue;
-};
-
-class CHIPGroupsClusterGetGroupMembershipResponseCallbackBridge : public Callback::Callback<GroupsClusterGetGroupMembershipResponseCallback>
-{
-public:
-    CHIPGroupsClusterGetGroupMembershipResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<GroupsClusterGetGroupMembershipResponseCallback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
-
-    ~CHIPGroupsClusterGetGroupMembershipResponseCallbackBridge() {};
-
-    static void CallbackFn(void * context, uint8_t capacity, uint8_t groupCount, /* TYPE WARNING: array array defaults to */ uint8_t *  groupList)
-    {
-        CHIPGroupsClusterGetGroupMembershipResponseCallbackBridge * callback = reinterpret_cast<CHIPGroupsClusterGetGroupMembershipResponseCallbackBridge *>(context);
-        if (callback && callback->mQueue)
-        {
-            dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @{
-                  @"capacity": [NSNumber numberWithUnsignedChar:capacity],
-                                    @"groupCount": [NSNumber numberWithUnsignedChar:groupCount],
-                                    // groupList: /* TYPE WARNING: array array defaults to */ uint8_t *
-                  // Conversion from this type to Objc is not properly implemented yet
+                callback->mHandler(nil, @ {
+                    @"groupId" : [NSNumber numberWithUnsignedShort:groupId],
                 });
                 callback->Cancel();
                 delete callback;
@@ -386,22 +363,62 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPGroupsClusterRemoveGroupResponseCallbackBridge : public Callback::Callback<GroupsClusterRemoveGroupResponseCallback>
-{
+class CHIPGroupsClusterGetGroupMembershipResponseCallbackBridge
+    : public Callback::Callback<GroupsClusterGetGroupMembershipResponseCallback> {
 public:
-    CHIPGroupsClusterRemoveGroupResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<GroupsClusterRemoveGroupResponseCallback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
+    CHIPGroupsClusterGetGroupMembershipResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
+        : Callback::Callback<GroupsClusterGetGroupMembershipResponseCallback>(CallbackFn, this)
+        , mHandler(handler)
+        , mQueue(queue)
+    {
+    }
+
+    ~CHIPGroupsClusterGetGroupMembershipResponseCallbackBridge() {};
+
+    static void CallbackFn(
+        void * context, uint8_t capacity, uint8_t groupCount, /* TYPE WARNING: array array defaults to */ uint8_t * groupList)
+    {
+        CHIPGroupsClusterGetGroupMembershipResponseCallbackBridge * callback
+            = reinterpret_cast<CHIPGroupsClusterGetGroupMembershipResponseCallbackBridge *>(context);
+        if (callback && callback->mQueue) {
+            dispatch_async(callback->mQueue, ^{
+                callback->mHandler(nil, @ {
+                    @"capacity" : [NSNumber numberWithUnsignedChar:capacity],
+                    @"groupCount" : [NSNumber numberWithUnsignedChar:groupCount],
+                    // groupList: /* TYPE WARNING: array array defaults to */ uint8_t *
+                    // Conversion from this type to Objc is not properly implemented yet
+                });
+                callback->Cancel();
+                delete callback;
+            });
+        }
+    };
+
+private:
+    ResponseHandler mHandler;
+    dispatch_queue_t mQueue;
+};
+
+class CHIPGroupsClusterRemoveGroupResponseCallbackBridge : public Callback::Callback<GroupsClusterRemoveGroupResponseCallback> {
+public:
+    CHIPGroupsClusterRemoveGroupResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
+        : Callback::Callback<GroupsClusterRemoveGroupResponseCallback>(CallbackFn, this)
+        , mHandler(handler)
+        , mQueue(queue)
+    {
+    }
 
     ~CHIPGroupsClusterRemoveGroupResponseCallbackBridge() {};
 
     static void CallbackFn(void * context, uint16_t groupId)
     {
-        CHIPGroupsClusterRemoveGroupResponseCallbackBridge * callback = reinterpret_cast<CHIPGroupsClusterRemoveGroupResponseCallbackBridge *>(context);
-        if (callback && callback->mQueue)
-        {
+        CHIPGroupsClusterRemoveGroupResponseCallbackBridge * callback
+            = reinterpret_cast<CHIPGroupsClusterRemoveGroupResponseCallbackBridge *>(context);
+        if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @{
-                  @"groupId": [NSNumber numberWithUnsignedShort:groupId],
-                                  });
+                callback->mHandler(nil, @ {
+                    @"groupId" : [NSNumber numberWithUnsignedShort:groupId],
+                });
                 callback->Cancel();
                 delete callback;
             });
@@ -413,22 +430,26 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPGroupsClusterViewGroupResponseCallbackBridge : public Callback::Callback<GroupsClusterViewGroupResponseCallback>
-{
+class CHIPGroupsClusterViewGroupResponseCallbackBridge : public Callback::Callback<GroupsClusterViewGroupResponseCallback> {
 public:
-    CHIPGroupsClusterViewGroupResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<GroupsClusterViewGroupResponseCallback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
+    CHIPGroupsClusterViewGroupResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
+        : Callback::Callback<GroupsClusterViewGroupResponseCallback>(CallbackFn, this)
+        , mHandler(handler)
+        , mQueue(queue)
+    {
+    }
 
     ~CHIPGroupsClusterViewGroupResponseCallbackBridge() {};
 
     static void CallbackFn(void * context, uint16_t groupId, uint8_t * groupName)
     {
-        CHIPGroupsClusterViewGroupResponseCallbackBridge * callback = reinterpret_cast<CHIPGroupsClusterViewGroupResponseCallbackBridge *>(context);
-        if (callback && callback->mQueue)
-        {
+        CHIPGroupsClusterViewGroupResponseCallbackBridge * callback
+            = reinterpret_cast<CHIPGroupsClusterViewGroupResponseCallbackBridge *>(context);
+        if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @{
-                  @"groupId": [NSNumber numberWithUnsignedShort:groupId],
-                                    @"groupName": [NSString stringWithFormat:@"%s", groupName],
+                callback->mHandler(nil, @ {
+                    @"groupId" : [NSNumber numberWithUnsignedShort:groupId],
+                    @"groupName" : [NSString stringWithFormat:@"%s", groupName],
                 });
                 callback->Cancel();
                 delete callback;
@@ -441,22 +462,27 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPIdentifyClusterIdentifyQueryResponseCallbackBridge : public Callback::Callback<IdentifyClusterIdentifyQueryResponseCallback>
-{
+class CHIPIdentifyClusterIdentifyQueryResponseCallbackBridge
+    : public Callback::Callback<IdentifyClusterIdentifyQueryResponseCallback> {
 public:
-    CHIPIdentifyClusterIdentifyQueryResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<IdentifyClusterIdentifyQueryResponseCallback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
+    CHIPIdentifyClusterIdentifyQueryResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
+        : Callback::Callback<IdentifyClusterIdentifyQueryResponseCallback>(CallbackFn, this)
+        , mHandler(handler)
+        , mQueue(queue)
+    {
+    }
 
     ~CHIPIdentifyClusterIdentifyQueryResponseCallbackBridge() {};
 
     static void CallbackFn(void * context, uint16_t timeout)
     {
-        CHIPIdentifyClusterIdentifyQueryResponseCallbackBridge * callback = reinterpret_cast<CHIPIdentifyClusterIdentifyQueryResponseCallbackBridge *>(context);
-        if (callback && callback->mQueue)
-        {
+        CHIPIdentifyClusterIdentifyQueryResponseCallbackBridge * callback
+            = reinterpret_cast<CHIPIdentifyClusterIdentifyQueryResponseCallbackBridge *>(context);
+        if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @{
-                  @"timeout": [NSNumber numberWithUnsignedShort:timeout],
-                                  });
+                callback->mHandler(nil, @ {
+                    @"timeout" : [NSNumber numberWithUnsignedShort:timeout],
+                });
                 callback->Cancel();
                 delete callback;
             });
@@ -468,53 +494,26 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPScenesClusterAddSceneResponseCallbackBridge : public Callback::Callback<ScenesClusterAddSceneResponseCallback>
-{
+class CHIPScenesClusterAddSceneResponseCallbackBridge : public Callback::Callback<ScenesClusterAddSceneResponseCallback> {
 public:
-    CHIPScenesClusterAddSceneResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<ScenesClusterAddSceneResponseCallback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
+    CHIPScenesClusterAddSceneResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
+        : Callback::Callback<ScenesClusterAddSceneResponseCallback>(CallbackFn, this)
+        , mHandler(handler)
+        , mQueue(queue)
+    {
+    }
 
     ~CHIPScenesClusterAddSceneResponseCallbackBridge() {};
 
     static void CallbackFn(void * context, uint16_t groupId, uint8_t sceneId)
     {
-        CHIPScenesClusterAddSceneResponseCallbackBridge * callback = reinterpret_cast<CHIPScenesClusterAddSceneResponseCallbackBridge *>(context);
-        if (callback && callback->mQueue)
-        {
+        CHIPScenesClusterAddSceneResponseCallbackBridge * callback
+            = reinterpret_cast<CHIPScenesClusterAddSceneResponseCallbackBridge *>(context);
+        if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @{
-                  @"groupId": [NSNumber numberWithUnsignedShort:groupId],
-                                    @"sceneId": [NSNumber numberWithUnsignedChar:sceneId],
-                                  });
-                callback->Cancel();
-                delete callback;
-            });
-        }
-    };
-
-private:
-    ResponseHandler mHandler;
-    dispatch_queue_t mQueue;
-};
-
-class CHIPScenesClusterGetSceneMembershipResponseCallbackBridge : public Callback::Callback<ScenesClusterGetSceneMembershipResponseCallback>
-{
-public:
-    CHIPScenesClusterGetSceneMembershipResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<ScenesClusterGetSceneMembershipResponseCallback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
-
-    ~CHIPScenesClusterGetSceneMembershipResponseCallbackBridge() {};
-
-    static void CallbackFn(void * context, uint8_t capacity, uint16_t groupId, uint8_t sceneCount, /* TYPE WARNING: array array defaults to */ uint8_t *  sceneList)
-    {
-        CHIPScenesClusterGetSceneMembershipResponseCallbackBridge * callback = reinterpret_cast<CHIPScenesClusterGetSceneMembershipResponseCallbackBridge *>(context);
-        if (callback && callback->mQueue)
-        {
-            dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @{
-                  @"capacity": [NSNumber numberWithUnsignedChar:capacity],
-                                    @"groupId": [NSNumber numberWithUnsignedShort:groupId],
-                                    @"sceneCount": [NSNumber numberWithUnsignedChar:sceneCount],
-                                    // sceneList: /* TYPE WARNING: array array defaults to */ uint8_t *
-                  // Conversion from this type to Objc is not properly implemented yet
+                callback->mHandler(nil, @ {
+                    @"groupId" : [NSNumber numberWithUnsignedShort:groupId],
+                    @"sceneId" : [NSNumber numberWithUnsignedChar:sceneId],
                 });
                 callback->Cancel();
                 delete callback;
@@ -527,109 +526,63 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPScenesClusterRemoveAllScenesResponseCallbackBridge : public Callback::Callback<ScenesClusterRemoveAllScenesResponseCallback>
-{
+class CHIPScenesClusterGetSceneMembershipResponseCallbackBridge
+    : public Callback::Callback<ScenesClusterGetSceneMembershipResponseCallback> {
 public:
-    CHIPScenesClusterRemoveAllScenesResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<ScenesClusterRemoveAllScenesResponseCallback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
+    CHIPScenesClusterGetSceneMembershipResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
+        : Callback::Callback<ScenesClusterGetSceneMembershipResponseCallback>(CallbackFn, this)
+        , mHandler(handler)
+        , mQueue(queue)
+    {
+    }
+
+    ~CHIPScenesClusterGetSceneMembershipResponseCallbackBridge() {};
+
+    static void CallbackFn(void * context, uint8_t capacity, uint16_t groupId, uint8_t sceneCount,
+        /* TYPE WARNING: array array defaults to */ uint8_t * sceneList)
+    {
+        CHIPScenesClusterGetSceneMembershipResponseCallbackBridge * callback
+            = reinterpret_cast<CHIPScenesClusterGetSceneMembershipResponseCallbackBridge *>(context);
+        if (callback && callback->mQueue) {
+            dispatch_async(callback->mQueue, ^{
+                callback->mHandler(nil, @ {
+                    @"capacity" : [NSNumber numberWithUnsignedChar:capacity],
+                    @"groupId" : [NSNumber numberWithUnsignedShort:groupId],
+                    @"sceneCount" : [NSNumber numberWithUnsignedChar:sceneCount],
+                    // sceneList: /* TYPE WARNING: array array defaults to */ uint8_t *
+                    // Conversion from this type to Objc is not properly implemented yet
+                });
+                callback->Cancel();
+                delete callback;
+            });
+        }
+    };
+
+private:
+    ResponseHandler mHandler;
+    dispatch_queue_t mQueue;
+};
+
+class CHIPScenesClusterRemoveAllScenesResponseCallbackBridge
+    : public Callback::Callback<ScenesClusterRemoveAllScenesResponseCallback> {
+public:
+    CHIPScenesClusterRemoveAllScenesResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
+        : Callback::Callback<ScenesClusterRemoveAllScenesResponseCallback>(CallbackFn, this)
+        , mHandler(handler)
+        , mQueue(queue)
+    {
+    }
 
     ~CHIPScenesClusterRemoveAllScenesResponseCallbackBridge() {};
 
     static void CallbackFn(void * context, uint16_t groupId)
     {
-        CHIPScenesClusterRemoveAllScenesResponseCallbackBridge * callback = reinterpret_cast<CHIPScenesClusterRemoveAllScenesResponseCallbackBridge *>(context);
-        if (callback && callback->mQueue)
-        {
+        CHIPScenesClusterRemoveAllScenesResponseCallbackBridge * callback
+            = reinterpret_cast<CHIPScenesClusterRemoveAllScenesResponseCallbackBridge *>(context);
+        if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @{
-                  @"groupId": [NSNumber numberWithUnsignedShort:groupId],
-                                  });
-                callback->Cancel();
-                delete callback;
-            });
-        }
-    };
-
-private:
-    ResponseHandler mHandler;
-    dispatch_queue_t mQueue;
-};
-
-class CHIPScenesClusterRemoveSceneResponseCallbackBridge : public Callback::Callback<ScenesClusterRemoveSceneResponseCallback>
-{
-public:
-    CHIPScenesClusterRemoveSceneResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<ScenesClusterRemoveSceneResponseCallback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
-
-    ~CHIPScenesClusterRemoveSceneResponseCallbackBridge() {};
-
-    static void CallbackFn(void * context, uint16_t groupId, uint8_t sceneId)
-    {
-        CHIPScenesClusterRemoveSceneResponseCallbackBridge * callback = reinterpret_cast<CHIPScenesClusterRemoveSceneResponseCallbackBridge *>(context);
-        if (callback && callback->mQueue)
-        {
-            dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @{
-                  @"groupId": [NSNumber numberWithUnsignedShort:groupId],
-                                    @"sceneId": [NSNumber numberWithUnsignedChar:sceneId],
-                                  });
-                callback->Cancel();
-                delete callback;
-            });
-        }
-    };
-
-private:
-    ResponseHandler mHandler;
-    dispatch_queue_t mQueue;
-};
-
-class CHIPScenesClusterStoreSceneResponseCallbackBridge : public Callback::Callback<ScenesClusterStoreSceneResponseCallback>
-{
-public:
-    CHIPScenesClusterStoreSceneResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<ScenesClusterStoreSceneResponseCallback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
-
-    ~CHIPScenesClusterStoreSceneResponseCallbackBridge() {};
-
-    static void CallbackFn(void * context, uint16_t groupId, uint8_t sceneId)
-    {
-        CHIPScenesClusterStoreSceneResponseCallbackBridge * callback = reinterpret_cast<CHIPScenesClusterStoreSceneResponseCallbackBridge *>(context);
-        if (callback && callback->mQueue)
-        {
-            dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @{
-                  @"groupId": [NSNumber numberWithUnsignedShort:groupId],
-                                    @"sceneId": [NSNumber numberWithUnsignedChar:sceneId],
-                                  });
-                callback->Cancel();
-                delete callback;
-            });
-        }
-    };
-
-private:
-    ResponseHandler mHandler;
-    dispatch_queue_t mQueue;
-};
-
-class CHIPScenesClusterViewSceneResponseCallbackBridge : public Callback::Callback<ScenesClusterViewSceneResponseCallback>
-{
-public:
-    CHIPScenesClusterViewSceneResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<ScenesClusterViewSceneResponseCallback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
-
-    ~CHIPScenesClusterViewSceneResponseCallbackBridge() {};
-
-    static void CallbackFn(void * context, uint16_t groupId, uint8_t sceneId, uint16_t transitionTime, uint8_t * sceneName, /* TYPE WARNING: array array defaults to */ uint8_t *  extensionFieldSets)
-    {
-        CHIPScenesClusterViewSceneResponseCallbackBridge * callback = reinterpret_cast<CHIPScenesClusterViewSceneResponseCallbackBridge *>(context);
-        if (callback && callback->mQueue)
-        {
-            dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @{
-                  @"groupId": [NSNumber numberWithUnsignedShort:groupId],
-                                    @"sceneId": [NSNumber numberWithUnsignedChar:sceneId],
-                                    @"transitionTime": [NSNumber numberWithUnsignedShort:transitionTime],
-                                    @"sceneName": [NSString stringWithFormat:@"%s", sceneName],
-                  // extensionFieldSets: /* TYPE WARNING: array array defaults to */ uint8_t *
-                  // Conversion from this type to Objc is not properly implemented yet
+                callback->mHandler(nil, @ {
+                    @"groupId" : [NSNumber numberWithUnsignedShort:groupId],
                 });
                 callback->Cancel();
                 delete callback;
@@ -642,187 +595,106 @@ private:
     dispatch_queue_t mQueue;
 };
 
-
-
-@interface CHIPBarrierControl ()
-
-@property (readonly) Controller::BarrierControlCluster cppCluster;
-@property (readonly, nonatomic) dispatch_queue_t callbackQueue;
-@end
-
-@implementation CHIPBarrierControl
-
-- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(EndpointId)endpoint queue:(dispatch_queue_t)queue
-{
-    CHIP_ERROR err = _cppCluster.Associate([device internalDevice], endpoint);
-
-    if (err != CHIP_NO_ERROR) {
-        return nil;
+class CHIPScenesClusterRemoveSceneResponseCallbackBridge : public Callback::Callback<ScenesClusterRemoveSceneResponseCallback> {
+public:
+    CHIPScenesClusterRemoveSceneResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
+        : Callback::Callback<ScenesClusterRemoveSceneResponseCallback>(CallbackFn, this)
+        , mHandler(handler)
+        , mQueue(queue)
+    {
     }
 
-    if (self = [super init]) {
-        _callbackQueue = queue;
+    ~CHIPScenesClusterRemoveSceneResponseCallbackBridge() {};
+
+    static void CallbackFn(void * context, uint16_t groupId, uint8_t sceneId)
+    {
+        CHIPScenesClusterRemoveSceneResponseCallbackBridge * callback
+            = reinterpret_cast<CHIPScenesClusterRemoveSceneResponseCallbackBridge *>(context);
+        if (callback && callback->mQueue) {
+            dispatch_async(callback->mQueue, ^{
+                callback->mHandler(nil, @ {
+                    @"groupId" : [NSNumber numberWithUnsignedShort:groupId],
+                    @"sceneId" : [NSNumber numberWithUnsignedChar:sceneId],
+                });
+                callback->Cancel();
+                delete callback;
+            });
+        }
+    };
+
+private:
+    ResponseHandler mHandler;
+    dispatch_queue_t mQueue;
+};
+
+class CHIPScenesClusterStoreSceneResponseCallbackBridge : public Callback::Callback<ScenesClusterStoreSceneResponseCallback> {
+public:
+    CHIPScenesClusterStoreSceneResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
+        : Callback::Callback<ScenesClusterStoreSceneResponseCallback>(CallbackFn, this)
+        , mHandler(handler)
+        , mQueue(queue)
+    {
     }
 
-    return self;
-}
+    ~CHIPScenesClusterStoreSceneResponseCallbackBridge() {};
 
-- (BOOL)barrierControlGoToPercent:(uint8_t)percentOpen completionHandler:(ResponseHandler)completionHandler
-{
-    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
+    static void CallbackFn(void * context, uint16_t groupId, uint8_t sceneId)
+    {
+        CHIPScenesClusterStoreSceneResponseCallbackBridge * callback
+            = reinterpret_cast<CHIPScenesClusterStoreSceneResponseCallbackBridge *>(context);
+        if (callback && callback->mQueue) {
+            dispatch_async(callback->mQueue, ^{
+                callback->mHandler(nil, @ {
+                    @"groupId" : [NSNumber numberWithUnsignedShort:groupId],
+                    @"sceneId" : [NSNumber numberWithUnsignedChar:sceneId],
+                });
+                callback->Cancel();
+                delete callback;
+            });
+        }
+    };
+
+private:
+    ResponseHandler mHandler;
+    dispatch_queue_t mQueue;
+};
+
+class CHIPScenesClusterViewSceneResponseCallbackBridge : public Callback::Callback<ScenesClusterViewSceneResponseCallback> {
+public:
+    CHIPScenesClusterViewSceneResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
+        : Callback::Callback<ScenesClusterViewSceneResponseCallback>(CallbackFn, this)
+        , mHandler(handler)
+        , mQueue(queue)
+    {
     }
 
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
+    ~CHIPScenesClusterViewSceneResponseCallbackBridge() {};
 
-    CHIP_ERROR err = self.cppCluster.BarrierControlGoToPercent(onSuccess->Cancel(), onFailure->Cancel(), percentOpen);
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
-    return YES;
-}
-- (BOOL)barrierControlStop:(ResponseHandler)completionHandler
-{
-    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
-    }
+    static void CallbackFn(void * context, uint16_t groupId, uint8_t sceneId, uint16_t transitionTime, uint8_t * sceneName,
+        /* TYPE WARNING: array array defaults to */ uint8_t * extensionFieldSets)
+    {
+        CHIPScenesClusterViewSceneResponseCallbackBridge * callback
+            = reinterpret_cast<CHIPScenesClusterViewSceneResponseCallbackBridge *>(context);
+        if (callback && callback->mQueue) {
+            dispatch_async(callback->mQueue, ^{
+                callback->mHandler(nil, @ {
+                    @"groupId" : [NSNumber numberWithUnsignedShort:groupId],
+                    @"sceneId" : [NSNumber numberWithUnsignedChar:sceneId],
+                    @"transitionTime" : [NSNumber numberWithUnsignedShort:transitionTime],
+                    @"sceneName" : [NSString stringWithFormat:@"%s", sceneName],
+                    // extensionFieldSets: /* TYPE WARNING: array array defaults to */ uint8_t *
+                    // Conversion from this type to Objc is not properly implemented yet
+                });
+                callback->Cancel();
+                delete callback;
+            });
+        }
+    };
 
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.BarrierControlStop(onSuccess->Cancel(), onFailure->Cancel());
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
-    return YES;
-}
-
-- (BOOL)readAttributeBarrierMovingState:(ResponseHandler)completionHandler
-{
-    CHIPInt8uAttributeCallbackBridge * onSuccess = new CHIPInt8uAttributeCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.ReadAttributeBarrierMovingState(onSuccess->Cancel(), onFailure->Cancel());
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
-    return YES;
-}
-
-- (BOOL)readAttributeBarrierSafetyStatus:(ResponseHandler)completionHandler
-{
-    CHIPInt16uAttributeCallbackBridge * onSuccess = new CHIPInt16uAttributeCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.ReadAttributeBarrierSafetyStatus(onSuccess->Cancel(), onFailure->Cancel());
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
-    return YES;
-}
-
-- (BOOL)readAttributeBarrierCapabilities:(ResponseHandler)completionHandler
-{
-    CHIPInt8uAttributeCallbackBridge * onSuccess = new CHIPInt8uAttributeCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.ReadAttributeBarrierCapabilities(onSuccess->Cancel(), onFailure->Cancel());
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
-    return YES;
-}
-
-- (BOOL)readAttributeBarrierPosition:(ResponseHandler)completionHandler
-{
-    CHIPInt8uAttributeCallbackBridge * onSuccess = new CHIPInt8uAttributeCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.ReadAttributeBarrierPosition(onSuccess->Cancel(), onFailure->Cancel());
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
-    return YES;
-}
-
-- (BOOL)readAttributeClusterRevision:(ResponseHandler)completionHandler
-{
-    CHIPInt16uAttributeCallbackBridge * onSuccess = new CHIPInt16uAttributeCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.ReadAttributeClusterRevision(onSuccess->Cancel(), onFailure->Cancel());
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
-    return YES;
-}
-
-
-@end
-
+private:
+    ResponseHandler mHandler;
+    dispatch_queue_t mQueue;
+};
 
 @interface CHIPBarrierControl ()
 
@@ -1000,9 +872,185 @@ private:
     return YES;
 }
 
-
 @end
 
+@interface CHIPBarrierControl ()
+
+@property (readonly) Controller::BarrierControlCluster cppCluster;
+@property (readonly, nonatomic) dispatch_queue_t callbackQueue;
+@end
+
+@implementation CHIPBarrierControl
+
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(EndpointId)endpoint queue:(dispatch_queue_t)queue
+{
+    CHIP_ERROR err = _cppCluster.Associate([device internalDevice], endpoint);
+
+    if (err != CHIP_NO_ERROR) {
+        return nil;
+    }
+
+    if (self = [super init]) {
+        _callbackQueue = queue;
+    }
+
+    return self;
+}
+
+- (BOOL)barrierControlGoToPercent:(uint8_t)percentOpen completionHandler:(ResponseHandler)completionHandler
+{
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
+    if (!onSuccess) {
+        return NO;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    if (!onFailure) {
+        delete onSuccess;
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.BarrierControlGoToPercent(onSuccess->Cancel(), onFailure->Cancel(), percentOpen);
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        return NO;
+    }
+    return YES;
+}
+- (BOOL)barrierControlStop:(ResponseHandler)completionHandler
+{
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
+    if (!onSuccess) {
+        return NO;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    if (!onFailure) {
+        delete onSuccess;
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.BarrierControlStop(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        return NO;
+    }
+    return YES;
+}
+
+- (BOOL)readAttributeBarrierMovingState:(ResponseHandler)completionHandler
+{
+    CHIPInt8uAttributeCallbackBridge * onSuccess = new CHIPInt8uAttributeCallbackBridge(completionHandler, _callbackQueue);
+    if (!onSuccess) {
+        return NO;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    if (!onFailure) {
+        delete onSuccess;
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.ReadAttributeBarrierMovingState(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        return NO;
+    }
+    return YES;
+}
+
+- (BOOL)readAttributeBarrierSafetyStatus:(ResponseHandler)completionHandler
+{
+    CHIPInt16uAttributeCallbackBridge * onSuccess = new CHIPInt16uAttributeCallbackBridge(completionHandler, _callbackQueue);
+    if (!onSuccess) {
+        return NO;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    if (!onFailure) {
+        delete onSuccess;
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.ReadAttributeBarrierSafetyStatus(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        return NO;
+    }
+    return YES;
+}
+
+- (BOOL)readAttributeBarrierCapabilities:(ResponseHandler)completionHandler
+{
+    CHIPInt8uAttributeCallbackBridge * onSuccess = new CHIPInt8uAttributeCallbackBridge(completionHandler, _callbackQueue);
+    if (!onSuccess) {
+        return NO;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    if (!onFailure) {
+        delete onSuccess;
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.ReadAttributeBarrierCapabilities(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        return NO;
+    }
+    return YES;
+}
+
+- (BOOL)readAttributeBarrierPosition:(ResponseHandler)completionHandler
+{
+    CHIPInt8uAttributeCallbackBridge * onSuccess = new CHIPInt8uAttributeCallbackBridge(completionHandler, _callbackQueue);
+    if (!onSuccess) {
+        return NO;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    if (!onFailure) {
+        delete onSuccess;
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.ReadAttributeBarrierPosition(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        return NO;
+    }
+    return YES;
+}
+
+- (BOOL)readAttributeClusterRevision:(ResponseHandler)completionHandler
+{
+    CHIPInt16uAttributeCallbackBridge * onSuccess = new CHIPInt16uAttributeCallbackBridge(completionHandler, _callbackQueue);
+    if (!onSuccess) {
+        return NO;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    if (!onFailure) {
+        delete onSuccess;
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.ReadAttributeClusterRevision(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        return NO;
+    }
+    return YES;
+}
+
+@end
 
 @interface CHIPBasic ()
 
@@ -1136,9 +1184,7 @@ private:
     return YES;
 }
 
-
 @end
-
 
 @interface CHIPBasic ()
 
@@ -1272,9 +1318,7 @@ private:
     return YES;
 }
 
-
 @end
-
 
 @interface CHIPColorControl ()
 
@@ -1299,7 +1343,11 @@ private:
     return self;
 }
 
-- (BOOL)moveColor:(int16_t)rateX rateY:(int16_t)rateY optionsMask:(uint8_t)optionsMask optionsOverride:(uint8_t)optionsOverride completionHandler:(ResponseHandler)completionHandler
+- (BOOL)moveColor:(int16_t)rateX
+                rateY:(int16_t)rateY
+          optionsMask:(uint8_t)optionsMask
+      optionsOverride:(uint8_t)optionsOverride
+    completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
@@ -1312,7 +1360,8 @@ private:
         return NO;
     }
 
-    CHIP_ERROR err = self.cppCluster.MoveColor(onSuccess->Cancel(), onFailure->Cancel(), rateX, rateY, optionsMask, optionsOverride);
+    CHIP_ERROR err
+        = self.cppCluster.MoveColor(onSuccess->Cancel(), onFailure->Cancel(), rateX, rateY, optionsMask, optionsOverride);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -1320,7 +1369,13 @@ private:
     }
     return YES;
 }
-- (BOOL)moveColorTemperature:(uint8_t)moveMode rate:(uint16_t)rate colorTemperatureMinimum:(uint16_t)colorTemperatureMinimum colorTemperatureMaximum:(uint16_t)colorTemperatureMaximum optionsMask:(uint8_t)optionsMask optionsOverride:(uint8_t)optionsOverride completionHandler:(ResponseHandler)completionHandler
+- (BOOL)moveColorTemperature:(uint8_t)moveMode
+                        rate:(uint16_t)rate
+     colorTemperatureMinimum:(uint16_t)colorTemperatureMinimum
+     colorTemperatureMaximum:(uint16_t)colorTemperatureMaximum
+                 optionsMask:(uint8_t)optionsMask
+             optionsOverride:(uint8_t)optionsOverride
+           completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
@@ -1333,7 +1388,8 @@ private:
         return NO;
     }
 
-    CHIP_ERROR err = self.cppCluster.MoveColorTemperature(onSuccess->Cancel(), onFailure->Cancel(), moveMode, rate, colorTemperatureMinimum, colorTemperatureMaximum, optionsMask, optionsOverride);
+    CHIP_ERROR err = self.cppCluster.MoveColorTemperature(onSuccess->Cancel(), onFailure->Cancel(), moveMode, rate,
+        colorTemperatureMinimum, colorTemperatureMaximum, optionsMask, optionsOverride);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -1341,7 +1397,11 @@ private:
     }
     return YES;
 }
-- (BOOL)moveHue:(uint8_t)moveMode rate:(uint8_t)rate optionsMask:(uint8_t)optionsMask optionsOverride:(uint8_t)optionsOverride completionHandler:(ResponseHandler)completionHandler
+- (BOOL)moveHue:(uint8_t)moveMode
+                 rate:(uint8_t)rate
+          optionsMask:(uint8_t)optionsMask
+      optionsOverride:(uint8_t)optionsOverride
+    completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
@@ -1354,7 +1414,8 @@ private:
         return NO;
     }
 
-    CHIP_ERROR err = self.cppCluster.MoveHue(onSuccess->Cancel(), onFailure->Cancel(), moveMode, rate, optionsMask, optionsOverride);
+    CHIP_ERROR err
+        = self.cppCluster.MoveHue(onSuccess->Cancel(), onFailure->Cancel(), moveMode, rate, optionsMask, optionsOverride);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -1362,7 +1423,11 @@ private:
     }
     return YES;
 }
-- (BOOL)moveSaturation:(uint8_t)moveMode rate:(uint8_t)rate optionsMask:(uint8_t)optionsMask optionsOverride:(uint8_t)optionsOverride completionHandler:(ResponseHandler)completionHandler
+- (BOOL)moveSaturation:(uint8_t)moveMode
+                  rate:(uint8_t)rate
+           optionsMask:(uint8_t)optionsMask
+       optionsOverride:(uint8_t)optionsOverride
+     completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
@@ -1375,7 +1440,8 @@ private:
         return NO;
     }
 
-    CHIP_ERROR err = self.cppCluster.MoveSaturation(onSuccess->Cancel(), onFailure->Cancel(), moveMode, rate, optionsMask, optionsOverride);
+    CHIP_ERROR err
+        = self.cppCluster.MoveSaturation(onSuccess->Cancel(), onFailure->Cancel(), moveMode, rate, optionsMask, optionsOverride);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -1383,7 +1449,12 @@ private:
     }
     return YES;
 }
-- (BOOL)moveToColor:(uint16_t)colorX colorY:(uint16_t)colorY transitionTime:(uint16_t)transitionTime optionsMask:(uint8_t)optionsMask optionsOverride:(uint8_t)optionsOverride completionHandler:(ResponseHandler)completionHandler
+- (BOOL)moveToColor:(uint16_t)colorX
+               colorY:(uint16_t)colorY
+       transitionTime:(uint16_t)transitionTime
+          optionsMask:(uint8_t)optionsMask
+      optionsOverride:(uint8_t)optionsOverride
+    completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
@@ -1396,7 +1467,8 @@ private:
         return NO;
     }
 
-    CHIP_ERROR err = self.cppCluster.MoveToColor(onSuccess->Cancel(), onFailure->Cancel(), colorX, colorY, transitionTime, optionsMask, optionsOverride);
+    CHIP_ERROR err = self.cppCluster.MoveToColor(
+        onSuccess->Cancel(), onFailure->Cancel(), colorX, colorY, transitionTime, optionsMask, optionsOverride);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -1404,7 +1476,11 @@ private:
     }
     return YES;
 }
-- (BOOL)moveToColorTemperature:(uint16_t)colorTemperature transitionTime:(uint16_t)transitionTime optionsMask:(uint8_t)optionsMask optionsOverride:(uint8_t)optionsOverride completionHandler:(ResponseHandler)completionHandler
+- (BOOL)moveToColorTemperature:(uint16_t)colorTemperature
+                transitionTime:(uint16_t)transitionTime
+                   optionsMask:(uint8_t)optionsMask
+               optionsOverride:(uint8_t)optionsOverride
+             completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
@@ -1417,7 +1493,8 @@ private:
         return NO;
     }
 
-    CHIP_ERROR err = self.cppCluster.MoveToColorTemperature(onSuccess->Cancel(), onFailure->Cancel(), colorTemperature, transitionTime, optionsMask, optionsOverride);
+    CHIP_ERROR err = self.cppCluster.MoveToColorTemperature(
+        onSuccess->Cancel(), onFailure->Cancel(), colorTemperature, transitionTime, optionsMask, optionsOverride);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -1425,7 +1502,12 @@ private:
     }
     return YES;
 }
-- (BOOL)moveToHue:(uint8_t)hue direction:(uint8_t)direction transitionTime:(uint16_t)transitionTime optionsMask:(uint8_t)optionsMask optionsOverride:(uint8_t)optionsOverride completionHandler:(ResponseHandler)completionHandler
+- (BOOL)moveToHue:(uint8_t)hue
+            direction:(uint8_t)direction
+       transitionTime:(uint16_t)transitionTime
+          optionsMask:(uint8_t)optionsMask
+      optionsOverride:(uint8_t)optionsOverride
+    completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
@@ -1438,7 +1520,8 @@ private:
         return NO;
     }
 
-    CHIP_ERROR err = self.cppCluster.MoveToHue(onSuccess->Cancel(), onFailure->Cancel(), hue, direction, transitionTime, optionsMask, optionsOverride);
+    CHIP_ERROR err = self.cppCluster.MoveToHue(
+        onSuccess->Cancel(), onFailure->Cancel(), hue, direction, transitionTime, optionsMask, optionsOverride);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -1446,7 +1529,12 @@ private:
     }
     return YES;
 }
-- (BOOL)moveToHueAndSaturation:(uint8_t)hue saturation:(uint8_t)saturation transitionTime:(uint16_t)transitionTime optionsMask:(uint8_t)optionsMask optionsOverride:(uint8_t)optionsOverride completionHandler:(ResponseHandler)completionHandler
+- (BOOL)moveToHueAndSaturation:(uint8_t)hue
+                    saturation:(uint8_t)saturation
+                transitionTime:(uint16_t)transitionTime
+                   optionsMask:(uint8_t)optionsMask
+               optionsOverride:(uint8_t)optionsOverride
+             completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
@@ -1459,7 +1547,8 @@ private:
         return NO;
     }
 
-    CHIP_ERROR err = self.cppCluster.MoveToHueAndSaturation(onSuccess->Cancel(), onFailure->Cancel(), hue, saturation, transitionTime, optionsMask, optionsOverride);
+    CHIP_ERROR err = self.cppCluster.MoveToHueAndSaturation(
+        onSuccess->Cancel(), onFailure->Cancel(), hue, saturation, transitionTime, optionsMask, optionsOverride);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -1467,7 +1556,11 @@ private:
     }
     return YES;
 }
-- (BOOL)moveToSaturation:(uint8_t)saturation transitionTime:(uint16_t)transitionTime optionsMask:(uint8_t)optionsMask optionsOverride:(uint8_t)optionsOverride completionHandler:(ResponseHandler)completionHandler
+- (BOOL)moveToSaturation:(uint8_t)saturation
+          transitionTime:(uint16_t)transitionTime
+             optionsMask:(uint8_t)optionsMask
+         optionsOverride:(uint8_t)optionsOverride
+       completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
@@ -1480,7 +1573,8 @@ private:
         return NO;
     }
 
-    CHIP_ERROR err = self.cppCluster.MoveToSaturation(onSuccess->Cancel(), onFailure->Cancel(), saturation, transitionTime, optionsMask, optionsOverride);
+    CHIP_ERROR err = self.cppCluster.MoveToSaturation(
+        onSuccess->Cancel(), onFailure->Cancel(), saturation, transitionTime, optionsMask, optionsOverride);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -1488,7 +1582,12 @@ private:
     }
     return YES;
 }
-- (BOOL)stepColor:(int16_t)stepX stepY:(int16_t)stepY transitionTime:(uint16_t)transitionTime optionsMask:(uint8_t)optionsMask optionsOverride:(uint8_t)optionsOverride completionHandler:(ResponseHandler)completionHandler
+- (BOOL)stepColor:(int16_t)stepX
+                stepY:(int16_t)stepY
+       transitionTime:(uint16_t)transitionTime
+          optionsMask:(uint8_t)optionsMask
+      optionsOverride:(uint8_t)optionsOverride
+    completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
@@ -1501,7 +1600,8 @@ private:
         return NO;
     }
 
-    CHIP_ERROR err = self.cppCluster.StepColor(onSuccess->Cancel(), onFailure->Cancel(), stepX, stepY, transitionTime, optionsMask, optionsOverride);
+    CHIP_ERROR err = self.cppCluster.StepColor(
+        onSuccess->Cancel(), onFailure->Cancel(), stepX, stepY, transitionTime, optionsMask, optionsOverride);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -1509,7 +1609,14 @@ private:
     }
     return YES;
 }
-- (BOOL)stepColorTemperature:(uint8_t)stepMode stepSize:(uint16_t)stepSize transitionTime:(uint16_t)transitionTime colorTemperatureMinimum:(uint16_t)colorTemperatureMinimum colorTemperatureMaximum:(uint16_t)colorTemperatureMaximum optionsMask:(uint8_t)optionsMask optionsOverride:(uint8_t)optionsOverride completionHandler:(ResponseHandler)completionHandler
+- (BOOL)stepColorTemperature:(uint8_t)stepMode
+                    stepSize:(uint16_t)stepSize
+              transitionTime:(uint16_t)transitionTime
+     colorTemperatureMinimum:(uint16_t)colorTemperatureMinimum
+     colorTemperatureMaximum:(uint16_t)colorTemperatureMaximum
+                 optionsMask:(uint8_t)optionsMask
+             optionsOverride:(uint8_t)optionsOverride
+           completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
@@ -1522,7 +1629,8 @@ private:
         return NO;
     }
 
-    CHIP_ERROR err = self.cppCluster.StepColorTemperature(onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime, colorTemperatureMinimum, colorTemperatureMaximum, optionsMask, optionsOverride);
+    CHIP_ERROR err = self.cppCluster.StepColorTemperature(onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize,
+        transitionTime, colorTemperatureMinimum, colorTemperatureMaximum, optionsMask, optionsOverride);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -1530,7 +1638,12 @@ private:
     }
     return YES;
 }
-- (BOOL)stepHue:(uint8_t)stepMode stepSize:(uint8_t)stepSize transitionTime:(uint8_t)transitionTime optionsMask:(uint8_t)optionsMask optionsOverride:(uint8_t)optionsOverride completionHandler:(ResponseHandler)completionHandler
+- (BOOL)stepHue:(uint8_t)stepMode
+             stepSize:(uint8_t)stepSize
+       transitionTime:(uint8_t)transitionTime
+          optionsMask:(uint8_t)optionsMask
+      optionsOverride:(uint8_t)optionsOverride
+    completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
@@ -1543,7 +1656,8 @@ private:
         return NO;
     }
 
-    CHIP_ERROR err = self.cppCluster.StepHue(onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime, optionsMask, optionsOverride);
+    CHIP_ERROR err = self.cppCluster.StepHue(
+        onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime, optionsMask, optionsOverride);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -1551,7 +1665,12 @@ private:
     }
     return YES;
 }
-- (BOOL)stepSaturation:(uint8_t)stepMode stepSize:(uint8_t)stepSize transitionTime:(uint8_t)transitionTime optionsMask:(uint8_t)optionsMask optionsOverride:(uint8_t)optionsOverride completionHandler:(ResponseHandler)completionHandler
+- (BOOL)stepSaturation:(uint8_t)stepMode
+              stepSize:(uint8_t)stepSize
+        transitionTime:(uint8_t)transitionTime
+           optionsMask:(uint8_t)optionsMask
+       optionsOverride:(uint8_t)optionsOverride
+     completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
@@ -1564,7 +1683,8 @@ private:
         return NO;
     }
 
-    CHIP_ERROR err = self.cppCluster.StepSaturation(onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime, optionsMask, optionsOverride);
+    CHIP_ERROR err = self.cppCluster.StepSaturation(
+        onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime, optionsMask, optionsOverride);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -1572,7 +1692,9 @@ private:
     }
     return YES;
 }
-- (BOOL)stopMoveStep:(uint8_t)optionsMask optionsOverride:(uint8_t)optionsOverride completionHandler:(ResponseHandler)completionHandler
+- (BOOL)stopMoveStep:(uint8_t)optionsMask
+      optionsOverride:(uint8_t)optionsOverride
+    completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
@@ -1616,7 +1738,10 @@ private:
     return YES;
 }
 
-- (BOOL) configureAttributeCurrentHue:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval change:(uint8_t)change completionHandler:(ResponseHandler)completionHandler
+- (BOOL)configureAttributeCurrentHue:(uint16_t)minInterval
+                         maxInterval:(uint16_t)maxInterval
+                              change:(uint8_t)change
+                   completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
@@ -1629,8 +1754,8 @@ private:
         return NO;
     }
 
-
-    CHIP_ERROR err = self.cppCluster.ConfigureAttributeCurrentHue(onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
+    CHIP_ERROR err
+        = self.cppCluster.ConfigureAttributeCurrentHue(onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -1639,7 +1764,7 @@ private:
     return YES;
 }
 
-- (BOOL) reportAttributeCurrentHue:(ResponseHandler)reportHandler
+- (BOOL)reportAttributeCurrentHue:(ResponseHandler)reportHandler
 {
     CHIPInt8uAttributeCallbackBridge * onReport = new CHIPInt8uAttributeCallbackBridge(reportHandler, _callbackQueue, true);
     if (!onReport) {
@@ -1677,7 +1802,10 @@ private:
     return YES;
 }
 
-- (BOOL) configureAttributeCurrentSaturation:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval change:(uint8_t)change completionHandler:(ResponseHandler)completionHandler
+- (BOOL)configureAttributeCurrentSaturation:(uint16_t)minInterval
+                                maxInterval:(uint16_t)maxInterval
+                                     change:(uint8_t)change
+                          completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
@@ -1690,8 +1818,8 @@ private:
         return NO;
     }
 
-
-    CHIP_ERROR err = self.cppCluster.ConfigureAttributeCurrentSaturation(onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
+    CHIP_ERROR err = self.cppCluster.ConfigureAttributeCurrentSaturation(
+        onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -1700,7 +1828,7 @@ private:
     return YES;
 }
 
-- (BOOL) reportAttributeCurrentSaturation:(ResponseHandler)reportHandler
+- (BOOL)reportAttributeCurrentSaturation:(ResponseHandler)reportHandler
 {
     CHIPInt8uAttributeCallbackBridge * onReport = new CHIPInt8uAttributeCallbackBridge(reportHandler, _callbackQueue, true);
     if (!onReport) {
@@ -1760,7 +1888,10 @@ private:
     return YES;
 }
 
-- (BOOL) configureAttributeCurrentX:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval change:(uint16_t)change completionHandler:(ResponseHandler)completionHandler
+- (BOOL)configureAttributeCurrentX:(uint16_t)minInterval
+                       maxInterval:(uint16_t)maxInterval
+                            change:(uint16_t)change
+                 completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
@@ -1773,8 +1904,8 @@ private:
         return NO;
     }
 
-
-    CHIP_ERROR err = self.cppCluster.ConfigureAttributeCurrentX(onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
+    CHIP_ERROR err
+        = self.cppCluster.ConfigureAttributeCurrentX(onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -1783,7 +1914,7 @@ private:
     return YES;
 }
 
-- (BOOL) reportAttributeCurrentX:(ResponseHandler)reportHandler
+- (BOOL)reportAttributeCurrentX:(ResponseHandler)reportHandler
 {
     CHIPInt16uAttributeCallbackBridge * onReport = new CHIPInt16uAttributeCallbackBridge(reportHandler, _callbackQueue, true);
     if (!onReport) {
@@ -1821,7 +1952,10 @@ private:
     return YES;
 }
 
-- (BOOL) configureAttributeCurrentY:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval change:(uint16_t)change completionHandler:(ResponseHandler)completionHandler
+- (BOOL)configureAttributeCurrentY:(uint16_t)minInterval
+                       maxInterval:(uint16_t)maxInterval
+                            change:(uint16_t)change
+                 completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
@@ -1834,8 +1968,8 @@ private:
         return NO;
     }
 
-
-    CHIP_ERROR err = self.cppCluster.ConfigureAttributeCurrentY(onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
+    CHIP_ERROR err
+        = self.cppCluster.ConfigureAttributeCurrentY(onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -1844,7 +1978,7 @@ private:
     return YES;
 }
 
-- (BOOL) reportAttributeCurrentY:(ResponseHandler)reportHandler
+- (BOOL)reportAttributeCurrentY:(ResponseHandler)reportHandler
 {
     CHIPInt16uAttributeCallbackBridge * onReport = new CHIPInt16uAttributeCallbackBridge(reportHandler, _callbackQueue, true);
     if (!onReport) {
@@ -1884,7 +2018,8 @@ private:
 
 - (BOOL)readAttributeCompensationText:(ResponseHandler)completionHandler
 {
-    CHIPUnsupportedAttributeCallbackBridge * onSuccess = new CHIPUnsupportedAttributeCallbackBridge(completionHandler, _callbackQueue);
+    CHIPUnsupportedAttributeCallbackBridge * onSuccess
+        = new CHIPUnsupportedAttributeCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
         return NO;
     }
@@ -1926,7 +2061,10 @@ private:
     return YES;
 }
 
-- (BOOL) configureAttributeColorTemperature:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval change:(uint16_t)change completionHandler:(ResponseHandler)completionHandler
+- (BOOL)configureAttributeColorTemperature:(uint16_t)minInterval
+                               maxInterval:(uint16_t)maxInterval
+                                    change:(uint16_t)change
+                         completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
@@ -1939,8 +2077,8 @@ private:
         return NO;
     }
 
-
-    CHIP_ERROR err = self.cppCluster.ConfigureAttributeColorTemperature(onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
+    CHIP_ERROR err = self.cppCluster.ConfigureAttributeColorTemperature(
+        onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -1949,7 +2087,7 @@ private:
     return YES;
 }
 
-- (BOOL) reportAttributeColorTemperature:(ResponseHandler)reportHandler
+- (BOOL)reportAttributeColorTemperature:(ResponseHandler)reportHandler
 {
     CHIPInt16uAttributeCallbackBridge * onReport = new CHIPInt16uAttributeCallbackBridge(reportHandler, _callbackQueue, true);
     if (!onReport) {
@@ -3197,9 +3335,7 @@ private:
     return YES;
 }
 
-
 @end
-
 
 @interface CHIPColorControl ()
 
@@ -3224,7 +3360,11 @@ private:
     return self;
 }
 
-- (BOOL)moveColor:(int16_t)rateX rateY:(int16_t)rateY optionsMask:(uint8_t)optionsMask optionsOverride:(uint8_t)optionsOverride completionHandler:(ResponseHandler)completionHandler
+- (BOOL)moveColor:(int16_t)rateX
+                rateY:(int16_t)rateY
+          optionsMask:(uint8_t)optionsMask
+      optionsOverride:(uint8_t)optionsOverride
+    completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
@@ -3237,7 +3377,8 @@ private:
         return NO;
     }
 
-    CHIP_ERROR err = self.cppCluster.MoveColor(onSuccess->Cancel(), onFailure->Cancel(), rateX, rateY, optionsMask, optionsOverride);
+    CHIP_ERROR err
+        = self.cppCluster.MoveColor(onSuccess->Cancel(), onFailure->Cancel(), rateX, rateY, optionsMask, optionsOverride);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -3245,7 +3386,13 @@ private:
     }
     return YES;
 }
-- (BOOL)moveColorTemperature:(uint8_t)moveMode rate:(uint16_t)rate colorTemperatureMinimum:(uint16_t)colorTemperatureMinimum colorTemperatureMaximum:(uint16_t)colorTemperatureMaximum optionsMask:(uint8_t)optionsMask optionsOverride:(uint8_t)optionsOverride completionHandler:(ResponseHandler)completionHandler
+- (BOOL)moveColorTemperature:(uint8_t)moveMode
+                        rate:(uint16_t)rate
+     colorTemperatureMinimum:(uint16_t)colorTemperatureMinimum
+     colorTemperatureMaximum:(uint16_t)colorTemperatureMaximum
+                 optionsMask:(uint8_t)optionsMask
+             optionsOverride:(uint8_t)optionsOverride
+           completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
@@ -3258,7 +3405,8 @@ private:
         return NO;
     }
 
-    CHIP_ERROR err = self.cppCluster.MoveColorTemperature(onSuccess->Cancel(), onFailure->Cancel(), moveMode, rate, colorTemperatureMinimum, colorTemperatureMaximum, optionsMask, optionsOverride);
+    CHIP_ERROR err = self.cppCluster.MoveColorTemperature(onSuccess->Cancel(), onFailure->Cancel(), moveMode, rate,
+        colorTemperatureMinimum, colorTemperatureMaximum, optionsMask, optionsOverride);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -3266,7 +3414,11 @@ private:
     }
     return YES;
 }
-- (BOOL)moveHue:(uint8_t)moveMode rate:(uint8_t)rate optionsMask:(uint8_t)optionsMask optionsOverride:(uint8_t)optionsOverride completionHandler:(ResponseHandler)completionHandler
+- (BOOL)moveHue:(uint8_t)moveMode
+                 rate:(uint8_t)rate
+          optionsMask:(uint8_t)optionsMask
+      optionsOverride:(uint8_t)optionsOverride
+    completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
@@ -3279,7 +3431,8 @@ private:
         return NO;
     }
 
-    CHIP_ERROR err = self.cppCluster.MoveHue(onSuccess->Cancel(), onFailure->Cancel(), moveMode, rate, optionsMask, optionsOverride);
+    CHIP_ERROR err
+        = self.cppCluster.MoveHue(onSuccess->Cancel(), onFailure->Cancel(), moveMode, rate, optionsMask, optionsOverride);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -3287,7 +3440,11 @@ private:
     }
     return YES;
 }
-- (BOOL)moveSaturation:(uint8_t)moveMode rate:(uint8_t)rate optionsMask:(uint8_t)optionsMask optionsOverride:(uint8_t)optionsOverride completionHandler:(ResponseHandler)completionHandler
+- (BOOL)moveSaturation:(uint8_t)moveMode
+                  rate:(uint8_t)rate
+           optionsMask:(uint8_t)optionsMask
+       optionsOverride:(uint8_t)optionsOverride
+     completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
@@ -3300,7 +3457,8 @@ private:
         return NO;
     }
 
-    CHIP_ERROR err = self.cppCluster.MoveSaturation(onSuccess->Cancel(), onFailure->Cancel(), moveMode, rate, optionsMask, optionsOverride);
+    CHIP_ERROR err
+        = self.cppCluster.MoveSaturation(onSuccess->Cancel(), onFailure->Cancel(), moveMode, rate, optionsMask, optionsOverride);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -3308,7 +3466,12 @@ private:
     }
     return YES;
 }
-- (BOOL)moveToColor:(uint16_t)colorX colorY:(uint16_t)colorY transitionTime:(uint16_t)transitionTime optionsMask:(uint8_t)optionsMask optionsOverride:(uint8_t)optionsOverride completionHandler:(ResponseHandler)completionHandler
+- (BOOL)moveToColor:(uint16_t)colorX
+               colorY:(uint16_t)colorY
+       transitionTime:(uint16_t)transitionTime
+          optionsMask:(uint8_t)optionsMask
+      optionsOverride:(uint8_t)optionsOverride
+    completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
@@ -3321,7 +3484,8 @@ private:
         return NO;
     }
 
-    CHIP_ERROR err = self.cppCluster.MoveToColor(onSuccess->Cancel(), onFailure->Cancel(), colorX, colorY, transitionTime, optionsMask, optionsOverride);
+    CHIP_ERROR err = self.cppCluster.MoveToColor(
+        onSuccess->Cancel(), onFailure->Cancel(), colorX, colorY, transitionTime, optionsMask, optionsOverride);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -3329,7 +3493,11 @@ private:
     }
     return YES;
 }
-- (BOOL)moveToColorTemperature:(uint16_t)colorTemperature transitionTime:(uint16_t)transitionTime optionsMask:(uint8_t)optionsMask optionsOverride:(uint8_t)optionsOverride completionHandler:(ResponseHandler)completionHandler
+- (BOOL)moveToColorTemperature:(uint16_t)colorTemperature
+                transitionTime:(uint16_t)transitionTime
+                   optionsMask:(uint8_t)optionsMask
+               optionsOverride:(uint8_t)optionsOverride
+             completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
@@ -3342,7 +3510,8 @@ private:
         return NO;
     }
 
-    CHIP_ERROR err = self.cppCluster.MoveToColorTemperature(onSuccess->Cancel(), onFailure->Cancel(), colorTemperature, transitionTime, optionsMask, optionsOverride);
+    CHIP_ERROR err = self.cppCluster.MoveToColorTemperature(
+        onSuccess->Cancel(), onFailure->Cancel(), colorTemperature, transitionTime, optionsMask, optionsOverride);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -3350,7 +3519,12 @@ private:
     }
     return YES;
 }
-- (BOOL)moveToHue:(uint8_t)hue direction:(uint8_t)direction transitionTime:(uint16_t)transitionTime optionsMask:(uint8_t)optionsMask optionsOverride:(uint8_t)optionsOverride completionHandler:(ResponseHandler)completionHandler
+- (BOOL)moveToHue:(uint8_t)hue
+            direction:(uint8_t)direction
+       transitionTime:(uint16_t)transitionTime
+          optionsMask:(uint8_t)optionsMask
+      optionsOverride:(uint8_t)optionsOverride
+    completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
@@ -3363,7 +3537,8 @@ private:
         return NO;
     }
 
-    CHIP_ERROR err = self.cppCluster.MoveToHue(onSuccess->Cancel(), onFailure->Cancel(), hue, direction, transitionTime, optionsMask, optionsOverride);
+    CHIP_ERROR err = self.cppCluster.MoveToHue(
+        onSuccess->Cancel(), onFailure->Cancel(), hue, direction, transitionTime, optionsMask, optionsOverride);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -3371,7 +3546,12 @@ private:
     }
     return YES;
 }
-- (BOOL)moveToHueAndSaturation:(uint8_t)hue saturation:(uint8_t)saturation transitionTime:(uint16_t)transitionTime optionsMask:(uint8_t)optionsMask optionsOverride:(uint8_t)optionsOverride completionHandler:(ResponseHandler)completionHandler
+- (BOOL)moveToHueAndSaturation:(uint8_t)hue
+                    saturation:(uint8_t)saturation
+                transitionTime:(uint16_t)transitionTime
+                   optionsMask:(uint8_t)optionsMask
+               optionsOverride:(uint8_t)optionsOverride
+             completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
@@ -3384,7 +3564,8 @@ private:
         return NO;
     }
 
-    CHIP_ERROR err = self.cppCluster.MoveToHueAndSaturation(onSuccess->Cancel(), onFailure->Cancel(), hue, saturation, transitionTime, optionsMask, optionsOverride);
+    CHIP_ERROR err = self.cppCluster.MoveToHueAndSaturation(
+        onSuccess->Cancel(), onFailure->Cancel(), hue, saturation, transitionTime, optionsMask, optionsOverride);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -3392,7 +3573,11 @@ private:
     }
     return YES;
 }
-- (BOOL)moveToSaturation:(uint8_t)saturation transitionTime:(uint16_t)transitionTime optionsMask:(uint8_t)optionsMask optionsOverride:(uint8_t)optionsOverride completionHandler:(ResponseHandler)completionHandler
+- (BOOL)moveToSaturation:(uint8_t)saturation
+          transitionTime:(uint16_t)transitionTime
+             optionsMask:(uint8_t)optionsMask
+         optionsOverride:(uint8_t)optionsOverride
+       completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
@@ -3405,7 +3590,8 @@ private:
         return NO;
     }
 
-    CHIP_ERROR err = self.cppCluster.MoveToSaturation(onSuccess->Cancel(), onFailure->Cancel(), saturation, transitionTime, optionsMask, optionsOverride);
+    CHIP_ERROR err = self.cppCluster.MoveToSaturation(
+        onSuccess->Cancel(), onFailure->Cancel(), saturation, transitionTime, optionsMask, optionsOverride);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -3413,7 +3599,12 @@ private:
     }
     return YES;
 }
-- (BOOL)stepColor:(int16_t)stepX stepY:(int16_t)stepY transitionTime:(uint16_t)transitionTime optionsMask:(uint8_t)optionsMask optionsOverride:(uint8_t)optionsOverride completionHandler:(ResponseHandler)completionHandler
+- (BOOL)stepColor:(int16_t)stepX
+                stepY:(int16_t)stepY
+       transitionTime:(uint16_t)transitionTime
+          optionsMask:(uint8_t)optionsMask
+      optionsOverride:(uint8_t)optionsOverride
+    completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
@@ -3426,7 +3617,8 @@ private:
         return NO;
     }
 
-    CHIP_ERROR err = self.cppCluster.StepColor(onSuccess->Cancel(), onFailure->Cancel(), stepX, stepY, transitionTime, optionsMask, optionsOverride);
+    CHIP_ERROR err = self.cppCluster.StepColor(
+        onSuccess->Cancel(), onFailure->Cancel(), stepX, stepY, transitionTime, optionsMask, optionsOverride);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -3434,7 +3626,14 @@ private:
     }
     return YES;
 }
-- (BOOL)stepColorTemperature:(uint8_t)stepMode stepSize:(uint16_t)stepSize transitionTime:(uint16_t)transitionTime colorTemperatureMinimum:(uint16_t)colorTemperatureMinimum colorTemperatureMaximum:(uint16_t)colorTemperatureMaximum optionsMask:(uint8_t)optionsMask optionsOverride:(uint8_t)optionsOverride completionHandler:(ResponseHandler)completionHandler
+- (BOOL)stepColorTemperature:(uint8_t)stepMode
+                    stepSize:(uint16_t)stepSize
+              transitionTime:(uint16_t)transitionTime
+     colorTemperatureMinimum:(uint16_t)colorTemperatureMinimum
+     colorTemperatureMaximum:(uint16_t)colorTemperatureMaximum
+                 optionsMask:(uint8_t)optionsMask
+             optionsOverride:(uint8_t)optionsOverride
+           completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
@@ -3447,7 +3646,8 @@ private:
         return NO;
     }
 
-    CHIP_ERROR err = self.cppCluster.StepColorTemperature(onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime, colorTemperatureMinimum, colorTemperatureMaximum, optionsMask, optionsOverride);
+    CHIP_ERROR err = self.cppCluster.StepColorTemperature(onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize,
+        transitionTime, colorTemperatureMinimum, colorTemperatureMaximum, optionsMask, optionsOverride);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -3455,7 +3655,12 @@ private:
     }
     return YES;
 }
-- (BOOL)stepHue:(uint8_t)stepMode stepSize:(uint8_t)stepSize transitionTime:(uint8_t)transitionTime optionsMask:(uint8_t)optionsMask optionsOverride:(uint8_t)optionsOverride completionHandler:(ResponseHandler)completionHandler
+- (BOOL)stepHue:(uint8_t)stepMode
+             stepSize:(uint8_t)stepSize
+       transitionTime:(uint8_t)transitionTime
+          optionsMask:(uint8_t)optionsMask
+      optionsOverride:(uint8_t)optionsOverride
+    completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
@@ -3468,7 +3673,8 @@ private:
         return NO;
     }
 
-    CHIP_ERROR err = self.cppCluster.StepHue(onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime, optionsMask, optionsOverride);
+    CHIP_ERROR err = self.cppCluster.StepHue(
+        onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime, optionsMask, optionsOverride);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -3476,7 +3682,12 @@ private:
     }
     return YES;
 }
-- (BOOL)stepSaturation:(uint8_t)stepMode stepSize:(uint8_t)stepSize transitionTime:(uint8_t)transitionTime optionsMask:(uint8_t)optionsMask optionsOverride:(uint8_t)optionsOverride completionHandler:(ResponseHandler)completionHandler
+- (BOOL)stepSaturation:(uint8_t)stepMode
+              stepSize:(uint8_t)stepSize
+        transitionTime:(uint8_t)transitionTime
+           optionsMask:(uint8_t)optionsMask
+       optionsOverride:(uint8_t)optionsOverride
+     completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
@@ -3489,7 +3700,8 @@ private:
         return NO;
     }
 
-    CHIP_ERROR err = self.cppCluster.StepSaturation(onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime, optionsMask, optionsOverride);
+    CHIP_ERROR err = self.cppCluster.StepSaturation(
+        onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime, optionsMask, optionsOverride);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -3497,7 +3709,9 @@ private:
     }
     return YES;
 }
-- (BOOL)stopMoveStep:(uint8_t)optionsMask optionsOverride:(uint8_t)optionsOverride completionHandler:(ResponseHandler)completionHandler
+- (BOOL)stopMoveStep:(uint8_t)optionsMask
+      optionsOverride:(uint8_t)optionsOverride
+    completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
@@ -3541,7 +3755,10 @@ private:
     return YES;
 }
 
-- (BOOL) configureAttributeCurrentHue:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval change:(uint8_t)change completionHandler:(ResponseHandler)completionHandler
+- (BOOL)configureAttributeCurrentHue:(uint16_t)minInterval
+                         maxInterval:(uint16_t)maxInterval
+                              change:(uint8_t)change
+                   completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
@@ -3554,8 +3771,8 @@ private:
         return NO;
     }
 
-
-    CHIP_ERROR err = self.cppCluster.ConfigureAttributeCurrentHue(onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
+    CHIP_ERROR err
+        = self.cppCluster.ConfigureAttributeCurrentHue(onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -3564,7 +3781,7 @@ private:
     return YES;
 }
 
-- (BOOL) reportAttributeCurrentHue:(ResponseHandler)reportHandler
+- (BOOL)reportAttributeCurrentHue:(ResponseHandler)reportHandler
 {
     CHIPInt8uAttributeCallbackBridge * onReport = new CHIPInt8uAttributeCallbackBridge(reportHandler, _callbackQueue, true);
     if (!onReport) {
@@ -3602,7 +3819,10 @@ private:
     return YES;
 }
 
-- (BOOL) configureAttributeCurrentSaturation:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval change:(uint8_t)change completionHandler:(ResponseHandler)completionHandler
+- (BOOL)configureAttributeCurrentSaturation:(uint16_t)minInterval
+                                maxInterval:(uint16_t)maxInterval
+                                     change:(uint8_t)change
+                          completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
@@ -3615,8 +3835,8 @@ private:
         return NO;
     }
 
-
-    CHIP_ERROR err = self.cppCluster.ConfigureAttributeCurrentSaturation(onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
+    CHIP_ERROR err = self.cppCluster.ConfigureAttributeCurrentSaturation(
+        onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -3625,7 +3845,7 @@ private:
     return YES;
 }
 
-- (BOOL) reportAttributeCurrentSaturation:(ResponseHandler)reportHandler
+- (BOOL)reportAttributeCurrentSaturation:(ResponseHandler)reportHandler
 {
     CHIPInt8uAttributeCallbackBridge * onReport = new CHIPInt8uAttributeCallbackBridge(reportHandler, _callbackQueue, true);
     if (!onReport) {
@@ -3685,7 +3905,10 @@ private:
     return YES;
 }
 
-- (BOOL) configureAttributeCurrentX:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval change:(uint16_t)change completionHandler:(ResponseHandler)completionHandler
+- (BOOL)configureAttributeCurrentX:(uint16_t)minInterval
+                       maxInterval:(uint16_t)maxInterval
+                            change:(uint16_t)change
+                 completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
@@ -3698,8 +3921,8 @@ private:
         return NO;
     }
 
-
-    CHIP_ERROR err = self.cppCluster.ConfigureAttributeCurrentX(onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
+    CHIP_ERROR err
+        = self.cppCluster.ConfigureAttributeCurrentX(onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -3708,7 +3931,7 @@ private:
     return YES;
 }
 
-- (BOOL) reportAttributeCurrentX:(ResponseHandler)reportHandler
+- (BOOL)reportAttributeCurrentX:(ResponseHandler)reportHandler
 {
     CHIPInt16uAttributeCallbackBridge * onReport = new CHIPInt16uAttributeCallbackBridge(reportHandler, _callbackQueue, true);
     if (!onReport) {
@@ -3746,7 +3969,10 @@ private:
     return YES;
 }
 
-- (BOOL) configureAttributeCurrentY:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval change:(uint16_t)change completionHandler:(ResponseHandler)completionHandler
+- (BOOL)configureAttributeCurrentY:(uint16_t)minInterval
+                       maxInterval:(uint16_t)maxInterval
+                            change:(uint16_t)change
+                 completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
@@ -3759,8 +3985,8 @@ private:
         return NO;
     }
 
-
-    CHIP_ERROR err = self.cppCluster.ConfigureAttributeCurrentY(onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
+    CHIP_ERROR err
+        = self.cppCluster.ConfigureAttributeCurrentY(onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -3769,7 +3995,7 @@ private:
     return YES;
 }
 
-- (BOOL) reportAttributeCurrentY:(ResponseHandler)reportHandler
+- (BOOL)reportAttributeCurrentY:(ResponseHandler)reportHandler
 {
     CHIPInt16uAttributeCallbackBridge * onReport = new CHIPInt16uAttributeCallbackBridge(reportHandler, _callbackQueue, true);
     if (!onReport) {
@@ -3809,7 +4035,8 @@ private:
 
 - (BOOL)readAttributeCompensationText:(ResponseHandler)completionHandler
 {
-    CHIPUnsupportedAttributeCallbackBridge * onSuccess = new CHIPUnsupportedAttributeCallbackBridge(completionHandler, _callbackQueue);
+    CHIPUnsupportedAttributeCallbackBridge * onSuccess
+        = new CHIPUnsupportedAttributeCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
         return NO;
     }
@@ -3851,7 +4078,10 @@ private:
     return YES;
 }
 
-- (BOOL) configureAttributeColorTemperature:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval change:(uint16_t)change completionHandler:(ResponseHandler)completionHandler
+- (BOOL)configureAttributeColorTemperature:(uint16_t)minInterval
+                               maxInterval:(uint16_t)maxInterval
+                                    change:(uint16_t)change
+                         completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
@@ -3864,8 +4094,8 @@ private:
         return NO;
     }
 
-
-    CHIP_ERROR err = self.cppCluster.ConfigureAttributeColorTemperature(onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
+    CHIP_ERROR err = self.cppCluster.ConfigureAttributeColorTemperature(
+        onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -3874,7 +4104,7 @@ private:
     return YES;
 }
 
-- (BOOL) reportAttributeColorTemperature:(ResponseHandler)reportHandler
+- (BOOL)reportAttributeColorTemperature:(ResponseHandler)reportHandler
 {
     CHIPInt16uAttributeCallbackBridge * onReport = new CHIPInt16uAttributeCallbackBridge(reportHandler, _callbackQueue, true);
     if (!onReport) {
@@ -5122,9 +5352,7 @@ private:
     return YES;
 }
 
-
 @end
-
 
 @interface CHIPDoorLock ()
 
@@ -5445,7 +5673,8 @@ private:
 }
 - (BOOL)lockDoor:(char *)pin completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPDoorLockClusterLockDoorResponseCallbackBridge * onSuccess = new CHIPDoorLockClusterLockDoorResponseCallbackBridge(completionHandler, _callbackQueue);
+    CHIPDoorLockClusterLockDoorResponseCallbackBridge * onSuccess
+        = new CHIPDoorLockClusterLockDoorResponseCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
         return NO;
     }
@@ -5464,7 +5693,11 @@ private:
     }
     return YES;
 }
-- (BOOL)setHolidaySchedule:(uint8_t)scheduleId localStartTime:(uint32_t)localStartTime localEndTime:(uint32_t)localEndTime operatingModeDuringHoliday:(uint8_t)operatingModeDuringHoliday completionHandler:(ResponseHandler)completionHandler
+- (BOOL)setHolidaySchedule:(uint8_t)scheduleId
+                localStartTime:(uint32_t)localStartTime
+                  localEndTime:(uint32_t)localEndTime
+    operatingModeDuringHoliday:(uint8_t)operatingModeDuringHoliday
+             completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
@@ -5477,7 +5710,8 @@ private:
         return NO;
     }
 
-    CHIP_ERROR err = self.cppCluster.SetHolidaySchedule(onSuccess->Cancel(), onFailure->Cancel(), scheduleId, localStartTime, localEndTime, operatingModeDuringHoliday);
+    CHIP_ERROR err = self.cppCluster.SetHolidaySchedule(
+        onSuccess->Cancel(), onFailure->Cancel(), scheduleId, localStartTime, localEndTime, operatingModeDuringHoliday);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5485,7 +5719,11 @@ private:
     }
     return YES;
 }
-- (BOOL)setPin:(uint16_t)userId userStatus:(uint8_t)userStatus userType:(uint8_t)userType pin:(char *)pin completionHandler:(ResponseHandler)completionHandler
+- (BOOL)setPin:(uint16_t)userId
+           userStatus:(uint8_t)userStatus
+             userType:(uint8_t)userType
+                  pin:(char *)pin
+    completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
@@ -5506,7 +5744,11 @@ private:
     }
     return YES;
 }
-- (BOOL)setRfid:(uint16_t)userId userStatus:(uint8_t)userStatus userType:(uint8_t)userType id:(char *)id completionHandler:(ResponseHandler)completionHandler
+- (BOOL)setRfid:(uint16_t)userId
+           userStatus:(uint8_t)userStatus
+             userType:(uint8_t)userType
+                   id:(char *)id
+    completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
@@ -5548,7 +5790,14 @@ private:
     }
     return YES;
 }
-- (BOOL)setWeekdaySchedule:(uint8_t)scheduleId userId:(uint16_t)userId daysMask:(uint8_t)daysMask startHour:(uint8_t)startHour startMinute:(uint8_t)startMinute endHour:(uint8_t)endHour endMinute:(uint8_t)endMinute completionHandler:(ResponseHandler)completionHandler
+- (BOOL)setWeekdaySchedule:(uint8_t)scheduleId
+                    userId:(uint16_t)userId
+                  daysMask:(uint8_t)daysMask
+                 startHour:(uint8_t)startHour
+               startMinute:(uint8_t)startMinute
+                   endHour:(uint8_t)endHour
+                 endMinute:(uint8_t)endMinute
+         completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
@@ -5561,7 +5810,8 @@ private:
         return NO;
     }
 
-    CHIP_ERROR err = self.cppCluster.SetWeekdaySchedule(onSuccess->Cancel(), onFailure->Cancel(), scheduleId, userId, daysMask, startHour, startMinute, endHour, endMinute);
+    CHIP_ERROR err = self.cppCluster.SetWeekdaySchedule(
+        onSuccess->Cancel(), onFailure->Cancel(), scheduleId, userId, daysMask, startHour, startMinute, endHour, endMinute);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5569,7 +5819,11 @@ private:
     }
     return YES;
 }
-- (BOOL)setYeardaySchedule:(uint8_t)scheduleId userId:(uint16_t)userId localStartTime:(uint32_t)localStartTime localEndTime:(uint32_t)localEndTime completionHandler:(ResponseHandler)completionHandler
+- (BOOL)setYeardaySchedule:(uint8_t)scheduleId
+                    userId:(uint16_t)userId
+            localStartTime:(uint32_t)localStartTime
+              localEndTime:(uint32_t)localEndTime
+         completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
@@ -5582,7 +5836,8 @@ private:
         return NO;
     }
 
-    CHIP_ERROR err = self.cppCluster.SetYeardaySchedule(onSuccess->Cancel(), onFailure->Cancel(), scheduleId, userId, localStartTime, localEndTime);
+    CHIP_ERROR err = self.cppCluster.SetYeardaySchedule(
+        onSuccess->Cancel(), onFailure->Cancel(), scheduleId, userId, localStartTime, localEndTime);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5592,7 +5847,8 @@ private:
 }
 - (BOOL)unlockDoor:(char *)pin completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPDoorLockClusterUnlockDoorResponseCallbackBridge * onSuccess = new CHIPDoorLockClusterUnlockDoorResponseCallbackBridge(completionHandler, _callbackQueue);
+    CHIPDoorLockClusterUnlockDoorResponseCallbackBridge * onSuccess
+        = new CHIPDoorLockClusterUnlockDoorResponseCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
         return NO;
     }
@@ -5655,7 +5911,9 @@ private:
     return YES;
 }
 
-- (BOOL) configureAttributeLockState:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval completionHandler:(ResponseHandler)completionHandler
+- (BOOL)configureAttributeLockState:(uint16_t)minInterval
+                        maxInterval:(uint16_t)maxInterval
+                  completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
@@ -5668,8 +5926,8 @@ private:
         return NO;
     }
 
-
-    CHIP_ERROR err = self.cppCluster.ConfigureAttributeLockState(onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval);
+    CHIP_ERROR err
+        = self.cppCluster.ConfigureAttributeLockState(onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5678,7 +5936,7 @@ private:
     return YES;
 }
 
-- (BOOL) reportAttributeLockState:(ResponseHandler)reportHandler
+- (BOOL)reportAttributeLockState:(ResponseHandler)reportHandler
 {
     CHIPInt8uAttributeCallbackBridge * onReport = new CHIPInt8uAttributeCallbackBridge(reportHandler, _callbackQueue, true);
     if (!onReport) {
@@ -5760,9 +6018,7 @@ private:
     return YES;
 }
 
-
 @end
-
 
 @interface CHIPDoorLock ()
 
@@ -6083,7 +6339,8 @@ private:
 }
 - (BOOL)lockDoor:(char *)pin completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPDoorLockClusterLockDoorResponseCallbackBridge * onSuccess = new CHIPDoorLockClusterLockDoorResponseCallbackBridge(completionHandler, _callbackQueue);
+    CHIPDoorLockClusterLockDoorResponseCallbackBridge * onSuccess
+        = new CHIPDoorLockClusterLockDoorResponseCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
         return NO;
     }
@@ -6102,7 +6359,11 @@ private:
     }
     return YES;
 }
-- (BOOL)setHolidaySchedule:(uint8_t)scheduleId localStartTime:(uint32_t)localStartTime localEndTime:(uint32_t)localEndTime operatingModeDuringHoliday:(uint8_t)operatingModeDuringHoliday completionHandler:(ResponseHandler)completionHandler
+- (BOOL)setHolidaySchedule:(uint8_t)scheduleId
+                localStartTime:(uint32_t)localStartTime
+                  localEndTime:(uint32_t)localEndTime
+    operatingModeDuringHoliday:(uint8_t)operatingModeDuringHoliday
+             completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
@@ -6115,7 +6376,8 @@ private:
         return NO;
     }
 
-    CHIP_ERROR err = self.cppCluster.SetHolidaySchedule(onSuccess->Cancel(), onFailure->Cancel(), scheduleId, localStartTime, localEndTime, operatingModeDuringHoliday);
+    CHIP_ERROR err = self.cppCluster.SetHolidaySchedule(
+        onSuccess->Cancel(), onFailure->Cancel(), scheduleId, localStartTime, localEndTime, operatingModeDuringHoliday);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6123,7 +6385,11 @@ private:
     }
     return YES;
 }
-- (BOOL)setPin:(uint16_t)userId userStatus:(uint8_t)userStatus userType:(uint8_t)userType pin:(char *)pin completionHandler:(ResponseHandler)completionHandler
+- (BOOL)setPin:(uint16_t)userId
+           userStatus:(uint8_t)userStatus
+             userType:(uint8_t)userType
+                  pin:(char *)pin
+    completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
@@ -6144,7 +6410,11 @@ private:
     }
     return YES;
 }
-- (BOOL)setRfid:(uint16_t)userId userStatus:(uint8_t)userStatus userType:(uint8_t)userType id:(char *)id completionHandler:(ResponseHandler)completionHandler
+- (BOOL)setRfid:(uint16_t)userId
+           userStatus:(uint8_t)userStatus
+             userType:(uint8_t)userType
+                   id:(char *)id
+    completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
@@ -6186,7 +6456,14 @@ private:
     }
     return YES;
 }
-- (BOOL)setWeekdaySchedule:(uint8_t)scheduleId userId:(uint16_t)userId daysMask:(uint8_t)daysMask startHour:(uint8_t)startHour startMinute:(uint8_t)startMinute endHour:(uint8_t)endHour endMinute:(uint8_t)endMinute completionHandler:(ResponseHandler)completionHandler
+- (BOOL)setWeekdaySchedule:(uint8_t)scheduleId
+                    userId:(uint16_t)userId
+                  daysMask:(uint8_t)daysMask
+                 startHour:(uint8_t)startHour
+               startMinute:(uint8_t)startMinute
+                   endHour:(uint8_t)endHour
+                 endMinute:(uint8_t)endMinute
+         completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
@@ -6199,7 +6476,8 @@ private:
         return NO;
     }
 
-    CHIP_ERROR err = self.cppCluster.SetWeekdaySchedule(onSuccess->Cancel(), onFailure->Cancel(), scheduleId, userId, daysMask, startHour, startMinute, endHour, endMinute);
+    CHIP_ERROR err = self.cppCluster.SetWeekdaySchedule(
+        onSuccess->Cancel(), onFailure->Cancel(), scheduleId, userId, daysMask, startHour, startMinute, endHour, endMinute);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6207,7 +6485,11 @@ private:
     }
     return YES;
 }
-- (BOOL)setYeardaySchedule:(uint8_t)scheduleId userId:(uint16_t)userId localStartTime:(uint32_t)localStartTime localEndTime:(uint32_t)localEndTime completionHandler:(ResponseHandler)completionHandler
+- (BOOL)setYeardaySchedule:(uint8_t)scheduleId
+                    userId:(uint16_t)userId
+            localStartTime:(uint32_t)localStartTime
+              localEndTime:(uint32_t)localEndTime
+         completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
@@ -6220,7 +6502,8 @@ private:
         return NO;
     }
 
-    CHIP_ERROR err = self.cppCluster.SetYeardaySchedule(onSuccess->Cancel(), onFailure->Cancel(), scheduleId, userId, localStartTime, localEndTime);
+    CHIP_ERROR err = self.cppCluster.SetYeardaySchedule(
+        onSuccess->Cancel(), onFailure->Cancel(), scheduleId, userId, localStartTime, localEndTime);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6230,7 +6513,8 @@ private:
 }
 - (BOOL)unlockDoor:(char *)pin completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPDoorLockClusterUnlockDoorResponseCallbackBridge * onSuccess = new CHIPDoorLockClusterUnlockDoorResponseCallbackBridge(completionHandler, _callbackQueue);
+    CHIPDoorLockClusterUnlockDoorResponseCallbackBridge * onSuccess
+        = new CHIPDoorLockClusterUnlockDoorResponseCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
         return NO;
     }
@@ -6293,7 +6577,9 @@ private:
     return YES;
 }
 
-- (BOOL) configureAttributeLockState:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval completionHandler:(ResponseHandler)completionHandler
+- (BOOL)configureAttributeLockState:(uint16_t)minInterval
+                        maxInterval:(uint16_t)maxInterval
+                  completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
@@ -6306,8 +6592,8 @@ private:
         return NO;
     }
 
-
-    CHIP_ERROR err = self.cppCluster.ConfigureAttributeLockState(onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval);
+    CHIP_ERROR err
+        = self.cppCluster.ConfigureAttributeLockState(onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6316,7 +6602,7 @@ private:
     return YES;
 }
 
-- (BOOL) reportAttributeLockState:(ResponseHandler)reportHandler
+- (BOOL)reportAttributeLockState:(ResponseHandler)reportHandler
 {
     CHIPInt8uAttributeCallbackBridge * onReport = new CHIPInt8uAttributeCallbackBridge(reportHandler, _callbackQueue, true);
     if (!onReport) {
@@ -6398,9 +6684,7 @@ private:
     return YES;
 }
 
-
 @end
-
 
 @interface CHIPGroups ()
 
@@ -6427,7 +6711,8 @@ private:
 
 - (BOOL)addGroup:(uint16_t)groupId groupName:(char *)groupName completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPGroupsClusterAddGroupResponseCallbackBridge * onSuccess = new CHIPGroupsClusterAddGroupResponseCallbackBridge(completionHandler, _callbackQueue);
+    CHIPGroupsClusterAddGroupResponseCallbackBridge * onSuccess
+        = new CHIPGroupsClusterAddGroupResponseCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
         return NO;
     }
@@ -6469,7 +6754,8 @@ private:
 }
 - (BOOL)getGroupMembership:(uint8_t)groupCount groupList:(uint16_t)groupList completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPGroupsClusterGetGroupMembershipResponseCallbackBridge * onSuccess = new CHIPGroupsClusterGetGroupMembershipResponseCallbackBridge(completionHandler, _callbackQueue);
+    CHIPGroupsClusterGetGroupMembershipResponseCallbackBridge * onSuccess
+        = new CHIPGroupsClusterGetGroupMembershipResponseCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
         return NO;
     }
@@ -6511,7 +6797,8 @@ private:
 }
 - (BOOL)removeGroup:(uint16_t)groupId completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPGroupsClusterRemoveGroupResponseCallbackBridge * onSuccess = new CHIPGroupsClusterRemoveGroupResponseCallbackBridge(completionHandler, _callbackQueue);
+    CHIPGroupsClusterRemoveGroupResponseCallbackBridge * onSuccess
+        = new CHIPGroupsClusterRemoveGroupResponseCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
         return NO;
     }
@@ -6532,7 +6819,8 @@ private:
 }
 - (BOOL)viewGroup:(uint16_t)groupId completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPGroupsClusterViewGroupResponseCallbackBridge * onSuccess = new CHIPGroupsClusterViewGroupResponseCallbackBridge(completionHandler, _callbackQueue);
+    CHIPGroupsClusterViewGroupResponseCallbackBridge * onSuccess
+        = new CHIPGroupsClusterViewGroupResponseCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
         return NO;
     }
@@ -6596,9 +6884,7 @@ private:
     return YES;
 }
 
-
 @end
-
 
 @interface CHIPGroups ()
 
@@ -6625,7 +6911,8 @@ private:
 
 - (BOOL)addGroup:(uint16_t)groupId groupName:(char *)groupName completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPGroupsClusterAddGroupResponseCallbackBridge * onSuccess = new CHIPGroupsClusterAddGroupResponseCallbackBridge(completionHandler, _callbackQueue);
+    CHIPGroupsClusterAddGroupResponseCallbackBridge * onSuccess
+        = new CHIPGroupsClusterAddGroupResponseCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
         return NO;
     }
@@ -6667,7 +6954,8 @@ private:
 }
 - (BOOL)getGroupMembership:(uint8_t)groupCount groupList:(uint16_t)groupList completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPGroupsClusterGetGroupMembershipResponseCallbackBridge * onSuccess = new CHIPGroupsClusterGetGroupMembershipResponseCallbackBridge(completionHandler, _callbackQueue);
+    CHIPGroupsClusterGetGroupMembershipResponseCallbackBridge * onSuccess
+        = new CHIPGroupsClusterGetGroupMembershipResponseCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
         return NO;
     }
@@ -6709,7 +6997,8 @@ private:
 }
 - (BOOL)removeGroup:(uint16_t)groupId completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPGroupsClusterRemoveGroupResponseCallbackBridge * onSuccess = new CHIPGroupsClusterRemoveGroupResponseCallbackBridge(completionHandler, _callbackQueue);
+    CHIPGroupsClusterRemoveGroupResponseCallbackBridge * onSuccess
+        = new CHIPGroupsClusterRemoveGroupResponseCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
         return NO;
     }
@@ -6730,7 +7019,8 @@ private:
 }
 - (BOOL)viewGroup:(uint16_t)groupId completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPGroupsClusterViewGroupResponseCallbackBridge * onSuccess = new CHIPGroupsClusterViewGroupResponseCallbackBridge(completionHandler, _callbackQueue);
+    CHIPGroupsClusterViewGroupResponseCallbackBridge * onSuccess
+        = new CHIPGroupsClusterViewGroupResponseCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
         return NO;
     }
@@ -6794,9 +7084,7 @@ private:
     return YES;
 }
 
-
 @end
-
 
 @interface CHIPIasZone ()
 
@@ -6820,7 +7108,6 @@ private:
 
     return self;
 }
-
 
 - (BOOL)readAttributeZoneState:(ResponseHandler)completionHandler
 {
@@ -6976,9 +7263,7 @@ private:
     return YES;
 }
 
-
 @end
-
 
 @interface CHIPIdentify ()
 
@@ -7026,7 +7311,8 @@ private:
 }
 - (BOOL)identifyQuery:(ResponseHandler)completionHandler
 {
-    CHIPIdentifyClusterIdentifyQueryResponseCallbackBridge * onSuccess = new CHIPIdentifyClusterIdentifyQueryResponseCallbackBridge(completionHandler, _callbackQueue);
+    CHIPIdentifyClusterIdentifyQueryResponseCallbackBridge * onSuccess
+        = new CHIPIdentifyClusterIdentifyQueryResponseCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
         return NO;
     }
@@ -7112,9 +7398,7 @@ private:
     return YES;
 }
 
-
 @end
-
 
 @interface CHIPIdentify ()
 
@@ -7162,7 +7446,8 @@ private:
 }
 - (BOOL)identifyQuery:(ResponseHandler)completionHandler
 {
-    CHIPIdentifyClusterIdentifyQueryResponseCallbackBridge * onSuccess = new CHIPIdentifyClusterIdentifyQueryResponseCallbackBridge(completionHandler, _callbackQueue);
+    CHIPIdentifyClusterIdentifyQueryResponseCallbackBridge * onSuccess
+        = new CHIPIdentifyClusterIdentifyQueryResponseCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
         return NO;
     }
@@ -7248,9 +7533,7 @@ private:
     return YES;
 }
 
-
 @end
-
 
 @interface CHIPLevelControl ()
 
@@ -7275,7 +7558,11 @@ private:
     return self;
 }
 
-- (BOOL)move:(uint8_t)moveMode rate:(uint8_t)rate optionMask:(uint8_t)optionMask optionOverride:(uint8_t)optionOverride completionHandler:(ResponseHandler)completionHandler
+- (BOOL)move:(uint8_t)moveMode
+                 rate:(uint8_t)rate
+           optionMask:(uint8_t)optionMask
+       optionOverride:(uint8_t)optionOverride
+    completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
@@ -7296,7 +7583,11 @@ private:
     }
     return YES;
 }
-- (BOOL)moveToLevel:(uint8_t)level transitionTime:(uint16_t)transitionTime optionMask:(uint8_t)optionMask optionOverride:(uint8_t)optionOverride completionHandler:(ResponseHandler)completionHandler
+- (BOOL)moveToLevel:(uint8_t)level
+       transitionTime:(uint16_t)transitionTime
+           optionMask:(uint8_t)optionMask
+       optionOverride:(uint8_t)optionOverride
+    completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
@@ -7309,7 +7600,8 @@ private:
         return NO;
     }
 
-    CHIP_ERROR err = self.cppCluster.MoveToLevel(onSuccess->Cancel(), onFailure->Cancel(), level, transitionTime, optionMask, optionOverride);
+    CHIP_ERROR err
+        = self.cppCluster.MoveToLevel(onSuccess->Cancel(), onFailure->Cancel(), level, transitionTime, optionMask, optionOverride);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -7317,7 +7609,9 @@ private:
     }
     return YES;
 }
-- (BOOL)moveToLevelWithOnOff:(uint8_t)level transitionTime:(uint16_t)transitionTime completionHandler:(ResponseHandler)completionHandler
+- (BOOL)moveToLevelWithOnOff:(uint8_t)level
+              transitionTime:(uint16_t)transitionTime
+           completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
@@ -7359,7 +7653,12 @@ private:
     }
     return YES;
 }
-- (BOOL)step:(uint8_t)stepMode stepSize:(uint8_t)stepSize transitionTime:(uint16_t)transitionTime optionMask:(uint8_t)optionMask optionOverride:(uint8_t)optionOverride completionHandler:(ResponseHandler)completionHandler
+- (BOOL)step:(uint8_t)stepMode
+             stepSize:(uint8_t)stepSize
+       transitionTime:(uint16_t)transitionTime
+           optionMask:(uint8_t)optionMask
+       optionOverride:(uint8_t)optionOverride
+    completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
@@ -7372,7 +7671,8 @@ private:
         return NO;
     }
 
-    CHIP_ERROR err = self.cppCluster.Step(onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime, optionMask, optionOverride);
+    CHIP_ERROR err = self.cppCluster.Step(
+        onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime, optionMask, optionOverride);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -7380,7 +7680,10 @@ private:
     }
     return YES;
 }
-- (BOOL)stepWithOnOff:(uint8_t)stepMode stepSize:(uint8_t)stepSize transitionTime:(uint16_t)transitionTime completionHandler:(ResponseHandler)completionHandler
+- (BOOL)stepWithOnOff:(uint8_t)stepMode
+             stepSize:(uint8_t)stepSize
+       transitionTime:(uint16_t)transitionTime
+    completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
@@ -7466,7 +7769,10 @@ private:
     return YES;
 }
 
-- (BOOL) configureAttributeCurrentLevel:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval change:(uint8_t)change completionHandler:(ResponseHandler)completionHandler
+- (BOOL)configureAttributeCurrentLevel:(uint16_t)minInterval
+                           maxInterval:(uint16_t)maxInterval
+                                change:(uint8_t)change
+                     completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
@@ -7479,8 +7785,8 @@ private:
         return NO;
     }
 
-
-    CHIP_ERROR err = self.cppCluster.ConfigureAttributeCurrentLevel(onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
+    CHIP_ERROR err = self.cppCluster.ConfigureAttributeCurrentLevel(
+        onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -7489,7 +7795,7 @@ private:
     return YES;
 }
 
-- (BOOL) reportAttributeCurrentLevel:(ResponseHandler)reportHandler
+- (BOOL)reportAttributeCurrentLevel:(ResponseHandler)reportHandler
 {
     CHIPInt8uAttributeCallbackBridge * onReport = new CHIPInt8uAttributeCallbackBridge(reportHandler, _callbackQueue, true);
     if (!onReport) {
@@ -7527,9 +7833,7 @@ private:
     return YES;
 }
 
-
 @end
-
 
 @interface CHIPLevelControl ()
 
@@ -7554,7 +7858,11 @@ private:
     return self;
 }
 
-- (BOOL)move:(uint8_t)moveMode rate:(uint8_t)rate optionMask:(uint8_t)optionMask optionOverride:(uint8_t)optionOverride completionHandler:(ResponseHandler)completionHandler
+- (BOOL)move:(uint8_t)moveMode
+                 rate:(uint8_t)rate
+           optionMask:(uint8_t)optionMask
+       optionOverride:(uint8_t)optionOverride
+    completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
@@ -7575,7 +7883,11 @@ private:
     }
     return YES;
 }
-- (BOOL)moveToLevel:(uint8_t)level transitionTime:(uint16_t)transitionTime optionMask:(uint8_t)optionMask optionOverride:(uint8_t)optionOverride completionHandler:(ResponseHandler)completionHandler
+- (BOOL)moveToLevel:(uint8_t)level
+       transitionTime:(uint16_t)transitionTime
+           optionMask:(uint8_t)optionMask
+       optionOverride:(uint8_t)optionOverride
+    completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
@@ -7588,7 +7900,8 @@ private:
         return NO;
     }
 
-    CHIP_ERROR err = self.cppCluster.MoveToLevel(onSuccess->Cancel(), onFailure->Cancel(), level, transitionTime, optionMask, optionOverride);
+    CHIP_ERROR err
+        = self.cppCluster.MoveToLevel(onSuccess->Cancel(), onFailure->Cancel(), level, transitionTime, optionMask, optionOverride);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -7596,7 +7909,9 @@ private:
     }
     return YES;
 }
-- (BOOL)moveToLevelWithOnOff:(uint8_t)level transitionTime:(uint16_t)transitionTime completionHandler:(ResponseHandler)completionHandler
+- (BOOL)moveToLevelWithOnOff:(uint8_t)level
+              transitionTime:(uint16_t)transitionTime
+           completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
@@ -7638,7 +7953,12 @@ private:
     }
     return YES;
 }
-- (BOOL)step:(uint8_t)stepMode stepSize:(uint8_t)stepSize transitionTime:(uint16_t)transitionTime optionMask:(uint8_t)optionMask optionOverride:(uint8_t)optionOverride completionHandler:(ResponseHandler)completionHandler
+- (BOOL)step:(uint8_t)stepMode
+             stepSize:(uint8_t)stepSize
+       transitionTime:(uint16_t)transitionTime
+           optionMask:(uint8_t)optionMask
+       optionOverride:(uint8_t)optionOverride
+    completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
@@ -7651,7 +7971,8 @@ private:
         return NO;
     }
 
-    CHIP_ERROR err = self.cppCluster.Step(onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime, optionMask, optionOverride);
+    CHIP_ERROR err = self.cppCluster.Step(
+        onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime, optionMask, optionOverride);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -7659,7 +7980,10 @@ private:
     }
     return YES;
 }
-- (BOOL)stepWithOnOff:(uint8_t)stepMode stepSize:(uint8_t)stepSize transitionTime:(uint16_t)transitionTime completionHandler:(ResponseHandler)completionHandler
+- (BOOL)stepWithOnOff:(uint8_t)stepMode
+             stepSize:(uint8_t)stepSize
+       transitionTime:(uint16_t)transitionTime
+    completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
@@ -7745,7 +8069,10 @@ private:
     return YES;
 }
 
-- (BOOL) configureAttributeCurrentLevel:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval change:(uint8_t)change completionHandler:(ResponseHandler)completionHandler
+- (BOOL)configureAttributeCurrentLevel:(uint16_t)minInterval
+                           maxInterval:(uint16_t)maxInterval
+                                change:(uint8_t)change
+                     completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
@@ -7758,8 +8085,8 @@ private:
         return NO;
     }
 
-
-    CHIP_ERROR err = self.cppCluster.ConfigureAttributeCurrentLevel(onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
+    CHIP_ERROR err = self.cppCluster.ConfigureAttributeCurrentLevel(
+        onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -7768,7 +8095,7 @@ private:
     return YES;
 }
 
-- (BOOL) reportAttributeCurrentLevel:(ResponseHandler)reportHandler
+- (BOOL)reportAttributeCurrentLevel:(ResponseHandler)reportHandler
 {
     CHIPInt8uAttributeCallbackBridge * onReport = new CHIPInt8uAttributeCallbackBridge(reportHandler, _callbackQueue, true);
     if (!onReport) {
@@ -7806,9 +8133,7 @@ private:
     return YES;
 }
 
-
 @end
-
 
 @interface CHIPMediaPlayback ()
 
@@ -8088,9 +8413,7 @@ private:
     return YES;
 }
 
-
 @end
-
 
 @interface CHIPOnOff ()
 
@@ -8201,7 +8524,9 @@ private:
     return YES;
 }
 
-- (BOOL) configureAttributeOnOff:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval completionHandler:(ResponseHandler)completionHandler
+- (BOOL)configureAttributeOnOff:(uint16_t)minInterval
+                    maxInterval:(uint16_t)maxInterval
+              completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
@@ -8214,7 +8539,6 @@ private:
         return NO;
     }
 
-
     CHIP_ERROR err = self.cppCluster.ConfigureAttributeOnOff(onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
@@ -8224,7 +8548,7 @@ private:
     return YES;
 }
 
-- (BOOL) reportAttributeOnOff:(ResponseHandler)reportHandler
+- (BOOL)reportAttributeOnOff:(ResponseHandler)reportHandler
 {
     CHIPBooleanAttributeCallbackBridge * onReport = new CHIPBooleanAttributeCallbackBridge(reportHandler, _callbackQueue, true);
     if (!onReport) {
@@ -8262,9 +8586,7 @@ private:
     return YES;
 }
 
-
 @end
-
 
 @interface CHIPOnOff ()
 
@@ -8375,7 +8697,9 @@ private:
     return YES;
 }
 
-- (BOOL) configureAttributeOnOff:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval completionHandler:(ResponseHandler)completionHandler
+- (BOOL)configureAttributeOnOff:(uint16_t)minInterval
+                    maxInterval:(uint16_t)maxInterval
+              completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
@@ -8388,7 +8712,6 @@ private:
         return NO;
     }
 
-
     CHIP_ERROR err = self.cppCluster.ConfigureAttributeOnOff(onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
@@ -8398,7 +8721,7 @@ private:
     return YES;
 }
 
-- (BOOL) reportAttributeOnOff:(ResponseHandler)reportHandler
+- (BOOL)reportAttributeOnOff:(ResponseHandler)reportHandler
 {
     CHIPBooleanAttributeCallbackBridge * onReport = new CHIPBooleanAttributeCallbackBridge(reportHandler, _callbackQueue, true);
     if (!onReport) {
@@ -8436,9 +8759,7 @@ private:
     return YES;
 }
 
-
 @end
-
 
 @interface CHIPScenes ()
 
@@ -8463,9 +8784,17 @@ private:
     return self;
 }
 
-- (BOOL)addScene:(uint16_t)groupId sceneId:(uint8_t)sceneId transitionTime:(uint16_t)transitionTime sceneName:(char *)sceneName clusterId:(uint16_t)clusterId length:(uint8_t)length value:(uint8_t)value completionHandler:(ResponseHandler)completionHandler
+- (BOOL)addScene:(uint16_t)groupId
+              sceneId:(uint8_t)sceneId
+       transitionTime:(uint16_t)transitionTime
+            sceneName:(char *)sceneName
+            clusterId:(uint16_t)clusterId
+               length:(uint8_t)length
+                value:(uint8_t)value
+    completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPScenesClusterAddSceneResponseCallbackBridge * onSuccess = new CHIPScenesClusterAddSceneResponseCallbackBridge(completionHandler, _callbackQueue);
+    CHIPScenesClusterAddSceneResponseCallbackBridge * onSuccess
+        = new CHIPScenesClusterAddSceneResponseCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
         return NO;
     }
@@ -8476,7 +8805,8 @@ private:
         return NO;
     }
 
-    CHIP_ERROR err = self.cppCluster.AddScene(onSuccess->Cancel(), onFailure->Cancel(), groupId, sceneId, transitionTime, sceneName, clusterId, length, value);
+    CHIP_ERROR err = self.cppCluster.AddScene(
+        onSuccess->Cancel(), onFailure->Cancel(), groupId, sceneId, transitionTime, sceneName, clusterId, length, value);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -8486,7 +8816,8 @@ private:
 }
 - (BOOL)getSceneMembership:(uint16_t)groupId completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPScenesClusterGetSceneMembershipResponseCallbackBridge * onSuccess = new CHIPScenesClusterGetSceneMembershipResponseCallbackBridge(completionHandler, _callbackQueue);
+    CHIPScenesClusterGetSceneMembershipResponseCallbackBridge * onSuccess
+        = new CHIPScenesClusterGetSceneMembershipResponseCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
         return NO;
     }
@@ -8505,7 +8836,10 @@ private:
     }
     return YES;
 }
-- (BOOL)recallScene:(uint16_t)groupId sceneId:(uint8_t)sceneId transitionTime:(uint16_t)transitionTime completionHandler:(ResponseHandler)completionHandler
+- (BOOL)recallScene:(uint16_t)groupId
+              sceneId:(uint8_t)sceneId
+       transitionTime:(uint16_t)transitionTime
+    completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
@@ -8528,7 +8862,8 @@ private:
 }
 - (BOOL)removeAllScenes:(uint16_t)groupId completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPScenesClusterRemoveAllScenesResponseCallbackBridge * onSuccess = new CHIPScenesClusterRemoveAllScenesResponseCallbackBridge(completionHandler, _callbackQueue);
+    CHIPScenesClusterRemoveAllScenesResponseCallbackBridge * onSuccess
+        = new CHIPScenesClusterRemoveAllScenesResponseCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
         return NO;
     }
@@ -8549,7 +8884,8 @@ private:
 }
 - (BOOL)removeScene:(uint16_t)groupId sceneId:(uint8_t)sceneId completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPScenesClusterRemoveSceneResponseCallbackBridge * onSuccess = new CHIPScenesClusterRemoveSceneResponseCallbackBridge(completionHandler, _callbackQueue);
+    CHIPScenesClusterRemoveSceneResponseCallbackBridge * onSuccess
+        = new CHIPScenesClusterRemoveSceneResponseCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
         return NO;
     }
@@ -8570,7 +8906,8 @@ private:
 }
 - (BOOL)storeScene:(uint16_t)groupId sceneId:(uint8_t)sceneId completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPScenesClusterStoreSceneResponseCallbackBridge * onSuccess = new CHIPScenesClusterStoreSceneResponseCallbackBridge(completionHandler, _callbackQueue);
+    CHIPScenesClusterStoreSceneResponseCallbackBridge * onSuccess
+        = new CHIPScenesClusterStoreSceneResponseCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
         return NO;
     }
@@ -8591,7 +8928,8 @@ private:
 }
 - (BOOL)viewScene:(uint16_t)groupId sceneId:(uint8_t)sceneId completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPScenesClusterViewSceneResponseCallbackBridge * onSuccess = new CHIPScenesClusterViewSceneResponseCallbackBridge(completionHandler, _callbackQueue);
+    CHIPScenesClusterViewSceneResponseCallbackBridge * onSuccess
+        = new CHIPScenesClusterViewSceneResponseCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
         return NO;
     }
@@ -8743,9 +9081,7 @@ private:
     return YES;
 }
 
-
 @end
-
 
 @interface CHIPScenes ()
 
@@ -8770,9 +9106,17 @@ private:
     return self;
 }
 
-- (BOOL)addScene:(uint16_t)groupId sceneId:(uint8_t)sceneId transitionTime:(uint16_t)transitionTime sceneName:(char *)sceneName clusterId:(uint16_t)clusterId length:(uint8_t)length value:(uint8_t)value completionHandler:(ResponseHandler)completionHandler
+- (BOOL)addScene:(uint16_t)groupId
+              sceneId:(uint8_t)sceneId
+       transitionTime:(uint16_t)transitionTime
+            sceneName:(char *)sceneName
+            clusterId:(uint16_t)clusterId
+               length:(uint8_t)length
+                value:(uint8_t)value
+    completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPScenesClusterAddSceneResponseCallbackBridge * onSuccess = new CHIPScenesClusterAddSceneResponseCallbackBridge(completionHandler, _callbackQueue);
+    CHIPScenesClusterAddSceneResponseCallbackBridge * onSuccess
+        = new CHIPScenesClusterAddSceneResponseCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
         return NO;
     }
@@ -8783,7 +9127,8 @@ private:
         return NO;
     }
 
-    CHIP_ERROR err = self.cppCluster.AddScene(onSuccess->Cancel(), onFailure->Cancel(), groupId, sceneId, transitionTime, sceneName, clusterId, length, value);
+    CHIP_ERROR err = self.cppCluster.AddScene(
+        onSuccess->Cancel(), onFailure->Cancel(), groupId, sceneId, transitionTime, sceneName, clusterId, length, value);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -8793,7 +9138,8 @@ private:
 }
 - (BOOL)getSceneMembership:(uint16_t)groupId completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPScenesClusterGetSceneMembershipResponseCallbackBridge * onSuccess = new CHIPScenesClusterGetSceneMembershipResponseCallbackBridge(completionHandler, _callbackQueue);
+    CHIPScenesClusterGetSceneMembershipResponseCallbackBridge * onSuccess
+        = new CHIPScenesClusterGetSceneMembershipResponseCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
         return NO;
     }
@@ -8812,7 +9158,10 @@ private:
     }
     return YES;
 }
-- (BOOL)recallScene:(uint16_t)groupId sceneId:(uint8_t)sceneId transitionTime:(uint16_t)transitionTime completionHandler:(ResponseHandler)completionHandler
+- (BOOL)recallScene:(uint16_t)groupId
+              sceneId:(uint8_t)sceneId
+       transitionTime:(uint16_t)transitionTime
+    completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
@@ -8835,7 +9184,8 @@ private:
 }
 - (BOOL)removeAllScenes:(uint16_t)groupId completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPScenesClusterRemoveAllScenesResponseCallbackBridge * onSuccess = new CHIPScenesClusterRemoveAllScenesResponseCallbackBridge(completionHandler, _callbackQueue);
+    CHIPScenesClusterRemoveAllScenesResponseCallbackBridge * onSuccess
+        = new CHIPScenesClusterRemoveAllScenesResponseCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
         return NO;
     }
@@ -8856,7 +9206,8 @@ private:
 }
 - (BOOL)removeScene:(uint16_t)groupId sceneId:(uint8_t)sceneId completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPScenesClusterRemoveSceneResponseCallbackBridge * onSuccess = new CHIPScenesClusterRemoveSceneResponseCallbackBridge(completionHandler, _callbackQueue);
+    CHIPScenesClusterRemoveSceneResponseCallbackBridge * onSuccess
+        = new CHIPScenesClusterRemoveSceneResponseCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
         return NO;
     }
@@ -8877,7 +9228,8 @@ private:
 }
 - (BOOL)storeScene:(uint16_t)groupId sceneId:(uint8_t)sceneId completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPScenesClusterStoreSceneResponseCallbackBridge * onSuccess = new CHIPScenesClusterStoreSceneResponseCallbackBridge(completionHandler, _callbackQueue);
+    CHIPScenesClusterStoreSceneResponseCallbackBridge * onSuccess
+        = new CHIPScenesClusterStoreSceneResponseCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
         return NO;
     }
@@ -8898,7 +9250,8 @@ private:
 }
 - (BOOL)viewScene:(uint16_t)groupId sceneId:(uint8_t)sceneId completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPScenesClusterViewSceneResponseCallbackBridge * onSuccess = new CHIPScenesClusterViewSceneResponseCallbackBridge(completionHandler, _callbackQueue);
+    CHIPScenesClusterViewSceneResponseCallbackBridge * onSuccess
+        = new CHIPScenesClusterViewSceneResponseCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
         return NO;
     }
@@ -9050,9 +9403,7 @@ private:
     return YES;
 }
 
-
 @end
-
 
 @interface CHIPTemperatureMeasurement ()
 
@@ -9077,7 +9428,6 @@ private:
     return self;
 }
 
-
 - (BOOL)readAttributeMeasuredValue:(ResponseHandler)completionHandler
 {
     CHIPInt16sAttributeCallbackBridge * onSuccess = new CHIPInt16sAttributeCallbackBridge(completionHandler, _callbackQueue);
@@ -9100,7 +9450,10 @@ private:
     return YES;
 }
 
-- (BOOL) configureAttributeMeasuredValue:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval change:(int16_t)change completionHandler:(ResponseHandler)completionHandler
+- (BOOL)configureAttributeMeasuredValue:(uint16_t)minInterval
+                            maxInterval:(uint16_t)maxInterval
+                                 change:(int16_t)change
+                      completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
@@ -9113,8 +9466,8 @@ private:
         return NO;
     }
 
-
-    CHIP_ERROR err = self.cppCluster.ConfigureAttributeMeasuredValue(onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
+    CHIP_ERROR err = self.cppCluster.ConfigureAttributeMeasuredValue(
+        onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -9123,7 +9476,7 @@ private:
     return YES;
 }
 
-- (BOOL) reportAttributeMeasuredValue:(ResponseHandler)reportHandler
+- (BOOL)reportAttributeMeasuredValue:(ResponseHandler)reportHandler
 {
     CHIPInt16sAttributeCallbackBridge * onReport = new CHIPInt16sAttributeCallbackBridge(reportHandler, _callbackQueue, true);
     if (!onReport) {
@@ -9204,6 +9557,5 @@ private:
     }
     return YES;
 }
-
 
 @end
