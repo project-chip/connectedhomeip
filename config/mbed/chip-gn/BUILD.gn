@@ -13,8 +13,8 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-
 import("//${chip_root}/build/chip/tests.gni")
+
 import("//build_overrides/mbedtls.gni")
 import("${mbedtls_root}/mbedtls.gni")
 
