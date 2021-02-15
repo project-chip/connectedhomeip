@@ -67,7 +67,8 @@ int AppTask::StartAppTask()
     }
 
     // Start App task.
-    if (xTaskCreate(AppTaskMain, "APP", APP_TASK_STACK_SIZE / sizeof(StackType_t), NULL, APP_TASK_PRIORITY, &sAppTaskHandle) != pdPASS)
+    if (xTaskCreate(AppTaskMain, "APP", APP_TASK_STACK_SIZE / sizeof(StackType_t), NULL, APP_TASK_PRIORITY, &sAppTaskHandle) !=
+        pdPASS)
     {
         PLAT_LOG("Failed to create app task");
         while (1)
