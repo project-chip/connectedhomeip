@@ -73,7 +73,7 @@
 }
 
 - (NSString *)openPairingWindowWithPIN:(NSTimeInterval)duration
-                         discriminator:(NSInteger)discriminator
+                         discriminator:(NSUInteger)discriminator
                                  error:(NSError * __autoreleasing *)error
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -81,7 +81,7 @@
     uint16_t u16Descriminator = 0;
 
     if (discriminator > 0xfff) {
-        CHIP_LOG_ERROR("Error: Discriminator %ld is too large. Max value %d", (long) discriminator, 0xfff);
+        CHIP_LOG_ERROR("Error: Discriminator %tu is too large. Max value %d", discriminator, 0xfff);
         if (error) {
             *error = [CHIPError errorForCHIPErrorCode:CHIP_ERROR_INVALID_INTEGER_VALUE];
         }
