@@ -62,13 +62,24 @@ void CHIPSetNextAvailableDeviceID(uint64_t id)
     CHIPSetDomainValueForKey(kCHIPToolDefaultsDomain, kCHIPNextAvailableDeviceIDKey, [NSNumber numberWithUnsignedLongLong:id]);
 }
 
-CHIPDevice * GetPairedDevice(void)
+CHIPDeviceController * InitializeCHIP(void)
 {
-    CHIPToolPersistentStorageDelegate * storage = [[CHIPToolPersistentStorageDelegate alloc] init];
-    dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.persistentstorage.callback", DISPATCH_QUEUE_SERIAL);
-
+    static dispatch_queue_t callbackQueue;
+    static CHIPToolPersistentStorageDelegate * storage = nil;
+    static dispatch_once_t onceToken;
     CHIPDeviceController * controller = [CHIPDeviceController sharedController];
-    [controller setPersistentStorageDelegate:storage queue:callbackQueue];
+    dispatch_once(&onceToken, ^{
+        storage = [[CHIPToolPersistentStorageDelegate alloc] init];
+        callbackQueue = dispatch_queue_create("com.chip.persistentstorage.callback", DISPATCH_QUEUE_SERIAL);
+        [controller setPersistentStorageDelegate:storage queue:callbackQueue];
+    });
+
+    return controller;
+}
+
+CHIPDevice * CHIPGetPairedDevice(void)
+{
+    CHIPDeviceController * controller = InitializeCHIP();
 
     CHIPDevice * device = nil;
     uint64_t deviceId = CHIPGetNextAvailableDeviceID();
@@ -82,15 +93,9 @@ CHIPDevice * GetPairedDevice(void)
     return device;
 }
 
-CHIPDevice * GetPairedDeviceWithID(uint64_t deviceId)
+CHIPDevice * CHIPGetPairedDeviceWithID(uint64_t deviceId)
 {
-    CHIPToolPersistentStorageDelegate * storage = [[CHIPToolPersistentStorageDelegate alloc] init];
-    dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.persistentstorage.callback", DISPATCH_QUEUE_SERIAL);
-
-    CHIPDeviceController * controller = [CHIPDeviceController sharedController];
-    // TODO: setting persistent storage delegate repeatedly is wasteful. This is being done here, and in
-    //       GetPairedDevice() on every call. The delegate should be set once at the controller init time.
-    [controller setPersistentStorageDelegate:storage queue:callbackQueue];
+    CHIPDeviceController * controller = InitializeCHIP();
 
     NSError * error;
     return [controller getPairedDevice:deviceId error:&error];

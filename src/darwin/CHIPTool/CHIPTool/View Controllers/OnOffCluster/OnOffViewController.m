@@ -234,6 +234,10 @@ NSString * const kCHIPNumLightOnOffCluster = @"OnOffViewController_NumLights";
 - (IBAction)onButtonTapped:(id)sender
 {
     CHIPDevice * chipDevice = [self.deviceSelector selectedDevice];
+    if (chipDevice == nil) {
+        [self updateResult:[NSString stringWithFormat:@"No device has been selected"]];
+        return;
+    }
 
     UIButton * button = (UIButton *) sender;
     NSInteger endpoint = button.tag;
@@ -250,6 +254,10 @@ NSString * const kCHIPNumLightOnOffCluster = @"OnOffViewController_NumLights";
 - (IBAction)offButtonTapped:(id)sender
 {
     CHIPDevice * chipDevice = [self.deviceSelector selectedDevice];
+    if (chipDevice == nil) {
+        [self updateResult:[NSString stringWithFormat:@"No device has been selected"]];
+        return;
+    }
 
     UIButton * button = (UIButton *) sender;
     NSInteger endpoint = button.tag;
@@ -266,6 +274,10 @@ NSString * const kCHIPNumLightOnOffCluster = @"OnOffViewController_NumLights";
 - (IBAction)toggleButtonTapped:(id)sender
 {
     CHIPDevice * chipDevice = [self.deviceSelector selectedDevice];
+    if (chipDevice == nil) {
+        [self updateResult:[NSString stringWithFormat:@"No device has been selected"]];
+        return;
+    }
 
     UIButton * button = (UIButton *) sender;
     NSInteger endpoint = button.tag;

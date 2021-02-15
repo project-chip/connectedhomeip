@@ -46,7 +46,7 @@
 {
     _deviceList = [NSMutableArray new];
     for (uint64_t i = 0; i < _nextDeviceID; i++) {
-        if (GetPairedDeviceWithID(i) != nil) {
+        if (CHIPGetPairedDeviceWithID(i) != nil) {
             [_deviceList addObject:[@(i) stringValue]];
         }
     }
@@ -55,8 +55,10 @@
 
 - (void)selectDevice
 {
-    uint64_t deviceID = [_deviceList[_selectedDeviceIndex] intValue];
-    _chipDevice = GetPairedDeviceWithID(deviceID);
+    if ([_deviceList count] > 0) {
+        uint64_t deviceID = [_deviceList[_selectedDeviceIndex] intValue];
+        _chipDevice = CHIPGetPairedDeviceWithID(deviceID);
+    }
 }
 
 - (CHIPDevice *)selectedDevice
@@ -66,7 +68,9 @@
 
 - (void)setupView
 {
-    self.text = [_deviceList objectAtIndex:_selectedDeviceIndex];
+    if ([_deviceList count] > 0) {
+        self.text = [_deviceList objectAtIndex:_selectedDeviceIndex];
+    }
     _devicePicker = [[UIPickerView alloc] initWithFrame:CGRectMake(0, 100, 0, 0)];
     self.inputView = _devicePicker;
     [_devicePicker setDataSource:self];
