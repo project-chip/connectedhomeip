@@ -115,11 +115,20 @@ endif()
 
 # Prepare compiler flags
 
-mbed_get_common_compile_flags(CHIP_CFLAGS)
-mbed_get_lang_compile_flags(CHIP_CFLAGS_C C)
+mbed_get_target_common_compile_flags(CHIP_CFLAGS mbed-core)
+mbed_get_lang_compile_flags(CHIP_CFLAGS_C mbed-core C)
 list(APPEND CHIP_CFLAGS_C ${CMAKE_C_FLAGS_INIT})
-mbed_get_lang_compile_flags(CHIP_CFLAGS_CC CXX)
+mbed_get_lang_compile_flags(CHIP_CFLAGS_CC mbed-core CXX)
 list(APPEND CHIP_CFLAGS_CC ${CMAKE_CXX_FLAGS_INIT})
+
+if (CONFIG_CHIP_WITH_EXTERNAL_MBEDTLS)
+    mbed_get_target_common_compile_flags(CHIP_MBEDTLS_CFLAGS mbed-mbedtls)
+    list(APPEND CHIP_CFLAGS ${CHIP_MBEDTLS_CFLAGS})
+    if (${MBED_TARGET} MATCHES "NRF52840_DK")
+        mbed_get_target_common_compile_flags(CHIP_CRYPTOCELL310_CFLAGS mbed-mbedtls-cryptocell310)
+        list(APPEND CHIP_CFLAGS ${CHIP_CRYPTOCELL310_CFLAGS})
+    endif()
+endif()
 
 set(SEPARATOR ",")
 convert_list_of_flags_to_string_of_flags(CHIP_CFLAGS CHIP_CFLAGS ${SEPARATOR})
@@ -168,6 +177,7 @@ chip_gn_arg_bool  ("is_debug"                             CONFIG_DEBUG)
 chip_gn_arg_bool  ("chip_build_tests"                     CONFIG_CHIP_BUILD_TESTS)
 chip_gn_arg_bool  ("chip_build_libshell"                  CONFIG_CHIP_LIB_SHELL)
 chip_gn_arg_bool  ("chip_with_lwip"                       CONFIG_CHIP_WITH_LWIP)
+chip_gn_arg_bool  ("chip_with_platform_mbedtls"           CONFIG_CHIP_WITH_EXTERNAL_MBEDTLS)
 
 if (BOARD STREQUAL "native_posix")
     chip_gn_arg_string("target_cpu" "x86")
@@ -233,6 +243,10 @@ if (${CONFIG_CHIP_WITH_LWIP})
         "IN_ADDR_T_DEFINED=1"
     )
 endif()
+
+list(APPEND CHIP_INCLUDES 
+    ${CHIP_ROOT}/config/mbed/mbedtls
+)
 
 target_include_directories(${APP_TARGET} PRIVATE 
                            ${CHIP_INCLUDES}
