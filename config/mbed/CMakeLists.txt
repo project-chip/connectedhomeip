@@ -121,6 +121,15 @@ list(APPEND CHIP_CFLAGS_C ${CMAKE_C_FLAGS_INIT})
 mbed_get_lang_compile_flags(CHIP_CFLAGS_CC mbed-core CXX)
 list(APPEND CHIP_CFLAGS_CC ${CMAKE_CXX_FLAGS_INIT})
 
+# Add support for Mbed event 
+mbed_get_target_common_compile_flags(CHIP_MBEDEVENTS_CFLAGS mbed-events)
+list(APPEND CHIP_CFLAGS ${CHIP_MBEDEVENTS_CFLAGS})
+
+# Add support for Mbed rtos
+mbed_get_target_common_compile_flags(CHIP_MBEDRTOS_CFLAGS mbed-rtos)
+list(APPEND CHIP_CFLAGS ${CHIP_MBEDRTOS_CFLAGS})
+
+
 if (CONFIG_CHIP_WITH_EXTERNAL_MBEDTLS)
     mbed_get_target_common_compile_flags(CHIP_MBEDTLS_CFLAGS mbed-mbedtls)
     list(APPEND CHIP_CFLAGS ${CHIP_MBEDTLS_CFLAGS})
@@ -185,7 +194,7 @@ elseif (BOARD STREQUAL "native_posix_64")
     chip_gn_arg_string("target_cpu" "x64")
 endif()
 
-file(GENERATE OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/args.gn CONTENT ${CHIP_GN_ARGS})
+# file(GENERATE OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/args.gn CONTENT ${CHIP_GN_ARGS})
 
 # ==============================================================================
 # Define 'chip-gn' target that builds CHIP library(ies) with GN build system
