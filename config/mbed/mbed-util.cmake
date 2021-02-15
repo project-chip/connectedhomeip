@@ -55,13 +55,14 @@ function(get_flags_for_lang lang input output)
   set(${output} ${tmp_list} PARENT_SCOPE)
 endfunction()
 
-# Get include directory of mbed build
-# Get mbed-core property of includes directories
+# Get include directory of target build
+# Get target property of includes directories
 # For each flag add -I prefix and put it in quotation marks
 # [Args]:
+#   target - target name
 #   output - output variable name
-function(mbed_get_include_directories output)
-  get_property(flags TARGET mbed-core PROPERTY INTERFACE_INCLUDE_DIRECTORIES)
+function(mbed_get_include_directories target output)
+  get_property(flags TARGET ${target} PROPERTY INTERFACE_INCLUDE_DIRECTORIES)
   list(APPEND CFLAG_LIST)
   foreach(flag ${flags})
     list(APPEND CFLAG_LIST "\"-I${flag}\"")
@@ -69,13 +70,14 @@ function(mbed_get_include_directories output)
   set(${output} ${CFLAG_LIST} PARENT_SCOPE)
 endfunction()
 
-# Get compile definitions of mbed build
-# Get mbed-core property of compile definitions
+# Get compile definitions of target build
+# Get target property of compile definitions
 # For each flag change format, add -D prefix and put it in quotation marks
 # [Args]:
+#   target - target name
 #   output - output variable name
-function(mbed_get_compile_definitions output)
-  get_property(flags TARGET mbed-core PROPERTY INTERFACE_COMPILE_DEFINITIONS)
+function(mbed_get_compile_definitions target output)
+  get_property(flags TARGET ${target} PROPERTY INTERFACE_COMPILE_DEFINITIONS)
 
   list(APPEND CFLAG_LIST)
   foreach(flag ${flags})
@@ -89,30 +91,33 @@ endfunction()
 # Get compile options of mbed build for specific language
 # Get mbed-core property of compile options
 # [Args]:
-#   lang - compilation languge (C, C++ or ASM) 
+#   lang - compilation languge (C, C++ or ASM)
+#   target - target name
 #   output - output variable name
-function(mbed_get_compile_options_for_lang lang i)
-  get_property(flags TARGET mbed-core PROPERTY INTERFACE_COMPILE_OPTIONS)
+function(mbed_get_compile_options_for_lang lang target output)
+  get_property(flags TARGET ${target} PROPERTY INTERFACE_COMPILE_OPTIONS)
   get_flags_for_lang(${lang} flags output_list)
-  set(${i} ${output_list} PARENT_SCOPE)
+  set(${output} ${output_list} PARENT_SCOPE)
 endfunction()
 
 
-# Retrieve mbed common compilation flags
+# Retrieve common compilation flags specific for target
 # [Args]:
 #   VAR - flags variable name
-function(mbed_get_common_compile_flags VAR)
-  mbed_get_include_directories(INCLUDES)
-  mbed_get_compile_definitions(DEFINES)
+#   TARGET - target name
+function(mbed_get_target_common_compile_flags VAR TARGET)
+  mbed_get_include_directories(${TARGET} INCLUDES)
+  mbed_get_compile_definitions(${TARGET} DEFINES)
   set(${VAR} ${INCLUDES} ${DEFINES} ${${VAR}} PARENT_SCOPE)
 endfunction()
 
-# Retrieve mbed compiler flags for the specific language (C or CXX)
+# Retrieve target compiler flags for the specific language (C or CXX)
 # [Args]:
 #   VAR - flags variable name
+#   TARGET - target name
 #   LANG - compilation languge (C, C++ or ASM) 
-function(mbed_get_lang_compile_flags VAR LANG)
-  mbed_get_compile_options_for_lang(${LANG} FLAGS)
+function(mbed_get_lang_compile_flags VAR TARGET LANG)
+  mbed_get_compile_options_for_lang(${LANG} ${TARGET} FLAGS)
   set(${VAR} ${FLAGS} ${${VAR}} PARENT_SCOPE)
 endfunction()
 

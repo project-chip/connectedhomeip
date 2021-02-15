@@ -115,28 +115,24 @@ endif()
 
 # Prepare compiler flags
 
-mbed_get_common_compile_flags(CHIP_CFLAGS)
-mbed_get_lang_compile_flags(CHIP_CFLAGS_C C)
+mbed_get_target_common_compile_flags(CHIP_CFLAGS mbed-core)
+mbed_get_lang_compile_flags(CHIP_CFLAGS_C mbed-core C)
 list(APPEND CHIP_CFLAGS_C ${CMAKE_C_FLAGS_INIT})
-mbed_get_lang_compile_flags(CHIP_CFLAGS_CC CXX)
+mbed_get_lang_compile_flags(CHIP_CFLAGS_CC mbed-core CXX)
 list(APPEND CHIP_CFLAGS_CC ${CMAKE_CXX_FLAGS_INIT})
 
 if (CONFIG_CHIP_WITH_EXTERNAL_MBEDTLS)
-    list(APPEND CHIP_CFLAGS 
-        "\"-I${MBED_PATH}connectivity/mbedtls\""
-        "\"-I${MBED_PATH}connectivity/mbedtls/platform\""
-        "\"-I${MBED_PATH}connectivity/mbedtls/include\""
-    )
+    mbed_get_target_common_compile_flags(CHIP_MBEDTLS_CFLAGS mbed-mbedtls)
+    list(APPEND CHIP_CFLAGS ${CHIP_MBEDTLS_CFLAGS})
     list(APPEND CHIP_CFLAGS 
         "\"-DMBEDTLS_X509_CSR_WRITE_C\""
         "\"-DMBEDTLS_X509_CREATE_C\""
         "\"-DMBEDTLS_PEM_WRITE_C\""
     )
-    if ("\"-DFEATURE_CRYPTOCELL310=1\"" IN_LIST CHIP_CFLAGS)
-        list(APPEND CHIP_CFLAGS 
-            "\"-I${MBED_PATH}connectivity/drivers/mbedtls/FEATURE_CRYPTOCELL310/include/cryptocell310\""
-            "\"-I${MBED_PATH}connectivity/drivers/mbedtls/FEATURE_CRYPTOCELL310/include/cryptocell310/internal\""
-        )
+    message(${MBED_TARGET})
+    if (${MBED_TARGET} MATCHES "NRF52840_DK")
+        mbed_get_target_common_compile_flags(CHIP_CRYPTOCELL310_CFLAGS mbed-mbedtls-cryptocell310)
+        list(APPEND CHIP_CFLAGS ${CHIP_CRYPTOCELL310_CFLAGS})
     endif()
 endif()
 
