@@ -35,21 +35,43 @@ namespace System {
 namespace Platform {
 namespace Layer {
 
+/**
+ * Platform-specific function for getting monotonic system time in microseconds.
+ *
+ * @returns Elapsed time in microseconds since an arbitrary, platform-defined epoch.
+ */
 uint64_t GetClock_Monotonic()
 {
     return rtos::Kernel::get_ms_count() * UINT64_C(1000);
 }
 
+/**
+ * Platform-specific function for getting monotonic system time in milliseconds.
+ *
+ * @returns Elapsed time in milliseconds since an arbitrary, platform-defined epoch.
+ */
 uint64_t GetClock_MonotonicMS()
 {
     return rtos::Kernel::get_ms_count();
 }
 
+/**
+ * Platform-specific function for getting high-resolution monotonic system time in microseconds.
+ *
+ * @returns Elapsed time in microseconds since an arbitrary, platform-defined epoch.
+ */
 uint64_t GetClock_MonotonicHiRes()
 {
     return GetClock_Monotonic();
 }
 
+/**
+ * Platform-specific function for getting the current real (civil) time in microsecond Unix time
+ * format.
+ *
+ * @param[out] curTime      The current time, expressed as Unix time scaled to microseconds.
+ * @returns                 CHIP_SYSTEM_NO_ERROR if the method succeeded.
+ */
 Error GetClock_RealTime(uint64_t & curTime)
 {
     struct timeval tv;
@@ -66,6 +88,13 @@ Error GetClock_RealTime(uint64_t & curTime)
     return CHIP_SYSTEM_NO_ERROR;
 }
 
+/**
+ * Platform-specific function for getting the current real (civil) time in millisecond Unix time
+ * format.
+ *
+ * @param[out] curTimeMS    The current time, expressed as Unix time scaled to milliseconds.
+ * @returns                 CHIP_SYSTEM_NO_ERROR if the method succeeded.
+ */
 Error GetClock_RealTimeMS(uint64_t & curTimeMS)
 {
     struct timeval tv;
@@ -82,6 +111,12 @@ Error GetClock_RealTimeMS(uint64_t & curTimeMS)
     return CHIP_SYSTEM_NO_ERROR;
 }
 
+/**
+ * Platform-specific function for setting the current real (civil) time.
+ *
+ * @param[out] newCurTime   The new current time, expressed as Unix time scaled to microseconds.
+ * @returns                 CHIP_SYSTEM_NO_ERROR if the method succeeded.
+ */
 Error SetClock_RealTime(uint64_t newCurTime)
 {
     struct timeval tv;
