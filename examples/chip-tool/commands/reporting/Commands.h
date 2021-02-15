@@ -30,7 +30,7 @@ public:
     Listen() : ReportingCommand("listen")
     {
     }
-    
+
     void AddReportCallbacks(uint8_t endpointId) override
     {
         chip::app::CHIPDeviceCallbacksMgr & callbacksMgr = chip::app::CHIPDeviceCallbacksMgr::GetInstance();

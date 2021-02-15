@@ -293,5 +293,3 @@
 #define EMBER_AF_GENERATED_REPORTING_CONFIG_DEFAULTS { \
   { ZAP_REPORT_DIRECTION(REPORTED), 0x0001, 0x0000, 0xFFFD, ZAP_CLUSTER_MASK(CLIENT), 0x0000, {{ 0, 65344, 0 }} }, /* Reporting for cluster: "Basic", attribute: "cluster revision". side: client */ \
 }
-
-
