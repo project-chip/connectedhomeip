@@ -27,7 +27,7 @@ The Python chip-device-ctrl is located in
 
 | Onboarding | iOS | Android | CLI | Python |
 | ---------- | --- | ------- | --- | ------ |
-| Setup code | y?  | y?      | y   | y      |
+| Setup code | y?  | n       | y   | y      |
 | QR code    | y   | y       | n   | n      |
 | NFC        | n   | y       | n   | n      |
 
