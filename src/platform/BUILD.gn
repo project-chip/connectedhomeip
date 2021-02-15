@@ -241,13 +241,13 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "cc13x2_26x2/ConfigurationManagerImpl.cpp",
         "cc13x2_26x2/ConnectivityManagerImpl.cpp",
         "cc13x2_26x2/ConnectivityManagerImpl.h",
+        "cc13x2_26x2/DeviceNetworkProvisioningDelegateImpl.cpp",
+        "cc13x2_26x2/DeviceNetworkProvisioningDelegateImpl.h",
         "cc13x2_26x2/InetPlatformConfig.h",
         "cc13x2_26x2/Logging.cpp",
         "cc13x2_26x2/PlatformManagerImpl.cpp",
         "cc13x2_26x2/PlatformManagerImpl.h",
         "cc13x2_26x2/SystemPlatformConfig.h",
-        "cc13x2_26x2/DeviceNetworkProvisioningDelegateImpl.cpp",
-        "cc13x2_26x2/DeviceNetworkProvisioningDelegateImpl.h",
       ]
 
       if (chip_enable_ble) {
@@ -263,7 +263,6 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         # needed for MTD/FTD
         import("//build_overrides/ti_simplelink_sdk.gni")
         import("${ti_simplelink_sdk_build_root}/ti_simplelink_board.gni")
-
         public_deps += [
           "${chip_root}/third_party/ti_simplelink_sdk:mbedtls",
           "${chip_root}/third_party/ti_simplelink_sdk:ti_simplelink_sdk",

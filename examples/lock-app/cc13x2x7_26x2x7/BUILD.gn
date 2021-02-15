@@ -66,8 +66,10 @@ ti_sysconfig("sysconfig") {
 
   cflags = [
     "-Wno-comment",
-    "@" + rebase_path("${target_gen_dir}/sysconfig/ti_ble_app_config.opt", root_build_dir),
-    "@" + rebase_path("${target_gen_dir}/sysconfig/ti_build_config.opt", root_build_dir),
+    "@" + rebase_path("${target_gen_dir}/sysconfig/ti_ble_app_config.opt",
+                      root_build_dir),
+    "@" + rebase_path("${target_gen_dir}/sysconfig/ti_build_config.opt",
+                      root_build_dir),
   ]
 }
 
@@ -108,8 +110,9 @@ ti_simplelink_executable("lock_app") {
 
   ldflags = [
     "-L${ti_simplelink_sdk_root}/source",
-    rebase_path("${target_gen_dir}/sysconfig/ti_utils_build_linker.cmd.genlibs", root_build_dir),
-    "-T" + rebase_path(ldscript, root_build_dir) 
+    rebase_path("${target_gen_dir}/sysconfig/ti_utils_build_linker.cmd.genlibs",
+                root_build_dir),
+    "-T" + rebase_path(ldscript, root_build_dir),
   ]
 }
 
