@@ -18,20 +18,13 @@
 
 #pragma once
 
-#include "pw_rpc/server.h"
-
 namespace chip {
 namespace rpc {
 
-class Mutex
-{
-public:
-    virtual void Lock()   = 0;
-    virtual void Unlock() = 0;
-    virtual ~Mutex() {} // Virtual Destructor
-};
+class LightingService;
 
-void Start(void (*RegisterServices)(pw::rpc::Server &), ::chip::rpc::Mutex * uart_mutex_);
+int Init();
+void RunRpcService(void *);
 
 } // namespace rpc
 } // namespace chip
