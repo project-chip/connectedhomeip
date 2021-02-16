@@ -25,19 +25,13 @@ constexpr size_t kStatusReportMinSize = 2 + 4 + 2; ///< 16 bits for GeneralCode,
 CHIP_ERROR WriteToPacketBuffer(const ::chip::bdx::BdxMessage & msgStruct, ::chip::System::PacketBufferHandle & msgBuf)
 {
     size_t msgDataSize = msgStruct.MessageSize();
-    ::chip::Encoding::LittleEndian::PacketBufferWriter bbuf(msgDataSize);
+    ::chip::Encoding::LittleEndian::PacketBufferWriter bbuf(::chip::System::PacketBufferHandle::New(msgDataSize));
     if (bbuf.IsNull())
     {
         return CHIP_ERROR_NO_MEMORY;
     }
     msgStruct.WriteToBuffer(bbuf);
-    msgBuf = bbuf.Finalize();
-    if (msgBuf.IsNull())
-    {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    return CHIP_NO_ERROR;
+    return bbuf.Finalize(&msgBuf);
 }
 
 // We could make this whole method a template, but it's probably smaller code to
@@ -848,21 +842,21 @@ void TransferSession::PrepareStatusReport(StatusCode code)
 {
     mStatusReportData.StatusCode = code;
 
-    Encoding::LittleEndian::PacketBufferWriter bbuf(kStatusReportMinSize);
+    Encoding::LittleEndian::PacketBufferWriter bbuf(System::PacketBufferHandle::New(kStatusReportMinSize));
     VerifyOrReturn(!bbuf.IsNull());
 
     bbuf.Put16(static_cast<uint16_t>(Protocols::Common::StatusCode::Failure));
     bbuf.Put32(Protocols::kProtocol_BDX);
     bbuf.Put16(mStatusReportData.StatusCode);
 
-    mPendingMsgHandle = bbuf.Finalize();
-    if (mPendingMsgHandle.IsNull())
+    CHIP_ERROR err = bbuf.Finalize(&mPendingMsgHandle);
+    if (err != CHIP_NO_ERROR)
     {
         mPendingOutput = kInternalError;
     }
     else
     {
-        CHIP_ERROR err = AttachHeader(Protocols::Common::MsgType::StatusReport, mPendingMsgHandle);
+        err = AttachHeader(Protocols::Common::MsgType::StatusReport, mPendingMsgHandle);
         VerifyOrReturn(err == CHIP_NO_ERROR);
 
         mPendingOutput = kMsgToSend;

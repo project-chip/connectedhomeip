@@ -36,6 +36,7 @@
 #include <system/SystemError.h>
 
 #include <stddef.h>
+#include <utility>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/mem.h>
@@ -60,7 +61,6 @@ class PacketBufferTest;
 
 #undef CHIP_SYSTEM_PACKETBUFFER_HAS_RIGHT_SIZE // True if RightSize() has a nontrivial implementation
 #undef CHIP_SYSTEM_PACKETBUFFER_HAS_CHECK      // True if Check() has a nontrivial implementation
-
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #if LWIP_PBUF_FROM_CUSTOM_POOLS
 #define CHIP_SYSTEM_PACKETBUFFER_STORE CHIP_SYSTEM_PACKETBUFFER_STORE_LWIP_CUSTOM
@@ -697,9 +697,9 @@ class PacketBufferWriterUtil
 private:
     template <typename>
     friend class PacketBufferWriterBase;
-    static void Initialize(BufferWriter & aBufferWriter, System::PacketBufferHandle & aPacket, size_t aAvailableSize,
-                           uint16_t aReservedSize);
     static System::PacketBufferHandle Finalize(BufferWriter & aBufferWriter, System::PacketBufferHandle & aPacket);
+    static CHIP_ERROR Finalize(BufferWriter & aBufferWriter, System::PacketBufferHandle & aPacket,
+                               System::PacketBufferHandle * outPacket);
 };
 
 /**
@@ -730,10 +730,9 @@ public:
      *  @param[in]  aAvailableSize  Length bound of the BufferWriter.
      *  @param[in]  aReservedSize   Reserved packet buffer space for protocol headers; see \c PacketBufferHandle::New().
      */
-    PacketBufferWriterBase(size_t aAvailableSize, uint16_t aReservedSize = CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE) :
-        Writer(nullptr, 0)
+    PacketBufferWriterBase(System::PacketBufferHandle && aPacket) : Writer(aPacket->Start(), aPacket->AvailableDataLength())
     {
-        PacketBufferWriterUtil::Initialize(*this, mPacket, aAvailableSize, aReservedSize);
+        mPacket = std::move(aPacket);
     }
 
     /**
@@ -756,6 +755,22 @@ public:
      *  @return     A packet buffer handle.
      */
     System::PacketBufferHandle Finalize() { return PacketBufferWriterUtil::Finalize(*this, mPacket); }
+
+    /**
+     * Finish the writing to the buffer and release ownership of the underlying PacketBuffer.
+     *
+     * This signature matches `PacketBufferTLVWriter::Finalize()`.
+     *
+     * @param[out] outBuffer                    The backing packet buffer.
+     *
+     * @retval #CHIP_NO_ERROR                   If the encoding was finalized successfully.
+     * @retval #CHIP_ERROR_NO_MEMORY            If the backing PacketBuffer is null.
+     * @retval #CHIP_ERROR_MESSAGE_TOO_LONG     If writing overflowed (BufferWriter::Fit() is false).
+     */
+    CHIP_ERROR Finalize(chip::System::PacketBufferHandle * outPacket)
+    {
+        return PacketBufferWriterUtil::Finalize(*this, mPacket, outPacket);
+    }
 
 private:
     System::PacketBufferHandle mPacket;

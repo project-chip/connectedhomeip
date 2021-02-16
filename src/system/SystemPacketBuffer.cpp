@@ -619,16 +619,6 @@ PacketBufferHandle PacketBufferHandle::CloneData(uint16_t aAdditionalSize, uint1
 
 namespace Encoding {
 
-void PacketBufferWriterUtil::Initialize(BufferWriter & aBufferWriter, System::PacketBufferHandle & aPacket, size_t aAvailableSize,
-                                        uint16_t aReservedSize)
-{
-    aPacket = System::PacketBufferHandle::New(aAvailableSize, aReservedSize);
-    if (!aPacket.IsNull())
-    {
-        aBufferWriter = Encoding::BufferWriter(aPacket->Start(), aAvailableSize);
-    }
-}
-
 System::PacketBufferHandle PacketBufferWriterUtil::Finalize(BufferWriter & aBufferWriter, System::PacketBufferHandle & aPacket)
 {
     if (!aPacket.IsNull() && aBufferWriter.Fit())
@@ -643,6 +633,25 @@ System::PacketBufferHandle PacketBufferWriterUtil::Finalize(BufferWriter & aBuff
     }
     aBufferWriter = Encoding::BufferWriter(nullptr, 0);
     return std::move(aPacket);
+}
+
+CHIP_ERROR PacketBufferWriterUtil::Finalize(BufferWriter & aBufferWriter, System::PacketBufferHandle & aPacket,
+                                            System::PacketBufferHandle * outPacket)
+{
+    *outPacket = std::move(aPacket);
+    if (outPacket->IsNull())
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+    if (!aBufferWriter.Fit())
+    {
+        return CHIP_ERROR_MESSAGE_TOO_LONG;
+    }
+    // Since mPacket was successfully allocated to hold the maximum length,
+    // we know that the actual length fits in a uint16_t.
+    (*outPacket)->SetDataLength(static_cast<uint16_t>(aBufferWriter.Needed()));
+    aBufferWriter = Encoding::BufferWriter(nullptr, 0);
+    return CHIP_NO_ERROR;
 }
 
 } // namespace Encoding
