@@ -65,8 +65,6 @@ CHIP_ERROR Encode(NodeId localNodeId, Transport::PeerConnectionState * state, Pa
 
     ReturnErrorOnFailure(payloadHeader.EncodeBeforeData(msgBuf));
 
-    packetHeader.SetPayloadLength(msgBuf->DataLength());
-
     uint8_t * data    = msgBuf->Start();
     uint16_t totalLen = msgBuf->TotalLength();
 
@@ -91,7 +89,7 @@ CHIP_ERROR Decode(Transport::PeerConnectionState * state, PayloadHeader & payloa
     ReturnErrorCodeIf(msg.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
 
     uint8_t * data = msg->Start();
-    uint16_t len   = msg->TotalLength();
+    uint16_t len   = msg->DataLength();
 
     PacketBufferHandle origMsg;
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -103,12 +101,13 @@ CHIP_ERROR Decode(Transport::PeerConnectionState * state, PayloadHeader & payloa
     msg->SetDataLength(len);
 #endif
 
-    uint16_t payloadlen = packetHeader.GetPayloadLength();
-    VerifyOrReturnError(payloadlen <= len, CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+    uint16_t footerLen = MessageAuthenticationCode::TagLenForEncryptionType(packetHeader.GetEncryptionType());
+    VerifyOrReturnError(footerLen <= len, CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
     uint16_t taglen = 0;
     MessageAuthenticationCode mac;
-    ReturnErrorOnFailure(mac.Decode(packetHeader, &data[payloadlen], static_cast<uint16_t>(len - payloadlen), &taglen));
+    ReturnErrorOnFailure(mac.Decode(packetHeader, &data[len - footerLen], footerLen, &taglen));
+    VerifyOrReturnError(taglen == footerLen, CHIP_ERROR_INTERNAL);
 
     len = static_cast<uint16_t>(len - taglen);
     msg->SetDataLength(len);
