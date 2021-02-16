@@ -210,12 +210,19 @@ CHIP_ERROR PASESession::ComputePASEVerifier(uint32_t setUpPINCode, uint32_t pbkd
                          sizeof(PASEVerifier), &verifier[0][0]);
 }
 
-CHIP_ERROR PASESession::GeneratePASEVerifier(PASEVerifier & verifier, uint32_t & setupPIN)
+CHIP_ERROR PASESession::GeneratePASEVerifier(PASEVerifier & verifier, bool useRandomPIN, uint32_t & setupPIN)
 {
-    ReturnErrorOnFailure(DRBG_get_bytes(reinterpret_cast<uint8_t *>(&setupPIN), sizeof(setupPIN)));
+    if (useRandomPIN)
+    {
+        ReturnErrorOnFailure(DRBG_get_bytes(reinterpret_cast<uint8_t *>(&setupPIN), sizeof(setupPIN)));
 
-    // Use only kSetupPINCodeFieldLengthInBits bits out of the code
-    setupPIN &= ((1 << kSetupPINCodeFieldLengthInBits) - 1);
+        // Use only kSetupPINCodeFieldLengthInBits bits out of the code
+        setupPIN &= ((1 << kSetupPINCodeFieldLengthInBits) - 1);
+    }
+    else if (setupPIN >= (1 << kSetupPINCodeFieldLengthInBits))
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
 
     return PASESession::ComputePASEVerifier(setupPIN, kSpake2p_Iteration_Count,
                                             reinterpret_cast<const unsigned char *>(kSpake2pKeyExchangeSalt),
