@@ -9,13 +9,18 @@ typedef void (^ResponseHandler)(NSError * _Nullable error, NSDictionary * _Nulla
 
 @class CHIPDevice;
 
-{{#chip_clusters}}
-
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CHIP{{asCamelCased name false}} : NSObject
+@interface CHIPCluster : NSObject
+- (nullable instancetype)initWithDevice:(CHIPDevice *)device endpoint:(uint8_t)endpoint queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+@end
 
-- (nullable instancetype)initWithDevice:(CHIPDevice *)device endpoint:(uint8_t)endpoint queue:(dispatch_queue_t)queue;
+{{#chip_clusters}}
+
+@interface CHIP{{asCamelCased name false}} : CHIPCluster
+
 {{#chip_server_cluster_commands}}
 {{#if (zcl_command_arguments_count this.id)}}
 - (BOOL){{asCamelCased name}}:{{#chip_server_cluster_command_arguments}}{{#if (isFirstElement index)}}{{else}}{{asCamelCased label}}:{{/if}}({{asBasicType chipType}}){{asCamelCased label}} {{/chip_server_cluster_command_arguments}}completionHandler:(ResponseHandler)completionHandler;
@@ -35,12 +40,10 @@ NS_ASSUME_NONNULL_BEGIN
 {{/if}}
 {{/chip_server_cluster_attributes}}
 
-- (instancetype)init NS_UNAVAILABLE;
-+ (instancetype)new NS_UNAVAILABLE;
-
 @end
 
-NS_ASSUME_NONNULL_END
 {{/chip_clusters}}
+
+NS_ASSUME_NONNULL_END
 
 #endif /* CHIP_CLUSTERS_H */
