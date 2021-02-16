@@ -698,8 +698,6 @@ private:
     template <typename>
     friend class PacketBufferWriterBase;
     static System::PacketBufferHandle Finalize(BufferWriter & aBufferWriter, System::PacketBufferHandle & aPacket);
-    static CHIP_ERROR Finalize(BufferWriter & aBufferWriter, System::PacketBufferHandle & aPacket,
-                               System::PacketBufferHandle * outPacket);
 };
 
 /**
@@ -721,15 +719,24 @@ class PacketBufferWriterBase : public Writer
 {
 public:
     /**
-     * Constructs a BufferWriter that writes into a newly allocated packet buffer.
-     *
-     *  If no memory is available, or if the size requested is too large, then \c IsNull() will be true.
-     *  Otherwise, it is guaranteed that the BufferWriter length is \a aAvailableSize. (The underlying packet
-     *  buffer may be larger.)
+     * Constructs a BufferWriter that writes into a packet buffer, using all avaiable space.
      *
      *  @param[in]  aPacket  A handle to PacketBuffer, to be used as backing store for the BufferWriter.
      */
-    PacketBufferWriterBase(System::PacketBufferHandle && aPacket) : Writer(aPacket->Start(), aPacket->AvailableDataLength())
+    PacketBufferWriterBase(System::PacketBufferHandle && aPacket) :
+        Writer(aPacket->Start() + aPacket->DataLength(), aPacket->AvailableDataLength())
+    {
+        mPacket = std::move(aPacket);
+    }
+
+    /**
+     * Constructs a BufferWriter that writes into a packet buffer, using no more than the requested space.
+     *
+     *  @param[in]  aPacket A handle to PacketBuffer, to be used as backing store for the BufferWriter.
+     *  @param[in]  aSize   Maximum number of octects to write into the packet buffer.
+     */
+    PacketBufferWriterBase(System::PacketBufferHandle && aPacket, size_t aSize) :
+        Writer(aPacket->Start() + aPacket->DataLength(), chip::min(aSize, static_cast<size_t>(aPacket->AvailableDataLength())))
     {
         mPacket = std::move(aPacket);
     }
@@ -754,22 +761,6 @@ public:
      *  @return     A packet buffer handle.
      */
     System::PacketBufferHandle Finalize() { return PacketBufferWriterUtil::Finalize(*this, mPacket); }
-
-    /**
-     * Finish the writing to the buffer and release ownership of the underlying PacketBuffer.
-     *
-     * This signature matches `PacketBufferTLVWriter::Finalize()`.
-     *
-     * @param[out] outPacket                    The backing packet buffer.
-     *
-     * @retval #CHIP_NO_ERROR                   If the encoding was finalized successfully.
-     * @retval #CHIP_ERROR_NO_MEMORY            If the backing PacketBuffer is null.
-     * @retval #CHIP_ERROR_MESSAGE_TOO_LONG     If writing overflowed (BufferWriter::Fit() is false).
-     */
-    CHIP_ERROR Finalize(chip::System::PacketBufferHandle * outPacket)
-    {
-        return PacketBufferWriterUtil::Finalize(*this, mPacket, outPacket);
-    }
 
 private:
     System::PacketBufferHandle mPacket;

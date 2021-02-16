@@ -13,6 +13,7 @@
 #include <support/CodeUtils.h>
 #include <support/ReturnMacros.h>
 #include <system/SystemPacketBuffer.h>
+#include <transport/SecureSessionMgr.h>
 
 namespace {
 constexpr uint8_t kBdxVersion         = 0;         ///< The version of this implementation of the BDX spec
@@ -25,13 +26,18 @@ constexpr size_t kStatusReportMinSize = 2 + 4 + 2; ///< 16 bits for GeneralCode,
 CHIP_ERROR WriteToPacketBuffer(const ::chip::bdx::BdxMessage & msgStruct, ::chip::System::PacketBufferHandle & msgBuf)
 {
     size_t msgDataSize = msgStruct.MessageSize();
-    ::chip::Encoding::LittleEndian::PacketBufferWriter bbuf(::chip::System::PacketBufferHandle::New(msgDataSize));
+    ::chip::Encoding::LittleEndian::PacketBufferWriter bbuf(chip::MessagePacketBuffer::New(msgDataSize));
     if (bbuf.IsNull())
     {
         return CHIP_ERROR_NO_MEMORY;
     }
     msgStruct.WriteToBuffer(bbuf);
-    return bbuf.Finalize(&msgBuf);
+    msgBuf = bbuf.Finalize();
+    if (msgBuf.IsNull())
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+    return CHIP_NO_ERROR;
 }
 
 // We could make this whole method a template, but it's probably smaller code to
@@ -842,21 +848,21 @@ void TransferSession::PrepareStatusReport(StatusCode code)
 {
     mStatusReportData.StatusCode = code;
 
-    Encoding::LittleEndian::PacketBufferWriter bbuf(System::PacketBufferHandle::New(kStatusReportMinSize));
+    Encoding::LittleEndian::PacketBufferWriter bbuf(chip::MessagePacketBuffer::New(kStatusReportMinSize), kStatusReportMinSize);
     VerifyOrReturn(!bbuf.IsNull());
 
     bbuf.Put16(static_cast<uint16_t>(Protocols::Common::StatusCode::Failure));
     bbuf.Put32(Protocols::kProtocol_BDX);
     bbuf.Put16(mStatusReportData.StatusCode);
 
-    CHIP_ERROR err = bbuf.Finalize(&mPendingMsgHandle);
-    if (err != CHIP_NO_ERROR)
+    mPendingMsgHandle = bbuf.Finalize();
+    if (mPendingMsgHandle.IsNull())
     {
         mPendingOutput = kInternalError;
     }
     else
     {
-        err = AttachHeader(Protocols::Common::MsgType::StatusReport, mPendingMsgHandle);
+        CHIP_ERROR err = AttachHeader(Protocols::Common::MsgType::StatusReport, mPendingMsgHandle);
         VerifyOrReturn(err == CHIP_NO_ERROR);
 
         mPendingOutput = kMsgToSend;

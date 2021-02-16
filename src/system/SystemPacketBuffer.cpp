@@ -635,24 +635,5 @@ System::PacketBufferHandle PacketBufferWriterUtil::Finalize(BufferWriter & aBuff
     return std::move(aPacket);
 }
 
-CHIP_ERROR PacketBufferWriterUtil::Finalize(BufferWriter & aBufferWriter, System::PacketBufferHandle & aPacket,
-                                            System::PacketBufferHandle * outPacket)
-{
-    *outPacket = std::move(aPacket);
-    if (outPacket->IsNull())
-    {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-    if (!aBufferWriter.Fit())
-    {
-        return CHIP_ERROR_MESSAGE_TOO_LONG;
-    }
-    // Since mPacket was successfully allocated to hold the maximum length,
-    // we know that the actual length fits in a uint16_t.
-    (*outPacket)->SetDataLength(static_cast<uint16_t>(aBufferWriter.Needed()));
-    aBufferWriter = Encoding::BufferWriter(nullptr, 0);
-    return CHIP_NO_ERROR;
-}
-
 } // namespace Encoding
 } // namespace chip

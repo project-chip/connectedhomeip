@@ -1716,7 +1716,7 @@ void PacketBufferTest::CheckPacketBufferWriter(nlTestSuite * inSuite, void * inC
     const char kPayload[] = "Hello, world!";
 
     PacketBufferWriter yay(PacketBufferHandle::New(sizeof(kPayload)));
-    PacketBufferWriter nay(PacketBufferHandle::New(sizeof(kPayload) - 2));
+    PacketBufferWriter nay(PacketBufferHandle::New(sizeof(kPayload)), sizeof(kPayload) - 2);
     NL_TEST_ASSERT(inSuite, !yay.IsNull());
     NL_TEST_ASSERT(inSuite, !nay.IsNull());
 
@@ -1733,28 +1733,6 @@ void PacketBufferTest::CheckPacketBufferWriter(nlTestSuite * inSuite, void * inC
     NL_TEST_ASSERT(inSuite, nay.IsNull());
     NL_TEST_ASSERT(inSuite, !yayBuffer.IsNull());
     NL_TEST_ASSERT(inSuite, nayBuffer.IsNull());
-    NL_TEST_ASSERT(inSuite, memcmp(yayBuffer->Start(), kPayload, sizeof kPayload) == 0);
-
-    yay = PacketBufferWriter(PacketBufferHandle::New(sizeof(kPayload)));
-    nay = PacketBufferWriter(PacketBufferHandle::New(sizeof(kPayload) - 2));
-
-    yay.Put(kPayload);
-    yay.Put('\0');
-    nay.Put(kPayload);
-    nay.Put('\0');
-    NL_TEST_ASSERT(inSuite, yay.Fit());
-    NL_TEST_ASSERT(inSuite, !nay.Fit());
-
-    CHIP_ERROR yayErr = yay.Finalize(&yayBuffer);
-    CHIP_ERROR nayErr = nay.Finalize(&nayBuffer);
-    NL_TEST_ASSERT(inSuite, yay.IsNull());
-    NL_TEST_ASSERT(inSuite, nay.IsNull());
-    NL_TEST_ASSERT(inSuite, !yayBuffer.IsNull());
-    NL_TEST_ASSERT(inSuite, !nayBuffer.IsNull());
-    NL_TEST_ASSERT(inSuite, yayBuffer->DataLength() == sizeof kPayload);
-    NL_TEST_ASSERT(inSuite, nayBuffer->DataLength() == 0);
-    NL_TEST_ASSERT(inSuite, yayErr == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, nayErr == CHIP_ERROR_MESSAGE_TOO_LONG);
     NL_TEST_ASSERT(inSuite, memcmp(yayBuffer->Start(), kPayload, sizeof kPayload) == 0);
 }
 
