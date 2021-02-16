@@ -21,7 +21,7 @@ declare_args() {
   chip_system_config_use_lwip = chip_with_lwip && (current_os == "freertos" || current_os == "mbed")
 
   # Use BSD/POSIX socket API.
-  chip_system_config_use_sockets = current_os != "freertos"
+  chip_system_config_use_sockets = (current_os != "freertos" && current_os != "mbed")
 
   # Mutex implementation: posix, freertos, none.
   chip_system_config_locking = ""

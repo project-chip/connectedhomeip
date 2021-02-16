@@ -233,16 +233,15 @@ list(APPEND CHIP_INCLUDES)
 # CHIP defines
 list(APPEND CHIP_DEFINES)
 
-if (${CONFIG_CHIP_WITH_LWIP})
-    list(APPEND CHIP_INCLUDES 
-        ${CHIP_ROOT}/third_party/lwip/repo/lwip/src/include
-        ${CHIP_ROOT}/src/lwip/mbed
-    )
-    list(APPEND CHIP_DEFINES
-        "LWIP_NO_STDINT_H=1" 
-        "IN_ADDR_T_DEFINED=1"
-    )
-endif()
+# CHIP LwIP support
+list(APPEND CHIP_INCLUDES 
+    ${CHIP_ROOT}/third_party/lwip/repo/lwip/src/include
+    ${CHIP_ROOT}/src/lwip/mbed
+)
+list(APPEND CHIP_DEFINES
+    "LWIP_NO_STDINT_H=1" 
+    "IN_ADDR_T_DEFINED=1"
+)
 
 list(APPEND CHIP_INCLUDES 
     ${CHIP_ROOT}/config/mbed/mbedtls
