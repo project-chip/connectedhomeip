@@ -617,9 +617,10 @@
 {
     NSError * error;
     uint64_t deviceID = CHIPGetNextAvailableDeviceID();
-    [self.chipController pairDevice:deviceID discriminator:discriminator setupPINCode:setupPINCode error:&error];
-    deviceID++;
-    CHIPSetNextAvailableDeviceID(deviceID);
+    if ([self.chipController pairDevice:deviceID discriminator:discriminator setupPINCode:setupPINCode error:&error]) {
+        deviceID++;
+        CHIPSetNextAvailableDeviceID(deviceID);
+    }
 }
 
 - (void)handleRendezVousWiFi:(NSString *)name
