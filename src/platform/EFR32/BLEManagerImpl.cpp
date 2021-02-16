@@ -28,13 +28,13 @@
 
 #include <platform/internal/BLEManager.h>
 
+#include "sl_bt_api.h"
+#include "sl_bt_stack_config.h"
+#include "sl_bt_stack_init.h"
 #include <ble/CHIPBleServiceData.h>
 #include <platform/EFR32/freertos_bluetooth.h>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
-#include "sl_bt_stack_init.h"
-#include "sl_bt_stack_config.h"
-#include "sl_bt_api.h"
 
 using namespace ::chip;
 using namespace ::chip::Ble;
@@ -65,15 +65,14 @@ namespace {
 #define TIMER_MS_2_TIMERTICK(ms) ((TIMER_CLK_FREQ * ms) / 1000)
 #define TIMER_S_2_TIMERTICK(s) (TIMER_CLK_FREQ * s)
 
-#define BLE_MAX_BUFFER_SIZE                         (3150)
-#define BLE_MAX_ADVERTISERS                         (1)
-#define BLE_CONFIG_MAX_PERIODIC_ADVERTISING_SYNC    (0)
-#define BLE_CONFIG_MAX_SOFTWARE_TIMERS              (4)
-#define BLE_CONFIG_MIN_TX_POWER                     (-30)
-#define BLE_CONFIG_MAX_TX_POWER                     (80)
-#define BLE_CONFIG_RF_PATH_GAIN_TX                  (0)
-#define BLE_CONFIG_RF_PATH_GAIN_RX                  (0)
-
+#define BLE_MAX_BUFFER_SIZE (3150)
+#define BLE_MAX_ADVERTISERS (1)
+#define BLE_CONFIG_MAX_PERIODIC_ADVERTISING_SYNC (0)
+#define BLE_CONFIG_MAX_SOFTWARE_TIMERS (4)
+#define BLE_CONFIG_MIN_TX_POWER (-30)
+#define BLE_CONFIG_MAX_TX_POWER (80)
+#define BLE_CONFIG_RF_PATH_GAIN_TX (0)
+#define BLE_CONFIG_RF_PATH_GAIN_RX (0)
 
 /* Bluetooth stack configuration parameters (see "UG136: Silicon Labs Bluetooth C Application Developer's Guide" for
  * details on each parameter) */
@@ -120,19 +119,19 @@ extern "C" sl_status_t initialize_bluetooth()
 static void initBleConfig(void)
 {
     memset(&config, 0, sizeof(sl_bt_configuration_t));
-    config.config_flags                 = SL_BT_CONFIG_FLAG_RTOS;       /* Check flag options from UG136 */
-    config.bluetooth.max_connections    = BLE_LAYER_NUM_BLE_ENDPOINTS;  /* Maximum number of simultaneous connections */
-    config.bluetooth.max_advertisers    = BLE_MAX_ADVERTISERS;
-    config.bluetooth.max_periodic_sync  = BLE_CONFIG_MAX_PERIODIC_ADVERTISING_SYNC;
-    config.bluetooth.max_buffer_memory  = BLE_MAX_BUFFER_SIZE;
-    config.gattdb                       = &bg_gattdb_data;              /* Pointer to GATT database */
-    config.scheduler_callback           = BluetoothLLCallback;
-    config.stack_schedule_callback      = BluetoothUpdate;
-    config.max_timers                   = BLE_CONFIG_MAX_SOFTWARE_TIMERS;
-    config.rf.tx_gain                   = BLE_CONFIG_RF_PATH_GAIN_TX;
-    config.rf.rx_gain                   = BLE_CONFIG_RF_PATH_GAIN_RX;
-    config.rf.tx_min_power              = BLE_CONFIG_MIN_TX_POWER;
-    config.rf.tx_max_power              = BLE_CONFIG_MAX_TX_POWER;
+    config.config_flags                = SL_BT_CONFIG_FLAG_RTOS;      /* Check flag options from UG136 */
+    config.bluetooth.max_connections   = BLE_LAYER_NUM_BLE_ENDPOINTS; /* Maximum number of simultaneous connections */
+    config.bluetooth.max_advertisers   = BLE_MAX_ADVERTISERS;
+    config.bluetooth.max_periodic_sync = BLE_CONFIG_MAX_PERIODIC_ADVERTISING_SYNC;
+    config.bluetooth.max_buffer_memory = BLE_MAX_BUFFER_SIZE;
+    config.gattdb                      = &bg_gattdb_data; /* Pointer to GATT database */
+    config.scheduler_callback          = BluetoothLLCallback;
+    config.stack_schedule_callback     = BluetoothUpdate;
+    config.max_timers                  = BLE_CONFIG_MAX_SOFTWARE_TIMERS;
+    config.rf.tx_gain                  = BLE_CONFIG_RF_PATH_GAIN_TX;
+    config.rf.rx_gain                  = BLE_CONFIG_RF_PATH_GAIN_RX;
+    config.rf.tx_min_power             = BLE_CONFIG_MIN_TX_POWER;
+    config.rf.tx_max_power             = BLE_CONFIG_MAX_TX_POWER;
 #if (HAL_PA_ENABLE)
     config.pa.config_enable = 1; /* Set this to be a valid PA config */
 #if defined(FEATURE_PA_INPUT_FROM_VBAT)
@@ -219,11 +218,9 @@ void BLEManagerImpl::bluetoothStackEventHandler(void * p_arg)
             switch (SL_BT_MSG_ID(bluetooth_evt->header))
             {
             case sl_bt_evt_system_boot_id: {
-                ChipLogProgress(DeviceLayer, "Bluetooth stack booted: v%d.%d.%d-b%d\n",
-                 bluetooth_evt->data.evt_system_boot.major,
-                 bluetooth_evt->data.evt_system_boot.minor,
-                 bluetooth_evt->data.evt_system_boot.patch,
-                 bluetooth_evt->data.evt_system_boot.build);
+                ChipLogProgress(DeviceLayer, "Bluetooth stack booted: v%d.%d.%d-b%d\n", bluetooth_evt->data.evt_system_boot.major,
+                                bluetooth_evt->data.evt_system_boot.minor, bluetooth_evt->data.evt_system_boot.patch,
+                                bluetooth_evt->data.evt_system_boot.build);
                 sInstance.HandleBootEvent();
             }
             break;
@@ -236,7 +233,7 @@ void BLEManagerImpl::bluetoothStackEventHandler(void * p_arg)
                 // ChipLogProgress(DeviceLayer, "Connection parameter ID received. Nothing to do");
             }
             break;
-            case sl_bt_evt_connection_phy_status_id : {
+            case sl_bt_evt_connection_phy_status_id: {
                 // ChipLogProgress(DeviceLayer, "PHY update procedure is completed");
             }
             break;
@@ -372,9 +369,9 @@ CHIP_ERROR BLEManagerImpl::_SetDeviceName(const char * deviceName)
         SetFlag(mFlags, kFlag_DeviceNameSet, true);
         ChipLogProgress(DeviceLayer, "Setting device name to : \"%s\"", deviceName);
         static_assert(kMaxDeviceNameLength <= UINT16_MAX, "deviceName length might not fit in a uint8_t");
-        ret = sl_bt_gatt_server_write_attribute_value(gattdb_device_name, 0, strlen(deviceName),
-                                                    (uint8_t *) deviceName);
-        if (ret != SL_STATUS_OK) {
+        ret = sl_bt_gatt_server_write_attribute_value(gattdb_device_name, 0, strlen(deviceName), (uint8_t *) deviceName);
+        if (ret != SL_STATUS_OK)
+        {
             err = MapBLEError(ret);
             ChipLogError(DeviceLayer, "sl_bt_gatt_server_write_attribute_value() failed: %s", ErrorStr(err));
             return err;
@@ -524,13 +521,17 @@ void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
 
 CHIP_ERROR BLEManagerImpl::MapBLEError(int bleErr)
 {
-    switch (bleErr) {
-        case SL_STATUS_OK : return CHIP_NO_ERROR;
-        case SL_STATUS_BT_ATT_INVALID_ATT_LENGTH : return CHIP_ERROR_INVALID_STRING_LENGTH;
-        case SL_STATUS_INVALID_PARAMETER : return CHIP_ERROR_INVALID_ARGUMENT;
-        default : return (CHIP_ERROR) bleErr + CHIP_DEVICE_CONFIG_EFR32_BLE_ERROR_MIN;
+    switch (bleErr)
+    {
+    case SL_STATUS_OK:
+        return CHIP_NO_ERROR;
+    case SL_STATUS_BT_ATT_INVALID_ATT_LENGTH:
+        return CHIP_ERROR_INVALID_STRING_LENGTH;
+    case SL_STATUS_INVALID_PARAMETER:
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    default:
+        return (CHIP_ERROR) bleErr + CHIP_DEVICE_CONFIG_EFR32_BLE_ERROR_MIN;
     }
-
 }
 
 void BLEManagerImpl::DriveBLEState(void)
@@ -591,44 +592,44 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
         snprintf(mDeviceName, sizeof(mDeviceName), "%s%04" PRIX32, CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX, (uint32_t) 0);
 
         mDeviceName[kMaxDeviceNameLength] = 0;
-        mDeviceNameLength = strlen(mDeviceName);
+        mDeviceNameLength                 = strlen(mDeviceName);
 
         VerifyOrExit(mDeviceNameLength < kMaxDeviceNameLength, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-        ret = sl_bt_gatt_server_write_attribute_value(gattdb_device_name, 0, mDeviceNameLength,
-                                                    (uint8_t *) mDeviceName);
-        if (ret != SL_STATUS_OK) {
+        ret = sl_bt_gatt_server_write_attribute_value(gattdb_device_name, 0, mDeviceNameLength, (uint8_t *) mDeviceName);
+        if (ret != SL_STATUS_OK)
+        {
             err = MapBLEError(ret);
             ChipLogError(DeviceLayer, "sl_bt_gatt_server_write_attribute_value() failed: %s", ErrorStr(err));
             return err;
         }
     }
 
-
-    mDeviceNameLength   = strlen(mDeviceName);      // Device Name length + length field
+    mDeviceNameLength = strlen(mDeviceName); // Device Name length + length field
     VerifyOrExit(mDeviceNameLength < kMaxDeviceNameLength, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    mDeviceIdInfoLength = sizeof(mDeviceIdInfo);    // Servicedatalen + length+ UUID (Short)
+    mDeviceIdInfoLength = sizeof(mDeviceIdInfo); // Servicedatalen + length+ UUID (Short)
     static_assert(sizeof(mDeviceIdInfo) + CHIP_ADV_SHORT_UUID_LEN + 1 <= UINT8_MAX, "Our length won't fit in a uint8_t");
     static_assert(2 + CHIP_ADV_SHORT_UUID_LEN + sizeof(mDeviceIdInfo) + 1 <= MAX_ADV_DATA_LEN, "Our buffer is not big enough");
 
     index            = 0;
-    advData[index++] = 0x02;                     // length
-    advData[index++] = CHIP_ADV_DATA_TYPE_FLAGS; // AD type : flags
-    advData[index++] = CHIP_ADV_DATA_FLAGS;      // AD value
+    advData[index++] = 0x02;                                                                    // length
+    advData[index++] = CHIP_ADV_DATA_TYPE_FLAGS;                                                // AD type : flags
+    advData[index++] = CHIP_ADV_DATA_FLAGS;                                                     // AD value
     advData[index++] = static_cast<uint8_t>(mDeviceIdInfoLength + CHIP_ADV_SHORT_UUID_LEN + 1); // AD length
-    advData[index++] = CHIP_ADV_DATA_TYPE_SERVICE_DATA;                     // AD type : Service Data
-    advData[index++] = ShortUUID_CHIPoBLEService[0];                        // AD value
+    advData[index++] = CHIP_ADV_DATA_TYPE_SERVICE_DATA;                                         // AD type : Service Data
+    advData[index++] = ShortUUID_CHIPoBLEService[0];                                            // AD value
     advData[index++] = ShortUUID_CHIPoBLEService[1];
     memcpy(&advData[index], (void *) &mDeviceIdInfo, mDeviceIdInfoLength); // AD value
     index += mDeviceIdInfoLength;
 
     advData[index++] = static_cast<uint8_t>(mDeviceNameLength + 1); // length
     advData[index++] = CHIP_ADV_DATA_TYPE_NAME;                     // AD type : name
-    memcpy(&advData[index], mDeviceName, mDeviceNameLength);   // AD value
+    memcpy(&advData[index], mDeviceName, mDeviceNameLength);        // AD value
     index += mDeviceNameLength;
 
-    if (0xff != advertising_set_handle) {
+    if (0xff != advertising_set_handle)
+    {
         sl_bt_advertiser_delete_set(advertising_set_handle);
         advertising_set_handle = 0xff;
     }
@@ -656,8 +657,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     responseData[index++] = ShortUUID_CHIPoBLEService[0]; // AD value
     responseData[index++] = ShortUUID_CHIPoBLEService[1];
 
-    ret = sl_bt_advertiser_set_data(advertising_set_handle, CHIP_ADV_SCAN_RESPONSE_DATA, index,
-                                                      (uint8_t *) responseData);
+    ret = sl_bt_advertiser_set_data(advertising_set_handle, CHIP_ADV_SCAN_RESPONSE_DATA, index, (uint8_t *) responseData);
 
     if (ret != SL_STATUS_OK)
     {
@@ -679,11 +679,11 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     uint32_t interval_min;
     uint32_t interval_max;
     uint16_t numConnectionss = NumConnections();
-    uint8_t connectableAdv = (numConnectionss < kMaxConnections) ? sl_bt_advertiser_connectable_scannable : sl_bt_advertiser_scannable_non_connectable;
+    uint8_t connectableAdv =
+        (numConnectionss < kMaxConnections) ? sl_bt_advertiser_connectable_scannable : sl_bt_advertiser_scannable_non_connectable;
 
     err = ConfigureAdvertisingData();
     SuccessOrExit(err);
-
 
     ClearFlag(mFlags, kFlag_RestartAdvertising);
 
@@ -698,7 +698,8 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 
     ret = sl_bt_advertiser_start(advertising_set_handle, sl_bt_advertiser_user_data, connectableAdv);
 
-    if (SL_STATUS_OK == ret) {
+    if (SL_STATUS_OK == ret)
+    {
         SetFlag(mFlags, kFlag_Advertising, true);
     }
 
@@ -721,7 +722,7 @@ CHIP_ERROR BLEManagerImpl::StopAdvertising(void)
         ret = sl_bt_advertiser_stop(advertising_set_handle);
         sl_bt_advertiser_delete_set(advertising_set_handle);
         advertising_set_handle = 0xff;
-        err = MapBLEError(ret);
+        err                    = MapBLEError(ret);
         SuccessOrExit(err);
     }
 
@@ -760,21 +761,21 @@ void BLEManagerImpl::HandleBootEvent(void)
 void BLEManagerImpl::HandleConnectEvent(volatile sl_bt_msg_t * evt)
 {
     sl_bt_evt_connection_opened_t * conn_evt = (sl_bt_evt_connection_opened_t *) &(evt->data);
-    uint8_t connHandle                                     = conn_evt->connection;
-    uint8_t bondingHandle                                  = conn_evt->bonding;
+    uint8_t connHandle                       = conn_evt->connection;
+    uint8_t bondingHandle                    = conn_evt->bonding;
 
     ChipLogProgress(DeviceLayer, "Connect Event for handle : %d", connHandle);
 
     AddConnection(connHandle, bondingHandle);
 
-    //SetFlag(mFlags, kFlag_RestartAdvertising, true);
+    // SetFlag(mFlags, kFlag_RestartAdvertising, true);
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
 }
 
 void BLEManagerImpl::HandleConnectionCloseEvent(volatile sl_bt_msg_t * evt)
 {
     sl_bt_evt_connection_closed_t * conn_evt = (sl_bt_evt_connection_closed_t *) &(evt->data);
-    uint8_t connHandle                                     = conn_evt->connection;
+    uint8_t connHandle                       = conn_evt->connection;
 
     ChipLogProgress(DeviceLayer, "Disconnect Event for handle : %d", connHandle);
 
@@ -927,10 +928,10 @@ void BLEManagerImpl::HandleSoftTimerEvent(volatile sl_bt_msg_t * evt)
     {
         ChipLogProgress(DeviceLayer, "BLEManagerImpl::HandleSoftTimerEvent CHIPOBLE_PROTOCOL_ABORT");
         ChipDeviceEvent event;
-        event.Type                                                     = DeviceEventType::kCHIPoBLEConnectionError;
-        event.CHIPoBLEConnectionError.ConId                            = mIndConfId[evt->data.evt_system_soft_timer.handle];
+        event.Type                                                   = DeviceEventType::kCHIPoBLEConnectionError;
+        event.CHIPoBLEConnectionError.ConId                          = mIndConfId[evt->data.evt_system_soft_timer.handle];
         sInstance.mIndConfId[evt->data.evt_system_soft_timer.handle] = kUnusedIndex;
-        event.CHIPoBLEConnectionError.Reason                           = BLE_ERROR_CHIPOBLE_PROTOCOL_ABORT;
+        event.CHIPoBLEConnectionError.Reason                         = BLE_ERROR_CHIPOBLE_PROTOCOL_ABORT;
         PlatformMgr().PostEvent(&event);
     }
 }
