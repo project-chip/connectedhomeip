@@ -1,5 +1,4 @@
 /*
- *
  *    Copyright (c) 2021 Project CHIP Authors
  *    All rights reserved.
  *
@@ -18,20 +17,15 @@
 
 #pragma once
 
-#include "pw_rpc/server.h"
+#include <FreeRTOS.h>
 
-namespace chip {
-namespace rpc {
+#include "semphr.h"
+#include <cstdint>
 
-class Mutex
-{
-public:
-    virtual void Lock()   = 0;
-    virtual void Unlock() = 0;
-    virtual ~Mutex() {} // Virtual Destructor
-};
+namespace PigweedLogger {
 
-void Start(void (*RegisterServices)(pw::rpc::Server &), ::chip::rpc::Mutex * uart_mutex_);
+void init(void);
+int putString(const char * buffer, size_t size);
+SemaphoreHandle_t * GetSemaphore();
 
-} // namespace rpc
-} // namespace chip
+} // namespace PigweedLogger
