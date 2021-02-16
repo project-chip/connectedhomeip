@@ -85,8 +85,9 @@ public:
      *
      * @return CHIP_ERROR     The result of initialization
      */
-    CHIP_ERROR WaitForSessionEstablishment(const uint8_t * devOpCert, uint16_t devOpCertLen, P256SerializedKeypair & myDeviceOpKey,
-                                           NodeId myNodeId, uint16_t myKeyId, SessionEstablishmentDelegate * delegate);
+    CHIP_ERROR WaitForSessionEstablishment(ChipCertificateSet * chipCertificateSet, const uint8_t * devOpCert,
+                                           uint16_t devOpCertLen, P256SerializedKeypair & myDeviceOpKey, NodeId myNodeId,
+                                           uint16_t myKeyId, SessionEstablishmentDelegate * delegate);
 
     /**
      * @brief
@@ -100,9 +101,9 @@ public:
      *
      * @return CHIP_ERROR      The result of initialization
      */
-    CHIP_ERROR EstablishSession(const Transport::PeerAddress peerAddress, const uint8_t * devOpCert, uint16_t devOpCertLen,
-                                P256SerializedKeypair & myDeviceOpKeys, NodeId myNodeId, NodeId peerNodeId, uint16_t myKeyId,
-                                SessionEstablishmentDelegate * delegate);
+    CHIP_ERROR EstablishSession(const Transport::PeerAddress peerAddress, ChipCertificateSet * chipCertificateSet,
+                                const uint8_t * devOpCert, uint16_t devOpCertLen, P256SerializedKeypair & myDeviceOpKeys,
+                                NodeId myNodeId, NodeId peerNodeId, uint16_t myKeyId, SessionEstablishmentDelegate * delegate);
 
     /**
      * @brief
@@ -187,8 +188,9 @@ private:
         kUnexpected           = 0xff,
     };
 
-    CHIP_ERROR Init(const uint8_t * devOpCert, uint16_t devOpCertLen, P256SerializedKeypair & myDeviceOpKeys, NodeId myNodeId,
-                    uint16_t myKeyId, SessionEstablishmentDelegate * delegate);
+    CHIP_ERROR Init(ChipCertificateSet * chipCertificateSet, const uint8_t * devOpCert, uint16_t devOpCertLen,
+                    P256SerializedKeypair & myDeviceOpKeys, NodeId myNodeId, uint16_t myKeyId,
+                    SessionEstablishmentDelegate * delegate);
 
     CHIP_ERROR SendSigmaR1();
     CHIP_ERROR HandleSigmaR1_and_SendSigmaR2(const PacketHeader & header, const System::PacketBufferHandle & msg);
@@ -205,6 +207,9 @@ private:
     void SendErrorMsg(SigmaErrorType errorCode);
     void HandleErrorMsg(const PacketHeader & header, const System::PacketBufferHandle & msg);
 
+    // PLACEHOLDER... MIGHT REMOVE
+    CHIP_ERROR SetEffectiveTime(void);
+
     CHIP_ERROR AttachHeaderAndSend(Protocols::SecureChannel::MsgType msgType, System::PacketBufferHandle msgBuf);
 
     void Clear();
@@ -220,6 +225,8 @@ private:
     const uint8_t * mDeviceOpCert;
     uint16_t mDeviceOpCertLen;
     P256ECDHDerivedSecret mSharedSecret;
+    ChipCertificateSet * mChipCertificateSet;
+    ValidationContext mValidContext;
 
     struct SigmaErrorMsg
     {
