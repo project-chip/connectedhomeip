@@ -732,8 +732,9 @@ void DeviceCommissioner::RendezvousCleanup(CHIP_ERROR status)
         // method to get access to the device, which will fetch
         // the device information from the persistent storage.
         DeviceController::ReleaseDevice(mDeviceBeingPaired);
-        mDeviceBeingPaired = kNumMaxActiveDevices;
     }
+
+    mDeviceBeingPaired = kNumMaxActiveDevices;
 }
 
 void DeviceCommissioner::OnRendezvousError(CHIP_ERROR err)

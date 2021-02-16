@@ -38,7 +38,7 @@
     UITapGestureRecognizer * tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dismissKeyboard)];
     [self.view addGestureRecognizer:tap];
 
-    self.cluster = [[CHIPBinding alloc] initWithDevice:GetPairedDevice() endpoint:1 queue:dispatch_get_main_queue()];
+    self.cluster = [[CHIPBinding alloc] initWithDevice:CHIPGetPairedDevice() endpoint:1 queue:dispatch_get_main_queue()];
 }
 
 - (void)dismissKeyboard
@@ -122,7 +122,8 @@
 
 - (void)_clearTextFields
 {
-    _nodeIDTextField.text = [NSString stringWithFormat:@"%d", 112233];
+    CHIPDeviceController * chipController = [CHIPDeviceController sharedController];
+    _nodeIDTextField.text = [NSString stringWithFormat:@"%@", chipController.getControllerNodeId];
     _endpointIDTextField.text = @"1";
     _groupIDTextField.text = @"0";
     _clusterIDTextField.text = @"";
@@ -132,7 +133,9 @@
 
 - (IBAction)bind:(id)sender
 {
-    int nodeId = [_nodeIDTextField.text intValue];
+    uint64_t nodeId;
+    NSScanner * scanner = [NSScanner scannerWithString:_nodeIDTextField.text];
+    [scanner scanUnsignedLongLong:&nodeId];
     int endpointId = [_endpointIDTextField.text intValue];
     int groupId = [_groupIDTextField.text intValue];
     int clusterId = [_clusterIDTextField.text intValue];

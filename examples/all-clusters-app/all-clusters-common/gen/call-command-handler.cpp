@@ -166,7 +166,7 @@ EmberAfStatus emberAfBasicClusterServerCommandParse(EmberAfClusterCommand * cmd)
 
     if (cmd->mfgSpecific)
     {
-        if (cmd->mfgCode == 0x1002 && cmd->commandId == ZCL_MFG_SPECIFIC_PING_COMMAND_ID)
+        if (cmd->mfgCode == 4098 && cmd->commandId == ZCL_MFG_SPECIFIC_PING_COMMAND_ID)
         {
             wasHandled = emberAfBasicClusterMfgSpecificPingCallback();
         }
