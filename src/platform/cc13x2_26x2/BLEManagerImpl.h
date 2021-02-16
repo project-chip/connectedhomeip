@@ -60,12 +60,6 @@ using namespace chip::Ble;
 #define ICALL_EVT ICALL_MSG_EVENT_ID  // Event_Id_31
 #define QUEUE_EVT UTIL_QUEUE_EVENT_ID // Event_Id_30
 
-// Spin if the expression is not true
-#define BLEMANAGER_ASSERT(expr)                                                                                                    \
-    if (!(expr))                                                                                                                   \
-        while (1)                                                                                                                  \
-            ;
-
 // Application events
 #define BLEManagerIMPL_STATE_UPDATE_EVT (0)
 
@@ -304,13 +298,13 @@ private:
     void AdvInit(void);
     void EventHandler_init(void);
     void InitPHYRSSIArray(void);
-    void CreateEventHandler(void);
+    CHIP_ERROR CreateEventHandler(void);
     uint8_t ProcessStackEvent(ICall_Hdr * pMsg);
     void ProcessEvtHdrMsg(QueuedEvt_t * pMsg);
     void ProcessGapMessage(gapEventHdr_t * pMsg);
     uint8_t ProcessGATTMsg(gattMsgEvent_t * pMsg);
     void ProcessAdvEvent(GapAdvEventData_t * pEventData);
-    void ProcessParamUpdate(uint16_t connHandle);
+    CHIP_ERROR ProcessParamUpdate(uint16_t connHandle);
     status_t EnqueueEvtHdrMsg(uint8_t event, void * pData);
     uint8_t AddBLEConn(uint16_t connHandle);
     uint8_t RemoveBLEConn(uint16_t connHandle);
@@ -323,7 +317,7 @@ private:
 
     /* Static helper function */
     static void EventHandler(void * arg);
-    static void DriveBLEState(void);
+    static CHIP_ERROR DriveBLEState(void);
 
     /* Declared static to acquire function ptr */
     static void advCallback(uint32_t event, void * pBuf, uintptr_t arg);

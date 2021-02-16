@@ -107,9 +107,9 @@ CHIP_ERROR BLEManagerImpl::_Init(void)
     err = BleLayer::Init(this, this, &SystemLayer);
     if (err != CHIP_NO_ERROR)
     {
-        while (1)
-            ;
+        return err;
     }
+
     /* Register BLE Stack assert handler */
     RegisterAssertCback(AssertHandler);
 
@@ -118,7 +118,7 @@ CHIP_ERROR BLEManagerImpl::_Init(void)
     mServiceMode             = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
     OnChipBleConnectReceived = HandleIncomingBleConnection;
 
-    CreateEventHandler();
+    err = CreateEventHandler();
     return err;
 }
 
@@ -132,9 +132,7 @@ CHIP_ERROR BLEManagerImpl::_SetCHIPoBLEServiceMode(BLEManager::CHIPoBLEServiceMo
     mServiceMode = val;
 
     /* Trigger state update */
-    DriveBLEState();
-
-    return CHIP_NO_ERROR;
+    return DriveBLEState();
 }
 
 bool BLEManagerImpl::_IsAdvertisingEnabled(void)
@@ -148,9 +146,7 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
     SetFlag(mFlags, kFlag_AdvertisingEnabled, val);
 
     /* Send event to process state change request */
-    DriveBLEState();
-
-    return CHIP_NO_ERROR;
+    return DriveBLEState();
 }
 
 bool BLEManagerImpl::_IsFastAdvertisingEnabled(void)
@@ -160,14 +156,16 @@ bool BLEManagerImpl::_IsFastAdvertisingEnabled(void)
 
 CHIP_ERROR BLEManagerImpl::_SetFastAdvertisingEnabled(bool val)
 {
+    CHIP_ERROR ret = CHIP_NO_ERROR;
+
     if (!GetFlag(mFlags, kFlag_FastAdvertisingEnabled))
     {
         SetFlag(mFlags, kFlag_FastAdvertisingEnabled, val);
 
         /* Send event to process state change request */
-        DriveBLEState();
+        ret = DriveBLEState();
     }
-    return CHIP_NO_ERROR;
+    return ret;
 }
 
 bool BLEManagerImpl::_IsAdvertising(void)
@@ -185,7 +183,7 @@ CHIP_ERROR BLEManagerImpl::_GetDeviceName(char * buf, size_t bufSize)
     }
     else
     {
-        ret = CHIP_ERROR_INVALID_ARGUMENT;
+        ret = CHIP_ERROR_BUFFER_TOO_SMALL;
     }
 
     return ret;
@@ -194,18 +192,19 @@ CHIP_ERROR BLEManagerImpl::_GetDeviceName(char * buf, size_t bufSize)
 CHIP_ERROR BLEManagerImpl::_SetDeviceName(const char * deviceName)
 {
     CHIP_ERROR ret = CHIP_NO_ERROR;
+
     if (strlen(deviceName) <= GAP_DEVICE_NAME_LEN)
     {
         strncpy(mDeviceName, deviceName, strlen(deviceName));
+
+        SetFlag(mFlags, kFlag_BLEStackGATTNameUpdate, true);
+
+        ret = DriveBLEState();
     }
     else
     {
-        ret = CHIP_ERROR_INVALID_ARGUMENT;
+        ret = CHIP_ERROR_BUFFER_TOO_SMALL;
     }
-
-    SetFlag(mFlags, kFlag_BLEStackGATTNameUpdate, true);
-
-    DriveBLEState();
 
     return ret;
 }
@@ -278,7 +277,7 @@ bool BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
 
     EnqueueEvtHdrMsg(BLEManagerIMPL_CHIPOBLE_CLOSE_CONN_EVT, (void *) pMsg);
 
-    return (CHIP_NO_ERROR);
+    return CHIP_NO_ERROR;
 }
 
 uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
@@ -315,23 +314,29 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
 
     // Allocate buffers to send to BLE app task
     uint8_t dataLen         = static_cast<uint8_t>(data->DataLength());
-    CHIPoBLEIndEvt_t * pMsg = (CHIPoBLEIndEvt_t *) ICall_malloc(sizeof(CHIPoBLEIndEvt_t));
-    uint8_t * pBuf          = (uint8_t *) ICall_malloc(dataLen);
-
-    memset(pBuf, 0x00, dataLen);
-    if (!pMsg || !pBuf)
+    CHIPoBLEIndEvt_t * pMsg;
+    uint8_t * pBuf;
+    
+    pMsg = (CHIPoBLEIndEvt_t *) ICall_malloc(sizeof(CHIPoBLEIndEvt_t));
+    if (NULL == pMsg)
     {
-        while (1)
-            ;
+        return false;
     }
 
+    pBuf = (uint8_t *) ICall_malloc(dataLen);
+    if (NULL == pBuf)
+    {
+        ICall_free((void *) pBuf);
+        return false;
+    }
+
+    memset(pBuf, 0x00, dataLen);
     memcpy(pBuf, data->Start(), dataLen);
 
     pMsg->pData = pBuf;
     pMsg->len   = dataLen;
 
     EnqueueEvtHdrMsg(BLEManagerIMPL_CHIPOBLE_TX_IND_EVT, (void *) pMsg);
-    // taskYIELD();
 
     BLEMGR_LOG("BLEMGR: BLE SendIndication RETURN, Length: %d ", dataLen);
     return true;
@@ -467,7 +472,7 @@ void BLEManagerImpl::AdvInit(void)
 
     // Create Advertisement set #1 and assign handle
     status = (bStatus_t) GapAdv_create(&advCallback, &advParams1, &sInstance.advHandleLegacy);
-    BLEMANAGER_ASSERT(status == SUCCESS);
+    assert(status == SUCCESS);
 
     // Load advertising data for set #1 that is statically allocated by the app
     status = (bStatus_t) GapAdv_loadByHandle(sInstance.advHandleLegacy, GAP_ADV_DATA_TYPE_ADV,
@@ -476,7 +481,7 @@ void BLEManagerImpl::AdvInit(void)
     // Load scan response data for set #1 that is statically allocated by the app
     status =
         (bStatus_t) GapAdv_loadByHandle(sInstance.advHandleLegacy, GAP_ADV_DATA_TYPE_SCAN_RSP, scanResLength, scanResDatachipOBle);
-    BLEMANAGER_ASSERT(status == SUCCESS);
+    assert(status == SUCCESS);
 
     // Set event mask for set #1
     status = (bStatus_t) GapAdv_setEventMask(sInstance.advHandleLegacy,
@@ -613,7 +618,7 @@ void BLEManagerImpl::InitPHYRSSIArray(void)
  * @brief   Create FreeRTOS Task for BLE Event handling
  *
  */
-void BLEManagerImpl::CreateEventHandler(void)
+CHIP_ERROR BLEManagerImpl::CreateEventHandler(void)
 {
     BLEMGR_LOG("BLEMGR: CreateEventHandler");
 
@@ -629,9 +634,11 @@ void BLEManagerImpl::CreateEventHandler(void)
 
     if (xReturned == errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY)
     {
-        /* Creation of FreeRTOS task failed */
-        while (1)
-            ;
+        return CHIP_ERROR_NO_MEMORY;
+    }
+    else
+    {
+        return CHIP_NO_ERROR;
     }
 }
 
@@ -672,8 +679,7 @@ uint8_t BLEManagerImpl::ProcessStackEvent(ICall_Hdr * pMsg)
                 break;
             }
         case HCI_BLE_HARDWARE_ERROR_EVENT_CODE:
-            while (1)
-                ;
+            assert(false);
             break;
         // HCI Commands Events
         case HCI_COMMAND_STATUS_EVENT_CODE: {
@@ -722,7 +728,7 @@ uint8_t BLEManagerImpl::ProcessStackEvent(ICall_Hdr * pMsg)
         break;
     }
 
-    return (safeToDealloc);
+    return safeToDealloc;
 }
 
 /*********************************************************************
@@ -769,7 +775,7 @@ void BLEManagerImpl::ProcessEvtHdrMsg(QueuedEvt_t * pMsg)
                     // Enable legacy advertising for set #1
                     status = (bStatus_t) GapAdv_enable(sInstance.advHandleLegacy, GAP_ADV_ENABLE_OPTIONS_USE_MAX, 0);
 
-                    BLEMANAGER_ASSERT(status == SUCCESS);
+                    assert(status == SUCCESS);
 
                     // Start advertisement timer
                     Util_startClock(&sInstance.clkAdvTimeout);
@@ -788,7 +794,7 @@ void BLEManagerImpl::ProcessEvtHdrMsg(QueuedEvt_t * pMsg)
 
                     // Enable legacy advertising for set #1
                     status = (bStatus_t) GapAdv_enable(sInstance.advHandleLegacy, GAP_ADV_ENABLE_OPTIONS_USE_MAX, 0);
-                    BLEMANAGER_ASSERT(status == SUCCESS);
+                    assert(status == SUCCESS);
                     SetFlag(sInstance.mFlags, kFlag_Advertising, true);
                 }
             }
@@ -867,13 +873,13 @@ void BLEManagerImpl::ProcessEvtHdrMsg(QueuedEvt_t * pMsg)
             // Pull written data from CHIPOBLE Profile based on extern server write
             uint8_t * rxBuf = (uint8_t *) ICall_malloc(writeLen);
 
-            memset(rxBuf, 0x00, writeLen);
-
             if (rxBuf == NULL)
             {
-                while (1)
-                    ;
+                // alloc error
+                return;
             }
+
+            memset(rxBuf, 0x00, writeLen);
 
             BLEMGR_LOG("BLEMGR: BLE Process Application Message: CHIPOBLE_CHAR_CHANGE_EVT, length: %d", writeLen);
             CHIPoBLEProfile_GetParameter(CHIPOBLEPROFILE_RX_CHAR, rxBuf, writeLen);
@@ -884,8 +890,8 @@ void BLEManagerImpl::ProcessEvtHdrMsg(QueuedEvt_t * pMsg)
 
             if (packetBuf.IsNull())
             {
-                while (1)
-                    ;
+                // alloc error
+                return;
             }
 
             // Arrange to post a CHIPoBLERXWriteEvent event to the CHIP queue.
@@ -947,7 +953,11 @@ void BLEManagerImpl::ProcessEvtHdrMsg(QueuedEvt_t * pMsg)
         // Extract connection handle from data
         uint16_t connHandle = *(uint16_t *) (((ClockEventData_t *) pMsg->pData)->data);
 
-        ProcessParamUpdate(connHandle);
+        if (CHIP_NO_ERROR != ProcessParamUpdate(connHandle))
+        {
+            // error
+            return;
+        }
 
         // This data is not dynamically allocated
         dealloc = FALSE;
@@ -1191,7 +1201,7 @@ uint8_t BLEManagerImpl::ProcessGATTMsg(gattMsgEvent_t * pMsg)
     GATT_bm_free(&pMsg->msg, pMsg->method);
 
     // It's safe to free the incoming message
-    return (TRUE);
+    return TRUE;
 }
 
 /*********************************************************************
@@ -1259,7 +1269,7 @@ void BLEManagerImpl::ProcessAdvEvent(GapAdvEventData_t * pEventData)
  *
  * @return  None
  */
-void BLEManagerImpl::ProcessParamUpdate(uint16_t connHandle)
+CHIP_ERROR BLEManagerImpl::ProcessParamUpdate(uint16_t connHandle)
 {
     gapUpdateLinkParamReq_t req;
     uint8_t connIndex;
@@ -1274,8 +1284,7 @@ void BLEManagerImpl::ProcessParamUpdate(uint16_t connHandle)
     connIndex = GetBLEConnIndex(connHandle);
     if (!(connIndex < MAX_NUM_BLE_CONNS))
     {
-        while (1)
-            ;
+        return CHIP_ERROR_TOO_MANY_CONNECTIONS;
     }
 
     // Deconstruct the clock object
@@ -1308,6 +1317,8 @@ void BLEManagerImpl::ProcessParamUpdate(uint16_t connHandle)
             List_put(&sInstance.paramUpdateList, (List_Elem *) connHandleEntry);
         }
     }
+
+    return CHIP_NO_ERROR;
 }
 
 /*********************************************************************
@@ -1336,7 +1347,7 @@ status_t BLEManagerImpl::EnqueueEvtHdrMsg(uint8_t event, void * pData)
         return (success) ? SUCCESS : FAILURE;
     }
 
-    return (bleMemAllocError);
+    return bleMemAllocError;
 }
 
 /*********************************************************************
@@ -1458,7 +1469,7 @@ uint8_t BLEManagerImpl::GetBLEConnIndex(uint16_t connHandle) const
         }
     }
 
-    return (MAX_NUM_BLE_CONNS);
+    return MAX_NUM_BLE_CONNS;
 }
 
 /*********************************************************************
@@ -1482,7 +1493,7 @@ uint8_t BLEManagerImpl::ClearBLEConnListEntry(uint16_t connHandle)
         connIndex = GetBLEConnIndex(connHandle);
         if (connIndex >= MAX_NUM_BLE_CONNS)
         {
-            return (bleInvalidRange);
+            return bleInvalidRange;
         }
     }
 
@@ -1504,7 +1515,7 @@ uint8_t BLEManagerImpl::ClearBLEConnListEntry(uint16_t connHandle)
         }
     }
 
-    return (SUCCESS);
+    return SUCCESS;
 }
 
 /*********************************************************************
@@ -1635,15 +1646,16 @@ void BLEManagerImpl::EventHandler(void * arg)
 }
 
 /* Post event to app processing loop to begin CHIP advertising */
-void BLEManagerImpl::DriveBLEState(void)
+CHIP_ERROR BLEManagerImpl::DriveBLEState(void)
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
     BLEMGR_LOG("BLEMGR: DriveBLEState");
 
     if (sInstance.EnqueueEvtHdrMsg(BLEManagerIMPL_STATE_UPDATE_EVT, NULL) != SUCCESS)
     {
-        while (1)
-            ;
+        err = CHIP_ERROR_NO_MEMORY;
     }
+    return err;
 }
 
 /*********************************************************************
@@ -1836,39 +1848,31 @@ void BLEManagerImpl::AssertHandler(uint8 assertCause, uint8 assertSubcause)
     switch (assertCause)
     {
     case HAL_ASSERT_CAUSE_OUT_OF_MEMORY:
-        while (1)
-            ;
+        assert(false);
         break;
 
     case HAL_ASSERT_CAUSE_INTERNAL_ERROR:
         // check the subcause
         if (assertSubcause == HAL_ASSERT_SUBCAUSE_FW_INERNAL_ERROR)
         {
-            while (1)
-                ;
+            assert(false);
         }
         else
         {
-            while (1)
-                ;
+            assert(false);
         }
         break;
     case HAL_ASSERT_CAUSE_ICALL_ABORT:
-        while (1)
-            ;
-        break;
+        assert(false);
 
     case HAL_ASSERT_CAUSE_ICALL_TIMEOUT:
-        while (1)
-            ;
+        assert(false);
         break;
     case HAL_ASSERT_CAUSE_WRONG_API_CALL:
-        while (1)
-            ;
+        assert(false);
         break;
     default:
-        while (1)
-            ;
+        assert(false);
         break;
     }
     return;

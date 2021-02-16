@@ -169,7 +169,7 @@ bStatus_t CHIPoBLEProfile_AddService(uint32 services)
     chipOBleProfileTxStateDataConfig = (gattCharCfg_t *) ICall_malloc((uint_least16_t)(sizeof(gattCharCfg_t) * MAX_NUM_BLE_CONNS));
     if (chipOBleProfileTxStateDataConfig == NULL)
     {
-        return (bleMemAllocError);
+        return bleMemAllocError;
     }
 
     // Initialize Client Characteristic Configuration attributes
@@ -186,7 +186,7 @@ bStatus_t CHIPoBLEProfile_AddService(uint32 services)
         status = SUCCESS;
     }
 
-    return (status);
+    return status;
 }
 
 /*********************************************************************
@@ -205,11 +205,11 @@ bStatus_t CHIPoBLEProfile_RegisterAppCBs(chipOBleProfileCBs_t * appCallbacks)
     {
         chipOBleProfile_AppCBs = appCallbacks;
 
-        return (SUCCESS);
+        return SUCCESS;
     }
     else
     {
-        return (bleAlreadyInRequestedMode);
+        return bleAlreadyInRequestedMode;
     }
 }
 
@@ -246,7 +246,7 @@ bStatus_t CHIPoBLEProfile_SetParameter(uint8 param, uint8 len, void * value, uin
         break;
     }
 
-    return (ret);
+    return ret;
 }
 
 /*********************************************************************
@@ -285,7 +285,7 @@ bStatus_t CHIPoBLEProfile_GetParameter(uint8 param, void * value, uint16_t len)
         break;
     }
 
-    return (ret);
+    return ret;
 }
 
 /*********************************************************************
@@ -315,7 +315,7 @@ static bStatus_t CHIPoBLEProfile_ReadAttrCB(uint16_t connHandle, gattAttribute_t
     *pLen = len;
     VOID osal_memcpy(pValue, (pAttr->pValue) + offset, len);
 
-    return (status);
+    return status;
 }
 
 /*********************************************************************
@@ -373,5 +373,5 @@ static bStatus_t CHIPoBLEProfile_WriteAttrCB(uint16_t connHandle, gattAttribute_
         chipOBleProfile_AppCBs->pfnchipOBleProfileChange(notifyApp, len, connHandle);
     }
 
-    return (status);
+    return status;
 }
