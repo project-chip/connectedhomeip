@@ -88,33 +88,32 @@ void LogQuery(const QueryData & data)
 
 class AllInterfaces : public ListenIterator
 {
+private:
 public:
-    AllInterfaces() {}
+    AllInterfaces() { SkipToFirstValidInterface(); }
 
     bool Next(chip::Inet::InterfaceId * id, chip::Inet::IPAddressType * type) override
     {
-#if INET_CONFIG_ENABLE_IPV4
-        if (mState == State::kIpV4)
-        {
-            *id    = INET_NULL_INTERFACEID;
-            *type  = chip::Inet::kIPAddressType_IPv4;
-            mState = State::kIpV6;
-
-            SkipToFirstValidInterface();
-            return true;
-        }
-#else
-        mState = State::kIpV6;
-        SkipToFirstValidInterface();
-#endif
-
         if (!mIterator.HasCurrent())
         {
             return false;
         }
 
+#if INET_CONFIG_ENABLE_IPV4
+        if (mState == State::kIpV4)
+        {
+            *id    = mIterator.GetInterfaceId();
+            *type  = chip::Inet::kIPAddressType_IPv4;
+            mState = State::kIpV6;
+            return true;
+        }
+#endif
+
         *id   = mIterator.GetInterfaceId();
         *type = chip::Inet::kIPAddressType_IPv6;
+#if INET_CONFIG_ENABLE_IPV4
+        mState = State::kIpV4;
+#endif
 
         for (mIterator.Next(); SkipCurrentInterface(); mIterator.Next())
         {
@@ -128,7 +127,11 @@ private:
         kIpV4,
         kIpV6,
     };
+#if INET_CONFIG_ENABLE_IPV4
     State mState = State::kIpV4;
+#else
+    State mState = State::kIpV6;
+#endif
     chip::Inet::InterfaceIterator mIterator;
 
     void SkipToFirstValidInterface()
