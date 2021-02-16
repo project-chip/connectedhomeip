@@ -68,6 +68,7 @@ class ServerBase
 public:
     struct EndpointInfo
     {
+        chip::Inet::InterfaceId interfaceId = INET_NULL_INTERFACEID;
         chip::Inet::IPAddressType addressType;
         chip::Inet::UDPEndPoint * udp = nullptr;
     };
@@ -106,12 +107,20 @@ public:
         return *this;
     }
 
+    /// How many endpoints are availabe to be used by the server.
+    size_t GetEndpointCount() const { return mEndpointCount; }
+
+    /// Get the endpoints that are used by this server
+    ///
+    /// Entries with non-null UDP are considered usable.
+    const EndpointInfo * GetEndpoints() const { return mEndpoints; }
+
 private:
     static void OnUdpPacketReceived(chip::Inet::IPEndPointBasis * endPoint, chip::System::PacketBufferHandle buffer,
                                     const chip::Inet::IPPacketInfo * info);
 
     EndpointInfo * mEndpoints;   // possible endpoints, to listen on multiple interfaces
-    const size_t mEndpointCount; // how many endpoints are used
+    const size_t mEndpointCount; // how many endpoints are allocated
     ServerDelegate * mDelegate = nullptr;
 };
 

@@ -158,5 +158,13 @@ void QueryResponderBase::AddAllResponses(const chip::Inet::IPPacketInfo * source
     }
 }
 
+void QueryResponderBase::ClearBroadcastTrottle()
+{
+    for (size_t i = 0; i < mResponderInfoSize; i++)
+    {
+        mResponderInfos[i].lastMulticastTime = 0;
+    }
+}
+
 } // namespace Minimal
 } // namespace mdns

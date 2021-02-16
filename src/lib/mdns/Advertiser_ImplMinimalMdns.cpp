@@ -212,6 +212,11 @@ private:
     /// allocated memory.
     void Clear();
 
+    /// Advertise availabe records configured within the server
+    ///
+    /// Usable as boot-time advertisement of available SRV records.
+    void AdvertiseRecords();
+
     QueryResponderSettings AddAllocatedResponder(Responder * responder)
     {
         if (responder == nullptr)
@@ -330,6 +335,9 @@ CHIP_ERROR AdvertiserMinMdns::Start(chip::Inet::InetLayer * inetLayer, uint16_t 
     ReturnErrorOnFailure(mServer.Listen(inetLayer, &allInterfaces, port));
 
     ChipLogProgress(Discovery, "CHIP minimal mDNS started advertising.");
+
+    AdvertiseRecords();
+
     return CHIP_NO_ERROR;
 }
 
@@ -569,6 +577,82 @@ FullQName AdvertiserMinMdns::GetCommisioningTextEntries(const CommissionAdvertis
     else
     {
         return AllocateQName(txtDiscriminator, txtVidPid);
+    }
+}
+
+bool CanAdvertiseOn(chip::Inet::InterfaceAddressIterator & current)
+{
+    if (!current.IsUp())
+    {
+        return false;
+    }
+
+    if (!current.SupportsMulticast())
+    {
+        return false;
+    }
+
+    char name[64];
+    if (current.GetInterfaceName(name, sizeof(name)) != CHIP_NO_ERROR)
+    {
+        ChipLogError(Discovery, "Failed to get interface name - will not advertise on this interface");
+        return false;
+    }
+
+    if (strncmp(name, "lo", 2) == 0)
+    {
+        // Skip advertisement on what looks like a local loopback interface
+        return false;
+    }
+
+    return true;
+}
+
+void AdvertiserMinMdns::AdvertiseRecords()
+{
+    chip::Inet::InterfaceAddressIterator interfaceAddress;
+
+    if (!interfaceAddress.Next())
+    {
+        return;
+    }
+
+    for (; interfaceAddress.HasCurrent(); interfaceAddress.Next())
+    {
+        if (!CanAdvertiseOn(interfaceAddress))
+        {
+            continue;
+        }
+
+        // FIXME: Loop through server and see if listening on this endpoint
+        // either IPv4 or IPv6
+
+        chip::Inet::IPPacketInfo packetInfo;
+
+        packetInfo.Clear();
+        packetInfo.SrcAddress = interfaceAddress.GetAddress();
+        if (interfaceAddress.GetAddress().IsIPv4())
+        {
+            chip::Inet::IPAddress::FromString("224.0.0.251", packetInfo.DestAddress);
+        }
+        else
+        {
+            chip::Inet::IPAddress::FromString("FF02::FB", packetInfo.DestAddress);
+        }
+        packetInfo.SrcPort   = kMdnsPort;
+        packetInfo.DestPort  = kMdnsPort;
+        packetInfo.Interface = interfaceAddress.GetInterfaceId();
+
+        QueryData queryData(QType::PTR, QClass::IN, false /* unicast */);
+        queryData.SetIsBootAdvertising(true);
+
+        mQueryResponder.ClearBroadcastTrottle();
+
+        CHIP_ERROR err = mResponseSender.Respond(0, queryData, &packetInfo);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Discovery, "Failed to advertise records: %s", ErrorStr(err));
+        }
     }
 }
 

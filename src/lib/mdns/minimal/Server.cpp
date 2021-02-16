@@ -100,6 +100,7 @@ CHIP_ERROR ServerBase::Listen(chip::Inet::InetLayer * inetLayer, ListenIterator 
 
         EndpointInfo * info = &mEndpoints[endpointIndex];
         info->addressType   = addressType;
+        info->interfaceId   = interfaceId;
 
         CHIP_ERROR err = inetLayer->NewUDPEndPoint(&info->udp);
         if (err != CHIP_NO_ERROR)
