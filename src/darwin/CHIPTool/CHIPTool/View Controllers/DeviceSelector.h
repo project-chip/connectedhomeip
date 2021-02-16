@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,26 +15,14 @@
  *    limitations under the License.
  */
 
-#ifndef CHIP_DEVICE_H
-#define CHIP_DEVICE_H
-
-#import <Foundation/Foundation.h>
+#import <CHIP/CHIP.h>
+#import <UIKit/UIKit.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CHIPDevice : NSObject
-
-- (BOOL)openPairingWindow:(NSTimeInterval)duration error:(NSError * __autoreleasing *)error;
-- (NSString *)openPairingWindowWithPIN:(NSTimeInterval)duration
-                         discriminator:(NSUInteger)discriminator
-                                 error:(NSError * __autoreleasing *)error;
-- (BOOL)isActive;
-
-- (instancetype)init NS_UNAVAILABLE;
-+ (instancetype)new NS_UNAVAILABLE;
-
+@interface DeviceSelector : UITextField <UIPickerViewDelegate, UIPickerViewDataSource, UITextFieldDelegate>
+- (instancetype)init;
+- (CHIPDevice *)selectedDevice;
 @end
 
 NS_ASSUME_NONNULL_END
-
-#endif /* CHIP_DEVICE_H */

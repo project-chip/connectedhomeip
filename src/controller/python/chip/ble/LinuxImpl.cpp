@@ -11,41 +11,41 @@ using namespace chip::DeviceLayer::Internal;
 
 extern "C" void * pychip_ble_adapter_list_new()
 {
-    return reinterpret_cast<void *>(new chip::DeviceLayer::Internal::AdapterIterator());
+    return static_cast<void *>(new chip::DeviceLayer::Internal::AdapterIterator());
 }
 
 extern "C" void pychip_ble_adapter_list_delete(void * adapter)
 {
-    delete reinterpret_cast<chip::DeviceLayer::Internal::AdapterIterator *>(adapter);
+    delete static_cast<chip::DeviceLayer::Internal::AdapterIterator *>(adapter);
 }
 
 extern "C" bool pychip_ble_adapter_list_next(void * adapter)
 {
-    return reinterpret_cast<chip::DeviceLayer::Internal::AdapterIterator *>(adapter)->Next();
+    return static_cast<chip::DeviceLayer::Internal::AdapterIterator *>(adapter)->Next();
 }
 
 extern "C" unsigned pychip_ble_adapter_list_get_index(void * adapter)
 {
     /// NOTE: returning unsigned because python native has no sized values
-    return reinterpret_cast<chip::DeviceLayer::Internal::AdapterIterator *>(adapter)->GetIndex();
+    return static_cast<chip::DeviceLayer::Internal::AdapterIterator *>(adapter)->GetIndex();
 }
 
 extern "C" const char * pychip_ble_adapter_list_get_address(void * adapter)
 {
-    return reinterpret_cast<chip::DeviceLayer::Internal::AdapterIterator *>(adapter)->GetAddress();
+    return static_cast<chip::DeviceLayer::Internal::AdapterIterator *>(adapter)->GetAddress();
 }
 
 extern "C" const char * pychip_ble_adapter_list_get_alias(void * adapter)
 {
-    return reinterpret_cast<chip::DeviceLayer::Internal::AdapterIterator *>(adapter)->GetAlias();
+    return static_cast<chip::DeviceLayer::Internal::AdapterIterator *>(adapter)->GetAlias();
 }
 
 extern "C" const char * pychip_ble_adapter_list_get_name(void * adapter)
 {
-    return reinterpret_cast<chip::DeviceLayer::Internal::AdapterIterator *>(adapter)->GetName();
+    return static_cast<chip::DeviceLayer::Internal::AdapterIterator *>(adapter)->GetName();
 }
 
 extern "C" bool pychip_ble_adapter_list_is_powered(void * adapter)
 {
-    return reinterpret_cast<chip::DeviceLayer::Internal::AdapterIterator *>(adapter)->IsPowered();
+    return static_cast<chip::DeviceLayer::Internal::AdapterIterator *>(adapter)->IsPowered();
 }

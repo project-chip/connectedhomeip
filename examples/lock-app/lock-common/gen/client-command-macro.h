@@ -3027,21 +3027,19 @@
  * @param numberOfEvents INT8U
  * @param blockPeriodStartTime UTC_TIME
  * @param blockPeriodDuration INT24U
- * @param numberOfPriceTiersAndNumberOfBlockThresholds BITMAP8
  * @param blockPeriodControl BlockPeriodControl
  * @param blockPeriodDurationType BlockPeriodDurationType
  * @param tariffType TariffType
  * @param tariffResolutionPeriod TariffResolutionPeriod
  */
-#define emberAfFillCommandPriceClusterPublishBlockPeriod(                                                                          \
-    providerId, startTime, issuerEventId, numberOfEvents, blockPeriodStartTime, blockPeriodDuration,                               \
-    numberOfPriceTiersAndNumberOfBlockThresholds, blockPeriodControl, blockPeriodDurationType, tariffType, tariffResolutionPeriod) \
+#define emberAfFillCommandPriceClusterPublishBlockPeriod(providerId, startTime, issuerEventId, numberOfEvents,                     \
+                                                         blockPeriodStartTime, blockPeriodDuration, blockPeriodControl,            \
+                                                         blockPeriodDurationType, tariffType, tariffResolutionPeriod)              \
     emberAfFillExternalBuffer(mask,                                                                                                \
                                                                                                                                    \
-                              ZCL_PUBLISH_BLOCK_PERIOD_COMMAND_ID, "uuuuuuuuuuu", providerId, startTime, issuerEventId,            \
-                              numberOfEvents, blockPeriodStartTime, blockPeriodDuration,                                           \
-                              numberOfPriceTiersAndNumberOfBlockThresholds, blockPeriodControl, blockPeriodDurationType,           \
-                              tariffType, tariffResolutionPeriod);
+                              ZCL_PUBLISH_BLOCK_PERIOD_COMMAND_ID, "uuuuuuuuuu", providerId, startTime, issuerEventId,             \
+                              numberOfEvents, blockPeriodStartTime, blockPeriodDuration, blockPeriodControl,                       \
+                              blockPeriodDurationType, tariffType, tariffResolutionPeriod);
 
 /** @brief Command description for PublishConversionFactor
  *
@@ -3887,15 +3885,11 @@
  * Command: SelectAvailableEmergencyCredit
  * @param commandIssueDateTime UTC_TIME
  * @param originatingDevice OriginatingDevice
- * @param siteId OCTET_STRING
- * @param meterSerialNumber OCTET_STRING
  */
-#define emberAfFillCommandPrepaymentClusterSelectAvailableEmergencyCredit(commandIssueDateTime, originatingDevice, siteId,         \
-                                                                          meterSerialNumber)                                       \
+#define emberAfFillCommandPrepaymentClusterSelectAvailableEmergencyCredit(commandIssueDateTime, originatingDevice)                 \
     emberAfFillExternalBuffer(mask,                                                                                                \
                                                                                                                                    \
-                              ZCL_SELECT_AVAILABLE_EMERGENCY_CREDIT_COMMAND_ID, "uuuu", commandIssueDateTime, originatingDevice,   \
-                              siteId, meterSerialNumber);
+                              ZCL_SELECT_AVAILABLE_EMERGENCY_CREDIT_COMMAND_ID, "uu", commandIssueDateTime, originatingDevice);
 
 /** @brief Command description for PublishPrepaySnapshot
  *

@@ -1,6 +1,6 @@
 {
-  "writeTime": "Wed Feb 10 2021 17:00:13 GMT-0800 (Pacific Standard Time)",
-  "featureLevel": 6,
+  "writeTime": "Mon Feb 15 2021 16:34:42 GMT+0100 (Central European Standard Time)",
+  "featureLevel": 11,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -79,7 +79,6 @@
           "define": "BASIC_CLUSTER",
           "side": "server",
           "enabled": 1,
-          "commands": [],
           "attributes": [
             {
               "name": "cluster revision",
@@ -126,7 +125,8 @@
               "maxInterval": 65344,
               "reportableChange": 0
             }
-          ]
+          ],
+          "commands": []
         },
         {
           "name": "Identify",
@@ -2837,10 +2837,10 @@
             {
               "name": "MfgSpecificPing",
               "code": 0,
-              "mfgCode": "0x1002",
+              "mfgCode": "4098",
               "source": "client",
               "incoming": 1,
-              "outgoing": 1
+              "outgoing": 0
             }
           ],
           "attributes": [
@@ -2868,7 +2868,6 @@
           "define": "BASIC_CLUSTER",
           "side": "server",
           "enabled": 1,
-          "commands": [],
           "attributes": [
             {
               "name": "cluster revision",
@@ -2915,7 +2914,8 @@
               "maxInterval": 65344,
               "reportableChange": 0
             }
-          ]
+          ],
+          "commands": []
         },
         {
           "name": "Identify",
@@ -2924,23 +2924,6 @@
           "define": "IDENTIFY_CLUSTER",
           "side": "client",
           "enabled": 0,
-          "attributes": [
-            {
-              "name": "cluster revision",
-              "code": 65533,
-              "mfgCode": null,
-              "side": "client",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "2",
-              "reportable": 0,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            }
-          ],
           "commands": [
             {
               "name": "Identify",
@@ -2958,6 +2941,23 @@
               "incoming": 1,
               "outgoing": 1
             }
+          ],
+          "attributes": [
+            {
+              "name": "cluster revision",
+              "code": 65533,
+              "mfgCode": null,
+              "side": "client",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "2",
+              "reportable": 0,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            }
           ]
         },
         {
@@ -2967,6 +2967,16 @@
           "define": "IDENTIFY_CLUSTER",
           "side": "server",
           "enabled": 1,
+          "commands": [
+            {
+              "name": "IdentifyQueryResponse",
+              "code": 0,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 1,
+              "outgoing": 1
+            }
+          ],
           "attributes": [
             {
               "name": "cluster revision",
@@ -2997,16 +3007,6 @@
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
-            }
-          ],
-          "commands": [
-            {
-              "name": "IdentifyQueryResponse",
-              "code": 0,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 1
             }
           ]
         },
@@ -3166,23 +3166,6 @@
           "define": "SCENES_CLUSTER",
           "side": "client",
           "enabled": 0,
-          "attributes": [
-            {
-              "name": "cluster revision",
-              "code": 65533,
-              "mfgCode": null,
-              "side": "client",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "3",
-              "reportable": 0,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            }
-          ],
           "commands": [
             {
               "name": "AddScene",
@@ -3239,6 +3222,23 @@
               "source": "client",
               "incoming": 1,
               "outgoing": 1
+            }
+          ],
+          "attributes": [
+            {
+              "name": "cluster revision",
+              "code": 65533,
+              "mfgCode": null,
+              "side": "client",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "3",
+              "reportable": 0,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
             }
           ]
         },
@@ -4340,7 +4340,6 @@
           "define": "BARRIER_CONTROL_CLUSTER",
           "side": "server",
           "enabled": 1,
-          "commands": [],
           "attributes": [
             {
               "name": "cluster revision",
@@ -4417,7 +4416,8 @@
               "maxInterval": 65344,
               "reportableChange": 0
             }
-          ]
+          ],
+          "commands": []
         },
         {
           "name": "Color Control",
@@ -5675,7 +5675,6 @@
     {
       "endpointTypeName": "Anonymous Endpoint Type",
       "endpointTypeIndex": 1,
-      "endpointTypeRef": 2,
       "profileId": "0x0103",
       "endpointId": 1,
       "networkId": 0
@@ -5683,7 +5682,6 @@
     {
       "endpointTypeName": "Anonymous Endpoint Type",
       "endpointTypeIndex": 0,
-      "endpointTypeRef": 1,
       "profileId": "0x0103",
       "endpointId": 2,
       "networkId": 0

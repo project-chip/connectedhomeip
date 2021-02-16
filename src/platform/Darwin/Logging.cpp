@@ -1,8 +1,10 @@
 /* See Project chip LICENSE file for licensing information. */
 
 #include <platform/logging/LogV.h>
+#include <support/logging/Constants.h>
 
 #include <core/CHIPConfig.h>
+#include <support/logging/Constants.h>
 
 #include <os/log.h>
 
