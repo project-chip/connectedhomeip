@@ -53,11 +53,11 @@ void TestBytesToHexNotNulTerminated(nlTestSuite * inSuite, void * inContext)
 
     // Trivial: Zero size input
     {
-        uint8_t src[]    = {};
+        uint8_t src[]    = { 0x00 };
         char dest[2]     = { '!', '@' };
         char expected[2] = { '!', '@' };
         NL_TEST_ASSERT(inSuite,
-                       BytesToHex(&src[0], sizeof(src), &dest[0], sizeof(src) * 2u,
+                       BytesToHex(&src[0], 0, &dest[0], sizeof(src) * 2u,
                                   /*uppercase=*/false, /*nul_terminate=*/false) == CHIP_NO_ERROR);
         // Nothing should have been touched.
         NL_TEST_ASSERT(inSuite, memcmp(&dest[0], &expected[0], sizeof(expected)) == 0);
@@ -92,11 +92,11 @@ void TestBytesToHexNulTerminated(nlTestSuite * inSuite, void * inContext)
 
     // Trivial: Zero size input
     {
-        uint8_t src[]    = {};
+        uint8_t src[]    = { 0x00 };
         char dest[2]     = { '!', '@' };
         char expected[2] = { '\0', '@' };
         NL_TEST_ASSERT(inSuite,
-                       BytesToHex(&src[0], sizeof(src), &dest[0], sizeof(dest),
+                       BytesToHex(&src[0], 0, &dest[0], sizeof(dest),
                                   /*uppercase=*/false, /*nul_terminate=*/true) == CHIP_NO_ERROR);
         // Expect nul termination
         NL_TEST_ASSERT(inSuite, memcmp(&dest[0], &expected[0], sizeof(expected)) == 0);
