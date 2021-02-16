@@ -22,8 +22,7 @@ add_subdirectory(${MBED_PATH} ./mbed_build)
 add_executable(${APP_TARGET})
 
 target_include_directories(${APP_TARGET} PRIVATE
-                           ${CMAKE_CURRENT_SOURCE_DIR}
-                           ${APP_ROOT}/shell_common/include)
+                           ${CMAKE_CURRENT_SOURCE_DIR})
 
 target_sources(${APP_TARGET} PRIVATE
     ${APP_ROOT}/shell_common/cmd_base64.cpp
@@ -31,8 +30,9 @@ target_sources(${APP_TARGET} PRIVATE
     ${APP_ROOT}/shell_common/cmd_misc.cpp
     ${APP_ROOT}/shell_common/cmd_otcli.cpp
     ${APP_ROOT}/shell_common/cmd_btp.cpp
-    ${APP_ROOT}/standalone/main.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/cmd_mbed_utils.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/arch.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
 )
 
 add_subdirectory(${CHIP_ROOT}/config/mbed ./chip_build)
