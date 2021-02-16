@@ -105,6 +105,18 @@ public:
         mReceiverSecureSession.Reset();
     }
 
+    CHIP_ERROR EncryptBeforeSend(const uint8_t * input, size_t input_length, uint8_t * output, PacketHeader & header,
+                                 MessageAuthenticationCode & mac)
+    {
+        return mSenderSecureSession.Encrypt(input, input_length, output, header, mac);
+    }
+
+    CHIP_ERROR DecryptOnReceive(const uint8_t * input, size_t input_length, uint8_t * output, const PacketHeader & header,
+                                const MessageAuthenticationCode & mac)
+    {
+        return mReceiverSecureSession.Decrypt(input, input_length, output, header, mac);
+    }
+
 private:
     PeerAddress mPeerAddress;
     NodeId mPeerNodeId           = kUndefinedNodeId;
