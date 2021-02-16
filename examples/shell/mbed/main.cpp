@@ -24,6 +24,7 @@
 #include <lib/support/RandUtils.h>
 #include <support/logging/CHIPLogging.h>
 
+#include "ChipShellMbedCollection.h"
 #include <ChipShellCollection.h>
 
 using namespace chip;

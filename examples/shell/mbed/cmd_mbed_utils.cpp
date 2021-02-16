@@ -25,7 +25,7 @@
 #include <inttypes.h>
 #include <stdarg.h>
 
-#include <ChipShellCollection.h>
+#include "ChipShellMbedCollection.h"
 
 using namespace chip;
 using namespace chip::Shell;
@@ -89,20 +89,20 @@ int cmd_date_set(int argc, char ** argv)
     ret = sscanf(argv[0], "%4" SCNu16 "-%2" SCNu8 "-%2" SCNu8, &year, &month, &dayOfMonth);
     if (3 != ret)
     {
-        streamer_printf(sout, "ERROR: Date is in wrong format!\r\n");
+        streamer_printf(sout, "ERROR: Date is in wrong format! Please use 'YYYY-MM-DD HH:MM:SS' format.\r\n");
         ExitNow(error = CHIP_ERROR_INVALID_ARGUMENT;);
     }
 
     ret = sscanf(argv[1], "%2" SCNu8 ":%2" SCNu8 ":%2" SCNu8, &hour, &minute, &seconds);
     if (3 != ret)
     {
-        streamer_printf(sout, "ERROR: Time is in wrong format!\r\n");
+        streamer_printf(sout, "ERROR: Time is in wrong format! Please use 'YYYY-MM-DD HH:MM:SS' format.\r\n");
         ExitNow(error = CHIP_ERROR_INVALID_ARGUMENT;);
     }
 
     if (!CalendarTimeToSecondsSinceEpoch(year, month, dayOfMonth, hour, minute, seconds, newCurrTime))
     {
-        streamer_printf(sout, "ERROR: Wrond date and/or time value\r\n");
+        streamer_printf(sout, "ERROR: Wrond date and/or time values\r\n");
         ExitNow(error = CHIP_ERROR_INVALID_ARGUMENT;);
     }
 

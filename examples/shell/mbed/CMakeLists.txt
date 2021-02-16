@@ -22,7 +22,8 @@ add_subdirectory(${MBED_PATH} ./mbed_build)
 add_executable(${APP_TARGET})
 
 target_include_directories(${APP_TARGET} PRIVATE
-                           ${CMAKE_CURRENT_SOURCE_DIR})
+                           ${CMAKE_CURRENT_SOURCE_DIR}
+                           ${APP_ROOT}/shell_common/include)
 
 target_sources(${APP_TARGET} PRIVATE
     ${APP_ROOT}/shell_common/cmd_base64.cpp
