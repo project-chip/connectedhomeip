@@ -2073,10 +2073,10 @@ bool AdapterIterator::Advance()
             index = 0;
         }
 
-        mCurrent.index = index;
-        CopyString(mCurrent.address, bluez_adapter1_get_address(adapter));
-        CopyString(mCurrent.alias, bluez_adapter1_get_alias(adapter));
-        CopyString(mCurrent.name, bluez_adapter1_get_name(adapter));
+        mCurrent.index   = index;
+        mCurrent.address = bluez_adapter1_get_address(adapter);
+        mCurrent.alias   = bluez_adapter1_get_alias(adapter);
+        mCurrent.name    = bluez_adapter1_get_name(adapter);
         mCurrent.powered = bluez_adapter1_get_powered(adapter);
 
         g_object_unref(adapter);
