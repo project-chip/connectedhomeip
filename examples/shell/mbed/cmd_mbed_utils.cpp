@@ -64,7 +64,7 @@ int cmd_date_dispatch(int argc, char ** argv)
         }
 
         SecondsSinceEpochToCalendarTime(currTimeMS / 1000, year, month, dayOfMonth, hour, minute, second);
-        streamer_printf(sout, "%04" PRIu16 "-%02" PRIu8 "-%02" PRIu8 " %02" PRIu8 ":%02" PRIu8 ":%02" PRIu16 "\n\r", year, month,
+        streamer_printf(sout, "%04" PRIu16 "-%02" PRIu8 "-%02" PRIu8 " %02" PRIu8 ":%02" PRIu8 ":%02" PRIu8 "\n\r", year, month,
                         dayOfMonth, hour, minute, second);
         return CHIP_NO_ERROR;
     }
@@ -86,14 +86,14 @@ int cmd_date_set(int argc, char ** argv)
 
     VerifyOrExit(argc == 2, error = CHIP_ERROR_INVALID_ARGUMENT);
 
-    ret = sscanf(argv[0], "%" SCNu16 "-%02" SCNu8 "-%02" SCNu8, &year, &month, &dayOfMonth);
+    ret = sscanf(argv[0], "%4" SCNu16 "-%2" SCNu8 "-%2" SCNu8, &year, &month, &dayOfMonth);
     if (3 != ret)
     {
         streamer_printf(sout, "ERROR: Date is in wrong format!\r\n");
         ExitNow(error = CHIP_ERROR_INVALID_ARGUMENT;);
     }
 
-    ret = sscanf(argv[1], "%02" SCNu8 ":%02" SCNu8 ":%02" SCNu8, &hour, &minute, &seconds);
+    ret = sscanf(argv[1], "%2" SCNu8 ":%2" SCNu8 ":%2" SCNu8, &hour, &minute, &seconds);
     if (3 != ret)
     {
         streamer_printf(sout, "ERROR: Time is in wrong format!\r\n");
