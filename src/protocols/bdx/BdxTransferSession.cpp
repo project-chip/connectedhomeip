@@ -26,7 +26,7 @@ constexpr size_t kStatusReportMinSize = 2 + 4 + 2; ///< 16 bits for GeneralCode,
 CHIP_ERROR WriteToPacketBuffer(const ::chip::bdx::BdxMessage & msgStruct, ::chip::System::PacketBufferHandle & msgBuf)
 {
     size_t msgDataSize = msgStruct.MessageSize();
-    ::chip::Encoding::LittleEndian::PacketBufferWriter bbuf(chip::MessagePacketBuffer::New(msgDataSize));
+    ::chip::Encoding::LittleEndian::PacketBufferWriter bbuf(chip::MessagePacketBuffer::New(msgDataSize), msgDataSize);
     if (bbuf.IsNull())
     {
         return CHIP_ERROR_NO_MEMORY;
