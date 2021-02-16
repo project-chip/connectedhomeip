@@ -31,9 +31,8 @@ namespace Minimal {
 class ResourceRecord
 {
 public:
-
     static constexpr uint64_t kTtlHourInSeconds = 3600;
-    static constexpr uint64_t kTtlDayInSeconds = 24 * kTtlHourInSeconds;
+    static constexpr uint64_t kTtlDayInSeconds  = 24 * kTtlHourInSeconds;
     static constexpr uint64_t kTtlYearInSeconds = 365 * kTtlDayInSeconds;
 
     static constexpr uint64_t kDefaultTtl = 10 * kTtlYearInSeconds;
