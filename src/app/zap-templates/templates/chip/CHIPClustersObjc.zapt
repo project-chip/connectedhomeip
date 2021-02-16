@@ -5,20 +5,31 @@
 
 #import <Foundation/Foundation.h>
 
-typedef void (^ResponseHandler)(NSError * _Nullable error, NSDictionary * _Nullable values);
-
 @class CHIPDevice;
+
+typedef void (^ResponseHandler)(NSError * _Nullable error, NSDictionary * _Nullable values);
 
 NS_ASSUME_NONNULL_BEGIN
 
+/**
+ * CHIPCluster
+ *    This is the base class for clusters.
+ */
 @interface CHIPCluster : NSObject
+
 - (nullable instancetype)initWithDevice:(CHIPDevice *)device endpoint:(uint8_t)endpoint queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
+
 @end
 
 {{#chip_clusters}}
 
+
+/**
+ * Cluster {{name}}
+ *    {{description}}
+ */
 @interface CHIP{{asCamelCased name false}} : CHIPCluster
 
 {{#chip_server_cluster_commands}}
