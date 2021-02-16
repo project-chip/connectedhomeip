@@ -660,9 +660,6 @@ void AdvertiserMinMdns::AdvertiseRecords()
             continue;
         }
 
-        // FIXME: Loop through server and see if listening on this endpoint
-        // either IPv4 or IPv6
-
         chip::Inet::IPPacketInfo packetInfo;
 
         packetInfo.Clear();
