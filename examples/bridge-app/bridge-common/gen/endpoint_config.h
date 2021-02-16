@@ -236,11 +236,11 @@
             { 0x0006, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* On/off (server): Toggle */                                     \
             { 0x0006, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* On/off (server): Toggle */                                     \
             { 0x0006, 0x40, 0 },                                 /* On/off (server): OffWithEffect */                              \
-            { 0x0006, 0x40, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* On/off (server): OffWithEffect */                              \
+            { 0x0006, 0x40, 0 },                                 /* On/off (server): OffWithEffect */                              \
             { 0x0006, 0x41, 0 },                                 /* On/off (server): OnWithRecallGlobalScene */                    \
-            { 0x0006, 0x41, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* On/off (server): OnWithRecallGlobalScene */                    \
+            { 0x0006, 0x41, 0 },                                 /* On/off (server): OnWithRecallGlobalScene */                    \
             { 0x0006, 0x42, 0 },                                 /* On/off (server): OnWithTimedOff */                             \
-            { 0x0006, 0x42, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* On/off (server): OnWithTimedOff */                             \
+            { 0x0006, 0x42, 0 },                                 /* On/off (server): OnWithTimedOff */                             \
             { 0x0008, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Level Control (server): MoveToLevel */                         \
             { 0x0008, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Level Control (server): MoveToLevel */                         \
             { 0x0008, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Level Control (server): MoveToLevel */                         \
