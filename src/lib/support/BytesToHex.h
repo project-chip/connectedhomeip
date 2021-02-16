@@ -38,7 +38,7 @@ namespace Encoding {
  * on overlap, but only the core validity checks are done and it's possible to
  * get CHIP_NO_ERROR with erroneous output.
  *
- * On success, number of writes written to destination is always:
+ * On success, number of bytes written to destination is always:
  *   output_size = (src_size * 2) + (nul_terminate ? 1 : 0);
  *
  * @param src_bytes Pointer to non-null buffer to convert
