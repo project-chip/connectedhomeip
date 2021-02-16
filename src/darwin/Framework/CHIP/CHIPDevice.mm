@@ -58,7 +58,8 @@
     chip::SetupPayload setupPayload;
 
     [self.lock lock];
-    err = self.cppDevice->OpenPairingWindow(duration, false, false, setupPayload);
+    err = self.cppDevice->OpenPairingWindow(
+        duration, chip::Controller::Device::PairingWindowOption::kOriginalSetupCode, setupPayload);
     [self.lock unlock];
 
     if (err != CHIP_NO_ERROR) {
@@ -95,7 +96,8 @@
     setupPayload.setUpPINCode = (uint32_t) setupPIN;
 
     [self.lock lock];
-    err = self.cppDevice->OpenPairingWindow(duration, true, true, setupPayload);
+    err = self.cppDevice->OpenPairingWindow(
+        duration, chip::Controller::Device::PairingWindowOption::kTokenWithProvidedPIN, setupPayload);
     [self.lock unlock];
 
     if (err != CHIP_NO_ERROR) {

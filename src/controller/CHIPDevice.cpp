@@ -248,7 +248,7 @@ void Device::OnMessageReceived(const PacketHeader & header, const PayloadHeader 
     }
 }
 
-CHIP_ERROR Device::OpenPairingWindow(uint32_t timeout, bool useToken, bool randomSetupPIN, SetupPayload & setupPayload)
+CHIP_ERROR Device::OpenPairingWindow(uint32_t timeout, PairingWindowOption option, SetupPayload & setupPayload)
 {
     // TODO: This code is temporary, and must be updated to use the Cluster API.
     // Issue: https://github.com/project-chip/connectedhomeip/issues/4725
@@ -262,11 +262,12 @@ CHIP_ERROR Device::OpenPairingWindow(uint32_t timeout, bool useToken, bool rando
 
     ReturnErrorOnFailure(writer.Put(TLV::ProfileTag(writer.ImplicitProfileId, 1), timeout));
 
-    if (useToken)
+    if (option != PairingWindowOption::kOriginalSetupCode)
     {
         ReturnErrorOnFailure(writer.Put(TLV::ProfileTag(writer.ImplicitProfileId, 2), setupPayload.discriminator));
 
         PASEVerifier verifier;
+        bool randomSetupPIN = (option == PairingWindowOption::kTokenWithRandomPIN);
         ReturnErrorOnFailure(PASESession::GeneratePASEVerifier(verifier, randomSetupPIN, setupPayload.setUpPINCode));
         ReturnErrorOnFailure(writer.PutBytes(TLV::ProfileTag(writer.ImplicitProfileId, 3),
                                              reinterpret_cast<const uint8_t *>(verifier), sizeof(verifier)));

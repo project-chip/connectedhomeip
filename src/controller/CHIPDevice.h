@@ -71,6 +71,13 @@ public:
         }
     }
 
+    enum class PairingWindowOption
+    {
+        kOriginalSetupCode,
+        kTokenWithRandomPIN,
+        kTokenWithProvidedPIN,
+    };
+
     /**
      * @brief
      *   Set the delegate object which will be called when a message is received.
@@ -241,16 +248,15 @@ public:
      *   The device will exit the pairing mode after a successful pairing, or after the given `timeout` time.
      *
      * @param[in] timeout         The pairing mode should terminate after this much time.
-     * @param[in] useToken        Generate an onboarding token and send it to the device. The device must
-     *                            use the provided onboarding token instead of the original pairing setup PIN
-     *                            and discriminator.
-     * @param[in] randomSetupPIN  If true, generate a random setup PIN while opening the pairing window
-     *                            else, use the setup PIN from the setupPayload.
+     * @param[in] option          The pairing window can be opened using the original setup code, or an
+     *                            onboarding token can be generated using a random setup PIN code (or with
+     *                            the PIN code provied in the setupPayload). This argument selects one of these
+     *                            methods.
      * @param[out] setupPayload   The setup payload corresponding to the generated onboarding token.
      *
      * @return CHIP_ERROR               CHIP_NO_ERROR on success, or corresponding error
      */
-    CHIP_ERROR OpenPairingWindow(uint32_t timeout, bool useToken, bool randomSetupPIN, SetupPayload & setupPayload);
+    CHIP_ERROR OpenPairingWindow(uint32_t timeout, PairingWindowOption option, SetupPayload & setupPayload);
 
     /**
      * @brief
