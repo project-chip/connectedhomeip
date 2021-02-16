@@ -54,9 +54,8 @@ namespace Encoding {
  * @return CHIP_NO_ERROR on success
  */
 
-CHIP_ERROR BytesToHex(const uint8_t * src_bytes, size_t src_size,
-                      char * dest_hex, size_t dest_size_max,
-                      bool uppercase, bool nul_terminate);
+CHIP_ERROR BytesToHex(const uint8_t * src_bytes, size_t src_size, char * dest_hex, size_t dest_size_max, bool uppercase,
+                      bool nul_terminate);
 
 } // namespace Encoding
 } // namespace chip

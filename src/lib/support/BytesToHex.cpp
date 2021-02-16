@@ -38,9 +38,8 @@ char NibbleToHex(uint8_t nibble, bool uppercase)
 
 } // namespace
 
-CHIP_ERROR BytesToHex(const uint8_t * src_bytes, size_t src_size,
-                      char * dest_hex, size_t dest_size_max,
-                      bool uppercase, bool nul_terminate)
+CHIP_ERROR BytesToHex(const uint8_t * src_bytes, size_t src_size, char * dest_hex, size_t dest_size_max, bool uppercase,
+                      bool nul_terminate)
 {
     if ((src_bytes == nullptr) || (dest_hex == nullptr))
     {
@@ -53,7 +52,7 @@ CHIP_ERROR BytesToHex(const uint8_t * src_bytes, size_t src_size,
         return CHIP_ERROR_BUFFER_TOO_SMALL;
     }
 
-    char *cursor = dest_hex;
+    char * cursor = dest_hex;
     for (size_t byte_idx = 0; byte_idx < src_size; ++byte_idx)
     {
         *cursor++ = NibbleToHex((src_bytes[byte_idx] >> 4) & 0xFu, uppercase);
