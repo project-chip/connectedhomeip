@@ -311,29 +311,49 @@ private:
 {{/if}}
 {{/all_user_clusters}}
 
+@interface CHIPCluster ()
+@property (readonly, nonatomic) dispatch_queue_t callbackQueue;
+- (Controller::ClusterBase *)getCluster;
+@end
+
+@implementation CHIPCluster
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(EndpointId)endpoint queue:(dispatch_queue_t)queue
+{
+    if (self = [super init]) {
+        Controller::ClusterBase * cppCluster = [self getCluster];
+        if (cppCluster == nullptr)
+        {
+            return nil;
+        }
+    
+        CHIP_ERROR err = cppCluster->Associate([device internalDevice], endpoint);
+        if (err != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        _callbackQueue = queue;
+    }
+    return self;
+}
+
+- (Controller::ClusterBase *)getCluster
+{
+    return nullptr;
+}
+@end
+
+
 {{#chip_clusters}}
 
 @interface CHIP{{asCamelCased name false}} ()
-
 @property (readonly) Controller::{{asCamelCased name false}}Cluster cppCluster;
-@property (readonly, nonatomic) dispatch_queue_t callbackQueue;
 @end
 
 @implementation CHIP{{asCamelCased name false}}
 
-- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(EndpointId)endpoint queue:(dispatch_queue_t)queue
+- (Controller::ClusterBase *)getCluster
 {
-    CHIP_ERROR err = _cppCluster.Associate([device internalDevice], endpoint);
-
-    if (err != CHIP_NO_ERROR) {
-        return nil;
-    }
-
-    if (self = [super init]) {
-        _callbackQueue = queue;
-    }
-
-    return self;
+    return &_cppCluster;
 }
 
 {{#chip_server_cluster_commands}}
@@ -344,15 +364,15 @@ private:
 {{/if}}
 {
 {{#if (hasSpecificResponse name)}}
-    CHIP{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}ResponseCallbackBridge * onSuccess = new CHIP{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}ResponseCallbackBridge(completionHandler, _callbackQueue);
+    CHIP{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}ResponseCallbackBridge * onSuccess = new CHIP{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}ResponseCallbackBridge(completionHandler, [self callbackQueue]);
 {{else}}
-    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
 {{/if}}
     if (!onSuccess) {
         return NO;
     }
 
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onFailure) {
         delete onSuccess;
         return NO;
@@ -371,12 +391,12 @@ private:
 {{#chip_server_cluster_attributes}}
 - (BOOL)readAttribute{{asCamelCased name false}}:(ResponseHandler)completionHandler
 {
-    CHIP{{asCallbackAttributeType atomicTypeId}}AttributeCallbackBridge * onSuccess = new CHIP{{asCallbackAttributeType atomicTypeId}}AttributeCallbackBridge(completionHandler, _callbackQueue);
+    CHIP{{asCallbackAttributeType atomicTypeId}}AttributeCallbackBridge * onSuccess = new CHIP{{asCallbackAttributeType atomicTypeId}}AttributeCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
         return NO;
     }
 
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onFailure) {
         delete onSuccess;
         return NO;
@@ -394,12 +414,12 @@ private:
 {{#if (isWritableAttribute)}}
 - (BOOL)writeAttribute{{asCamelCased name false}}:({{asUnderlyingZclType type}})value completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
         return NO;
     }
 
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onFailure) {
         delete onSuccess;
         return NO;
@@ -418,12 +438,12 @@ private:
 {{#if (isReportableAttribute)}}
 - (BOOL) configureAttribute{{asCamelCased name false}}:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval{{#unless (isDiscreteType)}} change:({{chipType}})change{{/unless}} completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
         return NO;
     }
 
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onFailure) {
         delete onSuccess;
         return NO;
@@ -441,7 +461,7 @@ private:
 
 - (BOOL) reportAttribute{{asCamelCased name false}}:(ResponseHandler)reportHandler
 {
-    CHIP{{asCallbackAttributeType atomicTypeId}}AttributeCallbackBridge * onReport = new CHIP{{asCallbackAttributeType atomicTypeId}}AttributeCallbackBridge(reportHandler, _callbackQueue, true);
+    CHIP{{asCallbackAttributeType atomicTypeId}}AttributeCallbackBridge * onReport = new CHIP{{asCallbackAttributeType atomicTypeId}}AttributeCallbackBridge(reportHandler, [self callbackQueue], true);
     if (!onReport) {
         return NO;
     }
