@@ -113,8 +113,8 @@ Error SetClock_RealTime(uint64_t newCurTime)
         uint8_t month, dayOfMonth, hour, minute, second;
         SecondsSinceEpochToCalendarTime(tv.tv_sec, year, month, dayOfMonth, hour, minute, second);
         ChipLogProgress(DeviceLayer,
-                        "Real time clock set to %ld (%04" PRIu16 "/%02" PRIu8 "/%02" PRIu8 " %02" PRIu8 ":%02" PRIu8 ":%02" PRIu8
-                        " UTC)",
+                        "Real time clock set to %" PRId64 " (%04" PRIu16 "/%02" PRIu8 "/%02" PRIu8 " %02" PRIu8 ":%02" PRIu8
+                        ":%02" PRIu8 " UTC)",
                         tv.tv_sec, year, month, dayOfMonth, hour, minute, second);
     }
 #endif // CHIP_PROGRESS_LOGGING
