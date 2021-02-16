@@ -727,8 +727,7 @@ public:
      *  Otherwise, it is guaranteed that the BufferWriter length is \a aAvailableSize. (The underlying packet
      *  buffer may be larger.)
      *
-     *  @param[in]  aAvailableSize  Length bound of the BufferWriter.
-     *  @param[in]  aReservedSize   Reserved packet buffer space for protocol headers; see \c PacketBufferHandle::New().
+     *  @param[in]  aPacket  A handle to PacketBuffer, to be used as backing store for the BufferWriter.
      */
     PacketBufferWriterBase(System::PacketBufferHandle && aPacket) : Writer(aPacket->Start(), aPacket->AvailableDataLength())
     {
@@ -761,7 +760,7 @@ public:
      *
      * This signature matches `PacketBufferTLVWriter::Finalize()`.
      *
-     * @param[out] outBuffer                    The backing packet buffer.
+     * @param[out] outPacket                    The backing packet buffer.
      *
      * @retval #CHIP_NO_ERROR                   If the encoding was finalized successfully.
      * @retval #CHIP_ERROR_NO_MEMORY            If the backing PacketBuffer is null.
