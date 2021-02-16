@@ -32,7 +32,7 @@ char NibbleToHex(uint8_t nibble, bool uppercase)
     }
     else
     {
-        return x + '0';
+        return static_cast<char>(x + '0');
     }
 }
 
