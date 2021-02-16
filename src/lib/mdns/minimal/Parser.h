@@ -64,7 +64,8 @@ private:
     bool mAnswerViaUnicast = false;
     SerializedQNameIterator mNameIterator;
 
-    /// Ignore name matching when replying to a query.
+    /// Flag as a boot-time internal query. This allows query replies
+    /// to be built accordingly.
     bool mIsBootAdvertising = false;
 };
 
