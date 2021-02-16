@@ -69,7 +69,7 @@ static uint16_t doEncodeApsFrame(BufferWriter & buf, ClusterId clusterId, Endpoi
 
 uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * apsFrame)
 {
-    BufferWriter buf = BufferWriter(buffer, buf_length);
+    BufferWriter buf(buffer, buf_length);
     return doEncodeApsFrame(buf, apsFrame->clusterId, apsFrame->sourceEndpoint, apsFrame->destinationEndpoint, apsFrame->options,
                             apsFrame->groupId, apsFrame->sequence, apsFrame->radius, !buffer);
 }

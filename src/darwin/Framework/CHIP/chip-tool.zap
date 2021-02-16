@@ -1,6 +1,6 @@
 {
-  "writeTime": "Wed Feb 03 2021 16:25:50 GMT+0100 (Central European Standard Time)",
-  "featureLevel": 6,
+  "writeTime": "Mon Feb 15 2021 16:35:24 GMT+0100 (Central European Standard Time)",
+  "featureLevel": 11,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -19,13 +19,13 @@
   "package": [
     {
       "pathRelativity": "relativeToZap",
-      "path": "../../../src/app/zap-templates/zcl/zcl.json",
+      "path": "../../../../app/zap-templates/zcl/zcl.json",
       "version": "ZCL Test Data",
       "type": "zcl-properties"
     },
     {
       "pathRelativity": "relativeToZap",
-      "path": "../../../src/app/zap-templates/app-templates.json",
+      "path": "../../../../app/zap-templates/app-templates.json",
       "version": "chip-v1",
       "type": "gen-templates-json"
     }
@@ -56,9 +56,9 @@
             {
               "name": "MfgSpecificPing",
               "code": 0,
-              "mfgCode": "0x1002",
+              "mfgCode": "4098",
               "source": "client",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 1
             }
           ],
@@ -186,6 +186,16 @@
           "define": "IDENTIFY_CLUSTER",
           "side": "server",
           "enabled": 0,
+          "commands": [
+            {
+              "name": "IdentifyQueryResponse",
+              "code": 0,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 1,
+              "outgoing": 1
+            }
+          ],
           "attributes": [
             {
               "name": "cluster revision",
@@ -216,16 +226,6 @@
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
-            }
-          ],
-          "commands": [
-            {
-              "name": "IdentifyQueryResponse",
-              "code": 0,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 1
             }
           ]
         },
@@ -3078,7 +3078,6 @@
     {
       "endpointTypeName": "Anonymous Endpoint Type",
       "endpointTypeIndex": 0,
-      "endpointTypeRef": 1,
       "profileId": "0x0103",
       "endpointId": 1,
       "networkId": 0
