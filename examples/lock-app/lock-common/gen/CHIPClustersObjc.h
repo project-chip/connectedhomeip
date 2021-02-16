@@ -22,28 +22,42 @@
 
 #import <Foundation/Foundation.h>
 
-typedef void (^ResponseHandler)(NSError * _Nullable error, NSDictionary * _Nullable values);
-
 @class CHIPDevice;
+
+typedef void (^ResponseHandler)(NSError * _Nullable error, NSDictionary * _Nullable values);
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CHIPOnOff : NSObject
+/**
+ * CHIPCluster
+ *    This is the base class for clusters.
+ */
+@interface CHIPCluster : NSObject
 
-- (nullable instancetype)initWithDevice:(CHIPDevice *)device endpoint:(uint8_t)endpoint queue:(dispatch_queue_t)queue;
-- (BOOL)off:(ResponseHandler)completionHandler;
-- (BOOL)on:(ResponseHandler)completionHandler;
-- (BOOL)toggle:(ResponseHandler)completionHandler;
-
-- (BOOL)readAttributeOnOff:(ResponseHandler)completionHandler;
-- (BOOL)configureAttributeOnOff:(uint16_t)minInterval
-                    maxInterval:(uint16_t)maxInterval
-              completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)reportAttributeOnOff:(ResponseHandler)reportHandler;
-- (BOOL)readAttributeClusterRevision:(ResponseHandler)completionHandler;
-
+- (nullable instancetype)initWithDevice:(CHIPDevice *)device
+                               endpoint:(uint8_t)endpoint
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
+
+@end
+
+/**
+ * Cluster On/off
+ *
+ */
+@interface CHIPOnOff : CHIPCluster
+
+- (void)off:(ResponseHandler)completionHandler;
+- (void)on:(ResponseHandler)completionHandler;
+- (void)toggle:(ResponseHandler)completionHandler;
+
+- (void)readAttributeOnOff:(ResponseHandler)completionHandler;
+- (void)configureAttributeOnOff:(uint16_t)minInterval
+                    maxInterval:(uint16_t)maxInterval
+              completionHandler:(ResponseHandler)completionHandler;
+- (void)reportAttributeOnOff:(ResponseHandler)reportHandler;
+- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
 
 @end
 

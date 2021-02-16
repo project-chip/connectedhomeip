@@ -22,75 +22,85 @@
 
 #import <Foundation/Foundation.h>
 
-typedef void (^ResponseHandler)(NSError * _Nullable error, NSDictionary * _Nullable values);
-
 @class CHIPDevice;
+
+typedef void (^ResponseHandler)(NSError * _Nullable error, NSDictionary * _Nullable values);
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CHIPLevelControl : NSObject
+/**
+ * CHIPCluster
+ *    This is the base class for clusters.
+ */
+@interface CHIPCluster : NSObject
 
-- (nullable instancetype)initWithDevice:(CHIPDevice *)device endpoint:(uint8_t)endpoint queue:(dispatch_queue_t)queue;
-- (BOOL)move:(uint8_t)moveMode
-                 rate:(uint8_t)rate
-           optionMask:(uint8_t)optionMask
-       optionOverride:(uint8_t)optionOverride
-    completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)moveToLevel:(uint8_t)level
-       transitionTime:(uint16_t)transitionTime
-           optionMask:(uint8_t)optionMask
-       optionOverride:(uint8_t)optionOverride
-    completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)moveToLevelWithOnOff:(uint8_t)level
-              transitionTime:(uint16_t)transitionTime
-           completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)moveWithOnOff:(uint8_t)moveMode rate:(uint8_t)rate completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)step:(uint8_t)stepMode
-             stepSize:(uint8_t)stepSize
-       transitionTime:(uint16_t)transitionTime
-           optionMask:(uint8_t)optionMask
-       optionOverride:(uint8_t)optionOverride
-    completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)stepWithOnOff:(uint8_t)stepMode
-             stepSize:(uint8_t)stepSize
-       transitionTime:(uint16_t)transitionTime
-    completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)stop:(uint8_t)optionMask optionOverride:(uint8_t)optionOverride completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)stopWithOnOff:(ResponseHandler)completionHandler;
-
-- (BOOL)readAttributeCurrentLevel:(ResponseHandler)completionHandler;
-- (BOOL)configureAttributeCurrentLevel:(uint16_t)minInterval
-                           maxInterval:(uint16_t)maxInterval
-                                change:(uint8_t)change
-                     completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)reportAttributeCurrentLevel:(ResponseHandler)reportHandler;
-- (BOOL)readAttributeClusterRevision:(ResponseHandler)completionHandler;
-
+- (nullable instancetype)initWithDevice:(CHIPDevice *)device
+                               endpoint:(uint8_t)endpoint
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
 
 @end
 
-NS_ASSUME_NONNULL_END
+/**
+ * Cluster Level Control
+ *
+ */
+@interface CHIPLevelControl : CHIPCluster
 
-NS_ASSUME_NONNULL_BEGIN
+- (void)move:(uint8_t)moveMode
+                 rate:(uint8_t)rate
+           optionMask:(uint8_t)optionMask
+       optionOverride:(uint8_t)optionOverride
+    completionHandler:(ResponseHandler)completionHandler;
+- (void)moveToLevel:(uint8_t)level
+       transitionTime:(uint16_t)transitionTime
+           optionMask:(uint8_t)optionMask
+       optionOverride:(uint8_t)optionOverride
+    completionHandler:(ResponseHandler)completionHandler;
+- (void)moveToLevelWithOnOff:(uint8_t)level
+              transitionTime:(uint16_t)transitionTime
+           completionHandler:(ResponseHandler)completionHandler;
+- (void)moveWithOnOff:(uint8_t)moveMode rate:(uint8_t)rate completionHandler:(ResponseHandler)completionHandler;
+- (void)step:(uint8_t)stepMode
+             stepSize:(uint8_t)stepSize
+       transitionTime:(uint16_t)transitionTime
+           optionMask:(uint8_t)optionMask
+       optionOverride:(uint8_t)optionOverride
+    completionHandler:(ResponseHandler)completionHandler;
+- (void)stepWithOnOff:(uint8_t)stepMode
+             stepSize:(uint8_t)stepSize
+       transitionTime:(uint16_t)transitionTime
+    completionHandler:(ResponseHandler)completionHandler;
+- (void)stop:(uint8_t)optionMask optionOverride:(uint8_t)optionOverride completionHandler:(ResponseHandler)completionHandler;
+- (void)stopWithOnOff:(ResponseHandler)completionHandler;
 
-@interface CHIPOnOff : NSObject
+- (void)readAttributeCurrentLevel:(ResponseHandler)completionHandler;
+- (void)configureAttributeCurrentLevel:(uint16_t)minInterval
+                           maxInterval:(uint16_t)maxInterval
+                                change:(uint8_t)change
+                     completionHandler:(ResponseHandler)completionHandler;
+- (void)reportAttributeCurrentLevel:(ResponseHandler)reportHandler;
+- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
 
-- (nullable instancetype)initWithDevice:(CHIPDevice *)device endpoint:(uint8_t)endpoint queue:(dispatch_queue_t)queue;
-- (BOOL)off:(ResponseHandler)completionHandler;
-- (BOOL)on:(ResponseHandler)completionHandler;
-- (BOOL)toggle:(ResponseHandler)completionHandler;
+@end
 
-- (BOOL)readAttributeOnOff:(ResponseHandler)completionHandler;
-- (BOOL)configureAttributeOnOff:(uint16_t)minInterval
+/**
+ * Cluster On/off
+ *
+ */
+@interface CHIPOnOff : CHIPCluster
+
+- (void)off:(ResponseHandler)completionHandler;
+- (void)on:(ResponseHandler)completionHandler;
+- (void)toggle:(ResponseHandler)completionHandler;
+
+- (void)readAttributeOnOff:(ResponseHandler)completionHandler;
+- (void)configureAttributeOnOff:(uint16_t)minInterval
                     maxInterval:(uint16_t)maxInterval
               completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)reportAttributeOnOff:(ResponseHandler)reportHandler;
-- (BOOL)readAttributeClusterRevision:(ResponseHandler)completionHandler;
-
-- (instancetype)init NS_UNAVAILABLE;
-+ (instancetype)new NS_UNAVAILABLE;
+- (void)reportAttributeOnOff:(ResponseHandler)reportHandler;
+- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
 
 @end
 

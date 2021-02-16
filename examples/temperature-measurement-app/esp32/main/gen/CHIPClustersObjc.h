@@ -22,46 +22,55 @@
 
 #import <Foundation/Foundation.h>
 
-typedef void (^ResponseHandler)(NSError * _Nullable error, NSDictionary * _Nullable values);
-
 @class CHIPDevice;
+
+typedef void (^ResponseHandler)(NSError * _Nullable error, NSDictionary * _Nullable values);
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CHIPBasic : NSObject
+/**
+ * CHIPCluster
+ *    This is the base class for clusters.
+ */
+@interface CHIPCluster : NSObject
 
-- (nullable instancetype)initWithDevice:(CHIPDevice *)device endpoint:(uint8_t)endpoint queue:(dispatch_queue_t)queue;
-- (BOOL)resetToFactoryDefaults:(ResponseHandler)completionHandler;
-
-- (BOOL)readAttributeZclVersion:(ResponseHandler)completionHandler;
-- (BOOL)readAttributePowerSource:(ResponseHandler)completionHandler;
-- (BOOL)readAttributeClusterRevision:(ResponseHandler)completionHandler;
-
+- (nullable instancetype)initWithDevice:(CHIPDevice *)device
+                               endpoint:(uint8_t)endpoint
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
 
 @end
 
-NS_ASSUME_NONNULL_END
+/**
+ * Cluster Basic
+ *
+ */
+@interface CHIPBasic : CHIPCluster
 
-NS_ASSUME_NONNULL_BEGIN
+- (void)resetToFactoryDefaults:(ResponseHandler)completionHandler;
 
-@interface CHIPTemperatureMeasurement : NSObject
+- (void)readAttributeZclVersion:(ResponseHandler)completionHandler;
+- (void)readAttributePowerSource:(ResponseHandler)completionHandler;
+- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
 
-- (nullable instancetype)initWithDevice:(CHIPDevice *)device endpoint:(uint8_t)endpoint queue:(dispatch_queue_t)queue;
+@end
 
-- (BOOL)readAttributeMeasuredValue:(ResponseHandler)completionHandler;
-- (BOOL)configureAttributeMeasuredValue:(uint16_t)minInterval
+/**
+ * Cluster Temperature Measurement
+ *
+ */
+@interface CHIPTemperatureMeasurement : CHIPCluster
+
+- (void)readAttributeMeasuredValue:(ResponseHandler)completionHandler;
+- (void)configureAttributeMeasuredValue:(uint16_t)minInterval
                             maxInterval:(uint16_t)maxInterval
                                  change:(int16_t)change
                       completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)reportAttributeMeasuredValue:(ResponseHandler)reportHandler;
-- (BOOL)readAttributeMinMeasuredValue:(ResponseHandler)completionHandler;
-- (BOOL)readAttributeMaxMeasuredValue:(ResponseHandler)completionHandler;
-- (BOOL)readAttributeClusterRevision:(ResponseHandler)completionHandler;
-
-- (instancetype)init NS_UNAVAILABLE;
-+ (instancetype)new NS_UNAVAILABLE;
+- (void)reportAttributeMeasuredValue:(ResponseHandler)reportHandler;
+- (void)readAttributeMinMeasuredValue:(ResponseHandler)completionHandler;
+- (void)readAttributeMaxMeasuredValue:(ResponseHandler)completionHandler;
+- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
 
 @end
 
