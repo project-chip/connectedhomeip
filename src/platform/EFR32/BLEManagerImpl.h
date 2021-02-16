@@ -25,9 +25,9 @@
 #pragma once
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
+#include "gatt_db.h"
 #include "sl_bgapi.h"
 #include "sl_bt_api.h"
-#include "gatt_db.h"
 
 namespace chip {
 namespace DeviceLayer {
