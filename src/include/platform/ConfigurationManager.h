@@ -492,10 +492,11 @@ inline bool ConfigurationManager::IsFullyProvisioned()
 
 inline void ConfigurationManager::InitiateFactoryReset()
 {
-    static_cast<ImplClass *>(this)->_InitiateFactoryReset();
 #if CHIP_ENABLE_ROTATING_DEVICE_ID
     static_cast<ImplClass *>(this)->_IncrementLifetimeCounter();
 #endif
+
+    static_cast<ImplClass *>(this)->_InitiateFactoryReset();
 }
 
 #if !defined(NDEBUG)
