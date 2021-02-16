@@ -313,7 +313,7 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
     BLEMGR_LOG("BLEMGR: BLE SendIndication ");
 
     // Allocate buffers to send to BLE app task
-    uint8_t dataLen         = static_cast<uint8_t>(data->DataLength());
+    uint8_t dataLen = static_cast<uint8_t>(data->DataLength());
     CHIPoBLEIndEvt_t * pMsg;
     uint8_t * pBuf;
 
@@ -628,9 +628,9 @@ CHIP_ERROR BLEManagerImpl::CreateEventHandler(void)
     xReturned = xTaskCreate(EventHandler,            /* Function that implements the task. */
                             "ble_hndlr",             /* Text name for the task. */
                             4096 / sizeof(uint32_t), /* Stack size in words, not bytes. */
-                            this,                  /* Parameter passed into the task. */
-                            ICALL_TASK_PRIORITIES, /* Keep priority the same as ICALL until init is complete */
-                            NULL);                 /* Used to pass out the created task's handle. */
+                            this,                    /* Parameter passed into the task. */
+                            ICALL_TASK_PRIORITIES,   /* Keep priority the same as ICALL until init is complete */
+                            NULL);                   /* Used to pass out the created task's handle. */
 
     if (xReturned == errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY)
     {
