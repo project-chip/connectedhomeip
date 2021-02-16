@@ -19,6 +19,7 @@
 
 #import "CHIPUIViewUtils.h"
 #import "DefaultsUtils.h"
+#import "DeviceSelector.h"
 
 static NSString * const DEFAULT_TIMEOUT = @"900";
 static NSString * const DEFAULT_DISCRIMINATOR = @"3840";
@@ -33,10 +34,7 @@ static NSString * const DEFAULT_DISCRIMINATOR = @"3840";
 @property (nonatomic, strong) UILabel * resultLabel;
 @property (nonatomic, strong) UIStackView * stackView;
 
-@property (readwrite) CHIPDevice * chipDevice;
-
-@property (readonly) CHIPToolPersistentStorageDelegate * persistentStorage;
-
+@property (nonatomic, strong) DeviceSelector * deviceSelector;
 @end
 
 @implementation MultiAdminViewController
@@ -51,14 +49,13 @@ static NSString * const DEFAULT_DISCRIMINATOR = @"3840";
     // listen for taps to dismiss the keyboard
     UITapGestureRecognizer * tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dismissKeyboard)];
     [self.view addGestureRecognizer:tap];
-
-    self.chipDevice = GetPairedDevice();
 }
 
 - (void)dismissKeyboard
 {
     [self.discriminatorField resignFirstResponder];
     [self.timeoutField resignFirstResponder];
+    [self.deviceSelector resignFirstResponder];
 }
 
 // MARK: UI Setup
@@ -82,6 +79,18 @@ static NSString * const DEFAULT_DISCRIMINATOR = @"3840";
     [stackView.topAnchor constraintEqualToAnchor:titleLabel.bottomAnchor constant:40].active = YES;
     [stackView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:30].active = YES;
     [stackView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-30].active = YES;
+
+    // Device List and selector
+    UILabel * deviceIDLabel = [UILabel new];
+    deviceIDLabel.text = @"Device ID:";
+    _deviceSelector = [DeviceSelector new];
+
+    UIView * deviceIDView = [CHIPUIViewUtils viewWithLabel:deviceIDLabel textField:_deviceSelector];
+    deviceIDLabel.font = [UIFont systemFontOfSize:17 weight:UIFontWeightSemibold];
+
+    [stackView addArrangedSubview:deviceIDView];
+    deviceIDView.translatesAutoresizingMaskIntoConstraints = false;
+    [deviceIDView.trailingAnchor constraintEqualToAnchor:stackView.trailingAnchor].active = true;
 
     // Open Pairing Window
     UILabel * useOnboardingToken = [UILabel new];
@@ -170,7 +179,8 @@ static NSString * const DEFAULT_DISCRIMINATOR = @"3840";
 - (IBAction)openPairingWindow:(id)sender
 {
     // send message
-    if ([self.chipDevice isActive]) {
+    CHIPDevice * chipDevice = [self.deviceSelector selectedDevice];
+    if (chipDevice != nil && [chipDevice isActive]) {
         NSString * timeoutStr = [self.timeoutField text];
         if (timeoutStr.length == 0) {
             timeoutStr = [self.timeoutField placeholder];
@@ -186,7 +196,7 @@ static NSString * const DEFAULT_DISCRIMINATOR = @"3840";
             }
             NSInteger discriminator = [discriminatorStr intValue];
 
-            output = [self.chipDevice openPairingWindowWithPIN:timeout discriminator:discriminator error:&error];
+            output = [chipDevice openPairingWindowWithPIN:timeout discriminator:discriminator error:&error];
 
             if (output != nil) {
                 NSString * result = [@"Use Manual Code: " stringByAppendingString:output];
@@ -195,7 +205,7 @@ static NSString * const DEFAULT_DISCRIMINATOR = @"3840";
                 [self updateResult:@"Failed in opening the pairing window"];
             }
         } else {
-            BOOL didSend = [self.chipDevice openPairingWindow:timeout error:&error];
+            BOOL didSend = [chipDevice openPairingWindow:timeout error:&error];
             if (didSend) {
                 [self updateResult:@"Scan the QR code on the device"];
             } else {
@@ -205,23 +215,6 @@ static NSString * const DEFAULT_DISCRIMINATOR = @"3840";
         }
     } else {
         [self updateResult:@"Controller not connected"];
-    }
-}
-
-// MARK: CHIPDeviceControllerDelegate
-- (void)deviceControllerOnConnected
-{
-    NSLog(@"Status: Device connected");
-}
-
-- (void)deviceControllerOnError:(nonnull NSError *)error
-{
-    NSLog(@"Status: Device Controller error %@", [error description]);
-    if (error) {
-        NSString * stringError = [@"Error: " stringByAppendingString:error.description];
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 5.0), dispatch_get_main_queue(), ^{
-            [self updateResult:stringError];
-        });
     }
 }
 

@@ -264,7 +264,7 @@ CHIP_ERROR NetworkProvisioning::SendThreadCredentials(const DeviceLayer::Interna
         4;                  // threadData.ThreadChannel, threadData.FieldPresent.ThreadExtendedPANId,
                             // threadData.FieldPresent.ThreadMeshPrefix, threadData.FieldPresent.ThreadPSKc
     /* clang-format on */
-    Encoding::LittleEndian::PacketBufferWriter bbuf(System::PacketBufferHandle::New(credentialSize));
+    Encoding::LittleEndian::PacketBufferWriter bbuf(MessagePacketBuffer::New(credentialSize));
 
     ChipLogProgress(NetworkProvisioning, "Sending Thread Credentials");
     VerifyOrExit(mDelegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
