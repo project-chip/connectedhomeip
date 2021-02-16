@@ -217,6 +217,10 @@ private:
     /// Usable as boot-time advertisement of available SRV records.
     void AdvertiseRecords();
 
+    /// Determine if advertisement on the specified interface/address is ok given the
+    /// interfaces on which the mDNS server is listening
+    bool ShouldAdvertiseOn(const chip::Inet::InterfaceId id, const chip::Inet::IPAddress & addr);
+
     QueryResponderSettings AddAllocatedResponder(Responder * responder)
     {
         if (responder == nullptr)
@@ -608,6 +612,33 @@ bool CanAdvertiseOn(chip::Inet::InterfaceAddressIterator & current)
     return true;
 }
 
+bool AdvertiserMinMdns::ShouldAdvertiseOn(const chip::Inet::InterfaceId id, const chip::Inet::IPAddress & addr)
+{
+    for (unsigned i = 0; i < mServer.GetEndpointCount(); i++)
+    {
+        const ServerBase::EndpointInfo & info = mServer.GetEndpoints()[i];
+
+        if (info.udp == nullptr)
+        {
+            continue;
+        }
+
+        if (info.interfaceId != id)
+        {
+            continue;
+        }
+
+        if (info.addressType != addr.Type())
+        {
+            continue;
+        }
+
+        return true;
+    }
+
+    return false;
+}
+
 void AdvertiserMinMdns::AdvertiseRecords()
 {
     chip::Inet::InterfaceAddressIterator interfaceAddress;
@@ -620,6 +651,11 @@ void AdvertiserMinMdns::AdvertiseRecords()
     for (; interfaceAddress.HasCurrent(); interfaceAddress.Next())
     {
         if (!CanAdvertiseOn(interfaceAddress))
+        {
+            continue;
+        }
+
+        if (!ShouldAdvertiseOn(interfaceAddress.GetInterfaceId(), interfaceAddress.GetAddress()))
         {
             continue;
         }
@@ -654,6 +690,9 @@ void AdvertiserMinMdns::AdvertiseRecords()
             ChipLogError(Discovery, "Failed to advertise records: %s", ErrorStr(err));
         }
     }
+
+    // Once all automatic broadcasts are done, allow immediate replies once.
+    mQueryResponder.ClearBroadcastTrottle();
 }
 
 AdvertiserMinMdns gAdvertiser;
