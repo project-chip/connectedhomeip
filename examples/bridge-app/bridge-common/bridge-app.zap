@@ -1,5 +1,5 @@
 {
-  "writeTime": "Fri Feb 12 2021 07:41:35 GMT-0800 (Pacific Standard Time)",
+  "writeTime": "Tue Feb 16 2021 18:07:17 GMT+0100 (Central European Standard Time)",
   "featureLevel": 11,
   "creator": "zap",
   "keyValuePairs": [
@@ -451,56 +451,6 @@
           "define": "SCENES_CLUSTER",
           "side": "server",
           "enabled": 0,
-          "commands": [
-            {
-              "name": "AddSceneResponse",
-              "code": 0,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 0,
-              "outgoing": 1
-            },
-            {
-              "name": "ViewSceneResponse",
-              "code": 1,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 0,
-              "outgoing": 1
-            },
-            {
-              "name": "RemoveSceneResponse",
-              "code": 2,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 0,
-              "outgoing": 1
-            },
-            {
-              "name": "RemoveAllScenesResponse",
-              "code": 3,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 0,
-              "outgoing": 1
-            },
-            {
-              "name": "StoreSceneResponse",
-              "code": 4,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 0,
-              "outgoing": 1
-            },
-            {
-              "name": "GetSceneMembershipResponse",
-              "code": 6,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 0,
-              "outgoing": 1
-            }
-          ],
           "attributes": [
             {
               "name": "cluster revision",
@@ -591,6 +541,56 @@
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
+            }
+          ],
+          "commands": [
+            {
+              "name": "AddSceneResponse",
+              "code": 0,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 0,
+              "outgoing": 1
+            },
+            {
+              "name": "ViewSceneResponse",
+              "code": 1,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 0,
+              "outgoing": 1
+            },
+            {
+              "name": "RemoveSceneResponse",
+              "code": 2,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 0,
+              "outgoing": 1
+            },
+            {
+              "name": "RemoveAllScenesResponse",
+              "code": 3,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 0,
+              "outgoing": 1
+            },
+            {
+              "name": "StoreSceneResponse",
+              "code": 4,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 0,
+              "outgoing": 1
+            },
+            {
+              "name": "GetSceneMembershipResponse",
+              "code": 6,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 0,
+              "outgoing": 1
             }
           ]
         },
@@ -1617,7 +1617,7 @@
               "code": 64,
               "mfgCode": null,
               "source": "client",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 0
             },
             {
@@ -1625,7 +1625,7 @@
               "code": 65,
               "mfgCode": null,
               "source": "client",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 0
             },
             {
@@ -1633,7 +1633,7 @@
               "code": 66,
               "mfgCode": null,
               "source": "client",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 0
             }
           ],
