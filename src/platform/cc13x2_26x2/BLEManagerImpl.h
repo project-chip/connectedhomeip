@@ -247,10 +247,6 @@ private:
 
     void NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId) override;
 
-    // ===== Members for internal use by the following friends.
-    // const ChipBleUUID chipUUID_CHIPoBLEChar_RX = { { CHIPOBLEPROFILE_CHAR_UUID_BASE128(CHIPOBLEPROFILE_RX_CHAR_UUID) } };
-    // const ChipBleUUID chipUUID_CHIPoBLEChar_TX = { { CHIPOBLEPROFILE_CHAR_UUID_BASE128(CHIPOBLEPROFILE_TX_CHAR_UUID) } };
-
     const ChipBleUUID chipUUID_CHIPoBLEChar_RX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42,
                                                      0x9F, 0x9D, 0x11 } };
     const ChipBleUUID chipUUID_CHIPoBLEChar_TX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42,

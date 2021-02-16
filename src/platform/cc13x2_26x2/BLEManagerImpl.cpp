@@ -623,7 +623,6 @@ void BLEManagerImpl::CreateEventHandler(void)
     xReturned = xTaskCreate(EventHandler,            /* Function that implements the task. */
                             "ble_hndlr",             /* Text name for the task. */
                             4096 / sizeof(uint32_t), /* Stack size in words, not bytes. */
-                            // BLEMANAGER_EVENT_HANDLER_STACK_SIZE / sizeof(uint32_t),  /* Stack size in words, not bytes. */
                             this,                  /* Parameter passed into the task. */
                             ICALL_TASK_PRIORITIES, /* Keep priority the same as ICALL until init is complete */
                             NULL);                 /* Used to pass out the created task's handle. */
@@ -767,14 +766,6 @@ void BLEManagerImpl::ProcessEvtHdrMsg(QueuedEvt_t * pMsg)
                     ThreadStackMgr().OnCHIPoBLEAdvertisingStart();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
-                    // Stop advertising
-                    // GapAdv_disable(sInstance.advHandleLegacy);
-
-                    // Set a parameter
-                    // GapAdv_setParam(sInstance.advHandleLegacy, GAP_ADV_PARAM_PRIMARY_INTERVAL_MAX, 200);
-
-                    // GapAdv_setParam(sInstance.advHandleLegacy, GAP_ADV_PARAM_PRIMARY_INTERVAL_MIN, 200);
-
                     // Enable legacy advertising for set #1
                     status = (bStatus_t) GapAdv_enable(sInstance.advHandleLegacy, GAP_ADV_ENABLE_OPTIONS_USE_MAX, 0);
 
@@ -795,12 +786,6 @@ void BLEManagerImpl::ProcessEvtHdrMsg(QueuedEvt_t * pMsg)
                     ThreadStackMgr().OnCHIPoBLEAdvertisingStart();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
-                    // Stop advertising
-                    // GapAdv_disable(sInstance.advHandleLegacy);
-
-                    // Set a parameter
-                    // GapAdv_setParam(sInstance.advHandleLegacy, GAP_ADV_PARAM_PRIMARY_INTERVAL_MIN, BLEMANAGERIMPL_ADV_INT_FAST);
-
                     // Enable legacy advertising for set #1
                     status = (bStatus_t) GapAdv_enable(sInstance.advHandleLegacy, GAP_ADV_ENABLE_OPTIONS_USE_MAX, 0);
                     BLEMANAGER_ASSERT(status == SUCCESS);
@@ -818,10 +803,6 @@ void BLEManagerImpl::ProcessEvtHdrMsg(QueuedEvt_t * pMsg)
                 ClearFlag(sInstance.mFlags, kFlag_Advertising);
 
                 Util_stopClock(&sInstance.clkAdvTimeout);
-
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-// ThreadStackMgr().OnCHIPoBLEAdvertisingStop();
-#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
             }
         }
 
@@ -1192,8 +1173,6 @@ uint8_t BLEManagerImpl::ProcessGATTMsg(gattMsgEvent_t * pMsg)
     }
     else if (pMsg->method == ATT_HANDLE_VALUE_CFM)
     {
-        // index = GetBLEConnIndex(pMsg->connHandle);
-
         void * connHandle;
         ChipDeviceEvent event;
 
