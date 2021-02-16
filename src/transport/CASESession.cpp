@@ -31,11 +31,11 @@
 #include <core/CHIPEncoding.h>
 #include <core/CHIPSafeCasts.h>
 #include <protocols/Protocols.h>
+#include <support/BufferWriter.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/ReturnMacros.h>
 #include <support/SafeInt.h>
-#include <support/BufferWriter.h>
 #include <transport/SecureSessionMgr.h>
 
 namespace chip {
