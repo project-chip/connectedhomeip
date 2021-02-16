@@ -316,7 +316,7 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
     uint8_t dataLen         = static_cast<uint8_t>(data->DataLength());
     CHIPoBLEIndEvt_t * pMsg;
     uint8_t * pBuf;
-    
+
     pMsg = (CHIPoBLEIndEvt_t *) ICall_malloc(sizeof(CHIPoBLEIndEvt_t));
     if (NULL == pMsg)
     {
