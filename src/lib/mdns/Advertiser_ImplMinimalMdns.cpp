@@ -39,8 +39,6 @@ namespace {
 
 using namespace mdns::Minimal;
 
-
-
 const char * ToString(QClass qClass)
 {
     switch (qClass)
