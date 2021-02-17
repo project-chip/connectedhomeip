@@ -373,6 +373,60 @@ static void OnScenesClusterViewSceneResponse(void * context, uint16_t groupId, u
     command->SetCommandExitStatus(true);
 }
 
+static void OnDescriptorDeviceListAttributeResponse(void * context, uint16_t count, _DeviceType * entries)
+{
+    ChipLogProgress(chipTool, "OnDescriptorDeviceListAttributeResponse: %lu entries", count);
+
+    for (uint16_t i = 0; i < count; i++)
+    {
+        ChipLogProgress(chipTool, "_DeviceType[%lu]:", i);
+        ChipLogProgress(chipTool, "  deviceTypeId: %" PRIu32 "", entries[i].deviceTypeId);
+        ChipLogProgress(chipTool, "  revision: %" PRIu16 "", entries[i].revision);
+    }
+
+    ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
+    command->SetCommandExitStatus(true);
+}
+
+static void OnDescriptorServerListAttributeResponse(void * context, uint16_t count, chip::ClusterId * entries)
+{
+    ChipLogProgress(chipTool, "OnDescriptorServerListAttributeResponse: %lu entries", count);
+
+    for (uint16_t i = 0; i < count; i++)
+    {
+        ChipLogProgress(chipTool, "[%lu]: %p", i, entries[i]);
+    }
+
+    ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
+    command->SetCommandExitStatus(true);
+}
+
+static void OnDescriptorClientListAttributeResponse(void * context, uint16_t count, chip::ClusterId * entries)
+{
+    ChipLogProgress(chipTool, "OnDescriptorClientListAttributeResponse: %lu entries", count);
+
+    for (uint16_t i = 0; i < count; i++)
+    {
+        ChipLogProgress(chipTool, "[%lu]: %p", i, entries[i]);
+    }
+
+    ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
+    command->SetCommandExitStatus(true);
+}
+
+static void OnDescriptorPartsListAttributeResponse(void * context, uint16_t count, chip::EndpointId * entries)
+{
+    ChipLogProgress(chipTool, "OnDescriptorPartsListAttributeResponse: %lu entries", count);
+
+    for (uint16_t i = 0; i < count; i++)
+    {
+        ChipLogProgress(chipTool, "[%lu]: %p", i, entries[i]);
+    }
+
+    ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
+    command->SetCommandExitStatus(true);
+}
+
 /*----------------------------------------------------------------------------*\
 | Cluster Name                                                        |   ID   |
 |---------------------------------------------------------------------+--------|
@@ -381,6 +435,7 @@ static void OnScenesClusterViewSceneResponse(void * context, uint16_t groupId, u
 | Binding                                                             | 0xF000 |
 | ColorControl                                                        | 0x0300 |
 | ContentLaunch                                                       | 0xF002 |
+| Descriptor                                                          | 0xF003 |
 | DoorLock                                                            | 0x0101 |
 | Groups                                                              | 0x0004 |
 | Identify                                                            | 0x0003 |
@@ -396,6 +451,7 @@ constexpr chip::ClusterId kBasicClusterId                  = 0x0000;
 constexpr chip::ClusterId kBindingClusterId                = 0xF000;
 constexpr chip::ClusterId kColorControlClusterId           = 0x0300;
 constexpr chip::ClusterId kContentLaunchClusterId          = 0xF002;
+constexpr chip::ClusterId kDescriptorClusterId             = 0xF003;
 constexpr chip::ClusterId kDoorLockClusterId               = 0x0101;
 constexpr chip::ClusterId kGroupsClusterId                 = 0x0004;
 constexpr chip::ClusterId kIdentifyClusterId               = 0x0003;
@@ -3656,6 +3712,183 @@ private:
 };
 
 /*----------------------------------------------------------------------------*\
+| Cluster Descriptor                                                  | 0xF003 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * Device                                                            | 0x0000 |
+| * Server                                                            | 0x0001 |
+| * Client                                                            | 0x0002 |
+| * Parts                                                             | 0x0003 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Discover Attributes
+ */
+class DiscoverDescriptorAttributes : public ModelCommand
+{
+public:
+    DiscoverDescriptorAttributes() : ModelCommand("discover") { ModelCommand::AddArguments(); }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000) command (0x0C) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::DescriptorCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.DiscoverAttributes(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute Device
+ */
+class ReadDescriptorDevice : public ModelCommand
+{
+public:
+    ReadDescriptorDevice() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "device");
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0xF003) command (0x00) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::DescriptorCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeDevice(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<DescriptorDeviceListAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DescriptorDeviceListAttributeCallback>(OnDescriptorDeviceListAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute Server
+ */
+class ReadDescriptorServer : public ModelCommand
+{
+public:
+    ReadDescriptorServer() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "server");
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0xF003) command (0x00) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::DescriptorCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeServer(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<DescriptorServerListAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DescriptorServerListAttributeCallback>(OnDescriptorServerListAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute Client
+ */
+class ReadDescriptorClient : public ModelCommand
+{
+public:
+    ReadDescriptorClient() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "client");
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0xF003) command (0x00) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::DescriptorCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeClient(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<DescriptorClientListAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DescriptorClientListAttributeCallback>(OnDescriptorClientListAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute Parts
+ */
+class ReadDescriptorParts : public ModelCommand
+{
+public:
+    ReadDescriptorParts() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "parts");
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0xF003) command (0x00) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::DescriptorCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeParts(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<DescriptorPartsListAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DescriptorPartsListAttributeCallback>(OnDescriptorPartsListAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute ClusterRevision
+ */
+class ReadDescriptorClusterRevision : public ModelCommand
+{
+public:
+    ReadDescriptorClusterRevision() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "cluster-revision");
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0xF003) command (0x00) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::DescriptorCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*----------------------------------------------------------------------------*\
 | Cluster DoorLock                                                    | 0x0101 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
@@ -6746,6 +6979,18 @@ void registerClusterContentLaunch(Commands & commands)
 
     commands.Register(clusterName, clusterCommands);
 }
+void registerClusterDescriptor(Commands & commands)
+{
+    const char * clusterName = "Descriptor";
+
+    commands_list clusterCommands = {
+        make_unique<DiscoverDescriptorAttributes>(), make_unique<ReadDescriptorDevice>(),
+        make_unique<ReadDescriptorServer>(),         make_unique<ReadDescriptorClient>(),
+        make_unique<ReadDescriptorParts>(),          make_unique<ReadDescriptorClusterRevision>(),
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
 void registerClusterDoorLock(Commands & commands)
 {
     const char * clusterName = "DoorLock";
@@ -6901,6 +7146,7 @@ void registerClusters(Commands & commands)
     registerClusterBinding(commands);
     registerClusterColorControl(commands);
     registerClusterContentLaunch(commands);
+    registerClusterDescriptor(commands);
     registerClusterDoorLock(commands);
     registerClusterGroups(commands);
     registerClusterIdentify(commands);

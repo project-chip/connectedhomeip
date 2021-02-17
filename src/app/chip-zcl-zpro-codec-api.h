@@ -32,6 +32,7 @@
 | Binding                                                             | 0xF000 |
 | ColorControl                                                        | 0x0300 |
 | ContentLaunch                                                       | 0xF002 |
+| Descriptor                                                          | 0xF003 |
 | DoorLock                                                            | 0x0101 |
 | Groups                                                              | 0x0004 |
 | IasZone                                                             | 0x0500 |
@@ -942,6 +943,56 @@ chip::System::PacketBufferHandle encodeContentLaunchClusterDiscoverAttributes(ui
  */
 chip::System::PacketBufferHandle encodeContentLaunchClusterReadClusterRevisionAttribute(uint8_t seqNum,
                                                                                         chip::EndpointId destinationEndpoint);
+
+/*----------------------------------------------------------------------------*\
+| Cluster Descriptor                                                  | 0xF003 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * Device                                                            | 0x0000 |
+| * Server                                                            | 0x0001 |
+| * Client                                                            | 0x0002 |
+| * Parts                                                             | 0x0003 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/**
+ * @brief
+ *    Encode a Descriptor server discover command into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeDescriptorClusterDiscoverAttributes(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Descriptor server read command for the device attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeDescriptorClusterReadDeviceAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Descriptor server read command for the server attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeDescriptorClusterReadServerAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Descriptor server read command for the client attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeDescriptorClusterReadClientAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Descriptor server read command for the parts attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeDescriptorClusterReadPartsAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Descriptor server read command for the cluster revision attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeDescriptorClusterReadClusterRevisionAttribute(uint8_t seqNum,
+                                                                                     chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
 | Cluster DoorLock                                                    | 0x0101 |

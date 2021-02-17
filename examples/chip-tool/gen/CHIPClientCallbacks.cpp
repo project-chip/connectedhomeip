@@ -276,7 +276,6 @@ bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * messag
             case 0x42: // string / Character string
             case 0x43: // octstr16 / Long octet string
             case 0x44: // string16 / Long character string
-            case 0x48: // array / Array
             case 0x49: // struct / Structure
             case 0x50: // set / Set
             case 0x51: // bag / Bag
@@ -287,6 +286,85 @@ bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * messag
                     Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
                 cb->mCall(cb->mContext, EMBER_ZCL_STATUS_INVALID_VALUE);
                 return true;
+            }
+
+            case 0x48: // array / Array
+            {
+                CHECK_MESSAGE_LENGTH(2);
+                uint16_t count = chip::Encoding::LittleEndian::Read16(message);
+                ChipLogProgress(Zcl, "  count: %lu", count);
+
+                switch (clusterId)
+                {
+                case 0xF003:
+                    switch (attributeId)
+                    {
+                    case 0x0000: // _DeviceType
+                    {
+                        _DeviceType data[count];
+                        for (size_t i = 0; i < count; i++)
+                        {
+                            data[i].deviceTypeId = emberAfGetInt32u(message, 0, messageLen);
+                            message += 4;
+                            messageLen -= 4;
+                            data[i].revision = emberAfGetInt16u(message, 0, messageLen);
+                            message += 2;
+                            messageLen -= 2;
+                        }
+
+                        Callback::Callback<DescriptorDeviceListAttributeCallback> * cb =
+                            Callback::Callback<DescriptorDeviceListAttributeCallback>::FromCancelable(onSuccessCallback);
+                        cb->mCall(cb->mContext, count, data);
+                        break;
+                    }
+                    case 0x0001: //
+                    {
+                        chip::ClusterId data[count];
+                        for (size_t i = 0; i < count; i++)
+                        {
+                            data[i] = emberAfGetInt16u(message, 0, messageLen);
+                            message += 2;
+                            messageLen -= 2;
+                        }
+
+                        Callback::Callback<DescriptorServerListAttributeCallback> * cb =
+                            Callback::Callback<DescriptorServerListAttributeCallback>::FromCancelable(onSuccessCallback);
+                        cb->mCall(cb->mContext, count, data);
+                        break;
+                    }
+                    case 0x0002: //
+                    {
+                        chip::ClusterId data[count];
+                        for (size_t i = 0; i < count; i++)
+                        {
+                            data[i] = emberAfGetInt16u(message, 0, messageLen);
+                            message += 2;
+                            messageLen -= 2;
+                        }
+
+                        Callback::Callback<DescriptorClientListAttributeCallback> * cb =
+                            Callback::Callback<DescriptorClientListAttributeCallback>::FromCancelable(onSuccessCallback);
+                        cb->mCall(cb->mContext, count, data);
+                        break;
+                    }
+                    case 0x0003: //
+                    {
+                        chip::EndpointId data[count];
+                        for (size_t i = 0; i < count; i++)
+                        {
+                            data[i] = emberAfGetInt8u(message, 0, messageLen);
+                            message += 1;
+                            messageLen -= 1;
+                        }
+
+                        Callback::Callback<DescriptorPartsListAttributeCallback> * cb =
+                            Callback::Callback<DescriptorPartsListAttributeCallback>::FromCancelable(onSuccessCallback);
+                        cb->mCall(cb->mContext, count, data);
+                        break;
+                    }
+                    }
+                }
+                break;
             }
 
             case 0x08: // data8 / 8-bit data

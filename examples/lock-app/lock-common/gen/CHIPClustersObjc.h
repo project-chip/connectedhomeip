@@ -42,25 +42,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-/**
- * Cluster On/off
- *
- */
-@interface CHIPOnOff : CHIPCluster
-
-- (void)off:(ResponseHandler)completionHandler;
-- (void)on:(ResponseHandler)completionHandler;
-- (void)toggle:(ResponseHandler)completionHandler;
-
-- (void)readAttributeOnOff:(ResponseHandler)completionHandler;
-- (void)configureAttributeOnOff:(uint16_t)minInterval
-                    maxInterval:(uint16_t)maxInterval
-              completionHandler:(ResponseHandler)completionHandler;
-- (void)reportAttributeOnOff:(ResponseHandler)reportHandler;
-- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
-
-@end
-
 NS_ASSUME_NONNULL_END
 
 #endif /* CHIP_CLUSTERS_H */

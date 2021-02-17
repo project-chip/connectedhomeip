@@ -740,6 +740,12 @@
 #define CHIP_PRINTCLUSTER_CONTENT_LAUNCH_CLUSTER
 #endif
 
+#if defined(ZCL_USING_DESCRIPTOR_CLUSTER_SERVER) || defined(ZCL_USING_DESCRIPTOR_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_DESCRIPTOR_CLUSTER { ZCL_DESCRIPTOR_CLUSTER_ID, 61443, "Descriptor" },
+#else
+#define CHIP_PRINTCLUSTER_DESCRIPTOR_CLUSTER
+#endif
+
 #if defined(ZCL_USING_SAMPLE_MFG_SPECIFIC_CLUSTER_SERVER) || defined(ZCL_USING_SAMPLE_MFG_SPECIFIC_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_SAMPLE_MFG_SPECIFIC_CLUSTER { ZCL_SAMPLE_MFG_SPECIFIC_CLUSTER_ID, 64512, "Sample Mfg Specific Cluster" },
 #else
@@ -880,6 +886,7 @@
     CHIP_PRINTCLUSTER_BINDING_CLUSTER                                                                                              \
     CHIP_PRINTCLUSTER_MEDIA_PLAYBACK_CLUSTER                                                                                       \
     CHIP_PRINTCLUSTER_CONTENT_LAUNCH_CLUSTER                                                                                       \
+    CHIP_PRINTCLUSTER_DESCRIPTOR_CLUSTER                                                                                           \
     CHIP_PRINTCLUSTER_SAMPLE_MFG_SPECIFIC_CLUSTER                                                                                  \
     CHIP_PRINTCLUSTER_SAMPLE_MFG_SPECIFIC_CLUSTER_2                                                                                \
     CHIP_PRINTCLUSTER_OTA_CONFIGURATION_CLUSTER                                                                                    \

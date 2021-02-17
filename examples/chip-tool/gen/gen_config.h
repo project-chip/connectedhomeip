@@ -34,6 +34,7 @@
 #define EMBER_AF_BINDING_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_COLOR_CONTROL_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_CONTENT_LAUNCH_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_DESCRIPTOR_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_DOOR_LOCK_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_GROUPS_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_IDENTIFY_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
@@ -64,6 +65,10 @@
 // Use this macro to check if the client side of the Content Launch cluster is included
 #define ZCL_USING_CONTENT_LAUNCH_CLUSTER_CLIENT
 #define EMBER_AF_PLUGIN_CONTENT_LAUNCH_CLIENT
+
+// Use this macro to check if the client side of the Descriptor cluster is included
+#define ZCL_USING_DESCRIPTOR_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_DESCRIPTOR_CLIENT
 
 // Use this macro to check if the client side of the Door Lock cluster is included
 #define ZCL_USING_DOOR_LOCK_CLUSTER_CLIENT

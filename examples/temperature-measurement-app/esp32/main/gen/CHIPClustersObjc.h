@@ -42,38 +42,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-/**
- * Cluster Basic
- *
- */
-@interface CHIPBasic : CHIPCluster
-
-- (void)resetToFactoryDefaults:(ResponseHandler)completionHandler;
-
-- (void)readAttributeZclVersion:(ResponseHandler)completionHandler;
-- (void)readAttributePowerSource:(ResponseHandler)completionHandler;
-- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
-
-@end
-
-/**
- * Cluster Temperature Measurement
- *
- */
-@interface CHIPTemperatureMeasurement : CHIPCluster
-
-- (void)readAttributeMeasuredValue:(ResponseHandler)completionHandler;
-- (void)configureAttributeMeasuredValue:(uint16_t)minInterval
-                            maxInterval:(uint16_t)maxInterval
-                                 change:(int16_t)change
-                      completionHandler:(ResponseHandler)completionHandler;
-- (void)reportAttributeMeasuredValue:(ResponseHandler)reportHandler;
-- (void)readAttributeMinMeasuredValue:(ResponseHandler)completionHandler;
-- (void)readAttributeMaxMeasuredValue:(ResponseHandler)completionHandler;
-- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
-
-@end
-
 NS_ASSUME_NONNULL_END
 
 #endif /* CHIP_CLUSTERS_H */

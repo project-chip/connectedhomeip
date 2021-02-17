@@ -270,6 +270,9 @@ CHIP_ERROR chip_ime_AppendCommand_ContentLaunch_LaunchURL(chip::Controller::Devi
 }
 // End of Cluster ContentLaunch
 
+// Cluster Descriptor
+// End of Cluster Descriptor
+
 // Cluster DoorLock
 CHIP_ERROR chip_ime_AppendCommand_DoorLock_ClearAllPins(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
                                                         chip::GroupId ZCLgroupId)

@@ -24,6 +24,16 @@
 #include "enums.h"
 #include <stdint.h>
 
+// Struct for AclEntries
+typedef struct _AclEntries
+{
+    uint8_t privilege;
+    uint16_t authMode;
+    /* TYPE WARNING: array array defaults to */ uint8_t * subjects;
+    /* TYPE WARNING: array array defaults to */ uint8_t * targets;
+    uint8_t * extension;
+} EmberAfAclEntries;
+
 // Struct for BlockThreshold
 typedef struct _BlockThreshold
 {
@@ -111,6 +121,13 @@ typedef struct _DeviceInformationRecord
     uint8_t groupIdCount;
     uint8_t sort;
 } EmberAfDeviceInformationRecord;
+
+// Struct for DeviceType
+typedef struct _DeviceType
+{
+    chip::DeviceId deviceTypeId;
+    uint16_t revision;
+} EmberAfDeviceType;
 
 // Struct for DiscoverAttributesInfoRecord
 typedef struct _DiscoverAttributesInfoRecord
@@ -378,6 +395,14 @@ typedef struct _SpecialDay
     uint32_t specialDayDate;
     uint8_t dayIdRef;
 } EmberAfSpecialDay;
+
+// Struct for Target
+typedef struct _Target
+{
+    chip::EndpointId endpoint;
+    chip::DeviceId deviceTypeId;
+    chip::ClusterId cluster;
+} EmberAfTarget;
 
 // Struct for ThreadInterfaceScanResult
 typedef struct _ThreadInterfaceScanResult

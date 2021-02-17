@@ -287,6 +287,20 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
+ * Cluster Descriptor
+ *
+ */
+@interface CHIPDescriptor : CHIPCluster
+
+- (void)readAttributeDevice:(ResponseHandler)completionHandler;
+- (void)readAttributeServer:(ResponseHandler)completionHandler;
+- (void)readAttributeClient:(ResponseHandler)completionHandler;
+- (void)readAttributeParts:(ResponseHandler)completionHandler;
+- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
+
+@end
+
+/**
  * Cluster Door Lock
  *
  */

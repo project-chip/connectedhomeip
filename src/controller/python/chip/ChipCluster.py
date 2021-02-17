@@ -163,6 +163,8 @@ class ChipCluster:
                 "LaunchURL": {
                 },
             },
+            "Descriptor": {
+            },
             "DoorLock": {
                 "ClearAllPins": {
                 },
@@ -1049,6 +1051,7 @@ class ChipCluster:
         # Cluster ContentLaunch Command LaunchURL
         self._chipLib.chip_ime_AppendCommand_ContentLaunch_LaunchURL.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_ContentLaunch_LaunchURL.restype = ctypes.c_uint32
+        # Cluster Descriptor
         # Cluster DoorLock
         # Cluster DoorLock Command ClearAllPins
         self._chipLib.chip_ime_AppendCommand_DoorLock_ClearAllPins.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
