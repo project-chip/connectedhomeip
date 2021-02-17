@@ -326,7 +326,7 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
     pBuf = (uint8_t *) ICall_malloc(dataLen);
     if (NULL == pBuf)
     {
-        ICall_free((void *) pBuf);
+        ICall_free((void *) pMsg);
         return false;
     }
 
