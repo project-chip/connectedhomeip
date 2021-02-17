@@ -107,7 +107,6 @@ void DiscoveryImplPlatform::HandleMdnsError(void * context, CHIP_ERROR error)
     }
 }
 
-#if CHIP_ENABLE_ROTATING_DEVICE_ID
 static CHIP_ERROR DiscoveryImplPlatform::GenerateRotatingDeviceId(char rotatingDeviceIdHexBuffer[],
                                                                   size_t & rotatingDeviceIdHexBufferSize)
 {
@@ -123,7 +122,6 @@ static CHIP_ERROR DiscoveryImplPlatform::GenerateRotatingDeviceId(char rotatingD
                       rotatingDeviceIdHexBufferSize));
     return error;
 }
-#endif
 
 CHIP_ERROR DiscoveryImplPlatform::SetupHostname()
 {
@@ -194,7 +192,7 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
                                          strnlen(vendorProductBuf, sizeof(vendorProductBuf)) };
     }
 #if CHIP_ENABLE_ROTATING_DEVICE_ID
-    if (textEntrySize < ArraySize(textEntries))
+    if (ArraySize(textEntries) > textEntrySize)
     {
         SuccessOrExit(error = GenerateRotatingDeviceId(rotatingDeviceIdHexBuffer, rotatingDeviceIdHexBufferSize));
         // Rotating Device ID

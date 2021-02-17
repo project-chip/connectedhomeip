@@ -53,7 +53,7 @@ AdditionalDataPayloadGenerator::generateAdditionalDataPayload(uint16_t lifetimeC
     size_t rotatingDeviceIdBufferSize = 0;
 
     // Initialize TLVWriter
-    writer.Init(chip::System::PacketBufferHandle::New(RotatingDeviceId::kMaxLength));
+    writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
 
     SuccessOrExit(err = writer.OpenContainer(AnonymousTag, kTLVType_Structure, innerWriter));
 
@@ -106,7 +106,7 @@ CHIP_ERROR AdditionalDataPayloadGenerator::generateRotatingDeviceId(uint16_t lif
     outputBufferWriter.Put(&hashOutputBuffer[kSHA256_Hash_Length - RotatingDeviceId::kHashSuffixLength],
                            RotatingDeviceId::kHashSuffixLength);
 
-    for (rotatingDeviceIdBufferIndex = 0; rotatingDeviceIdBufferIndex < outputBufferWriter.Needed(); rotatingDeviceIdBufferIndex++)
+    for (; rotatingDeviceIdBufferIndex < outputBufferWriter.Needed(); rotatingDeviceIdBufferIndex++)
     {
         snprintf(&rotatingDeviceIdBuffer[rotatingDeviceIdBufferIndex * 2],
                  rotatingDeviceIdBufferSize - rotatingDeviceIdBufferIndex * 2, "%02X",
