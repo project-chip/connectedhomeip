@@ -51,7 +51,7 @@ public:
 private:
     // ===== Methods that implement the PlatformManager abstract interface.
 
-    CHIP_ERROR _InitChipStack(void) { return 0; }
+    CHIP_ERROR _InitChipStack(void);
     void _LockChipStack() {}
     bool _TryLockChipStack() { return true; }
     void _UnlockChipStack() {}
@@ -77,6 +77,17 @@ private:
  * that are common to all platforms.
  */
 inline PlatformManager & PlatformMgr(void)
+{
+    return PlatformManagerImpl::sInstance;
+}
+
+/**
+ * Returns the public interface of the PlatformManager singleton object.
+ *
+ * chip applications should use this to access features of the PlatformManager object
+ * that are specific to mbed based platforms.
+ */
+inline PlatformManagerImpl & PlatformMgrImpl(void)
 {
     return PlatformManagerImpl::sInstance;
 }

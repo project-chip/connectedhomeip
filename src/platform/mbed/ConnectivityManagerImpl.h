@@ -19,6 +19,7 @@
 
 #include <platform/ConnectivityManager.h>
 #include <platform/internal/GenericConnectivityManagerImpl.h>
+#include <platform/internal/GenericConnectivityManagerImpl_WiFi.h>
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #include <platform/internal/GenericConnectivityManagerImpl_BLE.h>
 #else
@@ -29,7 +30,6 @@
 #else
 #include <platform/internal/GenericConnectivityManagerImpl_NoThread.h>
 #endif
-#include <platform/internal/GenericConnectivityManagerImpl_NoWiFi.h>
 
 #include <support/logging/CHIPLogging.h>
 
@@ -43,10 +43,12 @@ namespace chip {
 namespace DeviceLayer {
 
 /**
- * Concrete implementation of the ConnectivityManager singleton object for Zephyr platforms.
+ * Concrete implementation of the ConnectivityManager singleton object for mbed platforms.
  */
 class ConnectivityManagerImpl final : public ConnectivityManager,
                                       public Internal::GenericConnectivityManagerImpl<ConnectivityManagerImpl>,
+                                      public Internal::GenericConnectivityManagerImpl_WiFi<ConnectivityManagerImpl>,
+
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
                                       public Internal::GenericConnectivityManagerImpl_BLE<ConnectivityManagerImpl>,
 #else
@@ -55,17 +57,33 @@ class ConnectivityManagerImpl final : public ConnectivityManager,
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
                                       public Internal::GenericConnectivityManagerImpl_Thread<ConnectivityManagerImpl>,
 #else
-                                      public Internal::GenericConnectivityManagerImpl_NoThread<ConnectivityManagerImpl>,
+                                      public Internal::GenericConnectivityManagerImpl_NoThread<ConnectivityManagerImpl>
 #endif
-                                      public Internal::GenericConnectivityManagerImpl_NoWiFi<ConnectivityManagerImpl>
+
 {
     // Allow the ConnectivityManager interface class to delegate method calls to
     // the implementation methods provided by this class.
     friend class ConnectivityManager;
 
+public:
+    CHIP_ERROR ProvisionWiFiNetwork(const char * ssid, const char * key);
+    CHIP_ERROR ScanWiFi();
+    CHIP_ERROR WiFiScanResults();
+    CHIP_ERROR OnStationConnected();
+    CHIP_ERROR OnStationDisconnected();
+    CHIP_ERROR WiFiConnect();
+    CHIP_ERROR WiFiDisconnect();
+
 private:
     // ===== Members that implement the ConnectivityManager abstract interface.
-
+    WiFiStationMode _GetWiFiStationMode(void);
+    CHIP_ERROR _SetWiFiStationMode(WiFiStationMode val);
+    bool _IsWiFiStationConnected(void);
+    bool _IsWiFiStationEnabled(void);
+    bool _IsWiFiStationProvisioned(void);
+    void _ClearWiFiStationProvision(void);
+    CHIP_ERROR GetWifiParams(void);
+    CHIP_ERROR _SetWiFiAPMode(WiFiAPMode val);
     bool _HaveIPv4InternetConnectivity(void);
     bool _HaveIPv6InternetConnectivity(void);
     bool _HaveServiceConnectivity(void);
@@ -78,6 +96,10 @@ private:
     friend ConnectivityManagerImpl & ConnectivityMgrImpl(void);
 
     static ConnectivityManagerImpl sInstance;
+    WiFiStationMode mWiFiStationMode;
+    WiFiStationState mWiFiStationState;
+    uint32_t mWiFiStationReconnectIntervalMS;
+    uint32_t mWiFiAPIdleTimeoutMS;
 };
 
 inline bool ConnectivityManagerImpl::_HaveIPv4InternetConnectivity(void)
@@ -95,13 +117,6 @@ inline bool ConnectivityManagerImpl::_HaveServiceConnectivity(void)
     return false;
 }
 
-inline CHIP_ERROR ConnectivityManagerImpl::_Init(void)
-{
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-
-inline void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event) {}
-
 /**
  * Returns the public interface of the ConnectivityManager singleton object.
  *
@@ -117,7 +132,7 @@ inline ConnectivityManager & ConnectivityMgr(void)
  * Returns the platform-specific implementation of the ConnectivityManager singleton object.
  *
  * chip applications can use this to gain access to features of the ConnectivityManager
- * that are specific to the ESP32 platform.
+ * that are specific to the mbed platform.
  */
 inline ConnectivityManagerImpl & ConnectivityMgrImpl(void)
 {

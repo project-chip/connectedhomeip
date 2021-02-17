@@ -1,6 +1,8 @@
 /*
  *
  *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2018 Nest Labs, Inc.
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,29 +17,34 @@
  *    limitations under the License.
  */
 
-#pragma once
+/**
+ *    @file
+ *          Provides an implementation of the PlatformManager object
+ *          for the ESP32 platform.
+ */
+/* this file behaves like a config.h, comes first */
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <platform/internal/GenericDeviceNetworkProvisioningDelegateImpl.h>
+#include <platform/PlatformManager.h>
 
 namespace chip {
 namespace DeviceLayer {
 
 namespace Internal {
+extern CHIP_ERROR InitLwIPCoreLock(void);
+}
 
-template <class ImplClass>
-class GenericDeviceNetworkProvisioningDelegateImpl;
+PlatformManagerImpl PlatformManagerImpl::sInstance;
 
-} // namespace Internal
-
-class DeviceNetworkProvisioningDelegateImpl final
-    : public Internal::GenericDeviceNetworkProvisioningDelegateImpl<DeviceNetworkProvisioningDelegateImpl>
+CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {
-private:
-    friend class GenericDeviceNetworkProvisioningDelegateImpl<DeviceNetworkProvisioningDelegateImpl>;
+    CHIP_ERROR err;
 
-    CHIP_ERROR _ProvisionWiFiNetwork(const char * ssid, const char * passwd);
-    CHIP_ERROR _ProvisionThreadNetwork(DeviceLayer::Internal::DeviceNetworkInfo & threadData) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-};
+    SuccessOrExit(err);
+
+exit:
+    return err;
+}
 
 } // namespace DeviceLayer
 } // namespace chip
