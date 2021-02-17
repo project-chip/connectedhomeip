@@ -24,7 +24,7 @@ import("${ti_simplelink_sdk_build_root}/ti_simplelink_sdk.gni")
 
 assert(current_os == "freertos")
 
-project_dir = "${chip_root}/examples/lock-app/cc13x2_26x2"
+project_dir = "${chip_root}/examples/lock-app/cc13x2x7_26x2x7"
 
 ti_simplelink_sdk("sdk") {
   include_dirs = [ "${project_dir}/main/include" ]
@@ -45,6 +45,10 @@ ti_sysconfig("sysconfig") {
     "ti_radio_config.h",
     "ti_drivers_config.c",
     "ti_drivers_config.h",
+    "ti_ble_config.c",
+    "ti_ble_config.h",
+    "ti_dmm_application_policy.c",
+    "ti_dmm_application_policy.h",
 
     # disabled until upstream generation is aligned
     #"tiop_config.h",
@@ -55,6 +59,17 @@ ti_sysconfig("sysconfig") {
     #"syscfg_c.rov.xs",
     #"ti_utils_runtime_model.gv",
     #"ti_utils_runtime_Makefile",
+    #"ti_ble_app_config.opt",
+    #"ti_build_config.opt",
+  ]
+  public_configs = [ ":sdk_dmm_config" ]
+
+  cflags = [
+    "-Wno-comment",
+    "@" + rebase_path("${target_gen_dir}/sysconfig/ti_ble_app_config.opt",
+                      root_build_dir),
+    "@" + rebase_path("${target_gen_dir}/sysconfig/ti_build_config.opt",
+                      root_build_dir),
   ]
 }
 
@@ -67,14 +82,14 @@ ti_simplelink_executable("lock_app") {
     "${project_dir}/main/include",
   ]
   defines = []
-  output_name = "chip-cc13x2_26x2-lock-example.out"
+  output_name = "chip-${ti_simplelink_board}-lock-example.out"
 
   public_deps = [
     ":sdk",
     ":sysconfig",
     "${chip_root}/examples/lock-app/lock-common",
     "${chip_root}/src/lib",
-    "${openthread_root}:libopenthread-cli-mtd",
+    "${openthread_root}:libopenthread-cli-ftd",
   ]
 
   sources = [
@@ -84,17 +99,27 @@ ti_simplelink_executable("lock_app") {
     "${project_dir}/main/main.cpp",
   ]
 
+  cflags = [
+    "-Wno-implicit-fallthrough",
+    "-Wno-sign-compare",
+  ]
+
   output_dir = root_out_dir
 
-  ldscript = "${ti_simplelink_sdk_root}/source/ti/boards/cc13x2_cc26x2/cc13x2_cc26x2_freertos.lds"
+  ldscript = "${ti_simplelink_sdk_root}/source/ti/dmm/apps/common/freertos/cc13x2x7_cc26x2x7.lds"
 
-  ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
+  ldflags = [
+    "-L${ti_simplelink_sdk_root}/source",
+    rebase_path("${target_gen_dir}/sysconfig/ti_utils_build_linker.cmd.genlibs",
+                root_build_dir),
+    "-T" + rebase_path(ldscript, root_build_dir),
+  ]
 }
 
-group("cc13x2_26x2") {
+group("cc13x2x7_26x2x7") {
   deps = [ ":lock_app" ]
 }
 
 group("default") {
-  deps = [ ":cc13x2_26x2" ]
+  deps = [ ":cc13x2x7_26x2x7" ]
 }

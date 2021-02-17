@@ -15,29 +15,29 @@
  *    limitations under the License.
  */
 
-#pragma once
+#include "DeviceNetworkProvisioningDelegateImpl.h"
 
-#include <platform/internal/GenericDeviceNetworkProvisioningDelegateImpl.h>
+#if CHIP_ENABLE_OPENTHREAD
+#include <platform/ThreadStackManager.h>
+#endif
 
 namespace chip {
 namespace DeviceLayer {
 
-namespace Internal {
-
-template <class ImplClass>
-class GenericDeviceNetworkProvisioningDelegateImpl;
-
-} // namespace Internal
-
-class DeviceNetworkProvisioningDelegateImpl final
-    : public Internal::GenericDeviceNetworkProvisioningDelegateImpl<DeviceNetworkProvisioningDelegateImpl>
+CHIP_ERROR DeviceNetworkProvisioningDelegateImpl::_ProvisionThreadNetwork(DeviceLayer::Internal::DeviceNetworkInfo & threadData)
 {
-    friend class GenericDeviceNetworkProvisioningDelegateImpl<DeviceNetworkProvisioningDelegateImpl>;
+#if CHIP_ENABLE_OPENTHREAD
+    CHIP_ERROR error = CHIP_NO_ERROR;
 
-private:
-    CHIP_ERROR _ProvisionWiFiNetwork(const char * ssid, const char * passwd) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _ProvisionThreadNetwork(DeviceLayer::Internal::DeviceNetworkInfo & threadData);
-};
+    SuccessOrExit(error = ThreadStackMgr().SetThreadEnabled(false));
+    SuccessOrExit(error = ThreadStackMgr().SetThreadProvision(threadData));
+    SuccessOrExit(error = ThreadStackMgr().SetThreadEnabled(true));
+exit:
+    return error;
+#else
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif // CHIP_ENABLE_OPENTHREAD
+}
 
 } // namespace DeviceLayer
 } // namespace chip
