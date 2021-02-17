@@ -719,10 +719,6 @@ CHIP_ERROR PASESession::HandleMsg2_and_SendMsg3(const PacketHeader & header, con
 
     mPairingComplete = true;
 
-    err = DeriveSecureSession(reinterpret_cast<const unsigned char *>(kSpake2pI2RSessionInfo), strlen(kSpake2pI2RSessionInfo),
-                              mConnectionState.GetSecureSession());
-    SuccessOrExit(err);
-
     // Call delegate to indicate pairing completion
     mDelegate->OnSessionEstablished();
 
@@ -765,10 +761,6 @@ CHIP_ERROR PASESession::HandleMsg3(const PacketHeader & header, const System::Pa
     SuccessOrExit(err);
 
     mPairingComplete = true;
-
-    err = DeriveSecureSession(reinterpret_cast<const unsigned char *>(kSpake2pI2RSessionInfo), strlen(kSpake2pI2RSessionInfo),
-                              mConnectionState.GetSecureSession());
-    SuccessOrExit(err);
 
     // Call delegate to indicate pairing completion
     mDelegate->OnSessionEstablished();
