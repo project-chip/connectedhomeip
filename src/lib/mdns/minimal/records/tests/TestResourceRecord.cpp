@@ -177,7 +177,7 @@ void ErrorsOutOnSmallBuffers(nlTestSuite * inSuite, void * inContext)
         0,                      // QNAME ends
         0,    255,              // QType ANY (totally fake)
         0,    1,                // QClass IN
-        0x01, 0xe1, 0x33, 0x80, // TTL
+        0x12, 0xcc, 0x03, 0x00, // TTL
         0,    8,                // data size
         's',  'o',  'm',  'e',  'd', 'a', 't', 'a',
     };
