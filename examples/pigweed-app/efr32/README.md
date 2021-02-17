@@ -31,11 +31,9 @@ following features are available:
 ## Building the Example Application
 
 -   Download or clone the
-    [sdk_support](https://github.com/SiliconLabs/sdk_support) from GitHub
-    $ git clone https://github.com/SiliconLabs/sdk_support.git
-    and export the path with :
-            $
-    export EFR32_SDK_ROOT=<Path to cloned git repo>
+    [sdk_support](https://github.com/SiliconLabs/sdk_support) from GitHub $ git
+    clone https://github.com/SiliconLabs/sdk_support.git and export the path
+    with : $ export EFR32_SDK_ROOT=<Path to cloned git repo>
 
 -   Download the
     [Simplicity Commander](https://www.silabs.com/mcu/programming-options)
@@ -122,3 +120,12 @@ following features are available:
     Note: Some users might have to install the
     [VCP driver](https://www.silabs.com/products/development-tools/software/usb-to-uart-bridge-vcp-drivers)
     before the device shows up on `/dev/tty`.
+
+## Memory settings
+
+While most of the RAM usage in CHIP is static allowing easier debugging and
+optimization with symbols analysis, we still need some HEAP for the crypto and
+OpenThread. Size of the HEAP can be modify by changing the value of
+`SL_STACK_SIZE` define inside of the BUILD.gn file of this example. Please take
+note that a HEAP size smaller than 5k can and will cause a Mbedtls failure
+during the BLE rendez-vous.

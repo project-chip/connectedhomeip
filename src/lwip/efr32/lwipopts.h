@@ -52,10 +52,11 @@
 #define LWIP_TCPIP_CORE_LOCKING 1
 #define TCP_QUEUE_OOSEQ 0
 #define ARP_QUEUEING (0)
+#define TCPIP_THREAD_NAME "LWIP"
 
 #define LWIP_SOCKET 0
 
-#define LWIP_FREERTOS_USE_STATIC_TCPIP_TASK 0
+#define LWIP_FREERTOS_USE_STATIC_TCPIP_TASK 1
 
 // TODO: seems like this is unnecessary on Thread-only platforms
 #define LWIP_RAW 1
@@ -131,7 +132,7 @@
 #define SUB_ETHERNET_HEADER_SPACE (0)
 #define PBUF_LINK_HLEN (0)
 
-#define TCPIP_THREAD_STACKSIZE (4096)
+#define TCPIP_THREAD_STACKSIZE (2048)
 #define TCPIP_THREAD_PRIO (2)
 
 #define NETIF_MAX_HWADDR_LEN 8U

@@ -47,7 +47,7 @@
 
 #define FACTORY_RESET_TRIGGER_TIMEOUT 3000
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
-#define APP_TASK_STACK_SIZE (2048)
+#define APP_TASK_STACK_SIZE (1536)
 #define APP_TASK_PRIORITY 2
 #define APP_EVENT_QUEUE_SIZE 10
 
@@ -63,6 +63,9 @@ static bool sIsThreadProvisioned     = false;
 static bool sIsThreadEnabled         = false;
 static bool sHaveBLEConnections      = false;
 static bool sHaveServiceConnectivity = false;
+
+StackType_t appStack[APP_TASK_STACK_SIZE/sizeof(StackType_t)];
+StaticTask_t appTaskStruct;
 
 using namespace chip::TLV;
 using namespace ::chip::DeviceLayer;
@@ -81,7 +84,8 @@ int AppTask::StartAppTask()
     }
 
     // Start App task.
-    if (xTaskCreate(AppTaskMain, "APP", APP_TASK_STACK_SIZE / sizeof(StackType_t), NULL, 1, &sAppTaskHandle) == pdPASS)
+    sAppTaskHandle = xTaskCreateStatic(AppTaskMain, APP_TASK_NAME, APP_TASK_STACK_SIZE / sizeof(StackType_t), NULL, 1, appStack, &appTaskStruct);
+    if (sAppTaskHandle != NULL)
     {
         err = CHIP_NO_ERROR;
     }

@@ -41,7 +41,7 @@ efr32_sdk("sdk") {
     "${efr32_project_dir}/include/FreeRTOSConfig.h",
   ]
 
-  defines = [ "BOARD_ID=${efr32_board}" ]
+  defines = [ "BOARD_ID=${efr32_board}", "SL_HEAP_SIZE=(10 * 1024)" ]
 }
 
 efr32_executable("persistent_storage") {
@@ -72,9 +72,9 @@ efr32_executable("persistent_storage") {
   output_dir = root_out_dir
 
   if (efr32_family == "efr32mg12") {
-    ldscript = "${efr32_project_dir}/ldscripts/efr32-persistent_storage-example-MG12P.ld"
+    ldscript = "${examples_plat_dir}/ldscripts/efr32-MG12P.ld"
   } else if (efr32_family == "efr32mg21") {
-    ldscript = "${efr32_project_dir}/ldscripts/efr32-persistent_storage-example-MG21.ld"
+    ldscript = "${examples_plat_dir}/ldscripts/efr32-MG21.ld"
   }
 
   ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]

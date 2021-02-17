@@ -155,3 +155,12 @@ combination with JLinkRTTClient as follows:
 -   In a second terminal, run the JLinkRTTClient to view logs:
 
           $ JLinkRTTClient
+
+## Memory settings
+
+While most of the RAM usage in CHIP is static allowing easier debugging and
+optimization with symbols analysis, we still need some HEAP for the crypto and
+OpenThread. Size of the HEAP can be modify by changing the value of
+`SL_STACK_SIZE` define inside of the BUILD.gn file of this example. Please take
+note that a HEAP size smaller than 5k can and will cause a Mbedtls failure
+during the BLE rendez-vous.

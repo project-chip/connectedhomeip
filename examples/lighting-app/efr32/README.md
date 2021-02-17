@@ -291,3 +291,19 @@ combination with JLinkRTTClient as follows:
     where : idx = 0 or 1 for Button PB0 or PB1 action = 0 for PRESSED, 1 for
     RELEASE Test toggling the LED with
     `rpcs.chip.rpc.LightingService.ButtonEvent(idx=1,action=0)`
+
+## Memory settings
+
+While most of the RAM usage in CHIP is static allowing easier debugging and
+optimization with symbols analysis, we still need some HEAP for the crypto and
+OpenThread. Size of the HEAP can be modify by changing the value of
+`SL_STACK_SIZE` define inside of the BUILD.gn file of this example. Please take
+note that a HEAP size smaller than 5k can and will cause a Mbedtls failure
+during the BLE rendez-vous.
+
+To track memory usage you can set `enable_heap_monitoring = true` either in the
+BUILD.gn file or pass it as a build argument to gn. This will print on the RTT
+console the RAM usage of each individual task and the number of Memory
+allocation and Free. While this is not extensive monitoring you're welcome to
+modify the `examples/platform/efr32/MemMonitoring.cpp` to add your own memory
+tracking code inside the `trackAlloc` and `trackFree` function

@@ -351,6 +351,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "EFR32/ConnectivityManagerImpl.h",
         "EFR32/DeviceNetworkProvisioningDelegateImpl.cpp",
         "EFR32/DeviceNetworkProvisioningDelegateImpl.h",
+        "EFR32/CHIPMem-Platform.cpp",
         "EFR32/EFR32Config.cpp",
         "EFR32/EFR32Config.h",
         "EFR32/InetPlatformConfig.h",
