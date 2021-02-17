@@ -12,7 +12,7 @@ An example showing the use of CHIP on the Silicon Labs EFR32 MG12.
     -   [Viewing Logging Output](#viewing-logging-output)
     -   [Running the Complete Example](#running-the-complete-example)
         -   [Notes](#notes)
-    -    [Running Pigweed RPC console](#running-pigweed-rpc-console)
+    -   [Running Pigweed RPC console](#running-pigweed-rpc-console)
 
 <hr>
 
@@ -97,12 +97,15 @@ OR use GN/Ninja directly
           $ rm -rf out/
 
 *   Build the example with pigweed RCP use GN/Ninja Directly
-          $ cd ~/connectedhomeip/examples/lighting-app/efr32
-          $ git submodule update --init
-          $ source third_party/connectedhomeip/scripts/activate.sh
-          $ export EFR32_BOARD=BRD4161A
-          $ gn gen out/debug --args='import("//with_pw_rpc.gni")'
-          $ ninja -C out/debug          
+    $ cd ~/connectedhomeip/examples/lighting-app/efr32
+          $ git submodule
+    update --init
+    $ source third_party/connectedhomeip/scripts/activate.sh
+          $ export
+    EFR32_BOARD=BRD4161A
+    $ gn gen out/debug --args='import("//with_pw_rpc.gni")'
+          $ ninja -C
+    out/debug
 
     [Running Pigweed RPC console](#running-pigweed-rpc-console)
 
@@ -280,13 +283,13 @@ combination with JLinkRTTClient as follows:
 
 ## Running Pigweed RPC console
 
--   If you build the example with pigweed RPC option you can can interact with the example by UART using the RPC LightingService.
-    Call the following command in your terminal
+-   If you build the example with pigweed RPC option you can can interact with
+    the example by UART using the RPC LightingService. Call the following
+    command in your terminal
 
     `python -m pw_hdlc.rpc_console --device /dev/tty.<SERIALDEVICE> -b 115200 /<CHIP_ROOT>/examples/lighting-app/lighting-common/pigweed_lighting.proto -o /<YourFolder>/pw_log.out`
 
--   Then you can simulate a button press or realease using the following command where :
-    idx = 0 or 1 for Button PB0 or PB1
-    action = 0 for PRESSED, 1 for RELEASE 
-    Test toggling the LED with
+-   Then you can simulate a button press or realease using the following command
+    where : idx = 0 or 1 for Button PB0 or PB1 action = 0 for PRESSED, 1 for
+    RELEASE Test toggling the LED with
     `rpcs.chip.rpc.LightingService.ButtonEvent(idx=1,action=0)`
