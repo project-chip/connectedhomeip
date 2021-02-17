@@ -632,19 +632,6 @@ CHIP_ERROR ASN1ToChipEpochTime(const chip::ASN1::ASN1UniversalTime & asn1Time, u
 CHIP_ERROR ChipEpochToASN1Time(uint32_t epochTime, chip::ASN1::ASN1UniversalTime & asn1Time);
 
 /**
- * @brief
- *   Convert the number of seconds since 1970-01-01 00:00:00 UTC to a CHIP Epoch UTC time.
- *
- * @param unixEpoch  Number of seconds since 1970-01-01 00:00:00 UTC.
- *                   Note: this value is compatible with *positive* values
- *                   of the POSIX time_t value, up to the year 2105.
- * @param chipEpoch  Number of seconds since 2020-01-01 00:00:00 UTC.
- *
- * @return  #CHIP_NO_ERROR  If the input was successfully converted.
- **/
-CHIP_ERROR UnixEpochToChipEpochTime(uint32_t unixEpoch, uint32_t & chipEpoch);
-
-/**
  *  @return  True if the OID represents a CHIP-defined X.509 distinguished named attribute.
  **/
 inline bool IsChipX509Attr(chip::ASN1::OID oid)
