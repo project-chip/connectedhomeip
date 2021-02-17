@@ -319,9 +319,7 @@ config("exceptions_default") {
 }
 
 config("unwind_tables") {
-  cflags = [
-    "-funwind-tables",
-  ]
+  cflags = [ "-funwind-tables" ]
 }
 
 config("no_unwind_tables") {
@@ -333,9 +331,9 @@ config("no_unwind_tables") {
 
 config("unwind_tables_default") {
   if (current_os == "android") {
-    configs = [":unwind_tables"]
+    configs = [ ":unwind_tables" ]
   } else {
-    configs = [":no_unwind_tables"]
+    configs = [ ":no_unwind_tables" ]
   }
 }
 

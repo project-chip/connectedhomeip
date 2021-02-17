@@ -49,7 +49,8 @@ declare_args() {
       [ "${build_root}/config/compiler:exceptions_default" ]
 
   # Default configs for unwind tables.
-  default_configs_unwind_tables = [ "${build_root}/config/compiler:unwind_tables_default" ]
+  default_configs_unwind_tables =
+      [ "${build_root}/config/compiler:unwind_tables_default" ]
 
   # Defaults configs for rtti.
   default_configs_rtti = [ "${build_root}/config/compiler:rtti_default" ]
