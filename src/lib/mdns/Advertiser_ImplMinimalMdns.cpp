@@ -478,7 +478,7 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
     }
 
     {
-        sprintf(nameBuffer, "S%03d", params.GetShortDiscriminator());
+        sprintf(nameBuffer, "_S%03d", params.GetShortDiscriminator());
         FullQName shortServiceName = AllocateQName(nameBuffer, "_sub", serviceType, "_udp", "local");
         ReturnErrorCodeIf(shortServiceName.nameCount == 0, CHIP_ERROR_NO_MEMORY);
 
@@ -493,7 +493,7 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
     }
 
     {
-        sprintf(nameBuffer, "L%04d", params.GetLongDiscriminator());
+        sprintf(nameBuffer, "_L%04d", params.GetLongDiscriminator());
         FullQName longServiceName = AllocateQName(nameBuffer, "_sub", serviceType, "_udp", "local");
         ReturnErrorCodeIf(longServiceName.nameCount == 0, CHIP_ERROR_NO_MEMORY);
         if (!AddResponder<PtrResponder>(longServiceName, operationalServerName)
@@ -508,7 +508,7 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
 
     if (params.GetVendorId().HasValue())
     {
-        sprintf(nameBuffer, "V%d", params.GetVendorId().Value());
+        sprintf(nameBuffer, "_V%d", params.GetVendorId().Value());
         FullQName vendorServiceName = AllocateQName(nameBuffer, "_sub", serviceType, "_udp", "local");
         ReturnErrorCodeIf(vendorServiceName.nameCount == 0, CHIP_ERROR_NO_MEMORY);
 
