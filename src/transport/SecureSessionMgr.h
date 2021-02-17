@@ -62,6 +62,9 @@ public:
         return mPeerNodeId == that.mPeerNodeId && mPeerKeyId == that.mPeerKeyId && mAdmin == that.mAdmin;
     }
 
+    NodeId GetPeerNodeId() const { return mPeerNodeId; }
+    uint16_t GetPeerKeyId() const { return mPeerKeyId; }
+
 private:
     friend class SecureSessionMgr;
     NodeId mPeerNodeId;
@@ -203,6 +206,15 @@ public:
     ~SecureSessionMgr() override;
 
     /**
+     *    Whether the current node initiated the pairing, or it is responding to a pairing request.
+     */
+    enum class PairingDirection
+    {
+        kInitiator, /**< We initiated the pairing request. */
+        kResponder, /**< We are responding to the pairing request. */
+    };
+
+    /**
      * @brief
      *   Send a message to a currently connected peer.
      *
@@ -238,7 +250,7 @@ public:
      *   peer node.
      */
     CHIP_ERROR NewPairing(const Optional<Transport::PeerAddress> & peerAddr, NodeId peerNodeId, PASESession * pairing,
-                          Transport::AdminId admin, Transport::Base * transport = nullptr);
+                          PairingDirection direction, Transport::AdminId admin, Transport::Base * transport = nullptr);
 
     /**
      * @brief

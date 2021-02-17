@@ -29,6 +29,7 @@ extern "C" {
 #endif
 
 int TestExchangeMgr(void);
+int TestMessageCounterSyncMgr(void);
 int TestReliableMessageProtocol(void);
 
 #ifdef __cplusplus

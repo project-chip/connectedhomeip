@@ -126,6 +126,7 @@ extern "C" {
  *  See the comments at the top of main.c, main_full.c and main_low_power.c for
  *  more information.
  */
+
 #define configCREATE_LOW_POWER_DEMO (0)
 
 /* Some configuration is dependent on the demo being built. */
@@ -147,7 +148,7 @@ turn the tick off. */
 #define configUSE_TICK_HOOK (1)
 #define configCHECK_FOR_STACK_OVERFLOW (2)
 #define configUSE_MALLOC_FAILED_HOOK (1)
-#define configUSE_IDLE_HOOK (0)
+#define configUSE_IDLE_HOOK (1)
 
 #define configENERGY_MODE (sleepEM1)
 
@@ -221,8 +222,8 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 #define configUSE_PORT_OPTIMISED_TASK_SELECTION (1)
 #define configUSE_TICKLESS_IDLE_SIMPLE_DEBUG (1) /* See into vPortSuppressTicksAndSleep source code for explanation */
 #define configMAX_PRIORITIES (8)
-#define configMINIMAL_STACK_SIZE (120) /* Number of words to use for Idle and Timer stacks */
-#define configMAX_TASK_NAME_LEN (4)
+#define configMINIMAL_STACK_SIZE (140) /* Number of words to use for Idle and Timer stacks */
+#define configMAX_TASK_NAME_LEN (10)
 #define configUSE_16_BIT_TICKS (0)
 #define configIDLE_SHOULD_YIELD (0)
 #define configUSE_MUTEXES (1)
@@ -233,6 +234,7 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 #define configUSE_QUEUE_SETS (0)
 #define configUSE_NEWLIB_REENTRANT (0)
 #define configENABLE_BACKWARD_COMPATIBILITY (1)
+#define configSUPPORT_STATIC_ALLOCATION (1)
 
 /* Optional functions - most linkers will remove unused functions anyway. */
 #define INCLUDE_vTaskPrioritySet (1)

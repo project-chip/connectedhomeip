@@ -77,8 +77,8 @@ public:
     uint64_t GetLastActivityTimeMs() const { return mLastActivityTimeMs; }
     void SetLastActivityTimeMs(uint64_t value) { mLastActivityTimeMs = value; }
 
-    SecureSession & GetSecureSession() { return mSecureSession; }
-    const SecureSession & GetSecureSession() const { return mSecureSession; }
+    SecureSession & GetSenderSecureSession() { return mSenderSecureSession; }
+    SecureSession & GetReceiverSecureSession() { return mReceiverSecureSession; }
 
     Transport::AdminId GetAdminId() const { return mAdmin; }
     void SetAdminId(Transport::AdminId admin) { mAdmin = admin; }
@@ -98,7 +98,20 @@ public:
         mPeerNodeId         = kUndefinedNodeId;
         mSendMessageIndex   = 0;
         mLastActivityTimeMs = 0;
-        mSecureSession.Reset();
+        mSenderSecureSession.Reset();
+        mReceiverSecureSession.Reset();
+    }
+
+    CHIP_ERROR EncryptBeforeSend(const uint8_t * input, size_t input_length, uint8_t * output, PacketHeader & header,
+                                 MessageAuthenticationCode & mac) const
+    {
+        return mSenderSecureSession.Encrypt(input, input_length, output, header, mac);
+    }
+
+    CHIP_ERROR DecryptOnReceive(const uint8_t * input, size_t input_length, uint8_t * output, const PacketHeader & header,
+                                const MessageAuthenticationCode & mac) const
+    {
+        return mReceiverSecureSession.Decrypt(input, input_length, output, header, mac);
     }
 
 private:
@@ -109,7 +122,8 @@ private:
     uint16_t mLocalKeyID         = UINT16_MAX;
     uint64_t mLastActivityTimeMs = 0;
     Transport::Base * mTransport = nullptr;
-    SecureSession mSecureSession;
+    SecureSession mSenderSecureSession;
+    SecureSession mReceiverSecureSession;
     Transport::AdminId mAdmin = kUndefinedAdminId;
 };
 
