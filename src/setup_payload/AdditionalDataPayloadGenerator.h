@@ -29,10 +29,10 @@
 
 namespace chip {
 namespace RotatingDeviceId {
-static constexpr unsigned kLifetimeCounterSize    = 2;
-static constexpr unsigned kHashSuffixLength       = 16;
-static constexpr unsigned kMaxLength              = kLifetimeCounterSize + kHashSuffixLength;
-static constexpr unsigned kHexMaxLength           = kMaxLength * 2 + 1;
+static constexpr unsigned kLifetimeCounterSize = 2;
+static constexpr unsigned kHashSuffixLength    = 16;
+static constexpr unsigned kMaxLength           = kLifetimeCounterSize + kHashSuffixLength;
+static constexpr unsigned kHexMaxLength        = kMaxLength * 2 + 1;
 } // namespace RotatingDeviceId
 
 enum class AdditionalDataFields : int8_t
