@@ -57,8 +57,8 @@
 namespace chip {
 namespace app {
 
-static const size_t kMax_SecureSDU_Length = 1024;
-static const uint32_t kIM_MSG_TIMEOUT     = 20;
+static const size_t kMax_SecureSDU_Length      = 1024;
+static const uint32_t kIM_MSG_TIMEOUT          = 20;
 static const uint32_t kMIN_EVENT_BOUNDARY_SIZE = 8;
 
 typedef void (*CommandCbFunct)(chip::TLV::TLVReader & aReader, Command * apCommandObj);
