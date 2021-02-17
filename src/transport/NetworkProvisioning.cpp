@@ -35,12 +35,6 @@
 
 namespace chip {
 
-#ifdef IFNAMSIZ
-constexpr uint16_t kMaxInterfaceName = IFNAMSIZ;
-#else
-constexpr uint16_t kMaxInterfaceName = 32;
-#endif
-
 constexpr char kAPInterfaceNamePrefix[]      = "ap";
 constexpr char kLoobackInterfaceNamePrefix[] = "lo";
 
@@ -208,7 +202,7 @@ CHIP_ERROR NetworkProvisioning::SendCurrentIPv4Address()
 {
     for (chip::Inet::InterfaceAddressIterator it; it.HasCurrent(); it.Next())
     {
-        char ifName[kMaxInterfaceName];
+        char ifName[chip::Inet::InterfaceIterator::kMaxIfNameLength];
         if (it.IsUp() && CHIP_NO_ERROR == it.GetInterfaceName(ifName, sizeof(ifName)) &&
             memcmp(ifName, kAPInterfaceNamePrefix, sizeof(kAPInterfaceNamePrefix) - 1) &&
             memcmp(ifName, kLoobackInterfaceNamePrefix, sizeof(kLoobackInterfaceNamePrefix) - 1))

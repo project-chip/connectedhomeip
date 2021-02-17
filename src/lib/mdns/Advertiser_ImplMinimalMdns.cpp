@@ -39,6 +39,8 @@ namespace {
 
 using namespace mdns::Minimal;
 
+
+
 const char * ToString(QClass qClass)
 {
     switch (qClass)
@@ -156,7 +158,7 @@ private:
         {
             return true; // not a usable interface
         }
-        char name[64];
+        char name[chip::Inet::InterfaceIterator::kMaxIfNameLength];
         if (mIterator.GetInterfaceName(name, sizeof(name)) != CHIP_NO_ERROR)
         {
             ChipLogError(Discovery, "Interface iterator failed to get interface name.");
@@ -596,7 +598,7 @@ bool CanAdvertiseOn(chip::Inet::InterfaceAddressIterator & current)
         return false;
     }
 
-    char name[64];
+    char name[chip::Inet::InterfaceIterator::kMaxIfNameLength];
     if (current.GetInterfaceName(name, sizeof(name)) != CHIP_NO_ERROR)
     {
         ChipLogError(Discovery, "Failed to get interface name - will not advertise on this interface");
