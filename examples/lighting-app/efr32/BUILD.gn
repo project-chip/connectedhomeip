@@ -17,10 +17,10 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/efr32_sdk.gni")
 import("//build_overrides/pigweed.gni")
 
+import("$dir_pw_protobuf_compiler/proto.gni")
 import("${build_root}/config/defaults.gni")
 import("${efr32_sdk_build_root}/efr32_executable.gni")
 import("${efr32_sdk_build_root}/efr32_sdk.gni")
-import("$dir_pw_protobuf_compiler/proto.gni")
 
 assert(current_os == "freertos")
 
@@ -62,8 +62,7 @@ efr32_sdk("sdk") {
 
   defines += [ "BOARD_ID=${efr32_board}" ]
 
-  if (enable_pw_rpc)
-  {  
+  if (enable_pw_rpc) {
     defines += [
       "HAL_VCOM_ENABLE = 1",
       "PW_RPC_ENABLED",
@@ -71,8 +70,7 @@ efr32_sdk("sdk") {
   }
 }
 
-if (enable_pw_rpc)
-{
+if (enable_pw_rpc) {
   pw_proto_library("pw_light_service_proto") {
     sources = [ "${chip_root}/examples/lighting-app/lighting-common/pigweed_lighting.proto" ]
     inputs = [ "${chip_root}/examples/lighting-app/lighting-common/pigweed_lighting.options" ]
@@ -123,12 +121,11 @@ efr32_executable("lighting_app") {
     defines += [ "DISPLAY_ENABLED" ]
   }
 
-  if (enable_pw_rpc)
-  {  
+  if (enable_pw_rpc) {
     public_deps += [
+      ":pw_light_service_proto.nanopb_rpc",
       "$dir_pw_assert",
       "$dir_pw_checksum",
-      ":pw_light_service_proto.nanopb_rpc",
       "${chip_root}/config/efr32/lib/pw_rpc:pw_rpc",
       "${examples_plat_dir}/pw_sys_io:pw_sys_io_efr32",
     ]
@@ -159,11 +156,11 @@ efr32_executable("lighting_app") {
     ]
 
     sources += [
-      "src/Rpc.cpp",
-      "${examples_plat_dir}/uart.c",
-      "${examples_plat_dir}/PigweedLogger.cpp",
       "${chip_root}/examples/common/pigweed/RpcService.cpp",
       "${chip_root}/examples/common/pigweed/efr32/PigWeedLoggerMutex.cpp",
+      "${examples_plat_dir}/PigweedLogger.cpp",
+      "${examples_plat_dir}/uart.c",
+      "src/Rpc.cpp",
     ]
   }
 
