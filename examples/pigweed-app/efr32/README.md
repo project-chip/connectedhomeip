@@ -109,8 +109,8 @@ following features are available:
         - On MAC
             /dev/tty.usbmodem0004401548451
 
--   Run the following command to start an interactive Python shell, where the Echo
-    RPC commands can be invoked:
+-   Run the following command to start an interactive Python shell, where the
+    Echo RPC commands can be invoked:
 
         python -m pw_hdlc.rpc_console --device /dev/tty.usbmodem0004401548451 -b 115200 <CHIP_ROOT>/third_party/pigweed/repo/pw_rpc/pw_rpc_protos/echo.proto -o /tmp/pw_rpc.out
 
