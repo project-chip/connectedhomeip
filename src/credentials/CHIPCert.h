@@ -275,7 +275,7 @@ struct ChipCertificateData
  */
 struct ValidationContext
 {
-    uint32_t mEffectiveTime;                                 /**< Current CHIP Epoch time. */
+    uint32_t mEffectiveTime;                                 /**< Current CHIP Epoch UTC time. */
     const ChipCertificateData * mTrustAnchor;                /**< Pointer to the Trust Anchor Certificate data structure. */
     const ChipCertificateData * mSigningCert;                /**< Pointer to the Signing Certificate data structure. */
     BitFlags<uint16_t, KeyUsageFlags> mRequiredKeyUsages;    /**< Key usage extensions that should be present in the
@@ -605,26 +605,26 @@ CHIP_ERROR DetermineCertType(ChipCertificateData & cert);
 
 /**
  * @brief
- *   Convert a certificate date/time (in the form of an ASN.1 universal time structure) into a CHIP Epoch time.
+ *   Convert a certificate date/time (in the form of an ASN.1 universal time structure) into a CHIP Epoch UTC time.
  *
  * @note
  *   This function makes no attempt to verify the correct range of the input time other than year.
  *   Therefore callers must make sure the supplied values are valid prior to invocation.
  *
  * @param asn1Time   The calendar date/time to be converted.
- * @param epochTime  A reference to an integer that will receive CHIP Epoch time.
+ * @param epochTime  A reference to an integer that will receive CHIP Epoch UTC time.
  *
  * @retval  #CHIP_NO_ERROR                      If the input time was successfully converted.
  * @retval  #ASN1_ERROR_UNSUPPORTED_ENCODING    If the input time contained a year value that could not
- *                                              be represented in a CHIP epoch time value.
+ *                                              be represented in a CHIP epoch UTC time value.
  **/
 CHIP_ERROR ASN1ToChipEpochTime(const chip::ASN1::ASN1UniversalTime & asn1Time, uint32_t & epochTime);
 
 /**
  * @brief
- *   Convert a CHIP epoch time into an ASN.1 universal time structure.
+ *   Convert a CHIP epoch UTC time into an ASN.1 universal time structure.
  *
- * @param epochTime  A CHIP epoch time to be converted.
+ * @param epochTime  A CHIP epoch UTC time to be converted.
  * @param asn1Time   A reference to an ASN1UniversalTime structure to receive the date/time.
  *
  * @retval  #CHIP_NO_ERROR                      If the input time was successfully converted.
@@ -633,7 +633,7 @@ CHIP_ERROR ChipEpochToASN1Time(uint32_t epochTime, chip::ASN1::ASN1UniversalTime
 
 /**
  * @brief
- *   Convert the number of seconds since 1970-01-01 00:00:00 UTC to a CHIP Epoch time.
+ *   Convert the number of seconds since 1970-01-01 00:00:00 UTC to a CHIP Epoch UTC time.
  *
  * @param unixEpoch  Number of seconds since 1970-01-01 00:00:00 UTC.
  *                   Note: this value is compatible with *positive* values
