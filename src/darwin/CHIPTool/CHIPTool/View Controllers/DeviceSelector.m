@@ -21,8 +21,6 @@
 #import "DefaultsUtils.h"
 
 @interface DeviceSelector ()
-@property (readwrite) CHIPDevice * chipDevice;
-@property (readwrite) uint64_t nextDeviceID;
 @end
 
 @implementation DeviceSelector {
@@ -34,43 +32,49 @@
 - (id)init
 {
     if (self = [super init]) {
-        _nextDeviceID = CHIPGetNextAvailableDeviceID();
-        _selectedDeviceIndex = self.nextDeviceID + 1;
         [self refreshDeviceList];
         [self setupView];
+        [self setEnabled:YES];
     }
     return self;
 }
 
 - (void)refreshDeviceList
 {
+    uint64_t nextDeviceID = CHIPGetNextAvailableDeviceID();
     _deviceList = [NSMutableArray new];
-    for (uint64_t i = 0; i < _nextDeviceID; i++) {
+    for (uint64_t i = 0; i < nextDeviceID; i++) {
         if (CHIPGetPairedDeviceWithID(i) != nil) {
             [_deviceList addObject:[@(i) stringValue]];
         }
     }
     _selectedDeviceIndex = 0;
+
+    // This will refresh the view with the updated device list
+    [self setEnabled:self.isEnabled];
 }
 
-- (void)selectDevice
+- (void)forSelectedDevices:(DeviceAction)action
 {
-    if ([_deviceList count] > 0) {
-        uint64_t deviceID = [_deviceList[_selectedDeviceIndex] intValue];
-        _chipDevice = CHIPGetPairedDeviceWithID(deviceID);
+    if ([self isEnabled]) {
+        if ([_deviceList count] > 0) {
+            uint64_t nodeId;
+            NSScanner * scanner = [NSScanner scannerWithString:[_deviceList objectAtIndex:_selectedDeviceIndex]];
+            [scanner scanUnsignedLongLong:&nodeId];
+            action(nodeId);
+        }
+    } else {
+        for (id device in _deviceList) {
+            uint64_t nodeId;
+            NSScanner * scanner = [NSScanner scannerWithString:device];
+            [scanner scanUnsignedLongLong:&nodeId];
+            action(nodeId);
+        }
     }
-}
-
-- (CHIPDevice *)selectedDevice
-{
-    return _chipDevice;
 }
 
 - (void)setupView
 {
-    if ([_deviceList count] > 0) {
-        self.text = [_deviceList objectAtIndex:_selectedDeviceIndex];
-    }
     _devicePicker = [[UIPickerView alloc] initWithFrame:CGRectMake(0, 100, 0, 0)];
     self.inputView = _devicePicker;
     [_devicePicker setDataSource:self];
@@ -79,7 +83,7 @@
 
     UIToolbar * deviceSelectButtonView = [[UIToolbar alloc] init];
     [deviceSelectButtonView sizeToFit];
-    UIBarButtonItem * deviceSelectButton = [[UIBarButtonItem alloc] initWithTitle:@"Select Device"
+    UIBarButtonItem * deviceSelectButton = [[UIBarButtonItem alloc] initWithTitle:@"Select"
                                                                             style:UIBarButtonItemStylePlain
                                                                            target:self
                                                                            action:@selector(deviceSelectClicked:)];
@@ -88,16 +92,26 @@
                                                                                action:nil];
     [deviceSelectButtonView setItems:[NSArray arrayWithObjects:flexible, deviceSelectButton, nil]];
     self.inputAccessoryView = deviceSelectButtonView;
+}
 
-    [self selectDevice];
+- (void)setEnabled:(BOOL)enabled
+{
+    [super setEnabled:enabled];
+    if (enabled == NO) {
+        self.text = [_deviceList description];
+    } else if ([_deviceList count] > 0) {
+        self.text = [NSString stringWithFormat:@"%@", [_deviceList objectAtIndex:_selectedDeviceIndex]];
+    }
 }
 
 // MARK: UIPickerView
 
 - (void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component
 {
-    NSLog(@"%@", [_deviceList objectAtIndex:row]);
-    self.text = [NSString stringWithFormat:@"%@", [_deviceList objectAtIndex:row]];
+    if ([_deviceList count] > 0) {
+        NSLog(@"%@", [_deviceList objectAtIndex:row]);
+        self.text = [NSString stringWithFormat:@"%@", [_deviceList objectAtIndex:row]];
+    }
 }
 
 - (NSInteger)pickerView:(UIPickerView *)pickerView numberOfRowsInComponent:(NSInteger)component
@@ -112,7 +126,11 @@
 
 - (NSString *)pickerView:(UIPickerView *)pickerView titleForRow:(NSInteger)row forComponent:(NSInteger)component
 {
-    return [_deviceList objectAtIndex:row];
+    if ([_deviceList count] > 0) {
+        return [_deviceList objectAtIndex:row];
+    } else {
+        return [NSString new];
+    }
 }
 
 - (CGFloat)pickerView:(UIPickerView *)pickerView widthForComponent:(NSInteger)component
@@ -122,9 +140,10 @@
 
 - (IBAction)deviceSelectClicked:(id)sender
 {
-    _selectedDeviceIndex = [_deviceList indexOfObject:self.text];
+    if ([_deviceList count] > 0) {
+        _selectedDeviceIndex = [_deviceList indexOfObject:self.text];
+    }
     [self resignFirstResponder];
-    [self selectDevice];
 }
 
 // MARK: CHIPDeviceControllerDelegate

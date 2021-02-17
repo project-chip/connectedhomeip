@@ -26,6 +26,7 @@ static NSString * const DEFAULT_DISCRIMINATOR = @"3840";
 
 @interface MultiAdminViewController ()
 
+@property (strong, nonatomic) UISwitch * openPairingOnAllDevices;
 @property (strong, nonatomic) UISwitch * useOnboardingTokenSwitch;
 @property (strong, nonatomic) UITextField * discriminatorField;
 @property (strong, nonatomic) UITextField * timeoutField;
@@ -80,15 +81,26 @@ static NSString * const DEFAULT_DISCRIMINATOR = @"3840";
     [stackView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:30].active = YES;
     [stackView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-30].active = YES;
 
+    // Open pairing on all devices
+    UILabel * pairAllDevices = [UILabel new];
+    pairAllDevices.text = @"Enable pairing on all devices";
+    _openPairingOnAllDevices = [UISwitch new];
+    [_openPairingOnAllDevices setOn:YES];
+    UIView * openPairingOnAllDevicesView = [CHIPUIViewUtils viewWithLabel:pairAllDevices toggle:_openPairingOnAllDevices];
+    [_openPairingOnAllDevices addTarget:self action:@selector(pairAllDevicesButton:) forControlEvents:UIControlEventTouchUpInside];
+    [stackView addArrangedSubview:openPairingOnAllDevicesView];
+    openPairingOnAllDevicesView.translatesAutoresizingMaskIntoConstraints = false;
+    [openPairingOnAllDevicesView.trailingAnchor constraintEqualToAnchor:stackView.trailingAnchor].active = YES;
+
     // Device List and selector
+    _deviceSelector = [DeviceSelector new];
+    [_deviceSelector setEnabled:NO];
+
     UILabel * deviceIDLabel = [UILabel new];
     deviceIDLabel.text = @"Device ID:";
-    _deviceSelector = [DeviceSelector new];
-
     UIView * deviceIDView = [CHIPUIViewUtils viewWithLabel:deviceIDLabel textField:_deviceSelector];
-    deviceIDLabel.font = [UIFont systemFontOfSize:17 weight:UIFontWeightSemibold];
-
     [stackView addArrangedSubview:deviceIDView];
+
     deviceIDView.translatesAutoresizingMaskIntoConstraints = false;
     [deviceIDView.trailingAnchor constraintEqualToAnchor:stackView.trailingAnchor].active = true;
 
@@ -163,6 +175,15 @@ static NSString * const DEFAULT_DISCRIMINATOR = @"3840";
 
 // MARK: UIButton actions
 
+- (IBAction)pairAllDevicesButton:(id)sender
+{
+    if ([_openPairingOnAllDevices isOn]) {
+        [_deviceSelector setEnabled:NO];
+    } else {
+        [_deviceSelector setEnabled:YES];
+    }
+}
+
 - (IBAction)overrideControls:(id)sender
 {
     if ([_useOnboardingTokenSwitch isOn]) {
@@ -178,44 +199,47 @@ static NSString * const DEFAULT_DISCRIMINATOR = @"3840";
 
 - (IBAction)openPairingWindow:(id)sender
 {
-    // send message
-    CHIPDevice * chipDevice = [self.deviceSelector selectedDevice];
-    if (chipDevice != nil && [chipDevice isActive]) {
-        NSString * timeoutStr = [self.timeoutField text];
-        if (timeoutStr.length == 0) {
-            timeoutStr = [self.timeoutField placeholder];
-        }
-        int timeout = [timeoutStr intValue];
-
-        NSString * output;
-        NSError * error;
-        if ([_useOnboardingTokenSwitch isOn]) {
-            NSString * discriminatorStr = [self.discriminatorField text];
-            if (discriminatorStr.length == 0) {
-                discriminatorStr = [self.discriminatorField placeholder];
+    uint32_t setupPIN = arc4random();
+    [_deviceSelector forSelectedDevices:^(uint64_t deviceId) {
+        CHIPDevice * chipDevice = CHIPGetPairedDeviceWithID(deviceId);
+        // send message
+        if (chipDevice != nil && [chipDevice isActive]) {
+            NSString * timeoutStr = [self.timeoutField text];
+            if (timeoutStr.length == 0) {
+                timeoutStr = [self.timeoutField placeholder];
             }
-            NSInteger discriminator = [discriminatorStr intValue];
+            int timeout = [timeoutStr intValue];
 
-            output = [chipDevice openPairingWindowWithPIN:timeout discriminator:discriminator error:&error];
+            NSString * output;
+            NSError * error;
+            if ([self.useOnboardingTokenSwitch isOn]) {
+                NSString * discriminatorStr = [self.discriminatorField text];
+                if (discriminatorStr.length == 0) {
+                    discriminatorStr = [self.discriminatorField placeholder];
+                }
+                NSInteger discriminator = [discriminatorStr intValue];
 
-            if (output != nil) {
-                NSString * result = [@"Use Manual Code: " stringByAppendingString:output];
-                [self updateResult:result];
+                output = [chipDevice openPairingWindowWithPIN:timeout discriminator:discriminator setupPIN:setupPIN error:&error];
+
+                if (output != nil) {
+                    NSString * result = [@"Use Manual Code: " stringByAppendingString:output];
+                    [self updateResult:result];
+                } else {
+                    [self updateResult:@"Failed in opening the pairing window"];
+                }
             } else {
-                [self updateResult:@"Failed in opening the pairing window"];
+                BOOL didSend = [chipDevice openPairingWindow:timeout error:&error];
+                if (didSend) {
+                    [self updateResult:@"Scan the QR code on the device"];
+                } else {
+                    NSString * errorString = [@"Error: " stringByAppendingString:error.localizedDescription];
+                    [self updateResult:errorString];
+                }
             }
         } else {
-            BOOL didSend = [chipDevice openPairingWindow:timeout error:&error];
-            if (didSend) {
-                [self updateResult:@"Scan the QR code on the device"];
-            } else {
-                NSString * errorString = [@"Error: " stringByAppendingString:error.localizedDescription];
-                [self updateResult:errorString];
-            }
+            [self updateResult:@"Controller not connected"];
         }
-    } else {
-        [self updateResult:@"Controller not connected"];
-    }
+    }];
 }
 
 @end

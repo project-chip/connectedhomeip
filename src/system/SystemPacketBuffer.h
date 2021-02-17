@@ -36,6 +36,7 @@
 #include <system/SystemError.h>
 
 #include <stddef.h>
+#include <utility>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/mem.h>
@@ -60,7 +61,6 @@ class PacketBufferTest;
 
 #undef CHIP_SYSTEM_PACKETBUFFER_HAS_RIGHT_SIZE // True if RightSize() has a nontrivial implementation
 #undef CHIP_SYSTEM_PACKETBUFFER_HAS_CHECK      // True if Check() has a nontrivial implementation
-
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #if LWIP_PBUF_FROM_CUSTOM_POOLS
 #define CHIP_SYSTEM_PACKETBUFFER_STORE CHIP_SYSTEM_PACKETBUFFER_STORE_LWIP_CUSTOM
@@ -697,8 +697,6 @@ class PacketBufferWriterUtil
 private:
     template <typename>
     friend class PacketBufferWriterBase;
-    static void Initialize(BufferWriter & aBufferWriter, System::PacketBufferHandle & aPacket, size_t aAvailableSize,
-                           uint16_t aReservedSize);
     static System::PacketBufferHandle Finalize(BufferWriter & aBufferWriter, System::PacketBufferHandle & aPacket);
 };
 
@@ -721,19 +719,26 @@ class PacketBufferWriterBase : public Writer
 {
 public:
     /**
-     * Constructs a BufferWriter that writes into a newly allocated packet buffer.
+     * Constructs a BufferWriter that writes into a packet buffer, using all avaiable space.
      *
-     *  If no memory is available, or if the size requested is too large, then \c IsNull() will be true.
-     *  Otherwise, it is guaranteed that the BufferWriter length is \a aAvailableSize. (The underlying packet
-     *  buffer may be larger.)
-     *
-     *  @param[in]  aAvailableSize  Length bound of the BufferWriter.
-     *  @param[in]  aReservedSize   Reserved packet buffer space for protocol headers; see \c PacketBufferHandle::New().
+     *  @param[in]  aPacket  A handle to PacketBuffer, to be used as backing store for the BufferWriter.
      */
-    PacketBufferWriterBase(size_t aAvailableSize, uint16_t aReservedSize = CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE) :
-        Writer(nullptr, 0)
+    PacketBufferWriterBase(System::PacketBufferHandle && aPacket) :
+        Writer(aPacket->Start() + aPacket->DataLength(), aPacket->AvailableDataLength())
     {
-        PacketBufferWriterUtil::Initialize(*this, mPacket, aAvailableSize, aReservedSize);
+        mPacket = std::move(aPacket);
+    }
+
+    /**
+     * Constructs a BufferWriter that writes into a packet buffer, using no more than the requested space.
+     *
+     *  @param[in]  aPacket A handle to PacketBuffer, to be used as backing store for the BufferWriter.
+     *  @param[in]  aSize   Maximum number of octects to write into the packet buffer.
+     */
+    PacketBufferWriterBase(System::PacketBufferHandle && aPacket, size_t aSize) :
+        Writer(aPacket->Start() + aPacket->DataLength(), chip::min(aSize, static_cast<size_t>(aPacket->AvailableDataLength())))
+    {
+        mPacket = std::move(aPacket);
     }
 
     /**

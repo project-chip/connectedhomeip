@@ -224,7 +224,7 @@ CHIP_ERROR NetworkProvisioning::SendNetworkCredentials(const char * ssid, const 
     const size_t bufferSize = EncodedStringSize(ssid) + EncodedStringSize(passwd);
     VerifyOrExit(CanCastTo<uint16_t>(bufferSize), err = CHIP_ERROR_INVALID_ARGUMENT);
     {
-        Encoding::LittleEndian::PacketBufferWriter bbuf(bufferSize + MessagePacketBuffer::kMaxFooterSize);
+        Encoding::LittleEndian::PacketBufferWriter bbuf(MessagePacketBuffer::New(bufferSize), bufferSize);
 
         ChipLogProgress(NetworkProvisioning, "Sending Network Creds. Delegate %p\n", mDelegate);
         VerifyOrExit(mDelegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -258,7 +258,7 @@ CHIP_ERROR NetworkProvisioning::SendThreadCredentials(const DeviceLayer::Interna
         4;                  // threadData.ThreadChannel, threadData.FieldPresent.ThreadExtendedPANId,
                             // threadData.FieldPresent.ThreadMeshPrefix, threadData.FieldPresent.ThreadPSKc
     /* clang-format on */
-    Encoding::LittleEndian::PacketBufferWriter bbuf(credentialSize);
+    Encoding::LittleEndian::PacketBufferWriter bbuf(MessagePacketBuffer::New(credentialSize), credentialSize);
 
     ChipLogProgress(NetworkProvisioning, "Sending Thread Credentials");
     VerifyOrExit(mDelegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);

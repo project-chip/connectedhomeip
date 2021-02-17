@@ -57,6 +57,7 @@
 #include <platform/Linux/dbus/bluez/DbusBluez.h>
 
 #include <cstdint>
+#include <string>
 
 namespace chip {
 namespace DeviceLayer {
@@ -213,6 +214,11 @@ CHIP_ERROR ConnectDevice(BluezDevice1 * apDevice);
 ///  while (iterator.Next()) {
 ///      std::cout << iterator.GetAddress() << std::endl;
 ///  }
+///
+/// Data is provided through the bluez dbus interface. You can view
+/// this data in the commandline using commands such as:
+///
+///    busctl introspect org.bluez /org/bluez/hci0
 class AdapterIterator
 {
 public:
@@ -227,9 +233,9 @@ public:
     // Information about the current value. Safe to call only after
     // "Next" has returned true.
     uint32_t GetIndex() const { return mCurrent.index; }
-    const char * GetAddress() const { return mCurrent.address; }
-    const char * GetAlias() const { return mCurrent.alias; }
-    const char * GetName() const { return mCurrent.name; }
+    const char * GetAddress() const { return mCurrent.address.c_str(); }
+    const char * GetAlias() const { return mCurrent.alias.c_str(); }
+    const char * GetName() const { return mCurrent.name.c_str(); }
     bool IsPowered() const { return mCurrent.powered; }
 
 private:
@@ -253,9 +259,9 @@ private:
     struct
     {
         uint32_t index;
-        char address[kMaxAddressLength];
-        char alias[kMaxNameLength];
-        char name[kMaxNameLength];
+        std::string address;
+        std::string alias;
+        std::string name;
         bool powered;
     } mCurrent = { 0 };
 };

@@ -101,6 +101,14 @@ CHIPDevice * CHIPGetPairedDeviceWithID(uint64_t deviceId)
     return [controller getPairedDevice:deviceId error:&error];
 }
 
+void CHIPUnpairDeviceWithID(uint64_t deviceId)
+{
+    CHIPDeviceController * controller = InitializeCHIP();
+
+    NSError * error;
+    [controller unpairDevice:deviceId error:&error];
+}
+
 @implementation CHIPToolPersistentStorageDelegate
 
 // MARK: CHIPPersistentStorageDelegate
