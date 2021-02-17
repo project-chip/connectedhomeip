@@ -34,9 +34,6 @@
 #include <transport/SecureSessionMgr.h>
 
 namespace chip {
-
-constexpr uint16_t kMsgCounterChallengeSize = 8; // The size of the message counter synchronization request message.
-
 namespace Messaging {
 
 class ExchangeManager;
@@ -167,12 +164,6 @@ public:
 
     uint16_t GetExchangeId() const { return mExchangeId; }
 
-    void SetChallenge(const uint8_t * value) { memcpy(&mChallenge[0], value, kMsgCounterChallengeSize); }
-
-    const uint8_t * GetChallenge() const { return mChallenge; }
-
-    SecureSessionHandle GetSecureSessionHandle() const { return mSecureSession; }
-
     /*
      * In order to use reference counting (see refCount below) we use a hold/free paradigm where users of the exchange
      * can hold onto it while it's out of their direct control to make sure it isn't closed before everyone's ready.
@@ -203,10 +194,6 @@ private:
 
     SecureSessionHandle mSecureSession; // The connection state
     uint16_t mExchangeId;               // Assigned exchange ID.
-
-    // [TODO: #4711]: this field need to be moved to appState object which implement 'exchange-specific' contextual
-    // actions with a delegate pattern.
-    uint8_t mChallenge[kMsgCounterChallengeSize]; // Challenge number to identify the sychronization request cryptographically.
 
     BitFlags<uint16_t, ExFlagValues> mFlags; // Internal state flags
 
