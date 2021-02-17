@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">CHIPTool</string>
     <string name="barcode_scanner_activity_toolbar_title">QR Scan</string>
+    <string name="text_ok">Ok</string>
+    <string name="location_permission_denied_title">Location permission required</string>
+    <string name="location_permission_denied_message">Since location permission was denied, some functions of the app may be unavailable. </string>
     <string name="chip_device_info_title">CHIP Device Info:</string>
     <string name="chip_device_info_subtitle">Please manually connect to this device\'s soft AP using the information below.</string>
     <string name="chip_device_info_version_label">Version:</string>
