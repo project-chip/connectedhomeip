@@ -32,16 +32,18 @@ using namespace chip::TLV;
 
 namespace chip {
 namespace Platform {
-//TODO: Implement CriticalSectionEnter per platform
-void CriticalSectionEnter() {
+// TODO: Implement CriticalSectionEnter per platform
+void CriticalSectionEnter()
+{
     return;
 }
 
-void CriticalSectionExit() {
+void CriticalSectionExit()
+{
     return;
 }
-} // Platform
-}// chip
+} // namespace Platform
+} // namespace chip
 
 namespace chip {
 namespace app {
@@ -574,7 +576,7 @@ CHIP_ERROR LoggingManagement::CopyAndAdjustDeltaTime(const TLVReader & aReader, 
     CopyAndAdjustDeltaTimeContext * ctx = static_cast<CopyAndAdjustDeltaTimeContext *>(apContext);
     TLVReader reader(aReader);
 
-    //TODO: Add UC timestamp support
+    // TODO: Add UC timestamp support
     if (aReader.GetTag() == chip::TLV::ContextTag(chip::app::EventDataElement::kCsTag_DeltaSystemTimeStamp))
     {
         if (ctx->mContext->mFirst) // First event gets a timestamp, subsequent ones get a delta T
@@ -598,7 +600,8 @@ CHIP_ERROR LoggingManagement::CopyAndAdjustDeltaTime(const TLVReader & aReader, 
     {
         if (ctx->mContext->mFirst)
         {
-            err = ctx->mWriter->Put(TLV::ContextTag(chip::app::EventDataElement::kCsTag_Number), ctx->mContext->mCurrentEventNumber);
+            err =
+                ctx->mWriter->Put(TLV::ContextTag(chip::app::EventDataElement::kCsTag_Number), ctx->mContext->mCurrentEventNumber);
         }
     }
 
@@ -701,9 +704,9 @@ inline chip::EventId LoggingManagement::LogEventPrivate(const EventSchema & aSch
         opts.relatedPriority = apOptions->relatedPriority;
     }
 
-    ctxt.mFirst          = false;
+    ctxt.mFirst              = false;
     ctxt.mCurrentEventNumber = GetPriorityBuffer(aSchema.mPriority)->mLastEventID;
-    ctxt.mCurrentTime    = GetPriorityBuffer(aSchema.mPriority)->mLastEventTimestamp;
+    ctxt.mCurrentTime        = GetPriorityBuffer(aSchema.mPriority)->mLastEventTimestamp;
 
     // Begin writing
     while (!didWriteEvent)
@@ -968,9 +971,9 @@ CHIP_ERROR LoggingManagement::FetchEventsSince(TLVWriter & aWriter, PriorityLeve
         buf = buf->mpNext;
     }
 
-    context.mCurrentTime    = buf->mFirstEventTimestamp;
+    context.mCurrentTime        = buf->mFirstEventTimestamp;
     context.mCurrentEventNumber = buf->mFirstEventID;
-    err                     = GetEventReader(reader, aPriority);
+    err                         = GetEventReader(reader, aPriority);
     SuccessOrExit(err);
 
     err = chip::TLV::Utilities::Iterate(reader, CopyEventsSince, &context, recurse);
@@ -1175,7 +1178,7 @@ void LoggingManagement::SignalUploadDone(void) {}
 CHIP_ERROR LoggingManagement::ScheduleFlushIfNeeded(bool inRequestFlush)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    //TODO: Implement ScheduleFlushIfNeeded
+    // TODO: Implement ScheduleFlushIfNeeded
     return err;
 }
 

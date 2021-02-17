@@ -44,7 +44,7 @@ CHIP_ERROR ReportingEngine::Init()
 
 CHIP_ERROR ReportingEngine::BuildSingleReportDataEventList(ReportData::Builder & aReportDataBuilder, ReadHandler * apReadHandler)
 {
-    CHIP_ERROR err  = CHIP_NO_ERROR;
+    CHIP_ERROR err       = CHIP_NO_ERROR;
     uint32_t event_count = 0;
     bool dataClean;
     chip::EventId initialEvents[kPriorityLevel_Last - kPriorityLevel_First + 1];
@@ -91,7 +91,7 @@ CHIP_ERROR ReportingEngine::BuildSingleReportDataEventList(ReportData::Builder &
         else
         {
             apReadHandler->mCurrentPriority = apReadHandler->FindNextPriorityForTransfer();
-            dataClean                      = (apReadHandler->mCurrentPriority == kPriorityLevel_Invalid);
+            dataClean                       = (apReadHandler->mCurrentPriority == kPriorityLevel_Invalid);
         }
 
         // proceed only if there are new events.
@@ -111,9 +111,9 @@ CHIP_ERROR ReportingEngine::BuildSingleReportDataEventList(ReportData::Builder &
                 // We have successfully reached the end of the log for
                 // the current priority. Advance to the next
                 // priority level.
-                err                            = CHIP_NO_ERROR;
+                err                             = CHIP_NO_ERROR;
                 apReadHandler->mCurrentPriority = apReadHandler->FindNextPriorityForTransfer();
-                mMoreChunkedMessages           = false;
+                mMoreChunkedMessages            = false;
             }
             else if ((err == CHIP_ERROR_BUFFER_TOO_SMALL) || (err == CHIP_ERROR_NO_MEMORY))
             {
@@ -207,7 +207,7 @@ CHIP_ERROR ReportingEngine::BuildAndSendSingleReportData(ReadHandler * apReadHan
 
     VerifyOrExit(bufHandle->EnsureReservedSize(System::PacketBuffer::kDefaultHeaderReserve), err = CHIP_ERROR_BUFFER_TOO_SMALL);
 
-#if 1 //CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+#if 1 // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     {
         chip::System::PacketBufferTLVReader reader;
         ReportData::Parser report;

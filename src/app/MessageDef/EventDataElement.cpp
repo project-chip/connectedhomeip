@@ -377,8 +377,7 @@ CHIP_ERROR EventDataElement::Parser::CheckSchemaValidity() const
     if (CHIP_END_OF_TLV == err)
     {
         // check for required fields:
-        const uint16_t RequiredFields =
-            (1 << kCsTag_EventPath) | (1 << kCsTag_PriorityLevel) | (1 << kCsTag_Data);
+        const uint16_t RequiredFields = (1 << kCsTag_EventPath) | (1 << kCsTag_PriorityLevel) | (1 << kCsTag_Data);
 
         if ((TagPresenceMask & RequiredFields) == RequiredFields)
         {
