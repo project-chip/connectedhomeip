@@ -318,11 +318,25 @@ config("exceptions_default") {
   configs = [ ":no_exceptions" ]
 }
 
-config("unwind_tables_default") {
+config("unwind_tables") {
+  cflags = [
+    "-funwind-tables",
+  ]
+}
+
+config("no_unwind_tables") {
   cflags = [
     "-fno-unwind-tables",
     "-fno-asynchronous-unwind-tables",
   ]
+}
+
+config("unwind_tables_default") {
+  if (current_os == "android") {
+    configs = [":unwind_tables"]
+  } else {
+    configs = [":no_unwind_tables"]
+  }
 }
 
 config("size_default") {
