@@ -251,8 +251,6 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       ]
 
       if (chip_enable_ble) {
-        configs -= [ "${build_root}/config/compiler:std_default" ]
-        configs += [ "//:sdk_posix_config" ]
         sources += [
           "cc13x2_26x2/BLEManagerImpl.cpp",
           "cc13x2_26x2/BLEManagerImpl.h",
