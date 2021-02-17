@@ -44,7 +44,7 @@ mbed_set_mbed_target_linker_script(${APP_TARGET})
 
 project(${APP_TARGET})
 
-target_link_libraries(${APP_TARGET} mbed-os mbed-events chip)
+target_link_libraries(${APP_TARGET} mbed-os mbed-events mbed-storage mbed-storage-kv-global-api mbed-mbedtls mbed-mbedtls-cryptocell310 chip)
 
 mbed_set_post_build(${APP_TARGET})
 

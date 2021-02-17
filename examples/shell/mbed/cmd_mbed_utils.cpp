@@ -21,6 +21,7 @@
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/TimeUtils.h>
+#include <platform/CHIPDeviceLayer.h>
 
 #include <inttypes.h>
 #include <stdarg.h>
@@ -112,13 +113,28 @@ exit:
     return error;
 }
 
+int cmd_device_test_config(int argc, char ** argv)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+
+    VerifyOrExit(argc == 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    chip::DeviceLayer::ConfigurationMgrImpl().RunConfigUnitTest();
+exit:
+    return error;
+}
+
 static const shell_command_t cmds_date_root = { &cmd_date_dispatch, "date", "Display the current time, or set the system date." };
 
 static const shell_command_t cmds_date[] = { { &cmd_date_set, "set", "Set date/time using 'YYYY-MM-DD HH:MM:SS' format" },
                                              { &cmd_date_help, "help", "Display help for each subcommand" } };
 
+static const shell_command_t cmds_test_config = { &cmd_device_test_config, "testconfig",
+                                                  "Test the configuration implementation. Usage: device testconfig" };
+
 void cmd_mbed_utils_init()
 {
     sShellDateSubcommands.RegisterCommands(cmds_date, ArraySize(cmds_date));
     shell_register(&cmds_date_root, 1);
+    shell_register(&cmds_test_config, 1);
 }
