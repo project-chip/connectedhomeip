@@ -78,10 +78,7 @@ public:
     void SetLastActivityTimeMs(uint64_t value) { mLastActivityTimeMs = value; }
 
     SecureSession & GetSenderSecureSession() { return mSenderSecureSession; }
-    const SecureSession & GetSenderSecureSession() const { return mSenderSecureSession; }
-
     SecureSession & GetReceiverSecureSession() { return mReceiverSecureSession; }
-    const SecureSession & GetReceiverSecureSession() const { return mReceiverSecureSession; }
 
     Transport::AdminId GetAdminId() const { return mAdmin; }
     void SetAdminId(Transport::AdminId admin) { mAdmin = admin; }
@@ -106,13 +103,13 @@ public:
     }
 
     CHIP_ERROR EncryptBeforeSend(const uint8_t * input, size_t input_length, uint8_t * output, PacketHeader & header,
-                                 MessageAuthenticationCode & mac)
+                                 MessageAuthenticationCode & mac) const
     {
         return mSenderSecureSession.Encrypt(input, input_length, output, header, mac);
     }
 
     CHIP_ERROR DecryptOnReceive(const uint8_t * input, size_t input_length, uint8_t * output, const PacketHeader & header,
-                                const MessageAuthenticationCode & mac)
+                                const MessageAuthenticationCode & mac) const
     {
         return mReceiverSecureSession.Decrypt(input, input_length, output, header, mac);
     }
