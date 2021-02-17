@@ -55,81 +55,6 @@ function hasSpecificResponse(commandName)
   return templateUtil.templatePromise(this.global, promise);
 }
 
-function asCallbackAttributeType(attributeType)
-{
-  switch (parseInt(attributeType)) {
-  case 0x00: // nodata / No data
-  case 0x0A: // data24 / 24-bit data
-  case 0x0C: // data40 / 40-bit data
-  case 0x0D: // data48 / 48-bit data
-  case 0x0E: // data56 / 56-bit data
-  case 0x1A: // map24 / 24-bit bitmap
-  case 0x1C: // map40 / 40-bit bitmap
-  case 0x1D: // map48 / 48-bit bitmap
-  case 0x1E: // map56 / 56-bit bitmap
-  case 0x22: // uint24 / Unsigned 24-bit integer
-  case 0x24: // uint40 / Unsigned 40-bit integer
-  case 0x25: // uint48 / Unsigned 48-bit integer
-  case 0x26: // uint56 / Unsigned 56-bit integer
-  case 0x2A: // int24 / Signed 24-bit integer
-  case 0x2C: // int40 / Signed 40-bit integer
-  case 0x2D: // int48 / Signed 48-bit integer
-  case 0x2E: // int56 / Signed 56-bit integer
-  case 0x38: // semi / Semi-precision
-  case 0x39: // single / Single precision
-  case 0x3A: // double / Double precision
-  case 0x41: // octstr / Octet string
-  case 0x42: // string / Character string
-  case 0x43: // octstr16 / Long octet string
-  case 0x44: // string16 / Long character string
-  case 0x48: // array / Array
-  case 0x49: // struct / Structure
-  case 0x50: // set / Set
-  case 0x51: // bag / Bag
-  case 0xE0: // ToD / Time of day
-    return 'Unsupported';
-  case 0x08: // data8 / 8-bit data
-  case 0x18: // map8 / 8-bit bitmap
-  case 0x20: // uint8 / Unsigned  8-bit integer
-  case 0x30: // enum8 / 8-bit enumeration
-    return 'Int8u';
-  case 0x09: // data16 / 16-bit data
-  case 0x19: // map16 / 16-bit bitmap
-  case 0x21: // uint16 / Unsigned 16-bit integer
-  case 0x31: // enum16 / 16-bit enumeration
-  case 0xE8: // clusterId / Cluster ID
-  case 0xE9: // attribId / Attribute ID
-  case 0xEA: // bacOID / BACnet OID
-  case 0xF1: // key128 / 128-bit security key
-  case 0xFF: // unk / Unknown
-    return 'Int16u';
-  case 0x0B: // data32 / 32-bit data
-  case 0x1B: // map32 / 32-bit bitmap
-  case 0x23: // uint32 / Unsigned 32-bit integer
-  case 0xE1: // date / Date
-  case 0xE2: // UTC / UTCTime
-    return 'Int32u';
-  case 0x0F: // data64 / 64-bit data
-  case 0x1F: // map64 / 64-bit bitmap
-  case 0x27: // uint64 / Unsigned 64-bit integer
-  case 0xF0: // EUI64 / IEEE address
-    return 'Int64u';
-  case 0x10: // bool / Boolean
-    return 'Boolean';
-  case 0x28: // int8 / Signed 8-bit integer
-    return 'Int8s';
-  case 0x29: // int16 / Signed 16-bit integer
-    return 'Int16s';
-  case 0x2B: // int32 / Signed 32-bit integer
-    return 'Int32s';
-  case 0x2F: // int64 / Signed 64-bit integer
-    return 'Int64s';
-  default:
-    error = 'Unhandled attribute type ' + attributeType;
-    throw error;
-  }
-}
-
 function asDelimitedCommand(name)
 {
   return name.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
@@ -204,7 +129,6 @@ function isStrEndsWith(str, substr)
 // Module exports
 //
 exports.hasSpecificResponse     = hasSpecificResponse;
-exports.asCallbackAttributeType = asCallbackAttributeType;
 exports.asDelimitedCommand      = asDelimitedCommand;
 exports.asTypeMinValue          = asTypeMinValue;
 exports.asTypeMaxValue          = asTypeMaxValue;

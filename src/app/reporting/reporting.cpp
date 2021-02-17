@@ -239,7 +239,7 @@ void emberAfPluginReportingTickEventHandler(void)
         }
 
         // find size of current report
-        dataSize   = emberAfAttributeValueSize(dataType, readData);
+        dataSize   = emberAfAttributeValueSize(entry.clusterId, entry.attributeId, dataType, readData);
         reportSize = static_cast<uint32_t>(sizeof(entry.attributeId) + sizeof(dataType) + dataSize);
 
         // If we have already started a report for a different attribute or

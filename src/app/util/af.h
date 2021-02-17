@@ -570,12 +570,26 @@ uint8_t emberAfStringLength(const uint8_t * buffer);
 uint16_t emberAfLongStringLength(const uint8_t * buffer);
 
 /*
+ * @brief Function that copies a ZCL typed list into a buffer. The index parameter
+ * may indicate a specific member of the list of the whole list if it is equal to -1.
+ */
+uint16_t emberAfCopyList(chip::ClusterId clusterId, EmberAfAttributeMetadata * am, bool write, uint8_t * dest, uint8_t * src,
+                         int32_t index);
+
+/*
  * @brief Function that determines the size of a zigbee Cluster Library
  * attribute value (where the attribute could be non-string, string, or long
  * string). For strings, the size includes the length of the string plus the
  * number of the string's length prefix byte(s).
  */
-uint16_t emberAfAttributeValueSize(EmberAfAttributeType dataType, const uint8_t * buffer);
+uint16_t emberAfAttributeValueSize(chip::ClusterId clusterId, chip::AttributeId attributeId, EmberAfAttributeType dataType,
+                                   const uint8_t * buffer);
+
+/*
+ * @brief Function that determines the size of a zigbee Cluster Library
+ * attribute List[T] where T could be of any type.
+ */
+uint16_t emberAfAttributeValueListSize(chip::ClusterId clusterId, chip::AttributeId attributeId, const uint8_t * buffer);
 
 /** @} END Attribute Storage */
 
@@ -645,6 +659,12 @@ bool emberAfIsStringAttributeType(EmberAfAttributeType attributeType);
 /** @brief Returns true if the given attribute type is a long string. */
 bool emberAfIsLongStringAttributeType(EmberAfAttributeType attributeType);
 
+/**
+ * @brief Returns true if a given ZCL data type is a list type.
+ *
+ * @return true if data type is a list.
+ */
+bool emberAfIsThisDataTypeAListType(EmberAfAttributeType dataType);
 /**
  * @brief The mask applied by ::emberAfNextSequence when generating ZCL
  * sequence numbers.

@@ -20,5 +20,22 @@ limitations under the License.
     <type id="0xF3" name="group_id" size="2" description="Group Id" discrete="true" />
     <type id="0xF4" name="command_id" size="1" description="Command Id" discrete="true" />
     <type id="0xF5" name="node_id" size="8" description="Node Id" discrete="true" />
+    <type id="0xF6" name="device_id" size="4" description="Device Id" discrete="true" />
   </atomic>
+  <struct name="DeviceType">
+    <item name="deviceTypeId" type="DEVICE_ID"/>
+    <item name="revision" type="INT16U"/>
+  </struct>
+  <struct name="AclEntries">
+    <item name="privilege" type="ENUM8"/>
+    <item name="authMode" type="INT16U"/>
+    <item name="subjects" type="ARRAY" subtype="NODE_ID"/>
+    <item name="targets" type="ARRAY" subtype="Target"/>
+    <item name="extension" type="OCTET_STRING"/>
+  </struct>
+  <struct name="Target">
+    <item name="endpoint" type="ENDPOINT_ID"/>
+    <item name="deviceTypeId" type="DEVICE_ID"/>
+    <item name="cluster" type="CLUSTER_ID"/>
+  </struct>
 </configurator>

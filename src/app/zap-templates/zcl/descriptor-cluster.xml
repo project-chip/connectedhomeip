@@ -22,9 +22,9 @@ limitations under the License.
     <code>0xF003</code>
     <define>DESCRIPTOR_CLUSTER</define>
     <description>The Descriptor Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for describing a node, its endpoints and clusters.</description>
-    <attribute side="server" code="0x0000" define="DEVICE" type="ARRAY" length="254" writable="false" optional="false" array="true">device</attribute>
-    <attribute side="server" code="0x0001" define="SERVER" type="ARRAY" length="254" writable="false" optional="false" array="true">server</attribute>
-    <attribute side="server" code="0x0002" define="CLIENT" type="ARRAY" length="254" writable="false" optional="false" array="true">client</attribute>
-    <attribute side="server" code="0x0003" define="PARTS" type="ARRAY" length="254" writable="false" optional="false" array="true">parts</attribute>
+    <attribute side="server" code="0x0000" define="DEVICE" type="ARRAY" entryType="DeviceType" length="254" writable="false" optional="false">device</attribute>
+    <attribute side="server" code="0x0001" define="SERVER" type="ARRAY" entryType="CLUSTER_ID" length="254" writable="false" optional="false">server</attribute>
+    <attribute side="server" code="0x0002" define="CLIENT" type="ARRAY" entryType="CLUSTER_ID" length="254" writable="false" optional="false">client</attribute>
+    <attribute side="server" code="0x0003" define="PARTS" type="ARRAY" entryType="ENDPOINT_ID" length="254" writable="false" optional="false">parts</attribute>
   </cluster>
 </configurator>

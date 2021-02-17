@@ -28,6 +28,8 @@ function asBasicType(type)
     return 'uint16_t';
   case 'chip::NodeId':
     return 'uint64_t';
+  case 'chip::DeviceId':
+    return 'uint32_t';
   default:
     return type;
   }

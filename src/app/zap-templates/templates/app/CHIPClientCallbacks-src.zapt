@@ -257,7 +257,6 @@ bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * messag
                 case 0x42: // string / Character string
                 case 0x43: // octstr16 / Long octet string
                 case 0x44: // string16 / Long character string
-                case 0x48: // array / Array
                 case 0x49: // struct / Structure
                 case 0x50: // set / Set
                 case 0x51: // bag / Bag
@@ -267,6 +266,56 @@ bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * messag
                     Callback::Callback<DefaultFailureCallback> * cb = Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
                     cb->mCall(cb->mContext, EMBER_ZCL_STATUS_INVALID_VALUE);
                     return true;
+                }
+
+                case 0x48: // array / Array
+                {
+                    CHECK_MESSAGE_LENGTH(2);
+                    uint16_t count = chip::Encoding::LittleEndian::Read16(message);
+                    ChipLogProgress(Zcl, "  count: %lu", count);
+
+                    switch (clusterId)
+                    {
+{{#chip_client_clusters}}
+{{#if (hasListAttributes)}}
+                    case {{asHex code 4}}:
+                        switch (attributeId)
+                        {
+{{#chip_server_cluster_attributes}}
+                        {{#if (isListAttribute)}}
+                        case {{asHex attributeCode 4}}: // {{listType}}
+                        {
+                            {{#if isStructItem}}
+                            {{listType}} data[count];
+                            {{else}}
+                            {{entryType.chipType}} data[count];
+                            {{/if}}
+                            for (size_t i = 0; i < count; i++)
+                            {
+                                {{#if isStructItem}}
+                                {{#chip_attribute_list_entryTypes}}
+                                data[i].{{name}} = emberAfGet{{asReadType type}}(message, 0, messageLen);
+                                message += {{size}};
+                                messageLen -= {{size}};
+                                {{/chip_attribute_list_entryTypes}}
+                                {{else}}
+                                data[i] = emberAfGet{{asReadType entryType.type}}(message, 0, messageLen);
+                                message += {{asListEntryLength}};
+                                messageLen -= {{asListEntryLength}};
+                                {{/if}}
+                            }
+
+                            Callback::Callback<{{asCamelCased parent.name false}}{{asCamelCased name false}}ListAttributeCallback> * cb = Callback::Callback<{{asCamelCased parent.name false}}{{asCamelCased name false}}ListAttributeCallback>::FromCancelable(onSuccessCallback);
+                            cb->mCall(cb->mContext, count, data);
+                            break;
+                        }
+                        {{/if}}
+{{/chip_server_cluster_attributes}}
+                        }
+{{/if}}
+{{/chip_client_clusters}}
+                    }
+                    break;
                 }
 
                 case 0x08: // data8 / 8-bit data

@@ -23,7 +23,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-{{#chip_clusters}}
+{{#chip_client_clusters}}
 
 
 /**
@@ -53,7 +53,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-{{/chip_clusters}}
+{{/chip_client_clusters}}
 
 NS_ASSUME_NONNULL_END
 

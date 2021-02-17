@@ -180,6 +180,11 @@ bool emberAfIsLongStringAttributeType(EmberAfAttributeType attributeType)
     return (attributeType == ZCL_LONG_OCTET_STRING_ATTRIBUTE_TYPE || attributeType == ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
+bool emberAfIsThisDataTypeAListType(EmberAfAttributeType dataType)
+{
+    return dataType == ZCL_ARRAY_ATTRIBUTE_TYPE;
+}
+
 // This function is used to call the per-cluster default response callback
 void emberAfClusterDefaultResponseWithMfgCodeCallback(EndpointId endpoint, ClusterId clusterId, uint8_t commandId,
                                                       EmberAfStatus status, uint8_t clientServerMask, uint16_t manufacturerCode)
@@ -370,8 +375,8 @@ static uint8_t * singletonAttributeLocation(EmberAfAttributeMetadata * am)
 // If src == NULL, then this method will set memory to zeroes
 // See documentation for emAfReadOrWriteAttribute for the semantics of
 // readLength when reading and writing.
-static EmberAfStatus typeSensitiveMemCopy(uint8_t * dest, uint8_t * src, EmberAfAttributeMetadata * am, bool write,
-                                          uint16_t readLength)
+static EmberAfStatus typeSensitiveMemCopy(ClusterId clusterId, uint8_t * dest, uint8_t * src, EmberAfAttributeMetadata * am,
+                                          bool write, uint16_t readLength, int32_t index)
 {
     EmberAfAttributeType attributeType = am->attributeType;
     // readLength == 0 for a read indicates that we should just trust that the
@@ -394,6 +399,15 @@ static EmberAfStatus typeSensitiveMemCopy(uint8_t * dest, uint8_t * src, EmberAf
             return EMBER_ZCL_STATUS_INSUFFICIENT_SPACE;
         }
         emberAfCopyLongString(dest, src, static_cast<uint16_t>(bufferSize - 2));
+    }
+    else if (emberAfIsThisDataTypeAListType(attributeType))
+    {
+        if (bufferSize < 2)
+        {
+            return EMBER_ZCL_STATUS_INSUFFICIENT_SPACE;
+        }
+
+        emberAfCopyList(clusterId, am, write, dest, src, index);
     }
     else
     {
@@ -503,7 +517,7 @@ bool emAfMatchAttribute(EmberAfCluster * cluster, EmberAfAttributeMetadata * am,
 // attribute.  This means the resulting string may be truncated.  The length
 // byte(s) in the resulting string will reflect any truncated.
 EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord, EmberAfAttributeMetadata ** metadata,
-                                       uint8_t * buffer, uint16_t readLength, bool write)
+                                       uint8_t * buffer, uint16_t readLength, bool write, int32_t index)
 {
     uint8_t i;
     uint16_t attributeOffsetIndex = 0;
@@ -576,7 +590,7 @@ EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord,
                                                             attRecord->endpoint, attRecord->clusterId, am,
                                                             emAfGetManufacturerCodeForAttribute(cluster, am), buffer,
                                                             emberAfAttributeSize(am))
-                                            : typeSensitiveMemCopy(dst, src, am, write, readLength));
+                                            : typeSensitiveMemCopy(attRecord->clusterId, dst, src, am, write, readLength, index));
                             }
                         }
                         else

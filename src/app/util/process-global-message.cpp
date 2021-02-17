@@ -252,7 +252,7 @@ bool emAfProcessGlobalCommand(EmberAfClusterCommand * cmd)
             attrId   = emberAfGetInt16u(message, msgIndex, msgLen);
             dataType = emberAfGetInt8u(message, msgIndex + 2, msgLen);
 
-            dataSize = emberAfAttributeValueSize(dataType, message + msgIndex + 3);
+            dataSize = emberAfAttributeValueSize(clusterId, attrId, dataType, message + msgIndex + 3);
 
             // Check to see if there are dataSize bytes left in the message if it is a string
             if (emberAfIsThisDataTypeAStringType(dataType) && (dataSize < msgLen - (msgIndex + 3)))
@@ -330,7 +330,7 @@ bool emAfProcessGlobalCommand(EmberAfClusterCommand * cmd)
             attrId   = emberAfGetInt16u(message, msgIndex, msgLen);
             dataType = emberAfGetInt8u(message, msgIndex + 2, msgLen);
 
-            dataSize = emberAfAttributeValueSize(dataType, message + msgIndex + 3);
+            dataSize = emberAfAttributeValueSize(clusterId, attrId, dataType, message + msgIndex + 3);
 
             // the data is sent little endian over-the-air, it needs to be
             // inserted into the table big endian for the EM250 and little

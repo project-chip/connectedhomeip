@@ -3,6 +3,7 @@
 #pragma once
 
 #include <inttypes.h>
+#include <gen/af-structs.h>
 
 // Global Response Callbacks
 typedef void (*DefaultSuccessCallback)(void * context);
@@ -33,3 +34,16 @@ typedef void (*{{asCamelCased parent.name false}}Cluster{{asCamelCased name fals
 {{/if}}
 {{/if}}
 {{/all_user_clusters}}
+
+// List specific responses
+{{#chip_client_clusters}}
+{{#chip_server_cluster_attributes}}
+{{#if (isListAttribute)}}
+{{#if isStructItem}}
+typedef void (*{{asCamelCased parent.name false}}{{asCamelCased name false}}ListAttributeCallback)(void * context, uint16_t count, {{listType}} * entries);
+{{else}}
+typedef void (*{{asCamelCased parent.name false}}{{asCamelCased name false}}ListAttributeCallback)(void * context, uint16_t count, {{entryType.chipType}} * entries);
+{{/if}}
+{{/if}}
+{{/chip_server_cluster_attributes}}
+{{/chip_client_clusters}}
