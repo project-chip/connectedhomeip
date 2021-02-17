@@ -465,9 +465,8 @@ exit:
 CHIP_ERROR ChipCertificateSet::ValidateCert(const ChipCertificateData * cert, ValidationContext & context,
                                             BitFlags<uint8_t, CertValidateFlags> validateFlags, uint8_t depth)
 {
-    CHIP_ERROR err                        = CHIP_NO_ERROR;
-    ChipCertificateData * caCert          = nullptr;
-    static constexpr int kLastSecondOfDay = kSecondsPerDay - 1;
+    CHIP_ERROR err               = CHIP_NO_ERROR;
+    ChipCertificateData * caCert = nullptr;
 
     // If the depth is greater than 0 then the certificate is required to be a CA certificate...
     if (depth > 0)
@@ -524,14 +523,13 @@ CHIP_ERROR ChipCertificateSet::ValidateCert(const ChipCertificateData * cert, Va
     }
 
     // Verify the validity time of the certificate, if requested.
-    if (cert->mNotBeforeDate != 0 && !validateFlags.Has(CertValidateFlags::kIgnoreNotBefore))
+    if (cert->mNotBeforeTime != 0 && !validateFlags.Has(CertValidateFlags::kIgnoreNotBefore))
     {
-        VerifyOrExit(context.mEffectiveTime >= PackedCertDateToTime(cert->mNotBeforeDate), err = CHIP_ERROR_CERT_NOT_VALID_YET);
+        VerifyOrExit(context.mEffectiveTime >= cert->mNotBeforeTime, err = CHIP_ERROR_CERT_NOT_VALID_YET);
     }
-    if (cert->mNotAfterDate != 0 && !validateFlags.Has(CertValidateFlags::kIgnoreNotAfter))
+    if (cert->mNotAfterTime != 0 && !validateFlags.Has(CertValidateFlags::kIgnoreNotAfter))
     {
-        VerifyOrExit(context.mEffectiveTime <= PackedCertDateToTime(cert->mNotAfterDate) + kLastSecondOfDay,
-                     err = CHIP_ERROR_CERT_EXPIRED);
+        VerifyOrExit(context.mEffectiveTime <= cert->mNotAfterTime, err = CHIP_ERROR_CERT_EXPIRED);
     }
 
     // If the certificate itself is trusted, then it is implicitly valid.  Record this certificate as the trust
@@ -641,8 +639,8 @@ void ChipCertificateData::Clear()
     mIssuerDN.Clear();
     mSubjectKeyId.Clear();
     mAuthKeyId.Clear();
-    mNotBeforeDate  = 0;
-    mNotAfterDate   = 0;
+    mNotBeforeTime  = 0;
+    mNotAfterTime   = 0;
     mPublicKey      = nullptr;
     mPublicKeyLen   = 0;
     mPubKeyCurveOID = 0;
@@ -733,114 +731,51 @@ bool CertificateKeyId::IsEqual(const CertificateKeyId & other) const
     return mId != nullptr && other.mId != nullptr && mLen == other.mLen && memcmp(mId, other.mId, mLen) == 0;
 }
 
-DLL_EXPORT CHIP_ERROR PackCertTime(const ASN1UniversalTime & time, uint32_t & packedTime)
+DLL_EXPORT CHIP_ERROR ASN1ToChipEpochTime(const chip::ASN1::ASN1UniversalTime & asn1Time, uint32_t & epochTime)
 {
-    enum
-    {
-        kCertTimeBaseYear = 2020,
-        kCertTimeMaxYear  = kCertTimeBaseYear +
-            UINT32_MAX / (kMonthsPerYear * kMaxDaysPerMonth * kHoursPerDay * kMinutesPerHour * kSecondsPerMinute),
-        kX509NoWellDefinedExpirationDateYear = 9999
-    };
-
-    // The packed time in a CHIP certificate cannot represent dates prior to 2020/01/01.
-    if (time.Year < kCertTimeBaseYear)
-    {
-        return ASN1_ERROR_UNSUPPORTED_ENCODING;
-    }
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     // X.509/RFC5280 defines the special time 99991231235959Z to mean 'no well-defined expiration date'.
-    // We represent that as a packed time value of 0, which for simplicity's sake is assigned to any
-    // date in the associated year.
-    if (time.Year == kX509NoWellDefinedExpirationDateYear)
+    // In CHIP certificate it is represented as a CHIP Epoch UTC time value of 0 sec (2020-01-01 00:00:00 UTC).
+    if ((asn1Time.Year == kX509NoWellDefinedExpirationDateYear) && (asn1Time.Month == kMonthsPerYear) &&
+        (asn1Time.Day == kMaxDaysPerMonth) && (asn1Time.Hour == kHoursPerDay - 1) && (asn1Time.Minute == kMinutesPerHour - 1) &&
+        (asn1Time.Second == kSecondsPerMinute - 1))
     {
-        packedTime = kNullCertTime;
-        return CHIP_NO_ERROR;
+        epochTime = kNullCertTime;
     }
-
-    // Technically packed certificate time values could grow beyond 32bits. However we restrict it here
-    // to dates that fit within 32bits to reduce code size and eliminate the need for 64bit math.
-    if (time.Year > kCertTimeMaxYear)
-    {
-        return ASN1_ERROR_UNSUPPORTED_ENCODING;
-    }
-
-    packedTime = time.Year - kCertTimeBaseYear;
-    packedTime = packedTime * kMonthsPerYear + time.Month - 1;
-    packedTime = packedTime * kMaxDaysPerMonth + time.Day - 1;
-    packedTime = packedTime * kHoursPerDay + time.Hour;
-    packedTime = packedTime * kMinutesPerHour + time.Minute;
-    packedTime = packedTime * kSecondsPerMinute + time.Second;
-
-    return CHIP_NO_ERROR;
-}
-
-DLL_EXPORT CHIP_ERROR UnpackCertTime(uint32_t packedTime, ASN1UniversalTime & time)
-{
-    enum
-    {
-        kCertTimeBaseYear                    = 2020,
-        kX509NoWellDefinedExpirationDateYear = 9999,
-    };
-
-    // X.509/RFC5280 defines the special time 99991231235959Z to mean 'no well-defined expiration date'.
-    // We represent that as a packed time value of 0.
-    if (packedTime == kNullCertTime)
-    {
-        time.Year   = kX509NoWellDefinedExpirationDateYear;
-        time.Month  = kMonthsPerYear;
-        time.Day    = kMaxDaysPerMonth;
-        time.Hour   = kHoursPerDay - 1;
-        time.Minute = kMinutesPerHour - 1;
-        time.Second = kSecondsPerMinute - 1;
-    }
-
     else
     {
-        time.Second = static_cast<uint8_t>(packedTime % kSecondsPerMinute);
-        packedTime /= kSecondsPerMinute;
+        if (!CalendarToChipEpochTime(asn1Time.Year, asn1Time.Month, asn1Time.Day, asn1Time.Hour, asn1Time.Minute, asn1Time.Second,
+                                     epochTime))
+        {
+            ExitNow(err = ASN1_ERROR_UNSUPPORTED_ENCODING);
+        }
+    }
 
-        time.Minute = static_cast<uint8_t>(packedTime % kMinutesPerHour);
-        packedTime /= kMinutesPerHour;
+exit:
+    return err;
+}
 
-        time.Hour = static_cast<uint8_t>(packedTime % kHoursPerDay);
-        packedTime /= kHoursPerDay;
-
-        time.Day = static_cast<uint8_t>((packedTime % kMaxDaysPerMonth) + 1);
-        packedTime /= kMaxDaysPerMonth;
-
-        time.Month = static_cast<uint8_t>((packedTime % kMonthsPerYear) + 1);
-        packedTime /= kMonthsPerYear;
-
-        time.Year = static_cast<uint16_t>(packedTime + kCertTimeBaseYear);
+DLL_EXPORT CHIP_ERROR ChipEpochToASN1Time(uint32_t epochTime, chip::ASN1::ASN1UniversalTime & asn1Time)
+{
+    // X.509/RFC5280 defines the special time 99991231235959Z to mean 'no well-defined expiration date'.
+    // In CHIP certificate it is represented as a CHIP Epoch time value of 0 secs (2020-01-01 00:00:00 UTC).
+    if (epochTime == kNullCertTime)
+    {
+        asn1Time.Year   = kX509NoWellDefinedExpirationDateYear;
+        asn1Time.Month  = kMonthsPerYear;
+        asn1Time.Day    = kMaxDaysPerMonth;
+        asn1Time.Hour   = kHoursPerDay - 1;
+        asn1Time.Minute = kMinutesPerHour - 1;
+        asn1Time.Second = kSecondsPerMinute - 1;
+    }
+    else
+    {
+        ChipEpochToCalendarTime(epochTime, asn1Time.Year, asn1Time.Month, asn1Time.Day, asn1Time.Hour, asn1Time.Minute,
+                                asn1Time.Second);
     }
 
     return CHIP_NO_ERROR;
-}
-
-DLL_EXPORT uint16_t PackedCertTimeToDate(uint32_t packedTime)
-{
-    return static_cast<uint16_t>(packedTime / kSecondsPerDay);
-}
-
-DLL_EXPORT uint32_t PackedCertDateToTime(uint16_t packedDate)
-{
-    return static_cast<uint32_t>(packedDate * kSecondsPerDay);
-}
-
-DLL_EXPORT uint32_t SecondsSinceEpochToPackedCertTime(uint32_t secondsSinceEpoch)
-{
-    chip::ASN1::ASN1UniversalTime asn1Time;
-    uint32_t packedTime;
-
-    // Convert seconds-since-epoch to calendar date and time and store in an ASN1UniversalTime structure.
-    SecondsSinceEpochToCalendarTime(secondsSinceEpoch, asn1Time.Year, asn1Time.Month, asn1Time.Day, asn1Time.Hour, asn1Time.Minute,
-                                    asn1Time.Second);
-
-    // Convert the calendar date/time to a packed certificate date/time.
-    PackCertTime(asn1Time, packedTime);
-
-    return packedTime;
 }
 
 } // namespace Credentials
