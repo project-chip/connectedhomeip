@@ -41,14 +41,14 @@ namespace app {
 namespace EventDataElement {
 enum
 {
-    kCsTag_EventPath              = 0,
-    kCsTag_PriorityLevel          = 1,
-    kCsTag_Number                 = 2,
-    kCsTag_UTCTimestamp           = 3,
-    kCsTag_SystemTimestamp        = 4,
-    kCsTag_DeltaUTCTimestamp = 5,
-    kCsTag_DeltaSystemTimestamp   = 6,
-    kCsTag_Data                   = 7,
+    kCsTag_EventPath            = 0,
+    kCsTag_PriorityLevel        = 1,
+    kCsTag_Number               = 2,
+    kCsTag_UTCTimestamp         = 3,
+    kCsTag_SystemTimestamp      = 4,
+    kCsTag_DeltaUTCTimestamp    = 5,
+    kCsTag_DeltaSystemTimestamp = 6,
+    kCsTag_Data                 = 7,
 };
 
 class Parser : public chip::app::Parser
