@@ -42,7 +42,7 @@ struct ifaddrs;
 #endif // CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
 
 #if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
-#include <zephyr.h>
+#include <device.h>
 
 struct net_if;
 struct net_if_ipv4;
