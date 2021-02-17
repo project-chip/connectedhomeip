@@ -155,7 +155,7 @@ public:
     bool HasBroadcastAddress();
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-    static constexpr size_t kMaxIfNameLength = 3; // LWIP size + null terminator
+    static constexpr size_t kMaxIfNameLength = 8; // Names are formatted as %c%c%d
 #elif CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
     static constexpr size_t kMaxIfNameLength = IF_NAMESIZE;
 #elif CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
