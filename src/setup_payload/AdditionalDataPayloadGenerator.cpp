@@ -106,7 +106,7 @@ CHIP_ERROR AdditionalDataPayloadGenerator::generateRotatingDeviceId(uint16_t lif
     outputBufferWriter.Put(&hashOutputBuffer[kSHA256_Hash_Length - RotatingDeviceId::kHashSuffixLength],
                            RotatingDeviceId::kHashSuffixLength);
 
-    for (; rotatingDeviceIdBufferIndex < outputBufferWriter.Needed(); rotatingDeviceIdBufferIndex++)
+    for (rotatingDeviceIdBufferIndex = 0; rotatingDeviceIdBufferIndex < outputBufferWriter.Needed(); rotatingDeviceIdBufferIndex++)
     {
         snprintf(&rotatingDeviceIdBuffer[rotatingDeviceIdBufferIndex * 2],
                  rotatingDeviceIdBufferSize - rotatingDeviceIdBufferIndex * 2, "%02X",

@@ -29,9 +29,9 @@
 
 namespace chip {
 namespace RotatingDeviceId {
-static constexpr unsigned kCounterStringMaxLength = 10;
+static constexpr unsigned kLifetimeCounterSize    = 2;
 static constexpr unsigned kHashSuffixLength       = 16;
-static constexpr unsigned kMaxLength              = kCounterStringMaxLength + kHashSuffixLength;
+static constexpr unsigned kMaxLength              = kLifetimeCounterSize + kHashSuffixLength;
 static constexpr unsigned kHexMaxLength           = kMaxLength * 2 + 1;
 } // namespace RotatingDeviceId
 
@@ -51,12 +51,22 @@ public:
      * Generate additional data payload (i.e. TLV encoded).
      *
      * @param lifetimeCounter lifetime counter
-     * @param serialNumberBuffer serial number buffer
+     * @param serialNumberBuffer null-terminated serial number buffer
      * @param serialNumberBufferSize size of the serial number buffer supplied.
      * @param bufferHandle output buffer handle
      * @param additionalDataFields bitfield for what fields should be generated in the additional data
      *
-     * @return CHIP_NO_ERROR on success.
+     * @retval #CHIP_ERROR_INVALID_TLV_TAG
+     *                              If the specified tag value is invalid or inappropriate in the context
+     *                              in which the value is being written.
+     * @retval #CHIP_ERROR_BUFFER_TOO_SMALL
+     *                              If writing the value would exceed the limit on the maximum number of
+     *                              bytes specified when the writer was initialized.
+     * @retval #CHIP_ERROR_NO_MEMORY
+     *                              If an attempt to allocate an output buffer failed due to lack of
+     *                              memory.
+     * @retval other                Other CHIP or platform-specific errors returned by the configured
+     *                              TLVBackingStore
      *
      */
     CHIP_ERROR generateAdditionalDataPayload(uint16_t lifetimeCounter, const char * serialNumberBuffer,
@@ -67,13 +77,13 @@ public:
      * Generate additional data payload (i.e. TLV encoded).
      *
      * @param lifetimeCounter lifetime counter
-     * @param serialNumberBuffer serial number buffer
+     * @param serialNumberBuffer null-terminated serial number buffer
      * @param serialNumberBufferSize size of the serial number buffer supplied.
      * @param rotatingDeviceIdBuffer rotating device id buffer
      * @param rotatingDeviceIdBufferSize the current size of the supplied buffer
      * @param rotatingDeviceIdValueOutputSize the number of chars making up the actual value of the returned rotating device id
      *
-     * @return CHIP_NO_ERROR on success.
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      *
      */
     CHIP_ERROR generateRotatingDeviceId(uint16_t lifetimeCounter, const char * serialNumberBuffer, size_t serialNumberBufferSize,
