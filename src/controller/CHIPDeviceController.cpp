@@ -332,6 +332,10 @@ exit:
     {
         chip::Platform::MemoryFree(buffer);
     }
+    if (err != CHIP_NO_ERROR && device != nullptr)
+    {
+        ReleaseDevice(device);
+    }
     return err;
 }
 
@@ -449,6 +453,17 @@ void DeviceController::ReleaseDevice(uint16_t index)
     if (index < kNumMaxActiveDevices)
     {
         ReleaseDevice(&mActiveDevices[index]);
+    }
+}
+
+void DeviceController::ReleaseDeviceById(NodeId remoteDeviceId)
+{
+    for (uint16_t i = 0; i < kNumMaxActiveDevices; i++)
+    {
+        if (mActiveDevices[i].GetDeviceId() == remoteDeviceId)
+        {
+            ReleaseDevice(&mActiveDevices[i]);
+        }
     }
 }
 
@@ -672,6 +687,7 @@ exit:
 
     return err;
 }
+
 CHIP_ERROR DeviceCommissioner::StopPairing(NodeId remoteDeviceId)
 {
     CHIP_ERROR err  = CHIP_NO_ERROR;
@@ -703,9 +719,11 @@ CHIP_ERROR DeviceCommissioner::UnpairDevice(NodeId remoteDeviceId)
     if (mStorageDelegate != nullptr)
     {
         PERSISTENT_KEY_OP(remoteDeviceId, kPairedDeviceKeyPrefix, key, mStorageDelegate->DeleteKeyValue(key));
-        mPairedDevices.Remove(remoteDeviceId);
-        mPairedDevicesUpdated = true;
     }
+
+    mPairedDevices.Remove(remoteDeviceId);
+    mPairedDevicesUpdated = true;
+    ReleaseDeviceById(remoteDeviceId);
 
     return CHIP_NO_ERROR;
 }

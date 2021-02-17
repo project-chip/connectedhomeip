@@ -86,14 +86,13 @@ NSString * const kCHIPNumLightOnOffCluster = @"OnOffViewController_NumLights";
     [stackView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-30].active = YES;
 
     // Device List and picker
-    UILabel * deviceIDLabel = [UILabel new];
-    deviceIDLabel.text = @"Device ID:";
     _deviceSelector = [DeviceSelector new];
 
+    UILabel * deviceIDLabel = [UILabel new];
+    deviceIDLabel.text = @"Device ID:";
     UIView * deviceIDView = [CHIPUIViewUtils viewWithLabel:deviceIDLabel textField:_deviceSelector];
-    deviceIDLabel.font = [UIFont systemFontOfSize:17 weight:UIFontWeightSemibold];
-
     [stackView addArrangedSubview:deviceIDView];
+
     deviceIDView.translatesAutoresizingMaskIntoConstraints = false;
     [deviceIDView.trailingAnchor constraintEqualToAnchor:stackView.trailingAnchor].active = true;
 
@@ -233,61 +232,64 @@ NSString * const kCHIPNumLightOnOffCluster = @"OnOffViewController_NumLights";
 
 - (IBAction)onButtonTapped:(id)sender
 {
-    CHIPDevice * chipDevice = [self.deviceSelector selectedDevice];
-    if (chipDevice == nil) {
-        [self updateResult:[NSString stringWithFormat:@"No device has been selected"]];
-        return;
-    }
-
     UIButton * button = (UIButton *) sender;
     NSInteger endpoint = button.tag;
     [self updateResult:[NSString stringWithFormat:@"On command sent on endpoint %@", @(endpoint)]];
 
-    CHIPOnOff * onOff = [[CHIPOnOff alloc] initWithDevice:chipDevice endpoint:endpoint queue:dispatch_get_main_queue()];
-    [onOff on:^(NSError * error, NSDictionary * values) {
-        NSString * resultString
-            = (error != nil) ? [NSString stringWithFormat:@"An error occured: 0x%02lx", error.code] : @"On command success";
-        [self updateResult:resultString];
+    [_deviceSelector forSelectedDevices:^(uint64_t deviceId) {
+        CHIPDevice * chipDevice = CHIPGetPairedDeviceWithID(deviceId);
+        if (chipDevice != nil) {
+            CHIPOnOff * onOff = [[CHIPOnOff alloc] initWithDevice:chipDevice endpoint:endpoint queue:dispatch_get_main_queue()];
+            [onOff on:^(NSError * error, NSDictionary * values) {
+                NSString * resultString
+                    = (error != nil) ? [NSString stringWithFormat:@"An error occured: 0x%02lx", error.code] : @"On command success";
+                [self updateResult:resultString];
+            }];
+        } else {
+            [self updateResult:[NSString stringWithFormat:@"Device not found"]];
+        }
     }];
 }
 
 - (IBAction)offButtonTapped:(id)sender
 {
-    CHIPDevice * chipDevice = [self.deviceSelector selectedDevice];
-    if (chipDevice == nil) {
-        [self updateResult:[NSString stringWithFormat:@"No device has been selected"]];
-        return;
-    }
-
     UIButton * button = (UIButton *) sender;
     NSInteger endpoint = button.tag;
     [self updateResult:[NSString stringWithFormat:@"Off command sent on endpoint %@", @(endpoint)]];
 
-    CHIPOnOff * onOff = [[CHIPOnOff alloc] initWithDevice:chipDevice endpoint:endpoint queue:dispatch_get_main_queue()];
-    [onOff off:^(NSError * error, NSDictionary * values) {
-        NSString * resultString
-            = (error != nil) ? [NSString stringWithFormat:@"An error occured: 0x%02lx", error.code] : @"Off command success";
-        [self updateResult:resultString];
+    [_deviceSelector forSelectedDevices:^(uint64_t deviceId) {
+        CHIPDevice * chipDevice = CHIPGetPairedDeviceWithID(deviceId);
+        if (chipDevice != nil) {
+            CHIPOnOff * onOff = [[CHIPOnOff alloc] initWithDevice:chipDevice endpoint:endpoint queue:dispatch_get_main_queue()];
+            [onOff off:^(NSError * error, NSDictionary * values) {
+                NSString * resultString = (error != nil) ? [NSString stringWithFormat:@"An error occured: 0x%02lx", error.code]
+                                                         : @"Off command success";
+                [self updateResult:resultString];
+            }];
+        } else {
+            [self updateResult:[NSString stringWithFormat:@"Device not found"]];
+        }
     }];
 }
 
 - (IBAction)toggleButtonTapped:(id)sender
 {
-    CHIPDevice * chipDevice = [self.deviceSelector selectedDevice];
-    if (chipDevice == nil) {
-        [self updateResult:[NSString stringWithFormat:@"No device has been selected"]];
-        return;
-    }
-
     UIButton * button = (UIButton *) sender;
     NSInteger endpoint = button.tag;
     [self updateResult:[NSString stringWithFormat:@"Toggle command sent on endpoint %@", @(endpoint)]];
 
-    CHIPOnOff * onOff = [[CHIPOnOff alloc] initWithDevice:chipDevice endpoint:endpoint queue:dispatch_get_main_queue()];
-    [onOff toggle:^(NSError * error, NSDictionary * values) {
-        NSString * resultString
-            = (error != nil) ? [NSString stringWithFormat:@"An error occured: 0x%02lx", error.code] : @"Toggle command success";
-        [self updateResult:resultString];
+    [_deviceSelector forSelectedDevices:^(uint64_t deviceId) {
+        CHIPDevice * chipDevice = CHIPGetPairedDeviceWithID(deviceId);
+        if (chipDevice != nil) {
+            CHIPOnOff * onOff = [[CHIPOnOff alloc] initWithDevice:chipDevice endpoint:endpoint queue:dispatch_get_main_queue()];
+            [onOff toggle:^(NSError * error, NSDictionary * values) {
+                NSString * resultString = (error != nil) ? [NSString stringWithFormat:@"An error occured: 0x%02lx", error.code]
+                                                         : @"Toggle command success";
+                [self updateResult:resultString];
+            }];
+        } else {
+            [self updateResult:[NSString stringWithFormat:@"Device not found"]];
+        }
     }];
 }
 

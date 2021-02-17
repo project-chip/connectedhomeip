@@ -619,16 +619,6 @@ PacketBufferHandle PacketBufferHandle::CloneData(uint16_t aAdditionalSize, uint1
 
 namespace Encoding {
 
-void PacketBufferWriterUtil::Initialize(BufferWriter & aBufferWriter, System::PacketBufferHandle & aPacket, size_t aAvailableSize,
-                                        uint16_t aReservedSize)
-{
-    aPacket = System::PacketBufferHandle::New(aAvailableSize, aReservedSize);
-    if (!aPacket.IsNull())
-    {
-        aBufferWriter = Encoding::BufferWriter(aPacket->Start(), aAvailableSize);
-    }
-}
-
 System::PacketBufferHandle PacketBufferWriterUtil::Finalize(BufferWriter & aBufferWriter, System::PacketBufferHandle & aPacket)
 {
     if (!aPacket.IsNull() && aBufferWriter.Fit())

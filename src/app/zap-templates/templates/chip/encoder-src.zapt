@@ -61,7 +61,7 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
 #define COMMAND_HEADER(name, clusterId)                                                                                            \
     const char * kName = name;                                                                                                     \
                                                                                                                                    \
-    PacketBufferWriter buf(kMaxBufferSize);                                                                                        \
+    PacketBufferWriter buf(System::PacketBufferHandle::New(kMaxBufferSize));                                                       \
     if (buf.IsNull())                                                                                                              \
     {                                                                                                                              \
         ChipLogError(Zcl, "Could not allocate packet buffer while trying to encode %s command", kName);                            \
