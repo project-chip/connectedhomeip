@@ -129,6 +129,10 @@ list(APPEND CHIP_CFLAGS ${CHIP_MBEDEVENTS_CFLAGS})
 mbed_get_target_common_compile_flags(CHIP_MBEDRTOS_CFLAGS mbed-rtos)
 list(APPEND CHIP_CFLAGS ${CHIP_MBEDRTOS_CFLAGS})
 
+# Add support for Mbed storage
+mbed_get_target_common_compile_flags(CHIP_MBEDSTORAGE_CFLAGS mbed-storage-kv-global-api)
+list(APPEND CHIP_CFLAGS ${CHIP_MBEDSTORAGE_CFLAGS})
+
 
 if (CONFIG_CHIP_WITH_EXTERNAL_MBEDTLS)
     mbed_get_target_common_compile_flags(CHIP_MBEDTLS_CFLAGS mbed-mbedtls)
@@ -194,7 +198,7 @@ elseif (BOARD STREQUAL "native_posix_64")
     chip_gn_arg_string("target_cpu" "x64")
 endif()
 
-file(GENERATE OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/args.gn CONTENT ${CHIP_GN_ARGS})
+# file(GENERATE OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/args.gn CONTENT ${CHIP_GN_ARGS})
 
 # ==============================================================================
 # Define 'chip-gn' target that builds CHIP library(ies) with GN build system
