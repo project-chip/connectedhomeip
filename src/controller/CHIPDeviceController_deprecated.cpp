@@ -176,8 +176,7 @@ bool ChipDeviceController::GetIpAddress(Inet::IPAddress & addr)
     if (!IsConnected())
         return false;
 
-    if (mDevice == nullptr)
-        InitDevice();
+    InitDevice();
 
     return mDevice != nullptr && mDevice->GetIpAddress(addr);
 }
@@ -206,10 +205,7 @@ CHIP_ERROR ChipDeviceController::SendMessage(void * appReqState, PacketBufferHan
     }
     VerifyOrExit(mRemoteDeviceId != kUndefinedNodeId, err = CHIP_ERROR_INCORRECT_STATE);
 
-    if (mDevice == nullptr)
-    {
-        SuccessOrExit(InitDevice());
-    }
+    SuccessOrExit(InitDevice());
 
     VerifyOrExit(mDevice != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     mDevice->SetDelegate(this);
