@@ -44,7 +44,7 @@ mbed_set_mbed_target_linker_script(${APP_TARGET})
 
 project(${APP_TARGET})
 
-target_link_libraries(${APP_TARGET} mbed-os chip)
+target_link_libraries(${APP_TARGET} mbed-os mbed-events chip)
 
 mbed_set_post_build(${APP_TARGET})
 
