@@ -157,7 +157,7 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
     const char * subTypes[3];
     size_t subTypeSize = 0;
 #if CHIP_ENABLE_ROTATING_DEVICE_ID
-    char rotatingDeviceIdHexBuffer[RotatingDeviceId::kRotatingDeviceIdHexMaxLength];
+    char rotatingDeviceIdHexBuffer[RotatingDeviceId::kHexMaxLength];
     size_t rotatingDeviceIdHexBufferSize = 0;
 #endif
 

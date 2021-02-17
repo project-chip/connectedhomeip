@@ -49,11 +49,11 @@ AdditionalDataPayloadGenerator::generateAdditionalDataPayload(uint16_t lifetimeC
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferTLVWriter writer;
     TLVWriter innerWriter;
-    char rotatingDeviceIdBuffer[RotatingDeviceId::kRotatingDeviceIdHexMaxLength];
+    char rotatingDeviceIdBuffer[RotatingDeviceId::kHexMaxLength];
     size_t rotatingDeviceIdBufferSize = 0;
 
     // Initialize TLVWriter
-    writer.Init(chip::System::PacketBufferHandle::New(RotatingDeviceId::kRotatingDeviceIdMaxLength));
+    writer.Init(chip::System::PacketBufferHandle::New(RotatingDeviceId::kMaxLength));
 
     SuccessOrExit(err = writer.OpenContainer(AnonymousTag, kTLVType_Structure, innerWriter));
 
@@ -84,7 +84,7 @@ CHIP_ERROR AdditionalDataPayloadGenerator::generateRotatingDeviceId(uint16_t lif
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     Hash_SHA256_stream hash;
-    uint8_t outputBuffer[RotatingDeviceId::kRotatingDeviceIdMaxLength];
+    uint8_t outputBuffer[RotatingDeviceId::kMaxLength];
     uint8_t hashOutputBuffer[kSHA256_Hash_Length];
     BufferWriter outputBufferWriter(outputBuffer, ArraySize(outputBuffer));
     size_t rotatingDeviceIdBufferIndex = 0;
@@ -92,7 +92,7 @@ CHIP_ERROR AdditionalDataPayloadGenerator::generateRotatingDeviceId(uint16_t lif
 
     Put16(lifetimeCounterBuffer, lifetimeCounter);
 
-    VerifyOrExit(rotatingDeviceIdBufferSize >= RotatingDeviceId::kRotatingDeviceIdHexMaxLength, err = CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrExit(rotatingDeviceIdBufferSize >= RotatingDeviceId::kHexMaxLength, err = CHIP_ERROR_BUFFER_TOO_SMALL);
 
     // Computing the Rotating Device Id
     // RDI = Lifetime_Counter + SuffixBytes(SHA256(Serial_Number + Lifetime_Counter), 16)
@@ -103,8 +103,8 @@ CHIP_ERROR AdditionalDataPayloadGenerator::generateRotatingDeviceId(uint16_t lif
     SuccessOrExit(err = hash.Finish(hashOutputBuffer));
 
     outputBufferWriter.Put16(lifetimeCounter);
-    outputBufferWriter.Put(&hashOutputBuffer[kSHA256_Hash_Length - RotatingDeviceId::kRotatingDeviceIdHashSuffixLength],
-                           RotatingDeviceId::kRotatingDeviceIdHashSuffixLength);
+    outputBufferWriter.Put(&hashOutputBuffer[kSHA256_Hash_Length - RotatingDeviceId::kHashSuffixLength],
+                           RotatingDeviceId::kHashSuffixLength);
 
     for (rotatingDeviceIdBufferIndex = 0; rotatingDeviceIdBufferIndex < outputBufferWriter.Needed(); rotatingDeviceIdBufferIndex++)
     {
