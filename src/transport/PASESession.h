@@ -136,10 +136,17 @@ public:
     CHIP_ERROR Pair(const Transport::PeerAddress peerAddress, const PASEVerifier & verifier, Optional<NodeId> myNodeId,
                     NodeId peerNodeId, uint16_t myKeyId, SessionEstablishmentDelegate * delegate);
 
-    static CHIP_ERROR ComputePASEVerifier(uint32_t mySetUpPINCode, uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen,
-                                          PASEVerifier & verifier);
-
-    static CHIP_ERROR GeneratePASEVerifier(PASEVerifier & verifier, uint32_t & setupPIN);
+    /**
+     * @brief
+     *   Generate a new PASE verifier.
+     *
+     * @param verifier      The generated PASE verifier
+     * @param useRandomPIN  Generate a random setup PIN, if true. Else, use the provided PIN
+     * @param setupPIN      Provided setup PIN (if useRandomPIN is false), or the generated PIN
+     *
+     * @return CHIP_ERROR      The result of PASE verifier generation
+     */
+    static CHIP_ERROR GeneratePASEVerifier(PASEVerifier & verifier, bool useRandomPIN, uint32_t & setupPIN);
 
     /**
      * @brief
@@ -224,6 +231,9 @@ private:
     };
 
     CHIP_ERROR Init(Optional<NodeId> myNodeId, uint16_t myKeyId, uint32_t setupCode, SessionEstablishmentDelegate * delegate);
+
+    static CHIP_ERROR ComputePASEVerifier(uint32_t mySetUpPINCode, uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen,
+                                          PASEVerifier & verifier);
 
     CHIP_ERROR SetupSpake2p(uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen);
 

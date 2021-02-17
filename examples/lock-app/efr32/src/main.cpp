@@ -128,7 +128,7 @@ int main(void)
         EFR32_LOG("PlatformMgr().InitChipStack() failed");
         appError(ret);
     }
-
+    chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName("EFR32_LOCK");
 #if CHIP_ENABLE_OPENTHREAD
     EFR32_LOG("Initializing OpenThread stack");
     ret = ThreadStackMgr().InitThreadStack();

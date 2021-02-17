@@ -1715,8 +1715,8 @@ void PacketBufferTest::CheckPacketBufferWriter(nlTestSuite * inSuite, void * inC
 
     const char kPayload[] = "Hello, world!";
 
-    PacketBufferWriter yay(sizeof(kPayload));
-    PacketBufferWriter nay(sizeof(kPayload) - 2);
+    PacketBufferWriter yay(PacketBufferHandle::New(sizeof(kPayload)));
+    PacketBufferWriter nay(PacketBufferHandle::New(sizeof(kPayload)), sizeof(kPayload) - 2);
     NL_TEST_ASSERT(inSuite, !yay.IsNull());
     NL_TEST_ASSERT(inSuite, !nay.IsNull());
 

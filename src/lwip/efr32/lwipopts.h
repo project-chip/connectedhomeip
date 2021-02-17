@@ -55,6 +55,8 @@
 
 #define LWIP_SOCKET 0
 
+#define LWIP_FREERTOS_USE_STATIC_TCPIP_TASK 0
+
 // TODO: seems like this is unnecessary on Thread-only platforms
 #define LWIP_RAW 1
 #define MEMP_NUM_RAW_PCB (5)

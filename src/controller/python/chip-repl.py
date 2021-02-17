@@ -29,9 +29,8 @@ Usage examples:
 
 ######## List available BLE adapters #########
 
-for adapter in chip.GetBleAdapters():
-    print(adapter)
-    
+import chip.ble
+print(chip.ble.GetAdapters())
     '''.strip())
 
 if __name__ == "__main__":

@@ -22,5 +22,3 @@
 #
 
 """Provides Python APIs for CHIP."""
-
-from chip.ble import GetBleAdapters

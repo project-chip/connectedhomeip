@@ -26,7 +26,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (BOOL)openPairingWindow:(NSTimeInterval)duration error:(NSError * __autoreleasing *)error;
 - (NSString *)openPairingWindowWithPIN:(NSTimeInterval)duration
-                         discriminator:(NSInteger)discriminator
+                         discriminator:(NSUInteger)discriminator
+                              setupPIN:(NSUInteger)setupPIN
                                  error:(NSError * __autoreleasing *)error;
 - (BOOL)isActive;
 
