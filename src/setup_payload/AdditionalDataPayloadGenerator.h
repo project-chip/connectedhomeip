@@ -83,7 +83,7 @@ public:
      * @param rotatingDeviceIdBufferSize the current size of the supplied buffer
      * @param rotatingDeviceIdValueOutputSize the number of chars making up the actual value of the returned rotating device id
      *
-     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise.
      *
      */
     CHIP_ERROR generateRotatingDeviceId(uint16_t lifetimeCounter, const char * serialNumberBuffer, size_t serialNumberBufferSize,
