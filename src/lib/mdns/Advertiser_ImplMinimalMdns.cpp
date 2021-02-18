@@ -91,12 +91,12 @@ void LogQuery(const QueryData & data)
 template <typename T>
 bool IsCurrentInterfaceUsable(T & iterator)
 {
-    if (!mIterator.IsUp() || !mIterator.SupportsMulticast())
+    if (!iterator.IsUp() || !iterator.SupportsMulticast())
     {
         return false; // not a usable interface
     }
     char name[chip::Inet::InterfaceIterator::kMaxIfNameLength];
-    if (mIterator.GetInterfaceName(name, sizeof(name)) != CHIP_NO_ERROR)
+    if (iterator.GetInterfaceName(name, sizeof(name)) != CHIP_NO_ERROR)
     {
         ChipLogError(Discovery, "Failed to get interface name.");
         return false;
