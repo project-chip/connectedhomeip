@@ -209,28 +209,34 @@ static CHIP_ERROR DecodeConvertValidity(TLVReader & reader, ASN1Writer & writer,
 {
     CHIP_ERROR err;
     ASN1UniversalTime asn1Time;
-    uint64_t packedTime;
+    uint64_t chipEpochTime;
 
     ASN1_START_SEQUENCE
     {
         err = reader.Next(kTLVType_UnsignedInteger, ContextTag(kTag_NotBefore));
         SuccessOrExit(err);
-        err = reader.Get(packedTime);
+
+        err = reader.Get(chipEpochTime);
         SuccessOrExit(err);
-        VerifyOrExit(packedTime <= UINT32_MAX, err = CHIP_ERROR_UNSUPPORTED_CERT_FORMAT);
-        certData.mNotBeforeDate = PackedCertTimeToDate(static_cast<uint32_t>(packedTime));
-        err                     = UnpackCertTime(static_cast<uint32_t>(packedTime), asn1Time);
+
+        VerifyOrExit(chipEpochTime <= UINT32_MAX, err = CHIP_ERROR_UNSUPPORTED_CERT_FORMAT);
+        certData.mNotBeforeTime = static_cast<uint32_t>(chipEpochTime);
+
+        err = ChipEpochToASN1Time(static_cast<uint32_t>(chipEpochTime), asn1Time);
         SuccessOrExit(err);
 
         ASN1_ENCODE_TIME(asn1Time);
 
         err = reader.Next(kTLVType_UnsignedInteger, ContextTag(kTag_NotAfter));
         SuccessOrExit(err);
-        err = reader.Get(packedTime);
+
+        err = reader.Get(chipEpochTime);
         SuccessOrExit(err);
-        VerifyOrExit(packedTime <= UINT32_MAX, err = CHIP_ERROR_UNSUPPORTED_CERT_FORMAT);
-        certData.mNotAfterDate = PackedCertTimeToDate(static_cast<uint32_t>(packedTime));
-        err                    = UnpackCertTime(static_cast<uint32_t>(packedTime), asn1Time);
+
+        VerifyOrExit(chipEpochTime <= UINT32_MAX, err = CHIP_ERROR_UNSUPPORTED_CERT_FORMAT);
+        certData.mNotAfterTime = static_cast<uint32_t>(chipEpochTime);
+
+        err = ChipEpochToASN1Time(static_cast<uint32_t>(chipEpochTime), asn1Time);
         SuccessOrExit(err);
 
         ASN1_ENCODE_TIME(asn1Time);

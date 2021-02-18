@@ -210,12 +210,19 @@ CHIP_ERROR PASESession::ComputePASEVerifier(uint32_t setUpPINCode, uint32_t pbkd
                          sizeof(PASEVerifier), &verifier[0][0]);
 }
 
-CHIP_ERROR PASESession::GeneratePASEVerifier(PASEVerifier & verifier, uint32_t & setupPIN)
+CHIP_ERROR PASESession::GeneratePASEVerifier(PASEVerifier & verifier, bool useRandomPIN, uint32_t & setupPIN)
 {
-    ReturnErrorOnFailure(DRBG_get_bytes(reinterpret_cast<uint8_t *>(&setupPIN), sizeof(setupPIN)));
+    if (useRandomPIN)
+    {
+        ReturnErrorOnFailure(DRBG_get_bytes(reinterpret_cast<uint8_t *>(&setupPIN), sizeof(setupPIN)));
 
-    // Use only kSetupPINCodeFieldLengthInBits bits out of the code
-    setupPIN &= ((1 << kSetupPINCodeFieldLengthInBits) - 1);
+        // Use only kSetupPINCodeFieldLengthInBits bits out of the code
+        setupPIN &= ((1 << kSetupPINCodeFieldLengthInBits) - 1);
+    }
+    else if (setupPIN >= (1 << kSetupPINCodeFieldLengthInBits))
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
 
     return PASESession::ComputePASEVerifier(setupPIN, kSpake2p_Iteration_Count,
                                             reinterpret_cast<const unsigned char *>(kSpake2pKeyExchangeSalt),
@@ -628,7 +635,7 @@ CHIP_ERROR PASESession::HandleMsg1_and_SendMsg2(const PacketHeader & header, con
     data_len = static_cast<uint16_t>(Y_len + verifier_len);
 
     {
-        Encoding::PacketBufferWriter bbuf(data_len);
+        Encoding::PacketBufferWriter bbuf(System::PacketBufferHandle::New(data_len));
         VerifyOrExit(!bbuf.IsNull(), err = CHIP_SYSTEM_ERROR_NO_MEMORY);
         bbuf.Put(&Y[0], Y_len);
         bbuf.Put(verifier, verifier_len);
@@ -684,7 +691,7 @@ CHIP_ERROR PASESession::HandleMsg2_and_SendMsg3(const PacketHeader & header, con
     }
 
     {
-        Encoding::PacketBufferWriter bbuf(verifier_len);
+        Encoding::PacketBufferWriter bbuf(System::PacketBufferHandle::New(verifier_len));
         VerifyOrExit(!bbuf.IsNull(), err = CHIP_SYSTEM_ERROR_NO_MEMORY);
 
         bbuf.Put(verifier, verifier_len);
@@ -711,10 +718,6 @@ CHIP_ERROR PASESession::HandleMsg2_and_SendMsg3(const PacketHeader & header, con
     }
 
     mPairingComplete = true;
-
-    err = DeriveSecureSession(reinterpret_cast<const unsigned char *>(kSpake2pI2RSessionInfo), strlen(kSpake2pI2RSessionInfo),
-                              mConnectionState.GetSecureSession());
-    SuccessOrExit(err);
 
     // Call delegate to indicate pairing completion
     mDelegate->OnSessionEstablished();
@@ -758,10 +761,6 @@ CHIP_ERROR PASESession::HandleMsg3(const PacketHeader & header, const System::Pa
     SuccessOrExit(err);
 
     mPairingComplete = true;
-
-    err = DeriveSecureSession(reinterpret_cast<const unsigned char *>(kSpake2pI2RSessionInfo), strlen(kSpake2pI2RSessionInfo),
-                              mConnectionState.GetSecureSession());
-    SuccessOrExit(err);
 
     // Call delegate to indicate pairing completion
     mDelegate->OnSessionEstablished();

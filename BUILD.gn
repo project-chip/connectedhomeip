@@ -171,6 +171,10 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
     enable_linux_all_clusters_app_build =
         enable_default_builds && (host_os == "linux" || host_os == "mac")
 
+    # Build the Linux bridge app example.
+    enable_linux_bridge_app_build =
+        enable_default_builds && (host_os == "linux" || host_os == "mac")
+
     # Build the Linux lighting app example.
     enable_linux_lighting_app_build =
         enable_default_builds && (host_os == "linux" || host_os == "mac")
@@ -257,6 +261,13 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
     }
   }
 
+  if (enable_linux_bridge_app_build) {
+    group("linux_bridge_app") {
+      deps =
+          [ "${chip_root}/examples/bridge-app/linux(${standalone_toolchain})" ]
+    }
+  }
+
   if (enable_linux_lighting_app_build) {
     group("linux_lighting_app") {
       deps = [
@@ -316,6 +327,9 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
     }
     if (enable_linux_all_clusters_app_build) {
       deps += [ ":linux_all_clusters_app" ]
+    }
+    if (enable_linux_bridge_app_build) {
+      deps += [ ":linux_bridge_app" ]
     }
     if (enable_linux_lighting_app_build) {
       deps += [ ":linux_lighting_app" ]

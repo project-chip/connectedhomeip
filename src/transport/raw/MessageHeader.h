@@ -136,9 +136,6 @@ public:
 
     uint16_t GetEncryptionKeyID() const { return mEncryptionKeyID; }
 
-    /** Get the length of encrypted payload. */
-    uint16_t GetPayloadLength() const { return mPayloadLength; }
-
     Header::Flags & GetFlags() { return mFlags; }
     const Header::Flags & GetFlags() const { return mFlags; }
 
@@ -171,13 +168,6 @@ public:
     {
         mSourceNodeId.ClearValue();
         mFlags.Clear(Header::FlagValues::kSourceNodeIdPresent);
-        return *this;
-    }
-
-    /** Set the secure payload length for this header. */
-    PacketHeader & SetPayloadLength(uint16_t len)
-    {
-        mPayloadLength = len;
         return *this;
     }
 
@@ -312,9 +302,6 @@ private:
 
     /// Intended recipient of the message.
     Optional<NodeId> mDestinationNodeId;
-
-    /// Length of application data (payload)
-    uint16_t mPayloadLength = 0;
 
     /// Encryption Key ID
     uint16_t mEncryptionKeyID = 0;

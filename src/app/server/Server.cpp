@@ -407,7 +407,8 @@ void InitServer(AppDelegate * delegate)
         AdminPairingInfo * adminInfo = gAdminPairings.AssignAdminId(gNextAvailableAdminId);
         VerifyOrExit(adminInfo != nullptr, err = CHIP_ERROR_NO_MEMORY);
         adminInfo->SetNodeId(chip::kTestDeviceNodeId);
-        err = gSessions.NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing, gNextAvailableAdminId);
+        err = gSessions.NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing, SecureSessionMgr::PairingDirection::kResponder,
+                                   gNextAvailableAdminId);
         SuccessOrExit(err);
     }
 

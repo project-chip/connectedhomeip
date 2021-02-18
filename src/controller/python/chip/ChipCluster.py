@@ -321,6 +321,28 @@ class ChipCluster:
                 "StopWithOnOff": {
                 },
             },
+            "MediaPlayback": {
+                "FastForwardRequest": {
+                },
+                "NextRequest": {
+                },
+                "PauseRequest": {
+                },
+                "PlayRequest": {
+                },
+                "PreviousRequest": {
+                },
+                "RewindRequest": {
+                },
+                "SkipBackwardRequest": {
+                },
+                "SkipForwardRequest": {
+                },
+                "StartOverRequest": {
+                },
+                "StopRequest": {
+                },
+            },
             "OnOff": {
                 "Off": {
                 },
@@ -793,6 +815,76 @@ class ChipCluster:
             )
         )
 
+    def ClusterMediaPlayback_CommandFastForwardRequest(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        self._ChipStack.Call(
+            lambda: self._chipLib.chip_ime_AppendCommand_MediaPlayback_FastForwardRequest(
+                device, ZCLendpoint, ZCLgroupid
+            )
+        )
+
+    def ClusterMediaPlayback_CommandNextRequest(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        self._ChipStack.Call(
+            lambda: self._chipLib.chip_ime_AppendCommand_MediaPlayback_NextRequest(
+                device, ZCLendpoint, ZCLgroupid
+            )
+        )
+
+    def ClusterMediaPlayback_CommandPauseRequest(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        self._ChipStack.Call(
+            lambda: self._chipLib.chip_ime_AppendCommand_MediaPlayback_PauseRequest(
+                device, ZCLendpoint, ZCLgroupid
+            )
+        )
+
+    def ClusterMediaPlayback_CommandPlayRequest(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        self._ChipStack.Call(
+            lambda: self._chipLib.chip_ime_AppendCommand_MediaPlayback_PlayRequest(
+                device, ZCLendpoint, ZCLgroupid
+            )
+        )
+
+    def ClusterMediaPlayback_CommandPreviousRequest(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        self._ChipStack.Call(
+            lambda: self._chipLib.chip_ime_AppendCommand_MediaPlayback_PreviousRequest(
+                device, ZCLendpoint, ZCLgroupid
+            )
+        )
+
+    def ClusterMediaPlayback_CommandRewindRequest(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        self._ChipStack.Call(
+            lambda: self._chipLib.chip_ime_AppendCommand_MediaPlayback_RewindRequest(
+                device, ZCLendpoint, ZCLgroupid
+            )
+        )
+
+    def ClusterMediaPlayback_CommandSkipBackwardRequest(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        self._ChipStack.Call(
+            lambda: self._chipLib.chip_ime_AppendCommand_MediaPlayback_SkipBackwardRequest(
+                device, ZCLendpoint, ZCLgroupid
+            )
+        )
+
+    def ClusterMediaPlayback_CommandSkipForwardRequest(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        self._ChipStack.Call(
+            lambda: self._chipLib.chip_ime_AppendCommand_MediaPlayback_SkipForwardRequest(
+                device, ZCLendpoint, ZCLgroupid
+            )
+        )
+
+    def ClusterMediaPlayback_CommandStartOverRequest(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        self._ChipStack.Call(
+            lambda: self._chipLib.chip_ime_AppendCommand_MediaPlayback_StartOverRequest(
+                device, ZCLendpoint, ZCLgroupid
+            )
+        )
+
+    def ClusterMediaPlayback_CommandStopRequest(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        self._ChipStack.Call(
+            lambda: self._chipLib.chip_ime_AppendCommand_MediaPlayback_StopRequest(
+                device, ZCLendpoint, ZCLgroupid
+            )
+        )
+
     def ClusterOnOff_CommandOff(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_OnOff_Off(
@@ -1052,6 +1144,37 @@ class ChipCluster:
         # Cluster LevelControl Command StopWithOnOff
         self._chipLib.chip_ime_AppendCommand_LevelControl_StopWithOnOff.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_LevelControl_StopWithOnOff.restype = ctypes.c_uint32
+        # Cluster MediaPlayback
+        # Cluster MediaPlayback Command FastForwardRequest
+        self._chipLib.chip_ime_AppendCommand_MediaPlayback_FastForwardRequest.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_MediaPlayback_FastForwardRequest.restype = ctypes.c_uint32
+        # Cluster MediaPlayback Command NextRequest
+        self._chipLib.chip_ime_AppendCommand_MediaPlayback_NextRequest.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_MediaPlayback_NextRequest.restype = ctypes.c_uint32
+        # Cluster MediaPlayback Command PauseRequest
+        self._chipLib.chip_ime_AppendCommand_MediaPlayback_PauseRequest.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_MediaPlayback_PauseRequest.restype = ctypes.c_uint32
+        # Cluster MediaPlayback Command PlayRequest
+        self._chipLib.chip_ime_AppendCommand_MediaPlayback_PlayRequest.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_MediaPlayback_PlayRequest.restype = ctypes.c_uint32
+        # Cluster MediaPlayback Command PreviousRequest
+        self._chipLib.chip_ime_AppendCommand_MediaPlayback_PreviousRequest.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_MediaPlayback_PreviousRequest.restype = ctypes.c_uint32
+        # Cluster MediaPlayback Command RewindRequest
+        self._chipLib.chip_ime_AppendCommand_MediaPlayback_RewindRequest.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_MediaPlayback_RewindRequest.restype = ctypes.c_uint32
+        # Cluster MediaPlayback Command SkipBackwardRequest
+        self._chipLib.chip_ime_AppendCommand_MediaPlayback_SkipBackwardRequest.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_MediaPlayback_SkipBackwardRequest.restype = ctypes.c_uint32
+        # Cluster MediaPlayback Command SkipForwardRequest
+        self._chipLib.chip_ime_AppendCommand_MediaPlayback_SkipForwardRequest.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_MediaPlayback_SkipForwardRequest.restype = ctypes.c_uint32
+        # Cluster MediaPlayback Command StartOverRequest
+        self._chipLib.chip_ime_AppendCommand_MediaPlayback_StartOverRequest.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_MediaPlayback_StartOverRequest.restype = ctypes.c_uint32
+        # Cluster MediaPlayback Command StopRequest
+        self._chipLib.chip_ime_AppendCommand_MediaPlayback_StopRequest.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_MediaPlayback_StopRequest.restype = ctypes.c_uint32
         # Cluster OnOff
         # Cluster OnOff Command Off
         self._chipLib.chip_ime_AppendCommand_OnOff_Off.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]

@@ -36,9 +36,15 @@
 #include <ti/drivers/ECJPAKE.h>
 #include <ti/drivers/SHA2.h>
 
+#include <bget.h>
+#define TOTAL_ICALL_HEAP_SIZE (0xf000)
+
 using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;
+
+__attribute__((section(".heap"))) uint8_t GlobalHeapZoneBuffer[TOTAL_ICALL_HEAP_SIZE];
+uint32_t heapSize = TOTAL_ICALL_HEAP_SIZE;
 
 // ================================================================================
 // FreeRTOS Callbacks
@@ -59,6 +65,7 @@ int main(void)
     int ret = CHIP_ERROR_MAX;
 
     Board_init();
+    bpool((void *) GlobalHeapZoneBuffer, TOTAL_ICALL_HEAP_SIZE);
 
     GPIO_init();
 

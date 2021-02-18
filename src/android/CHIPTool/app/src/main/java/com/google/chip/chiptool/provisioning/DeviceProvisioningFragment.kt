@@ -98,6 +98,7 @@ class DeviceProvisioningFragment : Fragment() {
 
       showMessage(R.string.rendezvous_over_ble_pairing_text)
       deviceController.setCompletionListener(ConnectionCallback())
+      deviceController.disconnectDevice();
       deviceController.beginConnectDeviceBle(gatt, deviceInfo.setupPinCode);
     }
   }

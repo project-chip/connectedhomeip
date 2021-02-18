@@ -628,6 +628,99 @@ CHIP_ERROR chip_ime_AppendCommand_LevelControl_StopWithOnOff(chip::Controller::D
 }
 // End of Cluster LevelControl
 
+// Cluster MediaPlayback
+CHIP_ERROR chip_ime_AppendCommand_MediaPlayback_FastForwardRequest(chip::Controller::Device * device,
+                                                                   chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::MediaPlaybackCluster clusterMediaPlayback;
+    (void) ZCLgroupId;
+    clusterMediaPlayback.Associate(device, ZCLendpointId);
+    return clusterMediaPlayback.FastForwardRequest(nullptr, nullptr);
+}
+CHIP_ERROR chip_ime_AppendCommand_MediaPlayback_NextRequest(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                            chip::GroupId ZCLgroupId)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::MediaPlaybackCluster clusterMediaPlayback;
+    (void) ZCLgroupId;
+    clusterMediaPlayback.Associate(device, ZCLendpointId);
+    return clusterMediaPlayback.NextRequest(nullptr, nullptr);
+}
+CHIP_ERROR chip_ime_AppendCommand_MediaPlayback_PauseRequest(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                             chip::GroupId ZCLgroupId)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::MediaPlaybackCluster clusterMediaPlayback;
+    (void) ZCLgroupId;
+    clusterMediaPlayback.Associate(device, ZCLendpointId);
+    return clusterMediaPlayback.PauseRequest(nullptr, nullptr);
+}
+CHIP_ERROR chip_ime_AppendCommand_MediaPlayback_PlayRequest(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                            chip::GroupId ZCLgroupId)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::MediaPlaybackCluster clusterMediaPlayback;
+    (void) ZCLgroupId;
+    clusterMediaPlayback.Associate(device, ZCLendpointId);
+    return clusterMediaPlayback.PlayRequest(nullptr, nullptr);
+}
+CHIP_ERROR chip_ime_AppendCommand_MediaPlayback_PreviousRequest(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                                chip::GroupId ZCLgroupId)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::MediaPlaybackCluster clusterMediaPlayback;
+    (void) ZCLgroupId;
+    clusterMediaPlayback.Associate(device, ZCLendpointId);
+    return clusterMediaPlayback.PreviousRequest(nullptr, nullptr);
+}
+CHIP_ERROR chip_ime_AppendCommand_MediaPlayback_RewindRequest(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                              chip::GroupId ZCLgroupId)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::MediaPlaybackCluster clusterMediaPlayback;
+    (void) ZCLgroupId;
+    clusterMediaPlayback.Associate(device, ZCLendpointId);
+    return clusterMediaPlayback.RewindRequest(nullptr, nullptr);
+}
+CHIP_ERROR chip_ime_AppendCommand_MediaPlayback_SkipBackwardRequest(chip::Controller::Device * device,
+                                                                    chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::MediaPlaybackCluster clusterMediaPlayback;
+    (void) ZCLgroupId;
+    clusterMediaPlayback.Associate(device, ZCLendpointId);
+    return clusterMediaPlayback.SkipBackwardRequest(nullptr, nullptr);
+}
+CHIP_ERROR chip_ime_AppendCommand_MediaPlayback_SkipForwardRequest(chip::Controller::Device * device,
+                                                                   chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::MediaPlaybackCluster clusterMediaPlayback;
+    (void) ZCLgroupId;
+    clusterMediaPlayback.Associate(device, ZCLendpointId);
+    return clusterMediaPlayback.SkipForwardRequest(nullptr, nullptr);
+}
+CHIP_ERROR chip_ime_AppendCommand_MediaPlayback_StartOverRequest(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                                 chip::GroupId ZCLgroupId)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::MediaPlaybackCluster clusterMediaPlayback;
+    (void) ZCLgroupId;
+    clusterMediaPlayback.Associate(device, ZCLendpointId);
+    return clusterMediaPlayback.StartOverRequest(nullptr, nullptr);
+}
+CHIP_ERROR chip_ime_AppendCommand_MediaPlayback_StopRequest(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                            chip::GroupId ZCLgroupId)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::MediaPlaybackCluster clusterMediaPlayback;
+    (void) ZCLgroupId;
+    clusterMediaPlayback.Associate(device, ZCLendpointId);
+    return clusterMediaPlayback.StopRequest(nullptr, nullptr);
+}
+// End of Cluster MediaPlayback
+
 // Cluster OnOff
 CHIP_ERROR chip_ime_AppendCommand_OnOff_Off(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
                                             chip::GroupId ZCLgroupId)

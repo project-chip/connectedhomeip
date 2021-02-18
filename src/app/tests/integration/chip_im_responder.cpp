@@ -131,7 +131,8 @@ int main(int argc, char * argv[])
     err = chip::app::InteractionModelEngine::GetInstance()->Init(&gExchangeManager);
     SuccessOrExit(err);
 
-    err = gSessionManager.NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing, gAdminId);
+    err = gSessionManager.NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing,
+                                     chip::SecureSessionMgr::PairingDirection::kResponder, gAdminId);
     SuccessOrExit(err);
 
     printf("Listening for IM requests...\n");

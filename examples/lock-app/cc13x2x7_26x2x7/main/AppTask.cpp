@@ -25,6 +25,10 @@
 #include "FreeRTOS.h"
 
 #include <platform/CHIPDeviceLayer.h>
+#include <support/CHIPMem.h>
+#include <support/CHIPPlatformMemory.h>
+
+#include "QRCodeUtil.h"
 
 #include "DataModelHandler.h"
 
@@ -35,7 +39,7 @@
 #include <ti_drivers_config.h>
 
 #define APP_TASK_STACK_SIZE (4096)
-#define APP_TASK_PRIORITY 2
+#define APP_TASK_PRIORITY 4
 #define APP_EVENT_QUEUE_SIZE 10
 
 using namespace ::chip::DeviceLayer;
@@ -82,6 +86,9 @@ int AppTask::Init()
 
     cc13x2_26x2LogInit();
 
+    // Init Chip memory management before the stack
+    chip::Platform::MemoryInit();
+
     ret = PlatformMgr().InitChipStack();
     if (ret != CHIP_NO_ERROR)
     {
@@ -98,7 +105,7 @@ int AppTask::Init()
             ;
     }
 
-    ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SleepyEndDevice);
+    ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router);
     if (ret != CHIP_NO_ERROR)
     {
         PLAT_LOG("ConnectivityMgr().SetThreadDeviceType() failed");
@@ -144,11 +151,11 @@ int AppTask::Init()
 
     LED_Params_init(&ledParams); // default PWM LED
     sAppRedHandle = LED_open(CONFIG_LED_RED, &ledParams);
-    LED_setOn(sAppRedHandle, LED_BRIGHTNESS_MAX);
+    LED_setOff(sAppRedHandle);
 
     LED_Params_init(&ledParams); // default PWM LED
     sAppGreenHandle = LED_open(CONFIG_LED_GREEN, &ledParams);
-    LED_setOn(sAppGreenHandle, LED_BRIGHTNESS_MAX);
+    LED_setOff(sAppGreenHandle);
 
     // Initialize buttons
     PLAT_LOG("Initialize buttons");
@@ -169,6 +176,11 @@ int AppTask::Init()
     BoltLockMgr().Init();
 
     BoltLockMgr().SetCallbacks(ActionInitiated, ActionCompleted);
+
+    ConfigurationMgr().LogDeviceConfig();
+
+    // QR code will be used with CHIP Tool
+    PrintQRCode(chip::RendezvousInformationFlags::kBLE);
 
     return 0;
 }
@@ -288,24 +300,38 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     case AppEvent::kEventType_ButtonLeft:
         if (AppEvent::kAppEventButtonType_Clicked == aEvent->ButtonEvent.Type)
         {
-            BoltLockMgr().InitiateAction(0, BoltLockManager::UNLOCK_ACTION);
+            if (!BoltLockMgr().IsUnlocked())
+            {
+                BoltLockMgr().InitiateAction(0, BoltLockManager::UNLOCK_ACTION);
+            }
         }
         else if (AppEvent::kAppEventButtonType_LongClicked == aEvent->ButtonEvent.Type)
         {
-            // TODO: factory reset device
-            BoltLockMgr().InitiateAction(0, BoltLockManager::UNLOCK_ACTION);
+            // Disable BLE advertisements
+            if (ConnectivityMgr().IsBLEAdvertisingEnabled())
+            {
+                ConnectivityMgr().SetBLEAdvertisingEnabled(false);
+                PLAT_LOG("Disabled BLE Advertisements");
+            }
         }
         break;
 
     case AppEvent::kEventType_ButtonRight:
         if (AppEvent::kAppEventButtonType_Clicked == aEvent->ButtonEvent.Type)
         {
-            BoltLockMgr().InitiateAction(0, BoltLockManager::LOCK_ACTION);
+            if (BoltLockMgr().IsUnlocked())
+            {
+                BoltLockMgr().InitiateAction(0, BoltLockManager::LOCK_ACTION);
+            }
         }
         else if (AppEvent::kAppEventButtonType_LongClicked == aEvent->ButtonEvent.Type)
         {
-            // TODO: factory reset device
-            BoltLockMgr().InitiateAction(0, BoltLockManager::LOCK_ACTION);
+            // Enable BLE advertisements
+            if (!ConnectivityMgr().IsBLEAdvertisingEnabled())
+            {
+                ConnectivityMgr().SetBLEAdvertisingEnabled(true);
+                PLAT_LOG("Enabled BLE Advertisements");
+            }
         }
         break;
 

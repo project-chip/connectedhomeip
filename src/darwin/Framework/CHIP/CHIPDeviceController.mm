@@ -192,11 +192,14 @@ static NSString * const kErrorGetPairedDevice = @"Failure while trying to retrie
 
 - (void)setPersistentStorageDelegate:(id<CHIPPersistentStorageDelegate>)delegate queue:(dispatch_queue_t)queue
 {
-    [self.lock lock];
-    _persistentStorageDelegateBridge->setFrameworkDelegate(delegate, queue);
-    [self.lock unlock];
-    _persistentStorageDelegateBridge->SetKeyValue(
-        CHIP_COMMISSIONER_DEVICE_ID_KEY, [[NSString stringWithFormat:@"%llx", _localDeviceId] UTF8String]);
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        [self.lock lock];
+        _persistentStorageDelegateBridge->setFrameworkDelegate(delegate, queue);
+        [self.lock unlock];
+        _persistentStorageDelegateBridge->SetKeyValue(
+            CHIP_COMMISSIONER_DEVICE_ID_KEY, [[NSString stringWithFormat:@"%llx", _localDeviceId] UTF8String]);
+    });
 }
 
 - (void)sendWiFiCredentials:(NSString *)ssid password:(NSString *)password
