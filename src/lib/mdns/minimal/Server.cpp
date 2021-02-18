@@ -50,6 +50,8 @@ private:
 
 } // namespace
 
+const BroadcastIpAddresses kBroadcastIpAddresses;
+
 ServerBase::~ServerBase()
 {
     Shutdown();
