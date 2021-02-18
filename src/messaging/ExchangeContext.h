@@ -97,9 +97,6 @@ public:
      *
      *  @param[in]    sendFlags     Flags set by the application for the CHIP message being sent.
      *
-     *  @param[in]    msgCtxt       A pointer to an application-specific context object to be associated
-     *                              with the message being sent.
-
      *  @retval  #CHIP_ERROR_INVALID_ARGUMENT               if an invalid argument was passed to this SendMessage API.
      *  @retval  #CHIP_ERROR_WRONG_MSG_VERSION_FOR_EXCHANGE if there is a mismatch in the specific send operation and the
      *                                                       CHIP message protocol version that is supported.
@@ -109,8 +106,8 @@ public:
      *  @retval  #CHIP_NO_ERROR                             if the CHIP layer successfully sent the message down to the
      *                                                       network layer.
      */
-    CHIP_ERROR SendMessage(uint16_t protocolId, uint8_t msgType, System::PacketBufferHandle msgPayload, const SendFlags & sendFlags,
-                           void * msgCtxt = nullptr);
+    CHIP_ERROR SendMessage(uint16_t protocolId, uint8_t msgType, System::PacketBufferHandle msgPayload,
+                           const SendFlags & sendFlags);
 
     /**
      * A strongly-message-typed version of SendMessage.
@@ -121,7 +118,7 @@ public:
     {
         static_assert(std::is_same<std::underlying_type_t<MessageType>, uint8_t>::value, "Enum is wrong size; cast is not safe");
         return SendMessage(Protocols::MessageTypeTraits<MessageType>::ProtocolId, static_cast<uint8_t>(msgType),
-                           std::move(msgPayload), sendFlags, msgCtxt);
+                           std::move(msgPayload), sendFlags);
     }
 
     /**

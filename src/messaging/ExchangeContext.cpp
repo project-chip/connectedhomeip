@@ -76,7 +76,7 @@ void ExchangeContext::SetResponseTimeout(Timeout timeout)
 }
 
 CHIP_ERROR ExchangeContext::SendMessage(uint16_t protocolId, uint8_t msgType, PacketBufferHandle msgBuf,
-                                        const SendFlags & sendFlags, void * msgCtxt)
+                                        const SendFlags & sendFlags)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     PayloadHeader payloadHeader;
