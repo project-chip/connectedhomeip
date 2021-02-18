@@ -1,5 +1,5 @@
 {
-  "writeTime": "Tue Feb 16 2021 18:22:03 GMT+0100 (Central European Standard Time)",
+  "writeTime": "Thu Feb 18 2021 20:59:45 GMT+0800 (China Standard Time)",
   "featureLevel": 11,
   "creator": "zap",
   "keyValuePairs": [
@@ -22,12 +22,6 @@
       "path": "../../../../src/app/zap-templates/zcl/zcl.json",
       "version": "ZCL Test Data",
       "type": "zcl-properties"
-    },
-    {
-      "pathRelativity": "relativeToZap",
-      "path": "../../../../src/app/zap-templates/app-templates.json",
-      "version": "chip-v1",
-      "type": "gen-templates-json"
     }
   ],
   "endpointTypes": [
@@ -44,16 +38,6 @@
           "define": "BASIC_CLUSTER",
           "side": "client",
           "enabled": 0,
-          "commands": [
-            {
-              "name": "ResetToFactoryDefaults",
-              "code": 0,
-              "mfgCode": null,
-              "source": "client",
-              "incoming": 1,
-              "outgoing": 1
-            }
-          ],
           "attributes": [
             {
               "name": "cluster revision",
@@ -70,6 +54,16 @@
               "maxInterval": 65344,
               "reportableChange": 0
             }
+          ],
+          "commands": [
+            {
+              "name": "ResetToFactoryDefaults",
+              "code": 0,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 1
+            }
           ]
         },
         {
@@ -79,7 +73,6 @@
           "define": "BASIC_CLUSTER",
           "side": "server",
           "enabled": 1,
-          "commands": [],
           "attributes": [
             {
               "name": "cluster revision",
@@ -126,7 +119,8 @@
               "maxInterval": 65344,
               "reportableChange": 0
             }
-          ]
+          ],
+          "commands": []
         },
         {
           "name": "Identify",
@@ -377,23 +371,6 @@
           "define": "SCENES_CLUSTER",
           "side": "client",
           "enabled": 0,
-          "attributes": [
-            {
-              "name": "cluster revision",
-              "code": 65533,
-              "mfgCode": null,
-              "side": "client",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "3",
-              "reportable": 0,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            }
-          ],
           "commands": [
             {
               "name": "AddScene",
@@ -450,6 +427,23 @@
               "source": "client",
               "incoming": 1,
               "outgoing": 1
+            }
+          ],
+          "attributes": [
+            {
+              "name": "cluster revision",
+              "code": 65533,
+              "mfgCode": null,
+              "side": "client",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "3",
+              "reportable": 0,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
             }
           ]
         },
@@ -793,6 +787,7 @@
           "define": "LEVEL_CONTROL_CLUSTER",
           "side": "server",
           "enabled": 0,
+          "commands": [],
           "attributes": [
             {
               "name": "cluster revision",
@@ -824,8 +819,7 @@
               "maxInterval": 65344,
               "reportableChange": 0
             }
-          ],
-          "commands": []
+          ]
         },
         {
           "name": "Door Lock",
@@ -1045,6 +1039,24 @@
           "define": "DOOR_LOCK_CLUSTER",
           "side": "server",
           "enabled": 0,
+          "commands": [
+            {
+              "name": "LockDoorResponse",
+              "code": 0,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 1,
+              "outgoing": 1
+            },
+            {
+              "name": "UnlockDoorResponse",
+              "code": 1,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 1,
+              "outgoing": 1
+            }
+          ],
           "attributes": [
             {
               "name": "cluster revision",
@@ -1480,24 +1492,6 @@
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
-            }
-          ],
-          "commands": [
-            {
-              "name": "LockDoorResponse",
-              "code": 0,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 1
-            },
-            {
-              "name": "UnlockDoorResponse",
-              "code": 1,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 1
             }
           ]
         },
@@ -2552,6 +2546,7 @@
           "define": "TEMP_MEASUREMENT_CLUSTER",
           "side": "client",
           "enabled": 0,
+          "commands": [],
           "attributes": [
             {
               "name": "cluster revision",
@@ -2568,8 +2563,7 @@
               "maxInterval": 65344,
               "reportableChange": 0
             }
-          ],
-          "commands": []
+          ]
         },
         {
           "name": "Temperature Measurement",
@@ -2825,6 +2819,23 @@
           "define": "BASIC_CLUSTER",
           "side": "client",
           "enabled": 0,
+          "attributes": [
+            {
+              "name": "cluster revision",
+              "code": 65533,
+              "mfgCode": null,
+              "side": "client",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "3",
+              "reportable": 0,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            }
+          ],
           "commands": [
             {
               "name": "ResetToFactoryDefaults",
@@ -2841,23 +2852,6 @@
               "source": "client",
               "incoming": 1,
               "outgoing": 0
-            }
-          ],
-          "attributes": [
-            {
-              "name": "cluster revision",
-              "code": 65533,
-              "mfgCode": null,
-              "side": "client",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "3",
-              "reportable": 0,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
             }
           ]
         },
@@ -2924,6 +2918,23 @@
           "define": "IDENTIFY_CLUSTER",
           "side": "client",
           "enabled": 0,
+          "attributes": [
+            {
+              "name": "cluster revision",
+              "code": 65533,
+              "mfgCode": null,
+              "side": "client",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "2",
+              "reportable": 0,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            }
+          ],
           "commands": [
             {
               "name": "Identify",
@@ -2940,23 +2951,6 @@
               "source": "client",
               "incoming": 1,
               "outgoing": 1
-            }
-          ],
-          "attributes": [
-            {
-              "name": "cluster revision",
-              "code": 65533,
-              "mfgCode": null,
-              "side": "client",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "2",
-              "reportable": 0,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
             }
           ]
         },
@@ -3834,24 +3828,6 @@
           "define": "DOOR_LOCK_CLUSTER",
           "side": "server",
           "enabled": 1,
-          "commands": [
-            {
-              "name": "LockDoorResponse",
-              "code": 0,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 1
-            },
-            {
-              "name": "UnlockDoorResponse",
-              "code": 1,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 1
-            }
-          ],
           "attributes": [
             {
               "name": "cluster revision",
@@ -4288,6 +4264,24 @@
               "maxInterval": 65344,
               "reportableChange": 0
             }
+          ],
+          "commands": [
+            {
+              "name": "LockDoorResponse",
+              "code": 0,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 1,
+              "outgoing": 1
+            },
+            {
+              "name": "UnlockDoorResponse",
+              "code": 1,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 1,
+              "outgoing": 1
+            }
           ]
         },
         {
@@ -4297,6 +4291,23 @@
           "define": "BARRIER_CONTROL_CLUSTER",
           "side": "client",
           "enabled": 0,
+          "attributes": [
+            {
+              "name": "cluster revision",
+              "code": 65533,
+              "mfgCode": null,
+              "side": "client",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0x0001",
+              "reportable": 0,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            }
+          ],
           "commands": [
             {
               "name": "BarrierControlGoToPercent",
@@ -4313,23 +4324,6 @@
               "source": "client",
               "incoming": 1,
               "outgoing": 1
-            }
-          ],
-          "attributes": [
-            {
-              "name": "cluster revision",
-              "code": 65533,
-              "mfgCode": null,
-              "side": "client",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "0x0001",
-              "reportable": 0,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
             }
           ]
         },
@@ -4426,6 +4420,23 @@
           "define": "COLOR_CONTROL_CLUSTER",
           "side": "client",
           "enabled": 0,
+          "attributes": [
+            {
+              "name": "cluster revision",
+              "code": 65533,
+              "mfgCode": null,
+              "side": "client",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "3",
+              "reportable": 0,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            }
+          ],
           "commands": [
             {
               "name": "MoveToHue",
@@ -4539,23 +4550,6 @@
               "incoming": 1,
               "outgoing": 1
             }
-          ],
-          "attributes": [
-            {
-              "name": "cluster revision",
-              "code": 65533,
-              "mfgCode": null,
-              "side": "client",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "3",
-              "reportable": 0,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            }
           ]
         },
         {
@@ -4565,7 +4559,6 @@
           "define": "COLOR_CONTROL_CLUSTER",
           "side": "server",
           "enabled": 1,
-          "commands": [],
           "attributes": [
             {
               "name": "cluster revision",
@@ -5332,7 +5325,8 @@
               "maxInterval": 65344,
               "reportableChange": 0
             }
-          ]
+          ],
+          "commands": []
         },
         {
           "name": "Temperature Measurement",
@@ -5367,7 +5361,6 @@
           "define": "TEMP_MEASUREMENT_CLUSTER",
           "side": "server",
           "enabled": 1,
-          "commands": [],
           "attributes": [
             {
               "name": "cluster revision",
@@ -5444,7 +5437,8 @@
               "maxInterval": 65344,
               "reportableChange": 0
             }
-          ]
+          ],
+          "commands": []
         },
         {
           "name": "IAS Zone",
@@ -5488,24 +5482,6 @@
           "define": "IAS_ZONE_CLUSTER",
           "side": "server",
           "enabled": 1,
-          "commands": [
-            {
-              "name": "ZoneStatusChangeNotification",
-              "code": 0,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 1
-            },
-            {
-              "name": "ZoneEnrollRequest",
-              "code": 1,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 1
-            }
-          ],
           "attributes": [
             {
               "name": "cluster revision",
@@ -5597,6 +5573,214 @@
               "maxInterval": 65344,
               "reportableChange": 0
             }
+          ],
+          "commands": [
+            {
+              "name": "ZoneStatusChangeNotification",
+              "code": 0,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 1,
+              "outgoing": 1
+            },
+            {
+              "name": "ZoneEnrollRequest",
+              "code": 1,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 1,
+              "outgoing": 1
+            }
+          ]
+        },
+        {
+          "name": "Network Commissioning",
+          "code": 43690,
+          "mfgCode": null,
+          "define": "NETWORK_COMMISSIONING_CLUSTER",
+          "side": "client",
+          "enabled": 1,
+          "attributes": [
+            {
+              "name": "cluster revision",
+              "code": 65533,
+              "mfgCode": null,
+              "side": "client",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0x0001",
+              "reportable": 0,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            }
+          ],
+          "commands": [
+            {
+              "name": "ScanNetworks",
+              "code": 0,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 1
+            },
+            {
+              "name": "AddWiFiNetwork",
+              "code": 2,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 1
+            },
+            {
+              "name": "UpdateWiFiNetwork",
+              "code": 4,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 1
+            },
+            {
+              "name": "AddThreadNetwork",
+              "code": 6,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 1
+            },
+            {
+              "name": "UpdateThreadNetwork",
+              "code": 8,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 1
+            },
+            {
+              "name": "RemoveNetwork",
+              "code": 10,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 1
+            },
+            {
+              "name": "EnableNetwork",
+              "code": 12,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 1
+            },
+            {
+              "name": "DisableNetwork",
+              "code": 14,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 1
+            },
+            {
+              "name": "GetLastNetworkCommissioningResult",
+              "code": 16,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 1
+            }
+          ]
+        },
+        {
+          "name": "Network Commissioning",
+          "code": 43690,
+          "mfgCode": null,
+          "define": "NETWORK_COMMISSIONING_CLUSTER",
+          "side": "server",
+          "enabled": 0,
+          "commands": [
+            {
+              "name": "ScanNetworksResponse",
+              "code": 1,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 1,
+              "outgoing": 1
+            },
+            {
+              "name": "AddWiFiNetworkResponse",
+              "code": 3,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 1,
+              "outgoing": 1
+            },
+            {
+              "name": "UpdateWiFiNetworkResponse",
+              "code": 5,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 1,
+              "outgoing": 1
+            },
+            {
+              "name": "AddThreadNetworkResponse",
+              "code": 7,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 1,
+              "outgoing": 1
+            },
+            {
+              "name": "UpdateThreadNetworkResponse",
+              "code": 9,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 1,
+              "outgoing": 1
+            },
+            {
+              "name": "RemoveNetworkResponse",
+              "code": 11,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 1,
+              "outgoing": 1
+            },
+            {
+              "name": "EnableNetworkResponse",
+              "code": 13,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 1,
+              "outgoing": 1
+            },
+            {
+              "name": "DisableNetworkResponse",
+              "code": 15,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 1,
+              "outgoing": 1
+            }
+          ],
+          "attributes": [
+            {
+              "name": "cluster revision",
+              "code": 65533,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0x0001",
+              "reportable": 0,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            }
           ]
         },
         {
@@ -5649,7 +5833,6 @@
           "define": "BINDING_CLUSTER",
           "side": "server",
           "enabled": 1,
-          "commands": [],
           "attributes": [
             {
               "name": "cluster revision",
@@ -5666,7 +5849,8 @@
               "maxInterval": 65344,
               "reportableChange": 0
             }
-          ]
+          ],
+          "commands": []
         },
         {
           "name": "Media Playback",
@@ -5675,6 +5859,23 @@
           "define": "MEDIA_PLAYBACK_CLUSTER",
           "side": "client",
           "enabled": 0,
+          "attributes": [
+            {
+              "name": "cluster revision",
+              "code": 65533,
+              "mfgCode": null,
+              "side": "client",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0x0001",
+              "reportable": 0,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            }
+          ],
           "commands": [
             {
               "name": "PlayRequest",
@@ -5755,23 +5956,6 @@
               "source": "client",
               "incoming": 1,
               "outgoing": 1
-            }
-          ],
-          "attributes": [
-            {
-              "name": "cluster revision",
-              "code": 65533,
-              "mfgCode": null,
-              "side": "client",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "0x0001",
-              "reportable": 0,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
             }
           ]
         },
