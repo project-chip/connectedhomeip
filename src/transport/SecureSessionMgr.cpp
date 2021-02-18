@@ -122,7 +122,7 @@ CHIP_ERROR SecureSessionMgr::SendEncryptedMessage(SecureSessionHandle session, E
     PacketHeader packetHeader;
     PayloadHeader payloadHeader;
 
-#if !CHIP_SYSTEM_CONFIG_USE_LWIP1     
+#if !CHIP_SYSTEM_CONFIG_USE_LWIP1
     // Advancing the start to encrypted header, since the transport will attach the packet header on top of it
     ReturnErrorOnFailure(packetHeader.DecodeAndConsume(msgBuf));
 #endif
@@ -142,7 +142,7 @@ CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHea
     Transport::AdminPairingInfo * admin = nullptr;
     NodeId localNodeId          = mLocalNodeId;
 
-#if !CHIP_SYSTEM_CONFIG_USE_LWIP1    
+#if !CHIP_SYSTEM_CONFIG_USE_LWIP1
     uint8_t * msgStart          = nullptr;
     uint16_t msgLen             = 0;
     uint16_t headerSize         = 0;
@@ -188,7 +188,7 @@ CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHea
     // Retain the packet buffer in case it's needed for retransmissions.
     if (bufferRetainSlot != nullptr)
     {
-#if CHIP_SYSTEM_CONFIG_USE_LWIP1        
+#if CHIP_SYSTEM_CONFIG_USE_LWIP1
         encryptedMsg        = msgBuf.CloneData(MessagePacketBuffer::kMaxFooterSize);
 #else
         encryptedMsg        = msgBuf.Retain();
