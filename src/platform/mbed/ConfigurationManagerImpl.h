@@ -26,6 +26,9 @@
 #include <platform/internal/GenericConfigurationManagerImpl.h>
 #include <platform/mbed/MbedConfig.h>
 
+// Forward declare test method that run the tests.
+int cmd_device_test_config(int argc, char ** argv);
+
 namespace chip {
 namespace DeviceLayer {
 
@@ -68,6 +71,10 @@ private:
     // ===== Private members reserved for use by this class only.
 
     static void DoFactoryReset(intptr_t arg);
+
+    // ===== Members for internal use by the following friends (testing in shell application)
+    friend int ::cmd_device_test_config(int argc, char ** argv);
+    using MbedConfig::RunConfigUnitTest;
 };
 
 /**
@@ -90,27 +97,6 @@ inline ConfigurationManager & ConfigurationMgr(void)
 inline ConfigurationManagerImpl & ConfigurationMgrImpl(void)
 {
     return ConfigurationManagerImpl::sInstance;
-}
-
-inline bool ConfigurationManagerImpl::_CanFactoryReset()
-{
-    return true;
-}
-
-inline CHIP_ERROR ConfigurationManagerImpl::_ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key,
-                                                                       uint32_t & value)
-{
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-
-inline CHIP_ERROR ConfigurationManagerImpl::_WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value)
-{
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-
-inline CHIP_ERROR ConfigurationManagerImpl::_GetPrimaryWiFiMACAddress(uint8_t * /* buf */)
-{
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 } // namespace DeviceLayer

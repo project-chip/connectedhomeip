@@ -129,6 +129,10 @@ list(APPEND CHIP_CFLAGS ${CHIP_MBEDEVENTS_CFLAGS})
 mbed_get_target_common_compile_flags(CHIP_MBEDRTOS_CFLAGS mbed-rtos)
 list(APPEND CHIP_CFLAGS ${CHIP_MBEDRTOS_CFLAGS})
 
+# Add support for Mbed storage
+mbed_get_target_common_compile_flags(CHIP_MBEDSTORAGE_CFLAGS mbed-storage-kv-global-api)
+list(APPEND CHIP_CFLAGS ${CHIP_MBEDSTORAGE_CFLAGS})
+
 
 if (CONFIG_CHIP_WITH_EXTERNAL_MBEDTLS)
     mbed_get_target_common_compile_flags(CHIP_MBEDTLS_CFLAGS mbed-mbedtls)

@@ -39,7 +39,38 @@ ConfigurationManagerImpl ConfigurationManagerImpl::sInstance;
 
 CHIP_ERROR ConfigurationManagerImpl::_Init()
 {
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ConfigurationManagerImpl::_GetPrimaryWiFiMACAddress(uint8_t * buf)
+{
+    // TODO: Implement once Mbed interface integration is in place.
     return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+bool ConfigurationManagerImpl::_CanFactoryReset()
+{
+    return true;
+}
+
+void ConfigurationManagerImpl::_InitiateFactoryReset(void)
+{
+    PlatformMgr().ScheduleWork(DoFactoryReset);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::_ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value)
+{
+    return ReadCounter(key, value);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::_WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value)
+{
+    return WriteCounter(key, value);
+}
+
+void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
+{
+    FactoryResetConfig();
 }
 
 } // namespace DeviceLayer
