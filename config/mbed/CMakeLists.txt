@@ -133,6 +133,16 @@ list(APPEND CHIP_CFLAGS ${CHIP_MBEDRTOS_CFLAGS})
 mbed_get_target_common_compile_flags(CHIP_MBEDSTORAGE_CFLAGS mbed-storage-kv-global-api)
 list(APPEND CHIP_CFLAGS ${CHIP_MBEDSTORAGE_CFLAGS})
 
+# Add support for Mbed Socket 
+mbed_get_target_common_compile_flags(CHIP_MBEDNETSOCKET_CFLAGS mbed-netsocket)
+list(APPEND CHIP_CFLAGS ${CHIP_MBEDNETSOCKET_CFLAGS})
+
+mbed_get_target_common_compile_flags(CHIP_MBEDLWIPSTACK_CFLAGS mbed-lwipstack)
+list(APPEND CHIP_CFLAGS ${CHIP_MBEDLWIPSTACK_CFLAGS})
+
+
+
+
 
 if (CONFIG_CHIP_WITH_EXTERNAL_MBEDTLS)
     mbed_get_target_common_compile_flags(CHIP_MBEDTLS_CFLAGS mbed-mbedtls)
@@ -245,15 +255,6 @@ list(APPEND CHIP_INCLUDES)
 # CHIP defines
 list(APPEND CHIP_DEFINES)
 
-# CHIP LwIP support
-list(APPEND CHIP_INCLUDES 
-    ${CHIP_ROOT}/third_party/lwip/repo/lwip/src/include
-    ${CHIP_ROOT}/src/lwip/mbed
-)
-list(APPEND CHIP_DEFINES
-    "LWIP_NO_STDINT_H=1" 
-    "IN_ADDR_T_DEFINED=1"
-)
 
 list(APPEND CHIP_INCLUDES 
     ${CHIP_ROOT}/config/mbed/mbedtls
