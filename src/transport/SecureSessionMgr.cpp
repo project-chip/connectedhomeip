@@ -320,11 +320,6 @@ void SecureSessionMgr::OnMessageReceived(const PacketHeader & packetHeader, cons
         ExitNow(err = CHIP_ERROR_KEY_NOT_FOUND_FROM_PEER);
     }
 
-    if (!state->GetPeerAddress().IsInitialized())
-    {
-        state->SetPeerAddress(peerAddress);
-    }
-
     mPeerConnections.MarkConnectionActive(state);
 
     // Decode the message
@@ -333,6 +328,14 @@ void SecureSessionMgr::OnMessageReceived(const PacketHeader & packetHeader, cons
     if (state->GetPeerNodeId() == kUndefinedNodeId && packetHeader.GetSourceNodeId().HasValue())
     {
         state->SetPeerNodeId(packetHeader.GetSourceNodeId().Value());
+    }
+
+    // TODO: once mDNS address resolution is available reconsider if this is required
+    // This updates the peer address once a packet is received from a new address
+    // and serves as a way to auto-detect peer changing IPs.
+    if (state->GetPeerAddress() != peerAddress)
+    {
+        state->SetPeerAddress(peerAddress);
     }
 
     if (mCB != nullptr)
