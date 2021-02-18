@@ -49,6 +49,8 @@ using System::PacketBufferHandle;
 using Transport::PeerAddress;
 using Transport::PeerConnectionState;
 
+#define CHIP_SYSTEM_CONFIG_USE_LWIP1 0
+
 // Maximum length of application data that can be encrypted as one block.
 // The limit is derived from IPv6 MTU (1280 bytes) - expected header overheads.
 // This limit would need additional reviews once we have formalized Secure Transport header.
@@ -117,11 +119,16 @@ CHIP_ERROR SecureSessionMgr::SendEncryptedMessage(SecureSessionHandle session, E
     VerifyOrReturnError(!msgBuf->HasChainedBuffer(), CHIP_ERROR_INVALID_MESSAGE_LENGTH);
     VerifyOrReturnError(msgBuf->TotalLength() < kMax_SecureSDU_Length, CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
-    // Advancing the start to encrypted header, since the transport will attach the packet header on top of it
     PacketHeader packetHeader;
-    ReturnErrorOnFailure(packetHeader.DecodeAndConsume(msgBuf));
-
     PayloadHeader payloadHeader;
+
+#if !CHIP_SYSTEM_CONFIG_USE_LWIP1     
+    // Advancing the start to encrypted header, since the transport will attach the packet header on top of it
+    ReturnErrorOnFailure(packetHeader.DecodeAndConsume(msgBuf));
+#endif
+
+    packetHeader.GetFlags().Set(Header::FlagValues::kSecure);
+
     return SendMessage(session, payloadHeader, packetHeader, std::move(msgBuf), bufferRetainSlot,
                        EncryptionState::kPayloadIsEncrypted);
 }
@@ -132,12 +139,14 @@ CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHea
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;
     PeerConnectionState * state = nullptr;
+    Transport::AdminPairingInfo * admin = nullptr;
+    NodeId localNodeId          = mLocalNodeId;
+
+#if !CHIP_SYSTEM_CONFIG_USE_LWIP1    
     uint8_t * msgStart          = nullptr;
     uint16_t msgLen             = 0;
     uint16_t headerSize         = 0;
-    NodeId localNodeId          = mLocalNodeId;
-
-    Transport::AdminPairingInfo * admin = nullptr;
+#endif
 
     // Hold the reference to encrypted message in stack variable.
     // In case of any failures, the reference is not returned, and this stack variable
@@ -166,6 +175,7 @@ CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHea
         SuccessOrExit(err);
     }
 
+#if !CHIP_SYSTEM_CONFIG_USE_LWIP1
     // The start of buffer points to the beginning of the encrypted header, and the length of buffer
     // contains both the encrypted header and encrypted data.
     // Locally store the start and length of the retained buffer after accounting for the size of packet header.
@@ -173,11 +183,16 @@ CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHea
 
     msgStart = static_cast<uint8_t *>(msgBuf->Start() - headerSize);
     msgLen   = static_cast<uint16_t>(msgBuf->DataLength() + headerSize);
+#endif
 
     // Retain the packet buffer in case it's needed for retransmissions.
     if (bufferRetainSlot != nullptr)
     {
+#if CHIP_SYSTEM_CONFIG_USE_LWIP1        
+        encryptedMsg        = msgBuf.CloneData(MessagePacketBuffer::kMaxFooterSize);
+#else
         encryptedMsg        = msgBuf.Retain();
+#endif
         encryptedMsg.mMsgId = packetHeader.GetMessageId();
     }
 
@@ -198,10 +213,11 @@ CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHea
 
     if (bufferRetainSlot != nullptr)
     {
+#if !CHIP_SYSTEM_CONFIG_USE_LWIP1
         // Rewind the start and len of the buffer back to pre-send state for following possible retransmition.
         encryptedMsg->SetStart(msgStart);
         encryptedMsg->SetDataLength(msgLen);
-
+#endif
         (*bufferRetainSlot) = std::move(encryptedMsg);
     }
 
