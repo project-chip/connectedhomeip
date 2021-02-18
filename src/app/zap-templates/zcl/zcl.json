@@ -29,7 +29,7 @@
         "wwah-silabs.xml",
         "wwah-silabs-devices.xml",
         "sample-extensions.xml",
-	"commissioning.xml"
+        "commissioning.xml"
     ],
     "manufacturersXml": "../../../../third_party/zap/repo/zcl-builtin/shared/manufacturers.xml",
     "options": {
