@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -310,11 +310,7 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.Off(callback);
-=======
     CHIP_ERROR err = self.cppCluster.Off(onSuccess->Cancel(), onFailure->Cancel());
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -335,11 +331,7 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.On(callback);
-=======
     CHIP_ERROR err = self.cppCluster.On(onSuccess->Cancel(), onFailure->Cancel());
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -360,11 +352,7 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.Toggle(callback);
-=======
     CHIP_ERROR err = self.cppCluster.Toggle(onSuccess->Cancel(), onFailure->Cancel());
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;

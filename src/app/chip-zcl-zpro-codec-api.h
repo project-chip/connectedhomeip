@@ -37,6 +37,7 @@
 | Identify                                                            | 0x0003 |
 | LevelControl                                                        | 0x0008 |
 | MediaPlayback                                                       | 0xF001 |
+| NetworkCommissioning                                                | 0xAAAA |
 | OnOff                                                               | 0x0006 |
 | Scenes                                                              | 0x0005 |
 | TemperatureMeasurement                                              | 0x0402 |

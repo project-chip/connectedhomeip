@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -716,10 +716,10 @@
 #define CHIP_PRINTCLUSTER_ZLL_COMMISSIONING_CLUSTER
 #endif
 
-#if defined(ZCL_USING_NETWORK_PROVISIONING_CLUSTER_SERVER) || defined(ZCL_USING_NETWORK_PROVISIONING_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_NETWORK_PROVISIONING_CLUSTER { ZCL_NETWORK_PROVISIONING_CLUSTER_ID, 43690, "Network Provisioning" },
+#if defined(ZCL_USING_NETWORK_COMMISSIONING_CLUSTER_SERVER) || defined(ZCL_USING_NETWORK_COMMISSIONING_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_NETWORK_COMMISSIONING_CLUSTER { ZCL_NETWORK_COMMISSIONING_CLUSTER_ID, 43690, "Network Commissioning" },
 #else
-#define CHIP_PRINTCLUSTER_NETWORK_PROVISIONING_CLUSTER
+#define CHIP_PRINTCLUSTER_NETWORK_COMMISSIONING_CLUSTER
 #endif
 
 #if defined(ZCL_USING_BINDING_CLUSTER_SERVER) || defined(ZCL_USING_BINDING_CLUSTER_CLIENT)
@@ -870,7 +870,7 @@
     CHIP_PRINTCLUSTER_ELECTRICAL_MEASUREMENT_CLUSTER                                                                               \
     CHIP_PRINTCLUSTER_DIAGNOSTICS_CLUSTER                                                                                          \
     CHIP_PRINTCLUSTER_ZLL_COMMISSIONING_CLUSTER                                                                                    \
-    CHIP_PRINTCLUSTER_NETWORK_PROVISIONING_CLUSTER                                                                                 \
+    CHIP_PRINTCLUSTER_NETWORK_COMMISSIONING_CLUSTER                                                                                \
     CHIP_PRINTCLUSTER_BINDING_CLUSTER                                                                                              \
     CHIP_PRINTCLUSTER_MEDIA_PLAYBACK_CLUSTER                                                                                       \
     CHIP_PRINTCLUSTER_SAMPLE_MFG_SPECIFIC_CLUSTER                                                                                  \

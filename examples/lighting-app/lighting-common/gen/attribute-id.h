@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -4058,7 +4058,7 @@
 
 // Server attributes
 
-// Attribute ids for cluster: Network Provisioning
+// Attribute ids for cluster: Network Commissioning
 
 // Client attributes
 
@@ -4069,6 +4069,13 @@
 // Client attributes
 
 // Server attributes
+
+// Attribute ids for cluster: Media Playback
+
+// Client attributes
+
+// Server attributes
+#define ZCL_CURRENT_STATE_ATTRIBUTE_ID (0x0000)
 
 // Attribute ids for cluster: Sample Mfg Specific Cluster
 

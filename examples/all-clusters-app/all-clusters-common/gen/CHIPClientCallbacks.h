@@ -37,3 +37,15 @@ typedef void (*ReadReportingConfigurationReportedCallback)(void * context, uint1
 typedef void (*ReadReportingConfigurationReceivedCallback)(void * context, uint16_t timeout);
 
 // Cluster Specific Response Callbacks
+typedef void (*NetworkCommissioningClusterAddThreadNetworkResponseCallback)(void * context, uint8_t errorCode, uint8_t * debugText);
+typedef void (*NetworkCommissioningClusterAddWiFiNetworkResponseCallback)(void * context, uint8_t errorCode, uint8_t * debugText);
+typedef void (*NetworkCommissioningClusterDisableNetworkResponseCallback)(void * context, uint8_t errorCode, uint8_t * debugText);
+typedef void (*NetworkCommissioningClusterEnableNetworkResponseCallback)(void * context, uint8_t errorCode, uint8_t * debugText);
+typedef void (*NetworkCommissioningClusterRemoveNetworkResponseCallback)(void * context, uint8_t errorCode, uint8_t * debugText);
+typedef void (*NetworkCommissioningClusterScanNetworksResponseCallback)(
+    void * context, uint8_t errorCode, uint8_t * debugText, /* TYPE WARNING: array array defaults to */ uint8_t * wifiScanResults,
+    /* TYPE WARNING: array array defaults to */ uint8_t * threadScanResults);
+typedef void (*NetworkCommissioningClusterUpdateThreadNetworkResponseCallback)(void * context, uint8_t errorCode,
+                                                                               uint8_t * debugText);
+typedef void (*NetworkCommissioningClusterUpdateWiFiNetworkResponseCallback)(void * context, uint8_t errorCode,
+                                                                             uint8_t * debugText);

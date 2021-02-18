@@ -89,7 +89,7 @@
 
 #define ZAP_ATTRIBUTE_MASK(mask) ATTRIBUTE_MASK_##mask
 // This is an array of EmberAfAttributeMetadata structures.
-#define GENERATED_ATTRIBUTE_COUNT 95
+#define GENERATED_ATTRIBUTE_COUNT 96
 #define GENERATED_ATTRIBUTES                                                                                                       \
     {                                                                                                                              \
         { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 3 } },       /* Basic (server): cluster revision */                        \
@@ -211,8 +211,11 @@
             { 0x0002, ZAP_TYPE(BITMAP16), 2, 0, { (uint8_t *) 0x0000 } }, /* IAS Zone (server): zone status */                     \
             {                                                                                                                      \
                 0x0010, ZAP_TYPE(IEEE_ADDRESS), 8, ZAP_ATTRIBUTE_MASK(WRITABLE), { (uint8_t *) ZAP_LONG_DEFAULTS_INDEX(254) }      \
-            },                                                          /* IAS Zone (server): IAS CIE address */                   \
-            { 0x0011, ZAP_TYPE(INT8U), 1, 0, { (uint8_t *) 0xff } },    /* IAS Zone (server): Zone ID */                           \
+            },                                                       /* IAS Zone (server): IAS CIE address */                      \
+            { 0x0011, ZAP_TYPE(INT8U), 1, 0, { (uint8_t *) 0xff } }, /* IAS Zone (server): Zone ID */                              \
+            {                                                                                                                      \
+                0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), { (uint8_t *) 0x0001 }                                    \
+            },                                                          /* Network Commissioning (client): cluster revision */     \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 0x0001 } }, /* Binding (server): cluster revision */                   \
             { 0x0000, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 0 } },      /* Media Playback (server): current state */               \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 0x0001 } }, /* Media Playback (server): cluster revision */            \
@@ -257,7 +260,7 @@
     };
 
 #define ZAP_CLUSTER_MASK(mask) CLUSTER_MASK_##mask
-#define GENERATED_CLUSTER_COUNT 15
+#define GENERATED_CLUSTER_COUNT 16
 #define GENERATED_CLUSTERS                                                                                                         \
     {                                                                                                                              \
         { 0x0000, ZAP_ATTRIBUTE_INDEX(0), 3, 4, ZAP_CLUSTER_MASK(SERVER), NULL }, /* Endpoint: 1, Cluster: Basic (server) */       \
@@ -317,14 +320,17 @@
                   ZAP_CLUSTER_MASK(MESSAGE_SENT_FUNCTION),                                                                         \
               chipFuncArrayIasZoneServer }, /* Endpoint: 1, Cluster: IAS Zone (server) */                                          \
             {                                                                                                                      \
-                0xF000, ZAP_ATTRIBUTE_INDEX(87), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                              \
+                0xAAAA, ZAP_ATTRIBUTE_INDEX(87), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+            }, /* Endpoint: 1, Cluster: Network Commissioning (client) */                                                          \
+            {                                                                                                                      \
+                0xF000, ZAP_ATTRIBUTE_INDEX(88), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                              \
             }, /* Endpoint: 1, Cluster: Binding (server) */                                                                        \
             {                                                                                                                      \
-                0xF001, ZAP_ATTRIBUTE_INDEX(88), 2, 4, ZAP_CLUSTER_MASK(SERVER), NULL                                              \
+                0xF001, ZAP_ATTRIBUTE_INDEX(89), 2, 4, ZAP_CLUSTER_MASK(SERVER), NULL                                              \
             }, /* Endpoint: 1, Cluster: Media Playback (server) */                                                                 \
-            { 0x0000, ZAP_ATTRIBUTE_INDEX(90), 3, 4, ZAP_CLUSTER_MASK(SERVER), NULL }, /* Endpoint: 2, Cluster: Basic (server) */  \
+            { 0x0000, ZAP_ATTRIBUTE_INDEX(91), 3, 4, ZAP_CLUSTER_MASK(SERVER), NULL }, /* Endpoint: 2, Cluster: Basic (server) */  \
             { 0x0006,                                                                                                              \
-              ZAP_ATTRIBUTE_INDEX(93),                                                                                             \
+              ZAP_ATTRIBUTE_INDEX(94),                                                                                             \
               2,                                                                                                                   \
               3,                                                                                                                   \
               ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
@@ -336,7 +342,7 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 13, 403 }, { ZAP_CLUSTER_INDEX(13), 2, 7 },                                                        \
+        { ZAP_CLUSTER_INDEX(0), 14, 405 }, { ZAP_CLUSTER_INDEX(14), 2, 7 },                                                        \
     }
 
 // Largest attribute size is needed for various buffers
@@ -346,7 +352,7 @@
 #define ATTRIBUTE_SINGLETONS_SIZE (0)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (410)
+#define ATTRIBUTE_MAX_SIZE (412)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (2)
@@ -390,7 +396,7 @@
 
 // Array of EmberAfCommandMetadata structs.
 #define ZAP_COMMAND_MASK(mask) COMMAND_MASK_##mask
-#define EMBER_AF_GENERATED_COMMAND_COUNT (100)
+#define EMBER_AF_GENERATED_COMMAND_COUNT (117)
 #define GENERATED_COMMANDS                                                                                                         \
     {                                                                                                                              \
         { 0x0000, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Basic (server): MfgSpecificPing */                                 \
@@ -532,6 +538,40 @@
             { 0x0500, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* IAS Zone (server): ZoneEnrollResponse */                       \
             { 0x0500, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* IAS Zone (server): ZoneStatusChangeNotification */             \
             { 0x0500, 0x01, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* IAS Zone (server): ZoneEnrollRequest */                        \
+            { 0xAAAA, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Network Commissioning (client): ScanNetworks */                \
+            { 0xAAAA, 0x01, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Network Commissioning (client): ScanNetworksResponse */        \
+            {                                                                                                                      \
+                0xAAAA, 0x02, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
+            }, /* Network Commissioning (client): AddWiFiNetwork */                                                                \
+            {                                                                                                                      \
+                0xAAAA, 0x03, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
+            }, /* Network Commissioning (client): AddWiFiNetworkResponse */                                                        \
+            {                                                                                                                      \
+                0xAAAA, 0x04, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
+            }, /* Network Commissioning (client): UpdateWiFiNetwork */                                                             \
+            {                                                                                                                      \
+                0xAAAA, 0x05, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
+            }, /* Network Commissioning (client): UpdateWiFiNetworkResponse */                                                     \
+            {                                                                                                                      \
+                0xAAAA, 0x06, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
+            }, /* Network Commissioning (client): AddThreadNetwork */                                                              \
+            {                                                                                                                      \
+                0xAAAA, 0x07, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
+            }, /* Network Commissioning (client): AddThreadNetworkResponse */                                                      \
+            {                                                                                                                      \
+                0xAAAA, 0x08, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
+            }, /* Network Commissioning (client): UpdateThreadNetwork */                                                           \
+            {                                                                                                                      \
+                0xAAAA, 0x09, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
+            },                                                   /* Network Commissioning (client): UpdateThreadNetworkResponse */ \
+            { 0xAAAA, 0x0A, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Network Commissioning (client): RemoveNetwork */               \
+            { 0xAAAA, 0x0B, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Network Commissioning (client): RemoveNetworkResponse */       \
+            { 0xAAAA, 0x0C, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Network Commissioning (client): EnableNetwork */               \
+            { 0xAAAA, 0x0D, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Network Commissioning (client): EnableNetworkResponse */       \
+            { 0xAAAA, 0x0E, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Network Commissioning (client): DisableNetwork */              \
+            { 0xAAAA, 0x0F, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Network Commissioning (client): DisableNetworkResponse */      \
+            { 0xAAAA, 0x10,                                                                                                        \
+              ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Network Commissioning (client): GetLastNetworkCommissioningResult */         \
             { 0xF000, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Binding (server): Bind */                                      \
             { 0xF000, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Binding (server): Unbind */                                    \
             { 0xF001, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (server): PlayRequest */                        \

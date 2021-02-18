@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -685,7 +685,7 @@
 #define ZCL_GET_ENDPOINT_LIST_REQUEST_COMMAND_ID (0x42)
 #define ZCL_GET_ENDPOINT_LIST_RESPONSE_COMMAND_ID (0x42)
 
-// Commands for cluster: Network Provisioning
+// Commands for cluster: Network Commissioning
 #define ZCL_SCAN_NETWORKS_COMMAND_ID (0x00)
 #define ZCL_SCAN_NETWORKS_RESPONSE_COMMAND_ID (0x01)
 #define ZCL_ADD_WI_FI_NETWORK_COMMAND_ID (0x02)
@@ -702,11 +702,24 @@
 #define ZCL_ENABLE_NETWORK_RESPONSE_COMMAND_ID (0x0D)
 #define ZCL_DISABLE_NETWORK_COMMAND_ID (0x0E)
 #define ZCL_DISABLE_NETWORK_RESPONSE_COMMAND_ID (0x0F)
-#define ZCL_GET_LAST_NETWORK_PROVISIONING_RESULT_COMMAND_ID (0x10)
+#define ZCL_GET_LAST_NETWORK_COMMISSIONING_RESULT_COMMAND_ID (0x10)
 
 // Commands for cluster: Binding
 #define ZCL_BIND_COMMAND_ID (0x00)
 #define ZCL_UNBIND_COMMAND_ID (0x01)
+
+// Commands for cluster: Media Playback
+#define ZCL_PLAY_REQUEST_COMMAND_ID (0x00)
+#define ZCL_PLAYBACK_COMMAND_ID (0x00)
+#define ZCL_PAUSE_REQUEST_COMMAND_ID (0x01)
+#define ZCL_STOP_REQUEST_COMMAND_ID (0x02)
+#define ZCL_START_OVER_REQUEST_COMMAND_ID (0x03)
+#define ZCL_PREVIOUS_REQUEST_COMMAND_ID (0x04)
+#define ZCL_NEXT_REQUEST_COMMAND_ID (0x05)
+#define ZCL_REWIND_REQUEST_COMMAND_ID (0x06)
+#define ZCL_FAST_FORWARD_REQUEST_COMMAND_ID (0x07)
+#define ZCL_SKIP_FORWARD_REQUEST_COMMAND_ID (0x08)
+#define ZCL_SKIP_BACKWARD_REQUEST_COMMAND_ID (0x09)
 
 // Commands for cluster: Sample Mfg Specific Cluster
 #define ZCL_COMMAND_ONE_COMMAND_ID (0x00)

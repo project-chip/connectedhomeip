@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -1158,22 +1158,22 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPNetworkProvisioningClusterAddThreadNetworkResponseCallbackBridge
-    : public Callback::Callback<NetworkProvisioningClusterAddThreadNetworkResponseCallback> {
+class CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallbackBridge
+    : public Callback::Callback<NetworkCommissioningClusterAddThreadNetworkResponseCallback> {
 public:
-    CHIPNetworkProvisioningClusterAddThreadNetworkResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<NetworkProvisioningClusterAddThreadNetworkResponseCallback>(CallbackFn, this)
+    CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
+        : Callback::Callback<NetworkCommissioningClusterAddThreadNetworkResponseCallback>(CallbackFn, this)
         , mHandler(handler)
         , mQueue(queue)
     {
     }
 
-    ~CHIPNetworkProvisioningClusterAddThreadNetworkResponseCallbackBridge() {};
+    ~CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallbackBridge() {};
 
     static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
     {
-        CHIPNetworkProvisioningClusterAddThreadNetworkResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPNetworkProvisioningClusterAddThreadNetworkResponseCallbackBridge *>(context);
+        CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallbackBridge * callback
+            = reinterpret_cast<CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
                 callback->mHandler(nil, @ {
@@ -1191,22 +1191,22 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPNetworkProvisioningClusterAddWiFiNetworkResponseCallbackBridge
-    : public Callback::Callback<NetworkProvisioningClusterAddWiFiNetworkResponseCallback> {
+class CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallbackBridge
+    : public Callback::Callback<NetworkCommissioningClusterAddWiFiNetworkResponseCallback> {
 public:
-    CHIPNetworkProvisioningClusterAddWiFiNetworkResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<NetworkProvisioningClusterAddWiFiNetworkResponseCallback>(CallbackFn, this)
+    CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
+        : Callback::Callback<NetworkCommissioningClusterAddWiFiNetworkResponseCallback>(CallbackFn, this)
         , mHandler(handler)
         , mQueue(queue)
     {
     }
 
-    ~CHIPNetworkProvisioningClusterAddWiFiNetworkResponseCallbackBridge() {};
+    ~CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallbackBridge() {};
 
     static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
     {
-        CHIPNetworkProvisioningClusterAddWiFiNetworkResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPNetworkProvisioningClusterAddWiFiNetworkResponseCallbackBridge *>(context);
+        CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallbackBridge * callback
+            = reinterpret_cast<CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
                 callback->mHandler(nil, @ {
@@ -1224,22 +1224,22 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPNetworkProvisioningClusterDisableNetworkResponseCallbackBridge
-    : public Callback::Callback<NetworkProvisioningClusterDisableNetworkResponseCallback> {
+class CHIPNetworkCommissioningClusterDisableNetworkResponseCallbackBridge
+    : public Callback::Callback<NetworkCommissioningClusterDisableNetworkResponseCallback> {
 public:
-    CHIPNetworkProvisioningClusterDisableNetworkResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<NetworkProvisioningClusterDisableNetworkResponseCallback>(CallbackFn, this)
+    CHIPNetworkCommissioningClusterDisableNetworkResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
+        : Callback::Callback<NetworkCommissioningClusterDisableNetworkResponseCallback>(CallbackFn, this)
         , mHandler(handler)
         , mQueue(queue)
     {
     }
 
-    ~CHIPNetworkProvisioningClusterDisableNetworkResponseCallbackBridge() {};
+    ~CHIPNetworkCommissioningClusterDisableNetworkResponseCallbackBridge() {};
 
     static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
     {
-        CHIPNetworkProvisioningClusterDisableNetworkResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPNetworkProvisioningClusterDisableNetworkResponseCallbackBridge *>(context);
+        CHIPNetworkCommissioningClusterDisableNetworkResponseCallbackBridge * callback
+            = reinterpret_cast<CHIPNetworkCommissioningClusterDisableNetworkResponseCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
                 callback->mHandler(nil, @ {
@@ -1257,22 +1257,22 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPNetworkProvisioningClusterEnableNetworkResponseCallbackBridge
-    : public Callback::Callback<NetworkProvisioningClusterEnableNetworkResponseCallback> {
+class CHIPNetworkCommissioningClusterEnableNetworkResponseCallbackBridge
+    : public Callback::Callback<NetworkCommissioningClusterEnableNetworkResponseCallback> {
 public:
-    CHIPNetworkProvisioningClusterEnableNetworkResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<NetworkProvisioningClusterEnableNetworkResponseCallback>(CallbackFn, this)
+    CHIPNetworkCommissioningClusterEnableNetworkResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
+        : Callback::Callback<NetworkCommissioningClusterEnableNetworkResponseCallback>(CallbackFn, this)
         , mHandler(handler)
         , mQueue(queue)
     {
     }
 
-    ~CHIPNetworkProvisioningClusterEnableNetworkResponseCallbackBridge() {};
+    ~CHIPNetworkCommissioningClusterEnableNetworkResponseCallbackBridge() {};
 
     static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
     {
-        CHIPNetworkProvisioningClusterEnableNetworkResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPNetworkProvisioningClusterEnableNetworkResponseCallbackBridge *>(context);
+        CHIPNetworkCommissioningClusterEnableNetworkResponseCallbackBridge * callback
+            = reinterpret_cast<CHIPNetworkCommissioningClusterEnableNetworkResponseCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
                 callback->mHandler(nil, @ {
@@ -1290,22 +1290,22 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPNetworkProvisioningClusterRemoveNetworkResponseCallbackBridge
-    : public Callback::Callback<NetworkProvisioningClusterRemoveNetworkResponseCallback> {
+class CHIPNetworkCommissioningClusterRemoveNetworkResponseCallbackBridge
+    : public Callback::Callback<NetworkCommissioningClusterRemoveNetworkResponseCallback> {
 public:
-    CHIPNetworkProvisioningClusterRemoveNetworkResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<NetworkProvisioningClusterRemoveNetworkResponseCallback>(CallbackFn, this)
+    CHIPNetworkCommissioningClusterRemoveNetworkResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
+        : Callback::Callback<NetworkCommissioningClusterRemoveNetworkResponseCallback>(CallbackFn, this)
         , mHandler(handler)
         , mQueue(queue)
     {
     }
 
-    ~CHIPNetworkProvisioningClusterRemoveNetworkResponseCallbackBridge() {};
+    ~CHIPNetworkCommissioningClusterRemoveNetworkResponseCallbackBridge() {};
 
     static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
     {
-        CHIPNetworkProvisioningClusterRemoveNetworkResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPNetworkProvisioningClusterRemoveNetworkResponseCallbackBridge *>(context);
+        CHIPNetworkCommissioningClusterRemoveNetworkResponseCallbackBridge * callback
+            = reinterpret_cast<CHIPNetworkCommissioningClusterRemoveNetworkResponseCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
                 callback->mHandler(nil, @ {
@@ -1323,24 +1323,24 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPNetworkProvisioningClusterScanNetworksResponseCallbackBridge
-    : public Callback::Callback<NetworkProvisioningClusterScanNetworksResponseCallback> {
+class CHIPNetworkCommissioningClusterScanNetworksResponseCallbackBridge
+    : public Callback::Callback<NetworkCommissioningClusterScanNetworksResponseCallback> {
 public:
-    CHIPNetworkProvisioningClusterScanNetworksResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<NetworkProvisioningClusterScanNetworksResponseCallback>(CallbackFn, this)
+    CHIPNetworkCommissioningClusterScanNetworksResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
+        : Callback::Callback<NetworkCommissioningClusterScanNetworksResponseCallback>(CallbackFn, this)
         , mHandler(handler)
         , mQueue(queue)
     {
     }
 
-    ~CHIPNetworkProvisioningClusterScanNetworksResponseCallbackBridge() {};
+    ~CHIPNetworkCommissioningClusterScanNetworksResponseCallbackBridge() {};
 
     static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText,
         /* TYPE WARNING: array array defaults to */ uint8_t * wifiScanResults,
         /* TYPE WARNING: array array defaults to */ uint8_t * threadScanResults)
     {
-        CHIPNetworkProvisioningClusterScanNetworksResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPNetworkProvisioningClusterScanNetworksResponseCallbackBridge *>(context);
+        CHIPNetworkCommissioningClusterScanNetworksResponseCallbackBridge * callback
+            = reinterpret_cast<CHIPNetworkCommissioningClusterScanNetworksResponseCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
                 callback->mHandler(nil, @ {
@@ -1362,22 +1362,22 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPNetworkProvisioningClusterUpdateThreadNetworkResponseCallbackBridge
-    : public Callback::Callback<NetworkProvisioningClusterUpdateThreadNetworkResponseCallback> {
+class CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallbackBridge
+    : public Callback::Callback<NetworkCommissioningClusterUpdateThreadNetworkResponseCallback> {
 public:
-    CHIPNetworkProvisioningClusterUpdateThreadNetworkResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<NetworkProvisioningClusterUpdateThreadNetworkResponseCallback>(CallbackFn, this)
+    CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
+        : Callback::Callback<NetworkCommissioningClusterUpdateThreadNetworkResponseCallback>(CallbackFn, this)
         , mHandler(handler)
         , mQueue(queue)
     {
     }
 
-    ~CHIPNetworkProvisioningClusterUpdateThreadNetworkResponseCallbackBridge() {};
+    ~CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallbackBridge() {};
 
     static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
     {
-        CHIPNetworkProvisioningClusterUpdateThreadNetworkResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPNetworkProvisioningClusterUpdateThreadNetworkResponseCallbackBridge *>(context);
+        CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallbackBridge * callback
+            = reinterpret_cast<CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
                 callback->mHandler(nil, @ {
@@ -1395,22 +1395,22 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPNetworkProvisioningClusterUpdateWiFiNetworkResponseCallbackBridge
-    : public Callback::Callback<NetworkProvisioningClusterUpdateWiFiNetworkResponseCallback> {
+class CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallbackBridge
+    : public Callback::Callback<NetworkCommissioningClusterUpdateWiFiNetworkResponseCallback> {
 public:
-    CHIPNetworkProvisioningClusterUpdateWiFiNetworkResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<NetworkProvisioningClusterUpdateWiFiNetworkResponseCallback>(CallbackFn, this)
+    CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
+        : Callback::Callback<NetworkCommissioningClusterUpdateWiFiNetworkResponseCallback>(CallbackFn, this)
         , mHandler(handler)
         , mQueue(queue)
     {
     }
 
-    ~CHIPNetworkProvisioningClusterUpdateWiFiNetworkResponseCallbackBridge() {};
+    ~CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallbackBridge() {};
 
     static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
     {
-        CHIPNetworkProvisioningClusterUpdateWiFiNetworkResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPNetworkProvisioningClusterUpdateWiFiNetworkResponseCallbackBridge *>(context);
+        CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallbackBridge * callback
+            = reinterpret_cast<CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
                 callback->mHandler(nil, @ {
@@ -1666,11 +1666,7 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.BarrierControlGoToPercent(callback, percentOpen);
-=======
     CHIP_ERROR err = self.cppCluster.BarrierControlGoToPercent(onSuccess->Cancel(), onFailure->Cancel(), percentOpen);
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -1691,11 +1687,7 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.BarrierControlStop(callback);
-=======
     CHIP_ERROR err = self.cppCluster.BarrierControlStop(onSuccess->Cancel(), onFailure->Cancel());
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -1852,11 +1844,7 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.MfgSpecificPing(callback);
-=======
     CHIP_ERROR err = self.cppCluster.MfgSpecificPing(onSuccess->Cancel(), onFailure->Cancel());
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -1877,11 +1865,7 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.ResetToFactoryDefaults(callback);
-=======
     CHIP_ERROR err = self.cppCluster.ResetToFactoryDefaults(onSuccess->Cancel(), onFailure->Cancel());
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -1998,11 +1982,7 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.Bind(callback, nodeId, groupId, endpointId, clusterId);
-=======
     CHIP_ERROR err = self.cppCluster.Bind(onSuccess->Cancel(), onFailure->Cancel(), nodeId, groupId, endpointId, clusterId);
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -2027,11 +2007,7 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.Unbind(callback, nodeId, groupId, endpointId, clusterId);
-=======
     CHIP_ERROR err = self.cppCluster.Unbind(onSuccess->Cancel(), onFailure->Cancel(), nodeId, groupId, endpointId, clusterId);
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -2104,12 +2080,8 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.MoveColor(callback, rateX, rateY, optionsMask, optionsOverride);
-=======
     CHIP_ERROR err
         = self.cppCluster.MoveColor(onSuccess->Cancel(), onFailure->Cancel(), rateX, rateY, optionsMask, optionsOverride);
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -2136,13 +2108,8 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.MoveColorTemperature(
-        callback, moveMode, rate, colorTemperatureMinimum, colorTemperatureMaximum, optionsMask, optionsOverride);
-=======
     CHIP_ERROR err = self.cppCluster.MoveColorTemperature(onSuccess->Cancel(), onFailure->Cancel(), moveMode, rate,
         colorTemperatureMinimum, colorTemperatureMaximum, optionsMask, optionsOverride);
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -2167,12 +2134,8 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.MoveHue(callback, moveMode, rate, optionsMask, optionsOverride);
-=======
     CHIP_ERROR err
         = self.cppCluster.MoveHue(onSuccess->Cancel(), onFailure->Cancel(), moveMode, rate, optionsMask, optionsOverride);
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -2197,12 +2160,8 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.MoveSaturation(callback, moveMode, rate, optionsMask, optionsOverride);
-=======
     CHIP_ERROR err
         = self.cppCluster.MoveSaturation(onSuccess->Cancel(), onFailure->Cancel(), moveMode, rate, optionsMask, optionsOverride);
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -2228,12 +2187,8 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.MoveToColor(callback, colorX, colorY, transitionTime, optionsMask, optionsOverride);
-=======
     CHIP_ERROR err = self.cppCluster.MoveToColor(
         onSuccess->Cancel(), onFailure->Cancel(), colorX, colorY, transitionTime, optionsMask, optionsOverride);
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -2258,13 +2213,8 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err
-        = self.cppCluster.MoveToColorTemperature(callback, colorTemperature, transitionTime, optionsMask, optionsOverride);
-=======
     CHIP_ERROR err = self.cppCluster.MoveToColorTemperature(
         onSuccess->Cancel(), onFailure->Cancel(), colorTemperature, transitionTime, optionsMask, optionsOverride);
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -2290,12 +2240,8 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.MoveToHue(callback, hue, direction, transitionTime, optionsMask, optionsOverride);
-=======
     CHIP_ERROR err = self.cppCluster.MoveToHue(
         onSuccess->Cancel(), onFailure->Cancel(), hue, direction, transitionTime, optionsMask, optionsOverride);
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -2321,13 +2267,8 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err
-        = self.cppCluster.MoveToHueAndSaturation(callback, hue, saturation, transitionTime, optionsMask, optionsOverride);
-=======
     CHIP_ERROR err = self.cppCluster.MoveToHueAndSaturation(
         onSuccess->Cancel(), onFailure->Cancel(), hue, saturation, transitionTime, optionsMask, optionsOverride);
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -2352,12 +2293,8 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.MoveToSaturation(callback, saturation, transitionTime, optionsMask, optionsOverride);
-=======
     CHIP_ERROR err = self.cppCluster.MoveToSaturation(
         onSuccess->Cancel(), onFailure->Cancel(), saturation, transitionTime, optionsMask, optionsOverride);
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -2383,12 +2320,8 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.StepColor(callback, stepX, stepY, transitionTime, optionsMask, optionsOverride);
-=======
     CHIP_ERROR err = self.cppCluster.StepColor(
         onSuccess->Cancel(), onFailure->Cancel(), stepX, stepY, transitionTime, optionsMask, optionsOverride);
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -2416,13 +2349,8 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.StepColorTemperature(callback, stepMode, stepSize, transitionTime, colorTemperatureMinimum,
-        colorTemperatureMaximum, optionsMask, optionsOverride);
-=======
     CHIP_ERROR err = self.cppCluster.StepColorTemperature(onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize,
         transitionTime, colorTemperatureMinimum, colorTemperatureMaximum, optionsMask, optionsOverride);
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -2448,12 +2376,8 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.StepHue(callback, stepMode, stepSize, transitionTime, optionsMask, optionsOverride);
-=======
     CHIP_ERROR err = self.cppCluster.StepHue(
         onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime, optionsMask, optionsOverride);
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -2479,12 +2403,8 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.StepSaturation(callback, stepMode, stepSize, transitionTime, optionsMask, optionsOverride);
-=======
     CHIP_ERROR err = self.cppCluster.StepSaturation(
         onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime, optionsMask, optionsOverride);
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -2507,11 +2427,7 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.StopMoveStep(callback, optionsMask, optionsOverride);
-=======
     CHIP_ERROR err = self.cppCluster.StopMoveStep(onSuccess->Cancel(), onFailure->Cancel(), optionsMask, optionsOverride);
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -4178,11 +4094,7 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.ClearAllPins(callback);
-=======
     CHIP_ERROR err = self.cppCluster.ClearAllPins(onSuccess->Cancel(), onFailure->Cancel());
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -4204,11 +4116,7 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.ClearAllRfids(callback);
-=======
     CHIP_ERROR err = self.cppCluster.ClearAllRfids(onSuccess->Cancel(), onFailure->Cancel());
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -4230,11 +4138,7 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.ClearHolidaySchedule(callback, scheduleId);
-=======
     CHIP_ERROR err = self.cppCluster.ClearHolidaySchedule(onSuccess->Cancel(), onFailure->Cancel(), scheduleId);
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -4256,11 +4160,7 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.ClearPin(callback, userId);
-=======
     CHIP_ERROR err = self.cppCluster.ClearPin(onSuccess->Cancel(), onFailure->Cancel(), userId);
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -4282,11 +4182,7 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.ClearRfid(callback, userId);
-=======
     CHIP_ERROR err = self.cppCluster.ClearRfid(onSuccess->Cancel(), onFailure->Cancel(), userId);
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -4308,11 +4204,7 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.ClearWeekdaySchedule(callback, scheduleId, userId);
-=======
     CHIP_ERROR err = self.cppCluster.ClearWeekdaySchedule(onSuccess->Cancel(), onFailure->Cancel(), scheduleId, userId);
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -4334,11 +4226,7 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.ClearYeardaySchedule(callback, scheduleId, userId);
-=======
     CHIP_ERROR err = self.cppCluster.ClearYeardaySchedule(onSuccess->Cancel(), onFailure->Cancel(), scheduleId, userId);
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -4360,11 +4248,7 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.GetHolidaySchedule(callback, scheduleId);
-=======
     CHIP_ERROR err = self.cppCluster.GetHolidaySchedule(onSuccess->Cancel(), onFailure->Cancel(), scheduleId);
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -4386,11 +4270,7 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.GetLogRecord(callback, logIndex);
-=======
     CHIP_ERROR err = self.cppCluster.GetLogRecord(onSuccess->Cancel(), onFailure->Cancel(), logIndex);
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -4412,11 +4292,7 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.GetPin(callback, userId);
-=======
     CHIP_ERROR err = self.cppCluster.GetPin(onSuccess->Cancel(), onFailure->Cancel(), userId);
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -4438,11 +4314,7 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.GetRfid(callback, userId);
-=======
     CHIP_ERROR err = self.cppCluster.GetRfid(onSuccess->Cancel(), onFailure->Cancel(), userId);
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -4464,11 +4336,7 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.GetUserType(callback, userId);
-=======
     CHIP_ERROR err = self.cppCluster.GetUserType(onSuccess->Cancel(), onFailure->Cancel(), userId);
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -4490,11 +4358,7 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.GetWeekdaySchedule(callback, scheduleId, userId);
-=======
     CHIP_ERROR err = self.cppCluster.GetWeekdaySchedule(onSuccess->Cancel(), onFailure->Cancel(), scheduleId, userId);
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -4516,11 +4380,7 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.GetYeardaySchedule(callback, scheduleId, userId);
-=======
     CHIP_ERROR err = self.cppCluster.GetYeardaySchedule(onSuccess->Cancel(), onFailure->Cancel(), scheduleId, userId);
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -4542,11 +4402,7 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.LockDoor(callback, pin);
-=======
     CHIP_ERROR err = self.cppCluster.LockDoor(onSuccess->Cancel(), onFailure->Cancel(), pin);
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -4572,13 +4428,8 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err
-        = self.cppCluster.SetHolidaySchedule(callback, scheduleId, localStartTime, localEndTime, operatingModeDuringHoliday);
-=======
     CHIP_ERROR err = self.cppCluster.SetHolidaySchedule(
         onSuccess->Cancel(), onFailure->Cancel(), scheduleId, localStartTime, localEndTime, operatingModeDuringHoliday);
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -4604,11 +4455,7 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.SetPin(callback, userId, userStatus, userType, pin);
-=======
     CHIP_ERROR err = self.cppCluster.SetPin(onSuccess->Cancel(), onFailure->Cancel(), userId, userStatus, userType, pin);
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -4634,11 +4481,7 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.SetRfid(callback, userId, userStatus, userType, id);
-=======
     CHIP_ERROR err = self.cppCluster.SetRfid(onSuccess->Cancel(), onFailure->Cancel(), userId, userStatus, userType, id);
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -4660,11 +4503,7 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.SetUserType(callback, userId, userType);
-=======
     CHIP_ERROR err = self.cppCluster.SetUserType(onSuccess->Cancel(), onFailure->Cancel(), userId, userType);
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -4693,13 +4532,8 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err
-        = self.cppCluster.SetWeekdaySchedule(callback, scheduleId, userId, daysMask, startHour, startMinute, endHour, endMinute);
-=======
     CHIP_ERROR err = self.cppCluster.SetWeekdaySchedule(
         onSuccess->Cancel(), onFailure->Cancel(), scheduleId, userId, daysMask, startHour, startMinute, endHour, endMinute);
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -4725,12 +4559,8 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.SetYeardaySchedule(callback, scheduleId, userId, localStartTime, localEndTime);
-=======
     CHIP_ERROR err = self.cppCluster.SetYeardaySchedule(
         onSuccess->Cancel(), onFailure->Cancel(), scheduleId, userId, localStartTime, localEndTime);
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -4752,11 +4582,7 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.UnlockDoor(callback, pin);
-=======
     CHIP_ERROR err = self.cppCluster.UnlockDoor(onSuccess->Cancel(), onFailure->Cancel(), pin);
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -4778,11 +4604,7 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.UnlockWithTimeout(callback, timeoutInSeconds, pin);
-=======
     CHIP_ERROR err = self.cppCluster.UnlockWithTimeout(onSuccess->Cancel(), onFailure->Cancel(), timeoutInSeconds, pin);
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -4959,11 +4781,7 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.AddGroup(callback, groupId, groupName);
-=======
     CHIP_ERROR err = self.cppCluster.AddGroup(onSuccess->Cancel(), onFailure->Cancel(), groupId, groupName);
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -4984,11 +4802,7 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.AddGroupIfIdentifying(callback, groupId, groupName);
-=======
     CHIP_ERROR err = self.cppCluster.AddGroupIfIdentifying(onSuccess->Cancel(), onFailure->Cancel(), groupId, groupName);
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5010,11 +4824,7 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.GetGroupMembership(callback, groupCount, groupList);
-=======
     CHIP_ERROR err = self.cppCluster.GetGroupMembership(onSuccess->Cancel(), onFailure->Cancel(), groupCount, groupList);
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5035,11 +4845,7 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.RemoveAllGroups(callback);
-=======
     CHIP_ERROR err = self.cppCluster.RemoveAllGroups(onSuccess->Cancel(), onFailure->Cancel());
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5061,11 +4867,7 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.RemoveGroup(callback, groupId);
-=======
     CHIP_ERROR err = self.cppCluster.RemoveGroup(onSuccess->Cancel(), onFailure->Cancel(), groupId);
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5087,11 +4889,7 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.ViewGroup(callback, groupId);
-=======
     CHIP_ERROR err = self.cppCluster.ViewGroup(onSuccess->Cancel(), onFailure->Cancel(), groupId);
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5182,11 +4980,7 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.Identify(callback, identifyTime);
-=======
     CHIP_ERROR err = self.cppCluster.Identify(onSuccess->Cancel(), onFailure->Cancel(), identifyTime);
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5208,11 +5002,7 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.IdentifyQuery(callback);
-=======
     CHIP_ERROR err = self.cppCluster.IdentifyQuery(onSuccess->Cancel(), onFailure->Cancel());
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5329,11 +5119,7 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.Move(callback, moveMode, rate, optionMask, optionOverride);
-=======
     CHIP_ERROR err = self.cppCluster.Move(onSuccess->Cancel(), onFailure->Cancel(), moveMode, rate, optionMask, optionOverride);
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5358,12 +5144,8 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.MoveToLevel(callback, level, transitionTime, optionMask, optionOverride);
-=======
     CHIP_ERROR err
         = self.cppCluster.MoveToLevel(onSuccess->Cancel(), onFailure->Cancel(), level, transitionTime, optionMask, optionOverride);
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5386,11 +5168,7 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.MoveToLevelWithOnOff(callback, level, transitionTime);
-=======
     CHIP_ERROR err = self.cppCluster.MoveToLevelWithOnOff(onSuccess->Cancel(), onFailure->Cancel(), level, transitionTime);
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5411,11 +5189,7 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.MoveWithOnOff(callback, moveMode, rate);
-=======
     CHIP_ERROR err = self.cppCluster.MoveWithOnOff(onSuccess->Cancel(), onFailure->Cancel(), moveMode, rate);
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5441,12 +5215,8 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.Step(callback, stepMode, stepSize, transitionTime, optionMask, optionOverride);
-=======
     CHIP_ERROR err = self.cppCluster.Step(
         onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime, optionMask, optionOverride);
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5470,11 +5240,7 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.StepWithOnOff(callback, stepMode, stepSize, transitionTime);
-=======
     CHIP_ERROR err = self.cppCluster.StepWithOnOff(onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime);
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5495,11 +5261,7 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.Stop(callback, optionMask, optionOverride);
-=======
     CHIP_ERROR err = self.cppCluster.Stop(onSuccess->Cancel(), onFailure->Cancel(), optionMask, optionOverride);
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5520,11 +5282,7 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.StopWithOnOff(callback);
-=======
     CHIP_ERROR err = self.cppCluster.StopWithOnOff(onSuccess->Cancel(), onFailure->Cancel());
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5621,13 +5379,13 @@ private:
 
 @end
 
-@interface CHIPNetworkProvisioning ()
+@interface CHIPNetworkCommissioning ()
 
-@property (readonly) Controller::NetworkProvisioningCluster cppCluster;
+@property (readonly) Controller::NetworkCommissioningCluster cppCluster;
 @property (readonly, nonatomic) dispatch_queue_t callbackQueue;
 @end
 
-@implementation CHIPNetworkProvisioning
+@implementation CHIPNetworkCommissioning
 
 - (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(EndpointId)endpoint queue:(dispatch_queue_t)queue
 {
@@ -5644,14 +5402,13 @@ private:
     return self;
 }
 
-- (BOOL)addThreadNetwork:(uint8_t *)operationalDataset
-    operationalDatasetLen:(uint32_t)operationalDatasetLen
-               breadcrumb:(uint64_t)breadcrumb
-                timeoutMs:(uint32_t)timeoutMs
-        completionHandler:(ResponseHandler)completionHandler
+- (BOOL)addThreadNetwork:(char *)operationalDataset
+              breadcrumb:(uint64_t)breadcrumb
+               timeoutMs:(uint32_t)timeoutMs
+       completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPNetworkProvisioningClusterAddThreadNetworkResponseCallbackBridge * onSuccess
-        = new CHIPNetworkProvisioningClusterAddThreadNetworkResponseCallbackBridge(completionHandler, _callbackQueue);
+    CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallbackBridge * onSuccess
+        = new CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
         return NO;
     }
@@ -5662,12 +5419,8 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.AddThreadNetwork(callback, operationalDataset, operationalDatasetLen, breadcrumb, timeoutMs);
-=======
     CHIP_ERROR err
         = self.cppCluster.AddThreadNetwork(onSuccess->Cancel(), onFailure->Cancel(), operationalDataset, breadcrumb, timeoutMs);
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5675,16 +5428,14 @@ private:
     }
     return YES;
 }
-- (BOOL)addWiFiNetwork:(uint8_t *)ssid
-               ssidLen:(uint32_t)ssidLen
-           credentials:(uint8_t *)credentials
-        credentialsLen:(uint32_t)credentialsLen
+- (BOOL)addWiFiNetwork:(char *)ssid
+           credentials:(char *)credentials
             breadcrumb:(uint64_t)breadcrumb
              timeoutMs:(uint32_t)timeoutMs
      completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPNetworkProvisioningClusterAddWiFiNetworkResponseCallbackBridge * onSuccess
-        = new CHIPNetworkProvisioningClusterAddWiFiNetworkResponseCallbackBridge(completionHandler, _callbackQueue);
+    CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallbackBridge * onSuccess
+        = new CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
         return NO;
     }
@@ -5695,12 +5446,8 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.AddWiFiNetwork(callback, ssid, ssidLen, credentials, credentialsLen, breadcrumb, timeoutMs);
-=======
     CHIP_ERROR err
         = self.cppCluster.AddWiFiNetwork(onSuccess->Cancel(), onFailure->Cancel(), ssid, credentials, breadcrumb, timeoutMs);
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5708,14 +5455,13 @@ private:
     }
     return YES;
 }
-- (BOOL)disableNetwork:(uint8_t *)networkID
-          networkIDLen:(uint32_t)networkIDLen
+- (BOOL)disableNetwork:(char *)networkID
             breadcrumb:(uint64_t)breadcrumb
              timeoutMs:(uint32_t)timeoutMs
      completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPNetworkProvisioningClusterDisableNetworkResponseCallbackBridge * onSuccess
-        = new CHIPNetworkProvisioningClusterDisableNetworkResponseCallbackBridge(completionHandler, _callbackQueue);
+    CHIPNetworkCommissioningClusterDisableNetworkResponseCallbackBridge * onSuccess
+        = new CHIPNetworkCommissioningClusterDisableNetworkResponseCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
         return NO;
     }
@@ -5726,11 +5472,7 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.DisableNetwork(callback, networkID, networkIDLen, breadcrumb, timeoutMs);
-=======
     CHIP_ERROR err = self.cppCluster.DisableNetwork(onSuccess->Cancel(), onFailure->Cancel(), networkID, breadcrumb, timeoutMs);
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5738,14 +5480,13 @@ private:
     }
     return YES;
 }
-- (BOOL)enableNetwork:(uint8_t *)networkID
-         networkIDLen:(uint32_t)networkIDLen
+- (BOOL)enableNetwork:(char *)networkID
            breadcrumb:(uint64_t)breadcrumb
             timeoutMs:(uint32_t)timeoutMs
     completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPNetworkProvisioningClusterEnableNetworkResponseCallbackBridge * onSuccess
-        = new CHIPNetworkProvisioningClusterEnableNetworkResponseCallbackBridge(completionHandler, _callbackQueue);
+    CHIPNetworkCommissioningClusterEnableNetworkResponseCallbackBridge * onSuccess
+        = new CHIPNetworkCommissioningClusterEnableNetworkResponseCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
         return NO;
     }
@@ -5756,11 +5497,7 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.EnableNetwork(callback, networkID, networkIDLen, breadcrumb, timeoutMs);
-=======
     CHIP_ERROR err = self.cppCluster.EnableNetwork(onSuccess->Cancel(), onFailure->Cancel(), networkID, breadcrumb, timeoutMs);
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5768,7 +5505,7 @@ private:
     }
     return YES;
 }
-- (BOOL)getLastNetworkProvisioningResult:(uint32_t)timeoutMs completionHandler:(ResponseHandler)completionHandler
+- (BOOL)getLastNetworkCommissioningResult:(uint32_t)timeoutMs completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
@@ -5781,11 +5518,7 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.GetLastNetworkProvisioningResult(callback, timeoutMs);
-=======
-    CHIP_ERROR err = self.cppCluster.GetLastNetworkProvisioningResult(onSuccess->Cancel(), onFailure->Cancel(), timeoutMs);
->>>>>>> chip/master
+    CHIP_ERROR err = self.cppCluster.GetLastNetworkCommissioningResult(onSuccess->Cancel(), onFailure->Cancel(), timeoutMs);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5793,14 +5526,13 @@ private:
     }
     return YES;
 }
-- (BOOL)removeNetwork:(uint8_t *)networkID
-         networkIDLen:(uint32_t)networkIDLen
+- (BOOL)removeNetwork:(char *)networkID
            breadcrumb:(uint64_t)breadcrumb
             timeoutMs:(uint32_t)timeoutMs
     completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPNetworkProvisioningClusterRemoveNetworkResponseCallbackBridge * onSuccess
-        = new CHIPNetworkProvisioningClusterRemoveNetworkResponseCallbackBridge(completionHandler, _callbackQueue);
+    CHIPNetworkCommissioningClusterRemoveNetworkResponseCallbackBridge * onSuccess
+        = new CHIPNetworkCommissioningClusterRemoveNetworkResponseCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
         return NO;
     }
@@ -5811,11 +5543,7 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.RemoveNetwork(callback, networkID, networkIDLen, breadcrumb, timeoutMs);
-=======
     CHIP_ERROR err = self.cppCluster.RemoveNetwork(onSuccess->Cancel(), onFailure->Cancel(), networkID, breadcrumb, timeoutMs);
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5823,14 +5551,13 @@ private:
     }
     return YES;
 }
-- (BOOL)scanNetworks:(uint8_t *)ssid
-              ssidLen:(uint32_t)ssidLen
+- (BOOL)scanNetworks:(char *)ssid
            breadcrumb:(uint64_t)breadcrumb
             timeoutMs:(uint32_t)timeoutMs
     completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPNetworkProvisioningClusterScanNetworksResponseCallbackBridge * onSuccess
-        = new CHIPNetworkProvisioningClusterScanNetworksResponseCallbackBridge(completionHandler, _callbackQueue);
+    CHIPNetworkCommissioningClusterScanNetworksResponseCallbackBridge * onSuccess
+        = new CHIPNetworkCommissioningClusterScanNetworksResponseCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
         return NO;
     }
@@ -5841,11 +5568,7 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.ScanNetworks(callback, ssid, ssidLen, breadcrumb, timeoutMs);
-=======
     CHIP_ERROR err = self.cppCluster.ScanNetworks(onSuccess->Cancel(), onFailure->Cancel(), ssid, breadcrumb, timeoutMs);
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5853,14 +5576,13 @@ private:
     }
     return YES;
 }
-- (BOOL)updateThreadNetwork:(uint8_t *)operationalDataset
-      operationalDatasetLen:(uint32_t)operationalDatasetLen
+- (BOOL)updateThreadNetwork:(char *)operationalDataset
                  breadcrumb:(uint64_t)breadcrumb
                   timeoutMs:(uint32_t)timeoutMs
           completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPNetworkProvisioningClusterUpdateThreadNetworkResponseCallbackBridge * onSuccess
-        = new CHIPNetworkProvisioningClusterUpdateThreadNetworkResponseCallbackBridge(completionHandler, _callbackQueue);
+    CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallbackBridge * onSuccess
+        = new CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
         return NO;
     }
@@ -5871,13 +5593,8 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err
-        = self.cppCluster.UpdateThreadNetwork(callback, operationalDataset, operationalDatasetLen, breadcrumb, timeoutMs);
-=======
     CHIP_ERROR err
         = self.cppCluster.UpdateThreadNetwork(onSuccess->Cancel(), onFailure->Cancel(), operationalDataset, breadcrumb, timeoutMs);
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5885,16 +5602,14 @@ private:
     }
     return YES;
 }
-- (BOOL)updateWiFiNetwork:(uint8_t *)ssid
-                  ssidLen:(uint32_t)ssidLen
-              credentials:(uint8_t *)credentials
-           credentialsLen:(uint32_t)credentialsLen
+- (BOOL)updateWiFiNetwork:(char *)ssid
+              credentials:(char *)credentials
                breadcrumb:(uint64_t)breadcrumb
                 timeoutMs:(uint32_t)timeoutMs
         completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPNetworkProvisioningClusterUpdateWiFiNetworkResponseCallbackBridge * onSuccess
-        = new CHIPNetworkProvisioningClusterUpdateWiFiNetworkResponseCallbackBridge(completionHandler, _callbackQueue);
+    CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallbackBridge * onSuccess
+        = new CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
         return NO;
     }
@@ -5905,12 +5620,8 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.UpdateWiFiNetwork(callback, ssid, ssidLen, credentials, credentialsLen, breadcrumb, timeoutMs);
-=======
     CHIP_ERROR err
         = self.cppCluster.UpdateWiFiNetwork(onSuccess->Cancel(), onFailure->Cancel(), ssid, credentials, breadcrumb, timeoutMs);
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5979,11 +5690,7 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.Off(callback);
-=======
     CHIP_ERROR err = self.cppCluster.Off(onSuccess->Cancel(), onFailure->Cancel());
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6004,11 +5711,7 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.On(callback);
-=======
     CHIP_ERROR err = self.cppCluster.On(onSuccess->Cancel(), onFailure->Cancel());
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6029,11 +5732,7 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.Toggle(callback);
-=======
     CHIP_ERROR err = self.cppCluster.Toggle(onSuccess->Cancel(), onFailure->Cancel());
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6172,12 +5871,8 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.AddScene(callback, groupId, sceneId, transitionTime, sceneName, clusterId, length, value);
-=======
     CHIP_ERROR err = self.cppCluster.AddScene(
         onSuccess->Cancel(), onFailure->Cancel(), groupId, sceneId, transitionTime, sceneName, clusterId, length, value);
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6199,11 +5894,7 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.GetSceneMembership(callback, groupId);
-=======
     CHIP_ERROR err = self.cppCluster.GetSceneMembership(onSuccess->Cancel(), onFailure->Cancel(), groupId);
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6227,11 +5918,7 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.RecallScene(callback, groupId, sceneId, transitionTime);
-=======
     CHIP_ERROR err = self.cppCluster.RecallScene(onSuccess->Cancel(), onFailure->Cancel(), groupId, sceneId, transitionTime);
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6253,11 +5940,7 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.RemoveAllScenes(callback, groupId);
-=======
     CHIP_ERROR err = self.cppCluster.RemoveAllScenes(onSuccess->Cancel(), onFailure->Cancel(), groupId);
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6279,11 +5962,7 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.RemoveScene(callback, groupId, sceneId);
-=======
     CHIP_ERROR err = self.cppCluster.RemoveScene(onSuccess->Cancel(), onFailure->Cancel(), groupId, sceneId);
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6305,11 +5984,7 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.StoreScene(callback, groupId, sceneId);
-=======
     CHIP_ERROR err = self.cppCluster.StoreScene(onSuccess->Cancel(), onFailure->Cancel(), groupId, sceneId);
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6331,11 +6006,7 @@ private:
         return NO;
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR err = self.cppCluster.ViewScene(callback, groupId, sceneId);
-=======
     CHIP_ERROR err = self.cppCluster.ViewScene(onSuccess->Cancel(), onFailure->Cancel(), groupId, sceneId);
->>>>>>> chip/master
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;

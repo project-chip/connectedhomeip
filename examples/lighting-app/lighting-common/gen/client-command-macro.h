@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -5666,7 +5666,7 @@
  * @param timeoutMs INT32U
  */
 #define emberAfFillCommandNetwork                                                                                                  \
-    ProvisioningClusterScanNetworks(ssid, breadcrumb, timeoutMs)                                                                   \
+    CommissioningClusterScanNetworks(ssid, breadcrumb, timeoutMs)                                                                  \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
                                   ZCL_SCAN_NETWORKS_COMMAND_ID, "uuu", ssid, breadcrumb, timeoutMs);
@@ -5682,8 +5682,8 @@
  * @param threadScanResultsLen int
  */
 #define emberAfFillCommandNetwork                                                                                                  \
-    ProvisioningClusterScanNetworksResponse(errorCode, debugText, wifiScanResults, wifiScanResultsLen, threadScanResults,          \
-                                            threadScanResultsLen)                                                                  \
+    CommissioningClusterScanNetworksResponse(errorCode, debugText, wifiScanResults, wifiScanResultsLen, threadScanResults,         \
+                                             threadScanResultsLen)                                                                 \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
                                   ZCL_SCAN_NETWORKS_RESPONSE_COMMAND_ID, "uubb", errorCode, debugText, wifiScanResults,            \
@@ -5698,7 +5698,7 @@
  * @param timeoutMs INT32U
  */
 #define emberAfFillCommandNetwork                                                                                                  \
-    ProvisioningClusterAddWiFiNetwork(ssid, credentials, breadcrumb, timeoutMs)                                                    \
+    CommissioningClusterAddWiFiNetwork(ssid, credentials, breadcrumb, timeoutMs)                                                   \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
                                   ZCL_ADD_WI_FI_NETWORK_COMMAND_ID, "uuuu", ssid, credentials, breadcrumb, timeoutMs);
@@ -5710,7 +5710,7 @@
  * @param debugText CHAR_STRING
  */
 #define emberAfFillCommandNetwork                                                                                                  \
-    ProvisioningClusterAddWiFiNetworkResponse(errorCode, debugText)                                                                \
+    CommissioningClusterAddWiFiNetworkResponse(errorCode, debugText)                                                               \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
                                   ZCL_ADD_WI_FI_NETWORK_RESPONSE_COMMAND_ID, "uu", errorCode, debugText);
@@ -5724,7 +5724,7 @@
  * @param timeoutMs INT32U
  */
 #define emberAfFillCommandNetwork                                                                                                  \
-    ProvisioningClusterUpdateWiFiNetwork(ssid, credentials, breadcrumb, timeoutMs)                                                 \
+    CommissioningClusterUpdateWiFiNetwork(ssid, credentials, breadcrumb, timeoutMs)                                                \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
                                   ZCL_UPDATE_WI_FI_NETWORK_COMMAND_ID, "uuuu", ssid, credentials, breadcrumb, timeoutMs);
@@ -5736,7 +5736,7 @@
  * @param debugText CHAR_STRING
  */
 #define emberAfFillCommandNetwork                                                                                                  \
-    ProvisioningClusterUpdateWiFiNetworkResponse(errorCode, debugText)                                                             \
+    CommissioningClusterUpdateWiFiNetworkResponse(errorCode, debugText)                                                            \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
                                   ZCL_UPDATE_WI_FI_NETWORK_RESPONSE_COMMAND_ID, "uu", errorCode, debugText);
@@ -5749,7 +5749,7 @@
  * @param timeoutMs INT32U
  */
 #define emberAfFillCommandNetwork                                                                                                  \
-    ProvisioningClusterAddThreadNetwork(operationalDataset, breadcrumb, timeoutMs)                                                 \
+    CommissioningClusterAddThreadNetwork(operationalDataset, breadcrumb, timeoutMs)                                                \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
                                   ZCL_ADD_THREAD_NETWORK_COMMAND_ID, "uuu", operationalDataset, breadcrumb, timeoutMs);
@@ -5761,7 +5761,7 @@
  * @param debugText CHAR_STRING
  */
 #define emberAfFillCommandNetwork                                                                                                  \
-    ProvisioningClusterAddThreadNetworkResponse(errorCode, debugText)                                                              \
+    CommissioningClusterAddThreadNetworkResponse(errorCode, debugText)                                                             \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
                                   ZCL_ADD_THREAD_NETWORK_RESPONSE_COMMAND_ID, "uu", errorCode, debugText);
@@ -5774,7 +5774,7 @@
  * @param timeoutMs INT32U
  */
 #define emberAfFillCommandNetwork                                                                                                  \
-    ProvisioningClusterUpdateThreadNetwork(operationalDataset, breadcrumb, timeoutMs)                                              \
+    CommissioningClusterUpdateThreadNetwork(operationalDataset, breadcrumb, timeoutMs)                                             \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
                                   ZCL_UPDATE_THREAD_NETWORK_COMMAND_ID, "uuu", operationalDataset, breadcrumb, timeoutMs);
@@ -5786,7 +5786,7 @@
  * @param debugText CHAR_STRING
  */
 #define emberAfFillCommandNetwork                                                                                                  \
-    ProvisioningClusterUpdateThreadNetworkResponse(errorCode, debugText)                                                           \
+    CommissioningClusterUpdateThreadNetworkResponse(errorCode, debugText)                                                          \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
                                   ZCL_UPDATE_THREAD_NETWORK_RESPONSE_COMMAND_ID, "uu", errorCode, debugText);
@@ -5799,7 +5799,7 @@
  * @param TimeoutMs INT32U
  */
 #define emberAfFillCommandNetwork                                                                                                  \
-    ProvisioningClusterRemoveNetwork(NetworkID, Breadcrumb, TimeoutMs)                                                             \
+    CommissioningClusterRemoveNetwork(NetworkID, Breadcrumb, TimeoutMs)                                                            \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
                                   ZCL_REMOVE_NETWORK_COMMAND_ID, "uuu", NetworkID, Breadcrumb, TimeoutMs);
@@ -5811,7 +5811,7 @@
  * @param debugText CHAR_STRING
  */
 #define emberAfFillCommandNetwork                                                                                                  \
-    ProvisioningClusterRemoveNetworkResponse(errorCode, debugText)                                                                 \
+    CommissioningClusterRemoveNetworkResponse(errorCode, debugText)                                                                \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
                                   ZCL_REMOVE_NETWORK_RESPONSE_COMMAND_ID, "uu", errorCode, debugText);
@@ -5824,7 +5824,7 @@
  * @param timeoutMs INT32U
  */
 #define emberAfFillCommandNetwork                                                                                                  \
-    ProvisioningClusterEnableNetwork(networkID, breadcrumb, timeoutMs)                                                             \
+    CommissioningClusterEnableNetwork(networkID, breadcrumb, timeoutMs)                                                            \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
                                   ZCL_ENABLE_NETWORK_COMMAND_ID, "uuu", networkID, breadcrumb, timeoutMs);
@@ -5836,7 +5836,7 @@
  * @param debugText CHAR_STRING
  */
 #define emberAfFillCommandNetwork                                                                                                  \
-    ProvisioningClusterEnableNetworkResponse(errorCode, debugText)                                                                 \
+    CommissioningClusterEnableNetworkResponse(errorCode, debugText)                                                                \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
                                   ZCL_ENABLE_NETWORK_RESPONSE_COMMAND_ID, "uu", errorCode, debugText);
@@ -5849,7 +5849,7 @@
  * @param timeoutMs INT32U
  */
 #define emberAfFillCommandNetwork                                                                                                  \
-    ProvisioningClusterDisableNetwork(networkID, breadcrumb, timeoutMs)                                                            \
+    CommissioningClusterDisableNetwork(networkID, breadcrumb, timeoutMs)                                                           \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
                                   ZCL_DISABLE_NETWORK_COMMAND_ID, "uuu", networkID, breadcrumb, timeoutMs);
@@ -5861,21 +5861,21 @@
  * @param debugText CHAR_STRING
  */
 #define emberAfFillCommandNetwork                                                                                                  \
-    ProvisioningClusterDisableNetworkResponse(errorCode, debugText)                                                                \
+    CommissioningClusterDisableNetworkResponse(errorCode, debugText)                                                               \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
                                   ZCL_DISABLE_NETWORK_RESPONSE_COMMAND_ID, "uu", errorCode, debugText);
 
-/** @brief Command description for GetLastNetworkProvisioningResult
+/** @brief Command description for GetLastNetworkCommissioningResult
  *
- * Command: GetLastNetworkProvisioningResult
+ * Command: GetLastNetworkCommissioningResult
  * @param timeoutMs INT32U
  */
 #define emberAfFillCommandNetwork                                                                                                  \
-    ProvisioningClusterGetLastNetworkProvisioningResult(timeoutMs)                                                                 \
+    CommissioningClusterGetLastNetworkCommissioningResult(timeoutMs)                                                               \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-                                  ZCL_GET_LAST_NETWORK_PROVISIONING_RESULT_COMMAND_ID, "u", timeoutMs);
+                                  ZCL_GET_LAST_NETWORK_COMMISSIONING_RESULT_COMMAND_ID, "u", timeoutMs);
 
 /** @brief Command description for Bind
  *
@@ -5902,6 +5902,96 @@
     emberAfFillExternalBuffer(mask,                                                                                                \
                                                                                                                                    \
                               ZCL_UNBIND_COMMAND_ID, "uuuu", nodeId, groupId, endpointId, clusterId);
+
+/** @brief Command description for PlayRequest
+ *
+ * Command: PlayRequest
+ */
+#define emberAfFillCommandMedia                                                                                                    \
+    PlaybackClusterPlayRequest() emberAfFillExternalBuffer(mask,                                                                   \
+                                                                                                                                   \
+                                                           ZCL_PLAY_REQUEST_COMMAND_ID, "", );
+
+/** @brief Command description for PauseRequest
+ *
+ * Command: PauseRequest
+ */
+#define emberAfFillCommandMedia                                                                                                    \
+    PlaybackClusterPauseRequest() emberAfFillExternalBuffer(mask,                                                                  \
+                                                                                                                                   \
+                                                            ZCL_PAUSE_REQUEST_COMMAND_ID, "", );
+
+/** @brief Command description for StopRequest
+ *
+ * Command: StopRequest
+ */
+#define emberAfFillCommandMedia                                                                                                    \
+    PlaybackClusterStopRequest() emberAfFillExternalBuffer(mask,                                                                   \
+                                                                                                                                   \
+                                                           ZCL_STOP_REQUEST_COMMAND_ID, "", );
+
+/** @brief Command description for StartOverRequest
+ *
+ * Command: StartOverRequest
+ */
+#define emberAfFillCommandMedia                                                                                                    \
+    PlaybackClusterStartOverRequest() emberAfFillExternalBuffer(mask,                                                              \
+                                                                                                                                   \
+                                                                ZCL_START_OVER_REQUEST_COMMAND_ID, "", );
+
+/** @brief Command description for PreviousRequest
+ *
+ * Command: PreviousRequest
+ */
+#define emberAfFillCommandMedia                                                                                                    \
+    PlaybackClusterPreviousRequest() emberAfFillExternalBuffer(mask,                                                               \
+                                                                                                                                   \
+                                                               ZCL_PREVIOUS_REQUEST_COMMAND_ID, "", );
+
+/** @brief Command description for NextRequest
+ *
+ * Command: NextRequest
+ */
+#define emberAfFillCommandMedia                                                                                                    \
+    PlaybackClusterNextRequest() emberAfFillExternalBuffer(mask,                                                                   \
+                                                                                                                                   \
+                                                           ZCL_NEXT_REQUEST_COMMAND_ID, "", );
+
+/** @brief Command description for RewindRequest
+ *
+ * Command: RewindRequest
+ */
+#define emberAfFillCommandMedia                                                                                                    \
+    PlaybackClusterRewindRequest() emberAfFillExternalBuffer(mask,                                                                 \
+                                                                                                                                   \
+                                                             ZCL_REWIND_REQUEST_COMMAND_ID, "", );
+
+/** @brief Command description for FastForwardRequest
+ *
+ * Command: FastForwardRequest
+ */
+#define emberAfFillCommandMedia                                                                                                    \
+    PlaybackClusterFastForwardRequest() emberAfFillExternalBuffer(mask,                                                            \
+                                                                                                                                   \
+                                                                  ZCL_FAST_FORWARD_REQUEST_COMMAND_ID, "", );
+
+/** @brief Command description for SkipForwardRequest
+ *
+ * Command: SkipForwardRequest
+ */
+#define emberAfFillCommandMedia                                                                                                    \
+    PlaybackClusterSkipForwardRequest() emberAfFillExternalBuffer(mask,                                                            \
+                                                                                                                                   \
+                                                                  ZCL_SKIP_FORWARD_REQUEST_COMMAND_ID, "", );
+
+/** @brief Command description for SkipBackwardRequest
+ *
+ * Command: SkipBackwardRequest
+ */
+#define emberAfFillCommandMedia                                                                                                    \
+    PlaybackClusterSkipBackwardRequest() emberAfFillExternalBuffer(mask,                                                           \
+                                                                                                                                   \
+                                                                   ZCL_SKIP_BACKWARD_REQUEST_COMMAND_ID, "", );
 
 /** @brief Command description for CommandOne
  *

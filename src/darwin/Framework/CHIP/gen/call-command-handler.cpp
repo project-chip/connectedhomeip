@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ EmberAfStatus emberAfDoorLockClusterClientCommandParse(EmberAfClusterCommand * c
 EmberAfStatus emberAfGroupsClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfIdentifyClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfLevelControlClusterClientCommandParse(EmberAfClusterCommand * cmd);
-EmberAfStatus emberAfNetworkProvisioningClusterClientCommandParse(EmberAfClusterCommand * cmd);
+EmberAfStatus emberAfNetworkCommissioningClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfOnOffClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfScenesClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfTemperatureMeasurementClusterClientCommandParse(EmberAfClusterCommand * cmd);
@@ -99,8 +99,8 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
             // No commands are enabled for cluster Level Control
             result = status(false, true, cmd->mfgSpecific);
             break;
-        case ZCL_NETWORK_PROVISIONING_CLUSTER_ID:
-            result = emberAfNetworkProvisioningClusterClientCommandParse(cmd);
+        case ZCL_NETWORK_COMMISSIONING_CLUSTER_ID:
+            result = emberAfNetworkCommissioningClusterClientCommandParse(cmd);
             break;
         case ZCL_ON_OFF_CLUSTER_ID:
             // No commands are enabled for cluster On/off
@@ -783,7 +783,7 @@ EmberAfStatus emberAfIdentifyClusterClientCommandParse(EmberAfClusterCommand * c
     }
     return status(wasHandled, true, cmd->mfgSpecific);
 }
-EmberAfStatus emberAfNetworkProvisioningClusterClientCommandParse(EmberAfClusterCommand * cmd)
+EmberAfStatus emberAfNetworkCommissioningClusterClientCommandParse(EmberAfClusterCommand * cmd)
 {
     bool wasHandled = false;
 
@@ -808,7 +808,7 @@ EmberAfStatus emberAfNetworkProvisioningClusterClientCommandParse(EmberAfCluster
             }
             debugText = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
 
-            wasHandled = emberAfNetworkProvisioningClusterAddThreadNetworkResponseCallback(errorCode, debugText);
+            wasHandled = emberAfNetworkCommissioningClusterAddThreadNetworkResponseCallback(errorCode, debugText);
             break;
         }
         case ZCL_ADD_WI_FI_NETWORK_RESPONSE_COMMAND_ID: {
@@ -828,7 +828,7 @@ EmberAfStatus emberAfNetworkProvisioningClusterClientCommandParse(EmberAfCluster
             }
             debugText = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
 
-            wasHandled = emberAfNetworkProvisioningClusterAddWiFiNetworkResponseCallback(errorCode, debugText);
+            wasHandled = emberAfNetworkCommissioningClusterAddWiFiNetworkResponseCallback(errorCode, debugText);
             break;
         }
         case ZCL_DISABLE_NETWORK_RESPONSE_COMMAND_ID: {
@@ -848,7 +848,7 @@ EmberAfStatus emberAfNetworkProvisioningClusterClientCommandParse(EmberAfCluster
             }
             debugText = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
 
-            wasHandled = emberAfNetworkProvisioningClusterDisableNetworkResponseCallback(errorCode, debugText);
+            wasHandled = emberAfNetworkCommissioningClusterDisableNetworkResponseCallback(errorCode, debugText);
             break;
         }
         case ZCL_ENABLE_NETWORK_RESPONSE_COMMAND_ID: {
@@ -868,7 +868,7 @@ EmberAfStatus emberAfNetworkProvisioningClusterClientCommandParse(EmberAfCluster
             }
             debugText = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
 
-            wasHandled = emberAfNetworkProvisioningClusterEnableNetworkResponseCallback(errorCode, debugText);
+            wasHandled = emberAfNetworkCommissioningClusterEnableNetworkResponseCallback(errorCode, debugText);
             break;
         }
         case ZCL_REMOVE_NETWORK_RESPONSE_COMMAND_ID: {
@@ -888,7 +888,7 @@ EmberAfStatus emberAfNetworkProvisioningClusterClientCommandParse(EmberAfCluster
             }
             debugText = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
 
-            wasHandled = emberAfNetworkProvisioningClusterRemoveNetworkResponseCallback(errorCode, debugText);
+            wasHandled = emberAfNetworkCommissioningClusterRemoveNetworkResponseCallback(errorCode, debugText);
             break;
         }
         case ZCL_SCAN_NETWORKS_RESPONSE_COMMAND_ID: {
@@ -913,8 +913,8 @@ EmberAfStatus emberAfNetworkProvisioningClusterClientCommandParse(EmberAfCluster
             wifiScanResults   = cmd->buffer + payloadOffset;
             threadScanResults = cmd->buffer + payloadOffset;
 
-            wasHandled = emberAfNetworkProvisioningClusterScanNetworksResponseCallback(errorCode, debugText, wifiScanResults,
-                                                                                       threadScanResults);
+            wasHandled = emberAfNetworkCommissioningClusterScanNetworksResponseCallback(errorCode, debugText, wifiScanResults,
+                                                                                        threadScanResults);
             break;
         }
         case ZCL_UPDATE_THREAD_NETWORK_RESPONSE_COMMAND_ID: {
@@ -934,7 +934,7 @@ EmberAfStatus emberAfNetworkProvisioningClusterClientCommandParse(EmberAfCluster
             }
             debugText = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
 
-            wasHandled = emberAfNetworkProvisioningClusterUpdateThreadNetworkResponseCallback(errorCode, debugText);
+            wasHandled = emberAfNetworkCommissioningClusterUpdateThreadNetworkResponseCallback(errorCode, debugText);
             break;
         }
         case ZCL_UPDATE_WI_FI_NETWORK_RESPONSE_COMMAND_ID: {
@@ -954,7 +954,7 @@ EmberAfStatus emberAfNetworkProvisioningClusterClientCommandParse(EmberAfCluster
             }
             debugText = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
 
-            wasHandled = emberAfNetworkProvisioningClusterUpdateWiFiNetworkResponseCallback(errorCode, debugText);
+            wasHandled = emberAfNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback(errorCode, debugText);
             break;
         }
         default: {

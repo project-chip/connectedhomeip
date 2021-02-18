@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -88,7 +88,7 @@
             }, /* Temperature Measurement (client): cluster revision */                                                            \
             {                                                                                                                      \
                 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), { (uint8_t *) 0x0001 }                                    \
-            }, /* Network Provisioning (client): cluster revision */                                                               \
+            }, /* Network Commissioning (client): cluster revision */                                                              \
             {                                                                                                                      \
                 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), { (uint8_t *) 0x0001 }                                    \
             }, /* Binding (client): cluster revision */                                                                            \
@@ -128,7 +128,7 @@
             }, /* Endpoint: 1, Cluster: Temperature Measurement (client) */                                                        \
             {                                                                                                                      \
                 0xAAAA, ZAP_ATTRIBUTE_INDEX(10), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
-            }, /* Endpoint: 1, Cluster: Network Provisioning (client) */                                                           \
+            }, /* Endpoint: 1, Cluster: Network Commissioning (client) */                                                          \
             {                                                                                                                      \
                 0xF000, ZAP_ATTRIBUTE_INDEX(11), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
             }, /* Endpoint: 1, Cluster: Binding (client) */                                                                        \
@@ -385,40 +385,40 @@
             {                                                                                                                      \
                 0x0300, 0x4C, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
             },                                                   /* Color Control (client): StepColorTemperature */                \
-            { 0xAAAA, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Network Provisioning (client): ScanNetworks */                 \
-            { 0xAAAA, 0x01, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Network Provisioning (client): ScanNetworksResponse */         \
+            { 0xAAAA, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Network Commissioning (client): ScanNetworks */                \
+            { 0xAAAA, 0x01, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Network Commissioning (client): ScanNetworksResponse */        \
             {                                                                                                                      \
                 0xAAAA, 0x02, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
-            }, /* Network Provisioning (client): AddWiFiNetwork */                                                                 \
+            }, /* Network Commissioning (client): AddWiFiNetwork */                                                                \
             {                                                                                                                      \
                 0xAAAA, 0x03, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
-            }, /* Network Provisioning (client): AddWiFiNetworkResponse */                                                         \
+            }, /* Network Commissioning (client): AddWiFiNetworkResponse */                                                        \
             {                                                                                                                      \
                 0xAAAA, 0x04, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
-            }, /* Network Provisioning (client): UpdateWiFiNetwork */                                                              \
+            }, /* Network Commissioning (client): UpdateWiFiNetwork */                                                             \
             {                                                                                                                      \
                 0xAAAA, 0x05, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
-            }, /* Network Provisioning (client): UpdateWiFiNetworkResponse */                                                      \
+            }, /* Network Commissioning (client): UpdateWiFiNetworkResponse */                                                     \
             {                                                                                                                      \
                 0xAAAA, 0x06, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
-            }, /* Network Provisioning (client): AddThreadNetwork */                                                               \
+            }, /* Network Commissioning (client): AddThreadNetwork */                                                              \
             {                                                                                                                      \
                 0xAAAA, 0x07, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
-            }, /* Network Provisioning (client): AddThreadNetworkResponse */                                                       \
+            }, /* Network Commissioning (client): AddThreadNetworkResponse */                                                      \
             {                                                                                                                      \
                 0xAAAA, 0x08, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
-            }, /* Network Provisioning (client): UpdateThreadNetwork */                                                            \
+            }, /* Network Commissioning (client): UpdateThreadNetwork */                                                           \
             {                                                                                                                      \
                 0xAAAA, 0x09, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
-            },                                                   /* Network Provisioning (client): UpdateThreadNetworkResponse */  \
-            { 0xAAAA, 0x0A, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Network Provisioning (client): RemoveNetwork */                \
-            { 0xAAAA, 0x0B, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Network Provisioning (client): RemoveNetworkResponse */        \
-            { 0xAAAA, 0x0C, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Network Provisioning (client): EnableNetwork */                \
-            { 0xAAAA, 0x0D, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Network Provisioning (client): EnableNetworkResponse */        \
-            { 0xAAAA, 0x0E, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Network Provisioning (client): DisableNetwork */               \
-            { 0xAAAA, 0x0F, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Network Provisioning (client): DisableNetworkResponse */       \
+            },                                                   /* Network Commissioning (client): UpdateThreadNetworkResponse */ \
+            { 0xAAAA, 0x0A, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Network Commissioning (client): RemoveNetwork */               \
+            { 0xAAAA, 0x0B, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Network Commissioning (client): RemoveNetworkResponse */       \
+            { 0xAAAA, 0x0C, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Network Commissioning (client): EnableNetwork */               \
+            { 0xAAAA, 0x0D, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Network Commissioning (client): EnableNetworkResponse */       \
+            { 0xAAAA, 0x0E, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Network Commissioning (client): DisableNetwork */              \
+            { 0xAAAA, 0x0F, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Network Commissioning (client): DisableNetworkResponse */      \
             { 0xAAAA, 0x10,                                                                                                        \
-              ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Network Provisioning (client): GetLastNetworkProvisioningResult */           \
+              ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Network Commissioning (client): GetLastNetworkCommissioningResult */         \
             { 0xF000, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Binding (client): Bind */                                      \
             { 0xF000, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Binding (client): Unbind */                                    \
     }
