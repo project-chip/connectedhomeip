@@ -14,7 +14,8 @@
         "${workspaceFolder}/src/lib/**",
         "${workspaceFolder}/src/system/**",
         "${workspaceFolder}/third_party/nlassert/repo/include/**",
-        "${workspaceFolder}/third_party/nlio/repo/include/**"
+        "${workspaceFolder}/third_party/nlio/repo/include/**",
+        "/opt/mbed-os/**"
     ],
     "[cpp]": {
         "editor.defaultFormatter": "xaver.clang-format"
@@ -111,7 +112,10 @@
         "ratio": "cpp",
         "set": "cpp",
         "stack": "cpp",
-        "regex": "cpp"
+        "regex": "cpp",
+        "mstd_iterator": "cpp",
+        "list": "cpp",
+        "span": "cpp"
     },
     "files.eol": "\n",
     "editor.formatOnSave": true,
@@ -156,5 +160,6 @@
     "clang-format.fallbackStyle": "WebKit",
     "files.trimFinalNewlines": true,
     "C_Cpp.default.cppStandard": "gnu++14",
-    "C_Cpp.default.cStandard": "gnu11"
+    "C_Cpp.default.cStandard": "gnu11",
+    "cmake.sourceDirectory": "${workspaceFolder}/examples/shell/mbed"
 }
