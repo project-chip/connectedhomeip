@@ -13,6 +13,7 @@
 #include <support/CodeUtils.h>
 #include <support/ReturnMacros.h>
 #include <system/SystemPacketBuffer.h>
+#include <transport/SecureSessionMgr.h>
 
 namespace {
 constexpr uint8_t kBdxVersion         = 0;         ///< The version of this implementation of the BDX spec
@@ -25,7 +26,7 @@ constexpr size_t kStatusReportMinSize = 2 + 4 + 2; ///< 16 bits for GeneralCode,
 CHIP_ERROR WriteToPacketBuffer(const ::chip::bdx::BdxMessage & msgStruct, ::chip::System::PacketBufferHandle & msgBuf)
 {
     size_t msgDataSize = msgStruct.MessageSize();
-    ::chip::System::PacketBufferWriter bbuf(msgDataSize);
+    ::chip::Encoding::LittleEndian::PacketBufferWriter bbuf(chip::MessagePacketBuffer::New(msgDataSize), msgDataSize);
     if (bbuf.IsNull())
     {
         return CHIP_ERROR_NO_MEMORY;
@@ -36,29 +37,28 @@ CHIP_ERROR WriteToPacketBuffer(const ::chip::bdx::BdxMessage & msgStruct, ::chip
     {
         return CHIP_ERROR_NO_MEMORY;
     }
-
     return CHIP_NO_ERROR;
 }
 
+// We could make this whole method a template, but it's probably smaller code to
+// share the implementation across all message types.
 CHIP_ERROR AttachHeader(uint16_t protocolId, uint8_t msgType, ::chip::System::PacketBufferHandle & msgBuf)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     ::chip::PayloadHeader payloadHeader;
 
     payloadHeader.SetMessageType(protocolId, msgType);
 
-    uint16_t headerSize              = payloadHeader.EncodeSizeBytes();
-    uint16_t actualEncodedHeaderSize = 0;
-
-    VerifyOrExit(msgBuf->EnsureReservedSize(headerSize), err = CHIP_ERROR_NO_MEMORY);
-
-    msgBuf->SetStart(msgBuf->Start() - headerSize);
-    err = payloadHeader.Encode(msgBuf->Start(), headerSize, &actualEncodedHeaderSize);
+    CHIP_ERROR err = payloadHeader.EncodeBeforeData(msgBuf);
     SuccessOrExit(err);
-    VerifyOrExit(headerSize == actualEncodedHeaderSize, err = CHIP_ERROR_INTERNAL);
 
 exit:
     return err;
+}
+
+template <typename MessageType>
+inline CHIP_ERROR AttachHeader(MessageType msgType, ::chip::System::PacketBufferHandle & msgBuf)
+{
+    return AttachHeader(chip::Protocols::MessageTypeTraits<MessageType>::ProtocolId, static_cast<uint8_t>(msgType), msgBuf);
 }
 } // anonymous namespace
 
@@ -169,8 +169,8 @@ CHIP_ERROR TransferSession::StartTransfer(TransferRole role, const TransferInitD
     err = WriteToPacketBuffer(initMsg, mPendingMsgHandle);
     SuccessOrExit(err);
 
-    msgType = (mRole == kRole_Sender) ? kBdxMsg_SendInit : kBdxMsg_ReceiveInit;
-    err     = AttachHeader(Protocols::kProtocol_BDX, msgType, mPendingMsgHandle);
+    msgType = (mRole == kRole_Sender) ? MessageType::SendInit : MessageType::ReceiveInit;
+    err     = AttachHeader(msgType, mPendingMsgHandle);
     SuccessOrExit(err);
 
     mState            = kAwaitingAccept;
@@ -235,7 +235,7 @@ CHIP_ERROR TransferSession::AcceptTransfer(const TransferAcceptData & acceptData
         err = WriteToPacketBuffer(acceptMsg, mPendingMsgHandle);
         SuccessOrExit(err);
 
-        err = AttachHeader(Protocols::kProtocol_BDX, kBdxMsg_ReceiveAccept, mPendingMsgHandle);
+        err = AttachHeader(MessageType::ReceiveAccept, mPendingMsgHandle);
         SuccessOrExit(err);
     }
     else
@@ -250,7 +250,7 @@ CHIP_ERROR TransferSession::AcceptTransfer(const TransferAcceptData & acceptData
         err = WriteToPacketBuffer(acceptMsg, mPendingMsgHandle);
         SuccessOrExit(err);
 
-        err = AttachHeader(Protocols::kProtocol_BDX, kBdxMsg_SendAccept, mPendingMsgHandle);
+        err = AttachHeader(MessageType::SendAccept, mPendingMsgHandle);
         SuccessOrExit(err);
     }
 
@@ -283,7 +283,7 @@ CHIP_ERROR TransferSession::PrepareBlockQuery()
     err = WriteToPacketBuffer(queryMsg, mPendingMsgHandle);
     SuccessOrExit(err);
 
-    err = AttachHeader(Protocols::kProtocol_BDX, kBdxMsg_BlockQuery, mPendingMsgHandle);
+    err = AttachHeader(MessageType::BlockQuery, mPendingMsgHandle);
     SuccessOrExit(err);
 
     mPendingOutput = kMsgToSend;
@@ -316,13 +316,13 @@ CHIP_ERROR TransferSession::PrepareBlock(const BlockData & inData)
     err = WriteToPacketBuffer(blockMsg, mPendingMsgHandle);
     SuccessOrExit(err);
 
-    msgType = inData.IsEof ? kBdxMsg_BlockEOF : kBdxMsg_Block;
-    err     = AttachHeader(Protocols::kProtocol_BDX, msgType, mPendingMsgHandle);
+    msgType = inData.IsEof ? MessageType::BlockEOF : MessageType::Block;
+    err     = AttachHeader(msgType, mPendingMsgHandle);
     SuccessOrExit(err);
 
     mPendingOutput = kMsgToSend;
 
-    if (msgType == kBdxMsg_BlockEOF)
+    if (msgType == MessageType::BlockEOF)
     {
         mState = kAwaitingEOFAck;
     }
@@ -345,12 +345,12 @@ CHIP_ERROR TransferSession::PrepareBlockAck()
     VerifyOrExit(mPendingOutput == kNone, err = CHIP_ERROR_INCORRECT_STATE);
 
     ackMsg.BlockCounter = mLastBlockNum;
-    msgType             = (mState == kReceivedEOF) ? kBdxMsg_BlockAckEOF : kBdxMsg_BlockAck;
+    msgType             = (mState == kReceivedEOF) ? MessageType::BlockAckEOF : MessageType::BlockAck;
 
     err = WriteToPacketBuffer(ackMsg, mPendingMsgHandle);
     SuccessOrExit(err);
 
-    err = AttachHeader(Protocols::kProtocol_BDX, msgType, mPendingMsgHandle);
+    err = AttachHeader(msgType, mPendingMsgHandle);
     SuccessOrExit(err);
 
     if (mState == kTransferInProgress)
@@ -415,16 +415,13 @@ void TransferSession::Reset()
 
 CHIP_ERROR TransferSession::HandleMessageReceived(System::PacketBufferHandle msg, uint64_t curTimeMs)
 {
-    CHIP_ERROR err      = CHIP_NO_ERROR;
-    uint16_t headerSize = 0;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     PayloadHeader payloadHeader;
 
     VerifyOrExit(!msg.IsNull(), err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    err = payloadHeader.Decode(msg->Start(), msg->DataLength(), &headerSize);
+    err = payloadHeader.DecodeAndConsume(msg);
     SuccessOrExit(err);
-
-    msg->ConsumeHead(headerSize);
 
     if (payloadHeader.GetProtocolID() == Protocols::kProtocol_BDX)
     {
@@ -459,29 +456,29 @@ CHIP_ERROR TransferSession::HandleBdxMessage(PayloadHeader & header, System::Pac
 
     switch (msgType)
     {
-    case kBdxMsg_SendInit:
-    case kBdxMsg_ReceiveInit:
+    case MessageType::SendInit:
+    case MessageType::ReceiveInit:
         HandleTransferInit(msgType, std::move(msg));
         break;
-    case kBdxMsg_SendAccept:
+    case MessageType::SendAccept:
         HandleSendAccept(std::move(msg));
         break;
-    case kBdxMsg_ReceiveAccept:
+    case MessageType::ReceiveAccept:
         HandleReceiveAccept(std::move(msg));
         break;
-    case kBdxMsg_BlockQuery:
+    case MessageType::BlockQuery:
         HandleBlockQuery(std::move(msg));
         break;
-    case kBdxMsg_Block:
+    case MessageType::Block:
         HandleBlock(std::move(msg));
         break;
-    case kBdxMsg_BlockEOF:
+    case MessageType::BlockEOF:
         HandleBlockEOF(std::move(msg));
         break;
-    case kBdxMsg_BlockAck:
+    case MessageType::BlockAck:
         HandleBlockAck(std::move(msg));
         break;
-    case kBdxMsg_BlockAckEOF:
+    case MessageType::BlockAckEOF:
         HandleBlockAckEOF(std::move(msg));
         break;
     default:
@@ -530,11 +527,11 @@ void TransferSession::HandleTransferInit(MessageType msgType, System::PacketBuff
 
     if (mRole == kRole_Sender)
     {
-        VerifyOrExit(msgType == kBdxMsg_ReceiveInit, PrepareStatusReport(kStatus_ServerBadState));
+        VerifyOrExit(msgType == MessageType::ReceiveInit, PrepareStatusReport(kStatus_ServerBadState));
     }
     else
     {
-        VerifyOrExit(msgType == kBdxMsg_SendInit, PrepareStatusReport(kStatus_ServerBadState));
+        VerifyOrExit(msgType == MessageType::SendInit, PrepareStatusReport(kStatus_ServerBadState));
     }
 
     err = transferInit.Parse(msgData.Retain());
@@ -851,7 +848,7 @@ void TransferSession::PrepareStatusReport(StatusCode code)
 {
     mStatusReportData.StatusCode = code;
 
-    System::PacketBufferWriter bbuf(kStatusReportMinSize);
+    Encoding::LittleEndian::PacketBufferWriter bbuf(chip::MessagePacketBuffer::New(kStatusReportMinSize), kStatusReportMinSize);
     VerifyOrReturn(!bbuf.IsNull());
 
     bbuf.Put16(static_cast<uint16_t>(Protocols::Common::StatusCode::Failure));
@@ -865,8 +862,7 @@ void TransferSession::PrepareStatusReport(StatusCode code)
     }
     else
     {
-        CHIP_ERROR err = AttachHeader(Protocols::kProtocol_Protocol_Common,
-                                      static_cast<uint8_t>(Protocols::Common::MsgType::StatusReport), mPendingMsgHandle);
+        CHIP_ERROR err = AttachHeader(Protocols::Common::MsgType::StatusReport, mPendingMsgHandle);
         VerifyOrReturn(err == CHIP_NO_ERROR);
 
         mPendingOutput = kMsgToSend;

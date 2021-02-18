@@ -30,6 +30,6 @@ static_library("bdx") {
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/system",
-    "${chip_root}/src/transport/raw",
+    "${chip_root}/src/transport",
   ]
 }

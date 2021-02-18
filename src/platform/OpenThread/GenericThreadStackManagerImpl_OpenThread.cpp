@@ -121,7 +121,7 @@ bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::_HaveRouteToAddress(co
             {
                 const IPPrefix prefix = ToIPPrefix(routeConfig.mPrefix);
                 char addrStr[64];
-                prefix.IPAddr.ToString(addrStr, sizeof(addrStr));
+                prefix.IPAddr.ToString(addrStr);
                 if (!routeConfig.mNextHopIsThisDevice && (!destIsULA || routeConfig.mPrefix.mLength > 0) &&
                     ToIPPrefix(routeConfig.mPrefix).MatchAddress(destAddr))
                 {

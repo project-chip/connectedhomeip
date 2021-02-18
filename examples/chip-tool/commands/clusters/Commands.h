@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -306,73 +306,6 @@ static void OnIdentifyClusterIdentifyQueryResponse(void * context, uint16_t time
     command->SetCommandExitStatus(true);
 }
 
-static void OnNetworkProvisioningClusterAddThreadNetworkResponse(void * context, uint8_t errorCode, uint8_t * debugText)
-{
-    ChipLogProgress(chipTool, "NetworkProvisioningClusterAddThreadNetworkResponse");
-
-    ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(true);
-}
-
-static void OnNetworkProvisioningClusterAddWiFiNetworkResponse(void * context, uint8_t errorCode, uint8_t * debugText)
-{
-    ChipLogProgress(chipTool, "NetworkProvisioningClusterAddWiFiNetworkResponse");
-
-    ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(true);
-}
-
-static void OnNetworkProvisioningClusterDisableNetworkResponse(void * context, uint8_t errorCode, uint8_t * debugText)
-{
-    ChipLogProgress(chipTool, "NetworkProvisioningClusterDisableNetworkResponse");
-
-    ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(true);
-}
-
-static void OnNetworkProvisioningClusterEnableNetworkResponse(void * context, uint8_t errorCode, uint8_t * debugText)
-{
-    ChipLogProgress(chipTool, "NetworkProvisioningClusterEnableNetworkResponse");
-
-    ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(true);
-}
-
-static void OnNetworkProvisioningClusterRemoveNetworkResponse(void * context, uint8_t errorCode, uint8_t * debugText)
-{
-    ChipLogProgress(chipTool, "NetworkProvisioningClusterRemoveNetworkResponse");
-
-    ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(true);
-}
-
-static void
-OnNetworkProvisioningClusterScanNetworksResponse(void * context, uint8_t errorCode, uint8_t * debugText,
-                                                 /* TYPE WARNING: array array defaults to */ uint8_t * wifiScanResults,
-                                                 /* TYPE WARNING: array array defaults to */ uint8_t * threadScanResults)
-{
-    ChipLogProgress(chipTool, "NetworkProvisioningClusterScanNetworksResponse");
-
-    ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(true);
-}
-
-static void OnNetworkProvisioningClusterUpdateThreadNetworkResponse(void * context, uint8_t errorCode, uint8_t * debugText)
-{
-    ChipLogProgress(chipTool, "NetworkProvisioningClusterUpdateThreadNetworkResponse");
-
-    ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(true);
-}
-
-static void OnNetworkProvisioningClusterUpdateWiFiNetworkResponse(void * context, uint8_t errorCode, uint8_t * debugText)
-{
-    ChipLogProgress(chipTool, "NetworkProvisioningClusterUpdateWiFiNetworkResponse");
-
-    ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(true);
-}
-
 static void OnScenesClusterAddSceneResponse(void * context, uint16_t groupId, uint8_t sceneId)
 {
     ChipLogProgress(chipTool, "ScenesClusterAddSceneResponse");
@@ -435,7 +368,7 @@ static void OnScenesClusterViewSceneResponse(void * context, uint16_t groupId, u
 | Groups                                                              | 0x0004 |
 | Identify                                                            | 0x0003 |
 | LevelControl                                                        | 0x0008 |
-| NetworkProvisioning                                                 | 0xAAAA |
+| MediaPlayback                                                       | 0xF001 |
 | OnOff                                                               | 0x0006 |
 | Scenes                                                              | 0x0005 |
 | TemperatureMeasurement                                              | 0x0402 |
@@ -449,7 +382,7 @@ constexpr chip::ClusterId kDoorLockClusterId               = 0x0101;
 constexpr chip::ClusterId kGroupsClusterId                 = 0x0004;
 constexpr chip::ClusterId kIdentifyClusterId               = 0x0003;
 constexpr chip::ClusterId kLevelControlClusterId           = 0x0008;
-constexpr chip::ClusterId kNetworkProvisioningClusterId    = 0xAAAA;
+constexpr chip::ClusterId kMediaPlaybackClusterId          = 0xF001;
 constexpr chip::ClusterId kOnOffClusterId                  = 0x0006;
 constexpr chip::ClusterId kScenesClusterId                 = 0x0005;
 constexpr chip::ClusterId kTemperatureMeasurementClusterId = 0x0402;
@@ -5365,188 +5298,40 @@ private:
 };
 
 /*----------------------------------------------------------------------------*\
-| Cluster NetworkProvisioning                                         | 0xAAAA |
+| Cluster MediaPlayback                                               | 0xF001 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
-| * AddThreadNetwork                                                  |   0x06 |
-| * AddWiFiNetwork                                                    |   0x02 |
-| * DisableNetwork                                                    |   0x0E |
-| * EnableNetwork                                                     |   0x0C |
-| * GetLastNetworkProvisioningResult                                  |   0x10 |
-| * RemoveNetwork                                                     |   0x0A |
-| * ScanNetworks                                                      |   0x00 |
-| * UpdateThreadNetwork                                               |   0x08 |
-| * UpdateWiFiNetwork                                                 |   0x04 |
+| * FastForwardRequest                                                |   0x07 |
+| * NextRequest                                                       |   0x05 |
+| * PauseRequest                                                      |   0x01 |
+| * PlayRequest                                                       |   0x00 |
+| * PreviousRequest                                                   |   0x04 |
+| * RewindRequest                                                     |   0x06 |
+| * SkipBackwardRequest                                               |   0x09 |
+| * SkipForwardRequest                                                |   0x08 |
+| * StartOverRequest                                                  |   0x03 |
+| * StopRequest                                                       |   0x02 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
+| * CurrentState                                                      | 0x0000 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
 /*
- * Command AddThreadNetwork
+ * Command FastForwardRequest
  */
-class NetworkProvisioningAddThreadNetwork : public ModelCommand
+class MediaPlaybackFastForwardRequest : public ModelCommand
 {
 public:
-    NetworkProvisioningAddThreadNetwork() : ModelCommand("add-thread-network")
-    {
-        AddArgument("operationalDataset", &mOperationalDataset);
-        AddArgument("breadcrumb", 0, UINT64_MAX, &mBreadcrumb);
-        AddArgument("timeoutMs", 0, UINT32_MAX, &mTimeoutMs);
-        ModelCommand::AddArguments();
-    }
+    MediaPlaybackFastForwardRequest() : ModelCommand("fast-forward-request") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0xAAAA) command (0x06) on endpoint %" PRIu16, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0xF001) command (0x07) on endpoint %" PRIu16, endpointId);
 
-        chip::Controller::NetworkProvisioningCluster cluster;
+        chip::Controller::MediaPlaybackCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.AddThreadNetwork(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
-                                        reinterpret_cast<uint8_t *>(mOperationalDataset),
-                                        static_cast<uint32_t>(strlen(mOperationalDataset)), mBreadcrumb, mTimeoutMs);
-    }
-
-private:
-    chip::Callback::Callback<NetworkProvisioningClusterAddThreadNetworkResponseCallback> * onSuccessCallback =
-        new chip::Callback::Callback<NetworkProvisioningClusterAddThreadNetworkResponseCallback>(
-            OnNetworkProvisioningClusterAddThreadNetworkResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    char * mOperationalDataset;
-    uint64_t mBreadcrumb;
-    uint32_t mTimeoutMs;
-};
-
-/*
- * Command AddWiFiNetwork
- */
-class NetworkProvisioningAddWiFiNetwork : public ModelCommand
-{
-public:
-    NetworkProvisioningAddWiFiNetwork() : ModelCommand("add-wi-fi-network")
-    {
-        AddArgument("ssid", &mSsid);
-        AddArgument("credentials", &mCredentials);
-        AddArgument("breadcrumb", 0, UINT64_MAX, &mBreadcrumb);
-        AddArgument("timeoutMs", 0, UINT32_MAX, &mTimeoutMs);
-        ModelCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0xAAAA) command (0x02) on endpoint %" PRIu16, endpointId);
-
-        chip::Controller::NetworkProvisioningCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.AddWiFiNetwork(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), reinterpret_cast<uint8_t *>(mSsid),
-                                      static_cast<uint32_t>(strlen(mSsid)), reinterpret_cast<uint8_t *>(mCredentials),
-                                      static_cast<uint32_t>(strlen(mCredentials)), mBreadcrumb, mTimeoutMs);
-    }
-
-private:
-    chip::Callback::Callback<NetworkProvisioningClusterAddWiFiNetworkResponseCallback> * onSuccessCallback =
-        new chip::Callback::Callback<NetworkProvisioningClusterAddWiFiNetworkResponseCallback>(
-            OnNetworkProvisioningClusterAddWiFiNetworkResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    char * mSsid;
-    char * mCredentials;
-    uint64_t mBreadcrumb;
-    uint32_t mTimeoutMs;
-};
-
-/*
- * Command DisableNetwork
- */
-class NetworkProvisioningDisableNetwork : public ModelCommand
-{
-public:
-    NetworkProvisioningDisableNetwork() : ModelCommand("disable-network")
-    {
-        AddArgument("networkID", &mNetworkID);
-        AddArgument("breadcrumb", 0, UINT64_MAX, &mBreadcrumb);
-        AddArgument("timeoutMs", 0, UINT32_MAX, &mTimeoutMs);
-        ModelCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0xAAAA) command (0x0E) on endpoint %" PRIu16, endpointId);
-
-        chip::Controller::NetworkProvisioningCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.DisableNetwork(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
-                                      reinterpret_cast<uint8_t *>(mNetworkID), static_cast<uint32_t>(strlen(mNetworkID)),
-                                      mBreadcrumb, mTimeoutMs);
-    }
-
-private:
-    chip::Callback::Callback<NetworkProvisioningClusterDisableNetworkResponseCallback> * onSuccessCallback =
-        new chip::Callback::Callback<NetworkProvisioningClusterDisableNetworkResponseCallback>(
-            OnNetworkProvisioningClusterDisableNetworkResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    char * mNetworkID;
-    uint64_t mBreadcrumb;
-    uint32_t mTimeoutMs;
-};
-
-/*
- * Command EnableNetwork
- */
-class NetworkProvisioningEnableNetwork : public ModelCommand
-{
-public:
-    NetworkProvisioningEnableNetwork() : ModelCommand("enable-network")
-    {
-        AddArgument("networkID", &mNetworkID);
-        AddArgument("breadcrumb", 0, UINT64_MAX, &mBreadcrumb);
-        AddArgument("timeoutMs", 0, UINT32_MAX, &mTimeoutMs);
-        ModelCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0xAAAA) command (0x0C) on endpoint %" PRIu16, endpointId);
-
-        chip::Controller::NetworkProvisioningCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.EnableNetwork(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
-                                     reinterpret_cast<uint8_t *>(mNetworkID), static_cast<uint32_t>(strlen(mNetworkID)),
-                                     mBreadcrumb, mTimeoutMs);
-    }
-
-private:
-    chip::Callback::Callback<NetworkProvisioningClusterEnableNetworkResponseCallback> * onSuccessCallback =
-        new chip::Callback::Callback<NetworkProvisioningClusterEnableNetworkResponseCallback>(
-            OnNetworkProvisioningClusterEnableNetworkResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    char * mNetworkID;
-    uint64_t mBreadcrumb;
-    uint32_t mTimeoutMs;
-};
-
-/*
- * Command GetLastNetworkProvisioningResult
- */
-class NetworkProvisioningGetLastNetworkProvisioningResult : public ModelCommand
-{
-public:
-    NetworkProvisioningGetLastNetworkProvisioningResult() : ModelCommand("get-last-network-provisioning-result")
-    {
-        AddArgument("timeoutMs", 0, UINT32_MAX, &mTimeoutMs);
-        ModelCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0xAAAA) command (0x10) on endpoint %" PRIu16, endpointId);
-
-        chip::Controller::NetworkProvisioningCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.GetLastNetworkProvisioningResult(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mTimeoutMs);
+        return cluster.FastForwardRequest(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
     }
 
 private:
@@ -5554,168 +5339,237 @@ private:
         new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    uint32_t mTimeoutMs;
 };
 
 /*
- * Command RemoveNetwork
+ * Command NextRequest
  */
-class NetworkProvisioningRemoveNetwork : public ModelCommand
+class MediaPlaybackNextRequest : public ModelCommand
 {
 public:
-    NetworkProvisioningRemoveNetwork() : ModelCommand("remove-network")
-    {
-        AddArgument("networkID", &mNetworkID);
-        AddArgument("breadcrumb", 0, UINT64_MAX, &mBreadcrumb);
-        AddArgument("timeoutMs", 0, UINT32_MAX, &mTimeoutMs);
-        ModelCommand::AddArguments();
-    }
+    MediaPlaybackNextRequest() : ModelCommand("next-request") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0xAAAA) command (0x0A) on endpoint %" PRIu16, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0xF001) command (0x05) on endpoint %" PRIu16, endpointId);
 
-        chip::Controller::NetworkProvisioningCluster cluster;
+        chip::Controller::MediaPlaybackCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.RemoveNetwork(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
-                                     reinterpret_cast<uint8_t *>(mNetworkID), static_cast<uint32_t>(strlen(mNetworkID)),
-                                     mBreadcrumb, mTimeoutMs);
+        return cluster.NextRequest(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
     }
 
 private:
-    chip::Callback::Callback<NetworkProvisioningClusterRemoveNetworkResponseCallback> * onSuccessCallback =
-        new chip::Callback::Callback<NetworkProvisioningClusterRemoveNetworkResponseCallback>(
-            OnNetworkProvisioningClusterRemoveNetworkResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    char * mNetworkID;
-    uint64_t mBreadcrumb;
-    uint32_t mTimeoutMs;
 };
 
 /*
- * Command ScanNetworks
+ * Command PauseRequest
  */
-class NetworkProvisioningScanNetworks : public ModelCommand
+class MediaPlaybackPauseRequest : public ModelCommand
 {
 public:
-    NetworkProvisioningScanNetworks() : ModelCommand("scan-networks")
-    {
-        AddArgument("ssid", &mSsid);
-        AddArgument("breadcrumb", 0, UINT64_MAX, &mBreadcrumb);
-        AddArgument("timeoutMs", 0, UINT32_MAX, &mTimeoutMs);
-        ModelCommand::AddArguments();
-    }
+    MediaPlaybackPauseRequest() : ModelCommand("pause-request") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0xAAAA) command (0x00) on endpoint %" PRIu16, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0xF001) command (0x01) on endpoint %" PRIu16, endpointId);
 
-        chip::Controller::NetworkProvisioningCluster cluster;
+        chip::Controller::MediaPlaybackCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ScanNetworks(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), reinterpret_cast<uint8_t *>(mSsid),
-                                    static_cast<uint32_t>(strlen(mSsid)), mBreadcrumb, mTimeoutMs);
+        return cluster.PauseRequest(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
     }
 
 private:
-    chip::Callback::Callback<NetworkProvisioningClusterScanNetworksResponseCallback> * onSuccessCallback =
-        new chip::Callback::Callback<NetworkProvisioningClusterScanNetworksResponseCallback>(
-            OnNetworkProvisioningClusterScanNetworksResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    char * mSsid;
-    uint64_t mBreadcrumb;
-    uint32_t mTimeoutMs;
 };
 
 /*
- * Command UpdateThreadNetwork
+ * Command PlayRequest
  */
-class NetworkProvisioningUpdateThreadNetwork : public ModelCommand
+class MediaPlaybackPlayRequest : public ModelCommand
 {
 public:
-    NetworkProvisioningUpdateThreadNetwork() : ModelCommand("update-thread-network")
-    {
-        AddArgument("operationalDataset", &mOperationalDataset);
-        AddArgument("breadcrumb", 0, UINT64_MAX, &mBreadcrumb);
-        AddArgument("timeoutMs", 0, UINT32_MAX, &mTimeoutMs);
-        ModelCommand::AddArguments();
-    }
+    MediaPlaybackPlayRequest() : ModelCommand("play-request") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0xAAAA) command (0x08) on endpoint %" PRIu16, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0xF001) command (0x00) on endpoint %" PRIu16, endpointId);
 
-        chip::Controller::NetworkProvisioningCluster cluster;
+        chip::Controller::MediaPlaybackCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.UpdateThreadNetwork(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
-                                           reinterpret_cast<uint8_t *>(mOperationalDataset),
-                                           static_cast<uint32_t>(strlen(mOperationalDataset)), mBreadcrumb, mTimeoutMs);
+        return cluster.PlayRequest(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
     }
 
 private:
-    chip::Callback::Callback<NetworkProvisioningClusterUpdateThreadNetworkResponseCallback> * onSuccessCallback =
-        new chip::Callback::Callback<NetworkProvisioningClusterUpdateThreadNetworkResponseCallback>(
-            OnNetworkProvisioningClusterUpdateThreadNetworkResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    char * mOperationalDataset;
-    uint64_t mBreadcrumb;
-    uint32_t mTimeoutMs;
 };
 
 /*
- * Command UpdateWiFiNetwork
+ * Command PreviousRequest
  */
-class NetworkProvisioningUpdateWiFiNetwork : public ModelCommand
+class MediaPlaybackPreviousRequest : public ModelCommand
 {
 public:
-    NetworkProvisioningUpdateWiFiNetwork() : ModelCommand("update-wi-fi-network")
-    {
-        AddArgument("ssid", &mSsid);
-        AddArgument("credentials", &mCredentials);
-        AddArgument("breadcrumb", 0, UINT64_MAX, &mBreadcrumb);
-        AddArgument("timeoutMs", 0, UINT32_MAX, &mTimeoutMs);
-        ModelCommand::AddArguments();
-    }
+    MediaPlaybackPreviousRequest() : ModelCommand("previous-request") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0xAAAA) command (0x04) on endpoint %" PRIu16, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0xF001) command (0x04) on endpoint %" PRIu16, endpointId);
 
-        chip::Controller::NetworkProvisioningCluster cluster;
+        chip::Controller::MediaPlaybackCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.UpdateWiFiNetwork(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
-                                         reinterpret_cast<uint8_t *>(mSsid), static_cast<uint32_t>(strlen(mSsid)),
-                                         reinterpret_cast<uint8_t *>(mCredentials), static_cast<uint32_t>(strlen(mCredentials)),
-                                         mBreadcrumb, mTimeoutMs);
+        return cluster.PreviousRequest(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
     }
 
 private:
-    chip::Callback::Callback<NetworkProvisioningClusterUpdateWiFiNetworkResponseCallback> * onSuccessCallback =
-        new chip::Callback::Callback<NetworkProvisioningClusterUpdateWiFiNetworkResponseCallback>(
-            OnNetworkProvisioningClusterUpdateWiFiNetworkResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    char * mSsid;
-    char * mCredentials;
-    uint64_t mBreadcrumb;
-    uint32_t mTimeoutMs;
+};
+
+/*
+ * Command RewindRequest
+ */
+class MediaPlaybackRewindRequest : public ModelCommand
+{
+public:
+    MediaPlaybackRewindRequest() : ModelCommand("rewind-request") { ModelCommand::AddArguments(); }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0xF001) command (0x06) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::MediaPlaybackCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.RewindRequest(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Command SkipBackwardRequest
+ */
+class MediaPlaybackSkipBackwardRequest : public ModelCommand
+{
+public:
+    MediaPlaybackSkipBackwardRequest() : ModelCommand("skip-backward-request") { ModelCommand::AddArguments(); }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0xF001) command (0x09) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::MediaPlaybackCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.SkipBackwardRequest(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Command SkipForwardRequest
+ */
+class MediaPlaybackSkipForwardRequest : public ModelCommand
+{
+public:
+    MediaPlaybackSkipForwardRequest() : ModelCommand("skip-forward-request") { ModelCommand::AddArguments(); }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0xF001) command (0x08) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::MediaPlaybackCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.SkipForwardRequest(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Command StartOverRequest
+ */
+class MediaPlaybackStartOverRequest : public ModelCommand
+{
+public:
+    MediaPlaybackStartOverRequest() : ModelCommand("start-over-request") { ModelCommand::AddArguments(); }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0xF001) command (0x03) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::MediaPlaybackCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.StartOverRequest(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Command StopRequest
+ */
+class MediaPlaybackStopRequest : public ModelCommand
+{
+public:
+    MediaPlaybackStopRequest() : ModelCommand("stop-request") { ModelCommand::AddArguments(); }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0xF001) command (0x02) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::MediaPlaybackCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.StopRequest(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
 };
 
 /*
  * Discover Attributes
  */
-class DiscoverNetworkProvisioningAttributes : public ModelCommand
+class DiscoverMediaPlaybackAttributes : public ModelCommand
 {
 public:
-    DiscoverNetworkProvisioningAttributes() : ModelCommand("discover") { ModelCommand::AddArguments(); }
+    DiscoverMediaPlaybackAttributes() : ModelCommand("discover") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000) command (0x0C) on endpoint %" PRIu16, endpointId);
 
-        chip::Controller::NetworkProvisioningCluster cluster;
+        chip::Controller::MediaPlaybackCluster cluster;
         cluster.Associate(device, endpointId);
         return cluster.DiscoverAttributes(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
     }
@@ -5728,12 +5582,40 @@ private:
 };
 
 /*
- * Attribute ClusterRevision
+ * Attribute CurrentState
  */
-class ReadNetworkProvisioningClusterRevision : public ModelCommand
+class ReadMediaPlaybackCurrentState : public ModelCommand
 {
 public:
-    ReadNetworkProvisioningClusterRevision() : ModelCommand("read")
+    ReadMediaPlaybackCurrentState() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "current-state");
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0xF001) command (0x00) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::MediaPlaybackCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeCurrentState(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute ClusterRevision
+ */
+class ReadMediaPlaybackClusterRevision : public ModelCommand
+{
+public:
+    ReadMediaPlaybackClusterRevision() : ModelCommand("read")
     {
         AddArgument("attr-name", "cluster-revision");
         ModelCommand::AddArguments();
@@ -5741,9 +5623,9 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0xAAAA) command (0x00) on endpoint %" PRIu16, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0xF001) command (0x00) on endpoint %" PRIu16, endpointId);
 
-        chip::Controller::NetworkProvisioningCluster cluster;
+        chip::Controller::MediaPlaybackCluster cluster;
         cluster.Associate(device, endpointId);
         return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
     }
@@ -6810,22 +6692,18 @@ void registerClusterLevelControl(Commands & commands)
 
     commands.Register(clusterName, clusterCommands);
 }
-void registerClusterNetworkProvisioning(Commands & commands)
+void registerClusterMediaPlayback(Commands & commands)
 {
-    const char * clusterName = "NetworkProvisioning";
+    const char * clusterName = "MediaPlayback";
 
     commands_list clusterCommands = {
-        make_unique<NetworkProvisioningAddThreadNetwork>(),
-        make_unique<NetworkProvisioningAddWiFiNetwork>(),
-        make_unique<NetworkProvisioningDisableNetwork>(),
-        make_unique<NetworkProvisioningEnableNetwork>(),
-        make_unique<NetworkProvisioningGetLastNetworkProvisioningResult>(),
-        make_unique<NetworkProvisioningRemoveNetwork>(),
-        make_unique<NetworkProvisioningScanNetworks>(),
-        make_unique<NetworkProvisioningUpdateThreadNetwork>(),
-        make_unique<NetworkProvisioningUpdateWiFiNetwork>(),
-        make_unique<DiscoverNetworkProvisioningAttributes>(),
-        make_unique<ReadNetworkProvisioningClusterRevision>(),
+        make_unique<MediaPlaybackFastForwardRequest>(),  make_unique<MediaPlaybackNextRequest>(),
+        make_unique<MediaPlaybackPauseRequest>(),        make_unique<MediaPlaybackPlayRequest>(),
+        make_unique<MediaPlaybackPreviousRequest>(),     make_unique<MediaPlaybackRewindRequest>(),
+        make_unique<MediaPlaybackSkipBackwardRequest>(), make_unique<MediaPlaybackSkipForwardRequest>(),
+        make_unique<MediaPlaybackStartOverRequest>(),    make_unique<MediaPlaybackStopRequest>(),
+        make_unique<DiscoverMediaPlaybackAttributes>(),  make_unique<ReadMediaPlaybackCurrentState>(),
+        make_unique<ReadMediaPlaybackClusterRevision>(),
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -6883,7 +6761,7 @@ void registerClusters(Commands & commands)
     registerClusterGroups(commands);
     registerClusterIdentify(commands);
     registerClusterLevelControl(commands);
-    registerClusterNetworkProvisioning(commands);
+    registerClusterMediaPlayback(commands);
     registerClusterOnOff(commands);
     registerClusterScenes(commands);
     registerClusterTemperatureMeasurement(commands);

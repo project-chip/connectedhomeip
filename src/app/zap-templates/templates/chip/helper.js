@@ -161,11 +161,7 @@ function chip_server_cluster_command_arguments(options)
   {
     return Promise.all(args.map(arg => collectItem.call(this, arg, pkgId))).then(items => items.flat()).then(items => {
       return Promise.all(items.map(item => {
-        if (StringHelper.isByteString(item.type)) {
-          // Enhanced the command argument with 'chipType' for conveniences.
-          item.chipType = 'uint8_t *';
-          return item;
-        } else if (StringHelper.isString(item.type)) {
+        if (StringHelper.isString(item.type)) {
           // Enhanced the command argument with 'chipType' for conveniences.
           item.chipType = 'char *';
           return item;
@@ -374,7 +370,7 @@ function asPythonType(zclType)
   case 'char *':
     return 'str';
   case 'uint8_t *':
-    return 'bytes';
+    return 'byte';
   }
 }
 
@@ -535,6 +531,11 @@ function asObjectiveCNumberType(label, type)
   return templateUtil.templatePromise(this.global, promise)
 }
 
+function isStrEndsWith(str, substr)
+{
+  return str.endsWith(substr);
+}
+
 //
 // Module exports
 //
@@ -554,3 +555,4 @@ exports.asPythonType                          = asPythonType;
 exports.asPythonCType                         = asPythonCType;
 exports.asCallbackAttributeType               = asCallbackAttributeType;
 exports.hasSpecificResponse                   = hasSpecificResponse;
+exports.isStrEndsWith                         = isStrEndsWith;

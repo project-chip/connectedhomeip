@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -88,10 +88,10 @@
             }, /* Temperature Measurement (client): cluster revision */                                                            \
             {                                                                                                                      \
                 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), { (uint8_t *) 0x0001 }                                    \
-            }, /* Network Provisioning (client): cluster revision */                                                               \
+            }, /* Binding (client): cluster revision */                                                                            \
             {                                                                                                                      \
                 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), { (uint8_t *) 0x0001 }                                    \
-            }, /* Binding (client): cluster revision */                                                                            \
+            }, /* Media Playback (client): cluster revision */                                                                     \
     }
 
 // This is an array of EmberAfCluster structures.
@@ -127,11 +127,11 @@
                 0x0402, ZAP_ATTRIBUTE_INDEX(9), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                               \
             }, /* Endpoint: 1, Cluster: Temperature Measurement (client) */                                                        \
             {                                                                                                                      \
-                0xAAAA, ZAP_ATTRIBUTE_INDEX(10), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
-            }, /* Endpoint: 1, Cluster: Network Provisioning (client) */                                                           \
-            {                                                                                                                      \
-                0xF000, ZAP_ATTRIBUTE_INDEX(11), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+                0xF000, ZAP_ATTRIBUTE_INDEX(10), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
             }, /* Endpoint: 1, Cluster: Binding (client) */                                                                        \
+            {                                                                                                                      \
+                0xF001, ZAP_ATTRIBUTE_INDEX(11), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+            }, /* Endpoint: 1, Cluster: Media Playback (client) */                                                                 \
     }
 
 #define ZAP_CLUSTER_INDEX(index) ((EmberAfCluster *) (&generatedClusters[index]))
@@ -193,11 +193,10 @@
 
 // Array of EmberAfCommandMetadata structs.
 #define ZAP_COMMAND_MASK(mask) COMMAND_MASK_##mask
-#define EMBER_AF_GENERATED_COMMAND_COUNT (122)
+#define EMBER_AF_GENERATED_COMMAND_COUNT (116)
 #define GENERATED_COMMANDS                                                                                                         \
     {                                                                                                                              \
-        { 0x0000, 0x00,                                                                                                            \
-          ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT) }, /* Basic (client): MfgSpecificPing */           \
+        { 0x0000, 0x00, ZAP_COMMAND_MASK(OUTGOING_CLIENT) }, /* Basic (client): MfgSpecificPing */                                 \
             {                                                                                                                      \
                 0x0000, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
             },                                                   /* Basic (client): ResetToFactoryDefaults */                      \
@@ -386,49 +385,26 @@
             {                                                                                                                      \
                 0x0300, 0x4C, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
             },                                                   /* Color Control (client): StepColorTemperature */                \
-            { 0xAAAA, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Network Provisioning (client): ScanNetworks */                 \
-            { 0xAAAA, 0x01, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Network Provisioning (client): ScanNetworksResponse */         \
-            {                                                                                                                      \
-                0xAAAA, 0x02, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
-            }, /* Network Provisioning (client): AddWiFiNetwork */                                                                 \
-            {                                                                                                                      \
-                0xAAAA, 0x03, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
-            }, /* Network Provisioning (client): AddWiFiNetworkResponse */                                                         \
-            {                                                                                                                      \
-                0xAAAA, 0x04, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
-            }, /* Network Provisioning (client): UpdateWiFiNetwork */                                                              \
-            {                                                                                                                      \
-                0xAAAA, 0x05, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
-            }, /* Network Provisioning (client): UpdateWiFiNetworkResponse */                                                      \
-            {                                                                                                                      \
-                0xAAAA, 0x06, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
-            }, /* Network Provisioning (client): AddThreadNetwork */                                                               \
-            {                                                                                                                      \
-                0xAAAA, 0x07, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
-            }, /* Network Provisioning (client): AddThreadNetworkResponse */                                                       \
-            {                                                                                                                      \
-                0xAAAA, 0x08, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
-            }, /* Network Provisioning (client): UpdateThreadNetwork */                                                            \
-            {                                                                                                                      \
-                0xAAAA, 0x09, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
-            },                                                   /* Network Provisioning (client): UpdateThreadNetworkResponse */  \
-            { 0xAAAA, 0x0A, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Network Provisioning (client): RemoveNetwork */                \
-            { 0xAAAA, 0x0B, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Network Provisioning (client): RemoveNetworkResponse */        \
-            { 0xAAAA, 0x0C, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Network Provisioning (client): EnableNetwork */                \
-            { 0xAAAA, 0x0D, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Network Provisioning (client): EnableNetworkResponse */        \
-            { 0xAAAA, 0x0E, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Network Provisioning (client): DisableNetwork */               \
-            { 0xAAAA, 0x0F, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Network Provisioning (client): DisableNetworkResponse */       \
-            { 0xAAAA, 0x10,                                                                                                        \
-              ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Network Provisioning (client): GetLastNetworkProvisioningResult */           \
             { 0xF000, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Binding (client): Bind */                                      \
             { 0xF000, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Binding (client): Unbind */                                    \
+            { 0xF001, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (client): PlayRequest */                        \
+            { 0xF001, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Media Playback (client): Playback */                           \
+            { 0xF001, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (client): PauseRequest */                       \
+            { 0xF001, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (client): StopRequest */                        \
+            { 0xF001, 0x03, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (client): StartOverRequest */                   \
+            { 0xF001, 0x04, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (client): PreviousRequest */                    \
+            { 0xF001, 0x05, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (client): NextRequest */                        \
+            { 0xF001, 0x06, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (client): RewindRequest */                      \
+            { 0xF001, 0x07, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (client): FastForwardRequest */                 \
+            { 0xF001, 0x08, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (client): SkipForwardRequest */                 \
+            { 0xF001, 0x09, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (client): SkipBackwardRequest */                \
     }
 
 // Array of EmberAfManufacturerCodeEntry structures for commands.
 #define GENERATED_COMMAND_MANUFACTURER_CODE_COUNT (1)
 #define GENERATED_COMMAND_MANUFACTURER_CODES                                                                                       \
     {                                                                                                                              \
-        { 0, 0x1002 },                                                                                                             \
+        { 0, 4098 },                                                                                                               \
     }
 
 // This is an array of EmberAfManufacturerCodeEntry structures for clusters.

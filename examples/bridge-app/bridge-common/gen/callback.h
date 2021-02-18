@@ -37,6 +37,14 @@ void emberAfClusterInitCallback(chip::EndpointId endpoint, chip::ClusterId clust
 
 // Cluster Init Functions
 
+/** @brief Basic Cluster Init
+ *
+ * Cluster Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfBasicClusterInitCallback(chip::EndpointId endpoint);
+
 /** @brief Level Control Cluster Init
  *
  * Cluster Init
@@ -54,6 +62,74 @@ void emberAfLevelControlClusterInitCallback(chip::EndpointId endpoint);
 void emberAfOnOffClusterInitCallback(chip::EndpointId endpoint);
 
 // Cluster Server/Client Init Functions
+
+//
+// Basic Cluster server
+//
+
+/** @brief Basic Cluster Server Init
+ *
+ * Server Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfBasicClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Basic Cluster Server Attribute Changed
+ *
+ * Server Attribute Changed
+ *
+ * @param endpoint    Endpoint that is being initialized
+ * @param attributeId Attribute that changed
+ */
+void emberAfBasicClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+
+/** @brief Basic Cluster Server Manufacturer Specific Attribute Changed
+ *
+ * Server Manufacturer Specific Attribute Changed
+ *
+ * @param endpoint          Endpoint that is being initialized
+ * @param attributeId       Attribute that changed
+ * @param manufacturerCode  Manufacturer Code of the attribute that changed
+ */
+void emberAfBasicClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
+                                                                           uint16_t manufacturerCode);
+
+/** @brief Basic Cluster Server Message Sent
+ *
+ * Server Message Sent
+ *
+ * @param type               The type of message sent
+ * @param indexOrDestination The destination or address to which the message was sent
+ * @param apsFrame           The APS frame for the message
+ * @param msgLen             The length of the message
+ * @param message            The message that was sent
+ * @param status             The status of the sent message
+ */
+void emberAfBasicClusterServerMessageSentCallback(EmberOutgoingMessageType type, uint64_t indexOrDestination,
+                                                  EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message, EmberStatus status);
+
+/** @brief Basic Cluster Server Pre Attribute Changed
+ *
+ * server Pre Attribute Changed
+ *
+ * @param endpoint      Endpoint that is being initialized
+ * @param attributeId   Attribute to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+EmberAfStatus emberAfBasicClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
+                                                                   EmberAfAttributeType attributeType, uint8_t size,
+                                                                   uint8_t * value);
+
+/** @brief Basic Cluster Server Tick
+ *
+ * server Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfBasicClusterServerTickCallback(chip::EndpointId endpoint);
 
 //
 // Level Control Cluster server
@@ -196,6 +272,12 @@ void emberAfOnOffClusterServerTickCallback(chip::EndpointId endpoint);
 // Cluster Commands Callback
 
 /**
+ * @brief Basic Cluster ResetToFactoryDefaults Command callback
+ */
+
+bool emberAfBasicClusterResetToFactoryDefaultsCallback();
+
+/**
  * @brief Level Control Cluster Move Command callback
  * @param moveMode
  * @param rate
@@ -274,33 +356,10 @@ bool emberAfLevelControlClusterStopWithOnOffCallback();
 bool emberAfOnOffClusterOffCallback();
 
 /**
- * @brief On/off Cluster OffWithEffect Command callback
- * @param effectId
- * @param effectVariant
- */
-
-bool emberAfOnOffClusterOffWithEffectCallback(uint8_t effectId, uint8_t effectVariant);
-
-/**
  * @brief On/off Cluster On Command callback
  */
 
 bool emberAfOnOffClusterOnCallback();
-
-/**
- * @brief On/off Cluster OnWithRecallGlobalScene Command callback
- */
-
-bool emberAfOnOffClusterOnWithRecallGlobalSceneCallback();
-
-/**
- * @brief On/off Cluster OnWithTimedOff Command callback
- * @param onOffControl
- * @param onTime
- * @param offWaitTime
- */
-
-bool emberAfOnOffClusterOnWithTimedOffCallback(uint8_t onOffControl, uint16_t onTime, uint16_t offWaitTime);
 
 /**
  * @brief On/off Cluster Toggle Command callback

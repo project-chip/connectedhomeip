@@ -120,7 +120,7 @@ CHIP_ERROR SendCommandRequest(void)
     err = gpCommandSender->AddCommand(CommandParams);
     SuccessOrExit(err);
 
-    err = gpCommandSender->SendCommandRequest(chip::kTestDeviceNodeId);
+    err = gpCommandSender->SendCommandRequest(chip::kTestDeviceNodeId, gAdminId);
     SuccessOrExit(err);
 
     if (err == CHIP_NO_ERROR)
@@ -147,7 +147,8 @@ CHIP_ERROR EstablishSecureSession()
     // Attempt to connect to the peer.
     err = gSessionManager.NewPairing(chip::Optional<chip::Transport::PeerAddress>::Value(
                                          chip::Transport::PeerAddress::UDP(gDestAddr, CHIP_PORT, INET_NULL_INTERFACEID)),
-                                     chip::kTestDeviceNodeId, testSecurePairingSecret, gAdminId);
+                                     chip::kTestDeviceNodeId, testSecurePairingSecret,
+                                     chip::SecureSessionMgr::PairingDirection::kInitiator, gAdminId);
 
 exit:
     if (err != CHIP_NO_ERROR)

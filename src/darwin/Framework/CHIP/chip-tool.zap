@@ -1,6 +1,6 @@
 {
-  "writeTime": "Sun Feb 07 2021 10:23:58 GMT+0800 (China Standard Time)",
-  "featureLevel": 6,
+  "writeTime": "Mon Feb 15 2021 16:35:24 GMT+0100 (Central European Standard Time)",
+  "featureLevel": 11,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -22,6 +22,12 @@
       "path": "../../../../app/zap-templates/zcl/zcl.json",
       "version": "ZCL Test Data",
       "type": "zcl-properties"
+    },
+    {
+      "pathRelativity": "relativeToZap",
+      "path": "../../../../app/zap-templates/app-templates.json",
+      "version": "chip-v1",
+      "type": "gen-templates-json"
     }
   ],
   "endpointTypes": [
@@ -50,9 +56,9 @@
             {
               "name": "MfgSpecificPing",
               "code": 0,
-              "mfgCode": "0x1002",
+              "mfgCode": "4098",
               "source": "client",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 1
             }
           ],
@@ -180,6 +186,16 @@
           "define": "IDENTIFY_CLUSTER",
           "side": "server",
           "enabled": 0,
+          "commands": [
+            {
+              "name": "IdentifyQueryResponse",
+              "code": 0,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 1,
+              "outgoing": 1
+            }
+          ],
           "attributes": [
             {
               "name": "cluster revision",
@@ -210,16 +226,6 @@
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
-            }
-          ],
-          "commands": [
-            {
-              "name": "IdentifyQueryResponse",
-              "code": 0,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 1
             }
           ]
         },
@@ -3262,7 +3268,6 @@
     {
       "endpointTypeName": "Anonymous Endpoint Type",
       "endpointTypeIndex": 0,
-      "endpointTypeRef": 2,
       "profileId": "0x0103",
       "endpointId": 1,
       "networkId": 0

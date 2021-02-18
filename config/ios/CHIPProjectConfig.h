@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2016-2017 Nest Labs, Inc.
  *    Copyright (c) 2019-2020 Google LLC.
  *    All rights reserved.
@@ -44,7 +44,7 @@
 
 #define CHIP_CONFIG_LEGACY_KEY_EXPORT_DELEGATE 0
 
-#define CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC 300
+#define CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE 300
 
 #define CHIP_CONFIG_ENABLE_FUNCT_ERROR_LOGGING 1
 

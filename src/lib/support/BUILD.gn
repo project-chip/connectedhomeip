@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2020-2021 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -36,6 +36,10 @@ action("gen_chip_version") {
   ]
 }
 
+source_set("logging_constants") {
+  sources = [ "logging/Constants.h" ]
+}
+
 source_set("chip_version_header") {
   sources = get_target_outputs(":gen_chip_version")
 
@@ -51,7 +55,10 @@ static_library("support") {
     "BitFlags.h",
     "BufferReader.cpp",
     "BufferReader.h",
+    "BufferWriter.cpp",
     "BufferWriter.h",
+    "BytesToHex.cpp",
+    "BytesToHex.h",
     "CHIPArgParser.cpp",
     "CHIPCounter.cpp",
     "CHIPCounter.h",
@@ -82,7 +89,6 @@ static_library("support") {
     "UnitTestRegistration.h",
     "logging/CHIPLogging.cpp",
     "logging/CHIPLogging.h",
-    "logging/CHIPLoggingLogV.cpp",
     "verhoeff/Verhoeff.cpp",
     "verhoeff/Verhoeff.h",
     "verhoeff/Verhoeff10.cpp",
@@ -91,11 +97,15 @@ static_library("support") {
     "verhoeff/Verhoeff36.cpp",
   ]
 
+  libs = []
+
   cflags = [ "-Wconversion" ]
 
   public_deps = [
     ":chip_version_header",
+    ":logging_constants",
     "${chip_root}/src/lib/core:chip_config_header",
+    "${chip_root}/src/platform/logging:headers",
     "${nlassert_root}:nlassert",
     "${nlio_root}:nlio",
   ]
@@ -107,6 +117,11 @@ static_library("support") {
     "${chip_root}/src/ble:ble_config_header",
     "${chip_root}/src/inet:inet_config_header",
   ]
+
+  # Android has no 'platform' that provides logging
+  if (current_os == "android") {
+    public_deps += [ "${chip_root}/src/platform/logging:android" ]
+  }
 
   public_configs = [
     "${chip_root}/src:includes",
@@ -128,8 +143,7 @@ static_library("support") {
     public_deps += [ "${nlfaultinjection_root}:nlfaultinjection" ]
   }
 
-  libs = []
-  if (chip_logging_style == "android") {
-    libs += [ "log" ]
+  if (chip_config_memory_debug_dmalloc) {
+    libs += [ "dmallocthcxx" ]
   }
 }

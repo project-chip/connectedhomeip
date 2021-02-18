@@ -1,7 +1,7 @@
 '''
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 
 import ctypes
 from .ChipStack import *
-from .ChipExceptions import *
+from .exceptions import *
 
 '''
 TODO(#4511): This file only sends cluster commands, should add more functions.
@@ -321,51 +321,26 @@ class ChipCluster:
                 "StopWithOnOff": {
                 },
             },
-            "NetworkProvisioning": {
-                "AddThreadNetwork": {
-                    "operationalDataset": "bytes",
-                    "breadcrumb": "int",
-                    "timeoutMs": "int",
+            "MediaPlayback": {
+                "FastForwardRequest": {
                 },
-                "AddWiFiNetwork": {
-                    "ssid": "bytes",
-                    "credentials": "bytes",
-                    "breadcrumb": "int",
-                    "timeoutMs": "int",
+                "NextRequest": {
                 },
-                "DisableNetwork": {
-                    "networkID": "bytes",
-                    "breadcrumb": "int",
-                    "timeoutMs": "int",
+                "PauseRequest": {
                 },
-                "EnableNetwork": {
-                    "networkID": "bytes",
-                    "breadcrumb": "int",
-                    "timeoutMs": "int",
+                "PlayRequest": {
                 },
-                "GetLastNetworkProvisioningResult": {
-                    "timeoutMs": "int",
+                "PreviousRequest": {
                 },
-                "RemoveNetwork": {
-                    "networkID": "bytes",
-                    "breadcrumb": "int",
-                    "timeoutMs": "int",
+                "RewindRequest": {
                 },
-                "ScanNetworks": {
-                    "ssid": "bytes",
-                    "breadcrumb": "int",
-                    "timeoutMs": "int",
+                "SkipBackwardRequest": {
                 },
-                "UpdateThreadNetwork": {
-                    "operationalDataset": "bytes",
-                    "breadcrumb": "int",
-                    "timeoutMs": "int",
+                "SkipForwardRequest": {
                 },
-                "UpdateWiFiNetwork": {
-                    "ssid": "bytes",
-                    "credentials": "bytes",
-                    "breadcrumb": "int",
-                    "timeoutMs": "int",
+                "StartOverRequest": {
+                },
+                "StopRequest": {
                 },
             },
             "OnOff": {
@@ -840,66 +815,73 @@ class ChipCluster:
             )
         )
 
-    def ClusterNetworkProvisioning_CommandAddThreadNetwork(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, operationalDataset: bytes, breadcrumb: int, timeoutMs: int):
+    def ClusterMediaPlayback_CommandFastForwardRequest(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_NetworkProvisioning_AddThreadNetwork(
-                device, ZCLendpoint, ZCLgroupid, operationalDataset, len(operationalDataset), breadcrumb, timeoutMs
+            lambda: self._chipLib.chip_ime_AppendCommand_MediaPlayback_FastForwardRequest(
+                device, ZCLendpoint, ZCLgroupid
             )
         )
 
-    def ClusterNetworkProvisioning_CommandAddWiFiNetwork(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, ssid: bytes, credentials: bytes, breadcrumb: int, timeoutMs: int):
+    def ClusterMediaPlayback_CommandNextRequest(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_NetworkProvisioning_AddWiFiNetwork(
-                device, ZCLendpoint, ZCLgroupid, ssid, len(ssid), credentials, len(credentials), breadcrumb, timeoutMs
+            lambda: self._chipLib.chip_ime_AppendCommand_MediaPlayback_NextRequest(
+                device, ZCLendpoint, ZCLgroupid
             )
         )
 
-    def ClusterNetworkProvisioning_CommandDisableNetwork(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, networkID: bytes, breadcrumb: int, timeoutMs: int):
+    def ClusterMediaPlayback_CommandPauseRequest(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_NetworkProvisioning_DisableNetwork(
-                device, ZCLendpoint, ZCLgroupid, networkID, len(networkID), breadcrumb, timeoutMs
+            lambda: self._chipLib.chip_ime_AppendCommand_MediaPlayback_PauseRequest(
+                device, ZCLendpoint, ZCLgroupid
             )
         )
 
-    def ClusterNetworkProvisioning_CommandEnableNetwork(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, networkID: bytes, breadcrumb: int, timeoutMs: int):
+    def ClusterMediaPlayback_CommandPlayRequest(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_NetworkProvisioning_EnableNetwork(
-                device, ZCLendpoint, ZCLgroupid, networkID, len(networkID), breadcrumb, timeoutMs
+            lambda: self._chipLib.chip_ime_AppendCommand_MediaPlayback_PlayRequest(
+                device, ZCLendpoint, ZCLgroupid
             )
         )
 
-    def ClusterNetworkProvisioning_CommandGetLastNetworkProvisioningResult(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, timeoutMs: int):
+    def ClusterMediaPlayback_CommandPreviousRequest(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_NetworkProvisioning_GetLastNetworkProvisioningResult(
-                device, ZCLendpoint, ZCLgroupid, timeoutMs
+            lambda: self._chipLib.chip_ime_AppendCommand_MediaPlayback_PreviousRequest(
+                device, ZCLendpoint, ZCLgroupid
             )
         )
 
-    def ClusterNetworkProvisioning_CommandRemoveNetwork(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, networkID: bytes, breadcrumb: int, timeoutMs: int):
+    def ClusterMediaPlayback_CommandRewindRequest(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_NetworkProvisioning_RemoveNetwork(
-                device, ZCLendpoint, ZCLgroupid, networkID, len(networkID), breadcrumb, timeoutMs
+            lambda: self._chipLib.chip_ime_AppendCommand_MediaPlayback_RewindRequest(
+                device, ZCLendpoint, ZCLgroupid
             )
         )
 
-    def ClusterNetworkProvisioning_CommandScanNetworks(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, ssid: bytes, breadcrumb: int, timeoutMs: int):
+    def ClusterMediaPlayback_CommandSkipBackwardRequest(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_NetworkProvisioning_ScanNetworks(
-                device, ZCLendpoint, ZCLgroupid, ssid, len(ssid), breadcrumb, timeoutMs
+            lambda: self._chipLib.chip_ime_AppendCommand_MediaPlayback_SkipBackwardRequest(
+                device, ZCLendpoint, ZCLgroupid
             )
         )
 
-    def ClusterNetworkProvisioning_CommandUpdateThreadNetwork(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, operationalDataset: bytes, breadcrumb: int, timeoutMs: int):
+    def ClusterMediaPlayback_CommandSkipForwardRequest(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_NetworkProvisioning_UpdateThreadNetwork(
-                device, ZCLendpoint, ZCLgroupid, operationalDataset, len(operationalDataset), breadcrumb, timeoutMs
+            lambda: self._chipLib.chip_ime_AppendCommand_MediaPlayback_SkipForwardRequest(
+                device, ZCLendpoint, ZCLgroupid
             )
         )
 
-    def ClusterNetworkProvisioning_CommandUpdateWiFiNetwork(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, ssid: bytes, credentials: bytes, breadcrumb: int, timeoutMs: int):
+    def ClusterMediaPlayback_CommandStartOverRequest(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_NetworkProvisioning_UpdateWiFiNetwork(
-                device, ZCLendpoint, ZCLgroupid, ssid, len(ssid), credentials, len(credentials), breadcrumb, timeoutMs
+            lambda: self._chipLib.chip_ime_AppendCommand_MediaPlayback_StartOverRequest(
+                device, ZCLendpoint, ZCLgroupid
+            )
+        )
+
+    def ClusterMediaPlayback_CommandStopRequest(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        self._ChipStack.Call(
+            lambda: self._chipLib.chip_ime_AppendCommand_MediaPlayback_StopRequest(
+                device, ZCLendpoint, ZCLgroupid
             )
         )
 
@@ -1162,34 +1144,37 @@ class ChipCluster:
         # Cluster LevelControl Command StopWithOnOff
         self._chipLib.chip_ime_AppendCommand_LevelControl_StopWithOnOff.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_LevelControl_StopWithOnOff.restype = ctypes.c_uint32
-        # Cluster NetworkProvisioning
-        # Cluster NetworkProvisioning Command AddThreadNetwork
-        self._chipLib.chip_ime_AppendCommand_NetworkProvisioning_AddThreadNetwork.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint64, ctypes.c_uint32]
-        self._chipLib.chip_ime_AppendCommand_NetworkProvisioning_AddThreadNetwork.restype = ctypes.c_uint32
-        # Cluster NetworkProvisioning Command AddWiFiNetwork
-        self._chipLib.chip_ime_AppendCommand_NetworkProvisioning_AddWiFiNetwork.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint64, ctypes.c_uint32]
-        self._chipLib.chip_ime_AppendCommand_NetworkProvisioning_AddWiFiNetwork.restype = ctypes.c_uint32
-        # Cluster NetworkProvisioning Command DisableNetwork
-        self._chipLib.chip_ime_AppendCommand_NetworkProvisioning_DisableNetwork.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint64, ctypes.c_uint32]
-        self._chipLib.chip_ime_AppendCommand_NetworkProvisioning_DisableNetwork.restype = ctypes.c_uint32
-        # Cluster NetworkProvisioning Command EnableNetwork
-        self._chipLib.chip_ime_AppendCommand_NetworkProvisioning_EnableNetwork.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint64, ctypes.c_uint32]
-        self._chipLib.chip_ime_AppendCommand_NetworkProvisioning_EnableNetwork.restype = ctypes.c_uint32
-        # Cluster NetworkProvisioning Command GetLastNetworkProvisioningResult
-        self._chipLib.chip_ime_AppendCommand_NetworkProvisioning_GetLastNetworkProvisioningResult.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint32]
-        self._chipLib.chip_ime_AppendCommand_NetworkProvisioning_GetLastNetworkProvisioningResult.restype = ctypes.c_uint32
-        # Cluster NetworkProvisioning Command RemoveNetwork
-        self._chipLib.chip_ime_AppendCommand_NetworkProvisioning_RemoveNetwork.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint64, ctypes.c_uint32]
-        self._chipLib.chip_ime_AppendCommand_NetworkProvisioning_RemoveNetwork.restype = ctypes.c_uint32
-        # Cluster NetworkProvisioning Command ScanNetworks
-        self._chipLib.chip_ime_AppendCommand_NetworkProvisioning_ScanNetworks.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint64, ctypes.c_uint32]
-        self._chipLib.chip_ime_AppendCommand_NetworkProvisioning_ScanNetworks.restype = ctypes.c_uint32
-        # Cluster NetworkProvisioning Command UpdateThreadNetwork
-        self._chipLib.chip_ime_AppendCommand_NetworkProvisioning_UpdateThreadNetwork.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint64, ctypes.c_uint32]
-        self._chipLib.chip_ime_AppendCommand_NetworkProvisioning_UpdateThreadNetwork.restype = ctypes.c_uint32
-        # Cluster NetworkProvisioning Command UpdateWiFiNetwork
-        self._chipLib.chip_ime_AppendCommand_NetworkProvisioning_UpdateWiFiNetwork.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint64, ctypes.c_uint32]
-        self._chipLib.chip_ime_AppendCommand_NetworkProvisioning_UpdateWiFiNetwork.restype = ctypes.c_uint32
+        # Cluster MediaPlayback
+        # Cluster MediaPlayback Command FastForwardRequest
+        self._chipLib.chip_ime_AppendCommand_MediaPlayback_FastForwardRequest.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_MediaPlayback_FastForwardRequest.restype = ctypes.c_uint32
+        # Cluster MediaPlayback Command NextRequest
+        self._chipLib.chip_ime_AppendCommand_MediaPlayback_NextRequest.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_MediaPlayback_NextRequest.restype = ctypes.c_uint32
+        # Cluster MediaPlayback Command PauseRequest
+        self._chipLib.chip_ime_AppendCommand_MediaPlayback_PauseRequest.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_MediaPlayback_PauseRequest.restype = ctypes.c_uint32
+        # Cluster MediaPlayback Command PlayRequest
+        self._chipLib.chip_ime_AppendCommand_MediaPlayback_PlayRequest.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_MediaPlayback_PlayRequest.restype = ctypes.c_uint32
+        # Cluster MediaPlayback Command PreviousRequest
+        self._chipLib.chip_ime_AppendCommand_MediaPlayback_PreviousRequest.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_MediaPlayback_PreviousRequest.restype = ctypes.c_uint32
+        # Cluster MediaPlayback Command RewindRequest
+        self._chipLib.chip_ime_AppendCommand_MediaPlayback_RewindRequest.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_MediaPlayback_RewindRequest.restype = ctypes.c_uint32
+        # Cluster MediaPlayback Command SkipBackwardRequest
+        self._chipLib.chip_ime_AppendCommand_MediaPlayback_SkipBackwardRequest.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_MediaPlayback_SkipBackwardRequest.restype = ctypes.c_uint32
+        # Cluster MediaPlayback Command SkipForwardRequest
+        self._chipLib.chip_ime_AppendCommand_MediaPlayback_SkipForwardRequest.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_MediaPlayback_SkipForwardRequest.restype = ctypes.c_uint32
+        # Cluster MediaPlayback Command StartOverRequest
+        self._chipLib.chip_ime_AppendCommand_MediaPlayback_StartOverRequest.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_MediaPlayback_StartOverRequest.restype = ctypes.c_uint32
+        # Cluster MediaPlayback Command StopRequest
+        self._chipLib.chip_ime_AppendCommand_MediaPlayback_StopRequest.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_MediaPlayback_StopRequest.restype = ctypes.c_uint32
         # Cluster OnOff
         # Cluster OnOff Command Off
         self._chipLib.chip_ime_AppendCommand_OnOff_Off.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]

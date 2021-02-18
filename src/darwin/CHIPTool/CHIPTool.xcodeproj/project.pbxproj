@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		0CA0E0CF248599BB009087B9 /* OnOffViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0CA0E0CE248599BB009087B9 /* OnOffViewController.m */; };
+		2C21071525D1A8F200DDA4AD /* MultiAdminViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C21071325D1A8F200DDA4AD /* MultiAdminViewController.m */; };
+		2C460C2425D7594B000512D6 /* DeviceSelector.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C460C2325D7594B000512D6 /* DeviceSelector.m */; };
+		2C460C3225D97CB3000512D6 /* UnpairDevicesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C460C3025D97CB3000512D6 /* UnpairDevicesViewController.m */; };
 		991DC091247747F500C13860 /* EchoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 991DC090247747F500C13860 /* EchoViewController.m */; };
 		997A639C253F93F7005C64E6 /* CHIP.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 997A639B253F93F7005C64E6 /* CHIP.framework */; };
 		997A639D253F93F7005C64E6 /* CHIP.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 997A639B253F93F7005C64E6 /* CHIP.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -52,6 +55,12 @@
 /* Begin PBXFileReference section */
 		0CA0E0CD248599BB009087B9 /* OnOffViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OnOffViewController.h; sourceTree = "<group>"; };
 		0CA0E0CE248599BB009087B9 /* OnOffViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OnOffViewController.m; sourceTree = "<group>"; };
+		2C21071325D1A8F200DDA4AD /* MultiAdminViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MultiAdminViewController.m; sourceTree = "<group>"; };
+		2C21071425D1A8F200DDA4AD /* MultiAdminViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MultiAdminViewController.h; sourceTree = "<group>"; };
+		2C460C2225D7594B000512D6 /* DeviceSelector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DeviceSelector.h; sourceTree = "<group>"; };
+		2C460C2325D7594B000512D6 /* DeviceSelector.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DeviceSelector.m; sourceTree = "<group>"; };
+		2C460C3025D97CB3000512D6 /* UnpairDevicesViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UnpairDevicesViewController.m; sourceTree = "<group>"; };
+		2C460C3125D97CB3000512D6 /* UnpairDevicesViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UnpairDevicesViewController.h; sourceTree = "<group>"; };
 		991DC08F247747F500C13860 /* EchoViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EchoViewController.h; sourceTree = "<group>"; };
 		991DC090247747F500C13860 /* EchoViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = EchoViewController.m; sourceTree = "<group>"; };
 		997A639B253F93F7005C64E6 /* CHIP.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = CHIP.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -129,6 +138,24 @@
 			path = OnOffCluster;
 			sourceTree = "<group>";
 		};
+		2C21071225D1A8F200DDA4AD /* MultiAdmin */ = {
+			isa = PBXGroup;
+			children = (
+				2C21071325D1A8F200DDA4AD /* MultiAdminViewController.m */,
+				2C21071425D1A8F200DDA4AD /* MultiAdminViewController.h */,
+			);
+			path = MultiAdmin;
+			sourceTree = "<group>";
+		};
+		2C460C2F25D97CB3000512D6 /* UnpairDevices */ = {
+			isa = PBXGroup;
+			children = (
+				2C460C3025D97CB3000512D6 /* UnpairDevicesViewController.m */,
+				2C460C3125D97CB3000512D6 /* UnpairDevicesViewController.h */,
+			);
+			path = UnpairDevices;
+			sourceTree = "<group>";
+		};
 		B20252DE2459EC7600F97062 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -191,6 +218,10 @@
 		B232D8BF251A0EC500792CB4 /* View Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				2C460C2F25D97CB3000512D6 /* UnpairDevices */,
+				2C460C2225D7594B000512D6 /* DeviceSelector.h */,
+				2C460C2325D7594B000512D6 /* DeviceSelector.m */,
+				2C21071225D1A8F200DDA4AD /* MultiAdmin */,
 				B204A61F244E1D0600C7C0E1 /* AppDelegate.h */,
 				B204A620244E1D0600C7C0E1 /* AppDelegate.m */,
 				B204A622244E1D0600C7C0E1 /* SceneDelegate.h */,
@@ -343,7 +374,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2C460C2425D7594B000512D6 /* DeviceSelector.m in Sources */,
+				2C21071525D1A8F200DDA4AD /* MultiAdminViewController.m in Sources */,
 				B204A627244E1D0600C7C0E1 /* QRCodeViewController.m in Sources */,
+				2C460C3225D97CB3000512D6 /* UnpairDevicesViewController.m in Sources */,
 				B232D8BA2514BD0800792CB4 /* CHIPUIViewUtils.m in Sources */,
 				B2946A9B24C9A7BF005C87D0 /* DefaultsUtils.m in Sources */,
 				991DC091247747F500C13860 /* EchoViewController.m in Sources */,

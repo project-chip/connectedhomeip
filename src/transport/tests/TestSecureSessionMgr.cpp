@@ -21,6 +21,9 @@
  *      This file implements unit tests for the SecureSessionMgr implementation.
  */
 
+#define CHIP_ENABLE_TEST_ENCRYPTED_BUFFER_API // Up here in case some other header
+                                              // includes SecureSessionMgr.h indirectly
+
 #include <core/CHIPCore.h>
 #include <protocols/Protocols.h>
 #include <protocols/echo/Echo.h>
@@ -35,6 +38,8 @@
 #include <nlunit-test.h>
 
 #include <errno.h>
+
+#undef CHIP_ENABLE_TEST_ENCRYPTED_BUFFER_API
 
 namespace {
 
@@ -73,15 +78,9 @@ public:
 
     CHIP_ERROR SendMessage(const PacketHeader & header, const PeerAddress & address, System::PacketBufferHandle msgBuf) override
     {
-        const uint16_t headerSize           = header.EncodeSizeBytes();
         System::PacketBufferHandle recvdMsg = msgBuf.CloneData();
 
-        VerifyOrReturnError(msgBuf->EnsureReservedSize(headerSize), CHIP_ERROR_NO_MEMORY);
-
-        msgBuf->SetStart(msgBuf->Start() - headerSize);
-
-        uint16_t actualEncodedHeaderSize;
-        ReturnErrorOnFailure(header.Encode(msgBuf->Start(), msgBuf->DataLength(), &actualEncodedHeaderSize));
+        ReturnErrorOnFailure(header.EncodeBeforeData(msgBuf));
 
         HandleMessageReceived(header, address, std::move(recvdMsg));
         return CHIP_NO_ERROR;
@@ -183,11 +182,11 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, admin != nullptr);
 
     SecurePairingUsingTestSecret pairing1(Optional<NodeId>::Value(kSourceNodeId), 1, 2);
-    err = secureSessionMgr.NewPairing(peer, kSourceNodeId, &pairing1, 1);
+    err = secureSessionMgr.NewPairing(peer, kSourceNodeId, &pairing1, SecureSessionMgr::PairingDirection::kInitiator, 1);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     SecurePairingUsingTestSecret pairing2(Optional<NodeId>::Value(kDestinationNodeId), 2, 1);
-    err = secureSessionMgr.NewPairing(peer, kDestinationNodeId, &pairing2, 0);
+    err = secureSessionMgr.NewPairing(peer, kDestinationNodeId, &pairing2, SecureSessionMgr::PairingDirection::kResponder, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     SecureSessionHandle localToRemoteSession = callback.mLocalToRemoteSession;
@@ -196,7 +195,6 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
     callback.ReceiveHandlerCallCount = 0;
 
     err = secureSessionMgr.SendMessage(localToRemoteSession, std::move(buffer));
-    printf("err=%d\n", err);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     ctx.DriveIOUntil(1000 /* ms */, []() { return callback.ReceiveHandlerCallCount != 0; });
@@ -242,11 +240,11 @@ void SendEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, admin != nullptr);
 
     SecurePairingUsingTestSecret pairing1(Optional<NodeId>::Value(kSourceNodeId), 1, 2);
-    err = secureSessionMgr.NewPairing(peer, kSourceNodeId, &pairing1, 1);
+    err = secureSessionMgr.NewPairing(peer, kSourceNodeId, &pairing1, SecureSessionMgr::PairingDirection::kInitiator, 1);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     SecurePairingUsingTestSecret pairing2(Optional<NodeId>::Value(kDestinationNodeId), 2, 1);
-    err = secureSessionMgr.NewPairing(peer, kDestinationNodeId, &pairing2, 0);
+    err = secureSessionMgr.NewPairing(peer, kDestinationNodeId, &pairing2, SecureSessionMgr::PairingDirection::kResponder, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     SecureSessionHandle localToRemoteSession = callback.mLocalToRemoteSession;
@@ -316,11 +314,11 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, admin != nullptr);
 
     SecurePairingUsingTestSecret pairing1(Optional<NodeId>::Value(kSourceNodeId), 1, 2);
-    err = secureSessionMgr.NewPairing(peer, kSourceNodeId, &pairing1, 1);
+    err = secureSessionMgr.NewPairing(peer, kSourceNodeId, &pairing1, SecureSessionMgr::PairingDirection::kInitiator, 1);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     SecurePairingUsingTestSecret pairing2(Optional<NodeId>::Value(kDestinationNodeId), 2, 1);
-    err = secureSessionMgr.NewPairing(peer, kDestinationNodeId, &pairing2, 0);
+    err = secureSessionMgr.NewPairing(peer, kDestinationNodeId, &pairing2, SecureSessionMgr::PairingDirection::kResponder, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     SecureSessionHandle localToRemoteSession = callback.mLocalToRemoteSession;
@@ -345,17 +343,15 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     ctx.DriveIOUntil(1000 /* ms */, []() { return callback.ReceiveHandlerCallCount != 0; });
     NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 1);
 
-    uint16_t headerSize = 0;
     PacketHeader packetHeader;
 
     // Change Destination Node ID
     EncryptedPacketBufferHandle badDestNodeIdMsg = msgBuf.CloneData();
-    NL_TEST_ASSERT(inSuite,
-                   packetHeader.Decode(badDestNodeIdMsg->Start(), badDestNodeIdMsg->DataLength(), &headerSize) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, badDestNodeIdMsg.ExtractPacketHeader(packetHeader) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, packetHeader.GetDestinationNodeId().Value() == kDestinationNodeId);
     packetHeader.SetDestinationNodeId(kSourceNodeId);
-    packetHeader.Encode(badDestNodeIdMsg->Start(), badDestNodeIdMsg->DataLength(), &headerSize);
+    NL_TEST_ASSERT(inSuite, badDestNodeIdMsg.InsertPacketHeader(packetHeader) == CHIP_NO_ERROR);
 
     err = secureSessionMgr.SendEncryptedMessage(localToRemoteSession, std::move(badDestNodeIdMsg), nullptr);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -366,11 +362,10 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
 
     // Change Source Node ID
     EncryptedPacketBufferHandle badSrcNodeIdMsg = msgBuf.CloneData();
-    NL_TEST_ASSERT(inSuite,
-                   packetHeader.Decode(badSrcNodeIdMsg->Start(), badSrcNodeIdMsg->DataLength(), &headerSize) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, badSrcNodeIdMsg.ExtractPacketHeader(packetHeader) == CHIP_NO_ERROR);
 
     packetHeader.SetSourceNodeId(kDestinationNodeId);
-    packetHeader.Encode(badSrcNodeIdMsg->Start(), badSrcNodeIdMsg->DataLength(), &headerSize);
+    NL_TEST_ASSERT(inSuite, badSrcNodeIdMsg.InsertPacketHeader(packetHeader) == CHIP_NO_ERROR);
 
     err = secureSessionMgr.SendEncryptedMessage(localToRemoteSession, std::move(badSrcNodeIdMsg), nullptr);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -381,12 +376,11 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
 
     // Change Message ID
     EncryptedPacketBufferHandle badMessageIdMsg = msgBuf.CloneData();
-    NL_TEST_ASSERT(inSuite,
-                   packetHeader.Decode(badMessageIdMsg->Start(), badMessageIdMsg->DataLength(), &headerSize) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, badMessageIdMsg.ExtractPacketHeader(packetHeader) == CHIP_NO_ERROR);
 
     uint32_t msgID = packetHeader.GetMessageId();
     packetHeader.SetMessageId(msgID + 1);
-    packetHeader.Encode(badMessageIdMsg->Start(), badMessageIdMsg->DataLength(), &headerSize);
+    NL_TEST_ASSERT(inSuite, badMessageIdMsg.InsertPacketHeader(packetHeader) == CHIP_NO_ERROR);
 
     err = secureSessionMgr.SendEncryptedMessage(localToRemoteSession, std::move(badMessageIdMsg), nullptr);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -397,11 +391,11 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
 
     // Change Key ID
     EncryptedPacketBufferHandle badKeyIdMsg = msgBuf.CloneData();
-    NL_TEST_ASSERT(inSuite, packetHeader.Decode(badKeyIdMsg->Start(), badKeyIdMsg->DataLength(), &headerSize) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, badKeyIdMsg.ExtractPacketHeader(packetHeader) == CHIP_NO_ERROR);
 
     // the secure channel is setup to use key ID 1, and 2. So let's use 3 here.
     packetHeader.SetEncryptionKeyID(3);
-    packetHeader.Encode(badKeyIdMsg->Start(), badKeyIdMsg->DataLength(), &headerSize);
+    NL_TEST_ASSERT(inSuite, badKeyIdMsg.InsertPacketHeader(packetHeader) == CHIP_NO_ERROR);
 
     err = secureSessionMgr.SendEncryptedMessage(localToRemoteSession, std::move(badKeyIdMsg), nullptr);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);

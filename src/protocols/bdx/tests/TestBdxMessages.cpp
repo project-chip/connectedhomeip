@@ -2,6 +2,8 @@
 
 #include <nlunit-test.h>
 
+#include <support/BufferWriter.h>
+#include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/UnitTestRegistration.h>
 
@@ -20,7 +22,7 @@ void TestHelperWrittenAndParsedMatch(nlTestSuite * inSuite, void * inContext, Ms
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     size_t msgSize = testMsg.MessageSize();
-    System::PacketBufferWriter bbuf(msgSize);
+    Encoding::LittleEndian::PacketBufferWriter bbuf(System::PacketBufferHandle::New(msgSize));
     NL_TEST_ASSERT(inSuite, !bbuf.IsNull());
 
     testMsg.WriteToBuffer(bbuf);
@@ -138,13 +140,33 @@ static const nlTest sTests[] =
 };
 // clang-format on
 
+/**
+ *  Set up the test suite.
+ */
+static int TestSetup(void * inContext)
+{
+    CHIP_ERROR error = chip::Platform::MemoryInit();
+    if (error != CHIP_NO_ERROR)
+        return FAILURE;
+    return SUCCESS;
+}
+
+/**
+ *  Tear down the test suite.
+ */
+static int TestTeardown(void * inContext)
+{
+    chip::Platform::MemoryShutdown();
+    return SUCCESS;
+}
+
 // clang-format off
 static nlTestSuite sSuite =
 {
     "Test-CHIP-BdxMessages",
     &sTests[0],
-    nullptr,
-    nullptr
+    TestSetup,
+    TestTeardown,
 };
 // clang-format on
 

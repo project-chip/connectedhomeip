@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -36,8 +36,7 @@
 | IasZone                                                             | 0x0500 |
 | Identify                                                            | 0x0003 |
 | LevelControl                                                        | 0x0008 |
-| NetworkProvisioning                                                 | 0xAAAA |
-| NetworkProvisioning                                                 | 0xAAAA |
+| MediaPlayback                                                       | 0xF001 |
 | OnOff                                                               | 0x0006 |
 | Scenes                                                              | 0x0005 |
 | TemperatureMeasurement                                              | 0x0402 |
@@ -1453,115 +1452,111 @@ chip::System::PacketBufferHandle encodeLevelControlClusterReadClusterRevisionAtt
                                                                                        chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
-| Cluster NetworkProvisioning                                         | 0xAAAA |
+| Cluster MediaPlayback                                               | 0xF001 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
-| * AddThreadNetwork                                                  |   0x06 |
-| * AddWiFiNetwork                                                    |   0x02 |
-| * DisableNetwork                                                    |   0x0E |
-| * EnableNetwork                                                     |   0x0C |
-| * GetLastNetworkProvisioningResult                                  |   0x10 |
-| * RemoveNetwork                                                     |   0x0A |
-| * ScanNetworks                                                      |   0x00 |
-| * UpdateThreadNetwork                                               |   0x08 |
-| * UpdateWiFiNetwork                                                 |   0x04 |
+| * FastForwardRequest                                                |   0x07 |
+| * NextRequest                                                       |   0x05 |
+| * PauseRequest                                                      |   0x01 |
+| * PlayRequest                                                       |   0x00 |
+| * PreviousRequest                                                   |   0x04 |
+| * RewindRequest                                                     |   0x06 |
+| * SkipBackwardRequest                                               |   0x09 |
+| * SkipForwardRequest                                                |   0x08 |
+| * StartOverRequest                                                  |   0x03 |
+| * StopRequest                                                       |   0x02 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
+| * CurrentState                                                      | 0x0000 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
 /**
  * @brief
- *    Encode an AddThreadNetwork command for Network Provisioning server into buffer including the APS frame
+ *    Encode an FastForwardRequest command for Media Playback server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeNetworkProvisioningClusterAddThreadNetworkCommand(uint8_t seqNum,
-                                                                                         chip::EndpointId destinationEndpoint,
-                                                                                         uint8_t * operationalDataset,
-                                                                                         uint64_t breadcrumb, uint32_t timeoutMs);
+chip::System::PacketBufferHandle encodeMediaPlaybackClusterFastForwardRequestCommand(uint8_t seqNum,
+                                                                                     chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
- *    Encode an AddWiFiNetwork command for Network Provisioning server into buffer including the APS frame
+ *    Encode an NextRequest command for Media Playback server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeNetworkProvisioningClusterAddWiFiNetworkCommand(uint8_t seqNum,
-                                                                                       chip::EndpointId destinationEndpoint,
-                                                                                       uint8_t * ssid, uint8_t * credentials,
-                                                                                       uint64_t breadcrumb, uint32_t timeoutMs);
+chip::System::PacketBufferHandle encodeMediaPlaybackClusterNextRequestCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
- *    Encode an DisableNetwork command for Network Provisioning server into buffer including the APS frame
+ *    Encode an PauseRequest command for Media Playback server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeNetworkProvisioningClusterDisableNetworkCommand(uint8_t seqNum,
-                                                                                       chip::EndpointId destinationEndpoint,
-                                                                                       uint8_t * networkID, uint64_t breadcrumb,
-                                                                                       uint32_t timeoutMs);
+chip::System::PacketBufferHandle encodeMediaPlaybackClusterPauseRequestCommand(uint8_t seqNum,
+                                                                               chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
- *    Encode an EnableNetwork command for Network Provisioning server into buffer including the APS frame
+ *    Encode an PlayRequest command for Media Playback server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeNetworkProvisioningClusterEnableNetworkCommand(uint8_t seqNum,
-                                                                                      chip::EndpointId destinationEndpoint,
-                                                                                      uint8_t * networkID, uint64_t breadcrumb,
-                                                                                      uint32_t timeoutMs);
+chip::System::PacketBufferHandle encodeMediaPlaybackClusterPlayRequestCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
- *    Encode an GetLastNetworkProvisioningResult command for Network Provisioning server into buffer including the APS frame
+ *    Encode an PreviousRequest command for Media Playback server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle
-encodeNetworkProvisioningClusterGetLastNetworkProvisioningResultCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint,
-                                                                        uint32_t timeoutMs);
+chip::System::PacketBufferHandle encodeMediaPlaybackClusterPreviousRequestCommand(uint8_t seqNum,
+                                                                                  chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
- *    Encode an RemoveNetwork command for Network Provisioning server into buffer including the APS frame
+ *    Encode an RewindRequest command for Media Playback server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeNetworkProvisioningClusterRemoveNetworkCommand(uint8_t seqNum,
-                                                                                      chip::EndpointId destinationEndpoint,
-                                                                                      uint8_t * networkID, uint64_t breadcrumb,
-                                                                                      uint32_t timeoutMs);
+chip::System::PacketBufferHandle encodeMediaPlaybackClusterRewindRequestCommand(uint8_t seqNum,
+                                                                                chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
- *    Encode an ScanNetworks command for Network Provisioning server into buffer including the APS frame
+ *    Encode an SkipBackwardRequest command for Media Playback server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeNetworkProvisioningClusterScanNetworksCommand(uint8_t seqNum,
-                                                                                     chip::EndpointId destinationEndpoint,
-                                                                                     uint8_t * ssid, uint64_t breadcrumb,
-                                                                                     uint32_t timeoutMs);
+chip::System::PacketBufferHandle encodeMediaPlaybackClusterSkipBackwardRequestCommand(uint8_t seqNum,
+                                                                                      chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
- *    Encode an UpdateThreadNetwork command for Network Provisioning server into buffer including the APS frame
+ *    Encode an SkipForwardRequest command for Media Playback server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle
-encodeNetworkProvisioningClusterUpdateThreadNetworkCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint,
-                                                           uint8_t * operationalDataset, uint64_t breadcrumb, uint32_t timeoutMs);
+chip::System::PacketBufferHandle encodeMediaPlaybackClusterSkipForwardRequestCommand(uint8_t seqNum,
+                                                                                     chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
- *    Encode an UpdateWiFiNetwork command for Network Provisioning server into buffer including the APS frame
+ *    Encode an StartOverRequest command for Media Playback server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeNetworkProvisioningClusterUpdateWiFiNetworkCommand(uint8_t seqNum,
-                                                                                          chip::EndpointId destinationEndpoint,
-                                                                                          uint8_t * ssid, uint8_t * credentials,
-                                                                                          uint64_t breadcrumb, uint32_t timeoutMs);
+chip::System::PacketBufferHandle encodeMediaPlaybackClusterStartOverRequestCommand(uint8_t seqNum,
+                                                                                   chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
- *    Encode a Network Provisioning server discover command into buffer including the APS frame
+ *    Encode an StopRequest command for Media Playback server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeNetworkProvisioningClusterDiscoverAttributes(uint8_t seqNum,
-                                                                                    chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeMediaPlaybackClusterStopRequestCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
- *    Encode a Network Provisioning server read command for the cluster revision attribute into buffer including the APS frame
+ *    Encode a Media Playback server discover command into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeNetworkProvisioningClusterReadClusterRevisionAttribute(uint8_t seqNum,
-                                                                                              chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeMediaPlaybackClusterDiscoverAttributes(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Media Playback server read command for the current state attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeMediaPlaybackClusterReadCurrentStateAttribute(uint8_t seqNum,
+                                                                                     chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Media Playback server read command for the cluster revision attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeMediaPlaybackClusterReadClusterRevisionAttribute(uint8_t seqNum,
+                                                                                        chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
 | Cluster OnOff                                                       | 0x0006 |

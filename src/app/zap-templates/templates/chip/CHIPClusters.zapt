@@ -24,7 +24,7 @@ public:
 
     // Cluster Commands
     {{/first}}
-    CHIP_ERROR {{asCamelCased name false}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback{{#chip_server_cluster_command_arguments}}, {{chipType}} {{asCamelCased label}}{{#if (isByteString type)}}, uint32_t {{asCamelCased label}}Len{{/if}}{{/chip_server_cluster_command_arguments}});
+    CHIP_ERROR {{asCamelCased name false}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback{{#chip_server_cluster_command_arguments}}, {{chipType}} {{asCamelCased label}}{{/chip_server_cluster_command_arguments}});
     {{/chip_server_cluster_commands}}
 
     // Cluster Attributes

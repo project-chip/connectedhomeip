@@ -18,6 +18,7 @@
 #import "OnOffViewController.h"
 #import "CHIPUIViewUtils.h"
 #import "DefaultsUtils.h"
+#import "DeviceSelector.h"
 #import <CHIP/CHIP.h>
 
 NSString * const kCHIPNumLightOnOffCluster = @"OnOffViewController_NumLights";
@@ -29,7 +30,7 @@ NSString * const kCHIPNumLightOnOffCluster = @"OnOffViewController_NumLights";
 @property (nonatomic, strong) UILabel * titleLabel;
 @property (nonatomic, strong) UIStackView * stackView;
 
-@property (readwrite) CHIPDevice * chipDevice;
+@property (nonatomic, strong) DeviceSelector * deviceSelector;
 
 @end
 
@@ -48,13 +49,12 @@ NSString * const kCHIPNumLightOnOffCluster = @"OnOffViewController_NumLights";
     [self.view addGestureRecognizer:tap];
 
     [self setupUIElements];
-
-    self.chipDevice = GetPairedDevice();
 }
 
 - (void)dismissKeyboard
 {
     [_numLightsTextField resignFirstResponder];
+    [_deviceSelector resignFirstResponder];
 }
 
 // MARK: UI Setup
@@ -84,6 +84,17 @@ NSString * const kCHIPNumLightOnOffCluster = @"OnOffViewController_NumLights";
     [stackView.topAnchor constraintEqualToAnchor:_titleLabel.bottomAnchor constant:30].active = YES;
     [stackView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:30].active = YES;
     [stackView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-30].active = YES;
+
+    // Device List and picker
+    _deviceSelector = [DeviceSelector new];
+
+    UILabel * deviceIDLabel = [UILabel new];
+    deviceIDLabel.text = @"Device ID:";
+    UIView * deviceIDView = [CHIPUIViewUtils viewWithLabel:deviceIDLabel textField:_deviceSelector];
+    [stackView addArrangedSubview:deviceIDView];
+
+    deviceIDView.translatesAutoresizingMaskIntoConstraints = false;
+    [deviceIDView.trailingAnchor constraintEqualToAnchor:stackView.trailingAnchor].active = true;
 
     // Num lights to show
     UILabel * numLightsLabel = [UILabel new];
@@ -174,7 +185,6 @@ NSString * const kCHIPNumLightOnOffCluster = @"OnOffViewController_NumLights";
 {
     NSLog(@"%@", [_numLightsOptions objectAtIndex:row]);
     _numLightsTextField.text = [NSString stringWithFormat:@"%@", [_numLightsOptions objectAtIndex:row]];
-    ;
 }
 
 - (NSInteger)pickerView:(UIPickerView *)pickerView numberOfRowsInComponent:(NSInteger)component
@@ -226,11 +236,18 @@ NSString * const kCHIPNumLightOnOffCluster = @"OnOffViewController_NumLights";
     NSInteger endpoint = button.tag;
     [self updateResult:[NSString stringWithFormat:@"On command sent on endpoint %@", @(endpoint)]];
 
-    CHIPOnOff * onOff = [[CHIPOnOff alloc] initWithDevice:self.chipDevice endpoint:endpoint queue:dispatch_get_main_queue()];
-    [onOff on:^(NSError * error, NSDictionary * values) {
-        NSString * resultString
-            = (error != nil) ? [NSString stringWithFormat:@"An error occured: 0x%02lx", error.code] : @"On command success";
-        [self updateResult:resultString];
+    [_deviceSelector forSelectedDevices:^(uint64_t deviceId) {
+        CHIPDevice * chipDevice = CHIPGetPairedDeviceWithID(deviceId);
+        if (chipDevice != nil) {
+            CHIPOnOff * onOff = [[CHIPOnOff alloc] initWithDevice:chipDevice endpoint:endpoint queue:dispatch_get_main_queue()];
+            [onOff on:^(NSError * error, NSDictionary * values) {
+                NSString * resultString
+                    = (error != nil) ? [NSString stringWithFormat:@"An error occured: 0x%02lx", error.code] : @"On command success";
+                [self updateResult:resultString];
+            }];
+        } else {
+            [self updateResult:[NSString stringWithFormat:@"Device not found"]];
+        }
     }];
 }
 
@@ -240,11 +257,18 @@ NSString * const kCHIPNumLightOnOffCluster = @"OnOffViewController_NumLights";
     NSInteger endpoint = button.tag;
     [self updateResult:[NSString stringWithFormat:@"Off command sent on endpoint %@", @(endpoint)]];
 
-    CHIPOnOff * onOff = [[CHIPOnOff alloc] initWithDevice:self.chipDevice endpoint:endpoint queue:dispatch_get_main_queue()];
-    [onOff off:^(NSError * error, NSDictionary * values) {
-        NSString * resultString
-            = (error != nil) ? [NSString stringWithFormat:@"An error occured: 0x%02lx", error.code] : @"Off command success";
-        [self updateResult:resultString];
+    [_deviceSelector forSelectedDevices:^(uint64_t deviceId) {
+        CHIPDevice * chipDevice = CHIPGetPairedDeviceWithID(deviceId);
+        if (chipDevice != nil) {
+            CHIPOnOff * onOff = [[CHIPOnOff alloc] initWithDevice:chipDevice endpoint:endpoint queue:dispatch_get_main_queue()];
+            [onOff off:^(NSError * error, NSDictionary * values) {
+                NSString * resultString = (error != nil) ? [NSString stringWithFormat:@"An error occured: 0x%02lx", error.code]
+                                                         : @"Off command success";
+                [self updateResult:resultString];
+            }];
+        } else {
+            [self updateResult:[NSString stringWithFormat:@"Device not found"]];
+        }
     }];
 }
 
@@ -254,11 +278,18 @@ NSString * const kCHIPNumLightOnOffCluster = @"OnOffViewController_NumLights";
     NSInteger endpoint = button.tag;
     [self updateResult:[NSString stringWithFormat:@"Toggle command sent on endpoint %@", @(endpoint)]];
 
-    CHIPOnOff * onOff = [[CHIPOnOff alloc] initWithDevice:self.chipDevice endpoint:endpoint queue:dispatch_get_main_queue()];
-    [onOff toggle:^(NSError * error, NSDictionary * values) {
-        NSString * resultString
-            = (error != nil) ? [NSString stringWithFormat:@"An error occured: 0x%02lx", error.code] : @"Toggle command success";
-        [self updateResult:resultString];
+    [_deviceSelector forSelectedDevices:^(uint64_t deviceId) {
+        CHIPDevice * chipDevice = CHIPGetPairedDeviceWithID(deviceId);
+        if (chipDevice != nil) {
+            CHIPOnOff * onOff = [[CHIPOnOff alloc] initWithDevice:chipDevice endpoint:endpoint queue:dispatch_get_main_queue()];
+            [onOff toggle:^(NSError * error, NSDictionary * values) {
+                NSString * resultString = (error != nil) ? [NSString stringWithFormat:@"An error occured: 0x%02lx", error.code]
+                                                         : @"Toggle command success";
+                [self updateResult:resultString];
+            }];
+        } else {
+            [self updateResult:[NSString stringWithFormat:@"Device not found"]];
+        }
     }];
 }
 

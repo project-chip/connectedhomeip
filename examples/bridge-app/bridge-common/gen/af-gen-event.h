@@ -63,7 +63,7 @@
 #define EMBER_AF_GENERATED_EVENT_STRINGS "Level Control Cluster Server EP 1",
 
 // The length of the event context table used to track and retrieve cluster events
-#define EMBER_AF_EVENT_CONTEXT_LENGTH 4
+#define EMBER_AF_EVENT_CONTEXT_LENGTH 1
 
 // EmberAfEventContext structs used to populate the EmberAfEventContext table
 #define EMBER_AF_GENERATED_EVENT_CONTEXT                                                                                           \

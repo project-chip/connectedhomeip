@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ EmberAfStatus emberAfDoorLockClusterClientCommandParse(EmberAfClusterCommand * c
 EmberAfStatus emberAfGroupsClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfIdentifyClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfLevelControlClusterClientCommandParse(EmberAfClusterCommand * cmd);
-EmberAfStatus emberAfNetworkProvisioningClusterClientCommandParse(EmberAfClusterCommand * cmd);
+EmberAfStatus emberAfMediaPlaybackClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfOnOffClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfScenesClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfTemperatureMeasurementClusterClientCommandParse(EmberAfClusterCommand * cmd);
@@ -99,8 +99,8 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
             // No commands are enabled for cluster Level Control
             result = status(false, true, cmd->mfgSpecific);
             break;
-        case ZCL_NETWORK_PROVISIONING_CLUSTER_ID:
-            result = emberAfNetworkProvisioningClusterClientCommandParse(cmd);
+        case ZCL_MEDIA_PLAYBACK_CLUSTER_ID:
+            result = emberAfMediaPlaybackClusterClientCommandParse(cmd);
             break;
         case ZCL_ON_OFF_CLUSTER_ID:
             // No commands are enabled for cluster On/off
@@ -783,7 +783,7 @@ EmberAfStatus emberAfIdentifyClusterClientCommandParse(EmberAfClusterCommand * c
     }
     return status(wasHandled, true, cmd->mfgSpecific);
 }
-EmberAfStatus emberAfNetworkProvisioningClusterClientCommandParse(EmberAfClusterCommand * cmd)
+EmberAfStatus emberAfMediaPlaybackClusterClientCommandParse(EmberAfClusterCommand * cmd)
 {
     bool wasHandled = false;
 
@@ -791,170 +791,8 @@ EmberAfStatus emberAfNetworkProvisioningClusterClientCommandParse(EmberAfCluster
     {
         switch (cmd->commandId)
         {
-        case ZCL_ADD_THREAD_NETWORK_RESPONSE_COMMAND_ID: {
-            uint16_t payloadOffset = cmd->payloadStartIndex;
-            uint8_t errorCode;
-            uint8_t * debugText;
-
-            if (cmd->bufLen < payloadOffset + 1)
-            {
-                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-            }
-            errorCode     = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-            payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
-            if (cmd->bufLen < payloadOffset + 1u)
-            {
-                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-            }
-            debugText = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
-
-            wasHandled = emberAfNetworkProvisioningClusterAddThreadNetworkResponseCallback(errorCode, debugText);
-            break;
-        }
-        case ZCL_ADD_WI_FI_NETWORK_RESPONSE_COMMAND_ID: {
-            uint16_t payloadOffset = cmd->payloadStartIndex;
-            uint8_t errorCode;
-            uint8_t * debugText;
-
-            if (cmd->bufLen < payloadOffset + 1)
-            {
-                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-            }
-            errorCode     = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-            payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
-            if (cmd->bufLen < payloadOffset + 1u)
-            {
-                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-            }
-            debugText = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
-
-            wasHandled = emberAfNetworkProvisioningClusterAddWiFiNetworkResponseCallback(errorCode, debugText);
-            break;
-        }
-        case ZCL_DISABLE_NETWORK_RESPONSE_COMMAND_ID: {
-            uint16_t payloadOffset = cmd->payloadStartIndex;
-            uint8_t errorCode;
-            uint8_t * debugText;
-
-            if (cmd->bufLen < payloadOffset + 1)
-            {
-                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-            }
-            errorCode     = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-            payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
-            if (cmd->bufLen < payloadOffset + 1u)
-            {
-                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-            }
-            debugText = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
-
-            wasHandled = emberAfNetworkProvisioningClusterDisableNetworkResponseCallback(errorCode, debugText);
-            break;
-        }
-        case ZCL_ENABLE_NETWORK_RESPONSE_COMMAND_ID: {
-            uint16_t payloadOffset = cmd->payloadStartIndex;
-            uint8_t errorCode;
-            uint8_t * debugText;
-
-            if (cmd->bufLen < payloadOffset + 1)
-            {
-                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-            }
-            errorCode     = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-            payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
-            if (cmd->bufLen < payloadOffset + 1u)
-            {
-                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-            }
-            debugText = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
-
-            wasHandled = emberAfNetworkProvisioningClusterEnableNetworkResponseCallback(errorCode, debugText);
-            break;
-        }
-        case ZCL_REMOVE_NETWORK_RESPONSE_COMMAND_ID: {
-            uint16_t payloadOffset = cmd->payloadStartIndex;
-            uint8_t errorCode;
-            uint8_t * debugText;
-
-            if (cmd->bufLen < payloadOffset + 1)
-            {
-                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-            }
-            errorCode     = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-            payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
-            if (cmd->bufLen < payloadOffset + 1u)
-            {
-                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-            }
-            debugText = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
-
-            wasHandled = emberAfNetworkProvisioningClusterRemoveNetworkResponseCallback(errorCode, debugText);
-            break;
-        }
-        case ZCL_SCAN_NETWORKS_RESPONSE_COMMAND_ID: {
-            uint16_t payloadOffset = cmd->payloadStartIndex;
-            uint8_t errorCode;
-            uint8_t * debugText;
-            /* TYPE WARNING: array array defaults to */ uint8_t * wifiScanResults;
-            /* TYPE WARNING: array array defaults to */ uint8_t * threadScanResults;
-
-            if (cmd->bufLen < payloadOffset + 1)
-            {
-                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-            }
-            errorCode     = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-            payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
-            if (cmd->bufLen < payloadOffset + 1u)
-            {
-                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-            }
-            debugText         = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
-            payloadOffset     = static_cast<uint16_t>(payloadOffset + emberAfStringLength(debugText) + 1u);
-            wifiScanResults   = cmd->buffer + payloadOffset;
-            threadScanResults = cmd->buffer + payloadOffset;
-
-            wasHandled = emberAfNetworkProvisioningClusterScanNetworksResponseCallback(errorCode, debugText, wifiScanResults,
-                                                                                       threadScanResults);
-            break;
-        }
-        case ZCL_UPDATE_THREAD_NETWORK_RESPONSE_COMMAND_ID: {
-            uint16_t payloadOffset = cmd->payloadStartIndex;
-            uint8_t errorCode;
-            uint8_t * debugText;
-
-            if (cmd->bufLen < payloadOffset + 1)
-            {
-                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-            }
-            errorCode     = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-            payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
-            if (cmd->bufLen < payloadOffset + 1u)
-            {
-                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-            }
-            debugText = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
-
-            wasHandled = emberAfNetworkProvisioningClusterUpdateThreadNetworkResponseCallback(errorCode, debugText);
-            break;
-        }
-        case ZCL_UPDATE_WI_FI_NETWORK_RESPONSE_COMMAND_ID: {
-            uint16_t payloadOffset = cmd->payloadStartIndex;
-            uint8_t errorCode;
-            uint8_t * debugText;
-
-            if (cmd->bufLen < payloadOffset + 1)
-            {
-                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-            }
-            errorCode     = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-            payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
-            if (cmd->bufLen < payloadOffset + 1u)
-            {
-                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-            }
-            debugText = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
-
-            wasHandled = emberAfNetworkProvisioningClusterUpdateWiFiNetworkResponseCallback(errorCode, debugText);
+        case ZCL_PLAYBACK_COMMAND_ID: {
+            wasHandled = emberAfMediaPlaybackClusterPlaybackCallback();
             break;
         }
         default: {

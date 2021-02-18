@@ -26,9 +26,11 @@ set -x
 env
 
 if [ -z "$3" ]; then
-    gn gen --check --fail-on-unused-args --root="$1" --args="efr32_sdk_root=\"$EFR32_SDK_ROOT\"" "$2"/"$EFR32_BOARD"/
+    gn gen --check --fail-on-unused-args --root="$1" "$2"/"$EFR32_BOARD"/
     ninja -v -C "$2"/"$EFR32_BOARD"/
+    arm-none-eabi-size -A "$2"/"$EFR32_BOARD"/*.out
 else
-    gn gen --check --fail-on-unused-args --root="$1" --args="efr32_sdk_root=\"$EFR32_SDK_ROOT\" efr32_board=\"$3\"" "$2/$3"
+    gn gen --check --fail-on-unused-args --root="$1" --args="efr32_board=\"$3\"" "$2/$3"
     ninja -v -C "$2/$3"
+    arm-none-eabi-size -A "$2"/"$3"/*.out
 fi

@@ -196,8 +196,7 @@
 #define EMBER_AF_GENERATED_COMMAND_COUNT (122)
 #define GENERATED_COMMANDS                                                                                                         \
     {                                                                                                                              \
-        { 0x0000, 0x00,                                                                                                            \
-          ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT) }, /* Basic (client): MfgSpecificPing */           \
+        { 0x0000, 0x00, ZAP_COMMAND_MASK(OUTGOING_CLIENT) }, /* Basic (client): MfgSpecificPing */                                 \
             {                                                                                                                      \
                 0x0000, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
             },                                                   /* Basic (client): ResetToFactoryDefaults */                      \
@@ -428,7 +427,7 @@
 #define GENERATED_COMMAND_MANUFACTURER_CODE_COUNT (1)
 #define GENERATED_COMMAND_MANUFACTURER_CODES                                                                                       \
     {                                                                                                                              \
-        { 0, 0x1002 },                                                                                                             \
+        { 0, 4098 },                                                                                                               \
     }
 
 // This is an array of EmberAfManufacturerCodeEntry structures for clusters.

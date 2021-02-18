@@ -186,7 +186,21 @@ limitations under the License.
       </include>
       <include cluster="Temperature Measurement" client="false" server="true" clientLocked="true" serverLocked="true">
       </include>
-      <include cluster="Network Provisioning" client="true" server="true" clientLocked="true" serverLocked="true">
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>Bridge Device</name>
+    <domain>CHIP</domain>
+    <typeName>CHIP Bridge Device</typeName>
+    <zigbeeType>Router</zigbeeType>
+    <profileId editable="false">0xabcd</profileId>
+    <deviceId editable="false">0x0a0b</deviceId>
+    <clusters lockOthers="true">
+      <include cluster="Basic" client="false" server="true" clientLocked="true" serverLocked="true">
+        <requireAttribute>VERSION</requireAttribute>
+        <requireAttribute>POWER_SOURCE</requireAttribute>
+        <requireCommand>ResetToFactoryDefaults</requireCommand>
+        <requireCommand>MfgSpecificPing</requireCommand>
       </include>
     </clusters>
   </deviceType>

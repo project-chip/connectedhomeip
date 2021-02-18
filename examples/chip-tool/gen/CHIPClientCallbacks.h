@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -74,17 +74,7 @@ typedef void (*GroupsClusterGetGroupMembershipResponseCallback)(void * context, 
 typedef void (*GroupsClusterRemoveGroupResponseCallback)(void * context, uint16_t groupId);
 typedef void (*GroupsClusterViewGroupResponseCallback)(void * context, uint16_t groupId, uint8_t * groupName);
 typedef void (*IdentifyClusterIdentifyQueryResponseCallback)(void * context, uint16_t timeout);
-typedef void (*NetworkProvisioningClusterAddThreadNetworkResponseCallback)(void * context, uint8_t errorCode, uint8_t * debugText);
-typedef void (*NetworkProvisioningClusterAddWiFiNetworkResponseCallback)(void * context, uint8_t errorCode, uint8_t * debugText);
-typedef void (*NetworkProvisioningClusterDisableNetworkResponseCallback)(void * context, uint8_t errorCode, uint8_t * debugText);
-typedef void (*NetworkProvisioningClusterEnableNetworkResponseCallback)(void * context, uint8_t errorCode, uint8_t * debugText);
-typedef void (*NetworkProvisioningClusterRemoveNetworkResponseCallback)(void * context, uint8_t errorCode, uint8_t * debugText);
-typedef void (*NetworkProvisioningClusterScanNetworksResponseCallback)(
-    void * context, uint8_t errorCode, uint8_t * debugText, /* TYPE WARNING: array array defaults to */ uint8_t * wifiScanResults,
-    /* TYPE WARNING: array array defaults to */ uint8_t * threadScanResults);
-typedef void (*NetworkProvisioningClusterUpdateThreadNetworkResponseCallback)(void * context, uint8_t errorCode,
-                                                                              uint8_t * debugText);
-typedef void (*NetworkProvisioningClusterUpdateWiFiNetworkResponseCallback)(void * context, uint8_t errorCode, uint8_t * debugText);
+typedef void (*MediaPlaybackClusterPlaybackCallback)(void * context);
 typedef void (*ScenesClusterAddSceneResponseCallback)(void * context, uint16_t groupId, uint8_t sceneId);
 typedef void (*ScenesClusterGetSceneMembershipResponseCallback)(void * context, uint8_t capacity, uint16_t groupId,
                                                                 uint8_t sceneCount,

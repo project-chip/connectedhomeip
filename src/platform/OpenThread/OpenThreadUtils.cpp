@@ -121,7 +121,7 @@ void LogOpenThreadStateChange(otInstance * otInst, uint32_t flags)
             chip::Inet::IPAddress meshPrefix;
             memset(meshPrefix.Addr, 0, sizeof(meshPrefix.Addr));
             memcpy(meshPrefix.Addr, otMeshPrefix->m8, sizeof(otMeshPrefix->m8));
-            meshPrefix.ToString(strBuf, sizeof(strBuf));
+            meshPrefix.ToString(strBuf);
             ChipLogDetail(DeviceLayer, "   Mesh Prefix: %s/64", strBuf);
         }
 #if CHIP_CONFIG_SECURITY_TEST_MODE
@@ -145,7 +145,7 @@ void LogOpenThreadStateChange(otInstance * otInst, uint32_t flags)
             chip::Inet::IPAddress ipAddr;
             memcpy(ipAddr.Addr, addr->mAddress.mFields.m32, sizeof(ipAddr.Addr));
 
-            ipAddr.ToString(strBuf, sizeof(strBuf));
+            ipAddr.ToString(strBuf);
 
             ChipLogDetail(DeviceLayer, "        %s/%d%s%s%s", strBuf, addr->mPrefixLength, addr->mValid ? " valid" : "",
                           addr->mPreferred ? " preferred" : "", addr->mRloc ? " rloc" : "");
@@ -187,10 +187,10 @@ void LogOpenThreadPacket(const char * titleStr, otMessage * pkt)
         otMessageRead(pkt, 0, headerData, sizeof(headerData));
 
         memcpy(addr.Addr, IPv6_SrcAddr, 16);
-        addr.ToString(srcStr, sizeof(srcStr));
+        addr.ToString(srcStr);
 
         memcpy(addr.Addr, IPv6_DestAddr, 16);
-        addr.ToString(destStr, sizeof(destStr));
+        addr.ToString(destStr);
 
         if (IPv6_NextHeader == kIPProto_UDP)
         {

@@ -274,6 +274,367 @@ private:
     bool mKeepAlive;
 };
 
+@interface CHIPBasic ()
+
+@property (readonly) Controller::BasicCluster cppCluster;
+@property (readonly, nonatomic) dispatch_queue_t callbackQueue;
+@end
+
+@implementation CHIPBasic
+
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(EndpointId)endpoint queue:(dispatch_queue_t)queue
+{
+    CHIP_ERROR err = _cppCluster.Associate([device internalDevice], endpoint);
+
+    if (err != CHIP_NO_ERROR) {
+        return nil;
+    }
+
+    if (self = [super init]) {
+        _callbackQueue = queue;
+    }
+
+    return self;
+}
+
+- (BOOL)resetToFactoryDefaults:(ResponseHandler)completionHandler
+{
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
+    if (!onSuccess) {
+        return NO;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    if (!onFailure) {
+        delete onSuccess;
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.ResetToFactoryDefaults(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        return NO;
+    }
+    return YES;
+}
+
+- (BOOL)readAttributeZclVersion:(ResponseHandler)completionHandler
+{
+    CHIPInt8uAttributeCallbackBridge * onSuccess = new CHIPInt8uAttributeCallbackBridge(completionHandler, _callbackQueue);
+    if (!onSuccess) {
+        return NO;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    if (!onFailure) {
+        delete onSuccess;
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.ReadAttributeZclVersion(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        return NO;
+    }
+    return YES;
+}
+
+- (BOOL)readAttributeApplicationVersion:(ResponseHandler)completionHandler
+{
+    CHIPInt8uAttributeCallbackBridge * onSuccess = new CHIPInt8uAttributeCallbackBridge(completionHandler, _callbackQueue);
+    if (!onSuccess) {
+        return NO;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    if (!onFailure) {
+        delete onSuccess;
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.ReadAttributeApplicationVersion(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        return NO;
+    }
+    return YES;
+}
+
+- (BOOL)readAttributeStackVersion:(ResponseHandler)completionHandler
+{
+    CHIPInt8uAttributeCallbackBridge * onSuccess = new CHIPInt8uAttributeCallbackBridge(completionHandler, _callbackQueue);
+    if (!onSuccess) {
+        return NO;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    if (!onFailure) {
+        delete onSuccess;
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.ReadAttributeStackVersion(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        return NO;
+    }
+    return YES;
+}
+
+- (BOOL)readAttributeHardwareVersion:(ResponseHandler)completionHandler
+{
+    CHIPInt8uAttributeCallbackBridge * onSuccess = new CHIPInt8uAttributeCallbackBridge(completionHandler, _callbackQueue);
+    if (!onSuccess) {
+        return NO;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    if (!onFailure) {
+        delete onSuccess;
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.ReadAttributeHardwareVersion(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        return NO;
+    }
+    return YES;
+}
+
+- (BOOL)readAttributeManufacturerName:(ResponseHandler)completionHandler
+{
+    CHIPUnsupportedAttributeCallbackBridge * onSuccess
+        = new CHIPUnsupportedAttributeCallbackBridge(completionHandler, _callbackQueue);
+    if (!onSuccess) {
+        return NO;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    if (!onFailure) {
+        delete onSuccess;
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.ReadAttributeManufacturerName(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        return NO;
+    }
+    return YES;
+}
+
+- (BOOL)readAttributeModelIdentifier:(ResponseHandler)completionHandler
+{
+    CHIPUnsupportedAttributeCallbackBridge * onSuccess
+        = new CHIPUnsupportedAttributeCallbackBridge(completionHandler, _callbackQueue);
+    if (!onSuccess) {
+        return NO;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    if (!onFailure) {
+        delete onSuccess;
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.ReadAttributeModelIdentifier(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        return NO;
+    }
+    return YES;
+}
+
+- (BOOL)readAttributeDateCode:(ResponseHandler)completionHandler
+{
+    CHIPUnsupportedAttributeCallbackBridge * onSuccess
+        = new CHIPUnsupportedAttributeCallbackBridge(completionHandler, _callbackQueue);
+    if (!onSuccess) {
+        return NO;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    if (!onFailure) {
+        delete onSuccess;
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.ReadAttributeDateCode(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        return NO;
+    }
+    return YES;
+}
+
+- (BOOL)readAttributePowerSource:(ResponseHandler)completionHandler
+{
+    CHIPInt8uAttributeCallbackBridge * onSuccess = new CHIPInt8uAttributeCallbackBridge(completionHandler, _callbackQueue);
+    if (!onSuccess) {
+        return NO;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    if (!onFailure) {
+        delete onSuccess;
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.ReadAttributePowerSource(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        return NO;
+    }
+    return YES;
+}
+
+- (BOOL)readAttributeGenericDeviceClass:(ResponseHandler)completionHandler
+{
+    CHIPInt8uAttributeCallbackBridge * onSuccess = new CHIPInt8uAttributeCallbackBridge(completionHandler, _callbackQueue);
+    if (!onSuccess) {
+        return NO;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    if (!onFailure) {
+        delete onSuccess;
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.ReadAttributeGenericDeviceClass(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        return NO;
+    }
+    return YES;
+}
+
+- (BOOL)readAttributeGenericDeviceType:(ResponseHandler)completionHandler
+{
+    CHIPInt8uAttributeCallbackBridge * onSuccess = new CHIPInt8uAttributeCallbackBridge(completionHandler, _callbackQueue);
+    if (!onSuccess) {
+        return NO;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    if (!onFailure) {
+        delete onSuccess;
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.ReadAttributeGenericDeviceType(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        return NO;
+    }
+    return YES;
+}
+
+- (BOOL)readAttributeProductCode:(ResponseHandler)completionHandler
+{
+    CHIPUnsupportedAttributeCallbackBridge * onSuccess
+        = new CHIPUnsupportedAttributeCallbackBridge(completionHandler, _callbackQueue);
+    if (!onSuccess) {
+        return NO;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    if (!onFailure) {
+        delete onSuccess;
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.ReadAttributeProductCode(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        return NO;
+    }
+    return YES;
+}
+
+- (BOOL)readAttributeProductUrl:(ResponseHandler)completionHandler
+{
+    CHIPUnsupportedAttributeCallbackBridge * onSuccess
+        = new CHIPUnsupportedAttributeCallbackBridge(completionHandler, _callbackQueue);
+    if (!onSuccess) {
+        return NO;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    if (!onFailure) {
+        delete onSuccess;
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.ReadAttributeProductUrl(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        return NO;
+    }
+    return YES;
+}
+
+- (BOOL)readAttributeSwBuildId:(ResponseHandler)completionHandler
+{
+    CHIPUnsupportedAttributeCallbackBridge * onSuccess
+        = new CHIPUnsupportedAttributeCallbackBridge(completionHandler, _callbackQueue);
+    if (!onSuccess) {
+        return NO;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    if (!onFailure) {
+        delete onSuccess;
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.ReadAttributeSwBuildId(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        return NO;
+    }
+    return YES;
+}
+
+- (BOOL)readAttributeClusterRevision:(ResponseHandler)completionHandler
+{
+    CHIPInt16uAttributeCallbackBridge * onSuccess = new CHIPInt16uAttributeCallbackBridge(completionHandler, _callbackQueue);
+    if (!onSuccess) {
+        return NO;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    if (!onFailure) {
+        delete onSuccess;
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.ReadAttributeClusterRevision(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        return NO;
+    }
+    return YES;
+}
+
+@end
+
 @interface CHIPLevelControl ()
 
 @property (readonly) Controller::LevelControlCluster cppCluster;

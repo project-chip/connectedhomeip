@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ constexpr ClusterId kGroupsClusterId                 = 0x0004;
 constexpr ClusterId kIasZoneClusterId                = 0x0500;
 constexpr ClusterId kIdentifyClusterId               = 0x0003;
 constexpr ClusterId kLevelControlClusterId           = 0x0008;
-constexpr ClusterId kNetworkProvisioningClusterId    = 0xAAAA;
+constexpr ClusterId kMediaPlaybackClusterId          = 0xF001;
 constexpr ClusterId kOnOffClusterId                  = 0x0006;
 constexpr ClusterId kScenesClusterId                 = 0x0005;
 constexpr ClusterId kTemperatureMeasurementClusterId = 0x0402;
@@ -462,50 +462,40 @@ private:
     static constexpr CommandId kStopWithOnOffCommandId        = 0x07;
 };
 
-class DLL_EXPORT NetworkProvisioningCluster : public ClusterBase
+class DLL_EXPORT MediaPlaybackCluster : public ClusterBase
 {
 public:
-    NetworkProvisioningCluster() : ClusterBase(kNetworkProvisioningClusterId) {}
-    ~NetworkProvisioningCluster() {}
+    MediaPlaybackCluster() : ClusterBase(kMediaPlaybackClusterId) {}
+    ~MediaPlaybackCluster() {}
 
     // Cluster Commands
-    CHIP_ERROR AddThreadNetwork(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                uint8_t * operationalDataset, uint32_t operationalDatasetLen, uint64_t breadcrumb,
-                                uint32_t timeoutMs);
-    CHIP_ERROR AddWiFiNetwork(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t * ssid,
-                              uint32_t ssidLen, uint8_t * credentials, uint32_t credentialsLen, uint64_t breadcrumb,
-                              uint32_t timeoutMs);
-    CHIP_ERROR DisableNetwork(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                              uint8_t * networkID, uint32_t networkIDLen, uint64_t breadcrumb, uint32_t timeoutMs);
-    CHIP_ERROR EnableNetwork(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                             uint8_t * networkID, uint32_t networkIDLen, uint64_t breadcrumb, uint32_t timeoutMs);
-    CHIP_ERROR GetLastNetworkProvisioningResult(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                                uint32_t timeoutMs);
-    CHIP_ERROR RemoveNetwork(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                             uint8_t * networkID, uint32_t networkIDLen, uint64_t breadcrumb, uint32_t timeoutMs);
-    CHIP_ERROR ScanNetworks(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t * ssid,
-                            uint32_t ssidLen, uint64_t breadcrumb, uint32_t timeoutMs);
-    CHIP_ERROR UpdateThreadNetwork(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                   uint8_t * operationalDataset, uint32_t operationalDatasetLen, uint64_t breadcrumb,
-                                   uint32_t timeoutMs);
-    CHIP_ERROR UpdateWiFiNetwork(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t * ssid,
-                                 uint32_t ssidLen, uint8_t * credentials, uint32_t credentialsLen, uint64_t breadcrumb,
-                                 uint32_t timeoutMs);
+    CHIP_ERROR FastForwardRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR NextRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR PauseRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR PlayRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR PreviousRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR RewindRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR SkipBackwardRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR SkipForwardRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR StartOverRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR StopRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 
     // Cluster Attributes
     CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeCurrentState(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 
 private:
-    static constexpr CommandId kAddThreadNetworkCommandId                 = 0x06;
-    static constexpr CommandId kAddWiFiNetworkCommandId                   = 0x02;
-    static constexpr CommandId kDisableNetworkCommandId                   = 0x0E;
-    static constexpr CommandId kEnableNetworkCommandId                    = 0x0C;
-    static constexpr CommandId kGetLastNetworkProvisioningResultCommandId = 0x10;
-    static constexpr CommandId kRemoveNetworkCommandId                    = 0x0A;
-    static constexpr CommandId kScanNetworksCommandId                     = 0x00;
-    static constexpr CommandId kUpdateThreadNetworkCommandId              = 0x08;
-    static constexpr CommandId kUpdateWiFiNetworkCommandId                = 0x04;
+    static constexpr CommandId kFastForwardRequestCommandId  = 0x07;
+    static constexpr CommandId kNextRequestCommandId         = 0x05;
+    static constexpr CommandId kPauseRequestCommandId        = 0x01;
+    static constexpr CommandId kPlayRequestCommandId         = 0x00;
+    static constexpr CommandId kPreviousRequestCommandId     = 0x04;
+    static constexpr CommandId kRewindRequestCommandId       = 0x06;
+    static constexpr CommandId kSkipBackwardRequestCommandId = 0x09;
+    static constexpr CommandId kSkipForwardRequestCommandId  = 0x08;
+    static constexpr CommandId kStartOverRequestCommandId    = 0x03;
+    static constexpr CommandId kStopRequestCommandId         = 0x02;
 };
 
 class DLL_EXPORT OnOffCluster : public ClusterBase

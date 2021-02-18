@@ -24,6 +24,7 @@
 
 #pragma once
 
+#include <protocols/Protocols.h>
 #include <support/BitFlags.h>
 #include <support/BufferWriter.h>
 #include <support/CodeUtils.h>
@@ -31,17 +32,17 @@
 namespace chip {
 namespace bdx {
 
-enum MessageType : uint8_t
+enum class MessageType : uint8_t
 {
-    kBdxMsg_SendInit      = 0x01,
-    kBdxMsg_SendAccept    = 0x02,
-    kBdxMsg_ReceiveInit   = 0x04,
-    kBdxMsg_ReceiveAccept = 0x05,
-    kBdxMsg_BlockQuery    = 0x10,
-    kBdxMsg_Block         = 0x11,
-    kBdxMsg_BlockEOF      = 0x12,
-    kBdxMsg_BlockAck      = 0x13,
-    kBdxMsg_BlockAckEOF   = 0x14,
+    SendInit      = 0x01,
+    SendAccept    = 0x02,
+    ReceiveInit   = 0x04,
+    ReceiveAccept = 0x05,
+    BlockQuery    = 0x10,
+    Block         = 0x11,
+    BlockEOF      = 0x12,
+    BlockAck      = 0x13,
+    BlockAckEOF   = 0x14,
 };
 
 enum StatusCode : uint16_t
@@ -280,4 +281,13 @@ using Block    = DataBlock;
 using BlockEOF = DataBlock;
 
 } // namespace bdx
+
+namespace Protocols {
+template <>
+struct MessageTypeTraits<bdx::MessageType>
+{
+    static constexpr uint16_t ProtocolId = chip::Protocols::kProtocol_BDX;
+};
+} // namespace Protocols
+
 } // namespace chip

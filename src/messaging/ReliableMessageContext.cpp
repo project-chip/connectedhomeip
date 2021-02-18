@@ -65,128 +65,56 @@ void ReliableMessageContext::Release()
     mExchange->Release();
 }
 
-/**
- * Returns whether an acknowledgment will be requested whenever a message is sent.
- */
 bool ReliableMessageContext::AutoRequestAck() const
 {
     return mFlags.Has(Flags::kFlagAutoRequestAck);
 }
 
-/**
- *  Determine whether there is already an acknowledgment pending to be sent
- *  to the peer on this exchange.
- *
- */
 bool ReliableMessageContext::IsAckPending() const
 {
     return mFlags.Has(Flags::kFlagAckPending);
 }
 
-/**
- *  Determine whether peer requested acknowledgment for at least one message
- *  on this exchange.
- *
- *  @return Returns 'true' if acknowledgment requested, else 'false'.
- */
 bool ReliableMessageContext::HasPeerRequestedAck() const
 {
     return mFlags.Has(Flags::kFlagPeerRequestedAck);
 }
 
-/**
- *  Determine whether at least one message has been received
- *  on this exchange from peer.
- *
- *  @return Returns 'true' if message received, else 'false'.
- */
 bool ReliableMessageContext::HasRcvdMsgFromPeer() const
 {
     return mFlags.Has(Flags::kFlagMsgRcvdFromPeer);
 }
 
-/**
- * Set whether an acknowledgment should be requested whenever a message is sent.
- *
- * @param[in] autoReqAck            A Boolean indicating whether or not an
- *                                  acknowledgment should be requested whenever a
- *                                  message is sent.
- */
 void ReliableMessageContext::SetAutoRequestAck(bool autoReqAck)
 {
     mFlags.Set(Flags::kFlagAutoRequestAck, autoReqAck);
 }
 
-/**
- *  Set if a message has been received from the peer
- *  on this exchange.
- *
- *  @param[in]  inMsgRcvdFromPeer  A Boolean indicating whether (true) or not
- *                                 (false) a message has been received
- *                                 from the peer on this exchange context.
- *
- */
 void ReliableMessageContext::SetMsgRcvdFromPeer(bool inMsgRcvdFromPeer)
 {
     mFlags.Set(Flags::kFlagMsgRcvdFromPeer, inMsgRcvdFromPeer);
 }
 
-/**
- *  Set if an acknowledgment needs to be sent back to the peer on this exchange.
- *
- *  @param[in]  inAckPending A Boolean indicating whether (true) or not
- *                          (false) an acknowledgment should be sent back
- *                          in response to a received message.
- *
- */
 void ReliableMessageContext::SetAckPending(bool inAckPending)
 {
     mFlags.Set(Flags::kFlagAckPending, inAckPending);
 }
 
-/**
- *  Set if an acknowledgment was requested in the last message received
- *  on this exchange.
- *
- *  @param[in]  inPeerRequestedAck A Boolean indicating whether (true) or not
- *                                 (false) an acknowledgment was requested
- *                                 in the last received message.
- *
- */
 void ReliableMessageContext::SetPeerRequestedAck(bool inPeerRequestedAck)
 {
     mFlags.Set(Flags::kFlagPeerRequestedAck, inPeerRequestedAck);
 }
 
-/**
- *  Set whether the ChipExchangeManager should not send acknowledgements
- *  for this context.
- *
- *  For internal, debug use only.
- *
- *  @param[in]  inDropAckDebug  A Boolean indicating whether (true) or not
- *                         (false) the acknowledgements should be not
- *                         sent for the exchange.
- *
- */
 void ReliableMessageContext::SetDropAckDebug(bool inDropAckDebug)
 {
     mFlags.Set(Flags::kFlagDropAckDebug, inDropAckDebug);
 }
 
-/**
- *  Determine whether the ChipExchangeManager should not send an
- *  acknowledgement.
- *
- *  For internal, debug use only.
- *
- */
 bool ReliableMessageContext::ShouldDropAckDebug() const
 {
     return mFlags.Has(Flags::kFlagDropAckDebug);
 }
 
-// Flush the pending Ack
 CHIP_ERROR ReliableMessageContext::FlushAcks()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -207,13 +135,6 @@ CHIP_ERROR ReliableMessageContext::FlushAcks()
     return err;
 }
 
-/**
- *  Get the current retransmit timeout. It would be either the initial or
- *  the active retransmit timeout based on whether the ExchangeContext has
- *  an active message exchange going with its peer.
- *
- *  @return the current retransmit time.
- */
 uint64_t ReliableMessageContext::GetCurrentRetransmitTimeoutTick()
 {
     return (HasRcvdMsgFromPeer() ? mConfig.mActiveRetransTimeoutTick : mConfig.mInitialRetransTimeoutTick);
@@ -327,24 +248,12 @@ exit:
     return err;
 }
 
-/**
- *  Send a SecureChannel::StandaloneAck message.
- *
- *  @note  When sent via UDP, the null message is sent *without* requesting an acknowledgment,
- *  even in the case where the auto-request acknowledgment feature has been enabled on the
- *  exchange.
- *
- *  @retval  #CHIP_ERROR_NO_MEMORY   If no available PacketBuffers.
- *  @retval  #CHIP_NO_ERROR          If the method succeeded or the error wasn't critical.
- *  @retval  other                    Another critical error returned by SendMessage().
- *
- */
 CHIP_ERROR ReliableMessageContext::SendStandaloneAckMessage()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Allocate a buffer for the null message
-    System::PacketBufferHandle msgBuf = System::PacketBufferHandle::New(0, CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE);
+    System::PacketBufferHandle msgBuf = MessagePacketBuffer::New(0);
     VerifyOrExit(!msgBuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
     // Send the null message

@@ -543,7 +543,7 @@ void HandleTCPConnectionComplete(TCPEndPoint * aEndPoint, INET_ERROR aError)
         lStatus = aEndPoint->GetPeerInfo(&lPeerAddress, &lPeerPort);
         INET_FAIL_ERROR(lStatus, "TCPEndPoint::GetPeerInfo failed");
 
-        lPeerAddress.ToString(lPeerAddressBuffer, sizeof(lPeerAddressBuffer));
+        lPeerAddress.ToString(lPeerAddressBuffer);
 
         printf("TCP connection established to %s:%u\n", lPeerAddressBuffer, lPeerPort);
 
@@ -622,7 +622,7 @@ static void HandleTCPDataReceived(TCPEndPoint * aEndPoint, PacketBufferHandle aB
     lStatus = aEndPoint->GetPeerInfo(&lPeerAddress, &lPeerPort);
     INET_FAIL_ERROR(lStatus, "TCPEndPoint::GetPeerInfo failed");
 
-    lPeerAddress.ToString(lPeerAddressBuffer, sizeof(lPeerAddressBuffer));
+    lPeerAddress.ToString(lPeerAddressBuffer);
 
     printf("TCP message received from %s:%u (%zu bytes)\n", lPeerAddressBuffer, lPeerPort,
            static_cast<size_t>(aBuffer->DataLength()));
@@ -652,7 +652,7 @@ static void HandleTCPConnectionReceived(TCPEndPoint * aListenEndPoint, TCPEndPoi
 {
     char lPeerAddressBuffer[INET6_ADDRSTRLEN];
 
-    aPeerAddress.ToString(lPeerAddressBuffer, sizeof(lPeerAddressBuffer));
+    aPeerAddress.ToString(lPeerAddressBuffer);
 
     printf("TCP connection accepted from %s:%u\n", lPeerAddressBuffer, aPeerPort);
 

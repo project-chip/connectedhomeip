@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -562,7 +562,7 @@ public:
     /**
      * Size of the largest TCP packet that can be received.
      */
-    constexpr static size_t kMaxReceiveMessageSize = System::kMaxPacketBufferSizeWithoutReserve;
+    constexpr static size_t kMaxReceiveMessageSize = System::PacketBuffer::kMaxSizeWithoutReserve;
 
 private:
     static chip::System::ObjectPool<TCPEndPoint, INET_CONFIG_NUM_TCP_ENDPOINTS> sPool;

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -69,7 +69,7 @@ static uint16_t doEncodeApsFrame(BufferWriter & buf, ClusterId clusterId, Endpoi
 
 uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * apsFrame)
 {
-    BufferWriter buf = BufferWriter(buffer, buf_length);
+    BufferWriter buf(buffer, buf_length);
     return doEncodeApsFrame(buf, apsFrame->clusterId, apsFrame->sourceEndpoint, apsFrame->destinationEndpoint, apsFrame->options,
                             apsFrame->groupId, apsFrame->sequence, apsFrame->radius, !buffer);
 }
@@ -77,7 +77,7 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
 #define COMMAND_HEADER(name, clusterId)                                                                                            \
     const char * kName = name;                                                                                                     \
                                                                                                                                    \
-    PacketBufferWriter buf(kMaxBufferSize);                                                                                        \
+    PacketBufferWriter buf(System::PacketBufferHandle::New(kMaxBufferSize));                                                       \
     if (buf.IsNull())                                                                                                              \
     {                                                                                                                              \
         ChipLogError(Zcl, "Could not allocate packet buffer while trying to encode %s command", kName);                            \
@@ -107,8 +107,7 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
 | IasZone                                                             | 0x0500 |
 | Identify                                                            | 0x0003 |
 | LevelControl                                                        | 0x0008 |
-| NetworkProvisioning                                                 | 0xAAAA |
-| NetworkProvisioning                                                 | 0xAAAA |
+| MediaPlayback                                                       | 0xF001 |
 | OnOff                                                               | 0x0006 |
 | Scenes                                                              | 0x0005 |
 | TemperatureMeasurement                                              | 0x0402 |
@@ -217,16 +216,17 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
 #define ZCL_STOP_COMMAND_ID (0x03)
 #define ZCL_STOP_WITH_ON_OFF_COMMAND_ID (0x07)
 
-#define NETWORK_PROVISIONING_CLUSTER_ID 0xAAAA
-#define ZCL_ADD_THREAD_NETWORK_COMMAND_ID (0x06)
-#define ZCL_ADD_WI_FI_NETWORK_COMMAND_ID (0x02)
-#define ZCL_DISABLE_NETWORK_COMMAND_ID (0x0E)
-#define ZCL_ENABLE_NETWORK_COMMAND_ID (0x0C)
-#define ZCL_GET_LAST_NETWORK_PROVISIONING_RESULT_COMMAND_ID (0x10)
-#define ZCL_REMOVE_NETWORK_COMMAND_ID (0x0A)
-#define ZCL_SCAN_NETWORKS_COMMAND_ID (0x00)
-#define ZCL_UPDATE_THREAD_NETWORK_COMMAND_ID (0x08)
-#define ZCL_UPDATE_WI_FI_NETWORK_COMMAND_ID (0x04)
+#define MEDIA_PLAYBACK_CLUSTER_ID 0xF001
+#define ZCL_FAST_FORWARD_REQUEST_COMMAND_ID (0x07)
+#define ZCL_NEXT_REQUEST_COMMAND_ID (0x05)
+#define ZCL_PAUSE_REQUEST_COMMAND_ID (0x01)
+#define ZCL_PLAY_REQUEST_COMMAND_ID (0x00)
+#define ZCL_PREVIOUS_REQUEST_COMMAND_ID (0x04)
+#define ZCL_REWIND_REQUEST_COMMAND_ID (0x06)
+#define ZCL_SKIP_BACKWARD_REQUEST_COMMAND_ID (0x09)
+#define ZCL_SKIP_FORWARD_REQUEST_COMMAND_ID (0x08)
+#define ZCL_START_OVER_REQUEST_COMMAND_ID (0x03)
+#define ZCL_STOP_REQUEST_COMMAND_ID (0x02)
 
 #define ON_OFF_CLUSTER_ID 0x0006
 #define ZCL_OFF_COMMAND_ID (0x00)
@@ -2506,258 +2506,148 @@ PacketBufferHandle encodeLevelControlClusterReadClusterRevisionAttribute(uint8_t
 }
 
 /*----------------------------------------------------------------------------*\
-| Cluster NetworkProvisioning                                         | 0xAAAA |
+| Cluster MediaPlayback                                               | 0xF001 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
-| * AddThreadNetwork                                                  |   0x06 |
-| * AddWiFiNetwork                                                    |   0x02 |
-| * DisableNetwork                                                    |   0x0E |
-| * EnableNetwork                                                     |   0x0C |
-| * GetLastNetworkProvisioningResult                                  |   0x10 |
-| * RemoveNetwork                                                     |   0x0A |
-| * ScanNetworks                                                      |   0x00 |
-| * UpdateThreadNetwork                                               |   0x08 |
-| * UpdateWiFiNetwork                                                 |   0x04 |
+| * FastForwardRequest                                                |   0x07 |
+| * NextRequest                                                       |   0x05 |
+| * PauseRequest                                                      |   0x01 |
+| * PlayRequest                                                       |   0x00 |
+| * PreviousRequest                                                   |   0x04 |
+| * RewindRequest                                                     |   0x06 |
+| * SkipBackwardRequest                                               |   0x09 |
+| * SkipForwardRequest                                                |   0x08 |
+| * StartOverRequest                                                  |   0x03 |
+| * StopRequest                                                       |   0x02 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
+| * CurrentState                                                      | 0x0000 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
 /*
- * Command AddThreadNetwork
+ * Command FastForwardRequest
  */
-PacketBufferHandle encodeNetworkProvisioningClusterAddThreadNetworkCommand(uint8_t seqNum, EndpointId destinationEndpoint,
-                                                                           uint8_t * operationalDataset, uint64_t breadcrumb,
-                                                                           uint32_t timeoutMs)
+PacketBufferHandle encodeMediaPlaybackClusterFastForwardRequestCommand(uint8_t seqNum, EndpointId destinationEndpoint)
 {
-    COMMAND_HEADER("AddThreadNetwork", NETWORK_PROVISIONING_CLUSTER_ID);
-    size_t operationalDatasetStrLen = strlen(reinterpret_cast<char *>(operationalDataset));
-    if (!CanCastTo<uint8_t>(operationalDatasetStrLen))
-    {
-        ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, operationalDatasetStrLen);
-        return PacketBufferHandle();
-    }
-    buf.Put8(kFrameControlClusterSpecificCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_ADD_THREAD_NETWORK_COMMAND_ID)
-        .Put(static_cast<uint8_t>(operationalDatasetStrLen))
-        .Put(reinterpret_cast<char *>(operationalDataset))
-        .Put64(breadcrumb)
-        .Put32(timeoutMs);
+    COMMAND_HEADER("FastForwardRequest", MEDIA_PLAYBACK_CLUSTER_ID);
+    buf.Put8(kFrameControlClusterSpecificCommand).Put8(seqNum).Put8(ZCL_FAST_FORWARD_REQUEST_COMMAND_ID);
     COMMAND_FOOTER();
 }
 
 /*
- * Command AddWiFiNetwork
+ * Command NextRequest
  */
-PacketBufferHandle encodeNetworkProvisioningClusterAddWiFiNetworkCommand(uint8_t seqNum, EndpointId destinationEndpoint,
-                                                                         uint8_t * ssid, uint8_t * credentials, uint64_t breadcrumb,
-                                                                         uint32_t timeoutMs)
+PacketBufferHandle encodeMediaPlaybackClusterNextRequestCommand(uint8_t seqNum, EndpointId destinationEndpoint)
 {
-    COMMAND_HEADER("AddWiFiNetwork", NETWORK_PROVISIONING_CLUSTER_ID);
-    size_t ssidStrLen = strlen(reinterpret_cast<char *>(ssid));
-    if (!CanCastTo<uint8_t>(ssidStrLen))
-    {
-        ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, ssidStrLen);
-        return PacketBufferHandle();
-    }
-    size_t credentialsStrLen = strlen(reinterpret_cast<char *>(credentials));
-    if (!CanCastTo<uint8_t>(credentialsStrLen))
-    {
-        ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, credentialsStrLen);
-        return PacketBufferHandle();
-    }
-    buf.Put8(kFrameControlClusterSpecificCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_ADD_WI_FI_NETWORK_COMMAND_ID)
-        .Put(static_cast<uint8_t>(ssidStrLen))
-        .Put(reinterpret_cast<char *>(ssid))
-        .Put(static_cast<uint8_t>(credentialsStrLen))
-        .Put(reinterpret_cast<char *>(credentials))
-        .Put64(breadcrumb)
-        .Put32(timeoutMs);
+    COMMAND_HEADER("NextRequest", MEDIA_PLAYBACK_CLUSTER_ID);
+    buf.Put8(kFrameControlClusterSpecificCommand).Put8(seqNum).Put8(ZCL_NEXT_REQUEST_COMMAND_ID);
     COMMAND_FOOTER();
 }
 
 /*
- * Command DisableNetwork
+ * Command PauseRequest
  */
-PacketBufferHandle encodeNetworkProvisioningClusterDisableNetworkCommand(uint8_t seqNum, EndpointId destinationEndpoint,
-                                                                         uint8_t * networkID, uint64_t breadcrumb,
-                                                                         uint32_t timeoutMs)
+PacketBufferHandle encodeMediaPlaybackClusterPauseRequestCommand(uint8_t seqNum, EndpointId destinationEndpoint)
 {
-    COMMAND_HEADER("DisableNetwork", NETWORK_PROVISIONING_CLUSTER_ID);
-    size_t networkIDStrLen = strlen(reinterpret_cast<char *>(networkID));
-    if (!CanCastTo<uint8_t>(networkIDStrLen))
-    {
-        ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, networkIDStrLen);
-        return PacketBufferHandle();
-    }
-    buf.Put8(kFrameControlClusterSpecificCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_DISABLE_NETWORK_COMMAND_ID)
-        .Put(static_cast<uint8_t>(networkIDStrLen))
-        .Put(reinterpret_cast<char *>(networkID))
-        .Put64(breadcrumb)
-        .Put32(timeoutMs);
+    COMMAND_HEADER("PauseRequest", MEDIA_PLAYBACK_CLUSTER_ID);
+    buf.Put8(kFrameControlClusterSpecificCommand).Put8(seqNum).Put8(ZCL_PAUSE_REQUEST_COMMAND_ID);
     COMMAND_FOOTER();
 }
 
 /*
- * Command EnableNetwork
+ * Command PlayRequest
  */
-PacketBufferHandle encodeNetworkProvisioningClusterEnableNetworkCommand(uint8_t seqNum, EndpointId destinationEndpoint,
-                                                                        uint8_t * networkID, uint64_t breadcrumb,
-                                                                        uint32_t timeoutMs)
+PacketBufferHandle encodeMediaPlaybackClusterPlayRequestCommand(uint8_t seqNum, EndpointId destinationEndpoint)
 {
-    COMMAND_HEADER("EnableNetwork", NETWORK_PROVISIONING_CLUSTER_ID);
-    size_t networkIDStrLen = strlen(reinterpret_cast<char *>(networkID));
-    if (!CanCastTo<uint8_t>(networkIDStrLen))
-    {
-        ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, networkIDStrLen);
-        return PacketBufferHandle();
-    }
-    buf.Put8(kFrameControlClusterSpecificCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_ENABLE_NETWORK_COMMAND_ID)
-        .Put(static_cast<uint8_t>(networkIDStrLen))
-        .Put(reinterpret_cast<char *>(networkID))
-        .Put64(breadcrumb)
-        .Put32(timeoutMs);
+    COMMAND_HEADER("PlayRequest", MEDIA_PLAYBACK_CLUSTER_ID);
+    buf.Put8(kFrameControlClusterSpecificCommand).Put8(seqNum).Put8(ZCL_PLAY_REQUEST_COMMAND_ID);
     COMMAND_FOOTER();
 }
 
 /*
- * Command GetLastNetworkProvisioningResult
+ * Command PreviousRequest
  */
-PacketBufferHandle encodeNetworkProvisioningClusterGetLastNetworkProvisioningResultCommand(uint8_t seqNum,
-                                                                                           EndpointId destinationEndpoint,
-                                                                                           uint32_t timeoutMs)
+PacketBufferHandle encodeMediaPlaybackClusterPreviousRequestCommand(uint8_t seqNum, EndpointId destinationEndpoint)
 {
-    COMMAND_HEADER("GetLastNetworkProvisioningResult", NETWORK_PROVISIONING_CLUSTER_ID);
-    buf.Put8(kFrameControlClusterSpecificCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_GET_LAST_NETWORK_PROVISIONING_RESULT_COMMAND_ID)
-        .Put32(timeoutMs);
+    COMMAND_HEADER("PreviousRequest", MEDIA_PLAYBACK_CLUSTER_ID);
+    buf.Put8(kFrameControlClusterSpecificCommand).Put8(seqNum).Put8(ZCL_PREVIOUS_REQUEST_COMMAND_ID);
     COMMAND_FOOTER();
 }
 
 /*
- * Command RemoveNetwork
+ * Command RewindRequest
  */
-PacketBufferHandle encodeNetworkProvisioningClusterRemoveNetworkCommand(uint8_t seqNum, EndpointId destinationEndpoint,
-                                                                        uint8_t * networkID, uint64_t breadcrumb,
-                                                                        uint32_t timeoutMs)
+PacketBufferHandle encodeMediaPlaybackClusterRewindRequestCommand(uint8_t seqNum, EndpointId destinationEndpoint)
 {
-    COMMAND_HEADER("RemoveNetwork", NETWORK_PROVISIONING_CLUSTER_ID);
-    size_t networkIDStrLen = strlen(reinterpret_cast<char *>(networkID));
-    if (!CanCastTo<uint8_t>(networkIDStrLen))
-    {
-        ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, networkIDStrLen);
-        return PacketBufferHandle();
-    }
-    buf.Put8(kFrameControlClusterSpecificCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_REMOVE_NETWORK_COMMAND_ID)
-        .Put(static_cast<uint8_t>(networkIDStrLen))
-        .Put(reinterpret_cast<char *>(networkID))
-        .Put64(breadcrumb)
-        .Put32(timeoutMs);
+    COMMAND_HEADER("RewindRequest", MEDIA_PLAYBACK_CLUSTER_ID);
+    buf.Put8(kFrameControlClusterSpecificCommand).Put8(seqNum).Put8(ZCL_REWIND_REQUEST_COMMAND_ID);
     COMMAND_FOOTER();
 }
 
 /*
- * Command ScanNetworks
+ * Command SkipBackwardRequest
  */
-PacketBufferHandle encodeNetworkProvisioningClusterScanNetworksCommand(uint8_t seqNum, EndpointId destinationEndpoint,
-                                                                       uint8_t * ssid, uint64_t breadcrumb, uint32_t timeoutMs)
+PacketBufferHandle encodeMediaPlaybackClusterSkipBackwardRequestCommand(uint8_t seqNum, EndpointId destinationEndpoint)
 {
-    COMMAND_HEADER("ScanNetworks", NETWORK_PROVISIONING_CLUSTER_ID);
-    size_t ssidStrLen = strlen(reinterpret_cast<char *>(ssid));
-    if (!CanCastTo<uint8_t>(ssidStrLen))
-    {
-        ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, ssidStrLen);
-        return PacketBufferHandle();
-    }
-    buf.Put8(kFrameControlClusterSpecificCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_SCAN_NETWORKS_COMMAND_ID)
-        .Put(static_cast<uint8_t>(ssidStrLen))
-        .Put(reinterpret_cast<char *>(ssid))
-        .Put64(breadcrumb)
-        .Put32(timeoutMs);
+    COMMAND_HEADER("SkipBackwardRequest", MEDIA_PLAYBACK_CLUSTER_ID);
+    buf.Put8(kFrameControlClusterSpecificCommand).Put8(seqNum).Put8(ZCL_SKIP_BACKWARD_REQUEST_COMMAND_ID);
     COMMAND_FOOTER();
 }
 
 /*
- * Command UpdateThreadNetwork
+ * Command SkipForwardRequest
  */
-PacketBufferHandle encodeNetworkProvisioningClusterUpdateThreadNetworkCommand(uint8_t seqNum, EndpointId destinationEndpoint,
-                                                                              uint8_t * operationalDataset, uint64_t breadcrumb,
-                                                                              uint32_t timeoutMs)
+PacketBufferHandle encodeMediaPlaybackClusterSkipForwardRequestCommand(uint8_t seqNum, EndpointId destinationEndpoint)
 {
-    COMMAND_HEADER("UpdateThreadNetwork", NETWORK_PROVISIONING_CLUSTER_ID);
-    size_t operationalDatasetStrLen = strlen(reinterpret_cast<char *>(operationalDataset));
-    if (!CanCastTo<uint8_t>(operationalDatasetStrLen))
-    {
-        ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, operationalDatasetStrLen);
-        return PacketBufferHandle();
-    }
-    buf.Put8(kFrameControlClusterSpecificCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_UPDATE_THREAD_NETWORK_COMMAND_ID)
-        .Put(static_cast<uint8_t>(operationalDatasetStrLen))
-        .Put(reinterpret_cast<char *>(operationalDataset))
-        .Put64(breadcrumb)
-        .Put32(timeoutMs);
+    COMMAND_HEADER("SkipForwardRequest", MEDIA_PLAYBACK_CLUSTER_ID);
+    buf.Put8(kFrameControlClusterSpecificCommand).Put8(seqNum).Put8(ZCL_SKIP_FORWARD_REQUEST_COMMAND_ID);
     COMMAND_FOOTER();
 }
 
 /*
- * Command UpdateWiFiNetwork
+ * Command StartOverRequest
  */
-PacketBufferHandle encodeNetworkProvisioningClusterUpdateWiFiNetworkCommand(uint8_t seqNum, EndpointId destinationEndpoint,
-                                                                            uint8_t * ssid, uint8_t * credentials,
-                                                                            uint64_t breadcrumb, uint32_t timeoutMs)
+PacketBufferHandle encodeMediaPlaybackClusterStartOverRequestCommand(uint8_t seqNum, EndpointId destinationEndpoint)
 {
-    COMMAND_HEADER("UpdateWiFiNetwork", NETWORK_PROVISIONING_CLUSTER_ID);
-    size_t ssidStrLen = strlen(reinterpret_cast<char *>(ssid));
-    if (!CanCastTo<uint8_t>(ssidStrLen))
-    {
-        ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, ssidStrLen);
-        return PacketBufferHandle();
-    }
-    size_t credentialsStrLen = strlen(reinterpret_cast<char *>(credentials));
-    if (!CanCastTo<uint8_t>(credentialsStrLen))
-    {
-        ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, credentialsStrLen);
-        return PacketBufferHandle();
-    }
-    buf.Put8(kFrameControlClusterSpecificCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_UPDATE_WI_FI_NETWORK_COMMAND_ID)
-        .Put(static_cast<uint8_t>(ssidStrLen))
-        .Put(reinterpret_cast<char *>(ssid))
-        .Put(static_cast<uint8_t>(credentialsStrLen))
-        .Put(reinterpret_cast<char *>(credentials))
-        .Put64(breadcrumb)
-        .Put32(timeoutMs);
+    COMMAND_HEADER("StartOverRequest", MEDIA_PLAYBACK_CLUSTER_ID);
+    buf.Put8(kFrameControlClusterSpecificCommand).Put8(seqNum).Put8(ZCL_START_OVER_REQUEST_COMMAND_ID);
     COMMAND_FOOTER();
 }
 
-PacketBufferHandle encodeNetworkProvisioningClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
+/*
+ * Command StopRequest
+ */
+PacketBufferHandle encodeMediaPlaybackClusterStopRequestCommand(uint8_t seqNum, EndpointId destinationEndpoint)
 {
-    COMMAND_HEADER("DiscoverNetworkProvisioningAttributes", NETWORK_PROVISIONING_CLUSTER_ID);
+    COMMAND_HEADER("StopRequest", MEDIA_PLAYBACK_CLUSTER_ID);
+    buf.Put8(kFrameControlClusterSpecificCommand).Put8(seqNum).Put8(ZCL_STOP_REQUEST_COMMAND_ID);
+    COMMAND_FOOTER();
+}
+
+PacketBufferHandle encodeMediaPlaybackClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("DiscoverMediaPlaybackAttributes", MEDIA_PLAYBACK_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute CurrentState
+ */
+PacketBufferHandle encodeMediaPlaybackClusterReadCurrentStateAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadMediaPlaybackCurrentState", MEDIA_PLAYBACK_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0000);
     COMMAND_FOOTER();
 }
 
 /*
  * Attribute ClusterRevision
  */
-PacketBufferHandle encodeNetworkProvisioningClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+PacketBufferHandle encodeMediaPlaybackClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
-    COMMAND_HEADER("ReadNetworkProvisioningClusterRevision", NETWORK_PROVISIONING_CLUSTER_ID);
+    COMMAND_HEADER("ReadMediaPlaybackClusterRevision", MEDIA_PLAYBACK_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
     COMMAND_FOOTER();
 }

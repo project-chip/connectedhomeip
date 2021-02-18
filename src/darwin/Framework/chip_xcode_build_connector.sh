@@ -67,9 +67,6 @@ for define in "${defines[@]}"; do
         CHIP_CRYPTO_*)
             continue
             ;;
-        CHIP_LOGGING_STYLE_*)
-            continue
-            ;;
     esac
     target_defines+=,\"${define//\"/\\\"}\"
 done

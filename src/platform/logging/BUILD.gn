@@ -1,0 +1,36 @@
+# See Project CHIP LICENSE file for licensing information.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/pigweed.gni")
+
+import("${chip_root}/src/platform/device.gni")
+
+source_set("headers") {
+  public = [ "LogV.h" ]
+}
+
+if (current_os == "android") {
+  static_library("android") {
+    sources = [ "impl/android/Logging.cpp" ]
+    deps = [
+      ":headers",
+      "${chip_root}/src/lib/core:chip_config_header",
+      "${chip_root}/src/lib/support:logging_constants",
+      "${chip_root}/src/platform:platform_buildconfig",
+    ]
+
+    libs = [ "log" ]
+  }
+}
+
+static_library("stdio") {
+  sources = [ "impl/stdio/Logging.cpp" ]
+
+  deps = [
+    ":headers",
+    "${chip_root}/src/lib/core:chip_config_header",
+    "${chip_root}/src/lib/support:logging_constants",
+    "${chip_root}/src/platform:platform_buildconfig",
+  ]
+}
