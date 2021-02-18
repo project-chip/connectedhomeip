@@ -330,7 +330,9 @@ void SecureSessionMgr::OnMessageReceived(const PacketHeader & packetHeader, cons
         state->SetPeerNodeId(packetHeader.GetSourceNodeId().Value());
     }
 
-    // Update peer address every time it changes
+    // TODO: once mDNS address resolution is available reconsider if this is required
+    // This updates the peer address once a packet is received from a new address
+    // and serves as a way to auto-detect peer changing IPs.
     if (state->GetPeerAddress() != peerAddress)
     {
         state->SetPeerAddress(peerAddress);
