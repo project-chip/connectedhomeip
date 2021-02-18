@@ -26,6 +26,7 @@
 #pragma once
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <platform/internal/testing/ConfigUnitTest.h>
 
 #include <string.h>
 
@@ -42,12 +43,9 @@ namespace Internal {
 class MbedConfig
 {
 public:
-    struct Key;
+    using Key = const char *;
 
-    // Maximum length of an NVS key name, as specified in the ESP-IDF documentation.
-    static constexpr size_t kMaxConfigKeyNameLength = 15;
-
-    // NVS namespaces used to store device configuration information.
+    // NVS prefix used to store device configuration information.
     static const char kConfigNamespace_ChipFactory[];
     static const char kConfigNamespace_ChipConfig[];
     static const char kConfigNamespace_ChipCounters[];
@@ -76,8 +74,6 @@ public:
     static const Key kConfigKey_OperationalDevicePrivateKey;
     static const Key kConfigKey_SetupDiscriminator;
 
-    static const char kGroupKeyNamePrefix[];
-
     // Config value accessors.
     static CHIP_ERROR ReadConfigValue(Key key, bool & val);
     static CHIP_ERROR ReadConfigValue(Key key, uint32_t & val);
@@ -92,26 +88,16 @@ public:
     static CHIP_ERROR WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen);
     static CHIP_ERROR ClearConfigValue(Key key);
     static bool ConfigValueExists(Key key);
+    static CHIP_ERROR FactoryResetConfig();
 
     // NVS Namespace helper functions.
-    static CHIP_ERROR EnsureNamespace(const char * ns);
+    static CHIP_ERROR ConstructCounterKey(Key id, char * buf, size_t bufSize);
+    static CHIP_ERROR ReadCounter(Key counterId, uint32_t & value);
+    static CHIP_ERROR WriteCounter(Key counterId, uint32_t value);
     static CHIP_ERROR ClearNamespace(const char * ns);
 
     static void RunConfigUnitTest(void);
 };
-
-struct MbedConfig::Key
-{
-    const char * Namespace;
-    const char * Name;
-
-    bool operator==(const Key & other) const;
-};
-
-inline bool MbedConfig::Key::operator==(const Key & other) const
-{
-    return strcmp(Namespace, other.Namespace) == 0 && strcmp(Name, other.Name) == 0;
-}
 
 } // namespace Internal
 } // namespace DeviceLayer
