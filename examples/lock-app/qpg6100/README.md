@@ -10,6 +10,8 @@ An example application showing the use
     -   [Building](#building)
     -   [Flashing the application](#flashing-the-application)
     -   [Viewing Logging Output](#viewing-logging-output)
+    -   [Button Control](#button-control)
+    -   [LED output](#led-output)
 
 ---
 
@@ -20,21 +22,6 @@ An example application showing the use
 The QPG6100 Lock shows an implementation of a Door Lock device, based on CHIP
 and the Qorvo QPG6100 SDK. Intention of this example is to demonstrate a CHIP
 device, with Thread connectivity, using BLE to perform CHIP provisioning.
-
-The example will be implemented in a phased approach, enabling more features
-with separate updates.
-
-Current status of implementation:
-
--   Button and LED control
--   Initialization of the CHIP stack.
--   CHIP Logging, PlatformManager and ConfigurationManager enabled.
--   BLE: CHIPoBLE advertisement and connection available for provisioning
--   CHIP ZCL cluster control for the Lock mechanism through CHIP tool.
-
-Pending:
-
--   Thread: Linking QPG6100 OpenThread implementation to CHIP build
 
 For more information on Qorvo and the platforms, please visit
 [the Qorvo website](http://www.qorvo.com) or contact us on
@@ -133,3 +120,33 @@ qvCHIP v0.0.0.0 (CL:155586) running
 -   Note! Logging is currently encapsulated by the Qorvo logging module. Output
     will have additional header and footer bytes. This will be updated later
     into a raw stream for any serial terminal to parse.
+
+## Button control
+
+This application uses following buttons of the DK board:
+
+-   SW2: Used to perform a HW reset button for the full board
+-   SW4: Used to toggle the Unlock/Lock the simulated lock
+-   SW5: Used to perform, depending on the time the button is kept pressed,
+    -   Software update - not yet supported (released before 3s)
+    -   Trigger Thread joining (release after 3s)
+    -   Factory reset (released after 6s)
+
+Unused:
+
+-   SW1
+-   SW3 - slider switch
+
+## LED output
+
+The following LEDs are used during the application:
+
+-   LD1 - RED led: Status LED simulating the lock state
+    -   On - lock closed
+    -   Off - lock open
+    -   Blinking - lock moving to new state
+-   LD2 - GRN led:
+    -   Short blink every 1s: BLE advertising
+    -   Fast blinks: BLE connected and subscribed
+    -   Short off: Thread connected
+    -   On: Full service connectivity
