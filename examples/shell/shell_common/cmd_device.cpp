@@ -38,6 +38,7 @@ using namespace chip::Platform;
 using namespace chip::DeviceLayer;
 using namespace chip::Logging;
 using namespace chip::ArgParser;
+using namespace ::chip::DeviceLayer::Internal;
 
 static chip::Shell::Shell sShellDeviceSubcommands;
 
@@ -817,14 +818,11 @@ int cmd_device_scan(int argc, char ** argv)
     VerifyOrExit(PlatformMgr().TryLockChipStack(), error = CHIP_ERROR_INVALID_ARGUMENT);
 
     streamer_printf(sout, "Scanning WIFI AP  command \r\n");
+
     error = CHIP_ERROR_NOT_CONNECTED;
-
-    NetworkInfo * wifiInfo;
-    wifiInfo = new NetworkInfo[LIMIT_AP];
-
+    NetworkInfo wifiInfo[LIMIT_AP];
     int foundAPs;
     foundAPs = ConnectivityMgrImpl().ScanWiFi(LIMIT_AP, wifiInfo);
-
     if (foundAPs <= 0)
     {
         streamer_printf(sout, "Failed to find any WiFi network \r\n");
@@ -834,11 +832,11 @@ int cmd_device_scan(int argc, char ** argv)
         streamer_printf(sout, "Found  %d  networks \r\n", foundAPs);
         error = CHIP_NO_ERROR;
         for (int i = 0; i < foundAPs; i++)
-            printf("Network: %s secured: %s BSSID: %hhX:%hhX:%hhX:%hhx:%hhx:%hhx RSSI: %hhd Ch: %hhd\n", wifiInfo[i].WiFiSSID,
-                   wifiInfo[i].sec2str(wifiInfo[i].security), wifiInfo[i].BSSID[0], wifiInfo[i].BSSID[1], wifiInfo[i].BSSID[2],
-                   wifiInfo[i].BSSID[3], wifiInfo[i].BSSID[4], wifiInfo[i].BSSID[5], wifiInfo[i].RSSI, wifiInfo[i].channel);
+            streamer_printf(sout, "Network: %s secured: %s BSSID: %hhX:%hhX:%hhX:%hhx:%hhx:%hhx RSSI: %hhd Ch: %hhd\n",
+                            wifiInfo[i].WiFiSSID, wifiInfo[i].sec2str(wifiInfo[i].security), wifiInfo[i].BSSID[0],
+                            wifiInfo[i].BSSID[1], wifiInfo[i].BSSID[2], wifiInfo[i].BSSID[3], wifiInfo[i].BSSID[4],
+                            wifiInfo[i].BSSID[5], wifiInfo[i].RSSI, wifiInfo[i].channel);
     }
-    delete[] wifiInfo;
 exit:
     PlatformMgr().UnlockChipStack();
     return error;
@@ -851,15 +849,14 @@ int cmd_device_status(int argc, char ** argv)
 
     VerifyOrExit(PlatformMgr().TryLockChipStack(), error = CHIP_ERROR_INVALID_ARGUMENT);
     streamer_printf(sout, " WIFI status \r\n");
-    error = CHIP_ERROR_INVALID_ARGUMENT;
-
-    error = ConnectivityMgrImpl().GetWifiStatus();
-
-    if (error != CHIP_NO_ERROR)
-    {
-        streamer_printf(sout, "Failed to connect to WiFi network: %s\r\n", chip::ErrorStr(error));
-    }
-
+    NetworkStatus WifiStatus;
+    ConnectivityMgrImpl().GetWifiStatus(&WifiStatus);
+    streamer_printf(sout, "Connection status: %s\r\n", WifiStatus.Status);
+    streamer_printf(sout, "MAC: %s\r\n", WifiStatus.MAC);
+    streamer_printf(sout, "IP: %s\r\n", WifiStatus.IP);
+    streamer_printf(sout, "Netmask: %s\r\n", WifiStatus.Netmask);
+    streamer_printf(sout, "Gateway: %s\r\n", WifiStatus.Gateway);
+    streamer_printf(sout, "RSSI: %d\r\n", WifiStatus.RSSI);
 exit:
     PlatformMgr().UnlockChipStack();
     return error;
