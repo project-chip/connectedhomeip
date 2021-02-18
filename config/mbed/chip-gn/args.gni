@@ -17,8 +17,9 @@ import("//build_overrides/chip.gni")
 chip_device_platform = "mbed"
 lwip_platform = "mbed"
 
-chip_project_config_include = ""
-chip_system_project_config_include = ""
+chip_project_config_include = "<platform/mbed/CHIPProjectDefaultConfig.h>"
+chip_system_project_config_include = "<platform/mbed/CHIPProjectDefaultConfig.h>"
+chip_device_project_config_include = "<platform/mbed/CHIPProjectDefaultConfig.h>"
 
 custom_toolchain = "//toolchain:mbed"
 mbedtls_target = "//mbedtls:mbedtls"
