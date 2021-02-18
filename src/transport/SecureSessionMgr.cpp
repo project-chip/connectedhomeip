@@ -137,15 +137,15 @@ CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHea
                                          System::PacketBufferHandle msgBuf, EncryptedPacketBufferHandle * bufferRetainSlot,
                                          EncryptionState encryptionState)
 {
-    CHIP_ERROR err              = CHIP_NO_ERROR;
-    PeerConnectionState * state = nullptr;
+    CHIP_ERROR err                      = CHIP_NO_ERROR;
+    PeerConnectionState * state         = nullptr;
     Transport::AdminPairingInfo * admin = nullptr;
-    NodeId localNodeId          = mLocalNodeId;
+    NodeId localNodeId                  = mLocalNodeId;
 
 #if !CHIP_SYSTEM_CONFIG_USE_LWIP1
-    uint8_t * msgStart          = nullptr;
-    uint16_t msgLen             = 0;
-    uint16_t headerSize         = 0;
+    uint8_t * msgStart  = nullptr;
+    uint16_t msgLen     = 0;
+    uint16_t headerSize = 0;
 #endif
 
     // Hold the reference to encrypted message in stack variable.
@@ -189,9 +189,9 @@ CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHea
     if (bufferRetainSlot != nullptr)
     {
 #if CHIP_SYSTEM_CONFIG_USE_LWIP1
-        encryptedMsg        = msgBuf.CloneData(MessagePacketBuffer::kMaxFooterSize);
+        encryptedMsg = msgBuf.CloneData(MessagePacketBuffer::kMaxFooterSize);
 #else
-        encryptedMsg        = msgBuf.Retain();
+        encryptedMsg = msgBuf.Retain();
 #endif
         encryptedMsg.mMsgId = packetHeader.GetMessageId();
     }
