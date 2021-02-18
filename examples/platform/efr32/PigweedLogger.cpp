@@ -46,11 +46,11 @@ constexpr size_t kWriteBufferSize = 128; // Buffer for constructing HDLC frames
 // from different threads are not interwoven.
 SemaphoreHandle_t sLoggerLock;
 
-pw::stream::SysIoWriter sWriter;
-size_t sWriteBufferPos;
-char sWriteBuffer[kWriteBufferSize];
+static pw::stream::SysIoWriter sWriter;
+static size_t sWriteBufferPos;
+static char sWriteBuffer[kWriteBufferSize];
 
-void send(void)
+static void send(void)
 {
     pw::hdlc::WriteUIFrame(kLogHdlcAddress, std::as_bytes(std::span(sWriteBuffer, sWriteBufferPos)), sWriter);
     sWriteBufferPos = 0;

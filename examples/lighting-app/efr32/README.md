@@ -97,15 +97,13 @@ OR use GN/Ninja directly
           $ rm -rf out/
 
 *   Build the example with pigweed RCP use GN/Ninja Directly
-    $ cd ~/connectedhomeip/examples/lighting-app/efr32
-          $ git submodule
-    update --init
-    $ source third_party/connectedhomeip/scripts/activate.sh
-          $ export
-    EFR32_BOARD=BRD4161A
-    $ gn gen out/debug --args='import("//with_pw_rpc.gni")'
-          $ ninja -C
-    out/debug
+
+          $ cd ~/connectedhomeip/examples/lighting-app/efr32
+          $ git submodule update --init
+          $ source third_party/connectedhomeip/scripts/activate.sh
+          $ export EFR32_BOARD=BRD4161A
+          $ gn gen out/debug --args='import("//with_pw_rpc.gni")'
+          $ ninja -C out/debug
 
     [Running Pigweed RPC console](#running-pigweed-rpc-console)
 
