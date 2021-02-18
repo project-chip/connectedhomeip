@@ -168,6 +168,28 @@ else()
     set(CHIP_PROJECT_CONFIG "")
 endif()
 
+if (CONFIG_CHIP_SYSTEM_PROJECT_CONFIG)
+    get_filename_component(CHIP_SYSTEM_PROJECT_CONFIG 
+        ${CONFIG_CHIP_SYSTEM_PROJECT_CONFIG}
+        REALPATH
+        BASE_DIR ${CMAKE_SOURCE_DIR}
+    )
+    set(CHIP_SYSTEM_PROJECT_CONFIG "<${CHIP_SYSTEM_PROJECT_CONFIG}>")
+else()
+    set(CHIP_SYSTEM_PROJECT_CONFIG "")
+endif()
+
+if (CONFIG_CHIP_DEVICE_PROJECT_CONFIG)
+    get_filename_component(CHIP_DEVICE_PROJECT_CONFIG 
+        ${CONFIG_CHIP_DEVICE_PROJECT_CONFIG}
+        REALPATH
+        BASE_DIR ${CMAKE_SOURCE_DIR}
+    )
+    set(CHIP_DEVICE_PROJECT_CONFIG "<${CHIP_DEVICE_PROJECT_CONFIG}>")
+else()
+    set(CHIP_DEVICE_PROJECT_CONFIG "")
+endif()
+
 if (${CMAKE_BUILD_TYPE} STREQUAL "debug")
     set(CONFIG_DEBUG "y")
 endif()
@@ -192,6 +214,18 @@ if (BOARD STREQUAL "native_posix")
     chip_gn_arg_string("target_cpu" "x86")
 elseif (BOARD STREQUAL "native_posix_64")
     chip_gn_arg_string("target_cpu" "x64")
+endif()
+
+if (CHIP_PROJECT_CONFIG)
+    chip_gn_arg_string("chip_project_config_include"  "${CHIP_PROJECT_CONFIG}")
+endif()
+
+if (CHIP_SYSTEM_PROJECT_CONFIG)
+    chip_gn_arg_string("chip_system_project_config_include"  "${CHIP_SYSTEM_PROJECT_CONFIG}")
+endif()
+
+if (CHIP_DEVICE_PROJECT_CONFIG)
+    chip_gn_arg_string("chip_device_project_config_include"  "${CHIP_DEVICE_PROJECT_CONFIG}")
 endif()
 
 file(GENERATE OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/args.gn CONTENT ${CHIP_GN_ARGS})
