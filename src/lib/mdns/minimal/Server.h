@@ -28,6 +28,20 @@
 namespace mdns {
 namespace Minimal {
 
+/// These are addresses that are used for MDNS broadcasts
+struct BroadcastIpAddresses
+{
+    chip::Inet::IPAddress ipv6;
+    chip::Inet::IPAddress ipv4;
+
+    BroadcastIpAddresses()
+    {
+        chip::Inet::IPAddress::FromString("FF02::FB", ipv6);
+        chip::Inet::IPAddress::FromString("224.0.0.251", ipv4);
+    }
+};
+extern const BroadcastIpAddresses kBroadcastIpAddresses;
+
 /// Provides a list of intefaces to listen on.
 ///
 /// When listening on IP, both IP address type (IPv4 or IPv6) and interface id

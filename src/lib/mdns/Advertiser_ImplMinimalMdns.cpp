@@ -220,7 +220,7 @@ private:
     /// allocated memory.
     void Clear();
 
-    /// Advertise availabe records configured within the server
+    /// Advertise available records configured within the server
     ///
     /// Usable as boot-time advertisement of available SRV records.
     void AdvertiseRecords();
@@ -643,18 +643,11 @@ void AdvertiserMinMdns::AdvertiseRecords()
         chip::Inet::IPPacketInfo packetInfo;
 
         packetInfo.Clear();
-        packetInfo.SrcAddress = interfaceAddress.GetAddress();
-        if (interfaceAddress.GetAddress().IsIPv4())
-        {
-            chip::Inet::IPAddress::FromString("224.0.0.251", packetInfo.DestAddress);
-        }
-        else
-        {
-            chip::Inet::IPAddress::FromString("FF02::FB", packetInfo.DestAddress);
-        }
-        packetInfo.SrcPort   = kMdnsPort;
-        packetInfo.DestPort  = kMdnsPort;
-        packetInfo.Interface = interfaceAddress.GetInterfaceId();
+        packetInfo.SrcAddress  = interfaceAddress.GetAddress();
+        packetInfo.DestAddress = interfaceAddress.GetAddress().IsIPv4() ? kBroadcastIpAddresses.ipv4 : kBroadcastIpAddresses.ipv6;
+        packetInfo.SrcPort     = kMdnsPort;
+        packetInfo.DestPort    = kMdnsPort;
+        packetInfo.Interface   = interfaceAddress.GetInterfaceId();
 
         QueryData queryData(QType::PTR, QClass::IN, false /* unicast */);
         queryData.SetIsBootAdvertising(true);

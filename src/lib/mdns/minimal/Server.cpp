@@ -26,20 +26,6 @@ namespace mdns {
 namespace Minimal {
 namespace {
 
-struct BroadcastIpAddresses
-{
-    chip::Inet::IPAddress ipv6;
-    chip::Inet::IPAddress ipv4;
-
-    BroadcastIpAddresses()
-    {
-        chip::Inet::IPAddress::FromString("FF02::FB", ipv6);
-        chip::Inet::IPAddress::FromString("224.0.0.251", ipv4);
-    }
-};
-
-const BroadcastIpAddresses kBroadcastIp;
-
 class ShutdownOnError
 {
 public:
@@ -183,12 +169,12 @@ CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBufferHandle data, uint
 
         if (info->addressType == chip::Inet::kIPAddressType_IPv6)
         {
-            err = info->udp->SendTo(kBroadcastIp.ipv6, port, info->udp->GetBoundInterface(), std::move(copy));
+            err = info->udp->SendTo(kBroadcastIpAddresses.ipv6, port, info->udp->GetBoundInterface(), std::move(copy));
         }
 #if INET_CONFIG_ENABLE_IPV4
         else if (info->addressType == chip::Inet::kIPAddressType_IPv4)
         {
-            err = info->udp->SendTo(kBroadcastIp.ipv4, port, info->udp->GetBoundInterface(), std::move(copy));
+            err = info->udp->SendTo(kBroadcastIpAddresses.ipv4, port, info->udp->GetBoundInterface(), std::move(copy));
         }
 #endif
         else
@@ -225,12 +211,12 @@ CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBufferHandle data, uint
 
         if (info->addressType == chip::Inet::kIPAddressType_IPv6)
         {
-            err = info->udp->SendTo(kBroadcastIp.ipv6, port, info->udp->GetBoundInterface(), std::move(copy));
+            err = info->udp->SendTo(kBroadcastIpAddresses.ipv6, port, info->udp->GetBoundInterface(), std::move(copy));
         }
 #if INET_CONFIG_ENABLE_IPV4
         else if (info->addressType == chip::Inet::kIPAddressType_IPv4)
         {
-            err = info->udp->SendTo(kBroadcastIp.ipv4, port, info->udp->GetBoundInterface(), std::move(copy));
+            err = info->udp->SendTo(kBroadcastIpAddresses.ipv4, port, info->udp->GetBoundInterface(), std::move(copy));
         }
 #endif
         else
