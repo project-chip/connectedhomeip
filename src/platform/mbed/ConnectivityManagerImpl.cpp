@@ -17,6 +17,8 @@
  *    limitations under the License.
  */
 /* this file behaves like a config.h, comes first */
+
+#include "netsocket/WiFiInterface.h"
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <platform/ConnectivityManager.h>
@@ -293,6 +295,7 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
     mWiFiAPIdleTimeoutMS            = CHIP_DEVICE_CONFIG_WIFI_AP_IDLE_TIMEOUT;
 
     // TODO Initialize the Chip Addressing and Routing Module.
+    // interface->set_sefault_parameters();
 
     return err;
 }
@@ -311,6 +314,25 @@ CHIP_ERROR ConnectivityManagerImpl::WiFiDisconnect()
 
 CHIP_ERROR ConnectivityManagerImpl::ProvisionWiFiNetwork(const char * ssid, const char * key)
 {
+    WiFiInterface * interface = WiFiInterface::get_default_instance();
+    // ChipLogDetail(DeviceLayer, "wifi interface: %p", interface);
+    // ChipLogDetail(DeviceLayer, "wifi interface: set the default parameters");
+    // interface->set_default_parameters();
+    // auto conn_status = interface->get_connection_status();
+    // ChipLogDetail(DeviceLayer, "interface connection status: %d", interface);
+    // interface->attach(
+    //     [](nsapi_event_t event, intptr_t data) { ChipLogDetail(DeviceLayer, "WiFi event: event = %d, data = %p", event, data);
+    //     });
+
+    ChipLogDetail(DeviceLayer, "connect to %s with %s password", ssid, key);
+    interface->attach(
+        [](nsapi_event_t event, intptr_t data) { ChipLogDetail(DeviceLayer, "WiFi event: event = %d, data = %p", event, data); });
+
+    auto result = interface->connect(ssid, key, NSAPI_SECURITY_WPA_WPA2);
+    ChipLogDetail(DeviceLayer, "Connection result: %d", result);
+    auto status = interface->get_connection_status();
+    ChipLogDetail(DeviceLayer, "Connection status: %d", status);
+
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR ConnectivityManagerImpl::ScanWiFi()
