@@ -86,6 +86,30 @@ void LogQuery(const QueryData & data)
     ChipLogDetail(Discovery, "%s", logString.c_str());
 }
 
+/// Checks if the current interface is powered on
+/// and not local loopback.
+template <typename T>
+bool IsCurrentInterfaceUsable(T & iterator)
+{
+    if (!mIterator.IsUp() || !mIterator.SupportsMulticast())
+    {
+        return false; // not a usable interface
+    }
+    char name[chip::Inet::InterfaceIterator::kMaxIfNameLength];
+    if (mIterator.GetInterfaceName(name, sizeof(name)) != CHIP_NO_ERROR)
+    {
+        ChipLogError(Discovery, "Failed to get interface name.");
+        return false;
+    }
+
+    if (strncmp(name, "lo", 2) == 0)
+    {
+        /// local loopback interface is not usable by MDNS
+        return false;
+    }
+    return true;
+}
+
 class AllInterfaces : public ListenIterator
 {
 private:
@@ -152,23 +176,7 @@ private:
             return false; // nothing to try.
         }
 
-        if (!mIterator.IsUp() || !mIterator.SupportsMulticast())
-        {
-            return true; // not a usable interface
-        }
-        char name[chip::Inet::InterfaceIterator::kMaxIfNameLength];
-        if (mIterator.GetInterfaceName(name, sizeof(name)) != CHIP_NO_ERROR)
-        {
-            ChipLogError(Discovery, "Interface iterator failed to get interface name.");
-            return true;
-        }
-
-        if (strncmp(name, "lo", 2) == 0)
-        {
-            ChipLogDetail(Discovery, "Skipping interface '%s' (assume local loopback)", name);
-            return true;
-        }
-        return false;
+        return !IsCurrentInterfaceUsable(mIterator);
     }
 };
 
@@ -584,34 +592,6 @@ FullQName AdvertiserMinMdns::GetCommisioningTextEntries(const CommissionAdvertis
     }
 }
 
-bool CanAdvertiseOn(chip::Inet::InterfaceAddressIterator & current)
-{
-    if (!current.IsUp())
-    {
-        return false;
-    }
-
-    if (!current.SupportsMulticast())
-    {
-        return false;
-    }
-
-    char name[chip::Inet::InterfaceIterator::kMaxIfNameLength];
-    if (current.GetInterfaceName(name, sizeof(name)) != CHIP_NO_ERROR)
-    {
-        ChipLogError(Discovery, "Failed to get interface name - will not advertise on this interface");
-        return false;
-    }
-
-    if (strncmp(name, "lo", 2) == 0)
-    {
-        // Skip advertisement on what looks like a local loopback interface
-        return false;
-    }
-
-    return true;
-}
-
 bool AdvertiserMinMdns::ShouldAdvertiseOn(const chip::Inet::InterfaceId id, const chip::Inet::IPAddress & addr)
 {
     for (unsigned i = 0; i < mServer.GetEndpointCount(); i++)
@@ -650,7 +630,7 @@ void AdvertiserMinMdns::AdvertiseRecords()
 
     for (; interfaceAddress.HasCurrent(); interfaceAddress.Next())
     {
-        if (!CanAdvertiseOn(interfaceAddress))
+        if (!IsCurrentInterfaceUsable(interfaceAddress))
         {
             continue;
         }
