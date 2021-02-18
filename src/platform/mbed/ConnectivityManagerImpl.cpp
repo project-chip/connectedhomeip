@@ -44,7 +44,7 @@
 using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::System;
-
+using namespace ::chip::DeviceLayer::Internal;
 namespace chip {
 namespace DeviceLayer {
 
@@ -79,10 +79,12 @@ CHIP_ERROR ConnectivityManagerImpl::_SetWiFiStationMode(WiFiStationMode val)
 
     return err;
 }
+
 bool ConnectivityManagerImpl::_IsWiFiStationConnected(void)
 {
     return mWiFiStationState == kWiFiStationState_Connected;
 }
+
 bool ConnectivityManagerImpl::_IsWiFiStationProvisioned(void)
 {
     return mIsProvisioned;
@@ -95,195 +97,24 @@ CHIP_ERROR ConnectivityManagerImpl::_SetWiFiAPMode(WiFiAPMode val)
     return err;
 }
 
-#define WIFI_BAND_2_4GHZ 2400
-#define WIFI_BAND_5_0GHZ 5000
-
-static uint16_t Map2400MHz(const uint8_t inChannel)
+void ConnectivityManagerImpl::GetWifiStatus(::chip::DeviceLayer::Internal::NetworkStatus * WifiStatus)
 {
-    uint16_t frequency = 0;
-
-    if (inChannel >= 1 && inChannel <= 13)
+    // TODO Update with snprintf or memcpy + strlen
+    if (!_interface)
     {
-        // Cast is OK because we definitely fit in 16 bits.
-        frequency = static_cast<uint16_t>(2412 + ((inChannel - 1) * 5));
+        ChipLogDetail(DeviceLayer, "No WiFiInterface found ");
+        return;
     }
-    else if (inChannel == 14)
-    {
-        frequency = 2484;
-    }
-
-    return frequency;
-}
-
-static uint16_t Map5000MHz(const uint8_t inChannel)
-{
-    uint16_t frequency = 0;
-
-    switch (inChannel)
-    {
-
-    case 183:
-        frequency = 4915;
-        break;
-    case 184:
-        frequency = 4920;
-        break;
-    case 185:
-        frequency = 4925;
-        break;
-    case 187:
-        frequency = 4935;
-        break;
-    case 188:
-        frequency = 4940;
-        break;
-    case 189:
-        frequency = 4945;
-        break;
-    case 192:
-        frequency = 4960;
-        break;
-    case 196:
-        frequency = 4980;
-        break;
-    case 7:
-        frequency = 5035;
-        break;
-    case 8:
-        frequency = 5040;
-        break;
-    case 9:
-        frequency = 5045;
-        break;
-    case 11:
-        frequency = 5055;
-        break;
-    case 12:
-        frequency = 5060;
-        break;
-    case 16:
-        frequency = 5080;
-        break;
-    case 34:
-        frequency = 5170;
-        break;
-    case 36:
-        frequency = 5180;
-        break;
-    case 38:
-        frequency = 5190;
-        break;
-    case 40:
-        frequency = 5200;
-        break;
-    case 42:
-        frequency = 5210;
-        break;
-    case 44:
-        frequency = 5220;
-        break;
-    case 46:
-        frequency = 5230;
-        break;
-    case 48:
-        frequency = 5240;
-        break;
-    case 52:
-        frequency = 5260;
-        break;
-    case 56:
-        frequency = 5280;
-        break;
-    case 60:
-        frequency = 5300;
-        break;
-    case 64:
-        frequency = 5320;
-        break;
-    case 100:
-        frequency = 5500;
-        break;
-    case 104:
-        frequency = 5520;
-        break;
-    case 108:
-        frequency = 5540;
-        break;
-    case 112:
-        frequency = 5560;
-        break;
-    case 116:
-        frequency = 5580;
-        break;
-    case 120:
-        frequency = 5600;
-        break;
-    case 124:
-        frequency = 5620;
-        break;
-    case 128:
-        frequency = 5640;
-        break;
-    case 132:
-        frequency = 5660;
-        break;
-    case 136:
-        frequency = 5680;
-        break;
-    case 140:
-        frequency = 5700;
-        break;
-    case 149:
-        frequency = 5745;
-        break;
-    case 153:
-        frequency = 5765;
-        break;
-    case 157:
-        frequency = 5785;
-        break;
-    case 161:
-        frequency = 5805;
-        break;
-    case 165:
-        frequency = 5825;
-        break;
-    }
-
-    return frequency;
-}
-
-static uint16_t MapFrequency(const uint16_t inBand, const uint8_t inChannel)
-{
-    uint16_t frequency = 0;
-
-    if (inBand == WIFI_BAND_2_4GHZ)
-    {
-        frequency = Map2400MHz(inChannel);
-    }
-    else if (inBand == WIFI_BAND_5_0GHZ)
-    {
-        frequency = Map5000MHz(inChannel);
-    }
-
-    return frequency;
-}
-
-CHIP_ERROR ConnectivityManagerImpl::GetWifiStatus(void)
-{
-    _interface  = WiFiInterface::get_default_instance();
-    auto status = _interface->get_connection_status();
-    ChipLogDetail(DeviceLayer, "Connection status: %s", status2str(status));
-    printf("MAC: %s\n", _interface->get_mac_address());
+    sprintf(WifiStatus->Status, "%s", status2str(_interface->get_connection_status()));
+    sprintf(WifiStatus->MAC, "%s", _interface->get_mac_address());
     SocketAddress a;
     _interface->get_ip_address(&a);
-    printf("IP: %s\n", a.get_ip_address());
+    sprintf(WifiStatus->IP, "%s", a.get_ip_address());
     _interface->get_netmask(&a);
-    printf("Netmask: %s\n", a.get_ip_address());
+    sprintf(WifiStatus->Netmask, "%s", a.get_ip_address());
     _interface->get_gateway(&a);
-    printf("Gateway: %s\n", a.get_ip_address());
-    printf("RSSI: %d\n\n", _interface->get_rssi());
-    return CHIP_NO_ERROR;
+    sprintf(WifiStatus->Gateway, "%s", a.get_ip_address());
+    WifiStatus->RSSI = _interface->get_rssi();
 }
 
 // ==================== ConnectivityManager Platform Internal Methods ====================
@@ -300,24 +131,62 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
     mWiFiAPIdleTimeoutMS            = CHIP_DEVICE_CONFIG_WIFI_AP_IDLE_TIMEOUT;
 
     // TODO Initialize the Chip Addressing and Routing Module.
-
+    _interface = WiFiInterface::get_default_instance();
+    _security  = NSAPI_SECURITY_WPA_WPA2;
+    _interface->attach([this](nsapi_event_t event, intptr_t data) {
+        PlatformMgrImpl().mQueue.call([this, event, data] {
+            PlatformMgr().LockChipStack();
+            OnInterfaceEvent(event, data);
+            PlatformMgr().UnlockChipStack();
+        });
+    });
     return err;
 }
 
-void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event) {}
+void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
+{
+    // This is for internal use, state change is handled by platform middleware
+}
+
+void ConnectivityManagerImpl::OnInterfaceEvent(nsapi_event_t event, intptr_t data)
+{
+    if (event == NSAPI_EVENT_CONNECTION_STATUS_CHANGE)
+    {
+        switch (data)
+        {
+        case NSAPI_STATUS_LOCAL_UP:
+            ChipLogDetail(DeviceLayer, "Status - LOCAL_UP");
+            break;
+        case NSAPI_STATUS_GLOBAL_UP:
+            OnStationConnected();
+            break;
+        case NSAPI_STATUS_DISCONNECTED:
+            OnStationDisconnected();
+            break;
+        case NSAPI_STATUS_CONNECTING:
+            ChipLogDetail(DeviceLayer, "Status - CONNECTING");
+
+            break;
+        default:
+
+            break;
+        }
+    }
+}
 
 CHIP_ERROR ConnectivityManagerImpl::ProvisionWiFiNetwork(const char * ssid, const char * key)
 {
-    _interface = WiFiInterface::get_default_instance();
-
-    ChipLogDetail(DeviceLayer, "connect to %s with %s password", ssid, key);
-    _interface->attach(
-        [](nsapi_event_t event, intptr_t data) { ChipLogDetail(DeviceLayer, "WiFi event: event = %d, data = %p", event, data); });
-
-    auto result = _interface->connect(ssid, key, NSAPI_SECURITY_WPA_WPA2);
-    ChipLogDetail(DeviceLayer, "Connection result: %d", result);
+#if defined(CHIP_DEVICE_CONFIG_WIFI_SECURITY_SCAN)
+#error Wifi security scan Not implemented yet
+#else
+    if (!_interface)
+    {
+        ChipLogDetail(DeviceLayer, "No WiFiInterface found ");
+        return -1;
+    }
+    auto result = _interface->connect(ssid, key, _security);
     auto status = _interface->get_connection_status();
-    ChipLogDetail(DeviceLayer, "Connection status: %s", status2str(status));
+    ChipLogDetail(DeviceLayer, "Connection result %d status: %s", result, status2str(status));
     mWiFiStationMode = kWiFiStationMode_Enabled;
     if (status == NSAPI_STATUS_GLOBAL_UP)
     {
@@ -328,31 +197,37 @@ CHIP_ERROR ConnectivityManagerImpl::ProvisionWiFiNetwork(const char * ssid, cons
     {
         mWiFiStationState = kWiFiStationState_NotConnected;
     }
-
     return CHIP_NO_ERROR;
+#endif
 }
 
 void ConnectivityManagerImpl::_ClearWiFiStationProvision(void)
 {
-    _interface = WiFiInterface::get_default_instance();
-    _interface->set_credentials(NULL, NULL, NSAPI_SECURITY_NONE);
     mWiFiStationMode  = kWiFiStationMode_Disabled;
     mWiFiStationState = kWiFiStationState_NotConnected;
     mIsProvisioned    = false;
-}
-int ConnectivityManagerImpl::ScanWiFi(int APlimit, NetworkInfo * wifiInfo)
-{
+    _security         = NSAPI_SECURITY_WPA_WPA2;
 
-    _interface = WiFiInterface::get_default_instance();
     if (!_interface)
     {
-        printf("ERROR: No WiFiInterface found.\n");
+        ChipLogDetail(DeviceLayer, "No WiFiInterface found ");
+        return;
+    }
+    _interface->set_credentials(NULL, NULL, _security);
+    _interface->disconnect();
+}
+int ConnectivityManagerImpl::ScanWiFi(int APlimit, ::chip::DeviceLayer::Internal::NetworkInfo * wifiInfo)
+{
+
+    if (!_interface)
+    {
+        ChipLogDetail(DeviceLayer, "No WiFiInterface found ");
         return -1;
     }
     auto status = _interface->get_connection_status();
     if (status != NSAPI_STATUS_GLOBAL_UP)
     {
-        printf(" Currently device not connected to any WIFI  AP\n");
+        ChipLogDetail(DeviceLayer, "Currently device not connected to any WIFI  AP");
     }
     WiFiAccessPoint * ap;
 
@@ -360,7 +235,7 @@ int ConnectivityManagerImpl::ScanWiFi(int APlimit, NetworkInfo * wifiInfo)
 
     if (count <= 0)
     {
-        printf("scan() failed with return value: %d\n", count);
+        ChipLogDetail(DeviceLayer, "scan() failed with return value: %d", count);
         return 0;
     }
 
@@ -373,7 +248,7 @@ int ConnectivityManagerImpl::ScanWiFi(int APlimit, NetworkInfo * wifiInfo)
     {
         return 0;
     }
-
+    // use snprintf
     for (int i = 0; i < count; i++)
     {
         sprintf(wifiInfo[i].WiFiSSID, "%s", ap[i].get_ssid());
@@ -405,6 +280,8 @@ CHIP_ERROR ConnectivityManagerImpl::OnStationConnected()
     event.WiFiConnectivityChange.Result = kConnectivity_Established;
     PlatformMgr().PostEvent(&event);
     mWiFiStationState = kWiFiStationState_Connected;
+    ChipLogDetail(DeviceLayer, "Event - StationConnected");
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ConnectivityManagerImpl::OnStationDisconnected()
@@ -417,6 +294,8 @@ CHIP_ERROR ConnectivityManagerImpl::OnStationDisconnected()
     event.WiFiConnectivityChange.Result = kConnectivity_Lost;
     PlatformMgr().PostEvent(&event);
     mWiFiStationState = kWiFiStationState_NotConnected;
+    ChipLogDetail(DeviceLayer, "Event - StationDisconnected");
+    return CHIP_NO_ERROR;
 }
 
 const char * ConnectivityManagerImpl::status2str(nsapi_connection_status_t status)
@@ -466,6 +345,24 @@ WiFiAuthSecurityType ConnectivityManagerImpl::NsapiToNetworkSecurity(nsapi_secur
         return kWiFiSecurityType_WPA3Enterprise;
     default:
         return kWiFiSecurityType_NotSpecified;
+    }
+}
+void ConnectivityManagerImpl::SetWifiSecurity(::chip::DeviceLayer::Internal::WiFiAuthSecurityType security)
+{
+    switch (security)
+    {
+    case kWiFiSecurityType_None:
+        _security = NSAPI_SECURITY_NONE;
+    case kWiFiSecurityType_WEP:
+        _security = NSAPI_SECURITY_WEP;
+    case kWiFiSecurityType_WPAPersonal:
+        _security = NSAPI_SECURITY_WPA;
+    case kWiFiSecurityType_WPA2Personal:
+        _security = NSAPI_SECURITY_WPA_WPA2;
+    case kWiFiSecurityType_WPA3Personal:
+        _security = NSAPI_SECURITY_WPA3;
+    default:
+        _security = NSAPI_SECURITY_WPA_WPA2;
     }
 }
 

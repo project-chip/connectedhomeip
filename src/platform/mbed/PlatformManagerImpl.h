@@ -69,6 +69,7 @@ private:
     friend PlatformManager & PlatformMgr(void);
     friend PlatformManagerImpl & PlatformMgrImpl(void);
     friend class Internal::BLEManagerImpl;
+    friend class ConnectivityManagerImpl;
 
     static PlatformManagerImpl sInstance;
 
@@ -91,6 +92,10 @@ private:
  * that are common to all platforms.
  */
 inline PlatformManager & PlatformMgr(void)
+{
+    return PlatformManagerImpl::sInstance;
+}
+inline PlatformManagerImpl & PlatformMgrImpl(void)
 {
     return PlatformManagerImpl::sInstance;
 }
