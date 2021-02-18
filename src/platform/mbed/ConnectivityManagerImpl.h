@@ -74,6 +74,9 @@ public:
     CHIP_ERROR WiFiConnect();
     CHIP_ERROR WiFiDisconnect();
 
+    // TODO
+    void StartWiFiManagement() {}
+
 private:
     // ===== Members that implement the ConnectivityManager abstract interface.
     WiFiStationMode _GetWiFiStationMode(void);
@@ -89,6 +92,7 @@ private:
     bool _HaveServiceConnectivity(void);
     CHIP_ERROR _Init(void);
     void _OnPlatformEvent(const ChipDeviceEvent * event);
+    bool _IsWiFiStationApplicationControlled(void) { return mWiFiStationMode == kWiFiStationMode_ApplicationControlled; }
 
     // ===== Members for internal use by the following friends.
 
