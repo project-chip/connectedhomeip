@@ -1,5 +1,5 @@
 {
-  "writeTime": "Mon Feb 15 2021 16:30:21 GMT+0100 (Central European Standard Time)",
+  "writeTime": "Thu Feb 18 2021 21:00:50 GMT+0800 (China Standard Time)",
   "featureLevel": 11,
   "creator": "zap",
   "keyValuePairs": [
@@ -81,6 +81,7 @@
           "define": "BASIC_CLUSTER",
           "side": "server",
           "enabled": 0,
+          "commands": [],
           "attributes": [
             {
               "name": "cluster revision",
@@ -127,8 +128,7 @@
               "maxInterval": 65344,
               "reportableChange": 0
             }
-          ],
-          "commands": []
+          ]
         },
         {
           "name": "Identify",
@@ -137,23 +137,6 @@
           "define": "IDENTIFY_CLUSTER",
           "side": "client",
           "enabled": 1,
-          "attributes": [
-            {
-              "name": "cluster revision",
-              "code": 65533,
-              "mfgCode": null,
-              "side": "client",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "2",
-              "reportable": 0,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            }
-          ],
           "commands": [
             {
               "name": "Identify",
@@ -170,6 +153,23 @@
               "source": "client",
               "incoming": 1,
               "outgoing": 1
+            }
+          ],
+          "attributes": [
+            {
+              "name": "cluster revision",
+              "code": 65533,
+              "mfgCode": null,
+              "side": "client",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "2",
+              "reportable": 0,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
             }
           ]
         },
@@ -379,6 +379,23 @@
           "define": "SCENES_CLUSTER",
           "side": "client",
           "enabled": 1,
+          "attributes": [
+            {
+              "name": "cluster revision",
+              "code": 65533,
+              "mfgCode": null,
+              "side": "client",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "3",
+              "reportable": 0,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            }
+          ],
           "commands": [
             {
               "name": "AddScene",
@@ -435,23 +452,6 @@
               "source": "client",
               "incoming": 1,
               "outgoing": 1
-            }
-          ],
-          "attributes": [
-            {
-              "name": "cluster revision",
-              "code": 65533,
-              "mfgCode": null,
-              "side": "client",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "3",
-              "reportable": 0,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
             }
           ]
         },
@@ -612,23 +612,6 @@
           "define": "ON_OFF_CLUSTER",
           "side": "client",
           "enabled": 1,
-          "attributes": [
-            {
-              "name": "cluster revision",
-              "code": 65533,
-              "mfgCode": null,
-              "side": "client",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "2",
-              "reportable": 0,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            }
-          ],
           "commands": [
             {
               "name": "Off",
@@ -653,6 +636,23 @@
               "source": "client",
               "incoming": 1,
               "outgoing": 1
+            }
+          ],
+          "attributes": [
+            {
+              "name": "cluster revision",
+              "code": 65533,
+              "mfgCode": null,
+              "side": "client",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "2",
+              "reportable": 0,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
             }
           ]
         },
@@ -704,23 +704,6 @@
           "define": "LEVEL_CONTROL_CLUSTER",
           "side": "client",
           "enabled": 1,
-          "attributes": [
-            {
-              "name": "cluster revision",
-              "code": 65533,
-              "mfgCode": null,
-              "side": "client",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "3",
-              "reportable": 0,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            }
-          ],
           "commands": [
             {
               "name": "MoveToLevel",
@@ -786,6 +769,23 @@
               "incoming": 1,
               "outgoing": 1
             }
+          ],
+          "attributes": [
+            {
+              "name": "cluster revision",
+              "code": 65533,
+              "mfgCode": null,
+              "side": "client",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "3",
+              "reportable": 0,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            }
           ]
         },
         {
@@ -836,23 +836,6 @@
           "define": "DOOR_LOCK_CLUSTER",
           "side": "client",
           "enabled": 1,
-          "attributes": [
-            {
-              "name": "cluster revision",
-              "code": 65533,
-              "mfgCode": null,
-              "side": "client",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "3",
-              "reportable": 0,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            }
-          ],
           "commands": [
             {
               "name": "LockDoor",
@@ -1037,6 +1020,23 @@
               "source": "client",
               "incoming": 1,
               "outgoing": 1
+            }
+          ],
+          "attributes": [
+            {
+              "name": "cluster revision",
+              "code": 65533,
+              "mfgCode": null,
+              "side": "client",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "3",
+              "reportable": 0,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
             }
           ]
         },
@@ -2764,6 +2764,7 @@
           "define": "TEMP_MEASUREMENT_CLUSTER",
           "side": "server",
           "enabled": 0,
+          "commands": [],
           "attributes": [
             {
               "name": "cluster revision",
@@ -2840,8 +2841,7 @@
               "maxInterval": 65344,
               "reportableChange": 0
             }
-          ],
-          "commands": []
+          ]
         },
         {
           "name": "IAS Zone",
@@ -2997,10 +2997,10 @@
           ]
         },
         {
-          "name": "Network Provisioning",
+          "name": "Network Commissioning",
           "code": 43690,
           "mfgCode": null,
-          "define": "NETWORK_PROVISIONING_CLUSTER",
+          "define": "NETWORK_COMMISSIONING_CLUSTER",
           "side": "client",
           "enabled": 1,
           "commands": [
@@ -3069,7 +3069,7 @@
               "outgoing": 1
             },
             {
-              "name": "GetLastNetworkProvisioningResult",
+              "name": "GetLastNetworkCommissioningResult",
               "code": 16,
               "mfgCode": null,
               "source": "client",
@@ -3096,10 +3096,10 @@
           ]
         },
         {
-          "name": "Network Provisioning",
+          "name": "Network Commissioning",
           "code": 43690,
           "mfgCode": null,
-          "define": "NETWORK_PROVISIONING_CLUSTER",
+          "define": "NETWORK_COMMISSIONING_CLUSTER",
           "side": "server",
           "enabled": 0,
           "commands": [

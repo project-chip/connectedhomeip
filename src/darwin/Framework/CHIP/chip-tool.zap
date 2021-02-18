@@ -1,5 +1,5 @@
 {
-  "writeTime": "Mon Feb 15 2021 16:35:24 GMT+0100 (Central European Standard Time)",
+  "writeTime": "Thu Feb 18 2021 21:01:49 GMT+0800 (China Standard Time)",
   "featureLevel": 11,
   "creator": "zap",
   "keyValuePairs": [
@@ -22,12 +22,6 @@
       "path": "../../../../app/zap-templates/zcl/zcl.json",
       "version": "ZCL Test Data",
       "type": "zcl-properties"
-    },
-    {
-      "pathRelativity": "relativeToZap",
-      "path": "../../../../app/zap-templates/app-templates.json",
-      "version": "chip-v1",
-      "type": "gen-templates-json"
     }
   ],
   "endpointTypes": [
@@ -801,6 +795,7 @@
           "define": "LEVEL_CONTROL_CLUSTER",
           "side": "server",
           "enabled": 0,
+          "commands": [],
           "attributes": [
             {
               "name": "cluster revision",
@@ -832,8 +827,7 @@
               "maxInterval": 65344,
               "reportableChange": 0
             }
-          ],
-          "commands": []
+          ]
         },
         {
           "name": "Door Lock",
@@ -2744,7 +2738,6 @@
           "define": "TEMP_MEASUREMENT_CLUSTER",
           "side": "client",
           "enabled": 1,
-          "commands": [],
           "attributes": [
             {
               "name": "cluster revision",
@@ -2761,7 +2754,8 @@
               "maxInterval": 65344,
               "reportableChange": 0
             }
-          ]
+          ],
+          "commands": []
         },
         {
           "name": "Temperature Measurement",
@@ -2770,7 +2764,6 @@
           "define": "TEMP_MEASUREMENT_CLUSTER",
           "side": "server",
           "enabled": 0,
-          "commands": [],
           "attributes": [
             {
               "name": "cluster revision",
@@ -2847,7 +2840,8 @@
               "maxInterval": 65344,
               "reportableChange": 0
             }
-          ]
+          ],
+          "commands": []
         },
         {
           "name": "IAS Zone",
@@ -3003,10 +2997,10 @@
           ]
         },
         {
-          "name": "Network Provisioning",
+          "name": "Network Commissioning",
           "code": 43690,
           "mfgCode": null,
-          "define": "NETWORK_PROVISIONING_CLUSTER",
+          "define": "NETWORK_COMMISSIONING_CLUSTER",
           "side": "client",
           "enabled": 1,
           "commands": [
@@ -3075,7 +3069,7 @@
               "outgoing": 1
             },
             {
-              "name": "GetLastNetworkProvisioningResult",
+              "name": "GetLastNetworkCommissioningResult",
               "code": 16,
               "mfgCode": null,
               "source": "client",
@@ -3102,12 +3096,29 @@
           ]
         },
         {
-          "name": "Network Provisioning",
+          "name": "Network Commissioning",
           "code": 43690,
           "mfgCode": null,
-          "define": "NETWORK_PROVISIONING_CLUSTER",
+          "define": "NETWORK_COMMISSIONING_CLUSTER",
           "side": "server",
           "enabled": 0,
+          "attributes": [
+            {
+              "name": "cluster revision",
+              "code": 65533,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0x0001",
+              "reportable": 0,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            }
+          ],
           "commands": [
             {
               "name": "ScanNetworksResponse",
@@ -3173,23 +3184,6 @@
               "incoming": 1,
               "outgoing": 1
             }
-          ],
-          "attributes": [
-            {
-              "name": "cluster revision",
-              "code": 65533,
-              "mfgCode": null,
-              "side": "server",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "0x0001",
-              "reportable": 0,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            }
           ]
         },
         {
@@ -3242,7 +3236,6 @@
           "define": "BINDING_CLUSTER",
           "side": "server",
           "enabled": 0,
-          "commands": [],
           "attributes": [
             {
               "name": "cluster revision",
@@ -3259,7 +3252,8 @@
               "maxInterval": 65344,
               "reportableChange": 0
             }
-          ]
+          ],
+          "commands": []
         }
       ]
     }
