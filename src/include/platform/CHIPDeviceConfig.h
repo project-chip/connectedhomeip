@@ -128,6 +128,16 @@
 #endif
 
 /**
+ * CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER
+ *
+ * Enables the use of a hard-coded default serial number if none
+ * is found in Chip NV storage.
+ */
+#ifndef CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER
+#define CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER "TEST_SN"
+#endif
+
+/**
  * CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID
  *
  * The unique id assigned by the device vendor to identify the product or device type.  This
@@ -937,13 +947,4 @@
  */
 #ifndef CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_TIME
 #define CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_TIME __TIME__
-#endif
-
-/**
- * CHIP_ROTATING_DEVICE_ID
- *
- * Sample Rotating Device Id.
- */
-#ifndef CHIP_ROTATING_DEVICE_ID
-#define CHIP_ROTATING_DEVICE_ID "1122334455667788"
 #endif

@@ -52,6 +52,9 @@ if (chip_device_platform != "none") {
 
     # Enable including the additional data in the advertisement packets
     chip_enable_additional_data_advertising = true
+
+    # Enable adding rotating device id to the additional data.
+    chip_enable_rotating_device_id = true
   }
 
   buildconfig_header("platform_buildconfig") {
@@ -91,6 +94,12 @@ if (chip_device_platform != "none") {
       defines += [ "CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING=1" ]
     } else {
       defines += [ "CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING=0" ]
+    }
+
+    if (chip_enable_rotating_device_id) {
+      defines += [ "CHIP_ENABLE_ROTATING_DEVICE_ID=1" ]
+    } else {
+      defines += [ "CHIP_ENABLE_ROTATING_DEVICE_ID=0" ]
     }
 
     if (chip_device_platform == "cc13x2_26x2") {

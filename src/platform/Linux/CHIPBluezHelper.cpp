@@ -48,11 +48,12 @@
  *          Provides Bluez dbus implementatioon for BLE
  */
 
-#include <AdditionalDataPayload.h>
 #include <ble/BleUUID.h>
 #include <ble/CHIPBleServiceData.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/Protocols.h>
+#include <setup_payload/AdditionalDataPayloadGenerator.h>
+#include <support/BitFlags.h>
 #include <support/CHIPMemString.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
@@ -71,7 +72,6 @@
 #include <system/TLVPacketBufferBackingStore.h>
 
 using namespace ::nl;
-using namespace chip::SetupPayloadData;
 using namespace chip::Protocols;
 using chip::Platform::CopyString;
 
@@ -1277,23 +1277,24 @@ static void UpdateAdditionalDataCharacteristic(BluezGattCharacteristic1 * charac
     // Construct the TLV for the additional data
     GVariant * cValue = nullptr;
     CHIP_ERROR err    = CHIP_NO_ERROR;
-    System::PacketBufferTLVWriter writer;
-    TLVWriter innerWriter;
     chip::System::PacketBufferHandle bufferHandle;
 
-    writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
+    char serialNumber[ConfigurationManager::kMaxSerialNumberLength + 1];
+    size_t serialNumberSize  = 0;
+    uint16_t lifetimeCounter = 0;
+    BitFlags<uint8_t, AdditionalDataFields> additionalDataFields;
 
-    err = writer.OpenContainer(AnonymousTag, kTLVType_Structure, innerWriter);
+#if CHIP_ENABLE_ROTATING_DEVICE_ID
+    err = ConfigurationMgr().GetSerialNumber(serialNumber, sizeof(serialNumber), serialNumberSize);
+    SuccessOrExit(err);
+    err = ConfigurationMgr().GetLifetimeCounter(lifetimeCounter);
     SuccessOrExit(err);
 
-    // Adding the rotating device id to the TLV data
-    err = innerWriter.PutString(ContextTag(kRotatingDeviceIdTag), CHIP_ROTATING_DEVICE_ID);
-    SuccessOrExit(err);
+    additionalDataFields.Set(AdditionalDataFields::RotatingDeviceId);
+#endif
 
-    err = writer.CloseContainer(innerWriter);
-    SuccessOrExit(err);
-
-    err = writer.Finalize(&bufferHandle);
+    err = AdditionalDataPayloadGenerator().generateAdditionalDataPayload(lifetimeCounter, serialNumber, serialNumberSize,
+                                                                         bufferHandle, additionalDataFields);
     SuccessOrExit(err);
 
     cValue = g_variant_new_from_data(G_VARIANT_TYPE("ay"), bufferHandle->Start(), bufferHandle->DataLength(), TRUE, g_free,

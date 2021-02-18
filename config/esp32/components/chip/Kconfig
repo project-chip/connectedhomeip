@@ -640,7 +640,7 @@ menu "CHIP Device Layer"
 
         config USE_TEST_SERIAL_NUMBER
             string "Use Test Serial Number"
-            default "DUMMY_SN"
+            default "TEST_SN"
             help
                 Specifies a hard-coded device serial number to be used if none is found in CHIP NV storage.
                 Setting the value to an empty string disables the feature.

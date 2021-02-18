@@ -2112,6 +2112,16 @@
 #endif
 
 /**
+ * @def CHIP_CONFIG_LIFETIIME_PERSISTED_COUNTER_KEY
+ *
+ * @brief
+ *   Lifetime Counter Key.
+ */
+#ifndef CHIP_CONFIG_LIFETIIME_PERSISTED_COUNTER_KEY
+#define CHIP_CONFIG_LIFETIIME_PERSISTED_COUNTER_KEY "life-count"
+#endif
+
+/**
  *  @def CHIP_CONFIG_PERSISTED_STORAGE_ENC_MSG_CNTR_ID
  *
  *  @brief
