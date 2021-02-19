@@ -73,8 +73,8 @@ public:
      *  @retval  #CHIP_ERROR_NO_MEMORY If there is no empty slot left in the table for addition.
      *  @retval  #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR AddToRetransTable(uint16_t protocolId, uint8_t msgType, const SendFlags & sendFlags,
-                                 System::PacketBufferHandle msgBuf, Messaging::ExchangeContext * exchangeContext);
+    CHIP_ERROR AddToRetransmissionTable(uint16_t protocolId, uint8_t msgType, const SendFlags & sendFlags,
+                                        System::PacketBufferHandle msgBuf, Messaging::ExchangeContext * exchangeContext);
 
     /**
      *  Add a CHIP message into the cache table to queue the incomming messages that trigger message counter synchronization

@@ -217,6 +217,12 @@ bool ExchangeManager::isMsgCounterSyncMessage(const PayloadHeader & payloadHeade
     return false;
 }
 
+void ExchangeManager::HandleGroupMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+                                                 const SecureSessionHandle & session, System::PacketBufferHandle msgBuf)
+{
+    OnMessageReceived(packetHeader, payloadHeader, session, std::move(msgBuf), nullptr);
+}
+
 void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                                         SecureSessionHandle session, System::PacketBufferHandle msgBuf, SecureSessionMgr * msgLayer)
 {

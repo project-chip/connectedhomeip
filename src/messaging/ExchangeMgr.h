@@ -48,8 +48,6 @@ static constexpr int16_t kAnyMessageType = -1;
  */
 class DLL_EXPORT ExchangeManager : public SecureSessionMgrDelegate
 {
-    friend class MessageCounterSyncMgr;
-
 public:
     ExchangeManager();
     ExchangeManager(const ExchangeManager &) = delete;
@@ -172,6 +170,18 @@ public:
         return UnregisterUnsolicitedMessageHandlerForType(Protocols::MessageTypeTraits<MessageType>::ProtocolId,
                                                           static_cast<uint8_t>(msgType));
     }
+
+    /**
+     * @brief
+     *   Called when a cached group message is received.
+     *
+     * @param packetHeader  The message header
+     * @param payloadHeader The payload header
+     * @param session       The handle to the secure session
+     * @param msgBuf        The received message
+     */
+    void HandleGroupMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+                                    const SecureSessionHandle & session, System::PacketBufferHandle msgBuf);
 
     void IncrementContextsInUse();
     void DecrementContextsInUse();

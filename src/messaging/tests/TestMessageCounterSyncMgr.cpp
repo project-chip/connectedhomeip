@@ -231,8 +231,9 @@ void CheckAddRetransTable(nlTestSuite * inSuite, void * inContext)
     System::PacketBufferHandle buffer = MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());
 
-    CHIP_ERROR err = sm->AddToRetransTable(Protocols::kProtocol_Echo, static_cast<uint8_t>(Protocols::Echo::MsgType::EchoRequest),
-                                           Messaging::SendFlags(Messaging::SendMessageFlags::kNone), std::move(buffer), exchange);
+    CHIP_ERROR err =
+        sm->AddToRetransmissionTable(Protocols::kProtocol_Echo, static_cast<uint8_t>(Protocols::Echo::MsgType::EchoRequest),
+                                     Messaging::SendFlags(Messaging::SendMessageFlags::kNone), std::move(buffer), exchange);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 

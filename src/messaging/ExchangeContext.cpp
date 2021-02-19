@@ -82,10 +82,10 @@ CHIP_ERROR ExchangeContext::SendMessage(uint16_t protocolId, uint8_t msgType, Pa
     CHIP_ERROR err                         = CHIP_NO_ERROR;
     Transport::PeerConnectionState * state = nullptr;
 
-    VerifyOrReturnError(mExchangeMgr != nullptr, err = CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(mExchangeMgr != nullptr, CHIP_ERROR_INTERNAL);
 
     state = mExchangeMgr->GetSessionMgr()->GetPeerConnectionState(mSecureSession);
-    VerifyOrReturnError(state != nullptr, err = CHIP_ERROR_NOT_CONNECTED);
+    VerifyOrReturnError(state != nullptr, CHIP_ERROR_NOT_CONNECTED);
 
     // If a group message is to be transmitted to a destination node whose message counter is unknown.
     if (ChipKeyId::IsAppGroupKey(state->GetLocalKeyID()) && !state->isPeerMsgCounterSynced())
@@ -94,7 +94,7 @@ CHIP_ERROR ExchangeContext::SendMessage(uint16_t protocolId, uint8_t msgType, Pa
         VerifyOrReturnError(messageCounterSyncMgr != nullptr, CHIP_ERROR_INTERNAL);
 
         // Queue the message as need for sync with destination node.
-        err = messageCounterSyncMgr->AddToRetransTable(protocolId, msgType, sendFlags, std::move(msgBuf), this);
+        err = messageCounterSyncMgr->AddToRetransmissionTable(protocolId, msgType, sendFlags, std::move(msgBuf), this);
         ReturnErrorOnFailure(err);
 
         // Initiate message counter synchronization if no message counter synchronization is in progress.
@@ -105,7 +105,7 @@ CHIP_ERROR ExchangeContext::SendMessage(uint16_t protocolId, uint8_t msgType, Pa
     }
     else
     {
-        SendMessageImpl(protocolId, msgType, std::move(msgBuf), sendFlags, state);
+        err = SendMessageImpl(protocolId, msgType, std::move(msgBuf), sendFlags, state);
     }
 
     return err;

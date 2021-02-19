@@ -83,13 +83,14 @@ void MessageCounterSyncMgr::OnResponseTimeout(Messaging::ExchangeContext * excha
         exchangeContext->Close();
 }
 
-CHIP_ERROR MessageCounterSyncMgr::AddToRetransTable(uint16_t protocolId, uint8_t msgType, const SendFlags & sendFlags,
-                                                    System::PacketBufferHandle msgBuf, Messaging::ExchangeContext * exchangeContext)
+CHIP_ERROR MessageCounterSyncMgr::AddToRetransmissionTable(uint16_t protocolId, uint8_t msgType, const SendFlags & sendFlags,
+                                                           System::PacketBufferHandle msgBuf,
+                                                           Messaging::ExchangeContext * exchangeContext)
 {
     bool added     = false;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    VerifyOrReturnError(exchangeContext != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(exchangeContext != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     for (RetransTableEntry & entry : mRetransTable)
     {
@@ -100,8 +101,6 @@ CHIP_ERROR MessageCounterSyncMgr::AddToRetransTable(uint16_t protocolId, uint8_t
             entry.msgType         = msgType;
             entry.msgBuf          = std::move(msgBuf);
             entry.exchangeContext = exchangeContext;
-
-            // Increment the reference count
             entry.exchangeContext->Retain();
             added = true;
 
@@ -179,7 +178,7 @@ CHIP_ERROR MessageCounterSyncMgr::AddToReceiveTable(const PacketHeader & packetH
 }
 
 /**
- *  Retransmit all pending messages that were encrypted with application
+ *  Reprocess all pending messages that were encrypted with application
  *  group key and were addressed to the specified node.
  *
  *  @param[in] peerNodeId    Node ID of the destination node.
@@ -192,9 +191,9 @@ void MessageCounterSyncMgr::ProcessPendingGroupMsgs(NodeId peerNodeId)
     {
         if (!entry.msgBuf.IsNull() && entry.session.GetPeerNodeId() == peerNodeId)
         {
-            // Retramsmit message.
-            mExchangeMgr->OnMessageReceived(entry.packetHeader, entry.payloadHeader, entry.session, std::move(entry.msgBuf),
-                                            nullptr);
+            // Reprocess message.
+            mExchangeMgr->HandleGroupMessageReceived(entry.packetHeader, entry.payloadHeader, entry.session,
+                                                     std::move(entry.msgBuf));
 
             // Explicitly free any buffer owned by this handle.
             entry.msgBuf = nullptr;
