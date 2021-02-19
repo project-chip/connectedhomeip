@@ -652,8 +652,7 @@ CHIP_ERROR DeviceCommissioner::PairTestDeviceWithoutSecurity(NodeId remoteDevice
     VerifyOrExit(mState == State::Initialized, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mDeviceBeingPaired == kNumMaxActiveDevices, err = CHIP_ERROR_INCORRECT_STATE);
 
-    testSecurePairingSecret = chip::Platform::New<SecurePairingUsingTestSecret>(Optional<NodeId>::Value(remoteDeviceId),
-                                                                                static_cast<uint16_t>(0), static_cast<uint16_t>(0));
+    testSecurePairingSecret = chip::Platform::New<SecurePairingUsingTestSecret>();
     VerifyOrExit(testSecurePairingSecret != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     mDeviceBeingPaired = GetInactiveDeviceIndex();

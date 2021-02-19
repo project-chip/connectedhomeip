@@ -140,8 +140,7 @@ CHIP_ERROR EstablishSecureSession()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    chip::SecurePairingUsingTestSecret * testSecurePairingSecret = chip::Platform::New<chip::SecurePairingUsingTestSecret>(
-        chip::Optional<chip::NodeId>::Value(chip::kTestDeviceNodeId), static_cast<uint16_t>(0), static_cast<uint16_t>(0));
+    chip::SecurePairingUsingTestSecret * testSecurePairingSecret = chip::Platform::New<chip::SecurePairingUsingTestSecret>();
     VerifyOrExit(testSecurePairingSecret != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     // Attempt to connect to the peer.

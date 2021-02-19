@@ -76,11 +76,11 @@ CHIP_ERROR RendezvousSession::Init(const RendezvousParameters & params, Transpor
     {
         if (mParams.HasPASEVerifier())
         {
-            ReturnErrorOnFailure(WaitForPairing(mParams.GetLocalNodeId(), mParams.GetPASEVerifier()));
+            ReturnErrorOnFailure(WaitForPairing(mParams.GetPASEVerifier()));
         }
         else
         {
-            ReturnErrorOnFailure(WaitForPairing(mParams.GetLocalNodeId(), mParams.GetSetupPINCode()));
+            ReturnErrorOnFailure(WaitForPairing(mParams.GetSetupPINCode()));
         }
     }
 
@@ -171,11 +171,6 @@ void RendezvousSession::OnSessionEstablished()
     if (mParams.GetPeerAddress().GetTransportType() != Transport::Type::kBle || // For rendezvous initializer
         mPeerAddress.GetTransportType() != Transport::Type::kBle)               // For rendezvous target
     {
-        if (!mParams.HasRemoteNodeId())
-        {
-            ChipLogProgress(Ble, "Completed rendezvous with %llu", mPairingSession.GetPeerNodeId());
-            mParams.SetRemoteNodeId(mPairingSession.GetPeerNodeId());
-        }
         UpdateState(State::kRendezvousComplete);
         if (!mParams.IsController())
         {
@@ -205,7 +200,7 @@ void RendezvousSession::OnRendezvousConnectionOpened()
         return;
     }
 
-    CHIP_ERROR err = Pair(mParams.GetLocalNodeId(), mParams.GetSetupPINCode());
+    CHIP_ERROR err = Pair(mParams.GetSetupPINCode());
     if (err != CHIP_NO_ERROR)
     {
         OnSessionEstablishmentError(err);
@@ -435,32 +430,30 @@ void RendezvousSession::ReleasePairingSessionHandle()
     }
 }
 
-CHIP_ERROR RendezvousSession::WaitForPairing(Optional<NodeId> nodeId, uint32_t setupPINCode)
+CHIP_ERROR RendezvousSession::WaitForPairing(uint32_t setupPINCode)
 {
     UpdateState(State::kSecurePairing);
     return mPairingSession.WaitForPairing(setupPINCode, kSpake2p_Iteration_Count,
                                           reinterpret_cast<const unsigned char *>(kSpake2pKeyExchangeSalt),
-                                          strlen(kSpake2pKeyExchangeSalt), nodeId, 0, this);
+                                          strlen(kSpake2pKeyExchangeSalt), 0, this);
 }
 
-CHIP_ERROR RendezvousSession::WaitForPairing(Optional<NodeId> nodeId, const PASEVerifier & verifier)
+CHIP_ERROR RendezvousSession::WaitForPairing(const PASEVerifier & verifier)
 {
     UpdateState(State::kSecurePairing);
-    return mPairingSession.WaitForPairing(verifier, nodeId, 0, this);
+    return mPairingSession.WaitForPairing(verifier, 0 /* keyId */, this);
 }
 
-CHIP_ERROR RendezvousSession::Pair(Optional<NodeId> nodeId, uint32_t setupPINCode)
+CHIP_ERROR RendezvousSession::Pair(uint32_t setupPINCode)
 {
     UpdateState(State::kSecurePairing);
-    return mPairingSession.Pair(mParams.GetPeerAddress(), setupPINCode, nodeId, mParams.GetRemoteNodeId().ValueOr(kUndefinedNodeId),
-                                mNextKeyId++, this);
+    return mPairingSession.Pair(mParams.GetPeerAddress(), setupPINCode, mNextKeyId++, this);
 }
 
-CHIP_ERROR RendezvousSession::Pair(Optional<NodeId> nodeId, const PASEVerifier & verifier)
+CHIP_ERROR RendezvousSession::Pair(const PASEVerifier & verifier)
 {
     UpdateState(State::kSecurePairing);
-    return mPairingSession.Pair(mParams.GetPeerAddress(), verifier, nodeId, mParams.GetRemoteNodeId().ValueOr(kUndefinedNodeId),
-                                mNextKeyId++, this);
+    return mPairingSession.Pair(mParams.GetPeerAddress(), verifier, mNextKeyId++, this);
 }
 
 void RendezvousSession::SendNetworkCredentials(const char * ssid, const char * passwd)
