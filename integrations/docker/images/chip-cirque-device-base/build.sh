@@ -62,6 +62,10 @@ set -ex
 if [[ ${*/--try-download//} != "${*}" ]]; then
     docker pull "$ORG"/"$IMAGE":"$VERSION"
     if [[ $? -eq 0 ]]; then
+        # tag it as latest for this version, note: this should only be used on CI
+        [[ ${*/--latest//} != "${*}" ]] && {
+            docker tag "$ORG"/"$IMAGE":"$VERSION" "$ORG"/"$IMAGE":latest
+        }
         exit 0
     fi
 fi
