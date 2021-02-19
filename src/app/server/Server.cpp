@@ -532,7 +532,7 @@ void InitServer(AppDelegate * delegate)
 #endif
     }
 
-#if CHIP_ENABLE_MDNS
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
     // TODO: advertise this only when really operational once we support both
     // operational and commisioning advertising is supported.
     if (ConfigurationMgr().IsFullyProvisioned())

@@ -441,7 +441,7 @@ exit:
     return OTBR_TO_CHIP_ERROR(error);
 }
 
-CHIP_ERROR ThreadStackManagerImpl::_GetSlaacIPv6Address(chip::Inet::IPAddress & addr)
+CHIP_ERROR ThreadStackManagerImpl::_GetExternalIPv6Address(chip::Inet::IPAddress & addr)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }

@@ -94,6 +94,14 @@ config CHIP_ENABLE_RENDEZVOUS_BYPASS
 	help
 	  Enables bypassing rendezvous for the test purposes.
 
+config CHIP_ENABLE_DNSSD_SRP
+	bool "Enable support for service registration"
+	default n
+	imply OPENTHREAD_ECDSA
+	imply OPENTHREAD_SRP_CLIENT
+	help
+	  Enables DNS-SD SRP client support
+
 config APP_LINK_WITH_CHIP
 	bool "Link 'app' with Connected Home over IP"
 	default y

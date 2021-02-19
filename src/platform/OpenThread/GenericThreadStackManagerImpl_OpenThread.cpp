@@ -39,6 +39,11 @@
 #include <openthread/thread_ftd.h>
 #endif
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+#include <openthread/srp_client.h>
+#endif
+
+#include <core/CHIPEncoding.h>
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.h>
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
@@ -813,14 +818,27 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetPrimary80215
 };
 
 template <class ImplClass>
-CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetSlaacIPv6Address(chip::Inet::IPAddress & addr)
+CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetExternalIPv6Address(chip::Inet::IPAddress & addr)
 {
-    for (const otNetifAddress * otAddr = otIp6GetUnicastAddresses(mOTInst); otAddr != nullptr; otAddr = otAddr->mNext)
+    const otNetifAddress * otAddresses = otIp6GetUnicastAddresses(mOTInst);
+
+    // Look only for the global unicast addresses, not internally assigned by Thread.
+    for (const otNetifAddress * otAddress = otAddresses; otAddress != nullptr; otAddress = otAddress->mNext)
     {
-        if (otAddr->mValid && otAddr->mAddressOrigin == OT_ADDRESS_ORIGIN_SLAAC)
+        if (otAddress->mValid)
         {
-            addr = ToIPAddress(otAddr->mAddress);
-            return CHIP_NO_ERROR;
+            switch (otAddress->mAddressOrigin)
+            {
+            case OT_ADDRESS_ORIGIN_THREAD:
+                break;
+            case OT_ADDRESS_ORIGIN_SLAAC:
+            case OT_ADDRESS_ORIGIN_DHCPV6:
+            case OT_ADDRESS_ORIGIN_MANUAL:
+                addr = ToIPAddress(otAddress->mAddress);
+                return CHIP_NO_ERROR;
+            default:
+                break;
+            }
         }
     }
 
@@ -864,6 +882,12 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::DoInit(otInstanc
 #if OPENTHREAD_CONFIG_IP6_SLAAC_ENABLE
     otIp6SetSlaacEnabled(otInst, true);
 #endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+    otSrpClientSetCallback(mOTInst, &OnSrpClientNotification, nullptr);
+    otSrpClientEnableAutoStartMode(mOTInst, &OnSrpClientStateChange, nullptr);
+    memset(&mSrpClient, 0, sizeof(mSrpClient));
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 
     // If the Thread stack has been provisioned, but is not currently enabled, enable it now.
     if (otThreadGetDeviceRole(mOTInst) == OT_DEVICE_ROLE_DISABLED && otDatasetIsCommissioned(otInst))
@@ -1001,6 +1025,208 @@ exit:
 
     return error;
 }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+
+static_assert(OPENTHREAD_API_VERSION >= 80, "SRP Client requires a more recent OpenThread version");
+
+template <class ImplClass>
+void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnSrpClientNotification(otError aError,
+                                                                                  const otSrpClientHostInfo * aHostInfo,
+                                                                                  const otSrpClientService * aServices,
+                                                                                  const otSrpClientService * aRemovedServices,
+                                                                                  void * aContext)
+{
+    switch (aError)
+    {
+    case OT_ERROR_NONE: {
+        ChipLogProgress(DeviceLayer, "OnSrpClientNotification: Last requested operation completed successfully");
+
+        if (aRemovedServices)
+        {
+            otSrpClientService * otService = const_cast<otSrpClientService *>(aRemovedServices);
+            otSrpClientService * next      = nullptr;
+            using Service                  = typename SrpClient::Service;
+
+            // Free memory for all removed services.
+            do
+            {
+                next         = otService->mNext;
+                auto service = reinterpret_cast<Service *>(reinterpret_cast<size_t>(otService) - offsetof(Service, mService));
+                memset(service, 0, sizeof(Service));
+                otService = next;
+            } while (otService);
+        }
+        break;
+    }
+    case OT_ERROR_PARSE:
+        ChipLogError(DeviceLayer, "OnSrpClientNotification: Parsing operaton failed");
+        break;
+    case OT_ERROR_NOT_FOUND:
+        ChipLogError(DeviceLayer, "OnSrpClientNotification: Domain name or RRset does not exist");
+        break;
+    case OT_ERROR_NOT_IMPLEMENTED:
+        ChipLogError(DeviceLayer, "OnSrpClientNotification: Server does not support query type");
+        break;
+    case OT_ERROR_SECURITY:
+        ChipLogError(DeviceLayer, "OnSrpClientNotification: Operation refused for security reasons");
+        break;
+    case OT_ERROR_DUPLICATED:
+        ChipLogError(DeviceLayer, "OnSrpClientNotification: Domain name or RRset is duplicated");
+        break;
+    case OT_ERROR_RESPONSE_TIMEOUT:
+        ChipLogError(DeviceLayer, "OnSrpClientNotification: Timed out waiting on server response");
+        break;
+    case OT_ERROR_INVALID_ARGS:
+        ChipLogError(DeviceLayer, "OnSrpClientNotification: Invalid service structure detected");
+        break;
+    case OT_ERROR_NO_BUFS:
+        ChipLogError(DeviceLayer, "OnSrpClientNotification: Insufficient buffer to handle message");
+        break;
+    case OT_ERROR_FAILED:
+        ChipLogError(DeviceLayer, "OnSrpClientNotification: Internal server error occurred");
+        break;
+    default:
+        ChipLogError(DeviceLayer, "OnSrpClientNotification: Unknown error occurred");
+        break;
+    }
+}
+
+template <class ImplClass>
+void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnSrpClientStateChange(const otSockAddr * aServerSockAddr,
+                                                                                 void * aContext)
+{
+    if (aServerSockAddr)
+    {
+        ChipLogProgress(DeviceLayer, "SRP Client was started, as detected server addressed: %x:%x:%x:%x:%x:%x:%x:%x",
+                        Encoding::BigEndian::HostSwap16(aServerSockAddr->mAddress.mFields.m16[0]),
+                        Encoding::BigEndian::HostSwap16(aServerSockAddr->mAddress.mFields.m16[1]),
+                        Encoding::BigEndian::HostSwap16(aServerSockAddr->mAddress.mFields.m16[2]),
+                        Encoding::BigEndian::HostSwap16(aServerSockAddr->mAddress.mFields.m16[3]),
+                        Encoding::BigEndian::HostSwap16(aServerSockAddr->mAddress.mFields.m16[4]),
+                        Encoding::BigEndian::HostSwap16(aServerSockAddr->mAddress.mFields.m16[5]),
+                        Encoding::BigEndian::HostSwap16(aServerSockAddr->mAddress.mFields.m16[6]),
+                        Encoding::BigEndian::HostSwap16(aServerSockAddr->mAddress.mFields.m16[7]));
+    }
+    else
+    {
+        ChipLogProgress(DeviceLayer, "SRP Client was stopped, because current server is no longer detected.");
+    }
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_AddSrpService(const char * aInstanceName, const char * aName,
+                                                                               uint16_t aPort, uint32_t aLeaseInterval,
+                                                                               uint32_t aKeyLeaseInterval)
+{
+    CHIP_ERROR error                         = CHIP_NO_ERROR;
+    typename SrpClient::Service * srpService = nullptr;
+
+    Impl()->LockThreadStack();
+
+    VerifyOrExit(aInstanceName, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(strlen(aInstanceName) < SrpClient::kMaxInstanceNameSize, error = CHIP_ERROR_INVALID_STRING_LENGTH);
+    VerifyOrExit(aName, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(strlen(aName) < SrpClient::kMaxNameSize, error = CHIP_ERROR_INVALID_STRING_LENGTH);
+
+    // Check if service with desired instance name already exists and try to find empty slot in array for new service
+    for (typename SrpClient::Service & service : mSrpClient.mServices)
+    {
+        if (strcmp(service.mInstanceName, "") == 0)
+        {
+            // Assign first empty slot in array for a new service.
+            srpService = srpService ? srpService : &service;
+        }
+        else
+        {
+            VerifyOrExit((strcmp(service.mInstanceName, aInstanceName) != 0) || (strcmp(service.mName, aName) != 0),
+                         error = MapOpenThreadError(OT_ERROR_DUPLICATED));
+        }
+    }
+
+    // Verify is there an empty place for new service.
+    VerifyOrExit(srpService, error = MapOpenThreadError(OT_ERROR_NO_BUFS));
+
+    otSrpClientSetLeaseInterval(mOTInst, aLeaseInterval);
+    otSrpClientSetKeyLeaseInterval(mOTInst, aKeyLeaseInterval);
+
+    memcpy(srpService->mInstanceName, aInstanceName, strlen(aInstanceName) + 1);
+    srpService->mService.mInstanceName = srpService->mInstanceName;
+
+    memcpy(srpService->mName, aName, strlen(aName) + 1);
+    srpService->mService.mName = srpService->mName;
+
+    srpService->mService.mPort = aPort;
+
+    error = MapOpenThreadError(otSrpClientAddService(mOTInst, &(srpService->mService)));
+
+exit:
+    Impl()->UnlockThreadStack();
+
+    return error;
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_RemoveSrpService(const char * aInstanceName, const char * aName)
+{
+    CHIP_ERROR error                         = CHIP_NO_ERROR;
+    typename SrpClient::Service * srpService = nullptr;
+
+    Impl()->LockThreadStack();
+
+    VerifyOrExit(aInstanceName, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(strlen(aInstanceName) < SrpClient::kMaxInstanceNameSize, error = CHIP_ERROR_INVALID_STRING_LENGTH);
+    VerifyOrExit(aName, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(strlen(aName) < SrpClient::kMaxNameSize, error = CHIP_ERROR_INVALID_STRING_LENGTH);
+
+    // Check if service to remove exists.
+    for (typename SrpClient::Service & service : mSrpClient.mServices)
+    {
+        if ((strcmp(service.mInstanceName, aInstanceName) == 0) && (strcmp(service.mName, aName) == 0))
+        {
+            srpService = &service;
+            break;
+        }
+    }
+
+    VerifyOrExit(srpService, error = MapOpenThreadError(OT_ERROR_NOT_FOUND));
+
+    error = MapOpenThreadError(otSrpClientRemoveService(mOTInst, &(srpService->mService)));
+
+exit:
+    Impl()->UnlockThreadStack();
+
+    return error;
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetupSrpHost(const char * aHostName)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    Inet::IPAddress hostAddress;
+
+    Impl()->LockThreadStack();
+
+    VerifyOrExit(aHostName, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(strlen(aHostName) < SrpClient::kMaxHostNameSize, error = CHIP_ERROR_INVALID_STRING_LENGTH);
+
+    memcpy(mSrpClient.mHostName, aHostName, strlen(aHostName) + 1);
+    error = MapOpenThreadError(otSrpClientSetHostName(mOTInst, aHostName));
+    SuccessOrExit(error);
+
+    error = ThreadStackMgr().GetExternalIPv6Address(hostAddress);
+    SuccessOrExit(error);
+
+    memcpy(&mSrpClient.mHostAddress.mFields.m32, hostAddress.Addr, sizeof(hostAddress.Addr));
+    error = MapOpenThreadError(otSrpClientSetHostAddresses(mOTInst, &mSrpClient.mHostAddress, 1));
+
+exit:
+    Impl()->UnlockThreadStack();
+
+    return error;
+}
+
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 
 } // namespace Internal
 } // namespace DeviceLayer

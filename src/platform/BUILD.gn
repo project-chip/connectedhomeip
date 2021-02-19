@@ -67,10 +67,13 @@ if (chip_device_platform != "none") {
     defines = [
       "CHIP_DEVICE_CONFIG_ENABLE_WPA=${chip_device_config_enable_wpa}",
       "CHIP_ENABLE_OPENTHREAD=${chip_enable_openthread}",
-      "CHIP_ENABLE_MDNS=${chip_enable_mdns}",
       "CHIP_WITH_GIO=${chip_with_gio}",
       "OPENTHREAD_CONFIG_ENABLE_TOBLE=false",
     ]
+
+    if (chip_enable_mdns) {
+      defines += [ "CHIP_DEVICE_CONFIG_ENABLE_MDNS=1"]
+    }
 
     if (chip_device_project_config_include != "") {
       defines += [ "CHIP_DEVICE_PROJECT_CONFIG_INCLUDE=${chip_device_project_config_include}" ]

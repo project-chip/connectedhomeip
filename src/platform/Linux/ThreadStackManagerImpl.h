@@ -86,7 +86,7 @@ public:
 
     CHIP_ERROR _GetPrimary802154MACAddress(uint8_t * buf);
 
-    CHIP_ERROR _GetSlaacIPv6Address(chip::Inet::IPAddress & addr);
+    CHIP_ERROR _GetExternalIPv6Address(chip::Inet::IPAddress & addr);
 
     CHIP_ERROR _JoinerStart();
 
