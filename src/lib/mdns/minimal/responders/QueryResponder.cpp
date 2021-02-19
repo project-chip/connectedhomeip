@@ -158,7 +158,7 @@ void QueryResponderBase::AddAllResponses(const chip::Inet::IPPacketInfo * source
     }
 }
 
-void QueryResponderBase::ClearBroadcastTrottle()
+void QueryResponderBase::ClearBroadcastThrottle()
 {
     for (size_t i = 0; i < mResponderInfoSize; i++)
     {

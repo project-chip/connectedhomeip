@@ -659,7 +659,7 @@ void AdvertiserMinMdns::AdvertiseRecords()
         QueryData queryData(QType::PTR, QClass::IN, false /* unicast */);
         queryData.SetIsBootAdvertising(true);
 
-        mQueryResponder.ClearBroadcastTrottle();
+        mQueryResponder.ClearBroadcastThrottle();
 
         CHIP_ERROR err = mResponseSender.Respond(0, queryData, &packetInfo);
         if (err != CHIP_NO_ERROR)
@@ -669,7 +669,7 @@ void AdvertiserMinMdns::AdvertiseRecords()
     }
 
     // Once all automatic broadcasts are done, allow immediate replies once.
-    mQueryResponder.ClearBroadcastTrottle();
+    mQueryResponder.ClearBroadcastThrottle();
 }
 
 AdvertiserMinMdns gAdvertiser;
