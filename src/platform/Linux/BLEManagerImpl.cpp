@@ -34,7 +34,7 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
-#include "CHIPBluezHelper.h"
+#include "bluez/Helper.h"
 
 using namespace ::nl;
 using namespace ::chip::Ble;
