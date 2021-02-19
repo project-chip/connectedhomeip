@@ -80,9 +80,9 @@ CHIP_ERROR pychip_DeviceController_DeleteDeviceController(chip::Controller::Devi
 
 // Rendezvous
 CHIP_ERROR pychip_DeviceController_ConnectBLE(chip::Controller::DeviceCommissioner * devCtrl, uint16_t discriminator,
-                                              uint32_t setupPINCode);
+                                              uint32_t setupPINCode, chip::NodeId nodeid);
 CHIP_ERROR pychip_DeviceController_ConnectIP(chip::Controller::DeviceCommissioner * devCtrl, const char * peerAddrStr,
-                                             uint32_t setupPINCode);
+                                             uint32_t setupPINCode, chip::NodeId nodeid);
 
 // Pairing Delegate
 CHIP_ERROR
@@ -162,9 +162,9 @@ void pychip_DeviceController_SetLogFilter(uint8_t category)
 }
 
 CHIP_ERROR pychip_DeviceController_ConnectBLE(chip::Controller::DeviceCommissioner * devCtrl, uint16_t discriminator,
-                                              uint32_t setupPINCode)
+                                              uint32_t setupPINCode, chip::NodeId nodeid)
 {
-    return devCtrl->PairDevice(kRemoteDeviceId,
+    return devCtrl->PairDevice(nodeid,
                                chip::RendezvousParameters()
                                    .SetPeerAddress(Transport::PeerAddress(Transport::Type::kBle))
                                    .SetSetupPINCode(setupPINCode)
@@ -172,7 +172,7 @@ CHIP_ERROR pychip_DeviceController_ConnectBLE(chip::Controller::DeviceCommission
 }
 
 CHIP_ERROR pychip_DeviceController_ConnectIP(chip::Controller::DeviceCommissioner * devCtrl, const char * peerAddrStr,
-                                             uint32_t setupPINCode)
+                                             uint32_t setupPINCode, chip::NodeId nodeid)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::Inet::IPAddress peerAddr;
@@ -183,7 +183,7 @@ CHIP_ERROR pychip_DeviceController_ConnectIP(chip::Controller::DeviceCommissione
     // TODO: IP rendezvous should use TCP connection.
     addr.SetTransportType(chip::Transport::Type::kUdp).SetIPAddress(peerAddr);
     params.SetPeerAddress(addr).SetDiscriminator(0);
-    return devCtrl->PairDevice(kRemoteDeviceId, params);
+    return devCtrl->PairDevice(nodeid, params);
 }
 
 CHIP_ERROR
