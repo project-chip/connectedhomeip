@@ -643,11 +643,18 @@ void AdvertiserMinMdns::AdvertiseRecords()
         chip::Inet::IPPacketInfo packetInfo;
 
         packetInfo.Clear();
-        packetInfo.SrcAddress  = interfaceAddress.GetAddress();
-        packetInfo.DestAddress = interfaceAddress.GetAddress().IsIPv4() ? kBroadcastIpAddresses.ipv4 : kBroadcastIpAddresses.ipv6;
-        packetInfo.SrcPort     = kMdnsPort;
-        packetInfo.DestPort    = kMdnsPort;
-        packetInfo.Interface   = interfaceAddress.GetInterfaceId();
+        packetInfo.SrcAddress = interfaceAddress.GetAddress();
+        if (interfaceAddress.GetAddress().IsIPv4())
+        {
+            BroadcastIpAddresses::GetIpv4Into(packetInfo.DestAddress);
+        }
+        else
+        {
+            BroadcastIpAddresses::GetIpv6Into(packetInfo.DestAddress);
+        }
+        packetInfo.SrcPort   = kMdnsPort;
+        packetInfo.DestPort  = kMdnsPort;
+        packetInfo.Interface = interfaceAddress.GetInterfaceId();
 
         QueryData queryData(QType::PTR, QClass::IN, false /* unicast */);
         queryData.SetIsBootAdvertising(true);

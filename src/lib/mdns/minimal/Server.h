@@ -28,19 +28,14 @@
 namespace mdns {
 namespace Minimal {
 
-/// These are addresses that are used for MDNS broadcasts
-struct BroadcastIpAddresses
-{
-    chip::Inet::IPAddress ipv6;
-    chip::Inet::IPAddress ipv4;
+namespace BroadcastIpAddresses {
 
-    BroadcastIpAddresses()
-    {
-        chip::Inet::IPAddress::FromString("FF02::FB", ipv6);
-        chip::Inet::IPAddress::FromString("224.0.0.251", ipv4);
-    }
-};
-extern const BroadcastIpAddresses kBroadcastIpAddresses;
+// Get standard mDNS Broadcast addresses
+
+void GetIpv6Into(chip::Inet::IPAddress & dest);
+void GetIpv4Into(chip::Inet::IPAddress & dest);
+
+} // namespace BroadcastIpAddresses
 
 /// Provides a list of intefaces to listen on.
 ///
@@ -93,6 +88,12 @@ public:
         {
             mEndpoints[i].udp = nullptr;
         }
+
+        BroadcastIpAddresses::GetIpv6Into(mIpv6BroadcastAddress);
+
+#if INET_CONFIG_ENABLE_IPV4
+        BroadcastIpAddresses::GetIpv4Into(mIpv4BroadcastAddress);
+#endif
     }
     ~ServerBase();
 
@@ -136,6 +137,13 @@ private:
     EndpointInfo * mEndpoints;   // possible endpoints, to listen on multiple interfaces
     const size_t mEndpointCount; // how many endpoints are allocated
     ServerDelegate * mDelegate = nullptr;
+
+    // Broadcast IP addresses are cached to not require a string parse every time
+    // Ideally we should be able to constexpr these
+    chip::Inet::IPAddress mIpv6BroadcastAddress;
+#if INET_CONFIG_ENABLE_IPV4
+    chip::Inet::IPAddress mIpv4BroadcastAddress;
+#endif
 };
 
 template <size_t kCount>

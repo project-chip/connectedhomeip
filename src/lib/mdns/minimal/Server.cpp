@@ -50,7 +50,23 @@ private:
 
 } // namespace
 
-const BroadcastIpAddresses kBroadcastIpAddresses;
+namespace BroadcastIpAddresses {
+
+// Get standard mDNS Broadcast addresses
+
+void GetIpv6Into(chip::Inet::IPAddress & dest)
+{
+    CHIP_ERROR err = chip::Inet::IPAddress::FromString("FF02::FB", dest);
+    VerifyOrDie(err == CHIP_NO_ERROR); // standard address, should be parseable
+}
+
+void GetIpv4Into(chip::Inet::IPAddress & dest)
+{
+    CHIP_ERROR err = chip::Inet::IPAddress::FromString("224.0.0.251", dest);
+    VerifyOrDie(err == CHIP_NO_ERROR); // standard address, should be parseable
+}
+
+} // namespace BroadcastIpAddresses
 
 ServerBase::~ServerBase()
 {
@@ -171,12 +187,12 @@ CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBufferHandle data, uint
 
         if (info->addressType == chip::Inet::kIPAddressType_IPv6)
         {
-            err = info->udp->SendTo(kBroadcastIpAddresses.ipv6, port, info->udp->GetBoundInterface(), std::move(copy));
+            err = info->udp->SendTo(mIpv6BroadcastAddress, port, info->udp->GetBoundInterface(), std::move(copy));
         }
 #if INET_CONFIG_ENABLE_IPV4
         else if (info->addressType == chip::Inet::kIPAddressType_IPv4)
         {
-            err = info->udp->SendTo(kBroadcastIpAddresses.ipv4, port, info->udp->GetBoundInterface(), std::move(copy));
+            err = info->udp->SendTo(mIpv4BroadcastAddress, port, info->udp->GetBoundInterface(), std::move(copy));
         }
 #endif
         else
@@ -213,12 +229,12 @@ CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBufferHandle data, uint
 
         if (info->addressType == chip::Inet::kIPAddressType_IPv6)
         {
-            err = info->udp->SendTo(kBroadcastIpAddresses.ipv6, port, info->udp->GetBoundInterface(), std::move(copy));
+            err = info->udp->SendTo(mIpv6BroadcastAddress, port, info->udp->GetBoundInterface(), std::move(copy));
         }
 #if INET_CONFIG_ENABLE_IPV4
         else if (info->addressType == chip::Inet::kIPAddressType_IPv4)
         {
-            err = info->udp->SendTo(kBroadcastIpAddresses.ipv4, port, info->udp->GetBoundInterface(), std::move(copy));
+            err = info->udp->SendTo(mIpv4BroadcastAddress, port, info->udp->GetBoundInterface(), std::move(copy));
         }
 #endif
         else
