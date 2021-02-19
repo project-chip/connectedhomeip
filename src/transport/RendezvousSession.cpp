@@ -116,13 +116,29 @@ CHIP_ERROR RendezvousSession::SendSessionEstablishmentMessage(const PacketHeader
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
+    // TODO: Admin information and node ID shouold be set during operation credential configuration
+    // This setting of header properties is a hack to transmit the local node id to our peer
+    // so that admin configurations are preserved. Generally PASE sesions should not need to send
+    // node-ids as the peers may not be part of a fabric.
+    PacketHeader headerWithNodeIds = header;
+
+    if (mParams.HasLocalNodeId())
+    {
+        headerWithNodeIds.SetSourceNodeId(mParams.GetLocalNodeId().Value());
+    }
+
+    if (mParams.HasRemoteNodeId())
+    {
+        headerWithNodeIds.SetDestinationNodeId(mParams.GetRemoteNodeId());
+    }
+
     if (peerAddress.GetTransportType() == Transport::Type::kBle)
     {
-        return mTransport->SendMessage(header, peerAddress, std::move(msgIn));
+        return mTransport->SendMessage(headerWithNodeIds, peerAddress, std::move(msgIn));
     }
     else if (mTransportMgr != nullptr)
     {
-        return mTransportMgr->SendMessage(header, peerAddress, std::move(msgIn));
+        return mTransportMgr->SendMessage(headerWithNodeIds, peerAddress, std::move(msgIn));
     }
     else
     {
@@ -327,6 +343,20 @@ void RendezvousSession::OnRendezvousMessageReceived(const PacketHeader & packetH
     switch (mCurrentState)
     {
     case State::kSecurePairing:
+        // TODO: when operational certificates are in use, Rendezvous should not rely on destination node id.
+        //   This marks internal key settings to identify the underlying key by the value that the
+        // remote node has sent.
+        //   Generally such things should be saved as part of a CASE session, where operational credentials
+        // would be authenticated and matched against a remote node id.
+        //   Also unclear why 'destination node id' is used here - it seems to be better ot use
+        // the source node id, which would identify the peer (rather than 'self' - rendezvous should
+        // already know the local node id).
+        if (packetHeader.GetDestinationNodeId().HasValue())
+        {
+            ChipLogProgress(Ble, "Received pairing message for %llu", packetHeader.GetDestinationNodeId().Value());
+            mAdmin->SetNodeId(packetHeader.GetDestinationNodeId().Value());
+        }
+
         err = HandlePairingMessage(packetHeader, peerAddress, std::move(msgBuf));
         break;
 
