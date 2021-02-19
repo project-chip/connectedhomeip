@@ -17,6 +17,10 @@
 #include <string.h>
 #include <task.h>
 
+#ifdef PW_RPC_ENABLED
+#include "PigweedLogger.h"
+#endif
+
 // RTT Buffer size and name
 #ifndef LOG_RTT_BUFFER_INDEX
 #define LOG_RTT_BUFFER_INDEX 0
@@ -73,11 +77,18 @@ static void PrintLog(const char * msg)
         size_t sz;
         sz = strlen(msg);
         SEGGER_RTT_WriteNoLock(LOG_RTT_BUFFER_INDEX, msg, sz);
+#ifdef PW_RPC_ENABLED
+        PigweedLogger::putString(msg, sz);
+#endif
 
         const char * newline = "\r\n";
         sz                   = strlen(newline);
         SEGGER_RTT_WriteNoLock(LOG_RTT_BUFFER_INDEX, newline, sz);
+#ifdef PW_RPC_ENABLED
+        PigweedLogger::putString(newline, sz);
+#endif
     }
+
 #endif // EFR32_LOG_ENABLED
 }
 
@@ -95,6 +106,10 @@ extern "C" void efr32LogInit(void)
                                 SEGGER_RTT_MODE_NO_BLOCK_SKIP);
 #else
     SEGGER_RTT_SetFlagsUpBuffer(LOG_RTT_BUFFER_INDEX, SEGGER_RTT_MODE_NO_BLOCK_TRIM);
+#endif
+
+#ifdef PW_RPC_ENABLED
+    PigweedLogger::init();
 #endif
     sLogInitialized = true;
 #endif // EFR32_LOG_ENABLED

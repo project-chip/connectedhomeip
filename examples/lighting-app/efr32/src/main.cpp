@@ -58,6 +58,10 @@
 #include <openthread/thread.h>
 #endif // CHIP_ENABLE_OPENTHREAD
 
+#if PW_RPC_ENABLED
+#include "Rpc.h"
+#endif
+
 using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;
@@ -106,6 +110,10 @@ int main(void)
 #if EFR32_LOG_ENABLED
     efr32LogInit();
 #endif
+#endif
+
+#if PW_RPC_ENABLED
+    chip::rpc::Init();
 #endif
 
     mbedtls_platform_set_calloc_free(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);

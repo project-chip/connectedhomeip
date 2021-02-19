@@ -18,20 +18,37 @@
 
 #pragma once
 
-#include "pw_rpc/server.h"
+#include "PigweedLogger.h"
+#include "pigweed/RpcService.h"
+#include "semphr.h"
+#include <FreeRTOS.h>
 
 namespace chip {
 namespace rpc {
-
-class Mutex
+class PigweedLoggerMutex : public ::chip::rpc::Mutex
 {
+
 public:
-    virtual void Lock()   = 0;
-    virtual void Unlock() = 0;
-    virtual ~Mutex() {} // Virtual Destructor
+    PigweedLoggerMutex() {}
+    void Lock() override
+    {
+        SemaphoreHandle_t * sem = PigweedLogger::GetSemaphore();
+        if (sem)
+        {
+            xSemaphoreTake(*sem, portMAX_DELAY);
+        }
+    }
+    void Unlock() override
+    {
+        SemaphoreHandle_t * sem = PigweedLogger::GetSemaphore();
+        if (sem)
+        {
+            xSemaphoreGive(*sem);
+        }
+    }
 };
 
-void Start(void (*RegisterServices)(pw::rpc::Server &), ::chip::rpc::Mutex * uart_mutex_);
+extern PigweedLoggerMutex logger_mutex;
 
 } // namespace rpc
 } // namespace chip

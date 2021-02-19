@@ -31,14 +31,14 @@ static_library("pw_rpc") {
   output_name = "libPwRpc"
 
   public_configs = [ "${dir_pigweed}/pw_hdlc:default_config" ]
-  sources = [ "${dir_pigweed}/pw_hdlc/rpc_example/hdlc_rpc_server.cc" ]
+
   deps = [
     "$dir_pw_rpc:server",
     "$dir_pw_rpc/nanopb:echo_service",
-    "$dir_pw_rpc/system_server",
     "${chip_root}/examples/platform/efr32/pw_sys_io:pw_sys_io_efr32",
     "${dir_pigweed}/pw_hdlc:pw_rpc",
     dir_pw_assert,
+    dir_pw_checksum,
     dir_pw_hdlc,
     dir_pw_log,
   ]
