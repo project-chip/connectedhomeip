@@ -95,4 +95,3 @@ public:
 private:
     int32_t mStatus;
 };
-
