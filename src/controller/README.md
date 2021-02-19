@@ -29,12 +29,12 @@ The Python chip-device-ctrl is located in
 | ---------- | --- | ------- | --- | ------ |
 | Setup code | y?  | n       | y   | y      |
 | QR code    | y   | y       | n   | n      |
-| NFC        | n   | y       | n   | n      |
+| NFC        | y   | y       | n   | n      |
 
 | Provisioning | iOS    | Android | CLI | Python |
 | ------------ | ------ | ------- | --- | ------ |
-| Soft-AP      | y      | y?      | y   | y      |
-| WiFi-BLE     | y?     | y?      | y   | y      |
+| Soft-AP      | y      | n       | y   | y      |
+| WiFi-BLE     | y?     | y       | y   | y      |
 | Thread-BLE   | n(\*0) | y(\*1)  | n   | n      |
 
 | Commands/Clusters   | iOS | Android | CLI | Python |
