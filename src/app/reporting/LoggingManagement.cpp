@@ -317,21 +317,21 @@ LoggingManagement::LoggingManagement(Messaging::ExchangeManager * apMgr, size_t 
 
         VerifyOrDie(apLogStorageResources[bufferIndex].mBufferSize > sizeof(CircularEventBuffer));
 
-        new (apLogStorageResources[bufferIndex].mpBuffer)
-            CircularEventBuffer(static_cast<uint8_t *>(apLogStorageResources[bufferIndex].mpBuffer) + sizeof(CircularEventBuffer),
-                                (uint32_t)(apLogStorageResources[bufferIndex].mBufferSize - sizeof(CircularEventBuffer)), prev, next);
+        new (apLogStorageResources[bufferIndex].mpBuffer) CircularEventBuffer(
+            static_cast<uint8_t *>(apLogStorageResources[bufferIndex].mpBuffer) + sizeof(CircularEventBuffer),
+            (uint32_t)(apLogStorageResources[bufferIndex].mBufferSize - sizeof(CircularEventBuffer)), prev, next);
 
         current = prev                  = static_cast<CircularEventBuffer *>(apLogStorageResources[bufferIndex].mpBuffer);
         current->mProcessEvictedElement = AlwaysFail;
         current->mAppData               = NULL;
         current->mPriority              = apLogStorageResources[bufferIndex].mPriority;
-        if ((apLogStorageResources[bufferIndex].mCounterStorage != NULL) && (apLogStorageResources[bufferIndex].mCounterKey != NULL) &&
-            (apLogStorageResources[bufferIndex].mCounterEpoch != 0))
+        if ((apLogStorageResources[bufferIndex].mCounterStorage != NULL) &&
+            (apLogStorageResources[bufferIndex].mCounterKey != NULL) && (apLogStorageResources[bufferIndex].mCounterEpoch != 0))
         {
             // We have been provided storage for a counter for this priority level.
             new (apLogStorageResources[bufferIndex].mCounterStorage) PersistedCounter();
-            CHIP_ERROR err = apLogStorageResources[bufferIndex].mCounterStorage->Init(*(apLogStorageResources[bufferIndex].mCounterKey),
-                                                                            apLogStorageResources[bufferIndex].mCounterEpoch);
+            CHIP_ERROR err = apLogStorageResources[bufferIndex].mCounterStorage->Init(
+                *(apLogStorageResources[bufferIndex].mCounterKey), apLogStorageResources[bufferIndex].mCounterEpoch);
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(EventLogging, "%s PersistedCounter[%d]->Init() failed with %d", __FUNCTION__, j, err);
