@@ -144,4 +144,3 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
 
 } // namespace app
 } // namespace chip
-

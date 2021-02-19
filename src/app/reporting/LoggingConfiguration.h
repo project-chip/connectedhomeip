@@ -65,4 +65,3 @@ private:
 } // namespace reporting
 } // namespace app
 } // namespace chip
-
