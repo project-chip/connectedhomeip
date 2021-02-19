@@ -158,9 +158,10 @@ static void CheckLogReadOut(nlTestSuite * apSuite, chip::app::reporting::Logging
 class TestEventGenerator : public chip::app::reporting::EventLoggingDelegate
 {
 public:
-    CHIP_ERROR WriteEvent(chip::TLV::TLVWriter &aWriter) {
+    CHIP_ERROR WriteEvent(chip::TLV::TLVWriter & aWriter)
+    {
         CHIP_ERROR err = CHIP_NO_ERROR;
-        err = aWriter.Put(kLivenessDeviceStatus, mStatus);
+        err            = aWriter.Put(kLivenessDeviceStatus, mStatus);
         return err;
     }
 
@@ -191,12 +192,12 @@ static void CheckLogEventBasics(nlTestSuite * apSuite, void * apContext)
 
         usleep(10000);
         testEventGenerator.SetStatus(1);
-        eid2   = chip::app::reporting::LogEvent(schema, &testEventGenerator, &options);
+        eid2 = chip::app::reporting::LogEvent(schema, &testEventGenerator, &options);
         CheckLogState(apSuite, logMgmt, 2);
 
         usleep(10000);
         testEventGenerator.SetStatus(0);
-        eid3   = chip::app::reporting::LogEvent(schema, &testEventGenerator, &options);
+        eid3 = chip::app::reporting::LogEvent(schema, &testEventGenerator, &options);
         CheckLogState(apSuite, logMgmt, 3);
 
         PrintEventLog();

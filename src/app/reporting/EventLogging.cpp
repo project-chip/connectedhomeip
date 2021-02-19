@@ -32,8 +32,7 @@ using namespace chip::TLV;
 namespace chip {
 namespace app {
 namespace reporting {
-chip::EventNumber LogEvent(const EventSchema & aSchema, EventLoggingDelegate * apDelegate,
-                           const EventOptions * apOptions)
+chip::EventNumber LogEvent(const EventSchema & aSchema, EventLoggingDelegate * apDelegate, const EventOptions * apOptions)
 {
 
     LoggingManagement & logManager = LoggingManagement::GetInstance();

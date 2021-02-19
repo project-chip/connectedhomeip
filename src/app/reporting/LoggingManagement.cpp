@@ -186,7 +186,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR LoggingManagement::BlitEvent(EventLoadOutContext * apContext, const EventSchema & aSchema, EventLoggingDelegate * apDelegate, const EventOptions * apOptions)
+CHIP_ERROR LoggingManagement::BlitEvent(EventLoadOutContext * apContext, const EventSchema & aSchema,
+                                        EventLoggingDelegate * apDelegate, const EventOptions * apOptions)
 {
 
     CHIP_ERROR err       = CHIP_NO_ERROR;
@@ -473,7 +474,8 @@ exit:
     return event_number;
 }
 
-inline chip::EventNumber LoggingManagement::LogEventPrivate(const EventSchema & aSchema, EventLoggingDelegate * apDelegate, const EventOptions * apOptions)
+inline chip::EventNumber LoggingManagement::LogEventPrivate(const EventSchema & aSchema, EventLoggingDelegate * apDelegate,
+                                                            const EventOptions * apOptions)
 {
     chip::EventNumber event_number = 0;
     CircularTLVWriter writer;
@@ -936,9 +938,7 @@ CopyAndAdjustDeltaTimeContext::CopyAndAdjustDeltaTimeContext(TLVWriter * aWriter
     mWriter(aWriter), mContext(inContext)
 {}
 
-EventEnvelopeContext::EventEnvelopeContext(void) :
-    mNumFieldsToRead(2), mDeltaTime(0), mPriority(kPriorityLevel_First)
-{}
+EventEnvelopeContext::EventEnvelopeContext(void) : mNumFieldsToRead(2), mDeltaTime(0), mPriority(kPriorityLevel_First) {}
 
 } // namespace reporting
 } // namespace app

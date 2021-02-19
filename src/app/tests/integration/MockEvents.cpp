@@ -104,8 +104,8 @@ void LivenessEventGenerator::Generate(void)
 
 CHIP_ERROR LivenessEventGenerator::WriteEvent(chip::TLV::TLVWriter & aWriter)
 {
-    CHIP_ERROR err    = CHIP_NO_ERROR;
-    err = aWriter.Put(kLivenessDeviceStatus, mStatus);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    err            = aWriter.Put(kLivenessDeviceStatus, mStatus);
     return err;
 }
 
@@ -115,7 +115,7 @@ chip::EventNumber LivenessEventGenerator::LogLiveness(chip::NodeId aNodeId, chip
     chip::app::reporting::DetailedRootSection root(aNodeId, aEndpointId);
     chip::app::reporting::EventSchema schema = { kLivenessClusterId, kLivenessChangeEvent, chip::app::reporting::Debug };
     chip::app::reporting::EventOptions options;
-    mStatus      = static_cast<int32_t>(aStatus);
+    mStatus             = static_cast<int32_t>(aStatus);
     options.eventSource = &root;
     options.urgent      = true;
 

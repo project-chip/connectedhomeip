@@ -74,8 +74,7 @@ namespace reporting {
  * @return chip::EventNumber      The event Number if the event was written to the
  *                         log, 0 otherwise.
  */
-chip::EventNumber LogEvent(const EventSchema & aSchema, EventLoggingDelegate * apDelegate,
-                           const EventOptions * apOptions);
+chip::EventNumber LogEvent(const EventSchema & aSchema, EventLoggingDelegate * apDelegate, const EventOptions * apOptions);
 
 } // namespace reporting
 } // namespace app

@@ -92,6 +92,7 @@ public:
     void Generate(void);
     chip::EventNumber LogLiveness(chip::NodeId aNodeId, chip::EndpointId aEndpointId, LivenessDeviceStatus aStatus);
     CHIP_ERROR WriteEvent(chip::TLV::TLVWriter & aWriter);
+
 private:
     int32_t mStatus;
 };

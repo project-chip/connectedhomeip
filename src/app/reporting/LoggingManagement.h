@@ -26,8 +26,8 @@
  */
 #pragma once
 
-#include "EventLoggingTypes.h"
 #include "EventLoggingDelegate.h"
+#include "EventLoggingTypes.h"
 #include <core/CHIPCircularTLVBuffer.h>
 #include <messaging/ExchangeMgr.h>
 #include <support/PersistedCounter.h>
@@ -279,7 +279,6 @@ public:
      */
     CHIP_ERROR SetExchangeManager(Messaging::ExchangeManager * apMgr);
 
-
     /**
      * @brief
      *   Log an event via a EventLoggingDelegate, with options.
@@ -318,8 +317,7 @@ public:
      * @return chip::EventNumber      The event Number if the event was written to the
      *                         log, 0 otherwise.
      */
-    chip::EventNumber LogEvent(const EventSchema & aSchema, EventLoggingDelegate * apDelegate,
-                               const EventOptions * apOptions);
+    chip::EventNumber LogEvent(const EventSchema & aSchema, EventLoggingDelegate * apDelegate, const EventOptions * apOptions);
 
     /**
      * @brief
@@ -475,7 +473,8 @@ public:
      *                          relevant to this event.
      *
      */
-    CHIP_ERROR BlitEvent(EventLoadOutContext * apContext, const EventSchema & aSchema, EventLoggingDelegate * apDelegate, const EventOptions * apOptions);
+    CHIP_ERROR BlitEvent(EventLoadOutContext * apContext, const EventSchema & aSchema, EventLoggingDelegate * apDelegate,
+                         const EventOptions * apOptions);
 
     /**
      * @brief Helper function to skip writing an event corresponding to an allocated
