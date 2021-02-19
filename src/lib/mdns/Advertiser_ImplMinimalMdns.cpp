@@ -102,6 +102,14 @@ bool IsCurrentInterfaceUsable(T & iterator)
         return false;
     }
 
+    // TODO: need a better way to ignore local loopback interfaces/addresses
+    // We do not want to listen on local loopback even though they are up and
+    // support multicast
+    //
+    // Some way to detect 'is local looback' that is smarter (e.g. at least
+    // strict string compare on linux instead of substring) would be better.
+    //
+    // This would reject likely valid interfaces like 'lollipop' or 'lostinspace'
     if (strncmp(name, "lo", 2) == 0)
     {
         /// local loopback interface is not usable by MDNS
