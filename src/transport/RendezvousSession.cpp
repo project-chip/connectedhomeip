@@ -155,7 +155,7 @@ void RendezvousSession::OnSessionEstablished()
         direction = SecureSessionMgr::PairingDirection::kResponder;
     }
 
-    // TODO: Once Operational credentials are implemented, this needs revisiting:
+    // TODO: Once Operational credentials are implemented, node id assignment should be done during opcreds configuration.
     // - can use internal node ids (0xFFFF_FFFE_xxxx_xxx - spec still being defined) if a temporary
     //   node id is required for indexing
     // - should only assign a final node id as part of setting operational credentials
