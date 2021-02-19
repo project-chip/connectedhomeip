@@ -389,7 +389,8 @@ void ChannelContext::OnSessionEstablished()
         // This will trigger OnNewConnection callback from SecureSessionManager
         mExchangeManager->GetSessionMgr()->NewPairing(
             Optional<Transport::PeerAddress>(addr), mStateVars.mPreparing.mBuilder.GetPeerNodeId(),
-            mStateVars.mPreparing.mSession.mPasePairingSession, SecureSessionMgr::PairingDirection::kInitiator, mExchangeManager->GetAdminId());
+            mStateVars.mPreparing.mSession.mPasePairingSession, SecureSessionMgr::PairingDirection::kInitiator,
+            mExchangeManager->GetAdminId());
         return;
     }
     case PrepareState::kCasePairing:
