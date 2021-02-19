@@ -2,7 +2,7 @@
 
 ## Building the Example Application
 
-Building the example application requires the use of the Espressif ESP32 IoT 
+Building the example application requires the use of the Espressif ESP32 IoT
 Development Framework and the xtensa-esp32-elf toolchain.
 
 The VSCode devcontainer has these components pre-installed, so you can skip this
@@ -118,6 +118,7 @@ your network configuration. To erase it, simply run.
 The demo application supports temperaturemeasurement and basic cluster.
 
 ## Temperature-measurement-app optimization
+
 Optimize the temperature-measurement-app to use less RAM and Flash.
 
 To enable this option set is_debug=false from command-line.
