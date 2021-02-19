@@ -308,7 +308,6 @@ public:
         size_t secretLen    = strlen(secret);
         mKeLen              = secretLen;
         memmove(mKe, secret, mKeLen);
-        mConnectionState.SetPeerNodeId(kUndefinedNodeId);
         mConnectionState.SetPeerKeyID(peerKeyId);
         mConnectionState.SetLocalKeyID(localKeyId);
         mPairingComplete = true;

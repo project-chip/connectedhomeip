@@ -155,6 +155,16 @@ void RendezvousSession::OnSessionEstablished()
         direction = SecureSessionMgr::PairingDirection::kResponder;
     }
 
+    // TODO: Once Operational credentials are implemented, this needs revisiting:
+    // - can use internal node ids (0xFFFF_FFFE_xxxx_xxx - spec still being defined) if a temporary
+    //   node id is required for indexing
+    // - should only assign a final node id as part of setting operational credentials
+    if (!mParams.GetRemoteNodeId().HasValue())
+    {
+        ChipLogError(Ble, "Missing node id in rendezvous parameters. Node ID is required until opcerts are implemented");
+    }
+    mPairingSession.PeerConnection().SetPeerNodeId(mParams.GetRemoteNodeId().ValueOr(kUndefinedNodeId));
+
     CHIP_ERROR err = mSecureSessionMgr->NewPairing(
         Optional<Transport::PeerAddress>::Value(mPairingSession.PeerConnection().GetPeerAddress()),
         mPairingSession.PeerConnection().GetPeerNodeId(), &mPairingSession, direction, mAdmin->GetAdminId(), mTransport);
@@ -317,15 +327,6 @@ void RendezvousSession::OnRendezvousMessageReceived(const PacketHeader & packetH
     switch (mCurrentState)
     {
     case State::kSecurePairing:
-        if (packetHeader.GetSourceNodeId().HasValue())
-        {
-            ChipLogProgress(Ble, "Received pairing message from %llu", packetHeader.GetSourceNodeId().Value());
-        }
-        if (packetHeader.GetDestinationNodeId().HasValue())
-        {
-            ChipLogProgress(Ble, "Received pairing message for %llu", packetHeader.GetDestinationNodeId().Value());
-            mAdmin->SetNodeId(packetHeader.GetDestinationNodeId().Value());
-        }
         err = HandlePairingMessage(packetHeader, peerAddress, std::move(msgBuf));
         break;
 
