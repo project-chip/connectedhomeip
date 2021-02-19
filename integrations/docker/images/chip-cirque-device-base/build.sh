@@ -40,10 +40,11 @@ VERSION=${DOCKER_BUILD_VERSION:-$(cat version)}
   Build and (optionally tag as latest, push) a docker image from Dockerfile in CWD
 
   Options:
-   --no-cache passed as a docker build argument
-   --latest   update latest to the current built version (\"$VERSION\")
-   --push     push image(s) to docker.io (requires docker login for \"$ORG\")
-   --help     get this message
+   --try-download  try to download latest image from dockerhub and skip whole build procedure if success
+   --no-cache      passed as a docker build argument
+   --latest        update latest to the current built version (\"$VERSION\")
+   --push          push image(s) to docker.io (requires docker login for \"$ORG\")
+   --help          get this message
 
 "
     exit 0
@@ -57,6 +58,13 @@ die() {
 set -ex
 
 [[ -n $VERSION ]] || die "version cannot be empty"
+
+if [[ ${*/--try-download//} != "${*}" ]]; then
+    docker pull "$ORG"/"$IMAGE":"$VERSION"
+    if [[ $? -eq 0 ]]; then
+        exit 0
+    fi
+fi
 
 # go find and build any CHIP images this image is "FROM"
 awk -F/ '/^FROM connectedhomeip/ {print $2}' Dockerfile | while read -r dep; do
