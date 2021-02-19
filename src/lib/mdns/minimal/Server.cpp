@@ -56,8 +56,7 @@ namespace BroadcastIpAddresses {
 
 void GetIpv6Into(chip::Inet::IPAddress & dest)
 {
-    CHIP_ERROR err = chip::Inet::IPAddress::FromString("FF02::FB", dest);
-    if (err != CHIP_NO_ERROR)
+    if (!chip::Inet::IPAddress::FromString("FF02::FB", dest))
     {
         ChipLogError(Discovery, "Failed to parse standard IPv6 broadcast address");
     }
@@ -65,8 +64,7 @@ void GetIpv6Into(chip::Inet::IPAddress & dest)
 
 void GetIpv4Into(chip::Inet::IPAddress & dest)
 {
-    CHIP_ERROR err = chip::Inet::IPAddress::FromString("224.0.0.251", dest);
-    if (err != CHIP_NO_ERROR)
+    if (!chip::Inet::IPAddress::FromString("224.0.0.251", dest))
     {
         ChipLogError(Discovery, "Failed to parse standard IPv4 broadcast address");
     }
