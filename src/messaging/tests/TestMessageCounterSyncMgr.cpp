@@ -56,10 +56,12 @@ using TestContext = chip::Test::MessagingContext;
 
 TestContext sContext;
 
-constexpr NodeId kSourceNodeId              = 123654;
-constexpr NodeId kDestinationNodeId         = 111222333;
-constexpr chip::NodeId kTestPeerGroupKeyId  = 0x4000;
-constexpr chip::NodeId kTestLocalGroupKeyId = 0x5000;
+constexpr NodeId kSourceNodeId        = 123654;
+constexpr NodeId kDestinationNodeId   = 111222333;
+constexpr NodeId kTestPeerGroupKeyId  = 0x4000;
+constexpr NodeId kTestLocalGroupKeyId = 0x5000;
+
+const char PAYLOAD[] = "Hello!";
 
 class LoopbackTransport : public Transport::Base
 {
@@ -213,6 +215,46 @@ void CheckReceiveMsgCounterSyncReq(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, mockAppDelegate.IsOnMessageReceivedCalled == true);
 }
 
+void CheckAddRetransTable(nlTestSuite * inSuite, void * inContext)
+{
+    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+
+    ctx.GetInetLayer().SystemLayer()->Init(nullptr);
+
+    MockAppDelegate mockAppDelegate;
+    ExchangeContext * exchange = ctx.NewExchangeToPeer(&mockAppDelegate);
+    NL_TEST_ASSERT(inSuite, exchange != nullptr);
+
+    MessageCounterSyncMgr * sm = ctx.GetExchangeManager().GetMessageCounterSyncMgr();
+    NL_TEST_ASSERT(inSuite, sm != nullptr);
+
+    System::PacketBufferHandle buffer = MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
+    NL_TEST_ASSERT(inSuite, !buffer.IsNull());
+
+    CHIP_ERROR err = sm->AddToRetransTable(Protocols::kProtocol_Echo, static_cast<uint8_t>(Protocols::Echo::MsgType::EchoRequest),
+                                           Messaging::SendFlags(Messaging::SendMessageFlags::kNone), std::move(buffer), exchange);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+}
+
+void CheckAddToReceiveTable(nlTestSuite * inSuite, void * inContext)
+{
+    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+
+    ctx.GetInetLayer().SystemLayer()->Init(nullptr);
+
+    MessageCounterSyncMgr * sm = ctx.GetExchangeManager().GetMessageCounterSyncMgr();
+    NL_TEST_ASSERT(inSuite, sm != nullptr);
+
+    System::PacketBufferHandle buffer = MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
+    NL_TEST_ASSERT(inSuite, !buffer.IsNull());
+
+    PacketHeader packetHeader;
+    PayloadHeader payloadHeader;
+
+    CHIP_ERROR err = sm->AddToReceiveTable(packetHeader, payloadHeader, { chip::kTestDeviceNodeId, 0, 0 }, std::move(buffer));
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+}
+
 // Test Suite
 
 /**
@@ -223,6 +265,8 @@ const nlTest sTests[] =
 {
     NL_TEST_DEF("Test MessageCounterSyncMgr::ReceiveMsgCounterSyncReq", CheckReceiveMsgCounterSyncReq),
     NL_TEST_DEF("Test MessageCounterSyncMgr::SendMsgCounterSyncReq", CheckSendMsgCounterSyncReq),
+    NL_TEST_DEF("Test MessageCounterSyncMgr::AddToRetransTable", CheckAddRetransTable),
+    NL_TEST_DEF("Test MessageCounterSyncMgr::AddToReceiveTable", CheckAddToReceiveTable),
     NL_TEST_SENTINEL()
 };
 // clang-format on
@@ -245,7 +289,11 @@ nlTestSuite sSuite =
  */
 int Initialize(void * aContext)
 {
-    CHIP_ERROR err = gTransportMgr.Init("LOOPBACK");
+    CHIP_ERROR err = chip::Platform::MemoryInit();
+    if (err != CHIP_NO_ERROR)
+        return FAILURE;
+
+    err = gTransportMgr.Init("LOOPBACK");
     if (err != CHIP_NO_ERROR)
         return FAILURE;
 

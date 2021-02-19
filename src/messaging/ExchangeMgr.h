@@ -48,6 +48,8 @@ static constexpr int16_t kAnyMessageType = -1;
  */
 class DLL_EXPORT ExchangeManager : public SecureSessionMgrDelegate
 {
+    friend class MessageCounterSyncMgr;
+
 public:
     ExchangeManager();
     ExchangeManager(const ExchangeManager &) = delete;
@@ -212,6 +214,8 @@ private:
 
     CHIP_ERROR RegisterUMH(uint32_t protocolId, int16_t msgType, ExchangeDelegate * delegate);
     CHIP_ERROR UnregisterUMH(uint32_t protocolId, int16_t msgType);
+
+    bool isMsgCounterSyncMessage(const PayloadHeader & payloadHeader) const;
 
     void OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source, SecureSessionMgr * msgLayer) override;
 

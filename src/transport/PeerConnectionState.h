@@ -30,6 +30,8 @@
 namespace chip {
 namespace Transport {
 
+static constexpr uint32_t kUndefinedMessageIndex = UINT32_MAX;
+
 /**
  * Defines state of a peer connection at a transport layer.
  *
@@ -61,6 +63,9 @@ public:
 
     void SetTransport(Transport::Base * transport) { mTransport = transport; }
     Transport::Base * GetTransport() { return mTransport; }
+
+    bool isPeerMsgCounterSynced() { return (mPeerMessageIndex != kUndefinedMessageIndex); }
+    void SetPeerMessageIndex(uint32_t id) { mPeerMessageIndex = id; }
 
     NodeId GetPeerNodeId() const { return mPeerNodeId; }
     void SetPeerNodeId(NodeId peerNodeId) { mPeerNodeId = peerNodeId; }
@@ -118,6 +123,7 @@ private:
     PeerAddress mPeerAddress;
     NodeId mPeerNodeId           = kUndefinedNodeId;
     uint32_t mSendMessageIndex   = 0;
+    uint32_t mPeerMessageIndex   = kUndefinedMessageIndex;
     uint16_t mPeerKeyID          = UINT16_MAX;
     uint16_t mLocalKeyID         = UINT16_MAX;
     uint64_t mLastActivityTimeMs = 0;
