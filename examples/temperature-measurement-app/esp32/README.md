@@ -120,8 +120,7 @@ The demo application supports temperaturemeasurement and basic cluster.
 ## Optimization
 
 Optimization related to WiFi, BLuetooth, Asserts etc are the part of this
-example by default.
-To enable this option set is_debug=false from command-line.
+example by default. To enable this option set is_debug=false from command-line.
 
 ```
 idf make build flash monitor 'is_debug=false'
