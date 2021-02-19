@@ -40,9 +40,10 @@ VERSION=${DOCKER_BUILD_VERSION:-$(cat version)}
   Build and (optionally tag as latest, push) a docker image from Dockerfile in CWD
 
   Options:
-   --try-download  try to download latest image from dockerhub and skip whole build procedure if success
+   --try-download  try to download latest image from dockerhub and skip whole
+                   build procedure if the expected image version is downloaded.
    --no-cache      passed as a docker build argument
-   --latest        update latest to the current built version (\"$VERSION\")
+   --latest        update latest to the current built (or downloaded) version (\"$VERSION\")
    --push          push image(s) to docker.io (requires docker login for \"$ORG\")
    --help          get this message
 
