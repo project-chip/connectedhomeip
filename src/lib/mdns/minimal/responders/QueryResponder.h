@@ -268,7 +268,7 @@ public:
 
     /// Resets the internal broadcast throttle setting to allow re-broadcasting
     /// of all packets without a timedelay.
-    void ClearBroadcastTrottle();
+    void ClearBroadcastThrottle();
 
 private:
     Internal::QueryResponderInfo * mResponderInfos;
