@@ -85,7 +85,7 @@ public:
      * @return CHIP_ERROR The result of encryption
      */
     CHIP_ERROR Encrypt(const uint8_t * input, size_t input_length, uint8_t * output, PacketHeader & header,
-                       MessageAuthenticationCode & mac);
+                       MessageAuthenticationCode & mac) const;
 
     /**
      * @brief
@@ -99,7 +99,7 @@ public:
      * @param mac Input mac
      */
     CHIP_ERROR Decrypt(const uint8_t * input, size_t input_length, uint8_t * output, const PacketHeader & header,
-                       const MessageAuthenticationCode & mac);
+                       const MessageAuthenticationCode & mac) const;
 
     /**
      * @brief

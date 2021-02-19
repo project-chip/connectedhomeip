@@ -13,6 +13,7 @@
 #include <support/CodeUtils.h>
 #include <support/ReturnMacros.h>
 #include <system/SystemPacketBuffer.h>
+#include <transport/SecureSessionMgr.h>
 
 namespace {
 constexpr uint8_t kBdxVersion         = 0;         ///< The version of this implementation of the BDX spec
@@ -25,7 +26,7 @@ constexpr size_t kStatusReportMinSize = 2 + 4 + 2; ///< 16 bits for GeneralCode,
 CHIP_ERROR WriteToPacketBuffer(const ::chip::bdx::BdxMessage & msgStruct, ::chip::System::PacketBufferHandle & msgBuf)
 {
     size_t msgDataSize = msgStruct.MessageSize();
-    ::chip::Encoding::LittleEndian::PacketBufferWriter bbuf(msgDataSize);
+    ::chip::Encoding::LittleEndian::PacketBufferWriter bbuf(chip::MessagePacketBuffer::New(msgDataSize), msgDataSize);
     if (bbuf.IsNull())
     {
         return CHIP_ERROR_NO_MEMORY;
@@ -36,7 +37,6 @@ CHIP_ERROR WriteToPacketBuffer(const ::chip::bdx::BdxMessage & msgStruct, ::chip
     {
         return CHIP_ERROR_NO_MEMORY;
     }
-
     return CHIP_NO_ERROR;
 }
 
@@ -848,7 +848,7 @@ void TransferSession::PrepareStatusReport(StatusCode code)
 {
     mStatusReportData.StatusCode = code;
 
-    Encoding::LittleEndian::PacketBufferWriter bbuf(kStatusReportMinSize);
+    Encoding::LittleEndian::PacketBufferWriter bbuf(chip::MessagePacketBuffer::New(kStatusReportMinSize), kStatusReportMinSize);
     VerifyOrReturn(!bbuf.IsNull());
 
     bbuf.Put16(static_cast<uint16_t>(Protocols::Common::StatusCode::Failure));

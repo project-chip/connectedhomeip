@@ -26,6 +26,7 @@ chip_test_suite("tests") {
     "MessagingContext.cpp",
     "MessagingContext.h",
     "TestExchangeMgr.cpp",
+    "TestMessageCounterSyncMgr.cpp",
     "TestMessagingLayer.h",
     "TestReliableMessageProtocol.cpp",
   ]
@@ -46,6 +47,7 @@ chip_test_suite("tests") {
 
   tests = [
     "TestExchangeMgr",
+    "TestMessageCounterSyncMgr",
     "TestReliableMessageProtocol",
   ]
 }

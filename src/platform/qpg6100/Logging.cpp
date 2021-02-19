@@ -111,8 +111,10 @@ extern "C" void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const ch
 {
     char formattedMsg[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
 
+    va_list v;
+
     va_start(v, aFormat);
-    size_t len = vsnprintf(formattedMsg, sizeof(formattedMsg), aFormat, v);
+    vsnprintf(formattedMsg, sizeof(formattedMsg), aFormat, v);
     va_end(v);
 
     qvCHIP_Printf(kPrintfModuleOpenThread, formattedMsg);

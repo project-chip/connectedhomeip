@@ -5684,6 +5684,96 @@
                                                                                                                                    \
                               ZCL_UNBIND_COMMAND_ID, "uuuu", nodeId, groupId, endpointId, clusterId);
 
+/** @brief Command description for PlayRequest
+ *
+ * Command: PlayRequest
+ */
+#define emberAfFillCommandMedia                                                                                                    \
+    PlaybackClusterPlayRequest() emberAfFillExternalBuffer(mask,                                                                   \
+                                                                                                                                   \
+                                                           ZCL_PLAY_REQUEST_COMMAND_ID, "", );
+
+/** @brief Command description for PauseRequest
+ *
+ * Command: PauseRequest
+ */
+#define emberAfFillCommandMedia                                                                                                    \
+    PlaybackClusterPauseRequest() emberAfFillExternalBuffer(mask,                                                                  \
+                                                                                                                                   \
+                                                            ZCL_PAUSE_REQUEST_COMMAND_ID, "", );
+
+/** @brief Command description for StopRequest
+ *
+ * Command: StopRequest
+ */
+#define emberAfFillCommandMedia                                                                                                    \
+    PlaybackClusterStopRequest() emberAfFillExternalBuffer(mask,                                                                   \
+                                                                                                                                   \
+                                                           ZCL_STOP_REQUEST_COMMAND_ID, "", );
+
+/** @brief Command description for StartOverRequest
+ *
+ * Command: StartOverRequest
+ */
+#define emberAfFillCommandMedia                                                                                                    \
+    PlaybackClusterStartOverRequest() emberAfFillExternalBuffer(mask,                                                              \
+                                                                                                                                   \
+                                                                ZCL_START_OVER_REQUEST_COMMAND_ID, "", );
+
+/** @brief Command description for PreviousRequest
+ *
+ * Command: PreviousRequest
+ */
+#define emberAfFillCommandMedia                                                                                                    \
+    PlaybackClusterPreviousRequest() emberAfFillExternalBuffer(mask,                                                               \
+                                                                                                                                   \
+                                                               ZCL_PREVIOUS_REQUEST_COMMAND_ID, "", );
+
+/** @brief Command description for NextRequest
+ *
+ * Command: NextRequest
+ */
+#define emberAfFillCommandMedia                                                                                                    \
+    PlaybackClusterNextRequest() emberAfFillExternalBuffer(mask,                                                                   \
+                                                                                                                                   \
+                                                           ZCL_NEXT_REQUEST_COMMAND_ID, "", );
+
+/** @brief Command description for RewindRequest
+ *
+ * Command: RewindRequest
+ */
+#define emberAfFillCommandMedia                                                                                                    \
+    PlaybackClusterRewindRequest() emberAfFillExternalBuffer(mask,                                                                 \
+                                                                                                                                   \
+                                                             ZCL_REWIND_REQUEST_COMMAND_ID, "", );
+
+/** @brief Command description for FastForwardRequest
+ *
+ * Command: FastForwardRequest
+ */
+#define emberAfFillCommandMedia                                                                                                    \
+    PlaybackClusterFastForwardRequest() emberAfFillExternalBuffer(mask,                                                            \
+                                                                                                                                   \
+                                                                  ZCL_FAST_FORWARD_REQUEST_COMMAND_ID, "", );
+
+/** @brief Command description for SkipForwardRequest
+ *
+ * Command: SkipForwardRequest
+ */
+#define emberAfFillCommandMedia                                                                                                    \
+    PlaybackClusterSkipForwardRequest() emberAfFillExternalBuffer(mask,                                                            \
+                                                                                                                                   \
+                                                                  ZCL_SKIP_FORWARD_REQUEST_COMMAND_ID, "", );
+
+/** @brief Command description for SkipBackwardRequest
+ *
+ * Command: SkipBackwardRequest
+ */
+#define emberAfFillCommandMedia                                                                                                    \
+    PlaybackClusterSkipBackwardRequest() emberAfFillExternalBuffer(mask,                                                           \
+                                                                                                                                   \
+                                                                   ZCL_SKIP_BACKWARD_REQUEST_COMMAND_ID, "", );
+
 /** @brief Command description for CommandOne
  *
  * Command: CommandOne

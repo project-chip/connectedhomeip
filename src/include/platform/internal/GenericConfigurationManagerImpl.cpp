@@ -27,6 +27,7 @@
 #define GENERIC_CONFIGURATION_MANAGER_IMPL_CPP
 
 #include <ble/CHIPBleServiceData.h>
+#include <core/CHIPConfig.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/GenericConfigurationManagerImpl.h>
 #include <support/Base64.h>
@@ -58,6 +59,10 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_Init()
     SetFlag(mFlags, kFlag_IsPairedToAccount, Impl()->ConfigValueExists(ImplClass::kConfigKey_PairedAccountId));
     SetFlag(mFlags, kFlag_OperationalDeviceCredentialsProvisioned,
             Impl()->ConfigValueExists(ImplClass::kConfigKey_OperationalDeviceCert));
+
+#if CHIP_ENABLE_ROTATING_DEVICE_ID
+    mLifetimePersistedCounter.Init(CHIP_CONFIG_LIFETIIME_PERSISTED_COUNTER_KEY);
+#endif
 
     return CHIP_NO_ERROR;
 }
@@ -187,15 +192,15 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetSerialNumber(char * b
     CHIP_ERROR err;
 
     err = Impl()->ReadConfigValueStr(ImplClass::kConfigKey_SerialNum, buf, bufSize, serialNumLen);
-#ifdef CHIP_DEVICE_CONFIG_USE_TEST_SERIAL_NUMBER
-    if (CHIP_DEVICE_CONFIG_USE_TEST_SERIAL_NUMBER[0] != 0 && err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+#ifdef CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER
+    if (CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER[0] != 0 && err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
-        VerifyOrExit(sizeof(CHIP_DEVICE_CONFIG_USE_TEST_SERIAL_NUMBER) <= bufSize, err = CHIP_ERROR_BUFFER_TOO_SMALL);
-        memcpy(buf, CHIP_DEVICE_CONFIG_USE_TEST_SERIAL_NUMBER, sizeof(CHIP_DEVICE_CONFIG_USE_TEST_SERIAL_NUMBER));
-        serialNumLen = sizeof(CHIP_DEVICE_CONFIG_USE_TEST_SERIAL_NUMBER) - 1;
+        VerifyOrExit(sizeof(CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER) <= bufSize, err = CHIP_ERROR_BUFFER_TOO_SMALL);
+        memcpy(buf, CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER, sizeof(CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER));
+        serialNumLen = sizeof(CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER) - 1;
         err          = CHIP_NO_ERROR;
     }
-#endif // CHIP_DEVICE_CONFIG_USE_TEST_SERIAL_NUMBER
+#endif // CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER
     SuccessOrExit(err);
 
 exit:
@@ -654,6 +659,21 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreServiceConfig(const
 {
     return Impl()->WriteConfigValueBin(ImplClass::kConfigKey_ServiceConfig, serviceConfig, serviceConfigLen);
 }
+
+#if CHIP_ENABLE_ROTATING_DEVICE_ID
+template <class ImplClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetLifetimeCounter(uint16_t & lifetimeCounter)
+{
+    lifetimeCounter = static_cast<uint16_t>(mLifetimePersistedCounter.GetValue());
+    return CHIP_NO_ERROR;
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_IncrementLifetimeCounter()
+{
+    return mLifetimePersistedCounter.Advance();
+}
+#endif
 
 template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetPairedAccountId(char * buf, size_t bufSize, size_t & accountIdLen)

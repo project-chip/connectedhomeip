@@ -41,6 +41,7 @@
 #include <support/CHIPFaultInjection.h>
 #include <support/CodeUtils.h>
 #include <support/RandUtils.h>
+#include <support/ReturnMacros.h>
 #include <support/logging/CHIPLogging.h>
 
 using namespace chip::Encoding;
@@ -66,8 +67,9 @@ ExchangeManager::ExchangeManager() : mReliableMessageMgr(mContextPool)
 
 CHIP_ERROR ExchangeManager::Init(SecureSessionMgr * sessionMgr)
 {
-    if (mState != State::kState_NotInitialized)
-        return CHIP_ERROR_INCORRECT_STATE;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    VerifyOrReturnError(mState == State::kState_NotInitialized, err = CHIP_ERROR_INCORRECT_STATE);
 
     mSessionMgr = sessionMgr;
 
@@ -82,13 +84,17 @@ CHIP_ERROR ExchangeManager::Init(SecureSessionMgr * sessionMgr)
 
     mReliableMessageMgr.Init(sessionMgr->SystemLayer(), sessionMgr);
 
+    err = mMessageCounterSyncMgr.Init(this);
+    ReturnErrorOnFailure(err);
+
     mState = State::kState_Initialized;
 
-    return CHIP_NO_ERROR;
+    return err;
 }
 
 CHIP_ERROR ExchangeManager::Shutdown()
 {
+    mMessageCounterSyncMgr.Shutdown();
     mReliableMessageMgr.Shutdown();
 
     if (mSessionMgr != nullptr)

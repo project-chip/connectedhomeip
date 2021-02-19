@@ -36,6 +36,7 @@ EmberAfStatus emberAfDoorLockClusterClientCommandParse(EmberAfClusterCommand * c
 EmberAfStatus emberAfGroupsClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfIdentifyClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfLevelControlClusterClientCommandParse(EmberAfClusterCommand * cmd);
+EmberAfStatus emberAfMediaPlaybackClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfOnOffClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfScenesClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfTemperatureMeasurementClusterClientCommandParse(EmberAfClusterCommand * cmd);
@@ -97,6 +98,9 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
         case ZCL_LEVEL_CONTROL_CLUSTER_ID:
             // No commands are enabled for cluster Level Control
             result = status(false, true, cmd->mfgSpecific);
+            break;
+        case ZCL_MEDIA_PLAYBACK_CLUSTER_ID:
+            result = emberAfMediaPlaybackClusterClientCommandParse(cmd);
             break;
         case ZCL_ON_OFF_CLUSTER_ID:
             // No commands are enabled for cluster On/off
@@ -769,6 +773,26 @@ EmberAfStatus emberAfIdentifyClusterClientCommandParse(EmberAfClusterCommand * c
             timeout = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
 
             wasHandled = emberAfIdentifyClusterIdentifyQueryResponseCallback(timeout);
+            break;
+        }
+        default: {
+            // Unrecognized command ID, error status will apply.
+            break;
+        }
+        }
+    }
+    return status(wasHandled, true, cmd->mfgSpecific);
+}
+EmberAfStatus emberAfMediaPlaybackClusterClientCommandParse(EmberAfClusterCommand * cmd)
+{
+    bool wasHandled = false;
+
+    if (!cmd->mfgSpecific)
+    {
+        switch (cmd->commandId)
+        {
+        case ZCL_PLAYBACK_COMMAND_ID: {
+            wasHandled = emberAfMediaPlaybackClusterPlaybackCallback();
             break;
         }
         default: {

@@ -25,10 +25,11 @@ assert(ti_simplelink_board != "", "ti_simplelink_board must be specified")
 
 # Differentiate between boards
 #
-# | Development Kit   | Device Family | SoC        |
-# | ----------------- | ------------- | ---------- |
-# | CC1352R1_LAUNCHXL | cc13x2_26x2   | cc1352r1f3 |
-# | CC2652R1_LAUNCHXL | cc13x2_26x2   | cc2652r1f3 |
+# | Development Kit   | Device Family   | SoC        |                     |
+# | ----------------- | --------------- | ---------- | ------------------- |
+# | CC1352R1_LAUNCHXL | cc13x2_26x2     | cc1352r1f3 | Thread MTD + no BLE |
+# | CC2652R1_LAUNCHXL | cc13x2_26x2     | cc2652r1f3 | Thread MTD + no BLE |
+# | LP_CC2652R7       | cc13x2x7_26x2x7 | cc2652r1f7 | Thread FTD + BLE    |
 
 # XXX: Can we do an array with a case statement?
 if (ti_simplelink_board == "CC1352R1_LAUNCHXL") {
@@ -43,6 +44,12 @@ if (ti_simplelink_board == "CC1352R1_LAUNCHXL") {
 
   # set -DDeviceFamily_CC26X2?
   ti_simplelink_soc = "cc2652r1f3"
+} else if (ti_simplelink_board == "LP_CC2652R7") {
+  ti_simplelink_device_family = "cc13x2x7_26x2x7"
+  ti_simplelink_soc_family = "cc26x2"
+
+  # set -DDeviceFamily_CC26X2?
+  ti_simplelink_soc = "cc2652r1f7"
 } else {
   print("Please provide a valid value for TI_SIMPLELINK_BOARD env variable")
   assert(false, "The board ${ti_simplelink_board} is unsupported as for now.")

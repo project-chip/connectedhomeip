@@ -27,6 +27,8 @@ static_library("messaging") {
     "ExchangeMgr.cpp",
     "ExchangeMgr.h",
     "Flags.h",
+    "MessageCounterSync.cpp",
+    "MessageCounterSync.h",
     "ReliableMessageContext.cpp",
     "ReliableMessageContext.h",
     "ReliableMessageMgr.cpp",
