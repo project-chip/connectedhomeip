@@ -366,7 +366,7 @@ class DeviceMgrCmd(Cmd):
                 self.do_help("connect SetupPinCode")
                 return
 
-            nodeid = random.randint(1000000)  # Just a random number
+            nodeid = random.randint(1, 1000000)  # Just a random number
             if len(args) == 4:
                 nodeid = int(args[3])
             print("Device is assigned with nodeid = {}".format(nodeid))
