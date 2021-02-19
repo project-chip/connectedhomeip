@@ -57,10 +57,15 @@ CHIP_ERROR Encode(NodeId localNodeId, Transport::PeerConnectionState * state, Pa
                   "Addition to generate payloadLength might overflow");
 
     packetHeader
-        .SetSourceNodeId(localNodeId)                 //
-        .SetDestinationNodeId(state->GetPeerNodeId()) //
-        .SetMessageId(msgId)                          //
+        .SetSourceNodeId(localNodeId) //
+        .SetMessageId(msgId)          //
         .SetEncryptionKeyID(state->GetLocalKeyID());
+
+    if (state->GetPeerNodeId() != kUndefinedNodeId)
+    {
+        packetHeader.SetDestinationNodeId(state->GetPeerNodeId());
+    }
+
     packetHeader.GetFlags().Set(Header::FlagValues::kSecure);
 
     ReturnErrorOnFailure(payloadHeader.EncodeBeforeData(msgBuf));
