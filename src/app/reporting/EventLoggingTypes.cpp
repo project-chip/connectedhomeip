@@ -50,9 +50,11 @@ EventOptions::EventOptions(utc_timestamp_t aUtcTimestamp, bool aUrgent) :
     timestamp(aUtcTimestamp), eventSource(NULL), timestampType(kTimestampType_UTC), urgent(aUrgent)
 {}
 
-EventLoadOutContext::EventLoadOutContext(chip::TLV::TLVWriter & aWriter, PriorityLevel aPriority, chip::EventNumber aStartingEventID) :
-    mWriter(aWriter), mPriority(aPriority), mStartingEventNumber(aStartingEventID), mCurrentTime(0), mCurrentEventNumber(0),
-    mCurrentUTCTime(0), mFirstUtc(true), mFirst(true)
+EventLoadOutContext::EventLoadOutContext(chip::TLV::TLVWriter & aWriter, PriorityLevel aPriority,
+                                         chip::EventNumber aStartingEventID) :
+    mWriter(aWriter),
+    mPriority(aPriority), mStartingEventNumber(aStartingEventID), mCurrentTime(0), mCurrentEventNumber(0), mCurrentUTCTime(0),
+    mFirstUtc(true), mFirst(true)
 {}
 
 } // namespace reporting

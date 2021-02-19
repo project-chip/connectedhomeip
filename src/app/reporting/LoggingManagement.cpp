@@ -33,13 +33,9 @@ using namespace chip::TLV;
 namespace chip {
 namespace Platform {
 // TODO: Implement CriticalSectionEnter per platform
-void CriticalSectionEnter()
-{
-}
+void CriticalSectionEnter() {}
 
-void CriticalSectionExit()
-{
-}
+void CriticalSectionExit() {}
 } // namespace Platform
 } // namespace chip
 
@@ -508,10 +504,10 @@ PriorityLevel LoggingManagement::GetMaxPriority(void)
  */
 chip::EventNumber CircularEventBuffer::VendEventNumber(void)
 {
-    CHIP_ERROR err       = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Assign event Number to the buffer's counter's value.
-    mLastEventNumber       = static_cast<chip::EventNumber>(mpEventNumberCounter->GetValue());
+    mLastEventNumber = static_cast<chip::EventNumber>(mpEventNumberCounter->GetValue());
 
     // Now advance the counter.
     err = mpEventNumberCounter->Advance();
@@ -645,7 +641,7 @@ CHIP_ERROR LoggingManagement::CopyAndAdjustDeltaTime(const TLVReader & aReader, 
  *                         log, 0 otherwise.
  */
 chip::EventNumber LoggingManagement::LogEvent(const EventSchema & aSchema, EventWriterFunct aEventWriter, void * apAppData,
-                                          const EventOptions * apOptions)
+                                              const EventOptions * apOptions)
 {
     chip::EventNumber event_number = 0;
     Platform::CriticalSectionEnter();
@@ -663,7 +659,7 @@ exit:
 // locked, and only when the logger is not shutting down
 
 inline chip::EventNumber LoggingManagement::LogEventPrivate(const EventSchema & aSchema, EventWriterFunct aEventWriter,
-                                                        void * apAppData, const EventOptions * apOptions)
+                                                            void * apAppData, const EventOptions * apOptions)
 {
     chip::EventNumber event_number = 0;
     CircularTLVWriter writer;
@@ -671,8 +667,9 @@ inline chip::EventNumber LoggingManagement::LogEventPrivate(const EventSchema & 
     size_t requestSize             = CHIP_CONFIG_EVENT_SIZE_RESERVE;
     bool didWriteEvent             = false;
     CircularEventBuffer checkpoint = *mpEventBuffer;
-    EventLoadOutContext ctxt = EventLoadOutContext(writer, aSchema.mPriority, GetPriorityBuffer(aSchema.mPriority)->mLastEventNumber);
-    EventOptions opts        = EventOptions(static_cast<timestamp_t>(System::Timer::GetCurrentEpoch()));
+    EventLoadOutContext ctxt =
+        EventLoadOutContext(writer, aSchema.mPriority, GetPriorityBuffer(aSchema.mPriority)->mLastEventNumber);
+    EventOptions opts = EventOptions(static_cast<timestamp_t>(System::Timer::GetCurrentEpoch()));
 
     // check whether the entry is to be logged or discarded silently
     VerifyOrExit(aSchema.mPriority <= GetCurrentPriority(aSchema.mClusterId), /* no-op */);
@@ -691,7 +688,7 @@ inline chip::EventNumber LoggingManagement::LogEventPrivate(const EventSchema & 
 
     if (apOptions != NULL)
     {
-        opts.eventSource     = apOptions->eventSource;
+        opts.eventSource = apOptions->eventSource;
     }
 
     ctxt.mFirst              = false;
@@ -1205,8 +1202,8 @@ void LoggingManagement::NotifyEventsDelivered(PriorityLevel aPriority, chip::Eve
 CircularEventBuffer::CircularEventBuffer(uint8_t * apBuffer, uint32_t aBufferLength, CircularEventBuffer * apPrev,
                                          CircularEventBuffer * apNext) :
     CHIPCircularTLVBuffer(apBuffer, aBufferLength),
-    mpPrev(apPrev), mpNext(apNext), mPriority(kPriorityLevel_First), mFirstEventNumber(1), mLastEventNumber(0), mFirstEventTimestamp(0),
-    mLastEventTimestamp(0), mpEventNumberCounter(nullptr)
+    mpPrev(apPrev), mpNext(apNext), mPriority(kPriorityLevel_First), mFirstEventNumber(1), mLastEventNumber(0),
+    mFirstEventTimestamp(0), mLastEventTimestamp(0), mpEventNumberCounter(nullptr)
 {
     // TODO: hook up the platform-specific persistent event ID.
 }

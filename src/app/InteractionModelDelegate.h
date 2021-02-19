@@ -47,16 +47,16 @@ public:
 
     enum class EventId
     {
-        //InteractionModelEngine
+        // InteractionModelEngine
         kIncomingInvokeCommandRequest,
         kIncomingReadRequest,
         kIncomingReportRequest,
-        //ReadClient
+        // ReadClient
         kReadRequestPrepareNeeded,
         kReportDataRequest,
         kReportProcessed,
         kEventStreamReceived,
-        //ReadHandler
+        // ReadHandler
         kReadRequestParsed,
     };
 
@@ -66,7 +66,7 @@ public:
      */
     union InEventParam
     {
-        InEventParam() {Clear(); }
+        InEventParam() { Clear(); }
 
         void Clear(void) { memset(this, 0, sizeof(*this)); }
 
@@ -113,7 +113,7 @@ public:
      */
     union OutEventParam
     {
-        OutEventParam() {Clear(); }
+        OutEventParam() { Clear(); }
         void Clear(void) { memset(this, 0, sizeof(*this)); }
 
         struct
@@ -133,8 +133,8 @@ public:
         struct
         {
             EventPathParams * eventPathParamsList; //< Pointer to a list of event path parameter
-            size_t eventPathParamsListSize;         //< Number of event paths in mpEventPathList
-            uint64_t eventNumber;                   //< A event number it has already
+            size_t eventPathParamsListSize;        //< Number of event paths in mpEventPathList
+            uint64_t eventNumber;                  //< A event number it has already
         } mReadRequestPrepareNeeded;
     };
 
@@ -144,10 +144,12 @@ public:
      * @param[in]  aInParam     A const reference to the input parameter for this event
      * @param[out] aOutParam    A reference to the output parameter for this event
      */
-    virtual void HandleEvent(EventId aEvent,
-                             const InEventParam & aInParam, OutEventParam & aOutParam) = 0;
+    virtual void HandleEvent(EventId aEvent, const InEventParam & aInParam, OutEventParam & aOutParam) = 0;
 
-    void DefaultEventHandler(EventId aEvent, const InEventParam & aInParam, OutEventParam & aOutParam) { ChipLogDetail(DataManagement, "%s event: %d", __func__, aEvent); }
+    void DefaultEventHandler(EventId aEvent, const InEventParam & aInParam, OutEventParam & aOutParam)
+    {
+        ChipLogDetail(DataManagement, "%s event: %d", __func__, aEvent);
+    }
 };
 
 } // namespace app

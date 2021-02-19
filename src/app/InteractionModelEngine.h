@@ -41,10 +41,10 @@
 #include <app/Command.h>
 #include <app/CommandHandler.h>
 #include <app/CommandSender.h>
+#include <app/InteractionModelDelegate.h>
 #include <app/ReadClient.h>
 #include <app/ReadHandler.h>
 #include <app/reporting/ReportingEngine.h>
-#include <app/InteractionModelDelegate.h>
 
 #define CHIP_MAX_NUM_COMMAND_HANDLER_OBJECTS 1
 #define CHIP_MAX_NUM_COMMAND_SENDER_OBJECTS 1
@@ -55,10 +55,10 @@
 namespace chip {
 namespace app {
 
-constexpr const size_t kMaxSecureSduLength      = 1024;
-constexpr const uint32_t kImMesssageTimeout          = 20;
+constexpr const size_t kMaxSecureSduLength     = 1024;
+constexpr const uint32_t kImMesssageTimeout    = 20;
 constexpr const uint32_t kMinEventBoundarySize = 8;
-static constexpr chip::NodeId kAnyNodeId          = 0xFFFFFFFFFFFFFFFFULL;
+static constexpr chip::NodeId kAnyNodeId       = 0xFFFFFFFFFFFFFFFFULL;
 
 typedef void (*CommandCbFunct)(chip::TLV::TLVReader & aReader, Command * apCommandObj);
 
@@ -125,13 +125,13 @@ private:
     friend class ReadClient;
     friend class reporting::ReportingEngine;
 
-    void OnReadRequest(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader, const PayloadHeader & aPayloadHeader,
-                       System::PacketBufferHandle aPayload);
+    void OnReadRequest(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
+                       const PayloadHeader & aPayloadHeader, System::PacketBufferHandle aPayload);
 
     uint16_t GetReadClientArrayIndex(const ReadClient * const apClient) const;
 
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
-    InteractionModelDelegate * mpDelegate = nullptr;
+    InteractionModelDelegate * mpDelegate      = nullptr;
     CommandHandler mCommandHandlerObjs[CHIP_MAX_NUM_COMMAND_HANDLER_OBJECTS];
     CommandSender mCommandSenderObjs[CHIP_MAX_NUM_COMMAND_SENDER_OBJECTS];
     ReadClient mReadClients[CHIP_MAX_NUM_READ_CLIENT];

@@ -35,10 +35,10 @@ CHIP_ERROR ReadClient::Init(Messaging::ExchangeManager * apExchangeMgr, Interact
     VerifyOrExit(mpExchangeMgr == nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mpExchangeCtx == nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    mpExchangeMgr  = apExchangeMgr;
-    mpExchangeCtx  = nullptr;
-    mpDelegate = apDelegate;
-    mState = kState_Initialized;
+    mpExchangeMgr        = apExchangeMgr;
+    mpExchangeCtx        = nullptr;
+    mpDelegate           = apDelegate;
+    mState               = kState_Initialized;
     mMoreChunkedMessages = false;
 
 exit:
@@ -52,7 +52,7 @@ void ReadClient::Shutdown()
         return;
     ClearExistingExchangeContext();
     mpExchangeMgr = nullptr;
-    mpDelegate = nullptr;
+    mpDelegate    = nullptr;
     MoveToState(kState_Uninitialized);
 }
 
@@ -81,8 +81,8 @@ const char * ReadClient::GetStateStr() const
 void ReadClient::MoveToState(const ClientState aTargetState)
 {
     mState = aTargetState;
-    ChipLogDetail(DataManagement, "Client[%u] moving to [%5.5s]", InteractionModelEngine::GetInstance()->GetReadClientArrayIndex(this),
-                  GetStateStr());
+    ChipLogDetail(DataManagement, "Client[%u] moving to [%5.5s]",
+                  InteractionModelEngine::GetInstance()->GetReadClientArrayIndex(this), GetStateStr());
 }
 
 void ReadClient::ClearState(void)
@@ -104,8 +104,7 @@ CHIP_ERROR ReadClient::SendReadRequest(NodeId aNodeId, Transport::AdminId aAdmin
     if (nullptr != mpDelegate)
     {
         outParam.mReadRequestPrepareNeeded.eventPathParamsList = nullptr;
-        mpDelegate->HandleEvent(chip::app::InteractionModelDelegate::EventId::kReadRequestPrepareNeeded, inParam,
-                                outParam);
+        mpDelegate->HandleEvent(chip::app::InteractionModelDelegate::EventId::kReadRequestPrepareNeeded, inParam, outParam);
     }
 
     {
@@ -291,7 +290,8 @@ exit:
 
 void ReadClient::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext)
 {
-    ChipLogProgress(DataManagement, "Time out! failed to receive report data from Exchange: %d", apExchangeContext->GetExchangeId());
+    ChipLogProgress(DataManagement, "Time out! failed to receive report data from Exchange: %d",
+                    apExchangeContext->GetExchangeId());
     Reset();
 }
 }; // namespace app

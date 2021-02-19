@@ -113,12 +113,9 @@ uint8_t gCritEventBuffer[2048];
 void InitializeEventLogging(chip::Messaging::ExchangeManager * apMgr)
 {
     chip::app::reporting::LogStorageResources logStorageResources[] = {
-        { &gDebugEventBuffer[0], sizeof(gDebugEventBuffer), nullptr, 0, nullptr,
-          chip::app::reporting::PriorityLevel::Critical },
-        { &gInfoEventBuffer[0], sizeof(gInfoEventBuffer), nullptr, 0, nullptr,
-          chip::app::reporting::PriorityLevel::Info },
-        { &gCritEventBuffer[0], sizeof(gCritEventBuffer), nullptr, 0, nullptr,
-          chip::app::reporting::PriorityLevel::Debug },
+        { &gDebugEventBuffer[0], sizeof(gDebugEventBuffer), nullptr, 0, nullptr, chip::app::reporting::PriorityLevel::Critical },
+        { &gInfoEventBuffer[0], sizeof(gInfoEventBuffer), nullptr, 0, nullptr, chip::app::reporting::PriorityLevel::Info },
+        { &gCritEventBuffer[0], sizeof(gCritEventBuffer), nullptr, 0, nullptr, chip::app::reporting::PriorityLevel::Debug },
     };
 
     chip::app::reporting::LoggingManagement::CreateLoggingManagement(
@@ -130,13 +127,15 @@ class MockInteractionModelApp : public chip::app::InteractionModelDelegate
 {
 public:
     void HandleEvent(chip::app::InteractionModelDelegate::EventId aEventId,
-                     const chip::app::InteractionModelDelegate::InEventParam &aInParam,
-                     chip::app::InteractionModelDelegate::OutEventParam &aOutParam) {
-        switch (aEventId) {
-            case chip::app::InteractionModelDelegate::EventId::kIncomingReadRequest:
-            default:
-                chip::app::InteractionModelDelegate::DefaultEventHandler(aEventId, aInParam, aOutParam);
-                break;
+                     const chip::app::InteractionModelDelegate::InEventParam & aInParam,
+                     chip::app::InteractionModelDelegate::OutEventParam & aOutParam)
+    {
+        switch (aEventId)
+        {
+        case chip::app::InteractionModelDelegate::EventId::kIncomingReadRequest:
+        default:
+            chip::app::InteractionModelDelegate::DefaultEventHandler(aEventId, aInParam, aOutParam);
+            break;
         }
     }
 };

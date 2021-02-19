@@ -44,8 +44,8 @@ CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeM
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    mpExchangeMgr  = apExchangeMgr;
-    mpDelegate = apDelegate;
+    mpExchangeMgr = apExchangeMgr;
+    mpDelegate    = apDelegate;
 
     err = mpExchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::kProtocol_InteractionModel, this);
     SuccessOrExit(err);
@@ -82,7 +82,7 @@ void InteractionModelEngine::Shutdown()
 
 CHIP_ERROR InteractionModelEngine::NewCommandSender(CommandSender ** const apCommandSender, InteractionModelDelegate * apDelegate)
 {
-    CHIP_ERROR err  = CHIP_ERROR_NO_MEMORY;
+    CHIP_ERROR err   = CHIP_ERROR_NO_MEMORY;
     *apCommandSender = nullptr;
 
     for (size_t i = 0; i < CHIP_MAX_NUM_COMMAND_SENDER_OBJECTS; ++i)
@@ -90,7 +90,7 @@ CHIP_ERROR InteractionModelEngine::NewCommandSender(CommandSender ** const apCom
         if (mCommandHandlerObjs[i].IsFree())
         {
             *apCommandSender = &mCommandSenderObjs[i];
-            err             = mCommandSenderObjs[i].Init(mpExchangeMgr, apDelegate);
+            err              = mCommandSenderObjs[i].Init(mpExchangeMgr, apDelegate);
             SuccessOrExit(err);
             if (CHIP_NO_ERROR != err)
             {
@@ -151,8 +151,9 @@ void InteractionModelEngine::OnUnknownMsgType(Messaging::ExchangeContext * apExc
     }
 }
 
-void InteractionModelEngine::OnInvokeCommandRequest(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
-                                                    const PayloadHeader & aPayloadHeader, System::PacketBufferHandle aPayload)
+void InteractionModelEngine::OnInvokeCommandRequest(Messaging::ExchangeContext * apExchangeContext,
+                                                    const PacketHeader & aPacketHeader, const PayloadHeader & aPayloadHeader,
+                                                    System::PacketBufferHandle aPayload)
 {
     CHIP_ERROR err                 = CHIP_NO_ERROR;
     CommandHandler * commandServer = nullptr;
@@ -162,7 +163,7 @@ void InteractionModelEngine::OnInvokeCommandRequest(Messaging::ExchangeContext *
         chip::app::InteractionModelDelegate::InEventParam inParam;
         chip::app::InteractionModelDelegate::OutEventParam outParam;
         outParam.mIncomingInvokeCommandRequest.invokeCommandAllowed = true;
-        inParam.mIncomingInvokeCommandRequest.packetHeader             = &aPacketHeader;
+        inParam.mIncomingInvokeCommandRequest.packetHeader          = &aPacketHeader;
 
         mpDelegate->HandleEvent(app::InteractionModelDelegate::EventId::kIncomingInvokeCommandRequest, inParam, outParam);
 
@@ -209,7 +210,7 @@ void InteractionModelEngine::OnReadRequest(Messaging::ExchangeContext * apExchan
         chip::app::InteractionModelDelegate::InEventParam inParam;
         chip::app::InteractionModelDelegate::OutEventParam outParam;
         outParam.mIncomingReadRequest.readRequestAllowed = true;
-        inParam.mIncomingReadRequest.packetHeader             = &aPacketHeader;
+        inParam.mIncomingReadRequest.packetHeader        = &aPacketHeader;
 
         mpDelegate->HandleEvent(app::InteractionModelDelegate::EventId::kIncomingReadRequest, inParam, outParam);
 

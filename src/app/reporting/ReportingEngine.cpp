@@ -44,7 +44,7 @@ CHIP_ERROR ReportingEngine::Init()
 
 CHIP_ERROR ReportingEngine::BuildSingleReportDataEventList(ReportData::Builder & aReportDataBuilder, ReadHandler * apReadHandler)
 {
-    CHIP_ERROR err       = CHIP_NO_ERROR;
+    CHIP_ERROR err                = CHIP_NO_ERROR;
     chip::EventNumber event_count = 0;
     bool dataClean;
     chip::EventNumber initialEvents[kPriorityLevel_Last - kPriorityLevel_First + 1];

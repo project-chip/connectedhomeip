@@ -116,14 +116,15 @@ exit:
     return err;
 }
 
-chip::EventNumber LivenessEventGenerator::LogLiveness(chip::NodeId aNodeId, chip::EndpointId aEndpointId, LivenessDeviceStatus aStatus)
+chip::EventNumber LivenessEventGenerator::LogLiveness(chip::NodeId aNodeId, chip::EndpointId aEndpointId,
+                                                      LivenessDeviceStatus aStatus)
 {
     chip::app::reporting::DetailedRootSection root(aNodeId, aEndpointId);
     chip::app::reporting::EventSchema schema = { kLivenessClusterId, kLivenessChangeEvent, chip::app::reporting::Debug };
     chip::app::reporting::EventOptions options;
-    int32_t status          = static_cast<int32_t>(aStatus);
-    options.eventSource     = &root;
-    options.urgent          = true;
+    int32_t status      = static_cast<int32_t>(aStatus);
+    options.eventSource = &root;
+    options.urgent      = true;
 
     return chip::app::reporting::LogEvent(schema, WriteLivenessStatusEvent, &status, &options);
 }

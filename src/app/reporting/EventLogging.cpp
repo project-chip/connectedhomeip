@@ -83,7 +83,8 @@ chip::EventNumber LogEvent(const EventSchema & aSchema, EventWriterFunct aEventW
     return LogEvent(aSchema, aEventWriter, apAppData, NULL);
 }
 
-chip::EventNumber LogEvent(const EventSchema & aSchema, EventWriterFunct aEventWriter, void * apAppData, const EventOptions * apOptions)
+chip::EventNumber LogEvent(const EventSchema & aSchema, EventWriterFunct aEventWriter, void * apAppData,
+                           const EventOptions * apOptions)
 {
 
     LoggingManagement & logManager = LoggingManagement::GetInstance();

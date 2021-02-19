@@ -36,12 +36,12 @@ CHIP_ERROR ReadHandler::Init(Messaging::ExchangeManager * apExchangeMgr, Interac
 
     mpExchangeMgr     = apExchangeMgr;
     mpExchangeCtx     = nullptr;
-    mpDelegate = apDelegate;
+    mpDelegate        = apDelegate;
     mCurrentPriority  = reporting::kPriorityLevel_Invalid;
-    mBytesOffloaded = 0;
+    mBytesOffloaded   = 0;
     mSuppressResponse = true;
     mGetToAllEvents   = true;
-    mState = kState_Initialized;
+    mState            = kState_Initialized;
 
 exit:
     ChipLogFunctError(err);
@@ -55,7 +55,7 @@ void ReadHandler::Shutdown()
     ClearExistingExchangeContext();
     MoveToState(kState_Uninitialized);
     mpExchangeMgr = nullptr;
-    mpDelegate = nullptr;
+    mpDelegate    = nullptr;
 }
 
 CHIP_ERROR ReadHandler::ClearExistingExchangeContext()
@@ -175,7 +175,7 @@ const char * ReadHandler::GetStateStr() const
     case kState_ReportDataSending:
         return "ReportDataSending";
     }
-#endif  // CHIP_DETAIL_LOGGING
+#endif // CHIP_DETAIL_LOGGING
     return "N/A";
 }
 
@@ -198,7 +198,8 @@ bool ReadHandler::CheckEventUpToDate(reporting::LoggingManagement & inLogger)
     {
         for (size_t i = 0; i < sizeof(mSelfVendedEvents) / sizeof(chip::EventNumber); i++)
         {
-            chip::EventNumber eid = inLogger.GetLastEventNumber(static_cast<reporting::PriorityLevel>(i + reporting::kPriorityLevel_First));
+            chip::EventNumber eid =
+                inLogger.GetLastEventNumber(static_cast<reporting::PriorityLevel>(i + reporting::kPriorityLevel_First));
             if ((eid != 0) && (eid >= mSelfVendedEvents[i]))
             {
                 retval = false;

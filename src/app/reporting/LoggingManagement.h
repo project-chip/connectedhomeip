@@ -178,7 +178,7 @@ public:
     CHIP_ERROR SetExchangeManager(Messaging::ExchangeManager * apMgr);
 
     chip::EventNumber LogEvent(const EventSchema & aSchema, EventWriterFunct aEventWriter, void * apAppData,
-                           const EventOptions * apOptions);
+                               const EventOptions * apOptions);
 
     CHIP_ERROR GetEventReader(chip::TLV::TLVReader & aReader, PriorityLevel aPriority);
 
@@ -210,7 +210,7 @@ public:
 
 private:
     chip::EventNumber LogEventPrivate(const EventSchema & aSchema, EventWriterFunct aEventWriter, void * apAppData,
-                                  const EventOptions * apOptions);
+                                      const EventOptions * apOptions);
 
     void FlushHandler(System::Layer * inSystemLayer, INET_ERROR inErr);
     void SignalUploadDone(void);

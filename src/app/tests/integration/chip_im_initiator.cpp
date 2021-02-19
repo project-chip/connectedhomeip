@@ -218,35 +218,36 @@ class MockInteractionModelApp : public chip::app::InteractionModelDelegate
 {
 public:
     void HandleEvent(chip::app::InteractionModelDelegate::EventId aEventType,
-                     const chip::app::InteractionModelDelegate::InEventParam & aInParam, chip::app::InteractionModelDelegate::OutEventParam & aOutParam)
+                     const chip::app::InteractionModelDelegate::InEventParam & aInParam,
+                     chip::app::InteractionModelDelegate::OutEventParam & aOutParam)
     {
         switch (aEventType)
         {
-            case chip::app::InteractionModelDelegate::EventId::kReadRequestPrepareNeeded: {
-                aOutParam.mReadRequestPrepareNeeded.eventPathParamsList    = &gEventPathParams;
-                aOutParam.mReadRequestPrepareNeeded.eventPathParamsListSize = 1;
+        case chip::app::InteractionModelDelegate::EventId::kReadRequestPrepareNeeded: {
+            aOutParam.mReadRequestPrepareNeeded.eventPathParamsList     = &gEventPathParams;
+            aOutParam.mReadRequestPrepareNeeded.eventPathParamsListSize = 1;
 
-                ChipLogProgress(DataManagement, "Sending outbound read request (path count %" PRIu16 ")",
-                        aOutParam.mReadRequestPrepareNeeded.eventPathParamsListSize);
+            ChipLogProgress(DataManagement, "Sending outbound read request (path count %" PRIu16 ")",
+                            aOutParam.mReadRequestPrepareNeeded.eventPathParamsListSize);
 
-                break;
-            }
-            case chip::app::InteractionModelDelegate::EventId::kEventStreamReceived: {
-                ChipLogProgress(DataManagement, "Received Event stream");
+            break;
+        }
+        case chip::app::InteractionModelDelegate::EventId::kEventStreamReceived: {
+            ChipLogProgress(DataManagement, "Received Event stream");
 
-                break;
-            }
-            case chip::app::InteractionModelDelegate::EventId::kReportProcessed: {
-                aOutParam.mReadRequestPrepareNeeded.eventPathParamsList    = &gEventPathParams;
-                aOutParam.mReadRequestPrepareNeeded.eventPathParamsListSize = 1;
+            break;
+        }
+        case chip::app::InteractionModelDelegate::EventId::kReportProcessed: {
+            aOutParam.mReadRequestPrepareNeeded.eventPathParamsList     = &gEventPathParams;
+            aOutParam.mReadRequestPrepareNeeded.eventPathParamsListSize = 1;
 
-                HandleReadComplete();
+            HandleReadComplete();
 
-                break;
-            }
-            default:
-                chip::app::InteractionModelDelegate::DefaultEventHandler(aEventType, aInParam, aOutParam);
-                break;
+            break;
+        }
+        default:
+            chip::app::InteractionModelDelegate::DefaultEventHandler(aEventType, aInParam, aOutParam);
+            break;
         }
         return;
     }

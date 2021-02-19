@@ -82,12 +82,9 @@ void InitializeChip(nlTestSuite * apSuite)
 void InitializeEventLogging()
 {
     chip::app::reporting::LogStorageResources logStorageResources[] = {
-        { &gDebugEventBuffer[0], sizeof(gDebugEventBuffer), nullptr, 0, nullptr,
-          chip::app::reporting::PriorityLevel::Critical },
-        { &gInfoEventBuffer[0], sizeof(gInfoEventBuffer), nullptr, 0, nullptr,
-          chip::app::reporting::PriorityLevel::Info },
-        { &gCritEventBuffer[0], sizeof(gCritEventBuffer), nullptr, 0, nullptr,
-          chip::app::reporting::PriorityLevel::Debug },
+        { &gDebugEventBuffer[0], sizeof(gDebugEventBuffer), nullptr, 0, nullptr, chip::app::reporting::PriorityLevel::Critical },
+        { &gInfoEventBuffer[0], sizeof(gInfoEventBuffer), nullptr, 0, nullptr, chip::app::reporting::PriorityLevel::Info },
+        { &gCritEventBuffer[0], sizeof(gCritEventBuffer), nullptr, 0, nullptr, chip::app::reporting::PriorityLevel::Debug },
     };
 
     chip::app::reporting::LoggingManagement::CreateLoggingManagement(
@@ -134,7 +131,8 @@ static void CheckLogState(nlTestSuite * apSuite, chip::app::reporting::LoggingMa
 }
 
 static void CheckLogReadOut(nlTestSuite * apSuite, chip::app::reporting::LoggingManagement & alogMgmt,
-                            chip::app::reporting::PriorityLevel priority, chip::EventNumber startingEventNumber, size_t expectedNumEvents)
+                            chip::app::reporting::PriorityLevel priority, chip::EventNumber startingEventNumber,
+                            size_t expectedNumEvents)
 {
     CHIP_ERROR err;
     chip::TLV::TLVReader reader;
@@ -182,8 +180,8 @@ static void CheckLogEventBasics(nlTestSuite * apSuite, void * apContext)
     int32_t status;
 
     InitializeEventLogging();
-    options.eventSource     = &root;
-    options.urgent          = true;
+    options.eventSource = &root;
+    options.urgent      = true;
 
     {
         chip::app::reporting::LoggingManagement & logMgmt = chip::app::reporting::LoggingManagement::GetInstance();

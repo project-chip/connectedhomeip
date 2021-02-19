@@ -136,7 +136,7 @@ struct DetailedRootSection
     /**
      * Default constructor
      */
-    DetailedRootSection(chip::NodeId aNodeId, chip::EndpointId aEndpointId): mNodeId(aNodeId), mEndpointId(aEndpointId) {};
+    DetailedRootSection(chip::NodeId aNodeId, chip::EndpointId aEndpointId) : mNodeId(aNodeId), mEndpointId(aEndpointId){};
     chip::NodeId mNodeId;
     chip::EndpointId mEndpointId;
 };

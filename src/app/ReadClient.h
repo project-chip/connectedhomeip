@@ -24,6 +24,7 @@
 
 #pragma once
 
+#include <app/InteractionModelDelegate.h>
 #include <app/MessageDef/ReadRequest.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPTLVDebug.hpp>
@@ -35,14 +36,15 @@
 #include <support/DLLUtil.h>
 #include <support/logging/CHIPLogging.h>
 #include <system/SystemPacketBuffer.h>
-#include <app/InteractionModelDelegate.h>
 
 namespace chip {
 namespace app {
 /* A structure representing a path parameters to a event */
 struct EventPathParams
 {
-    EventPathParams(chip::NodeId aNodeId, chip::EndpointId aEndpointId, chip::ClusterId aClusterId, chip::EventId aEventId) : mNodeId(aNodeId), mEndpointId(aEndpointId), mClusterId(aClusterId), mEventId(aEventId) {}
+    EventPathParams(chip::NodeId aNodeId, chip::EndpointId aEndpointId, chip::ClusterId aClusterId, chip::EventId aEventId) :
+        mNodeId(aNodeId), mEndpointId(aEndpointId), mClusterId(aClusterId), mEventId(aEventId)
+    {}
     chip::NodeId mNodeId;
     chip::EndpointId mEndpointId;
     chip::ClusterId mClusterId;
@@ -116,7 +118,7 @@ private:
 
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
-    InteractionModelDelegate * mpDelegate = nullptr;
+    InteractionModelDelegate * mpDelegate      = nullptr;
     ClientState mState;
     bool mMoreChunkedMessages;
 };

@@ -118,7 +118,7 @@ private:
     chip::EventNumber mLastScheduledEventNumber[reporting::kPriorityLevel_Last - reporting::kPriorityLevel_First + 1];
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
-    InteractionModelDelegate * mpDelegate = nullptr;
+    InteractionModelDelegate * mpDelegate      = nullptr;
     reporting::PriorityLevel mCurrentPriority;
     size_t mBytesOffloaded;
     bool mSuppressResponse;

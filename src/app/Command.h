@@ -35,10 +35,10 @@
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
 
+#include <app/InteractionModelDelegate.h>
 #include <app/MessageDef/CommandDataElement.h>
 #include <app/MessageDef/CommandList.h>
 #include <app/MessageDef/InvokeCommand.h>
-#include <app/InteractionModelDelegate.h>
 
 namespace chip {
 namespace app {
@@ -78,7 +78,6 @@ public:
         kCommandPathFlag_EndpointIdValid = 0x0001, /**< Set when the EndpointId field is valid */
         kCommandPathFlag_GroupIdValid    = 0x0002, /**< Set when the GroupId field is valid */
     } CommandPathFlags;
-
 
     /**
      * @brief Set delegate and pointer to associated state object for Command specific call backs

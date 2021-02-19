@@ -204,7 +204,7 @@ chip::EventNumber LogEvent(const EventSchema & aSchema, EventWriterFunct aEventW
  *                         log, 0 otherwise.
  */
 chip::EventNumber LogEvent(const EventSchema & aSchema, EventWriterFunct aEventWriter, void * apAppData,
-                       const EventOptions * apOptions);
+                           const EventOptions * apOptions);
 
 } // namespace reporting
 } // namespace app
