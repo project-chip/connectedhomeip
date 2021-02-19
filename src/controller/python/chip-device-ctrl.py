@@ -30,6 +30,7 @@ from chip import exceptions
 import sys
 import os
 import platform
+import random
 from optparse import OptionParser, OptionValueError
 import shlex
 import base64
@@ -348,8 +349,8 @@ class DeviceMgrCmd(Cmd):
 
     def do_connect(self, line):
         """
-        connect -ip <ip address> <setup pin code>
-        connect -ble <discriminator> <setup pin code>
+        connect -ip <ip address> <setup pin code> [<nodeid>]
+        connect -ble <discriminator> <setup pin code> [<nodeid>]
 
         connect command is used for establishing a rendezvous session to the device.
         currently, only connect using setupPinCode is supported.
@@ -364,14 +365,21 @@ class DeviceMgrCmd(Cmd):
                 print("Usage:")
                 self.do_help("connect SetupPinCode")
                 return
-            if args[0] == "-ip" and len(args) == 3:
-                self.devCtrl.ConnectIP(args[1].encode("utf-8"), int(args[2]))
-            elif args[0] == "-ble" and len(args) == 3:
-                self.devCtrl.ConnectBLE(int(args[1]), int(args[2]))
+
+            nodeid = random.randint(1, 1000000)  # Just a random number
+            if len(args) == 4:
+                nodeid = int(args[3])
+            print("Device is assigned with nodeid = {}".format(nodeid))
+
+            if args[0] == "-ip" and len(args) >= 3:
+                self.devCtrl.ConnectIP(args[1].encode("utf-8"), int(args[2]), nodeid)
+            elif args[0] == "-ble" and len(args) >= 3:
+                self.devCtrl.ConnectBLE(int(args[1]), int(args[2]), nodeid)
             else:
                 print("Usage:")
                 self.do_help("connect SetupPinCode")
                 return
+            print("Device temporary node id (**this does not match spec**): {}".format(nodeid))
         except exceptions.ChipStackException as ex:
             print(str(ex))
             return

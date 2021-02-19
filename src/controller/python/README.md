@@ -203,15 +203,27 @@ chip-device-ctrl > ble-scan
 2021-01-19 02:27:34,213 ChipBLEMgr   INFO     scanning stopped
 ```
 
-### `connect -ip <address> <SetUpPinCode>`
+### `connect -ip <address> <SetUpPinCode> [<nodeid>]`
 
 Do key exchange and establish a secure session between controller and device
 using IP transport.
 
-### `connect -ble <discriminator> <SetUpPinCode>`
+The node id will be used by controller to distinguish multiple devices. This
+does not match the spec and will be removed later. The nodeid will not be
+persisted by controller / device.
+
+If no nodeid given, a random node id will be used.
+
+### `connect -ble <discriminator> <SetUpPinCode> [<nodeid>]`
 
 Do key exchange and establish a secure session between controller and device
 using BLE transport.
+
+The node id will be used by controller to distinguish multiple devices. This
+does not match the spec and will be removed later. The nodeid will not be
+persisted by controller / device.
+
+If no nodeid given, a random node id will be used.
 
 ### **`[D]`** `set-pairing-wifi-credential <ssid> <password>`
 
