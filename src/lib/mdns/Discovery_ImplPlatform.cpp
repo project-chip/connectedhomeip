@@ -23,6 +23,7 @@
 #include "lib/support/logging/CHIPLogging.h"
 #include "platform/CHIPDeviceConfig.h"
 #include "platform/CHIPDeviceLayer.h"
+#include "setup_payload/AdditionalDataPayloadGenerator.h"
 #include "support/CodeUtils.h"
 #include "support/ErrorStr.h"
 #include "support/RandUtils.h"
@@ -106,6 +107,24 @@ void DiscoveryImplPlatform::HandleMdnsError(void * context, CHIP_ERROR error)
     }
 }
 
+#if CHIP_ENABLE_ROTATING_DEVICE_ID
+static CHIP_ERROR DiscoveryImplPlatform::GenerateRotatingDeviceId(char rotatingDeviceIdHexBuffer[],
+                                                                  size_t & rotatingDeviceIdHexBufferSize)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    char serialNumber[chip::DeviceLayer::ConfigurationManager::kMaxSerialNumberLength + 1];
+    size_t serialNumberSize  = 0;
+    uint16_t lifetimeCounter = 0;
+    SuccessOrExit(error =
+                      chip::DeviceLayer::ConfigurationMgr().GetSerialNumber(serialNumber, sizeof(serialNumber), serialNumberSize));
+    SuccessOrExit(error = chip::DeviceLayer::ConfigurationMgr().GetLifetimeCounter(lifetimeCounter));
+    SuccessOrExit(error = AdditionDataPayloadGenerator().generateRotatingDeviceId(
+                      lifetimeCounter, serialNumber, serialNumberSize, rotatingDeviceIdHexBuffer, rotatingDeviceIdHexBufferSize,
+                      rotatingDeviceIdHexBufferSize));
+    return error;
+}
+#endif
+
 CHIP_ERROR DiscoveryImplPlatform::SetupHostname()
 {
     uint8_t mac[6];    // 6 byte wifi mac
@@ -137,6 +156,10 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
     char vendorSubType[8];
     const char * subTypes[3];
     size_t subTypeSize = 0;
+#if CHIP_ENABLE_ROTATING_DEVICE_ID
+    char rotatingDeviceIdHexBuffer[RotatingDeviceId::kHexMaxLength];
+    size_t rotatingDeviceIdHexBufferSize = 0;
+#endif
 
     if (!mMdnsInitialized)
     {
@@ -170,9 +193,18 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
         textEntries[textEntrySize++] = { "VP", reinterpret_cast<const uint8_t *>(vendorProductBuf),
                                          strnlen(vendorProductBuf, sizeof(vendorProductBuf)) };
     }
-#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
-    textEntries[textEntrySize++] = { "RI", reinterpret_cast<const uint8_t *>(CHIP_ROTATING_DEVICE_ID),
-                                     strlen(CHIP_ROTATING_DEVICE_ID) };
+#if CHIP_ENABLE_ROTATING_DEVICE_ID
+    if (textEntrySize < ArraySize(textEntries))
+    {
+        SuccessOrExit(error = GenerateRotatingDeviceId(rotatingDeviceIdHexBuffer, rotatingDeviceIdHexBufferSize));
+        // Rotating Device ID
+
+        textEntries[textEntrySize++] = { "RI", Uint8::from_const_char(rotatingDeviceIdHexBuffer), rotatingDeviceIdHexBufferSize };
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_LIST_LENGTH;
+    }
 #endif
     if (params.GetPairingHint().HasValue() && params.GetPairingInstr().HasValue())
     {

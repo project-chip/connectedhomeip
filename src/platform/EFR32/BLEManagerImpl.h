@@ -23,12 +23,11 @@
  */
 
 #pragma once
-
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
-#include "bg_types.h"
 #include "gatt_db.h"
-#include "rtos_gecko.h"
+#include "sl_bgapi.h"
+#include "sl_bt_api.h"
 
 namespace chip {
 namespace DeviceLayer {
@@ -124,21 +123,23 @@ class BLEManagerImpl final : public BLEManager, private BleLayer, private BlePla
     CHIPoBLEServiceMode mServiceMode;
     uint16_t mFlags;
     char mDeviceName[kMaxDeviceNameLength + 1];
+    // The advertising set handle allocated from Bluetooth stack.
+    uint8_t advertising_set_handle = 0xff;
 
     CHIP_ERROR MapBLEError(int bleErr);
     void DriveBLEState(void);
     CHIP_ERROR ConfigureAdvertisingData(void);
     CHIP_ERROR StartAdvertising(void);
     CHIP_ERROR StopAdvertising(void);
-    void UpdateMtu(volatile struct gecko_cmd_packet * evt);
+    void UpdateMtu(volatile sl_bt_msg_t * evt);
     void HandleBootEvent(void);
-    void HandleConnectEvent(volatile struct gecko_cmd_packet * evt);
-    void HandleConnectionCloseEvent(volatile struct gecko_cmd_packet * evt);
-    void HandleWriteEvent(volatile struct gecko_cmd_packet * evt);
-    void HandleTXCharCCCDWrite(volatile struct gecko_cmd_packet * evt);
-    void HandleRXCharWrite(volatile struct gecko_cmd_packet * evt);
-    void HandleTxConfirmationEvent(volatile struct gecko_cmd_packet * evt);
-    void HandleSoftTimerEvent(volatile struct gecko_cmd_packet * evt);
+    void HandleConnectEvent(volatile sl_bt_msg_t * evt);
+    void HandleConnectionCloseEvent(volatile sl_bt_msg_t * evt);
+    void HandleWriteEvent(volatile sl_bt_msg_t * evt);
+    void HandleTXCharCCCDWrite(volatile sl_bt_msg_t * evt);
+    void HandleRXCharWrite(volatile sl_bt_msg_t * evt);
+    void HandleTxConfirmationEvent(volatile sl_bt_msg_t * evt);
+    void HandleSoftTimerEvent(volatile sl_bt_msg_t * evt);
     bool RemoveConnection(uint8_t connectionHandle);
     void AddConnection(uint8_t connectionHandle, uint8_t bondingHandle);
     CHIPoBLEConState * GetConnectionState(uint8_t conId, bool allocate = false);

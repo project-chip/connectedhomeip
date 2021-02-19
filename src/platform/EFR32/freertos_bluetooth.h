@@ -25,10 +25,11 @@ extern "C" {
 
 #include "FreeRTOS.h"
 #include "event_groups.h"
-#include "rtos_gecko.h"
 #include "semphr.h"
 #include "task.h"
 #include "timers.h"
+
+#include "sl_bt_api.h"
 
 // Bluetooth event flag group
 extern EventGroupHandle_t bluetooth_event_flags;
@@ -41,10 +42,10 @@ extern EventGroupHandle_t bluetooth_event_flags;
 #define BLUETOOTH_EVENT_FLAG_EVT_HANDLED (0x20u) // BGAPI event is handled
 
 // Bluetooth event data pointer
-extern volatile struct gecko_cmd_packet * bluetooth_evt;
+extern volatile sl_bt_msg_t * bluetooth_evt;
 
 // Function prototype for initializing Bluetooth stack.
-typedef errorcode_t (*bluetooth_stack_init_func)();
+typedef sl_status_t (*bluetooth_stack_init_func)();
 
 /**
  * Start Bluetooth tasks. The given Bluetooth stack initialization function
@@ -55,7 +56,7 @@ typedef errorcode_t (*bluetooth_stack_init_func)();
  * @param stack_priority Bluetooth stack task priority
  * @param initialize_bluetooth_stack The function for initializing Bluetooth stack
  */
-errorcode_t bluetooth_start(UBaseType_t ll_priority, UBaseType_t stack_priority,
+sl_status_t bluetooth_start(UBaseType_t ll_priority, UBaseType_t stack_priority,
                             bluetooth_stack_init_func initialize_bluetooth_stack);
 
 // Set the callback for wakeup, Bluetooth task will call this when it has a new event

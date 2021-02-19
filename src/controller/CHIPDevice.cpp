@@ -130,7 +130,7 @@ CHIP_ERROR Device::SendCommands()
     bool loadedSecureSession = false;
     ReturnErrorOnFailure(LoadSecureSessionParametersIfNeeded(loadedSecureSession));
     VerifyOrReturnError(mCommandSender != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    return mCommandSender->SendCommandRequest(mDeviceId);
+    return mCommandSender->SendCommandRequest(mDeviceId, mAdminId);
 }
 
 CHIP_ERROR Device::SendMessage(System::PacketBufferHandle buffer)
@@ -248,7 +248,7 @@ void Device::OnMessageReceived(const PacketHeader & header, const PayloadHeader 
     }
 }
 
-CHIP_ERROR Device::OpenPairingWindow(uint32_t timeout, bool useToken, uint16_t discriminator, SetupPayload & setupPayload)
+CHIP_ERROR Device::OpenPairingWindow(uint32_t timeout, PairingWindowOption option, SetupPayload & setupPayload)
 {
     // TODO: This code is temporary, and must be updated to use the Cluster API.
     // Issue: https://github.com/project-chip/connectedhomeip/issues/4725
@@ -262,12 +262,13 @@ CHIP_ERROR Device::OpenPairingWindow(uint32_t timeout, bool useToken, uint16_t d
 
     ReturnErrorOnFailure(writer.Put(TLV::ProfileTag(writer.ImplicitProfileId, 1), timeout));
 
-    if (useToken)
+    if (option != PairingWindowOption::kOriginalSetupCode)
     {
-        ReturnErrorOnFailure(writer.Put(TLV::ProfileTag(writer.ImplicitProfileId, 2), discriminator));
+        ReturnErrorOnFailure(writer.Put(TLV::ProfileTag(writer.ImplicitProfileId, 2), setupPayload.discriminator));
 
         PASEVerifier verifier;
-        ReturnErrorOnFailure(PASESession::GeneratePASEVerifier(verifier, setupPayload.setUpPINCode));
+        bool randomSetupPIN = (option == PairingWindowOption::kTokenWithRandomPIN);
+        ReturnErrorOnFailure(PASESession::GeneratePASEVerifier(verifier, randomSetupPIN, setupPayload.setUpPINCode));
         ReturnErrorOnFailure(writer.PutBytes(TLV::ProfileTag(writer.ImplicitProfileId, 3),
                                              reinterpret_cast<const uint8_t *>(verifier), sizeof(verifier)));
     }
@@ -283,7 +284,6 @@ CHIP_ERROR Device::OpenPairingWindow(uint32_t timeout, bool useToken, uint16_t d
 
     setupPayload.version               = 1;
     setupPayload.rendezvousInformation = RendezvousInformationFlags::kBLE;
-    setupPayload.discriminator         = discriminator;
 
     return CHIP_NO_ERROR;
 }
@@ -315,7 +315,7 @@ CHIP_ERROR Device::LoadSecureSessionParameters(ResetTransport resetNeeded)
 
     err = mSessionManager->NewPairing(
         Optional<Transport::PeerAddress>::Value(Transport::PeerAddress::UDP(mDeviceAddr, mDevicePort, mInterface)), mDeviceId,
-        &pairingSession, mAdminId);
+        &pairingSession, SecureSessionMgr::PairingDirection::kInitiator, mAdminId);
     SuccessOrExit(err);
 
 exit:

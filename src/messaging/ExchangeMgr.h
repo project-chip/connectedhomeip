@@ -27,6 +27,7 @@
 #include <array>
 
 #include <messaging/ExchangeContext.h>
+#include <messaging/MessageCounterSync.h>
 #include <messaging/ReliableMessageMgr.h>
 #include <support/DLLUtil.h>
 #include <transport/SecureSessionMgr.h>
@@ -177,6 +178,8 @@ public:
 
     ReliableMessageMgr * GetReliableMessageMgr() { return &mReliableMessageMgr; };
 
+    MessageCounterSyncMgr * GetMessageCounterSyncMgr() { return &mMessageCounterSyncMgr; };
+
     size_t GetContextsInUse() const { return mContextsInUse; }
 
 private:
@@ -197,6 +200,7 @@ private:
     State mState;
     SecureSessionMgr * mSessionMgr;
     ReliableMessageMgr mReliableMessageMgr;
+    MessageCounterSyncMgr mMessageCounterSyncMgr;
 
     std::array<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> mContextPool;
     size_t mContextsInUse;

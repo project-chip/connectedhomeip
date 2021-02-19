@@ -52,6 +52,9 @@ if (chip_device_platform != "none") {
 
     # Enable including the additional data in the advertisement packets
     chip_enable_additional_data_advertising = true
+
+    # Enable adding rotating device id to the additional data.
+    chip_enable_rotating_device_id = true
   }
 
   buildconfig_header("platform_buildconfig") {
@@ -91,6 +94,12 @@ if (chip_device_platform != "none") {
       defines += [ "CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING=1" ]
     } else {
       defines += [ "CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING=0" ]
+    }
+
+    if (chip_enable_rotating_device_id) {
+      defines += [ "CHIP_ENABLE_ROTATING_DEVICE_ID=1" ]
+    } else {
+      defines += [ "CHIP_ENABLE_ROTATING_DEVICE_ID=0" ]
     }
 
     if (chip_device_platform == "cc13x2_26x2") {
@@ -215,6 +224,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       "${chip_root}/src/lib/core",
       "${chip_root}/src/lib/core:chip_config_header",
       "${chip_root}/src/lib/support",
+      "${chip_root}/src/platform/logging:headers",
       "${chip_root}/src/setup_payload",
       "${nlio_root}:nlio",
     ]
@@ -240,19 +250,37 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "cc13x2_26x2/ConfigurationManagerImpl.cpp",
         "cc13x2_26x2/ConnectivityManagerImpl.cpp",
         "cc13x2_26x2/ConnectivityManagerImpl.h",
+        "cc13x2_26x2/DeviceNetworkProvisioningDelegateImpl.cpp",
+        "cc13x2_26x2/DeviceNetworkProvisioningDelegateImpl.h",
         "cc13x2_26x2/InetPlatformConfig.h",
         "cc13x2_26x2/Logging.cpp",
         "cc13x2_26x2/PlatformManagerImpl.cpp",
         "cc13x2_26x2/PlatformManagerImpl.h",
         "cc13x2_26x2/SystemPlatformConfig.h",
       ]
+
+      if (chip_enable_ble) {
+        sources += [
+          "cc13x2_26x2/BLEManagerImpl.cpp",
+          "cc13x2_26x2/BLEManagerImpl.h",
+        ]
+      }
+
       if (chip_enable_openthread) {
+        # needed for MTD/FTD
+        import("//build_overrides/ti_simplelink_sdk.gni")
+        import("${ti_simplelink_sdk_build_root}/ti_simplelink_board.gni")
         public_deps += [
           "${chip_root}/third_party/ti_simplelink_sdk:mbedtls",
           "${chip_root}/third_party/ti_simplelink_sdk:ti_simplelink_sdk",
           "${chip_root}/third_party/ti_simplelink_sdk:ti_simplelink_sysconfig",
-          "${openthread_root}:libopenthread-mtd",
         ]
+
+        if (ti_simplelink_device_family == "cc13x2_26x2") {
+          public_deps += [ "${openthread_root}:libopenthread-mtd" ]
+        } else if (ti_simplelink_device_family == "cc13x2x7_26x2x7") {
+          public_deps += [ "${openthread_root}:libopenthread-ftd" ]
+        }
 
         sources += [
           "OpenThread/OpenThreadUtils.cpp",
@@ -273,6 +301,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "Darwin/ConnectivityManagerImpl.cpp",
         "Darwin/ConnectivityManagerImpl.h",
         "Darwin/InetPlatformConfig.h",
+        "Darwin/Logging.cpp",
         "Darwin/PlatformManagerImpl.cpp",
         "Darwin/PlatformManagerImpl.h",
         "Darwin/PosixConfig.cpp",
@@ -469,6 +498,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       sources += [
         "Zephyr/BLEManagerImpl.cpp",
         "Zephyr/ConfigurationManagerImpl.cpp",
+        "Zephyr/KeyValueStoreManagerImpl.cpp",
         "Zephyr/Logging.cpp",
         "Zephyr/PlatformManagerImpl.cpp",
         "Zephyr/SystemTimeSupport.cpp",
@@ -485,6 +515,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "nrfconnect/DeviceNetworkProvisioningDelegateImpl.cpp",
         "nrfconnect/DeviceNetworkProvisioningDelegateImpl.h",
         "nrfconnect/InetPlatformConfig.h",
+        "nrfconnect/KeyValueStoreManagerImpl.h",
         "nrfconnect/PlatformManagerImpl.h",
         "nrfconnect/SystemPlatformConfig.h",
       ]
@@ -521,6 +552,10 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       ]
 
       if (chip_enable_openthread) {
+        public_deps += [ "${openthread_root}:libopenthread-ftd" ]
+
+        public_configs += [ "${chip_root}/third_party/openthread/platforms/qpg6100:openthread_qpg6100_config" ]
+
         sources += [
           "OpenThread/OpenThreadUtils.cpp",
           "qpg6100/ThreadStackManagerImpl.cpp",

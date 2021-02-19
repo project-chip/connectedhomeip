@@ -22,12 +22,15 @@ extern NSString * const kCHIPToolDefaultsDomain;
 extern NSString * const kNetworkSSIDDefaultsKey;
 extern NSString * const kNetworkPasswordDefaultsKey;
 
+CHIPDeviceController * InitializeCHIP(void);
 id CHIPGetDomainValueForKey(NSString * domain, NSString * key);
 void CHIPSetDomainValueForKey(NSString * domain, NSString * key, id value);
 void CHIPRemoveDomainValueForKey(NSString * domain, NSString * key);
 uint64_t CHIPGetNextAvailableDeviceID(void);
 void CHIPSetNextAvailableDeviceID(uint64_t id);
-CHIPDevice * GetPairedDevice(void);
+CHIPDevice * CHIPGetPairedDevice(void);
+CHIPDevice * CHIPGetPairedDeviceWithID(uint64_t id);
+void CHIPUnpairDeviceWithID(uint64_t deviceId);
 
 @interface CHIPToolPersistentStorageDelegate : NSObject <CHIPPersistentStorageDelegate>
 

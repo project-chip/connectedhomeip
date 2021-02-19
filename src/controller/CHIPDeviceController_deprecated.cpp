@@ -187,6 +187,7 @@ CHIP_ERROR ChipDeviceController::DisconnectDevice()
     if (mDevice != nullptr)
     {
         mCommissioner.ReleaseDevice(mDevice);
+        mDevice = nullptr;
     }
 
     return CHIP_NO_ERROR;

@@ -131,7 +131,7 @@ static CHIP_ERROR SetEffectiveTime(ValidationContext & validContext, uint16_t ye
     effectiveTime.Minute = min;
     effectiveTime.Second = sec;
 
-    return PackCertTime(effectiveTime, validContext.mEffectiveTime);
+    return ASN1ToChipEpochTime(effectiveTime, validContext.mEffectiveTime);
 }
 
 static void TestChipCert_ChipToX509(nlTestSuite * inSuite, void * inContext)
@@ -414,28 +414,31 @@ static void TestChipCert_CertValidTime(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_CERT_NOT_VALID_YET);
 
     // 1 second before validity period.
-    err = SetEffectiveTime(validContext, 2020, 10, 14, 23, 59, 59);
+    err = SetEffectiveTime(validContext, 2020, 10, 15, 14, 23, 42);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     err = certSet.ValidateCert(certSet.GetLastCert(), validContext);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_CERT_NOT_VALID_YET);
 
-    // 1st second of 1st day of validity period.
-    // NOTE: the given time is technically outside the stated certificate validity period, which starts mid-day.
-    // However for simplicity's sake, the Chip cert validation algorithm rounds the validity period to whole days.
-    err = SetEffectiveTime(validContext, 2020, 10, 15, 0, 0, 0);
+    // 1st second of validity period.
+    err = SetEffectiveTime(validContext, 2020, 10, 15, 14, 23, 43);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     err = certSet.ValidateCert(certSet.GetLastCert(), validContext);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    // Last second of last day of validity period.
-    // As above, this time is considered valid because of rounding to whole days.
-    err = SetEffectiveTime(validContext, 2040, 10, 15, 23, 59, 59);
+    // Validity period.
+    err = SetEffectiveTime(validContext, 2022, 02, 23, 12, 30, 01);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    err = certSet.ValidateCert(certSet.GetLastCert(), validContext);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    // Last second of validity period.
+    err = SetEffectiveTime(validContext, 2040, 10, 15, 14, 23, 42);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     err = certSet.ValidateCert(certSet.GetLastCert(), validContext);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // 1 second after end of certificate validity period.
-    err = SetEffectiveTime(validContext, 2040, 10, 16, 0, 0, 0);
+    err = SetEffectiveTime(validContext, 2040, 10, 15, 14, 23, 43);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     err = certSet.ValidateCert(certSet.GetLastCert(), validContext);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_CERT_EXPIRED);

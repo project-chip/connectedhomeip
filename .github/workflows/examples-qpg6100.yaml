@@ -46,9 +46,6 @@ jobs:
             - name: Build example QPG6100 Lock App
               run: scripts/examples/gn_build_example.sh
                    examples/lock-app/qpg6100 out/lock_app_debug
-            - name: Build QPG6100 shell App
-              run: scripts/examples/gn_build_example.sh
-                   examples/shell/qpg6100 out/shell_app
             - name: Binary artifact suffix
               id: outsuffix
               uses: haya14busa/action-cond@v1.0.0
@@ -64,7 +61,6 @@ jobs:
                       steps.outsuffix.outputs.value }}
                   path: |
                       out/lock_app_debug/chip-qpg6100-lock-example.out
-                      out/shell_app/shell-qpg6100.out
             - name: Remove third_party binaries for CodeQL Analysis
               run: find out -type d -name "third_party" -exec rm -rf {} +
             - name: Perform CodeQL Analysis

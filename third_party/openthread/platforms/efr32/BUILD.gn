@@ -28,14 +28,15 @@ config("openthread_efr32_config") {
   include_dirs = [
     "${chip_root}/examples/platform/efr32",
     "${chip_root}/examples/platform/efr32/${efr32_family}/${efr32_board}",
-    "${openthread_root}/examples/platforms/${efr32_family}",
+    "${openthread_root}/examples/platforms/efr32/src",
+    "${openthread_root}/examples/platforms/efr32/${efr32_family}",
   ]
 }
 
 source_set("openthread_core_config_efr32") {
   sources = [
-    "${openthread_root}/examples/platforms/${efr32_family}/openthread-core-efr32-config-check.h",
-    "${openthread_root}/examples/platforms/${efr32_family}/openthread-core-efr32-config.h",
+    "${openthread_root}/examples/platforms/efr32/src/openthread-core-efr32-config-check.h",
+    "${openthread_root}/examples/platforms/efr32/src/openthread-core-efr32-config.h",
   ]
 
   public_deps = [ "${efr32_sdk_build_root}:efr32_sdk" ]
@@ -44,18 +45,18 @@ source_set("openthread_core_config_efr32") {
 }
 
 source_set("openthread_mbedtls_config_efr32") {
-  sources = [ "${openthread_root}/examples/platforms/${efr32_family}/crypto/efr32-mbedtls-config.h" ]
+  sources = [ "${openthread_root}/examples/platforms/efr32/${efr32_family}/crypto/mbedtls_config_autogen.h" ]
 }
 
 source_set("libopenthread-efr32") {
   sources = [
-    "${openthread_root}/examples/platforms/${efr32_family}/alarm.c",
-    "${openthread_root}/examples/platforms/${efr32_family}/entropy.c",
-    "${openthread_root}/examples/platforms/${efr32_family}/flash.c",
-    "${openthread_root}/examples/platforms/${efr32_family}/misc.c",
-    "${openthread_root}/examples/platforms/${efr32_family}/radio.c",
-    "${openthread_root}/examples/platforms/${efr32_family}/system.c",
-    "${openthread_root}/examples/platforms/${efr32_family}/uart.c",
+    "${openthread_root}/examples/platforms/efr32/src/alarm.c",
+    "${openthread_root}/examples/platforms/efr32/src/entropy.c",
+    "${openthread_root}/examples/platforms/efr32/src/flash.c",
+    "${openthread_root}/examples/platforms/efr32/src/misc.c",
+    "${openthread_root}/examples/platforms/efr32/src/radio.c",
+    "${openthread_root}/examples/platforms/efr32/src/system.c",
+    "${openthread_root}/examples/platforms/efr32/src/uart.c",
     "${openthread_root}/third_party/silabs/rail_config/rail_config.c",
   ]
 

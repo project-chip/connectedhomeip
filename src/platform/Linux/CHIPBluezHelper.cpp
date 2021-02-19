@@ -48,11 +48,13 @@
  *          Provides Bluez dbus implementatioon for BLE
  */
 
-#include <AdditionalDataPayload.h>
 #include <ble/BleUUID.h>
 #include <ble/CHIPBleServiceData.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/Protocols.h>
+#include <setup_payload/AdditionalDataPayloadGenerator.h>
+#include <support/BitFlags.h>
+#include <support/CHIPMemString.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #include <errno.h>
@@ -70,8 +72,8 @@
 #include <system/TLVPacketBufferBackingStore.h>
 
 using namespace ::nl;
-using namespace chip::SetupPayloadData;
 using namespace chip::Protocols;
+using chip::Platform::CopyString;
 
 namespace chip {
 namespace DeviceLayer {
@@ -1275,23 +1277,24 @@ static void UpdateAdditionalDataCharacteristic(BluezGattCharacteristic1 * charac
     // Construct the TLV for the additional data
     GVariant * cValue = nullptr;
     CHIP_ERROR err    = CHIP_NO_ERROR;
-    System::PacketBufferTLVWriter writer;
-    TLVWriter innerWriter;
     chip::System::PacketBufferHandle bufferHandle;
 
-    writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
+    char serialNumber[ConfigurationManager::kMaxSerialNumberLength + 1];
+    size_t serialNumberSize  = 0;
+    uint16_t lifetimeCounter = 0;
+    BitFlags<uint8_t, AdditionalDataFields> additionalDataFields;
 
-    err = writer.OpenContainer(AnonymousTag, kTLVType_Structure, innerWriter);
+#if CHIP_ENABLE_ROTATING_DEVICE_ID
+    err = ConfigurationMgr().GetSerialNumber(serialNumber, sizeof(serialNumber), serialNumberSize);
+    SuccessOrExit(err);
+    err = ConfigurationMgr().GetLifetimeCounter(lifetimeCounter);
     SuccessOrExit(err);
 
-    // Adding the rotating device id to the TLV data
-    err = innerWriter.PutString(ContextTag(kRotatingDeviceIdTag), CHIP_ROTATING_DEVICE_ID);
-    SuccessOrExit(err);
+    additionalDataFields.Set(AdditionalDataFields::RotatingDeviceId);
+#endif
 
-    err = writer.CloseContainer(innerWriter);
-    SuccessOrExit(err);
-
-    err = writer.Finalize(&bufferHandle);
+    err = AdditionalDataPayloadGenerator().generateAdditionalDataPayload(lifetimeCounter, serialNumber, serialNumberSize,
+                                                                         bufferHandle, additionalDataFields);
     SuccessOrExit(err);
 
     cValue = g_variant_new_from_data(G_VARIANT_TYPE("ay"), bufferHandle->Start(), bufferHandle->DataLength(), TRUE, g_free,
@@ -2006,6 +2009,95 @@ CHIP_ERROR ConnectDevice(BluezDevice1 * apDevice)
     }
 
     return error;
+}
+
+AdapterIterator::~AdapterIterator()
+{
+    if (mManager != nullptr)
+    {
+        g_object_unref(mManager);
+    }
+
+    if (mObjectList != nullptr)
+    {
+        g_list_free_full(mObjectList, g_object_unref);
+    }
+}
+
+void AdapterIterator::Initialize()
+{
+    GError * error = nullptr;
+
+    mManager = g_dbus_object_manager_client_new_for_bus_sync(G_BUS_TYPE_SYSTEM, G_DBUS_OBJECT_MANAGER_CLIENT_FLAGS_NONE,
+                                                             BLUEZ_INTERFACE, "/", bluez_object_manager_client_get_proxy_type,
+                                                             nullptr /* unused user data in the Proxy Type Func */,
+                                                             nullptr /*destroy notify */, nullptr /* cancellable */, &error);
+
+    VerifyOrExit(mManager != nullptr, ChipLogError(DeviceLayer, "Failed to get DBUS object manager for listing adapters."));
+
+    mObjectList      = g_dbus_object_manager_get_objects(mManager);
+    mCurrentListItem = mObjectList;
+
+exit:
+    if (error != nullptr)
+    {
+        ChipLogError(DeviceLayer, "DBus error: %s", error->message);
+        g_error_free(error);
+    }
+}
+
+bool AdapterIterator::Advance()
+{
+    if (mCurrentListItem == nullptr)
+    {
+        return false;
+    }
+
+    while (mCurrentListItem != nullptr)
+    {
+        BluezAdapter1 * adapter = bluez_object_get_adapter1(BLUEZ_OBJECT(mCurrentListItem->data));
+        if (adapter == nullptr)
+        {
+            mCurrentListItem = mCurrentListItem->next;
+            continue;
+        }
+
+        // PATH is of the for  BLUEZ_PATH / hci<nr>, i.e. like
+        // '/org/bluez/hci0'
+        // Index represents the number after hci
+        const char * path = g_dbus_proxy_get_object_path(G_DBUS_PROXY(adapter));
+        unsigned index    = 0;
+
+        if (sscanf(path, BLUEZ_PATH "/hci%u", &index) != 1)
+        {
+            ChipLogError(DeviceLayer, "Failed to extract HCI index from '%s'", path);
+            index = 0;
+        }
+
+        mCurrent.index   = index;
+        mCurrent.address = bluez_adapter1_get_address(adapter);
+        mCurrent.alias   = bluez_adapter1_get_alias(adapter);
+        mCurrent.name    = bluez_adapter1_get_name(adapter);
+        mCurrent.powered = bluez_adapter1_get_powered(adapter);
+
+        g_object_unref(adapter);
+
+        mCurrentListItem = mCurrentListItem->next;
+
+        return true;
+    }
+
+    return false;
+}
+
+bool AdapterIterator::Next()
+{
+    if (mManager == nullptr)
+    {
+        Initialize();
+    }
+
+    return Advance();
 }
 
 } // namespace Internal

@@ -61,7 +61,7 @@ void TestPacketHeaderEncodeDecode(nlTestSuite * inSuite, void * inContext)
     uint16_t encodeLen;
     uint16_t decodeLen;
 
-    header.SetMessageId(123).SetPayloadLength(16);
+    header.SetMessageId(123);
     NL_TEST_ASSERT(inSuite, header.Encode(buffer, &encodeLen) == CHIP_NO_ERROR);
 
     // change it to verify decoding
@@ -189,15 +189,15 @@ void TestPacketHeaderEncodeDecodeBounds(nlTestSuite * inSuite, void * inContext)
     uint8_t buffer[64];
     uint16_t unusedLen;
 
-    for (uint16_t shortLen = 0; shortLen < 10; shortLen++)
+    for (uint16_t shortLen = 0; shortLen < 8; shortLen++)
     {
         NL_TEST_ASSERT(inSuite, header.Encode(buffer, shortLen, &unusedLen) != CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, header.Decode(buffer, shortLen, &unusedLen) != CHIP_NO_ERROR);
     }
 
-    // Now check that with 10 bytes we can successfully encode a
+    // Now check that with 8 bytes we can successfully encode a
     // default-constructed PacketHeader.
-    static const size_t minLen = 10;
+    static const size_t minLen = 8;
     uint16_t encoded_len;
     NL_TEST_ASSERT(inSuite, header.Encode(buffer, minLen, &encoded_len) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, encoded_len == minLen);
