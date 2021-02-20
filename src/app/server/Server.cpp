@@ -29,6 +29,7 @@
 #include <mdns/Advertiser.h>
 #include <messaging/ExchangeMgr.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/KeyValueStoreManager.h>
 #include <setup_payload/SetupPayload.h>
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
@@ -39,6 +40,7 @@
 #include <system/TLVPacketBufferBackingStore.h>
 #include <transport/AdminPairingTable.h>
 #include <transport/SecureSessionMgr.h>
+#include <transport/StorablePeerConnection.h>
 
 using namespace ::chip;
 using namespace ::chip::Inet;
@@ -68,6 +70,89 @@ constexpr bool useTestPairing()
     // any way to communicate with the device using CHIP protocol.
     return isRendezvousBypassed();
 #endif
+}
+
+CHIP_ERROR PersistAdminPairingToKVS(AdminPairingInfo * admin, AdminId nextAvailableId)
+{
+    ReturnErrorCodeIf(admin == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    ChipLogProgress(AppServer, "Persisting admin ID %d, next available %d", admin->GetAdminId(), nextAvailableId);
+
+    ReturnErrorOnFailure(admin->StoreUsingKVSMgr(PersistedStorage::KeyValueStoreMgr()));
+    ReturnErrorOnFailure(PersistedStorage::KeyValueStoreMgr().Put(kAdminTableCountKey, &nextAvailableId, sizeof(nextAvailableId)));
+
+    ChipLogProgress(AppServer, "Persisting admin ID successfully");
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR RestoreAllAdminPairingsFromKVS(AdminPairingTable & adminPairings, AdminId & nextAvailableId)
+{
+    // It's not an error if the key doesn't exist. Just return right away.
+    VerifyOrReturnError(PersistedStorage::KeyValueStoreMgr().Get(kAdminTableCountKey, &nextAvailableId) == CHIP_NO_ERROR,
+                        CHIP_NO_ERROR);
+    ChipLogProgress(AppServer, "Next available admin ID is %d", nextAvailableId);
+
+    for (AdminId id = 0; id < nextAvailableId; id++)
+    {
+        AdminPairingInfo * admin = adminPairings.AssignAdminId(id);
+        // Recreate the binding if one exists in persistent storage. Else skip to the next ID
+        if (admin->FetchUsingKVSMgr(PersistedStorage::KeyValueStoreMgr()) != CHIP_NO_ERROR)
+        {
+            adminPairings.ReleaseAdminId(id);
+        }
+        else
+        {
+            ChipLogProgress(AppServer, "Found admin pairing for %d, node ID %llu", admin->GetAdminId(), admin->GetNodeId());
+        }
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+void DeleteAdminPairingsInKVS(AdminId nextAvailableId)
+{
+    PersistedStorage::KeyValueStoreMgr().Delete(kAdminTableCountKey);
+    for (AdminId id = 0; id < nextAvailableId; id++)
+    {
+        AdminPairingInfo::DeleteUsingKVSMgr(PersistedStorage::KeyValueStoreMgr(), id);
+    }
+}
+
+CHIP_ERROR RestoreAllSessionsFromKVS(SecureSessionMgr & sessionMgr, RendezvousServer & server)
+{
+    uint16_t nextSessionKeyId = 0;
+    // It's not an error if the key doesn't exist. Just return right away.
+    VerifyOrReturnError(PersistedStorage::KeyValueStoreMgr().Get(kStorablePeerConnectionCountKey, &nextSessionKeyId) ==
+                            CHIP_NO_ERROR,
+                        CHIP_NO_ERROR);
+    ChipLogProgress(AppServer, "Found %d stored connections", nextSessionKeyId);
+
+    for (uint16_t keyId = 0; keyId < nextSessionKeyId; keyId++)
+    {
+        StorablePeerConnection connection;
+        if (CHIP_NO_ERROR == connection.FetchUsingKVSMgr(PersistedStorage::KeyValueStoreMgr(), keyId))
+        {
+            // The following is static to save on stack space usage
+            static PASESession session;
+            connection.GetPASESession(session);
+
+            ChipLogProgress(AppServer, "Fetched the session information: from %llu", session.PeerConnection().GetPeerNodeId());
+            sessionMgr.NewPairing(Optional<Transport::PeerAddress>::Value(session.PeerConnection().GetPeerAddress()),
+                                  session.PeerConnection().GetPeerNodeId(), &session,
+                                  SecureSessionMgr::PairingDirection::kResponder, connection.GetAdminId(), nullptr);
+        }
+    }
+
+    server.GetRendezvousSession()->SetNextKeyId(nextSessionKeyId);
+    return CHIP_NO_ERROR;
+}
+
+void DeleteSessionsInKVS(uint16_t nextSessionKeyId)
+{
+    PersistedStorage::KeyValueStoreMgr().Delete(kStorablePeerConnectionCountKey);
+    for (uint16_t keyId = 0; keyId < nextSessionKeyId; keyId++)
+    {
+        StorablePeerConnection::DeleteUsingKVSMgr(PersistedStorage::KeyValueStoreMgr(), keyId);
+    }
 }
 
 // TODO: The following class is setting the discriminator in Persistent Storage. This is
@@ -108,6 +193,8 @@ private:
 };
 
 DeviceDiscriminatorCache gDeviceDiscriminatorCache;
+AdminPairingTable gAdminPairings;
+AdminId gNextAvailableAdminId = 0;
 
 class ServerRendezvousAdvertisementDelegate : public RendezvousAdvertisementDelegate
 {
@@ -126,24 +213,31 @@ public:
         gDeviceDiscriminatorCache.RestoreDiscriminator();
 
         ReturnErrorOnFailure(chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(false));
-        if (mDelegate != nullptr)
         {
-            mDelegate->OnPairingWindowClosed();
+            if (mDelegate != nullptr)
+                mDelegate->OnPairingWindowClosed();
+        }
+
+        AdminPairingInfo * admin = gAdminPairings.FindAdmin(mAdmin);
+        if (admin != nullptr)
+        {
+            ReturnErrorOnFailure(PersistAdminPairingToKVS(admin, gNextAvailableAdminId));
         }
         return CHIP_NO_ERROR;
     }
 
     void SetDelegate(AppDelegate * delegate) { mDelegate = delegate; }
 
+    void SetAdminId(AdminId id) { mAdmin = id; }
+
 private:
     AppDelegate * mDelegate = nullptr;
+    AdminId mAdmin;
 };
 
 DemoTransportMgr gTransports;
 SecureSessionMgr gSessions;
 RendezvousServer gRendezvousServer;
-AdminPairingTable gAdminPairings;
-AdminId gNextAvailableAdminId = 0;
 
 ServerRendezvousAdvertisementDelegate gAdvDelegate;
 
@@ -357,6 +451,9 @@ CHIP_ERROR OpenDefaultPairingWindow(ResetAdmins resetAdmins)
 
     if (resetAdmins == ResetAdmins::kYes)
     {
+        uint16_t nextKeyId = gRendezvousServer.GetRendezvousSession()->GetNextKeyId();
+        DeleteAdminPairingsInKVS(gNextAvailableAdminId);
+        DeleteSessionsInKVS(nextKeyId);
         gNextAvailableAdminId = 0;
         gAdminPairings.Reset();
     }
@@ -423,6 +520,13 @@ void InitServer(AppDelegate * delegate)
         // If the network is already provisioned, proactively disable BLE advertisement.
         ChipLogProgress(AppServer, "Network already provisioned. Disabling BLE advertisement");
         chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(false);
+
+        // Restore any previous admin pairings
+        VerifyOrExit(CHIP_NO_ERROR == RestoreAllAdminPairingsFromKVS(gAdminPairings, gNextAvailableAdminId),
+                     ChipLogError(AppServer, "Could not restore admin table"));
+
+        VerifyOrExit(CHIP_NO_ERROR == RestoreAllSessionsFromKVS(gSessions, gRendezvousServer),
+                     ChipLogError(AppServer, "Could not restore previous sessions"));
     }
     else
     {
