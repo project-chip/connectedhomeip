@@ -21,6 +21,7 @@
 #include <core/CHIPError.h>
 #include <support/CodeUtils.h>
 #include <transport/SecureSessionMgr.h>
+#include <transport/StorablePeerConnection.h>
 
 #if CHIP_ENABLE_OPENTHREAD
 #include <platform/ThreadStackManager.h>
@@ -63,6 +64,12 @@ void RendezvousServer::OnRendezvousMessageReceived(const PacketHeader & packetHe
 void RendezvousServer::OnRendezvousComplete()
 {
     ChipLogProgress(AppServer, "Device completed Rendezvous process");
+    StorablePeerConnection connection(mRendezvousSession.GetPairingSession(), mRendezvousSession.GetAdminId());
+
+    VerifyOrReturn(connection.StoreUsingKVSMgr(PersistedStorage::KeyValueStoreMgr()) == CHIP_NO_ERROR);
+
+    uint16_t nextKeyId = mRendezvousSession.GetNextKeyId();
+    PersistedStorage::KeyValueStoreMgr().Put(kStorablePeerConnectionCountKey, nextKeyId);
 }
 
 void RendezvousServer::OnRendezvousStatusUpdate(Status status, CHIP_ERROR err)
