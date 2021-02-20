@@ -431,56 +431,6 @@ NS_ASSUME_NONNULL_END
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CHIPNetworkCommissioning : NSObject
-
-- (nullable instancetype)initWithDevice:(CHIPDevice *)device endpoint:(uint8_t)endpoint queue:(dispatch_queue_t)queue;
-- (BOOL)addThreadNetwork:(char *)operationalDataset
-              breadcrumb:(uint64_t)breadcrumb
-               timeoutMs:(uint32_t)timeoutMs
-       completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)addWiFiNetwork:(char *)ssid
-           credentials:(char *)credentials
-            breadcrumb:(uint64_t)breadcrumb
-             timeoutMs:(uint32_t)timeoutMs
-     completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)disableNetwork:(char *)networkID
-            breadcrumb:(uint64_t)breadcrumb
-             timeoutMs:(uint32_t)timeoutMs
-     completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)enableNetwork:(char *)networkID
-           breadcrumb:(uint64_t)breadcrumb
-            timeoutMs:(uint32_t)timeoutMs
-    completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)getLastNetworkCommissioningResult:(uint32_t)timeoutMs completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)removeNetwork:(char *)networkID
-           breadcrumb:(uint64_t)breadcrumb
-            timeoutMs:(uint32_t)timeoutMs
-    completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)scanNetworks:(char *)ssid
-           breadcrumb:(uint64_t)breadcrumb
-            timeoutMs:(uint32_t)timeoutMs
-    completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)updateThreadNetwork:(char *)operationalDataset
-                 breadcrumb:(uint64_t)breadcrumb
-                  timeoutMs:(uint32_t)timeoutMs
-          completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)updateWiFiNetwork:(char *)ssid
-              credentials:(char *)credentials
-               breadcrumb:(uint64_t)breadcrumb
-                timeoutMs:(uint32_t)timeoutMs
-        completionHandler:(ResponseHandler)completionHandler;
-
-- (BOOL)readAttributeClusterRevision:(ResponseHandler)completionHandler;
-
-- (instancetype)init NS_UNAVAILABLE;
-+ (instancetype)new NS_UNAVAILABLE;
-
-@end
-
-NS_ASSUME_NONNULL_END
-
-NS_ASSUME_NONNULL_BEGIN
-
 @interface CHIPOnOff : NSObject
 
 - (nullable instancetype)initWithDevice:(CHIPDevice *)device endpoint:(uint8_t)endpoint queue:(dispatch_queue_t)queue;

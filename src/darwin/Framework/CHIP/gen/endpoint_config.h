@@ -55,7 +55,7 @@
 
 #define ZAP_ATTRIBUTE_MASK(mask) ATTRIBUTE_MASK_##mask
 // This is an array of EmberAfAttributeMetadata structures.
-#define GENERATED_ATTRIBUTE_COUNT 12
+#define GENERATED_ATTRIBUTE_COUNT 11
 #define GENERATED_ATTRIBUTES                                                                                                       \
     {                                                                                                                              \
         { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), { (uint8_t *) 3 } }, /* Basic (client): cluster revision */     \
@@ -88,9 +88,6 @@
             }, /* Temperature Measurement (client): cluster revision */                                                            \
             {                                                                                                                      \
                 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), { (uint8_t *) 0x0001 }                                    \
-            }, /* Network Commissioning (client): cluster revision */                                                              \
-            {                                                                                                                      \
-                0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), { (uint8_t *) 0x0001 }                                    \
             }, /* Binding (client): cluster revision */                                                                            \
     }
 
@@ -101,7 +98,7 @@
 #define GENERATED_FUNCTION_ARRAYS
 
 #define ZAP_CLUSTER_MASK(mask) CLUSTER_MASK_##mask
-#define GENERATED_CLUSTER_COUNT 12
+#define GENERATED_CLUSTER_COUNT 11
 #define GENERATED_CLUSTERS                                                                                                         \
     {                                                                                                                              \
         { 0x0000, ZAP_ATTRIBUTE_INDEX(0), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL }, /* Endpoint: 1, Cluster: Basic (client) */       \
@@ -127,10 +124,7 @@
                 0x0402, ZAP_ATTRIBUTE_INDEX(9), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                               \
             }, /* Endpoint: 1, Cluster: Temperature Measurement (client) */                                                        \
             {                                                                                                                      \
-                0xAAAA, ZAP_ATTRIBUTE_INDEX(10), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
-            }, /* Endpoint: 1, Cluster: Network Commissioning (client) */                                                          \
-            {                                                                                                                      \
-                0xF000, ZAP_ATTRIBUTE_INDEX(11), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+                0xF000, ZAP_ATTRIBUTE_INDEX(10), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
             }, /* Endpoint: 1, Cluster: Binding (client) */                                                                        \
     }
 
@@ -139,7 +133,7 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 12, 24 },                                                                                          \
+        { ZAP_CLUSTER_INDEX(0), 11, 22 },                                                                                          \
     }
 
 // Largest attribute size is needed for various buffers
@@ -149,7 +143,7 @@
 #define ATTRIBUTE_SINGLETONS_SIZE (0)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (24)
+#define ATTRIBUTE_MAX_SIZE (22)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (1)
@@ -193,7 +187,7 @@
 
 // Array of EmberAfCommandMetadata structs.
 #define ZAP_COMMAND_MASK(mask) COMMAND_MASK_##mask
-#define EMBER_AF_GENERATED_COMMAND_COUNT (122)
+#define EMBER_AF_GENERATED_COMMAND_COUNT (105)
 #define GENERATED_COMMANDS                                                                                                         \
     {                                                                                                                              \
         { 0x0000, 0x00, ZAP_COMMAND_MASK(OUTGOING_CLIENT) }, /* Basic (client): MfgSpecificPing */                                 \
@@ -385,40 +379,6 @@
             {                                                                                                                      \
                 0x0300, 0x4C, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
             },                                                   /* Color Control (client): StepColorTemperature */                \
-            { 0xAAAA, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Network Commissioning (client): ScanNetworks */                \
-            { 0xAAAA, 0x01, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Network Commissioning (client): ScanNetworksResponse */        \
-            {                                                                                                                      \
-                0xAAAA, 0x02, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
-            }, /* Network Commissioning (client): AddWiFiNetwork */                                                                \
-            {                                                                                                                      \
-                0xAAAA, 0x03, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
-            }, /* Network Commissioning (client): AddWiFiNetworkResponse */                                                        \
-            {                                                                                                                      \
-                0xAAAA, 0x04, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
-            }, /* Network Commissioning (client): UpdateWiFiNetwork */                                                             \
-            {                                                                                                                      \
-                0xAAAA, 0x05, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
-            }, /* Network Commissioning (client): UpdateWiFiNetworkResponse */                                                     \
-            {                                                                                                                      \
-                0xAAAA, 0x06, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
-            }, /* Network Commissioning (client): AddThreadNetwork */                                                              \
-            {                                                                                                                      \
-                0xAAAA, 0x07, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
-            }, /* Network Commissioning (client): AddThreadNetworkResponse */                                                      \
-            {                                                                                                                      \
-                0xAAAA, 0x08, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
-            }, /* Network Commissioning (client): UpdateThreadNetwork */                                                           \
-            {                                                                                                                      \
-                0xAAAA, 0x09, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
-            },                                                   /* Network Commissioning (client): UpdateThreadNetworkResponse */ \
-            { 0xAAAA, 0x0A, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Network Commissioning (client): RemoveNetwork */               \
-            { 0xAAAA, 0x0B, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Network Commissioning (client): RemoveNetworkResponse */       \
-            { 0xAAAA, 0x0C, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Network Commissioning (client): EnableNetwork */               \
-            { 0xAAAA, 0x0D, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Network Commissioning (client): EnableNetworkResponse */       \
-            { 0xAAAA, 0x0E, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Network Commissioning (client): DisableNetwork */              \
-            { 0xAAAA, 0x0F, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Network Commissioning (client): DisableNetworkResponse */      \
-            { 0xAAAA, 0x10,                                                                                                        \
-              ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Network Commissioning (client): GetLastNetworkCommissioningResult */         \
             { 0xF000, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Binding (client): Bind */                                      \
             { 0xF000, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Binding (client): Unbind */                                    \
     }

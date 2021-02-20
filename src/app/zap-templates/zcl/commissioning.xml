@@ -38,7 +38,7 @@ limitations under the License.
         <item name="Label15" value="0x12"/>
         <item name="UnknownError" value="0x13"/>
     </enum>
-    <bitmap name="ShadeClosureStatus" type="BITMAP8">
+    <bitmap name="SecurityType" type="BITMAP8">
         <field name="Unencrypted" mask="0x1"/>
         <field name="WEP-PERSONAL" mask="0x2"/>
         <field name="WPA-PERSONAL" mask="0x4"/>
