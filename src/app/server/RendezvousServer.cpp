@@ -66,10 +66,13 @@ void RendezvousServer::OnRendezvousComplete()
     ChipLogProgress(AppServer, "Device completed Rendezvous process");
     StorablePeerConnection connection(mRendezvousSession.GetPairingSession(), mRendezvousSession.GetAdminId());
 
-    VerifyOrReturn(connection.StoreUsingKVSMgr(PersistedStorage::KeyValueStoreMgr()) == CHIP_NO_ERROR);
+    VerifyOrReturn(mStorage != nullptr);
+    VerifyOrReturn(connection.StoreIntoKVS(*mStorage) == CHIP_NO_ERROR);
 
     uint16_t nextKeyId = mRendezvousSession.GetNextKeyId();
-    PersistedStorage::KeyValueStoreMgr().Put(kStorablePeerConnectionCountKey, nextKeyId);
+    VerifyOrReturn(CanCastTo<uint16_t>(sizeof(nextKeyId)));
+    uint16_t size = static_cast<uint16_t>(sizeof(nextKeyId));
+    mStorage->SetKeyValue(kStorablePeerConnectionCountKey, &nextKeyId, size);
 }
 
 void RendezvousServer::OnRendezvousStatusUpdate(Status status, CHIP_ERROR err)
