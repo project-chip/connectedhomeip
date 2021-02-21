@@ -21,14 +21,8 @@
 
 #pragma once
 
-#include <core/CHIPEncoding.h>
 #include <core/CHIPPersistentStorageDelegate.h>
-#include <core/CHIPSafeCasts.h>
-#include <support/Base64.h>
-#include <support/CHIPMem.h>
 #include <support/DLLUtil.h>
-#include <support/ReturnMacros.h>
-#include <support/SafeInt.h>
 #include <transport/raw/MessageHeader.h>
 
 namespace chip {
@@ -93,46 +87,11 @@ public:
         mAdmin  = kUndefinedAdminId;
     }
 
-    CHIP_ERROR StoreIntoKVS(PersistentStorageDelegate & kvs)
-    {
-        char key[KeySize()];
-        ReturnErrorOnFailure(GenerateKey(mAdmin, key, sizeof(key)));
+    CHIP_ERROR StoreIntoKVS(PersistentStorageDelegate & kvs);
 
-        StorableAdminPairingInfo info;
-        info.mNodeId = Encoding::LittleEndian::HostSwap64(mNodeId);
-        info.mAdmin  = Encoding::LittleEndian::HostSwap16(mAdmin);
+    CHIP_ERROR FetchFromKVS(PersistentStorageDelegate & kvs);
 
-        VerifyOrReturnError(CanCastTo<uint16_t>(sizeof(info)), CHIP_ERROR_INTERNAL);
-        uint16_t size = static_cast<uint16_t>(sizeof(info));
-        return kvs.SetKeyValue(key, &info, size);
-    }
-
-    CHIP_ERROR FetchFromKVS(PersistentStorageDelegate & kvs)
-    {
-        char key[KeySize()];
-        ReturnErrorOnFailure(GenerateKey(mAdmin, key, sizeof(key)));
-
-        StorableAdminPairingInfo info;
-
-        VerifyOrReturnError(CanCastTo<uint16_t>(sizeof(info)), CHIP_ERROR_INTERNAL);
-        uint16_t size = static_cast<uint16_t>(sizeof(info));
-        ReturnErrorOnFailure(kvs.GetKeyValue(key, &info, size));
-
-        mNodeId    = Encoding::LittleEndian::HostSwap64(info.mNodeId);
-        AdminId id = Encoding::LittleEndian::HostSwap16(info.mAdmin);
-        ReturnErrorCodeIf(mAdmin != id, CHIP_ERROR_INCORRECT_STATE);
-
-        return CHIP_NO_ERROR;
-    }
-
-    static CHIP_ERROR DeleteFromKVS(PersistentStorageDelegate & kvs, AdminId id)
-    {
-        char key[KeySize()];
-        ReturnErrorOnFailure(GenerateKey(id, key, sizeof(key)));
-
-        kvs.DeleteKeyValue(key);
-        return CHIP_NO_ERROR;
-    }
+    static CHIP_ERROR DeleteFromKVS(PersistentStorageDelegate & kvs, AdminId id);
 
 private:
     AdminId mAdmin = kUndefinedAdminId;
@@ -141,16 +100,9 @@ private:
     OperationalCredentials mOpCred;
     AccessControlList mACL;
 
-    static constexpr size_t KeySize() { return sizeof(kAdminTableKeyPrefix) + 2 * sizeof(AdminId); }
+    static constexpr size_t KeySize(); // { return sizeof(kAdminTableKeyPrefix) + 2 * sizeof(AdminId); }
 
-    static CHIP_ERROR GenerateKey(AdminId id, char * key, size_t len)
-    {
-        VerifyOrReturnError(len >= KeySize(), CHIP_ERROR_INVALID_ARGUMENT);
-        int keySize = snprintf(key, len, "%s%x", kAdminTableKeyPrefix, id);
-        VerifyOrReturnError(keySize > 0, CHIP_ERROR_INTERNAL);
-        VerifyOrReturnError(len > (size_t) keySize, CHIP_ERROR_INTERNAL);
-        return CHIP_NO_ERROR;
-    }
+    static CHIP_ERROR GenerateKey(AdminId id, char * key, size_t len);
 
     struct StorableAdminPairingInfo
     {
@@ -162,62 +114,15 @@ private:
 class DLL_EXPORT AdminPairingTable
 {
 public:
-    AdminPairingInfo * AssignAdminId(AdminId adminId)
-    {
-        for (size_t i = 0; i < CHIP_CONFIG_MAX_DEVICE_ADMINS; i++)
-        {
-            if (!mStates[i].IsInitialized())
-            {
-                mStates[i].SetAdminId(adminId);
+    AdminPairingInfo * AssignAdminId(AdminId adminId);
 
-                return &mStates[i];
-            }
-        }
+    AdminPairingInfo * AssignAdminId(AdminId adminId, NodeId nodeId);
 
-        return nullptr;
-    }
+    void ReleaseAdminId(AdminId adminId);
 
-    AdminPairingInfo * AssignAdminId(AdminId adminId, NodeId nodeId)
-    {
-        AdminPairingInfo * admin = AssignAdminId(adminId);
+    AdminPairingInfo * FindAdmin(AdminId adminId);
 
-        if (admin != nullptr)
-        {
-            admin->SetNodeId(nodeId);
-        }
-
-        return admin;
-    }
-
-    void ReleaseAdminId(AdminId adminId)
-    {
-        AdminPairingInfo * admin = FindAdmin(adminId);
-        if (admin != nullptr)
-        {
-            admin->Reset();
-        }
-    }
-
-    AdminPairingInfo * FindAdmin(AdminId adminId)
-    {
-        for (size_t i = 0; i < CHIP_CONFIG_MAX_DEVICE_ADMINS; i++)
-        {
-            if (mStates[i].IsInitialized() && mStates[i].GetAdminId() == adminId)
-            {
-                return &mStates[i];
-            }
-        }
-
-        return nullptr;
-    }
-
-    void Reset()
-    {
-        for (size_t i = 0; i < CHIP_CONFIG_MAX_DEVICE_ADMINS; i++)
-        {
-            return mStates[i].Reset();
-        }
-    }
+    void Reset();
 
 private:
     AdminPairingInfo mStates[CHIP_CONFIG_MAX_DEVICE_ADMINS];

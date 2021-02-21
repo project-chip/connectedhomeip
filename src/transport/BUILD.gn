@@ -20,6 +20,7 @@ static_library("transport") {
   output_name = "libTransportLayer"
 
   sources = [
+    "AdminPairingTable.cpp",
     "AdminPairingTable.h",
     "CASESession.cpp",
     "CASESession.h",
@@ -40,6 +41,7 @@ static_library("transport") {
     "SecureSessionMgr.cpp",
     "SecureSessionMgr.h",
     "SessionEstablishmentDelegate.h",
+    "StorablePeerConnection.cpp",
     "StorablePeerConnection.h",
     "TransportMgr.h",
     "TransportMgrBase.cpp",

@@ -20,6 +20,8 @@
 #include <app/server/SessionManager.h>
 #include <core/CHIPError.h>
 #include <support/CodeUtils.h>
+#include <support/ReturnMacros.h>
+#include <support/SafeInt.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/StorablePeerConnection.h>
 
