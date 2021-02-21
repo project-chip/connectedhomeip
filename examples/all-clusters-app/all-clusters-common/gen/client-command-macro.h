@@ -5774,6 +5774,27 @@
                                                                                                                                    \
                                                                    ZCL_SKIP_BACKWARD_REQUEST_COMMAND_ID, "", );
 
+/** @brief Command description for LaunchContent
+ *
+ * Command: LaunchContent
+ * @param contentLaunchStatus ContentLaunchStatus
+ */
+#define emberAfFillCommandContent                                                                                                  \
+    LaunchClusterLaunchContent(contentLaunchStatus)                                                                                \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_LAUNCH_CONTENT_COMMAND_ID, "u", contentLaunchStatus);
+
+/** @brief Command description for LaunchURL
+ *
+ * Command: LaunchURL
+ * @param contentLaunchStatus ContentLaunchStatus
+ */
+#define emberAfFillCommandContent                                                                                                  \
+    LaunchClusterLaunchURL(contentLaunchStatus) emberAfFillExternalBuffer(mask,                                                    \
+                                                                                                                                   \
+                                                                          ZCL_LAUNCH_URL_COMMAND_ID, "u", contentLaunchStatus);
+
 /** @brief Command description for CommandOne
  *
  * Command: CommandOne

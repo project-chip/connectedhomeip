@@ -77,6 +77,22 @@ static void OnInt16sAttributeResponse(void * context, int16_t value)
     command->SetCommandExitStatus(true);
 }
 
+static void OnContentLaunchClusterLaunchContentResponse(void * context, uint8_t contentLaunchStatus)
+{
+    ChipLogProgress(chipTool, "ContentLaunchClusterLaunchContentResponse");
+
+    ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
+    command->SetCommandExitStatus(true);
+}
+
+static void OnContentLaunchClusterLaunchURLResponse(void * context, uint8_t contentLaunchStatus)
+{
+    ChipLogProgress(chipTool, "ContentLaunchClusterLaunchURLResponse");
+
+    ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
+    command->SetCommandExitStatus(true);
+}
+
 static void OnDoorLockClusterClearAllPinsResponse(void * context)
 {
     ChipLogProgress(chipTool, "DoorLockClusterClearAllPinsResponse");
@@ -364,6 +380,7 @@ static void OnScenesClusterViewSceneResponse(void * context, uint16_t groupId, u
 | Basic                                                               | 0x0000 |
 | Binding                                                             | 0xF000 |
 | ColorControl                                                        | 0x0300 |
+| ContentLaunch                                                       | 0xF002 |
 | DoorLock                                                            | 0x0101 |
 | Groups                                                              | 0x0004 |
 | Identify                                                            | 0x0003 |
@@ -378,6 +395,7 @@ constexpr chip::ClusterId kBarrierControlClusterId         = 0x0103;
 constexpr chip::ClusterId kBasicClusterId                  = 0x0000;
 constexpr chip::ClusterId kBindingClusterId                = 0xF000;
 constexpr chip::ClusterId kColorControlClusterId           = 0x0300;
+constexpr chip::ClusterId kContentLaunchClusterId          = 0xF002;
 constexpr chip::ClusterId kDoorLockClusterId               = 0x0101;
 constexpr chip::ClusterId kGroupsClusterId                 = 0x0004;
 constexpr chip::ClusterId kIdentifyClusterId               = 0x0003;
@@ -3526,6 +3544,118 @@ private:
 };
 
 /*----------------------------------------------------------------------------*\
+| Cluster ContentLaunch                                               | 0xF002 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * LaunchContent                                                     |   0x00 |
+| * LaunchURL                                                         |   0x01 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command LaunchContent
+ */
+class ContentLaunchLaunchContent : public ModelCommand
+{
+public:
+    ContentLaunchLaunchContent() : ModelCommand("launch-content") { ModelCommand::AddArguments(); }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0xF002) command (0x00) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::ContentLaunchCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.LaunchContent(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<ContentLaunchClusterLaunchContentResponseCallback> * onSuccessCallback =
+        new chip::Callback::Callback<ContentLaunchClusterLaunchContentResponseCallback>(OnContentLaunchClusterLaunchContentResponse,
+                                                                                        this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Command LaunchURL
+ */
+class ContentLaunchLaunchURL : public ModelCommand
+{
+public:
+    ContentLaunchLaunchURL() : ModelCommand("launch-url") { ModelCommand::AddArguments(); }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0xF002) command (0x01) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::ContentLaunchCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.LaunchURL(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<ContentLaunchClusterLaunchURLResponseCallback> * onSuccessCallback =
+        new chip::Callback::Callback<ContentLaunchClusterLaunchURLResponseCallback>(OnContentLaunchClusterLaunchURLResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Discover Attributes
+ */
+class DiscoverContentLaunchAttributes : public ModelCommand
+{
+public:
+    DiscoverContentLaunchAttributes() : ModelCommand("discover") { ModelCommand::AddArguments(); }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000) command (0x0C) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::ContentLaunchCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.DiscoverAttributes(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute ClusterRevision
+ */
+class ReadContentLaunchClusterRevision : public ModelCommand
+{
+public:
+    ReadContentLaunchClusterRevision() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "cluster-revision");
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0xF002) command (0x00) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::ContentLaunchCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*----------------------------------------------------------------------------*\
 | Cluster DoorLock                                                    | 0x0101 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
@@ -6603,6 +6733,19 @@ void registerClusterColorControl(Commands & commands)
 
     commands.Register(clusterName, clusterCommands);
 }
+void registerClusterContentLaunch(Commands & commands)
+{
+    const char * clusterName = "ContentLaunch";
+
+    commands_list clusterCommands = {
+        make_unique<ContentLaunchLaunchContent>(),
+        make_unique<ContentLaunchLaunchURL>(),
+        make_unique<DiscoverContentLaunchAttributes>(),
+        make_unique<ReadContentLaunchClusterRevision>(),
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
 void registerClusterDoorLock(Commands & commands)
 {
     const char * clusterName = "DoorLock";
@@ -6757,6 +6900,7 @@ void registerClusters(Commands & commands)
     registerClusterBasic(commands);
     registerClusterBinding(commands);
     registerClusterColorControl(commands);
+    registerClusterContentLaunch(commands);
     registerClusterDoorLock(commands);
     registerClusterGroups(commands);
     registerClusterIdentify(commands);
