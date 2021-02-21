@@ -17,7 +17,6 @@
 
 #pragma once
 
-#include <core/CHIPEncoding.h>
 #include <core/CHIPPersistentStorageDelegate.h>
 #include <transport/PASESession.h>
 
@@ -33,59 +32,24 @@ class DLL_EXPORT StorablePeerConnection
 public:
     StorablePeerConnection() {}
 
-    StorablePeerConnection(PASESession & session, Transport::AdminId admin)
-    {
-        session.ToSerializable(mSession.mOpCreds);
-        mSession.mAdmin = Encoding::LittleEndian::HostSwap16(admin);
-        mKeyId          = session.GetLocalKeyId();
-    }
+    StorablePeerConnection(PASESession & session, Transport::AdminId admin);
 
     virtual ~StorablePeerConnection() {}
 
-    CHIP_ERROR StoreIntoKVS(PersistentStorageDelegate & kvs)
-    {
-        char key[KeySize()];
-        ReturnErrorOnFailure(GenerateKey(mKeyId, key, sizeof(key)));
+    CHIP_ERROR StoreIntoKVS(PersistentStorageDelegate & kvs);
 
-        VerifyOrReturnError(CanCastTo<uint16_t>(sizeof(mSession)), CHIP_ERROR_INTERNAL);
-        uint16_t size = static_cast<uint16_t>(sizeof(mSession));
-        return kvs.SetKeyValue(key, &mSession, size);
-    }
+    CHIP_ERROR FetchFromKVS(PersistentStorageDelegate & kvs, uint16_t keyId);
 
-    CHIP_ERROR FetchFromKVS(PersistentStorageDelegate & kvs, uint16_t keyId)
-    {
-        char key[KeySize()];
-        ReturnErrorOnFailure(GenerateKey(keyId, key, sizeof(key)));
-
-        VerifyOrReturnError(CanCastTo<uint16_t>(sizeof(mSession)), CHIP_ERROR_INTERNAL);
-        uint16_t size = static_cast<uint16_t>(sizeof(mSession));
-        return kvs.GetKeyValue(key, &mSession, size);
-    }
-
-    static CHIP_ERROR DeleteFromKVS(PersistentStorageDelegate & kvs, uint16_t keyId)
-    {
-        char key[KeySize()];
-        ReturnErrorOnFailure(GenerateKey(keyId, key, sizeof(key)));
-
-        kvs.DeleteKeyValue(key);
-        return CHIP_NO_ERROR;
-    }
+    static CHIP_ERROR DeleteFromKVS(PersistentStorageDelegate & kvs, uint16_t keyId);
 
     void GetPASESession(PASESession & session) { session.FromSerializable(mSession.mOpCreds); }
 
     Transport::AdminId GetAdminId() { return mSession.mAdmin; }
 
 private:
-    static constexpr size_t KeySize() { return sizeof(kStorablePeerConnectionKeyPrefix) + 2 * sizeof(uint16_t); }
+    static constexpr size_t KeySize();
 
-    static CHIP_ERROR GenerateKey(uint16_t id, char * key, size_t len)
-    {
-        VerifyOrReturnError(len >= KeySize(), CHIP_ERROR_INVALID_ARGUMENT);
-        int keySize = snprintf(key, len, "%s%x", kStorablePeerConnectionKeyPrefix, id);
-        VerifyOrReturnError(keySize > 0, CHIP_ERROR_INTERNAL);
-        VerifyOrReturnError(len > (size_t) keySize, CHIP_ERROR_INTERNAL);
-        return CHIP_NO_ERROR;
-    }
+    static CHIP_ERROR GenerateKey(uint16_t id, char * key, size_t len);
 
     struct StorableSession
     {
