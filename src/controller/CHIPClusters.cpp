@@ -1505,6 +1505,81 @@ CHIP_ERROR ColorControlCluster::ReadAttributeClusterRevision(Callback::Cancelabl
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
+// ContentLaunch Cluster Commands
+CHIP_ERROR ContentLaunchCluster::LaunchContent(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+{
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    (void) onCompletion;
+
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kLaunchContentCommandId,
+                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+
+    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    // Command takes no arguments.
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
+    return mDevice->SendCommands();
+#else
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeContentLaunchClusterLaunchContentCommand(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+#endif
+}
+
+CHIP_ERROR ContentLaunchCluster::LaunchURL(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+{
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    (void) onCompletion;
+
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kLaunchURLCommandId,
+                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+
+    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    // Command takes no arguments.
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
+    return mDevice->SendCommands();
+#else
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeContentLaunchClusterLaunchURLCommand(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+#endif
+}
+
+// ContentLaunch Cluster Attributes
+CHIP_ERROR ContentLaunchCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
+                                                    Callback::Cancelable * onFailureCallback)
+{
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeContentLaunchClusterDiscoverAttributes(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+CHIP_ERROR ContentLaunchCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
+                                                              Callback::Cancelable * onFailureCallback)
+{
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeContentLaunchClusterReadClusterRevisionAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+
 // DoorLock Cluster Commands
 CHIP_ERROR DoorLockCluster::ClearAllPins(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {

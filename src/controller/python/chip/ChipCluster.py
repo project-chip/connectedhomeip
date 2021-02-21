@@ -157,6 +157,12 @@ class ChipCluster:
                     "optionsOverride": "int",
                 },
             },
+            "ContentLaunch": {
+                "LaunchContent": {
+                },
+                "LaunchURL": {
+                },
+            },
             "DoorLock": {
                 "ClearAllPins": {
                 },
@@ -532,6 +538,20 @@ class ChipCluster:
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_ColorControl_StopMoveStep(
                 device, ZCLendpoint, ZCLgroupid, optionsMask, optionsOverride
+            )
+        )
+
+    def ClusterContentLaunch_CommandLaunchContent(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        self._ChipStack.Call(
+            lambda: self._chipLib.chip_ime_AppendCommand_ContentLaunch_LaunchContent(
+                device, ZCLendpoint, ZCLgroupid
+            )
+        )
+
+    def ClusterContentLaunch_CommandLaunchURL(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        self._ChipStack.Call(
+            lambda: self._chipLib.chip_ime_AppendCommand_ContentLaunch_LaunchURL(
+                device, ZCLendpoint, ZCLgroupid
             )
         )
 
@@ -1022,6 +1042,13 @@ class ChipCluster:
         # Cluster ColorControl Command StopMoveStep
         self._chipLib.chip_ime_AppendCommand_ColorControl_StopMoveStep.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8]
         self._chipLib.chip_ime_AppendCommand_ColorControl_StopMoveStep.restype = ctypes.c_uint32
+        # Cluster ContentLaunch
+        # Cluster ContentLaunch Command LaunchContent
+        self._chipLib.chip_ime_AppendCommand_ContentLaunch_LaunchContent.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_ContentLaunch_LaunchContent.restype = ctypes.c_uint32
+        # Cluster ContentLaunch Command LaunchURL
+        self._chipLib.chip_ime_AppendCommand_ContentLaunch_LaunchURL.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_ContentLaunch_LaunchURL.restype = ctypes.c_uint32
         # Cluster DoorLock
         # Cluster DoorLock Command ClearAllPins
         self._chipLib.chip_ime_AppendCommand_DoorLock_ClearAllPins.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]

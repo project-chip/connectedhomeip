@@ -702,6 +702,12 @@
 #define ZCL_SKIP_FORWARD_REQUEST_COMMAND_ID (0x08)
 #define ZCL_SKIP_BACKWARD_REQUEST_COMMAND_ID (0x09)
 
+// Commands for cluster: Content Launch
+#define ZCL_LAUNCH_CONTENT_COMMAND_ID (0x00)
+#define ZCL_LAUNCH_CONTENT_RESPONSE_COMMAND_ID (0x00)
+#define ZCL_LAUNCH_URL_COMMAND_ID (0x01)
+#define ZCL_LAUNCH_URL_RESPONSE_COMMAND_ID (0x01)
+
 // Commands for cluster: Sample Mfg Specific Cluster
 #define ZCL_COMMAND_ONE_COMMAND_ID (0x00)
 

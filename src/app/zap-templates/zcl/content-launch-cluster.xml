@@ -1,0 +1,91 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2021 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="CHIP"/>
+  <cluster>
+    <domain>General</domain>
+    <name>Content Launch</name>
+    <code>0xF002</code>
+    <define>CONTENT_LAUNCH_CLUSTER</define>
+    <client init="false" tick="false">true</client>
+    <server init="false" tick="false">true</server>
+    <description>This cluster provides an interface for launching content on a media player device such as a TV or Speaker.</description>
+
+    <command source="client" code="0x00" name="LaunchContent" optional="false">
+      <description>Upon receipt, this SHALL launch the specified content with optional search criteria.</description>
+    </command>
+
+    <command source="client" code="0x01" name="LaunchURL" optional="false">
+      <description>Upon receipt, this SHALL launch content from the specified URL.</description>
+    </command>
+
+    <command source="server" code="0x00" name="LaunchContentResponse" optional="false" disableDefaultResponse="true">
+      <description>This command SHALL be generated in response to LaunchContent command.</description>
+      <arg name="contentLaunchStatus" type="ContentLaunchStatus"/>
+    </command>
+
+    <command source="server" code="0x01" name="LaunchURLResponse" optional="false" disableDefaultResponse="true">
+      <description>This command SHALL be generated in response to LaunchURL command.</description>
+      <arg name="contentLaunchStatus" type="ContentLaunchStatus"/>
+    </command>
+
+  </cluster>
+
+  <enum name="ContentLaunchStatus" type="ENUM8">
+    <item name="Success" value="0x00"/>
+    <item name="UrlNotAvailable" value="0x01"/>
+    <item name="AuthFailed" value="0x02"/>
+  </enum>
+
+  <struct name="ContentLaunchSearch">
+    <item name="EntitiesList" type="INT8U"/>
+    <item name="searchWindowStart" type="OCTET_STRING"/>
+    <item name="searchWindowEnd" type="OCTET_STRING"/>
+  </struct>
+
+  <struct name="ContentLaunchAdditionalInfo">
+    <item name="Name" type="OCTET_STRING"/>
+    <item name="Value" type="OCTET_STRING"/>
+  </struct>
+
+  <struct name="ContentLaunchAdditionalInfo">
+    <item name="Type" type="ContentLaunchType"/>
+    <item name="Value" type="OCTET_STRING"/>
+    <item name="ExternalIDList" type="INT8U"/>
+  </struct>
+
+  <enum name="ContentLaunchType" type="ENUM8">
+    <item name="Actor" value="0x00"/>
+    <item name="Channel" value="0x01"/>
+    <item name="Character" value="0x02"/>
+    <item name="Event" value="0x03"/>
+    <item name="Franchise" value="0x04"/>
+    <item name="Genre" value="0x05"/>
+    <item name="League" value="0x06"/>
+    <item name="Popularity" value="0x07"/>
+    <item name="Sport" value="0x08"/>
+    <item name="SportsTeam" value="0x009"/>
+    <item name="Video" value="0x0A"/>
+  </enum>
+
+  <enum name="MediaPlaybackStatus" type="ENUM8">
+    <item name="Success" value="0x00"/>
+    <item name="InvalidStateForCommand" value="0x01"/>
+    <item name="NotAllowed" value="0x02"/>
+    <item name="NotActive" value="0x03"/>
+  </enum>
+</configurator>
