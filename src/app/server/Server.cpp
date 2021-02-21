@@ -23,6 +23,7 @@
 #include <app/server/SessionManager.h>
 
 #include <ble/BLEEndPoint.h>
+#include <core/CHIPPersistentStorageDelegate.h>
 #include <inet/IPAddress.h>
 #include <inet/InetError.h>
 #include <inet/InetLayer.h>
@@ -72,12 +73,33 @@ constexpr bool useTestPairing()
 #endif
 }
 
+class ServerStorageDelegate : public PersistentStorageDelegate
+{
+    void SetDelegate(PersistentStorageResultDelegate * delegate) override {}
+    void GetKeyValue(const char * key) override {}
+    void SetKeyValue(const char * key, const char * value) override {}
+
+    CHIP_ERROR GetKeyValue(const char * key, void * buffer, uint16_t & size) override
+    {
+        return PersistedStorage::KeyValueStoreMgr().Get(key, buffer, size);
+    }
+
+    CHIP_ERROR SetKeyValue(const char * key, const void * value, uint16_t size) override
+    {
+        return PersistedStorage::KeyValueStoreMgr().Put(key, value, size);
+    }
+
+    void DeleteKeyValue(const char * key) override { PersistedStorage::KeyValueStoreMgr().Delete(key); }
+};
+
+ServerStorageDelegate gServerStorage;
+
 CHIP_ERROR PersistAdminPairingToKVS(AdminPairingInfo * admin, AdminId nextAvailableId)
 {
     ReturnErrorCodeIf(admin == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     ChipLogProgress(AppServer, "Persisting admin ID %d, next available %d", admin->GetAdminId(), nextAvailableId);
 
-    ReturnErrorOnFailure(admin->StoreUsingKVSMgr(PersistedStorage::KeyValueStoreMgr()));
+    ReturnErrorOnFailure(admin->StoreIntoKVS(gServerStorage));
     ReturnErrorOnFailure(PersistedStorage::KeyValueStoreMgr().Put(kAdminTableCountKey, &nextAvailableId, sizeof(nextAvailableId)));
 
     ChipLogProgress(AppServer, "Persisting admin ID successfully");
@@ -91,11 +113,14 @@ CHIP_ERROR RestoreAllAdminPairingsFromKVS(AdminPairingTable & adminPairings, Adm
                         CHIP_NO_ERROR);
     ChipLogProgress(AppServer, "Next available admin ID is %d", nextAvailableId);
 
+    // TODO: The admin ID space allocation should be re-evaluated. With the current approach, the space could be
+    //       exhausted while IDs are still available (e.g. if the admin IDs are allocated and freed over a period of time).
+    //       Also, the current approach can make ID lookup slower as more IDs are allocated and freed.
     for (AdminId id = 0; id < nextAvailableId; id++)
     {
         AdminPairingInfo * admin = adminPairings.AssignAdminId(id);
         // Recreate the binding if one exists in persistent storage. Else skip to the next ID
-        if (admin->FetchUsingKVSMgr(PersistedStorage::KeyValueStoreMgr()) != CHIP_NO_ERROR)
+        if (admin->FetchFromKVS(gServerStorage) != CHIP_NO_ERROR)
         {
             adminPairings.ReleaseAdminId(id);
         }
@@ -111,13 +136,14 @@ CHIP_ERROR RestoreAllAdminPairingsFromKVS(AdminPairingTable & adminPairings, Adm
 void DeleteAdminPairingsInKVS(AdminId nextAvailableId)
 {
     PersistedStorage::KeyValueStoreMgr().Delete(kAdminTableCountKey);
+
     for (AdminId id = 0; id < nextAvailableId; id++)
     {
-        AdminPairingInfo::DeleteUsingKVSMgr(PersistedStorage::KeyValueStoreMgr(), id);
+        AdminPairingInfo::DeleteFromKVS(gServerStorage, id);
     }
 }
 
-CHIP_ERROR RestoreAllSessionsFromKVS(SecureSessionMgr & sessionMgr, RendezvousServer & server)
+static CHIP_ERROR RestoreAllSessionsFromKVS(SecureSessionMgr & sessionMgr, RendezvousServer & server)
 {
     uint16_t nextSessionKeyId = 0;
     // It's not an error if the key doesn't exist. Just return right away.
@@ -129,7 +155,7 @@ CHIP_ERROR RestoreAllSessionsFromKVS(SecureSessionMgr & sessionMgr, RendezvousSe
     for (uint16_t keyId = 0; keyId < nextSessionKeyId; keyId++)
     {
         StorablePeerConnection connection;
-        if (CHIP_NO_ERROR == connection.FetchUsingKVSMgr(PersistedStorage::KeyValueStoreMgr(), keyId))
+        if (CHIP_NO_ERROR == connection.FetchFromKVS(gServerStorage, keyId))
         {
             // The following is static to save on stack space usage
             static PASESession session;
@@ -149,9 +175,10 @@ CHIP_ERROR RestoreAllSessionsFromKVS(SecureSessionMgr & sessionMgr, RendezvousSe
 void DeleteSessionsInKVS(uint16_t nextSessionKeyId)
 {
     PersistedStorage::KeyValueStoreMgr().Delete(kStorablePeerConnectionCountKey);
+
     for (uint16_t keyId = 0; keyId < nextSessionKeyId; keyId++)
     {
-        StorablePeerConnection::DeleteUsingKVSMgr(PersistedStorage::KeyValueStoreMgr(), keyId);
+        StorablePeerConnection::DeleteFromKVS(gServerStorage, keyId);
     }
 }
 
@@ -476,6 +503,7 @@ void InitServer(AppDelegate * delegate)
     InitDataModelHandler();
     gCallbacks.SetDelegate(delegate);
     gRendezvousServer.SetDelegate(delegate);
+    gRendezvousServer.SetStorage(&gServerStorage);
     gAdvDelegate.SetDelegate(delegate);
 
     // Init transport before operations with secure session mgr.

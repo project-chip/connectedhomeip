@@ -18,7 +18,7 @@
 #pragma once
 
 #include <core/CHIPEncoding.h>
-#include <platform/KeyValueStoreManager.h>
+#include <core/CHIPPersistentStorageDelegate.h>
 #include <transport/PASESession.h>
 
 namespace chip {
@@ -42,28 +42,33 @@ public:
 
     virtual ~StorablePeerConnection() {}
 
-    CHIP_ERROR StoreUsingKVSMgr(DeviceLayer::PersistedStorage::KeyValueStoreManager & mgr)
+    CHIP_ERROR StoreIntoKVS(PersistentStorageDelegate & kvs)
     {
         char key[KeySize()];
         ReturnErrorOnFailure(GenerateKey(mKeyId, key, sizeof(key)));
 
-        return mgr.Put(key, &mSession, sizeof(mSession));
+        VerifyOrReturnError(CanCastTo<uint16_t>(sizeof(mSession)), CHIP_ERROR_INTERNAL);
+        uint16_t size = static_cast<uint16_t>(sizeof(mSession));
+        return kvs.SetKeyValue(key, &mSession, size);
     }
 
-    CHIP_ERROR FetchUsingKVSMgr(DeviceLayer::PersistedStorage::KeyValueStoreManager & mgr, uint16_t keyId)
+    CHIP_ERROR FetchFromKVS(PersistentStorageDelegate & kvs, uint16_t keyId)
     {
         char key[KeySize()];
         ReturnErrorOnFailure(GenerateKey(keyId, key, sizeof(key)));
 
-        return mgr.Get(key, &mSession, sizeof(mSession));
+        VerifyOrReturnError(CanCastTo<uint16_t>(sizeof(mSession)), CHIP_ERROR_INTERNAL);
+        uint16_t size = static_cast<uint16_t>(sizeof(mSession));
+        return kvs.GetKeyValue(key, &mSession, size);
     }
 
-    static CHIP_ERROR DeleteUsingKVSMgr(DeviceLayer::PersistedStorage::KeyValueStoreManager & mgr, uint16_t keyId)
+    static CHIP_ERROR DeleteFromKVS(PersistentStorageDelegate & kvs, uint16_t keyId)
     {
         char key[KeySize()];
         ReturnErrorOnFailure(GenerateKey(keyId, key, sizeof(key)));
 
-        return mgr.Delete(key);
+        kvs.DeleteKeyValue(key);
+        return CHIP_NO_ERROR;
     }
 
     void GetPASESession(PASESession & session) { session.FromSerializable(mSession.mOpCreds); }

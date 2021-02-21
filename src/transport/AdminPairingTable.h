@@ -22,8 +22,8 @@
 #pragma once
 
 #include <core/CHIPEncoding.h>
+#include <core/CHIPPersistentStorageDelegate.h>
 #include <core/CHIPSafeCasts.h>
-#include <platform/KeyValueStoreManager.h>
 #include <support/Base64.h>
 #include <support/CHIPMem.h>
 #include <support/DLLUtil.h>
@@ -93,7 +93,7 @@ public:
         mAdmin  = kUndefinedAdminId;
     }
 
-    CHIP_ERROR StoreUsingKVSMgr(DeviceLayer::PersistedStorage::KeyValueStoreManager & mgr)
+    CHIP_ERROR StoreIntoKVS(PersistentStorageDelegate & kvs)
     {
         char key[KeySize()];
         ReturnErrorOnFailure(GenerateKey(mAdmin, key, sizeof(key)));
@@ -102,17 +102,22 @@ public:
         info.mNodeId = Encoding::LittleEndian::HostSwap64(mNodeId);
         info.mAdmin  = Encoding::LittleEndian::HostSwap16(mAdmin);
 
-        return mgr.Put(key, info);
+        VerifyOrReturnError(CanCastTo<uint16_t>(sizeof(info)), CHIP_ERROR_INTERNAL);
+        uint16_t size = static_cast<uint16_t>(sizeof(info));
+        return kvs.SetKeyValue(key, &info, size);
     }
 
-    CHIP_ERROR FetchUsingKVSMgr(DeviceLayer::PersistedStorage::KeyValueStoreManager & mgr)
+    CHIP_ERROR FetchFromKVS(PersistentStorageDelegate & kvs)
     {
         char key[KeySize()];
         ReturnErrorOnFailure(GenerateKey(mAdmin, key, sizeof(key)));
 
         StorableAdminPairingInfo info;
 
-        ReturnErrorOnFailure(mgr.Get(key, &info, sizeof(info)));
+        VerifyOrReturnError(CanCastTo<uint16_t>(sizeof(info)), CHIP_ERROR_INTERNAL);
+        uint16_t size = static_cast<uint16_t>(sizeof(info));
+        ReturnErrorOnFailure(kvs.GetKeyValue(key, &info, size));
+
         mNodeId    = Encoding::LittleEndian::HostSwap64(info.mNodeId);
         AdminId id = Encoding::LittleEndian::HostSwap16(info.mAdmin);
         ReturnErrorCodeIf(mAdmin != id, CHIP_ERROR_INCORRECT_STATE);
@@ -120,12 +125,13 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    static CHIP_ERROR DeleteUsingKVSMgr(DeviceLayer::PersistedStorage::KeyValueStoreManager & mgr, AdminId id)
+    static CHIP_ERROR DeleteFromKVS(PersistentStorageDelegate & kvs, AdminId id)
     {
         char key[KeySize()];
         ReturnErrorOnFailure(GenerateKey(id, key, sizeof(key)));
 
-        return mgr.Delete(key);
+        kvs.DeleteKeyValue(key);
+        return CHIP_NO_ERROR;
     }
 
 private:
