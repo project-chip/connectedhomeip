@@ -43,7 +43,9 @@ jobs:
                   submodules: true
             - name: Bootstrap
               run: |
-                  integrations/docker/images/chip-build-cirque/run.sh scripts/tests/cirque_tests.sh bootstrap
+                  integrations/docker/images/chip-build-cirque/run.sh \
+                    --env GITHUB_ACTION_RUN=1 \
+                    -- scripts/tests/cirque_tests.sh bootstrap
             - name: Artifact suffix
               id: outsuffix
               uses: haya14busa/action-cond@v1.0.0
