@@ -50,6 +50,7 @@ from .ChipBleUtility import (
 
 from .ChipUtility import ChipUtility
 from .ChipBleBase import ChipBleBase
+from chip.device import DeviceDescriptor
 
 
 try:
@@ -138,6 +139,7 @@ class BlePeripheral:
 
 class CoreBluetoothManager(ChipBleBase):
     def __init__(self, devCtrl, logger=None):
+        super().__init__()
         if logger:
             self.logger = logger
         else:
@@ -273,6 +275,7 @@ class CoreBluetoothManager(ChipBleBase):
         """ Called for each peripheral discovered during scan."""
         if self.bg_peripheral_name is None:
             if peripheral not in self.peripheral_list:
+                devIdInfo = BlePeripheral(peripheral, data).getPeripheralDevIdInfo()
                 if not self.scan_quiet:
                     self.logger.info("adding to scan list:")
                     self.logger.info("")
@@ -293,6 +296,14 @@ class CoreBluetoothManager(ChipBleBase):
                         self.logger.info("{0:<16}= {1}".format("Product Id", devIdInfo.productId))
                     self.logger.info("ADV data: " + repr(data))
                     self.logger.info("")
+
+                if devIdInfo:
+                    self.UpdateDevice(str(peripheral._.name), DeviceDescriptor('ble',
+                        name=str(peripheral._.name),
+                        discriminator=devIdInfo.discriminator,
+                        vendor=devIdInfo.vendorId,
+                        product=devIdInfo.productId,
+                        paired=bool(devIdInfo.pairingState)))
 
                 self.peripheral_list.append(peripheral)
                 self.peripheral_adv_list.append(BlePeripheral(peripheral, data))
@@ -472,7 +483,7 @@ class CoreBluetoothManager(ChipBleBase):
         args = self.ParseInputLine(line, "scan")
 
         if not args:
-            return
+            return []
         self.scan_quiet = args[1]
         self.bg_peripheral_name = None
         del self.peripheral_list[:]
@@ -495,6 +506,7 @@ class CoreBluetoothManager(ChipBleBase):
 
         self.manager.stopScan()
         self.logger.info("scanning stopped")
+        return self.DeviceList()
 
     def bgScanStart(self, name):
         """ API to initiate background BLE scanning."""

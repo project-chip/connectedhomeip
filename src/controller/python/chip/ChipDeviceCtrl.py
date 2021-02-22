@@ -202,7 +202,7 @@ class ChipDeviceController(object):
     # ----- Private Members -----
     def _InitLib(self):
         if self._dmLib is None:
-            self._dmLib = CDLL(self._ChipStack.LocateChipDLL())
+            self._dmLib = PyDLL(self._ChipStack.LocateChipDLL())
 
             self._dmLib.pychip_DeviceController_NewDeviceController.argtypes = [POINTER(c_void_p), c_uint64]
             self._dmLib.pychip_DeviceController_NewDeviceController.restype = c_uint32

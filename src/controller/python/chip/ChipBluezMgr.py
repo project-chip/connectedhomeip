@@ -37,6 +37,8 @@ import traceback
 import uuid
 import queue
 
+from chip.device import DeviceDescriptor
+
 from ctypes import *
 
 try:
@@ -784,6 +786,7 @@ class BluezDbusGattCharacteristic:
 
 class BluezManager(ChipBleBase):
     def __init__(self, devMgr, logger=None):
+        super().__init__()
         if logger:
             self.logger = logger
         else:
@@ -952,6 +955,7 @@ class BluezManager(ChipBleBase):
         timeout = kwargs["timeout"] + time.time()
         self.device_uuid_list = []
         self.peripheral_list = []
+        self.ClearDeviceList()
 
         while time.time() < timeout:
             scanned_peripheral_list = self.adapter.find_devices(
@@ -973,6 +977,13 @@ class BluezManager(ChipBleBase):
                     if not devIdInfo:
                         # Not a chip device
                         continue
+                    self.UpdateDevice(str(device.Name), DeviceDescriptor('ble',
+                        address=str(device.Address),
+                        name=str(device.Name),
+                        discriminator=devIdInfo.discriminator,
+                        vendor=devIdInfo.vendorId,
+                        product=devIdInfo.productId,
+                        paired=bool(devIdInfo.pairingState)))
                     if identifier and (device.Name == identifier or str(device.Address).upper() == str(
                         identifier.upper()
                     ) or str(devIdInfo.discriminator) == identifier):
@@ -993,7 +1004,7 @@ class BluezManager(ChipBleBase):
     def scan(self, line):
         args = self.ParseInputLine(line, "scan")
         if not args:
-            return False
+            return []
         self.target = None
         if not self.adapter:
             self.logger.info("use default adapter")
@@ -1003,7 +1014,7 @@ class BluezManager(ChipBleBase):
         self.runLoopUntil(
             self.scan_bg_implementation, timeout=args[0], identifier=args[2]
         )
-        return True
+        return self.DeviceList()
 
     def get_peripheral_devIdInfo(self, peripheral):
         if not peripheral.ServiceData:

@@ -324,6 +324,11 @@ CHIP_ERROR pychip_Stack_Init()
 
 #endif /* CHIP_SYSTEM_CONFIG_USE_SOCKETS */
 
+#ifdef CHIP_MDNS_USE_PLATFORM
+    // GetInstance will initialize the Avahi, and we can call ChipMdnsBrowse and other functions.
+    Mdns::DiscoveryImplPlatform::GetInstance().Start(nullptr, 0);
+#endif
+
 exit:
     if (err != CHIP_NO_ERROR)
         pychip_Stack_Shutdown();

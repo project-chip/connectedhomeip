@@ -227,26 +227,25 @@ chip-device-ctrl > ble-adapter-select DC:A6:32:9E:2E:A7
 (no output)
 ```
 
-### `ble-scan [-t <timeout>] [identifier]`
+### **`[D]`** `ble-scan [-t <timeout>] [identifier]`
 
-Start a ble-scan action for searching valid CHIP devices over BLE [for at most
-*timeout* seconds], stop when device matching the identifier or timeout.
+*Deprecated, use `discover ble` instead*
+
+Alias for `discover ble`
+
+### `discover [ble|mdns]`
+
+Start device discovery procedure for searching valid CHIP devices over BLE or mDNS.
 
 ```
-chip-device-ctrl > ble-scan
-2021-01-19 02:27:23,653 ChipBLEMgr   INFO     scanning started
-2021-01-19 02:27:25,144 ChipBLEMgr   INFO     Name            = CHIP-1383
-2021-01-19 02:27:25,144 ChipBLEMgr   INFO     ID              = ae0125dc-e621-3e05-9166-70ca7ea07985
-2021-01-19 02:27:25,146 ChipBLEMgr   INFO     RSSI            = -32
-2021-01-19 02:27:25,147 ChipBLEMgr   INFO     Address         = DC:A6:32:A5:4C:56
-2021-01-19 02:27:25,151 ChipBLEMgr   INFO     Pairing State   = 0
-2021-01-19 02:27:25,151 ChipBLEMgr   INFO     Discriminator   = 1383
-2021-01-19 02:27:25,152 ChipBLEMgr   INFO     Vendor Id       = 9050
-2021-01-19 02:27:25,152 ChipBLEMgr   INFO     Product Id      = 65279
-2021-01-19 02:27:25,155 ChipBLEMgr   INFO     Adv UUID        = 0000feaf-0000-1000-8000-00805f9b34fb
-2021-01-19 02:27:25,156 ChipBLEMgr   INFO     Adv Data        = 0067055a23fffe
-2021-01-19 02:27:27,257 ChipBLEMgr   INFO
-2021-01-19 02:27:34,213 ChipBLEMgr   INFO     scanning stopped
+chip-device-ctrl > discover ble
+......
+1 Device(s) found
+Device({'network': 'ble', 'address': 'DC:A6:32:A5:4C:56', 'name': 'CHIP-3840', 'discriminator': 3840, 'vendor': 9050, 'product': 65279, 'paired': False})
+
+chip-device-ctrl > discover mdns
+......
+Device({'network': 'ip', 'discriminator': 3840, 'vendor': 9050, 'product': 65279, 'address': '172.16.243.197', 'port': 11097, 'name': '4873986923C64567._chipc._udp.local.'})
 ```
 
 ### `connect -ip <address> <SetUpPinCode> [<nodeid>]`

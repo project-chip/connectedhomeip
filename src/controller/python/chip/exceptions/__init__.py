@@ -23,10 +23,19 @@ __all__ = [
     "InvalidArgumentType",
     "UnknownCluster",
     "UnknownCommand",
+
+    "ChipPythonException",
 ]
 
 
 class ChipStackException(Exception):
+    pass
+
+
+class ChipPythonException(Exception):
+    '''
+    Exception for Python API instead of chip stack
+    '''
     pass
 
 
@@ -93,3 +102,29 @@ class UnknownCommand(ClusterError):
 
     def __str__(self):
         return "UnknownCommand: cluster: {} command: {}".format(self.cluster, self.command)
+
+
+class InvalidArgumentType(ChipPythonException):
+    def __init__(self, expect: type, given: type, name: str):
+        self.expect = expect
+        self.given = given
+        self.argname = name
+
+    def __str__(self):
+        return "InvalidArgumentType: Argument {} should be {}, {} got".format(self.argname, self.expect, self.given)
+
+class InvalidArgument(ChipPythonException):
+    def __init__(self, name: str, value):
+        self.argname = name
+        self.value = value
+
+    def __str__(self):
+        return "InvalidArgument: {} (value={})".format(self.argname, self.value) if self.value else "InvalidArgument: {}".format(self.argname)
+
+class UnexpectedArgument(ChipPythonException):
+    def __init__(self, name: str, valtype: type):
+        self.argname = name
+        self.valtype = valtype
+
+    def __str__(self):
+        return "UnexpectedArgument: {} (type: {})".format(self.argname, self.valtype)

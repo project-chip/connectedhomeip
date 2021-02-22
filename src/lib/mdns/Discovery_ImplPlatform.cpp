@@ -65,6 +65,7 @@ CHIP_ERROR DiscoveryImplPlatform::Init()
 {
     if (!mMdnsInitialized)
     {
+        ChipLogError(DeviceLayer, "DiscoveryImplPlatform::Init()");
         ReturnErrorOnFailure(ChipMdnsInit(HandleMdnsInit, HandleMdnsError, this));
         mCommissionInstanceName = GetRandU64();
         mMdnsInitialized        = true;
@@ -271,8 +272,8 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const OperationalAdvertisingParamete
 
     mOperationalAdvertisingParams = params;
     // TODO: There may be multilple device/fabrid ids after multi-admin.
-    snprintf(service.mName, sizeof(service.mName), "%08X%08X-%08X%08X", (uint32_t)(params.GetNodeId() >> 32),
-             (uint32_t)(params.GetNodeId()), (uint32_t)(params.GetFabricId() >> 32), (uint32_t)(params.GetFabricId()));
+    snprintf(service.mName, sizeof(service.mName), "%08X%08X-%08X%08X", (uint32_t) (params.GetNodeId() >> 32),
+             (uint32_t) (params.GetNodeId()), (uint32_t) (params.GetFabricId() >> 32), (uint32_t) (params.GetFabricId()));
     strncpy(service.mType, "_chip", sizeof(service.mType));
     service.mProtocol      = MdnsServiceProtocol::kMdnsProtocolTcp;
     service.mPort          = CHIP_PORT;

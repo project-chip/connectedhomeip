@@ -25,9 +25,14 @@ from __future__ import absolute_import
 import abc
 import optparse
 import shlex
+from threading import Lock
 
 
 class ChipBleBase(metaclass=abc.ABCMeta):
+    def __init__(self):
+        self.deviceList = dict()
+        self.device_lock = Lock()
+
     @abc.abstractmethod
     def scan(self, line):
         """ API to initiate BLE scanning for -t user_timeout seconds."""
@@ -49,6 +54,21 @@ class ChipBleBase(metaclass=abc.ABCMeta):
             line += "ble-scan [-t <timeout>] [<name>|<identifier>] [-q <quiet>]"
 
         self.logger.info(line)
+
+    def UpdateDevice(self, identifier, device):
+        with self.device_lock:
+            if not device:
+                del self.deviceList[identifier]
+                return
+            self.deviceList[identifier] = device
+
+    def ClearDeviceList(self):
+        with self.device_lock:
+            self.deviceList.clear()
+
+    def DeviceList(self):
+        with self.device_lock:
+            return list(self.deviceList.values())
 
     def ParseInputLine(self, line, cmd=None):
         args = shlex.split(line)

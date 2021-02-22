@@ -375,7 +375,6 @@ void MdnsAvahi::HandleClientState(AvahiClient * client, AvahiClientState state)
     switch (state)
     {
     case AVAHI_CLIENT_S_RUNNING:
-        ChipLogProgress(DeviceLayer, "Avahi client registered");
         mClient = client;
         mGroup  = avahi_entry_group_new(client, HandleGroupState, this);
         if (mGroup == nullptr)

@@ -41,6 +41,7 @@
 #include <transport/SecureSessionMgr.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/UDP.h>
+#include <lib/mdns/Discovery_ImplPlatform.h>
 
 namespace chip {
 

@@ -80,7 +80,7 @@ CHIP_ERROR ExchangeManager::Init(NodeId localNodeId, TransportMgrBase * transpor
 
     mContextsInUse = 0;
 
-    memset(UMHandlerPool, 0, sizeof(UMHandlerPool));
+    memset(static_cast<void *>(UMHandlerPool), 0, sizeof(UMHandlerPool));
 
     mTransportMgr->SetRendezvousSession(this);
 

@@ -27,6 +27,8 @@ from __future__ import absolute_import
 from __future__ import print_function
 from chip import ChipDeviceCtrl
 from chip import exceptions
+from chip import mdns as chipmdns
+from chip import types as chiptypes
 import sys
 import os
 import platform
@@ -172,6 +174,7 @@ class DeviceMgrCmd(Cmd):
         "ble-adapter-print",
         "ble-debug-log",
 
+        "discover",
         "connect",
         "resolve",
         "zcl",
@@ -345,18 +348,41 @@ class DeviceMgrCmd(Cmd):
         self.bleMgr.ble_debug_log(line)
 
         return
-
+    
     def do_blescan(self, line):
         """
-        ble-scan
-
-        Start BLE scanning operations.
+        ble-scan Alias for "scan ble"
         """
 
-        if not self.bleMgr:
-            self.bleMgr = BleManager(self.devCtrl)
+        lineSplit = shlex.split(line)
+        self.do_scan(shlex.join(["ble"] + [lineSplit]))
 
-        self.bleMgr.scan(line)
+    def do_discover(self, line):
+        """
+        discover ble  Start ble scanning operations.
+        discover mdns Start mdns discovery operations.
+        """
+
+        lineSplit = shlex.split(line)
+
+        if lineSplit == 0:
+            print("Error: no method (ble or mdns) specified")
+            return
+
+        deviceList = []
+
+        if lineSplit[0] == "ble":
+            if not self.bleMgr:
+                self.bleMgr = BleManager(self.devCtrl)
+            deviceList = self.bleMgr.scan(shlex.join(lineSplit[1:]))
+        elif lineSplit[0] == "mdns":
+            a = chipmdns.DNSSDDeviceDiscovery()
+            a.BrowseService("_chipc", chiptypes.MdnsServiceProtocol.Udp, chiptypes.IPAddressType.Any)
+            deviceList = []
+
+        print("{} Device(s) found".format(len(deviceList)))
+        for val in deviceList:
+            print(val)
 
         return
 
