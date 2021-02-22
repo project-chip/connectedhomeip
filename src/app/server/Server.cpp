@@ -75,9 +75,23 @@ constexpr bool useTestPairing()
 
 class ServerStorageDelegate : public PersistentStorageDelegate
 {
-    void SetDelegate(PersistentStorageResultDelegate * delegate) override {}
-    void GetKeyValue(const char * key) override {}
-    void SetKeyValue(const char * key, const char * value) override {}
+    void SetDelegate(PersistentStorageResultDelegate * delegate) override
+    {
+        ChipLogError(AppServer, "ServerStorageDelegate does not support async operations");
+        chipDie();
+    }
+
+    void GetKeyValue(const char * key) override
+    {
+        ChipLogError(AppServer, "ServerStorageDelegate does not support async operations");
+        chipDie();
+    }
+
+    void SetKeyValue(const char * key, const char * value) override
+    {
+        ChipLogError(AppServer, "ServerStorageDelegate does not support async operations");
+        chipDie();
+    }
 
     CHIP_ERROR GetKeyValue(const char * key, void * buffer, uint16_t & size) override
     {
@@ -133,7 +147,7 @@ CHIP_ERROR RestoreAllAdminPairingsFromKVS(AdminPairingTable & adminPairings, Adm
     return CHIP_NO_ERROR;
 }
 
-void DeleteAdminPairingsInKVS(AdminId nextAvailableId)
+void EraseAllAdminPairingsUpTo(AdminId nextAvailableId)
 {
     PersistedStorage::KeyValueStoreMgr().Delete(kAdminTableCountKey);
 
@@ -152,27 +166,31 @@ static CHIP_ERROR RestoreAllSessionsFromKVS(SecureSessionMgr & sessionMgr, Rende
                         CHIP_NO_ERROR);
     ChipLogProgress(AppServer, "Found %d stored connections", nextSessionKeyId);
 
+    PASESession * session = static_cast<PASESession *>(chip::Platform::MemoryAlloc(sizeof(PASESession)));
+    VerifyOrReturnError(session != nullptr, CHIP_ERROR_NO_MEMORY);
+
     for (uint16_t keyId = 0; keyId < nextSessionKeyId; keyId++)
     {
         StorablePeerConnection connection;
         if (CHIP_NO_ERROR == connection.FetchFromKVS(gServerStorage, keyId))
         {
-            // The following is static to save on stack space usage
-            static PASESession session;
             connection.GetPASESession(session);
 
-            ChipLogProgress(AppServer, "Fetched the session information: from %llu", session.PeerConnection().GetPeerNodeId());
-            sessionMgr.NewPairing(Optional<Transport::PeerAddress>::Value(session.PeerConnection().GetPeerAddress()),
-                                  session.PeerConnection().GetPeerNodeId(), &session,
+            ChipLogProgress(AppServer, "Fetched the session information: from %llu", session->PeerConnection().GetPeerNodeId());
+            sessionMgr.NewPairing(Optional<Transport::PeerAddress>::Value(session->PeerConnection().GetPeerAddress()),
+                                  session->PeerConnection().GetPeerNodeId(), session,
                                   SecureSessionMgr::PairingDirection::kResponder, connection.GetAdminId(), nullptr);
+            session->Clear();
         }
     }
+
+    chip::Platform::MemoryFree(session);
 
     server.GetRendezvousSession()->SetNextKeyId(nextSessionKeyId);
     return CHIP_NO_ERROR;
 }
 
-void DeleteSessionsInKVS(uint16_t nextSessionKeyId)
+void EraseAllSessionsUpTo(uint16_t nextSessionKeyId)
 {
     PersistedStorage::KeyValueStoreMgr().Delete(kStorablePeerConnectionCountKey);
 
@@ -288,7 +306,7 @@ static CHIP_ERROR OpenPairingWindowUsingVerifier(uint16_t discriminator, PASEVer
     VerifyOrReturnError(adminInfo != nullptr, CHIP_ERROR_NO_MEMORY);
     gNextAvailableAdminId++;
 
-    return gRendezvousServer.Init(std::move(params), &gTransports, &gSessions, adminInfo);
+    return gRendezvousServer.WaitForPairing(std::move(params), &gTransports, &gSessions, adminInfo);
 }
 
 class ServerCallback : public SecureSessionMgrDelegate
@@ -479,8 +497,8 @@ CHIP_ERROR OpenDefaultPairingWindow(ResetAdmins resetAdmins)
     if (resetAdmins == ResetAdmins::kYes)
     {
         uint16_t nextKeyId = gRendezvousServer.GetRendezvousSession()->GetNextKeyId();
-        DeleteAdminPairingsInKVS(gNextAvailableAdminId);
-        DeleteSessionsInKVS(nextKeyId);
+        EraseAllAdminPairingsUpTo(gNextAvailableAdminId);
+        EraseAllSessionsUpTo(nextKeyId);
         gNextAvailableAdminId = 0;
         gAdminPairings.Reset();
     }
@@ -490,7 +508,7 @@ CHIP_ERROR OpenDefaultPairingWindow(ResetAdmins resetAdmins)
     VerifyOrReturnError(adminInfo != nullptr, CHIP_ERROR_NO_MEMORY);
     gNextAvailableAdminId++;
 
-    return gRendezvousServer.Init(std::move(params), &gTransports, &gSessions, adminInfo);
+    return gRendezvousServer.WaitForPairing(std::move(params), &gTransports, &gSessions, adminInfo);
 }
 
 // The function will initialize datamodel handler and then start the server
@@ -500,10 +518,11 @@ void InitServer(AppDelegate * delegate)
     CHIP_ERROR err = CHIP_NO_ERROR;
     Optional<Transport::PeerAddress> peer(Transport::Type::kUndefined);
 
+    chip::Platform::MemoryInit();
+
     InitDataModelHandler();
     gCallbacks.SetDelegate(delegate);
-    gRendezvousServer.SetDelegate(delegate);
-    gRendezvousServer.SetStorage(&gServerStorage);
+    gRendezvousServer.SetDelegates(delegate, &gServerStorage);
     gAdvDelegate.SetDelegate(delegate);
 
     // Init transport before operations with secure session mgr.

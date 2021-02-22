@@ -38,8 +38,8 @@ namespace chip {
 
 RendezvousServer::RendezvousServer() : mRendezvousSession(this) {}
 
-CHIP_ERROR RendezvousServer::Init(const RendezvousParameters & params, TransportMgrBase * transportMgr,
-                                  SecureSessionMgr * sessionMgr, Transport::AdminPairingInfo * admin)
+CHIP_ERROR RendezvousServer::WaitForPairing(const RendezvousParameters & params, TransportMgrBase * transportMgr,
+                                            SecureSessionMgr * sessionMgr, Transport::AdminPairingInfo * admin)
 {
     return mRendezvousSession.Init(params, transportMgr, sessionMgr, admin);
 }
@@ -68,11 +68,13 @@ void RendezvousServer::OnRendezvousComplete()
     ChipLogProgress(AppServer, "Device completed Rendezvous process");
     StorablePeerConnection connection(mRendezvousSession.GetPairingSession(), mRendezvousSession.GetAdminId());
 
-    VerifyOrReturn(mStorage != nullptr);
-    VerifyOrReturn(connection.StoreIntoKVS(*mStorage) == CHIP_NO_ERROR);
+    VerifyOrReturn(mStorage != nullptr,
+                   ChipLogError(AppServer, "Storage delegate is not available. Cannot store the connection state"));
+    VerifyOrReturn(connection.StoreIntoKVS(*mStorage) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to store the connection state"));
 
     uint16_t nextKeyId = mRendezvousSession.GetNextKeyId();
-    VerifyOrReturn(CanCastTo<uint16_t>(sizeof(nextKeyId)));
+    VerifyOrReturn(CanCastTo<uint16_t>(sizeof(nextKeyId)), ChipLogError(AppServer, "Cannot cast the KeyID to uint16_t type"));
     uint16_t size = static_cast<uint16_t>(sizeof(nextKeyId));
     mStorage->SetKeyValue(kStorablePeerConnectionCountKey, &nextKeyId, size);
 }

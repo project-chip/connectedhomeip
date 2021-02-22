@@ -42,7 +42,7 @@ public:
 
     static CHIP_ERROR DeleteFromKVS(PersistentStorageDelegate & kvs, uint16_t keyId);
 
-    void GetPASESession(PASESession & session) { session.FromSerializable(mSession.mOpCreds); }
+    void GetPASESession(PASESession * session) { session->FromSerializable(mSession.mOpCreds); }
 
     Transport::AdminId GetAdminId() { return mSession.mAdmin; }
 
