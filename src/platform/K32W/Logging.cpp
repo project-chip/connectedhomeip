@@ -4,8 +4,8 @@
 
 #include <core/CHIPConfig.h>
 #include <platform/CHIPDeviceConfig.h>
-#include <support/logging/Constants.h>
 #include <src/lib/support/CodeUtils.h>
+#include <support/logging/Constants.h>
 
 #include <cstring>
 
@@ -72,7 +72,7 @@ void GetMessageString(char * buf, uint8_t chipCategory, uint8_t otLevelLog)
 void FillPrefix(char * buf, uint8_t bufLen, uint8_t chipCategory, uint8_t otLevelLog)
 {
     /* add the error string */
-	chip::Logging::Platform::GetMessageString(buf, chipCategory, otLevelLog);
+    chip::Logging::Platform::GetMessageString(buf, chipCategory, otLevelLog);
 }
 
 namespace chip {
@@ -98,7 +98,8 @@ void GenericLog(const char * format, va_list arg)
     size_t prefixLen, writtenLen;
 
     /* Prefix is composed of [Debug String][MOdule Name String] */
-    FillPrefix(formattedMsg, CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE - 1, chip::Logging::kLogCategory_None, chip::Logging::kLogCategory_Detail);
+    FillPrefix(formattedMsg, CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE - 1, chip::Logging::kLogCategory_None,
+               chip::Logging::kLogCategory_Detail);
     prefixLen = strlen(formattedMsg);
 
     // Append the log message.
