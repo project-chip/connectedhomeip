@@ -33,8 +33,9 @@ qpg6100_sdk("sdk") {
   ]
 
   sources = [
+    "${examples_plat_dir}/app/include/Service.h",
     "${examples_plat_dir}/project_include/CHIPProjectConfig.h",
-    "${examples_plat_dir}/app/include/Service.h"]
+  ]
 
   defines = []
   if (is_debug) {
@@ -69,11 +70,11 @@ qpg6100_executable("lighting_app") {
   ]
 
   sources = [
+    "${examples_plat_dir}/app/Service.cpp",
     "src/AppTask.cpp",
     "src/LightingManager.cpp",
     "src/ZclCallbacks.cpp",
     "src/main.cpp",
-    "${examples_plat_dir}/app/Service.cpp",
   ]
 
   output_dir = root_out_dir

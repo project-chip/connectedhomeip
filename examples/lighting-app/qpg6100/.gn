@@ -17,7 +17,6 @@ import("//build_overrides/build.gni")
 # The location of the build configuration file.
 buildconfig = "${build_root}/config/BUILDCONFIG.gn"
 
-
 # CHIP uses angle bracket includes.
 check_system_includes = true
 
