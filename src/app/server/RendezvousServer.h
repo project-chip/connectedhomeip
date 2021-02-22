@@ -20,6 +20,7 @@
 #include <app/server/AppDelegate.h>
 #include <core/CHIPPersistentStorageDelegate.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <support/ReturnMacros.h>
 #include <transport/RendezvousSession.h>
 
 namespace chip {
@@ -31,10 +32,13 @@ public:
 
     CHIP_ERROR WaitForPairing(const RendezvousParameters & params, TransportMgrBase * transportMgr, SecureSessionMgr * sessionMgr,
                               Transport::AdminPairingInfo * admin);
-    void SetDelegates(AppDelegate * delegate, PersistentStorageDelegate * storage)
+
+    CHIP_ERROR Init(AppDelegate * delegate, PersistentStorageDelegate * storage)
     {
+        VerifyOrReturnError(storage != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
         mDelegate = delegate;
         mStorage  = storage;
+        return CHIP_NO_ERROR;
     }
 
     //////////////// RendezvousSessionDelegate Implementation ///////////////////

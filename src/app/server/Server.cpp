@@ -522,7 +522,10 @@ void InitServer(AppDelegate * delegate)
 
     InitDataModelHandler();
     gCallbacks.SetDelegate(delegate);
-    gRendezvousServer.SetDelegates(delegate, &gServerStorage);
+
+    err = gRendezvousServer.Init(delegate, &gServerStorage);
+    SuccessOrExit(err);
+
     gAdvDelegate.SetDelegate(delegate);
 
     // Init transport before operations with secure session mgr.
