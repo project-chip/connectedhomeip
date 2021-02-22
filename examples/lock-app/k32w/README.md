@@ -144,16 +144,11 @@ distribution (the demo-application was compiled on Ubuntu 20.04).
 user@ubuntu:~/Desktop/git/connectedhomeip$ export K32W061_SDK_ROOT=/home/user/Desktop/SDK_2.6.2_K32W061DK6/
 user@ubuntu:~/Desktop/git/connectedhomeip$ ./third_party/k32w_sdk/mr2_fixes/patch_k32w_mr2_sdk.sh
 user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/activate.sh
-user@ubuntu:~/Desktop/git/connectedhomeip$ cd third_party/openthread/repo/
-user@ubuntu:~/Desktop/git/connectedhomeip/third_party/openthread/repo$ git checkout a8265a5628af2f11914d7ff181e58aa110f93cea
-user@ubuntu:~/Desktop/git/connectedhomeip/third_party/openthread/repo$ cd ../../../examples/lock-app/k32w/
+user@ubuntu:~/Desktop/git/connectedhomeip/third_party/openthread/repo$ cd examples/lock-app/k32w/
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/lock-app/k32w$ gn gen out/debug --args="k32w_sdk_root=\"${K32W061_SDK_ROOT}\" is_debug=true"
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/lock-app/k32w$ ninja -C out/debug
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/lock-app/k32w$ $K32W061_SDK_ROOT/tools/imagetool/sign_images.sh out/debug/
 ```
-
-Note that openthread must be updated to the latest master for including the
-latest K32W openthread updates.
 
 Note that "patch_k32w_mr2_sdk.sh" script must be run for patching the K32W061
 SDK 2.6.2.
