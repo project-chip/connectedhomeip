@@ -45,7 +45,6 @@ struct GObjectUnref
 using GCancellableUniquePtr       = std::unique_ptr<GCancellable, GObjectUnref>;
 using GDBusObjectManagerUniquePtr = std::unique_ptr<GDBusObjectManager, GObjectUnref>;
 
-/// TODO: dedup this!
 /// Retrieve CHIP device identification info from the device advertising data
 bool BluezGetChipDeviceInfo(BluezDevice1 & aDevice, chip::Ble::ChipBLEDeviceIdentificationInfo & aDeviceInfo)
 {
