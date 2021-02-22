@@ -56,6 +56,7 @@ public:
     const char * GetAlias() const { return mCurrent.alias.c_str(); }
     const char * GetName() const { return mCurrent.name.c_str(); }
     bool IsPowered() const { return mCurrent.powered; }
+    BluezAdapter1 * GetAdapter() const { return mCurrent.adapter; }
 
 private:
     /// Sets up the DBUS manager and loads the list
@@ -82,6 +83,7 @@ private:
         std::string alias;
         std::string name;
         bool powered;
+        BluezAdapter1 * adapter;
     } mCurrent = { 0 };
 };
 

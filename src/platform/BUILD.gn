@@ -466,8 +466,12 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "Linux/SystemTimeSupport.cpp",
         "Linux/bluez/AdapterIterator.cpp",
         "Linux/bluez/AdapterIterator.h",
+        "Linux/bluez/ChipDeviceScanner.cpp",
+        "Linux/bluez/ChipDeviceScanner.h",
         "Linux/bluez/Helper.cpp",
         "Linux/bluez/Helper.h",
+        "Linux/bluez/MainLoop.cpp",
+        "Linux/bluez/MainLoop.h",
         "Linux/bluez/Types.h",
       ]
 
