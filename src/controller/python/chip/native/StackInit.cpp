@@ -43,14 +43,12 @@ extern "C" void pychip_native_init()
     err = chip::Platform::MemoryInit();
     if (err != CHIP_NO_ERROR)
     {
-        // FIXME: implement
         ChipLogError(DeviceLayer, "Failed to initialize CHIP stack: memory init failed: %s", chip::ErrorStr(err));
     }
 
     err = chip::DeviceLayer::PlatformMgr().InitChipStack();
     if (err != CHIP_NO_ERROR)
     {
-        // FIXME: implement
         ChipLogError(DeviceLayer, "Failed to initialize CHIP stack: platform init failed: %s", chip::ErrorStr(err));
     }
     int result   = pthread_create(&sPlatformMainThread, nullptr, PlatfomrMainLoop, nullptr);
