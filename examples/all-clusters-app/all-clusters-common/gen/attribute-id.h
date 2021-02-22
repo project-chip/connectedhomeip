@@ -4058,6 +4058,12 @@
 
 // Server attributes
 
+// Attribute ids for cluster: Network Commissioning
+
+// Client attributes
+
+// Server attributes
+
 // Attribute ids for cluster: Binding
 
 // Client attributes

@@ -195,6 +195,11 @@ function asTypeMaxValue(type)
   return templateUtil.templatePromise(this.global, promise);
 }
 
+function isStrEndsWith(str, substr)
+{
+  return str.endsWith(substr);
+}
+
 //
 // Module exports
 //
@@ -203,3 +208,4 @@ exports.asCallbackAttributeType = asCallbackAttributeType;
 exports.asDelimitedCommand      = asDelimitedCommand;
 exports.asTypeMinValue          = asTypeMinValue;
 exports.asTypeMaxValue          = asTypeMaxValue;
+exports.isStrEndsWith           = isStrEndsWith;
