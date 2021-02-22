@@ -29,10 +29,13 @@ class RendezvousServer : public RendezvousSessionDelegate
 public:
     RendezvousServer();
 
-    CHIP_ERROR Init(const RendezvousParameters & params, TransportMgrBase * transportMgr, SecureSessionMgr * sessionMgr,
-                    Transport::AdminPairingInfo * admin);
-    void SetDelegate(AppDelegate * delegate) { mDelegate = delegate; };
-    void SetStorage(PersistentStorageDelegate * delegate) { mStorage = delegate; };
+    CHIP_ERROR WaitForPairing(const RendezvousParameters & params, TransportMgrBase * transportMgr, SecureSessionMgr * sessionMgr,
+                              Transport::AdminPairingInfo * admin);
+    void SetDelegates(AppDelegate * delegate, PersistentStorageDelegate * storage)
+    {
+        mDelegate = delegate;
+        mStorage  = storage;
+    }
 
     //////////////// RendezvousSessionDelegate Implementation ///////////////////
 
