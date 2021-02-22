@@ -18,10 +18,10 @@ import("${chip_root}/src/lwip/lwip.gni")
 
 declare_args() {
   # Use the lwIP library.
-  chip_system_config_use_lwip = chip_with_lwip && (current_os == "freertos" || current_os == "mbed")
+  chip_system_config_use_lwip = chip_with_lwip && (current_os == "freertos")
 
   # Use BSD/POSIX socket API.
-  chip_system_config_use_sockets = (current_os != "freertos" && current_os != "mbed")
+  chip_system_config_use_sockets = (current_os != "freertos")
 
   # Mutex implementation: posix, freertos, none.
   chip_system_config_locking = ""
