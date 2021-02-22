@@ -43,8 +43,8 @@ void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId
             return;
         }
 
-        LightingMgr().InitiateAction(*value ? LightingManager::ON_ACTION : LightingManager::OFF_ACTION,
-                                     AppEvent::kEventType_Level, size, value);
+        LightingMgr().InitiateAction(*value ? LightingManager::ON_ACTION : LightingManager::OFF_ACTION, AppEvent::kEventType_Level,
+                                     size, value);
     }
     else if (clusterId == ZCL_LEVEL_CONTROL_CLUSTER_ID)
     {
@@ -68,7 +68,8 @@ void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId
     {
         ChipLogProgress(Zcl, "Unknown cluster ID: %d", clusterId);
         return;
-    }}
+    }
+}
 
 /** @brief OnOff Cluster Init
  *

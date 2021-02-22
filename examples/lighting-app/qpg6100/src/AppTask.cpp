@@ -196,8 +196,6 @@ void AppTask::AppTaskMain(void * pvParameter)
     }
 }
 
-
-
 void AppTask::LightingActionEventHandler(AppEvent * aEvent)
 {
     LightingManager::Action_t action;
@@ -213,12 +211,11 @@ void AppTask::LightingActionEventHandler(AppEvent * aEvent)
         }
         LightingMgr().InitiateAction(action, 0, 0, 0);
     }
-    if (aEvent->Type == AppEvent::kEventType_Level &&
-        aEvent->ButtonEvent.Action != 0)
+    if (aEvent->Type == AppEvent::kEventType_Level && aEvent->ButtonEvent.Action != 0)
     {
         uint8_t val = 0x0;
-        val = LightingMgr().GetLevel() == 0x7f ? 0x1 : 0x7f;
-        action = LightingManager::LEVEL_ACTION;
+        val         = LightingMgr().GetLevel() == 0x7f ? 0x1 : 0x7f;
+        action      = LightingManager::LEVEL_ACTION;
         LightingMgr().InitiateAction(action, 0, 1, &val);
     }
     return;
@@ -245,7 +242,7 @@ void AppTask::ButtonEventHandler(uint8_t btnIdx, bool btnPressed)
     else if (btnIdx == APP_FUNCTION_BUTTON)
     {
         // TODO hijacked the function button to change level
-        button_event.Type                  = AppEvent::kEventType_Level;
+        button_event.Type    = AppEvent::kEventType_Level;
         button_event.Handler = LightingActionEventHandler;
         sAppTask.PostEvent(&button_event);
     }
@@ -457,8 +454,7 @@ void AppTask::UpdateClusterState(void)
     newValue = LightingMgr().GetLevel();
     // TODO understand well enough to implement the level cluster ZCL_CURRENT_LEVEL_ATTRIBUTE_ID
     status = emberAfWriteAttribute(1, ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_CURRENT_LEVEL_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
-                                                 (uint8_t *) &newValue, ZCL_DATA8_ATTRIBUTE_TYPE);
-
+                                   (uint8_t *) &newValue, ZCL_DATA8_ATTRIBUTE_TYPE);
 
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {

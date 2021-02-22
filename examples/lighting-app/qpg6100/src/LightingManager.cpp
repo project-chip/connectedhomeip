@@ -17,7 +17,6 @@
  *    limitations under the License.
  */
 
-
 #include "LightingManager.h"
 #include "qvCHIP.h"
 #include <support/logging/CHIPLogging.h>
@@ -107,7 +106,6 @@ bool LightingManager::InitiateAction(Action_t aAction, int32_t aActor, uint8_t s
         {
             Set(new_state == kState_On);
         }
-
 
         if (mActionCompleted_CB)
         {

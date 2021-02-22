@@ -28,7 +28,6 @@
 #include "FreeRTOS.h"
 #include "timers.h" // provides FreeRTOS timer support
 
-
 class LightingManager
 {
 public:
@@ -60,7 +59,6 @@ private:
     State_t mState;
     uint8_t mLevel;
 
-
     LightingCallback_fn mActionInitiated_CB;
     LightingCallback_fn mActionCompleted_CB;
 
@@ -68,10 +66,8 @@ private:
     void SetLevel(uint8_t aLevel);
     void UpdateLight();
 
-
     static LightingManager sLight;
     static void TimerEventHandler(TimerHandle_t xTimer);
-
 };
 
 inline LightingManager & LightingMgr(void)
