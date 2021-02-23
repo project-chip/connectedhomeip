@@ -71,6 +71,11 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)setPersistentStorageDelegate:(id<CHIPPersistentStorageDelegate>)delegate queue:(dispatch_queue_t)queue;
 
+/**
+ * Notify the controller about changes to the underlying storage. This will make the controller invalidate any locally cached data.
+ */
+- (void)storageChanged;
+
 @end
 
 NS_ASSUME_NONNULL_END
