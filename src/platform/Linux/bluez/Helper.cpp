@@ -1278,7 +1278,7 @@ static void UpdateAdditionalDataCharacteristic(BluezGattCharacteristic1 * charac
     // Construct the TLV for the additional data
     GVariant * cValue = nullptr;
     gpointer data;
-    CHIP_ERROR err    = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     chip::System::PacketBufferHandle bufferHandle;
 
     char serialNumber[ConfigurationManager::kMaxSerialNumberLength + 1];
