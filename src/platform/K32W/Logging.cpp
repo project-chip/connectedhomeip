@@ -4,7 +4,10 @@
 
 #include <core/CHIPConfig.h>
 #include <platform/CHIPDeviceConfig.h>
+#include <src/lib/support/CodeUtils.h>
 #include <support/logging/Constants.h>
+
+#include <cstring>
 
 #define K32W_LOG_MODULE_NAME chip
 #define EOL_CHARS "\r\n" /* End of Line Characters */
@@ -16,6 +19,10 @@
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
 extern "C" void K32WWriteBlocking(const uint8_t * aBuf, uint32_t len);
+
+namespace chip {
+namespace Logging {
+namespace Platform {
 
 void GetMessageString(char * buf, uint8_t chipCategory, uint8_t otLevelLog)
 {
@@ -58,10 +65,14 @@ void GetMessageString(char * buf, uint8_t chipCategory, uint8_t otLevelLog)
     }
 }
 
+} // namespace Platform
+} // namespace Logging
+} // namespace chip
+
 void FillPrefix(char * buf, uint8_t bufLen, uint8_t chipCategory, uint8_t otLevelLog)
 {
     /* add the error string */
-    ::GetMessageString(buf, chipCategory, otLevelLog);
+    chip::Logging::Platform::GetMessageString(buf, chipCategory, otLevelLog);
 }
 
 namespace chip {
@@ -87,7 +98,8 @@ void GenericLog(const char * format, va_list arg)
     size_t prefixLen, writtenLen;
 
     /* Prefix is composed of [Debug String][MOdule Name String] */
-    FillPrefix(formattedMsg, CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE - 1, kLogCategory_None, kLogCategory_Detail);
+    FillPrefix(formattedMsg, CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE - 1, chip::Logging::kLogCategory_None,
+               chip::Logging::kLogCategory_Detail);
     prefixLen = strlen(formattedMsg);
 
     // Append the log message.
@@ -105,6 +117,7 @@ void GenericLog(const char * format, va_list arg)
 
 namespace chip {
 namespace Logging {
+namespace Platform {
 
 /**
  * CHIP log output function.
@@ -122,6 +135,7 @@ void LogV(const char * module, uint8_t category, const char * msg, va_list v)
 #endif // K32W_LOG_ENABLED
 }
 
+} // namespace Platform
 } // namespace Logging
 } // namespace chip
 
