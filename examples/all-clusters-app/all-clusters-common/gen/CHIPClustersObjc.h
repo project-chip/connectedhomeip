@@ -28,6 +28,28 @@ typedef void (^ResponseHandler)(NSError * _Nullable error, NSDictionary * _Nulla
 
 NS_ASSUME_NONNULL_BEGIN
 
+@interface CHIPApplicationBasic : NSObject
+
+- (nullable instancetype)initWithDevice:(CHIPDevice *)device endpoint:(uint8_t)endpoint queue:(dispatch_queue_t)queue;
+
+- (BOOL)readAttributeVendorName:(ResponseHandler)completionHandler;
+- (BOOL)readAttributeVendorId:(ResponseHandler)completionHandler;
+- (BOOL)readAttributeApplicationName:(ResponseHandler)completionHandler;
+- (BOOL)readAttributeProductId:(ResponseHandler)completionHandler;
+- (BOOL)readAttributeApplicationId:(ResponseHandler)completionHandler;
+- (BOOL)readAttributeCatalogVendorId:(ResponseHandler)completionHandler;
+- (BOOL)readAttributeApplicationSatus:(ResponseHandler)completionHandler;
+- (BOOL)readAttributeClusterRevision:(ResponseHandler)completionHandler;
+
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
+@end
+
+NS_ASSUME_NONNULL_END
+
+NS_ASSUME_NONNULL_BEGIN
+
 @interface CHIPBarrierControl : NSObject
 
 - (nullable instancetype)initWithDevice:(CHIPDevice *)device endpoint:(uint8_t)endpoint queue:(dispatch_queue_t)queue;
