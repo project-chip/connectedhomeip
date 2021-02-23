@@ -309,6 +309,11 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "Darwin/SystemPlatformConfig.h",
       ]
 
+      sources += [
+        "Darwin/KeyValueStoreManagerImpl.cpp",
+        "Darwin/KeyValueStoreManagerImpl.h",
+      ]
+
       if (chip_enable_ble) {
         sources += [
           "Darwin/BleApplicationDelegate.h",
@@ -555,6 +560,11 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "qpg6100/SystemPlatformConfig.h",
         "qpg6100/qpg6100Config.cpp",
         "qpg6100/qpg6100Config.h",
+      ]
+
+      sources += [
+        "qpg6100/KeyValueStoreManagerImpl.cpp",
+        "qpg6100/KeyValueStoreManagerImpl.h",
       ]
 
       if (chip_enable_openthread) {
