@@ -354,10 +354,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "$dir_pw_kvs:crc16",
         "$dir_pw_log",
       ]
-      public_deps += [
-        "$dir_pw_checksum",
-        "$dir_pw_kvs",
-      ]
+      public_deps += [ "$dir_pw_kvs" ]
       sources += [
         "EFR32/KeyValueStoreManagerImpl.cpp",
         "EFR32/KeyValueStoreManagerImpl.h",

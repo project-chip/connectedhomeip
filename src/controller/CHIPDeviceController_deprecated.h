@@ -29,8 +29,8 @@
 #pragma once
 
 #include <controller/CHIPDeviceController.h>
+#include <controller/CHIPPersistentStorageDelegate.h>
 #include <core/CHIPCore.h>
-#include <core/CHIPPersistentStorageDelegate.h>
 #include <core/CHIPTLV.h>
 #include <support/DLLUtil.h>
 #include <transport/RendezvousSession.h>
@@ -68,13 +68,13 @@ public:
      * System::Layer and InetLayer.
      */
     CHIP_ERROR Init(NodeId localDeviceId, Controller::DevicePairingDelegate * pairingDelegate = nullptr,
-                    PersistentStorageDelegate * storageDelegate = nullptr);
+                    Controller::PersistentStorageDelegate * storageDelegate = nullptr);
     /**
      * Init function to be used when already-initialized System::Layer and InetLayer are available.
      */
     CHIP_ERROR Init(NodeId localDeviceId, System::Layer * systemLayer, Inet::InetLayer * inetLayer,
-                    Controller::DevicePairingDelegate * pairingDelegate = nullptr,
-                    PersistentStorageDelegate * storageDelegate         = nullptr);
+                    Controller::DevicePairingDelegate * pairingDelegate     = nullptr,
+                    Controller::PersistentStorageDelegate * storageDelegate = nullptr);
     CHIP_ERROR Shutdown();
 
     CHIP_ERROR SetUdpListenPort(uint16_t listenPort);
