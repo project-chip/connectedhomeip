@@ -430,29 +430,32 @@ class DeviceMgrCmd(Cmd):
 
     def do_setpairingwificredential(self, line):
         """
-        set-pairing-wifi-credential
+        set-pairing-wifi-credential <ssid> <password>
 
-        Set WiFi credential for pairing, will sent to device
+        Set WiFi credential to be used while pairing a Wi-Fi device
         """
         try:
             args = shlex.split(line)
-            self.devCtrl.SetWifiCredential(args[0], args[1])
+            if len(args) == 2:
+                self.devCtrl.SetWifiCredential(args[0], args[1])
+                print("WiFi credential set")
+            else:
+                self.do_help("set-pairing-wifi-credential")
         except exceptions.ChipStackException as ex:
             print(str(ex))
             return
-
-        print("WiFi credential set")
 
     def do_setpairingthreadcredential(self, line):
         """
         set-pairing-thread-credential <channel> <panid> <masterkey>
 
-        Set Thread credentials used while pairing device
+        Set Thread credential to be used while pairing a Thread device
         """
         try:
             args = shlex.split(line)
             if len(args) == 3:
                 self.devCtrl.SetThreadCredential(int(args[0]), int(args[1], 16), args[2])
+                print("Thread credential set")
             else:
                 self.do_help("set-pairing-thread-credential")
         except exceptions.ChipStackException as ex:
