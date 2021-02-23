@@ -47,6 +47,10 @@ struct net_if_ipv4;
 struct net_if_ipv6;
 #endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
 
+#if CHIP_SYSTEM_CONFIG_USE_MBED_NET_IF
+#include <NetworkInterface.h>
+#endif
+
 #include <stddef.h>
 #include <stdint.h>
 
@@ -83,6 +87,10 @@ typedef unsigned InterfaceId;
 typedef int InterfaceId;
 #endif
 
+#if CHIP_SYSTEM_CONFIG_USE_MBED_NET_IF
+typedef int InterfaceId;
+#endif
+
 /**
  * @def     INET_NULL_INTERFACEID
  *
@@ -99,9 +107,9 @@ typedef int InterfaceId;
 #define INET_NULL_INTERFACEID NULL
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS || CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
+#if CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS || CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF || CHIP_SYSTEM_CONFIG_USE_MBED_NET_IF
 #define INET_NULL_INTERFACEID 0
-#endif // CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS || CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
+#endif // CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS || CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF || CHIP_SYSTEM_CONFIG_USE_MBED_NET_IF
 
 /**
  * @brief   Test \c ID for inequivalence with \c INET_NULL_INTERFACEID

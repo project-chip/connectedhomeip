@@ -73,7 +73,7 @@
 #define INET_IPV6_ADD_MEMBERSHIP IPV6_ADD_MEMBERSHIP
 #elif defined(IPV6_JOIN_GROUP)
 #define INET_IPV6_ADD_MEMBERSHIP IPV6_JOIN_GROUP
-#elif !__ZEPHYR__
+#elif (!__ZEPHYR__ && !__MBED__)
 #error                                                                                                                             \
     "Neither IPV6_ADD_MEMBERSHIP nor IPV6_JOIN_GROUP are defined which are required for generalized IPv6 multicast group support."
 #endif // IPV6_ADD_MEMBERSHIP
@@ -82,7 +82,7 @@
 #define INET_IPV6_DROP_MEMBERSHIP IPV6_DROP_MEMBERSHIP
 #elif defined(IPV6_LEAVE_GROUP)
 #define INET_IPV6_DROP_MEMBERSHIP IPV6_LEAVE_GROUP
-#elif !__ZEPHYR__
+#elif (!__ZEPHYR__ && !__MBED__)
 #error                                                                                                                             \
     "Neither IPV6_DROP_MEMBERSHIP nor IPV6_LEAVE_GROUP are defined which are required for generalized IPv6 multicast group support."
 #endif // IPV6_DROP_MEMBERSHIP
