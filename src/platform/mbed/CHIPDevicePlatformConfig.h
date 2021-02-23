@@ -25,9 +25,6 @@
 
 // ==================== Platform Adaptations ====================
 
-#define CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION 0
-#define CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP 0
-
 #define CHIP_DEVICE_CONFIG_ENABLE_THREAD 0
 #define CHIP_DEVICE_CONFIG_THREAD_FTD 0
 

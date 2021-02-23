@@ -19,6 +19,7 @@ lwip_platform = "mbed"
 
 chip_project_config_include = ""
 chip_system_project_config_include = ""
+chip_device_project_config_include = ""
 
 custom_toolchain = "//toolchain:mbed"
 mbedtls_target = "//mbedtls:mbedtls"
