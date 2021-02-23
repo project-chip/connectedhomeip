@@ -29,8 +29,8 @@
 #pragma once
 
 #include <controller/CHIPDevice.h>
+#include <controller/CHIPPersistentStorageDelegate.h>
 #include <core/CHIPCore.h>
-#include <core/CHIPPersistentStorageDelegate.h>
 #include <core/CHIPTLV.h>
 #include <messaging/ExchangeMgr.h>
 #include <support/DLLUtil.h>

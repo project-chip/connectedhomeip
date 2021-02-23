@@ -22,6 +22,7 @@
 #include <support/DLLUtil.h>
 
 namespace chip {
+namespace Controller {
 
 class DLL_EXPORT PersistentStorageResultDelegate
 {
@@ -95,39 +96,12 @@ public:
 
     /**
      * @brief
-     *   This is a synchronous Get API, where the value is returned via the output
-     *   buffer. This API should be used sparingly, since it may block for
-     *   some duration.
-     *
-     *   This API can be used to retrieve a byte buffer value from the storage.
-     *
-     * @param[in]      key Key to lookup
-     * @param[out]     buffer Value for the key
-     * @param[in, out] size Input value buffer size, output length of value.
-     *                 The output length could be larger than input value. In
-     *                 such cases, the user should allocate the buffer large
-     *                 enough (>= output length), and call the API again.
-     */
-    virtual CHIP_ERROR GetKeyValue(const char * key, void * buffer, uint16_t & size) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-
-    /**
-     * @brief
-     *   Set the value for the key to a null terminated string.
+     *   Set the value for the key
      *
      * @param[in] key Key to be set
      * @param[in] value Value to be set
      */
     virtual void SetKeyValue(const char * key, const char * value) = 0;
-
-    /**
-     * @brief
-     *   Set the value for the key to a byte buffer.
-     *
-     * @param[in] key Key to be set
-     * @param[in] value Value to be set
-     * @param[in] size Size of the Value
-     */
-    virtual CHIP_ERROR SetKeyValue(const char * key, const void * value, uint16_t size) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
     /**
      * @brief
@@ -138,4 +112,5 @@ public:
     virtual void DeleteKeyValue(const char * key) = 0;
 };
 
+} // namespace Controller
 } // namespace chip

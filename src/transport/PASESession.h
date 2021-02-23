@@ -159,7 +159,7 @@ public:
      *                    initialized once pairing is complete
      * @return CHIP_ERROR The result of session derivation
      */
-    CHIP_ERROR DeriveSecureSession(const uint8_t * info, size_t info_len, SecureSession & session);
+    virtual CHIP_ERROR DeriveSecureSession(const uint8_t * info, size_t info_len, SecureSession & session);
 
     /**
      * @brief
@@ -223,10 +223,6 @@ public:
      **/
     CHIP_ERROR FromSerializable(const PASESessionSerializable & output);
 
-    /** @brief This function zeroes out and resets the memory used by the object.
-     **/
-    void Clear();
-
 private:
     enum Spake2pErrorType : uint8_t
     {
@@ -257,6 +253,8 @@ private:
     void HandleErrorMsg(const PacketHeader & header, const System::PacketBufferHandle & msg);
 
     CHIP_ERROR AttachHeaderAndSend(Protocols::SecureChannel::MsgType msgType, System::PacketBufferHandle msgBuf);
+
+    void Clear();
 
     SessionEstablishmentDelegate * mDelegate = nullptr;
 

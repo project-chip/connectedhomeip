@@ -142,11 +142,6 @@ public:
      */
     const Inet::IPAddress & GetIPAddress() const { return mNetworkProvision.GetIPAddress(); }
 
-    Transport::AdminId GetAdminId() const { return (mAdmin != nullptr) ? mAdmin->GetAdminId() : Transport::kUndefinedAdminId; }
-
-    uint16_t GetNextKeyId() const { return mNextKeyId; }
-    void SetNextKeyId(uint16_t id) { mNextKeyId = id; }
-
 private:
     CHIP_ERROR HandlePairingMessage(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
                                     System::PacketBufferHandle msgBuf);
