@@ -2701,6 +2701,98 @@ private:
 
 @end
 
+@interface CHIPContentLaunch ()
+
+@property (readonly) Controller::ContentLaunchCluster cppCluster;
+@property (readonly, nonatomic) dispatch_queue_t callbackQueue;
+@end
+
+@implementation CHIPContentLaunch
+
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(EndpointId)endpoint queue:(dispatch_queue_t)queue
+{
+    CHIP_ERROR err = _cppCluster.Associate([device internalDevice], endpoint);
+
+    if (err != CHIP_NO_ERROR) {
+        return nil;
+    }
+
+    if (self = [super init]) {
+        _callbackQueue = queue;
+    }
+
+    return self;
+}
+
+- (BOOL)launchContent:(ResponseHandler)completionHandler
+{
+    CHIPContentLaunchClusterLaunchContentResponseCallbackBridge * onSuccess
+        = new CHIPContentLaunchClusterLaunchContentResponseCallbackBridge(completionHandler, _callbackQueue);
+    if (!onSuccess) {
+        return NO;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    if (!onFailure) {
+        delete onSuccess;
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.LaunchContent(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        return NO;
+    }
+    return YES;
+}
+- (BOOL)launchURL:(ResponseHandler)completionHandler
+{
+    CHIPContentLaunchClusterLaunchURLResponseCallbackBridge * onSuccess
+        = new CHIPContentLaunchClusterLaunchURLResponseCallbackBridge(completionHandler, _callbackQueue);
+    if (!onSuccess) {
+        return NO;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    if (!onFailure) {
+        delete onSuccess;
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.LaunchURL(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        return NO;
+    }
+    return YES;
+}
+
+- (BOOL)readAttributeClusterRevision:(ResponseHandler)completionHandler
+{
+    CHIPInt16uAttributeCallbackBridge * onSuccess = new CHIPInt16uAttributeCallbackBridge(completionHandler, _callbackQueue);
+    if (!onSuccess) {
+        return NO;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    if (!onFailure) {
+        delete onSuccess;
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.ReadAttributeClusterRevision(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        return NO;
+    }
+    return YES;
+}
+
+@end
+
 @interface CHIPDoorLock ()
 
 @property (readonly) Controller::DoorLockCluster cppCluster;

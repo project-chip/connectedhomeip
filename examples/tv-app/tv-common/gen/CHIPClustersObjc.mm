@@ -332,370 +332,6 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPGroupsClusterAddGroupResponseCallbackBridge : public Callback::Callback<GroupsClusterAddGroupResponseCallback> {
-public:
-    CHIPGroupsClusterAddGroupResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<GroupsClusterAddGroupResponseCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-    {
-    }
-
-    ~CHIPGroupsClusterAddGroupResponseCallbackBridge() {};
-
-    static void CallbackFn(void * context, uint16_t groupId)
-    {
-        CHIPGroupsClusterAddGroupResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPGroupsClusterAddGroupResponseCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
-            dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {
-                    @"groupId" : [NSNumber numberWithUnsignedShort:groupId],
-                });
-                callback->Cancel();
-                delete callback;
-            });
-        }
-    };
-
-private:
-    ResponseHandler mHandler;
-    dispatch_queue_t mQueue;
-};
-
-class CHIPGroupsClusterGetGroupMembershipResponseCallbackBridge
-    : public Callback::Callback<GroupsClusterGetGroupMembershipResponseCallback> {
-public:
-    CHIPGroupsClusterGetGroupMembershipResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<GroupsClusterGetGroupMembershipResponseCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-    {
-    }
-
-    ~CHIPGroupsClusterGetGroupMembershipResponseCallbackBridge() {};
-
-    static void CallbackFn(
-        void * context, uint8_t capacity, uint8_t groupCount, /* TYPE WARNING: array array defaults to */ uint8_t * groupList)
-    {
-        CHIPGroupsClusterGetGroupMembershipResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPGroupsClusterGetGroupMembershipResponseCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
-            dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {
-                    @"capacity" : [NSNumber numberWithUnsignedChar:capacity],
-                    @"groupCount" : [NSNumber numberWithUnsignedChar:groupCount],
-                    // groupList: /* TYPE WARNING: array array defaults to */ uint8_t *
-                    // Conversion from this type to Objc is not properly implemented yet
-                });
-                callback->Cancel();
-                delete callback;
-            });
-        }
-    };
-
-private:
-    ResponseHandler mHandler;
-    dispatch_queue_t mQueue;
-};
-
-class CHIPGroupsClusterRemoveGroupResponseCallbackBridge : public Callback::Callback<GroupsClusterRemoveGroupResponseCallback> {
-public:
-    CHIPGroupsClusterRemoveGroupResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<GroupsClusterRemoveGroupResponseCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-    {
-    }
-
-    ~CHIPGroupsClusterRemoveGroupResponseCallbackBridge() {};
-
-    static void CallbackFn(void * context, uint16_t groupId)
-    {
-        CHIPGroupsClusterRemoveGroupResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPGroupsClusterRemoveGroupResponseCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
-            dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {
-                    @"groupId" : [NSNumber numberWithUnsignedShort:groupId],
-                });
-                callback->Cancel();
-                delete callback;
-            });
-        }
-    };
-
-private:
-    ResponseHandler mHandler;
-    dispatch_queue_t mQueue;
-};
-
-class CHIPGroupsClusterViewGroupResponseCallbackBridge : public Callback::Callback<GroupsClusterViewGroupResponseCallback> {
-public:
-    CHIPGroupsClusterViewGroupResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<GroupsClusterViewGroupResponseCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-    {
-    }
-
-    ~CHIPGroupsClusterViewGroupResponseCallbackBridge() {};
-
-    static void CallbackFn(void * context, uint16_t groupId, uint8_t * groupName)
-    {
-        CHIPGroupsClusterViewGroupResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPGroupsClusterViewGroupResponseCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
-            dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {
-                    @"groupId" : [NSNumber numberWithUnsignedShort:groupId],
-                    @"groupName" : [NSString stringWithFormat:@"%s", groupName],
-                });
-                callback->Cancel();
-                delete callback;
-            });
-        }
-    };
-
-private:
-    ResponseHandler mHandler;
-    dispatch_queue_t mQueue;
-};
-
-class CHIPIdentifyClusterIdentifyQueryResponseCallbackBridge
-    : public Callback::Callback<IdentifyClusterIdentifyQueryResponseCallback> {
-public:
-    CHIPIdentifyClusterIdentifyQueryResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<IdentifyClusterIdentifyQueryResponseCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-    {
-    }
-
-    ~CHIPIdentifyClusterIdentifyQueryResponseCallbackBridge() {};
-
-    static void CallbackFn(void * context, uint16_t timeout)
-    {
-        CHIPIdentifyClusterIdentifyQueryResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPIdentifyClusterIdentifyQueryResponseCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
-            dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {
-                    @"timeout" : [NSNumber numberWithUnsignedShort:timeout],
-                });
-                callback->Cancel();
-                delete callback;
-            });
-        }
-    };
-
-private:
-    ResponseHandler mHandler;
-    dispatch_queue_t mQueue;
-};
-
-class CHIPScenesClusterAddSceneResponseCallbackBridge : public Callback::Callback<ScenesClusterAddSceneResponseCallback> {
-public:
-    CHIPScenesClusterAddSceneResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<ScenesClusterAddSceneResponseCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-    {
-    }
-
-    ~CHIPScenesClusterAddSceneResponseCallbackBridge() {};
-
-    static void CallbackFn(void * context, uint16_t groupId, uint8_t sceneId)
-    {
-        CHIPScenesClusterAddSceneResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPScenesClusterAddSceneResponseCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
-            dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {
-                    @"groupId" : [NSNumber numberWithUnsignedShort:groupId],
-                    @"sceneId" : [NSNumber numberWithUnsignedChar:sceneId],
-                });
-                callback->Cancel();
-                delete callback;
-            });
-        }
-    };
-
-private:
-    ResponseHandler mHandler;
-    dispatch_queue_t mQueue;
-};
-
-class CHIPScenesClusterGetSceneMembershipResponseCallbackBridge
-    : public Callback::Callback<ScenesClusterGetSceneMembershipResponseCallback> {
-public:
-    CHIPScenesClusterGetSceneMembershipResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<ScenesClusterGetSceneMembershipResponseCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-    {
-    }
-
-    ~CHIPScenesClusterGetSceneMembershipResponseCallbackBridge() {};
-
-    static void CallbackFn(void * context, uint8_t capacity, uint16_t groupId, uint8_t sceneCount,
-        /* TYPE WARNING: array array defaults to */ uint8_t * sceneList)
-    {
-        CHIPScenesClusterGetSceneMembershipResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPScenesClusterGetSceneMembershipResponseCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
-            dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {
-                    @"capacity" : [NSNumber numberWithUnsignedChar:capacity],
-                    @"groupId" : [NSNumber numberWithUnsignedShort:groupId],
-                    @"sceneCount" : [NSNumber numberWithUnsignedChar:sceneCount],
-                    // sceneList: /* TYPE WARNING: array array defaults to */ uint8_t *
-                    // Conversion from this type to Objc is not properly implemented yet
-                });
-                callback->Cancel();
-                delete callback;
-            });
-        }
-    };
-
-private:
-    ResponseHandler mHandler;
-    dispatch_queue_t mQueue;
-};
-
-class CHIPScenesClusterRemoveAllScenesResponseCallbackBridge
-    : public Callback::Callback<ScenesClusterRemoveAllScenesResponseCallback> {
-public:
-    CHIPScenesClusterRemoveAllScenesResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<ScenesClusterRemoveAllScenesResponseCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-    {
-    }
-
-    ~CHIPScenesClusterRemoveAllScenesResponseCallbackBridge() {};
-
-    static void CallbackFn(void * context, uint16_t groupId)
-    {
-        CHIPScenesClusterRemoveAllScenesResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPScenesClusterRemoveAllScenesResponseCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
-            dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {
-                    @"groupId" : [NSNumber numberWithUnsignedShort:groupId],
-                });
-                callback->Cancel();
-                delete callback;
-            });
-        }
-    };
-
-private:
-    ResponseHandler mHandler;
-    dispatch_queue_t mQueue;
-};
-
-class CHIPScenesClusterRemoveSceneResponseCallbackBridge : public Callback::Callback<ScenesClusterRemoveSceneResponseCallback> {
-public:
-    CHIPScenesClusterRemoveSceneResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<ScenesClusterRemoveSceneResponseCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-    {
-    }
-
-    ~CHIPScenesClusterRemoveSceneResponseCallbackBridge() {};
-
-    static void CallbackFn(void * context, uint16_t groupId, uint8_t sceneId)
-    {
-        CHIPScenesClusterRemoveSceneResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPScenesClusterRemoveSceneResponseCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
-            dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {
-                    @"groupId" : [NSNumber numberWithUnsignedShort:groupId],
-                    @"sceneId" : [NSNumber numberWithUnsignedChar:sceneId],
-                });
-                callback->Cancel();
-                delete callback;
-            });
-        }
-    };
-
-private:
-    ResponseHandler mHandler;
-    dispatch_queue_t mQueue;
-};
-
-class CHIPScenesClusterStoreSceneResponseCallbackBridge : public Callback::Callback<ScenesClusterStoreSceneResponseCallback> {
-public:
-    CHIPScenesClusterStoreSceneResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<ScenesClusterStoreSceneResponseCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-    {
-    }
-
-    ~CHIPScenesClusterStoreSceneResponseCallbackBridge() {};
-
-    static void CallbackFn(void * context, uint16_t groupId, uint8_t sceneId)
-    {
-        CHIPScenesClusterStoreSceneResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPScenesClusterStoreSceneResponseCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
-            dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {
-                    @"groupId" : [NSNumber numberWithUnsignedShort:groupId],
-                    @"sceneId" : [NSNumber numberWithUnsignedChar:sceneId],
-                });
-                callback->Cancel();
-                delete callback;
-            });
-        }
-    };
-
-private:
-    ResponseHandler mHandler;
-    dispatch_queue_t mQueue;
-};
-
-class CHIPScenesClusterViewSceneResponseCallbackBridge : public Callback::Callback<ScenesClusterViewSceneResponseCallback> {
-public:
-    CHIPScenesClusterViewSceneResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<ScenesClusterViewSceneResponseCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-    {
-    }
-
-    ~CHIPScenesClusterViewSceneResponseCallbackBridge() {};
-
-    static void CallbackFn(void * context, uint16_t groupId, uint8_t sceneId, uint16_t transitionTime, uint8_t * sceneName,
-        /* TYPE WARNING: array array defaults to */ uint8_t * extensionFieldSets)
-    {
-        CHIPScenesClusterViewSceneResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPScenesClusterViewSceneResponseCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
-            dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {
-                    @"groupId" : [NSNumber numberWithUnsignedShort:groupId],
-                    @"sceneId" : [NSNumber numberWithUnsignedChar:sceneId],
-                    @"transitionTime" : [NSNumber numberWithUnsignedShort:transitionTime],
-                    @"sceneName" : [NSString stringWithFormat:@"%s", sceneName],
-                    // extensionFieldSets: /* TYPE WARNING: array array defaults to */ uint8_t *
-                    // Conversion from this type to Objc is not properly implemented yet
-                });
-                callback->Cancel();
-                delete callback;
-            });
-        }
-    };
-
-private:
-    ResponseHandler mHandler;
-    dispatch_queue_t mQueue;
-};
-
 @interface CHIPBarrierControl ()
 
 @property (readonly) Controller::BarrierControlCluster cppCluster;
@@ -1020,119 +656,6 @@ private:
     }
 
     CHIP_ERROR err = self.cppCluster.ReadAttributeBarrierPosition(onSuccess->Cancel(), onFailure->Cancel());
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
-    return YES;
-}
-
-- (BOOL)readAttributeClusterRevision:(ResponseHandler)completionHandler
-{
-    CHIPInt16uAttributeCallbackBridge * onSuccess = new CHIPInt16uAttributeCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.ReadAttributeClusterRevision(onSuccess->Cancel(), onFailure->Cancel());
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
-    return YES;
-}
-
-@end
-
-@interface CHIPBasic ()
-
-@property (readonly) Controller::BasicCluster cppCluster;
-@property (readonly, nonatomic) dispatch_queue_t callbackQueue;
-@end
-
-@implementation CHIPBasic
-
-- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(EndpointId)endpoint queue:(dispatch_queue_t)queue
-{
-    CHIP_ERROR err = _cppCluster.Associate([device internalDevice], endpoint);
-
-    if (err != CHIP_NO_ERROR) {
-        return nil;
-    }
-
-    if (self = [super init]) {
-        _callbackQueue = queue;
-    }
-
-    return self;
-}
-
-- (BOOL)resetToFactoryDefaults:(ResponseHandler)completionHandler
-{
-    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.ResetToFactoryDefaults(onSuccess->Cancel(), onFailure->Cancel());
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
-    return YES;
-}
-
-- (BOOL)readAttributeZclVersion:(ResponseHandler)completionHandler
-{
-    CHIPInt8uAttributeCallbackBridge * onSuccess = new CHIPInt8uAttributeCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.ReadAttributeZclVersion(onSuccess->Cancel(), onFailure->Cancel());
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
-    return YES;
-}
-
-- (BOOL)readAttributePowerSource:(ResponseHandler)completionHandler
-{
-    CHIPInt8uAttributeCallbackBridge * onSuccess = new CHIPInt8uAttributeCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.ReadAttributePowerSource(onSuccess->Cancel(), onFailure->Cancel());
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5312,13 +4835,13 @@ private:
 
 @end
 
-@interface CHIPDoorLock ()
+@interface CHIPContentLaunch ()
 
-@property (readonly) Controller::DoorLockCluster cppCluster;
+@property (readonly) Controller::ContentLaunchCluster cppCluster;
 @property (readonly, nonatomic) dispatch_queue_t callbackQueue;
 @end
 
-@implementation CHIPDoorLock
+@implementation CHIPContentLaunch
 
 - (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(EndpointId)endpoint queue:(dispatch_queue_t)queue
 {
@@ -5335,9 +4858,10 @@ private:
     return self;
 }
 
-- (BOOL)clearAllPins:(ResponseHandler)completionHandler
+- (BOOL)launchContent:(ResponseHandler)completionHandler
 {
-    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
+    CHIPContentLaunchClusterLaunchContentResponseCallbackBridge * onSuccess
+        = new CHIPContentLaunchClusterLaunchContentResponseCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
         return NO;
     }
@@ -5348,7 +4872,7 @@ private:
         return NO;
     }
 
-    CHIP_ERROR err = self.cppCluster.ClearAllPins(onSuccess->Cancel(), onFailure->Cancel());
+    CHIP_ERROR err = self.cppCluster.LaunchContent(onSuccess->Cancel(), onFailure->Cancel());
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5356,9 +4880,10 @@ private:
     }
     return YES;
 }
-- (BOOL)clearAllRfids:(ResponseHandler)completionHandler
+- (BOOL)launchURL:(ResponseHandler)completionHandler
 {
-    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
+    CHIPContentLaunchClusterLaunchURLResponseCallbackBridge * onSuccess
+        = new CHIPContentLaunchClusterLaunchURLResponseCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
         return NO;
     }
@@ -5369,583 +4894,7 @@ private:
         return NO;
     }
 
-    CHIP_ERROR err = self.cppCluster.ClearAllRfids(onSuccess->Cancel(), onFailure->Cancel());
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
-    return YES;
-}
-- (BOOL)clearHolidaySchedule:(uint8_t)scheduleId completionHandler:(ResponseHandler)completionHandler
-{
-    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.ClearHolidaySchedule(onSuccess->Cancel(), onFailure->Cancel(), scheduleId);
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
-    return YES;
-}
-- (BOOL)clearPin:(uint16_t)userId completionHandler:(ResponseHandler)completionHandler
-{
-    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.ClearPin(onSuccess->Cancel(), onFailure->Cancel(), userId);
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
-    return YES;
-}
-- (BOOL)clearRfid:(uint16_t)userId completionHandler:(ResponseHandler)completionHandler
-{
-    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.ClearRfid(onSuccess->Cancel(), onFailure->Cancel(), userId);
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
-    return YES;
-}
-- (BOOL)clearWeekdaySchedule:(uint8_t)scheduleId userId:(uint16_t)userId completionHandler:(ResponseHandler)completionHandler
-{
-    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.ClearWeekdaySchedule(onSuccess->Cancel(), onFailure->Cancel(), scheduleId, userId);
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
-    return YES;
-}
-- (BOOL)clearYeardaySchedule:(uint8_t)scheduleId userId:(uint16_t)userId completionHandler:(ResponseHandler)completionHandler
-{
-    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.ClearYeardaySchedule(onSuccess->Cancel(), onFailure->Cancel(), scheduleId, userId);
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
-    return YES;
-}
-- (BOOL)getHolidaySchedule:(uint8_t)scheduleId completionHandler:(ResponseHandler)completionHandler
-{
-    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.GetHolidaySchedule(onSuccess->Cancel(), onFailure->Cancel(), scheduleId);
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
-    return YES;
-}
-- (BOOL)getLogRecord:(uint16_t)logIndex completionHandler:(ResponseHandler)completionHandler
-{
-    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.GetLogRecord(onSuccess->Cancel(), onFailure->Cancel(), logIndex);
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
-    return YES;
-}
-- (BOOL)getPin:(uint16_t)userId completionHandler:(ResponseHandler)completionHandler
-{
-    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.GetPin(onSuccess->Cancel(), onFailure->Cancel(), userId);
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
-    return YES;
-}
-- (BOOL)getRfid:(uint16_t)userId completionHandler:(ResponseHandler)completionHandler
-{
-    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.GetRfid(onSuccess->Cancel(), onFailure->Cancel(), userId);
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
-    return YES;
-}
-- (BOOL)getUserType:(uint16_t)userId completionHandler:(ResponseHandler)completionHandler
-{
-    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.GetUserType(onSuccess->Cancel(), onFailure->Cancel(), userId);
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
-    return YES;
-}
-- (BOOL)getWeekdaySchedule:(uint8_t)scheduleId userId:(uint16_t)userId completionHandler:(ResponseHandler)completionHandler
-{
-    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.GetWeekdaySchedule(onSuccess->Cancel(), onFailure->Cancel(), scheduleId, userId);
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
-    return YES;
-}
-- (BOOL)getYeardaySchedule:(uint8_t)scheduleId userId:(uint16_t)userId completionHandler:(ResponseHandler)completionHandler
-{
-    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.GetYeardaySchedule(onSuccess->Cancel(), onFailure->Cancel(), scheduleId, userId);
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
-    return YES;
-}
-- (BOOL)lockDoor:(char *)pin completionHandler:(ResponseHandler)completionHandler
-{
-    CHIPDoorLockClusterLockDoorResponseCallbackBridge * onSuccess
-        = new CHIPDoorLockClusterLockDoorResponseCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.LockDoor(onSuccess->Cancel(), onFailure->Cancel(), pin);
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
-    return YES;
-}
-- (BOOL)setHolidaySchedule:(uint8_t)scheduleId
-                localStartTime:(uint32_t)localStartTime
-                  localEndTime:(uint32_t)localEndTime
-    operatingModeDuringHoliday:(uint8_t)operatingModeDuringHoliday
-             completionHandler:(ResponseHandler)completionHandler
-{
-    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.SetHolidaySchedule(
-        onSuccess->Cancel(), onFailure->Cancel(), scheduleId, localStartTime, localEndTime, operatingModeDuringHoliday);
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
-    return YES;
-}
-- (BOOL)setPin:(uint16_t)userId
-           userStatus:(uint8_t)userStatus
-             userType:(uint8_t)userType
-                  pin:(char *)pin
-    completionHandler:(ResponseHandler)completionHandler
-{
-    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.SetPin(onSuccess->Cancel(), onFailure->Cancel(), userId, userStatus, userType, pin);
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
-    return YES;
-}
-- (BOOL)setRfid:(uint16_t)userId
-           userStatus:(uint8_t)userStatus
-             userType:(uint8_t)userType
-                   id:(char *)id
-    completionHandler:(ResponseHandler)completionHandler
-{
-    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.SetRfid(onSuccess->Cancel(), onFailure->Cancel(), userId, userStatus, userType, id);
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
-    return YES;
-}
-- (BOOL)setUserType:(uint16_t)userId userType:(uint8_t)userType completionHandler:(ResponseHandler)completionHandler
-{
-    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.SetUserType(onSuccess->Cancel(), onFailure->Cancel(), userId, userType);
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
-    return YES;
-}
-- (BOOL)setWeekdaySchedule:(uint8_t)scheduleId
-                    userId:(uint16_t)userId
-                  daysMask:(uint8_t)daysMask
-                 startHour:(uint8_t)startHour
-               startMinute:(uint8_t)startMinute
-                   endHour:(uint8_t)endHour
-                 endMinute:(uint8_t)endMinute
-         completionHandler:(ResponseHandler)completionHandler
-{
-    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.SetWeekdaySchedule(
-        onSuccess->Cancel(), onFailure->Cancel(), scheduleId, userId, daysMask, startHour, startMinute, endHour, endMinute);
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
-    return YES;
-}
-- (BOOL)setYeardaySchedule:(uint8_t)scheduleId
-                    userId:(uint16_t)userId
-            localStartTime:(uint32_t)localStartTime
-              localEndTime:(uint32_t)localEndTime
-         completionHandler:(ResponseHandler)completionHandler
-{
-    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.SetYeardaySchedule(
-        onSuccess->Cancel(), onFailure->Cancel(), scheduleId, userId, localStartTime, localEndTime);
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
-    return YES;
-}
-- (BOOL)unlockDoor:(char *)pin completionHandler:(ResponseHandler)completionHandler
-{
-    CHIPDoorLockClusterUnlockDoorResponseCallbackBridge * onSuccess
-        = new CHIPDoorLockClusterUnlockDoorResponseCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.UnlockDoor(onSuccess->Cancel(), onFailure->Cancel(), pin);
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
-    return YES;
-}
-- (BOOL)unlockWithTimeout:(uint16_t)timeoutInSeconds pin:(char *)pin completionHandler:(ResponseHandler)completionHandler
-{
-    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.UnlockWithTimeout(onSuccess->Cancel(), onFailure->Cancel(), timeoutInSeconds, pin);
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
-    return YES;
-}
-
-- (BOOL)readAttributeLockState:(ResponseHandler)completionHandler
-{
-    CHIPInt8uAttributeCallbackBridge * onSuccess = new CHIPInt8uAttributeCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.ReadAttributeLockState(onSuccess->Cancel(), onFailure->Cancel());
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
-    return YES;
-}
-
-- (BOOL)configureAttributeLockState:(uint16_t)minInterval
-                        maxInterval:(uint16_t)maxInterval
-                  completionHandler:(ResponseHandler)completionHandler
-{
-    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
-
-    CHIP_ERROR err
-        = self.cppCluster.ConfigureAttributeLockState(onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval);
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
-    return YES;
-}
-
-- (BOOL)reportAttributeLockState:(ResponseHandler)reportHandler
-{
-    CHIPInt8uAttributeCallbackBridge * onReport = new CHIPInt8uAttributeCallbackBridge(reportHandler, _callbackQueue, true);
-    if (!onReport) {
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.ReportAttributeLockState(onReport->Cancel());
-    if (err != CHIP_NO_ERROR) {
-        delete onReport;
-        return NO;
-    }
-
-    return YES;
-}
-
-- (BOOL)readAttributeLockType:(ResponseHandler)completionHandler
-{
-    CHIPInt8uAttributeCallbackBridge * onSuccess = new CHIPInt8uAttributeCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.ReadAttributeLockType(onSuccess->Cancel(), onFailure->Cancel());
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
-    return YES;
-}
-
-- (BOOL)readAttributeActuatorEnabled:(ResponseHandler)completionHandler
-{
-    CHIPBooleanAttributeCallbackBridge * onSuccess = new CHIPBooleanAttributeCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.ReadAttributeActuatorEnabled(onSuccess->Cancel(), onFailure->Cancel());
+    CHIP_ERROR err = self.cppCluster.LaunchURL(onSuccess->Cancel(), onFailure->Cancel());
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6644,13 +5593,13 @@ private:
 
 @end
 
-@interface CHIPGroups ()
+@interface CHIPDoorLock ()
 
-@property (readonly) Controller::GroupsCluster cppCluster;
+@property (readonly) Controller::DoorLockCluster cppCluster;
 @property (readonly, nonatomic) dispatch_queue_t callbackQueue;
 @end
 
-@implementation CHIPGroups
+@implementation CHIPDoorLock
 
 - (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(EndpointId)endpoint queue:(dispatch_queue_t)queue
 {
@@ -6667,29 +5616,7 @@ private:
     return self;
 }
 
-- (BOOL)addGroup:(uint16_t)groupId groupName:(char *)groupName completionHandler:(ResponseHandler)completionHandler
-{
-    CHIPGroupsClusterAddGroupResponseCallbackBridge * onSuccess
-        = new CHIPGroupsClusterAddGroupResponseCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.AddGroup(onSuccess->Cancel(), onFailure->Cancel(), groupId, groupName);
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
-    return YES;
-}
-- (BOOL)addGroupIfIdentifying:(uint16_t)groupId groupName:(char *)groupName completionHandler:(ResponseHandler)completionHandler
+- (BOOL)clearAllPins:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
@@ -6702,7 +5629,7 @@ private:
         return NO;
     }
 
-    CHIP_ERROR err = self.cppCluster.AddGroupIfIdentifying(onSuccess->Cancel(), onFailure->Cancel(), groupId, groupName);
+    CHIP_ERROR err = self.cppCluster.ClearAllPins(onSuccess->Cancel(), onFailure->Cancel());
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6710,29 +5637,7 @@ private:
     }
     return YES;
 }
-- (BOOL)getGroupMembership:(uint8_t)groupCount groupList:(uint16_t)groupList completionHandler:(ResponseHandler)completionHandler
-{
-    CHIPGroupsClusterGetGroupMembershipResponseCallbackBridge * onSuccess
-        = new CHIPGroupsClusterGetGroupMembershipResponseCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.GetGroupMembership(onSuccess->Cancel(), onFailure->Cancel(), groupCount, groupList);
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
-    return YES;
-}
-- (BOOL)removeAllGroups:(ResponseHandler)completionHandler
+- (BOOL)clearAllRfids:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
@@ -6745,7 +5650,7 @@ private:
         return NO;
     }
 
-    CHIP_ERROR err = self.cppCluster.RemoveAllGroups(onSuccess->Cancel(), onFailure->Cancel());
+    CHIP_ERROR err = self.cppCluster.ClearAllRfids(onSuccess->Cancel(), onFailure->Cancel());
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6753,10 +5658,9 @@ private:
     }
     return YES;
 }
-- (BOOL)removeGroup:(uint16_t)groupId completionHandler:(ResponseHandler)completionHandler
+- (BOOL)clearHolidaySchedule:(uint8_t)scheduleId completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPGroupsClusterRemoveGroupResponseCallbackBridge * onSuccess
-        = new CHIPGroupsClusterRemoveGroupResponseCallbackBridge(completionHandler, _callbackQueue);
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
         return NO;
     }
@@ -6767,7 +5671,7 @@ private:
         return NO;
     }
 
-    CHIP_ERROR err = self.cppCluster.RemoveGroup(onSuccess->Cancel(), onFailure->Cancel(), groupId);
+    CHIP_ERROR err = self.cppCluster.ClearHolidaySchedule(onSuccess->Cancel(), onFailure->Cancel(), scheduleId);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6775,10 +5679,9 @@ private:
     }
     return YES;
 }
-- (BOOL)viewGroup:(uint16_t)groupId completionHandler:(ResponseHandler)completionHandler
+- (BOOL)clearPin:(uint16_t)userId completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPGroupsClusterViewGroupResponseCallbackBridge * onSuccess
-        = new CHIPGroupsClusterViewGroupResponseCallbackBridge(completionHandler, _callbackQueue);
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
         return NO;
     }
@@ -6789,7 +5692,434 @@ private:
         return NO;
     }
 
-    CHIP_ERROR err = self.cppCluster.ViewGroup(onSuccess->Cancel(), onFailure->Cancel(), groupId);
+    CHIP_ERROR err = self.cppCluster.ClearPin(onSuccess->Cancel(), onFailure->Cancel(), userId);
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        return NO;
+    }
+    return YES;
+}
+- (BOOL)clearRfid:(uint16_t)userId completionHandler:(ResponseHandler)completionHandler
+{
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
+    if (!onSuccess) {
+        return NO;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    if (!onFailure) {
+        delete onSuccess;
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.ClearRfid(onSuccess->Cancel(), onFailure->Cancel(), userId);
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        return NO;
+    }
+    return YES;
+}
+- (BOOL)clearWeekdaySchedule:(uint8_t)scheduleId userId:(uint16_t)userId completionHandler:(ResponseHandler)completionHandler
+{
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
+    if (!onSuccess) {
+        return NO;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    if (!onFailure) {
+        delete onSuccess;
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.ClearWeekdaySchedule(onSuccess->Cancel(), onFailure->Cancel(), scheduleId, userId);
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        return NO;
+    }
+    return YES;
+}
+- (BOOL)clearYeardaySchedule:(uint8_t)scheduleId userId:(uint16_t)userId completionHandler:(ResponseHandler)completionHandler
+{
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
+    if (!onSuccess) {
+        return NO;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    if (!onFailure) {
+        delete onSuccess;
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.ClearYeardaySchedule(onSuccess->Cancel(), onFailure->Cancel(), scheduleId, userId);
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        return NO;
+    }
+    return YES;
+}
+- (BOOL)getHolidaySchedule:(uint8_t)scheduleId completionHandler:(ResponseHandler)completionHandler
+{
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
+    if (!onSuccess) {
+        return NO;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    if (!onFailure) {
+        delete onSuccess;
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.GetHolidaySchedule(onSuccess->Cancel(), onFailure->Cancel(), scheduleId);
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        return NO;
+    }
+    return YES;
+}
+- (BOOL)getLogRecord:(uint16_t)logIndex completionHandler:(ResponseHandler)completionHandler
+{
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
+    if (!onSuccess) {
+        return NO;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    if (!onFailure) {
+        delete onSuccess;
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.GetLogRecord(onSuccess->Cancel(), onFailure->Cancel(), logIndex);
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        return NO;
+    }
+    return YES;
+}
+- (BOOL)getPin:(uint16_t)userId completionHandler:(ResponseHandler)completionHandler
+{
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
+    if (!onSuccess) {
+        return NO;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    if (!onFailure) {
+        delete onSuccess;
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.GetPin(onSuccess->Cancel(), onFailure->Cancel(), userId);
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        return NO;
+    }
+    return YES;
+}
+- (BOOL)getRfid:(uint16_t)userId completionHandler:(ResponseHandler)completionHandler
+{
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
+    if (!onSuccess) {
+        return NO;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    if (!onFailure) {
+        delete onSuccess;
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.GetRfid(onSuccess->Cancel(), onFailure->Cancel(), userId);
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        return NO;
+    }
+    return YES;
+}
+- (BOOL)getUserType:(uint16_t)userId completionHandler:(ResponseHandler)completionHandler
+{
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
+    if (!onSuccess) {
+        return NO;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    if (!onFailure) {
+        delete onSuccess;
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.GetUserType(onSuccess->Cancel(), onFailure->Cancel(), userId);
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        return NO;
+    }
+    return YES;
+}
+- (BOOL)getWeekdaySchedule:(uint8_t)scheduleId userId:(uint16_t)userId completionHandler:(ResponseHandler)completionHandler
+{
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
+    if (!onSuccess) {
+        return NO;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    if (!onFailure) {
+        delete onSuccess;
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.GetWeekdaySchedule(onSuccess->Cancel(), onFailure->Cancel(), scheduleId, userId);
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        return NO;
+    }
+    return YES;
+}
+- (BOOL)getYeardaySchedule:(uint8_t)scheduleId userId:(uint16_t)userId completionHandler:(ResponseHandler)completionHandler
+{
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
+    if (!onSuccess) {
+        return NO;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    if (!onFailure) {
+        delete onSuccess;
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.GetYeardaySchedule(onSuccess->Cancel(), onFailure->Cancel(), scheduleId, userId);
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        return NO;
+    }
+    return YES;
+}
+- (BOOL)lockDoor:(char *)pin completionHandler:(ResponseHandler)completionHandler
+{
+    CHIPDoorLockClusterLockDoorResponseCallbackBridge * onSuccess
+        = new CHIPDoorLockClusterLockDoorResponseCallbackBridge(completionHandler, _callbackQueue);
+    if (!onSuccess) {
+        return NO;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    if (!onFailure) {
+        delete onSuccess;
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.LockDoor(onSuccess->Cancel(), onFailure->Cancel(), pin);
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        return NO;
+    }
+    return YES;
+}
+- (BOOL)setHolidaySchedule:(uint8_t)scheduleId
+                localStartTime:(uint32_t)localStartTime
+                  localEndTime:(uint32_t)localEndTime
+    operatingModeDuringHoliday:(uint8_t)operatingModeDuringHoliday
+             completionHandler:(ResponseHandler)completionHandler
+{
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
+    if (!onSuccess) {
+        return NO;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    if (!onFailure) {
+        delete onSuccess;
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.SetHolidaySchedule(
+        onSuccess->Cancel(), onFailure->Cancel(), scheduleId, localStartTime, localEndTime, operatingModeDuringHoliday);
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        return NO;
+    }
+    return YES;
+}
+- (BOOL)setPin:(uint16_t)userId
+           userStatus:(uint8_t)userStatus
+             userType:(uint8_t)userType
+                  pin:(char *)pin
+    completionHandler:(ResponseHandler)completionHandler
+{
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
+    if (!onSuccess) {
+        return NO;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    if (!onFailure) {
+        delete onSuccess;
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.SetPin(onSuccess->Cancel(), onFailure->Cancel(), userId, userStatus, userType, pin);
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        return NO;
+    }
+    return YES;
+}
+- (BOOL)setRfid:(uint16_t)userId
+           userStatus:(uint8_t)userStatus
+             userType:(uint8_t)userType
+                   id:(char *)id
+    completionHandler:(ResponseHandler)completionHandler
+{
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
+    if (!onSuccess) {
+        return NO;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    if (!onFailure) {
+        delete onSuccess;
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.SetRfid(onSuccess->Cancel(), onFailure->Cancel(), userId, userStatus, userType, id);
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        return NO;
+    }
+    return YES;
+}
+- (BOOL)setUserType:(uint16_t)userId userType:(uint8_t)userType completionHandler:(ResponseHandler)completionHandler
+{
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
+    if (!onSuccess) {
+        return NO;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    if (!onFailure) {
+        delete onSuccess;
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.SetUserType(onSuccess->Cancel(), onFailure->Cancel(), userId, userType);
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        return NO;
+    }
+    return YES;
+}
+- (BOOL)setWeekdaySchedule:(uint8_t)scheduleId
+                    userId:(uint16_t)userId
+                  daysMask:(uint8_t)daysMask
+                 startHour:(uint8_t)startHour
+               startMinute:(uint8_t)startMinute
+                   endHour:(uint8_t)endHour
+                 endMinute:(uint8_t)endMinute
+         completionHandler:(ResponseHandler)completionHandler
+{
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
+    if (!onSuccess) {
+        return NO;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    if (!onFailure) {
+        delete onSuccess;
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.SetWeekdaySchedule(
+        onSuccess->Cancel(), onFailure->Cancel(), scheduleId, userId, daysMask, startHour, startMinute, endHour, endMinute);
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        return NO;
+    }
+    return YES;
+}
+- (BOOL)setYeardaySchedule:(uint8_t)scheduleId
+                    userId:(uint16_t)userId
+            localStartTime:(uint32_t)localStartTime
+              localEndTime:(uint32_t)localEndTime
+         completionHandler:(ResponseHandler)completionHandler
+{
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
+    if (!onSuccess) {
+        return NO;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    if (!onFailure) {
+        delete onSuccess;
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.SetYeardaySchedule(
+        onSuccess->Cancel(), onFailure->Cancel(), scheduleId, userId, localStartTime, localEndTime);
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        return NO;
+    }
+    return YES;
+}
+- (BOOL)unlockDoor:(char *)pin completionHandler:(ResponseHandler)completionHandler
+{
+    CHIPDoorLockClusterUnlockDoorResponseCallbackBridge * onSuccess
+        = new CHIPDoorLockClusterUnlockDoorResponseCallbackBridge(completionHandler, _callbackQueue);
+    if (!onSuccess) {
+        return NO;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    if (!onFailure) {
+        delete onSuccess;
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.UnlockDoor(onSuccess->Cancel(), onFailure->Cancel(), pin);
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        return NO;
+    }
+    return YES;
+}
+- (BOOL)unlockWithTimeout:(uint16_t)timeoutInSeconds pin:(char *)pin completionHandler:(ResponseHandler)completionHandler
+{
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
+    if (!onSuccess) {
+        return NO;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    if (!onFailure) {
+        delete onSuccess;
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.UnlockWithTimeout(onSuccess->Cancel(), onFailure->Cancel(), timeoutInSeconds, pin);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6798,7 +6128,7 @@ private:
     return YES;
 }
 
-- (BOOL)readAttributeNameSupport:(ResponseHandler)completionHandler
+- (BOOL)readAttributeLockState:(ResponseHandler)completionHandler
 {
     CHIPInt8uAttributeCallbackBridge * onSuccess = new CHIPInt8uAttributeCallbackBridge(completionHandler, _callbackQueue);
     if (!onSuccess) {
@@ -6811,7 +6141,92 @@ private:
         return NO;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeNameSupport(onSuccess->Cancel(), onFailure->Cancel());
+    CHIP_ERROR err = self.cppCluster.ReadAttributeLockState(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        return NO;
+    }
+    return YES;
+}
+
+- (BOOL)configureAttributeLockState:(uint16_t)minInterval
+                        maxInterval:(uint16_t)maxInterval
+                  completionHandler:(ResponseHandler)completionHandler
+{
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
+    if (!onSuccess) {
+        return NO;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    if (!onFailure) {
+        delete onSuccess;
+        return NO;
+    }
+
+    CHIP_ERROR err
+        = self.cppCluster.ConfigureAttributeLockState(onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval);
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        return NO;
+    }
+    return YES;
+}
+
+- (BOOL)reportAttributeLockState:(ResponseHandler)reportHandler
+{
+    CHIPInt8uAttributeCallbackBridge * onReport = new CHIPInt8uAttributeCallbackBridge(reportHandler, _callbackQueue, true);
+    if (!onReport) {
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.ReportAttributeLockState(onReport->Cancel());
+    if (err != CHIP_NO_ERROR) {
+        delete onReport;
+        return NO;
+    }
+
+    return YES;
+}
+
+- (BOOL)readAttributeLockType:(ResponseHandler)completionHandler
+{
+    CHIPInt8uAttributeCallbackBridge * onSuccess = new CHIPInt8uAttributeCallbackBridge(completionHandler, _callbackQueue);
+    if (!onSuccess) {
+        return NO;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    if (!onFailure) {
+        delete onSuccess;
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.ReadAttributeLockType(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        return NO;
+    }
+    return YES;
+}
+
+- (BOOL)readAttributeActuatorEnabled:(ResponseHandler)completionHandler
+{
+    CHIPBooleanAttributeCallbackBridge * onSuccess = new CHIPBooleanAttributeCallbackBridge(completionHandler, _callbackQueue);
+    if (!onSuccess) {
+        return NO;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    if (!onFailure) {
+        delete onSuccess;
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.ReadAttributeActuatorEnabled(onSuccess->Cancel(), onFailure->Cancel());
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -7331,441 +6746,6 @@ private:
         delete onFailure;
         return NO;
     }
-    return YES;
-}
-
-- (BOOL)readAttributeClusterRevision:(ResponseHandler)completionHandler
-{
-    CHIPInt16uAttributeCallbackBridge * onSuccess = new CHIPInt16uAttributeCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.ReadAttributeClusterRevision(onSuccess->Cancel(), onFailure->Cancel());
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
-    return YES;
-}
-
-@end
-
-@interface CHIPIdentify ()
-
-@property (readonly) Controller::IdentifyCluster cppCluster;
-@property (readonly, nonatomic) dispatch_queue_t callbackQueue;
-@end
-
-@implementation CHIPIdentify
-
-- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(EndpointId)endpoint queue:(dispatch_queue_t)queue
-{
-    CHIP_ERROR err = _cppCluster.Associate([device internalDevice], endpoint);
-
-    if (err != CHIP_NO_ERROR) {
-        return nil;
-    }
-
-    if (self = [super init]) {
-        _callbackQueue = queue;
-    }
-
-    return self;
-}
-
-- (BOOL)identify:(uint16_t)identifyTime completionHandler:(ResponseHandler)completionHandler
-{
-    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.Identify(onSuccess->Cancel(), onFailure->Cancel(), identifyTime);
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
-    return YES;
-}
-- (BOOL)identifyQuery:(ResponseHandler)completionHandler
-{
-    CHIPIdentifyClusterIdentifyQueryResponseCallbackBridge * onSuccess
-        = new CHIPIdentifyClusterIdentifyQueryResponseCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.IdentifyQuery(onSuccess->Cancel(), onFailure->Cancel());
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
-    return YES;
-}
-
-- (BOOL)readAttributeIdentifyTime:(ResponseHandler)completionHandler
-{
-    CHIPInt16uAttributeCallbackBridge * onSuccess = new CHIPInt16uAttributeCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.ReadAttributeIdentifyTime(onSuccess->Cancel(), onFailure->Cancel());
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
-    return YES;
-}
-
-- (BOOL)writeAttributeIdentifyTime:(uint16_t)value completionHandler:(ResponseHandler)completionHandler
-{
-    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.WriteAttributeIdentifyTime(onSuccess->Cancel(), onFailure->Cancel(), value);
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
-    return YES;
-}
-
-- (BOOL)readAttributeClusterRevision:(ResponseHandler)completionHandler
-{
-    CHIPInt16uAttributeCallbackBridge * onSuccess = new CHIPInt16uAttributeCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.ReadAttributeClusterRevision(onSuccess->Cancel(), onFailure->Cancel());
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
-    return YES;
-}
-
-@end
-
-@interface CHIPLevelControl ()
-
-@property (readonly) Controller::LevelControlCluster cppCluster;
-@property (readonly, nonatomic) dispatch_queue_t callbackQueue;
-@end
-
-@implementation CHIPLevelControl
-
-- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(EndpointId)endpoint queue:(dispatch_queue_t)queue
-{
-    CHIP_ERROR err = _cppCluster.Associate([device internalDevice], endpoint);
-
-    if (err != CHIP_NO_ERROR) {
-        return nil;
-    }
-
-    if (self = [super init]) {
-        _callbackQueue = queue;
-    }
-
-    return self;
-}
-
-- (BOOL)move:(uint8_t)moveMode
-                 rate:(uint8_t)rate
-           optionMask:(uint8_t)optionMask
-       optionOverride:(uint8_t)optionOverride
-    completionHandler:(ResponseHandler)completionHandler
-{
-    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.Move(onSuccess->Cancel(), onFailure->Cancel(), moveMode, rate, optionMask, optionOverride);
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
-    return YES;
-}
-- (BOOL)moveToLevel:(uint8_t)level
-       transitionTime:(uint16_t)transitionTime
-           optionMask:(uint8_t)optionMask
-       optionOverride:(uint8_t)optionOverride
-    completionHandler:(ResponseHandler)completionHandler
-{
-    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
-
-    CHIP_ERROR err
-        = self.cppCluster.MoveToLevel(onSuccess->Cancel(), onFailure->Cancel(), level, transitionTime, optionMask, optionOverride);
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
-    return YES;
-}
-- (BOOL)moveToLevelWithOnOff:(uint8_t)level
-              transitionTime:(uint16_t)transitionTime
-           completionHandler:(ResponseHandler)completionHandler
-{
-    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.MoveToLevelWithOnOff(onSuccess->Cancel(), onFailure->Cancel(), level, transitionTime);
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
-    return YES;
-}
-- (BOOL)moveWithOnOff:(uint8_t)moveMode rate:(uint8_t)rate completionHandler:(ResponseHandler)completionHandler
-{
-    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.MoveWithOnOff(onSuccess->Cancel(), onFailure->Cancel(), moveMode, rate);
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
-    return YES;
-}
-- (BOOL)step:(uint8_t)stepMode
-             stepSize:(uint8_t)stepSize
-       transitionTime:(uint16_t)transitionTime
-           optionMask:(uint8_t)optionMask
-       optionOverride:(uint8_t)optionOverride
-    completionHandler:(ResponseHandler)completionHandler
-{
-    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.Step(
-        onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime, optionMask, optionOverride);
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
-    return YES;
-}
-- (BOOL)stepWithOnOff:(uint8_t)stepMode
-             stepSize:(uint8_t)stepSize
-       transitionTime:(uint16_t)transitionTime
-    completionHandler:(ResponseHandler)completionHandler
-{
-    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.StepWithOnOff(onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime);
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
-    return YES;
-}
-- (BOOL)stop:(uint8_t)optionMask optionOverride:(uint8_t)optionOverride completionHandler:(ResponseHandler)completionHandler
-{
-    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.Stop(onSuccess->Cancel(), onFailure->Cancel(), optionMask, optionOverride);
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
-    return YES;
-}
-- (BOOL)stopWithOnOff:(ResponseHandler)completionHandler
-{
-    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.StopWithOnOff(onSuccess->Cancel(), onFailure->Cancel());
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
-    return YES;
-}
-
-- (BOOL)readAttributeCurrentLevel:(ResponseHandler)completionHandler
-{
-    CHIPInt8uAttributeCallbackBridge * onSuccess = new CHIPInt8uAttributeCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.ReadAttributeCurrentLevel(onSuccess->Cancel(), onFailure->Cancel());
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
-    return YES;
-}
-
-- (BOOL)configureAttributeCurrentLevel:(uint16_t)minInterval
-                           maxInterval:(uint16_t)maxInterval
-                                change:(uint8_t)change
-                     completionHandler:(ResponseHandler)completionHandler
-{
-    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.ConfigureAttributeCurrentLevel(
-        onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
-    return YES;
-}
-
-- (BOOL)reportAttributeCurrentLevel:(ResponseHandler)reportHandler
-{
-    CHIPInt8uAttributeCallbackBridge * onReport = new CHIPInt8uAttributeCallbackBridge(reportHandler, _callbackQueue, true);
-    if (!onReport) {
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.ReportAttributeCurrentLevel(onReport->Cancel());
-    if (err != CHIP_NO_ERROR) {
-        delete onReport;
-        return NO;
-    }
-
     return YES;
 }
 
@@ -8519,501 +7499,6 @@ private:
         return NO;
     }
 
-    return YES;
-}
-
-- (BOOL)readAttributeClusterRevision:(ResponseHandler)completionHandler
-{
-    CHIPInt16uAttributeCallbackBridge * onSuccess = new CHIPInt16uAttributeCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.ReadAttributeClusterRevision(onSuccess->Cancel(), onFailure->Cancel());
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
-    return YES;
-}
-
-@end
-
-@interface CHIPOnOff ()
-
-@property (readonly) Controller::OnOffCluster cppCluster;
-@property (readonly, nonatomic) dispatch_queue_t callbackQueue;
-@end
-
-@implementation CHIPOnOff
-
-- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(EndpointId)endpoint queue:(dispatch_queue_t)queue
-{
-    CHIP_ERROR err = _cppCluster.Associate([device internalDevice], endpoint);
-
-    if (err != CHIP_NO_ERROR) {
-        return nil;
-    }
-
-    if (self = [super init]) {
-        _callbackQueue = queue;
-    }
-
-    return self;
-}
-
-- (BOOL)off:(ResponseHandler)completionHandler
-{
-    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.Off(onSuccess->Cancel(), onFailure->Cancel());
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
-    return YES;
-}
-- (BOOL)on:(ResponseHandler)completionHandler
-{
-    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.On(onSuccess->Cancel(), onFailure->Cancel());
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
-    return YES;
-}
-- (BOOL)toggle:(ResponseHandler)completionHandler
-{
-    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.Toggle(onSuccess->Cancel(), onFailure->Cancel());
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
-    return YES;
-}
-
-- (BOOL)readAttributeOnOff:(ResponseHandler)completionHandler
-{
-    CHIPBooleanAttributeCallbackBridge * onSuccess = new CHIPBooleanAttributeCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.ReadAttributeOnOff(onSuccess->Cancel(), onFailure->Cancel());
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
-    return YES;
-}
-
-- (BOOL)configureAttributeOnOff:(uint16_t)minInterval
-                    maxInterval:(uint16_t)maxInterval
-              completionHandler:(ResponseHandler)completionHandler
-{
-    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.ConfigureAttributeOnOff(onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval);
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
-    return YES;
-}
-
-- (BOOL)reportAttributeOnOff:(ResponseHandler)reportHandler
-{
-    CHIPBooleanAttributeCallbackBridge * onReport = new CHIPBooleanAttributeCallbackBridge(reportHandler, _callbackQueue, true);
-    if (!onReport) {
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.ReportAttributeOnOff(onReport->Cancel());
-    if (err != CHIP_NO_ERROR) {
-        delete onReport;
-        return NO;
-    }
-
-    return YES;
-}
-
-- (BOOL)readAttributeClusterRevision:(ResponseHandler)completionHandler
-{
-    CHIPInt16uAttributeCallbackBridge * onSuccess = new CHIPInt16uAttributeCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.ReadAttributeClusterRevision(onSuccess->Cancel(), onFailure->Cancel());
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
-    return YES;
-}
-
-@end
-
-@interface CHIPScenes ()
-
-@property (readonly) Controller::ScenesCluster cppCluster;
-@property (readonly, nonatomic) dispatch_queue_t callbackQueue;
-@end
-
-@implementation CHIPScenes
-
-- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(EndpointId)endpoint queue:(dispatch_queue_t)queue
-{
-    CHIP_ERROR err = _cppCluster.Associate([device internalDevice], endpoint);
-
-    if (err != CHIP_NO_ERROR) {
-        return nil;
-    }
-
-    if (self = [super init]) {
-        _callbackQueue = queue;
-    }
-
-    return self;
-}
-
-- (BOOL)addScene:(uint16_t)groupId
-              sceneId:(uint8_t)sceneId
-       transitionTime:(uint16_t)transitionTime
-            sceneName:(char *)sceneName
-            clusterId:(uint16_t)clusterId
-               length:(uint8_t)length
-                value:(uint8_t)value
-    completionHandler:(ResponseHandler)completionHandler
-{
-    CHIPScenesClusterAddSceneResponseCallbackBridge * onSuccess
-        = new CHIPScenesClusterAddSceneResponseCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.AddScene(
-        onSuccess->Cancel(), onFailure->Cancel(), groupId, sceneId, transitionTime, sceneName, clusterId, length, value);
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
-    return YES;
-}
-- (BOOL)getSceneMembership:(uint16_t)groupId completionHandler:(ResponseHandler)completionHandler
-{
-    CHIPScenesClusterGetSceneMembershipResponseCallbackBridge * onSuccess
-        = new CHIPScenesClusterGetSceneMembershipResponseCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.GetSceneMembership(onSuccess->Cancel(), onFailure->Cancel(), groupId);
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
-    return YES;
-}
-- (BOOL)recallScene:(uint16_t)groupId
-              sceneId:(uint8_t)sceneId
-       transitionTime:(uint16_t)transitionTime
-    completionHandler:(ResponseHandler)completionHandler
-{
-    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.RecallScene(onSuccess->Cancel(), onFailure->Cancel(), groupId, sceneId, transitionTime);
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
-    return YES;
-}
-- (BOOL)removeAllScenes:(uint16_t)groupId completionHandler:(ResponseHandler)completionHandler
-{
-    CHIPScenesClusterRemoveAllScenesResponseCallbackBridge * onSuccess
-        = new CHIPScenesClusterRemoveAllScenesResponseCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.RemoveAllScenes(onSuccess->Cancel(), onFailure->Cancel(), groupId);
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
-    return YES;
-}
-- (BOOL)removeScene:(uint16_t)groupId sceneId:(uint8_t)sceneId completionHandler:(ResponseHandler)completionHandler
-{
-    CHIPScenesClusterRemoveSceneResponseCallbackBridge * onSuccess
-        = new CHIPScenesClusterRemoveSceneResponseCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.RemoveScene(onSuccess->Cancel(), onFailure->Cancel(), groupId, sceneId);
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
-    return YES;
-}
-- (BOOL)storeScene:(uint16_t)groupId sceneId:(uint8_t)sceneId completionHandler:(ResponseHandler)completionHandler
-{
-    CHIPScenesClusterStoreSceneResponseCallbackBridge * onSuccess
-        = new CHIPScenesClusterStoreSceneResponseCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.StoreScene(onSuccess->Cancel(), onFailure->Cancel(), groupId, sceneId);
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
-    return YES;
-}
-- (BOOL)viewScene:(uint16_t)groupId sceneId:(uint8_t)sceneId completionHandler:(ResponseHandler)completionHandler
-{
-    CHIPScenesClusterViewSceneResponseCallbackBridge * onSuccess
-        = new CHIPScenesClusterViewSceneResponseCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.ViewScene(onSuccess->Cancel(), onFailure->Cancel(), groupId, sceneId);
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
-    return YES;
-}
-
-- (BOOL)readAttributeSceneCount:(ResponseHandler)completionHandler
-{
-    CHIPInt8uAttributeCallbackBridge * onSuccess = new CHIPInt8uAttributeCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.ReadAttributeSceneCount(onSuccess->Cancel(), onFailure->Cancel());
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
-    return YES;
-}
-
-- (BOOL)readAttributeCurrentScene:(ResponseHandler)completionHandler
-{
-    CHIPInt8uAttributeCallbackBridge * onSuccess = new CHIPInt8uAttributeCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.ReadAttributeCurrentScene(onSuccess->Cancel(), onFailure->Cancel());
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
-    return YES;
-}
-
-- (BOOL)readAttributeCurrentGroup:(ResponseHandler)completionHandler
-{
-    CHIPInt16uAttributeCallbackBridge * onSuccess = new CHIPInt16uAttributeCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.ReadAttributeCurrentGroup(onSuccess->Cancel(), onFailure->Cancel());
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
-    return YES;
-}
-
-- (BOOL)readAttributeSceneValid:(ResponseHandler)completionHandler
-{
-    CHIPBooleanAttributeCallbackBridge * onSuccess = new CHIPBooleanAttributeCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.ReadAttributeSceneValid(onSuccess->Cancel(), onFailure->Cancel());
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
-    return YES;
-}
-
-- (BOOL)readAttributeNameSupport:(ResponseHandler)completionHandler
-{
-    CHIPInt8uAttributeCallbackBridge * onSuccess = new CHIPInt8uAttributeCallbackBridge(completionHandler, _callbackQueue);
-    if (!onSuccess) {
-        return NO;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
-    if (!onFailure) {
-        delete onSuccess;
-        return NO;
-    }
-
-    CHIP_ERROR err = self.cppCluster.ReadAttributeNameSupport(onSuccess->Cancel(), onFailure->Cancel());
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        return NO;
-    }
     return YES;
 }
 

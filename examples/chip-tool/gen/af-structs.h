@@ -76,6 +76,21 @@ typedef struct _ConfigureReportingStatusRecord
     chip::AttributeId attributeId;
 } EmberAfConfigureReportingStatusRecord;
 
+// Struct for ContentLaunchAdditionalInfo
+typedef struct _ContentLaunchAdditionalInfo
+{
+    uint8_t * Name;
+    uint8_t * Value;
+} EmberAfContentLaunchAdditionalInfo;
+
+// Struct for ContentLaunchSearch
+typedef struct _ContentLaunchSearch
+{
+    uint8_t EntitiesList;
+    uint8_t * searchWindowStart;
+    uint8_t * searchWindowEnd;
+} EmberAfContentLaunchSearch;
+
 // Struct for DebtPayload
 typedef struct _DebtPayload
 {

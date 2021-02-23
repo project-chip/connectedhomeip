@@ -39,19 +39,3 @@ typedef void (*ReadReportingConfigurationReceivedCallback)(void * context, uint1
 // Cluster Specific Response Callbacks
 typedef void (*DoorLockClusterLockDoorResponseCallback)(void * context);
 typedef void (*DoorLockClusterUnlockDoorResponseCallback)(void * context);
-typedef void (*GroupsClusterAddGroupResponseCallback)(void * context, uint16_t groupId);
-typedef void (*GroupsClusterGetGroupMembershipResponseCallback)(void * context, uint8_t capacity, uint8_t groupCount,
-                                                                /* TYPE WARNING: array array defaults to */ uint8_t * groupList);
-typedef void (*GroupsClusterRemoveGroupResponseCallback)(void * context, uint16_t groupId);
-typedef void (*GroupsClusterViewGroupResponseCallback)(void * context, uint16_t groupId, uint8_t * groupName);
-typedef void (*IdentifyClusterIdentifyQueryResponseCallback)(void * context, uint16_t timeout);
-typedef void (*ScenesClusterAddSceneResponseCallback)(void * context, uint16_t groupId, uint8_t sceneId);
-typedef void (*ScenesClusterGetSceneMembershipResponseCallback)(void * context, uint8_t capacity, uint16_t groupId,
-                                                                uint8_t sceneCount,
-                                                                /* TYPE WARNING: array array defaults to */ uint8_t * sceneList);
-typedef void (*ScenesClusterRemoveAllScenesResponseCallback)(void * context, uint16_t groupId);
-typedef void (*ScenesClusterRemoveSceneResponseCallback)(void * context, uint16_t groupId, uint8_t sceneId);
-typedef void (*ScenesClusterStoreSceneResponseCallback)(void * context, uint16_t groupId, uint8_t sceneId);
-typedef void (*ScenesClusterViewSceneResponseCallback)(void * context, uint16_t groupId, uint8_t sceneId, uint16_t transitionTime,
-                                                       uint8_t * sceneName,
-                                                       /* TYPE WARNING: array array defaults to */ uint8_t * extensionFieldSets);
