@@ -42,6 +42,8 @@ class ScriptDevicePairingDelegate final : public Controller::DevicePairingDelega
 public:
     ~ScriptDevicePairingDelegate() = default;
     void SetWifiCredential(const char * ssid, const char * password);
+    void SetThreadCredential(uint8_t channel, uint16_t panId,
+                             uint8_t (&masterKey)[chip::DeviceLayer::Internal::kThreadMasterKeyLength]);
     void SetKeyExchangeCallback(DevicePairingDelegate_OnPairingCompleteFunct callback);
 
     void OnNetworkCredentialsRequested(RendezvousDeviceCredentialsDelegate * callback) override;
@@ -56,6 +58,16 @@ private:
     char mWifiSSID[chip::DeviceLayer::Internal::kMaxWiFiSSIDLength + 1];
     char mWifiPassword[chip::DeviceLayer::Internal::kMaxWiFiKeyLength];
 
+    // Thread Provisioning Data
+    chip::DeviceLayer::Internal::DeviceNetworkInfo mThreadInfo = {};
+
+    enum class Mode
+    {
+        Wifi,
+        Thread
+    };
+
+    Mode mMode                                                              = Mode::Wifi;
     DevicePairingDelegate_OnPairingCompleteFunct mOnPairingCompleteCallback = nullptr;
 };
 
