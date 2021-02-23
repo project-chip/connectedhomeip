@@ -21,6 +21,7 @@
 #include <utility>
 
 #include <mdns/minimal/core/DnsHeader.h>
+#include <support/ReturnMacros.h>
 
 namespace mdns {
 namespace Minimal {
@@ -72,6 +73,49 @@ void GetIpv4Into(chip::Inet::IPAddress & dest)
 
 } // namespace BroadcastIpAddresses
 
+namespace {
+
+CHIP_ERROR JoinMulticastGroup(chip::Inet::InterfaceId interfaceId, chip::Inet::UDPEndPoint * endpoint,
+                              chip::Inet::IPAddressType addressType)
+{
+
+    chip::Inet::IPAddress address;
+
+    if (addressType == chip::Inet::IPAddressType::kIPAddressType_IPv6)
+    {
+        BroadcastIpAddresses::GetIpv6Into(address);
+#if INET_CONFIG_ENABLE_IPV4
+    }
+    else if (addressType == chip::Inet::IPAddressType::kIPAddressType_IPv4)
+    {
+        BroadcastIpAddresses::GetIpv4Into(address);
+#endif // INET_CONFIG_ENABLE_IPV4
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    return endpoint->JoinMulticastGroup(interfaceId, address);
+}
+
+const char * AddressTypeStr(chip::Inet::IPAddressType addressType)
+{
+    switch (addressType)
+    {
+    case chip::Inet::IPAddressType::kIPAddressType_IPv6:
+        return "IPv6";
+#if INET_CONFIG_ENABLE_IPV4
+    case chip::Inet::IPAddressType::kIPAddressType_IPv4:
+        return "IPv4";
+#endif // INET_CONFIG_ENABLE_IPV4
+    default:
+        return "UNKNOWN";
+    }
+}
+
+} // namespace
+
 ServerBase::~ServerBase()
 {
     Shutdown();
@@ -101,34 +145,30 @@ CHIP_ERROR ServerBase::Listen(chip::Inet::InetLayer * inetLayer, ListenIterator 
 
     while (it->Next(&interfaceId, &addressType))
     {
-        if (endpointIndex >= mEndpointCount)
-        {
-            return CHIP_ERROR_NO_MEMORY;
-        }
+        ReturnErrorCodeIf(endpointIndex >= mEndpointCount, CHIP_ERROR_NO_MEMORY);
 
         EndpointInfo * info = &mEndpoints[endpointIndex];
         info->addressType   = addressType;
         info->interfaceId   = interfaceId;
 
-        CHIP_ERROR err = inetLayer->NewUDPEndPoint(&info->udp);
-        if (err != CHIP_NO_ERROR)
-        {
-            return err;
-        }
+        ReturnErrorOnFailure(inetLayer->NewUDPEndPoint(&info->udp));
 
-        info->udp->Bind(addressType, chip::Inet::IPAddress::Any, port, interfaceId);
-        if (err != CHIP_NO_ERROR)
-        {
-            return err;
-        }
+        ReturnErrorOnFailure(info->udp->Bind(addressType, chip::Inet::IPAddress::Any, port, interfaceId));
 
         info->udp->AppState          = static_cast<void *>(this);
         info->udp->OnMessageReceived = OnUdpPacketReceived;
 
-        err = info->udp->Listen();
+        ReturnErrorOnFailure(info->udp->Listen());
+
+        CHIP_ERROR err = JoinMulticastGroup(interfaceId, info->udp, addressType);
         if (err != CHIP_NO_ERROR)
         {
-            return err;
+            char interfaceName[chip::Inet::InterfaceIterator::kMaxIfNameLength];
+            chip::Inet::GetInterfaceName(interfaceId, interfaceName, sizeof(interfaceName));
+
+            // Log only as non-fatal error. Failure to join will mean we reply to unicast queries only.
+            ChipLogError(DeviceLayer, "MDNS failed to join multicast group on %s for address type %s: %s", interfaceName,
+                         AddressTypeStr(addressType), chip::ErrorStr(err));
         }
 
         endpointIndex++;
