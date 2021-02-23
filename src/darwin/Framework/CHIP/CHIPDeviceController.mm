@@ -202,6 +202,13 @@ static NSString * const kErrorGetPairedDevice = @"Failure while trying to retrie
     });
 }
 
+- (void)storageChanged
+{
+    [self.lock lock];
+    _cppCommissioner->StorageChanged();
+    [self.lock unlock];
+}
+
 - (void)sendWiFiCredentials:(NSString *)ssid password:(NSString *)password
 {
     [self.lock lock];
