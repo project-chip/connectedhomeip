@@ -145,10 +145,10 @@ public:
 private:
     CHIP_ERROR HandlePairingMessage(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
                                     System::PacketBufferHandle msgBuf);
-    CHIP_ERROR Pair(Optional<NodeId> nodeId, uint32_t setupPINCode);
-    CHIP_ERROR Pair(Optional<NodeId> nodeId, const PASEVerifier & verifier);
-    CHIP_ERROR WaitForPairing(Optional<NodeId> nodeId, uint32_t setupPINCode);
-    CHIP_ERROR WaitForPairing(Optional<NodeId> nodeId, const PASEVerifier & verifier);
+    CHIP_ERROR Pair(uint32_t setupPINCode);
+    CHIP_ERROR Pair(const PASEVerifier & verifier);
+    CHIP_ERROR WaitForPairing(uint32_t setupPINCode);
+    CHIP_ERROR WaitForPairing(const PASEVerifier & verifier);
 
     CHIP_ERROR HandleSecureMessage(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
                                    System::PacketBufferHandle msgBuf);

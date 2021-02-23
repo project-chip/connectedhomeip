@@ -34,9 +34,8 @@ class MessagingContext : public IOContext
 {
 public:
     MessagingContext() :
-        mPeer(Transport::PeerAddress::UDP(GetAddress(), CHIP_PORT)),
-        mPairingPeerToLocal(Optional<NodeId>::Value(GetSourceNodeId()), GetLocalKeyId(), GetPeerKeyId()),
-        mPairingLocalToPeer(Optional<NodeId>::Value(GetDestinationNodeId()), GetPeerKeyId(), GetLocalKeyId())
+        mPeer(Transport::PeerAddress::UDP(GetAddress(), CHIP_PORT)), mPairingPeerToLocal(GetLocalKeyId(), GetPeerKeyId()),
+        mPairingLocalToPeer(GetPeerKeyId(), GetLocalKeyId())
     {}
 
     /// Initialize the underlying layers and test suite pointer

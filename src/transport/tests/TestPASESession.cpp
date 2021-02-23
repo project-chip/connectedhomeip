@@ -62,15 +62,10 @@ void SecurePairingWaitTest(nlTestSuite * inSuite, void * inContext)
     TestSecurePairingDelegate delegate;
     PASESession pairing;
 
+    NL_TEST_ASSERT(inSuite, pairing.WaitForPairing(1234, 500, nullptr, 0, 0, &delegate) == CHIP_ERROR_INVALID_ARGUMENT);
     NL_TEST_ASSERT(inSuite,
-                   pairing.WaitForPairing(1234, 500, nullptr, 0, Optional<NodeId>::Value(1), 0, &delegate) ==
-                       CHIP_ERROR_INVALID_ARGUMENT);
-    NL_TEST_ASSERT(inSuite,
-                   pairing.WaitForPairing(1234, 500, (const uint8_t *) "salt", 4, Optional<NodeId>::Value(1), 0, nullptr) ==
-                       CHIP_ERROR_INVALID_ARGUMENT);
-    NL_TEST_ASSERT(inSuite,
-                   pairing.WaitForPairing(1234, 500, (const uint8_t *) "salt", 4, Optional<NodeId>::Value(1), 0, &delegate) ==
-                       CHIP_NO_ERROR);
+                   pairing.WaitForPairing(1234, 500, (const uint8_t *) "salt", 4, 0, nullptr) == CHIP_ERROR_INVALID_ARGUMENT);
+    NL_TEST_ASSERT(inSuite, pairing.WaitForPairing(1234, 500, (const uint8_t *) "salt", 4, 0, &delegate) == CHIP_NO_ERROR);
 }
 
 void SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
@@ -79,12 +74,8 @@ void SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
     TestSecurePairingDelegate delegate;
     PASESession pairing;
 
-    NL_TEST_ASSERT(inSuite,
-                   pairing.Pair(Transport::PeerAddress(Transport::Type::kBle), 1234, Optional<NodeId>::Value(1), 2, 0, nullptr) !=
-                       CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite,
-                   pairing.Pair(Transport::PeerAddress(Transport::Type::kBle), 1234, Optional<NodeId>::Value(1), 2, 0, &delegate) ==
-                       CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, pairing.Pair(Transport::PeerAddress(Transport::Type::kBle), 1234, 0, nullptr) != CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, pairing.Pair(Transport::PeerAddress(Transport::Type::kBle), 1234, 0, &delegate) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, delegate.mNumMessageSend == 1);
 
@@ -93,8 +84,7 @@ void SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
     PASESession pairing1;
 
     NL_TEST_ASSERT(inSuite,
-                   pairing1.Pair(Transport::PeerAddress(Transport::Type::kBle), 1234, Optional<NodeId>::Value(1), 2, 0,
-                                 &delegate) == CHIP_ERROR_BAD_REQUEST);
+                   pairing1.Pair(Transport::PeerAddress(Transport::Type::kBle), 1234, 0, &delegate) == CHIP_ERROR_BAD_REQUEST);
 }
 
 void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, PASESession & pairingCommissioner,
@@ -108,11 +98,10 @@ void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, P
     delegateAccessory.peer    = &pairingCommissioner;
 
     NL_TEST_ASSERT(inSuite,
-                   pairingAccessory.WaitForPairing(1234, 500, (const uint8_t *) "salt", 4, Optional<NodeId>::Value(1), 0,
-                                                   &delegateAccessory) == CHIP_NO_ERROR);
+                   pairingAccessory.WaitForPairing(1234, 500, (const uint8_t *) "salt", 4, 0, &delegateAccessory) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite,
-                   pairingCommissioner.Pair(Transport::PeerAddress(Transport::Type::kBle), 1234, Optional<NodeId>::Value(2), 1, 0,
-                                            &delegateCommissioner) == CHIP_NO_ERROR);
+                   pairingCommissioner.Pair(Transport::PeerAddress(Transport::Type::kBle), 1234, 0, &delegateCommissioner) ==
+                       CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, delegateAccessory.mNumMessageSend == 2);
     NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingComplete == 1);
