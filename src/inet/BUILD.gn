@@ -29,6 +29,12 @@ declare_args() {
   chip_inet_project_config_include = ""
 }
 
+config("mbed_bsd_socket_config") {
+  include_dirs = [
+    "${chip_root}/src/platform/mbed/posix"
+  ]
+}
+
 buildconfig_header("inet_buildconfig") {
   header = "InetBuildConfig.h"
   header_dir = "inet"
@@ -58,6 +64,10 @@ source_set("inet_config_header") {
   sources = [ "InetConfig.h" ]
 
   public_configs = [ "${chip_root}/src:includes" ]
+
+  if (current_os == "mbed") {
+    public_configs += [ ":mbed_bsd_socket_config" ]
+  }
 
   public_deps = [
     ":inet_buildconfig",
