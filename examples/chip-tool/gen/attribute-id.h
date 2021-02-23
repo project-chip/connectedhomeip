@@ -4058,6 +4058,12 @@
 
 // Server attributes
 
+// Attribute ids for cluster: Network Commissioning
+
+// Client attributes
+
+// Server attributes
+
 // Attribute ids for cluster: Binding
 
 // Client attributes
@@ -4070,6 +4076,12 @@
 
 // Server attributes
 #define ZCL_CURRENT_STATE_ATTRIBUTE_ID (0x0000)
+
+// Attribute ids for cluster: Content Launch
+
+// Client attributes
+
+// Server attributes
 
 // Attribute ids for cluster: Sample Mfg Specific Cluster
 

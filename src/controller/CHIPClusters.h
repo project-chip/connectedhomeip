@@ -30,6 +30,7 @@ constexpr ClusterId kBarrierControlClusterId         = 0x0103;
 constexpr ClusterId kBasicClusterId                  = 0x0000;
 constexpr ClusterId kBindingClusterId                = 0xF000;
 constexpr ClusterId kColorControlClusterId           = 0x0300;
+constexpr ClusterId kContentLaunchClusterId          = 0xF002;
 constexpr ClusterId kDoorLockClusterId               = 0x0101;
 constexpr ClusterId kGroupsClusterId                 = 0x0004;
 constexpr ClusterId kIasZoneClusterId                = 0x0500;
@@ -265,6 +266,25 @@ private:
     static constexpr CommandId kStepHueCommandId                = 0x02;
     static constexpr CommandId kStepSaturationCommandId         = 0x05;
     static constexpr CommandId kStopMoveStepCommandId           = 0x47;
+};
+
+class DLL_EXPORT ContentLaunchCluster : public ClusterBase
+{
+public:
+    ContentLaunchCluster() : ClusterBase(kContentLaunchClusterId) {}
+    ~ContentLaunchCluster() {}
+
+    // Cluster Commands
+    CHIP_ERROR LaunchContent(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR LaunchURL(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+
+    // Cluster Attributes
+    CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+
+private:
+    static constexpr CommandId kLaunchContentCommandId = 0x00;
+    static constexpr CommandId kLaunchURLCommandId     = 0x01;
 };
 
 class DLL_EXPORT DoorLockCluster : public ClusterBase

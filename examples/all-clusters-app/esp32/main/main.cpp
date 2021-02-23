@@ -271,8 +271,10 @@ class SetupListModel : public ListScreen::Model
 public:
     SetupListModel()
     {
-        std::string resetWiFi = "Reset WiFi";
+        std::string resetWiFi      = "Reset WiFi";
+        std::string resetToFactory = "Reset to factory";
         options.emplace_back(resetWiFi);
+        options.emplace_back(resetToFactory);
     }
     virtual std::string GetTitle() { return "Setup"; }
     virtual int GetItemCount() { return options.size(); }
@@ -284,6 +286,10 @@ public:
         {
             ConnectivityMgr().ClearWiFiStationProvision();
             OpenDefaultPairingWindow(ResetAdmins::kYes);
+        }
+        else if (i == 1)
+        {
+            ConfigurationMgr().InitiateFactoryReset();
         }
     }
 

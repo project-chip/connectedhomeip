@@ -356,10 +356,33 @@ bool emberAfLevelControlClusterStopWithOnOffCallback();
 bool emberAfOnOffClusterOffCallback();
 
 /**
+ * @brief On/off Cluster OffWithEffect Command callback
+ * @param effectId
+ * @param effectVariant
+ */
+
+bool emberAfOnOffClusterOffWithEffectCallback(uint8_t effectId, uint8_t effectVariant);
+
+/**
  * @brief On/off Cluster On Command callback
  */
 
 bool emberAfOnOffClusterOnCallback();
+
+/**
+ * @brief On/off Cluster OnWithRecallGlobalScene Command callback
+ */
+
+bool emberAfOnOffClusterOnWithRecallGlobalSceneCallback();
+
+/**
+ * @brief On/off Cluster OnWithTimedOff Command callback
+ * @param onOffControl
+ * @param onTime
+ * @param offWaitTime
+ */
+
+bool emberAfOnOffClusterOnWithTimedOffCallback(uint8_t onOffControl, uint16_t onTime, uint16_t offWaitTime);
 
 /**
  * @brief On/off Cluster Toggle Command callback
