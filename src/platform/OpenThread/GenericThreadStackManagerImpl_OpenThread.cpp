@@ -28,7 +28,6 @@
 
 #include <openthread/cli.h>
 #include <openthread/dataset.h>
-#include <openthread/instance.h>
 #include <openthread/joiner.h>
 #include <openthread/link.h>
 #include <openthread/netdata.h>
@@ -121,7 +120,7 @@ bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::_HaveRouteToAddress(co
             {
                 const IPPrefix prefix = ToIPPrefix(routeConfig.mPrefix);
                 char addrStr[64];
-                prefix.IPAddr.ToString(addrStr, sizeof(addrStr));
+                prefix.IPAddr.ToString(addrStr);
                 if (!routeConfig.mNextHopIsThisDevice && (!destIsULA || routeConfig.mPrefix.mLength > 0) &&
                     ToIPPrefix(routeConfig.mPrefix).MatchAddress(destAddr))
                 {
@@ -756,13 +755,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetAndLogThread
                         neighbor->mExtAddress.m8[3], neighbor->mExtAddress.m8[4], neighbor->mExtAddress.m8[5],
                         neighbor->mExtAddress.m8[6], neighbor->mExtAddress.m8[7], neighbor->mRloc16, neighbor->mAge,
                         neighbor->mLinkQualityIn, neighbor->mAverageRssi, neighbor->mLastRssi, neighbor->mLinkFrameCounter,
-                        neighbor->mMleFrameCounter, neighbor->mRxOnWhenIdle ? 'Y' : 'n',
-#if OPENTHREAD_API_VERSION
-                        neighbor->mFullThreadDevice ? 'Y' : 'n',
-#else
-                        'n',
-#endif
-
+                        neighbor->mMleFrameCounter, neighbor->mRxOnWhenIdle ? 'Y' : 'n', neighbor->mFullThreadDevice ? 'Y' : 'n',
                         neighbor->mFullNetworkData ? 'Y' : 'n', neighbor->mIsChild ? 'Y' : 'n', printBuf);
     }
 
@@ -826,7 +819,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::DoInit(otInstanc
         VerifyOrExit(otInst != NULL, err = MapOpenThreadError(OT_ERROR_FAILED));
     }
 
-#if !defined(__ZEPHYR__) && !defined(ENABLE_CHIP_SHELL)
+#if !defined(__ZEPHYR__) && !defined(ENABLE_CHIP_SHELL) && !defined(PW_RPC_ENABLED)
     otCliUartInit(otInst);
 #endif
 
@@ -838,17 +831,6 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::DoInit(otInstanc
     // method implementation if it chooses to.
     otErr = otSetStateChangedCallback(otInst, ImplClass::OnOpenThreadStateChange, NULL);
     VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
-
-    // Secure data request mode bit has been removed from the certain OpenThread version.
-#if OPENTHREAD_API_VERSION < 30
-    // Enable use of secure data requests.
-    {
-        otLinkModeConfig linkMode    = otThreadGetLinkMode(otInst);
-        linkMode.mSecureDataRequests = true;
-        otErr                        = otThreadSetLinkMode(otInst, linkMode);
-        VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
-    }
-#endif
 
     // Enable automatic assignment of Thread advertised addresses.
 #if OPENTHREAD_CONFIG_IP6_SLAAC_ENABLE

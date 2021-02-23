@@ -26,20 +26,6 @@ namespace mdns {
 namespace Minimal {
 namespace {
 
-struct BroadcastIpAddresses
-{
-    chip::Inet::IPAddress ipv6;
-    chip::Inet::IPAddress ipv4;
-
-    BroadcastIpAddresses()
-    {
-        chip::Inet::IPAddress::FromString("FF02::FB", ipv6);
-        chip::Inet::IPAddress::FromString("224.0.0.251", ipv4);
-    }
-};
-
-const BroadcastIpAddresses kBroadcastIp;
-
 class ShutdownOnError
 {
 public:
@@ -63,6 +49,28 @@ private:
 };
 
 } // namespace
+
+namespace BroadcastIpAddresses {
+
+// Get standard mDNS Broadcast addresses
+
+void GetIpv6Into(chip::Inet::IPAddress & dest)
+{
+    if (!chip::Inet::IPAddress::FromString("FF02::FB", dest))
+    {
+        ChipLogError(Discovery, "Failed to parse standard IPv6 broadcast address");
+    }
+}
+
+void GetIpv4Into(chip::Inet::IPAddress & dest)
+{
+    if (!chip::Inet::IPAddress::FromString("224.0.0.251", dest))
+    {
+        ChipLogError(Discovery, "Failed to parse standard IPv4 broadcast address");
+    }
+}
+
+} // namespace BroadcastIpAddresses
 
 ServerBase::~ServerBase()
 {
@@ -100,6 +108,7 @@ CHIP_ERROR ServerBase::Listen(chip::Inet::InetLayer * inetLayer, ListenIterator 
 
         EndpointInfo * info = &mEndpoints[endpointIndex];
         info->addressType   = addressType;
+        info->interfaceId   = interfaceId;
 
         CHIP_ERROR err = inetLayer->NewUDPEndPoint(&info->udp);
         if (err != CHIP_NO_ERROR)
@@ -182,12 +191,12 @@ CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBufferHandle data, uint
 
         if (info->addressType == chip::Inet::kIPAddressType_IPv6)
         {
-            err = info->udp->SendTo(kBroadcastIp.ipv6, port, info->udp->GetBoundInterface(), std::move(copy));
+            err = info->udp->SendTo(mIpv6BroadcastAddress, port, info->udp->GetBoundInterface(), std::move(copy));
         }
 #if INET_CONFIG_ENABLE_IPV4
         else if (info->addressType == chip::Inet::kIPAddressType_IPv4)
         {
-            err = info->udp->SendTo(kBroadcastIp.ipv4, port, info->udp->GetBoundInterface(), std::move(copy));
+            err = info->udp->SendTo(mIpv4BroadcastAddress, port, info->udp->GetBoundInterface(), std::move(copy));
         }
 #endif
         else
@@ -224,12 +233,12 @@ CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBufferHandle data, uint
 
         if (info->addressType == chip::Inet::kIPAddressType_IPv6)
         {
-            err = info->udp->SendTo(kBroadcastIp.ipv6, port, info->udp->GetBoundInterface(), std::move(copy));
+            err = info->udp->SendTo(mIpv6BroadcastAddress, port, info->udp->GetBoundInterface(), std::move(copy));
         }
 #if INET_CONFIG_ENABLE_IPV4
         else if (info->addressType == chip::Inet::kIPAddressType_IPv4)
         {
-            err = info->udp->SendTo(kBroadcastIp.ipv4, port, info->udp->GetBoundInterface(), std::move(copy));
+            err = info->udp->SendTo(mIpv4BroadcastAddress, port, info->udp->GetBoundInterface(), std::move(copy));
         }
 #endif
         else

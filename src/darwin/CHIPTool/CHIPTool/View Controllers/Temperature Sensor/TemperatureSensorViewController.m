@@ -32,7 +32,9 @@
     UITapGestureRecognizer * tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dismissKeyboard)];
     [self.view addGestureRecognizer:tap];
 
-    self.cluster = [[CHIPTemperatureMeasurement alloc] initWithDevice:GetPairedDevice() endpoint:1 queue:dispatch_get_main_queue()];
+    self.cluster = [[CHIPTemperatureMeasurement alloc] initWithDevice:CHIPGetPairedDevice()
+                                                             endpoint:1
+                                                                queue:dispatch_get_main_queue()];
     [self readCurrentTemperature];
 }
 

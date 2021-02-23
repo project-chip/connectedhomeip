@@ -1505,6 +1505,81 @@ CHIP_ERROR ColorControlCluster::ReadAttributeClusterRevision(Callback::Cancelabl
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
+// ContentLaunch Cluster Commands
+CHIP_ERROR ContentLaunchCluster::LaunchContent(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+{
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    (void) onCompletion;
+
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kLaunchContentCommandId,
+                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+
+    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    // Command takes no arguments.
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
+    return mDevice->SendCommands();
+#else
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeContentLaunchClusterLaunchContentCommand(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+#endif
+}
+
+CHIP_ERROR ContentLaunchCluster::LaunchURL(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+{
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    (void) onCompletion;
+
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kLaunchURLCommandId,
+                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+
+    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    // Command takes no arguments.
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
+    return mDevice->SendCommands();
+#else
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeContentLaunchClusterLaunchURLCommand(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+#endif
+}
+
+// ContentLaunch Cluster Attributes
+CHIP_ERROR ContentLaunchCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
+                                                    Callback::Cancelable * onFailureCallback)
+{
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeContentLaunchClusterDiscoverAttributes(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+CHIP_ERROR ContentLaunchCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
+                                                              Callback::Cancelable * onFailureCallback)
+{
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeContentLaunchClusterReadClusterRevisionAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+
 // DoorLock Cluster Commands
 CHIP_ERROR DoorLockCluster::ClearAllPins(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
@@ -3052,6 +3127,325 @@ CHIP_ERROR LevelControlCluster::ReadAttributeClusterRevision(Callback::Cancelabl
 {
     uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeLevelControlClusterReadClusterRevisionAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+
+// MediaPlayback Cluster Commands
+CHIP_ERROR MediaPlaybackCluster::FastForwardRequest(Callback::Cancelable * onSuccessCallback,
+                                                    Callback::Cancelable * onFailureCallback)
+{
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    (void) onCompletion;
+
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kFastForwardRequestCommandId,
+                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+
+    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    // Command takes no arguments.
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
+    return mDevice->SendCommands();
+#else
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeMediaPlaybackClusterFastForwardRequestCommand(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+#endif
+}
+
+CHIP_ERROR MediaPlaybackCluster::NextRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+{
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    (void) onCompletion;
+
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kNextRequestCommandId,
+                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+
+    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    // Command takes no arguments.
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
+    return mDevice->SendCommands();
+#else
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeMediaPlaybackClusterNextRequestCommand(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+#endif
+}
+
+CHIP_ERROR MediaPlaybackCluster::PauseRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+{
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    (void) onCompletion;
+
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kPauseRequestCommandId,
+                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+
+    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    // Command takes no arguments.
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
+    return mDevice->SendCommands();
+#else
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeMediaPlaybackClusterPauseRequestCommand(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+#endif
+}
+
+CHIP_ERROR MediaPlaybackCluster::PlayRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+{
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    (void) onCompletion;
+
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kPlayRequestCommandId,
+                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+
+    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    // Command takes no arguments.
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
+    return mDevice->SendCommands();
+#else
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeMediaPlaybackClusterPlayRequestCommand(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+#endif
+}
+
+CHIP_ERROR MediaPlaybackCluster::PreviousRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+{
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    (void) onCompletion;
+
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kPreviousRequestCommandId,
+                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+
+    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    // Command takes no arguments.
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
+    return mDevice->SendCommands();
+#else
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeMediaPlaybackClusterPreviousRequestCommand(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+#endif
+}
+
+CHIP_ERROR MediaPlaybackCluster::RewindRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+{
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    (void) onCompletion;
+
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kRewindRequestCommandId,
+                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+
+    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    // Command takes no arguments.
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
+    return mDevice->SendCommands();
+#else
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeMediaPlaybackClusterRewindRequestCommand(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+#endif
+}
+
+CHIP_ERROR MediaPlaybackCluster::SkipBackwardRequest(Callback::Cancelable * onSuccessCallback,
+                                                     Callback::Cancelable * onFailureCallback)
+{
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    (void) onCompletion;
+
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kSkipBackwardRequestCommandId,
+                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+
+    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    // Command takes no arguments.
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
+    return mDevice->SendCommands();
+#else
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeMediaPlaybackClusterSkipBackwardRequestCommand(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+#endif
+}
+
+CHIP_ERROR MediaPlaybackCluster::SkipForwardRequest(Callback::Cancelable * onSuccessCallback,
+                                                    Callback::Cancelable * onFailureCallback)
+{
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    (void) onCompletion;
+
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kSkipForwardRequestCommandId,
+                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+
+    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    // Command takes no arguments.
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
+    return mDevice->SendCommands();
+#else
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeMediaPlaybackClusterSkipForwardRequestCommand(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+#endif
+}
+
+CHIP_ERROR MediaPlaybackCluster::StartOverRequest(Callback::Cancelable * onSuccessCallback,
+                                                  Callback::Cancelable * onFailureCallback)
+{
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    (void) onCompletion;
+
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kStartOverRequestCommandId,
+                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+
+    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    // Command takes no arguments.
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
+    return mDevice->SendCommands();
+#else
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeMediaPlaybackClusterStartOverRequestCommand(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+#endif
+}
+
+CHIP_ERROR MediaPlaybackCluster::StopRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+{
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    (void) onCompletion;
+
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kStopRequestCommandId,
+                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+
+    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+
+    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    // Command takes no arguments.
+
+    ReturnErrorOnFailure(writer.EndContainer(dummyType));
+    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+
+    return mDevice->SendCommands();
+#else
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeMediaPlaybackClusterStopRequestCommand(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+#endif
+}
+
+// MediaPlayback Cluster Attributes
+CHIP_ERROR MediaPlaybackCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
+                                                    Callback::Cancelable * onFailureCallback)
+{
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeMediaPlaybackClusterDiscoverAttributes(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+CHIP_ERROR MediaPlaybackCluster::ReadAttributeCurrentState(Callback::Cancelable * onSuccessCallback,
+                                                           Callback::Cancelable * onFailureCallback)
+{
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeMediaPlaybackClusterReadCurrentStateAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR MediaPlaybackCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
+                                                              Callback::Cancelable * onFailureCallback)
+{
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeMediaPlaybackClusterReadClusterRevisionAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 

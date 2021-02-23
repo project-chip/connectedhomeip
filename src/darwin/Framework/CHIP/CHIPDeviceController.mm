@@ -26,8 +26,7 @@
 #include <support/CHIPMem.h>
 
 static const char * const CHIP_SELECT_QUEUE = "com.zigbee.chip.select";
-
-constexpr chip::NodeId kLocalDeviceId = chip::kTestControllerNodeId;
+static const char * const CHIP_COMMISSIONER_DEVICE_ID_KEY = "com.zigbee.chip.commissioner.device.id";
 
 static NSString * const kErrorMemoryInit = @"Init Memory failure";
 static NSString * const kErrorCommissionerCreate = @"Init failure while creating a commissioner";
@@ -51,6 +50,7 @@ static NSString * const kErrorGetPairedDevice = @"Failure while trying to retrie
 @property (readonly) chip::Controller::DeviceCommissioner * cppCommissioner;
 @property (readonly) CHIPDevicePairingDelegateBridge * pairingDelegateBridge;
 @property (readonly) CHIPPersistentStorageDelegateBridge * persistentStorageDelegateBridge;
+@property (readonly) chip::NodeId localDeviceId;
 
 @end
 
@@ -94,7 +94,8 @@ static NSString * const kErrorGetPairedDevice = @"Failure while trying to retrie
             return nil;
         }
 
-        errorCode = _cppCommissioner->Init(kLocalDeviceId, _persistentStorageDelegateBridge, _pairingDelegateBridge);
+        [self getControllerNodeId];
+        errorCode = _cppCommissioner->Init(_localDeviceId, _persistentStorageDelegateBridge, _pairingDelegateBridge);
         if ([self checkForInitError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorCommissionerInit]) {
             return nil;
         }
@@ -110,6 +111,25 @@ static NSString * const kErrorGetPairedDevice = @"Failure while trying to retrie
         });
     }
     return self;
+}
+
+- (NSNumber *)getControllerNodeId
+{
+    uint16_t idStringLen = 32;
+    char deviceIdString[idStringLen];
+    if (CHIP_NO_ERROR
+        != _persistentStorageDelegateBridge->GetKeyValue(CHIP_COMMISSIONER_DEVICE_ID_KEY, deviceIdString, idStringLen)) {
+        _localDeviceId = arc4random();
+        _localDeviceId = _localDeviceId << 32 | arc4random();
+        CHIP_LOG_ERROR("Assigned %llx node ID to the controller", _localDeviceId);
+        _persistentStorageDelegateBridge->SetKeyValue(
+            CHIP_COMMISSIONER_DEVICE_ID_KEY, [[NSString stringWithFormat:@"%llx", _localDeviceId] UTF8String]);
+    } else {
+        NSScanner * scanner = [NSScanner scannerWithString:[NSString stringWithUTF8String:deviceIdString]];
+        [scanner scanHexLongLong:&_localDeviceId];
+        CHIP_LOG_ERROR("Found %llx node ID for the controller", _localDeviceId);
+    }
+    return [NSNumber numberWithUnsignedLongLong:_localDeviceId];
 }
 
 - (BOOL)pairDevice:(uint64_t)deviceID
@@ -172,8 +192,27 @@ static NSString * const kErrorGetPairedDevice = @"Failure while trying to retrie
 
 - (void)setPersistentStorageDelegate:(id<CHIPPersistentStorageDelegate>)delegate queue:(dispatch_queue_t)queue
 {
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        [self.lock lock];
+        _persistentStorageDelegateBridge->setFrameworkDelegate(delegate, queue);
+        [self.lock unlock];
+        _persistentStorageDelegateBridge->SetKeyValue(
+            CHIP_COMMISSIONER_DEVICE_ID_KEY, [[NSString stringWithFormat:@"%llx", _localDeviceId] UTF8String]);
+    });
+}
+
+- (void)sendWiFiCredentials:(NSString *)ssid password:(NSString *)password
+{
     [self.lock lock];
-    _persistentStorageDelegateBridge->setFrameworkDelegate(delegate, queue);
+    _pairingDelegateBridge->SendWiFiCredentials(ssid, password);
+    [self.lock unlock];
+}
+
+- (void)sendThreadCredentials:(NSData *)threadDataSet
+{
+    [self.lock lock];
+    _pairingDelegateBridge->SendThreadCredentials(threadDataSet);
     [self.lock unlock];
 }
 

@@ -68,14 +68,7 @@ public:
 
     CHIP_ERROR SendMessage(const PacketHeader & header, const PeerAddress & address, System::PacketBufferHandle msgBuf) override
     {
-        const uint16_t headerSize = header.EncodeSizeBytes();
-
-        VerifyOrReturnError(msgBuf->EnsureReservedSize(headerSize), CHIP_ERROR_NO_MEMORY);
-
-        msgBuf->SetStart(msgBuf->Start() - headerSize);
-
-        uint16_t actualEncodedHeaderSize;
-        ReturnErrorOnFailure(header.Encode(msgBuf->Start(), msgBuf->DataLength(), &actualEncodedHeaderSize));
+        ReturnErrorOnFailure(header.EncodeBeforeData(msgBuf));
 
         gSendMessageCount++;
 
@@ -220,6 +213,27 @@ void CheckResendMessage(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, gSendMessageCount == 3);
 }
 
+void CheckSendStandaloneAckMessage(nlTestSuite * inSuite, void * inContext)
+{
+    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+
+    ctx.GetInetLayer().SystemLayer()->Init(nullptr);
+
+    MockAppDelegate mockAppDelegate;
+    ExchangeContext * exchange = ctx.NewExchangeToPeer(&mockAppDelegate);
+    NL_TEST_ASSERT(inSuite, exchange != nullptr);
+
+    ReliableMessageMgr * rm     = ctx.GetExchangeManager().GetReliableMessageMgr();
+    ReliableMessageContext * rc = exchange->GetReliableMessageContext();
+    NL_TEST_ASSERT(inSuite, rm != nullptr);
+    NL_TEST_ASSERT(inSuite, rc != nullptr);
+
+    ReliableMessageDelegateObject delegate;
+    rc->SetDelegate(&delegate);
+
+    NL_TEST_ASSERT(inSuite, rc->SendStandaloneAckMessage() == CHIP_NO_ERROR);
+}
+
 // Test Suite
 
 /**
@@ -231,6 +245,7 @@ const nlTest sTests[] =
     NL_TEST_DEF("Test ReliableMessageMgr::CheckAddClearRetrans", CheckAddClearRetrans),
     NL_TEST_DEF("Test ReliableMessageMgr::CheckFailRetrans", CheckFailRetrans),
     NL_TEST_DEF("Test ReliableMessageMgr::CheckResendMessage", CheckResendMessage),
+    NL_TEST_DEF("Test ReliableMessageMgr::CheckSendStandaloneAckMessage", CheckSendStandaloneAckMessage),
 
     NL_TEST_SENTINEL()
 };
@@ -254,7 +269,11 @@ nlTestSuite sSuite =
  */
 int Initialize(void * aContext)
 {
-    CHIP_ERROR err = gTransportMgr.Init("LOOPBACK");
+    CHIP_ERROR err = chip::Platform::MemoryInit();
+    if (err != CHIP_NO_ERROR)
+        return FAILURE;
+
+    err = gTransportMgr.Init("LOOPBACK");
     if (err != CHIP_NO_ERROR)
         return FAILURE;
 
@@ -268,6 +287,7 @@ int Initialize(void * aContext)
 int Finalize(void * aContext)
 {
     CHIP_ERROR err = reinterpret_cast<TestContext *>(aContext)->Shutdown();
+    chip::Platform::MemoryShutdown();
     return (err == CHIP_NO_ERROR) ? SUCCESS : FAILURE;
 }
 

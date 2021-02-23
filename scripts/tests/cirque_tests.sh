@@ -59,7 +59,7 @@ function __cirquetest_start_flask() {
     echo 'Start Flask'
     cd "$REPO_DIR"/third_party/cirque/repo
     FLASK_APP='cirque/restservice/service.py' \
-        PATH="$PATH":"$REPO_DIR"/third_party/openthread/repo/output/x86_64-unknown-linux-gnu/bin/ \
+        PATH="$PATH":"$REPO_DIR"/third_party/openthread/repo/output/simulation/bin/ \
         python3 -m flask run >"$LOG_DIR/$CURRENT_TEST/flask.log" 2>&1
 }
 
@@ -83,7 +83,13 @@ function cirquetest_bootstrap() {
     cd "$REPO_DIR"/third_party/cirque/repo
     pip3 install pycodestyle==2.5.0 wheel
     make NO_GRPC=1 install -j
-    "$REPO_DIR"/integrations/docker/images/chip-cirque-device-base/build.sh
+
+    if [[ "x$GITHUB_ACTION_RUN" = "x1" ]]; then
+        "$REPO_DIR"/integrations/docker/images/chip-cirque-device-base/build.sh --try-download --latest
+    else
+        "$REPO_DIR"/integrations/docker/images/chip-cirque-device-base/build.sh --try-download
+    fi
+
     __cirquetest_build_ot
     pip3 install -r requirements_nogrpc.txt
 

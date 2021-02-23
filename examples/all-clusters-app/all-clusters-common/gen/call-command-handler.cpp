@@ -32,11 +32,13 @@ EmberAfStatus emberAfBarrierControlClusterServerCommandParse(EmberAfClusterComma
 EmberAfStatus emberAfBasicClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfBindingClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfColorControlClusterServerCommandParse(EmberAfClusterCommand * cmd);
+EmberAfStatus emberAfContentLaunchClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfDoorLockClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfGroupsClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfIasZoneClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfIdentifyClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfLevelControlClusterServerCommandParse(EmberAfClusterCommand * cmd);
+EmberAfStatus emberAfMediaPlaybackClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfOnOffClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfScenesClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfTemperatureMeasurementClusterServerCommandParse(EmberAfClusterCommand * cmd);
@@ -92,6 +94,9 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
         case ZCL_COLOR_CONTROL_CLUSTER_ID:
             result = emberAfColorControlClusterServerCommandParse(cmd);
             break;
+        case ZCL_CONTENT_LAUNCH_CLUSTER_ID:
+            result = emberAfContentLaunchClusterServerCommandParse(cmd);
+            break;
         case ZCL_DOOR_LOCK_CLUSTER_ID:
             result = emberAfDoorLockClusterServerCommandParse(cmd);
             break;
@@ -106,6 +111,9 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
             break;
         case ZCL_LEVEL_CONTROL_CLUSTER_ID:
             result = emberAfLevelControlClusterServerCommandParse(cmd);
+            break;
+        case ZCL_MEDIA_PLAYBACK_CLUSTER_ID:
+            result = emberAfMediaPlaybackClusterServerCommandParse(cmd);
             break;
         case ZCL_ON_OFF_CLUSTER_ID:
             result = emberAfOnOffClusterServerCommandParse(cmd);
@@ -166,7 +174,7 @@ EmberAfStatus emberAfBasicClusterServerCommandParse(EmberAfClusterCommand * cmd)
 
     if (cmd->mfgSpecific)
     {
-        if (cmd->mfgCode == 0x1002 && cmd->commandId == ZCL_MFG_SPECIFIC_PING_COMMAND_ID)
+        if (cmd->mfgCode == 4098 && cmd->commandId == ZCL_MFG_SPECIFIC_PING_COMMAND_ID)
         {
             wasHandled = emberAfBasicClusterMfgSpecificPingCallback();
         }
@@ -824,6 +832,30 @@ EmberAfStatus emberAfColorControlClusterServerCommandParse(EmberAfClusterCommand
             optionsOverride = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
 
             wasHandled = emberAfColorControlClusterStopMoveStepCallback(optionsMask, optionsOverride);
+            break;
+        }
+        default: {
+            // Unrecognized command ID, error status will apply.
+            break;
+        }
+        }
+    }
+    return status(wasHandled, true, cmd->mfgSpecific);
+}
+EmberAfStatus emberAfContentLaunchClusterServerCommandParse(EmberAfClusterCommand * cmd)
+{
+    bool wasHandled = false;
+
+    if (!cmd->mfgSpecific)
+    {
+        switch (cmd->commandId)
+        {
+        case ZCL_LAUNCH_CONTENT_COMMAND_ID: {
+            wasHandled = emberAfContentLaunchClusterLaunchContentCallback();
+            break;
+        }
+        case ZCL_LAUNCH_URL_COMMAND_ID: {
+            wasHandled = emberAfContentLaunchClusterLaunchURLCallback();
             break;
         }
         default: {
@@ -1678,6 +1710,62 @@ EmberAfStatus emberAfLevelControlClusterServerCommandParse(EmberAfClusterCommand
         }
         case ZCL_STOP_WITH_ON_OFF_COMMAND_ID: {
             wasHandled = emberAfLevelControlClusterStopWithOnOffCallback();
+            break;
+        }
+        default: {
+            // Unrecognized command ID, error status will apply.
+            break;
+        }
+        }
+    }
+    return status(wasHandled, true, cmd->mfgSpecific);
+}
+EmberAfStatus emberAfMediaPlaybackClusterServerCommandParse(EmberAfClusterCommand * cmd)
+{
+    bool wasHandled = false;
+
+    if (!cmd->mfgSpecific)
+    {
+        switch (cmd->commandId)
+        {
+        case ZCL_FAST_FORWARD_REQUEST_COMMAND_ID: {
+            wasHandled = emberAfMediaPlaybackClusterFastForwardRequestCallback();
+            break;
+        }
+        case ZCL_NEXT_REQUEST_COMMAND_ID: {
+            wasHandled = emberAfMediaPlaybackClusterNextRequestCallback();
+            break;
+        }
+        case ZCL_PAUSE_REQUEST_COMMAND_ID: {
+            wasHandled = emberAfMediaPlaybackClusterPauseRequestCallback();
+            break;
+        }
+        case ZCL_PLAY_REQUEST_COMMAND_ID: {
+            wasHandled = emberAfMediaPlaybackClusterPlayRequestCallback();
+            break;
+        }
+        case ZCL_PREVIOUS_REQUEST_COMMAND_ID: {
+            wasHandled = emberAfMediaPlaybackClusterPreviousRequestCallback();
+            break;
+        }
+        case ZCL_REWIND_REQUEST_COMMAND_ID: {
+            wasHandled = emberAfMediaPlaybackClusterRewindRequestCallback();
+            break;
+        }
+        case ZCL_SKIP_BACKWARD_REQUEST_COMMAND_ID: {
+            wasHandled = emberAfMediaPlaybackClusterSkipBackwardRequestCallback();
+            break;
+        }
+        case ZCL_SKIP_FORWARD_REQUEST_COMMAND_ID: {
+            wasHandled = emberAfMediaPlaybackClusterSkipForwardRequestCallback();
+            break;
+        }
+        case ZCL_START_OVER_REQUEST_COMMAND_ID: {
+            wasHandled = emberAfMediaPlaybackClusterStartOverRequestCallback();
+            break;
+        }
+        case ZCL_STOP_REQUEST_COMMAND_ID: {
+            wasHandled = emberAfMediaPlaybackClusterStopRequestCallback();
             break;
         }
         default: {

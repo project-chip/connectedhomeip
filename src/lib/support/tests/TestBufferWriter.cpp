@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -80,6 +80,17 @@ using namespace chip::Encoding;
 void TestStringWrite(nlTestSuite * inSuite, void * inContext)
 {
     {
+        BWTest<BufferWriter> bb(2);
+        bb.Put("hi");
+        NL_TEST_ASSERT(inSuite, bb.expect("hi", 2, 0));
+    }
+    {
+        BWTest<BufferWriter> bb(1);
+        bb.Put("hi");
+        NL_TEST_ASSERT(inSuite, bb.expect("hi", 2, 0));
+    }
+
+    {
         BWTest<LittleEndian::BufferWriter> bb(2);
         bb.Put("hi");
         NL_TEST_ASSERT(inSuite, bb.expect("hi", 2, 0));
@@ -104,6 +115,17 @@ void TestStringWrite(nlTestSuite * inSuite, void * inContext)
 
 void TestBufferWrite(nlTestSuite * inSuite, void * inContext)
 {
+    {
+        BWTest<BufferWriter> bb(2);
+        bb.Put("hithere", 2);
+        NL_TEST_ASSERT(inSuite, bb.expect("hi", 2, 0));
+    }
+    {
+        BWTest<BufferWriter> bb(1);
+        bb.Put("hithere", 2);
+        NL_TEST_ASSERT(inSuite, bb.expect("hi", 2, 0));
+    }
+
     {
         BWTest<LittleEndian::BufferWriter> bb(2);
         bb.Put("hithere", 2);

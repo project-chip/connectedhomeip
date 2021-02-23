@@ -28,6 +28,15 @@
 namespace mdns {
 namespace Minimal {
 
+namespace BroadcastIpAddresses {
+
+// Get standard mDNS Broadcast addresses
+
+void GetIpv6Into(chip::Inet::IPAddress & dest);
+void GetIpv4Into(chip::Inet::IPAddress & dest);
+
+} // namespace BroadcastIpAddresses
+
 /// Provides a list of intefaces to listen on.
 ///
 /// When listening on IP, both IP address type (IPv4 or IPv6) and interface id
@@ -68,6 +77,7 @@ class ServerBase
 public:
     struct EndpointInfo
     {
+        chip::Inet::InterfaceId interfaceId = INET_NULL_INTERFACEID;
         chip::Inet::IPAddressType addressType;
         chip::Inet::UDPEndPoint * udp = nullptr;
     };
@@ -78,6 +88,12 @@ public:
         {
             mEndpoints[i].udp = nullptr;
         }
+
+        BroadcastIpAddresses::GetIpv6Into(mIpv6BroadcastAddress);
+
+#if INET_CONFIG_ENABLE_IPV4
+        BroadcastIpAddresses::GetIpv4Into(mIpv4BroadcastAddress);
+#endif
     }
     ~ServerBase();
 
@@ -106,13 +122,28 @@ public:
         return *this;
     }
 
+    /// How many endpoints are availabe to be used by the server.
+    size_t GetEndpointCount() const { return mEndpointCount; }
+
+    /// Get the endpoints that are used by this server
+    ///
+    /// Entries with non-null UDP are considered usable.
+    const EndpointInfo * GetEndpoints() const { return mEndpoints; }
+
 private:
     static void OnUdpPacketReceived(chip::Inet::IPEndPointBasis * endPoint, chip::System::PacketBufferHandle buffer,
                                     const chip::Inet::IPPacketInfo * info);
 
     EndpointInfo * mEndpoints;   // possible endpoints, to listen on multiple interfaces
-    const size_t mEndpointCount; // how many endpoints are used
+    const size_t mEndpointCount; // how many endpoints are allocated
     ServerDelegate * mDelegate = nullptr;
+
+    // Broadcast IP addresses are cached to not require a string parse every time
+    // Ideally we should be able to constexpr these
+    chip::Inet::IPAddress mIpv6BroadcastAddress;
+#if INET_CONFIG_ENABLE_IPV4
+    chip::Inet::IPAddress mIpv4BroadcastAddress;
+#endif
 };
 
 template <size_t kCount>

@@ -35,6 +35,8 @@ NS_ASSUME_NONNULL_BEGIN
              error:(NSError * __autoreleasing *)error;
 - (BOOL)unpairDevice:(uint64_t)deviceID error:(NSError * __autoreleasing *)error;
 - (BOOL)stopDevicePairing:(uint64_t)deviceID error:(NSError * __autoreleasing *)error;
+- (void)sendWiFiCredentials:(NSString *)ssid password:(NSString *)password;
+- (void)sendThreadCredentials:(NSData *)threadDataSet;
 
 - (CHIPDevice *)getPairedDevice:(uint64_t)deviceID error:(NSError * __autoreleasing *)error;
 
@@ -45,6 +47,11 @@ NS_ASSUME_NONNULL_BEGIN
  * Return the single CHIPDeviceController we support existing.
  */
 + (CHIPDeviceController *)sharedController;
+
+/**
+ * Return the Node Id assigned to the controller.
+ */
+- (NSNumber *)getControllerNodeId;
 
 /**
  * Set the Delegate for the Device Pairing  as well as the Queue on which the Delegate callbacks will be triggered

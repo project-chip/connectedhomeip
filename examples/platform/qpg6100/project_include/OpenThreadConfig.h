@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2019 Google LLC.
+ *    Copyright (c) 2021 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,9 +21,6 @@
  *      Overrides to default OpenThread configuration.
  *
  */
-
-// TODO - enable full OpenThread integration
-// https://github.com/project-chip/connectedhomeip/issues/293
 
 #pragma once
 
@@ -49,4 +45,4 @@
 // NB: This file gets included during the build of OpenThread.  Hence
 // it cannot use "openthread" in the path to the included file.
 //
-//#include "openthread-core-qpg6095-config.h"
+#include "openthread-core-qpg6100-config.h"

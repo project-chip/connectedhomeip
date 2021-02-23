@@ -22,7 +22,7 @@
 #include <string>
 
 using namespace ::chip;
-using namespace ::chip::SetupPayload;
+using namespace ::chip::SetupPayloadData;
 
 CHIP_ERROR AdditionalDataParseCommand::Run(PersistentStorage & storage, NodeId localId, NodeId remoteId)
 {

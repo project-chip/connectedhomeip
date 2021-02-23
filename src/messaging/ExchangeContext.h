@@ -24,6 +24,7 @@
 #pragma once
 
 #include <lib/core/ReferenceCounted.h>
+#include <messaging/ExchangeACL.h>
 #include <messaging/ExchangeDelegate.h>
 #include <messaging/Flags.h>
 #include <messaging/ReliableMessageContext.h>
@@ -33,6 +34,9 @@
 #include <transport/SecureSessionMgr.h>
 
 namespace chip {
+
+constexpr uint16_t kMsgCounterChallengeSize = 8; // The size of the message counter synchronization request message.
+
 namespace Messaging {
 
 class ExchangeManager;
@@ -93,9 +97,6 @@ public:
      *
      *  @param[in]    sendFlags     Flags set by the application for the CHIP message being sent.
      *
-     *  @param[in]    msgCtxt       A pointer to an application-specific context object to be associated
-     *                              with the message being sent.
-
      *  @retval  #CHIP_ERROR_INVALID_ARGUMENT               if an invalid argument was passed to this SendMessage API.
      *  @retval  #CHIP_ERROR_WRONG_MSG_VERSION_FOR_EXCHANGE if there is a mismatch in the specific send operation and the
      *                                                       CHIP message protocol version that is supported.
@@ -105,8 +106,8 @@ public:
      *  @retval  #CHIP_NO_ERROR                             if the CHIP layer successfully sent the message down to the
      *                                                       network layer.
      */
-    CHIP_ERROR SendMessage(uint16_t protocolId, uint8_t msgType, System::PacketBufferHandle msgPayload, const SendFlags & sendFlags,
-                           void * msgCtxt = nullptr);
+    CHIP_ERROR SendMessage(uint16_t protocolId, uint8_t msgType, System::PacketBufferHandle msgPayload,
+                           const SendFlags & sendFlags);
 
     /**
      * A strongly-message-typed version of SendMessage.
@@ -117,7 +118,7 @@ public:
     {
         static_assert(std::is_same<std::underlying_type_t<MessageType>, uint8_t>::value, "Enum is wrong size; cast is not safe");
         return SendMessage(Protocols::MessageTypeTraits<MessageType>::ProtocolId, static_cast<uint8_t>(msgType),
-                           std::move(msgPayload), sendFlags, msgCtxt);
+                           std::move(msgPayload), sendFlags);
     }
 
     /**
@@ -145,9 +146,29 @@ public:
 
     ReliableMessageContext * GetReliableMessageContext() { return &mReliableMessageContext; };
 
+    ExchangeACL * GetExchangeACL(Transport::AdminPairingTable & table)
+    {
+        if (mExchangeACL == nullptr)
+        {
+            Transport::AdminPairingInfo * admin = table.FindAdmin(mSecureSession.GetAdminId());
+            if (admin != nullptr)
+            {
+                mExchangeACL = chip::Platform::New<CASEExchangeACL>(admin);
+            }
+        }
+
+        return mExchangeACL;
+    }
+
     SecureSessionHandle GetSecureSession() { return mSecureSession; }
 
     uint16_t GetExchangeId() const { return mExchangeId; }
+
+    void SetChallenge(const uint8_t * value) { memcpy(&mChallenge[0], value, kMsgCounterChallengeSize); }
+
+    const uint8_t * GetChallenge() const { return mChallenge; }
+
+    SecureSessionHandle GetSecureSessionHandle() const { return mSecureSession; }
 
     /*
      * In order to use reference counting (see refCount below) we use a hold/free paradigm where users of the exchange
@@ -175,9 +196,14 @@ private:
     ReliableMessageContext mReliableMessageContext;
     ExchangeDelegate * mDelegate   = nullptr;
     ExchangeManager * mExchangeMgr = nullptr;
+    ExchangeACL * mExchangeACL     = nullptr;
 
     SecureSessionHandle mSecureSession; // The connection state
     uint16_t mExchangeId;               // Assigned exchange ID.
+
+    // [TODO: #4711]: this field need to be moved to appState object which implement 'exchange-specific' contextual
+    // actions with a delegate pattern.
+    uint8_t mChallenge[kMsgCounterChallengeSize]; // Challenge number to identify the sychronization request cryptographically.
 
     BitFlags<uint16_t, ExFlagValues> mFlags; // Internal state flags
 

@@ -19,14 +19,18 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef void (^SendNetworkCredentials)(NSString * ssid, NSString * password);
-
-typedef NS_ENUM(NSUInteger, PairingStatus) {
+typedef NS_ENUM(NSUInteger, CHIPPairingStatus) {
     kSecurePairingSuccess = 0,
     kSecurePairingFailed,
     kNetworkProvisioningSuccess,
     kNetworkProvisioningFailed,
     kUnknownStatus,
+};
+
+typedef NS_ENUM(NSUInteger, CHIPNetworkCredentialType) {
+    kNetworkCredentialTypeWiFi = 0,
+    kNetworkCredentialTypeThread,
+    kNetworkCredentialTypeAll,
 };
 
 /**
@@ -37,17 +41,17 @@ typedef NS_ENUM(NSUInteger, PairingStatus) {
 @protocol CHIPDevicePairingDelegate <NSObject>
 @required
 /**
- * Notify the delegate when pairing requires network credentials
+ * Notify the delegate when pairing requires network credentials along with the NetworkCredentialType requested
  *
  */
-- (void)onNetworkCredentialsRequested:(SendNetworkCredentials)handler;
+- (void)onNetworkCredentialsRequested:(CHIPNetworkCredentialType)type;
 
 @optional
 /**
  * Notify the delegate when pairing status gets updated
  *
  */
-- (void)onStatusUpdate:(PairingStatus)status;
+- (void)onStatusUpdate:(CHIPPairingStatus)status;
 
 /**
  * Notify the delegate when pairing is completed

@@ -23,6 +23,7 @@
 #include <support/ErrorStr.h>
 #include <support/SafeInt.h>
 #include <transport/NetworkProvisioning.h>
+#include <transport/SecureSessionMgr.h>
 
 #if CONFIG_DEVICE_LAYER
 #include <platform/CHIPDeviceLayer.h>
@@ -33,12 +34,6 @@
 #endif
 
 namespace chip {
-
-#ifdef IFNAMSIZ
-constexpr uint16_t kMaxInterfaceName = IFNAMSIZ;
-#else
-constexpr uint16_t kMaxInterfaceName = 32;
-#endif
 
 constexpr char kAPInterfaceNamePrefix[]      = "ap";
 constexpr char kLoobackInterfaceNamePrefix[] = "lo";
@@ -209,7 +204,7 @@ CHIP_ERROR NetworkProvisioning::SendCurrentIPv4Address()
 {
     for (chip::Inet::InterfaceAddressIterator it; it.HasCurrent(); it.Next())
     {
-        char ifName[kMaxInterfaceName];
+        char ifName[chip::Inet::InterfaceIterator::kMaxIfNameLength];
         if (it.IsUp() && CHIP_NO_ERROR == it.GetInterfaceName(ifName, sizeof(ifName)) &&
             memcmp(ifName, kAPInterfaceNamePrefix, sizeof(kAPInterfaceNamePrefix) - 1) &&
             memcmp(ifName, kLoobackInterfaceNamePrefix, sizeof(kLoobackInterfaceNamePrefix) - 1))
@@ -231,7 +226,7 @@ CHIP_ERROR NetworkProvisioning::SendNetworkCredentials(const char * ssid, const 
     const size_t bufferSize = EncodedStringSize(ssid) + EncodedStringSize(passwd);
     VerifyOrExit(CanCastTo<uint16_t>(bufferSize), err = CHIP_ERROR_INVALID_ARGUMENT);
     {
-        System::PacketBufferWriter bbuf(bufferSize);
+        Encoding::LittleEndian::PacketBufferWriter bbuf(MessagePacketBuffer::New(bufferSize), bufferSize);
 
         ChipLogProgress(NetworkProvisioning, "Sending Network Creds. Delegate %p\n", mDelegate);
         VerifyOrExit(mDelegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -267,7 +262,7 @@ CHIP_ERROR NetworkProvisioning::SendThreadCredentials(const DeviceLayer::Interna
         4;                  // threadData.ThreadChannel, threadData.FieldPresent.ThreadExtendedPANId,
                             // threadData.FieldPresent.ThreadMeshPrefix, threadData.FieldPresent.ThreadPSKc
     /* clang-format on */
-    System::PacketBufferWriter bbuf(credentialSize);
+    Encoding::LittleEndian::PacketBufferWriter bbuf(MessagePacketBuffer::New(credentialSize), credentialSize);
 
     ChipLogProgress(NetworkProvisioning, "Sending Thread Credentials");
     VerifyOrExit(mDelegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);

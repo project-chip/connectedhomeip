@@ -31,6 +31,8 @@
 #include "gen/attribute-type.h"
 #include "gen/cluster-id.h"
 
+#include "Service.h"
+
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
@@ -47,7 +49,7 @@ using namespace chip::DeviceLayer;
 
 #define FACTORY_RESET_TRIGGER_TIMEOUT 3000
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
-#define APP_TASK_STACK_SIZE (4096)
+#define APP_TASK_STACK_SIZE (2048)
 #define APP_TASK_PRIORITY 2
 #define APP_EVENT_QUEUE_SIZE 10
 
@@ -56,8 +58,6 @@ static QueueHandle_t sAppEventQueue;
 
 static bool sIsThreadProvisioned     = false;
 static bool sIsThreadEnabled         = false;
-static bool sIsThreadAttached        = false;
-static bool sIsPairedToAccount       = false;
 static bool sHaveBLEConnections      = false;
 static bool sHaveServiceConnectivity = false;
 
@@ -124,8 +124,7 @@ void AppTask::AppTaskMain(void * pvParameter)
     }
 
     ChipLogProgress(NotSpecified, "App Task started");
-    // TODO: PR # 2939 - OT support
-    // SetDeviceName("QPG6100LockDemo._chip._udp.local.");
+    SetDeviceName("QPG6100LockDemo._chip._udp.local.");
 
     while (true)
     {
@@ -145,7 +144,6 @@ void AppTask::AppTaskMain(void * pvParameter)
         {
             sIsThreadProvisioned     = ConnectivityMgr().IsThreadProvisioned();
             sIsThreadEnabled         = ConnectivityMgr().IsThreadEnabled();
-            sIsThreadAttached        = ConnectivityMgr().IsThreadAttached();
             sHaveBLEConnections      = (ConnectivityMgr().NumBLEConnections() != 0);
             sHaveServiceConnectivity = ConnectivityMgr().HaveServiceConnectivity();
             PlatformMgr().UnlockChipStack();
@@ -171,8 +169,7 @@ void AppTask::AppTaskMain(void * pvParameter)
             {
                 qvCHIP_LedSet(SYSTEM_STATE_LED, true);
             }
-            else if (sIsThreadProvisioned && sIsThreadEnabled && sIsPairedToAccount &&
-                     (!sIsThreadAttached || !sHaveServiceConnectivity))
+            else if (sIsThreadProvisioned && sIsThreadEnabled)
             {
                 qvCHIP_LedBlink(SYSTEM_STATE_LED, 950, 50);
             }
@@ -191,10 +188,7 @@ void AppTask::AppTaskMain(void * pvParameter)
 
         if (nowUS > nextChangeTimeUS)
         {
-            // TODO: PR # 2939 - OT support
-            /*
             PublishService();
-            */
             mLastChangeTimeUS = nowUS;
         }
     }

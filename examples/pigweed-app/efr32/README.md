@@ -79,9 +79,8 @@ following features are available:
         cd ~/connectedhomeip/examples/pigweed-app/efr32
         git submodule update --init
         source third_party/connectedhomeip/scripts/activate.sh
-        export EFR32_SDK_ROOT=<path-to-silabs-sdk-v2.7>
         export EFR32_BOARD=BRD4161A
-        gn gen out/debug --args="efr32_sdk_root=\"${EFR32_SDK_ROOT}\" efr32_board=\"${EFR32_BOARD}\""
+        gn gen out/debug
         ninja -C out/debug
 
 -   To delete generated executable, libraries and object files use:
@@ -101,22 +100,22 @@ following features are available:
 
 ## Testing the Example Application
 
-Determine the serial port name for the EFR device by checking /dev: ls
-/dev/tty\*
+-   Determine the serial port name for the EFR device by checking /dev: ls
+    /dev/tty\*
 
-    It should look like this :
-    - On Linux
-        /dev/ttyACM0
-    - On MAC
-        /dev/tty.usbmodem0004401548451
+        It should look like this :
+        - On Linux
+            /dev/ttyACM0
+        - On MAC
+            /dev/tty.usbmodem0004401548451
 
-Run the following command to start an interactive Python shell, where the Echo
-RPC commands can be invoked:
+-   Run the following command to start an interactive Python shell, where the
+    Echo RPC commands can be invoked:
 
-        python -m pw_hdlc.rpc_console --device /dev/tty.usbmodem0004401548451 -b 115200 $CHIP_ROOT/third_party/pigweed/repo/pw_rpc/pw_rpc_protos/echo.proto -o /tmp/pw_rpc.out
+        python -m pw_hdlc.rpc_console --device /dev/tty.usbmodem0004401548451 -b 115200 <CHIP_ROOT>/third_party/pigweed/repo/pw_rpc/pw_rpc_protos/echo.proto -o /tmp/pw_rpc.out
 
-To send an Echo RPC message, type the following command, where the actual
-message is the text in quotation marks after the `msg=` phrase:
+-   To send an Echo RPC message, type the following command, where the actual
+    message is the text in quotation marks after the `msg=` phrase:
 
         rpcs.pw.rpc.EchoService.Echo(msg="hi")
 

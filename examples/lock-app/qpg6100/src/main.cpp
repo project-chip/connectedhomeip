@@ -83,8 +83,12 @@ int CHIP_Init(void)
 {
     int ret = CHIP_ERROR_MAX;
 
-    // Init Chip memory management before the stack
-    chip::Platform::MemoryInit();
+    ret = chip::Platform::MemoryInit();
+    if (ret != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Platform::MemoryInit() failed");
+        goto exit;
+    }
 
     ChipLogProgress(NotSpecified, "Init CHIP Stack");
     ret = PlatformMgr().InitChipStack();
@@ -93,6 +97,32 @@ int CHIP_Init(void)
         ChipLogError(NotSpecified, "PlatformMgr().InitChipStack() failed");
         goto exit;
     }
+
+#if CHIP_ENABLE_OPENTHREAD
+    ChipLogProgress(NotSpecified, "Initializing OpenThread stack");
+
+    ret = ThreadStackMgr().InitThreadStack();
+    if (ret != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "ThreadStackMgr().InitThreadStack() failed");
+        goto exit;
+    }
+
+    ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router);
+    if (ret != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "ConnectivityMgr().SetThreadDeviceType() failed");
+        goto exit;
+    }
+
+    ChipLogProgress(NotSpecified, "Starting OpenThread task");
+    ret = ThreadStackMgrImpl().StartThreadTask();
+    if (ret != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "ThreadStackMgr().StartThreadTask() failed");
+        goto exit;
+    }
+#endif // CHIP_ENABLE_OPENTHREAD
 
     ChipLogProgress(NotSpecified, "Starting Platform Manager Event Loop");
     ret = PlatformMgr().StartEventLoopTask();

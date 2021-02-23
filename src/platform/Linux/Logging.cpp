@@ -1,37 +1,8 @@
-/*
- *
- *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2018 Nest Labs, Inc.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
+/* See Project CHIP LICENSE file for licensing information. */
 
-/**
- *    @file
- *          Provides implementations for the CHIP and LwIP logging functions
- *          on Linux platforms.
- */
+#include <platform/logging/LogV.h>
 
-#include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <support/logging/CHIPLogging.h>
-
-#include <assert.h>
-#include <stdarg.h>
-#include <syslog.h>
-
-using namespace ::chip;
-using namespace ::chip::DeviceLayer;
-using namespace ::chip::DeviceLayer::Internal;
+#include <stdio.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -45,26 +16,25 @@ namespace DeviceLayer {
 void __attribute__((weak)) OnLogOutput() {}
 
 } // namespace DeviceLayer
-} // namespace chip
 
-namespace chip {
 namespace Logging {
+namespace Platform {
 
 /**
  * CHIP log output functions.
  */
-void LogV(uint8_t module, uint8_t category, const char * msg, va_list v)
+void LogV(const char * module, uint8_t category, const char * msg, va_list v)
 {
 #if _CHIP_USE_LOGGING
-    if (IsCategoryEnabled(category))
-    {
-        vsyslog(LOG_INFO, msg, v);
+    printf("CHIP:%s: ", module);
+    vprintf(msg, v);
+    printf("\n");
 
-        // Let the application know that a log message has been emitted.
-        DeviceLayer::OnLogOutput();
-    }
+    // Let the application know that a log message has been emitted.
+    DeviceLayer::OnLogOutput();
 #endif // _CHIP_USE_LOGGING
 }
 
+} // namespace Platform
 } // namespace Logging
 } // namespace chip

@@ -42,6 +42,8 @@
 #define MBEDTLS_THREADING_C
 #define MBEDTLS_THREADING_ALT
 
+#define SL_CATALOG_FREERTOS_KERNEL_PRESENT
+
 /**
  * Enable H Crypto and Entropy modules
  */

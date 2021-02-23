@@ -35,9 +35,11 @@
 #include <core/CHIPEncoding.h>
 #include <core/CHIPSafeCasts.h>
 #include <protocols/Protocols.h>
+#include <setup_payload/SetupPayload.h>
 #include <support/BufferWriter.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
+#include <support/ReturnMacros.h>
 #include <support/SafeInt.h>
 #include <transport/SecureSessionMgr.h>
 
@@ -48,6 +50,9 @@ using namespace Crypto;
 const char * kSpake2pContext        = "CHIP PAKE V1 Commissioning";
 const char * kSpake2pI2RSessionInfo = "Commissioning I2R Key";
 const char * kSpake2pR2ISessionInfo = "Commissioning R2I Key";
+
+static constexpr uint32_t kSpake2p_Iteration_Count = 100;
+static const char * kSpake2pKeyExchangeSalt        = "SPAKE2P Key Exchange Salt";
 
 PASESession::PASESession() {}
 
@@ -62,7 +67,7 @@ void PASESession::Clear()
     // This function zeroes out and resets the memory used by the object.
     // It's done so that no security related information will be leaked.
     memset(&mPoint[0], 0, sizeof(mPoint));
-    memset(&mWS[0][0], 0, sizeof(mWS));
+    memset(&mPASEVerifier[0][0], 0, sizeof(mPASEVerifier));
     memset(&mKe[0], 0, sizeof(mKe));
     mNextExpectedMsg = Protocols::SecureChannel::MsgType::PASE_Spake2pError;
 
@@ -77,9 +82,9 @@ void PASESession::Clear()
         chip::Platform::MemoryFree(mSalt);
         mSalt = nullptr;
     }
-    mLocalNodeId     = kUndefinedNodeId;
     mKeLen           = sizeof(mKe);
     mPairingComplete = false;
+    mComputeVerifier = true;
     mConnectionState.Reset();
 }
 
@@ -132,16 +137,11 @@ CHIP_ERROR PASESession::ToSerializable(PASESessionSerializable & serializable)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
 
-    const NodeId peerNodeId = mConnectionState.GetPeerNodeId();
     VerifyOrExit(CanCastTo<uint16_t>(mKeLen), error = CHIP_ERROR_INTERNAL);
-    VerifyOrExit(CanCastTo<uint64_t>(mLocalNodeId), error = CHIP_ERROR_INTERNAL);
-    VerifyOrExit(CanCastTo<uint64_t>(peerNodeId), error = CHIP_ERROR_INTERNAL);
 
     memset(&serializable, 0, sizeof(serializable));
     serializable.mKeLen           = static_cast<uint16_t>(mKeLen);
     serializable.mPairingComplete = (mPairingComplete) ? 1 : 0;
-    serializable.mLocalNodeId     = mLocalNodeId;
-    serializable.mPeerNodeId      = peerNodeId;
     serializable.mLocalKeyId      = mConnectionState.GetLocalKeyID();
     serializable.mPeerKeyId       = mConnectionState.GetPeerKeyID();
 
@@ -162,8 +162,6 @@ CHIP_ERROR PASESession::FromSerializable(const PASESessionSerializable & seriali
     memset(mKe, 0, sizeof(mKe));
     memcpy(mKe, serializable.mKe, mKeLen);
 
-    mLocalNodeId = serializable.mLocalNodeId;
-    mConnectionState.SetPeerNodeId(serializable.mPeerNodeId);
     mConnectionState.SetLocalKeyID(serializable.mLocalKeyId);
     mConnectionState.SetPeerKeyID(serializable.mPeerKeyId);
 
@@ -171,8 +169,7 @@ exit:
     return error;
 }
 
-CHIP_ERROR PASESession::Init(Optional<NodeId> myNodeId, uint16_t myKeyId, uint32_t setupCode,
-                             SessionEstablishmentDelegate * delegate)
+CHIP_ERROR PASESession::Init(uint16_t myKeyId, uint32_t setupCode, SessionEstablishmentDelegate * delegate)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -187,13 +184,39 @@ CHIP_ERROR PASESession::Init(Optional<NodeId> myNodeId, uint16_t myKeyId, uint32
     err = mCommissioningHash.AddData(Uint8::from_const_char(kSpake2pContext), strlen(kSpake2pContext));
     SuccessOrExit(err);
 
-    mDelegate    = delegate;
-    mLocalNodeId = myNodeId.ValueOr(kUndefinedNodeId);
+    mDelegate = delegate;
     mConnectionState.SetLocalKeyID(myKeyId);
-    mSetupPINCode = setupCode;
+    mSetupPINCode    = setupCode;
+    mComputeVerifier = true;
 
 exit:
     return err;
+}
+
+CHIP_ERROR PASESession::ComputePASEVerifier(uint32_t setUpPINCode, uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen,
+                                            PASEVerifier & verifier)
+{
+    return pbkdf2_sha256(reinterpret_cast<const uint8_t *>(&setUpPINCode), sizeof(setUpPINCode), salt, saltLen, pbkdf2IterCount,
+                         sizeof(PASEVerifier), &verifier[0][0]);
+}
+
+CHIP_ERROR PASESession::GeneratePASEVerifier(PASEVerifier & verifier, bool useRandomPIN, uint32_t & setupPIN)
+{
+    if (useRandomPIN)
+    {
+        ReturnErrorOnFailure(DRBG_get_bytes(reinterpret_cast<uint8_t *>(&setupPIN), sizeof(setupPIN)));
+
+        // Use only kSetupPINCodeFieldLengthInBits bits out of the code
+        setupPIN &= ((1 << kSetupPINCodeFieldLengthInBits) - 1);
+    }
+    else if (setupPIN >= (1 << kSetupPINCodeFieldLengthInBits))
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    return PASESession::ComputePASEVerifier(setupPIN, kSpake2p_Iteration_Count,
+                                            reinterpret_cast<const unsigned char *>(kSpake2pKeyExchangeSalt),
+                                            strlen(kSpake2pKeyExchangeSalt), verifier);
 }
 
 CHIP_ERROR PASESession::SetupSpake2p(uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen)
@@ -203,12 +226,14 @@ CHIP_ERROR PASESession::SetupSpake2p(uint32_t pbkdf2IterCount, const uint8_t * s
         0,
     };
 
-    VerifyOrExit(salt != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(saltLen > 0, err = CHIP_ERROR_INVALID_ARGUMENT);
+    if (mComputeVerifier)
+    {
+        VerifyOrExit(salt != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrExit(saltLen > 0, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    err = pbkdf2_sha256(reinterpret_cast<const uint8_t *>(&mSetupPINCode), sizeof(mSetupPINCode), salt, saltLen, pbkdf2IterCount,
-                        sizeof(mWS), &mWS[0][0]);
-    SuccessOrExit(err);
+        err = PASESession::ComputePASEVerifier(mSetupPINCode, pbkdf2IterCount, salt, saltLen, mPASEVerifier);
+        SuccessOrExit(err);
+    }
 
     err = mCommissioningHash.Finish(context);
     SuccessOrExit(err);
@@ -221,14 +246,14 @@ exit:
 }
 
 CHIP_ERROR PASESession::WaitForPairing(uint32_t mySetUpPINCode, uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen,
-                                       Optional<NodeId> myNodeId, uint16_t myKeyId, SessionEstablishmentDelegate * delegate)
+                                       uint16_t myKeyId, SessionEstablishmentDelegate * delegate)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     VerifyOrExit(salt != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(saltLen > 0, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    err = Init(myNodeId, myKeyId, mySetUpPINCode, delegate);
+    err = Init(myKeyId, mySetUpPINCode, delegate);
     SuccessOrExit(err);
 
     VerifyOrExit(CanCastTo<uint16_t>(saltLen), err = CHIP_ERROR_INVALID_ARGUMENT);
@@ -260,28 +285,33 @@ exit:
     return err;
 }
 
+CHIP_ERROR PASESession::WaitForPairing(const PASEVerifier & verifier, uint16_t myKeyId, SessionEstablishmentDelegate * delegate)
+{
+    CHIP_ERROR err = WaitForPairing(0, kSpake2p_Iteration_Count, reinterpret_cast<const unsigned char *>(kSpake2pKeyExchangeSalt),
+                                    strlen(kSpake2pKeyExchangeSalt), myKeyId, delegate);
+    SuccessOrExit(err);
+
+    memmove(&mPASEVerifier, verifier, sizeof(verifier));
+    mComputeVerifier = false;
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        Clear();
+    }
+    return err;
+}
+
 CHIP_ERROR PASESession::AttachHeaderAndSend(Protocols::SecureChannel::MsgType msgType, System::PacketBufferHandle msgBuf)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
     PayloadHeader payloadHeader;
 
     payloadHeader.SetMessageType(msgType);
 
-    uint16_t headerSize              = payloadHeader.EncodeSizeBytes();
-    uint16_t actualEncodedHeaderSize = 0;
-
-    VerifyOrExit(msgBuf->EnsureReservedSize(headerSize), err = CHIP_ERROR_NO_MEMORY);
-
-    msgBuf->SetStart(msgBuf->Start() - headerSize);
-    err = payloadHeader.Encode(msgBuf->Start(), msgBuf->DataLength(), &actualEncodedHeaderSize);
+    CHIP_ERROR err = payloadHeader.EncodeBeforeData(msgBuf);
     SuccessOrExit(err);
-    VerifyOrExit(headerSize == actualEncodedHeaderSize, err = CHIP_ERROR_INTERNAL);
 
-    err = mDelegate->SendSessionEstablishmentMessage(PacketHeader()
-                                                         .SetSourceNodeId(mLocalNodeId)
-                                                         .SetDestinationNodeId(mConnectionState.GetPeerNodeId())
-                                                         .SetEncryptionKeyID(mConnectionState.GetLocalKeyID()),
+    err = mDelegate->SendSessionEstablishmentMessage(PacketHeader().SetEncryptionKeyID(mConnectionState.GetLocalKeyID()),
                                                      mConnectionState.GetPeerAddress(), std::move(msgBuf));
     SuccessOrExit(err);
 
@@ -289,14 +319,35 @@ exit:
     return err;
 }
 
-CHIP_ERROR PASESession::Pair(const Transport::PeerAddress peerAddress, uint32_t peerSetUpPINCode, Optional<NodeId> myNodeId,
-                             NodeId peerNodeId, uint16_t myKeyId, SessionEstablishmentDelegate * delegate)
+CHIP_ERROR PASESession::Pair(const Transport::PeerAddress peerAddress, uint32_t peerSetUpPINCode, uint16_t myKeyId,
+                             SessionEstablishmentDelegate * delegate)
 {
-    CHIP_ERROR err = Init(myNodeId, myKeyId, peerSetUpPINCode, delegate);
+    CHIP_ERROR err = Init(myKeyId, peerSetUpPINCode, delegate);
     SuccessOrExit(err);
 
     mConnectionState.SetPeerAddress(peerAddress);
-    mConnectionState.SetPeerNodeId(peerNodeId);
+
+    err = SendPBKDFParamRequest();
+    SuccessOrExit(err);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        Clear();
+    }
+    return err;
+}
+
+CHIP_ERROR PASESession::Pair(const Transport::PeerAddress peerAddress, const PASEVerifier & verifier, uint16_t myKeyId,
+                             SessionEstablishmentDelegate * delegate)
+{
+    CHIP_ERROR err = Init(myKeyId, 0, delegate);
+    SuccessOrExit(err);
+
+    mConnectionState.SetPeerAddress(peerAddress);
+
+    memmove(&mPASEVerifier, verifier, sizeof(verifier));
+    mComputeVerifier = false;
 
     err = SendPBKDFParamRequest();
     SuccessOrExit(err);
@@ -373,11 +424,6 @@ CHIP_ERROR PASESession::HandlePBKDFParamRequest(const PacketHeader & header, con
     err = mCommissioningHash.AddData(req, reqlen);
     SuccessOrExit(err);
 
-    if (header.GetSourceNodeId().HasValue() && mConnectionState.GetPeerNodeId() == kUndefinedNodeId)
-    {
-        mConnectionState.SetPeerNodeId(header.GetSourceNodeId().Value());
-    }
-
     err = SendPBKDFParamResponse();
     SuccessOrExit(err);
 
@@ -429,7 +475,7 @@ CHIP_ERROR PASESession::SendPBKDFParamResponse()
     err = SetupSpake2p(mIterationCount, mSalt, mSaltLength);
     SuccessOrExit(err);
 
-    err = mSpake2p.ComputeL(mPoint, &sizeof_point, &mWS[1][0], kSpake2p_WS_Length);
+    err = mSpake2p.ComputeL(mPoint, &sizeof_point, &mPASEVerifier[1][0], kSpake2p_WS_Length);
     SuccessOrExit(err);
 
     mNextExpectedMsg = Protocols::SecureChannel::MsgType::PASE_Spake2p1;
@@ -481,11 +527,6 @@ CHIP_ERROR PASESession::HandlePBKDFParamResponse(const PacketHeader & header, co
         SuccessOrExit(err);
     }
 
-    if (header.GetSourceNodeId().HasValue() && mConnectionState.GetPeerNodeId() == kUndefinedNodeId)
-    {
-        mConnectionState.SetPeerNodeId(header.GetSourceNodeId().Value());
-    }
-
     err = SendMsg1();
     SuccessOrExit(err);
 
@@ -505,7 +546,7 @@ CHIP_ERROR PASESession::SendMsg1()
     System::PacketBufferHandle msg_pA;
 
     CHIP_ERROR err = mSpake2p.BeginProver(reinterpret_cast<const uint8_t *>(""), 0, reinterpret_cast<const uint8_t *>(""), 0,
-                                          &mWS[0][0], kSpake2p_WS_Length, &mWS[1][0], kSpake2p_WS_Length);
+                                          &mPASEVerifier[0][0], kSpake2p_WS_Length, &mPASEVerifier[1][0], kSpake2p_WS_Length);
     SuccessOrExit(err);
 
     err = mSpake2p.ComputeRoundOne(X, &X_len);
@@ -546,8 +587,8 @@ CHIP_ERROR PASESession::HandleMsg1_and_SendMsg2(const PacketHeader & header, con
     VerifyOrExit(buf != nullptr, err = CHIP_ERROR_MESSAGE_INCOMPLETE);
     VerifyOrExit(buf_len == kMAX_Point_Length, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
-    err = mSpake2p.BeginVerifier(reinterpret_cast<const uint8_t *>(""), 0, reinterpret_cast<const uint8_t *>(""), 0, &mWS[0][0],
-                                 kSpake2p_WS_Length, mPoint, sizeof(mPoint));
+    err = mSpake2p.BeginVerifier(reinterpret_cast<const uint8_t *>(""), 0, reinterpret_cast<const uint8_t *>(""), 0,
+                                 &mPASEVerifier[0][0], kSpake2p_WS_Length, mPoint, sizeof(mPoint));
     SuccessOrExit(err);
 
     err = mSpake2p.ComputeRoundOne(Y, &Y_len);
@@ -557,10 +598,6 @@ CHIP_ERROR PASESession::HandleMsg1_and_SendMsg2(const PacketHeader & header, con
     SuccessOrExit(err);
 
     mConnectionState.SetPeerKeyID(header.GetEncryptionKeyID());
-    if (header.GetSourceNodeId().HasValue() && mConnectionState.GetPeerNodeId() == kUndefinedNodeId)
-    {
-        mConnectionState.SetPeerNodeId(header.GetSourceNodeId().Value());
-    }
 
     // Make sure our addition doesn't overflow.
     VerifyOrExit(UINTMAX_MAX - verifier_len >= Y_len, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
@@ -568,7 +605,7 @@ CHIP_ERROR PASESession::HandleMsg1_and_SendMsg2(const PacketHeader & header, con
     data_len = static_cast<uint16_t>(Y_len + verifier_len);
 
     {
-        System::PacketBufferWriter bbuf(data_len);
+        Encoding::PacketBufferWriter bbuf(System::PacketBufferHandle::New(data_len));
         VerifyOrExit(!bbuf.IsNull(), err = CHIP_SYSTEM_ERROR_NO_MEMORY);
         bbuf.Put(&Y[0], Y_len);
         bbuf.Put(verifier, verifier_len);
@@ -618,13 +655,9 @@ CHIP_ERROR PASESession::HandleMsg2_and_SendMsg3(const PacketHeader & header, con
     verifier_len = static_cast<uint16_t>(verifier_len_raw);
 
     mConnectionState.SetPeerKeyID(header.GetEncryptionKeyID());
-    if (header.GetSourceNodeId().HasValue() && mConnectionState.GetPeerNodeId() == kUndefinedNodeId)
-    {
-        mConnectionState.SetPeerNodeId(header.GetSourceNodeId().Value());
-    }
 
     {
-        System::PacketBufferWriter bbuf(verifier_len);
+        Encoding::PacketBufferWriter bbuf(System::PacketBufferHandle::New(verifier_len));
         VerifyOrExit(!bbuf.IsNull(), err = CHIP_SYSTEM_ERROR_NO_MEMORY);
 
         bbuf.Put(verifier, verifier_len);
@@ -652,10 +685,6 @@ CHIP_ERROR PASESession::HandleMsg2_and_SendMsg3(const PacketHeader & header, con
 
     mPairingComplete = true;
 
-    err = DeriveSecureSession(reinterpret_cast<const unsigned char *>(kSpake2pI2RSessionInfo), strlen(kSpake2pI2RSessionInfo),
-                              mConnectionState.GetSecureSession());
-    SuccessOrExit(err);
-
     // Call delegate to indicate pairing completion
     mDelegate->OnSessionEstablished();
 
@@ -682,9 +711,6 @@ CHIP_ERROR PASESession::HandleMsg3(const PacketHeader & header, const System::Pa
 
     VerifyOrExit(hash != nullptr, err = CHIP_ERROR_MESSAGE_INCOMPLETE);
     VerifyOrExit(msg->DataLength() == kMAX_Hash_Length, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
-
-    VerifyOrExit(header.GetSourceNodeId().ValueOr(kUndefinedNodeId) == mConnectionState.GetPeerNodeId(),
-                 err = CHIP_ERROR_WRONG_NODE_ID);
     VerifyOrExit(header.GetEncryptionKeyID() == mConnectionState.GetPeerKeyID(), err = CHIP_ERROR_INVALID_KEY_ID);
 
     err = mSpake2p.KeyConfirm(hash, kMAX_Hash_Length);
@@ -698,10 +724,6 @@ CHIP_ERROR PASESession::HandleMsg3(const PacketHeader & header, const System::Pa
     SuccessOrExit(err);
 
     mPairingComplete = true;
-
-    err = DeriveSecureSession(reinterpret_cast<const unsigned char *>(kSpake2pI2RSessionInfo), strlen(kSpake2pI2RSessionInfo),
-                              mConnectionState.GetSecureSession());
-    SuccessOrExit(err);
 
     // Call delegate to indicate pairing completion
     mDelegate->OnSessionEstablished();
@@ -758,30 +780,18 @@ exit:
 CHIP_ERROR PASESession::HandlePeerMessage(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
                                           System::PacketBufferHandle msg)
 {
-    CHIP_ERROR err      = CHIP_NO_ERROR;
-    uint16_t headerSize = 0;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     PayloadHeader payloadHeader;
 
     VerifyOrExit(!msg.IsNull(), err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    err = payloadHeader.Decode(msg->Start(), msg->DataLength(), &headerSize);
+    err = payloadHeader.DecodeAndConsume(msg);
     SuccessOrExit(err);
-
-    msg->ConsumeHead(headerSize);
 
     VerifyOrExit(payloadHeader.GetProtocolID() == Protocols::kProtocol_SecureChannel, err = CHIP_ERROR_INVALID_MESSAGE_TYPE);
     VerifyOrExit(payloadHeader.GetMessageType() == (uint8_t) mNextExpectedMsg, err = CHIP_ERROR_INVALID_MESSAGE_TYPE);
 
     mConnectionState.SetPeerAddress(peerAddress);
-
-    if (mLocalNodeId == kUndefinedNodeId)
-    {
-        mLocalNodeId = packetHeader.GetDestinationNodeId().ValueOr(kUndefinedNodeId);
-    }
-    else if (packetHeader.GetDestinationNodeId().HasValue())
-    {
-        VerifyOrExit(mLocalNodeId == packetHeader.GetDestinationNodeId().Value(), err = CHIP_ERROR_WRONG_NODE_ID);
-    }
 
     switch (static_cast<Protocols::SecureChannel::MsgType>(payloadHeader.GetMessageType()))
     {

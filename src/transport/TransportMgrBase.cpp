@@ -56,7 +56,7 @@ void TransportMgrBase::HandleMessageReceived(const PacketHeader & packetHeader, 
     else
     {
         char addrBuffer[Transport::PeerAddress::kMaxToStringSize];
-        peerAddress.ToString(addrBuffer, sizeof(addrBuffer));
+        peerAddress.ToString(addrBuffer);
         ChipLogError(Inet, "%s message from %s is dropped since no corresponding handler is set in TransportMgr.",
                      packetHeader.GetFlags().Has(Header::FlagValues::kSecure) ? "Encrypted" : "Unencrypted", addrBuffer);
     }

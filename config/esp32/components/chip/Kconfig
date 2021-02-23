@@ -321,7 +321,7 @@ menu "CHIP Device Layer"
         config CHIP_TASK_STACK_SIZE
             int "CHIP Task Stack Size"
             range 0 65535
-            default 8192
+            default 5120
             help
                 The size (in bytes) of the CHIP task stack.
 
@@ -640,7 +640,7 @@ menu "CHIP Device Layer"
 
         config USE_TEST_SERIAL_NUMBER
             string "Use Test Serial Number"
-            default "DUMMY_SN"
+            default "TEST_SN"
             help
                 Specifies a hard-coded device serial number to be used if none is found in CHIP NV storage.
                 Setting the value to an empty string disables the feature.

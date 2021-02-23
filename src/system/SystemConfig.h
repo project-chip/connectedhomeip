@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2016-2018 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -135,9 +135,9 @@
 #define CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING INET_CONFIG_FREERTOS_LOCKING
 #endif // !defined(CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING) && defined(INET_CONFIG_FREERTOS_LOCKING)
 
-#if !defined(CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC) && defined(INET_CONFIG_NUM_BUFS)
-#define CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC INET_CONFIG_NUM_BUFS
-#endif // !defined(CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC) && defined(INET_CONFIG_NUM_BUFS)
+#if !defined(CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE) && defined(INET_CONFIG_NUM_BUFS)
+#define CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE INET_CONFIG_NUM_BUFS
+#endif // !defined(CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE) && defined(INET_CONFIG_NUM_BUFS)
 
 #if !defined(CHIP_SYSTEM_CONFIG_NUM_TIMERS) && defined(INET_CONFIG_NUM_TIMERS)
 #define CHIP_SYSTEM_CONFIG_NUM_TIMERS INET_CONFIG_NUM_TIMERS
@@ -324,16 +324,16 @@
 #endif /* CHIP_SYSTEM_HEADER_RESERVE_SIZE */
 
 /**
- *  @def CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
+ *  @def CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE
  *
  *  @brief
  *      This is the total number of packet buffers for the BSD sockets configuration.
  *
  *      This may be set to zero (0) to enable unbounded dynamic allocation using malloc.
  */
-#ifndef CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
-#define CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC 15
-#endif /* CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC */
+#ifndef CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE
+#define CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE 15
+#endif /* CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE */
 
 /**
  *  @def CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX
@@ -367,7 +367,7 @@
  *
  *      The size of PacketBuffer structure does not need to be included in this value.
  */
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && !defined(DOXYGEN)
 #ifdef CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX
 #error "CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX cannot be defined on an LwIP-based platform."
 #endif /* CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX */

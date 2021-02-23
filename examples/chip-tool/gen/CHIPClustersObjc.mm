@@ -274,6 +274,70 @@ private:
     bool mKeepAlive;
 };
 
+class CHIPContentLaunchClusterLaunchContentResponseCallbackBridge
+    : public Callback::Callback<ContentLaunchClusterLaunchContentResponseCallback> {
+public:
+    CHIPContentLaunchClusterLaunchContentResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
+        : Callback::Callback<ContentLaunchClusterLaunchContentResponseCallback>(CallbackFn, this)
+        , mHandler(handler)
+        , mQueue(queue)
+    {
+    }
+
+    ~CHIPContentLaunchClusterLaunchContentResponseCallbackBridge() {};
+
+    static void CallbackFn(void * context, uint8_t contentLaunchStatus)
+    {
+        CHIPContentLaunchClusterLaunchContentResponseCallbackBridge * callback
+            = reinterpret_cast<CHIPContentLaunchClusterLaunchContentResponseCallbackBridge *>(context);
+        if (callback && callback->mQueue) {
+            dispatch_async(callback->mQueue, ^{
+                callback->mHandler(nil, @ {
+                    @"contentLaunchStatus" : [NSNumber numberWithUnsignedChar:contentLaunchStatus],
+                });
+                callback->Cancel();
+                delete callback;
+            });
+        }
+    };
+
+private:
+    ResponseHandler mHandler;
+    dispatch_queue_t mQueue;
+};
+
+class CHIPContentLaunchClusterLaunchURLResponseCallbackBridge
+    : public Callback::Callback<ContentLaunchClusterLaunchURLResponseCallback> {
+public:
+    CHIPContentLaunchClusterLaunchURLResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
+        : Callback::Callback<ContentLaunchClusterLaunchURLResponseCallback>(CallbackFn, this)
+        , mHandler(handler)
+        , mQueue(queue)
+    {
+    }
+
+    ~CHIPContentLaunchClusterLaunchURLResponseCallbackBridge() {};
+
+    static void CallbackFn(void * context, uint8_t contentLaunchStatus)
+    {
+        CHIPContentLaunchClusterLaunchURLResponseCallbackBridge * callback
+            = reinterpret_cast<CHIPContentLaunchClusterLaunchURLResponseCallbackBridge *>(context);
+        if (callback && callback->mQueue) {
+            dispatch_async(callback->mQueue, ^{
+                callback->mHandler(nil, @ {
+                    @"contentLaunchStatus" : [NSNumber numberWithUnsignedChar:contentLaunchStatus],
+                });
+                callback->Cancel();
+                delete callback;
+            });
+        }
+    };
+
+private:
+    ResponseHandler mHandler;
+    dispatch_queue_t mQueue;
+};
+
 class CHIPDoorLockClusterClearAllPinsResponseCallbackBridge
     : public Callback::Callback<DoorLockClusterClearAllPinsResponseCallback> {
 public:
@@ -1147,6 +1211,35 @@ public:
                 callback->mHandler(nil, @ {
                     @"timeout" : [NSNumber numberWithUnsignedShort:timeout],
                 });
+                callback->Cancel();
+                delete callback;
+            });
+        }
+    };
+
+private:
+    ResponseHandler mHandler;
+    dispatch_queue_t mQueue;
+};
+
+class CHIPMediaPlaybackClusterPlaybackCallbackBridge : public Callback::Callback<MediaPlaybackClusterPlaybackCallback> {
+public:
+    CHIPMediaPlaybackClusterPlaybackCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
+        : Callback::Callback<MediaPlaybackClusterPlaybackCallback>(CallbackFn, this)
+        , mHandler(handler)
+        , mQueue(queue)
+    {
+    }
+
+    ~CHIPMediaPlaybackClusterPlaybackCallbackBridge() {};
+
+    static void CallbackFn(void * context)
+    {
+        CHIPMediaPlaybackClusterPlaybackCallbackBridge * callback
+            = reinterpret_cast<CHIPMediaPlaybackClusterPlaybackCallbackBridge *>(context);
+        if (callback && callback->mQueue) {
+            dispatch_async(callback->mQueue, ^{
+                callback->mHandler(nil, @ {});
                 callback->Cancel();
                 delete callback;
             });
@@ -3787,6 +3880,98 @@ private:
 
 @end
 
+@interface CHIPContentLaunch ()
+
+@property (readonly) Controller::ContentLaunchCluster cppCluster;
+@property (readonly, nonatomic) dispatch_queue_t callbackQueue;
+@end
+
+@implementation CHIPContentLaunch
+
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(EndpointId)endpoint queue:(dispatch_queue_t)queue
+{
+    CHIP_ERROR err = _cppCluster.Associate([device internalDevice], endpoint);
+
+    if (err != CHIP_NO_ERROR) {
+        return nil;
+    }
+
+    if (self = [super init]) {
+        _callbackQueue = queue;
+    }
+
+    return self;
+}
+
+- (BOOL)launchContent:(ResponseHandler)completionHandler
+{
+    CHIPContentLaunchClusterLaunchContentResponseCallbackBridge * onSuccess
+        = new CHIPContentLaunchClusterLaunchContentResponseCallbackBridge(completionHandler, _callbackQueue);
+    if (!onSuccess) {
+        return NO;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    if (!onFailure) {
+        delete onSuccess;
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.LaunchContent(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        return NO;
+    }
+    return YES;
+}
+- (BOOL)launchURL:(ResponseHandler)completionHandler
+{
+    CHIPContentLaunchClusterLaunchURLResponseCallbackBridge * onSuccess
+        = new CHIPContentLaunchClusterLaunchURLResponseCallbackBridge(completionHandler, _callbackQueue);
+    if (!onSuccess) {
+        return NO;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    if (!onFailure) {
+        delete onSuccess;
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.LaunchURL(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        return NO;
+    }
+    return YES;
+}
+
+- (BOOL)readAttributeClusterRevision:(ResponseHandler)completionHandler
+{
+    CHIPInt16uAttributeCallbackBridge * onSuccess = new CHIPInt16uAttributeCallbackBridge(completionHandler, _callbackQueue);
+    if (!onSuccess) {
+        return NO;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    if (!onFailure) {
+        delete onSuccess;
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.ReadAttributeClusterRevision(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        return NO;
+    }
+    return YES;
+}
+
+@end
+
 @interface CHIPDoorLock ()
 
 @property (readonly) Controller::DoorLockCluster cppCluster;
@@ -5082,6 +5267,286 @@ private:
         return NO;
     }
 
+    return YES;
+}
+
+- (BOOL)readAttributeClusterRevision:(ResponseHandler)completionHandler
+{
+    CHIPInt16uAttributeCallbackBridge * onSuccess = new CHIPInt16uAttributeCallbackBridge(completionHandler, _callbackQueue);
+    if (!onSuccess) {
+        return NO;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    if (!onFailure) {
+        delete onSuccess;
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.ReadAttributeClusterRevision(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        return NO;
+    }
+    return YES;
+}
+
+@end
+
+@interface CHIPMediaPlayback ()
+
+@property (readonly) Controller::MediaPlaybackCluster cppCluster;
+@property (readonly, nonatomic) dispatch_queue_t callbackQueue;
+@end
+
+@implementation CHIPMediaPlayback
+
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(EndpointId)endpoint queue:(dispatch_queue_t)queue
+{
+    CHIP_ERROR err = _cppCluster.Associate([device internalDevice], endpoint);
+
+    if (err != CHIP_NO_ERROR) {
+        return nil;
+    }
+
+    if (self = [super init]) {
+        _callbackQueue = queue;
+    }
+
+    return self;
+}
+
+- (BOOL)fastForwardRequest:(ResponseHandler)completionHandler
+{
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
+    if (!onSuccess) {
+        return NO;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    if (!onFailure) {
+        delete onSuccess;
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.FastForwardRequest(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        return NO;
+    }
+    return YES;
+}
+- (BOOL)nextRequest:(ResponseHandler)completionHandler
+{
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
+    if (!onSuccess) {
+        return NO;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    if (!onFailure) {
+        delete onSuccess;
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.NextRequest(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        return NO;
+    }
+    return YES;
+}
+- (BOOL)pauseRequest:(ResponseHandler)completionHandler
+{
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
+    if (!onSuccess) {
+        return NO;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    if (!onFailure) {
+        delete onSuccess;
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.PauseRequest(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        return NO;
+    }
+    return YES;
+}
+- (BOOL)playRequest:(ResponseHandler)completionHandler
+{
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
+    if (!onSuccess) {
+        return NO;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    if (!onFailure) {
+        delete onSuccess;
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.PlayRequest(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        return NO;
+    }
+    return YES;
+}
+- (BOOL)previousRequest:(ResponseHandler)completionHandler
+{
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
+    if (!onSuccess) {
+        return NO;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    if (!onFailure) {
+        delete onSuccess;
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.PreviousRequest(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        return NO;
+    }
+    return YES;
+}
+- (BOOL)rewindRequest:(ResponseHandler)completionHandler
+{
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
+    if (!onSuccess) {
+        return NO;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    if (!onFailure) {
+        delete onSuccess;
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.RewindRequest(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        return NO;
+    }
+    return YES;
+}
+- (BOOL)skipBackwardRequest:(ResponseHandler)completionHandler
+{
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
+    if (!onSuccess) {
+        return NO;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    if (!onFailure) {
+        delete onSuccess;
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.SkipBackwardRequest(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        return NO;
+    }
+    return YES;
+}
+- (BOOL)skipForwardRequest:(ResponseHandler)completionHandler
+{
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
+    if (!onSuccess) {
+        return NO;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    if (!onFailure) {
+        delete onSuccess;
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.SkipForwardRequest(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        return NO;
+    }
+    return YES;
+}
+- (BOOL)startOverRequest:(ResponseHandler)completionHandler
+{
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
+    if (!onSuccess) {
+        return NO;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    if (!onFailure) {
+        delete onSuccess;
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.StartOverRequest(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        return NO;
+    }
+    return YES;
+}
+- (BOOL)stopRequest:(ResponseHandler)completionHandler
+{
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
+    if (!onSuccess) {
+        return NO;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    if (!onFailure) {
+        delete onSuccess;
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.StopRequest(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        return NO;
+    }
+    return YES;
+}
+
+- (BOOL)readAttributeCurrentState:(ResponseHandler)completionHandler
+{
+    CHIPInt16uAttributeCallbackBridge * onSuccess = new CHIPInt16uAttributeCallbackBridge(completionHandler, _callbackQueue);
+    if (!onSuccess) {
+        return NO;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    if (!onFailure) {
+        delete onSuccess;
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.ReadAttributeCurrentState(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        return NO;
+    }
     return YES;
 }
 

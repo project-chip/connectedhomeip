@@ -48,18 +48,32 @@ class SecureSessionMgr;
 class SecureSessionHandle
 {
 public:
-    SecureSessionHandle() : mPeerNodeId(kAnyNodeId), mPeerKeyId(0) {}
-    SecureSessionHandle(NodeId peerNodeId, uint16_t peerKeyId) : mPeerNodeId(peerNodeId), mPeerKeyId(peerKeyId) {}
+    SecureSessionHandle() : mPeerNodeId(kAnyNodeId), mPeerKeyId(0), mAdmin(Transport::kUndefinedAdminId) {}
+    SecureSessionHandle(NodeId peerNodeId, uint16_t peerKeyId, Transport::AdminId admin) :
+        mPeerNodeId(peerNodeId), mPeerKeyId(peerKeyId), mAdmin(admin)
+    {}
+
+    bool HasAdminId() const { return (mAdmin != Transport::kUndefinedAdminId); }
+    Transport::AdminId GetAdminId() const { return mAdmin; }
+    void SetAdminId(Transport::AdminId adminId) { mAdmin = adminId; }
 
     bool operator==(const SecureSessionHandle & that) const
     {
-        return mPeerNodeId == that.mPeerNodeId && mPeerKeyId == that.mPeerKeyId;
+        return mPeerNodeId == that.mPeerNodeId && mPeerKeyId == that.mPeerKeyId && mAdmin == that.mAdmin;
     }
+
+    NodeId GetPeerNodeId() const { return mPeerNodeId; }
+    uint16_t GetPeerKeyId() const { return mPeerKeyId; }
 
 private:
     friend class SecureSessionMgr;
     NodeId mPeerNodeId;
     uint16_t mPeerKeyId;
+    // TODO: Re-evaluate the storing of Admin ID in SecureSessionHandle
+    //       The Admin ID will not be available for PASE and group sessions. So need
+    //       to identify an approach that'll allow looking up the corresponding information for
+    //       such sessions.
+    Transport::AdminId mAdmin;
 };
 
 /**
@@ -69,7 +83,7 @@ private:
  *  EncryptedPacketBufferHandle is a kind of PacketBufferHandle class and used to hold a packet buffer
  *  object whose payload has already been encrypted.
  */
-class EncryptedPacketBufferHandle final : public System::PacketBufferHandle
+class EncryptedPacketBufferHandle final : private System::PacketBufferHandle
 {
 public:
     EncryptedPacketBufferHandle() : mMsgId(0) {}
@@ -93,6 +107,26 @@ public:
      * @returns empty handle on allocation failure.
      */
     EncryptedPacketBufferHandle CloneData() { return EncryptedPacketBufferHandle(PacketBufferHandle::CloneData()); }
+
+#ifdef CHIP_ENABLE_TEST_ENCRYPTED_BUFFER_API
+    /**
+     * Extracts the (unencrypted) packet header from this encrypted packet
+     * buffer.  Returns error if a packet header cannot be extracted (e.g. if
+     * there are not enough bytes in this packet buffer).  After this call the
+     * buffer does not have a packet header.  This API is meant for
+     * unit tests only.   The CHIP_ENABLE_TEST_ENCRYPTED_BUFFER_API define
+     * should not be defined normally.
+     */
+    CHIP_ERROR ExtractPacketHeader(PacketHeader & aPacketHeader) { return aPacketHeader.DecodeAndConsume(*this); }
+
+    /**
+     * Inserts a new (unencrypted) packet header in the encrypted packet buffer
+     * based on the given PacketHeader.  This API is meant for
+     * unit tests only.   The CHIP_ENABLE_TEST_ENCRYPTED_BUFFER_API define
+     * should not be defined normally.
+     */
+    CHIP_ERROR InsertPacketHeader(const PacketHeader & aPacketHeader) { return aPacketHeader.EncodeBeforeData(*this); }
+#endif // CHIP_ENABLE_TEST_ENCRYPTED_BUFFER_API
 
 private:
     // Allow SecureSessionMgr to assign or construct us from a PacketBufferHandle
@@ -172,6 +206,15 @@ public:
     ~SecureSessionMgr() override;
 
     /**
+     *    Whether the current node initiated the pairing, or it is responding to a pairing request.
+     */
+    enum class PairingDirection
+    {
+        kInitiator, /**< We initiated the pairing request. */
+        kResponder, /**< We are responding to the pairing request. */
+    };
+
+    /**
      * @brief
      *   Send a message to a currently connected peer.
      *
@@ -207,7 +250,7 @@ public:
      *   peer node.
      */
     CHIP_ERROR NewPairing(const Optional<Transport::PeerAddress> & peerAddr, NodeId peerNodeId, PASESession * pairing,
-                          Transport::AdminId admin, Transport::Base * transport = nullptr);
+                          PairingDirection direction, Transport::AdminId admin, Transport::Base * transport = nullptr);
 
     /**
      * @brief
@@ -318,8 +361,8 @@ constexpr uint16_t kMaxFooterSize = kMaxTagLen;
  */
 inline System::PacketBufferHandle New(size_t aAvailableSize)
 {
-    static_assert(CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX > kMaxFooterSize, "inadequate capacity");
-    if (aAvailableSize > CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX - kMaxFooterSize)
+    static_assert(System::PacketBuffer::kMaxSize > kMaxFooterSize, "inadequate capacity");
+    if (aAvailableSize > System::PacketBuffer::kMaxSize - kMaxFooterSize)
     {
         return System::PacketBufferHandle();
     }

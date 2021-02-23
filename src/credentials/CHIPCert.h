@@ -39,6 +39,10 @@
 namespace chip {
 namespace Credentials {
 
+static constexpr uint32_t kKeyIdentifierLength                 = 20;
+static constexpr uint32_t kChipIdUTF8Length                    = 16;
+static constexpr uint16_t kX509NoWellDefinedExpirationDateYear = 9999;
+
 /** Data Element Tags for the CHIP Certificate
  */
 enum
@@ -61,43 +65,21 @@ enum
     // ---- Tags identifying certificate extensions (tag numbers 128 - 255) ----
     kCertificateExtensionTagsStart = 128,
     kTag_BasicConstraints          = 128, /**< [ structure ] Identifies whether the subject of the certificate is a CA. */
-    kTag_KeyUsage                  = 129, /**< [ structure ] Purpose of the key contained in the certificate. */
-    kTag_ExtendedKeyUsage          = 130, /**< [ structure ] Purposes for which the certified public key may be used. */
-    kTag_SubjectKeyIdentifier      = 131, /**< [ structure ] Information about the certificate's public key. */
-    kTag_AuthorityKeyIdentifier    = 132, /**< [ structure ] Information about the public key used to sign the certificate. */
-    kCertificateExtensionTagsEnd   = 255,
+    kTag_KeyUsage                  = 129, /**< [ unsigned int ] Bits identifying key usage, per RFC5280. */
+    kTag_ExtendedKeyUsage          = 130, /**< [ array ] Array of enumerated values giving the purposes for which
+                                             the public key can be used, per RFC5280. */
+    kTag_SubjectKeyIdentifier    = 131,   /**< [ byte string ] Identifier of the certificate's public key. */
+    kTag_AuthorityKeyIdentifier  = 132,   /**< [ byte string ] Identifier of the public key used to sign the certificate. */
+    kCertificateExtensionTagsEnd = 255,
 
     // ---- Context-specific Tags for ECDSASignature Structure ----
     kTag_ECDSASignature_r = 1, /**< [ byte string ] ECDSA r value, in ASN.1 integer encoding. */
     kTag_ECDSASignature_s = 2, /**< [ byte string ] ECDSA s value, in ASN.1 integer encoding. */
 
-    // ---- Context-specific Tags for AuthorityKeyIdentifier Structure ----
-    kTag_AuthorityKeyIdentifier_Critical = 1,      /**< [ boolean ] True if the AuthorityKeyIdentifier extension is critical.
-                                                      Otherwise absent. */
-    kTag_AuthorityKeyIdentifier_KeyIdentifier = 2, /**< [ byte string ] Unique identifier of the issuer's public key,
-                                                      per RFC5280. */
-
-    // ---- Context-specific Tags for SubjectKeyIdentifier Structure ----
-    kTag_SubjectKeyIdentifier_Critical = 1,      /**< [ boolean ] True if the SubjectKeyIdentifier extension is critical.
-                                                    Otherwise absent. */
-    kTag_SubjectKeyIdentifier_KeyIdentifier = 2, /**< [ byte string ] Unique identifier for certificate's public key,
-                                                    per RFC5280. */
-
-    // ---- Context-specific Tags for KeyUsage Structure ----
-    kTag_KeyUsage_Critical = 1, /**< [ boolean ] True if the KeyUsage extension is critical. Otherwise absent. */
-    kTag_KeyUsage_KeyUsage = 2, /**< [ unsigned int ] Integer containing key usage bits, per to RFC5280. */
-
     // ---- Context-specific Tags for BasicConstraints Structure ----
-    kTag_BasicConstraints_Critical = 1,          /**< [ boolean ] True if the BasicConstraints extension is critical.
-                                                    Otherwise absent. */
-    kTag_BasicConstraints_IsCA = 2,              /**< [ boolean ] True if the certificate can be used to verify certificate
+    kTag_BasicConstraints_IsCA = 1,              /**< [ boolean ] True if the certificate can be used to verify certificate
                                                     signatures. */
-    kTag_BasicConstraints_PathLenConstraint = 3, /**< [ unsigned int ] Maximum number of subordinate intermediate certificates. */
-
-    // ---- Context-specific Tags for ExtendedKeyUsage Structure ----
-    kTag_ExtendedKeyUsage_Critical    = 1, /**< [ boolean ] True if the ExtendedKeyUsage extension is critical. Otherwise absent. */
-    kTag_ExtendedKeyUsage_KeyPurposes = 2, /**< [ array ] Array of enumerated values giving the purposes for which the public key
-                                              can be used. */
+    kTag_BasicConstraints_PathLenConstraint = 2, /**< [ unsigned int ] Maximum number of subordinate intermediate certificates. */
 };
 
 /** Identifies the purpose or application of certificate
@@ -161,10 +143,10 @@ enum class KeyUsageFlags : uint16_t
 enum class CertFlags : uint16_t
 {
     kExtPresent_BasicConstraints = 0x0001, /**< Basic constraints extension is present in the certificate. */
-    kExtPresent_KeyUsage         = 0x0002, /**< Key usage extention is present in the certificate. */
-    kExtPresent_ExtendedKeyUsage = 0x0004, /**< Extended key usage extention is present in the certificate. */
-    kExtPresent_SubjectKeyId     = 0x0008, /**< Subject key identifier extention is present in the certificate. */
-    kExtPresent_AuthKeyId        = 0x0010, /**< Authority key identifier extention is present in the certificate. */
+    kExtPresent_KeyUsage         = 0x0002, /**< Key usage extension is present in the certificate. */
+    kExtPresent_ExtendedKeyUsage = 0x0004, /**< Extended key usage extension is present in the certificate. */
+    kExtPresent_SubjectKeyId     = 0x0008, /**< Subject key identifier extension is present in the certificate. */
+    kExtPresent_AuthKeyId        = 0x0010, /**< Authority key identifier extension is present in the certificate. */
     kPathLenConstraintPresent    = 0x0020, /**< Path length constraint is present in the certificate. */
     kIsCA                        = 0x0040, /**< Indicates that certificate is a CA certificate. */
     kIsTrustAnchor               = 0x0080, /**< Indicates that certificate is a trust anchor. */
@@ -263,8 +245,8 @@ struct ChipCertificateData
     ChipDN mIssuerDN;                                    /**< Certificate Issuer DN. */
     CertificateKeyId mSubjectKeyId;                      /**< Certificate Subject public key identifier. */
     CertificateKeyId mAuthKeyId;                         /**< Certificate Authority public key identifier. */
-    uint16_t mNotBeforeDate;                             /**< Certificate validity: Not Before field. */
-    uint16_t mNotAfterDate;                              /**< Certificate validity: Not After field. */
+    uint32_t mNotBeforeTime;                             /**< Certificate validity: Not Before field. */
+    uint32_t mNotAfterTime;                              /**< Certificate validity: Not After field. */
     const uint8_t * mPublicKey;                          /**< Pointer to the certificate public key. */
     uint8_t mPublicKeyLen;                               /**< Certificate public key length. */
     uint16_t mPubKeyCurveOID;                            /**< Public key Elliptic Curve CHIP OID. */
@@ -293,7 +275,7 @@ struct ChipCertificateData
  */
 struct ValidationContext
 {
-    uint32_t mEffectiveTime;                                 /**< Current time in the CHIP Packed Certificate Time format. */
+    uint32_t mEffectiveTime;                                 /**< Current CHIP Epoch UTC time. */
     const ChipCertificateData * mTrustAnchor;                /**< Pointer to the Trust Anchor Certificate data structure. */
     const ChipCertificateData * mSigningCert;                /**< Pointer to the Signing Certificate data structure. */
     BitFlags<uint16_t, KeyUsageFlags> mRequiredKeyUsages;    /**< Key usage extensions that should be present in the
@@ -623,83 +605,31 @@ CHIP_ERROR DetermineCertType(ChipCertificateData & cert);
 
 /**
  * @brief
- *   Convert a certificate date/time (in the form of an ASN.1 universal time structure) into a packed
- *   certificate date/time.
- *
- * @details
- *   Packed certificate date/times provide a compact representation for the time values within a certificate
- *   (notBefore and notAfter) that does not require full calendar math to interpret.
- *
- *   A packed certificate date/time contains the fields of a calendar date/time--i.e. year, month, day, hour,
- *   minute, second--packed into an unsigned integer. The bit representation is organized such that
- *   ordinal comparisons of packed date/time values correspond to the natural ordering of the corresponding
- *   times.  To reduce their size, packed certificate date/times are limited to representing times that are on
- *   or after 2020/01/01 00:00:00.  When housed within a 32-bit unsigned integer, packed certificate
- *   date/times can represent times up to the year 2153.
+ *   Convert a certificate date/time (in the form of an ASN.1 universal time structure) into a CHIP Epoch UTC time.
  *
  * @note
  *   This function makes no attempt to verify the correct range of the input time other than year.
  *   Therefore callers must make sure the supplied values are valid prior to invocation.
  *
- * @param time        The calendar date/time to be converted.
- * @param packedTime  A reference to an integer that will receive packed date/time.
+ * @param asn1Time   The calendar date/time to be converted.
+ * @param epochTime  A reference to an integer that will receive CHIP Epoch UTC time.
  *
  * @retval  #CHIP_NO_ERROR                      If the input time was successfully converted.
  * @retval  #ASN1_ERROR_UNSUPPORTED_ENCODING    If the input time contained a year value that could not
- *                                              be represented in a packed certificate time value.
+ *                                              be represented in a CHIP epoch UTC time value.
  **/
-CHIP_ERROR PackCertTime(const chip::ASN1::ASN1UniversalTime & time, uint32_t & packedTime);
+CHIP_ERROR ASN1ToChipEpochTime(const chip::ASN1::ASN1UniversalTime & asn1Time, uint32_t & epochTime);
 
 /**
  * @brief
- *   Unpack a packed certificate date/time into an ASN.1 universal time structure.
+ *   Convert a CHIP epoch UTC time into an ASN.1 universal time structure.
  *
- * @param packedTime  A packed certificate time to be unpacked.
- * @param time        A reference to an ASN1UniversalTime structure to receive the unpacked date/time.
+ * @param epochTime  A CHIP epoch UTC time to be converted.
+ * @param asn1Time   A reference to an ASN1UniversalTime structure to receive the date/time.
  *
- * @retval  #CHIP_NO_ERROR                      If the input time was successfully unpacked.
+ * @retval  #CHIP_NO_ERROR                      If the input time was successfully converted.
  */
-CHIP_ERROR UnpackCertTime(uint32_t packedTime, chip::ASN1::ASN1UniversalTime & time);
-
-/**
- * @brief
- *   Convert a packed certificate date/time to a packed certificate date.
- *
- * @details
- *   A packed certificate date contains the fields of a calendar date--year, month, day--packed into an
- *   unsigned integer.  The bits are organized such that ordinal comparisons of packed date values
- *   correspond to the natural ordering of the corresponding dates.  To reduce their size, packed
- *   certificate dates are limited to representing dates on or after 2020/01/01.  When housed within
- *   a 16-bit unsigned integer, packed certificate dates can represent dates up to the year 2196.
- *
- * @param packedTime  The packed certificate date/time to be converted.
- *
- * @return A corresponding packed certificate date.
- **/
-uint16_t PackedCertTimeToDate(uint32_t packedTime);
-
-/**
- * @brief
- *   Convert a packed certificate date to a corresponding packed certificate date/time, where
- *   the time portion of the value is set to 00:00:00.
- *
- * @param packedDate  The packed certificate date to be converted.
- *
- * @return  A corresponding packed certificate date/time.
- **/
-uint32_t PackedCertDateToTime(uint16_t packedDate);
-
-/**
- * @brief
- *   Convert the number of seconds since 1970-01-01 00:00:00 UTC to a packed certificate date/time.
- *
- * @param secondsSinceEpoch  Number of seconds since 1970-01-01 00:00:00 UTC.
- *                           Note: this value is compatible with *positive* values
- *                           of the POSIX time_t value, up to the year 2105.
- *
- * @return  A corresponding packed certificate date/time.
- **/
-uint32_t SecondsSinceEpochToPackedCertTime(uint32_t secondsSinceEpoch);
+CHIP_ERROR ChipEpochToASN1Time(uint32_t epochTime, chip::ASN1::ASN1UniversalTime & asn1Time);
 
 /**
  *  @return  True if the OID represents a CHIP-defined X.509 distinguished named attribute.

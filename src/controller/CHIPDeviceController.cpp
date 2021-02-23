@@ -332,6 +332,10 @@ exit:
     {
         chip::Platform::MemoryFree(buffer);
     }
+    if (err != CHIP_NO_ERROR && device != nullptr)
+    {
+        ReleaseDevice(device);
+    }
     return err;
 }
 
@@ -449,6 +453,17 @@ void DeviceController::ReleaseDevice(uint16_t index)
     if (index < kNumMaxActiveDevices)
     {
         ReleaseDevice(&mActiveDevices[index]);
+    }
+}
+
+void DeviceController::ReleaseDeviceById(NodeId remoteDeviceId)
+{
+    for (uint16_t i = 0; i < kNumMaxActiveDevices; i++)
+    {
+        if (mActiveDevices[i].GetDeviceId() == remoteDeviceId)
+        {
+            ReleaseDevice(&mActiveDevices[i]);
+        }
     }
 }
 
@@ -637,8 +652,7 @@ CHIP_ERROR DeviceCommissioner::PairTestDeviceWithoutSecurity(NodeId remoteDevice
     VerifyOrExit(mState == State::Initialized, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mDeviceBeingPaired == kNumMaxActiveDevices, err = CHIP_ERROR_INCORRECT_STATE);
 
-    testSecurePairingSecret = chip::Platform::New<SecurePairingUsingTestSecret>(Optional<NodeId>::Value(remoteDeviceId),
-                                                                                static_cast<uint16_t>(0), static_cast<uint16_t>(0));
+    testSecurePairingSecret = chip::Platform::New<SecurePairingUsingTestSecret>();
     VerifyOrExit(testSecurePairingSecret != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     mDeviceBeingPaired = GetInactiveDeviceIndex();
@@ -672,6 +686,7 @@ exit:
 
     return err;
 }
+
 CHIP_ERROR DeviceCommissioner::StopPairing(NodeId remoteDeviceId)
 {
     CHIP_ERROR err  = CHIP_NO_ERROR;
@@ -703,9 +718,11 @@ CHIP_ERROR DeviceCommissioner::UnpairDevice(NodeId remoteDeviceId)
     if (mStorageDelegate != nullptr)
     {
         PERSISTENT_KEY_OP(remoteDeviceId, kPairedDeviceKeyPrefix, key, mStorageDelegate->DeleteKeyValue(key));
-        mPairedDevices.Remove(remoteDeviceId);
-        mPairedDevicesUpdated = true;
     }
+
+    mPairedDevices.Remove(remoteDeviceId);
+    mPairedDevicesUpdated = true;
+    ReleaseDeviceById(remoteDeviceId);
 
     return CHIP_NO_ERROR;
 }
@@ -732,8 +749,9 @@ void DeviceCommissioner::RendezvousCleanup(CHIP_ERROR status)
         // method to get access to the device, which will fetch
         // the device information from the persistent storage.
         DeviceController::ReleaseDevice(mDeviceBeingPaired);
-        mDeviceBeingPaired = kNumMaxActiveDevices;
     }
+
+    mDeviceBeingPaired = kNumMaxActiveDevices;
 }
 
 void DeviceCommissioner::OnRendezvousError(CHIP_ERROR err)

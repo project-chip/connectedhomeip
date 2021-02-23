@@ -25,10 +25,9 @@ from __future__ import absolute_import
 import abc
 import optparse
 import shlex
-import six
 
 
-class ChipBleBase(six.with_metaclass(abc.ABCMeta, object)):
+class ChipBleBase(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def scan(self, line):
         """ API to initiatae BLE scanning for -t user_timeout seconds."""

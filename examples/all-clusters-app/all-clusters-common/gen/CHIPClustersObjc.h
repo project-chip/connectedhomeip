@@ -275,6 +275,23 @@ NS_ASSUME_NONNULL_END
 
 NS_ASSUME_NONNULL_BEGIN
 
+@interface CHIPContentLaunch : NSObject
+
+- (nullable instancetype)initWithDevice:(CHIPDevice *)device endpoint:(uint8_t)endpoint queue:(dispatch_queue_t)queue;
+- (BOOL)launchContent:(ResponseHandler)completionHandler;
+- (BOOL)launchURL:(ResponseHandler)completionHandler;
+
+- (BOOL)readAttributeClusterRevision:(ResponseHandler)completionHandler;
+
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
+@end
+
+NS_ASSUME_NONNULL_END
+
+NS_ASSUME_NONNULL_BEGIN
+
 @interface CHIPDoorLock : NSObject
 
 - (nullable instancetype)initWithDevice:(CHIPDevice *)device endpoint:(uint8_t)endpoint queue:(dispatch_queue_t)queue;
@@ -441,6 +458,32 @@ NS_ASSUME_NONNULL_BEGIN
                                 change:(uint8_t)change
                      completionHandler:(ResponseHandler)completionHandler;
 - (BOOL)reportAttributeCurrentLevel:(ResponseHandler)reportHandler;
+- (BOOL)readAttributeClusterRevision:(ResponseHandler)completionHandler;
+
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
+@end
+
+NS_ASSUME_NONNULL_END
+
+NS_ASSUME_NONNULL_BEGIN
+
+@interface CHIPMediaPlayback : NSObject
+
+- (nullable instancetype)initWithDevice:(CHIPDevice *)device endpoint:(uint8_t)endpoint queue:(dispatch_queue_t)queue;
+- (BOOL)fastForwardRequest:(ResponseHandler)completionHandler;
+- (BOOL)nextRequest:(ResponseHandler)completionHandler;
+- (BOOL)pauseRequest:(ResponseHandler)completionHandler;
+- (BOOL)playRequest:(ResponseHandler)completionHandler;
+- (BOOL)previousRequest:(ResponseHandler)completionHandler;
+- (BOOL)rewindRequest:(ResponseHandler)completionHandler;
+- (BOOL)skipBackwardRequest:(ResponseHandler)completionHandler;
+- (BOOL)skipForwardRequest:(ResponseHandler)completionHandler;
+- (BOOL)startOverRequest:(ResponseHandler)completionHandler;
+- (BOOL)stopRequest:(ResponseHandler)completionHandler;
+
+- (BOOL)readAttributeCurrentState:(ResponseHandler)completionHandler;
 - (BOOL)readAttributeClusterRevision:(ResponseHandler)completionHandler;
 
 - (instancetype)init NS_UNAVAILABLE;

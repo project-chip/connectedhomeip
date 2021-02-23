@@ -32,6 +32,7 @@
 #include <app/util/basic-types.h>
 #include <core/CHIPCallback.h>
 #include <core/CHIPCore.h>
+#include <setup_payload/SetupPayload.h>
 #include <support/Base64.h>
 #include <support/DLLUtil.h>
 #include <transport/PASESession.h>
@@ -69,6 +70,13 @@ public:
             mCommandSender = nullptr;
         }
     }
+
+    enum class PairingWindowOption
+    {
+        kOriginalSetupCode,
+        kTokenWithRandomPIN,
+        kTokenWithProvidedPIN,
+    };
 
     /**
      * @brief
@@ -233,6 +241,25 @@ public:
 
     /**
      * @brief
+     *   Trigger a paired device to re-enter the pairing mode. If an onboarding token is provided, the device will use
+     *   the provided setup PIN code and the discriminator to advertise itself for pairing availability. If the token
+     *   is not provided, the device will use the manufacturer assigned setup PIN code and discriminator.
+     *
+     *   The device will exit the pairing mode after a successful pairing, or after the given `timeout` time.
+     *
+     * @param[in] timeout         The pairing mode should terminate after this much time.
+     * @param[in] option          The pairing window can be opened using the original setup code, or an
+     *                            onboarding token can be generated using a random setup PIN code (or with
+     *                            the PIN code provied in the setupPayload). This argument selects one of these
+     *                            methods.
+     * @param[out] setupPayload   The setup payload corresponding to the generated onboarding token.
+     *
+     * @return CHIP_ERROR               CHIP_NO_ERROR on success, or corresponding error
+     */
+    CHIP_ERROR OpenPairingWindow(uint32_t timeout, PairingWindowOption option, SetupPayload & setupPayload);
+
+    /**
+     * @brief
      *   Return whether the current device object is actively associated with a paired CHIP
      *   device. An active object can be used to communicate with the corresponding device.
      */
@@ -354,6 +381,14 @@ public:
      * @param[in] msg Received message buffer.
      */
     virtual void OnMessage(System::PacketBufferHandle msg) = 0;
+
+    /**
+     * @brief
+     *   Called when response to OpenPairingWindow is received from the device.
+     *
+     * @param[in] status CHIP_NO_ERROR on success, or corresponding error.
+     */
+    virtual void OnPairingWindowOpenStatus(CHIP_ERROR status){};
 
     /**
      * @brief

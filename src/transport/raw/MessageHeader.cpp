@@ -32,6 +32,7 @@
 #include <core/CHIPError.h>
 #include <support/BufferReader.h>
 #include <support/CodeUtils.h>
+#include <support/ReturnMacros.h>
 
 /**********************************************
  * Header format (little endian):
@@ -63,7 +64,7 @@ namespace {
 using namespace chip::Encoding;
 
 /// size of the fixed portion of the header
-constexpr size_t kFixedUnencryptedHeaderSizeBytes = 10;
+constexpr size_t kFixedUnencryptedHeaderSizeBytes = 8;
 
 /// size of the encrypted portion of the header
 constexpr size_t kEncryptedHeaderSizeBytes = 6;
@@ -188,7 +189,7 @@ CHIP_ERROR PacketHeader::Decode(const uint8_t * const data, uint16_t size, uint1
         mDestinationNodeId.ClearValue();
     }
 
-    err = reader.Read16(&mEncryptionKeyID).Read16(&mPayloadLength).StatusCode();
+    err = reader.Read16(&mEncryptionKeyID).StatusCode();
     SuccessOrExit(err);
 
     octets_read = reader.OctetsRead();
@@ -198,6 +199,14 @@ CHIP_ERROR PacketHeader::Decode(const uint8_t * const data, uint16_t size, uint1
 exit:
 
     return err;
+}
+
+CHIP_ERROR PacketHeader::DecodeAndConsume(const System::PacketBufferHandle & buf)
+{
+    uint16_t headerSize = 0;
+    ReturnErrorOnFailure(Decode(buf->Start(), buf->DataLength(), &headerSize));
+    buf->ConsumeHead(headerSize);
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR PayloadHeader::Decode(const uint8_t * const data, uint16_t size, uint16_t * decode_len)
@@ -248,6 +257,14 @@ exit:
     return err;
 }
 
+CHIP_ERROR PayloadHeader::DecodeAndConsume(const System::PacketBufferHandle & buf)
+{
+    uint16_t headerSize = 0;
+    ReturnErrorOnFailure(Decode(buf->Start(), buf->DataLength(), &headerSize));
+    buf->ConsumeHead(headerSize);
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR PacketHeader::Encode(uint8_t * data, uint16_t size, uint16_t * encode_size) const
 {
     CHIP_ERROR err  = CHIP_NO_ERROR;
@@ -278,7 +295,6 @@ CHIP_ERROR PacketHeader::Encode(uint8_t * data, uint16_t size, uint16_t * encode
     }
 
     LittleEndian::Write16(p, mEncryptionKeyID);
-    LittleEndian::Write16(p, mPayloadLength);
 
     // Written data size provided to caller on success
     VerifyOrExit(p - data == EncodeSizeBytes(), err = CHIP_ERROR_INTERNAL);
@@ -286,6 +302,19 @@ CHIP_ERROR PacketHeader::Encode(uint8_t * data, uint16_t size, uint16_t * encode
 
 exit:
     return err;
+}
+
+CHIP_ERROR PacketHeader::EncodeBeforeData(const System::PacketBufferHandle & buf) const
+{
+    // Note: PayloadHeader::EncodeBeforeData probably needs changes if you
+    // change anything here.
+    uint16_t headerSize = EncodeSizeBytes();
+    VerifyOrReturnError(buf->EnsureReservedSize(headerSize), CHIP_ERROR_NO_MEMORY);
+    buf->SetStart(buf->Start() - headerSize);
+    uint16_t actualEncodedHeaderSize;
+    ReturnErrorOnFailure(EncodeAtStart(buf, &actualEncodedHeaderSize));
+    VerifyOrReturnError(actualEncodedHeaderSize == headerSize, CHIP_ERROR_INTERNAL);
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR PayloadHeader::Encode(uint8_t * data, uint16_t size, uint16_t * encode_size) const
@@ -315,6 +344,19 @@ CHIP_ERROR PayloadHeader::Encode(uint8_t * data, uint16_t size, uint16_t * encod
 
 exit:
     return err;
+}
+
+CHIP_ERROR PayloadHeader::EncodeBeforeData(const System::PacketBufferHandle & buf) const
+{
+    // Note: PacketHeader::EncodeBeforeData probably needs changes if you change
+    // anything here.
+    uint16_t headerSize = EncodeSizeBytes();
+    VerifyOrReturnError(buf->EnsureReservedSize(headerSize), CHIP_ERROR_NO_MEMORY);
+    buf->SetStart(buf->Start() - headerSize);
+    uint16_t actualEncodedHeaderSize;
+    ReturnErrorOnFailure(EncodeAtStart(buf, &actualEncodedHeaderSize));
+    VerifyOrReturnError(actualEncodedHeaderSize == headerSize, CHIP_ERROR_INTERNAL);
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR MessageAuthenticationCode::Decode(const PacketHeader & packetHeader, const uint8_t * const data, uint16_t size,
