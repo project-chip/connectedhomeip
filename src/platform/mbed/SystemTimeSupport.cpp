@@ -29,6 +29,9 @@
 #include <support/logging/CHIPLogging.h>
 
 #include <Kernel.h>
+#include <sys/time.h>
+
+#include <inttypes.h>
 
 namespace chip {
 namespace System {
