@@ -28,6 +28,7 @@ source_set("all-clusters-common") {
     "${chip_root}/src/app/clusters/bindings/bindings.cpp",
     "${chip_root}/src/app/clusters/color-control-server/color-control-server.cpp",
     "${chip_root}/src/app/clusters/content-launch-server/content-launch-server.cpp",
+    "${chip_root}/src/app/clusters/descriptor/descriptor.cpp",
     "${chip_root}/src/app/clusters/door-lock-server/door-lock-server-core.cpp",
     "${chip_root}/src/app/clusters/door-lock-server/door-lock-server-logging.cpp",
     "${chip_root}/src/app/clusters/door-lock-server/door-lock-server-schedule.cpp",
