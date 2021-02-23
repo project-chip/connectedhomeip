@@ -166,7 +166,7 @@ static CHIP_ERROR RestoreAllSessionsFromKVS(SecureSessionMgr & sessionMgr, Rende
                         CHIP_NO_ERROR);
     ChipLogProgress(AppServer, "Found %d stored connections", nextSessionKeyId);
 
-    PASESession * session = static_cast<PASESession *>(chip::Platform::MemoryAlloc(sizeof(PASESession)));
+    PASESession * session = chip::Platform::New<PASESession>();
     VerifyOrReturnError(session != nullptr, CHIP_ERROR_NO_MEMORY);
 
     for (uint16_t keyId = 0; keyId < nextSessionKeyId; keyId++)
@@ -184,7 +184,7 @@ static CHIP_ERROR RestoreAllSessionsFromKVS(SecureSessionMgr & sessionMgr, Rende
         }
     }
 
-    chip::Platform::MemoryFree(session);
+    chip::Platform::Delete(session);
 
     server.GetRendezvousSession()->SetNextKeyId(nextSessionKeyId);
     return CHIP_NO_ERROR;
