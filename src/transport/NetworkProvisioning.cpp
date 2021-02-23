@@ -194,9 +194,7 @@ CHIP_ERROR NetworkProvisioning::SendIPAddress(const Inet::IPAddress & addr)
 
 exit:
     if (CHIP_NO_ERROR != err)
-    {
         ChipLogError(NetworkProvisioning, "Failed in sending IP address. error %s\n", ErrorStr(err));
-    }
     return err;
 }
 
@@ -242,9 +240,7 @@ CHIP_ERROR NetworkProvisioning::SendNetworkCredentials(const char * ssid, const 
 
 exit:
     if (CHIP_NO_ERROR != err)
-    {
         ChipLogError(NetworkProvisioning, "Failed in sending Network Creds. error %s\n", ErrorStr(err));
-    }
     return err;
 }
 
@@ -285,9 +281,7 @@ CHIP_ERROR NetworkProvisioning::SendThreadCredentials(const DeviceLayer::Interna
 
 exit:
     if (CHIP_NO_ERROR != err)
-    {
         ChipLogError(NetworkProvisioning, "Failed to send Thread Credentials: %s", ErrorStr(err));
-    }
     return err;
 }
 
