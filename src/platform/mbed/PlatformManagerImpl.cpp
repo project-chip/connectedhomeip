@@ -105,7 +105,8 @@ CHIP_ERROR PlatformManagerImpl::_StartChipTimer(int64_t durationMS)
 
     VerifyOrExit(mInitialized == true, err = CHIP_ERROR_INCORRECT_STATE);
 
-    event = mQueue.call_in(std::chrono::milliseconds(durationMS), [this] {
+    // HandlePlatformTimer() is supported only when LwIP enabled
+    /*event = mQueue.call_in(std::chrono::milliseconds(durationMS), [this] {
         LockChipStack();
         auto err = SystemLayer.HandlePlatformTimer();
         if (err != CHIP_SYSTEM_NO_ERROR)
@@ -116,6 +117,7 @@ CHIP_ERROR PlatformManagerImpl::_StartChipTimer(int64_t durationMS)
     });
 
     VerifyOrExit(event != 0, err = CHIP_ERROR_NO_MEMORY);
+    */
 
 exit:
     return err;
