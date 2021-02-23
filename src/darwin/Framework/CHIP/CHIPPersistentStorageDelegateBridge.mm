@@ -39,14 +39,14 @@ void CHIPPersistentStorageDelegateBridge::setFrameworkDelegate(id<CHIPPersistent
     });
 }
 
-void CHIPPersistentStorageDelegateBridge::SetDelegate(chip::Controller::PersistentStorageResultDelegate * delegate)
+void CHIPPersistentStorageDelegateBridge::SetDelegate(chip::PersistentStorageResultDelegate * delegate)
 {
     dispatch_async(mWorkQueue, ^{
         if (delegate) {
             mCallback = delegate;
 
             mCompletionHandler = ^(NSString * key, NSString * value) {
-                chip::Controller::PersistentStorageResultDelegate * callback = mCallback;
+                chip::PersistentStorageResultDelegate * callback = mCallback;
                 if (callback) {
                     dispatch_async(mWorkQueue, ^{
                         callback->OnValue([key UTF8String], [value UTF8String]);
@@ -55,20 +55,20 @@ void CHIPPersistentStorageDelegateBridge::SetDelegate(chip::Controller::Persiste
             };
 
             mSetStatusHandler = ^(NSString * key, NSError * status) {
-                chip::Controller::PersistentStorageResultDelegate * callback = mCallback;
+                chip::PersistentStorageResultDelegate * callback = mCallback;
                 if (callback) {
                     dispatch_async(mWorkQueue, ^{
-                        callback->OnStatus([key UTF8String], chip::Controller::PersistentStorageResultDelegate::Operation::kSET,
+                        callback->OnStatus([key UTF8String], chip::PersistentStorageResultDelegate::Operation::kSET,
                             [CHIPError errorToCHIPErrorCode:status]);
                     });
                 }
             };
 
             mDeleteStatusHandler = ^(NSString * key, NSError * status) {
-                chip::Controller::PersistentStorageResultDelegate * callback = mCallback;
+                chip::PersistentStorageResultDelegate * callback = mCallback;
                 if (callback) {
                     dispatch_async(mWorkQueue, ^{
-                        callback->OnStatus([key UTF8String], chip::Controller::PersistentStorageResultDelegate::Operation::kDELETE,
+                        callback->OnStatus([key UTF8String], chip::PersistentStorageResultDelegate::Operation::kDELETE,
                             [CHIPError errorToCHIPErrorCode:status]);
                     });
                 }

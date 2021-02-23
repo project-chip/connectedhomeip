@@ -23,12 +23,14 @@
 #include <app/server/SessionManager.h>
 
 #include <ble/BLEEndPoint.h>
+#include <core/CHIPPersistentStorageDelegate.h>
 #include <inet/IPAddress.h>
 #include <inet/InetError.h>
 #include <inet/InetLayer.h>
 #include <mdns/Advertiser.h>
 #include <messaging/ExchangeMgr.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/KeyValueStoreManager.h>
 #include <setup_payload/SetupPayload.h>
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
@@ -39,6 +41,7 @@
 #include <system/TLVPacketBufferBackingStore.h>
 #include <transport/AdminPairingTable.h>
 #include <transport/SecureSessionMgr.h>
+#include <transport/StorablePeerConnection.h>
 
 using namespace ::chip;
 using namespace ::chip::Inet;
@@ -68,6 +71,133 @@ constexpr bool useTestPairing()
     // any way to communicate with the device using CHIP protocol.
     return isRendezvousBypassed();
 #endif
+}
+
+class ServerStorageDelegate : public PersistentStorageDelegate
+{
+    void SetDelegate(PersistentStorageResultDelegate * delegate) override
+    {
+        ChipLogError(AppServer, "ServerStorageDelegate does not support async operations");
+        chipDie();
+    }
+
+    void GetKeyValue(const char * key) override
+    {
+        ChipLogError(AppServer, "ServerStorageDelegate does not support async operations");
+        chipDie();
+    }
+
+    void SetKeyValue(const char * key, const char * value) override
+    {
+        ChipLogError(AppServer, "ServerStorageDelegate does not support async operations");
+        chipDie();
+    }
+
+    CHIP_ERROR GetKeyValue(const char * key, void * buffer, uint16_t & size) override
+    {
+        return PersistedStorage::KeyValueStoreMgr().Get(key, buffer, size);
+    }
+
+    CHIP_ERROR SetKeyValue(const char * key, const void * value, uint16_t size) override
+    {
+        return PersistedStorage::KeyValueStoreMgr().Put(key, value, size);
+    }
+
+    void DeleteKeyValue(const char * key) override { PersistedStorage::KeyValueStoreMgr().Delete(key); }
+};
+
+ServerStorageDelegate gServerStorage;
+
+CHIP_ERROR PersistAdminPairingToKVS(AdminPairingInfo * admin, AdminId nextAvailableId)
+{
+    ReturnErrorCodeIf(admin == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    ChipLogProgress(AppServer, "Persisting admin ID %d, next available %d", admin->GetAdminId(), nextAvailableId);
+
+    ReturnErrorOnFailure(admin->StoreIntoKVS(gServerStorage));
+    ReturnErrorOnFailure(PersistedStorage::KeyValueStoreMgr().Put(kAdminTableCountKey, &nextAvailableId, sizeof(nextAvailableId)));
+
+    ChipLogProgress(AppServer, "Persisting admin ID successfully");
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR RestoreAllAdminPairingsFromKVS(AdminPairingTable & adminPairings, AdminId & nextAvailableId)
+{
+    // It's not an error if the key doesn't exist. Just return right away.
+    VerifyOrReturnError(PersistedStorage::KeyValueStoreMgr().Get(kAdminTableCountKey, &nextAvailableId) == CHIP_NO_ERROR,
+                        CHIP_NO_ERROR);
+    ChipLogProgress(AppServer, "Next available admin ID is %d", nextAvailableId);
+
+    // TODO: The admin ID space allocation should be re-evaluated. With the current approach, the space could be
+    //       exhausted while IDs are still available (e.g. if the admin IDs are allocated and freed over a period of time).
+    //       Also, the current approach can make ID lookup slower as more IDs are allocated and freed.
+    for (AdminId id = 0; id < nextAvailableId; id++)
+    {
+        AdminPairingInfo * admin = adminPairings.AssignAdminId(id);
+        // Recreate the binding if one exists in persistent storage. Else skip to the next ID
+        if (admin->FetchFromKVS(gServerStorage) != CHIP_NO_ERROR)
+        {
+            adminPairings.ReleaseAdminId(id);
+        }
+        else
+        {
+            ChipLogProgress(AppServer, "Found admin pairing for %d, node ID %llu", admin->GetAdminId(), admin->GetNodeId());
+        }
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+void EraseAllAdminPairingsUpTo(AdminId nextAvailableId)
+{
+    PersistedStorage::KeyValueStoreMgr().Delete(kAdminTableCountKey);
+
+    for (AdminId id = 0; id < nextAvailableId; id++)
+    {
+        AdminPairingInfo::DeleteFromKVS(gServerStorage, id);
+    }
+}
+
+static CHIP_ERROR RestoreAllSessionsFromKVS(SecureSessionMgr & sessionMgr, RendezvousServer & server)
+{
+    uint16_t nextSessionKeyId = 0;
+    // It's not an error if the key doesn't exist. Just return right away.
+    VerifyOrReturnError(PersistedStorage::KeyValueStoreMgr().Get(kStorablePeerConnectionCountKey, &nextSessionKeyId) ==
+                            CHIP_NO_ERROR,
+                        CHIP_NO_ERROR);
+    ChipLogProgress(AppServer, "Found %d stored connections", nextSessionKeyId);
+
+    PASESession * session = static_cast<PASESession *>(chip::Platform::MemoryAlloc(sizeof(PASESession)));
+    VerifyOrReturnError(session != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    for (uint16_t keyId = 0; keyId < nextSessionKeyId; keyId++)
+    {
+        StorablePeerConnection connection;
+        if (CHIP_NO_ERROR == connection.FetchFromKVS(gServerStorage, keyId))
+        {
+            connection.GetPASESession(session);
+
+            ChipLogProgress(AppServer, "Fetched the session information: from %llu", session->PeerConnection().GetPeerNodeId());
+            sessionMgr.NewPairing(Optional<Transport::PeerAddress>::Value(session->PeerConnection().GetPeerAddress()),
+                                  session->PeerConnection().GetPeerNodeId(), session,
+                                  SecureSessionMgr::PairingDirection::kResponder, connection.GetAdminId(), nullptr);
+            session->Clear();
+        }
+    }
+
+    chip::Platform::MemoryFree(session);
+
+    server.GetRendezvousSession()->SetNextKeyId(nextSessionKeyId);
+    return CHIP_NO_ERROR;
+}
+
+void EraseAllSessionsUpTo(uint16_t nextSessionKeyId)
+{
+    PersistedStorage::KeyValueStoreMgr().Delete(kStorablePeerConnectionCountKey);
+
+    for (uint16_t keyId = 0; keyId < nextSessionKeyId; keyId++)
+    {
+        StorablePeerConnection::DeleteFromKVS(gServerStorage, keyId);
+    }
 }
 
 // TODO: The following class is setting the discriminator in Persistent Storage. This is
@@ -108,6 +238,8 @@ private:
 };
 
 DeviceDiscriminatorCache gDeviceDiscriminatorCache;
+AdminPairingTable gAdminPairings;
+AdminId gNextAvailableAdminId = 0;
 
 class ServerRendezvousAdvertisementDelegate : public RendezvousAdvertisementDelegate
 {
@@ -126,24 +258,31 @@ public:
         gDeviceDiscriminatorCache.RestoreDiscriminator();
 
         ReturnErrorOnFailure(chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(false));
-        if (mDelegate != nullptr)
         {
-            mDelegate->OnPairingWindowClosed();
+            if (mDelegate != nullptr)
+                mDelegate->OnPairingWindowClosed();
+        }
+
+        AdminPairingInfo * admin = gAdminPairings.FindAdmin(mAdmin);
+        if (admin != nullptr)
+        {
+            ReturnErrorOnFailure(PersistAdminPairingToKVS(admin, gNextAvailableAdminId));
         }
         return CHIP_NO_ERROR;
     }
 
     void SetDelegate(AppDelegate * delegate) { mDelegate = delegate; }
 
+    void SetAdminId(AdminId id) { mAdmin = id; }
+
 private:
     AppDelegate * mDelegate = nullptr;
+    AdminId mAdmin;
 };
 
 DemoTransportMgr gTransports;
 SecureSessionMgr gSessions;
 RendezvousServer gRendezvousServer;
-AdminPairingTable gAdminPairings;
-AdminId gNextAvailableAdminId = 0;
 
 ServerRendezvousAdvertisementDelegate gAdvDelegate;
 
@@ -167,7 +306,7 @@ static CHIP_ERROR OpenPairingWindowUsingVerifier(uint16_t discriminator, PASEVer
     VerifyOrReturnError(adminInfo != nullptr, CHIP_ERROR_NO_MEMORY);
     gNextAvailableAdminId++;
 
-    return gRendezvousServer.Init(std::move(params), &gTransports, &gSessions, adminInfo);
+    return gRendezvousServer.WaitForPairing(std::move(params), &gTransports, &gSessions, adminInfo);
 }
 
 class ServerCallback : public SecureSessionMgrDelegate
@@ -357,6 +496,9 @@ CHIP_ERROR OpenDefaultPairingWindow(ResetAdmins resetAdmins)
 
     if (resetAdmins == ResetAdmins::kYes)
     {
+        uint16_t nextKeyId = gRendezvousServer.GetRendezvousSession()->GetNextKeyId();
+        EraseAllAdminPairingsUpTo(gNextAvailableAdminId);
+        EraseAllSessionsUpTo(nextKeyId);
         gNextAvailableAdminId = 0;
         gAdminPairings.Reset();
     }
@@ -366,7 +508,7 @@ CHIP_ERROR OpenDefaultPairingWindow(ResetAdmins resetAdmins)
     VerifyOrReturnError(adminInfo != nullptr, CHIP_ERROR_NO_MEMORY);
     gNextAvailableAdminId++;
 
-    return gRendezvousServer.Init(std::move(params), &gTransports, &gSessions, adminInfo);
+    return gRendezvousServer.WaitForPairing(std::move(params), &gTransports, &gSessions, adminInfo);
 }
 
 // The function will initialize datamodel handler and then start the server
@@ -376,9 +518,14 @@ void InitServer(AppDelegate * delegate)
     CHIP_ERROR err = CHIP_NO_ERROR;
     Optional<Transport::PeerAddress> peer(Transport::Type::kUndefined);
 
+    chip::Platform::MemoryInit();
+
     InitDataModelHandler();
     gCallbacks.SetDelegate(delegate);
-    gRendezvousServer.SetDelegate(delegate);
+
+    err = gRendezvousServer.Init(delegate, &gServerStorage);
+    SuccessOrExit(err);
+
     gAdvDelegate.SetDelegate(delegate);
 
     // Init transport before operations with secure session mgr.
@@ -423,6 +570,13 @@ void InitServer(AppDelegate * delegate)
         // If the network is already provisioned, proactively disable BLE advertisement.
         ChipLogProgress(AppServer, "Network already provisioned. Disabling BLE advertisement");
         chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(false);
+
+        // Restore any previous admin pairings
+        VerifyOrExit(CHIP_NO_ERROR == RestoreAllAdminPairingsFromKVS(gAdminPairings, gNextAvailableAdminId),
+                     ChipLogError(AppServer, "Could not restore admin table"));
+
+        VerifyOrExit(CHIP_NO_ERROR == RestoreAllSessionsFromKVS(gSessions, gRendezvousServer),
+                     ChipLogError(AppServer, "Could not restore previous sessions"));
     }
     else
     {
