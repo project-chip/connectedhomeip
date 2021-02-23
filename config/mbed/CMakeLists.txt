@@ -121,6 +121,10 @@ list(APPEND CHIP_CFLAGS_C ${CMAKE_C_FLAGS_INIT})
 mbed_get_lang_compile_flags(CHIP_CFLAGS_CC mbed-core CXX)
 list(APPEND CHIP_CFLAGS_CC ${CMAKE_CXX_FLAGS_INIT})
 
+# Add support for Mbed BLE
+mbed_get_target_common_compile_flags(CHIP_MBEDBLE_CFLAGS mbed-ble)
+list(APPEND CHIP_CFLAGS ${CHIP_MBEDBLE_CFLAGS})
+
 # Add support for Mbed event 
 mbed_get_target_common_compile_flags(CHIP_MBEDEVENTS_CFLAGS mbed-events)
 list(APPEND CHIP_CFLAGS ${CHIP_MBEDEVENTS_CFLAGS})
