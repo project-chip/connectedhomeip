@@ -1277,6 +1277,7 @@ static void UpdateAdditionalDataCharacteristic(BluezGattCharacteristic1 * charac
 
     // Construct the TLV for the additional data
     GVariant * cValue = nullptr;
+    gpointer data;
     CHIP_ERROR err    = CHIP_NO_ERROR;
     chip::System::PacketBufferHandle bufferHandle;
 
@@ -1298,8 +1299,9 @@ static void UpdateAdditionalDataCharacteristic(BluezGattCharacteristic1 * charac
                                                                          bufferHandle, additionalDataFields);
     SuccessOrExit(err);
 
-    cValue = g_variant_new_from_data(G_VARIANT_TYPE("ay"), bufferHandle->Start(), bufferHandle->DataLength(), TRUE, g_free,
-                                     g_memdup(bufferHandle->Start(), bufferHandle->DataLength()));
+    data = g_memdup(bufferHandle->Start(), bufferHandle->DataLength());
+
+    cValue = g_variant_new_from_data(G_VARIANT_TYPE("ay"), data, bufferHandle->DataLength(), TRUE, g_free, data);
     bluez_gatt_characteristic1_set_value(characteristic, cValue);
 
     return;
