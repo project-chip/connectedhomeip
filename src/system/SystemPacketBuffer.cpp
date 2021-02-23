@@ -505,7 +505,9 @@ PacketBuffer * PacketBuffer::BuildFreeList()
         lHead                  = lCursor;
     }
 
+#if !CHIP_SYSTEM_CONFIG_NO_LOCKING
     Mutex::Init(sBufferPoolMutex);
+#endif
 
     return lHead;
 }
