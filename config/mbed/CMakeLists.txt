@@ -161,6 +161,9 @@ endif()
 
 # Set up CHIP project configuration file
 
+set(CHIP_DEFAULT_CONFIG_FILE "<${CHIP_ROOT}/config/mbed/CHIPProjectConfig.h>")
+set(CHIP_PROJECT_CONFIG         ${CHIP_DEFAULT_CONFIG_FILE})
+
 if (CONFIG_CHIP_PROJECT_CONFIG)
     get_filename_component(CHIP_PROJECT_CONFIG 
         ${CONFIG_CHIP_PROJECT_CONFIG}
@@ -168,8 +171,6 @@ if (CONFIG_CHIP_PROJECT_CONFIG)
         BASE_DIR ${CMAKE_SOURCE_DIR}
     )
     set(CHIP_PROJECT_CONFIG "<${CHIP_PROJECT_CONFIG}>")
-else()
-    set(CHIP_PROJECT_CONFIG "")
 endif()
 
 if (${CMAKE_BUILD_TYPE} STREQUAL "debug")
@@ -186,6 +187,7 @@ chip_gn_arg_lang_flags("target_cflags_cc"                 ${CHIP_CFLAGS_CC})
 chip_gn_arg_string("mbed_ar"                              ${CMAKE_AR})
 chip_gn_arg_string("mbed_cc"                              ${CMAKE_C_COMPILER})
 chip_gn_arg_string("mbed_cxx"                             ${CMAKE_CXX_COMPILER})
+chip_gn_arg_string("chip_project_config_include"          "${CHIP_PROJECT_CONFIG}")
 chip_gn_arg_bool  ("is_debug"                             CONFIG_DEBUG)
 chip_gn_arg_bool  ("chip_build_tests"                     CONFIG_CHIP_BUILD_TESTS)
 chip_gn_arg_bool  ("chip_build_libshell"                  CONFIG_CHIP_LIB_SHELL)
