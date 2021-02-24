@@ -95,7 +95,7 @@ void SetLogFilter(uint8_t category);
     chip::Logging::Log(chip::Logging::kLogModule_##MOD, chip::Logging::kLogCategory_Error, MSG, ##__VA_ARGS__)
 #endif
 #else
-#define ChipLogError(MOD, MSG, ...)
+#define ChipLogError(MOD, MSG, ...) ((void)0)
 #endif
 
 #ifndef CHIP_PROGRESS_LOGGING
@@ -116,7 +116,7 @@ void SetLogFilter(uint8_t category);
     chip::Logging::Log(chip::Logging::kLogModule_##MOD, chip::Logging::kLogCategory_Progress, MSG, ##__VA_ARGS__)
 #endif
 #else
-#define ChipLogProgress(MOD, MSG, ...)
+#define ChipLogProgress(MOD, MSG, ...) ((void)0)
 #endif
 
 #ifndef CHIP_DETAIL_LOGGING
@@ -137,7 +137,7 @@ void SetLogFilter(uint8_t category);
     chip::Logging::Log(chip::Logging::kLogModule_##MOD, chip::Logging::kLogCategory_Detail, MSG, ##__VA_ARGS__)
 #endif
 #else
-#define ChipLogDetail(MOD, MSG, ...)
+#define ChipLogDetail(MOD, MSG, ...) ((void)0)
 #endif
 
 #if CHIP_ERROR_LOGGING || CHIP_PROGRESS_LOGGING || CHIP_DETAIL_LOGGING

@@ -140,8 +140,9 @@ config("disabled_warnings") {
     "-Wno-missing-field-initializers",
     "-Wno-unused-parameter",
   ]
-  if (!is_debug) {
+  if (!is_debug || !chip_error_logging || !chip_progress_logging || !chip_detail_logging) {
     # assert() causes unused variable warnings in release.
+    # ChipLog uses cause unused variable warnings when logging is disabled.
     cflags += [ "-Wno-unused" ]
   }
   if (!is_clang) {
