@@ -233,7 +233,7 @@
             }
         },
         {
-            "label": "Build nRF mbed shell Example",
+            "label": "Build Mbed Shell example (NRF52840-DK)",
             "type": "shell",
             "command": "scripts/examples/mbed_example.sh",
             "args": ["-a=shell", "-b=NRF52840_DK", "-p=release"],
@@ -245,6 +245,36 @@
                     "${workspaceFolder}/examples/shell/mbed/build"
                 ]
             }
+        },
+        {
+            "label": "Build Mbed Shell example (DISCO_L475VG_IOT01A)",
+            "type": "shell",
+            "command": "scripts/examples/mbed_example.sh",
+            "args": ["-a=shell", "-b=DISCO_L475VG_IOT01A", "-p=release"],
+            "group": "build",
+            "problemMatcher": {
+                "base": "$gcc",
+                "fileLocation": [
+                    "relative",
+                    "${workspaceFolder}/examples/shell/mbed/build"
+                ]
+            }
+        },
+        {
+            "label": "Flash Mbed Shell example (NRF52840-DK)",
+            "type": "shell",
+            "command": "scripts/examples/mbed_example_utils.sh",
+            "args": ["-a=shell", "-b=NRF52840_DK"],
+            "problemMatcher": [],
+            "group": "build"
+        },
+        {
+            "label": "Flash Mbed Shell example (DISCO_L475VG_IOT01A)",
+            "type": "shell",
+            "command": "scripts/examples/mbed_example_utils.sh",
+            "args": ["-a=shell", "-b=DISCO_L475VG_IOT01A"],
+            "problemMatcher": [],
+            "group": "build"
         }
     ]
 }
