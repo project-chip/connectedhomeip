@@ -35,7 +35,6 @@ namespace Internal {
 class MainLoop
 {
 public:
-
     /// Ensure that a thread with g_main_loop_run is executing.
     CHIP_ERROR EnsureStarted();
 
