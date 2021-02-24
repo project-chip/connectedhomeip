@@ -402,6 +402,33 @@ private:
 
 #if CHIP_ENABLE_MDNS
 
+NodeId GetCurrentNodeId()
+{
+    // TODO: once operational credentials are implemented, node ID should be read from them
+    if (!ConfigurationMgr().IsFullyProvisioned())
+    {
+        ChipLogError(Discovery, "Device not fully provisioned. Node ID unknown.");
+        return chip::kTestDeviceNodeId;
+    }
+
+    // Admin pairings should have been persisted and should be loadable
+
+    // TODO: once multi-admin is decided, figure out if a single node id
+    // is sufficient or if we need multi-node-id advertisement. Existing
+    // mdns advertises a single node id as parameter.
+
+    // Search for one admin pariing and use its node id.
+    for (auto pairing = gAdminPairings.cbegin(); pairing != gAdminPairings.cend(); pairing++)
+    {
+        ChipLogProgress(Discovery, "Found admin paring for admin %" PRIX64 ", node %" PRIX64, pairing->GetAdminId(),
+                        pairing->GetNodeId());
+        return pairing->GetNodeId();
+    }
+
+    ChipLogError(Discovery, "Failed to find a valid admin pairing. Node ID unknown");
+    return chip::kTestDeviceNodeId;
+}
+
 CHIP_ERROR InitMdns()
 {
     auto & mdnsAdvertiser = Mdns::ServiceAdvertiser::Instance();
@@ -420,7 +447,7 @@ CHIP_ERROR InitMdns()
 
         const auto advertiseParameters = Mdns::OperationalAdvertisingParameters()
                                              .SetFabricId(fabricId)
-                                             .SetNodeId(chip::kTestDeviceNodeId)
+                                             .SetNodeId(GetCurrentNodeId())
                                              .SetPort(CHIP_PORT)
                                              .EnableIpV4(true);
 
