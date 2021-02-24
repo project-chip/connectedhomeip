@@ -32,6 +32,7 @@
 #include <core/CHIPCore.h>
 #include <core/CHIPPersistentStorageDelegate.h>
 #include <core/CHIPTLV.h>
+#include <lib/mdns/Resolver.h>
 #include <messaging/ExchangeMgr.h>
 #include <support/DLLUtil.h>
 #include <support/SerializableIntegerSet.h>
@@ -98,6 +99,14 @@ public:
     virtual void OnPairingDeleted(CHIP_ERROR error) {}
 };
 
+class DLL_EXPORT DeviceDiscoveryDelegate
+{
+public:
+    virtual ~DeviceDiscoveryDelegate() {}
+
+    virtual void OnDiscoveryComplete(NodeId nodeId, CHIP_ERROR error) {}
+};
+
 /**
  * @brief
  *   Controller applications can use this class to communicate with already paired CHIP devices. The
@@ -106,7 +115,9 @@ public:
  *   and device pairing information for individual devices). Alternatively, this class can retrieve the
  *   relevant information when the application tries to communicate with the device
  */
-class DLL_EXPORT DeviceController : public SecureSessionMgrDelegate, public PersistentStorageResultDelegate
+class DLL_EXPORT DeviceController : public SecureSessionMgrDelegate,
+                                    public PersistentStorageResultDelegate,
+                                    public Mdns::ResolverDelegate
 {
 public:
     DeviceController();
@@ -118,6 +129,8 @@ public:
      */
     CHIP_ERROR Init(NodeId localDeviceId, PersistentStorageDelegate * storageDelegate = nullptr,
                     System::Layer * systemLayer = nullptr, Inet::InetLayer * inetLayer = nullptr);
+
+    void SetDeviceDiscoveryDelegate(DeviceDiscoveryDelegate * delegate) { mDiscoveryDelegate = delegate; }
 
     virtual CHIP_ERROR Shutdown();
 
@@ -151,6 +164,8 @@ public:
     CHIP_ERROR SetUdpListenPort(uint16_t listenPort);
 
     virtual void ReleaseDevice(Device * device);
+
+    CHIP_ERROR DiscoverDevice(uint64_t fabricId, NodeId nodeId);
 
     // ----- IO -----
     /**
@@ -191,6 +206,7 @@ protected:
     SecureSessionMgr * mSessionManager;
     Messaging::ExchangeManager * mExchangeManager;
     PersistentStorageDelegate * mStorageDelegate;
+    DeviceDiscoveryDelegate * mDiscoveryDelegate = nullptr;
     Inet::InetLayer * mInetLayer;
 
     uint16_t mListenPort;
@@ -215,6 +231,9 @@ private:
     //////////// PersistentStorageResultDelegate Implementation ///////////////
     void OnValue(const char * key, const char * value) override;
     void OnStatus(const char * key, Operation op, CHIP_ERROR err) override;
+
+    //////////// Mdns::ResolverDelegate Implementation ///////////////
+    void OnNodeIdResolved(CHIP_ERROR error, uint64_t nodeId, const Mdns::ResolvedNodeData & nodeData) override;
 
     void ReleaseAllDevices();
 

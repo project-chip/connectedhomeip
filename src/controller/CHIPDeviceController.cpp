@@ -44,6 +44,7 @@
 #include <core/CHIPCore.h>
 #include <core/CHIPEncoding.h>
 #include <core/CHIPSafeCasts.h>
+#include <inet/IPAddress.h>
 #include <support/Base64.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
@@ -166,6 +167,10 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, PersistentStorageDelegat
 #endif
 
     InitDataModelHandler();
+
+#ifdef CHIP_ENABLE_MDNS
+    Mdns::Resolver::Instance().SetResolverDelegate(this);
+#endif
 
     mState         = State::Initialized;
     mLocalDeviceId = localDeviceId;
@@ -527,6 +532,52 @@ exit:
 void DeviceController::OnValue(const char * key, const char * value) {}
 
 void DeviceController::OnStatus(const char * key, Operation op, CHIP_ERROR err) {}
+
+#if CHIP_ENABLE_MDNS
+
+void DeviceController::OnNodeIdResolved(CHIP_ERROR error, uint64_t nodeId, const Mdns::ResolvedNodeData & nodeData)
+{
+    Device * device   = nullptr;
+    bool addressValid = false;
+
+    SuccessOrExit(error);
+    SuccessOrExit(error = GetDevice(nodeId, &device));
+
+#if INET_CONFIG_ENABLE_IPV4
+    addressValid |= (nodeData.mAddressType == Inet::kIPAddressType_IPv4);
+#endif
+    addressValid |= (nodeData.mAddressType == Inet::kIPAddressType_IPv6);
+    VerifyOrExit(addressValid, error = CHIP_ERROR_INVALID_ADDRESS);
+
+    device->UpdateAddress(nodeData.mAddress, nodeData.mPort);
+
+exit:
+    if (mDiscoveryDelegate != nullptr)
+    {
+        mDiscoveryDelegate->OnDiscoveryComplete(nodeId, error);
+    }
+}
+
+CHIP_ERROR DeviceController::DiscoverDevice(uint64_t fabricId, NodeId nodeId)
+{
+    return Mdns::Resolver::Instance().ResolveNodeId(nodeId, fabricId, Inet::kIPAddressType_Any);
+}
+
+#else // CHIP_ENABLE_MDNS
+
+void DeviceController::OnNodeIdResolved(CHIP_ERROR error, uint64_t nodeId, const Mdns::ResolvedNodeData & nodeData)
+{
+    IgnoreUnusedVariable(error);
+    IgnoreUnusedVariable(nodeId);
+    IgnoreUnusedVariable(nodeData);
+}
+
+CHIP_ERROR DeviceController::DiscoverDevice(uint64_t fabricId, NodeId nodeId)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+#endif // CHIP_ENABLE_MDNS
 
 DeviceCommissioner::DeviceCommissioner()
 {

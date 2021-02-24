@@ -167,6 +167,7 @@ class DeviceMgrCmd(Cmd):
         "ble-debug-log",
 
         "connect",
+        "discover",
         "zcl",
 
         "set-pairing-wifi-credential",
@@ -381,6 +382,26 @@ class DeviceMgrCmd(Cmd):
                 self.do_help("connect SetupPinCode")
                 return
             print("Device temporary node id (**this does not match spec**): {}".format(nodeid))
+        except exceptions.ChipStackException as ex:
+            print(str(ex))
+            return
+
+    def do_discover(self, line):
+        """
+        discover <fabricid> <nodeid>
+
+        Discover DNS service published by a given node and retrieve its address
+        """
+        try:
+            args = shlex.split(line)
+            if len(args) == 2:
+                err = self.devCtrl.DiscoverNode(int(args[0]), int(args[1]))
+                if err == 0:
+                    address = self.devCtrl.GetAddressAndPort(int(args[1]))
+                    address = "{}:{}".format(*address) if address else "unknown"
+                    print("Current address: " + address)
+            else:
+                self.do_help("discover")
         except exceptions.ChipStackException as ex:
             print(str(ex))
             return

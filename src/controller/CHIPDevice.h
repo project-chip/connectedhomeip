@@ -123,14 +123,14 @@ public:
     app::CommandSender * GetCommandSender() { return mCommandSender; }
 
     /**
-     * @brief
-     *   Get the IP address assigned to the device.
+     * @brief Get the IP address and port assigned to the device.
      *
-     * @param[out] addr   The reference to the IP address.
+     * @param[out] addr   Reference to the IP address.
+     * @param[out] port   Reference to the port.
      *
-     * @return true, if the IP address was filled in the out parameter, false otherwise
+     * @return true, if the IP address and port were filled in the out parameters, false otherwise
      */
-    bool GetIpAddress(Inet::IPAddress & addr) const;
+    bool GetAddress(Inet::IPAddress & addr, uint16_t & port) const;
 
     /**
      * @brief
@@ -258,6 +258,20 @@ public:
      */
     CHIP_ERROR OpenPairingWindow(uint32_t timeout, PairingWindowOption option, SetupPayload & setupPayload);
 
+    /**
+     * @brief
+     *   Update IP address and port of the device.
+     *
+     *   This function will set a new IP address and port of the device. Since the device settings might
+     *   have been moved from RAM to the persistent storage, the function will load the device settings
+     *   first, before making the changes.
+     *
+     * @param[out] addr   IP address to be set.
+     * @param[out] port   Port to be set.
+     *
+     * @return CHIP_NO_ERROR if the IP address and port have been updated, an error code otherwise.
+     */
+    CHIP_ERROR UpdateAddress(const Inet::IPAddress & addr, uint16_t port);
     /**
      * @brief
      *   Return whether the current device object is actively associated with a paired CHIP

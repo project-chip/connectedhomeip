@@ -38,6 +38,7 @@ import enum
 __all__ = ["ChipDeviceController"]
 
 _DevicePairingDelegate_OnPairingCompleteFunct = CFUNCTYPE(None, c_uint32)
+_DeviceDiscoveryDelegate_OnDiscoveryComplete = CFUNCTYPE(None, c_uint64, c_uint32)
 
 # This is a fix for WEAV-429. Jay Logue recommends revisiting this at a later
 # date to allow for truely multiple instances so this is temporary.
@@ -90,8 +91,20 @@ class ChipDeviceController(object):
             self.state = DCState.IDLE
             self._ChipStack.completeEvent.set()
 
+        def HandleDiscoveryComplete(nodeid, err):
+            if err != 0:
+                print("Failed to discover node: {}".format(err))
+            else:
+                print("Node has been discovered")
+            self.state = DCState.IDLE
+            self._ChipStack.callbackRes = err
+            self._ChipStack.completeEvent.set()
+
         self.cbHandleKeyExchangeCompleteFunct = _DevicePairingDelegate_OnPairingCompleteFunct(HandleKeyExchangeComplete)
         self._dmLib.pychip_ScriptDevicePairingDelegate_SetKeyExchangeCallback(self.devCtrl, self.cbHandleKeyExchangeCompleteFunct)
+
+        self.cbHandleDiscoveryComplete = _DeviceDiscoveryDelegate_OnDiscoveryComplete(HandleDiscoveryComplete)
+        self._dmLib.pychip_ScriptDeviceDiscoveryDelegate_SetDiscoveryCompleteCallback(self.cbHandleDiscoveryComplete)
 
         self.state = DCState.IDLE
 
@@ -127,11 +140,27 @@ class ChipDeviceController(object):
             lambda: self._dmLib.pychip_DeviceController_ConnectIP(self.devCtrl, ipaddr, setupPinCode, nodeid)
         )
 
+    def DiscoverNode(self, fabricid, nodeid):
+        return self._ChipStack.CallAsync(
+            lambda: self._dmLib.pychip_DeviceController_DiscoverNode(self.devCtrl, fabricid, nodeid)
+        )
+
+    def GetAddressAndPort(self, nodeid):
+        address = create_string_buffer(64)
+        port = c_uint16(0)
+
+        error = self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_GetAddressAndPort(self.devCtrl, nodeid, address, 64, pointer(port))
+        )
+
+        return (address.value.decode(), port.value) if error == 0 else None
+
     def ZCLSend(self, cluster, command, nodeid, endpoint, groupid, args):
         device = c_void_p(None)
         self._ChipStack.Call(
             lambda: self._dmLib.pychip_GetDeviceByNodeId(self.devCtrl, nodeid, pointer(device))
         )
+
         self._Cluster.SendCommand(device, cluster, command, endpoint, groupid, args)
 
     def ZCLList(self):
@@ -186,11 +215,20 @@ class ChipDeviceController(object):
             self._dmLib.pychip_DeviceController_ConnectIP.argtypes = [c_void_p, c_char_p, c_uint32, c_uint64]
             self._dmLib.pychip_DeviceController_ConnectIP.restype = c_uint32
 
+            self._dmLib.pychip_DeviceController_DiscoverNode.argtypes = [c_void_p, c_uint64, c_uint64]
+            self._dmLib.pychip_DeviceController_DiscoverNode.restype = c_uint32
+
+            self._dmLib.pychip_DeviceController_GetAddressAndPort.argtypes = [c_void_p, c_uint64, c_char_p, c_uint64, POINTER(c_uint16)]
+            self._dmLib.pychip_DeviceController_GetAddressAndPort.restype = c_uint32
+
             self._dmLib.pychip_ScriptDevicePairingDelegate_SetWifiCredential.argtypes = [c_void_p, c_char_p, c_char_p]
             self._dmLib.pychip_ScriptDevicePairingDelegate_SetWifiCredential.restype = c_uint32
 
             self._dmLib.pychip_ScriptDevicePairingDelegate_SetKeyExchangeCallback.argtypes = [c_void_p, _DevicePairingDelegate_OnPairingCompleteFunct]
             self._dmLib.pychip_ScriptDevicePairingDelegate_SetKeyExchangeCallback.restype = c_uint32
+
+            self._dmLib.pychip_ScriptDeviceDiscoveryDelegate_SetDiscoveryCompleteCallback.argtypes = [_DeviceDiscoveryDelegate_OnDiscoveryComplete]
+            self._dmLib.pychip_ScriptDeviceDiscoveryDelegate_SetDiscoveryCompleteCallback.restype = None
 
             self._dmLib.pychip_GetDeviceByNodeId.argtypes = [c_void_p, c_uint64, POINTER(c_void_p)]
             self._dmLib.pychip_GetDeviceByNodeId.restype = c_uint32

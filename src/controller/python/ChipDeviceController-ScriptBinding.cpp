@@ -38,6 +38,7 @@
 #include <inttypes.h>
 #include <net/if.h>
 
+#include "ChipDeviceController-ScriptDeviceDiscoveryDelegate.h"
 #include "ChipDeviceController-ScriptDevicePairingDelegate.h"
 #include "ChipDeviceController-StorageDelegate.h"
 
@@ -45,6 +46,7 @@
 #include <app/InteractionModelEngine.h>
 #include <controller/CHIPDevice.h>
 #include <controller/CHIPDeviceController.h>
+#include <inet/IPAddress.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/DLLUtil.h>
@@ -63,6 +65,7 @@ typedef void (*LogMessageFunct)(uint64_t time, uint64_t timeUS, const char * mod
 namespace {
 chip::Controller::PythonPersistentStorageDelegate sStorageDelegate;
 chip::Controller::ScriptDevicePairingDelegate sPairingDelegate;
+chip::Controller::ScriptDeviceDiscoveryDelegate sDiscoveryDelegate;
 } // namespace
 
 // NOTE: Remote device ID is in sync with the echo server device id
@@ -83,6 +86,12 @@ CHIP_ERROR pychip_DeviceController_ConnectBLE(chip::Controller::DeviceCommission
                                               uint32_t setupPINCode, chip::NodeId nodeid);
 CHIP_ERROR pychip_DeviceController_ConnectIP(chip::Controller::DeviceCommissioner * devCtrl, const char * peerAddrStr,
                                              uint32_t setupPINCode, chip::NodeId nodeid);
+// Discovery
+CHIP_ERROR
+pychip_DeviceController_DiscoverNode(chip::Controller::DeviceCommissioner * devCtrl, uint64_t fabricid, chip::NodeId nodeid);
+CHIP_ERROR
+pychip_DeviceController_GetAddressAndPort(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeId, char * outAddress,
+                                          uint64_t maxAddressLen, uint16_t * outPort);
 
 // Pairing Delegate
 CHIP_ERROR
@@ -91,10 +100,13 @@ pychip_ScriptDevicePairingDelegate_SetWifiCredential(chip::Controller::DeviceCom
 CHIP_ERROR
 pychip_ScriptDevicePairingDelegate_SetThreadCredential(chip::Controller::DeviceCommissioner * devCtrl, int channel, int panId,
                                                        const char * masterKey);
-
 CHIP_ERROR
 pychip_ScriptDevicePairingDelegate_SetKeyExchangeCallback(chip::Controller::DeviceCommissioner * devCtrl,
                                                           chip::Controller::DevicePairingDelegate_OnPairingCompleteFunct callback);
+
+// Discovery Delegate
+void pychip_ScriptDeviceDiscoveryDelegate_SetDiscoveryCompleteCallback(
+    chip::Controller::DeviceDiscoveryDelegate_OnDiscoveryComplete callback);
 
 uint8_t pychip_DeviceController_GetLogFilter();
 void pychip_DeviceController_SetLogFilter(uint8_t category);
@@ -117,6 +129,8 @@ CHIP_ERROR pychip_DeviceController_NewDeviceController(chip::Controller::DeviceC
     VerifyOrExit(*outDevCtrl != NULL, err = CHIP_ERROR_NO_MEMORY);
 
     SuccessOrExit(err = (*outDevCtrl)->Init(kLocalDeviceId, &sStorageDelegate, &sPairingDelegate));
+    (*outDevCtrl)->SetDeviceDiscoveryDelegate(&sDiscoveryDelegate);
+
     SuccessOrExit(err = (*outDevCtrl)->ServiceEvents());
 
 exit:
@@ -190,6 +204,25 @@ CHIP_ERROR pychip_DeviceController_ConnectIP(chip::Controller::DeviceCommissione
     return devCtrl->PairDevice(nodeid, params);
 }
 
+CHIP_ERROR pychip_DeviceController_DiscoverNode(chip::Controller::DeviceCommissioner * devCtrl, uint64_t fabricid,
+                                                chip::NodeId nodeId)
+{
+    return devCtrl->DiscoverDevice(fabricid, nodeId);
+}
+
+CHIP_ERROR pychip_DeviceController_GetAddressAndPort(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeId,
+                                                     char * outAddress, uint64_t maxAddressLen, uint16_t * outPort)
+{
+    Device * device;
+    ReturnErrorOnFailure(devCtrl->GetDevice(nodeId, &device));
+
+    Inet::IPAddress address;
+    VerifyOrReturnError(device->GetAddress(address, *outPort), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(address.ToString(outAddress, maxAddressLen), CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR
 pychip_ScriptDevicePairingDelegate_SetWifiCredential(chip::Controller::DeviceCommissioner * devCtrl, const char * ssid,
                                                      const char * password)
@@ -232,6 +265,12 @@ pychip_ScriptDevicePairingDelegate_SetKeyExchangeCallback(chip::Controller::Devi
 {
     sPairingDelegate.SetKeyExchangeCallback(callback);
     return CHIP_NO_ERROR;
+}
+
+void pychip_ScriptDeviceDiscoveryDelegate_SetDiscoveryCompleteCallback(
+    chip::Controller::DeviceDiscoveryDelegate_OnDiscoveryComplete callback)
+{
+    sDiscoveryDelegate.SetDiscoveryCompleteCallback(callback);
 }
 
 CHIP_ERROR pychip_Stack_Init()

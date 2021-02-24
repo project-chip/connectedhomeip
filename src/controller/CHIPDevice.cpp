@@ -288,6 +288,17 @@ CHIP_ERROR Device::OpenPairingWindow(uint32_t timeout, PairingWindowOption optio
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR Device::UpdateAddress(const Inet::IPAddress & addr, uint16_t port)
+{
+    bool didLoad;
+    ReturnErrorOnFailure(LoadSecureSessionParametersIfNeeded(didLoad));
+
+    mDeviceAddr = addr;
+    mDevicePort = port;
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR Device::LoadSecureSessionParameters(ResetTransport resetNeeded)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -327,11 +338,12 @@ exit:
     return err;
 }
 
-bool Device::GetIpAddress(Inet::IPAddress & addr) const
+bool Device::GetAddress(Inet::IPAddress & addr, uint16_t & port) const
 {
     if (mState == ConnectionState::NotConnected)
         return false;
     addr = mDeviceAddr;
+    port = mDevicePort;
     return true;
 }
 
