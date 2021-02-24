@@ -19,6 +19,7 @@
 
 #include <inttypes.h>
 
+#include "lib/core/CHIPSafeCasts.h"
 #include "lib/mdns/platform/Mdns.h"
 #include "lib/support/ReturnMacros.h"
 #include "lib/support/logging/CHIPLogging.h"
@@ -109,8 +110,7 @@ void DiscoveryImplPlatform::HandleMdnsError(void * context, CHIP_ERROR error)
 }
 
 #if CHIP_ENABLE_ROTATING_DEVICE_ID
-static CHIP_ERROR DiscoveryImplPlatform::GenerateRotatingDeviceId(char rotatingDeviceIdHexBuffer[],
-                                                                  size_t & rotatingDeviceIdHexBufferSize)
+CHIP_ERROR DiscoveryImplPlatform::GenerateRotatingDeviceId(char rotatingDeviceIdHexBuffer[], size_t & rotatingDeviceIdHexBufferSize)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     char serialNumber[chip::DeviceLayer::ConfigurationManager::kMaxSerialNumberLength + 1];
@@ -119,9 +119,10 @@ static CHIP_ERROR DiscoveryImplPlatform::GenerateRotatingDeviceId(char rotatingD
     SuccessOrExit(error =
                       chip::DeviceLayer::ConfigurationMgr().GetSerialNumber(serialNumber, sizeof(serialNumber), serialNumberSize));
     SuccessOrExit(error = chip::DeviceLayer::ConfigurationMgr().GetLifetimeCounter(lifetimeCounter));
-    SuccessOrExit(error = AdditionDataPayloadGenerator().generateRotatingDeviceId(
+    SuccessOrExit(error = AdditionalDataPayloadGenerator().generateRotatingDeviceId(
                       lifetimeCounter, serialNumber, serialNumberSize, rotatingDeviceIdHexBuffer, rotatingDeviceIdHexBufferSize,
                       rotatingDeviceIdHexBufferSize));
+exit:
     return error;
 }
 #endif
@@ -197,7 +198,7 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
 #if CHIP_ENABLE_ROTATING_DEVICE_ID
     if (textEntrySize < ArraySize(textEntries))
     {
-        SuccessOrExit(error = GenerateRotatingDeviceId(rotatingDeviceIdHexBuffer, rotatingDeviceIdHexBufferSize));
+        ReturnErrorOnFailure(GenerateRotatingDeviceId(rotatingDeviceIdHexBuffer, rotatingDeviceIdHexBufferSize));
         // Rotating Device ID
 
         textEntries[textEntrySize++] = { "RI", Uint8::from_const_char(rotatingDeviceIdHexBuffer), rotatingDeviceIdHexBufferSize };

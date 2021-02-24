@@ -36,7 +36,7 @@ struct ResolvedNodeData
 class ResolverDelegate
 {
 public:
-    virtual ~ResolverDelegate() {}
+    virtual ~ResolverDelegate() = default;
 
     /// Called when a requested CHIP node has been successfully resolved or the request has failed
     virtual void OnNodeIdResolved(CHIP_ERROR error, uint64_t nodeId, const ResolvedNodeData & nodeData) = 0;
@@ -49,10 +49,10 @@ public:
     virtual ~Resolver() {}
 
     /// Registers a resolver delegate if none has been registered before
-    virtual CHIP_ERROR SetResolverDelegate(ResolverDelegate * delegate);
+    virtual CHIP_ERROR SetResolverDelegate(ResolverDelegate * delegate) = 0;
 
     /// Requests resolution of a node ID to its address
-    virtual CHIP_ERROR ResolveNodeId(uint64_t nodeId, uint64_t fabricId, Inet::IPAddressType type);
+    virtual CHIP_ERROR ResolveNodeId(uint64_t nodeId, uint64_t fabricId, Inet::IPAddressType type) = 0;
 
     /// Provides the system-wide implementation of the service resolver
     static Resolver & Instance();
