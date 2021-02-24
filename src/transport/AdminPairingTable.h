@@ -160,7 +160,7 @@ public:
 private:
     const AdminPairingInfo * mStart;
     size_t mIndex;
-    const size_t mMaxSize;
+    size_t mMaxSize;
 
     ConstAdminIterator & Advance()
     {
