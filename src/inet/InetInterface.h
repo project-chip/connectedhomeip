@@ -83,11 +83,7 @@ typedef struct netif * InterfaceId;
 typedef unsigned InterfaceId;
 #endif // CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
 
-#if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
-typedef int InterfaceId;
-#endif
-
-#if CHIP_SYSTEM_CONFIG_USE_MBED_NET_IF
+#if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF || CHIP_SYSTEM_CONFIG_USE_MBED_NET_IF
 typedef int InterfaceId;
 #endif
 
@@ -178,6 +174,11 @@ protected:
     InterfaceId mCurrentId     = 1;
     net_if * mCurrentInterface = nullptr;
 #endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
+
+#if CHIP_SYSTEM_CONFIG_USE_MBED_NET_IF
+    InterfaceId mCurrentId               = 0;
+    NetworkInterface * mCurrentInterface = nullptr;
+#endif // CHIP_SYSTEM_CONFIG_USE_MBED_NET_IF
 };
 
 /**
@@ -242,6 +243,11 @@ private:
     net_if_ipv6 * mIpv6 = nullptr;
     int mCurAddrIndex   = -1;
 #endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
+
+#if CHIP_SYSTEM_CONFIG_USE_MBED_NET_IF
+    InterfaceIterator mIntfIter;
+    SocketAddress * mCurAddr = nullptr;
+#endif // CHIP_SYSTEM_CONFIG_USE_MBED_NET_IF
 };
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -272,7 +278,7 @@ inline InterfaceAddressIterator::~InterfaceAddressIterator(void) {}
 
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
+#if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF || CHIP_SYSTEM_CONFIG_USE_MBED_NET_IF
 inline InterfaceIterator::~InterfaceIterator()               = default;
 inline InterfaceAddressIterator::~InterfaceAddressIterator() = default;
 #endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
