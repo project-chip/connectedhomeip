@@ -27,6 +27,57 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
+namespace {
+
+class Semaphore
+{
+public:
+    Semaphore()
+    {
+        if (sem_init(&mSemaphore, 0 /* shared */, 0 /*value*/) != 0)
+        {
+            ChipLogError(DeviceLayer, "Failed to initialize semaphore.");
+        }
+    }
+
+    ~Semaphore()
+    {
+        if (sem_destroy(&mSemaphore) != 0)
+        {
+            ChipLogError(DeviceLayer, "Failed to destroy semaphore.");
+        }
+    }
+
+    void Post() { sem_post(&mSemaphore); }
+
+    void Wait() { sem_wait(&mSemaphore); }
+
+private:
+    sem_t mSemaphore;
+};
+
+class CallbackIndirection
+{
+public:
+    CallbackIndirection(GSourceFunc f, void * a) : mCallback(f), mArgument(a) {}
+
+    void Wait() { mDoneSemaphore.Wait(); }
+
+    static int Callback(CallbackIndirection * self)
+    {
+        int result = self->mCallback(self->mArgument);
+        self->mDoneSemaphore.Post();
+        return result;
+    }
+
+private:
+    Semaphore mDoneSemaphore;
+    GSourceFunc mCallback;
+    void * mArgument;
+};
+
+} // namespace
+
 MainLoop & MainLoop::Instance()
 {
     static MainLoop sMainLoop;
@@ -106,6 +157,20 @@ exit:
     }
 
     return msg == nullptr;
+}
+
+bool MainLoop::RunOnBluezThreadAndWait(GSourceFunc closure, void * argument)
+{
+    CallbackIndirection indirection(closure, argument);
+
+    if (!Schedule(&CallbackIndirection::Callback, &indirection))
+    {
+        return false;
+    }
+
+    indirection.Wait();
+
+    return true;
 }
 
 } // namespace Internal

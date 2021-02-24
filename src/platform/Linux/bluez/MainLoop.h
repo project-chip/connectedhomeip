@@ -22,6 +22,7 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
 #include <glib.h>
+#include <semaphore.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -34,6 +35,7 @@ namespace Internal {
 class MainLoop
 {
 public:
+
     /// Ensure that a thread with g_main_loop_run is executing.
     CHIP_ERROR EnsureStarted();
 
@@ -42,11 +44,24 @@ public:
     /// The main loop MUST have been started already.
     bool RunOnBluezThread(GSourceFunc closure, void * arg);
 
+    /// Executes a callback on the underlying main loop and waits for
+    /// the method to complete.
+    ///
+    /// The main loop MUST have been started already.
+    bool RunOnBluezThreadAndWait(GSourceFunc closure, void * arg);
+
     /// Convenience method to require less casts to void*
     template <class T>
     bool Schedule(int (*callback)(T *), T * value)
     {
         return RunOnBluezThread(G_SOURCE_FUNC(callback), value);
+    }
+
+    /// Convenience method to require less casts to void*
+    template <class T>
+    bool ScheduleAndWait(int (*callback)(T *), T * value)
+    {
+        return RunOnBluezThreadAndWait(G_SOURCE_FUNC(callback), value);
     }
 
     /// Schedules a method to be executed after the main loop has finished
