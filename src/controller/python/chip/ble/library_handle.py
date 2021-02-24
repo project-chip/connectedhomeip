@@ -17,7 +17,7 @@
 import chip.native
 import ctypes
 from ctypes import c_bool, c_void_p, c_char_p, c_uint, py_object
-from chip.ble.types import DeviceScannedCallback_t, ScanDoneCallback_t
+from chip.ble.types import DeviceScannedCallback, ScanDoneCallback
 
 
 # This prevents python auto-casting c_void_p to integers and 
@@ -53,7 +53,7 @@ def _GetBleLibraryHandle() -> ctypes.CDLL:
     setter.Set('pychip_ble_adapter_list_get_raw_adapter', VoidPointer, [VoidPointer])
 
     setter.Set('pychip_ble_start_scanning', VoidPointer, [
-        py_object, VoidPointer, c_uint, DeviceScannedCallback_t, ScanDoneCallback_t
+        py_object, VoidPointer, c_uint, DeviceScannedCallback, ScanDoneCallback
     ])
 
   return handle

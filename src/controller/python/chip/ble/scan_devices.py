@@ -19,15 +19,15 @@ from typing import Generator
 from dataclasses import dataclass
 from chip.ble.library_handle import _GetBleLibraryHandle
 from queue import Queue
-from chip.ble.types import DeviceScannedCallback_t, ScanDoneCallback_t
+from chip.ble.types import DeviceScannedCallback, ScanDoneCallback
 
-@DeviceScannedCallback_t
+@DeviceScannedCallback
 def ScanFoundCallback(closure, address: str, discriminator: int, vendor: int,
                       product: int):
   closure.DeviceFound(address, discriminator, vendor, product)
 
 
-@ScanDoneCallback_t
+@ScanDoneCallback
 def ScanDoneCallback(closure):
   closure.ScanCompleted()
 

@@ -16,7 +16,7 @@
 
 from ctypes import CFUNCTYPE, py_object, c_char_p, c_uint16
 
-DeviceScannedCallback_t = CFUNCTYPE(None, py_object, c_char_p, c_uint16,
+DeviceScannedCallback = CFUNCTYPE(None, py_object, c_char_p, c_uint16,
                                     c_uint16, c_uint16)
 
-ScanDoneCallback_t = CFUNCTYPE(None, py_object)
+ScanDoneCallback = CFUNCTYPE(None, py_object)
