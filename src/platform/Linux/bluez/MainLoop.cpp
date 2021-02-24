@@ -56,6 +56,12 @@ private:
     sem_t mSemaphore;
 };
 
+int PostSemaphore(Semaphore * semaphore)
+{
+    semaphore->Post();
+    return 0;
+}
+
 class CallbackIndirection
 {
 public:
@@ -125,11 +131,19 @@ CHIP_ERROR MainLoop::EnsureStarted()
         return CHIP_ERROR_INTERNAL;
     }
 
-    // Ensure that the newly created thread starts the main loop
-    while (!g_main_loop_is_running(mBluezMainLoop))
+    Semaphore semaphore;
+
+    GMainContext * context = g_main_loop_get_context(mBluezMainLoop);
+    if (context == nullptr)
     {
-        pthread_yield();
+        ChipLogError(DeviceLayer, "Unexpected null context on the main loop");
+        // bluez loop not cleaned as running thread is already started.
+        return CHIP_ERROR_INTERNAL;
     }
+    g_main_context_invoke(context, GSourceFunc(PostSemaphore), &semaphore);
+
+    semaphore.Wait();
+    VerifyOrDie(g_main_loop_is_running(mBluezMainLoop));
 
     return CHIP_NO_ERROR;
 }
