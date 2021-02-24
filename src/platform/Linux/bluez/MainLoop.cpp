@@ -114,7 +114,7 @@ CHIP_ERROR MainLoop::EnsureStarted()
         return CHIP_NO_ERROR;
     }
 
-    mBluezMainLoop = g_main_loop_new(nullptr, FALSE);
+    mBluezMainLoop = g_main_loop_new(nullptr, TRUE);
     if (mBluezMainLoop == nullptr)
     {
         ChipLogError(DeviceLayer, "FAIL: memory alloc in %s", __func__);
@@ -143,7 +143,6 @@ CHIP_ERROR MainLoop::EnsureStarted()
     g_main_context_invoke(context, GSourceFunc(PostSemaphore), &semaphore);
 
     semaphore.Wait();
-    VerifyOrDie(g_main_loop_is_running(mBluezMainLoop));
 
     return CHIP_NO_ERROR;
 }
