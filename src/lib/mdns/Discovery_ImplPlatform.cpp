@@ -20,6 +20,7 @@
 #include <inttypes.h>
 
 #include "lib/mdns/platform/Mdns.h"
+#include "lib/support/ReturnMacros.h"
 #include "lib/support/logging/CHIPLogging.h"
 #include "platform/CHIPDeviceConfig.h"
 #include "platform/CHIPDeviceLayer.h"
@@ -263,17 +264,11 @@ CHIP_ERROR DiscoveryImplPlatform::StopPublishDevice()
     return ChipMdnsStopPublish();
 }
 
-CHIP_ERROR DiscoveryImplPlatform::RegisterResolveDelegate(ResolveDelegate * delegate)
+CHIP_ERROR DiscoveryImplPlatform::SetResolverDelegate(ResolverDelegate * delegate)
 {
-    if (mResolveDelegate != nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
-    else
-    {
-        mResolveDelegate = delegate;
-        return CHIP_NO_ERROR;
-    }
+    VerifyOrReturnError(mResolverDelegate == nullptr, CHIP_ERROR_INCORRECT_STATE);
+    mResolverDelegate = delegate;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DiscoveryImplPlatform::ResolveNodeId(uint64_t nodeId, uint64_t fabricId, Inet::IPAddressType type)
@@ -291,19 +286,19 @@ void DiscoveryImplPlatform::HandleNodeIdResolve(void * context, MdnsService * re
 {
     DiscoveryImplPlatform * mgr = static_cast<DiscoveryImplPlatform *>(context);
 
-    if (mgr->mResolveDelegate == nullptr)
+    if (mgr->mResolverDelegate == nullptr)
     {
         return;
     }
     if (error != CHIP_NO_ERROR)
     {
         ChipLogError(Discovery, "Node ID resolved failed with %s", chip::ErrorStr(error));
-        mgr->mResolveDelegate->HandleNodeIdResolve(error, kUndefinedNodeId, MdnsService{});
+        mgr->mResolverDelegate->OnNodeIdResolved(error, kUndefinedNodeId, ResolvedNodeData{});
     }
     else if (result == nullptr)
     {
         ChipLogError(Discovery, "Node ID resolve not found");
-        mgr->mResolveDelegate->HandleNodeIdResolve(CHIP_ERROR_UNKNOWN_RESOURCE_ID, kUndefinedNodeId, MdnsService{});
+        mgr->mResolverDelegate->OnNodeIdResolved(CHIP_ERROR_UNKNOWN_RESOURCE_ID, kUndefinedNodeId, ResolvedNodeData{});
     }
     else
     {
@@ -333,20 +328,30 @@ void DiscoveryImplPlatform::HandleNodeIdResolve(void * context, MdnsService * re
             }
         }
 
+        ResolvedNodeData nodeData;
+        nodeData.mAddress     = result->mAddress.ValueOr({});
+        nodeData.mAddressType = result->mAddressType;
+        nodeData.mPort        = result->mPort;
+
         if (deliminatorFound)
         {
             ChipLogProgress(Discovery, "Node ID resolved for %" PRIX64, nodeId);
-            mgr->mResolveDelegate->HandleNodeIdResolve(error, nodeId, *result);
+            mgr->mResolverDelegate->OnNodeIdResolved(error, nodeId, nodeData);
         }
         else
         {
             ChipLogProgress(Discovery, "Invalid service entry from node %" PRIX64, nodeId);
-            mgr->mResolveDelegate->HandleNodeIdResolve(error, kUndefinedNodeId, *result);
+            mgr->mResolverDelegate->OnNodeIdResolved(error, kUndefinedNodeId, nodeData);
         }
     }
 }
 
 ServiceAdvertiser & chip::Mdns::ServiceAdvertiser::Instance()
+{
+    return DiscoveryImplPlatform::GetInstance();
+}
+
+Resolver & chip::Mdns::Resolver::Instance()
 {
     return DiscoveryImplPlatform::GetInstance();
 }
