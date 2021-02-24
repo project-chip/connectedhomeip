@@ -78,7 +78,6 @@ public:
 
     ~ScannerDelegateImpl()
     {
-        mContext          = nullptr;
         mScanCallback     = nullptr;
         mCompleteCallback = nullptr;
     }
@@ -106,7 +105,7 @@ public:
 
 private:
     ChipDeviceScanner::Ptr mScanner;
-    PyObject * mContext;
+    PyObject * const mContext;
     DeviceScannedCallback mScanCallback;
     ScanCompleteCallback mCompleteCallback;
 };

@@ -38,12 +38,13 @@ def DiscoverAsync(timeoutMs: int, scanCallback, doneCallback, adapter=None):
   NOTE: devices are not guaranteed to be unique. New entries are returned
   as soon as the underlying BLE manager detects changes.
 
-  :param timeoutMs    - scan will complete after this time
-  :param scanCallback - callback when a device is found
-  :param doneCallback - callback when the scan is complete
-  :param adapter      - what adapter to choose. Either an AdapterInfo object or
-                        a string with the adapter address. If None, the first
-                        adapter on the system is used.
+  Args:
+    timeoutMs:    scan will complete after this time
+    scanCallback: callback when a device is found
+    doneCallback: callback when the scan is complete
+    adapter:      what adapter to choose. Either an AdapterInfo object or
+                  a string with the adapter address. If None, the first
+                  adapter on the system is used.
   """
   if adapter and not isinstance(adapter, str):
     adapter = adapter.address
@@ -115,12 +116,13 @@ def DiscoverSync(timeoutMs: int, adapter = None) -> Generator[DeviceInfo, None, 
   NOTE: devices are not guaranteed to be unique. New entries are returned
   as soon as the underlying BLE manager detects changes.
 
-  :param timeoutMs    - scan will complete after this time
-  :param scanCallback - callback when a device is found
-  :param doneCallback - callback when the scan is complete
-  :param adapter      - what adapter to choose. Either an AdapterInfo object or
-                        a string with the adapter address. If None, the first
-                        adapter on the system is used.
+  Args:
+    timeoutMs:    scan will complete after this time
+    scanCallback: callback when a device is found
+    doneCallback: callback when the scan is complete
+    adapter:      what adapter to choose. Either an AdapterInfo object or
+                  a string with the adapter address. If None, the first
+                  adapter on the system is used.
   """
 
   receiver = _DeviceInfoReceiver()
