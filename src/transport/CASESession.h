@@ -25,6 +25,8 @@
 
 #pragma once
 
+#include <credentials/CHIPCert.h>
+#include <credentials/CHIPOpCred.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <protocols/secure_channel/Constants.h>
 #include <support/Base64.h>
@@ -37,7 +39,29 @@
 
 namespace chip {
 
+constexpr uint16_t kAEADKeySize = 16;
+
+constexpr uint16_t kSigmaParamRandomNumberSize = 32;
+constexpr uint16_t kTrustedRootIdSize          = 20;
+constexpr uint16_t kMaxTrustedRootIds          = 5;
+
+constexpr uint16_t kIPKSize = 0;
+
 using namespace Crypto;
+using namespace Credentials;
+
+struct CASESessionSerialized;
+
+struct CASESessionSerializable
+{
+    uint16_t mI2RR2IKeyLen;
+    uint8_t mI2RR2IKey[kAEADKeySize * 2];
+    uint8_t mPairingComplete;
+    uint64_t mLocalNodeId;
+    uint64_t mPeerNodeId;
+    uint16_t mLocalKeyId;
+    uint16_t mPeerKeyId;
+};
 
 class DLL_EXPORT CASESession
 {
@@ -54,39 +78,47 @@ public:
      * @brief
      *   Initialize using operational credentials code and wait for session establishment requests.
      *
-     * @param myNodeId        Node id of local node
-     * @param myKeyId         Key ID to be assigned to the secure session on the peer node
-     * @param delegate        Callback object
+     * @param chipOperationalCredentialSet  CHIP Certificate Set used to store the chain root of trust an validate peer node
+     *                                      certificates
+     * @param myNodeId                      Node id of local node
+     * @param myKeyId                       Key ID to be assigned to the secure session on the peer node
+     * @param delegate                      Callback object
      *
      * @return CHIP_ERROR     The result of initialization
      */
-    CHIP_ERROR WaitForSessionEstablishment(NodeId myNodeId, uint16_t myKeyId, SessionEstablishmentDelegate * delegate);
+    CHIP_ERROR WaitForSessionEstablishment(ChipOperationalCredentialSet * chipOperationalCredentialSet, NodeId myNodeId,
+                                           uint16_t myKeyId, SessionEstablishmentDelegate * delegate);
 
     /**
      * @brief
      *   Create and send session establishment request using device's operational credentials.
      *
-     * @param peerAddress      Address of peer with which to establish a session.
-     * @param myNodeId         Node id of local node
-     * @param peerNodeId       Node id of the peer node
-     * @param myKeyId          Key ID to be assigned to the secure session on the peer node
-     * @param delegate         Callback object
+     * @param peerAddress                   Address of peer with which to establish a session.
+     * @param chipOperationalCredentialSet  CHIP Certificate Set used to store the chain root of trust an validate peer node
+     *                                      certificates
+     * @param myNodeId                      Node id of local node
+     * @param peerNodeId                    Node id of the peer node
+     * @param myKeyId                       Key ID to be assigned to the secure session on the peer node
+     * @param delegate                      Callback object
      *
      * @return CHIP_ERROR      The result of initialization
      */
-    CHIP_ERROR EstablishSession(const Transport::PeerAddress peerAddress, NodeId myNodeId, NodeId peerNodeId, uint16_t myKeyId,
-                                SessionEstablishmentDelegate * delegate);
+    CHIP_ERROR EstablishSession(const Transport::PeerAddress peerAddress,
+                                ChipOperationalCredentialSet * chipOperationalCredentialSet, NodeId myNodeId, NodeId peerNodeId,
+                                uint16_t myKeyId, SessionEstablishmentDelegate * delegate);
 
     /**
      * @brief
      *   Derive a secure session from the established session. The API will return error
      *   if called before session is established.
      *
+     * @param info        Information string used for key derivation
+     * @param info_len    Length of info string
      * @param session     Reference to the secure session that will be
      *                    initialized once session establishment is complete
      * @return CHIP_ERROR The result of session derivation
      */
-    virtual CHIP_ERROR DeriveSecureSession(SecureSession & session);
+    virtual CHIP_ERROR DeriveSecureSession(const uint8_t * info, size_t info_len, SecureSession & session);
 
     /**
      * @brief
@@ -126,6 +158,30 @@ public:
 
     Transport::PeerConnectionState & PeerConnection() { return mConnectionState; }
 
+    /** @brief Serialize the Pairing Session to a string.
+     *
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    CHIP_ERROR Serialize(CASESessionSerialized & output);
+
+    /** @brief Deserialize the Pairing Session from the string.
+     *
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    CHIP_ERROR Deserialize(CASESessionSerialized & input);
+
+    /** @brief Serialize the CASESession to the given serializable data structure for secure pairing
+     *
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    CHIP_ERROR ToSerializable(CASESessionSerializable & output);
+
+    /** @brief Reconstruct secure pairing class from the serializable data structure.
+     *
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    CHIP_ERROR FromSerializable(const CASESessionSerializable & output);
+
 private:
     enum SigmaErrorType : uint8_t
     {
@@ -136,9 +192,16 @@ private:
         kUnexpected           = 0xff,
     };
 
+    CHIP_ERROR Init(ChipOperationalCredentialSet * chipOperationalCredentialSet, NodeId myNodeId, uint16_t myKeyId,
+                    SessionEstablishmentDelegate * delegate);
+
     CHIP_ERROR SendSigmaR1();
     CHIP_ERROR HandleSigmaR1_and_SendSigmaR2(const PacketHeader & header, const System::PacketBufferHandle & msg);
+    CHIP_ERROR HandleSigmaR1(const PacketHeader & header, const System::PacketBufferHandle & msg);
+    CHIP_ERROR SendSigmaR2();
     CHIP_ERROR HandleSigmaR2_and_SendSigmaR3(const PacketHeader & header, const System::PacketBufferHandle & msg);
+    CHIP_ERROR HandleSigmaR2(const PacketHeader & header, const System::PacketBufferHandle & msg);
+    CHIP_ERROR SendSigmaR3();
     CHIP_ERROR HandleSigmaR3(const PacketHeader & header, const System::PacketBufferHandle & msg);
 
     CHIP_ERROR SendSigmaR1Resume();
@@ -146,6 +209,9 @@ private:
 
     void SendErrorMsg(SigmaErrorType errorCode);
     void HandleErrorMsg(const PacketHeader & header, const System::PacketBufferHandle & msg);
+
+    // TODO
+    CHIP_ERROR SetEffectiveTime(void);
 
     CHIP_ERROR AttachHeaderAndSend(Protocols::SecureChannel::MsgType msgType, System::PacketBufferHandle msgBuf);
 
@@ -155,6 +221,14 @@ private:
 
     Protocols::SecureChannel::MsgType mNextExpectedMsg = Protocols::SecureChannel::MsgType::CASE_SigmaErr;
 
+    Hash_SHA256_stream mCommissioningHash;
+    P256PublicKey mRemotePubKey;
+    P256Keypair mEphemeralKey;
+    P256ECDHDerivedSecret mSharedSecret;
+    ChipOperationalCredentialSet * mOpCredSet;
+    CertificateKeyId mTrustedRootId;
+    ValidationContext mValidContext;
+
     struct SigmaErrorMsg
     {
         SigmaErrorType error;
@@ -163,9 +237,19 @@ private:
 protected:
     NodeId mLocalNodeId = kUndefinedNodeId;
 
+    uint8_t mI2RR2IKey[kAEADKeySize * 2];
+
+    size_t mI2RR2IKeyLen = sizeof(mI2RR2IKey);
+
     bool mPairingComplete = false;
 
     Transport::PeerConnectionState mConnectionState;
 };
+
+typedef struct CASESessionSerialized
+{
+    // Extra uint64_t to account for padding bytes (NULL termination, and some decoding overheads)
+    uint8_t inner[BASE64_ENCODED_LEN(sizeof(CASESessionSerializable) + sizeof(uint64_t))];
+} CASESessionSerialized;
 
 } // namespace chip
