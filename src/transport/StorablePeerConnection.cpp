@@ -34,9 +34,7 @@ CHIP_ERROR StorablePeerConnection::StoreIntoKVS(PersistentStorageDelegate & kvs)
     char key[KeySize()];
     ReturnErrorOnFailure(GenerateKey(mKeyId, key, sizeof(key)));
 
-    VerifyOrReturnError(CanCastTo<uint16_t>(sizeof(mSession)), CHIP_ERROR_INTERNAL);
-    uint16_t size = static_cast<uint16_t>(sizeof(mSession));
-    return kvs.SetKeyValue(key, &mSession, size);
+    return kvs.SetKeyValue(key, &mSession, sizeof(mSession));
 }
 
 CHIP_ERROR StorablePeerConnection::FetchFromKVS(PersistentStorageDelegate & kvs, uint16_t keyId)
@@ -44,8 +42,7 @@ CHIP_ERROR StorablePeerConnection::FetchFromKVS(PersistentStorageDelegate & kvs,
     char key[KeySize()];
     ReturnErrorOnFailure(GenerateKey(keyId, key, sizeof(key)));
 
-    VerifyOrReturnError(CanCastTo<uint16_t>(sizeof(mSession)), CHIP_ERROR_INTERNAL);
-    uint16_t size = static_cast<uint16_t>(sizeof(mSession));
+    uint16_t size = sizeof(mSession);
     return kvs.GetKeyValue(key, &mSession, size);
 }
 
