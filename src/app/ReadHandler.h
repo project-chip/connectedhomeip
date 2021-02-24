@@ -116,7 +116,6 @@ private:
     // The event number of the last event for each priority level
     chip::EventNumber mSelfVendedEvents[reporting::kPriorityLevel_Last - reporting::kPriorityLevel_First + 1];
 
-
     chip::EventNumber mLastScheduledEventNumber[reporting::kPriorityLevel_Last - reporting::kPriorityLevel_First + 1];
 
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;

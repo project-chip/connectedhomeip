@@ -161,17 +161,17 @@ union Timestamp
     /**
      * Default constructor.
      */
-    Timestamp(void) : systemTimestamp(0){}
+    Timestamp(void) : systemTimestamp(0) {}
 
     /**
      * UTC timestamp constructor.
      */
-    Timestamp(utc_timestamp_t aUtc) : utcTimestamp(aUtc){}
+    Timestamp(utc_timestamp_t aUtc) : utcTimestamp(aUtc) {}
 
     /**
      * System timestamp constructor.
      */
-    Timestamp(timestamp_t aSystem) : systemTimestamp(aSystem){}
+    Timestamp(timestamp_t aSystem) : systemTimestamp(aSystem) {}
 
     timestamp_t systemTimestamp;  //< System timestamp.
     utc_timestamp_t utcTimestamp; //< UTC timestamp.
