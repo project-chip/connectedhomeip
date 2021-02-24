@@ -466,13 +466,13 @@ CHIP_ERROR RendezvousSession::WaitForPairing(uint32_t setupPINCode)
     UpdateState(State::kSecurePairing);
     return mPairingSession.WaitForPairing(setupPINCode, kSpake2p_Iteration_Count,
                                           reinterpret_cast<const unsigned char *>(kSpake2pKeyExchangeSalt),
-                                          strlen(kSpake2pKeyExchangeSalt), 0, this);
+                                          strlen(kSpake2pKeyExchangeSalt), mNextKeyId++, this);
 }
 
 CHIP_ERROR RendezvousSession::WaitForPairing(const PASEVerifier & verifier)
 {
     UpdateState(State::kSecurePairing);
-    return mPairingSession.WaitForPairing(verifier, 0 /* keyId */, this);
+    return mPairingSession.WaitForPairing(verifier, mNextKeyId++, this);
 }
 
 CHIP_ERROR RendezvousSession::Pair(uint32_t setupPINCode)

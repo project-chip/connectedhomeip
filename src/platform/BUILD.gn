@@ -253,6 +253,8 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "cc13x2_26x2/DeviceNetworkProvisioningDelegateImpl.cpp",
         "cc13x2_26x2/DeviceNetworkProvisioningDelegateImpl.h",
         "cc13x2_26x2/InetPlatformConfig.h",
+        "cc13x2_26x2/KeyValueStoreManagerImpl.cpp",
+        "cc13x2_26x2/KeyValueStoreManagerImpl.h",
         "cc13x2_26x2/Logging.cpp",
         "cc13x2_26x2/PlatformManagerImpl.cpp",
         "cc13x2_26x2/PlatformManagerImpl.h",
@@ -309,6 +311,11 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "Darwin/SystemPlatformConfig.h",
       ]
 
+      sources += [
+        "Darwin/KeyValueStoreManagerImpl.cpp",
+        "Darwin/KeyValueStoreManagerImpl.h",
+      ]
+
       if (chip_enable_ble) {
         sources += [
           "Darwin/BleApplicationDelegate.h",
@@ -354,7 +361,10 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "$dir_pw_kvs:crc16",
         "$dir_pw_log",
       ]
-      public_deps += [ "$dir_pw_kvs" ]
+      public_deps += [
+        "$dir_pw_checksum",
+        "$dir_pw_kvs",
+      ]
       sources += [
         "EFR32/KeyValueStoreManagerImpl.cpp",
         "EFR32/KeyValueStoreManagerImpl.h",
@@ -417,6 +427,8 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "K32W/DeviceNetworkProvisioningDelegateImpl.h",
         "K32W/K32WConfig.cpp",
         "K32W/K32WConfig.h",
+        "K32W/KeyValueStoreManagerImpl.cpp",
+        "K32W/KeyValueStoreManagerImpl.h",
         "K32W/Logging.cpp",
         "K32W/NetworkProvisioningServerImpl.h",
         "K32W/PlatformManagerImpl.cpp",
@@ -552,6 +564,11 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "qpg6100/SystemPlatformConfig.h",
         "qpg6100/qpg6100Config.cpp",
         "qpg6100/qpg6100Config.h",
+      ]
+
+      sources += [
+        "qpg6100/KeyValueStoreManagerImpl.cpp",
+        "qpg6100/KeyValueStoreManagerImpl.h",
       ]
 
       if (chip_enable_openthread) {
