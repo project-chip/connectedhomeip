@@ -39,6 +39,8 @@ shared_library("ChipDeviceCtrl") {
   sources = [
     "ChipDeviceController-ClusterCommands.cpp",
     "ChipDeviceController-ScriptBinding.cpp",
+    "ChipDeviceController-ScriptDeviceAddressUpdateDelegate.cpp",
+    "ChipDeviceController-ScriptDeviceAddressUpdateDelegate.h",
     "ChipDeviceController-ScriptDevicePairingDelegate.cpp",
     "ChipDeviceController-ScriptDevicePairingDelegate.h",
     "ChipDeviceController-StorageDelegate.cpp",

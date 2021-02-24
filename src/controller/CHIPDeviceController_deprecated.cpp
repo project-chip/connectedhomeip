@@ -177,7 +177,8 @@ bool ChipDeviceController::GetIpAddress(Inet::IPAddress & addr)
     if (mDevice == nullptr)
         InitDevice();
 
-    return mDevice != nullptr && mDevice->GetIpAddress(addr);
+    uint16_t port;
+    return mDevice != nullptr && mDevice->GetAddress(addr, port);
 }
 
 CHIP_ERROR ChipDeviceController::DisconnectDevice()

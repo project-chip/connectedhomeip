@@ -267,7 +267,7 @@ CHIP_ERROR DiscoveryImplPlatform::StopPublishDevice()
 
 CHIP_ERROR DiscoveryImplPlatform::SetResolverDelegate(ResolverDelegate * delegate)
 {
-    VerifyOrReturnError(mResolverDelegate == nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(delegate == nullptr || mResolverDelegate == nullptr, CHIP_ERROR_INCORRECT_STATE);
     mResolverDelegate = delegate;
     return CHIP_NO_ERROR;
 }
@@ -291,59 +291,61 @@ void DiscoveryImplPlatform::HandleNodeIdResolve(void * context, MdnsService * re
     {
         return;
     }
+
     if (error != CHIP_NO_ERROR)
     {
         ChipLogError(Discovery, "Node ID resolved failed with %s", chip::ErrorStr(error));
-        mgr->mResolverDelegate->OnNodeIdResolved(error, kUndefinedNodeId, ResolvedNodeData{});
+        mgr->mResolverDelegate->OnNodeIdResolutionFailed(kUndefinedNodeId, error);
+        return;
     }
-    else if (result == nullptr)
+
+    if (result == nullptr)
     {
         ChipLogError(Discovery, "Node ID resolve not found");
-        mgr->mResolverDelegate->OnNodeIdResolved(CHIP_ERROR_UNKNOWN_RESOURCE_ID, kUndefinedNodeId, ResolvedNodeData{});
+        mgr->mResolverDelegate->OnNodeIdResolutionFailed(kUndefinedNodeId, CHIP_ERROR_UNKNOWN_RESOURCE_ID);
+        return;
     }
-    else
-    {
-        // Parse '%x-%x' from the name
-        uint64_t nodeId       = 0;
-        bool deliminatorFound = false;
 
-        for (size_t i = 0; i < sizeof(result->mName) && result->mName[i] != 0; i++)
+    // Parse '%x-%x' from the name
+    uint64_t nodeId       = 0;
+    bool deliminatorFound = false;
+
+    for (size_t i = 0; i < sizeof(result->mName) && result->mName[i] != 0; i++)
+    {
+        if (result->mName[i] == '-')
         {
-            if (result->mName[i] == '-')
+            deliminatorFound = true;
+            break;
+        }
+        else
+        {
+            uint8_t val = HexToInt(result->mName[i]);
+
+            if (val == UINT8_MAX)
             {
-                deliminatorFound = true;
                 break;
             }
             else
             {
-                uint8_t val = HexToInt(result->mName[i]);
-
-                if (val == UINT8_MAX)
-                {
-                    break;
-                }
-                else
-                {
-                    nodeId = nodeId * 16 + val;
-                }
+                nodeId = nodeId * 16 + val;
             }
         }
+    }
 
-        ResolvedNodeData nodeData;
-        nodeData.mAddress     = result->mAddress.ValueOr({});
-        nodeData.mAddressType = result->mAddressType;
-        nodeData.mPort        = result->mPort;
+    ResolvedNodeData nodeData;
+    nodeData.mInterfaceId = result->mInterface;
+    nodeData.mAddress     = result->mAddress.ValueOr({});
+    nodeData.mPort        = result->mPort;
 
-        if (deliminatorFound)
-        {
-            ChipLogProgress(Discovery, "Node ID resolved for %" PRIX64, nodeId);
-            mgr->mResolverDelegate->OnNodeIdResolved(error, nodeId, nodeData);
-        }
-        else
-        {
-            ChipLogProgress(Discovery, "Invalid service entry from node %" PRIX64, nodeId);
-            mgr->mResolverDelegate->OnNodeIdResolved(error, kUndefinedNodeId, nodeData);
-        }
+    if (deliminatorFound)
+    {
+        ChipLogProgress(Discovery, "Node ID resolved for %" PRIX64, nodeId);
+        mgr->mResolverDelegate->OnNodeIdResolved(nodeId, nodeData);
+    }
+    else
+    {
+        ChipLogProgress(Discovery, "Invalid service entry from node %" PRIX64, nodeId);
+        mgr->mResolverDelegate->OnNodeIdResolved(kUndefinedNodeId, nodeData);
     }
 }
 

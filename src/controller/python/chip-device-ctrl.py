@@ -167,6 +167,7 @@ class DeviceMgrCmd(Cmd):
         "ble-debug-log",
 
         "connect",
+        "resolve",
         "zcl",
 
         "set-pairing-wifi-credential",
@@ -381,6 +382,27 @@ class DeviceMgrCmd(Cmd):
                 self.do_help("connect SetupPinCode")
                 return
             print("Device temporary node id (**this does not match spec**): {}".format(nodeid))
+        except exceptions.ChipStackException as ex:
+            print(str(ex))
+            return
+
+    def do_resolve(self, line):
+        """
+        resolve <fabricid> <nodeid>
+
+        Resolve DNS-SD name corresponding with the given fabric and node IDs and
+        update address of the node in the device controller.
+        """
+        try:
+            args = shlex.split(line)
+            if len(args) == 2:
+                err = self.devCtrl.ResolveNode(int(args[0]), int(args[1]))
+                if err == 0:
+                    address = self.devCtrl.GetAddressAndPort(int(args[1]))
+                    address = "{}:{}".format(*address) if address else "unknown"
+                    print("Current address: " + address)
+            else:
+                self.do_help("resolve")
         except exceptions.ChipStackException as ex:
             print(str(ex))
             return

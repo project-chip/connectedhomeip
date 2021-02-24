@@ -21,14 +21,15 @@
 
 #include <core/CHIPError.h>
 #include <inet/IPAddress.h>
+#include <inet/InetInterface.h>
 
 namespace chip {
 namespace Mdns {
 
 struct ResolvedNodeData
 {
+    Inet::InterfaceId mInterfaceId;
     Inet::IPAddress mAddress;
-    Inet::IPAddressType mAddressType;
     uint16_t mPort;
 };
 
@@ -38,8 +39,11 @@ class ResolverDelegate
 public:
     virtual ~ResolverDelegate() = default;
 
-    /// Called when a requested CHIP node has been successfully resolved or the request has failed
-    virtual void OnNodeIdResolved(CHIP_ERROR error, uint64_t nodeId, const ResolvedNodeData & nodeData) = 0;
+    /// Called when a requested CHIP node ID has been successfully resolved
+    virtual void OnNodeIdResolved(uint64_t nodeId, const ResolvedNodeData & nodeData) = 0;
+
+    /// Called when a CHIP node ID resolution has failed
+    virtual void OnNodeIdResolutionFailed(uint64_t nodeId, CHIP_ERROR error) = 0;
 };
 
 /// Interface for resolving CHIP services
