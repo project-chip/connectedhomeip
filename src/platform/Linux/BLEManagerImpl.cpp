@@ -651,15 +651,6 @@ void BLEManagerImpl::InitiateScan(BleScanState scanType)
         return;
     }
 
-    // Bluez BLE state will asynchronously schedule an initialization of the
-    // BLE adapters on the glib MainLoop.
-
-    // TODO: this wait is error prone. Find a better way.
-    while (mpEndpoint->mpAdapter == nullptr)
-    {
-        pthread_yield();
-    }
-
     if (mpEndpoint->mpAdapter == nullptr)
     {
         OnConnectionError(mBLEScanConfig.mAppState, CHIP_ERROR_INCORRECT_STATE);

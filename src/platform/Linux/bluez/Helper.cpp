@@ -1549,7 +1549,7 @@ CHIP_ERROR InitBluezBleLayer(bool aIsCentral, char * apBleAddr, BLEAdvConfig & a
     err = MainLoop::Instance().EnsureStarted();
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "Failed to start BLE main loop"));
 
-    if (!MainLoop::Instance().Schedule(StartupEndpointBindings, endpoint))
+    if (!MainLoop::Instance().ScheduleAndWait(StartupEndpointBindings, endpoint))
     {
         ChipLogError(DeviceLayer, "Failed to schedule endpoint initialization");
         ExitNow();
