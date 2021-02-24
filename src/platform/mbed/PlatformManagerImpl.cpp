@@ -61,11 +61,11 @@ void PlatformManagerImpl::_UnlockChipStack()
     mChipStackMutex.unlock();
 }
 
-void PlatformManagerImpl::_PostEvent(const ChipDeviceEvent * event)
+void PlatformManagerImpl::_PostEvent(const ChipDeviceEvent * eventPtr)
 {
-    auto handle = mQueue.call([event, this] {
+    auto handle = mQueue.call([event = *eventPtr, this] {
         LockChipStack();
-        DispatchEvent(event);
+        DispatchEvent(&event);
         UnlockChipStack();
     });
 
