@@ -108,16 +108,22 @@ CHIP_ERROR MainLoop::EnsureStarted()
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    int pthreadErr = 0;
-    int tmpErrno;
-
     mBluezMainLoop = g_main_loop_new(nullptr, FALSE);
-    VerifyOrExit(mBluezMainLoop != nullptr, ChipLogError(DeviceLayer, "FAIL: memory alloc in %s", __func__));
+    if (mBluezMainLoop == nullptr)
+    {
+        ChipLogError(DeviceLayer, "FAIL: memory alloc in %s", __func__);
+        return CHIP_ERROR_NO_MEMORY;
+    }
 
-    pthreadErr = pthread_create(&mThread, nullptr, &MainLoop::Thread, reinterpret_cast<void *>(this));
-    tmpErrno   = errno;
-    VerifyOrExit(pthreadErr == 0, ChipLogError(DeviceLayer, "FAIL: pthread_create (%s) in %s", strerror(tmpErrno), __func__));
+    int pthreadErr = pthread_create(&mThread, nullptr, &MainLoop::Thread, reinterpret_cast<void *>(this));
+    int tmpErrno   = errno;
+    if (pthreadErr != 0)
+    {
+        ChipLogError(DeviceLayer, "FAIL: pthread_create (%s) in %s", strerror(tmpErrno), __func__);
+        g_free(mBluezMainLoop);
+        mBluezMainLoop = nullptr;
+        return CHIP_ERROR_INTERNAL;
+    }
 
     // Ensure that the newly created thread starts the main loop
     while (!g_main_loop_is_running(mBluezMainLoop))
@@ -125,18 +131,7 @@ CHIP_ERROR MainLoop::EnsureStarted()
         pthread_yield();
     }
 
-exit:
-
-    if (err != CHIP_NO_ERROR)
-    {
-        if (mBluezMainLoop != nullptr)
-        {
-            g_free(mBluezMainLoop);
-            mBluezMainLoop = nullptr;
-        }
-    }
-
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 bool MainLoop::RunOnBluezThread(GSourceFunc callback, void * argument)
