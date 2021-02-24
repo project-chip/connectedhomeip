@@ -93,10 +93,12 @@
 #define GENERATED_ATTRIBUTES                                                                                                       \
     {                                                                                                                              \
         { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(SINGLETON), { (uint8_t *) 3 } }, /* Basic (server): cluster revision */  \
-            { 0x0000, ZAP_TYPE(INT8U), 1, ZAP_ATTRIBUTE_MASK(SINGLETON), { (uint8_t *) 0x08 } }, /* Basic (server): ZCL version */ \
             {                                                                                                                      \
-                0x0007, ZAP_TYPE(ENUM8), 1, ZAP_ATTRIBUTE_MASK(SINGLETON), { (uint8_t *) 0x00 }                                    \
-            },                                                     /* Basic (server): power source */                              \
+                0x0000, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(SINGLETON), { (uint8_t *) 0x08 }                                   \
+            }, /* Basic (server): InteractionModelVersion */                                                                       \
+            {                                                                                                                      \
+                0x0007, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(SINGLETON), { (uint8_t *) 0x00 }                                   \
+            },                                                     /* Basic (server): HardwareRevision */                          \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 2 } }, /* Identify (server): cluster revision */                       \
             {                                                                                                                      \
                 0x0000, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(WRITABLE), { (uint8_t *) 0x0000 }                                  \
@@ -266,7 +268,7 @@
 #define GENERATED_CLUSTER_COUNT 16
 #define GENERATED_CLUSTERS                                                                                                         \
     {                                                                                                                              \
-        { 0x0000, ZAP_ATTRIBUTE_INDEX(0), 3, 4, ZAP_CLUSTER_MASK(SERVER), NULL }, /* Endpoint: 1, Cluster: Basic (server) */       \
+        { 0x0000, ZAP_ATTRIBUTE_INDEX(0), 3, 6, ZAP_CLUSTER_MASK(SERVER), NULL }, /* Endpoint: 1, Cluster: Basic (server) */       \
             { 0x0003,                                                                                                              \
               ZAP_ATTRIBUTE_INDEX(3),                                                                                              \
               2,                                                                                                                   \
@@ -344,17 +346,17 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 16, 409 },                                                                                         \
+        { ZAP_CLUSTER_INDEX(0), 16, 411 },                                                                                         \
     }
 
 // Largest attribute size is needed for various buffers
 #define ATTRIBUTE_LARGEST (254)
 
 // Total size of singleton attributes
-#define ATTRIBUTE_SINGLETONS_SIZE (4)
+#define ATTRIBUTE_SINGLETONS_SIZE (6)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (409)
+#define ATTRIBUTE_MAX_SIZE (411)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (1)
@@ -398,19 +400,17 @@
 
 // Array of EmberAfCommandMetadata structs.
 #define ZAP_COMMAND_MASK(mask) COMMAND_MASK_##mask
-#define EMBER_AF_GENERATED_COMMAND_COUNT (138)
+#define EMBER_AF_GENERATED_COMMAND_COUNT (137)
 #define GENERATED_COMMANDS                                                                                                         \
     {                                                                                                                              \
-        { 0x0000, 0x00,                                                                                                            \
-          ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER) }, /* Basic (server): ResetToFactoryDefaults */    \
-            { 0x0003, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) },                   /* Identify (server): Identify */               \
-            { 0x0003, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) },                   /* Identify (server): IdentifyQueryResponse */  \
-            { 0x0003, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) },                   /* Identify (server): IdentifyQuery */          \
-            { 0x0004, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) },                   /* Groups (server): AddGroup */                 \
-            { 0x0004, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) },                   /* Groups (server): AddGroupResponse */         \
-            { 0x0004, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) },                   /* Groups (server): ViewGroup */                \
-            { 0x0004, 0x01, ZAP_COMMAND_MASK(INCOMING_CLIENT) },                   /* Groups (server): ViewGroupResponse */        \
-            { 0x0004, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) },                   /* Groups (server): GetGroupMembership */       \
+        { 0x0003, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) },     /* Identify (server): Identify */                                 \
+            { 0x0003, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Identify (server): IdentifyQueryResponse */                    \
+            { 0x0003, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Identify (server): IdentifyQuery */                            \
+            { 0x0004, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Groups (server): AddGroup */                                   \
+            { 0x0004, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Groups (server): AddGroupResponse */                           \
+            { 0x0004, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Groups (server): ViewGroup */                                  \
+            { 0x0004, 0x01, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Groups (server): ViewGroupResponse */                          \
+            { 0x0004, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Groups (server): GetGroupMembership */                         \
             { 0x0004, 0x02, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Groups (server): GetGroupMembershipResponse */                 \
             { 0x0004, 0x03, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Groups (server): RemoveGroup */                                \
             { 0x0004, 0x03, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Groups (server): RemoveGroupResponse */                        \

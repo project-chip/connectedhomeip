@@ -59,8 +59,8 @@
 #define GENERATED_ATTRIBUTES                                                                                                       \
     {                                                                                                                              \
         { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 3 } },          /* Basic (server): cluster revision */                     \
-            { 0x0000, ZAP_TYPE(INT8U), 1, 0, { (uint8_t *) 0x08 } },    /* Basic (server): ZCL version */                          \
-            { 0x0007, ZAP_TYPE(ENUM8), 1, 0, { (uint8_t *) 0x00 } },    /* Basic (server): power source */                         \
+            { 0x0000, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 0x08 } },   /* Basic (server): InteractionModelVersion */              \
+            { 0x0007, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 0x00 } },   /* Basic (server): HardwareRevision */                     \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 3 } },      /* Temperature Measurement (server): cluster revision */   \
             { 0x0000, ZAP_TYPE(INT16S), 2, 0, { (uint8_t *) 0x8000 } }, /* Temperature Measurement (server): measured value */     \
             { 0x0001, ZAP_TYPE(INT16S), 2, 0, { (uint8_t *) 0x8000 } }, /* Temperature Measurement (server): min measured value */ \
@@ -77,7 +77,7 @@
 #define GENERATED_CLUSTER_COUNT 2
 #define GENERATED_CLUSTERS                                                                                                         \
     {                                                                                                                              \
-        { 0x0000, ZAP_ATTRIBUTE_INDEX(0), 3, 4, ZAP_CLUSTER_MASK(SERVER), NULL }, /* Endpoint: 1, Cluster: Basic (server) */       \
+        { 0x0000, ZAP_ATTRIBUTE_INDEX(0), 3, 6, ZAP_CLUSTER_MASK(SERVER), NULL }, /* Endpoint: 1, Cluster: Basic (server) */       \
             {                                                                                                                      \
                 0x0402, ZAP_ATTRIBUTE_INDEX(3), 4, 8, ZAP_CLUSTER_MASK(SERVER), NULL                                               \
             }, /* Endpoint: 1, Cluster: Temperature Measurement (server) */                                                        \
@@ -88,7 +88,7 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 2, 12 },                                                                                           \
+        { ZAP_CLUSTER_INDEX(0), 2, 14 },                                                                                           \
     }
 
 // Largest attribute size is needed for various buffers
@@ -98,7 +98,7 @@
 #define ATTRIBUTE_SINGLETONS_SIZE (0)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (12)
+#define ATTRIBUTE_MAX_SIZE (14)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (1)
@@ -142,10 +142,9 @@
 
 // Array of EmberAfCommandMetadata structs.
 #define ZAP_COMMAND_MASK(mask) COMMAND_MASK_##mask
-#define EMBER_AF_GENERATED_COMMAND_COUNT (1)
+#define EMBER_AF_GENERATED_COMMAND_COUNT (0)
 #define GENERATED_COMMANDS                                                                                                         \
     {                                                                                                                              \
-        { 0x0000, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Basic (server): ResetToFactoryDefaults */                          \
     }
 
 // Array of EmberAfManufacturerCodeEntry structures for commands.

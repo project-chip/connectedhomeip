@@ -147,7 +147,6 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
 
 #define BASIC_CLUSTER_ID 0x0000
 #define ZCL_MFG_SPECIFIC_PING_COMMAND_ID (0x00)
-#define ZCL_RESET_TO_FACTORY_DEFAULTS_COMMAND_ID (0x00)
 
 #define BINDING_CLUSTER_ID 0xF000
 #define ZCL_BIND_COMMAND_ID (0x00)
@@ -365,11 +364,10 @@ PacketBufferHandle encodeBarrierControlClusterReadClusterRevisionAttribute(uint8
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * MfgSpecificPing                                                   |   0x00 |
-| * ResetToFactoryDefaults                                            |   0x00 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
-| * ZclVersion                                                        | 0x0000 |
-| * PowerSource                                                       | 0x0007 |
+| * InteractionModelVersion                                           | 0x0000 |
+| * HardwareRevision                                                  | 0x0007 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -383,16 +381,6 @@ PacketBufferHandle encodeBasicClusterMfgSpecificPingCommand(uint8_t seqNum, Endp
     COMMAND_FOOTER();
 }
 
-/*
- * Command ResetToFactoryDefaults
- */
-PacketBufferHandle encodeBasicClusterResetToFactoryDefaultsCommand(uint8_t seqNum, EndpointId destinationEndpoint)
-{
-    COMMAND_HEADER("ResetToFactoryDefaults", BASIC_CLUSTER_ID);
-    buf.Put8(kFrameControlClusterSpecificCommand).Put8(seqNum).Put8(ZCL_RESET_TO_FACTORY_DEFAULTS_COMMAND_ID);
-    COMMAND_FOOTER();
-}
-
 PacketBufferHandle encodeBasicClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("DiscoverBasicAttributes", BASIC_CLUSTER_ID);
@@ -401,21 +389,21 @@ PacketBufferHandle encodeBasicClusterDiscoverAttributes(uint8_t seqNum, Endpoint
 }
 
 /*
- * Attribute ZclVersion
+ * Attribute InteractionModelVersion
  */
-PacketBufferHandle encodeBasicClusterReadZclVersionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+PacketBufferHandle encodeBasicClusterReadInteractionModelVersionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
-    COMMAND_HEADER("ReadBasicZclVersion", BASIC_CLUSTER_ID);
+    COMMAND_HEADER("ReadBasicInteractionModelVersion", BASIC_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0000);
     COMMAND_FOOTER();
 }
 
 /*
- * Attribute PowerSource
+ * Attribute HardwareRevision
  */
-PacketBufferHandle encodeBasicClusterReadPowerSourceAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+PacketBufferHandle encodeBasicClusterReadHardwareRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
-    COMMAND_HEADER("ReadBasicPowerSource", BASIC_CLUSTER_ID);
+    COMMAND_HEADER("ReadBasicHardwareRevision", BASIC_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0007);
     COMMAND_FOOTER();
 }

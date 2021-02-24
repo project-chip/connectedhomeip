@@ -48,10 +48,8 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPBasic : CHIPCluster
 
-- (void)resetToFactoryDefaults:(ResponseHandler)completionHandler;
-
-- (void)readAttributeZclVersion:(ResponseHandler)completionHandler;
-- (void)readAttributePowerSource:(ResponseHandler)completionHandler;
+- (void)readAttributeInteractionModelVersion:(ResponseHandler)completionHandler;
+- (void)readAttributeHardwareRevision:(ResponseHandler)completionHandler;
 - (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
 
 @end

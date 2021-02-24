@@ -59,10 +59,12 @@
 #define GENERATED_ATTRIBUTES                                                                                                       \
     {                                                                                                                              \
         { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(SINGLETON), { (uint8_t *) 3 } }, /* Basic (server): cluster revision */  \
-            { 0x0000, ZAP_TYPE(INT8U), 1, ZAP_ATTRIBUTE_MASK(SINGLETON), { (uint8_t *) 0x08 } }, /* Basic (server): ZCL version */ \
             {                                                                                                                      \
-                0x0007, ZAP_TYPE(ENUM8), 1, ZAP_ATTRIBUTE_MASK(SINGLETON), { (uint8_t *) 0x00 }                                    \
-            },                                                         /* Basic (server): power source */                          \
+                0x0000, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(SINGLETON), { (uint8_t *) 0x08 }                                   \
+            }, /* Basic (server): InteractionModelVersion */                                                                       \
+            {                                                                                                                      \
+                0x0007, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(SINGLETON), { (uint8_t *) 0x00 }                                   \
+            },                                                         /* Basic (server): HardwareRevision */                      \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 2 } },     /* On/off (server): cluster revision */                     \
             { 0x0000, ZAP_TYPE(BOOLEAN), 1, 0, { (uint8_t *) 0x00 } }, /* On/off (server): on/off */                               \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 3 } },     /* Level Control (server): cluster revision */              \
@@ -123,7 +125,7 @@
 #define GENERATED_CLUSTER_COUNT 7
 #define GENERATED_CLUSTERS                                                                                                         \
     {                                                                                                                              \
-        { 0x0000, ZAP_ATTRIBUTE_INDEX(0), 3, 4, ZAP_CLUSTER_MASK(SERVER), NULL }, /* Endpoint: 0, Cluster: Basic (server) */       \
+        { 0x0000, ZAP_ATTRIBUTE_INDEX(0), 3, 6, ZAP_CLUSTER_MASK(SERVER), NULL }, /* Endpoint: 0, Cluster: Basic (server) */       \
             { 0x0006,                                                                                                              \
               ZAP_ATTRIBUTE_INDEX(3),                                                                                              \
               2,                                                                                                                   \
@@ -167,7 +169,7 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 1, 4 }, { ZAP_CLUSTER_INDEX(1), 2, 6 }, { ZAP_CLUSTER_INDEX(3), 2, 16 },                           \
+        { ZAP_CLUSTER_INDEX(0), 1, 6 }, { ZAP_CLUSTER_INDEX(1), 2, 6 }, { ZAP_CLUSTER_INDEX(3), 2, 16 },                           \
             { ZAP_CLUSTER_INDEX(5), 2, 16 },                                                                                       \
     }
 
@@ -175,10 +177,10 @@
 #define ATTRIBUTE_LARGEST (2)
 
 // Total size of singleton attributes
-#define ATTRIBUTE_SINGLETONS_SIZE (4)
+#define ATTRIBUTE_SINGLETONS_SIZE (6)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (42)
+#define ATTRIBUTE_MAX_SIZE (44)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (4)
@@ -222,11 +224,10 @@
 
 // Array of EmberAfCommandMetadata structs.
 #define ZAP_COMMAND_MASK(mask) COMMAND_MASK_##mask
-#define EMBER_AF_GENERATED_COMMAND_COUNT (40)
+#define EMBER_AF_GENERATED_COMMAND_COUNT (39)
 #define GENERATED_COMMANDS                                                                                                         \
     {                                                                                                                              \
-        { 0x0000, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) },     /* Basic (server): ResetToFactoryDefaults */                      \
-            { 0x0006, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* On/off (server): Off */                                        \
+        { 0x0006, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) },     /* On/off (server): Off */                                        \
             { 0x0006, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* On/off (server): Off */                                        \
             { 0x0006, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* On/off (server): Off */                                        \
             { 0x0006, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* On/off (server): On */                                         \

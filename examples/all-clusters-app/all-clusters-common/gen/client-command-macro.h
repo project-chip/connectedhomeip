@@ -256,14 +256,32 @@
     emberAfFillExternalBuffer(mask, clusterId, ZCL_DISCOVER_ATTRIBUTES_EXTENDED_RESPONSE_COMMAND_ID, "ub", discoveryComplete,      \
                               extendedDiscoverAttributesInfoRecords, extendedDiscoverAttributesInfoRecordsLen);
 
-/** @brief Command description for ResetToFactoryDefaults
+/** @brief Command description for StartUp
  *
- * Command: ResetToFactoryDefaults
+ * Command: StartUp
  */
-#define emberAfFillCommandBasicClusterResetToFactoryDefaults()                                                                     \
+#define emberAfFillCommandBasicClusterStartUp()                                                                                    \
     emberAfFillExternalBuffer(mask,                                                                                                \
                                                                                                                                    \
-                              ZCL_RESET_TO_FACTORY_DEFAULTS_COMMAND_ID, "", );
+                              ZCL_START_UP_COMMAND_ID, "", );
+
+/** @brief Command description for ShutDown
+ *
+ * Command: ShutDown
+ */
+#define emberAfFillCommandBasicClusterShutDown()                                                                                   \
+    emberAfFillExternalBuffer(mask,                                                                                                \
+                                                                                                                                   \
+                              ZCL_SHUT_DOWN_COMMAND_ID, "", );
+
+/** @brief Command description for Leave
+ *
+ * Command: Leave
+ */
+#define emberAfFillCommandBasicClusterLeave()                                                                                      \
+    emberAfFillExternalBuffer(mask,                                                                                                \
+                                                                                                                                   \
+                              ZCL_LEAVE_COMMAND_ID, "", );
 
 /** @brief Command description for Identify
  *
