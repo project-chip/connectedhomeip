@@ -56,7 +56,6 @@ set(CHIP_CFLAG_EXCLUDES
     "-fdata-sections"
     "-g*"
     "-O*"
-    "-W*"
 )
 
 # ==============================================================================
@@ -148,6 +147,16 @@ if (CONFIG_CHIP_WITH_EXTERNAL_MBEDTLS)
         list(APPEND CHIP_CFLAGS ${CHIP_CRYPTOCELL310_CFLAGS})
     endif()
 endif()
+
+set(CHIP_CFLAGS_EXTRA 
+    -Wno-conversion
+    -Wno-shadow
+    -Wno-maybe-uninitialized
+    -Wno-return-type
+)
+
+list(APPEND CHIP_CFLAGS_C ${CHIP_CFLAGS_EXTRA})
+list(APPEND CHIP_CFLAGS_CC ${CHIP_CFLAGS_EXTRA})
 
 set(SEPARATOR ",")
 convert_list_of_flags_to_string_of_flags(CHIP_CFLAGS CHIP_CFLAGS ${SEPARATOR})
