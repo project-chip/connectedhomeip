@@ -43,12 +43,12 @@ namespace app {
 namespace ReportData {
 enum
 {
-    kCsTag_RequestResponse     = 0,
+    kCsTag_SuppressResponse    = 0,
     kCsTag_SubscriptionId      = 1,
     kCsTag_AttributeStatusList = 2,
     kCsTag_AttributeDataList   = 3,
     kCsTag_EventDataList       = 4,
-    kCsTag_IsLastReport        = 5,
+    kCsTag_MoreChunkedMessages = 5,
 };
 
 class Parser : public chip::app::Parser
@@ -79,19 +79,20 @@ public:
     CHIP_ERROR CheckSchemaValidity() const;
 
     /**
-     *  @brief Check whether this message needs request response. Next() must be called before accessing them.
+     *  @brief Check whether a response (a StatusReponse specifically) is to be sent back to the request.
+     *  Next() must be called before accessing them.
      *
-     *  @param [in] apRequestResponse    A pointer to apRequestResponse
+     *  @param [in] apSuppressResponse    A pointer to apSuppressResponse
      *
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetRequestResponse(bool * const apRequestResponse) const;
+    CHIP_ERROR GetSuppressResponse(bool * const apSuppressResponse) const;
 
     /**
      *  @brief Get Subscription Id. Next() must be called before accessing them.
      *
-     *  @param [in] apSubscriptionId    A pointer to apIsLastReport
+     *  @param [in] apSubscriptionId    A pointer to apSubscriptionId
      *
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_END_OF_TLV if there is no such element
@@ -132,14 +133,14 @@ public:
     CHIP_ERROR GetEventDataList(EventList::Parser * const apEventDataList) const;
 
     /**
-     *  @brief Check whether this message is last report. Next() must be called before accessing them.
+     *  @brief Check whether there are more chunked messages in a transaction. Next() must be called before accessing them.
      *
-     *  @param [in] apIsLastReport    A pointer to apIsLastReport
+     *  @param [in] apMoreChunkedMessages   A pointer to apMoreChunkedMessages
      *
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetIsLastReport(bool * const apIsLastReport) const;
+    CHIP_ERROR GetMoreChunkedMessages(bool * const apMoreChunkedMessages) const;
 };
 
 class Builder : public chip::app::Builder
@@ -155,14 +156,14 @@ public:
     CHIP_ERROR Init(chip::TLV::TLVWriter * const apWriter);
 
     /**
-     *  @brief Inject RequestResponse into the TLV stream to indicate whether a response (a StatusReponse specifically)
+     *  @brief Inject SuppressResponse into the TLV stream to indicate whether a response (a StatusResponse specifically)
      *  is to be sent back to the request.
      *
-     *  @param [in] aRequestResponse The boolean variable to indicate if request response is needed.
+     *  @param [in] aSuppressResponse The boolean variable to indicate if request response is needed.
      *
      *  @return A reference to *this
      */
-    ReportData::Builder & RequestResponse(const bool aRequestResponse);
+    ReportData::Builder & SuppressResponse(const bool aSuppressResponse);
 
     /**
      *  @brief Inject subscription id into the TLV stream, This field contains the Subscription ID
@@ -199,12 +200,11 @@ public:
     EventList::Builder & CreateEventDataListBuilder();
 
     /**
-     *  @brief This flag is set to ‘true’ when this is the last ReportDataRequest message
-     *  in a transaction and there are no more Changes to be conveyed.
-     *  @param [in] aIsLastReport The boolean variable to indicate if it is LastReport
+     *  @brief This flag is set to ‘true’ when there are more chunked messages in a transaction.
+     *  @param [in] aMoreChunkedMessages The boolean variable to indicate if there are more chunked messages in a transaction.
      *  @return A reference to *this
      */
-    ReportData::Builder & IsLastReport(const bool aIsLastReport);
+    ReportData::Builder & MoreChunkedMessages(const bool aMoreChunkedMessages);
 
     /**
      *  @brief Mark the end of this ReportData

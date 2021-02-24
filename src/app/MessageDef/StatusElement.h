@@ -40,10 +40,10 @@ namespace app {
 namespace StatusElement {
 enum
 {
-    kCsTag_GeneralCode         = 1,
-    kCsTag_ProtocolId          = 2,
-    kCsTag_ProtocolCode        = 3,
-    kCsTag_NamespacedClusterId = 4
+    kCsTag_GeneralCode  = 1,
+    kCsTag_ProtocolId   = 2,
+    kCsTag_ProtocolCode = 3,
+    kCsTag_ClusterId    = 4
 };
 
 class Parser : public ListParser
@@ -74,19 +74,19 @@ public:
     CHIP_ERROR CheckSchemaValidity() const;
 
     /**
-    `* Read the GeneralCode, ProtocolId, ProtocolCode, NamespacedClusterId
+    `* Read the GeneralCode, ProtocolId, ProtocolCode, ClusterId
      *
      * @param[out]   apGeneralCode     Pointer to the storage for the GeneralCode
      * @param[out]   apProtocolId     Pointer to the storage for the ProtocolId
      * @param[out]   apProtocolCode   Pointer to the storage for the ProtocolCode
-     * @param[out]   apNamespacedClusterId     Pointer to the storage for the NamespacedClusterId
+     * @param[out]   apClusterId     Pointer to the storage for the ClusterId
      *
      * @return       CHIP_ERROR codes returned by chip::TLV objects. CHIP_END_OF_TLV if either
      *               element is missing. CHIP_ERROR_WRONG_TLV_TYPE if the elements are of the wrong
      *               type.
      */
     CHIP_ERROR DecodeStatusElement(uint16_t * apGeneralCode, uint32_t * apProtocolId, uint16_t * apProtocolCode,
-                                   chip::ClusterId * apNamespacedClusterId) const;
+                                   chip::ClusterId * apClusterId) const;
 };
 
 class Builder : public ListBuilder
@@ -113,19 +113,19 @@ public:
     CHIP_ERROR Init(chip::TLV::TLVWriter * const apWriter, const uint8_t aContextTagToUse);
 
     /**
-    `* Read the GeneralCode, ProtocolId, ProtocolCode, NamespacedClusterId
+    `* Read the GeneralCode, ProtocolId, ProtocolCode, ClusterId
      *
      * @param[in]   aGeneralCode    General status code
      * @param[in]   aProtocolId     A protocol ID (32-bit integer composed of a 16-bit vendor id and 16-bit Scoped id)
      * @param[in]   aProtocolCode   16-bit protocol-specific error code
-     * @param[in]   aNamespacedClusterId      Cluster Id for ZCL
+     * @param[in]   aClusterId      Cluster Id for ZCL
      *
      * @return       CHIP_ERROR codes returned by chip::TLV objects. CHIP_END_OF_TLV if either
      *               element is missing. CHIP_ERROR_WRONG_TLV_TYPE if the elements are of the wrong
      *               type.
      */
     StatusElement::Builder & EncodeStatusElement(const uint16_t aGeneralCode, const uint32_t aProtocolId,
-                                                 const uint16_t aProtocolCode, const chip::ClusterId aNamespacedClusterId);
+                                                 const uint16_t aProtocolCode, const chip::ClusterId aClusterId);
 
     /**
      *  @brief Mark the end of this StatusElement
