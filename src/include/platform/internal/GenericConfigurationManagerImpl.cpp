@@ -42,8 +42,6 @@
 #include <crypto/CHIPCryptoPAL.h>
 #endif
 
-#include <inttypes.h>
-
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {

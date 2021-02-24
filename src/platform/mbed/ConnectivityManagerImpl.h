@@ -31,6 +31,7 @@
 #include <platform/internal/GenericConnectivityManagerImpl_NoThread.h>
 #endif
 
+#include <inttypes.h>
 #include <support/logging/CHIPLogging.h>
 
 namespace chip {

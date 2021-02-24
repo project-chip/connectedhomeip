@@ -36,8 +36,6 @@
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 
-#include <inttypes.h>
-
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
