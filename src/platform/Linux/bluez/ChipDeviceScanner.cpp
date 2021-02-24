@@ -81,11 +81,6 @@ ChipDeviceScanner::~ChipDeviceScanner()
     // In case the timeout timer is still active
     chip::DeviceLayer::SystemLayer.CancelTimer(TimerExpiredCallback, this);
 
-    while (mIsScanning)
-    {
-        g_thread_yield();
-    }
-
     g_object_unref(mManager);
     g_object_unref(mCancellable);
     g_object_unref(mAdapter);
@@ -173,7 +168,7 @@ CHIP_ERROR ChipDeviceScanner::StopScan()
         mInterfaceChangedSignal = 0;
     }
 
-    if (!MainLoop::Instance().Schedule(MainLoopStopScan, this))
+    if (!MainLoop::Instance().ScheduleAndWait(MainLoopStopScan, this))
     {
         ChipLogError(Ble, "Failed to schedule BLE scan stop.");
         return CHIP_ERROR_INTERNAL;

@@ -94,8 +94,8 @@ private:
     ChipDeviceScannerDelegate * mDelegate = nullptr;
     gulong mObjectAddedSignal             = 0;
     gulong mInterfaceChangedSignal        = 0;
-    volatile bool mIsScanning             = false;
-    volatile bool mIsStopping             = false;
+    bool mIsScanning                      = false;
+    bool mIsStopping                      = false;
 };
 
 } // namespace Internal

@@ -119,6 +119,7 @@ CHIP_ERROR MainLoop::EnsureStarted()
     tmpErrno   = errno;
     VerifyOrExit(pthreadErr == 0, ChipLogError(DeviceLayer, "FAIL: pthread_create (%s) in %s", strerror(tmpErrno), __func__));
 
+    // Ensure that the newly created thread starts the main loop
     while (!g_main_loop_is_running(mBluezMainLoop))
     {
         pthread_yield();
