@@ -18,6 +18,7 @@ chip_device_platform = "mbed"
 
 chip_project_config_include = ""
 chip_system_project_config_include = ""
+chip_device_project_config_include = ""
 
 chip_inet_config_enable_raw_endpoint = false
 chip_inet_config_enable_udp_endpoint = true
