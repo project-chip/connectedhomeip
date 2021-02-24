@@ -82,7 +82,7 @@ public:
         mCompleteCallback = nullptr;
     }
 
-    void SetScanner(ChipDeviceScanner::Ptr scanner) { mScanner = std::move(scanner); }
+    void SetScanner(std::unique_ptr<ChipDeviceScanner> scanner) { mScanner = std::move(scanner); }
 
     void OnDeviceScanned(BluezDevice1 * device, const chip::Ble::ChipBLEDeviceIdentificationInfo & info) override
     {
@@ -104,7 +104,7 @@ public:
     }
 
 private:
-    ChipDeviceScanner::Ptr mScanner;
+    std::unique_ptr<ChipDeviceScanner> mScanner;
     PyObject * const mContext;
     DeviceScannedCallback mScanCallback;
     ScanCompleteCallback mCompleteCallback;
@@ -118,7 +118,7 @@ extern "C" void * pychip_ble_start_scanning(PyObject * context, void * adapter, 
 {
     std::unique_ptr<ScannerDelegateImpl> delegate = std::make_unique<ScannerDelegateImpl>(context, scanCallback, completeCallback);
 
-    ChipDeviceScanner::Ptr scanner = ChipDeviceScanner::Create(static_cast<BluezAdapter1 *>(adapter), delegate.get());
+    std::unique_ptr<ChipDeviceScanner> scanner = ChipDeviceScanner::Create(static_cast<BluezAdapter1 *>(adapter), delegate.get());
 
     if (!scanner)
     {

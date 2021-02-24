@@ -52,8 +52,6 @@ public:
 class ChipDeviceScanner
 {
 public:
-    using Ptr = std::unique_ptr<ChipDeviceScanner>;
-
     /// NOTE: prefer to use the  ::Create method instead direct constructor calling.
     ChipDeviceScanner(GDBusObjectManager * manager, BluezAdapter1 * adapter, GCancellable * cancellable,
                       ChipDeviceScannerDelegate * delegate);
@@ -74,7 +72,7 @@ public:
     ///
     /// Convenience method to allocate any required variables.
     /// On success, maintains a reference to the provided adapter.
-    static Ptr Create(BluezAdapter1 * adapter, ChipDeviceScannerDelegate * delegate);
+    static std::unique_ptr<ChipDeviceScanner> Create(BluezAdapter1 * adapter, ChipDeviceScannerDelegate * delegate);
 
 private:
     static void TimerExpiredCallback(chip::System::Layer * layer, void * appState, chip::System::Error error);

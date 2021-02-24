@@ -91,7 +91,7 @@ ChipDeviceScanner::~ChipDeviceScanner()
     mDelegate    = nullptr;
 }
 
-ChipDeviceScanner::Ptr ChipDeviceScanner::Create(BluezAdapter1 * adapter, ChipDeviceScannerDelegate * delegate)
+std::unique_ptr<ChipDeviceScanner> ChipDeviceScanner::Create(BluezAdapter1 * adapter, ChipDeviceScannerDelegate * delegate)
 {
     GError * error = nullptr;
 

@@ -27,7 +27,7 @@ namespace {
 
 pthread_t sPlatformMainThread;
 
-void * PlatfomrMainLoop(void *)
+void * PlatformMainLoop(void *)
 {
     ChipLogProgress(DeviceLayer, "Platform main loop started.");
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
@@ -52,7 +52,7 @@ extern "C" void pychip_native_init()
     {
         ChipLogError(DeviceLayer, "Failed to initialize CHIP stack: platform init failed: %s", chip::ErrorStr(err));
     }
-    int result   = pthread_create(&sPlatformMainThread, nullptr, PlatfomrMainLoop, nullptr);
+    int result   = pthread_create(&sPlatformMainThread, nullptr, PlatformMainLoop, nullptr);
     int tmpErrno = errno;
 
     if (result != 0)
