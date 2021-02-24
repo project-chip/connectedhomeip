@@ -89,6 +89,10 @@ CHIP_ERROR
 pychip_ScriptDevicePairingDelegate_SetWifiCredential(chip::Controller::DeviceCommissioner * devCtrl, const char * ssid,
                                                      const char * password);
 CHIP_ERROR
+pychip_ScriptDevicePairingDelegate_SetThreadCredential(chip::Controller::DeviceCommissioner * devCtrl, int channel, int panId,
+                                                       const char * masterKey);
+
+CHIP_ERROR
 pychip_ScriptDevicePairingDelegate_SetKeyExchangeCallback(chip::Controller::DeviceCommissioner * devCtrl,
                                                           chip::Controller::DevicePairingDelegate_OnPairingCompleteFunct callback);
 
@@ -197,6 +201,26 @@ pychip_ScriptDevicePairingDelegate_SetWifiCredential(chip::Controller::DeviceCom
     VerifyOrExit(password != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     sPairingDelegate.SetWifiCredential(ssid, password);
+
+exit:
+    return err;
+}
+
+CHIP_ERROR
+pychip_ScriptDevicePairingDelegate_SetThreadCredential(chip::Controller::DeviceCommissioner * devCtrl, int channel, int panId,
+                                                       const char * masterKeyStr)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    uint8_t masterKey[chip::DeviceLayer::Internal::kThreadMasterKeyLength];
+    (void) devCtrl;
+
+    VerifyOrExit(strlen(masterKeyStr) == 2 * chip::DeviceLayer::Internal::kThreadMasterKeyLength,
+                 err = CHIP_ERROR_INVALID_ARGUMENT);
+
+    for (size_t i = 0; i < chip::DeviceLayer::Internal::kThreadMasterKeyLength; i++)
+        VerifyOrExit(sscanf(&masterKeyStr[2 * i], "%2hhx", &masterKey[i]) == 1, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+    sPairingDelegate.SetThreadCredential(channel, panId, masterKey);
 
 exit:
     return err;

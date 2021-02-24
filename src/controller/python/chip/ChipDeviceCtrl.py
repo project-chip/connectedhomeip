@@ -158,6 +158,11 @@ class ChipDeviceController(object):
         if ret != 0:
             raise self._ChipStack.ErrorToException(res)
 
+    def SetThreadCredential(self, channel, panid, masterKey):
+        ret = self._dmLib.pychip_ScriptDevicePairingDelegate_SetThreadCredential(self.devCtrl, channel, panid, masterKey.encode("utf-8") + b'\0')
+        if ret != 0:
+            raise self._ChipStack.ErrorToException(ret)
+
     # ----- Private Members -----
     def _InitLib(self):
         if self._dmLib is None:
