@@ -19,6 +19,7 @@
 
 #include <platform/ConnectivityManager.h>
 #include <platform/internal/GenericConnectivityManagerImpl.h>
+#include <platform/internal/GenericConnectivityManagerImpl_WiFi.h>
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #include <platform/internal/GenericConnectivityManagerImpl_BLE.h>
 #else
@@ -29,8 +30,8 @@
 #else
 #include <platform/internal/GenericConnectivityManagerImpl_NoThread.h>
 #endif
-#include <platform/internal/GenericConnectivityManagerImpl_NoWiFi.h>
-
+#include "NetworkInfo.h"
+#include "netsocket/WiFiInterface.h"
 #include <support/logging/CHIPLogging.h>
 
 namespace chip {
@@ -43,10 +44,12 @@ namespace chip {
 namespace DeviceLayer {
 
 /**
- * Concrete implementation of the ConnectivityManager singleton object for Zephyr platforms.
+ * Concrete implementation of the ConnectivityManager singleton object for mbed platforms.
  */
 class ConnectivityManagerImpl final : public ConnectivityManager,
                                       public Internal::GenericConnectivityManagerImpl<ConnectivityManagerImpl>,
+                                      public Internal::GenericConnectivityManagerImpl_WiFi<ConnectivityManagerImpl>,
+
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
                                       public Internal::GenericConnectivityManagerImpl_BLE<ConnectivityManagerImpl>,
 #else
@@ -55,34 +58,61 @@ class ConnectivityManagerImpl final : public ConnectivityManager,
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
                                       public Internal::GenericConnectivityManagerImpl_Thread<ConnectivityManagerImpl>,
 #else
-                                      public Internal::GenericConnectivityManagerImpl_NoThread<ConnectivityManagerImpl>,
+                                      public Internal::GenericConnectivityManagerImpl_NoThread<ConnectivityManagerImpl>
 #endif
-                                      public Internal::GenericConnectivityManagerImpl_NoWiFi<ConnectivityManagerImpl>
+
 {
     // Allow the ConnectivityManager interface class to delegate method calls to
     // the implementation methods provided by this class.
     friend class ConnectivityManager;
 
+public:
+    CHIP_ERROR ProvisionWiFiNetwork(const char * ssid, const char * key);
+    void StartWiFiManagement() {}
+    int ScanWiFi(int APlimit, NetworkInfo * wifiInfo);
+    CHIP_ERROR GetWifiStatus();
+
 private:
     // ===== Members that implement the ConnectivityManager abstract interface.
-
     bool _HaveIPv4InternetConnectivity(void);
     bool _HaveIPv6InternetConnectivity(void);
     bool _HaveServiceConnectivity(void);
     CHIP_ERROR _Init(void);
     void _OnPlatformEvent(const ChipDeviceEvent * event);
 
+    WiFiStationMode _GetWiFiStationMode(void);
+    CHIP_ERROR _SetWiFiStationMode(WiFiStationMode val);
+
+    bool _IsWiFiStationConnected(void);
+    bool _IsWiFiStationEnabled(void);
+    bool _IsWiFiStationProvisioned(void);
+    void _ClearWiFiStationProvision(void);
+    bool _IsWiFiStationApplicationControlled(void);
+    CHIP_ERROR _SetWiFiAPMode(WiFiAPMode val);
+
+    // TODO
+    CHIP_ERROR OnStationConnected();
+    CHIP_ERROR OnStationDisconnected();
+    const char * status2str(nsapi_connection_status_t sec);
+    WiFiAuthSecurityType NsapiToNetworkSecurity(nsapi_security_t nsapi_security);
     // ===== Members for internal use by the following friends.
 
     friend ConnectivityManager & ConnectivityMgr(void);
     friend ConnectivityManagerImpl & ConnectivityMgrImpl(void);
 
     static ConnectivityManagerImpl sInstance;
+    WiFiStationMode mWiFiStationMode;
+    WiFiStationState mWiFiStationState;
+    WiFiAPMode mWiFiAPMode;
+    uint32_t mWiFiStationReconnectIntervalMS;
+    uint32_t mWiFiAPIdleTimeoutMS;
+    bool mIsProvisioned;
+    WiFiInterface * _interface;
 };
 
 inline bool ConnectivityManagerImpl::_HaveIPv4InternetConnectivity(void)
 {
-    return false;
+    return mWiFiStationState == kWiFiStationState_Connected;
 }
 
 inline bool ConnectivityManagerImpl::_HaveIPv6InternetConnectivity(void)
@@ -92,15 +122,8 @@ inline bool ConnectivityManagerImpl::_HaveIPv6InternetConnectivity(void)
 
 inline bool ConnectivityManagerImpl::_HaveServiceConnectivity(void)
 {
-    return false;
+    return mWiFiStationState == kWiFiStationState_Connected;
 }
-
-inline CHIP_ERROR ConnectivityManagerImpl::_Init(void)
-{
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-
-inline void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event) {}
 
 /**
  * Returns the public interface of the ConnectivityManager singleton object.
@@ -117,7 +140,7 @@ inline ConnectivityManager & ConnectivityMgr(void)
  * Returns the platform-specific implementation of the ConnectivityManager singleton object.
  *
  * chip applications can use this to gain access to features of the ConnectivityManager
- * that are specific to the ESP32 platform.
+ * that are specific to the mbed platform.
  */
 inline ConnectivityManagerImpl & ConnectivityMgrImpl(void)
 {

@@ -16,7 +16,7 @@
  */
 
 #include <lib/core/CHIPCore.h>
-
+#define LIMIT_AP 15 // to do   move it to proprer place dont know yet
 #if CONFIG_DEVICE_LAYER
 
 #include <inttypes.h>
@@ -808,6 +808,62 @@ exit:
     PlatformMgr().UnlockChipStack();
     return error;
 }
+int cmd_device_scan(int argc, char ** argv)
+{
+    streamer_t * sout = streamer_get();
+
+    CHIP_ERROR error = CHIP_NO_ERROR;
+
+    VerifyOrExit(PlatformMgr().TryLockChipStack(), error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    streamer_printf(sout, "Scanning WIFI AP  command \r\n");
+    error = CHIP_ERROR_NOT_CONNECTED;
+
+    NetworkInfo * wifiInfo;
+    wifiInfo = new NetworkInfo[LIMIT_AP];
+
+    int foundAPs;
+    foundAPs = ConnectivityMgrImpl().ScanWiFi(LIMIT_AP, wifiInfo);
+
+    if (foundAPs <= 0)
+    {
+        streamer_printf(sout, "Failed to find any WiFi network \r\n");
+    }
+    else
+    {
+        streamer_printf(sout, "Found  %d  networks \r\n", foundAPs);
+        error = CHIP_NO_ERROR;
+        for (int i = 0; i < foundAPs; i++)
+            printf("Network: %s secured: %s BSSID: %hhX:%hhX:%hhX:%hhx:%hhx:%hhx RSSI: %hhd Ch: %hhd\n", wifiInfo[i].WiFiSSID,
+                   wifiInfo[i].sec2str(wifiInfo[i].security), wifiInfo[i].BSSID[0], wifiInfo[i].BSSID[1], wifiInfo[i].BSSID[2],
+                   wifiInfo[i].BSSID[3], wifiInfo[i].BSSID[4], wifiInfo[i].BSSID[5], wifiInfo[i].RSSI, wifiInfo[i].channel);
+    }
+    delete[] wifiInfo;
+exit:
+    PlatformMgr().UnlockChipStack();
+    return error;
+}
+
+int cmd_device_status(int argc, char ** argv)
+{
+    streamer_t * sout = streamer_get();
+    CHIP_ERROR error  = CHIP_NO_ERROR;
+
+    VerifyOrExit(PlatformMgr().TryLockChipStack(), error = CHIP_ERROR_INVALID_ARGUMENT);
+    streamer_printf(sout, " WIFI status \r\n");
+    error = CHIP_ERROR_INVALID_ARGUMENT;
+
+    error = ConnectivityMgrImpl().GetWifiStatus();
+
+    if (error != CHIP_NO_ERROR)
+    {
+        streamer_printf(sout, "Failed to connect to WiFi network: %s\r\n", chip::ErrorStr(error));
+    }
+
+exit:
+    PlatformMgr().UnlockChipStack();
+    return error;
+}
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
@@ -933,6 +989,8 @@ static const shell_command_t cmds_device[] = {
     { &cmd_device_start_wifi, "start_wifi", "Start WiFi management. Usage: device start_wifi" },
     { &cmd_device_sta, "sta", "Control the WiFi STA interface. Usage: device sta <param_name>" },
     { &cmd_device_ap, "ap", "Control the WiFi AP interface. Usage: device ap <param_name>" },
+    { &cmd_device_status, "status", "WiFi status" },
+    { &cmd_device_scan, "scan", "Scan WiFi" },
     { &cmd_device_connect, "connect", "Join the network with the given SSID and PSK. Usage: device connect <ssid> <passphrase>" },
 #endif
 };
