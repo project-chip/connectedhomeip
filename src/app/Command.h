@@ -120,7 +120,7 @@ public:
                           chip::CommandId aCommandId, uint8_t Flags);
     CHIP_ERROR AddCommand(CommandParams & aCommandParams);
     CHIP_ERROR AddStatusCode(const uint16_t aGeneralCode, const uint32_t aProtocolId, const uint16_t aProtocolCode,
-                             const chip::ClusterId aNamespacedClusterId);
+                             const chip::ClusterId aClusterId);
     CHIP_ERROR ClearExistingExchangeContext();
 
     CHIP_ERROR Reset();

@@ -129,7 +129,7 @@ CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser &
         err = aCommandElement.GetCommandPath(&commandPath);
         SuccessOrExit(err);
 
-        err = commandPath.GetNamespacedClusterId(&clusterId);
+        err = commandPath.GetClusterId(&clusterId);
         SuccessOrExit(err);
 
         err = commandPath.GetCommandId(&commandId);
