@@ -43,18 +43,18 @@ namespace clusters {
 
 namespace BarrierControl {
 #if IM_HAVE_BARRIER_CONTROL_CLUSTER_BARRIER_CONTROL_GO_TO_PERCENT_COMMAND
-void OnBarrierControlGoToPercentCommandCallback(app::Command*, EndpointId ZCLEndpointId, uint8_t percentOpen)
+void OnBarrierControlGoToPercentCommandCallback(app::Command* command, EndpointId ZCLEndpointId, uint8_t percentOpen)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_BARRIER_CONTROL_CLUSTER_ID, ZCL_BARRIER_CONTROL_GO_TO_PERCENT_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_BARRIER_CONTROL_CLUSTER_ID, ZCL_BARRIER_CONTROL_GO_TO_PERCENT_COMMAND_ID, ZCLEndpointId);
     emberAfBarrierControlClusterBarrierControlGoToPercentCallback(percentOpen);
     Compatibility::ResetEmberAfObjects();
 }
 #endif
 
 #if IM_HAVE_BARRIER_CONTROL_CLUSTER_BARRIER_CONTROL_STOP_COMMAND
-void OnBarrierControlStopCommandCallback(app::Command*, EndpointId ZCLEndpointId)
+void OnBarrierControlStopCommandCallback(app::Command* command, EndpointId ZCLEndpointId)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_BARRIER_CONTROL_CLUSTER_ID, ZCL_BARRIER_CONTROL_STOP_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_BARRIER_CONTROL_CLUSTER_ID, ZCL_BARRIER_CONTROL_STOP_COMMAND_ID, ZCLEndpointId);
     emberAfBarrierControlClusterBarrierControlStopCallback();
     Compatibility::ResetEmberAfObjects();
 }
@@ -63,9 +63,9 @@ void OnBarrierControlStopCommandCallback(app::Command*, EndpointId ZCLEndpointId
 } // namespace BarrierControl
 namespace Basic {
 #if IM_HAVE_BASIC_CLUSTER_RESET_TO_FACTORY_DEFAULTS_COMMAND
-void OnResetToFactoryDefaultsCommandCallback(app::Command*, EndpointId ZCLEndpointId)
+void OnResetToFactoryDefaultsCommandCallback(app::Command* command, EndpointId ZCLEndpointId)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_BASIC_CLUSTER_ID, ZCL_RESET_TO_FACTORY_DEFAULTS_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_BASIC_CLUSTER_ID, ZCL_RESET_TO_FACTORY_DEFAULTS_COMMAND_ID, ZCLEndpointId);
     emberAfBasicClusterResetToFactoryDefaultsCallback();
     Compatibility::ResetEmberAfObjects();
 }
@@ -74,18 +74,18 @@ void OnResetToFactoryDefaultsCommandCallback(app::Command*, EndpointId ZCLEndpoi
 } // namespace Basic
 namespace Binding {
 #if IM_HAVE_BINDING_CLUSTER_BIND_COMMAND
-void OnBindCommandCallback(app::Command*, EndpointId ZCLEndpointId, chip::NodeId nodeId, chip::GroupId groupId, chip::EndpointId endpointId, chip::ClusterId clusterId)
+void OnBindCommandCallback(app::Command* command, EndpointId ZCLEndpointId, chip::NodeId nodeId, chip::GroupId groupId, chip::EndpointId endpointId, chip::ClusterId clusterId)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_BINDING_CLUSTER_ID, ZCL_BIND_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_BINDING_CLUSTER_ID, ZCL_BIND_COMMAND_ID, ZCLEndpointId);
     emberAfBindingClusterBindCallback(nodeId, groupId, endpointId, clusterId);
     Compatibility::ResetEmberAfObjects();
 }
 #endif
 
 #if IM_HAVE_BINDING_CLUSTER_UNBIND_COMMAND
-void OnUnbindCommandCallback(app::Command*, EndpointId ZCLEndpointId, chip::NodeId nodeId, chip::GroupId groupId, chip::EndpointId endpointId, chip::ClusterId clusterId)
+void OnUnbindCommandCallback(app::Command* command, EndpointId ZCLEndpointId, chip::NodeId nodeId, chip::GroupId groupId, chip::EndpointId endpointId, chip::ClusterId clusterId)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_BINDING_CLUSTER_ID, ZCL_UNBIND_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_BINDING_CLUSTER_ID, ZCL_UNBIND_COMMAND_ID, ZCLEndpointId);
     emberAfBindingClusterUnbindCallback(nodeId, groupId, endpointId, clusterId);
     Compatibility::ResetEmberAfObjects();
 }
@@ -94,126 +94,126 @@ void OnUnbindCommandCallback(app::Command*, EndpointId ZCLEndpointId, chip::Node
 } // namespace Binding
 namespace ColorControl {
 #if IM_HAVE_COLOR_CONTROL_CLUSTER_MOVE_COLOR_COMMAND
-void OnMoveColorCommandCallback(app::Command*, EndpointId ZCLEndpointId, int16_t rateX, int16_t rateY, uint8_t optionsMask, uint8_t optionsOverride)
+void OnMoveColorCommandCallback(app::Command* command, EndpointId ZCLEndpointId, int16_t rateX, int16_t rateY, uint8_t optionsMask, uint8_t optionsOverride)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_MOVE_COLOR_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_MOVE_COLOR_COMMAND_ID, ZCLEndpointId);
     emberAfColorControlClusterMoveColorCallback(rateX, rateY, optionsMask, optionsOverride);
     Compatibility::ResetEmberAfObjects();
 }
 #endif
 
 #if IM_HAVE_COLOR_CONTROL_CLUSTER_MOVE_COLOR_TEMPERATURE_COMMAND
-void OnMoveColorTemperatureCommandCallback(app::Command*, EndpointId ZCLEndpointId, uint8_t moveMode, uint16_t rate, uint16_t colorTemperatureMinimum, uint16_t colorTemperatureMaximum, uint8_t optionsMask, uint8_t optionsOverride)
+void OnMoveColorTemperatureCommandCallback(app::Command* command, EndpointId ZCLEndpointId, uint8_t moveMode, uint16_t rate, uint16_t colorTemperatureMinimum, uint16_t colorTemperatureMaximum, uint8_t optionsMask, uint8_t optionsOverride)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_MOVE_COLOR_TEMPERATURE_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_MOVE_COLOR_TEMPERATURE_COMMAND_ID, ZCLEndpointId);
     emberAfColorControlClusterMoveColorTemperatureCallback(moveMode, rate, colorTemperatureMinimum, colorTemperatureMaximum, optionsMask, optionsOverride);
     Compatibility::ResetEmberAfObjects();
 }
 #endif
 
 #if IM_HAVE_COLOR_CONTROL_CLUSTER_MOVE_HUE_COMMAND
-void OnMoveHueCommandCallback(app::Command*, EndpointId ZCLEndpointId, uint8_t moveMode, uint8_t rate, uint8_t optionsMask, uint8_t optionsOverride)
+void OnMoveHueCommandCallback(app::Command* command, EndpointId ZCLEndpointId, uint8_t moveMode, uint8_t rate, uint8_t optionsMask, uint8_t optionsOverride)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_MOVE_HUE_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_MOVE_HUE_COMMAND_ID, ZCLEndpointId);
     emberAfColorControlClusterMoveHueCallback(moveMode, rate, optionsMask, optionsOverride);
     Compatibility::ResetEmberAfObjects();
 }
 #endif
 
 #if IM_HAVE_COLOR_CONTROL_CLUSTER_MOVE_SATURATION_COMMAND
-void OnMoveSaturationCommandCallback(app::Command*, EndpointId ZCLEndpointId, uint8_t moveMode, uint8_t rate, uint8_t optionsMask, uint8_t optionsOverride)
+void OnMoveSaturationCommandCallback(app::Command* command, EndpointId ZCLEndpointId, uint8_t moveMode, uint8_t rate, uint8_t optionsMask, uint8_t optionsOverride)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_MOVE_SATURATION_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_MOVE_SATURATION_COMMAND_ID, ZCLEndpointId);
     emberAfColorControlClusterMoveSaturationCallback(moveMode, rate, optionsMask, optionsOverride);
     Compatibility::ResetEmberAfObjects();
 }
 #endif
 
 #if IM_HAVE_COLOR_CONTROL_CLUSTER_MOVE_TO_COLOR_COMMAND
-void OnMoveToColorCommandCallback(app::Command*, EndpointId ZCLEndpointId, uint16_t colorX, uint16_t colorY, uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride)
+void OnMoveToColorCommandCallback(app::Command* command, EndpointId ZCLEndpointId, uint16_t colorX, uint16_t colorY, uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_MOVE_TO_COLOR_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_MOVE_TO_COLOR_COMMAND_ID, ZCLEndpointId);
     emberAfColorControlClusterMoveToColorCallback(colorX, colorY, transitionTime, optionsMask, optionsOverride);
     Compatibility::ResetEmberAfObjects();
 }
 #endif
 
 #if IM_HAVE_COLOR_CONTROL_CLUSTER_MOVE_TO_COLOR_TEMPERATURE_COMMAND
-void OnMoveToColorTemperatureCommandCallback(app::Command*, EndpointId ZCLEndpointId, uint16_t colorTemperature, uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride)
+void OnMoveToColorTemperatureCommandCallback(app::Command* command, EndpointId ZCLEndpointId, uint16_t colorTemperature, uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_MOVE_TO_COLOR_TEMPERATURE_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_MOVE_TO_COLOR_TEMPERATURE_COMMAND_ID, ZCLEndpointId);
     emberAfColorControlClusterMoveToColorTemperatureCallback(colorTemperature, transitionTime, optionsMask, optionsOverride);
     Compatibility::ResetEmberAfObjects();
 }
 #endif
 
 #if IM_HAVE_COLOR_CONTROL_CLUSTER_MOVE_TO_HUE_COMMAND
-void OnMoveToHueCommandCallback(app::Command*, EndpointId ZCLEndpointId, uint8_t hue, uint8_t direction, uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride)
+void OnMoveToHueCommandCallback(app::Command* command, EndpointId ZCLEndpointId, uint8_t hue, uint8_t direction, uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_MOVE_TO_HUE_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_MOVE_TO_HUE_COMMAND_ID, ZCLEndpointId);
     emberAfColorControlClusterMoveToHueCallback(hue, direction, transitionTime, optionsMask, optionsOverride);
     Compatibility::ResetEmberAfObjects();
 }
 #endif
 
 #if IM_HAVE_COLOR_CONTROL_CLUSTER_MOVE_TO_HUE_AND_SATURATION_COMMAND
-void OnMoveToHueAndSaturationCommandCallback(app::Command*, EndpointId ZCLEndpointId, uint8_t hue, uint8_t saturation, uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride)
+void OnMoveToHueAndSaturationCommandCallback(app::Command* command, EndpointId ZCLEndpointId, uint8_t hue, uint8_t saturation, uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_MOVE_TO_HUE_AND_SATURATION_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_MOVE_TO_HUE_AND_SATURATION_COMMAND_ID, ZCLEndpointId);
     emberAfColorControlClusterMoveToHueAndSaturationCallback(hue, saturation, transitionTime, optionsMask, optionsOverride);
     Compatibility::ResetEmberAfObjects();
 }
 #endif
 
 #if IM_HAVE_COLOR_CONTROL_CLUSTER_MOVE_TO_SATURATION_COMMAND
-void OnMoveToSaturationCommandCallback(app::Command*, EndpointId ZCLEndpointId, uint8_t saturation, uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride)
+void OnMoveToSaturationCommandCallback(app::Command* command, EndpointId ZCLEndpointId, uint8_t saturation, uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_MOVE_TO_SATURATION_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_MOVE_TO_SATURATION_COMMAND_ID, ZCLEndpointId);
     emberAfColorControlClusterMoveToSaturationCallback(saturation, transitionTime, optionsMask, optionsOverride);
     Compatibility::ResetEmberAfObjects();
 }
 #endif
 
 #if IM_HAVE_COLOR_CONTROL_CLUSTER_STEP_COLOR_COMMAND
-void OnStepColorCommandCallback(app::Command*, EndpointId ZCLEndpointId, int16_t stepX, int16_t stepY, uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride)
+void OnStepColorCommandCallback(app::Command* command, EndpointId ZCLEndpointId, int16_t stepX, int16_t stepY, uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_STEP_COLOR_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_STEP_COLOR_COMMAND_ID, ZCLEndpointId);
     emberAfColorControlClusterStepColorCallback(stepX, stepY, transitionTime, optionsMask, optionsOverride);
     Compatibility::ResetEmberAfObjects();
 }
 #endif
 
 #if IM_HAVE_COLOR_CONTROL_CLUSTER_STEP_COLOR_TEMPERATURE_COMMAND
-void OnStepColorTemperatureCommandCallback(app::Command*, EndpointId ZCLEndpointId, uint8_t stepMode, uint16_t stepSize, uint16_t transitionTime, uint16_t colorTemperatureMinimum, uint16_t colorTemperatureMaximum, uint8_t optionsMask, uint8_t optionsOverride)
+void OnStepColorTemperatureCommandCallback(app::Command* command, EndpointId ZCLEndpointId, uint8_t stepMode, uint16_t stepSize, uint16_t transitionTime, uint16_t colorTemperatureMinimum, uint16_t colorTemperatureMaximum, uint8_t optionsMask, uint8_t optionsOverride)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_STEP_COLOR_TEMPERATURE_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_STEP_COLOR_TEMPERATURE_COMMAND_ID, ZCLEndpointId);
     emberAfColorControlClusterStepColorTemperatureCallback(stepMode, stepSize, transitionTime, colorTemperatureMinimum, colorTemperatureMaximum, optionsMask, optionsOverride);
     Compatibility::ResetEmberAfObjects();
 }
 #endif
 
 #if IM_HAVE_COLOR_CONTROL_CLUSTER_STEP_HUE_COMMAND
-void OnStepHueCommandCallback(app::Command*, EndpointId ZCLEndpointId, uint8_t stepMode, uint8_t stepSize, uint8_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride)
+void OnStepHueCommandCallback(app::Command* command, EndpointId ZCLEndpointId, uint8_t stepMode, uint8_t stepSize, uint8_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_STEP_HUE_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_STEP_HUE_COMMAND_ID, ZCLEndpointId);
     emberAfColorControlClusterStepHueCallback(stepMode, stepSize, transitionTime, optionsMask, optionsOverride);
     Compatibility::ResetEmberAfObjects();
 }
 #endif
 
 #if IM_HAVE_COLOR_CONTROL_CLUSTER_STEP_SATURATION_COMMAND
-void OnStepSaturationCommandCallback(app::Command*, EndpointId ZCLEndpointId, uint8_t stepMode, uint8_t stepSize, uint8_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride)
+void OnStepSaturationCommandCallback(app::Command* command, EndpointId ZCLEndpointId, uint8_t stepMode, uint8_t stepSize, uint8_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_STEP_SATURATION_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_STEP_SATURATION_COMMAND_ID, ZCLEndpointId);
     emberAfColorControlClusterStepSaturationCallback(stepMode, stepSize, transitionTime, optionsMask, optionsOverride);
     Compatibility::ResetEmberAfObjects();
 }
 #endif
 
 #if IM_HAVE_COLOR_CONTROL_CLUSTER_STOP_MOVE_STEP_COMMAND
-void OnStopMoveStepCommandCallback(app::Command*, EndpointId ZCLEndpointId, uint8_t optionsMask, uint8_t optionsOverride)
+void OnStopMoveStepCommandCallback(app::Command* command, EndpointId ZCLEndpointId, uint8_t optionsMask, uint8_t optionsOverride)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_STOP_MOVE_STEP_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_STOP_MOVE_STEP_COMMAND_ID, ZCLEndpointId);
     emberAfColorControlClusterStopMoveStepCallback(optionsMask, optionsOverride);
     Compatibility::ResetEmberAfObjects();
 }
@@ -222,18 +222,18 @@ void OnStopMoveStepCommandCallback(app::Command*, EndpointId ZCLEndpointId, uint
 } // namespace ColorControl
 namespace ContentLaunch {
 #if IM_HAVE_CONTENT_LAUNCH_CLUSTER_LAUNCH_CONTENT_COMMAND
-void OnLaunchContentCommandCallback(app::Command*, EndpointId ZCLEndpointId)
+void OnLaunchContentCommandCallback(app::Command* command, EndpointId ZCLEndpointId)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_CONTENT_LAUNCH_CLUSTER_ID, ZCL_LAUNCH_CONTENT_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_CONTENT_LAUNCH_CLUSTER_ID, ZCL_LAUNCH_CONTENT_COMMAND_ID, ZCLEndpointId);
     emberAfContentLaunchClusterLaunchContentCallback();
     Compatibility::ResetEmberAfObjects();
 }
 #endif
 
 #if IM_HAVE_CONTENT_LAUNCH_CLUSTER_LAUNCH_URL_COMMAND
-void OnLaunchURLCommandCallback(app::Command*, EndpointId ZCLEndpointId)
+void OnLaunchURLCommandCallback(app::Command* command, EndpointId ZCLEndpointId)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_CONTENT_LAUNCH_CLUSTER_ID, ZCL_LAUNCH_URL_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_CONTENT_LAUNCH_CLUSTER_ID, ZCL_LAUNCH_URL_COMMAND_ID, ZCLEndpointId);
     emberAfContentLaunchClusterLaunchURLCallback();
     Compatibility::ResetEmberAfObjects();
 }
@@ -242,207 +242,207 @@ void OnLaunchURLCommandCallback(app::Command*, EndpointId ZCLEndpointId)
 } // namespace ContentLaunch
 namespace DoorLock {
 #if IM_HAVE_DOOR_LOCK_CLUSTER_CLEAR_ALL_PINS_COMMAND
-void OnClearAllPinsCommandCallback(app::Command*, EndpointId ZCLEndpointId)
+void OnClearAllPinsCommandCallback(app::Command* command, EndpointId ZCLEndpointId)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_DOOR_LOCK_CLUSTER_ID, ZCL_CLEAR_ALL_PINS_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_DOOR_LOCK_CLUSTER_ID, ZCL_CLEAR_ALL_PINS_COMMAND_ID, ZCLEndpointId);
     emberAfDoorLockClusterClearAllPinsCallback();
     Compatibility::ResetEmberAfObjects();
 }
 #endif
 
 #if IM_HAVE_DOOR_LOCK_CLUSTER_CLEAR_ALL_RFIDS_COMMAND
-void OnClearAllRfidsCommandCallback(app::Command*, EndpointId ZCLEndpointId)
+void OnClearAllRfidsCommandCallback(app::Command* command, EndpointId ZCLEndpointId)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_DOOR_LOCK_CLUSTER_ID, ZCL_CLEAR_ALL_RFIDS_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_DOOR_LOCK_CLUSTER_ID, ZCL_CLEAR_ALL_RFIDS_COMMAND_ID, ZCLEndpointId);
     emberAfDoorLockClusterClearAllRfidsCallback();
     Compatibility::ResetEmberAfObjects();
 }
 #endif
 
 #if IM_HAVE_DOOR_LOCK_CLUSTER_CLEAR_HOLIDAY_SCHEDULE_COMMAND
-void OnClearHolidayScheduleCommandCallback(app::Command*, EndpointId ZCLEndpointId, uint8_t scheduleId)
+void OnClearHolidayScheduleCommandCallback(app::Command* command, EndpointId ZCLEndpointId, uint8_t scheduleId)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_DOOR_LOCK_CLUSTER_ID, ZCL_CLEAR_HOLIDAY_SCHEDULE_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_DOOR_LOCK_CLUSTER_ID, ZCL_CLEAR_HOLIDAY_SCHEDULE_COMMAND_ID, ZCLEndpointId);
     emberAfDoorLockClusterClearHolidayScheduleCallback(scheduleId);
     Compatibility::ResetEmberAfObjects();
 }
 #endif
 
 #if IM_HAVE_DOOR_LOCK_CLUSTER_CLEAR_PIN_COMMAND
-void OnClearPinCommandCallback(app::Command*, EndpointId ZCLEndpointId, uint16_t userId)
+void OnClearPinCommandCallback(app::Command* command, EndpointId ZCLEndpointId, uint16_t userId)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_DOOR_LOCK_CLUSTER_ID, ZCL_CLEAR_PIN_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_DOOR_LOCK_CLUSTER_ID, ZCL_CLEAR_PIN_COMMAND_ID, ZCLEndpointId);
     emberAfDoorLockClusterClearPinCallback(userId);
     Compatibility::ResetEmberAfObjects();
 }
 #endif
 
 #if IM_HAVE_DOOR_LOCK_CLUSTER_CLEAR_RFID_COMMAND
-void OnClearRfidCommandCallback(app::Command*, EndpointId ZCLEndpointId, uint16_t userId)
+void OnClearRfidCommandCallback(app::Command* command, EndpointId ZCLEndpointId, uint16_t userId)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_DOOR_LOCK_CLUSTER_ID, ZCL_CLEAR_RFID_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_DOOR_LOCK_CLUSTER_ID, ZCL_CLEAR_RFID_COMMAND_ID, ZCLEndpointId);
     emberAfDoorLockClusterClearRfidCallback(userId);
     Compatibility::ResetEmberAfObjects();
 }
 #endif
 
 #if IM_HAVE_DOOR_LOCK_CLUSTER_CLEAR_WEEKDAY_SCHEDULE_COMMAND
-void OnClearWeekdayScheduleCommandCallback(app::Command*, EndpointId ZCLEndpointId, uint8_t scheduleId, uint16_t userId)
+void OnClearWeekdayScheduleCommandCallback(app::Command* command, EndpointId ZCLEndpointId, uint8_t scheduleId, uint16_t userId)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_DOOR_LOCK_CLUSTER_ID, ZCL_CLEAR_WEEKDAY_SCHEDULE_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_DOOR_LOCK_CLUSTER_ID, ZCL_CLEAR_WEEKDAY_SCHEDULE_COMMAND_ID, ZCLEndpointId);
     emberAfDoorLockClusterClearWeekdayScheduleCallback(scheduleId, userId);
     Compatibility::ResetEmberAfObjects();
 }
 #endif
 
 #if IM_HAVE_DOOR_LOCK_CLUSTER_CLEAR_YEARDAY_SCHEDULE_COMMAND
-void OnClearYeardayScheduleCommandCallback(app::Command*, EndpointId ZCLEndpointId, uint8_t scheduleId, uint16_t userId)
+void OnClearYeardayScheduleCommandCallback(app::Command* command, EndpointId ZCLEndpointId, uint8_t scheduleId, uint16_t userId)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_DOOR_LOCK_CLUSTER_ID, ZCL_CLEAR_YEARDAY_SCHEDULE_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_DOOR_LOCK_CLUSTER_ID, ZCL_CLEAR_YEARDAY_SCHEDULE_COMMAND_ID, ZCLEndpointId);
     emberAfDoorLockClusterClearYeardayScheduleCallback(scheduleId, userId);
     Compatibility::ResetEmberAfObjects();
 }
 #endif
 
 #if IM_HAVE_DOOR_LOCK_CLUSTER_GET_HOLIDAY_SCHEDULE_COMMAND
-void OnGetHolidayScheduleCommandCallback(app::Command*, EndpointId ZCLEndpointId, uint8_t scheduleId)
+void OnGetHolidayScheduleCommandCallback(app::Command* command, EndpointId ZCLEndpointId, uint8_t scheduleId)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_DOOR_LOCK_CLUSTER_ID, ZCL_GET_HOLIDAY_SCHEDULE_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_DOOR_LOCK_CLUSTER_ID, ZCL_GET_HOLIDAY_SCHEDULE_COMMAND_ID, ZCLEndpointId);
     emberAfDoorLockClusterGetHolidayScheduleCallback(scheduleId);
     Compatibility::ResetEmberAfObjects();
 }
 #endif
 
 #if IM_HAVE_DOOR_LOCK_CLUSTER_GET_LOG_RECORD_COMMAND
-void OnGetLogRecordCommandCallback(app::Command*, EndpointId ZCLEndpointId, uint16_t logIndex)
+void OnGetLogRecordCommandCallback(app::Command* command, EndpointId ZCLEndpointId, uint16_t logIndex)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_DOOR_LOCK_CLUSTER_ID, ZCL_GET_LOG_RECORD_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_DOOR_LOCK_CLUSTER_ID, ZCL_GET_LOG_RECORD_COMMAND_ID, ZCLEndpointId);
     emberAfDoorLockClusterGetLogRecordCallback(logIndex);
     Compatibility::ResetEmberAfObjects();
 }
 #endif
 
 #if IM_HAVE_DOOR_LOCK_CLUSTER_GET_PIN_COMMAND
-void OnGetPinCommandCallback(app::Command*, EndpointId ZCLEndpointId, uint16_t userId)
+void OnGetPinCommandCallback(app::Command* command, EndpointId ZCLEndpointId, uint16_t userId)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_DOOR_LOCK_CLUSTER_ID, ZCL_GET_PIN_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_DOOR_LOCK_CLUSTER_ID, ZCL_GET_PIN_COMMAND_ID, ZCLEndpointId);
     emberAfDoorLockClusterGetPinCallback(userId);
     Compatibility::ResetEmberAfObjects();
 }
 #endif
 
 #if IM_HAVE_DOOR_LOCK_CLUSTER_GET_RFID_COMMAND
-void OnGetRfidCommandCallback(app::Command*, EndpointId ZCLEndpointId, uint16_t userId)
+void OnGetRfidCommandCallback(app::Command* command, EndpointId ZCLEndpointId, uint16_t userId)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_DOOR_LOCK_CLUSTER_ID, ZCL_GET_RFID_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_DOOR_LOCK_CLUSTER_ID, ZCL_GET_RFID_COMMAND_ID, ZCLEndpointId);
     emberAfDoorLockClusterGetRfidCallback(userId);
     Compatibility::ResetEmberAfObjects();
 }
 #endif
 
 #if IM_HAVE_DOOR_LOCK_CLUSTER_GET_USER_TYPE_COMMAND
-void OnGetUserTypeCommandCallback(app::Command*, EndpointId ZCLEndpointId, uint16_t userId)
+void OnGetUserTypeCommandCallback(app::Command* command, EndpointId ZCLEndpointId, uint16_t userId)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_DOOR_LOCK_CLUSTER_ID, ZCL_GET_USER_TYPE_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_DOOR_LOCK_CLUSTER_ID, ZCL_GET_USER_TYPE_COMMAND_ID, ZCLEndpointId);
     emberAfDoorLockClusterGetUserTypeCallback(userId);
     Compatibility::ResetEmberAfObjects();
 }
 #endif
 
 #if IM_HAVE_DOOR_LOCK_CLUSTER_GET_WEEKDAY_SCHEDULE_COMMAND
-void OnGetWeekdayScheduleCommandCallback(app::Command*, EndpointId ZCLEndpointId, uint8_t scheduleId, uint16_t userId)
+void OnGetWeekdayScheduleCommandCallback(app::Command* command, EndpointId ZCLEndpointId, uint8_t scheduleId, uint16_t userId)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_DOOR_LOCK_CLUSTER_ID, ZCL_GET_WEEKDAY_SCHEDULE_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_DOOR_LOCK_CLUSTER_ID, ZCL_GET_WEEKDAY_SCHEDULE_COMMAND_ID, ZCLEndpointId);
     emberAfDoorLockClusterGetWeekdayScheduleCallback(scheduleId, userId);
     Compatibility::ResetEmberAfObjects();
 }
 #endif
 
 #if IM_HAVE_DOOR_LOCK_CLUSTER_GET_YEARDAY_SCHEDULE_COMMAND
-void OnGetYeardayScheduleCommandCallback(app::Command*, EndpointId ZCLEndpointId, uint8_t scheduleId, uint16_t userId)
+void OnGetYeardayScheduleCommandCallback(app::Command* command, EndpointId ZCLEndpointId, uint8_t scheduleId, uint16_t userId)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_DOOR_LOCK_CLUSTER_ID, ZCL_GET_YEARDAY_SCHEDULE_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_DOOR_LOCK_CLUSTER_ID, ZCL_GET_YEARDAY_SCHEDULE_COMMAND_ID, ZCLEndpointId);
     emberAfDoorLockClusterGetYeardayScheduleCallback(scheduleId, userId);
     Compatibility::ResetEmberAfObjects();
 }
 #endif
 
 #if IM_HAVE_DOOR_LOCK_CLUSTER_LOCK_DOOR_COMMAND
-void OnLockDoorCommandCallback(app::Command*, EndpointId ZCLEndpointId, const uint8_t * PIN)
+void OnLockDoorCommandCallback(app::Command* command, EndpointId ZCLEndpointId, const uint8_t * PIN)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_DOOR_LOCK_CLUSTER_ID, ZCL_LOCK_DOOR_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_DOOR_LOCK_CLUSTER_ID, ZCL_LOCK_DOOR_COMMAND_ID, ZCLEndpointId);
     emberAfDoorLockClusterLockDoorCallback(PIN);
     Compatibility::ResetEmberAfObjects();
 }
 #endif
 
 #if IM_HAVE_DOOR_LOCK_CLUSTER_SET_HOLIDAY_SCHEDULE_COMMAND
-void OnSetHolidayScheduleCommandCallback(app::Command*, EndpointId ZCLEndpointId, uint8_t scheduleId, uint32_t localStartTime, uint32_t localEndTime, uint8_t operatingModeDuringHoliday)
+void OnSetHolidayScheduleCommandCallback(app::Command* command, EndpointId ZCLEndpointId, uint8_t scheduleId, uint32_t localStartTime, uint32_t localEndTime, uint8_t operatingModeDuringHoliday)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_DOOR_LOCK_CLUSTER_ID, ZCL_SET_HOLIDAY_SCHEDULE_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_DOOR_LOCK_CLUSTER_ID, ZCL_SET_HOLIDAY_SCHEDULE_COMMAND_ID, ZCLEndpointId);
     emberAfDoorLockClusterSetHolidayScheduleCallback(scheduleId, localStartTime, localEndTime, operatingModeDuringHoliday);
     Compatibility::ResetEmberAfObjects();
 }
 #endif
 
 #if IM_HAVE_DOOR_LOCK_CLUSTER_SET_PIN_COMMAND
-void OnSetPinCommandCallback(app::Command*, EndpointId ZCLEndpointId, uint16_t userId, uint8_t userStatus, uint8_t userType, const uint8_t * pin)
+void OnSetPinCommandCallback(app::Command* command, EndpointId ZCLEndpointId, uint16_t userId, uint8_t userStatus, uint8_t userType, const uint8_t * pin)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_DOOR_LOCK_CLUSTER_ID, ZCL_SET_PIN_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_DOOR_LOCK_CLUSTER_ID, ZCL_SET_PIN_COMMAND_ID, ZCLEndpointId);
     emberAfDoorLockClusterSetPinCallback(userId, userStatus, userType, pin);
     Compatibility::ResetEmberAfObjects();
 }
 #endif
 
 #if IM_HAVE_DOOR_LOCK_CLUSTER_SET_RFID_COMMAND
-void OnSetRfidCommandCallback(app::Command*, EndpointId ZCLEndpointId, uint16_t userId, uint8_t userStatus, uint8_t userType, const uint8_t * id)
+void OnSetRfidCommandCallback(app::Command* command, EndpointId ZCLEndpointId, uint16_t userId, uint8_t userStatus, uint8_t userType, const uint8_t * id)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_DOOR_LOCK_CLUSTER_ID, ZCL_SET_RFID_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_DOOR_LOCK_CLUSTER_ID, ZCL_SET_RFID_COMMAND_ID, ZCLEndpointId);
     emberAfDoorLockClusterSetRfidCallback(userId, userStatus, userType, id);
     Compatibility::ResetEmberAfObjects();
 }
 #endif
 
 #if IM_HAVE_DOOR_LOCK_CLUSTER_SET_USER_TYPE_COMMAND
-void OnSetUserTypeCommandCallback(app::Command*, EndpointId ZCLEndpointId, uint16_t userId, uint8_t userType)
+void OnSetUserTypeCommandCallback(app::Command* command, EndpointId ZCLEndpointId, uint16_t userId, uint8_t userType)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_DOOR_LOCK_CLUSTER_ID, ZCL_SET_USER_TYPE_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_DOOR_LOCK_CLUSTER_ID, ZCL_SET_USER_TYPE_COMMAND_ID, ZCLEndpointId);
     emberAfDoorLockClusterSetUserTypeCallback(userId, userType);
     Compatibility::ResetEmberAfObjects();
 }
 #endif
 
 #if IM_HAVE_DOOR_LOCK_CLUSTER_SET_WEEKDAY_SCHEDULE_COMMAND
-void OnSetWeekdayScheduleCommandCallback(app::Command*, EndpointId ZCLEndpointId, uint8_t scheduleId, uint16_t userId, uint8_t daysMask, uint8_t startHour, uint8_t startMinute, uint8_t endHour, uint8_t endMinute)
+void OnSetWeekdayScheduleCommandCallback(app::Command* command, EndpointId ZCLEndpointId, uint8_t scheduleId, uint16_t userId, uint8_t daysMask, uint8_t startHour, uint8_t startMinute, uint8_t endHour, uint8_t endMinute)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_DOOR_LOCK_CLUSTER_ID, ZCL_SET_WEEKDAY_SCHEDULE_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_DOOR_LOCK_CLUSTER_ID, ZCL_SET_WEEKDAY_SCHEDULE_COMMAND_ID, ZCLEndpointId);
     emberAfDoorLockClusterSetWeekdayScheduleCallback(scheduleId, userId, daysMask, startHour, startMinute, endHour, endMinute);
     Compatibility::ResetEmberAfObjects();
 }
 #endif
 
 #if IM_HAVE_DOOR_LOCK_CLUSTER_SET_YEARDAY_SCHEDULE_COMMAND
-void OnSetYeardayScheduleCommandCallback(app::Command*, EndpointId ZCLEndpointId, uint8_t scheduleId, uint16_t userId, uint32_t localStartTime, uint32_t localEndTime)
+void OnSetYeardayScheduleCommandCallback(app::Command* command, EndpointId ZCLEndpointId, uint8_t scheduleId, uint16_t userId, uint32_t localStartTime, uint32_t localEndTime)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_DOOR_LOCK_CLUSTER_ID, ZCL_SET_YEARDAY_SCHEDULE_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_DOOR_LOCK_CLUSTER_ID, ZCL_SET_YEARDAY_SCHEDULE_COMMAND_ID, ZCLEndpointId);
     emberAfDoorLockClusterSetYeardayScheduleCallback(scheduleId, userId, localStartTime, localEndTime);
     Compatibility::ResetEmberAfObjects();
 }
 #endif
 
 #if IM_HAVE_DOOR_LOCK_CLUSTER_UNLOCK_DOOR_COMMAND
-void OnUnlockDoorCommandCallback(app::Command*, EndpointId ZCLEndpointId, const uint8_t * PIN)
+void OnUnlockDoorCommandCallback(app::Command* command, EndpointId ZCLEndpointId, const uint8_t * PIN)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_DOOR_LOCK_CLUSTER_ID, ZCL_UNLOCK_DOOR_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_DOOR_LOCK_CLUSTER_ID, ZCL_UNLOCK_DOOR_COMMAND_ID, ZCLEndpointId);
     emberAfDoorLockClusterUnlockDoorCallback(PIN);
     Compatibility::ResetEmberAfObjects();
 }
 #endif
 
 #if IM_HAVE_DOOR_LOCK_CLUSTER_UNLOCK_WITH_TIMEOUT_COMMAND
-void OnUnlockWithTimeoutCommandCallback(app::Command*, EndpointId ZCLEndpointId, uint16_t timeoutInSeconds, const uint8_t * pin)
+void OnUnlockWithTimeoutCommandCallback(app::Command* command, EndpointId ZCLEndpointId, uint16_t timeoutInSeconds, const uint8_t * pin)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_DOOR_LOCK_CLUSTER_ID, ZCL_UNLOCK_WITH_TIMEOUT_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_DOOR_LOCK_CLUSTER_ID, ZCL_UNLOCK_WITH_TIMEOUT_COMMAND_ID, ZCLEndpointId);
     emberAfDoorLockClusterUnlockWithTimeoutCallback(timeoutInSeconds, pin);
     Compatibility::ResetEmberAfObjects();
 }
@@ -451,54 +451,54 @@ void OnUnlockWithTimeoutCommandCallback(app::Command*, EndpointId ZCLEndpointId,
 } // namespace DoorLock
 namespace Groups {
 #if IM_HAVE_GROUPS_CLUSTER_ADD_GROUP_COMMAND
-void OnAddGroupCommandCallback(app::Command*, EndpointId ZCLEndpointId, uint16_t groupId, const uint8_t * groupName)
+void OnAddGroupCommandCallback(app::Command* command, EndpointId ZCLEndpointId, uint16_t groupId, const uint8_t * groupName)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_GROUPS_CLUSTER_ID, ZCL_ADD_GROUP_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_GROUPS_CLUSTER_ID, ZCL_ADD_GROUP_COMMAND_ID, ZCLEndpointId);
     emberAfGroupsClusterAddGroupCallback(groupId, groupName);
     Compatibility::ResetEmberAfObjects();
 }
 #endif
 
 #if IM_HAVE_GROUPS_CLUSTER_ADD_GROUP_IF_IDENTIFYING_COMMAND
-void OnAddGroupIfIdentifyingCommandCallback(app::Command*, EndpointId ZCLEndpointId, uint16_t groupId, const uint8_t * groupName)
+void OnAddGroupIfIdentifyingCommandCallback(app::Command* command, EndpointId ZCLEndpointId, uint16_t groupId, const uint8_t * groupName)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_GROUPS_CLUSTER_ID, ZCL_ADD_GROUP_IF_IDENTIFYING_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_GROUPS_CLUSTER_ID, ZCL_ADD_GROUP_IF_IDENTIFYING_COMMAND_ID, ZCLEndpointId);
     emberAfGroupsClusterAddGroupIfIdentifyingCallback(groupId, groupName);
     Compatibility::ResetEmberAfObjects();
 }
 #endif
 
 #if IM_HAVE_GROUPS_CLUSTER_GET_GROUP_MEMBERSHIP_COMMAND
-void OnGetGroupMembershipCommandCallback(app::Command*, EndpointId ZCLEndpointId, uint8_t groupCount, /* TYPE WARNING: array array defaults to */ uint8_t *  groupList)
+void OnGetGroupMembershipCommandCallback(app::Command* command, EndpointId ZCLEndpointId, uint8_t groupCount, /* TYPE WARNING: array array defaults to */ uint8_t *  groupList)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_GROUPS_CLUSTER_ID, ZCL_GET_GROUP_MEMBERSHIP_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_GROUPS_CLUSTER_ID, ZCL_GET_GROUP_MEMBERSHIP_COMMAND_ID, ZCLEndpointId);
     emberAfGroupsClusterGetGroupMembershipCallback(groupCount, groupList);
     Compatibility::ResetEmberAfObjects();
 }
 #endif
 
 #if IM_HAVE_GROUPS_CLUSTER_REMOVE_ALL_GROUPS_COMMAND
-void OnRemoveAllGroupsCommandCallback(app::Command*, EndpointId ZCLEndpointId)
+void OnRemoveAllGroupsCommandCallback(app::Command* command, EndpointId ZCLEndpointId)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_GROUPS_CLUSTER_ID, ZCL_REMOVE_ALL_GROUPS_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_GROUPS_CLUSTER_ID, ZCL_REMOVE_ALL_GROUPS_COMMAND_ID, ZCLEndpointId);
     emberAfGroupsClusterRemoveAllGroupsCallback();
     Compatibility::ResetEmberAfObjects();
 }
 #endif
 
 #if IM_HAVE_GROUPS_CLUSTER_REMOVE_GROUP_COMMAND
-void OnRemoveGroupCommandCallback(app::Command*, EndpointId ZCLEndpointId, uint16_t groupId)
+void OnRemoveGroupCommandCallback(app::Command* command, EndpointId ZCLEndpointId, uint16_t groupId)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_GROUPS_CLUSTER_ID, ZCL_REMOVE_GROUP_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_GROUPS_CLUSTER_ID, ZCL_REMOVE_GROUP_COMMAND_ID, ZCLEndpointId);
     emberAfGroupsClusterRemoveGroupCallback(groupId);
     Compatibility::ResetEmberAfObjects();
 }
 #endif
 
 #if IM_HAVE_GROUPS_CLUSTER_VIEW_GROUP_COMMAND
-void OnViewGroupCommandCallback(app::Command*, EndpointId ZCLEndpointId, uint16_t groupId)
+void OnViewGroupCommandCallback(app::Command* command, EndpointId ZCLEndpointId, uint16_t groupId)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_GROUPS_CLUSTER_ID, ZCL_VIEW_GROUP_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_GROUPS_CLUSTER_ID, ZCL_VIEW_GROUP_COMMAND_ID, ZCLEndpointId);
     emberAfGroupsClusterViewGroupCallback(groupId);
     Compatibility::ResetEmberAfObjects();
 }
@@ -507,9 +507,9 @@ void OnViewGroupCommandCallback(app::Command*, EndpointId ZCLEndpointId, uint16_
 } // namespace Groups
 namespace IasZone {
 #if IM_HAVE_IAS_ZONE_CLUSTER_ZONE_ENROLL_RESPONSE_COMMAND
-void OnZoneEnrollResponseCommandCallback(app::Command*, EndpointId ZCLEndpointId, uint8_t enrollResponseCode, uint8_t zoneId)
+void OnZoneEnrollResponseCommandCallback(app::Command* command, EndpointId ZCLEndpointId, uint8_t enrollResponseCode, uint8_t zoneId)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_IAS_ZONE_CLUSTER_ID, ZCL_ZONE_ENROLL_RESPONSE_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_IAS_ZONE_CLUSTER_ID, ZCL_ZONE_ENROLL_RESPONSE_COMMAND_ID, ZCLEndpointId);
     emberAfIasZoneClusterZoneEnrollResponseCallback(enrollResponseCode, zoneId);
     Compatibility::ResetEmberAfObjects();
 }
@@ -518,18 +518,18 @@ void OnZoneEnrollResponseCommandCallback(app::Command*, EndpointId ZCLEndpointId
 } // namespace IasZone
 namespace Identify {
 #if IM_HAVE_IDENTIFY_CLUSTER_IDENTIFY_COMMAND
-void OnIdentifyCommandCallback(app::Command*, EndpointId ZCLEndpointId, uint16_t identifyTime)
+void OnIdentifyCommandCallback(app::Command* command, EndpointId ZCLEndpointId, uint16_t identifyTime)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_IDENTIFY_CLUSTER_ID, ZCL_IDENTIFY_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_IDENTIFY_CLUSTER_ID, ZCL_IDENTIFY_COMMAND_ID, ZCLEndpointId);
     emberAfIdentifyClusterIdentifyCallback(identifyTime);
     Compatibility::ResetEmberAfObjects();
 }
 #endif
 
 #if IM_HAVE_IDENTIFY_CLUSTER_IDENTIFY_QUERY_COMMAND
-void OnIdentifyQueryCommandCallback(app::Command*, EndpointId ZCLEndpointId)
+void OnIdentifyQueryCommandCallback(app::Command* command, EndpointId ZCLEndpointId)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_IDENTIFY_CLUSTER_ID, ZCL_IDENTIFY_QUERY_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_IDENTIFY_CLUSTER_ID, ZCL_IDENTIFY_QUERY_COMMAND_ID, ZCLEndpointId);
     emberAfIdentifyClusterIdentifyQueryCallback();
     Compatibility::ResetEmberAfObjects();
 }
@@ -538,72 +538,72 @@ void OnIdentifyQueryCommandCallback(app::Command*, EndpointId ZCLEndpointId)
 } // namespace Identify
 namespace LevelControl {
 #if IM_HAVE_LEVEL_CONTROL_CLUSTER_MOVE_COMMAND
-void OnMoveCommandCallback(app::Command*, EndpointId ZCLEndpointId, uint8_t moveMode, uint8_t rate, uint8_t optionMask, uint8_t optionOverride)
+void OnMoveCommandCallback(app::Command* command, EndpointId ZCLEndpointId, uint8_t moveMode, uint8_t rate, uint8_t optionMask, uint8_t optionOverride)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_MOVE_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_MOVE_COMMAND_ID, ZCLEndpointId);
     emberAfLevelControlClusterMoveCallback(moveMode, rate, optionMask, optionOverride);
     Compatibility::ResetEmberAfObjects();
 }
 #endif
 
 #if IM_HAVE_LEVEL_CONTROL_CLUSTER_MOVE_TO_LEVEL_COMMAND
-void OnMoveToLevelCommandCallback(app::Command*, EndpointId ZCLEndpointId, uint8_t level, uint16_t transitionTime, uint8_t optionMask, uint8_t optionOverride)
+void OnMoveToLevelCommandCallback(app::Command* command, EndpointId ZCLEndpointId, uint8_t level, uint16_t transitionTime, uint8_t optionMask, uint8_t optionOverride)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_MOVE_TO_LEVEL_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_MOVE_TO_LEVEL_COMMAND_ID, ZCLEndpointId);
     emberAfLevelControlClusterMoveToLevelCallback(level, transitionTime, optionMask, optionOverride);
     Compatibility::ResetEmberAfObjects();
 }
 #endif
 
 #if IM_HAVE_LEVEL_CONTROL_CLUSTER_MOVE_TO_LEVEL_WITH_ON_OFF_COMMAND
-void OnMoveToLevelWithOnOffCommandCallback(app::Command*, EndpointId ZCLEndpointId, uint8_t level, uint16_t transitionTime)
+void OnMoveToLevelWithOnOffCommandCallback(app::Command* command, EndpointId ZCLEndpointId, uint8_t level, uint16_t transitionTime)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_MOVE_TO_LEVEL_WITH_ON_OFF_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_MOVE_TO_LEVEL_WITH_ON_OFF_COMMAND_ID, ZCLEndpointId);
     emberAfLevelControlClusterMoveToLevelWithOnOffCallback(level, transitionTime);
     Compatibility::ResetEmberAfObjects();
 }
 #endif
 
 #if IM_HAVE_LEVEL_CONTROL_CLUSTER_MOVE_WITH_ON_OFF_COMMAND
-void OnMoveWithOnOffCommandCallback(app::Command*, EndpointId ZCLEndpointId, uint8_t moveMode, uint8_t rate)
+void OnMoveWithOnOffCommandCallback(app::Command* command, EndpointId ZCLEndpointId, uint8_t moveMode, uint8_t rate)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_MOVE_WITH_ON_OFF_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_MOVE_WITH_ON_OFF_COMMAND_ID, ZCLEndpointId);
     emberAfLevelControlClusterMoveWithOnOffCallback(moveMode, rate);
     Compatibility::ResetEmberAfObjects();
 }
 #endif
 
 #if IM_HAVE_LEVEL_CONTROL_CLUSTER_STEP_COMMAND
-void OnStepCommandCallback(app::Command*, EndpointId ZCLEndpointId, uint8_t stepMode, uint8_t stepSize, uint16_t transitionTime, uint8_t optionMask, uint8_t optionOverride)
+void OnStepCommandCallback(app::Command* command, EndpointId ZCLEndpointId, uint8_t stepMode, uint8_t stepSize, uint16_t transitionTime, uint8_t optionMask, uint8_t optionOverride)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_STEP_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_STEP_COMMAND_ID, ZCLEndpointId);
     emberAfLevelControlClusterStepCallback(stepMode, stepSize, transitionTime, optionMask, optionOverride);
     Compatibility::ResetEmberAfObjects();
 }
 #endif
 
 #if IM_HAVE_LEVEL_CONTROL_CLUSTER_STEP_WITH_ON_OFF_COMMAND
-void OnStepWithOnOffCommandCallback(app::Command*, EndpointId ZCLEndpointId, uint8_t stepMode, uint8_t stepSize, uint16_t transitionTime)
+void OnStepWithOnOffCommandCallback(app::Command* command, EndpointId ZCLEndpointId, uint8_t stepMode, uint8_t stepSize, uint16_t transitionTime)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_STEP_WITH_ON_OFF_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_STEP_WITH_ON_OFF_COMMAND_ID, ZCLEndpointId);
     emberAfLevelControlClusterStepWithOnOffCallback(stepMode, stepSize, transitionTime);
     Compatibility::ResetEmberAfObjects();
 }
 #endif
 
 #if IM_HAVE_LEVEL_CONTROL_CLUSTER_STOP_COMMAND
-void OnStopCommandCallback(app::Command*, EndpointId ZCLEndpointId, uint8_t optionMask, uint8_t optionOverride)
+void OnStopCommandCallback(app::Command* command, EndpointId ZCLEndpointId, uint8_t optionMask, uint8_t optionOverride)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_STOP_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_STOP_COMMAND_ID, ZCLEndpointId);
     emberAfLevelControlClusterStopCallback(optionMask, optionOverride);
     Compatibility::ResetEmberAfObjects();
 }
 #endif
 
 #if IM_HAVE_LEVEL_CONTROL_CLUSTER_STOP_WITH_ON_OFF_COMMAND
-void OnStopWithOnOffCommandCallback(app::Command*, EndpointId ZCLEndpointId)
+void OnStopWithOnOffCommandCallback(app::Command* command, EndpointId ZCLEndpointId)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_STOP_WITH_ON_OFF_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_STOP_WITH_ON_OFF_COMMAND_ID, ZCLEndpointId);
     emberAfLevelControlClusterStopWithOnOffCallback();
     Compatibility::ResetEmberAfObjects();
 }
@@ -612,90 +612,90 @@ void OnStopWithOnOffCommandCallback(app::Command*, EndpointId ZCLEndpointId)
 } // namespace LevelControl
 namespace MediaPlayback {
 #if IM_HAVE_MEDIA_PLAYBACK_CLUSTER_FAST_FORWARD_REQUEST_COMMAND
-void OnFastForwardRequestCommandCallback(app::Command*, EndpointId ZCLEndpointId)
+void OnFastForwardRequestCommandCallback(app::Command* command, EndpointId ZCLEndpointId)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_MEDIA_PLAYBACK_CLUSTER_ID, ZCL_FAST_FORWARD_REQUEST_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_MEDIA_PLAYBACK_CLUSTER_ID, ZCL_FAST_FORWARD_REQUEST_COMMAND_ID, ZCLEndpointId);
     emberAfMediaPlaybackClusterFastForwardRequestCallback();
     Compatibility::ResetEmberAfObjects();
 }
 #endif
 
 #if IM_HAVE_MEDIA_PLAYBACK_CLUSTER_NEXT_REQUEST_COMMAND
-void OnNextRequestCommandCallback(app::Command*, EndpointId ZCLEndpointId)
+void OnNextRequestCommandCallback(app::Command* command, EndpointId ZCLEndpointId)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_MEDIA_PLAYBACK_CLUSTER_ID, ZCL_NEXT_REQUEST_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_MEDIA_PLAYBACK_CLUSTER_ID, ZCL_NEXT_REQUEST_COMMAND_ID, ZCLEndpointId);
     emberAfMediaPlaybackClusterNextRequestCallback();
     Compatibility::ResetEmberAfObjects();
 }
 #endif
 
 #if IM_HAVE_MEDIA_PLAYBACK_CLUSTER_PAUSE_REQUEST_COMMAND
-void OnPauseRequestCommandCallback(app::Command*, EndpointId ZCLEndpointId)
+void OnPauseRequestCommandCallback(app::Command* command, EndpointId ZCLEndpointId)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_MEDIA_PLAYBACK_CLUSTER_ID, ZCL_PAUSE_REQUEST_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_MEDIA_PLAYBACK_CLUSTER_ID, ZCL_PAUSE_REQUEST_COMMAND_ID, ZCLEndpointId);
     emberAfMediaPlaybackClusterPauseRequestCallback();
     Compatibility::ResetEmberAfObjects();
 }
 #endif
 
 #if IM_HAVE_MEDIA_PLAYBACK_CLUSTER_PLAY_REQUEST_COMMAND
-void OnPlayRequestCommandCallback(app::Command*, EndpointId ZCLEndpointId)
+void OnPlayRequestCommandCallback(app::Command* command, EndpointId ZCLEndpointId)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_MEDIA_PLAYBACK_CLUSTER_ID, ZCL_PLAY_REQUEST_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_MEDIA_PLAYBACK_CLUSTER_ID, ZCL_PLAY_REQUEST_COMMAND_ID, ZCLEndpointId);
     emberAfMediaPlaybackClusterPlayRequestCallback();
     Compatibility::ResetEmberAfObjects();
 }
 #endif
 
 #if IM_HAVE_MEDIA_PLAYBACK_CLUSTER_PREVIOUS_REQUEST_COMMAND
-void OnPreviousRequestCommandCallback(app::Command*, EndpointId ZCLEndpointId)
+void OnPreviousRequestCommandCallback(app::Command* command, EndpointId ZCLEndpointId)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_MEDIA_PLAYBACK_CLUSTER_ID, ZCL_PREVIOUS_REQUEST_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_MEDIA_PLAYBACK_CLUSTER_ID, ZCL_PREVIOUS_REQUEST_COMMAND_ID, ZCLEndpointId);
     emberAfMediaPlaybackClusterPreviousRequestCallback();
     Compatibility::ResetEmberAfObjects();
 }
 #endif
 
 #if IM_HAVE_MEDIA_PLAYBACK_CLUSTER_REWIND_REQUEST_COMMAND
-void OnRewindRequestCommandCallback(app::Command*, EndpointId ZCLEndpointId)
+void OnRewindRequestCommandCallback(app::Command* command, EndpointId ZCLEndpointId)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_MEDIA_PLAYBACK_CLUSTER_ID, ZCL_REWIND_REQUEST_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_MEDIA_PLAYBACK_CLUSTER_ID, ZCL_REWIND_REQUEST_COMMAND_ID, ZCLEndpointId);
     emberAfMediaPlaybackClusterRewindRequestCallback();
     Compatibility::ResetEmberAfObjects();
 }
 #endif
 
 #if IM_HAVE_MEDIA_PLAYBACK_CLUSTER_SKIP_BACKWARD_REQUEST_COMMAND
-void OnSkipBackwardRequestCommandCallback(app::Command*, EndpointId ZCLEndpointId)
+void OnSkipBackwardRequestCommandCallback(app::Command* command, EndpointId ZCLEndpointId)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_MEDIA_PLAYBACK_CLUSTER_ID, ZCL_SKIP_BACKWARD_REQUEST_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_MEDIA_PLAYBACK_CLUSTER_ID, ZCL_SKIP_BACKWARD_REQUEST_COMMAND_ID, ZCLEndpointId);
     emberAfMediaPlaybackClusterSkipBackwardRequestCallback();
     Compatibility::ResetEmberAfObjects();
 }
 #endif
 
 #if IM_HAVE_MEDIA_PLAYBACK_CLUSTER_SKIP_FORWARD_REQUEST_COMMAND
-void OnSkipForwardRequestCommandCallback(app::Command*, EndpointId ZCLEndpointId)
+void OnSkipForwardRequestCommandCallback(app::Command* command, EndpointId ZCLEndpointId)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_MEDIA_PLAYBACK_CLUSTER_ID, ZCL_SKIP_FORWARD_REQUEST_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_MEDIA_PLAYBACK_CLUSTER_ID, ZCL_SKIP_FORWARD_REQUEST_COMMAND_ID, ZCLEndpointId);
     emberAfMediaPlaybackClusterSkipForwardRequestCallback();
     Compatibility::ResetEmberAfObjects();
 }
 #endif
 
 #if IM_HAVE_MEDIA_PLAYBACK_CLUSTER_START_OVER_REQUEST_COMMAND
-void OnStartOverRequestCommandCallback(app::Command*, EndpointId ZCLEndpointId)
+void OnStartOverRequestCommandCallback(app::Command* command, EndpointId ZCLEndpointId)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_MEDIA_PLAYBACK_CLUSTER_ID, ZCL_START_OVER_REQUEST_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_MEDIA_PLAYBACK_CLUSTER_ID, ZCL_START_OVER_REQUEST_COMMAND_ID, ZCLEndpointId);
     emberAfMediaPlaybackClusterStartOverRequestCallback();
     Compatibility::ResetEmberAfObjects();
 }
 #endif
 
 #if IM_HAVE_MEDIA_PLAYBACK_CLUSTER_STOP_REQUEST_COMMAND
-void OnStopRequestCommandCallback(app::Command*, EndpointId ZCLEndpointId)
+void OnStopRequestCommandCallback(app::Command* command, EndpointId ZCLEndpointId)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_MEDIA_PLAYBACK_CLUSTER_ID, ZCL_STOP_REQUEST_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_MEDIA_PLAYBACK_CLUSTER_ID, ZCL_STOP_REQUEST_COMMAND_ID, ZCLEndpointId);
     emberAfMediaPlaybackClusterStopRequestCallback();
     Compatibility::ResetEmberAfObjects();
 }
@@ -704,27 +704,27 @@ void OnStopRequestCommandCallback(app::Command*, EndpointId ZCLEndpointId)
 } // namespace MediaPlayback
 namespace OnOff {
 #if IM_HAVE_ON_OFF_CLUSTER_OFF_COMMAND
-void OnOffCommandCallback(app::Command*, EndpointId ZCLEndpointId)
+void OnOffCommandCallback(app::Command* command, EndpointId ZCLEndpointId)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_ON_OFF_CLUSTER_ID, ZCL_OFF_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_ON_OFF_CLUSTER_ID, ZCL_OFF_COMMAND_ID, ZCLEndpointId);
     emberAfOnOffClusterOffCallback();
     Compatibility::ResetEmberAfObjects();
 }
 #endif
 
 #if IM_HAVE_ON_OFF_CLUSTER_ON_COMMAND
-void OnOnCommandCallback(app::Command*, EndpointId ZCLEndpointId)
+void OnOnCommandCallback(app::Command* command, EndpointId ZCLEndpointId)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_COMMAND_ID, ZCLEndpointId);
     emberAfOnOffClusterOnCallback();
     Compatibility::ResetEmberAfObjects();
 }
 #endif
 
 #if IM_HAVE_ON_OFF_CLUSTER_TOGGLE_COMMAND
-void OnToggleCommandCallback(app::Command*, EndpointId ZCLEndpointId)
+void OnToggleCommandCallback(app::Command* command, EndpointId ZCLEndpointId)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_ON_OFF_CLUSTER_ID, ZCL_TOGGLE_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_ON_OFF_CLUSTER_ID, ZCL_TOGGLE_COMMAND_ID, ZCLEndpointId);
     emberAfOnOffClusterToggleCallback();
     Compatibility::ResetEmberAfObjects();
 }
@@ -733,63 +733,63 @@ void OnToggleCommandCallback(app::Command*, EndpointId ZCLEndpointId)
 } // namespace OnOff
 namespace Scenes {
 #if IM_HAVE_SCENES_CLUSTER_ADD_SCENE_COMMAND
-void OnAddSceneCommandCallback(app::Command*, EndpointId ZCLEndpointId, uint16_t groupId, uint8_t sceneId, uint16_t transitionTime, const uint8_t * sceneName, /* TYPE WARNING: array array defaults to */ uint8_t *  extensionFieldSets)
+void OnAddSceneCommandCallback(app::Command* command, EndpointId ZCLEndpointId, uint16_t groupId, uint8_t sceneId, uint16_t transitionTime, const uint8_t * sceneName, /* TYPE WARNING: array array defaults to */ uint8_t *  extensionFieldSets)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_SCENES_CLUSTER_ID, ZCL_ADD_SCENE_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_SCENES_CLUSTER_ID, ZCL_ADD_SCENE_COMMAND_ID, ZCLEndpointId);
     emberAfScenesClusterAddSceneCallback(groupId, sceneId, transitionTime, sceneName, extensionFieldSets);
     Compatibility::ResetEmberAfObjects();
 }
 #endif
 
 #if IM_HAVE_SCENES_CLUSTER_GET_SCENE_MEMBERSHIP_COMMAND
-void OnGetSceneMembershipCommandCallback(app::Command*, EndpointId ZCLEndpointId, uint16_t groupId)
+void OnGetSceneMembershipCommandCallback(app::Command* command, EndpointId ZCLEndpointId, uint16_t groupId)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_SCENES_CLUSTER_ID, ZCL_GET_SCENE_MEMBERSHIP_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_SCENES_CLUSTER_ID, ZCL_GET_SCENE_MEMBERSHIP_COMMAND_ID, ZCLEndpointId);
     emberAfScenesClusterGetSceneMembershipCallback(groupId);
     Compatibility::ResetEmberAfObjects();
 }
 #endif
 
 #if IM_HAVE_SCENES_CLUSTER_RECALL_SCENE_COMMAND
-void OnRecallSceneCommandCallback(app::Command*, EndpointId ZCLEndpointId, uint16_t groupId, uint8_t sceneId, uint16_t transitionTime)
+void OnRecallSceneCommandCallback(app::Command* command, EndpointId ZCLEndpointId, uint16_t groupId, uint8_t sceneId, uint16_t transitionTime)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_SCENES_CLUSTER_ID, ZCL_RECALL_SCENE_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_SCENES_CLUSTER_ID, ZCL_RECALL_SCENE_COMMAND_ID, ZCLEndpointId);
     emberAfScenesClusterRecallSceneCallback(groupId, sceneId, transitionTime);
     Compatibility::ResetEmberAfObjects();
 }
 #endif
 
 #if IM_HAVE_SCENES_CLUSTER_REMOVE_ALL_SCENES_COMMAND
-void OnRemoveAllScenesCommandCallback(app::Command*, EndpointId ZCLEndpointId, uint16_t groupId)
+void OnRemoveAllScenesCommandCallback(app::Command* command, EndpointId ZCLEndpointId, uint16_t groupId)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_SCENES_CLUSTER_ID, ZCL_REMOVE_ALL_SCENES_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_SCENES_CLUSTER_ID, ZCL_REMOVE_ALL_SCENES_COMMAND_ID, ZCLEndpointId);
     emberAfScenesClusterRemoveAllScenesCallback(groupId);
     Compatibility::ResetEmberAfObjects();
 }
 #endif
 
 #if IM_HAVE_SCENES_CLUSTER_REMOVE_SCENE_COMMAND
-void OnRemoveSceneCommandCallback(app::Command*, EndpointId ZCLEndpointId, uint16_t groupId, uint8_t sceneId)
+void OnRemoveSceneCommandCallback(app::Command* command, EndpointId ZCLEndpointId, uint16_t groupId, uint8_t sceneId)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_SCENES_CLUSTER_ID, ZCL_REMOVE_SCENE_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_SCENES_CLUSTER_ID, ZCL_REMOVE_SCENE_COMMAND_ID, ZCLEndpointId);
     emberAfScenesClusterRemoveSceneCallback(groupId, sceneId);
     Compatibility::ResetEmberAfObjects();
 }
 #endif
 
 #if IM_HAVE_SCENES_CLUSTER_STORE_SCENE_COMMAND
-void OnStoreSceneCommandCallback(app::Command*, EndpointId ZCLEndpointId, uint16_t groupId, uint8_t sceneId)
+void OnStoreSceneCommandCallback(app::Command* command, EndpointId ZCLEndpointId, uint16_t groupId, uint8_t sceneId)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_SCENES_CLUSTER_ID, ZCL_STORE_SCENE_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_SCENES_CLUSTER_ID, ZCL_STORE_SCENE_COMMAND_ID, ZCLEndpointId);
     emberAfScenesClusterStoreSceneCallback(groupId, sceneId);
     Compatibility::ResetEmberAfObjects();
 }
 #endif
 
 #if IM_HAVE_SCENES_CLUSTER_VIEW_SCENE_COMMAND
-void OnViewSceneCommandCallback(app::Command*, EndpointId ZCLEndpointId, uint16_t groupId, uint8_t sceneId)
+void OnViewSceneCommandCallback(app::Command* command, EndpointId ZCLEndpointId, uint16_t groupId, uint8_t sceneId)
 {
-    Compatibility::SetupEmberAfObjects(ZCL_SCENES_CLUSTER_ID, ZCL_VIEW_SCENE_COMMAND_ID, ZCLEndpointId);
+    Compatibility::SetupEmberAfObjects(command, ZCL_SCENES_CLUSTER_ID, ZCL_VIEW_SCENE_COMMAND_ID, ZCLEndpointId);
     emberAfScenesClusterViewSceneCallback(groupId, sceneId);
     Compatibility::ResetEmberAfObjects();
 }

@@ -62,6 +62,19 @@
 
 using namespace chip;
 
+// Function for Compatibility
+namespace chip {
+namespace app {
+namespace Compatibility {
+bool IMEmberAfSendImmediateDefaultResponseHandle(EmberAfStatus status);
+bool __attribute__((weak)) IMEmberAfSendImmediateDefaultResponseHandle(EmberAfStatus status)
+{
+    return false;
+}
+} // namespace Compatibility
+} // namespace app
+} // namespace chip
+
 //------------------------------------------------------------------------------
 // Forward Declarations
 
@@ -770,6 +783,11 @@ EmberStatus emberAfSendImmediateDefaultResponseWithCallback(EmberAfStatus status
 
 EmberStatus emberAfSendImmediateDefaultResponse(EmberAfStatus status)
 {
+    if (chip::app::Compatibility::IMEmberAfSendImmediateDefaultResponseHandle(status))
+    {
+        // If the compatibility can handle this response
+        return EMBER_SUCCESS;
+    }
     return emberAfSendImmediateDefaultResponseWithCallback(status, NULL);
 }
 
@@ -801,7 +819,7 @@ EmberStatus emberAfSendDefaultResponseWithCallback(const EmberAfClusterCommand *
     appResponseLength = 0;
     frameControl      = static_cast<uint8_t>(ZCL_GLOBAL_COMMAND |
                                         (cmd->direction == ZCL_DIRECTION_CLIENT_TO_SERVER ? ZCL_FRAME_CONTROL_SERVER_TO_CLIENT
-                                                                                          : ZCL_FRAME_CONTROL_CLIENT_TO_SERVER));
+                                                                                               : ZCL_FRAME_CONTROL_CLIENT_TO_SERVER));
 
     if (!cmd->mfgSpecific)
     {
@@ -874,23 +892,23 @@ uint8_t emberAfMaximumApsPayloadLength(EmberOutgoingMessageType type, uint64_t i
 
 void emberAfCopyInt16u(uint8_t * data, uint16_t index, uint16_t x)
 {
-    data[index]     = (uint8_t)(((x)) & 0xFF);
-    data[index + 1] = (uint8_t)(((x) >> 8) & 0xFF);
+    data[index]     = (uint8_t) (((x)) & 0xFF);
+    data[index + 1] = (uint8_t) (((x) >> 8) & 0xFF);
 }
 
 void emberAfCopyInt24u(uint8_t * data, uint16_t index, uint32_t x)
 {
-    data[index]     = (uint8_t)(((x)) & 0xFF);
-    data[index + 1] = (uint8_t)(((x) >> 8) & 0xFF);
-    data[index + 2] = (uint8_t)(((x) >> 16) & 0xFF);
+    data[index]     = (uint8_t) (((x)) & 0xFF);
+    data[index + 1] = (uint8_t) (((x) >> 8) & 0xFF);
+    data[index + 2] = (uint8_t) (((x) >> 16) & 0xFF);
 }
 
 void emberAfCopyInt32u(uint8_t * data, uint16_t index, uint32_t x)
 {
-    data[index]     = (uint8_t)(((x)) & 0xFF);
-    data[index + 1] = (uint8_t)(((x) >> 8) & 0xFF);
-    data[index + 2] = (uint8_t)(((x) >> 16) & 0xFF);
-    data[index + 3] = (uint8_t)(((x) >> 24) & 0xFF);
+    data[index]     = (uint8_t) (((x)) & 0xFF);
+    data[index + 1] = (uint8_t) (((x) >> 8) & 0xFF);
+    data[index + 2] = (uint8_t) (((x) >> 16) & 0xFF);
+    data[index + 3] = (uint8_t) (((x) >> 24) & 0xFF);
 }
 
 void emberAfCopyString(uint8_t * dest, const uint8_t * src, uint8_t size)
