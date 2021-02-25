@@ -123,6 +123,15 @@ public:
                              const chip::ClusterId aClusterId);
     CHIP_ERROR ClearExistingExchangeContext();
 
+    /**
+     * Gets the inner exchange context object, without ownership.
+     *
+     * @return The inner exchange context, might be nullptr if no
+     *         exchange context has been assigned or the context
+     *         has been released.
+     */
+    const Messaging::ExchangeContext * GetExchangeContext() const { return mpExchangeCtx; }
+
     CHIP_ERROR Reset();
 
     virtual ~Command() = default;

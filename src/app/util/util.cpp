@@ -62,6 +62,19 @@
 
 using namespace chip;
 
+// Function for Compatibility
+namespace chip {
+namespace app {
+namespace Compatibility {
+bool IMEmberAfSendDefaultResponseWithCallback(EmberAfStatus status);
+bool __attribute__((weak)) IMEmberAfSendDefaultResponseWithCallback(EmberAfStatus status)
+{
+    return false;
+}
+} // namespace Compatibility
+} // namespace app
+} // namespace chip
+
 //------------------------------------------------------------------------------
 // Forward Declarations
 
@@ -777,6 +790,12 @@ EmberStatus emberAfSendDefaultResponseWithCallback(const EmberAfClusterCommand *
                                                    EmberAfMessageSentFunction callback)
 {
     uint8_t frameControl;
+
+    if (chip::app::Compatibility::IMEmberAfSendDefaultResponseWithCallback(status))
+    {
+        // If the compatibility can handle this response
+        return EMBER_SUCCESS;
+    }
 
     // Default Response commands are only sent in response to unicast commands.
     if (cmd->type != EMBER_INCOMING_UNICAST && cmd->type != EMBER_INCOMING_UNICAST_REPLY)
