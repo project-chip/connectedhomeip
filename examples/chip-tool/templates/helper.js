@@ -128,8 +128,8 @@ function isStrEndsWith(str, substr)
 //
 // Module exports
 //
-exports.hasSpecificResponse     = hasSpecificResponse;
-exports.asDelimitedCommand      = asDelimitedCommand;
-exports.asTypeMinValue          = asTypeMinValue;
-exports.asTypeMaxValue          = asTypeMaxValue;
-exports.isStrEndsWith           = isStrEndsWith;
+exports.hasSpecificResponse = hasSpecificResponse;
+exports.asDelimitedCommand  = asDelimitedCommand;
+exports.asTypeMinValue      = asTypeMinValue;
+exports.asTypeMaxValue      = asTypeMaxValue;
+exports.isStrEndsWith       = isStrEndsWith;
