@@ -81,7 +81,7 @@ CHIP_ERROR ExchangeManager::Init(SecureSessionMgr * sessionMgr, SecureSessionMgr
     OnExchangeContextChanged = nullptr;
 
     sessionMgr->SetDelegate(this);
-    mSecureSessionEventReceiver = deviceController;
+    mSecureSessionEventReceiver = secureSessionEventReceiver;
 
     mReliableMessageMgr.Init(sessionMgr->SystemLayer(), sessionMgr);
 
@@ -113,7 +113,10 @@ CHIP_ERROR ExchangeManager::Shutdown()
 
 ExchangeContext * ExchangeManager::NewContext(SecureSessionHandle session, ExchangeDelegate * delegate)
 {
-    return AllocContext(mNextExchangeId++, session, true, delegate);
+    uint16_t nextId = mNextExchangeId++;
+    if (nextId == kReservedExchangeId)
+        nextId = mNextExchangeId++;
+    return AllocContext(nextId, session, true, delegate);
 }
 
 CHIP_ERROR ExchangeManager::RegisterUnsolicitedMessageHandlerForProtocol(uint32_t protocolId, ExchangeDelegate * delegate)
