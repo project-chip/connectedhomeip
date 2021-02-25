@@ -99,10 +99,9 @@ public:
     bool MatchNodeId(NodeId nodeId);
     bool MatchTransport(Transport::Type transport);
     bool MatchTransportPreference(ChannelBuilder::TransportPreference transport);
-    bool MatchSessionType(ChannelBuilder::SessionType type);
     bool MatchCaseParameters();
 
-    bool IsPasePairing();
+    bool IsCasePairing();
 
     bool MatchesBuilder(const ChannelBuilder & builder);
     bool MatchesSession(SecureSessionHandle session, SecureSessionMgr * ssm);
@@ -132,9 +131,8 @@ private:
     enum class PrepareState
     {
         kAddressResolving,
-        kPasePairing,
-        kPasePairingDone,
         kCasePairing,
+        kCasePairingDone,
     };
 
     union StateVars
@@ -147,11 +145,7 @@ private:
             PrepareState mState;
             Inet::IPAddressType mAddressType;
             Inet::IPAddress mAddress;
-            union Session
-            {
-                PASESession * mPasePairingSession;
-                CASESession * mCasePairingSession;
-            } mSession;
+            CASESession * mCasePairingSession;
             ChannelBuilder mBuilder;
         } mPreparing;
 

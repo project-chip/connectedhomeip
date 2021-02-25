@@ -75,14 +75,6 @@ public:
         kDefault = kConnectionless,
     };
 
-    enum class SessionType
-    {
-        kPASE, // Use SPAKE2 key exchange
-        kCASE, // Use SIGMA key exchange
-
-        kDefault = kCASE,
-    };
-
     ChannelBuilder & SetPeerNodeId(NodeId peerNodeId)
     {
         mPeerNodeId = peerNodeId;
@@ -97,26 +89,10 @@ public:
     }
     TransportPreference GetTransportPreference() const { return mTransportPreference; }
 
-    ChannelBuilder & SetSessionType(SessionType preference)
-    {
-        mSessionType = preference;
-        return *this;
-    }
-    SessionType GetSessionType() const { return mSessionType; }
-
-    uint16_t GetPeerKeyID() const { return mSessionParameters.mCaseParameters.mPeerKeyId; }
+    uint16_t GetPeerKeyID() const { return mCaseParameters.mPeerKeyId; }
     ChannelBuilder & SetPeerKeyID(uint16_t keyId)
     {
-        assert(mSessionType == SessionType::kCASE);
-        mSessionParameters.mCaseParameters.mPeerKeyId = keyId;
-        return *this;
-    }
-
-    uint32_t GetPeerSetUpPINCode() const { return mSessionParameters.mPaseParameters.mPeerSetUpPINCode; }
-    ChannelBuilder & SetPeerSetUpPINCode(uint32_t peerPINCode)
-    {
-        assert(mSessionType == SessionType::kPASE);
-        mSessionParameters.mPaseParameters.mPeerSetUpPINCode = peerPINCode;
+        mCaseParameters.mPeerKeyId = keyId;
         return *this;
     }
 
@@ -130,18 +106,10 @@ public:
 private:
     NodeId mPeerNodeId                       = kUndefinedNodeId;
     TransportPreference mTransportPreference = TransportPreference::kDefault;
-    SessionType mSessionType                 = SessionType::kDefault;
-    union SessionParameters
+    struct
     {
-        struct
-        {
-            uint16_t mPeerKeyId;
-        } mCaseParameters;
-        struct
-        {
-            uint32_t mPeerSetUpPINCode;
-        } mPaseParameters;
-    } mSessionParameters;
+        uint16_t mPeerKeyId;
+    } mCaseParameters;
 
     Optional<Inet::IPAddress> mForcePeerAddr;
 };
