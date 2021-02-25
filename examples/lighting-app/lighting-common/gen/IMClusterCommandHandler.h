@@ -29,31 +29,51 @@
 #include <app/Command.h>
 #include <core/CHIPTLV.h>
 
-using namespace chip;
-using namespace chip::app;
-using namespace chip::app::clusters;
+// The IM_HAVE_XXX_CLUSTER_YYY_COMMAND is used for compatibility handlers.
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace LevelControl {
 void DispatchServerCommand(app::Command * command, CommandId commandId, EndpointId endpointId, TLV::TLVReader & dataTlv);
+#define IM_HAVE_LEVEL_CONTROL_CLUSTER_MOVE_COMMAND 1
+#define IM_HAVE_LEVEL_CONTROL_CLUSTER_MOVE_TO_LEVEL_COMMAND 1
+#define IM_HAVE_LEVEL_CONTROL_CLUSTER_MOVE_TO_LEVEL_WITH_ON_OFF_COMMAND 1
+#define IM_HAVE_LEVEL_CONTROL_CLUSTER_MOVE_WITH_ON_OFF_COMMAND 1
+#define IM_HAVE_LEVEL_CONTROL_CLUSTER_STEP_COMMAND 1
+#define IM_HAVE_LEVEL_CONTROL_CLUSTER_STEP_WITH_ON_OFF_COMMAND 1
+#define IM_HAVE_LEVEL_CONTROL_CLUSTER_STOP_COMMAND 1
+#define IM_HAVE_LEVEL_CONTROL_CLUSTER_STOP_WITH_ON_OFF_COMMAND 1
+#define IM_HAVE_LEVEL_CONTROL_CLUSTER_MOVE_COMMAND 1
 void OnMoveCommandCallback(app::Command *, EndpointId, uint8_t moveMode, uint8_t rate, uint8_t optionMask, uint8_t optionOverride);
+#define IM_HAVE_LEVEL_CONTROL_CLUSTER_MOVE_TO_LEVEL_COMMAND 1
 void OnMoveToLevelCommandCallback(app::Command *, EndpointId, uint8_t level, uint16_t transitionTime, uint8_t optionMask,
                                   uint8_t optionOverride);
+#define IM_HAVE_LEVEL_CONTROL_CLUSTER_MOVE_TO_LEVEL_WITH_ON_OFF_COMMAND 1
 void OnMoveToLevelWithOnOffCommandCallback(app::Command *, EndpointId, uint8_t level, uint16_t transitionTime);
+#define IM_HAVE_LEVEL_CONTROL_CLUSTER_MOVE_WITH_ON_OFF_COMMAND 1
 void OnMoveWithOnOffCommandCallback(app::Command *, EndpointId, uint8_t moveMode, uint8_t rate);
+#define IM_HAVE_LEVEL_CONTROL_CLUSTER_STEP_COMMAND 1
 void OnStepCommandCallback(app::Command *, EndpointId, uint8_t stepMode, uint8_t stepSize, uint16_t transitionTime,
                            uint8_t optionMask, uint8_t optionOverride);
+#define IM_HAVE_LEVEL_CONTROL_CLUSTER_STEP_WITH_ON_OFF_COMMAND 1
 void OnStepWithOnOffCommandCallback(app::Command *, EndpointId, uint8_t stepMode, uint8_t stepSize, uint16_t transitionTime);
+#define IM_HAVE_LEVEL_CONTROL_CLUSTER_STOP_COMMAND 1
 void OnStopCommandCallback(app::Command *, EndpointId, uint8_t optionMask, uint8_t optionOverride);
+#define IM_HAVE_LEVEL_CONTROL_CLUSTER_STOP_WITH_ON_OFF_COMMAND 1
 void OnStopWithOnOffCommandCallback(app::Command *, EndpointId);
 } // namespace LevelControl
 
 namespace OnOff {
 void DispatchServerCommand(app::Command * command, CommandId commandId, EndpointId endpointId, TLV::TLVReader & dataTlv);
+#define IM_HAVE_ON_OFF_CLUSTER_OFF_COMMAND 1
+#define IM_HAVE_ON_OFF_CLUSTER_ON_COMMAND 1
+#define IM_HAVE_ON_OFF_CLUSTER_TOGGLE_COMMAND 1
+#define IM_HAVE_ON_OFF_CLUSTER_OFF_COMMAND 1
 void OnOffCommandCallback(app::Command *, EndpointId);
+#define IM_HAVE_ON_OFF_CLUSTER_ON_COMMAND 1
 void OnOnCommandCallback(app::Command *, EndpointId);
+#define IM_HAVE_ON_OFF_CLUSTER_TOGGLE_COMMAND 1
 void OnToggleCommandCallback(app::Command *, EndpointId);
 } // namespace OnOff
 

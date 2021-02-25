@@ -29,17 +29,21 @@
 #include <app/Command.h>
 #include <core/CHIPTLV.h>
 
-using namespace chip;
-using namespace chip::app;
-using namespace chip::app::clusters;
+// The IM_HAVE_XXX_CLUSTER_YYY_COMMAND is used for compatibility handlers.
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace OnOff {
 void DispatchServerCommand(app::Command * command, CommandId commandId, EndpointId endpointId, TLV::TLVReader & dataTlv);
+#define IM_HAVE_ON_OFF_CLUSTER_OFF_COMMAND 1
+#define IM_HAVE_ON_OFF_CLUSTER_ON_COMMAND 1
+#define IM_HAVE_ON_OFF_CLUSTER_TOGGLE_COMMAND 1
+#define IM_HAVE_ON_OFF_CLUSTER_OFF_COMMAND 1
 void OnOffCommandCallback(app::Command *, EndpointId);
+#define IM_HAVE_ON_OFF_CLUSTER_ON_COMMAND 1
 void OnOnCommandCallback(app::Command *, EndpointId);
+#define IM_HAVE_ON_OFF_CLUSTER_TOGGLE_COMMAND 1
 void OnToggleCommandCallback(app::Command *, EndpointId);
 } // namespace OnOff
 

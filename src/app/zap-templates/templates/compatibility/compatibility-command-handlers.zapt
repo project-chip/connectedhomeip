@@ -1,17 +1,18 @@
 {{> header}}
 
-#include "IMClusterCommandHandler.h"
 
-#include <stdint.h>
+#include <cstdint>
+#include <cinttypes>
 
-#include "af-structs.h"
-#include "call-command-handler.h"
-#include "callback.h"
-#include "cluster-id.h"
-#include "command-id.h"
-#include "util.h"
+#include <gen/af-structs.h>
+#include <gen/call-command-handler.h>
+#include <gen/callback.h>
+#include <gen/cluster-id.h>
+#include <gen/command-id.h>
+#include <util.h>
 
 #include <app/InteractionModelEngine.h>
+#include <gen/IMClusterCommandHandler.h>
 
 namespace chip {
 namespace app {
@@ -23,21 +24,23 @@ namespace clusters {
 
 {{#all_user_clusters}}
 {{#if (user_cluster_has_enabled_command name side)}}
-namespace {{asCamelCased parent.name false}} {
+namespace {{asCamelCased name false}} {
 {{#all_user_cluster_commands}}
 {{#unless mfgCode}}
 {{#if (isStrEqual clusterName parent.name)}}
 {{#if (isCommandAvailable parent.side incoming outgoing commandSource name)}}
+#if IM_HAVE_{{as_delimited_macro parent.name}}_CLUSTER_{{as_delimited_macro name}}_COMMAND
 void On{{asCamelCased name false}}CommandCallback(app::Command*, EndpointId ZCLEndpointId{{#zcl_command_arguments}}, {{#if (isString type)}}const uint8_t * {{asSymbol label}}{{else}}{{asUnderlyingZclType type}} {{asSymbol label}}{{/if}}{{/zcl_command_arguments}})
 {
     emberAf{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback({{#zcl_command_arguments}}{{asSymbol label}}{{#unless (isLastElement index count)}}, {{/unless}}{{/zcl_command_arguments}});
 }
+#endif
 
 {{/if}}
 {{/if}}
 {{/unless}}
 {{/all_user_cluster_commands}}
-} // namespace {{asCamelCased parent.name false}}
+} // namespace {{asCamelCased name false}}
 {{/if}}
 {{/all_user_clusters}}
 

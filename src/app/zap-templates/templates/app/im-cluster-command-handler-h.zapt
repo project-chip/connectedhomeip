@@ -12,9 +12,7 @@
 #include <app/Command.h>
 #include <core/CHIPTLV.h>
 
-using namespace chip;
-using namespace chip::app;
-using namespace chip::app::clusters;
+// The IM_HAVE_XXX_CLUSTER_YYY_COMMAND is used for compatibility handlers.
 
 namespace chip{
 namespace app {
@@ -27,6 +25,16 @@ void Dispatch{{asCamelCased side false}}Command(app::Command * command, CommandI
 {{#unless mfgCode}}
 {{#if (isStrEqual clusterName parent.name)}}
 {{#if (isCommandAvailable parent.side incoming outgoing commandSource name)}}
+#define IM_HAVE_{{as_delimited_macro parent.name}}_CLUSTER_{{as_delimited_macro name}}_COMMAND 1
+{{/if}}
+{{/if}}
+{{/unless}}
+{{/all_user_cluster_commands}}
+{{#all_user_cluster_commands}}
+{{#unless mfgCode}}
+{{#if (isStrEqual clusterName parent.name)}}
+{{#if (isCommandAvailable parent.side incoming outgoing commandSource name)}}
+#define IM_HAVE_{{as_delimited_macro parent.name}}_CLUSTER_{{as_delimited_macro name}}_COMMAND 1
 void On{{asCamelCased name false}}CommandCallback(app::Command*, EndpointId{{#zcl_command_arguments}}, {{#if (isString type)}}const uint8_t * {{asSymbol label}}{{else}}{{asUnderlyingZclType type}} {{asSymbol label}}{{/if}}{{/zcl_command_arguments}});
 {{/if}}
 {{/if}}

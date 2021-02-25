@@ -29,15 +29,15 @@
 #include <app/Command.h>
 #include <core/CHIPTLV.h>
 
-using namespace chip;
-using namespace chip::app;
-using namespace chip::app::clusters;
+// The IM_HAVE_XXX_CLUSTER_YYY_COMMAND is used for compatibility handlers.
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace Basic {
 void DispatchServerCommand(app::Command * command, CommandId commandId, EndpointId endpointId, TLV::TLVReader & dataTlv);
+#define IM_HAVE_BASIC_CLUSTER_RESET_TO_FACTORY_DEFAULTS_COMMAND 1
+#define IM_HAVE_BASIC_CLUSTER_RESET_TO_FACTORY_DEFAULTS_COMMAND 1
 void OnResetToFactoryDefaultsCommandCallback(app::Command *, EndpointId);
 } // namespace Basic
 

@@ -19,7 +19,8 @@
 
 #include "IMClusterCommandHandler.h"
 
-#include <stdint.h>
+#include <cinttypes>
+#include <cstdint>
 
 #include "af-structs.h"
 #include "call-command-handler.h"
@@ -92,8 +93,7 @@ namespace clusters {
 
 namespace BarrierControl {
 
-void BarrierControl::DispatchServerCommand(app::Command * command, CommandId commandId, EndpointId endpointId,
-                                           TLV::TLVReader & dataTlv)
+void DispatchServerCommand(app::Command * command, CommandId commandId, EndpointId endpointId, TLV::TLVReader & dataTlv)
 {
     {
         switch (commandId)
@@ -139,7 +139,7 @@ void BarrierControl::DispatchServerCommand(app::Command * command, CommandId com
 
 namespace Basic {
 
-void Basic::DispatchServerCommand(app::Command * command, CommandId commandId, EndpointId endpointId, TLV::TLVReader & dataTlv)
+void DispatchServerCommand(app::Command * command, CommandId commandId, EndpointId endpointId, TLV::TLVReader & dataTlv)
 {
     {
         switch (commandId)
@@ -161,8 +161,7 @@ void Basic::DispatchServerCommand(app::Command * command, CommandId commandId, E
 
 namespace ColorControl {
 
-void ColorControl::DispatchServerCommand(app::Command * command, CommandId commandId, EndpointId endpointId,
-                                         TLV::TLVReader & dataTlv)
+void DispatchServerCommand(app::Command * command, CommandId commandId, EndpointId endpointId, TLV::TLVReader & dataTlv)
 {
     {
         switch (commandId)
@@ -724,8 +723,7 @@ void ColorControl::DispatchServerCommand(app::Command * command, CommandId comma
 
 namespace ContentLaunch {
 
-void ContentLaunch::DispatchServerCommand(app::Command * command, CommandId commandId, EndpointId endpointId,
-                                          TLV::TLVReader & dataTlv)
+void DispatchServerCommand(app::Command * command, CommandId commandId, EndpointId endpointId, TLV::TLVReader & dataTlv)
 {
     {
         switch (commandId)
@@ -751,7 +749,7 @@ void ContentLaunch::DispatchServerCommand(app::Command * command, CommandId comm
 
 namespace DoorLock {
 
-void DoorLock::DispatchClientCommand(app::Command * command, CommandId commandId, EndpointId endpointId, TLV::TLVReader & dataTlv)
+void DispatchClientCommand(app::Command * command, CommandId commandId, EndpointId endpointId, TLV::TLVReader & dataTlv)
 {
     {
         switch (commandId)
@@ -817,7 +815,7 @@ void DoorLock::DispatchClientCommand(app::Command * command, CommandId commandId
 
 namespace DoorLock {
 
-void DoorLock::DispatchServerCommand(app::Command * command, CommandId commandId, EndpointId endpointId, TLV::TLVReader & dataTlv)
+void DispatchServerCommand(app::Command * command, CommandId commandId, EndpointId endpointId, TLV::TLVReader & dataTlv)
 {
     {
         switch (commandId)
@@ -1445,7 +1443,7 @@ void DoorLock::DispatchServerCommand(app::Command * command, CommandId commandId
 
 namespace Groups {
 
-void Groups::DispatchServerCommand(app::Command * command, CommandId commandId, EndpointId endpointId, TLV::TLVReader & dataTlv)
+void DispatchServerCommand(app::Command * command, CommandId commandId, EndpointId endpointId, TLV::TLVReader & dataTlv)
 {
     {
         switch (commandId)
@@ -1599,7 +1597,7 @@ void Groups::DispatchServerCommand(app::Command * command, CommandId commandId, 
 
 namespace IasZone {
 
-void IasZone::DispatchServerCommand(app::Command * command, CommandId commandId, EndpointId endpointId, TLV::TLVReader & dataTlv)
+void DispatchServerCommand(app::Command * command, CommandId commandId, EndpointId endpointId, TLV::TLVReader & dataTlv)
 {
     {
         switch (commandId)
@@ -1645,7 +1643,7 @@ void IasZone::DispatchServerCommand(app::Command * command, CommandId commandId,
 
 namespace Identify {
 
-void Identify::DispatchServerCommand(app::Command * command, CommandId commandId, EndpointId endpointId, TLV::TLVReader & dataTlv)
+void DispatchServerCommand(app::Command * command, CommandId commandId, EndpointId endpointId, TLV::TLVReader & dataTlv)
 {
     {
         switch (commandId)
@@ -1691,8 +1689,7 @@ void Identify::DispatchServerCommand(app::Command * command, CommandId commandId
 
 namespace LevelControl {
 
-void LevelControl::DispatchServerCommand(app::Command * command, CommandId commandId, EndpointId endpointId,
-                                         TLV::TLVReader & dataTlv)
+void DispatchServerCommand(app::Command * command, CommandId commandId, EndpointId endpointId, TLV::TLVReader & dataTlv)
 {
     {
         switch (commandId)
@@ -1942,8 +1939,7 @@ void LevelControl::DispatchServerCommand(app::Command * command, CommandId comma
 
 namespace MediaPlayback {
 
-void MediaPlayback::DispatchServerCommand(app::Command * command, CommandId commandId, EndpointId endpointId,
-                                          TLV::TLVReader & dataTlv)
+void DispatchServerCommand(app::Command * command, CommandId commandId, EndpointId endpointId, TLV::TLVReader & dataTlv)
 {
     {
         switch (commandId)
@@ -2001,7 +1997,7 @@ void MediaPlayback::DispatchServerCommand(app::Command * command, CommandId comm
 
 namespace OnOff {
 
-void OnOff::DispatchServerCommand(app::Command * command, CommandId commandId, EndpointId endpointId, TLV::TLVReader & dataTlv)
+void DispatchServerCommand(app::Command * command, CommandId commandId, EndpointId endpointId, TLV::TLVReader & dataTlv)
 {
     {
         switch (commandId)
@@ -2031,7 +2027,7 @@ void OnOff::DispatchServerCommand(app::Command * command, CommandId commandId, E
 
 namespace Scenes {
 
-void Scenes::DispatchServerCommand(app::Command * command, CommandId commandId, EndpointId endpointId, TLV::TLVReader & dataTlv)
+void DispatchServerCommand(app::Command * command, CommandId commandId, EndpointId endpointId, TLV::TLVReader & dataTlv)
 {
     {
         switch (commandId)

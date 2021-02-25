@@ -19,7 +19,8 @@
 
 #include "IMClusterCommandHandler.h"
 
-#include <stdint.h>
+#include <cinttypes>
+#include <cstdint>
 
 #include "af-structs.h"
 #include "call-command-handler.h"
@@ -53,8 +54,7 @@ namespace clusters {
 
 namespace ContentLaunch {
 
-void ContentLaunch::DispatchClientCommand(app::Command * command, CommandId commandId, EndpointId endpointId,
-                                          TLV::TLVReader & dataTlv)
+void DispatchClientCommand(app::Command * command, CommandId commandId, EndpointId endpointId, TLV::TLVReader & dataTlv)
 {
     {
         switch (commandId)
@@ -120,7 +120,7 @@ void ContentLaunch::DispatchClientCommand(app::Command * command, CommandId comm
 
 namespace DoorLock {
 
-void DoorLock::DispatchClientCommand(app::Command * command, CommandId commandId, EndpointId endpointId, TLV::TLVReader & dataTlv)
+void DispatchClientCommand(app::Command * command, CommandId commandId, EndpointId endpointId, TLV::TLVReader & dataTlv)
 {
     {
         switch (commandId)
@@ -806,7 +806,7 @@ void DoorLock::DispatchClientCommand(app::Command * command, CommandId commandId
 
 namespace Groups {
 
-void Groups::DispatchClientCommand(app::Command * command, CommandId commandId, EndpointId endpointId, TLV::TLVReader & dataTlv)
+void DispatchClientCommand(app::Command * command, CommandId commandId, EndpointId endpointId, TLV::TLVReader & dataTlv)
 {
     {
         switch (commandId)
@@ -944,7 +944,7 @@ void Groups::DispatchClientCommand(app::Command * command, CommandId commandId, 
 
 namespace Identify {
 
-void Identify::DispatchClientCommand(app::Command * command, CommandId commandId, EndpointId endpointId, TLV::TLVReader & dataTlv)
+void DispatchClientCommand(app::Command * command, CommandId commandId, EndpointId endpointId, TLV::TLVReader & dataTlv)
 {
     {
         switch (commandId)
@@ -986,8 +986,7 @@ void Identify::DispatchClientCommand(app::Command * command, CommandId commandId
 
 namespace MediaPlayback {
 
-void MediaPlayback::DispatchClientCommand(app::Command * command, CommandId commandId, EndpointId endpointId,
-                                          TLV::TLVReader & dataTlv)
+void DispatchClientCommand(app::Command * command, CommandId commandId, EndpointId endpointId, TLV::TLVReader & dataTlv)
 {
     {
         switch (commandId)
@@ -1009,7 +1008,7 @@ void MediaPlayback::DispatchClientCommand(app::Command * command, CommandId comm
 
 namespace Scenes {
 
-void Scenes::DispatchClientCommand(app::Command * command, CommandId commandId, EndpointId endpointId, TLV::TLVReader & dataTlv)
+void DispatchClientCommand(app::Command * command, CommandId commandId, EndpointId endpointId, TLV::TLVReader & dataTlv)
 {
     {
         switch (commandId)

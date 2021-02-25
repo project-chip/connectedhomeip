@@ -19,7 +19,8 @@
 
 #include "IMClusterCommandHandler.h"
 
-#include <stdint.h>
+#include <cinttypes>
+#include <cstdint>
 
 #include "af-structs.h"
 #include "call-command-handler.h"
@@ -56,7 +57,7 @@ namespace clusters {
 
 namespace OnOff {
 
-void OnOff::DispatchServerCommand(app::Command * command, CommandId commandId, EndpointId endpointId, TLV::TLVReader & dataTlv)
+void DispatchServerCommand(app::Command * command, CommandId commandId, EndpointId endpointId, TLV::TLVReader & dataTlv)
 {
     {
         switch (commandId)

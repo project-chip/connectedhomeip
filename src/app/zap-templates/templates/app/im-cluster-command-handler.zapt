@@ -2,7 +2,8 @@
 
 #include "IMClusterCommandHandler.h"
 
-#include <stdint.h>
+#include <cstdint>
+#include <cinttypes>
 
 #include "af-structs.h"
 #include "call-command-handler.h"
@@ -45,7 +46,7 @@ namespace clusters {
 {{#if (user_cluster_has_enabled_command name side)}}
 namespace {{asCamelCased name false}} {
 
-void {{asCamelCased name false}}::Dispatch{{asCamelCased side false}}Command(app::Command * command, CommandId commandId, EndpointId endpointId, TLV::TLVReader & dataTlv)
+void Dispatch{{asCamelCased side false}}Command(app::Command * command, CommandId commandId, EndpointId endpointId, TLV::TLVReader & dataTlv)
 {
     {{#if (user_cluster_has_enabled_manufacturer_command name side)}}
     {{else}}
