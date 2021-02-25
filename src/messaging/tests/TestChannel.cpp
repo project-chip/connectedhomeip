@@ -82,79 +82,52 @@ public:
     bool IsOnMessageReceivedCalled = false;
 };
 
-void CheckNewContextTest(nlTestSuite * inSuite, void * inContext)
+class MockChannelDelegate : public ChannelDelegate
+{
+public:
+    ~MockChannelDelegate() override {}
+
+    void OnEstablished() override {}
+    void OnClosed() override {}
+    void OnFail(CHIP_ERROR err) override {}
+};
+
+void CheckExchangeChannels(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
-
-    MockAppDelegate mockAppDelegate;
-    ExchangeContext * ec1 = ctx.NewExchangeToLocal(&mockAppDelegate);
-    NL_TEST_ASSERT(inSuite, ec1 != nullptr);
-    NL_TEST_ASSERT(inSuite, ec1->IsInitiator() == true);
-    NL_TEST_ASSERT(inSuite, ec1->GetExchangeId() != 0);
-    auto sessionPeerToLocal = ctx.GetSecureSessionManager().GetPeerConnectionState(ec1->GetSecureSession());
-    NL_TEST_ASSERT(inSuite, sessionPeerToLocal->GetPeerNodeId() == ctx.GetSourceNodeId());
-    NL_TEST_ASSERT(inSuite, sessionPeerToLocal->GetPeerKeyID() == ctx.GetLocalKeyId());
-    NL_TEST_ASSERT(inSuite, ec1->GetDelegate() == &mockAppDelegate);
-
-    ExchangeContext * ec2 = ctx.NewExchangeToPeer(&mockAppDelegate);
-    NL_TEST_ASSERT(inSuite, ec2 != nullptr);
-    NL_TEST_ASSERT(inSuite, ec2->GetExchangeId() > ec1->GetExchangeId());
-    auto sessionLocalToPeer = ctx.GetSecureSessionManager().GetPeerConnectionState(ec2->GetSecureSession());
-    NL_TEST_ASSERT(inSuite, sessionLocalToPeer->GetPeerNodeId() == ctx.GetDestinationNodeId());
-    NL_TEST_ASSERT(inSuite, sessionLocalToPeer->GetPeerKeyID() == ctx.GetPeerKeyId());
-}
-
-void CheckUmhRegistrationTest(nlTestSuite * inSuite, void * inContext)
-{
-    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
-
-    CHIP_ERROR err;
-    MockAppDelegate mockAppDelegate;
-
-    err = ctx.GetExchangeManager().RegisterUnsolicitedMessageHandlerForProtocol(0x0001, &mockAppDelegate);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    err = ctx.GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(0x0002, 0x0001, &mockAppDelegate);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    err = ctx.GetExchangeManager().UnregisterUnsolicitedMessageHandlerForProtocol(0x0001);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    err = ctx.GetExchangeManager().UnregisterUnsolicitedMessageHandlerForProtocol(0x0002);
-    NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
-
-    err = ctx.GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(0x0002, 0x0001);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    err = ctx.GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(0x0002, 0x0002);
-    NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
-}
-
-void CheckExchangeMessages(nlTestSuite * inSuite, void * inContext)
-{
-    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
-
-    CHIP_ERROR err;
-
-    // create solicited exchange
-    MockAppDelegate mockSolicitedAppDelegate;
-    ExchangeContext * ec1 = ctx.NewExchangeToPeer(&mockSolicitedAppDelegate);
 
     // create unsolicited exchange
     MockAppDelegate mockUnsolicitedAppDelegate;
-    err = ctx.GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(0x0001, 0x0001, &mockUnsolicitedAppDelegate);
+    CHIP_ERROR err = ctx.GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(0x0001, 0x0001, &mockUnsolicitedAppDelegate);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
+    // create the channel
+    ChannelBuilder channelBuilder;
+    channelBuilder.SetPeerNodeId(ctx.GetDestinationNodeId()).SetForcePeerAddress(ctx.GetAddress());
+    MockChannelDelegate channelDelegate;
+    auto channelHandle = ctx.GetExchangeManager().EstablishChannel(channelBuilder, &channelDelegate);
+    return;
+
+    // TODO: complete test when CASESession is completed
+    // wait for channel establishment
+    ctx.DriveIOUntil(1000, [&] { return channelHandle.GetState() == ChannelState::kReady; });
+    NL_TEST_ASSERT(inSuite, channelHandle.GetState() == ChannelState::kReady);
+
+    MockAppDelegate mockAppDelegate;
+    ExchangeContext * ec1 = channelHandle.NewExchange(&mockAppDelegate);
+
     // send a malicious packet
-    // TODO: https://github.com/project-chip/connectedhomeip/issues/4635
-    // ec1->SendMessage(0x0001, 0x0002, System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize),
-    //                 SendFlags(Messaging::SendMessageFlags::kNone));
+    ec1->SendMessage(0x0001, 0x0002, System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize),
+                     SendFlags(Messaging::SendMessageFlags::kNone));
     NL_TEST_ASSERT(inSuite, !mockUnsolicitedAppDelegate.IsOnMessageReceivedCalled);
 
     // send a good packet
     ec1->SendMessage(0x0001, 0x0001, System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize),
                      SendFlags(Messaging::SendMessageFlags::kNone));
     NL_TEST_ASSERT(inSuite, mockUnsolicitedAppDelegate.IsOnMessageReceivedCalled);
+
+    ec1->Close();
+    channelHandle.Release();
 }
 
 // Test Suite
@@ -165,9 +138,7 @@ void CheckExchangeMessages(nlTestSuite * inSuite, void * inContext)
 // clang-format off
 const nlTest sTests[] =
 {
-    NL_TEST_DEF("Test ExchangeMgr::NewContext",               CheckNewContextTest),
-    NL_TEST_DEF("Test ExchangeMgr::CheckUmhRegistrationTest", CheckUmhRegistrationTest),
-    NL_TEST_DEF("Test ExchangeMgr::CheckExchangeMessages",    CheckExchangeMessages),
+    NL_TEST_DEF("Test Channel/Exchange",               CheckExchangeChannels),
 
     NL_TEST_SENTINEL()
 };
@@ -218,7 +189,7 @@ int Finalize(void * aContext)
 /**
  *  Main
  */
-int TestExchangeMgr()
+int TestChannel()
 {
     // Run test suit against one context
     nlTestRunner(&sSuite, &sContext);
