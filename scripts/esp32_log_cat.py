@@ -17,6 +17,10 @@
 #
 
 #
+# Required modules:
+#    pyserial
+#    coloredlogs
+#
 # Example usage to show only warning and above messages:
 #
 #   ./scripts/esp32_log_cat.py --log-level WARNING
@@ -99,10 +103,8 @@ def main():
   args = parser.parse_args()
 
   # Ensures somewhat pretty logging of what is going on
-  logging.basicConfig(
-      level=args.log_level,
-      format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-  coloredlogs.install()
+  logging.basicConfig(level=args.log_level);
+  coloredlogs.install(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
   logger = logging.getLogger(args.device)
   logger.setLevel(args.log_level)
