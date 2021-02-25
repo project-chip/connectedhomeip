@@ -134,7 +134,7 @@ CHIP_ERROR MainLoop::EnsureStarted()
     Semaphore semaphore;
 
     GMainContext * context = g_main_loop_get_context(mBluezMainLoop);
-    VerifyOrDieWithMsg(context != nullptr, "Unexpected null context on the main loop");
+    VerifyOrDie(context != nullptr);
 
     g_main_context_invoke(context, GSourceFunc(PostSemaphore), &semaphore);
 
