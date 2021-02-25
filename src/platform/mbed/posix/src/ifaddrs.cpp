@@ -1,4 +1,5 @@
 #include <ifaddrs.h>
+#include <net_if.h>
 
 int getifaddrs(struct ifaddrs ** ifap)
 {

@@ -35,11 +35,7 @@ typedef uint64_t eventfd_t;
  *
  * @return New eventfd file descriptor on success, -1 on error
  */
-int eventfd(unsigned int initval, int flags)
-{
-    return 0;
-}
-
+int eventfd(unsigned int initval, int flags);
 /**
  * @brief Read from an eventfd
  *
@@ -50,11 +46,7 @@ int eventfd(unsigned int initval, int flags)
  *
  * @return 0 on success, -1 on error
  */
-static inline int eventfd_read(int fd, eventfd_t * value)
-{
-    return 0;
-}
-
+int eventfd_read(int fd, eventfd_t * value);
 /**
  * @brief Write to an eventfd
  *
@@ -63,10 +55,7 @@ static inline int eventfd_read(int fd, eventfd_t * value)
  *
  * @return 0 on success, -1 on error
  */
-static inline int eventfd_write(int fd, eventfd_t value)
-{
-    return 0;
-}
+int eventfd_write(int fd, eventfd_t value);
 
 #ifdef __cplusplus
 }

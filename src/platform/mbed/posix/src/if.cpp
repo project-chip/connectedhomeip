@@ -1,7 +1,7 @@
 
-#include <stddef.h>
 #include <net/if.h>
-
+#include <net_if.h>
+#include <stddef.h>
 
 struct if_nameindex * if_nameindex(void)
 {
