@@ -33,7 +33,7 @@ if (chip_device_platform == "auto") {
 declare_args() {
   # Enable openthread support.
   chip_enable_openthread =
-      chip_device_platform == "linux" ||
+      chip_device_platform == "linux" || chip_device_platform == "qpg6100" ||
       chip_device_platform == "cc13x2_26x2" ||
       chip_device_platform == "efr32" || chip_device_platform == "k32w"
 
@@ -42,7 +42,8 @@ declare_args() {
 
   # Enable ble support.
   chip_enable_ble =
-      chip_device_platform == "linux" || chip_device_platform == "darwin"
+      chip_device_platform == "linux" || chip_device_platform == "darwin" ||
+      chip_device_platform == "cc13x2_26x2"
 
   chip_enable_mdns =
       chip_device_platform == "linux" || chip_device_platform == "esp32"

@@ -224,7 +224,7 @@ public:
     virtual const PK & Pubkey() = 0;
 };
 
-struct P256KeypairContext
+struct alignas(size_t) P256KeypairContext
 {
     uint8_t mBytes[kMAX_P256Keypair_Context_Size];
 };
@@ -354,7 +354,7 @@ CHIP_ERROR Hash_SHA256(const uint8_t * data, size_t data_length, uint8_t * out_b
  *        All implementations must check for std::is_trivially_copyable.
  **/
 
-struct HashSHA256OpaqueContext
+struct alignas(size_t) HashSHA256OpaqueContext
 {
     uint8_t mOpaque[kMAX_Hash_SHA256_Context_Size];
 };
@@ -458,14 +458,14 @@ public:
     /**
      * @brief Initialize Spake2+ with some context specific information.
      *
-     * @param context     The spake2p session will bootstrap from this hash context.
-     *                    If the provided context pointer is null, the spake2p session will bootstrap
-     *                    from a blank hash context.
-     *                    Note: calling this function will nullptr doesn't free the object state.
+     * @param context     The context is arbitrary but should include information about the
+     *                    protocol being run, contain the transcript for negotiation, include
+     *                    the PKBDF parameters, etc.
+     * @param context_len The length of the context.
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR Init(const Hash_SHA256_stream * context);
+    CHIP_ERROR Init(const uint8_t * context, size_t context_len);
 
     /**
      * @brief Start the Spake2+ process as a verifier (i.e. an accessory being provisioned).
@@ -718,7 +718,7 @@ protected:
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    virtual CHIP_ERROR InitImpl(const Hash_SHA256_stream * context) = 0;
+    virtual CHIP_ERROR InitImpl() = 0;
 
     /**
      * @brief Hash in_len bytes of in into the internal hash context.
@@ -797,7 +797,7 @@ protected:
     uint8_t * Ke;
 };
 
-struct Spake2pOpaqueContext
+struct alignas(size_t) Spake2pOpaqueContext
 {
     uint8_t mOpaque[kMAX_Spake2p_Context_Size];
 };
@@ -830,7 +830,7 @@ public:
     CHIP_ERROR ComputeL(uint8_t * Lout, size_t * L_len, const uint8_t * w1in, size_t w1in_len) override;
 
 protected:
-    CHIP_ERROR InitImpl(const Hash_SHA256_stream * context) override;
+    CHIP_ERROR InitImpl() override;
     CHIP_ERROR Hash(const uint8_t * in, size_t in_len) override;
     CHIP_ERROR HashFinalize(uint8_t * out) override;
     CHIP_ERROR KDF(const uint8_t * secret, size_t secret_length, const uint8_t * salt, size_t salt_length, const uint8_t * info,

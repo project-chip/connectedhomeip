@@ -19,49 +19,51 @@
 
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
+#include <support/ReturnMacros.h>
 
 namespace chip {
 namespace Test {
 
 CHIP_ERROR MessagingContext::Init(nlTestSuite * suite, TransportMgrBase * transport)
 {
-    CHIP_ERROR err = IOContext::Init(suite);
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(IOContext::Init(suite));
 
-    err = mSecureSessionMgr.Init(GetSourceNodeId(), &GetSystemLayer(), transport);
-    SuccessOrExit(err);
+    mAdmins.Reset();
 
-    err = mExchangeManager.Init(&mSecureSessionMgr);
-    SuccessOrExit(err);
+    chip::Transport::AdminPairingInfo * srcNodeAdmin = mAdmins.AssignAdminId(mSrcAdminId, GetSourceNodeId());
+    VerifyOrReturnError(srcNodeAdmin != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    err = mSecureSessionMgr.NewPairing(mPeer, GetDestinationNodeId(), &mPairingLocalToPeer);
-    SuccessOrExit(err);
+    chip::Transport::AdminPairingInfo * destNodeAdmin = mAdmins.AssignAdminId(mDestAdminId, GetDestinationNodeId());
+    VerifyOrReturnError(destNodeAdmin != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    err = mSecureSessionMgr.NewPairing(mPeer, GetSourceNodeId(), &mPairingPeerToLocal);
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(mSecureSessionMgr.Init(GetSourceNodeId(), &GetSystemLayer(), transport, &mAdmins));
 
-exit:
-    return err;
+    ReturnErrorOnFailure(mExchangeManager.Init(&mSecureSessionMgr));
+
+    ReturnErrorOnFailure(mSecureSessionMgr.NewPairing(mPeer, GetDestinationNodeId(), &mPairingLocalToPeer,
+                                                      SecureSessionMgr::PairingDirection::kInitiator, mSrcAdminId));
+
+    return mSecureSessionMgr.NewPairing(mPeer, GetSourceNodeId(), &mPairingPeerToLocal,
+                                        SecureSessionMgr::PairingDirection::kResponder, mDestAdminId);
 }
 
 // Shutdown all layers, finalize operations
 CHIP_ERROR MessagingContext::Shutdown()
 {
-    CHIP_ERROR err = IOContext::Shutdown();
-
-    return err;
+    mExchangeManager.Shutdown();
+    return IOContext::Shutdown();
 }
 
 Messaging::ExchangeContext * MessagingContext::NewExchangeToPeer(Messaging::ExchangeDelegate * delegate)
 {
     // TODO: temprary create a SecureSessionHandle from node id, will be fix in PR 3602
-    return mExchangeManager.NewContext({ GetDestinationNodeId(), GetPeerKeyId() }, delegate);
+    return mExchangeManager.NewContext({ GetDestinationNodeId(), GetPeerKeyId(), GetAdminId() }, delegate);
 }
 
 Messaging::ExchangeContext * MessagingContext::NewExchangeToLocal(Messaging::ExchangeDelegate * delegate)
 {
     // TODO: temprary create a SecureSessionHandle from node id, will be fix in PR 3602
-    return mExchangeManager.NewContext({ GetSourceNodeId(), GetLocalKeyId() }, delegate);
+    return mExchangeManager.NewContext({ GetSourceNodeId(), GetLocalKeyId(), GetAdminId() }, delegate);
 }
 
 } // namespace Test

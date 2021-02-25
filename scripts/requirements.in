@@ -14,13 +14,15 @@ requests>=2.24.0
 
 # device controller wheel package
 wheel==0.34.2
+dbus-python; sys_platform == 'linux'
+pgi; sys_platform == 'linux'
 
 # mobly tests
 portpicker
 mobly
 
 # zephyr
-west>=0.8.0
+west>=0.9.0
 
 # happy tests
 lockfile

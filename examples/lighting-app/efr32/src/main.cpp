@@ -58,6 +58,10 @@
 #include <openthread/thread.h>
 #endif // CHIP_ENABLE_OPENTHREAD
 
+#if PW_RPC_ENABLED
+#include "Rpc.h"
+#endif
+
 using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;
@@ -108,6 +112,10 @@ int main(void)
 #endif
 #endif
 
+#if PW_RPC_ENABLED
+    chip::rpc::Init();
+#endif
+
     mbedtls_platform_set_calloc_free(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
 
     // Initialize mbedtls threading support on EFR32
@@ -128,7 +136,7 @@ int main(void)
         EFR32_LOG("PlatformMgr().InitChipStack() failed");
         appError(ret);
     }
-
+    chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName("EFR32_LIGHT");
 #if CHIP_ENABLE_OPENTHREAD
     EFR32_LOG("Initializing OpenThread stack");
     ret = ThreadStackMgr().InitThreadStack();

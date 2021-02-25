@@ -23,8 +23,8 @@ static void HandleResolve(void * context, MdnsService * result, CHIP_ERROR error
     result->mAddress.Value().ToString(addrBuf, sizeof(addrBuf));
     printf("Service at [%s]:%u\n", addrBuf, result->mPort);
     NL_TEST_ASSERT(suite, result->mTextEntrySize == 1);
-    NL_TEST_ASSERT(suite, strcmp(result->mTextEntryies[0].mKey, "key") == 0);
-    NL_TEST_ASSERT(suite, strcmp(reinterpret_cast<const char *>(result->mTextEntryies[0].mData), "val") == 0);
+    NL_TEST_ASSERT(suite, strcmp(result->mTextEntries[0].mKey, "key") == 0);
+    NL_TEST_ASSERT(suite, strcmp(reinterpret_cast<const char *>(result->mTextEntries[0].mData), "val") == 0);
 
     exit(0);
 }
@@ -61,7 +61,7 @@ static void InitCallback(void * context, CHIP_ERROR error)
     entry.mKey             = key;
     entry.mData            = reinterpret_cast<const uint8_t *>(val);
     entry.mDataSize        = strlen(reinterpret_cast<const char *>(entry.mData));
-    service.mTextEntryies  = &entry;
+    service.mTextEntries   = &entry;
     service.mTextEntrySize = 1;
     service.mSubTypes      = nullptr;
     service.mSubTypeSize   = 0;

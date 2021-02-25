@@ -35,3 +35,18 @@ using DemoTransportMgr = chip::TransportMgr<chip::Transport::UDP>;
  * @param [in] delegate   An optional AppDelegate
  */
 void InitServer(AppDelegate * delegate = nullptr);
+
+namespace chip {
+
+enum class ResetAdmins
+{
+    kYes,
+    kNo,
+};
+
+} // namespace chip
+
+/**
+ * Open the pairing window using default configured parameters.
+ */
+CHIP_ERROR OpenDefaultPairingWindow(chip::ResetAdmins resetAdmins);

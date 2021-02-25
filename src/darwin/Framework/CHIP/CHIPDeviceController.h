@@ -18,29 +18,16 @@
 #ifndef CHIP_DEVICE_CONTROLLER_H
 #define CHIP_DEVICE_CONTROLLER_H
 
-#import <CHIP/CHIPDeviceStatusDelegate.h>
 #import <Foundation/Foundation.h>
 
 @class CHIPDevice;
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef void (^ControllerOnConnectedBlock)(void);
-typedef void (^ControllerOnMessageBlock)(NSData * message);
-typedef void (^ControllerOnErrorBlock)(NSError * error);
-
-@protocol CHIPDeviceControllerDelegate;
 @protocol CHIPDevicePairingDelegate;
 @protocol CHIPPersistentStorageDelegate;
 
-@interface AddressInfo : NSObject
-
-@property (readonly, copy) NSString * ip;
-- (instancetype)initWithIP:(NSString *)ip;
-
-@end
-
-@interface CHIPDeviceController : NSObject <CHIPDeviceStatusDelegate>
+@interface CHIPDeviceController : NSObject
 
 - (BOOL)pairDevice:(uint64_t)deviceID
      discriminator:(uint16_t)discriminator
@@ -48,10 +35,10 @@ typedef void (^ControllerOnErrorBlock)(NSError * error);
              error:(NSError * __autoreleasing *)error;
 - (BOOL)unpairDevice:(uint64_t)deviceID error:(NSError * __autoreleasing *)error;
 - (BOOL)stopDevicePairing:(uint64_t)deviceID error:(NSError * __autoreleasing *)error;
+- (void)sendWiFiCredentials:(NSString *)ssid password:(NSString *)password;
+- (void)sendThreadCredentials:(NSData *)threadDataSet;
 
 - (CHIPDevice *)getPairedDevice:(uint64_t)deviceID error:(NSError * __autoreleasing *)error;
-
-- (BOOL)disconnect:(NSError * __autoreleasing *)error;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -62,13 +49,9 @@ typedef void (^ControllerOnErrorBlock)(NSError * error);
 + (CHIPDeviceController *)sharedController;
 
 /**
- * Set the Delegate for the Device Controller as well as the Queue on which the Delegate callbacks will be triggered
- *
- * @param[in] delegate The delegate the Device Controller should use
- *
- * @param[in] queue The queue on which the Device Controller will deliver callbacks
+ * Return the Node Id assigned to the controller.
  */
-- (void)setDelegate:(id<CHIPDeviceControllerDelegate>)delegate queue:(dispatch_queue_t)queue;
+- (NSNumber *)getControllerNodeId;
 
 /**
  * Set the Delegate for the Device Pairing  as well as the Queue on which the Delegate callbacks will be triggered
@@ -87,35 +70,6 @@ typedef void (^ControllerOnErrorBlock)(NSError * error);
  * @param[in] queue The queue on which the callbacks will be delivered
  */
 - (void)setPersistentStorageDelegate:(id<CHIPPersistentStorageDelegate>)delegate queue:(dispatch_queue_t)queue;
-
-@end
-
-/**
- * The protocol definition for the CHIPDeviceControllerDelegate
- *
- * All delegate methods will be called on the supplied Delegate Queue.
- */
-@protocol CHIPDeviceControllerDelegate <NSObject>
-
-/**
- * Notify the delegate when a connection request succeeds
- *
- */
-- (void)deviceControllerOnConnected;
-
-/**
- * Notify the delegate that a message was received
- *
- * @param[in] message The received message
- */
-- (void)deviceControllerOnMessage:(NSData *)message;
-
-/**
- * Notify the Delegate that an error occurred
- *
- * @param[in] error The error that occurred
- */
-- (void)deviceControllerOnError:(NSError *)error;
 
 @end
 

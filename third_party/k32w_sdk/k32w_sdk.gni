@@ -49,7 +49,7 @@ template("k32w_sdk") {
     _sdk_include_dirs = [
       "${k32w_sdk_root}/boards/k32w061dk6/wireless_examples/openthread/reed/bm",
       "${k32w_sdk_root}/boards/k32w061dk6/wireless_examples/openthread/enablement",
-      "${k32w_sdk_root}/boards/k32w061dk6/wireless_examples/hybrid/ble_ot/chip",
+      "${chip_root}/src/platform/K32W",
       "${k32w_sdk_root}/CMSIS/Include",
       "${k32w_sdk_root}/components/serial_manager",
       "${k32w_sdk_root}/components/uart",

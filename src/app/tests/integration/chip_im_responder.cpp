@@ -39,27 +39,28 @@
 #include <transport/SecureSessionMgr.h>
 #include <transport/raw/UDP.h>
 
-namespace {
+namespace chip {
+namespace app {
 
-// The CommandHandler object
-chip::TransportMgr<chip::Transport::UDP> gTransportManager;
-chip::SecureSessionMgr gSessionManager;
-chip::SecurePairingUsingTestSecret gTestPairing;
-
-// Callback handler when a CHIP EchoRequest is received.
-void HandleCommandRequestReceived(chip::TLV::TLVReader & aReader, chip::app::Command * apCommandObj)
+void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId,
+                                  chip::TLV::TLVReader & aReader, Command * apCommandObj)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+
+    if (aClusterId != kTestClusterId || aCommandId != kTestCommandId || aEndPointId != kTestEndPointId)
+    {
+        return;
+    }
 
     if (aReader.GetLength() != 0)
     {
         chip::TLV::Debug::Dump(aReader, TLVPrettyPrinter);
     }
 
-    chip::app::Command::CommandParams commandParams = { 1,  // Endpoint
-                                                        0,  // GroupId
-                                                        6,  // ClusterId
-                                                        40, // CommandId
+    chip::app::Command::CommandParams commandParams = { kTestEndPointId, // Endpoint
+                                                        kTestGroupId,    // GroupId
+                                                        kTestClusterId,  // ClusterId
+                                                        kTestCommandId,  // CommandId
                                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
 
     // Add command data here
@@ -93,6 +94,15 @@ void HandleCommandRequestReceived(chip::TLV::TLVReader & aReader, chip::app::Com
 exit:
     return;
 }
+} // namespace app
+} // namespace chip
+
+namespace {
+
+// The CommandHandler object
+chip::TransportMgr<chip::Transport::UDP> gTransportManager;
+chip::SecureSessionMgr gSessionManager;
+chip::SecurePairingUsingTestSecret gTestPairing;
 
 } // namespace
 
@@ -100,6 +110,11 @@ int main(int argc, char * argv[])
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::Optional<chip::Transport::PeerAddress> peer(chip::Transport::Type::kUndefined);
+    const chip::Transport::AdminId gAdminId = 0;
+    chip::Transport::AdminPairingTable admins;
+    chip::Transport::AdminPairingInfo * adminInfo = admins.AssignAdminId(gAdminId, chip::kTestDeviceNodeId);
+
+    VerifyOrExit(adminInfo != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     InitializeChip();
 
@@ -107,7 +122,7 @@ int main(int argc, char * argv[])
         chip::Transport::UdpListenParameters(&chip::DeviceLayer::InetLayer).SetAddressType(chip::Inet::kIPAddressType_IPv4));
     SuccessOrExit(err);
 
-    err = gSessionManager.Init(chip::kTestDeviceNodeId, &chip::DeviceLayer::SystemLayer, &gTransportManager);
+    err = gSessionManager.Init(chip::kTestDeviceNodeId, &chip::DeviceLayer::SystemLayer, &gTransportManager, &admins);
     SuccessOrExit(err);
 
     err = gExchangeManager.Init(&gSessionManager);
@@ -116,18 +131,15 @@ int main(int argc, char * argv[])
     err = chip::app::InteractionModelEngine::GetInstance()->Init(&gExchangeManager);
     SuccessOrExit(err);
 
-    err = gSessionManager.NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing);
+    err = gSessionManager.NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing,
+                                     chip::SecureSessionMgr::PairingDirection::kResponder, gAdminId);
     SuccessOrExit(err);
 
-    chip::app::InteractionModelEngine::GetInstance()->RegisterClusterCommandHandler(
-        6, 40, chip::app::Command::CommandRoleId::kCommandHandlerId, HandleCommandRequestReceived);
     printf("Listening for IM requests...\n");
 
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
 
 exit:
-    chip::app::InteractionModelEngine::GetInstance()->DeregisterClusterCommandHandler(
-        6, 40, chip::app::Command::CommandRoleId::kCommandHandlerId);
 
     if (err != CHIP_NO_ERROR)
     {

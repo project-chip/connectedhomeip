@@ -43,7 +43,7 @@ using std::byte;
 constexpr size_t kMaxTransmissionUnit = 1500;
 
 // Used to write HDLC data to pw::sys_io.
-pw::stream::SysIoWriter writer;
+pw::stream::SysIoWriter sysIoWriter;
 
 // May be nullptr
 ::chip::rpc::Mutex * uart_mutex;
@@ -91,7 +91,7 @@ private:
 };
 
 // Set up the output channel for the pw_rpc server to use to use.
-ChipRpcChannelOutputBuffer<kMaxTransmissionUnit> hdlc_channel_output(writer, pw::hdlc::kDefaultRpcAddress, "HDLC channel");
+ChipRpcChannelOutputBuffer<kMaxTransmissionUnit> hdlc_channel_output(sysIoWriter, pw::hdlc::kDefaultRpcAddress, "HDLC channel");
 
 pw::rpc::Channel channels[] = { pw::rpc::Channel::Create<1>(&hdlc_channel_output) };
 
@@ -113,7 +113,7 @@ void Start(void (*RegisterServices)(pw::rpc::Server &), ::chip::rpc::Mutex * uar
         {
             uart_mutex->Lock();
         }
-        pw::hdlc::WriteUIFrame(1, std::as_bytes(std::span(log)), writer);
+        pw::hdlc::WriteUIFrame(1, std::as_bytes(std::span(log)), sysIoWriter);
         if (uart_mutex)
         {
             uart_mutex->Unlock();

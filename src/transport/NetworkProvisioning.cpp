@@ -23,6 +23,7 @@
 #include <support/ErrorStr.h>
 #include <support/SafeInt.h>
 #include <transport/NetworkProvisioning.h>
+#include <transport/SecureSessionMgr.h>
 
 #if CONFIG_DEVICE_LAYER
 #include <platform/CHIPDeviceLayer.h>
@@ -33,6 +34,9 @@
 #endif
 
 namespace chip {
+
+constexpr char kAPInterfaceNamePrefix[]      = "ap";
+constexpr char kLoobackInterfaceNamePrefix[] = "lo";
 
 void NetworkProvisioning::Init(NetworkProvisioningDelegate * delegate)
 {
@@ -62,8 +66,8 @@ CHIP_ERROR NetworkProvisioning::HandleNetworkProvisioningMessage(uint8_t msgType
     case NetworkProvisioning::MsgTypes::kWiFiAssociationRequest: {
         char SSID[chip::DeviceLayer::Internal::kMaxWiFiSSIDLength];
         char passwd[chip::DeviceLayer::Internal::kMaxWiFiKeyLength];
-        BufBound bbufSSID(Uint8::from_char(SSID), chip::DeviceLayer::Internal::kMaxWiFiSSIDLength);
-        BufBound bbufPW(Uint8::from_char(passwd), chip::DeviceLayer::Internal::kMaxWiFiKeyLength);
+        Encoding::LittleEndian::BufferWriter bbufSSID(Uint8::from_char(SSID), chip::DeviceLayer::Internal::kMaxWiFiSSIDLength);
+        Encoding::LittleEndian::BufferWriter bbufPW(Uint8::from_char(passwd), chip::DeviceLayer::Internal::kMaxWiFiKeyLength);
 
         const uint8_t * buffer = msgBuf->Start();
         size_t len             = msgBuf->DataLength();
@@ -81,6 +85,12 @@ CHIP_ERROR NetworkProvisioning::HandleNetworkProvisioningMessage(uint8_t msgType
 #if defined(CHIP_DEVICE_LAYER_TARGET)
         DeviceLayer::DeviceNetworkProvisioningDelegateImpl deviceDelegate;
         err = deviceDelegate.ProvisionWiFi(SSID, passwd);
+        SuccessOrExit(err);
+
+        if (DeviceLayer::ConnectivityMgr().IsWiFiStationConnected())
+        {
+            err = SendCurrentIPv4Address();
+        }
 #endif
 #endif
     }
@@ -129,7 +139,7 @@ size_t NetworkProvisioning::EncodedStringSize(const char * str)
     return strlen(str) + sizeof(uint16_t);
 }
 
-CHIP_ERROR NetworkProvisioning::EncodeString(const char * str, BufBound & bbuf)
+CHIP_ERROR NetworkProvisioning::EncodeString(const char * str, Encoding::LittleEndian::BufferWriter & bbuf)
 {
     CHIP_ERROR err  = CHIP_NO_ERROR;
     size_t length   = strlen(str);
@@ -143,7 +153,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR NetworkProvisioning::DecodeString(const uint8_t * input, size_t input_len, BufBound & bbuf, size_t & consumed)
+CHIP_ERROR NetworkProvisioning::DecodeString(const uint8_t * input, size_t input_len, Encoding::LittleEndian::BufferWriter & bbuf,
+                                             size_t & consumed)
 {
     CHIP_ERROR err  = CHIP_NO_ERROR;
     uint16_t length = 0;
@@ -187,27 +198,43 @@ exit:
     return err;
 }
 
+CHIP_ERROR NetworkProvisioning::SendCurrentIPv4Address()
+{
+    for (chip::Inet::InterfaceAddressIterator it; it.HasCurrent(); it.Next())
+    {
+        char ifName[chip::Inet::InterfaceIterator::kMaxIfNameLength];
+        if (it.IsUp() && CHIP_NO_ERROR == it.GetInterfaceName(ifName, sizeof(ifName)) &&
+            memcmp(ifName, kAPInterfaceNamePrefix, sizeof(kAPInterfaceNamePrefix) - 1) &&
+            memcmp(ifName, kLoobackInterfaceNamePrefix, sizeof(kLoobackInterfaceNamePrefix) - 1))
+        {
+            chip::Inet::IPAddress addr = it.GetAddress();
+            if (addr.IsIPv4())
+            {
+                return SendIPAddress(addr);
+            }
+        }
+    }
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR NetworkProvisioning::SendNetworkCredentials(const char * ssid, const char * passwd)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     const size_t bufferSize = EncodedStringSize(ssid) + EncodedStringSize(passwd);
     VerifyOrExit(CanCastTo<uint16_t>(bufferSize), err = CHIP_ERROR_INVALID_ARGUMENT);
     {
-        System::PacketBufferHandle buffer = System::PacketBufferHandle::New(bufferSize);
-        BufBound bbuf(buffer->Start(), buffer->AvailableDataLength());
+        Encoding::LittleEndian::PacketBufferWriter bbuf(MessagePacketBuffer::New(bufferSize), bufferSize);
 
         ChipLogProgress(NetworkProvisioning, "Sending Network Creds. Delegate %p\n", mDelegate);
         VerifyOrExit(mDelegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-        VerifyOrExit(!buffer.IsNull(), err = CHIP_ERROR_NO_MEMORY);
+        VerifyOrExit(!bbuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
         SuccessOrExit(EncodeString(ssid, bbuf));
         SuccessOrExit(EncodeString(passwd, bbuf));
         VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_BUFFER_TOO_SMALL);
 
-        VerifyOrExit(CanCastTo<uint16_t>(bbuf.Needed()), err = CHIP_ERROR_INVALID_ARGUMENT);
-        buffer->SetDataLength(static_cast<uint16_t>(bbuf.Needed()));
-
         err = mDelegate->SendSecureMessage(Protocols::kProtocol_NetworkProvisioning,
-                                           NetworkProvisioning::MsgTypes::kWiFiAssociationRequest, std::move(buffer));
+                                           NetworkProvisioning::MsgTypes::kWiFiAssociationRequest, bbuf.Finalize());
         SuccessOrExit(err);
     }
 
@@ -231,31 +258,26 @@ CHIP_ERROR NetworkProvisioning::SendThreadCredentials(const DeviceLayer::Interna
         4;                  // threadData.ThreadChannel, threadData.FieldPresent.ThreadExtendedPANId,
                             // threadData.FieldPresent.ThreadMeshPrefix, threadData.FieldPresent.ThreadPSKc
     /* clang-format on */
-    System::PacketBufferHandle buffer = System::PacketBufferHandle::New(credentialSize);
+    Encoding::LittleEndian::PacketBufferWriter bbuf(MessagePacketBuffer::New(credentialSize), credentialSize);
 
     ChipLogProgress(NetworkProvisioning, "Sending Thread Credentials");
     VerifyOrExit(mDelegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(!buffer.IsNull(), err = CHIP_ERROR_NO_MEMORY);
+    VerifyOrExit(!bbuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
-    {
-        BufBound bbuf(buffer->Start(), buffer->AvailableDataLength());
-        bbuf.Put(threadData.ThreadNetworkName, sizeof(threadData.ThreadNetworkName));
-        bbuf.Put(threadData.ThreadExtendedPANId, sizeof(threadData.ThreadExtendedPANId));
-        bbuf.Put(threadData.ThreadMeshPrefix, sizeof(threadData.ThreadMeshPrefix));
-        bbuf.Put(threadData.ThreadMasterKey, sizeof(threadData.ThreadMasterKey));
-        bbuf.Put(threadData.ThreadPSKc, sizeof(threadData.ThreadPSKc));
-        bbuf.Put16(threadData.ThreadPANId);
-        bbuf.Put(threadData.ThreadChannel);
-        bbuf.Put(static_cast<uint8_t>(threadData.FieldPresent.ThreadExtendedPANId));
-        bbuf.Put(static_cast<uint8_t>(threadData.FieldPresent.ThreadMeshPrefix));
-        bbuf.Put(static_cast<uint8_t>(threadData.FieldPresent.ThreadPSKc));
+    bbuf.Put(threadData.ThreadNetworkName, sizeof(threadData.ThreadNetworkName));
+    bbuf.Put(threadData.ThreadExtendedPANId, sizeof(threadData.ThreadExtendedPANId));
+    bbuf.Put(threadData.ThreadMeshPrefix, sizeof(threadData.ThreadMeshPrefix));
+    bbuf.Put(threadData.ThreadMasterKey, sizeof(threadData.ThreadMasterKey));
+    bbuf.Put(threadData.ThreadPSKc, sizeof(threadData.ThreadPSKc));
+    bbuf.Put16(threadData.ThreadPANId);
+    bbuf.Put(threadData.ThreadChannel);
+    bbuf.Put(static_cast<uint8_t>(threadData.FieldPresent.ThreadExtendedPANId));
+    bbuf.Put(static_cast<uint8_t>(threadData.FieldPresent.ThreadMeshPrefix));
+    bbuf.Put(static_cast<uint8_t>(threadData.FieldPresent.ThreadPSKc));
 
-        VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_BUFFER_TOO_SMALL);
-        buffer->SetDataLength(static_cast<uint16_t>(bbuf.Needed()));
-
-        err = mDelegate->SendSecureMessage(Protocols::kProtocol_NetworkProvisioning,
-                                           NetworkProvisioning::MsgTypes::kThreadAssociationRequest, std::move(buffer));
-    }
+    VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_BUFFER_TOO_SMALL);
+    err = mDelegate->SendSecureMessage(Protocols::kProtocol_NetworkProvisioning,
+                                       NetworkProvisioning::MsgTypes::kThreadAssociationRequest, bbuf.Finalize());
 
 exit:
     if (CHIP_NO_ERROR != err)

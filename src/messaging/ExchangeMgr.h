@@ -27,7 +27,8 @@
 #include <array>
 
 #include <messaging/ExchangeContext.h>
-#include <messaging/ReliableMessageManager.h>
+#include <messaging/MessageCounterSync.h>
+#include <messaging/ReliableMessageMgr.h>
 #include <support/DLLUtil.h>
 #include <transport/SecureSessionMgr.h>
 
@@ -107,7 +108,7 @@ public:
      *                                                             is full and a new one cannot be allocated.
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR RegisterUnsolicitedMessageHandler(uint32_t protocolId, ExchangeDelegate * delegate);
+    CHIP_ERROR RegisterUnsolicitedMessageHandlerForProtocol(uint32_t protocolId, ExchangeDelegate * delegate);
 
     /**
      *  Register an unsolicited message handler for a given protocol identifier and message type.
@@ -122,7 +123,18 @@ public:
      *                                                             is full and a new one cannot be allocated.
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR RegisterUnsolicitedMessageHandler(uint32_t protocolId, uint8_t msgType, ExchangeDelegate * delegate);
+    CHIP_ERROR RegisterUnsolicitedMessageHandlerForType(uint32_t protocolId, uint8_t msgType, ExchangeDelegate * delegate);
+
+    /**
+     * A strongly-message-typed version of RegisterUnsolicitedMessageHandlerForType.
+     */
+    template <typename MessageType, typename = std::enable_if_t<std::is_enum<MessageType>::value>>
+    CHIP_ERROR RegisterUnsolicitedMessageHandlerForType(MessageType msgType, ExchangeDelegate * delegate)
+    {
+        static_assert(std::is_same<std::underlying_type_t<MessageType>, uint8_t>::value, "Enum is wrong size; cast is not safe");
+        return RegisterUnsolicitedMessageHandlerForType(Protocols::MessageTypeTraits<MessageType>::ProtocolId,
+                                                        static_cast<uint8_t>(msgType), delegate);
+    }
 
     /**
      *  Unregister an unsolicited message handler for a given protocol identifier.
@@ -133,7 +145,7 @@ public:
      *                                                       is not found.
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR UnregisterUnsolicitedMessageHandler(uint32_t protocolId);
+    CHIP_ERROR UnregisterUnsolicitedMessageHandlerForProtocol(uint32_t protocolId);
 
     /**
      *  Unregister an unsolicited message handler for a given protocol identifier and message type.
@@ -146,14 +158,27 @@ public:
      *                                                       is not found.
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR UnregisterUnsolicitedMessageHandler(uint32_t protocolId, uint8_t msgType);
+    CHIP_ERROR UnregisterUnsolicitedMessageHandlerForType(uint32_t protocolId, uint8_t msgType);
+
+    /**
+     * A strongly-message-typed version of UnregisterUnsolicitedMessageHandlerForType.
+     */
+    template <typename MessageType, typename = std::enable_if_t<std::is_enum<MessageType>::value>>
+    CHIP_ERROR UnregisterUnsolicitedMessageHandlerForType(MessageType msgType)
+    {
+        static_assert(std::is_same<std::underlying_type_t<MessageType>, uint8_t>::value, "Enum is wrong size; cast is not safe");
+        return UnregisterUnsolicitedMessageHandlerForType(Protocols::MessageTypeTraits<MessageType>::ProtocolId,
+                                                          static_cast<uint8_t>(msgType));
+    }
 
     void IncrementContextsInUse();
     void DecrementContextsInUse();
 
     SecureSessionMgr * GetSessionMgr() const { return mSessionMgr; }
 
-    ReliableMessageManager * GetReliableMessageMgr() { return &mReliableMessageMgr; };
+    ReliableMessageMgr * GetReliableMessageMgr() { return &mReliableMessageMgr; };
+
+    MessageCounterSyncMgr * GetMessageCounterSyncMgr() { return &mMessageCounterSyncMgr; };
 
     size_t GetContextsInUse() const { return mContextsInUse; }
 
@@ -174,7 +199,8 @@ private:
     uint16_t mNextExchangeId;
     State mState;
     SecureSessionMgr * mSessionMgr;
-    ReliableMessageManager mReliableMessageMgr;
+    ReliableMessageMgr mReliableMessageMgr;
+    MessageCounterSyncMgr mMessageCounterSyncMgr;
 
     std::array<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> mContextPool;
     size_t mContextsInUse;

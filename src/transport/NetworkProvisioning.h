@@ -26,7 +26,7 @@
 #include <core/CHIPCore.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 #include <protocols/Protocols.h>
-#include <support/BufBound.h>
+#include <support/BufferWriter.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/RendezvousSessionDelegate.h>
 
@@ -113,9 +113,18 @@ private:
      */
     CHIP_ERROR SendIPAddress(const Inet::IPAddress & addr);
 
+    /**
+     * @brief
+     *  The device can use this function to send its current IP address to
+     *  commissioner. This would generally be called during network
+     *  provisioning of the device, when the device already has an IP address.
+     */
+    CHIP_ERROR SendCurrentIPv4Address();
+
     static size_t EncodedStringSize(const char * str);
-    static CHIP_ERROR EncodeString(const char * str, BufBound & bbuf);
-    static CHIP_ERROR DecodeString(const uint8_t * input, size_t input_len, BufBound & bbuf, size_t & consumed);
+    static CHIP_ERROR EncodeString(const char * str, Encoding::LittleEndian::BufferWriter & bbuf);
+    static CHIP_ERROR DecodeString(const uint8_t * input, size_t input_len, Encoding::LittleEndian::BufferWriter & bbuf,
+                                   size_t & consumed);
 
     CHIP_ERROR DecodeThreadAssociationRequest(const System::PacketBufferHandle & msgBuf);
 

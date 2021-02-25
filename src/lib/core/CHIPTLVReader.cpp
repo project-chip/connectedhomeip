@@ -673,7 +673,7 @@ CHIP_ERROR TLVReader::VerifyElement()
                 return CHIP_ERROR_INVALID_TLV_TAG;
             break;
         case kTLVType_UnknownContainer:
-        case kTLVType_Path:
+        case kTLVType_List:
             break;
         default:
             return CHIP_ERROR_INCORRECT_STATE;

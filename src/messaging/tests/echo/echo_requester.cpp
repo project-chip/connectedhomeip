@@ -53,6 +53,8 @@ constexpr size_t kMaxEchoCount = 3;
 // The CHIP Echo interval time in milliseconds.
 constexpr int32_t gEchoInterval = 1000;
 
+constexpr chip::Transport::AdminId gAdminId = 0;
+
 // The EchoClient object.
 chip::Protocols::Echo::EchoClient gEchoClient;
 
@@ -89,7 +91,7 @@ CHIP_ERROR SendEchoRequest(void)
     const char kRequestFormat[] = "Echo Message %" PRIu64 "\n";
     char requestData[(sizeof kRequestFormat) + 20 /* uint64_t decimal digits */];
     snprintf(requestData, sizeof requestData, kRequestFormat, gEchoCount);
-    chip::System::PacketBufferHandle payloadBuf = chip::System::PacketBufferHandle::NewWithData(requestData, strlen(requestData));
+    chip::System::PacketBufferHandle payloadBuf = chip::MessagePacketBuffer::NewWithData(requestData, strlen(requestData));
 
     if (payloadBuf.IsNull())
     {
@@ -121,8 +123,7 @@ CHIP_ERROR EstablishSecureSession()
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     chip::Optional<chip::Transport::PeerAddress> peerAddr;
-    chip::SecurePairingUsingTestSecret * testSecurePairingSecret = chip::Platform::New<chip::SecurePairingUsingTestSecret>(
-        chip::Optional<chip::NodeId>::Value(chip::kTestDeviceNodeId), static_cast<uint16_t>(0), static_cast<uint16_t>(0));
+    chip::SecurePairingUsingTestSecret * testSecurePairingSecret = chip::Platform::New<chip::SecurePairingUsingTestSecret>();
     VerifyOrExit(testSecurePairingSecret != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     if (gUseTCP)
@@ -136,7 +137,8 @@ CHIP_ERROR EstablishSecureSession()
     }
 
     // Attempt to connect to the peer.
-    err = gSessionManager.NewPairing(peerAddr, chip::kTestDeviceNodeId, testSecurePairingSecret);
+    err = gSessionManager.NewPairing(peerAddr, chip::kTestDeviceNodeId, testSecurePairingSecret,
+                                     chip::SecureSessionMgr::PairingDirection::kInitiator, gAdminId);
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -170,6 +172,9 @@ int main(int argc, char * argv[])
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+    chip::Transport::AdminPairingTable admins;
+    chip::Transport::AdminPairingInfo * adminInfo = nullptr;
+
     if (argc <= 1)
     {
         printf("Missing Echo Server IP address\n");
@@ -195,6 +200,9 @@ int main(int argc, char * argv[])
 
     InitializeChip();
 
+    adminInfo = admins.AssignAdminId(gAdminId, chip::kTestControllerNodeId);
+    VerifyOrExit(adminInfo != nullptr, err = CHIP_ERROR_NO_MEMORY);
+
     if (gUseTCP)
     {
         err = gTCPManager.Init(chip::Transport::TcpListenParameters(&chip::DeviceLayer::InetLayer)
@@ -202,7 +210,7 @@ int main(int argc, char * argv[])
                                    .SetListenPort(ECHO_CLIENT_PORT));
         SuccessOrExit(err);
 
-        err = gSessionManager.Init(chip::kTestControllerNodeId, &chip::DeviceLayer::SystemLayer, &gTCPManager);
+        err = gSessionManager.Init(chip::kTestControllerNodeId, &chip::DeviceLayer::SystemLayer, &gTCPManager, &admins);
         SuccessOrExit(err);
     }
     else
@@ -212,7 +220,7 @@ int main(int argc, char * argv[])
                                    .SetListenPort(ECHO_CLIENT_PORT));
         SuccessOrExit(err);
 
-        err = gSessionManager.Init(chip::kTestControllerNodeId, &chip::DeviceLayer::SystemLayer, &gUDPManager);
+        err = gSessionManager.Init(chip::kTestControllerNodeId, &chip::DeviceLayer::SystemLayer, &gUDPManager, &admins);
         SuccessOrExit(err);
     }
 
@@ -224,7 +232,7 @@ int main(int argc, char * argv[])
     SuccessOrExit(err);
 
     // TODO: temprary create a SecureSessionHandle from node id to unblock end-to-end test. Complete solution is tracked in PR:4451
-    err = gEchoClient.Init(&gExchangeManager, { chip::kTestDeviceNodeId, 0 });
+    err = gEchoClient.Init(&gExchangeManager, { chip::kTestDeviceNodeId, 0, gAdminId });
     SuccessOrExit(err);
 
     // Arrange to get a callback whenever an Echo Response is received.

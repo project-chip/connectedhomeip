@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,7 +23,7 @@
  */
 
 #include <core/CHIPEncoding.h>
-#include <support/BufBound.h>
+#include <support/BufferWriter.h>
 #include <support/CodeUtils.h>
 #include <support/ReturnMacros.h>
 #include <transport/SecureSession.h>
@@ -88,7 +88,7 @@ CHIP_ERROR SecureSession::GetIV(const PacketHeader & header, uint8_t * iv, size_
 
     VerifyOrReturnError(len == kAESCCMIVLen, CHIP_ERROR_INVALID_ARGUMENT);
 
-    BufBound bbuf(iv, len);
+    Encoding::LittleEndian::BufferWriter bbuf(iv, len);
 
     bbuf.Put64(header.GetSourceNodeId().ValueOr(0));
     bbuf.Put32(header.GetMessageId());
@@ -113,7 +113,7 @@ CHIP_ERROR SecureSession::GetAdditionalAuthData(const PacketHeader & header, uin
 }
 
 CHIP_ERROR SecureSession::Encrypt(const uint8_t * input, size_t input_length, uint8_t * output, PacketHeader & header,
-                                  MessageAuthenticationCode & mac)
+                                  MessageAuthenticationCode & mac) const
 {
 
     constexpr Header::EncryptionType encType = Header::EncryptionType::kAESCCMTagLen16;
@@ -142,7 +142,7 @@ CHIP_ERROR SecureSession::Encrypt(const uint8_t * input, size_t input_length, ui
 }
 
 CHIP_ERROR SecureSession::Decrypt(const uint8_t * input, size_t input_length, uint8_t * output, const PacketHeader & header,
-                                  const MessageAuthenticationCode & mac)
+                                  const MessageAuthenticationCode & mac) const
 {
     const size_t taglen = MessageAuthenticationCode::TagLenForEncryptionType(header.GetEncryptionType());
     const uint8_t * tag = mac.GetTag();

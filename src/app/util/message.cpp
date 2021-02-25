@@ -177,6 +177,11 @@ uint8_t * emberAfPutDateInResp(EmberAfDate * value)
     }
 }
 
+void emberAfPutInt16sInResp(int16_t value)
+{
+    emberAfPutInt16uInResp(static_cast<uint16_t>(value));
+}
+
 // ------------------------------------
 // Utilities for reading from RAM buffers (reading from incoming message
 // buffer)
@@ -209,17 +214,17 @@ uint64_t emberAfGetInt64u(const uint8_t * message, uint16_t currentIndex, uint16
 
 uint32_t emberAfGetInt32u(const uint8_t * message, uint16_t currentIndex, uint16_t msgLen)
 {
-    return emberAfGetInt(message, currentIndex, msgLen, 4);
+    return static_cast<uint32_t>(emberAfGetInt(message, currentIndex, msgLen, 4));
 }
 
 uint32_t emberAfGetInt24u(const uint8_t * message, uint16_t currentIndex, uint16_t msgLen)
 {
-    return emberAfGetInt(message, currentIndex, msgLen, 3);
+    return static_cast<uint32_t>(emberAfGetInt(message, currentIndex, msgLen, 3));
 }
 
 uint16_t emberAfGetInt16u(const uint8_t * message, uint16_t currentIndex, uint16_t msgLen)
 {
-    return (uint16_t) emberAfGetInt(message, currentIndex, msgLen, 2);
+    return static_cast<uint16_t>(emberAfGetInt(message, currentIndex, msgLen, 2));
 }
 
 uint8_t * emberAfGetString(uint8_t * message, uint16_t currentIndex, uint16_t msgLen)

@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2020-2021 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,17 +24,16 @@ jobs:
 
         strategy:
             matrix:
-                type: [main, clang, mbedtls]
+                type: [gcc_debug, gcc_release, clang, mbedtls]
         env:
             BUILD_TYPE: ${{ matrix.type }}
-            BUILD_VERSION: 0.2.18
             BUILD_IMAGE: chip-build-openssl
             BUILD_ORG: connectedhomeip
 
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build:0.4.18
+            image: connectedhomeip/chip-build:latest
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
             options:
@@ -57,7 +56,8 @@ jobs:
             - name: Setup Build
               run: |
                   case $BUILD_TYPE in
-                     "main") GN_ARGS='';;
+                     "gcc_debug") GN_ARGS='chip_config_memory_debug_checks=true chip_config_memory_debug_dmalloc=true';;
+                     "gcc_release") GN_ARGS='is_debug=false';;
                      "clang") GN_ARGS='is_clang=true';;
                      "mbedtls") GN_ARGS='chip_crypto="mbedtls"';;
                      *) ;;

@@ -31,6 +31,8 @@ public:
     QueryData(const QueryData &) = default;
     QueryData & operator=(const QueryData &) = default;
 
+    QueryData(QType type, QClass klass, bool unicast) : mType(type), mClass(klass), mAnswerViaUnicast(unicast) {}
+
     QueryData(QType type, QClass klass, bool unicast, const uint8_t * nameStart, const BytesRange & validData) :
         mType(type), mClass(klass), mAnswerViaUnicast(unicast), mNameIterator(validData, nameStart)
     {}
@@ -38,6 +40,11 @@ public:
     QType GetType() const { return mType; }
     QClass GetClass() const { return mClass; }
     bool RequestedUnicastAnswer() const { return mAnswerViaUnicast; }
+
+    /// Boot advertisement is an internal query meant to advertise all available
+    /// services at device startup time.
+    bool IsBootAdvertising() const { return mIsBootAdvertising; }
+    void SetIsBootAdvertising(bool isBootAdvertising) { mIsBootAdvertising = isBootAdvertising; }
 
     SerializedQNameIterator GetName() const { return mNameIterator; }
 
@@ -55,7 +62,11 @@ private:
     QType mType            = QType::ANY;
     QClass mClass          = QClass::ANY;
     bool mAnswerViaUnicast = false;
-    SerializedQNameIterator mNameIterator; // const since we reuse it
+    SerializedQNameIterator mNameIterator;
+
+    /// Flag as a boot-time internal query. This allows query replies
+    /// to be built accordingly.
+    bool mIsBootAdvertising = false;
 };
 
 class ResourceData

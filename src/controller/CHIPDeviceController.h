@@ -29,12 +29,13 @@
 #pragma once
 
 #include <controller/CHIPDevice.h>
-#include <controller/CHIPPersistentStorageDelegate.h>
 #include <core/CHIPCore.h>
+#include <core/CHIPPersistentStorageDelegate.h>
 #include <core/CHIPTLV.h>
 #include <messaging/ExchangeMgr.h>
 #include <support/DLLUtil.h>
 #include <support/SerializableIntegerSet.h>
+#include <transport/AdminPairingTable.h>
 #include <transport/RendezvousSession.h>
 #include <transport/RendezvousSessionDelegate.h>
 #include <transport/SecureSessionMgr.h>
@@ -197,7 +198,11 @@ protected:
     uint16_t FindDeviceIndex(SecureSessionHandle session);
     uint16_t FindDeviceIndex(NodeId id);
     void ReleaseDevice(uint16_t index);
+    void ReleaseDeviceById(NodeId remoteDeviceId);
     CHIP_ERROR SetPairedDeviceList(const char * pairedDeviceSerializedSet);
+
+    Transport::AdminId mAdminId = 0;
+    Transport::AdminPairingTable mAdmins;
 
 private:
     //////////// SecureSessionMgrDelegate Implementation ///////////////
@@ -214,6 +219,27 @@ private:
     void ReleaseAllDevices();
 
     System::Layer * mSystemLayer;
+};
+
+/**
+ * @brief
+ *   The commissioner applications doesn't advertise itself as an available device for rendezvous
+ *   process. This delegate class provides no-op functions for the advertisement delegate.
+ */
+class DeviceCommissionerRendezvousAdvertisementDelegate : public RendezvousAdvertisementDelegate
+{
+public:
+    /**
+     * @brief
+     *   Starts advertisement of the device for rendezvous availability.
+     */
+    CHIP_ERROR StartAdvertisement() const override { return CHIP_NO_ERROR; }
+
+    /**
+     * @brief
+     *   Stops advertisement of the device for rendezvous availability.
+     */
+    CHIP_ERROR StopAdvertisement() const override { return CHIP_NO_ERROR; }
 };
 
 /**
@@ -313,6 +339,8 @@ private:
        the pairing for a device is removed. The DeviceCommissioner uses this to decide when to
        persist the device list */
     bool mPairedDevicesUpdated;
+
+    DeviceCommissionerRendezvousAdvertisementDelegate mRendezvousAdvDelegate;
 
     void PersistDeviceList();
 };

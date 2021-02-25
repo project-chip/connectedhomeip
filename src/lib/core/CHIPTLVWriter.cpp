@@ -632,7 +632,7 @@ CHIP_ERROR TLVWriter::WriteElementHead(TLVElementType elemType, uint64_t tag, ui
     {
         if (tagNum < 256)
         {
-            if (mContainerType != kTLVType_Structure && mContainerType != kTLVType_Path)
+            if (mContainerType != kTLVType_Structure && mContainerType != kTLVType_List)
                 return CHIP_ERROR_INVALID_TLV_TAG;
 
             Write8(p, TLVTagControl::ContextSpecific | elemType);
@@ -641,7 +641,7 @@ CHIP_ERROR TLVWriter::WriteElementHead(TLVElementType elemType, uint64_t tag, ui
         else
         {
             if (elemType != TLVElementType::EndOfContainer && mContainerType != kTLVType_NotSpecified &&
-                mContainerType != kTLVType_Array && mContainerType != kTLVType_Path)
+                mContainerType != kTLVType_Array && mContainerType != kTLVType_List)
                 return CHIP_ERROR_INVALID_TLV_TAG;
 
             Write8(p, TLVTagControl::Anonymous | elemType);
@@ -651,7 +651,7 @@ CHIP_ERROR TLVWriter::WriteElementHead(TLVElementType elemType, uint64_t tag, ui
     {
         uint32_t profileId = ProfileIdFromTag(tag);
 
-        if (mContainerType != kTLVType_NotSpecified && mContainerType != kTLVType_Structure && mContainerType != kTLVType_Path)
+        if (mContainerType != kTLVType_NotSpecified && mContainerType != kTLVType_Structure && mContainerType != kTLVType_List)
             return CHIP_ERROR_INVALID_TLV_TAG;
 
         if (profileId == kCommonProfileId)

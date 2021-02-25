@@ -13,12 +13,15 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("//build_overrides/nlio.gni")
 import("${chip_root}/src/ble/ble.gni")
 
 static_library("transport") {
   output_name = "libTransportLayer"
 
   sources = [
+    "AdminPairingTable.cpp",
+    "AdminPairingTable.h",
     "CASESession.cpp",
     "CASESession.h",
     "NetworkProvisioning.cpp",
@@ -38,8 +41,11 @@ static_library("transport") {
     "SecureSessionMgr.cpp",
     "SecureSessionMgr.h",
     "SessionEstablishmentDelegate.h",
-    "TransportMgr.cpp",
+    "StorablePeerConnection.cpp",
+    "StorablePeerConnection.h",
     "TransportMgr.h",
+    "TransportMgrBase.cpp",
+    "TransportMgrBase.h",
   ]
 
   if (chip_config_network_layer_ble) {
@@ -58,6 +64,8 @@ static_library("transport") {
     "${chip_root}/src/lib/mdns",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/platform",
+    "${chip_root}/src/setup_payload",
     "${chip_root}/src/transport/raw",
+    "${nlio_root}:nlio",
   ]
 }

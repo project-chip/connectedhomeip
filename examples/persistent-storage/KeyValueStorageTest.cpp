@@ -16,6 +16,8 @@
  *    limitations under the License.
  */
 
+#include "KeyValueStorageTest.h"
+
 #include <cstring>
 #include <string>
 
@@ -150,7 +152,7 @@ CHIP_ERROR TestMultiRead()
 
 } // namespace
 
-void RunKvsTest()
+void RunKvsTest(TestConfigurations test_config)
 {
     RUN_TEST(TestEmptyString());
     RUN_TEST(TestString());
@@ -158,7 +160,10 @@ void RunKvsTest()
     RUN_TEST(TestArray());
     RUN_TEST(TestStruct());
     RUN_TEST(TestUpdateValue());
-    RUN_TEST(TestMultiRead());
+    if (test_config != SKIP_MULTI_READ_TEST)
+    {
+        RUN_TEST(TestMultiRead());
+    }
 }
 
 } // namespace chip

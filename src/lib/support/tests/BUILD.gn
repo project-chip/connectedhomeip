@@ -22,9 +22,9 @@ chip_test_suite("tests") {
   output_name = "libSupportTests"
 
   test_sources = [
-    "TestBufBound.cpp",
     "TestBufferReader.cpp",
     "TestBufferWriter.cpp",
+    "TestBytesToHex.cpp",
     "TestCHIPArgParser.cpp",
     "TestCHIPCounter.cpp",
     "TestCHIPMem.cpp",

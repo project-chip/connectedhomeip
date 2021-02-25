@@ -22,6 +22,7 @@ REPO_DIR=$SOURCE_DIR/../../
 TEST_DIR=$REPO_DIR/src/test_driver/linux-cirque
 
 LOG_DIR=${LOG_DIR:-$(mktemp -d)}
+GITHUB_ACTION_RUN=${GITHUB_ACTION_RUN:-"0"}
 
 # Append test name here to add more tests for run_all_tests
 CIRQUE_TESTS=(
@@ -58,7 +59,7 @@ function __cirquetest_start_flask() {
     echo 'Start Flask'
     cd "$REPO_DIR"/third_party/cirque/repo
     FLASK_APP='cirque/restservice/service.py' \
-        PATH="$PATH":"$REPO_DIR"/third_party/openthread/repo/output/x86_64-unknown-linux-gnu/bin/ \
+        PATH="$PATH":"$REPO_DIR"/third_party/openthread/repo/output/simulation/bin/ \
         python3 -m flask run >"$LOG_DIR/$CURRENT_TEST/flask.log" 2>&1
 }
 
@@ -82,7 +83,13 @@ function cirquetest_bootstrap() {
     cd "$REPO_DIR"/third_party/cirque/repo
     pip3 install pycodestyle==2.5.0 wheel
     make NO_GRPC=1 install -j
-    "$REPO_DIR"/integrations/docker/images/chip-cirque-device-base/build.sh
+
+    if [[ "x$GITHUB_ACTION_RUN" = "x1" ]]; then
+        "$REPO_DIR"/integrations/docker/images/chip-cirque-device-base/build.sh --try-download --latest
+    else
+        "$REPO_DIR"/integrations/docker/images/chip-cirque-device-base/build.sh --try-download
+    fi
+
     __cirquetest_build_ot
     pip3 install -r requirements_nogrpc.txt
 
@@ -137,11 +144,15 @@ function cirquetest_run_all_tests() {
         fi
     done
 
+    if [[ "x$GITHUB_ACTION_RUN" = "x1" ]]; then
+        echo -e "[$BOLD_YELLOW_TEXT""INFO""$RESET_COLOR] Logs will be uploaded to artifacts."
+    fi
+
     if ((test_pass)); then
-        echo -e "[$BOLD_GREEN_TEXT""PASS""$RESET_COLOR] Test finished, test log can be found at artifacts"
+        echo -e "[$BOLD_GREEN_TEXT""PASS""$RESET_COLOR] Test finished, test log can be found at $LOG_DIR"
         return 0
     else
-        echo -e "[$BOLD_RED_TEXT""FAIL""$RESET_COLOR] Test failed, test log can be found at artifacts"
+        echo -e "[$BOLD_RED_TEXT""FAIL""$RESET_COLOR] Test failed, test log can be found at $LOG_DIR"
         return 1
     fi
 }

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -41,6 +41,7 @@
 #include <support/CHIPFaultInjection.h>
 #include <support/CodeUtils.h>
 #include <support/RandUtils.h>
+#include <support/ReturnMacros.h>
 #include <support/logging/CHIPLogging.h>
 
 using namespace chip::Encoding;
@@ -66,8 +67,9 @@ ExchangeManager::ExchangeManager() : mReliableMessageMgr(mContextPool)
 
 CHIP_ERROR ExchangeManager::Init(SecureSessionMgr * sessionMgr)
 {
-    if (mState != State::kState_NotInitialized)
-        return CHIP_ERROR_INCORRECT_STATE;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    VerifyOrReturnError(mState == State::kState_NotInitialized, err = CHIP_ERROR_INCORRECT_STATE);
 
     mSessionMgr = sessionMgr;
 
@@ -82,13 +84,19 @@ CHIP_ERROR ExchangeManager::Init(SecureSessionMgr * sessionMgr)
 
     mReliableMessageMgr.Init(sessionMgr->SystemLayer(), sessionMgr);
 
+    err = mMessageCounterSyncMgr.Init(this);
+    ReturnErrorOnFailure(err);
+
     mState = State::kState_Initialized;
 
-    return CHIP_NO_ERROR;
+    return err;
 }
 
 CHIP_ERROR ExchangeManager::Shutdown()
 {
+    mMessageCounterSyncMgr.Shutdown();
+    mReliableMessageMgr.Shutdown();
+
     if (mSessionMgr != nullptr)
     {
         mSessionMgr->SetDelegate(nullptr);
@@ -107,22 +115,23 @@ ExchangeContext * ExchangeManager::NewContext(SecureSessionHandle session, Excha
     return AllocContext(mNextExchangeId++, session, true, delegate);
 }
 
-CHIP_ERROR ExchangeManager::RegisterUnsolicitedMessageHandler(uint32_t protocolId, ExchangeDelegate * delegate)
+CHIP_ERROR ExchangeManager::RegisterUnsolicitedMessageHandlerForProtocol(uint32_t protocolId, ExchangeDelegate * delegate)
 {
     return RegisterUMH(protocolId, kAnyMessageType, delegate);
 }
 
-CHIP_ERROR ExchangeManager::RegisterUnsolicitedMessageHandler(uint32_t protocolId, uint8_t msgType, ExchangeDelegate * delegate)
+CHIP_ERROR ExchangeManager::RegisterUnsolicitedMessageHandlerForType(uint32_t protocolId, uint8_t msgType,
+                                                                     ExchangeDelegate * delegate)
 {
     return RegisterUMH(protocolId, static_cast<int16_t>(msgType), delegate);
 }
 
-CHIP_ERROR ExchangeManager::UnregisterUnsolicitedMessageHandler(uint32_t protocolId)
+CHIP_ERROR ExchangeManager::UnregisterUnsolicitedMessageHandlerForProtocol(uint32_t protocolId)
 {
     return UnregisterUMH(protocolId, kAnyMessageType);
 }
 
-CHIP_ERROR ExchangeManager::UnregisterUnsolicitedMessageHandler(uint32_t protocolId, uint8_t msgType)
+CHIP_ERROR ExchangeManager::UnregisterUnsolicitedMessageHandlerForType(uint32_t protocolId, uint8_t msgType)
 {
     return UnregisterUMH(protocolId, static_cast<int16_t>(msgType));
 }
@@ -252,14 +261,14 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
     }
     // Discard the message if it isn't marked as being sent by an initiator and the message does not need to send
     // an ack to the peer.
-    else if (!payloadHeader.IsNeedsAck())
+    else if (!payloadHeader.NeedsAck())
     {
         ExitNow(err = CHIP_ERROR_UNSOLICITED_MSG_NO_ORIGINATOR);
     }
 
     // If we didn't find an existing exchange that matches the message, and no unsolicited message handler registered
     // to hand this message, we need to create a temporary exchange to send an ack for this message and then close this exchange.
-    sendAckAndCloseExchange = payloadHeader.IsNeedsAck() && (matchingUMH == nullptr);
+    sendAckAndCloseExchange = payloadHeader.NeedsAck() && (matchingUMH == nullptr);
 
     // If we found a handler or we need to create a new exchange context (EC).
     if (matchingUMH != nullptr || sendAckAndCloseExchange)

@@ -47,6 +47,8 @@
 #include <logging/log.h>
 #include <zephyr.h>
 
+#include <algorithm>
+
 LOG_MODULE_DECLARE(app);
 
 namespace {
@@ -72,8 +74,6 @@ NFCWidget sNFC;
 
 bool sIsThreadProvisioned     = false;
 bool sIsThreadEnabled         = false;
-bool sIsThreadAttached        = false;
-bool sIsPairedToAccount       = false;
 bool sHaveBLEConnections      = false;
 bool sHaveServiceConnectivity = false;
 
@@ -162,15 +162,10 @@ int AppTask::StartApp()
         {
             sIsThreadProvisioned     = ConnectivityMgr().IsThreadProvisioned();
             sIsThreadEnabled         = ConnectivityMgr().IsThreadEnabled();
-            sIsThreadAttached        = ConnectivityMgr().IsThreadAttached();
             sHaveBLEConnections      = (ConnectivityMgr().NumBLEConnections() != 0);
             sHaveServiceConnectivity = ConnectivityMgr().HaveServiceConnectivity();
             PlatformMgr().UnlockChipStack();
         }
-
-        // Consider the system to be "fully connected" if it has service
-        // connectivity and it is able to interact with the service on a regular basis.
-        bool isFullyConnected = sHaveServiceConnectivity;
 
         // Update the status LED if factory reset has not been initiated.
         //
@@ -186,11 +181,11 @@ int AppTask::StartApp()
         // Otherwise, blink the LED ON for a very short time.
         if (sAppTask.mFunction != kFunction_FactoryReset)
         {
-            if (isFullyConnected)
+            if (sHaveServiceConnectivity)
             {
                 sStatusLED.Set(true);
             }
-            else if (sIsThreadProvisioned && sIsThreadEnabled && sIsPairedToAccount && (!sIsThreadAttached || !isFullyConnected))
+            else if (sIsThreadProvisioned && sIsThreadEnabled)
             {
                 sStatusLED.Blink(950, 50);
             }
@@ -379,6 +374,12 @@ void AppTask::StartBLEAdvertisementHandler(AppEvent * aEvent)
     if (aEvent->ButtonEvent.PinNo != BLE_ADVERTISEMENT_START_BUTTON)
         return;
 
+    if (chip::DeviceLayer::ConnectivityMgr().IsThreadProvisioned())
+    {
+        LOG_INF("NFC Tag emulation and BLE advertisement not started - device is commissioned to a Thread network.");
+        return;
+    }
+
     if (!sNFC.IsTagEmulationStarted())
     {
         if (!(GetAppTask().StartNFCTag() < 0))
@@ -395,14 +396,19 @@ void AppTask::StartBLEAdvertisementHandler(AppEvent * aEvent)
         LOG_INF("NFC Tag emulation is already started");
     }
 
-    if (!ConnectivityMgr().IsBLEAdvertisingEnabled())
+    if (ConnectivityMgr().IsBLEAdvertisingEnabled())
     {
-        ConnectivityMgr().SetBLEAdvertisingEnabled(true);
+        LOG_INF("BLE Advertisement is already enabled");
+        return;
+    }
+
+    if (OpenDefaultPairingWindow(chip::ResetAdmins::kNo) == CHIP_NO_ERROR)
+    {
         LOG_INF("Enabled BLE Advertisement");
     }
     else
     {
-        LOG_INF("BLE Advertisement is already enabled");
+        LOG_ERR("OpenDefaultPairingWindow() failed");
     }
 }
 
@@ -441,6 +447,9 @@ int AppTask::StartNFCTag()
 
     int result = GetQRCode(QRCode, chip::RendezvousInformationFlags::kBLE);
     VerifyOrExit(!result, ChipLogError(AppServer, "Getting QR code payload failed"));
+
+    // TODO: Issue #4504 - Remove replacing spaces with _ after problem described in #415 will be fixed.
+    std::replace(QRCode.begin(), QRCode.end(), ' ', '_');
 
     result = sNFC.StartTagEmulation(QRCode.c_str(), QRCode.size());
     VerifyOrExit(result >= 0, ChipLogError(AppServer, "Starting NFC Tag emulation failed"));

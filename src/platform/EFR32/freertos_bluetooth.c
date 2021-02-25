@@ -17,26 +17,28 @@
  *    limitations under the License.
  */
 
-#include <platform/EFR32/freertos_bluetooth.h>
-
+#include "AppConfig.h"
 #include <em_device.h>
+#include <platform/EFR32/freertos_bluetooth.h>
 #include <stdint.h>
 #include <string.h>
 
-#include "gecko_configuration.h"
-#include "rtos_gecko.h"
+#include "sl_bt_api.h"
+#include "sl_bt_ncp_host.h"
+#include "sl_status.h"
 
 #ifdef CONFIGURATION_HEADER
 #include CONFIGURATION_HEADER
 #endif // CONFIGURATION_HEADER
 
 void BluetoothUpdate();
-volatile struct gecko_cmd_packet * bluetooth_evt;
-SemaphoreHandle_t BluetoothMutex = NULL;
+static sl_bt_msg_t ble_evt;
+volatile sl_bt_msg_t * bluetooth_evt = &ble_evt;
+SemaphoreHandle_t BluetoothMutex     = NULL;
 
 static volatile uint32_t command_header;
 static volatile void * command_data;
-static volatile gecko_cmd_handler command_handler_func = NULL;
+static volatile sl_bgapi_handler command_handler_func = NULL;
 
 // Bluetooth task
 #ifndef BLUETOOTH_STACK_SIZE
@@ -44,6 +46,10 @@ static volatile gecko_cmd_handler command_handler_func = NULL;
 #endif
 static void BluetoothTask(void * p_arg);
 static TaskHandle_t BluetoothTaskHandle = NULL;
+
+void sli_bt_cmd_handler_rtos_delegate(uint32_t header, sl_bgapi_handler handler, const void * payload);
+extern void sli_bgapi_cmd_handler_delegate(uint32_t header, sl_bgapi_handler, const void *);
+extern uint32_t sli_bt_can_sleep_ticks();
 
 // Linklayer task
 #ifndef LINKLAYER_STACK_SIZE
@@ -56,18 +62,12 @@ static TaskHandle_t LinklayerTaskHandle = NULL;
 #define BLUETOOTH_TICK_HZ 32768
 #define BLUETOOTH_TO_RTOS_TICK (BLUETOOTH_TICK_HZ / RTOS_TICK_HZ)
 
-static volatile wakeupCallback wakeupCB = NULL;
-// Set the task to post semaphore
-void BluetoothSetWakeupCallback(wakeupCallback cb)
-{
-    wakeupCB = (volatile wakeupCallback) cb;
-}
 EventGroupHandle_t bluetooth_event_flags;
 
-errorcode_t bluetooth_start(UBaseType_t ll_priority, UBaseType_t stack_priority,
+sl_status_t bluetooth_start(UBaseType_t ll_priority, UBaseType_t stack_priority,
                             bluetooth_stack_init_func initialize_bluetooth_stack)
 {
-    errorcode_t err;
+    sl_status_t err;
     bluetooth_event_flags = xEventGroupCreate();
     configASSERT(bluetooth_event_flags);
 
@@ -75,7 +75,7 @@ errorcode_t bluetooth_start(UBaseType_t ll_priority, UBaseType_t stack_priority,
 
     err = initialize_bluetooth_stack();
 
-    if (err == 0)
+    if (err == SL_STATUS_OK)
     {
         // create tasks for Bluetooth host stack
         xTaskCreate(BluetoothTask,                              /* Function that implements the task. */
@@ -97,15 +97,11 @@ errorcode_t bluetooth_start(UBaseType_t ll_priority, UBaseType_t stack_priority,
     return err;
 }
 
-// This callback is called from interrupt context (Kernel Aware)
-// sets flag to trigger Link Layer Task
 void BluetoothLLCallback()
 {
     vRaiseEventFlagBasedOnContext(bluetooth_event_flags, BLUETOOTH_EVENT_FLAG_LL);
 }
-// This callback is called from Bluetooth stack
-// Called from kernel aware interrupt context (RTCC interrupt) and from Bluetooth task
-// sets flag to trigger running Bluetooth stack
+
 void BluetoothUpdate()
 {
     vRaiseEventFlagBasedOnContext(bluetooth_event_flags, BLUETOOTH_EVENT_FLAG_STACK);
@@ -116,69 +112,46 @@ void BluetoothTask(void * p)
     EventBits_t flags = BLUETOOTH_EVENT_FLAG_EVT_HANDLED | BLUETOOTH_EVENT_FLAG_STACK;
     TickType_t xTicksToWait;
 
+    sli_bgapi_set_cmd_handler_delegate(sli_bt_cmd_handler_rtos_delegate);
+
     while (1)
     {
         // Command needs to be sent to Bluetooth stack
         if (flags & BLUETOOTH_EVENT_FLAG_CMD_WAITING)
         {
-            uint32_t header               = command_header;
-            gecko_cmd_handler cmd_handler = command_handler_func;
-            sli_bt_cmd_handler_delegate(header, cmd_handler, (void *) command_data);
+            uint32_t header              = command_header;
+            sl_bgapi_handler cmd_handler = command_handler_func;
+            sli_bgapi_cmd_handler_delegate(header, cmd_handler, (void *) command_data);
             command_handler_func = NULL;
             flags &= ~BLUETOOTH_EVENT_FLAG_CMD_WAITING;
             vRaiseEventFlagBasedOnContext(bluetooth_event_flags, BLUETOOTH_EVENT_FLAG_RSP_WAITING);
         }
 
         // Bluetooth stack needs updating, and evt can be used
-        if ((flags & BLUETOOTH_EVENT_FLAG_STACK) && (flags & BLUETOOTH_EVENT_FLAG_EVT_HANDLED))
+        if (sl_bt_event_pending() && (flags & BLUETOOTH_EVENT_FLAG_EVT_HANDLED))
         { // update bluetooth & read event
-            bluetooth_evt = gecko_wait_event();
-            if (bluetooth_evt != NULL)
-            { // we got event, notify event handler. evt state is now waiting handling
-                vRaiseEventFlagBasedOnContext(bluetooth_event_flags, BLUETOOTH_EVENT_FLAG_EVT_WAITING);
-                flags &= ~(BLUETOOTH_EVENT_FLAG_EVT_HANDLED);
-                if (wakeupCB != NULL)
-                {
-                    wakeupCB();
-                }
+            sl_status_t status = sl_bt_pop_event((sl_bt_msg_t *) bluetooth_evt);
+            if (SL_STATUS_OK != status)
+            {
+                continue;
             }
-            else
-            { // nothing to do in stack, clear the flag
-                flags &= ~(BLUETOOTH_EVENT_FLAG_STACK);
-            }
+            flags &= ~BLUETOOTH_EVENT_FLAG_EVT_HANDLED;
+            vRaiseEventFlagBasedOnContext(bluetooth_event_flags, BLUETOOTH_EVENT_FLAG_EVT_WAITING);
         }
 
-        // Ask from Bluetooth stack how long we can sleep
-        // UINT32_MAX = sleep indefinitely
-        // 0 = cannot sleep, stack needs update and we need to check if evt is handled that we can actually update it
-        uint32_t timeout = gecko_can_sleep_ms();
-        if (timeout == 0 && (flags & BLUETOOTH_EVENT_FLAG_EVT_HANDLED))
+        xTicksToWait = sli_bt_can_sleep_ticks();
+        if (xTicksToWait == 0 && (flags & BLUETOOTH_EVENT_FLAG_EVT_HANDLED))
         {
             flags |= BLUETOOTH_EVENT_FLAG_STACK;
             continue;
         }
-
-        if (timeout == 0x07CFFFFF)
-        {
-            xTicksToWait = portMAX_DELAY;
-        }
-        else if (timeout == 0)
-        {
-            xTicksToWait = 10 / portTICK_PERIOD_MS;
-        }
-        else
-        {
-            // round up to RTOS ticks
-            xTicksToWait = timeout / portTICK_PERIOD_MS;
-        }
         flags |= xEventGroupWaitBits(bluetooth_event_flags, /* The event group being tested. */
                                      (BLUETOOTH_EVENT_FLAG_STACK + BLUETOOTH_EVENT_FLAG_EVT_HANDLED +
                                       BLUETOOTH_EVENT_FLAG_CMD_WAITING), /* The bits within the event group to wait for. */
-                                     pdTRUE,        /* BLUETOOTH_EVENT_FLAG_LL should be cleared before returning. */
-                                     pdFALSE,       /* Wait for all the bits to be set, not needed for single bit. */
-                                     xTicksToWait); /* Wait for maximum duration for bit to be set. With 1 ms tick,
+                                     pdTRUE,         /* BLUETOOTH_EVENT_FLAG_LL should be cleared before returning. */
+                                     pdFALSE,        /* Wait for all the bits to be set, not needed for single bit. */
+                                     portMAX_DELAY); /* Wait for maximum duration for bit to be set. With 1 ms tick,
                                                        portMAX_DELAY will result in wait of 50 days*/
-
         if (((flags & BLUETOOTH_EVENT_FLAG_STACK) == 0) && ((flags & BLUETOOTH_EVENT_FLAG_EVT_HANDLED) == 0) &&
             ((flags & BLUETOOTH_EVENT_FLAG_CMD_WAITING) == 0))
         {
@@ -205,22 +178,14 @@ static void LinklayerTask(void * p_arg)
 
         if (uxBits & BLUETOOTH_EVENT_FLAG_LL)
         {
-            gecko_priority_handle();
+            sl_bt_priority_handle();
         }
     }
 }
 
 // hooks for API
 // called from tasks using BGAPI
-void rtos_gecko_handle_command(uint32_t header, void * payload)
-{
-    sli_bt_cmd_handler_rtos_delegate(header, NULL, payload);
-}
-void rtos_gecko_handle_command_noresponse(uint32_t header, void * payload)
-{
-    sli_bt_cmd_handler_rtos_delegate(header, NULL, payload);
-}
-void sli_bt_cmd_handler_rtos_delegate(uint32_t header, gecko_cmd_handler handler, const void * payload)
+void sli_bt_cmd_handler_rtos_delegate(uint32_t header, sl_bgapi_handler handler, const void * payload)
 {
     EventBits_t uxBits;
 
@@ -264,13 +229,14 @@ void vApplicationMallocFailedHook(void)
 
 void vApplicationStackOverflowHook(TaskHandle_t pxTask, char * pcTaskName)
 {
-    (void) pcTaskName;
+    //(void) pcTaskName;
     (void) pxTask;
 
     /* Run time stack overflow checking is performed if
     configCHECK_FOR_STACK_OVERFLOW is defined to 1 or 2.  This hook
     function is called if a stack overflow is detected. */
-
+    EFR32_LOG("TASK OVERFLOW");
+    EFR32_LOG(pcTaskName);
     /* Force an assert. */
     configASSERT((volatile void *) NULL);
 }

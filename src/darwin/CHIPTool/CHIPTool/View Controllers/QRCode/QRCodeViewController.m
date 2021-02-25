@@ -20,6 +20,7 @@
 // local imports
 #import "CHIPUIViewUtils.h"
 #import "DefaultsUtils.h"
+#import "DeviceSelector.h"
 #import <CHIP/CHIP.h>
 
 // system imports
@@ -68,9 +69,10 @@
 @property (strong, nonatomic) UILabel * errorLabel;
 
 @property (readwrite) CHIPDeviceController * chipController;
-@property (readonly) CHIPToolPersistentStorageDelegate * persistentStorage;
 
 @property (strong, nonatomic) NFCNDEFReaderSession * session;
+@property (strong, nonatomic) CHIPSetupPayload * setupPayload;
+@property (strong, nonatomic) DeviceSelector * deviceList;
 @end
 
 @implementation QRCodeViewController {
@@ -147,6 +149,17 @@
     [_nfcScanButton.leadingAnchor constraintEqualToAnchor:stackView.leadingAnchor].active = YES;
     [_nfcScanButton.trailingAnchor constraintEqualToAnchor:stackView.trailingAnchor].active = YES;
     [_nfcScanButton.heightAnchor constraintEqualToConstant:40].active = YES;
+
+    _deviceList = [DeviceSelector new];
+    [_deviceList setEnabled:NO];
+
+    UILabel * deviceIDLabel = [UILabel new];
+    deviceIDLabel.text = @"Paired Devices:";
+    UIView * deviceIDView = [CHIPUIViewUtils viewWithLabel:deviceIDLabel textField:_deviceList];
+    [stackView addArrangedSubview:deviceIDView];
+
+    deviceIDView.translatesAutoresizingMaskIntoConstraints = false;
+    [deviceIDView.trailingAnchor constraintEqualToAnchor:stackView.trailingAnchor].active = true;
 
     // Results view
     _setupPayloadView = [UIView new];
@@ -289,13 +302,9 @@
     [super viewDidLoad];
     [self setupUI];
 
-    _persistentStorage = [[CHIPToolPersistentStorageDelegate alloc] init];
-
     dispatch_queue_t callbackQueue = dispatch_queue_create("com.zigbee.chip.qrcodevc.callback", DISPATCH_QUEUE_SERIAL);
-    self.chipController = [CHIPDeviceController sharedController];
-    [self.chipController setDelegate:self queue:callbackQueue];
+    self.chipController = InitializeCHIP();
     [self.chipController setPairingDelegate:self queue:callbackQueue];
-    [self.chipController setPersistentStorageDelegate:_persistentStorage queue:callbackQueue];
 
     UITapGestureRecognizer * tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dismissKeyboard)];
     [self.view addGestureRecognizer:tap];
@@ -355,27 +364,23 @@
     _session = nil;
 }
 
-// MARK: CHIPDeviceControllerDelegate
-- (void)deviceControllerOnConnected
-{
-    NSLog(@"Status: Device connected");
-}
-
-- (void)deviceControllerOnError:(nonnull NSError *)error
-{
-    NSLog(@"Status: Device Controller error %@", [error description]);
-}
-
-- (void)deviceControllerOnMessage:(nonnull NSData *)message
-{
-}
-
 // MARK: CHIPDevicePairingDelegate
-- (void)onNetworkCredentialsRequested:(SendNetworkCredentials)handler
+- (void)onNetworkCredentialsRequested:(CHIPNetworkCredentialType)type
 {
-    NSLog(@"Network credential requested for pairing");
+    NSLog(@"Network credential requested for pairing for type %lu", (unsigned long) type);
+    if (type == kNetworkCredentialTypeWiFi) {
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, DISPATCH_TIME_NOW), dispatch_get_main_queue(), ^{
+            [self retrieveAndSendWifiCredentials];
+        });
+    } else {
+        NSLog(@"Unsupported credentials requested");
+    }
+}
+
+- (void)onPairingComplete:(NSError *)error
+{
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, DISPATCH_TIME_NOW), dispatch_get_main_queue(), ^{
-        [self retrieveAndSendWifiCredentialsUsing:handler];
+        [self->_deviceList refreshDeviceList];
     });
 }
 
@@ -461,7 +466,7 @@
     [self handleRendezVous:payload];
 }
 
-- (void)retrieveAndSendWifiCredentialsUsing:(SendNetworkCredentials)sendCredentials
+- (void)retrieveAndSendWifiCredentials
 {
     UIAlertController * alertController =
         [UIAlertController alertControllerWithTitle:@"Wifi Configuration"
@@ -515,7 +520,8 @@
                                                  }
                                                  NSLog(@"New SSID: %@ Password: %@", networkSSID.text, networkPassword.text);
 
-                                                 sendCredentials(networkSSID.text, networkPassword.text);
+                                                 [strongSelf.chipController sendWiFiCredentials:networkSSID.text
+                                                                                       password:networkPassword.text];
                                              }
                                          }]];
     [self presentViewController:alertController animated:YES completion:nil];
@@ -611,9 +617,10 @@
 {
     NSError * error;
     uint64_t deviceID = CHIPGetNextAvailableDeviceID();
-    [self.chipController pairDevice:deviceID discriminator:discriminator setupPINCode:setupPINCode error:&error];
-    deviceID++;
-    CHIPSetNextAvailableDeviceID(deviceID);
+    if ([self.chipController pairDevice:deviceID discriminator:discriminator setupPINCode:setupPINCode error:&error]) {
+        deviceID++;
+        CHIPSetNextAvailableDeviceID(deviceID);
+    }
 }
 
 - (void)handleRendezVousWiFi:(NSString *)name
@@ -680,12 +687,12 @@
     });
     CHIPQRCodeSetupPayloadParser * parser = [[CHIPQRCodeSetupPayloadParser alloc] initWithBase41Representation:qrCode];
     NSError * error;
-    CHIPSetupPayload * payload = [parser populatePayload:&error];
+    _setupPayload = [parser populatePayload:&error];
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1.0 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
         [self postScanningQRCodeState];
 
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, INDICATOR_DELAY), dispatch_get_main_queue(), ^{
-            [self displayQRCodeInSetupPayloadView:payload withError:error];
+            [self displayQRCodeInSetupPayloadView:self->_setupPayload withError:error];
         });
     });
 }
@@ -754,9 +761,9 @@
     CHIPManualSetupPayloadParser * parser =
         [[CHIPManualSetupPayloadParser alloc] initWithDecimalStringRepresentation:decimalString];
     NSError * error;
-    CHIPSetupPayload * payload = [parser populatePayload:&error];
+    _setupPayload = [parser populatePayload:&error];
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, INDICATOR_DELAY), dispatch_get_main_queue(), ^{
-        [self displayManualCodeInSetupPayloadView:payload decimalString:decimalString withError:error];
+        [self displayManualCodeInSetupPayloadView:self->_setupPayload decimalString:decimalString withError:error];
     });
     [_manualCodeTextField resignFirstResponder];
 }

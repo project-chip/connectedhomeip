@@ -49,7 +49,7 @@
 
 /* Constants related to the behaviour or the scheduler. */
 #define configUSE_PORT_OPTIMISED_TASK_SELECTION 1
-#define configTICK_RATE_HZ ((TickType_t) 1000)
+#define configTICK_RATE_HZ ((TickType_t) 100000)
 #define configUSE_PREEMPTION 1
 #define configUSE_TIME_SLICING 0
 #define configMAX_PRIORITIES (10UL)
@@ -58,14 +58,18 @@
 
 /* Constants that describe the hardware and memory usage. */
 #define configCPU_CLOCK_HZ ((unsigned long) 48000000)
-#define configMINIMAL_STACK_SIZE ((unsigned short) 256)
+#define configMINIMAL_STACK_SIZE ((unsigned short) 1024)
 #define configMAX_TASK_NAME_LEN (12)
 
-#define configTOTAL_HEAP_SIZE ((size_t)(0x8000))
+/* FreeRTOS heap size is 0 because currently "bget" heap is the
+ only heap available, for both FreeRTOS and application */
+//#define configTOTAL_HEAP_SIZE           ( ( size_t ) ( 0 ) )
+#define configTOTAL_HEAP_SIZE ((size_t)(0))
 #define configSUPPORT_STATIC_ALLOCATION 1
+#define configAPPLICATION_ALLOCATED_HEAP 1
 
 /* Default stack size for TI-POSIX threads (in words) */
-#define configPOSIX_STACK_SIZE ((unsigned short) 512)
+#define configPOSIX_STACK_SIZE ((unsigned short) 1024)
 
 /* Constants that build features in or out. */
 #define configUSE_MUTEXES 1
@@ -99,7 +103,7 @@
 
 /* Software timer definitions. */
 #define configUSE_TIMERS 1
-#define configTIMER_TASK_PRIORITY (5)
+#define configTIMER_TASK_PRIORITY (6)
 #define configTIMER_QUEUE_LENGTH (20)
 #define configTIMER_TASK_STACK_DEPTH (configMINIMAL_STACK_SIZE * 2)
 

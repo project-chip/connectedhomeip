@@ -47,7 +47,7 @@ class DLL_EXPORT CommandHandler : public Command
 {
 public:
     CHIP_ERROR SendCommandResponse();
-    void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, uint32_t protocolId, uint8_t msgType,
+    void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                            System::PacketBufferHandle payload);
 
 private:

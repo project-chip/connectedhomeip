@@ -28,9 +28,11 @@
 
 #include <app/CommandSender.h>
 #include <app/InteractionModelEngine.h>
+#include <app/util/CHIPDeviceCallbacksMgr.h>
 #include <app/util/basic-types.h>
 #include <core/CHIPCallback.h>
 #include <core/CHIPCore.h>
+#include <setup_payload/SetupPayload.h>
 #include <support/Base64.h>
 #include <support/DLLUtil.h>
 #include <transport/PASESession.h>
@@ -56,7 +58,10 @@ using DeviceTransportMgr = TransportMgr<Transport::UDP /* IPv6 */
 class DLL_EXPORT Device
 {
 public:
-    Device() : mInterface(INET_NULL_INTERFACEID), mActive(false), mState(ConnectionState::NotConnected) {}
+    Device() :
+        mInterface(INET_NULL_INTERFACEID), mActive(false), mState(ConnectionState::NotConnected),
+        mAdminId(Transport::kUndefinedAdminId)
+    {}
     ~Device()
     {
         if (mCommandSender != nullptr)
@@ -65,6 +70,13 @@ public:
             mCommandSender = nullptr;
         }
     }
+
+    enum class PairingWindowOption
+    {
+        kOriginalSetupCode,
+        kTokenWithRandomPIN,
+        kTokenWithProvidedPIN,
+    };
 
     /**
      * @brief
@@ -136,13 +148,16 @@ public:
      * @param[in] sessionMgr   Secure session manager object pointer
      * @param[in] inetLayer    InetLayer object pointer
      * @param[in] listenPort   Port on which controller is listening (typically CHIP_PORT)
+     * @param[in] admin        Local administrator that's initializing this device object
      */
-    void Init(DeviceTransportMgr * transportMgr, SecureSessionMgr * sessionMgr, Inet::InetLayer * inetLayer, uint16_t listenPort)
+    void Init(DeviceTransportMgr * transportMgr, SecureSessionMgr * sessionMgr, Inet::InetLayer * inetLayer, uint16_t listenPort,
+              Transport::AdminId admin)
     {
         mTransportMgr   = transportMgr;
         mSessionManager = sessionMgr;
         mInetLayer      = inetLayer;
         mListenPort     = listenPort;
+        mAdminId        = admin;
     }
 
     /**
@@ -163,11 +178,12 @@ public:
      * @param[in] deviceId     Node ID of the device
      * @param[in] devicePort   Port on which device is listening (typically CHIP_PORT)
      * @param[in] interfaceId  Local Interface ID that should be used to talk to the device
+     * @param[in] admin        Local administrator that's initializing this device object
      */
     void Init(DeviceTransportMgr * transportMgr, SecureSessionMgr * sessionMgr, Inet::InetLayer * inetLayer, uint16_t listenPort,
-              NodeId deviceId, uint16_t devicePort, Inet::InterfaceId interfaceId)
+              NodeId deviceId, uint16_t devicePort, Inet::InterfaceId interfaceId, Transport::AdminId admin)
     {
-        Init(transportMgr, sessionMgr, inetLayer, mListenPort);
+        Init(transportMgr, sessionMgr, inetLayer, mListenPort, admin);
         mDeviceId   = deviceId;
         mDevicePort = devicePort;
         mInterface  = interfaceId;
@@ -225,6 +241,25 @@ public:
 
     /**
      * @brief
+     *   Trigger a paired device to re-enter the pairing mode. If an onboarding token is provided, the device will use
+     *   the provided setup PIN code and the discriminator to advertise itself for pairing availability. If the token
+     *   is not provided, the device will use the manufacturer assigned setup PIN code and discriminator.
+     *
+     *   The device will exit the pairing mode after a successful pairing, or after the given `timeout` time.
+     *
+     * @param[in] timeout         The pairing mode should terminate after this much time.
+     * @param[in] option          The pairing window can be opened using the original setup code, or an
+     *                            onboarding token can be generated using a random setup PIN code (or with
+     *                            the PIN code provied in the setupPayload). This argument selects one of these
+     *                            methods.
+     * @param[out] setupPayload   The setup payload corresponding to the generated onboarding token.
+     *
+     * @return CHIP_ERROR               CHIP_NO_ERROR on success, or corresponding error
+     */
+    CHIP_ERROR OpenPairingWindow(uint32_t timeout, PairingWindowOption option, SetupPayload & setupPayload);
+
+    /**
+     * @brief
      *   Return whether the current device object is actively associated with a paired CHIP
      *   device. An active object can be used to communicate with the corresponding device.
      */
@@ -251,8 +286,9 @@ public:
 
     PASESessionSerializable & GetPairing() { return mPairing; }
 
-    void AddResponseHandler(EndpointId endpoint, ClusterId cluster, Callback::Callback<> * onResponse);
-    void AddReportHandler(EndpointId endpoint, ClusterId cluster, Callback::Callback<> * onReport);
+    uint8_t GetNextSequenceNumber() { return mSequenceNumber++; };
+    void AddResponseHandler(uint8_t seqNum, Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    void AddReportHandler(EndpointId endpoint, ClusterId cluster, AttributeId attribute, Callback::Cancelable * onReportCallback);
 
 private:
     enum class ConnectionState
@@ -260,12 +296,6 @@ private:
         NotConnected,
         Connecting,
         SecureConnected,
-    };
-
-    struct CallbackInfo
-    {
-        EndpointId endpoint;
-        ClusterId cluster;
     };
 
     enum class ResetTransport
@@ -280,35 +310,31 @@ private:
     Inet::IPAddress mDeviceAddr;
 
     /* Port on which the CHIP device is receiving messages. Typically it is CHIP_PORT */
-    uint16_t mDevicePort;
+    uint16_t mDevicePort = CHIP_PORT;
 
     /* Local network interface that should be used to communicate with the device */
-    Inet::InterfaceId mInterface;
+    Inet::InterfaceId mInterface = INET_NULL_INTERFACEID;
 
-    Inet::InetLayer * mInetLayer;
+    Inet::InetLayer * mInetLayer = nullptr;
 
-    bool mActive;
-    ConnectionState mState;
+    bool mActive           = false;
+    ConnectionState mState = ConnectionState::NotConnected;
 
     PASESessionSerializable mPairing;
 
-    DeviceStatusDelegate * mStatusDelegate;
+    DeviceStatusDelegate * mStatusDelegate = nullptr;
 
-    SecureSessionMgr * mSessionManager;
+    SecureSessionMgr * mSessionManager = nullptr;
 
-    DeviceTransportMgr * mTransportMgr;
+    DeviceTransportMgr * mTransportMgr = nullptr;
 
-    app::CommandSender * mCommandSender;
+    app::CommandSender * mCommandSender = nullptr;
 
     SecureSessionHandle mSecureSession = {};
 
-    /* Track all outstanding response callbacks for this device. The callbacks are
-       registered when a command is sent to the device, to get notified with the results. */
-    Callback::CallbackDeque mResponses;
+    uint8_t mSequenceNumber = 0;
 
-    /* Track all outstanding callbacks for attribute reports from this device. The callbacks are
-       registered when the user requests attribute reporting for device attributes. */
-    Callback::CallbackDeque mReports;
+    app::CHIPDeviceCallbacksMgr & mCallbacksMgr = app::CHIPDeviceCallbacksMgr::GetInstance();
 
     /**
      * @brief
@@ -320,7 +346,21 @@ private:
      */
     CHIP_ERROR LoadSecureSessionParameters(ResetTransport resetNeeded);
 
+    /**
+     * @brief
+     *   This function loads the secure session object from the serialized operational
+     *   credentials corresponding if needed, based on the current state of the device and
+     *   underlying transport object.
+     *
+     * @param[out] didLoad   Were the secure session params loaded by the call to this function.
+     */
+    CHIP_ERROR LoadSecureSessionParametersIfNeeded(bool & didLoad);
+
+    CHIP_ERROR SendMessage(System::PacketBufferHandle message, PayloadHeader & payloadHeader);
+
     uint16_t mListenPort;
+
+    Transport::AdminId mAdminId;
 };
 
 /**
@@ -344,6 +384,14 @@ public:
 
     /**
      * @brief
+     *   Called when response to OpenPairingWindow is received from the device.
+     *
+     * @param[in] status CHIP_NO_ERROR on success, or corresponding error.
+     */
+    virtual void OnPairingWindowOpenStatus(CHIP_ERROR status){};
+
+    /**
+     * @brief
      *   Called when device status is updated.
      *
      */
@@ -361,7 +409,8 @@ typedef struct SerializableDevice
     PASESessionSerializable mOpsCreds;
     uint64_t mDeviceId; /* This field is serialized in LittleEndian byte order */
     uint8_t mDeviceAddr[INET6_ADDRSTRLEN];
-    uint16_t mDevicePort; /* This field is serealized in LittelEndian byte order */
+    uint16_t mDevicePort; /* This field is serialized in LittleEndian byte order */
+    uint16_t mAdminId;    /* This field is serialized in LittleEndian byte order */
     uint8_t mInterfaceName[kMaxInterfaceName];
 } SerializableDevice;
 

@@ -70,7 +70,6 @@ static_library("app") {
     "MessageDef/ListBuilder.h",
     "MessageDef/ListParser.cpp",
     "MessageDef/ListParser.h",
-    "MessageDef/MessageDef.h",
     "MessageDef/MessageDefHelper.h",
     "MessageDef/Parser.cpp",
     "MessageDef/Parser.h",
@@ -82,8 +81,6 @@ static_library("app") {
     "MessageDef/StatusElement.h",
     "decoder.cpp",
     "encoder.cpp",
-    "im-handler.cpp",
-    "im-handler.h",
   ]
 
   public_deps = [

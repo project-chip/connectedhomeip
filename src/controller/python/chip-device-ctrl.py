@@ -25,20 +25,18 @@
 
 from __future__ import absolute_import
 from __future__ import print_function
-from chip import ChipStack
 from chip import ChipDeviceCtrl
-from chip import ChipExceptions
-from builtins import range
+from chip import exceptions
 import sys
 import os
 import platform
+import random
 from optparse import OptionParser, OptionValueError
 import shlex
 import base64
 import textwrap
 import string
 from cmd import Cmd
-from six.moves import range
 from chip.ChipBleUtility import FAKE_CONN_OBJ_VALUE
 
 # Extend sys.path with one or more directories, relative to the location of the
@@ -71,7 +69,7 @@ elif sys.platform.startswith('linux'):
 # The exceptions for CHIP Device Controller CLI
 
 
-class ChipDevCtrlException(ChipExceptions.ChipStackException):
+class ChipDevCtrlException(exceptions.ChipStackException):
     pass
 
 
@@ -163,8 +161,6 @@ class DeviceMgrCmd(Cmd):
             pass
 
     command_names = [
-        "close",
-
         "ble-scan",
         "ble-adapter-select",
         "ble-adapter-print",
@@ -172,7 +168,9 @@ class DeviceMgrCmd(Cmd):
 
         "connect",
         "zcl",
+
         "set-pairing-wifi-credential",
+        "set-pairing-thread-credential",
     ]
 
     def parseline(self, line):
@@ -248,7 +246,7 @@ class DeviceMgrCmd(Cmd):
 
         try:
             self.devCtrl.Close()
-        except ChipExceptions.ChipStackException as ex:
+        except exceptions.ChipStackException as ex:
             print(str(ex))
 
     def do_setlogoutput(self, line):
@@ -283,7 +281,7 @@ class DeviceMgrCmd(Cmd):
 
         try:
             self.devCtrl.SetLogFilter(category)
-        except ChipExceptions.ChipStackException as ex:
+        except exceptions.ChipStackException as ex:
             print(str(ex))
             return
 
@@ -352,8 +350,8 @@ class DeviceMgrCmd(Cmd):
 
     def do_connect(self, line):
         """
-        connect -ip <ip address> <setup pin code>
-        connect -ble <discriminator> <setup pin code>
+        connect -ip <ip address> <setup pin code> [<nodeid>]
+        connect -ble <discriminator> <setup pin code> [<nodeid>]
 
         connect command is used for establishing a rendezvous session to the device.
         currently, only connect using setupPinCode is supported.
@@ -368,18 +366,24 @@ class DeviceMgrCmd(Cmd):
                 print("Usage:")
                 self.do_help("connect SetupPinCode")
                 return
-            if args[0] == "-ip" and len(args) == 3:
-                self.devCtrl.ConnectIP(args[1].encode("utf-8"), int(args[2]))
-            elif args[0] == "-ble" and len(args) == 3:
-                self.devCtrl.ConnectBLE(int(args[1]), int(args[2]))
+
+            nodeid = random.randint(1, 1000000)  # Just a random number
+            if len(args) == 4:
+                nodeid = int(args[3])
+            print("Device is assigned with nodeid = {}".format(nodeid))
+
+            if args[0] == "-ip" and len(args) >= 3:
+                self.devCtrl.ConnectIP(args[1].encode("utf-8"), int(args[2]), nodeid)
+            elif args[0] == "-ble" and len(args) >= 3:
+                self.devCtrl.ConnectBLE(int(args[1]), int(args[2]), nodeid)
             else:
                 print("Usage:")
                 self.do_help("connect SetupPinCode")
                 return
-        except ChipExceptions.ChipStackException as ex:
+            print("Device temporary node id (**this does not match spec**): {}".format(nodeid))
+        except exceptions.ChipStackException as ex:
             print(str(ex))
             return
-        print("Connected")
 
     def do_zcl(self, line):
         """
@@ -399,7 +403,7 @@ class DeviceMgrCmd(Cmd):
             elif len(args) == 2 and args[0] == '?':
                 cluster = self.devCtrl.ZCLList().get(args[1], None)
                 if not cluster:
-                    raise ChipExceptions.UnknownCluster(args[1])
+                    raise exceptions.UnknownCluster(args[1])
                 for commands in cluster.items():
                     args = ", ".join(["{}: {}".format(argName, argType)
                                       for argName, argType in commands[1].items()])
@@ -411,33 +415,52 @@ class DeviceMgrCmd(Cmd):
             elif len(args) > 4:
                 cluster = self.devCtrl.ZCLList().get(args[0], None)
                 if not cluster:
-                    raise ChipExceptions.UnknownCluster(args[0])
+                    raise exceptions.UnknownCluster(args[0])
                 command = cluster.get(args[1], None)
                 # When command takes no arguments, (not command) is True
                 if command == None:
-                    raise ChipExceptions.UnknownCommand(args[0], args[1])
+                    raise exceptions.UnknownCommand(args[0], args[1])
                 self.devCtrl.ZCLSend(args[0], args[1], int(
                     args[2]), int(args[3]), int(args[4]), FormatZCLArguments(args[5:], command))
             else:
                 self.do_help("zcl")
-        except ChipExceptions.ChipStackException as ex:
+        except exceptions.ChipStackException as ex:
             print("An exception occurred during process ZCL command:")
             print(str(ex))
 
     def do_setpairingwificredential(self, line):
         """
-        set-pairing-wifi-credential
+        set-pairing-wifi-credential <ssid> <password>
 
-        Set WiFi credential for pairing, will sent to device
+        Set WiFi credential to be used while pairing a Wi-Fi device
         """
         try:
             args = shlex.split(line)
-            self.devCtrl.SetWifiCredential(args[0], args[1])
-        except ChipExceptions.ChipStackException as ex:
+            if len(args) == 2:
+                self.devCtrl.SetWifiCredential(args[0], args[1])
+                print("WiFi credential set")
+            else:
+                self.do_help("set-pairing-wifi-credential")
+        except exceptions.ChipStackException as ex:
             print(str(ex))
             return
 
-        print("WiFi credential set")
+    def do_setpairingthreadcredential(self, line):
+        """
+        set-pairing-thread-credential <channel> <panid> <masterkey>
+
+        Set Thread credential to be used while pairing a Thread device
+        """
+        try:
+            args = shlex.split(line)
+            if len(args) == 3:
+                self.devCtrl.SetThreadCredential(int(args[0]), int(args[1], 16), args[2])
+                print("Thread credential set")
+            else:
+                self.do_help("set-pairing-thread-credential")
+        except exceptions.ChipStackException as ex:
+            print(str(ex))
+            return
 
     def do_history(self, line):
         """

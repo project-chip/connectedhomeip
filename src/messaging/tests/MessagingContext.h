@@ -18,6 +18,7 @@
 
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
+#include <transport/AdminPairingTable.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/tests/NetworkTestHelpers.h>
@@ -33,9 +34,8 @@ class MessagingContext : public IOContext
 {
 public:
     MessagingContext() :
-        mPeer(Transport::PeerAddress::UDP(GetAddress(), CHIP_PORT)),
-        mPairingPeerToLocal(Optional<NodeId>::Value(GetSourceNodeId()), GetLocalKeyId(), GetPeerKeyId()),
-        mPairingLocalToPeer(Optional<NodeId>::Value(GetDestinationNodeId()), GetPeerKeyId(), GetLocalKeyId())
+        mPeer(Transport::PeerAddress::UDP(GetAddress(), CHIP_PORT)), mPairingPeerToLocal(GetLocalKeyId(), GetPeerKeyId()),
+        mPairingLocalToPeer(GetPeerKeyId(), GetLocalKeyId())
     {}
 
     /// Initialize the underlying layers and test suite pointer
@@ -55,6 +55,7 @@ public:
 
     static constexpr uint16_t GetLocalKeyId() { return 1; }
     static constexpr uint16_t GetPeerKeyId() { return 2; }
+    static constexpr uint16_t GetAdminId() { return 0; }
 
     SecureSessionMgr & GetSecureSessionManager() { return mSecureSessionMgr; }
     Messaging::ExchangeManager & GetExchangeManager() { return mExchangeManager; }
@@ -69,6 +70,9 @@ private:
     Optional<Transport::PeerAddress> mPeer;
     SecurePairingUsingTestSecret mPairingPeerToLocal;
     SecurePairingUsingTestSecret mPairingLocalToPeer;
+    Transport::AdminPairingTable mAdmins;
+    Transport::AdminId mSrcAdminId  = 0;
+    Transport::AdminId mDestAdminId = 1;
 };
 
 } // namespace Test

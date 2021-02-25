@@ -56,31 +56,25 @@ CHIP_ERROR Encode(NodeId localNodeId, Transport::PeerConnectionState * state, Pa
     static_assert(std::is_same<decltype(msgBuf->TotalLength()), uint16_t>::value,
                   "Addition to generate payloadLength might overflow");
 
-    uint16_t headerSize = payloadHeader.EncodeSizeBytes();
-
-    // Make sure it's big enough to add two 16-bit ints without overflowing.
-    uint32_t payloadLength = static_cast<uint32_t>(headerSize + msgBuf->TotalLength());
-    VerifyOrReturnError(CanCastTo<uint16_t>(payloadLength), CHIP_ERROR_NO_MEMORY);
-
     packetHeader
-        .SetSourceNodeId(localNodeId)                 //
-        .SetDestinationNodeId(state->GetPeerNodeId()) //
-        .SetMessageId(msgId)                          //
-        .SetEncryptionKeyID(state->GetLocalKeyID())   //
-        .SetPayloadLength(static_cast<uint16_t>(payloadLength));
+        .SetSourceNodeId(localNodeId) //
+        .SetMessageId(msgId)          //
+        .SetEncryptionKeyID(state->GetLocalKeyID());
+
+    if (state->GetPeerNodeId() != kUndefinedNodeId)
+    {
+        packetHeader.SetDestinationNodeId(state->GetPeerNodeId());
+    }
+
     packetHeader.GetFlags().Set(Header::FlagValues::kSecure);
 
-    VerifyOrReturnError(msgBuf->EnsureReservedSize(headerSize), CHIP_ERROR_NO_MEMORY);
+    ReturnErrorOnFailure(payloadHeader.EncodeBeforeData(msgBuf));
 
-    msgBuf->SetStart(msgBuf->Start() - headerSize);
     uint8_t * data    = msgBuf->Start();
     uint16_t totalLen = msgBuf->TotalLength();
 
-    uint16_t actualEncodedHeaderSize;
-    ReturnErrorOnFailure(payloadHeader.Encode(data, totalLen, &actualEncodedHeaderSize));
-
     MessageAuthenticationCode mac;
-    ReturnErrorOnFailure(state->GetSecureSession().Encrypt(data, totalLen, data, packetHeader, mac));
+    ReturnErrorOnFailure(state->EncryptBeforeSend(data, totalLen, data, packetHeader, mac));
 
     uint16_t taglen = 0;
     ReturnErrorOnFailure(mac.Encode(packetHeader, &data[totalLen], msgBuf->AvailableDataLength(), &taglen));
@@ -100,7 +94,7 @@ CHIP_ERROR Decode(Transport::PeerConnectionState * state, PayloadHeader & payloa
     ReturnErrorCodeIf(msg.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
 
     uint8_t * data = msg->Start();
-    uint16_t len   = msg->TotalLength();
+    uint16_t len   = msg->DataLength();
 
     PacketBufferHandle origMsg;
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -112,25 +106,21 @@ CHIP_ERROR Decode(Transport::PeerConnectionState * state, PayloadHeader & payloa
     msg->SetDataLength(len);
 #endif
 
-    uint16_t payloadlen = packetHeader.GetPayloadLength();
-    VerifyOrReturnError(payloadlen <= len, CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+    uint16_t footerLen = MessageAuthenticationCode::TagLenForEncryptionType(packetHeader.GetEncryptionType());
+    VerifyOrReturnError(footerLen <= len, CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
     uint16_t taglen = 0;
     MessageAuthenticationCode mac;
-    ReturnErrorOnFailure(mac.Decode(packetHeader, &data[payloadlen], static_cast<uint16_t>(len - payloadlen), &taglen));
+    ReturnErrorOnFailure(mac.Decode(packetHeader, &data[len - footerLen], footerLen, &taglen));
+    VerifyOrReturnError(taglen == footerLen, CHIP_ERROR_INTERNAL);
 
     len = static_cast<uint16_t>(len - taglen);
     msg->SetDataLength(len);
 
     uint8_t * plainText = msg->Start();
-    ReturnErrorOnFailure(state->GetSecureSession().Decrypt(data, len, plainText, packetHeader, mac));
+    ReturnErrorOnFailure(state->DecryptOnReceive(data, len, plainText, packetHeader, mac));
 
-    uint16_t decodedSize = 0;
-    ReturnErrorOnFailure(payloadHeader.Decode(plainText, len, &decodedSize));
-    uint16_t headerSize = payloadHeader.EncodeSizeBytes();
-    VerifyOrReturnError(headerSize == decodedSize, CHIP_ERROR_INVALID_MESSAGE_LENGTH);
-
-    msg->ConsumeHead(headerSize);
+    ReturnErrorOnFailure(payloadHeader.DecodeAndConsume(msg));
     return CHIP_NO_ERROR;
 }
 

@@ -18,47 +18,43 @@
 #import "OnOffViewController.h"
 #import "CHIPUIViewUtils.h"
 #import "DefaultsUtils.h"
+#import "DeviceSelector.h"
 #import <CHIP/CHIP.h>
 
+NSString * const kCHIPNumLightOnOffCluster = @"OnOffViewController_NumLights";
+
 @interface OnOffViewController ()
-@property (weak, nonatomic) IBOutlet UIButton * onButton;
-@property (weak, nonatomic) IBOutlet UIButton * offButton;
-@property (weak, nonatomic) IBOutlet UIButton * toggleButton;
-@property (readwrite) CHIPOnOff * onOff;
+@property (nonatomic, strong) UITextField * numLightsTextField;
 
 @property (nonatomic, strong) UILabel * resultLabel;
+@property (nonatomic, strong) UILabel * titleLabel;
+@property (nonatomic, strong) UIStackView * stackView;
 
-@property (readwrite) CHIPDeviceController * chipController;
-@property (readwrite) CHIPDevice * chipDevice;
+@property (nonatomic, strong) DeviceSelector * deviceSelector;
 
-@property (readonly) CHIPToolPersistentStorageDelegate * persistentStorage;
 @end
 
-@implementation OnOffViewController
+@implementation OnOffViewController {
+    dispatch_queue_t _callbackQueue;
+    NSArray * _numLightsOptions;
+}
 
 // MARK: UIViewController methods
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+
+    UITapGestureRecognizer * tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dismissKeyboard)];
+    [self.view addGestureRecognizer:tap];
+
     [self setupUIElements];
+}
 
-    _persistentStorage = [[CHIPToolPersistentStorageDelegate alloc] init];
-
-    // initialize the device controller
-    dispatch_queue_t callbackQueue = dispatch_queue_create("com.zigbee.chip.onoffvc.callback", DISPATCH_QUEUE_SERIAL);
-    self.chipController = [CHIPDeviceController sharedController];
-    [self.chipController setDelegate:self queue:callbackQueue];
-    [self.chipController setPersistentStorageDelegate:_persistentStorage queue:callbackQueue];
-
-    uint64_t deviceID = CHIPGetNextAvailableDeviceID();
-    if (deviceID > 1) {
-        // Let's use the last device that was paired
-        deviceID--;
-        NSError * error;
-        self.chipDevice = [self.chipController getPairedDevice:deviceID error:&error];
-        self.onOff = [[CHIPOnOff alloc] initWithDevice:self.chipDevice endpoint:1 queue:callbackQueue];
-    }
+- (void)dismissKeyboard
+{
+    [_numLightsTextField resignFirstResponder];
+    [_deviceSelector resignFirstResponder];
 }
 
 // MARK: UI Setup
@@ -68,23 +64,71 @@
     self.view.backgroundColor = UIColor.whiteColor;
 
     // Title
-    UILabel * titleLabel = [CHIPUIViewUtils addTitle:@"On Off Cluster" toView:self.view];
+    _titleLabel = [CHIPUIViewUtils addTitle:@"On Off Cluster" toView:self.view];
+    [self setupStackView];
+}
 
+- (void)setupStackView
+{
     // stack view
     UIStackView * stackView = [UIStackView new];
     stackView.axis = UILayoutConstraintAxisVertical;
     stackView.distribution = UIStackViewDistributionEqualSpacing;
     stackView.alignment = UIStackViewAlignmentLeading;
     stackView.spacing = 30;
+    [_stackView removeFromSuperview];
+    _stackView = stackView;
     [self.view addSubview:stackView];
 
     stackView.translatesAutoresizingMaskIntoConstraints = false;
-    [stackView.topAnchor constraintEqualToAnchor:titleLabel.bottomAnchor constant:30].active = YES;
+    [stackView.topAnchor constraintEqualToAnchor:_titleLabel.bottomAnchor constant:30].active = YES;
     [stackView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:30].active = YES;
     [stackView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-30].active = YES;
 
+    // Device List and picker
+    _deviceSelector = [DeviceSelector new];
+
+    UILabel * deviceIDLabel = [UILabel new];
+    deviceIDLabel.text = @"Device ID:";
+    UIView * deviceIDView = [CHIPUIViewUtils viewWithLabel:deviceIDLabel textField:_deviceSelector];
+    [stackView addArrangedSubview:deviceIDView];
+
+    deviceIDView.translatesAutoresizingMaskIntoConstraints = false;
+    [deviceIDView.trailingAnchor constraintEqualToAnchor:stackView.trailingAnchor].active = true;
+
+    // Num lights to show
+    UILabel * numLightsLabel = [UILabel new];
+    numLightsLabel.text = @"# of light endpoints:";
+    _numLightsTextField = [UITextField new];
+    _numLightsOptions = @[ @"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9", @"10" ];
+    _numLightsTextField.text
+        = CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, kCHIPNumLightOnOffCluster) ?: [_numLightsOptions objectAtIndex:0];
+    UIPickerView * numLightsPicker = [[UIPickerView alloc] initWithFrame:CGRectMake(0, 100, 0, 0)];
+    _numLightsTextField.inputView = numLightsPicker;
+    [numLightsPicker setDataSource:self];
+    [numLightsPicker setDelegate:self];
+    _numLightsTextField.delegate = self;
+    UIView * numLightsView = [CHIPUIViewUtils viewWithLabel:numLightsLabel textField:_numLightsTextField];
+    numLightsLabel.font = [UIFont systemFontOfSize:17 weight:UIFontWeightSemibold];
+
+    UIToolbar * keyboardDoneButtonView = [[UIToolbar alloc] init];
+    [keyboardDoneButtonView sizeToFit];
+    UIBarButtonItem * doneButton = [[UIBarButtonItem alloc] initWithTitle:@"Done"
+                                                                    style:UIBarButtonItemStylePlain
+                                                                   target:self
+                                                                   action:@selector(pickerDoneClicked:)];
+    UIBarButtonItem * flexible = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
+                                                                               target:self
+                                                                               action:nil];
+    [keyboardDoneButtonView setItems:[NSArray arrayWithObjects:flexible, doneButton, nil]];
+    _numLightsTextField.inputAccessoryView = keyboardDoneButtonView;
+
+    [stackView addArrangedSubview:numLightsView];
+    numLightsView.translatesAutoresizingMaskIntoConstraints = false;
+    [numLightsView.trailingAnchor constraintEqualToAnchor:stackView.trailingAnchor].active = true;
+
     // Create buttons
-    [self addButtons:3 toStackView:stackView];
+    [self addButtons:[self numLightClustersToShow] toStackView:stackView];
 
     // Result message
     _resultLabel = [UILabel new];
@@ -105,7 +149,7 @@
     for (int i = 1; i <= numButtons; i++) {
         // Create buttons
         UILabel * labelLight = [UILabel new];
-        labelLight.text = [NSString stringWithFormat:@"Light %@: ", @(i)];
+        labelLight.text = [NSString stringWithFormat:@"Light (endpoint %@): ", @(i)];
         UIButton * onButton = [UIButton new];
         onButton.tag = i;
         [onButton setTitle:@"On" forState:UIControlStateNormal];
@@ -135,75 +179,118 @@
     _resultLabel.text = result;
 }
 
+// MARK: UIPickerView
+
+- (void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component
+{
+    NSLog(@"%@", [_numLightsOptions objectAtIndex:row]);
+    _numLightsTextField.text = [NSString stringWithFormat:@"%@", [_numLightsOptions objectAtIndex:row]];
+}
+
+- (NSInteger)pickerView:(UIPickerView *)pickerView numberOfRowsInComponent:(NSInteger)component
+{
+    return [_numLightsOptions count];
+}
+
+- (NSInteger)numberOfComponentsInPickerView:(UIPickerView *)pickerView
+{
+    return 1;
+}
+
+- (NSString *)pickerView:(UIPickerView *)pickerView titleForRow:(NSInteger)row forComponent:(NSInteger)component
+{
+    return [_numLightsOptions objectAtIndex:row];
+}
+
+// tell the picker the width of each row for a given component
+- (CGFloat)pickerView:(UIPickerView *)pickerView widthForComponent:(NSInteger)component
+{
+    return 200;
+}
+
+- (IBAction)pickerDoneClicked:(id)sender
+{
+    CHIPSetDomainValueForKey(kCHIPToolDefaultsDomain, kCHIPNumLightOnOffCluster, _numLightsTextField.text);
+    [_numLightsTextField resignFirstResponder];
+    [self setupStackView];
+}
+
+// MARK: Cluster Setup
+
+- (int)numLightClustersToShow
+{
+    NSString * numClusters = CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, kCHIPNumLightOnOffCluster);
+    int numberOfLights = 1;
+
+    if (numClusters) {
+        numberOfLights = [numClusters intValue];
+    }
+    return numberOfLights;
+}
+
 // MARK: UIButton actions
 
 - (IBAction)onButtonTapped:(id)sender
 {
-    CHIPDeviceCallback completionHandler = ^(NSError * error) {
-        NSLog(@"Status: On command completed with error %@", [error description]);
-    };
-
     UIButton * button = (UIButton *) sender;
-    NSInteger lightNumber = button.tag;
-    NSLog(@"Light %@ on button pressed.", @(lightNumber));
-    // TODO: Do something based on which light is selected
-    [self.onOff on:completionHandler];
+    NSInteger endpoint = button.tag;
+    [self updateResult:[NSString stringWithFormat:@"On command sent on endpoint %@", @(endpoint)]];
+
+    [_deviceSelector forSelectedDevices:^(uint64_t deviceId) {
+        CHIPDevice * chipDevice = CHIPGetPairedDeviceWithID(deviceId);
+        if (chipDevice != nil) {
+            CHIPOnOff * onOff = [[CHIPOnOff alloc] initWithDevice:chipDevice endpoint:endpoint queue:dispatch_get_main_queue()];
+            [onOff on:^(NSError * error, NSDictionary * values) {
+                NSString * resultString
+                    = (error != nil) ? [NSString stringWithFormat:@"An error occured: 0x%02lx", error.code] : @"On command success";
+                [self updateResult:resultString];
+            }];
+        } else {
+            [self updateResult:[NSString stringWithFormat:@"Device not found"]];
+        }
+    }];
 }
 
 - (IBAction)offButtonTapped:(id)sender
 {
-    CHIPDeviceCallback completionHandler = ^(NSError * error) {
-        NSLog(@"Status: Off command completed with error %@", [error description]);
-    };
-
     UIButton * button = (UIButton *) sender;
-    NSInteger lightNumber = button.tag;
-    NSLog(@"Light %@ off button pressed.", @(lightNumber));
-    // TODO: Do something based on which light is selected
-    [self.onOff off:completionHandler];
+    NSInteger endpoint = button.tag;
+    [self updateResult:[NSString stringWithFormat:@"Off command sent on endpoint %@", @(endpoint)]];
+
+    [_deviceSelector forSelectedDevices:^(uint64_t deviceId) {
+        CHIPDevice * chipDevice = CHIPGetPairedDeviceWithID(deviceId);
+        if (chipDevice != nil) {
+            CHIPOnOff * onOff = [[CHIPOnOff alloc] initWithDevice:chipDevice endpoint:endpoint queue:dispatch_get_main_queue()];
+            [onOff off:^(NSError * error, NSDictionary * values) {
+                NSString * resultString = (error != nil) ? [NSString stringWithFormat:@"An error occured: 0x%02lx", error.code]
+                                                         : @"Off command success";
+                [self updateResult:resultString];
+            }];
+        } else {
+            [self updateResult:[NSString stringWithFormat:@"Device not found"]];
+        }
+    }];
 }
 
 - (IBAction)toggleButtonTapped:(id)sender
 {
-    CHIPDeviceCallback completionHandler = ^(NSError * error) {
-        NSLog(@"Status: Toggle command completed with error %@", [error description]);
-    };
-
     UIButton * button = (UIButton *) sender;
-    NSInteger lightNumber = button.tag;
-    NSLog(@"Light %@ toggle button pressed.", @(lightNumber));
-    // TODO: Do something based on which light is selected
-    [self.onOff toggle:completionHandler];
+    NSInteger endpoint = button.tag;
+    [self updateResult:[NSString stringWithFormat:@"Toggle command sent on endpoint %@", @(endpoint)]];
+
+    [_deviceSelector forSelectedDevices:^(uint64_t deviceId) {
+        CHIPDevice * chipDevice = CHIPGetPairedDeviceWithID(deviceId);
+        if (chipDevice != nil) {
+            CHIPOnOff * onOff = [[CHIPOnOff alloc] initWithDevice:chipDevice endpoint:endpoint queue:dispatch_get_main_queue()];
+            [onOff toggle:^(NSError * error, NSDictionary * values) {
+                NSString * resultString = (error != nil) ? [NSString stringWithFormat:@"An error occured: 0x%02lx", error.code]
+                                                         : @"Toggle command success";
+                [self updateResult:resultString];
+            }];
+        } else {
+            [self updateResult:[NSString stringWithFormat:@"Device not found"]];
+        }
+    }];
 }
 
-// MARK: CHIPDeviceControllerDelegate
-- (void)deviceControllerOnConnected
-{
-    NSLog(@"Status: Device connected");
-}
-
-- (void)deviceControllerOnError:(nonnull NSError *)error
-{
-    NSLog(@"Status: Device Controller error %@", [error description]);
-    if (error) {
-        NSString * stringError = [@"Error: " stringByAppendingString:error.description];
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 5.0), dispatch_get_main_queue(), ^{
-            [self updateResult:stringError];
-        });
-    }
-}
-
-- (void)deviceControllerOnMessage:(nonnull NSData *)message
-{
-    NSString * stringMessage;
-    if ([CHIPDevice isDataModelCommand:message] == YES) {
-        stringMessage = [CHIPDevice commandToString:message];
-    } else {
-        stringMessage = [[NSString alloc] initWithData:message encoding:NSUTF8StringEncoding];
-    }
-    NSString * resultMessage = [@"Echo Response: " stringByAppendingFormat:@"%@", stringMessage];
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 5.0), dispatch_get_main_queue(), ^{
-        [self updateResult:resultMessage];
-    });
-}
 @end

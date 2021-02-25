@@ -76,7 +76,7 @@ void ExchangeContext::SetResponseTimeout(Timeout timeout)
 }
 
 CHIP_ERROR ExchangeContext::SendMessage(uint16_t protocolId, uint8_t msgType, PacketBufferHandle msgBuf,
-                                        const SendFlags & sendFlags, void * msgCtxt)
+                                        const SendFlags & sendFlags)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     PayloadHeader payloadHeader;
@@ -139,9 +139,9 @@ CHIP_ERROR ExchangeContext::SendMessage(uint16_t protocolId, uint8_t msgType, Pa
     }
 
     // Send the message.
-    if (payloadHeader.IsNeedsAck())
+    if (payloadHeader.NeedsAck())
     {
-        ReliableMessageManager::RetransTableEntry * entry = nullptr;
+        ReliableMessageMgr::RetransTableEntry * entry = nullptr;
 
         // Add to Table for subsequent sending
         err = mExchangeMgr->GetReliableMessageMgr()->AddToRetransTable(&mReliableMessageContext, &entry);
@@ -289,6 +289,12 @@ void ExchangeContext::Free()
 
     em->DecrementContextsInUse();
 
+    if (mExchangeACL != nullptr)
+    {
+        chip::Platform::Delete(mExchangeACL);
+        mExchangeACL = nullptr;
+    }
+
 #if defined(CHIP_EXCHANGE_CONTEXT_DETAIL_LOGGING)
     ChipLogProgress(ExchangeManager, "ec-- id: %d [%04" PRIX16 "], inUse: %d, addr: 0x%x", (this - em->ContextPool + 1),
                     mExchangeId, em->GetContextsInUse(), this);
@@ -380,7 +386,7 @@ CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, con
         SuccessOrExit(err);
     }
 
-    if (payloadHeader.IsNeedsAck())
+    if (payloadHeader.NeedsAck())
     {
         MessageFlags msgFlags;
 
@@ -411,7 +417,7 @@ CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, con
 
         if (mDelegate != nullptr)
         {
-            mDelegate->OnMessageReceived(this, packetHeader, protocolId, messageType, std::move(msgBuf));
+            mDelegate->OnMessageReceived(this, packetHeader, payloadHeader, std::move(msgBuf));
         }
         else
         {

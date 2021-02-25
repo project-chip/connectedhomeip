@@ -49,14 +49,6 @@
 
 // These are configuration options that are unique to the EFR32 platform.
 // These can be overridden by the application as needed.
-/**
- * @def CHIP_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE
- *
- * The maximum size of any log message.
- */
-#ifndef CHIP_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE
-#define CHIP_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE 150
-#endif // CHIP_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE
 
 // -------------- EFR32 NVM3 Storage Configuration -------------
 

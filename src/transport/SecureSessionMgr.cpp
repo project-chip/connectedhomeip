@@ -34,6 +34,7 @@
 #include <support/ReturnMacros.h>
 #include <support/SafeInt.h>
 #include <support/logging/CHIPLogging.h>
+#include <transport/AdminPairingTable.h>
 #include <transport/PASESession.h>
 #include <transport/RendezvousSession.h>
 #include <transport/SecureMessageCodec.h>
@@ -62,7 +63,8 @@ SecureSessionMgr::~SecureSessionMgr()
     CancelExpiryTimer();
 }
 
-CHIP_ERROR SecureSessionMgr::Init(NodeId localNodeId, System::Layer * systemLayer, TransportMgrBase * transportMgr)
+CHIP_ERROR SecureSessionMgr::Init(NodeId localNodeId, System::Layer * systemLayer, TransportMgrBase * transportMgr,
+                                  Transport::AdminPairingTable * admins)
 {
     VerifyOrReturnError(mState == State::kNotReady, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(transportMgr != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -71,6 +73,7 @@ CHIP_ERROR SecureSessionMgr::Init(NodeId localNodeId, System::Layer * systemLaye
     mLocalNodeId  = localNodeId;
     mSystemLayer  = systemLayer;
     mTransportMgr = transportMgr;
+    mAdmins       = admins;
 
     ChipLogProgress(Inet, "local node id is %llu\n", mLocalNodeId);
 
@@ -102,8 +105,8 @@ CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, System::Pa
 CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHeader & payloadHeader,
                                          System::PacketBufferHandle && msgBuf, EncryptedPacketBufferHandle * bufferRetainSlot)
 {
-    PacketHeader ununsedPacketHeader;
-    return SendMessage(session, payloadHeader, ununsedPacketHeader, std::move(msgBuf), bufferRetainSlot,
+    PacketHeader unusedPacketHeader;
+    return SendMessage(session, payloadHeader, unusedPacketHeader, std::move(msgBuf), bufferRetainSlot,
                        EncryptionState::kPayloadIsUnencrypted);
 }
 
@@ -114,12 +117,9 @@ CHIP_ERROR SecureSessionMgr::SendEncryptedMessage(SecureSessionHandle session, E
     VerifyOrReturnError(!msgBuf->HasChainedBuffer(), CHIP_ERROR_INVALID_MESSAGE_LENGTH);
     VerifyOrReturnError(msgBuf->TotalLength() < kMax_SecureSDU_Length, CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
-    uint16_t headerSize = 0;
-    PacketHeader packetHeader;
-    ReturnErrorOnFailure(packetHeader.Decode(msgBuf->Start(), msgBuf->DataLength(), &headerSize));
-
     // Advancing the start to encrypted header, since the transport will attach the packet header on top of it
-    msgBuf->SetStart(msgBuf->Start() + headerSize);
+    PacketHeader packetHeader;
+    ReturnErrorOnFailure(packetHeader.DecodeAndConsume(msgBuf));
 
     PayloadHeader payloadHeader;
     return SendMessage(session, payloadHeader, packetHeader, std::move(msgBuf), bufferRetainSlot,
@@ -135,6 +135,9 @@ CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHea
     uint8_t * msgStart          = nullptr;
     uint16_t msgLen             = 0;
     uint16_t headerSize         = 0;
+    NodeId localNodeId          = mLocalNodeId;
+
+    Transport::AdminPairingInfo * admin = nullptr;
 
     // Hold the reference to encrypted message in stack variable.
     // In case of any failures, the reference is not returned, and this stack variable
@@ -153,10 +156,13 @@ CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHea
 
     // This marks any connection where we send data to as 'active'
     mPeerConnections.MarkConnectionActive(state);
+    admin = mAdmins->FindAdmin(state->GetAdminId());
+    VerifyOrExit(admin != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    localNodeId = admin->GetNodeId();
 
     if (encryptionState == EncryptionState::kPayloadIsUnencrypted)
     {
-        err = SecureMessageCodec::Encode(mLocalNodeId, state, payloadHeader, packetHeader, msgBuf);
+        err = SecureMessageCodec::Encode(localNodeId, state, payloadHeader, packetHeader, msgBuf);
         SuccessOrExit(err);
     }
 
@@ -175,7 +181,7 @@ CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHea
         encryptedMsg.mMsgId = packetHeader.GetMessageId();
     }
 
-    ChipLogProgress(Inet, "Sending msg from %llu to %llu", mLocalNodeId, state->GetPeerNodeId());
+    ChipLogProgress(Inet, "Sending msg from %llu to %llu", localNodeId, state->GetPeerNodeId());
 
     if (state->GetTransport() != nullptr)
     {
@@ -213,16 +219,14 @@ exit:
 }
 
 CHIP_ERROR SecureSessionMgr::NewPairing(const Optional<Transport::PeerAddress> & peerAddr, NodeId peerNodeId, PASESession * pairing,
-                                        Transport::Base * transport)
+                                        PairingDirection direction, Transport::AdminId admin, Transport::Base * transport)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
     uint16_t peerKeyId          = pairing->GetPeerKeyId();
     uint16_t localKeyId         = pairing->GetLocalKeyId();
     PeerConnectionState * state = mPeerConnections.FindPeerConnectionState(Optional<NodeId>::Value(peerNodeId), peerKeyId, nullptr);
 
     // Find any existing connection with the same node and key ID
-    if (state)
+    if (state && (state->GetAdminId() == Transport::kUndefinedAdminId || state->GetAdminId() == admin))
     {
         mPeerConnections.MarkConnectionExpired(
             state, [this](const Transport::PeerConnectionState & state1) { HandleConnectionExpired(state1); });
@@ -234,6 +238,7 @@ CHIP_ERROR SecureSessionMgr::NewPairing(const Optional<Transport::PeerAddress> &
     ReturnErrorOnFailure(
         mPeerConnections.CreateNewPeerConnectionState(Optional<NodeId>::Value(peerNodeId), peerKeyId, localKeyId, &state));
 
+    state->SetAdminId(admin);
     state->SetTransport(transport);
 
     if (peerAddr.HasValue() && peerAddr.Value().GetIPAddress() != Inet::IPAddress::Any)
@@ -249,15 +254,34 @@ CHIP_ERROR SecureSessionMgr::NewPairing(const Optional<Transport::PeerAddress> &
 
     if (state != nullptr)
     {
-        err = pairing->DeriveSecureSession(reinterpret_cast<const uint8_t *>(kSpake2pI2RSessionInfo),
-                                           strlen(kSpake2pI2RSessionInfo), state->GetSecureSession());
+        switch (direction)
+        {
+        case PairingDirection::kInitiator:
+            ReturnErrorOnFailure(pairing->DeriveSecureSession(reinterpret_cast<const uint8_t *>(kSpake2pI2RSessionInfo),
+                                                              strlen(kSpake2pI2RSessionInfo), state->GetSenderSecureSession()));
+
+            ReturnErrorOnFailure(pairing->DeriveSecureSession(reinterpret_cast<const uint8_t *>(kSpake2pR2ISessionInfo),
+                                                              strlen(kSpake2pR2ISessionInfo), state->GetReceiverSecureSession()));
+
+            break;
+        case PairingDirection::kResponder:
+            ReturnErrorOnFailure(pairing->DeriveSecureSession(reinterpret_cast<const uint8_t *>(kSpake2pR2ISessionInfo),
+                                                              strlen(kSpake2pR2ISessionInfo), state->GetSenderSecureSession()));
+            ReturnErrorOnFailure(pairing->DeriveSecureSession(reinterpret_cast<const uint8_t *>(kSpake2pI2RSessionInfo),
+                                                              strlen(kSpake2pI2RSessionInfo), state->GetReceiverSecureSession()));
+
+            break;
+        default:
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        };
+
         if (mCB != nullptr)
         {
-            mCB->OnNewConnection({ state->GetPeerNodeId(), state->GetPeerKeyID() }, this);
+            mCB->OnNewConnection({ state->GetPeerNodeId(), state->GetPeerKeyID(), admin }, this);
         }
     }
 
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 void SecureSessionMgr::ScheduleExpiryTimer()
@@ -279,9 +303,12 @@ void SecureSessionMgr::CancelExpiryTimer()
 void SecureSessionMgr::OnMessageReceived(const PacketHeader & packetHeader, const PeerAddress & peerAddress,
                                          System::PacketBufferHandle msg)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    PeerConnectionState * state =
-        mPeerConnections.FindPeerConnectionState(packetHeader.GetSourceNodeId(), packetHeader.GetEncryptionKeyID(), nullptr);
+    CHIP_ERROR err    = CHIP_NO_ERROR;
+    NodeId destNodeId = packetHeader.GetDestinationNodeId().ValueOr(kUndefinedNodeId);
+
+    // Find the connection which matches src node ID, dest node ID, and peer encryption key
+    PeerConnectionState * state = mPeerConnections.FindPeerConnectionState(packetHeader.GetSourceNodeId(), destNodeId, mAdmins,
+                                                                           packetHeader.GetEncryptionKeyID(), nullptr);
     PacketBufferHandle origMsg;
     PayloadHeader payloadHeader;
 
@@ -291,11 +318,6 @@ void SecureSessionMgr::OnMessageReceived(const PacketHeader & packetHeader, cons
     {
         ChipLogError(Inet, "Data received on an unknown connection (%d). Dropping it!!", packetHeader.GetEncryptionKeyID());
         ExitNow(err = CHIP_ERROR_KEY_NOT_FOUND_FROM_PEER);
-    }
-
-    if (!state->GetPeerAddress().IsInitialized())
-    {
-        state->SetPeerAddress(peerAddress);
     }
 
     mPeerConnections.MarkConnectionActive(state);
@@ -308,10 +330,18 @@ void SecureSessionMgr::OnMessageReceived(const PacketHeader & packetHeader, cons
         state->SetPeerNodeId(packetHeader.GetSourceNodeId().Value());
     }
 
+    // TODO: once mDNS address resolution is available reconsider if this is required
+    // This updates the peer address once a packet is received from a new address
+    // and serves as a way to auto-detect peer changing IPs.
+    if (state->GetPeerAddress() != peerAddress)
+    {
+        state->SetPeerAddress(peerAddress);
+    }
+
     if (mCB != nullptr)
     {
-        mCB->OnMessageReceived(packetHeader, payloadHeader, { state->GetPeerNodeId(), state->GetPeerKeyID() }, std::move(msg),
-                               this);
+        mCB->OnMessageReceived(packetHeader, payloadHeader, { state->GetPeerNodeId(), state->GetPeerKeyID(), state->GetAdminId() },
+                               std::move(msg), this);
     }
 
 exit:
@@ -324,13 +354,13 @@ exit:
 void SecureSessionMgr::HandleConnectionExpired(const Transport::PeerConnectionState & state)
 {
     char addr[Transport::PeerAddress::kMaxToStringSize];
-    state.GetPeerAddress().ToString(addr, sizeof(addr));
+    state.GetPeerAddress().ToString(addr);
 
     ChipLogDetail(Inet, "Connection from '%s' expired", addr);
 
     if (mCB != nullptr)
     {
-        mCB->OnConnectionExpired({ state.GetPeerNodeId(), state.GetPeerKeyID() }, this);
+        mCB->OnConnectionExpired({ state.GetPeerNodeId(), state.GetPeerKeyID(), state.GetAdminId() }, this);
     }
 
     mTransportMgr->Disconnect(state.GetPeerAddress());

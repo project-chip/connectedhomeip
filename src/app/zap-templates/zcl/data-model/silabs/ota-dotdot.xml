@@ -1,0 +1,149 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2008,2020 Silicon Labs.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="SE" spec="se-1.2b-15-0131-02" dependsOn="zcl-1.0-07-5123-04" certifiable="false">
+  </domain>
+  <cluster>
+    <name>Over the Air Bootloading</name>
+    <domain>General</domain>
+    <description>This cluster contains commands and attributes that act as an interface for Thread Over-the-air bootloading.</description>
+    <code>0x2000</code>
+    <define>OTA_BOOTLOAD_CLUSTER</define>
+    <client tick="false" init="false">true</client>
+    <server tick="false" init="false">true</server>
+    <generateCmdHandlers>false</generateCmdHandlers>
+    <attribute side="client" type="IEEE_ADDRESS" code="0x0000" writable="false" optional="false" default="0xffffffffffffffff" define="UPGRADE_SERVER_ID">OTA Upgrade Server ID</attribute>
+    <!-- Although the File Offset attribute is optional, it is mandatory for our implementation of the OTA client plugin. -->
+    <attribute side="client" type="INT32U" code="0x0001" writable="false" optional="false" default="0xffffffff" define="FILE_OFFSET">Offset (address) into the file</attribute>
+    <attribute side="client" type="INT32U" code="0x0002" writable="false" optional="true" default="0xffffffff" define="CURRENT_FILE_VERSION">OTA Current File Version</attribute>
+    <attribute side="client" type="INT16U" code="0x0003" writable="false" optional="true" default="0xffff" define="CURRENT_ZIGBEE_STACK_VERSION">OTA Current ZigBee Stack Version</attribute>
+    <attribute side="client" type="INT32U" code="0x0004" writable="false" optional="true" default="0xffffffff" define="DOWNLOADED_FILE_VERSION">OTA Downloaded File Version</attribute>
+    <attribute side="client" type="INT16U" code="0x0005" writable="false" optional="true" default="0xffff" define="DOWNLOADED_ZIGBEE_STACK_VERSION">OTA Downloaded ZigBee Stack Version</attribute>
+    <attribute side="client" type="ENUM8" code="0x0006" writable="false" optional="false" default="0x00" define="IMAGE_UPGRADE_STATUS">OTA Upgrade Status</attribute>
+    <attribute side="client" type="INT16U" code="0x0007" writable="false" optional="true" define="MANUFACTURER_ID">Manufacturer ID</attribute>
+    <attribute side="client" type="INT16U" code="0x0008" writable="false" optional="true" define="IMAGE_TYPE_ID">Image Type ID</attribute>
+    <attribute side="client" type="INT16U" code="0x0009" writable="false" optional="true" define="MINIMUM_BLOCK_REQUEST_PERIOD" introducedIn="ha-1.2-05-3520-29">Minimum Block Request Period</attribute>
+    <attribute side="client" type="INT32U" code="0x000A" writable="false" optional="true" define="IMAGE_STAMP" introducedIn="ha-1.2-05-3520-29">Image Stamp</attribute>
+    <attribute side="client" type="ENUM8" code="0x000B" writable="false" optional="true" default="0x00" define="UPGRADE_ACTIVATION_POLICY" introducedIn="se-1.2b-15-0131-02">Upgrade Activation Policy</attribute>
+    <attribute side="client" type="ENUM8" code="0x000C" writable="false" optional="true" default="0x00" define="UPGRADE_TIMEOUT_POLICY" introducedIn="se-1.2b-15-0131-02">Upgrade Timeout Policy</attribute>
+    <command code="0x0" name="ImageNotify" source="server">
+      <description>
+        This command is generated when the upgrade server wishes to notify the clients of the available OTA upgrade image.  The command can be sent as unicast which provides a way for the server to force the upgrade on the client.  The command can also be sent as broadcast or multicast to certain class of clients (for example, the ones that have matching manufacturing and device ids).
+      </description>
+      <arg name="payloadType" type="ENUM8"/>
+      <arg name="queryJitter" type="INT8U"/>
+      <arg name="manufacturerId" type="INT16U"/>
+      <arg name="imageType" type="INT16U"/>
+      <arg name="newFileVersion" type="INT32U"/>
+    </command>
+    <command code="0x1" name="QueryNextImageRequest" source="client">
+      <description>
+      This command is generated upon receipt of an Image Notify command to indicate that the client is looking for the next firmware image to upgrade to.  The client may also choose to send the command periodically to the server.
+      </description>
+      <arg name="fieldControl" type="INT8U"/>
+      <arg name="manufacturerId" type="INT16U"/>
+      <arg name="imageType" type="INT16U"/>
+      <arg name="currentFileVersion" type="INT32U"/>
+      <arg name="hardwareVersion" type="INT16U"/>
+    </command>
+    <command code="0x2" name="QueryNextImageResponse" source="server" disableDefaultResponse="true">
+      <description>
+        This command is generated upon receipt of an QueryNextImageRequest command to response whether the server has a valid OTA upgrade image for the client or not.  If the server has the file, information regarding the file and OTA upgrade process will be included in the command.
+      </description>
+      <arg name="status" type="Status"/>
+      <arg name="fileVersion" type="INT32U"/>
+      <arg name="imageSize" type="INT32U"/>
+      <arg name="fileUri" type="CHAR_STRING"/>
+    </command>
+    <command code="0x3" name="ImageBlockRequest" source="client">
+      <description>
+        This command is generated by the client to request blocks of OTA upgrade file data.
+      </description>
+      <arg name="fieldControl" type="INT8U"/>
+      <arg name="manufacturerId" type="INT16U"/>
+      <arg name="imageType" type="INT16U"/>
+      <arg name="fileVersion" type="INT32U"/>
+      <arg name="fileOffset" type="INT32U"/>
+      <arg name="maxDataSize" type="INT8U"/>
+      <arg name="requestNodeAddress" type="IEEE_ADDRESS"/>
+    </command>
+    <command code="0x4" name="ImagePageRequest" source="client" optional="true">
+      <description>
+        This command is generated by the client to request pages of OTA upgrade file data. A page would contain multiple blocks of data.
+      </description>
+      <arg name="fieldControl" type="INT8U"/>
+      <arg name="manufacturerId" type="INT16U"/>
+      <arg name="imageType" type="INT16U"/>
+      <arg name="fileVersion" type="INT32U"/>
+      <arg name="fileOffset" type="INT32U"/>
+      <arg name="maxDataSize" type="INT8U"/>
+      <arg name="pageSize" type="INT16U"/>
+      <arg name="responseSpacing" type="INT16U"/>
+      <arg name="requestNodeAddress" type="IEEE_ADDRESS"/>
+    </command>
+    <command code="0x5" name="ImageBlockResponse" source="server" disableDefaultResponse="true">
+      <description>
+        This command is generated by the server in response to the block or page request command.  If the server has the data available, it will reply back with a SUCCESS status.  For other error cases, it may reply with status WAIT_FOR_DATA (server does not have the data available yet) or ABORT (invalid requested parameters or other failure cases).
+      </description>
+      <arg name="status" type="Status"/>
+      <arg name="manufacturerId" type="INT16U"/>
+      <arg name="imageType" type="INT16U"/>
+      <arg name="fileVersion" type="INT32U"/>
+      <arg name="fileOffset" type="INT32U"/>
+      <arg name="dataSize" type="INT8U"/>
+      <arg name="imageData" type="INT8U" array="true"/>
+    </command>
+    <command code="0x6" name="UpgradeEndRequest" source="client">
+      <description>
+        This command is generated by the client to notify the server of the end of the upgrade process.  The process may end with success or error status.
+      </description>
+      <arg name="status" type="Status"/>
+      <arg name="manufacturerId" type="INT16U"/>
+      <arg name="imageType" type="INT16U"/>
+      <arg name="fileVersion" type="INT32U"/>
+    </command>
+    <command code="0x7" name="UpgradeEndResponse" source="server" disableDefaultResponse="true">
+      <description>
+        This command is generated by the server in response to the upgrade request in order to let the client know when to upgrade to running new firmware image.
+      </description>
+      <arg name="manufacturerId" type="INT16U"/>
+      <arg name="imageType" type="INT16U"/>
+      <arg name="fileVersion" type="INT32U"/>
+      <arg name="currentTime" type="INT32U"/>
+      <arg name="upgradeTime" type="INT32U"/>
+    </command>
+    <command code="0x8" name="QuerySpecificFileRequest" source="client" optional="true">
+      <description>
+        This command is generated by the client to request a file that is specific to itself.  The intention is to provide a way for the client to request non-OTA upgrade file.
+      </description>
+      <arg name="requestNodeAddress" type="IEEE_ADDRESS"/>
+      <arg name="manufacturerId" type="INT16U"/>
+      <arg name="imageType" type="INT16U"/>
+      <arg name="fileVersion" type="INT32U"/>
+      <arg name="currentZigbeeStackVersion" type="INT16U"/>
+    </command>
+    <command code="0x9" name="QuerySpecificFileResponse" source="server" disableDefaultResponse="true" optional="true">
+      <description>
+        This command is generated upon receipt of an QuerySpecificFileRequest command to response whether the server has a valid file for the client or not.  If the server has the file, information regarding the file and OTA process will be included in the command.
+      </description>
+      <arg name="status" type="Status"/>
+      <arg name="fileVersion" type="INT32U"/>
+      <arg name="imageSize" type="INT32U"/>
+      <arg name="fileUri" type="CHAR_STRING"/>
+    </command>
+  </cluster>
+</configurator>

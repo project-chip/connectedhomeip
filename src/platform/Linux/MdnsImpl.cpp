@@ -461,7 +461,7 @@ CHIP_ERROR MdnsAvahi::PublishService(const MdnsService & service)
 
     if (mPublishedServices.find(key) == mPublishedServices.end())
     {
-        SuccessOrExit(error = MakeAvahiStringListFromTextEntries(service.mTextEntryies, service.mTextEntrySize, &text));
+        SuccessOrExit(error = MakeAvahiStringListFromTextEntries(service.mTextEntries, service.mTextEntrySize, &text));
 
         mPublishedServices.emplace(key);
         VerifyOrExit(avahi_entry_group_add_service_strlst(mGroup, interface, ToAvahiProtocol(service.mAddressType),
@@ -482,7 +482,7 @@ CHIP_ERROR MdnsAvahi::PublishService(const MdnsService & service)
     }
     else
     {
-        SuccessOrExit(error = MakeAvahiStringListFromTextEntries(service.mTextEntryies, service.mTextEntrySize, &text));
+        SuccessOrExit(error = MakeAvahiStringListFromTextEntries(service.mTextEntries, service.mTextEntrySize, &text));
 
         VerifyOrExit(avahi_entry_group_update_service_txt_strlst(mGroup, interface, ToAvahiProtocol(service.mAddressType),
                                                                  static_cast<AvahiPublishFlags>(0), service.mName, type.c_str(),
@@ -703,7 +703,7 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
 
         if (!textEntries.empty())
         {
-            result.mTextEntryies = textEntries.data();
+            result.mTextEntries = textEntries.data();
         }
         result.mTextEntrySize = textEntries.size();
 

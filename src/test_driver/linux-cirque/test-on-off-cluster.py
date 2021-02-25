@@ -83,7 +83,7 @@ class TestOnOffCluster(CHIPVirtualHome):
 
         for ip in server_ip_address:
             ret = self.execute_device_cmd(
-                tool_device_id, "chip-tool pairing softap ssid_not_used passwd_not_used {} {} {} {}".format(SETUPPINCODE, DISCRIMINATOR, ip, CHIP_PORT))
+                tool_device_id, "chip-tool pairing softap {} {} {} {}".format(SETUPPINCODE, DISCRIMINATOR, ip, CHIP_PORT))
             self.assertEqual(ret['return_code'], '0', "{} command failure: {}".format(
                 "pairing softap", ret['output']))
 

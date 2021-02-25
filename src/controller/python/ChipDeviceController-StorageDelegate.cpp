@@ -23,7 +23,7 @@
 #include <map>
 #include <string>
 
-#include <controller/CHIPPersistentStorageDelegate.h>
+#include <core/CHIPPersistentStorageDelegate.h>
 #include <support/logging/CHIPLogging.h>
 
 namespace chip {

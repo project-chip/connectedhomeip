@@ -16,8 +16,6 @@
  */
 
 #import "CHIPPersistentStorageDelegateBridge.h"
-#import "CHIPError.h"
-#import <Foundation/Foundation.h>
 
 CHIPPersistentStorageDelegateBridge::CHIPPersistentStorageDelegateBridge(void)
     : mDelegate(nil)
@@ -41,14 +39,14 @@ void CHIPPersistentStorageDelegateBridge::setFrameworkDelegate(id<CHIPPersistent
     });
 }
 
-void CHIPPersistentStorageDelegateBridge::SetDelegate(chip::Controller::PersistentStorageResultDelegate * delegate)
+void CHIPPersistentStorageDelegateBridge::SetDelegate(chip::PersistentStorageResultDelegate * delegate)
 {
     dispatch_async(mWorkQueue, ^{
         if (delegate) {
             mCallback = delegate;
 
             mCompletionHandler = ^(NSString * key, NSString * value) {
-                chip::Controller::PersistentStorageResultDelegate * callback = mCallback;
+                chip::PersistentStorageResultDelegate * callback = mCallback;
                 if (callback) {
                     dispatch_async(mWorkQueue, ^{
                         callback->OnValue([key UTF8String], [value UTF8String]);
@@ -57,20 +55,20 @@ void CHIPPersistentStorageDelegateBridge::SetDelegate(chip::Controller::Persiste
             };
 
             mSetStatusHandler = ^(NSString * key, NSError * status) {
-                chip::Controller::PersistentStorageResultDelegate * callback = mCallback;
+                chip::PersistentStorageResultDelegate * callback = mCallback;
                 if (callback) {
                     dispatch_async(mWorkQueue, ^{
-                        callback->OnStatus([key UTF8String], chip::Controller::PersistentStorageResultDelegate::Operation::kSET,
+                        callback->OnStatus([key UTF8String], chip::PersistentStorageResultDelegate::Operation::kSET,
                             [CHIPError errorToCHIPErrorCode:status]);
                     });
                 }
             };
 
             mDeleteStatusHandler = ^(NSString * key, NSError * status) {
-                chip::Controller::PersistentStorageResultDelegate * callback = mCallback;
+                chip::PersistentStorageResultDelegate * callback = mCallback;
                 if (callback) {
                     dispatch_async(mWorkQueue, ^{
-                        callback->OnStatus([key UTF8String], chip::Controller::PersistentStorageResultDelegate::Operation::kDELETE,
+                        callback->OnStatus([key UTF8String], chip::PersistentStorageResultDelegate::Operation::kDELETE,
                             [CHIPError errorToCHIPErrorCode:status]);
                     });
                 }
@@ -98,7 +96,9 @@ void CHIPPersistentStorageDelegateBridge::GetKeyValue(const char * key)
         } else {
             NSString * value = [mDefaultPersistentStorage objectForKey:keyString];
             NSLog(@"PersistentStorageDelegate Get Value for Key: %@, value %@", keyString, value);
-            mCompletionHandler(keyString, value);
+            if (mCompletionHandler) {
+                mCompletionHandler(keyString, value);
+            }
         }
     });
 }
@@ -148,7 +148,9 @@ void CHIPPersistentStorageDelegateBridge::SetKeyValue(const char * key, const ch
             });
         } else {
             [mDefaultPersistentStorage setObject:valueString forKey:keyString];
-            mSetStatusHandler(keyString, [CHIPError errorForCHIPErrorCode:0]);
+            if (mSetStatusHandler) {
+                mSetStatusHandler(keyString, [CHIPError errorForCHIPErrorCode:0]);
+            }
         }
     });
 }
@@ -166,7 +168,9 @@ void CHIPPersistentStorageDelegateBridge::DeleteKeyValue(const char * key)
             });
         } else {
             [mDefaultPersistentStorage removeObjectForKey:keyString];
-            mDeleteStatusHandler(keyString, [CHIPError errorForCHIPErrorCode:0]);
+            if (mDeleteStatusHandler) {
+                mDeleteStatusHandler(keyString, [CHIPError errorForCHIPErrorCode:0]);
+            }
         }
     });
 }

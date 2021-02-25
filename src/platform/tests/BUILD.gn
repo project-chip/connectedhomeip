@@ -72,6 +72,10 @@ if (chip_device_platform != "none") {
       ]
       tests = [ "TestCHIPoBLEStackMgr" ]
     }
+
+    if (current_os == "zephyr") {
+      test_sources += [ "TestKeyValueStoreMgr.cpp" ]
+    }
   }
 } else {
   import("${build_root}/chip/chip_test_group.gni")

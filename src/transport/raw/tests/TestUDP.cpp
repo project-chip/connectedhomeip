@@ -26,6 +26,7 @@
 #include <core/CHIPCore.h>
 #include <support/CodeUtils.h>
 #include <support/UnitTestRegistration.h>
+#include <transport/TransportMgr.h>
 #include <transport/raw/UDP.h>
 
 #include <nlbyteorder.h>
@@ -51,19 +52,29 @@ TestContext sContext;
 const char PAYLOAD[]        = "Hello!";
 int ReceiveHandlerCallCount = 0;
 
-void MessageReceiveHandler(const PacketHeader & header, const Transport::PeerAddress & source, System::PacketBufferHandle msgBuf,
-                           nlTestSuite * inSuite)
+class MockTransportMgrDelegate : public TransportMgrDelegate
 {
-    NL_TEST_ASSERT(inSuite, header.GetSourceNodeId() == Optional<NodeId>::Value(kSourceNodeId));
-    NL_TEST_ASSERT(inSuite, header.GetDestinationNodeId() == Optional<NodeId>::Value(kDestinationNodeId));
-    NL_TEST_ASSERT(inSuite, header.GetMessageId() == kMessageId);
+public:
+    MockTransportMgrDelegate(nlTestSuite * inSuite) : mSuite(inSuite) {}
+    ~MockTransportMgrDelegate() override {}
 
-    size_t data_len = msgBuf->DataLength();
-    int compare     = memcmp(msgBuf->Start(), PAYLOAD, data_len);
-    NL_TEST_ASSERT(inSuite, compare == 0);
+    void OnMessageReceived(const PacketHeader & header, const Transport::PeerAddress & source,
+                           System::PacketBufferHandle msgBuf) override
+    {
+        NL_TEST_ASSERT(mSuite, header.GetSourceNodeId() == Optional<NodeId>::Value(kSourceNodeId));
+        NL_TEST_ASSERT(mSuite, header.GetDestinationNodeId() == Optional<NodeId>::Value(kDestinationNodeId));
+        NL_TEST_ASSERT(mSuite, header.GetMessageId() == kMessageId);
 
-    ReceiveHandlerCallCount++;
-}
+        size_t data_len = msgBuf->DataLength();
+        int compare     = memcmp(msgBuf->Start(), PAYLOAD, data_len);
+        NL_TEST_ASSERT(mSuite, compare == 0);
+
+        ReceiveHandlerCallCount++;
+    }
+
+private:
+    nlTestSuite * mSuite;
+};
 
 } // namespace
 
@@ -110,7 +121,12 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext, const IPAddress &
     err = udp.Init(Transport::UdpListenParameters(&ctx.GetInetLayer()).SetAddressType(addr.Type()));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    udp.SetMessageReceiveHandler(MessageReceiveHandler, inSuite);
+    MockTransportMgrDelegate gMockTransportMgrDelegate(inSuite);
+    TransportMgrBase gTransportMgrBase;
+    gTransportMgrBase.SetSecureSessionMgr(&gMockTransportMgrDelegate);
+    gTransportMgrBase.SetRendezvousSession(&gMockTransportMgrDelegate);
+    gTransportMgrBase.Init(&udp);
+
     ReceiveHandlerCallCount = 0;
 
     PacketHeader header;

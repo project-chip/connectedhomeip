@@ -30,7 +30,7 @@
 namespace chip {
 namespace app {
 
-CHIP_ERROR CommandSender::SendCommandRequest(NodeId aNodeId)
+CHIP_ERROR CommandSender::SendCommandRequest(NodeId aNodeId, Transport::AdminId aAdminId)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -41,12 +41,12 @@ CHIP_ERROR CommandSender::SendCommandRequest(NodeId aNodeId)
 
     // Create a new exchange context.
     // TODO: temprary create a SecureSessionHandle from node id, will be fix in PR 3602
-    mpExchangeCtx = mpExchangeMgr->NewContext({ aNodeId, Transport::kAnyKeyId }, this);
+    // TODO: Hard code keyID to 0 to unblock IM end-to-end test. Complete solution is tracked in issue:4451
+    mpExchangeCtx = mpExchangeMgr->NewContext({ aNodeId, 0, aAdminId }, this);
     VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
     mpExchangeCtx->SetResponseTimeout(CHIP_INVOKE_COMMAND_RSP_TIMEOUT);
 
-    err = mpExchangeCtx->SendMessage(Protocols::kProtocol_InteractionModel, kMsgType_InvokeCommandRequest,
-                                     std::move(mCommandMessageBuf),
+    err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::InvokeCommandRequest, std::move(mCommandMessageBuf),
                                      Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
     SuccessOrExit(err);
     MoveToState(kState_Sending);
@@ -61,8 +61,8 @@ exit:
     return err;
 }
 
-void CommandSender::OnMessageReceived(Messaging::ExchangeContext * apEc, const PacketHeader & aPacketHeader, uint32_t aProtocolId,
-                                      uint8_t aMsgType, System::PacketBufferHandle aPayload)
+void CommandSender::OnMessageReceived(Messaging::ExchangeContext * apEc, const PacketHeader & aPacketHeader,
+                                      const PayloadHeader & aPayloadHeader, System::PacketBufferHandle aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     // Assert that the exchange context matches the client's current context.
@@ -74,7 +74,7 @@ void CommandSender::OnMessageReceived(Messaging::ExchangeContext * apEc, const P
 
     // Verify that the message is an Invoke Command Response.
     // If not, close the exchange and free the payload.
-    if (aProtocolId != Protocols::kProtocol_InteractionModel || aMsgType != kMsgType_InvokeCommandResponse)
+    if (!aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::InvokeCommandResponse))
     {
         apEc->Close();
         mpExchangeCtx = nullptr;
@@ -108,6 +108,7 @@ CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser &
     chip::TLV::TLVReader commandDataReader;
     chip::ClusterId clusterId;
     chip::CommandId commandId;
+    chip::EndpointId endpointId;
     uint16_t generalCode  = 0;
     uint32_t protocolId   = 0;
     uint16_t protocolCode = 0;
@@ -134,6 +135,9 @@ CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser &
         err = commandPath.GetCommandId(&commandId);
         SuccessOrExit(err);
 
+        err = commandPath.GetEndpointId(&endpointId);
+        SuccessOrExit(err);
+
         err = aCommandElement.GetData(&commandDataReader);
         if (CHIP_END_OF_TLV == err)
         {
@@ -142,7 +146,8 @@ CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser &
             // Todo: Define protocol code for StatusCode
             AddStatusCode(0, chip::Protocols::kProtocol_Protocol_Common, 0, clusterId);
         }
-        InteractionModelEngine::GetInstance()->ProcessCommand(clusterId, commandId, commandDataReader, this, kCommandSenderId);
+        // TODO(#4503): Should call callbacks of cluster that sends the command.
+        DispatchSingleClusterCommand(clusterId, commandId, endpointId, commandDataReader, this);
     }
 
 exit:

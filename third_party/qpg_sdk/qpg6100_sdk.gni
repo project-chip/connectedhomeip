@@ -15,9 +15,8 @@
 import("//build_overrides/chip.gni")
 import("//build_overrides/jlink.gni")
 import("//build_overrides/mbedtls.gni")
+import("//build_overrides/openthread.gni")
 import("//build_overrides/qpg6100_sdk.gni")
-
-#import("//build_overrides/openthread.gni")
 
 declare_args() {
   # Location of the QPG6100 SDK.
@@ -60,6 +59,7 @@ template("qpg6100_sdk") {
       "${qpg6100_sdk_root}/qpg6100/comps/gpFreeRTOS/Source/Portable/GCC/ARM_CM3",
       "${qpg6100_sdk_root}/qpg6100/comps/libmbedtls",
       "${mbedtls_root}/repo/include",
+      "${openthread_root}/include",
     ]
 
     lib_dirs = []
@@ -69,11 +69,11 @@ template("qpg6100_sdk") {
       "${qpg6100_sdk_root}/qpg6100/lib/libmbedtls_alt_qpg6100.a",
     ]
 
+    #MBed TLS built from third_party/mbedtls tree - OT config not used
     defines = [
       "QORVO_CRYPTO_ENGINE",
       "MBEDTLS_CONFIG_FILE=\"qpg6100-mbedtls-config.h\"",
     ]
-
     cflags = []
 
     # Allow warning due to mbedtls
@@ -100,6 +100,7 @@ template("qpg6100_sdk") {
       "${chip_root}/third_party/mbedtls/repo/library/certs.c",
       "${chip_root}/third_party/mbedtls/repo/library/cipher.c",
       "${chip_root}/third_party/mbedtls/repo/library/cipher_wrap.c",
+      "${chip_root}/third_party/mbedtls/repo/library/cmac.c",
       "${chip_root}/third_party/mbedtls/repo/library/ctr_drbg.c",
       "${chip_root}/third_party/mbedtls/repo/library/debug.c",
       "${chip_root}/third_party/mbedtls/repo/library/des.c",
@@ -129,8 +130,6 @@ template("qpg6100_sdk") {
       "${chip_root}/third_party/mbedtls/repo/library/platform.c",
       "${chip_root}/third_party/mbedtls/repo/library/platform_util.c",
       "${chip_root}/third_party/mbedtls/repo/library/ripemd160.c",
-      "${chip_root}/third_party/mbedtls/repo/library/rsa.c",
-      "${chip_root}/third_party/mbedtls/repo/library/rsa_internal.c",
       "${chip_root}/third_party/mbedtls/repo/library/sha1.c",
       "${chip_root}/third_party/mbedtls/repo/library/sha256.c",
       "${chip_root}/third_party/mbedtls/repo/library/sha512.c",

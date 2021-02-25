@@ -25,7 +25,8 @@
 #include <assert.h>
 #include <inet/InetLayer.h>
 #include <support/logging/CHIPLogging.h>
-#include <transport/SecureSessionMgr.h> // For SecureSessionMgr
+#include <transport/SecureSessionMgr.h>
+#include <transport/raw/MessageHeader.h>
 
 using namespace chip;
 
@@ -55,7 +56,7 @@ EmberStatus chipSendUnicast(NodeId destination, EmberApsFrame * apsFrame, uint16
         return EMBER_ERR_FATAL;
     }
 
-    System::PacketBufferHandle buffer = System::PacketBufferHandle::New(dataLength);
+    System::PacketBufferHandle buffer = MessagePacketBuffer::New(dataLength);
     if (buffer.IsNull())
     {
         // FIXME: Not quite right... what's the right way to indicate "out of
@@ -74,7 +75,7 @@ EmberStatus chipSendUnicast(NodeId destination, EmberApsFrame * apsFrame, uint16
     buffer->SetDataLength(dataLength);
 
     // TODO: temprary create a handle from node id, will be fix in PR 3602
-    CHIP_ERROR err = SessionManager().SendMessage({ destination, Transport::kAnyKeyId }, std::move(buffer));
+    CHIP_ERROR err = SessionManager().SendMessage({ destination, Transport::kAnyKeyId, 0 }, std::move(buffer));
     if (err != CHIP_NO_ERROR)
     {
         // FIXME: Figure out better translations between our error types?
