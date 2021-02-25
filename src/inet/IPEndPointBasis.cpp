@@ -185,7 +185,6 @@ exit:
 #else
 // Within Project CHIP multicast support is highly desirable: used for mDNS
 // as well as group communication.
-#warning "IPv6 multicast not available. Joining multicast groups will return 'Not Supported'"
 #undef HAVE_IPV6_MULTICAST
 #endif
 
