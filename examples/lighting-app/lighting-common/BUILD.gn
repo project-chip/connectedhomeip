@@ -50,6 +50,7 @@ source_set("lighting-common") {
   if (chip_config_experimental) {
     sources += [
       "${chip_root}/src/app/clusters/im-compatibility/compatibility-command-handlers.cpp",
+      "${chip_root}/src/app/clusters/im-compatibility/compatibility-common.cpp",
       "gen/IMClusterCommandHandler.cpp",
     ]
   }
