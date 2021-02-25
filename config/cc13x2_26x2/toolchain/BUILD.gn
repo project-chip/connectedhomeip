@@ -17,9 +17,9 @@ import("//build_overrides/chip.gni")
 
 import("${build_root}/toolchain/arm_gcc/arm_toolchain.gni")
 
-arm_toolchain("cc13x2_26x2_lock_app") {
+arm_toolchain("cc13x2x7_26x2x7_lock_app") {
   toolchain_args = {
     current_os = "freertos"
-    import("${chip_root}/examples/lock-app/cc13x2_26x2/args.gni")
+    import("${chip_root}/examples/lock-app/cc13x2x7_26x2x7/args.gni")
   }
 }

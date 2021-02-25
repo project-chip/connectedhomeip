@@ -249,6 +249,27 @@ CHIP_ERROR chip_ime_AppendCommand_ColorControl_StopMoveStep(chip::Controller::De
 }
 // End of Cluster ColorControl
 
+// Cluster ContentLaunch
+CHIP_ERROR chip_ime_AppendCommand_ContentLaunch_LaunchContent(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                              chip::GroupId ZCLgroupId)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::ContentLaunchCluster clusterContentLaunch;
+    (void) ZCLgroupId;
+    clusterContentLaunch.Associate(device, ZCLendpointId);
+    return clusterContentLaunch.LaunchContent(nullptr, nullptr);
+}
+CHIP_ERROR chip_ime_AppendCommand_ContentLaunch_LaunchURL(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                          chip::GroupId ZCLgroupId)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::ContentLaunchCluster clusterContentLaunch;
+    (void) ZCLgroupId;
+    clusterContentLaunch.Associate(device, ZCLendpointId);
+    return clusterContentLaunch.LaunchURL(nullptr, nullptr);
+}
+// End of Cluster ContentLaunch
+
 // Cluster DoorLock
 CHIP_ERROR chip_ime_AppendCommand_DoorLock_ClearAllPins(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
                                                         chip::GroupId ZCLgroupId)

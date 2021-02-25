@@ -181,11 +181,11 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
     admin = admins.AssignAdminId(1, kDestinationNodeId);
     NL_TEST_ASSERT(inSuite, admin != nullptr);
 
-    SecurePairingUsingTestSecret pairing1(Optional<NodeId>::Value(kSourceNodeId), 1, 2);
+    SecurePairingUsingTestSecret pairing1(1, 2);
     err = secureSessionMgr.NewPairing(peer, kSourceNodeId, &pairing1, SecureSessionMgr::PairingDirection::kInitiator, 1);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    SecurePairingUsingTestSecret pairing2(Optional<NodeId>::Value(kDestinationNodeId), 2, 1);
+    SecurePairingUsingTestSecret pairing2(2, 1);
     err = secureSessionMgr.NewPairing(peer, kDestinationNodeId, &pairing2, SecureSessionMgr::PairingDirection::kResponder, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
@@ -239,11 +239,11 @@ void SendEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     admin = admins.AssignAdminId(1, kDestinationNodeId);
     NL_TEST_ASSERT(inSuite, admin != nullptr);
 
-    SecurePairingUsingTestSecret pairing1(Optional<NodeId>::Value(kSourceNodeId), 1, 2);
+    SecurePairingUsingTestSecret pairing1(1, 2);
     err = secureSessionMgr.NewPairing(peer, kSourceNodeId, &pairing1, SecureSessionMgr::PairingDirection::kInitiator, 1);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    SecurePairingUsingTestSecret pairing2(Optional<NodeId>::Value(kDestinationNodeId), 2, 1);
+    SecurePairingUsingTestSecret pairing2(2, 1);
     err = secureSessionMgr.NewPairing(peer, kDestinationNodeId, &pairing2, SecureSessionMgr::PairingDirection::kResponder, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
@@ -313,11 +313,11 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     admin = admins.AssignAdminId(1, kDestinationNodeId);
     NL_TEST_ASSERT(inSuite, admin != nullptr);
 
-    SecurePairingUsingTestSecret pairing1(Optional<NodeId>::Value(kSourceNodeId), 1, 2);
+    SecurePairingUsingTestSecret pairing1(1, 2);
     err = secureSessionMgr.NewPairing(peer, kSourceNodeId, &pairing1, SecureSessionMgr::PairingDirection::kInitiator, 1);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    SecurePairingUsingTestSecret pairing2(Optional<NodeId>::Value(kDestinationNodeId), 2, 1);
+    SecurePairingUsingTestSecret pairing2(2, 1);
     err = secureSessionMgr.NewPairing(peer, kDestinationNodeId, &pairing2, SecureSessionMgr::PairingDirection::kResponder, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 

@@ -68,6 +68,7 @@ run_suite libCoreTests.a
 run_suite libInetLayerTests.a
 run_suite libRetransmitTests.a
 run_suite libSystemLayerTests.a
+run_suite libChipCryptoTests.a
 
 # TODO: Transport layer tests do not link:
 #    - getpid undefined
@@ -80,6 +81,3 @@ run_suite libSystemLayerTests.a
 #    - ArgParser for IPAddresses are not linked in
 #    - std::__throw_bad_alloc() linker errors
 # run_suite libTransportLayerTests.a "-lNetworkTestHelpers -lInetTestHelpers"
-
-# TODO - Fix crypto tests.
-# run_suite libChipCryptoTests.a || true

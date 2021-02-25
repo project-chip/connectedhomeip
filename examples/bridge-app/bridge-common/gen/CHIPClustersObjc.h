@@ -22,122 +22,128 @@
 
 #import <Foundation/Foundation.h>
 
-typedef void (^ResponseHandler)(NSError * _Nullable error, NSDictionary * _Nullable values);
-
 @class CHIPDevice;
+
+typedef void (^ResponseHandler)(NSError * _Nullable error, NSDictionary * _Nullable values);
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CHIPBasic : NSObject
+/**
+ * CHIPCluster
+ *    This is the base class for clusters.
+ */
+@interface CHIPCluster : NSObject
 
-- (nullable instancetype)initWithDevice:(CHIPDevice *)device endpoint:(uint8_t)endpoint queue:(dispatch_queue_t)queue;
-- (BOOL)resetToFactoryDefaults:(ResponseHandler)completionHandler;
-
-- (BOOL)readAttributeZclVersion:(ResponseHandler)completionHandler;
-- (BOOL)readAttributeApplicationVersion:(ResponseHandler)completionHandler;
-- (BOOL)readAttributeStackVersion:(ResponseHandler)completionHandler;
-- (BOOL)readAttributeHardwareVersion:(ResponseHandler)completionHandler;
-- (BOOL)readAttributeManufacturerName:(ResponseHandler)completionHandler;
-- (BOOL)readAttributeModelIdentifier:(ResponseHandler)completionHandler;
-- (BOOL)readAttributeDateCode:(ResponseHandler)completionHandler;
-- (BOOL)readAttributePowerSource:(ResponseHandler)completionHandler;
-- (BOOL)readAttributeGenericDeviceClass:(ResponseHandler)completionHandler;
-- (BOOL)readAttributeGenericDeviceType:(ResponseHandler)completionHandler;
-- (BOOL)readAttributeProductCode:(ResponseHandler)completionHandler;
-- (BOOL)readAttributeProductUrl:(ResponseHandler)completionHandler;
-- (BOOL)readAttributeSwBuildId:(ResponseHandler)completionHandler;
-- (BOOL)readAttributeClusterRevision:(ResponseHandler)completionHandler;
-
+- (nullable instancetype)initWithDevice:(CHIPDevice *)device
+                               endpoint:(uint8_t)endpoint
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
 
 @end
 
-NS_ASSUME_NONNULL_END
+/**
+ * Cluster Basic
+ *
+ */
+@interface CHIPBasic : CHIPCluster
 
-NS_ASSUME_NONNULL_BEGIN
+- (void)resetToFactoryDefaults:(ResponseHandler)completionHandler;
 
-@interface CHIPLevelControl : NSObject
+- (void)readAttributeZclVersion:(ResponseHandler)completionHandler;
+- (void)readAttributeApplicationVersion:(ResponseHandler)completionHandler;
+- (void)readAttributeStackVersion:(ResponseHandler)completionHandler;
+- (void)readAttributeHardwareVersion:(ResponseHandler)completionHandler;
+- (void)readAttributeManufacturerName:(ResponseHandler)completionHandler;
+- (void)readAttributeModelIdentifier:(ResponseHandler)completionHandler;
+- (void)readAttributeDateCode:(ResponseHandler)completionHandler;
+- (void)readAttributePowerSource:(ResponseHandler)completionHandler;
+- (void)readAttributeGenericDeviceClass:(ResponseHandler)completionHandler;
+- (void)readAttributeGenericDeviceType:(ResponseHandler)completionHandler;
+- (void)readAttributeProductCode:(ResponseHandler)completionHandler;
+- (void)readAttributeProductUrl:(ResponseHandler)completionHandler;
+- (void)readAttributeSwBuildId:(ResponseHandler)completionHandler;
+- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
 
-- (nullable instancetype)initWithDevice:(CHIPDevice *)device endpoint:(uint8_t)endpoint queue:(dispatch_queue_t)queue;
-- (BOOL)move:(uint8_t)moveMode
+@end
+
+/**
+ * Cluster Level Control
+ *
+ */
+@interface CHIPLevelControl : CHIPCluster
+
+- (void)move:(uint8_t)moveMode
                  rate:(uint8_t)rate
            optionMask:(uint8_t)optionMask
        optionOverride:(uint8_t)optionOverride
     completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)moveToLevel:(uint8_t)level
+- (void)moveToLevel:(uint8_t)level
        transitionTime:(uint16_t)transitionTime
            optionMask:(uint8_t)optionMask
        optionOverride:(uint8_t)optionOverride
     completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)moveToLevelWithOnOff:(uint8_t)level
+- (void)moveToLevelWithOnOff:(uint8_t)level
               transitionTime:(uint16_t)transitionTime
            completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)moveWithOnOff:(uint8_t)moveMode rate:(uint8_t)rate completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)step:(uint8_t)stepMode
+- (void)moveWithOnOff:(uint8_t)moveMode rate:(uint8_t)rate completionHandler:(ResponseHandler)completionHandler;
+- (void)step:(uint8_t)stepMode
              stepSize:(uint8_t)stepSize
        transitionTime:(uint16_t)transitionTime
            optionMask:(uint8_t)optionMask
        optionOverride:(uint8_t)optionOverride
     completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)stepWithOnOff:(uint8_t)stepMode
+- (void)stepWithOnOff:(uint8_t)stepMode
              stepSize:(uint8_t)stepSize
        transitionTime:(uint16_t)transitionTime
     completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)stop:(uint8_t)optionMask optionOverride:(uint8_t)optionOverride completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)stopWithOnOff:(ResponseHandler)completionHandler;
+- (void)stop:(uint8_t)optionMask optionOverride:(uint8_t)optionOverride completionHandler:(ResponseHandler)completionHandler;
+- (void)stopWithOnOff:(ResponseHandler)completionHandler;
 
-- (BOOL)readAttributeCurrentLevel:(ResponseHandler)completionHandler;
-- (BOOL)configureAttributeCurrentLevel:(uint16_t)minInterval
+- (void)readAttributeCurrentLevel:(ResponseHandler)completionHandler;
+- (void)configureAttributeCurrentLevel:(uint16_t)minInterval
                            maxInterval:(uint16_t)maxInterval
                                 change:(uint8_t)change
                      completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)reportAttributeCurrentLevel:(ResponseHandler)reportHandler;
-- (BOOL)readAttributeRemainingTime:(ResponseHandler)completionHandler;
-- (BOOL)readAttributeOptions:(ResponseHandler)completionHandler;
-- (BOOL)writeAttributeOptions:(uint8_t)value completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)readAttributeStartUpCurrentLevel:(ResponseHandler)completionHandler;
-- (BOOL)writeAttributeStartUpCurrentLevel:(uint8_t)value completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)readAttributeClusterRevision:(ResponseHandler)completionHandler;
-
-- (instancetype)init NS_UNAVAILABLE;
-+ (instancetype)new NS_UNAVAILABLE;
+- (void)reportAttributeCurrentLevel:(ResponseHandler)reportHandler;
+- (void)readAttributeRemainingTime:(ResponseHandler)completionHandler;
+- (void)readAttributeOptions:(ResponseHandler)completionHandler;
+- (void)writeAttributeOptions:(uint8_t)value completionHandler:(ResponseHandler)completionHandler;
+- (void)readAttributeStartUpCurrentLevel:(ResponseHandler)completionHandler;
+- (void)writeAttributeStartUpCurrentLevel:(uint8_t)value completionHandler:(ResponseHandler)completionHandler;
+- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
 
 @end
 
-NS_ASSUME_NONNULL_END
+/**
+ * Cluster On/off
+ *
+ */
+@interface CHIPOnOff : CHIPCluster
 
-NS_ASSUME_NONNULL_BEGIN
-
-@interface CHIPOnOff : NSObject
-
-- (nullable instancetype)initWithDevice:(CHIPDevice *)device endpoint:(uint8_t)endpoint queue:(dispatch_queue_t)queue;
-- (BOOL)off:(ResponseHandler)completionHandler;
-- (BOOL)offWithEffect:(uint8_t)effectId effectVariant:(uint8_t)effectVariant completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)on:(ResponseHandler)completionHandler;
-- (BOOL)onWithRecallGlobalScene:(ResponseHandler)completionHandler;
-- (BOOL)onWithTimedOff:(uint8_t)onOffControl
+- (void)off:(ResponseHandler)completionHandler;
+- (void)offWithEffect:(uint8_t)effectId effectVariant:(uint8_t)effectVariant completionHandler:(ResponseHandler)completionHandler;
+- (void)on:(ResponseHandler)completionHandler;
+- (void)onWithRecallGlobalScene:(ResponseHandler)completionHandler;
+- (void)onWithTimedOff:(uint8_t)onOffControl
                 onTime:(uint16_t)onTime
            offWaitTime:(uint16_t)offWaitTime
      completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)toggle:(ResponseHandler)completionHandler;
+- (void)toggle:(ResponseHandler)completionHandler;
 
-- (BOOL)readAttributeOnOff:(ResponseHandler)completionHandler;
-- (BOOL)configureAttributeOnOff:(uint16_t)minInterval
+- (void)readAttributeOnOff:(ResponseHandler)completionHandler;
+- (void)configureAttributeOnOff:(uint16_t)minInterval
                     maxInterval:(uint16_t)maxInterval
               completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)reportAttributeOnOff:(ResponseHandler)reportHandler;
-- (BOOL)readAttributeGlobalSceneControl:(ResponseHandler)completionHandler;
-- (BOOL)readAttributeOnTime:(ResponseHandler)completionHandler;
-- (BOOL)writeAttributeOnTime:(uint16_t)value completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)readAttributeOffWaitTime:(ResponseHandler)completionHandler;
-- (BOOL)writeAttributeOffWaitTime:(uint16_t)value completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)readAttributeStartUpOnOff:(ResponseHandler)completionHandler;
-- (BOOL)writeAttributeStartUpOnOff:(uint8_t)value completionHandler:(ResponseHandler)completionHandler;
-- (BOOL)readAttributeClusterRevision:(ResponseHandler)completionHandler;
-
-- (instancetype)init NS_UNAVAILABLE;
-+ (instancetype)new NS_UNAVAILABLE;
+- (void)reportAttributeOnOff:(ResponseHandler)reportHandler;
+- (void)readAttributeGlobalSceneControl:(ResponseHandler)completionHandler;
+- (void)readAttributeOnTime:(ResponseHandler)completionHandler;
+- (void)writeAttributeOnTime:(uint16_t)value completionHandler:(ResponseHandler)completionHandler;
+- (void)readAttributeOffWaitTime:(ResponseHandler)completionHandler;
+- (void)writeAttributeOffWaitTime:(uint16_t)value completionHandler:(ResponseHandler)completionHandler;
+- (void)readAttributeStartUpOnOff:(ResponseHandler)completionHandler;
+- (void)writeAttributeStartUpOnOff:(uint8_t)value completionHandler:(ResponseHandler)completionHandler;
+- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
 
 @end
 

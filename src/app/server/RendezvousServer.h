@@ -18,7 +18,9 @@
 #pragma once
 
 #include <app/server/AppDelegate.h>
+#include <core/CHIPPersistentStorageDelegate.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <support/ReturnMacros.h>
 #include <transport/RendezvousSession.h>
 
 namespace chip {
@@ -28,9 +30,16 @@ class RendezvousServer : public RendezvousSessionDelegate
 public:
     RendezvousServer();
 
-    CHIP_ERROR Init(const RendezvousParameters & params, TransportMgrBase * transportMgr, SecureSessionMgr * sessionMgr,
-                    Transport::AdminPairingInfo * admin);
-    void SetDelegate(AppDelegate * delegate) { mDelegate = delegate; };
+    CHIP_ERROR WaitForPairing(const RendezvousParameters & params, TransportMgrBase * transportMgr, SecureSessionMgr * sessionMgr,
+                              Transport::AdminPairingInfo * admin);
+
+    CHIP_ERROR Init(AppDelegate * delegate, PersistentStorageDelegate * storage)
+    {
+        VerifyOrReturnError(storage != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+        mDelegate = delegate;
+        mStorage  = storage;
+        return CHIP_NO_ERROR;
+    }
 
     //////////////// RendezvousSessionDelegate Implementation ///////////////////
 
@@ -46,6 +55,7 @@ public:
 private:
     RendezvousSession mRendezvousSession;
     AppDelegate * mDelegate;
+    PersistentStorageDelegate * mStorage = nullptr;
 };
 
 } // namespace chip

@@ -39,10 +39,10 @@ namespace app {
 namespace CommandPath {
 enum
 {
-    kCsTag_EndpointId          = 0,
-    kCsTag_GroupId             = 1,
-    kCsTag_NamespacedClusterId = 2,
-    kCsTag_CommandId           = 3,
+    kCsTag_EndpointId = 0,
+    kCsTag_GroupId    = 1,
+    kCsTag_ClusterId  = 2,
+    kCsTag_CommandId  = 3,
 };
 
 class Parser : public chip::app::Parser
@@ -95,15 +95,15 @@ public:
     CHIP_ERROR GetGroupId(chip::GroupId * const apGroupId) const;
 
     /**
-     *  @brief Get a TLVReader for the NamespacedClusterId. Next() must be called before accessing them.
+     *  @brief Get a TLVReader for the ClusterId. Next() must be called before accessing them.
      *
-     *  @param [in] apEndpointId    A pointer to NamespacedClusterId
+     *  @param [in] apEndpointId    A pointer to ClusterId
      *
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not any of the defined unsigned integer types
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetNamespacedClusterId(chip::ClusterId * const apNamespacedClusterId) const;
+    CHIP_ERROR GetClusterId(chip::ClusterId * const apClusterId) const;
 
     /**
      *  @brief Get a TLVReader for the CommandId. Next() must be called before accessing them.
@@ -159,18 +159,18 @@ public:
     CommandPath::Builder & GroupId(const chip::GroupId aGroupId);
 
     /**
-     *  @brief Inject NamespacedClusterId into the TLV stream.
+     *  @brief Inject ClusterId into the TLV stream.
      *
-     *  @param [in] aNamespacedClusterId NamespacedClusterId for this command path
+     *  @param [in] aClusterId ClusterId for this command path
      *
      *  @return A reference to *this
      */
-    CommandPath::Builder & NamespacedClusterId(const chip::ClusterId aNamespacedClusterId);
+    CommandPath::Builder & ClusterId(const chip::ClusterId aClusterId);
 
     /**
      *  @brief Inject CommandId into the TLV stream
      *
-     *  @param [in] aCommandId Command Id for NamespacedClusterId for this command path
+     *  @param [in] aCommandId Command Id for ClusterId for this command path
      *
      *  @return A reference to *this
      */

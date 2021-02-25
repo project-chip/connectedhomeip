@@ -1,6 +1,7 @@
 
 #include <platform/CHIPDeviceLayer.h>
-#include <platform/Linux/CHIPBluezHelper.h>
+#include <platform/Linux/bluez/AdapterIterator.h>
+#include <platform/Linux/bluez/MainLoop.h>
 #include <platform/internal/BLEManager.h>
 #include <support/CHIPMem.h>
 #include <support/ReturnMacros.h>
@@ -11,41 +12,118 @@ using namespace chip::DeviceLayer::Internal;
 
 extern "C" void * pychip_ble_adapter_list_new()
 {
-    return static_cast<void *>(new chip::DeviceLayer::Internal::AdapterIterator());
+    return static_cast<void *>(new AdapterIterator());
 }
 
-extern "C" void pychip_ble_adapter_list_delete(void * adapter)
+extern "C" void pychip_ble_adapter_list_delete(void * adapterIterator)
 {
-    delete static_cast<chip::DeviceLayer::Internal::AdapterIterator *>(adapter);
+    delete static_cast<AdapterIterator *>(adapterIterator);
 }
 
-extern "C" bool pychip_ble_adapter_list_next(void * adapter)
+extern "C" bool pychip_ble_adapter_list_next(void * adapterIterator)
 {
-    return static_cast<chip::DeviceLayer::Internal::AdapterIterator *>(adapter)->Next();
+    return static_cast<AdapterIterator *>(adapterIterator)->Next();
 }
 
-extern "C" unsigned pychip_ble_adapter_list_get_index(void * adapter)
+extern "C" uint32_t pychip_ble_adapter_list_get_index(void * adapterIterator)
 {
-    /// NOTE: returning unsigned because python native has no sized values
-    return static_cast<chip::DeviceLayer::Internal::AdapterIterator *>(adapter)->GetIndex();
+    return static_cast<AdapterIterator *>(adapterIterator)->GetIndex();
 }
 
-extern "C" const char * pychip_ble_adapter_list_get_address(void * adapter)
+extern "C" const char * pychip_ble_adapter_list_get_address(void * adapterIterator)
 {
-    return static_cast<chip::DeviceLayer::Internal::AdapterIterator *>(adapter)->GetAddress();
+    return static_cast<AdapterIterator *>(adapterIterator)->GetAddress();
 }
 
-extern "C" const char * pychip_ble_adapter_list_get_alias(void * adapter)
+extern "C" const char * pychip_ble_adapter_list_get_alias(void * adapterIterator)
 {
-    return static_cast<chip::DeviceLayer::Internal::AdapterIterator *>(adapter)->GetAlias();
+    return static_cast<AdapterIterator *>(adapterIterator)->GetAlias();
 }
 
-extern "C" const char * pychip_ble_adapter_list_get_name(void * adapter)
+extern "C" const char * pychip_ble_adapter_list_get_name(void * adapterIterator)
 {
-    return static_cast<chip::DeviceLayer::Internal::AdapterIterator *>(adapter)->GetName();
+    return static_cast<AdapterIterator *>(adapterIterator)->GetName();
 }
 
-extern "C" bool pychip_ble_adapter_list_is_powered(void * adapter)
+extern "C" bool pychip_ble_adapter_list_is_powered(void * adapterIterator)
 {
-    return static_cast<chip::DeviceLayer::Internal::AdapterIterator *>(adapter)->IsPowered();
+    return static_cast<AdapterIterator *>(adapterIterator)->IsPowered();
+}
+
+extern "C" void * pychip_ble_adapter_list_get_raw_adapter(void * adapterIterator)
+{
+    return static_cast<AdapterIterator *>(adapterIterator)->GetAdapter();
+}
+
+/////////// CHIP Device scanner implementation //////////
+
+namespace {
+
+// To avoid pythoon compatibility issues on inc/dec references,
+// code assumes an abstract type and leaves it up to python to keep track of
+// reference counts
+struct PyObject;
+
+class ScannerDelegateImpl : public ChipDeviceScannerDelegate
+{
+public:
+    using DeviceScannedCallback = void (*)(PyObject * context, const char * address, uint16_t discriminator, uint16_t vendorId,
+                                           uint16_t productId);
+    using ScanCompleteCallback  = void (*)(PyObject * context);
+
+    ScannerDelegateImpl(PyObject * context, DeviceScannedCallback scanCallback, ScanCompleteCallback completeCallback) :
+        mContext(context), mScanCallback(scanCallback), mCompleteCallback(completeCallback)
+    {}
+
+    void SetScanner(std::unique_ptr<ChipDeviceScanner> scanner) { mScanner = std::move(scanner); }
+
+    void OnDeviceScanned(BluezDevice1 * device, const chip::Ble::ChipBLEDeviceIdentificationInfo & info) override
+    {
+        if (mScanCallback)
+        {
+            mScanCallback(mContext, bluez_device1_get_address(device), info.GetDeviceDiscriminator(), info.GetProductId(),
+                          info.GetVendorId());
+        }
+    }
+
+    void OnScanComplete() override
+    {
+        if (mCompleteCallback)
+        {
+            mCompleteCallback(mContext);
+        }
+
+        delete this;
+    }
+
+private:
+    std::unique_ptr<ChipDeviceScanner> mScanner;
+    PyObject * const mContext;
+    const DeviceScannedCallback mScanCallback;
+    const ScanCompleteCallback mCompleteCallback;
+};
+
+} // namespace
+
+extern "C" void * pychip_ble_start_scanning(PyObject * context, void * adapter, uint32_t timeout,
+                                            ScannerDelegateImpl::DeviceScannedCallback scanCallback,
+                                            ScannerDelegateImpl::ScanCompleteCallback completeCallback)
+{
+    std::unique_ptr<ScannerDelegateImpl> delegate = std::make_unique<ScannerDelegateImpl>(context, scanCallback, completeCallback);
+
+    std::unique_ptr<ChipDeviceScanner> scanner = ChipDeviceScanner::Create(static_cast<BluezAdapter1 *>(adapter), delegate.get());
+
+    if (!scanner)
+    {
+        return nullptr;
+    }
+
+    if (scanner->StartScan(timeout) != CHIP_NO_ERROR)
+    {
+        return nullptr;
+    }
+
+    delegate->SetScanner(std::move(scanner));
+
+    return delegate.release();
 }

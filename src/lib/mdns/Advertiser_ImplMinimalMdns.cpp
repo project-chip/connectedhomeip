@@ -86,35 +86,66 @@ void LogQuery(const QueryData & data)
     ChipLogDetail(Discovery, "%s", logString.c_str());
 }
 
+/// Checks if the current interface is powered on
+/// and not local loopback.
+template <typename T>
+bool IsCurrentInterfaceUsable(T & iterator)
+{
+    if (!iterator.IsUp() || !iterator.SupportsMulticast())
+    {
+        return false; // not a usable interface
+    }
+    char name[chip::Inet::InterfaceIterator::kMaxIfNameLength];
+    if (iterator.GetInterfaceName(name, sizeof(name)) != CHIP_NO_ERROR)
+    {
+        ChipLogError(Discovery, "Failed to get interface name.");
+        return false;
+    }
+
+    // TODO: need a better way to ignore local loopback interfaces/addresses
+    // We do not want to listen on local loopback even though they are up and
+    // support multicast
+    //
+    // Some way to detect 'is local looback' that is smarter (e.g. at least
+    // strict string compare on linux instead of substring) would be better.
+    //
+    // This would reject likely valid interfaces like 'lollipop' or 'lostinspace'
+    if (strncmp(name, "lo", 2) == 0)
+    {
+        /// local loopback interface is not usable by MDNS
+        return false;
+    }
+    return true;
+}
+
 class AllInterfaces : public ListenIterator
 {
+private:
 public:
-    AllInterfaces() {}
+    AllInterfaces() { SkipToFirstValidInterface(); }
 
     bool Next(chip::Inet::InterfaceId * id, chip::Inet::IPAddressType * type) override
     {
-#if INET_CONFIG_ENABLE_IPV4
-        if (mState == State::kIpV4)
-        {
-            *id    = INET_NULL_INTERFACEID;
-            *type  = chip::Inet::kIPAddressType_IPv4;
-            mState = State::kIpV6;
-
-            SkipToFirstValidInterface();
-            return true;
-        }
-#else
-        mState = State::kIpV6;
-        SkipToFirstValidInterface();
-#endif
-
         if (!mIterator.HasCurrent())
         {
             return false;
         }
 
+#if INET_CONFIG_ENABLE_IPV4
+        if (mState == State::kIpV4)
+        {
+            *id    = mIterator.GetInterfaceId();
+            *type  = chip::Inet::kIPAddressType_IPv4;
+            mState = State::kIpV6;
+            return true;
+        }
+#endif
+
         *id   = mIterator.GetInterfaceId();
         *type = chip::Inet::kIPAddressType_IPv6;
+#if INET_CONFIG_ENABLE_IPV4
+        mState = State::kIpV4;
+#endif
 
         for (mIterator.Next(); SkipCurrentInterface(); mIterator.Next())
         {
@@ -128,7 +159,11 @@ private:
         kIpV4,
         kIpV6,
     };
+#if INET_CONFIG_ENABLE_IPV4
     State mState = State::kIpV4;
+#else
+    State mState = State::kIpV6;
+#endif
     chip::Inet::InterfaceIterator mIterator;
 
     void SkipToFirstValidInterface()
@@ -149,23 +184,7 @@ private:
             return false; // nothing to try.
         }
 
-        if (!mIterator.IsUp() || !mIterator.SupportsMulticast())
-        {
-            return true; // not a usable interface
-        }
-        char name[64];
-        if (mIterator.GetInterfaceName(name, sizeof(name)) != CHIP_NO_ERROR)
-        {
-            ChipLogError(Discovery, "Interface iterator failed to get interface name.");
-            return true;
-        }
-
-        if (strncmp(name, "lo", 2) == 0)
-        {
-            ChipLogDetail(Discovery, "Skipping interface '%s' (assume local loopback)", name);
-            return true;
-        }
-        return false;
+        return !IsCurrentInterfaceUsable(mIterator);
     }
 };
 
@@ -208,6 +227,15 @@ private:
     /// Sets the query responder to a blank state and frees up any
     /// allocated memory.
     void Clear();
+
+    /// Advertise available records configured within the server
+    ///
+    /// Usable as boot-time advertisement of available SRV records.
+    void AdvertiseRecords();
+
+    /// Determine if advertisement on the specified interface/address is ok given the
+    /// interfaces on which the mDNS server is listening
+    bool ShouldAdvertiseOn(const chip::Inet::InterfaceId id, const chip::Inet::IPAddress & addr);
 
     QueryResponderSettings AddAllocatedResponder(Responder * responder)
     {
@@ -327,6 +355,9 @@ CHIP_ERROR AdvertiserMinMdns::Start(chip::Inet::InetLayer * inetLayer, uint16_t 
     ReturnErrorOnFailure(mServer.Listen(inetLayer, &allInterfaces, port));
 
     ChipLogProgress(Discovery, "CHIP minimal mDNS started advertising.");
+
+    AdvertiseRecords();
+
     return CHIP_NO_ERROR;
 }
 
@@ -567,6 +598,86 @@ FullQName AdvertiserMinMdns::GetCommisioningTextEntries(const CommissionAdvertis
     {
         return AllocateQName(txtDiscriminator, txtVidPid);
     }
+}
+
+bool AdvertiserMinMdns::ShouldAdvertiseOn(const chip::Inet::InterfaceId id, const chip::Inet::IPAddress & addr)
+{
+    for (unsigned i = 0; i < mServer.GetEndpointCount(); i++)
+    {
+        const ServerBase::EndpointInfo & info = mServer.GetEndpoints()[i];
+
+        if (info.udp == nullptr)
+        {
+            continue;
+        }
+
+        if (info.interfaceId != id)
+        {
+            continue;
+        }
+
+        if (info.addressType != addr.Type())
+        {
+            continue;
+        }
+
+        return true;
+    }
+
+    return false;
+}
+
+void AdvertiserMinMdns::AdvertiseRecords()
+{
+    chip::Inet::InterfaceAddressIterator interfaceAddress;
+
+    if (!interfaceAddress.Next())
+    {
+        return;
+    }
+
+    for (; interfaceAddress.HasCurrent(); interfaceAddress.Next())
+    {
+        if (!IsCurrentInterfaceUsable(interfaceAddress))
+        {
+            continue;
+        }
+
+        if (!ShouldAdvertiseOn(interfaceAddress.GetInterfaceId(), interfaceAddress.GetAddress()))
+        {
+            continue;
+        }
+
+        chip::Inet::IPPacketInfo packetInfo;
+
+        packetInfo.Clear();
+        packetInfo.SrcAddress = interfaceAddress.GetAddress();
+        if (interfaceAddress.GetAddress().IsIPv4())
+        {
+            BroadcastIpAddresses::GetIpv4Into(packetInfo.DestAddress);
+        }
+        else
+        {
+            BroadcastIpAddresses::GetIpv6Into(packetInfo.DestAddress);
+        }
+        packetInfo.SrcPort   = kMdnsPort;
+        packetInfo.DestPort  = kMdnsPort;
+        packetInfo.Interface = interfaceAddress.GetInterfaceId();
+
+        QueryData queryData(QType::PTR, QClass::IN, false /* unicast */);
+        queryData.SetIsBootAdvertising(true);
+
+        mQueryResponder.ClearBroadcastThrottle();
+
+        CHIP_ERROR err = mResponseSender.Respond(0, queryData, &packetInfo);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Discovery, "Failed to advertise records: %s", ErrorStr(err));
+        }
+    }
+
+    // Once all automatic broadcasts are done, allow immediate replies once.
+    mQueryResponder.ClearBroadcastThrottle();
 }
 
 AdvertiserMinMdns gAdvertiser;

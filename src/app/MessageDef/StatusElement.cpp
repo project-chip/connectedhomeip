@@ -151,19 +151,19 @@ CHIP_ERROR StatusElement::Parser::CheckSchemaValidity() const
             }
 #endif // CHIP_DETAIL_LOGGING
         }
-        else if (!(TagPresenceMask & (1 << kCsTag_NamespacedClusterId)))
+        else if (!(TagPresenceMask & (1 << kCsTag_ClusterId)))
         {
-            TagPresenceMask |= (1 << kCsTag_NamespacedClusterId);
+            TagPresenceMask |= (1 << kCsTag_ClusterId);
 
             VerifyOrExit(chip::TLV::kTLVType_UnsignedInteger == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
 
 #if CHIP_DETAIL_LOGGING
             {
-                chip::ClusterId namespacedClusterId;
-                err = reader.Get(namespacedClusterId);
+                chip::ClusterId clusterId;
+                err = reader.Get(clusterId);
                 SuccessOrExit(err);
 
-                PRETTY_PRINT("\tNamespacedClusterId = 0x%" PRIx32 ",", namespacedClusterId);
+                PRETTY_PRINT("\tClusterId = 0x%" PRIx32 ",", clusterId);
             }
 #endif // CHIP_DETAIL_LOGGING
         }
@@ -210,7 +210,7 @@ CHIP_ERROR StatusElement::Builder::Init(chip::TLV::TLVWriter * const apWriter, c
 
 StatusElement::Builder & StatusElement::Builder::EncodeStatusElement(const uint16_t aGeneralCode, const uint32_t aProtocolId,
                                                                      const uint16_t aStatusElement,
-                                                                     const chip::ClusterId aNamespacedClusterId)
+                                                                     const chip::ClusterId aClusterId)
 {
     uint64_t tag = chip::TLV::AnonymousTag;
 
@@ -225,7 +225,7 @@ StatusElement::Builder & StatusElement::Builder::EncodeStatusElement(const uint1
     mError = mpWriter->Put(tag, aStatusElement);
     SuccessOrExit(mError);
 
-    mError = mpWriter->Put(tag, aNamespacedClusterId);
+    mError = mpWriter->Put(tag, aClusterId);
     SuccessOrExit(mError);
 
 exit:

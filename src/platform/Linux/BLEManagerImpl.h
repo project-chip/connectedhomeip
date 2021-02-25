@@ -28,30 +28,14 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
+#include "bluez/ChipDeviceScanner.h"
+#include "bluez/Types.h"
+
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-struct BluezEndpoint;
-
 void HandleIncomingBleConnection(Ble::BLEEndPoint * bleEP);
-
-enum ChipAdvType
-{
-    BLUEZ_ADV_TYPE_CONNECTABLE = 0x01,
-    BLUEZ_ADV_TYPE_SCANNABLE   = 0x02,
-    BLUEZ_ADV_TYPE_DIRECTED    = 0x04,
-
-    BLUEZ_ADV_TYPE_UNDIRECTED_NONCONNECTABLE_NONSCANNABLE = 0,
-    BLUEZ_ADV_TYPE_UNDIRECTED_CONNECTABLE_NONSCANNABLE    = BLUEZ_ADV_TYPE_CONNECTABLE,
-    BLUEZ_ADV_TYPE_UNDIRECTED_NONCONNECTABLE_SCANNABLE    = BLUEZ_ADV_TYPE_SCANNABLE,
-    BLUEZ_ADV_TYPE_UNDIRECTED_CONNECTABLE_SCANNABLE       = BLUEZ_ADV_TYPE_CONNECTABLE | BLUEZ_ADV_TYPE_SCANNABLE,
-
-    BLUEZ_ADV_TYPE_DIRECTED_NONCONNECTABLE_NONSCANNABLE = BLUEZ_ADV_TYPE_DIRECTED,
-    BLUEZ_ADV_TYPE_DIRECTED_CONNECTABLE_NONSCANNABLE    = BLUEZ_ADV_TYPE_DIRECTED | BLUEZ_ADV_TYPE_CONNECTABLE,
-    BLUEZ_ADV_TYPE_DIRECTED_NONCONNECTABLE_SCANNABLE    = BLUEZ_ADV_TYPE_DIRECTED | BLUEZ_ADV_TYPE_SCANNABLE,
-    BLUEZ_ADV_TYPE_DIRECTED_CONNECTABLE_SCANNABLE = BLUEZ_ADV_TYPE_DIRECTED | BLUEZ_ADV_TYPE_CONNECTABLE | BLUEZ_ADV_TYPE_SCANNABLE,
-};
 
 struct BLEAdvConfig
 {
@@ -68,10 +52,23 @@ struct BLEAdvConfig
     const char * mpAdvertisingUUID;
 };
 
+enum class BleScanState
+{
+    kNotScanning,
+    kScanForDiscriminator,
+    kScanForAddress,
+};
+
 struct BLEScanConfig
 {
-    // Discriminator of seeked device (encoded in its BLE advertising payload)
+    // If a active scan for connection is being performed
+    BleScanState bleScanState = BleScanState::kNotScanning;
+
+    // If scanning by discriminator, what are we scanning for
     uint16_t mDiscriminator = 0;
+
+    // If scanning by address, what address are we searching for
+    std::string mAddress;
 
     // Optional argument to be passed to callback functions provided by the BLE scan/connect requestor
     void * mAppState = nullptr;
@@ -84,7 +81,8 @@ class BLEManagerImpl final : public BLEManager,
                              private Ble::BleLayer,
                              private Ble::BlePlatformDelegate,
                              private Ble::BleApplicationDelegate,
-                             private Ble::BleConnectionDelegate
+                             private Ble::BleConnectionDelegate,
+                             private ChipDeviceScannerDelegate
 {
     // Allow the BLEManager interface class to delegate method calls to
     // the implementation methods provided by this class.
@@ -153,6 +151,10 @@ private:
 
     void NewConnection(BleLayer * bleLayer, void * appState, uint16_t connDiscriminator) override;
 
+    // ===== Members that implement virtual methods on ChipDeviceScannerDelegate
+    void OnDeviceScanned(BluezDevice1 * device, const chip::Ble::ChipBLEDeviceIdentificationInfo & info) override;
+    void OnScanComplete() override;
+
     // ===== Members for internal use by the following friends.
 
     friend BLEManager & BLEMgr();
@@ -173,7 +175,6 @@ private:
         kFlag_FastAdvertisingEnabled   = 0x0080, /**< The application has enabled fast advertising. */
         kFlag_UseCustomDeviceName      = 0x0100, /**< The application has configured a custom BLE device name. */
         kFlag_AdvertisingRefreshNeeded = 0x0200, /**< The advertising configuration/state in BLE layer needs to be updated. */
-        kFlag_Scanning                 = 0x0400, /**< The system is currently scanning for CHIPoBLE devices */
     };
 
     enum
@@ -189,13 +190,17 @@ private:
     void DriveBLEState();
     static void DriveBLEState(intptr_t arg);
 
+    void InitiateScan(BleScanState scanType);
+    static void InitiateScan(intptr_t arg);
+
     CHIPoBLEServiceMode mServiceMode;
     BLEAdvConfig mBLEAdvConfig;
     BLEScanConfig mBLEScanConfig;
     uint16_t mFlags;
     char mDeviceName[kMaxDeviceNameLength + 1];
-    bool mIsCentral = false;
-    void * mpAppState;
+    bool mIsCentral            = false;
+    BluezEndpoint * mpEndpoint = nullptr;
+    std::unique_ptr<ChipDeviceScanner> mDeviceScanner;
 };
 
 /**

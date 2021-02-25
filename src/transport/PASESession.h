@@ -54,8 +54,6 @@ struct PASESessionSerializable
     uint16_t mKeLen;
     uint8_t mKe[kMAX_Hash_Length];
     uint8_t mPairingComplete;
-    uint64_t mLocalNodeId;
-    uint64_t mPeerNodeId;
     uint16_t mLocalKeyId;
     uint16_t mPeerKeyId;
 };
@@ -81,28 +79,25 @@ public:
      * @param pbkdf2IterCount Iteration count for PBKDF2 function
      * @param salt            Salt to be used for SPAKE2P opertation
      * @param saltLen         Length of salt
-     * @param myNodeId        Optional node id of local node
      * @param myKeyId         Key ID to be assigned to the secure session on the peer node
      * @param delegate        Callback object
      *
      * @return CHIP_ERROR     The result of initialization
      */
     CHIP_ERROR WaitForPairing(uint32_t mySetUpPINCode, uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen,
-                              Optional<NodeId> myNodeId, uint16_t myKeyId, SessionEstablishmentDelegate * delegate);
+                              uint16_t myKeyId, SessionEstablishmentDelegate * delegate);
 
     /**
      * @brief
      *   Initialize using PASE verifier and wait for pairing requests.
      *
      * @param verifier        PASE verifier to be used for SPAKE2P pairing
-     * @param myNodeId        Optional node id of local node
      * @param myKeyId         Key ID to be assigned to the secure session on the peer node
      * @param delegate        Callback object
      *
      * @return CHIP_ERROR     The result of initialization
      */
-    CHIP_ERROR WaitForPairing(const PASEVerifier & verifier, Optional<NodeId> myNodeId, uint16_t myKeyId,
-                              SessionEstablishmentDelegate * delegate);
+    CHIP_ERROR WaitForPairing(const PASEVerifier & verifier, uint16_t myKeyId, SessionEstablishmentDelegate * delegate);
 
     /**
      * @brief
@@ -110,15 +105,13 @@ public:
      *
      * @param peerAddress      Address of peer to pair
      * @param peerSetUpPINCode Setup PIN code of the peer device
-     * @param myNodeId         Optional node id of local node
-     * @param peerNodeId       Node id assigned to the peer node by commissioner
      * @param myKeyId          Key ID to be assigned to the secure session on the peer node
      * @param delegate         Callback object
      *
      * @return CHIP_ERROR      The result of initialization
      */
-    CHIP_ERROR Pair(const Transport::PeerAddress peerAddress, uint32_t peerSetUpPINCode, Optional<NodeId> myNodeId,
-                    NodeId peerNodeId, uint16_t myKeyId, SessionEstablishmentDelegate * delegate);
+    CHIP_ERROR Pair(const Transport::PeerAddress peerAddress, uint32_t peerSetUpPINCode, uint16_t myKeyId,
+                    SessionEstablishmentDelegate * delegate);
 
     /**
      * @brief
@@ -126,15 +119,13 @@ public:
      *
      * @param peerAddress      Address of peer to pair
      * @param verifier         PASE verifier to be used for SPAKE2P pairing
-     * @param myNodeId         Optional node id of local node
-     * @param peerNodeId       Node id assigned to the peer node by commissioner
      * @param myKeyId          Key ID to be assigned to the secure session on the peer node
      * @param delegate         Callback object
      *
      * @return CHIP_ERROR      The result of initialization
      */
-    CHIP_ERROR Pair(const Transport::PeerAddress peerAddress, const PASEVerifier & verifier, Optional<NodeId> myNodeId,
-                    NodeId peerNodeId, uint16_t myKeyId, SessionEstablishmentDelegate * delegate);
+    CHIP_ERROR Pair(const Transport::PeerAddress peerAddress, const PASEVerifier & verifier, uint16_t myKeyId,
+                    SessionEstablishmentDelegate * delegate);
 
     /**
      * @brief
@@ -159,7 +150,7 @@ public:
      *                    initialized once pairing is complete
      * @return CHIP_ERROR The result of session derivation
      */
-    virtual CHIP_ERROR DeriveSecureSession(const uint8_t * info, size_t info_len, SecureSession & session);
+    CHIP_ERROR DeriveSecureSession(const uint8_t * info, size_t info_len, SecureSession & session);
 
     /**
      * @brief
@@ -172,14 +163,6 @@ public:
      */
     virtual CHIP_ERROR HandlePeerMessage(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
                                          System::PacketBufferHandle msg);
-
-    /**
-     * @brief
-     *  Return the associated secure session peer NodeId
-     *
-     * @return Optional<NodeId> The associated peer NodeId
-     */
-    NodeId GetPeerNodeId() const { return mConnectionState.GetPeerNodeId(); }
 
     /**
      * @brief
@@ -223,6 +206,10 @@ public:
      **/
     CHIP_ERROR FromSerializable(const PASESessionSerializable & output);
 
+    /** @brief This function zeroes out and resets the memory used by the object.
+     **/
+    void Clear();
+
 private:
     enum Spake2pErrorType : uint8_t
     {
@@ -230,7 +217,7 @@ private:
         kUnexpected             = 0xff,
     };
 
-    CHIP_ERROR Init(Optional<NodeId> myNodeId, uint16_t myKeyId, uint32_t setupCode, SessionEstablishmentDelegate * delegate);
+    CHIP_ERROR Init(uint16_t myKeyId, uint32_t setupCode, SessionEstablishmentDelegate * delegate);
 
     static CHIP_ERROR ComputePASEVerifier(uint32_t mySetUpPINCode, uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen,
                                           PASEVerifier & verifier);
@@ -253,8 +240,6 @@ private:
     void HandleErrorMsg(const PacketHeader & header, const System::PacketBufferHandle & msg);
 
     CHIP_ERROR AttachHeaderAndSend(Protocols::SecureChannel::MsgType msgType, System::PacketBufferHandle msgBuf);
-
-    void Clear();
 
     SessionEstablishmentDelegate * mDelegate = nullptr;
 
@@ -282,8 +267,6 @@ private:
     };
 
 protected:
-    NodeId mLocalNodeId = kUndefinedNodeId;
-
     uint8_t mKe[kMAX_Hash_Length];
 
     size_t mKeLen = sizeof(mKe);
@@ -321,13 +304,12 @@ public:
         mPairingComplete = true;
     }
 
-    SecurePairingUsingTestSecret(Optional<NodeId> peerNodeId, uint16_t peerKeyId, uint16_t localKeyId)
+    SecurePairingUsingTestSecret(uint16_t peerKeyId, uint16_t localKeyId)
     {
         const char * secret = "Test secret for key derivation";
         size_t secretLen    = strlen(secret);
         mKeLen              = secretLen;
         memmove(mKe, secret, mKeLen);
-        mConnectionState.SetPeerNodeId(peerNodeId.ValueOr(kUndefinedNodeId));
         mConnectionState.SetPeerKeyID(peerKeyId);
         mConnectionState.SetLocalKeyID(localKeyId);
         mPairingComplete = true;
@@ -336,13 +318,13 @@ public:
     ~SecurePairingUsingTestSecret() override {}
 
     CHIP_ERROR WaitForPairing(uint32_t mySetUpPINCode, uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen,
-                              Optional<NodeId> myNodeId, uint16_t myKeyId, SessionEstablishmentDelegate * delegate)
+                              uint16_t myKeyId, SessionEstablishmentDelegate * delegate)
     {
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR Pair(uint32_t peerSetUpPINCode, uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen,
-                    Optional<NodeId> myNodeId, uint16_t myKeyId, SessionEstablishmentDelegate * delegate)
+    CHIP_ERROR Pair(uint32_t peerSetUpPINCode, uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen, uint16_t myKeyId,
+                    SessionEstablishmentDelegate * delegate)
     {
         return CHIP_NO_ERROR;
     }

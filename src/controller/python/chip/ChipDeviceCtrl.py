@@ -115,16 +115,16 @@ class ChipDeviceController(object):
             )
         )
 
-    def ConnectBLE(self, discriminator, setupPinCode):
+    def ConnectBLE(self, discriminator, setupPinCode, nodeid):
         self.state = DCState.RENDEZVOUS_ONGOING
         return self._ChipStack.CallAsync(
-            lambda: self._dmLib.pychip_DeviceController_ConnectBLE(self.devCtrl, discriminator, setupPinCode)
+            lambda: self._dmLib.pychip_DeviceController_ConnectBLE(self.devCtrl, discriminator, setupPinCode, nodeid)
         )
 
-    def ConnectIP(self, ipaddr, setupPinCode):
+    def ConnectIP(self, ipaddr, setupPinCode, nodeid):
         self.state = DCState.RENDEZVOUS_ONGOING
         return self._ChipStack.CallAsync(
-            lambda: self._dmLib.pychip_DeviceController_ConnectIP(self.devCtrl, ipaddr, setupPinCode)
+            lambda: self._dmLib.pychip_DeviceController_ConnectIP(self.devCtrl, ipaddr, setupPinCode, nodeid)
         )
 
     def ZCLSend(self, cluster, command, nodeid, endpoint, groupid, args):
@@ -158,6 +158,11 @@ class ChipDeviceController(object):
         if ret != 0:
             raise self._ChipStack.ErrorToException(res)
 
+    def SetThreadCredential(self, channel, panid, masterKey):
+        ret = self._dmLib.pychip_ScriptDevicePairingDelegate_SetThreadCredential(self.devCtrl, channel, panid, masterKey.encode("utf-8") + b'\0')
+        if ret != 0:
+            raise self._ChipStack.ErrorToException(ret)
+
     # ----- Private Members -----
     def _InitLib(self):
         if self._dmLib is None:
@@ -175,10 +180,10 @@ class ChipDeviceController(object):
                 c_uint32
             )
 
-            self._dmLib.pychip_DeviceController_ConnectBLE.argtypes = [c_void_p, c_uint16, c_uint32]
+            self._dmLib.pychip_DeviceController_ConnectBLE.argtypes = [c_void_p, c_uint16, c_uint32, c_uint64]
             self._dmLib.pychip_DeviceController_ConnectBLE.restype = c_uint32
 
-            self._dmLib.pychip_DeviceController_ConnectIP.argtypes = [c_void_p, c_char_p, c_uint32]
+            self._dmLib.pychip_DeviceController_ConnectIP.argtypes = [c_void_p, c_char_p, c_uint32, c_uint64]
             self._dmLib.pychip_DeviceController_ConnectIP.restype = c_uint32
 
             self._dmLib.pychip_ScriptDevicePairingDelegate_SetWifiCredential.argtypes = [c_void_p, c_char_p, c_char_p]

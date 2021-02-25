@@ -266,6 +266,10 @@ public:
     /// Flag any additional responses required for the given iterator
     void MarkAdditionalRepliesFor(QueryResponderIterator it);
 
+    /// Resets the internal broadcast throttle setting to allow re-broadcasting
+    /// of all packets without a timedelay.
+    void ClearBroadcastThrottle();
+
 private:
     Internal::QueryResponderInfo * mResponderInfos;
     size_t mResponderInfoSize;
