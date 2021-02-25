@@ -234,6 +234,8 @@ private:
                            System::PacketBufferHandle msgBuf, SecureSessionMgr * msgLayer) override;
 
     void OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * mgr) override;
+
+    void OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr) override;
 };
 
 } // namespace Messaging

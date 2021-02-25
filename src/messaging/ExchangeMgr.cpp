@@ -336,6 +336,12 @@ void ExchangeManager::OnConnectionExpired(SecureSessionHandle session, SecureSes
             // Continue iterate because there can be multiple contexts associated with the connection.
         }
     }
+#if CHIP_CONFIG_EXPERIMENTAL
+    if (mLegacySecureSessionDelegate != nullptr)
+    {
+        mLegacySecureSessionDelegate->OnConnectionExpired(session, mgr);
+    }
+#endif
 }
 
 void ExchangeManager::IncrementContextsInUse()
@@ -353,6 +359,16 @@ void ExchangeManager::DecrementContextsInUse()
     {
         ChipLogError(ExchangeManager, "No context in use, decrement failed");
     }
+}
+
+void ExchangeManager::OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr)
+{
+#if CHIP_CONFIG_EXPERIMENTAL
+    if (mLegacySecureSessionDelegate != nullptr)
+    {
+        mLegacySecureSessionDelegate->OnNewConnection(session, mgr);
+    }
+#endif
 }
 
 } // namespace Messaging
