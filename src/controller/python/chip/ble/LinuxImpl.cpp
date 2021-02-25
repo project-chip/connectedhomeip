@@ -100,7 +100,7 @@ private:
     const std::unique_ptr<ChipDeviceScanner> mScanner;
     PyObject * const mContext;
     const DeviceScannedCallback mScanCallback;
-    const kScanCompleteCallback mCompleteCallback;
+    const ScanCompleteCallback mCompleteCallback;
 };
 
 } // namespace

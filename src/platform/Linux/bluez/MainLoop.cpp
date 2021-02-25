@@ -134,12 +134,8 @@ CHIP_ERROR MainLoop::EnsureStarted()
     Semaphore semaphore;
 
     GMainContext * context = g_main_loop_get_context(mBluezMainLoop);
-    if (context == nullptr)
-    {
-        ChipLogError(DeviceLayer, "Unexpected null context on the main loop");
-        // bluez loop not cleaned as running thread is already started.
-        return CHIP_ERROR_INTERNAL;
-    }
+    VerifyOrDieWithMsg(context != nullptr, "Unexpected null context on the main loop");
+
     g_main_context_invoke(context, GSourceFunc(PostSemaphore), &semaphore);
 
     semaphore.Wait();
