@@ -24,6 +24,7 @@
 
 #include <assert.h>
 #include <inet/InetLayer.h>
+#include <messaging/ExchangeMgr.h>
 #include <support/logging/CHIPLogging.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/raw/MessageHeader.h>
@@ -75,7 +76,9 @@ EmberStatus chipSendUnicast(NodeId destination, EmberApsFrame * apsFrame, uint16
     buffer->SetDataLength(dataLength);
 
     // TODO: temprary create a handle from node id, will be fix in PR 3602
-    CHIP_ERROR err = SessionManager().SendMessage({ destination, Transport::kAnyKeyId, 0 }, std::move(buffer));
+    PayloadHeader payloadHeader;
+    payloadHeader.SetExchangeID(Messaging::ExchangeManager::kReservedExchangeId);
+    CHIP_ERROR err = SessionManager().SendMessage({ destination, Transport::kAnyKeyId, 0 }, payloadHeader, std::move(buffer));
     if (err != CHIP_NO_ERROR)
     {
         // FIXME: Figure out better translations between our error types?

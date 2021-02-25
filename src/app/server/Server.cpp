@@ -410,9 +410,7 @@ private:
     AppDelegate * mDelegate = nullptr;
 };
 
-#ifdef CHIP_APP_USE_INTERACTION_MODEL
 Messaging::ExchangeManager gExchange;
-#endif
 ServerCallback gCallbacks;
 SecurePairingUsingTestSecret gTestPairing;
 
@@ -487,13 +485,11 @@ void InitServer(AppDelegate * delegate)
     err = gSessions.Init(chip::kTestDeviceNodeId, &DeviceLayer::SystemLayer, &gTransports, &gAdminPairings);
     SuccessOrExit(err);
 
-#ifdef CHIP_APP_USE_INTERACTION_MODEL
-    err = gExchange.Init(&gSessions);
+    err = gExchange.Init(&gSessions, &gCallbacks);
     SuccessOrExit(err);
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
     err = chip::app::InteractionModelEngine::GetInstance()->Init(&gExchange);
     SuccessOrExit(err);
-#else
-    gSessions.SetDelegate(&gCallbacks);
 #endif
 
     if (useTestPairing())

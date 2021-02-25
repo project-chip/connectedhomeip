@@ -89,7 +89,7 @@ CHIP_ERROR Device::SendMessage(System::PacketBufferHandle buffer, PayloadHeader 
 
         ReturnErrorOnFailure(LoadSecureSessionParameters(ResetTransport::kYes));
 
-        err = mSessionManager->SendMessage(mSecureSession, std::move(resend));
+        err = mSessionManager->SendMessage(mSecureSession, payloadHeader, std::move(resend));
         ChipLogDetail(Controller, "Re-SendMessage returned %d", err);
         ReturnErrorOnFailure(err);
     }
@@ -135,8 +135,9 @@ CHIP_ERROR Device::SendCommands()
 
 CHIP_ERROR Device::SendMessage(System::PacketBufferHandle buffer)
 {
-    PayloadHeader unusedHeader;
-    return SendMessage(std::move(buffer), unusedHeader);
+    PayloadHeader payloadHeader;
+    payloadHeader.SetExchangeID(Messaging::ExchangeManager::kReservedExchangeId);
+    return SendMessage(std::move(buffer), payloadHeader);
 }
 
 CHIP_ERROR Device::Serialize(SerializedDevice & output)
