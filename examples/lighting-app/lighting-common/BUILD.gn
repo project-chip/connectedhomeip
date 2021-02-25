@@ -26,6 +26,7 @@ source_set("lighting-common") {
     "${chip_root}/src/app/clusters/bindings/bindings.cpp",
     "${chip_root}/src/app/clusters/level-control/level-control.cpp",
     "${chip_root}/src/app/clusters/on-off-server/on-off.cpp",
+    "${chip_root}/src/app/clusters/im-compatibility/compatibility-command-handlers.cpp",
     "${chip_root}/src/app/reporting/reporting-default-configuration.cpp",
     "${chip_root}/src/app/reporting/reporting.cpp",
     "${chip_root}/src/app/server/DataModelHandler.cpp",
@@ -44,6 +45,7 @@ source_set("lighting-common") {
     "${chip_root}/src/app/util/util.cpp",
     "gen/call-command-handler.cpp",
     "gen/callback-stub.cpp",
+    "gen/IMClusterCommandHandler.cpp",
   ]
 
   deps = [ "${chip_root}/src/lib" ]

@@ -1,0 +1,46 @@
+{{> header}}
+
+#include "IMClusterCommandHandler.h"
+
+#include <stdint.h>
+
+#include "af-structs.h"
+#include "call-command-handler.h"
+#include "callback.h"
+#include "cluster-id.h"
+#include "command-id.h"
+#include "util.h"
+
+#include <app/InteractionModelEngine.h>
+
+namespace chip {
+namespace app {
+
+// Cluster specific command parsing
+// TODO: Take care of internal status of ember library.
+
+namespace clusters {
+
+{{#all_user_clusters}}
+{{#if (user_cluster_has_enabled_command name side)}}
+namespace {{asCamelCased parent.name false}} {
+{{#all_user_cluster_commands}}
+{{#unless mfgCode}}
+{{#if (isStrEqual clusterName parent.name)}}
+{{#if (isCommandAvailable parent.side incoming outgoing commandSource name)}}
+void On{{asCamelCased name false}}CommandCallback(app::Command*, EndpointId ZCLEndpointId{{#zcl_command_arguments}}, {{#if (isString type)}}const uint8_t * {{asSymbol label}}{{else}}{{asUnderlyingZclType type}} {{asSymbol label}}{{/if}}{{/zcl_command_arguments}})
+{
+    emberAf{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback({{#zcl_command_arguments}}{{asSymbol label}}{{#unless (isLastElement index count)}}, {{/unless}}{{/zcl_command_arguments}});
+}
+
+{{/if}}
+{{/if}}
+{{/unless}}
+{{/all_user_cluster_commands}}
+} // namespace {{asCamelCased parent.name false}}
+{{/if}}
+{{/all_user_clusters}}
+
+} // namespace clusters
+} // namespace app
+} // namespace chip

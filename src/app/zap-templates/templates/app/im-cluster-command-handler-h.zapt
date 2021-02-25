@@ -1,0 +1,41 @@
+{{> header}}
+
+#include <stdint.h>
+
+#include "af-structs.h"
+#include "call-command-handler.h"
+#include "callback.h"
+#include "cluster-id.h"
+#include "command-id.h"
+#include "util.h"
+
+#include <app/Command.h>
+#include <core/CHIPTLV.h>
+
+using namespace chip;
+using namespace chip::app;
+using namespace chip::app::clusters;
+
+namespace chip{
+namespace app {
+namespace clusters {
+{{#all_user_clusters}}
+{{#if (user_cluster_has_enabled_command name side)}}
+namespace {{asCamelCased name false}} {
+void Dispatch{{asCamelCased side false}}Command(app::Command * command, CommandId commandId, EndpointId endpointId, TLV::TLVReader & dataTlv);
+{{#all_user_cluster_commands}}
+{{#unless mfgCode}}
+{{#if (isStrEqual clusterName parent.name)}}
+{{#if (isCommandAvailable parent.side incoming outgoing commandSource name)}}
+void On{{asCamelCased name false}}CommandCallback(app::Command*, EndpointId{{#zcl_command_arguments}}, {{#if (isString type)}}const uint8_t * {{asSymbol label}}{{else}}{{asUnderlyingZclType type}} {{asSymbol label}}{{/if}}{{/zcl_command_arguments}});
+{{/if}}
+{{/if}}
+{{/unless}}
+{{/all_user_cluster_commands}}
+}
+
+{{/if}}
+{{/all_user_clusters}}
+}
+}
+}

@@ -1,0 +1,35 @@
+{{#if (zcl_command_arguments_count this.id)}}
+CHIP_ERROR TLVError = CHIP_NO_ERROR;
+{{#zcl_command_arguments}}
+{{#if (isString type)}}
+const uint8_t * {{asSymbol label}};
+{{else}}
+{{asUnderlyingZclType type}} {{asSymbol label}};
+{{/if}}
+{{/zcl_command_arguments}}
+
+while ((TLVError = dataTlv.Next()) == CHIP_NO_ERROR)
+{
+  switch (TLV::TagNumFromTag(dataTlv.GetTag()))
+  {
+{{#zcl_command_arguments}}
+    case {{index}}:
+{{#if (isString type)}}
+      TLVError = dataTlv.GetDataPtr({{asSymbol label}});
+{{else}}
+      TLVError = dataTlv.Get({{asSymbol label}});
+{{/if}}
+      break;
+{{/zcl_command_arguments}}
+    default:
+      // Unsupported tag, ignore it.
+      // TODO: Can be a log for INFO level
+      continue;
+  }
+  if (TLVError != CHIP_NO_ERROR)
+  {
+    // TODO: Report Error Here
+  }
+}
+{{/if}}
+On{{asCamelCased name false}}CommandCallback(command, endpointId{{#zcl_command_arguments}}, {{asSymbol label}}{{/zcl_command_arguments}});

@@ -23,6 +23,10 @@
         {
             "name": "command_handler_cluster_commands",
             "path": "partials/command_handler_cluster_commands.zapt"
+        },
+        {
+            "name": "im_command_handler_cluster_commands",
+            "path": "partials/im_command_handler_cluster_commands.zapt"
         }
     ],
     "templates": [
@@ -120,6 +124,16 @@
             "path": "templates/app/CHIPClientCallbacks-src.zapt",
             "name": "CHIP Client Callbacks",
             "output": "CHIPClientCallbacks.cpp"
+        },
+        {
+            "path": "templates/app/im-cluster-command-handler.zapt",
+            "name": "CHIP Client Callbacks",
+            "output": "IMClusterCommandHandler.cpp"
+        },
+        {
+            "path": "templates/app/im-cluster-command-handler-h.zapt",
+            "name": "CHIP Client Callbacks",
+            "output": "IMClusterCommandHandler.h"
         },
         {
             "path": "templates/chip/CHIPClustersObjc.zapt",

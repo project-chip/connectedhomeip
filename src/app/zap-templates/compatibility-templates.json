@@ -1,0 +1,39 @@
+{
+    "name": "CHIP Application templates",
+    "version": "chip-v1",
+    "helpers": [
+        "common/StringHelper.js",
+        "templates/app/helper.js",
+        "templates/chip/helper.js"
+    ],
+    "override": "common/override.js",
+    "partials": [
+        {
+            "name": "header",
+            "path": "partials/header.zapt"
+        },
+        {
+            "name": "clusters_header",
+            "path": "partials/clusters_header.zapt"
+        },
+        {
+            "name": "cluster_header",
+            "path": "partials/cluster_header.zapt"
+        },
+        {
+            "name": "command_handler_cluster_commands",
+            "path": "partials/command_handler_cluster_commands.zapt"
+        },
+        {
+            "name": "im_command_handler_cluster_commands",
+            "path": "partials/im_command_handler_cluster_commands.zapt"
+        }
+    ],
+    "templates": [
+        {
+            "path": "templates/compatibility/compatibility-command-handlers.zapt",
+            "name": "Command Handlers for Compatibility",
+            "output": "compatibility-command-handlers.cpp"
+        }
+    ]
+}
