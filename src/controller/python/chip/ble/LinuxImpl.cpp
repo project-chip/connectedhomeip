@@ -25,9 +25,8 @@ extern "C" bool pychip_ble_adapter_list_next(void * adapterIterator)
     return static_cast<AdapterIterator *>(adapterIterator)->Next();
 }
 
-extern "C" unsigned pychip_ble_adapter_list_get_index(void * adapterIterator)
+extern "C" uint32_t pychip_ble_adapter_list_get_index(void * adapterIterator)
 {
-    /// NOTE: returning unsigned because python native has no sized values
     return static_cast<AdapterIterator *>(adapterIterator)->GetIndex();
 }
 
@@ -76,12 +75,6 @@ public:
         mContext(context), mScanCallback(scanCallback), mCompleteCallback(completeCallback)
     {}
 
-    ~ScannerDelegateImpl()
-    {
-        mScanCallback     = nullptr;
-        mCompleteCallback = nullptr;
-    }
-
     void SetScanner(std::unique_ptr<ChipDeviceScanner> scanner) { mScanner = std::move(scanner); }
 
     void OnDeviceScanned(BluezDevice1 * device, const chip::Ble::ChipBLEDeviceIdentificationInfo & info) override
@@ -104,15 +97,15 @@ public:
     }
 
 private:
-    std::unique_ptr<ChipDeviceScanner> mScanner;
+    const std::unique_ptr<ChipDeviceScanner> mScanner;
     PyObject * const mContext;
-    DeviceScannedCallback mScanCallback;
-    ScanCompleteCallback mCompleteCallback;
+    const DeviceScannedCallback mScanCallback;
+    const kScanCompleteCallback mCompleteCallback;
 };
 
 } // namespace
 
-extern "C" void * pychip_ble_start_scanning(PyObject * context, void * adapter, unsigned timeout,
+extern "C" void * pychip_ble_start_scanning(PyObject * context, void * adapter, uint32_t timeout,
                                             ScannerDelegateImpl::DeviceScannedCallback scanCallback,
                                             ScannerDelegateImpl::ScanCompleteCallback completeCallback)
 {

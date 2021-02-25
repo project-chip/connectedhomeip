@@ -16,7 +16,7 @@
 
 import chip.native
 import ctypes
-from ctypes import c_bool, c_void_p, c_char_p, c_uint, py_object
+from ctypes import c_bool, c_void_p, c_char_p, c_uint32, py_object
 from chip.ble.types import DeviceScannedCallback, ScanDoneCallback
 
 
@@ -44,7 +44,7 @@ def _GetBleLibraryHandle() -> ctypes.CDLL:
 
     setter.Set('pychip_ble_adapter_list_new', VoidPointer, [])
     setter.Set('pychip_ble_adapter_list_next', c_bool, [VoidPointer])
-    setter.Set('pychip_ble_adapter_list_get_index', c_uint, [VoidPointer])
+    setter.Set('pychip_ble_adapter_list_get_index', c_uint32, [VoidPointer])
     setter.Set('pychip_ble_adapter_list_get_address', c_char_p, [VoidPointer])
     setter.Set('pychip_ble_adapter_list_get_alias', c_char_p, [VoidPointer])
     setter.Set('pychip_ble_adapter_list_get_name', c_char_p, [VoidPointer])
@@ -53,7 +53,7 @@ def _GetBleLibraryHandle() -> ctypes.CDLL:
     setter.Set('pychip_ble_adapter_list_get_raw_adapter', VoidPointer, [VoidPointer])
 
     setter.Set('pychip_ble_start_scanning', VoidPointer, [
-        py_object, VoidPointer, c_uint, DeviceScannedCallback, ScanDoneCallback
+        py_object, VoidPointer, c_uint32, DeviceScannedCallback, ScanDoneCallback
     ])
 
   return handle
