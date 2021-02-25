@@ -433,7 +433,7 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & header, const Trans
 
     auto node     = peer.Value();
     auto notFound = mChannelContexts.ForEachActiveObject([&](ChannelContext * context) {
-        if (context->IsPasePairing() && context->MatchNodeId(node))
+        if (context->IsCasePairing() && context->MatchNodeId(node))
         {
             CHIP_ERROR err = context->HandlePairingMessage(header, source, std::move(msgBuf));
             if (err != CHIP_NO_ERROR)
