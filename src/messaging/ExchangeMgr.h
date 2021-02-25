@@ -180,6 +180,8 @@ public:
 
     MessageCounterSyncMgr * GetMessageCounterSyncMgr() { return &mMessageCounterSyncMgr; };
 
+    void SetLegacySecureSessionDelegate(SecureSessionMgrDelegate * delegate) { mLegacySecureSessionDelegate = delegate; }
+
     size_t GetContextsInUse() const { return mContextsInUse; }
 
 private:
@@ -201,6 +203,12 @@ private:
     SecureSessionMgr * mSessionMgr;
     ReliableMessageMgr mReliableMessageMgr;
     MessageCounterSyncMgr mMessageCounterSyncMgr;
+
+#if CHIP_CONFIG_EXPERIMENTAL
+    // We have some code still accepting messages from secure session manager directly.
+    // This handler is for co-exist of "legacy" handlers and message layer.
+    SecureSessionMgrDelegate * mLegacySecureSessionDelegate;
+#endif
 
     std::array<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> mContextPool;
     size_t mContextsInUse;

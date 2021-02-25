@@ -156,11 +156,14 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, PersistentStorageDelegat
     err = mSessionManager->Init(localDeviceId, mSystemLayer, mTransportMgr, &mAdmins);
     SuccessOrExit(err);
 
-#ifdef CHIP_APP_USE_INTERACTION_MODEL
+#if CHIP_CONFIG_EXPERIMENTAL
     err = mExchangeManager->Init(mSessionManager);
     SuccessOrExit(err);
+    mExchangeManager->SetLegacySecureSessionDelegate(this);
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
     err = chip::app::InteractionModelEngine::GetInstance()->Init(mExchangeManager);
     SuccessOrExit(err);
+#endif
 #else
     mSessionManager->SetDelegate(this);
 #endif
@@ -205,12 +208,20 @@ CHIP_ERROR DeviceController::Shutdown()
         mStorageDelegate = nullptr;
     }
 
+#if CHIP_CONFIG_EXPERIMENTAL
+    if (mExchangeManager != nullptr)
+    {
+        mExchangeManager->Shutdown();
+        mExchangeManager = nullptr;
+    }
+#else
     if (mSessionManager != nullptr)
     {
         mSessionManager->SetDelegate(nullptr);
         chip::Platform::Delete(mSessionManager);
         mSessionManager = nullptr;
     }
+#endif
 
     if (mTransportMgr != nullptr)
     {

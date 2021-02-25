@@ -463,7 +463,7 @@ CHIP_ERROR InitMdns()
 }
 #endif
 
-#ifdef CHIP_APP_USE_INTERACTION_MODEL
+#if CHIP_CONFIG_EXPERIMENTAL
 Messaging::ExchangeManager gExchange;
 #endif
 ServerCallback gCallbacks;
@@ -540,11 +540,14 @@ void InitServer(AppDelegate * delegate)
     err = gSessions.Init(chip::kTestDeviceNodeId, &DeviceLayer::SystemLayer, &gTransports, &gAdminPairings);
     SuccessOrExit(err);
 
-#ifdef CHIP_APP_USE_INTERACTION_MODEL
+#if CHIP_CONFIG_EXPERIMENTAL
     err = gExchange.Init(&gSessions);
     SuccessOrExit(err);
+    gExchange.SetLegacySecureSessionDelegate(&gCallbacks);
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
     err = chip::app::InteractionModelEngine::GetInstance()->Init(&gExchange);
     SuccessOrExit(err);
+#endif
 #else
     gSessions.SetDelegate(&gCallbacks);
 #endif

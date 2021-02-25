@@ -139,6 +139,12 @@ CHIP_ERROR ExchangeManager::UnregisterUnsolicitedMessageHandlerForType(uint32_t 
 void ExchangeManager::OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source, SecureSessionMgr * msgLayer)
 {
     ChipLogError(ExchangeManager, "Accept FAILED, err = %s", ErrorStr(error));
+#if CHIP_CONFIG_EXPERIMENTAL
+    if (mLegacySecureSessionDelegate != nullptr)
+    {
+        mLegacySecureSessionDelegate->OnReceiveError(error, source, msgLayer);
+    }
+#endif
 }
 
 ExchangeContext * ExchangeManager::AllocContext(uint16_t ExchangeId, SecureSessionHandle session, bool Initiator,
@@ -297,6 +303,12 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
         if (sendAckAndCloseExchange)
             ec->Close();
     }
+#if CHIP_CONFIG_EXPERIMENTAL
+    else if (mLegacySecureSessionDelegate != nullptr)
+    {
+        mLegacySecureSessionDelegate->OnMessageReceived(packetHeader, payloadHeader, session, std::move(msgBuf), msgLayer);
+    }
+#endif
 
 exit:
     if (err != CHIP_NO_ERROR)
