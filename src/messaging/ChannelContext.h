@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -66,18 +66,12 @@ public:
  *
  *  Preparing Substates:
  *    A: AddressResolving, use mDNS to resolve the node address
- *    P: PasePairing, do SPAKE2 key exchange
- *    PD: PasePairingDone, wait for OnNewConnection from SecureSessionManager
  *    C: CasePairing, do SIGMA key exchange
  *    CD: CasePairingDone, wait for OnNewConnection from SecureSessionManager
  *
- *                    +---+   +----+
- *                 +->| P |-->| PD |--+
- *  /---\   +---+  |  +---+   +----+  |   /---\
- *  |   |-->| A |--+                  +-->| O |
- *  \---/   +---+  |  +---+   +----+  |   \---/
- *                 +->| C |-->| CD |--+
- *                    +---+   +----+
+ *  /---\   +---+   +---+   +----+   /---\
+ *  |   |-->| A |-->| C |-->| CD |-->| O |
+ *  \---/   +---+   +---+   +----+   \---/
  */
 class ChannelContext : public ReferenceCounted<ChannelContext, ChannelContextDeletor>, public SessionEstablishmentDelegate
 {
@@ -170,9 +164,6 @@ private:
     static void AddressResolveTimeout(System::Layer * aLayer, void * aAppState, System::Error aError);
     void AddressResolveTimeout();
     void ExitAddressResolve() {}
-
-    void EnterPasePairingState();
-    void ExitPasePairingState();
 
     void EnterCasePairingState();
     void ExitCasePairingState();
