@@ -180,7 +180,13 @@ public:
 
     MessageCounterSyncMgr * GetMessageCounterSyncMgr() { return &mMessageCounterSyncMgr; };
 
-    void SetLegacySecureSessionDelegate(SecureSessionMgrDelegate * delegate) { mLegacySecureSessionDelegate = delegate; }
+#if CHIP_CONFIG_EXPERIMENTAL
+    [[deprecated("Available until interactional model is fully functional")]] void
+    SetLegacySecureSessionDelegate(SecureSessionMgrDelegate * delegate)
+    {
+        mLegacySecureSessionDelegate = delegate;
+    }
+#endif
 
     size_t GetContextsInUse() const { return mContextsInUse; }
 
@@ -207,6 +213,7 @@ private:
 #if CHIP_CONFIG_EXPERIMENTAL
     // We have some code still accepting messages from secure session manager directly.
     // This handler is for co-exist of "legacy" handlers and message layer.
+    // TODO: Remove mLegacySecureSessionDelegate when we have a fully functional interaction model.
     SecureSessionMgrDelegate * mLegacySecureSessionDelegate;
 #endif
 

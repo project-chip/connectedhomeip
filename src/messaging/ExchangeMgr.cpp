@@ -219,6 +219,11 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
     UnsolicitedMessageHandler * umh         = nullptr;
     UnsolicitedMessageHandler * matchingUMH = nullptr;
     bool sendAckAndCloseExchange            = false;
+#if CHIP_CONFIG_EXPERIMENTAL
+    // This flag is used to determine if the message is accepted by EM
+    // Should be deleted when we remove mLegacySecureSessionDelegate.
+    bool wasHandled = false;
+#endif
 
     // Search for an existing exchange that the message applies to. If a match is found...
     for (auto & ec : mContextPool)
@@ -234,7 +239,9 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
 
             // Matched ExchangeContext; send to message handler.
             ec.HandleMessage(packetHeader, payloadHeader, std::move(msgBuf));
-
+#if CHIP_CONFIG_EXPERIMENTAL
+            wasHandled = true;
+#endif
             ExitNow(err = CHIP_NO_ERROR);
         }
     }
@@ -298,23 +305,25 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
                         ec->GetDelegate());
 
         ec->HandleMessage(packetHeader, payloadHeader, std::move(msgBuf));
-
+#if CHIP_CONFIG_EXPERIMENTAL
+        wasHandled = true;
+#endif
         // Close exchange if it was created only to send ack for a duplicate message.
         if (sendAckAndCloseExchange)
             ec->Close();
     }
-#if CHIP_CONFIG_EXPERIMENTAL
-    else if (mLegacySecureSessionDelegate != nullptr)
-    {
-        mLegacySecureSessionDelegate->OnMessageReceived(packetHeader, payloadHeader, session, std::move(msgBuf), msgLayer);
-    }
-#endif
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %d", err);
     }
+#if CHIP_CONFIG_EXPERIMENTAL
+    if (!wasHandled && mLegacySecureSessionDelegate != nullptr)
+    {
+        mLegacySecureSessionDelegate->OnMessageReceived(packetHeader, payloadHeader, session, std::move(msgBuf), msgLayer);
+    }
+#endif
 }
 
 void ExchangeManager::OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * mgr)
