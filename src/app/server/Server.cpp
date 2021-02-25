@@ -268,7 +268,17 @@ public:
         {
             ReturnErrorOnFailure(PersistAdminPairingToKVS(admin, gNextAvailableAdminId));
         }
+
         return CHIP_NO_ERROR;
+    }
+
+    void RendezvousComplete() const override
+    {
+        // Once rendezvous completed, assume we are operational
+        if (app::Mdns::AdvertiseOperational() != CHIP_NO_ERROR)
+        {
+            ChipLogError(Discovery, "Failed to start advertising operational state at rendezvous completion time.");
+        }
     }
 
     void SetDelegate(AppDelegate * delegate) { mDelegate = delegate; }
