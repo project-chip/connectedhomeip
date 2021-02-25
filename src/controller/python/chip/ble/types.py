@@ -1,8 +1,5 @@
-#!/usr/bin/env python
-
 #
 #    Copyright (c) 2021 Project CHIP Authors
-#    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -17,29 +14,9 @@
 #    limitations under the License.
 #
 
-from IPython import embed
-import chip
+from ctypes import CFUNCTYPE, py_object, c_char_p, c_uint16
 
-def main():
-    # The chip import at the top level will be visible in the ipython REPL.
-    embed(header = '''
-Welcome to the CHIP python REPL utilty.
+DeviceScannedCallback = CFUNCTYPE(None, py_object, c_char_p, c_uint16,
+                                    c_uint16, c_uint16)
 
-Usage examples:
-
-import chip.ble
-
-######## List available BLE adapters #########
-print(chip.ble.GetAdapters())
-
-######## Discover chip devices #########
-
-chip.ble.DiscoverAsync(2000, lambda *x: print('Discovered: %r' % (x,)), lambda: print('Done'))
-
-for device in chip.ble.DiscoverSync(2000):
-    print(device)
-
-    '''.strip())
-
-if __name__ == "__main__":
-    main()
+ScanDoneCallback = CFUNCTYPE(None, py_object)

@@ -19,6 +19,9 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
+#include <support/CodeUtils.h>
+#include <support/logging/CHIPLogging.h>
+
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
@@ -33,6 +36,12 @@ AdapterIterator::~AdapterIterator()
     if (mObjectList != nullptr)
     {
         g_list_free_full(mObjectList, g_object_unref);
+    }
+
+    if (mCurrent.adapter != nullptr)
+    {
+        g_object_unref(mCurrent.adapter);
+        mCurrent.adapter = nullptr;
     }
 }
 
@@ -86,13 +95,18 @@ bool AdapterIterator::Advance()
             index = 0;
         }
 
+        if (mCurrent.adapter != nullptr)
+        {
+            g_object_unref(mCurrent.adapter);
+            mCurrent.adapter = nullptr;
+        }
+
         mCurrent.index   = index;
         mCurrent.address = bluez_adapter1_get_address(adapter);
         mCurrent.alias   = bluez_adapter1_get_alias(adapter);
         mCurrent.name    = bluez_adapter1_get_name(adapter);
         mCurrent.powered = bluez_adapter1_get_powered(adapter);
-
-        g_object_unref(adapter);
+        mCurrent.adapter = adapter;
 
         mCurrentListItem = mCurrentListItem->next;
 

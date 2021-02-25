@@ -72,9 +72,6 @@ chip::NodeId kLocalDeviceId  = chip::kTestControllerNodeId;
 chip::NodeId kRemoteDeviceId = chip::kTestDeviceNodeId;
 
 extern "C" {
-// Trampolined callback types
-CHIP_ERROR pychip_DeviceController_DriveIO(uint32_t sleepTimeMS);
-
 CHIP_ERROR pychip_DeviceController_NewDeviceController(chip::Controller::DeviceCommissioner ** outDevCtrl);
 CHIP_ERROR pychip_DeviceController_DeleteDeviceController(chip::Controller::DeviceCommissioner * devCtrl);
 
