@@ -137,7 +137,7 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, PersistentStorageDelegat
     mTransportMgr   = chip::Platform::New<DeviceTransportMgr>();
     mSessionManager = chip::Platform::New<SecureSessionMgr>();
 
-#ifdef CHIP_APP_USE_INTERACTION_MODEL
+#if CHIP_CONFIG_EXPERIMENTAL
     mExchangeManager = chip::Platform::New<Messaging::ExchangeManager>();
 #endif
 
