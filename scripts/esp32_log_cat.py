@@ -104,7 +104,7 @@ def main():
 
   # Ensures somewhat pretty logging of what is going on
   logging.basicConfig(level=args.log_level);
-  coloredlogs.install(fmt='%(asctime)s %(name)s %(levelname)s %(message)s')
+  coloredlogs.install(fmt='%(asctime)s %(name)s %(levelname)-7s %(message)s')
 
   logger = logging.getLogger(args.device)
   logger.setLevel(args.log_level)
