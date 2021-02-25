@@ -7,6 +7,13 @@
 extern "C" {
 #endif
 
+/** Max length of the IPv4 address as a string. Defined by POSIX. */
+#define INET_ADDRSTRLEN 16
+/** Max length of the IPv6 address as a string. Takes into account possible
+ * mapped IPv4 addresses.
+ */
+#define INET6_ADDRSTRLEN 46
+
 static inline char * inet_ntop(sa_family_t family, const void * src, char * dst, size_t size)
 {
     return NULL;

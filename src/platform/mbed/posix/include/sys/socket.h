@@ -1,8 +1,10 @@
 #ifndef MBED_POSIX_SYS_SOCKET_H
 #define MBED_POSIX_SYS_SOCKET_H
 
-#include <netsocket/Socket.h>
-#include <utils/byteorder.h>
+#include <net_if.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdio.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -57,54 +59,6 @@ enum net_sock_type
     SOCK_DGRAM,      /**< Datagram socket type */
     SOCK_RAW         /**< RAW socket type      */
 };
-
-/** @brief Convert 16-bit value from network to host byte order.
- *
- * @param x The network byte order value to convert.
- *
- * @return Host byte order value.
- */
-#define ntohs(x) sys_be16_to_cpu(x)
-
-/** @brief Convert 32-bit value from network to host byte order.
- *
- * @param x The network byte order value to convert.
- *
- * @return Host byte order value.
- */
-#define ntohl(x) sys_be32_to_cpu(x)
-
-/** @brief Convert 64-bit value from network to host byte order.
- *
- * @param x The network byte order value to convert.
- *
- * @return Host byte order value.
- */
-#define ntohll(x) sys_be64_to_cpu(x)
-
-/** @brief Convert 16-bit value from host to network byte order.
- *
- * @param x The host byte order value to convert.
- *
- * @return Network byte order value.
- */
-#define htons(x) sys_cpu_to_be16(x)
-
-/** @brief Convert 32-bit value from host to network byte order.
- *
- * @param x The host byte order value to convert.
- *
- * @return Network byte order value.
- */
-#define htonl(x) sys_cpu_to_be32(x)
-
-/** @brief Convert 64-bit value from host to network byte order.
- *
- * @param x The host byte order value to convert.
- *
- * @return Network byte order value.
- */
-#define htonll(x) sys_cpu_to_be64(x)
 
 /** IPv6 address struct */
 struct in6_addr
@@ -337,12 +291,10 @@ struct net_addr
 extern const struct in6_addr in6addr_any;
 extern const struct in6_addr in6addr_loopback;
 
-/** Max length of the IPv4 address as a string. Defined by POSIX. */
-#define INET_ADDRSTRLEN 16
-/** Max length of the IPv6 address as a string. Takes into account possible
- * mapped IPv4 addresses.
+/*
+ * Level number for (get/set)sockopt() to apply to socket itself.
  */
-#define INET6_ADDRSTRLEN 46
+#define SOL_SOCKET 0xfff /* options for socket level */
 
 /* Socket protocol types (TCP/UDP/RAW) */
 #define SOCK_STREAM 1
@@ -387,11 +339,6 @@ struct linger
     int l_onoff;  /* option on/off */
     int l_linger; /* linger time in seconds */
 };
-
-/*
- * Level number for (get/set)sockopt() to apply to socket itself.
- */
-#define SOL_SOCKET 0xfff /* options for socket level */
 
 /* File status flags and file access modes for fnctl,
    these are bits in an int. */

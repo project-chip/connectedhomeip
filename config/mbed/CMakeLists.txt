@@ -266,6 +266,7 @@ list(APPEND CHIP_DEFINES)
 list(APPEND CHIP_INCLUDES 
     ${CHIP_ROOT}/config/mbed/mbedtls
     ${CHIP_ROOT}/src/platform/mbed/posix/include
+    ${CHIP_ROOT}/src/platform/mbed/net/include
 )
 
 target_include_directories(${APP_TARGET} PRIVATE 

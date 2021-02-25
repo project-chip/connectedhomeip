@@ -72,7 +72,8 @@ source_set("mbed_bsd_socket") {
   sources = [
     "${chip_root}/src/platform/mbed/posix/src/if.cpp",
     "${chip_root}/src/platform/mbed/posix/src/ioctl.cpp",
-    "${chip_root}/src/platform/mbed/posix/src/ifaddrs.cpp"
+    "${chip_root}/src/platform/mbed/posix/src/ifaddrs.cpp",
+    "${chip_root}/src/platform/mbed/net/src/net_if.cpp"
   ]
 }
 
