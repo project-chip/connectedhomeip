@@ -198,7 +198,7 @@ public:
     // TODO(#4170): Create a unique exchange id for legacy messages which doesn't go through exchange manager. When message with
     // this id is received, it will be passed to mSecureSessionEventReceiver. It is not allowed to create an exchange with this id.
     // This const value will be removed after fully migrated to messaging layer.
-    static constexpr const uint16_t kReservedExchangeId = -1;
+    static constexpr const uint16_t kReservedExchangeId = 0xFFFF;
 
 private:
     enum class State
