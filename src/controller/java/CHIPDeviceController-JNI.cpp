@@ -368,7 +368,8 @@ JNI_METHOD(void, beginConnectDeviceIp)(JNIEnv * env, jobject self, jlong handle,
     {
         ScopedPthreadLock lock(&sStackLock);
         err = wrapper->Controller()->ConnectDeviceWithoutSecurePairing(
-            kRemoteDeviceId, deviceIPAddr, (void *) "ConnectDevice", HandleKeyExchange, HandleEchoResponse, HandleError, CHIP_PORT);
+            kRemoteDeviceId, chip::Transport::PeerAddress::UDP(deviceIPAddr), (void *) "ConnectDevice", HandleKeyExchange,
+            HandleEchoResponse, HandleError);
     }
 
     if (err != CHIP_NO_ERROR)
