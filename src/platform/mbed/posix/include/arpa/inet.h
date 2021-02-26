@@ -14,8 +14,8 @@ extern "C" {
  */
 #define INET6_ADDRSTRLEN 46
 
-static inline char * inet_ntop(sa_family_t family, const void * src, char * dst, size_t size);
-static inline int inet_pton(sa_family_t family, const char * src, void * dst);
+char * inet_ntop(sa_family_t family, const void * src, char * dst, size_t size);
+int inet_pton(sa_family_t family, const char * src, void * dst);
 
 #ifdef __cplusplus
 }

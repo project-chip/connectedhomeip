@@ -33,6 +33,7 @@ using namespace chip::Shell;
 using namespace chip::System;
 
 static chip::Shell::Shell sShellDateSubcommands;
+static chip::Shell::Shell sShellNetworkSubcommands;
 
 int cmd_date_help_iterator(shell_command_t * command, void * arg)
 {
@@ -124,6 +125,44 @@ exit:
     return error;
 }
 
+int cmd_network_dispatch(int argc, char ** argv)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+
+    VerifyOrExit(argc > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    error = sShellNetworkSubcommands.ExecCommand(argc, argv);
+
+exit:
+    return error;
+}
+
+int cmd_network_help_iterator(shell_command_t * command, void * arg)
+{
+    streamer_printf(streamer_get(), "  %-15s %s\n\r", command->cmd_name, command->cmd_help);
+    return 0;
+}
+
+int cmd_network_help(int argc, char ** argv)
+{
+    sShellNetworkSubcommands.ForEachCommand(cmd_network_help_iterator, nullptr);
+    return 0;
+}
+
+int cmd_network_interface(int argc, char ** argv)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+
+    streamer_t * sout = streamer_get();
+
+    VerifyOrExit(argc == 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    streamer_printf(sout, "Test interface details\r\n");
+
+exit:
+    return error;
+}
+
 static const shell_command_t cmds_date_root = { &cmd_date_dispatch, "date", "Display the current time, or set the system date." };
 
 static const shell_command_t cmds_date[] = { { &cmd_date_set, "set", "Set date/time using 'YYYY-MM-DD HH:MM:SS' format" },
@@ -132,9 +171,17 @@ static const shell_command_t cmds_date[] = { { &cmd_date_set, "set", "Set date/t
 static const shell_command_t cmds_test_config = { &cmd_device_test_config, "testconfig",
                                                   "Test the configuration implementation. Usage: device testconfig" };
 
+static const shell_command_t cmds_network_root = { &cmd_network_dispatch, "network", "Network interface layer commands" };
+
+static const shell_command_t cmds_network[] = { { &cmd_network_interface, "interface",
+                                                  "Display current network interface details" },
+                                                { &cmd_network_help, "help", "Display help for each network subcommand" } };
+
 void cmd_mbed_utils_init()
 {
     sShellDateSubcommands.RegisterCommands(cmds_date, ArraySize(cmds_date));
+    sShellNetworkSubcommands.RegisterCommands(cmds_network, ArraySize(cmds_network));
     shell_register(&cmds_date_root, 1);
     shell_register(&cmds_test_config, 1);
+    shell_register(&cmds_network_root, 1);
 }
