@@ -5,6 +5,7 @@
 
 #include <controller/CHIPCluster.h>
 #include <core/CHIPCallback.h>
+#include <lib/support/BytesData.h>
 
 namespace chip {
 namespace Controller {
