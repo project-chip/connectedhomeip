@@ -19,6 +19,7 @@
 
 #include <memory>
 #include <thread>
+#include <vector>
 
 #include "platform/internal/CHIPDeviceLayerInternal.h"
 
@@ -103,6 +104,7 @@ private:
 
     std::unique_ptr<otbr::DBus::ThreadApiDBus> mThreadApi;
     UniqueDBusConnection mConnection;
+    std::vector<uint8_t> mOperationalDatasetTlv;
     Internal::DeviceNetworkInfo mNetworkInfo;
     bool mAttached;
     std::thread mDBusEventLoop;
