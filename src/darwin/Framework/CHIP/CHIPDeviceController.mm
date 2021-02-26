@@ -89,7 +89,6 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
         if ([self checkForInitError:(_persistentStorageDelegateBridge != nullptr) logMsg:kErrorPersistentStorageInit]) {
             return nil;
         }
-
     }
     return self;
 }
@@ -117,8 +116,7 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
 
 - (BOOL)startup:(id<CHIPPersistentStorageDelegate>)storageDelegate queue:(nonnull dispatch_queue_t)queue
 {
-    if ([self isRunning])
-    {
+    if ([self isRunning]) {
         return YES;
     }
 
@@ -152,8 +150,7 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
     // Start the IO pump
     dispatch_async(_chipSelectQueue, ^() {
         [self.lock lock];
-        if (self.cppCommissioner)
-        {
+        if (self.cppCommissioner) {
             self.cppCommissioner->ServiceEvents();
         }
         [self.lock unlock];
@@ -199,8 +196,7 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
     CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
 
     [self.lock lock];
-    if (self.cppCommissioner != nullptr)
-    {
+    if (self.cppCommissioner != nullptr) {
         errorCode = self.cppCommissioner->UnpairDevice(deviceID);
     }
     [self.lock unlock];
@@ -213,8 +209,7 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
     CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
 
     [self.lock lock];
-    if (self.cppCommissioner != nullptr)
-    {
+    if (self.cppCommissioner != nullptr) {
         errorCode = self.cppCommissioner->StopPairing(deviceID);
     }
     [self.lock unlock];
@@ -228,8 +223,7 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
     chip::Controller::Device * device = nil;
 
     [self.lock lock];
-    if (self.cppCommissioner != nullptr)
-    {
+    if (self.cppCommissioner != nullptr) {
         errorCode = self.cppCommissioner->GetDevice(deviceID, &device);
     }
     [self.lock unlock];
