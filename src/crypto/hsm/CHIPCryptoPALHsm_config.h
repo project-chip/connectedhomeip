@@ -24,7 +24,7 @@
 /*
  * Enable HSM for SHA256
  */
-#define ENABLE_HSM_HASH_SHA256 1
+#define ENABLE_HSM_HASH_SHA256 0
 
 
 /*
@@ -55,12 +55,12 @@
 /*
  * Enable HSM for Generate EC Key
  */
-#define ENABLE_HSM_GENERATE_EC_KEY 1 //1 for ecc example
+#define ENABLE_HSM_GENERATE_EC_KEY 0 //1 for ecc example
 
 /*
  * Enable HSM for MAC
  */
-#define ENABLE_HSM_MAC 1
+#define ENABLE_HSM_MAC 0
 
 /*
  * Enable HSM for SPAKE VERIFIER
