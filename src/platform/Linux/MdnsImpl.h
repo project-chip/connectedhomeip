@@ -33,8 +33,6 @@
 #include <avahi-common/error.h>
 #include <avahi-common/watch.h>
 
-#include "lib/mdns/platform/Mdns.h"
-
 struct AvahiWatch
 {
     int mFd;                      ///< The file descriptor to watch.
