@@ -38,9 +38,7 @@ namespace ContentLaunch {
 void DispatchClientCommand(app::Command * command, CommandId commandId, EndpointId endpointId, TLV::TLVReader & dataTlv);
 #define IM_HAVE_CONTENT_LAUNCH_CLUSTER_LAUNCH_CONTENT_RESPONSE_COMMAND 1
 #define IM_HAVE_CONTENT_LAUNCH_CLUSTER_LAUNCH_URL_RESPONSE_COMMAND 1
-#define IM_HAVE_CONTENT_LAUNCH_CLUSTER_LAUNCH_CONTENT_RESPONSE_COMMAND 1
 void OnLaunchContentResponseCommandCallback(app::Command *, EndpointId, uint8_t contentLaunchStatus);
-#define IM_HAVE_CONTENT_LAUNCH_CLUSTER_LAUNCH_URL_RESPONSE_COMMAND 1
 void OnLaunchURLResponseCommandCallback(app::Command *, EndpointId, uint8_t contentLaunchStatus);
 } // namespace ContentLaunch
 
@@ -69,59 +67,36 @@ void DispatchClientCommand(app::Command * command, CommandId commandId, Endpoint
 #define IM_HAVE_DOOR_LOCK_CLUSTER_SET_YEARDAY_SCHEDULE_RESPONSE_COMMAND 1
 #define IM_HAVE_DOOR_LOCK_CLUSTER_UNLOCK_DOOR_RESPONSE_COMMAND 1
 #define IM_HAVE_DOOR_LOCK_CLUSTER_UNLOCK_WITH_TIMEOUT_RESPONSE_COMMAND 1
-#define IM_HAVE_DOOR_LOCK_CLUSTER_CLEAR_ALL_PINS_RESPONSE_COMMAND 1
 void OnClearAllPinsResponseCommandCallback(app::Command *, EndpointId, uint8_t status);
-#define IM_HAVE_DOOR_LOCK_CLUSTER_CLEAR_ALL_RFIDS_RESPONSE_COMMAND 1
 void OnClearAllRfidsResponseCommandCallback(app::Command *, EndpointId, uint8_t status);
-#define IM_HAVE_DOOR_LOCK_CLUSTER_CLEAR_HOLIDAY_SCHEDULE_RESPONSE_COMMAND 1
 void OnClearHolidayScheduleResponseCommandCallback(app::Command *, EndpointId, uint8_t status);
-#define IM_HAVE_DOOR_LOCK_CLUSTER_CLEAR_PIN_RESPONSE_COMMAND 1
 void OnClearPinResponseCommandCallback(app::Command *, EndpointId, uint8_t status);
-#define IM_HAVE_DOOR_LOCK_CLUSTER_CLEAR_RFID_RESPONSE_COMMAND 1
 void OnClearRfidResponseCommandCallback(app::Command *, EndpointId, uint8_t status);
-#define IM_HAVE_DOOR_LOCK_CLUSTER_CLEAR_WEEKDAY_SCHEDULE_RESPONSE_COMMAND 1
 void OnClearWeekdayScheduleResponseCommandCallback(app::Command *, EndpointId, uint8_t status);
-#define IM_HAVE_DOOR_LOCK_CLUSTER_CLEAR_YEARDAY_SCHEDULE_RESPONSE_COMMAND 1
 void OnClearYeardayScheduleResponseCommandCallback(app::Command *, EndpointId, uint8_t status);
-#define IM_HAVE_DOOR_LOCK_CLUSTER_GET_HOLIDAY_SCHEDULE_RESPONSE_COMMAND 1
 void OnGetHolidayScheduleResponseCommandCallback(app::Command *, EndpointId, uint8_t scheduleId, uint8_t status,
                                                  uint32_t localStartTime, uint32_t localEndTime,
                                                  uint8_t operatingModeDuringHoliday);
-#define IM_HAVE_DOOR_LOCK_CLUSTER_GET_LOG_RECORD_RESPONSE_COMMAND 1
 void OnGetLogRecordResponseCommandCallback(app::Command *, EndpointId, uint16_t logEntryId, uint32_t timestamp, uint8_t eventType,
                                            uint8_t source, uint8_t eventIdOrAlarmCode, uint16_t userId, const uint8_t * pin);
-#define IM_HAVE_DOOR_LOCK_CLUSTER_GET_PIN_RESPONSE_COMMAND 1
 void OnGetPinResponseCommandCallback(app::Command *, EndpointId, uint16_t userId, uint8_t userStatus, uint8_t userType,
                                      const uint8_t * pin);
-#define IM_HAVE_DOOR_LOCK_CLUSTER_GET_RFID_RESPONSE_COMMAND 1
 void OnGetRfidResponseCommandCallback(app::Command *, EndpointId, uint16_t userId, uint8_t userStatus, uint8_t userType,
                                       const uint8_t * rfid);
-#define IM_HAVE_DOOR_LOCK_CLUSTER_GET_USER_TYPE_RESPONSE_COMMAND 1
 void OnGetUserTypeResponseCommandCallback(app::Command *, EndpointId, uint16_t userId, uint8_t userType);
-#define IM_HAVE_DOOR_LOCK_CLUSTER_GET_WEEKDAY_SCHEDULE_RESPONSE_COMMAND 1
 void OnGetWeekdayScheduleResponseCommandCallback(app::Command *, EndpointId, uint8_t scheduleId, uint16_t userId, uint8_t status,
                                                  uint8_t daysMask, uint8_t startHour, uint8_t startMinute, uint8_t endHour,
                                                  uint8_t endMinute);
-#define IM_HAVE_DOOR_LOCK_CLUSTER_GET_YEARDAY_SCHEDULE_RESPONSE_COMMAND 1
 void OnGetYeardayScheduleResponseCommandCallback(app::Command *, EndpointId, uint8_t scheduleId, uint16_t userId, uint8_t status,
                                                  uint32_t localStartTime, uint32_t localEndTime);
-#define IM_HAVE_DOOR_LOCK_CLUSTER_LOCK_DOOR_RESPONSE_COMMAND 1
 void OnLockDoorResponseCommandCallback(app::Command *, EndpointId, uint8_t status);
-#define IM_HAVE_DOOR_LOCK_CLUSTER_SET_HOLIDAY_SCHEDULE_RESPONSE_COMMAND 1
 void OnSetHolidayScheduleResponseCommandCallback(app::Command *, EndpointId, uint8_t status);
-#define IM_HAVE_DOOR_LOCK_CLUSTER_SET_PIN_RESPONSE_COMMAND 1
 void OnSetPinResponseCommandCallback(app::Command *, EndpointId, uint8_t status);
-#define IM_HAVE_DOOR_LOCK_CLUSTER_SET_RFID_RESPONSE_COMMAND 1
 void OnSetRfidResponseCommandCallback(app::Command *, EndpointId, uint8_t status);
-#define IM_HAVE_DOOR_LOCK_CLUSTER_SET_USER_TYPE_RESPONSE_COMMAND 1
 void OnSetUserTypeResponseCommandCallback(app::Command *, EndpointId, uint8_t status);
-#define IM_HAVE_DOOR_LOCK_CLUSTER_SET_WEEKDAY_SCHEDULE_RESPONSE_COMMAND 1
 void OnSetWeekdayScheduleResponseCommandCallback(app::Command *, EndpointId, uint8_t status);
-#define IM_HAVE_DOOR_LOCK_CLUSTER_SET_YEARDAY_SCHEDULE_RESPONSE_COMMAND 1
 void OnSetYeardayScheduleResponseCommandCallback(app::Command *, EndpointId, uint8_t status);
-#define IM_HAVE_DOOR_LOCK_CLUSTER_UNLOCK_DOOR_RESPONSE_COMMAND 1
 void OnUnlockDoorResponseCommandCallback(app::Command *, EndpointId, uint8_t status);
-#define IM_HAVE_DOOR_LOCK_CLUSTER_UNLOCK_WITH_TIMEOUT_RESPONSE_COMMAND 1
 void OnUnlockWithTimeoutResponseCommandCallback(app::Command *, EndpointId, uint8_t status);
 } // namespace DoorLock
 
@@ -131,27 +106,21 @@ void DispatchClientCommand(app::Command * command, CommandId commandId, Endpoint
 #define IM_HAVE_GROUPS_CLUSTER_GET_GROUP_MEMBERSHIP_RESPONSE_COMMAND 1
 #define IM_HAVE_GROUPS_CLUSTER_REMOVE_GROUP_RESPONSE_COMMAND 1
 #define IM_HAVE_GROUPS_CLUSTER_VIEW_GROUP_RESPONSE_COMMAND 1
-#define IM_HAVE_GROUPS_CLUSTER_ADD_GROUP_RESPONSE_COMMAND 1
 void OnAddGroupResponseCommandCallback(app::Command *, EndpointId, uint8_t status, uint16_t groupId);
-#define IM_HAVE_GROUPS_CLUSTER_GET_GROUP_MEMBERSHIP_RESPONSE_COMMAND 1
 void OnGetGroupMembershipResponseCommandCallback(app::Command *, EndpointId, uint8_t capacity, uint8_t groupCount,
                                                  /* TYPE WARNING: array array defaults to */ uint8_t * groupList);
-#define IM_HAVE_GROUPS_CLUSTER_REMOVE_GROUP_RESPONSE_COMMAND 1
 void OnRemoveGroupResponseCommandCallback(app::Command *, EndpointId, uint8_t status, uint16_t groupId);
-#define IM_HAVE_GROUPS_CLUSTER_VIEW_GROUP_RESPONSE_COMMAND 1
 void OnViewGroupResponseCommandCallback(app::Command *, EndpointId, uint8_t status, uint16_t groupId, const uint8_t * groupName);
 } // namespace Groups
 
 namespace Identify {
 void DispatchClientCommand(app::Command * command, CommandId commandId, EndpointId endpointId, TLV::TLVReader & dataTlv);
 #define IM_HAVE_IDENTIFY_CLUSTER_IDENTIFY_QUERY_RESPONSE_COMMAND 1
-#define IM_HAVE_IDENTIFY_CLUSTER_IDENTIFY_QUERY_RESPONSE_COMMAND 1
 void OnIdentifyQueryResponseCommandCallback(app::Command *, EndpointId, uint16_t timeout);
 } // namespace Identify
 
 namespace MediaPlayback {
 void DispatchClientCommand(app::Command * command, CommandId commandId, EndpointId endpointId, TLV::TLVReader & dataTlv);
-#define IM_HAVE_MEDIA_PLAYBACK_CLUSTER_PLAYBACK_COMMAND 1
 #define IM_HAVE_MEDIA_PLAYBACK_CLUSTER_PLAYBACK_COMMAND 1
 void OnPlaybackCommandCallback(app::Command *, EndpointId);
 } // namespace MediaPlayback
@@ -164,19 +133,13 @@ void DispatchClientCommand(app::Command * command, CommandId commandId, Endpoint
 #define IM_HAVE_SCENES_CLUSTER_REMOVE_SCENE_RESPONSE_COMMAND 1
 #define IM_HAVE_SCENES_CLUSTER_STORE_SCENE_RESPONSE_COMMAND 1
 #define IM_HAVE_SCENES_CLUSTER_VIEW_SCENE_RESPONSE_COMMAND 1
-#define IM_HAVE_SCENES_CLUSTER_ADD_SCENE_RESPONSE_COMMAND 1
 void OnAddSceneResponseCommandCallback(app::Command *, EndpointId, uint8_t status, uint16_t groupId, uint8_t sceneId);
-#define IM_HAVE_SCENES_CLUSTER_GET_SCENE_MEMBERSHIP_RESPONSE_COMMAND 1
 void OnGetSceneMembershipResponseCommandCallback(app::Command *, EndpointId, uint8_t status, uint8_t capacity, uint16_t groupId,
                                                  uint8_t sceneCount,
                                                  /* TYPE WARNING: array array defaults to */ uint8_t * sceneList);
-#define IM_HAVE_SCENES_CLUSTER_REMOVE_ALL_SCENES_RESPONSE_COMMAND 1
 void OnRemoveAllScenesResponseCommandCallback(app::Command *, EndpointId, uint8_t status, uint16_t groupId);
-#define IM_HAVE_SCENES_CLUSTER_REMOVE_SCENE_RESPONSE_COMMAND 1
 void OnRemoveSceneResponseCommandCallback(app::Command *, EndpointId, uint8_t status, uint16_t groupId, uint8_t sceneId);
-#define IM_HAVE_SCENES_CLUSTER_STORE_SCENE_RESPONSE_COMMAND 1
 void OnStoreSceneResponseCommandCallback(app::Command *, EndpointId, uint8_t status, uint16_t groupId, uint8_t sceneId);
-#define IM_HAVE_SCENES_CLUSTER_VIEW_SCENE_RESPONSE_COMMAND 1
 void OnViewSceneResponseCommandCallback(app::Command *, EndpointId, uint8_t status, uint16_t groupId, uint8_t sceneId,
                                         uint16_t transitionTime, const uint8_t * sceneName,
                                         /* TYPE WARNING: array array defaults to */ uint8_t * extensionFieldSets);

@@ -16,6 +16,8 @@ while ((TLVError = dataTlv.Next()) == CHIP_NO_ERROR)
     case {{index}}:
 {{#if (isString type)}}
       TLVError = dataTlv.GetDataPtr({{asSymbol label}});
+{{else if isArray}}
+      TLVError = dataTlv.GetDataPtr({{asSymbol label}});
 {{else}}
       TLVError = dataTlv.Get({{asSymbol label}});
 {{/if}}

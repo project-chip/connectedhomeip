@@ -14,6 +14,7 @@
 
 import("//build_overrides/chip.gni")
 import("${chip_root}/src/lib/core/core.gni")
+import("${chip_root}/src/app/common_flags.gni")
 
 config("includes") {
   include_dirs = [
@@ -47,7 +48,7 @@ source_set("lighting-common") {
     "gen/callback-stub.cpp",
   ]
 
-  if (chip_config_experimental) {
+  if (chip_app_use_interaction_model) {
     sources += [
       "${chip_root}/src/app/clusters/im-compatibility/compatibility-command-handlers.cpp",
       "${chip_root}/src/app/clusters/im-compatibility/compatibility-common.cpp",

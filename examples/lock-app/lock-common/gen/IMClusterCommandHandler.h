@@ -39,11 +39,8 @@ void DispatchServerCommand(app::Command * command, CommandId commandId, Endpoint
 #define IM_HAVE_ON_OFF_CLUSTER_OFF_COMMAND 1
 #define IM_HAVE_ON_OFF_CLUSTER_ON_COMMAND 1
 #define IM_HAVE_ON_OFF_CLUSTER_TOGGLE_COMMAND 1
-#define IM_HAVE_ON_OFF_CLUSTER_OFF_COMMAND 1
 void OnOffCommandCallback(app::Command *, EndpointId);
-#define IM_HAVE_ON_OFF_CLUSTER_ON_COMMAND 1
 void OnOnCommandCallback(app::Command *, EndpointId);
-#define IM_HAVE_ON_OFF_CLUSTER_TOGGLE_COMMAND 1
 void OnToggleCommandCallback(app::Command *, EndpointId);
 } // namespace OnOff
 

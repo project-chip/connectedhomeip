@@ -37,7 +37,6 @@ namespace clusters {
 namespace Basic {
 void DispatchServerCommand(app::Command * command, CommandId commandId, EndpointId endpointId, TLV::TLVReader & dataTlv);
 #define IM_HAVE_BASIC_CLUSTER_RESET_TO_FACTORY_DEFAULTS_COMMAND 1
-#define IM_HAVE_BASIC_CLUSTER_RESET_TO_FACTORY_DEFAULTS_COMMAND 1
 void OnResetToFactoryDefaultsCommandCallback(app::Command *, EndpointId);
 } // namespace Basic
 

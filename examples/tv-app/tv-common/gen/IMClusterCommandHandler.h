@@ -38,15 +38,12 @@ namespace BarrierControl {
 void DispatchServerCommand(app::Command * command, CommandId commandId, EndpointId endpointId, TLV::TLVReader & dataTlv);
 #define IM_HAVE_BARRIER_CONTROL_CLUSTER_BARRIER_CONTROL_GO_TO_PERCENT_COMMAND 1
 #define IM_HAVE_BARRIER_CONTROL_CLUSTER_BARRIER_CONTROL_STOP_COMMAND 1
-#define IM_HAVE_BARRIER_CONTROL_CLUSTER_BARRIER_CONTROL_GO_TO_PERCENT_COMMAND 1
 void OnBarrierControlGoToPercentCommandCallback(app::Command *, EndpointId, uint8_t percentOpen);
-#define IM_HAVE_BARRIER_CONTROL_CLUSTER_BARRIER_CONTROL_STOP_COMMAND 1
 void OnBarrierControlStopCommandCallback(app::Command *, EndpointId);
 } // namespace BarrierControl
 
 namespace Basic {
 void DispatchServerCommand(app::Command * command, CommandId commandId, EndpointId endpointId, TLV::TLVReader & dataTlv);
-#define IM_HAVE_BASIC_CLUSTER_RESET_TO_FACTORY_DEFAULTS_COMMAND 1
 #define IM_HAVE_BASIC_CLUSTER_RESET_TO_FACTORY_DEFAULTS_COMMAND 1
 void OnResetToFactoryDefaultsCommandCallback(app::Command *, EndpointId);
 } // namespace Basic
@@ -67,48 +64,34 @@ void DispatchServerCommand(app::Command * command, CommandId commandId, Endpoint
 #define IM_HAVE_COLOR_CONTROL_CLUSTER_STEP_HUE_COMMAND 1
 #define IM_HAVE_COLOR_CONTROL_CLUSTER_STEP_SATURATION_COMMAND 1
 #define IM_HAVE_COLOR_CONTROL_CLUSTER_STOP_MOVE_STEP_COMMAND 1
-#define IM_HAVE_COLOR_CONTROL_CLUSTER_MOVE_COLOR_COMMAND 1
 void OnMoveColorCommandCallback(app::Command *, EndpointId, int16_t rateX, int16_t rateY, uint8_t optionsMask,
                                 uint8_t optionsOverride);
-#define IM_HAVE_COLOR_CONTROL_CLUSTER_MOVE_COLOR_TEMPERATURE_COMMAND 1
 void OnMoveColorTemperatureCommandCallback(app::Command *, EndpointId, uint8_t moveMode, uint16_t rate,
                                            uint16_t colorTemperatureMinimum, uint16_t colorTemperatureMaximum, uint8_t optionsMask,
                                            uint8_t optionsOverride);
-#define IM_HAVE_COLOR_CONTROL_CLUSTER_MOVE_HUE_COMMAND 1
 void OnMoveHueCommandCallback(app::Command *, EndpointId, uint8_t moveMode, uint8_t rate, uint8_t optionsMask,
                               uint8_t optionsOverride);
-#define IM_HAVE_COLOR_CONTROL_CLUSTER_MOVE_SATURATION_COMMAND 1
 void OnMoveSaturationCommandCallback(app::Command *, EndpointId, uint8_t moveMode, uint8_t rate, uint8_t optionsMask,
                                      uint8_t optionsOverride);
-#define IM_HAVE_COLOR_CONTROL_CLUSTER_MOVE_TO_COLOR_COMMAND 1
 void OnMoveToColorCommandCallback(app::Command *, EndpointId, uint16_t colorX, uint16_t colorY, uint16_t transitionTime,
                                   uint8_t optionsMask, uint8_t optionsOverride);
-#define IM_HAVE_COLOR_CONTROL_CLUSTER_MOVE_TO_COLOR_TEMPERATURE_COMMAND 1
 void OnMoveToColorTemperatureCommandCallback(app::Command *, EndpointId, uint16_t colorTemperature, uint16_t transitionTime,
                                              uint8_t optionsMask, uint8_t optionsOverride);
-#define IM_HAVE_COLOR_CONTROL_CLUSTER_MOVE_TO_HUE_COMMAND 1
 void OnMoveToHueCommandCallback(app::Command *, EndpointId, uint8_t hue, uint8_t direction, uint16_t transitionTime,
                                 uint8_t optionsMask, uint8_t optionsOverride);
-#define IM_HAVE_COLOR_CONTROL_CLUSTER_MOVE_TO_HUE_AND_SATURATION_COMMAND 1
 void OnMoveToHueAndSaturationCommandCallback(app::Command *, EndpointId, uint8_t hue, uint8_t saturation, uint16_t transitionTime,
                                              uint8_t optionsMask, uint8_t optionsOverride);
-#define IM_HAVE_COLOR_CONTROL_CLUSTER_MOVE_TO_SATURATION_COMMAND 1
 void OnMoveToSaturationCommandCallback(app::Command *, EndpointId, uint8_t saturation, uint16_t transitionTime, uint8_t optionsMask,
                                        uint8_t optionsOverride);
-#define IM_HAVE_COLOR_CONTROL_CLUSTER_STEP_COLOR_COMMAND 1
 void OnStepColorCommandCallback(app::Command *, EndpointId, int16_t stepX, int16_t stepY, uint16_t transitionTime,
                                 uint8_t optionsMask, uint8_t optionsOverride);
-#define IM_HAVE_COLOR_CONTROL_CLUSTER_STEP_COLOR_TEMPERATURE_COMMAND 1
 void OnStepColorTemperatureCommandCallback(app::Command *, EndpointId, uint8_t stepMode, uint16_t stepSize, uint16_t transitionTime,
                                            uint16_t colorTemperatureMinimum, uint16_t colorTemperatureMaximum, uint8_t optionsMask,
                                            uint8_t optionsOverride);
-#define IM_HAVE_COLOR_CONTROL_CLUSTER_STEP_HUE_COMMAND 1
 void OnStepHueCommandCallback(app::Command *, EndpointId, uint8_t stepMode, uint8_t stepSize, uint8_t transitionTime,
                               uint8_t optionsMask, uint8_t optionsOverride);
-#define IM_HAVE_COLOR_CONTROL_CLUSTER_STEP_SATURATION_COMMAND 1
 void OnStepSaturationCommandCallback(app::Command *, EndpointId, uint8_t stepMode, uint8_t stepSize, uint8_t transitionTime,
                                      uint8_t optionsMask, uint8_t optionsOverride);
-#define IM_HAVE_COLOR_CONTROL_CLUSTER_STOP_MOVE_STEP_COMMAND 1
 void OnStopMoveStepCommandCallback(app::Command *, EndpointId, uint8_t optionsMask, uint8_t optionsOverride);
 } // namespace ColorControl
 
@@ -116,9 +99,7 @@ namespace ContentLaunch {
 void DispatchServerCommand(app::Command * command, CommandId commandId, EndpointId endpointId, TLV::TLVReader & dataTlv);
 #define IM_HAVE_CONTENT_LAUNCH_CLUSTER_LAUNCH_CONTENT_COMMAND 1
 #define IM_HAVE_CONTENT_LAUNCH_CLUSTER_LAUNCH_URL_COMMAND 1
-#define IM_HAVE_CONTENT_LAUNCH_CLUSTER_LAUNCH_CONTENT_COMMAND 1
 void OnLaunchContentCommandCallback(app::Command *, EndpointId);
-#define IM_HAVE_CONTENT_LAUNCH_CLUSTER_LAUNCH_URL_COMMAND 1
 void OnLaunchURLCommandCallback(app::Command *, EndpointId);
 } // namespace ContentLaunch
 
@@ -126,9 +107,7 @@ namespace DoorLock {
 void DispatchClientCommand(app::Command * command, CommandId commandId, EndpointId endpointId, TLV::TLVReader & dataTlv);
 #define IM_HAVE_DOOR_LOCK_CLUSTER_LOCK_DOOR_RESPONSE_COMMAND 1
 #define IM_HAVE_DOOR_LOCK_CLUSTER_UNLOCK_DOOR_RESPONSE_COMMAND 1
-#define IM_HAVE_DOOR_LOCK_CLUSTER_LOCK_DOOR_RESPONSE_COMMAND 1
 void OnLockDoorResponseCommandCallback(app::Command *, EndpointId, uint8_t status);
-#define IM_HAVE_DOOR_LOCK_CLUSTER_UNLOCK_DOOR_RESPONSE_COMMAND 1
 void OnUnlockDoorResponseCommandCallback(app::Command *, EndpointId, uint8_t status);
 } // namespace DoorLock
 
@@ -157,56 +136,33 @@ void DispatchServerCommand(app::Command * command, CommandId commandId, Endpoint
 #define IM_HAVE_DOOR_LOCK_CLUSTER_SET_YEARDAY_SCHEDULE_COMMAND 1
 #define IM_HAVE_DOOR_LOCK_CLUSTER_UNLOCK_DOOR_COMMAND 1
 #define IM_HAVE_DOOR_LOCK_CLUSTER_UNLOCK_WITH_TIMEOUT_COMMAND 1
-#define IM_HAVE_DOOR_LOCK_CLUSTER_CLEAR_ALL_PINS_COMMAND 1
 void OnClearAllPinsCommandCallback(app::Command *, EndpointId);
-#define IM_HAVE_DOOR_LOCK_CLUSTER_CLEAR_ALL_RFIDS_COMMAND 1
 void OnClearAllRfidsCommandCallback(app::Command *, EndpointId);
-#define IM_HAVE_DOOR_LOCK_CLUSTER_CLEAR_HOLIDAY_SCHEDULE_COMMAND 1
 void OnClearHolidayScheduleCommandCallback(app::Command *, EndpointId, uint8_t scheduleId);
-#define IM_HAVE_DOOR_LOCK_CLUSTER_CLEAR_PIN_COMMAND 1
 void OnClearPinCommandCallback(app::Command *, EndpointId, uint16_t userId);
-#define IM_HAVE_DOOR_LOCK_CLUSTER_CLEAR_RFID_COMMAND 1
 void OnClearRfidCommandCallback(app::Command *, EndpointId, uint16_t userId);
-#define IM_HAVE_DOOR_LOCK_CLUSTER_CLEAR_WEEKDAY_SCHEDULE_COMMAND 1
 void OnClearWeekdayScheduleCommandCallback(app::Command *, EndpointId, uint8_t scheduleId, uint16_t userId);
-#define IM_HAVE_DOOR_LOCK_CLUSTER_CLEAR_YEARDAY_SCHEDULE_COMMAND 1
 void OnClearYeardayScheduleCommandCallback(app::Command *, EndpointId, uint8_t scheduleId, uint16_t userId);
-#define IM_HAVE_DOOR_LOCK_CLUSTER_GET_HOLIDAY_SCHEDULE_COMMAND 1
 void OnGetHolidayScheduleCommandCallback(app::Command *, EndpointId, uint8_t scheduleId);
-#define IM_HAVE_DOOR_LOCK_CLUSTER_GET_LOG_RECORD_COMMAND 1
 void OnGetLogRecordCommandCallback(app::Command *, EndpointId, uint16_t logIndex);
-#define IM_HAVE_DOOR_LOCK_CLUSTER_GET_PIN_COMMAND 1
 void OnGetPinCommandCallback(app::Command *, EndpointId, uint16_t userId);
-#define IM_HAVE_DOOR_LOCK_CLUSTER_GET_RFID_COMMAND 1
 void OnGetRfidCommandCallback(app::Command *, EndpointId, uint16_t userId);
-#define IM_HAVE_DOOR_LOCK_CLUSTER_GET_USER_TYPE_COMMAND 1
 void OnGetUserTypeCommandCallback(app::Command *, EndpointId, uint16_t userId);
-#define IM_HAVE_DOOR_LOCK_CLUSTER_GET_WEEKDAY_SCHEDULE_COMMAND 1
 void OnGetWeekdayScheduleCommandCallback(app::Command *, EndpointId, uint8_t scheduleId, uint16_t userId);
-#define IM_HAVE_DOOR_LOCK_CLUSTER_GET_YEARDAY_SCHEDULE_COMMAND 1
 void OnGetYeardayScheduleCommandCallback(app::Command *, EndpointId, uint8_t scheduleId, uint16_t userId);
-#define IM_HAVE_DOOR_LOCK_CLUSTER_LOCK_DOOR_COMMAND 1
 void OnLockDoorCommandCallback(app::Command *, EndpointId, const uint8_t * PIN);
-#define IM_HAVE_DOOR_LOCK_CLUSTER_SET_HOLIDAY_SCHEDULE_COMMAND 1
 void OnSetHolidayScheduleCommandCallback(app::Command *, EndpointId, uint8_t scheduleId, uint32_t localStartTime,
                                          uint32_t localEndTime, uint8_t operatingModeDuringHoliday);
-#define IM_HAVE_DOOR_LOCK_CLUSTER_SET_PIN_COMMAND 1
 void OnSetPinCommandCallback(app::Command *, EndpointId, uint16_t userId, uint8_t userStatus, uint8_t userType,
                              const uint8_t * pin);
-#define IM_HAVE_DOOR_LOCK_CLUSTER_SET_RFID_COMMAND 1
 void OnSetRfidCommandCallback(app::Command *, EndpointId, uint16_t userId, uint8_t userStatus, uint8_t userType,
                               const uint8_t * id);
-#define IM_HAVE_DOOR_LOCK_CLUSTER_SET_USER_TYPE_COMMAND 1
 void OnSetUserTypeCommandCallback(app::Command *, EndpointId, uint16_t userId, uint8_t userType);
-#define IM_HAVE_DOOR_LOCK_CLUSTER_SET_WEEKDAY_SCHEDULE_COMMAND 1
 void OnSetWeekdayScheduleCommandCallback(app::Command *, EndpointId, uint8_t scheduleId, uint16_t userId, uint8_t daysMask,
                                          uint8_t startHour, uint8_t startMinute, uint8_t endHour, uint8_t endMinute);
-#define IM_HAVE_DOOR_LOCK_CLUSTER_SET_YEARDAY_SCHEDULE_COMMAND 1
 void OnSetYeardayScheduleCommandCallback(app::Command *, EndpointId, uint8_t scheduleId, uint16_t userId, uint32_t localStartTime,
                                          uint32_t localEndTime);
-#define IM_HAVE_DOOR_LOCK_CLUSTER_UNLOCK_DOOR_COMMAND 1
 void OnUnlockDoorCommandCallback(app::Command *, EndpointId, const uint8_t * PIN);
-#define IM_HAVE_DOOR_LOCK_CLUSTER_UNLOCK_WITH_TIMEOUT_COMMAND 1
 void OnUnlockWithTimeoutCommandCallback(app::Command *, EndpointId, uint16_t timeoutInSeconds, const uint8_t * pin);
 } // namespace DoorLock
 
@@ -218,24 +174,17 @@ void DispatchServerCommand(app::Command * command, CommandId commandId, Endpoint
 #define IM_HAVE_GROUPS_CLUSTER_REMOVE_ALL_GROUPS_COMMAND 1
 #define IM_HAVE_GROUPS_CLUSTER_REMOVE_GROUP_COMMAND 1
 #define IM_HAVE_GROUPS_CLUSTER_VIEW_GROUP_COMMAND 1
-#define IM_HAVE_GROUPS_CLUSTER_ADD_GROUP_COMMAND 1
 void OnAddGroupCommandCallback(app::Command *, EndpointId, uint16_t groupId, const uint8_t * groupName);
-#define IM_HAVE_GROUPS_CLUSTER_ADD_GROUP_IF_IDENTIFYING_COMMAND 1
 void OnAddGroupIfIdentifyingCommandCallback(app::Command *, EndpointId, uint16_t groupId, const uint8_t * groupName);
-#define IM_HAVE_GROUPS_CLUSTER_GET_GROUP_MEMBERSHIP_COMMAND 1
 void OnGetGroupMembershipCommandCallback(app::Command *, EndpointId, uint8_t groupCount,
                                          /* TYPE WARNING: array array defaults to */ uint8_t * groupList);
-#define IM_HAVE_GROUPS_CLUSTER_REMOVE_ALL_GROUPS_COMMAND 1
 void OnRemoveAllGroupsCommandCallback(app::Command *, EndpointId);
-#define IM_HAVE_GROUPS_CLUSTER_REMOVE_GROUP_COMMAND 1
 void OnRemoveGroupCommandCallback(app::Command *, EndpointId, uint16_t groupId);
-#define IM_HAVE_GROUPS_CLUSTER_VIEW_GROUP_COMMAND 1
 void OnViewGroupCommandCallback(app::Command *, EndpointId, uint16_t groupId);
 } // namespace Groups
 
 namespace IasZone {
 void DispatchServerCommand(app::Command * command, CommandId commandId, EndpointId endpointId, TLV::TLVReader & dataTlv);
-#define IM_HAVE_IAS_ZONE_CLUSTER_ZONE_ENROLL_RESPONSE_COMMAND 1
 #define IM_HAVE_IAS_ZONE_CLUSTER_ZONE_ENROLL_RESPONSE_COMMAND 1
 void OnZoneEnrollResponseCommandCallback(app::Command *, EndpointId, uint8_t enrollResponseCode, uint8_t zoneId);
 } // namespace IasZone
@@ -244,9 +193,7 @@ namespace Identify {
 void DispatchServerCommand(app::Command * command, CommandId commandId, EndpointId endpointId, TLV::TLVReader & dataTlv);
 #define IM_HAVE_IDENTIFY_CLUSTER_IDENTIFY_COMMAND 1
 #define IM_HAVE_IDENTIFY_CLUSTER_IDENTIFY_QUERY_COMMAND 1
-#define IM_HAVE_IDENTIFY_CLUSTER_IDENTIFY_COMMAND 1
 void OnIdentifyCommandCallback(app::Command *, EndpointId, uint16_t identifyTime);
-#define IM_HAVE_IDENTIFY_CLUSTER_IDENTIFY_QUERY_COMMAND 1
 void OnIdentifyQueryCommandCallback(app::Command *, EndpointId);
 } // namespace Identify
 
@@ -260,23 +207,15 @@ void DispatchServerCommand(app::Command * command, CommandId commandId, Endpoint
 #define IM_HAVE_LEVEL_CONTROL_CLUSTER_STEP_WITH_ON_OFF_COMMAND 1
 #define IM_HAVE_LEVEL_CONTROL_CLUSTER_STOP_COMMAND 1
 #define IM_HAVE_LEVEL_CONTROL_CLUSTER_STOP_WITH_ON_OFF_COMMAND 1
-#define IM_HAVE_LEVEL_CONTROL_CLUSTER_MOVE_COMMAND 1
 void OnMoveCommandCallback(app::Command *, EndpointId, uint8_t moveMode, uint8_t rate, uint8_t optionMask, uint8_t optionOverride);
-#define IM_HAVE_LEVEL_CONTROL_CLUSTER_MOVE_TO_LEVEL_COMMAND 1
 void OnMoveToLevelCommandCallback(app::Command *, EndpointId, uint8_t level, uint16_t transitionTime, uint8_t optionMask,
                                   uint8_t optionOverride);
-#define IM_HAVE_LEVEL_CONTROL_CLUSTER_MOVE_TO_LEVEL_WITH_ON_OFF_COMMAND 1
 void OnMoveToLevelWithOnOffCommandCallback(app::Command *, EndpointId, uint8_t level, uint16_t transitionTime);
-#define IM_HAVE_LEVEL_CONTROL_CLUSTER_MOVE_WITH_ON_OFF_COMMAND 1
 void OnMoveWithOnOffCommandCallback(app::Command *, EndpointId, uint8_t moveMode, uint8_t rate);
-#define IM_HAVE_LEVEL_CONTROL_CLUSTER_STEP_COMMAND 1
 void OnStepCommandCallback(app::Command *, EndpointId, uint8_t stepMode, uint8_t stepSize, uint16_t transitionTime,
                            uint8_t optionMask, uint8_t optionOverride);
-#define IM_HAVE_LEVEL_CONTROL_CLUSTER_STEP_WITH_ON_OFF_COMMAND 1
 void OnStepWithOnOffCommandCallback(app::Command *, EndpointId, uint8_t stepMode, uint8_t stepSize, uint16_t transitionTime);
-#define IM_HAVE_LEVEL_CONTROL_CLUSTER_STOP_COMMAND 1
 void OnStopCommandCallback(app::Command *, EndpointId, uint8_t optionMask, uint8_t optionOverride);
-#define IM_HAVE_LEVEL_CONTROL_CLUSTER_STOP_WITH_ON_OFF_COMMAND 1
 void OnStopWithOnOffCommandCallback(app::Command *, EndpointId);
 } // namespace LevelControl
 
@@ -292,25 +231,15 @@ void DispatchServerCommand(app::Command * command, CommandId commandId, Endpoint
 #define IM_HAVE_MEDIA_PLAYBACK_CLUSTER_SKIP_FORWARD_REQUEST_COMMAND 1
 #define IM_HAVE_MEDIA_PLAYBACK_CLUSTER_START_OVER_REQUEST_COMMAND 1
 #define IM_HAVE_MEDIA_PLAYBACK_CLUSTER_STOP_REQUEST_COMMAND 1
-#define IM_HAVE_MEDIA_PLAYBACK_CLUSTER_FAST_FORWARD_REQUEST_COMMAND 1
 void OnFastForwardRequestCommandCallback(app::Command *, EndpointId);
-#define IM_HAVE_MEDIA_PLAYBACK_CLUSTER_NEXT_REQUEST_COMMAND 1
 void OnNextRequestCommandCallback(app::Command *, EndpointId);
-#define IM_HAVE_MEDIA_PLAYBACK_CLUSTER_PAUSE_REQUEST_COMMAND 1
 void OnPauseRequestCommandCallback(app::Command *, EndpointId);
-#define IM_HAVE_MEDIA_PLAYBACK_CLUSTER_PLAY_REQUEST_COMMAND 1
 void OnPlayRequestCommandCallback(app::Command *, EndpointId);
-#define IM_HAVE_MEDIA_PLAYBACK_CLUSTER_PREVIOUS_REQUEST_COMMAND 1
 void OnPreviousRequestCommandCallback(app::Command *, EndpointId);
-#define IM_HAVE_MEDIA_PLAYBACK_CLUSTER_REWIND_REQUEST_COMMAND 1
 void OnRewindRequestCommandCallback(app::Command *, EndpointId);
-#define IM_HAVE_MEDIA_PLAYBACK_CLUSTER_SKIP_BACKWARD_REQUEST_COMMAND 1
 void OnSkipBackwardRequestCommandCallback(app::Command *, EndpointId);
-#define IM_HAVE_MEDIA_PLAYBACK_CLUSTER_SKIP_FORWARD_REQUEST_COMMAND 1
 void OnSkipForwardRequestCommandCallback(app::Command *, EndpointId);
-#define IM_HAVE_MEDIA_PLAYBACK_CLUSTER_START_OVER_REQUEST_COMMAND 1
 void OnStartOverRequestCommandCallback(app::Command *, EndpointId);
-#define IM_HAVE_MEDIA_PLAYBACK_CLUSTER_STOP_REQUEST_COMMAND 1
 void OnStopRequestCommandCallback(app::Command *, EndpointId);
 } // namespace MediaPlayback
 
@@ -319,11 +248,8 @@ void DispatchServerCommand(app::Command * command, CommandId commandId, Endpoint
 #define IM_HAVE_ON_OFF_CLUSTER_OFF_COMMAND 1
 #define IM_HAVE_ON_OFF_CLUSTER_ON_COMMAND 1
 #define IM_HAVE_ON_OFF_CLUSTER_TOGGLE_COMMAND 1
-#define IM_HAVE_ON_OFF_CLUSTER_OFF_COMMAND 1
 void OnOffCommandCallback(app::Command *, EndpointId);
-#define IM_HAVE_ON_OFF_CLUSTER_ON_COMMAND 1
 void OnOnCommandCallback(app::Command *, EndpointId);
-#define IM_HAVE_ON_OFF_CLUSTER_TOGGLE_COMMAND 1
 void OnToggleCommandCallback(app::Command *, EndpointId);
 } // namespace OnOff
 
@@ -336,20 +262,13 @@ void DispatchServerCommand(app::Command * command, CommandId commandId, Endpoint
 #define IM_HAVE_SCENES_CLUSTER_REMOVE_SCENE_COMMAND 1
 #define IM_HAVE_SCENES_CLUSTER_STORE_SCENE_COMMAND 1
 #define IM_HAVE_SCENES_CLUSTER_VIEW_SCENE_COMMAND 1
-#define IM_HAVE_SCENES_CLUSTER_ADD_SCENE_COMMAND 1
 void OnAddSceneCommandCallback(app::Command *, EndpointId, uint16_t groupId, uint8_t sceneId, uint16_t transitionTime,
                                const uint8_t * sceneName, /* TYPE WARNING: array array defaults to */ uint8_t * extensionFieldSets);
-#define IM_HAVE_SCENES_CLUSTER_GET_SCENE_MEMBERSHIP_COMMAND 1
 void OnGetSceneMembershipCommandCallback(app::Command *, EndpointId, uint16_t groupId);
-#define IM_HAVE_SCENES_CLUSTER_RECALL_SCENE_COMMAND 1
 void OnRecallSceneCommandCallback(app::Command *, EndpointId, uint16_t groupId, uint8_t sceneId, uint16_t transitionTime);
-#define IM_HAVE_SCENES_CLUSTER_REMOVE_ALL_SCENES_COMMAND 1
 void OnRemoveAllScenesCommandCallback(app::Command *, EndpointId, uint16_t groupId);
-#define IM_HAVE_SCENES_CLUSTER_REMOVE_SCENE_COMMAND 1
 void OnRemoveSceneCommandCallback(app::Command *, EndpointId, uint16_t groupId, uint8_t sceneId);
-#define IM_HAVE_SCENES_CLUSTER_STORE_SCENE_COMMAND 1
 void OnStoreSceneCommandCallback(app::Command *, EndpointId, uint16_t groupId, uint8_t sceneId);
-#define IM_HAVE_SCENES_CLUSTER_VIEW_SCENE_COMMAND 1
 void OnViewSceneCommandCallback(app::Command *, EndpointId, uint16_t groupId, uint8_t sceneId);
 } // namespace Scenes
 

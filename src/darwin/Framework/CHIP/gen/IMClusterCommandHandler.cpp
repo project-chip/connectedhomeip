@@ -790,7 +790,7 @@ void DispatchClientCommand(app::Command * command, CommandId commandId, Endpoint
                     TLVError = dataTlv.Get(groupCount);
                     break;
                 case 2:
-                    TLVError = dataTlv.Get(groupList);
+                    TLVError = dataTlv.GetDataPtr(groupList);
                     break;
                 default:
                     // Unsupported tag, ignore it.
@@ -982,7 +982,7 @@ void DispatchClientCommand(app::Command * command, CommandId commandId, Endpoint
                     TLVError = dataTlv.Get(sceneCount);
                     break;
                 case 4:
-                    TLVError = dataTlv.Get(sceneList);
+                    TLVError = dataTlv.GetDataPtr(sceneList);
                     break;
                 default:
                     // Unsupported tag, ignore it.
@@ -1118,7 +1118,7 @@ void DispatchClientCommand(app::Command * command, CommandId commandId, Endpoint
                     TLVError = dataTlv.GetDataPtr(sceneName);
                     break;
                 case 5:
-                    TLVError = dataTlv.Get(extensionFieldSets);
+                    TLVError = dataTlv.GetDataPtr(extensionFieldSets);
                     break;
                 default:
                     // Unsupported tag, ignore it.
