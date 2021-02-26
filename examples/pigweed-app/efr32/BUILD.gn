@@ -100,8 +100,7 @@ efr32_executable("pigweed_app") {
   sources = [
     "${chip_root}/examples/common/pigweed/RpcService.cpp",
     "${chip_root}/examples/common/pigweed/efr32/PigWeedLoggerMutex.cpp",
-    "${examples_plat_dir}/${efr32_family}/${efr32_board}/init_board.c",
-    "${examples_plat_dir}/${efr32_family}/${efr32_board}/init_mcu.c",
+    "${examples_plat_dir}/init_efrPlatform.cpp",
     "${examples_plat_dir}/LEDWidget.cpp",
     "${examples_plat_dir}/PigweedLogger.cpp",
     "${examples_plat_dir}/uart.c",

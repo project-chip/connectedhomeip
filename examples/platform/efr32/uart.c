@@ -19,7 +19,6 @@
 #include "em_core.h"
 #include "em_usart.h"
 #include "hal-config.h"
-#include "init_board.h"
 #include "uartdrv.h"
 #include <retargetserial.h>
 #include <stddef.h>
@@ -28,7 +27,6 @@ void uartConsoleInit(void)
 {
     RETARGET_SerialCrLf(0);
     RETARGET_SerialInit();
-    initVcomEnable();
 }
 
 int16_t uartConsoleWrite(const char * Buf, uint16_t BufLength)
