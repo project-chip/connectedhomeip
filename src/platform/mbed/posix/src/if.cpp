@@ -5,17 +5,20 @@
 
 struct if_nameindex * if_nameindex(void)
 {
-    return NULL;
+    return mbed_if_nameindex();
 }
 
 char * if_indextoname(unsigned int ifindex, char * ifname)
 {
-    return NULL;
+    return mbed_if_indextoname(ifindex, ifname);
 }
 
 unsigned int if_nametoindex(const char * ifname)
 {
-    return 0;
+    return mbed_if_nametoindex(ifname);
 }
 
-void if_freenameindex(struct if_nameindex * ptr) {}
+void if_freenameindex(struct if_nameindex * ptr)
+{
+    mbed_if_freenameindex(ptr);
+}

@@ -1,5 +1,5 @@
-#ifndef MBED_POSIX_UTILS_BYTEORDER_H
-#define MBED_POSIX_UTILS_BYTEORDER_H
+#ifndef MBED_NET_BYTEORDER_H
+#define MBED_NET_BYTEORDER_H
 
 #include <mbed_assert.h>
 #include <stddef.h>
@@ -549,4 +549,4 @@ static inline void sys_mem_swap(void * buf, size_t length)
 }
 #endif
 
-#endif /* MBED_POSIX_UTILS_BYTEORDER_H */
+#endif /* MBED_NET_BYTEORDER_H */

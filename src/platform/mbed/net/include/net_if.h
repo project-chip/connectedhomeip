@@ -56,6 +56,11 @@ extern "C" {
  */
 #define htonll(x) sys_cpu_to_be64(x)
 
+struct if_nameindex * mbed_if_nameindex(void);
+char * mbed_if_indextoname(unsigned int ifindex, char * ifname);
+unsigned int mbed_if_nametoindex(const char * ifname);
+void mbed_if_freenameindex(struct if_nameindex * ptr);
+
 #ifdef __cplusplus
 }
 #endif
