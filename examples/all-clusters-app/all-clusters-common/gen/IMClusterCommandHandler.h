@@ -30,6 +30,7 @@
 #include <core/CHIPTLV.h>
 
 // The IM_HAVE_XXX_CLUSTER_YYY_COMMAND is used for compatibility handlers.
+// TODO: Remove these defines after we no longer need those handlers.
 
 namespace chip {
 namespace app {

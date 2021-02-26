@@ -37,13 +37,14 @@ namespace app {
 void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId,
                                   chip::TLV::TLVReader & aReader, Command * apCommandObj)
 {
-    ChipLogDetail(DataManagement, "Received Cluster Command: Cluster=%" PRIx16 " Command=%" PRIx8 " Endpoint=%" PRIx8, aClusterId,
-                  aCommandId, aEndPointId);
+    ChipLogDetail(Zcl, "Received Cluster Command: Cluster=%" PRIx16 " Command=%" PRIx8 " Endpoint=%" PRIx8, aClusterId, aCommandId,
+                  aEndPointId);
     switch (aClusterId)
     {
     default:
         // Unrecognized cluster ID, error status will apply.
         // TODO: Encode response for Cluster not found
+        ChipLogError(Zcl, "Unknown cluster %" PRIx16, aClusterId);
         break;
     }
 }
@@ -72,8 +73,8 @@ void DispatchClientCommand(app::Command * command, CommandId commandId, Endpoint
                     break;
                 default:
                     // Unsupported tag, ignore it.
-                    // TODO: Can be a log for INFO level
-                    continue;
+                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
+                    break;
                 }
                 if (TLVError != CHIP_NO_ERROR)
                 {
@@ -96,8 +97,8 @@ void DispatchClientCommand(app::Command * command, CommandId commandId, Endpoint
                     break;
                 default:
                     // Unsupported tag, ignore it.
-                    // TODO: Can be a log for INFO level
-                    continue;
+                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
+                    break;
                 }
                 if (TLVError != CHIP_NO_ERROR)
                 {
@@ -110,6 +111,7 @@ void DispatchClientCommand(app::Command * command, CommandId commandId, Endpoint
         default: {
             // Unrecognized command ID, error status will apply.
             // TODO: Encode response for command not found
+            ChipLogError(Zcl, "Unknown command %" PRIx16 " for cluster %" PRIx16, commandId, ZCL_CONTENT_LAUNCH_CLUSTER_ID);
             break;
         }
         }
@@ -138,8 +140,8 @@ void DispatchClientCommand(app::Command * command, CommandId commandId, Endpoint
                     break;
                 default:
                     // Unsupported tag, ignore it.
-                    // TODO: Can be a log for INFO level
-                    continue;
+                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
+                    break;
                 }
                 if (TLVError != CHIP_NO_ERROR)
                 {
@@ -162,8 +164,8 @@ void DispatchClientCommand(app::Command * command, CommandId commandId, Endpoint
                     break;
                 default:
                     // Unsupported tag, ignore it.
-                    // TODO: Can be a log for INFO level
-                    continue;
+                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
+                    break;
                 }
                 if (TLVError != CHIP_NO_ERROR)
                 {
@@ -186,8 +188,8 @@ void DispatchClientCommand(app::Command * command, CommandId commandId, Endpoint
                     break;
                 default:
                     // Unsupported tag, ignore it.
-                    // TODO: Can be a log for INFO level
-                    continue;
+                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
+                    break;
                 }
                 if (TLVError != CHIP_NO_ERROR)
                 {
@@ -210,8 +212,8 @@ void DispatchClientCommand(app::Command * command, CommandId commandId, Endpoint
                     break;
                 default:
                     // Unsupported tag, ignore it.
-                    // TODO: Can be a log for INFO level
-                    continue;
+                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
+                    break;
                 }
                 if (TLVError != CHIP_NO_ERROR)
                 {
@@ -234,8 +236,8 @@ void DispatchClientCommand(app::Command * command, CommandId commandId, Endpoint
                     break;
                 default:
                     // Unsupported tag, ignore it.
-                    // TODO: Can be a log for INFO level
-                    continue;
+                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
+                    break;
                 }
                 if (TLVError != CHIP_NO_ERROR)
                 {
@@ -258,8 +260,8 @@ void DispatchClientCommand(app::Command * command, CommandId commandId, Endpoint
                     break;
                 default:
                     // Unsupported tag, ignore it.
-                    // TODO: Can be a log for INFO level
-                    continue;
+                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
+                    break;
                 }
                 if (TLVError != CHIP_NO_ERROR)
                 {
@@ -282,8 +284,8 @@ void DispatchClientCommand(app::Command * command, CommandId commandId, Endpoint
                     break;
                 default:
                     // Unsupported tag, ignore it.
-                    // TODO: Can be a log for INFO level
-                    continue;
+                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
+                    break;
                 }
                 if (TLVError != CHIP_NO_ERROR)
                 {
@@ -322,8 +324,8 @@ void DispatchClientCommand(app::Command * command, CommandId commandId, Endpoint
                     break;
                 default:
                     // Unsupported tag, ignore it.
-                    // TODO: Can be a log for INFO level
-                    continue;
+                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
+                    break;
                 }
                 if (TLVError != CHIP_NO_ERROR)
                 {
@@ -371,8 +373,8 @@ void DispatchClientCommand(app::Command * command, CommandId commandId, Endpoint
                     break;
                 default:
                     // Unsupported tag, ignore it.
-                    // TODO: Can be a log for INFO level
-                    continue;
+                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
+                    break;
                 }
                 if (TLVError != CHIP_NO_ERROR)
                 {
@@ -408,8 +410,8 @@ void DispatchClientCommand(app::Command * command, CommandId commandId, Endpoint
                     break;
                 default:
                     // Unsupported tag, ignore it.
-                    // TODO: Can be a log for INFO level
-                    continue;
+                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
+                    break;
                 }
                 if (TLVError != CHIP_NO_ERROR)
                 {
@@ -444,8 +446,8 @@ void DispatchClientCommand(app::Command * command, CommandId commandId, Endpoint
                     break;
                 default:
                     // Unsupported tag, ignore it.
-                    // TODO: Can be a log for INFO level
-                    continue;
+                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
+                    break;
                 }
                 if (TLVError != CHIP_NO_ERROR)
                 {
@@ -472,8 +474,8 @@ void DispatchClientCommand(app::Command * command, CommandId commandId, Endpoint
                     break;
                 default:
                     // Unsupported tag, ignore it.
-                    // TODO: Can be a log for INFO level
-                    continue;
+                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
+                    break;
                 }
                 if (TLVError != CHIP_NO_ERROR)
                 {
@@ -524,8 +526,8 @@ void DispatchClientCommand(app::Command * command, CommandId commandId, Endpoint
                     break;
                 default:
                     // Unsupported tag, ignore it.
-                    // TODO: Can be a log for INFO level
-                    continue;
+                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
+                    break;
                 }
                 if (TLVError != CHIP_NO_ERROR)
                 {
@@ -565,8 +567,8 @@ void DispatchClientCommand(app::Command * command, CommandId commandId, Endpoint
                     break;
                 default:
                     // Unsupported tag, ignore it.
-                    // TODO: Can be a log for INFO level
-                    continue;
+                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
+                    break;
                 }
                 if (TLVError != CHIP_NO_ERROR)
                 {
@@ -590,8 +592,8 @@ void DispatchClientCommand(app::Command * command, CommandId commandId, Endpoint
                     break;
                 default:
                     // Unsupported tag, ignore it.
-                    // TODO: Can be a log for INFO level
-                    continue;
+                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
+                    break;
                 }
                 if (TLVError != CHIP_NO_ERROR)
                 {
@@ -614,8 +616,8 @@ void DispatchClientCommand(app::Command * command, CommandId commandId, Endpoint
                     break;
                 default:
                     // Unsupported tag, ignore it.
-                    // TODO: Can be a log for INFO level
-                    continue;
+                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
+                    break;
                 }
                 if (TLVError != CHIP_NO_ERROR)
                 {
@@ -638,8 +640,8 @@ void DispatchClientCommand(app::Command * command, CommandId commandId, Endpoint
                     break;
                 default:
                     // Unsupported tag, ignore it.
-                    // TODO: Can be a log for INFO level
-                    continue;
+                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
+                    break;
                 }
                 if (TLVError != CHIP_NO_ERROR)
                 {
@@ -662,8 +664,8 @@ void DispatchClientCommand(app::Command * command, CommandId commandId, Endpoint
                     break;
                 default:
                     // Unsupported tag, ignore it.
-                    // TODO: Can be a log for INFO level
-                    continue;
+                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
+                    break;
                 }
                 if (TLVError != CHIP_NO_ERROR)
                 {
@@ -686,8 +688,8 @@ void DispatchClientCommand(app::Command * command, CommandId commandId, Endpoint
                     break;
                 default:
                     // Unsupported tag, ignore it.
-                    // TODO: Can be a log for INFO level
-                    continue;
+                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
+                    break;
                 }
                 if (TLVError != CHIP_NO_ERROR)
                 {
@@ -710,8 +712,8 @@ void DispatchClientCommand(app::Command * command, CommandId commandId, Endpoint
                     break;
                 default:
                     // Unsupported tag, ignore it.
-                    // TODO: Can be a log for INFO level
-                    continue;
+                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
+                    break;
                 }
                 if (TLVError != CHIP_NO_ERROR)
                 {
@@ -734,8 +736,8 @@ void DispatchClientCommand(app::Command * command, CommandId commandId, Endpoint
                     break;
                 default:
                     // Unsupported tag, ignore it.
-                    // TODO: Can be a log for INFO level
-                    continue;
+                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
+                    break;
                 }
                 if (TLVError != CHIP_NO_ERROR)
                 {
@@ -758,8 +760,8 @@ void DispatchClientCommand(app::Command * command, CommandId commandId, Endpoint
                     break;
                 default:
                     // Unsupported tag, ignore it.
-                    // TODO: Can be a log for INFO level
-                    continue;
+                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
+                    break;
                 }
                 if (TLVError != CHIP_NO_ERROR)
                 {
@@ -782,8 +784,8 @@ void DispatchClientCommand(app::Command * command, CommandId commandId, Endpoint
                     break;
                 default:
                     // Unsupported tag, ignore it.
-                    // TODO: Can be a log for INFO level
-                    continue;
+                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
+                    break;
                 }
                 if (TLVError != CHIP_NO_ERROR)
                 {
@@ -796,6 +798,7 @@ void DispatchClientCommand(app::Command * command, CommandId commandId, Endpoint
         default: {
             // Unrecognized command ID, error status will apply.
             // TODO: Encode response for command not found
+            ChipLogError(Zcl, "Unknown command %" PRIx16 " for cluster %" PRIx16, commandId, ZCL_DOOR_LOCK_CLUSTER_ID);
             break;
         }
         }
@@ -828,8 +831,8 @@ void DispatchClientCommand(app::Command * command, CommandId commandId, Endpoint
                     break;
                 default:
                     // Unsupported tag, ignore it.
-                    // TODO: Can be a log for INFO level
-                    continue;
+                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
+                    break;
                 }
                 if (TLVError != CHIP_NO_ERROR)
                 {
@@ -861,8 +864,8 @@ void DispatchClientCommand(app::Command * command, CommandId commandId, Endpoint
                     break;
                 default:
                     // Unsupported tag, ignore it.
-                    // TODO: Can be a log for INFO level
-                    continue;
+                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
+                    break;
                 }
                 if (TLVError != CHIP_NO_ERROR)
                 {
@@ -889,8 +892,8 @@ void DispatchClientCommand(app::Command * command, CommandId commandId, Endpoint
                     break;
                 default:
                     // Unsupported tag, ignore it.
-                    // TODO: Can be a log for INFO level
-                    continue;
+                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
+                    break;
                 }
                 if (TLVError != CHIP_NO_ERROR)
                 {
@@ -921,8 +924,8 @@ void DispatchClientCommand(app::Command * command, CommandId commandId, Endpoint
                     break;
                 default:
                     // Unsupported tag, ignore it.
-                    // TODO: Can be a log for INFO level
-                    continue;
+                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
+                    break;
                 }
                 if (TLVError != CHIP_NO_ERROR)
                 {
@@ -935,6 +938,7 @@ void DispatchClientCommand(app::Command * command, CommandId commandId, Endpoint
         default: {
             // Unrecognized command ID, error status will apply.
             // TODO: Encode response for command not found
+            ChipLogError(Zcl, "Unknown command %" PRIx16 " for cluster %" PRIx16, commandId, ZCL_GROUPS_CLUSTER_ID);
             break;
         }
         }
@@ -963,8 +967,8 @@ void DispatchClientCommand(app::Command * command, CommandId commandId, Endpoint
                     break;
                 default:
                     // Unsupported tag, ignore it.
-                    // TODO: Can be a log for INFO level
-                    continue;
+                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
+                    break;
                 }
                 if (TLVError != CHIP_NO_ERROR)
                 {
@@ -977,6 +981,7 @@ void DispatchClientCommand(app::Command * command, CommandId commandId, Endpoint
         default: {
             // Unrecognized command ID, error status will apply.
             // TODO: Encode response for command not found
+            ChipLogError(Zcl, "Unknown command %" PRIx16 " for cluster %" PRIx16, commandId, ZCL_IDENTIFY_CLUSTER_ID);
             break;
         }
         }
@@ -999,6 +1004,7 @@ void DispatchClientCommand(app::Command * command, CommandId commandId, Endpoint
         default: {
             // Unrecognized command ID, error status will apply.
             // TODO: Encode response for command not found
+            ChipLogError(Zcl, "Unknown command %" PRIx16 " for cluster %" PRIx16, commandId, ZCL_MEDIA_PLAYBACK_CLUSTER_ID);
             break;
         }
         }
@@ -1035,8 +1041,8 @@ void DispatchClientCommand(app::Command * command, CommandId commandId, Endpoint
                     break;
                 default:
                     // Unsupported tag, ignore it.
-                    // TODO: Can be a log for INFO level
-                    continue;
+                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
+                    break;
                 }
                 if (TLVError != CHIP_NO_ERROR)
                 {
@@ -1076,8 +1082,8 @@ void DispatchClientCommand(app::Command * command, CommandId commandId, Endpoint
                     break;
                 default:
                     // Unsupported tag, ignore it.
-                    // TODO: Can be a log for INFO level
-                    continue;
+                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
+                    break;
                 }
                 if (TLVError != CHIP_NO_ERROR)
                 {
@@ -1104,8 +1110,8 @@ void DispatchClientCommand(app::Command * command, CommandId commandId, Endpoint
                     break;
                 default:
                     // Unsupported tag, ignore it.
-                    // TODO: Can be a log for INFO level
-                    continue;
+                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
+                    break;
                 }
                 if (TLVError != CHIP_NO_ERROR)
                 {
@@ -1136,8 +1142,8 @@ void DispatchClientCommand(app::Command * command, CommandId commandId, Endpoint
                     break;
                 default:
                     // Unsupported tag, ignore it.
-                    // TODO: Can be a log for INFO level
-                    continue;
+                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
+                    break;
                 }
                 if (TLVError != CHIP_NO_ERROR)
                 {
@@ -1168,8 +1174,8 @@ void DispatchClientCommand(app::Command * command, CommandId commandId, Endpoint
                     break;
                 default:
                     // Unsupported tag, ignore it.
-                    // TODO: Can be a log for INFO level
-                    continue;
+                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
+                    break;
                 }
                 if (TLVError != CHIP_NO_ERROR)
                 {
@@ -1213,8 +1219,8 @@ void DispatchClientCommand(app::Command * command, CommandId commandId, Endpoint
                     break;
                 default:
                     // Unsupported tag, ignore it.
-                    // TODO: Can be a log for INFO level
-                    continue;
+                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
+                    break;
                 }
                 if (TLVError != CHIP_NO_ERROR)
                 {
@@ -1228,6 +1234,7 @@ void DispatchClientCommand(app::Command * command, CommandId commandId, Endpoint
         default: {
             // Unrecognized command ID, error status will apply.
             // TODO: Encode response for command not found
+            ChipLogError(Zcl, "Unknown command %" PRIx16 " for cluster %" PRIx16, commandId, ZCL_SCENES_CLUSTER_ID);
             break;
         }
         }

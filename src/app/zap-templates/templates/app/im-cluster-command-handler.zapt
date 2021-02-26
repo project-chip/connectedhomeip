@@ -20,7 +20,7 @@ namespace app {
 void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId,
                              chip::TLV::TLVReader & aReader, Command * apCommandObj)
 {
-    ChipLogDetail(DataManagement, "Received Cluster Command: Cluster=%" PRIx16 " Command=%" PRIx8 " Endpoint=%" PRIx8, aClusterId,
+    ChipLogDetail(Zcl, "Received Cluster Command: Cluster=%" PRIx16 " Command=%" PRIx8 " Endpoint=%" PRIx8, aClusterId,
                   aCommandId, aEndPointId);
     switch (aClusterId)
     {
@@ -36,6 +36,7 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
     default:
         // Unrecognized cluster ID, error status will apply.
         // TODO: Encode response for Cluster not found
+        ChipLogError(Zcl, "Unknown cluster %" PRIx16, aClusterId);
         break;
     }
 }
@@ -71,6 +72,7 @@ void Dispatch{{asCamelCased side false}}Command(app::Command * command, CommandI
         default: {
             // Unrecognized command ID, error status will apply.
             // TODO: Encode response for command not found
+            ChipLogError(Zcl, "Unknown command %" PRIx16 " for cluster %" PRIx16, commandId, ZCL_{{asDelimitedMacro define}}_ID);
             break;
         }
         }
