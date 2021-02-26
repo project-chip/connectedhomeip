@@ -278,9 +278,10 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetThreadProvis
     otOperationalDatasetTlvs datasetTlv;
 
     VerifyOrReturnError(operationalDatasetLen <= sizeof(datasetTlv.mTlvs), CHIP_ERROR_MESSAGE_TOO_LONG);
-
+    // Just a check, what if we have updated the thread spec and dataset can be larger?
+    static_assert(sizeof(datasetTlv.mTlvs) <= UINT8_MAX);
     memcpy(datasetTlv.mTlvs, operationalDataset, operationalDatasetLen);
-    datasetTlv.mLength = operationalDatasetLen;
+    datasetTlv.mLength = static_cast<uint8_t>(operationalDatasetLen);
 
     // Set the dataset as the active dataset for the node.
     Impl()->LockThreadStack();
