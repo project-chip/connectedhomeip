@@ -54,17 +54,17 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
     }
     switch (status_and_size.status().code())
     {
-    case pw::OkStatus():
+    case pw::OkStatus().code():
         return CHIP_NO_ERROR;
-    case pw::Status::NotFound():
+    case pw::Status::NotFound().code():
         return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
-    case pw::Status::DataLoss():
+    case pw::Status::DataLoss().code():
         return CHIP_ERROR_INTEGRITY_CHECK_FAILED;
-    case pw::Status::ResourceExhausted():
+    case pw::Status::ResourceExhausted().code():
         return CHIP_ERROR_BUFFER_TOO_SMALL;
-    case pw::Status::FailedPrecondition():
+    case pw::Status::FailedPrecondition().code():
         return CHIP_ERROR_WELL_UNINITIALIZED;
-    case pw::Status::InvalidArgument():
+    case pw::Status::InvalidArgument().code():
         return CHIP_ERROR_INVALID_ARGUMENT;
     default:
         break;
@@ -78,16 +78,16 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, 
     auto status = mKvs.Put(key, std::span<const std::byte>(reinterpret_cast<const std::byte *>(value), value_size));
     switch (status.code())
     {
-    case pw::OkStatus():
+    case pw::OkStatus().code():
         return CHIP_NO_ERROR;
-    case pw::Status::DataLoss():
+    case pw::Status::DataLoss().code():
         return CHIP_ERROR_INTEGRITY_CHECK_FAILED;
-    case pw::Status::ResourceExhausted():
-    case pw::Status::AlreadyExists():
+    case pw::Status::ResourceExhausted().code():
+    case pw::Status::AlreadyExists().code():
         return CHIP_ERROR_PERSISTED_STORAGE_FAILED;
-    case pw::Status::FailedPrecondition():
+    case pw::Status::FailedPrecondition().code():
         return CHIP_ERROR_WELL_UNINITIALIZED;
-    case pw::Status::InvalidArgument():
+    case pw::Status::InvalidArgument().code():
         return CHIP_ERROR_INVALID_ARGUMENT;
     default:
         break;
@@ -101,17 +101,17 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
     auto status = mKvs.Delete(key);
     switch (status.code())
     {
-    case pw::OkStatus():
+    case pw::OkStatus().code():
         return CHIP_NO_ERROR;
-    case pw::Status::NotFound():
+    case pw::Status::NotFound().code():
         return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
-    case pw::Status::DataLoss():
+    case pw::Status::DataLoss().code():
         return CHIP_ERROR_INTEGRITY_CHECK_FAILED;
-    case pw::Status::ResourceExhausted():
+    case pw::Status::ResourceExhausted().code():
         return CHIP_ERROR_PERSISTED_STORAGE_FAILED;
-    case pw::Status::FailedPrecondition():
+    case pw::Status::FailedPrecondition().code():
         return CHIP_ERROR_WELL_UNINITIALIZED;
-    case pw::Status::InvalidArgument():
+    case pw::Status::InvalidArgument().code():
         return CHIP_ERROR_INVALID_ARGUMENT;
     default:
         break;
@@ -125,11 +125,11 @@ CHIP_ERROR KeyValueStoreManagerImpl::ErasePartition()
     auto status = mKvsPartition.Erase();
     switch (status.code())
     {
-    case pw::OkStatus():
+    case pw::OkStatus().code():
         return CHIP_NO_ERROR;
-    case pw::Status::DeadlineExceeded():
+    case pw::Status::DeadlineExceeded().code():
         return CHIP_ERROR_TIMEOUT;
-    case pw::Status::PermissionDenied():
+    case pw::Status::PermissionDenied().code():
         return CHIP_ERROR_ACCESS_DENIED;
     default:
         break;
