@@ -15,6 +15,7 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/k32w_sdk.gni")
 import("//build_overrides/mbedtls.gni")
 import("//build_overrides/openthread.gni")
+import("${chip_root}/src/crypto/crypto.gni")
 
 declare_args() {
   # Location of the k32w SDK.
@@ -129,7 +130,6 @@ template("k32w_sdk") {
       "ENABLE_RAM_VECTOR_TABLE=1",
       "gTMR_Enabled_d=1",
       "gTimestamp_Enabled_d=0",
-      "gMainThreadStackSize_c=6024",
       "K32W_LOG_ENABLED=1",
       "CHIP_ENABLE_OPENTHREAD=1",
       "PoolsDetails_c=_block_size_ 32 _number_of_blocks_ 6 _pool_id_(0) _eol_ _block_size_ 512 _number_of_blocks_ 2 _pool_id_(0) _eol_ _block_size_ 768 _number_of_blocks_ 1 _pool_id_(0) _eol_",
@@ -151,6 +151,18 @@ template("k32w_sdk") {
       #TODO: move this define in a MBEDTLS specific GN file
       "MBEDTLS_FREESCALE_FREERTOS_CALLOC_ALT=1",
     ]
+    if (with_se05x == 1) {
+      defines += [
+        "MBEDTLS_FREESCALE_FREERTOS_CALLOC_ALT=1",
+        "gMainThreadStackSize_c=14048",
+      ]
+    }
+    else {
+      defines += [
+        "gMainThreadStackSize_c=6024",
+      ]
+    }
+
 
     if (defined(invoker.defines)) {
       defines += invoker.defines
@@ -178,8 +190,6 @@ template("k32w_sdk") {
     }
 
     sources += [
-      "${k32w_sdk_root}/boards/k32w061dk6/wireless_examples/openthread/enablement/clock_config.c",
-      "${k32w_sdk_root}/boards/k32w061dk6/wireless_examples/openthread/enablement/pin_mux.c",
       "${k32w_sdk_root}/boards/k32w061dk6/wireless_examples/openthread/reed/bm/board.c",
       "${k32w_sdk_root}/boards/k32w061dk6/wireless_examples/openthread/reed/bm/board_utility.c",
       "${k32w_sdk_root}/boards/k32w061dk6/wireless_examples/openthread/reed/bm/hardware_init.c",
@@ -203,6 +213,8 @@ template("k32w_sdk") {
       "${k32w_sdk_root}/devices/K32W061/drivers/fsl_spifi.c",
       "${k32w_sdk_root}/devices/K32W061/drivers/fsl_usart.c",
       "${k32w_sdk_root}/devices/K32W061/drivers/fsl_wtimer.c",
+      "${k32w_sdk_root}/devices/K32W061/drivers/fsl_i2c.c",
+      "${k32w_sdk_root}/devices/K32W061/drivers/fsl_i2c_freertos.c",
       "${k32w_sdk_root}/devices/K32W061/mcuxpresso/startup_k32w061.c",
       "${k32w_sdk_root}/devices/K32W061/system_K32W061.c",
       "${k32w_sdk_root}/devices/K32W061/utilities/debug_console/fsl_debug_console.c",
@@ -238,6 +250,20 @@ template("k32w_sdk") {
       "${k32w_sdk_root}/rtos/amazon-freertos/lib/FreeRTOS/tasks.c",
       "${k32w_sdk_root}/rtos/amazon-freertos/lib/FreeRTOS/timers.c",
     ]
+
+    if (with_se05x == 1) {
+      sources += [
+        "${chip_root}/third_party/simw-top/demos/repo/ksdk/common/boards/DK6/wireless_examples/chip/pin_mux.c",
+        "${chip_root}/third_party/simw-top/demos/repo/ksdk/common/boards/DK6/wireless_examples/chip/clock_config.c",
+      ]
+    }
+    else {
+      sources += [
+        "${k32w_sdk_root}/boards/k32w061dk6/wireless_examples/openthread/enablement/clock_config.c",
+        "${k32w_sdk_root}/boards/k32w061dk6/wireless_examples/openthread/enablement/pin_mux.c",
+      ]
+    }
+
 
     if (!defined(public_deps)) {
       public_deps = []

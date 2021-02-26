@@ -46,6 +46,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <crypto/hsm/CHIPCryptoPALHsm_config.h>
 
 using namespace chip;
 using namespace chip::Crypto;
@@ -660,7 +661,11 @@ static void TestECDSA_Signing_SHA256_Msg(nlTestSuite * inSuite, void * inContext
     const char * msg  = "Hello World!";
     size_t msg_length = strlen(msg);
 
+#if ENABLE_HSM_GENERATE_EC_KEY
+    P256Keypair keypair(0xFF112233);
+#else
     P256Keypair keypair;
+#endif
     NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
 
     P256ECDSASignature signature;
@@ -678,7 +683,11 @@ static void TestECDSA_Signing_SHA256_Hash(nlTestSuite * inSuite, void * inContex
                              0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F };
     size_t hash_length   = sizeof(hash);
 
+#if ENABLE_HSM_GENERATE_EC_KEY
+    P256Keypair keypair(0xFF112233);
+#else
     P256Keypair keypair;
+#endif
     NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
 
     P256ECDSASignature signature;
@@ -694,7 +703,11 @@ static void TestECDSA_ValidationFailsDifferentMessage(nlTestSuite * inSuite, voi
     const char * msg  = "Hello World!";
     size_t msg_length = strlen(msg);
 
+#if ENABLE_HSM_GENERATE_EC_KEY
+    P256Keypair keypair(0xFF112233);
+#else
     P256Keypair keypair;
+#endif
     NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
 
     P256ECDSASignature signature;
@@ -714,7 +727,11 @@ static void TestECDSA_ValidationFailsDifferentHash(nlTestSuite * inSuite, void *
                              0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F };
     size_t hash_length   = sizeof(hash);
 
+#if ENABLE_HSM_GENERATE_EC_KEY
+    P256Keypair keypair(0xFF112233);
+#else
     P256Keypair keypair;
+#endif
     NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
 
     P256ECDSASignature signature;
@@ -734,7 +751,11 @@ static void TestECDSA_ValidationFailIncorrectMsgSignature(nlTestSuite * inSuite,
     const char * msg  = "Hello World!";
     size_t msg_length = strlen(msg);
 
+#if ENABLE_HSM_GENERATE_EC_KEY
+    P256Keypair keypair(0xFF112233);
+#else
     P256Keypair keypair;
+#endif
     NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
 
     P256ECDSASignature signature;
@@ -753,7 +774,11 @@ static void TestECDSA_ValidationFailIncorrectHashSignature(nlTestSuite * inSuite
                              0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F };
     size_t hash_length   = sizeof(hash);
 
+#if ENABLE_HSM_GENERATE_EC_KEY
+    P256Keypair keypair(0xFF112233);
+#else
     P256Keypair keypair;
+#endif
     NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
 
     P256ECDSASignature signature;
@@ -770,7 +795,11 @@ static void TestECDSA_SigningMsgInvalidParams(nlTestSuite * inSuite, void * inCo
     const uint8_t * msg = reinterpret_cast<const uint8_t *>("Hello World!");
     size_t msg_length   = strlen(reinterpret_cast<const char *>(msg));
 
+#if ENABLE_HSM_GENERATE_EC_KEY
+    P256Keypair keypair(0xFF112233);
+#else
     P256Keypair keypair;
+#endif
     NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
 
     P256ECDSASignature signature;
@@ -789,7 +818,11 @@ static void TestECDSA_SigningHashInvalidParams(nlTestSuite * inSuite, void * inC
                              0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F };
     size_t hash_length   = sizeof(hash);
 
+#if ENABLE_HSM_GENERATE_EC_KEY
+    P256Keypair keypair(0xFF112233);
+#else
     P256Keypair keypair;
+#endif
     NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
 
     P256ECDSASignature signature;
@@ -807,7 +840,11 @@ static void TestECDSA_ValidationMsgInvalidParam(nlTestSuite * inSuite, void * in
     const char * msg  = "Hello World!";
     size_t msg_length = strlen(msg);
 
+#if ENABLE_HSM_GENERATE_EC_KEY
+    P256Keypair keypair(0xFF112233);
+#else
     P256Keypair keypair;
+#endif
     NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
 
     P256ECDSASignature signature;
@@ -829,7 +866,11 @@ static void TestECDSA_ValidationHashInvalidParam(nlTestSuite * inSuite, void * i
                              0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F };
     size_t hash_length   = sizeof(hash);
 
+#if ENABLE_HSM_GENERATE_EC_KEY
+    P256Keypair keypair(0xFF112233);
+#else
     P256Keypair keypair;
+#endif
     NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
 
     P256ECDSASignature signature;
@@ -847,10 +888,18 @@ static void TestECDSA_ValidationHashInvalidParam(nlTestSuite * inSuite, void * i
 
 static void TestECDH_EstablishSecret(nlTestSuite * inSuite, void * inContext)
 {
+#if ENABLE_HSM_GENERATE_EC_KEY
+    P256Keypair keypair1(0xFF112233);
+#else
     P256Keypair keypair1;
+#endif
     NL_TEST_ASSERT(inSuite, keypair1.Initialize() == CHIP_NO_ERROR);
 
+#if ENABLE_HSM_GENERATE_EC_KEY
+    P256Keypair keypair2(0xFF112233);
+#else
     P256Keypair keypair2;
+#endif
     NL_TEST_ASSERT(inSuite, keypair2.Initialize() == CHIP_NO_ERROR);
 
     P256ECDHDerivedSecret out_secret1;
@@ -893,13 +942,17 @@ static void TestAddEntropySources(nlTestSuite * inSuite, void * inContext)
     CHIP_ERROR error = add_entropy_source(test_entropy_source, nullptr, 10);
     NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
     uint8_t buffer[5];
+    #ifndef ENABLE_HSM_RAND_GEN
     uint32_t test_entropy_source_call_count = gs_test_entropy_source_called;
+    #endif
     NL_TEST_ASSERT(inSuite, DRBG_get_bytes(buffer, sizeof(buffer)) == CHIP_NO_ERROR);
     for (int i = 0; i < 5000 * 2; i++)
     {
         (void) DRBG_get_bytes(buffer, sizeof(buffer));
     }
+    #ifndef ENABLE_HSM_RAND_GEN
     NL_TEST_ASSERT(inSuite, gs_test_entropy_source_called > test_entropy_source_call_count);
+    #endif
 }
 #endif
 
@@ -932,7 +985,11 @@ static void TestPBKDF2_SHA256_TestVectors(nlTestSuite * inSuite, void * inContex
 
 static void TestP256_Keygen(nlTestSuite * inSuite, void * inContext)
 {
+#if ENABLE_HSM_GENERATE_EC_KEY
+    P256Keypair keypair(0xFF112233);
+#else
     P256Keypair keypair;
+#endif
     NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
 
     const char * msg         = "Test Message for Keygen";
@@ -957,13 +1014,21 @@ static void TestCSR_Gen(nlTestSuite * inSuite, void * inContext)
 
 static void TestKeypair_Serialize(nlTestSuite * inSuite, void * inContext)
 {
+#if ENABLE_HSM_GENERATE_EC_KEY
+    P256Keypair keypair(0xFF112233);
+#else
     P256Keypair keypair;
+#endif
     NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
 
     P256SerializedKeypair serialized;
     NL_TEST_ASSERT(inSuite, keypair.Serialize(serialized) == CHIP_NO_ERROR);
 
+#if ENABLE_HSM_GENERATE_EC_KEY
+    P256Keypair keypair_dup(0xFF112233);
+#else
     P256Keypair keypair_dup;
+#endif
     NL_TEST_ASSERT(inSuite, keypair_dup.Deserialize(serialized) == CHIP_NO_ERROR);
 
     const char * msg         = "Test Message for Keygen";
@@ -1269,7 +1334,7 @@ static void TestSPAKE2P_RFC(nlTestSuite * inSuite, void * inContext)
 
         // Compute the first round and send it to the verifier
         X_len = sizeof(X);
-        error = Prover.ComputeRoundOne(X, &X_len);
+        error = Prover.ComputeRoundOne(NULL, 0, X, &X_len);
         NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, X_len == vector->X_len);
         NL_TEST_ASSERT(inSuite, memcmp(X, vector->X, vector->X_len) == 0);
@@ -1296,7 +1361,7 @@ static void TestSPAKE2P_RFC(nlTestSuite * inSuite, void * inContext)
 
         // Compute the first round and send it to the prover
         Y_len = sizeof(Y);
-        error = Verifier.ComputeRoundOne(Y, &Y_len);
+        error = Verifier.ComputeRoundOne(X, X_len, Y, &Y_len);
         NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, Y_len == vector->Y_len);
         NL_TEST_ASSERT(inSuite, memcmp(Y, vector->Y, vector->Y_len) == 0);
@@ -1401,6 +1466,7 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test P256 Keygen", TestP256_Keygen),
     NL_TEST_DEF("Test CSR Generation", TestCSR_Gen),
     NL_TEST_DEF("Test Keypair Serialize", TestKeypair_Serialize),
+    NL_TEST_DEF("Test Spake2+ against RFC test vectors", TestSPAKE2P_RFC),
     NL_TEST_DEF("Test Spake2p_spake2p FEMul", TestSPAKE2P_spake2p_FEMul),
     NL_TEST_DEF("Test Spake2p_spake2p FELoad/FEWrite", TestSPAKE2P_spake2p_FELoadWrite),
     NL_TEST_DEF("Test Spake2p_spake2p Mac", TestSPAKE2P_spake2p_Mac),
@@ -1408,7 +1474,6 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test Spake2p_spake2p PointMulAdd", TestSPAKE2P_spake2p_PointMulAdd),
     NL_TEST_DEF("Test Spake2p_spake2p PointLoad/PointWrite", TestSPAKE2P_spake2p_PointLoadWrite),
     NL_TEST_DEF("Test Spake2p_spake2p PointIsValid", TestSPAKE2P_spake2p_PointIsValid),
-    NL_TEST_DEF("Test Spake2+ against RFC test vectors", TestSPAKE2P_RFC),
     NL_TEST_SENTINEL()
 };
 

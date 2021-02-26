@@ -1,5 +1,4 @@
 # Copyright (c) 2020 Project CHIP Authors
-# Copyright 2020 NXP
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,20 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Configuration file
+
 declare_args() {
-  # Crypto implementation: mbedtls, openssl.
-  chip_crypto = ""
-  with_se05x = 0
-}
 
-if (chip_crypto == "") {
-  if (current_os == "android" || current_os == "freertos" ||
-      current_os == "zephyr") {
-    chip_crypto = "mbedtls"
-  } else {
-    chip_crypto = "openssl"
-  }
+# possible values host_k32w, host_linux
+  host = "host_linux"
 }
-
-assert(chip_crypto == "mbedtls" || chip_crypto == "openssl",
-       "Please select a valid crypto implementation: mbedtls, openssl")

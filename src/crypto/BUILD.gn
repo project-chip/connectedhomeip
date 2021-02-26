@@ -1,4 +1,5 @@
 # Copyright (c) 2020 Project CHIP Authors
+# Copyright 2020 NXP
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -32,6 +33,13 @@ buildconfig_header("crypto_buildconfig") {
     "CHIP_CRYPTO_OPENSSL=${chip_crypto_openssl}",
     "CHIP_WITH_OPENSSL=${chip_crypto_openssl}",
   ]
+
+  if(with_se05x == 1){
+    defines += [ "CHIP_CRYPTO_HSM=1" ]
+  }
+  else {
+    defines += [ "CHIP_CRYPTO_HSM=0" ]
+  }
 }
 
 if (chip_crypto == "openssl") {
@@ -75,5 +83,11 @@ static_library("crypto") {
     public_configs += [ ":openssl_config" ]
   } else {
     assert(false, "Invalid CHIP crypto")
+  }
+
+  if(with_se05x == 1){
+    sources += [ "hsm/nxp/CHIPCryptoPALHsm_SE05X.cpp" ]
+    public_deps += [ "${chip_root}/third_party/simw-top:se05x" ]
+    public_configs += [ "${chip_root}/third_party/simw-top:se05x_config" ]
   }
 }

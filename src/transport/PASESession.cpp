@@ -549,7 +549,7 @@ CHIP_ERROR PASESession::SendMsg1()
                                           &mPASEVerifier[0][0], kSpake2p_WS_Length, &mPASEVerifier[1][0], kSpake2p_WS_Length);
     SuccessOrExit(err);
 
-    err = mSpake2p.ComputeRoundOne(X, &X_len);
+    err = mSpake2p.ComputeRoundOne(NULL, 0, X, &X_len);
     SuccessOrExit(err);
 
     msg_pA = System::PacketBufferHandle::NewWithData(&X[0], X_len);
@@ -591,7 +591,8 @@ CHIP_ERROR PASESession::HandleMsg1_and_SendMsg2(const PacketHeader & header, con
                                  &mPASEVerifier[0][0], kSpake2p_WS_Length, mPoint, sizeof(mPoint));
     SuccessOrExit(err);
 
-    err = mSpake2p.ComputeRoundOne(Y, &Y_len);
+    // Pass parameters Pa (to check abort condition) and random value (to compute Pb value).
+    err = mSpake2p.ComputeRoundOne(buf, buf_len, Y, &Y_len);
     SuccessOrExit(err);
 
     err = mSpake2p.ComputeRoundTwo(buf, buf_len, verifier, &verifier_len);
