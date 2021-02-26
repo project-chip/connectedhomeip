@@ -14,7 +14,7 @@ Following table shows the operations supported by secure element.
 +-------------------------+-----------+----------------+---------------------------------+------------+----------------------------+
 | SPAKE Verifier          | No        | Enabled        | -                               | No         | ENABLE_HSM_SPAKE_VERIFIER  |
 +-------------------------+-----------+----------------+---------------------------------+------------+----------------------------+
-| SPAKE Prover            | No        | Disabled       | -                               | No         | ENABLE_HSM_SPAKE_PROVER    |
+| SPAKE Prover            | No        | Enabled        | -                               | No         | ENABLE_HSM_SPAKE_PROVER    |
 +-------------------------+-----------+----------------+---------------------------------+------------+----------------------------+
 | AES CCM Encrypt         | -         | -              | Not supported                   | -          | Not supported              |
 +-------------------------+-----------+----------------+---------------------------------+------------+----------------------------+
@@ -24,13 +24,13 @@ Following table shows the operations supported by secure element.
 +-------------------------+-----------+----------------+---------------------------------+------------+----------------------------+
 | SHA256 Multistep        | -         | -              | Not supported                   | -          | Not supported              |
 +-------------------------+-----------+----------------+---------------------------------+------------+----------------------------+
-| HKDF SHA256             | Yes       | Disabled       | SW rollback if -                | Yes        | ENABLE_HSM_HKDF_SHA256     |
+| HKDF SHA256             | Yes       | Enabled        | SW rollback if -                | Yes        | ENABLE_HSM_HKDF_SHA256     |
 |                         |           |                | salt length is > 64             |            |                            |
 |                         |           |                | info length > 80                |            |                            |
 |                         |           |                | secret_length > 256             |            |                            |
 |                         |           |                | out_length > 768                |            |                            |
 +-------------------------+-----------+----------------+---------------------------------+------------+----------------------------+
-| RAND Generator          | No        | Disabled       | -                               | Yes        | ENABLE_HSM_RAND_GEN        |
+| RAND Generator          | No        | Enabled        | -                               | Yes        | ENABLE_HSM_RAND_GEN        |
 +-------------------------+-----------+----------------+---------------------------------+------------+----------------------------+
 | ECDSA Sign Message      | No        | Disabled       | -                               | Yes        | ENABLE_HSM_GENERATE_EC_KEY |
 | (Nist256)               |           |                |                                 |            |                            |
