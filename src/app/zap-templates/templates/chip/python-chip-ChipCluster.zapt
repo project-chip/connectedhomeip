@@ -42,6 +42,7 @@ class ChipCluster:
     def Cluster{{asCamelCased clusterName false}}_Command{{asCamelCased name false}}(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int{{#chip_server_cluster_command_arguments}}, {{asCamelCased label}}: {{asPythonType chipType}}{{/chip_server_cluster_command_arguments}}):
 {{#chip_server_cluster_command_arguments}}
 {{#if (isByteString type)}}
+        {{asCamelCased label}} = {{asCamelCased label}}.encode("utf-8") + b'\x00'
 {{else if (isString type)}}
         {{asCamelCased label}} = {{asCamelCased label}}.encode("utf-8") + b'\x00'
 {{/if}}
