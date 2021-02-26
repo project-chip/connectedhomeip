@@ -1466,7 +1466,6 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test P256 Keygen", TestP256_Keygen),
     NL_TEST_DEF("Test CSR Generation", TestCSR_Gen),
     NL_TEST_DEF("Test Keypair Serialize", TestKeypair_Serialize),
-    NL_TEST_DEF("Test Spake2+ against RFC test vectors", TestSPAKE2P_RFC),
     NL_TEST_DEF("Test Spake2p_spake2p FEMul", TestSPAKE2P_spake2p_FEMul),
     NL_TEST_DEF("Test Spake2p_spake2p FELoad/FEWrite", TestSPAKE2P_spake2p_FELoadWrite),
     NL_TEST_DEF("Test Spake2p_spake2p Mac", TestSPAKE2P_spake2p_Mac),
@@ -1474,6 +1473,7 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test Spake2p_spake2p PointMulAdd", TestSPAKE2P_spake2p_PointMulAdd),
     NL_TEST_DEF("Test Spake2p_spake2p PointLoad/PointWrite", TestSPAKE2P_spake2p_PointLoadWrite),
     NL_TEST_DEF("Test Spake2p_spake2p PointIsValid", TestSPAKE2P_spake2p_PointIsValid),
+    NL_TEST_DEF("Test Spake2+ against RFC test vectors", TestSPAKE2P_RFC),
     NL_TEST_SENTINEL()
 };
 

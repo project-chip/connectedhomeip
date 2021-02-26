@@ -793,6 +793,7 @@ exit:
     }
     if (ec_key != nullptr)
     {
+        EC_KEY_free(ec_key);
         ec_key = nullptr;
     }
     if (verification_key != nullptr)
