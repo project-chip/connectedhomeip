@@ -112,6 +112,22 @@ exit:
 }
 
 template <class ImplClass>
+CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_Shutdown()
+{
+    CHIP_ERROR err;
+    ChipLogError(DeviceLayer, "system Layer shutdown");
+    err = SystemLayer.Shutdown();
+    ChipLogError(DeviceLayer, "Inet Layer shutdown");
+    err = InetLayer.Shutdown();
+
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+    ChipLogError(DeviceLayer, "ble layer shutdown");
+    err = BLEMgr().GetBleLayer()->Shutdown();
+#endif
+    return err;
+}
+
+template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_AddEventHandler(PlatformManager::EventHandlerFunct handler, intptr_t arg)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
