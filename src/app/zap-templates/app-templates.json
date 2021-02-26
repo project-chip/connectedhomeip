@@ -127,12 +127,12 @@
         },
         {
             "path": "templates/app/im-cluster-command-handler.zapt",
-            "name": "CHIP Client Callbacks",
+            "name": "CHIP Client Callbacks for Interaction Model",
             "output": "IMClusterCommandHandler.cpp"
         },
         {
             "path": "templates/app/im-cluster-command-handler-h.zapt",
-            "name": "CHIP Client Callbacks",
+            "name": "CHIP Client Callbacks header for Interaction Model",
             "output": "IMClusterCommandHandler.h"
         },
         {
