@@ -43,7 +43,7 @@
 #include "af-event.h"
 #include "af-main.h"
 #include "af.h"
-#include "common.h"
+#include "app/util/common.h"
 
 #include "gen/attribute-id.h"
 #include "gen/attribute-type.h"
