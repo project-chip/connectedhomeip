@@ -10,7 +10,7 @@
         "DISCO_L475VG_IOT01A": {
             "lwip.ipv6-enabled": true,
             "lwip.raw-socket-enabled": true,
-            "target.components_add": ["ism43362"],
+            "target.components_add": ["wifi_ism43362"],
             "ism43362.provide-default": true,
             "target.network-default-interface-type": "WIFI",
             "target.macros_add" : ["MBEDTLS_SHA1_C"]
