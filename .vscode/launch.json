@@ -83,6 +83,128 @@
                     "ignoreFailures": true
                 }
             ]
+        },
+        {
+            "name": "Shell Mbed Example Debug [NRF52840_DK]",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceRoot}/examples/shell/mbed/build-NRF52840_DK/chip-mbed-shell-example",
+            "args": [],
+            "stopAtEntry": true,
+            "cwd": "${workspaceRoot}/examples/shell/mbed",
+            "environment": [],
+            "externalConsole": false,
+            "debugServerArgs": "",
+            "serverLaunchTimeout": 20000,
+            "filterStderr": true,
+            "filterStdout": false,
+            "serverStarted": "GDB\\ server\\ started",
+            "logging": {
+                "moduleLoad": true,
+                "trace": true,
+                "engineLogging": true,
+                "programOutput": true,
+                "exceptions": true
+            },
+            "linux": {
+                "MIMode": "gdb",
+                "MIDebuggerPath": "arm-none-eabi-gdb",
+                "debugServerPath": "pyocd-gdbserver"
+            },
+            "setupCommands": [
+                {
+                    "text": "-target-select remote localhost:3333",
+                    "description": "connect to target",
+                    "ignoreFailures": false
+                },
+                {
+                    "text": "-file-exec-and-symbols ${workspaceRoot}/examples/shell/mbed/build-NRF52840_DK/chip-mbed-shell-example",
+                    "description": "load file",
+                    "ignoreFailures": false
+                },
+                {
+                    "text": "-interpreter-exec console \"monitor endian little\"",
+                    "ignoreFailures": false
+                },
+                {
+                    "text": "-interpreter-exec console \"monitor reset\"",
+                    "ignoreFailures": false
+                },
+                {
+                    "text": "-interpreter-exec console \"monitor halt\"",
+                    "ignoreFailures": false
+                },
+                {
+                    "text": "-interpreter-exec console \"monitor arm semihosting enable\"",
+                    "ignoreFailures": false
+                },
+                {
+                    "text": "-target-download",
+                    "description": "flash target",
+                    "ignoreFailures": false
+                }
+            ]
+        },
+        {
+            "name": "Shell Mbed Example Debug [DISCO_L475VG_IOT01A]",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceRoot}/examples/shell/mbed/build-DISCO_L475VG_IOT01A/chip-mbed-shell-example",
+            "args": [],
+            "stopAtEntry": true,
+            "cwd": "${workspaceRoot}/examples/shell/mbed",
+            "environment": [],
+            "externalConsole": false,
+            "debugServerArgs": "",
+            "serverLaunchTimeout": 20000,
+            "filterStderr": true,
+            "filterStdout": false,
+            "serverStarted": "GDB\\ server\\ started",
+            "logging": {
+                "moduleLoad": true,
+                "trace": true,
+                "engineLogging": true,
+                "programOutput": true,
+                "exceptions": true
+            },
+            "linux": {
+                "MIMode": "gdb",
+                "MIDebuggerPath": "arm-none-eabi-gdb",
+                "debugServerPath": "pyocd-gdbserver"
+            },
+            "setupCommands": [
+                {
+                    "text": "-target-select remote localhost:3333",
+                    "description": "connect to target",
+                    "ignoreFailures": false
+                },
+                {
+                    "text": "-file-exec-and-symbols ${workspaceRoot}/examples/shell/mbed/build-DISCO_L475VG_IOT01A/chip-mbed-shell-example",
+                    "description": "load file",
+                    "ignoreFailures": false
+                },
+                {
+                    "text": "-interpreter-exec console \"monitor endian little\"",
+                    "ignoreFailures": false
+                },
+                {
+                    "text": "-interpreter-exec console \"monitor reset\"",
+                    "ignoreFailures": false
+                },
+                {
+                    "text": "-interpreter-exec console \"monitor halt\"",
+                    "ignoreFailures": false
+                },
+                {
+                    "text": "-interpreter-exec console \"monitor arm semihosting enable\"",
+                    "ignoreFailures": false
+                },
+                {
+                    "text": "-target-download",
+                    "description": "flash target",
+                    "ignoreFailures": false
+                }
+            ]
         }
     ]
 }
