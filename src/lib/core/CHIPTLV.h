@@ -32,6 +32,7 @@
 #include <core/CHIPTLVTypes.h>
 
 #include <support/DLLUtil.h>
+#include <support/BytesData.h>
 
 #include <stdarg.h>
 #include <stdlib.h>
@@ -1078,6 +1079,34 @@ public:
      * @overload CHIP_ERROR TLVWriter::Put(uint64_t tag, double v)
      */
     CHIP_ERROR Put(uint64_t tag, float v);
+
+    /**
+     * Encodes a TLV byte string value using BytesData class.
+     *
+     * @param[in]   tag             The TLV tag to be encoded with the value, or @p AnonymousTag if the
+     *                              value should be encoded without a tag.  Tag values should be
+     *                              constructed with one of the tag definition functions ProfileTag(),
+     *                              ContextTag() or CommonTag().
+     * @param[in]   data            A BytesData object containing the bytes string to be encoded.
+     *
+     * @retval #CHIP_NO_ERROR      If the method succeeded.
+     * @retval #CHIP_ERROR_TLV_CONTAINER_OPEN
+     *                              If a container writer has been opened on the current writer and not
+     *                              yet closed.
+     * @retval #CHIP_ERROR_INVALID_TLV_TAG
+     *                              If the specified tag value is invalid or inappropriate in the context
+     *                              in which the value is being written.
+     * @retval #CHIP_ERROR_BUFFER_TOO_SMALL
+     *                              If writing the value would exceed the limit on the maximum number of
+     *                              bytes specified when the writer was initialized.
+     * @retval #CHIP_ERROR_NO_MEMORY
+     *                              If an attempt to allocate an output buffer failed due to lack of
+     *                              memory.
+     * @retval other                Other CHIP or platform-specific errors returned by the configured
+     *                              TLVBackingStore.
+     *
+     */
+    CHIP_ERROR Put(uint64_t tag, BytesData data);
 
     /**
      * Encodes a TLV boolean value.
