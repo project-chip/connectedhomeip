@@ -148,15 +148,6 @@ public:
      */
     CHIP_ERROR GetDevice(NodeId deviceId, Device ** device);
 
-    /**
-     * @brief
-     *   This function notifies the controller that the persistent storage has updated externally.
-     *   This lets the controller invalidate any local caches and fetch new data when needed.
-     *
-     * @return CHIP_ERROR
-     */
-    CHIP_ERROR StorageChanged();
-
     CHIP_ERROR SetUdpListenPort(uint16_t listenPort);
 
     virtual void ReleaseDevice(Device * device);
