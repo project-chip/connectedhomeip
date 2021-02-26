@@ -579,9 +579,10 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
 
     Transport::AdminPairingInfo * admin = mAdmins.FindAdmin(mAdminId);
 
+    VerifyOrExit(remoteDeviceId != kAnyNodeId && remoteDeviceId != kUndefinedNodeId, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(mState == State::Initialized, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mDeviceBeingPaired == kNumMaxActiveDevices, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(admin != nullptr, err = CHIP_ERROR_NO_MEMORY);
+    VerifyOrExit(admin != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     params.SetAdvertisementDelegate(&mRendezvousAdvDelegate);
 

@@ -138,7 +138,10 @@ try:
         packages=[
             'chip',
             'chip.ble',
+            'chip.ble.commisioning',
+            'chip.configuration',
             'chip.exceptions',
+            'chip.internal',
             'chip.native',
             'chip.tlv',
         ],
