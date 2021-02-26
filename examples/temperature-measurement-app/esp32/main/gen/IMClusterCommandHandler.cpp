@@ -44,9 +44,6 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
     case ZCL_BASIC_CLUSTER_ID:
         clusters::Basic::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
         return;
-    case ZCL_TEMP_MEASUREMENT_CLUSTER_ID:
-        clusters::TemperatureMeasurement::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
-        return;
     default:
         // Unrecognized cluster ID, error status will apply.
         // TODO: Encode response for Cluster not found

@@ -843,7 +843,7 @@ void DispatchClientCommand(app::Command * command, CommandId commandId, Endpoint
             CHIP_ERROR TLVError = CHIP_NO_ERROR;
             uint8_t capacity;
             uint8_t groupCount;
-            const uint8_t * groupList;
+            /* TYPE WARNING: array array defaults to */ uint8_t * groupList;
 
             while ((TLVError = dataTlv.Next()) == CHIP_NO_ERROR)
             {
@@ -856,7 +856,8 @@ void DispatchClientCommand(app::Command * command, CommandId commandId, Endpoint
                     TLVError = dataTlv.Get(groupCount);
                     break;
                 case 2:
-                    TLVError = dataTlv.GetDataPtr(groupList);
+                    // Just for compatibility, we will add array type support in IM later.
+                    TLVError = dataTlv.GetDataPtr(const_cast<const uint8_t *&>(groupList));
                     break;
                 default:
                     // Unsupported tag, ignore it.
@@ -1051,7 +1052,7 @@ void DispatchClientCommand(app::Command * command, CommandId commandId, Endpoint
             uint8_t capacity;
             uint16_t groupId;
             uint8_t sceneCount;
-            const uint8_t * sceneList;
+            /* TYPE WARNING: array array defaults to */ uint8_t * sceneList;
 
             while ((TLVError = dataTlv.Next()) == CHIP_NO_ERROR)
             {
@@ -1070,7 +1071,8 @@ void DispatchClientCommand(app::Command * command, CommandId commandId, Endpoint
                     TLVError = dataTlv.Get(sceneCount);
                     break;
                 case 4:
-                    TLVError = dataTlv.GetDataPtr(sceneList);
+                    // Just for compatibility, we will add array type support in IM later.
+                    TLVError = dataTlv.GetDataPtr(const_cast<const uint8_t *&>(sceneList));
                     break;
                 default:
                     // Unsupported tag, ignore it.
@@ -1184,7 +1186,7 @@ void DispatchClientCommand(app::Command * command, CommandId commandId, Endpoint
             uint8_t sceneId;
             uint16_t transitionTime;
             const uint8_t * sceneName;
-            const uint8_t * extensionFieldSets;
+            /* TYPE WARNING: array array defaults to */ uint8_t * extensionFieldSets;
 
             while ((TLVError = dataTlv.Next()) == CHIP_NO_ERROR)
             {
@@ -1206,7 +1208,8 @@ void DispatchClientCommand(app::Command * command, CommandId commandId, Endpoint
                     TLVError = dataTlv.GetDataPtr(sceneName);
                     break;
                 case 5:
-                    TLVError = dataTlv.GetDataPtr(extensionFieldSets);
+                    // Just for compatibility, we will add array type support in IM later.
+                    TLVError = dataTlv.GetDataPtr(const_cast<const uint8_t *&>(extensionFieldSets));
                     break;
                 default:
                     // Unsupported tag, ignore it.

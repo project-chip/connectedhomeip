@@ -80,9 +80,6 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
     case ZCL_SCENES_CLUSTER_ID:
         clusters::Scenes::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
         return;
-    case ZCL_TEMP_MEASUREMENT_CLUSTER_ID:
-        clusters::TemperatureMeasurement::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
-        return;
     default:
         // Unrecognized cluster ID, error status will apply.
         // TODO: Encode response for Cluster not found
@@ -1534,7 +1531,7 @@ void DispatchServerCommand(app::Command * command, CommandId commandId, Endpoint
         case ZCL_GET_GROUP_MEMBERSHIP_COMMAND_ID: {
             CHIP_ERROR TLVError = CHIP_NO_ERROR;
             uint8_t groupCount;
-            const uint8_t * groupList;
+            /* TYPE WARNING: array array defaults to */ uint8_t * groupList;
 
             while ((TLVError = dataTlv.Next()) == CHIP_NO_ERROR)
             {
@@ -1544,7 +1541,8 @@ void DispatchServerCommand(app::Command * command, CommandId commandId, Endpoint
                     TLVError = dataTlv.Get(groupCount);
                     break;
                 case 1:
-                    TLVError = dataTlv.GetDataPtr(groupList);
+                    // Just for compatibility, we will add array type support in IM later.
+                    TLVError = dataTlv.GetDataPtr(const_cast<const uint8_t *&>(groupList));
                     break;
                 default:
                     // Unsupported tag, ignore it.
@@ -2065,7 +2063,7 @@ void DispatchServerCommand(app::Command * command, CommandId commandId, Endpoint
             uint8_t sceneId;
             uint16_t transitionTime;
             const uint8_t * sceneName;
-            const uint8_t * extensionFieldSets;
+            /* TYPE WARNING: array array defaults to */ uint8_t * extensionFieldSets;
 
             while ((TLVError = dataTlv.Next()) == CHIP_NO_ERROR)
             {
@@ -2084,7 +2082,8 @@ void DispatchServerCommand(app::Command * command, CommandId commandId, Endpoint
                     TLVError = dataTlv.GetDataPtr(sceneName);
                     break;
                 case 4:
-                    TLVError = dataTlv.GetDataPtr(extensionFieldSets);
+                    // Just for compatibility, we will add array type support in IM later.
+                    TLVError = dataTlv.GetDataPtr(const_cast<const uint8_t *&>(extensionFieldSets));
                     break;
                 default:
                     // Unsupported tag, ignore it.
