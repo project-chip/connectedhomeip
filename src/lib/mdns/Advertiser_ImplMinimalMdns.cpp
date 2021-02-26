@@ -33,12 +33,16 @@
 #include <support/ReturnMacros.h>
 #include <support/StringBuilder.h>
 
+// Enable detailed mDNS logging for received queries
+#undef DETAIL_LOGGING
+
 namespace chip {
 namespace Mdns {
 namespace {
 
 using namespace mdns::Minimal;
 
+#ifdef DETAIL_LOGGING
 const char * ToString(QClass qClass)
 {
     switch (qClass)
@@ -85,6 +89,9 @@ void LogQuery(const QueryData & data)
 
     ChipLogDetail(Discovery, "%s", logString.c_str());
 }
+#else
+void LogQuery(const QueryData & data) {}
+#endif
 
 /// Checks if the current interface is powered on
 /// and not local loopback.
@@ -319,7 +326,9 @@ private:
 
 void AdvertiserMinMdns::OnQuery(const BytesRange & data, const chip::Inet::IPPacketInfo * info)
 {
+#ifdef DETAIL_LOGGING
     ChipLogDetail(Discovery, "MinMdns received a query.");
+#endif
 
     mCurrentSource = info;
     if (!ParsePacket(data, this))

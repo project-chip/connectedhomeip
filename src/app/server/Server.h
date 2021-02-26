@@ -19,6 +19,7 @@
 
 #include <app/server/AppDelegate.h>
 #include <inet/InetConfig.h>
+#include <transport/AdminPairingTable.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/UDP.h>
 
@@ -35,6 +36,8 @@ using DemoTransportMgr = chip::TransportMgr<chip::Transport::UDP>;
  * @param [in] delegate   An optional AppDelegate
  */
 void InitServer(AppDelegate * delegate = nullptr);
+
+chip::Transport::AdminPairingTable & GetGlobalAdminPairingTable();
 
 namespace chip {
 

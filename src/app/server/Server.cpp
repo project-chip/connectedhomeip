@@ -27,7 +27,6 @@
 #include <inet/IPAddress.h>
 #include <inet/InetError.h>
 #include <inet/InetLayer.h>
-#include <mdns/Advertiser.h>
 #include <messaging/ExchangeMgr.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/KeyValueStoreManager.h>
@@ -39,9 +38,10 @@
 #include <sys/param.h>
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
-#include <transport/AdminPairingTable.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/StorablePeerConnection.h>
+
+#include "Mdns.h"
 
 using namespace ::chip;
 using namespace ::chip::Inet;
@@ -268,7 +268,17 @@ public:
         {
             ReturnErrorOnFailure(PersistAdminPairingToKVS(admin, gNextAvailableAdminId));
         }
+
         return CHIP_NO_ERROR;
+    }
+
+    void RendezvousComplete() const override
+    {
+        // Once rendezvous completed, assume we are operational
+        if (app::Mdns::AdvertiseOperational() != CHIP_NO_ERROR)
+        {
+            ChipLogError(Discovery, "Failed to start advertising operational state at rendezvous completion time.");
+        }
     }
 
     void SetDelegate(AppDelegate * delegate) { mDelegate = delegate; }
@@ -400,69 +410,6 @@ private:
     AppDelegate * mDelegate = nullptr;
 };
 
-#if CHIP_ENABLE_MDNS
-
-CHIP_ERROR InitMdns()
-{
-    auto & mdnsAdvertiser = Mdns::ServiceAdvertiser::Instance();
-
-    // TODO: advertise this only when really operational once we support both
-    // operational and commisioning advertising is supported.
-    if (ConfigurationMgr().IsFullyProvisioned())
-    {
-        uint64_t fabricId;
-
-        if (ConfigurationMgr().GetFabricId(fabricId) != CHIP_NO_ERROR)
-        {
-            ChipLogError(Discovery, "Fabric ID not known. Using a default");
-            fabricId = 5544332211;
-        }
-
-        const auto advertiseParameters = Mdns::OperationalAdvertisingParameters()
-                                             .SetFabricId(fabricId)
-                                             .SetNodeId(chip::kTestDeviceNodeId)
-                                             .SetPort(CHIP_PORT)
-                                             .EnableIpV4(true);
-
-        ReturnErrorOnFailure(mdnsAdvertiser.Advertise(advertiseParameters));
-    }
-    else
-    {
-        auto advertiseParameters = Mdns::CommissionAdvertisingParameters().SetPort(CHIP_PORT).EnableIpV4(true);
-
-        uint16_t value;
-        if (ConfigurationMgr().GetVendorId(value) != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(Discovery, "Vendor ID not known");
-        }
-        else
-        {
-            advertiseParameters.SetVendorId(chip::Optional<uint16_t>::Value(value));
-        }
-
-        if (ConfigurationMgr().GetProductId(value) != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(Discovery, "Product ID not known");
-        }
-        else
-        {
-            advertiseParameters.SetProductId(chip::Optional<uint16_t>::Value(value));
-        }
-
-        if (ConfigurationMgr().GetSetupDiscriminator(value) != CHIP_NO_ERROR)
-        {
-            ChipLogError(Discovery, "Setup discriminator not known. Using a default.");
-            value = 840;
-        }
-        advertiseParameters.SetShortDiscriminator(static_cast<uint8_t>(value & 0xFF)).SetLongDiscrimininator(value);
-
-        ReturnErrorOnFailure(mdnsAdvertiser.Advertise(advertiseParameters));
-    }
-
-    return mdnsAdvertiser.Start(&DeviceLayer::InetLayer, chip::Mdns::kMdnsPort);
-}
-#endif
-
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
 Messaging::ExchangeManager gExchange;
 #endif
@@ -586,7 +533,16 @@ void InitServer(AppDelegate * delegate)
     }
 
 #if CHIP_ENABLE_MDNS
-    err = InitMdns();
+    // TODO: advertise this only when really operational once we support both
+    // operational and commisioning advertising is supported.
+    if (ConfigurationMgr().IsFullyProvisioned())
+    {
+        err = app::Mdns::AdvertiseOperational();
+    }
+    else
+    {
+        err = app::Mdns::AdvertiseCommisioning();
+    }
     SuccessOrExit(err);
 #endif
 
@@ -599,4 +555,9 @@ exit:
     {
         ChipLogProgress(AppServer, "Server Listening...");
     }
+}
+
+AdminPairingTable & GetGlobalAdminPairingTable()
+{
+    return gAdminPairings;
 }
