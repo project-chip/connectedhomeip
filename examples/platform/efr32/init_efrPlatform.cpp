@@ -17,9 +17,19 @@
  *    limitations under the License.
  */
 
+#include "AppConfig.h"
 #include <support/CHIPPlatformMemory.h>
+#include <platform/CHIPDeviceLayer.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+#include <assert.h>
+#include <string.h>
 
 #include <mbedtls/platform.h>
+
+#if CHIP_ENABLE_OPENTHREAD
 #include <openthread/cli.h>
 #include <openthread/dataset.h>
 #include <openthread/error.h>
@@ -31,14 +41,16 @@
 #include <openthread/platform/uart.h>
 #include <openthread/tasklet.h>
 #include <openthread/thread.h>
-
 #include <openthread-core-config.h>
 #include <openthread/config.h>
 
-#include <assert.h>
-#include <string.h>
+#include "platform-efr32.h"
 
-#include "common/logging.hpp"
+#if OPENTHREAD_CONFIG_HEAP_EXTERNAL_ENABLE
+#include "openthread/heap.h"
+#include "sl_malloc.h"
+#endif // OPENTHREAD_CONFIG_HEAP_EXTERNAL_ENABLE
+#endif // CHIP_ENABLE_OPENTHREAD
 
 #include "bsp.h"
 #include "bsp_init.h"
@@ -52,21 +64,14 @@
 #include "em_system.h"
 #include "hal-config.h"
 #include "hal_common.h"
+#include "init_efrPlatform.h"
 #include "rail.h"
 #include "sl_mpu.h"
 #include "sl_sleeptimer.h"
-#if OPENTHREAD_CONFIG_HEAP_EXTERNAL_ENABLE
-#include "openthread/heap.h"
-#include "sl_malloc.h"
-#endif
-
-#include "platform-efr32.h"
 
 #if (HAL_FEM_ENABLE)
 #include "fem-control.h"
 #endif
-
-#include "platform-efr32.h"
 
 #if DISPLAY_ENABLED
 #include "lcd.h"
@@ -75,7 +80,7 @@
 static void halInitChipSpecific(void);
 void initAntenna(void);
 
-void initOtSysEFR(void)
+void init_efrPlatform(void)
 {
     sl_status_t status;
     uint32_t PrioGoupPos = 0;
@@ -123,9 +128,12 @@ void initOtSysEFR(void)
 #if EFR32_LOG_ENABLED
     efr32LogInit();
 #endif
+
+#if CHIP_ENABLE_OPENTHREAD
     efr32RadioInit();
     efr32AlarmInit();
     efr32MiscInit();
+#endif // CHIP_ENABLE_OPENTHREAD
 }
 
 void halInitChipSpecific(void)
@@ -176,7 +184,9 @@ void halInitChipSpecific(void)
 #endif // HAL_PTI_ENABLE
 
 #if !defined(RAIL_IC_SIM_BUILD)
+#if CHIP_ENABLE_OPENTHREAD
     initAntenna();
+#endif // CHIP_ENABLE_OPENTHREAD
 
 // Disable any unused peripherals to ensure we enter a low power mode
 #if defined(BSP_EXTFLASH_USART) && !defined(HAL_DISABLE_EXTFLASH)
@@ -185,7 +195,12 @@ void halInitChipSpecific(void)
     MX25_DP();
 #endif
 
-#endif
+#endif //RAIL_IC_SIM_BUILD
+
+#if defined(HAL_VCOM_ENABLE)
+    // Enable VCOM if requested
+    GPIO_PinModeSet(BSP_VCOM_ENABLE_PORT, BSP_VCOM_ENABLE_PIN, gpioModePushPull, HAL_VCOM_ENABLE);
+#endif // HAL_VCOM_ENABLE
 
 #if RAIL_DMA_CHANNEL == DMA_CHANNEL_DMADRV
     Ecode_t dmaError = DMADRV_Init();
@@ -204,3 +219,7 @@ void halInitChipSpecific(void)
     RAIL_UseDma(RAIL_DMA_CHANNEL);
 #endif
 }
+
+#ifdef __cplusplus
+}
+#endif

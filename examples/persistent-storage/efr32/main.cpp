@@ -29,8 +29,7 @@
 
 #include "AppConfig.h"
 #include "KeyValueStorageTest.h"
-#include "init_board.h"
-#include "init_mcu.h"
+#include "init_efrPlatform.h"
 #include <platform/KeyValueStoreManager.h>
 
 static TaskHandle_t sTestTaskHandle;
@@ -46,10 +45,7 @@ void TestTask(void * pvParameter)
 
 int main(void)
 {
-
-    initMcu();
-    initBoard();
-    efr32LogInit();
+    init_efrPlatform();
 
     chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init();
     EFR32_LOG("==================================================");

@@ -37,8 +37,7 @@
 #include "AppConfig.h"
 #include "DataModelHandler.h"
 #include "Server.h"
-#include "init_board.h"
-#include "init_mcu.h"
+#include "init_efrPlatform.h"
 
 #if DISPLAY_ENABLED
 #include "lcd.h"
@@ -98,19 +97,7 @@ int main(void)
 {
     int ret = CHIP_ERROR_MAX;
 
-#if CHIP_ENABLE_OPENTHREAD
-    initOtSysEFR();
-#else
-    initMcu();
-    initBoard();
-    efr32RandomInit();
-#if DISPLAY_ENABLED
-    initLCD();
-#endif
-#if EFR32_LOG_ENABLED
-    efr32LogInit();
-#endif
-#endif
+    init_efrPlatform();
 
 #if PW_RPC_ENABLED
     chip::rpc::Init();

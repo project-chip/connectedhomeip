@@ -60,18 +60,20 @@
 #define LOG_LWIP "<lwip  > "
 #define LOG_EFR32 "<efr32 > "
 
+#if EFR32_LOG_ENABLED
 static bool sLogInitialized = false;
+#endif
 #if LOG_RTT_BUFFER_INDEX != 0
 static uint8_t sLogBuffer[LOG_RTT_BUFFER_SIZE];
 static uint8_t sCmdLineBuffer[LOG_RTT_BUFFER_SIZE];
 #endif
 
+#if EFR32_LOG_ENABLED
 /**
  * Print a log message to RTT
  */
 static void PrintLog(const char * msg)
 {
-#if EFR32_LOG_ENABLED
     if (sLogInitialized)
     {
         size_t sz;
@@ -88,9 +90,8 @@ static void PrintLog(const char * msg)
         PigweedLogger::putString(newline, sz);
 #endif
     }
-
-#endif // EFR32_LOG_ENABLED
 }
+#endif // EFR32_LOG_ENABLED
 
 /**
  * Initialize Segger RTT for logging
@@ -190,7 +191,7 @@ void LogV(const char * module, uint8_t category, const char * aFormat, va_list v
         formattedMsgLen = strlen(formattedMsg);
 
         // Form the log prefix, e.g. "[DL] "
-        snprintf(formattedMsg, sizeof(formattedMsg), "[%s] ", module);
+        snprintf(formattedMsg + formattedMsgLen, sizeof(formattedMsg) - formattedMsgLen, "[%s] ", module);
         formattedMsg[sizeof(formattedMsg) - 1] = 0;
         formattedMsgLen                        = strlen(formattedMsg);
 
