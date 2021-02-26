@@ -427,6 +427,9 @@ class DeviceMgrCmd(Cmd):
         except exceptions.ChipStackException as ex:
             print("An exception occurred during process ZCL command:")
             print(str(ex))
+        except Exception as ex:
+            print("An exception occurred during processing input:")
+            print(str(ex))
 
     def do_setpairingwificredential(self, line):
         """

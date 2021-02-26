@@ -2,9 +2,13 @@
 
 #pragma once
 
+#include <cstdint>
+
 #include "ModelCommand.h"
 #include "gen/CHIPClientCallbacks.h"
 #include <controller/CHIPClusters.h>
+#include <lib/support/Span.h>
+#include <lib/core/CHIPSafeCasts.h>
 
 static void OnDefaultSuccessResponse(void * context)
 {
@@ -125,7 +129,7 @@ public:
 
         chip::Controller::{{asCamelCased parent.name false}}Cluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.{{asCamelCased name false}}(onSuccessCallback->Cancel(), onFailureCallback->Cancel(){{#chip_server_cluster_command_arguments}}, {{#if (isByteString type)}} reinterpret_cast<char*>(m{{asCamelCased label false}}){{else}}m{{asCamelCased label false}}{{/if}}{{/chip_server_cluster_command_arguments}});
+        return cluster.{{asCamelCased name false}}(onSuccessCallback->Cancel(), onFailureCallback->Cancel(){{#chip_server_cluster_command_arguments}}, {{#if (isByteString type)}} chip::ByteSpan(chip::Uint8::from_char(m{{asCamelCased label false}}), strlen(m{{asCamelCased label false}})){{else}}m{{asCamelCased label false}}{{/if}}{{/chip_server_cluster_command_arguments}});
     }
 
 private:

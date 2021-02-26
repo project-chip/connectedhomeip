@@ -4,6 +4,7 @@
 #pragma once
 
 #include <app/util/basic-types.h>
+#include <lib/support/Span.h>
 #include <stdint.h>
 #include <system/SystemPacketBuffer.h>
 

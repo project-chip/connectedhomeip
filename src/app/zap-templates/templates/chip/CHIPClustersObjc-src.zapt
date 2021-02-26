@@ -9,6 +9,7 @@
 #import "gen/CHIPClientCallbacks.h"
 
 #include <controller/CHIPClusters.h>
+#include <lib/support/Span.h>
 
 using namespace ::chip;
 
@@ -359,7 +360,7 @@ private:
 
 {{#chip_server_cluster_commands}}
 {{#if (zcl_command_arguments_count this.id)}}
-- (void){{asCamelCased name}}:{{#chip_server_cluster_command_arguments}}{{#if (isFirstElement index)}}{{else}}{{asCamelCased label}}:{{/if}}({{asBasicType chipType}}){{asCamelCased label}} {{/chip_server_cluster_command_arguments}}completionHandler:(ResponseHandler)completionHandler
+- (void){{asCamelCased name}}:{{#chip_server_cluster_command_arguments}}{{#if (isFirstElement index)}}{{else}}{{asCamelCased label}}:{{/if}}({{#if (isByteString type)}}NSByte *{{else}}{{asBasicType chipType}}{{/if}}){{asCamelCased label}} {{/chip_server_cluster_command_arguments}}completionHandler:(ResponseHandler)completionHandler
 {{else}}
 - (void){{asCamelCased name}}:(ResponseHandler)completionHandler
 {{/if}}
@@ -381,7 +382,7 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.{{asCamelCased name false}}(onSuccess->Cancel(), onFailure->Cancel(){{#chip_server_cluster_command_arguments}}, {{asCamelCased label}}{{/chip_server_cluster_command_arguments}});
+    CHIP_ERROR err = self.cppCluster.{{asCamelCased name false}}(onSuccess->Cancel(), onFailure->Cancel(){{#chip_server_cluster_command_arguments}}, {{#if (isByteString type)}}chip::ByteSpan((const uint8_t*){{asCamelCased label}}.bytes, {{asCamelCased label}}.length){{else}}{{asCamelCased label}}{{/if}}{{/chip_server_cluster_command_arguments}});
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
