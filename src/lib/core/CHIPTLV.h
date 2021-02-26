@@ -1774,6 +1774,12 @@ public:
     uint32_t GetLengthWritten() const { return mLenWritten; }
 
     /**
+     * Returns the total remaining number of bytes for current tlv writer
+     *
+     * @return the total remaining number of bytes.
+     */
+    uint32_t GetRemainingFreeLength() const { return mRemainingLen; }
+    /**
      * The profile id of tags that should be encoded in implicit form.
      *
      * When a writer is asked to encode a new element, if the profile id of the tag associated with the
@@ -2202,7 +2208,6 @@ class DLL_EXPORT TLVBackingStore
 {
 public:
     virtual ~TLVBackingStore() {}
-
     /**
      * A function to provide a backing store's initial start position and data length to a reader.
      *
