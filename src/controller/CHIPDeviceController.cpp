@@ -235,20 +235,6 @@ CHIP_ERROR DeviceController::SetUdpListenPort(uint16_t listenPort)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DeviceController::StorageChanged()
-{
-    if (mState != State::Initialized)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
-
-    // Invalidate any cached data
-    // The next call to GetDevice will fetch from storage
-    mPairedDevicesInitialized = false;
-
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR DeviceController::GetDevice(NodeId deviceId, const SerializedDevice & deviceInfo, Device ** out_device)
 {
     CHIP_ERROR err  = CHIP_NO_ERROR;
