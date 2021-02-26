@@ -1534,7 +1534,7 @@ void DispatchServerCommand(app::Command * command, CommandId commandId, Endpoint
         case ZCL_GET_GROUP_MEMBERSHIP_COMMAND_ID: {
             CHIP_ERROR TLVError = CHIP_NO_ERROR;
             uint8_t groupCount;
-            /* TYPE WARNING: array array defaults to */ uint8_t * groupList;
+            const uint8_t * groupList;
 
             while ((TLVError = dataTlv.Next()) == CHIP_NO_ERROR)
             {
@@ -2065,7 +2065,7 @@ void DispatchServerCommand(app::Command * command, CommandId commandId, Endpoint
             uint8_t sceneId;
             uint16_t transitionTime;
             const uint8_t * sceneName;
-            /* TYPE WARNING: array array defaults to */ uint8_t * extensionFieldSets;
+            const uint8_t * extensionFieldSets;
 
             while ((TLVError = dataTlv.Next()) == CHIP_NO_ERROR)
             {

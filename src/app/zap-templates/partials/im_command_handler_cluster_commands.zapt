@@ -3,6 +3,8 @@ CHIP_ERROR TLVError = CHIP_NO_ERROR;
 {{#zcl_command_arguments}}
 {{#if (isString type)}}
 const uint8_t * {{asSymbol label}};
+{{else if isArray}}
+const uint8_t * {{asSymbol label}};
 {{else}}
 {{asUnderlyingZclType type}} {{asSymbol label}};
 {{/if}}

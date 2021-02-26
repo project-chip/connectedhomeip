@@ -777,7 +777,7 @@ void DispatchClientCommand(app::Command * command, CommandId commandId, Endpoint
             CHIP_ERROR TLVError = CHIP_NO_ERROR;
             uint8_t capacity;
             uint8_t groupCount;
-            /* TYPE WARNING: array array defaults to */ uint8_t * groupList;
+            const uint8_t * groupList;
 
             while ((TLVError = dataTlv.Next()) == CHIP_NO_ERROR)
             {
@@ -963,7 +963,7 @@ void DispatchClientCommand(app::Command * command, CommandId commandId, Endpoint
             uint8_t capacity;
             uint16_t groupId;
             uint8_t sceneCount;
-            /* TYPE WARNING: array array defaults to */ uint8_t * sceneList;
+            const uint8_t * sceneList;
 
             while ((TLVError = dataTlv.Next()) == CHIP_NO_ERROR)
             {
@@ -1096,7 +1096,7 @@ void DispatchClientCommand(app::Command * command, CommandId commandId, Endpoint
             uint8_t sceneId;
             uint16_t transitionTime;
             const uint8_t * sceneName;
-            /* TYPE WARNING: array array defaults to */ uint8_t * extensionFieldSets;
+            const uint8_t * extensionFieldSets;
 
             while ((TLVError = dataTlv.Next()) == CHIP_NO_ERROR)
             {
