@@ -30,7 +30,7 @@
 #include <app/InteractionModelEngine.h>
 #include <gen/IMClusterCommandHandler.h>
 
-#include "compatibility-common.h"
+#include "ember-compatibility-functions.h"
 
 namespace chip {
 namespace app {

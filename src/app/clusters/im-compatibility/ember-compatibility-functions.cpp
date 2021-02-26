@@ -17,11 +17,11 @@
 
 /**
  *    @file
- *          Contains the common functions for compatibility with ember ZCL state
+ *          Contains the functions for compatibility with ember ZCL inner state
  *          when calling ember callbacks.
  */
 
-#include "compatibility-common.h"
+#include "ember-compatibility-functions.h"
 
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLV.h>

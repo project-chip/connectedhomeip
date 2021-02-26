@@ -17,7 +17,7 @@
 
 /**
  *    @file
- *          Contains the common functions for compatibility with ember ZCL state
+ *          Contains the functions for compatibility with ember ZCL inner state
  *          when calling ember callbacks.
  */
 
