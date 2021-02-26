@@ -20,9 +20,9 @@ RUN set -x \
 RUN set -x \
     && (mkdir -p /opt/mbed-os \
     && cd /opt/mbed-os \
-    && wget --progress=dot:giga https://github.com/ARMmbed/mbed-os/archive/mbed-os-6.6.0.tar.gz \
-    && tar --strip-components=1 -xzf mbed-os-6.6.0.tar.gz \
-    && rm mbed-os-6.6.0.tar.gz) \
+    && wget --progress=dot:giga https://github.com/ARMmbed/mbed-os/archive/mbed-os-6.7.0.tar.gz \
+    && tar --strip-components=1 -xzf mbed-os-6.7.0.tar.gz \
+    && rm mbed-os-6.7.0.tar.gz) \
     && : # last line
 
 # ------------------------------------------------------------------------------
