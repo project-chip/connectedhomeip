@@ -85,7 +85,6 @@ CHIP_ERROR ThreadStackManagerImpl::InitThreadStack(otInstance * otInst)
 
 #if OPENTHREAD_CONFIG_HEAP_EXTERNAL_ENABLE != 0
     mbedtls_platform_set_calloc_free(ot_calloc, ot_free);
-    otHeapSetCAllocFree(ot_calloc, ot_free);
 #endif /* OPENTHREAD_CONFIG_HEAP_EXTERNAL_ENABLE != 0 */
 
     // Initialize the OpenThread platform layer
