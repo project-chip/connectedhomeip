@@ -5,6 +5,7 @@
 
 #include <core/CHIPConfig.h>
 #include <platform/CHIPDeviceConfig.h>
+#include <support/CHIPPlatformMemory.h>
 #include <support/logging/Constants.h>
 
 #include <ctype.h>
@@ -12,6 +13,7 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <openthread/platform/logging.h>
+#include <openthread/platform/memory.h>
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
 constexpr uint8_t kPrintfModuleLwip       = 0x01;
@@ -121,5 +123,15 @@ extern "C" void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const ch
 
     // Let the application know that a log message has been emitted.
     chip::DeviceLayer::OnLogOutput();
+}
+
+extern "C" void * otPlatCAlloc(size_t aNum, size_t aSize)
+{
+    return CHIPPlatformMemoryCalloc(aNum, aSize);
+}
+
+extern "C" void otPlatFree(void * aPtr)
+{
+    CHIPPlatformMemoryFree(aPtr);
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
