@@ -272,13 +272,13 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetThreadProvis
 
 template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetThreadProvision(const uint8_t * operationalDataset,
-                                                                                    uint32_t operationalDatasetLen)
+                                                                                    size_t operationalDatasetLen)
 {
     otError otErr = OT_ERROR_FAILED;
     otOperationalDatasetTlvs datasetTlv;
 
     VerifyOrReturnError(operationalDatasetLen <= sizeof(datasetTlv.mTlvs), CHIP_ERROR_MESSAGE_TOO_LONG);
-    // Just a check, what if we have updated the thread spec and dataset can be larger?
+    // A compile time check to avoid misbehavior if the openthread implementation changed over time.
     static_assert(sizeof(datasetTlv.mTlvs) <= UINT8_MAX);
     memcpy(datasetTlv.mTlvs, operationalDataset, operationalDatasetLen);
     datasetTlv.mLength = static_cast<uint8_t>(operationalDatasetLen);

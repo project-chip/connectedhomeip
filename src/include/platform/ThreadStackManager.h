@@ -78,7 +78,7 @@ public:
 
     CHIP_ERROR JoinerStart();
     CHIP_ERROR SetThreadProvision(const Internal::DeviceNetworkInfo & netInfo);
-    CHIP_ERROR SetThreadProvision(const uint8_t * operationalDataset, uint32_t operationalDatasetLen);
+    CHIP_ERROR SetThreadProvision(const uint8_t * operationalDataset, size_t operationalDatasetLen);
     CHIP_ERROR SetThreadEnabled(bool val);
 
 private:
@@ -238,7 +238,7 @@ inline CHIP_ERROR ThreadStackManager::SetThreadProvision(const Internal::DeviceN
     return static_cast<ImplClass *>(this)->_SetThreadProvision(netInfo);
 }
 
-inline CHIP_ERROR ThreadStackManager::SetThreadProvision(const uint8_t * operationalDataset, uint32_t operationalDatasetLen)
+inline CHIP_ERROR ThreadStackManager::SetThreadProvision(const uint8_t * operationalDataset, size_t operationalDatasetLen)
 {
     return static_cast<ImplClass *>(this)->_SetThreadProvision(operationalDataset, operationalDatasetLen);
 }

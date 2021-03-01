@@ -50,7 +50,7 @@ public:
 
     CHIP_ERROR _SetThreadProvision(const Internal::DeviceNetworkInfo & netInfo);
 
-    CHIP_ERROR _SetThreadProvision(const uint8_t * operationalDataset, uint32_t operationalDatasetLen);
+    CHIP_ERROR _SetThreadProvision(const uint8_t * operationalDataset, size_t operationalDatasetLen);
 
     void _ErasePersistentInfo();
 

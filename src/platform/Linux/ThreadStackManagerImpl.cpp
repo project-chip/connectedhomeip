@@ -174,7 +174,7 @@ CHIP_ERROR ThreadStackManagerImpl::_SetThreadProvision(const Internal::DeviceNet
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ThreadStackManagerImpl::_SetThreadProvision(const uint8_t * operationalDataset, uint32_t operationalDatasetLen)
+CHIP_ERROR ThreadStackManagerImpl::_SetThreadProvision(const uint8_t * operationalDataset, size_t operationalDatasetLen)
 {
     mOperationalDatasetTlv = std::vector<uint8_t>(operationalDataset, operationalDataset + operationalDatasetLen);
 
@@ -238,8 +238,10 @@ CHIP_ERROR ThreadStackManagerImpl::_SetThreadEnabled(bool val)
         if (mOperationalDatasetTlv.size() > 0)
         {
             SuccessOrExit(error = mThreadApi->SetActiveDatasetTlvs(mOperationalDatasetTlv));
-            SuccessOrExit(error = mThreadApi->Attach(
-                              [](ClientError result) { ChipLogProgress(DeviceLayer, "Thread attach result %d", result); }));
+            SuccessOrExit(error = mThreadApi->Attach([](ClientError result) {
+                // ThreadDevcieRoleChangedHandler should take care of this, so we don't emit another event.
+                ChipLogProgress(DeviceLayer, "Thread attach result %d", result);
+            }));
         }
         else
         {
