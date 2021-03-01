@@ -115,7 +115,7 @@ template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_Shutdown()
 {
     CHIP_ERROR err;
-    ChipLogError(DeviceLayer, "system Layer shutdown");
+    ChipLogError(DeviceLayer, "System Layer shutdown");
     err = SystemLayer.Shutdown();
     ChipLogError(DeviceLayer, "Inet Layer shutdown");
     err = InetLayer.Shutdown();
