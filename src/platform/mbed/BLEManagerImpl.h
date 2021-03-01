@@ -29,6 +29,8 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
+class GapEventHandler;
+
 using namespace chip::Ble;
 
 // TODO Add missing BlePlatformDelegate and BleApplicationDelegate virtual method implementations.
@@ -96,6 +98,7 @@ class BLEManagerImpl final : public BLEManager,
 
     friend BLEManager & BLEMgr(void);
     friend BLEManagerImpl & BLEMgrImpl(void);
+    friend class GapEventHandler;
 
     static BLEManagerImpl sInstance;
 
