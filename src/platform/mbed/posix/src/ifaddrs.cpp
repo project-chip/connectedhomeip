@@ -3,7 +3,10 @@
 
 int getifaddrs(struct ifaddrs ** ifap)
 {
-    return 0;
+    return mbed_getifaddrs(ifap);
 }
 
-void freeifaddrs(struct ifaddrs * ifp) {}
+void freeifaddrs(struct ifaddrs * ifp)
+{
+    mbed_freeifaddrs(ifp);
+}

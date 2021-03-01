@@ -3,10 +3,10 @@
 
 char * inet_ntop(sa_family_t family, const void * src, char * dst, size_t size)
 {
-    return NULL;
+    return mbed_inet_ntop(family, src, dst, size);
 }
 
 int inet_pton(sa_family_t family, const char * src, void * dst)
 {
-    return 0;
+    return mbed_inet_pton(family, src, dst);
 }

@@ -1,7 +1,8 @@
 #ifndef MBED_POSIX_SYS_SOCKET_H
 #define MBED_POSIX_SYS_SOCKET_H
 
-#include <net_if.h>
+#include <net/if.h>
+#include <net_def.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>

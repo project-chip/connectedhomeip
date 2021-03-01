@@ -3,63 +3,22 @@
 
 #include <byteorder.h>
 #include <netsocket/Socket.h>
+#include <sys/socket.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/** @brief Convert 16-bit value from network to host byte order.
- *
- * @param x The network byte order value to convert.
- *
- * @return Host byte order value.
- */
-#define ntohs(x) sys_be16_to_cpu(x)
-
-/** @brief Convert 32-bit value from network to host byte order.
- *
- * @param x The network byte order value to convert.
- *
- * @return Host byte order value.
- */
-#define ntohl(x) sys_be32_to_cpu(x)
-
-/** @brief Convert 64-bit value from network to host byte order.
- *
- * @param x The network byte order value to convert.
- *
- * @return Host byte order value.
- */
-#define ntohll(x) sys_be64_to_cpu(x)
-
-/** @brief Convert 16-bit value from host to network byte order.
- *
- * @param x The host byte order value to convert.
- *
- * @return Network byte order value.
- */
-#define htons(x) sys_cpu_to_be16(x)
-
-/** @brief Convert 32-bit value from host to network byte order.
- *
- * @param x The host byte order value to convert.
- *
- * @return Network byte order value.
- */
-#define htonl(x) sys_cpu_to_be32(x)
-
-/** @brief Convert 64-bit value from host to network byte order.
- *
- * @param x The host byte order value to convert.
- *
- * @return Network byte order value.
- */
-#define htonll(x) sys_cpu_to_be64(x)
-
 struct if_nameindex * mbed_if_nameindex(void);
 char * mbed_if_indextoname(unsigned int ifindex, char * ifname);
 unsigned int mbed_if_nametoindex(const char * ifname);
 void mbed_if_freenameindex(struct if_nameindex * ptr);
+
+int mbed_getifaddrs(struct ifaddrs ** ifap);
+void mbed_freeifaddrs(struct ifaddrs * ifp);
+
+char * mbed_inet_ntop(sa_family_t family, const void * src, char * dst, size_t size);
+int mbed_inet_pton(sa_family_t family, const char * src, void * dst);
 
 #ifdef __cplusplus
 }
