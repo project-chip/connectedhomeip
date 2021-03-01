@@ -27,6 +27,7 @@
 /*----------------------------------------------------------------------------*\
 | Cluster Name                                                        |   ID   |
 |---------------------------------------------------------------------+--------|
+| ApplicationBasic                                                    | 0x050D |
 | BarrierControl                                                      | 0x0103 |
 | Basic                                                               | 0x0000 |
 | Binding                                                             | 0xF000 |
@@ -43,6 +44,85 @@
 | Scenes                                                              | 0x0005 |
 | TemperatureMeasurement                                              | 0x0402 |
 \*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------*\
+| Cluster ApplicationBasic                                            | 0x050D |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * VendorName                                                        | 0x0000 |
+| * VendorId                                                          | 0x0001 |
+| * ApplicationName                                                   | 0x0002 |
+| * ProductId                                                         | 0x0003 |
+| * ApplicationId                                                     | 0x0005 |
+| * CatalogVendorId                                                   | 0x0006 |
+| * ApplicationSatus                                                  | 0x0007 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/**
+ * @brief
+ *    Encode a Application Basic server discover command into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeApplicationBasicClusterDiscoverAttributes(uint8_t seqNum,
+                                                                                 chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Application Basic server read command for the vendor name attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeApplicationBasicClusterReadVendorNameAttribute(uint8_t seqNum,
+                                                                                      chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Application Basic server read command for the vendor id attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeApplicationBasicClusterReadVendorIdAttribute(uint8_t seqNum,
+                                                                                    chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Application Basic server read command for the application name attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeApplicationBasicClusterReadApplicationNameAttribute(uint8_t seqNum,
+                                                                                           chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Application Basic server read command for the product id attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeApplicationBasicClusterReadProductIdAttribute(uint8_t seqNum,
+                                                                                     chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Application Basic server read command for the application id attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeApplicationBasicClusterReadApplicationIdAttribute(uint8_t seqNum,
+                                                                                         chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Application Basic server read command for the catalog vendor id attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeApplicationBasicClusterReadCatalogVendorIdAttribute(uint8_t seqNum,
+                                                                                           chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Application Basic server read command for the application satus attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeApplicationBasicClusterReadApplicationSatusAttribute(uint8_t seqNum,
+                                                                                            chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Application Basic server read command for the cluster revision attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeApplicationBasicClusterReadClusterRevisionAttribute(uint8_t seqNum,
+                                                                                           chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
 | Cluster BarrierControl                                              | 0x0103 |

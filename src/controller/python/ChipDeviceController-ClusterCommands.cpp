@@ -31,6 +31,9 @@ using namespace chip::app;
 
 extern "C" {
 
+// Cluster ApplicationBasic
+// End of Cluster ApplicationBasic
+
 // Cluster BarrierControl
 CHIP_ERROR chip_ime_AppendCommand_BarrierControl_BarrierControlGoToPercent(chip::Controller::Device * device,
                                                                            chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,

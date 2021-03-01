@@ -42,7 +42,7 @@ namespace EventDataElement {
 enum
 {
     kCsTag_EventPath            = 0,
-    kCsTag_ImportanceLevel      = 1,
+    kCsTag_PriorityLevel        = 1,
     kCsTag_Number               = 2,
     kCsTag_UTCTimestamp         = 3,
     kCsTag_SystemTimestamp      = 4,
@@ -92,13 +92,13 @@ public:
     /**
      *  @brief Get a TLVReader for the Number. Next() must be called before accessing them.
      *
-     *  @param [in] apImportanceLevel    A pointer to apImportanceLevel
+     *  @param [in] apPriorityLevel    A pointer to apPriorityLevel
      *
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not any of the defined unsigned integer types
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetImportanceLevel(uint8_t * const apImportanceLevel);
+    CHIP_ERROR GetPriorityLevel(uint8_t * const apPriorityLevel);
 
     /**
      *  @brief Get a TLVReader for the Number. Next() must be called before accessing them.
@@ -134,26 +134,26 @@ public:
     CHIP_ERROR GetSystemTimestamp(uint64_t * const apSystemTimestamp);
 
     /**
-     *  @brief Get a TLVReader for the DeltaUTCTime. Next() must be called before accessing them.
+     *  @brief Get a TLVReader for the DeltaUTCTimestamp. Next() must be called before accessing them.
      *
-     *  @param [in] apDeltaUTCTimestamp   A pointer to apDeltaUTCTime
+     *  @param [in] apDeltaUTCTimestampstamp   A pointer to apDeltaUTCTimestamp
      *
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not any of the defined unsigned integer types
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetDeltaUTCTime(uint64_t * const apDeltaUTCTime);
+    CHIP_ERROR GetDeltaUTCTimestamp(uint64_t * const apDeltaUTCTimestamp);
 
     /**
-     *  @brief Get a TLVReader for the DeltaSystemTime. Next() must be called before accessing them.
+     *  @brief Get a TLVReader for the DeltaSystemTimestamp. Next() must be called before accessing them.
      *
-     *  @param [in] apDeltaSystemTimestamp   A pointer to apDeltaSystemTime
+     *  @param [in] apDeltaSystemTimestamp   A pointer to apDeltaSystemTimestamp
      *
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not any of the defined unsigned integer types
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetDeltaSystemTime(uint64_t * const apDeltaSystemTime);
+    CHIP_ERROR GetDeltaSystemTimestamp(uint64_t * const apDeltaSystemTimestamp);
 
     /**
      *  @brief Get a TLVReader for the Data. Next() must be called before accessing them.
@@ -190,19 +190,19 @@ public:
     EventPath::Builder & CreateEventPathBuilder();
 
     /**
-     *  @brief Inject ImportanceLevel into the TLV stream to indicate the importance level associated with
+     *  @brief Inject PriorityLevel into the TLV stream to indicate the priority level associated with
      *  the cluster that is referenced by the path.
      *
-     *  @param [in] aImportanceLevel This is an integer representation of the importance level.
+     *  @param [in] aPriorityLevel This is an integer representation of the priority level.
      *
      *  @return A reference to *this
      */
-    EventDataElement::Builder ImportanceLevel(const uint8_t aImportanceLevel);
+    EventDataElement::Builder PriorityLevel(const uint8_t aPriorityLevel);
 
     /**
      *  @brief Inject Number into the TLV stream to indicate the number associated with
      *  the cluster that is referenced by the path. The event number is a monotonically increasing number that
-     *  uniquely identifies each emitted event. This number is scoped to the ImportanceLevel.
+     *  uniquely identifies each emitted event. This number is scoped to the PriorityLevel.
      *
      *  @param [in] aNumber The uint64_t variable to reflectt the event number
      *
@@ -231,26 +231,26 @@ public:
     EventDataElement::Builder SystemTimestamp(const uint64_t aSystemTimestamp);
 
     /**
-     *  @brief Inject DeltaUTCTime into the TLV stream.
+     *  @brief Inject DeltaUTCTimestamp into the TLV stream.
      *      This field is present if delta encoding of the UTC timestamp relative to a prior event is desired for compression
      *      reasons. When this field is present, the UTC Timestamp field SHALL be omitted.
      *
-     *  @param [in] aDeltaUTCTime The uint64_t variable to reflect DeltaUTCTime
+     *  @param [in] aDeltaUTCTimestamp The uint64_t variable to reflect DeltaUTCTimestamp
      *
      *  @return A reference to *this
      */
-    EventDataElement::Builder DeltaUTCTime(const uint64_t aDeltaUTCTime);
+    EventDataElement::Builder DeltaUTCTimestamp(const uint64_t aDeltaUTCTimestamp);
 
     /**
      *  @brief Inject DeltaSystemTimestamp into the TLV stream.
      *  This field is present if delta encoding of the System timestamp relative to a prior event is desired for compression
      * reasons. When this field is present, the System Timestamp field SHALL be omitted.
      *
-     *  @param [in] DeltaSystemTimestamp The uint64_t variable to reflect DeltaSystemTime
+     *  @param [in] DeltaSystemTimestamp The uint64_t variable to reflect DeltaSystemTimestamp
      *
      *  @return A reference to *this
      */
-    EventDataElement::Builder DeltaSystemTime(const uint64_t aDeltaSystemTime);
+    EventDataElement::Builder DeltaSystemTimestamp(const uint64_t aDeltaSystemTimestamp);
 
     /**
      *  @brief Mark the end of this EventDataElement

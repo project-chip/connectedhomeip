@@ -1085,6 +1085,19 @@
 // Server attributes
 #define ZCL_MAX_DURATION_ATTRIBUTE_ID (0x0000)
 
+// Attribute ids for cluster: Application Basic
+
+// Client attributes
+
+// Server attributes
+#define ZCL_VENDOR_NAME_ATTRIBUTE_ID (0x0000)
+#define ZCL_VENDOR_ID_ATTRIBUTE_ID (0x0001)
+#define ZCL_APPLICATION_NAME_ATTRIBUTE_ID (0x0002)
+#define ZCL_PRODUCT_ID_ATTRIBUTE_ID (0x0003)
+#define ZCL_APPLICATION_ID_ATTRIBUTE_ID (0x0005)
+#define ZCL_CATALOG_VENDOR_ID_ATTRIBUTE_ID (0x0006)
+#define ZCL_APPLICATION_STATUS_ATTRIBUTE_ID (0x0007)
+
 // Attribute ids for cluster: Generic Tunnel
 
 // Client attributes

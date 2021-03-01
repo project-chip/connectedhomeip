@@ -233,6 +233,7 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 #define configUSE_QUEUE_SETS (0)
 #define configUSE_NEWLIB_REENTRANT (0)
 #define configENABLE_BACKWARD_COMPATIBILITY (1)
+#define configSUPPORT_STATIC_ALLOCATION (1)
 
 /* Optional functions - most linkers will remove unused functions anyway. */
 #define INCLUDE_vTaskPrioritySet (1)

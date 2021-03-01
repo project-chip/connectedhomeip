@@ -98,6 +98,7 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
 /*----------------------------------------------------------------------------*\
 | Cluster Name                                                        |   ID   |
 |---------------------------------------------------------------------+--------|
+| ApplicationBasic                                                    | 0x050D |
 | BarrierControl                                                      | 0x0103 |
 | Basic                                                               | 0x0000 |
 | Binding                                                             | 0xF000 |
@@ -140,6 +141,8 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
 #define ZCL_DISCOVER_COMMANDS_GENERATED_RESPONSE_COMMAND_ID (0x14)
 #define ZCL_DISCOVER_ATTRIBUTES_EXTENDED_COMMAND_ID (0x15)
 #define ZCL_DISCOVER_ATTRIBUTES_EXTENDED_RESPONSE_COMMAND_ID (0x16)
+
+#define APPLICATION_BASIC_CLUSTER_ID 0x050D
 
 #define BARRIER_CONTROL_CLUSTER_ID 0x0103
 #define ZCL_BARRIER_CONTROL_GO_TO_PERCENT_COMMAND_ID (0x00)
@@ -265,6 +268,109 @@ constexpr uint8_t kFrameControlGlobalCommand = 0x00;
 
 // Pick source endpoint as 1 for now
 constexpr EndpointId kSourceEndpoint = 1;
+
+/*----------------------------------------------------------------------------*\
+| Cluster ApplicationBasic                                            | 0x050D |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * VendorName                                                        | 0x0000 |
+| * VendorId                                                          | 0x0001 |
+| * ApplicationName                                                   | 0x0002 |
+| * ProductId                                                         | 0x0003 |
+| * ApplicationId                                                     | 0x0005 |
+| * CatalogVendorId                                                   | 0x0006 |
+| * ApplicationSatus                                                  | 0x0007 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+PacketBufferHandle encodeApplicationBasicClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("DiscoverApplicationBasicAttributes", APPLICATION_BASIC_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute VendorName
+ */
+PacketBufferHandle encodeApplicationBasicClusterReadVendorNameAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadApplicationBasicVendorName", APPLICATION_BASIC_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0000);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute VendorId
+ */
+PacketBufferHandle encodeApplicationBasicClusterReadVendorIdAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadApplicationBasicVendorId", APPLICATION_BASIC_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0001);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute ApplicationName
+ */
+PacketBufferHandle encodeApplicationBasicClusterReadApplicationNameAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadApplicationBasicApplicationName", APPLICATION_BASIC_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0002);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute ProductId
+ */
+PacketBufferHandle encodeApplicationBasicClusterReadProductIdAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadApplicationBasicProductId", APPLICATION_BASIC_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0003);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute ApplicationId
+ */
+PacketBufferHandle encodeApplicationBasicClusterReadApplicationIdAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadApplicationBasicApplicationId", APPLICATION_BASIC_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0005);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute CatalogVendorId
+ */
+PacketBufferHandle encodeApplicationBasicClusterReadCatalogVendorIdAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadApplicationBasicCatalogVendorId", APPLICATION_BASIC_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0006);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute ApplicationSatus
+ */
+PacketBufferHandle encodeApplicationBasicClusterReadApplicationSatusAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadApplicationBasicApplicationSatus", APPLICATION_BASIC_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0007);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute ClusterRevision
+ */
+PacketBufferHandle encodeApplicationBasicClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadApplicationBasicClusterRevision", APPLICATION_BASIC_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    COMMAND_FOOTER();
+}
 
 /*----------------------------------------------------------------------------*\
 | Cluster BarrierControl                                              | 0x0103 |

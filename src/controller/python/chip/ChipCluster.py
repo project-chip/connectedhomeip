@@ -35,6 +35,8 @@ class ChipCluster:
 
     def ListClusters(self):
         return {
+            "ApplicationBasic": {
+            },
             "BarrierControl": {
                 "BarrierControlGoToPercent": {
                     "percentOpen": "int",
@@ -969,6 +971,7 @@ class ChipCluster:
 
     def InitLib(self, chipLib):
         self._chipLib = chipLib
+        # Cluster ApplicationBasic
         # Cluster BarrierControl
         # Cluster BarrierControl Command BarrierControlGoToPercent
         self._chipLib.chip_ime_AppendCommand_BarrierControl_BarrierControlGoToPercent.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]

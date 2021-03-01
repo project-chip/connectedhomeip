@@ -1344,9 +1344,13 @@ void CheckSimpleWriteRead(nlTestSuite * inSuite, void * inContext)
     uint8_t buf[2048];
     TLVWriter writer;
     TLVReader reader;
+    uint32_t remainingFreedLen;
 
     writer.Init(buf, sizeof(buf));
     writer.ImplicitProfileId = TestProfile_2;
+
+    remainingFreedLen = writer.GetRemainingFreeLength();
+    NL_TEST_ASSERT(inSuite, sizeof(buf) == remainingFreedLen);
 
     WriteEncoding1(inSuite, writer);
 

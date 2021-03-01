@@ -28,6 +28,7 @@
 
 using namespace chip;
 
+EmberAfStatus emberAfApplicationBasicClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfBarrierControlClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfBarrierControlClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfBasicClusterServerCommandParse(EmberAfClusterCommand * cmd);
@@ -95,6 +96,10 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
     {
         switch (cmd->apsFrame->clusterId)
         {
+        case ZCL_APPLICATION_BASIC_CLUSTER_ID:
+            // No commands are enabled for cluster Application Basic
+            result = status(false, true, cmd->mfgSpecific);
+            break;
         case ZCL_BARRIER_CONTROL_CLUSTER_ID:
             result = emberAfBarrierControlClusterServerCommandParse(cmd);
             break;

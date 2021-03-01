@@ -376,6 +376,7 @@ static void OnScenesClusterViewSceneResponse(void * context, uint16_t groupId, u
 /*----------------------------------------------------------------------------*\
 | Cluster Name                                                        |   ID   |
 |---------------------------------------------------------------------+--------|
+| ApplicationBasic                                                    | 0x050D |
 | BarrierControl                                                      | 0x0103 |
 | Basic                                                               | 0x0000 |
 | Binding                                                             | 0xF000 |
@@ -391,6 +392,7 @@ static void OnScenesClusterViewSceneResponse(void * context, uint16_t groupId, u
 | TemperatureMeasurement                                              | 0x0402 |
 \*----------------------------------------------------------------------------*/
 
+constexpr chip::ClusterId kApplicationBasicClusterId       = 0x050D;
 constexpr chip::ClusterId kBarrierControlClusterId         = 0x0103;
 constexpr chip::ClusterId kBasicClusterId                  = 0x0000;
 constexpr chip::ClusterId kBindingClusterId                = 0xF000;
@@ -404,6 +406,270 @@ constexpr chip::ClusterId kMediaPlaybackClusterId          = 0xF001;
 constexpr chip::ClusterId kOnOffClusterId                  = 0x0006;
 constexpr chip::ClusterId kScenesClusterId                 = 0x0005;
 constexpr chip::ClusterId kTemperatureMeasurementClusterId = 0x0402;
+
+/*----------------------------------------------------------------------------*\
+| Cluster ApplicationBasic                                            | 0x050D |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * VendorName                                                        | 0x0000 |
+| * VendorId                                                          | 0x0001 |
+| * ApplicationName                                                   | 0x0002 |
+| * ProductId                                                         | 0x0003 |
+| * ApplicationId                                                     | 0x0005 |
+| * CatalogVendorId                                                   | 0x0006 |
+| * ApplicationSatus                                                  | 0x0007 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Discover Attributes
+ */
+class DiscoverApplicationBasicAttributes : public ModelCommand
+{
+public:
+    DiscoverApplicationBasicAttributes() : ModelCommand("discover") { ModelCommand::AddArguments(); }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000) command (0x0C) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::ApplicationBasicCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.DiscoverAttributes(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute VendorName
+ */
+class ReadApplicationBasicVendorName : public ModelCommand
+{
+public:
+    ReadApplicationBasicVendorName() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "vendor-name");
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050D) command (0x00) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::ApplicationBasicCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeVendorName(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<UnsupportedAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<UnsupportedAttributeCallback>(OnUnsupportedAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute VendorId
+ */
+class ReadApplicationBasicVendorId : public ModelCommand
+{
+public:
+    ReadApplicationBasicVendorId() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "vendor-id");
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050D) command (0x00) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::ApplicationBasicCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeVendorId(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute ApplicationName
+ */
+class ReadApplicationBasicApplicationName : public ModelCommand
+{
+public:
+    ReadApplicationBasicApplicationName() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "application-name");
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050D) command (0x00) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::ApplicationBasicCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeApplicationName(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<UnsupportedAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<UnsupportedAttributeCallback>(OnUnsupportedAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute ProductId
+ */
+class ReadApplicationBasicProductId : public ModelCommand
+{
+public:
+    ReadApplicationBasicProductId() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "product-id");
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050D) command (0x00) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::ApplicationBasicCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeProductId(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute ApplicationId
+ */
+class ReadApplicationBasicApplicationId : public ModelCommand
+{
+public:
+    ReadApplicationBasicApplicationId() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "application-id");
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050D) command (0x00) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::ApplicationBasicCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeApplicationId(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<UnsupportedAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<UnsupportedAttributeCallback>(OnUnsupportedAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute CatalogVendorId
+ */
+class ReadApplicationBasicCatalogVendorId : public ModelCommand
+{
+public:
+    ReadApplicationBasicCatalogVendorId() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "catalog-vendor-id");
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050D) command (0x00) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::ApplicationBasicCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeCatalogVendorId(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute ApplicationSatus
+ */
+class ReadApplicationBasicApplicationSatus : public ModelCommand
+{
+public:
+    ReadApplicationBasicApplicationSatus() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "application-satus");
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050D) command (0x00) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::ApplicationBasicCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeApplicationSatus(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute ClusterRevision
+ */
+class ReadApplicationBasicClusterRevision : public ModelCommand
+{
+public:
+    ReadApplicationBasicClusterRevision() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "cluster-revision");
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050D) command (0x00) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::ApplicationBasicCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
 
 /*----------------------------------------------------------------------------*\
 | Cluster BarrierControl                                              | 0x0103 |
@@ -6578,6 +6844,20 @@ private:
 /*----------------------------------------------------------------------------*\
 | Register all Clusters commands                                               |
 \*----------------------------------------------------------------------------*/
+void registerClusterApplicationBasic(Commands & commands)
+{
+    const char * clusterName = "ApplicationBasic";
+
+    commands_list clusterCommands = {
+        make_unique<DiscoverApplicationBasicAttributes>(),  make_unique<ReadApplicationBasicVendorName>(),
+        make_unique<ReadApplicationBasicVendorId>(),        make_unique<ReadApplicationBasicApplicationName>(),
+        make_unique<ReadApplicationBasicProductId>(),       make_unique<ReadApplicationBasicApplicationId>(),
+        make_unique<ReadApplicationBasicCatalogVendorId>(), make_unique<ReadApplicationBasicApplicationSatus>(),
+        make_unique<ReadApplicationBasicClusterRevision>(),
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
 void registerClusterBarrierControl(Commands & commands)
 {
     const char * clusterName = "BarrierControl";
@@ -6874,6 +7154,7 @@ void registerClusterTemperatureMeasurement(Commands & commands)
 
 void registerClusters(Commands & commands)
 {
+    registerClusterApplicationBasic(commands);
     registerClusterBarrierControl(commands);
     registerClusterBasic(commands);
     registerClusterBinding(commands);
