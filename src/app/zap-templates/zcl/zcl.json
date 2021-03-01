@@ -7,6 +7,7 @@
         "clusters-extensions.xml",
         "content-launch-cluster.xml",
         "media-playback-cluster.xml",
+        "low-power-cluster.xml",
         "custom-types.xml",
         "chip-devices.xml",
         "types.xml",

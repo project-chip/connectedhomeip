@@ -40,6 +40,7 @@
 #define EMBER_AF_GROUPS_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_IDENTIFY_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_LEVEL_CONTROL_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_LOW_POWER_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_MEDIA_PLAYBACK_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_ON_OFF_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_SCENES_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
@@ -90,6 +91,10 @@
 // Use this macro to check if the client side of the Level Control cluster is included
 #define ZCL_USING_LEVEL_CONTROL_CLUSTER_CLIENT
 #define EMBER_AF_PLUGIN_LEVEL_CONTROL_CLIENT
+
+// Use this macro to check if the client side of the Low Power cluster is included
+#define ZCL_USING_LOW_POWER_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_LOW_POWER_CLIENT
 
 // Use this macro to check if the client side of the Media Playback cluster is included
 #define ZCL_USING_MEDIA_PLAYBACK_CLUSTER_CLIENT

@@ -2964,6 +2964,15 @@
                                                                                                                                    \
                                                           ZCL_SQUAWK_COMMAND_ID, "u", squawkInfo);
 
+/** @brief Command description for Sleep
+ *
+ * Command: Sleep
+ */
+#define emberAfFillCommandLow                                                                                                      \
+    PowerClusterSleep() emberAfFillExternalBuffer(mask,                                                                            \
+                                                                                                                                   \
+                                                  ZCL_SLEEP_COMMAND_ID, "", );
+
 /** @brief Command description for MatchProtocolAddress
  *
  * Command: MatchProtocolAddress
