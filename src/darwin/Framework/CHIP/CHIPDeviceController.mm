@@ -98,7 +98,7 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
     [self.lock lock];
     BOOL commissionerInitialized = _cppCommissioner != nullptr;
     [self.lock unlock];
-    return commissionerInitialzied;
+    return commissionerInitialized;
 }
 
 - (BOOL)shutdown
@@ -120,13 +120,7 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
         return YES;
     }
 
-    CHIP_ERROR errorCode = CHIP_NO_ERROR;
-    [self.lock lock];
-    _cppCommissioner = new chip::Controller::DeviceCommissioner();
-    [self.lock unlock];
-    if ([self checkForStartError:(_cppCommissioner != nullptr) logMsg:kErrorCommissionerCreate]) {
-        return NO;
-    }
+    CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
 
     [self.lock lock];
     _persistentStorageDelegateBridge->setFrameworkDelegate(storageDelegate, queue);
@@ -134,7 +128,11 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
     [self getControllerNodeId];
 
     [self.lock lock];
-    errorCode = _cppCommissioner->Init(_localDeviceId, _persistentStorageDelegateBridge, _pairingDelegateBridge);
+    _cppCommissioner = new chip::Controller::DeviceCommissioner();
+    if (_cppCommissioner != nullptr)
+    {
+        errorCode = _cppCommissioner->Init(_localDeviceId, _persistentStorageDelegateBridge, _pairingDelegateBridge);
+    }
     [self.lock unlock];
     if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorCommissionerInit]) {
         return NO;
