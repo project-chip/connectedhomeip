@@ -17,6 +17,8 @@
 
 #include "Mdns.h"
 
+#include <inttypes.h>
+
 #include <core/Optional.h>
 #include <mdns/Advertiser.h>
 #include <platform/CHIPDeviceLayer.h>
