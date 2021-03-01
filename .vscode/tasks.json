@@ -233,10 +233,14 @@
             }
         },
         {
-            "label": "Build Mbed Shell example (NRF52840-DK)",
+            "label": "Build Mbed Shell Example",
             "type": "shell",
             "command": "scripts/examples/mbed_example.sh",
-            "args": ["-a=shell", "-b=NRF52840_DK", "-p=release"],
+            "args": [
+                "-a=shell",
+                "-b=${input:mbedTarget}",
+                "-p=${input:mbedProfile}"
+            ],
             "group": "build",
             "problemMatcher": {
                 "base": "$gcc",
@@ -247,34 +251,28 @@
             }
         },
         {
-            "label": "Build Mbed Shell example (DISCO_L475VG_IOT01A)",
-            "type": "shell",
-            "command": "scripts/examples/mbed_example.sh",
-            "args": ["-a=shell", "-b=DISCO_L475VG_IOT01A", "-p=release"],
-            "group": "build",
-            "problemMatcher": {
-                "base": "$gcc",
-                "fileLocation": [
-                    "relative",
-                    "${workspaceFolder}/examples/shell/mbed/build"
-                ]
-            }
-        },
-        {
-            "label": "Flash Mbed Shell example (NRF52840-DK)",
+            "label": "Flash Mbed Shell Example",
             "type": "shell",
             "command": "scripts/examples/mbed_example_utils.sh",
-            "args": ["-a=shell", "-b=NRF52840_DK"],
+            "args": ["-a=shell", "-b=${input:mbedTarget}"],
             "problemMatcher": [],
             "group": "build"
+        }
+    ],
+    "inputs": [
+        {
+            "type": "pickString",
+            "id": "mbedTarget",
+            "description": "What mbed target will be used?",
+            "options": ["NRF52840_DK", "DISCO_L475VG_IOT01A"],
+            "default": "NRF52840_DK"
         },
         {
-            "label": "Flash Mbed Shell example (DISCO_L475VG_IOT01A)",
-            "type": "shell",
-            "command": "scripts/examples/mbed_example_utils.sh",
-            "args": ["-a=shell", "-b=DISCO_L475VG_IOT01A"],
-            "problemMatcher": [],
-            "group": "build"
+            "type": "pickString",
+            "id": "mbedProfile",
+            "description": "What mbed profile do you want to use?",
+            "options": ["release", "debug", "develop"],
+            "default": "debug"
         }
     ]
 }
