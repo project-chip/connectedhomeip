@@ -129,8 +129,7 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
 
     [self.lock lock];
     _cppCommissioner = new chip::Controller::DeviceCommissioner();
-    if (_cppCommissioner != nullptr)
-    {
+    if (_cppCommissioner != nullptr) {
         errorCode = _cppCommissioner->Init(_localDeviceId, _persistentStorageDelegateBridge, _pairingDelegateBridge);
     }
     [self.lock unlock];
