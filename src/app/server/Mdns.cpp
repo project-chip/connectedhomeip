@@ -33,8 +33,6 @@ namespace Mdns {
 
 namespace {
 
-using namespace chip;
-
 NodeId GetCurrentNodeId()
 {
     // TODO: once operational credentials are implemented, node ID should be read from them
@@ -50,8 +48,9 @@ NodeId GetCurrentNodeId()
     // is sufficient or if we need multi-node-id advertisement. Existing
     // mdns advertises a single node id as parameter.
 
-    // Search for one admin pariing and use its node id.
-    for (auto pairing = GetGlobalAdminPairingTable().cbegin(); pairing != GetGlobalAdminPairingTable().cend(); pairing++)
+    // Search for one admin pairing and use its node id.
+    auto pairing = GetGlobalAdminPairingTable().cbegin();
+    if (pairing != GetGlobalAdminPairingTable().cend())
     {
         ChipLogProgress(Discovery, "Found admin paring for admin %" PRIX64 ", node %" PRIX64, pairing->GetAdminId(),
                         pairing->GetNodeId());
