@@ -9,4 +9,4 @@ ot-ctl panid 0x1234
 ot-ctl ifconfig up
 ot-ctl thread start
 
-chip-tool-server --thread
+chip-lighting-app --thread
