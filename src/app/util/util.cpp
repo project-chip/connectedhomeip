@@ -315,7 +315,7 @@ void emberAfStackDown(void)
     // (Issue 77101) Also don't clear the table if the stack has gone down as a
     // a result of losing its parent or some other transient state where a future
     // rejoin is expected to get us back online.
-    if (false
+    if ((false)
         // emberStackIsPerformingRejoin() == false
         // && emberNetworkState() == EMBER_NO_NETWORK
     )
