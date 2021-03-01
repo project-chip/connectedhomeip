@@ -239,6 +239,9 @@
 // Definitions for cluster: IAS WD
 #define ZCL_IAS_WD_CLUSTER_ID (0x0502)
 
+// Definitions for cluster: Low Power
+#define ZCL_LOW_POWER_CLUSTER_ID (0x0508)
+
 // Definitions for cluster: Application Basic
 #define ZCL_APPLICATION_BASIC_CLUSTER_ID (0x050D)
 

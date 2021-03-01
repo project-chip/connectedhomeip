@@ -344,6 +344,10 @@ class ChipCluster:
                 "StopWithOnOff": {
                 },
             },
+            "LowPower": {
+                "Sleep": {
+                },
+            },
             "MediaPlayback": {
                 "FastForwardRequest": {
                 },
@@ -920,6 +924,13 @@ class ChipCluster:
             )
         )
 
+    def ClusterLowPower_CommandSleep(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        self._ChipStack.Call(
+            lambda: self._chipLib.chip_ime_AppendCommand_LowPower_Sleep(
+                device, ZCLendpoint, ZCLgroupid
+            )
+        )
+
     def ClusterMediaPlayback_CommandFastForwardRequest(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_MediaPlayback_FastForwardRequest(
@@ -1330,6 +1341,10 @@ class ChipCluster:
         # Cluster LevelControl Command StopWithOnOff
         self._chipLib.chip_ime_AppendCommand_LevelControl_StopWithOnOff.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_LevelControl_StopWithOnOff.restype = ctypes.c_uint32
+        # Cluster LowPower
+        # Cluster LowPower Command Sleep
+        self._chipLib.chip_ime_AppendCommand_LowPower_Sleep.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_LowPower_Sleep.restype = ctypes.c_uint32
         # Cluster MediaPlayback
         # Cluster MediaPlayback Command FastForwardRequest
         self._chipLib.chip_ime_AppendCommand_MediaPlayback_FastForwardRequest.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]

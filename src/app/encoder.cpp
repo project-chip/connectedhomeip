@@ -111,6 +111,7 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
 | IasZone                                                             | 0x0500 |
 | Identify                                                            | 0x0003 |
 | LevelControl                                                        | 0x0008 |
+| LowPower                                                            | 0x0508 |
 | MediaPlayback                                                       | 0xF001 |
 | NetworkCommissioning                                                | 0xAAAA |
 | OnOff                                                               | 0x0006 |
@@ -231,6 +232,9 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
 #define ZCL_STEP_WITH_ON_OFF_COMMAND_ID (0x06)
 #define ZCL_STOP_COMMAND_ID (0x03)
 #define ZCL_STOP_WITH_ON_OFF_COMMAND_ID (0x07)
+
+#define LOW_POWER_CLUSTER_ID 0x0508
+#define ZCL_SLEEP_COMMAND_ID (0x00)
 
 #define MEDIA_PLAYBACK_CLUSTER_ID 0xF001
 #define ZCL_FAST_FORWARD_REQUEST_COMMAND_ID (0x07)
@@ -2800,6 +2804,43 @@ PacketBufferHandle encodeLevelControlClusterConfigureCurrentLevelAttribute(uint8
 PacketBufferHandle encodeLevelControlClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadLevelControlClusterRevision", LEVEL_CONTROL_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    COMMAND_FOOTER();
+}
+
+/*----------------------------------------------------------------------------*\
+| Cluster LowPower                                                    | 0x0508 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * Sleep                                                             |   0x00 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command Sleep
+ */
+PacketBufferHandle encodeLowPowerClusterSleepCommand(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("Sleep", LOW_POWER_CLUSTER_ID);
+    buf.Put8(kFrameControlClusterSpecificCommand).Put8(seqNum).Put8(ZCL_SLEEP_COMMAND_ID);
+    COMMAND_FOOTER();
+}
+
+PacketBufferHandle encodeLowPowerClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("DiscoverLowPowerAttributes", LOW_POWER_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute ClusterRevision
+ */
+PacketBufferHandle encodeLowPowerClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadLowPowerClusterRevision", LOW_POWER_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
     COMMAND_FOOTER();
 }

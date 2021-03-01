@@ -39,6 +39,7 @@ EmberAfStatus emberAfGeneralCommissioningClusterClientCommandParse(EmberAfCluste
 EmberAfStatus emberAfGroupsClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfIdentifyClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfLevelControlClusterClientCommandParse(EmberAfClusterCommand * cmd);
+EmberAfStatus emberAfLowPowerClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfMediaPlaybackClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfOnOffClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfScenesClusterClientCommandParse(EmberAfClusterCommand * cmd);
@@ -110,6 +111,10 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
             break;
         case ZCL_LEVEL_CONTROL_CLUSTER_ID:
             // No commands are enabled for cluster Level Control
+            result = status(false, true, cmd->mfgSpecific);
+            break;
+        case ZCL_LOW_POWER_CLUSTER_ID:
+            // No commands are enabled for cluster Low Power
             result = status(false, true, cmd->mfgSpecific);
             break;
         case ZCL_MEDIA_PLAYBACK_CLUSTER_ID:

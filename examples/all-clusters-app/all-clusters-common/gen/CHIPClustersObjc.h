@@ -484,6 +484,18 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
+ * Cluster Low Power
+ *
+ */
+@interface CHIPLowPower : CHIPCluster
+
+- (void)sleep:(ResponseHandler)completionHandler;
+
+- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
+
+@end
+
+/**
  * Cluster Media Playback
  *
  */
