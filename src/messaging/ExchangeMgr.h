@@ -66,7 +66,7 @@ public:
      *  @retval #CHIP_NO_ERROR On success.
      *
      */
-    CHIP_ERROR Init(SecureSessionMgr * sessionMgr, SecureSessionMgrDelegate * secureSessionEventReceiver = nullptr);
+    CHIP_ERROR Init(SecureSessionMgr * sessionMgr, SecureSessionMgrDelegate * legacySecureSessionEventReceiver = nullptr);
 
     /**
      *  Shutdown the ExchangeManager. This terminates this instance
@@ -183,8 +183,8 @@ public:
     size_t GetContextsInUse() const { return mContextsInUse; }
 
     // TODO(#4170): Create a unique exchange id for legacy messages which doesn't go through exchange manager. When message with
-    // this id is received, it will be passed to mSecureSessionEventReceiver. It is not allowed to create an exchange with this id.
-    // This const value will be removed after fully migrated to messaging layer.
+    // this id is received, it will be passed to mLegacySecureSessionEventReceiver. It is not allowed to create an exchange with
+    // this id.  This const value will be removed after fully migrated to messaging layer.
     static constexpr const uint16_t kReservedExchangeId = 0xFFFF;
 
 private:
@@ -206,9 +206,9 @@ private:
     SecureSessionMgr * mSessionMgr;
     ReliableMessageMgr mReliableMessageMgr;
     MessageCounterSyncMgr mMessageCounterSyncMgr;
-    // TODO(#4170): allow temporary propagate SecureSessionMgrDelegate events to device controller, it won't be necessary after
-    // fully migrated to messaging layer
-    SecureSessionMgrDelegate * mSecureSessionEventReceiver;
+    // TODO(#4170): allow temporary propagate SecureSessionMgrDelegate events to legacy components which doesn't use Exchange API to
+    // receive packets and events. It won't be necessary after fully migrated to messaging layer
+    SecureSessionMgrDelegate * mLegacySecureSessionEventReceiver;
 
     std::array<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> mContextPool;
     size_t mContextsInUse;
