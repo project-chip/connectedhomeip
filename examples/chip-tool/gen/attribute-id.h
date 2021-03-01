@@ -1085,6 +1085,12 @@
 // Server attributes
 #define ZCL_MAX_DURATION_ATTRIBUTE_ID (0x0000)
 
+// Attribute ids for cluster: Low Power
+
+// Client attributes
+
+// Server attributes
+
 // Attribute ids for cluster: Generic Tunnel
 
 // Client attributes

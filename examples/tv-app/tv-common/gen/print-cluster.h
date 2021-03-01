@@ -520,6 +520,12 @@
 #define CHIP_PRINTCLUSTER_IAS_WD_CLUSTER
 #endif
 
+#if defined(ZCL_USING_LOW_POWER_CLUSTER_SERVER) || defined(ZCL_USING_LOW_POWER_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_LOW_POWER_CLUSTER { ZCL_LOW_POWER_CLUSTER_ID, 1288, "Low Power" },
+#else
+#define CHIP_PRINTCLUSTER_LOW_POWER_CLUSTER
+#endif
+
 #if defined(ZCL_USING_GENERIC_TUNNEL_CLUSTER_SERVER) || defined(ZCL_USING_GENERIC_TUNNEL_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_GENERIC_TUNNEL_CLUSTER { ZCL_GENERIC_TUNNEL_CLUSTER_ID, 1536, "Generic Tunnel" },
 #else
@@ -844,6 +850,7 @@
     CHIP_PRINTCLUSTER_IAS_ZONE_CLUSTER                                                                                             \
     CHIP_PRINTCLUSTER_IAS_ACE_CLUSTER                                                                                              \
     CHIP_PRINTCLUSTER_IAS_WD_CLUSTER                                                                                               \
+    CHIP_PRINTCLUSTER_LOW_POWER_CLUSTER                                                                                            \
     CHIP_PRINTCLUSTER_GENERIC_TUNNEL_CLUSTER                                                                                       \
     CHIP_PRINTCLUSTER_BACNET_PROTOCOL_TUNNEL_CLUSTER                                                                               \
     CHIP_PRINTCLUSTER_11073_PROTOCOL_TUNNEL_CLUSTER                                                                                \

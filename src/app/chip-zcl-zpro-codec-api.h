@@ -37,6 +37,7 @@
 | IasZone                                                             | 0x0500 |
 | Identify                                                            | 0x0003 |
 | LevelControl                                                        | 0x0008 |
+| LowPower                                                            | 0x0508 |
 | MediaPlayback                                                       | 0xF001 |
 | NetworkCommissioning                                                | 0xAAAA |
 | OnOff                                                               | 0x0006 |
@@ -1489,6 +1490,35 @@ chip::System::PacketBufferHandle encodeLevelControlClusterConfigureCurrentLevelA
  */
 chip::System::PacketBufferHandle encodeLevelControlClusterReadClusterRevisionAttribute(uint8_t seqNum,
                                                                                        chip::EndpointId destinationEndpoint);
+
+/*----------------------------------------------------------------------------*\
+| Cluster LowPower                                                    | 0x0508 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * Sleep                                                             |   0x00 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/**
+ * @brief
+ *    Encode an Sleep command for Low Power server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeLowPowerClusterSleepCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Low Power server discover command into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeLowPowerClusterDiscoverAttributes(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Low Power server read command for the cluster revision attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeLowPowerClusterReadClusterRevisionAttribute(uint8_t seqNum,
+                                                                                   chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
 | Cluster MediaPlayback                                               | 0xF001 |
