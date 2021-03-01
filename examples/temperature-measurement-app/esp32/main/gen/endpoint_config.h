@@ -60,7 +60,7 @@
     {                                                                                                                              \
         { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 3 } },          /* Basic (server): cluster revision */                     \
             { 0x0000, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 0x08 } },   /* Basic (server): InteractionModelVersion */              \
-            { 0x0007, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 0x00 } },   /* Basic (server): HardwareRevision */                     \
+            { 0x0007, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 0x00 } },   /* Basic (server): HardwareVersion */                      \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 3 } },      /* Temperature Measurement (server): cluster revision */   \
             { 0x0000, ZAP_TYPE(INT16S), 2, 0, { (uint8_t *) 0x8000 } }, /* Temperature Measurement (server): measured value */     \
             { 0x0001, ZAP_TYPE(INT16S), 2, 0, { (uint8_t *) 0x8000 } }, /* Temperature Measurement (server): min measured value */ \

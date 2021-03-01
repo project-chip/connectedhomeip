@@ -116,7 +116,7 @@
             }, /* Basic (server): InteractionModelVersion */                                                                       \
             {                                                                                                                      \
                 0x0007, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(SINGLETON), { (uint8_t *) 0x00 }                                   \
-            },                                                     /* Basic (server): HardwareRevision */                          \
+            },                                                     /* Basic (server): HardwareVersion */                           \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 2 } }, /* Identify (server): cluster revision */                       \
             {                                                                                                                      \
                 0x0000, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(WRITABLE), { (uint8_t *) 0x0000 }                                  \
@@ -251,8 +251,8 @@
             {                                                                                                                      \
                 0x0002, ZAP_TYPE(OCTET_STRING), 32, 0, { (uint8_t *) ZAP_LONG_DEFAULTS_INDEX(294) }                                \
             },                                                          /* Application Basic (server): application name */         \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 0x0001 } }, /* Application Basic (server): cluster revision */         \
             { 0x0003, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 0 } },      /* Application Basic (server): product id */               \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 0x0001 } }, /* Application Basic (server): cluster revision */         \
             {                                                                                                                      \
                 0x0005, ZAP_TYPE(OCTET_STRING), 32, 0, { (uint8_t *) ZAP_LONG_DEFAULTS_INDEX(326) }                                \
             },                                                          /* Application Basic (server): application id */           \

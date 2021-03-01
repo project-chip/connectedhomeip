@@ -100,7 +100,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPBasic : CHIPCluster
 
 - (void)readAttributeInteractionModelVersion:(ResponseHandler)completionHandler;
-- (void)readAttributeHardwareRevision:(ResponseHandler)completionHandler;
+- (void)readAttributeHardwareVersion:(ResponseHandler)completionHandler;
 - (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
 
 @end

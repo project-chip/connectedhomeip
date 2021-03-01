@@ -64,7 +64,7 @@
             }, /* Basic (server): InteractionModelVersion */                                                                       \
             {                                                                                                                      \
                 0x0007, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(SINGLETON), { (uint8_t *) 0x00 }                                   \
-            },                                                         /* Basic (server): HardwareRevision */                      \
+            },                                                         /* Basic (server): HardwareVersion */                       \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 2 } },     /* On/off (server): cluster revision */                     \
             { 0x0000, ZAP_TYPE(BOOLEAN), 1, 0, { (uint8_t *) 0x00 } }, /* On/off (server): on/off */                               \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 3 } },     /* Level Control (server): cluster revision */              \

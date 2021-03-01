@@ -85,7 +85,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)mfgSpecificPing:(ResponseHandler)completionHandler;
 
 - (void)readAttributeInteractionModelVersion:(ResponseHandler)completionHandler;
-- (void)readAttributeHardwareRevision:(ResponseHandler)completionHandler;
+- (void)readAttributeHardwareVersion:(ResponseHandler)completionHandler;
 - (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
 
 @end

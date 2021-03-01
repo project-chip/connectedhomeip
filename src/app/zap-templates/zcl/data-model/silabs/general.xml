@@ -180,20 +180,20 @@ limitations under the License.
     <attribute side="server" code="0x0000" define="INTERACTION_MODEL_VERSION" type="INT16U" min="0x0000" max="0xFFFF" writable="false" optional="false">InteractionModelVersion</attribute>
     <attribute side="server" code="0x0001" define="VENDOR_NAME" type="CHAR_STRING" length="32" writable="false" default="" optional="false">VendorName</attribute>
     <attribute side="server" code="0x0002" define="VENDOR_ID" type="INT16U" min="0x0000" max="0xFFFF" writable="false" optional="false">VendorID</attribute>
-    <attribute side="server" code="0x0003" define="MODEL_NAME" type="CHAR_STRING" length="32" writable="false" default="" optional="false">ModelName</attribute>
+    <attribute side="server" code="0x0003" define="PRODUCT_NAME" type="CHAR_STRING" length="32" writable="false" default="" optional="false">ProductName</attribute>
     <attribute side="server" code="0x0004" define="PRODUCT_ID" type="INT16U" min="0x0000" max="0xFFFF" writable="false" optional="false">ProductID</attribute>
     <attribute side="server" code="0x0005" define="USER_LABEL" type="CHAR_STRING" length="32" writable="true" default="" optional="false">ProductID</attribute>
     <attribute side="server" code="0x0006" define="LOCATION" type="CHAR_STRING" length="16" writable="true" default="" optional="false">Location</attribute>
-    <attribute side="server" code="0x0007" define="HARDWARE_REVISION" type="INT16U" min="0x0000" max="0xFFFF" writable="false" optional="false">HardwareRevision</attribute>
-    <attribute side="server" code="0x0008" define="HARDWARE_REVISION_STRING" type="CHAR_STRING" length="64" writable="false" default="" optional="false">HardwareRevisionString</attribute>
-    <attribute side="server" code="0x0009" define="MANUFACTURING_DATE" type="CHAR_STRING" length="16" writable="false" default="" optional="true">ManufacturingDate</attribute>
-    <attribute side="server" code="0x000A" define="PRODUCT_CODE" type="CHAR_STRING" writable="false" optional="true">ProductCode</attribute>
-    <attribute side="server" code="0x000B" define="PRODUCT_URL" type="CHAR_STRING" writable="false" optional="true">ProductURL</attribute>
-    <attribute side="server" code="0x000C" define="PRODUCT_LABEL" type="CHAR_STRING" length="64" writable="false" default="" optional="true">ProductLabel</attribute>
-    <attribute side="server" code="0x000C" define="SERIAL_NUMBER" type="CHAR_STRING" length="32" writable="false" default="" optional="true">SerialNumber</attribute>
-    <attribute side="server" code="0x000D" define="LOCAL_CONFIG_DISABLED" type="BOOLEAN" min="0x00" max="0x01" writable="true" default="0x00" optional="true">LocalConfigDisabled</attribute>
-    <attribute side="server" code="0x000E" define="CURRENT_VERSION" type="INT32U" min="0x00" max="0xFFFFFF" writable="false" optional="false">CurrentVersion</attribute>
-    <attribute side="server" code="0x000E" define="CURRENT_VERSION_STRING" type="CHAR_STRING" length="64" writable="false" default="" optional="false">CurrentVersionString</attribute>
+    <attribute side="server" code="0x0007" define="HARDWARE_VERSION" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x00" optional="false">HardwareVersion</attribute>
+    <attribute side="server" code="0x0008" define="HARDWARE_VERSION_STRING" type="CHAR_STRING" length="64" writable="false" default="" optional="false">HardwareVersionString</attribute>
+    <attribute side="server" code="0x0009" define="SOFTWARE_VERSION" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x00" optional="false">SoftwareVersion</attribute>
+    <attribute side="server" code="0x000A" define="SOFTWARE_VERSION_STRING" type="CHAR_STRING" length="64" writable="false" default="" optional="false">SoftwareVersionString</attribute>
+    <attribute side="server" code="0x000B" define="MANUFACTURING_DATE" type="CHAR_STRING" length="16" writable="false" default="" optional="true">ManufacturingDate</attribute>
+    <attribute side="server" code="0x000C" define="PART_NUMBER" type="CHAR_STRING" writable="false" optional="true">PartNumber</attribute>
+    <attribute side="server" code="0x000D" define="PRODUCT_URL" type="CHAR_STRING" writable="false" optional="true">ProductURL</attribute>
+    <attribute side="server" code="0x000E" define="PRODUCT_LABEL" type="CHAR_STRING" length="64" writable="false" default="" optional="true">ProductLabel</attribute>
+    <attribute side="server" code="0x000F" define="SERIAL_NUMBER" type="CHAR_STRING" length="32" writable="false" default="" optional="true">SerialNumber</attribute>
+    <attribute side="server" code="0x0010" define="LOCAL_CONFIG_DISABLED" type="BOOLEAN" min="0x00" max="0x01" writable="true" default="0x00" optional="true">LocalConfigDisabled</attribute>
     <command source="server" code="0x00" name="StartUp" optional="false">
       <description>The StartUp event SHALL be emitted by a Node as soon as reasonable after completing a boot or reboot process.</description>
     </command>

@@ -945,7 +945,7 @@ private:
     }
 }
 
-- (void)readAttributeHardwareRevision:(ResponseHandler)completionHandler
+- (void)readAttributeHardwareVersion:(ResponseHandler)completionHandler
 {
     CHIPInt16uAttributeCallbackBridge * onSuccess = new CHIPInt16uAttributeCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
@@ -960,7 +960,7 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeHardwareRevision(onSuccess->Cancel(), onFailure->Cancel());
+    CHIP_ERROR err = self.cppCluster.ReadAttributeHardwareVersion(onSuccess->Cancel(), onFailure->Cancel());
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;

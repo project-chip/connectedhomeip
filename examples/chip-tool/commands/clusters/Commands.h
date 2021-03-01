@@ -911,7 +911,7 @@ private:
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * InteractionModelVersion                                           | 0x0000 |
-| * HardwareRevision                                                  | 0x0007 |
+| * HardwareVersion                                                   | 0x0007 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -992,14 +992,14 @@ private:
 };
 
 /*
- * Attribute HardwareRevision
+ * Attribute HardwareVersion
  */
-class ReadBasicHardwareRevision : public ModelCommand
+class ReadBasicHardwareVersion : public ModelCommand
 {
 public:
-    ReadBasicHardwareRevision() : ModelCommand("read")
+    ReadBasicHardwareVersion() : ModelCommand("read")
     {
-        AddArgument("attr-name", "hardware-revision");
+        AddArgument("attr-name", "hardware-version");
         ModelCommand::AddArguments();
     }
 
@@ -1009,7 +1009,7 @@ public:
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeHardwareRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttributeHardwareVersion(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
     }
 
 private:
@@ -6879,7 +6879,7 @@ void registerClusterBasic(Commands & commands)
         make_unique<BasicMfgSpecificPing>(),
         make_unique<DiscoverBasicAttributes>(),
         make_unique<ReadBasicInteractionModelVersion>(),
-        make_unique<ReadBasicHardwareRevision>(),
+        make_unique<ReadBasicHardwareVersion>(),
         make_unique<ReadBasicClusterRevision>(),
     };
 
