@@ -96,7 +96,7 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
 - (BOOL)isRunning
 {
     [self.lock lock];
-    BOOL commissionerInitialzied = _cppCommissioner != nullptr;
+    BOOL commissionerInitialized = _cppCommissioner != nullptr;
     [self.lock unlock];
     return commissionerInitialzied;
 }
