@@ -36,6 +36,7 @@ constexpr ClusterId kGroupsClusterId                 = 0x0004;
 constexpr ClusterId kIasZoneClusterId                = 0x0500;
 constexpr ClusterId kIdentifyClusterId               = 0x0003;
 constexpr ClusterId kLevelControlClusterId           = 0x0008;
+constexpr ClusterId kLowPowerClusterId               = 0xF004;
 constexpr ClusterId kMediaPlaybackClusterId          = 0xF001;
 constexpr ClusterId kOnOffClusterId                  = 0x0006;
 constexpr ClusterId kScenesClusterId                 = 0x0005;
@@ -480,6 +481,23 @@ private:
     static constexpr CommandId kStepWithOnOffCommandId        = 0x06;
     static constexpr CommandId kStopCommandId                 = 0x03;
     static constexpr CommandId kStopWithOnOffCommandId        = 0x07;
+};
+
+class DLL_EXPORT LowPowerCluster : public ClusterBase
+{
+public:
+    LowPowerCluster() : ClusterBase(kLowPowerClusterId) {}
+    ~LowPowerCluster() {}
+
+    // Cluster Commands
+    CHIP_ERROR Sleep(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+
+    // Cluster Attributes
+    CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+
+private:
+    static constexpr CommandId kSleepCommandId = 0x00;
 };
 
 class DLL_EXPORT MediaPlaybackCluster : public ClusterBase

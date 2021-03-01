@@ -727,6 +727,9 @@
 #define ZCL_LAUNCH_URL_COMMAND_ID (0x01)
 #define ZCL_LAUNCH_URL_RESPONSE_COMMAND_ID (0x01)
 
+// Commands for cluster: Low Power
+#define ZCL_SLEEP_COMMAND_ID (0x00)
+
 // Commands for cluster: Sample Mfg Specific Cluster
 #define ZCL_COMMAND_ONE_COMMAND_ID (0x00)
 

@@ -6014,6 +6014,15 @@
                                                                                                                                    \
                                                                           ZCL_LAUNCH_URL_COMMAND_ID, "u", contentLaunchStatus);
 
+/** @brief Command description for Sleep
+ *
+ * Command: Sleep
+ */
+#define emberAfFillCommandLow                                                                                                      \
+    PowerClusterSleep() emberAfFillExternalBuffer(mask,                                                                            \
+                                                                                                                                   \
+                                                  ZCL_SLEEP_COMMAND_ID, "", );
+
 /** @brief Command description for CommandOne
  *
  * Command: CommandOne

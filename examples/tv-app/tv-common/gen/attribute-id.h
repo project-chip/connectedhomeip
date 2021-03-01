@@ -4083,6 +4083,12 @@
 
 // Server attributes
 
+// Attribute ids for cluster: Low Power
+
+// Client attributes
+
+// Server attributes
+
 // Attribute ids for cluster: Sample Mfg Specific Cluster
 
 // Client attributes

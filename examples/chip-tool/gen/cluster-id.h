@@ -344,6 +344,9 @@
 // Definitions for cluster: Content Launch
 #define ZCL_CONTENT_LAUNCH_CLUSTER_ID (0xF002)
 
+// Definitions for cluster: Low Power
+#define ZCL_LOW_POWER_CLUSTER_ID (0xF004)
+
 // Definitions for cluster: Sample Mfg Specific Cluster
 #define ZCL_SAMPLE_MFG_SPECIFIC_CLUSTER_ID (0xFC00)
 
