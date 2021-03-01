@@ -4,6 +4,7 @@
 
 #import "CHIPDevice.h"
 #import "CHIPDevice_Internal.h"
+#import "ChipError.h"
 #import "gen/CHIPClustersObjc.h"
 #import "gen/CHIPClientCallbacks.h"
 
@@ -55,7 +56,7 @@ public:
         CHIPDefaultFailureCallbackBridge * callback = reinterpret_cast<CHIPDefaultFailureCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
-                NSError* error = [NSError errorWithDomain:@"ZCL" code:status userInfo:@{NSLocalizedDescriptionKey:@""}];
+                NSError* error = [NSError errorWithDomain:CHIPErrorDomain code:status userInfo:@{NSLocalizedDescriptionKey:@""}];
                 callback->mHandler(error, nil);
                 callback->Cancel();
                 delete callback;
@@ -82,7 +83,7 @@ public:
         CHIPUnsupportedAttributeCallbackBridge * callback = reinterpret_cast<CHIPUnsupportedAttributeCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
-                NSError* error = [NSError errorWithDomain:@"ZCL" code:0 userInfo:@{NSLocalizedDescriptionKey:@"Unsuported attribute type"}];
+                NSError* error = [NSError errorWithDomain:CHIPErrorDomain code:CHIPErrorCodeUndefinedError userInfo:@{NSLocalizedDescriptionKey:@"Unsupported attribute type"}];
                 callback->mHandler(error, nil);
                 callback->Cancel();
                 delete callback;
@@ -311,122 +312,147 @@ private:
 {{/if}}
 {{/all_user_clusters}}
 
+@interface CHIPCluster ()
+@property (readonly, nonatomic) dispatch_queue_t callbackQueue;
+- (Controller::ClusterBase *)getCluster;
+@end
+
+@implementation CHIPCluster
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(EndpointId)endpoint queue:(dispatch_queue_t)queue
+{
+    if (self = [super init]) {
+        Controller::ClusterBase * cppCluster = [self getCluster];
+        if (cppCluster == nullptr)
+        {
+            return nil;
+        }
+    
+        CHIP_ERROR err = cppCluster->Associate([device internalDevice], endpoint);
+        if (err != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        _callbackQueue = queue;
+    }
+    return self;
+}
+
+- (Controller::ClusterBase *)getCluster
+{
+    return nullptr;
+}
+@end
+
+
 {{#chip_clusters}}
 
 @interface CHIP{{asCamelCased name false}} ()
-
 @property (readonly) Controller::{{asCamelCased name false}}Cluster cppCluster;
-@property (readonly, nonatomic) dispatch_queue_t callbackQueue;
 @end
 
 @implementation CHIP{{asCamelCased name false}}
 
-- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(EndpointId)endpoint queue:(dispatch_queue_t)queue
+- (Controller::ClusterBase *)getCluster
 {
-    CHIP_ERROR err = _cppCluster.Associate([device internalDevice], endpoint);
-
-    if (err != CHIP_NO_ERROR) {
-        return nil;
-    }
-
-    if (self = [super init]) {
-        _callbackQueue = queue;
-    }
-
-    return self;
+    return &_cppCluster;
 }
 
 {{#chip_server_cluster_commands}}
 {{#if (zcl_command_arguments_count this.id)}}
-- (BOOL){{asCamelCased name}}:{{#chip_server_cluster_command_arguments}}{{#if (isFirstElement index)}}{{else}}{{asCamelCased label}}:{{/if}}({{asBasicType chipType}}){{asCamelCased label}} {{/chip_server_cluster_command_arguments}}completionHandler:(ResponseHandler)completionHandler
+- (void){{asCamelCased name}}:{{#chip_server_cluster_command_arguments}}{{#if (isFirstElement index)}}{{else}}{{asCamelCased label}}:{{/if}}({{asBasicType chipType}}){{asCamelCased label}} {{/chip_server_cluster_command_arguments}}completionHandler:(ResponseHandler)completionHandler
 {{else}}
-- (BOOL){{asCamelCased name}}:(ResponseHandler)completionHandler
+- (void){{asCamelCased name}}:(ResponseHandler)completionHandler
 {{/if}}
 {
 {{#if (hasSpecificResponse name)}}
-    CHIP{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}ResponseCallbackBridge * onSuccess = new CHIP{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}ResponseCallbackBridge(completionHandler, _callbackQueue);
+    CHIP{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}ResponseCallbackBridge * onSuccess = new CHIP{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}ResponseCallbackBridge(completionHandler, [self callbackQueue]);
 {{else}}
-    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
 {{/if}}
     if (!onSuccess) {
-        return NO;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
     }
 
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onFailure) {
         delete onSuccess;
-        return NO;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
     }
 
     CHIP_ERROR err = self.cppCluster.{{asCamelCased name false}}(onSuccess->Cancel(), onFailure->Cancel(){{#chip_server_cluster_command_arguments}}, {{asCamelCased label}}{{/chip_server_cluster_command_arguments}});
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
-        return NO;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
-    return YES;
 }
 {{/chip_server_cluster_commands}}
 
 {{#chip_server_cluster_attributes}}
-- (BOOL)readAttribute{{asCamelCased name false}}:(ResponseHandler)completionHandler
+- (void)readAttribute{{asCamelCased name false}}:(ResponseHandler)completionHandler
 {
-    CHIP{{asCallbackAttributeType atomicTypeId}}AttributeCallbackBridge * onSuccess = new CHIP{{asCallbackAttributeType atomicTypeId}}AttributeCallbackBridge(completionHandler, _callbackQueue);
+    CHIP{{asCallbackAttributeType atomicTypeId}}AttributeCallbackBridge * onSuccess = new CHIP{{asCallbackAttributeType atomicTypeId}}AttributeCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
-        return NO;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
     }
 
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onFailure) {
         delete onSuccess;
-        return NO;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
     }
 
     CHIP_ERROR err = self.cppCluster.ReadAttribute{{asCamelCased name false}}(onSuccess->Cancel(), onFailure->Cancel());
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
-        return NO;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
-    return YES;
 }
 
 {{#if (isWritableAttribute)}}
-- (BOOL)writeAttribute{{asCamelCased name false}}:({{asUnderlyingZclType type}})value completionHandler:(ResponseHandler)completionHandler
+- (void)writeAttribute{{asCamelCased name false}}:({{asUnderlyingZclType type}})value completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
-        return NO;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
     }
 
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onFailure) {
         delete onSuccess;
-        return NO;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
     }
 
     CHIP_ERROR err = self.cppCluster.WriteAttribute{{asCamelCased name false}}(onSuccess->Cancel(), onFailure->Cancel(), value);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
-        return NO;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
-    return YES;
 }
 
 {{/if}}
 {{#if (isReportableAttribute)}}
-- (BOOL) configureAttribute{{asCamelCased name false}}:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval{{#unless (isDiscreteType)}} change:({{chipType}})change{{/unless}} completionHandler:(ResponseHandler)completionHandler
+- (void) configureAttribute{{asCamelCased name false}}:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval{{#unless (isDiscreteType)}} change:({{chipType}})change{{/unless}} completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
-        return NO;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
     }
 
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onFailure) {
         delete onSuccess;
-        return NO;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
     }
 
 
@@ -434,25 +460,23 @@ private:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
-        return NO;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
-    return YES;
 }
 
-- (BOOL) reportAttribute{{asCamelCased name false}}:(ResponseHandler)reportHandler
+- (void) reportAttribute{{asCamelCased name false}}:(ResponseHandler)reportHandler
 {
-    CHIP{{asCallbackAttributeType atomicTypeId}}AttributeCallbackBridge * onReport = new CHIP{{asCallbackAttributeType atomicTypeId}}AttributeCallbackBridge(reportHandler, _callbackQueue, true);
+    CHIP{{asCallbackAttributeType atomicTypeId}}AttributeCallbackBridge * onReport = new CHIP{{asCallbackAttributeType atomicTypeId}}AttributeCallbackBridge(reportHandler, [self callbackQueue], true);
     if (!onReport) {
-        return NO;
+        reportHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
     }
 
     CHIP_ERROR err = self.cppCluster.ReportAttribute{{asCamelCased name false}}(onReport->Cancel());
     if (err != CHIP_NO_ERROR) {
         delete onReport;
-        return NO;
+        reportHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
-
-    return YES;
 }
 
 {{/if}}

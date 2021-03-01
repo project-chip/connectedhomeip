@@ -127,7 +127,7 @@ extern "C" void app_main()
         exit(err);
     }
 
-    xTaskCreate(tester_task, "tester", 8192, (void *) NULL, tskIDLE_PRIORITY + 10, NULL);
+    xTaskCreate(tester_task, "tester", 12288, (void *) NULL, tskIDLE_PRIORITY + 10, NULL);
 
     while (1)
     {

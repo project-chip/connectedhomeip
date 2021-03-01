@@ -19,6 +19,8 @@ static_library("server") {
   output_name = "libCHIPAppServer"
 
   sources = [
+    "Mdns.cpp",
+    "Mdns.h",
     "QRCodeUtil.cpp",
     "QRCodeUtil.h",
     "RendezvousServer.cpp",

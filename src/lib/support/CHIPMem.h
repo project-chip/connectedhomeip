@@ -165,7 +165,12 @@ extern void MemoryFree(void * p);
 template <typename T, typename... Args>
 inline T * New(Args &&... args)
 {
-    return new (MemoryAlloc(sizeof(T))) T(std::forward<Args>(args)...);
+    void * p = MemoryAlloc(sizeof(T));
+    if (p != nullptr)
+    {
+        return new (p) T(std::forward<Args>(args)...);
+    }
+    return nullptr;
 }
 
 /**

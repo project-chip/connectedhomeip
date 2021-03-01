@@ -21,6 +21,7 @@
 
 #import "CHIPDevice.h"
 #import "CHIPDevice_Internal.h"
+#import "ChipError.h"
 #import "gen/CHIPClientCallbacks.h"
 #import "gen/CHIPClustersObjc.h"
 
@@ -72,7 +73,9 @@ public:
         CHIPDefaultFailureCallbackBridge * callback = reinterpret_cast<CHIPDefaultFailureCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
-                NSError * error = [NSError errorWithDomain:@"ZCL" code:status userInfo:@ { NSLocalizedDescriptionKey : @"" }];
+                NSError * error = [NSError errorWithDomain:CHIPErrorDomain
+                                                      code:status
+                                                  userInfo:@ { NSLocalizedDescriptionKey : @"" }];
                 callback->mHandler(error, nil);
                 callback->Cancel();
                 delete callback;
@@ -99,9 +102,9 @@ public:
         CHIPUnsupportedAttributeCallbackBridge * callback = reinterpret_cast<CHIPUnsupportedAttributeCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
-                NSError * error = [NSError errorWithDomain:@"ZCL"
-                                                      code:0
-                                                  userInfo:@ { NSLocalizedDescriptionKey : @"Unsuported attribute type" }];
+                NSError * error = [NSError errorWithDomain:CHIPErrorDomain
+                                                      code:CHIPErrorCodeUndefinedError
+                                                  userInfo:@ { NSLocalizedDescriptionKey : @"Unsupported attribute type" }];
                 callback->mHandler(error, nil);
                 callback->Cancel();
                 delete callback;
@@ -274,175 +277,200 @@ private:
     bool mKeepAlive;
 };
 
-@interface CHIPOnOff ()
-
-@property (readonly) Controller::OnOffCluster cppCluster;
+@interface CHIPCluster ()
 @property (readonly, nonatomic) dispatch_queue_t callbackQueue;
+- (Controller::ClusterBase *)getCluster;
+@end
+
+@implementation CHIPCluster
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(EndpointId)endpoint queue:(dispatch_queue_t)queue
+{
+    if (self = [super init]) {
+        Controller::ClusterBase * cppCluster = [self getCluster];
+        if (cppCluster == nullptr) {
+            return nil;
+        }
+
+        CHIP_ERROR err = cppCluster->Associate([device internalDevice], endpoint);
+        if (err != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        _callbackQueue = queue;
+    }
+    return self;
+}
+
+- (Controller::ClusterBase *)getCluster
+{
+    return nullptr;
+}
+@end
+
+@interface CHIPOnOff ()
+@property (readonly) Controller::OnOffCluster cppCluster;
 @end
 
 @implementation CHIPOnOff
 
-- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(EndpointId)endpoint queue:(dispatch_queue_t)queue
+- (Controller::ClusterBase *)getCluster
 {
-    CHIP_ERROR err = _cppCluster.Associate([device internalDevice], endpoint);
-
-    if (err != CHIP_NO_ERROR) {
-        return nil;
-    }
-
-    if (self = [super init]) {
-        _callbackQueue = queue;
-    }
-
-    return self;
+    return &_cppCluster;
 }
 
-- (BOOL)off:(ResponseHandler)completionHandler
+- (void)off:(ResponseHandler)completionHandler
 {
-    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
-        return NO;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
     }
 
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onFailure) {
         delete onSuccess;
-        return NO;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
     }
 
     CHIP_ERROR err = self.cppCluster.Off(onSuccess->Cancel(), onFailure->Cancel());
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
-        return NO;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
-    return YES;
 }
-- (BOOL)on:(ResponseHandler)completionHandler
+- (void)on:(ResponseHandler)completionHandler
 {
-    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
-        return NO;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
     }
 
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onFailure) {
         delete onSuccess;
-        return NO;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
     }
 
     CHIP_ERROR err = self.cppCluster.On(onSuccess->Cancel(), onFailure->Cancel());
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
-        return NO;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
-    return YES;
 }
-- (BOOL)toggle:(ResponseHandler)completionHandler
+- (void)toggle:(ResponseHandler)completionHandler
 {
-    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
-        return NO;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
     }
 
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onFailure) {
         delete onSuccess;
-        return NO;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
     }
 
     CHIP_ERROR err = self.cppCluster.Toggle(onSuccess->Cancel(), onFailure->Cancel());
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
-        return NO;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
-    return YES;
 }
 
-- (BOOL)readAttributeOnOff:(ResponseHandler)completionHandler
+- (void)readAttributeOnOff:(ResponseHandler)completionHandler
 {
-    CHIPBooleanAttributeCallbackBridge * onSuccess = new CHIPBooleanAttributeCallbackBridge(completionHandler, _callbackQueue);
+    CHIPBooleanAttributeCallbackBridge * onSuccess
+        = new CHIPBooleanAttributeCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
-        return NO;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
     }
 
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onFailure) {
         delete onSuccess;
-        return NO;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
     }
 
     CHIP_ERROR err = self.cppCluster.ReadAttributeOnOff(onSuccess->Cancel(), onFailure->Cancel());
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
-        return NO;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
-    return YES;
 }
 
-- (BOOL)configureAttributeOnOff:(uint16_t)minInterval
+- (void)configureAttributeOnOff:(uint16_t)minInterval
                     maxInterval:(uint16_t)maxInterval
               completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, _callbackQueue);
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
-        return NO;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
     }
 
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onFailure) {
         delete onSuccess;
-        return NO;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
     }
 
     CHIP_ERROR err = self.cppCluster.ConfigureAttributeOnOff(onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
-        return NO;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
-    return YES;
 }
 
-- (BOOL)reportAttributeOnOff:(ResponseHandler)reportHandler
+- (void)reportAttributeOnOff:(ResponseHandler)reportHandler
 {
-    CHIPBooleanAttributeCallbackBridge * onReport = new CHIPBooleanAttributeCallbackBridge(reportHandler, _callbackQueue, true);
+    CHIPBooleanAttributeCallbackBridge * onReport
+        = new CHIPBooleanAttributeCallbackBridge(reportHandler, [self callbackQueue], true);
     if (!onReport) {
-        return NO;
+        reportHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
     }
 
     CHIP_ERROR err = self.cppCluster.ReportAttributeOnOff(onReport->Cancel());
     if (err != CHIP_NO_ERROR) {
         delete onReport;
-        return NO;
+        reportHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
-
-    return YES;
 }
 
-- (BOOL)readAttributeClusterRevision:(ResponseHandler)completionHandler
+- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler
 {
-    CHIPInt16uAttributeCallbackBridge * onSuccess = new CHIPInt16uAttributeCallbackBridge(completionHandler, _callbackQueue);
+    CHIPInt16uAttributeCallbackBridge * onSuccess = new CHIPInt16uAttributeCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
-        return NO;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
     }
 
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, _callbackQueue);
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onFailure) {
         delete onSuccess;
-        return NO;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
     }
 
     CHIP_ERROR err = self.cppCluster.ReadAttributeClusterRevision(onSuccess->Cancel(), onFailure->Cancel());
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
-        return NO;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
-    return YES;
 }
 
 @end

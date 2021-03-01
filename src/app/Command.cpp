@@ -205,7 +205,7 @@ CHIP_ERROR Command::AddCommand(CommandParams & aCommandParams)
             commandPath.GroupId(aCommandParams.GroupId);
         }
 
-        commandPath.NamespacedClusterId(aCommandParams.ClusterId).CommandId(aCommandParams.CommandId).EndOfCommandPath();
+        commandPath.ClusterId(aCommandParams.ClusterId).CommandId(aCommandParams.CommandId).EndOfCommandPath();
 
         err = commandPath.GetError();
         SuccessOrExit(err);
@@ -233,7 +233,7 @@ exit:
 }
 
 CHIP_ERROR Command::AddStatusCode(const uint16_t aGeneralCode, const uint32_t aProtocolId, const uint16_t aProtocolCode,
-                                  const chip::ClusterId aNamespacedClusterId)
+                                  const chip::ClusterId aClusterId)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     StatusElement::Builder statusElementBuilder;

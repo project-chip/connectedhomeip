@@ -21,6 +21,8 @@
 
 #pragma once
 
+#include <core/CHIPPersistentStorageDelegate.h>
+#include <iterator>
 #include <support/DLLUtil.h>
 #include <transport/raw/MessageHeader.h>
 
@@ -29,6 +31,11 @@ namespace Transport {
 
 typedef uint16_t AdminId;
 static constexpr AdminId kUndefinedAdminId = UINT16_MAX;
+
+// KVS store is sensitive to length of key strings, based on the underlying
+// platform. Keeping them short.
+constexpr char kAdminTableKeyPrefix[] = "CHIPAdmin";
+constexpr char kAdminTableCountKey[]  = "CHIPAdminNextId";
 
 struct OperationalCredentials
 {
@@ -70,7 +77,7 @@ public:
     AccessControlList & GetACL() { return mACL; }
     void SetACL(const AccessControlList & acl) { mACL = acl; }
 
-    bool IsInitialized() { return (mNodeId != kUndefinedNodeId && mAdmin != kUndefinedAdminId); }
+    bool IsInitialized() const { return (mNodeId != kUndefinedNodeId && mAdmin != kUndefinedAdminId); }
 
     /**
      *  Reset the state to a completely uninitialized status.
@@ -81,72 +88,111 @@ public:
         mAdmin  = kUndefinedAdminId;
     }
 
+    CHIP_ERROR StoreIntoKVS(PersistentStorageDelegate & kvs);
+
+    CHIP_ERROR FetchFromKVS(PersistentStorageDelegate & kvs);
+
+    static CHIP_ERROR DeleteFromKVS(PersistentStorageDelegate & kvs, AdminId id);
+
 private:
     AdminId mAdmin = kUndefinedAdminId;
     NodeId mNodeId = kUndefinedNodeId;
 
     OperationalCredentials mOpCred;
     AccessControlList mACL;
+
+    static constexpr size_t KeySize(); // { return sizeof(kAdminTableKeyPrefix) + 2 * sizeof(AdminId); }
+
+    static CHIP_ERROR GenerateKey(AdminId id, char * key, size_t len);
+
+    struct StorableAdminPairingInfo
+    {
+        uint16_t mAdmin;  /* This field is serialized in LittleEndian byte order */
+        uint64_t mNodeId; /* This field is serialized in LittleEndian byte order */
+    };
+};
+
+/**
+ * Iterates over valid admins within a list
+ */
+class ConstAdminIterator : public std::iterator<std::forward_iterator_tag, const AdminPairingInfo>
+{
+public:
+    ConstAdminIterator(const AdminPairingInfo * start, size_t index, size_t maxSize) :
+        mStart(start), mIndex(index), mMaxSize(maxSize)
+    {
+        if (mIndex >= maxSize)
+        {
+            mIndex = maxSize;
+        }
+        else if (!mStart[mIndex].IsInitialized())
+        {
+            Advance();
+        }
+    }
+    ConstAdminIterator(const ConstAdminIterator &) = default;
+    ConstAdminIterator & operator=(const ConstAdminIterator &) = default;
+
+    ConstAdminIterator & operator++() { return Advance(); }
+    ConstAdminIterator operator++(int)
+    {
+        ConstAdminIterator other(*this);
+        Advance();
+        return other;
+    }
+
+    const AdminPairingInfo & operator*() const { return mStart[mIndex]; }
+    const AdminPairingInfo * operator->() const { return mStart + mIndex; }
+
+    bool operator==(const ConstAdminIterator & other)
+    {
+        if (IsAtEnd())
+        {
+            return other.IsAtEnd();
+        }
+
+        return (mStart == other.mStart) && (mIndex == other.mIndex) && (mMaxSize == other.mMaxSize);
+    }
+    bool operator!=(const ConstAdminIterator & other) { return !(*this == other); }
+
+    bool IsAtEnd() const { return (mIndex == mMaxSize); }
+
+private:
+    const AdminPairingInfo * mStart;
+    size_t mIndex;
+    size_t mMaxSize;
+
+    ConstAdminIterator & Advance()
+    {
+        do
+        {
+            if (mIndex < mMaxSize)
+            {
+                mIndex++;
+            }
+        } while (!IsAtEnd() && !mStart[mIndex].IsInitialized());
+
+        return *this;
+    }
 };
 
 class DLL_EXPORT AdminPairingTable
 {
 public:
-    AdminPairingInfo * AssignAdminId(AdminId adminId)
+    AdminPairingInfo * AssignAdminId(AdminId adminId);
+
+    AdminPairingInfo * AssignAdminId(AdminId adminId, NodeId nodeId);
+
+    void ReleaseAdminId(AdminId adminId);
+
+    AdminPairingInfo * FindAdmin(AdminId adminId);
+
+    void Reset();
+
+    ConstAdminIterator cbegin() const { return ConstAdminIterator(mStates, 0, CHIP_CONFIG_MAX_DEVICE_ADMINS); }
+    ConstAdminIterator cend() const
     {
-        for (size_t i = 0; i < CHIP_CONFIG_MAX_DEVICE_ADMINS; i++)
-        {
-            if (!mStates[i].IsInitialized())
-            {
-                mStates[i].SetAdminId(adminId);
-
-                return &mStates[i];
-            }
-        }
-
-        return nullptr;
-    }
-
-    AdminPairingInfo * AssignAdminId(AdminId adminId, NodeId nodeId)
-    {
-        AdminPairingInfo * admin = AssignAdminId(adminId);
-
-        if (admin != nullptr)
-        {
-            admin->SetNodeId(nodeId);
-        }
-
-        return admin;
-    }
-
-    void ReleaseAdminId(AdminId adminId)
-    {
-        AdminPairingInfo * admin = FindAdmin(adminId);
-        if (admin != nullptr)
-        {
-            admin->Reset();
-        }
-    }
-
-    AdminPairingInfo * FindAdmin(AdminId adminId)
-    {
-        for (size_t i = 0; i < CHIP_CONFIG_MAX_DEVICE_ADMINS; i++)
-        {
-            if (mStates[i].IsInitialized() && mStates[i].GetAdminId() == adminId)
-            {
-                return &mStates[i];
-            }
-        }
-
-        return nullptr;
-    }
-
-    void Reset()
-    {
-        for (size_t i = 0; i < CHIP_CONFIG_MAX_DEVICE_ADMINS; i++)
-        {
-            return mStates[i].Reset();
-        }
+        return ConstAdminIterator(mStates, CHIP_CONFIG_MAX_DEVICE_ADMINS, CHIP_CONFIG_MAX_DEVICE_ADMINS);
     }
 
 private:

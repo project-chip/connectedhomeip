@@ -998,6 +998,11 @@ void ConnectivityManagerImpl::OnStationIPv4AddressAvailable(const ip_event_got_i
     RefreshMessageLayer();
 
     UpdateInternetConnectivityState();
+
+    ChipDeviceEvent event;
+    event.Type                           = DeviceEventType::kInterfaceIpAddressChanged;
+    event.InterfaceIpAddressChanged.Type = InterfaceIpChangeType::kIpV4_Assigned;
+    PlatformMgr().PostEvent(&event);
 }
 
 void ConnectivityManagerImpl::OnStationIPv4AddressLost(void)
@@ -1007,6 +1012,11 @@ void ConnectivityManagerImpl::OnStationIPv4AddressLost(void)
     RefreshMessageLayer();
 
     UpdateInternetConnectivityState();
+
+    ChipDeviceEvent event;
+    event.Type                           = DeviceEventType::kInterfaceIpAddressChanged;
+    event.InterfaceIpAddressChanged.Type = InterfaceIpChangeType::kIpV4_Lost;
+    PlatformMgr().PostEvent(&event);
 }
 
 void ConnectivityManagerImpl::OnIPv6AddressAvailable(const ip_event_got_ip6_t & got_ip)
@@ -1021,6 +1031,11 @@ void ConnectivityManagerImpl::OnIPv6AddressAvailable(const ip_event_got_ip6_t & 
     RefreshMessageLayer();
 
     UpdateInternetConnectivityState();
+
+    ChipDeviceEvent event;
+    event.Type                           = DeviceEventType::kInterfaceIpAddressChanged;
+    event.InterfaceIpAddressChanged.Type = InterfaceIpChangeType::kIpV6_Assigned;
+    PlatformMgr().PostEvent(&event);
 }
 
 void ConnectivityManagerImpl::RefreshMessageLayer(void) {}

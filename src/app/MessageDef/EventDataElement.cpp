@@ -254,10 +254,10 @@ CHIP_ERROR EventDataElement::Parser::CheckSchemaValidity() const
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
-        case kCsTag_ImportanceLevel:
+        case kCsTag_PriorityLevel:
             // check if this tag has appeared before
-            VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_ImportanceLevel)), err = CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << kCsTag_ImportanceLevel);
+            VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_PriorityLevel)), err = CHIP_ERROR_INVALID_TLV_TAG);
+            TagPresenceMask |= (1 << kCsTag_PriorityLevel);
             VerifyOrExit(chip::TLV::kTLVType_UnsignedInteger == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
 
 #if CHIP_DETAIL_LOGGING
@@ -266,7 +266,7 @@ CHIP_ERROR EventDataElement::Parser::CheckSchemaValidity() const
                 err = reader.Get(value);
                 SuccessOrExit(err);
 
-                PRETTY_PRINT("\tImportanceLevel = 0x%" PRIx64 ",", value);
+                PRETTY_PRINT("\tPriorityLevel = 0x%" PRIx64 ",", value);
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
@@ -335,7 +335,7 @@ CHIP_ERROR EventDataElement::Parser::CheckSchemaValidity() const
                 err = reader.Get(value);
                 SuccessOrExit(err);
 
-                PRETTY_PRINT("\tDeltaUTCTimestamp= 0x%" PRIx64 ",", value);
+                PRETTY_PRINT("\tDeltaUTCTimestampstamp= 0x%" PRIx64 ",", value);
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
@@ -352,7 +352,7 @@ CHIP_ERROR EventDataElement::Parser::CheckSchemaValidity() const
                 err = reader.Get(value);
                 SuccessOrExit(err);
 
-                PRETTY_PRINT("\tDeltaSystemTimestamp= 0x%" PRIx64 ",", value);
+                PRETTY_PRINT("\tDeltaSystemTimestamp = 0x%" PRIx64 ",", value);
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
@@ -372,12 +372,12 @@ CHIP_ERROR EventDataElement::Parser::CheckSchemaValidity() const
     }
     PRETTY_PRINT("},");
     PRETTY_PRINT("");
+
     // if we have exhausted this container
     if (CHIP_END_OF_TLV == err)
     {
         // check for required fields:
-        const uint16_t RequiredFields =
-            (1 << kCsTag_EventPath) | (1 << kCsTag_ImportanceLevel) | (1 << kCsTag_Number) | (1 << kCsTag_Data);
+        const uint16_t RequiredFields = (1 << kCsTag_EventPath) | (1 << kCsTag_PriorityLevel) | (1 << kCsTag_Data);
 
         if ((TagPresenceMask & RequiredFields) == RequiredFields)
         {
@@ -416,9 +416,9 @@ exit:
     return err;
 }
 
-CHIP_ERROR EventDataElement::Parser::GetImportanceLevel(uint8_t * const apImportanceLevel)
+CHIP_ERROR EventDataElement::Parser::GetPriorityLevel(uint8_t * const apPriorityLevel)
 {
-    return GetUnsignedInteger(kCsTag_ImportanceLevel, apImportanceLevel);
+    return GetUnsignedInteger(kCsTag_PriorityLevel, apPriorityLevel);
 }
 
 CHIP_ERROR EventDataElement::Parser::GetNumber(uint64_t * const apNumber)
@@ -436,12 +436,12 @@ CHIP_ERROR EventDataElement::Parser::GetSystemTimestamp(uint64_t * const apSyste
     return GetUnsignedInteger(kCsTag_SystemTimestamp, apSystemTimestamp);
 }
 
-CHIP_ERROR EventDataElement::Parser::GetDeltaUTCTime(uint64_t * const apDeltaUTCTimestamp)
+CHIP_ERROR EventDataElement::Parser::GetDeltaUTCTimestamp(uint64_t * const apDeltaUTCTimestampstamp)
 {
-    return GetUnsignedInteger(kCsTag_DeltaUTCTimestamp, apDeltaUTCTimestamp);
+    return GetUnsignedInteger(kCsTag_DeltaUTCTimestamp, apDeltaUTCTimestampstamp);
 }
 
-CHIP_ERROR EventDataElement::Parser::GetDeltaSystemTime(uint64_t * const apDeltaSystemTimestamp)
+CHIP_ERROR EventDataElement::Parser::GetDeltaSystemTimestamp(uint64_t * const apDeltaSystemTimestamp)
 {
     return GetUnsignedInteger(kCsTag_DeltaSystemTimestamp, apDeltaSystemTimestamp);
 }
@@ -473,12 +473,12 @@ exit:
     return mEventPathBuilder;
 }
 
-EventDataElement::Builder EventDataElement::Builder::ImportanceLevel(const uint8_t aImportanceLevel)
+EventDataElement::Builder EventDataElement::Builder::PriorityLevel(const uint8_t aPriorityLevel)
 {
     // skip if error has already been set
     SuccessOrExit(mError);
 
-    mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_ImportanceLevel), aImportanceLevel);
+    mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_PriorityLevel), aPriorityLevel);
     ChipLogFunctError(mError);
 
 exit:
@@ -521,7 +521,7 @@ exit:
     return *this;
 }
 
-EventDataElement::Builder EventDataElement::Builder::DeltaUTCTime(const uint64_t aDeltaUTCTimestamp)
+EventDataElement::Builder EventDataElement::Builder::DeltaUTCTimestamp(const uint64_t aDeltaUTCTimestamp)
 {
     // skip if error has already been set
     SuccessOrExit(mError);
@@ -533,7 +533,7 @@ exit:
     return *this;
 }
 
-EventDataElement::Builder EventDataElement::Builder::DeltaSystemTime(const uint64_t aDeltaSystemTimestamp)
+EventDataElement::Builder EventDataElement::Builder::DeltaSystemTimestamp(const uint64_t aDeltaSystemTimestamp)
 {
     // skip if error has already been set
     SuccessOrExit(mError);

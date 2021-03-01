@@ -434,6 +434,30 @@ typedef enum
     EMBER_ZCL_COMMODITY_TYPE_ELECTRIC_METERING_ELEMENT3          = 15,
 } EmberAfCommodityType;
 
+// Enum for ContentLaunchStatus
+typedef enum
+{
+    EMBER_ZCL_CONTENT_LAUNCH_STATUS_SUCCESS           = 0,
+    EMBER_ZCL_CONTENT_LAUNCH_STATUS_URL_NOT_AVAILABLE = 1,
+    EMBER_ZCL_CONTENT_LAUNCH_STATUS_AUTH_FAILED       = 2,
+} EmberAfContentLaunchStatus;
+
+// Enum for ContentLaunchType
+typedef enum
+{
+    EMBER_ZCL_CONTENT_LAUNCH_TYPE_ACTOR       = 0,
+    EMBER_ZCL_CONTENT_LAUNCH_TYPE_CHANNEL     = 1,
+    EMBER_ZCL_CONTENT_LAUNCH_TYPE_CHARACTER   = 2,
+    EMBER_ZCL_CONTENT_LAUNCH_TYPE_EVENT       = 3,
+    EMBER_ZCL_CONTENT_LAUNCH_TYPE_FRANCHISE   = 4,
+    EMBER_ZCL_CONTENT_LAUNCH_TYPE_GENRE       = 5,
+    EMBER_ZCL_CONTENT_LAUNCH_TYPE_LEAGUE      = 6,
+    EMBER_ZCL_CONTENT_LAUNCH_TYPE_POPULARITY  = 7,
+    EMBER_ZCL_CONTENT_LAUNCH_TYPE_SPORT       = 8,
+    EMBER_ZCL_CONTENT_LAUNCH_TYPE_SPORTS_TEAM = 9,
+    EMBER_ZCL_CONTENT_LAUNCH_TYPE_VIDEO       = 10,
+} EmberAfContentLaunchType;
+
 // Enum for CppEventResponseCppAuth
 typedef enum
 {
@@ -1605,6 +1629,15 @@ typedef enum
     EMBER_ZCL_MEASUREMENT_LIGHT_SENSOR_TYPE_PHOTODIODE = 0,
     EMBER_ZCL_MEASUREMENT_LIGHT_SENSOR_TYPE_CMOS       = 1,
 } EmberAfMeasurementLightSensorType;
+
+// Enum for MediaPlaybackStatus
+typedef enum
+{
+    EMBER_ZCL_MEDIA_PLAYBACK_STATUS_SUCCESS                   = 0,
+    EMBER_ZCL_MEDIA_PLAYBACK_STATUS_INVALID_STATE_FOR_COMMAND = 1,
+    EMBER_ZCL_MEDIA_PLAYBACK_STATUS_NOT_ALLOWED               = 2,
+    EMBER_ZCL_MEDIA_PLAYBACK_STATUS_NOT_ACTIVE                = 3,
+} EmberAfMediaPlaybackStatus;
 
 // Enum for MessagingControlConfirmation
 typedef enum

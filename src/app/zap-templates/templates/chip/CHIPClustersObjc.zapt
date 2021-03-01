@@ -5,42 +5,56 @@
 
 #import <Foundation/Foundation.h>
 
-typedef void (^ResponseHandler)(NSError * _Nullable error, NSDictionary * _Nullable values);
-
 @class CHIPDevice;
 
-{{#chip_clusters}}
+typedef void (^ResponseHandler)(NSError * _Nullable error, NSDictionary * _Nullable values);
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CHIP{{asCamelCased name false}} : NSObject
+/**
+ * CHIPCluster
+ *    This is the base class for clusters.
+ */
+@interface CHIPCluster : NSObject
 
-- (nullable instancetype)initWithDevice:(CHIPDevice *)device endpoint:(uint8_t)endpoint queue:(dispatch_queue_t)queue;
-{{#chip_server_cluster_commands}}
-{{#if (zcl_command_arguments_count this.id)}}
-- (BOOL){{asCamelCased name}}:{{#chip_server_cluster_command_arguments}}{{#if (isFirstElement index)}}{{else}}{{asCamelCased label}}:{{/if}}({{asBasicType chipType}}){{asCamelCased label}} {{/chip_server_cluster_command_arguments}}completionHandler:(ResponseHandler)completionHandler;
-{{else}}
-- (BOOL){{asCamelCased name}}:(ResponseHandler)completionHandler;
-{{/if}}
-{{/chip_server_cluster_commands}}
-
-{{#chip_server_cluster_attributes}}
-- (BOOL)readAttribute{{asCamelCased name false}}:(ResponseHandler)completionHandler;
-{{#if (isWritableAttribute)}}
-- (BOOL)writeAttribute{{asCamelCased name false}}:({{asUnderlyingZclType type}})value completionHandler:(ResponseHandler)completionHandler;
-{{/if}}
-{{#if (isReportableAttribute)}}
-- (BOOL) configureAttribute{{asCamelCased name false}}:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval{{#unless (isDiscreteType)}} change:({{chipType}})change{{/unless}} completionHandler:(ResponseHandler)completionHandler;
-- (BOOL) reportAttribute{{asCamelCased name false}}:(ResponseHandler)reportHandler;
-{{/if}}
-{{/chip_server_cluster_attributes}}
-
+- (nullable instancetype)initWithDevice:(CHIPDevice *)device endpoint:(uint8_t)endpoint queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
 
 @end
 
-NS_ASSUME_NONNULL_END
+{{#chip_clusters}}
+
+
+/**
+ * Cluster {{name}}
+ *    {{description}}
+ */
+@interface CHIP{{asCamelCased name false}} : CHIPCluster
+
+{{#chip_server_cluster_commands}}
+{{#if (zcl_command_arguments_count this.id)}}
+- (void){{asCamelCased name}}:{{#chip_server_cluster_command_arguments}}{{#if (isFirstElement index)}}{{else}}{{asCamelCased label}}:{{/if}}({{asBasicType chipType}}){{asCamelCased label}} {{/chip_server_cluster_command_arguments}}completionHandler:(ResponseHandler)completionHandler;
+{{else}}
+- (void){{asCamelCased name}}:(ResponseHandler)completionHandler;
+{{/if}}
+{{/chip_server_cluster_commands}}
+
+{{#chip_server_cluster_attributes}}
+- (void)readAttribute{{asCamelCased name false}}:(ResponseHandler)completionHandler;
+{{#if (isWritableAttribute)}}
+- (void)writeAttribute{{asCamelCased name false}}:({{asUnderlyingZclType type}})value completionHandler:(ResponseHandler)completionHandler;
+{{/if}}
+{{#if (isReportableAttribute)}}
+- (void) configureAttribute{{asCamelCased name false}}:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval{{#unless (isDiscreteType)}} change:({{chipType}})change{{/unless}} completionHandler:(ResponseHandler)completionHandler;
+- (void) reportAttribute{{asCamelCased name false}}:(ResponseHandler)reportHandler;
+{{/if}}
+{{/chip_server_cluster_attributes}}
+
+@end
+
 {{/chip_clusters}}
+
+NS_ASSUME_NONNULL_END
 
 #endif /* CHIP_CLUSTERS_H */

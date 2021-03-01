@@ -27,10 +27,18 @@ Welcome to the CHIP python REPL utilty.
 
 Usage examples:
 
-######## List available BLE adapters #########
-
 import chip.ble
+
+######## List available BLE adapters #########
 print(chip.ble.GetAdapters())
+
+######## Discover chip devices #########
+
+chip.ble.DiscoverAsync(2000, lambda *x: print('Discovered: %r' % (x,)), lambda: print('Done'))
+
+for device in chip.ble.DiscoverSync(2000):
+    print(device)
+
     '''.strip())
 
 if __name__ == "__main__":
