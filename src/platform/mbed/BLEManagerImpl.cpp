@@ -48,6 +48,7 @@
 #include "ble/BLE.h"
 #include "ble/Gap.h"
 #include "platform/Callback.h"
+#include "platform/NonCopyable.h"
 #include "platform/Span.h"
 
 #if _BLEMGRIMPL_USE_LEDS
@@ -93,9 +94,168 @@ events::EventQueue event_queue(32 * EVENTS_EVENT_SIZE);
 rtos::Thread event_thread;
 #endif
 
+class GapEventHandler : private mbed::NonCopyable<GapEventHandler>, public ble::Gap::EventHandler
+{
+    void onScanRequestReceived(const ble::ScanRequestEvent & event)
+    {
+        // Requires enable action from setScanRequestNotification(true).
+        ChipLogDetail(DeviceLayer, "GAP %s", __FUNCTION__);
+    }
+
+    /* Called when advertising starts.
+     */
+    void onAdvertisingStart(const ble::AdvertisingStartEvent & event)
+    {
+#if _BLEMGRIMPL_USE_LEDS
+        led3 = 0;
+#endif
+        ChipLogDetail(DeviceLayer, "GAP %s", __FUNCTION__);
+
+        BLEManagerImpl & ble_manager = BLEMgrImpl();
+        SetFlag(ble_manager.mFlags, ble_manager.kFlag_Advertising);
+        ClearFlag(ble_manager.mFlags, ble_manager.kFlag_AdvertisingRefreshNeeded);
+
+        // Post a CHIPoBLEAdvertisingChange(Started) event.
+        ChipDeviceEvent chip_event;
+        chip_event.Type                             = DeviceEventType::kCHIPoBLEAdvertisingChange;
+        chip_event.CHIPoBLEAdvertisingChange.Result = kActivity_Started;
+        PlatformMgrImpl().PostEvent(&chip_event);
+
+        PlatformMgr().ScheduleWork(ble_manager.DriveBLEState, 0);
+    }
+
+    /* Called when advertising ends.
+     *
+     * Advertising ends when the process timeout or if it is stopped by the
+     * application or if the local device accepts a connection request.
+     */
+    void onAdvertisingEnd(const ble::AdvertisingEndEvent & event)
+    {
+#if _BLEMGRIMPL_USE_LEDS
+        led3 = 1;
+#endif
+        ChipLogDetail(DeviceLayer, "GAP %s", __FUNCTION__);
+
+        BLEManagerImpl & ble_manager = BLEMgrImpl();
+        ClearFlag(ble_manager.mFlags, ble_manager.kFlag_Advertising);
+
+        // Post a CHIPoBLEAdvertisingChange(Stopped) event.
+        ChipDeviceEvent chip_event;
+        chip_event.Type                             = DeviceEventType::kCHIPoBLEAdvertisingChange;
+        chip_event.CHIPoBLEAdvertisingChange.Result = kActivity_Stopped;
+        PlatformMgrImpl().PostEvent(&chip_event);
+
+        if (event.isConnected())
+        {
+            SetFlag(ble_manager.mFlags, ble_manager.kFlag_AdvertisingRefreshNeeded);
+            ChipLogDetail(DeviceLayer, "Restarting advertising to allow more connections.");
+        }
+        PlatformMgr().ScheduleWork(ble_manager.DriveBLEState, 0);
+    }
+
+    /* Called when connection attempt ends or an advertising device has been
+     * connected.
+     */
+    void onConnectionComplete(const ble::ConnectionCompleteEvent & event)
+    {
+        ChipLogDetail(DeviceLayer, "GAP %s", __FUNCTION__);
+
+        ble_error_t mbed_err         = event.getStatus();
+        BLEManagerImpl & ble_manager = BLEMgrImpl();
+
+        if (mbed_err == BLE_ERROR_NONE)
+        {
+            const ble::address_t & peer_addr = event.getPeerAddress();
+            ChipLogProgress(DeviceLayer, "BLE connection established with %02hhX:%02hhX:%02hhX:%02hhX:%02hhX:%02hhX", peer_addr[5],
+                            peer_addr[4], peer_addr[3], peer_addr[2], peer_addr[1], peer_addr[0]);
+            ble_manager.mGAPConns++;
+        }
+        else
+        {
+            ChipLogError(DeviceLayer, "BLE connection failed, mbed-os error: %d", mbed_err);
+        }
+        ChipLogProgress(DeviceLayer, "Current number of connections: %" PRIu16 "/%d", ble_manager.NumConnections(),
+                        ble_manager.kMaxConnections);
+
+        // The connection established event is propagated when the client has subscribed to
+        // the TX characteristic.
+    }
+
+    void onUpdateConnectionParametersRequest(const ble::UpdateConnectionParametersRequestEvent & event)
+    {
+        ChipLogDetail(DeviceLayer, "GAP %s", __FUNCTION__);
+    }
+
+    void onConnectionParametersUpdateComplete(const ble::ConnectionParametersUpdateCompleteEvent & event)
+    {
+        ChipLogDetail(DeviceLayer, "GAP %s", __FUNCTION__);
+    }
+
+    void onReadPhy(ble_error_t status, ble::connection_handle_t connectionHandle, ble::phy_t txPhy, ble::phy_t rxPhy)
+    {
+        ChipLogDetail(DeviceLayer, "GAP %s", __FUNCTION__);
+    }
+
+    void onPhyUpdateComplete(ble_error_t status, ble::connection_handle_t connectionHandle, ble::phy_t txPhy, ble::phy_t rxPhy)
+    {
+        ChipLogDetail(DeviceLayer, "GAP %s", __FUNCTION__);
+    }
+
+    /* Called when a connection has been disconnected.
+     */
+    void onDisconnectionComplete(const ble::DisconnectionCompleteEvent & event)
+    {
+        ChipLogDetail(DeviceLayer, "GAP %s", __FUNCTION__);
+
+        const ble::disconnection_reason_t & reason = event.getReason();
+        BLEManagerImpl & ble_manager               = BLEMgrImpl();
+
+        if (ble_manager.NumConnections())
+        {
+            ble_manager.mGAPConns--;
+        }
+
+        ChipDeviceEvent chip_event;
+        chip_event.Type                          = DeviceEventType::kCHIPoBLEConnectionError;
+        chip_event.CHIPoBLEConnectionError.ConId = event.getConnectionHandle();
+        switch (reason.value())
+        {
+        case ble::disconnection_reason_t::REMOTE_USER_TERMINATED_CONNECTION:
+            chip_event.CHIPoBLEConnectionError.Reason = BLE_ERROR_REMOTE_DEVICE_DISCONNECTED;
+            break;
+        case ble::disconnection_reason_t::LOCAL_HOST_TERMINATED_CONNECTION:
+            chip_event.CHIPoBLEConnectionError.Reason = BLE_ERROR_APP_CLOSED_CONNECTION;
+            break;
+        default:
+            chip_event.CHIPoBLEConnectionError.Reason = BLE_ERROR_CHIPOBLE_PROTOCOL_ABORT;
+            break;
+        }
+        PlatformMgrImpl().PostEvent(&chip_event);
+
+        ChipLogProgress(DeviceLayer, "BLE connection terminated, mbed-os reason: %d", reason);
+        ChipLogProgress(DeviceLayer, "Current number of connections: %" PRIu16 "/%d", ble_manager.NumConnections(),
+                        ble_manager.kMaxConnections);
+
+        // Force a reconfiguration of advertising in case we switched to non-connectable mode when
+        // the BLE connection was established.
+        SetFlag(ble_manager.mFlags, ble_manager.kFlag_AdvertisingRefreshNeeded);
+        PlatformMgr().ScheduleWork(ble_manager.DriveBLEState, 0);
+    }
+
+    void onDataLengthChange(ble::connection_handle_t connectionHandle, uint16_t txSize, uint16_t rxSize)
+    {
+        ChipLogDetail(DeviceLayer, "GAP %s", __FUNCTION__);
+    }
+
+    void onPrivacyEnabled() { ChipLogDetail(DeviceLayer, "GAP %s", __FUNCTION__); }
+};
+
+static GapEventHandler sMbedGapEventHandler;
+
 /* Initialize the mbed-os BLE subsystem. Register the BLE event processing
  * callback to the system event queue. Register the BLE initialization complete
- * callback that handles the rest of the setup commands.
+ * callback that handles the rest of the setup commands. Register the BLE GAP
+ * event handler.
  */
 CHIP_ERROR BLEManagerImpl::_Init()
 {
@@ -115,6 +275,8 @@ CHIP_ERROR BLEManagerImpl::_Init()
     // memset(mSubscribedConns, 0, sizeof(mSubscribedConns));
 
     ble::BLE & ble_interface = ble::BLE::Instance();
+
+    ble_interface.gap().setEventHandler(&sMbedGapEventHandler);
 
     ble_interface.onEventsToProcess(FunctionPointerWithContext<ble::BLE::OnEventsToProcessCallbackContext *>{
         [](ble::BLE::OnEventsToProcessCallbackContext * context) {
@@ -259,6 +421,14 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     // Change own address type from RANDOM to PUBLIC.
     adv_params.setOwnAddressType(ble::own_address_type_t::PUBLIC);
 
+    // Restart advertising if already active.
+    if (gap.isAdvertisingActive(ble::LEGACY_ADVERTISING_HANDLE))
+    {
+        mbed_err = gap.stopAdvertising(ble::LEGACY_ADVERTISING_HANDLE);
+        VerifyOrExit(mbed_err == BLE_ERROR_NONE, err = CHIP_ERROR_INTERNAL);
+        ChipLogDetail(DeviceLayer, "Advertising already active. Restarting.");
+    }
+
     mbed_err = gap.setAdvertisingParameters(ble::LEGACY_ADVERTISING_HANDLE, adv_params);
     VerifyOrExit(mbed_err == BLE_ERROR_NONE, err = CHIP_ERROR_INTERNAL);
 
@@ -296,11 +466,6 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     mbed_err = gap.startAdvertising(ble::LEGACY_ADVERTISING_HANDLE);
     VerifyOrExit(mbed_err == BLE_ERROR_NONE, err = CHIP_ERROR_INTERNAL);
 
-    SetFlag(mFlags, kFlag_Advertising);
-    ClearFlag(mFlags, kFlag_AdvertisingRefreshNeeded);
-#if _BLEMGRIMPL_USE_LEDS
-    led3 = 0;
-#endif
     ChipLogDetail(DeviceLayer, "Advertising started, type: 0x%x (%sconnectable), interval: [%d:%d] ms, device name: %s)",
                   adv_params.getType(), connectable ? "" : "non-", adv_params.getMinPrimaryInterval().valueInMs(),
                   adv_params.getMaxPrimaryInterval().valueInMs(), mDeviceName);
@@ -327,10 +492,6 @@ CHIP_ERROR BLEManagerImpl::StopAdvertising(void)
     }
     mbed_err = gap.stopAdvertising(ble::LEGACY_ADVERTISING_HANDLE);
     VerifyOrExit(mbed_err == BLE_ERROR_NONE, err = CHIP_ERROR_INTERNAL);
-    ClearFlag(mFlags, kFlag_Advertising);
-#if _BLEMGRIMPL_USE_LEDS
-    led3 = 1;
-#endif
 
 exit:
     if (mbed_err != BLE_ERROR_NONE)
