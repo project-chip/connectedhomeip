@@ -105,6 +105,7 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
 | ColorControl                                                        | 0x0300 |
 | ContentLaunch                                                       | 0xF002 |
 | DoorLock                                                            | 0x0101 |
+| GeneralCommissioning                                                | 0x0030 |
 | Groups                                                              | 0x0004 |
 | IasZone                                                             | 0x0500 |
 | Identify                                                            | 0x0003 |
@@ -200,6 +201,11 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
 #define ZCL_SET_YEARDAY_SCHEDULE_COMMAND_ID (0x0E)
 #define ZCL_UNLOCK_DOOR_COMMAND_ID (0x01)
 #define ZCL_UNLOCK_WITH_TIMEOUT_COMMAND_ID (0x03)
+
+#define GENERAL_COMMISSIONING_CLUSTER_ID 0x0030
+#define ZCL_ARM_FAIL_SAFE_COMMAND_ID (0x02)
+#define ZCL_COMMISSIONING_COMPLETE_COMMAND_ID (0x06)
+#define ZCL_SET_FABRIC_COMMAND_ID (0x00)
 
 #define GROUPS_CLUSTER_ID 0x0004
 #define ZCL_ADD_GROUP_COMMAND_ID (0x00)
@@ -2185,6 +2191,129 @@ PacketBufferHandle encodeDoorLockClusterReadActuatorEnabledAttribute(uint8_t seq
 PacketBufferHandle encodeDoorLockClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadDoorLockClusterRevision", DOOR_LOCK_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    COMMAND_FOOTER();
+}
+
+/*----------------------------------------------------------------------------*\
+| Cluster GeneralCommissioning                                        | 0x0030 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * ArmFailSafe                                                       |   0x02 |
+| * CommissioningComplete                                             |   0x06 |
+| * SetFabric                                                         |   0x00 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * FabricId                                                          | 0x0000 |
+| * Breadcrumb                                                        | 0x0001 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command ArmFailSafe
+ */
+PacketBufferHandle encodeGeneralCommissioningClusterArmFailSafeCommand(uint8_t seqNum, EndpointId destinationEndpoint,
+                                                                       uint16_t expiryLengthSeconds, uint64_t breadcrumb,
+                                                                       uint32_t timeoutMs)
+{
+    COMMAND_HEADER("ArmFailSafe", GENERAL_COMMISSIONING_CLUSTER_ID);
+    buf.Put8(kFrameControlClusterSpecificCommand)
+        .Put8(seqNum)
+        .Put8(ZCL_ARM_FAIL_SAFE_COMMAND_ID)
+        .Put16(expiryLengthSeconds)
+        .Put64(breadcrumb)
+        .Put32(timeoutMs);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Command CommissioningComplete
+ */
+PacketBufferHandle encodeGeneralCommissioningClusterCommissioningCompleteCommand(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("CommissioningComplete", GENERAL_COMMISSIONING_CLUSTER_ID);
+    buf.Put8(kFrameControlClusterSpecificCommand).Put8(seqNum).Put8(ZCL_COMMISSIONING_COMPLETE_COMMAND_ID);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Command SetFabric
+ */
+PacketBufferHandle encodeGeneralCommissioningClusterSetFabricCommand(uint8_t seqNum, EndpointId destinationEndpoint,
+                                                                     char * fabricId, char * fabricSecret, uint64_t breadcrumb,
+                                                                     uint32_t timeoutMs)
+{
+    COMMAND_HEADER("SetFabric", GENERAL_COMMISSIONING_CLUSTER_ID);
+    size_t fabricIdStrLen = strlen(fabricId);
+    if (!CanCastTo<uint8_t>(fabricIdStrLen))
+    {
+        ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, fabricIdStrLen);
+        return PacketBufferHandle();
+    }
+    size_t fabricSecretStrLen = strlen(fabricSecret);
+    if (!CanCastTo<uint8_t>(fabricSecretStrLen))
+    {
+        ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, fabricSecretStrLen);
+        return PacketBufferHandle();
+    }
+    buf.Put8(kFrameControlClusterSpecificCommand)
+        .Put8(seqNum)
+        .Put8(ZCL_SET_FABRIC_COMMAND_ID)
+        .Put(static_cast<uint8_t>(fabricIdStrLen))
+        .Put(fabricId)
+        .Put(static_cast<uint8_t>(fabricSecretStrLen))
+        .Put(fabricSecret)
+        .Put64(breadcrumb)
+        .Put32(timeoutMs);
+    COMMAND_FOOTER();
+}
+
+PacketBufferHandle encodeGeneralCommissioningClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("DiscoverGeneralCommissioningAttributes", GENERAL_COMMISSIONING_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute FabricId
+ */
+PacketBufferHandle encodeGeneralCommissioningClusterReadFabricIdAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadGeneralCommissioningFabricId", GENERAL_COMMISSIONING_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0000);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute Breadcrumb
+ */
+PacketBufferHandle encodeGeneralCommissioningClusterReadBreadcrumbAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadGeneralCommissioningBreadcrumb", GENERAL_COMMISSIONING_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0001);
+    COMMAND_FOOTER();
+}
+
+PacketBufferHandle encodeGeneralCommissioningClusterWriteBreadcrumbAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
+                                                                             uint64_t breadcrumb)
+{
+    COMMAND_HEADER("WriteGeneralCommissioningBreadcrumb", GENERAL_COMMISSIONING_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
+        .Put16(0x0001)
+        .Put8(39)
+        .Put64(static_cast<uint64_t>(breadcrumb));
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute ClusterRevision
+ */
+PacketBufferHandle encodeGeneralCommissioningClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadGeneralCommissioningClusterRevision", GENERAL_COMMISSIONING_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
     COMMAND_FOOTER();
 }

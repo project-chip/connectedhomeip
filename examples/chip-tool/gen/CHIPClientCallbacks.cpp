@@ -1158,6 +1158,48 @@ bool emberAfDoorLockClusterUnlockWithTimeoutResponseCallback(uint8_t status)
     return true;
 }
 
+bool emberAfGeneralCommissioningClusterArmFailSafeResponseCallback(uint8_t errorCode, uint8_t * debugText)
+{
+    ChipLogProgress(Zcl, "ArmFailSafeResponse:");
+    ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
+    ChipLogProgress(Zcl, "  debugText: %s", debugText);
+
+    GET_RESPONSE_CALLBACKS("GeneralCommissioningClusterArmFailSafeResponseCallback");
+
+    Callback::Callback<GeneralCommissioningClusterArmFailSafeResponseCallback> * cb =
+        Callback::Callback<GeneralCommissioningClusterArmFailSafeResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, errorCode, debugText);
+    return true;
+}
+
+bool emberAfGeneralCommissioningClusterCommissioningCompleteResponseCallback(uint8_t errorCode, uint8_t * debugText)
+{
+    ChipLogProgress(Zcl, "CommissioningCompleteResponse:");
+    ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
+    ChipLogProgress(Zcl, "  debugText: %s", debugText);
+
+    GET_RESPONSE_CALLBACKS("GeneralCommissioningClusterCommissioningCompleteResponseCallback");
+
+    Callback::Callback<GeneralCommissioningClusterCommissioningCompleteResponseCallback> * cb =
+        Callback::Callback<GeneralCommissioningClusterCommissioningCompleteResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, errorCode, debugText);
+    return true;
+}
+
+bool emberAfGeneralCommissioningClusterSetFabricResponseCallback(uint8_t errorCode, uint8_t * debugText)
+{
+    ChipLogProgress(Zcl, "SetFabricResponse:");
+    ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
+    ChipLogProgress(Zcl, "  debugText: %s", debugText);
+
+    GET_RESPONSE_CALLBACKS("GeneralCommissioningClusterSetFabricResponseCallback");
+
+    Callback::Callback<GeneralCommissioningClusterSetFabricResponseCallback> * cb =
+        Callback::Callback<GeneralCommissioningClusterSetFabricResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, errorCode, debugText);
+    return true;
+}
+
 bool emberAfGroupsClusterAddGroupResponseCallback(uint8_t status, uint16_t groupId)
 {
     ChipLogProgress(Zcl, "AddGroupResponse:");

@@ -34,6 +34,7 @@
 | ColorControl                                                        | 0x0300 |
 | ContentLaunch                                                       | 0xF002 |
 | DoorLock                                                            | 0x0101 |
+| GeneralCommissioning                                                | 0x0030 |
 | Groups                                                              | 0x0004 |
 | IasZone                                                             | 0x0500 |
 | Identify                                                            | 0x0003 |
@@ -1267,6 +1268,81 @@ chip::System::PacketBufferHandle encodeDoorLockClusterReadActuatorEnabledAttribu
  */
 chip::System::PacketBufferHandle encodeDoorLockClusterReadClusterRevisionAttribute(uint8_t seqNum,
                                                                                    chip::EndpointId destinationEndpoint);
+
+/*----------------------------------------------------------------------------*\
+| Cluster GeneralCommissioning                                        | 0x0030 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * ArmFailSafe                                                       |   0x02 |
+| * CommissioningComplete                                             |   0x06 |
+| * SetFabric                                                         |   0x00 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * FabricId                                                          | 0x0000 |
+| * Breadcrumb                                                        | 0x0001 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/**
+ * @brief
+ *    Encode an ArmFailSafe command for General Commissioning server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeGeneralCommissioningClusterArmFailSafeCommand(uint8_t seqNum,
+                                                                                     chip::EndpointId destinationEndpoint,
+                                                                                     uint16_t expiryLengthSeconds,
+                                                                                     uint64_t breadcrumb, uint32_t timeoutMs);
+
+/**
+ * @brief
+ *    Encode an CommissioningComplete command for General Commissioning server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeGeneralCommissioningClusterCommissioningCompleteCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode an SetFabric command for General Commissioning server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeGeneralCommissioningClusterSetFabricCommand(uint8_t seqNum,
+                                                                                   chip::EndpointId destinationEndpoint,
+                                                                                   char * fabricId, char * fabricSecret,
+                                                                                   uint64_t breadcrumb, uint32_t timeoutMs);
+
+/**
+ * @brief
+ *    Encode a General Commissioning server discover command into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeGeneralCommissioningClusterDiscoverAttributes(uint8_t seqNum,
+                                                                                     chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a General Commissioning server read command for the FabricId attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeGeneralCommissioningClusterReadFabricIdAttribute(uint8_t seqNum,
+                                                                                        chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a General Commissioning server read command for the Breadcrumb attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeGeneralCommissioningClusterReadBreadcrumbAttribute(uint8_t seqNum,
+                                                                                          chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a General Commissioning server write command for the Breadcrumb attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeGeneralCommissioningClusterWriteBreadcrumbAttribute(uint8_t seqNum,
+                                                                                           chip::EndpointId destinationEndpoint,
+                                                                                           uint64_t breadcrumb);
+
+/**
+ * @brief
+ *    Encode a General Commissioning server read command for the cluster revision attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeGeneralCommissioningClusterReadClusterRevisionAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
 | Cluster Groups                                                      | 0x0004 |
