@@ -2,6 +2,7 @@
     "version": "ZCL Test Data",
     "xmlRoot": [".", "./data-model/silabs/"],
     "xmlFile": [
+        "application-basic-cluster.xml",
         "binding-cluster.xml",
         "clusters-extensions.xml",
         "content-launch-cluster.xml",
