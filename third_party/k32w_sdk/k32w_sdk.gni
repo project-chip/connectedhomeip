@@ -253,8 +253,8 @@ template("k32w_sdk") {
 
     if (with_se05x == 1) {
       sources += [
-        "${chip_root}/third_party/simw-top/demos/repo/ksdk/common/boards/DK6/wireless_examples/chip/pin_mux.c",
-        "${chip_root}/third_party/simw-top/demos/repo/ksdk/common/boards/DK6/wireless_examples/chip/clock_config.c",
+        "${chip_root}/third_party/simw-top-mini/repo/demos/ksdk/common/boards/DK6/wireless_examples/chip/pin_mux.c",
+        "${chip_root}/third_party/simw-top-mini/repo/demos/ksdk/common/boards/DK6/wireless_examples/chip/clock_config.c",
       ]
     }
     else {

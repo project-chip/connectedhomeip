@@ -90,8 +90,6 @@ source_set("se05x") {
     if (host == "host_k32w") {
         sources +=[
             "${chip_root}/third_party/simw-top-mini/repo/hostlib/hostLib/platform/ksdk/i2c_dk6.c",
-            "${chip_root}/third_party/simw-top-mini/repo/demos/ksdk/common/boards/DK6/wireless_examples/chip/pin_mux.c",
-            "${chip_root}/third_party/simw-top-mini/repo/demos/ksdk/common/boards/DK6/wireless_examples/chip/clock_config.c",
             "${chip_root}/third_party/simw-top-mini/repo/hostlib/hostLib/platform/ksdk/timer_kinetis_freertos.c",
         ]
     }

@@ -87,7 +87,7 @@ static_library("crypto") {
 
   if(with_se05x == 1){
     sources += [ "hsm/nxp/CHIPCryptoPALHsm_SE05X.cpp" ]
-    public_deps += [ "${chip_root}/third_party/simw-top:se05x" ]
-    public_configs += [ "${chip_root}/third_party/simw-top:se05x_config" ]
+    public_deps += [ "${chip_root}/third_party/simw-top-mini:se05x" ]
+    public_configs += [ "${chip_root}/third_party/simw-top-mini:se05x_config" ]
   }
 }
