@@ -65,7 +65,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)setPairingDelegate:(id<CHIPDevicePairingDelegate>)delegate queue:(dispatch_queue_t)queue;
 
 /**
- * Start the CHIP Stack. Repeated calls to startup are NO-OPs. Use the isRunning property to check if the stack needs to be started
+ * Start the CHIP Stack. Repeated calls to startup without calls to shutdown in between are NO-OPs. Use the isRunning property to check if the stack needs to be started
  * up.
  *
  * @param[in] storageDelegate The delegate for persistent storage
