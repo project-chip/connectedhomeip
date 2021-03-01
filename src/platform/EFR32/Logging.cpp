@@ -59,6 +59,7 @@
 #define LOG_DETAIL "<detail> "
 #define LOG_LWIP "<lwip  > "
 #define LOG_EFR32 "<efr32 > "
+static constexpr uint8_t kMaxCategoryStrLen  = 9;
 
 #if EFR32_LOG_ENABLED
 static bool sLogInitialized = false;
@@ -126,6 +127,7 @@ extern "C" void efr32Log(const char * aFormat, ...)
     va_start(v, aFormat);
 #if EFR32_LOG_ENABLED
     char formattedMsg[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
+    static_assert(sizeof(formattedMsg) > kMaxCategoryStrLen);
 
     strcpy(formattedMsg, LOG_EFR32);
     size_t prefixLen = strlen(formattedMsg);
@@ -171,8 +173,9 @@ void LogV(const char * module, uint8_t category, const char * aFormat, va_list v
         char formattedMsg[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
         size_t formattedMsgLen;
 
-        constexpr size_t maxPrefixLen = chip::Logging::kMaxModuleNameLen + 3;
-        static_assert(sizeof(formattedMsg) > maxPrefixLen);
+        // len for Category string + "[" + Module name + "] " (Brackets and space =3) 
+        constexpr size_t maxPrefixLen = kMaxCategoryStrLen + chip::Logging::kMaxModuleNameLen + 3;
+        static_assert(sizeof(formattedMsg) > maxPrefixLen); // Greater than to at least accommodate a ending Null Character
 
         switch (category)
         {
