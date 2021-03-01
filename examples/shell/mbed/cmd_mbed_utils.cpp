@@ -34,6 +34,7 @@ using namespace chip::System;
 
 static chip::Shell::Shell sShellDateSubcommands;
 static chip::Shell::Shell sShellNetworkSubcommands;
+static chip::Shell::Shell sShellSocketSubcommands;
 
 int cmd_date_help_iterator(shell_command_t * command, void * arg)
 {
@@ -125,6 +126,7 @@ exit:
     return error;
 }
 
+/* Network commands */
 int cmd_network_dispatch(int argc, char ** argv)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
@@ -163,6 +165,31 @@ exit:
     return error;
 }
 
+/* Socket commands */
+int cmd_socket_dispatch(int argc, char ** argv)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+
+    VerifyOrExit(argc > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    error = sShellSocketSubcommands.ExecCommand(argc, argv);
+
+exit:
+    return error;
+}
+
+int cmd_socket_help_iterator(shell_command_t * command, void * arg)
+{
+    streamer_printf(streamer_get(), "  %-15s %s\n\r", command->cmd_name, command->cmd_help);
+    return 0;
+}
+
+int cmd_socket_help(int argc, char ** argv)
+{
+    sShellSocketSubcommands.ForEachCommand(cmd_socket_help_iterator, nullptr);
+    return 0;
+}
+
 static const shell_command_t cmds_date_root = { &cmd_date_dispatch, "date", "Display the current time, or set the system date." };
 
 static const shell_command_t cmds_date[] = { { &cmd_date_set, "set", "Set date/time using 'YYYY-MM-DD HH:MM:SS' format" },
@@ -175,13 +202,19 @@ static const shell_command_t cmds_network_root = { &cmd_network_dispatch, "netwo
 
 static const shell_command_t cmds_network[] = { { &cmd_network_interface, "interface",
                                                   "Display current network interface details" },
-                                                { &cmd_network_help, "help", "Display help for each network subcommand" } };
+                                                { &cmd_network_help, "help", "Display help for each network subcommands" } };
+
+static const shell_command_t cmds_socket_root = { &cmd_socket_dispatch, "socket", "Socket layer commands" };
+
+static const shell_command_t cmds_socket[] = { { &cmd_socket_help, "help", "Display help for each socket subcommands" } };
 
 void cmd_mbed_utils_init()
 {
     sShellDateSubcommands.RegisterCommands(cmds_date, ArraySize(cmds_date));
     sShellNetworkSubcommands.RegisterCommands(cmds_network, ArraySize(cmds_network));
+    sShellSocketSubcommands.RegisterCommands(cmds_socket, ArraySize(cmds_socket));
     shell_register(&cmds_date_root, 1);
     shell_register(&cmds_test_config, 1);
     shell_register(&cmds_network_root, 1);
+    shell_register(&cmds_socket_root, 1);
 }
