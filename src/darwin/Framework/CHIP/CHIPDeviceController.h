@@ -75,7 +75,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)startup:(id<CHIPPersistentStorageDelegate>)storageDelegate queue:(dispatch_queue_t)queue;
 
 /**
- * Shutdown the CHIP Stack. Repeated calls to shutdown are NO-OPs.
+ * Shutdown the CHIP Stack. Repeated calls to shutdown without calls to startup in between are NO-OPs.
  */
 - (BOOL)shutdown;
 
