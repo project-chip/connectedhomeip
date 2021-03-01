@@ -221,7 +221,8 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
     UnsolicitedMessageHandler * matchingUMH = nullptr;
     bool sendAckAndCloseExchange            = false;
 
-    if (payloadHeader.GetExchangeID() == kReservedExchangeId) {
+    if (payloadHeader.GetExchangeID() == kReservedExchangeId)
+    {
         // TODO(#4170): it won't be necessary after fully migrated to messaging layer
         if (mLegacySecureSessionEventReceiver != nullptr)
             mLegacySecureSessionEventReceiver->OnMessageReceived(packetHeader, payloadHeader, session, std::move(msgBuf), mgr);
