@@ -182,11 +182,11 @@ limitations under the License.
     <attribute side="server" code="0x0002" define="VENDOR_ID" type="INT16U" min="0x0000" max="0xFFFF" writable="false" optional="false">VendorID</attribute>
     <attribute side="server" code="0x0003" define="PRODUCT_NAME" type="CHAR_STRING" length="32" writable="false" default="" optional="false">ProductName</attribute>
     <attribute side="server" code="0x0004" define="PRODUCT_ID" type="INT16U" min="0x0000" max="0xFFFF" writable="false" optional="false">ProductID</attribute>
-    <attribute side="server" code="0x0005" define="USER_LABEL" type="CHAR_STRING" length="32" writable="true" default="" optional="false">ProductID</attribute>
+    <attribute side="server" code="0x0005" define="USER_LABEL" type="CHAR_STRING" length="32" writable="true" default="" optional="false">UserLabel</attribute>
     <attribute side="server" code="0x0006" define="LOCATION" type="CHAR_STRING" length="16" writable="true" default="" optional="false">Location</attribute>
     <attribute side="server" code="0x0007" define="HARDWARE_VERSION" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x00" optional="false">HardwareVersion</attribute>
     <attribute side="server" code="0x0008" define="HARDWARE_VERSION_STRING" type="CHAR_STRING" length="64" writable="false" default="" optional="false">HardwareVersionString</attribute>
-    <attribute side="server" code="0x0009" define="SOFTWARE_VERSION" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x00" optional="false">SoftwareVersion</attribute>
+    <attribute side="server" code="0x0009" define="SOFTWARE_VERSION" type="INT32U" min="0x0000" max="0xFFFF" writable="false" default="0x00" optional="false">SoftwareVersion</attribute>
     <attribute side="server" code="0x000A" define="SOFTWARE_VERSION_STRING" type="CHAR_STRING" length="64" writable="false" default="" optional="false">SoftwareVersionString</attribute>
     <attribute side="server" code="0x000B" define="MANUFACTURING_DATE" type="CHAR_STRING" length="16" writable="false" default="" optional="true">ManufacturingDate</attribute>
     <attribute side="server" code="0x000C" define="PART_NUMBER" type="CHAR_STRING" writable="false" optional="true">PartNumber</attribute>
