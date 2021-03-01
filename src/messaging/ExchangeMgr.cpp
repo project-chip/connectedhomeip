@@ -65,7 +65,7 @@ ExchangeManager::ExchangeManager() : mReliableMessageMgr(mContextPool)
     mState = State::kState_NotInitialized;
 }
 
-CHIP_ERROR ExchangeManager::Init(SecureSessionMgr * sessionMgr, SecureSessionMgrDelegate * secureSessionEventReceiver)
+CHIP_ERROR ExchangeManager::Init(SecureSessionMgr * sessionMgr, SecureSessionMgrDelegate * legacySecureSessionEventReceiver)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -81,7 +81,7 @@ CHIP_ERROR ExchangeManager::Init(SecureSessionMgr * sessionMgr, SecureSessionMgr
     OnExchangeContextChanged = nullptr;
 
     sessionMgr->SetDelegate(this);
-    mSecureSessionEventReceiver = secureSessionEventReceiver;
+    mLegacySecureSessionEventReceiver = legacySecureSessionEventReceiver;
 
     mReliableMessageMgr.Init(sessionMgr->SystemLayer(), sessionMgr);
 
@@ -143,9 +143,9 @@ CHIP_ERROR ExchangeManager::UnregisterUnsolicitedMessageHandlerForType(uint32_t 
 void ExchangeManager::OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source, SecureSessionMgr * secureSessionManager)
 {
     ChipLogError(ExchangeManager, "Accept FAILED, err = %s", ErrorStr(error));
-    // TODO(#4170): propagate event into device controller, it won't be necessary after fully migrated to messaging layer
-    if (mSecureSessionEventReceiver != nullptr)
-        mSecureSessionEventReceiver->OnReceiveError(error, source, secureSessionManager);
+    // TODO(#4170): it won't be necessary after fully migrated to messaging layer
+    if (mLegacySecureSessionEventReceiver != nullptr)
+        mLegacySecureSessionEventReceiver->OnReceiveError(error, source, secureSessionManager);
 }
 
 ExchangeContext * ExchangeManager::AllocContext(uint16_t ExchangeId, SecureSessionHandle session, bool Initiator,
@@ -238,6 +238,13 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
     UnsolicitedMessageHandler * matchingUMH = nullptr;
     bool sendAckAndCloseExchange            = false;
 
+    if (payloadHeader.GetExchangeID() == kReservedExchangeId) {
+        // TODO(#4170): it won't be necessary after fully migrated to messaging layer
+        if (mLegacySecureSessionEventReceiver != nullptr)
+            mLegacySecureSessionEventReceiver->OnMessageReceived(packetHeader, payloadHeader, session, std::move(msgBuf), secureSessionManager);
+        ExitNow(err = CHIP_NO_ERROR);
+    }
+
     if (!IsMsgCounterSyncMessage(payloadHeader) && packetHeader.IsPeerGroupMsgIdNotSynchronized())
     {
         Transport::PeerConnectionState * state = mSessionMgr->GetPeerConnectionState(session);
@@ -316,11 +323,7 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
     // an ack to the peer.
     else if (!payloadHeader.NeedsAck())
     {
-        // TODO(#4170): propagate event into device controller, it won't be necessary after fully migrated to messaging layer
-        // ExitNow(err = CHIP_ERROR_UNSOLICITED_MSG_NO_ORIGINATOR);
-        if (mSecureSessionEventReceiver != nullptr)
-            mSecureSessionEventReceiver->OnMessageReceived(packetHeader, payloadHeader, session, std::move(msgBuf), secureSessionManager);
-        ExitNow(err = CHIP_NO_ERROR);
+        ExitNow(err = CHIP_ERROR_UNSOLICITED_MSG_NO_ORIGINATOR);
     }
 
     // If we didn't find an existing exchange that matches the message, and no unsolicited message handler registered
@@ -365,8 +368,8 @@ exit:
 void ExchangeManager::OnNewConnection(SecureSessionHandle session, SecureSessionMgr * secureSessionManager)
 {
     // TODO(#4170): propagate event into device controller, it won't be necessary after fully migrated to messaging layer
-    if (mSecureSessionEventReceiver != nullptr)
-        mSecureSessionEventReceiver->OnNewConnection(session, secureSessionManager);
+    if (mLegacySecureSessionEventReceiver != nullptr)
+        mLegacySecureSessionEventReceiver->OnNewConnection(session, secureSessionManager);
 }
 
 void ExchangeManager::OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * secureSessionManager)
@@ -381,8 +384,8 @@ void ExchangeManager::OnConnectionExpired(SecureSessionHandle session, SecureSes
     }
 
     // TODO(#4170): propagate event into device controller, it won't be necessary after fully migrated to messaging layer
-    if (mSecureSessionEventReceiver != nullptr)
-        mSecureSessionEventReceiver->OnConnectionExpired(session, secureSessionManager);
+    if (mLegacySecureSessionEventReceiver != nullptr)
+        mLegacySecureSessionEventReceiver->OnConnectionExpired(session, secureSessionManager);
 }
 
 void ExchangeManager::IncrementContextsInUse()
