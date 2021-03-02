@@ -51,7 +51,8 @@ NodeId GetCurrentNodeId()
     // mdns advertises a single node id as parameter.
 
     // Search for one admin pariing and use its node id.
-    for (auto pairing = GetGlobalAdminPairingTable().cbegin(); pairing != GetGlobalAdminPairingTable().cend(); pairing++)
+    auto pairing = GetGlobalAdminPairingTable().cbegin();
+    if (pairing != GetGlobalAdminPairingTable().cend())
     {
         ChipLogProgress(Discovery, "Found admin paring for admin %" PRIX64 ", node %" PRIX64, pairing->GetAdminId(),
                         pairing->GetNodeId());
