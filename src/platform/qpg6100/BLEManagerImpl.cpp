@@ -263,7 +263,7 @@ bool BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
 uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
 {
     uint16_t retVal = 0;
-    CHIP_ERROR err = MapBLEError(qvCHIP_BleGetMTU(conId, &retVal));
+    CHIP_ERROR err  = MapBLEError(qvCHIP_BleGetMTU(conId, &retVal));
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "qvCHIP_BleGetMTU() failed: %s", ErrorStr(err));
@@ -327,7 +327,7 @@ CHIP_ERROR BLEManagerImpl::MapBLEError(int bleErr) const
 {
     CHIP_ERROR err;
 
-    switch(bleErr)
+    switch (bleErr)
     {
     case QV_STATUS_NO_ERROR: {
         err = CHIP_NO_ERROR;
@@ -342,12 +342,11 @@ CHIP_ERROR BLEManagerImpl::MapBLEError(int bleErr) const
         break;
     }
     default: {
-        err = CHIP_ERROR_INCORRECT_STATE ;
+        err = CHIP_ERROR_INCORRECT_STATE;
     }
     }
     return err;
 }
-
 
 void BLEManagerImpl::DriveBLEState(void)
 {
@@ -421,7 +420,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
         snprintf(mDeviceName, sizeof(mDeviceName), "%s%04" PRIX32, CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX, (uint32_t) 0);
 
         mDeviceName[kMaxDeviceNameLength] = 0;
-        err = MapBLEError(qvCHIP_BleSetDeviceName(mDeviceName));
+        err                               = MapBLEError(qvCHIP_BleSetDeviceName(mDeviceName));
         SuccessOrExit(err);
     }
 

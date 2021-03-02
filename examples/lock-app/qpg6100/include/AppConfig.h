@@ -21,7 +21,7 @@
 
 // ---- Lock Example App Config ----
 
-#define APP_LOCK_BUTTON     BTN_SW4
+#define APP_LOCK_BUTTON BTN_SW4
 #define APP_FUNCTION_BUTTON BTN_SW5
 
 #define SYSTEM_STATE_LED LED_GREEN

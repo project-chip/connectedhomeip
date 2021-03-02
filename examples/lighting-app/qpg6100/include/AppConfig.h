@@ -21,9 +21,9 @@
 
 // ---- Lighting Example App Config ----
 
-#define APP_ON_OFF_BUTTON   BTN_SW4
+#define APP_ON_OFF_BUTTON BTN_SW4
 #define APP_FUNCTION_BUTTON BTN_SW5
-#define APP_LEVEL_BUTTON    BTN_SW1
+#define APP_LEVEL_BUTTON BTN_SW1
 
 #define SYSTEM_STATE_LED LED_GREEN
 
