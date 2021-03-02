@@ -35,6 +35,7 @@ import com.google.chip.chiptool.setuppayloadscanner.BarcodeFragment
 import com.google.chip.chiptool.setuppayloadscanner.CHIPDeviceDetailsFragment
 import com.google.chip.chiptool.setuppayloadscanner.CHIPDeviceInfo
 import com.google.chip.chiptool.setuppayloadscanner.QrCodeInfo
+import chip.devicecontroller.PersistentStorage
 
 class CHIPToolActivity :
     AppCompatActivity(),
@@ -47,6 +48,8 @@ class CHIPToolActivity :
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.top_activity)
+
+    PersistentStorage.initialize(this);
 
     if (savedInstanceState == null) {
       val fragment = SelectActionFragment.newInstance()
