@@ -2,10 +2,13 @@
 #define MBED_NET_NET_DEF_H
 
 #include <byteorder.h>
+#include <netsocket/nsapi_types.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#define IF_NAMESIZE NSAPI_INTERFACE_NAME_MAX_SIZE
 
 /** @brief Convert 16-bit value from network to host byte order.
  *

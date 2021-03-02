@@ -5,8 +5,6 @@
 extern "C" {
 #endif
 
-#define IF_NAMESIZE 6
-
 /* Standard interface flags */
 #define IFF_UP 0x1           /* interface is up		*/
 #define IFF_BROADCAST 0x2    /* broadcast address valid	*/

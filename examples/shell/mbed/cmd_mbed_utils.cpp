@@ -28,9 +28,16 @@
 
 #include "ChipShellMbedCollection.h"
 
+#include <inet/InetError.h>
+#include <inet/InetLayer.h>
+
 using namespace chip;
 using namespace chip::Shell;
 using namespace chip::System;
+using namespace chip::Inet;
+
+System::Layer gSystemLayer;
+Inet::InetLayer gInet;
 
 static chip::Shell::Shell sShellDateSubcommands;
 static chip::Shell::Shell sShellNetworkSubcommands;
@@ -154,12 +161,45 @@ int cmd_network_help(int argc, char ** argv)
 int cmd_network_interface(int argc, char ** argv)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
+    InterfaceIterator intIterator;
+    InterfaceAddressIterator addrIterator;
+    char intName[IF_NAMESIZE];
+    InterfaceId intId;
+    IPAddress addr;
+    INET_ERROR err;
 
     streamer_t * sout = streamer_get();
 
     VerifyOrExit(argc == 0, error = CHIP_ERROR_INVALID_ARGUMENT);
 
-    streamer_printf(sout, "Test interface details\r\n");
+    streamer_printf(sout, "    Current interface:\n");
+    for (; intIterator.HasCurrent(); intIterator.Next())
+    {
+        intId = intIterator.GetInterface();
+        if (intId == INET_NULL_INTERFACEID)
+        {
+            streamer_printf(sout, "ERROR: get interface failed\r\n");
+            ExitNow(error = CHIP_ERROR_INTERNAL;);
+        }
+
+        err = intIterator.GetInterfaceName(intName, sizeof(intName));
+        if (err != INET_NO_ERROR)
+        {
+            streamer_printf(sout, "ERROR: get interface name failed\r\n");
+            ExitNow(error = CHIP_ERROR_INTERNAL;);
+        }
+        printf("     interface id: %d, interface name: %s\n", intId, intName);
+
+        //         printf("     interface id: 0x%" PRIxPTR ", interface name: %s, interface state: %s, %s multicast, %s broadcast
+        //         addr\n",
+        // #if CHIP_SYSTEM_CONFIG_USE_LWIP
+        //                reinterpret_cast<uintptr_t>(intId),
+        // #else
+        //                static_cast<uintptr_t>(intId),
+        // #endif
+        //                intName, intIterator.IsUp() ? "UP" : "DOWN", intIterator.SupportsMulticast() ? "supports" : "no",
+        //                intIterator.HasBroadcastAddress() ? "has" : "no");
+    }
 
 exit:
     return error;
@@ -210,6 +250,9 @@ static const shell_command_t cmds_socket[] = { { &cmd_socket_help, "help", "Disp
 
 void cmd_mbed_utils_init()
 {
+    gSystemLayer.Init(nullptr);
+    gInet.Init(gSystemLayer, nullptr);
+
     sShellDateSubcommands.RegisterCommands(cmds_date, ArraySize(cmds_date));
     sShellNetworkSubcommands.RegisterCommands(cmds_network, ArraySize(cmds_network));
     sShellSocketSubcommands.RegisterCommands(cmds_socket, ArraySize(cmds_socket));

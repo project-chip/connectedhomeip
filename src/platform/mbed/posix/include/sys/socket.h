@@ -373,7 +373,7 @@ struct linger
 #define TCP_KEEPCNT 0x05   /* set pcb->keep_cnt   - Use number of probes sent for get/setsockopt */
 
 /* Set socket options argument */
-#define IFNAMSIZ 6
+#define IFNAMSIZ IF_NAMESIZE
 struct ifreq
 {
     char ifr_name[IFNAMSIZ]; /* if name,	e.g. "en0" */

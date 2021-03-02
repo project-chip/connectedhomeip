@@ -2,12 +2,14 @@
 #define MBED_NET_NET_IF_H
 
 #include <byteorder.h>
-#include <netsocket/Socket.h>
 #include <sys/socket.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#define MBED_MAX_INTERFACES_NUM 1
+#define MBED_NET_IF_LIST_SIZE (MBED_MAX_INTERFACES_NUM + 1)
 
 struct if_nameindex * mbed_if_nameindex(void);
 char * mbed_if_indextoname(unsigned int ifindex, char * ifname);
