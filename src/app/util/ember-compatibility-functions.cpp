@@ -58,7 +58,7 @@ void SetupEmberAfObjects(Command * command, ClusterId clusterId, CommandId comma
     currentCommandObject = command;
 }
 
-bool IMEmberAfSendImmediateDefaultResponseHandle(EmberAfStatus status)
+bool IMEmberAfSendDefaultResponseWithCallback(EmberAfStatus status)
 {
     if (currentCommandObject == nullptr)
     {

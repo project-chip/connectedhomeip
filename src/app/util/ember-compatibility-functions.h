@@ -32,7 +32,7 @@ namespace app {
 namespace Compatibility {
 
 void SetupEmberAfObjects(Command * command, ClusterId clusterId, CommandId commandId, EndpointId endpointId);
-bool IMEmberAfSendImmediateDefaultResponseHandle(EmberAfStatus status);
+bool IMEmberAfSendDefaultResponseWithCallback(EmberAfStatus status);
 void ResetEmberAfObjects();
 
 } // namespace Compatibility
