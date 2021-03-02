@@ -148,7 +148,7 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
 
         // Start the IO pump
         self.cppCommissioner->ServiceEvents();
-        });
+    });
 
     return YES;
 }
@@ -188,9 +188,10 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
 {
     __block BOOL success;
     dispatch_sync(_chipWorkQueue, ^{
-        chip::RendezvousParameters params = chip::RendezvousParameters().SetSetupPINCode(setupPINCode).SetDiscriminator(discriminator);
+        chip::RendezvousParameters params
+            = chip::RendezvousParameters().SetSetupPINCode(setupPINCode).SetDiscriminator(discriminator);
         CHIP_ERROR err = self.cppCommissioner->PairDevice(deviceID, params);
-        success =![self checkForError:err logMsg:kErrorPairDevice error:error];
+        success = ![self checkForError:err logMsg:kErrorPairDevice error:error];
     });
 
     return success;
@@ -228,7 +229,7 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
 
 - (CHIPDevice *)getPairedDevice:(uint64_t)deviceID error:(NSError * __autoreleasing *)error
 {
-    __block CHIPDevice *chipDevice = nil;
+    __block CHIPDevice * chipDevice = nil;
     dispatch_sync(_chipWorkQueue, ^{
         CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
         chip::Controller::Device * device = nullptr;
