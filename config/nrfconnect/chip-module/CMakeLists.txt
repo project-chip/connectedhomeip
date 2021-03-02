@@ -112,7 +112,6 @@ endif()
 
 if (CONFIG_POSIX_API)
     list(APPEND CHIP_CFLAGS
-        -D_USE_LONG_TIME_T # TODO: Remove when #3822 is resolved
         -D_SYS__PTHREADTYPES_H_
         -isystem${ZEPHYR_BASE}/include/posix
     )
@@ -122,12 +121,7 @@ if (CONFIG_NORDIC_SECURITY_BACKEND)
     # TODO: Remove when the missing dependency is fixed in nRF Connect SDK
     zephyr_include_directories(${ZEPHYR_BASE}/../nrfxlib/crypto/nrf_cc310_platform/include)
 
-    list(APPEND CHIP_CFLAGS
-        -DMBEDTLS_CONFIG_FILE=<nrf-config.h>
-        -DMBEDTLS_PK_WRITE_C
-        -DMBEDTLS_X509_CREATE_C
-        -DMBEDTLS_X509_CSR_WRITE_C
-    )
+    list(APPEND CHIP_CFLAGS -DMBEDTLS_CONFIG_FILE=<nrf-config.h>)
 endif()
 
 zephyr_get_compile_flags(CHIP_CFLAGS_C C)
