@@ -88,7 +88,7 @@
             "name": "Shell Mbed Example Debug [remote]",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceRoot}/examples/shell/mbed/build-${input:mbedTarget}/chip-mbed-shell-example",
+            "program": "${workspaceRoot}/examples/shell/mbed/build-${input:mbedTarget}/${input:mbedProfile}/chip-mbed-shell-example",
             "args": [],
             "stopAtEntry": true,
             "cwd": "${workspaceRoot}/examples/shell/mbed",
@@ -106,7 +106,7 @@
                     "ignoreFailures": false
                 },
                 {
-                    "text": "-file-exec-and-symbols ${workspaceRoot}/examples/shell/mbed/build-${input:mbedTarget}/chip-mbed-shell-example",
+                    "text": "-file-exec-and-symbols ${workspaceRoot}/examples/shell/mbed/build-${input:mbedTarget}/${input:mbedProfile}/chip-mbed-shell-example",
                     "description": "load file",
                     "ignoreFailures": false
                 },
@@ -144,7 +144,7 @@
             "name": "Shell Mbed Example Debug [local: nrf52840]",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceRoot}/examples/shell/mbed/build-NRF52840_DK/chip-mbed-shell-example",
+            "program": "${workspaceRoot}/examples/shell/mbed/build-NRF52840_DK/${input:mbedProfile}/chip-mbed-shell-example",
             "args": [],
             "stopAtEntry": true,
             "cwd": "${workspaceRoot}/examples/shell/mbed",
@@ -169,7 +169,7 @@
                     "ignoreFailures": false
                 },
                 {
-                    "text": "-file-exec-and-symbols ${workspaceRoot}/examples/shell/mbed/build-NRF52840_DK/chip-mbed-shell-example",
+                    "text": "-file-exec-and-symbols ${workspaceRoot}/examples/shell/mbed/build-NRF52840_DK/${input:mbedProfile}/chip-mbed-shell-example",
                     "description": "load file",
                     "ignoreFailures": false
                 },
@@ -202,7 +202,7 @@
             "name": "Shell Mbed Example Debug [local: stm32l475xg]",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceRoot}/examples/shell/mbed/build-DISCO_L475VG_IOT01A/chip-mbed-shell-example",
+            "program": "${workspaceRoot}/examples/shell/mbed/build-DISCO_L475VG_IOT01A/${input:mbedProfile}/chip-mbed-shell-example",
             "args": [],
             "stopAtEntry": true,
             "cwd": "${workspaceRoot}/examples/shell/mbed",
@@ -227,7 +227,7 @@
                     "ignoreFailures": false
                 },
                 {
-                    "text": "-file-exec-and-symbols ${workspaceRoot}/examples/shell/mbed/build-DISCO_L475VG_IOT01A/chip-mbed-shell-example",
+                    "text": "-file-exec-and-symbols ${workspaceRoot}/examples/shell/mbed/build-DISCO_L475VG_IOT01A/${input:mbedProfile}/chip-mbed-shell-example",
                     "description": "load file",
                     "ignoreFailures": false
                 },
@@ -264,6 +264,13 @@
             "description": "What mbed target will be used?",
             "options": ["NRF52840_DK", "DISCO_L475VG_IOT01A"],
             "default": "NRF52840_DK"
+        },
+        {
+            "type": "pickString",
+            "id": "mbedProfile",
+            "description": "What mbed profile do you want to use?",
+            "options": ["debug", "develop"],
+            "default": "develop"
         }
     ]
 }
