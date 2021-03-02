@@ -26,4 +26,4 @@ ot-ctl panid 0x1234
 ot-ctl ifconfig up
 ot-ctl thread start
 
-chip-tool-all-clusters-server
+chip-all-clusters-app

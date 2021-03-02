@@ -52,7 +52,7 @@ const char * kSpake2pI2RSessionInfo = "Commissioning I2R Key";
 const char * kSpake2pR2ISessionInfo = "Commissioning R2I Key";
 
 static constexpr uint32_t kSpake2p_Iteration_Count = 100;
-static const char * kSpake2pKeyExchangeSalt        = "SPAKE2P Key Exchange Salt";
+static const char * kSpake2pKeyExchangeSalt        = "SPAKE2P Key Salt";
 
 PASESession::PASESession() {}
 

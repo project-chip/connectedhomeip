@@ -25,6 +25,8 @@ source_set("lighting-common") {
   sources = [
     "${chip_root}/src/app/clusters/bindings/bindings.cpp",
     "${chip_root}/src/app/clusters/level-control/level-control.cpp",
+    "${chip_root}/src/app/clusters/network-commissioning/network-commissioning-ember.cpp",
+    "${chip_root}/src/app/clusters/network-commissioning/network-commissioning.cpp",
     "${chip_root}/src/app/clusters/on-off-server/on-off.cpp",
     "${chip_root}/src/app/reporting/reporting-default-configuration.cpp",
     "${chip_root}/src/app/reporting/reporting.cpp",
