@@ -56,12 +56,6 @@ executable("chip-tool") {
     "main.cpp",
   ]
 
-  if (is_debug) {
-    defines = [ "BUILD_RELEASE=0" ]
-  } else {
-    defines = [ "BUILD_RELEASE=1" ]
-  }
-
   cflags = [ "-Wconversion" ]
 
   public_deps = [

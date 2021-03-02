@@ -50,14 +50,7 @@ efr32_sdk("sdk") {
     "${efr32_project_dir}/include/FreeRTOSConfig.h",
   ]
 
-  defines = []
-  if (is_debug) {
-    defines += [ "BUILD_RELEASE=0" ]
-  } else {
-    defines += [ "BUILD_RELEASE=1" ]
-  }
-
-  defines += [ "BOARD_ID=${efr32_board}" ]
+  defines = [ "BOARD_ID=${efr32_board}" ]
 }
 
 efr32_executable("lock_app") {
