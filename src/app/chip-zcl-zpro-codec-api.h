@@ -1651,4 +1651,3 @@ chip::System::PacketBufferHandle encodeTemperatureMeasurementClusterReadMaxMeasu
  *    Encode a Temperature Measurement server read command for the cluster revision attribute into buffer including the APS frame
  */
 chip::System::PacketBufferHandle encodeTemperatureMeasurementClusterReadClusterRevisionAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
-
