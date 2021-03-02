@@ -63,8 +63,6 @@ void LogV(const char * module, uint8_t category, const char * msg, va_list v)
         formattedMsg[prefixLen++] = 'P';
         break;
     }
-    formattedMsg[prefixLen++] = ']';
-    formattedMsg[prefixLen++] = '[';
     snprintf(formattedMsg + prefixLen, sizeof(formattedMsg) - prefixLen, "][%s] ", module);
     formattedMsg[sizeof(formattedMsg) - 2] = 0; // -2 to allow at least one char for the vsnprintf
     prefixLen                              = strlen(formattedMsg);
