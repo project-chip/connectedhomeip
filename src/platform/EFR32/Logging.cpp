@@ -59,7 +59,7 @@
 #define LOG_DETAIL "<detail> "
 #define LOG_LWIP "<lwip  > "
 #define LOG_EFR32 "<efr32 > "
-static constexpr uint8_t kMaxCategoryStrLen  = 9;
+static constexpr uint8_t kMaxCategoryStrLen = 9;
 
 #if EFR32_LOG_ENABLED
 static bool sLogInitialized = false;

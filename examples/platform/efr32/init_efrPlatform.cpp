@@ -18,8 +18,8 @@
  */
 
 #include "AppConfig.h"
-#include <support/CHIPPlatformMemory.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <support/CHIPPlatformMemory.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -30,7 +30,9 @@ extern "C" {
 #include <mbedtls/platform.h>
 
 #if CHIP_ENABLE_OPENTHREAD
+#include <openthread-core-config.h>
 #include <openthread/cli.h>
+#include <openthread/config.h>
 #include <openthread/dataset.h>
 #include <openthread/error.h>
 #include <openthread/heap.h>
@@ -41,8 +43,6 @@ extern "C" {
 #include <openthread/platform/uart.h>
 #include <openthread/tasklet.h>
 #include <openthread/thread.h>
-#include <openthread-core-config.h>
-#include <openthread/config.h>
 
 #include "platform-efr32.h"
 
@@ -195,7 +195,7 @@ void halInitChipSpecific(void)
     MX25_DP();
 #endif
 
-#endif //RAIL_IC_SIM_BUILD
+#endif // RAIL_IC_SIM_BUILD
 
 #if defined(HAL_VCOM_ENABLE)
     // Enable VCOM if requested
