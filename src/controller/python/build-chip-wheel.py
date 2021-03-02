@@ -110,6 +110,9 @@ try:
     requiredPackages = []
 
     requiredPackages.append('ipython')
+
+    if platform.system() == 'Darwin':
+        requiredPackages.append('pyobjc')
     
     if platform.system() == 'Linux':
         requiredPackages.append('dbus-python')
