@@ -54,9 +54,9 @@ jobs:
 
             - name: Copy aside build products
               run: |
-                  mkdir -p example_binaries/$BUILD_TYPE-build
-                  cp examples/$EXAMPLE_NAME/mbed/build-${{matrix.EXAMPLE_TARGET}}/chip-mbed-$EXAMPLE_NAME-example.hex \
-                     example_binaries/$BUILD_TYPE-build/${{matrix.EXAMPLE_TARGET}}.hex
+                  mkdir -p example_binaries/$BUILD_TYPE-build/$EXAMPLE_PROFILE
+                  cp examples/$EXAMPLE_NAME/mbed/build-${{matrix.EXAMPLE_TARGET}}/$EXAMPLE_PROFILE/chip-mbed-$EXAMPLE_NAME-example.hex \
+                     example_binaries/$BUILD_TYPE-build/$EXAMPLE_PROFILE/${{matrix.EXAMPLE_TARGET}}.hex
 
             - name: Binary artifact suffix
               id: outsuffix
@@ -68,12 +68,12 @@ jobs:
 
             - name: Copy aside binaries
               run: |
-                  cp -r example_binaries/$BUILD_TYPE-build /tmp/output_binaries/
+                  cp -r example_binaries/$BUILD_TYPE-build/$EXAMPLE_PROFILE /tmp/output_binaries/
 
             - name: Uploading Binaries
               uses: actions/upload-artifact@v1
               with:
                   name:
-                      ${{ env.BUILD_TYPE }}-${{ env.EXAMPLE_NAME }}-example-${{matrix.EXAMPLE_TARGET}}-build-${{
+                      ${{ env.BUILD_TYPE }}-${{ env.EXAMPLE_NAME }}-example-${{matrix.EXAMPLE_TARGET}}-${{ env.EXAMPLE_PROFILE}}-build-${{
                       steps.outsuffix.outputs.value }}
                   path: /tmp/output_binaries/${{ env.BUILD_TYPE }}-build/${{matrix.EXAMPLE_TARGET}}.hex
