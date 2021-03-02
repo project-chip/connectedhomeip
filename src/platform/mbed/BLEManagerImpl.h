@@ -30,6 +30,7 @@ namespace DeviceLayer {
 namespace Internal {
 
 class GapEventHandler;
+class CHIPService;
 
 using namespace chip::Ble;
 
@@ -99,6 +100,7 @@ class BLEManagerImpl final : public BLEManager,
     friend BLEManager & BLEMgr(void);
     friend BLEManagerImpl & BLEMgrImpl(void);
     friend class GapEventHandler;
+    friend class CHIPService;
 
     static BLEManagerImpl sInstance;
 
