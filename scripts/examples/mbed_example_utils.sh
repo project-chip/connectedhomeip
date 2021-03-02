@@ -20,10 +20,12 @@ cd "$(dirname "$0")/../../examples"
 
 SUPPORTED_TARGET_BOARD=(DISCO_L475VG_IOT01A NRF52840_DK)
 SUPPORTED_APP=(shell)
+SUPPORTED_PROFILES=(release develop debug)
 
 APP=
 TARGET_BOARD=
 PYOCD_TARGET=
+PROFILE=
 
 for i in "$@"; do
     case $i in
@@ -33,6 +35,10 @@ for i in "$@"; do
         ;;
     -b=* | --board=*)
         TARGET_BOARD="${i#*=}"
+        shift
+        ;;
+    -p=* | --profile=*)
+        PROFILE="${i#*=}"
         shift
         ;;
     *)
@@ -65,6 +71,11 @@ if [[ ! " ${SUPPORTED_APP[@]} " =~ " ${APP} " ]]; then
     exit 1
 fi
 
+if [[ ! " ${SUPPORTED_PROFILES[@]} " =~ " ${PROFILE} " ]]; then
+    echo "ERROR: Profile $PROFILE not supported"
+    exit 1
+fi
+
 echo "############################"
-pyocd flash -t $PYOCD_TARGET $PWD/$APP/mbed/build-$TARGET_BOARD/chip-mbed-$APP-example.hex
+pyocd flash -t $PYOCD_TARGET $PWD/$APP/mbed/build-$TARGET_BOARD/$PROFILE/chip-mbed-$APP-example.hex
 echo "############################"

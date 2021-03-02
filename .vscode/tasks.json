@@ -254,7 +254,11 @@
             "label": "Flash Mbed Shell Example",
             "type": "shell",
             "command": "scripts/examples/mbed_example_utils.sh",
-            "args": ["-a=shell", "-b=${input:mbedTarget}"],
+            "args": [
+                "-a=shell",
+                "-b=${input:mbedTarget}",
+                "-p=${input:mbedProfile}"
+            ],
             "problemMatcher": [],
             "group": "build"
         }
@@ -272,7 +276,7 @@
             "id": "mbedProfile",
             "description": "What mbed profile do you want to use?",
             "options": ["release", "debug", "develop"],
-            "default": "debug"
+            "default": "develop"
         }
     ]
 }
