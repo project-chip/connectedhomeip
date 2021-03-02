@@ -114,19 +114,25 @@ template("efr32_sdk") {
     ]
 
     if (efr32_board == "BRD4166A") {
-      _include_dirs += ["${efr32_sdk_root}/hardware/board/config/brd4166a",]
+      _include_dirs += [ "${efr32_sdk_root}/hardware/board/config/brd4166a" ]
     } else if (efr32_board == "BRD4161A") {
-      _include_dirs += ["${efr32_sdk_root}/hardware/board/config/brd4161a_brd4001a",]
+      _include_dirs +=
+          [ "${efr32_sdk_root}/hardware/board/config/brd4161a_brd4001a" ]
     } else if (efr32_board == "BRD4163A") {
-      _include_dirs += ["${efr32_sdk_root}/hardware/board/config/brd4163a_brd4001a",]
+      _include_dirs +=
+          [ "${efr32_sdk_root}/hardware/board/config/brd4163a_brd4001a" ]
     } else if (efr32_board == "BRD4164A") {
-      _include_dirs += ["${efr32_sdk_root}/hardware/board/config/brd4164a_brd4001a",]
+      _include_dirs +=
+          [ "${efr32_sdk_root}/hardware/board/config/brd4164a_brd4001a" ]
     } else if (efr32_board == "BRD4170A") {
-      _include_dirs += ["${efr32_sdk_root}/hardware/board/config/brd4170a_brd4001a",]
+      _include_dirs +=
+          [ "${efr32_sdk_root}/hardware/board/config/brd4170a_brd4001a" ]
     } else if (efr32_board == "BRD4304A") {
-      _include_dirs += ["${efr32_sdk_root}/hardware/board/config/brd4304a_brd4001a",]
+      _include_dirs +=
+          [ "${efr32_sdk_root}/hardware/board/config/brd4304a_brd4001a" ]
     } else if (efr32_board == "BRD4180A") {
-      _include_dirs += ["${efr32_sdk_root}/hardware/board/config/brd4180a_brd4001a",]
+      _include_dirs +=
+          [ "${efr32_sdk_root}/hardware/board/config/brd4180a_brd4001a" ]
     }
 
     defines = [
