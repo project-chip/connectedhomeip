@@ -41,7 +41,7 @@
 
 #include "attribute-storage.h"
 #include "af.h"
-#include "common.h"
+#include "app/util/common.h"
 
 #include "gen/attribute-type.h"
 #include "gen/callback.h"

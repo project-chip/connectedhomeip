@@ -40,9 +40,9 @@
  ******************************************************************************/
 
 #include "af.h"
-#include "common.h"
 
 #include <app/clusters/ias-zone-client/ias-zone-client.h>
+#include <app/util/common.h>
 
 #ifdef EMBER_AF_PLUGIN_REPORTING
 #include <app/reporting/reporting.h>
