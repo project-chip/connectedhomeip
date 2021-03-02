@@ -198,10 +198,10 @@ CHIP_ERROR Device::Deserialize(const SerializedDevice & input)
         IPAddress::FromString(Uint8::to_const_char(serializable.mDeviceAddr), sizeof(serializable.mDeviceAddr) - 1, ipAddress),
         error = CHIP_ERROR_INVALID_ADDRESS);
 
-    mPairing    = serializable.mOpsCreds;
-    mDeviceId   = Encoding::LittleEndian::HostSwap64(serializable.mDeviceId);
-    mDevicePort = Encoding::LittleEndian::HostSwap16(serializable.mDevicePort);
-    mAdminId    = Encoding::LittleEndian::HostSwap16(serializable.mAdminId);
+    mPairing  = serializable.mOpsCreds;
+    mDeviceId = Encoding::LittleEndian::HostSwap64(serializable.mDeviceId);
+    port      = Encoding::LittleEndian::HostSwap16(serializable.mDevicePort);
+    mAdminId  = Encoding::LittleEndian::HostSwap16(serializable.mAdminId);
 
     // The InterfaceNameToId() API requires initialization of mInterface, and lock/unlock of
     // LwIP stack.
