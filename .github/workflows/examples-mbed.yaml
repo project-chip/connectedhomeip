@@ -22,7 +22,6 @@ jobs:
     mbedos:
         strategy:
             fail-fast: False
-            max-parallel: 1
             matrix:
                 EXAMPLE_TARGET: [DISCO_L475VG_IOT01A, NRF52840_DK]
         
