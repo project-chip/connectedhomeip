@@ -34,6 +34,8 @@
 
 #include <openthread/platform/entropy.h>
 
+#include <support/CHIPPlatformMemory.h>
+
 namespace chip {
 namespace DeviceLayer {
 
@@ -122,4 +124,14 @@ extern "C" void otSysEventSignalPending(void)
 {
     BaseType_t yieldRequired = ThreadStackMgrImpl().SignalThreadActivityPendingFromISR();
     portYIELD_FROM_ISR(yieldRequired);
+}
+
+extern "C" void * otPlatCAlloc(size_t aNum, size_t aSize)
+{
+    return CHIPPlatformMemoryCalloc(aNum, aSize);
+}
+
+extern "C" void otPlatFree(void * aPtr)
+{
+    CHIPPlatformMemoryFree(aPtr);
 }

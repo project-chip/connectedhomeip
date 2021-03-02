@@ -62,6 +62,7 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/base/hal/micro/cortexm3/efm32/config",
       "${efr32_sdk_root}/platform/base/hal/micro/cortexm3",
       "${efr32_sdk_root}/platform/base/hal/plugin",
+      "${efr32_sdk_root}/platform/service/device_init/inc",
       "${efr32_sdk_root}/platform/CMSIS/Include",
       "${efr32_sdk_root}/platform/emdrv/common/inc",
       "${efr32_sdk_root}/platform/emdrv/gpiointerrupt/inc",
@@ -111,6 +112,22 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/bootloader",
       "${mbedtls_root}/repo/include",
     ]
+
+    if (efr32_board == "BRD4166A") {
+      _include_dirs += ["${efr32_sdk_root}/hardware/board/config/brd4166a",]
+    } else if (efr32_board == "BRD4161A") {
+      _include_dirs += ["${efr32_sdk_root}/hardware/board/config/brd4161a_brd4001a",]
+    } else if (efr32_board == "BRD4163A") {
+      _include_dirs += ["${efr32_sdk_root}/hardware/board/config/brd4163a_brd4001a",]
+    } else if (efr32_board == "BRD4164A") {
+      _include_dirs += ["${efr32_sdk_root}/hardware/board/config/brd4164a_brd4001a",]
+    } else if (efr32_board == "BRD4170A") {
+      _include_dirs += ["${efr32_sdk_root}/hardware/board/config/brd4170a_brd4001a",]
+    } else if (efr32_board == "BRD4304A") {
+      _include_dirs += ["${efr32_sdk_root}/hardware/board/config/brd4304a_brd4001a",]
+    } else if (efr32_board == "BRD4180A") {
+      _include_dirs += ["${efr32_sdk_root}/hardware/board/config/brd4180a_brd4001a",]
+    }
 
     defines = [
       "MBEDTLS_CONFIG_FILE=\"efr32-chip-mbedtls-config.h\"",
@@ -195,7 +212,6 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/hardware/kit/common/bsp/bsp_init.c",
       "${efr32_sdk_root}/hardware/kit/common/bsp/bsp_stk.c",
       "${efr32_sdk_root}/hardware/kit/common/bsp/bsp_stk_leds.c",
-      "${efr32_sdk_root}/hardware/kit/common/drivers/retargetserial.c",
       "${efr32_sdk_root}/hardware/kit/common/drivers/udelay.c",
       "${efr32_sdk_root}/platform/bootloader/plugin/security/sha/crypto_sha.c",
       "${efr32_sdk_root}/platform/common/src/sl_slist.c",
