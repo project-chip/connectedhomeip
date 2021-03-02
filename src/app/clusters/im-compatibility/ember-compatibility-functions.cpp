@@ -23,6 +23,7 @@
 
 #include "ember-compatibility-functions.h"
 
+#include <app/Command.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLV.h>
 #include <lib/support/CodeUtils.h>
@@ -40,14 +41,21 @@ Command * currentCommandObject;
 
 void SetupEmberAfObjects(Command * command, ClusterId clusterId, CommandId commandId, EndpointId endpointId)
 {
+    const Messaging::ExchangeContext * commandExchangeCtx = command->GetExchangeContext();
+
     imCompatibilityEmberApsFrame.clusterId           = clusterId;
     imCompatibilityEmberApsFrame.destinationEndpoint = endpointId;
-    imCompatibilityEmberApsFrame.sourceEndpoint      = endpointId;
-    imCompatibilityEmberAfCluster.commandId          = commandId;
-    imCompatibilityEmberAfCluster.apsFrame           = &imCompatibilityEmberApsFrame;
-    imCompatibilityEmberAfCluster.interPanHeader     = &imCompatibilityInterpanHeader;
-    emAfCurrentCommand                               = &imCompatibilityEmberAfCluster;
-    currentCommandObject                             = command;
+    imCompatibilityEmberApsFrame.sourceEndpoint      = 1; // source endpoint is fixed to 1 for now.
+    imCompatibilityEmberApsFrame.sequence = (commandExchangeCtx != nullptr ? commandExchangeCtx->GetExchangeId() & 0xFF : 0);
+
+    imCompatibilityEmberAfCluster.commandId      = commandId;
+    imCompatibilityEmberAfCluster.apsFrame       = &imCompatibilityEmberApsFrame;
+    imCompatibilityEmberAfCluster.interPanHeader = &imCompatibilityInterpanHeader;
+    imCompatibilityEmberAfCluster.source =
+        (commandExchangeCtx != nullptr ? commandExchangeCtx->GetSecureSessionHandle().GetPeerNodeId() : 0); // 0 is "Any" NodeId.
+
+    emAfCurrentCommand   = &imCompatibilityEmberAfCluster;
+    currentCommandObject = command;
 }
 
 bool IMEmberAfSendImmediateDefaultResponseHandle(EmberAfStatus status)
