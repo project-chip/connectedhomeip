@@ -16,10 +16,12 @@
  *
  */
 #include "AndroidDeviceControllerWrapper.h"
+#include "CHIPJNIError.h"
 
 #include <memory>
 
-using chip::DeviceController::ChipDeviceController;
+using chip::PersistentStorageResultDelegate;
+using chip::Controller::DeviceCommissioner;
 
 namespace {
 
@@ -61,17 +63,60 @@ void CallVoidInt(JNIEnv * env, jobject object, const char * methodName, jint arg
     env->CallVoidMethod(object, method, argument);
 }
 
-bool N2J_ByteArray(JNIEnv * env, const uint8_t * inArray, uint32_t inArrayLen, jbyteArray & outArray)
+CHIP_ERROR N2J_ByteArray(JNIEnv * env, const uint8_t * inArray, uint32_t inArrayLen, jbyteArray & outArray)
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
     outArray = env->NewByteArray((int) inArrayLen);
-    if (outArray == nullptr)
-    {
-        return false;
-    }
+    VerifyOrExit(outArray != NULL, err = CHIP_ERROR_NO_MEMORY);
 
     env->ExceptionClear();
     env->SetByteArrayRegion(outArray, 0, inArrayLen, (jbyte *) inArray);
-    return !env->ExceptionCheck();
+    VerifyOrExit(!env->ExceptionCheck(), err = CDC_JNI_ERROR_EXCEPTION_THROWN);
+
+exit:
+    return err;
+}
+
+CHIP_ERROR N2J_NewStringUTF(JNIEnv * env, const char * inStr, size_t inStrLen, jstring & outString)
+{
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    jbyteArray charArray    = NULL;
+    jstring utf8Encoding    = NULL;
+    jclass java_lang_String = NULL;
+    jmethodID ctor          = NULL;
+
+    err = N2J_ByteArray(env, reinterpret_cast<const uint8_t *>(inStr), inStrLen, charArray);
+    SuccessOrExit(err);
+
+    utf8Encoding = env->NewStringUTF("UTF-8");
+    VerifyOrExit(utf8Encoding != NULL, err = CHIP_ERROR_NO_MEMORY);
+
+    java_lang_String = env->FindClass("java/lang/String");
+    VerifyOrExit(java_lang_String != NULL, err = CDC_JNI_ERROR_TYPE_NOT_FOUND);
+
+    ctor = env->GetMethodID(java_lang_String, "<init>", "([BLjava/lang/String;)V");
+    VerifyOrExit(ctor != NULL, err = CDC_JNI_ERROR_METHOD_NOT_FOUND);
+
+    outString = (jstring) env->NewObject(java_lang_String, ctor, charArray, utf8Encoding);
+    VerifyOrExit(outString != NULL, err = CHIP_ERROR_NO_MEMORY);
+
+exit:
+    // error code propagated from here, so clear any possible
+    // exceptions that arose here
+    env->ExceptionClear();
+
+    if (utf8Encoding != NULL)
+        env->DeleteLocalRef(utf8Encoding);
+    if (charArray != NULL)
+        env->DeleteLocalRef(charArray);
+
+    return err;
+}
+
+CHIP_ERROR N2J_NewStringUTF(JNIEnv * env, const char * inStr, jstring & outString)
+{
+    return N2J_NewStringUTF(env, inStr, strlen(inStr), outString);
 }
 
 } // namespace
@@ -82,7 +127,6 @@ AndroidDeviceControllerWrapper::~AndroidDeviceControllerWrapper()
     {
         GetJavaEnv()->DeleteGlobalRef(mJavaObjectRef);
     }
-    mController->AppState = nullptr;
     mController->Shutdown();
 }
 
@@ -129,7 +173,7 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(chi
 
     *errInfoOnFailure = CHIP_NO_ERROR;
 
-    std::unique_ptr<ChipDeviceController> controller(new ChipDeviceController());
+    std::unique_ptr<DeviceCommissioner> controller(new DeviceCommissioner());
 
     if (!controller)
     {
@@ -138,7 +182,17 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(chi
     }
     std::unique_ptr<AndroidDeviceControllerWrapper> wrapper(new AndroidDeviceControllerWrapper(std::move(controller)));
 
-    *errInfoOnFailure = wrapper->Controller()->Init(nodeId, systemLayer, inetLayer, wrapper.get());
+    wrapper->Controller()->SetUdpListenPort(CHIP_PORT + 1);
+    *errInfoOnFailure = wrapper->Controller()->Init(nodeId, wrapper.get(), wrapper.get(), systemLayer, inetLayer);
+
+
+    if (*errInfoOnFailure != CHIP_NO_ERROR)
+    {
+        return nullptr;
+    }
+
+    *errInfoOnFailure = wrapper->Controller()->ServiceEvents();
+
     if (*errInfoOnFailure != CHIP_NO_ERROR)
     {
         return nullptr;
@@ -225,4 +279,125 @@ void AndroidDeviceControllerWrapper::OnPairingComplete(CHIP_ERROR error)
 void AndroidDeviceControllerWrapper::OnPairingDeleted(CHIP_ERROR error)
 {
     CallVoidInt(GetJavaEnv(), mJavaObjectRef, "onPairingDeleted", static_cast<jint>(error));
+}
+
+void AndroidDeviceControllerWrapper::OnMessage(chip::System::PacketBufferHandle msg) {}
+
+void AndroidDeviceControllerWrapper::OnStatusChange(void) {}
+
+void AndroidDeviceControllerWrapper::SetDelegate(PersistentStorageResultDelegate * delegate)
+{
+    mStorageResultDelegate = delegate;
+}
+
+void AndroidDeviceControllerWrapper::GetKeyValue(const char * key)
+{
+    jstring keyString   = NULL;
+    jstring valueString = NULL;
+    CHIP_ERROR err      = CHIP_NO_ERROR;
+    jclass storageCls   = GetPersistentStorageClass();
+    jmethodID method    = GetJavaEnv()->GetStaticMethodID(storageCls, "getKeyValue", "(Ljava/lang/String;)Ljava/lang/String;");
+
+
+    GetJavaEnv()->ExceptionClear();
+
+    err = N2J_NewStringUTF(GetJavaEnv(), key, keyString);
+    SuccessOrExit(err);
+
+    valueString = (jstring) GetJavaEnv()->CallStaticObjectMethod(storageCls, method, keyString);
+
+    if (mStorageResultDelegate) {
+        mStorageResultDelegate->OnValue(key, GetJavaEnv()->GetStringUTFChars(valueString, 0));
+    }
+
+exit:
+    GetJavaEnv()->ExceptionClear();
+    GetJavaEnv()->DeleteLocalRef(keyString);
+    GetJavaEnv()->DeleteLocalRef(valueString);
+}
+
+CHIP_ERROR AndroidDeviceControllerWrapper::GetKeyValue(const char * key, char * value, uint16_t & size)
+{
+    jstring keyString   = NULL;
+    jstring valueString = NULL;
+    CHIP_ERROR err      = CHIP_NO_ERROR;
+    jclass storageCls   = GetPersistentStorageClass();
+    jmethodID method    = GetJavaEnv()->GetStaticMethodID(storageCls, "getKeyValue", "(Ljava/lang/String;)Ljava/lang/String;");
+
+    GetJavaEnv()->ExceptionClear();
+
+    err = N2J_NewStringUTF(GetJavaEnv(), key, keyString);
+    SuccessOrExit(err);
+
+    valueString = (jstring) GetJavaEnv()->CallStaticObjectMethod(storageCls, method, keyString);
+
+    if (value != nullptr) {
+        if (valueString != NULL) {
+            size = strlcpy(value, GetJavaEnv()->GetStringUTFChars(valueString, 0), size);
+        } else {
+            size = 0;
+        }
+        // Increment size to account for null termination
+        size += 1;
+    } else {
+        err = CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    
+exit:
+    GetJavaEnv()->ExceptionClear();
+    GetJavaEnv()->DeleteLocalRef(keyString);
+    GetJavaEnv()->DeleteLocalRef(valueString);
+    return err;
+}
+
+void AndroidDeviceControllerWrapper::SetKeyValue(const char * key, const char * value)
+{   
+    jclass storageCls = GetPersistentStorageClass();
+    jmethodID method = GetJavaEnv()->GetStaticMethodID(storageCls, "setKeyValue", "(Ljava/lang/String;Ljava/lang/String;)V");
+
+    GetJavaEnv()->ExceptionClear();
+
+    jstring keyString = NULL;
+    jstring valueString = NULL;
+    CHIP_ERROR err    = CHIP_NO_ERROR;
+
+    err = N2J_NewStringUTF(GetJavaEnv(), key, keyString);
+    SuccessOrExit(err);
+    err = N2J_NewStringUTF(GetJavaEnv(), value, valueString);
+    SuccessOrExit(err);
+
+    GetJavaEnv()->CallStaticVoidMethod(storageCls, method, keyString, valueString);
+
+    if (mStorageResultDelegate) {
+        mStorageResultDelegate->OnStatus(key, PersistentStorageResultDelegate::Operation::kSET, CHIP_NO_ERROR);
+    }
+
+exit:
+    GetJavaEnv()->ExceptionClear();
+    GetJavaEnv()->DeleteLocalRef(keyString);
+    GetJavaEnv()->DeleteLocalRef(valueString);
+}
+
+void AndroidDeviceControllerWrapper::DeleteKeyValue(const char * key) 
+{
+    jclass storageCls = GetPersistentStorageClass();
+    jmethodID method = GetJavaEnv()->GetStaticMethodID(storageCls, "deleteKeyValue", "(Ljava/lang/String;)V");
+
+    GetJavaEnv()->ExceptionClear();
+
+    jstring keyString = NULL;
+    CHIP_ERROR err    = CHIP_NO_ERROR;
+
+    err = N2J_NewStringUTF(GetJavaEnv(), key, keyString);
+    SuccessOrExit(err);
+
+    GetJavaEnv()->CallStaticVoidMethod(storageCls, method, keyString);
+
+    if (mStorageResultDelegate) {
+        mStorageResultDelegate->OnStatus(key, PersistentStorageResultDelegate::Operation::kDELETE, CHIP_NO_ERROR);
+    }
+
+exit:
+    GetJavaEnv()->ExceptionClear();
+    GetJavaEnv()->DeleteLocalRef(keyString);
 }
