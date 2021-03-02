@@ -233,10 +233,14 @@
             }
         },
         {
-            "label": "Build nRF mbed shell Example",
+            "label": "Build Mbed Shell Example",
             "type": "shell",
             "command": "scripts/examples/mbed_example.sh",
-            "args": ["-a=shell", "-b=NRF52840_DK", "-p=release"],
+            "args": [
+                "-a=shell",
+                "-b=${input:mbedTarget}",
+                "-p=${input:mbedProfile}"
+            ],
             "group": "build",
             "problemMatcher": {
                 "base": "$gcc",
@@ -245,6 +249,34 @@
                     "${workspaceFolder}/examples/shell/mbed/build"
                 ]
             }
+        },
+        {
+            "label": "Flash Mbed Shell Example",
+            "type": "shell",
+            "command": "scripts/examples/mbed_example_utils.sh",
+            "args": [
+                "-a=shell",
+                "-b=${input:mbedTarget}",
+                "-p=${input:mbedProfile}"
+            ],
+            "problemMatcher": [],
+            "group": "build"
+        }
+    ],
+    "inputs": [
+        {
+            "type": "pickString",
+            "id": "mbedTarget",
+            "description": "What mbed target will be used?",
+            "options": ["NRF52840_DK", "DISCO_L475VG_IOT01A"],
+            "default": "NRF52840_DK"
+        },
+        {
+            "type": "pickString",
+            "id": "mbedProfile",
+            "description": "What mbed profile do you want to use?",
+            "options": ["release", "debug", "develop"],
+            "default": "develop"
         }
     ]
 }
