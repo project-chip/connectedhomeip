@@ -58,7 +58,7 @@ other cases.
 
 ## Requirements
 
-The application requires the nRF Connect SDK v1.4.0 to work correctly.
+The application requires the nRF Connect SDK v1.5.0 to work correctly.
 
 The example supports building and running on the following devices:
 
@@ -103,7 +103,7 @@ using the following command:
 
         $ git submodule update --init
 
-The example requires the nRF Connect SDK v1.4.0. You can either install it along
+The example requires the nRF Connect SDK v1.5.0. You can either install it along
 with the related tools directly on your system or use a Docker image that has
 the tools pre-installed.
 
@@ -147,11 +147,11 @@ To use the Docker container for setup, complete the following steps:
     -   _-e RUNAS=\$(id -u)_ is needed to start the container session as the
         current user instead of root.
 
-4.  Check out or update the nRF Connect SDK to the recommended `v1.4.0` version
+4.  Check out or update the nRF Connect SDK to the recommended `v1.5.0` version
     by running the following command in the Docker container:
 
-         $ setup --ncs v1.4.0
-         /var/ncs repository is empty. Do you wish to check out nRF Connect SDK sources [v1.4.0]? [Y/N] y
+         $ setup --ncs v1.5.0
+         /var/ncs repository is empty. Do you wish to check out nRF Connect SDK sources [v1.5.0]? [Y/N] y
          ...
          /var/chip repository is initialized, skipping...
 
@@ -171,7 +171,7 @@ To use the native shell for setup, complete the following steps:
     -   Follow the
         [guide](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/gs_assistant.html#)
         in the nRF Connect SDK documentation to install the nRF Connect SDK
-        v1.4.0. Since command-line tools will be used for building the example,
+        v1.5.0. Since command-line tools will be used for building the example,
         installing SEGGER Embedded Studio is not required.
 
     -   If you have an older version of the SDK installed, use the following
@@ -181,7 +181,7 @@ To use the native shell for setup, complete the following steps:
 
                $ cd nrfconnect-dir/nrf
                $ git fetch origin
-               $ git checkout v1.4.0
+               $ git checkout v1.5.0
                $ west update
 
 3.  Initialize environment variables referred to by the CHIP and the nRF Connect
