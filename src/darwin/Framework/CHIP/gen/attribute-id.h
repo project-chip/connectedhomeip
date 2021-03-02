@@ -383,6 +383,14 @@
 #define ZCL_SERIAL_NUMBER_ATTRIBUTE_ID (0x000F)
 #define ZCL_LOCAL_CONFIG_DISABLED_ATTRIBUTE_ID (0x0010)
 
+// Attribute ids for cluster: General Commissioning
+
+// Client attributes
+
+// Server attributes
+#define ZCL_FABRIC_ID_ATTRIBUTE_ID (0x0000)
+#define ZCL_BREADCRUMB_ATTRIBUTE_ID (0x0001)
+
 // Attribute ids for cluster: Shade Configuration
 
 // Client attributes

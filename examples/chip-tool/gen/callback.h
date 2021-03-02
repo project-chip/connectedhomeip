@@ -93,6 +93,14 @@ void emberAfContentLaunchClusterInitCallback(chip::EndpointId endpoint);
  */
 void emberAfDoorLockClusterInitCallback(chip::EndpointId endpoint);
 
+/** @brief General Commissioning Cluster Init
+ *
+ * Cluster Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfGeneralCommissioningClusterInitCallback(chip::EndpointId endpoint);
+
 /** @brief Groups Cluster Init
  *
  * Cluster Init
@@ -640,6 +648,77 @@ EmberAfStatus emberAfDoorLockClusterClientPreAttributeChangedCallback(chip::Endp
  * @param endpoint  Endpoint that is being served
  */
 void emberAfDoorLockClusterClientTickCallback(chip::EndpointId endpoint);
+
+//
+// General Commissioning Cluster client
+//
+
+/** @brief General Commissioning Cluster Client Init
+ *
+ * Client Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfGeneralCommissioningClusterClientInitCallback(chip::EndpointId endpoint);
+
+/** @brief General Commissioning Cluster Client Attribute Changed
+ *
+ * Client Attribute Changed
+ *
+ * @param endpoint    Endpoint that is being initialized
+ * @param attributeId Attribute that changed
+ */
+void emberAfGeneralCommissioningClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+
+/** @brief General Commissioning Cluster Client Manufacturer Specific Attribute Changed
+ *
+ * Client Manufacturer Specific Attribute Changed
+ *
+ * @param endpoint          Endpoint that is being initialized
+ * @param attributeId       Attribute that changed
+ * @param manufacturerCode  Manufacturer Code of the attribute that changed
+ */
+void emberAfGeneralCommissioningClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                          chip::AttributeId attributeId,
+                                                                                          uint16_t manufacturerCode);
+
+/** @brief General Commissioning Cluster Client Message Sent
+ *
+ * Client Message Sent
+ *
+ * @param type               The type of message sent
+ * @param indexOrDestination The destination or address to which the message was sent
+ * @param apsFrame           The APS frame for the message
+ * @param msgLen             The length of the message
+ * @param message            The message that was sent
+ * @param status             The status of the sent message
+ */
+void emberAfGeneralCommissioningClusterClientMessageSentCallback(EmberOutgoingMessageType type, uint64_t indexOrDestination,
+                                                                 EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
+                                                                 EmberStatus status);
+
+/** @brief General Commissioning Cluster Client Pre Attribute Changed
+ *
+ * client Pre Attribute Changed
+ *
+ * @param endpoint      Endpoint that is being initialized
+ * @param attributeId   Attribute to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+EmberAfStatus emberAfGeneralCommissioningClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                  chip::AttributeId attributeId,
+                                                                                  EmberAfAttributeType attributeType, uint8_t size,
+                                                                                  uint8_t * value);
+
+/** @brief General Commissioning Cluster Client Tick
+ *
+ * client Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfGeneralCommissioningClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
 // Groups Cluster client
@@ -1339,6 +1418,30 @@ bool emberAfDoorLockClusterUnlockDoorResponseCallback(uint8_t status);
  */
 
 bool emberAfDoorLockClusterUnlockWithTimeoutResponseCallback(uint8_t status);
+
+/**
+ * @brief General Commissioning Cluster ArmFailSafeResponse Command callback
+ * @param errorCode
+ * @param debugText
+ */
+
+bool emberAfGeneralCommissioningClusterArmFailSafeResponseCallback(uint8_t errorCode, uint8_t * debugText);
+
+/**
+ * @brief General Commissioning Cluster CommissioningCompleteResponse Command callback
+ * @param errorCode
+ * @param debugText
+ */
+
+bool emberAfGeneralCommissioningClusterCommissioningCompleteResponseCallback(uint8_t errorCode, uint8_t * debugText);
+
+/**
+ * @brief General Commissioning Cluster SetFabricResponse Command callback
+ * @param errorCode
+ * @param debugText
+ */
+
+bool emberAfGeneralCommissioningClusterSetFabricResponseCallback(uint8_t errorCode, uint8_t * debugText);
 
 /**
  * @brief Groups Cluster AddGroupResponse Command callback

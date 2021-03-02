@@ -473,6 +473,41 @@ CHIP_ERROR chip_ime_AppendCommand_DoorLock_UnlockWithTimeout(chip::Controller::D
 }
 // End of Cluster DoorLock
 
+// Cluster GeneralCommissioning
+CHIP_ERROR chip_ime_AppendCommand_GeneralCommissioning_ArmFailSafe(chip::Controller::Device * device,
+                                                                   chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
+                                                                   uint16_t expiryLengthSeconds, uint64_t breadcrumb,
+                                                                   uint32_t timeoutMs)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::GeneralCommissioningCluster clusterGeneralCommissioning;
+    (void) ZCLgroupId;
+    clusterGeneralCommissioning.Associate(device, ZCLendpointId);
+    return clusterGeneralCommissioning.ArmFailSafe(nullptr, nullptr, expiryLengthSeconds, breadcrumb, timeoutMs);
+}
+CHIP_ERROR chip_ime_AppendCommand_GeneralCommissioning_CommissioningComplete(chip::Controller::Device * device,
+                                                                             chip::EndpointId ZCLendpointId,
+                                                                             chip::GroupId ZCLgroupId)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::GeneralCommissioningCluster clusterGeneralCommissioning;
+    (void) ZCLgroupId;
+    clusterGeneralCommissioning.Associate(device, ZCLendpointId);
+    return clusterGeneralCommissioning.CommissioningComplete(nullptr, nullptr);
+}
+CHIP_ERROR chip_ime_AppendCommand_GeneralCommissioning_SetFabric(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                                 chip::GroupId ZCLgroupId, char * fabricId, uint32_t fabricId_Len,
+                                                                 char * fabricSecret, uint32_t fabricSecret_Len,
+                                                                 uint64_t breadcrumb, uint32_t timeoutMs)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::GeneralCommissioningCluster clusterGeneralCommissioning;
+    (void) ZCLgroupId;
+    clusterGeneralCommissioning.Associate(device, ZCLendpointId);
+    return clusterGeneralCommissioning.SetFabric(nullptr, nullptr, fabricId, fabricSecret, breadcrumb, timeoutMs);
+}
+// End of Cluster GeneralCommissioning
+
 // Cluster Groups
 CHIP_ERROR chip_ime_AppendCommand_Groups_AddGroup(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
                                                   chip::GroupId ZCLgroupId, uint16_t groupId, char * groupName)

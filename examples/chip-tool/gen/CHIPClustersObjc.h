@@ -367,6 +367,30 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
+ * Cluster General Commissioning
+ *
+ */
+@interface CHIPGeneralCommissioning : CHIPCluster
+
+- (void)armFailSafe:(uint16_t)expiryLengthSeconds
+           breadcrumb:(uint64_t)breadcrumb
+            timeoutMs:(uint32_t)timeoutMs
+    completionHandler:(ResponseHandler)completionHandler;
+- (void)commissioningComplete:(ResponseHandler)completionHandler;
+- (void)setFabric:(char *)fabricId
+         fabricSecret:(char *)fabricSecret
+           breadcrumb:(uint64_t)breadcrumb
+            timeoutMs:(uint32_t)timeoutMs
+    completionHandler:(ResponseHandler)completionHandler;
+
+- (void)readAttributeFabricId:(ResponseHandler)completionHandler;
+- (void)readAttributeBreadcrumb:(ResponseHandler)completionHandler;
+- (void)writeAttributeBreadcrumb:(uint64_t)value completionHandler:(ResponseHandler)completionHandler;
+- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
+
+@end
+
+/**
  * Cluster Groups
  *
  */

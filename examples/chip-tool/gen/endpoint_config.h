@@ -100,7 +100,7 @@
 
 #define ZAP_ATTRIBUTE_MASK(mask) ATTRIBUTE_MASK_##mask
 // This is an array of EmberAfAttributeMetadata structures.
-#define GENERATED_ATTRIBUTE_COUNT 25
+#define GENERATED_ATTRIBUTE_COUNT 26
 #define GENERATED_ATTRIBUTES                                                                                                       \
     {                                                                                                                              \
         { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), { (uint8_t *) 2 } }, /* Identify (client): cluster revision */  \
@@ -153,6 +153,9 @@
                 0x000A, ZAP_TYPE(CHAR_STRING), 64, ZAP_ATTRIBUTE_MASK(SINGLETON), { (uint8_t *) ZAP_LONG_DEFAULTS_INDEX(180) }     \
             }, /* Basic (server): SoftwareVersionString */                                                                         \
             {                                                                                                                      \
+                0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), { (uint8_t *) 0x0001 }                                    \
+            }, /* General Commissioning (client): cluster revision */                                                              \
+            {                                                                                                                      \
                 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), { (uint8_t *) 3 }                                         \
             }, /* Door Lock (client): cluster revision */                                                                          \
             {                                                                                                                      \
@@ -185,7 +188,7 @@
 #define GENERATED_FUNCTION_ARRAYS
 
 #define ZAP_CLUSTER_MASK(mask) CLUSTER_MASK_##mask
-#define GENERATED_CLUSTER_COUNT 14
+#define GENERATED_CLUSTER_COUNT 15
 #define GENERATED_CLUSTERS                                                                                                         \
     {                                                                                                                              \
         { 0x0003, ZAP_ATTRIBUTE_INDEX(0), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL }, /* Endpoint: 1, Cluster: Identify (client) */    \
@@ -199,28 +202,31 @@
                 0x0028, ZAP_ATTRIBUTE_INDEX(5), 12, 254, ZAP_CLUSTER_MASK(SERVER), NULL                                            \
             }, /* Endpoint: 1, Cluster: Basic (server) */                                                                          \
             {                                                                                                                      \
-                0x0101, ZAP_ATTRIBUTE_INDEX(17), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+                0x0030, ZAP_ATTRIBUTE_INDEX(17), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+            }, /* Endpoint: 1, Cluster: General Commissioning (client) */                                                          \
+            {                                                                                                                      \
+                0x0101, ZAP_ATTRIBUTE_INDEX(18), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
             }, /* Endpoint: 1, Cluster: Door Lock (client) */                                                                      \
             {                                                                                                                      \
-                0x0103, ZAP_ATTRIBUTE_INDEX(18), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+                0x0103, ZAP_ATTRIBUTE_INDEX(19), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
             }, /* Endpoint: 1, Cluster: Barrier Control (client) */                                                                \
             {                                                                                                                      \
-                0x0300, ZAP_ATTRIBUTE_INDEX(19), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+                0x0300, ZAP_ATTRIBUTE_INDEX(20), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
             }, /* Endpoint: 1, Cluster: Color Control (client) */                                                                  \
             {                                                                                                                      \
-                0x0402, ZAP_ATTRIBUTE_INDEX(20), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+                0x0402, ZAP_ATTRIBUTE_INDEX(21), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
             }, /* Endpoint: 1, Cluster: Temperature Measurement (client) */                                                        \
             {                                                                                                                      \
-                0x050D, ZAP_ATTRIBUTE_INDEX(21), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+                0x050D, ZAP_ATTRIBUTE_INDEX(22), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
             }, /* Endpoint: 1, Cluster: Application Basic (client) */                                                              \
             {                                                                                                                      \
-                0xF000, ZAP_ATTRIBUTE_INDEX(22), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+                0xF000, ZAP_ATTRIBUTE_INDEX(23), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
             }, /* Endpoint: 1, Cluster: Binding (client) */                                                                        \
             {                                                                                                                      \
-                0xF001, ZAP_ATTRIBUTE_INDEX(23), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+                0xF001, ZAP_ATTRIBUTE_INDEX(24), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
             }, /* Endpoint: 1, Cluster: Media Playback (client) */                                                                 \
             {                                                                                                                      \
-                0xF002, ZAP_ATTRIBUTE_INDEX(24), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+                0xF002, ZAP_ATTRIBUTE_INDEX(25), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
             }, /* Endpoint: 1, Cluster: Content Launch (client) */                                                                 \
     }
 
@@ -229,7 +235,7 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 14, 280 },                                                                                         \
+        { ZAP_CLUSTER_INDEX(0), 15, 282 },                                                                                         \
     }
 
 // Largest attribute size is needed for various buffers
@@ -239,7 +245,7 @@
 #define ATTRIBUTE_SINGLETONS_SIZE (254)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (280)
+#define ATTRIBUTE_MAX_SIZE (282)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (1)
@@ -283,7 +289,7 @@
 
 // Array of EmberAfCommandMetadata structs.
 #define ZAP_COMMAND_MASK(mask) COMMAND_MASK_##mask
-#define EMBER_AF_GENERATED_COMMAND_COUNT (121)
+#define EMBER_AF_GENERATED_COMMAND_COUNT (127)
 #define GENERATED_COMMANDS                                                                                                         \
     {                                                                                                                              \
         { 0x0003, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) },     /* Identify (client): Identify */                                 \
@@ -326,6 +332,13 @@
             { 0x0028, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Basic (server): StartUp */                                     \
             { 0x0028, 0x01, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Basic (server): ShutDown */                                    \
             { 0x0028, 0x02, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Basic (server): Leave */                                       \
+            { 0x0030, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* General Commissioning (client): SetFabric */                   \
+            { 0x0030, 0x01, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* General Commissioning (client): SetFabricResponse */           \
+            { 0x0030, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* General Commissioning (client): ArmFailSafe */                 \
+            { 0x0030, 0x03, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* General Commissioning (client): ArmFailSafeResponse */         \
+            { 0x0030, 0x06, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* General Commissioning (client): CommissioningComplete */       \
+            { 0x0030, 0x07,                                                                                                        \
+              ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* General Commissioning (client): CommissioningCompleteResponse */             \
             { 0x0101, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Door Lock (client): LockDoor */                                \
             { 0x0101, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Door Lock (client): LockDoorResponse */                        \
             { 0x0101, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Door Lock (client): UnlockDoor */                              \

@@ -33,6 +33,7 @@ constexpr ClusterId kBindingClusterId                = 0xF000;
 constexpr ClusterId kColorControlClusterId           = 0x0300;
 constexpr ClusterId kContentLaunchClusterId          = 0xF002;
 constexpr ClusterId kDoorLockClusterId               = 0x0101;
+constexpr ClusterId kGeneralCommissioningClusterId   = 0x0030;
 constexpr ClusterId kGroupsClusterId                 = 0x0004;
 constexpr ClusterId kIasZoneClusterId                = 0x0500;
 constexpr ClusterId kIdentifyClusterId               = 0x0003;
@@ -386,6 +387,33 @@ private:
     static constexpr CommandId kSetYeardayScheduleCommandId   = 0x0E;
     static constexpr CommandId kUnlockDoorCommandId           = 0x01;
     static constexpr CommandId kUnlockWithTimeoutCommandId    = 0x03;
+};
+
+class DLL_EXPORT GeneralCommissioningCluster : public ClusterBase
+{
+public:
+    GeneralCommissioningCluster() : ClusterBase(kGeneralCommissioningClusterId) {}
+    ~GeneralCommissioningCluster() {}
+
+    // Cluster Commands
+    CHIP_ERROR ArmFailSafe(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                           uint16_t expiryLengthSeconds, uint64_t breadcrumb, uint32_t timeoutMs);
+    CHIP_ERROR CommissioningComplete(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR SetFabric(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, char * fabricId,
+                         char * fabricSecret, uint64_t breadcrumb, uint32_t timeoutMs);
+
+    // Cluster Attributes
+    CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeFabricId(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeBreadcrumb(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR WriteAttributeBreadcrumb(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                        uint64_t value);
+
+private:
+    static constexpr CommandId kArmFailSafeCommandId           = 0x02;
+    static constexpr CommandId kCommissioningCompleteCommandId = 0x06;
+    static constexpr CommandId kSetFabricCommandId             = 0x00;
 };
 
 class DLL_EXPORT GroupsCluster : public ClusterBase

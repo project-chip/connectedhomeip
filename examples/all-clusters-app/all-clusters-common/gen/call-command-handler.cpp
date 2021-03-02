@@ -35,6 +35,7 @@ EmberAfStatus emberAfBindingClusterServerCommandParse(EmberAfClusterCommand * cm
 EmberAfStatus emberAfColorControlClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfContentLaunchClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfDoorLockClusterServerCommandParse(EmberAfClusterCommand * cmd);
+EmberAfStatus emberAfGeneralCommissioningClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfGroupsClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfIasZoneClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfIdentifyClusterServerCommandParse(EmberAfClusterCommand * cmd);
@@ -105,6 +106,9 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
             break;
         case ZCL_DOOR_LOCK_CLUSTER_ID:
             result = emberAfDoorLockClusterServerCommandParse(cmd);
+            break;
+        case ZCL_GENERAL_COMMISSIONING_CLUSTER_ID:
+            result = emberAfGeneralCommissioningClusterServerCommandParse(cmd);
             break;
         case ZCL_GROUPS_CLUSTER_ID:
             result = emberAfGroupsClusterServerCommandParse(cmd);
@@ -1302,6 +1306,87 @@ EmberAfStatus emberAfDoorLockClusterServerCommandParse(EmberAfClusterCommand * c
             pin = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
 
             wasHandled = emberAfDoorLockClusterUnlockWithTimeoutCallback(timeoutInSeconds, pin);
+            break;
+        }
+        default: {
+            // Unrecognized command ID, error status will apply.
+            break;
+        }
+        }
+    }
+    return status(wasHandled, true, cmd->mfgSpecific);
+}
+EmberAfStatus emberAfGeneralCommissioningClusterServerCommandParse(EmberAfClusterCommand * cmd)
+{
+    bool wasHandled = false;
+
+    if (!cmd->mfgSpecific)
+    {
+        switch (cmd->commandId)
+        {
+        case ZCL_ARM_FAIL_SAFE_COMMAND_ID: {
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint16_t expiryLengthSeconds;
+            uint64_t breadcrumb;
+            uint32_t timeoutMs;
+
+            if (cmd->bufLen < payloadOffset + 2)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            expiryLengthSeconds = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset       = static_cast<uint16_t>(payloadOffset + 2);
+            if (cmd->bufLen < payloadOffset + 8)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            breadcrumb    = emberAfGetInt64u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 8);
+            if (cmd->bufLen < payloadOffset + 4)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            timeoutMs = emberAfGetInt32u(cmd->buffer, payloadOffset, cmd->bufLen);
+
+            wasHandled = emberAfGeneralCommissioningClusterArmFailSafeCallback(expiryLengthSeconds, breadcrumb, timeoutMs);
+            break;
+        }
+        case ZCL_COMMISSIONING_COMPLETE_COMMAND_ID: {
+            wasHandled = emberAfGeneralCommissioningClusterCommissioningCompleteCallback();
+            break;
+        }
+        case ZCL_SET_FABRIC_COMMAND_ID: {
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t * fabricId;
+            uint8_t * fabricSecret;
+            uint64_t breadcrumb;
+            uint32_t timeoutMs;
+
+            if (cmd->bufLen < payloadOffset + 1u)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            fabricId      = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + emberAfStringLength(fabricId) + 1u);
+            if (cmd->bufLen < payloadOffset + 1u)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            fabricSecret  = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + emberAfStringLength(fabricSecret) + 1u);
+            if (cmd->bufLen < payloadOffset + 8)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            breadcrumb    = emberAfGetInt64u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 8);
+            if (cmd->bufLen < payloadOffset + 4)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            timeoutMs = emberAfGetInt32u(cmd->buffer, payloadOffset, cmd->bufLen);
+
+            wasHandled = emberAfGeneralCommissioningClusterSetFabricCallback(fabricId, fabricSecret, breadcrumb, timeoutMs);
             break;
         }
         default: {

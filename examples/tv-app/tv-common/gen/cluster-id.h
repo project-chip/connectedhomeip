@@ -83,6 +83,9 @@
 // Definitions for cluster: Basic
 #define ZCL_BASIC_CLUSTER_ID (0x0028)
 
+// Definitions for cluster: General Commissioning
+#define ZCL_GENERAL_COMMISSIONING_CLUSTER_ID (0x0030)
+
 // Definitions for cluster: Shade Configuration
 #define ZCL_SHADE_CONFIG_CLUSTER_ID (0x0100)
 
