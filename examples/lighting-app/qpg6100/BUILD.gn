@@ -75,7 +75,6 @@ qpg6100_executable("lighting_app") {
     "src/AppTask.cpp",
     "src/LightingManager.cpp",
     "src/ZclCallbacks.cpp",
-
   ]
 
   output_dir = root_out_dir
