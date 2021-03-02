@@ -133,7 +133,7 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 
     // Restart the system.
     ChipLogProgress(DeviceLayer, "System restarting");
-    // TODO - Add CHIP library de-init
+    qvCHIP_ResetSystem();
 }
 
 } // namespace DeviceLayer

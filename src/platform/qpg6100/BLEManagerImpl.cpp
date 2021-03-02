@@ -145,7 +145,7 @@ CHIP_ERROR BLEManagerImpl::_GetDeviceName(char * buf, size_t bufSize)
 {
     CHIP_ERROR err;
 
-    err = qvCHIP_BleGetDeviceName(buf, bufSize);
+    err = MapBLEError(qvCHIP_BleGetDeviceName(buf, bufSize));
 
     return err;
 }
@@ -158,7 +158,7 @@ CHIP_ERROR BLEManagerImpl::_SetDeviceName(const char * devName)
 
     if (devName != nullptr && devName[0] != 0)
     {
-        err = qvCHIP_BleSetDeviceName(devName);
+        err = MapBLEError(qvCHIP_BleSetDeviceName(devName));
     }
 
 exit:
@@ -251,7 +251,7 @@ bool BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
 
     ChipLogProgress(DeviceLayer, "Closing BLE GATT connection (con %u)", conId);
 
-    err = qvCHIP_BleCloseConnection(conId);
+    err = MapBLEError(qvCHIP_BleCloseConnection(conId));
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "qvCHIP_BleCloseConnection() failed: %s", ErrorStr(err));
@@ -262,7 +262,14 @@ bool BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
 
 uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
 {
-    return qvCHIP_BleGetMTU(conId);
+    uint16_t retVal = 0;
+    CHIP_ERROR err = MapBLEError(qvCHIP_BleGetMTU(conId, &retVal));
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "qvCHIP_BleGetMTU() failed: %s", ErrorStr(err));
+    }
+
+    return retVal;
 }
 
 bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
@@ -315,6 +322,32 @@ void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
 {
     // Nothing to do
 }
+
+CHIP_ERROR BLEManagerImpl::MapBLEError(int bleErr) const
+{
+    CHIP_ERROR err;
+
+    switch(bleErr)
+    {
+    case QV_STATUS_NO_ERROR: {
+        err = CHIP_NO_ERROR;
+        break;
+    }
+    case QV_STATUS_BUFFER_TOO_SMALL: {
+        err = CHIP_ERROR_BUFFER_TOO_SMALL;
+        break;
+    }
+    case QV_STATUS_INVALID_ARGUMENT: {
+        err = CHIP_ERROR_INVALID_ARGUMENT;
+        break;
+    }
+    default: {
+        err = CHIP_ERROR_INCORRECT_STATE ;
+    }
+    }
+    return err;
+}
+
 
 void BLEManagerImpl::DriveBLEState(void)
 {
@@ -388,7 +421,8 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
         snprintf(mDeviceName, sizeof(mDeviceName), "%s%04" PRIX32, CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX, (uint32_t) 0);
 
         mDeviceName[kMaxDeviceNameLength] = 0;
-        qvCHIP_BleSetDeviceName(mDeviceName);
+        err = MapBLEError(qvCHIP_BleSetDeviceName(mDeviceName));
+        SuccessOrExit(err);
     }
 
     mDeviceNameLength   = static_cast<uint8_t>(strlen(mDeviceName));
@@ -450,8 +484,8 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     // Minimum and maximum interval are the same
     qvCHIP_BleSetAdvInterval(interval, interval);
 
-    err = qvCHIP_BleStartAdvertising();
-    // TODO: translate from qvStatus_t to CHIP_ERROR
+    err = MapBLEError(qvCHIP_BleStartAdvertising());
+    SuccessOrExit(err);
 
 exit:
     return err;
@@ -461,7 +495,7 @@ CHIP_ERROR BLEManagerImpl::StopAdvertising(void)
 {
     CHIP_ERROR err;
 
-    err = qvCHIP_BleStopAdvertising();
+    err = MapBLEError(qvCHIP_BleStopAdvertising());
     SuccessOrExit(err);
 
     // Transition to the not Advertising state...
