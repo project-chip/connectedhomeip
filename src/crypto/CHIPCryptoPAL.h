@@ -177,15 +177,15 @@ public:
                                             const P256ECDSASignature & signature) const override;
     CHIP_ERROR ECDSA_validate_hash_signature(const uint8_t * hash, size_t hash_length,
                                              const P256ECDSASignature & signature) const override;
-    #if ENABLE_HSM_GENERATE_EC_KEY
-    void setPubKeyId(uint32_t id){ pub_key_id = id; }
-    #endif
+#if ENABLE_HSM_GENERATE_EC_KEY
+    void setPubKeyId(uint32_t id) { pub_key_id = id; }
+#endif
 
 private:
     uint8_t bytes[kP256_PublicKey_Length];
-    #if ENABLE_HSM_GENERATE_EC_KEY
+#if ENABLE_HSM_GENERATE_EC_KEY
     uint32_t pub_key_id = 0;
-    #endif
+#endif
 };
 
 template <typename PK, typename Secret, typename Sig>
@@ -245,9 +245,9 @@ class P256Keypair : public ECPKeypair<P256PublicKey, P256ECDHDerivedSecret, P256
 {
 public:
     P256Keypair() {}
-    #if ENABLE_HSM_GENERATE_EC_KEY
-    P256Keypair(uint32_t id) {key_id = id;}
-    #endif
+#if ENABLE_HSM_GENERATE_EC_KEY
+    P256Keypair(uint32_t id) { key_id = id; }
+#endif
     ~P256Keypair();
 
     /** @brief Initialize the keypair.
@@ -310,9 +310,9 @@ private:
     P256PublicKey mPublicKey;
     P256KeypairContext mKeypair;
     bool mInitialized = false;
-    #if ENABLE_HSM_GENERATE_EC_KEY
+#if ENABLE_HSM_GENERATE_EC_KEY
     uint32_t key_id = 0;
-    #endif
+#endif
 };
 
 /**

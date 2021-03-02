@@ -28,7 +28,6 @@
  */
 #define ENABLE_HSM_HASH_SHA256 0
 
-
 /*
  * Enable HSM for MultiStep SHA256 (Currently not supported)
  */
@@ -57,7 +56,7 @@
 /*
  * Enable HSM for Generate EC Key
  */
-#define ENABLE_HSM_GENERATE_EC_KEY 0 //1 for ecc example
+#define ENABLE_HSM_GENERATE_EC_KEY 0 // 1 for ecc example
 
 /*
  * Enable HSM for MAC
