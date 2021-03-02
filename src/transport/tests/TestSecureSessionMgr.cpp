@@ -195,7 +195,7 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
     callback.ReceiveHandlerCallCount = 0;
 
     PayloadHeader payloadHeader;
-    payloadHeader.SetExchangeID(-1);
+    payloadHeader.SetExchangeID(static_cast<uint16_t>(0xFFFF));
     err = secureSessionMgr.SendMessage(localToRemoteSession, payloadHeader, std::move(buffer));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
