@@ -19,4 +19,4 @@ build:
     cmake: .
     kconfig: Kconfig
     depends:
-    - openthread
+        - openthread
