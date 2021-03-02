@@ -44,7 +44,7 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
 
 @property (nonatomic, readonly, strong, nonnull) NSRecursiveLock * lock;
 
-// queue used to serialize access to the underlying cppCommissioner
+// queue used to serialize all work performed by the CHIPDeviceController
 @property (atomic, readonly) dispatch_queue_t chipWorkQueue;
 
 @property (readonly) chip::Controller::DeviceCommissioner * cppCommissioner;
