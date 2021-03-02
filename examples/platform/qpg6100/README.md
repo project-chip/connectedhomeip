@@ -24,8 +24,9 @@ found in the APPLICATION.md file found in the qpg6100 directory of the
 example application directory
 
 Currently supported example applications
-- [~/examples/lighting-app/](../../../examples/lighting-app/qpg6100/APPLICATION.md)
-- [~/examples/lock-app/](../../../examples/lock-app/qpg6100/APPLICATION.md)
+
+-   [~/examples/lighting-app/](../../../examples/lighting-app/qpg6100/APPLICATION.md)
+-   [~/examples/lock-app/](../../../examples/lock-app/qpg6100/APPLICATION.md)
 
 For more information on Qorvo and the platforms, please visit
 [the Qorvo website](http://www.qorvo.com) or contact us on
@@ -79,7 +80,8 @@ export ARM_GCC_INSTALL_ROOT=${HOME}/tools/gcc-arm-none-eabi-9-2019-q4-major/bin
 export PATH=$PATH:$ARM_GCC_INSTALL_ROOT
 ```
 
--   Optionally, to use a different version of the QPG6100 SDK from the one bundled with CHIP:
+-   Optionally, to use a different version of the QPG6100 SDK from the one
+    bundled with CHIP:
 
 ```
 export QPG6100_SDK_ROOT=${HOME}/qpg-connectedhomeip
@@ -126,6 +128,7 @@ qvCHIP v0.0.0.0 (CL:155586) running
 [D][DL] CHIP task running
 ```
 
--   Note! Logging is currently encapsulated by the Qorvo logging module. Output  
+-   Note! Logging is currently encapsulated by the Qorvo logging module.
+    Output  
     will have additional header and footer bytes. This will be updated later  
     into a raw stream for any serial terminal to parse.

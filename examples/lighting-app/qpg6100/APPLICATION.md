@@ -3,11 +3,13 @@
 An example application showing the use
 [CHIP](https://github.com/project-chip/connectedhomeip) on the Qorvo QPG6100.
 
-More detailed information to be included in [SDK Documentation](../../platform/qpg6100/README.md).
+More detailed information to be included in
+[SDK Documentation](../../platform/qpg6100/README.md).
 
 ## Lighting-app
 
-The QPG6100 Lighting-app shows an implementation of a Lighting device, based on CHIP\
+The QPG6100 Lighting-app shows an implementation of a Lighting device, based on
+CHIP\
 and the Qorvo QPG6100 SDK. Intention of this example is to demonstrate a CHIP\
 device, with Thread connectivity, using BLE to perform CHIP provisioning.
 
@@ -40,9 +42,11 @@ The following LEDs are used during the application:
     -   Off: Light is off
     -   Dim: Light is set to low level
     -   Bright: Light is set to high level
+
 ## Logging Output
 
--   See [View Logging Output](../../platform/qpg6100/README.md#view-logging-output)
+-   See
+    [View Logging Output](../../platform/qpg6100/README.md#view-logging-output)
 -   At startup you will see:
 
 ```

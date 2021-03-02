@@ -3,7 +3,8 @@
 An example application showing the use
 [CHIP](https://github.com/project-chip/connectedhomeip) on the Qorvo QPG6100.
 
-More detailed information to be included in [SDK Documentation](../../platform/qpg6100/README.md).
+More detailed information to be included in
+[SDK Documentation](../../platform/qpg6100/README.md).
 
 ## Lock-app button control
 
@@ -37,7 +38,8 @@ The following LEDs are used during the application:
 
 ## Logging Output
 
--   See [View Logging Output](../../platform/qpg6100/README.md#view-logging-output)
+-   See
+    [View Logging Output](../../platform/qpg6100/README.md#view-logging-output)
 -   At startup you will see:
 
 ```
@@ -51,6 +53,7 @@ qvCHIP v0.0.0.0 (CL:155586) running
 [D][DL] CHIP task running
 ```
 
--   Note! Logging is currently encapsulated by the Qorvo logging module. Output  
+-   Note! Logging is currently encapsulated by the Qorvo logging module.
+    Output  
     will have additional header and footer bytes. This will be updated later  
     into a raw stream for any serial terminal to parse.
