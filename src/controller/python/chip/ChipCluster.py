@@ -45,8 +45,6 @@ class ChipCluster:
                 },
             },
             "Basic": {
-                "MfgSpecificPing": {
-                },
             },
             "Binding": {
                 "Bind": {
@@ -411,13 +409,6 @@ class ChipCluster:
     def ClusterBarrierControl_CommandBarrierControlStop(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_BarrierControl_BarrierControlStop(
-                device, ZCLendpoint, ZCLgroupid
-            )
-        )
-
-    def ClusterBasic_CommandMfgSpecificPing(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_Basic_MfgSpecificPing(
                 device, ZCLendpoint, ZCLgroupid
             )
         )
@@ -980,9 +971,6 @@ class ChipCluster:
         self._chipLib.chip_ime_AppendCommand_BarrierControl_BarrierControlStop.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_BarrierControl_BarrierControlStop.restype = ctypes.c_uint32
         # Cluster Basic
-        # Cluster Basic Command MfgSpecificPing
-        self._chipLib.chip_ime_AppendCommand_Basic_MfgSpecificPing.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_AppendCommand_Basic_MfgSpecificPing.restype = ctypes.c_uint32
         # Cluster Binding
         # Cluster Binding Command Bind
         self._chipLib.chip_ime_AppendCommand_Binding_Bind.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint64, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint16]

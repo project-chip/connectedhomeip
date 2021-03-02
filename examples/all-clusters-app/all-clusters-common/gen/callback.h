@@ -1224,12 +1224,6 @@ bool emberAfBarrierControlClusterBarrierControlGoToPercentCallback(uint8_t perce
 bool emberAfBarrierControlClusterBarrierControlStopCallback();
 
 /**
- * @brief Basic Cluster MfgSpecificPing Command callback
- */
-
-bool emberAfBasicClusterMfgSpecificPingCallback();
-
-/**
  * @brief Binding Cluster Bind Command callback
  * @param nodeId
  * @param groupId

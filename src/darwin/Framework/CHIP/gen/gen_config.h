@@ -30,7 +30,7 @@
 
 /**** Cluster endpoint counts ****/
 #define EMBER_AF_BARRIER_CONTROL_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
-#define EMBER_AF_BASIC_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_BINDING_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_COLOR_CONTROL_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_DOOR_LOCK_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
@@ -47,9 +47,10 @@
 #define ZCL_USING_BARRIER_CONTROL_CLUSTER_CLIENT
 #define EMBER_AF_PLUGIN_BARRIER_CONTROL_CLIENT
 
-// Use this macro to check if the client side of the Basic cluster is included
-#define ZCL_USING_BASIC_CLUSTER_CLIENT
-#define EMBER_AF_PLUGIN_BASIC_CLIENT
+// Use this macro to check if the server side of the Basic cluster is included
+#define ZCL_USING_BASIC_CLUSTER_SERVER
+#define EMBER_AF_PLUGIN_BASIC_SERVER
+#define EMBER_AF_PLUGIN_BASIC
 
 // Use this macro to check if the client side of the Binding cluster is included
 #define ZCL_USING_BINDING_CLUSTER_CLIENT

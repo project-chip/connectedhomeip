@@ -26,16 +26,61 @@
 #if BIGENDIAN_CPU
 #define GENERATED_DEFAULTS                                                                                                         \
     {                                                                                                                              \
+        /* 0 */ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
+            /* Default for cluster: "Basic", attribute: "VendorName". side: server, big-endian */ /* 32 */ 0x00, 0x00, 0x00, 0x00, \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                  \
+            /* Default for cluster: "Basic", attribute: "ProductName". side: server, big-endian */ /* 64 */ 0x00, 0x00, 0x00,      \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                            \
+            /* Default for cluster: "Basic", attribute: "UserLabel". side: server, big-endian */ /* 96 */ 0x00, 0x00, 0x00, 0x00,  \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                \
+            /* Default for cluster: "Basic", attribute: "Location". side: server, big-endian */ /* 112 */ 0x00, 0x00, 0x00, 0x00,  \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
+            0x00, 0x00, 0x00,                                                                                                      \
+            /* Default for cluster: "Basic", attribute: "HardwareVersionString". side: server, big-endian */ /* 176 */ 0x00, 0x00, \
+            0x00, 0x00, /* Default for cluster: "Basic", attribute: "SoftwareVersion". side: server, big-endian */ /* 180 */ 0x00, \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
+            0x00, 0x00, 0x00, 0x00, 0x00,                                                                                          \
+            0x00, /* Default for cluster: "Basic", attribute: "SoftwareVersionString". side: server, big-endian */                 \
     }
 
 #else // !BIGENDIAN_CPU
 #define GENERATED_DEFAULTS                                                                                                         \
     {                                                                                                                              \
+        /* 0 */ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
+            /* Default for cluster: "Basic", attribute: "VendorName". side: server, little-endian */ /* 32 */ 0x00, 0x00, 0x00,    \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                            \
+            /* Default for cluster: "Basic", attribute: "ProductName". side: server, little-endian */ /* 64 */ 0x00, 0x00, 0x00,   \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                            \
+            /* Default for cluster: "Basic", attribute: "UserLabel". side: server, little-endian */ /* 96 */ 0x00, 0x00, 0x00,     \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
+            /* Default for cluster: "Basic", attribute: "Location". side: server, little-endian */ /* 112 */ 0x00, 0x00, 0x00,     \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
+            0x00, 0x00, 0x00, 0x00,                                                                                                \
+            /* Default for cluster: "Basic", attribute: "HardwareVersionString". side: server, little-endian */ /* 176 */          \
+            0x00, 0x00, 0x00, 0x00,                                                                                                \
+            /* Default for cluster: "Basic", attribute: "SoftwareVersion". side: server, little-endian */ /* 180 */ 0x00, 0x00,    \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
+            0x00, 0x00, 0x00, 0x00,                                                                                                \
+            0x00, /* Default for cluster: "Basic", attribute: "SoftwareVersionString". side: server, little-endian */              \
     }
 
 #endif // BIGENDIAN_CPU
 
-#define GENERATED_DEFAULTS_COUNT (0)
+#define GENERATED_DEFAULTS_COUNT (7)
 
 #define ZAP_TYPE(type) ZCL_##type##_ATTRIBUTE_TYPE
 #define ZAP_LONG_DEFAULTS_INDEX(index)                                                                                             \
@@ -55,13 +100,49 @@
 
 #define ZAP_ATTRIBUTE_MASK(mask) ATTRIBUTE_MASK_##mask
 // This is an array of EmberAfAttributeMetadata structures.
-#define GENERATED_ATTRIBUTE_COUNT 4
+#define GENERATED_ATTRIBUTE_COUNT 16
 #define GENERATED_ATTRIBUTES                                                                                                       \
     {                                                                                                                              \
         { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 2 } },         /* On/off (server): cluster revision */                     \
             { 0x0000, ZAP_TYPE(BOOLEAN), 1, 0, { (uint8_t *) 0x00 } }, /* On/off (server): on/off */                               \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 3 } },     /* Level Control (server): cluster revision */              \
             { 0x0000, ZAP_TYPE(INT8U), 1, 0, { (uint8_t *) 0x00 } },   /* Level Control (server): current level */                 \
+            {                                                                                                                      \
+                0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(SINGLETON), { (uint8_t *) 3 }                                      \
+            }, /* Basic (server): cluster revision */                                                                              \
+            {                                                                                                                      \
+                0x0000, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(SINGLETON), { (uint8_t *) 0 }                                      \
+            }, /* Basic (server): InteractionModelVersion */                                                                       \
+            {                                                                                                                      \
+                0x0001, ZAP_TYPE(CHAR_STRING), 32, ZAP_ATTRIBUTE_MASK(SINGLETON), { (uint8_t *) ZAP_LONG_DEFAULTS_INDEX(0) }       \
+            },                                                                                 /* Basic (server): VendorName */    \
+            { 0x0002, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(SINGLETON), { (uint8_t *) 0 } }, /* Basic (server): VendorID */      \
+            {                                                                                                                      \
+                0x0003, ZAP_TYPE(CHAR_STRING), 32, ZAP_ATTRIBUTE_MASK(SINGLETON), { (uint8_t *) ZAP_LONG_DEFAULTS_INDEX(32) }      \
+            },                                                                                 /* Basic (server): ProductName */   \
+            { 0x0004, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(SINGLETON), { (uint8_t *) 0 } }, /* Basic (server): ProductID */     \
+            { 0x0005,                                                                                                              \
+              ZAP_TYPE(CHAR_STRING),                                                                                               \
+              32,                                                                                                                  \
+              ZAP_ATTRIBUTE_MASK(SINGLETON) | ZAP_ATTRIBUTE_MASK(WRITABLE),                                                        \
+              { (uint8_t *) ZAP_LONG_DEFAULTS_INDEX(64) } }, /* Basic (server): UserLabel */                                       \
+            { 0x0006,                                                                                                              \
+              ZAP_TYPE(CHAR_STRING),                                                                                               \
+              16,                                                                                                                  \
+              ZAP_ATTRIBUTE_MASK(SINGLETON) | ZAP_ATTRIBUTE_MASK(WRITABLE),                                                        \
+              { (uint8_t *) ZAP_LONG_DEFAULTS_INDEX(96) } }, /* Basic (server): Location */                                        \
+            {                                                                                                                      \
+                0x0007, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(SINGLETON), { (uint8_t *) 0x00 }                                   \
+            }, /* Basic (server): HardwareVersion */                                                                               \
+            {                                                                                                                      \
+                0x0008, ZAP_TYPE(CHAR_STRING), 64, ZAP_ATTRIBUTE_MASK(SINGLETON), { (uint8_t *) ZAP_LONG_DEFAULTS_INDEX(112) }     \
+            }, /* Basic (server): HardwareVersionString */                                                                         \
+            {                                                                                                                      \
+                0x0009, ZAP_TYPE(INT32U), 4, ZAP_ATTRIBUTE_MASK(SINGLETON), { (uint8_t *) ZAP_LONG_DEFAULTS_INDEX(176) }           \
+            }, /* Basic (server): SoftwareVersion */                                                                               \
+            {                                                                                                                      \
+                0x000A, ZAP_TYPE(CHAR_STRING), 64, ZAP_ATTRIBUTE_MASK(SINGLETON), { (uint8_t *) ZAP_LONG_DEFAULTS_INDEX(180) }     \
+            }, /* Basic (server): SoftwareVersionString */                                                                         \
     }
 
 // This is an array of EmberAfCluster structures.
@@ -77,7 +158,7 @@
     };
 
 #define ZAP_CLUSTER_MASK(mask) CLUSTER_MASK_##mask
-#define GENERATED_CLUSTER_COUNT 2
+#define GENERATED_CLUSTER_COUNT 3
 #define GENERATED_CLUSTERS                                                                                                         \
     {                                                                                                                              \
         {                                                                                                                          \
@@ -94,6 +175,9 @@
               3,                                                                                                                   \
               ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
               chipFuncArrayLevelControlServer }, /* Endpoint: 1, Cluster: Level Control (server) */                                \
+            {                                                                                                                      \
+                0x0028, ZAP_ATTRIBUTE_INDEX(4), 12, 254, ZAP_CLUSTER_MASK(SERVER), NULL                                            \
+            }, /* Endpoint: 1, Cluster: Basic (server) */                                                                          \
     }
 
 #define ZAP_CLUSTER_INDEX(index) ((EmberAfCluster *) (&generatedClusters[index]))
@@ -101,17 +185,17 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 2, 6 },                                                                                            \
+        { ZAP_CLUSTER_INDEX(0), 3, 260 },                                                                                          \
     }
 
 // Largest attribute size is needed for various buffers
-#define ATTRIBUTE_LARGEST (2)
+#define ATTRIBUTE_LARGEST (64)
 
 // Total size of singleton attributes
-#define ATTRIBUTE_SINGLETONS_SIZE (0)
+#define ATTRIBUTE_SINGLETONS_SIZE (254)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (6)
+#define ATTRIBUTE_MAX_SIZE (260)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (1)
@@ -155,7 +239,7 @@
 
 // Array of EmberAfCommandMetadata structs.
 #define ZAP_COMMAND_MASK(mask) COMMAND_MASK_##mask
-#define EMBER_AF_GENERATED_COMMAND_COUNT (11)
+#define EMBER_AF_GENERATED_COMMAND_COUNT (14)
 #define GENERATED_COMMANDS                                                                                                         \
     {                                                                                                                              \
         { 0x0006, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) },     /* On/off (server): Off */                                        \
@@ -169,6 +253,9 @@
             { 0x0008, 0x05, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Level Control (server): MoveWithOnOff */                       \
             { 0x0008, 0x06, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Level Control (server): StepWithOnOff */                       \
             { 0x0008, 0x07, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Level Control (server): StopWithOnOff */                       \
+            { 0x0028, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Basic (server): StartUp */                                     \
+            { 0x0028, 0x01, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Basic (server): ShutDown */                                    \
+            { 0x0028, 0x02, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Basic (server): Leave */                                       \
     }
 
 // Array of EmberAfManufacturerCodeEntry structures for commands.
