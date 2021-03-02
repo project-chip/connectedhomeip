@@ -156,13 +156,9 @@ template("k32w_sdk") {
         "MBEDTLS_FREESCALE_FREERTOS_CALLOC_ALT=1",
         "gMainThreadStackSize_c=14048",
       ]
+    } else {
+      defines += [ "gMainThreadStackSize_c=6024" ]
     }
-    else {
-      defines += [
-        "gMainThreadStackSize_c=6024",
-      ]
-    }
-
 
     if (defined(invoker.defines)) {
       defines += invoker.defines
@@ -204,6 +200,8 @@ template("k32w_sdk") {
       "${k32w_sdk_root}/devices/K32W061/drivers/fsl_flash.c",
       "${k32w_sdk_root}/devices/K32W061/drivers/fsl_flexcomm.c",
       "${k32w_sdk_root}/devices/K32W061/drivers/fsl_gpio.c",
+      "${k32w_sdk_root}/devices/K32W061/drivers/fsl_i2c.c",
+      "${k32w_sdk_root}/devices/K32W061/drivers/fsl_i2c_freertos.c",
       "${k32w_sdk_root}/devices/K32W061/drivers/fsl_inputmux.c",
       "${k32w_sdk_root}/devices/K32W061/drivers/fsl_pint.c",
       "${k32w_sdk_root}/devices/K32W061/drivers/fsl_power.c",
@@ -213,8 +211,6 @@ template("k32w_sdk") {
       "${k32w_sdk_root}/devices/K32W061/drivers/fsl_spifi.c",
       "${k32w_sdk_root}/devices/K32W061/drivers/fsl_usart.c",
       "${k32w_sdk_root}/devices/K32W061/drivers/fsl_wtimer.c",
-      "${k32w_sdk_root}/devices/K32W061/drivers/fsl_i2c.c",
-      "${k32w_sdk_root}/devices/K32W061/drivers/fsl_i2c_freertos.c",
       "${k32w_sdk_root}/devices/K32W061/mcuxpresso/startup_k32w061.c",
       "${k32w_sdk_root}/devices/K32W061/system_K32W061.c",
       "${k32w_sdk_root}/devices/K32W061/utilities/debug_console/fsl_debug_console.c",
@@ -253,17 +249,15 @@ template("k32w_sdk") {
 
     if (with_se05x == 1) {
       sources += [
-        "${chip_root}/third_party/simw-top-mini/repo/demos/ksdk/common/boards/DK6/wireless_examples/chip/pin_mux.c",
         "${chip_root}/third_party/simw-top-mini/repo/demos/ksdk/common/boards/DK6/wireless_examples/chip/clock_config.c",
+        "${chip_root}/third_party/simw-top-mini/repo/demos/ksdk/common/boards/DK6/wireless_examples/chip/pin_mux.c",
       ]
-    }
-    else {
+    } else {
       sources += [
         "${k32w_sdk_root}/boards/k32w061dk6/wireless_examples/openthread/enablement/clock_config.c",
         "${k32w_sdk_root}/boards/k32w061dk6/wireless_examples/openthread/enablement/pin_mux.c",
       ]
     }
-
 
     if (!defined(public_deps)) {
       public_deps = []

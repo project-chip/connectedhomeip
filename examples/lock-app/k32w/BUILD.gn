@@ -71,12 +71,12 @@ k32w_executable("lock_app") {
 
   deps = [
     ":sdk",
-    "${chip_root}/src/crypto",
-    "${chip_root}/third_party/simw-top-mini:se05x",
     "${chip_root}/examples/common/QRCode",
     "${chip_root}/examples/lock-app/lock-common",
+    "${chip_root}/src/crypto",
     "${chip_root}/src/lib",
     "${chip_root}/third_party/mbedtls:mbedtls",
+    "${chip_root}/third_party/simw-top-mini:se05x",
     "${k32w_platform_dir}/app/support:freertos_mbedtls_utils",
     "${openthread_root}:libopenthread-cli-ftd",
     "${openthread_root}:libopenthread-ftd",

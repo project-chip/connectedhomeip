@@ -34,10 +34,9 @@ buildconfig_header("crypto_buildconfig") {
     "CHIP_WITH_OPENSSL=${chip_crypto_openssl}",
   ]
 
-  if(with_se05x == 1){
+  if (with_se05x == 1) {
     defines += [ "CHIP_CRYPTO_HSM=1" ]
-  }
-  else {
+  } else {
     defines += [ "CHIP_CRYPTO_HSM=0" ]
   }
 }
@@ -85,7 +84,7 @@ static_library("crypto") {
     assert(false, "Invalid CHIP crypto")
   }
 
-  if(with_se05x == 1){
+  if (with_se05x == 1) {
     sources += [ "hsm/nxp/CHIPCryptoPALHsm_SE05X.cpp" ]
     public_deps += [ "${chip_root}/third_party/simw-top-mini:se05x" ]
     public_configs += [ "${chip_root}/third_party/simw-top-mini:se05x_config" ]
