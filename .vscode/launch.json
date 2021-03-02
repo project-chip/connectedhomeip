@@ -68,7 +68,7 @@
             "name": "LightingApp (Linux)",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/out/lighting-app/chip-tool-server",
+            "program": "${workspaceFolder}/out/lighting-app/chip-lighting-app",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

@@ -29,7 +29,7 @@ config("includes") {
   ]
 }
 
-executable("chip-tool-server") {
+executable("chip-lighting-app") {
   sources = [
     "LightingManager.cpp",
     "Options.cpp",
@@ -58,5 +58,5 @@ executable("chip-tool-server") {
 }
 
 group("linux") {
-  deps = [ ":chip-tool-server" ]
+  deps = [ ":chip-lighting-app" ]
 }

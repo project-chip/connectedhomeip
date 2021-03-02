@@ -28,7 +28,7 @@ config("includes") {
   ]
 }
 
-executable("all-clusters-server") {
+executable("chip-all-clusters-app") {
   sources = [ "main.cpp" ]
 
   if (is_debug) {
@@ -48,5 +48,5 @@ executable("all-clusters-server") {
 }
 
 group("linux") {
-  deps = [ ":all-clusters-server" ]
+  deps = [ ":chip-all-clusters-app" ]
 }

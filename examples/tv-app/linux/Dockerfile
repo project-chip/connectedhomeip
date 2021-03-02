@@ -17,7 +17,7 @@
 
 from generic_node_image
 RUN apt-get install -y libglib2.0
-COPY out/debug/chip-tool-tv-server /usr/bin/
+COPY out/debug/chip-tv-app /usr/bin/
 COPY entrypoint.sh /
 
 ENTRYPOINT ["/entrypoint.sh", "server"]
