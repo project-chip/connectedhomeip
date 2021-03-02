@@ -1672,6 +1672,117 @@ chip::System::PacketBufferHandle encodeMediaPlaybackClusterReadClusterRevisionAt
                                                                                         chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
+| Cluster NetworkCommissioning                                        | 0xAAAA |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * AddThreadNetwork                                                  |   0x06 |
+| * AddWiFiNetwork                                                    |   0x02 |
+| * DisableNetwork                                                    |   0x0E |
+| * EnableNetwork                                                     |   0x0C |
+| * GetLastNetworkCommissioningResult                                 |   0x10 |
+| * RemoveNetwork                                                     |   0x0A |
+| * ScanNetworks                                                      |   0x00 |
+| * UpdateThreadNetwork                                               |   0x08 |
+| * UpdateWiFiNetwork                                                 |   0x04 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/**
+ * @brief
+ *    Encode an AddThreadNetwork command for Network Commissioning server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeNetworkCommissioningClusterAddThreadNetworkCommand(uint8_t seqNum,
+                                                                                          chip::EndpointId destinationEndpoint,
+                                                                                          char * operationalDataset,
+                                                                                          uint64_t breadcrumb, uint32_t timeoutMs);
+
+/**
+ * @brief
+ *    Encode an AddWiFiNetwork command for Network Commissioning server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeNetworkCommissioningClusterAddWiFiNetworkCommand(uint8_t seqNum,
+                                                                                        chip::EndpointId destinationEndpoint,
+                                                                                        char * ssid, char * credentials,
+                                                                                        uint64_t breadcrumb, uint32_t timeoutMs);
+
+/**
+ * @brief
+ *    Encode an DisableNetwork command for Network Commissioning server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeNetworkCommissioningClusterDisableNetworkCommand(uint8_t seqNum,
+                                                                                        chip::EndpointId destinationEndpoint,
+                                                                                        char * networkID, uint64_t breadcrumb,
+                                                                                        uint32_t timeoutMs);
+
+/**
+ * @brief
+ *    Encode an EnableNetwork command for Network Commissioning server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeNetworkCommissioningClusterEnableNetworkCommand(uint8_t seqNum,
+                                                                                       chip::EndpointId destinationEndpoint,
+                                                                                       char * networkID, uint64_t breadcrumb,
+                                                                                       uint32_t timeoutMs);
+
+/**
+ * @brief
+ *    Encode an GetLastNetworkCommissioningResult command for Network Commissioning server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeNetworkCommissioningClusterGetLastNetworkCommissioningResultCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                          uint32_t timeoutMs);
+
+/**
+ * @brief
+ *    Encode an RemoveNetwork command for Network Commissioning server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeNetworkCommissioningClusterRemoveNetworkCommand(uint8_t seqNum,
+                                                                                       chip::EndpointId destinationEndpoint,
+                                                                                       char * networkID, uint64_t breadcrumb,
+                                                                                       uint32_t timeoutMs);
+
+/**
+ * @brief
+ *    Encode an ScanNetworks command for Network Commissioning server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeNetworkCommissioningClusterScanNetworksCommand(uint8_t seqNum,
+                                                                                      chip::EndpointId destinationEndpoint,
+                                                                                      char * ssid, uint64_t breadcrumb,
+                                                                                      uint32_t timeoutMs);
+
+/**
+ * @brief
+ *    Encode an UpdateThreadNetwork command for Network Commissioning server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeNetworkCommissioningClusterUpdateThreadNetworkCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                            char * operationalDataset, uint64_t breadcrumb, uint32_t timeoutMs);
+
+/**
+ * @brief
+ *    Encode an UpdateWiFiNetwork command for Network Commissioning server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeNetworkCommissioningClusterUpdateWiFiNetworkCommand(uint8_t seqNum,
+                                                                                           chip::EndpointId destinationEndpoint,
+                                                                                           char * ssid, char * credentials,
+                                                                                           uint64_t breadcrumb, uint32_t timeoutMs);
+
+/**
+ * @brief
+ *    Encode a Network Commissioning server discover command into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeNetworkCommissioningClusterDiscoverAttributes(uint8_t seqNum,
+                                                                                     chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Network Commissioning server read command for the cluster revision attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeNetworkCommissioningClusterReadClusterRevisionAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/*----------------------------------------------------------------------------*\
 | Cluster OnOff                                                       | 0x0006 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |

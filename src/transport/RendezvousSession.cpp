@@ -35,7 +35,7 @@
 #endif // CONFIG_NETWORK_LAYER_BLE
 
 static constexpr uint32_t kSpake2p_Iteration_Count = 100;
-static const char * kSpake2pKeyExchangeSalt        = "SPAKE2P Key Exchange Salt";
+static const char * kSpake2pKeyExchangeSalt        = "SPAKE2P Key Salt";
 
 using namespace chip::Inet;
 using namespace chip::System;
@@ -179,7 +179,9 @@ void RendezvousSession::OnSessionEstablished()
     {
         ChipLogError(Ble, "Missing node id in rendezvous parameters. Node ID is required until opcerts are implemented");
     }
-    mPairingSession.PeerConnection().SetPeerNodeId(mParams.GetRemoteNodeId().ValueOr(kUndefinedNodeId));
+
+    const auto defaultPeerNodeId = mParams.IsController() ? kTestDeviceNodeId : kTestControllerNodeId;
+    mPairingSession.PeerConnection().SetPeerNodeId(mParams.GetRemoteNodeId().ValueOr(defaultPeerNodeId));
 
     CHIP_ERROR err = mSecureSessionMgr->NewPairing(
         Optional<Transport::PeerAddress>::Value(mPairingSession.PeerConnection().GetPeerAddress()),

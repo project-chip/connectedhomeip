@@ -133,7 +133,7 @@ void AdminPairingTable::Reset()
 {
     for (size_t i = 0; i < CHIP_CONFIG_MAX_DEVICE_ADMINS; i++)
     {
-        return mStates[i].Reset();
+        mStates[i].Reset();
     }
 }
 

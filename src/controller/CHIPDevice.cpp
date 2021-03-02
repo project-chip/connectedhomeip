@@ -150,7 +150,7 @@ CHIP_ERROR Device::Serialize(SerializedDevice & output)
 
     CHIP_ZERO_AT(serializable);
 
-    memmove(&serializable.mOpsCreds, &mPairing, sizeof(mPairing));
+    serializable.mOpsCreds   = mPairing;
     serializable.mDeviceId   = Encoding::LittleEndian::HostSwap64(mDeviceId);
     serializable.mDevicePort = Encoding::LittleEndian::HostSwap16(mDevicePort);
     serializable.mAdminId    = Encoding::LittleEndian::HostSwap16(mAdminId);
@@ -196,7 +196,7 @@ CHIP_ERROR Device::Deserialize(const SerializedDevice & input)
         IPAddress::FromString(Uint8::to_const_char(serializable.mDeviceAddr), sizeof(serializable.mDeviceAddr) - 1, mDeviceAddr),
         error = CHIP_ERROR_INVALID_ADDRESS);
 
-    memmove(&mPairing, &serializable.mOpsCreds, sizeof(mPairing));
+    mPairing    = serializable.mOpsCreds;
     mDeviceId   = Encoding::LittleEndian::HostSwap64(serializable.mDeviceId);
     mDevicePort = Encoding::LittleEndian::HostSwap16(serializable.mDevicePort);
     mAdminId    = Encoding::LittleEndian::HostSwap16(serializable.mAdminId);

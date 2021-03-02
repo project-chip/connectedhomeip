@@ -61,6 +61,9 @@ jobs:
               run:
                   scripts/examples/gn_build_example.sh examples/all-clusters-app/linux
                   out/all_clusters_debug chip_bypass_rendezvous=true
+            - name: Build example Standalone Bridge
+              run:
+                  scripts/examples/gn_build_example.sh examples/bridge-app/linux out/bridge_debug
             - name: Binary artifact suffix
               id: outsuffix
               uses: haya14busa/action-cond@v1.0.0
@@ -75,6 +78,8 @@ jobs:
                       ${{ env.BUILD_TYPE }}-example-build-${{
                       steps.outsuffix.outputs.value }}
                   path: |
+                      out/all_clusters_debug/all-clusters-server
+                      out/bridge_debug/bridge-app-server
                       out/chip_tool_debug/chip-tool
                       out/shell_debug/chip-shell
             - name: Remove third_party binaries for CodeQL Analysis

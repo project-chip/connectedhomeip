@@ -27,7 +27,7 @@ config("includes") {
   ]
 }
 
-executable("bridge-app-server") {
+executable("chip-bridge-app") {
   sources = [
     "LightingManager.cpp",
     "Options.cpp",
@@ -52,5 +52,5 @@ executable("bridge-app-server") {
 }
 
 group("linux") {
-  deps = [ ":bridge-app-server" ]
+  deps = [ ":chip-bridge-app" ]
 }

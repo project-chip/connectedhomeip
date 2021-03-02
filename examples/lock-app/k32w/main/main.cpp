@@ -75,10 +75,6 @@ extern "C" void main_task(void const * argument)
 
     K32W_LOG("Welcome to NXP ELock Demo App");
 
-    /* Using OT Heap is deprecated so use instead the FreeRTOS
-     * allocation system - which is also thread-safe */
-    otHeapSetCAllocFree(pvPortCallocRtos, vPortFree);
-
     /* Mbedtls Threading support is needed because both
      * Thread and Weave tasks are using it */
     freertos_mbedtls_mutex_init();

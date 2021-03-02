@@ -64,8 +64,8 @@ void SecurePairingWaitTest(nlTestSuite * inSuite, void * inContext)
 
     NL_TEST_ASSERT(inSuite, pairing.WaitForPairing(1234, 500, nullptr, 0, 0, &delegate) == CHIP_ERROR_INVALID_ARGUMENT);
     NL_TEST_ASSERT(inSuite,
-                   pairing.WaitForPairing(1234, 500, (const uint8_t *) "salt", 4, 0, nullptr) == CHIP_ERROR_INVALID_ARGUMENT);
-    NL_TEST_ASSERT(inSuite, pairing.WaitForPairing(1234, 500, (const uint8_t *) "salt", 4, 0, &delegate) == CHIP_NO_ERROR);
+                   pairing.WaitForPairing(1234, 500, (const uint8_t *) "saltSalt", 8, 0, nullptr) == CHIP_ERROR_INVALID_ARGUMENT);
+    NL_TEST_ASSERT(inSuite, pairing.WaitForPairing(1234, 500, (const uint8_t *) "saltSalt", 8, 0, &delegate) == CHIP_NO_ERROR);
 }
 
 void SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
@@ -98,7 +98,8 @@ void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, P
     delegateAccessory.peer    = &pairingCommissioner;
 
     NL_TEST_ASSERT(inSuite,
-                   pairingAccessory.WaitForPairing(1234, 500, (const uint8_t *) "salt", 4, 0, &delegateAccessory) == CHIP_NO_ERROR);
+                   pairingAccessory.WaitForPairing(1234, 500, (const uint8_t *) "saltSALT", 8, 0, &delegateAccessory) ==
+                       CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite,
                    pairingCommissioner.Pair(Transport::PeerAddress(Transport::Type::kBle), 1234, 0, &delegateCommissioner) ==
                        CHIP_NO_ERROR);

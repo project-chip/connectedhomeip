@@ -87,12 +87,9 @@ private:
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
     unsigned int mDelay;
 
-    enum
-    {
-        kNumThreads         = 16,
-        kLoopIterations     = 100000,
-        kMaxDelayIterations = 3
-    };
+    static constexpr int kNumThreads         = 16;
+    static constexpr int kLoopIterations     = 100000;
+    static constexpr int kMaxDelayIterations = 3;
 
     void Delay(volatile unsigned int & aAccumulator);
     static void * CheckConcurrencyThread(void * aContext);

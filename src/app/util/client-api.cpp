@@ -39,7 +39,7 @@
  ******************************************************************************/
 
 #include "client-api.h"
-#include "common.h"
+#include "app/util/common.h"
 #include "util.h"
 #include <stdarg.h>
 
