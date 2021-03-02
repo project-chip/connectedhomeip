@@ -171,7 +171,7 @@ limitations under the License.
     <name>Basic</name>
     <domain>General</domain>
     <description>Attributes for determining basic information about a device, and setting user device information such as location.</description>
-    <code>0x0000</code>
+    <code>0x0028</code>
     <define>BASIC_CLUSTER</define>
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
