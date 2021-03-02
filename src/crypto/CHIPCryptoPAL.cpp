@@ -21,7 +21,11 @@
  */
 
 #include "CHIPCryptoPAL.h"
+
+#if CHIP_CRYPTO_HSM
 #include "hsm/CHIPCryptoPALHsm.h"
+#endif
+
 #include <string.h>
 #include <support/CodeUtils.h>
 

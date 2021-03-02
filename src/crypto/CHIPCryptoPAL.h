@@ -30,7 +30,9 @@
 #include <core/CHIPError.h>
 #include <support/CodeUtils.h>
 
+#if CHIP_CRYPTO_HSM
 #include "hsm/CHIPCryptoPALHsm_config.h"
+#endif
 
 #include <stddef.h>
 #include <string.h>
