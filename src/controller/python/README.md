@@ -24,9 +24,9 @@ Follow [BUILDING.md](/docs/BUILDING.md) to setup CHIP on your platform.
 Genrally, once build dependencies are satisfied you can build the `python`
 target.
 
--  If you are on MacOS BigSur(11.x) set this export before running the script
-   `export MACOSX_DEPLOYMENT_TARGET=10.16`
-   to prevent ".whl is not a supported wheel on this platform." when trying to install it
+-   If you are on MacOS BigSur(11.x) set this export before running the script
+    `export MACOSX_DEPLOYMENT_TARGET=10.16` to prevent ".whl is not a supported
+    wheel on this platform." when trying to install it
 
 Use `scripts/build_python.sh` or run something equivalent to:
 
