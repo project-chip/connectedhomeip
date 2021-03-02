@@ -75,7 +75,21 @@ fi
 echo "Build $APP app for $TARGET_BOARD target with $TOOLCHAIN toolchain and $PROFILE profile"
 set -x
 pwd
+
+# Build and config directory setup
+BUILD_DIRECTORY="$APP"/mbed/build-"$TARGET_BOARD"/"$PROFILE"/
+MBED_CONFIG_PATH="$APP"/mbed/cmake_build/"$TARGET_BOARD"/develop/"$TOOLCHAIN"/
+
+# Create symlink to /opt/mbed-os directory
 ln -sfT $MBED_OS_PATH "${APP}/mbed/mbed-os"
+
+# Generate config file for selected target, toolchain and hardware
 mbed-tools configure -t "$TOOLCHAIN" -m "$TARGET_BOARD" -p "$APP"/mbed/
-cmake -S "$APP/mbed" -B "$APP"/mbed/build-"$TARGET_BOARD" -GNinja -DCMAKE_BUILD_TYPE="$PROFILE"
-cmake --build "$APP"/mbed/build-"$TARGET_BOARD"
+
+# Create output directory and copy config file there.
+mkdir -p "$BUILD_DIRECTORY"
+cp -f "$MBED_CONFIG_PATH"/mbed_config.cmake "$BUILD_DIRECTORY"/mbed_config.cmake
+
+# Build application
+cmake -S "$APP/mbed" -B "$BUILD_DIRECTORY" -GNinja -DCMAKE_BUILD_TYPE="$PROFILE"
+cmake --build "$BUILD_DIRECTORY"
