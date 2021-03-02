@@ -150,9 +150,10 @@ CHIP_ERROR Device::Serialize(SerializedDevice & output)
 
     CHIP_ZERO_AT(serializable);
 
-    serializable.mOpsCreds = mPairing;
-    serializable.mDeviceId = Encoding::LittleEndian::HostSwap64(mDeviceId);
-    serializable.mAdminId  = Encoding::LittleEndian::HostSwap16(mAdminId);
+    serializable.mOpsCreds   = mPairing;
+    serializable.mDeviceId   = Encoding::LittleEndian::HostSwap64(mDeviceId);
+    serializable.mDevicePort = Encoding::LittleEndian::HostSwap16(mDeviceUdpAddress.GetPort());
+    serializable.mAdminId    = Encoding::LittleEndian::HostSwap16(mAdminId);
     SuccessOrExit(error = Inet::GetInterfaceName(mDeviceUdpAddress.GetInterface(), Uint8::to_char(serializable.mInterfaceName),
                                                  sizeof(serializable.mInterfaceName)));
     static_assert(sizeof(serializable.mDeviceAddr) <= INET6_ADDRSTRLEN, "Size of device address must fit within INET6_ADDRSTRLEN");
