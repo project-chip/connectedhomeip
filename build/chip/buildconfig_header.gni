@@ -109,7 +109,7 @@ template("buildconfig_header") {
   gen_target_name = "gen_${target_name}"
 
   action(gen_target_name) {
-    script = "${build_root}/chip/write_buildconfig_header.py"
+    script = "${chip_root}/build/chip/write_buildconfig_header.py"
 
     if (defined(invoker.header_dir)) {
       header_file = "${invoker.header_dir}/${invoker.header}"
