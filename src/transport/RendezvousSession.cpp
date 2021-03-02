@@ -179,7 +179,9 @@ void RendezvousSession::OnSessionEstablished()
     {
         ChipLogError(Ble, "Missing node id in rendezvous parameters. Node ID is required until opcerts are implemented");
     }
-    mPairingSession.PeerConnection().SetPeerNodeId(mParams.GetRemoteNodeId().ValueOr(kUndefinedNodeId));
+
+    const auto defaultPeerNodeId = mParams.IsController() ? kTestDeviceNodeId : kTestControllerNodeId;
+    mPairingSession.PeerConnection().SetPeerNodeId(mParams.GetRemoteNodeId().ValueOr(defaultPeerNodeId));
 
     CHIP_ERROR err = mSecureSessionMgr->NewPairing(
         Optional<Transport::PeerAddress>::Value(mPairingSession.PeerConnection().GetPeerAddress()),
