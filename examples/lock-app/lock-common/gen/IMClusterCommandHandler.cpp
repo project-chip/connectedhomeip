@@ -31,6 +31,9 @@
 
 #include <app/InteractionModelEngine.h>
 
+// Currently we need some work to keep compatible with ember lib.
+#include <util/ember-compatibility-functions.h>
+
 namespace chip {
 namespace app {
 
@@ -39,17 +42,19 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
 {
     ChipLogDetail(Zcl, "Received Cluster Command: Cluster=%" PRIx16 " Command=%" PRIx8 " Endpoint=%" PRIx8, aClusterId, aCommandId,
                   aEndPointId);
+    Compatibility::SetupEmberAfObjects(apCommandObj, aClusterId, aCommandId, aEndPointId);
     switch (aClusterId)
     {
     case ZCL_ON_OFF_CLUSTER_ID:
         clusters::OnOff::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
-        return;
+        break;
     default:
         // Unrecognized cluster ID, error status will apply.
         // TODO: Encode response for Cluster not found
         ChipLogError(Zcl, "Unknown cluster %" PRIx16, aClusterId);
         break;
     }
+    Compatibility::ResetEmberAfObjects();
 }
 
 // Cluster specific command parsing

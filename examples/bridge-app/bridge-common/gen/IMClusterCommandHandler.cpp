@@ -31,6 +31,9 @@
 
 #include <app/InteractionModelEngine.h>
 
+// Currently we need some work to keep compatible with ember lib.
+#include <util/ember-compatibility-functions.h>
+
 namespace chip {
 namespace app {
 
@@ -39,23 +42,25 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
 {
     ChipLogDetail(Zcl, "Received Cluster Command: Cluster=%" PRIx16 " Command=%" PRIx8 " Endpoint=%" PRIx8, aClusterId, aCommandId,
                   aEndPointId);
+    Compatibility::SetupEmberAfObjects(apCommandObj, aClusterId, aCommandId, aEndPointId);
     switch (aClusterId)
     {
     case ZCL_BASIC_CLUSTER_ID:
         clusters::Basic::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
-        return;
+        break;
     case ZCL_LEVEL_CONTROL_CLUSTER_ID:
         clusters::LevelControl::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
-        return;
+        break;
     case ZCL_ON_OFF_CLUSTER_ID:
         clusters::OnOff::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
-        return;
+        break;
     default:
         // Unrecognized cluster ID, error status will apply.
         // TODO: Encode response for Cluster not found
         ChipLogError(Zcl, "Unknown cluster %" PRIx16, aClusterId);
         break;
     }
+    Compatibility::ResetEmberAfObjects();
 }
 
 // Cluster specific command parsing
@@ -122,7 +127,8 @@ void DispatchServerCommand(app::Command * command, CommandId commandId, Endpoint
                 }
                 if (TLVError != CHIP_NO_ERROR)
                 {
-                    // TODO: Report Error Here
+                    ChipLogProgress(Zcl, "Failed to decode TLV data with tag %" PRIx32 ": %" PRId32,
+                                    TLV::TagNumFromTag(dataTlv.GetTag()), TLVError);
                 }
             }
             OnMoveCommandCallback(command, endpointId, moveMode, rate, optionMask, optionOverride);
@@ -158,7 +164,8 @@ void DispatchServerCommand(app::Command * command, CommandId commandId, Endpoint
                 }
                 if (TLVError != CHIP_NO_ERROR)
                 {
-                    // TODO: Report Error Here
+                    ChipLogProgress(Zcl, "Failed to decode TLV data with tag %" PRIx32 ": %" PRId32,
+                                    TLV::TagNumFromTag(dataTlv.GetTag()), TLVError);
                 }
             }
             OnMoveToLevelCommandCallback(command, endpointId, level, transitionTime, optionMask, optionOverride);
@@ -186,7 +193,8 @@ void DispatchServerCommand(app::Command * command, CommandId commandId, Endpoint
                 }
                 if (TLVError != CHIP_NO_ERROR)
                 {
-                    // TODO: Report Error Here
+                    ChipLogProgress(Zcl, "Failed to decode TLV data with tag %" PRIx32 ": %" PRId32,
+                                    TLV::TagNumFromTag(dataTlv.GetTag()), TLVError);
                 }
             }
             OnMoveToLevelWithOnOffCommandCallback(command, endpointId, level, transitionTime);
@@ -214,7 +222,8 @@ void DispatchServerCommand(app::Command * command, CommandId commandId, Endpoint
                 }
                 if (TLVError != CHIP_NO_ERROR)
                 {
-                    // TODO: Report Error Here
+                    ChipLogProgress(Zcl, "Failed to decode TLV data with tag %" PRIx32 ": %" PRId32,
+                                    TLV::TagNumFromTag(dataTlv.GetTag()), TLVError);
                 }
             }
             OnMoveWithOnOffCommandCallback(command, endpointId, moveMode, rate);
@@ -254,7 +263,8 @@ void DispatchServerCommand(app::Command * command, CommandId commandId, Endpoint
                 }
                 if (TLVError != CHIP_NO_ERROR)
                 {
-                    // TODO: Report Error Here
+                    ChipLogProgress(Zcl, "Failed to decode TLV data with tag %" PRIx32 ": %" PRId32,
+                                    TLV::TagNumFromTag(dataTlv.GetTag()), TLVError);
                 }
             }
             OnStepCommandCallback(command, endpointId, stepMode, stepSize, transitionTime, optionMask, optionOverride);
@@ -286,7 +296,8 @@ void DispatchServerCommand(app::Command * command, CommandId commandId, Endpoint
                 }
                 if (TLVError != CHIP_NO_ERROR)
                 {
-                    // TODO: Report Error Here
+                    ChipLogProgress(Zcl, "Failed to decode TLV data with tag %" PRIx32 ": %" PRId32,
+                                    TLV::TagNumFromTag(dataTlv.GetTag()), TLVError);
                 }
             }
             OnStepWithOnOffCommandCallback(command, endpointId, stepMode, stepSize, transitionTime);
@@ -314,7 +325,8 @@ void DispatchServerCommand(app::Command * command, CommandId commandId, Endpoint
                 }
                 if (TLVError != CHIP_NO_ERROR)
                 {
-                    // TODO: Report Error Here
+                    ChipLogProgress(Zcl, "Failed to decode TLV data with tag %" PRIx32 ": %" PRId32,
+                                    TLV::TagNumFromTag(dataTlv.GetTag()), TLVError);
                 }
             }
             OnStopCommandCallback(command, endpointId, optionMask, optionOverride);

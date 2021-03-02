@@ -31,7 +31,7 @@ while ((TLVError = dataTlv.Next()) == CHIP_NO_ERROR)
   }
   if (TLVError != CHIP_NO_ERROR)
   {
-    // TODO: Report Error Here
+    ChipLogProgress(Zcl, "Failed to decode TLV data with tag %" PRIx32 ": %" PRId32, TLV::TagNumFromTag(dataTlv.GetTag()), TLVError);
   }
 }
 {{/if}}

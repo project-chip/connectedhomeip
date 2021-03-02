@@ -34,9 +34,7 @@ namespace {{asCamelCased name false}} {
 #if IM_HAVE_{{as_delimited_macro parent.name}}_CLUSTER_{{as_delimited_macro name}}_COMMAND
 void On{{asCamelCased name false}}CommandCallback(app::Command* command, EndpointId ZCLEndpointId{{#zcl_command_arguments}}, {{#if (isString type)}}const uint8_t * {{asSymbol label}}{{else}}{{asUnderlyingZclType type}} {{asSymbol label}}{{/if}}{{/zcl_command_arguments}})
 {
-    Compatibility::SetupEmberAfObjects(command, ZCL_{{asDelimitedMacro parent.define}}_ID, ZCL_{{asDelimitedMacro name}}_COMMAND_ID, ZCLEndpointId);
     emberAf{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback({{#zcl_command_arguments}}{{asSymbol label}}{{#unless (isLastElement index count)}}, {{/unless}}{{/zcl_command_arguments}});
-    Compatibility::ResetEmberAfObjects();
 }
 #endif
 

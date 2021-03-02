@@ -51,7 +51,7 @@ source_set("lighting-common") {
   if (chip_app_use_interaction_model) {
     sources += [
       "${chip_root}/src/app/clusters/im-compatibility/compatibility-command-handlers.cpp",
-      "${chip_root}/src/app/clusters/im-compatibility/ember-compatibility-functions.cpp",
+      "${chip_root}/src/app/util/ember-compatibility-functions.cpp",
       "gen/IMClusterCommandHandler.cpp",
     ]
   }
