@@ -605,6 +605,279 @@ private:
 
 @end
 
+@interface CHIPNetworkCommissioning ()
+@property (readonly) Controller::NetworkCommissioningCluster cppCluster;
+@end
+
+@implementation CHIPNetworkCommissioning
+
+- (Controller::ClusterBase *)getCluster
+{
+    return &_cppCluster;
+}
+
+- (void)addThreadNetwork:(char *)operationalDataset
+              breadcrumb:(uint64_t)breadcrumb
+               timeoutMs:(uint32_t)timeoutMs
+       completionHandler:(ResponseHandler)completionHandler
+{
+    CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallbackBridge * onSuccess
+        = new CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIP_ERROR err
+        = self.cppCluster.AddThreadNetwork(onSuccess->Cancel(), onFailure->Cancel(), operationalDataset, breadcrumb, timeoutMs);
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+- (void)addWiFiNetwork:(char *)ssid
+           credentials:(char *)credentials
+            breadcrumb:(uint64_t)breadcrumb
+             timeoutMs:(uint32_t)timeoutMs
+     completionHandler:(ResponseHandler)completionHandler
+{
+    CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallbackBridge * onSuccess
+        = new CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIP_ERROR err
+        = self.cppCluster.AddWiFiNetwork(onSuccess->Cancel(), onFailure->Cancel(), ssid, credentials, breadcrumb, timeoutMs);
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+- (void)disableNetwork:(char *)networkID
+            breadcrumb:(uint64_t)breadcrumb
+             timeoutMs:(uint32_t)timeoutMs
+     completionHandler:(ResponseHandler)completionHandler
+{
+    CHIPNetworkCommissioningClusterDisableNetworkResponseCallbackBridge * onSuccess
+        = new CHIPNetworkCommissioningClusterDisableNetworkResponseCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIP_ERROR err = self.cppCluster.DisableNetwork(onSuccess->Cancel(), onFailure->Cancel(), networkID, breadcrumb, timeoutMs);
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+- (void)enableNetwork:(char *)networkID
+           breadcrumb:(uint64_t)breadcrumb
+            timeoutMs:(uint32_t)timeoutMs
+    completionHandler:(ResponseHandler)completionHandler
+{
+    CHIPNetworkCommissioningClusterEnableNetworkResponseCallbackBridge * onSuccess
+        = new CHIPNetworkCommissioningClusterEnableNetworkResponseCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIP_ERROR err = self.cppCluster.EnableNetwork(onSuccess->Cancel(), onFailure->Cancel(), networkID, breadcrumb, timeoutMs);
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+- (void)getLastNetworkCommissioningResult:(uint32_t)timeoutMs completionHandler:(ResponseHandler)completionHandler
+{
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIP_ERROR err = self.cppCluster.GetLastNetworkCommissioningResult(onSuccess->Cancel(), onFailure->Cancel(), timeoutMs);
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+- (void)removeNetwork:(char *)networkID
+           breadcrumb:(uint64_t)breadcrumb
+            timeoutMs:(uint32_t)timeoutMs
+    completionHandler:(ResponseHandler)completionHandler
+{
+    CHIPNetworkCommissioningClusterRemoveNetworkResponseCallbackBridge * onSuccess
+        = new CHIPNetworkCommissioningClusterRemoveNetworkResponseCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIP_ERROR err = self.cppCluster.RemoveNetwork(onSuccess->Cancel(), onFailure->Cancel(), networkID, breadcrumb, timeoutMs);
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+- (void)scanNetworks:(char *)ssid
+           breadcrumb:(uint64_t)breadcrumb
+            timeoutMs:(uint32_t)timeoutMs
+    completionHandler:(ResponseHandler)completionHandler
+{
+    CHIPNetworkCommissioningClusterScanNetworksResponseCallbackBridge * onSuccess
+        = new CHIPNetworkCommissioningClusterScanNetworksResponseCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIP_ERROR err = self.cppCluster.ScanNetworks(onSuccess->Cancel(), onFailure->Cancel(), ssid, breadcrumb, timeoutMs);
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+- (void)updateThreadNetwork:(char *)operationalDataset
+                 breadcrumb:(uint64_t)breadcrumb
+                  timeoutMs:(uint32_t)timeoutMs
+          completionHandler:(ResponseHandler)completionHandler
+{
+    CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallbackBridge * onSuccess
+        = new CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIP_ERROR err
+        = self.cppCluster.UpdateThreadNetwork(onSuccess->Cancel(), onFailure->Cancel(), operationalDataset, breadcrumb, timeoutMs);
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+- (void)updateWiFiNetwork:(char *)ssid
+              credentials:(char *)credentials
+               breadcrumb:(uint64_t)breadcrumb
+                timeoutMs:(uint32_t)timeoutMs
+        completionHandler:(ResponseHandler)completionHandler
+{
+    CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallbackBridge * onSuccess
+        = new CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIP_ERROR err
+        = self.cppCluster.UpdateWiFiNetwork(onSuccess->Cancel(), onFailure->Cancel(), ssid, credentials, breadcrumb, timeoutMs);
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler
+{
+    CHIPInt16uAttributeCallbackBridge * onSuccess = new CHIPInt16uAttributeCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIP_ERROR err = self.cppCluster.ReadAttributeClusterRevision(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+@end
+
 @interface CHIPOnOff ()
 @property (readonly) Controller::OnOffCluster cppCluster;
 @end

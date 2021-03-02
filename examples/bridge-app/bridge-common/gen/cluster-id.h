@@ -236,6 +236,9 @@
 // Definitions for cluster: IAS WD
 #define ZCL_IAS_WD_CLUSTER_ID (0x0502)
 
+// Definitions for cluster: Application Basic
+#define ZCL_APPLICATION_BASIC_CLUSTER_ID (0x050D)
+
 // Definitions for cluster: Generic Tunnel
 #define ZCL_GENERIC_TUNNEL_CLUSTER_ID (0x0600)
 
@@ -343,9 +346,6 @@
 
 // Definitions for cluster: Content Launch
 #define ZCL_CONTENT_LAUNCH_CLUSTER_ID (0xF002)
-
-// Definitions for cluster: Application Basic
-#define ZCL_APPLICATION_BASIC_CLUSTER_ID (0xF003)
 
 // Definitions for cluster: Sample Mfg Specific Cluster
 #define ZCL_SAMPLE_MFG_SPECIFIC_CLUSTER_ID (0xFC00)
