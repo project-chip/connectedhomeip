@@ -4,7 +4,11 @@
         "--cap-add=SYS_PTRACE",
         "--security-opt",
         "seccomp=unconfined",
-        "--network=host"
+        "--network=host",
+        "-v",
+        "/dev/bus/usb:/dev/bus/usb:ro",
+        "--device-cgroup-rule=a 189:* rmw",
+        "--add-host=host.docker.internal:host-gateway"
     ],
     "mounts": [
         "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
