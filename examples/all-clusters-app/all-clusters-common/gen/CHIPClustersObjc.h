@@ -43,6 +43,23 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
+ * Cluster Application Basic
+ *
+ */
+@interface CHIPApplicationBasic : CHIPCluster
+
+- (void)readAttributeVendorName:(ResponseHandler)completionHandler;
+- (void)readAttributeVendorId:(ResponseHandler)completionHandler;
+- (void)readAttributeApplicationName:(ResponseHandler)completionHandler;
+- (void)readAttributeProductId:(ResponseHandler)completionHandler;
+- (void)readAttributeApplicationId:(ResponseHandler)completionHandler;
+- (void)readAttributeCatalogVendorId:(ResponseHandler)completionHandler;
+- (void)readAttributeApplicationSatus:(ResponseHandler)completionHandler;
+- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
+
+@end
+
+/**
  * Cluster Barrier Control
  *
  */

@@ -127,7 +127,7 @@ void ServerBase::Shutdown()
     {
         if (mEndpoints[i].udp != nullptr)
         {
-            mEndpoints[i].udp->Close();
+            mEndpoints[i].udp->Free();
             mEndpoints[i].udp = nullptr;
         }
     }

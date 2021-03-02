@@ -126,8 +126,6 @@ void initOtSysEFR(void)
     efr32RadioInit();
     efr32AlarmInit();
     efr32MiscInit();
-
-    otHeapSetCAllocFree(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
 }
 
 void halInitChipSpecific(void)

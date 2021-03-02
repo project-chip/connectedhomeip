@@ -68,11 +68,12 @@ chip::Controller::ScriptDevicePairingDelegate sPairingDelegate;
 // NOTE: Remote device ID is in sync with the echo server device id
 // At some point, we may want to add an option to connect to a device without
 // knowing its id, because the ID can be learned on the first response that is received.
-chip::NodeId kLocalDeviceId  = chip::kTestControllerNodeId;
-chip::NodeId kRemoteDeviceId = chip::kTestDeviceNodeId;
+chip::NodeId kDefaultLocalDeviceId = chip::kTestControllerNodeId;
+chip::NodeId kRemoteDeviceId       = chip::kTestDeviceNodeId;
 
 extern "C" {
-CHIP_ERROR pychip_DeviceController_NewDeviceController(chip::Controller::DeviceCommissioner ** outDevCtrl);
+CHIP_ERROR pychip_DeviceController_NewDeviceController(chip::Controller::DeviceCommissioner ** outDevCtrl,
+                                                       chip::NodeId localDeviceId);
 CHIP_ERROR pychip_DeviceController_DeleteDeviceController(chip::Controller::DeviceCommissioner * devCtrl);
 
 // Rendezvous
@@ -106,14 +107,19 @@ CHIP_ERROR pychip_GetDeviceByNodeId(chip::Controller::DeviceCommissioner * devCt
                                     chip::Controller::Device ** device);
 }
 
-CHIP_ERROR pychip_DeviceController_NewDeviceController(chip::Controller::DeviceCommissioner ** outDevCtrl)
+CHIP_ERROR pychip_DeviceController_NewDeviceController(chip::Controller::DeviceCommissioner ** outDevCtrl,
+                                                       chip::NodeId localDeviceId)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     *outDevCtrl = new chip::Controller::DeviceCommissioner();
     VerifyOrExit(*outDevCtrl != NULL, err = CHIP_ERROR_NO_MEMORY);
 
-    SuccessOrExit(err = (*outDevCtrl)->Init(kLocalDeviceId, &sStorageDelegate, &sPairingDelegate));
+    if (localDeviceId == chip::kUndefinedNodeId)
+    {
+        localDeviceId = kDefaultLocalDeviceId;
+    }
+    SuccessOrExit(err = (*outDevCtrl)->Init(localDeviceId, &sStorageDelegate, &sPairingDelegate));
     SuccessOrExit(err = (*outDevCtrl)->ServiceEvents());
 
 exit:

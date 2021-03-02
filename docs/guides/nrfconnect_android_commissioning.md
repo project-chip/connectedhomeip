@@ -172,7 +172,7 @@ To form a Thread network, complete the following steps:
 1.  Create an IPv6 network for the OpenThread Border Router (OTBR) container in
     Docker:
 
-        $ docker network create --ipv6 --subnet 2001:db8:1::/64 -o com.docker.network.bridge.name=otbr0 otbr
+        $ docker network create --ipv6 --subnet fd11:db8:1::/64 -o com.docker.network.bridge.name=otbr0 otbr
 
 2.  Start the OTBR container using the following command. In the last line,
     provide the device node name of the nRF52840 kit that is running the RCP
@@ -194,13 +194,13 @@ To form a Thread network, complete the following steps:
 
          $ docker network inspect otbr | grep IPv6Address
 
-    After checking the output, the address will most likely be `2001:db8:1::2`.
+    After checking the output, the address will most likely be `fd11:db8:1::2`.
 
 8.  To ensure that packets targeting Thread network nodes are routed through the
-    OTBR container in Docker, run the following command, with _2001:db8:1::2_
+    OTBR container in Docker, run the following command, with _fd11:db8:1::2_
     replaced with the actual address obtained in the previous step:
 
-        $ sudo ip -6 route add fd11:22::/64 dev otbr0 via 2001:db8:1::2
+        $ sudo ip -6 route add fd11:22::/64 dev otbr0 via fd11:db8:1::2
 
 <a name="configuring-hotspot"></a>
 
@@ -220,7 +220,7 @@ following steps:
 5.  Run the following command to assign a well-known IPv6 address to the hotspot
     interface:
 
-        $ nmcli connection modify Hotspot ipv6.addresses 2001:db8:2::1/64
+        $ nmcli connection modify Hotspot ipv6.addresses fd11:db8:2::1/64
 
 6.  Run the following command to install Routing Advertisement Daemon (radvd),
     which enables the IPv6 auto-configuration of devices that connect to the
@@ -241,7 +241,7 @@ following steps:
           MaxRtrAdvInterval 4;
           AdvSendAdvert on;
           AdvManagedFlag on;
-          prefix 2001:db8:2::/64
+          prefix fd11:db8:2::/64
           {
              AdvValidLifetime 14300;
              AdvPreferredLifetime 14200;

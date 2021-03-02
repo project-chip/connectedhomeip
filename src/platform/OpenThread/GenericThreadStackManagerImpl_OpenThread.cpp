@@ -45,6 +45,7 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 #include <support/CodeUtils.h>
+#include <support/ReturnMacros.h>
 #include <support/logging/CHIPLogging.h>
 
 extern "C" void otSysProcessDrivers(otInstance * aInstance);
@@ -258,6 +259,33 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetThreadProvis
     // Set the dataset as the active dataset for the node.
     Impl()->LockThreadStack();
     otErr = otDatasetSetActive(mOTInst, &newDataset);
+    Impl()->UnlockThreadStack();
+
+    // post an event alerting other subsystems about change in provisioning state
+    ChipDeviceEvent event;
+    event.Type                                           = DeviceEventType::kServiceProvisioningChange;
+    event.ServiceProvisioningChange.IsServiceProvisioned = true;
+    PlatformMgr().PostEvent(&event);
+
+    return MapOpenThreadError(otErr);
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetThreadProvision(const uint8_t * operationalDataset,
+                                                                                    size_t operationalDatasetLen)
+{
+    otError otErr = OT_ERROR_FAILED;
+    otOperationalDatasetTlvs datasetTlv;
+
+    VerifyOrReturnError(operationalDatasetLen <= sizeof(datasetTlv.mTlvs), CHIP_ERROR_MESSAGE_TOO_LONG);
+    // A compile time check to avoid misbehavior if the openthread implementation changed over time.
+    static_assert(sizeof(datasetTlv.mTlvs) <= UINT8_MAX);
+    memcpy(datasetTlv.mTlvs, operationalDataset, operationalDatasetLen);
+    datasetTlv.mLength = static_cast<uint8_t>(operationalDatasetLen);
+
+    // Set the dataset as the active dataset for the node.
+    Impl()->LockThreadStack();
+    otErr = otDatasetSetActiveTlvs(mOTInst, &datasetTlv);
     Impl()->UnlockThreadStack();
 
     // post an event alerting other subsystems about change in provisioning state

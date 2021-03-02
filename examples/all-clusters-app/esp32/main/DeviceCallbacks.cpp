@@ -32,6 +32,7 @@
 #include "esp_log.h"
 #include "gen/attribute-id.h"
 #include "gen/cluster-id.h"
+#include <app/server/Mdns.h>
 #include <app/util/basic-types.h>
 #include <app/util/util.h>
 #include <lib/mdns/Advertiser.h>
@@ -57,6 +58,17 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
 
     case DeviceEventType::kSessionEstablished:
         OnSessionEstablished(event);
+        break;
+    case DeviceEventType::kInterfaceIpAddressChanged:
+        if ((event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV4_Assigned) ||
+            (event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV6_Assigned))
+        {
+            // MDNS server restart on any ip assignment: if link local ipv6 is configured, that
+            // will not trigger a 'internet connectivity change' as there is no internet
+            // connectivity. MDNS still wants to refresh its listening interfaces to include the
+            // newly selected address.
+            chip::app::Mdns::StartServer();
+        }
         break;
     }
 
@@ -93,11 +105,7 @@ void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event
     {
         ESP_LOGI(TAG, "Server ready at: %s:%d", event->InternetConnectivityChange.address, CHIP_PORT);
         wifiLED.Set(true);
-
-        if (chip::Mdns::ServiceAdvertiser::Instance().Start(&DeviceLayer::InetLayer, chip::Mdns::kMdnsPort) != CHIP_NO_ERROR)
-        {
-            ESP_LOGE(TAG, "Failed to start mDNS advertisement");
-        }
+        chip::app::Mdns::StartServer();
     }
     else if (event->InternetConnectivityChange.IPv4 == kConnectivity_Lost)
     {
@@ -107,10 +115,7 @@ void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event
     if (event->InternetConnectivityChange.IPv6 == kConnectivity_Established)
     {
         ESP_LOGI(TAG, "IPv6 Server ready...");
-        if (chip::Mdns::ServiceAdvertiser::Instance().Start(&DeviceLayer::InetLayer, chip::Mdns::kMdnsPort) != CHIP_NO_ERROR)
-        {
-            ESP_LOGE(TAG, "Failed to start mDNS advertisement");
-        }
+        chip::app::Mdns::StartServer();
     }
     else if (event->InternetConnectivityChange.IPv6 == kConnectivity_Lost)
     {

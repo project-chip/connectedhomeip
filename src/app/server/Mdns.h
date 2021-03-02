@@ -1,8 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2020 Google LLC.
- *    All rights reserved.
+ *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,20 +15,23 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *          Platform-specific configuration overrides for the CHIP BLE
- *          Layer on K32W platforms using the NXP SDK.
- *
- */
-
 #pragma once
 
-// ==================== Platform Adaptations ====================
+#include <core/CHIPError.h>
 
-#define BLE_CONNECTION_OBJECT uint8_t
-#define BLE_CONNECTION_UNINITIALIZED ((uint8_t) 0xFF)
+namespace chip {
+namespace app {
+namespace Mdns {
 
-// ========== Platform-specific Configuration Overrides =========
+/// Set MDNS operational advertisement
+CHIP_ERROR AdvertiseOperational();
 
-/* none so far */
+/// Set MDNS commisioning advertisement
+CHIP_ERROR AdvertiseCommisioning();
+
+/// (Re-)starts the minmdns server
+void StartServer();
+
+} // namespace Mdns
+} // namespace app
+} // namespace chip
