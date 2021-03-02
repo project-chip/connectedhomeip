@@ -65,55 +65,64 @@
  * @brief
  *    Encode a Application Basic server discover command into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeApplicationBasicClusterDiscoverAttributes(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeApplicationBasicClusterDiscoverAttributes(uint8_t seqNum,
+                                                                                 chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a Application Basic server read command for the vendor name attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeApplicationBasicClusterReadVendorNameAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeApplicationBasicClusterReadVendorNameAttribute(uint8_t seqNum,
+                                                                                      chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a Application Basic server read command for the vendor id attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeApplicationBasicClusterReadVendorIdAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeApplicationBasicClusterReadVendorIdAttribute(uint8_t seqNum,
+                                                                                    chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a Application Basic server read command for the application name attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeApplicationBasicClusterReadApplicationNameAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeApplicationBasicClusterReadApplicationNameAttribute(uint8_t seqNum,
+                                                                                           chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a Application Basic server read command for the product id attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeApplicationBasicClusterReadProductIdAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeApplicationBasicClusterReadProductIdAttribute(uint8_t seqNum,
+                                                                                     chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a Application Basic server read command for the application id attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeApplicationBasicClusterReadApplicationIdAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeApplicationBasicClusterReadApplicationIdAttribute(uint8_t seqNum,
+                                                                                         chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a Application Basic server read command for the catalog vendor id attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeApplicationBasicClusterReadCatalogVendorIdAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeApplicationBasicClusterReadCatalogVendorIdAttribute(uint8_t seqNum,
+                                                                                           chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a Application Basic server read command for the application satus attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeApplicationBasicClusterReadApplicationSatusAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeApplicationBasicClusterReadApplicationSatusAttribute(uint8_t seqNum,
+                                                                                            chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a Application Basic server read command for the cluster revision attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeApplicationBasicClusterReadClusterRevisionAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeApplicationBasicClusterReadClusterRevisionAttribute(uint8_t seqNum,
+                                                                                           chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
 | Cluster BarrierControl                                              | 0x0103 |
@@ -134,49 +143,58 @@ chip::System::PacketBufferHandle encodeApplicationBasicClusterReadClusterRevisio
  * @brief
  *    Encode an BarrierControlGoToPercent command for Barrier Control server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeBarrierControlClusterBarrierControlGoToPercentCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint8_t percentOpen);
+chip::System::PacketBufferHandle encodeBarrierControlClusterBarrierControlGoToPercentCommand(uint8_t seqNum,
+                                                                                             chip::EndpointId destinationEndpoint,
+                                                                                             uint8_t percentOpen);
 
 /**
  * @brief
  *    Encode an BarrierControlStop command for Barrier Control server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeBarrierControlClusterBarrierControlStopCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeBarrierControlClusterBarrierControlStopCommand(uint8_t seqNum,
+                                                                                      chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a Barrier Control server discover command into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeBarrierControlClusterDiscoverAttributes(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeBarrierControlClusterDiscoverAttributes(uint8_t seqNum,
+                                                                               chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a Barrier Control server read command for the barrier moving state attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeBarrierControlClusterReadBarrierMovingStateAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeBarrierControlClusterReadBarrierMovingStateAttribute(uint8_t seqNum,
+                                                                                            chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a Barrier Control server read command for the barrier safety status attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeBarrierControlClusterReadBarrierSafetyStatusAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeBarrierControlClusterReadBarrierSafetyStatusAttribute(uint8_t seqNum,
+                                                                                             chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a Barrier Control server read command for the barrier capabilities attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeBarrierControlClusterReadBarrierCapabilitiesAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeBarrierControlClusterReadBarrierCapabilitiesAttribute(uint8_t seqNum,
+                                                                                             chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a Barrier Control server read command for the barrier position attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeBarrierControlClusterReadBarrierPositionAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeBarrierControlClusterReadBarrierPositionAttribute(uint8_t seqNum,
+                                                                                         chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a Barrier Control server read command for the cluster revision attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeBarrierControlClusterReadClusterRevisionAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeBarrierControlClusterReadClusterRevisionAttribute(uint8_t seqNum,
+                                                                                         chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
 | Cluster Basic                                                       | 0x0000 |
@@ -206,19 +224,22 @@ chip::System::PacketBufferHandle encodeBasicClusterDiscoverAttributes(uint8_t se
  * @brief
  *    Encode a Basic server read command for the InteractionModelVersion attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeBasicClusterReadInteractionModelVersionAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeBasicClusterReadInteractionModelVersionAttribute(uint8_t seqNum,
+                                                                                        chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a Basic server read command for the HardwareVersion attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeBasicClusterReadHardwareVersionAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeBasicClusterReadHardwareVersionAttribute(uint8_t seqNum,
+                                                                                chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a Basic server read command for the cluster revision attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeBasicClusterReadClusterRevisionAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeBasicClusterReadClusterRevisionAttribute(uint8_t seqNum,
+                                                                                chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
 | Cluster Binding                                                     | 0xF000 |
@@ -235,13 +256,17 @@ chip::System::PacketBufferHandle encodeBasicClusterReadClusterRevisionAttribute(
  * @brief
  *    Encode an Bind command for Binding server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeBindingClusterBindCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, chip::NodeId nodeId, chip::GroupId groupId, chip::EndpointId endpointId, chip::ClusterId clusterId);
+chip::System::PacketBufferHandle encodeBindingClusterBindCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                 chip::NodeId nodeId, chip::GroupId groupId,
+                                                                 chip::EndpointId endpointId, chip::ClusterId clusterId);
 
 /**
  * @brief
  *    Encode an Unbind command for Binding server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeBindingClusterUnbindCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, chip::NodeId nodeId, chip::GroupId groupId, chip::EndpointId endpointId, chip::ClusterId clusterId);
+chip::System::PacketBufferHandle encodeBindingClusterUnbindCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                   chip::NodeId nodeId, chip::GroupId groupId,
+                                                                   chip::EndpointId endpointId, chip::ClusterId clusterId);
 
 /**
  * @brief
@@ -253,7 +278,8 @@ chip::System::PacketBufferHandle encodeBindingClusterDiscoverAttributes(uint8_t 
  * @brief
  *    Encode a Binding server read command for the cluster revision attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeBindingClusterReadClusterRevisionAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeBindingClusterReadClusterRevisionAttribute(uint8_t seqNum,
+                                                                                  chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
 | Cluster ColorControl                                                | 0x0300 |
@@ -332,85 +358,119 @@ chip::System::PacketBufferHandle encodeBindingClusterReadClusterRevisionAttribut
  * @brief
  *    Encode an MoveColor command for Color Control server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterMoveColorCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, int16_t rateX, int16_t rateY, uint8_t optionsMask, uint8_t optionsOverride);
+chip::System::PacketBufferHandle encodeColorControlClusterMoveColorCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                           int16_t rateX, int16_t rateY, uint8_t optionsMask,
+                                                                           uint8_t optionsOverride);
 
 /**
  * @brief
  *    Encode an MoveColorTemperature command for Color Control server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterMoveColorTemperatureCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint8_t moveMode, uint16_t rate, uint16_t colorTemperatureMinimum, uint16_t colorTemperatureMaximum, uint8_t optionsMask, uint8_t optionsOverride);
+chip::System::PacketBufferHandle encodeColorControlClusterMoveColorTemperatureCommand(
+    uint8_t seqNum, chip::EndpointId destinationEndpoint, uint8_t moveMode, uint16_t rate, uint16_t colorTemperatureMinimum,
+    uint16_t colorTemperatureMaximum, uint8_t optionsMask, uint8_t optionsOverride);
 
 /**
  * @brief
  *    Encode an MoveHue command for Color Control server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterMoveHueCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint8_t moveMode, uint8_t rate, uint8_t optionsMask, uint8_t optionsOverride);
+chip::System::PacketBufferHandle encodeColorControlClusterMoveHueCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                         uint8_t moveMode, uint8_t rate, uint8_t optionsMask,
+                                                                         uint8_t optionsOverride);
 
 /**
  * @brief
  *    Encode an MoveSaturation command for Color Control server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterMoveSaturationCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint8_t moveMode, uint8_t rate, uint8_t optionsMask, uint8_t optionsOverride);
+chip::System::PacketBufferHandle encodeColorControlClusterMoveSaturationCommand(uint8_t seqNum,
+                                                                                chip::EndpointId destinationEndpoint,
+                                                                                uint8_t moveMode, uint8_t rate, uint8_t optionsMask,
+                                                                                uint8_t optionsOverride);
 
 /**
  * @brief
  *    Encode an MoveToColor command for Color Control server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterMoveToColorCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint16_t colorX, uint16_t colorY, uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride);
+chip::System::PacketBufferHandle encodeColorControlClusterMoveToColorCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                             uint16_t colorX, uint16_t colorY,
+                                                                             uint16_t transitionTime, uint8_t optionsMask,
+                                                                             uint8_t optionsOverride);
 
 /**
  * @brief
  *    Encode an MoveToColorTemperature command for Color Control server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterMoveToColorTemperatureCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint16_t colorTemperature, uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride);
+chip::System::PacketBufferHandle
+encodeColorControlClusterMoveToColorTemperatureCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                       uint16_t colorTemperature, uint16_t transitionTime, uint8_t optionsMask,
+                                                       uint8_t optionsOverride);
 
 /**
  * @brief
  *    Encode an MoveToHue command for Color Control server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterMoveToHueCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint8_t hue, uint8_t direction, uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride);
+chip::System::PacketBufferHandle encodeColorControlClusterMoveToHueCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                           uint8_t hue, uint8_t direction, uint16_t transitionTime,
+                                                                           uint8_t optionsMask, uint8_t optionsOverride);
 
 /**
  * @brief
  *    Encode an MoveToHueAndSaturation command for Color Control server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterMoveToHueAndSaturationCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint8_t hue, uint8_t saturation, uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride);
+chip::System::PacketBufferHandle
+encodeColorControlClusterMoveToHueAndSaturationCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint8_t hue,
+                                                       uint8_t saturation, uint16_t transitionTime, uint8_t optionsMask,
+                                                       uint8_t optionsOverride);
 
 /**
  * @brief
  *    Encode an MoveToSaturation command for Color Control server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterMoveToSaturationCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint8_t saturation, uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride);
+chip::System::PacketBufferHandle encodeColorControlClusterMoveToSaturationCommand(uint8_t seqNum,
+                                                                                  chip::EndpointId destinationEndpoint,
+                                                                                  uint8_t saturation, uint16_t transitionTime,
+                                                                                  uint8_t optionsMask, uint8_t optionsOverride);
 
 /**
  * @brief
  *    Encode an StepColor command for Color Control server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterStepColorCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, int16_t stepX, int16_t stepY, uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride);
+chip::System::PacketBufferHandle encodeColorControlClusterStepColorCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                           int16_t stepX, int16_t stepY, uint16_t transitionTime,
+                                                                           uint8_t optionsMask, uint8_t optionsOverride);
 
 /**
  * @brief
  *    Encode an StepColorTemperature command for Color Control server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterStepColorTemperatureCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint8_t stepMode, uint16_t stepSize, uint16_t transitionTime, uint16_t colorTemperatureMinimum, uint16_t colorTemperatureMaximum, uint8_t optionsMask, uint8_t optionsOverride);
+chip::System::PacketBufferHandle encodeColorControlClusterStepColorTemperatureCommand(
+    uint8_t seqNum, chip::EndpointId destinationEndpoint, uint8_t stepMode, uint16_t stepSize, uint16_t transitionTime,
+    uint16_t colorTemperatureMinimum, uint16_t colorTemperatureMaximum, uint8_t optionsMask, uint8_t optionsOverride);
 
 /**
  * @brief
  *    Encode an StepHue command for Color Control server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterStepHueCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint8_t stepMode, uint8_t stepSize, uint8_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride);
+chip::System::PacketBufferHandle encodeColorControlClusterStepHueCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                         uint8_t stepMode, uint8_t stepSize, uint8_t transitionTime,
+                                                                         uint8_t optionsMask, uint8_t optionsOverride);
 
 /**
  * @brief
  *    Encode an StepSaturation command for Color Control server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterStepSaturationCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint8_t stepMode, uint8_t stepSize, uint8_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride);
+chip::System::PacketBufferHandle encodeColorControlClusterStepSaturationCommand(uint8_t seqNum,
+                                                                                chip::EndpointId destinationEndpoint,
+                                                                                uint8_t stepMode, uint8_t stepSize,
+                                                                                uint8_t transitionTime, uint8_t optionsMask,
+                                                                                uint8_t optionsOverride);
 
 /**
  * @brief
  *    Encode an StopMoveStep command for Color Control server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterStopMoveStepCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint8_t optionsMask, uint8_t optionsOverride);
+chip::System::PacketBufferHandle encodeColorControlClusterStopMoveStepCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                              uint8_t optionsMask, uint8_t optionsOverride);
 
 /**
  * @brief
@@ -422,415 +482,503 @@ chip::System::PacketBufferHandle encodeColorControlClusterDiscoverAttributes(uin
  * @brief
  *    Encode a Color Control server read command for the current hue attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterReadCurrentHueAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeColorControlClusterReadCurrentHueAttribute(uint8_t seqNum,
+                                                                                  chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a Color Control server configure report command for the current hue attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterConfigureCurrentHueAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint16_t minInterval, uint16_t maxInterval, uint8_t change);
+chip::System::PacketBufferHandle encodeColorControlClusterConfigureCurrentHueAttribute(uint8_t seqNum,
+                                                                                       chip::EndpointId destinationEndpoint,
+                                                                                       uint16_t minInterval, uint16_t maxInterval,
+                                                                                       uint8_t change);
 
 /**
  * @brief
  *    Encode a Color Control server read command for the current saturation attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterReadCurrentSaturationAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeColorControlClusterReadCurrentSaturationAttribute(uint8_t seqNum,
+                                                                                         chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
- *    Encode a Color Control server configure report command for the current saturation attribute into buffer including the APS frame
+ *    Encode a Color Control server configure report command for the current saturation attribute into buffer including the APS
+ * frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterConfigureCurrentSaturationAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint16_t minInterval, uint16_t maxInterval, uint8_t change);
+chip::System::PacketBufferHandle encodeColorControlClusterConfigureCurrentSaturationAttribute(uint8_t seqNum,
+                                                                                              chip::EndpointId destinationEndpoint,
+                                                                                              uint16_t minInterval,
+                                                                                              uint16_t maxInterval, uint8_t change);
 
 /**
  * @brief
  *    Encode a Color Control server read command for the remaining time attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterReadRemainingTimeAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeColorControlClusterReadRemainingTimeAttribute(uint8_t seqNum,
+                                                                                     chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a Color Control server read command for the current x attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterReadCurrentXAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeColorControlClusterReadCurrentXAttribute(uint8_t seqNum,
+                                                                                chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a Color Control server configure report command for the current x attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterConfigureCurrentXAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint16_t minInterval, uint16_t maxInterval, uint16_t change);
+chip::System::PacketBufferHandle encodeColorControlClusterConfigureCurrentXAttribute(uint8_t seqNum,
+                                                                                     chip::EndpointId destinationEndpoint,
+                                                                                     uint16_t minInterval, uint16_t maxInterval,
+                                                                                     uint16_t change);
 
 /**
  * @brief
  *    Encode a Color Control server read command for the current y attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterReadCurrentYAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeColorControlClusterReadCurrentYAttribute(uint8_t seqNum,
+                                                                                chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a Color Control server configure report command for the current y attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterConfigureCurrentYAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint16_t minInterval, uint16_t maxInterval, uint16_t change);
+chip::System::PacketBufferHandle encodeColorControlClusterConfigureCurrentYAttribute(uint8_t seqNum,
+                                                                                     chip::EndpointId destinationEndpoint,
+                                                                                     uint16_t minInterval, uint16_t maxInterval,
+                                                                                     uint16_t change);
 
 /**
  * @brief
  *    Encode a Color Control server read command for the drift compensation attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterReadDriftCompensationAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeColorControlClusterReadDriftCompensationAttribute(uint8_t seqNum,
+                                                                                         chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a Color Control server read command for the compensation text attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterReadCompensationTextAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeColorControlClusterReadCompensationTextAttribute(uint8_t seqNum,
+                                                                                        chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a Color Control server read command for the color temperature attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterReadColorTemperatureAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeColorControlClusterReadColorTemperatureAttribute(uint8_t seqNum,
+                                                                                        chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a Color Control server configure report command for the color temperature attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterConfigureColorTemperatureAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint16_t minInterval, uint16_t maxInterval, uint16_t change);
+chip::System::PacketBufferHandle encodeColorControlClusterConfigureColorTemperatureAttribute(uint8_t seqNum,
+                                                                                             chip::EndpointId destinationEndpoint,
+                                                                                             uint16_t minInterval,
+                                                                                             uint16_t maxInterval, uint16_t change);
 
 /**
  * @brief
  *    Encode a Color Control server read command for the color mode attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterReadColorModeAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeColorControlClusterReadColorModeAttribute(uint8_t seqNum,
+                                                                                 chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a Color Control server read command for the color control options attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterReadColorControlOptionsAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeColorControlClusterReadColorControlOptionsAttribute(uint8_t seqNum,
+                                                                                           chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a Color Control server write command for the color control options attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterWriteColorControlOptionsAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint8_t colorControlOptions);
+chip::System::PacketBufferHandle encodeColorControlClusterWriteColorControlOptionsAttribute(uint8_t seqNum,
+                                                                                            chip::EndpointId destinationEndpoint,
+                                                                                            uint8_t colorControlOptions);
 
 /**
  * @brief
  *    Encode a Color Control server read command for the number of primaries attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterReadNumberOfPrimariesAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeColorControlClusterReadNumberOfPrimariesAttribute(uint8_t seqNum,
+                                                                                         chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a Color Control server read command for the primary 1 x attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterReadPrimary1XAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeColorControlClusterReadPrimary1XAttribute(uint8_t seqNum,
+                                                                                 chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a Color Control server read command for the primary 1 y attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterReadPrimary1YAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeColorControlClusterReadPrimary1YAttribute(uint8_t seqNum,
+                                                                                 chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a Color Control server read command for the primary 1 intensity attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterReadPrimary1IntensityAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeColorControlClusterReadPrimary1IntensityAttribute(uint8_t seqNum,
+                                                                                         chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a Color Control server read command for the primary 2 x attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterReadPrimary2XAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeColorControlClusterReadPrimary2XAttribute(uint8_t seqNum,
+                                                                                 chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a Color Control server read command for the primary 2 y attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterReadPrimary2YAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeColorControlClusterReadPrimary2YAttribute(uint8_t seqNum,
+                                                                                 chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a Color Control server read command for the primary 2 intensity attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterReadPrimary2IntensityAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeColorControlClusterReadPrimary2IntensityAttribute(uint8_t seqNum,
+                                                                                         chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a Color Control server read command for the primary 3 x attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterReadPrimary3XAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeColorControlClusterReadPrimary3XAttribute(uint8_t seqNum,
+                                                                                 chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a Color Control server read command for the primary 3 y attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterReadPrimary3YAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeColorControlClusterReadPrimary3YAttribute(uint8_t seqNum,
+                                                                                 chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a Color Control server read command for the primary 3 intensity attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterReadPrimary3IntensityAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeColorControlClusterReadPrimary3IntensityAttribute(uint8_t seqNum,
+                                                                                         chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a Color Control server read command for the primary 4 x attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterReadPrimary4XAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeColorControlClusterReadPrimary4XAttribute(uint8_t seqNum,
+                                                                                 chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a Color Control server read command for the primary 4 y attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterReadPrimary4YAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeColorControlClusterReadPrimary4YAttribute(uint8_t seqNum,
+                                                                                 chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a Color Control server read command for the primary 4 intensity attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterReadPrimary4IntensityAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeColorControlClusterReadPrimary4IntensityAttribute(uint8_t seqNum,
+                                                                                         chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a Color Control server read command for the primary 5 x attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterReadPrimary5XAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeColorControlClusterReadPrimary5XAttribute(uint8_t seqNum,
+                                                                                 chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a Color Control server read command for the primary 5 y attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterReadPrimary5YAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeColorControlClusterReadPrimary5YAttribute(uint8_t seqNum,
+                                                                                 chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a Color Control server read command for the primary 5 intensity attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterReadPrimary5IntensityAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeColorControlClusterReadPrimary5IntensityAttribute(uint8_t seqNum,
+                                                                                         chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a Color Control server read command for the primary 6 x attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterReadPrimary6XAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeColorControlClusterReadPrimary6XAttribute(uint8_t seqNum,
+                                                                                 chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a Color Control server read command for the primary 6 y attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterReadPrimary6YAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeColorControlClusterReadPrimary6YAttribute(uint8_t seqNum,
+                                                                                 chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a Color Control server read command for the primary 6 intensity attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterReadPrimary6IntensityAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeColorControlClusterReadPrimary6IntensityAttribute(uint8_t seqNum,
+                                                                                         chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a Color Control server read command for the white point x attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterReadWhitePointXAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeColorControlClusterReadWhitePointXAttribute(uint8_t seqNum,
+                                                                                   chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a Color Control server write command for the white point x attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterWriteWhitePointXAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint16_t whitePointX);
+chip::System::PacketBufferHandle
+encodeColorControlClusterWriteWhitePointXAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint16_t whitePointX);
 
 /**
  * @brief
  *    Encode a Color Control server read command for the white point y attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterReadWhitePointYAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeColorControlClusterReadWhitePointYAttribute(uint8_t seqNum,
+                                                                                   chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a Color Control server write command for the white point y attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterWriteWhitePointYAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint16_t whitePointY);
+chip::System::PacketBufferHandle
+encodeColorControlClusterWriteWhitePointYAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint16_t whitePointY);
 
 /**
  * @brief
  *    Encode a Color Control server read command for the color point r x attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterReadColorPointRXAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeColorControlClusterReadColorPointRXAttribute(uint8_t seqNum,
+                                                                                    chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a Color Control server write command for the color point r x attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterWriteColorPointRXAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint16_t colorPointRX);
+chip::System::PacketBufferHandle
+encodeColorControlClusterWriteColorPointRXAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint16_t colorPointRX);
 
 /**
  * @brief
  *    Encode a Color Control server read command for the color point r y attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterReadColorPointRYAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeColorControlClusterReadColorPointRYAttribute(uint8_t seqNum,
+                                                                                    chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a Color Control server write command for the color point r y attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterWriteColorPointRYAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint16_t colorPointRY);
+chip::System::PacketBufferHandle
+encodeColorControlClusterWriteColorPointRYAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint16_t colorPointRY);
 
 /**
  * @brief
  *    Encode a Color Control server read command for the color point r intensity attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterReadColorPointRIntensityAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeColorControlClusterReadColorPointRIntensityAttribute(uint8_t seqNum,
+                                                                                            chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a Color Control server write command for the color point r intensity attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterWriteColorPointRIntensityAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint8_t colorPointRIntensity);
+chip::System::PacketBufferHandle encodeColorControlClusterWriteColorPointRIntensityAttribute(uint8_t seqNum,
+                                                                                             chip::EndpointId destinationEndpoint,
+                                                                                             uint8_t colorPointRIntensity);
 
 /**
  * @brief
  *    Encode a Color Control server read command for the color point g x attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterReadColorPointGXAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeColorControlClusterReadColorPointGXAttribute(uint8_t seqNum,
+                                                                                    chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a Color Control server write command for the color point g x attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterWriteColorPointGXAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint16_t colorPointGX);
+chip::System::PacketBufferHandle
+encodeColorControlClusterWriteColorPointGXAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint16_t colorPointGX);
 
 /**
  * @brief
  *    Encode a Color Control server read command for the color point g y attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterReadColorPointGYAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeColorControlClusterReadColorPointGYAttribute(uint8_t seqNum,
+                                                                                    chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a Color Control server write command for the color point g y attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterWriteColorPointGYAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint16_t colorPointGY);
+chip::System::PacketBufferHandle
+encodeColorControlClusterWriteColorPointGYAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint16_t colorPointGY);
 
 /**
  * @brief
  *    Encode a Color Control server read command for the color point g intensity attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterReadColorPointGIntensityAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeColorControlClusterReadColorPointGIntensityAttribute(uint8_t seqNum,
+                                                                                            chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a Color Control server write command for the color point g intensity attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterWriteColorPointGIntensityAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint8_t colorPointGIntensity);
+chip::System::PacketBufferHandle encodeColorControlClusterWriteColorPointGIntensityAttribute(uint8_t seqNum,
+                                                                                             chip::EndpointId destinationEndpoint,
+                                                                                             uint8_t colorPointGIntensity);
 
 /**
  * @brief
  *    Encode a Color Control server read command for the color point b x attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterReadColorPointBXAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeColorControlClusterReadColorPointBXAttribute(uint8_t seqNum,
+                                                                                    chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a Color Control server write command for the color point b x attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterWriteColorPointBXAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint16_t colorPointBX);
+chip::System::PacketBufferHandle
+encodeColorControlClusterWriteColorPointBXAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint16_t colorPointBX);
 
 /**
  * @brief
  *    Encode a Color Control server read command for the color point b y attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterReadColorPointBYAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeColorControlClusterReadColorPointBYAttribute(uint8_t seqNum,
+                                                                                    chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a Color Control server write command for the color point b y attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterWriteColorPointBYAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint16_t colorPointBY);
+chip::System::PacketBufferHandle
+encodeColorControlClusterWriteColorPointBYAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint16_t colorPointBY);
 
 /**
  * @brief
  *    Encode a Color Control server read command for the color point b intensity attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterReadColorPointBIntensityAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeColorControlClusterReadColorPointBIntensityAttribute(uint8_t seqNum,
+                                                                                            chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a Color Control server write command for the color point b intensity attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterWriteColorPointBIntensityAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint8_t colorPointBIntensity);
+chip::System::PacketBufferHandle encodeColorControlClusterWriteColorPointBIntensityAttribute(uint8_t seqNum,
+                                                                                             chip::EndpointId destinationEndpoint,
+                                                                                             uint8_t colorPointBIntensity);
 
 /**
  * @brief
  *    Encode a Color Control server read command for the enhanced current hue attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterReadEnhancedCurrentHueAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeColorControlClusterReadEnhancedCurrentHueAttribute(uint8_t seqNum,
+                                                                                          chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a Color Control server read command for the enhanced color mode attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterReadEnhancedColorModeAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeColorControlClusterReadEnhancedColorModeAttribute(uint8_t seqNum,
+                                                                                         chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a Color Control server read command for the color loop active attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterReadColorLoopActiveAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeColorControlClusterReadColorLoopActiveAttribute(uint8_t seqNum,
+                                                                                       chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a Color Control server read command for the color loop direction attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterReadColorLoopDirectionAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeColorControlClusterReadColorLoopDirectionAttribute(uint8_t seqNum,
+                                                                                          chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a Color Control server read command for the color loop time attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterReadColorLoopTimeAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeColorControlClusterReadColorLoopTimeAttribute(uint8_t seqNum,
+                                                                                     chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a Color Control server read command for the color capabilities attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterReadColorCapabilitiesAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeColorControlClusterReadColorCapabilitiesAttribute(uint8_t seqNum,
+                                                                                         chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a Color Control server read command for the color temp physical min attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterReadColorTempPhysicalMinAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeColorControlClusterReadColorTempPhysicalMinAttribute(uint8_t seqNum,
+                                                                                            chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a Color Control server read command for the color temp physical max attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterReadColorTempPhysicalMaxAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeColorControlClusterReadColorTempPhysicalMaxAttribute(uint8_t seqNum,
+                                                                                            chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
- *    Encode a Color Control server read command for the couple color temp to level min-mireds attribute into buffer including the APS frame
+ *    Encode a Color Control server read command for the couple color temp to level min-mireds attribute into buffer including the
+ * APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterReadCoupleColorTempToLevelMinMiredsAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle
+encodeColorControlClusterReadCoupleColorTempToLevelMinMiredsAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
- *    Encode a Color Control server read command for the start up color temperature mireds attribute into buffer including the APS frame
+ *    Encode a Color Control server read command for the start up color temperature mireds attribute into buffer including the APS
+ * frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterReadStartUpColorTemperatureMiredsAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle
+encodeColorControlClusterReadStartUpColorTemperatureMiredsAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
- *    Encode a Color Control server write command for the start up color temperature mireds attribute into buffer including the APS frame
+ *    Encode a Color Control server write command for the start up color temperature mireds attribute into buffer including the APS
+ * frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterWriteStartUpColorTemperatureMiredsAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint16_t startUpColorTemperatureMireds);
+chip::System::PacketBufferHandle
+encodeColorControlClusterWriteStartUpColorTemperatureMiredsAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                     uint16_t startUpColorTemperatureMireds);
 
 /**
  * @brief
  *    Encode a Color Control server read command for the cluster revision attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeColorControlClusterReadClusterRevisionAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeColorControlClusterReadClusterRevisionAttribute(uint8_t seqNum,
+                                                                                       chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
 | Cluster ContentLaunch                                               | 0xF002 |
@@ -847,7 +995,8 @@ chip::System::PacketBufferHandle encodeColorControlClusterReadClusterRevisionAtt
  * @brief
  *    Encode an LaunchContent command for Content Launch server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeContentLaunchClusterLaunchContentCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeContentLaunchClusterLaunchContentCommand(uint8_t seqNum,
+                                                                                chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
@@ -865,7 +1014,8 @@ chip::System::PacketBufferHandle encodeContentLaunchClusterDiscoverAttributes(ui
  * @brief
  *    Encode a Content Launch server read command for the cluster revision attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeContentLaunchClusterReadClusterRevisionAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeContentLaunchClusterReadClusterRevisionAttribute(uint8_t seqNum,
+                                                                                        chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
 | Cluster DoorLock                                                    | 0x0101 |
@@ -918,127 +1068,159 @@ chip::System::PacketBufferHandle encodeDoorLockClusterClearAllRfidsCommand(uint8
  * @brief
  *    Encode an ClearHolidaySchedule command for Door Lock server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeDoorLockClusterClearHolidayScheduleCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint8_t scheduleId);
+chip::System::PacketBufferHandle
+encodeDoorLockClusterClearHolidayScheduleCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint8_t scheduleId);
 
 /**
  * @brief
  *    Encode an ClearPin command for Door Lock server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeDoorLockClusterClearPinCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint16_t userId);
+chip::System::PacketBufferHandle encodeDoorLockClusterClearPinCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                      uint16_t userId);
 
 /**
  * @brief
  *    Encode an ClearRfid command for Door Lock server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeDoorLockClusterClearRfidCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint16_t userId);
+chip::System::PacketBufferHandle encodeDoorLockClusterClearRfidCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                       uint16_t userId);
 
 /**
  * @brief
  *    Encode an ClearWeekdaySchedule command for Door Lock server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeDoorLockClusterClearWeekdayScheduleCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint8_t scheduleId, uint16_t userId);
+chip::System::PacketBufferHandle encodeDoorLockClusterClearWeekdayScheduleCommand(uint8_t seqNum,
+                                                                                  chip::EndpointId destinationEndpoint,
+                                                                                  uint8_t scheduleId, uint16_t userId);
 
 /**
  * @brief
  *    Encode an ClearYeardaySchedule command for Door Lock server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeDoorLockClusterClearYeardayScheduleCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint8_t scheduleId, uint16_t userId);
+chip::System::PacketBufferHandle encodeDoorLockClusterClearYeardayScheduleCommand(uint8_t seqNum,
+                                                                                  chip::EndpointId destinationEndpoint,
+                                                                                  uint8_t scheduleId, uint16_t userId);
 
 /**
  * @brief
  *    Encode an GetHolidaySchedule command for Door Lock server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeDoorLockClusterGetHolidayScheduleCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint8_t scheduleId);
+chip::System::PacketBufferHandle
+encodeDoorLockClusterGetHolidayScheduleCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint8_t scheduleId);
 
 /**
  * @brief
  *    Encode an GetLogRecord command for Door Lock server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeDoorLockClusterGetLogRecordCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint16_t logIndex);
+chip::System::PacketBufferHandle encodeDoorLockClusterGetLogRecordCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                          uint16_t logIndex);
 
 /**
  * @brief
  *    Encode an GetPin command for Door Lock server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeDoorLockClusterGetPinCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint16_t userId);
+chip::System::PacketBufferHandle encodeDoorLockClusterGetPinCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                    uint16_t userId);
 
 /**
  * @brief
  *    Encode an GetRfid command for Door Lock server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeDoorLockClusterGetRfidCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint16_t userId);
+chip::System::PacketBufferHandle encodeDoorLockClusterGetRfidCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                     uint16_t userId);
 
 /**
  * @brief
  *    Encode an GetUserType command for Door Lock server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeDoorLockClusterGetUserTypeCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint16_t userId);
+chip::System::PacketBufferHandle encodeDoorLockClusterGetUserTypeCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                         uint16_t userId);
 
 /**
  * @brief
  *    Encode an GetWeekdaySchedule command for Door Lock server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeDoorLockClusterGetWeekdayScheduleCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint8_t scheduleId, uint16_t userId);
+chip::System::PacketBufferHandle encodeDoorLockClusterGetWeekdayScheduleCommand(uint8_t seqNum,
+                                                                                chip::EndpointId destinationEndpoint,
+                                                                                uint8_t scheduleId, uint16_t userId);
 
 /**
  * @brief
  *    Encode an GetYeardaySchedule command for Door Lock server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeDoorLockClusterGetYeardayScheduleCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint8_t scheduleId, uint16_t userId);
+chip::System::PacketBufferHandle encodeDoorLockClusterGetYeardayScheduleCommand(uint8_t seqNum,
+                                                                                chip::EndpointId destinationEndpoint,
+                                                                                uint8_t scheduleId, uint16_t userId);
 
 /**
  * @brief
  *    Encode an LockDoor command for Door Lock server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeDoorLockClusterLockDoorCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, char * pin);
+chip::System::PacketBufferHandle encodeDoorLockClusterLockDoorCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                      char * pin);
 
 /**
  * @brief
  *    Encode an SetHolidaySchedule command for Door Lock server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeDoorLockClusterSetHolidayScheduleCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint8_t scheduleId, uint32_t localStartTime, uint32_t localEndTime, uint8_t operatingModeDuringHoliday);
+chip::System::PacketBufferHandle
+encodeDoorLockClusterSetHolidayScheduleCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint8_t scheduleId,
+                                               uint32_t localStartTime, uint32_t localEndTime, uint8_t operatingModeDuringHoliday);
 
 /**
  * @brief
  *    Encode an SetPin command for Door Lock server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeDoorLockClusterSetPinCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint16_t userId, uint8_t userStatus, uint8_t userType, char * pin);
+chip::System::PacketBufferHandle encodeDoorLockClusterSetPinCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                    uint16_t userId, uint8_t userStatus, uint8_t userType,
+                                                                    char * pin);
 
 /**
  * @brief
  *    Encode an SetRfid command for Door Lock server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeDoorLockClusterSetRfidCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint16_t userId, uint8_t userStatus, uint8_t userType, char * id);
+chip::System::PacketBufferHandle encodeDoorLockClusterSetRfidCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                     uint16_t userId, uint8_t userStatus, uint8_t userType,
+                                                                     char * id);
 
 /**
  * @brief
  *    Encode an SetUserType command for Door Lock server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeDoorLockClusterSetUserTypeCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint16_t userId, uint8_t userType);
+chip::System::PacketBufferHandle encodeDoorLockClusterSetUserTypeCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                         uint16_t userId, uint8_t userType);
 
 /**
  * @brief
  *    Encode an SetWeekdaySchedule command for Door Lock server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeDoorLockClusterSetWeekdayScheduleCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint8_t scheduleId, uint16_t userId, uint8_t daysMask, uint8_t startHour, uint8_t startMinute, uint8_t endHour, uint8_t endMinute);
+chip::System::PacketBufferHandle
+encodeDoorLockClusterSetWeekdayScheduleCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint8_t scheduleId,
+                                               uint16_t userId, uint8_t daysMask, uint8_t startHour, uint8_t startMinute,
+                                               uint8_t endHour, uint8_t endMinute);
 
 /**
  * @brief
  *    Encode an SetYeardaySchedule command for Door Lock server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeDoorLockClusterSetYeardayScheduleCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint8_t scheduleId, uint16_t userId, uint32_t localStartTime, uint32_t localEndTime);
+chip::System::PacketBufferHandle encodeDoorLockClusterSetYeardayScheduleCommand(uint8_t seqNum,
+                                                                                chip::EndpointId destinationEndpoint,
+                                                                                uint8_t scheduleId, uint16_t userId,
+                                                                                uint32_t localStartTime, uint32_t localEndTime);
 
 /**
  * @brief
  *    Encode an UnlockDoor command for Door Lock server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeDoorLockClusterUnlockDoorCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, char * pin);
+chip::System::PacketBufferHandle encodeDoorLockClusterUnlockDoorCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                        char * pin);
 
 /**
  * @brief
  *    Encode an UnlockWithTimeout command for Door Lock server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeDoorLockClusterUnlockWithTimeoutCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint16_t timeoutInSeconds, char * pin);
+chip::System::PacketBufferHandle encodeDoorLockClusterUnlockWithTimeoutCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                               uint16_t timeoutInSeconds, char * pin);
 
 /**
  * @brief
@@ -1056,7 +1238,9 @@ chip::System::PacketBufferHandle encodeDoorLockClusterReadLockStateAttribute(uin
  * @brief
  *    Encode a Door Lock server configure report command for the lock state attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeDoorLockClusterConfigureLockStateAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint16_t minInterval, uint16_t maxInterval);
+chip::System::PacketBufferHandle encodeDoorLockClusterConfigureLockStateAttribute(uint8_t seqNum,
+                                                                                  chip::EndpointId destinationEndpoint,
+                                                                                  uint16_t minInterval, uint16_t maxInterval);
 
 /**
  * @brief
@@ -1068,13 +1252,15 @@ chip::System::PacketBufferHandle encodeDoorLockClusterReadLockTypeAttribute(uint
  * @brief
  *    Encode a Door Lock server read command for the actuator enabled attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeDoorLockClusterReadActuatorEnabledAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeDoorLockClusterReadActuatorEnabledAttribute(uint8_t seqNum,
+                                                                                   chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a Door Lock server read command for the cluster revision attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeDoorLockClusterReadClusterRevisionAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeDoorLockClusterReadClusterRevisionAttribute(uint8_t seqNum,
+                                                                                   chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
 | Cluster Groups                                                      | 0x0004 |
@@ -1096,19 +1282,23 @@ chip::System::PacketBufferHandle encodeDoorLockClusterReadClusterRevisionAttribu
  * @brief
  *    Encode an AddGroup command for Groups server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeGroupsClusterAddGroupCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint16_t groupId, char * groupName);
+chip::System::PacketBufferHandle encodeGroupsClusterAddGroupCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                    uint16_t groupId, char * groupName);
 
 /**
  * @brief
  *    Encode an AddGroupIfIdentifying command for Groups server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeGroupsClusterAddGroupIfIdentifyingCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint16_t groupId, char * groupName);
+chip::System::PacketBufferHandle encodeGroupsClusterAddGroupIfIdentifyingCommand(uint8_t seqNum,
+                                                                                 chip::EndpointId destinationEndpoint,
+                                                                                 uint16_t groupId, char * groupName);
 
 /**
  * @brief
  *    Encode an GetGroupMembership command for Groups server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeGroupsClusterGetGroupMembershipCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint8_t groupCount, uint16_t groupList);
+chip::System::PacketBufferHandle encodeGroupsClusterGetGroupMembershipCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                              uint8_t groupCount, uint16_t groupList);
 
 /**
  * @brief
@@ -1120,13 +1310,15 @@ chip::System::PacketBufferHandle encodeGroupsClusterRemoveAllGroupsCommand(uint8
  * @brief
  *    Encode an RemoveGroup command for Groups server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeGroupsClusterRemoveGroupCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint16_t groupId);
+chip::System::PacketBufferHandle encodeGroupsClusterRemoveGroupCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                       uint16_t groupId);
 
 /**
  * @brief
  *    Encode an ViewGroup command for Groups server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeGroupsClusterViewGroupCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint16_t groupId);
+chip::System::PacketBufferHandle encodeGroupsClusterViewGroupCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                     uint16_t groupId);
 
 /**
  * @brief
@@ -1144,7 +1336,8 @@ chip::System::PacketBufferHandle encodeGroupsClusterReadNameSupportAttribute(uin
  * @brief
  *    Encode a Groups server read command for the cluster revision attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeGroupsClusterReadClusterRevisionAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeGroupsClusterReadClusterRevisionAttribute(uint8_t seqNum,
+                                                                                 chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
 | Cluster IasZone                                                     | 0x0500 |
@@ -1188,13 +1381,15 @@ chip::System::PacketBufferHandle encodeIasZoneClusterReadZoneStatusAttribute(uin
  * @brief
  *    Encode a IAS Zone server read command for the IAS CIE address attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeIasZoneClusterReadIasCieAddressAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeIasZoneClusterReadIasCieAddressAttribute(uint8_t seqNum,
+                                                                                chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a IAS Zone server write command for the IAS CIE address attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeIasZoneClusterWriteIasCieAddressAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint64_t iasCieAddress);
+chip::System::PacketBufferHandle
+encodeIasZoneClusterWriteIasCieAddressAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint64_t iasCieAddress);
 
 /**
  * @brief
@@ -1206,7 +1401,8 @@ chip::System::PacketBufferHandle encodeIasZoneClusterReadZoneIdAttribute(uint8_t
  * @brief
  *    Encode a IAS Zone server read command for the cluster revision attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeIasZoneClusterReadClusterRevisionAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeIasZoneClusterReadClusterRevisionAttribute(uint8_t seqNum,
+                                                                                  chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
 | Cluster Identify                                                    | 0x0003 |
@@ -1224,7 +1420,8 @@ chip::System::PacketBufferHandle encodeIasZoneClusterReadClusterRevisionAttribut
  * @brief
  *    Encode an Identify command for Identify server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeIdentifyClusterIdentifyCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint16_t identifyTime);
+chip::System::PacketBufferHandle encodeIdentifyClusterIdentifyCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                      uint16_t identifyTime);
 
 /**
  * @brief
@@ -1242,19 +1439,22 @@ chip::System::PacketBufferHandle encodeIdentifyClusterDiscoverAttributes(uint8_t
  * @brief
  *    Encode a Identify server read command for the identify time attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeIdentifyClusterReadIdentifyTimeAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeIdentifyClusterReadIdentifyTimeAttribute(uint8_t seqNum,
+                                                                                chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a Identify server write command for the identify time attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeIdentifyClusterWriteIdentifyTimeAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint16_t identifyTime);
+chip::System::PacketBufferHandle
+encodeIdentifyClusterWriteIdentifyTimeAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint16_t identifyTime);
 
 /**
  * @brief
  *    Encode a Identify server read command for the cluster revision attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeIdentifyClusterReadClusterRevisionAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeIdentifyClusterReadClusterRevisionAttribute(uint8_t seqNum,
+                                                                                   chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
 | Cluster LevelControl                                                | 0x0008 |
@@ -1278,49 +1478,62 @@ chip::System::PacketBufferHandle encodeIdentifyClusterReadClusterRevisionAttribu
  * @brief
  *    Encode an Move command for Level Control server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeLevelControlClusterMoveCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint8_t moveMode, uint8_t rate, uint8_t optionMask, uint8_t optionOverride);
+chip::System::PacketBufferHandle encodeLevelControlClusterMoveCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                      uint8_t moveMode, uint8_t rate, uint8_t optionMask,
+                                                                      uint8_t optionOverride);
 
 /**
  * @brief
  *    Encode an MoveToLevel command for Level Control server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeLevelControlClusterMoveToLevelCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint8_t level, uint16_t transitionTime, uint8_t optionMask, uint8_t optionOverride);
+chip::System::PacketBufferHandle encodeLevelControlClusterMoveToLevelCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                             uint8_t level, uint16_t transitionTime,
+                                                                             uint8_t optionMask, uint8_t optionOverride);
 
 /**
  * @brief
  *    Encode an MoveToLevelWithOnOff command for Level Control server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeLevelControlClusterMoveToLevelWithOnOffCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint8_t level, uint16_t transitionTime);
+chip::System::PacketBufferHandle encodeLevelControlClusterMoveToLevelWithOnOffCommand(uint8_t seqNum,
+                                                                                      chip::EndpointId destinationEndpoint,
+                                                                                      uint8_t level, uint16_t transitionTime);
 
 /**
  * @brief
  *    Encode an MoveWithOnOff command for Level Control server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeLevelControlClusterMoveWithOnOffCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint8_t moveMode, uint8_t rate);
+chip::System::PacketBufferHandle encodeLevelControlClusterMoveWithOnOffCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                               uint8_t moveMode, uint8_t rate);
 
 /**
  * @brief
  *    Encode an Step command for Level Control server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeLevelControlClusterStepCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint8_t stepMode, uint8_t stepSize, uint16_t transitionTime, uint8_t optionMask, uint8_t optionOverride);
+chip::System::PacketBufferHandle encodeLevelControlClusterStepCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                      uint8_t stepMode, uint8_t stepSize, uint16_t transitionTime,
+                                                                      uint8_t optionMask, uint8_t optionOverride);
 
 /**
  * @brief
  *    Encode an StepWithOnOff command for Level Control server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeLevelControlClusterStepWithOnOffCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint8_t stepMode, uint8_t stepSize, uint16_t transitionTime);
+chip::System::PacketBufferHandle encodeLevelControlClusterStepWithOnOffCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                               uint8_t stepMode, uint8_t stepSize,
+                                                                               uint16_t transitionTime);
 
 /**
  * @brief
  *    Encode an Stop command for Level Control server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeLevelControlClusterStopCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint8_t optionMask, uint8_t optionOverride);
+chip::System::PacketBufferHandle encodeLevelControlClusterStopCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                      uint8_t optionMask, uint8_t optionOverride);
 
 /**
  * @brief
  *    Encode an StopWithOnOff command for Level Control server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeLevelControlClusterStopWithOnOffCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeLevelControlClusterStopWithOnOffCommand(uint8_t seqNum,
+                                                                               chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
@@ -1332,19 +1545,24 @@ chip::System::PacketBufferHandle encodeLevelControlClusterDiscoverAttributes(uin
  * @brief
  *    Encode a Level Control server read command for the current level attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeLevelControlClusterReadCurrentLevelAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeLevelControlClusterReadCurrentLevelAttribute(uint8_t seqNum,
+                                                                                    chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a Level Control server configure report command for the current level attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeLevelControlClusterConfigureCurrentLevelAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint16_t minInterval, uint16_t maxInterval, uint8_t change);
+chip::System::PacketBufferHandle encodeLevelControlClusterConfigureCurrentLevelAttribute(uint8_t seqNum,
+                                                                                         chip::EndpointId destinationEndpoint,
+                                                                                         uint16_t minInterval, uint16_t maxInterval,
+                                                                                         uint8_t change);
 
 /**
  * @brief
  *    Encode a Level Control server read command for the cluster revision attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeLevelControlClusterReadClusterRevisionAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeLevelControlClusterReadClusterRevisionAttribute(uint8_t seqNum,
+                                                                                       chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
 | Cluster MediaPlayback                                               | 0xF001 |
@@ -1370,7 +1588,8 @@ chip::System::PacketBufferHandle encodeLevelControlClusterReadClusterRevisionAtt
  * @brief
  *    Encode an FastForwardRequest command for Media Playback server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeMediaPlaybackClusterFastForwardRequestCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeMediaPlaybackClusterFastForwardRequestCommand(uint8_t seqNum,
+                                                                                     chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
@@ -1382,7 +1601,8 @@ chip::System::PacketBufferHandle encodeMediaPlaybackClusterNextRequestCommand(ui
  * @brief
  *    Encode an PauseRequest command for Media Playback server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeMediaPlaybackClusterPauseRequestCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeMediaPlaybackClusterPauseRequestCommand(uint8_t seqNum,
+                                                                               chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
@@ -1394,31 +1614,36 @@ chip::System::PacketBufferHandle encodeMediaPlaybackClusterPlayRequestCommand(ui
  * @brief
  *    Encode an PreviousRequest command for Media Playback server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeMediaPlaybackClusterPreviousRequestCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeMediaPlaybackClusterPreviousRequestCommand(uint8_t seqNum,
+                                                                                  chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode an RewindRequest command for Media Playback server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeMediaPlaybackClusterRewindRequestCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeMediaPlaybackClusterRewindRequestCommand(uint8_t seqNum,
+                                                                                chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode an SkipBackwardRequest command for Media Playback server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeMediaPlaybackClusterSkipBackwardRequestCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeMediaPlaybackClusterSkipBackwardRequestCommand(uint8_t seqNum,
+                                                                                      chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode an SkipForwardRequest command for Media Playback server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeMediaPlaybackClusterSkipForwardRequestCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeMediaPlaybackClusterSkipForwardRequestCommand(uint8_t seqNum,
+                                                                                     chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode an StartOverRequest command for Media Playback server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeMediaPlaybackClusterStartOverRequestCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeMediaPlaybackClusterStartOverRequestCommand(uint8_t seqNum,
+                                                                                   chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
@@ -1436,13 +1661,15 @@ chip::System::PacketBufferHandle encodeMediaPlaybackClusterDiscoverAttributes(ui
  * @brief
  *    Encode a Media Playback server read command for the current state attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeMediaPlaybackClusterReadCurrentStateAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeMediaPlaybackClusterReadCurrentStateAttribute(uint8_t seqNum,
+                                                                                     chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a Media Playback server read command for the cluster revision attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeMediaPlaybackClusterReadClusterRevisionAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeMediaPlaybackClusterReadClusterRevisionAttribute(uint8_t seqNum,
+                                                                                        chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
 | Cluster OnOff                                                       | 0x0006 |
@@ -1491,13 +1718,15 @@ chip::System::PacketBufferHandle encodeOnOffClusterReadOnOffAttribute(uint8_t se
  * @brief
  *    Encode a On/off server configure report command for the on/off attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeOnOffClusterConfigureOnOffAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint16_t minInterval, uint16_t maxInterval);
+chip::System::PacketBufferHandle encodeOnOffClusterConfigureOnOffAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                           uint16_t minInterval, uint16_t maxInterval);
 
 /**
  * @brief
  *    Encode a On/off server read command for the cluster revision attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeOnOffClusterReadClusterRevisionAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeOnOffClusterReadClusterRevisionAttribute(uint8_t seqNum,
+                                                                                chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
 | Cluster Scenes                                                      | 0x0005 |
@@ -1524,43 +1753,52 @@ chip::System::PacketBufferHandle encodeOnOffClusterReadClusterRevisionAttribute(
  * @brief
  *    Encode an AddScene command for Scenes server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeScenesClusterAddSceneCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint16_t groupId, uint8_t sceneId, uint16_t transitionTime, char * sceneName, chip::ClusterId clusterId, uint8_t length, uint8_t value);
+chip::System::PacketBufferHandle encodeScenesClusterAddSceneCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                    uint16_t groupId, uint8_t sceneId, uint16_t transitionTime,
+                                                                    char * sceneName, chip::ClusterId clusterId, uint8_t length,
+                                                                    uint8_t value);
 
 /**
  * @brief
  *    Encode an GetSceneMembership command for Scenes server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeScenesClusterGetSceneMembershipCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint16_t groupId);
+chip::System::PacketBufferHandle encodeScenesClusterGetSceneMembershipCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                              uint16_t groupId);
 
 /**
  * @brief
  *    Encode an RecallScene command for Scenes server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeScenesClusterRecallSceneCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint16_t groupId, uint8_t sceneId, uint16_t transitionTime);
+chip::System::PacketBufferHandle encodeScenesClusterRecallSceneCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                       uint16_t groupId, uint8_t sceneId, uint16_t transitionTime);
 
 /**
  * @brief
  *    Encode an RemoveAllScenes command for Scenes server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeScenesClusterRemoveAllScenesCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint16_t groupId);
+chip::System::PacketBufferHandle encodeScenesClusterRemoveAllScenesCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                           uint16_t groupId);
 
 /**
  * @brief
  *    Encode an RemoveScene command for Scenes server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeScenesClusterRemoveSceneCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint16_t groupId, uint8_t sceneId);
+chip::System::PacketBufferHandle encodeScenesClusterRemoveSceneCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                       uint16_t groupId, uint8_t sceneId);
 
 /**
  * @brief
  *    Encode an StoreScene command for Scenes server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeScenesClusterStoreSceneCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint16_t groupId, uint8_t sceneId);
+chip::System::PacketBufferHandle encodeScenesClusterStoreSceneCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                      uint16_t groupId, uint8_t sceneId);
 
 /**
  * @brief
  *    Encode an ViewScene command for Scenes server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeScenesClusterViewSceneCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint16_t groupId, uint8_t sceneId);
+chip::System::PacketBufferHandle encodeScenesClusterViewSceneCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                     uint16_t groupId, uint8_t sceneId);
 
 /**
  * @brief
@@ -1602,7 +1840,8 @@ chip::System::PacketBufferHandle encodeScenesClusterReadNameSupportAttribute(uin
  * @brief
  *    Encode a Scenes server read command for the cluster revision attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeScenesClusterReadClusterRevisionAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeScenesClusterReadClusterRevisionAttribute(uint8_t seqNum,
+                                                                                 chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
 | Cluster TemperatureMeasurement                                      | 0x0402 |
@@ -1620,34 +1859,42 @@ chip::System::PacketBufferHandle encodeScenesClusterReadClusterRevisionAttribute
  * @brief
  *    Encode a Temperature Measurement server discover command into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeTemperatureMeasurementClusterDiscoverAttributes(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeTemperatureMeasurementClusterDiscoverAttributes(uint8_t seqNum,
+                                                                                       chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a Temperature Measurement server read command for the measured value attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeTemperatureMeasurementClusterReadMeasuredValueAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle
+encodeTemperatureMeasurementClusterReadMeasuredValueAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
- *    Encode a Temperature Measurement server configure report command for the measured value attribute into buffer including the APS frame
+ *    Encode a Temperature Measurement server configure report command for the measured value attribute into buffer including the
+ * APS frame
  */
-chip::System::PacketBufferHandle encodeTemperatureMeasurementClusterConfigureMeasuredValueAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint16_t minInterval, uint16_t maxInterval, int16_t change);
+chip::System::PacketBufferHandle
+encodeTemperatureMeasurementClusterConfigureMeasuredValueAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                   uint16_t minInterval, uint16_t maxInterval, int16_t change);
 
 /**
  * @brief
  *    Encode a Temperature Measurement server read command for the min measured value attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeTemperatureMeasurementClusterReadMinMeasuredValueAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle
+encodeTemperatureMeasurementClusterReadMinMeasuredValueAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a Temperature Measurement server read command for the max measured value attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeTemperatureMeasurementClusterReadMaxMeasuredValueAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle
+encodeTemperatureMeasurementClusterReadMaxMeasuredValueAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a Temperature Measurement server read command for the cluster revision attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeTemperatureMeasurementClusterReadClusterRevisionAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle
+encodeTemperatureMeasurementClusterReadClusterRevisionAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
