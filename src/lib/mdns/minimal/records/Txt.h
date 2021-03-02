@@ -27,27 +27,19 @@ namespace Minimal {
 class TxtResourceRecord : public ResourceRecord
 {
 public:
-    static constexpr uint64_t kDefaultTtl = 10;
-
     TxtResourceRecord(const FullQName & qName, const char ** entries, size_t entryCount) :
         ResourceRecord(QType::TXT, qName), mEntries(entries), mEntryCount(entryCount)
-    {
-        SetTtl(kDefaultTtl);
-    }
+    {}
 
     template <size_t N>
     TxtResourceRecord(const FullQName & qName, const char * (&entries)[N]) :
         ResourceRecord(QType::TXT, qName), mEntries(entries), mEntryCount(N)
-    {
-        SetTtl(kDefaultTtl);
-    }
+    {}
 
     // A FullQName is a holder of a string array.
     TxtResourceRecord(const FullQName & qName, FullQName entries) :
         ResourceRecord(QType::TXT, qName), mEntries(entries.names), mEntryCount(entries.nameCount)
-    {
-        SetTtl(kDefaultTtl);
-    }
+    {}
 
 protected:
     bool WriteData(chip::Encoding::BigEndian::BufferWriter & out) const override
