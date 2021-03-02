@@ -41,7 +41,7 @@
 
 #include "board_features.h"
 #include "em_cmu.h"
-#include "hal-config-board.h"
+#include "hal-config.h"
 
 #include "bsp.h"
 

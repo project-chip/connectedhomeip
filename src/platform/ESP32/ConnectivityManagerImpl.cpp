@@ -116,7 +116,7 @@ void ConnectivityManagerImpl::_ClearWiFiStationProvision(void)
         wifi_config_t stationConfig;
 
         memset(&stationConfig, 0, sizeof(stationConfig));
-        esp_wifi_set_config(ESP_IF_WIFI_STA, &stationConfig);
+        esp_wifi_set_config(WIFI_IF_STA, &stationConfig);
 
         SystemLayer.ScheduleWork(DriveStationState, NULL);
         SystemLayer.ScheduleWork(DriveAPState, NULL);
@@ -360,7 +360,7 @@ CHIP_ERROR ConnectivityManagerImpl::_GetAndLogWifiStatsCounters(void)
     uint16_t freq;
     uint16_t bssid;
 
-    err = esp_wifi_get_config(ESP_IF_WIFI_STA, &wifiConfig);
+    err = esp_wifi_get_config(WIFI_IF_STA, &wifiConfig);
     if (err != ESP_OK)
     {
         ChipLogError(DeviceLayer, "esp_wifi_get_config() failed: %s", ErrorStr(err));
@@ -424,7 +424,7 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
             memcpy(wifiConfig.sta.password, CONFIG_DEFAULT_WIFI_PASSWORD, strlen(CONFIG_DEFAULT_WIFI_PASSWORD) + 1);
             wifiConfig.sta.scan_method = WIFI_ALL_CHANNEL_SCAN;
             wifiConfig.sta.sort_method = WIFI_CONNECT_AP_BY_SIGNAL;
-            err                        = esp_wifi_set_config(ESP_IF_WIFI_STA, &wifiConfig);
+            err                        = esp_wifi_set_config(WIFI_IF_STA, &wifiConfig);
             if (err != ESP_OK)
             {
                 ChipLogError(DeviceLayer, "esp_wifi_set_config() failed: %s", chip::ErrorStr(err));
@@ -875,10 +875,10 @@ CHIP_ERROR ConnectivityManagerImpl::ConfigureWiFiAP()
     wifiConfig.ap.max_connection  = CHIP_DEVICE_CONFIG_WIFI_AP_MAX_STATIONS;
     wifiConfig.ap.beacon_interval = CHIP_DEVICE_CONFIG_WIFI_AP_BEACON_INTERVAL;
     ChipLogProgress(DeviceLayer, "Configuring WiFi AP: SSID %s, channel %u", wifiConfig.ap.ssid, wifiConfig.ap.channel);
-    err = esp_wifi_set_config(ESP_IF_WIFI_AP, &wifiConfig);
+    err = esp_wifi_set_config(WIFI_IF_AP, &wifiConfig);
     if (err != ESP_OK)
     {
-        ChipLogError(DeviceLayer, "esp_wifi_set_config(ESP_IF_WIFI_AP) failed: %s", chip::ErrorStr(err));
+        ChipLogError(DeviceLayer, "esp_wifi_set_config(WIFI_IF_AP) failed: %s", chip::ErrorStr(err));
     }
     SuccessOrExit(err);
 
@@ -998,6 +998,11 @@ void ConnectivityManagerImpl::OnStationIPv4AddressAvailable(const ip_event_got_i
     RefreshMessageLayer();
 
     UpdateInternetConnectivityState();
+
+    ChipDeviceEvent event;
+    event.Type                           = DeviceEventType::kInterfaceIpAddressChanged;
+    event.InterfaceIpAddressChanged.Type = InterfaceIpChangeType::kIpV4_Assigned;
+    PlatformMgr().PostEvent(&event);
 }
 
 void ConnectivityManagerImpl::OnStationIPv4AddressLost(void)
@@ -1007,6 +1012,11 @@ void ConnectivityManagerImpl::OnStationIPv4AddressLost(void)
     RefreshMessageLayer();
 
     UpdateInternetConnectivityState();
+
+    ChipDeviceEvent event;
+    event.Type                           = DeviceEventType::kInterfaceIpAddressChanged;
+    event.InterfaceIpAddressChanged.Type = InterfaceIpChangeType::kIpV4_Lost;
+    PlatformMgr().PostEvent(&event);
 }
 
 void ConnectivityManagerImpl::OnIPv6AddressAvailable(const ip_event_got_ip6_t & got_ip)
@@ -1021,6 +1031,11 @@ void ConnectivityManagerImpl::OnIPv6AddressAvailable(const ip_event_got_ip6_t & 
     RefreshMessageLayer();
 
     UpdateInternetConnectivityState();
+
+    ChipDeviceEvent event;
+    event.Type                           = DeviceEventType::kInterfaceIpAddressChanged;
+    event.InterfaceIpAddressChanged.Type = InterfaceIpChangeType::kIpV6_Assigned;
+    PlatformMgr().PostEvent(&event);
 }
 
 void ConnectivityManagerImpl::RefreshMessageLayer(void) {}

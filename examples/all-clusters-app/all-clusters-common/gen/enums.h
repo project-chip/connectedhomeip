@@ -223,6 +223,14 @@ typedef enum
     EMBER_ZCL_APPLIANCE_STATUS_SUPERHEATING                = 15,
 } EmberAfApplianceStatus;
 
+// Enum for ApplicationBasicStatus
+typedef enum
+{
+    EMBER_ZCL_APPLICATION_BASIC_STATUS_STOPPED    = 0,
+    EMBER_ZCL_APPLICATION_BASIC_STATUS_RUNNING    = 1,
+    EMBER_ZCL_APPLICATION_BASIC_STATUS_BACKGROUND = 2,
+} EmberAfApplicationBasicStatus;
+
 // Enum for AttributeReportingStatus
 typedef enum
 {

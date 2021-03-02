@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2020 Project CHIP Authors
+#    Copyright (c) 2020-2021 Project CHIP Authors
 #    Copyright (c) 2019-2020 Google, LLC.
 #    Copyright (c) 2013-2018 Nest Labs, Inc.
 #    All rights reserved.
@@ -61,7 +61,7 @@ class DCState(enum.IntEnum):
 
 @_singleton
 class ChipDeviceController(object):
-    def __init__(self, startNetworkThread=True):
+    def __init__(self, startNetworkThread=True, controllerNodeId=0):
         self.state = DCState.NOT_INITIALIZED
         self.devCtrl = None
         self._ChipStack = ChipStack()
@@ -70,7 +70,7 @@ class ChipDeviceController(object):
         self._InitLib()
 
         devCtrl = c_void_p(None)
-        res = self._dmLib.pychip_DeviceController_NewDeviceController(pointer(devCtrl))
+        res = self._dmLib.pychip_DeviceController_NewDeviceController(pointer(devCtrl), controllerNodeId)
         if res != 0:
             raise self._ChipStack.ErrorToException(res)
 
@@ -169,7 +169,7 @@ class ChipDeviceController(object):
             self._dmLib = CDLL(self._ChipStack.LocateChipDLL())
 
             self._dmLib.pychip_DeviceController_NewDeviceController.argtypes = [
-                POINTER(c_void_p)
+                POINTER(c_void_p), c_uint64
             ]
             self._dmLib.pychip_DeviceController_NewDeviceController.restype = c_uint32
 

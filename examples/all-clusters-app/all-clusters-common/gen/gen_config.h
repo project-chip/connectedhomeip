@@ -29,6 +29,7 @@
 #define EMBER_APS_UNICAST_MESSAGE_COUNT 10
 
 /**** Cluster endpoint counts ****/
+#define EMBER_AF_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_BARRIER_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT (2)
 #define EMBER_AF_BINDING_CLUSTER_SERVER_ENDPOINT_COUNT (1)
@@ -45,6 +46,11 @@
 #define EMBER_AF_TEMP_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 
 /**** Cluster Plugins ****/
+
+// Use this macro to check if the server side of the Application Basic cluster is included
+#define ZCL_USING_APPLICATION_BASIC_CLUSTER_SERVER
+#define EMBER_AF_PLUGIN_APPLICATION_BASIC_SERVER
+#define EMBER_AF_PLUGIN_APPLICATION_BASIC
 
 // Use this macro to check if the server side of the Barrier Control cluster is included
 #define ZCL_USING_BARRIER_CONTROL_CLUSTER_SERVER

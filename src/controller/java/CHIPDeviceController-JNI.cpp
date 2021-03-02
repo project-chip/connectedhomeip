@@ -28,6 +28,7 @@
 #include "AndroidDeviceControllerWrapper.h"
 
 #include <app/chip-zcl-zpro-codec.h>
+#include <atomic>
 #include <ble/BleUUID.h>
 #include <controller/CHIPDeviceController_deprecated.h>
 #include <jni.h>
@@ -1048,13 +1049,16 @@ void * IOThreadMain(void * arg)
     sJVM->AttachCurrentThreadAsDaemon((void **) &env, (void *) &attachArgs);
 #endif
 
+    // Set to true to quit the loop. This is currently unused.
+    std::atomic<bool> quit;
+
     ChipLogProgress(Controller, "IO thread starting");
 
     // Lock the stack to prevent collisions with Java threads.
     pthread_mutex_lock(&sStackLock);
 
     // Loop until we are told to exit.
-    while (true)
+    while (!quit.load(std::memory_order_relaxed))
     {
         numFDs = 0;
         FD_ZERO(&readFDs);

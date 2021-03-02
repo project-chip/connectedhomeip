@@ -43,7 +43,7 @@
 #include "af-event.h"
 #include "af-main.h"
 #include "af.h"
-#include "common.h"
+#include "app/util/common.h"
 
 #include "gen/attribute-id.h"
 #include "gen/attribute-type.h"
@@ -315,7 +315,7 @@ void emberAfStackDown(void)
     // (Issue 77101) Also don't clear the table if the stack has gone down as a
     // a result of losing its parent or some other transient state where a future
     // rejoin is expected to get us back online.
-    if (false
+    if ((false)
         // emberStackIsPerformingRejoin() == false
         // && emberNetworkState() == EMBER_NO_NETWORK
     )

@@ -28,7 +28,7 @@ config("includes") {
   ]
 }
 
-executable("tv-server") {
+executable("chip-tv-app") {
   sources = [ "main.cpp" ]
 
   public_configs = [ ":includes" ]
@@ -42,5 +42,5 @@ executable("tv-server") {
 }
 
 group("linux") {
-  deps = [ ":tv-server" ]
+  deps = [ ":chip-tv-app" ]
 }

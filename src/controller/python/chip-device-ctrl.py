@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 #
-#    Copyright (c) 2020 Project CHIP Authors
+#    Copyright (c) 2020-2021 Project CHIP Authors
 #    Copyright (c) 2013-2018 Nest Labs, Inc.
 #    All rights reserved.
 #
@@ -125,7 +125,7 @@ def FormatZCLArguments(args, command):
 
 
 class DeviceMgrCmd(Cmd):
-    def __init__(self, rendezvousAddr=None):
+    def __init__(self, rendezvousAddr=None, controllerNodeId=0):
         self.lastNetworkId = None
 
         Cmd.__init__(self)
@@ -142,7 +142,7 @@ class DeviceMgrCmd(Cmd):
 
         self.bleMgr = None
 
-        self.devCtrl = ChipDeviceCtrl.ChipDeviceController()
+        self.devCtrl = ChipDeviceCtrl.ChipDeviceController(controllerNodeId=controllerNodeId)
 
         self.historyFileName = os.path.expanduser(
             "~/.chip-device-ctrl-history")
@@ -508,13 +508,23 @@ def main():
         help="Device rendezvous address",
         metavar="<ip-address>",
     )
+    optParser.add_option(
+        "-n",
+        "--controller-nodeid",
+        action="store",
+        dest="controllerNodeId",
+        default=0,
+        type='int',
+        help="Controller node ID",
+        metavar="<nodeid>",
+    )
     (options, remainingArgs) = optParser.parse_args(sys.argv[1:])
 
     if len(remainingArgs) != 0:
         print("Unexpected argument: %s" % remainingArgs[0])
         sys.exit(-1)
 
-    devMgrCmd = DeviceMgrCmd(rendezvousAddr=options.rendezvousAddr)
+    devMgrCmd = DeviceMgrCmd(rendezvousAddr=options.rendezvousAddr, controllerNodeId=options.controllerNodeId)
     print("Chip Device Controller Shell")
     if options.rendezvousAddr:
         print("Rendezvous address set to %s" % options.rendezvousAddr)

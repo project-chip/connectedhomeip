@@ -17,11 +17,6 @@ import("//build_overrides/build.gni")
 import("${build_root}/toolchain/flashable_executable.gni")
 
 template("ti_simplelink_executable") {
-  # we really only need the ELF
-  objcopy_image_name = invoker.output_name + ".hex"
-  objcopy_image_format = "ihex"
-  objcopy = "arm-none-eabi-objcopy"
-
   flashable_executable(target_name) {
     forward_variables_from(invoker, "*")
   }

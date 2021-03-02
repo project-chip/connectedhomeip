@@ -191,6 +191,12 @@ enum PublicEventTypes
      * Signals that the state of CHIPoBLE advertising has changed.
      */
     kCHIPoBLEAdvertisingChange,
+
+    /**
+     * IP address availability - either ipv4 or ipv6 addresses assigned to the underlying
+     * wifi/ethernet interface.
+     */
+    kInterfaceIpAddressChanged,
 };
 
 /**
@@ -226,6 +232,14 @@ enum ConnectivityChange
     kConnectivity_NoChange    = 0,
     kConnectivity_Established = 1,
     kConnectivity_Lost        = -1
+};
+
+enum class InterfaceIpChangeType
+{
+    kIpV4_Assigned,
+    kIpV4_Lost,
+    kIpV6_Assigned,
+    kIpV6_Lost,
 };
 
 /**
@@ -383,6 +397,10 @@ struct ChipDeviceEvent final
         {
             ActivityChange Result;
         } CHIPoBLEAdvertisingChange;
+        struct
+        {
+            InterfaceIpChangeType Type;
+        } InterfaceIpAddressChanged;
     };
 
     void Clear() { memset(this, 0, sizeof(*this)); }

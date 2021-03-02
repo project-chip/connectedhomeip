@@ -24,22 +24,16 @@ config("includes") {
   include_dirs = [
     ".",
     "include",
-    "${chip_root}/src/app/util",
-    "${chip_root}/src/app/server",
   ]
 }
 
-executable("chip-tool-server") {
+executable("chip-lighting-app") {
   sources = [
     "LightingManager.cpp",
     "Options.cpp",
     "include/LightingManager.h",
     "main.cpp",
   ]
-
-  if (chip_app_use_interaction_model) {
-    defines += [ "CHIP_APP_USE_INTERACTION_MODEL" ]
-  }
 
   public_configs = [ ":includes" ]
 
@@ -52,5 +46,5 @@ executable("chip-tool-server") {
 }
 
 group("linux") {
-  deps = [ ":chip-tool-server" ]
+  deps = [ ":chip-lighting-app" ]
 }
