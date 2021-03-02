@@ -98,7 +98,7 @@ CHIP_ERROR ExchangeContext::SendMessage(uint16_t protocolId, uint8_t msgType, Pa
         ReturnErrorOnFailure(err);
 
         // Initiate message counter synchronization if no message counter synchronization is in progress.
-        if (!messageCounterSyncMgr->IsMsgCounterSyncReqInProgress())
+        if (!state->IsMsgCounterSyncInProgress())
         {
             err = mExchangeMgr->GetMessageCounterSyncMgr()->SendMsgCounterSyncReq(mSecureSession);
         }

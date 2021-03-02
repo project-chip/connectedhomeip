@@ -76,7 +76,17 @@ void MessageCounterSyncMgr::OnMessageReceived(Messaging::ExchangeContext * excha
 
 void MessageCounterSyncMgr::OnResponseTimeout(Messaging::ExchangeContext * exchangeContext)
 {
-    mIsMsgCounterSyncReqInProgress = false;
+    Transport::PeerConnectionState * state =
+        mExchangeMgr->GetSessionMgr()->GetPeerConnectionState(exchangeContext->GetSecureSessionHandle());
+
+    if (state != nullptr)
+    {
+        state->SetMsgCounterSyncInProgress(false);
+    }
+    else
+    {
+        ChipLogError(ExchangeManager, "Timed out! Failed to clear message counter synchronization status.");
+    }
 
     // Close the exchange if MsgCounterSyncRsp is not received before kMsgCounterSyncTimeout.
     if (exchangeContext != nullptr)
@@ -219,11 +229,16 @@ CHIP_ERROR MessageCounterSyncMgr::NewMsgCounterSyncExchange(SecureSessionHandle 
 
 CHIP_ERROR MessageCounterSyncMgr::SendMsgCounterSyncReq(SecureSessionHandle session)
 {
-    CHIP_ERROR err                               = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
     Messaging::ExchangeContext * exchangeContext = nullptr;
+    Transport::PeerConnectionState * state       = nullptr;
     System::PacketBufferHandle msgBuf;
     Messaging::SendFlags sendFlags;
     uint8_t challenge[kMsgCounterChallengeSize];
+
+    state = mExchangeMgr->GetSessionMgr()->GetPeerConnectionState(session);
+    VerifyOrExit(state != nullptr, err = CHIP_ERROR_NOT_CONNECTED);
 
     // Create and initialize new exchange.
     err = NewMsgCounterSyncExchange(session, exchangeContext);
@@ -254,7 +269,7 @@ CHIP_ERROR MessageCounterSyncMgr::SendMsgCounterSyncReq(SecureSessionHandle sess
                                            std::move(msgBuf), sendFlags);
     SuccessOrExit(err);
 
-    mIsMsgCounterSyncReqInProgress = true;
+    state->SetMsgCounterSyncInProgress(true);
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -358,7 +373,12 @@ void MessageCounterSyncMgr::HandleMsgCounterSyncResp(Messaging::ExchangeContext 
     size_t resplen       = msgBuf->DataLength();
 
     ChipLogDetail(ExchangeManager, "Received MsgCounterSyncResp response");
-    mIsMsgCounterSyncReqInProgress = false;
+
+    // Find an active connection to the specified peer node
+    state = mExchangeMgr->GetSessionMgr()->GetPeerConnectionState(exchangeContext->GetSecureSessionHandle());
+    VerifyOrExit(state != nullptr, err = CHIP_ERROR_NOT_CONNECTED);
+
+    state->SetMsgCounterSyncInProgress(false);
 
     VerifyOrExit(msgBuf->DataLength() == kMsgCounterSyncRespMsgSize, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
     VerifyOrExit(ChipKeyId::IsAppGroupKey(packetHeader.GetEncryptionKeyID()), err = CHIP_ERROR_WRONG_KEY_TYPE);
@@ -378,10 +398,6 @@ void MessageCounterSyncMgr::HandleMsgCounterSyncResp(Messaging::ExchangeContext 
 
     VerifyOrExit(packetHeader.GetSourceNodeId().HasValue(), err = CHIP_ERROR_INVALID_ARGUMENT);
     peerNodeId = packetHeader.GetSourceNodeId().Value();
-
-    // Find an active connection to the specified peer node
-    state = mExchangeMgr->GetSessionMgr()->GetPeerConnectionState({ peerNodeId, packetHeader.GetEncryptionKeyID(), 0 });
-    VerifyOrExit(state != nullptr, err = CHIP_ERROR_NOT_CONNECTED);
 
     // Process all queued ougoing and incomming group messages after message counter synchronization is completed.
     RetransPendingGroupMsgs(peerNodeId);

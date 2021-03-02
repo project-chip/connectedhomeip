@@ -233,12 +233,15 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
 
     if (!isMsgCounterSyncMessage(payloadHeader) && packetHeader.IsPeerGroupMsgIdNotSynchronized())
     {
+        Transport::PeerConnectionState * state = mSessionMgr->GetPeerConnectionState(session);
+        VerifyOrReturn(state != nullptr);
+
         // Queue the message as need for sync with destination node.
         err = mMessageCounterSyncMgr.AddToReceiveTable(packetHeader, payloadHeader, session, std::move(msgBuf));
         VerifyOrReturn(err == CHIP_NO_ERROR);
 
         // Initiate message counter synchronization if no message counter synchronization is in progress.
-        if (!mMessageCounterSyncMgr.IsMsgCounterSyncReqInProgress())
+        if (!state->IsMsgCounterSyncInProgress())
         {
             err = mMessageCounterSyncMgr.SendMsgCounterSyncReq(session);
         }

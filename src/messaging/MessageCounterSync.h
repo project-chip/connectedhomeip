@@ -36,11 +36,10 @@ class ExchangeManager;
 class MessageCounterSyncMgr : public Messaging::ExchangeDelegate
 {
 public:
-    MessageCounterSyncMgr() : mExchangeMgr(nullptr), mIsMsgCounterSyncReqInProgress(false) {}
+    MessageCounterSyncMgr() : mExchangeMgr(nullptr) {}
 
     CHIP_ERROR Init(Messaging::ExchangeManager * exchangeMgr);
     void Shutdown();
-    bool IsMsgCounterSyncReqInProgress() { return mIsMsgCounterSyncReqInProgress; }
 
     /**
      * Send peer message counter synchronization request.
@@ -130,7 +129,6 @@ private:
     };
 
     Messaging::ExchangeManager * mExchangeMgr; // [READ ONLY] Associated Exchange Manager object.
-    bool mIsMsgCounterSyncReqInProgress;       // Indicate if a peer's message counter synchronization is in progress.
 
     // MessageCounterSyncProtocol cache table to queue the outging messages that trigger message counter synchronization protocol.
     RetransTableEntry mRetransTable[CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS];
