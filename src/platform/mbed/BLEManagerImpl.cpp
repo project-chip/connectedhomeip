@@ -70,6 +70,8 @@ namespace Internal {
 
 namespace {
 const UUID ShortUUID_CHIPoBLEService(0xFEAF);
+const UUID LongUUID_CHIPoBLEChar_RX("18EE2EF5-263D-4559-959F-4F9C429F9D11");
+const UUID LongUUID_CHIPoBLEChar_TX("18EE2EF5-263D-4559-959F-4F9C429F9D12");
 const ChipBleUUID ChipUUID_CHIPoBLEChar_RX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F,
                                                  0x9D, 0x11 } };
 const ChipBleUUID ChipUUID_CHIPoBLEChar_TX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F,
@@ -85,8 +87,6 @@ mbed::DigitalOut led1(LED1, 1);
 mbed::DigitalOut led2(LED2, 1);
 mbed::DigitalOut led3(LED3, 1);
 #endif
-
-BLEManagerImpl BLEManagerImpl::sInstance;
 
 // FIXME use CHIP platform for deferred calls
 #if _BLEMGRIMPL_USE_MBED_EVENTS
@@ -250,7 +250,162 @@ class GapEventHandler : private mbed::NonCopyable<GapEventHandler>, public ble::
     void onPrivacyEnabled() { ChipLogDetail(DeviceLayer, "GAP %s", __FUNCTION__); }
 };
 
+struct CHIPService : public ble::GattServer::EventHandler
+{
+    CHIPService() {}
+    CHIPService(const CHIPService &) = delete;
+    CHIPService & operator=(const CHIPService &) = delete;
+
+    CHIP_ERROR init(ble::BLE & ble_interface)
+    {
+        ChipLogDetail(DeviceLayer, "GATT %s", __FUNCTION__);
+
+        if (mCHIPoBLEChar_RX != nullptr || mCHIPoBLEChar_TX != nullptr)
+        {
+            return CHIP_NO_ERROR;
+        }
+
+        mCHIPoBLEChar_RX = new GattCharacteristic(LongUUID_CHIPoBLEChar_RX, nullptr, 0, 0,
+                                                  GattCharacteristic::BLE_GATT_CHAR_PROPERTIES_WRITE |
+                                                      GattCharacteristic::BLE_GATT_CHAR_PROPERTIES_WRITE_WITHOUT_RESPONSE);
+
+        mCHIPoBLEChar_TX = new GattCharacteristic(LongUUID_CHIPoBLEChar_TX, nullptr, 0, 0,
+                                                  GattCharacteristic::BLE_GATT_CHAR_PROPERTIES_INDICATE |
+                                                      GattCharacteristic::BLE_GATT_CHAR_PROPERTIES_NOTIFY);
+
+        // Setup callback
+        mCHIPoBLEChar_RX->setWriteAuthorizationCallback(this, &CHIPService::onWriteAuth);
+
+        GattCharacteristic * chipoble_gatt_characteristics[] = { mCHIPoBLEChar_RX, mCHIPoBLEChar_TX };
+        auto num_characteristics = sizeof chipoble_gatt_characteristics / sizeof chipoble_gatt_characteristics[0];
+        GattService chipoble_gatt_service(ShortUUID_CHIPoBLEService, chipoble_gatt_characteristics, num_characteristics);
+
+        auto mbed_err = ble_interface.gattServer().addService(chipoble_gatt_service);
+        if (mbed_err != BLE_ERROR_NONE)
+        {
+            ChipLogError(DeviceLayer, "Unable to add GATT service, mbed-os err: %d", mbed_err);
+            return CHIP_ERROR_INTERNAL;
+        }
+
+        // Store the attribute handles in the class so they are reused in
+        // callbacks to discriminate events.
+        mRxHandle = mCHIPoBLEChar_RX->getValueHandle();
+        mTxHandle = mCHIPoBLEChar_TX->getValueHandle();
+        // There is a single descriptor in the characteristic, CCCD is at index 0
+        mTxCCCDHandle = mCHIPoBLEChar_TX->getDescriptor(0)->getHandle();
+        ChipLogDetail(DeviceLayer, "char handles: rx=%d, tx=%d, cccd=%d", mRxHandle, mTxHandle, mTxCCCDHandle);
+
+        ble_interface.gattServer().setEventHandler(this);
+        return CHIP_NO_ERROR;
+    }
+
+    // Write authorization callback
+    void onWriteAuth(GattWriteAuthCallbackParams * params)
+    {
+        ChipLogDetail(DeviceLayer, "GATT %s, connHandle=%d, attHandle=%d", __FUNCTION__, params->connHandle, params->handle);
+        if (params->handle == mRxHandle)
+        {
+            ChipLogDetail(DeviceLayer, "Received BLE packet on RX");
+
+            // Allocate a buffer, copy the data. They will be passed into the event
+            auto buf = System::PacketBufferHandle::NewWithData(params->data, params->len);
+            if (buf.IsNull())
+            {
+                params->authorizationReply = AUTH_CALLBACK_REPLY_ATTERR_WRITE_REQUEST_REJECTED;
+                ChipLogError(DeviceLayer, "Dropping packet, not enough memory");
+                return;
+            }
+
+            params->authorizationReply = AUTH_CALLBACK_REPLY_SUCCESS;
+
+            ChipDeviceEvent chip_event;
+            chip_event.Type                        = DeviceEventType::kCHIPoBLEWriteReceived;
+            chip_event.CHIPoBLEWriteReceived.ConId = params->connHandle;
+            chip_event.CHIPoBLEWriteReceived.Data  = std::move(buf).UnsafeRelease();
+            PlatformMgrImpl().PostEvent(&chip_event);
+        }
+        else
+        {
+            params->authorizationReply = AUTH_CALLBACK_REPLY_ATTERR_INVALID_HANDLE;
+        }
+    }
+
+    // overrides of GattServerEvent Handler
+    void onAttMtuChange(ble::connection_handle_t connectionHandle, uint16_t attMtuSize) override
+    {
+        ChipLogDetail(DeviceLayer, "GATT %s", __FUNCTION__);
+    }
+
+    void onDataSent(const GattDataSentCallbackParams & params) override
+    {
+        ChipLogDetail(DeviceLayer, "GATT %s, connHandle=%d, attHandle=%d", __FUNCTION__, params.connHandle, params.attHandle);
+    }
+
+    void onDataWritten(const GattWriteCallbackParams & params) override
+    {
+        ChipLogDetail(DeviceLayer, "GATT %s, connHandle=%d, attHandle=%d", __FUNCTION__, params.connHandle, params.handle);
+    }
+
+    void onDataRead(const GattReadCallbackParams & params) override
+    {
+        ChipLogDetail(DeviceLayer, "GATT %s, connHandle=%d, attHandle=%d", __FUNCTION__, params.connHandle, params.handle);
+    }
+
+    void onShutdown(const ble::GattServer & server) override { ChipLogDetail(DeviceLayer, "GATT %s", __FUNCTION__); }
+
+    void onUpdatesEnabled(const GattUpdatesEnabledCallbackParams & params) override
+    {
+        ChipLogDetail(DeviceLayer, "GATT %s, connHandle=%d, attHandle=%d", __FUNCTION__, params.connHandle, params.attHandle);
+        if (params.attHandle == mTxCCCDHandle)
+        {
+            ChipLogDetail(DeviceLayer, "Updates enabled on TX CCCD");
+            ChipDeviceEvent chip_event;
+            chip_event.Type                    = DeviceEventType::kCHIPoBLESubscribe;
+            chip_event.CHIPoBLESubscribe.ConId = params.connHandle;
+            PlatformMgrImpl().PostEvent(&chip_event);
+        }
+    }
+
+    void onUpdatesDisabled(const GattUpdatesDisabledCallbackParams & params) override
+    {
+        ChipLogDetail(DeviceLayer, "GATT %s, connHandle=%d, attHandle=%d", __FUNCTION__, params.connHandle, params.attHandle);
+        if (params.attHandle == mTxCCCDHandle)
+        {
+            ChipLogDetail(DeviceLayer, "Updates disabled on TX CCCD");
+            ChipDeviceEvent chip_event;
+            chip_event.Type                      = DeviceEventType::kCHIPoBLEUnsubscribe;
+            chip_event.CHIPoBLEUnsubscribe.ConId = params.connHandle;
+            PlatformMgrImpl().PostEvent(&chip_event);
+        }
+    }
+
+    void onConfirmationReceived(const GattConfirmationReceivedCallbackParams & params) override
+    {
+        ChipLogDetail(DeviceLayer, "GATT %s, connHandle=%d, attHandle=%d", __FUNCTION__, params.connHandle, params.attHandle);
+        if (params.attHandle == mTxHandle)
+        {
+            ChipLogDetail(DeviceLayer, "Confirmation received for TX transfer");
+            ChipDeviceEvent chip_event;
+            chip_event.Type                          = DeviceEventType::kCHIPoBLEIndicateConfirm;
+            chip_event.CHIPoBLEIndicateConfirm.ConId = params.connHandle;
+            PlatformMgrImpl().PostEvent(&chip_event);
+        }
+    }
+
+    const ble::attribute_handle_t getTxHandle() const { return mTxHandle; }
+    const ble::attribute_handle_t getTxCCCDHandle() const { return mTxCCCDHandle; }
+    const ble::attribute_handle_t getRxHandle() const { return mRxHandle; }
+
+    GattCharacteristic * mCHIPoBLEChar_RX = nullptr;
+    GattCharacteristic * mCHIPoBLEChar_TX = nullptr;
+    ble::attribute_handle_t mRxHandle     = 0;
+    ble::attribute_handle_t mTxCCCDHandle = 0;
+    ble::attribute_handle_t mTxHandle     = 0;
+};
+
+BLEManagerImpl BLEManagerImpl::sInstance;
 static GapEventHandler sMbedGapEventHandler;
+static CHIPService sCHIPService;
 
 /* Initialize the mbed-os BLE subsystem. Register the BLE event processing
  * callback to the system event queue. Register the BLE initialization complete
@@ -272,11 +427,12 @@ CHIP_ERROR BLEManagerImpl::_Init()
     mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
     mFlags       = CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART ? kFlag_AdvertisingEnabled : 0;
     mGAPConns    = 0;
-    // memset(mSubscribedConns, 0, sizeof(mSubscribedConns));
 
     ble::BLE & ble_interface = ble::BLE::Instance();
 
     ble_interface.gap().setEventHandler(&sMbedGapEventHandler);
+    err = sCHIPService.init(ble_interface);
+    SuccessOrExit(err);
 
     ble_interface.onEventsToProcess(FunctionPointerWithContext<ble::BLE::OnEventsToProcessCallbackContext *>{
         [](ble::BLE::OnEventsToProcessCallbackContext * context) {
@@ -604,7 +760,7 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         ChipLogProgress(DeviceLayer, "_OnPlatformEvent kCHIPoBLESubscribe");
         HandleSubscribeReceived(event->CHIPoBLESubscribe.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_TX);
         connEstEvent.Type = DeviceEventType::kCHIPoBLEConnectionEstablished;
-        PlatformMgr().PostEvent(&connEstEvent);
+        PlatformMgrImpl().PostEvent(&connEstEvent);
     }
     break;
 
