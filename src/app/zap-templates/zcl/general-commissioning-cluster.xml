@@ -1,0 +1,85 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2021 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="CHIP"/>
+  <enum name="GeneralCommissioningError" type="ENUM8">
+    <item name="Ok" value="0x0"/>
+    <item name="ValueOutsideRange" value="0x1"/>
+    <item name="CannotChangeFabric" value="0x2"/>
+    <item name="InvalidAuthentication" value="0x3"/>
+  </enum>
+  <enum name="RegulatoryLocationType" type="ENUM8">
+    <item name="Indoor" value="0x0"/>
+    <item name="Outdoor" value="0x1"/>
+    <item name="IndoorOutdoor" value="0x2"/>
+  </enum>
+  <struct name="BasicCommissioningInfo">
+    <item name="FailSafeExpiryLengthMs" type="INT32U"/>
+  </struct>  
+  <cluster>
+    <domain>General</domain>
+    <name>General Commissioning</name>
+    <code>0x0030</code>
+    <define>GENERAL_COMMISSIONING_CLUSTER</define>
+    <description>This cluster is used to set, remove and update fabric information on a commissionee.</description>
+    <attribute side="server" code="0x00" define="FABRIC_ID" type="OCTET_STRING" length="8" writable="false" default="o" optional="false">FabricId</attribute>
+    <attribute side="server" code="0x01" define="BREADCRUMB" type="INT64U" min="0x0000000000000000" max="0xFFFFFFFFFFFFFFFF" writable="true" optional="false">Breadcrumb</attribute>
+    <command source="client" code="0x00" name="SetFabric" optional="false" cli="chip fabric_commissioning setfabric">
+      <description>Set the fabric ID as well as store the fabric secret</description>
+      <arg name="fabricId" type="OCTET_STRING"/>
+      <arg name="fabricSecret" type="OCTET_STRING"/>        
+      <arg name="breadcrumb" type="INT64U"/>
+      <arg name="timeoutMs" type="INT32U"/>
+    </command>
+    <command source="server" code="0x01" name="SetFabricResponse" optional="false" cli="chip fabric_commissioning setfabricresponse">
+      <description>Sender expects SetFabricResponse command within TimeoutMs milliseconds after sending SetFabric command</description>
+      <arg name="errorCode" type="INT8U"/>
+      <arg name="debugText" type="CHAR_STRING"/>
+    </command>
+    <command source="client" code="0x02" name="ArmFailSafe" optional="false" cli="chip fabric_commissioning armfailsafe">
+      <description>Arm the persistent fail-safe timer with an expiry time of now + ExpiryLengthSeconds using device clock</description>
+      <arg name="expiryLengthSeconds" type="INT16U"/>
+      <arg name="breadcrumb" type="INT64U"/>
+      <arg name="timeoutMs" type="INT32U"/>
+    </command>
+    <command source="server" code="0x03" name="ArmFailSafeResponse" optional="false" cli="chip fabric_commissioning armfailsaferesponse">
+      <description>Sender expects ArmFailSafeResponse command within TimeoutMs milliseconds after sending ArmFailSafe command</description>
+      <arg name="errorCode" type="INT8U"/>
+      <arg name="debugText" type="CHAR_STRING"/>
+    </command>
+    <command source="client" code="0x04" name="SetRegulatoryConfig" optional="true" cli="chip fabric_commissioning setregulatoryconfig">
+      <description>Add or update the regulatory configuration</description>
+      <arg name="location" type="RegulatoryLocationType"/>
+      <arg name="countryCode" type="CHAR_STRING"/>      
+      <arg name="breadcrumb" type="INT64U"/>
+      <arg name="timeoutMs" type="INT32U"/>
+    </command>
+    <command source="server" code="0x05" name="SetRegulatoryConfigResponse" optional="true" cli="chip fabric_commissioning setregulatoryconfigresponse">
+      <description>Sender expects SetRegulatoryConfigResponse command within TimeoutMs milliseconds after sending SetRegulatoryConfig command</description>
+      <arg name="errorCode" type="INT8U"/>
+      <arg name="debugText" type="CHAR_STRING"/>
+    </command>
+    <command source="client" code="0x06" name="CommissioningComplete" optional="false" cli="chip fabric_commissioning commissioningcomplete">
+      <description>Signals the Commissionee that the Commissioner has sucessfully completed all steps of commissioning</description>
+    </command>
+    <command source="server" code="0x07" name="CommissioningCompleteResponse" optional="false" cli="chip fabric_commissioning commissioningcompleteresponse">
+      <description>Sender expects CommissioningCompleteResponse command if the CommissioningComplete command was correctly received</description>
+      <arg name="errorCode" type="INT8U"/>
+      <arg name="debugText" type="CHAR_STRING"/>
+    </command>               
+  </cluster>
+</configurator>

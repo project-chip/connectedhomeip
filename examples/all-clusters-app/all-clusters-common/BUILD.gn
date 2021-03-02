@@ -32,6 +32,7 @@ source_set("all-clusters-common") {
     "${chip_root}/src/app/clusters/door-lock-server/door-lock-server-logging.cpp",
     "${chip_root}/src/app/clusters/door-lock-server/door-lock-server-schedule.cpp",
     "${chip_root}/src/app/clusters/door-lock-server/door-lock-server-user.cpp",
+    "${chip_root}/src/app/clusters/general-commissioning-server/general-commissioning-server.cpp",
     "${chip_root}/src/app/clusters/groups-server/groups-server.cpp",
     "${chip_root}/src/app/clusters/ias-zone-server/ias-zone-server.cpp",
     "${chip_root}/src/app/clusters/identify/identify.cpp",

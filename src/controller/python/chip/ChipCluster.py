@@ -258,6 +258,21 @@ class ChipCluster:
                     "pin": "str",
                 },
             },
+            "GeneralCommissioning": {
+                "ArmFailSafe": {
+                    "expiryLengthSeconds": "int",
+                    "breadcrumb": "int",
+                    "timeoutMs": "int",
+                },
+                "CommissioningComplete": {
+                },
+                "SetFabric": {
+                    "fabricId": "str",
+                    "fabricSecret": "str",
+                    "breadcrumb": "int",
+                    "timeoutMs": "int",
+                },
+            },
             "Groups": {
                 "AddGroup": {
                     "groupId": "int",
@@ -770,6 +785,27 @@ class ChipCluster:
             )
         )
 
+    def ClusterGeneralCommissioning_CommandArmFailSafe(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, expiryLengthSeconds: int, breadcrumb: int, timeoutMs: int):
+        self._ChipStack.Call(
+            lambda: self._chipLib.chip_ime_AppendCommand_GeneralCommissioning_ArmFailSafe(
+                device, ZCLendpoint, ZCLgroupid, expiryLengthSeconds, breadcrumb, timeoutMs
+            )
+        )
+
+    def ClusterGeneralCommissioning_CommandCommissioningComplete(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        self._ChipStack.Call(
+            lambda: self._chipLib.chip_ime_AppendCommand_GeneralCommissioning_CommissioningComplete(
+                device, ZCLendpoint, ZCLgroupid
+            )
+        )
+
+    def ClusterGeneralCommissioning_CommandSetFabric(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, fabricId: str, fabricSecret: str, breadcrumb: int, timeoutMs: int):
+        self._ChipStack.Call(
+            lambda: self._chipLib.chip_ime_AppendCommand_GeneralCommissioning_SetFabric(
+                device, ZCLendpoint, ZCLgroupid, fabricId, len(fabricId), fabricSecret, len(fabricSecret), breadcrumb, timeoutMs
+            )
+        )
+
     def ClusterGroups_CommandAddGroup(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, groupId: int, groupName: str):
         groupName = groupName.encode("utf-8") + b'\x00'
         self._ChipStack.Call(
@@ -1242,6 +1278,16 @@ class ChipCluster:
         # Cluster DoorLock Command UnlockWithTimeout
         self._chipLib.chip_ime_AppendCommand_DoorLock_UnlockWithTimeout.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_char_p]
         self._chipLib.chip_ime_AppendCommand_DoorLock_UnlockWithTimeout.restype = ctypes.c_uint32
+        # Cluster GeneralCommissioning
+        # Cluster GeneralCommissioning Command ArmFailSafe
+        self._chipLib.chip_ime_AppendCommand_GeneralCommissioning_ArmFailSafe.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint64, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_GeneralCommissioning_ArmFailSafe.restype = ctypes.c_uint32
+        # Cluster GeneralCommissioning Command CommissioningComplete
+        self._chipLib.chip_ime_AppendCommand_GeneralCommissioning_CommissioningComplete.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_GeneralCommissioning_CommissioningComplete.restype = ctypes.c_uint32
+        # Cluster GeneralCommissioning Command SetFabric
+        self._chipLib.chip_ime_AppendCommand_GeneralCommissioning_SetFabric.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint64, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_GeneralCommissioning_SetFabric.restype = ctypes.c_uint32
         # Cluster Groups
         # Cluster Groups Command AddGroup
         self._chipLib.chip_ime_AppendCommand_Groups_AddGroup.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_char_p]

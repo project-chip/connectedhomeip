@@ -83,6 +83,9 @@
 // Definitions for cluster: Keep-Alive
 #define ZCL_KEEPALIVE_CLUSTER_ID (0x0025)
 
+// Definitions for cluster: General Commissioning
+#define ZCL_GENERAL_COMMISSIONING_CLUSTER_ID (0x0030)
+
 // Definitions for cluster: Shade Configuration
 #define ZCL_SHADE_CONFIG_CLUSTER_ID (0x0100)
 
