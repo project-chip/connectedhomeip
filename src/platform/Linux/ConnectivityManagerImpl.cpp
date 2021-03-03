@@ -21,6 +21,7 @@
 #include <platform/ConnectivityManager.h>
 #include <platform/internal/BLEManager.h>
 
+#include <cstdlib>
 #include <new>
 
 #include <support/CodeUtils.h>
@@ -933,6 +934,20 @@ CHIP_ERROR ConnectivityManagerImpl::ProvisionWiFiNetwork(const char * ssid, cons
                         PlatformMgr().PostEvent(&event);
                     }
                 }
+            }
+
+            // Run dhclient for IP on WiFi.
+            // TODO: The wifi can be managed by networkmanager on linux so we don't have to care about this.
+            char cmdBuffer[128];
+            sprintf(cmdBuffer, "dhclient -nw %s", CHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME);
+            int dhclientSystemRet = system(cmdBuffer);
+            if (dhclientSystemRet != 0)
+            {
+                ChipLogError(DeviceLayer, "Failed to run dhclient, system() returns %d", dhclientSystemRet);
+            }
+            else
+            {
+                ChipLogProgress(DeviceLayer, "dhclient is running on the %s interface.", CHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME);
             }
 
             // Return success as long as the device is connected to the network
