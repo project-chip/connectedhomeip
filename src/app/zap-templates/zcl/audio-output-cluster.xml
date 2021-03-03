@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2021 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="CHIP"/>
+  <cluster>
+    <domain>General</domain>
+    <name>Audio Output</name>
+    <code>0x050b</code>
+    <define>AUDIO_OUTPUT_CLUSTER</define>
+    <client init="false" tick="false">true</client>
+    <server init="false" tick="false">true</server>
+    <description>This cluster provides an interface for controlling the Output on a media device such as a TV.</description>
+    <attribute side="server" code="0x0000" define="AUDIO_OUTPUT_LIST" type="OCTET_STRING" length="32" writable="false" optional="false">audio output list</attribute>
+    <attribute side="server" code="0x0001" define="AUDIO_OUTPUT_CURRENT_OUTPUT" type="INT8U" min="0x00" max="0xFF" writable="false" default="0x00" optional="true">current audio output</attribute>
+
+    <command source="client" code="0x00" name="SelectOutput" optional="false">
+      <description>Upon receipt, this SHALL change the output on the media device to the output at a specific index in the Output List.</description>
+      <arg name="index" type="INT8U"/>
+    </command>
+
+    <command source="client" code="0x01" name="RenameOutput" optional="false">
+      <description>Upon receipt, this SHALL rename the output at a specific index in the Output List. Updates to the output name SHALL appear in the TV settings menus.</description>
+      <arg name="index" type="INT8U"/>
+      <arg name="name" type="CHAR_STRING"/>
+    </command>
+
+  </cluster>
+
+  <struct name="AudioOutputInfo">
+    <item name="Index" type="INT8U"/>
+    <item name="OutputType" type="AudioOutputType"/>
+    <item name="Name" type="CHAR_STRING"/>
+  </struct>
+
+  <enum name="AudioOutputType" type="ENUM8">
+    <item name="Hdmi" value="0x00"/>
+    <item name="Bt" value="0x01"/>
+    <item name="Optical" value="0x02"/>
+    <item name="Headphone" value="0x03"/>
+    <item name="Internal" value="0x04"/>
+    <item name="Other" value="0x05"/>
+  </enum>
+
+</configurator>

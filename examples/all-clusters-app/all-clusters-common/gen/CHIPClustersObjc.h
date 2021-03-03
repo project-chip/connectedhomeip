@@ -60,6 +60,36 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
+ * Cluster Application Launcher
+ *
+ */
+@interface CHIPApplicationLauncher : CHIPCluster
+
+- (void)launchApp:(uint8_t)catalogVendorId
+        applicationId:(char *)applicationId
+                 data:(char *)data
+    completionHandler:(ResponseHandler)completionHandler;
+
+- (void)readAttributeApplicationLauncherList:(ResponseHandler)completionHandler;
+- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
+
+@end
+
+/**
+ * Cluster Audio Output
+ *
+ */
+@interface CHIPAudioOutput : CHIPCluster
+
+- (void)renameOutput:(uint8_t)index name:(char *)name completionHandler:(ResponseHandler)completionHandler;
+- (void)selectOutput:(uint8_t)index completionHandler:(ResponseHandler)completionHandler;
+
+- (void)readAttributeAudioOutputList:(ResponseHandler)completionHandler;
+- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
+
+@end
+
+/**
  * Cluster Barrier Control
  *
  */
@@ -441,6 +471,18 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
+ * Cluster Keypad Input
+ *
+ */
+@interface CHIPKeypadInput : CHIPCluster
+
+- (void)sendKey:(uint8_t)keyAction keyCode:(uint8_t)keyCode completionHandler:(ResponseHandler)completionHandler;
+
+- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
+
+@end
+
+/**
  * Cluster Level Control
  *
  */
@@ -491,6 +533,22 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)sleep:(ResponseHandler)completionHandler;
 
+- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
+
+@end
+
+/**
+ * Cluster Media Input
+ *
+ */
+@interface CHIPMediaInput : CHIPCluster
+
+- (void)hideInputStatus:(ResponseHandler)completionHandler;
+- (void)renameInput:(uint8_t)index name:(char *)name completionHandler:(ResponseHandler)completionHandler;
+- (void)selectInput:(uint8_t)index completionHandler:(ResponseHandler)completionHandler;
+- (void)showInputStatus:(ResponseHandler)completionHandler;
+
+- (void)readAttributeMediaInputList:(ResponseHandler)completionHandler;
 - (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
 
 @end
@@ -570,6 +628,38 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
+ * Cluster TV Channel
+ *
+ */
+@interface CHIPTvChannel : CHIPCluster
+
+- (void)changeChannel:(char *)match completionHandler:(ResponseHandler)completionHandler;
+- (void)changeChannelByNumber:(uint16_t)majorNumber
+                  minorNumber:(uint16_t)minorNumber
+            completionHandler:(ResponseHandler)completionHandler;
+- (void)skipChannel:(uint16_t)count completionHandler:(ResponseHandler)completionHandler;
+
+- (void)readAttributeTvChannelList:(ResponseHandler)completionHandler;
+- (void)readAttributeTvChannelLineup:(ResponseHandler)completionHandler;
+- (void)readAttributeCurrentTvChannel:(ResponseHandler)completionHandler;
+- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
+
+@end
+
+/**
+ * Cluster Target Navigator
+ *
+ */
+@interface CHIPTargetNavigator : CHIPCluster
+
+- (void)navigateTarget:(uint8_t)target data:(char *)data completionHandler:(ResponseHandler)completionHandler;
+
+- (void)readAttributeTargetNavigatorList:(ResponseHandler)completionHandler;
+- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
+
+@end
+
+/**
  * Cluster Temperature Measurement
  *
  */
@@ -583,6 +673,17 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)reportAttributeMeasuredValue:(ResponseHandler)reportHandler;
 - (void)readAttributeMinMeasuredValue:(ResponseHandler)completionHandler;
 - (void)readAttributeMaxMeasuredValue:(ResponseHandler)completionHandler;
+- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
+
+@end
+
+/**
+ * Cluster Wake on LAN
+ *
+ */
+@interface CHIPWakeOnLan : CHIPCluster
+
+- (void)readAttributeWakeOnLanMacAddress:(ResponseHandler)completionHandler;
 - (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
 
 @end

@@ -239,8 +239,29 @@
 // Definitions for cluster: IAS WD
 #define ZCL_IAS_WD_CLUSTER_ID (0x0502)
 
+// Definitions for cluster: Wake on LAN
+#define ZCL_WAKE_ON_LAN_CLUSTER_ID (0x0503)
+
+// Definitions for cluster: TV Channel
+#define ZCL_TV_CHANNEL_CLUSTER_ID (0x0504)
+
+// Definitions for cluster: Target Navigator
+#define ZCL_TARGET_NAVIGATOR_CLUSTER_ID (0x0505)
+
+// Definitions for cluster: Media Input
+#define ZCL_MEDIA_INPUT_CLUSTER_ID (0x0507)
+
 // Definitions for cluster: Low Power
 #define ZCL_LOW_POWER_CLUSTER_ID (0x0508)
+
+// Definitions for cluster: Keypad Input
+#define ZCL_KEYPAD_INPUT_CLUSTER_ID (0x0509)
+
+// Definitions for cluster: Audio Output
+#define ZCL_AUDIO_OUTPUT_CLUSTER_ID (0x050B)
+
+// Definitions for cluster: Application Launcher
+#define ZCL_APPLICATION_LAUNCHER_CLUSTER_ID (0x050C)
 
 // Definitions for cluster: Application Basic
 #define ZCL_APPLICATION_BASIC_CLUSTER_ID (0x050D)

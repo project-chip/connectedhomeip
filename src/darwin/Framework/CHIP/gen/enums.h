@@ -231,6 +231,14 @@ typedef enum
     EMBER_ZCL_APPLICATION_BASIC_STATUS_BACKGROUND = 2,
 } EmberAfApplicationBasicStatus;
 
+// Enum for ApplicationLauncherStatus
+typedef enum
+{
+    EMBER_ZCL_APPLICATION_LAUNCHER_STATUS_SUCCESS           = 0,
+    EMBER_ZCL_APPLICATION_LAUNCHER_STATUS_APP_NOT_AVAILABLE = 1,
+    EMBER_ZCL_APPLICATION_LAUNCHER_STATUS_SYSTEM_BUSY       = 2,
+} EmberAfApplicationLauncherStatus;
+
 // Enum for AttributeReportingStatus
 typedef enum
 {
@@ -249,6 +257,17 @@ typedef enum
     EMBER_ZCL_ATTRIBUTE_WRITE_PERMISSION_READ_ONLY                = 136,
     EMBER_ZCL_ATTRIBUTE_WRITE_PERMISSION_INVALID_DATA_TYPE        = 141,
 } EmberAfAttributeWritePermission;
+
+// Enum for AudioOutputType
+typedef enum
+{
+    EMBER_ZCL_AUDIO_OUTPUT_TYPE_HDMI      = 0,
+    EMBER_ZCL_AUDIO_OUTPUT_TYPE_BT        = 1,
+    EMBER_ZCL_AUDIO_OUTPUT_TYPE_OPTICAL   = 2,
+    EMBER_ZCL_AUDIO_OUTPUT_TYPE_HEADPHONE = 3,
+    EMBER_ZCL_AUDIO_OUTPUT_TYPE_INTERNAL  = 4,
+    EMBER_ZCL_AUDIO_OUTPUT_TYPE_OTHER     = 5,
+} EmberAfAudioOutputType;
 
 // Enum for BarrierControlBarrierPosition
 typedef enum
@@ -1591,6 +1610,23 @@ typedef enum
     EMBER_ZCL_KEY_INDEX_CERTIFICATION = 15,
 } EmberAfKeyIndex;
 
+// Enum for KeypadInputKeyAction
+typedef enum
+{
+    EMBER_ZCL_KEYPAD_INPUT_KEY_ACTION_KEY_ATOMIC = 0,
+    EMBER_ZCL_KEYPAD_INPUT_KEY_ACTION_KEY_DOWN   = 1,
+    EMBER_ZCL_KEYPAD_INPUT_KEY_ACTION_KEY_REPEAT = 2,
+    EMBER_ZCL_KEYPAD_INPUT_KEY_ACTION_KEY_UP     = 3,
+} EmberAfKeypadInputKeyAction;
+
+// Enum for KeypadInputStatus
+typedef enum
+{
+    EMBER_ZCL_KEYPAD_INPUT_STATUS_SUCCESS                      = 0,
+    EMBER_ZCL_KEYPAD_INPUT_STATUS_UNSUPPORTED_KEY              = 1,
+    EMBER_ZCL_KEYPAD_INPUT_STATUS_INVALID_KEY_IN_CURRENT_STATE = 2,
+} EmberAfKeypadInputStatus;
+
 // Enum for KeypadLockout
 typedef enum
 {
@@ -1647,14 +1683,22 @@ typedef enum
     EMBER_ZCL_MEASUREMENT_LIGHT_SENSOR_TYPE_CMOS       = 1,
 } EmberAfMeasurementLightSensorType;
 
-// Enum for MediaPlaybackStatus
+// Enum for MediaInputType
 typedef enum
 {
-    EMBER_ZCL_MEDIA_PLAYBACK_STATUS_SUCCESS                   = 0,
-    EMBER_ZCL_MEDIA_PLAYBACK_STATUS_INVALID_STATE_FOR_COMMAND = 1,
-    EMBER_ZCL_MEDIA_PLAYBACK_STATUS_NOT_ALLOWED               = 2,
-    EMBER_ZCL_MEDIA_PLAYBACK_STATUS_NOT_ACTIVE                = 3,
-} EmberAfMediaPlaybackStatus;
+    EMBER_ZCL_MEDIA_INPUT_TYPE_INTERNAL  = 0,
+    EMBER_ZCL_MEDIA_INPUT_TYPE_AUX       = 1,
+    EMBER_ZCL_MEDIA_INPUT_TYPE_COAX      = 2,
+    EMBER_ZCL_MEDIA_INPUT_TYPE_COMPOSITE = 3,
+    EMBER_ZCL_MEDIA_INPUT_TYPE_HDMI      = 4,
+    EMBER_ZCL_MEDIA_INPUT_TYPE_INPUT     = 5,
+    EMBER_ZCL_MEDIA_INPUT_TYPE_LINE      = 6,
+    EMBER_ZCL_MEDIA_INPUT_TYPE_OPTICAL   = 7,
+    EMBER_ZCL_MEDIA_INPUT_TYPE_VIDEO     = 8,
+    EMBER_ZCL_MEDIA_INPUT_TYPE_SCART     = 9,
+    EMBER_ZCL_MEDIA_INPUT_TYPE_USB       = 10,
+    EMBER_ZCL_MEDIA_INPUT_TYPE_OTHER     = 11,
+} EmberAfMediaInputType;
 
 // Enum for MessagingControlConfirmation
 typedef enum
@@ -1922,6 +1966,14 @@ typedef enum
     EMBER_ZCL_MOVE_MODE_UP   = 0,
     EMBER_ZCL_MOVE_MODE_DOWN = 1,
 } EmberAfMoveMode;
+
+// Enum for NavigateTargetStatus
+typedef enum
+{
+    EMBER_ZCL_NAVIGATE_TARGET_STATUS_SUCCESS           = 0,
+    EMBER_ZCL_NAVIGATE_TARGET_STATUS_APP_NOT_AVAILABLE = 1,
+    EMBER_ZCL_NAVIGATE_TARGET_STATUS_SYSTEM_BUSY       = 2,
+} EmberAfNavigateTargetStatus;
 
 // Enum for NetworkCommissioningError
 typedef enum
@@ -2567,6 +2619,19 @@ typedef enum
     EMBER_ZCL_TUNNELING_TUNNEL_STATUS_PROTOCOL_NOT_SUPPORTED     = 3,
     EMBER_ZCL_TUNNELING_TUNNEL_STATUS_FLOW_CONTROL_NOT_SUPPORTED = 4,
 } EmberAfTunnelingTunnelStatus;
+
+// Enum for TvChannelErrorType
+typedef enum
+{
+    EMBER_ZCL_TV_CHANNEL_ERROR_TYPE_MULTIPLE_MATCHES = 0,
+    EMBER_ZCL_TV_CHANNEL_ERROR_TYPE_NO_MATCHES       = 1,
+} EmberAfTvChannelErrorType;
+
+// Enum for TvChannelLineupInfoType
+typedef enum
+{
+    EMBER_ZCL_TV_CHANNEL_LINEUP_INFO_TYPE_MSO = 0,
+} EmberAfTvChannelLineupInfoType;
 
 // Enum for WanStatus
 typedef enum

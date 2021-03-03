@@ -37,6 +37,22 @@ class ChipCluster:
         return {
             "ApplicationBasic": {
             },
+            "ApplicationLauncher": {
+                "LaunchApp": {
+                    "catalogVendorId": "int",
+                    "applicationId": "str",
+                    "data": "str",
+                },
+            },
+            "AudioOutput": {
+                "RenameOutput": {
+                    "index": "int",
+                    "name": "str",
+                },
+                "SelectOutput": {
+                    "index": "int",
+                },
+            },
             "BarrierControl": {
                 "BarrierControlGoToPercent": {
                     "percentOpen": "int",
@@ -304,6 +320,12 @@ class ChipCluster:
                 "IdentifyQuery": {
                 },
             },
+            "KeypadInput": {
+                "SendKey": {
+                    "keyAction": "int",
+                    "keyCode": "int",
+                },
+            },
             "LevelControl": {
                 "Move": {
                     "moveMode": "int",
@@ -346,6 +368,19 @@ class ChipCluster:
             },
             "LowPower": {
                 "Sleep": {
+                },
+            },
+            "MediaInput": {
+                "HideInputStatus": {
+                },
+                "RenameInput": {
+                    "index": "int",
+                    "name": "str",
+                },
+                "SelectInput": {
+                    "index": "int",
+                },
+                "ShowInputStatus": {
                 },
             },
             "MediaPlayback": {
@@ -459,7 +494,27 @@ class ChipCluster:
                     "sceneId": "int",
                 },
             },
+            "TvChannel": {
+                "ChangeChannel": {
+                    "match": "str",
+                },
+                "ChangeChannelByNumber": {
+                    "majorNumber": "int",
+                    "minorNumber": "int",
+                },
+                "SkipChannel": {
+                    "count": "int",
+                },
+            },
+            "TargetNavigator": {
+                "NavigateTarget": {
+                    "target": "int",
+                    "data": "str",
+                },
+            },
             "TemperatureMeasurement": {
+            },
+            "WakeOnLan": {
             },
         }
 
@@ -468,6 +523,30 @@ class ChipCluster:
         if not func:
             raise UnknownCommand(cluster, command)
         func(device, endpoint, groupid, **args)
+
+    def ClusterApplicationLauncher_CommandLaunchApp(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, catalogVendorId: int, applicationId: str, data: str):
+        applicationId = applicationId.encode("utf-8") + b'\x00'
+        data = data.encode("utf-8") + b'\x00'
+        self._ChipStack.Call(
+            lambda: self._chipLib.chip_ime_AppendCommand_ApplicationLauncher_LaunchApp(
+                device, ZCLendpoint, ZCLgroupid, catalogVendorId, applicationId, data
+            )
+        )
+
+    def ClusterAudioOutput_CommandRenameOutput(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, index: int, name: str):
+        name = name.encode("utf-8") + b'\x00'
+        self._ChipStack.Call(
+            lambda: self._chipLib.chip_ime_AppendCommand_AudioOutput_RenameOutput(
+                device, ZCLendpoint, ZCLgroupid, index, name
+            )
+        )
+
+    def ClusterAudioOutput_CommandSelectOutput(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, index: int):
+        self._ChipStack.Call(
+            lambda: self._chipLib.chip_ime_AppendCommand_AudioOutput_SelectOutput(
+                device, ZCLendpoint, ZCLgroupid, index
+            )
+        )
 
     def ClusterBarrierControl_CommandBarrierControlGoToPercent(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, percentOpen: int):
         self._ChipStack.Call(
@@ -868,6 +947,13 @@ class ChipCluster:
             )
         )
 
+    def ClusterKeypadInput_CommandSendKey(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, keyAction: int, keyCode: int):
+        self._ChipStack.Call(
+            lambda: self._chipLib.chip_ime_AppendCommand_KeypadInput_SendKey(
+                device, ZCLendpoint, ZCLgroupid, keyAction, keyCode
+            )
+        )
+
     def ClusterLevelControl_CommandMove(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, moveMode: int, rate: int, optionMask: int, optionOverride: int):
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_LevelControl_Move(
@@ -927,6 +1013,35 @@ class ChipCluster:
     def ClusterLowPower_CommandSleep(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_LowPower_Sleep(
+                device, ZCLendpoint, ZCLgroupid
+            )
+        )
+
+    def ClusterMediaInput_CommandHideInputStatus(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        self._ChipStack.Call(
+            lambda: self._chipLib.chip_ime_AppendCommand_MediaInput_HideInputStatus(
+                device, ZCLendpoint, ZCLgroupid
+            )
+        )
+
+    def ClusterMediaInput_CommandRenameInput(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, index: int, name: str):
+        name = name.encode("utf-8") + b'\x00'
+        self._ChipStack.Call(
+            lambda: self._chipLib.chip_ime_AppendCommand_MediaInput_RenameInput(
+                device, ZCLendpoint, ZCLgroupid, index, name
+            )
+        )
+
+    def ClusterMediaInput_CommandSelectInput(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, index: int):
+        self._ChipStack.Call(
+            lambda: self._chipLib.chip_ime_AppendCommand_MediaInput_SelectInput(
+                device, ZCLendpoint, ZCLgroupid, index
+            )
+        )
+
+    def ClusterMediaInput_CommandShowInputStatus(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        self._ChipStack.Call(
+            lambda: self._chipLib.chip_ime_AppendCommand_MediaInput_ShowInputStatus(
                 device, ZCLendpoint, ZCLgroupid
             )
         )
@@ -1135,9 +1250,50 @@ class ChipCluster:
             )
         )
 
+    def ClusterTvChannel_CommandChangeChannel(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, match: str):
+        match = match.encode("utf-8") + b'\x00'
+        self._ChipStack.Call(
+            lambda: self._chipLib.chip_ime_AppendCommand_TvChannel_ChangeChannel(
+                device, ZCLendpoint, ZCLgroupid, match
+            )
+        )
+
+    def ClusterTvChannel_CommandChangeChannelByNumber(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, majorNumber: int, minorNumber: int):
+        self._ChipStack.Call(
+            lambda: self._chipLib.chip_ime_AppendCommand_TvChannel_ChangeChannelByNumber(
+                device, ZCLendpoint, ZCLgroupid, majorNumber, minorNumber
+            )
+        )
+
+    def ClusterTvChannel_CommandSkipChannel(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, count: int):
+        self._ChipStack.Call(
+            lambda: self._chipLib.chip_ime_AppendCommand_TvChannel_SkipChannel(
+                device, ZCLendpoint, ZCLgroupid, count
+            )
+        )
+
+    def ClusterTargetNavigator_CommandNavigateTarget(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, target: int, data: str):
+        data = data.encode("utf-8") + b'\x00'
+        self._ChipStack.Call(
+            lambda: self._chipLib.chip_ime_AppendCommand_TargetNavigator_NavigateTarget(
+                device, ZCLendpoint, ZCLgroupid, target, data
+            )
+        )
+
     def InitLib(self, chipLib):
         self._chipLib = chipLib
         # Cluster ApplicationBasic
+        # Cluster ApplicationLauncher
+        # Cluster ApplicationLauncher Command LaunchApp
+        self._chipLib.chip_ime_AppendCommand_ApplicationLauncher_LaunchApp.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_char_p, ctypes.c_char_p]
+        self._chipLib.chip_ime_AppendCommand_ApplicationLauncher_LaunchApp.restype = ctypes.c_uint32
+        # Cluster AudioOutput
+        # Cluster AudioOutput Command RenameOutput
+        self._chipLib.chip_ime_AppendCommand_AudioOutput_RenameOutput.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_char_p]
+        self._chipLib.chip_ime_AppendCommand_AudioOutput_RenameOutput.restype = ctypes.c_uint32
+        # Cluster AudioOutput Command SelectOutput
+        self._chipLib.chip_ime_AppendCommand_AudioOutput_SelectOutput.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
+        self._chipLib.chip_ime_AppendCommand_AudioOutput_SelectOutput.restype = ctypes.c_uint32
         # Cluster BarrierControl
         # Cluster BarrierControl Command BarrierControlGoToPercent
         self._chipLib.chip_ime_AppendCommand_BarrierControl_BarrierControlGoToPercent.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
@@ -1316,6 +1472,10 @@ class ChipCluster:
         # Cluster Identify Command IdentifyQuery
         self._chipLib.chip_ime_AppendCommand_Identify_IdentifyQuery.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_Identify_IdentifyQuery.restype = ctypes.c_uint32
+        # Cluster KeypadInput
+        # Cluster KeypadInput Command SendKey
+        self._chipLib.chip_ime_AppendCommand_KeypadInput_SendKey.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8]
+        self._chipLib.chip_ime_AppendCommand_KeypadInput_SendKey.restype = ctypes.c_uint32
         # Cluster LevelControl
         # Cluster LevelControl Command Move
         self._chipLib.chip_ime_AppendCommand_LevelControl_Move.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_uint8]
@@ -1345,6 +1505,19 @@ class ChipCluster:
         # Cluster LowPower Command Sleep
         self._chipLib.chip_ime_AppendCommand_LowPower_Sleep.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_LowPower_Sleep.restype = ctypes.c_uint32
+        # Cluster MediaInput
+        # Cluster MediaInput Command HideInputStatus
+        self._chipLib.chip_ime_AppendCommand_MediaInput_HideInputStatus.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_MediaInput_HideInputStatus.restype = ctypes.c_uint32
+        # Cluster MediaInput Command RenameInput
+        self._chipLib.chip_ime_AppendCommand_MediaInput_RenameInput.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_char_p]
+        self._chipLib.chip_ime_AppendCommand_MediaInput_RenameInput.restype = ctypes.c_uint32
+        # Cluster MediaInput Command SelectInput
+        self._chipLib.chip_ime_AppendCommand_MediaInput_SelectInput.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
+        self._chipLib.chip_ime_AppendCommand_MediaInput_SelectInput.restype = ctypes.c_uint32
+        # Cluster MediaInput Command ShowInputStatus
+        self._chipLib.chip_ime_AppendCommand_MediaInput_ShowInputStatus.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_MediaInput_ShowInputStatus.restype = ctypes.c_uint32
         # Cluster MediaPlayback
         # Cluster MediaPlayback Command FastForwardRequest
         self._chipLib.chip_ime_AppendCommand_MediaPlayback_FastForwardRequest.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
@@ -1436,4 +1609,19 @@ class ChipCluster:
         # Cluster Scenes Command ViewScene
         self._chipLib.chip_ime_AppendCommand_Scenes_ViewScene.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint8]
         self._chipLib.chip_ime_AppendCommand_Scenes_ViewScene.restype = ctypes.c_uint32
+        # Cluster TvChannel
+        # Cluster TvChannel Command ChangeChannel
+        self._chipLib.chip_ime_AppendCommand_TvChannel_ChangeChannel.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p]
+        self._chipLib.chip_ime_AppendCommand_TvChannel_ChangeChannel.restype = ctypes.c_uint32
+        # Cluster TvChannel Command ChangeChannelByNumber
+        self._chipLib.chip_ime_AppendCommand_TvChannel_ChangeChannelByNumber.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_TvChannel_ChangeChannelByNumber.restype = ctypes.c_uint32
+        # Cluster TvChannel Command SkipChannel
+        self._chipLib.chip_ime_AppendCommand_TvChannel_SkipChannel.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_TvChannel_SkipChannel.restype = ctypes.c_uint32
+        # Cluster TargetNavigator
+        # Cluster TargetNavigator Command NavigateTarget
+        self._chipLib.chip_ime_AppendCommand_TargetNavigator_NavigateTarget.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_char_p]
+        self._chipLib.chip_ime_AppendCommand_TargetNavigator_NavigateTarget.restype = ctypes.c_uint32
         # Cluster TemperatureMeasurement
+        # Cluster WakeOnLan

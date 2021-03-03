@@ -100,6 +100,8 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
 | Cluster Name                                                        |   ID   |
 |---------------------------------------------------------------------+--------|
 | ApplicationBasic                                                    | 0x050D |
+| ApplicationLauncher                                                 | 0x050C |
+| AudioOutput                                                         | 0x050B |
 | BarrierControl                                                      | 0x0103 |
 | Basic                                                               | 0x0000 |
 | Binding                                                             | 0xF000 |
@@ -110,13 +112,18 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
 | Groups                                                              | 0x0004 |
 | IasZone                                                             | 0x0500 |
 | Identify                                                            | 0x0003 |
+| KeypadInput                                                         | 0x0509 |
 | LevelControl                                                        | 0x0008 |
 | LowPower                                                            | 0x0508 |
+| MediaInput                                                          | 0x0507 |
 | MediaPlayback                                                       | 0xF001 |
 | NetworkCommissioning                                                | 0xAAAA |
 | OnOff                                                               | 0x0006 |
 | Scenes                                                              | 0x0005 |
+| TvChannel                                                           | 0x0504 |
+| TargetNavigator                                                     | 0x0505 |
 | TemperatureMeasurement                                              | 0x0402 |
+| WakeOnLan                                                           | 0x0503 |
 \*----------------------------------------------------------------------------*/
 
 #define EMBER_ZCL_REPORTING_DIRECTION_REPORTED 0x00
@@ -146,6 +153,13 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
 #define ZCL_DISCOVER_ATTRIBUTES_EXTENDED_RESPONSE_COMMAND_ID (0x16)
 
 #define APPLICATION_BASIC_CLUSTER_ID 0x050D
+
+#define APPLICATION_LAUNCHER_CLUSTER_ID 0x050C
+#define ZCL_LAUNCH_APP_COMMAND_ID (0x00)
+
+#define AUDIO_OUTPUT_CLUSTER_ID 0x050B
+#define ZCL_RENAME_OUTPUT_COMMAND_ID (0x01)
+#define ZCL_SELECT_OUTPUT_COMMAND_ID (0x00)
 
 #define BARRIER_CONTROL_CLUSTER_ID 0x0103
 #define ZCL_BARRIER_CONTROL_GO_TO_PERCENT_COMMAND_ID (0x00)
@@ -223,6 +237,9 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
 #define ZCL_IDENTIFY_COMMAND_ID (0x00)
 #define ZCL_IDENTIFY_QUERY_COMMAND_ID (0x01)
 
+#define KEYPAD_INPUT_CLUSTER_ID 0x0509
+#define ZCL_SEND_KEY_COMMAND_ID (0x00)
+
 #define LEVEL_CONTROL_CLUSTER_ID 0x0008
 #define ZCL_MOVE_COMMAND_ID (0x01)
 #define ZCL_MOVE_TO_LEVEL_COMMAND_ID (0x00)
@@ -235,6 +252,12 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
 
 #define LOW_POWER_CLUSTER_ID 0x0508
 #define ZCL_SLEEP_COMMAND_ID (0x00)
+
+#define MEDIA_INPUT_CLUSTER_ID 0x0507
+#define ZCL_HIDE_INPUT_STATUS_COMMAND_ID (0x02)
+#define ZCL_RENAME_INPUT_COMMAND_ID (0x03)
+#define ZCL_SELECT_INPUT_COMMAND_ID (0x00)
+#define ZCL_SHOW_INPUT_STATUS_COMMAND_ID (0x01)
 
 #define MEDIA_PLAYBACK_CLUSTER_ID 0xF001
 #define ZCL_FAST_FORWARD_REQUEST_COMMAND_ID (0x07)
@@ -273,7 +296,17 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
 #define ZCL_STORE_SCENE_COMMAND_ID (0x04)
 #define ZCL_VIEW_SCENE_COMMAND_ID (0x01)
 
+#define TV_CHANNEL_CLUSTER_ID 0x0504
+#define ZCL_CHANGE_CHANNEL_COMMAND_ID (0x00)
+#define ZCL_CHANGE_CHANNEL_BY_NUMBER_COMMAND_ID (0x01)
+#define ZCL_SKIP_CHANNEL_COMMAND_ID (0x02)
+
+#define TARGET_NAVIGATOR_CLUSTER_ID 0x0505
+#define ZCL_NAVIGATE_TARGET_COMMAND_ID (0x00)
+
 #define TEMP_MEASUREMENT_CLUSTER_ID 0x0402
+
+#define WAKE_ON_LAN_CLUSTER_ID 0x0503
 
 // TODO: Find a way to calculate maximum message length for clusters
 //       https://github.com/project-chip/connectedhomeip/issues/965
@@ -391,6 +424,146 @@ PacketBufferHandle encodeApplicationBasicClusterReadApplicationSatusAttribute(ui
 PacketBufferHandle encodeApplicationBasicClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadApplicationBasicClusterRevision", APPLICATION_BASIC_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    COMMAND_FOOTER();
+}
+
+/*----------------------------------------------------------------------------*\
+| Cluster ApplicationLauncher                                         | 0x050C |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * LaunchApp                                                         |   0x00 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * ApplicationLauncherList                                           | 0x0000 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command LaunchApp
+ */
+PacketBufferHandle encodeApplicationLauncherClusterLaunchAppCommand(uint8_t seqNum, EndpointId destinationEndpoint,
+                                                                    uint8_t catalogVendorId, char * applicationId, char * data)
+{
+    COMMAND_HEADER("LaunchApp", APPLICATION_LAUNCHER_CLUSTER_ID);
+    size_t applicationIdStrLen = strlen(applicationId);
+    if (!CanCastTo<uint8_t>(applicationIdStrLen))
+    {
+        ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, applicationIdStrLen);
+        return PacketBufferHandle();
+    }
+    size_t dataStrLen = strlen(data);
+    if (!CanCastTo<uint8_t>(dataStrLen))
+    {
+        ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, dataStrLen);
+        return PacketBufferHandle();
+    }
+    buf.Put8(kFrameControlClusterSpecificCommand)
+        .Put8(seqNum)
+        .Put8(ZCL_LAUNCH_APP_COMMAND_ID)
+        .Put8(catalogVendorId)
+        .Put(static_cast<uint8_t>(applicationIdStrLen))
+        .Put(applicationId)
+        .Put(static_cast<uint8_t>(dataStrLen))
+        .Put(data);
+    COMMAND_FOOTER();
+}
+
+PacketBufferHandle encodeApplicationLauncherClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("DiscoverApplicationLauncherAttributes", APPLICATION_LAUNCHER_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute ApplicationLauncherList
+ */
+PacketBufferHandle encodeApplicationLauncherClusterReadApplicationLauncherListAttribute(uint8_t seqNum,
+                                                                                        EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadApplicationLauncherApplicationLauncherList", APPLICATION_LAUNCHER_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0000);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute ClusterRevision
+ */
+PacketBufferHandle encodeApplicationLauncherClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadApplicationLauncherClusterRevision", APPLICATION_LAUNCHER_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    COMMAND_FOOTER();
+}
+
+/*----------------------------------------------------------------------------*\
+| Cluster AudioOutput                                                 | 0x050B |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * RenameOutput                                                      |   0x01 |
+| * SelectOutput                                                      |   0x00 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * AudioOutputList                                                   | 0x0000 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command RenameOutput
+ */
+PacketBufferHandle encodeAudioOutputClusterRenameOutputCommand(uint8_t seqNum, EndpointId destinationEndpoint, uint8_t index,
+                                                               char * name)
+{
+    COMMAND_HEADER("RenameOutput", AUDIO_OUTPUT_CLUSTER_ID);
+    size_t nameStrLen = strlen(name);
+    if (!CanCastTo<uint8_t>(nameStrLen))
+    {
+        ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, nameStrLen);
+        return PacketBufferHandle();
+    }
+    buf.Put8(kFrameControlClusterSpecificCommand)
+        .Put8(seqNum)
+        .Put8(ZCL_RENAME_OUTPUT_COMMAND_ID)
+        .Put8(index)
+        .Put(static_cast<uint8_t>(nameStrLen))
+        .Put(name);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Command SelectOutput
+ */
+PacketBufferHandle encodeAudioOutputClusterSelectOutputCommand(uint8_t seqNum, EndpointId destinationEndpoint, uint8_t index)
+{
+    COMMAND_HEADER("SelectOutput", AUDIO_OUTPUT_CLUSTER_ID);
+    buf.Put8(kFrameControlClusterSpecificCommand).Put8(seqNum).Put8(ZCL_SELECT_OUTPUT_COMMAND_ID).Put8(index);
+    COMMAND_FOOTER();
+}
+
+PacketBufferHandle encodeAudioOutputClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("DiscoverAudioOutputAttributes", AUDIO_OUTPUT_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute AudioOutputList
+ */
+PacketBufferHandle encodeAudioOutputClusterReadAudioOutputListAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadAudioOutputAudioOutputList", AUDIO_OUTPUT_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0000);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute ClusterRevision
+ */
+PacketBufferHandle encodeAudioOutputClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadAudioOutputClusterRevision", AUDIO_OUTPUT_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
     COMMAND_FOOTER();
 }
@@ -2631,6 +2804,44 @@ PacketBufferHandle encodeIdentifyClusterReadClusterRevisionAttribute(uint8_t seq
 }
 
 /*----------------------------------------------------------------------------*\
+| Cluster KeypadInput                                                 | 0x0509 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * SendKey                                                           |   0x00 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command SendKey
+ */
+PacketBufferHandle encodeKeypadInputClusterSendKeyCommand(uint8_t seqNum, EndpointId destinationEndpoint, uint8_t keyAction,
+                                                          uint8_t keyCode)
+{
+    COMMAND_HEADER("SendKey", KEYPAD_INPUT_CLUSTER_ID);
+    buf.Put8(kFrameControlClusterSpecificCommand).Put8(seqNum).Put8(ZCL_SEND_KEY_COMMAND_ID).Put8(keyAction).Put8(keyCode);
+    COMMAND_FOOTER();
+}
+
+PacketBufferHandle encodeKeypadInputClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("DiscoverKeypadInputAttributes", KEYPAD_INPUT_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute ClusterRevision
+ */
+PacketBufferHandle encodeKeypadInputClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadKeypadInputClusterRevision", KEYPAD_INPUT_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    COMMAND_FOOTER();
+}
+
+/*----------------------------------------------------------------------------*\
 | Cluster LevelControl                                                | 0x0008 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
@@ -2841,6 +3052,99 @@ PacketBufferHandle encodeLowPowerClusterDiscoverAttributes(uint8_t seqNum, Endpo
 PacketBufferHandle encodeLowPowerClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadLowPowerClusterRevision", LOW_POWER_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    COMMAND_FOOTER();
+}
+
+/*----------------------------------------------------------------------------*\
+| Cluster MediaInput                                                  | 0x0507 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * HideInputStatus                                                   |   0x02 |
+| * RenameInput                                                       |   0x03 |
+| * SelectInput                                                       |   0x00 |
+| * ShowInputStatus                                                   |   0x01 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * MediaInputList                                                    | 0x0000 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command HideInputStatus
+ */
+PacketBufferHandle encodeMediaInputClusterHideInputStatusCommand(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("HideInputStatus", MEDIA_INPUT_CLUSTER_ID);
+    buf.Put8(kFrameControlClusterSpecificCommand).Put8(seqNum).Put8(ZCL_HIDE_INPUT_STATUS_COMMAND_ID);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Command RenameInput
+ */
+PacketBufferHandle encodeMediaInputClusterRenameInputCommand(uint8_t seqNum, EndpointId destinationEndpoint, uint8_t index,
+                                                             char * name)
+{
+    COMMAND_HEADER("RenameInput", MEDIA_INPUT_CLUSTER_ID);
+    size_t nameStrLen = strlen(name);
+    if (!CanCastTo<uint8_t>(nameStrLen))
+    {
+        ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, nameStrLen);
+        return PacketBufferHandle();
+    }
+    buf.Put8(kFrameControlClusterSpecificCommand)
+        .Put8(seqNum)
+        .Put8(ZCL_RENAME_INPUT_COMMAND_ID)
+        .Put8(index)
+        .Put(static_cast<uint8_t>(nameStrLen))
+        .Put(name);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Command SelectInput
+ */
+PacketBufferHandle encodeMediaInputClusterSelectInputCommand(uint8_t seqNum, EndpointId destinationEndpoint, uint8_t index)
+{
+    COMMAND_HEADER("SelectInput", MEDIA_INPUT_CLUSTER_ID);
+    buf.Put8(kFrameControlClusterSpecificCommand).Put8(seqNum).Put8(ZCL_SELECT_INPUT_COMMAND_ID).Put8(index);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Command ShowInputStatus
+ */
+PacketBufferHandle encodeMediaInputClusterShowInputStatusCommand(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ShowInputStatus", MEDIA_INPUT_CLUSTER_ID);
+    buf.Put8(kFrameControlClusterSpecificCommand).Put8(seqNum).Put8(ZCL_SHOW_INPUT_STATUS_COMMAND_ID);
+    COMMAND_FOOTER();
+}
+
+PacketBufferHandle encodeMediaInputClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("DiscoverMediaInputAttributes", MEDIA_INPUT_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute MediaInputList
+ */
+PacketBufferHandle encodeMediaInputClusterReadMediaInputListAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadMediaInputMediaInputList", MEDIA_INPUT_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0000);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute ClusterRevision
+ */
+PacketBufferHandle encodeMediaInputClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadMediaInputClusterRevision", MEDIA_INPUT_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
     COMMAND_FOOTER();
 }
@@ -3511,6 +3815,173 @@ PacketBufferHandle encodeScenesClusterReadClusterRevisionAttribute(uint8_t seqNu
 }
 
 /*----------------------------------------------------------------------------*\
+| Cluster TvChannel                                                   | 0x0504 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * ChangeChannel                                                     |   0x00 |
+| * ChangeChannelByNumber                                             |   0x01 |
+| * SkipChannel                                                       |   0x02 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * TvChannelList                                                     | 0x0000 |
+| * TvChannelLineup                                                   | 0x0001 |
+| * CurrentTvChannel                                                  | 0x0002 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command ChangeChannel
+ */
+PacketBufferHandle encodeTvChannelClusterChangeChannelCommand(uint8_t seqNum, EndpointId destinationEndpoint, char * match)
+{
+    COMMAND_HEADER("ChangeChannel", TV_CHANNEL_CLUSTER_ID);
+    size_t matchStrLen = strlen(match);
+    if (!CanCastTo<uint8_t>(matchStrLen))
+    {
+        ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, matchStrLen);
+        return PacketBufferHandle();
+    }
+    buf.Put8(kFrameControlClusterSpecificCommand)
+        .Put8(seqNum)
+        .Put8(ZCL_CHANGE_CHANNEL_COMMAND_ID)
+        .Put(static_cast<uint8_t>(matchStrLen))
+        .Put(match);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Command ChangeChannelByNumber
+ */
+PacketBufferHandle encodeTvChannelClusterChangeChannelByNumberCommand(uint8_t seqNum, EndpointId destinationEndpoint,
+                                                                      uint16_t majorNumber, uint16_t minorNumber)
+{
+    COMMAND_HEADER("ChangeChannelByNumber", TV_CHANNEL_CLUSTER_ID);
+    buf.Put8(kFrameControlClusterSpecificCommand)
+        .Put8(seqNum)
+        .Put8(ZCL_CHANGE_CHANNEL_BY_NUMBER_COMMAND_ID)
+        .Put16(majorNumber)
+        .Put16(minorNumber);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Command SkipChannel
+ */
+PacketBufferHandle encodeTvChannelClusterSkipChannelCommand(uint8_t seqNum, EndpointId destinationEndpoint, uint16_t count)
+{
+    COMMAND_HEADER("SkipChannel", TV_CHANNEL_CLUSTER_ID);
+    buf.Put8(kFrameControlClusterSpecificCommand).Put8(seqNum).Put8(ZCL_SKIP_CHANNEL_COMMAND_ID).Put16(count);
+    COMMAND_FOOTER();
+}
+
+PacketBufferHandle encodeTvChannelClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("DiscoverTvChannelAttributes", TV_CHANNEL_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute TvChannelList
+ */
+PacketBufferHandle encodeTvChannelClusterReadTvChannelListAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadTvChannelTvChannelList", TV_CHANNEL_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0000);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute TvChannelLineup
+ */
+PacketBufferHandle encodeTvChannelClusterReadTvChannelLineupAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadTvChannelTvChannelLineup", TV_CHANNEL_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0001);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute CurrentTvChannel
+ */
+PacketBufferHandle encodeTvChannelClusterReadCurrentTvChannelAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadTvChannelCurrentTvChannel", TV_CHANNEL_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0002);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute ClusterRevision
+ */
+PacketBufferHandle encodeTvChannelClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadTvChannelClusterRevision", TV_CHANNEL_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    COMMAND_FOOTER();
+}
+
+/*----------------------------------------------------------------------------*\
+| Cluster TargetNavigator                                             | 0x0505 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * NavigateTarget                                                    |   0x00 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * TargetNavigatorList                                               | 0x0000 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command NavigateTarget
+ */
+PacketBufferHandle encodeTargetNavigatorClusterNavigateTargetCommand(uint8_t seqNum, EndpointId destinationEndpoint, uint8_t target,
+                                                                     char * data)
+{
+    COMMAND_HEADER("NavigateTarget", TARGET_NAVIGATOR_CLUSTER_ID);
+    size_t dataStrLen = strlen(data);
+    if (!CanCastTo<uint8_t>(dataStrLen))
+    {
+        ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, dataStrLen);
+        return PacketBufferHandle();
+    }
+    buf.Put8(kFrameControlClusterSpecificCommand)
+        .Put8(seqNum)
+        .Put8(ZCL_NAVIGATE_TARGET_COMMAND_ID)
+        .Put8(target)
+        .Put(static_cast<uint8_t>(dataStrLen))
+        .Put(data);
+    COMMAND_FOOTER();
+}
+
+PacketBufferHandle encodeTargetNavigatorClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("DiscoverTargetNavigatorAttributes", TARGET_NAVIGATOR_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute TargetNavigatorList
+ */
+PacketBufferHandle encodeTargetNavigatorClusterReadTargetNavigatorListAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadTargetNavigatorTargetNavigatorList", TARGET_NAVIGATOR_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0000);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute ClusterRevision
+ */
+PacketBufferHandle encodeTargetNavigatorClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadTargetNavigatorClusterRevision", TARGET_NAVIGATOR_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    COMMAND_FOOTER();
+}
+
+/*----------------------------------------------------------------------------*\
 | Cluster TemperatureMeasurement                                      | 0x0402 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
@@ -3583,6 +4054,43 @@ PacketBufferHandle encodeTemperatureMeasurementClusterReadMaxMeasuredValueAttrib
 PacketBufferHandle encodeTemperatureMeasurementClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadTemperatureMeasurementClusterRevision", TEMP_MEASUREMENT_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    COMMAND_FOOTER();
+}
+
+/*----------------------------------------------------------------------------*\
+| Cluster WakeOnLan                                                   | 0x0503 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * WakeOnLanMacAddress                                               | 0x0000 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+PacketBufferHandle encodeWakeOnLanClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("DiscoverWakeOnLanAttributes", WAKE_ON_LAN_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute WakeOnLanMacAddress
+ */
+PacketBufferHandle encodeWakeOnLanClusterReadWakeOnLanMacAddressAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadWakeOnLanWakeOnLanMacAddress", WAKE_ON_LAN_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0000);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute ClusterRevision
+ */
+PacketBufferHandle encodeWakeOnLanClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadWakeOnLanClusterRevision", WAKE_ON_LAN_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
     COMMAND_FOOTER();
 }
