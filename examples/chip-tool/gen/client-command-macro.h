@@ -3201,6 +3201,95 @@
                                                                                                                                    \
                                                           ZCL_SQUAWK_COMMAND_ID, "u", squawkInfo);
 
+/** @brief Command description for ChangeChannel
+ *
+ * Command: ChangeChannel
+ * @param match CHAR_STRING
+ * @param ChannelMatch TvChannelInfo []
+ * @param ChannelMatchLen int
+ * @param ErrorType TvChannelErrorType
+ */
+#define emberAfFillCommandTV                                                                                                       \
+    ChannelClusterChangeChannel(match, ChannelMatch, ChannelMatchLen, ErrorType)                                                   \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_CHANGE_CHANNEL_COMMAND_ID, "ubu", match, ChannelMatch, ChannelMatchLen, ErrorType);
+
+/** @brief Command description for ChangeChannelByNumber
+ *
+ * Command: ChangeChannelByNumber
+ * @param majorNumber INT16U
+ * @param minorNumber INT16U
+ */
+#define emberAfFillCommandTV                                                                                                       \
+    ChannelClusterChangeChannelByNumber(majorNumber, minorNumber)                                                                  \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_CHANGE_CHANNEL_BY_NUMBER_COMMAND_ID, "uu", majorNumber, minorNumber);
+
+/** @brief Command description for SkipChannel
+ *
+ * Command: SkipChannel
+ * @param Count INT16U
+ */
+#define emberAfFillCommandTV                                                                                                       \
+    ChannelClusterSkipChannel(Count) emberAfFillExternalBuffer(mask,                                                               \
+                                                                                                                                   \
+                                                               ZCL_SKIP_CHANNEL_COMMAND_ID, "u", Count);
+
+/** @brief Command description for NavigateTarget
+ *
+ * Command: NavigateTarget
+ * @param target INT8U
+ * @param status NavigateTargetStatus
+ * @param data CHAR_STRING
+ * @param data CHAR_STRING
+ */
+#define emberAfFillCommandTarget                                                                                                   \
+    NavigatorClusterNavigateTarget(target, status, data, data)                                                                     \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_NAVIGATE_TARGET_COMMAND_ID, "uuuu", target, status, data, data);
+
+/** @brief Command description for SelectInput
+ *
+ * Command: SelectInput
+ * @param index INT8U
+ */
+#define emberAfFillCommandMedia                                                                                                    \
+    InputClusterSelectInput(index) emberAfFillExternalBuffer(mask,                                                                 \
+                                                                                                                                   \
+                                                             ZCL_SELECT_INPUT_COMMAND_ID, "u", index);
+
+/** @brief Command description for ShowInputStatus
+ *
+ * Command: ShowInputStatus
+ */
+#define emberAfFillCommandMedia                                                                                                    \
+    InputClusterShowInputStatus() emberAfFillExternalBuffer(mask,                                                                  \
+                                                                                                                                   \
+                                                            ZCL_SHOW_INPUT_STATUS_COMMAND_ID, "", );
+
+/** @brief Command description for HideInputStatus
+ *
+ * Command: HideInputStatus
+ */
+#define emberAfFillCommandMedia                                                                                                    \
+    InputClusterHideInputStatus() emberAfFillExternalBuffer(mask,                                                                  \
+                                                                                                                                   \
+                                                            ZCL_HIDE_INPUT_STATUS_COMMAND_ID, "", );
+
+/** @brief Command description for RenameInput
+ *
+ * Command: RenameInput
+ * @param index INT8U
+ * @param name CHAR_STRING
+ */
+#define emberAfFillCommandMedia                                                                                                    \
+    InputClusterRenameInput(index, name) emberAfFillExternalBuffer(mask,                                                           \
+                                                                                                                                   \
+                                                                   ZCL_RENAME_INPUT_COMMAND_ID, "uu", index, name);
+
 /** @brief Command description for Sleep
  *
  * Command: Sleep
@@ -3209,6 +3298,55 @@
     PowerClusterSleep() emberAfFillExternalBuffer(mask,                                                                            \
                                                                                                                                    \
                                                   ZCL_SLEEP_COMMAND_ID, "", );
+
+/** @brief Command description for SendKey
+ *
+ * Command: SendKey
+ * @param keyAction KeypadInputKeyAction
+ * @param keypadInputStatus KeypadInputStatus
+ * @param keyCode INT8U
+ */
+#define emberAfFillCommandKeypad                                                                                                   \
+    InputClusterSendKey(keyAction, keypadInputStatus, keyCode)                                                                     \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_SEND_KEY_COMMAND_ID, "uuu", keyAction, keypadInputStatus, keyCode);
+
+/** @brief Command description for SelectOutput
+ *
+ * Command: SelectOutput
+ * @param index INT8U
+ */
+#define emberAfFillCommandAudio                                                                                                    \
+    OutputClusterSelectOutput(index) emberAfFillExternalBuffer(mask,                                                               \
+                                                                                                                                   \
+                                                               ZCL_SELECT_OUTPUT_COMMAND_ID, "u", index);
+
+/** @brief Command description for RenameOutput
+ *
+ * Command: RenameOutput
+ * @param index INT8U
+ * @param name CHAR_STRING
+ */
+#define emberAfFillCommandAudio                                                                                                    \
+    OutputClusterRenameOutput(index, name) emberAfFillExternalBuffer(mask,                                                         \
+                                                                                                                                   \
+                                                                     ZCL_RENAME_OUTPUT_COMMAND_ID, "uu", index, name);
+
+/** @brief Command description for LaunchApp
+ *
+ * Command: LaunchApp
+ * @param application ApplicationLauncherApp []
+ * @param applicationLen int
+ * @param status ApplicationLauncherStatus
+ * @param data CHAR_STRING
+ * @param data CHAR_STRING
+ */
+#define emberAfFillCommandApplication                                                                                              \
+    LauncherClusterLaunchApp(application, applicationLen, status, data, data)                                                      \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_LAUNCH_APP_COMMAND_ID, "buuu", application, applicationLen, status, data, data);
 
 /** @brief Command description for MatchProtocolAddress
  *

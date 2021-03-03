@@ -390,8 +390,36 @@
 #define ZCL_START_WARNING_COMMAND_ID (0x00)
 #define ZCL_SQUAWK_COMMAND_ID (0x01)
 
+// Commands for cluster: TV Channel
+#define ZCL_CHANGE_CHANNEL_COMMAND_ID (0x00)
+#define ZCL_CHANGE_CHANNEL_RESPONSE_COMMAND_ID (0x00)
+#define ZCL_CHANGE_CHANNEL_BY_NUMBER_COMMAND_ID (0x01)
+#define ZCL_SKIP_CHANNEL_COMMAND_ID (0x02)
+
+// Commands for cluster: Target Navigator
+#define ZCL_NAVIGATE_TARGET_COMMAND_ID (0x00)
+#define ZCL_NAVIGATE_TARGET_RESPONSE_COMMAND_ID (0x00)
+
+// Commands for cluster: Media Input
+#define ZCL_SELECT_INPUT_COMMAND_ID (0x00)
+#define ZCL_SHOW_INPUT_STATUS_COMMAND_ID (0x01)
+#define ZCL_HIDE_INPUT_STATUS_COMMAND_ID (0x02)
+#define ZCL_RENAME_INPUT_COMMAND_ID (0x03)
+
 // Commands for cluster: Low Power
 #define ZCL_SLEEP_COMMAND_ID (0x00)
+
+// Commands for cluster: Keypad Input
+#define ZCL_SEND_KEY_COMMAND_ID (0x00)
+#define ZCL_SEND_KEY_RESPONSE_COMMAND_ID (0x00)
+
+// Commands for cluster: Audio Output
+#define ZCL_SELECT_OUTPUT_COMMAND_ID (0x00)
+#define ZCL_RENAME_OUTPUT_COMMAND_ID (0x01)
+
+// Commands for cluster: Application Launcher
+#define ZCL_LAUNCH_APP_COMMAND_ID (0x00)
+#define ZCL_LAUNCH_APP_RESPONSE_COMMAND_ID (0x00)
 
 // Commands for cluster: Generic Tunnel
 #define ZCL_MATCH_PROTOCOL_ADDRESS_COMMAND_ID (0x00)
