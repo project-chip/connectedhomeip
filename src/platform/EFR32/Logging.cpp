@@ -59,19 +59,22 @@
 #define LOG_DETAIL "<detail> "
 #define LOG_LWIP "<lwip  > "
 #define LOG_EFR32 "<efr32 > "
+static constexpr uint8_t kMaxCategoryStrLen = 9;
 
+#if EFR32_LOG_ENABLED
 static bool sLogInitialized = false;
+#endif
 #if LOG_RTT_BUFFER_INDEX != 0
 static uint8_t sLogBuffer[LOG_RTT_BUFFER_SIZE];
 static uint8_t sCmdLineBuffer[LOG_RTT_BUFFER_SIZE];
 #endif
 
+#if EFR32_LOG_ENABLED
 /**
  * Print a log message to RTT
  */
 static void PrintLog(const char * msg)
 {
-#if EFR32_LOG_ENABLED
     if (sLogInitialized)
     {
         size_t sz;
@@ -88,9 +91,8 @@ static void PrintLog(const char * msg)
         PigweedLogger::putString(newline, sz);
 #endif
     }
-
-#endif // EFR32_LOG_ENABLED
 }
+#endif // EFR32_LOG_ENABLED
 
 /**
  * Initialize Segger RTT for logging
@@ -125,6 +127,7 @@ extern "C" void efr32Log(const char * aFormat, ...)
     va_start(v, aFormat);
 #if EFR32_LOG_ENABLED
     char formattedMsg[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
+    static_assert(sizeof(formattedMsg) > kMaxCategoryStrLen);
 
     strcpy(formattedMsg, LOG_EFR32);
     size_t prefixLen = strlen(formattedMsg);
@@ -170,8 +173,9 @@ void LogV(const char * module, uint8_t category, const char * aFormat, va_list v
         char formattedMsg[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
         size_t formattedMsgLen;
 
-        constexpr size_t maxPrefixLen = chip::Logging::kMaxModuleNameLen + 3;
-        static_assert(sizeof(formattedMsg) > maxPrefixLen);
+        // len for Category string + "[" + Module name + "] " (Brackets and space =3)
+        constexpr size_t maxPrefixLen = kMaxCategoryStrLen + chip::Logging::kMaxModuleNameLen + 3;
+        static_assert(sizeof(formattedMsg) > maxPrefixLen); // Greater than to at least accommodate a ending Null Character
 
         switch (category)
         {
@@ -190,7 +194,7 @@ void LogV(const char * module, uint8_t category, const char * aFormat, va_list v
         formattedMsgLen = strlen(formattedMsg);
 
         // Form the log prefix, e.g. "[DL] "
-        snprintf(formattedMsg, sizeof(formattedMsg), "[%s] ", module);
+        snprintf(formattedMsg + formattedMsgLen, sizeof(formattedMsg) - formattedMsgLen, "[%s] ", module);
         formattedMsg[sizeof(formattedMsg) - 1] = 0;
         formattedMsgLen                        = strlen(formattedMsg);
 

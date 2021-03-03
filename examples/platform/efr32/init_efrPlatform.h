@@ -15,20 +15,18 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+/*******************************************************************************/
+#pragma once
 
-#ifndef APP_CONFIG_H
-#define APP_CONFIG_H
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-// ---- Lighting Example App Config ----
+#include "board_features.h"
+#include "hal-config-board.h"
 
-#define APP_ON_OFF_BUTTON BTN_SW4
-#define APP_FUNCTION_BUTTON BTN_SW5
-#define APP_LEVEL_BUTTON BTN_SW1
+void init_efrPlatform(void);
 
-#define SYSTEM_STATE_LED LED_GREEN
-
-// ---- Thread Polling Config ----
-#define THREAD_ACTIVE_POLLING_INTERVAL_MS 100
-#define THREAD_INACTIVE_POLLING_INTERVAL_MS 1000
-
-#endif // APP_CONFIG_H
+#ifdef __cplusplus
+}
+#endif

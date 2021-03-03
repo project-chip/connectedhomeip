@@ -64,10 +64,10 @@ qpg6100_executable("lock_app") {
 
   sources = [
     "${examples_plat_dir}/app/Service.cpp",
+    "${examples_plat_dir}/app/main.cpp",
     "src/AppTask.cpp",
     "src/BoltLockManager.cpp",
     "src/ZclCallbacks.cpp",
-    "src/main.cpp",
   ]
 
   output_dir = root_out_dir

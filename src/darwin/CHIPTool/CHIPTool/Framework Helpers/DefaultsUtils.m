@@ -71,7 +71,7 @@ CHIPDeviceController * InitializeCHIP(void)
     dispatch_once(&onceToken, ^{
         storage = [[CHIPToolPersistentStorageDelegate alloc] init];
         callbackQueue = dispatch_queue_create("com.chip.persistentstorage.callback", DISPATCH_QUEUE_SERIAL);
-        [controller setPersistentStorageDelegate:storage queue:callbackQueue];
+        [controller startup:storage queue:callbackQueue];
     });
 
     return controller;

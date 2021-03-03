@@ -58,7 +58,6 @@ constexpr uint8_t kMaxThreadDatasetLen   = 128;
 constexpr uint8_t kMaxWiFiSSIDLen        = 32;
 constexpr uint8_t kMaxWiFiCredentialsLen = 64;
 constexpr uint8_t kMaxNetworks           = 4;
-constexpr char kThreadNetworkName[]      = "tmp-thread-network";
 
 enum class NetworkType : uint8_t
 {
