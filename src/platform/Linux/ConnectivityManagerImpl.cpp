@@ -900,38 +900,6 @@ CHIP_ERROR ConnectivityManagerImpl::ProvisionWiFiNetwork(const char * ssid, cons
             if (result)
             {
                 ChipLogProgress(DeviceLayer, "wpa_supplicant: save config succeeded!");
-
-                // Iterate on the network interface to see if we already have beed assigned addresses.
-                // The temporary hack for getting IP address change on linux for network provisioning in the rendezvous session.
-                // This should be removed or find a better place once we depercate the rendezvous session.
-                for (chip::Inet::InterfaceAddressIterator it; it.HasCurrent(); it.Next())
-                {
-                    char ifName[chip::Inet::InterfaceIterator::kMaxIfNameLength];
-                    if (it.IsUp() && CHIP_NO_ERROR == it.GetInterfaceName(ifName, sizeof(ifName)) &&
-                        strncmp(ifName, CHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME, sizeof(ifName)) == 0)
-                    {
-                        chip::Inet::IPAddress addr = it.GetAddress();
-                        if (addr.IsIPv4())
-                        {
-                            ChipDeviceEvent event;
-                            event.Type                            = DeviceEventType::kInternetConnectivityChange;
-                            event.InternetConnectivityChange.IPv4 = kConnectivity_Established;
-                            event.InternetConnectivityChange.IPv6 = kConnectivity_NoChange;
-                            addr.ToString(event.InternetConnectivityChange.address);
-
-                            ChipLogDetail(DeviceLayer, "Got IP address on interface: %s IP: %s", ifName,
-                                          event.InternetConnectivityChange.address);
-
-                            PlatformMgr().PostEvent(&event);
-                        }
-                    }
-                }
-
-                // Run dhclient for IP on WiFi.
-                // TODO: The wifi can be managed by networkmanager on linux so we don't have to care about this.
-                char cmdBuffer[128];
-                sprintf(cmdBuffer, "dhclient %s", CHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME);
-                system(cmdBuffer);
             }
             else
             {
@@ -941,6 +909,38 @@ CHIP_ERROR ConnectivityManagerImpl::ProvisionWiFiNetwork(const char * ssid, cons
 
             if (gerror != nullptr)
                 g_error_free(gerror);
+
+            // Iterate on the network interface to see if we already have beed assigned addresses.
+            // The temporary hack for getting IP address change on linux for network provisioning in the rendezvous session.
+            // This should be removed or find a better place once we depercate the rendezvous session.
+            for (chip::Inet::InterfaceAddressIterator it; it.HasCurrent(); it.Next())
+            {
+                char ifName[chip::Inet::InterfaceIterator::kMaxIfNameLength];
+                if (it.IsUp() && CHIP_NO_ERROR == it.GetInterfaceName(ifName, sizeof(ifName)) &&
+                    strncmp(ifName, CHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME, sizeof(ifName)) == 0)
+                {
+                    chip::Inet::IPAddress addr = it.GetAddress();
+                    if (addr.IsIPv4())
+                    {
+                        ChipDeviceEvent event;
+                        event.Type                            = DeviceEventType::kInternetConnectivityChange;
+                        event.InternetConnectivityChange.IPv4 = kConnectivity_Established;
+                        event.InternetConnectivityChange.IPv6 = kConnectivity_NoChange;
+                        addr.ToString(event.InternetConnectivityChange.address);
+
+                        ChipLogDetail(DeviceLayer, "Got IP address on interface: %s IP: %s", ifName,
+                                      event.InternetConnectivityChange.address);
+
+                        PlatformMgr().PostEvent(&event);
+                    }
+                }
+            }
+
+            // Run dhclient for IP on WiFi.
+            // TODO: The wifi can be managed by networkmanager on linux so we don't have to care about this.
+            char cmdBuffer[128];
+            sprintf(cmdBuffer, "dhclient %s", CHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME);
+            system(cmdBuffer);
 
             // Return success as long as the device is connected to the network
             ret = CHIP_NO_ERROR;
