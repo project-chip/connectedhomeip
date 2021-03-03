@@ -22,6 +22,8 @@
 
 #import <Foundation/Foundation.h>
 
+#include <lib/support/BytesData.h>
+
 @class CHIPDevice;
 
 typedef void (^ResponseHandler)(NSError * _Nullable error, NSDictionary * _Nullable values);
@@ -91,38 +93,38 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPNetworkCommissioning : CHIPCluster
 
-- (void)addThreadNetwork:(char *)operationalDataset
+- (void)addThreadNetwork:(chip::BytesData)operationalDataset
               breadcrumb:(uint64_t)breadcrumb
                timeoutMs:(uint32_t)timeoutMs
        completionHandler:(ResponseHandler)completionHandler;
-- (void)addWiFiNetwork:(char *)ssid
-           credentials:(char *)credentials
+- (void)addWiFiNetwork:(chip::BytesData)ssid
+           credentials:(chip::BytesData)credentials
             breadcrumb:(uint64_t)breadcrumb
              timeoutMs:(uint32_t)timeoutMs
      completionHandler:(ResponseHandler)completionHandler;
-- (void)disableNetwork:(char *)networkID
+- (void)disableNetwork:(chip::BytesData)networkID
             breadcrumb:(uint64_t)breadcrumb
              timeoutMs:(uint32_t)timeoutMs
      completionHandler:(ResponseHandler)completionHandler;
-- (void)enableNetwork:(char *)networkID
+- (void)enableNetwork:(chip::BytesData)networkID
            breadcrumb:(uint64_t)breadcrumb
             timeoutMs:(uint32_t)timeoutMs
     completionHandler:(ResponseHandler)completionHandler;
 - (void)getLastNetworkCommissioningResult:(uint32_t)timeoutMs completionHandler:(ResponseHandler)completionHandler;
-- (void)removeNetwork:(char *)networkID
+- (void)removeNetwork:(chip::BytesData)networkID
            breadcrumb:(uint64_t)breadcrumb
             timeoutMs:(uint32_t)timeoutMs
     completionHandler:(ResponseHandler)completionHandler;
-- (void)scanNetworks:(char *)ssid
+- (void)scanNetworks:(chip::BytesData)ssid
            breadcrumb:(uint64_t)breadcrumb
             timeoutMs:(uint32_t)timeoutMs
     completionHandler:(ResponseHandler)completionHandler;
-- (void)updateThreadNetwork:(char *)operationalDataset
+- (void)updateThreadNetwork:(chip::BytesData)operationalDataset
                  breadcrumb:(uint64_t)breadcrumb
                   timeoutMs:(uint32_t)timeoutMs
           completionHandler:(ResponseHandler)completionHandler;
-- (void)updateWiFiNetwork:(char *)ssid
-              credentials:(char *)credentials
+- (void)updateWiFiNetwork:(chip::BytesData)ssid
+              credentials:(chip::BytesData)credentials
                breadcrumb:(uint64_t)breadcrumb
                 timeoutMs:(uint32_t)timeoutMs
         completionHandler:(ResponseHandler)completionHandler;

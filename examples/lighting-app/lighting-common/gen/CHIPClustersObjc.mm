@@ -26,6 +26,7 @@
 #import "gen/CHIPClustersObjc.h"
 
 #include <controller/CHIPClusters.h>
+#include <lib/support/BytesData.h>
 
 using namespace ::chip;
 
@@ -616,7 +617,7 @@ private:
     return &_cppCluster;
 }
 
-- (void)addThreadNetwork:(char *)operationalDataset
+- (void)addThreadNetwork:(chip::BytesData)operationalDataset
               breadcrumb:(uint64_t)breadcrumb
                timeoutMs:(uint32_t)timeoutMs
        completionHandler:(ResponseHandler)completionHandler
@@ -643,8 +644,8 @@ private:
         completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
-- (void)addWiFiNetwork:(char *)ssid
-           credentials:(char *)credentials
+- (void)addWiFiNetwork:(chip::BytesData)ssid
+           credentials:(chip::BytesData)credentials
             breadcrumb:(uint64_t)breadcrumb
              timeoutMs:(uint32_t)timeoutMs
      completionHandler:(ResponseHandler)completionHandler
@@ -671,7 +672,7 @@ private:
         completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
-- (void)disableNetwork:(char *)networkID
+- (void)disableNetwork:(chip::BytesData)networkID
             breadcrumb:(uint64_t)breadcrumb
              timeoutMs:(uint32_t)timeoutMs
      completionHandler:(ResponseHandler)completionHandler
@@ -697,7 +698,7 @@ private:
         completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
-- (void)enableNetwork:(char *)networkID
+- (void)enableNetwork:(chip::BytesData)networkID
            breadcrumb:(uint64_t)breadcrumb
             timeoutMs:(uint32_t)timeoutMs
     completionHandler:(ResponseHandler)completionHandler
@@ -745,7 +746,7 @@ private:
         completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
-- (void)removeNetwork:(char *)networkID
+- (void)removeNetwork:(chip::BytesData)networkID
            breadcrumb:(uint64_t)breadcrumb
             timeoutMs:(uint32_t)timeoutMs
     completionHandler:(ResponseHandler)completionHandler
@@ -771,7 +772,7 @@ private:
         completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
-- (void)scanNetworks:(char *)ssid
+- (void)scanNetworks:(chip::BytesData)ssid
            breadcrumb:(uint64_t)breadcrumb
             timeoutMs:(uint32_t)timeoutMs
     completionHandler:(ResponseHandler)completionHandler
@@ -797,7 +798,7 @@ private:
         completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
-- (void)updateThreadNetwork:(char *)operationalDataset
+- (void)updateThreadNetwork:(chip::BytesData)operationalDataset
                  breadcrumb:(uint64_t)breadcrumb
                   timeoutMs:(uint32_t)timeoutMs
           completionHandler:(ResponseHandler)completionHandler
@@ -824,8 +825,8 @@ private:
         completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
-- (void)updateWiFiNetwork:(char *)ssid
-              credentials:(char *)credentials
+- (void)updateWiFiNetwork:(chip::BytesData)ssid
+              credentials:(chip::BytesData)credentials
                breadcrumb:(uint64_t)breadcrumb
                 timeoutMs:(uint32_t)timeoutMs
         completionHandler:(ResponseHandler)completionHandler

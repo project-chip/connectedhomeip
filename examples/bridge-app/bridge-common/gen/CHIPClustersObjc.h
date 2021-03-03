@@ -22,6 +22,8 @@
 
 #import <Foundation/Foundation.h>
 
+#include <lib/support/BytesData.h>
+
 @class CHIPDevice;
 
 typedef void (^ResponseHandler)(NSError * _Nullable error, NSDictionary * _Nullable values);
