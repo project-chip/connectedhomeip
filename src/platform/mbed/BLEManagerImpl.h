@@ -35,7 +35,7 @@ class CHIPService;
 using namespace chip::Ble;
 
 // TODO Add missing BlePlatformDelegate and BleApplicationDelegate virtual method implementations.
-#define _BLEMGRIMPL_BLEPLATFORMDELEGATE_IMPL_READY 0
+#define _BLEMGRIMPL_BLEPLATFORMDELEGATE_IMPL_READY 1
 #define _BLEMGRIMPL_BLEAPPLICATIONDELEGATE_IMPL_READY 1
 
 /**
