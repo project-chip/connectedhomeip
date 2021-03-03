@@ -114,7 +114,7 @@ OR use GN/Ninja directly
 -   On the command line:
 
           $ cd ~/connectedhomeip/examples/lighting-app/efr32
-          $ python3 out/debug/chip-efr32-lighting-example.out.flash.py
+          $ python3 out/debug/chip-efr32-lighting-example.flash.py
 
 -   Or with the Ozone debugger, just load the .out file.
 

@@ -22,6 +22,8 @@
 
 #pragma once
 
+#include <system/SystemPacketBuffer.h>
+
 namespace chip {
 namespace Messaging {
 
@@ -53,8 +55,90 @@ public:
      */
     CHIP_ERROR SendMsgCounterSyncReq(SecureSessionHandle session);
 
+    /**
+     *  Add a CHIP message into the cache table to queue the outging messages that trigger message counter synchronization protocol
+     *  for retransmission.
+     *
+     *  @param[in]    protocolId       The protocol identifier of the CHIP message to be sent.
+     *
+     *  @param[in]    msgType          The message type of the corresponding protocol.
+     *
+     *  @param[in]    sendFlags        Flags set by the application for the CHIP message being sent.
+     *
+     *  @param[in]    msgBuf           A handle to the packet buffer holding the CHIP message.
+     *
+     *  @param[in]    exchangeContext  A pointer to the exchange context object associated with the message being sent.
+     *
+     *  @retval  #CHIP_ERROR_NO_MEMORY If there is no empty slot left in the table for addition.
+     *  @retval  #CHIP_NO_ERROR On success.
+     */
+    CHIP_ERROR AddToRetransmissionTable(uint16_t protocolId, uint8_t msgType, const SendFlags & sendFlags,
+                                        System::PacketBufferHandle msgBuf, Messaging::ExchangeContext * exchangeContext);
+
+    /**
+     *  Add a CHIP message into the cache table to queue the incomming messages that trigger message counter synchronization
+     * protocol for re-processing.
+     *
+     *  @param[in]    packetHeader     The message header for the received message.
+     *  @param[in]    payloadHeader    The payload header for the received message.
+     *  @param[in]    session          The handle to the secure session.
+     *  @param[in]    msgBuf           A handle to the packet buffer holding the received message.
+     *
+     *  @retval  #CHIP_ERROR_NO_MEMORY If there is no empty slot left in the table for addition.
+     *  @retval  #CHIP_NO_ERROR On success.
+     */
+    CHIP_ERROR AddToReceiveTable(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+                                 const SecureSessionHandle & session, System::PacketBufferHandle msgBuf);
+
 private:
+    /**
+     *  @class RetransTableEntry
+     *
+     *  @brief
+     *    This class is part of the CHIP Message Counter Synchronization Protocol and is used
+     *    to keep track of a CHIP messages to be transmitted to a destination node whose message
+     *    counter is unknown. The message would be retransmitted from this table after message
+     *    synchronization is completed.
+     *
+     */
+    struct RetransTableEntry
+    {
+        ExchangeContext * exchangeContext; /**< The ExchangeContext for the stored CHIP message. */
+        System::PacketBufferHandle msgBuf; /**< A handle to the PacketBuffer object holding the CHIP message. */
+        SendFlags sendFlags;               /**< Flags set by the application for the CHIP message being sent. */
+        uint16_t protocolId;               /**< The protocol identifier of the CHIP message to be sent. */
+        uint8_t msgType;                   /**< The message type of the CHIP message to be sent. */
+    };
+
+    /**
+     *  @class RetransTableEntry
+     *
+     *  @brief
+     *    This class is part of the CHIP Message Counter Synchronization Protocol and is used
+     *    to keep track of a CHIP messages to be transmitted to a destination node whose message
+     *    counter is unknown. The message would be retransmitted from this table after message
+     *    synchronization is completed.
+     *
+     */
+    struct ReceiveTableEntry
+    {
+        PacketHeader packetHeader;         /**< The ExchangeContext for the stored CHIP message. */
+        PayloadHeader payloadHeader;       /**< Flags set by the application for the CHIP message being sent. */
+        SecureSessionHandle session;       /**< The protocol identifier of the CHIP message to be sent. */
+        System::PacketBufferHandle msgBuf; /**< A handle to the PacketBuffer object holding the CHIP message. */
+    };
+
     Messaging::ExchangeManager * mExchangeMgr; // [READ ONLY] Associated Exchange Manager object.
+
+    // MessageCounterSyncProtocol cache table to queue the outging messages that trigger message counter synchronization protocol.
+    RetransTableEntry mRetransTable[CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS];
+
+    // MessageCounterSyncProtocol cache table to queue the incomming messages that trigger message counter synchronization protocol.
+    ReceiveTableEntry mReceiveTable[CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS];
+
+    void RetransPendingGroupMsgs(NodeId peerNodeId);
+
+    void ProcessPendingGroupMsgs(NodeId peerNodeId);
 
     CHIP_ERROR NewMsgCounterSyncExchange(SecureSessionHandle session, Messaging::ExchangeContext *& exchangeContext);
 

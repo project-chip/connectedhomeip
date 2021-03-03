@@ -11,6 +11,7 @@
         "chip-devices.xml",
         "types.xml",
         "general.xml",
+        "general-commissioning-cluster.xml",
         "ha.xml",
         "ha-devices.xml",
         "cba.xml",

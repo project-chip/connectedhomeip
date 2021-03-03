@@ -57,7 +57,7 @@ void emberAfPrintBuffer(int category, const uint8_t * buffer, uint16_t length, b
     if (buffer != nullptr && length > 0)
     {
         constexpr uint16_t kBufferSize = CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE;
-        const char * perByteFormatStr  = withSpace ? "%02hhX " : "%02hhX";
+        const char * perByteFormatStr  = withSpace ? "%02X " : "%02X";
         const uint8_t perByteCharCount = withSpace ? 3 : 2;
         const uint16_t bytesPerBuffer  = static_cast<uint16_t>((kBufferSize - 1) / perByteCharCount);
         char result[kBufferSize];

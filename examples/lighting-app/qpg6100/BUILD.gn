@@ -38,11 +38,6 @@ qpg6100_sdk("sdk") {
   ]
 
   defines = []
-  if (is_debug) {
-    defines += [ "BUILD_RELEASE=0" ]
-  } else {
-    defines += [ "BUILD_RELEASE=1" ]
-  }
 }
 
 qpg6100_executable("lighting_app") {
@@ -71,10 +66,10 @@ qpg6100_executable("lighting_app") {
 
   sources = [
     "${examples_plat_dir}/app/Service.cpp",
+    "${examples_plat_dir}/app/main.cpp",
     "src/AppTask.cpp",
     "src/LightingManager.cpp",
     "src/ZclCallbacks.cpp",
-    "src/main.cpp",
   ]
 
   output_dir = root_out_dir

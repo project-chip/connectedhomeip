@@ -41,13 +41,7 @@ efr32_sdk("sdk") {
     "${efr32_project_dir}/include/FreeRTOSConfig.h",
   ]
 
-  if (is_debug) {
-    defines += [ "BUILD_RELEASE=0" ]
-  } else {
-    defines += [ "BUILD_RELEASE=1" ]
-  }
-
-  defines += [ "BOARD_ID=${efr32_board}" ]
+  defines = [ "BOARD_ID=${efr32_board}" ]
 }
 
 efr32_executable("persistent_storage") {
@@ -71,8 +65,7 @@ efr32_executable("persistent_storage") {
 
   sources = [
     "${efr32_project_dir}/../KeyValueStorageTest.cpp",
-    "${examples_plat_dir}/${efr32_family}/${efr32_board}/init_board.c",
-    "${examples_plat_dir}/${efr32_family}/${efr32_board}/init_mcu.c",
+    "${examples_plat_dir}/init_efrPlatform.cpp",
     "main.cpp",
   ]
 

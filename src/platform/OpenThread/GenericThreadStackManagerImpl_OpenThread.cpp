@@ -978,7 +978,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_JoinerStart(voi
         discerner.mLength = 12;
         discerner.mValue  = discriminator;
 
-        ChipLogProgress(DeviceLayer, "Joiner Discerner: %hu", discriminator);
+        ChipLogProgress(DeviceLayer, "Joiner Discerner: %u", discriminator);
         otJoinerSetDiscerner(mOTInst, &discerner);
     }
 
