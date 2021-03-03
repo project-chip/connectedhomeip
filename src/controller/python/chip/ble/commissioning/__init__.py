@@ -85,7 +85,7 @@ class Connection:
         self.needsOperationalCredentials = step.type == PairNotificationType.OPERATIONAL_CREDENTIALS
         self.paired = step.type == PairNotificationType.COMPLETE
 
-        if step.type == PairNotificationType.PAIR_NOTIFICATION_COMPLETE:
+        if step.type == PairNotificationType.COMPLETE:
           if step.error_code != 0:
               raise Exception('Pairing ended with error code %d' % step.error_code)
 
