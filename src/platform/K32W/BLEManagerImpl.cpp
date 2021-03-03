@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2020 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -119,7 +119,6 @@ EventGroupHandle_t bleAppTaskLoopEvent;
 
 /* keep the device ID of the connected peer */
 uint8_t device_id;
-uint16_t mFlags;
 
 const uint8_t ShortUUID_CHIPoBLEService[]  = { 0xAF, 0xFE };
 const ChipBleUUID ChipUUID_CHIPoBLEChar_RX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F,
@@ -140,7 +139,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
     mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
 
     // Check if BLE stack is initialized
-    VerifyOrExit(!GetFlag(mFlags, kFlag_K32WBLEStackInitialized), err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(!mFlags.Has(Flags::kK32WBLEStackInitialized), err = CHIP_ERROR_INCORRECT_STATE);
 
     // Initialize the Chip BleLayer.
     err = BleLayer::Init(this, this, &SystemLayer);
@@ -194,8 +193,8 @@ CHIP_ERROR BLEManagerImpl::_Init()
 
     GattServer_RegisterHandlesForWriteNotifications(1, attChipRxHandle);
 
-    SetFlag(mFlags, kFlag_K32WBLEStackInitialized, true);
-    SetFlag(mFlags, kFlag_AdvertisingEnabled, CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART ? true : false);
+    mFlags.Set(Flags::kK32WBLEStackInitialized);
+    mFlags.Set(Flags::kAdvertisingEnabled, CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART ? true : false);
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
 
 exit:
@@ -218,12 +217,12 @@ uint16_t BLEManagerImpl::_NumConnections(void)
 
 bool BLEManagerImpl::_IsAdvertisingEnabled(void)
 {
-    return GetFlag(mFlags, kFlag_AdvertisingEnabled);
+    return mFlags.Has(Flags::kAdvertisingEnabled);
 }
 
 bool BLEManagerImpl::_IsFastAdvertisingEnabled(void)
 {
-    return GetFlag(mFlags, kFlag_FastAdvertisingEnabled);
+    return mFlags.Has(Flags::kFastAdvertisingEnabled);
 }
 
 bool BLEManagerImpl::RemoveConnection(uint8_t connectionHandle)
@@ -308,9 +307,9 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
 
     VerifyOrExit(mServiceMode != ConnectivityManager::kCHIPoBLEServiceMode_NotSupported, err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
-    if (GetFlag(mFlags, kFlag_AdvertisingEnabled) != val)
+    if (mFlags.Has(Flags::kAdvertisingEnabled) != val)
     {
-        SetFlag(mFlags, kFlag_AdvertisingEnabled, val);
+        mFlags.Set(Flags::kAdvertisingEnabled, val);
         PlatformMgr().ScheduleWork(DriveBLEState, 0);
     }
 
@@ -324,9 +323,9 @@ CHIP_ERROR BLEManagerImpl::_SetFastAdvertisingEnabled(bool val)
 
     VerifyOrExit(mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_NotSupported, err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
-    if (GetFlag(mFlags, kFlag_FastAdvertisingEnabled) != val)
+    if (mFlags.Has(Flags::kFastAdvertisingEnabled) != val)
     {
-        SetFlag(mFlags, kFlag_FastAdvertisingEnabled, val);
+        mFlags.Set(Flags::kFastAdvertisingEnabled, val);
         PlatformMgr().ScheduleWork(DriveBLEState, 0);
     }
 
@@ -358,643 +357,13 @@ CHIP_ERROR BLEManagerImpl::_SetDeviceName(const char * deviceName)
         }
         memset(mDeviceName, 0, kMaxDeviceNameLength);
         strcpy(mDeviceName, deviceName);
-        SetFlag(mFlags, kFlag_DeviceNameSet, true);
+        mFlags.Set(Flags::kDeviceNameSet);
         ChipLogProgress(DeviceLayer, "Setting device name to : \"%s\"", deviceName);
     }
     else
     {
         mDeviceName[0] = 0;
-        SetFlag(mFlags, kFlag_DeviceNameSet, false);
-    }
-
-    return CHIP_NO_ERROR;
-}
-
-void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
-{
-    switch (event->Type)
-    {
-    case DeviceEventType::kCHIPoBLESubscribe:
-        ChipDeviceEvent connEstEvent;
-
-        HandleSubscribeReceived(event->CHIPoBLESubscribe.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_TX);
-        connEstEvent.Type = DeviceEventType::kCHIPoBLEConnectionEstablished;
-        PlatformMgr().PostEvent(&connEstEvent);
-        break;
-
-    case DeviceEventType::kCHIPoBLEUnsubscribe:
-        HandleUnsubscribeReceived(event->CHIPoBLEUnsubscribe.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_TX);
-        break;
-
-    case DeviceEventType::kCHIPoBLEWriteReceived:
-        HandleWriteReceived(event->CHIPoBLEWriteReceived.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_RX,
-                            PacketBufferHandle::Adopt(event->CHIPoBLEWriteReceived.Data));
-        break;
-
-    case DeviceEventType::kCHIPoBLEConnectionError:
-        HandleConnectionError(event->CHIPoBLEConnectionError.ConId, event->CHIPoBLEConnectionError.Reason);
-        break;
-
-    case DeviceEventType::kCHIPoBLEIndicateConfirm:
-        HandleIndicationConfirmation(event->CHIPoBLEIndicateConfirm.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_TX);
-        break;
-
-#if CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED
-    case DeviceEventType::kServiceProvisioningChange:
-        ChipLogProgress(DeviceLayer, "_OnPlatformEvent kServiceProvisioningChange");
-
-        ClearFlag(mFlags, kFlag_AdvertisingEnabled);
-        PlatformMgr().ScheduleWork(DriveBLEState, 0);
-        break;
-#endif // CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED
-
-    default:
-        break;
-    }
-}
-
-bool BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId)
-{
-    ChipLogProgress(DeviceLayer, "BLEManagerImpl::SubscribeCharacteristic() not supported");
-    return false;
-}
-
-bool BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId)
-{
-    ChipLogProgress(DeviceLayer, "BLEManagerImpl::UnsubscribeCharacteristic() not supported");
-    return false;
-}
-
-bool BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
-{
-    ChipLogProgress(DeviceLayer, "Closing BLE GATT connection (con %u)", conId);
-
-    if (Gap_Disconnect(conId) != gBleSuccess_c)
-    {
-        ChipLogProgress(DeviceLayer, "Gap_Disconnect() failed.");
-        return false;
-    }
-
-    return true;
-}
-
-uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
-{
-    uint16_t tempMtu = 0;
-    (void) Gatt_GetMtu(conId, &tempMtu);
-
-    return tempMtu;
-}
-
-bool BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                                      PacketBufferHandle pBuf)
-{
-    ChipLogProgress(DeviceLayer, "BLEManagerImpl::SendWriteRequest() not supported");
-    return false;
-}
-
-bool BLEManagerImpl::SendReadRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                                     PacketBufferHandle pBuf)
-{
-    ChipLogProgress(DeviceLayer, "BLEManagerImpl::SendReadRequest() not supported");
-    return false;
-}
-
-bool BLEManagerImpl::SendReadResponse(BLE_CONNECTION_OBJECT conId, BLE_READ_REQUEST_CONTEXT requestContext,
-                                      const ChipBleUUID * svcId, const ChipBleUUID * charId)
-{
-    ChipLogProgress(DeviceLayer, "BLEManagerImpl::SendReadResponse() not supported");
-    return false;
-}
-
-void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
-{
-    // Nothing to do
-}
-
-bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                                    PacketBufferHandle data)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    uint16_t cId   = (UUIDsMatch(&ChipUUID_CHIPoBLEChar_TX, charId) ? value_chipoble_tx : 0);
-    ChipDeviceEvent event;
-
-    if (cId != 0)
-    {
-        if (blekw_send_event(conId, cId, data->Start(), data->DataLength()) != BLE_OK)
-        {
-            err = CHIP_ERROR_SENDING_BLOCKED;
-        }
-        else
-        {
-            event.Type                          = DeviceEventType::kCHIPoBLEIndicateConfirm;
-            event.CHIPoBLEIndicateConfirm.ConId = conId;
-            PlatformMgr().PostEvent(&event);
-        }
-
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(DeviceLayer, "BLEManagerImpl::SendIndication() failed: %s", ErrorStr(err));
-            return false;
-        }
-        return true;
-    }
-    return false;
-}
-
-BLEManagerImpl::ble_err_t BLEManagerImpl::blekw_send_event(int8_t connection_handle, uint16_t handle, uint8_t * data, uint32_t len)
-{
-    osaEventFlags_t event_mask;
-
-#if CHIP_DEVICE_CHIP0BLE_DEBUG
-    ChipLogProgress(DeviceLayer, "Trying to send event.");
-#endif
-
-    if (connection_handle < 0 || handle <= 0)
-    {
-        ChipLogProgress(DeviceLayer, "BLE Event - Bad Handle");
-        return BLE_E_FAIL;
-    }
-
-    if (len > 0 && data == NULL)
-    {
-        ChipLogProgress(DeviceLayer, "BLE Event - Invalid Data");
-        return BLE_E_FAIL;
-    }
-
-    /************* Send the indication *************/
-    if (OSA_EventClear(event_msg, CHIP_BLE_KW_EVNT_INDICATION_CONFIRMED | CHIP_BLE_KW_EVNT_INDICATION_FAILED) != osaStatus_Success)
-    {
-        ChipLogProgress(DeviceLayer, "BLE Event - Can't clear OSA Events");
-        return BLE_E_FAIL;
-    }
-
-    if (GattServer_SendInstantValueIndication(connection_handle, handle, len, data) != gBleSuccess_c)
-    {
-        ChipLogProgress(DeviceLayer, "BLE Event - Can't sent indication");
-        return BLE_E_FAIL;
-    }
-
-    if (OSA_EventWait(event_msg, CHIP_BLE_KW_EVNT_INDICATION_CONFIRMED | CHIP_BLE_KW_EVNT_INDICATION_FAILED, FALSE,
-                      CHIP_BLE_KW_EVNT_TIMEOUT, &event_mask) != osaStatus_Success)
-    {
-        ChipLogProgress(DeviceLayer, "BLE Event - OSA Event failed");
-        return BLE_E_FAIL;
-    }
-
-    if (event_mask & CHIP_BLE_KW_EVNT_INDICATION_FAILED)
-    {
-        ChipLogProgress(DeviceLayer, "BLE Event - Sent Failed");
-        return BLE_E_FAIL;
-    }
-
-#if CHIP_DEVICE_CHIP0BLE_DEBUG
-    ChipLogProgress(DeviceLayer, "BLE Event - Sent :-) ");
-#endif
-
-    return BLE_OK;
-}
-/*******************************************************************************
- * Private functions
- *******************************************************************************/
-CHIP_ERROR BLEManagerImpl::blekw_controller_init(void)
-{
-    mControllerTaskEvent = OSA_EventCreate(TRUE);
-
-    if (!mControllerTaskEvent)
-    {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    Controller_TaskEventInit(mControllerTaskEvent, gUseRtos_c);
-
-    /* Task creation */
-    if (pdPASS !=
-        xTaskCreate(Controller_TaskHandler, "controllerTask", CONTROLLER_TASK_STACK_SIZE, (void *) 0, CONTROLLER_TASK_PRIORITY,
-                    NULL))
-    {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    /* Setup Interrupt priorities of Interrupt handlers that are used
-     * in application to meet requirements of FreeRTOS */
-
-    // BLE_DP_IRQHandler
-    NVIC_SetPriority(BLE_DP_IRQn, configMAX_PRIORITIES - 1);
-    // BLE_DP0_IRQHandler
-    NVIC_SetPriority(BLE_DP0_IRQn, configMAX_PRIORITIES - 1);
-    // BLE_DP1_IRQHandler
-    NVIC_SetPriority(BLE_DP1_IRQn, configMAX_PRIORITIES - 1);
-    // BLE_DP2_IRQHandler
-    NVIC_SetPriority(BLE_DP2_IRQn, configMAX_PRIORITIES - 1);
-    // BLE_LL_ALL_IRQHandler
-    NVIC_SetPriority(BLE_LL_ALL_IRQn, configMAX_PRIORITIES - 1);
-
-    /* Check for available memory storage */
-    if (!Ble_CheckMemoryStorage())
-    {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    /* BLE Controller Init */
-    if (osaStatus_Success != Controller_Init(Ble_HciRecv))
-    {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    return CHIP_NO_ERROR;
-}
-
-void BLEManagerImpl::Host_Task(osaTaskParam_t argument)
-{
-    Host_TaskHandler((void *) NULL);
-}
-
-CHIP_ERROR BLEManagerImpl::blekw_host_init(void)
-{
-    /* Initialization of task related */
-    gHost_TaskEvent = OSA_EventCreate(TRUE);
-    if (!gHost_TaskEvent)
-    {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    /* Initialization of task message queue */
-    MSG_InitQueue(&gApp2Host_TaskQueue);
-    MSG_InitQueue(&gHci2Host_TaskQueue);
-
-    /* Task creation */
-    if (pdPASS != xTaskCreate(Host_Task, "hostTask", HOST_TASK_STACK_SIZE, (void *) 0, HOST_TASK_PRIORITY, NULL))
-    {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    return CHIP_NO_ERROR;
-}
-
-BLEManagerImpl::ble_err_t BLEManagerImpl::blekw_start_advertising(gapAdvertisingParameters_t * adv_params,
-                                                                  gapAdvertisingData_t * adv, gapScanResponseData_t * scnrsp)
-{
-    osaEventFlags_t event_mask;
-
-    /************* Set the advertising parameters *************/
-    OSA_EventClear(event_msg, (CHIP_BLE_KW_EVNT_ADV_SETUP_FAILED | CHIP_BLE_KW_EVNT_ADV_PAR_SETUP_COMPLETE));
-
-    /* Set the advertising parameters */
-    if (Gap_SetAdvertisingParameters(adv_params) != gBleSuccess_c)
-    {
-        vTaskDelay(1);
-
-        /* Retry, just to make sure before giving up and sending an error. */
-        if (Gap_SetAdvertisingParameters(adv_params) != gBleSuccess_c)
-        {
-            return BLE_E_SET_ADV_PARAMS;
-        }
-    }
-
-    if (OSA_EventWait(event_msg, (CHIP_BLE_KW_EVNT_ADV_SETUP_FAILED | CHIP_BLE_KW_EVNT_ADV_PAR_SETUP_COMPLETE), FALSE,
-                      CHIP_BLE_KW_EVNT_TIMEOUT, &event_mask) != osaStatus_Success)
-    {
-        return BLE_E_ADV_PARAMS_FAILED;
-    }
-
-    if (event_mask & CHIP_BLE_KW_EVNT_ADV_SETUP_FAILED)
-    {
-        return BLE_E_ADV_PARAMS_FAILED;
-    }
-
-    /************* Set the advertising data *************/
-    OSA_EventClear(event_msg, (CHIP_BLE_KW_EVNT_ADV_SETUP_FAILED | CHIP_BLE_KW_EVNT_ADV_DAT_SETUP_COMPLETE));
-
-    /* Set the advertising data */
-    if (Gap_SetAdvertisingData(adv, scnrsp) != gBleSuccess_c)
-    {
-        return BLE_E_SET_ADV_DATA;
-    }
-
-    if (OSA_EventWait(event_msg, (CHIP_BLE_KW_EVNT_ADV_SETUP_FAILED | CHIP_BLE_KW_EVNT_ADV_DAT_SETUP_COMPLETE), FALSE,
-                      CHIP_BLE_KW_EVNT_TIMEOUT, &event_mask) != osaStatus_Success)
-    {
-        return BLE_E_ADV_SETUP_FAILED;
-    }
-
-    if (event_mask & CHIP_BLE_KW_EVNT_ADV_SETUP_FAILED)
-    {
-        return BLE_E_ADV_SETUP_FAILED;
-    }
-
-    /************* Start the advertising *************/
-    OSA_EventClear(event_msg, (CHIP_BLE_KW_EVNT_ADV_CHANGED | CHIP_BLE_KW_EVNT_ADV_FAILED));
-
-    /* Start the advertising */
-    if (Gap_StartAdvertising(blekw_gap_advertising_cb, blekw_gap_connection_cb) != gBleSuccess_c)
-    {
-        return BLE_E_START_ADV;
-    }
-
-    if (OSA_EventWait(event_msg, (CHIP_BLE_KW_EVNT_ADV_CHANGED | CHIP_BLE_KW_EVNT_ADV_FAILED), FALSE, CHIP_BLE_KW_EVNT_TIMEOUT,
-                      &event_mask) != osaStatus_Success)
-    {
-        return BLE_E_START_ADV_FAILED;
-    }
-
-    if (event_mask & CHIP_BLE_KW_EVNT_ADV_FAILED)
-    {
-        return BLE_E_START_ADV_FAILED;
-    }
-
-#if cPWR_UsePowerDownMode
-    PWR_AllowDeviceToSleep();
-#endif
-
-    return BLE_OK;
-}
-
-BLEManagerImpl::ble_err_t BLEManagerImpl::blekw_stop_advertising(void)
-{
-    osaEventFlags_t event_mask;
-    bleResult_t res;
-
-    OSA_EventClear(event_msg, (CHIP_BLE_KW_EVNT_ADV_CHANGED | CHIP_BLE_KW_EVNT_ADV_FAILED));
-
-    /* Stop the advertising data */
-    res = Gap_StopAdvertising();
-    if (res != gBleSuccess_c)
-    {
-        ChipLogProgress(DeviceLayer, "Failed to stop advertising %d", res);
-        return BLE_E_STOP;
-    }
-
-    if (OSA_EventWait(event_msg, (CHIP_BLE_KW_EVNT_ADV_CHANGED | CHIP_BLE_KW_EVNT_ADV_FAILED), FALSE, CHIP_BLE_KW_EVNT_TIMEOUT,
-                      &event_mask) != osaStatus_Success)
-    {
-        ChipLogProgress(DeviceLayer, "Stop advertising event timeout.");
-        return BLE_E_ADV_CHANGED;
-    }
-
-    if (event_mask & CHIP_BLE_KW_EVNT_ADV_FAILED)
-    {
-        ChipLogProgress(DeviceLayer, "Stop advertising flat out failed.");
-        return BLE_E_ADV_FAILED;
-    }
-
-    return BLE_OK;
-}
-
-CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
-{
-    ble_err_t err;
-    CHIP_ERROR chipErr;
-    uint16_t discriminator;
-    gapAdvertisingData_t adv                              = { 0 };
-    gapAdStructure_t adv_data[BLEKW_ADV_MAX_NO]           = { 0 };
-    gapAdStructure_t scan_rsp_data[BLEKW_SCAN_RSP_MAX_NO] = { 0 };
-    uint8_t advPayload[BLEKW_MAX_ADV_DATA_LEN]            = { 0 };
-    gapScanResponseData_t scanRsp                         = { 0 };
-    gapAdvertisingParameters_t adv_params                 = { 0 };
-    uint16_t advInterval                                  = 0;
-    uint8_t chipAdvDataFlags                              = (gLeGeneralDiscoverableMode_c | gBrEdrNotSupported_c);
-    uint8_t chipOverBleService[2];
-    ChipBLEDeviceIdentificationInfo mDeviceIdInfo = { 0 };
-    uint8_t mDeviceIdInfoLength                   = 0;
-
-    chipErr = ConfigurationMgr().GetSetupDiscriminator(discriminator);
-    if (chipErr != CHIP_NO_ERROR)
-    {
-        return chipErr;
-    }
-
-    if (!GetFlag(mFlags, kFlag_DeviceNameSet))
-    {
-        memset(mDeviceName, 0, kMaxDeviceNameLength);
-        snprintf(mDeviceName, kMaxDeviceNameLength, "%s%04u", CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX, discriminator);
-    }
-
-    /**************** Prepare advertising data *******************************************/
-    adv.cNumAdStructures = BLEKW_ADV_MAX_NO;
-
-    chipErr = ConfigurationMgr().GetBLEDeviceIdentificationInfo(mDeviceIdInfo);
-    SuccessOrExit(chipErr);
-    mDeviceIdInfoLength = sizeof(mDeviceIdInfo);
-
-    if ((mDeviceIdInfoLength + CHIP_ADV_SHORT_UUID_LEN + 1) > BLEKW_MAX_ADV_DATA_LEN)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
-
-    adv_data[0].length = 0x02;
-    adv_data[0].adType = gAdFlags_c;
-    adv_data[0].aData  = (uint8_t *) (&chipAdvDataFlags);
-
-    adv_data[1].length = static_cast<uint8_t>(mDeviceIdInfoLength + CHIP_ADV_SHORT_UUID_LEN + 1);
-    adv_data[1].adType = gAdServiceData16bit_c;
-    memcpy(advPayload, ShortUUID_CHIPoBLEService, CHIP_ADV_SHORT_UUID_LEN);
-    memcpy(&advPayload[CHIP_ADV_SHORT_UUID_LEN], (void *) &mDeviceIdInfo, mDeviceIdInfoLength);
-    adv_data[1].aData = advPayload;
-
-    adv.aAdStructures = adv_data;
-    /**************** Prepare scan response data *******************************************/
-    scanRsp.cNumAdStructures = BLEKW_SCAN_RSP_MAX_NO;
-
-    scan_rsp_data[0].length = static_cast<uint8_t>(strlen(mDeviceName) + 1);
-    scan_rsp_data[0].adType = gAdCompleteLocalName_c;
-    scan_rsp_data[0].aData  = (uint8_t *) mDeviceName;
-
-    scan_rsp_data[1].length = sizeof(chipOverBleService) + 1;
-    scan_rsp_data[1].adType = gAdComplete16bitServiceList_c;
-    chipOverBleService[0]   = ShortUUID_CHIPoBLEService[0];
-    chipOverBleService[1]   = ShortUUID_CHIPoBLEService[1];
-    scan_rsp_data[1].aData  = (uint8_t *) chipOverBleService;
-
-    scanRsp.aAdStructures = scan_rsp_data;
-
-    /**************** Prepare advertising parameters *************************************/
-    advInterval =
-        ((NumConnections() == 0 && !ConfigurationMgr().IsPairedToAccount()) || GetFlag(mFlags, kFlag_FastAdvertisingEnabled))
-        ? (CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL * 3)
-        : CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL;
-
-    adv_params.advertisingType = gAdvConnectableUndirected_c;
-    adv_params.ownAddressType  = gBleAddrTypePublic_c;
-    adv_params.peerAddressType = gBleAddrTypePublic_c;
-    memset(adv_params.peerAddress, 0, gcBleDeviceAddressSize_c);
-    adv_params.channelMap   = (gapAdvertisingChannelMapFlags_t)(gAdvChanMapFlag37_c | gAdvChanMapFlag38_c | gAdvChanMapFlag39_c);
-    adv_params.filterPolicy = gProcessAll_c;
-    adv_params.minInterval = adv_params.maxInterval = advInterval;
-
-    err = blekw_start_advertising(&adv_params, &adv, &scanRsp);
-    if (err == BLE_OK)
-    {
-        ChipLogProgress(DeviceLayer, "Started Advertising.");
-    }
-    else
-    {
-        ChipLogProgress(DeviceLayer, "Advertising error!");
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
-
-exit:
-    return chipErr;
-}
-
-CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
-{
-    SetFlag(mFlags, kFlag_Advertising, true);
-    ClearFlag(mFlags, kFlag_RestartAdvertising);
-
-    return ConfigureAdvertisingData();
-}
-
-CHIP_ERROR BLEManagerImpl::StopAdvertising(void)
-{
-    ble_err_t err;
-
-    if (GetFlag(mFlags, kFlag_Advertising))
-    {
-        ClearFlag(mFlags, kFlag_Advertising);
-        ClearFlag(mFlags, kFlag_RestartAdvertising);
-
-        err = blekw_stop_advertising();
-        if (err != BLE_OK)
-        {
-            return CHIP_ERROR_INCORRECT_STATE;
-        }
-    }
-
-    return CHIP_NO_ERROR;
-}
-
-void BLEManagerImpl::DriveBLEState(void)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    // Check if BLE stack is initialized
-    VerifyOrExit(GetFlag(mFlags, kFlag_K32WBLEStackInitialized), /* */);
-
-#if CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED
-    if (ConfigurationMgr().IsFullyProvisioned())
-    {
-        ClearFlag(mFlags, kFlag_AdvertisingEnabled);
-        ChipLogProgress(DeviceLayer, "CHIPoBLE advertising disabled because device is fully provisioned");
-    }
-#endif // CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED
-
-    // Start advertising if needed...
-    if (mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_Enabled && GetFlag(mFlags, kFlag_AdvertisingEnabled))
-    {
-        // Start/re-start advertising if not already started, or if there is a pending change
-        // to the advertising configuration.
-        if (!GetFlag(mFlags, kFlag_Advertising) || GetFlag(mFlags, kFlag_RestartAdvertising))
-        {
-            err = StartAdvertising();
-            SuccessOrExit(err);
-        }
-    }
-    // Otherwise, stop advertising if it is enabled.
-    else if (GetFlag(mFlags, kFlag_Advertising))
-    {
-        err = StopAdvertising();
-        SuccessOrExit(err);
-        ChipLogProgress(DeviceLayer, "Stopped Advertising");
-    }
-
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %s", ErrorStr(err));
-        mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
-    }
-}
-
-void BLEManagerImpl::DriveBLEState(intptr_t arg)
-{
-    sInstance.DriveBLEState();
-}
-
-/*******************************************************************************
- * BLE App Task Processing
- *******************************************************************************/
-void BLEManagerImpl::bleAppTask(void * p_arg)
-{
-    while (1)
-    {
-        xEventGroupWaitBits(bleAppTaskLoopEvent, LOOP_EV_BLE, true, false, portMAX_DELAY);
-
-        PlatformMgr().LockChipStack();
-
-        if (MSG_Pending(&blekw_msg_list))
-        {
-            /* There is message from the BLE tasks to solve */
-            blekw_msg_t * msg = (blekw_msg_t *) MSG_DeQueue(&blekw_msg_list);
-
-            assert(msg != NULL);
-
-            if (msg->type == BLE_KW_MSG_ERROR)
-            {
-                ChipLogProgress(DeviceLayer, "BLE Fatal Error: %d.\n", msg->data.u8);
-            }
-            else if (msg->type == BLE_KW_MSG_CONNECTED)
-            {
-                sInstance.HandleConnectEvent(msg);
-            }
-            else if (msg->type == BLE_KW_MSG_DISCONNECTED)
-            {
-                sInstance.HandleConnectionCloseEvent(msg);
-            }
-            else if (msg->type == BLE_KW_MSG_MTU_CHANGED)
-            {
-                blekw_start_connection_timeout();
-                ChipLogProgress(DeviceLayer, "BLE MTU size has been changed to %d.", msg->data.u16);
-            }
-            else if (msg->type == BLE_KW_MSG_ATT_WRITTEN || msg->type == BLE_KW_MSG_ATT_LONG_WRITTEN ||
-                     msg->type == BLE_KW_MSG_ATT_CCCD_WRITTEN)
-            {
-                sInstance.HandleWriteEvent(msg);
-            }
-            else if (msg->type == BLE_KW_MSG_FORCE_DISCONNECT)
-            {
-                ChipLogProgress(DeviceLayer, "BLE connection timeout: Forcing disconnection.");
-
-                /* Set the advertising parameters */
-                if (Gap_Disconnect(device_id) != gBleSuccess_c)
-                {
-                    ChipLogProgress(DeviceLayer, "Gap_Disconnect() failed.");
-                }
-            }
-
-            /* Freed the message from the queue */
-            MSG_Free(msg);
-        }
-        PlatformMgr().UnlockChipStack();
-    }
-}
-
-void BLEManagerImpl::HandleConnectEvent(blekw_msg_t * msg)
-{
-    uint8_t device_id_loc = msg->data.u8;
-    ChipLogProgress(DeviceLayer, "BLE is connected with device: %d.\n", device_id_loc);
-
-    device_id = device_id_loc;
-    blekw_start_connection_timeout();
-    sInstance.AddConnection(device_id_loc);
-    SetFlag(mFlags, kFlag_RestartAdvertising, true);
-    PlatformMgr().ScheduleWork(DriveBLEState, 0);
-}
-
-void BLEManagerImpl::HandleConnectionCloseEvent(blekw_msg_t * msg)
-{
-    uint8_t device_id_loc = msg->data.u8;
-    ChipLogProgress(DeviceLayer, "BLE is disconnected with device: %d.\n", device_id_loc);
-
-    if (sInstance.RemoveConnection(device_id_loc))
-    {
-        ChipDeviceEvent event;
-        event.Type                           = DeviceEventType::kCHIPoBLEConnectionError;
-        event.CHIPoBLEConnectionError.ConId  = device_id_loc;
-        event.CHIPoBLEConnectionError.Reason = BLE_ERROR_REMOTE_DEVICE_DISCONNECTED;
-
-        PlatformMgr().PostEvent(&event);
-        SetFlag(mFlags, kFlag_RestartAdvertising, true);
+        mFlags.Set(Flags::kRestartAdvertising);
         PlatformMgr().ScheduleWork(DriveBLEState, 0);
     }
 }

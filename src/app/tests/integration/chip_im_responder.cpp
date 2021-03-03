@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -60,7 +60,7 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
                                                         kTestGroupId,    // GroupId
                                                         kTestClusterId,  // ClusterId
                                                         kTestCommandId,  // CommandId
-                                                        (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                                        (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
 
     // Add command data here
 

@@ -1187,7 +1187,7 @@ static void UpdateAdditionalDataCharacteristic(BluezGattCharacteristic1 * charac
     char serialNumber[ConfigurationManager::kMaxSerialNumberLength + 1];
     size_t serialNumberSize  = 0;
     uint16_t lifetimeCounter = 0;
-    BitFlags<uint8_t, AdditionalDataFields> additionalDataFields;
+    BitFlags<AdditionalDataFields> additionalDataFields;
 
 #if CHIP_ENABLE_ROTATING_DEVICE_ID
     err = ConfigurationMgr().GetSerialNumber(serialNumber, sizeof(serialNumber), serialNumberSize);
