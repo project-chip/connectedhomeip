@@ -1,14 +1,12 @@
 #include <NetworkInterface.h>
 #include <errno.h>
 #include <net_if.h>
-
-static struct if_nameindex * net_list;
-static NetworkInterface * net_if = NetworkInterface::get_default_instance();
 struct if_nameindex * mbed_if_nameindex(void)
 {
     char name[IF_NAMESIZE];
     char * name_ptr = name;
 
+    NetworkInterface * net_if = NetworkInterface::get_default_instance();
     if (net_if == nullptr)
     {
         errno = ENOBUFS;
@@ -22,7 +20,7 @@ struct if_nameindex * mbed_if_nameindex(void)
         return NULL;
     }
 
-    net_list = (struct if_nameindex *) calloc((MBED_NET_IF_LIST_SIZE), sizeof(struct if_nameindex));
+    struct if_nameindex * net_list = (struct if_nameindex *) calloc((MBED_NET_IF_LIST_SIZE), sizeof(struct if_nameindex));
     if (net_list == NULL)
     {
         errno = ENOBUFS;
@@ -45,45 +43,6 @@ struct if_nameindex * mbed_if_nameindex(void)
     return net_list;
 }
 
-char * mbed_if_indextoname(unsigned int ifindex, char * ifname)
-{
-    char * ret = NULL;
-    int index  = ifindex - 1;
-
-    if (index < 0 || index > MBED_MAX_INTERFACES_NUM || ifname == NULL || net_list == NULL)
-    {
-        errno = ENXIO;
-        return NULL;
-    }
-
-    if (net_list[index].if_name != NULL)
-    {
-        ret = strncpy(ifname, net_list[index].if_name, IF_NAMESIZE);
-    }
-
-    return ret;
-}
-
-unsigned int mbed_if_nametoindex(const char * ifname)
-{
-    unsigned int index;
-    if (ifname == NULL || net_list == NULL)
-    {
-        errno = ENXIO;
-        return NULL;
-    }
-
-    for (index = 0; index < MBED_NET_IF_LIST_SIZE; ++index)
-    {
-        if (!strcmp(ifname, net_list[index].if_name))
-        {
-            return net_list[index].if_index;
-        }
-    }
-
-    return 0;
-}
-
 void mbed_if_freenameindex(struct if_nameindex * ptr)
 {
     struct if_nameindex * p;
@@ -99,6 +58,68 @@ void mbed_if_freenameindex(struct if_nameindex * ptr)
     }
 
     free(ptr);
+}
+
+char * mbed_if_indextoname(unsigned int ifindex, char * ifname)
+{
+    char * ret = NULL;
+    int index  = ifindex - 1;
+
+    if (index < 0 || index > MBED_MAX_INTERFACES_NUM || ifname == NULL)
+    {
+        errno = ENXIO;
+        return NULL;
+    }
+
+    struct if_nameindex * net_list = mbed_if_nameindex();
+    if (net_list == NULL)
+    {
+        errno = ENXIO;
+        return NULL;
+    }
+
+    if (net_list[index].if_name != NULL)
+    {
+        ret = strncpy(ifname, net_list[index].if_name, IF_NAMESIZE);
+    }
+    else
+    {
+        errno = ENXIO;
+    }
+
+    mbed_if_freenameindex(net_list);
+
+    return ret;
+}
+
+unsigned int mbed_if_nametoindex(const char * ifname)
+{
+    unsigned int index, ret = 0;
+    if (ifname == NULL)
+    {
+        errno = ENXIO;
+        return NULL;
+    }
+
+    struct if_nameindex * net_list = mbed_if_nameindex();
+    if (net_list == NULL)
+    {
+        errno = ENXIO;
+        return NULL;
+    }
+
+    for (index = 0; index < MBED_NET_IF_LIST_SIZE; ++index)
+    {
+        if (!strcmp(ifname, net_list[index].if_name))
+        {
+            ret = net_list[index].if_index;
+            break;
+        }
+    }
+
+    mbed_if_freenameindex(net_list);
+
+    return ret;
 }
 
 int mbed_getifaddrs(struct ifaddrs ** ifap)

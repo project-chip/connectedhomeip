@@ -5,11 +5,12 @@
     "target_overrides": { 
         "*": { 
             "lwip.ipv6-enabled": true,
-            "lwip.raw-socket-enabled": true
+            "lwip.raw-socket-enabled": true,
+            "nsapi.default-wifi-security": "WPA_WPA2",
+            "nsapi.default-wifi-ssid": "\"YOUR_SSID\"",
+            "nsapi.default-wifi-password": "\"YOUR_PASSWORD\""
         },
         "DISCO_L475VG_IOT01A": {
-            "lwip.ipv6-enabled": true,
-            "lwip.raw-socket-enabled": true,
             "target.components_add": ["wifi_ism43362"],
             "ism43362.provide-default": true,
             "target.network-default-interface-type": "WIFI",
