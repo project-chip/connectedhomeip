@@ -109,7 +109,7 @@ pw_python_action("python") {
         src_dir = "."
         sources = [
           "chip/ble/__init__.py",
-          "chip/ble/commisioning/__init__.py",
+          "chip/ble/commissioning/__init__.py",
           "chip/ble/get_adapters.py",
           "chip/ble/library_handle.py",
           "chip/ble/scan_devices.py",

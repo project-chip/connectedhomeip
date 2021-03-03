@@ -89,7 +89,7 @@ class Connection:
 
 
 def _StartAsyncConnection(discriminator: int, pin: int, deprecated_nodeid: Optional[int] = None) -> Connection:
-    """Initiates the connection to a BLE device for the purpose of commisioning
+    """Initiates the connection to a BLE device for the purpose of commissioning
 
     Args:
       discriminator:      the advertisement discriminator to use to connect to
@@ -97,7 +97,7 @@ def _StartAsyncConnection(discriminator: int, pin: int, deprecated_nodeid: Optio
       pin:                the pin number used to pair with the device (must match the
                           device secret pin, typically available in a QR code)
       deprecated_nodeid:  TEMPORARY, TO BE REMOVED nodeid that will be set during
-                          the commisioning. This will be replaced by setting the node id
+                          the commissioning. This will be replaced by setting the node id
                           at the time of setting operational credentials once such
                           credentials are supported.
     """
@@ -116,7 +116,7 @@ def _StartAsyncConnection(discriminator: int, pin: int, deprecated_nodeid: Optio
 
 
 def Connect(discriminator: int, pin: int, deprecated_nodeid: Optional[int] = None) -> Connection:
-    """Connects to a BLE device for the purpose of commisioning.
+    """Connects to a BLE device for the purpose of commissioning.
     Will block until the remote device can be operated on (e.g. setting network
     credentials or operational credentials.)
 
@@ -126,7 +126,7 @@ def Connect(discriminator: int, pin: int, deprecated_nodeid: Optional[int] = Non
       pin:                the pin number used to pair with the device (must match the
                           device secret pin, typically available in a QR code)
       deprecated_nodeid:  TEMPORARY, TO BE REMOVED nodeid that will be set during
-                          the commisioning. This will be replaced by setting the node id
+                          the commissioning. This will be replaced by setting the node id
                           at the time of setting operational credentials once such
                           credentials are supported.
     """

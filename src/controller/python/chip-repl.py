@@ -41,9 +41,9 @@ for device in chip.ble.DiscoverSync(2000):
 
 ####### Commision a BLE device #########
 
-import chip.ble.commisioning
+import chip.ble.commissioning
 
-device = chip.ble.commisioning.Connect(discriminator=3840, pin=12345678)
+device = chip.ble.commissioning.Connect(discriminator=3840, pin=12345678)
 if device.needsNetworkCredentials:
   device.ConnectToWifi("ssid", "password")
 

@@ -17,7 +17,7 @@
 from typing import Optional
 
 # Represents the node ID that is to be used when creating device
-# controllers/commisioning devices
+# controllers/commissioning devices
 _local_node_id: Optional[int] = None
 
 DEFAULT_LOCAL_NODE_ID = 12345
@@ -42,5 +42,5 @@ def GetLocalNodeId() -> int:
 
     if _local_node_id is None:
         SetLocalNodeId(DEFAULT_LOCAL_NODE_ID)
-    
+
     return _local_node_id
