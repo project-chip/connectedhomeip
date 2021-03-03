@@ -36,9 +36,6 @@ using namespace chip::Shell;
 using namespace chip::System;
 using namespace chip::Inet;
 
-System::Layer gSystemLayer;
-Inet::InetLayer gInet;
-
 static chip::Shell::Shell sShellDateSubcommands;
 static chip::Shell::Shell sShellNetworkSubcommands;
 static chip::Shell::Shell sShellSocketSubcommands;
@@ -165,7 +162,6 @@ int cmd_network_interface(int argc, char ** argv)
     InterfaceAddressIterator addrIterator;
     char intName[IF_NAMESIZE];
     InterfaceId intId;
-    IPAddress addr;
     INET_ERROR err;
 
     streamer_t * sout = streamer_get();
@@ -188,18 +184,72 @@ int cmd_network_interface(int argc, char ** argv)
             streamer_printf(sout, "ERROR: get interface name failed\r\n");
             ExitNow(error = CHIP_ERROR_INTERNAL;);
         }
-        printf("     interface id: %d, interface name: %s\n", intId, intName);
-
-        //         printf("     interface id: 0x%" PRIxPTR ", interface name: %s, interface state: %s, %s multicast, %s broadcast
-        //         addr\n",
-        // #if CHIP_SYSTEM_CONFIG_USE_LWIP
-        //                reinterpret_cast<uintptr_t>(intId),
-        // #else
-        //                static_cast<uintptr_t>(intId),
-        // #endif
-        //                intName, intIterator.IsUp() ? "UP" : "DOWN", intIterator.SupportsMulticast() ? "supports" : "no",
-        //                intIterator.HasBroadcastAddress() ? "has" : "no");
+        printf("     interface id: %d, interface name: %s, interface state: %s, %s broadcast addr\n", intId, intName,
+               intIterator.IsUp() ? "UP" : "DOWN", intIterator.HasBroadcastAddress() ? "has" : "no");
     }
+
+exit:
+    return error;
+}
+
+int cmd_network_idToName(int argc, char ** argv)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    char intName[IF_NAMESIZE];
+    InterfaceId intId;
+    INET_ERROR err;
+
+    streamer_t * sout = streamer_get();
+
+    VerifyOrExit(argc == 1, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    intId = (InterfaceId) atoi(argv[0]);
+    if (intId == INET_NULL_INTERFACEID)
+    {
+        streamer_printf(sout, "ERROR: wrong interface ID\r\n");
+        ExitNow(error = CHIP_ERROR_INTERNAL;);
+    }
+
+    err = GetInterfaceName(intId, intName, sizeof(intName));
+    if (err != INET_NO_ERROR)
+    {
+        streamer_printf(sout, "ERROR: get interface name failed\r\n");
+        ExitNow(error = CHIP_ERROR_INTERNAL;);
+    }
+
+    streamer_printf(sout, "Name of %d interface: %s\n", intId, intName);
+
+exit:
+    return error;
+}
+
+int cmd_network_nameToId(int argc, char ** argv)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    char intName[IF_NAMESIZE];
+    InterfaceId intId;
+    INET_ERROR err;
+
+    streamer_t * sout = streamer_get();
+
+    VerifyOrExit(argc == 1, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    strncpy(intName, argv[0], IF_NAMESIZE);
+
+    err = InterfaceNameToId(intName, intId);
+    if (err != INET_NO_ERROR)
+    {
+        streamer_printf(sout, "ERROR: get interface ID failed\r\n");
+        ExitNow(error = CHIP_ERROR_INTERNAL;);
+    }
+
+    if (intId == INET_NULL_INTERFACEID)
+    {
+        streamer_printf(sout, "ERROR: wrong interface name\r\n");
+        ExitNow(error = CHIP_ERROR_INTERNAL;);
+    }
+
+    streamer_printf(sout, "Interface %s has ID: %d\n", intName, intId);
 
 exit:
     return error;
@@ -242,6 +292,8 @@ static const shell_command_t cmds_network_root = { &cmd_network_dispatch, "netwo
 
 static const shell_command_t cmds_network[] = { { &cmd_network_interface, "interface",
                                                   "Display current network interface details" },
+                                                { &cmd_network_idToName, "idToName", "Display interface name by id" },
+                                                { &cmd_network_nameToId, "nameToId", "Display interface id by name" },
                                                 { &cmd_network_help, "help", "Display help for each network subcommands" } };
 
 static const shell_command_t cmds_socket_root = { &cmd_socket_dispatch, "socket", "Socket layer commands" };
@@ -250,9 +302,6 @@ static const shell_command_t cmds_socket[] = { { &cmd_socket_help, "help", "Disp
 
 void cmd_mbed_utils_init()
 {
-    gSystemLayer.Init(nullptr);
-    gInet.Init(gSystemLayer, nullptr);
-
     sShellDateSubcommands.RegisterCommands(cmds_date, ArraySize(cmds_date));
     sShellNetworkSubcommands.RegisterCommands(cmds_network, ArraySize(cmds_network));
     sShellSocketSubcommands.RegisterCommands(cmds_socket, ArraySize(cmds_socket));

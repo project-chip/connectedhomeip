@@ -125,7 +125,7 @@ extern "C" {
 
 #define SIOCPROTOPRIVATE 0x89E0 /* to 89EF */
 
-int ioctl(int fd, unsigned long request, ...);
+int ioctl(int fd, unsigned long request, void * param);
 
 #ifdef __cplusplus
 }

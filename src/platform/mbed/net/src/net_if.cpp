@@ -1,6 +1,9 @@
 #include <NetworkInterface.h>
+#include <SocketAddress.h>
 #include <errno.h>
+#include <net/if.h>
 #include <net_if.h>
+#include <sys/ioctl.h>
 struct if_nameindex * mbed_if_nameindex(void)
 {
     char name[IF_NAMESIZE];
@@ -140,4 +143,103 @@ char * mbed_inet_ntop(sa_family_t family, const void * src, char * dst, size_t s
 int mbed_inet_pton(sa_family_t family, const char * src, void * dst)
 {
     return 0;
+}
+
+int mbed_ioctl(int fd, unsigned long request, void * param)
+{
+    int ret = 0;
+    switch (request)
+    {
+    case SIOCGIFFLAGS: {
+        if (param == NULL)
+        {
+            errno = EFAULT;
+            ret   = -1;
+            break;
+        }
+        struct ifreq * intfData = (struct ifreq *) param;
+        short * flags           = &intfData->ifr_flags;
+        *flags                  = 0;
+        nsapi_error_t err;
+        NetworkInterface * net_if = NetworkInterface::get_default_instance();
+        if (net_if == nullptr)
+        {
+            errno = ENOTTY;
+            ret   = -1;
+            break;
+        }
+
+        err = net_if->connect();
+        if (err != NSAPI_ERROR_OK)
+        {
+            errno = ENOTTY;
+            ret   = -1;
+            break;
+        }
+
+        nsapi_connection_status_t status = net_if->get_connection_status();
+        if (status == NSAPI_STATUS_LOCAL_UP || status == NSAPI_STATUS_GLOBAL_UP)
+        {
+            *flags |= IFF_UP;
+        }
+
+        SocketAddress ip;
+        SocketAddress netmask;
+        bool isBroadcast         = true;
+        unsigned int bytesNumber = 0;
+
+        err = net_if->get_ip_address(&ip);
+        if (err != NSAPI_ERROR_OK)
+        {
+            errno = ENOTTY;
+            ret   = -1;
+            break;
+        }
+        err = net_if->get_netmask(&netmask);
+        if (err != NSAPI_ERROR_OK)
+        {
+            errno = ENOTTY;
+            ret   = -1;
+            break;
+        }
+
+        if (netmask.get_ip_version() == NSAPI_IPv6)
+        {
+            bytesNumber = NSAPI_IPv6_BYTES;
+        }
+        else
+        {
+            bytesNumber = NSAPI_IPv6_BYTES;
+        }
+
+        uint8_t * ip_bytes      = (uint8_t *) ip.get_ip_bytes();
+        uint8_t * netmask_bytes = (uint8_t *) netmask.get_ip_bytes();
+        uint8_t mask;
+        for (int index = 0; index < bytesNumber; ++index)
+        {
+            mask = *ip_bytes & ~(*netmask_bytes);
+            if (mask && mask != ~(*netmask_bytes))
+            {
+                isBroadcast = false;
+                break;
+            }
+            ip_bytes++;
+            netmask_bytes++;
+        }
+
+        if (isBroadcast)
+        {
+            *flags |= IFF_BROADCAST;
+        }
+
+        net_if->disconnect();
+
+        break;
+    }
+
+    default:
+        errno = ENOTTY;
+        ret   = -1;
+    }
+    return ret;
 }

@@ -22,6 +22,8 @@ void mbed_freeifaddrs(struct ifaddrs * ifp);
 char * mbed_inet_ntop(sa_family_t family, const void * src, char * dst, size_t size);
 int mbed_inet_pton(sa_family_t family, const char * src, void * dst);
 
+int mbed_ioctl(int fd, unsigned long request, void * param);
+
 #ifdef __cplusplus
 }
 #endif
