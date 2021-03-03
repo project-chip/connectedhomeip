@@ -19,7 +19,7 @@ import("//build_overrides/nlunit_test.gni")
 import("${chip_root}/src/platform/device.gni")
 
 if (chip_device_platform != "none") {
-  import("${build_root}/chip/chip_test_suite.gni")
+  import("${chip_root}/build/chip/chip_test_suite.gni")
 
   chip_test_suite("tests") {
     output_name = "libPlatformTests"
@@ -78,7 +78,7 @@ if (chip_device_platform != "none") {
     }
   }
 } else {
-  import("${build_root}/chip/chip_test_group.gni")
+  import("${chip_root}/build/chip/chip_test_group.gni")
   chip_test_group("tests") {
     deps = []
   }

@@ -138,7 +138,7 @@ public:
     uint8_t version;
     uint16_t vendorID;
     uint16_t productID;
-    uint8_t requiresCustomFlow;
+    bool requiresCustomFlow;
     RendezvousInformationFlags rendezvousInformation;
     uint16_t discriminator;
     uint32_t setUpPINCode;

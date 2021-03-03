@@ -5,6 +5,7 @@
 
 #include <core/CHIPConfig.h>
 #include <platform/CHIPDeviceConfig.h>
+#include <support/CHIPPlatformMemory.h>
 #include <support/logging/Constants.h>
 
 #include <ctype.h>
@@ -12,6 +13,7 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <openthread/platform/logging.h>
+#include <openthread/platform/memory.h>
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
 constexpr uint8_t kPrintfModuleLwip       = 0x01;
@@ -63,8 +65,6 @@ void LogV(const char * module, uint8_t category, const char * msg, va_list v)
         formattedMsg[prefixLen++] = 'P';
         break;
     }
-    formattedMsg[prefixLen++] = ']';
-    formattedMsg[prefixLen++] = '[';
     snprintf(formattedMsg + prefixLen, sizeof(formattedMsg) - prefixLen, "][%s] ", module);
     formattedMsg[sizeof(formattedMsg) - 2] = 0; // -2 to allow at least one char for the vsnprintf
     prefixLen                              = strlen(formattedMsg);
@@ -121,5 +121,22 @@ extern "C" void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const ch
 
     // Let the application know that a log message has been emitted.
     chip::DeviceLayer::OnLogOutput();
+}
+
+// TODO: have qpg6100 openthread platform implementation defines the APIs.
+// It is not perfect to have the openthread platform calloc/free
+// APIs defined here. If a dedicated source file (e.g. Memory.cpp)
+// that includes only the two functions is used, the target file
+// Memory.o will be thrown away whening linking the libary because
+// there is no one referring the symbols (We are not linking
+// the 'platform' library against openthread).
+extern "C" void * otPlatCAlloc(size_t aNum, size_t aSize)
+{
+    return CHIPPlatformMemoryCalloc(aNum, aSize);
+}
+
+extern "C" void otPlatFree(void * aPtr)
+{
+    CHIPPlatformMemoryFree(aPtr);
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD

@@ -98,12 +98,14 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
 /*----------------------------------------------------------------------------*\
 | Cluster Name                                                        |   ID   |
 |---------------------------------------------------------------------+--------|
+| ApplicationBasic                                                    | 0x050D |
 | BarrierControl                                                      | 0x0103 |
 | Basic                                                               | 0x0000 |
 | Binding                                                             | 0xF000 |
 | ColorControl                                                        | 0x0300 |
 | ContentLaunch                                                       | 0xF002 |
 | DoorLock                                                            | 0x0101 |
+| GeneralCommissioning                                                | 0x0030 |
 | Groups                                                              | 0x0004 |
 | IasZone                                                             | 0x0500 |
 | Identify                                                            | 0x0003 |
@@ -140,6 +142,8 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
 #define ZCL_DISCOVER_COMMANDS_GENERATED_RESPONSE_COMMAND_ID (0x14)
 #define ZCL_DISCOVER_ATTRIBUTES_EXTENDED_COMMAND_ID (0x15)
 #define ZCL_DISCOVER_ATTRIBUTES_EXTENDED_RESPONSE_COMMAND_ID (0x16)
+
+#define APPLICATION_BASIC_CLUSTER_ID 0x050D
 
 #define BARRIER_CONTROL_CLUSTER_ID 0x0103
 #define ZCL_BARRIER_CONTROL_GO_TO_PERCENT_COMMAND_ID (0x00)
@@ -198,6 +202,11 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
 #define ZCL_UNLOCK_DOOR_COMMAND_ID (0x01)
 #define ZCL_UNLOCK_WITH_TIMEOUT_COMMAND_ID (0x03)
 
+#define GENERAL_COMMISSIONING_CLUSTER_ID 0x0030
+#define ZCL_ARM_FAIL_SAFE_COMMAND_ID (0x02)
+#define ZCL_COMMISSIONING_COMPLETE_COMMAND_ID (0x06)
+#define ZCL_SET_FABRIC_COMMAND_ID (0x00)
+
 #define GROUPS_CLUSTER_ID 0x0004
 #define ZCL_ADD_GROUP_COMMAND_ID (0x00)
 #define ZCL_ADD_GROUP_IF_IDENTIFYING_COMMAND_ID (0x05)
@@ -234,6 +243,17 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
 #define ZCL_START_OVER_REQUEST_COMMAND_ID (0x03)
 #define ZCL_STOP_REQUEST_COMMAND_ID (0x02)
 
+#define NETWORK_COMMISSIONING_CLUSTER_ID 0xAAAA
+#define ZCL_ADD_THREAD_NETWORK_COMMAND_ID (0x06)
+#define ZCL_ADD_WI_FI_NETWORK_COMMAND_ID (0x02)
+#define ZCL_DISABLE_NETWORK_COMMAND_ID (0x0E)
+#define ZCL_ENABLE_NETWORK_COMMAND_ID (0x0C)
+#define ZCL_GET_LAST_NETWORK_COMMISSIONING_RESULT_COMMAND_ID (0x10)
+#define ZCL_REMOVE_NETWORK_COMMAND_ID (0x0A)
+#define ZCL_SCAN_NETWORKS_COMMAND_ID (0x00)
+#define ZCL_UPDATE_THREAD_NETWORK_COMMAND_ID (0x08)
+#define ZCL_UPDATE_WI_FI_NETWORK_COMMAND_ID (0x04)
+
 #define ON_OFF_CLUSTER_ID 0x0006
 #define ZCL_OFF_COMMAND_ID (0x00)
 #define ZCL_ON_COMMAND_ID (0x01)
@@ -266,6 +286,109 @@ constexpr uint8_t kFrameControlGlobalCommand = 0x00;
 
 // Pick source endpoint as 1 for now
 constexpr EndpointId kSourceEndpoint = 1;
+
+/*----------------------------------------------------------------------------*\
+| Cluster ApplicationBasic                                            | 0x050D |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * VendorName                                                        | 0x0000 |
+| * VendorId                                                          | 0x0001 |
+| * ApplicationName                                                   | 0x0002 |
+| * ProductId                                                         | 0x0003 |
+| * ApplicationId                                                     | 0x0005 |
+| * CatalogVendorId                                                   | 0x0006 |
+| * ApplicationSatus                                                  | 0x0007 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+PacketBufferHandle encodeApplicationBasicClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("DiscoverApplicationBasicAttributes", APPLICATION_BASIC_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute VendorName
+ */
+PacketBufferHandle encodeApplicationBasicClusterReadVendorNameAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadApplicationBasicVendorName", APPLICATION_BASIC_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0000);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute VendorId
+ */
+PacketBufferHandle encodeApplicationBasicClusterReadVendorIdAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadApplicationBasicVendorId", APPLICATION_BASIC_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0001);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute ApplicationName
+ */
+PacketBufferHandle encodeApplicationBasicClusterReadApplicationNameAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadApplicationBasicApplicationName", APPLICATION_BASIC_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0002);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute ProductId
+ */
+PacketBufferHandle encodeApplicationBasicClusterReadProductIdAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadApplicationBasicProductId", APPLICATION_BASIC_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0003);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute ApplicationId
+ */
+PacketBufferHandle encodeApplicationBasicClusterReadApplicationIdAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadApplicationBasicApplicationId", APPLICATION_BASIC_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0005);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute CatalogVendorId
+ */
+PacketBufferHandle encodeApplicationBasicClusterReadCatalogVendorIdAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadApplicationBasicCatalogVendorId", APPLICATION_BASIC_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0006);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute ApplicationSatus
+ */
+PacketBufferHandle encodeApplicationBasicClusterReadApplicationSatusAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadApplicationBasicApplicationSatus", APPLICATION_BASIC_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0007);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute ClusterRevision
+ */
+PacketBufferHandle encodeApplicationBasicClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadApplicationBasicClusterRevision", APPLICATION_BASIC_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    COMMAND_FOOTER();
+}
 
 /*----------------------------------------------------------------------------*\
 | Cluster BarrierControl                                              | 0x0103 |
@@ -2084,6 +2207,129 @@ PacketBufferHandle encodeDoorLockClusterReadClusterRevisionAttribute(uint8_t seq
 }
 
 /*----------------------------------------------------------------------------*\
+| Cluster GeneralCommissioning                                        | 0x0030 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * ArmFailSafe                                                       |   0x02 |
+| * CommissioningComplete                                             |   0x06 |
+| * SetFabric                                                         |   0x00 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * FabricId                                                          | 0x0000 |
+| * Breadcrumb                                                        | 0x0001 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command ArmFailSafe
+ */
+PacketBufferHandle encodeGeneralCommissioningClusterArmFailSafeCommand(uint8_t seqNum, EndpointId destinationEndpoint,
+                                                                       uint16_t expiryLengthSeconds, uint64_t breadcrumb,
+                                                                       uint32_t timeoutMs)
+{
+    COMMAND_HEADER("ArmFailSafe", GENERAL_COMMISSIONING_CLUSTER_ID);
+    buf.Put8(kFrameControlClusterSpecificCommand)
+        .Put8(seqNum)
+        .Put8(ZCL_ARM_FAIL_SAFE_COMMAND_ID)
+        .Put16(expiryLengthSeconds)
+        .Put64(breadcrumb)
+        .Put32(timeoutMs);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Command CommissioningComplete
+ */
+PacketBufferHandle encodeGeneralCommissioningClusterCommissioningCompleteCommand(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("CommissioningComplete", GENERAL_COMMISSIONING_CLUSTER_ID);
+    buf.Put8(kFrameControlClusterSpecificCommand).Put8(seqNum).Put8(ZCL_COMMISSIONING_COMPLETE_COMMAND_ID);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Command SetFabric
+ */
+PacketBufferHandle encodeGeneralCommissioningClusterSetFabricCommand(uint8_t seqNum, EndpointId destinationEndpoint,
+                                                                     char * fabricId, char * fabricSecret, uint64_t breadcrumb,
+                                                                     uint32_t timeoutMs)
+{
+    COMMAND_HEADER("SetFabric", GENERAL_COMMISSIONING_CLUSTER_ID);
+    size_t fabricIdStrLen = strlen(fabricId);
+    if (!CanCastTo<uint8_t>(fabricIdStrLen))
+    {
+        ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, fabricIdStrLen);
+        return PacketBufferHandle();
+    }
+    size_t fabricSecretStrLen = strlen(fabricSecret);
+    if (!CanCastTo<uint8_t>(fabricSecretStrLen))
+    {
+        ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, fabricSecretStrLen);
+        return PacketBufferHandle();
+    }
+    buf.Put8(kFrameControlClusterSpecificCommand)
+        .Put8(seqNum)
+        .Put8(ZCL_SET_FABRIC_COMMAND_ID)
+        .Put(static_cast<uint8_t>(fabricIdStrLen))
+        .Put(fabricId)
+        .Put(static_cast<uint8_t>(fabricSecretStrLen))
+        .Put(fabricSecret)
+        .Put64(breadcrumb)
+        .Put32(timeoutMs);
+    COMMAND_FOOTER();
+}
+
+PacketBufferHandle encodeGeneralCommissioningClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("DiscoverGeneralCommissioningAttributes", GENERAL_COMMISSIONING_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute FabricId
+ */
+PacketBufferHandle encodeGeneralCommissioningClusterReadFabricIdAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadGeneralCommissioningFabricId", GENERAL_COMMISSIONING_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0000);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute Breadcrumb
+ */
+PacketBufferHandle encodeGeneralCommissioningClusterReadBreadcrumbAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadGeneralCommissioningBreadcrumb", GENERAL_COMMISSIONING_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0001);
+    COMMAND_FOOTER();
+}
+
+PacketBufferHandle encodeGeneralCommissioningClusterWriteBreadcrumbAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
+                                                                             uint64_t breadcrumb)
+{
+    COMMAND_HEADER("WriteGeneralCommissioningBreadcrumb", GENERAL_COMMISSIONING_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
+        .Put16(0x0001)
+        .Put8(39)
+        .Put64(static_cast<uint64_t>(breadcrumb));
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute ClusterRevision
+ */
+PacketBufferHandle encodeGeneralCommissioningClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadGeneralCommissioningClusterRevision", GENERAL_COMMISSIONING_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    COMMAND_FOOTER();
+}
+
+/*----------------------------------------------------------------------------*\
 | Cluster Groups                                                      | 0x0004 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
@@ -2702,6 +2948,260 @@ PacketBufferHandle encodeMediaPlaybackClusterReadCurrentStateAttribute(uint8_t s
 PacketBufferHandle encodeMediaPlaybackClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadMediaPlaybackClusterRevision", MEDIA_PLAYBACK_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    COMMAND_FOOTER();
+}
+
+/*----------------------------------------------------------------------------*\
+| Cluster NetworkCommissioning                                        | 0xAAAA |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * AddThreadNetwork                                                  |   0x06 |
+| * AddWiFiNetwork                                                    |   0x02 |
+| * DisableNetwork                                                    |   0x0E |
+| * EnableNetwork                                                     |   0x0C |
+| * GetLastNetworkCommissioningResult                                 |   0x10 |
+| * RemoveNetwork                                                     |   0x0A |
+| * ScanNetworks                                                      |   0x00 |
+| * UpdateThreadNetwork                                               |   0x08 |
+| * UpdateWiFiNetwork                                                 |   0x04 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command AddThreadNetwork
+ */
+PacketBufferHandle encodeNetworkCommissioningClusterAddThreadNetworkCommand(uint8_t seqNum, EndpointId destinationEndpoint,
+                                                                            char * operationalDataset, uint64_t breadcrumb,
+                                                                            uint32_t timeoutMs)
+{
+    COMMAND_HEADER("AddThreadNetwork", NETWORK_COMMISSIONING_CLUSTER_ID);
+    size_t operationalDatasetStrLen = strlen(operationalDataset);
+    if (!CanCastTo<uint8_t>(operationalDatasetStrLen))
+    {
+        ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, operationalDatasetStrLen);
+        return PacketBufferHandle();
+    }
+    buf.Put8(kFrameControlClusterSpecificCommand)
+        .Put8(seqNum)
+        .Put8(ZCL_ADD_THREAD_NETWORK_COMMAND_ID)
+        .Put(static_cast<uint8_t>(operationalDatasetStrLen))
+        .Put(operationalDataset)
+        .Put64(breadcrumb)
+        .Put32(timeoutMs);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Command AddWiFiNetwork
+ */
+PacketBufferHandle encodeNetworkCommissioningClusterAddWiFiNetworkCommand(uint8_t seqNum, EndpointId destinationEndpoint,
+                                                                          char * ssid, char * credentials, uint64_t breadcrumb,
+                                                                          uint32_t timeoutMs)
+{
+    COMMAND_HEADER("AddWiFiNetwork", NETWORK_COMMISSIONING_CLUSTER_ID);
+    size_t ssidStrLen = strlen(ssid);
+    if (!CanCastTo<uint8_t>(ssidStrLen))
+    {
+        ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, ssidStrLen);
+        return PacketBufferHandle();
+    }
+    size_t credentialsStrLen = strlen(credentials);
+    if (!CanCastTo<uint8_t>(credentialsStrLen))
+    {
+        ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, credentialsStrLen);
+        return PacketBufferHandle();
+    }
+    buf.Put8(kFrameControlClusterSpecificCommand)
+        .Put8(seqNum)
+        .Put8(ZCL_ADD_WI_FI_NETWORK_COMMAND_ID)
+        .Put(static_cast<uint8_t>(ssidStrLen))
+        .Put(ssid)
+        .Put(static_cast<uint8_t>(credentialsStrLen))
+        .Put(credentials)
+        .Put64(breadcrumb)
+        .Put32(timeoutMs);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Command DisableNetwork
+ */
+PacketBufferHandle encodeNetworkCommissioningClusterDisableNetworkCommand(uint8_t seqNum, EndpointId destinationEndpoint,
+                                                                          char * networkID, uint64_t breadcrumb, uint32_t timeoutMs)
+{
+    COMMAND_HEADER("DisableNetwork", NETWORK_COMMISSIONING_CLUSTER_ID);
+    size_t networkIDStrLen = strlen(networkID);
+    if (!CanCastTo<uint8_t>(networkIDStrLen))
+    {
+        ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, networkIDStrLen);
+        return PacketBufferHandle();
+    }
+    buf.Put8(kFrameControlClusterSpecificCommand)
+        .Put8(seqNum)
+        .Put8(ZCL_DISABLE_NETWORK_COMMAND_ID)
+        .Put(static_cast<uint8_t>(networkIDStrLen))
+        .Put(networkID)
+        .Put64(breadcrumb)
+        .Put32(timeoutMs);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Command EnableNetwork
+ */
+PacketBufferHandle encodeNetworkCommissioningClusterEnableNetworkCommand(uint8_t seqNum, EndpointId destinationEndpoint,
+                                                                         char * networkID, uint64_t breadcrumb, uint32_t timeoutMs)
+{
+    COMMAND_HEADER("EnableNetwork", NETWORK_COMMISSIONING_CLUSTER_ID);
+    size_t networkIDStrLen = strlen(networkID);
+    if (!CanCastTo<uint8_t>(networkIDStrLen))
+    {
+        ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, networkIDStrLen);
+        return PacketBufferHandle();
+    }
+    buf.Put8(kFrameControlClusterSpecificCommand)
+        .Put8(seqNum)
+        .Put8(ZCL_ENABLE_NETWORK_COMMAND_ID)
+        .Put(static_cast<uint8_t>(networkIDStrLen))
+        .Put(networkID)
+        .Put64(breadcrumb)
+        .Put32(timeoutMs);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Command GetLastNetworkCommissioningResult
+ */
+PacketBufferHandle encodeNetworkCommissioningClusterGetLastNetworkCommissioningResultCommand(uint8_t seqNum,
+                                                                                             EndpointId destinationEndpoint,
+                                                                                             uint32_t timeoutMs)
+{
+    COMMAND_HEADER("GetLastNetworkCommissioningResult", NETWORK_COMMISSIONING_CLUSTER_ID);
+    buf.Put8(kFrameControlClusterSpecificCommand)
+        .Put8(seqNum)
+        .Put8(ZCL_GET_LAST_NETWORK_COMMISSIONING_RESULT_COMMAND_ID)
+        .Put32(timeoutMs);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Command RemoveNetwork
+ */
+PacketBufferHandle encodeNetworkCommissioningClusterRemoveNetworkCommand(uint8_t seqNum, EndpointId destinationEndpoint,
+                                                                         char * networkID, uint64_t breadcrumb, uint32_t timeoutMs)
+{
+    COMMAND_HEADER("RemoveNetwork", NETWORK_COMMISSIONING_CLUSTER_ID);
+    size_t networkIDStrLen = strlen(networkID);
+    if (!CanCastTo<uint8_t>(networkIDStrLen))
+    {
+        ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, networkIDStrLen);
+        return PacketBufferHandle();
+    }
+    buf.Put8(kFrameControlClusterSpecificCommand)
+        .Put8(seqNum)
+        .Put8(ZCL_REMOVE_NETWORK_COMMAND_ID)
+        .Put(static_cast<uint8_t>(networkIDStrLen))
+        .Put(networkID)
+        .Put64(breadcrumb)
+        .Put32(timeoutMs);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Command ScanNetworks
+ */
+PacketBufferHandle encodeNetworkCommissioningClusterScanNetworksCommand(uint8_t seqNum, EndpointId destinationEndpoint, char * ssid,
+                                                                        uint64_t breadcrumb, uint32_t timeoutMs)
+{
+    COMMAND_HEADER("ScanNetworks", NETWORK_COMMISSIONING_CLUSTER_ID);
+    size_t ssidStrLen = strlen(ssid);
+    if (!CanCastTo<uint8_t>(ssidStrLen))
+    {
+        ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, ssidStrLen);
+        return PacketBufferHandle();
+    }
+    buf.Put8(kFrameControlClusterSpecificCommand)
+        .Put8(seqNum)
+        .Put8(ZCL_SCAN_NETWORKS_COMMAND_ID)
+        .Put(static_cast<uint8_t>(ssidStrLen))
+        .Put(ssid)
+        .Put64(breadcrumb)
+        .Put32(timeoutMs);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Command UpdateThreadNetwork
+ */
+PacketBufferHandle encodeNetworkCommissioningClusterUpdateThreadNetworkCommand(uint8_t seqNum, EndpointId destinationEndpoint,
+                                                                               char * operationalDataset, uint64_t breadcrumb,
+                                                                               uint32_t timeoutMs)
+{
+    COMMAND_HEADER("UpdateThreadNetwork", NETWORK_COMMISSIONING_CLUSTER_ID);
+    size_t operationalDatasetStrLen = strlen(operationalDataset);
+    if (!CanCastTo<uint8_t>(operationalDatasetStrLen))
+    {
+        ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, operationalDatasetStrLen);
+        return PacketBufferHandle();
+    }
+    buf.Put8(kFrameControlClusterSpecificCommand)
+        .Put8(seqNum)
+        .Put8(ZCL_UPDATE_THREAD_NETWORK_COMMAND_ID)
+        .Put(static_cast<uint8_t>(operationalDatasetStrLen))
+        .Put(operationalDataset)
+        .Put64(breadcrumb)
+        .Put32(timeoutMs);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Command UpdateWiFiNetwork
+ */
+PacketBufferHandle encodeNetworkCommissioningClusterUpdateWiFiNetworkCommand(uint8_t seqNum, EndpointId destinationEndpoint,
+                                                                             char * ssid, char * credentials, uint64_t breadcrumb,
+                                                                             uint32_t timeoutMs)
+{
+    COMMAND_HEADER("UpdateWiFiNetwork", NETWORK_COMMISSIONING_CLUSTER_ID);
+    size_t ssidStrLen = strlen(ssid);
+    if (!CanCastTo<uint8_t>(ssidStrLen))
+    {
+        ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, ssidStrLen);
+        return PacketBufferHandle();
+    }
+    size_t credentialsStrLen = strlen(credentials);
+    if (!CanCastTo<uint8_t>(credentialsStrLen))
+    {
+        ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, credentialsStrLen);
+        return PacketBufferHandle();
+    }
+    buf.Put8(kFrameControlClusterSpecificCommand)
+        .Put8(seqNum)
+        .Put8(ZCL_UPDATE_WI_FI_NETWORK_COMMAND_ID)
+        .Put(static_cast<uint8_t>(ssidStrLen))
+        .Put(ssid)
+        .Put(static_cast<uint8_t>(credentialsStrLen))
+        .Put(credentials)
+        .Put64(breadcrumb)
+        .Put32(timeoutMs);
+    COMMAND_FOOTER();
+}
+
+PacketBufferHandle encodeNetworkCommissioningClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("DiscoverNetworkCommissioningAttributes", NETWORK_COMMISSIONING_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute ClusterRevision
+ */
+PacketBufferHandle encodeNetworkCommissioningClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadNetworkCommissioningClusterRevision", NETWORK_COMMISSIONING_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
     COMMAND_FOOTER();
 }

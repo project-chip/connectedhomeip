@@ -39,7 +39,7 @@
 
 #include "af-event.h"
 #include "af.h"
-#include "common.h"
+#include "app/util/common.h"
 #include "door-lock-server.h"
 #include "time-util.h"
 

@@ -18,6 +18,8 @@
 
 #include "ModelCommand.h"
 
+#include <inttypes.h>
+
 using namespace ::chip;
 
 namespace {

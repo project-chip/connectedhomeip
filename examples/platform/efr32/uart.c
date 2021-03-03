@@ -18,7 +18,6 @@
 #include "uart.h"
 #include "em_core.h"
 #include "em_usart.h"
-#include "hal-config-board.h"
 #include "hal-config.h"
 #include "init_board.h"
 #include "uartdrv.h"

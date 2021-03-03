@@ -24,11 +24,10 @@
  *
  */
 
-#include "common.h"
-
 #include <app/CommandHandler.h>
 #include <app/CommandSender.h>
 #include <app/InteractionModelEngine.h>
+#include <app/tests/integration/common.h>
 #include <core/CHIPCore.h>
 #include <platform/CHIPDeviceLayer.h>
 

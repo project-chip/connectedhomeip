@@ -41,18 +41,7 @@ efr32_sdk("sdk") {
     "${efr32_project_dir}/include/FreeRTOSConfig.h",
   ]
 
-  defines = [
-    "CHIP_KVS_SECTOR_COUNT=4",
-    "CHIP_KVS_BASE_SECTOR_INDEX=((FLASH_SIZE/FLASH_PAGE_SIZE)-(CHIP_KVS_SECTOR_COUNT))",
-  ]
-
-  if (is_debug) {
-    defines += [ "BUILD_RELEASE=0" ]
-  } else {
-    defines += [ "BUILD_RELEASE=1" ]
-  }
-
-  defines += [ "BOARD_ID=${efr32_board}" ]
+  defines = [ "BOARD_ID=${efr32_board}" ]
 }
 
 efr32_executable("persistent_storage") {

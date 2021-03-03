@@ -27,6 +27,9 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
 {
     switch (clusterId)
     {
+    case ZCL_APPLICATION_BASIC_CLUSTER_ID:
+        emberAfApplicationBasicClusterInitCallback(endpoint);
+        break;
     case ZCL_BARRIER_CONTROL_CLUSTER_ID:
         emberAfBarrierControlClusterInitCallback(endpoint);
         break;
@@ -44,6 +47,9 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
         break;
     case ZCL_DOOR_LOCK_CLUSTER_ID:
         emberAfDoorLockClusterInitCallback(endpoint);
+        break;
+    case ZCL_GENERAL_COMMISSIONING_CLUSTER_ID:
+        emberAfGeneralCommissioningClusterInitCallback(endpoint);
         break;
     case ZCL_GROUPS_CLUSTER_ID:
         emberAfGroupsClusterInitCallback(endpoint);
@@ -75,6 +81,11 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     }
 }
 
+void __attribute__((weak)) emberAfApplicationBasicClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
 void __attribute__((weak)) emberAfBarrierControlClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
@@ -101,6 +112,11 @@ void __attribute__((weak)) emberAfContentLaunchClusterInitCallback(EndpointId en
     (void) endpoint;
 }
 void __attribute__((weak)) emberAfDoorLockClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfGeneralCommissioningClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;

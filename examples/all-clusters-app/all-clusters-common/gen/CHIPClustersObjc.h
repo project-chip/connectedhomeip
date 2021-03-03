@@ -43,6 +43,23 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
+ * Cluster Application Basic
+ *
+ */
+@interface CHIPApplicationBasic : CHIPCluster
+
+- (void)readAttributeVendorName:(ResponseHandler)completionHandler;
+- (void)readAttributeVendorId:(ResponseHandler)completionHandler;
+- (void)readAttributeApplicationName:(ResponseHandler)completionHandler;
+- (void)readAttributeProductId:(ResponseHandler)completionHandler;
+- (void)readAttributeApplicationId:(ResponseHandler)completionHandler;
+- (void)readAttributeCatalogVendorId:(ResponseHandler)completionHandler;
+- (void)readAttributeApplicationSatus:(ResponseHandler)completionHandler;
+- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
+
+@end
+
+/**
  * Cluster Barrier Control
  *
  */
@@ -346,6 +363,30 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)reportAttributeLockState:(ResponseHandler)reportHandler;
 - (void)readAttributeLockType:(ResponseHandler)completionHandler;
 - (void)readAttributeActuatorEnabled:(ResponseHandler)completionHandler;
+- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
+
+@end
+
+/**
+ * Cluster General Commissioning
+ *
+ */
+@interface CHIPGeneralCommissioning : CHIPCluster
+
+- (void)armFailSafe:(uint16_t)expiryLengthSeconds
+           breadcrumb:(uint64_t)breadcrumb
+            timeoutMs:(uint32_t)timeoutMs
+    completionHandler:(ResponseHandler)completionHandler;
+- (void)commissioningComplete:(ResponseHandler)completionHandler;
+- (void)setFabric:(char *)fabricId
+         fabricSecret:(char *)fabricSecret
+           breadcrumb:(uint64_t)breadcrumb
+            timeoutMs:(uint32_t)timeoutMs
+    completionHandler:(ResponseHandler)completionHandler;
+
+- (void)readAttributeFabricId:(ResponseHandler)completionHandler;
+- (void)readAttributeBreadcrumb:(ResponseHandler)completionHandler;
+- (void)writeAttributeBreadcrumb:(uint64_t)value completionHandler:(ResponseHandler)completionHandler;
 - (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
 
 @end

@@ -81,8 +81,12 @@ int CHIP_Init(void)
 {
     int ret = CHIP_ERROR_MAX;
 
-    // Init Chip memory management before the stack
-    chip::Platform::MemoryInit();
+    ret = chip::Platform::MemoryInit();
+    if (ret != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Platform::MemoryInit() failed");
+        goto exit;
+    }
 
     ChipLogProgress(NotSpecified, "Init CHIP Stack");
     ret = PlatformMgr().InitChipStack();

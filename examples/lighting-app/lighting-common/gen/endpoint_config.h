@@ -55,13 +55,14 @@
 
 #define ZAP_ATTRIBUTE_MASK(mask) ATTRIBUTE_MASK_##mask
 // This is an array of EmberAfAttributeMetadata structures.
-#define GENERATED_ATTRIBUTE_COUNT 4
+#define GENERATED_ATTRIBUTE_COUNT 5
 #define GENERATED_ATTRIBUTES                                                                                                       \
     {                                                                                                                              \
-        { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 2 } },         /* On/off (server): cluster revision */                     \
-            { 0x0000, ZAP_TYPE(BOOLEAN), 1, 0, { (uint8_t *) 0x00 } }, /* On/off (server): on/off */                               \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 3 } },     /* Level Control (server): cluster revision */              \
-            { 0x0000, ZAP_TYPE(INT8U), 1, 0, { (uint8_t *) 0x00 } },   /* Level Control (server): current level */                 \
+        { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 2 } },          /* On/off (server): cluster revision */                    \
+            { 0x0000, ZAP_TYPE(BOOLEAN), 1, 0, { (uint8_t *) 0x00 } },  /* On/off (server): on/off */                              \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 3 } },      /* Level Control (server): cluster revision */             \
+            { 0x0000, ZAP_TYPE(INT8U), 1, 0, { (uint8_t *) 0x00 } },    /* Level Control (server): current level */                \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 0x0001 } }, /* Network Commissioning (server): cluster revision */     \
     }
 
 // This is an array of EmberAfCluster structures.
@@ -77,7 +78,7 @@
     };
 
 #define ZAP_CLUSTER_MASK(mask) CLUSTER_MASK_##mask
-#define GENERATED_CLUSTER_COUNT 2
+#define GENERATED_CLUSTER_COUNT 3
 #define GENERATED_CLUSTERS                                                                                                         \
     {                                                                                                                              \
         {                                                                                                                          \
@@ -94,6 +95,9 @@
               3,                                                                                                                   \
               ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
               chipFuncArrayLevelControlServer }, /* Endpoint: 1, Cluster: Level Control (server) */                                \
+            {                                                                                                                      \
+                0xAAAA, ZAP_ATTRIBUTE_INDEX(4), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                               \
+            }, /* Endpoint: 1, Cluster: Network Commissioning (server) */                                                          \
     }
 
 #define ZAP_CLUSTER_INDEX(index) ((EmberAfCluster *) (&generatedClusters[index]))
@@ -101,7 +105,7 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 2, 6 },                                                                                            \
+        { ZAP_CLUSTER_INDEX(0), 3, 8 },                                                                                            \
     }
 
 // Largest attribute size is needed for various buffers
@@ -111,7 +115,7 @@
 #define ATTRIBUTE_SINGLETONS_SIZE (0)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (6)
+#define ATTRIBUTE_MAX_SIZE (8)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (1)
@@ -155,7 +159,7 @@
 
 // Array of EmberAfCommandMetadata structs.
 #define ZAP_COMMAND_MASK(mask) COMMAND_MASK_##mask
-#define EMBER_AF_GENERATED_COMMAND_COUNT (11)
+#define EMBER_AF_GENERATED_COMMAND_COUNT (28)
 #define GENERATED_COMMANDS                                                                                                         \
     {                                                                                                                              \
         { 0x0006, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) },     /* On/off (server): Off */                                        \
@@ -169,6 +173,24 @@
             { 0x0008, 0x05, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Level Control (server): MoveWithOnOff */                       \
             { 0x0008, 0x06, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Level Control (server): StepWithOnOff */                       \
             { 0x0008, 0x07, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Level Control (server): StopWithOnOff */                       \
+            { 0xAAAA, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Network Commissioning (server): ScanNetworks */                \
+            { 0xAAAA, 0x01, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Network Commissioning (server): ScanNetworksResponse */        \
+            { 0xAAAA, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Network Commissioning (server): AddWiFiNetwork */              \
+            { 0xAAAA, 0x03, ZAP_COMMAND_MASK(OUTGOING_SERVER) }, /* Network Commissioning (server): AddWiFiNetworkResponse */      \
+            { 0xAAAA, 0x04, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Network Commissioning (server): UpdateWiFiNetwork */           \
+            { 0xAAAA, 0x05, ZAP_COMMAND_MASK(OUTGOING_SERVER) }, /* Network Commissioning (server): UpdateWiFiNetworkResponse */   \
+            { 0xAAAA, 0x06, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Network Commissioning (server): AddThreadNetwork */            \
+            { 0xAAAA, 0x07, ZAP_COMMAND_MASK(OUTGOING_SERVER) }, /* Network Commissioning (server): AddThreadNetworkResponse */    \
+            { 0xAAAA, 0x08, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Network Commissioning (server): UpdateThreadNetwork */         \
+            { 0xAAAA, 0x09, ZAP_COMMAND_MASK(OUTGOING_SERVER) }, /* Network Commissioning (server): UpdateThreadNetworkResponse */ \
+            { 0xAAAA, 0x0A, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Network Commissioning (server): RemoveNetwork */               \
+            { 0xAAAA, 0x0B, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Network Commissioning (server): RemoveNetworkResponse */       \
+            { 0xAAAA, 0x0C, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Network Commissioning (server): EnableNetwork */               \
+            { 0xAAAA, 0x0D, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Network Commissioning (server): EnableNetworkResponse */       \
+            { 0xAAAA, 0x0E, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Network Commissioning (server): DisableNetwork */              \
+            { 0xAAAA, 0x0F, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Network Commissioning (server): DisableNetworkResponse */      \
+            { 0xAAAA, 0x10,                                                                                                        \
+              ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Network Commissioning (server): GetLastNetworkCommissioningResult */         \
     }
 
 // Array of EmberAfManufacturerCodeEntry structures for commands.
