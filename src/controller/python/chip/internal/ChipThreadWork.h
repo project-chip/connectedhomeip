@@ -27,7 +27,10 @@ namespace python {
 using WorkCallback = std::function<void()>;
 
 /// Schedules a task to be run on the CHIP main thread and waits for that
-/// task to be complete
+/// task to be complete.
+///
+/// Returns only once callback has been completely executed (callback
+/// will not be running anymore when this returns).
 void ChipMainThreadScheduleAndWait(WorkCallback callback);
 
 } // namespace python

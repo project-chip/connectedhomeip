@@ -33,7 +33,7 @@ public:
     void GetKeyValue(const char * key) override
     {
         uint8_t buffer[kMaxKeyValueSize];
-        uint16_t bufferSize = sizeof(buffer) + 1;
+        uint16_t bufferSize = sizeof(buffer) - 1;
         CHIP_ERROR err      = GetKeyValue(key, buffer, bufferSize);
 
         if (err == CHIP_NO_ERROR)
@@ -195,7 +195,7 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commisioner_Ne
     chip::python::ChipMainThreadScheduleAndWait([&]() {
         result = std::make_unique<chip::Controller::DeviceCommissioner>();
 
-        // System and Inet layers exlicitly passed to indicate that the CHIP stack is
+        // System and Inet layers explicitly passed to indicate that the CHIP stack is
         // already assumed initialized
         err = result->Init(localDeviceId, &gServerStorage, &gPairingDelegate, &chip::DeviceLayer::SystemLayer,
                            &chip::DeviceLayer::InetLayer);
