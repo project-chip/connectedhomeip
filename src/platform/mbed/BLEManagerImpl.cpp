@@ -796,6 +796,11 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
     }
 }
 
+void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
+{
+    // no-op
+}
+
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip

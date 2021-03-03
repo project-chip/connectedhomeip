@@ -36,7 +36,7 @@ using namespace chip::Ble;
 
 // TODO Add missing BlePlatformDelegate and BleApplicationDelegate virtual method implementations.
 #define _BLEMGRIMPL_BLEPLATFORMDELEGATE_IMPL_READY 0
-#define _BLEMGRIMPL_BLEAPPLICATIONDELEGATE_IMPL_READY 0
+#define _BLEMGRIMPL_BLEAPPLICATIONDELEGATE_IMPL_READY 1
 
 /**
  * Concrete implementation of the BLEManager singleton object for the Mbed platform.
