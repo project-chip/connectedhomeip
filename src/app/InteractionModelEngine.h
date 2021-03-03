@@ -50,6 +50,9 @@
 namespace chip {
 namespace app {
 
+constexpr size_t kMaxSecureSduLength  = 1024;
+constexpr uint32_t kImMesssageTimeout = 20;
+
 typedef void (*CommandCbFunct)(chip::TLV::TLVReader & aReader, Command * apCommandObj);
 
 /**
