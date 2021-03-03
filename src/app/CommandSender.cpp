@@ -44,12 +44,12 @@ CHIP_ERROR CommandSender::SendCommandRequest(NodeId aNodeId, Transport::AdminId 
     // TODO: Hard code keyID to 0 to unblock IM end-to-end test. Complete solution is tracked in issue:4451
     mpExchangeCtx = mpExchangeMgr->NewContext({ aNodeId, 0, aAdminId }, this);
     VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
-    mpExchangeCtx->SetResponseTimeout(CHIP_INVOKE_COMMAND_RSP_TIMEOUT);
+    mpExchangeCtx->SetResponseTimeout(kImMesssageTimeout);
 
     err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::InvokeCommandRequest, std::move(mCommandMessageBuf),
                                      Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
     SuccessOrExit(err);
-    MoveToState(kState_Sending);
+    MoveToState(CommandState::Sending);
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -61,7 +61,7 @@ exit:
     return err;
 }
 
-void CommandSender::OnMessageReceived(Messaging::ExchangeContext * apEc, const PacketHeader & aPacketHeader,
+void CommandSender::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
                                       const PayloadHeader & aPayloadHeader, System::PacketBufferHandle aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -70,13 +70,13 @@ void CommandSender::OnMessageReceived(Messaging::ExchangeContext * apEc, const P
     // back-to-back, the second call will call Close() on the first exchange,
     // which clears the OnMessageReceived callback.
 
-    VerifyOrDie(apEc == mpExchangeCtx);
+    VerifyOrDie(apExchangeContext == mpExchangeCtx);
 
     // Verify that the message is an Invoke Command Response.
     // If not, close the exchange and free the payload.
     if (!aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::InvokeCommandResponse))
     {
-        apEc->Close();
+        apExchangeContext->Close();
         mpExchangeCtx = nullptr;
         goto exit;
     }
@@ -87,7 +87,7 @@ void CommandSender::OnMessageReceived(Messaging::ExchangeContext * apEc, const P
     // acknowledged at the transport layer.
     ClearExistingExchangeContext();
 
-    err = ProcessCommandMessage(std::move(aPayload), kCommandSenderId);
+    err = ProcessCommandMessage(std::move(aPayload), CommandRoleId::SenderId);
     SuccessOrExit(err);
 
 exit:
@@ -95,9 +95,10 @@ exit:
     return;
 }
 
-void CommandSender::OnResponseTimeout(Messaging::ExchangeContext * apEc)
+void CommandSender::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext)
 {
-    ChipLogProgress(DataManagement, "Time out! failed to receive invoke command response from Exchange: %d", apEc->GetExchangeId());
+    ChipLogProgress(DataManagement, "Time out! failed to receive invoke command response from Exchange: %d",
+                    apExchangeContext->GetExchangeId());
     Reset();
 }
 

@@ -24,9 +24,6 @@
 
 #pragma once
 
-#ifndef _CHIP_INTERACTION_MODEL_COMMAND_H
-#define _CHIP_INTERACTION_MODEL_COMMAND_H
-
 #include <core/CHIPCore.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
@@ -48,18 +45,18 @@ namespace app {
 class Command
 {
 public:
-    enum CommandRoleId
+    enum class CommandRoleId
     {
-        kCommandSenderId  = 0,
-        kCommandHandlerId = 1,
+        SenderId  = 0,
+        HandlerId = 1,
     };
 
-    enum CommandState
+    enum class CommandState
     {
-        kState_Uninitialized = 0, ///< The invoke command message has not been initialized
-        kState_Initialized,       ///< The invoke command message has been initialized and is ready
-        kState_AddCommand,        ///< The invoke command message has added Command
-        kState_Sending,           ///< The invoke command message  has sent out the invoke command
+        Uninitialized = 0, //< The invoke command message has not been initialized
+        Initialized,       //< The invoke command message has been initialized and is ready
+        AddCommand,        //< The invoke command message has added Command
+        Sending,           //< The invoke command message  has sent out the invoke command
     };
 
     /**
@@ -82,7 +79,7 @@ public:
     } CommandPathFlags;
 
     /**
-     *  Initialize the CommandSender object. Within the lifetime
+     *  Initialize the Command object. Within the lifetime
      *  of this instance, this method is invoked once after object
      *  construction until a call to Shutdown is made to terminate the
      *  instance.
@@ -90,7 +87,7 @@ public:
      *  @param[in]    apExchangeMgr    A pointer to the ExchangeManager object.
      *
      *  @retval #CHIP_ERROR_INCORRECT_STATE If the state is not equal to
-     *          kState_NotInitialized.
+     *          CommandState::NotInitialized.
      *  @retval #CHIP_NO_ERROR On success.
      *
      */
@@ -104,13 +101,9 @@ public:
     void Shutdown();
 
     /**
-     * Send an echo request to a CHIP node.
+     * Finalize Command Message TLV Builder and finalize command message
      *
-     * @param nodeId        The destination's nodeId
-     * @param payload       A System::PacketBuffer with the payload. This function takes ownership of the System::PacketBuffer
-     *
-     * @return CHIP_ERROR_NO_MEMORY if no ExchangeContext is available.
-     *         Other CHIPF_ERROR codes as returned by the lower layers.
+     * @return CHIP_ERROR
      *
      */
     CHIP_ERROR FinalizeCommandsMessage();
@@ -121,16 +114,16 @@ public:
     CHIP_ERROR AddCommand(CommandParams & aCommandParams);
     CHIP_ERROR AddStatusCode(const uint16_t aGeneralCode, const uint32_t aProtocolId, const uint16_t aProtocolCode,
                              const chip::ClusterId aClusterId);
-    CHIP_ERROR ClearExistingExchangeContext();
 
     CHIP_ERROR Reset();
 
     virtual ~Command() = default;
 
-    bool IsFree() { return (nullptr == mpExchangeCtx); };
+    bool IsFree() const { return (nullptr == mpExchangeCtx); };
     virtual CHIP_ERROR ProcessCommandDataElement(CommandDataElement::Parser & aCommandElement) = 0;
 
 protected:
+    CHIP_ERROR ClearExistingExchangeContext();
     void MoveToState(const CommandState aTargetState);
     CHIP_ERROR ProcessCommandMessage(System::PacketBufferHandle && payload, CommandRoleId aCommandRoleId);
     void ClearState();
@@ -151,5 +144,3 @@ private:
 };
 } // namespace app
 } // namespace chip
-
-#endif // _CHIP_INTERACTION_MODEL_COMMAND_H
