@@ -31,6 +31,7 @@ chip_test_suite("tests") {
     "TestErrorStr.cpp",
     "TestPool.cpp",
     "TestSafeInt.cpp",
+    "TestSafeString.cpp",
     "TestScopedBuffer.cpp",
     "TestSerializableIntegerSet.cpp",
     "TestStringBuilder.cpp",
