@@ -31,8 +31,70 @@ using namespace chip::app;
 
 extern "C" {
 
+// Cluster AccountLogin
+CHIP_ERROR chip_ime_AppendCommand_AccountLogin_GetSetupPIN(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                           chip::GroupId ZCLgroupId, const uint8_t * tempAccountIdentifier,
+                                                           uint32_t tempAccountIdentifier_Len)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::AccountLoginCluster clusterAccountLogin;
+    (void) ZCLgroupId;
+    clusterAccountLogin.Associate(device, ZCLendpointId);
+    return clusterAccountLogin.GetSetupPIN(nullptr, nullptr, chip::ByteSpan(tempAccountIdentifier, tempAccountIdentifier_Len));
+}
+CHIP_ERROR chip_ime_AppendCommand_AccountLogin_Login(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                     chip::GroupId ZCLgroupId, const uint8_t * tempAccountIdentifier,
+                                                     uint32_t tempAccountIdentifier_Len, const uint8_t * setupPIN,
+                                                     uint32_t setupPIN_Len)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::AccountLoginCluster clusterAccountLogin;
+    (void) ZCLgroupId;
+    clusterAccountLogin.Associate(device, ZCLendpointId);
+    return clusterAccountLogin.Login(nullptr, nullptr, chip::ByteSpan(tempAccountIdentifier, tempAccountIdentifier_Len),
+                                     chip::ByteSpan(setupPIN, setupPIN_Len));
+}
+// End of Cluster AccountLogin
+
 // Cluster ApplicationBasic
 // End of Cluster ApplicationBasic
+
+// Cluster ApplicationLauncher
+CHIP_ERROR chip_ime_AppendCommand_ApplicationLauncher_LaunchApp(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                                chip::GroupId ZCLgroupId, uint16_t catalogVendorId,
+                                                                const uint8_t * applicationId, uint32_t applicationId_Len,
+                                                                const uint8_t * data, uint32_t data_Len)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::ApplicationLauncherCluster clusterApplicationLauncher;
+    (void) ZCLgroupId;
+    clusterApplicationLauncher.Associate(device, ZCLendpointId);
+    return clusterApplicationLauncher.LaunchApp(nullptr, nullptr, catalogVendorId, chip::ByteSpan(applicationId, applicationId_Len),
+                                                chip::ByteSpan(data, data_Len));
+}
+// End of Cluster ApplicationLauncher
+
+// Cluster AudioOutput
+CHIP_ERROR chip_ime_AppendCommand_AudioOutput_RenameOutput(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                           chip::GroupId ZCLgroupId, uint8_t index, const uint8_t * name,
+                                                           uint32_t name_Len)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::AudioOutputCluster clusterAudioOutput;
+    (void) ZCLgroupId;
+    clusterAudioOutput.Associate(device, ZCLendpointId);
+    return clusterAudioOutput.RenameOutput(nullptr, nullptr, index, chip::ByteSpan(name, name_Len));
+}
+CHIP_ERROR chip_ime_AppendCommand_AudioOutput_SelectOutput(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                           chip::GroupId ZCLgroupId, uint8_t index)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::AudioOutputCluster clusterAudioOutput;
+    (void) ZCLgroupId;
+    clusterAudioOutput.Associate(device, ZCLendpointId);
+    return clusterAudioOutput.SelectOutput(nullptr, nullptr, index);
+}
+// End of Cluster AudioOutput
 
 // Cluster BarrierControl
 CHIP_ERROR chip_ime_AppendCommand_BarrierControl_BarrierControlGoToPercent(chip::Controller::Device * device,
@@ -242,6 +304,27 @@ CHIP_ERROR chip_ime_AppendCommand_ColorControl_StopMoveStep(chip::Controller::De
     return clusterColorControl.StopMoveStep(nullptr, nullptr, optionsMask, optionsOverride);
 }
 // End of Cluster ColorControl
+
+// Cluster ContentLaunch
+CHIP_ERROR chip_ime_AppendCommand_ContentLaunch_LaunchContent(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                              chip::GroupId ZCLgroupId)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::ContentLaunchCluster clusterContentLaunch;
+    (void) ZCLgroupId;
+    clusterContentLaunch.Associate(device, ZCLendpointId);
+    return clusterContentLaunch.LaunchContent(nullptr, nullptr);
+}
+CHIP_ERROR chip_ime_AppendCommand_ContentLaunch_LaunchURL(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                          chip::GroupId ZCLgroupId)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::ContentLaunchCluster clusterContentLaunch;
+    (void) ZCLgroupId;
+    clusterContentLaunch.Associate(device, ZCLendpointId);
+    return clusterContentLaunch.LaunchURL(nullptr, nullptr);
+}
+// End of Cluster ContentLaunch
 
 // Cluster DoorLock
 CHIP_ERROR chip_ime_AppendCommand_DoorLock_ClearAllPins(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
@@ -584,6 +667,18 @@ CHIP_ERROR chip_ime_AppendCommand_Identify_IdentifyQuery(chip::Controller::Devic
 }
 // End of Cluster Identify
 
+// Cluster KeypadInput
+CHIP_ERROR chip_ime_AppendCommand_KeypadInput_SendKey(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                      chip::GroupId ZCLgroupId, uint8_t keyCode)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::KeypadInputCluster clusterKeypadInput;
+    (void) ZCLgroupId;
+    clusterKeypadInput.Associate(device, ZCLendpointId);
+    return clusterKeypadInput.SendKey(nullptr, nullptr, keyCode);
+}
+// End of Cluster KeypadInput
+
 // Cluster LevelControl
 CHIP_ERROR chip_ime_AppendCommand_LevelControl_Move(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
                                                     chip::GroupId ZCLgroupId, uint8_t moveMode, uint8_t rate, uint8_t optionMask,
@@ -675,6 +770,139 @@ CHIP_ERROR chip_ime_AppendCommand_LowPower_Sleep(chip::Controller::Device * devi
     return clusterLowPower.Sleep(nullptr, nullptr);
 }
 // End of Cluster LowPower
+
+// Cluster MediaInput
+CHIP_ERROR chip_ime_AppendCommand_MediaInput_HideInputStatus(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                             chip::GroupId ZCLgroupId)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::MediaInputCluster clusterMediaInput;
+    (void) ZCLgroupId;
+    clusterMediaInput.Associate(device, ZCLendpointId);
+    return clusterMediaInput.HideInputStatus(nullptr, nullptr);
+}
+CHIP_ERROR chip_ime_AppendCommand_MediaInput_RenameInput(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                         chip::GroupId ZCLgroupId, uint8_t index, const uint8_t * name,
+                                                         uint32_t name_Len)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::MediaInputCluster clusterMediaInput;
+    (void) ZCLgroupId;
+    clusterMediaInput.Associate(device, ZCLendpointId);
+    return clusterMediaInput.RenameInput(nullptr, nullptr, index, chip::ByteSpan(name, name_Len));
+}
+CHIP_ERROR chip_ime_AppendCommand_MediaInput_SelectInput(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                         chip::GroupId ZCLgroupId, uint8_t index)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::MediaInputCluster clusterMediaInput;
+    (void) ZCLgroupId;
+    clusterMediaInput.Associate(device, ZCLendpointId);
+    return clusterMediaInput.SelectInput(nullptr, nullptr, index);
+}
+CHIP_ERROR chip_ime_AppendCommand_MediaInput_ShowInputStatus(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                             chip::GroupId ZCLgroupId)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::MediaInputCluster clusterMediaInput;
+    (void) ZCLgroupId;
+    clusterMediaInput.Associate(device, ZCLendpointId);
+    return clusterMediaInput.ShowInputStatus(nullptr, nullptr);
+}
+// End of Cluster MediaInput
+
+// Cluster MediaPlayback
+CHIP_ERROR chip_ime_AppendCommand_MediaPlayback_FastForwardRequest(chip::Controller::Device * device,
+                                                                   chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::MediaPlaybackCluster clusterMediaPlayback;
+    (void) ZCLgroupId;
+    clusterMediaPlayback.Associate(device, ZCLendpointId);
+    return clusterMediaPlayback.FastForwardRequest(nullptr, nullptr);
+}
+CHIP_ERROR chip_ime_AppendCommand_MediaPlayback_NextRequest(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                            chip::GroupId ZCLgroupId)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::MediaPlaybackCluster clusterMediaPlayback;
+    (void) ZCLgroupId;
+    clusterMediaPlayback.Associate(device, ZCLendpointId);
+    return clusterMediaPlayback.NextRequest(nullptr, nullptr);
+}
+CHIP_ERROR chip_ime_AppendCommand_MediaPlayback_PauseRequest(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                             chip::GroupId ZCLgroupId)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::MediaPlaybackCluster clusterMediaPlayback;
+    (void) ZCLgroupId;
+    clusterMediaPlayback.Associate(device, ZCLendpointId);
+    return clusterMediaPlayback.PauseRequest(nullptr, nullptr);
+}
+CHIP_ERROR chip_ime_AppendCommand_MediaPlayback_PlayRequest(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                            chip::GroupId ZCLgroupId)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::MediaPlaybackCluster clusterMediaPlayback;
+    (void) ZCLgroupId;
+    clusterMediaPlayback.Associate(device, ZCLendpointId);
+    return clusterMediaPlayback.PlayRequest(nullptr, nullptr);
+}
+CHIP_ERROR chip_ime_AppendCommand_MediaPlayback_PreviousRequest(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                                chip::GroupId ZCLgroupId)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::MediaPlaybackCluster clusterMediaPlayback;
+    (void) ZCLgroupId;
+    clusterMediaPlayback.Associate(device, ZCLendpointId);
+    return clusterMediaPlayback.PreviousRequest(nullptr, nullptr);
+}
+CHIP_ERROR chip_ime_AppendCommand_MediaPlayback_RewindRequest(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                              chip::GroupId ZCLgroupId)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::MediaPlaybackCluster clusterMediaPlayback;
+    (void) ZCLgroupId;
+    clusterMediaPlayback.Associate(device, ZCLendpointId);
+    return clusterMediaPlayback.RewindRequest(nullptr, nullptr);
+}
+CHIP_ERROR chip_ime_AppendCommand_MediaPlayback_SkipBackwardRequest(chip::Controller::Device * device,
+                                                                    chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::MediaPlaybackCluster clusterMediaPlayback;
+    (void) ZCLgroupId;
+    clusterMediaPlayback.Associate(device, ZCLendpointId);
+    return clusterMediaPlayback.SkipBackwardRequest(nullptr, nullptr);
+}
+CHIP_ERROR chip_ime_AppendCommand_MediaPlayback_SkipForwardRequest(chip::Controller::Device * device,
+                                                                   chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::MediaPlaybackCluster clusterMediaPlayback;
+    (void) ZCLgroupId;
+    clusterMediaPlayback.Associate(device, ZCLendpointId);
+    return clusterMediaPlayback.SkipForwardRequest(nullptr, nullptr);
+}
+CHIP_ERROR chip_ime_AppendCommand_MediaPlayback_StartOverRequest(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                                 chip::GroupId ZCLgroupId)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::MediaPlaybackCluster clusterMediaPlayback;
+    (void) ZCLgroupId;
+    clusterMediaPlayback.Associate(device, ZCLendpointId);
+    return clusterMediaPlayback.StartOverRequest(nullptr, nullptr);
+}
+CHIP_ERROR chip_ime_AppendCommand_MediaPlayback_StopRequest(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                            chip::GroupId ZCLgroupId)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::MediaPlaybackCluster clusterMediaPlayback;
+    (void) ZCLgroupId;
+    clusterMediaPlayback.Associate(device, ZCLendpointId);
+    return clusterMediaPlayback.StopRequest(nullptr, nullptr);
+}
+// End of Cluster MediaPlayback
 
 // Cluster NetworkCommissioning
 CHIP_ERROR chip_ime_AppendCommand_NetworkCommissioning_AddThreadNetwork(chip::Controller::Device * device,
@@ -889,6 +1117,53 @@ CHIP_ERROR chip_ime_AppendCommand_Scenes_ViewScene(chip::Controller::Device * de
 }
 // End of Cluster Scenes
 
+// Cluster TvChannel
+CHIP_ERROR chip_ime_AppendCommand_TvChannel_ChangeChannel(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                          chip::GroupId ZCLgroupId, const uint8_t * match, uint32_t match_Len)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::TvChannelCluster clusterTvChannel;
+    (void) ZCLgroupId;
+    clusterTvChannel.Associate(device, ZCLendpointId);
+    return clusterTvChannel.ChangeChannel(nullptr, nullptr, chip::ByteSpan(match, match_Len));
+}
+CHIP_ERROR chip_ime_AppendCommand_TvChannel_ChangeChannelByNumber(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                                  chip::GroupId ZCLgroupId, uint16_t majorNumber,
+                                                                  uint16_t minorNumber)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::TvChannelCluster clusterTvChannel;
+    (void) ZCLgroupId;
+    clusterTvChannel.Associate(device, ZCLendpointId);
+    return clusterTvChannel.ChangeChannelByNumber(nullptr, nullptr, majorNumber, minorNumber);
+}
+CHIP_ERROR chip_ime_AppendCommand_TvChannel_SkipChannel(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                        chip::GroupId ZCLgroupId, uint16_t count)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::TvChannelCluster clusterTvChannel;
+    (void) ZCLgroupId;
+    clusterTvChannel.Associate(device, ZCLendpointId);
+    return clusterTvChannel.SkipChannel(nullptr, nullptr, count);
+}
+// End of Cluster TvChannel
+
+// Cluster TargetNavigator
+CHIP_ERROR chip_ime_AppendCommand_TargetNavigator_NavigateTarget(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                                 chip::GroupId ZCLgroupId, uint8_t target, const uint8_t * data,
+                                                                 uint32_t data_Len)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::TargetNavigatorCluster clusterTargetNavigator;
+    (void) ZCLgroupId;
+    clusterTargetNavigator.Associate(device, ZCLendpointId);
+    return clusterTargetNavigator.NavigateTarget(nullptr, nullptr, target, chip::ByteSpan(data, data_Len));
+}
+// End of Cluster TargetNavigator
+
 // Cluster TemperatureMeasurement
 // End of Cluster TemperatureMeasurement
+
+// Cluster WakeOnLan
+// End of Cluster WakeOnLan
 }

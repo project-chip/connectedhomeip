@@ -66,34 +66,46 @@
 #define GENERATED_ATTRIBUTE_COUNT 14
 #define GENERATED_ATTRIBUTES                                                                                                       \
     {                                                                                                                              \
-        { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT),                                                                 \
-          ZAP_SIMPLE_DEFAULT(2) }, /* Identify (client): cluster revision */                                                       \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT),                                                             \
-              ZAP_SIMPLE_DEFAULT(3) }, /* Groups (client): cluster revision */                                                     \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT),                                                             \
-              ZAP_SIMPLE_DEFAULT(3) }, /* Scenes (client): cluster revision */                                                     \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT),                                                             \
-              ZAP_SIMPLE_DEFAULT(2) }, /* On/off (client): cluster revision */                                                     \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT),                                                             \
-              ZAP_SIMPLE_DEFAULT(3) }, /* Level Control (client): cluster revision */                                              \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT) | ZAP_ATTRIBUTE_MASK(SINGLETON),                             \
-              ZAP_SIMPLE_DEFAULT(3) }, /* Basic (client): cluster revision */                                                      \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT),                                                             \
-              ZAP_SIMPLE_DEFAULT(0x0001) }, /* General Commissioning (client): cluster revision */                                 \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT),                                                             \
-              ZAP_SIMPLE_DEFAULT(3) }, /* Door Lock (client): cluster revision */                                                  \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT),                                                             \
-              ZAP_SIMPLE_DEFAULT(0x0001) }, /* Barrier Control (client): cluster revision */                                       \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT),                                                             \
-              ZAP_SIMPLE_DEFAULT(3) }, /* Color Control (client): cluster revision */                                              \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT),                                                             \
-              ZAP_SIMPLE_DEFAULT(3) }, /* Temperature Measurement (client): cluster revision */                                    \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT),                                                             \
-              ZAP_SIMPLE_DEFAULT(0x0001) }, /* Low Power (client): cluster revision */                                             \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT),                                                             \
-              ZAP_SIMPLE_DEFAULT(0x0001) }, /* Application Basic (client): cluster revision */                                     \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT),                                                             \
-              ZAP_SIMPLE_DEFAULT(0x0001) }, /* Binding (client): cluster revision */                                               \
+        { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), { (uint8_t *) 2 } }, /* Identify (client): cluster revision */  \
+            {                                                                                                                      \
+                0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), { (uint8_t *) 3 }                                         \
+            }, /* Groups (client): cluster revision */                                                                             \
+            {                                                                                                                      \
+                0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), { (uint8_t *) 3 }                                         \
+            }, /* Scenes (client): cluster revision */                                                                             \
+            {                                                                                                                      \
+                0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), { (uint8_t *) 2 }                                         \
+            }, /* On/off (client): cluster revision */                                                                             \
+            {                                                                                                                      \
+                0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), { (uint8_t *) 3 }                                         \
+            }, /* Level Control (client): cluster revision */                                                                      \
+            {                                                                                                                      \
+                0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT) | ZAP_ATTRIBUTE_MASK(SINGLETON), { (uint8_t *) 3 }         \
+            }, /* Basic (client): cluster revision */                                                                              \
+            {                                                                                                                      \
+                0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), { (uint8_t *) 0x0001 }                                    \
+            }, /* General Commissioning (client): cluster revision */                                                              \
+            {                                                                                                                      \
+                0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), { (uint8_t *) 3 }                                         \
+            }, /* Door Lock (client): cluster revision */                                                                          \
+            {                                                                                                                      \
+                0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), { (uint8_t *) 0x0001 }                                    \
+            }, /* Barrier Control (client): cluster revision */                                                                    \
+            {                                                                                                                      \
+                0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), { (uint8_t *) 3 }                                         \
+            }, /* Color Control (client): cluster revision */                                                                      \
+            {                                                                                                                      \
+                0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), { (uint8_t *) 3 }                                         \
+            }, /* Temperature Measurement (client): cluster revision */                                                            \
+            {                                                                                                                      \
+                0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), { (uint8_t *) 0x0001 }                                    \
+            }, /* Low Power (client): cluster revision */                                                                          \
+            {                                                                                                                      \
+                0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), { (uint8_t *) 0x0001 }                                    \
+            }, /* Application Basic (client): cluster revision */                                                                  \
+            {                                                                                                                      \
+                0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), { (uint8_t *) 0x0001 }                                    \
+            }, /* Binding (client): cluster revision */                                                                            \
     }
 
 // This is an array of EmberAfCluster structures.
@@ -149,7 +161,7 @@
     }
 
 // Largest attribute size is needed for various buffers
-#define ATTRIBUTE_LARGEST (3)
+#define ATTRIBUTE_LARGEST (2)
 
 // Total size of singleton attributes
 #define ATTRIBUTE_SINGLETONS_SIZE (2)
@@ -431,6 +443,10 @@
 // Array of EmberAfPluginReportingEntry structures.
 #define ZRD(x) EMBER_ZCL_REPORTING_DIRECTION_##x
 #define ZAP_REPORT_DIRECTION(x) ZRD(x)
+
+// User options for plugin Reporting
+#define EMBER_AF_PLUGIN_REPORTING_TABLE_SIZE (0)
+#define EMBER_AF_PLUGIN_REPORTING_ENABLE_GROUP_BOUND_REPORTS
 
 #define EMBER_AF_GENERATED_REPORTING_CONFIG_DEFAULTS_TABLE_SIZE (0)
 #define EMBER_AF_GENERATED_REPORTING_CONFIG_DEFAULTS                                                                               \

@@ -686,6 +686,67 @@ bool emberAfDiscoverCommandsReceivedResponseCallback(ClusterId clusterId, uint16
     return true;
 }
 
+bool emberAfAccountLoginClusterGetSetupPINResponseCallback(uint8_t * setupPIN)
+{
+    ChipLogProgress(Zcl, "GetSetupPINResponse:");
+    ChipLogProgress(Zcl, "  setupPIN: %s", setupPIN);
+
+    GET_RESPONSE_CALLBACKS("AccountLoginClusterGetSetupPINResponseCallback");
+
+    Callback::Callback<AccountLoginClusterGetSetupPINResponseCallback> * cb =
+        Callback::Callback<AccountLoginClusterGetSetupPINResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, setupPIN);
+    return true;
+}
+
+bool emberAfApplicationLauncherClusterLaunchAppResponseCallback(uint8_t status, uint8_t * data)
+{
+    ChipLogProgress(Zcl, "LaunchAppResponse:");
+    LogStatus(status);
+    ChipLogProgress(Zcl, "  data: %s", data);
+
+    GET_RESPONSE_CALLBACKS("ApplicationLauncherClusterLaunchAppResponseCallback");
+
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        Callback::Callback<DefaultFailureCallback> * cb =
+            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+        cb->mCall(cb->mContext, status);
+        return true;
+    }
+
+    Callback::Callback<ApplicationLauncherClusterLaunchAppResponseCallback> * cb =
+        Callback::Callback<ApplicationLauncherClusterLaunchAppResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, data);
+    return true;
+}
+
+bool emberAfContentLaunchClusterLaunchContentResponseCallback(uint8_t contentLaunchStatus)
+{
+    ChipLogProgress(Zcl, "LaunchContentResponse:");
+    ChipLogProgress(Zcl, "  contentLaunchStatus: %" PRIu8 "", contentLaunchStatus);
+
+    GET_RESPONSE_CALLBACKS("ContentLaunchClusterLaunchContentResponseCallback");
+
+    Callback::Callback<ContentLaunchClusterLaunchContentResponseCallback> * cb =
+        Callback::Callback<ContentLaunchClusterLaunchContentResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, contentLaunchStatus);
+    return true;
+}
+
+bool emberAfContentLaunchClusterLaunchURLResponseCallback(uint8_t contentLaunchStatus)
+{
+    ChipLogProgress(Zcl, "LaunchURLResponse:");
+    ChipLogProgress(Zcl, "  contentLaunchStatus: %" PRIu8 "", contentLaunchStatus);
+
+    GET_RESPONSE_CALLBACKS("ContentLaunchClusterLaunchURLResponseCallback");
+
+    Callback::Callback<ContentLaunchClusterLaunchURLResponseCallback> * cb =
+        Callback::Callback<ContentLaunchClusterLaunchURLResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, contentLaunchStatus);
+    return true;
+}
+
 bool emberAfDoorLockClusterClearAllPinsResponseCallback(uint8_t status)
 {
     ChipLogProgress(Zcl, "ClearAllPinsResponse:");
@@ -1308,6 +1369,27 @@ bool emberAfIdentifyClusterIdentifyQueryResponseCallback(uint16_t timeout)
     return true;
 }
 
+bool emberAfKeypadInputClusterSendKeyResponseCallback(uint8_t status)
+{
+    ChipLogProgress(Zcl, "SendKeyResponse:");
+    LogStatus(status);
+
+    GET_RESPONSE_CALLBACKS("KeypadInputClusterSendKeyResponseCallback");
+
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        Callback::Callback<DefaultFailureCallback> * cb =
+            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+        cb->mCall(cb->mContext, status);
+        return true;
+    }
+
+    Callback::Callback<KeypadInputClusterSendKeyResponseCallback> * cb =
+        Callback::Callback<KeypadInputClusterSendKeyResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext);
+    return true;
+}
+
 bool emberAfScenesClusterAddSceneResponseCallback(uint8_t status, uint16_t groupId, uint8_t sceneId)
 {
     ChipLogProgress(Zcl, "AddSceneResponse:");
@@ -1450,6 +1532,43 @@ bool emberAfScenesClusterViewSceneResponseCallback(uint8_t status, uint16_t grou
     Callback::Callback<ScenesClusterViewSceneResponseCallback> * cb =
         Callback::Callback<ScenesClusterViewSceneResponseCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, groupId, sceneId, transitionTime, sceneName, extensionFieldSets);
+    return true;
+}
+
+bool emberAfTvChannelClusterChangeChannelResponseCallback(/* TYPE WARNING: array array defaults to */ uint8_t * ChannelMatch,
+                                                          uint8_t ErrorType)
+{
+    ChipLogProgress(Zcl, "ChangeChannelResponse:");
+    ChipLogProgress(Zcl, "  ChannelMatch: %p", ChannelMatch);
+    ChipLogProgress(Zcl, "  ErrorType: %" PRIu8 "", ErrorType);
+
+    GET_RESPONSE_CALLBACKS("TvChannelClusterChangeChannelResponseCallback");
+
+    Callback::Callback<TvChannelClusterChangeChannelResponseCallback> * cb =
+        Callback::Callback<TvChannelClusterChangeChannelResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, ChannelMatch, ErrorType);
+    return true;
+}
+
+bool emberAfTargetNavigatorClusterNavigateTargetResponseCallback(uint8_t status, uint8_t * data)
+{
+    ChipLogProgress(Zcl, "NavigateTargetResponse:");
+    LogStatus(status);
+    ChipLogProgress(Zcl, "  data: %s", data);
+
+    GET_RESPONSE_CALLBACKS("TargetNavigatorClusterNavigateTargetResponseCallback");
+
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        Callback::Callback<DefaultFailureCallback> * cb =
+            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+        cb->mCall(cb->mContext, status);
+        return true;
+    }
+
+    Callback::Callback<TargetNavigatorClusterNavigateTargetResponseCallback> * cb =
+        Callback::Callback<TargetNavigatorClusterNavigateTargetResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, data);
     return true;
 }
 

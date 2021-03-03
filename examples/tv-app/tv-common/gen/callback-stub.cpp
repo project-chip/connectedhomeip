@@ -29,8 +29,17 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
 {
     switch (clusterId)
     {
+    case ZCL_ACCOUNT_LOGIN_CLUSTER_ID:
+        emberAfAccountLoginClusterInitCallback(endpoint);
+        break;
     case ZCL_APPLICATION_BASIC_CLUSTER_ID:
         emberAfApplicationBasicClusterInitCallback(endpoint);
+        break;
+    case ZCL_APPLICATION_LAUNCHER_CLUSTER_ID:
+        emberAfApplicationLauncherClusterInitCallback(endpoint);
+        break;
+    case ZCL_AUDIO_OUTPUT_CLUSTER_ID:
+        emberAfAudioOutputClusterInitCallback(endpoint);
         break;
     case ZCL_BARRIER_CONTROL_CLUSTER_ID:
         emberAfBarrierControlClusterInitCallback(endpoint);
@@ -40,6 +49,9 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
         break;
     case ZCL_COLOR_CONTROL_CLUSTER_ID:
         emberAfColorControlClusterInitCallback(endpoint);
+        break;
+    case ZCL_CONTENT_LAUNCH_CLUSTER_ID:
+        emberAfContentLaunchClusterInitCallback(endpoint);
         break;
     case ZCL_DOOR_LOCK_CLUSTER_ID:
         emberAfDoorLockClusterInitCallback(endpoint);
@@ -53,11 +65,20 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_IDENTIFY_CLUSTER_ID:
         emberAfIdentifyClusterInitCallback(endpoint);
         break;
+    case ZCL_KEYPAD_INPUT_CLUSTER_ID:
+        emberAfKeypadInputClusterInitCallback(endpoint);
+        break;
     case ZCL_LEVEL_CONTROL_CLUSTER_ID:
         emberAfLevelControlClusterInitCallback(endpoint);
         break;
     case ZCL_LOW_POWER_CLUSTER_ID:
         emberAfLowPowerClusterInitCallback(endpoint);
+        break;
+    case ZCL_MEDIA_INPUT_CLUSTER_ID:
+        emberAfMediaInputClusterInitCallback(endpoint);
+        break;
+    case ZCL_MEDIA_PLAYBACK_CLUSTER_ID:
+        emberAfMediaPlaybackClusterInitCallback(endpoint);
         break;
     case ZCL_NETWORK_COMMISSIONING_CLUSTER_ID:
         emberAfNetworkCommissioningClusterInitCallback(endpoint);
@@ -68,8 +89,17 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_SCENES_CLUSTER_ID:
         emberAfScenesClusterInitCallback(endpoint);
         break;
+    case ZCL_TV_CHANNEL_CLUSTER_ID:
+        emberAfTvChannelClusterInitCallback(endpoint);
+        break;
+    case ZCL_TARGET_NAVIGATOR_CLUSTER_ID:
+        emberAfTargetNavigatorClusterInitCallback(endpoint);
+        break;
     case ZCL_TEMP_MEASUREMENT_CLUSTER_ID:
         emberAfTemperatureMeasurementClusterInitCallback(endpoint);
+        break;
+    case ZCL_WAKE_ON_LAN_CLUSTER_ID:
+        emberAfWakeOnLanClusterInitCallback(endpoint);
         break;
     default:
         // Unrecognized cluster ID
@@ -77,7 +107,22 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     }
 }
 
+void __attribute__((weak)) emberAfAccountLoginClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
 void __attribute__((weak)) emberAfApplicationBasicClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfApplicationLauncherClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfAudioOutputClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;
@@ -93,6 +138,11 @@ void __attribute__((weak)) emberAfBasicClusterInitCallback(EndpointId endpoint)
     (void) endpoint;
 }
 void __attribute__((weak)) emberAfColorControlClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfContentLaunchClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;
@@ -117,12 +167,27 @@ void __attribute__((weak)) emberAfIdentifyClusterInitCallback(EndpointId endpoin
     // To prevent warning
     (void) endpoint;
 }
+void __attribute__((weak)) emberAfKeypadInputClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
 void __attribute__((weak)) emberAfLevelControlClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;
 }
 void __attribute__((weak)) emberAfLowPowerClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfMediaInputClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfMediaPlaybackClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;
@@ -142,7 +207,22 @@ void __attribute__((weak)) emberAfScenesClusterInitCallback(EndpointId endpoint)
     // To prevent warning
     (void) endpoint;
 }
+void __attribute__((weak)) emberAfTvChannelClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfTargetNavigatorClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
 void __attribute__((weak)) emberAfTemperatureMeasurementClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfWakeOnLanClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;

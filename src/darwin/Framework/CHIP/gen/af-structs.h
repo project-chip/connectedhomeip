@@ -24,6 +24,21 @@
 #include "enums.h"
 #include <stdint.h>
 
+// Struct for ApplicationLauncherApp
+typedef struct _ApplicationLauncherApp
+{
+    uint16_t catalogVendorId;
+    uint8_t * applicationId;
+} EmberAfApplicationLauncherApp;
+
+// Struct for AudioOutputInfo
+typedef struct _AudioOutputInfo
+{
+    uint8_t Index;
+    uint8_t OutputType;
+    uint8_t * Name;
+} EmberAfAudioOutputInfo;
+
 // Struct for BasicCommissioningInfo
 typedef struct _BasicCommissioningInfo
 {
@@ -218,6 +233,22 @@ typedef struct _IasAceZoneStatusResult
 // Void typedef for EmberAfIdentity which is empty.
 // this will result in all the references to the data being as uint8_t*
 typedef uint8_t EmberAfIdentity;
+
+// Struct for MediaInputInfo
+typedef struct _MediaInputInfo
+{
+    uint8_t Index;
+    uint8_t InputType;
+    uint8_t * Name;
+    uint8_t * Description;
+} EmberAfMediaInputInfo;
+
+// Struct for NavigateTargetTargetInfo
+typedef struct _NavigateTargetTargetInfo
+{
+    uint8_t identifier;
+    uint8_t * name;
+} EmberAfNavigateTargetTargetInfo;
 
 // Struct for NeighborInfo
 typedef struct _NeighborInfo
@@ -434,6 +465,25 @@ typedef struct _TransferredPhase
     uint16_t energy;
     uint16_t maxActivationDelay;
 } EmberAfTransferredPhase;
+
+// Struct for TvChannelInfo
+typedef struct _TvChannelInfo
+{
+    uint16_t MajorNumber;
+    uint16_t MinorNumber;
+    uint8_t * Name;
+    uint8_t * CallSign;
+    uint8_t * AffiliateCallSign;
+} EmberAfTvChannelInfo;
+
+// Struct for TvChannelLineupInfo
+typedef struct _TvChannelLineupInfo
+{
+    uint8_t * OperatorName;
+    uint8_t * LineupName;
+    uint8_t * PostalCode;
+    uint8_t LineupInfoType;
+} EmberAfTvChannelLineupInfo;
 
 // Struct for WiFiInterfaceScanResult
 typedef struct _WiFiInterfaceScanResult

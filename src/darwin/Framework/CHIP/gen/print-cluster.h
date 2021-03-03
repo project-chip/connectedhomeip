@@ -532,10 +532,34 @@
 #define CHIP_PRINTCLUSTER_IAS_WD_CLUSTER
 #endif
 
+#if defined(ZCL_USING_WAKE_ON_LAN_CLUSTER_SERVER) || defined(ZCL_USING_WAKE_ON_LAN_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_WAKE_ON_LAN_CLUSTER { ZCL_WAKE_ON_LAN_CLUSTER_ID, 1283, "Wake on LAN" },
+#else
+#define CHIP_PRINTCLUSTER_WAKE_ON_LAN_CLUSTER
+#endif
+
+#if defined(ZCL_USING_TV_CHANNEL_CLUSTER_SERVER) || defined(ZCL_USING_TV_CHANNEL_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_TV_CHANNEL_CLUSTER { ZCL_TV_CHANNEL_CLUSTER_ID, 1284, "TV Channel" },
+#else
+#define CHIP_PRINTCLUSTER_TV_CHANNEL_CLUSTER
+#endif
+
+#if defined(ZCL_USING_TARGET_NAVIGATOR_CLUSTER_SERVER) || defined(ZCL_USING_TARGET_NAVIGATOR_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_TARGET_NAVIGATOR_CLUSTER { ZCL_TARGET_NAVIGATOR_CLUSTER_ID, 1285, "Target Navigator" },
+#else
+#define CHIP_PRINTCLUSTER_TARGET_NAVIGATOR_CLUSTER
+#endif
+
 #if defined(ZCL_USING_MEDIA_PLAYBACK_CLUSTER_SERVER) || defined(ZCL_USING_MEDIA_PLAYBACK_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_MEDIA_PLAYBACK_CLUSTER { ZCL_MEDIA_PLAYBACK_CLUSTER_ID, 1286, "Media Playback" },
 #else
 #define CHIP_PRINTCLUSTER_MEDIA_PLAYBACK_CLUSTER
+#endif
+
+#if defined(ZCL_USING_MEDIA_INPUT_CLUSTER_SERVER) || defined(ZCL_USING_MEDIA_INPUT_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_MEDIA_INPUT_CLUSTER { ZCL_MEDIA_INPUT_CLUSTER_ID, 1287, "Media Input" },
+#else
+#define CHIP_PRINTCLUSTER_MEDIA_INPUT_CLUSTER
 #endif
 
 #if defined(ZCL_USING_LOW_POWER_CLUSTER_SERVER) || defined(ZCL_USING_LOW_POWER_CLUSTER_CLIENT)
@@ -544,16 +568,40 @@
 #define CHIP_PRINTCLUSTER_LOW_POWER_CLUSTER
 #endif
 
+#if defined(ZCL_USING_KEYPAD_INPUT_CLUSTER_SERVER) || defined(ZCL_USING_KEYPAD_INPUT_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_KEYPAD_INPUT_CLUSTER { ZCL_KEYPAD_INPUT_CLUSTER_ID, 1289, "Keypad Input" },
+#else
+#define CHIP_PRINTCLUSTER_KEYPAD_INPUT_CLUSTER
+#endif
+
 #if defined(ZCL_USING_CONTENT_LAUNCH_CLUSTER_SERVER) || defined(ZCL_USING_CONTENT_LAUNCH_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_CONTENT_LAUNCH_CLUSTER { ZCL_CONTENT_LAUNCH_CLUSTER_ID, 1290, "Content Launch" },
 #else
 #define CHIP_PRINTCLUSTER_CONTENT_LAUNCH_CLUSTER
 #endif
 
+#if defined(ZCL_USING_AUDIO_OUTPUT_CLUSTER_SERVER) || defined(ZCL_USING_AUDIO_OUTPUT_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_AUDIO_OUTPUT_CLUSTER { ZCL_AUDIO_OUTPUT_CLUSTER_ID, 1291, "Audio Output" },
+#else
+#define CHIP_PRINTCLUSTER_AUDIO_OUTPUT_CLUSTER
+#endif
+
+#if defined(ZCL_USING_APPLICATION_LAUNCHER_CLUSTER_SERVER) || defined(ZCL_USING_APPLICATION_LAUNCHER_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_APPLICATION_LAUNCHER_CLUSTER { ZCL_APPLICATION_LAUNCHER_CLUSTER_ID, 1292, "Application Launcher" },
+#else
+#define CHIP_PRINTCLUSTER_APPLICATION_LAUNCHER_CLUSTER
+#endif
+
 #if defined(ZCL_USING_APPLICATION_BASIC_CLUSTER_SERVER) || defined(ZCL_USING_APPLICATION_BASIC_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_APPLICATION_BASIC_CLUSTER { ZCL_APPLICATION_BASIC_CLUSTER_ID, 1293, "Application Basic" },
 #else
 #define CHIP_PRINTCLUSTER_APPLICATION_BASIC_CLUSTER
+#endif
+
+#if defined(ZCL_USING_ACCOUNT_LOGIN_CLUSTER_SERVER) || defined(ZCL_USING_ACCOUNT_LOGIN_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_ACCOUNT_LOGIN_CLUSTER { ZCL_ACCOUNT_LOGIN_CLUSTER_ID, 1294, "Account Login" },
+#else
+#define CHIP_PRINTCLUSTER_ACCOUNT_LOGIN_CLUSTER
 #endif
 
 #if defined(ZCL_USING_GENERIC_TUNNEL_CLUSTER_SERVER) || defined(ZCL_USING_GENERIC_TUNNEL_CLUSTER_CLIENT)
@@ -870,10 +918,18 @@
     CHIP_PRINTCLUSTER_IAS_ZONE_CLUSTER                                                                                             \
     CHIP_PRINTCLUSTER_IAS_ACE_CLUSTER                                                                                              \
     CHIP_PRINTCLUSTER_IAS_WD_CLUSTER                                                                                               \
+    CHIP_PRINTCLUSTER_WAKE_ON_LAN_CLUSTER                                                                                          \
+    CHIP_PRINTCLUSTER_TV_CHANNEL_CLUSTER                                                                                           \
+    CHIP_PRINTCLUSTER_TARGET_NAVIGATOR_CLUSTER                                                                                     \
     CHIP_PRINTCLUSTER_MEDIA_PLAYBACK_CLUSTER                                                                                       \
+    CHIP_PRINTCLUSTER_MEDIA_INPUT_CLUSTER                                                                                          \
     CHIP_PRINTCLUSTER_LOW_POWER_CLUSTER                                                                                            \
+    CHIP_PRINTCLUSTER_KEYPAD_INPUT_CLUSTER                                                                                         \
     CHIP_PRINTCLUSTER_CONTENT_LAUNCH_CLUSTER                                                                                       \
+    CHIP_PRINTCLUSTER_AUDIO_OUTPUT_CLUSTER                                                                                         \
+    CHIP_PRINTCLUSTER_APPLICATION_LAUNCHER_CLUSTER                                                                                 \
     CHIP_PRINTCLUSTER_APPLICATION_BASIC_CLUSTER                                                                                    \
+    CHIP_PRINTCLUSTER_ACCOUNT_LOGIN_CLUSTER                                                                                        \
     CHIP_PRINTCLUSTER_GENERIC_TUNNEL_CLUSTER                                                                                       \
     CHIP_PRINTCLUSTER_BACNET_PROTOCOL_TUNNEL_CLUSTER                                                                               \
     CHIP_PRINTCLUSTER_11073_PROTOCOL_TUNNEL_CLUSTER                                                                                \
