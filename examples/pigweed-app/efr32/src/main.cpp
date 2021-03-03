@@ -17,8 +17,7 @@
 
 #include "AppConfig.h"
 #include "LEDWidget.h"
-#include "init_board.h"
-#include "init_mcu.h"
+#include "init_efrPlatform.h"
 
 #include "pw_rpc/echo_service_nanopb.h"
 #include "pw_sys_io/sys_io.h"
@@ -55,9 +54,7 @@ void RunRpcService(void *)
 
 int main(void)
 {
-    initMcu();
-    initBoard();
-    efr32LogInit();
+    init_efrPlatform();
     EFR32_LOG("***** CHIP EFR32 pigweed example *****\r\n");
 
     pw_sys_io_Init();

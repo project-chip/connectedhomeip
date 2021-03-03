@@ -39,9 +39,6 @@
 #include "hal-config-app-common.h"
 #include "hal-config-types.h"
 
-#ifndef HAL_VCOM_ENABLE
-#define HAL_VCOM_ENABLE (0)
-#endif
 #ifndef HAL_I2CSENSOR_ENABLE
 #define HAL_I2CSENSOR_ENABLE (0)
 #endif
