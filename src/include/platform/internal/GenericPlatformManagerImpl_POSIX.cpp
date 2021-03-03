@@ -232,6 +232,8 @@ CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_Shutdown()
         SystemLayer.WakeSelect();
         SuccessOrExit(err = pthread_join(mChipTask, nullptr));
     }
+    // Call up to the base class _Shutdown() to perform the bulk of the shutdown.
+    err = GenericPlatformManagerImpl<ImplClass>::_Shutdown();
 
 exit:
     return System::MapErrorPOSIX(err);
