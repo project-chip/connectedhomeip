@@ -571,11 +571,11 @@ exit:
     return err;
 }
 
-CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParameters & params, uint16_t remotePort,
-                                          Inet::InterfaceId interfaceId)
+CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParameters & params)
 {
-    CHIP_ERROR err  = CHIP_NO_ERROR;
-    Device * device = nullptr;
+    CHIP_ERROR err                        = CHIP_NO_ERROR;
+    Device * device                       = nullptr;
+    Transport::PeerAddress udpPeerAddress = Transport::PeerAddress::UDP(Inet::IPAddress::Any);
 
     Transport::AdminPairingInfo * admin = mAdmins.FindAdmin(mAdminId);
 
@@ -597,6 +597,12 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
         }
 #endif // CONFIG_DEVICE_LAYER && CONFIG_NETWORK_LAYER_BLE
     }
+    else if (params.GetPeerAddress().GetTransportType() == Transport::Type::kTcp ||
+             params.GetPeerAddress().GetTransportType() == Transport::Type::kUdp)
+    {
+        udpPeerAddress = Transport::PeerAddress::UDP(params.GetPeerAddress().GetIPAddress(), params.GetPeerAddress().GetPort(),
+                                                     params.GetPeerAddress().GetInterface());
+    }
 
     mDeviceBeingPaired = GetInactiveDeviceIndex();
     VerifyOrExit(mDeviceBeingPaired < kNumMaxActiveDevices, err = CHIP_ERROR_NO_MEMORY);
@@ -609,14 +615,12 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
                                    mSessionManager, admin);
     SuccessOrExit(err);
 
-    device->Init(mTransportMgr, mSessionManager, mInetLayer, mListenPort, remoteDeviceId, remotePort, interfaceId,
-                 admin->GetAdminId());
+    device->Init(mTransportMgr, mSessionManager, mInetLayer, mListenPort, remoteDeviceId, udpPeerAddress, admin->GetAdminId());
 
     // TODO: BLE rendezvous and IP rendezvous should have same logic in the future after BLE becomes a transport and network
     // provisiong cluster is ready.
     if (params.GetPeerAddress().GetTransportType() != Transport::Type::kBle)
     {
-        device->SetAddress(params.GetPeerAddress().GetIPAddress());
         mRendezvousSession->OnRendezvousConnectionOpened();
     }
 
@@ -640,14 +644,16 @@ exit:
     return err;
 }
 
-CHIP_ERROR DeviceCommissioner::PairTestDeviceWithoutSecurity(NodeId remoteDeviceId, const Inet::IPAddress & deviceAddr,
-                                                             SerializedDevice & serialized, uint16_t remotePort,
-                                                             Inet::InterfaceId interfaceId)
+CHIP_ERROR DeviceCommissioner::PairTestDeviceWithoutSecurity(NodeId remoteDeviceId, const Transport::PeerAddress & peerAddress,
+                                                             SerializedDevice & serialized)
 {
     CHIP_ERROR err  = CHIP_NO_ERROR;
     Device * device = nullptr;
 
     SecurePairingUsingTestSecret * testSecurePairingSecret = nullptr;
+
+    VerifyOrExit(peerAddress.GetTransportType() == Transport::Type::kUdp, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(remoteDeviceId != kUndefinedNodeId && remoteDeviceId != kAnyNodeId, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     VerifyOrExit(mState == State::Initialized, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mDeviceBeingPaired == kNumMaxActiveDevices, err = CHIP_ERROR_INCORRECT_STATE);
@@ -661,9 +667,7 @@ CHIP_ERROR DeviceCommissioner::PairTestDeviceWithoutSecurity(NodeId remoteDevice
 
     testSecurePairingSecret->ToSerializable(device->GetPairing());
 
-    device->Init(mTransportMgr, mSessionManager, mInetLayer, mListenPort, remoteDeviceId, remotePort, interfaceId, mAdminId);
-
-    device->SetAddress(deviceAddr);
+    device->Init(mTransportMgr, mSessionManager, mInetLayer, mListenPort, remoteDeviceId, peerAddress, mAdminId);
 
     device->Serialize(serialized);
 
