@@ -16,6 +16,7 @@
 from chip.configuration import GetLocalNodeId
 from chip.native import NativeLibraryHandleMethodArguments, GetLibraryHandle
 from ctypes import c_uint64, c_uint32, c_uint16, c_char_p
+from enum import Enum
 from typing import Optional
 from chip.internal.types import NetworkCredentialsRequested, OperationalCredentialsRequested, PairingComplete
 import ctypes
@@ -37,12 +38,18 @@ def OnOperationalCredentialsRequested(csr, csr_length):
 def OnPairingComplete(err: int):
     GetCommisioner()._OnPairingComplete(err)
 
+class PairingState(Enum):
+    """States throughout a pairing flow. 
+    
+    Devices generally go through:
+      initialized -> pairing -> netcreds -> opcreds -> done (initialized)
 
-# Commissioner states regarding pairing
-COMMISIONER_INITIALIZED = 0
-COMMISIONER_PAIRING = 1
-COMMISIONER_NEEDS_NETCREDS = 2
-COMMISIONER_NEEDS_OPCREDS = 3
+    where network credentials may be skipped if device is already on the network.
+    """
+    INITIALIZED = 0
+    PAIRING = 1
+    NEEDS_NETCREDS = 2
+    NEEDS_OPCREDS = 3
 
 
 class Commissioner:
@@ -58,7 +65,7 @@ class Commissioner:
     def __init__(self, handle: ctypes.CDLL, native: Commisioner_p):
         self._handle = handle
         self._native = native
-        self.pairing_state = COMMISIONER_INITIALIZED
+        self.pairing_state = PairingState.INITIALIZED
         self.on_network_credentials_requested = None
         self.on_operational_credentials_requested = None
         self.on_pairing_complete = None
@@ -69,12 +76,12 @@ class Commissioner:
         if result != 0: 
             raise Exception("Failed to pair. CHIP Error code %d" % result)
 
-        self.pairing_state = COMMISIONER_PAIRING
+        self.pairing_state = PairingState.PAIRING
     
     def PairSendWifiCredentials(self, ssid, password):
         """Send wifi credentials to the actively connected device."""
 
-        if self.pairing_state != COMMISIONER_NEEDS_NETCREDS:
+        if self.pairing_state != PairingState.NEEDS_NETCREDS:
             raise Exception("Not in a state requiring network credentials")
 
         self._handle.pychip_internal_PairingDelegate_SetNetworkCredentials(c_char_p(ssid.encode('utf8')), c_char_p(password.encode('utf8')))
@@ -87,17 +94,17 @@ class Commissioner:
 
     
     def _OnNetworkCredentialsRequested(self):
-        self.pairing_state = COMMISIONER_NEEDS_NETCREDS
+        self.pairing_state = PairingState.NEEDS_NETCREDS
         if self.on_network_credentials_requested:
           self.on_network_credentials_requested()
 
     def _OnOperationalCredentialsRequested(self, csr: bytes):
-        self.pairing_state = COMMISIONER_NEEDS_OPCREDS
+        self.pairing_state = PairingState.NEEDS_OPCREDS
         if self.on_operational_credentials_requested:
           self.on_operational_credentials_requested(csr)
 
     def _OnPairingComplete(self, err: int):
-        self.pairing_state = COMMISIONER_INITIALIZED
+        self.pairing_state = PairingState.INITIALIZED
         if self.on_pairing_complete:
           self.on_pairing_complete(err)
 

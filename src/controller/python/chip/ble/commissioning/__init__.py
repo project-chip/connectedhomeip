@@ -15,19 +15,21 @@
 #
 from typing import Optional
 from chip.internal import GetCommisioner
-from chip.internal.commissioner import COMMISIONER_INITIALIZED
+from chip.internal.commissioner import PairingState
 from queue import Queue
 from dataclasses import dataclass
+from enum import Enum
 
 TEST_NODE_ID = 11223344
 
-PAIR_NOTIFICATION_NETWORK_CREDENTIALS = 0
-PAIR_NOTIFICATION_OPERATIONAL_CREDENTIALS = 1
-PAIR_NOTIFICATION_COMPLETE = 2
+class PairNotificationType(Enum):
+  NETWORK_CREDENTIALS = 0
+  OPERATIONAL_CREDENTIALS = 1
+  COMPLETE = 2
 
 @dataclass
 class _PairNotification:
-    type: int
+    type: PairNotificationType
     csr: Optional[bytes]
     error_code: Optional[int]
 
@@ -59,13 +61,13 @@ class Connection:
 
     
     def _OnNetworkCredentialsRequested(self):
-        self._pair_queue.put(_PairNotification(PAIR_NOTIFICATION_NETWORK_CREDENTIALS, None, None))
+        self._pair_queue.put(_PairNotification(PairNotificationType.NETWORK_CREDENTIALS, None, None))
 
     def _OnOperationalCredentialsRequested(self, csr):
-        self._pair_queue.put(_PairNotification(PAIR_NOTIFICATION_OPERATIONAL_CREDENTIALS, csr, None))
+        self._pair_queue.put(_PairNotification(PairNotificationType.OPERATIONAL_CREDENTIALS, csr, None))
 
     def _OnPairingComplete(self, err):
-        self._pair_queue.put(_PairNotification(PAIR_NOTIFICATION_COMPLETE, None, err))
+        self._pair_queue.put(_PairNotification(PairNotificationType.COMPLETE, None, err))
 
     def _WaitForPairProgress(self):
         """Waits for some pairing callback progress.
@@ -79,11 +81,11 @@ class Connection:
 
         step = self._pair_queue.get()
 
-        self.needsNetworkCredentials = step.type == PAIR_NOTIFICATION_NETWORK_CREDENTIALS
-        self.needsOperationalCredentials = step.type == PAIR_NOTIFICATION_OPERATIONAL_CREDENTIALS
-        self.paired = step.type == PAIR_NOTIFICATION_COMPLETE
+        self.needsNetworkCredentials = step.type == PairNotificationType.NETWORK_CREDENTIALS
+        self.needsOperationalCredentials = step.type == PairNotificationType.OPERATIONAL_CREDENTIALS
+        self.paired = step.type == PairNotificationType.COMPLETE
 
-        if step.type == PAIR_NOTIFICATION_COMPLETE:
+        if step.type == PairNotificationType.PAIR_NOTIFICATION_COMPLETE:
           if step.error_code != 0:
               raise Exception('Pairing ended with error code %d' % step.error_code)
 
@@ -106,7 +108,7 @@ def _StartAsyncConnection(discriminator: int, pin: int, deprecated_nodeid: Optio
 
     controller = GetCommisioner()
 
-    if controller.pairing_state != COMMISIONER_INITIALIZED:
+    if controller.pairing_state != PairingState.INITIALIZED:
        raise Exception("Controller is not ready to start a new pairing")
 
     connection = Connection(controller)
