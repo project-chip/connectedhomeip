@@ -399,18 +399,6 @@ CHIP_ERROR RendezvousSession::HandleSecureMessage(const PacketHeader & packetHea
     ReturnErrorCodeIf(mPairingSessionHandle == nullptr, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorCodeIf(msgBuf.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
 
-    // Check if the source and destination node IDs match with what we already know
-    if (packetHeader.GetDestinationNodeId().HasValue() && mParams.HasLocalNodeId())
-    {
-        VerifyOrReturnError(packetHeader.GetDestinationNodeId().Value() == mParams.GetLocalNodeId().Value(),
-                            CHIP_ERROR_WRONG_NODE_ID);
-    }
-
-    if (packetHeader.GetSourceNodeId().HasValue() && mParams.HasRemoteNodeId())
-    {
-        VerifyOrReturnError(packetHeader.GetSourceNodeId().Value() == mParams.GetRemoteNodeId().Value(), CHIP_ERROR_WRONG_NODE_ID);
-    }
-
     PeerConnectionState * state = mSecureSessionMgr->GetPeerConnectionState(*mPairingSessionHandle);
     ReturnErrorCodeIf(state == nullptr, CHIP_ERROR_KEY_NOT_FOUND_FROM_PEER);
 
