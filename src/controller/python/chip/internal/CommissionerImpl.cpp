@@ -211,7 +211,8 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_N
 }
 
 /// Returns CHIP_ERROR corresponding to an UnpairDevice call
-extern "C" uint32_t pychip_internal_Commissioner_Unpair(chip::Controller::DeviceCommissioner * commissioner, uint64_t remoteDeviceId)
+extern "C" uint32_t pychip_internal_Commissioner_Unpair(chip::Controller::DeviceCommissioner * commissioner,
+                                                        uint64_t remoteDeviceId)
 {
     CHIP_ERROR err;
 
@@ -221,8 +222,8 @@ extern "C" uint32_t pychip_internal_Commissioner_Unpair(chip::Controller::Device
 }
 
 extern "C" uint32_t pychip_internal_Commissioner_BleConnectForPairing(chip::Controller::DeviceCommissioner * commissioner,
-                                                                     uint64_t remoteNodeId, uint32_t pinCode,
-                                                                     uint16_t discriminator)
+                                                                      uint64_t remoteNodeId, uint32_t pinCode,
+                                                                      uint16_t discriminator)
 {
 
     CHIP_ERROR err;
