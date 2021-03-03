@@ -94,6 +94,84 @@ events::EventQueue event_queue(32 * EVENTS_EVENT_SIZE);
 rtos::Thread event_thread;
 #endif
 
+struct ConnectionInfo
+{
+    struct ConnStatus
+    {
+        ble::connection_handle_t connHandle;
+        uint16_t attMtuSize;
+    };
+
+    ConnectionInfo()
+    {
+        for (size_t i = 0; i < kMaxConnections; i++)
+        {
+            mConnStates[i].connHandle = kInvalidHandle;
+            mConnStates[i].attMtuSize = 0;
+        }
+    }
+
+    CHIP_ERROR setStatus(ble::connection_handle_t conn_handle, uint16_t mtu_size)
+    {
+        size_t new_i = kMaxConnections;
+        for (size_t i = 0; i < kMaxConnections; i++)
+        {
+            if (mConnStates[i].connHandle == conn_handle)
+            {
+                mConnStates[i].attMtuSize = mtu_size;
+                return CHIP_NO_ERROR;
+            }
+            else if (mConnStates[i].connHandle == kInvalidHandle && i < new_i)
+            {
+                new_i = i;
+            }
+        }
+        // Handle not found, has to be added.
+        if (new_i == kMaxConnections)
+        {
+            return CHIP_ERROR_NO_MEMORY;
+        }
+        mConnStates[new_i].connHandle = conn_handle;
+        mConnStates[new_i].attMtuSize = mtu_size;
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR clearStatus(ble::connection_handle_t conn_handle)
+    {
+        for (size_t i = 0; i < kMaxConnections; i++)
+        {
+            if (mConnStates[i].connHandle == conn_handle)
+            {
+                mConnStates[i].connHandle = kInvalidHandle;
+                mConnStates[i].attMtuSize = 0;
+                return CHIP_NO_ERROR;
+            }
+        }
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    ConnStatus getStatus(ble::connection_handle_t conn_handle) const
+    {
+        for (size_t i = 0; i < kMaxConnections; i++)
+        {
+            if (mConnStates[i].connHandle == conn_handle)
+            {
+                return mConnStates[i];
+            }
+        }
+        return { kInvalidHandle, 0 };
+    }
+
+    uint16_t getMTU(ble::connection_handle_t conn_handle) const { return getStatus(conn_handle).attMtuSize; }
+
+private:
+    const int kMaxConnections = BLE_LAYER_NUM_BLE_ENDPOINTS;
+    ConnStatus mConnStates[BLE_LAYER_NUM_BLE_ENDPOINTS];
+    const ble::connection_handle_t kInvalidHandle = 0xf00d;
+};
+
+static ConnectionInfo sConnectionInfo;
+
 class GapEventHandler : private mbed::NonCopyable<GapEventHandler>, public ble::Gap::EventHandler
 {
     void onScanRequestReceived(const ble::ScanRequestEvent & event)
@@ -169,6 +247,11 @@ class GapEventHandler : private mbed::NonCopyable<GapEventHandler>, public ble::
             ChipLogProgress(DeviceLayer, "BLE connection established with %02hhX:%02hhX:%02hhX:%02hhX:%02hhX:%02hhX", peer_addr[5],
                             peer_addr[4], peer_addr[3], peer_addr[2], peer_addr[1], peer_addr[0]);
             ble_manager.mGAPConns++;
+            CHIP_ERROR err = sConnectionInfo.setStatus(event.getConnectionHandle(), BLE_GATT_MTU_SIZE_DEFAULT);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(DeviceLayer, "Unable to store connection status, error: %s ", ErrorStr(err));
+            }
         }
         else
         {
@@ -213,6 +296,11 @@ class GapEventHandler : private mbed::NonCopyable<GapEventHandler>, public ble::
         if (ble_manager.NumConnections())
         {
             ble_manager.mGAPConns--;
+        }
+        CHIP_ERROR err = sConnectionInfo.clearStatus(event.getConnectionHandle());
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "Unable to clear connection status, error: %s ", ErrorStr(err));
         }
 
         ChipDeviceEvent chip_event;
@@ -334,6 +422,11 @@ struct CHIPService : public ble::GattServer::EventHandler
     void onAttMtuChange(ble::connection_handle_t connectionHandle, uint16_t attMtuSize) override
     {
         ChipLogDetail(DeviceLayer, "GATT %s", __FUNCTION__);
+        CHIP_ERROR err = sConnectionInfo.setStatus(connectionHandle, attMtuSize);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "Unable to store connection status, error: %s ", ErrorStr(err));
+        }
     }
 
     void onDataSent(const GattDataSentCallbackParams & params) override
@@ -799,6 +892,100 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
 {
     // no-op
+}
+
+bool BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId)
+{
+    ChipLogError(DeviceLayer, "%s: NOT IMPLEMENTED", __PRETTY_FUNCTION__);
+    return true;
+}
+
+bool BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId)
+{
+    ChipLogError(DeviceLayer, "%s: NOT IMPLEMENTED", __PRETTY_FUNCTION__);
+    return true;
+}
+
+bool BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
+{
+    ChipLogProgress(DeviceLayer, "Closing BLE GATT connection, connHandle=%d", conId);
+
+    ble::Gap & gap = ble::BLE::Instance().gap();
+
+    ble_error_t mbed_err = gap.disconnect(conId, ble::local_disconnection_reason_t::USER_TERMINATION);
+    return mbed_err == BLE_ERROR_NONE;
+}
+
+uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
+{
+    return sConnectionInfo.getMTU(conId);
+}
+
+bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
+                                    PacketBufferHandle pBuf)
+{
+    ChipLogDetail(DeviceLayer, "BlePlatformDelegate %s", __FUNCTION__);
+
+    CHIP_ERROR err       = CHIP_NO_ERROR;
+    ble_error_t mbed_err = BLE_ERROR_NONE;
+
+    ble::GattServer & gatt_server = ble::BLE::Instance().gattServer();
+    ble::attribute_handle_t att_handle;
+
+    // No need to do anything fancy here. Only 3 handles are used in this impl.
+    if (UUIDsMatch(charId, &ChipUUID_CHIPoBLEChar_TX))
+    {
+        att_handle = sCHIPService.getTxHandle();
+        // att_handle = sCHIPService.getTxCCCDHandle();
+    }
+    else if (UUIDsMatch(charId, &ChipUUID_CHIPoBLEChar_RX))
+    {
+        // TODO does this make sense?
+        att_handle = sCHIPService.getRxHandle();
+    }
+    else
+    {
+        // TODO handle error with chipConnection::SendMessage as described
+        // in the BlePlatformDelegate.h.
+        ChipLogError(DeviceLayer, "Send indication failed, invalid charID.");
+        return false;
+    }
+
+    ChipLogDetail(DeviceLayer,
+                  "Sending indication for CHIPoBLE characteristic "
+                  "(connHandle=%d, attHandle=%d, data_len=%" PRIu16 ")",
+                  conId, att_handle, pBuf->DataLength());
+
+    mbed_err = gatt_server.write(att_handle, pBuf->Start(), pBuf->DataLength(), false);
+    VerifyOrExit(mbed_err == BLE_ERROR_NONE, err = CHIP_ERROR_INTERNAL);
+
+exit:
+    if (mbed_err != BLE_ERROR_NONE)
+    {
+        ChipLogError(DeviceLayer, "Send indication failed, mbed-os error: %d", mbed_err);
+    }
+    return err == CHIP_NO_ERROR;
+}
+
+bool BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
+                                      PacketBufferHandle pBuf)
+{
+    ChipLogError(DeviceLayer, "%s: NOT IMPLEMENTED", __PRETTY_FUNCTION__);
+    return true;
+}
+
+bool BLEManagerImpl::SendReadRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
+                                     PacketBufferHandle pBuf)
+{
+    ChipLogError(DeviceLayer, "%s: NOT IMPLEMENTED", __PRETTY_FUNCTION__);
+    return true;
+}
+
+bool BLEManagerImpl::SendReadResponse(BLE_CONNECTION_OBJECT conId, BLE_READ_REQUEST_CONTEXT requestContext,
+                                      const ChipBleUUID * svcId, const ChipBleUUID * charId)
+{
+    ChipLogError(DeviceLayer, "%s: NOT IMPLEMENTED", __PRETTY_FUNCTION__);
+    return true;
 }
 
 } // namespace Internal
