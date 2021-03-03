@@ -187,7 +187,7 @@ pychip_internal_PairingDelegate_SetPairingCompleteCallback(ScriptDevicePairingDe
     gPairingDelegate.SetPairingCompleteCallback(callback);
 }
 
-extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commisioner_New(uint64_t localDeviceId)
+extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_New(uint64_t localDeviceId)
 {
     std::unique_ptr<chip::Controller::DeviceCommissioner> result;
     CHIP_ERROR err;
@@ -203,7 +203,7 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commisioner_Ne
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "Commisioner initialization failed: %s", chip::ErrorStr(err));
+        ChipLogError(Controller, "Commissioner initialization failed: %s", chip::ErrorStr(err));
         return nullptr;
     }
 
@@ -211,7 +211,7 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commisioner_Ne
 }
 
 /// Returns CHIP_ERROR corresponding to an UnpairDevice call
-extern "C" uint32_t pychip_internal_Commisioner_Unpair(chip::Controller::DeviceCommissioner * commissioner, uint64_t remoteDeviceId)
+extern "C" uint32_t pychip_internal_Commissioner_Unpair(chip::Controller::DeviceCommissioner * commissioner, uint64_t remoteDeviceId)
 {
     CHIP_ERROR err;
 
@@ -220,7 +220,7 @@ extern "C" uint32_t pychip_internal_Commisioner_Unpair(chip::Controller::DeviceC
     return err;
 }
 
-extern "C" uint32_t pychip_internal_Commisioner_BleConnectForPairing(chip::Controller::DeviceCommissioner * commissioner,
+extern "C" uint32_t pychip_internal_Commissioner_BleConnectForPairing(chip::Controller::DeviceCommissioner * commissioner,
                                                                      uint64_t remoteNodeId, uint32_t pinCode,
                                                                      uint16_t discriminator)
 {

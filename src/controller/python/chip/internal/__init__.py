@@ -17,8 +17,8 @@
 # Classes and methods in this module are generally to be used internally
 # by the BLE constructs and are not meant as a public API. 
 
-from chip.internal.commissioner import GetCommisioner
+from chip.internal.commissioner import GetCommissioner
 
 __all__ = [
-    'GetCommisioner'
+    'GetCommissioner'
 ]

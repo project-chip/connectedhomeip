@@ -14,7 +14,7 @@
 #    limitations under the License.
 #
 from typing import Optional
-from chip.internal import GetCommisioner
+from chip.internal import GetCommissioner
 from chip.internal.commissioner import PairingState
 from queue import Queue
 from dataclasses import dataclass
@@ -106,7 +106,7 @@ def _StartAsyncConnection(discriminator: int, pin: int, deprecated_nodeid: Optio
     if not deprecated_nodeid:
         deprecated_nodeid = TEST_NODE_ID
 
-    controller = GetCommisioner()
+    controller = GetCommissioner()
 
     if controller.pairing_state != PairingState.INITIALIZED:
        raise Exception("Controller is not ready to start a new pairing")
