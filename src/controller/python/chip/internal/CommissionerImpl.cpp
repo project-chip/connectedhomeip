@@ -211,16 +211,16 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commisioner_Ne
 }
 
 /// Returns CHIP_ERROR corresponding to an UnpairDevice call
-extern "C" uint32_t pychip_internal_Commisioner_Unpair(chip::Controller::DeviceCommissioner * commisioner, uint64_t remoteDeviceId)
+extern "C" uint32_t pychip_internal_Commisioner_Unpair(chip::Controller::DeviceCommissioner * commissioner, uint64_t remoteDeviceId)
 {
     CHIP_ERROR err;
 
-    chip::python::ChipMainThreadScheduleAndWait([&]() { err = commisioner->UnpairDevice(remoteDeviceId); });
+    chip::python::ChipMainThreadScheduleAndWait([&]() { err = commissioner->UnpairDevice(remoteDeviceId); });
 
     return err;
 }
 
-extern "C" uint32_t pychip_internal_Commisioner_BleConnectForPairing(chip::Controller::DeviceCommissioner * commisioner,
+extern "C" uint32_t pychip_internal_Commisioner_BleConnectForPairing(chip::Controller::DeviceCommissioner * commissioner,
                                                                      uint64_t remoteNodeId, uint32_t pinCode,
                                                                      uint16_t discriminator)
 {
@@ -236,7 +236,7 @@ extern "C" uint32_t pychip_internal_Commisioner_BleConnectForPairing(chip::Contr
             .SetBleLayer(chip::DeviceLayer::ConnectivityMgr().GetBleLayer())
             .SetPeerAddress(chip::Transport::PeerAddress::BLE());
 
-        err = commisioner->PairDevice(remoteNodeId, params);
+        err = commissioner->PairDevice(remoteNodeId, params);
     });
 
     return err;

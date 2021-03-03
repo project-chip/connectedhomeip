@@ -45,7 +45,7 @@ shared_library("ChipDeviceCtrl") {
     "ChipDeviceController-StorageDelegate.h",
     "chip/internal/ChipThreadWork.cpp",
     "chip/internal/ChipThreadWork.h",
-    "chip/internal/CommisionerImpl.cpp",
+    "chip/internal/CommissionerImpl.cpp",
     "chip/native/StackInit.cpp",
   ]
 
@@ -87,7 +87,7 @@ pw_python_action("python") {
         "chip/configuration/__init__.py",
         "chip/exceptions/__init__.py",
         "chip/internal/__init__.py",
-        "chip/internal/commisioner.py",
+        "chip/internal/commissioner.py",
         "chip/internal/types.py",
         "chip/native/__init__.py",
         "chip/tlv/__init__.py",

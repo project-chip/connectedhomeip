@@ -15,7 +15,7 @@
 #
 from typing import Optional
 from chip.internal import GetCommisioner
-from chip.internal.commisioner import COMMISIONER_INITIALIZED
+from chip.internal.commissioner import COMMISIONER_INITIALIZED
 from queue import Queue
 from dataclasses import dataclass
 

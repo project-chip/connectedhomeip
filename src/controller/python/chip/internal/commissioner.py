@@ -38,18 +38,18 @@ def OnPairingComplete(err: int):
     GetCommisioner()._OnPairingComplete(err)
 
 
-# Commisioner states regarding pairing
+# Commissioner states regarding pairing
 COMMISIONER_INITIALIZED = 0
 COMMISIONER_PAIRING = 1
 COMMISIONER_NEEDS_NETCREDS = 2
 COMMISIONER_NEEDS_OPCREDS = 3
 
 
-class Commisioner:
-    """Commisioner wraps the DeviceCommisioner native class.
+class Commissioner:
+    """Commissioner wraps the DeviceCommisioner native class.
     
 
-    The commisioner is a DeviceController that supports pairing. Since the device
+    The commissioner is a DeviceController that supports pairing. Since the device
     controller supports multiple devices, this class is expected to be used 
     as a singleton
     
@@ -116,29 +116,29 @@ def _SetNativeCallSignatues(handle: ctypes.CDLL):
     setter.Set('pychip_internal_PairingDelegate_SetNetworkCredentials', None, [c_char_p, c_char_p])
 
 
-commisionerSingleton: Optional[Commisioner] = None
+commissionerSingleton: Optional[Commissioner] = None
 
-def GetCommisioner() -> Commisioner:
-    """Gets a reference to the global commisioner singleton.
+def GetCommissioner() -> Commissioner:
+    """Gets a reference to the global commissioner singleton.
 
     Uses the configuration GetLocalNodeId().
     """
 
-    global commisionerSingleton
+    global commissionerSingleton
 
-    if commisionerSingleton is None:
+    if commissionerSingleton is None:
         handle = GetLibraryHandle()
         _SetNativeCallSignatues(handle)
 
         native = handle.pychip_internal_Commisioner_New(GetLocalNodeId())
         if not native:
-            raise Exception('Failed to create commisioner object.') 
+            raise Exception('Failed to create commissioner object.') 
 
         handle.pychip_internal_PairingDelegate_SetNetworkCredentialsRequestedCallback(OnNetworkCredentialsRequested)
         handle.pychip_internal_PairingDelegate_SetOperationalCredentialsRequestedCallback(OnOperationalCredentialsRequested)
         handle.pychip_internal_PairingDelegate_SetPairingCompleteCallback(OnPairingComplete)
 
-        commisionerSingleton = Commisioner(handle, native)
+        commissionerSingleton = Commissioner(handle, native)
 
 
-    return commisionerSingleton
+    return commissionerSingleton
