@@ -342,7 +342,7 @@ CHIP_ERROR AndroidDeviceControllerWrapper::GetKeyValue(const char * key, char * 
     } else {
         err = CHIP_ERROR_INVALID_ARGUMENT;
     }
-    
+
 exit:
     GetJavaEnv()->ExceptionClear();
     GetJavaEnv()->DeleteLocalRef(keyString);
@@ -351,7 +351,7 @@ exit:
 }
 
 void AndroidDeviceControllerWrapper::SetKeyValue(const char * key, const char * value)
-{   
+{
     jclass storageCls = GetPersistentStorageClass();
     jmethodID method = GetJavaEnv()->GetStaticMethodID(storageCls, "setKeyValue", "(Ljava/lang/String;Ljava/lang/String;)V");
 
@@ -378,7 +378,7 @@ exit:
     GetJavaEnv()->DeleteLocalRef(valueString);
 }
 
-void AndroidDeviceControllerWrapper::DeleteKeyValue(const char * key) 
+void AndroidDeviceControllerWrapper::DeleteKeyValue(const char * key)
 {
     jclass storageCls = GetPersistentStorageClass();
     jmethodID method = GetJavaEnv()->GetStaticMethodID(storageCls, "deleteKeyValue", "(Ljava/lang/String;)V");
