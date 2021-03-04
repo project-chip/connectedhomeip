@@ -72,7 +72,7 @@ if (chip_device_platform != "none") {
     ]
 
     if (chip_enable_mdns) {
-      defines += [ "CHIP_DEVICE_CONFIG_ENABLE_MDNS=1"]
+      defines += [ "CHIP_DEVICE_CONFIG_ENABLE_MDNS=1" ]
     }
 
     if (chip_device_project_config_include != "") {
