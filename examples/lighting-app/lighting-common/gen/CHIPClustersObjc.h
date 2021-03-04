@@ -91,38 +91,38 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPNetworkCommissioning : CHIPCluster
 
-- (void)addThreadNetwork:(char *)operationalDataset
+- (void)addThreadNetwork:(NSString)operationalDataset
               breadcrumb:(uint64_t)breadcrumb
                timeoutMs:(uint32_t)timeoutMs
        completionHandler:(ResponseHandler)completionHandler;
-- (void)addWiFiNetwork:(char *)ssid
-           credentials:(char *)credentials
+- (void)addWiFiNetwork:(NSString)ssid
+           credentials:(NSString)credentials
             breadcrumb:(uint64_t)breadcrumb
              timeoutMs:(uint32_t)timeoutMs
      completionHandler:(ResponseHandler)completionHandler;
-- (void)disableNetwork:(char *)networkID
+- (void)disableNetwork:(NSString)networkID
             breadcrumb:(uint64_t)breadcrumb
              timeoutMs:(uint32_t)timeoutMs
      completionHandler:(ResponseHandler)completionHandler;
-- (void)enableNetwork:(char *)networkID
+- (void)enableNetwork:(NSString)networkID
            breadcrumb:(uint64_t)breadcrumb
             timeoutMs:(uint32_t)timeoutMs
     completionHandler:(ResponseHandler)completionHandler;
 - (void)getLastNetworkCommissioningResult:(uint32_t)timeoutMs completionHandler:(ResponseHandler)completionHandler;
-- (void)removeNetwork:(char *)networkID
+- (void)removeNetwork:(NSString)networkID
            breadcrumb:(uint64_t)breadcrumb
             timeoutMs:(uint32_t)timeoutMs
     completionHandler:(ResponseHandler)completionHandler;
-- (void)scanNetworks:(char *)ssid
+- (void)scanNetworks:(NSString)ssid
            breadcrumb:(uint64_t)breadcrumb
             timeoutMs:(uint32_t)timeoutMs
     completionHandler:(ResponseHandler)completionHandler;
-- (void)updateThreadNetwork:(char *)operationalDataset
+- (void)updateThreadNetwork:(NSString)operationalDataset
                  breadcrumb:(uint64_t)breadcrumb
                   timeoutMs:(uint32_t)timeoutMs
           completionHandler:(ResponseHandler)completionHandler;
-- (void)updateWiFiNetwork:(char *)ssid
-              credentials:(char *)credentials
+- (void)updateWiFiNetwork:(NSString)ssid
+              credentials:(NSString)credentials
                breadcrumb:(uint64_t)breadcrumb
                 timeoutMs:(uint32_t)timeoutMs
         completionHandler:(ResponseHandler)completionHandler;

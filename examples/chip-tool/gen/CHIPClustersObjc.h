@@ -378,8 +378,8 @@ NS_ASSUME_NONNULL_BEGIN
             timeoutMs:(uint32_t)timeoutMs
     completionHandler:(ResponseHandler)completionHandler;
 - (void)commissioningComplete:(ResponseHandler)completionHandler;
-- (void)setFabric:(char *)fabricId
-         fabricSecret:(char *)fabricSecret
+- (void)setFabric:(NSString)fabricId
+         fabricSecret:(NSString)fabricSecret
            breadcrumb:(uint64_t)breadcrumb
             timeoutMs:(uint32_t)timeoutMs
     completionHandler:(ResponseHandler)completionHandler;

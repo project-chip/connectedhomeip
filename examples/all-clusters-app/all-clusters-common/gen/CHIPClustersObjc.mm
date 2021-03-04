@@ -26,6 +26,7 @@
 #import "gen/CHIPClustersObjc.h"
 
 #include <controller/CHIPClusters.h>
+#include <lib/support/Span.h>
 
 using namespace ::chip;
 
@@ -3805,8 +3806,8 @@ private:
         completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
-- (void)setFabric:(char *)fabricId
-         fabricSecret:(char *)fabricSecret
+- (void)setFabric:(chip::ByteSpan)fabricId
+         fabricSecret:(chip::ByteSpan)fabricSecret
            breadcrumb:(uint64_t)breadcrumb
             timeoutMs:(uint32_t)timeoutMs
     completionHandler:(ResponseHandler)completionHandler

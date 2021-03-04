@@ -21,6 +21,7 @@
 
 #include <app/CommandSender.h>
 #include <app/InteractionModelEngine.h>
+#include <lib/support/Span.h>
 #include <support/ReturnMacros.h>
 
 #include <controller/CHIPClusters.h>
@@ -514,15 +515,16 @@ CHIP_ERROR chip_ime_AppendCommand_GeneralCommissioning_CommissioningComplete(chi
     return clusterGeneralCommissioning.CommissioningComplete(nullptr, nullptr);
 }
 CHIP_ERROR chip_ime_AppendCommand_GeneralCommissioning_SetFabric(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
-                                                                 chip::GroupId ZCLgroupId, char * fabricId, uint32_t fabricId_Len,
-                                                                 char * fabricSecret, uint32_t fabricSecret_Len,
-                                                                 uint64_t breadcrumb, uint32_t timeoutMs)
+                                                                 chip::GroupId ZCLgroupId, const uint8_t * fabricId,
+                                                                 uint32_t fabricId_Len, const uint8_t * fabricSecret,
+                                                                 uint32_t fabricSecret_Len, uint64_t breadcrumb, uint32_t timeoutMs)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::GeneralCommissioningCluster clusterGeneralCommissioning;
     (void) ZCLgroupId;
     clusterGeneralCommissioning.Associate(device, ZCLendpointId);
-    return clusterGeneralCommissioning.SetFabric(nullptr, nullptr, fabricId, fabricSecret, breadcrumb, timeoutMs);
+    return clusterGeneralCommissioning.SetFabric(nullptr, nullptr, chip::ByteSpan(fabricId, fabricId_Len),
+                                                 chip::ByteSpan(fabricSecret, fabricSecret_Len), breadcrumb, timeoutMs);
 }
 // End of Cluster GeneralCommissioning
 
@@ -783,48 +785,53 @@ CHIP_ERROR chip_ime_AppendCommand_MediaPlayback_StopRequest(chip::Controller::De
 // Cluster NetworkCommissioning
 CHIP_ERROR chip_ime_AppendCommand_NetworkCommissioning_AddThreadNetwork(chip::Controller::Device * device,
                                                                         chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
-                                                                        char * operationalDataset, uint32_t operationalDataset_Len,
-                                                                        uint64_t breadcrumb, uint32_t timeoutMs)
+                                                                        const uint8_t * operationalDataset,
+                                                                        uint32_t operationalDataset_Len, uint64_t breadcrumb,
+                                                                        uint32_t timeoutMs)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::NetworkCommissioningCluster clusterNetworkCommissioning;
     (void) ZCLgroupId;
     clusterNetworkCommissioning.Associate(device, ZCLendpointId);
-    return clusterNetworkCommissioning.AddThreadNetwork(nullptr, nullptr, operationalDataset, breadcrumb, timeoutMs);
+    return clusterNetworkCommissioning.AddThreadNetwork(
+        nullptr, nullptr, chip::ByteSpan(operationalDataset, operationalDataset_Len), breadcrumb, timeoutMs);
 }
 CHIP_ERROR chip_ime_AppendCommand_NetworkCommissioning_AddWiFiNetwork(chip::Controller::Device * device,
                                                                       chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
-                                                                      char * ssid, uint32_t ssid_Len, char * credentials,
-                                                                      uint32_t credentials_Len, uint64_t breadcrumb,
-                                                                      uint32_t timeoutMs)
+                                                                      const uint8_t * ssid, uint32_t ssid_Len,
+                                                                      const uint8_t * credentials, uint32_t credentials_Len,
+                                                                      uint64_t breadcrumb, uint32_t timeoutMs)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::NetworkCommissioningCluster clusterNetworkCommissioning;
     (void) ZCLgroupId;
     clusterNetworkCommissioning.Associate(device, ZCLendpointId);
-    return clusterNetworkCommissioning.AddWiFiNetwork(nullptr, nullptr, ssid, credentials, breadcrumb, timeoutMs);
+    return clusterNetworkCommissioning.AddWiFiNetwork(nullptr, nullptr, chip::ByteSpan(ssid, ssid_Len),
+                                                      chip::ByteSpan(credentials, credentials_Len), breadcrumb, timeoutMs);
 }
 CHIP_ERROR chip_ime_AppendCommand_NetworkCommissioning_DisableNetwork(chip::Controller::Device * device,
                                                                       chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
-                                                                      char * networkID, uint32_t networkID_Len, uint64_t breadcrumb,
-                                                                      uint32_t timeoutMs)
+                                                                      const uint8_t * networkID, uint32_t networkID_Len,
+                                                                      uint64_t breadcrumb, uint32_t timeoutMs)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::NetworkCommissioningCluster clusterNetworkCommissioning;
     (void) ZCLgroupId;
     clusterNetworkCommissioning.Associate(device, ZCLendpointId);
-    return clusterNetworkCommissioning.DisableNetwork(nullptr, nullptr, networkID, breadcrumb, timeoutMs);
+    return clusterNetworkCommissioning.DisableNetwork(nullptr, nullptr, chip::ByteSpan(networkID, networkID_Len), breadcrumb,
+                                                      timeoutMs);
 }
 CHIP_ERROR chip_ime_AppendCommand_NetworkCommissioning_EnableNetwork(chip::Controller::Device * device,
                                                                      chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
-                                                                     char * networkID, uint32_t networkID_Len, uint64_t breadcrumb,
-                                                                     uint32_t timeoutMs)
+                                                                     const uint8_t * networkID, uint32_t networkID_Len,
+                                                                     uint64_t breadcrumb, uint32_t timeoutMs)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::NetworkCommissioningCluster clusterNetworkCommissioning;
     (void) ZCLgroupId;
     clusterNetworkCommissioning.Associate(device, ZCLendpointId);
-    return clusterNetworkCommissioning.EnableNetwork(nullptr, nullptr, networkID, breadcrumb, timeoutMs);
+    return clusterNetworkCommissioning.EnableNetwork(nullptr, nullptr, chip::ByteSpan(networkID, networkID_Len), breadcrumb,
+                                                     timeoutMs);
 }
 CHIP_ERROR chip_ime_AppendCommand_NetworkCommissioning_GetLastNetworkCommissioningResult(chip::Controller::Device * device,
                                                                                          chip::EndpointId ZCLendpointId,
@@ -839,29 +846,30 @@ CHIP_ERROR chip_ime_AppendCommand_NetworkCommissioning_GetLastNetworkCommissioni
 }
 CHIP_ERROR chip_ime_AppendCommand_NetworkCommissioning_RemoveNetwork(chip::Controller::Device * device,
                                                                      chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
-                                                                     char * networkID, uint32_t networkID_Len, uint64_t breadcrumb,
-                                                                     uint32_t timeoutMs)
+                                                                     const uint8_t * networkID, uint32_t networkID_Len,
+                                                                     uint64_t breadcrumb, uint32_t timeoutMs)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::NetworkCommissioningCluster clusterNetworkCommissioning;
     (void) ZCLgroupId;
     clusterNetworkCommissioning.Associate(device, ZCLendpointId);
-    return clusterNetworkCommissioning.RemoveNetwork(nullptr, nullptr, networkID, breadcrumb, timeoutMs);
+    return clusterNetworkCommissioning.RemoveNetwork(nullptr, nullptr, chip::ByteSpan(networkID, networkID_Len), breadcrumb,
+                                                     timeoutMs);
 }
 CHIP_ERROR chip_ime_AppendCommand_NetworkCommissioning_ScanNetworks(chip::Controller::Device * device,
                                                                     chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
-                                                                    char * ssid, uint32_t ssid_Len, uint64_t breadcrumb,
+                                                                    const uint8_t * ssid, uint32_t ssid_Len, uint64_t breadcrumb,
                                                                     uint32_t timeoutMs)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::NetworkCommissioningCluster clusterNetworkCommissioning;
     (void) ZCLgroupId;
     clusterNetworkCommissioning.Associate(device, ZCLendpointId);
-    return clusterNetworkCommissioning.ScanNetworks(nullptr, nullptr, ssid, breadcrumb, timeoutMs);
+    return clusterNetworkCommissioning.ScanNetworks(nullptr, nullptr, chip::ByteSpan(ssid, ssid_Len), breadcrumb, timeoutMs);
 }
 CHIP_ERROR chip_ime_AppendCommand_NetworkCommissioning_UpdateThreadNetwork(chip::Controller::Device * device,
                                                                            chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
-                                                                           char * operationalDataset,
+                                                                           const uint8_t * operationalDataset,
                                                                            uint32_t operationalDataset_Len, uint64_t breadcrumb,
                                                                            uint32_t timeoutMs)
 {
@@ -869,19 +877,21 @@ CHIP_ERROR chip_ime_AppendCommand_NetworkCommissioning_UpdateThreadNetwork(chip:
     chip::Controller::NetworkCommissioningCluster clusterNetworkCommissioning;
     (void) ZCLgroupId;
     clusterNetworkCommissioning.Associate(device, ZCLendpointId);
-    return clusterNetworkCommissioning.UpdateThreadNetwork(nullptr, nullptr, operationalDataset, breadcrumb, timeoutMs);
+    return clusterNetworkCommissioning.UpdateThreadNetwork(
+        nullptr, nullptr, chip::ByteSpan(operationalDataset, operationalDataset_Len), breadcrumb, timeoutMs);
 }
 CHIP_ERROR chip_ime_AppendCommand_NetworkCommissioning_UpdateWiFiNetwork(chip::Controller::Device * device,
                                                                          chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
-                                                                         char * ssid, uint32_t ssid_Len, char * credentials,
-                                                                         uint32_t credentials_Len, uint64_t breadcrumb,
-                                                                         uint32_t timeoutMs)
+                                                                         const uint8_t * ssid, uint32_t ssid_Len,
+                                                                         const uint8_t * credentials, uint32_t credentials_Len,
+                                                                         uint64_t breadcrumb, uint32_t timeoutMs)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::NetworkCommissioningCluster clusterNetworkCommissioning;
     (void) ZCLgroupId;
     clusterNetworkCommissioning.Associate(device, ZCLendpointId);
-    return clusterNetworkCommissioning.UpdateWiFiNetwork(nullptr, nullptr, ssid, credentials, breadcrumb, timeoutMs);
+    return clusterNetworkCommissioning.UpdateWiFiNetwork(nullptr, nullptr, chip::ByteSpan(ssid, ssid_Len),
+                                                         chip::ByteSpan(credentials, credentials_Len), breadcrumb, timeoutMs);
 }
 // End of Cluster NetworkCommissioning
 

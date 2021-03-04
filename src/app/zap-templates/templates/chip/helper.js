@@ -162,7 +162,7 @@ function chip_server_cluster_command_arguments(options)
     return Promise.all(args.map(arg => collectItem.call(this, arg, pkgId))).then(items => items.flat()).then(items => {
       return Promise.all(items.map(item => {
         if (StringHelper.isByteString(item.type)) {
-          item.chipType = 'chip::BytesData';
+          item.chipType = 'chip::ByteSpan';
           return item;
         } else if (StringHelper.isString(item.type)) {
           // Enhanced the command argument with 'chipType' for conveniences.
@@ -373,7 +373,7 @@ function asPythonType(zclType)
   case 'char *':
     return 'str';
   case 'uint8_t *':
-  case 'chip::BytesData':
+  case 'chip::ByteSpan':
     return 'bytes'
   }
 }
