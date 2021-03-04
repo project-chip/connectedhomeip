@@ -94,20 +94,22 @@ $ hciconfig
 
 hci2:	Type: Primary  Bus: Virtual
 	BD Address: 00:AA:01:01:00:24  ACL MTU: 192:1  SCO MTU: 0:0
-	UP RUNNING 
+	UP RUNNING
 	RX bytes:0 acl:95 sco:0 events:205 errors:0
 	TX bytes:2691 acl:95 sco:0 commands:98 errors:0
 
 hci1:	Type: Primary  Bus: Virtual
 	BD Address: 00:AA:01:00:00:23  ACL MTU: 192:1  SCO MTU: 0:0
-	UP RUNNING 
+	UP RUNNING
 	RX bytes:0 acl:95 sco:0 events:208 errors:0
 	TX bytes:3488 acl:95 sco:0 commands:110 errors:0
 ```
 
-Then you can choose the adapter to use in command line arguments of the device controller:
+Then you can choose the adapter to use in command line arguments of the device
+controller:
 
-For example, add `--bluetooth-adapter=hci2` to use the virtual interface `hci2` listed above.
+For example, add `--bluetooth-adapter=hci2` to use the virtual interface `hci2`
+listed above.
 
 ```
 chip-device-ctrl --bluetooth-adapter=hci2
