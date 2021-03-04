@@ -34,23 +34,10 @@ class CHIPService;
 
 using namespace chip::Ble;
 
-// TODO Add missing BlePlatformDelegate and BleApplicationDelegate virtual method implementations.
-#define _BLEMGRIMPL_BLEPLATFORMDELEGATE_IMPL_READY 1
-#define _BLEMGRIMPL_BLEAPPLICATIONDELEGATE_IMPL_READY 1
-
 /**
  * Concrete implementation of the BLEManager singleton object for the Mbed platform.
  */
-class BLEManagerImpl final : public BLEManager,
-                             private BleLayer
-#if _BLEMGRIMPL_BLEPLATFORMDELEGATE_IMPL_READY
-    ,
-                             private BlePlatformDelegate
-#endif
-#if _BLEMGRIMPL_BLEAPPLICATIONDELEGATE_IMPL_READY
-    ,
-                             private BleApplicationDelegate
-#endif
+class BLEManagerImpl final : public BLEManager, private BleLayer, private BlePlatformDelegate, private BleApplicationDelegate
 {
     // Allow the BLEManager interface class to delegate method calls to
     // the implementation methods provided by this class.
@@ -74,7 +61,6 @@ class BLEManagerImpl final : public BLEManager,
 
     // ===== Members that implement virtual methods on BlePlatformDelegate.
 
-#if _BLEMGRIMPL_BLEPLATFORMDELEGATE_IMPL_READY
     bool SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId);
     bool UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId);
     bool CloseConnection(BLE_CONNECTION_OBJECT conId);
@@ -87,13 +73,10 @@ class BLEManagerImpl final : public BLEManager,
                          PacketBufferHandle pBuf);
     bool SendReadResponse(BLE_CONNECTION_OBJECT conId, BLE_READ_REQUEST_CONTEXT requestContext, const ChipBleUUID * svcId,
                           const ChipBleUUID * charId);
-#endif
 
     // ===== Members that implement virtual methods on BleApplicationDelegate.
 
-#if _BLEMGRIMPL_BLEAPPLICATIONDELEGATE_IMPL_READY
     void NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId);
-#endif
 
     // ===== Members for internal use by the following friends.
 
