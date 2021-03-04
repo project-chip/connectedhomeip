@@ -62,10 +62,10 @@ class DCState(enum.IntEnum):
 
 @_singleton
 class ChipDeviceController(object):
-    def __init__(self, startNetworkThread=True, controllerNodeId=0):
+    def __init__(self, startNetworkThread=True, controllerNodeId=0, bluetoothAdapter=0):
         self.state = DCState.NOT_INITIALIZED
         self.devCtrl = None
-        self._ChipStack = ChipStack()
+        self._ChipStack = ChipStack(bluetoothAdapter=bluetoothAdapter)
         self._dmLib = None
 
         self._InitLib()

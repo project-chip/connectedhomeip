@@ -61,6 +61,7 @@ executable("chip-tool") {
   public_deps = [
     "${chip_root}/src/app/server",
     "${chip_root}/src/lib",
+    "${chip_root}/src/platform",
     "${chip_root}/third_party/inipp",
   ]
 
