@@ -194,7 +194,8 @@ public class ChipDeviceController {
 
   private native long newDeviceController();
 
-  private native void pairDevice(long deviceControllerPtr, int deviceId, int connectionId, long pinCode);
+  private native void pairDevice(
+      long deviceControllerPtr, int deviceId, int connectionId, long pinCode);
 
   private native void unpairDevice(long deviceControllerPtr, int deviceId);
 
@@ -213,7 +214,8 @@ public class ChipDeviceController {
 
   private native void sendMessage(long deviceControllerPtr, int deviceId, String message);
 
-  private native void sendCommand(long deviceControllerPtr, int deviceId, ChipCommandType command, int value);
+  private native void sendCommand(
+      long deviceControllerPtr, int deviceId, ChipCommandType command, int value);
 
   private native boolean openPairingWindow(long deviceControllerPtr, int deviceId, int duration);
 

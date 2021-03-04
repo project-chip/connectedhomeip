@@ -30,7 +30,8 @@ public class PersistentStorage {
   private static SharedPreferences preferences;
   private static AndroidPersistentStorageDelegate storageDelegate;
 
-  private static final String PREFERENCE_FILE_KEY = "com.google.chip.devicecontroller.PREFERENCE_FILE_KEY";
+  private static final String PREFERENCE_FILE_KEY =
+      "com.google.chip.devicecontroller.PREFERENCE_FILE_KEY";
 
   public static String getKeyValue(String key) {
     Log.d(TAG, "getKeyValue called with key: " + key);
