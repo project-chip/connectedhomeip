@@ -53,7 +53,7 @@ public:
     /// Requests resolution of a node ID to its address
     CHIP_ERROR ResolveNodeId(uint64_t nodeId, uint64_t fabricId, Inet::IPAddressType type) override;
 
-    static DiscoveryImplPlatform & GetInstance() { return sManager; }
+    static DiscoveryImplPlatform & GetInstance();
 
 private:
     DiscoveryImplPlatform();
