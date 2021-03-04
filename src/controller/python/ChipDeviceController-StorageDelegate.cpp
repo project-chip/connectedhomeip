@@ -60,7 +60,8 @@ CHIP_ERROR PythonPersistentStorageDelegate::GetKeyValue(const char * key, char *
     }
 
     uint16_t neededSize = val->second.size() + 1;
-    if (size == 0) {
+    if (size == 0)
+    {
         size = neededSize;
         return CHIP_ERROR_NO_MEMORY;
     }
@@ -69,7 +70,7 @@ CHIP_ERROR PythonPersistentStorageDelegate::GetKeyValue(const char * key, char *
     {
         memcpy(value, val->second.c_str(), size - 1);
         value[size - 1] = '\0';
-        size = neededSize;
+        size            = neededSize;
         return CHIP_ERROR_NO_MEMORY;
     }
 
