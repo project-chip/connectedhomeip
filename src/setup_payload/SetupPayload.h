@@ -52,7 +52,6 @@ const int kManualSetupVendorIdCharLength  = 5;
 const int kManualSetupProductIdCharLength = 5;
 
 const uint8_t kSerialNumberTag               = 128;
-const uint32_t kTag_QRCodeExensionDescriptor = 0x00;
 
 // The largest value of the 12-bit Payload discriminator
 const uint16_t kMaxDiscriminatorValue = 0xFFF;
