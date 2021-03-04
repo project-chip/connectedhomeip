@@ -30,8 +30,9 @@ namespace Internal {
  * Constants for common network metadata entries
  */
 // ---- WiFi-specific Limits ----
-constexpr size_t kMaxWiFiSSIDLength = 32;
-constexpr size_t kMaxWiFiKeyLength  = 64;
+constexpr size_t kMaxWiFiSSIDLength   = 32;
+constexpr size_t kMaxWiFiKeyLength    = 64;
+constexpr size_t kMaxWiFiStatusLength = 40;
 
 // ---- Thread-specific Limits ----
 constexpr size_t kMaxThreadNetworkNameLength = 16;
@@ -106,7 +107,44 @@ public:
     uint8_t ThreadChannel;           /**< The Thread channel (currently [11..26]), or kThreadChannel_NotSpecified */
     uint64_t ThreadDatasetTimestamp; /**< Thread active dataset timestamp */
 };
+class NetworkInfo
+{
+public:
+    char WiFiSSID[kMaxWiFiSSIDLength];
+    int8_t BSSID[6];
+    WiFiAuthSecurityType security;
+    int8_t RSSI;
+    int8_t channel;
 
+    const char * sec2str(WiFiAuthSecurityType sec)
+    {
+        switch (sec)
+        {
+        case kWiFiSecurityType_None:
+            return "None";
+        case kWiFiSecurityType_WEP:
+            return "WEP";
+        case kWiFiSecurityType_WPAPersonal:
+            return "WPA";
+        case kWiFiSecurityType_WPA2Personal:
+            return "WPA2";
+        case kWiFiSecurityType_WPA3Personal:
+            return "WPA3";
+        default:
+            return "Unknown";
+        }
+    }
+};
+class NetworkStatus
+{
+public:
+    char Status[kMaxWiFiStatusLength];
+    char MAC[kMaxWiFiStatusLength];
+    char IP[kMaxWiFiStatusLength];
+    char Netmask[kMaxWiFiStatusLength];
+    char Gateway[kMaxWiFiStatusLength];
+    int8_t RSSI;
+};
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
