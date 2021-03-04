@@ -31,8 +31,8 @@
 #include <core/CHIPTLVTags.h>
 #include <core/CHIPTLVTypes.h>
 
-#include <support/Span.h>
 #include <support/DLLUtil.h>
+#include <support/Span.h>
 
 #include <stdarg.h>
 #include <stdlib.h>
