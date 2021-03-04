@@ -37,22 +37,30 @@ Welcome to the CHIP python REPL utilty.
 
 Usage examples:
 
-import chip.ble
-
 ######## Enable detailed logging if needed #########
 
 import logging
 logging.getLogger().setLevel(logging.DEBUG)
 
 ######## List available BLE adapters #########
+import chip.ble
 print(chip.ble.GetAdapters())
 
 ######## Discover chip devices #########
+import chip.ble
 
 chip.ble.DiscoverAsync(2000, lambda *x: print('Discovered: %r' % (x,)), lambda: print('Done'))
 
 for device in chip.ble.DiscoverSync(2000):
     print(device)
+
+####### Commision a BLE device #########
+
+import chip.ble.commissioning
+
+device = chip.ble.commissioning.Connect(discriminator=3840, pin=12345678)
+if device.needsNetworkCredentials:
+  device.ConnectToWifi("ssid", "password")
 
     '''.strip())
 
