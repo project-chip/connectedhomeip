@@ -127,7 +127,7 @@ CHIP_ERROR pychip_DeviceController_NewDeviceController(chip::Controller::DeviceC
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    *outDevCtrl = new chip::Controller::DeviceCommissioner();
+    *outDevCtrl        = new chip::Controller::DeviceCommissioner();
     *outAddressUpdater = new chip::Controller::DeviceAddressUpdater();
     VerifyOrExit(*outDevCtrl != NULL, err = CHIP_ERROR_NO_MEMORY);
     VerifyOrExit(*outAddressUpdater != NULL, err = CHIP_ERROR_NO_MEMORY);
