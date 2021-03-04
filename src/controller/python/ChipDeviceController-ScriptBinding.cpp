@@ -157,7 +157,7 @@ exit:
             *outAddressUpdater = NULL;
         }
     }
-    
+
     return err;
 }
 
