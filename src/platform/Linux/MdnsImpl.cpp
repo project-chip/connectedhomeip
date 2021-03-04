@@ -326,7 +326,7 @@ void Poller::Process(const fd_set & readFdSet, const fd_set & writeFdSet, const 
     }
 }
 
-CHIP_ERROR MdnsAvahi::Init(MdnsAsnycReturnCallback initCallback, MdnsAsnycReturnCallback errorCallback, void * context)
+CHIP_ERROR MdnsAvahi::Init(MdnsAsyncReturnCallback initCallback, MdnsAsyncReturnCallback errorCallback, void * context)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     int avahiError   = 0;
@@ -737,7 +737,7 @@ void ProcessMdns(fd_set & readFdSet, fd_set & writeFdSet, fd_set & errorFdSet)
     MdnsAvahi::GetInstance().GetPoller().Process(readFdSet, writeFdSet, errorFdSet);
 }
 
-CHIP_ERROR ChipMdnsInit(MdnsAsnycReturnCallback initCallback, MdnsAsnycReturnCallback errorCallback, void * context)
+CHIP_ERROR ChipMdnsInit(MdnsAsyncReturnCallback initCallback, MdnsAsyncReturnCallback errorCallback, void * context)
 {
     return MdnsAvahi::GetInstance().Init(initCallback, errorCallback, context);
 }
