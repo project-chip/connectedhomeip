@@ -21,6 +21,11 @@ chip_project_config_include = ""
 chip_system_project_config_include = ""
 chip_device_project_config_include = ""
 
+chip_custom_build_cflags = [
+    "-Wno-shadow",
+    "-Wno-conversion"
+    ]
+
 custom_toolchain = "//toolchain:mbed"
 mbedtls_target = "//mbedtls:mbedtls"
 

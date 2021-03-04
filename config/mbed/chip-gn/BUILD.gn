@@ -19,6 +19,11 @@ assert(current_os == "mbed")
 
 declare_args() {
   chip_build_libshell = false
+  chip_custom_build_cflags = []
+}
+
+config("chip_custom_cflags_config") {
+  cflags = chip_custom_build_cflags
 }
 
 group("mbed") {
