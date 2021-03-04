@@ -109,7 +109,8 @@ void PrintEventLog()
     chip::TLV::TLVReader reader;
     size_t elementCount;
     chip::app::reporting::CircularEventBufferWrapper bufWrapper;
-    chip::app::reporting::LoggingManagement::GetInstance().GetEventReader(reader, chip::app::reporting::PriorityLevel::Debug, &bufWrapper);
+    chip::app::reporting::LoggingManagement::GetInstance().GetEventReader(reader, chip::app::reporting::PriorityLevel::Debug,
+                                                                          &bufWrapper);
 
     chip::TLV::Utilities::Count(reader, elementCount);
     printf("Found %zu elements\n", elementCount);
@@ -176,7 +177,8 @@ static void CheckLogEventBasics(nlTestSuite * apSuite, void * apContext)
 {
     chip::EventNumber eid1, eid2, eid3;
     chip::app::reporting::DetailedRootSection root(kTestNodeId, kTestEndpointId);
-    chip::app::reporting::EventSchema schema = { kLivenessClusterId, kLivenessChangeEvent, chip::app::reporting::PriorityLevel::Debug };
+    chip::app::reporting::EventSchema schema = { kLivenessClusterId, kLivenessChangeEvent,
+                                                 chip::app::reporting::PriorityLevel::Debug };
 
     chip::app::reporting::EventOptions options;
     TestEventGenerator testEventGenerator;

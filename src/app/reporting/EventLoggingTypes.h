@@ -86,7 +86,7 @@ enum class PriorityLevel : uint8_t
      *  constrained devices; as a result, they must be used only over
      *  a limited time span in production systems.
      */
-    Debug                  = 3,
+    Debug   = 3,
     Last    = Debug,
     Invalid = Last + 1,
 

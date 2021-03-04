@@ -185,8 +185,8 @@ bool ReadHandler::CheckEventUpToDate(reporting::LoggingManagement & inLogger)
     {
         for (uint8_t i = 0; i < sizeof(mSelfVendedEvents) / sizeof(chip::EventNumber); i++)
         {
-            chip::EventNumber eid =
-                inLogger.GetLastEventNumber(static_cast<reporting::PriorityLevel>(i + static_cast<uint8_t>(reporting::PriorityLevel::First)));
+            chip::EventNumber eid = inLogger.GetLastEventNumber(
+                static_cast<reporting::PriorityLevel>(i + static_cast<uint8_t>(reporting::PriorityLevel::First)));
             if ((eid != 0) && (eid >= mSelfVendedEvents[i]))
             {
                 retval = false;
@@ -206,7 +206,8 @@ reporting::PriorityLevel ReadHandler::FindNextPriorityForTransfer(void)
     {
         if ((mLastScheduledEventNumber[i] != 0) && mSelfVendedEvents[i] <= mLastScheduledEventNumber[i])
         {
-            retval = static_cast<chip::app::reporting::PriorityLevel>(static_cast<reporting::PriorityLevel>(i + static_cast<uint8_t>(reporting::PriorityLevel::First)));
+            retval = static_cast<chip::app::reporting::PriorityLevel>(
+                static_cast<reporting::PriorityLevel>(i + static_cast<uint8_t>(reporting::PriorityLevel::First)));
             break;
         }
     }
@@ -220,8 +221,7 @@ CHIP_ERROR ReadHandler::SetEventLogEndpoint(reporting::LoggingManagement & aLogg
 
     VerifyOrExit(aLogger.IsValid(), err = CHIP_ERROR_INCORRECT_STATE);
 
-    err = aLogger.SetLoggingEndpoint(&(mLastScheduledEventNumber[0]),
-                                     CHIP_NUM_PRIORITY_LEVEL);
+    err = aLogger.SetLoggingEndpoint(&(mLastScheduledEventNumber[0]), CHIP_NUM_PRIORITY_LEVEL);
 
 exit:
     return err;

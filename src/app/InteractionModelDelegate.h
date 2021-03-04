@@ -97,7 +97,7 @@ public:
             EventPathParams * eventPathParamsList; //< Pointer to a list of event path parameter ZCL are intereted in
             size_t eventPathParamsListSize;        //< Number of event paths in mpEventPathList
             uint64_t eventNumber; //< A event number it has already to limit the set of retrieved events on the server for
-                                  //optimization purposes
+                                  // optimization purposes
         } mReadRequestPrepareNeeded;
     };
 

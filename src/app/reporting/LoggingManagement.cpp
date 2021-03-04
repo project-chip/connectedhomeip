@@ -479,7 +479,7 @@ LoggingManagement::LoggingManagement(Messaging::ExchangeManager * apMgr, size_t 
 
         current->mFirstEventNumber = (chip::EventNumber) current->mpEventNumberCounter->GetValue();
     }
-    mpEventBuffer = static_cast<CircularEventBuffer *>(apLogStorageResources[CHIP_NUM_PRIORITY_LEVEL-1].mpBuffer);
+    mpEventBuffer = static_cast<CircularEventBuffer *>(apLogStorageResources[CHIP_NUM_PRIORITY_LEVEL - 1].mpBuffer);
 
     mState        = LoggingManagementStates::Idle;
     mBytesWritten = 0;
@@ -953,9 +953,11 @@ CHIP_ERROR LoggingManagement::SetLoggingEndpoint(chip::EventNumber * apEventEndp
 
     while (eventBuffer != NULL && aNumPriorityLevels > 0)
     {
-        if ((eventBuffer->mPriority >= PriorityLevel::First) && (static_cast<size_t>(eventBuffer->mPriority) - static_cast<size_t>(PriorityLevel::First) < aNumPriorityLevels))
+        if ((eventBuffer->mPriority >= PriorityLevel::First) &&
+            (static_cast<size_t>(eventBuffer->mPriority) - static_cast<size_t>(PriorityLevel::First) < aNumPriorityLevels))
         {
-            apEventEndpoints[static_cast<int>(eventBuffer->mPriority) - static_cast<int>(PriorityLevel::First)] = eventBuffer->mLastEventNumber;
+            apEventEndpoints[static_cast<int>(eventBuffer->mPriority) - static_cast<int>(PriorityLevel::First)] =
+                eventBuffer->mLastEventNumber;
         }
         eventBuffer = eventBuffer->mpNext;
     }

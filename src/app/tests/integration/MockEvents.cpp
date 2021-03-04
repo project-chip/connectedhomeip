@@ -113,7 +113,8 @@ chip::EventNumber LivenessEventGenerator::LogLiveness(chip::NodeId aNodeId, chip
                                                       LivenessDeviceStatus aStatus)
 {
     chip::app::reporting::DetailedRootSection root(aNodeId, aEndpointId);
-    chip::app::reporting::EventSchema schema = { kLivenessClusterId, kLivenessChangeEvent, chip::app::reporting::PriorityLevel::Critical };
+    chip::app::reporting::EventSchema schema = { kLivenessClusterId, kLivenessChangeEvent,
+                                                 chip::app::reporting::PriorityLevel::Critical };
     chip::app::reporting::EventOptions options;
     mStatus             = static_cast<int32_t>(aStatus);
     options.eventSource = &root;
