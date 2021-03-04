@@ -60,6 +60,16 @@ class DCState(enum.IntEnum):
     RENDEZVOUS_ONGOING = 3
     RENDEZVOUS_CONNECTED = 4
 
+
+class SetupPayload(Structure):
+    _fields_ = [("version", c_uint8),
+                ("vendorID", c_uint16),
+                ("productID", c_uint16),
+                ("requiresCustomFlow", c_uint8),
+                ("rendezvousInformationFlags", c_uint16),
+                ("discriminator", c_uint16),
+                ("setUpPINCode", c_uint32)]
+
 @_singleton
 class ChipDeviceController(object):
     def __init__(self, startNetworkThread=True, controllerNodeId=0, bluetoothAdapter=0):
@@ -161,6 +171,31 @@ class ChipDeviceController(object):
         )
 
         return (address.value.decode(), port.value) if error == 0 else None
+    def DiscoverCommissioningLongDiscriminator(self, long_discriminator):
+        return self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_DiscoverCommissioningLongDiscriminator(self.devCtrl, long_discriminator)
+        )
+
+    def PrintDiscoveredDevices(self):
+        return self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_PrintDiscoveredDevices(self.devCtrl)
+        )
+
+    def ParseQRCode(self, qrCode, output):
+        print(output)
+        return self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_ParseQRCode(qrCode, output)
+        )
+
+    def GetIPForDiscoveredDevice(self, idx, addrStr, length):
+        return self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_GetIPForDiscoveredDevice(self.devCtrl, idx, addrStr, length)
+        )
+
+    def DiscoverAllCommissioning(self):
+        return self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_DiscoverAllCommissioning(self.devCtrl)
+        )
 
     def ZCLSend(self, cluster, command, nodeid, endpoint, groupid, args):
         device = c_void_p(None)
@@ -223,6 +258,20 @@ class ChipDeviceController(object):
 
             self._dmLib.pychip_DeviceController_ConnectBLE.argtypes = [c_void_p, c_uint16, c_uint32, c_uint64]
             self._dmLib.pychip_DeviceController_ConnectBLE.restype = c_uint32
+
+            self._dmLib.pychip_DeviceController_DiscoverAllCommissioning.argtypes = [c_void_p]
+            self._dmLib.pychip_DeviceController_DiscoverAllCommissioning.restype = c_uint32
+
+            self._dmLib.pychip_DeviceController_DiscoverCommissioningLongDiscriminator.argtypes = [c_void_p, c_uint16]
+            self._dmLib.pychip_DeviceController_DiscoverCommissioningLongDiscriminator.restype = c_uint32
+
+            self._dmLib.pychip_DeviceController_ParseQRCode.argtypes = [c_char_p, POINTER(SetupPayload)]
+            self._dmLib.pychip_DeviceController_ParseQRCode.restype = c_uint32
+
+            self._dmLib.pychip_DeviceController_PrintDiscoveredDevices.argtypes = [c_void_p]
+
+            self._dmLib.pychip_DeviceController_GetIPForDiscoveredDevice.argtypes = [c_void_p, c_int, c_char_p, c_uint32]
+            self._dmLib.pychip_DeviceController_GetIPForDiscoveredDevice.restype = c_bool
 
             self._dmLib.pychip_DeviceController_ConnectIP.argtypes = [c_void_p, c_char_p, c_uint32, c_uint64]
             self._dmLib.pychip_DeviceController_ConnectIP.restype = c_uint32

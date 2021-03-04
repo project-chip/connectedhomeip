@@ -49,6 +49,7 @@
 #include <controller/CHIPDeviceController.h>
 #include <controller/DeviceAddressUpdater.h>
 #include <mdns/Resolver.h>
+#include <setup_payload/QRCodeSetupPayloadParser.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/DLLUtil.h>
@@ -89,6 +90,14 @@ CHIP_ERROR pychip_DeviceController_ConnectBLE(chip::Controller::DeviceCommission
                                               uint32_t setupPINCode, chip::NodeId nodeid);
 CHIP_ERROR pychip_DeviceController_ConnectIP(chip::Controller::DeviceCommissioner * devCtrl, const char * peerAddrStr,
                                              uint32_t setupPINCode, chip::NodeId nodeid);
+
+CHIP_ERROR pychip_DeviceController_ParseQRCode(const char* qrCode, SetupPayload* output);
+
+CHIP_ERROR pychip_DeviceController_DiscoverCommissioningLongDiscriminator(chip::Controller::DeviceCommissioner * devCtrl, uint16_t long_discriminator);
+CHIP_ERROR pychip_DeviceController_DiscoverAllCommissioning(chip::Controller::DeviceCommissioner * devCtrl);
+void pychip_DeviceController_PrintDiscoveredDevices(chip::Controller::DeviceCommissioner * devCtrl);
+bool pychip_DeviceController_GetIPForDiscoveredDevice(chip::Controller::DeviceCommissioner * devCtrl, int idx, char * addrStr,
+                                                      uint32_t len);
 
 // Pairing Delegate
 CHIP_ERROR
@@ -216,6 +225,27 @@ CHIP_ERROR pychip_DeviceController_ConnectBLE(chip::Controller::DeviceCommission
                                    .SetDiscriminator(discriminator));
 }
 
+CHIP_ERROR pychip_DeviceController_ParseQRCode(const char* qrCode, SetupPayload* output)
+{
+    SetupPayload payload;
+    QRCodeSetupPayloadParser parser(qrCode);
+    CHIP_ERROR err = parser.populatePayload(payload);
+    if (err != CHIP_NO_ERROR)
+    {
+        printf("Unable to parse payload\n");
+        return err;
+    }
+    // Python SetupPayload is a simplified version of the C one (only the data members), so add one-by-one to match python.
+    output->version = payload.version;
+    output->vendorID = payload.vendorID;
+    output->productID = payload.productID;
+    output->requiresCustomFlow = payload.requiresCustomFlow;
+    output->rendezvousInformation = payload.rendezvousInformation;
+    output->discriminator = payload.discriminator;
+    output->setUpPINCode = payload.setUpPINCode;
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR pychip_DeviceController_ConnectIP(chip::Controller::DeviceCommissioner * devCtrl, const char * peerAddrStr,
                                              uint32_t setupPINCode, chip::NodeId nodeid)
 {
@@ -229,6 +259,37 @@ CHIP_ERROR pychip_DeviceController_ConnectIP(chip::Controller::DeviceCommissione
     addr.SetTransportType(chip::Transport::Type::kUdp).SetIPAddress(peerAddr);
     params.SetPeerAddress(addr).SetDiscriminator(0);
     return devCtrl->PairDevice(nodeid, params);
+}
+
+CHIP_ERROR pychip_DeviceController_DiscoverAllCommissioning(chip::Controller::DeviceCommissioner * devCtrl)
+{
+    return devCtrl->DiscoverAllCommissioning();
+}
+
+CHIP_ERROR pychip_DeviceController_DiscoverCommissioningLongDiscriminator(chip::Controller::DeviceCommissioner * devCtrl, uint16_t long_discriminator)
+{
+    return devCtrl->DiscoverCommissioningLongDiscriminator(long_discriminator);
+}
+
+void pychip_DeviceController_PrintDiscoveredDevices(chip::Controller::DeviceCommissioner * devCtrl)
+{
+    devCtrl->PrintDiscoveredDevices();
+}
+
+bool pychip_DeviceController_GetIPForDiscoveredDevice(chip::Controller::DeviceCommissioner * devCtrl, int idx, char * addrStr,
+                                                      uint32_t len)
+{
+    const DnsSdInfo * dnsSdInfo = devCtrl->GetDiscoveredDevice(idx);
+    if (dnsSdInfo == nullptr)
+    {
+        return false;
+    }
+    // TODO(cecille): Select which one we actually want.
+    if (dnsSdInfo->ipAddress[0].ToString(addrStr, len) == addrStr)
+    {
+        return true;
+    }
+    return false;
 }
 
 CHIP_ERROR

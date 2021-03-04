@@ -29,6 +29,8 @@ static_library("controller") {
     "CHIPDevice.h",
     "CHIPDeviceController.cpp",
     "CHIPDeviceController.h",
+    "CHIPDiscovery.cpp",
+    "CHIPDiscovery.h",
     "DeviceAddressUpdater.cpp",
     "DeviceAddressUpdater.h",
   ]
