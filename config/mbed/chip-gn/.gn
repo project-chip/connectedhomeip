@@ -26,7 +26,8 @@ default_args = {
 
   default_configs_warnings = [
     "${build_root}/config/compiler:warnings_default",
-    "//:chip_custom_cflags_config"]
+    "//:chip_custom_cflags_config"
+    ]
 
   import("//args.gni")
 }
