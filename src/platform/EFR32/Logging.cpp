@@ -4,6 +4,7 @@
 #include <core/CHIPConfig.h>
 #include <platform/CHIPDeviceConfig.h>
 
+#include <support/SafeString.h>
 #include <support/logging/CHIPLogging.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
@@ -59,7 +60,8 @@
 #define LOG_DETAIL "<detail> "
 #define LOG_LWIP "<lwip  > "
 #define LOG_EFR32 "<efr32 > "
-static constexpr uint8_t kMaxCategoryStrLen = 9;
+// If a new category string LOG_* is created, add it in the MaxStringLength arguments below
+static constexpr size_t kMaxCategoryStrLen = chip::MaxStringLength(LOG_ERROR, LOG_WARN, LOG_DETAIL, LOG_LWIP, LOG_EFR32);
 
 #if EFR32_LOG_ENABLED
 static bool sLogInitialized = false;
@@ -127,7 +129,7 @@ extern "C" void efr32Log(const char * aFormat, ...)
     va_start(v, aFormat);
 #if EFR32_LOG_ENABLED
     char formattedMsg[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
-    static_assert(sizeof(formattedMsg) > kMaxCategoryStrLen);
+    static_assert(sizeof(formattedMsg) > kMaxCategoryStrLen); // Greater than to at least accommodate a ending Null Character
 
     strcpy(formattedMsg, LOG_EFR32);
     size_t prefixLen = strlen(formattedMsg);
