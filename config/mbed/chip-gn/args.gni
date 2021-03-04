@@ -23,7 +23,9 @@ chip_device_project_config_include = ""
 
 chip_custom_build_cflags = [
     "-Wno-shadow",
-    "-Wno-conversion"
+    "-Wno-conversion",
+    "-Wno-maybe-uninitialized",
+    "-Wno-return-type"
     ]
 
 custom_toolchain = "//toolchain:mbed"
