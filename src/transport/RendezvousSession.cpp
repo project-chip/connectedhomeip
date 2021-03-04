@@ -98,10 +98,15 @@ RendezvousSession::~RendezvousSession()
 {
     ReleasePairingSessionHandle();
 
-    if (mTransport)
+    if (mTransport != nullptr)
     {
         chip::Platform::Delete(mTransport);
         mTransport = nullptr;
+    }
+
+    if (mTransportMgr != nullptr)
+    {
+        mTransportMgr->SetRendezvousSession(nullptr);
     }
 
     mDelegate = nullptr;
@@ -158,10 +163,7 @@ CHIP_ERROR RendezvousSession::SendSecureMessage(Protocols::CHIPProtocolId protoc
     return mSecureSessionMgr->SendMessage(*mPairingSessionHandle, payloadHeader, std::move(msgBuf));
 }
 
-void RendezvousSession::OnSessionEstablishmentError(CHIP_ERROR err)
-{
-    OnRendezvousError(err);
-}
+void RendezvousSession::OnSessionEstablishmentError(CHIP_ERROR err) {}
 
 void RendezvousSession::OnSessionEstablished()
 {
@@ -242,28 +244,7 @@ void RendezvousSession::OnRendezvousConnectionClosed()
 
 void RendezvousSession::OnRendezvousError(CHIP_ERROR err)
 {
-    if (mDelegate != nullptr)
-    {
-        switch (mCurrentState)
-        {
-        case State::kSecurePairing:
-            mDelegate->OnRendezvousStatusUpdate(RendezvousSessionDelegate::SecurePairingFailed, err);
-            break;
-
-        case State::kNetworkProvisioning:
-            mDelegate->OnRendezvousStatusUpdate(RendezvousSessionDelegate::NetworkProvisioningFailed, err);
-            break;
-
-        default:
-            break;
-        };
-        mDelegate->OnRendezvousError(err);
-    }
     UpdateState(State::kInit, err);
-    if (mAdmin != nullptr)
-    {
-        mAdmin->Reset();
-    }
 }
 
 void RendezvousSession::UpdateState(RendezvousSession::State newState, CHIP_ERROR err)
@@ -273,7 +254,7 @@ void RendezvousSession::UpdateState(RendezvousSession::State newState, CHIP_ERRO
         switch (mCurrentState)
         {
         case State::kSecurePairing:
-            if (newState != State::kInit)
+            if (CHIP_NO_ERROR == err)
             {
                 mDelegate->OnRendezvousStatusUpdate(RendezvousSessionDelegate::SecurePairingSuccess, err);
             }
@@ -284,7 +265,7 @@ void RendezvousSession::UpdateState(RendezvousSession::State newState, CHIP_ERRO
             break;
 
         case State::kNetworkProvisioning:
-            if (newState != State::kInit)
+            if (CHIP_NO_ERROR == err)
             {
                 mDelegate->OnRendezvousStatusUpdate(RendezvousSessionDelegate::NetworkProvisioningSuccess, err);
             }
@@ -298,6 +279,7 @@ void RendezvousSession::UpdateState(RendezvousSession::State newState, CHIP_ERRO
             break;
         };
     }
+
     mCurrentState = newState;
 
     switch (mCurrentState)
@@ -330,6 +312,19 @@ void RendezvousSession::UpdateState(RendezvousSession::State newState, CHIP_ERRO
             // Free the transport
             chip::Platform::Delete(mTransport);
             mTransport = nullptr;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            if (mAdmin != nullptr)
+            {
+                mAdmin->Reset();
+            }
+
+            if (mDelegate)
+            {
+                mDelegate->OnRendezvousError(err);
+            }
         }
         break;
 
