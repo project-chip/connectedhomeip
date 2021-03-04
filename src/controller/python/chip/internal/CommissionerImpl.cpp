@@ -32,6 +32,9 @@ public:
 
     void GetKeyValue(const char * key) override
     {
+        // TODO: Async Get/Set are implemented synchronously here.
+        // We need to figure out a standard way to implement this - this implementation
+        // was based on an example that just returned and that seemed even less useful.
         uint8_t buffer[kMaxKeyValueSize];
         uint16_t bufferSize = sizeof(buffer) - 1;
         CHIP_ERROR err      = GetKeyValue(key, buffer, bufferSize);
