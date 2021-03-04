@@ -38,6 +38,12 @@ namespace Logging {
 
 #if _CHIP_USE_LOGGING
 
+namespace {
+
+LogRedirectCallback_t sLogRedirectCallback = nullptr;
+
+}
+
 /*
  * Array of strings containing the names for each of the chip log
  * modules.
@@ -94,6 +100,11 @@ void GetModuleName(char * buf, uint8_t bufSize, uint8_t module)
     buf[chip::Logging::kMaxModuleNameLen] = 0;
 }
 
+void SetLogRedirectCallback(LogRedirectCallback_t callback)
+{
+    sLogRedirectCallback = callback;
+}
+
 /**
  * Log, to the platform-specified mechanism, the specified log
  * message, @a msg, for the specified module, @a module, in the
@@ -134,7 +145,15 @@ void LogV(uint8_t module, uint8_t category, const char * msg, va_list args)
 
     char moduleName[chip::Logging::kMaxModuleNameLen + 1];
     GetModuleName(moduleName, sizeof(moduleName), module);
-    Platform::LogV(moduleName, category, msg, args);
+
+    if (sLogRedirectCallback != nullptr)
+    {
+        sLogRedirectCallback(moduleName, category, msg, args);
+    }
+    else
+    {
+        Platform::LogV(moduleName, category, msg, args);
+    }
 }
 
 #if CHIP_LOG_FILTERING

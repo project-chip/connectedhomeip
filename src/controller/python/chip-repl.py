@@ -19,15 +19,30 @@
 
 from IPython import embed
 import chip
+import chip.logging
+import coloredlogs
+import logging
 
 def main():
-    # The chip import at the top level will be visible in the ipython REPL.
+    # The chip imports at the top level will be visible in the ipython REPL.
+
+    coloredlogs.install(level='DEBUG')
+    chip.logging.RedirectToPythonLogging()
+
+    # trace/debug logging is not friendly to an interactive console. Only keep errors.
+    logging.getLogger().setLevel(logging.ERROR)
+
     embed(header = '''
 Welcome to the CHIP python REPL utilty.
 
 Usage examples:
 
 import chip.ble
+
+######## Enable detailed logging if needed #########
+
+import logging
+logging.getLogger().setLevel(logging.DEBUG)
 
 ######## List available BLE adapters #########
 print(chip.ble.GetAdapters())
