@@ -23,6 +23,7 @@ mobly
 
 # zephyr
 west>=0.9.0
+intelhex
 
 # happy tests
 lockfile

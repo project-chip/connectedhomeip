@@ -15,18 +15,6 @@
  */
 
 / {
-
-	/*
-	* In some default configurations within the nRF Connect SDK,
-	* e.g. on nRF52840, the chosen zephyr,entropy node is &cryptocell.
-	* This devicetree overlay ensures that default is overridden wherever it
-	* is set, as this application uses the RNG node for entropy exclusively.
-	*/
-
-	chosen {
-		zephyr,entropy = &rng;
-	};
-
 	/*
 	* By default, PWM module is only configured for led0 (LED1 on the board).
 	* The lighting-app, however, uses LED2 to show the state of the lighting,
@@ -37,14 +25,17 @@
 	};
 
 	pwmleds {
+		compatible = "pwm-leds";
 		pwm_led1: pwm_led_1 {
-			pwms = < &pwm0 0xe >;
+			pwms = < &pwm0 0x1d >;
 		};
 	};
 
 };
 
 &pwm0 {
-	ch1-pin = < 0xe >;
+	/delete-property/ ch0-pin;
+	/delete-property/ ch0-inverted;
+	ch1-pin = < 0x1d >;
 	ch1-inverted;
 };
