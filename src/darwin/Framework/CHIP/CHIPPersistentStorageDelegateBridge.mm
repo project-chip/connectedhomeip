@@ -122,13 +122,17 @@ CHIP_ERROR CHIPPersistentStorageDelegateBridge::GetKeyValue(const char * key, ch
         if (valueString != nil) {
             if (value != nullptr) {
                 size = strlcpy(value, [valueString UTF8String], size);
+                if (size < [valueString length]) {
+                  error = CHIP_ERROR_NO_MEMORY;
+                }
             } else {
                 size = [valueString length];
+                error = CHIP_ERROR_NO_MEMORY;
             }
             // Increment size to account for null termination
             size += 1;
         } else {
-            error = CHIP_ERROR_INVALID_ARGUMENT;
+            error = CHIP_ERROR_KEY_NOT_FOUND;
         }
     });
     return error;
