@@ -15,7 +15,7 @@
  *   limitations under the License.
  *
  */
- #pragma once
+#pragma once
 
 #define CDC_JNI_ERROR_MIN 10000
 #define CDC_JNI_ERROR_MAX 10999

@@ -185,7 +185,6 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(chi
     wrapper->Controller()->SetUdpListenPort(CHIP_PORT + 1);
     *errInfoOnFailure = wrapper->Controller()->Init(nodeId, wrapper.get(), wrapper.get(), systemLayer, inetLayer);
 
-
     if (*errInfoOnFailure != CHIP_NO_ERROR)
     {
         return nullptr;
@@ -298,7 +297,6 @@ void AndroidDeviceControllerWrapper::GetKeyValue(const char * key)
     jclass storageCls   = GetPersistentStorageClass();
     jmethodID method    = GetJavaEnv()->GetStaticMethodID(storageCls, "getKeyValue", "(Ljava/lang/String;)Ljava/lang/String;");
 
-
     GetJavaEnv()->ExceptionClear();
 
     err = N2J_NewStringUTF(GetJavaEnv(), key, keyString);
@@ -306,7 +304,8 @@ void AndroidDeviceControllerWrapper::GetKeyValue(const char * key)
 
     valueString = (jstring) GetJavaEnv()->CallStaticObjectMethod(storageCls, method, keyString);
 
-    if (mStorageResultDelegate) {
+    if (mStorageResultDelegate)
+    {
         mStorageResultDelegate->OnValue(key, GetJavaEnv()->GetStringUTFChars(valueString, 0));
     }
 
@@ -331,15 +330,21 @@ CHIP_ERROR AndroidDeviceControllerWrapper::GetKeyValue(const char * key, char * 
 
     valueString = (jstring) GetJavaEnv()->CallStaticObjectMethod(storageCls, method, keyString);
 
-    if (value != nullptr) {
-        if (valueString != NULL) {
+    if (value != nullptr)
+    {
+        if (valueString != NULL)
+        {
             size = strlcpy(value, GetJavaEnv()->GetStringUTFChars(valueString, 0), size);
-        } else {
+        }
+        else
+        {
             size = 0;
         }
         // Increment size to account for null termination
         size += 1;
-    } else {
+    }
+    else
+    {
         err = CHIP_ERROR_INVALID_ARGUMENT;
     }
 
@@ -353,13 +358,13 @@ exit:
 void AndroidDeviceControllerWrapper::SetKeyValue(const char * key, const char * value)
 {
     jclass storageCls = GetPersistentStorageClass();
-    jmethodID method = GetJavaEnv()->GetStaticMethodID(storageCls, "setKeyValue", "(Ljava/lang/String;Ljava/lang/String;)V");
+    jmethodID method  = GetJavaEnv()->GetStaticMethodID(storageCls, "setKeyValue", "(Ljava/lang/String;Ljava/lang/String;)V");
 
     GetJavaEnv()->ExceptionClear();
 
-    jstring keyString = NULL;
+    jstring keyString   = NULL;
     jstring valueString = NULL;
-    CHIP_ERROR err    = CHIP_NO_ERROR;
+    CHIP_ERROR err      = CHIP_NO_ERROR;
 
     err = N2J_NewStringUTF(GetJavaEnv(), key, keyString);
     SuccessOrExit(err);
@@ -368,7 +373,8 @@ void AndroidDeviceControllerWrapper::SetKeyValue(const char * key, const char * 
 
     GetJavaEnv()->CallStaticVoidMethod(storageCls, method, keyString, valueString);
 
-    if (mStorageResultDelegate) {
+    if (mStorageResultDelegate)
+    {
         mStorageResultDelegate->OnStatus(key, PersistentStorageResultDelegate::Operation::kSET, CHIP_NO_ERROR);
     }
 
@@ -381,7 +387,7 @@ exit:
 void AndroidDeviceControllerWrapper::DeleteKeyValue(const char * key)
 {
     jclass storageCls = GetPersistentStorageClass();
-    jmethodID method = GetJavaEnv()->GetStaticMethodID(storageCls, "deleteKeyValue", "(Ljava/lang/String;)V");
+    jmethodID method  = GetJavaEnv()->GetStaticMethodID(storageCls, "deleteKeyValue", "(Ljava/lang/String;)V");
 
     GetJavaEnv()->ExceptionClear();
 
@@ -393,7 +399,8 @@ void AndroidDeviceControllerWrapper::DeleteKeyValue(const char * key)
 
     GetJavaEnv()->CallStaticVoidMethod(storageCls, method, keyString);
 
-    if (mStorageResultDelegate) {
+    if (mStorageResultDelegate)
+    {
         mStorageResultDelegate->OnStatus(key, PersistentStorageResultDelegate::Operation::kDELETE, CHIP_NO_ERROR);
     }
 

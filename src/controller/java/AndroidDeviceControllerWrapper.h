@@ -30,7 +30,9 @@
  *
  * Generally it contains the DeviceController class itself, plus any related delegates/callbacks.
  */
-class AndroidDeviceControllerWrapper : public chip::Controller::DevicePairingDelegate, public chip::Controller::DeviceStatusDelegate, public chip::PersistentStorageDelegate
+class AndroidDeviceControllerWrapper : public chip::Controller::DevicePairingDelegate,
+                                       public chip::Controller::DeviceStatusDelegate,
+                                       public chip::PersistentStorageDelegate
 {
 public:
     ~AndroidDeviceControllerWrapper();
@@ -81,17 +83,14 @@ private:
 
     ChipDeviceControllerPtr mController;
     chip::RendezvousDeviceCredentialsDelegate * mCredentialsDelegate = nullptr;
-    chip::PersistentStorageResultDelegate * mStorageResultDelegate = nullptr;
-
+    chip::PersistentStorageResultDelegate * mStorageResultDelegate   = nullptr;
 
     JavaVM * mJavaVM       = nullptr;
     jobject mJavaObjectRef = nullptr;
 
     JNIEnv * GetJavaEnv();
 
-    jclass GetPersistentStorageClass() {
-        return GetJavaEnv()->FindClass("chip/devicecontroller/PersistentStorage");
-    }
+    jclass GetPersistentStorageClass() { return GetJavaEnv()->FindClass("chip/devicecontroller/PersistentStorage"); }
 
     AndroidDeviceControllerWrapper(ChipDeviceControllerPtr controller) : mController(std::move(controller)) {}
 };

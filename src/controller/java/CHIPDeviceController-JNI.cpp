@@ -394,8 +394,8 @@ JNI_METHOD(void, pairTestDeviceWithoutSecurity)(JNIEnv * env, jobject self, jlon
     {
         ScopedPthreadLock lock(&sStackLock);
         Controller::SerializedDevice mSerializedTestDevice;
-        err = wrapper->Controller()->PairTestDeviceWithoutSecurity(
-            kRemoteDeviceId, chip::Transport::PeerAddress::UDP(deviceIPAddr), mSerializedTestDevice);
+        err = wrapper->Controller()->PairTestDeviceWithoutSecurity(kRemoteDeviceId, chip::Transport::PeerAddress::UDP(deviceIPAddr),
+                                                                   mSerializedTestDevice);
     }
 
     if (err != CHIP_NO_ERROR)
@@ -475,8 +475,8 @@ JNI_METHOD(jstring, getIpAddress)(JNIEnv * env, jobject self, jlong handle, jint
 
 JNI_METHOD(void, sendMessage)(JNIEnv * env, jobject self, jlong handle, jint deviceId, jstring messageObj)
 {
-    CHIP_ERROR err                           = CHIP_NO_ERROR;
-    Device * chipDevice                      = nullptr;
+    CHIP_ERROR err      = CHIP_NO_ERROR;
+    Device * chipDevice = nullptr;
 
     ChipLogProgress(Controller, "sendMessage() called with device id and message object");
 
@@ -566,18 +566,20 @@ JNI_METHOD(void, sendCommand)(JNIEnv * env, jobject self, jlong handle, jint dev
 
 JNI_METHOD(jboolean, openPairingWindow)(JNIEnv * env, jobject self, jlong handle, jint deviceId, jint duration)
 {
-    CHIP_ERROR err                  = CHIP_NO_ERROR;
-    Device * chipDevice             = nullptr;
+    CHIP_ERROR err      = CHIP_NO_ERROR;
+    Device * chipDevice = nullptr;
     chip::SetupPayload setupPayload;
 
     GetCHIPDevice(env, handle, deviceId, &chipDevice);
 
     {
         ScopedPthreadLock lock(&sStackLock);
-        err = chipDevice->OpenPairingWindow(duration, chip::Controller::Device::PairingWindowOption::kOriginalSetupCode, setupPayload);
+        err = chipDevice->OpenPairingWindow(duration, chip::Controller::Device::PairingWindowOption::kOriginalSetupCode,
+                                            setupPayload);
     }
 
-    if (err != CHIP_NO_ERROR) {
+    if (err != CHIP_NO_ERROR)
+    {
         ChipLogError(Controller, "OpenPairingWindow failed: %d", err);
         return false;
     }
