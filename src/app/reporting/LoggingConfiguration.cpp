@@ -1,6 +1,8 @@
-/**
+/*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2015-2017 Nest Labs, Inc.
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,26 +17,23 @@
  *    limitations under the License.
  */
 
-/**
- * @file
- * @brief The include file for all the types for the data model that are not
- *        dependent on an individual application configuration.
- */
-
-#pragma once
-
-#include <stdint.h>
-
-// Pull in NodeId
-#include <transport/raw/MessageHeader.h>
+#include "LoggingConfiguration.h"
+#include "EventLoggingTypes.h"
+#include <core/CHIPEventLoggingConfig.h>
 
 namespace chip {
-typedef uint8_t EndpointId;
-typedef uint16_t ClusterId;
-typedef uint16_t AttributeId;
-typedef uint16_t GroupId;
-typedef uint8_t CommandId;
-typedef uint16_t EventId;
-typedef uint64_t EventNumber;
-typedef uint64_t DataVersion;
+namespace app {
+namespace reporting {
+
+LoggingConfiguration::LoggingConfiguration(void) : mGlobalPriority(PriorityLevel::Critical) {}
+
+LoggingConfiguration & LoggingConfiguration::GetInstance(void)
+{
+    static LoggingConfiguration sInstance;
+
+    return sInstance;
+}
+
+} // namespace reporting
+} // namespace app
 } // namespace chip

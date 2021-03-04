@@ -82,6 +82,19 @@ CHIPCircularTLVBuffer::CHIPCircularTLVBuffer(uint8_t * inBuffer, uint32_t inBuff
  */
 CHIPCircularTLVBuffer::CHIPCircularTLVBuffer(uint8_t * inBuffer, uint32_t inBufferLength)
 {
+    Init(inBuffer, inBufferLength);
+}
+
+/**
+ * @brief
+ *   CHIPCircularTLVBuffer Init function
+ *
+ * @param[in] inBuffer       A pointer to the backing store for the queue
+ *
+ * @param[in] inBufferLength Length, in bytes, of the backing store
+ */
+void CHIPCircularTLVBuffer::Init(uint8_t * inBuffer, uint32_t inBufferLength)
+{
     mQueue       = inBuffer;
     mQueueSize   = inBufferLength;
     mQueueLength = 0;
