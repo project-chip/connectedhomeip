@@ -21,7 +21,10 @@ import("${chip_root}/build/chip/chip_test_suite.gni")
 chip_test_suite("tests") {
   output_name = "libAppTests"
 
-  test_sources = [ "TestMessageDef.cpp" ]
+  test_sources = [
+    "TestEventLogging.cpp",
+    "TestMessageDef.cpp",
+  ]
 
   cflags = [ "-Wconversion" ]
 
