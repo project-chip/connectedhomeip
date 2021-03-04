@@ -202,11 +202,10 @@ chip::System::PacketBufferHandle encodeBarrierControlClusterReadClusterRevisionA
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * MfgSpecificPing                                                   |   0x00 |
-| * ResetToFactoryDefaults                                            |   0x00 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
-| * ZclVersion                                                        | 0x0000 |
-| * PowerSource                                                       | 0x0007 |
+| * InteractionModelVersion                                           | 0x0000 |
+| * HardwareVersion                                                   | 0x0007 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -218,28 +217,23 @@ chip::System::PacketBufferHandle encodeBasicClusterMfgSpecificPingCommand(uint8_
 
 /**
  * @brief
- *    Encode an ResetToFactoryDefaults command for Basic server into buffer including the APS frame
- */
-chip::System::PacketBufferHandle encodeBasicClusterResetToFactoryDefaultsCommand(uint8_t seqNum,
-                                                                                 chip::EndpointId destinationEndpoint);
-
-/**
- * @brief
  *    Encode a Basic server discover command into buffer including the APS frame
  */
 chip::System::PacketBufferHandle encodeBasicClusterDiscoverAttributes(uint8_t seqNum, chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
- *    Encode a Basic server read command for the ZCL version attribute into buffer including the APS frame
+ *    Encode a Basic server read command for the InteractionModelVersion attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeBasicClusterReadZclVersionAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeBasicClusterReadInteractionModelVersionAttribute(uint8_t seqNum,
+                                                                                        chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
- *    Encode a Basic server read command for the power source attribute into buffer including the APS frame
+ *    Encode a Basic server read command for the HardwareVersion attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeBasicClusterReadPowerSourceAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeBasicClusterReadHardwareVersionAttribute(uint8_t seqNum,
+                                                                                chip::EndpointId destinationEndpoint);
 
 /**
  * @brief

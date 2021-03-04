@@ -170,32 +170,38 @@ limitations under the License.
   <cluster singleton="true">
     <name>Basic</name>
     <domain>General</domain>
-    <description>Attributes for determining basic information about a device, setting user device information such as location, and enabling a device.</description>
-    <code>0x0000</code>
+    <description>Attributes for determining basic information about a device, and setting user device information such as location.</description>
+    <code>0x0028</code>
     <define>BASIC_CLUSTER</define>
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="3"/>
-    <attribute side="server" code="0x0000" define="VERSION" type="INT8U" min="0x00" max="0xFF" writable="false" default="0x08" optional="false">ZCL version</attribute>
-    <!-- ZCL_VERSION -->
-    <attribute side="server" code="0x0001" define="APPLICATION_VERSION" type="INT8U" min="0x00" max="0xFF" writable="false" default="0x00" optional="true">application version</attribute>
-    <attribute side="server" code="0x0002" define="STACK_VERSION" type="INT8U" min="0x00" max="0xFF" writable="false" default="0x00" optional="true">stack version</attribute>
-    <attribute side="server" code="0x0003" define="HW_VERSION" type="INT8U" min="0x00" max="0xFF" writable="false" default="0x00" optional="true">hardware version</attribute>
-    <attribute side="server" code="0x0004" define="MANUFACTURER_NAME" type="CHAR_STRING" length="32" writable="false" default="" optional="true">manufacturer name</attribute>
-    <attribute side="server" code="0x0005" define="MODEL_IDENTIFIER" type="CHAR_STRING" length="32" writable="false" default="" optional="true">model identifier</attribute>
-    <attribute side="server" code="0x0006" define="DATE_CODE" type="CHAR_STRING" length="16" writable="false" default="" optional="true">date code</attribute>
-    <attribute side="server" code="0x0007" define="POWER_SOURCE" type="ENUM8" min="0x00" max="0xFF" writable="false" default="0x00" optional="false">power source</attribute>
-    <attribute side="server" code="0x0008" define="GENERIC_DEVICE_CLASS" type="ENUM8" min="0x00" max="0xFF" writable="false" default="0xFF" optional="true" introducedIn="l&amp;o-1.0-15-0014-04">generic device class</attribute>
-    <attribute side="server" code="0x0009" define="GENERIC_DEVICE_TYPE" type="ENUM8" min="0x00" max="0xFF" writable="false" default="0xFF" optional="true" introducedIn="l&amp;o-1.0-15-0014-04">generic device type</attribute>
-    <attribute side="server" code="0x000A" define="PRODUCT_CODE" type="OCTET_STRING" length="16" writable="false" optional="true" introducedIn="l&amp;o-1.0-15-0014-04">product code</attribute>
-    <attribute side="server" code="0x000B" define="PRODUCT_URL" type="CHAR_STRING" length="64" writable="false" optional="true" introducedIn="l&amp;o-1.0-15-0014-04">product url</attribute>
-    <attribute side="server" code="0x0010" define="LOCATION_DESCRIPTION" type="CHAR_STRING" length="16" writable="true" default="" optional="true">location description</attribute>
-    <attribute side="server" code="0x0011" define="PHYSICAL_ENVIRONMENT" type="ENUM8" min="0x00" max="0xFF" writable="true" default="0x00" optional="true">physical environment</attribute>
-    <attribute side="server" code="0x0012" define="DEVICE_ENABLED" type="BOOLEAN" min="0x00" max="0x01" writable="true" default="0x01" optional="true">device enabled</attribute>
-    <attribute side="server" code="0x0013" define="ALARM_MASK" type="BITMAP8" min="0x00" max="0x03" writable="true" default="0x00" optional="true">alarm mask</attribute>
-    <attribute side="server" code="0x0014" define="DISABLE_LOCAL_CONFIG" type="BITMAP8" min="0x00" max="0x03" writable="true" default="0x00" optional="true">disable local config</attribute>
-    <command source="client" code="0x00" name="ResetToFactoryDefaults" optional="true" cli="zcl basic rtfd">
-      <description>Command that resets all attribute values to factory default.</description>
+
+    <attribute side="server" code="0x0000" define="INTERACTION_MODEL_VERSION" type="INT16U" min="0x0000" max="0xFFFF" writable="false" optional="false">InteractionModelVersion</attribute>
+    <attribute side="server" code="0x0001" define="VENDOR_NAME" type="CHAR_STRING" length="32" writable="false" default="" optional="false">VendorName</attribute>
+    <attribute side="server" code="0x0002" define="VENDOR_ID" type="INT16U" min="0x0000" max="0xFFFF" writable="false" optional="false">VendorID</attribute>
+    <attribute side="server" code="0x0003" define="PRODUCT_NAME" type="CHAR_STRING" length="32" writable="false" default="" optional="false">ProductName</attribute>
+    <attribute side="server" code="0x0004" define="PRODUCT_ID" type="INT16U" min="0x0000" max="0xFFFF" writable="false" optional="false">ProductID</attribute>
+    <attribute side="server" code="0x0005" define="USER_LABEL" type="CHAR_STRING" length="32" writable="true" default="" optional="false">UserLabel</attribute>
+    <attribute side="server" code="0x0006" define="LOCATION" type="CHAR_STRING" length="16" writable="true" default="" optional="false">Location</attribute>
+    <attribute side="server" code="0x0007" define="HARDWARE_VERSION" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x00" optional="false">HardwareVersion</attribute>
+    <attribute side="server" code="0x0008" define="HARDWARE_VERSION_STRING" type="CHAR_STRING" length="64" writable="false" default="" optional="false">HardwareVersionString</attribute>
+    <attribute side="server" code="0x0009" define="SOFTWARE_VERSION" type="INT32U" min="0x0000" max="0xFFFF" writable="false" default="0x00" optional="false">SoftwareVersion</attribute>
+    <attribute side="server" code="0x000A" define="SOFTWARE_VERSION_STRING" type="CHAR_STRING" length="64" writable="false" default="" optional="false">SoftwareVersionString</attribute>
+    <attribute side="server" code="0x000B" define="MANUFACTURING_DATE" type="CHAR_STRING" length="16" writable="false" default="" optional="true">ManufacturingDate</attribute>
+    <attribute side="server" code="0x000C" define="PART_NUMBER" type="CHAR_STRING" writable="false" optional="true">PartNumber</attribute>
+    <attribute side="server" code="0x000D" define="PRODUCT_URL" type="CHAR_STRING" writable="false" optional="true">ProductURL</attribute>
+    <attribute side="server" code="0x000E" define="PRODUCT_LABEL" type="CHAR_STRING" length="64" writable="false" default="" optional="true">ProductLabel</attribute>
+    <attribute side="server" code="0x000F" define="SERIAL_NUMBER" type="CHAR_STRING" length="32" writable="false" default="" optional="true">SerialNumber</attribute>
+    <attribute side="server" code="0x0010" define="LOCAL_CONFIG_DISABLED" type="BOOLEAN" min="0x00" max="0x01" writable="true" default="0x00" optional="true">LocalConfigDisabled</attribute>
+    <command source="server" code="0x00" name="StartUp" optional="false">
+      <description>The StartUp event SHALL be emitted by a Node as soon as reasonable after completing a boot or reboot process.</description>
+    </command>
+    <command source="server" code="0x01" name="ShutDown" optional="false">
+      <description>The ShutDown event SHOULD be emitted by a Node prior to any orderly shutdown sequence on a best-effort basis.</description>
+    </command>
+    <command source="server" code="0x02" name="Leave" optional="false">
+      <description>The Leave event SHOULD be emitted by a Node prior to permanently leaving the Fabric.</description>
     </command>
   </cluster>
   <cluster singleton="true">

@@ -942,11 +942,10 @@ private:
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * MfgSpecificPing                                                   |   0x00 |
-| * ResetToFactoryDefaults                                            |   0x00 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
-| * ZclVersion                                                        | 0x0000 |
-| * PowerSource                                                       | 0x0007 |
+| * InteractionModelVersion                                           | 0x0000 |
+| * HardwareVersion                                                   | 0x0007 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -965,30 +964,6 @@ public:
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
         return cluster.MfgSpecificPing(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
-    }
-
-private:
-    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
-        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-};
-
-/*
- * Command ResetToFactoryDefaults
- */
-class BasicResetToFactoryDefaults : public ModelCommand
-{
-public:
-    BasicResetToFactoryDefaults() : ModelCommand("reset-to-factory-defaults") { ModelCommand::AddArguments(); }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000) command (0x00) on endpoint %" PRIu16, endpointId);
-
-        chip::Controller::BasicCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.ResetToFactoryDefaults(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
     }
 
 private:
@@ -1023,14 +998,14 @@ private:
 };
 
 /*
- * Attribute ZclVersion
+ * Attribute InteractionModelVersion
  */
-class ReadBasicZclVersion : public ModelCommand
+class ReadBasicInteractionModelVersion : public ModelCommand
 {
 public:
-    ReadBasicZclVersion() : ModelCommand("read")
+    ReadBasicInteractionModelVersion() : ModelCommand("read")
     {
-        AddArgument("attr-name", "zcl-version");
+        AddArgument("attr-name", "interaction-model-version");
         ModelCommand::AddArguments();
     }
 
@@ -1040,25 +1015,25 @@ public:
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeZclVersion(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttributeInteractionModelVersion(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
     }
 
 private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
 };
 
 /*
- * Attribute PowerSource
+ * Attribute HardwareVersion
  */
-class ReadBasicPowerSource : public ModelCommand
+class ReadBasicHardwareVersion : public ModelCommand
 {
 public:
-    ReadBasicPowerSource() : ModelCommand("read")
+    ReadBasicHardwareVersion() : ModelCommand("read")
     {
-        AddArgument("attr-name", "power-source");
+        AddArgument("attr-name", "hardware-version");
         ModelCommand::AddArguments();
     }
 
@@ -1068,12 +1043,12 @@ public:
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributePowerSource(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttributeHardwareVersion(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
     }
 
 private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
 };
@@ -7181,8 +7156,11 @@ void registerClusterBasic(Commands & commands)
     const char * clusterName = "Basic";
 
     commands_list clusterCommands = {
-        make_unique<BasicMfgSpecificPing>(), make_unique<BasicResetToFactoryDefaults>(), make_unique<DiscoverBasicAttributes>(),
-        make_unique<ReadBasicZclVersion>(),  make_unique<ReadBasicPowerSource>(),        make_unique<ReadBasicClusterRevision>(),
+        make_unique<BasicMfgSpecificPing>(),
+        make_unique<DiscoverBasicAttributes>(),
+        make_unique<ReadBasicInteractionModelVersion>(),
+        make_unique<ReadBasicHardwareVersion>(),
+        make_unique<ReadBasicClusterRevision>(),
     };
 
     commands.Register(clusterName, clusterCommands);
