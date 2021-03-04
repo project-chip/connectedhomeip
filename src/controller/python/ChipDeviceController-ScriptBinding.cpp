@@ -119,7 +119,8 @@ CHIP_ERROR pychip_DeviceController_NewDeviceController(chip::Controller::DeviceC
     {
         localDeviceId = kDefaultLocalDeviceId;
     }
-    SuccessOrExit(err = (*outDevCtrl)->Init(localDeviceId, &sStorageDelegate, &sPairingDelegate, nullptr, nullptr, bluetoothAdapterId));
+    SuccessOrExit(
+        err = (*outDevCtrl)->Init(localDeviceId, &sStorageDelegate, &sPairingDelegate, nullptr, nullptr, bluetoothAdapterId));
     SuccessOrExit(err = (*outDevCtrl)->ServiceEvents());
 
 exit:
