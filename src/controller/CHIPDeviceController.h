@@ -117,7 +117,7 @@ public:
      * System::Layer and InetLayer.
      */
     CHIP_ERROR Init(NodeId localDeviceId, PersistentStorageDelegate * storageDelegate = nullptr,
-                    System::Layer * systemLayer = nullptr, Inet::InetLayer * inetLayer = nullptr);
+                    System::Layer * systemLayer = nullptr, Inet::InetLayer * inetLayer = nullptr, uint32_t bluetoothAdapterId = 0);
 
     virtual CHIP_ERROR Shutdown();
 
@@ -260,7 +260,7 @@ public:
      */
     CHIP_ERROR Init(NodeId localDeviceId, PersistentStorageDelegate * storageDelegate = nullptr,
                     DevicePairingDelegate * pairingDelegate = nullptr, System::Layer * systemLayer = nullptr,
-                    Inet::InetLayer * inetLayer = nullptr);
+                    Inet::InetLayer * inetLayer = nullptr, uint32_t bluetoothAdapterId = 0);
 
     void SetDevicePairingDelegate(DevicePairingDelegate * pairingDelegate) { mPairingDelegate = pairingDelegate; }
 

@@ -94,7 +94,7 @@ DeviceController::DeviceController()
 }
 
 CHIP_ERROR DeviceController::Init(NodeId localDeviceId, PersistentStorageDelegate * storageDelegate, System::Layer * systemLayer,
-                                  Inet::InetLayer * inetLayer)
+                                  Inet::InetLayer * inetLayer, uint32_t bluetoothAdapterId)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -112,7 +112,7 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, PersistentStorageDelegat
 #if CONFIG_DEVICE_LAYER
 #if CHIP_DEVICE_LAYER_TARGET_LINUX && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
         // By default, Linux device is configured as a BLE peripheral while the controller needs a BLE central.
-        err = DeviceLayer::Internal::BLEMgrImpl().ConfigureBle(/* BLE adapter ID */ 0, /* BLE central */ true);
+        err = DeviceLayer::Internal::BLEMgrImpl().ConfigureBle(/* BLE adapter ID */ bluetoothAdapterId, /* BLE central */ true);
         SuccessOrExit(err);
 #endif // CHIP_DEVICE_LAYER_TARGET_LINUX && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
@@ -538,9 +538,9 @@ DeviceCommissioner::DeviceCommissioner()
 
 CHIP_ERROR DeviceCommissioner::Init(NodeId localDeviceId, PersistentStorageDelegate * storageDelegate,
                                     DevicePairingDelegate * pairingDelegate, System::Layer * systemLayer,
-                                    Inet::InetLayer * inetLayer)
+                                    Inet::InetLayer * inetLayer, uint32_t bluetoothAdapterId)
 {
-    CHIP_ERROR err = DeviceController::Init(localDeviceId, storageDelegate, systemLayer, inetLayer);
+    CHIP_ERROR err = DeviceController::Init(localDeviceId, storageDelegate, systemLayer, inetLayer, bluetoothAdapterId);
     SuccessOrExit(err);
 
     mPairingDelegate = pairingDelegate;

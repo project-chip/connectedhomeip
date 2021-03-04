@@ -1547,6 +1547,11 @@ CHIP_ERROR InitBluezBleLayer(bool aIsCentral, char * apBleAddr, BLEAdvConfig & a
         err = ConfigureBluezAdv(aBleAdvConfig, endpoint);
         SuccessOrExit(err);
     }
+    else
+    {
+        // TODO: The "node id" means the bluetooth adapter on linux, this is confusing and should have a better name.
+        endpoint->mNodeId = aBleAdvConfig.mNodeId;
+    }
 
     err = MainLoop::Instance().EnsureStarted();
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "Failed to start BLE main loop"));

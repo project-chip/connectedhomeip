@@ -61,7 +61,7 @@ class DCState(enum.IntEnum):
 
 @_singleton
 class ChipDeviceController(object):
-    def __init__(self, startNetworkThread=True, controllerNodeId=0):
+    def __init__(self, startNetworkThread=True, controllerNodeId=0, bluetoothAdapter=0):
         self.state = DCState.NOT_INITIALIZED
         self.devCtrl = None
         self._ChipStack = ChipStack()
@@ -70,7 +70,7 @@ class ChipDeviceController(object):
         self._InitLib()
 
         devCtrl = c_void_p(None)
-        res = self._dmLib.pychip_DeviceController_NewDeviceController(pointer(devCtrl), controllerNodeId)
+        res = self._dmLib.pychip_DeviceController_NewDeviceController(pointer(devCtrl), controllerNodeId, bluetoothAdapter)
         if res != 0:
             raise self._ChipStack.ErrorToException(res)
 
@@ -169,7 +169,7 @@ class ChipDeviceController(object):
             self._dmLib = CDLL(self._ChipStack.LocateChipDLL())
 
             self._dmLib.pychip_DeviceController_NewDeviceController.argtypes = [
-                POINTER(c_void_p), c_uint64
+                POINTER(c_void_p), c_uint64, c_uint32
             ]
             self._dmLib.pychip_DeviceController_NewDeviceController.restype = c_uint32
 
