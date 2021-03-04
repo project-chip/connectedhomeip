@@ -67,6 +67,10 @@
 namespace chip {
 namespace Logging {
 
+using LogRedirectCallback_t = void (*)(const char * module, uint8_t category, const char * msg, va_list args);
+
+void SetLogRedirectCallback(LogRedirectCallback_t callback);
+
 void LogV(uint8_t module, uint8_t category, const char * msg, va_list args);
 void Log(uint8_t module, uint8_t category, const char * msg, ...);
 

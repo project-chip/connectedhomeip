@@ -199,40 +199,40 @@ EmberAfStatus emberAfBarrierControlClusterClientPreAttributeChangedCallback(chip
 void emberAfBarrierControlClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
-// Basic Cluster client
+// Basic Cluster server
 //
 
-/** @brief Basic Cluster Client Init
+/** @brief Basic Cluster Server Init
  *
- * Client Init
+ * Server Init
  *
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfBasicClusterClientInitCallback(chip::EndpointId endpoint);
+void emberAfBasicClusterServerInitCallback(chip::EndpointId endpoint);
 
-/** @brief Basic Cluster Client Attribute Changed
+/** @brief Basic Cluster Server Attribute Changed
  *
- * Client Attribute Changed
+ * Server Attribute Changed
  *
  * @param endpoint    Endpoint that is being initialized
  * @param attributeId Attribute that changed
  */
-void emberAfBasicClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+void emberAfBasicClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 
-/** @brief Basic Cluster Client Manufacturer Specific Attribute Changed
+/** @brief Basic Cluster Server Manufacturer Specific Attribute Changed
  *
- * Client Manufacturer Specific Attribute Changed
+ * Server Manufacturer Specific Attribute Changed
  *
  * @param endpoint          Endpoint that is being initialized
  * @param attributeId       Attribute that changed
  * @param manufacturerCode  Manufacturer Code of the attribute that changed
  */
-void emberAfBasicClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
+void emberAfBasicClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                            uint16_t manufacturerCode);
 
-/** @brief Basic Cluster Client Message Sent
+/** @brief Basic Cluster Server Message Sent
  *
- * Client Message Sent
+ * Server Message Sent
  *
  * @param type               The type of message sent
  * @param indexOrDestination The destination or address to which the message was sent
@@ -241,12 +241,12 @@ void emberAfBasicClusterClientManufacturerSpecificAttributeChangedCallback(chip:
  * @param message            The message that was sent
  * @param status             The status of the sent message
  */
-void emberAfBasicClusterClientMessageSentCallback(EmberOutgoingMessageType type, uint64_t indexOrDestination,
+void emberAfBasicClusterServerMessageSentCallback(EmberOutgoingMessageType type, uint64_t indexOrDestination,
                                                   EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message, EmberStatus status);
 
-/** @brief Basic Cluster Client Pre Attribute Changed
+/** @brief Basic Cluster Server Pre Attribute Changed
  *
- * client Pre Attribute Changed
+ * server Pre Attribute Changed
  *
  * @param endpoint      Endpoint that is being initialized
  * @param attributeId   Attribute to be changed
@@ -254,17 +254,17 @@ void emberAfBasicClusterClientMessageSentCallback(EmberOutgoingMessageType type,
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfBasicClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
+EmberAfStatus emberAfBasicClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                    EmberAfAttributeType attributeType, uint8_t size,
                                                                    uint8_t * value);
 
-/** @brief Basic Cluster Client Tick
+/** @brief Basic Cluster Server Tick
  *
- * client Tick
+ * server Tick
  *
  * @param endpoint  Endpoint that is being served
  */
-void emberAfBasicClusterClientTickCallback(chip::EndpointId endpoint);
+void emberAfBasicClusterServerTickCallback(chip::EndpointId endpoint);
 
 //
 // Binding Cluster client

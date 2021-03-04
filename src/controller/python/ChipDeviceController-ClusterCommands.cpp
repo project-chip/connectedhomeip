@@ -57,24 +57,6 @@ CHIP_ERROR chip_ime_AppendCommand_BarrierControl_BarrierControlStop(chip::Contro
 // End of Cluster BarrierControl
 
 // Cluster Basic
-CHIP_ERROR chip_ime_AppendCommand_Basic_MfgSpecificPing(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
-                                                        chip::GroupId ZCLgroupId)
-{
-    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    chip::Controller::BasicCluster clusterBasic;
-    (void) ZCLgroupId;
-    clusterBasic.Associate(device, ZCLendpointId);
-    return clusterBasic.MfgSpecificPing(nullptr, nullptr);
-}
-CHIP_ERROR chip_ime_AppendCommand_Basic_ResetToFactoryDefaults(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
-                                                               chip::GroupId ZCLgroupId)
-{
-    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    chip::Controller::BasicCluster clusterBasic;
-    (void) ZCLgroupId;
-    clusterBasic.Associate(device, ZCLendpointId);
-    return clusterBasic.ResetToFactoryDefaults(nullptr, nullptr);
-}
 // End of Cluster Basic
 
 // Cluster Binding

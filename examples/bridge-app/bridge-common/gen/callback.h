@@ -272,12 +272,6 @@ void emberAfOnOffClusterServerTickCallback(chip::EndpointId endpoint);
 // Cluster Commands Callback
 
 /**
- * @brief Basic Cluster ResetToFactoryDefaults Command callback
- */
-
-bool emberAfBasicClusterResetToFactoryDefaultsCallback();
-
-/**
  * @brief Level Control Cluster Move Command callback
  * @param moveMode
  * @param rate
