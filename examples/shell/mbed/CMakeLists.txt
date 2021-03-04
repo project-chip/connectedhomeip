@@ -19,6 +19,10 @@ set(APP_TARGET chip-mbed-shell-example)
 include(${MBED_PATH}/tools/cmake/app.cmake)
 add_subdirectory(${MBED_PATH} ./mbed_build)
 
+if("wifi_ism43362" IN_LIST MBED_TARGET_LABELS)
+    add_subdirectory(wifi-ism43362)
+endif()
+
 add_executable(${APP_TARGET})
 
 target_include_directories(${APP_TARGET} PRIVATE
@@ -44,7 +48,13 @@ mbed_set_mbed_target_linker_script(${APP_TARGET})
 
 project(${APP_TARGET})
 
-target_link_libraries(${APP_TARGET} mbed-os mbed-events mbed-storage mbed-storage-kv-global-api mbed-mbedtls mbed-mbedtls-cryptocell310 chip)
+if("wifi_ism43362" IN_LIST MBED_TARGET_LABELS)
+    target_link_libraries(${APP_TARGET}
+            wifi-ism43362
+    )
+endif()
+
+target_link_libraries(${APP_TARGET} mbed-os mbed-events mbed-netsocket mbed-storage mbed-storage-kv-global-api mbed-mbedtls mbed-mbedtls-cryptocell310 chip)
 
 mbed_set_post_build(${APP_TARGET})
 

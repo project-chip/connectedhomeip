@@ -17,8 +17,8 @@
  */
 
 #pragma once
-
 #include <platform/ConnectivityManager.h>
+#include <platform/internal/DeviceNetworkInfo.h>
 #include <platform/internal/GenericConnectivityManagerImpl.h>
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #include <platform/internal/GenericConnectivityManagerImpl_BLE.h>
@@ -109,6 +109,9 @@ public:
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
     void StartWiFiManagement();
 #endif
+    int ScanWiFi(int APlimit, ::chip::DeviceLayer::Internal::NetworkInfo * wifiInfo) { return 0; }
+    void GetWifiStatus(::chip::DeviceLayer::Internal::NetworkStatus * WifiStatus) {}
+    void SetWifiSecurity(::chip::DeviceLayer::Internal::WiFiAuthSecurityType security) {}
 
 private:
     // ===== Members that implement the ConnectivityManager abstract interface.

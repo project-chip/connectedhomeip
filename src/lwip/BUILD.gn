@@ -65,17 +65,21 @@ buildconfig_header("lwip_buildconfig") {
     if (current_os == "android") {
       defines += [ "LWIP_NO_STDINT_H=1" ]
     }
-
-    if (lwip_platform == "mbed") { 
-      defines += [ "LWIP_NO_STDINT_H=1", "IN_ADDR_T_DEFINED=1" ]
-    }
   }
 }
 
 if (current_os == "zephyr") {
   group("lwip") {
   }
-} else if (lwip_platform == "external") {
+} else if (current_os == "mbed") {
+  group("lwip") {
+    public_deps = [ ":lwip_buildconfig" ]
+  }
+
+  group("all") {
+    deps = [ ":lwip" ]
+  }
+}  else if (lwip_platform == "external") {
   group("lwip") {
     public_deps = [ ":lwip_buildconfig" ]
   }
@@ -104,9 +108,6 @@ if (current_os == "zephyr") {
     if (lwip_platform == "standalone") {
       public += [ "standalone/arch/sys_arch.h" ]
       sources += [ "standalone/sys_arch.c" ]
-    } else if (lwip_platform == "mbed") {
-      public += [ "mbed/arch/sys_arch.h" ]
-      sources += [ "mbed/sys_arch.c" ]
     } else {
       public += [
         "${lwip_platform}/lwippools.h",
