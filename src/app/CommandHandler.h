@@ -24,13 +24,9 @@
 
 #pragma once
 
-#ifndef _CHIP_INTERACTION_MODEL_COMMAND_HANDLER_H
-#define _CHIP_INTERACTION_MODEL_COMMAND_HANDLER_H
-
 #include <app/Command.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPTLVDebug.hpp>
-#include <map>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
@@ -43,7 +39,7 @@
 namespace chip {
 namespace app {
 
-class DLL_EXPORT CommandHandler : public Command
+class CommandHandler : public Command
 {
 public:
     CHIP_ERROR SendCommandResponse();
@@ -55,5 +51,3 @@ private:
 };
 } // namespace app
 } // namespace chip
-
-#endif // _CHIP_INTERACTION_MODEL_COMMAND_HANDLER_H
