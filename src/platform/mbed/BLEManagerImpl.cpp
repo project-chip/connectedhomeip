@@ -33,8 +33,8 @@
 #include <support/logging/CHIPLogging.h>
 
 // FIXME temporary macros
+// Show BLE status with LEDs
 #define _BLEMGRIMPL_USE_LEDS 1
-#define _BLEMGRIMPL_USE_MBED_EVENTS 0
 // Disable advertising autostart for development.
 #define CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART 0
 
@@ -53,11 +53,6 @@
 
 #if _BLEMGRIMPL_USE_LEDS
 #include "drivers/DigitalOut.h"
-#endif
-
-#if _BLEMGRIMPL_USE_MBED_EVENTS
-#include "events/mbed_events.h"
-#include "rtos/Thread.h"
 #endif
 
 using namespace ::chip;
@@ -86,12 +81,6 @@ const ChipBleUUID ChipUUID_CHIPoBLEChar_TX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0
 mbed::DigitalOut led1(LED1, 1);
 mbed::DigitalOut led2(LED2, 1);
 mbed::DigitalOut led3(LED3, 1);
-#endif
-
-// FIXME use CHIP platform for deferred calls
-#if _BLEMGRIMPL_USE_MBED_EVENTS
-events::EventQueue event_queue(32 * EVENTS_EVENT_SIZE);
-rtos::Thread event_thread;
 #endif
 
 struct ConnectionInfo
@@ -510,13 +499,6 @@ CHIP_ERROR BLEManagerImpl::_Init()
     CHIP_ERROR err       = CHIP_NO_ERROR;
     ble_error_t mbed_err = BLE_ERROR_NONE;
 
-#if _BLEMGRIMPL_USE_MBED_EVENTS
-    event_thread.start(mbed::callback(&event_queue, &events::EventQueue::dispatch_forever));
-    ChipLogDetail(DeviceLayer, "Processing BLE events with Mbed EventQueue");
-#else
-    ChipLogDetail(DeviceLayer, "Processing BLE events with CHIP PlatformMgr");
-#endif
-
     mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
     mFlags       = CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART ? kFlag_AdvertisingEnabled : 0;
     mGAPConns    = 0;
@@ -528,13 +510,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
     SuccessOrExit(err);
 
     ble_interface.onEventsToProcess(FunctionPointerWithContext<ble::BLE::OnEventsToProcessCallbackContext *>{
-        [](ble::BLE::OnEventsToProcessCallbackContext * context) {
-#if _BLEMGRIMPL_USE_MBED_EVENTS
-            event_queue.call(DoBLEProcessing, 0);
-#else
-            PlatformMgr().ScheduleWork(DoBLEProcessing, 0);
-#endif
-        } });
+        [](ble::BLE::OnEventsToProcessCallbackContext * context) { PlatformMgr().ScheduleWork(DoBLEProcessing, 0); } });
 
     mbed_err = ble_interface.init([](ble::BLE::InitializationCompleteCallbackContext * context) {
         BLEMgrImpl().HandleInitComplete(context->error == BLE_ERROR_NONE);
@@ -564,10 +540,8 @@ void BLEManagerImpl::HandleInitComplete(bool no_error)
 
     VerifyOrExit(no_error, err = CHIP_ERROR_INTERNAL);
 
-#if _IMPL_READY_BLEPLATFORMDELEGATE && _IMPL_READY_BLEAPPLICATIONDELEGATE
     err = BleLayer::Init(this, this, &SystemLayer);
     SuccessOrExit(err);
-#endif
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
 #if _BLEMGRIMPL_USE_LEDS
     led2 = 0;
@@ -846,7 +820,6 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 {
     switch (event->Type)
     {
-#if _IMPL_READY_BLEPLATFORMDELEGATE && _IMPL_READY_BLEAPPLICATIONDELEGATE
     case DeviceEventType::kCHIPoBLESubscribe: {
         ChipDeviceEvent connEstEvent;
 
@@ -881,7 +854,6 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         HandleIndicationConfirmation(event->CHIPoBLEIndicateConfirm.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_TX);
     }
     break;
-#endif
 
     default:
         ChipLogProgress(DeviceLayer, "_OnPlatformEvent default:  event->Type = 0x%x", event->Type);
