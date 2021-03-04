@@ -43,6 +43,7 @@ shared_library("ChipDeviceCtrl") {
     "ChipDeviceController-ScriptDevicePairingDelegate.h",
     "ChipDeviceController-StorageDelegate.cpp",
     "ChipDeviceController-StorageDelegate.h",
+    "chip/logging/LoggingRedirect.cpp",
     "chip/native/StackInit.cpp",
   ]
 
@@ -82,6 +83,9 @@ pw_python_action("python") {
         "chip/ChipUtility.py",
         "chip/__init__.py",
         "chip/exceptions/__init__.py",
+        "chip/logging/__init__.py",
+        "chip/logging/library_handle.py",
+        "chip/logging/types.py",
         "chip/native/__init__.py",
         "chip/tlv/__init__.py",
       ]

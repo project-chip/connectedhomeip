@@ -107,21 +107,23 @@ try:
             bdist_wheel.finalize_options(self)
             self.root_is_pure = False
 
-    requiredPackages = []
+    requiredPackages = [
+        "ipython",
+        "coloredlogs",
+    ]
 
-    requiredPackages.append('ipython')
 
     if platform.system() == 'Darwin':
         requiredPackages.append('pyobjc')
-    
+
     if platform.system() == 'Linux':
         requiredPackages.append('dbus-python')
         requiredPackages.append('pygobject')
-    
+
     #
     # Build the chip package...
     #
-     
+
     # Invoke the setuptools 'bdist_wheel' command to generate a wheel containing
     # the CHIP python packages, shared libraries and scripts.
     setup(
@@ -142,6 +144,7 @@ try:
             'chip',
             'chip.ble',
             'chip.exceptions',
+            'chip.logging',
             'chip.native',
             'chip.tlv',
         ],
