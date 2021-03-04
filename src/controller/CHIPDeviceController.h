@@ -28,8 +28,11 @@
 
 #pragma once
 
+#include <optional>
+
 #include <app/InteractionModelDelegate.h>
 #include <controller/CHIPDevice.h>
+#include <controller/CHIPDiscovery.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPPersistentStorageDelegate.h>
 #include <core/CHIPTLV.h>
@@ -367,10 +370,37 @@ public:
      */
     CHIP_ERROR CloseBleConnection();
 #endif
+    /**
+     * @brief
+     *   Discovery devices advertising as commissionable that match the long descriptor.
+     * @return CHIP_ERROR   The return status
+     */
+    CHIP_ERROR DiscoverCommissioningLongDiscriminator(uint16_t long_discriminator);
+
+    /**
+     * @brief
+     *   Discovery all devices advertising as commissionable.
+     * @return CHIP_ERROR   The return status
+     */
+    CHIP_ERROR DiscoverAllCommissioning();
+
+    /**
+     * @brief
+     *   Helper function to print device info for device selection.
+     */
+    void PrintDiscoveredDevices();
+
+    /**
+     * @brief
+     *   Returns information about discovered devices.
+     * @return const DnsSdInfo* info about the selected device. May be nullptr if no information has been returned yet.
+     */
+    const DnsSdInfo* GetDiscoveredDevice(int idx);
 
 private:
     DevicePairingDelegate * mPairingDelegate;
     RendezvousSession * mRendezvousSession;
+    DeviceDiscovery discoveryAgent;
 
     /* This field is an index in mActiveDevices list. The object at this index in the list
        contains the device object that's tracking the state of the device that's being paired.

@@ -44,6 +44,7 @@
 #include <core/CHIPCore.h>
 #include <core/CHIPEncoding.h>
 #include <core/CHIPSafeCasts.h>
+#include <setup_payload/QRCodeSetupPayloadParser.h>
 #include <support/Base64.h>
 #include <support/CHIPArgParser.hpp>
 #include <support/CHIPMem.h>
@@ -661,6 +662,7 @@ CHIP_ERROR DeviceCommissioner::Init(NodeId localDeviceId, CommissionerInitParams
     {
         mNextKeyId = 0;
     }
+    discoveryAgent.SetInetLayer(mInetLayer);
 
     mPairingDelegate = params.pairingDelegate;
     return CHIP_NO_ERROR;
@@ -1012,6 +1014,51 @@ void DeviceCommissioner::OnSessionEstablishmentTimeout()
 void DeviceCommissioner::OnSessionEstablishmentTimeoutCallback(System::Layer * aLayer, void * aAppState, System::Error aError)
 {
     reinterpret_cast<DeviceCommissioner *>(aAppState)->OnSessionEstablishmentTimeout();
+}
+
+CHIP_ERROR DeviceCommissioner::DiscoverAllCommissioning()
+{
+    discoveryAgent.FindAvailableDevices(DiscoveryType::COMMISSIONING);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DeviceCommissioner::DiscoverCommissioningLongDiscriminator(uint16_t long_discriminator)
+{
+    discoveryAgent.FindAvailableDevicesLongDiscriminator(DiscoveryType::COMMISSIONING, long_discriminator);
+    return CHIP_NO_ERROR;
+}
+
+void DeviceCommissioner::PrintDiscoveredDevices()
+{
+    for (int i = 0; i < 10; ++i)
+    {
+        const DnsSdInfo * dnsSdInfo = discoveryAgent.GetDiscoveredDevice(i);
+        if (dnsSdInfo == nullptr)
+        {
+            break;
+        }
+        printf("Device %d\n", i);
+        printf("\tInstance name:\t\t%s\n", dnsSdInfo->instanceName);
+        printf("\tHost name:\t\t%s\n", dnsSdInfo->hostName);
+        printf("\tLong discriminator:\t%u\n", dnsSdInfo->longDiscriminator);
+        printf("\tVendor ID:\t\t%u\n", dnsSdInfo->vendorId);
+        printf("\tProduct ID:\t\t%u\n", dnsSdInfo->productId);
+        for (int j = 0; j < DnsSdInfo::kNumIpAddresses; ++j)
+        {
+            if (dnsSdInfo->ipAddress[j].Type() == Inet::kIPAddressType_Any)
+            {
+                break;
+            }
+            char buf[50];
+            dnsSdInfo->ipAddress[j].ToString(buf);
+            printf("\tAddress %d:\t\t%s\n", j, buf);
+        }
+    }
+}
+
+const DnsSdInfo * DeviceCommissioner::GetDiscoveredDevice(int idx)
+{
+    return discoveryAgent.GetDiscoveredDevice(idx);
 }
 
 } // namespace Controller
