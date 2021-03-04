@@ -1,0 +1,155 @@
+/*
+ *
+ *    Copyright (c) 2021 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+/**
+ *    @file
+ *      This file defines Reporting Engine for a CHIP Interaction Model
+ *
+ */
+
+#pragma once
+
+#include <app/MessageDef/ReportData.h>
+#include <app/ReadHandler.h>
+#include <app/reporting/EventLoggingTypes.h>
+#include <app/reporting/LoggingManagement.h>
+#include <core/CHIPCore.h>
+#include <messaging/ExchangeContext.h>
+#include <messaging/ExchangeMgr.h>
+#include <protocols/Protocols.h>
+#include <support/CodeUtils.h>
+#include <support/logging/CHIPLogging.h>
+#include <system/SystemPacketBuffer.h>
+#include <system/TLVPacketBufferBackingStore.h>
+#include <util/basic-types.h>
+
+namespace chip {
+namespace app {
+namespace reporting {
+/*
+ *  @class ReportingEngine
+ *
+ *  @brief The reporting engine is responsible for generating reports to subscriber and reader. It is able to find the intersection
+ * between the path interest set of each subscriber/reader with what has changed in the publisher data store and generate tailored
+ * reports for each subscriber/reader.
+ *
+ *         At its core, it  tries to gather and pack as much relevant attributes changes and/or events as possible into a report
+ * message before sending that to the subscriber/reader. It continues to do so until it has no more work to do. This could be due to
+ * a couple of reasons:
+ *
+ *         - Reports are in flight to the subscribers/readers
+ *         - We have exceeded the maximum number of reports that can be flight across all subscribers/readers.
+ *         - We have no more space in the packet to stuff in more data.
+ *         - We have no more dirty data to process.
+ *
+ *         Once it surmises there is no more work to be done, it returns. If all work for a read has been completed, it will
+ *         invoke a method in the ReadHandler to finish processing.
+ *
+ */
+class ReportingEngine
+{
+public:
+    /**
+     * Initializes the reporting engine. Should only be called once.
+     *
+     * @retval #CHIP_NO_ERROR On success.
+     * @retval other           Was unable to retrieve data and write it into the writer.
+     */
+    CHIP_ERROR Init();
+
+    /**
+     * Main work-horse function that executes the run-loop.
+     */
+    void Run();
+
+    /**
+     * Main work-horse function that executes the run-loop asynchronously on the CHIP thread
+     */
+    void ScheduleRun();
+
+private:
+    /**
+     * Build Event list via retrieving event stream from circular event buffers
+     *
+     * @param[in]    aReportDataBuilder    A Report Data Builder
+     * @param[in]    apReadHandler         A pointer to the RenaderHandler object
+     * @retval #CHIP_NO_ERROR On success.
+     * @retval other           Was unable to retrieve events and write it into the writer.
+     */
+    CHIP_ERROR BuildSingleReportDataEventList(ReportData::Builder & aReportDataBuilder, ReadHandler * apReadHandler);
+
+    /**
+     * Build Single Report Data including attribute changes and event data stream, and send out
+     *
+     * @param[in]    apReadHandler    A pointer to the RenaderHandler object
+     * @retval #CHIP_NO_ERROR On success.
+     * @retval other           Was unable to retrieve data and write it into the writer.
+     */
+    CHIP_ERROR BuildAndSendSingleReportData(ReadHandler * apReadHandler);
+
+    /**
+     * Send Report via ReadHandler
+     *
+     * @param[in]    apReadHandler    A pointer to the RenaderHandler object
+     * @param[in]    aPayload        A payload that has report data
+     * @retval #CHIP_NO_ERROR On success.
+     * @retval other           Was unable to send report
+     */
+    CHIP_ERROR SendReport(ReadHandler * apReadHandler, System::PacketBufferHandle && aPayload);
+
+    /**
+     * Should be invoked when the device receives a Status report, or when the Report data request times out.
+     * This allows the engine to do some clean-up.
+     *
+     */
+    void OnReportConfirm();
+
+    /**
+     * Generate and send the report data request when there exists subscription or read request
+     *
+     */
+    static void Run(System::Layer * aSystemLayer, void * apAppState, System::Error);
+
+    /**
+     * Counts sent event number from the buffers for all priority level
+     *
+     */
+    chip::EventNumber CountEvents(ReadHandler * apReadHandler, chip::EventNumber * apInitialEvents);
+
+    /**
+     * Boolean to show if more chunk message on the way
+     *
+     */
+    bool mMoreChunkedMessages;
+
+    /**
+     * The number of report date request in flight
+     *
+     */
+    uint32_t mNumReportsInFlight;
+
+    /**
+     *  Current read handler index
+     *
+     */
+    uint32_t mCurReadHandlerIdx;
+};
+
+}; // namespace reporting
+}; // namespace app
+}; // namespace chip
