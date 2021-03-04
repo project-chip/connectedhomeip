@@ -23,20 +23,24 @@
 namespace chip {
 
 /**
- * @brief A wrapper class for holding bytes buffer and its length, without the ownership of buffer.
+ * @brief A wrapper class for holding objects and its length, without the ownership of it.
+ * We can use C++20 std::span once we support it, the begin() and size() come from C++20 std::span.
  */
-class BytesData
+template <class T>
+class Span
 {
 public:
-    BytesData() : mDataBuf(nullptr), mDataLen(0) {}
-    BytesData(const uint8_t * databuf, size_t datalen) : mDataBuf(databuf), mDataLen(datalen) {}
+    Span() : mDataBuf(nullptr), mDataLen(0) {}
+    Span(const T * databuf, size_t datalen) : mDataBuf(databuf), mDataLen(datalen) {}
 
-    const uint8_t * Data() const { return mDataBuf; }
-    size_t Length() const { return mDataLen; }
+    const T * data() const { return mDataBuf; }
+    size_t size() const { return mDataLen; }
 
 private:
-    const uint8_t * mDataBuf;
+    const T * mDataBuf;
     size_t mDataLen;
 };
+
+using ByteSpan = Span<uint8_t>;
 
 } // namespace chip

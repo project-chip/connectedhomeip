@@ -4,7 +4,7 @@
 
 #include <app/CommandSender.h>
 #include <app/InteractionModelEngine.h>
-#include <lib/support/BytesData.h>
+#include <lib/support/Span.h>
 #include <support/ReturnMacros.h>
 
 #include <controller/CHIPClusters.h>
@@ -24,7 +24,7 @@ CHIP_ERROR chip_ime_AppendCommand_{{asCamelCased clusterName false}}_{{asCamelCa
     chip::Controller::{{asCamelCased clusterName false}}Cluster cluster{{asCamelCased clusterName false}};
     (void) ZCLgroupId;
     cluster{{asCamelCased clusterName false}}.Associate(device, ZCLendpointId);
-    return cluster{{asCamelCased clusterName false}}.{{asCamelCased name false}}(nullptr, nullptr{{#chip_server_cluster_command_arguments}}, {{#if (isByteString type)}}chip::BytesData({{asCamelCased label}}, {{asCamelCased label}}_Len){{else}}{{asCamelCased label}}{{/if}}
+    return cluster{{asCamelCased clusterName false}}.{{asCamelCased name false}}(nullptr, nullptr{{#chip_server_cluster_command_arguments}}, {{#if (isByteString type)}}chip::ByteSpan({{asCamelCased label}}, {{asCamelCased label}}_Len){{else}}{{asCamelCased label}}{{/if}}
     {{/chip_server_cluster_command_arguments}});
 }
 {{/chip_server_cluster_commands}}

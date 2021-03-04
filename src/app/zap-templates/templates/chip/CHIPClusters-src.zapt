@@ -4,7 +4,7 @@
 #include <cstdint>
 
 #include <app/chip-zcl-zpro-codec-api.h>
-#include <lib/support/BytesData.h>
+#include <lib/support/Span.h>
 #include <support/ReturnMacros.h>
 
 namespace chip {

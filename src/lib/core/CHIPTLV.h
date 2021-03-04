@@ -31,7 +31,7 @@
 #include <core/CHIPTLVTags.h>
 #include <core/CHIPTLVTypes.h>
 
-#include <support/BytesData.h>
+#include <support/Span.h>
 #include <support/DLLUtil.h>
 
 #include <stdarg.h>
@@ -1081,13 +1081,13 @@ public:
     CHIP_ERROR Put(uint64_t tag, float v);
 
     /**
-     * Encodes a TLV byte string value using BytesData class.
+     * Encodes a TLV byte string value using ByteSpan class.
      *
      * @param[in]   tag             The TLV tag to be encoded with the value, or @p AnonymousTag if the
      *                              value should be encoded without a tag.  Tag values should be
      *                              constructed with one of the tag definition functions ProfileTag(),
      *                              ContextTag() or CommonTag().
-     * @param[in]   data            A BytesData object containing the bytes string to be encoded.
+     * @param[in]   data            A ByteSpan object containing the bytes string to be encoded.
      *
      * @retval #CHIP_NO_ERROR      If the method succeeded.
      * @retval #CHIP_ERROR_TLV_CONTAINER_OPEN
@@ -1106,7 +1106,7 @@ public:
      *                              TLVBackingStore.
      *
      */
-    CHIP_ERROR Put(uint64_t tag, BytesData data);
+    CHIP_ERROR Put(uint64_t tag, ByteSpan data);
 
     /**
      * Encodes a TLV boolean value.

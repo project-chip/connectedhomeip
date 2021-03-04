@@ -9,7 +9,7 @@
 #import "gen/CHIPClientCallbacks.h"
 
 #include <controller/CHIPClusters.h>
-#include <lib/support/BytesData.h>
+#include <lib/support/Span.h>
 
 using namespace ::chip;
 
