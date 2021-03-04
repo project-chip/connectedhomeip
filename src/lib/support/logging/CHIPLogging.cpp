@@ -33,6 +33,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <atomic>
+
 namespace chip {
 namespace Logging {
 
@@ -40,7 +42,7 @@ namespace Logging {
 
 namespace {
 
-LogRedirectCallback_t sLogRedirectCallback = nullptr;
+std::atomic<LogRedirectCallback_t> sLogRedirectCallback{ nullptr };
 
 }
 
@@ -102,7 +104,7 @@ void GetModuleName(char * buf, uint8_t bufSize, uint8_t module)
 
 void SetLogRedirectCallback(LogRedirectCallback_t callback)
 {
-    sLogRedirectCallback = callback;
+    sLogRedirectCallback.store(callback);
 }
 
 /**
@@ -146,9 +148,11 @@ void LogV(uint8_t module, uint8_t category, const char * msg, va_list args)
     char moduleName[chip::Logging::kMaxModuleNameLen + 1];
     GetModuleName(moduleName, sizeof(moduleName), module);
 
-    if (sLogRedirectCallback != nullptr)
+    LogRedirectCallback_t redirect = sLogRedirectCallback.load();
+
+    if (redirect != nullptr)
     {
-        sLogRedirectCallback(moduleName, category, msg, args);
+        redirect(moduleName, category, msg, args);
     }
     else
     {
