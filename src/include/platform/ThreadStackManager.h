@@ -74,12 +74,19 @@ public:
     CHIP_ERROR GetAndLogThreadTopologyMinimal();
     CHIP_ERROR GetAndLogThreadTopologyFull();
     CHIP_ERROR GetPrimary802154MACAddress(uint8_t * buf);
-    CHIP_ERROR GetSlaacIPv6Address(chip::Inet::IPAddress & addr);
+    CHIP_ERROR GetExternalIPv6Address(chip::Inet::IPAddress & addr);
 
     CHIP_ERROR JoinerStart();
     CHIP_ERROR SetThreadProvision(const Internal::DeviceNetworkInfo & netInfo);
     CHIP_ERROR SetThreadProvision(const uint8_t * operationalDataset, size_t operationalDatasetLen);
     CHIP_ERROR SetThreadEnabled(bool val);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+    CHIP_ERROR AddSrpService(const char * aInstanceName, const char * aName, uint16_t aPort, uint32_t aLeaseInterval,
+                             uint32_t aKeyLeaseInterval);
+    CHIP_ERROR RemoveSrpService(const char * aInstanceName, const char * aName);
+    CHIP_ERROR SetupSrpHost(const char * aHostName);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 
 private:
     // ===== Members for internal use by the following friends.
@@ -218,6 +225,24 @@ inline CHIP_ERROR ThreadStackManager::SetThreadEnabled(bool val)
     return static_cast<ImplClass *>(this)->_SetThreadEnabled(val);
 }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+inline CHIP_ERROR ThreadStackManager::AddSrpService(const char * aInstanceName, const char * aName, uint16_t aPort,
+                                                    uint32_t aLeaseInterval = 0, uint32_t aKeyLeaseInterval = 0)
+{
+    return static_cast<ImplClass *>(this)->_AddSrpService(aInstanceName, aName, aPort, aLeaseInterval, aKeyLeaseInterval);
+}
+
+inline CHIP_ERROR ThreadStackManager::RemoveSrpService(const char * aInstanceName, const char * aName)
+{
+    return static_cast<ImplClass *>(this)->_RemoveSrpService(aInstanceName, aName);
+}
+
+inline CHIP_ERROR ThreadStackManager::SetupSrpHost(const char * aHostName)
+{
+    return static_cast<ImplClass *>(this)->_SetupSrpHost(aHostName);
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+
 inline bool ThreadStackManager::IsThreadProvisioned()
 {
     return static_cast<ImplClass *>(this)->_IsThreadProvisioned();
@@ -308,9 +333,9 @@ inline CHIP_ERROR ThreadStackManager::GetPrimary802154MACAddress(uint8_t * buf)
     return static_cast<ImplClass *>(this)->_GetPrimary802154MACAddress(buf);
 }
 
-inline CHIP_ERROR ThreadStackManager::GetSlaacIPv6Address(chip::Inet::IPAddress & addr)
+inline CHIP_ERROR ThreadStackManager::GetExternalIPv6Address(chip::Inet::IPAddress & addr)
 {
-    return static_cast<ImplClass *>(this)->_GetSlaacIPv6Address(addr);
+    return static_cast<ImplClass *>(this)->_GetExternalIPv6Address(addr);
 }
 
 inline CHIP_ERROR ThreadStackManager::JoinerStart()
