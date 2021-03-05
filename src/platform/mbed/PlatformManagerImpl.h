@@ -69,6 +69,7 @@ private:
     friend PlatformManager & PlatformMgr(void);
     friend PlatformManagerImpl & PlatformMgrImpl(void);
     friend class Internal::BLEManagerImpl;
+    friend class ConnectivityManagerImpl;
 
     static PlatformManagerImpl sInstance;
 
@@ -94,13 +95,6 @@ inline PlatformManager & PlatformMgr(void)
 {
     return PlatformManagerImpl::sInstance;
 }
-
-/**
- * Returns the public interface of the PlatformManager singleton object.
- *
- * chip applications should use this to access features of the PlatformManager object
- * that are specific to mbed based platforms.
- */
 inline PlatformManagerImpl & PlatformMgrImpl(void)
 {
     return PlatformManagerImpl::sInstance;

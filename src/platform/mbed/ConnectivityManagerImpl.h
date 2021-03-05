@@ -18,6 +18,7 @@
 #pragma once
 
 #include <platform/ConnectivityManager.h>
+#include <platform/internal/DeviceNetworkInfo.h>
 #include <platform/internal/GenericConnectivityManagerImpl.h>
 #include <platform/internal/GenericConnectivityManagerImpl_WiFi.h>
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
@@ -30,10 +31,10 @@
 #else
 #include <platform/internal/GenericConnectivityManagerImpl_NoThread.h>
 #endif
-
-#include <inttypes.h>
+#include "netsocket/WiFiInterface.h"
 #include <support/logging/CHIPLogging.h>
 
+#include <inttypes.h>
 namespace chip {
 namespace Inet {
 class IPAddress;
@@ -68,33 +69,33 @@ class ConnectivityManagerImpl final : public ConnectivityManager,
 
 public:
     CHIP_ERROR ProvisionWiFiNetwork(const char * ssid, const char * key);
-    CHIP_ERROR ScanWiFi();
-    CHIP_ERROR WiFiScanResults();
-    CHIP_ERROR OnStationConnected();
-    CHIP_ERROR OnStationDisconnected();
-    CHIP_ERROR WiFiConnect();
-    CHIP_ERROR WiFiDisconnect();
-
-    // TODO
     void StartWiFiManagement() {}
+    int ScanWiFi(int APlimit, ::chip::DeviceLayer::Internal::NetworkInfo * wifiInfo);
+    void GetWifiStatus(::chip::DeviceLayer::Internal::NetworkStatus * WifiStatus);
+    void SetWifiSecurity(::chip::DeviceLayer::Internal::WiFiAuthSecurityType security);
 
 private:
     // ===== Members that implement the ConnectivityManager abstract interface.
-    WiFiStationMode _GetWiFiStationMode(void);
-    CHIP_ERROR _SetWiFiStationMode(WiFiStationMode val);
-    bool _IsWiFiStationConnected(void);
-    bool _IsWiFiStationEnabled(void);
-    bool _IsWiFiStationProvisioned(void);
-    void _ClearWiFiStationProvision(void);
-    CHIP_ERROR GetWifiParams(void);
-    CHIP_ERROR _SetWiFiAPMode(WiFiAPMode val);
     bool _HaveIPv4InternetConnectivity(void);
     bool _HaveIPv6InternetConnectivity(void);
     bool _HaveServiceConnectivity(void);
     CHIP_ERROR _Init(void);
     void _OnPlatformEvent(const ChipDeviceEvent * event);
-    bool _IsWiFiStationApplicationControlled(void) { return mWiFiStationMode == kWiFiStationMode_ApplicationControlled; }
+    void OnInterfaceEvent(nsapi_event_t event, intptr_t data);
+    WiFiStationMode _GetWiFiStationMode(void);
+    CHIP_ERROR _SetWiFiStationMode(WiFiStationMode val);
 
+    bool _IsWiFiStationConnected(void);
+    bool _IsWiFiStationEnabled(void);
+    bool _IsWiFiStationProvisioned(void);
+    void _ClearWiFiStationProvision(void);
+    bool _IsWiFiStationApplicationControlled(void);
+    CHIP_ERROR _SetWiFiAPMode(WiFiAPMode val);
+
+    CHIP_ERROR OnStationConnected();
+    CHIP_ERROR OnStationDisconnected();
+    const char * status2str(nsapi_connection_status_t sec);
+    ::chip::DeviceLayer::Internal::WiFiAuthSecurityType NsapiToNetworkSecurity(nsapi_security_t nsapi_security);
     // ===== Members for internal use by the following friends.
 
     friend ConnectivityManager & ConnectivityMgr(void);
@@ -103,13 +104,17 @@ private:
     static ConnectivityManagerImpl sInstance;
     WiFiStationMode mWiFiStationMode;
     WiFiStationState mWiFiStationState;
+    WiFiAPMode mWiFiAPMode;
     uint32_t mWiFiStationReconnectIntervalMS;
     uint32_t mWiFiAPIdleTimeoutMS;
+    bool mIsProvisioned;
+    WiFiInterface * _interface;
+    nsapi_security_t _security = NSAPI_SECURITY_WPA_WPA2;
 };
 
 inline bool ConnectivityManagerImpl::_HaveIPv4InternetConnectivity(void)
 {
-    return false;
+    return mWiFiStationState == kWiFiStationState_Connected;
 }
 
 inline bool ConnectivityManagerImpl::_HaveIPv6InternetConnectivity(void)
@@ -119,7 +124,7 @@ inline bool ConnectivityManagerImpl::_HaveIPv6InternetConnectivity(void)
 
 inline bool ConnectivityManagerImpl::_HaveServiceConnectivity(void)
 {
-    return false;
+    return mWiFiStationState == kWiFiStationState_Connected;
 }
 
 /**

@@ -25,6 +25,13 @@ chip_inet_config_enable_udp_endpoint = true
 chip_inet_config_enable_tcp_endpoint = true
 chip_inet_config_enable_dns_resolver = false
 
+chip_custom_build_cflags = [
+    "-Wno-shadow",
+    "-Wno-conversion",
+    "-Wno-maybe-uninitialized",
+    "-Wno-return-type"
+    ]
+
 custom_toolchain = "//toolchain:mbed"
 mbedtls_target = "//mbedtls:mbedtls"
 
