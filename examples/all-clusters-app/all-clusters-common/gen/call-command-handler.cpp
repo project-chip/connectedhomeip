@@ -92,8 +92,7 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
             result = emberAfBarrierControlClusterServerCommandParse(cmd);
             break;
         case ZCL_BASIC_CLUSTER_ID:
-            // No commands are enabled for cluster Basic
-            result = status(false, true, cmd->mfgSpecific);
+            result = emberAfBasicClusterServerCommandParse(cmd);
             break;
         case ZCL_BINDING_CLUSTER_ID:
             result = emberAfBindingClusterServerCommandParse(cmd);
@@ -168,6 +167,33 @@ EmberAfStatus emberAfBarrierControlClusterServerCommandParse(EmberAfClusterComma
         }
         case ZCL_BARRIER_CONTROL_STOP_COMMAND_ID: {
             wasHandled = emberAfBarrierControlClusterBarrierControlStopCallback();
+            break;
+        }
+        default: {
+            // Unrecognized command ID, error status will apply.
+            break;
+        }
+        }
+    }
+    return status(wasHandled, true, cmd->mfgSpecific);
+}
+EmberAfStatus emberAfBasicClusterServerCommandParse(EmberAfClusterCommand * cmd)
+{
+    bool wasHandled = false;
+
+    if (cmd->mfgSpecific)
+    {
+        if (cmd->mfgCode == 4098 && cmd->commandId == ZCL_MFG_SPECIFIC_PING_COMMAND_ID)
+        {
+            wasHandled = emberAfBasicClusterMfgSpecificPingCallback();
+        }
+    }
+    else
+    {
+        switch (cmd->commandId)
+        {
+        case ZCL_RESET_TO_FACTORY_DEFAULTS_COMMAND_ID: {
+            wasHandled = emberAfBasicClusterResetToFactoryDefaultsCallback();
             break;
         }
         default: {

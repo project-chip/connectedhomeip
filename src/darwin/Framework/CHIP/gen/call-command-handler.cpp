@@ -29,7 +29,7 @@
 using namespace chip;
 
 EmberAfStatus emberAfBarrierControlClusterClientCommandParse(EmberAfClusterCommand * cmd);
-EmberAfStatus emberAfBasicClusterServerCommandParse(EmberAfClusterCommand * cmd);
+EmberAfStatus emberAfBasicClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfBindingClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfColorControlClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfDoorLockClusterClientCommandParse(EmberAfClusterCommand * cmd);
@@ -71,6 +71,10 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
         {
         case ZCL_BARRIER_CONTROL_CLUSTER_ID:
             // No commands are enabled for cluster Barrier Control
+            result = status(false, true, cmd->mfgSpecific);
+            break;
+        case ZCL_BASIC_CLUSTER_ID:
+            // No commands are enabled for cluster Basic
             result = status(false, true, cmd->mfgSpecific);
             break;
         case ZCL_BINDING_CLUSTER_ID:
@@ -115,10 +119,6 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
     {
         switch (cmd->apsFrame->clusterId)
         {
-        case ZCL_BASIC_CLUSTER_ID:
-            // No commands are enabled for cluster Basic
-            result = status(false, true, cmd->mfgSpecific);
-            break;
         default:
             // Unrecognized cluster ID, error status will apply.
             break;
