@@ -34,7 +34,7 @@ echo_bold_white() {
     echo -e "\033[1;37m$*\033[0m"
 }
 
-# Assume MaxOS BigSur is used if compiling on MAC
+# Assume macOS BigSur is used if compiling on MAC
 export MACOSX_DEPLOYMENT_TARGET=10.16
 
 CHIP_ROOT=$(realpath "$(dirname "$0")/..")
