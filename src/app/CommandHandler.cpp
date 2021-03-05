@@ -42,7 +42,7 @@ void CommandHandler::OnMessageReceived(Messaging::ExchangeContext * ec, const Pa
 
     mpExchangeCtx = ec;
 
-    err = ProcessCommandMessage(std::move(payload), kCommandHandlerId);
+    err = ProcessCommandMessage(std::move(payload), CommandRoleId::HandlerId);
     SuccessOrExit(err);
 
     SendCommandResponse();
@@ -63,7 +63,7 @@ CHIP_ERROR CommandHandler::SendCommandResponse()
                                      Messaging::SendFlags(Messaging::SendMessageFlags::kNone));
     SuccessOrExit(err);
 
-    MoveToState(kState_Sending);
+    MoveToState(CommandState::Sending);
 
 exit:
     Shutdown();

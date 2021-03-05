@@ -27,12 +27,14 @@
 /*----------------------------------------------------------------------------*\
 | Cluster Name                                                        |   ID   |
 |---------------------------------------------------------------------+--------|
+| ApplicationBasic                                                    | 0x050D |
 | BarrierControl                                                      | 0x0103 |
 | Basic                                                               | 0x0000 |
 | Binding                                                             | 0xF000 |
 | ColorControl                                                        | 0x0300 |
 | ContentLaunch                                                       | 0xF002 |
 | DoorLock                                                            | 0x0101 |
+| GeneralCommissioning                                                | 0x0030 |
 | Groups                                                              | 0x0004 |
 | IasZone                                                             | 0x0500 |
 | Identify                                                            | 0x0003 |
@@ -43,6 +45,85 @@
 | Scenes                                                              | 0x0005 |
 | TemperatureMeasurement                                              | 0x0402 |
 \*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------*\
+| Cluster ApplicationBasic                                            | 0x050D |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * VendorName                                                        | 0x0000 |
+| * VendorId                                                          | 0x0001 |
+| * ApplicationName                                                   | 0x0002 |
+| * ProductId                                                         | 0x0003 |
+| * ApplicationId                                                     | 0x0005 |
+| * CatalogVendorId                                                   | 0x0006 |
+| * ApplicationSatus                                                  | 0x0007 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/**
+ * @brief
+ *    Encode a Application Basic server discover command into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeApplicationBasicClusterDiscoverAttributes(uint8_t seqNum,
+                                                                                 chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Application Basic server read command for the vendor name attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeApplicationBasicClusterReadVendorNameAttribute(uint8_t seqNum,
+                                                                                      chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Application Basic server read command for the vendor id attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeApplicationBasicClusterReadVendorIdAttribute(uint8_t seqNum,
+                                                                                    chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Application Basic server read command for the application name attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeApplicationBasicClusterReadApplicationNameAttribute(uint8_t seqNum,
+                                                                                           chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Application Basic server read command for the product id attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeApplicationBasicClusterReadProductIdAttribute(uint8_t seqNum,
+                                                                                     chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Application Basic server read command for the application id attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeApplicationBasicClusterReadApplicationIdAttribute(uint8_t seqNum,
+                                                                                         chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Application Basic server read command for the catalog vendor id attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeApplicationBasicClusterReadCatalogVendorIdAttribute(uint8_t seqNum,
+                                                                                           chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Application Basic server read command for the application satus attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeApplicationBasicClusterReadApplicationSatusAttribute(uint8_t seqNum,
+                                                                                            chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Application Basic server read command for the cluster revision attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeApplicationBasicClusterReadClusterRevisionAttribute(uint8_t seqNum,
+                                                                                           chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
 | Cluster BarrierControl                                              | 0x0103 |
@@ -1189,6 +1270,81 @@ chip::System::PacketBufferHandle encodeDoorLockClusterReadClusterRevisionAttribu
                                                                                    chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
+| Cluster GeneralCommissioning                                        | 0x0030 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * ArmFailSafe                                                       |   0x02 |
+| * CommissioningComplete                                             |   0x06 |
+| * SetFabric                                                         |   0x00 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * FabricId                                                          | 0x0000 |
+| * Breadcrumb                                                        | 0x0001 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/**
+ * @brief
+ *    Encode an ArmFailSafe command for General Commissioning server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeGeneralCommissioningClusterArmFailSafeCommand(uint8_t seqNum,
+                                                                                     chip::EndpointId destinationEndpoint,
+                                                                                     uint16_t expiryLengthSeconds,
+                                                                                     uint64_t breadcrumb, uint32_t timeoutMs);
+
+/**
+ * @brief
+ *    Encode an CommissioningComplete command for General Commissioning server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeGeneralCommissioningClusterCommissioningCompleteCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode an SetFabric command for General Commissioning server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeGeneralCommissioningClusterSetFabricCommand(uint8_t seqNum,
+                                                                                   chip::EndpointId destinationEndpoint,
+                                                                                   char * fabricId, char * fabricSecret,
+                                                                                   uint64_t breadcrumb, uint32_t timeoutMs);
+
+/**
+ * @brief
+ *    Encode a General Commissioning server discover command into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeGeneralCommissioningClusterDiscoverAttributes(uint8_t seqNum,
+                                                                                     chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a General Commissioning server read command for the FabricId attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeGeneralCommissioningClusterReadFabricIdAttribute(uint8_t seqNum,
+                                                                                        chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a General Commissioning server read command for the Breadcrumb attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeGeneralCommissioningClusterReadBreadcrumbAttribute(uint8_t seqNum,
+                                                                                          chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a General Commissioning server write command for the Breadcrumb attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeGeneralCommissioningClusterWriteBreadcrumbAttribute(uint8_t seqNum,
+                                                                                           chip::EndpointId destinationEndpoint,
+                                                                                           uint64_t breadcrumb);
+
+/**
+ * @brief
+ *    Encode a General Commissioning server read command for the cluster revision attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeGeneralCommissioningClusterReadClusterRevisionAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/*----------------------------------------------------------------------------*\
 | Cluster Groups                                                      | 0x0004 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
@@ -1596,6 +1752,117 @@ chip::System::PacketBufferHandle encodeMediaPlaybackClusterReadCurrentStateAttri
  */
 chip::System::PacketBufferHandle encodeMediaPlaybackClusterReadClusterRevisionAttribute(uint8_t seqNum,
                                                                                         chip::EndpointId destinationEndpoint);
+
+/*----------------------------------------------------------------------------*\
+| Cluster NetworkCommissioning                                        | 0xAAAA |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * AddThreadNetwork                                                  |   0x06 |
+| * AddWiFiNetwork                                                    |   0x02 |
+| * DisableNetwork                                                    |   0x0E |
+| * EnableNetwork                                                     |   0x0C |
+| * GetLastNetworkCommissioningResult                                 |   0x10 |
+| * RemoveNetwork                                                     |   0x0A |
+| * ScanNetworks                                                      |   0x00 |
+| * UpdateThreadNetwork                                               |   0x08 |
+| * UpdateWiFiNetwork                                                 |   0x04 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/**
+ * @brief
+ *    Encode an AddThreadNetwork command for Network Commissioning server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeNetworkCommissioningClusterAddThreadNetworkCommand(uint8_t seqNum,
+                                                                                          chip::EndpointId destinationEndpoint,
+                                                                                          char * operationalDataset,
+                                                                                          uint64_t breadcrumb, uint32_t timeoutMs);
+
+/**
+ * @brief
+ *    Encode an AddWiFiNetwork command for Network Commissioning server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeNetworkCommissioningClusterAddWiFiNetworkCommand(uint8_t seqNum,
+                                                                                        chip::EndpointId destinationEndpoint,
+                                                                                        char * ssid, char * credentials,
+                                                                                        uint64_t breadcrumb, uint32_t timeoutMs);
+
+/**
+ * @brief
+ *    Encode an DisableNetwork command for Network Commissioning server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeNetworkCommissioningClusterDisableNetworkCommand(uint8_t seqNum,
+                                                                                        chip::EndpointId destinationEndpoint,
+                                                                                        char * networkID, uint64_t breadcrumb,
+                                                                                        uint32_t timeoutMs);
+
+/**
+ * @brief
+ *    Encode an EnableNetwork command for Network Commissioning server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeNetworkCommissioningClusterEnableNetworkCommand(uint8_t seqNum,
+                                                                                       chip::EndpointId destinationEndpoint,
+                                                                                       char * networkID, uint64_t breadcrumb,
+                                                                                       uint32_t timeoutMs);
+
+/**
+ * @brief
+ *    Encode an GetLastNetworkCommissioningResult command for Network Commissioning server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeNetworkCommissioningClusterGetLastNetworkCommissioningResultCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                          uint32_t timeoutMs);
+
+/**
+ * @brief
+ *    Encode an RemoveNetwork command for Network Commissioning server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeNetworkCommissioningClusterRemoveNetworkCommand(uint8_t seqNum,
+                                                                                       chip::EndpointId destinationEndpoint,
+                                                                                       char * networkID, uint64_t breadcrumb,
+                                                                                       uint32_t timeoutMs);
+
+/**
+ * @brief
+ *    Encode an ScanNetworks command for Network Commissioning server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeNetworkCommissioningClusterScanNetworksCommand(uint8_t seqNum,
+                                                                                      chip::EndpointId destinationEndpoint,
+                                                                                      char * ssid, uint64_t breadcrumb,
+                                                                                      uint32_t timeoutMs);
+
+/**
+ * @brief
+ *    Encode an UpdateThreadNetwork command for Network Commissioning server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeNetworkCommissioningClusterUpdateThreadNetworkCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                            char * operationalDataset, uint64_t breadcrumb, uint32_t timeoutMs);
+
+/**
+ * @brief
+ *    Encode an UpdateWiFiNetwork command for Network Commissioning server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeNetworkCommissioningClusterUpdateWiFiNetworkCommand(uint8_t seqNum,
+                                                                                           chip::EndpointId destinationEndpoint,
+                                                                                           char * ssid, char * credentials,
+                                                                                           uint64_t breadcrumb, uint32_t timeoutMs);
+
+/**
+ * @brief
+ *    Encode a Network Commissioning server discover command into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeNetworkCommissioningClusterDiscoverAttributes(uint8_t seqNum,
+                                                                                     chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Network Commissioning server read command for the cluster revision attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeNetworkCommissioningClusterReadClusterRevisionAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
 | Cluster OnOff                                                       | 0x0006 |

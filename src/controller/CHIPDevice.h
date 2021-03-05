@@ -58,10 +58,6 @@ using DeviceTransportMgr = TransportMgr<Transport::UDP /* IPv6 */
 class DLL_EXPORT Device
 {
 public:
-    Device() :
-        mInterface(INET_NULL_INTERFACEID), mActive(false), mState(ConnectionState::NotConnected),
-        mAdminId(Transport::kUndefinedAdminId)
-    {}
     ~Device()
     {
         if (mCommandSender != nullptr)
@@ -176,18 +172,25 @@ public:
      * @param[in] inetLayer    InetLayer object pointer
      * @param[in] listenPort   Port on which controller is listening (typically CHIP_PORT)
      * @param[in] deviceId     Node ID of the device
-     * @param[in] devicePort   Port on which device is listening (typically CHIP_PORT)
-     * @param[in] interfaceId  Local Interface ID that should be used to talk to the device
+     * @param[in] peerAddress  The location of the peer. MUST be of type Transport::Type::kUdp
      * @param[in] admin        Local administrator that's initializing this device object
      */
     void Init(DeviceTransportMgr * transportMgr, SecureSessionMgr * sessionMgr, Inet::InetLayer * inetLayer, uint16_t listenPort,
-              NodeId deviceId, uint16_t devicePort, Inet::InterfaceId interfaceId, Transport::AdminId admin)
+              NodeId deviceId, const Transport::PeerAddress & peerAddress, Transport::AdminId admin)
     {
         Init(transportMgr, sessionMgr, inetLayer, mListenPort, admin);
-        mDeviceId   = deviceId;
-        mDevicePort = devicePort;
-        mInterface  = interfaceId;
-        mState      = ConnectionState::Connecting;
+        mDeviceId = deviceId;
+        mState    = ConnectionState::Connecting;
+
+        if (peerAddress.GetTransportType() != Transport::Type::kUdp)
+        {
+            ChipLogError(Controller, "Invalid peer address received in chip device initialization. Expected a UDP address.");
+            chipDie();
+        }
+        else
+        {
+            mDeviceUdpAddress = peerAddress;
+        }
     }
 
     /** @brief Serialize the Pairing Session to a string. It's guaranteed that the string
@@ -282,7 +285,7 @@ public:
 
     bool MatchesSession(SecureSessionHandle session) const { return mSecureSession == session; }
 
-    void SetAddress(const Inet::IPAddress & deviceAddr) { mDeviceAddr = deviceAddr; }
+    void SetAddress(const Inet::IPAddress & deviceAddr) { mDeviceUdpAddress.SetIPAddress(deviceAddr); }
 
     PASESessionSerializable & GetPairing() { return mPairing; }
 
@@ -306,14 +309,10 @@ private:
     /* Node ID assigned to the CHIP device */
     NodeId mDeviceId;
 
-    /* IP Address of the CHIP device */
-    Inet::IPAddress mDeviceAddr;
-
-    /* Port on which the CHIP device is receiving messages. Typically it is CHIP_PORT */
-    uint16_t mDevicePort = CHIP_PORT;
-
-    /* Local network interface that should be used to communicate with the device */
-    Inet::InterfaceId mInterface = INET_NULL_INTERFACEID;
+    /** Address used to communicate with the device. MUST be Type::kUDP
+     *  in the current implementation.
+     */
+    Transport::PeerAddress mDeviceUdpAddress = Transport::PeerAddress::UDP(Inet::IPAddress::Any);
 
     Inet::InetLayer * mInetLayer = nullptr;
 
@@ -360,7 +359,7 @@ private:
 
     uint16_t mListenPort;
 
-    Transport::AdminId mAdminId;
+    Transport::AdminId mAdminId = Transport::kUndefinedAdminId;
 };
 
 /**

@@ -223,6 +223,14 @@ typedef enum
     EMBER_ZCL_APPLIANCE_STATUS_SUPERHEATING                = 15,
 } EmberAfApplianceStatus;
 
+// Enum for ApplicationBasicStatus
+typedef enum
+{
+    EMBER_ZCL_APPLICATION_BASIC_STATUS_STOPPED    = 0,
+    EMBER_ZCL_APPLICATION_BASIC_STATUS_RUNNING    = 1,
+    EMBER_ZCL_APPLICATION_BASIC_STATUS_BACKGROUND = 2,
+} EmberAfApplicationBasicStatus;
+
 // Enum for AttributeReportingStatus
 typedef enum
 {
@@ -1067,6 +1075,15 @@ typedef enum
     EMBER_ZCL_GAS_SPECIFIC_ALARM_GROUPS_EXCESS_FLOW           = 99,
     EMBER_ZCL_GAS_SPECIFIC_ALARM_GROUPS_TILT_TAMPER_ENDED     = 100,
 } EmberAfGasSpecificAlarmGroups;
+
+// Enum for GeneralCommissioningError
+typedef enum
+{
+    EMBER_ZCL_GENERAL_COMMISSIONING_ERROR_OK                     = 0,
+    EMBER_ZCL_GENERAL_COMMISSIONING_ERROR_VALUE_OUTSIDE_RANGE    = 1,
+    EMBER_ZCL_GENERAL_COMMISSIONING_ERROR_CANNOT_CHANGE_FABRIC   = 2,
+    EMBER_ZCL_GENERAL_COMMISSIONING_ERROR_INVALID_AUTHENTICATION = 3,
+} EmberAfGeneralCommissioningError;
 
 // Enum for GenerationTier
 typedef enum
@@ -2225,6 +2242,14 @@ typedef enum
     EMBER_ZCL_REGISTER_TIER_REFER_TO_EXTENDED_REGISTER_TIER_FIELD        = 15,
     EMBER_ZCL_REGISTER_TIER_CURRENT_TIER15_SUMMATION_DELIVERED_ATTRIBUTE = 15,
 } EmberAfRegisterTier;
+
+// Enum for RegulatoryLocationType
+typedef enum
+{
+    EMBER_ZCL_REGULATORY_LOCATION_TYPE_INDOOR         = 0,
+    EMBER_ZCL_REGULATORY_LOCATION_TYPE_OUTDOOR        = 1,
+    EMBER_ZCL_REGULATORY_LOCATION_TYPE_INDOOR_OUTDOOR = 2,
+} EmberAfRegulatoryLocationType;
 
 // Enum for RelativeHumidityDisplay
 typedef enum

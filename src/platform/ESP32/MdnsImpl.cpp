@@ -37,7 +37,7 @@ static constexpr size_t kMaxResults     = 20;
 namespace chip {
 namespace Mdns {
 
-CHIP_ERROR ChipMdnsInit(MdnsAsnycReturnCallback initCallback, MdnsAsnycReturnCallback errorCallback, void * context)
+CHIP_ERROR ChipMdnsInit(MdnsAsyncReturnCallback initCallback, MdnsAsyncReturnCallback errorCallback, void * context)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     esp_err_t espError;

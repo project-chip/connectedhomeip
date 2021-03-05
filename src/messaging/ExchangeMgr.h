@@ -171,6 +171,18 @@ public:
                                                           static_cast<uint8_t>(msgType));
     }
 
+    /**
+     * @brief
+     *   Called when a cached group message is received.
+     *
+     * @param packetHeader  The message header
+     * @param payloadHeader The payload header
+     * @param session       The handle to the secure session
+     * @param msgBuf        The received message
+     */
+    void HandleGroupMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+                                    const SecureSessionHandle & session, System::PacketBufferHandle msgBuf);
+
     void IncrementContextsInUse();
     void DecrementContextsInUse();
 
@@ -212,6 +224,8 @@ private:
 
     CHIP_ERROR RegisterUMH(uint32_t protocolId, int16_t msgType, ExchangeDelegate * delegate);
     CHIP_ERROR UnregisterUMH(uint32_t protocolId, int16_t msgType);
+
+    bool isMsgCounterSyncMessage(const PayloadHeader & payloadHeader) const;
 
     void OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source, SecureSessionMgr * msgLayer) override;
 

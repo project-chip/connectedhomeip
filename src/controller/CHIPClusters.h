@@ -26,20 +26,41 @@
 namespace chip {
 namespace Controller {
 
+constexpr ClusterId kApplicationBasicClusterId       = 0x050D;
 constexpr ClusterId kBarrierControlClusterId         = 0x0103;
 constexpr ClusterId kBasicClusterId                  = 0x0000;
 constexpr ClusterId kBindingClusterId                = 0xF000;
 constexpr ClusterId kColorControlClusterId           = 0x0300;
 constexpr ClusterId kContentLaunchClusterId          = 0xF002;
 constexpr ClusterId kDoorLockClusterId               = 0x0101;
+constexpr ClusterId kGeneralCommissioningClusterId   = 0x0030;
 constexpr ClusterId kGroupsClusterId                 = 0x0004;
 constexpr ClusterId kIasZoneClusterId                = 0x0500;
 constexpr ClusterId kIdentifyClusterId               = 0x0003;
 constexpr ClusterId kLevelControlClusterId           = 0x0008;
 constexpr ClusterId kMediaPlaybackClusterId          = 0xF001;
+constexpr ClusterId kNetworkCommissioningClusterId   = 0xAAAA;
 constexpr ClusterId kOnOffClusterId                  = 0x0006;
 constexpr ClusterId kScenesClusterId                 = 0x0005;
 constexpr ClusterId kTemperatureMeasurementClusterId = 0x0402;
+
+class DLL_EXPORT ApplicationBasicCluster : public ClusterBase
+{
+public:
+    ApplicationBasicCluster() : ClusterBase(kApplicationBasicClusterId) {}
+    ~ApplicationBasicCluster() {}
+
+    // Cluster Attributes
+    CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeVendorName(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeVendorId(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeApplicationName(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeProductId(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeApplicationId(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeCatalogVendorId(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeApplicationSatus(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+};
 
 class DLL_EXPORT BarrierControlCluster : public ClusterBase
 {
@@ -369,6 +390,33 @@ private:
     static constexpr CommandId kUnlockWithTimeoutCommandId    = 0x03;
 };
 
+class DLL_EXPORT GeneralCommissioningCluster : public ClusterBase
+{
+public:
+    GeneralCommissioningCluster() : ClusterBase(kGeneralCommissioningClusterId) {}
+    ~GeneralCommissioningCluster() {}
+
+    // Cluster Commands
+    CHIP_ERROR ArmFailSafe(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                           uint16_t expiryLengthSeconds, uint64_t breadcrumb, uint32_t timeoutMs);
+    CHIP_ERROR CommissioningComplete(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR SetFabric(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, char * fabricId,
+                         char * fabricSecret, uint64_t breadcrumb, uint32_t timeoutMs);
+
+    // Cluster Attributes
+    CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeFabricId(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeBreadcrumb(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR WriteAttributeBreadcrumb(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                        uint64_t value);
+
+private:
+    static constexpr CommandId kArmFailSafeCommandId           = 0x02;
+    static constexpr CommandId kCommissioningCompleteCommandId = 0x06;
+    static constexpr CommandId kSetFabricCommandId             = 0x00;
+};
+
 class DLL_EXPORT GroupsCluster : public ClusterBase
 {
 public:
@@ -516,6 +564,48 @@ private:
     static constexpr CommandId kSkipForwardRequestCommandId  = 0x08;
     static constexpr CommandId kStartOverRequestCommandId    = 0x03;
     static constexpr CommandId kStopRequestCommandId         = 0x02;
+};
+
+class DLL_EXPORT NetworkCommissioningCluster : public ClusterBase
+{
+public:
+    NetworkCommissioningCluster() : ClusterBase(kNetworkCommissioningClusterId) {}
+    ~NetworkCommissioningCluster() {}
+
+    // Cluster Commands
+    CHIP_ERROR AddThreadNetwork(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                char * operationalDataset, uint64_t breadcrumb, uint32_t timeoutMs);
+    CHIP_ERROR AddWiFiNetwork(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, char * ssid,
+                              char * credentials, uint64_t breadcrumb, uint32_t timeoutMs);
+    CHIP_ERROR DisableNetwork(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, char * networkID,
+                              uint64_t breadcrumb, uint32_t timeoutMs);
+    CHIP_ERROR EnableNetwork(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, char * networkID,
+                             uint64_t breadcrumb, uint32_t timeoutMs);
+    CHIP_ERROR GetLastNetworkCommissioningResult(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                                 uint32_t timeoutMs);
+    CHIP_ERROR RemoveNetwork(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, char * networkID,
+                             uint64_t breadcrumb, uint32_t timeoutMs);
+    CHIP_ERROR ScanNetworks(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, char * ssid,
+                            uint64_t breadcrumb, uint32_t timeoutMs);
+    CHIP_ERROR UpdateThreadNetwork(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                   char * operationalDataset, uint64_t breadcrumb, uint32_t timeoutMs);
+    CHIP_ERROR UpdateWiFiNetwork(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, char * ssid,
+                                 char * credentials, uint64_t breadcrumb, uint32_t timeoutMs);
+
+    // Cluster Attributes
+    CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+
+private:
+    static constexpr CommandId kAddThreadNetworkCommandId                  = 0x06;
+    static constexpr CommandId kAddWiFiNetworkCommandId                    = 0x02;
+    static constexpr CommandId kDisableNetworkCommandId                    = 0x0E;
+    static constexpr CommandId kEnableNetworkCommandId                     = 0x0C;
+    static constexpr CommandId kGetLastNetworkCommissioningResultCommandId = 0x10;
+    static constexpr CommandId kRemoveNetworkCommandId                     = 0x0A;
+    static constexpr CommandId kScanNetworksCommandId                      = 0x00;
+    static constexpr CommandId kUpdateThreadNetworkCommandId               = 0x08;
+    static constexpr CommandId kUpdateWiFiNetworkCommandId                 = 0x04;
 };
 
 class DLL_EXPORT OnOffCluster : public ClusterBase

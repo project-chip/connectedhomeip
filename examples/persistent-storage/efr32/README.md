@@ -76,7 +76,7 @@ defines = [
 *   Build the example application:
 
           cd ~/connectedhomeip
-          ./scripts/examples/gn_efr32_example.sh ./examples/persistent-storage/efr32/ ./out/persistent-storage BRD4161A
+          ./scripts/examples/gn_efr32_example.sh ./examples/persistent-storage/efr32/ ./out/persistent-storage BRD4161A
 
 -   To delete generated executable, libraries and object files use:
 

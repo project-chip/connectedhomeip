@@ -92,15 +92,12 @@ public:
      * @param[in] onConnected           Callback for when the connection is established
      * @param[in] onMessageReceived     Callback for when a message is received
      * @param[in] onError               Callback for when an error occurs
-     * @param[in] devicePort            [Optional] The CHIP Device's port, defaults to CHIP_PORT
-     * @param[in] interfaceId           [Optional] The interface indicator to use
      *
      * @return CHIP_ERROR               The connection status
      */
     [[deprecated("Available until controller apps move to DeviceController/DeviceCommissioner API")]] CHIP_ERROR
     ConnectDevice(NodeId remoteDeviceId, RendezvousParameters & params, void * appReqState, NewConnectionHandler onConnected,
-                  MessageReceiveHandler onMessageReceived, ErrorHandler onError, uint16_t devicePort = CHIP_PORT,
-                  Inet::InterfaceId interfaceId = INET_NULL_INTERFACEID);
+                  MessageReceiveHandler onMessageReceived, ErrorHandler onError);
 
     /**
      * @brief
@@ -108,20 +105,17 @@ public:
      *   that bypasses Rendezvous and Secure Pairing process.
      *
      * @param[in] remoteDeviceId        The remote device Id.
-     * @param[in] deviceAddr            The IPAddress of the requested Device
+     * @param[in] deviceAddr            The address of the requested Device
      * @param[in] appReqState           Application specific context to be passed back when a message is received or on error
      * @param[in] onConnected           Callback for when the connection is established
      * @param[in] onMessageReceived     Callback for when a message is received
      * @param[in] onError               Callback for when an error occurs
-     * @param[in] devicePort            [Optional] The CHIP Device's port, defaults to CHIP_PORT
-     * @param[in] interfaceId           [Optional] The interface indicator to use
      * @return CHIP_ERROR           The connection status
      */
     [[deprecated("Available until Rendezvous is implemented")]] CHIP_ERROR
-    ConnectDeviceWithoutSecurePairing(NodeId remoteDeviceId, const Inet::IPAddress & deviceAddr, void * appReqState,
+    ConnectDeviceWithoutSecurePairing(NodeId remoteDeviceId, const Transport::PeerAddress & deviceAddr, void * appReqState,
                                       NewConnectionHandler onConnected, MessageReceiveHandler onMessageReceived,
-                                      ErrorHandler onError, uint16_t devicePort = CHIP_PORT,
-                                      Inet::InterfaceId interfaceId = INET_NULL_INTERFACEID);
+                                      ErrorHandler onError);
 
     /**
      * @brief

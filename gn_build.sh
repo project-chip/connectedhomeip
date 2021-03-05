@@ -74,6 +74,24 @@ echo ninja -C "$CHIP_ROOT/out/custom"
 
 extra_args=""
 user_args=""
+ninja_args=()
+
+while getopts :d:j:k:l:nt:vw: opt; do
+    case "$opt" in
+        [nv])
+            ninja_args+=("-$opt")
+            ;;
+        [djkltw])
+            ninja_args+=("-$opt" "$OPTARG")
+            ;;
+        '?')
+            printf '\nError: unknown option -%s\n' "$OPTARG"
+            printf 'Usage: %s [ninja-options] [gn-args]\n' "$0"
+            exit 1
+            ;;
+    esac
+done
+shift $((OPTIND - 1))
 
 for arg; do
     case $arg in
@@ -141,4 +159,4 @@ gn --root="$CHIP_ROOT" gen --check --fail-on-unused-args "$CHIP_ROOT/out/release
 
 _chip_banner "Build: Ninja build"
 
-time ninja -C "$CHIP_ROOT/out/debug" all check
+time ninja -C "$CHIP_ROOT/out/debug" "${ninja_args[@]}" all check

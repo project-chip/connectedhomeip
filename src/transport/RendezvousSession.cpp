@@ -35,7 +35,7 @@
 #endif // CONFIG_NETWORK_LAYER_BLE
 
 static constexpr uint32_t kSpake2p_Iteration_Count = 100;
-static const char * kSpake2pKeyExchangeSalt        = "SPAKE2P Key Exchange Salt";
+static const char * kSpake2pKeyExchangeSalt        = "SPAKE2P Key Salt";
 
 using namespace chip::Inet;
 using namespace chip::System;
@@ -98,10 +98,15 @@ RendezvousSession::~RendezvousSession()
 {
     ReleasePairingSessionHandle();
 
-    if (mTransport)
+    if (mTransport != nullptr)
     {
         chip::Platform::Delete(mTransport);
         mTransport = nullptr;
+    }
+
+    if (mTransportMgr != nullptr)
+    {
+        mTransportMgr->SetRendezvousSession(nullptr);
     }
 
     mDelegate = nullptr;
@@ -158,10 +163,7 @@ CHIP_ERROR RendezvousSession::SendSecureMessage(Protocols::CHIPProtocolId protoc
     return mSecureSessionMgr->SendMessage(*mPairingSessionHandle, payloadHeader, std::move(msgBuf));
 }
 
-void RendezvousSession::OnSessionEstablishmentError(CHIP_ERROR err)
-{
-    OnRendezvousError(err);
-}
+void RendezvousSession::OnSessionEstablishmentError(CHIP_ERROR err) {}
 
 void RendezvousSession::OnSessionEstablished()
 {
@@ -179,7 +181,9 @@ void RendezvousSession::OnSessionEstablished()
     {
         ChipLogError(Ble, "Missing node id in rendezvous parameters. Node ID is required until opcerts are implemented");
     }
-    mPairingSession.PeerConnection().SetPeerNodeId(mParams.GetRemoteNodeId().ValueOr(kUndefinedNodeId));
+
+    const auto defaultPeerNodeId = mParams.IsController() ? kTestDeviceNodeId : kTestControllerNodeId;
+    mPairingSession.PeerConnection().SetPeerNodeId(mParams.GetRemoteNodeId().ValueOr(defaultPeerNodeId));
 
     CHIP_ERROR err = mSecureSessionMgr->NewPairing(
         Optional<Transport::PeerAddress>::Value(mPairingSession.PeerConnection().GetPeerAddress()),
@@ -240,28 +244,7 @@ void RendezvousSession::OnRendezvousConnectionClosed()
 
 void RendezvousSession::OnRendezvousError(CHIP_ERROR err)
 {
-    if (mDelegate != nullptr)
-    {
-        switch (mCurrentState)
-        {
-        case State::kSecurePairing:
-            mDelegate->OnRendezvousStatusUpdate(RendezvousSessionDelegate::SecurePairingFailed, err);
-            break;
-
-        case State::kNetworkProvisioning:
-            mDelegate->OnRendezvousStatusUpdate(RendezvousSessionDelegate::NetworkProvisioningFailed, err);
-            break;
-
-        default:
-            break;
-        };
-        mDelegate->OnRendezvousError(err);
-    }
     UpdateState(State::kInit, err);
-    if (mAdmin != nullptr)
-    {
-        mAdmin->Reset();
-    }
 }
 
 void RendezvousSession::UpdateState(RendezvousSession::State newState, CHIP_ERROR err)
@@ -271,7 +254,7 @@ void RendezvousSession::UpdateState(RendezvousSession::State newState, CHIP_ERRO
         switch (mCurrentState)
         {
         case State::kSecurePairing:
-            if (newState != State::kInit)
+            if (CHIP_NO_ERROR == err)
             {
                 mDelegate->OnRendezvousStatusUpdate(RendezvousSessionDelegate::SecurePairingSuccess, err);
             }
@@ -282,7 +265,7 @@ void RendezvousSession::UpdateState(RendezvousSession::State newState, CHIP_ERRO
             break;
 
         case State::kNetworkProvisioning:
-            if (newState != State::kInit)
+            if (CHIP_NO_ERROR == err)
             {
                 mDelegate->OnRendezvousStatusUpdate(RendezvousSessionDelegate::NetworkProvisioningSuccess, err);
             }
@@ -296,6 +279,7 @@ void RendezvousSession::UpdateState(RendezvousSession::State newState, CHIP_ERRO
             break;
         };
     }
+
     mCurrentState = newState;
 
     switch (mCurrentState)
@@ -305,6 +289,9 @@ void RendezvousSession::UpdateState(RendezvousSession::State newState, CHIP_ERRO
         {
             mDelegate->OnRendezvousComplete();
         }
+
+        mParams.GetAdvertisementDelegate()->RendezvousComplete();
+
         // Release the admin, as the rendezvous is complete.
         mAdmin = nullptr;
         break;
@@ -325,6 +312,19 @@ void RendezvousSession::UpdateState(RendezvousSession::State newState, CHIP_ERRO
             // Free the transport
             chip::Platform::Delete(mTransport);
             mTransport = nullptr;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            if (mAdmin != nullptr)
+            {
+                mAdmin->Reset();
+            }
+
+            if (mDelegate)
+            {
+                mDelegate->OnRendezvousError(err);
+            }
         }
         break;
 
@@ -393,18 +393,6 @@ CHIP_ERROR RendezvousSession::HandleSecureMessage(const PacketHeader & packetHea
 {
     ReturnErrorCodeIf(mPairingSessionHandle == nullptr, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorCodeIf(msgBuf.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
-
-    // Check if the source and destination node IDs match with what we already know
-    if (packetHeader.GetDestinationNodeId().HasValue() && mParams.HasLocalNodeId())
-    {
-        VerifyOrReturnError(packetHeader.GetDestinationNodeId().Value() == mParams.GetLocalNodeId().Value(),
-                            CHIP_ERROR_WRONG_NODE_ID);
-    }
-
-    if (packetHeader.GetSourceNodeId().HasValue() && mParams.HasRemoteNodeId())
-    {
-        VerifyOrReturnError(packetHeader.GetSourceNodeId().Value() == mParams.GetRemoteNodeId().Value(), CHIP_ERROR_WRONG_NODE_ID);
-    }
 
     PeerConnectionState * state = mSecureSessionMgr->GetPeerConnectionState(*mPairingSessionHandle);
     ReturnErrorCodeIf(state == nullptr, CHIP_ERROR_KEY_NOT_FOUND_FROM_PEER);

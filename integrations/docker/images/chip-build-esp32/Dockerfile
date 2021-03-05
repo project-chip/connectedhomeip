@@ -4,7 +4,7 @@ FROM connectedhomeip/chip-build:${VERSION}
 # Setup the ESP-IDF
 RUN set -x \
     && apt-get update \
-    && DEBIAN_FRONTEND=noninteractive apt-get install -y python \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y python libgcrypt20-dev \
     && mkdir -p /opt/espressif \
     && cd /opt/espressif \
     && git clone --progress -b release/v4.2 https://github.com/espressif/esp-idf.git \

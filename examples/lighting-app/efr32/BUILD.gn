@@ -53,14 +53,7 @@ efr32_sdk("sdk") {
     "${efr32_project_dir}/include/FreeRTOSConfig.h",
   ]
 
-  defines = []
-  if (is_debug) {
-    defines += [ "BUILD_RELEASE=0" ]
-  } else {
-    defines += [ "BUILD_RELEASE=1" ]
-  }
-
-  defines += [ "BOARD_ID=${efr32_board}" ]
+  defines = [ "BOARD_ID=${efr32_board}" ]
 
   if (enable_pw_rpc) {
     defines += [
@@ -103,11 +96,9 @@ efr32_executable("lighting_app") {
   ]
 
   sources = [
-    "${examples_plat_dir}/${efr32_family}/${efr32_board}/init_board.c",
-    "${examples_plat_dir}/${efr32_family}/${efr32_board}/init_mcu.c",
     "${examples_plat_dir}/LEDWidget.cpp",
     "${examples_plat_dir}/Service.cpp",
-    "${examples_plat_dir}/init_otSystem.c",
+    "${examples_plat_dir}/init_efrPlatform.cpp",
     "src/AppTask.cpp",
     "src/ButtonHandler.cpp",
     "src/LightingManager.cpp",
@@ -157,7 +148,7 @@ efr32_executable("lighting_app") {
 
     sources += [
       "${chip_root}/examples/common/pigweed/RpcService.cpp",
-      "${chip_root}/examples/common/pigweed/efr32/PigWeedLoggerMutex.cpp",
+      "${chip_root}/examples/common/pigweed/efr32/PigeedLoggerMutex.cpp",
       "${examples_plat_dir}/PigweedLogger.cpp",
       "${examples_plat_dir}/uart.c",
       "src/Rpc.cpp",

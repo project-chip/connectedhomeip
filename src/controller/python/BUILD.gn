@@ -18,7 +18,7 @@ import("//build_overrides/pigweed.gni")
 
 import("$dir_pw_build/python.gni")
 
-import("${build_root}/chip/tools.gni")
+import("${chip_root}/build/chip/tools.gni")
 import("${chip_root}/src/platform/device.gni")
 import("${dir_pw_unit_test}/test.gni")
 
@@ -43,6 +43,10 @@ shared_library("ChipDeviceCtrl") {
     "ChipDeviceController-ScriptDevicePairingDelegate.h",
     "ChipDeviceController-StorageDelegate.cpp",
     "ChipDeviceController-StorageDelegate.h",
+    "chip/internal/ChipThreadWork.cpp",
+    "chip/internal/ChipThreadWork.h",
+    "chip/internal/CommissionerImpl.cpp",
+    "chip/logging/LoggingRedirect.cpp",
     "chip/native/StackInit.cpp",
   ]
 
@@ -81,7 +85,14 @@ pw_python_action("python") {
         "chip/ChipStack.py",
         "chip/ChipUtility.py",
         "chip/__init__.py",
+        "chip/configuration/__init__.py",
         "chip/exceptions/__init__.py",
+        "chip/internal/__init__.py",
+        "chip/internal/commissioner.py",
+        "chip/internal/types.py",
+        "chip/logging/__init__.py",
+        "chip/logging/library_handle.py",
+        "chip/logging/types.py",
         "chip/native/__init__.py",
         "chip/tlv/__init__.py",
       ]
@@ -102,6 +113,7 @@ pw_python_action("python") {
         src_dir = "."
         sources = [
           "chip/ble/__init__.py",
+          "chip/ble/commissioning/__init__.py",
           "chip/ble/get_adapters.py",
           "chip/ble/library_handle.py",
           "chip/ble/scan_devices.py",
@@ -149,8 +161,10 @@ pw_python_action("python") {
 
   public_deps = [ ":ChipDeviceCtrl" ]
 
-  pythontags =
-      exec_script("${build_root}/chip/python_gen_tags.py", [], "list lines", [])
+  pythontags = exec_script("${chip_root}/build/chip/python_gen_tags.py",
+                           [],
+                           "list lines",
+                           [])
   pythontagsStr = string_join("", pythontags)
   output_name = "chip-0.0-$pythontagsStr.whl"
   outputs = [ "${_dist_dir}/$output_name" ]

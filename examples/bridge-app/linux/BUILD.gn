@@ -27,19 +27,13 @@ config("includes") {
   ]
 }
 
-executable("bridge-app-server") {
+executable("chip-bridge-app") {
   sources = [
     "LightingManager.cpp",
     "Options.cpp",
     "include/LightingManager.h",
     "main.cpp",
   ]
-
-  if (is_debug) {
-    defines = [ "BUILD_RELEASE=0" ]
-  } else {
-    defines = [ "BUILD_RELEASE=1" ]
-  }
 
   public_configs = [ ":includes" ]
 
@@ -52,5 +46,5 @@ executable("bridge-app-server") {
 }
 
 group("linux") {
-  deps = [ ":bridge-app-server" ]
+  deps = [ ":chip-bridge-app" ]
 }
