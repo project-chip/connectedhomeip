@@ -118,8 +118,8 @@ class ConstAdminIterator
 {
 public:
     using value_type = AdminPairingInfo;
-    using pointer = AdminPairingInfo*;
-    using reference = AdminPairingInfo&;
+    using pointer    = AdminPairingInfo *;
+    using reference  = AdminPairingInfo &;
 
     ConstAdminIterator(const AdminPairingInfo * start, size_t index, size_t maxSize) :
         mStart(start), mIndex(index), mMaxSize(maxSize)
