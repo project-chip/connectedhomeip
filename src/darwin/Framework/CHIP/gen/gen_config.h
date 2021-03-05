@@ -29,19 +29,28 @@
 #define EMBER_APS_UNICAST_MESSAGE_COUNT 10
 
 /**** Cluster endpoint counts ****/
+#define EMBER_AF_APPLICATION_BASIC_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_BARRIER_CONTROL_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_BASIC_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_BINDING_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_COLOR_CONTROL_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_CONTENT_LAUNCH_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_DOOR_LOCK_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_GENERAL_COMMISSIONING_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_GROUPS_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_IDENTIFY_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_LEVEL_CONTROL_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_LOW_POWER_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_MEDIA_PLAYBACK_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_ON_OFF_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_SCENES_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_TEMP_MEASUREMENT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 
 /**** Cluster Plugins ****/
+
+// Use this macro to check if the client side of the Application Basic cluster is included
+#define ZCL_USING_APPLICATION_BASIC_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_APPLICATION_BASIC_CLIENT
 
 // Use this macro to check if the client side of the Barrier Control cluster is included
 #define ZCL_USING_BARRIER_CONTROL_CLUSTER_CLIENT
@@ -59,9 +68,17 @@
 #define ZCL_USING_COLOR_CONTROL_CLUSTER_CLIENT
 #define EMBER_AF_PLUGIN_COLOR_CONTROL_CLIENT
 
+// Use this macro to check if the client side of the Content Launch cluster is included
+#define ZCL_USING_CONTENT_LAUNCH_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_CONTENT_LAUNCH_CLIENT
+
 // Use this macro to check if the client side of the Door Lock cluster is included
 #define ZCL_USING_DOOR_LOCK_CLUSTER_CLIENT
 #define EMBER_AF_PLUGIN_DOOR_LOCK_CLIENT
+
+// Use this macro to check if the client side of the General Commissioning cluster is included
+#define ZCL_USING_GENERAL_COMMISSIONING_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_GENERAL_COMMISSIONING_CLIENT
 
 // Use this macro to check if the client side of the Groups cluster is included
 #define ZCL_USING_GROUPS_CLUSTER_CLIENT
@@ -74,6 +91,14 @@
 // Use this macro to check if the client side of the Level Control cluster is included
 #define ZCL_USING_LEVEL_CONTROL_CLUSTER_CLIENT
 #define EMBER_AF_PLUGIN_LEVEL_CONTROL_CLIENT
+
+// Use this macro to check if the client side of the Low Power cluster is included
+#define ZCL_USING_LOW_POWER_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_LOW_POWER_CLIENT
+
+// Use this macro to check if the client side of the Media Playback cluster is included
+#define ZCL_USING_MEDIA_PLAYBACK_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_MEDIA_PLAYBACK_CLIENT
 
 // Use this macro to check if the client side of the On/off cluster is included
 #define ZCL_USING_ON_OFF_CLUSTER_CLIENT

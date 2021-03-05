@@ -48,21 +48,19 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPBasic : CHIPCluster
 
-- (void)resetToFactoryDefaults:(ResponseHandler)completionHandler;
-
-- (void)readAttributeZclVersion:(ResponseHandler)completionHandler;
-- (void)readAttributeApplicationVersion:(ResponseHandler)completionHandler;
-- (void)readAttributeStackVersion:(ResponseHandler)completionHandler;
+- (void)readAttributeInteractionModelVersion:(ResponseHandler)completionHandler;
+- (void)readAttributeVendorName:(ResponseHandler)completionHandler;
+- (void)readAttributeVendorID:(ResponseHandler)completionHandler;
+- (void)readAttributeProductName:(ResponseHandler)completionHandler;
+- (void)readAttributeProductID:(ResponseHandler)completionHandler;
+- (void)readAttributeUserLabel:(ResponseHandler)completionHandler;
+- (void)writeAttributeUserLabel:(NSString *)value completionHandler:(ResponseHandler)completionHandler;
+- (void)readAttributeLocation:(ResponseHandler)completionHandler;
+- (void)writeAttributeLocation:(NSString *)value completionHandler:(ResponseHandler)completionHandler;
 - (void)readAttributeHardwareVersion:(ResponseHandler)completionHandler;
-- (void)readAttributeManufacturerName:(ResponseHandler)completionHandler;
-- (void)readAttributeModelIdentifier:(ResponseHandler)completionHandler;
-- (void)readAttributeDateCode:(ResponseHandler)completionHandler;
-- (void)readAttributePowerSource:(ResponseHandler)completionHandler;
-- (void)readAttributeGenericDeviceClass:(ResponseHandler)completionHandler;
-- (void)readAttributeGenericDeviceType:(ResponseHandler)completionHandler;
-- (void)readAttributeProductCode:(ResponseHandler)completionHandler;
-- (void)readAttributeProductUrl:(ResponseHandler)completionHandler;
-- (void)readAttributeSwBuildId:(ResponseHandler)completionHandler;
+- (void)readAttributeHardwareVersionString:(ResponseHandler)completionHandler;
+- (void)readAttributeSoftwareVersion:(ResponseHandler)completionHandler;
+- (void)readAttributeSoftwareVersionString:(ResponseHandler)completionHandler;
 - (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
 
 @end
