@@ -19,7 +19,8 @@ CHIP_ERROR {{asCamelCased clusterName false}}Cluster::{{asCamelCased name false}
 {
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    (void) onCompletion;
+    (void) onSuccessCallback;
+(void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, k{{asCamelCased name false}}CommandId,
                                          (chip::app::Command::kCommandPathFlag_EndpointIdValid) };

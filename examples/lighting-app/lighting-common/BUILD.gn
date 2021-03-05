@@ -13,6 +13,8 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("${chip_root}/src/app/common_flags.gni")
+import("${chip_root}/src/lib/core/core.gni")
 
 config("includes") {
   include_dirs = [
@@ -47,6 +49,13 @@ source_set("lighting-common") {
     "gen/call-command-handler.cpp",
     "gen/callback-stub.cpp",
   ]
+
+  if (chip_app_use_interaction_model) {
+    sources += [
+      "${chip_root}/src/app/util/ember-compatibility-functions.cpp",
+      "gen/IMClusterCommandHandler.cpp",
+    ]
+  }
 
   deps = [ "${chip_root}/src/lib" ]
 

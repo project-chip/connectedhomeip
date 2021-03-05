@@ -115,6 +115,15 @@ public:
     CHIP_ERROR AddStatusCode(const uint16_t aGeneralCode, const uint32_t aProtocolId, const uint16_t aProtocolCode,
                              const chip::ClusterId aClusterId);
 
+    /**
+     * Gets the inner exchange context object, without ownership.
+     *
+     * @return The inner exchange context, might be nullptr if no
+     *         exchange context has been assigned or the context
+     *         has been released.
+     */
+    const Messaging::ExchangeContext * GetExchangeContext() const { return mpExchangeCtx; }
+
     CHIP_ERROR Reset();
 
     virtual ~Command() = default;
