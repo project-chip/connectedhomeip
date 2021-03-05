@@ -101,17 +101,17 @@ try:
                 os.path.join(tmpDir, script.installName))
 
     # Define a custom version of the bdist_wheel command that configures the
-    # resultant wheel as platform-specific (i.e. not "pure"). 
+    # resultant wheel as platform-specific (i.e. not "pure").
     class bdist_wheel_override(bdist_wheel):
         def finalize_options(self):
             bdist_wheel.finalize_options(self)
             self.root_is_pure = False
 
     requiredPackages = [
-        "ipython",
         "coloredlogs",
+        'construct',
+        'ipython',
     ]
-
 
     if platform.system() == 'Darwin':
         requiredPackages.append('pyobjc')

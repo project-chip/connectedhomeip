@@ -89,6 +89,7 @@ pw_python_action("python") {
         "chip/exceptions/__init__.py",
         "chip/internal/__init__.py",
         "chip/internal/commissioner.py",
+        "chip/internal/thread.py",
         "chip/internal/types.py",
         "chip/logging/__init__.py",
         "chip/logging/library_handle.py",

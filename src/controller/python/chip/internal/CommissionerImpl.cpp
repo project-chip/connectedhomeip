@@ -144,9 +144,18 @@ public:
             return;
         }
 
-        mWifiSsid     = ssid;
-        mWifiPassword = password;
-        mCredentialsDelegate->SendNetworkCredentials(mWifiSsid.c_str(), mWifiPassword.c_str());
+        mCredentialsDelegate->SendNetworkCredentials(ssid, password);
+    }
+
+    void SetThreadCredentials(const chip::DeviceLayer::Internal::DeviceNetworkInfo & threadData)
+    {
+        if (mCredentialsDelegate == nullptr)
+        {
+            ChipLogError(Controller, "Thread credentials received before delegate available.");
+            return;
+        }
+
+        mCredentialsDelegate->SendThreadCredentials(threadData);
     }
 
 private:
@@ -156,10 +165,6 @@ private:
 
     /// Delegate is set during request callbacks
     chip::RendezvousDeviceCredentialsDelegate * mCredentialsDelegate = nullptr;
-
-    // Copy of wifi credentials, to allow them to be used by callbacks
-    std::string mWifiSsid;
-    std::string mWifiPassword;
 };
 
 ServerStorageDelegate gServerStorage;
@@ -167,9 +172,42 @@ ScriptDevicePairingDelegate gPairingDelegate;
 
 } // namespace
 
-extern "C" void pychip_internal_PairingDelegate_SetNetworkCredentials(const char * ssid, const char * password)
+extern "C" void pychip_internal_PairingDelegate_SetWifiCredentials(const char * ssid, const char * password)
 {
     chip::python::ChipMainThreadScheduleAndWait([&]() { gPairingDelegate.SetWifiCredentials(ssid, password); });
+}
+
+extern "C" CHIP_ERROR pychip_internal_PairingDelegate_SetThreadCredentials(const void * data, uint32_t length)
+{
+
+    // Openthread is OPAQUE by the spec, however current CHIP stack does not have any
+    // validation/support for opaque blobs. As a result, we try to do some
+    // pre-validation hre
+
+    // TODO: there should be uniform 'BLOBL' support within the thread stack
+    if (length != sizeof(chip::DeviceLayer::Internal::DeviceNetworkInfo))
+    {
+        ChipLogError(Controller, "Received invalid thread credential blob. Expected size %u and got %u bytes instead",
+                     sizeof(chip::DeviceLayer::Internal::DeviceNetworkInfo), length);
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    // unsure about alignment so copy into a properly aligned item
+    chip::DeviceLayer::Internal::DeviceNetworkInfo threadInfo;
+    memcpy(&threadInfo, data, sizeof(threadInfo));
+
+    // TODO: figure out a proper way to validate this or remove validation once
+    // thread credentials are assumed opaque throughout
+    if ((threadInfo.ThreadChannel != chip::DeviceLayer::Internal::kThreadChannel_NotSpecified) &&
+        ((threadInfo.ThreadChannel < 11) || (threadInfo.ThreadChannel > 26)))
+    {
+        ChipLogError(Controller, "Failed to validate thread info: channel %d is not valid", threadInfo.ThreadChannel);
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    chip::python::ChipMainThreadScheduleAndWait([&]() { gPairingDelegate.SetThreadCredentials(threadInfo); });
+
+    return CHIP_NO_ERROR;
 }
 
 extern "C" void pychip_internal_PairingDelegate_SetNetworkCredentialsRequestedCallback(
