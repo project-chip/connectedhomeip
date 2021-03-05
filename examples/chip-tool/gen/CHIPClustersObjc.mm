@@ -26,6 +26,7 @@
 #import "gen/CHIPClustersObjc.h"
 
 #include <controller/CHIPClusters.h>
+#include <lib/support/Span.h>
 
 using namespace ::chip;
 
@@ -5104,8 +5105,8 @@ private:
         completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
-- (void)setFabric:(char *)fabricId
-         fabricSecret:(char *)fabricSecret
+- (void)setFabric:(NSData *)fabricId
+         fabricSecret:(NSData *)fabricSecret
            breadcrumb:(uint64_t)breadcrumb
             timeoutMs:(uint32_t)timeoutMs
     completionHandler:(ResponseHandler)completionHandler
@@ -5124,8 +5125,9 @@ private:
         return;
     }
 
-    CHIP_ERROR err
-        = self.cppCluster.SetFabric(onSuccess->Cancel(), onFailure->Cancel(), fabricId, fabricSecret, breadcrumb, timeoutMs);
+    CHIP_ERROR err = self.cppCluster.SetFabric(onSuccess->Cancel(), onFailure->Cancel(),
+        chip::ByteSpan((const uint8_t *) fabricId.bytes, fabricId.length),
+        chip::ByteSpan((const uint8_t *) fabricSecret.bytes, fabricSecret.length), breadcrumb, timeoutMs);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
