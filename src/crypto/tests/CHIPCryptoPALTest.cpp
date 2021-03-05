@@ -41,12 +41,12 @@
 #include <support/ScopedBuffer.h>
 #include <support/UnitTestRegistration.h>
 
+#include <crypto/hsm/CHIPCryptoPALHsm_config.h>
 #include <stdarg.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <crypto/hsm/CHIPCryptoPALHsm_config.h>
 
 using namespace chip;
 using namespace chip::Crypto;
@@ -942,17 +942,17 @@ static void TestAddEntropySources(nlTestSuite * inSuite, void * inContext)
     CHIP_ERROR error = add_entropy_source(test_entropy_source, nullptr, 10);
     NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
     uint8_t buffer[5];
-    #ifndef ENABLE_HSM_RAND_GEN
+#ifndef ENABLE_HSM_RAND_GEN
     uint32_t test_entropy_source_call_count = gs_test_entropy_source_called;
-    #endif
+#endif
     NL_TEST_ASSERT(inSuite, DRBG_get_bytes(buffer, sizeof(buffer)) == CHIP_NO_ERROR);
     for (int i = 0; i < 5000 * 2; i++)
     {
         (void) DRBG_get_bytes(buffer, sizeof(buffer));
     }
-    #ifndef ENABLE_HSM_RAND_GEN
+#ifndef ENABLE_HSM_RAND_GEN
     NL_TEST_ASSERT(inSuite, gs_test_entropy_source_called > test_entropy_source_call_count);
-    #endif
+#endif
 }
 #endif
 

@@ -112,9 +112,9 @@ position to another.
 be used to mimic a user manually operating the lock. The button behaves as a
 toggle, swapping the state every time it is pressed.
 
-**Button SW2** can be used to reset the device to a default state. Press and release
-SW2 to initiate a factory reset. The reset action can be cancelled by pressing
-and releasing the button at any point before the 6 second limit.
+**Button SW2** can be used to reset the device to a default state. Press and
+release SW2 to initiate a factory reset. The reset action can be cancelled by
+pressing and releasing the button at any point before the 6 second limit.
 
 **Button SW4** can be used for joining a predefined Thread network advertised by
 a Border Router. Default parameters for a Thread network are hard-coded and are
@@ -182,7 +182,8 @@ used or with _out/debug/chip-k32w061-lock-example_ if MCUXpresso is used.
 
 ## Known issues
 
-- When cross-compiling on Linux - Log messages from the Plug&Trust middleware stack may not echo to the console.
+-   When cross-compiling on Linux - Log messages from the Plug&Trust middleware
+    stack may not echo to the console.
 
 ## Testing the example
 

@@ -102,9 +102,11 @@ CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, c
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 1;
 
-#if ( (CHIP_CRYPTO_HSM) && (ENABLE_HSM_AES_CCM_ENCRYPT) )
-    error = AES_CCM_encrypt_HSM(plaintext, plaintext_length, aad, aad_length, key, key_length, iv, iv_length, ciphertext, tag, tag_length);
-    if(error != CHIP_ERROR_HSM) {
+#if ((CHIP_CRYPTO_HSM) && (ENABLE_HSM_AES_CCM_ENCRYPT))
+    error = AES_CCM_encrypt_HSM(plaintext, plaintext_length, aad, aad_length, key, key_length, iv, iv_length, ciphertext, tag,
+                                tag_length);
+    if (error != CHIP_ERROR_HSM)
+    {
         return error;
     }
     /* Rollback to software implementation if error is CHIP_ERROR_HSM */
@@ -152,9 +154,11 @@ CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_len, co
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 1;
 
-#if ( (CHIP_CRYPTO_HSM) && (ENABLE_HSM_AES_CCM_DECRYPT) )
-    error = AES_CCM_decrypt_HSM(ciphertext, ciphertext_len, aad, aad_len, tag, tag_length, key, key_length, iv, iv_length, plaintext);
-    if( error != CHIP_ERROR_HSM) {
+#if ((CHIP_CRYPTO_HSM) && (ENABLE_HSM_AES_CCM_DECRYPT))
+    error =
+        AES_CCM_decrypt_HSM(ciphertext, ciphertext_len, aad, aad_len, tag, tag_length, key, key_length, iv, iv_length, plaintext);
+    if (error != CHIP_ERROR_HSM)
+    {
         return error;
     }
     /* Rollback to software implementation if error is CHIP_ERROR_HSM */
@@ -202,9 +206,10 @@ CHIP_ERROR Hash_SHA256(const uint8_t * data, const size_t data_length, uint8_t *
 
     // zero data length hash is supported.
 
-#if ( (CHIP_CRYPTO_HSM) && (ENABLE_HSM_HASH_SHA256) )
+#if ((CHIP_CRYPTO_HSM) && (ENABLE_HSM_HASH_SHA256))
     error = Hash_SHA256_HSM(data, data_length, out_buffer);
-    if( error != CHIP_ERROR_HSM) {
+    if (error != CHIP_ERROR_HSM)
+    {
         return error;
     }
     /* Rollback to software implementation if error is CHIP_ERROR_HSM */
@@ -234,9 +239,10 @@ CHIP_ERROR Hash_SHA256_stream::Begin(void)
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;
 
-#if ( (CHIP_CRYPTO_HSM) && (ENABLE_HSM_HASH_SHA256_MULTISTEP) )
+#if ((CHIP_CRYPTO_HSM) && (ENABLE_HSM_HASH_SHA256_MULTISTEP))
     error = Hash_SHA256_stream_Begin_HSM();
-    if( CHIP_ERROR_HSM != error) {
+    if (CHIP_ERROR_HSM != error)
+    {
         return error;
     }
     /* Rollback to software implementation if error is CHIP_ERROR_HSM */
@@ -257,9 +263,10 @@ CHIP_ERROR Hash_SHA256_stream::AddData(const uint8_t * data, const size_t data_l
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;
 
-#if ( (CHIP_CRYPTO_HSM) && (ENABLE_HSM_HASH_SHA256_MULTISTEP) )
+#if ((CHIP_CRYPTO_HSM) && (ENABLE_HSM_HASH_SHA256_MULTISTEP))
     error = Hash_SHA256_stream_AddData_HSM(data, data_length);
-    if( CHIP_ERROR_HSM != error) {
+    if (CHIP_ERROR_HSM != error)
+    {
         return error;
     }
     /* Rollback to software implementation if error is CHIP_ERROR_HSM */
@@ -280,16 +287,17 @@ CHIP_ERROR Hash_SHA256_stream::Finish(uint8_t * out_buffer)
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;
 
-#if ( (CHIP_CRYPTO_HSM) && (ENABLE_HSM_HASH_SHA256_MULTISTEP) )
+#if ((CHIP_CRYPTO_HSM) && (ENABLE_HSM_HASH_SHA256_MULTISTEP))
     error = Hash_SHA256_stream_Finish_HSM(out_buffer);
-    if( CHIP_ERROR_HSM != error) {
+    if (CHIP_ERROR_HSM != error)
+    {
         return error;
     }
     /* Rollback to software implementation if error is CHIP_ERROR_HSM */
     error = CHIP_NO_ERROR
 #endif
 
-    mbedtls_sha256_context * context = to_inner_hash_sha256_context(&mContext);
+        mbedtls_sha256_context * context = to_inner_hash_sha256_context(&mContext);
 
     result = mbedtls_sha256_finish_ret(context, Uint8::to_uchar(out_buffer));
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
@@ -316,9 +324,10 @@ CHIP_ERROR HKDF_SHA256(const uint8_t * secret, const size_t secret_length, const
     VerifyOrExit(secret != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(secret_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
 
-#if ( (CHIP_CRYPTO_HSM) && (ENABLE_HSM_HKDF_SHA256) )
+#if ((CHIP_CRYPTO_HSM) && (ENABLE_HSM_HKDF_SHA256))
     error = HKDF_SHA256_HSM(secret, secret_length, salt, salt_length, info, info_length, out_buffer, out_length);
-    if( CHIP_ERROR_HSM != error) {
+    if (CHIP_ERROR_HSM != error)
+    {
         return error;
     }
     /* Rollback to software implementation if error is CHIP_ERROR_HSM */
@@ -451,9 +460,10 @@ CHIP_ERROR DRBG_get_bytes(uint8_t * out_buffer, const size_t out_length)
     VerifyOrExit(out_buffer != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(out_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
 
-#if ( (CHIP_CRYPTO_HSM) && (ENABLE_HSM_RAND_GEN) )
-    error  = DRBG_get_bytes_HSM(out_buffer, out_length);
-    if( CHIP_ERROR_HSM != error) {
+#if ((CHIP_CRYPTO_HSM) && (ENABLE_HSM_RAND_GEN))
+    error = DRBG_get_bytes_HSM(out_buffer, out_length);
+    if (CHIP_ERROR_HSM != error)
+    {
         return error;
     }
     /* Rollback to software implementation if error is CHIP_ERROR_HSM */
@@ -503,10 +513,12 @@ CHIP_ERROR P256Keypair::ECDSA_sign_msg(const uint8_t * msg, const size_t msg_len
     uint8_t hash[NUM_BYTES_IN_SHA256_HASH];
     size_t siglen = out_signature.Capacity();
 
-#if ( (CHIP_CRYPTO_HSM) && (ENABLE_HSM_GENERATE_EC_KEY) )
+#if ((CHIP_CRYPTO_HSM) && (ENABLE_HSM_GENERATE_EC_KEY))
     error = P256Keypair_ECDSA_sign_msg_HSM(msg, msg_length, Uint8::to_uchar(out_signature), &siglen, key_id);
-    if( CHIP_ERROR_HSM != error) {
-        if (CHIP_NO_ERROR == error) {
+    if (CHIP_ERROR_HSM != error)
+    {
+        if (CHIP_NO_ERROR == error)
+        {
             out_signature.SetLength(siglen);
         }
         return error;
@@ -548,10 +560,12 @@ CHIP_ERROR P256Keypair::ECDSA_sign_hash(const uint8_t * hash, const size_t hash_
     int result       = 0;
     size_t siglen    = out_signature.Capacity();
 
-#if ( (CHIP_CRYPTO_HSM) && (ENABLE_HSM_GENERATE_EC_KEY) )
+#if ((CHIP_CRYPTO_HSM) && (ENABLE_HSM_GENERATE_EC_KEY))
     error = P256Keypair_ECDSA_sign_hash_HSM(hash, hash_length, Uint8::to_uchar(out_signature), &siglen, key_id);
-    if( CHIP_ERROR_HSM != error) {
-        if (CHIP_NO_ERROR == error) {
+    if (CHIP_ERROR_HSM != error)
+    {
+        if (CHIP_NO_ERROR == error)
+        {
             out_signature.SetLength(siglen);
         }
         return error;
@@ -591,9 +605,11 @@ CHIP_ERROR P256PublicKey::ECDSA_validate_msg_signature(const uint8_t * msg, cons
     int result       = 0;
     uint8_t hash[NUM_BYTES_IN_SHA256_HASH];
 
-#if ( (CHIP_CRYPTO_HSM) && (ENABLE_HSM_GENERATE_EC_KEY) )
-    error = P256PublicKey_ECDSA_validate_msg_signature_HSM(msg, msg_length, Uint8::to_const_uchar(signature), signature.Length(), pub_key_id);
-    if( CHIP_ERROR_HSM != error) {
+#if ((CHIP_CRYPTO_HSM) && (ENABLE_HSM_GENERATE_EC_KEY))
+    error = P256PublicKey_ECDSA_validate_msg_signature_HSM(msg, msg_length, Uint8::to_const_uchar(signature), signature.Length(),
+                                                           pub_key_id);
+    if (CHIP_ERROR_HSM != error)
+    {
         return error;
     }
     /* Rollback to software implementation if error is CHIP_ERROR_HSM */
@@ -637,9 +653,11 @@ CHIP_ERROR P256PublicKey::ECDSA_validate_hash_signature(const uint8_t * hash, co
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;
 
-#if ( (CHIP_CRYPTO_HSM) && (ENABLE_HSM_GENERATE_EC_KEY) )
-    error = P256PublicKey_ECDSA_validate_hash_signature_HSM(hash, hash_length, Uint8::to_const_uchar(signature), signature.Length(), pub_key_id);
-    if( CHIP_ERROR_HSM != error) {
+#if ((CHIP_CRYPTO_HSM) && (ENABLE_HSM_GENERATE_EC_KEY))
+    error = P256PublicKey_ECDSA_validate_hash_signature_HSM(hash, hash_length, Uint8::to_const_uchar(signature), signature.Length(),
+                                                            pub_key_id);
+    if (CHIP_ERROR_HSM != error)
+    {
         return error;
     }
     /* Rollback to software implementation if error is CHIP_ERROR_HSM */
@@ -680,13 +698,11 @@ CHIP_ERROR P256Keypair::ECDH_derive_secret(const P256PublicKey & remote_public_k
     int result           = 0;
     size_t secret_length = (out_secret.Length() == 0) ? out_secret.Capacity() : out_secret.Length();
 
-#if ( (CHIP_CRYPTO_HSM) && (ENABLE_HSM_GENERATE_EC_KEY) )
-    error = P256Keypair_ECDH_derive_secret_HSM(Uint8::to_const_uchar(remote_public_key),
-        remote_public_key.Length(),
-        key_id,
-        Uint8::to_uchar(out_secret),
-        &secret_length);
-    if( CHIP_ERROR_HSM != error) {
+#if ((CHIP_CRYPTO_HSM) && (ENABLE_HSM_GENERATE_EC_KEY))
+    error = P256Keypair_ECDH_derive_secret_HSM(Uint8::to_const_uchar(remote_public_key), remote_public_key.Length(), key_id,
+                                               Uint8::to_uchar(out_secret), &secret_length);
+    if (CHIP_ERROR_HSM != error)
+    {
         return error;
     }
     /* Rollback to software implementation if error is CHIP_ERROR_HSM */
@@ -736,17 +752,21 @@ void ClearSecretData(uint8_t * buf, uint32_t len)
 
 CHIP_ERROR P256Keypair::Initialize()
 {
-    CHIP_ERROR error = CHIP_NO_ERROR;
-    int result       = 0;
+    CHIP_ERROR error   = CHIP_NO_ERROR;
+    int result         = 0;
     size_t pubkey_size = 0;
 
-#if ( (CHIP_CRYPTO_HSM) && (ENABLE_HSM_GENERATE_EC_KEY) )
-    uint8_t pubkey[128] = {0,};
+#if ((CHIP_CRYPTO_HSM) && (ENABLE_HSM_GENERATE_EC_KEY))
+    uint8_t pubkey[128] = {
+        0,
+    };
     size_t pbKeyByteLen = sizeof(pubkey);
 
     error = P256Keypair_Initialize_HSM(key_id, pubkey, &pbKeyByteLen);
-    if( CHIP_ERROR_HSM != error) {
-        if (CHIP_NO_ERROR == error) {
+    if (CHIP_ERROR_HSM != error)
+    {
+        if (CHIP_NO_ERROR == error)
+        {
             mPublicKey.setPubKeyId(key_id);
             pubkey_size = pbKeyByteLen - 26;
             memcpy(Uint8::to_uchar(mPublicKey), pubkey + 26, pubkey_size);
@@ -798,21 +818,24 @@ CHIP_ERROR P256Keypair::Serialize(P256SerializedKeypair & output)
 
     VerifyOrExit(bbuf.Available() == sizeof(privkey), error = CHIP_ERROR_INTERNAL);
 
-#if ( (CHIP_CRYPTO_HSM) && (ENABLE_HSM_GENERATE_EC_KEY) )
-    if (key_id != 0){
+#if ((CHIP_CRYPTO_HSM) && (ENABLE_HSM_GENERATE_EC_KEY))
+    if (key_id != 0)
+    {
         /* When HSM is used for ECC key generation, store key info in private key buffer */
-        privkey[0] = (uint8_t)(key_id >> 24) & 0xFF;;
+        privkey[0] = (uint8_t)(key_id >> 24) & 0xFF;
+        ;
         privkey[1] = (uint8_t)(key_id >> 16) & 0xFF;
         privkey[2] = (uint8_t)(key_id >> 8) & 0xFF;
-        privkey[3] = (uint8_t)key_id & 0xFF;
+        privkey[3] = (uint8_t) key_id & 0xFF;
     }
-    else {
+    else
+    {
 #endif
         VerifyOrExit(mbedtls_mpi_size(&keypair->d) <= bbuf.Available(), error = CHIP_ERROR_INTERNAL);
 
         result = mbedtls_mpi_write_binary(&keypair->d, Uint8::to_uchar(privkey), sizeof(privkey));
         VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
-#if ( (CHIP_CRYPTO_HSM) && (ENABLE_HSM_GENERATE_EC_KEY) )
+#if ((CHIP_CRYPTO_HSM) && (ENABLE_HSM_GENERATE_EC_KEY))
     }
 #endif
 
@@ -834,8 +857,9 @@ CHIP_ERROR P256Keypair::Deserialize(P256SerializedKeypair & input)
     int result       = 0;
     CHIP_ERROR error = CHIP_NO_ERROR;
 
-#if ( (CHIP_CRYPTO_HSM) && (ENABLE_HSM_GENERATE_EC_KEY) )
-    if (key_id != 0) {
+#if ((CHIP_CRYPTO_HSM) && (ENABLE_HSM_GENERATE_EC_KEY))
+    if (key_id != 0)
+    {
         VerifyOrExit(input.Length() == mPublicKey.Length() + kP256_PrivateKey_Length, error = CHIP_ERROR_INVALID_ARGUMENT);
         bbuf.Put((const uint8_t *) input, mPublicKey.Length());
         VerifyOrExit(bbuf.Fit(), error = CHIP_ERROR_NO_MEMORY);
@@ -846,7 +870,8 @@ CHIP_ERROR P256Keypair::Deserialize(P256SerializedKeypair & input)
             mPublicKey.setPubKeyId(key_id);
         }
     }
-    else {
+    else
+    {
 #endif
 
         mbedtls_ecp_keypair * keypair = to_keypair(&mKeypair);
@@ -867,7 +892,7 @@ CHIP_ERROR P256Keypair::Deserialize(P256SerializedKeypair & input)
             result                  = mbedtls_mpi_read_binary(&keypair->d, privkey, kP256_PrivateKey_Length);
             VerifyOrExit(result == 0, error = CHIP_ERROR_INVALID_ARGUMENT);
         }
-#if ( (CHIP_CRYPTO_HSM) && (ENABLE_HSM_GENERATE_EC_KEY) )
+#if ((CHIP_CRYPTO_HSM) && (ENABLE_HSM_GENERATE_EC_KEY))
     }
 #endif
 
@@ -880,18 +905,20 @@ exit:
 
 P256Keypair::~P256Keypair()
 {
-#if ( (CHIP_CRYPTO_HSM) && (ENABLE_HSM_GENERATE_EC_KEY) )
-    if (key_id != 0){
+#if ((CHIP_CRYPTO_HSM) && (ENABLE_HSM_GENERATE_EC_KEY))
+    if (key_id != 0)
+    {
         P256Keypair_deleteKey_HSM(key_id);
     }
-    else {
+    else
+    {
 #endif
         if (mInitialized)
         {
             mbedtls_ecp_keypair * keypair = to_keypair(&mKeypair);
             mbedtls_ecp_keypair_free(keypair);
         }
-#if ( (CHIP_CRYPTO_HSM) && (ENABLE_HSM_GENERATE_EC_KEY) )
+#if ((CHIP_CRYPTO_HSM) && (ENABLE_HSM_GENERATE_EC_KEY))
     }
 #endif
 }
@@ -1036,9 +1063,10 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::Mac(const uint8_t * key, size_t key_le
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;
 
-#if ( (CHIP_CRYPTO_HSM) && (ENABLE_HSM_MAC) )
-    error  = Spake2p_P256_SHA256_HKDF_HMAC_Mac_HSM(key, key_len, in, in_len, out);
-    if( CHIP_ERROR_HSM != error) {
+#if ((CHIP_CRYPTO_HSM) && (ENABLE_HSM_MAC))
+    error = Spake2p_P256_SHA256_HKDF_HMAC_Mac_HSM(key, key_len, in, in_len, out);
+    if (CHIP_ERROR_HSM != error)
+    {
         return error;
     }
     /* Rollback to software implementation if error is CHIP_ERROR_HSM */
