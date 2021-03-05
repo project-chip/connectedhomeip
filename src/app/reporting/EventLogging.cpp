@@ -32,7 +32,7 @@ using namespace chip::TLV;
 namespace chip {
 namespace app {
 namespace reporting {
-CHIP_ERROR LogEvent(EventLoggingDelegate * apDelegate, const EventOptions * apOptions, chip::EventNumber &aEventNumber)
+CHIP_ERROR LogEvent(EventLoggingDelegate * apDelegate, const EventOptions * apOptions, chip::EventNumber & aEventNumber)
 {
 
     LoggingManagement & logManager = LoggingManagement::GetInstance();

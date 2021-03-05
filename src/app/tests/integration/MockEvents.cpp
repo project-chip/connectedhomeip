@@ -112,15 +112,14 @@ CHIP_ERROR LivenessEventGenerator::WriteEvent(chip::TLV::TLVWriter & aWriter)
 chip::EventNumber LivenessEventGenerator::LogLiveness(chip::NodeId aNodeId, chip::EndpointId aEndpointId,
                                                       LivenessDeviceStatus aStatus)
 {
-    chip::EventNumber number = 0;
-    chip::app::reporting::EventSchema schema = { aNodeId, aEndpointId,
-                                                 kLivenessClusterId, kLivenessChangeEvent,
-                                                 chip::app::reporting::PriorityLevel::Critical,
-                                                 };
+    chip::EventNumber number                 = 0;
+    chip::app::reporting::EventSchema schema = {
+        aNodeId, aEndpointId, kLivenessClusterId, kLivenessChangeEvent, chip::app::reporting::PriorityLevel::Critical,
+    };
     chip::app::reporting::EventOptions options;
-    mStatus             = static_cast<int32_t>(aStatus);
+    mStatus               = static_cast<int32_t>(aStatus);
     options.mpEventSchema = &schema;
-    options.mUrgent      = true;
+    options.mUrgent       = true;
 
     chip::app::reporting::LogEvent(this, &options, number);
     return number;

@@ -59,22 +59,22 @@ exit:
 
 void InteractionModelEngine::Shutdown()
 {
-    for (auto& commandSender : mCommandSenderObjs)
+    for (auto & commandSender : mCommandSenderObjs)
     {
         commandSender.Shutdown();
     }
 
-    for (auto& commandHandler : mCommandHandlerObjs)
+    for (auto & commandHandler : mCommandHandlerObjs)
     {
         commandHandler.Shutdown();
     }
 
-    for (auto& readClient : mReadClients)
+    for (auto & readClient : mReadClients)
     {
         readClient.Shutdown();
     }
 
-    for (auto& readHandler : mReadHandlers)
+    for (auto & readHandler : mReadHandlers)
     {
         readHandler.Shutdown();
     }
@@ -85,7 +85,7 @@ CHIP_ERROR InteractionModelEngine::NewCommandSender(CommandSender ** const apCom
     CHIP_ERROR err   = CHIP_ERROR_NO_MEMORY;
     *apCommandSender = nullptr;
 
-    for (auto& commandSender : mCommandSenderObjs)
+    for (auto & commandSender : mCommandSenderObjs)
     {
         if (commandSender.IsFree())
         {
@@ -109,7 +109,7 @@ CHIP_ERROR InteractionModelEngine::NewReadClient(ReadClient ** const apReadClien
 {
     CHIP_ERROR err = CHIP_ERROR_NO_MEMORY;
 
-    for (auto& readClient : mReadClients)
+    for (auto & readClient : mReadClients)
     {
         if (readClient.IsFree())
         {
@@ -154,13 +154,13 @@ void InteractionModelEngine::OnInvokeCommandRequest(Messaging::ExchangeContext *
                                                     const PacketHeader & aPacketHeader, const PayloadHeader & aPayloadHeader,
                                                     System::PacketBufferHandle aPayload)
 {
-    CHIP_ERROR err                 = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
-    for (auto& commandHandler : mCommandHandlerObjs)
+    for (auto & commandHandler : mCommandHandlerObjs)
     {
         if (commandHandler.IsFree())
         {
-            err           = commandHandler.Init(mpExchangeMgr);
+            err = commandHandler.Init(mpExchangeMgr);
             SuccessOrExit(err);
             commandHandler.OnMessageReceived(apExchangeContext, aPacketHeader, aPayloadHeader, std::move(aPayload));
             apExchangeContext = nullptr;
@@ -181,15 +181,15 @@ exit:
 void InteractionModelEngine::OnReadRequest(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
                                            const PayloadHeader & aPayloadHeader, System::PacketBufferHandle aPayload)
 {
-    CHIP_ERROR err            = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     ChipLogDetail(DataManagement, "Receive Read request");
 
-    for (auto& readHandler : mReadHandlers)
+    for (auto & readHandler : mReadHandlers)
     {
         if (readHandler.IsFree())
         {
-            err         = readHandler.Init(mpExchangeMgr, mpDelegate);
+            err = readHandler.Init(mpExchangeMgr, mpDelegate);
             SuccessOrExit(err);
             readHandler.OnMessageReceived(apExchangeContext, aPacketHeader, aPayloadHeader, std::move(aPayload));
             apExchangeContext = nullptr;

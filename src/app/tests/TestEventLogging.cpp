@@ -177,8 +177,7 @@ static void CheckLogEventBasics(nlTestSuite * apSuite, void * apContext)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::EventNumber eid1, eid2, eid3;
-    chip::app::reporting::EventSchema schema = { kTestNodeId, kTestEndpointId,
-                                                 kLivenessClusterId, kLivenessChangeEvent,
+    chip::app::reporting::EventSchema schema = { kTestNodeId, kTestEndpointId, kLivenessClusterId, kLivenessChangeEvent,
                                                  chip::app::reporting::PriorityLevel::Debug };
 
     chip::app::reporting::EventOptions options;
@@ -186,7 +185,7 @@ static void CheckLogEventBasics(nlTestSuite * apSuite, void * apContext)
 
     InitializeEventLogging();
     options.mpEventSchema = &schema;
-    options.mUrgent      = true;
+    options.mUrgent       = true;
 
     {
         chip::app::reporting::LoggingManagement & logMgmt = chip::app::reporting::LoggingManagement::GetInstance();

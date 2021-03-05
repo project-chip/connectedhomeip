@@ -32,7 +32,9 @@ namespace reporting {
 
 EventOptions::EventOptions(void) : mTimestamp(), mpEventSchema(nullptr), mTimestampType(TimestampType::Invalid), mUrgent(false) {}
 
-EventOptions::EventOptions(bool aUrgent) : mTimestamp(), mpEventSchema(nullptr), mTimestampType(TimestampType::Invalid), mUrgent(aUrgent) {}
+EventOptions::EventOptions(bool aUrgent) :
+    mTimestamp(), mpEventSchema(nullptr), mTimestampType(TimestampType::Invalid), mUrgent(aUrgent)
+{}
 
 EventOptions::EventOptions(timestamp_t aSystemTimestamp) :
     mTimestamp(aSystemTimestamp), mpEventSchema(nullptr), mTimestampType(TimestampType::System), mUrgent(false)

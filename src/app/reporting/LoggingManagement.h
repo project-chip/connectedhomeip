@@ -198,7 +198,7 @@ public:
      *
      * @return CHIP_ERROR  CHIP Error Code
      */
-    CHIP_ERROR LogEvent(EventLoggingDelegate * apDelegate, const EventOptions * apOptions, chip::EventNumber &aEventNumber);
+    CHIP_ERROR LogEvent(EventLoggingDelegate * apDelegate, const EventOptions * apOptions, chip::EventNumber & aEventNumber);
 
     /**
      * @brief
@@ -358,8 +358,7 @@ public:
      *                          relevant to this event.
      *
      */
-    CHIP_ERROR BlitEvent(EventLoadOutContext * apContext, EventLoggingDelegate * apDelegate,
-                         const EventOptions * apOptions);
+    CHIP_ERROR BlitEvent(EventLoadOutContext * apContext, EventLoggingDelegate * apDelegate, const EventOptions * apOptions);
 
     /**
      * @brief Helper function to skip writing an event corresponding to an allocated
@@ -373,9 +372,8 @@ public:
     void SkipEvent(EventLoadOutContext * apContext);
 
 private:
-    //Internal function to log event
-    CHIP_ERROR LogEventPrivate(EventLoggingDelegate * apDelegate,
-                                      const EventOptions * apOptions, chip::EventNumber &aEventNumber);
+    // Internal function to log event
+    CHIP_ERROR LogEventPrivate(EventLoggingDelegate * apDelegate, const EventOptions * apOptions, chip::EventNumber & aEventNumber);
 
     void FlushHandler(System::Layer * inSystemLayer, INET_ERROR inErr);
 

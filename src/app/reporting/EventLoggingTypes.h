@@ -121,9 +121,10 @@ struct EventSchema
     /**
      * Default constructor
      */
-    EventSchema(chip::NodeId aNodeId, chip::EndpointId aEndpointId, chip::ClusterId aClusterId,
-            chip::EventId aEventId, PriorityLevel aPriority) : mNodeId(aNodeId), mEndpointId(aEndpointId),
-            mClusterId(aClusterId), mEventId(aEventId), mPriority(aPriority) {};
+    EventSchema(chip::NodeId aNodeId, chip::EndpointId aEndpointId, chip::ClusterId aClusterId, chip::EventId aEventId,
+                PriorityLevel aPriority) :
+        mNodeId(aNodeId),
+        mEndpointId(aEndpointId), mClusterId(aClusterId), mEventId(aEventId), mPriority(aPriority){};
     chip::NodeId mNodeId;
     chip::EndpointId mEndpointId;
     chip::ClusterId mClusterId; //< ID of cluster

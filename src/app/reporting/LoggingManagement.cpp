@@ -322,7 +322,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR LoggingManagement::BlitEvent(EventLoadOutContext * apContext, EventLoggingDelegate * apDelegate, const EventOptions * apOptions)
+CHIP_ERROR LoggingManagement::BlitEvent(EventLoadOutContext * apContext, EventLoggingDelegate * apDelegate,
+                                        const EventOptions * apOptions)
 {
 
     CHIP_ERROR err       = CHIP_NO_ERROR;
@@ -571,9 +572,8 @@ CHIP_ERROR LoggingManagement::CopyAndAdjustDeltaTime(const TLVReader & aReader, 
     return err;
 }
 
-CHIP_ERROR LoggingManagement::LogEvent(EventLoggingDelegate * apDelegate,
-                                              const EventOptions * apOptions,
-                                              chip::EventNumber &aEventNumber)
+CHIP_ERROR LoggingManagement::LogEvent(EventLoggingDelegate * apDelegate, const EventOptions * apOptions,
+                                       chip::EventNumber & aEventNumber)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     Platform::CriticalSectionEnter();
@@ -589,21 +589,19 @@ exit:
     return err;
 }
 
-CHIP_ERROR LoggingManagement::LogEventPrivate(EventLoggingDelegate * apDelegate,
-                                              const EventOptions * apOptions,
-                                              chip::EventNumber &aEventNumber)
+CHIP_ERROR LoggingManagement::LogEventPrivate(EventLoggingDelegate * apDelegate, const EventOptions * apOptions,
+                                              chip::EventNumber & aEventNumber)
 {
     CircularTLVWriter writer;
     CHIP_ERROR err                 = CHIP_NO_ERROR;
     size_t requestSize             = CHIP_CONFIG_EVENT_SIZE_RESERVE;
     bool didWriteEvent             = false;
-    aEventNumber = 0;
+    aEventNumber                   = 0;
     CircularEventBuffer checkpoint = *mpEventBuffer;
 
-    EventLoadOutContext ctxt =
-        EventLoadOutContext(writer, apOptions->mpEventSchema->mPriority, GetPriorityBuffer(apOptions->mpEventSchema->mPriority)->mLastEventNumber);
-    EventOptions opts = EventOptions(static_cast<timestamp_t>(System::Timer::GetCurrentEpoch()));
-
+    EventLoadOutContext ctxt = EventLoadOutContext(writer, apOptions->mpEventSchema->mPriority,
+                                                   GetPriorityBuffer(apOptions->mpEventSchema->mPriority)->mLastEventNumber);
+    EventOptions opts        = EventOptions(static_cast<timestamp_t>(System::Timer::GetCurrentEpoch()));
 
     // check whether the entry is to be logged or discarded silently
     VerifyOrExit(apOptions->mpEventSchema->mPriority <= GetCurrentPriority(apOptions->mpEventSchema->mClusterId), /* no-op */);
@@ -622,7 +620,7 @@ CHIP_ERROR LoggingManagement::LogEventPrivate(EventLoggingDelegate * apDelegate,
 
     if (apOptions != nullptr)
     {
-        opts.mUrgent = apOptions->mUrgent;
+        opts.mUrgent       = apOptions->mUrgent;
         opts.mpEventSchema = apOptions->mpEventSchema;
     }
 
@@ -696,7 +694,8 @@ exit:
 #if CHIP_CONFIG_EVENT_LOGGING_VERBOSE_DEBUG_LOGS
         ChipLogDetail(EventLogging,
                       "LogEvent event number: %u schema priority: %u cluster id: 0x%x event id: 0x%x sys timestamp: 0x%" PRIx32,
-                      aEventNumber, opts.mpEventSchema->mPriority, opts.mpEventSchema->mClusterId, opts.mpEventSchema->mEventId, opts.mTimestamp.systemTimestamp);
+                      aEventNumber, opts.mpEventSchema->mPriority, opts.mpEventSchema->mClusterId, opts.mpEventSchema->mEventId,
+                      opts.mTimestamp.systemTimestamp);
 #endif // CHIP_CONFIG_EVENT_LOGGING_VERBOSE_DEBUG_LOGS
 
         ScheduleFlushIfNeeded(apOptions == nullptr ? false : opts.mUrgent);

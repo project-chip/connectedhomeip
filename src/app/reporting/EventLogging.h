@@ -72,7 +72,7 @@ namespace reporting {
  *
  * @return CHIP_ERROR  CHIP Error Code
  */
-CHIP_ERROR LogEvent(EventLoggingDelegate * apDelegate, const EventOptions * apOptions, chip::EventNumber &aEventNumber);
+CHIP_ERROR LogEvent(EventLoggingDelegate * apDelegate, const EventOptions * apOptions, chip::EventNumber & aEventNumber);
 
 } // namespace reporting
 } // namespace app
