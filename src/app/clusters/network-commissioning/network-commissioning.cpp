@@ -115,6 +115,7 @@ EmberAfNetworkCommissioningError OnAddThreadNetworkCommandCallbackInternal(app::
 
     static_assert(std::is_same<std::remove_cv_t<decltype(kMaxNetworkIDLen)>, uint8_t>::value);
     static_assert(sizeof(kTemporaryThreadNetworkId) <= kMaxNetworkIDLen);
+    static_assert(sizeof(kTemporaryThreadNetworkId) <= sizeof(ThreadNetworkInfo::mDataset));
     VerifyOrExit(operationalDatasetLen <= kMaxThreadDatasetLen, err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_OUT_OF_RANGE);
 
     for (size_t i = 0; i < kMaxNetworks; i++)
