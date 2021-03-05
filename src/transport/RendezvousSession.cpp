@@ -182,8 +182,7 @@ void RendezvousSession::OnSessionEstablished()
         ChipLogError(Ble, "Missing node id in rendezvous parameters. Node ID is required until opcerts are implemented");
     }
 
-    const auto defaultPeerNodeId = mParams.IsController() ? kTestDeviceNodeId : kTestControllerNodeId;
-    mPairingSession.PeerConnection().SetPeerNodeId(mParams.GetRemoteNodeId().ValueOr(defaultPeerNodeId));
+    mPairingSession.PeerConnection().SetPeerNodeId(mParams.GetRemoteNodeId().ValueOr(kUndefinedNodeId));
 
     CHIP_ERROR err = mSecureSessionMgr->NewPairing(
         Optional<Transport::PeerAddress>::Value(mPairingSession.PeerConnection().GetPeerAddress()),
@@ -433,20 +432,24 @@ void RendezvousSession::InitPairingSessionHandle()
 
 void RendezvousSession::ReleasePairingSessionHandle()
 {
-    if (mPairingSessionHandle != nullptr)
+    VerifyOrReturn(mPairingSessionHandle != nullptr);
+
+    Transport::PeerConnectionState * state = mSecureSessionMgr->GetPeerConnectionState(*mPairingSessionHandle);
+    if (state != nullptr)
     {
-        Transport::PeerConnectionState * state = mSecureSessionMgr->GetPeerConnectionState(*mPairingSessionHandle);
-        if (state != nullptr)
-        {
-            // Reset the transport and peer address in the active secure channel
-            // This will allow the regular transport (e.g. UDP) to take over the existing secure channel
-            PeerAddress addr;
-            state->SetTransport(nullptr);
-            state->SetPeerAddress(addr);
-        }
-        chip::Platform::Delete(mPairingSessionHandle);
-        mPairingSessionHandle = nullptr;
+        // Reset the transport and peer address in the active secure channel
+        // This will allow the regular transport (e.g. UDP) to take over the existing secure channel
+        state->SetTransport(nullptr);
+        state->SetPeerAddress(PeerAddress{});
+
+        // When the remote node ID is not specified in the initial rendezvous parameters, the connection state
+        // is created with undefined peer node ID. Update it now.
+        if (state->GetPeerNodeId() == kUndefinedNodeId)
+            state->SetPeerNodeId(mParams.GetRemoteNodeId().ValueOr(kUndefinedNodeId));
     }
+
+    chip::Platform::Delete(mPairingSessionHandle);
+    mPairingSessionHandle = nullptr;
 }
 
 CHIP_ERROR RendezvousSession::WaitForPairing(uint32_t setupPINCode)
