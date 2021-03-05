@@ -40,7 +40,7 @@ void HandleIncomingBleConnection(Ble::BLEEndPoint * bleEP);
 struct BLEAdvConfig
 {
     char * mpBleName;
-    uint32_t mNodeId;
+    uint32_t mAdapterId;
     uint8_t mMajor;
     uint8_t mMinor;
     uint16_t mVendorId;
@@ -89,7 +89,7 @@ class BLEManagerImpl final : public BLEManager,
     friend BLEManager;
 
 public:
-    CHIP_ERROR ConfigureBle(uint32_t aNodeId, bool aIsCentral);
+    CHIP_ERROR ConfigureBle(uint32_t aAdapterId, bool aIsCentral);
 
     // Driven by BlueZ IO
     static void HandleNewConnection(BLE_CONNECTION_OBJECT conId);
