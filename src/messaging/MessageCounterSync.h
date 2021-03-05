@@ -76,7 +76,7 @@ public:
                                         System::PacketBufferHandle msgBuf, Messaging::ExchangeContext * exchangeContext);
 
     /**
-     *  Add a CHIP message into the cache table to queue the incomming messages that trigger message counter synchronization
+     *  Add a CHIP message into the cache table to queue the incoming messages that trigger message counter synchronization
      * protocol for re-processing.
      *
      *  @param[in]    packetHeader     The message header for the received message.
@@ -98,12 +98,13 @@ private:
      *    This class is part of the CHIP Message Counter Synchronization Protocol and is used
      *    to keep track of a CHIP messages to be transmitted to a destination node whose message
      *    counter is unknown. The message would be retransmitted from this table after message
-     *    synchronization is completed.
+     *    counter synchronization is completed.
      *
      */
     struct RetransTableEntry
     {
-        ExchangeContext * exchangeContext; /**< The ExchangeContext for the stored CHIP message. */
+        ExchangeContext * exchangeContext; /**< The ExchangeContext for the stored CHIP message.
+                                                Non-null if and only if this entry is in use. */
         System::PacketBufferHandle msgBuf; /**< A handle to the PacketBuffer object holding the CHIP message. */
         SendFlags sendFlags;               /**< Flags set by the application for the CHIP message being sent. */
         uint16_t protocolId;               /**< The protocol identifier of the CHIP message to be sent. */
@@ -115,17 +116,19 @@ private:
      *
      *  @brief
      *    This class is part of the CHIP Message Counter Synchronization Protocol and is used
-     *    to keep track of a CHIP messages to be transmitted to a destination node whose message
-     *    counter is unknown. The message would be retransmitted from this table after message
-     *    synchronization is completed.
+     *    to keep track of a CHIP messages to be reprocessed whose source's
+     *    message counter is unknown. The message is reprocessed after message
+     *    counter synchronization is completed.
      *
      */
     struct ReceiveTableEntry
     {
-        PacketHeader packetHeader;         /**< The ExchangeContext for the stored CHIP message. */
-        PayloadHeader payloadHeader;       /**< Flags set by the application for the CHIP message being sent. */
-        SecureSessionHandle session;       /**< The protocol identifier of the CHIP message to be sent. */
-        System::PacketBufferHandle msgBuf; /**< A handle to the PacketBuffer object holding the CHIP message. */
+        PacketHeader packetHeader;         /**< The packet header for the message. */
+        PayloadHeader payloadHeader;       /**< The payload header for the message. */
+        SecureSessionHandle session;       /**< The secure session the message was received on. */
+        System::PacketBufferHandle msgBuf; /**< A handle to the PacketBuffer object holding
+                                                the message data. This is non-null if and only
+                                                if this entry is in use. */
     };
 
     Messaging::ExchangeManager * mExchangeMgr; // [READ ONLY] Associated Exchange Manager object.
@@ -133,7 +136,7 @@ private:
     // MessageCounterSyncProtocol cache table to queue the outging messages that trigger message counter synchronization protocol.
     RetransTableEntry mRetransTable[CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS];
 
-    // MessageCounterSyncProtocol cache table to queue the incomming messages that trigger message counter synchronization protocol.
+    // MessageCounterSyncProtocol cache table to queue the incoming messages that trigger message counter synchronization protocol.
     ReceiveTableEntry mReceiveTable[CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS];
 
     void RetransPendingGroupMsgs(NodeId peerNodeId);

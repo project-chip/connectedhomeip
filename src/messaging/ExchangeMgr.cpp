@@ -206,7 +206,7 @@ CHIP_ERROR ExchangeManager::UnregisterUMH(uint32_t protocolId, int16_t msgType)
     return CHIP_ERROR_NO_UNSOLICITED_MESSAGE_HANDLER;
 }
 
-bool ExchangeManager::isMsgCounterSyncMessage(const PayloadHeader & payloadHeader) const
+bool ExchangeManager::IsMsgCounterSyncMessage(const PayloadHeader & payloadHeader)
 {
     if (payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::MsgCounterSyncReq) ||
         payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::MsgCounterSyncRsp))
@@ -231,12 +231,12 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
     UnsolicitedMessageHandler * matchingUMH = nullptr;
     bool sendAckAndCloseExchange            = false;
 
-    if (!isMsgCounterSyncMessage(payloadHeader) && packetHeader.IsPeerGroupMsgIdNotSynchronized())
+    if (!IsMsgCounterSyncMessage(payloadHeader) && packetHeader.IsPeerGroupMsgIdNotSynchronized())
     {
         Transport::PeerConnectionState * state = mSessionMgr->GetPeerConnectionState(session);
         VerifyOrReturn(state != nullptr);
 
-        // Queue the message as need for sync with destination node.
+        // Queue the message as needed for sync with destination node.
         err = mMessageCounterSyncMgr.AddToReceiveTable(packetHeader, payloadHeader, session, std::move(msgBuf));
         VerifyOrReturn(err == CHIP_NO_ERROR);
 
@@ -254,7 +254,7 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
         }
 
         // After the message that triggers message counter synchronization is stored, and a message counter
-        // synchronization exchange is initiated, we need to return immeidately and re-process the original message
+        // synchronization exchange is initiated, we need to return immediately and re-process the original message
         // when the synchronization is completed.
 
         return;

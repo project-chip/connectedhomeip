@@ -88,12 +88,12 @@ CHIP_ERROR ExchangeContext::SendMessage(uint16_t protocolId, uint8_t msgType, Pa
     VerifyOrReturnError(state != nullptr, CHIP_ERROR_NOT_CONNECTED);
 
     // If a group message is to be transmitted to a destination node whose message counter is unknown.
-    if (ChipKeyId::IsAppGroupKey(state->GetLocalKeyID()) && !state->isPeerMsgCounterSynced())
+    if (ChipKeyId::IsAppGroupKey(state->GetLocalKeyID()) && !state->IsPeerMsgCounterSynced())
     {
         MessageCounterSyncMgr * messageCounterSyncMgr = mExchangeMgr->GetMessageCounterSyncMgr();
         VerifyOrReturnError(messageCounterSyncMgr != nullptr, CHIP_ERROR_INTERNAL);
 
-        // Queue the message as need for sync with destination node.
+        // Queue the message as needed for sync with destination node.
         err = messageCounterSyncMgr->AddToRetransmissionTable(protocolId, msgType, sendFlags, std::move(msgBuf), this);
         ReturnErrorOnFailure(err);
 

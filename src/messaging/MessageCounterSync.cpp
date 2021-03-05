@@ -104,7 +104,7 @@ CHIP_ERROR MessageCounterSyncMgr::AddToRetransmissionTable(uint16_t protocolId, 
 
     for (RetransTableEntry & entry : mRetransTable)
     {
-        // Check the exchContext pointer for finding an empty slot in Table
+        // Entries are in use if they have an exchangeContext.
         if (entry.exchangeContext == nullptr)
         {
             entry.protocolId      = protocolId;
@@ -136,7 +136,8 @@ CHIP_ERROR MessageCounterSyncMgr::AddToRetransmissionTable(uint16_t protocolId, 
  */
 void MessageCounterSyncMgr::RetransPendingGroupMsgs(NodeId peerNodeId)
 {
-    // Find all retransmit entries (re) matching peerNodeId and using application group key.
+    // Find all retransmit entries matching peerNodeId.  Note that everything in
+    // this table was using an application group key; that's why it was added.
     for (RetransTableEntry & entry : mRetransTable)
     {
         if (entry.exchangeContext != nullptr && entry.exchangeContext->GetSecureSession().GetPeerNodeId() == peerNodeId)
@@ -165,7 +166,7 @@ CHIP_ERROR MessageCounterSyncMgr::AddToReceiveTable(const PacketHeader & packetH
 
     for (ReceiveTableEntry & entry : mReceiveTable)
     {
-        // Check the exchContext pointer for finding an empty slot in Table
+        // Entries are in use if they have a message buffer.
         if (entry.msgBuf.IsNull())
         {
             entry.packetHeader  = packetHeader;
@@ -189,14 +190,15 @@ CHIP_ERROR MessageCounterSyncMgr::AddToReceiveTable(const PacketHeader & packetH
 
 /**
  *  Reprocess all pending messages that were encrypted with application
- *  group key and were addressed to the specified node.
+ *  group key and were addressed to the specified node id.
  *
  *  @param[in] peerNodeId    Node ID of the destination node.
  *
  */
 void MessageCounterSyncMgr::ProcessPendingGroupMsgs(NodeId peerNodeId)
 {
-    // Find all retransmit entries (re) matching peerNodeId and using application group key.
+    // Find all receive entries matching peerNodeId.  Note that everything in
+    // this table was using an application group key; that's why it was added.
     for (ReceiveTableEntry & entry : mReceiveTable)
     {
         if (!entry.msgBuf.IsNull() && entry.session.GetPeerNodeId() == peerNodeId)
@@ -205,7 +207,10 @@ void MessageCounterSyncMgr::ProcessPendingGroupMsgs(NodeId peerNodeId)
             mExchangeMgr->HandleGroupMessageReceived(entry.packetHeader, entry.payloadHeader, entry.session,
                                                      std::move(entry.msgBuf));
 
-            // Explicitly free any buffer owned by this handle.
+            // Explicitly free any buffer owned by this handle.  The
+            // HandleGroupMessageReceived() call should really handle this, but
+            // just in case it messes up we don't want to get confused about
+            // wheter the entry is in use.
             entry.msgBuf = nullptr;
         }
     }
