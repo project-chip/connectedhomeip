@@ -1499,6 +1499,103 @@ void DispatchServerCommand(app::Command * command, CommandId commandId, Endpoint
 
 } // namespace DoorLock
 
+namespace GeneralCommissioning {
+
+void DispatchServerCommand(app::Command * command, CommandId commandId, EndpointId endpointId, TLV::TLVReader & dataTlv)
+{
+    {
+        switch (commandId)
+        {
+        case ZCL_ARM_FAIL_SAFE_COMMAND_ID: {
+            CHIP_ERROR TLVError = CHIP_NO_ERROR;
+            uint16_t expiryLengthSeconds;
+            uint64_t breadcrumb;
+            uint32_t timeoutMs;
+
+            while ((TLVError = dataTlv.Next()) == CHIP_NO_ERROR)
+            {
+                switch (TLV::TagNumFromTag(dataTlv.GetTag()))
+                {
+                case 0:
+                    TLVError = dataTlv.Get(expiryLengthSeconds);
+                    break;
+                case 1:
+                    TLVError = dataTlv.Get(breadcrumb);
+                    break;
+                case 2:
+                    TLVError = dataTlv.Get(timeoutMs);
+                    break;
+                default:
+                    // Unsupported tag, ignore it.
+                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
+                    break;
+                }
+                if (TLVError != CHIP_NO_ERROR)
+                {
+                    ChipLogProgress(Zcl, "Failed to decode TLV data with tag %" PRIx32 ": %" PRId32,
+                                    TLV::TagNumFromTag(dataTlv.GetTag()), TLVError);
+                }
+            }
+            // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
+            emberAfGeneralCommissioningClusterArmFailSafeCallback(expiryLengthSeconds, breadcrumb, timeoutMs);
+            break;
+        }
+        case ZCL_COMMISSIONING_COMPLETE_COMMAND_ID: {
+            // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
+            emberAfGeneralCommissioningClusterCommissioningCompleteCallback();
+            break;
+        }
+        case ZCL_SET_FABRIC_COMMAND_ID: {
+            CHIP_ERROR TLVError = CHIP_NO_ERROR;
+            const uint8_t * fabricId;
+            const uint8_t * fabricSecret;
+            uint64_t breadcrumb;
+            uint32_t timeoutMs;
+
+            while ((TLVError = dataTlv.Next()) == CHIP_NO_ERROR)
+            {
+                switch (TLV::TagNumFromTag(dataTlv.GetTag()))
+                {
+                case 0:
+                    TLVError = dataTlv.GetDataPtr(fabricId);
+                    break;
+                case 1:
+                    TLVError = dataTlv.GetDataPtr(fabricSecret);
+                    break;
+                case 2:
+                    TLVError = dataTlv.Get(breadcrumb);
+                    break;
+                case 3:
+                    TLVError = dataTlv.Get(timeoutMs);
+                    break;
+                default:
+                    // Unsupported tag, ignore it.
+                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
+                    break;
+                }
+                if (TLVError != CHIP_NO_ERROR)
+                {
+                    ChipLogProgress(Zcl, "Failed to decode TLV data with tag %" PRIx32 ": %" PRId32,
+                                    TLV::TagNumFromTag(dataTlv.GetTag()), TLVError);
+                }
+            }
+            // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
+            emberAfGeneralCommissioningClusterSetFabricCallback(const_cast<uint8_t *>(fabricId),
+                                                                const_cast<uint8_t *>(fabricSecret), breadcrumb, timeoutMs);
+            break;
+        }
+        default: {
+            // Unrecognized command ID, error status will apply.
+            // TODO: Encode response for command not found
+            ChipLogError(Zcl, "Unknown command %" PRIx16 " for cluster %" PRIx16, commandId, ZCL_GENERAL_COMMISSIONING_CLUSTER_ID);
+            break;
+        }
+        }
+    }
+}
+
+} // namespace GeneralCommissioning
+
 namespace Groups {
 
 void DispatchServerCommand(app::Command * command, CommandId commandId, EndpointId endpointId, TLV::TLVReader & dataTlv)
@@ -2400,6 +2497,9 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
         break;
     case ZCL_DOOR_LOCK_CLUSTER_ID:
         clusters::DoorLock::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
+        break;
+    case ZCL_GENERAL_COMMISSIONING_CLUSTER_ID:
+        clusters::GeneralCommissioning::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
         break;
     case ZCL_GROUPS_CLUSTER_ID:
         clusters::Groups::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);

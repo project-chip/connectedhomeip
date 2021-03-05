@@ -842,6 +842,115 @@ void DispatchClientCommand(app::Command * command, CommandId commandId, Endpoint
 
 } // namespace DoorLock
 
+namespace GeneralCommissioning {
+
+void DispatchClientCommand(app::Command * command, CommandId commandId, EndpointId endpointId, TLV::TLVReader & dataTlv)
+{
+    {
+        switch (commandId)
+        {
+        case ZCL_ARM_FAIL_SAFE_RESPONSE_COMMAND_ID: {
+            CHIP_ERROR TLVError = CHIP_NO_ERROR;
+            uint8_t errorCode;
+            const uint8_t * debugText;
+
+            while ((TLVError = dataTlv.Next()) == CHIP_NO_ERROR)
+            {
+                switch (TLV::TagNumFromTag(dataTlv.GetTag()))
+                {
+                case 0:
+                    TLVError = dataTlv.Get(errorCode);
+                    break;
+                case 1:
+                    TLVError = dataTlv.GetDataPtr(debugText);
+                    break;
+                default:
+                    // Unsupported tag, ignore it.
+                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
+                    break;
+                }
+                if (TLVError != CHIP_NO_ERROR)
+                {
+                    ChipLogProgress(Zcl, "Failed to decode TLV data with tag %" PRIx32 ": %" PRId32,
+                                    TLV::TagNumFromTag(dataTlv.GetTag()), TLVError);
+                }
+            }
+            // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
+            emberAfGeneralCommissioningClusterArmFailSafeResponseCallback(errorCode, const_cast<uint8_t *>(debugText));
+            break;
+        }
+        case ZCL_COMMISSIONING_COMPLETE_RESPONSE_COMMAND_ID: {
+            CHIP_ERROR TLVError = CHIP_NO_ERROR;
+            uint8_t errorCode;
+            const uint8_t * debugText;
+
+            while ((TLVError = dataTlv.Next()) == CHIP_NO_ERROR)
+            {
+                switch (TLV::TagNumFromTag(dataTlv.GetTag()))
+                {
+                case 0:
+                    TLVError = dataTlv.Get(errorCode);
+                    break;
+                case 1:
+                    TLVError = dataTlv.GetDataPtr(debugText);
+                    break;
+                default:
+                    // Unsupported tag, ignore it.
+                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
+                    break;
+                }
+                if (TLVError != CHIP_NO_ERROR)
+                {
+                    ChipLogProgress(Zcl, "Failed to decode TLV data with tag %" PRIx32 ": %" PRId32,
+                                    TLV::TagNumFromTag(dataTlv.GetTag()), TLVError);
+                }
+            }
+            // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
+            emberAfGeneralCommissioningClusterCommissioningCompleteResponseCallback(errorCode, const_cast<uint8_t *>(debugText));
+            break;
+        }
+        case ZCL_SET_FABRIC_RESPONSE_COMMAND_ID: {
+            CHIP_ERROR TLVError = CHIP_NO_ERROR;
+            uint8_t errorCode;
+            const uint8_t * debugText;
+
+            while ((TLVError = dataTlv.Next()) == CHIP_NO_ERROR)
+            {
+                switch (TLV::TagNumFromTag(dataTlv.GetTag()))
+                {
+                case 0:
+                    TLVError = dataTlv.Get(errorCode);
+                    break;
+                case 1:
+                    TLVError = dataTlv.GetDataPtr(debugText);
+                    break;
+                default:
+                    // Unsupported tag, ignore it.
+                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
+                    break;
+                }
+                if (TLVError != CHIP_NO_ERROR)
+                {
+                    ChipLogProgress(Zcl, "Failed to decode TLV data with tag %" PRIx32 ": %" PRId32,
+                                    TLV::TagNumFromTag(dataTlv.GetTag()), TLVError);
+                }
+            }
+            // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
+            emberAfGeneralCommissioningClusterSetFabricResponseCallback(errorCode, const_cast<uint8_t *>(debugText));
+            break;
+        }
+        default: {
+            // Unrecognized command ID, error status will apply.
+            // TODO: Encode response for command not found
+            ChipLogError(Zcl, "Unknown command %" PRIx16 " for cluster %" PRIx16, commandId, ZCL_GENERAL_COMMISSIONING_CLUSTER_ID);
+            break;
+        }
+        }
+    }
+}
+
+} // namespace GeneralCommissioning
+
 namespace Groups {
 
 void DispatchClientCommand(app::Command * command, CommandId commandId, EndpointId endpointId, TLV::TLVReader & dataTlv)

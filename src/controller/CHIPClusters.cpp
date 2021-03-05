@@ -2549,7 +2549,8 @@ CHIP_ERROR GeneralCommissioningCluster::ArmFailSafe(Callback::Cancelable * onSuc
 {
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    (void) onCompletion;
+    (void) onSuccessCallback;
+    (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kArmFailSafeCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
@@ -2586,7 +2587,8 @@ CHIP_ERROR GeneralCommissioningCluster::CommissioningComplete(Callback::Cancelab
 {
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    (void) onCompletion;
+    (void) onSuccessCallback;
+    (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kCommissioningCompleteCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
@@ -2617,7 +2619,8 @@ CHIP_ERROR GeneralCommissioningCluster::SetFabric(Callback::Cancelable * onSucce
 {
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    (void) onCompletion;
+    (void) onSuccessCallback;
+    (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kSetFabricCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
@@ -3749,7 +3752,8 @@ CHIP_ERROR NetworkCommissioningCluster::AddThreadNetwork(Callback::Cancelable * 
 {
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    (void) onCompletion;
+    (void) onSuccessCallback;
+    (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kAddThreadNetworkCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
@@ -3787,7 +3791,8 @@ CHIP_ERROR NetworkCommissioningCluster::AddWiFiNetwork(Callback::Cancelable * on
 {
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    (void) onCompletion;
+    (void) onSuccessCallback;
+    (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kAddWiFiNetworkCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
@@ -3827,7 +3832,8 @@ CHIP_ERROR NetworkCommissioningCluster::DisableNetwork(Callback::Cancelable * on
 {
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    (void) onCompletion;
+    (void) onSuccessCallback;
+    (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kDisableNetworkCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
@@ -3865,7 +3871,8 @@ CHIP_ERROR NetworkCommissioningCluster::EnableNetwork(Callback::Cancelable * onS
 {
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    (void) onCompletion;
+    (void) onSuccessCallback;
+    (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kEnableNetworkCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
@@ -3903,7 +3910,8 @@ CHIP_ERROR NetworkCommissioningCluster::GetLastNetworkCommissioningResult(Callba
 {
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    (void) onCompletion;
+    (void) onSuccessCallback;
+    (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetLastNetworkCommissioningResultCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
@@ -3937,7 +3945,8 @@ CHIP_ERROR NetworkCommissioningCluster::RemoveNetwork(Callback::Cancelable * onS
 {
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    (void) onCompletion;
+    (void) onSuccessCallback;
+    (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kRemoveNetworkCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
@@ -3975,7 +3984,8 @@ CHIP_ERROR NetworkCommissioningCluster::ScanNetworks(Callback::Cancelable * onSu
 {
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    (void) onCompletion;
+    (void) onSuccessCallback;
+    (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kScanNetworksCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
@@ -4013,7 +4023,8 @@ CHIP_ERROR NetworkCommissioningCluster::UpdateThreadNetwork(Callback::Cancelable
 {
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    (void) onCompletion;
+    (void) onSuccessCallback;
+    (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kUpdateThreadNetworkCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
@@ -4051,7 +4062,8 @@ CHIP_ERROR NetworkCommissioningCluster::UpdateWiFiNetwork(Callback::Cancelable *
 {
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    (void) onCompletion;
+    (void) onSuccessCallback;
+    (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kUpdateWiFiNetworkCommandId,
                                               (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
