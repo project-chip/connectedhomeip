@@ -58,7 +58,7 @@ Following table shows the operations supported by secure element.
 
 -	Use the following gn build arguments to enable the secure element in crypto layer,
 ```
-smcom=\"t1oi2c\" with_se05x=1
+smcom=\"t1oi2c\" chip_with_se05x=1
 ```
 
 ## Note
