@@ -182,7 +182,7 @@ extern "C" CHIP_ERROR pychip_internal_PairingDelegate_SetThreadCredentials(const
 
     // Openthread is OPAQUE by the spec, however current CHIP stack does not have any
     // validation/support for opaque blobs. As a result, we try to do some
-    // pre-validation hre
+    // pre-validation here
 
     // TODO: there should be uniform 'BLOBL' support within the thread stack
     if (length != sizeof(chip::DeviceLayer::Internal::DeviceNetworkInfo))

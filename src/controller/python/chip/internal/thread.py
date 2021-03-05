@@ -59,3 +59,4 @@ ThreadDeviceNetworkInfo = Struct(
     "_ThreadDatasetTimestampPadding" / Padding(3), # Aligns ThreadDAtasetTimestamp
     "ThreadDatasetTimestamp" / Int64ul,
 )
+
