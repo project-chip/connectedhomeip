@@ -3806,8 +3806,8 @@ private:
         completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
-- (void)setFabric:(NSByte *)fabricId
-         fabricSecret:(NSByte *)fabricSecret
+- (void)setFabric:(NSData *)fabricId
+         fabricSecret:(NSData *)fabricSecret
            breadcrumb:(uint64_t)breadcrumb
             timeoutMs:(uint32_t)timeoutMs
     completionHandler:(ResponseHandler)completionHandler
