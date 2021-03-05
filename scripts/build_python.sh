@@ -18,8 +18,8 @@
 
 set -e
 
-_normpath () {
-  python -c "import os.path; print(os.path.normpath('$@'))"
+_normpath() {
+    python -c "import os.path; print(os.path.normpath('$@'))"
 }
 
 echo_green() {
