@@ -173,7 +173,8 @@ public:
 
     /**
      * @brief
-     *   Called when a cached group message is received.
+     *   Called when a cached group message that was waiting for message counter
+     *   sync shold be reprocessed.
      *
      * @param packetHeader  The message header
      * @param payloadHeader The payload header
@@ -225,7 +226,7 @@ private:
     CHIP_ERROR RegisterUMH(uint32_t protocolId, int16_t msgType, ExchangeDelegate * delegate);
     CHIP_ERROR UnregisterUMH(uint32_t protocolId, int16_t msgType);
 
-    bool isMsgCounterSyncMessage(const PayloadHeader & payloadHeader) const;
+    static bool IsMsgCounterSyncMessage(const PayloadHeader & payloadHeader);
 
     void OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source, SecureSessionMgr * msgLayer) override;
 

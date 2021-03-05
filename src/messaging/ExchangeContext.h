@@ -223,6 +223,11 @@ private:
     bool MatchExchange(SecureSessionHandle session, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader);
 
     CHIP_ERROR StartResponseTimer();
+
+    /**
+     * A subset of SendMessage functionality that does not perform message
+     * counter sync for group keys.
+     */
     CHIP_ERROR SendMessageImpl(uint16_t protocolId, uint8_t msgType, System::PacketBufferHandle msgBuf, const SendFlags & sendFlags,
                                Transport::PeerConnectionState * state = nullptr);
     void CancelResponseTimer();

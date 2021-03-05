@@ -64,7 +64,7 @@ public:
     void SetTransport(Transport::Base * transport) { mTransport = transport; }
     Transport::Base * GetTransport() { return mTransport; }
 
-    bool isPeerMsgCounterSynced() { return (mPeerMessageIndex != kUndefinedMessageIndex); }
+    bool IsPeerMsgCounterSynced() { return (mPeerMessageIndex != kUndefinedMessageIndex); }
     void SetPeerMessageIndex(uint32_t id) { mPeerMessageIndex = id; }
 
     NodeId GetPeerNodeId() const { return mPeerNodeId; }

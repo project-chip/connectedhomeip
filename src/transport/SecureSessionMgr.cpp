@@ -345,7 +345,7 @@ void SecureSessionMgr::OnMessageReceived(const PacketHeader & packetHeader, cons
         state->SetPeerAddress(peerAddress);
     }
 
-    if (!state->isPeerMsgCounterSynced())
+    if (!state->IsPeerMsgCounterSynced())
     {
         // For all control messages, the first authenticated message counter from an unsynchronized peer is trusted
         // and used to seed subsequent message counter based replay protection.
