@@ -26,11 +26,7 @@ namespace {
 class NoneResolver : public Resolver
 {
 public:
-    CHIP_ERROR SetResolverDelegate(ResolverDelegate *) override
-    {
-        ChipLogError(Discovery, "Failed to register mDNS resolver delegate: mDNS resolving not available");
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
+    CHIP_ERROR SetResolverDelegate(ResolverDelegate *) override { return CHIP_NO_ERROR; }
 
     CHIP_ERROR ResolveNodeId(uint64_t nodeId, uint64_t fabricId, Inet::IPAddressType type) override
     {

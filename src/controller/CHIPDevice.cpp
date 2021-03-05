@@ -295,9 +295,15 @@ CHIP_ERROR Device::OpenPairingWindow(uint32_t timeout, PairingWindowOption optio
 CHIP_ERROR Device::UpdateAddress(const Transport::PeerAddress & addr)
 {
     bool didLoad;
+
+    VerifyOrReturnError(addr.GetTransportType() == Transport::Type::kUdp, CHIP_ERROR_INVALID_ADDRESS);
     ReturnErrorOnFailure(LoadSecureSessionParametersIfNeeded(didLoad));
 
+    Transport::PeerConnectionState * connectionState = mSessionManager->GetPeerConnectionState(mSecureSession);
+    VerifyOrReturnError(connectionState != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
     mDeviceUdpAddress = addr;
+    connectionState->SetPeerAddress(addr);
 
     return CHIP_NO_ERROR;
 }

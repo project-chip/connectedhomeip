@@ -72,7 +72,11 @@ class ChipDeviceController(object):
 
         devCtrl = c_void_p(None)
         addressUpdater = c_void_p(None)
-        res = self._dmLib.pychip_DeviceController_NewDeviceController(pointer(devCtrl), pointer(addressUpdater), controllerNodeId)
+        res = self._dmLib.pychip_DeviceController_NewDeviceController(pointer(devCtrl), controllerNodeId)
+        if res != 0:
+            raise self._ChipStack.ErrorToException(res)
+
+        res = self._dmLib.pychip_DeviceAddressUpdater_New(pointer(addressUpdater), devCtrl)
         if res != 0:
             raise self._ChipStack.ErrorToException(res)
 
@@ -112,7 +116,8 @@ class ChipDeviceController(object):
 
     def __del__(self):
         if self.devCtrl != None:
-            self._dmLib.pychip_DeviceController_DeleteDeviceController(self.devCtrl, self.addressUpdater)
+            self._dmLib.pychip_DeviceAddressUpdater_Delete(self.addressUpdater)
+            self._dmLib.pychip_DeviceController_DeleteDeviceController(self.devCtrl)
             self.devCtrl = None
 
     def IsConnected(self):
@@ -199,10 +204,10 @@ class ChipDeviceController(object):
         if self._dmLib is None:
             self._dmLib = CDLL(self._ChipStack.LocateChipDLL())
 
-            self._dmLib.pychip_DeviceController_NewDeviceController.argtypes = [POINTER(c_void_p), POINTER(c_void_p), c_uint64]
+            self._dmLib.pychip_DeviceController_NewDeviceController.argtypes = [POINTER(c_void_p), c_uint64]
             self._dmLib.pychip_DeviceController_NewDeviceController.restype = c_uint32
 
-            self._dmLib.pychip_DeviceController_DeleteDeviceController.argtypes = [c_void_p, c_void_p]
+            self._dmLib.pychip_DeviceController_DeleteDeviceController.argtypes = [c_void_p]
             self._dmLib.pychip_DeviceController_DeleteDeviceController.restype = c_uint32
 
             self._dmLib.pychip_DeviceController_ConnectBLE.argtypes = [c_void_p, c_uint16, c_uint32, c_uint64]
@@ -219,6 +224,12 @@ class ChipDeviceController(object):
 
             self._dmLib.pychip_ScriptDevicePairingDelegate_SetKeyExchangeCallback.argtypes = [c_void_p, _DevicePairingDelegate_OnPairingCompleteFunct]
             self._dmLib.pychip_ScriptDevicePairingDelegate_SetKeyExchangeCallback.restype = c_uint32
+
+            self._dmLib.pychip_DeviceAddressUpdater_New.argtypes = [POINTER(c_void_p), c_void_p]
+            self._dmLib.pychip_DeviceAddressUpdater_New.restype = c_uint32
+
+            self._dmLib.pychip_DeviceAddressUpdater_Delete.argtypes = [c_void_p]
+            self._dmLib.pychip_DeviceAddressUpdater_Delete.restype = None
 
             self._dmLib.pychip_ScriptDeviceAddressUpdateDelegate_SetOnAddressUpdateComplete.argtypes = [_DeviceAddressUpdateDelegate_OnUpdateComplete]
             self._dmLib.pychip_ScriptDeviceAddressUpdateDelegate_SetOnAddressUpdateComplete.restype = None
