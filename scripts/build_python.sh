@@ -16,6 +16,11 @@
 # limitations under the License.
 #
 
+# Install requirements for the script to work
+# MacOS:
+#   - brew install coreutils
+
+
 set -e
 
 echo_green() {
@@ -30,6 +35,9 @@ echo_bold_white() {
     echo -e "\033[1;37m$*\033[0m"
 }
 
+# Assume MaxOS BigSur is used if compiling on MAC
+export MACOSX_DEPLOYMENT_TARGET=10.16
+
 CHIP_ROOT=$(realpath "$(dirname "$0")/..")
 OUTPUT_ROOT="$CHIP_ROOT/out/python_lib"
 ENVIRONMENT_ROOT="$CHIP_ROOT/out/python_env"
@@ -42,6 +50,9 @@ gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT"
 
 # Compiles python files
 ninja -C "$OUTPUT_ROOT" python
+
+# Ensure we can create virtual environments
+which virtualenv || pip install virtualenv
 
 # Create a virtual environment that has access to the built python tools
 virtualenv --clear "$ENVIRONMENT_ROOT"
