@@ -96,11 +96,6 @@ void DispatchServerCommand(app::Command * command, CommandId commandId, Endpoint
     {
         switch (commandId)
         {
-        case ZCL_RESET_TO_FACTORY_DEFAULTS_COMMAND_ID: {
-            // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-            emberAfBasicClusterResetToFactoryDefaultsCallback();
-            break;
-        }
         default: {
             // Unrecognized command ID, error status will apply.
             // TODO: Encode response for command not found

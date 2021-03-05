@@ -192,10 +192,6 @@ EmberAfStatus emberAfBasicClusterServerCommandParse(EmberAfClusterCommand * cmd)
     {
         switch (cmd->commandId)
         {
-        case ZCL_RESET_TO_FACTORY_DEFAULTS_COMMAND_ID: {
-            wasHandled = emberAfBasicClusterResetToFactoryDefaultsCallback();
-            break;
-        }
         default: {
             // Unrecognized command ID, error status will apply.
             break;

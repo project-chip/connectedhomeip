@@ -47,8 +47,6 @@ class ChipCluster:
             "Basic": {
                 "MfgSpecificPing": {
                 },
-                "ResetToFactoryDefaults": {
-                },
             },
             "Binding": {
                 "Bind": {
@@ -211,7 +209,7 @@ class ChipCluster:
                     "userId": "int",
                 },
                 "LockDoor": {
-                    "pin": "str",
+                    "pin": "bytes",
                 },
                 "SetHolidaySchedule": {
                     "scheduleId": "int",
@@ -223,13 +221,13 @@ class ChipCluster:
                     "userId": "int",
                     "userStatus": "int",
                     "userType": "int",
-                    "pin": "str",
+                    "pin": "bytes",
                 },
                 "SetRfid": {
                     "userId": "int",
                     "userStatus": "int",
                     "userType": "int",
-                    "id": "str",
+                    "id": "bytes",
                 },
                 "SetUserType": {
                     "userId": "int",
@@ -251,11 +249,11 @@ class ChipCluster:
                     "localEndTime": "int",
                 },
                 "UnlockDoor": {
-                    "pin": "str",
+                    "pin": "bytes",
                 },
                 "UnlockWithTimeout": {
                     "timeoutInSeconds": "int",
-                    "pin": "str",
+                    "pin": "bytes",
                 },
             },
             "GeneralCommissioning": {
@@ -276,11 +274,11 @@ class ChipCluster:
             "Groups": {
                 "AddGroup": {
                     "groupId": "int",
-                    "groupName": "str",
+                    "groupName": "bytes",
                 },
                 "AddGroupIfIdentifying": {
                     "groupId": "int",
-                    "groupName": "str",
+                    "groupName": "bytes",
                 },
                 "GetGroupMembership": {
                     "groupCount": "int",
@@ -426,7 +424,7 @@ class ChipCluster:
                     "groupId": "int",
                     "sceneId": "int",
                     "transitionTime": "int",
-                    "sceneName": "str",
+                    "sceneName": "bytes",
                     "clusterId": "int",
                     "length": "int",
                     "value": "int",
@@ -482,13 +480,6 @@ class ChipCluster:
     def ClusterBasic_CommandMfgSpecificPing(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_Basic_MfgSpecificPing(
-                device, ZCLendpoint, ZCLgroupid
-            )
-        )
-
-    def ClusterBasic_CommandResetToFactoryDefaults(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_Basic_ResetToFactoryDefaults(
                 device, ZCLendpoint, ZCLgroupid
             )
         )
@@ -717,11 +708,11 @@ class ChipCluster:
             )
         )
 
-    def ClusterDoorLock_CommandLockDoor(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, pin: str):
+    def ClusterDoorLock_CommandLockDoor(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, pin: bytes):
         pin = pin.encode("utf-8") + b'\x00'
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_DoorLock_LockDoor(
-                device, ZCLendpoint, ZCLgroupid, pin
+                device, ZCLendpoint, ZCLgroupid, pin, len(pin)
             )
         )
 
@@ -732,19 +723,19 @@ class ChipCluster:
             )
         )
 
-    def ClusterDoorLock_CommandSetPin(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, userId: int, userStatus: int, userType: int, pin: str):
+    def ClusterDoorLock_CommandSetPin(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, userId: int, userStatus: int, userType: int, pin: bytes):
         pin = pin.encode("utf-8") + b'\x00'
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_DoorLock_SetPin(
-                device, ZCLendpoint, ZCLgroupid, userId, userStatus, userType, pin
+                device, ZCLendpoint, ZCLgroupid, userId, userStatus, userType, pin, len(pin)
             )
         )
 
-    def ClusterDoorLock_CommandSetRfid(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, userId: int, userStatus: int, userType: int, id: str):
+    def ClusterDoorLock_CommandSetRfid(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, userId: int, userStatus: int, userType: int, id: bytes):
         id = id.encode("utf-8") + b'\x00'
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_DoorLock_SetRfid(
-                device, ZCLendpoint, ZCLgroupid, userId, userStatus, userType, id
+                device, ZCLendpoint, ZCLgroupid, userId, userStatus, userType, id, len(id)
             )
         )
 
@@ -769,19 +760,19 @@ class ChipCluster:
             )
         )
 
-    def ClusterDoorLock_CommandUnlockDoor(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, pin: str):
+    def ClusterDoorLock_CommandUnlockDoor(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, pin: bytes):
         pin = pin.encode("utf-8") + b'\x00'
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_DoorLock_UnlockDoor(
-                device, ZCLendpoint, ZCLgroupid, pin
+                device, ZCLendpoint, ZCLgroupid, pin, len(pin)
             )
         )
 
-    def ClusterDoorLock_CommandUnlockWithTimeout(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, timeoutInSeconds: int, pin: str):
+    def ClusterDoorLock_CommandUnlockWithTimeout(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, timeoutInSeconds: int, pin: bytes):
         pin = pin.encode("utf-8") + b'\x00'
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_DoorLock_UnlockWithTimeout(
-                device, ZCLendpoint, ZCLgroupid, timeoutInSeconds, pin
+                device, ZCLendpoint, ZCLgroupid, timeoutInSeconds, pin, len(pin)
             )
         )
 
@@ -806,19 +797,19 @@ class ChipCluster:
             )
         )
 
-    def ClusterGroups_CommandAddGroup(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, groupId: int, groupName: str):
+    def ClusterGroups_CommandAddGroup(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, groupId: int, groupName: bytes):
         groupName = groupName.encode("utf-8") + b'\x00'
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_Groups_AddGroup(
-                device, ZCLendpoint, ZCLgroupid, groupId, groupName
+                device, ZCLendpoint, ZCLgroupid, groupId, groupName, len(groupName)
             )
         )
 
-    def ClusterGroups_CommandAddGroupIfIdentifying(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, groupId: int, groupName: str):
+    def ClusterGroups_CommandAddGroupIfIdentifying(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, groupId: int, groupName: bytes):
         groupName = groupName.encode("utf-8") + b'\x00'
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_Groups_AddGroupIfIdentifying(
-                device, ZCLendpoint, ZCLgroupid, groupId, groupName
+                device, ZCLendpoint, ZCLgroupid, groupId, groupName, len(groupName)
             )
         )
 
@@ -1074,11 +1065,11 @@ class ChipCluster:
             )
         )
 
-    def ClusterScenes_CommandAddScene(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, groupId: int, sceneId: int, transitionTime: int, sceneName: str, clusterId: int, length: int, value: int):
+    def ClusterScenes_CommandAddScene(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, groupId: int, sceneId: int, transitionTime: int, sceneName: bytes, clusterId: int, length: int, value: int):
         sceneName = sceneName.encode("utf-8") + b'\x00'
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_Scenes_AddScene(
-                device, ZCLendpoint, ZCLgroupid, groupId, sceneId, transitionTime, sceneName, clusterId, length, value
+                device, ZCLendpoint, ZCLgroupid, groupId, sceneId, transitionTime, sceneName, len(sceneName), clusterId, length, value
             )
         )
 
@@ -1138,9 +1129,6 @@ class ChipCluster:
         # Cluster Basic Command MfgSpecificPing
         self._chipLib.chip_ime_AppendCommand_Basic_MfgSpecificPing.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_Basic_MfgSpecificPing.restype = ctypes.c_uint32
-        # Cluster Basic Command ResetToFactoryDefaults
-        self._chipLib.chip_ime_AppendCommand_Basic_ResetToFactoryDefaults.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_AppendCommand_Basic_ResetToFactoryDefaults.restype = ctypes.c_uint32
         # Cluster Binding
         # Cluster Binding Command Bind
         self._chipLib.chip_ime_AppendCommand_Binding_Bind.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint64, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint16]
@@ -1242,16 +1230,16 @@ class ChipCluster:
         self._chipLib.chip_ime_AppendCommand_DoorLock_GetYeardaySchedule.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_DoorLock_GetYeardaySchedule.restype = ctypes.c_uint32
         # Cluster DoorLock Command LockDoor
-        self._chipLib.chip_ime_AppendCommand_DoorLock_LockDoor.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p]
+        self._chipLib.chip_ime_AppendCommand_DoorLock_LockDoor.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32]
         self._chipLib.chip_ime_AppendCommand_DoorLock_LockDoor.restype = ctypes.c_uint32
         # Cluster DoorLock Command SetHolidaySchedule
         self._chipLib.chip_ime_AppendCommand_DoorLock_SetHolidaySchedule.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint32, ctypes.c_uint32, ctypes.c_uint8]
         self._chipLib.chip_ime_AppendCommand_DoorLock_SetHolidaySchedule.restype = ctypes.c_uint32
         # Cluster DoorLock Command SetPin
-        self._chipLib.chip_ime_AppendCommand_DoorLock_SetPin.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_char_p]
+        self._chipLib.chip_ime_AppendCommand_DoorLock_SetPin.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_char_p, ctypes.c_uint32]
         self._chipLib.chip_ime_AppendCommand_DoorLock_SetPin.restype = ctypes.c_uint32
         # Cluster DoorLock Command SetRfid
-        self._chipLib.chip_ime_AppendCommand_DoorLock_SetRfid.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_char_p]
+        self._chipLib.chip_ime_AppendCommand_DoorLock_SetRfid.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_char_p, ctypes.c_uint32]
         self._chipLib.chip_ime_AppendCommand_DoorLock_SetRfid.restype = ctypes.c_uint32
         # Cluster DoorLock Command SetUserType
         self._chipLib.chip_ime_AppendCommand_DoorLock_SetUserType.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint8]
@@ -1263,10 +1251,10 @@ class ChipCluster:
         self._chipLib.chip_ime_AppendCommand_DoorLock_SetYeardaySchedule.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint32, ctypes.c_uint32]
         self._chipLib.chip_ime_AppendCommand_DoorLock_SetYeardaySchedule.restype = ctypes.c_uint32
         # Cluster DoorLock Command UnlockDoor
-        self._chipLib.chip_ime_AppendCommand_DoorLock_UnlockDoor.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p]
+        self._chipLib.chip_ime_AppendCommand_DoorLock_UnlockDoor.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32]
         self._chipLib.chip_ime_AppendCommand_DoorLock_UnlockDoor.restype = ctypes.c_uint32
         # Cluster DoorLock Command UnlockWithTimeout
-        self._chipLib.chip_ime_AppendCommand_DoorLock_UnlockWithTimeout.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_char_p]
+        self._chipLib.chip_ime_AppendCommand_DoorLock_UnlockWithTimeout.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32]
         self._chipLib.chip_ime_AppendCommand_DoorLock_UnlockWithTimeout.restype = ctypes.c_uint32
         # Cluster GeneralCommissioning
         # Cluster GeneralCommissioning Command ArmFailSafe
@@ -1280,10 +1268,10 @@ class ChipCluster:
         self._chipLib.chip_ime_AppendCommand_GeneralCommissioning_SetFabric.restype = ctypes.c_uint32
         # Cluster Groups
         # Cluster Groups Command AddGroup
-        self._chipLib.chip_ime_AppendCommand_Groups_AddGroup.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_char_p]
+        self._chipLib.chip_ime_AppendCommand_Groups_AddGroup.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32]
         self._chipLib.chip_ime_AppendCommand_Groups_AddGroup.restype = ctypes.c_uint32
         # Cluster Groups Command AddGroupIfIdentifying
-        self._chipLib.chip_ime_AppendCommand_Groups_AddGroupIfIdentifying.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_char_p]
+        self._chipLib.chip_ime_AppendCommand_Groups_AddGroupIfIdentifying.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32]
         self._chipLib.chip_ime_AppendCommand_Groups_AddGroupIfIdentifying.restype = ctypes.c_uint32
         # Cluster Groups Command GetGroupMembership
         self._chipLib.chip_ime_AppendCommand_Groups_GetGroupMembership.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint16]
@@ -1401,7 +1389,7 @@ class ChipCluster:
         self._chipLib.chip_ime_AppendCommand_OnOff_Toggle.restype = ctypes.c_uint32
         # Cluster Scenes
         # Cluster Scenes Command AddScene
-        self._chipLib.chip_ime_AppendCommand_Scenes_AddScene.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8]
+        self._chipLib.chip_ime_AppendCommand_Scenes_AddScene.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8]
         self._chipLib.chip_ime_AppendCommand_Scenes_AddScene.restype = ctypes.c_uint32
         # Cluster Scenes Command GetSceneMembership
         self._chipLib.chip_ime_AppendCommand_Scenes_GetSceneMembership.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]

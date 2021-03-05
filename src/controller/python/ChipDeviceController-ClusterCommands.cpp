@@ -67,15 +67,6 @@ CHIP_ERROR chip_ime_AppendCommand_Basic_MfgSpecificPing(chip::Controller::Device
     clusterBasic.Associate(device, ZCLendpointId);
     return clusterBasic.MfgSpecificPing(nullptr, nullptr);
 }
-CHIP_ERROR chip_ime_AppendCommand_Basic_ResetToFactoryDefaults(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
-                                                               chip::GroupId ZCLgroupId)
-{
-    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    chip::Controller::BasicCluster clusterBasic;
-    (void) ZCLgroupId;
-    clusterBasic.Associate(device, ZCLendpointId);
-    return clusterBasic.ResetToFactoryDefaults(nullptr, nullptr);
-}
 // End of Cluster Basic
 
 // Cluster Binding
@@ -402,13 +393,13 @@ CHIP_ERROR chip_ime_AppendCommand_DoorLock_GetYeardaySchedule(chip::Controller::
     return clusterDoorLock.GetYeardaySchedule(nullptr, nullptr, scheduleId, userId);
 }
 CHIP_ERROR chip_ime_AppendCommand_DoorLock_LockDoor(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
-                                                    chip::GroupId ZCLgroupId, char * pin)
+                                                    chip::GroupId ZCLgroupId, const uint8_t * pin, uint32_t pin_Len)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::DoorLockCluster clusterDoorLock;
     (void) ZCLgroupId;
     clusterDoorLock.Associate(device, ZCLendpointId);
-    return clusterDoorLock.LockDoor(nullptr, nullptr, pin);
+    return clusterDoorLock.LockDoor(nullptr, nullptr, chip::ByteSpan(pin, pin_Len));
 }
 CHIP_ERROR chip_ime_AppendCommand_DoorLock_SetHolidaySchedule(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
                                                               chip::GroupId ZCLgroupId, uint8_t scheduleId, uint32_t localStartTime,
@@ -423,23 +414,23 @@ CHIP_ERROR chip_ime_AppendCommand_DoorLock_SetHolidaySchedule(chip::Controller::
 }
 CHIP_ERROR chip_ime_AppendCommand_DoorLock_SetPin(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
                                                   chip::GroupId ZCLgroupId, uint16_t userId, uint8_t userStatus, uint8_t userType,
-                                                  char * pin)
+                                                  const uint8_t * pin, uint32_t pin_Len)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::DoorLockCluster clusterDoorLock;
     (void) ZCLgroupId;
     clusterDoorLock.Associate(device, ZCLendpointId);
-    return clusterDoorLock.SetPin(nullptr, nullptr, userId, userStatus, userType, pin);
+    return clusterDoorLock.SetPin(nullptr, nullptr, userId, userStatus, userType, chip::ByteSpan(pin, pin_Len));
 }
 CHIP_ERROR chip_ime_AppendCommand_DoorLock_SetRfid(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
                                                    chip::GroupId ZCLgroupId, uint16_t userId, uint8_t userStatus, uint8_t userType,
-                                                   char * id)
+                                                   const uint8_t * id, uint32_t id_Len)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::DoorLockCluster clusterDoorLock;
     (void) ZCLgroupId;
     clusterDoorLock.Associate(device, ZCLendpointId);
-    return clusterDoorLock.SetRfid(nullptr, nullptr, userId, userStatus, userType, id);
+    return clusterDoorLock.SetRfid(nullptr, nullptr, userId, userStatus, userType, chip::ByteSpan(id, id_Len));
 }
 CHIP_ERROR chip_ime_AppendCommand_DoorLock_SetUserType(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
                                                        chip::GroupId ZCLgroupId, uint16_t userId, uint8_t userType)
@@ -473,22 +464,23 @@ CHIP_ERROR chip_ime_AppendCommand_DoorLock_SetYeardaySchedule(chip::Controller::
     return clusterDoorLock.SetYeardaySchedule(nullptr, nullptr, scheduleId, userId, localStartTime, localEndTime);
 }
 CHIP_ERROR chip_ime_AppendCommand_DoorLock_UnlockDoor(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
-                                                      chip::GroupId ZCLgroupId, char * pin)
+                                                      chip::GroupId ZCLgroupId, const uint8_t * pin, uint32_t pin_Len)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::DoorLockCluster clusterDoorLock;
     (void) ZCLgroupId;
     clusterDoorLock.Associate(device, ZCLendpointId);
-    return clusterDoorLock.UnlockDoor(nullptr, nullptr, pin);
+    return clusterDoorLock.UnlockDoor(nullptr, nullptr, chip::ByteSpan(pin, pin_Len));
 }
 CHIP_ERROR chip_ime_AppendCommand_DoorLock_UnlockWithTimeout(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
-                                                             chip::GroupId ZCLgroupId, uint16_t timeoutInSeconds, char * pin)
+                                                             chip::GroupId ZCLgroupId, uint16_t timeoutInSeconds,
+                                                             const uint8_t * pin, uint32_t pin_Len)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::DoorLockCluster clusterDoorLock;
     (void) ZCLgroupId;
     clusterDoorLock.Associate(device, ZCLendpointId);
-    return clusterDoorLock.UnlockWithTimeout(nullptr, nullptr, timeoutInSeconds, pin);
+    return clusterDoorLock.UnlockWithTimeout(nullptr, nullptr, timeoutInSeconds, chip::ByteSpan(pin, pin_Len));
 }
 // End of Cluster DoorLock
 
@@ -530,22 +522,24 @@ CHIP_ERROR chip_ime_AppendCommand_GeneralCommissioning_SetFabric(chip::Controlle
 
 // Cluster Groups
 CHIP_ERROR chip_ime_AppendCommand_Groups_AddGroup(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
-                                                  chip::GroupId ZCLgroupId, uint16_t groupId, char * groupName)
+                                                  chip::GroupId ZCLgroupId, uint16_t groupId, const uint8_t * groupName,
+                                                  uint32_t groupName_Len)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::GroupsCluster clusterGroups;
     (void) ZCLgroupId;
     clusterGroups.Associate(device, ZCLendpointId);
-    return clusterGroups.AddGroup(nullptr, nullptr, groupId, groupName);
+    return clusterGroups.AddGroup(nullptr, nullptr, groupId, chip::ByteSpan(groupName, groupName_Len));
 }
 CHIP_ERROR chip_ime_AppendCommand_Groups_AddGroupIfIdentifying(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
-                                                               chip::GroupId ZCLgroupId, uint16_t groupId, char * groupName)
+                                                               chip::GroupId ZCLgroupId, uint16_t groupId,
+                                                               const uint8_t * groupName, uint32_t groupName_Len)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::GroupsCluster clusterGroups;
     (void) ZCLgroupId;
     clusterGroups.Associate(device, ZCLendpointId);
-    return clusterGroups.AddGroupIfIdentifying(nullptr, nullptr, groupId, groupName);
+    return clusterGroups.AddGroupIfIdentifying(nullptr, nullptr, groupId, chip::ByteSpan(groupName, groupName_Len));
 }
 CHIP_ERROR chip_ime_AppendCommand_Groups_GetGroupMembership(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
                                                             chip::GroupId ZCLgroupId, uint8_t groupCount, uint16_t groupList)
@@ -928,14 +922,15 @@ CHIP_ERROR chip_ime_AppendCommand_OnOff_Toggle(chip::Controller::Device * device
 // Cluster Scenes
 CHIP_ERROR chip_ime_AppendCommand_Scenes_AddScene(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
                                                   chip::GroupId ZCLgroupId, uint16_t groupId, uint8_t sceneId,
-                                                  uint16_t transitionTime, char * sceneName, chip::ClusterId clusterId,
-                                                  uint8_t length, uint8_t value)
+                                                  uint16_t transitionTime, const uint8_t * sceneName, uint32_t sceneName_Len,
+                                                  chip::ClusterId clusterId, uint8_t length, uint8_t value)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::ScenesCluster clusterScenes;
     (void) ZCLgroupId;
     clusterScenes.Associate(device, ZCLendpointId);
-    return clusterScenes.AddScene(nullptr, nullptr, groupId, sceneId, transitionTime, sceneName, clusterId, length, value);
+    return clusterScenes.AddScene(nullptr, nullptr, groupId, sceneId, transitionTime, chip::ByteSpan(sceneName, sceneName_Len),
+                                  clusterId, length, value);
 }
 CHIP_ERROR chip_ime_AppendCommand_Scenes_GetSceneMembership(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
                                                             chip::GroupId ZCLgroupId, uint16_t groupId)

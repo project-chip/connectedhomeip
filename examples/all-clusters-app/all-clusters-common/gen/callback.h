@@ -1309,12 +1309,6 @@ bool emberAfBarrierControlClusterBarrierControlStopCallback();
 bool emberAfBasicClusterMfgSpecificPingCallback();
 
 /**
- * @brief Basic Cluster ResetToFactoryDefaults Command callback
- */
-
-bool emberAfBasicClusterResetToFactoryDefaultsCallback();
-
-/**
  * @brief Binding Cluster Bind Command callback
  * @param nodeId
  * @param groupId

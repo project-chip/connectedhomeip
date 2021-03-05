@@ -1357,12 +1357,6 @@ bool emberAfBarrierControlClusterBarrierControlGoToPercentCallback(uint8_t perce
 bool emberAfBarrierControlClusterBarrierControlStopCallback();
 
 /**
- * @brief Basic Cluster ResetToFactoryDefaults Command callback
- */
-
-bool emberAfBasicClusterResetToFactoryDefaultsCallback();
-
-/**
  * @brief Color Control Cluster MoveColor Command callback
  * @param rateX
  * @param rateY

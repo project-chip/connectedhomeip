@@ -29,7 +29,7 @@ namespace Controller {
 
 constexpr ClusterId kApplicationBasicClusterId       = 0x050D;
 constexpr ClusterId kBarrierControlClusterId         = 0x0103;
-constexpr ClusterId kBasicClusterId                  = 0x0000;
+constexpr ClusterId kBasicClusterId                  = 0x0028;
 constexpr ClusterId kBindingClusterId                = 0xF000;
 constexpr ClusterId kColorControlClusterId           = 0x0300;
 constexpr ClusterId kContentLaunchClusterId          = 0xF002;
@@ -95,17 +95,31 @@ public:
 
     // Cluster Commands
     CHIP_ERROR MfgSpecificPing(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR ResetToFactoryDefaults(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 
     // Cluster Attributes
     CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR ReadAttributeZclVersion(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR ReadAttributePowerSource(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeInteractionModelVersion(Callback::Cancelable * onSuccessCallback,
+                                                    Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeVendorName(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeVendorID(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeProductName(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeProductID(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeUserLabel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeLocation(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeHardwareVersion(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeHardwareVersionString(Callback::Cancelable * onSuccessCallback,
+                                                  Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeSoftwareVersion(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeSoftwareVersionString(Callback::Cancelable * onSuccessCallback,
+                                                  Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR WriteAttributeUserLabel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                       chip::ByteSpan value);
+    CHIP_ERROR WriteAttributeLocation(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                      chip::ByteSpan value);
 
 private:
-    static constexpr CommandId kMfgSpecificPingCommandId        = 0x00;
-    static constexpr CommandId kResetToFactoryDefaultsCommandId = 0x00;
+    static constexpr CommandId kMfgSpecificPingCommandId = 0x00;
 };
 
 class DLL_EXPORT BindingCluster : public ClusterBase
@@ -336,14 +350,14 @@ public:
                                   uint8_t scheduleId, uint16_t userId);
     CHIP_ERROR GetYeardaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                   uint8_t scheduleId, uint16_t userId);
-    CHIP_ERROR LockDoor(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, char * pin);
+    CHIP_ERROR LockDoor(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, chip::ByteSpan pin);
     CHIP_ERROR SetHolidaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                   uint8_t scheduleId, uint32_t localStartTime, uint32_t localEndTime,
                                   uint8_t operatingModeDuringHoliday);
     CHIP_ERROR SetPin(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t userId,
-                      uint8_t userStatus, uint8_t userType, char * pin);
+                      uint8_t userStatus, uint8_t userType, chip::ByteSpan pin);
     CHIP_ERROR SetRfid(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t userId,
-                       uint8_t userStatus, uint8_t userType, char * id);
+                       uint8_t userStatus, uint8_t userType, chip::ByteSpan id);
     CHIP_ERROR SetUserType(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t userId,
                            uint8_t userType);
     CHIP_ERROR SetWeekdaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
@@ -351,9 +365,9 @@ public:
                                   uint8_t endHour, uint8_t endMinute);
     CHIP_ERROR SetYeardaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                   uint8_t scheduleId, uint16_t userId, uint32_t localStartTime, uint32_t localEndTime);
-    CHIP_ERROR UnlockDoor(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, char * pin);
+    CHIP_ERROR UnlockDoor(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, chip::ByteSpan pin);
     CHIP_ERROR UnlockWithTimeout(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                 uint16_t timeoutInSeconds, char * pin);
+                                 uint16_t timeoutInSeconds, chip::ByteSpan pin);
 
     // Cluster Attributes
     CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
@@ -426,9 +440,9 @@ public:
 
     // Cluster Commands
     CHIP_ERROR AddGroup(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t groupId,
-                        char * groupName);
+                        chip::ByteSpan groupName);
     CHIP_ERROR AddGroupIfIdentifying(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                     uint16_t groupId, char * groupName);
+                                     uint16_t groupId, chip::ByteSpan groupName);
     CHIP_ERROR GetGroupMembership(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                   uint8_t groupCount, uint16_t groupList);
     CHIP_ERROR RemoveAllGroups(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
@@ -642,8 +656,8 @@ public:
 
     // Cluster Commands
     CHIP_ERROR AddScene(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t groupId,
-                        uint8_t sceneId, uint16_t transitionTime, char * sceneName, chip::ClusterId clusterId, uint8_t length,
-                        uint8_t value);
+                        uint8_t sceneId, uint16_t transitionTime, chip::ByteSpan sceneName, chip::ClusterId clusterId,
+                        uint8_t length, uint8_t value);
     CHIP_ERROR GetSceneMembership(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                   uint16_t groupId);
     CHIP_ERROR RecallScene(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t groupId,

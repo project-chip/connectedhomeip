@@ -24,12 +24,6 @@
 // to the "EmberAfClusterName" defined in the ZCL header.
 // The names of clusters that are not present, are removed.
 
-#if defined(ZCL_USING_BASIC_CLUSTER_SERVER) || defined(ZCL_USING_BASIC_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_BASIC_CLUSTER { ZCL_BASIC_CLUSTER_ID, 0, "Basic" },
-#else
-#define CHIP_PRINTCLUSTER_BASIC_CLUSTER
-#endif
-
 #if defined(ZCL_USING_POWER_CONFIG_CLUSTER_SERVER) || defined(ZCL_USING_POWER_CONFIG_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_POWER_CONFIG_CLUSTER { ZCL_POWER_CONFIG_CLUSTER_ID, 1, "Power Configuration" },
 #else
@@ -148,6 +142,12 @@
 #define CHIP_PRINTCLUSTER_KEEPALIVE_CLUSTER { ZCL_KEEPALIVE_CLUSTER_ID, 37, "Keep-Alive" },
 #else
 #define CHIP_PRINTCLUSTER_KEEPALIVE_CLUSTER
+#endif
+
+#if defined(ZCL_USING_BASIC_CLUSTER_SERVER) || defined(ZCL_USING_BASIC_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_BASIC_CLUSTER { ZCL_BASIC_CLUSTER_ID, 40, "Basic" },
+#else
+#define CHIP_PRINTCLUSTER_BASIC_CLUSTER
 #endif
 
 #if defined(ZCL_USING_GENERAL_COMMISSIONING_CLUSTER_SERVER) || defined(ZCL_USING_GENERAL_COMMISSIONING_CLUSTER_CLIENT)
@@ -784,7 +784,6 @@
 #endif
 
 #define CLUSTER_IDS_TO_NAMES                                                                                                       \
-    CHIP_PRINTCLUSTER_BASIC_CLUSTER                                                                                                \
     CHIP_PRINTCLUSTER_POWER_CONFIG_CLUSTER                                                                                         \
     CHIP_PRINTCLUSTER_DEVICE_TEMP_CLUSTER                                                                                          \
     CHIP_PRINTCLUSTER_IDENTIFY_CLUSTER                                                                                             \
@@ -805,6 +804,7 @@
     CHIP_PRINTCLUSTER_POLL_CONTROL_CLUSTER                                                                                         \
     CHIP_PRINTCLUSTER_GREEN_POWER_CLUSTER                                                                                          \
     CHIP_PRINTCLUSTER_KEEPALIVE_CLUSTER                                                                                            \
+    CHIP_PRINTCLUSTER_BASIC_CLUSTER                                                                                                \
     CHIP_PRINTCLUSTER_GENERAL_COMMISSIONING_CLUSTER                                                                                \
     CHIP_PRINTCLUSTER_SHADE_CONFIG_CLUSTER                                                                                         \
     CHIP_PRINTCLUSTER_DOOR_LOCK_CLUSTER                                                                                            \
