@@ -53,18 +53,29 @@ CHIP_ERROR PythonPersistentStorageDelegate::GetKeyValue(const char * key, char *
     {
         return CHIP_ERROR_KEY_NOT_FOUND;
     }
-    if (size == 0 && value == nullptr)
+
+    if (value == nullptr)
     {
-        size = val->second.size() + 1;
-        return CHIP_NO_ERROR;
+        size = 0;
     }
-    else if (size < val->second.size() + 1)
+
+    uint16_t neededSize = val->second.size() + 1;
+    if (size == 0)
     {
-        size = val->second.size() + 1;
+        size = neededSize;
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    memcpy(value, val->second.c_str(), val->second.size() + 1);
+    if (size < neededSize)
+    {
+        memcpy(value, val->second.c_str(), size - 1);
+        value[size - 1] = '\0';
+        size            = neededSize;
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    memcpy(value, val->second.c_str(), neededSize);
+    size = neededSize;
     return CHIP_NO_ERROR;
 }
 
