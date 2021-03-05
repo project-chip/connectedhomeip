@@ -20,7 +20,6 @@
 # MacOS:
 #   - brew install coreutils
 
-
 set -e
 
 echo_green() {
