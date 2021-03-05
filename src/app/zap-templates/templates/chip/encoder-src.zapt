@@ -193,15 +193,29 @@ PacketBufferHandle encode{{asCamelCased parent.name false}}ClusterRead{{asCamelC
 }
 
 {{#if (isWritableAttribute)}}
-PacketBufferHandle encode{{asCamelCased parent.name false}}ClusterWrite{{asCamelCased name false}}Attribute(uint8_t seqNum, EndpointId destinationEndpoint, {{asUnderlyingZclType type}} {{asCamelCased name}})
+PacketBufferHandle encode{{asCamelCased parent.name false}}ClusterWrite{{asCamelCased name false}}Attribute(uint8_t seqNum, EndpointId destinationEndpoint, {{chipType}} {{asCamelCased name}})
 {
     COMMAND_HEADER("Write{{asCamelCased parent.name false}}{{asCamelCased name false}}", {{parent.define}}_ID);
+    {{#if (isString type)}}
+    size_t {{asCamelCased name}}StrLen = strlen({{asCamelCased name}});
+    if (!CanCastTo<uint8_t>({{asCamelCased name}}StrLen))
+    {
+        ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, {{asCamelCased name}}StrLen);
+        return PacketBufferHandle();
+    }
+
+    {{/if}}
     buf.Put8(kFrameControlGlobalCommand)
        .Put8(seqNum)
        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
        .Put16({{asHex attributeCode 4}})
        .Put8({{atomicTypeId}})
+    {{#if (isString type)}}
+       .Put(static_cast<uint8_t>({{asCamelCased name}}StrLen))
+       .Put({{asCamelCased name}});
+    {{else}}
        .Put{{chipTypePutLength}}(static_cast<{{chipTypePutCastType}}>({{asCamelCased name}}));
+    {{/if}}
     COMMAND_FOOTER();
 }
 

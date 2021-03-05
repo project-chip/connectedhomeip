@@ -47,7 +47,7 @@ function asPutLength(zclType)
   case 'uint64_t':
     return type.replace(/[^0-9]/g, '');
   default:
-    throw error = 'Unhandled type: ' + zclType;
+    throw error = 'asPutLength: Unhandled type: ' + zclType;
   }
 }
 
@@ -66,7 +66,7 @@ function asPutCastType(zclType)
   case 'uint64_t':
     return type;
   default:
-    throw error = 'Unhandled type: ' + zclType;
+    throw error = 'asPutCastType: Unhandled type: ' + zclType;
   }
 }
 
@@ -248,6 +248,13 @@ function getAttributes(pkgId, options)
       // Enhanced the attribute with 'atomidId', 'discrete', chipType properties for convenience.
       att.atomicTypeId = atomic.atomicId;
       att.discrete     = atomic.discrete;
+
+      if (StringHelper.isString(att.type)) {
+        // Enhanced the command argument with 'chipType' for conveniences.
+        att.chipType = 'char *';
+        return att;
+      }
+
       return zclHelper.asUnderlyingZclType.call(this, att.type, options).then(zclType => {
         att.chipType = zclType;
         return att;
@@ -285,8 +292,10 @@ function chip_server_cluster_attributes(options)
         let isWritable       = !!sameAttributes.find(att2 => att2.writable);
         let isReportable     = !!sameAttributes.find(att2 => att2.reportable.included);
         if (isWritable || isReportable) {
-          att.chipTypePutLength   = asPutLength(att.chipType);
-          att.chipTypePutCastType = asPutCastType(att.chipType);
+          if (!StringHelper.isString(att.type)) {
+            att.chipTypePutLength   = asPutLength(att.chipType);
+            att.chipTypePutCastType = asPutCastType(att.chipType);
+          }
           att.writable            = isWritable;
           att.reportable.included = isReportable;
         }

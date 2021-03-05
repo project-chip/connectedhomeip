@@ -21,17 +21,17 @@ const stringBytesTypes = [ 'OCTET_STRING', 'LONG_OCTET_STRING' ];
 
 function isShortString(type)
 {
-  return stringShortTypes.includes(type);
+  return stringShortTypes.includes(type.toUpperCase());
 }
 
 function isLongString(type)
 {
-  return stringLongTypes.includes(type);
+  return stringLongTypes.includes(type.toUpperCase());
 }
 
 function isByteString(type)
 {
-  return stringBytesTypes.includes(type);
+  return stringBytesTypes.includes(type.toUpperCase());
 }
 
 function isString(type)
