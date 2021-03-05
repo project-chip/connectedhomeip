@@ -114,7 +114,7 @@ try:
 
 
     if platform.system() == 'Darwin':
-        requiredPackages.append('pyobjc')
+        requiredPackages.append('pyobjc-framework-corebluetooth')
 
     if platform.system() == 'Linux':
         requiredPackages.append('dbus-python')
