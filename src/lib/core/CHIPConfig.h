@@ -1464,6 +1464,18 @@
 #endif // CHIP_CONFIG_ENABLE_UNSECURED_TCP_LISTEN
 
 /**
+ *  @def CHIP_CONFIG_CERT_MAX_RDN_ATTRIBUTES
+ *
+ *  @brief
+ *    The maximum number of Relative Distinguished Name (RDN) attributes
+ *    supported by the CHIP Certificate Distinguished Names (DN).
+ *
+ */
+#ifndef CHIP_CONFIG_CERT_MAX_RDN_ATTRIBUTES
+#define CHIP_CONFIG_CERT_MAX_RDN_ATTRIBUTES 3
+#endif // CHIP_CONFIG_CERT_MAX_RDN_ATTRIBUTES
+
+/**
  *  @def CHIP_CONFIG_DEBUG_CERT_VALIDATION
  *
  *  @brief
