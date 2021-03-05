@@ -800,6 +800,8 @@ class ChipCluster:
         )
 
     def ClusterGeneralCommissioning_CommandSetFabric(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, fabricId: str, fabricSecret: str, breadcrumb: int, timeoutMs: int):
+        fabricId = fabricId.encode("utf-8") + b'\x00'
+        fabricSecret = fabricSecret.encode("utf-8") + b'\x00'
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_GeneralCommissioning_SetFabric(
                 device, ZCLendpoint, ZCLgroupid, fabricId, len(fabricId), fabricSecret, len(fabricSecret), breadcrumb, timeoutMs
