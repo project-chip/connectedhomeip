@@ -138,7 +138,7 @@ private:
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
     InteractionModelDelegate * mpDelegate      = nullptr;
-    ClientState mState = ClientState::Uninitialized;
+    ClientState mState                         = ClientState::Uninitialized;
 };
 
 }; // namespace app

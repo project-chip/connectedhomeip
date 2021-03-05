@@ -25,9 +25,7 @@ namespace chip {
 namespace app {
 namespace reporting {
 
-LoggingConfiguration::LoggingConfiguration(void) :
-    mGlobalPriority(PriorityLevel::Critical)
-{}
+LoggingConfiguration::LoggingConfiguration(void) : mGlobalPriority(PriorityLevel::Critical) {}
 
 LoggingConfiguration & LoggingConfiguration::GetInstance(void)
 {

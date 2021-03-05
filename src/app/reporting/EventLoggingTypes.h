@@ -200,13 +200,13 @@ struct EventLoadOutContext
     EventLoadOutContext(chip::TLV::TLVWriter & aWriter, PriorityLevel aPriority, chip::EventNumber aStartingEventNumber);
 
     chip::TLV::TLVWriter & mWriter;
-    PriorityLevel mPriority = PriorityLevel::Invalid;
+    PriorityLevel mPriority                = PriorityLevel::Invalid;
     chip::EventNumber mStartingEventNumber = 0;
-    timestamp_t mCurrentTime = 0;
-    chip::EventNumber mCurrentEventNumber = 0;
-    utc_timestamp_t mCurrentUTCTime = 0;
-    bool mFirstUtc = true;
-    bool mFirst = true;
+    timestamp_t mCurrentTime               = 0;
+    chip::EventNumber mCurrentEventNumber  = 0;
+    utc_timestamp_t mCurrentUTCTime        = 0;
+    bool mFirstUtc                         = true;
+    bool mFirst                            = true;
 };
 
 using InternalLoggingBufferHandler = CHIP_ERROR(void * inAppState, chip::System::PacketBuffer * apBuffer);
