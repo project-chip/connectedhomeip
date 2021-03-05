@@ -1,9 +1,11 @@
-#include <NetworkInterface.h>
 #include <SocketAddress.h>
 #include <errno.h>
+#include <ifaddrs.h>
 #include <net/if.h>
 #include <net_if.h>
 #include <sys/ioctl.h>
+#include <sys/socket.h>
+
 struct if_nameindex * mbed_if_nameindex(void)
 {
     char name[IF_NAMESIZE];
@@ -101,14 +103,14 @@ unsigned int mbed_if_nametoindex(const char * ifname)
     if (ifname == NULL)
     {
         errno = ENXIO;
-        return NULL;
+        return 0;
     }
 
     struct if_nameindex * net_list = mbed_if_nameindex();
     if (net_list == NULL)
     {
         errno = ENXIO;
-        return NULL;
+        return 0;
     }
 
     for (index = 0; index < MBED_NET_IF_LIST_SIZE; ++index)
@@ -127,17 +129,284 @@ unsigned int mbed_if_nametoindex(const char * ifname)
 
 int mbed_getifaddrs(struct ifaddrs ** ifap)
 {
+    char name[IF_NAMESIZE];
+    char * name_ptr = name;
+    SocketAddress ip;
+    SocketAddress netmask;
+    nsapi_version_t ipVersion;
+    nsapi_error_t err;
+
+    struct ifaddrs * tmp;
+
+    if (ifap == NULL)
+    {
+        errno = ENOBUFS;
+        return -1;
+    }
+
+    *ifap = NULL;
+
+    NetworkInterface * net_if = NetworkInterface::get_default_instance();
+    if (net_if == nullptr)
+    {
+        errno = ENETUNREACH;
+        return -1;
+    }
+
+    name_ptr = net_if->get_interface_name(name_ptr);
+    if (name_ptr == NULL)
+    {
+        errno = ENOTTY;
+        return -1;
+    }
+
+    err = net_if->connect();
+    if (err != NSAPI_ERROR_OK)
+    {
+        errno = ENOTTY;
+        return -1;
+    }
+
+    net_if->get_ip_address(&ip);
+    ipVersion = ip.get_ip_version();
+    net_if->get_netmask(&netmask);
+
+    net_if->disconnect();
+
+    tmp = (struct ifaddrs *) calloc(1, sizeof(struct ifaddrs));
+    if (tmp == NULL)
+    {
+        errno = ENOBUFS;
+        return -1;
+    }
+
+    memset(tmp, 0, sizeof(struct ifaddrs));
+
+    tmp->ifa_next = *ifap;
+    *ifap         = tmp;
+
+    tmp->ifa_name = (char *) malloc(IF_NAMESIZE);
+    if (tmp->ifa_name == NULL)
+    {
+        errno = ENOBUFS;
+        mbed_freeifaddrs(tmp);
+        return -1;
+    }
+
+    memset(tmp->ifa_name, 0, IF_NAMESIZE);
+
+    if (name_ptr != NULL)
+    {
+        strncpy(tmp->ifa_name, name_ptr, IF_NAMESIZE);
+    }
+
+    tmp->ifa_addr = (struct sockaddr *) malloc(sizeof(struct sockaddr));
+    if (tmp->ifa_addr == NULL)
+    {
+        errno = ENOBUFS;
+        mbed_freeifaddrs(tmp);
+        return -1;
+    }
+
+    memset(tmp->ifa_addr, 0, sizeof(struct sockaddr));
+
+    tmp->ifa_netmask = (struct sockaddr *) malloc(sizeof(struct sockaddr));
+    if (tmp->ifa_netmask == NULL)
+    {
+        errno = ENOBUFS;
+        mbed_freeifaddrs(tmp);
+        return -1;
+    }
+
+    memset(tmp->ifa_netmask, 0, sizeof(struct sockaddr));
+
+    if (ipVersion == NSAPI_IPv4)
+    {
+        tmp->ifa_addr->sa_family    = AF_INET;
+        tmp->ifa_netmask->sa_family = AF_INET;
+        memcpy(&tmp->ifa_addr->data[2], ip.get_ip_bytes(), NSAPI_IPv4_BYTES);
+        memcpy(&tmp->ifa_netmask->data[2], netmask.get_ip_bytes(), NSAPI_IPv4_BYTES);
+    }
+    else if (ipVersion == NSAPI_IPv6)
+    {
+        tmp->ifa_addr->sa_family    = PF_INET6;
+        tmp->ifa_netmask->sa_family = PF_INET6;
+        memcpy(tmp->ifa_addr->data, ip.get_ip_bytes(), NSAPI_IPv6_BYTES);
+        memcpy(tmp->ifa_netmask->data, netmask.get_ip_bytes(), NSAPI_IPv6_BYTES);
+    }
+    else
+    {
+        tmp->ifa_addr->sa_family    = PF_UNSPEC;
+        tmp->ifa_netmask->sa_family = PF_UNSPEC;
+    }
+
     return 0;
 }
 
 void mbed_freeifaddrs(struct ifaddrs * ifp)
 {
+    struct ifaddrs * next;
+
+    while (ifp != NULL)
+    {
+        next = ifp->ifa_next;
+
+        if (ifp->ifa_name)
+        {
+            free(ifp->ifa_name);
+            ifp->ifa_name = NULL;
+        }
+
+        if (ifp->ifa_addr)
+        {
+            free(ifp->ifa_addr);
+            ifp->ifa_addr = NULL;
+        }
+
+        if (ifp->ifa_netmask)
+        {
+            free(ifp->ifa_netmask);
+            ifp->ifa_netmask = NULL;
+        }
+
+        free(ifp);
+
+        ifp = next;
+    }
+
     return;
+}
+
+static char * inet_ntop4(const void * src, char * dst, size_t size)
+{
+    char tmp[sizeof "255.255.255.255"];
+    int l;
+
+    uint8_t * buf = (uint8_t *) src;
+
+    l = snprintf(tmp, sizeof(tmp), "%u.%u.%u.%u", buf[0], buf[1], buf[2], buf[3]);
+    if (l <= 0 || l >= size)
+    {
+        return (NULL);
+    }
+    strlcpy(dst, tmp, size);
+    return (dst);
+}
+
+static char * inet_ntop6(const void * src, char * dst, size_t size)
+{
+    return NULL;
+    /*
+     * Note that int32_t and int16_t need only be "at least" large enough
+     * to contain a value of the specified size.  On some systems, like
+     * Crays, there is no such thing as an integer variable with 16 bits.
+     * Keep this in mind if you think this function should have been coded
+     * to use pointer overlays.  All the world's not a VAX.
+     */
+    // char tmp[sizeof "ffff:ffff:ffff:ffff:ffff:ffff:255.255.255.255"];
+    // char *tp, *ep;
+    // struct { int base, len; } best, cur;
+    // u_int words[IN6ADDRSZ / INT16SZ];
+    // int i;
+    // int advance;
+
+    // /*
+    //  * Preprocess:
+    //  *	Copy the input (bytewise) array into a wordwise array.
+    //  *	Find the longest run of 0x00's in src[] for :: shorthanding.
+    //  */
+    // memset(words, '\0', sizeof words);
+    // for (i = 0; i < IN6ADDRSZ; i++)
+    // 	words[i / 2] |= (src[i] << ((1 - (i % 2)) << 3));
+    // best.base = -1;
+    // cur.base = -1;
+    // for (i = 0; i < (IN6ADDRSZ / INT16SZ); i++) {
+    // 	if (words[i] == 0) {
+    // 		if (cur.base == -1)
+    // 			cur.base = i, cur.len = 1;
+    // 		else
+    // 			cur.len++;
+    // 	} else {
+    // 		if (cur.base != -1) {
+    // 			if (best.base == -1 || cur.len > best.len)
+    // 				best = cur;
+    // 			cur.base = -1;
+    // 		}
+    // 	}
+    // }
+    // if (cur.base != -1) {
+    // 	if (best.base == -1 || cur.len > best.len)
+    // 		best = cur;
+    // }
+    // if (best.base != -1 && best.len < 2)
+    // 	best.base = -1;
+
+    // /*
+    //  * Format the result.
+    //  */
+    // tp = tmp;
+    // ep = tmp + sizeof(tmp);
+    // for (i = 0; i < (IN6ADDRSZ / INT16SZ) && tp < ep; i++) {
+    // 	/* Are we inside the best run of 0x00's? */
+    // 	if (best.base != -1 && i >= best.base &&
+    // 	    i < (best.base + best.len)) {
+    // 		if (i == best.base) {
+    // 			if (tp + 1 >= ep)
+    // 				return (NULL);
+    // 			*tp++ = ':';
+    // 		}
+    // 		continue;
+    // 	}
+    // 	/* Are we following an initial run of 0x00s or any real hex? */
+    // 	if (i != 0) {
+    // 		if (tp + 1 >= ep)
+    // 			return (NULL);
+    // 		*tp++ = ':';
+    // 	}
+    // 	/* Is this address an encapsulated IPv4? */
+    // 	if (i == 6 && best.base == 0 &&
+    // 	    (best.len == 6 || (best.len == 5 && words[5] == 0xffff))) {
+    // 		if (!inet_ntop4(src+12, tp, (size_t)(ep - tp)))
+    // 			return (NULL);
+    // 		tp += strlen(tp);
+    // 		break;
+    // 	}
+    // 	advance = snprintf(tp, ep - tp, "%x", words[i]);
+    // 	if (advance <= 0 || advance >= ep - tp)
+    // 		return (NULL);
+    // 	tp += advance;
+    // }
+    // /* Was it a trailing run of 0x00's? */
+    // if (best.base != -1 && (best.base + best.len) == (IN6ADDRSZ / INT16SZ)) {
+    // 	if (tp + 1 >= ep)
+    // 		return (NULL);
+    // 	*tp++ = ':';
+    // }
+    // if (tp + 1 >= ep)
+    // 	return (NULL);
+    // *tp++ = '\0';
+
+    // /*
+    //  * Check for overflow, copy, and we're done.
+    //  */
+    // if ((size_t)(tp - tmp) > size) {
+    // 	return (NULL);
+    // }
+    // strlcpy(dst, tmp, size);
+    // return (dst);
 }
 
 char * mbed_inet_ntop(sa_family_t family, const void * src, char * dst, size_t size)
 {
-    return NULL;
+    switch (family)
+    {
+    case AF_INET:
+        return (inet_ntop4(src, dst, (size_t) size));
+    case AF_INET6:
+        return (inet_ntop6(src, dst, (size_t) size));
+    default:
+        return (NULL);
+    }
 }
 
 int mbed_inet_pton(sa_family_t family, const char * src, void * dst)
@@ -209,16 +478,17 @@ int mbed_ioctl(int fd, unsigned long request, void * param)
         }
         else
         {
-            bytesNumber = NSAPI_IPv6_BYTES;
+            bytesNumber = NSAPI_IPv4_BYTES;
         }
 
         uint8_t * ip_bytes      = (uint8_t *) ip.get_ip_bytes();
         uint8_t * netmask_bytes = (uint8_t *) netmask.get_ip_bytes();
-        uint8_t mask;
+        uint8_t mask, netmask_neg;
         for (int index = 0; index < bytesNumber; ++index)
         {
-            mask = *ip_bytes & ~(*netmask_bytes);
-            if (mask && mask != ~(*netmask_bytes))
+            netmask_neg = ~(*netmask_bytes);
+            mask        = *ip_bytes & netmask_neg;
+            if (mask && (mask != netmask_neg))
             {
                 isBroadcast = false;
                 break;

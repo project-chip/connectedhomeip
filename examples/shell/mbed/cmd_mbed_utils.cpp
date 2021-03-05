@@ -160,6 +160,8 @@ int cmd_network_interface(int argc, char ** argv)
     CHIP_ERROR error = CHIP_NO_ERROR;
     InterfaceIterator intIterator;
     InterfaceAddressIterator addrIterator;
+    IPAddress addr;
+    IPPrefix addrWithPrefix;
     char intName[IF_NAMESIZE];
     InterfaceId intId;
     INET_ERROR err;
@@ -186,6 +188,15 @@ int cmd_network_interface(int argc, char ** argv)
         }
         printf("     interface id: %d, interface name: %s, interface state: %s, %s broadcast addr\n", intId, intName,
                intIterator.IsUp() ? "UP" : "DOWN", intIterator.HasBroadcastAddress() ? "has" : "no");
+        if (addrIterator.HasCurrent())
+        {
+            addr = addrIterator.GetAddress();
+            addrIterator.GetAddressWithPrefix(addrWithPrefix);
+            char addrStr[80];
+            addrWithPrefix.IPAddr.ToString(addrStr, sizeof(addrStr));
+            printf("     interface address: %s/%d\n", addrStr, addrWithPrefix.Length);
+            addrIterator.Next();
+        }
     }
 
 exit:
