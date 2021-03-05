@@ -21,6 +21,7 @@
 #pragma once
 
 #include <app/util/basic-types.h>
+#include <lib/support/Span.h>
 #include <stdint.h>
 #include <system/SystemPacketBuffer.h>
 
@@ -1303,10 +1304,9 @@ encodeGeneralCommissioningClusterCommissioningCompleteCommand(uint8_t seqNum, ch
  * @brief
  *    Encode an SetFabric command for General Commissioning server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeGeneralCommissioningClusterSetFabricCommand(uint8_t seqNum,
-                                                                                   chip::EndpointId destinationEndpoint,
-                                                                                   char * fabricId, char * fabricSecret,
-                                                                                   uint64_t breadcrumb, uint32_t timeoutMs);
+chip::System::PacketBufferHandle
+encodeGeneralCommissioningClusterSetFabricCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, chip::ByteSpan fabricId,
+                                                  chip::ByteSpan fabricSecret, uint64_t breadcrumb, uint32_t timeoutMs);
 
 /**
  * @brief
@@ -1777,17 +1777,16 @@ chip::System::PacketBufferHandle encodeMediaPlaybackClusterReadClusterRevisionAt
  */
 chip::System::PacketBufferHandle encodeNetworkCommissioningClusterAddThreadNetworkCommand(uint8_t seqNum,
                                                                                           chip::EndpointId destinationEndpoint,
-                                                                                          char * operationalDataset,
+                                                                                          chip::ByteSpan operationalDataset,
                                                                                           uint64_t breadcrumb, uint32_t timeoutMs);
 
 /**
  * @brief
  *    Encode an AddWiFiNetwork command for Network Commissioning server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeNetworkCommissioningClusterAddWiFiNetworkCommand(uint8_t seqNum,
-                                                                                        chip::EndpointId destinationEndpoint,
-                                                                                        char * ssid, char * credentials,
-                                                                                        uint64_t breadcrumb, uint32_t timeoutMs);
+chip::System::PacketBufferHandle
+encodeNetworkCommissioningClusterAddWiFiNetworkCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, chip::ByteSpan ssid,
+                                                       chip::ByteSpan credentials, uint64_t breadcrumb, uint32_t timeoutMs);
 
 /**
  * @brief
@@ -1795,8 +1794,8 @@ chip::System::PacketBufferHandle encodeNetworkCommissioningClusterAddWiFiNetwork
  */
 chip::System::PacketBufferHandle encodeNetworkCommissioningClusterDisableNetworkCommand(uint8_t seqNum,
                                                                                         chip::EndpointId destinationEndpoint,
-                                                                                        char * networkID, uint64_t breadcrumb,
-                                                                                        uint32_t timeoutMs);
+                                                                                        chip::ByteSpan networkID,
+                                                                                        uint64_t breadcrumb, uint32_t timeoutMs);
 
 /**
  * @brief
@@ -1804,8 +1803,8 @@ chip::System::PacketBufferHandle encodeNetworkCommissioningClusterDisableNetwork
  */
 chip::System::PacketBufferHandle encodeNetworkCommissioningClusterEnableNetworkCommand(uint8_t seqNum,
                                                                                        chip::EndpointId destinationEndpoint,
-                                                                                       char * networkID, uint64_t breadcrumb,
-                                                                                       uint32_t timeoutMs);
+                                                                                       chip::ByteSpan networkID,
+                                                                                       uint64_t breadcrumb, uint32_t timeoutMs);
 
 /**
  * @brief
@@ -1821,8 +1820,8 @@ encodeNetworkCommissioningClusterGetLastNetworkCommissioningResultCommand(uint8_
  */
 chip::System::PacketBufferHandle encodeNetworkCommissioningClusterRemoveNetworkCommand(uint8_t seqNum,
                                                                                        chip::EndpointId destinationEndpoint,
-                                                                                       char * networkID, uint64_t breadcrumb,
-                                                                                       uint32_t timeoutMs);
+                                                                                       chip::ByteSpan networkID,
+                                                                                       uint64_t breadcrumb, uint32_t timeoutMs);
 
 /**
  * @brief
@@ -1830,25 +1829,26 @@ chip::System::PacketBufferHandle encodeNetworkCommissioningClusterRemoveNetworkC
  */
 chip::System::PacketBufferHandle encodeNetworkCommissioningClusterScanNetworksCommand(uint8_t seqNum,
                                                                                       chip::EndpointId destinationEndpoint,
-                                                                                      char * ssid, uint64_t breadcrumb,
+                                                                                      chip::ByteSpan ssid, uint64_t breadcrumb,
                                                                                       uint32_t timeoutMs);
 
 /**
  * @brief
  *    Encode an UpdateThreadNetwork command for Network Commissioning server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle
-encodeNetworkCommissioningClusterUpdateThreadNetworkCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint,
-                                                            char * operationalDataset, uint64_t breadcrumb, uint32_t timeoutMs);
+chip::System::PacketBufferHandle encodeNetworkCommissioningClusterUpdateThreadNetworkCommand(uint8_t seqNum,
+                                                                                             chip::EndpointId destinationEndpoint,
+                                                                                             chip::ByteSpan operationalDataset,
+                                                                                             uint64_t breadcrumb,
+                                                                                             uint32_t timeoutMs);
 
 /**
  * @brief
  *    Encode an UpdateWiFiNetwork command for Network Commissioning server into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeNetworkCommissioningClusterUpdateWiFiNetworkCommand(uint8_t seqNum,
-                                                                                           chip::EndpointId destinationEndpoint,
-                                                                                           char * ssid, char * credentials,
-                                                                                           uint64_t breadcrumb, uint32_t timeoutMs);
+chip::System::PacketBufferHandle
+encodeNetworkCommissioningClusterUpdateWiFiNetworkCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, chip::ByteSpan ssid,
+                                                          chip::ByteSpan credentials, uint64_t breadcrumb, uint32_t timeoutMs);
 
 /**
  * @brief

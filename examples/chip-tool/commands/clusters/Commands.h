@@ -19,9 +19,13 @@
 
 #pragma once
 
+#include <cstdint>
+
 #include "ModelCommand.h"
 #include "gen/CHIPClientCallbacks.h"
 #include <controller/CHIPClusters.h>
+#include <lib/core/CHIPSafeCasts.h>
+#include <lib/support/Span.h>
 
 static void OnDefaultSuccessResponse(void * context)
 {
@@ -4978,8 +4982,10 @@ public:
 
         chip::Controller::GeneralCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.SetFabric(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), reinterpret_cast<char *>(mFabricId),
-                                 reinterpret_cast<char *>(mFabricSecret), mBreadcrumb, mTimeoutMs);
+        return cluster.SetFabric(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
+                                 chip::ByteSpan(chip::Uint8::from_char(mFabricId), strlen(mFabricId)),
+                                 chip::ByteSpan(chip::Uint8::from_char(mFabricSecret), strlen(mFabricSecret)), mBreadcrumb,
+                                 mTimeoutMs);
     }
 
 private:

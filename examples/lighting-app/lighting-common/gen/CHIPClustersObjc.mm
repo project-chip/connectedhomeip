@@ -26,6 +26,7 @@
 #import "gen/CHIPClustersObjc.h"
 
 #include <controller/CHIPClusters.h>
+#include <lib/support/Span.h>
 
 using namespace ::chip;
 
@@ -616,7 +617,7 @@ private:
     return &_cppCluster;
 }
 
-- (void)addThreadNetwork:(char *)operationalDataset
+- (void)addThreadNetwork:(NSByte *)operationalDataset
               breadcrumb:(uint64_t)breadcrumb
                timeoutMs:(uint32_t)timeoutMs
        completionHandler:(ResponseHandler)completionHandler
@@ -635,16 +636,16 @@ private:
         return;
     }
 
-    CHIP_ERROR err
-        = self.cppCluster.AddThreadNetwork(onSuccess->Cancel(), onFailure->Cancel(), operationalDataset, breadcrumb, timeoutMs);
+    CHIP_ERROR err = self.cppCluster.AddThreadNetwork(onSuccess->Cancel(), onFailure->Cancel(),
+        chip::ByteSpan((const uint8_t *) operationalDataset.bytes, operationalDataset.length), breadcrumb, timeoutMs);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
         completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
-- (void)addWiFiNetwork:(char *)ssid
-           credentials:(char *)credentials
+- (void)addWiFiNetwork:(NSByte *)ssid
+           credentials:(NSByte *)credentials
             breadcrumb:(uint64_t)breadcrumb
              timeoutMs:(uint32_t)timeoutMs
      completionHandler:(ResponseHandler)completionHandler
@@ -663,15 +664,16 @@ private:
         return;
     }
 
-    CHIP_ERROR err
-        = self.cppCluster.AddWiFiNetwork(onSuccess->Cancel(), onFailure->Cancel(), ssid, credentials, breadcrumb, timeoutMs);
+    CHIP_ERROR err = self.cppCluster.AddWiFiNetwork(onSuccess->Cancel(), onFailure->Cancel(),
+        chip::ByteSpan((const uint8_t *) ssid.bytes, ssid.length),
+        chip::ByteSpan((const uint8_t *) credentials.bytes, credentials.length), breadcrumb, timeoutMs);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
         completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
-- (void)disableNetwork:(char *)networkID
+- (void)disableNetwork:(NSByte *)networkID
             breadcrumb:(uint64_t)breadcrumb
              timeoutMs:(uint32_t)timeoutMs
      completionHandler:(ResponseHandler)completionHandler
@@ -690,14 +692,15 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.DisableNetwork(onSuccess->Cancel(), onFailure->Cancel(), networkID, breadcrumb, timeoutMs);
+    CHIP_ERROR err = self.cppCluster.DisableNetwork(onSuccess->Cancel(), onFailure->Cancel(),
+        chip::ByteSpan((const uint8_t *) networkID.bytes, networkID.length), breadcrumb, timeoutMs);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
         completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
-- (void)enableNetwork:(char *)networkID
+- (void)enableNetwork:(NSByte *)networkID
            breadcrumb:(uint64_t)breadcrumb
             timeoutMs:(uint32_t)timeoutMs
     completionHandler:(ResponseHandler)completionHandler
@@ -716,7 +719,8 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.EnableNetwork(onSuccess->Cancel(), onFailure->Cancel(), networkID, breadcrumb, timeoutMs);
+    CHIP_ERROR err = self.cppCluster.EnableNetwork(onSuccess->Cancel(), onFailure->Cancel(),
+        chip::ByteSpan((const uint8_t *) networkID.bytes, networkID.length), breadcrumb, timeoutMs);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -745,7 +749,7 @@ private:
         completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
-- (void)removeNetwork:(char *)networkID
+- (void)removeNetwork:(NSByte *)networkID
            breadcrumb:(uint64_t)breadcrumb
             timeoutMs:(uint32_t)timeoutMs
     completionHandler:(ResponseHandler)completionHandler
@@ -764,14 +768,15 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.RemoveNetwork(onSuccess->Cancel(), onFailure->Cancel(), networkID, breadcrumb, timeoutMs);
+    CHIP_ERROR err = self.cppCluster.RemoveNetwork(onSuccess->Cancel(), onFailure->Cancel(),
+        chip::ByteSpan((const uint8_t *) networkID.bytes, networkID.length), breadcrumb, timeoutMs);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
         completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
-- (void)scanNetworks:(char *)ssid
+- (void)scanNetworks:(NSByte *)ssid
            breadcrumb:(uint64_t)breadcrumb
             timeoutMs:(uint32_t)timeoutMs
     completionHandler:(ResponseHandler)completionHandler
@@ -790,14 +795,15 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ScanNetworks(onSuccess->Cancel(), onFailure->Cancel(), ssid, breadcrumb, timeoutMs);
+    CHIP_ERROR err = self.cppCluster.ScanNetworks(
+        onSuccess->Cancel(), onFailure->Cancel(), chip::ByteSpan((const uint8_t *) ssid.bytes, ssid.length), breadcrumb, timeoutMs);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
         completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
-- (void)updateThreadNetwork:(char *)operationalDataset
+- (void)updateThreadNetwork:(NSByte *)operationalDataset
                  breadcrumb:(uint64_t)breadcrumb
                   timeoutMs:(uint32_t)timeoutMs
           completionHandler:(ResponseHandler)completionHandler
@@ -816,16 +822,16 @@ private:
         return;
     }
 
-    CHIP_ERROR err
-        = self.cppCluster.UpdateThreadNetwork(onSuccess->Cancel(), onFailure->Cancel(), operationalDataset, breadcrumb, timeoutMs);
+    CHIP_ERROR err = self.cppCluster.UpdateThreadNetwork(onSuccess->Cancel(), onFailure->Cancel(),
+        chip::ByteSpan((const uint8_t *) operationalDataset.bytes, operationalDataset.length), breadcrumb, timeoutMs);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
         completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
-- (void)updateWiFiNetwork:(char *)ssid
-              credentials:(char *)credentials
+- (void)updateWiFiNetwork:(NSByte *)ssid
+              credentials:(NSByte *)credentials
                breadcrumb:(uint64_t)breadcrumb
                 timeoutMs:(uint32_t)timeoutMs
         completionHandler:(ResponseHandler)completionHandler
@@ -844,8 +850,9 @@ private:
         return;
     }
 
-    CHIP_ERROR err
-        = self.cppCluster.UpdateWiFiNetwork(onSuccess->Cancel(), onFailure->Cancel(), ssid, credentials, breadcrumb, timeoutMs);
+    CHIP_ERROR err = self.cppCluster.UpdateWiFiNetwork(onSuccess->Cancel(), onFailure->Cancel(),
+        chip::ByteSpan((const uint8_t *) ssid.bytes, ssid.length),
+        chip::ByteSpan((const uint8_t *) credentials.bytes, credentials.length), breadcrumb, timeoutMs);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
