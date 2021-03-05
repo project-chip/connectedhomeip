@@ -164,8 +164,8 @@ class QueryResponderIterator
 {
 public:
     using value_type = QueryResponderRecord;
-    using pointer = QueryResponderRecord*;
-    using reference = QueryResponderRecord&;
+    using pointer    = QueryResponderRecord *;
+    using reference  = QueryResponderRecord &;
 
     QueryResponderIterator() : mCurrent(nullptr), mRemaining(0) {}
     QueryResponderIterator(QueryResponderRecordFilter * recordFilter, Internal::QueryResponderInfo * pos, size_t size) :
