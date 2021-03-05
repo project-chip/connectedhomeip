@@ -578,7 +578,7 @@ void MdnsAvahi::HandleBrowse(AvahiServiceBrowser * browser, AvahiIfIndex interfa
         ChipLogProgress(DeviceLayer, "Avahi browse: cache new");
         if (strcmp("local", domain) == 0)
         {
-            MdnsService service;
+            MdnsService service = {};
 
             strncpy(service.mName, name, sizeof(service.mName));
             strncpy(service.mType, type, sizeof(service.mType));
@@ -599,7 +599,7 @@ void MdnsAvahi::HandleBrowse(AvahiServiceBrowser * browser, AvahiIfIndex interfa
         ChipLogProgress(DeviceLayer, "Avahi browse: remove");
         if (strcmp("local", domain) == 0)
         {
-            std::remove_if(context->mServices.begin(), context->mServices.end(), [name, type](const MdnsService service) {
+            std::remove_if(context->mServices.begin(), context->mServices.end(), [name, type](const MdnsService & service) {
                 return strcmp(name, service.mName) == 0 && type == GetFullType(service.mType, service.mProtocol);
             });
         }
@@ -654,7 +654,7 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
         context->mCallback(context->mContext, nullptr, CHIP_ERROR_INTERNAL);
         break;
     case AVAHI_RESOLVER_FOUND:
-        MdnsService result;
+        MdnsService result = {};
 
         result.mAddress.SetValue(chip::Inet::IPAddress());
         ChipLogError(DeviceLayer, "Avahi resolve found");
