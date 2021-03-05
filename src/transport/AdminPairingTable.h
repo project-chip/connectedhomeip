@@ -22,7 +22,6 @@
 #pragma once
 
 #include <core/CHIPPersistentStorageDelegate.h>
-#include <iterator>
 #include <support/DLLUtil.h>
 #include <transport/raw/MessageHeader.h>
 
@@ -115,9 +114,13 @@ private:
 /**
  * Iterates over valid admins within a list
  */
-class ConstAdminIterator : public std::iterator<std::forward_iterator_tag, const AdminPairingInfo>
+class ConstAdminIterator
 {
 public:
+    using value_type = AdminPairingInfo;
+    using pointer    = AdminPairingInfo *;
+    using reference  = AdminPairingInfo &;
+
     ConstAdminIterator(const AdminPairingInfo * start, size_t index, size_t maxSize) :
         mStart(start), mIndex(index), mMaxSize(maxSize)
     {
