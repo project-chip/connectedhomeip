@@ -61,7 +61,7 @@
 #define LOG_LWIP "<lwip  > "
 #define LOG_EFR32 "<efr32 > "
 // If a new category string LOG_* is created, add it in the MaxStringLength arguments below
-static constexpr size_t kMaxCategoryStrLen = chip::MaxStringLength(LOG_ERROR, LOG_WARN, LOG_DETAIL, LOG_LWIP, LOG_EFR32);
+static constexpr size_t kMaxCategoryStrLen = chip::MaxStringLength(LOG_ERROR, LOG_WARN, LOG_INFO, LOG_DETAIL, LOG_LWIP, LOG_EFR32);
 
 #if EFR32_LOG_ENABLED
 static bool sLogInitialized = false;
