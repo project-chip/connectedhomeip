@@ -39,6 +39,8 @@ CHIP_ERROR ReadHandler::Init(InteractionModelDelegate * apDelegate)
     mpDelegate        = apDelegate;
     mSuppressResponse = true;
     mGetToAllEvents   = true;
+    mpClusterInfoList = nullptr;
+    mNumClusterInfos  = 0;
     MoveToState(HandlerState::Initialized);
 
 exit:
@@ -48,9 +50,12 @@ exit:
 
 void ReadHandler::Shutdown()
 {
+    InteractionModelEngine::GetInstance()->ReleaseClusterInfoListToPool(this);
     ClearExistingExchangeContext();
     MoveToState(HandlerState::Uninitialized);
-    mpDelegate = nullptr;
+    mpDelegate        = nullptr;
+    mpClusterInfoList = nullptr;
+    mNumClusterInfos  = 0;
 }
 
 CHIP_ERROR ReadHandler::ClearExistingExchangeContext()
@@ -102,6 +107,7 @@ CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle aPayload)
 
     ReadRequest::Parser readRequestParser;
     EventPathList::Parser eventPathListParser;
+    AttributePathList::Parser attributePathListParser;
     TLV::TLVReader eventPathListReader;
 
     reader.Init(std::move(aPayload));
@@ -136,11 +142,21 @@ CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle aPayload)
             // TODO: Pass event path to report engine to generate report with interested events
         }
     }
-
     // if we have exhausted this container
     if (CHIP_END_OF_TLV == err)
     {
         err = CHIP_NO_ERROR;
+    }
+
+    err = readRequestParser.GetAttributePathList(&attributePathListParser);
+    if (err == CHIP_END_OF_TLV)
+    {
+        err = CHIP_NO_ERROR;
+    }
+    else
+    {
+        SuccessOrExit(err);
+        ProcessAttributePathList(attributePathListParser);
     }
 
     MoveToState(HandlerState::Reportable);
@@ -149,6 +165,75 @@ CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle aPayload)
 
 exit:
     ChipLogFunctError(err);
+    return err;
+}
+
+CHIP_ERROR ReadHandler::ProcessAttributePathList(AttributePathList::Parser & aAttributePathListParser)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    TLV::TLVReader reader;
+    aAttributePathListParser.GetReader(&reader);
+
+    while (CHIP_NO_ERROR == (err = reader.Next()))
+    {
+
+        VerifyOrExit(TLV::AnonymousTag == reader.GetTag(), err = CHIP_ERROR_INVALID_TLV_TAG);
+        VerifyOrExit(TLV::kTLVType_List == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
+        {
+            AttributePath::Parser path;
+            ClusterDataHandle clusterDataHandle;
+            ClusterInfo * clusterInfo = nullptr;
+            err                       = path.Init(reader);
+            SuccessOrExit(err);
+
+            err = InteractionModelEngine::GetInstance()->mpSourceCatalog->LocateClusterDataHandle(path, clusterDataHandle);
+            SuccessOrExit(err);
+            // TODO: Add version check via parsing AttributeDataVersionList, if invalid, get entire attribute data, otherwise, send
+            // delta
+
+            for (size_t i = 0; i < mNumClusterInfos; ++i)
+            {
+                if (mpClusterInfoList[i].mClusterDataHandle == clusterDataHandle)
+                {
+                    clusterInfo = &mpClusterInfoList[i];
+                    break;
+                }
+            }
+
+            if (clusterInfo == nullptr)
+            {
+                if (InteractionModelEngine::GetInstance()->mNumClusterInfosInPool < IM_PUBLISHER_MAX_NUM_PATH_GROUPS)
+                {
+                    clusterInfo = InteractionModelEngine::GetInstance()->mClusterInfoPool +
+                        InteractionModelEngine::GetInstance()->mNumClusterInfosInPool;
+                    ++mNumClusterInfos;
+                    ++(InteractionModelEngine::GetInstance()->mNumClusterInfosInPool);
+                    clusterInfo->Init();
+                }
+                else
+                {
+                    SuccessOrExit(err = CHIP_ERROR_NO_MEMORY);
+                }
+            }
+            clusterInfo->mClusterDataHandle = clusterDataHandle;
+
+            if (nullptr == mpClusterInfoList)
+            {
+                // this the first cluster instance for this read handler
+                // mNumpClusterInfoList has already be incremented
+                mpClusterInfoList = clusterInfo;
+            }
+            clusterInfo->SetDirty();
+        }
+        ChipLogDetail(DataManagement, "IM RH debut3");
+    }
+    // if we have exhausted this container
+    if (CHIP_END_OF_TLV == err)
+    {
+        err = CHIP_NO_ERROR;
+    }
+
+exit:
     return err;
 }
 

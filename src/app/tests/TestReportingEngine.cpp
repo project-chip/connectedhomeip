@@ -43,6 +43,7 @@
 #include <nlunit-test.h>
 
 namespace chip {
+static System::Layer gSystemLayer;
 static SecureSessionMgr gSessionManager;
 static Messaging::ExchangeManager gExchangeManager;
 static TransportMgr<Transport::UDP> gTransportManager;
@@ -98,10 +99,12 @@ void InitializeChip(nlTestSuite * apSuite)
     err = chip::Platform::MemoryInit();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    err = chip::gSessionManager.Init(chip::kTestDeviceNodeId, nullptr, nullptr, &admins);
+    chip::gSystemLayer.Init(nullptr);
+
+    err = chip::gSessionManager.Init(chip::kTestDeviceNodeId, &chip::gSystemLayer, &chip::gTransportManager, &admins);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    err = chip::gExchangeManager.Init(chip::kTestDeviceNodeId, &chip::gTransportManager, &chip::gSessionManager);
+    err = chip::gExchangeManager.Init(&chip::gSessionManager);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 }
 

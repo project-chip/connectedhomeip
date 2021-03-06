@@ -90,10 +90,10 @@ void TestReadInteraction::TestReadClient(nlTestSuite * apSuite, void * apContext
     app::ReadClient readClient;
 
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
-    err                            = readClient.Init(&gExchangeManager, nullptr);
+    err                            = readClient.Init(&gExchangeManager, nullptr, nullptr);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    err = readClient.SendReadRequest(kTestDeviceNodeId, gAdminId, nullptr, 0);
+    err = readClient.SendReadRequest(kTestDeviceNodeId, gAdminId, nullptr, 0, nullptr, 0);
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_INCORRECT_STATE);
 
     GenerateReportData(apSuite, apContext, buf);

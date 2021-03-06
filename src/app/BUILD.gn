@@ -28,10 +28,14 @@ static_library("app") {
   output_name = "libCHIPDataModel"
 
   sources = [
+    "ClusterCatalog.cpp",
+    "ClusterCatalog.ipp",
+    "ClusterData.cpp",
     "Command.cpp",
     "Command.h",
     "CommandHandler.cpp",
     "CommandSender.cpp",
+    "InteractionModelDelegate.h",
     "InteractionModelEngine.cpp",
     "MessageDef/AttributeDataElement.cpp",
     "MessageDef/AttributeDataElement.h",
