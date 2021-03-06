@@ -58,7 +58,7 @@ CHIP_ERROR CommandHandler::SendCommandResponse()
     err = FinalizeCommandsMessage();
     SuccessOrExit(err);
 
-    VerifyOrExit(mpExchangeCtx != NULL, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::InvokeCommandResponse, std::move(mCommandMessageBuf),
                                      Messaging::SendFlags(Messaging::SendMessageFlags::kNone));
     SuccessOrExit(err);
