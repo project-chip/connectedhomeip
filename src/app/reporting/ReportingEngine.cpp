@@ -38,6 +38,84 @@ CHIP_ERROR ReportingEngine::Init()
     return err;
 }
 
+CHIP_ERROR
+ReportingEngine::RetrieveClusterData(AttributeDataElement::Builder & aAttributeDataElementBuilder, ClusterInfo & aClusterInfo)
+{
+    CHIP_ERROR err;
+    ClusterDataSource * dataSource;
+    chip::EndpointId endpointId                 = 0;
+    chip::NodeId nodeId                         = 0;
+    chip::ClusterId clusterId                   = 0;
+    AttributePath::Builder attributePathBuilder = aAttributeDataElementBuilder.CreateAttributePathBuilder();
+
+    err =
+        InteractionModelEngine::GetInstance()->mpSourceCatalog->LocateClusterInstance(aClusterInfo.mClusterDataHandle, &dataSource);
+    SuccessOrExit(err);
+
+    err = InteractionModelEngine::GetInstance()->mpSourceCatalog->GetEndpointId(aClusterInfo.mClusterDataHandle, endpointId);
+    SuccessOrExit(err);
+
+    err = InteractionModelEngine::GetInstance()->mpSourceCatalog->GetNodeId(aClusterInfo.mClusterDataHandle, nodeId);
+    SuccessOrExit(err);
+
+    clusterId = dataSource->GetSchemaEngine()->GetClusterId();
+
+    SuccessOrExit(attributePathBuilder.GetError());
+    attributePathBuilder.NodeId(nodeId).EndpointId(endpointId).ClusterId(clusterId).EndOfAttributePath();
+
+    aAttributeDataElementBuilder.DataVersion(dataSource->GetVersion());
+    err = dataSource->ReadData(kRootAttributePathHandle, TLV::ContextTag(AttributeDataElement::kCsTag_Data),
+                               *(aAttributeDataElementBuilder.GetWriter()));
+    SuccessOrExit(err);
+    aAttributeDataElementBuilder.MoreClusterData(false);
+    aAttributeDataElementBuilder.EndOfAttributeDataElement();
+    SuccessOrExit(aAttributeDataElementBuilder.GetError() == CHIP_NO_ERROR);
+
+exit:
+    aClusterInfo.ClearDirty();
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DataManagement, "Error retrieving data from cluster (instanceHandle: %u, clusterId: %08x), err = %d",
+                     aClusterInfo.mClusterDataHandle, clusterId, err);
+    }
+
+    return err;
+}
+
+CHIP_ERROR ReportingEngine::BuildSingleReportDataAttributeDataList(ReportData::Builder & reportDataBuilder,
+                                                                   ReadHandler * apReadHandler)
+{
+    CHIP_ERROR err            = CHIP_NO_ERROR;
+    ClusterInfo * clusterInfo = apReadHandler->GetClusterInfoList() + apReadHandler->mCurProcessingClusterInfoIdx;
+
+    AttributeDataList::Builder attributeDataList = reportDataBuilder.CreateAttributeDataListBuilder();
+    while (apReadHandler->mCurProcessingClusterInfoIdx < apReadHandler->GetNumClusterInfos())
+    {
+        if (clusterInfo->IsDirty())
+        {
+            AttributeDataElement::Builder attributeDataElementBuilder = attributeDataList.CreateAttributeDataElementBuilder();
+            ChipLogDetail(DataManagement, "<RE:Run> Cluster %u is dirty", apReadHandler->mCurProcessingClusterInfoIdx);
+            // Retrieve data for this cluster instance and clear its dirty flag.
+            err = RetrieveClusterData(attributeDataElementBuilder, *clusterInfo);
+            VerifyOrExit(err == CHIP_NO_ERROR,
+                         ChipLogError(DataManagement, "<RE:Run> Error retrieving data from cluster, aborting"));
+        }
+
+        apReadHandler->mCurProcessingClusterInfoIdx++;
+        clusterInfo++;
+    }
+
+    // Only do this if our read handler is still valid at this point (which it may not be)
+    if (apReadHandler->GetNumClusterInfos())
+    {
+        apReadHandler->mCurProcessingClusterInfoIdx %= apReadHandler->GetNumClusterInfos();
+    }
+
+exit:
+    return err;
+}
+
 CHIP_ERROR ReportingEngine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -56,6 +134,9 @@ CHIP_ERROR ReportingEngine::BuildAndSendSingleReportData(ReadHandler * apReadHan
     // TODO: Fill in the EventList.
     // err = BuildSingleReportDataEventList(reportDataBuilder, apReadHandler);
     // SuccessOrExit(err);
+
+    err = BuildSingleReportDataAttributeDataList(reportDataBuilder, apReadHandler);
+    SuccessOrExit(err);
 
     // TODO: Add mechanism to set mSuppressResponse to handle status reports for multiple reports
     // TODO: Add more chunk message support, currently mMoreChunkedMessages is always false.

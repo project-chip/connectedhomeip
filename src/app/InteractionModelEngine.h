@@ -37,6 +37,7 @@
 #include <support/logging/CHIPLogging.h>
 #include <system/SystemPacketBuffer.h>
 
+#include <app/ClusterCatalog.h>
 #include <app/Command.h>
 #include <app/CommandHandler.h>
 #include <app/CommandSender.h>
@@ -50,6 +51,7 @@
 #define CHIP_MAX_NUM_READ_CLIENT 1
 #define CHIP_MAX_NUM_READ_HANDLER 1
 #define CHIP_MAX_REPORTS_IN_FLIGHT 1
+#define IM_PUBLISHER_MAX_NUM_PATH_GROUPS 128
 
 namespace chip {
 namespace app {
@@ -88,7 +90,8 @@ public:
      *  @retval #CHIP_NO_ERROR On success.
      *
      */
-    CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate);
+    CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate,
+                    CatalogInterface<ClusterDataSource> * apSourceCatalog);
 
     void Shutdown();
 
@@ -114,7 +117,7 @@ public:
      *  @retval #CHIP_ERROR_INCORRECT_STATE If there is no ReadClient available
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR NewReadClient(ReadClient ** const apReadClient);
+    CHIP_ERROR NewReadClient(ReadClient ** const apReadClient, CatalogInterface<ClusterDataSink> * apCatalog);
 
     /**
      *  Get read client index in mReadClients
@@ -126,6 +129,12 @@ public:
     uint16_t GetReadClientArrayIndex(const ReadClient * const apReadClient) const;
 
     reporting::ReportingEngine * GetReportingEngine(void) { return &mReportingEngine; }
+
+    void ReleaseClusterInfoListToPool(ReadHandler * const apReadHandler);
+
+    CatalogInterface<ClusterDataSource> * mpSourceCatalog = nullptr;
+    size_t mNumClusterInfosInPool                         = 0;
+    ClusterInfo mClusterInfoPool[IM_PUBLISHER_MAX_NUM_PATH_GROUPS];
 
 private:
     friend class reporting::ReportingEngine;
@@ -150,6 +159,7 @@ private:
     CommandSender mCommandSenderObjs[CHIP_MAX_NUM_COMMAND_SENDER];
     ReadClient mReadClients[CHIP_MAX_NUM_READ_CLIENT];
     ReadHandler mReadHandlers[CHIP_MAX_NUM_READ_HANDLER];
+
     reporting::ReportingEngine mReportingEngine;
 };
 

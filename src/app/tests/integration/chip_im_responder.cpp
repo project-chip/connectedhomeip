@@ -24,6 +24,8 @@
  *
  */
 
+#include "MockCluster.h"
+#include <app/ClusterCatalog.h>
 #include <app/CommandHandler.h>
 #include <app/CommandSender.h>
 #include <app/InteractionModelEngine.h>
@@ -112,6 +114,20 @@ int main(int argc, char * argv[])
     chip::Transport::AdminPairingTable admins;
     chip::Transport::AdminPairingInfo * adminInfo = admins.AssignAdminId(gAdminId, chip::kTestDeviceNodeId);
 
+    chip::app::ClusterDataSourceCatalog::CatalogItem mSourceCatalogStore[4];
+    chip::app::ClusterDataSourceCatalog sourceCatalog(0, mSourceCatalogStore,
+                                                      sizeof(mSourceCatalogStore) / sizeof(mSourceCatalogStore[0]));
+    chip::EndpointId endpointId = 0;
+
+    chip::app::ClusterDataHandle mClusterHandleSet[1];
+    TestClusterDataSource mTestClusterDataSource;
+    sourceCatalog.Add(endpointId, &mTestClusterDataSource, mClusterHandleSet[0]);
+
+    mTestClusterDataSource.mValueA = 6;
+    mTestClusterDataSource.mValueB = 7;
+    // mTestClusterDataSource.SetDirty(TestCluster::kAttributeHandle_ValueA);
+    // mTestClusterDataSource.SetDirty(TestCluster::kAttributeHandle_ValueB);
+
     VerifyOrExit(adminInfo != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     InitializeChip();
@@ -126,7 +142,7 @@ int main(int argc, char * argv[])
     err = gExchangeManager.Init(&gSessionManager);
     SuccessOrExit(err);
 
-    err = chip::app::InteractionModelEngine::GetInstance()->Init(&gExchangeManager, &mockDelegate);
+    err = chip::app::InteractionModelEngine::GetInstance()->Init(&gExchangeManager, &mockDelegate, &sourceCatalog);
     SuccessOrExit(err);
 
     err = gSessionManager.NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing,

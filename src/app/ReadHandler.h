@@ -99,6 +99,14 @@ public:
 
     virtual ~ReadHandler() = default;
 
+    ClusterInfo * GetClusterInfoList(void) { return mpClusterInfoList; }
+
+    size_t GetNumClusterInfos(void) { return mNumClusterInfos; }
+
+    ClusterInfo * mpClusterInfoList     = nullptr;
+    size_t mNumClusterInfos             = 0;
+    size_t mCurProcessingClusterInfoIdx = 0;
+
 private:
     enum class HandlerState
     {
@@ -108,6 +116,8 @@ private:
     };
 
     CHIP_ERROR ProcessReadRequest(System::PacketBufferHandle aPayload);
+
+    CHIP_ERROR ProcessAttributePathList(AttributePathList::Parser & aAttributePathListParser);
 
     void MoveToState(const HandlerState aTargetState);
 

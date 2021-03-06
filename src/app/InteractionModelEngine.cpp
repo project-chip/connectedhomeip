@@ -27,6 +27,7 @@
 #include "Command.h"
 #include "CommandHandler.h"
 #include "CommandSender.h"
+#include <app/ClusterCatalog.h>
 #include <cinttypes>
 
 namespace chip {
@@ -40,7 +41,8 @@ InteractionModelEngine * InteractionModelEngine::GetInstance()
     return &sInteractionModelEngine;
 }
 
-CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate)
+CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate,
+                                        CatalogInterface<ClusterDataSource> * apSourceCatalog)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -52,6 +54,8 @@ CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeM
 
     mReportingEngine.Init();
     SuccessOrExit(err);
+
+    mpSourceCatalog = apSourceCatalog;
 
 exit:
     return err;
@@ -104,7 +108,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR InteractionModelEngine::NewReadClient(ReadClient ** const apReadClient)
+CHIP_ERROR InteractionModelEngine::NewReadClient(ReadClient ** const apReadClient, CatalogInterface<ClusterDataSink> * apCatalog)
 {
     CHIP_ERROR err = CHIP_ERROR_NO_MEMORY;
 
@@ -113,7 +117,7 @@ CHIP_ERROR InteractionModelEngine::NewReadClient(ReadClient ** const apReadClien
         if (readClient.IsFree())
         {
             *apReadClient = &readClient;
-            err           = readClient.Init(mpExchangeMgr, mpDelegate);
+            err           = readClient.Init(mpExchangeMgr, mpDelegate, apCatalog);
             if (CHIP_NO_ERROR != err)
             {
                 *apReadClient = nullptr;
@@ -244,5 +248,60 @@ uint16_t InteractionModelEngine::GetReadClientArrayIndex(const ReadClient * cons
 {
     return static_cast<uint16_t>(apReadClient - mReadClients);
 }
+
+void InteractionModelEngine::ReleaseClusterInfoListToPool(ReadHandler * const apReadHandler)
+{
+    ClusterInfo * const clusterInfoList = apReadHandler->mpClusterInfoList;
+    size_t numClusterInfos              = apReadHandler->mNumClusterInfos;
+    size_t numClusterInfosToBeAffected;
+
+    apReadHandler->mpClusterInfoList = nullptr;
+    apReadHandler->mNumClusterInfos  = 0;
+
+    if (numClusterInfos == 0)
+    {
+        ChipLogDetail(DataManagement, "No cluster instances allocated");
+        ExitNow();
+    }
+
+    // make sure everything is still sane
+    ChipLogIfFalse(clusterInfoList >= mClusterInfoPool);
+    ChipLogIfFalse(numClusterInfos <= mNumClusterInfosInPool);
+
+    // mPathGroupPool + IM_PUBLISHER_MAX_NUM_PATH_GROUPS is a pointer which points to the last+1byte of this array
+    // clusterInfoList is a pointer to the first cluster instance to be released
+    // the result of subtraction is the number of cluster instances from clusterInfoList to the end of this array
+    numClusterInfosToBeAffected = ((size_t) mClusterInfoPool + mNumClusterInfosInPool) - (size_t) clusterInfoList;
+
+    // Shrink the clusterInfosInPool by the number of cluster instances.
+    mNumClusterInfosInPool -= numClusterInfos;
+
+    ChipLogDetail(DataManagement, "numClusterInfos is %d, and numClusterInfosToBeAffected is %d", numClusterInfos,
+                  numClusterInfosToBeAffected);
+    if (numClusterInfos == numClusterInfosToBeAffected)
+    {
+        ChipLogDetail(DataManagement, "Releasing the last block of cluster instances");
+        ExitNow();
+    }
+
+    ChipLogDetail(DataManagement, "Moving %d cluster infos forward", numClusterInfosToBeAffected - numClusterInfos);
+
+    memmove(clusterInfoList, clusterInfoList + numClusterInfos,
+            sizeof(ClusterInfo) * (numClusterInfosToBeAffected - numClusterInfos));
+
+    for (size_t i = 0; i < CHIP_MAX_NUM_READ_HANDLER; ++i)
+    {
+        ReadHandler * const handler = mReadHandlers + i;
+
+        if ((apReadHandler != handler) && (handler->mpClusterInfoList > clusterInfoList))
+        {
+            handler->mpClusterInfoList -= numClusterInfos;
+        }
+    }
+
+exit:
+    ChipLogDetail(DataManagement, "Number of allocated cluster instances: %u", mNumClusterInfosInPool);
+}
+
 } // namespace app
 } // namespace chip

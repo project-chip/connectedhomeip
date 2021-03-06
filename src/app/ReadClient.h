@@ -72,7 +72,8 @@ public:
      *  @retval #CHIP_NO_ERROR On success.
      */
     CHIP_ERROR SendReadRequest(NodeId aNodeId, Transport::AdminId aAdminId, EventPathParams * apEventPathParamsList,
-                               size_t aEventPathParamsListSize);
+                               size_t aEventPathParamsListSize, AttributePathParams * apClusterPathList,
+                               size_t aClusterPathListSize);
 
 private:
     friend class TestReadInteraction;
@@ -98,7 +99,8 @@ private:
      *  @retval #CHIP_NO_ERROR On success.
      *
      */
-    CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate);
+    CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate,
+                    CatalogInterface<ClusterDataSink> * apClusterSinkCatalog);
 
     virtual ~ReadClient() = default;
 
@@ -112,15 +114,18 @@ private:
      */
     bool IsFree() const { return mState == ClientState::Uninitialized; };
 
+    CHIP_ERROR ProcessAttributeDataList(TLV::TLVReader & aAttributeDataListReader);
+
     void MoveToState(const ClientState aTargetState);
     CHIP_ERROR ProcessReportData(System::PacketBufferHandle aPayload);
     CHIP_ERROR ClearExistingExchangeContext();
     const char * GetStateStr() const;
 
-    Messaging::ExchangeManager * mpExchangeMgr = nullptr;
-    Messaging::ExchangeContext * mpExchangeCtx = nullptr;
-    InteractionModelDelegate * mpDelegate      = nullptr;
-    ClientState mState                         = ClientState::Uninitialized;
+    Messaging::ExchangeManager * mpExchangeMgr               = nullptr;
+    Messaging::ExchangeContext * mpExchangeCtx               = nullptr;
+    InteractionModelDelegate * mpDelegate                    = nullptr;
+    ClientState mState                                       = ClientState::Uninitialized;
+    CatalogInterface<ClusterDataSink> * mpClusterSinkCatalog = nullptr;
 };
 
 }; // namespace app
