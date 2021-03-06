@@ -44,7 +44,7 @@ CHIP_ERROR CommandSender::SendCommandRequest(NodeId aNodeId, Transport::AdminId 
     // TODO: Hard code keyID to 0 to unblock IM end-to-end test. Complete solution is tracked in issue:4451
     mpExchangeCtx = mpExchangeMgr->NewContext({ aNodeId, 0, aAdminId }, this);
     VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
-    mpExchangeCtx->SetResponseTimeout(kImMesssageTimeout);
+    mpExchangeCtx->SetResponseTimeout(kImMessageTimeoutMsec);
 
     err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::InvokeCommandRequest, std::move(mCommandMessageBuf),
                                      Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
@@ -92,7 +92,6 @@ void CommandSender::OnMessageReceived(Messaging::ExchangeContext * apExchangeCon
 
 exit:
     Reset();
-    return;
 }
 
 void CommandSender::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext)
