@@ -58,6 +58,7 @@ class DLL_EXPORT ExchangeContext : public ReferenceCounted<ExchangeContext, Exch
 {
     friend class ExchangeManager;
     friend class ExchangeContextDeletor;
+    friend class MessageCounterSyncMgr;
 
 public:
     typedef uint32_t Timeout; // Type used to express the timeout in this ExchangeContext, in milliseconds
@@ -222,6 +223,13 @@ private:
     bool MatchExchange(SecureSessionHandle session, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader);
 
     CHIP_ERROR StartResponseTimer();
+
+    /**
+     * A subset of SendMessage functionality that does not perform message
+     * counter sync for group keys.
+     */
+    CHIP_ERROR SendMessageImpl(uint16_t protocolId, uint8_t msgType, System::PacketBufferHandle msgBuf, const SendFlags & sendFlags,
+                               Transport::PeerConnectionState * state = nullptr);
     void CancelResponseTimer();
     static void HandleResponseTimeout(System::Layer * aSystemLayer, void * aAppState, System::Error aError);
 

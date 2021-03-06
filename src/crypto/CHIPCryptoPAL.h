@@ -47,6 +47,9 @@ const size_t kMAX_Point_Length           = kP256_Point_Length;
 const size_t kMAX_Hash_Length            = kSHA256_Hash_Length;
 const size_t kMAX_CSR_Length             = 512;
 
+const size_t kMin_Salt_Length = 8;
+const size_t kMax_Salt_Length = 16;
+
 const size_t kP256_PrivateKey_Length = 32;
 const size_t kP256_PublicKey_Length  = 65;
 

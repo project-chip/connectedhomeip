@@ -15,7 +15,7 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
-import("${build_root}/chip/tests.gni")
+import("${chip_root}/build/chip/tests.gni")
 
 assert(chip_build_tests)
 assert(chip_enable_happy_tests)

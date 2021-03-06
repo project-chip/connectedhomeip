@@ -40,7 +40,7 @@
  ******************************************************************************/
 
 // this file contains all the common includes for clusters in the zcl-util
-#include "common.h"
+#include "app/util/common.h"
 
 // for pulling in defines dealing with EITHER server or client
 #include "af-main.h"

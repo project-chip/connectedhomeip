@@ -100,9 +100,9 @@ CHIP_ERROR ChipDeviceController::Shutdown()
 
 CHIP_ERROR ChipDeviceController::ConnectDevice(NodeId remoteDeviceId, RendezvousParameters & params, void * appReqState,
                                                NewConnectionHandler onConnected, MessageReceiveHandler onMessageReceived,
-                                               ErrorHandler onError, uint16_t devicePort, Inet::InterfaceId interfaceId)
+                                               ErrorHandler onError)
 {
-    CHIP_ERROR err = mCommissioner.PairDevice(remoteDeviceId, params, devicePort, interfaceId);
+    CHIP_ERROR err = mCommissioner.PairDevice(remoteDeviceId, params);
     SuccessOrExit(err);
 
     mState           = kState_Initialized;
@@ -120,13 +120,11 @@ exit:
     return err;
 }
 
-CHIP_ERROR ChipDeviceController::ConnectDeviceWithoutSecurePairing(NodeId remoteDeviceId, const IPAddress & deviceAddr,
+CHIP_ERROR ChipDeviceController::ConnectDeviceWithoutSecurePairing(NodeId remoteDeviceId, const Transport::PeerAddress & deviceAddr,
                                                                    void * appReqState, NewConnectionHandler onConnected,
-                                                                   MessageReceiveHandler onMessageReceived, ErrorHandler onError,
-                                                                   uint16_t devicePort, Inet::InterfaceId interfaceId)
+                                                                   MessageReceiveHandler onMessageReceived, ErrorHandler onError)
 {
-    CHIP_ERROR err =
-        mCommissioner.PairTestDeviceWithoutSecurity(remoteDeviceId, deviceAddr, mSerializedTestDevice, devicePort, interfaceId);
+    CHIP_ERROR err = mCommissioner.PairTestDeviceWithoutSecurity(remoteDeviceId, deviceAddr, mSerializedTestDevice);
     SuccessOrExit(err);
 
     mPairingWithoutSecurity = true;
@@ -179,7 +177,8 @@ bool ChipDeviceController::GetIpAddress(Inet::IPAddress & addr)
     if (mDevice == nullptr)
         InitDevice();
 
-    return mDevice != nullptr && mDevice->GetIpAddress(addr);
+    uint16_t port;
+    return mDevice != nullptr && mDevice->GetAddress(addr, port);
 }
 
 CHIP_ERROR ChipDeviceController::DisconnectDevice()

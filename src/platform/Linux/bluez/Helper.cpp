@@ -980,7 +980,7 @@ static void bluezObjectsSetup(BluezEndpoint * apEndpoint)
 
     VerifyOrExit(apEndpoint != nullptr, ChipLogError(DeviceLayer, "endpoint is NULL in %s", __func__));
 
-    expectedPath = g_strdup_printf("%s/hci%d", BLUEZ_PATH, apEndpoint->mNodeId);
+    expectedPath = g_strdup_printf("%s/hci%d", BLUEZ_PATH, apEndpoint->mAdapterId);
     objects      = g_dbus_object_manager_get_objects(apEndpoint->mpObjMgr);
 
     for (l = objects; l != nullptr && apEndpoint->mpAdapter == nullptr; l = l->next)
@@ -1507,7 +1507,7 @@ CHIP_ERROR ConfigureBluezAdv(BLEAdvConfig & aBleAdvConfig, BluezEndpoint * apEnd
 
     apEndpoint->mpAdapterName     = g_strdup(aBleAdvConfig.mpBleName);
     apEndpoint->mpAdvertisingUUID = g_strdup(aBleAdvConfig.mpAdvertisingUUID);
-    apEndpoint->mNodeId           = aBleAdvConfig.mNodeId;
+    apEndpoint->mAdapterId        = aBleAdvConfig.mAdapterId;
     apEndpoint->mType             = aBleAdvConfig.mType;
     apEndpoint->mDuration         = aBleAdvConfig.mDuration;
     apEndpoint->mDuration         = aBleAdvConfig.mDuration;

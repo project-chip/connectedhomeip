@@ -32,6 +32,7 @@
 #include <core/CHIPTLVTypes.h>
 
 #include <support/DLLUtil.h>
+#include <support/Span.h>
 
 #include <stdarg.h>
 #include <stdlib.h>
@@ -1080,6 +1081,34 @@ public:
     CHIP_ERROR Put(uint64_t tag, float v);
 
     /**
+     * Encodes a TLV byte string value using ByteSpan class.
+     *
+     * @param[in]   tag             The TLV tag to be encoded with the value, or @p AnonymousTag if the
+     *                              value should be encoded without a tag.  Tag values should be
+     *                              constructed with one of the tag definition functions ProfileTag(),
+     *                              ContextTag() or CommonTag().
+     * @param[in]   data            A ByteSpan object containing the bytes string to be encoded.
+     *
+     * @retval #CHIP_NO_ERROR      If the method succeeded.
+     * @retval #CHIP_ERROR_TLV_CONTAINER_OPEN
+     *                              If a container writer has been opened on the current writer and not
+     *                              yet closed.
+     * @retval #CHIP_ERROR_INVALID_TLV_TAG
+     *                              If the specified tag value is invalid or inappropriate in the context
+     *                              in which the value is being written.
+     * @retval #CHIP_ERROR_BUFFER_TOO_SMALL
+     *                              If writing the value would exceed the limit on the maximum number of
+     *                              bytes specified when the writer was initialized.
+     * @retval #CHIP_ERROR_NO_MEMORY
+     *                              If an attempt to allocate an output buffer failed due to lack of
+     *                              memory.
+     * @retval other                Other CHIP or platform-specific errors returned by the configured
+     *                              TLVBackingStore.
+     *
+     */
+    CHIP_ERROR Put(uint64_t tag, ByteSpan data);
+
+    /**
      * Encodes a TLV boolean value.
      *
      * @param[in]   tag             The TLV tag to be encoded with the value, or @p AnonymousTag if the
@@ -1774,6 +1803,12 @@ public:
     uint32_t GetLengthWritten() const { return mLenWritten; }
 
     /**
+     * Returns the total remaining number of bytes for current tlv writer
+     *
+     * @return the total remaining number of bytes.
+     */
+    uint32_t GetRemainingFreeLength() const { return mRemainingLen; }
+    /**
      * The profile id of tags that should be encoded in implicit form.
      *
      * When a writer is asked to encode a new element, if the profile id of the tag associated with the
@@ -2202,7 +2237,6 @@ class DLL_EXPORT TLVBackingStore
 {
 public:
     virtual ~TLVBackingStore() {}
-
     /**
      * A function to provide a backing store's initial start position and data length to a reader.
      *

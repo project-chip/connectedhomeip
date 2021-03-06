@@ -532,6 +532,26 @@
 #define CHIP_DEVICE_CONFIG_ENABLE_JUST_IN_TIME_PROVISIONING 0
 #endif
 
+// -------------------- Service Discovery Configuration -----------------------
+
+/**
+ * CHIP_DEVICE_CONFIG_ENABLE_MDNS
+ *
+ * Enable support to use MDNS for service advertising and discovery in CHIP.
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_MDNS
+#define CHIP_DEVICE_CONFIG_ENABLE_MDNS 0
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+ *
+ * Enable support to DNS-SD SRP client usage for service advertising and discovery in CHIP.
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+#define CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT 0
+#endif
+
 // -------------------- Thread Configuration --------------------
 
 /**

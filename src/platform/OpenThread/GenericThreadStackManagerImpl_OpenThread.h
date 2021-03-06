@@ -26,6 +26,11 @@
 #pragma once
 
 #include <openthread/instance.h>
+#include <openthread/netdata.h>
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+#include <openthread/srp_client.h>
+#endif
 
 namespace chip {
 namespace DeviceLayer {
@@ -65,10 +70,12 @@ protected:
     void _OnPlatformEvent(const ChipDeviceEvent * event);
     bool _IsThreadEnabled(void);
     CHIP_ERROR _SetThreadEnabled(bool val);
+
     bool _IsThreadProvisioned(void);
     bool _IsThreadAttached(void);
     CHIP_ERROR _GetThreadProvision(DeviceNetworkInfo & netInfo, bool includeCredentials);
     CHIP_ERROR _SetThreadProvision(const DeviceNetworkInfo & netInfo);
+    CHIP_ERROR _SetThreadProvision(const uint8_t * operationalDataset, size_t operationalDatasetLen);
     void _ErasePersistentInfo(void);
     ConnectivityManager::ThreadDeviceType _GetThreadDeviceType(void);
     CHIP_ERROR _SetThreadDeviceType(ConnectivityManager::ThreadDeviceType deviceType);
@@ -80,9 +87,16 @@ protected:
     CHIP_ERROR _GetAndLogThreadTopologyMinimal(void);
     CHIP_ERROR _GetAndLogThreadTopologyFull(void);
     CHIP_ERROR _GetPrimary802154MACAddress(uint8_t * buf);
-    CHIP_ERROR _GetSlaacIPv6Address(chip::Inet::IPAddress & addr);
+    CHIP_ERROR _GetExternalIPv6Address(chip::Inet::IPAddress & addr);
     void _OnWoBLEAdvertisingStart(void);
     void _OnWoBLEAdvertisingStop(void);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+    CHIP_ERROR _AddSrpService(const char * aInstanceName, const char * aName, uint16_t aPort, uint32_t aLeaseInterval,
+                              uint32_t aKeyLeaseInterval);
+    CHIP_ERROR _RemoveSrpService(const char * aInstanceName, const char * aName);
+    CHIP_ERROR _SetupSrpHost(const char * aHostName);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 
     // ===== Members available to the implementation subclass.
 
@@ -98,6 +112,36 @@ private:
 
     otInstance * mOTInst;
     ConnectivityManager::ThreadPollingConfig mPollingConfig;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+
+    struct SrpClient
+    {
+        static constexpr uint8_t kServiceId           = 0x5d;
+        static constexpr uint8_t kMaxServicesNumber   = 3;
+        static constexpr uint8_t kMaxInstanceNameSize = 64;
+        static constexpr uint8_t kMaxNameSize         = 16;
+        static constexpr uint8_t kMaxHostNameSize     = 32;
+
+        struct Service
+        {
+            otSrpClientService mService;
+            char mInstanceName[kMaxInstanceNameSize];
+            char mName[kMaxNameSize];
+        };
+
+        char mHostName[kMaxHostNameSize];
+        otIp6Address mHostAddress;
+        Service mServices[kMaxServicesNumber];
+    };
+
+    SrpClient mSrpClient;
+
+    static void OnSrpClientNotification(otError aError, const otSrpClientHostInfo * aHostInfo, const otSrpClientService * aServices,
+                                        const otSrpClientService * aRemovedServices, void * aContext);
+    static void OnSrpClientStateChange(const otSockAddr * aServerSockAddr, void * aContext);
+
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 
     static void OnJoinerComplete(otError aError, void * aContext);
     void OnJoinerComplete(otError aError);

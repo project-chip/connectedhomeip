@@ -76,7 +76,7 @@ public:
     AccessControlList & GetACL() { return mACL; }
     void SetACL(const AccessControlList & acl) { mACL = acl; }
 
-    bool IsInitialized() { return (mNodeId != kUndefinedNodeId && mAdmin != kUndefinedAdminId); }
+    bool IsInitialized() const { return (mNodeId != kUndefinedNodeId && mAdmin != kUndefinedAdminId); }
 
     /**
      *  Reset the state to a completely uninitialized status.
@@ -111,6 +111,74 @@ private:
     };
 };
 
+/**
+ * Iterates over valid admins within a list
+ */
+class ConstAdminIterator
+{
+public:
+    using value_type = AdminPairingInfo;
+    using pointer    = AdminPairingInfo *;
+    using reference  = AdminPairingInfo &;
+
+    ConstAdminIterator(const AdminPairingInfo * start, size_t index, size_t maxSize) :
+        mStart(start), mIndex(index), mMaxSize(maxSize)
+    {
+        if (mIndex >= maxSize)
+        {
+            mIndex = maxSize;
+        }
+        else if (!mStart[mIndex].IsInitialized())
+        {
+            Advance();
+        }
+    }
+    ConstAdminIterator(const ConstAdminIterator &) = default;
+    ConstAdminIterator & operator=(const ConstAdminIterator &) = default;
+
+    ConstAdminIterator & operator++() { return Advance(); }
+    ConstAdminIterator operator++(int)
+    {
+        ConstAdminIterator other(*this);
+        Advance();
+        return other;
+    }
+
+    const AdminPairingInfo & operator*() const { return mStart[mIndex]; }
+    const AdminPairingInfo * operator->() const { return mStart + mIndex; }
+
+    bool operator==(const ConstAdminIterator & other)
+    {
+        if (IsAtEnd())
+        {
+            return other.IsAtEnd();
+        }
+
+        return (mStart == other.mStart) && (mIndex == other.mIndex) && (mMaxSize == other.mMaxSize);
+    }
+    bool operator!=(const ConstAdminIterator & other) { return !(*this == other); }
+
+    bool IsAtEnd() const { return (mIndex == mMaxSize); }
+
+private:
+    const AdminPairingInfo * mStart;
+    size_t mIndex;
+    size_t mMaxSize;
+
+    ConstAdminIterator & Advance()
+    {
+        do
+        {
+            if (mIndex < mMaxSize)
+            {
+                mIndex++;
+            }
+        } while (!IsAtEnd() && !mStart[mIndex].IsInitialized());
+
+        return *this;
+    }
+};
+
 class DLL_EXPORT AdminPairingTable
 {
 public:
@@ -123,6 +191,12 @@ public:
     AdminPairingInfo * FindAdmin(AdminId adminId);
 
     void Reset();
+
+    ConstAdminIterator cbegin() const { return ConstAdminIterator(mStates, 0, CHIP_CONFIG_MAX_DEVICE_ADMINS); }
+    ConstAdminIterator cend() const
+    {
+        return ConstAdminIterator(mStates, CHIP_CONFIG_MAX_DEVICE_ADMINS, CHIP_CONFIG_MAX_DEVICE_ADMINS);
+    }
 
 private:
     AdminPairingInfo mStates[CHIP_CONFIG_MAX_DEVICE_ADMINS];

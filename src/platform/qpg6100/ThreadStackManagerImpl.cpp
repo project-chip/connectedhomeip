@@ -58,8 +58,6 @@ CHIP_ERROR ThreadStackManagerImpl::InitThreadStack(otInstance * otInst)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    otHeapSetCAllocFree(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
-
     // Initialize Low level QPG OpenThread glue
     qorvoAlarmInit();
     qorvoRandomInit();

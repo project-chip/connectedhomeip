@@ -100,7 +100,7 @@ public:
     MdnsAvahi(const MdnsAvahi &) = delete;
     MdnsAvahi & operator=(const MdnsAvahi &) = delete;
 
-    CHIP_ERROR Init(MdnsAsnycReturnCallback initCallback, MdnsAsnycReturnCallback errorCallback, void * context);
+    CHIP_ERROR Init(MdnsAsyncReturnCallback initCallback, MdnsAsyncReturnCallback errorCallback, void * context);
     CHIP_ERROR SetHostname(const char * hostname);
     CHIP_ERROR PublishService(const MdnsService & service);
     CHIP_ERROR StopPublish();
@@ -148,8 +148,8 @@ private:
                               const char * host_name, const AvahiAddress * address, uint16_t port, AvahiStringList * txt,
                               AvahiLookupResultFlags flags, void * userdata);
 
-    MdnsAsnycReturnCallback mInitCallback;
-    MdnsAsnycReturnCallback mErrorCallback;
+    MdnsAsyncReturnCallback mInitCallback;
+    MdnsAsyncReturnCallback mErrorCallback;
     void * mAsyncReturnContext;
 
     std::set<std::string> mPublishedServices;

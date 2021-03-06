@@ -29,6 +29,7 @@
 #include <inttypes.h>
 #include <string.h>
 
+#include <core/CHIPKeyIds.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <support/CodeUtils.h>
 #include <support/ReturnMacros.h>
@@ -159,6 +160,12 @@ CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHea
     admin = mAdmins->FindAdmin(state->GetAdminId());
     VerifyOrExit(admin != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     localNodeId = admin->GetNodeId();
+
+    if (payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::MsgCounterSyncReq) ||
+        payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::MsgCounterSyncRsp))
+    {
+        packetHeader.SetSecureSessionControlMsg(true);
+    }
 
     if (encryptionState == EncryptionState::kPayloadIsUnencrypted)
     {
@@ -336,6 +343,22 @@ void SecureSessionMgr::OnMessageReceived(const PacketHeader & packetHeader, cons
     if (state->GetPeerAddress() != peerAddress)
     {
         state->SetPeerAddress(peerAddress);
+    }
+
+    if (!state->IsPeerMsgCounterSynced())
+    {
+        // For all control messages, the first authenticated message counter from an unsynchronized peer is trusted
+        // and used to seed subsequent message counter based replay protection.
+        if (packetHeader.IsSecureSessionControlMsg())
+        {
+            state->SetPeerMessageIndex(packetHeader.GetMessageId());
+        }
+
+        // For all group messages, Set flag if peer group key message counter is not synchronized.
+        if (ChipKeyId::IsAppGroupKey(packetHeader.GetEncryptionKeyID()))
+        {
+            const_cast<PacketHeader &>(packetHeader).SetPeerGroupMsgIdNotSynchronized(true);
+        }
     }
 
     if (mCB != nullptr)

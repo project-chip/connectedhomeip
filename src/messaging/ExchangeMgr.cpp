@@ -206,6 +206,23 @@ CHIP_ERROR ExchangeManager::UnregisterUMH(uint32_t protocolId, int16_t msgType)
     return CHIP_ERROR_NO_UNSOLICITED_MESSAGE_HANDLER;
 }
 
+bool ExchangeManager::IsMsgCounterSyncMessage(const PayloadHeader & payloadHeader)
+{
+    if (payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::MsgCounterSyncReq) ||
+        payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::MsgCounterSyncRsp))
+    {
+        return true;
+    }
+
+    return false;
+}
+
+void ExchangeManager::HandleGroupMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+                                                 const SecureSessionHandle & session, System::PacketBufferHandle msgBuf)
+{
+    OnMessageReceived(packetHeader, payloadHeader, session, std::move(msgBuf), nullptr);
+}
+
 void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                                         SecureSessionHandle session, System::PacketBufferHandle msgBuf, SecureSessionMgr * msgLayer)
 {
@@ -213,6 +230,35 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
     UnsolicitedMessageHandler * umh         = nullptr;
     UnsolicitedMessageHandler * matchingUMH = nullptr;
     bool sendAckAndCloseExchange            = false;
+
+    if (!IsMsgCounterSyncMessage(payloadHeader) && packetHeader.IsPeerGroupMsgIdNotSynchronized())
+    {
+        Transport::PeerConnectionState * state = mSessionMgr->GetPeerConnectionState(session);
+        VerifyOrReturn(state != nullptr);
+
+        // Queue the message as needed for sync with destination node.
+        err = mMessageCounterSyncMgr.AddToReceiveTable(packetHeader, payloadHeader, session, std::move(msgBuf));
+        VerifyOrReturn(err == CHIP_NO_ERROR);
+
+        // Initiate message counter synchronization if no message counter synchronization is in progress.
+        if (!state->IsMsgCounterSyncInProgress())
+        {
+            err = mMessageCounterSyncMgr.SendMsgCounterSyncReq(session);
+        }
+
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(ExchangeManager,
+                         "Message counter synchronization for received message, failed to send synchronization request, err = %d",
+                         err);
+        }
+
+        // After the message that triggers message counter synchronization is stored, and a message counter
+        // synchronization exchange is initiated, we need to return immediately and re-process the original message
+        // when the synchronization is completed.
+
+        return;
+    }
 
     // Search for an existing exchange that the message applies to. If a match is found...
     for (auto & ec : mContextPool)

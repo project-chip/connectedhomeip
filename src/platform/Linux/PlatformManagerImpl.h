@@ -67,6 +67,10 @@ private:
 
     static PlatformManagerImpl sInstance;
 
+    // The temporary hack for getting IP address change on linux for network provisioning in the rendezvous session.
+    // This should be removed or find a better place once we depercate the rendezvous session.
+    static void WiFIIPChangeListener();
+
 #if CHIP_WITH_GIO
     struct GDBusConnectionDeleter
     {
