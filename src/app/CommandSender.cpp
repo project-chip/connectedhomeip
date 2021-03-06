@@ -92,7 +92,6 @@ void CommandSender::OnMessageReceived(Messaging::ExchangeContext * apExchangeCon
 
 exit:
     Reset();
-    return;
 }
 
 void CommandSender::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext)
