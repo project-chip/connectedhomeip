@@ -25,11 +25,8 @@
 
 #pragma once
 
-#ifndef _CHIP_INTERACTION_MODEL_ENGINE_H
-#define _CHIP_INTERACTION_MODEL_ENGINE_H
-
+#include <app/MessageDef/ReportData.h>
 #include <core/CHIPCore.h>
-#include <map>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
@@ -43,17 +40,22 @@
 #include <app/Command.h>
 #include <app/CommandHandler.h>
 #include <app/CommandSender.h>
+#include <app/InteractionModelDelegate.h>
+#include <app/ReadClient.h>
+#include <app/ReadHandler.h>
 
-#define CHIP_MAX_NUM_COMMAND_HANDLER_OBJECTS 1
-#define CHIP_MAX_NUM_COMMAND_SENDER_OBJECTS 1
+#define CHIP_MAX_NUM_COMMAND_HANDLER 1
+#define CHIP_MAX_NUM_COMMAND_SENDER 1
+#define CHIP_MAX_NUM_READ_CLIENT 1
+#define CHIP_MAX_NUM_READ_HANDLER 1
+#define CHIP_MAX_REPORTS_IN_FLIGHT 1
 
 namespace chip {
 namespace app {
 
-constexpr size_t kMaxSecureSduLength  = 1024;
-constexpr uint32_t kImMesssageTimeout = 20;
-
-typedef void (*CommandCbFunct)(chip::TLV::TLVReader & aReader, Command * apCommandObj);
+constexpr size_t kMaxSecureSduLength     = 1024;
+constexpr uint32_t kImMesssageTimeout    = 3;
+constexpr uint32_t kMinEventBoundarySize = 20;
 
 /**
  * @class InteractionModelEngine
@@ -65,68 +67,15 @@ typedef void (*CommandCbFunct)(chip::TLV::TLVReader & aReader, Command * apComma
 class InteractionModelEngine : public Messaging::ExchangeDelegate
 {
 public:
-    enum EventID
-    {
-        kEvent_OnIncomingInvokeCommandRequest =
-            0, ///< Called when an incoming invoke command request has arrived before applying commands..
-    };
-
     /**
-     * Incoming parameters sent with events generated directly from this component
+     * @brief Set the delegate to associated state object for InteractionModelEngine specific call backs
      *
+     *  @param[in]    apDelegate       InteractionModelDelegate set by application.
      */
-    union InEventParam
-    {
-        void Clear(void) { memset(this, 0, sizeof(*this)); }
-        struct
-        {
-            const PacketHeader * mpPacketHeader; ///< A pointer to the message information for the request
-        } mIncomingInvokeCommandRequest;
-    };
+    void SetDelegate(InteractionModelDelegate * apDelegate) { mpDelegate = apDelegate; };
 
     /**
-     * Outgoing parameters sent with events generated directly from this component
-     *
-     */
-    union OutEventParam
-    {
-        void Clear(void) { memset(this, 0, sizeof(*this)); }
-
-        struct
-        {
-            bool mShouldContinueProcessing; ///< Set to true if update is allowed.
-        } mIncomingInvokeCommandRequest;
-    };
-
-    /**
-     * @brief Set the event back function and pointer to associated state object for SubscriptionEngine specific call backs
-     *
-     * @param[in]  apAppState    A pointer to application layer supplied state object
-     * @param[in]  aEvent       A function pointer for event call back
-     * @param[in]  aInParam     A const reference to the input parameter for this event
-     * @param[out] aOutParam    A reference to the output parameter for this event
-     */
-    typedef void (*EventCallback)(void * apAppState, EventID aEvent, const InEventParam & aInParam, OutEventParam & aOutParam);
-
-    /**
-     * @brief Set the event back function and pointer to associated state object for SubscriptionEngine specific call backs
-     *
-     * @param[in]  apAppState  		A pointer to application layer supplied state object
-     * @param[in]  aEventCallback  	A function pointer for event call back
-     */
-    void SetEventCallback(void * apAppState, EventCallback aEventCallback);
-
-    /**
-     * @brief This is the default event handler to be called by application layer for any ignored or unrecognized event
-     *
-     * @param[in]  aEvent       A function pointer for event call back
-     * @param[in]  aInParam     A const reference to the input parameter for this event
-     * @param[out] aOutParam    A reference to the output parameter for this event
-     */
-    static void DefaultEventHandler(EventID aEvent, const InEventParam & aInParam, OutEventParam & aOutParam);
-
-    /**
-     * @brief Retrieve the singleton DataManagement Engine. Note this function should be implemented by the
+     * @brief Retrieve the singleton Interaction Model Engine. Note this function should be implemented by the
      *  adoption layer.
      *
      *  @return  A pointer to the shared InteractionModel Engine
@@ -136,33 +85,48 @@ public:
 
     InteractionModelEngine(void);
 
-    CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr);
+    /**
+     *  Initialize the InteractionModel Engine.
+     *
+     *  @param[in]    apExchangeMgr    A pointer to the ExchangeManager object.
+     *  @param[in]    apDelegate       InteractionModelDelegate set by application.
+     *
+     *  @retval #CHIP_ERROR_INCORRECT_STATE If the state is not equal to
+     *          kState_NotInitialized.
+     *  @retval #CHIP_NO_ERROR On success.
+     *
+     */
+    CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate);
 
     void Shutdown();
 
-    CHIP_ERROR DeregisterClusterCommandHandler(chip::ClusterId aClusterId, chip::CommandId aCommandId,
-                                               Command::CommandRoleId aCommandRoleId);
-    CHIP_ERROR RegisterClusterCommandHandler(chip::ClusterId aClusterId, chip::CommandId aCommandId,
-                                             Command::CommandRoleId aCommandRoleId, CommandCbFunct aDispatcher);
-
     Messaging::ExchangeManager * GetExchangeManager(void) const { return mpExchangeMgr; };
 
-    CHIP_ERROR NewCommandSender(CommandSender ** const apComandSender);
+    CHIP_ERROR NewCommandSender(CommandSender ** const apCommandSender);
+
+    CHIP_ERROR NewReadClient(ReadClient ** const apReadClient, InteractionModelDelegate * apDelegate);
 
 private:
-    void OnUnknownMsgType(Messaging::ExchangeContext * apEc, const PacketHeader & aPacketHeader,
+    friend class ReadClient;
+    void OnUnknownMsgType(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
                           const PayloadHeader & aPayloadHeader, System::PacketBufferHandle aPayload);
-    void OnInvokeCommandRequest(Messaging::ExchangeContext * apEc, const PacketHeader & aPacketHeader,
+    void OnInvokeCommandRequest(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
                                 const PayloadHeader & aPayloadHeader, System::PacketBufferHandle aPayload);
-    void OnMessageReceived(Messaging::ExchangeContext * apEc, const PacketHeader & aPacketHeader,
+    void OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
                            const PayloadHeader & aPayloadHeader, System::PacketBufferHandle aPayload);
     void OnResponseTimeout(Messaging::ExchangeContext * ec);
 
+    void OnReadRequest(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
+                       const PayloadHeader & aPayloadHeader, System::PacketBufferHandle aPayload);
+
+    uint16_t GetReadClientArrayIndex(const ReadClient * const apClient) const;
+
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
-    void * mpAppState                          = nullptr;
-    EventCallback mEventCallback;
-    CommandHandler mCommandHandlerObjs[CHIP_MAX_NUM_COMMAND_HANDLER_OBJECTS];
-    CommandSender mCommandSenderObjs[CHIP_MAX_NUM_COMMAND_SENDER_OBJECTS];
+    InteractionModelDelegate * mpDelegate      = nullptr;
+    CommandHandler mCommandHandlerObjs[CHIP_MAX_NUM_COMMAND_HANDLER];
+    CommandSender mCommandSenderObjs[CHIP_MAX_NUM_COMMAND_SENDER];
+    ReadClient mReadClients[CHIP_MAX_NUM_READ_CLIENT];
+    ReadHandler mReadHandlers[CHIP_MAX_NUM_READ_HANDLER];
 };
 
 void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId,
@@ -170,5 +134,3 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
 
 } // namespace app
 } // namespace chip
-
-#endif //_CHIP_INTERACTION_MODEL_ENGINE_H

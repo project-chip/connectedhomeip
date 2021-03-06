@@ -20,18 +20,19 @@
  *      This file implements a chip-im-responder, for the
  *      CHIP Interaction Data Model Protocol.
  *
- *      Currently it provides simple command handler with sample cluster and command
+ *      Currently it provides simple command and read handler with sample cluster
  *
  */
 
-#include "app/InteractionModelEngine.h"
 #include <app/CommandHandler.h>
 #include <app/CommandSender.h>
+#include <app/InteractionModelEngine.h>
 #include <app/tests/integration/common.h>
 #include <core/CHIPCore.h>
+#include <messaging/ExchangeContext.h>
+#include <messaging/ExchangeMgr.h>
+#include <messaging/Flags.h>
 #include <platform/CHIPDeviceLayer.h>
-
-#include "InteractionModelEngine.h"
 #include <support/ErrorStr.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/PASESession.h>
@@ -40,7 +41,6 @@
 
 namespace chip {
 namespace app {
-
 void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId,
                                   chip::TLV::TLVReader & aReader, Command * apCommandObj)
 {
@@ -97,17 +97,32 @@ exit:
 } // namespace chip
 
 namespace {
-
-// The CommandHandler object
 chip::TransportMgr<chip::Transport::UDP> gTransportManager;
 chip::SecureSessionMgr gSessionManager;
 chip::SecurePairingUsingTestSecret gTestPairing;
+
+class MockInteractionModelApp : public chip::app::InteractionModelDelegate
+{
+public:
+    void HandleIMCallBack(chip::app::InteractionModelDelegate::CallbackId aCallbackId,
+                          const chip::app::InteractionModelDelegate::InParam & aInParam,
+                          chip::app::InteractionModelDelegate::OutParam & aOutParam)
+    {
+        switch (aCallbackId)
+        {
+        default:
+            chip::app::InteractionModelDelegate::DefaultCallbackIdHandler(aCallbackId, aInParam, aOutParam);
+            break;
+        }
+    }
+};
 
 } // namespace
 
 int main(int argc, char * argv[])
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+    MockInteractionModelApp mockDelegate;
     chip::Optional<chip::Transport::PeerAddress> peer(chip::Transport::Type::kUndefined);
     const chip::Transport::AdminId gAdminId = 0;
     chip::Transport::AdminPairingTable admins;
@@ -127,7 +142,7 @@ int main(int argc, char * argv[])
     err = gExchangeManager.Init(chip::kTestDeviceNodeId, &gTransportManager, &gSessionManager);
     SuccessOrExit(err);
 
-    err = chip::app::InteractionModelEngine::GetInstance()->Init(&gExchangeManager);
+    err = chip::app::InteractionModelEngine::GetInstance()->Init(&gExchangeManager, &mockDelegate);
     SuccessOrExit(err);
 
     err = gSessionManager.NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing,
@@ -142,7 +157,7 @@ exit:
 
     if (err != CHIP_NO_ERROR)
     {
-        printf("CommandHandler failed, err:%s\n", chip::ErrorStr(err));
+        printf("IM responder failed, err:%s\n", chip::ErrorStr(err));
         exit(EXIT_FAILURE);
     }
 
