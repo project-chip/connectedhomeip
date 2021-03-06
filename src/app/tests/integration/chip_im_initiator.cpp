@@ -23,14 +23,14 @@
  *      Currently it provides simple command sender with sample cluster and command
  *
  */
-
+#include "MockCluster.h"
+#include <app/ClusterCatalog.h>
 #include <app/CommandHandler.h>
 #include <app/CommandSender.h>
 #include <app/InteractionModelEngine.h>
 #include <app/tests/integration/common.h>
 #include <core/CHIPCore.h>
 #include <platform/CHIPDeviceLayer.h>
-
 #include <support/ErrorStr.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/PASESession.h>
@@ -148,7 +148,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR SendReadRequest(void)
+CHIP_ERROR SendReadRequest(chip::app::AttributePathParams * apClusterPath, size_t aClusterPathSize)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -156,7 +156,7 @@ CHIP_ERROR SendReadRequest(void)
 
     printf("\nSend read request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 
-    err = gpReadClient->SendReadRequest(chip::kTestDeviceNodeId, gAdminId, nullptr, 0);
+    err = gpReadClient->SendReadRequest(chip::kTestDeviceNodeId, gAdminId, nullptr, 0, apClusterPath, aClusterPathSize);
     SuccessOrExit(err);
 
     if (err == CHIP_NO_ERROR)
@@ -266,6 +266,18 @@ int main(int argc, char * argv[])
     MockInteractionModelApp mockDelegate;
     chip::Transport::AdminPairingTable admins;
     chip::Transport::AdminPairingInfo * adminInfo = admins.AssignAdminId(gAdminId, chip::kTestControllerNodeId);
+
+    chip::app::ClusterDataSinkCatalog::CatalogItem mSinkCatalogStore[4];
+    chip::app::ClusterDataSinkCatalog mSinkCatalog(0, mSinkCatalogStore, sizeof(mSinkCatalogStore) / sizeof(mSinkCatalogStore[0]));
+
+    chip::app::AttributePathParams mClusterPaths[1];
+    chip::app::ClusterDataHandle mClusterHandleSet[1];
+    TestClusterDataSink mTestClusterDataSink;
+    chip::EndpointId endpointId = 0;
+    mSinkCatalog.Add(endpointId, &mTestClusterDataSink, mClusterHandleSet[0]);
+    mClusterPaths[0].mClusterDataHandle   = mClusterHandleSet[0];
+    mClusterPaths[0].mAttributePathHandle = chip::app::kRootAttributePathHandle;
+
     VerifyOrExit(adminInfo != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     if (argc <= 1)
@@ -293,7 +305,7 @@ int main(int argc, char * argv[])
     err = gExchangeManager.Init(&gSessionManager);
     SuccessOrExit(err);
 
-    err = chip::app::InteractionModelEngine::GetInstance()->Init(&gExchangeManager, &mockDelegate);
+    err = chip::app::InteractionModelEngine::GetInstance()->Init(&gExchangeManager, &mockDelegate, nullptr);
     SuccessOrExit(err);
 
     // Start the CHIP connection to the CHIP im responder.
@@ -303,7 +315,7 @@ int main(int argc, char * argv[])
     err = chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&gpCommandSender);
     SuccessOrExit(err);
 
-    err = chip::app::InteractionModelEngine::GetInstance()->NewReadClient(&gpReadClient);
+    err = chip::app::InteractionModelEngine::GetInstance()->NewReadClient(&gpReadClient, &mSinkCatalog);
     SuccessOrExit(err);
 
     // Connection has been established. Now send the CommandRequests.
@@ -333,7 +345,7 @@ int main(int argc, char * argv[])
     // Connection has been established. Now send the ReadRequests.
     for (unsigned int i = 0; i < kMaxReadMessageCount; i++)
     {
-        err = SendReadRequest();
+        err = SendReadRequest(mClusterPaths, 1);
         if (err != CHIP_NO_ERROR)
         {
             printf("Send read request failed: %s\n", chip::ErrorStr(err));

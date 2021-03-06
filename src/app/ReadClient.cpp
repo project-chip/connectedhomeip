@@ -28,7 +28,8 @@
 namespace chip {
 namespace app {
 
-CHIP_ERROR ReadClient::Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate)
+CHIP_ERROR ReadClient::Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate,
+                            CatalogInterface<ClusterDataSink> * apClusterSinkCatalog)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     // Error if already initialized.
@@ -36,10 +37,11 @@ CHIP_ERROR ReadClient::Init(Messaging::ExchangeManager * apExchangeMgr, Interact
     VerifyOrExit(mpExchangeMgr == nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mpExchangeCtx == nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    mpExchangeMgr = apExchangeMgr;
-    mpExchangeCtx = nullptr;
-    mpDelegate    = apDelegate;
-    mState        = ClientState::Initialized;
+    mpExchangeMgr        = apExchangeMgr;
+    mpExchangeCtx        = nullptr;
+    mpDelegate           = apDelegate;
+    mState               = ClientState::Initialized;
+    mpClusterSinkCatalog = apClusterSinkCatalog;
 
 exit:
     ChipLogFunctError(err);
@@ -52,6 +54,7 @@ void ReadClient::Shutdown()
     mpExchangeMgr = nullptr;
     mpDelegate    = nullptr;
     MoveToState(ClientState::Uninitialized);
+    mpClusterSinkCatalog = nullptr;
 }
 
 const char * ReadClient::GetStateStr() const
@@ -78,7 +81,8 @@ void ReadClient::MoveToState(const ClientState aTargetState)
 }
 
 CHIP_ERROR ReadClient::SendReadRequest(NodeId aNodeId, Transport::AdminId aAdminId, EventPathParams * apEventPathParamsList,
-                                       size_t aEventPathParamsListSize)
+                                       size_t aEventPathParamsListSize, AttributePathParams * apClusterPathList,
+                                       size_t aClusterPathListSize)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferHandle msgBuf;
@@ -104,6 +108,24 @@ CHIP_ERROR ReadClient::SendReadRequest(NodeId aNodeId, Transport::AdminId aAdmin
         {
             // TODO: fill to construct event paths
         }
+
+        if (aClusterPathListSize != 0 && apClusterPathList != nullptr && mpClusterSinkCatalog != nullptr)
+        {
+            AttributePathList::Builder attributePathListBuilder = request.CreateAttributePathListBuilder();
+            for (size_t index = 0; index < aClusterPathListSize; index++)
+            {
+                EndpointId endpointId                       = 0;
+                ClusterId clusterId                         = 0;
+                AttributePath::Builder attributePathBuilder = attributePathListBuilder.CreateAttributePathBuilder();
+                err = mpClusterSinkCatalog->GetEndpointId(apClusterPathList[index].mClusterDataHandle, endpointId);
+                SuccessOrExit(err);
+                err = mpClusterSinkCatalog->GetClusterId(apClusterPathList[index].mClusterDataHandle, clusterId);
+                SuccessOrExit(err);
+                attributePathBuilder.EndpointId(endpointId).ClusterId(clusterId);
+                SuccessOrExit(attributePathBuilder.GetError());
+            }
+        }
+
         request.EndOfReadRequest();
         SuccessOrExit(request.GetError());
 
@@ -161,9 +183,10 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle aPayload)
     CHIP_ERROR err = CHIP_NO_ERROR;
     ReportData::Parser report;
 
-    bool isEventListPresent  = false;
-    bool suppressResponse    = false;
-    bool moreChunkedMessages = false;
+    bool isEventListPresent         = false;
+    bool isAttributeDataListPresent = false;
+    bool suppressResponse           = false;
+    bool moreChunkedMessages        = false;
 
     System::PacketBufferTLVReader reader;
 
@@ -214,6 +237,29 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle aPayload)
         }
     }
 
+    {
+        AttributeDataList::Parser attributeDataList;
+
+        err = report.GetAttributeDataList(&attributeDataList);
+        if (CHIP_NO_ERROR == err)
+        {
+            isAttributeDataListPresent = true;
+        }
+        else if (CHIP_END_OF_TLV == err)
+        {
+            isAttributeDataListPresent = false;
+            err                        = CHIP_NO_ERROR;
+        }
+        SuccessOrExit(err);
+
+        if (isAttributeDataListPresent && nullptr != mpDelegate && !moreChunkedMessages)
+        {
+            chip::TLV::TLVReader attributeDataListReader;
+            attributeDataList.GetReader(&attributeDataListReader);
+            err = ProcessAttributeDataList(attributeDataListReader);
+            SuccessOrExit(err);
+        }
+    }
     if (!suppressResponse)
     {
         // TODO: Add status report support and correspond handler in ReadHandler, particular for situation when there
@@ -226,6 +272,43 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle aPayload)
 
 exit:
     ChipLogFunctError(err);
+    return err;
+}
+
+CHIP_ERROR ReadClient::ProcessAttributeDataList(TLV::TLVReader & aAttributeDataListReader)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    VerifyOrExit(mpClusterSinkCatalog != NULL, err = CHIP_ERROR_INVALID_ARGUMENT);
+    while (CHIP_NO_ERROR == (err = aAttributeDataListReader.Next()))
+    {
+        AttributeDataElement::Parser element;
+        AttributePath::Parser attributePathParser;
+        TLV::TLVReader reader      = aAttributeDataListReader;
+        ClusterDataSink * dataSink = nullptr;
+        ClusterDataHandle clusterDataHandle;
+        err = element.Init(reader);
+        SuccessOrExit(err);
+
+        err = element.GetAttributePath(&attributePathParser);
+        SuccessOrExit(err);
+
+        err = mpClusterSinkCatalog->LocateClusterDataHandle(attributePathParser, clusterDataHandle);
+        SuccessOrExit(err);
+
+        err = mpClusterSinkCatalog->LocateClusterInstance(clusterDataHandle, &dataSink);
+        SuccessOrExit(err);
+
+        reader = aAttributeDataListReader;
+        err    = dataSink->StoreDataElement(kRootAttributePathHandle, reader);
+        SuccessOrExit(err);
+    }
+
+    if (CHIP_END_OF_TLV == err)
+    {
+        err = CHIP_NO_ERROR;
+    }
+
+exit:
     return err;
 }
 

@@ -24,6 +24,7 @@
 
 #pragma once
 
+#include <app/ClusterData.h>
 #include <app/MessageDef/ReportData.h>
 #include <app/ReadHandler.h>
 #include <core/CHIPCore.h>
@@ -36,6 +37,7 @@
 #include <system/TLVPacketBufferBackingStore.h>
 #include <util/basic-types.h>
 
+#define IM_PUBLISHER_MAX_ITEMS_IN_CLUSTER_DIRTY_STORE 128
 namespace chip {
 namespace app {
 namespace reporting {
@@ -80,6 +82,8 @@ public:
      */
     void ScheduleRun();
 
+    CHIP_ERROR SetDirty(ClusterDataHandle aDataHandle, AttributePathHandle aAttributePathHandle);
+
 private:
     friend class TestReportingEngine;
     /**
@@ -91,6 +95,7 @@ private:
      */
     CHIP_ERROR BuildAndSendSingleReportData(ReadHandler * apReadHandler);
 
+    CHIP_ERROR BuildSingleReportDataAttributeDataList(ReportData::Builder & reportDataBuilder, ReadHandler * apReadHandler);
     /**
      * Send Report via ReadHandler
      *
@@ -114,6 +119,7 @@ private:
      */
     static void Run(System::Layer * aSystemLayer, void * apAppState, System::Error);
 
+    CHIP_ERROR RetrieveClusterData(AttributeDataElement::Builder & aAttributeDataElementBuilder, ClusterInfo & aClusterInfo);
     /**
      * Boolean to show if more chunk message on the way
      *
