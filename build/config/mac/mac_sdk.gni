@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Copyright (c) 2020 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,17 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Utility script to genertae the python tag + the abi tag + platform tag for a Python
+_mac_deployment_target = "10.15"
 
-try:
-  from setuptools import pep425tags
-except ImportError:
-  from wheel import pep425tags
+if (current_cpu == "arm64") {
+  _mac_deployment_target = "11.0"
+}
 
-try:
-  platform_tag = pep425tags.get_platform(None)
-except TypeError:
-  platform_tag = pep425tags.get_platform()
+declare_args() {
+  # OS X version to target when compiling.
+  mac_deployment_target = _mac_deployment_target
+}
 
-print(pep425tags.get_abbr_impl() + pep425tags.get_impl_ver() + "-" +
-      pep425tags.get_abi_tag() + "-" + platform_tag)
+if (current_cpu == "x64") {
+  mac_target_arch = "x86_64"
+} else {
+  mac_target_arch = current_cpu
+}
+
+mac_target_triple = "${mac_target_arch}-apple-macos${mac_deployment_target}"

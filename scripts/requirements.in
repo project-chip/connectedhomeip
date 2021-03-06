@@ -13,7 +13,7 @@ pyelftools>=0.22
 requests>=2.24.0
 
 # device controller wheel package
-wheel==0.34.2
+wheel
 dbus-python; sys_platform == 'linux'
 pgi; sys_platform == 'linux'
 
