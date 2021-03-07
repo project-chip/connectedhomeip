@@ -307,6 +307,17 @@ To find dependency paths:
 gn path out/host //src/transport/tests:tests //src/system
 ```
 
+To list useful information for linking against libCHIP:
+
+```
+gn desc out/host //src/lib include_dirs
+gn desc out/host //src/lib defines
+gn desc out/host //src/lib outputs
+
+# everything as JSON
+gn desc out/host //src/lib --format=json
+```
+
 ## Maintaining CHIP
 
 If you make any change to the GN build system, the next build will regenerate
