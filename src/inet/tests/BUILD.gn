@@ -42,13 +42,6 @@ static_library("helpers") {
     "TestSetupSignallingPosix.cpp",
   ]
 
-  if (lwip_platform == "standalone") {
-    sources += [
-      "TapAddrAutoconf.cpp",
-      "TapAddrAutoconf.h",
-    ]
-  }
-
   cflags = [ "-Wconversion" ]
 
   public_deps = [
