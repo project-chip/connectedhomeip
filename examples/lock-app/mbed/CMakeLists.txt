@@ -16,7 +16,7 @@ configure_file(
 
 set(MBED_PATH $ENV{MBED_OS_PATH} CACHE INTERNAL "")
 set(MBED_CONFIG_PATH ${CMAKE_CURRENT_BINARY_DIR} CACHE INTERNAL "")
-set(APP_TARGET chip-mbed-lock_app-example)
+set(APP_TARGET chip-mbed-lock-app-example)
 
 include(${MBED_PATH}/tools/cmake/app.cmake)
 add_subdirectory(${MBED_PATH} ./mbed_build)
