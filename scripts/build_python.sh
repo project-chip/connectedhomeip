@@ -23,7 +23,7 @@ _normpath() {
 }
 
 _ensure_darwin_deployment_target() {
-    if [[ `uname` != "Darwin" ]]; then
+    if [[ $(uname) != "Darwin" ]]; then
         return
     fi
 
