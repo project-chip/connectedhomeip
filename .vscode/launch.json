@@ -255,6 +255,178 @@
                 "debugServerPath": "pyocd-gdbserver",
                 "debugServerArgs": "-t stm32l475xg"
             }
+        }, // drago
+        {
+            "name": "Lock-app Mbed Example Debug [remote]",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceRoot}/examples/lock-app/mbed/build-${input:mbedTarget}/${input:mbedProfile}/chip-mbed-lock-app-example",
+            "args": [],
+            "stopAtEntry": true,
+            "cwd": "${workspaceRoot}/examples/lock-app/mbed",
+            "environment": [],
+            "externalConsole": false,
+            "debugServerArgs": "",
+            "serverLaunchTimeout": 20000,
+            "filterStderr": true,
+            "filterStdout": false,
+            "serverStarted": "GDB\\ server\\ started",
+            "setupCommands": [
+                {
+                    "text": "-target-select remote host.docker.internal:3333",
+                    "description": "connect to target",
+                    "ignoreFailures": false
+                },
+                {
+                    "text": "-file-exec-and-symbols ${workspaceRoot}/examples/lock-app/mbed/build-${input:mbedTarget}/${input:mbedProfile}/chip-mbed-lock-app-example",
+                    "description": "load file",
+                    "ignoreFailures": false
+                },
+                {
+                    "text": "-interpreter-exec console \"monitor reset\"",
+                    "ignoreFailures": false
+                },
+                {
+                    "text": "-interpreter-exec console \"monitor halt\"",
+                    "ignoreFailures": false
+                },
+                {
+                    "text": "-interpreter-exec console \"monitor arm semihosting enable\"",
+                    "ignoreFailures": false
+                },
+                {
+                    "text": "-target-download",
+                    "description": "flash target",
+                    "ignoreFailures": false
+                }
+            ],
+            "logging": {
+                "moduleLoad": true,
+                "trace": true,
+                "engineLogging": true,
+                "programOutput": true,
+                "exceptions": true
+            },
+            "linux": {
+                "MIMode": "gdb",
+                "MIDebuggerPath": "arm-none-eabi-gdb"
+            }
+        },
+        {
+            "name": "Lock-app Mbed Example Debug [local: nrf52840]",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceRoot}/examples/lock-app/mbed/build-NRF52840_DK/${input:mbedProfile}/chip-mbed-lock-app-example",
+            "args": [],
+            "stopAtEntry": true,
+            "cwd": "${workspaceRoot}/examples/lock-app/mbed",
+            "environment": [],
+            "externalConsole": false,
+            "debugServerArgs": "",
+            "serverLaunchTimeout": 20000,
+            "filterStderr": true,
+            "filterStdout": false,
+            "serverStarted": "GDB\\ server\\ started",
+            "logging": {
+                "moduleLoad": true,
+                "trace": true,
+                "engineLogging": true,
+                "programOutput": true,
+                "exceptions": true
+            },
+            "setupCommands": [
+                {
+                    "text": "-target-select remote localhost:3333",
+                    "description": "connect to target",
+                    "ignoreFailures": false
+                },
+                {
+                    "text": "-file-exec-and-symbols ${workspaceRoot}/examples/lock-app/mbed/build-NRF52840_DK/${input:mbedProfile}/chip-mbed-lock-app-example",
+                    "description": "load file",
+                    "ignoreFailures": false
+                },
+                {
+                    "text": "-interpreter-exec console \"monitor reset\"",
+                    "ignoreFailures": false
+                },
+                {
+                    "text": "-interpreter-exec console \"monitor halt\"",
+                    "ignoreFailures": false
+                },
+                {
+                    "text": "-interpreter-exec console \"monitor arm semihosting enable\"",
+                    "ignoreFailures": false
+                },
+                {
+                    "text": "-target-download",
+                    "description": "flash target",
+                    "ignoreFailures": false
+                }
+            ],
+            "linux": {
+                "MIMode": "gdb",
+                "MIDebuggerPath": "arm-none-eabi-gdb",
+                "debugServerPath": "pyocd-gdbserver",
+                "debugServerArgs": "-t nrf52840"
+            }
+        },
+        {
+            "name": "Lock-app Mbed Example Debug [local: stm32l475xg]",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceRoot}/examples/lock-app/mbed/build-DISCO_L475VG_IOT01A/${input:mbedProfile}/chip-mbed-lock-app-example",
+            "args": [],
+            "stopAtEntry": true,
+            "cwd": "${workspaceRoot}/examples/lock-app/mbed",
+            "environment": [],
+            "externalConsole": false,
+            "debugServerArgs": "",
+            "serverLaunchTimeout": 20000,
+            "filterStderr": true,
+            "filterStdout": false,
+            "serverStarted": "GDB\\ server\\ started",
+            "logging": {
+                "moduleLoad": true,
+                "trace": true,
+                "engineLogging": true,
+                "programOutput": true,
+                "exceptions": true
+            },
+            "setupCommands": [
+                {
+                    "text": "-target-select remote localhost:3333",
+                    "description": "connect to target",
+                    "ignoreFailures": false
+                },
+                {
+                    "text": "-file-exec-and-symbols ${workspaceRoot}/examples/lock-app/mbed/build-DISCO_L475VG_IOT01A/${input:mbedProfile}/chip-mbed-lock-app-example",
+                    "description": "load file",
+                    "ignoreFailures": false
+                },
+                {
+                    "text": "-interpreter-exec console \"monitor reset\"",
+                    "ignoreFailures": false
+                },
+                {
+                    "text": "-interpreter-exec console \"monitor halt\"",
+                    "ignoreFailures": false
+                },
+                {
+                    "text": "-interpreter-exec console \"monitor arm semihosting enable\"",
+                    "ignoreFailures": false
+                },
+                {
+                    "text": "-target-download",
+                    "description": "flash target",
+                    "ignoreFailures": false
+                }
+            ],
+            "linux": {
+                "MIMode": "gdb",
+                "MIDebuggerPath": "arm-none-eabi-gdb",
+                "debugServerPath": "pyocd-gdbserver",
+                "debugServerArgs": "-t stm32l475xg"
+            }
         }
     ],
     "inputs": [
