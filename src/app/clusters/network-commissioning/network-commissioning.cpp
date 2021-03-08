@@ -36,7 +36,11 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ConnectivityManager.h>
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <platform/ThreadStackManager.h>
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
+
 #include <transport/NetworkProvisioning.h>
 
 // Include DeviceNetworkProvisioningDelegateImpl for WiFi provisioning.
@@ -113,22 +117,22 @@ EmberAfNetworkCommissioningError OnAddThreadNetworkCommandCallbackInternal(app::
 {
     EmberAfNetworkCommissioningError err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_BOUNDS_EXCEEDED;
 
-    static_assert(std::is_same<std::remove_cv_t<decltype(kMaxNetworkIDLen)>, uint8_t>::value);
-    static_assert(sizeof(kTemporaryThreadNetworkId) <= kMaxNetworkIDLen);
-    static_assert(sizeof(kTemporaryThreadNetworkId) <= sizeof(ThreadNetworkInfo::mDataset));
-    VerifyOrExit(operationalDatasetLen <= kMaxThreadDatasetLen, err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_OUT_OF_RANGE);
-
     for (size_t i = 0; i < kMaxNetworks; i++)
     {
         if (sNetworks[i].mNetworkType == NetworkType::kUndefined)
         {
+            VerifyOrExit(operationalDatasetLen <= sizeof(ThreadNetworkInfo::mDataset),
+                         err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_OUT_OF_RANGE);
             memcpy(sNetworks[i].mData.mThread.mDataset, operationalDataset, operationalDatasetLen);
-            // We have verified that the operationalDatasetLen is less than kMaxThreadDatasetLen.
+
+            VerifyOrExit(chip::CanCastTo<std::remove_cv_t<decltype(sNetworks[i].mData.mThread.mDatasetLen)>>(operationalDatasetLen),
+                         err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_OUT_OF_RANGE);
             sNetworks[i].mData.mThread.mDatasetLen = static_cast<uint8_t>(operationalDatasetLen);
 
             // A 64bit id for thread networks, currently, we are missing some API for getting the thread network extpanid from the
             // dataset tlv.
-            // TODO: Set thread network id to real ext panid from dataset tlv.
+            static_assert(sizeof(kTemporaryThreadNetworkId) <= sizeof(sNetworks[i].mNetworkID),
+                          "TemporaryThreadNetworkId too long");
             memcpy(sNetworks[i].mNetworkID, kTemporaryThreadNetworkId, sizeof(kTemporaryThreadNetworkId));
             sNetworks[i].mNetworkIDLen = sizeof(kTemporaryThreadNetworkId);
 
@@ -154,27 +158,33 @@ EmberAfNetworkCommissioningError OnAddWiFiNetworkCommandCallbackInternal(app::Co
 {
     EmberAfNetworkCommissioningError err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_BOUNDS_EXCEEDED;
 
-    // Checks for const values used in this function.
-    static_assert(std::is_same<std::remove_cv_t<decltype(kMaxWiFiSSIDLen)>, uint8_t>::value);
-    static_assert(std::is_same<std::remove_cv_t<decltype(kMaxWiFiCredentialsLen)>, uint8_t>::value);
-    static_assert(kMaxWiFiSSIDLen <= kMaxNetworkIDLen);
-    VerifyOrExit(ssidLen <= kMaxWiFiSSIDLen, err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_OUT_OF_RANGE);
-    VerifyOrExit(ssidLen <= kMaxNetworkIDLen, err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_OUT_OF_RANGE);
-    VerifyOrExit(credentialsLen <= kMaxWiFiCredentialsLen, err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_OUT_OF_RANGE);
-
     for (size_t i = 0; i < kMaxNetworks; i++)
     {
         if (sNetworks[i].mNetworkType == NetworkType::kUndefined)
         {
+            VerifyOrExit(ssidLen <= sizeof(sNetworks[i].mData.mWiFi.mSSID),
+                         err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_OUT_OF_RANGE);
             memcpy(sNetworks[i].mData.mWiFi.mSSID, ssid, ssidLen);
-            // We have verified that the ssidLen is less than kMaxWiFiSSIDLen.
-            sNetworks[i].mData.mWiFi.mSSIDLen = static_cast<uint8_t>(ssidLen);
+
+            VerifyOrExit(chip::CanCastTo<std::remove_cv_t<decltype(sNetworks[i].mData.mWiFi.mSSIDLen)>>(ssidLen),
+                         err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_OUT_OF_RANGE);
+            sNetworks[i].mData.mWiFi.mSSIDLen = static_cast<std::remove_cv_t<decltype(sNetworks[i].mData.mWiFi.mSSIDLen)>>(ssidLen);
+
+            VerifyOrExit(credentialsLen <= sizeof(sNetworks[i].mData.mWiFi.mCredentials),
+                         err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_OUT_OF_RANGE);
             memcpy(sNetworks[i].mData.mWiFi.mCredentials, credentials, credentialsLen);
-            // We have verified that the credentialsLen is less than kMaxWiFiCredentialsLen.
-            sNetworks[i].mData.mWiFi.mCredentialsLen = static_cast<uint8_t>(credentialsLen);
+
+            VerifyOrExit(chip::CanCastTo<std::remove_cv_t<decltype(sNetworks[i].mData.mWiFi.mCredentialsLen)>>(ssidLen),
+                         err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_OUT_OF_RANGE);
+            sNetworks[i].mData.mWiFi.mCredentialsLen =
+                static_cast<std::remove_cv_t<decltype(sNetworks[i].mData.mWiFi.mCredentialsLen)>>(credentialsLen);
+
+            VerifyOrExit(ssidLen <= sizeof(sNetworks[i].mNetworkID), err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_OUT_OF_RANGE);
             memcpy(sNetworks[i].mNetworkID, sNetworks[i].mData.mWiFi.mSSID, ssidLen);
-            // We have verified that the ssidLen is less than kMaxNetworkIDLen.
-            sNetworks[i].mNetworkIDLen = static_cast<uint8_t>(ssidLen);
+
+            VerifyOrExit(chip::CanCastTo<std::remove_cv_t<decltype(sNetworks[i].mNetworkIDLen)>>(ssidLen),
+                         err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_OUT_OF_RANGE);
+            sNetworks[i].mNetworkIDLen = static_cast<std::remove_cv_t<decltype(sNetworks[i].mNetworkIDLen)>>(ssidLen);
 
             sNetworks[i].mNetworkType = NetworkType::kWiFi;
             sNetworks[i].mEnabled     = false;
