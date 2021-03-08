@@ -137,7 +137,7 @@ public:
     /**
      * Check that no flags outside the arguments are set.
      *
-     * @param ...       Flags to test. Arguments can be BitFlags<FlagsEnum>, BitFlags<FlagsEnum>, or FlagsEnum.
+     * @param args      Flags to test. Arguments can be BitFlags<FlagsEnum>, BitFlags<FlagsEnum>, or FlagsEnum.
      * @returns         True if no flag is set other than those passed.
      *                  False if any flag is set other than those passed.
      *
@@ -152,7 +152,7 @@ public:
     /**
      * Check that all given flags are set.
      *
-     * @param ...       Flags to test. Arguments can be BitFlags<FlagsEnum>, BitFlags<FlagsEnum>, or FlagsEnum.
+     * @param args      Flags to test. Arguments can be BitFlags<FlagsEnum>, BitFlags<FlagsEnum>, or FlagsEnum.
      * @returns         True if all given flags are set.
      *                  False if any given flag is not set.
      */
@@ -166,7 +166,7 @@ public:
     /**
      * Check that at least one of the given flags is set.
      *
-     * @param ...       Flags to test. Arguments can be BitFlags<FlagsEnum>, BitFlags<FlagsEnum>, or FlagsEnum.
+     * @param args      Flags to test. Arguments can be BitFlags<FlagsEnum>, BitFlags<FlagsEnum>, or FlagsEnum.
      * @returns         True if all given flags are set.
      *                  False if any given flag is not set.
      */
@@ -188,7 +188,7 @@ public:
      *
      * @param lhs       Some flags.
      * @param rhs       Some flags.
-     * @returns         Flags set in both @a lhs and @rhs.
+     * @returns         Flags set in both @a lhs and @a rhs.
      *
      * @note: A multi-argument `BitFlags` constructor serves the function of `operator|`.
      */
