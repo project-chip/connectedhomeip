@@ -2,11 +2,28 @@
 #define MBED_NET_NET_SOCKET_H
 
 #include <netsocket/Socket.h>
+#include <netsocket/TCPSocket.h>
+#include <netsocket/UDPSocket.h>
+
 #include <sys/socket.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+struct BSDSocket
+{
+    BSDSocket() {}
+    ~BSDSocket() {}
+
+    union
+    {
+
+        TCPSocket tcpSocket;
+        UDPSocket udpSocket;
+    };
+    int type;
+};
 
 int mbed_socket(int family, int type, int proto);
 
