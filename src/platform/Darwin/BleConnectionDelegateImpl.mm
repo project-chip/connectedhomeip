@@ -292,7 +292,6 @@ namespace DeviceLayer {
 
 - (void)stop
 {
-    dispatch_source_cancel(_timer);
     [self stopScanning];
     [self disconnect];
     _centralManager = nil;
@@ -313,7 +312,7 @@ namespace DeviceLayer {
     if (!_centralManager) {
         return;
     }
-
+    dispatch_source_cancel(_timer);
     [_centralManager stopScan];
 }
 
