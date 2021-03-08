@@ -86,6 +86,14 @@ sudo apt-get install pi-bluetooth
 
 You need to reboot your RPi after install `pi-bluetooth`.
 
+Run the below commands on the linux machine that runs controller everytime you
+restart the RPi sudo btmgmt -i hci0 power off sudo btmgmt -i hci0 bredr off sudo
+btmgmt -i hci0 power on (note: raspberry pi has a dual mode bluetooth chip. RPi
+or android phones by default tries to connect using a classic mode(BREDR).
+Therefore we must disable bredr in /etc/bluetooth/main.conf or use btmgmt to
+disable bredr as the workaround, we will investigate the better solution in
+issue #5010)
+
 ### Build Preparation
 
 Before running any other build command, the `scripts/activate.sh` environment
