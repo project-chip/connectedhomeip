@@ -34,7 +34,7 @@ _ensure_darwin_deployment_target() {
 
     # This matches the deployment target for the current python binary.
     # platform.platform is of the form 'macOS-10.16-x86_64-i386-64bit'
-    export MACOSX_DEPLOYMENT_TARGET=`python -c "import platform; print(platform.platform().split('-')[1])"`
+    export MACOSX_DEPLOYMENT_TARGET="$(python -c "import platform; print(platform.platform().split('-')[1])")"
 }
 
 echo_green() {
