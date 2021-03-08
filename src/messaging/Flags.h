@@ -72,10 +72,8 @@ enum class SendMessageFlags : uint16_t
     kDefaultMulticastSourceAddress = 0x0100,
     /**< Used to indicate that the current message is the initiator of the exchange. */
     kFromInitiator = 0x0200,
-    /**< Used to send a ReliableMessageProtocol message requesting an acknowledgment. */
-    kRequestAck = 0x0400,
     /**< Suppress the auto-request acknowledgment feature when sending a message. */
-    kNoAutoRequestAck = 0x0800,
+    kNoAutoRequestAck = 0x0400,
 };
 
 using SendFlags = BitFlags<uint16_t, SendMessageFlags>;
