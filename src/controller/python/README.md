@@ -45,7 +45,7 @@ ninja -C out/python_lib python
 > WHL file.
 
 ```sh
-virtualenv out/python_env --clean
+virtualenv out/python_env --clear
 source out/python_env/bin/activate
 pip install out/python_lib/controller/python/chip*.whl
 ```

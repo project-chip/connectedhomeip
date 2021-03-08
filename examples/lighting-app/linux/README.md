@@ -40,10 +40,10 @@ Raspberry Pi Desktop 20.10 (aarch64)**
 
 > If you want to test ZCL, please disable Rendezvous
 >
->     gn gen out/debug --args='bypass_rendezvous=true'
+>     gn gen out/debug --args='chip_bypass_rendezvous=true'
 >     ninja -C out/debug
 >
-> Note that GN will set bypass_rendezvous for future builds, to enable
+> Note that GN will set chip_bypass_rendezvous for future builds, to enable
 > rendezvous, re-generate using
 >
 >     gn gen out/debug --args='chip_bypass_rendezvous=false'
