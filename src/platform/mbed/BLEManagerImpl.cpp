@@ -35,8 +35,6 @@
 // FIXME temporary macros
 // Show BLE status with LEDs
 #define _BLEMGRIMPL_USE_LEDS 1
-// Disable advertising autostart for development.
-#define CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART 0
 
 /* Undefine the BLE_ERROR_NOT_IMPLEMENTED macro provided by CHIP's
  * src/ble/BleError.h to avoid a name conflict with Mbed-OS ble_error_t
