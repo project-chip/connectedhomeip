@@ -16,13 +16,6 @@ Socket * getSocket(int id)
     }
 }
 
-int close(int id)
-{
-    auto * sock = getSocket(id);
-    sock->~Socket();
-    sockets[id].type = SOCKET_NOT_INITIALIZED;
-}
-
 int mbed_socket(int family, int type, int proto)
 {
     int id = ERR_NO_MEMORY;
@@ -69,6 +62,15 @@ int mbed_socket(int family, int type, int proto)
 
 int mbed_socketpair(int family, int type, int proto, int sv[2])
 {
+    return 0;
+}
+
+int mbed_close(int sock)
+{
+    auto * sock = getSocket(id);
+    sock->~Socket();
+    sockets[id].type = SOCKET_NOT_INITIALIZED;
+
     return 0;
 }
 

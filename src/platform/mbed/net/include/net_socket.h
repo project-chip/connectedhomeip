@@ -35,6 +35,8 @@ int mbed_socket(int family, int type, int proto);
 
 int mbed_socketpair(int family, int type, int proto, int sv[2]);
 
+int mbed_close(int sock);
+
 int mbed_shutdown(int sock, int how);
 
 int mbed_bind(int sock, const struct sockaddr * addr, socklen_t addrlen);
