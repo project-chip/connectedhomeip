@@ -6,6 +6,8 @@ cmake_minimum_required(VERSION 3.19.0)
 get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../../.. REALPATH)
 get_filename_component(APP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/.. REALPATH)
 
+get_filename_component(LOCK_COMMON ${CHIP_ROOT}/examples/lock-app/lock-common REALPATH)
+
 configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/config.in
     ${CMAKE_CURRENT_BINARY_DIR}/chip_build/config
@@ -14,7 +16,7 @@ configure_file(
 
 set(MBED_PATH $ENV{MBED_OS_PATH} CACHE INTERNAL "")
 set(MBED_CONFIG_PATH ${CMAKE_CURRENT_BINARY_DIR} CACHE INTERNAL "")
-set(APP_TARGET chip-mbed-shell-example)
+set(APP_TARGET chip-mbed-lock_app-example)
 
 include(${MBED_PATH}/tools/cmake/app.cmake)
 add_subdirectory(${MBED_PATH} ./mbed_build)
@@ -27,17 +29,32 @@ add_executable(${APP_TARGET})
 
 target_include_directories(${APP_TARGET} PRIVATE
                            ${CMAKE_CURRENT_SOURCE_DIR}
-                           ${APP_ROOT}/shell_common/include)
+                           ${APP_ROOT}/lock-common
+)
 
 target_sources(${APP_TARGET} PRIVATE
-    ${APP_ROOT}/shell_common/cmd_base64.cpp
-    ${APP_ROOT}/shell_common/cmd_device.cpp
-    ${APP_ROOT}/shell_common/cmd_misc.cpp
-    ${APP_ROOT}/shell_common/cmd_otcli.cpp
-    ${APP_ROOT}/shell_common/cmd_btp.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/cmd_mbed_utils.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/arch.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
+               ${CMAKE_CURRENT_SOURCE_DIR}/arch.c
+               ${CMAKE_CURRENT_SOURCE_DIR}/main/main.cpp
+               ${APP_ROOT}/lock-common/gen/call-command-handler.cpp
+               ${APP_ROOT}/lock-common/gen/callback-stub.cpp
+               ${CHIP_ROOT}/src/app/server/DataModelHandler.cpp
+               ${CHIP_ROOT}/src/app/reporting/reporting-default-configuration.cpp
+               ${CHIP_ROOT}/src/app/reporting/reporting.cpp
+               ${CHIP_ROOT}/src/app/util/af-event.cpp
+               ${CHIP_ROOT}/src/app/util/af-main-common.cpp
+               ${CHIP_ROOT}/src/app/util/attribute-size.cpp
+               ${CHIP_ROOT}/src/app/util/attribute-storage.cpp
+               ${CHIP_ROOT}/src/app/util/attribute-table.cpp
+               ${CHIP_ROOT}/src/app/util/binding-table.cpp
+               ${CHIP_ROOT}/src/app/util/chip-message-send.cpp
+               ${CHIP_ROOT}/src/app/util/client-api.cpp
+               ${CHIP_ROOT}/src/app/util/ember-print.cpp
+               ${CHIP_ROOT}/src/app/util/message.cpp
+               ${CHIP_ROOT}/src/app/util/process-cluster-message.cpp
+               ${CHIP_ROOT}/src/app/util/process-global-message.cpp
+               ${CHIP_ROOT}/src/app/util/util.cpp
+               ${CHIP_ROOT}/src/app/clusters/bindings/bindings.cpp
+               ${CHIP_ROOT}/src/app/clusters/on-off-server/on-off.cpp
 )
 
 add_subdirectory(${CHIP_ROOT}/config/mbed ./chip_build)
