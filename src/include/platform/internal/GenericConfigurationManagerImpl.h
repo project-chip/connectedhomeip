@@ -64,6 +64,7 @@ public:
     CHIP_ERROR _GetPrimaryWiFiMACAddress(uint8_t * buf);
     CHIP_ERROR _StorePrimaryWiFiMACAddress(const uint8_t * buf);
     CHIP_ERROR _GetPrimary802154MACAddress(uint8_t * buf);
+    CHIP_ERROR _GetFactoryAssignedEUI64(uint8_t (&buf)[8]);
     CHIP_ERROR _StorePrimary802154MACAddress(const uint8_t * buf);
     CHIP_ERROR _GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth);
     CHIP_ERROR _StoreManufacturingDate(const char * mfgDate, size_t mfgDateLen);

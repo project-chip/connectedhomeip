@@ -79,6 +79,13 @@ CHIP_ERROR DiscoveryImplPlatform::Start(Inet::InetLayer * inetLayer, uint16_t po
     {
         ChipLogError(Discovery, "Failed to initialize platform mdns: %s", ErrorStr(error));
     }
+
+    error = SetupHostname();
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(Discovery, "Failed to setup mdns hostname: %s", ErrorStr(error));
+    }
+
     return error;
 }
 
@@ -137,6 +144,13 @@ exit:
 
 CHIP_ERROR DiscoveryImplPlatform::SetupHostname()
 {
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    static char hostname[17]; // Hostname is 64-bit EUI-64 expressed as a 16-character hexadecimal string.
+    uint8_t eui64[8];
+    chip::DeviceLayer::ThreadStackMgr().GetFactoryAssignedEUI64(eui64);
+    snprintf(hostname, sizeof(hostname), "%02X%02X%02X%02X%02X%02X%02X%02X", eui64[0], eui64[1], eui64[2], eui64[3], eui64[4],
+             eui64[5], eui64[6], eui64[7]);
+#else
     uint8_t mac[6];    // 6 byte wifi mac
     char hostname[13]; // Hostname will be the hex representation of mac.
 
@@ -145,6 +159,8 @@ CHIP_ERROR DiscoveryImplPlatform::SetupHostname()
     {
         snprintf(&hostname[i * 2], sizeof(hostname) - i * 2, "%02X", mac[i]);
     }
+#endif
+
     ReturnErrorOnFailure(ChipMdnsSetHostname(hostname));
 
     return CHIP_NO_ERROR;
@@ -251,7 +267,8 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const OperationalAdvertisingParamete
 
     mOperationalAdvertisingParams = params;
     // TODO: There may be multilple device/fabrid ids after multi-admin.
-    snprintf(service.mName, sizeof(service.mName), "%" PRIX64 "-%" PRIX64, params.GetNodeId(), params.GetFabricId());
+    snprintf(service.mName, sizeof(service.mName), "%08X%08X-%08X%08X", (uint32_t)(params.GetNodeId() >> 32),
+             (uint32_t)(params.GetNodeId()), (uint32_t)(params.GetFabricId() >> 32), (uint32_t)(params.GetFabricId()));
     strncpy(service.mType, "_chip", sizeof(service.mType));
     service.mProtocol      = MdnsServiceProtocol::kMdnsProtocolTcp;
     service.mPort          = CHIP_PORT;
