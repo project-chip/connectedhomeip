@@ -60,7 +60,6 @@ source "$CHIP_ROOT/scripts/activate.sh"
 # python binary is used.
 _ensure_darwin_deployment_target
 
-
 # Generates ninja files
 gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT"
 
