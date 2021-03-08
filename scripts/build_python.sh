@@ -22,6 +22,21 @@ _normpath() {
     python -c "import os.path; print(os.path.normpath('$@'))"
 }
 
+_ensure_darwin_deployment_target() {
+    if [[ `uname` != "Darwin" ]]; then
+        return
+    fi
+
+    # Only override the deployment target if not set
+    if [[ -n "${MACOSX_DEPLOYMENT_TARGET}" ]]; then
+        return
+    fi
+
+    # This matches the deployment target for the current python binary.
+    # platform.platform is of the form 'macOS-10.16-x86_64-i386-64bit'
+    export MACOSX_DEPLOYMENT_TARGET=`python -c "import platform; print(platform.platform().split('-')[1])"`
+}
+
 echo_green() {
     echo -e "\033[0;32m$*\033[0m"
 }
@@ -40,6 +55,11 @@ ENVIRONMENT_ROOT="$CHIP_ROOT/out/python_env"
 
 # Ensure we have a compilation environment
 source "$CHIP_ROOT/scripts/activate.sh"
+
+# Deployment target set only post activate, to ensure the right
+# python binary is used.
+_ensure_darwin_deployment_target
+
 
 # Generates ninja files
 gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT"
