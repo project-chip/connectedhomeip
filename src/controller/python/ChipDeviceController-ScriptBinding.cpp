@@ -78,7 +78,6 @@ chip::NodeId kRemoteDeviceId       = chip::kTestDeviceNodeId;
 
 extern "C" {
 CHIP_ERROR pychip_DeviceController_NewDeviceController(chip::Controller::DeviceCommissioner ** outDevCtrl,
-                                                       chip::Controller::DeviceAddressUpdater ** outAddressUpdater,
                                                        chip::NodeId localDeviceId);
 CHIP_ERROR pychip_DeviceController_DeleteDeviceController(chip::Controller::DeviceCommissioner * devCtrl,
                                                           chip::Controller::DeviceAddressUpdater * addressUpdater);
@@ -125,7 +124,6 @@ CHIP_ERROR pychip_GetDeviceByNodeId(chip::Controller::DeviceCommissioner * devCt
 }
 
 CHIP_ERROR pychip_DeviceController_NewDeviceController(chip::Controller::DeviceCommissioner ** outDevCtrl,
-                                                       chip::Controller::DeviceAddressUpdater ** outAddressUpdater,
                                                        chip::NodeId localDeviceId)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -141,12 +139,6 @@ CHIP_ERROR pychip_DeviceController_NewDeviceController(chip::Controller::DeviceC
     SuccessOrExit(err = (*outDevCtrl)->ServiceEvents());
 
 exit:
-    if (err != CHIP_NO_ERROR && *outAddressUpdater != NULL)
-    {
-        delete *outAddressUpdater;
-        *outAddressUpdater = NULL;
-    }
-
     return err;
 }
 
