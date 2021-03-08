@@ -1,3 +1,4 @@
+#include "common.h"
 #include <net_socket.h>
 
 BSDSocket sockets[MAX_SOCKET];
@@ -73,6 +74,11 @@ int mbed_socketpair(int family, int type, int proto, int sv[2])
 int mbed_close(int sock)
 {
     auto * socket = getSocket(sock);
+    if (socket == nullptr)
+    {
+        _set_errno(EFAULT);
+        return -1;
+    }
     socket->~Socket();
     sockets[sock].type = SOCKET_NOT_INITIALIZED;
 
