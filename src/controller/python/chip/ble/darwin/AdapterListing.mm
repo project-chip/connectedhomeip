@@ -6,36 +6,36 @@
 
 /// MAC does not have specific adapters
 @interface FakeBleAdapterInformation : NSObject <CBCentralManagerDelegate>
-  @property (strong, nonatomic) dispatch_queue_t workQueue;
-  @property (strong, nonatomic) CBCentralManager * centralManager;
-  @property (nonatomic) bool advanced;
-  @property (nonatomic) bool hasStatus;
-  @property (assign, nonatomic) dispatch_semaphore_t statusSemaphore; 
+@property (strong, nonatomic) dispatch_queue_t workQueue;
+@property (strong, nonatomic) CBCentralManager * centralManager;
+@property (nonatomic) bool advanced;
+@property (nonatomic) bool hasStatus;
+@property (assign, nonatomic) dispatch_semaphore_t statusSemaphore;
 
-  - (id)init;
-  - (bool)isPoweredOn;
+- (id)init;
+- (bool)isPoweredOn;
 
 @end
 
 @implementation FakeBleAdapterInformation
 
--(id)init
+- (id)init
 {
     self = [super init];
     if (self) {
         _advanced = false;
         _hasStatus = false;
         _workQueue = dispatch_queue_create("com.chip.python.ble.work_queue", DISPATCH_QUEUE_SERIAL);
-        _centralManager = [[CBCentralManager alloc] initWithDelegate: self queue: _workQueue];
+        _centralManager = [[CBCentralManager alloc] initWithDelegate:self queue:_workQueue];
         _statusSemaphore = dispatch_semaphore_create(0);
     }
     return self;
 }
 
-- (bool) isPoweredOn 
+- (bool)isPoweredOn
 {
     if (!self.hasStatus) {
-        constexpr uint64_t kStateWaitTimeoutNs = 5*1000*1000*1000ll;
+        constexpr uint64_t kStateWaitTimeoutNs = 5 * 1000 * 1000 * 1000ll;
         dispatch_semaphore_wait(self.statusSemaphore, dispatch_time(DISPATCH_TIME_NOW, kStateWaitTimeoutNs));
 
         if (!self.hasStatus) {
@@ -87,15 +87,9 @@
 
 @end
 
-extern "C" void * pychip_ble_adapter_list_new()
-{
-    return static_cast<void *>([[FakeBleAdapterInformation alloc] init]);
-}
+extern "C" void * pychip_ble_adapter_list_new() { return static_cast<void *>([[FakeBleAdapterInformation alloc] init]); }
 
-extern "C" void pychip_ble_adapter_list_delete(FakeBleAdapterInformation * adapterIterator)
-{
-    [adapterIterator release];
-}
+extern "C" void pychip_ble_adapter_list_delete(FakeBleAdapterInformation * adapterIterator) { [adapterIterator release]; }
 
 extern "C" bool pychip_ble_adapter_list_next(FakeBleAdapterInformation * adapterIterator)
 {
@@ -106,25 +100,16 @@ extern "C" bool pychip_ble_adapter_list_next(FakeBleAdapterInformation * adapter
     return false;
 }
 
-extern "C" uint32_t pychip_ble_adapter_list_get_index(FakeBleAdapterInformation * adapterIterator)
-{
-    return 0;
-}
+extern "C" uint32_t pychip_ble_adapter_list_get_index(FakeBleAdapterInformation * adapterIterator) { return 0; }
 
 extern "C" const char * pychip_ble_adapter_list_get_address(FakeBleAdapterInformation * adapterIterator)
 {
     return "NOT_IMPLEMENTED";
 }
 
-extern "C" const char * pychip_ble_adapter_list_get_alias(FakeBleAdapterInformation * adapterIterator)
-{
-    return "DarwinBLE";
-}
+extern "C" const char * pychip_ble_adapter_list_get_alias(FakeBleAdapterInformation * adapterIterator) { return "DarwinBLE"; }
 
-extern "C" const char * pychip_ble_adapter_list_get_name(FakeBleAdapterInformation * adapterIterator)
-{
-    return "DarwinBLE";
-}
+extern "C" const char * pychip_ble_adapter_list_get_name(FakeBleAdapterInformation * adapterIterator) { return "DarwinBLE"; }
 
 extern "C" bool pychip_ble_adapter_list_is_powered(FakeBleAdapterInformation * adapterIterator)
 {

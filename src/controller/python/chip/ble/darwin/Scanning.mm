@@ -1,17 +1,17 @@
 #include <ble/BleUUID.h>
 #include <ble/CHIPBleServiceData.h>
+#include <platform/Darwin/UUIDHelper.h>
 #include <support/CHIPMem.h>
 #include <support/ReturnMacros.h>
 #include <support/logging/CHIPLogging.h>
-#include <platform/Darwin/UUIDHelper.h>
 
 #import <CoreBluetooth/CoreBluetooth.h>
 
 namespace {
 struct PyObject;
-using DeviceScannedCallback = void (*)(PyObject * context, const char * address, uint16_t discriminator, uint16_t vendorId,
-                                       uint16_t productId);
-using ScanCompleteCallback  = void (*)(PyObject * context);
+using DeviceScannedCallback
+    = void (*)(PyObject * context, const char * address, uint16_t discriminator, uint16_t vendorId, uint16_t productId);
+using ScanCompleteCallback = void (*)(PyObject * context);
 }
 
 @interface ChipDeviceBleScanner : NSObject <CBCentralManagerDelegate>
@@ -21,21 +21,25 @@ using ScanCompleteCallback  = void (*)(PyObject * context);
 @property (strong, nonatomic) CBCentralManager * centralManager;
 @property (strong, nonatomic) CBUUID * shortServiceUUID;
 
-@property (assign, nonatomic) PyObject *context;
+@property (assign, nonatomic) PyObject * context;
 @property (assign, nonatomic) DeviceScannedCallback scanCallback;
 @property (assign, nonatomic) ScanCompleteCallback completeCallback;
 
-- (id) initWithContext: (PyObject *) context scanCallback: (DeviceScannedCallback) scanCallback
-    completeCallback: (ScanCompleteCallback) completeCallback timeoutMs: (uint32_t) timeout;
+- (id)initWithContext:(PyObject *)context
+         scanCallback:(DeviceScannedCallback)scanCallback
+     completeCallback:(ScanCompleteCallback)completeCallback
+            timeoutMs:(uint32_t)timeout;
 
-- (void) stopTimeoutReached;
+- (void)stopTimeoutReached;
 
 @end
 
 @implementation ChipDeviceBleScanner
 
-- (id) initWithContext: (PyObject *) context scanCallback: (DeviceScannedCallback) scanCallback
-    completeCallback: (ScanCompleteCallback) completeCallback timeoutMs: (uint32_t) timeout
+- (id)initWithContext:(PyObject *)context
+         scanCallback:(DeviceScannedCallback)scanCallback
+     completeCallback:(ScanCompleteCallback)completeCallback
+            timeoutMs:(uint32_t)timeout
 {
     self = [super init];
     if (self) {
@@ -43,7 +47,7 @@ using ScanCompleteCallback  = void (*)(PyObject * context);
 
         _workQueue = dispatch_queue_create("com.chip.python.ble.work_queue", DISPATCH_QUEUE_SERIAL);
         _timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, _workQueue);
-        _centralManager = [[CBCentralManager alloc] initWithDelegate: self queue: _workQueue];
+        _centralManager = [[CBCentralManager alloc] initWithDelegate:self queue:_workQueue];
         _context = context;
         _scanCallback = scanCallback;
         _completeCallback = completeCallback;
@@ -79,25 +83,21 @@ using ScanCompleteCallback  = void (*)(PyObject * context);
         NSUInteger length = [serviceData length];
         if (length != sizeof(chip::Ble::ChipBLEDeviceIdentificationInfo)) {
             ChipLogError(Ble, "Device has invalid advertisement data length.");
-            break; 
+            break;
         }
 
         chip::Ble::ChipBLEDeviceIdentificationInfo data;
         memcpy(&data, [serviceData bytes], sizeof(data));
 
-        _scanCallback(
-            _context, 
-            [peripheral.identifier.UUIDString UTF8String],
-            data.GetDeviceDiscriminator(),
-            data.GetVendorId(),
-            data.GetProductId()
-        );
+        _scanCallback(_context, [peripheral.identifier.UUIDString UTF8String], data.GetDeviceDiscriminator(), data.GetVendorId(),
+            data.GetProductId());
 
         break;
     }
 }
 
-- (void) stopTimeoutReached {
+- (void)stopTimeoutReached
+{
     ChipLogProgress(Ble, "Scan timeout reached.");
 
     _completeCallback(_context);
@@ -112,7 +112,7 @@ using ScanCompleteCallback  = void (*)(PyObject * context);
     switch (central.state) {
     case CBManagerStatePoweredOn:
         ChipLogProgress(Ble, "Central BLE Manager is on. Starting to scan.");
-        [central scanForPeripheralsWithServices: @[ _shortServiceUUID ] options: nil];
+        [central scanForPeripheralsWithServices:@[ _shortServiceUUID ] options:nil];
         break;
     default:
         ChipLogError(Ble, "CBManagerState is NOT ON. Unable to scan.");
@@ -126,18 +126,15 @@ using ScanCompleteCallback  = void (*)(PyObject * context);
 
 @end
 
-
-
-extern "C" void * pychip_ble_start_scanning(PyObject * context, void * adapter, uint32_t timeout,
-                                            DeviceScannedCallback scanCallback,
-                                            ScanCompleteCallback completeCallback)
+extern "C" void * pychip_ble_start_scanning(
+    PyObject * context, void * adapter, uint32_t timeout, DeviceScannedCallback scanCallback, ScanCompleteCallback completeCallback)
 {
     // NOTE: adapter is ignored as it does not apply to mac
 
-    ChipDeviceBleScanner* scanner = [[ChipDeviceBleScanner alloc]
-        initWithContext: context scanCallback: scanCallback completeCallback: completeCallback
-        timeoutMs: timeout
-    ];
+    ChipDeviceBleScanner * scanner = [[ChipDeviceBleScanner alloc] initWithContext:context
+                                                                      scanCallback:scanCallback
+                                                                  completeCallback:completeCallback
+                                                                         timeoutMs:timeout];
 
     return static_cast<void *>(scanner);
 }
