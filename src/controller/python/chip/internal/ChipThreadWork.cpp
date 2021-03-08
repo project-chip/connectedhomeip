@@ -44,6 +44,7 @@ struct WorkData
     sem_t done;
 
     WorkData() { sem_init(&done, 0 /* shared */, 0); }
+    ~WorkData() { sem_destroy(&done); }
     void Post() { sem_post(&done); }
     void Wait() { sem_wait(&done); }
 #endif
