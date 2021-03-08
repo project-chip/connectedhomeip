@@ -1,0 +1,84 @@
+{
+    "name": "ism43362",
+    "config": {
+	    "wifi-country-code": {
+            "help": "Country Code to specify channel number"
+        },
+        "wifi-miso": {
+            "help": "SPI-MISO connection to external device",
+            "value": "NC"
+        },
+        "wifi-mosi": {
+            "help": "SPI-MOSI connection to external device",
+            "value": "NC"
+        },
+        "wifi-sclk": {
+            "help": "SPI-CLOCK connection to external device",
+            "value": "NC"
+        },
+        "wifi-nss": {
+            "help": "SPI chip select of external device",
+            "value": "NC"
+        },
+        "wifi-reset": {
+            "help": "ISM43362 reset",
+            "value": "NC"
+        },
+        "wifi-dataready": {
+            "help": "ISM43362 dataready",
+            "value": "NC"
+        },
+        "wifi-wakeup": {
+            "help": "ISM43362 wakeup",
+            "value": "NC"
+        },
+        "wifi-debug": {
+            "help": "Defines whether logging is on or off",
+            "value": false
+        },
+        "provide-default": {
+            "help": "Provide default WifiInterface. [true/false]",
+            "value": false
+        },
+        "read-thread-stack-size": {
+            "help": "Stack size of the read thread, defaults to MBED_CONF_APP_THREAD_STACK_SIZE or MBED_CONF_RTOS_THREAD_STACK_SIZE (default: 4096)",
+            "value": null
+        },
+        "read-thread-stack-statically-allocated": {
+            "help": "Whether to statically allocate the memory for the read thread stack. Requires 'read-thread-stack-size' to be set.",
+            "value": false
+        }
+    },
+    "target_overrides": {
+        "DISCO_F413ZH": {
+            "ism43362.wifi-miso": "PB_4",
+            "ism43362.wifi-mosi": "PB_5",
+            "ism43362.wifi-sclk": "PB_12",
+            "ism43362.wifi-nss": "PG_11",
+            "ism43362.wifi-reset": "PH_1",
+            "ism43362.wifi-dataready": "PG_12",
+            "ism43362.wifi-wakeup": "PB_15",
+            "ism43362.provide-default": true
+        },
+        "DISCO_L475VG_IOT01A": {
+            "ism43362.wifi-miso": "PC_11",
+            "ism43362.wifi-mosi": "PC_12",
+            "ism43362.wifi-sclk": "PC_10",
+            "ism43362.wifi-nss": "PE_0",
+            "ism43362.wifi-reset": "PE_8",
+            "ism43362.wifi-dataready": "PE_1",
+            "ism43362.wifi-wakeup": "PB_13",
+            "ism43362.provide-default": true
+        },
+        "B_L4S5I_IOT01A": {
+            "ism43362.wifi-miso": "PC_11",
+            "ism43362.wifi-mosi": "PC_12",
+            "ism43362.wifi-sclk": "PC_10",
+            "ism43362.wifi-nss": "PE_0",
+            "ism43362.wifi-reset": "PE_8",
+            "ism43362.wifi-dataready": "PE_1",
+            "ism43362.wifi-wakeup": "PB_13",
+            "ism43362.provide-default": true
+        }
+     }
+}
