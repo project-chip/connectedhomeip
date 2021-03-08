@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2021 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ k32w_sdk("sdk") {
     "main",
     "${k32w_platform_dir}/app/project_include",
     "${k32w_platform_dir}/app/support",
-    "${chip_root}/examples/lock-app/lock-common",
+    "${chip_root}/examples/lighting-app/lighting-common",
     "${chip_root}/src/app/util",
     "${chip_root}/src/app/server",
     "${k32w_platform_dir}/util/include",
@@ -53,25 +53,25 @@ k32w_sdk("sdk") {
   }
 }
 
-k32w_executable("lock_app") {
-  output_name = "chip-k32w061-lock-example"
+k32w_executable("light_app") {
+  output_name = "chip-k32w061-light-example"
 
   sources = [
     "${k32w_platform_dir}/util/LEDWidget.cpp",
     "${k32w_platform_dir}/util/include/LEDWidget.h",
     "main/AppTask.cpp",
-    "main/BoltLockManager.cpp",
+    "main/LightingManager.cpp",
     "main/ZclCallbacks.cpp",
     "main/include/AppEvent.h",
     "main/include/AppTask.h",
-    "main/include/BoltLockManager.h",
+    "main/include/LightingManager.h",
     "main/main.cpp",
   ]
 
   deps = [
     ":sdk",
     "${chip_root}/examples/common/QRCode",
-    "${chip_root}/examples/lock-app/lock-common",
+    "${chip_root}/examples/lighting-app/lighting-common",
     "${chip_root}/src/lib",
     "${chip_root}/third_party/mbedtls:mbedtls",
     "${k32w_platform_dir}/app/support:freertos_mbedtls_utils",
@@ -87,7 +87,7 @@ k32w_executable("lock_app") {
 }
 
 group("k32w") {
-  deps = [ ":lock_app" ]
+  deps = [ ":light_app" ]
 }
 
 group("default") {
