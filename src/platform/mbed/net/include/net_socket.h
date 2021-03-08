@@ -31,6 +31,8 @@ struct BSDSocket
     int type;
 };
 
+Socket * getSocket(int id);
+
 int mbed_socket(int family, int type, int proto);
 
 int mbed_socketpair(int family, int type, int proto, int sv[2]);

@@ -67,9 +67,9 @@ int mbed_socketpair(int family, int type, int proto, int sv[2])
 
 int mbed_close(int sock)
 {
-    auto * sock = getSocket(id);
-    sock->~Socket();
-    sockets[id].type = SOCKET_NOT_INITIALIZED;
+    auto * socket = getSocket(sock);
+    socket->~Socket();
+    sockets[sock].type = SOCKET_NOT_INITIALIZED;
 
     return 0;
 }

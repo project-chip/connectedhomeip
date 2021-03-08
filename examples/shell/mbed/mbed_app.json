@@ -3,7 +3,8 @@
         "MBEDTLS_USER_CONFIG_FILE=\"chip_mbedtls_config.h\""
     ],
     "target_overrides": { 
-        "*": { 
+        "*": {
+            "platform.stdio-minimal-console-only": true,
             "lwip.ipv6-enabled": true,
             "lwip.raw-socket-enabled": true,
             "nsapi.default-wifi-security": "WPA_WPA2",
