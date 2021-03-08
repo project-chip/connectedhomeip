@@ -115,6 +115,7 @@ EmberAfNetworkCommissioningError OnAddThreadNetworkCommandCallbackInternal(app::
                                                                            size_t operationalDatasetLen, uint64_t breadcrumb,
                                                                            uint32_t timeoutMs)
 {
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     EmberAfNetworkCommissioningError err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_BOUNDS_EXCEEDED;
 
     for (size_t i = 0; i < kMaxNetworks; i++)
@@ -149,6 +150,11 @@ exit:
 
     ChipLogDetail(Zcl, "AddThreadNetwork: %d", err);
     return err;
+#else
+    // The target does not supports ThreadNetwork. We should not add AddThreadNetwork command in that case then the upper layer will
+    // return "Command not found" error.
+    return EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_UNKNOWN_ERROR;
+#endif
 }
 
 EmberAfNetworkCommissioningError OnAddWiFiNetworkCommandCallbackInternal(app::Command *, EndpointId, const uint8_t * ssid,
@@ -210,9 +216,13 @@ CHIP_ERROR DoEnableNetwork(NetworkInfo * network)
     switch (network->mNetworkType)
     {
     case NetworkType::kThread:
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
         ReturnErrorOnFailure(
             DeviceLayer::ThreadStackMgr().SetThreadProvision(network->mData.mThread.mDataset, network->mData.mThread.mDatasetLen));
         ReturnErrorOnFailure(DeviceLayer::ThreadStackMgr().SetThreadEnabled(true));
+#else
+        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#endif
         break;
     case NetworkType::kWiFi:
 #if defined(CHIP_DEVICE_LAYER_TARGET)
@@ -220,8 +230,8 @@ CHIP_ERROR DoEnableNetwork(NetworkInfo * network)
         // TODO: Currently, DeviceNetworkProvisioningDelegateImpl assumes that ssid and credentials are null terminated strings,
         // which is not correct, this should be changed once we have better method for commissioning wifi networks.
         DeviceLayer::DeviceNetworkProvisioningDelegateImpl deviceDelegate;
-        deviceDelegate.ProvisionWiFi(reinterpret_cast<const char *>(network->mData.mWiFi.mSSID),
-                                     reinterpret_cast<const char *>(network->mData.mWiFi.mCredentials));
+        ReturnErrorOnFailure(deviceDelegate.ProvisionWiFi(reinterpret_cast<const char *>(network->mData.mWiFi.mSSID),
+                                                          reinterpret_cast<const char *>(network->mData.mWiFi.mCredentials)));
         break;
     }
 #else
