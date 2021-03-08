@@ -2,11 +2,35 @@
 #define MBED_NET_NET_SOCKET_H
 
 #include <netsocket/Socket.h>
+#include <netsocket/TCPSocket.h>
+#include <netsocket/UDPSocket.h>
+
 #include <sys/socket.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+#define MAX_SOCKET 5
+
+#define TCP_SOCKET SOCK_STREAM
+#define UDP_SOCKET SOCK_DGRAM
+#define SOCKET_NOT_INITIALIZED 0
+#define ERR_NO_MEMORY -1
+#define ERR_OPEN -2
+#define ERR_NO_SOCKET -3
+struct BSDSocket
+{
+    BSDSocket() {}
+    ~BSDSocket() {}
+
+    union
+    {
+
+        TCPSocket tcpSocket;
+        UDPSocket udpSocket;
+    };
+    int type;
+};
 
 int mbed_socket(int family, int type, int proto);
 
