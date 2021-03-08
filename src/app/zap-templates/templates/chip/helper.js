@@ -161,12 +161,8 @@ function chip_server_cluster_command_arguments(options)
   {
     return Promise.all(args.map(arg => collectItem.call(this, arg, pkgId))).then(items => items.flat()).then(items => {
       return Promise.all(items.map(item => {
-        if (StringHelper.isByteString(item.type)) {
+        if (StringHelper.isString(item.type)) {
           item.chipType = 'chip::ByteSpan';
-          return item;
-        } else if (StringHelper.isString(item.type)) {
-          // Enhanced the command argument with 'chipType' for conveniences.
-          item.chipType = 'char *';
           return item;
         }
 
@@ -251,7 +247,7 @@ function getAttributes(pkgId, options)
 
       if (StringHelper.isString(att.type)) {
         // Enhanced the command argument with 'chipType' for conveniences.
-        att.chipType = 'char *';
+        att.chipType = 'chip::ByteSpan';
         return att;
       }
 
@@ -458,16 +454,20 @@ function asCallbackAttributeType(attributeType)
   case 0x38: // semi / Semi-precision
   case 0x39: // single / Single precision
   case 0x3A: // double / Double precision
-  case 0x41: // octstr / Octet string
-  case 0x42: // string / Character string
-  case 0x43: // octstr16 / Long octet string
-  case 0x44: // string16 / Long character string
   case 0x48: // array / Array
   case 0x49: // struct / Structure
   case 0x50: // set / Set
   case 0x51: // bag / Bag
   case 0xE0: // ToD / Time of day
+  case 0xEA: // bacOID / BACnet OID
+  case 0xF1: // key128 / 128-bit security key
+  case 0xFF: // unk / Unknown
     return 'Unsupported';
+  case 0x41: // octstr / Octet string
+  case 0x42: // string / Character string
+  case 0x43: // octstr16 / Long octet string
+  case 0x44: // string16 / Long character string
+    return 'String';
   case 0x08: // data8 / 8-bit data
   case 0x18: // map8 / 8-bit bitmap
   case 0x20: // uint8 / Unsigned  8-bit integer
@@ -479,9 +479,6 @@ function asCallbackAttributeType(attributeType)
   case 0x31: // enum16 / 16-bit enumeration
   case 0xE8: // clusterId / Cluster ID
   case 0xE9: // attribId / Attribute ID
-  case 0xEA: // bacOID / BACnet OID
-  case 0xF1: // key128 / 128-bit security key
-  case 0xFF: // unk / Unknown
     return 'Int16u';
   case 0x0B: // data32 / 32-bit data
   case 0x1B: // map32 / 32-bit bitmap
@@ -507,6 +504,17 @@ function asCallbackAttributeType(attributeType)
   default:
     error = 'Unhandled attribute type ' + attributeType;
     throw error;
+  }
+}
+
+function asObjectiveCBasicType(type)
+{
+  if (StringHelper.isOctetString(type)) {
+    return 'NSData *';
+  } else if (StringHelper.isCharString(type)) {
+    return 'NSString *';
+  } else {
+    return ChipTypesHelper.asBasicType(this.chipType);
   }
 }
 
@@ -557,6 +565,7 @@ exports.chip_server_clusters                  = chip_server_clusters;
 exports.chip_server_cluster_commands          = chip_server_cluster_commands;
 exports.chip_server_cluster_command_arguments = chip_server_cluster_command_arguments
 exports.asBasicType                           = ChipTypesHelper.asBasicType;
+exports.asObjectiveCBasicType                 = asObjectiveCBasicType;
 exports.asObjectiveCNumberType                = asObjectiveCNumberType;
 exports.isSignedType                          = isSignedType;
 exports.isDiscreteType                        = isDiscreteType;

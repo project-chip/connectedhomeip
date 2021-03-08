@@ -18,13 +18,13 @@ extern "C" {
 {{#chip_server_clusters}}
 // Cluster {{asCamelCased name false}}
 {{#chip_server_cluster_commands}}
-CHIP_ERROR chip_ime_AppendCommand_{{asCamelCased clusterName false}}_{{asCamelCased name false}}(chip::Controller::Device * device, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId{{#chip_server_cluster_command_arguments}}, {{#if (isByteString type)}}const uint8_t * {{asCamelCased label}}, uint32_t {{asCamelCased label}}_Len{{else}}{{chipType}} {{asCamelCased label}}{{/if}}{{/chip_server_cluster_command_arguments}})
+CHIP_ERROR chip_ime_AppendCommand_{{asCamelCased clusterName false}}_{{asCamelCased name false}}(chip::Controller::Device * device, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId{{#chip_server_cluster_command_arguments}}, {{#if (isString type)}}const uint8_t * {{asCamelCased label}}, uint32_t {{asCamelCased label}}_Len{{else}}{{chipType}} {{asCamelCased label}}{{/if}}{{/chip_server_cluster_command_arguments}})
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::{{asCamelCased clusterName false}}Cluster cluster{{asCamelCased clusterName false}};
     (void) ZCLgroupId;
     cluster{{asCamelCased clusterName false}}.Associate(device, ZCLendpointId);
-    return cluster{{asCamelCased clusterName false}}.{{asCamelCased name false}}(nullptr, nullptr{{#chip_server_cluster_command_arguments}}, {{#if (isByteString type)}}chip::ByteSpan({{asCamelCased label}}, {{asCamelCased label}}_Len){{else}}{{asCamelCased label}}{{/if}}
+    return cluster{{asCamelCased clusterName false}}.{{asCamelCased name false}}(nullptr, nullptr{{#chip_server_cluster_command_arguments}}, {{#if (isString type)}}chip::ByteSpan({{asCamelCased label}}, {{asCamelCased label}}_Len){{else}}{{asCamelCased label}}{{/if}}
     {{/chip_server_cluster_command_arguments}});
 }
 {{/chip_server_cluster_commands}}
