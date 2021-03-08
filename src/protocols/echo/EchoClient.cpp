@@ -50,9 +50,12 @@ void EchoClient::Shutdown()
         mExchangeCtx->Abort();
         mExchangeCtx = nullptr;
     }
+
+    OnEchoResponseReceived = nullptr;
+    mExchangeMgr           = nullptr;
 }
 
-CHIP_ERROR EchoClient::SendEchoRequest(System::PacketBufferHandle && payload)
+CHIP_ERROR EchoClient::SendEchoRequest(System::PacketBufferHandle && payload, const Messaging::SendFlags & sendFlags)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -72,8 +75,7 @@ CHIP_ERROR EchoClient::SendEchoRequest(System::PacketBufferHandle && payload)
     }
 
     // Send an Echo Request message.  Discard the exchange context if the send fails.
-    err = mExchangeCtx->SendMessage(MsgType::EchoRequest, std::move(payload),
-                                    Messaging::SendFlags(Messaging::SendMessageFlags::kNone));
+    err = mExchangeCtx->SendMessage(MsgType::EchoRequest, std::move(payload), sendFlags);
 
     if (err != CHIP_NO_ERROR)
     {
