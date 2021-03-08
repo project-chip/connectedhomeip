@@ -7,7 +7,6 @@
 #include "ModelCommand.h"
 #include "gen/CHIPClientCallbacks.h"
 #include <controller/CHIPClusters.h>
-#include <lib/support/Span.h>
 #include <lib/core/CHIPSafeCasts.h>
 
 static void OnDefaultSuccessResponse(void * context)
@@ -24,12 +23,6 @@ static void OnDefaultFailureResponse(void * context, uint8_t status)
 
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(false);
-}
-
-typedef void (*UnsupportedAttributeCallback)(void * context);
-static void OnUnsupportedAttributeResponse(void * context)
-{
-    ChipLogError(chipTool, "Unsupported attribute Response. This should never happen !");
 }
 
 static void OnBooleanAttributeResponse(void * context, bool value)
@@ -75,6 +68,19 @@ static void OnInt64uAttributeResponse(void * context, uint64_t value)
 static void OnInt16sAttributeResponse(void * context, int16_t value)
 {
     ChipLogProgress(chipTool, "Int16s attribute Response: %" PRId16, value);
+
+    ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
+    command->SetCommandExitStatus(true);
+}
+
+static void OnStringAttributeResponse(void * context, const chip::ByteSpan value)
+{
+    char * str = (char *)malloc(value.size() * sizeof(char));
+    memmove(str, value.data(), value.size());
+    str[value.size()] = '\0';
+    free(str);
+
+    ChipLogProgress(chipTool, "String attribute Response: %s (%" PRIu16 ")", str, strlen(str));
 
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(true);
@@ -137,7 +143,7 @@ public:
 
         chip::Controller::{{asCamelCased parent.name false}}Cluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.{{asCamelCased name false}}(onSuccessCallback->Cancel(), onFailureCallback->Cancel(){{#chip_server_cluster_command_arguments}}, {{#if (isByteString type)}} chip::ByteSpan(chip::Uint8::from_char(m{{asCamelCased label false}}), strlen(m{{asCamelCased label false}})){{else}}m{{asCamelCased label false}}{{/if}}{{/chip_server_cluster_command_arguments}});
+        return cluster.{{asCamelCased name false}}(onSuccessCallback->Cancel(), onFailureCallback->Cancel(){{#chip_server_cluster_command_arguments}}, {{#if (isString type)}} chip::ByteSpan(chip::Uint8::from_char(m{{asCamelCased label false}}), strlen(m{{asCamelCased label false}})){{else}}m{{asCamelCased label false}}{{/if}}{{/chip_server_cluster_command_arguments}});
     }
 
 private:
@@ -231,13 +237,17 @@ public:
 
         chip::Controller::{{asCamelCased parent.name false}}Cluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute{{asCamelCased name false}}(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mValue);
+        return cluster.WriteAttribute{{asCamelCased name false}}(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), {{#if (isString type)}} chip::ByteSpan(chip::Uint8::from_char(mValue), strlen(mValue)){{else}}mValue{{/if}});
     }
 
 private:
     chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback = new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback = new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    {{#if (isString type)}}
+    char * mValue;
+    {{else}}
     {{chipType}} mValue;
+    {{/if}}
 };
 
 {{/if}}

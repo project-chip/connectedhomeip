@@ -125,20 +125,15 @@ PacketBufferHandle encode{{asCamelCased clusterName false}}Cluster{{asType name}
 {
     COMMAND_HEADER("{{asType name}}", {{parent.define}}_ID);
     {{#chip_server_cluster_command_arguments}}
-    {{#if (isByteString type)}}
-    if (!CanCastTo<uint8_t>({{asCamelCased label}}.size()))
-    {
-        ChipLogError(Zcl, "Error encoding %s command. String too long: %zu", kName, {{asCamelCased label}}.size());
-        return PacketBufferHandle();
-    }
-    {{else if (isString type)}}
-    size_t {{asCamelCased label}}StrLen = strlen({{asCamelCased label}});
-    if (!CanCastTo<uint8_t>({{asCamelCased label}}StrLen))
+    {{#if (isString type)}}
+    size_t {{asCamelCased label}}StrLen = {{asCamelCased label}}.size();
+    if (!CanCastTo<{{#if (isShortString type)}}uint8_t{{else}}uint16_t{{/if}}>({{asCamelCased label}}StrLen))
     {
         ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, {{asCamelCased label}}StrLen);
         return PacketBufferHandle();
     }
     {{/if}}
+
     {{/chip_server_cluster_command_arguments}}
       buf
     {{#if (isManufacturerSpecificCommand)}}
@@ -150,12 +145,9 @@ PacketBufferHandle encode{{asCamelCased clusterName false}}Cluster{{asType name}
        .Put8(seqNum)
        .Put8(ZCL_{{asDelimitedMacro name}}_COMMAND_ID)
     {{#chip_server_cluster_command_arguments}}
-    {{#if (isByteString type)}}
-       .Put(static_cast<uint8_t>({{asCamelCased label}}.size()))
+    {{#if (isString type)}}
+       .Put(static_cast<{{#if (isShortString type)}}uint8_t{{else}}uint16_t{{/if}}>({{asCamelCased label}}StrLen))
        .Put({{asCamelCased label}}.data(), {{asCamelCased label}}.size())
-    {{else if (isString type)}}
-       .Put(static_cast<uint8_t>({{asCamelCased label}}StrLen))
-       .Put({{asCamelCased label}})
     {{else if (isSignedType)}}
        .Put{{chipTypePutLength}}(static_cast<{{chipTypePutCastType}}>({{asCamelCased label}}))
     {{else}}
@@ -197,8 +189,8 @@ PacketBufferHandle encode{{asCamelCased parent.name false}}ClusterWrite{{asCamel
 {
     COMMAND_HEADER("Write{{asCamelCased parent.name false}}{{asCamelCased name false}}", {{parent.define}}_ID);
     {{#if (isString type)}}
-    size_t {{asCamelCased name}}StrLen = strlen({{asCamelCased name}});
-    if (!CanCastTo<uint8_t>({{asCamelCased name}}StrLen))
+    size_t {{asCamelCased name}}StrLen = {{asCamelCased name}}.size();
+    if (!CanCastTo<{{#if (isShortString type)}}uint8_t{{else}}uint16_t{{/if}}>({{asCamelCased name}}StrLen))
     {
         ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, {{asCamelCased name}}StrLen);
         return PacketBufferHandle();
@@ -211,11 +203,12 @@ PacketBufferHandle encode{{asCamelCased parent.name false}}ClusterWrite{{asCamel
        .Put16({{asHex attributeCode 4}})
        .Put8({{atomicTypeId}})
     {{#if (isString type)}}
-       .Put(static_cast<uint8_t>({{asCamelCased name}}StrLen))
-       .Put({{asCamelCased name}});
+       .Put(static_cast<{{#if (isShortString type)}}uint8_t{{else}}uint16_t{{/if}}>({{asCamelCased name}}StrLen))
+       .Put({{asCamelCased name}}.data(), {{asCamelCased name }}StrLen)
     {{else}}
-       .Put{{chipTypePutLength}}(static_cast<{{chipTypePutCastType}}>({{asCamelCased name}}));
+       .Put{{chipTypePutLength}}(static_cast<{{chipTypePutCastType}}>({{asCamelCased name}}))
     {{/if}}
+       ;
     COMMAND_FOOTER();
 }
 
