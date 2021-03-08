@@ -20,7 +20,7 @@ cd "$(dirname "$0")/../../examples"
 
 SUPPORTED_TOOLCHAIN=(GCC_ARM ARM)
 SUPPORTED_TARGET_BOARD=(DISCO_L475VG_IOT01A NRF52840_DK)
-SUPPORTED_APP=(shell)
+SUPPORTED_APP=(shell lock-app)
 SUPPORTED_PROFILES=(release develop debug)
 
 APP=shell

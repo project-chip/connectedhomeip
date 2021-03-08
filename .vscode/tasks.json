@@ -300,7 +300,25 @@
             ],
             "problemMatcher": [],
             "group": "build"
-        }
+        },
+        {
+            "label": "Build Mbed Lock-app Example",
+            "type": "shell",
+            "command": "scripts/examples/mbed_example.sh",
+            "args": [
+                "-a=lock-app",
+                "-b=${input:mbedTarget}",
+                "-p=${input:mbedProfile}"
+            ],
+            "group": "build",
+            "problemMatcher": {
+                "base": "$gcc",
+                "fileLocation": [
+                    "relative",
+                    "${workspaceFolder}/examples/lock-app/mbed/build"
+                ]
+            }
+        },
     ],
     "inputs": [
         {
