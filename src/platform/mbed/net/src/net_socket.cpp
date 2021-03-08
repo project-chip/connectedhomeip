@@ -15,8 +15,7 @@ Socket * getSocket(int id)
         return nullptr;
     }
 }
-
-int mbed_socket(int family, int type, int proto)
+int findMemForSocket()
 {
     int id = ERR_NO_MEMORY;
     for (int i = 0; i < MAX_SOCKET; i++)
@@ -27,6 +26,12 @@ int mbed_socket(int family, int type, int proto)
             break;
         }
     }
+    return id;
+}
+
+int mbed_socket(int family, int type, int proto)
+{
+    int id = findMemForSocket();
     if (id != ERR_NO_MEMORY)
     {
         switch (type)
@@ -84,7 +89,7 @@ int mbed_bind(int sock, const struct sockaddr * addr, socklen_t addrlen)
     auto * socket = getSocket(sock);
     if (socket == nullptr)
     {
-        return -1;
+        return ERR_NO_SOCKET;
     }
     SocketAddress sockAddr;
     return socket->bind(sockAddr);
@@ -95,7 +100,7 @@ int mbed_connect(int sock, const struct sockaddr * addr, socklen_t addrlen)
     auto * socket = getSocket(sock);
     if (socket == nullptr)
     {
-        return -1;
+        return ERR_NO_SOCKET;
     }
     SocketAddress sockAddr;
     return socket->connect(sockAddr);
@@ -106,7 +111,7 @@ int mbed_listen(int sock, int backlog)
     auto * socket = getSocket(sock);
     if (socket == nullptr)
     {
-        return -1;
+        return ERR_NO_SOCKET;
     }
 
     return socket->listen(backlog);
@@ -117,11 +122,26 @@ int mbed_accept(int sock, struct sockaddr * addr, socklen_t * addrlen)
     auto * socket = getSocket(sock);
     if (socket == nullptr)
     {
-        return -1;
+        return ERR_NO_SOCKET;
     }
+
     nsapi_error_t error;
-    socket->accept(&error); // must return socket
-    return 0;
+    int id                = findMemForSocket();
+    TCPSocket * tcpSocket = new (&sockets[id].tcpSocket) TCPSocket();
+    tcpSocket             = static_cast<TCPSocket *>(socket->accept(&error));
+
+    if (&sockets[id].tcpSocket == nullptr)
+    {
+        return ERR_NO_SOCKET;
+    }
+    if (sockets[id].tcpSocket.open(NetworkInterface::get_default_instance()) != NSAPI_ERROR_OK)
+    {
+        sockets[id].tcpSocket.~TCPSocket();
+        sockets[id].type = SOCKET_NOT_INITIALIZED;
+        return ERR_OPEN;
+    }
+    sockets[id].type = TCP_SOCKET;
+    return id;
 }
 
 ssize_t mbed_send(int sock, const void * buf, size_t len, int flags)

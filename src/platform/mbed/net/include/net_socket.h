@@ -17,6 +17,7 @@ extern "C" {
 #define SOCKET_NOT_INITIALIZED 0
 #define ERR_NO_MEMORY -1
 #define ERR_OPEN -2
+#define ERR_NO_SOCKET -3
 struct BSDSocket
 {
     BSDSocket() {}
