@@ -63,7 +63,6 @@ int main(void)
         goto exit;
     }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     LOG_INF("Init Thread stack");
     ret = ThreadStackMgr().InitThreadStack();
     if (ret != CHIP_NO_ERROR)
@@ -78,7 +77,6 @@ int main(void)
         LOG_ERR("ConnectivityMgr().SetThreadDeviceType() failed");
         goto exit;
     }
-#endif
 
     ret = GetAppTask().StartApp();
 
