@@ -52,8 +52,17 @@ shared_library("ChipDeviceCtrl") {
     "chip/native/StackInit.cpp",
   ]
 
-  if (current_os == "linux" && chip_enable_ble) {
-    sources += [ "chip/ble/LinuxImpl.cpp" ]
+  if (chip_enable_ble) {
+    if (current_os == "linux") {
+      sources += [ "chip/ble/LinuxImpl.cpp" ]
+    } else if (current_os == "mac") {
+      sources += [
+        "chip/ble/darwin/AdapterListing.mm",
+        "chip/ble/darwin/Scanning.mm",
+      ]
+    } else {
+      print("!!! WARNING: no BLE implementation for the current OS !!!")
+    }
   }
 
   public_deps = [
