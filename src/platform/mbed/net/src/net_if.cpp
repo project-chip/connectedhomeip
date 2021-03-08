@@ -1,5 +1,6 @@
+#include "common.h"
 #include <SocketAddress.h>
-#include <errno.h>
+#include <arpa/inet.h>
 #include <ifaddrs.h>
 #include <net/if.h>
 #include <net_if.h>
@@ -14,21 +15,21 @@ struct if_nameindex * mbed_if_nameindex(void)
     NetworkInterface * net_if = NetworkInterface::get_default_instance();
     if (net_if == nullptr)
     {
-        errno = ENOBUFS;
+        _set_errno(ENOBUFS);
         return NULL;
     }
 
     name_ptr = net_if->get_interface_name(name_ptr);
     if (name_ptr == NULL)
     {
-        errno = ENOBUFS;
+        _set_errno(ENOBUFS);
         return NULL;
     }
 
     struct if_nameindex * net_list = (struct if_nameindex *) calloc((MBED_NET_IF_LIST_SIZE), sizeof(struct if_nameindex));
     if (net_list == NULL)
     {
-        errno = ENOBUFS;
+        _set_errno(ENOBUFS);
         return NULL;
     }
 
@@ -37,7 +38,7 @@ struct if_nameindex * mbed_if_nameindex(void)
     net_list[0].if_name = (char *) malloc(IF_NAMESIZE);
     if (net_list[0].if_name == NULL)
     {
-        errno = ENOBUFS;
+        _set_errno(ENOBUFS);
         free(net_list);
         return NULL;
     }
@@ -72,14 +73,14 @@ char * mbed_if_indextoname(unsigned int ifindex, char * ifname)
 
     if (index < 0 || index > MBED_MAX_INTERFACES_NUM || ifname == NULL)
     {
-        errno = ENXIO;
+        _set_errno(ENXIO);
         return NULL;
     }
 
     struct if_nameindex * net_list = mbed_if_nameindex();
     if (net_list == NULL)
     {
-        errno = ENXIO;
+        _set_errno(ENXIO);
         return NULL;
     }
 
@@ -89,7 +90,7 @@ char * mbed_if_indextoname(unsigned int ifindex, char * ifname)
     }
     else
     {
-        errno = ENXIO;
+        _set_errno(ENXIO);
     }
 
     mbed_if_freenameindex(net_list);
@@ -102,14 +103,14 @@ unsigned int mbed_if_nametoindex(const char * ifname)
     unsigned int index, ret = 0;
     if (ifname == NULL)
     {
-        errno = ENXIO;
+        _set_errno(ENXIO);
         return 0;
     }
 
     struct if_nameindex * net_list = mbed_if_nameindex();
     if (net_list == NULL)
     {
-        errno = ENXIO;
+        _set_errno(ENXIO);
         return 0;
     }
 
@@ -140,7 +141,7 @@ int mbed_getifaddrs(struct ifaddrs ** ifap)
 
     if (ifap == NULL)
     {
-        errno = ENOBUFS;
+        _set_errno(ENOBUFS);
         return -1;
     }
 
@@ -149,21 +150,21 @@ int mbed_getifaddrs(struct ifaddrs ** ifap)
     NetworkInterface * net_if = NetworkInterface::get_default_instance();
     if (net_if == nullptr)
     {
-        errno = ENETUNREACH;
+        _set_errno(ENETUNREACH);
         return -1;
     }
 
     name_ptr = net_if->get_interface_name(name_ptr);
     if (name_ptr == NULL)
     {
-        errno = ENOTTY;
+        _set_errno(ENOTTY);
         return -1;
     }
 
     err = net_if->connect();
     if (err != NSAPI_ERROR_OK)
     {
-        errno = ENOTTY;
+        _set_errno(ENOTTY);
         return -1;
     }
 
@@ -176,7 +177,7 @@ int mbed_getifaddrs(struct ifaddrs ** ifap)
     tmp = (struct ifaddrs *) calloc(1, sizeof(struct ifaddrs));
     if (tmp == NULL)
     {
-        errno = ENOBUFS;
+        _set_errno(ENOBUFS);
         return -1;
     }
 
@@ -188,7 +189,7 @@ int mbed_getifaddrs(struct ifaddrs ** ifap)
     tmp->ifa_name = (char *) malloc(IF_NAMESIZE);
     if (tmp->ifa_name == NULL)
     {
-        errno = ENOBUFS;
+        _set_errno(ENOBUFS);
         mbed_freeifaddrs(tmp);
         return -1;
     }
@@ -203,7 +204,7 @@ int mbed_getifaddrs(struct ifaddrs ** ifap)
     tmp->ifa_addr = (struct sockaddr *) malloc(sizeof(struct sockaddr));
     if (tmp->ifa_addr == NULL)
     {
-        errno = ENOBUFS;
+        _set_errno(ENOBUFS);
         mbed_freeifaddrs(tmp);
         return -1;
     }
@@ -213,7 +214,7 @@ int mbed_getifaddrs(struct ifaddrs ** ifap)
     tmp->ifa_netmask = (struct sockaddr *) malloc(sizeof(struct sockaddr));
     if (tmp->ifa_netmask == NULL)
     {
-        errno = ENOBUFS;
+        _set_errno(ENOBUFS);
         mbed_freeifaddrs(tmp);
         return -1;
     }
@@ -287,6 +288,7 @@ static char * inet_ntop4(const void * src, char * dst, size_t size)
     l = snprintf(tmp, sizeof(tmp), "%u.%u.%u.%u", buf[0], buf[1], buf[2], buf[3]);
     if (l <= 0 || l >= size)
     {
+        _set_errno(ENOSPC);
         return (NULL);
     }
     strlcpy(dst, tmp, size);
@@ -295,7 +297,6 @@ static char * inet_ntop4(const void * src, char * dst, size_t size)
 
 static char * inet_ntop6(const void * src, char * dst, size_t size)
 {
-    return NULL;
     /*
      * Note that int32_t and int16_t need only be "at least" large enough
      * to contain a value of the specified size.  On some systems, like
@@ -303,97 +304,132 @@ static char * inet_ntop6(const void * src, char * dst, size_t size)
      * Keep this in mind if you think this function should have been coded
      * to use pointer overlays.  All the world's not a VAX.
      */
-    // char tmp[sizeof "ffff:ffff:ffff:ffff:ffff:ffff:255.255.255.255"];
-    // char *tp, *ep;
-    // struct { int base, len; } best, cur;
-    // u_int words[IN6ADDRSZ / INT16SZ];
-    // int i;
-    // int advance;
+    char tmp[sizeof "ffff:ffff:ffff:ffff:ffff:ffff:255.255.255.255"];
+    char *tp, *ep;
+    struct
+    {
+        int base, len;
+    } best, cur;
+    u_int words[IN6ADDRSZ / INT16SZ];
+    int i;
+    int advance;
 
-    // /*
-    //  * Preprocess:
-    //  *	Copy the input (bytewise) array into a wordwise array.
-    //  *	Find the longest run of 0x00's in src[] for :: shorthanding.
-    //  */
-    // memset(words, '\0', sizeof words);
-    // for (i = 0; i < IN6ADDRSZ; i++)
-    // 	words[i / 2] |= (src[i] << ((1 - (i % 2)) << 3));
-    // best.base = -1;
-    // cur.base = -1;
-    // for (i = 0; i < (IN6ADDRSZ / INT16SZ); i++) {
-    // 	if (words[i] == 0) {
-    // 		if (cur.base == -1)
-    // 			cur.base = i, cur.len = 1;
-    // 		else
-    // 			cur.len++;
-    // 	} else {
-    // 		if (cur.base != -1) {
-    // 			if (best.base == -1 || cur.len > best.len)
-    // 				best = cur;
-    // 			cur.base = -1;
-    // 		}
-    // 	}
-    // }
-    // if (cur.base != -1) {
-    // 	if (best.base == -1 || cur.len > best.len)
-    // 		best = cur;
-    // }
-    // if (best.base != -1 && best.len < 2)
-    // 	best.base = -1;
+    uint8_t * buf = (uint8_t *) src;
 
-    // /*
-    //  * Format the result.
-    //  */
-    // tp = tmp;
-    // ep = tmp + sizeof(tmp);
-    // for (i = 0; i < (IN6ADDRSZ / INT16SZ) && tp < ep; i++) {
-    // 	/* Are we inside the best run of 0x00's? */
-    // 	if (best.base != -1 && i >= best.base &&
-    // 	    i < (best.base + best.len)) {
-    // 		if (i == best.base) {
-    // 			if (tp + 1 >= ep)
-    // 				return (NULL);
-    // 			*tp++ = ':';
-    // 		}
-    // 		continue;
-    // 	}
-    // 	/* Are we following an initial run of 0x00s or any real hex? */
-    // 	if (i != 0) {
-    // 		if (tp + 1 >= ep)
-    // 			return (NULL);
-    // 		*tp++ = ':';
-    // 	}
-    // 	/* Is this address an encapsulated IPv4? */
-    // 	if (i == 6 && best.base == 0 &&
-    // 	    (best.len == 6 || (best.len == 5 && words[5] == 0xffff))) {
-    // 		if (!inet_ntop4(src+12, tp, (size_t)(ep - tp)))
-    // 			return (NULL);
-    // 		tp += strlen(tp);
-    // 		break;
-    // 	}
-    // 	advance = snprintf(tp, ep - tp, "%x", words[i]);
-    // 	if (advance <= 0 || advance >= ep - tp)
-    // 		return (NULL);
-    // 	tp += advance;
-    // }
-    // /* Was it a trailing run of 0x00's? */
-    // if (best.base != -1 && (best.base + best.len) == (IN6ADDRSZ / INT16SZ)) {
-    // 	if (tp + 1 >= ep)
-    // 		return (NULL);
-    // 	*tp++ = ':';
-    // }
-    // if (tp + 1 >= ep)
-    // 	return (NULL);
-    // *tp++ = '\0';
+    /*
+     * Preprocess:
+     *	Copy the input (bytewise) array into a wordwise array.
+     *	Find the longest run of 0x00's in buf[] for :: shorthanding.
+     */
+    memset(words, '\0', sizeof words);
+    for (i = 0; i < IN6ADDRSZ; i++)
+        words[i / 2] |= (buf[i] << ((1 - (i % 2)) << 3));
+    best.base = -1;
+    cur.base  = -1;
+    for (i = 0; i < (IN6ADDRSZ / INT16SZ); i++)
+    {
+        if (words[i] == 0)
+        {
+            if (cur.base == -1)
+                cur.base = i, cur.len = 1;
+            else
+                cur.len++;
+        }
+        else
+        {
+            if (cur.base != -1)
+            {
+                if (best.base == -1 || cur.len > best.len)
+                    best = cur;
+                cur.base = -1;
+            }
+        }
+    }
+    if (cur.base != -1)
+    {
+        if (best.base == -1 || cur.len > best.len)
+            best = cur;
+    }
+    if (best.base != -1 && best.len < 2)
+        best.base = -1;
 
-    // /*
-    //  * Check for overflow, copy, and we're done.
-    //  */
-    // if ((size_t)(tp - tmp) > size) {
-    // 	return (NULL);
-    // }
-    // strlcpy(dst, tmp, size);
-    // return (dst);
+    /*
+     * Format the result.
+     */
+    tp = tmp;
+    ep = tmp + sizeof(tmp);
+    for (i = 0; i < (IN6ADDRSZ / INT16SZ) && tp < ep; i++)
+    {
+        /* Are we inside the best run of 0x00's? */
+        if (best.base != -1 && i >= best.base && i < (best.base + best.len))
+        {
+            if (i == best.base)
+            {
+                if (tp + 1 >= ep)
+                {
+                    _set_errno(ENOSPC);
+                    return (NULL);
+                }
+
+                *tp++ = ':';
+            }
+            continue;
+        }
+        /* Are we following an initial run of 0x00s or any real hex? */
+        if (i != 0)
+        {
+            if (tp + 1 >= ep)
+            {
+                _set_errno(ENOSPC);
+                return (NULL);
+            }
+            *tp++ = ':';
+        }
+        /* Is this address an encapsulated IPv4? */
+        if (i == 6 && best.base == 0 && (best.len == 6 || (best.len == 5 && words[5] == 0xffff)))
+        {
+            if (!inet_ntop4(buf + 12, tp, (size_t)(ep - tp)))
+            {
+                return (NULL);
+            }
+            tp += strlen(tp);
+            break;
+        }
+        advance = snprintf(tp, ep - tp, "%x", words[i]);
+        if (advance <= 0 || advance >= ep - tp)
+        {
+            _set_errno(ENOSPC);
+            return (NULL);
+        }
+        tp += advance;
+    }
+    /* Was it a trailing run of 0x00's? */
+    if (best.base != -1 && (best.base + best.len) == (IN6ADDRSZ / INT16SZ))
+    {
+        if (tp + 1 >= ep)
+        {
+            _set_errno(ENOSPC);
+            return (NULL);
+        }
+        *tp++ = ':';
+    }
+    if (tp + 1 >= ep)
+    {
+        _set_errno(ENOSPC);
+        return (NULL);
+    }
+    *tp++ = '\0';
+
+    /*
+     * Check for overflow, copy, and we're done.
+     */
+    if ((size_t)(tp - tmp) > size)
+    {
+        _set_errno(ENOSPC);
+        return (NULL);
+    }
+    strlcpy(dst, tmp, size);
+    return (dst);
 }
 
 char * mbed_inet_ntop(sa_family_t family, const void * src, char * dst, size_t size)
@@ -405,13 +441,175 @@ char * mbed_inet_ntop(sa_family_t family, const void * src, char * dst, size_t s
     case AF_INET6:
         return (inet_ntop6(src, dst, (size_t) size));
     default:
+        _set_errno(EAFNOSUPPORT);
         return (NULL);
     }
 }
 
+/* Return the value of CH as a hexademical digit, or -1 if it is a
+   different type of character.  */
+static int hex_digit_value(char ch)
+{
+    if ('0' <= ch && ch <= '9')
+        return ch - '0';
+    if ('a' <= ch && ch <= 'f')
+        return ch - 'a' + 10;
+    if ('A' <= ch && ch <= 'F')
+        return ch - 'A' + 10;
+    return -1;
+}
+
+static int inet_pton4(const char * src, void * dst)
+{
+    int saw_digit, octets, ch;
+    unsigned char tmp[INADDRSZ], *tp;
+
+    const char * end = src + strlen(src);
+
+    saw_digit   = 0;
+    octets      = 0;
+    *(tp = tmp) = 0;
+    while (src < end)
+    {
+        ch = *src++;
+        if (ch >= '0' && ch <= '9')
+        {
+            unsigned int digit = *tp * 10 + (ch - '0');
+
+            if (saw_digit && *tp == 0)
+                return 0;
+            if (digit > 255)
+                return 0;
+            *tp = digit;
+            if (!saw_digit)
+            {
+                if (++octets > 4)
+                    return 0;
+                saw_digit = 1;
+            }
+        }
+        else if (ch == '.' && saw_digit)
+        {
+            if (octets == 4)
+                return 0;
+            *++tp     = 0;
+            saw_digit = 0;
+        }
+        else
+            return 0;
+    }
+    if (octets < 4)
+        return 0;
+    memcpy((unsigned char *) dst, tmp, INADDRSZ);
+    return 1;
+}
+
+static int inet_pton6(const char * src, void * dst)
+{
+    unsigned char tmp[IN6ADDRSZ], *tp, *endp, *colonp;
+    const char * curtok;
+    int ch;
+    size_t xdigits_seen; /* Number of hex digits since colon.  */
+    unsigned int val;
+
+    const char * src_endp = src + strlen(src);
+
+    tp     = (unsigned char *) memset(tmp, '\0', IN6ADDRSZ);
+    endp   = tp + IN6ADDRSZ;
+    colonp = NULL;
+
+    /* Leading :: requires some special handling.  */
+    if (src == src_endp)
+        return 0;
+    if (*src == ':')
+    {
+        ++src;
+        if (src == src_endp || *src != ':')
+            return 0;
+    }
+
+    curtok       = src;
+    xdigits_seen = 0;
+    val          = 0;
+    while (src < src_endp)
+    {
+        ch        = *src++;
+        int digit = hex_digit_value(ch);
+        if (digit >= 0)
+        {
+            if (xdigits_seen == 4)
+                return 0;
+            val <<= 4;
+            val |= digit;
+            if (val > 0xffff)
+                return 0;
+            ++xdigits_seen;
+            continue;
+        }
+        if (ch == ':')
+        {
+            curtok = src;
+            if (xdigits_seen == 0)
+            {
+                if (colonp)
+                    return 0;
+                colonp = tp;
+                continue;
+            }
+            else if (src == src_endp)
+                return 0;
+            if (tp + INT16SZ > endp)
+                return 0;
+            *tp++        = (unsigned char) (val >> 8) & 0xff;
+            *tp++        = (unsigned char) val & 0xff;
+            xdigits_seen = 0;
+            val          = 0;
+            continue;
+        }
+        if (ch == '.' && ((tp + INADDRSZ) <= endp) && inet_pton4(curtok, tp) > 0)
+        {
+            tp += INADDRSZ;
+            xdigits_seen = 0;
+            break; /* '\0' was seen by inet_pton4.  */
+        }
+        return 0;
+    }
+    if (xdigits_seen > 0)
+    {
+        if (tp + INT16SZ > endp)
+            return 0;
+        *tp++ = (unsigned char) (val >> 8) & 0xff;
+        *tp++ = (unsigned char) val & 0xff;
+    }
+    if (colonp != NULL)
+    {
+        /* Replace :: with zeros.  */
+        if (tp == endp)
+            /* :: would expand to a zero-width field.  */
+            return 0;
+        size_t n = tp - colonp;
+        memmove(endp - n, colonp, n);
+        memset(colonp, 0, endp - n - colonp);
+        tp = endp;
+    }
+    if (tp != endp)
+        return 0;
+    memcpy((unsigned char *) dst, tmp, IN6ADDRSZ);
+    return 1;
+}
+
 int mbed_inet_pton(sa_family_t family, const char * src, void * dst)
 {
-    return 0;
+    switch (family)
+    {
+    case AF_INET:
+        return inet_pton4(src, dst);
+    case AF_INET6:
+        return inet_pton6(src, dst);
+    default:
+        _set_errno(EAFNOSUPPORT);
+        return -1;
+    }
 }
 
 int mbed_ioctl(int fd, unsigned long request, void * param)
@@ -422,8 +620,8 @@ int mbed_ioctl(int fd, unsigned long request, void * param)
     case SIOCGIFFLAGS: {
         if (param == NULL)
         {
-            errno = EFAULT;
-            ret   = -1;
+            _set_errno(EFAULT);
+            ret = -1;
             break;
         }
         struct ifreq * intfData = (struct ifreq *) param;
@@ -433,16 +631,16 @@ int mbed_ioctl(int fd, unsigned long request, void * param)
         NetworkInterface * net_if = NetworkInterface::get_default_instance();
         if (net_if == nullptr)
         {
-            errno = ENOTTY;
-            ret   = -1;
+            _set_errno(ENOTTY);
+            ret = -1;
             break;
         }
 
         err = net_if->connect();
         if (err != NSAPI_ERROR_OK)
         {
-            errno = ENOTTY;
-            ret   = -1;
+            _set_errno(ENOTTY);
+            ret = -1;
             break;
         }
 
@@ -460,15 +658,15 @@ int mbed_ioctl(int fd, unsigned long request, void * param)
         err = net_if->get_ip_address(&ip);
         if (err != NSAPI_ERROR_OK)
         {
-            errno = ENOTTY;
-            ret   = -1;
+            _set_errno(ENOTTY);
+            ret = -1;
             break;
         }
         err = net_if->get_netmask(&netmask);
         if (err != NSAPI_ERROR_OK)
         {
-            errno = ENOTTY;
-            ret   = -1;
+            _set_errno(ENOTTY);
+            ret = -1;
             break;
         }
 
@@ -508,8 +706,8 @@ int mbed_ioctl(int fd, unsigned long request, void * param)
     }
 
     default:
-        errno = ENOTTY;
-        ret   = -1;
+        _set_errno(ENOTTY);
+        ret = -1;
     }
     return ret;
 }

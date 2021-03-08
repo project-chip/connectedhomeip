@@ -14,6 +14,10 @@ extern "C" {
  */
 #define INET6_ADDRSTRLEN 46
 
+#define INADDRSZ 4
+#define IN6ADDRSZ 16
+#define INT16SZ 2
+
 char * inet_ntop(sa_family_t family, const void * src, char * dst, size_t size);
 int inet_pton(sa_family_t family, const char * src, void * dst);
 
