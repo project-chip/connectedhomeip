@@ -140,7 +140,8 @@ CHIP_ERROR ExchangeManager::UnregisterUnsolicitedMessageHandlerForType(uint32_t 
     return UnregisterUMH(protocolId, static_cast<int16_t>(msgType));
 }
 
-void ExchangeManager::OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source, SecureSessionMgr * secureSessionManager)
+void ExchangeManager::OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source,
+                                     SecureSessionMgr * secureSessionManager)
 {
     ChipLogError(ExchangeManager, "Accept FAILED, err = %s", ErrorStr(error));
     // TODO(#4170): it won't be necessary after fully migrated to messaging layer
@@ -231,7 +232,8 @@ void ExchangeManager::HandleGroupMessageReceived(const PacketHeader & packetHead
 }
 
 void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                                        SecureSessionHandle session, System::PacketBufferHandle msgBuf, SecureSessionMgr * secureSessionManager)
+                                        SecureSessionHandle session, System::PacketBufferHandle msgBuf,
+                                        SecureSessionMgr * secureSessionManager)
 {
     CHIP_ERROR err                          = CHIP_NO_ERROR;
     UnsolicitedMessageHandler * umh         = nullptr;
@@ -242,7 +244,8 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
     {
         // TODO(#4170): it won't be necessary after fully migrated to messaging layer
         if (mLegacySecureSessionEventReceiver != nullptr)
-            mLegacySecureSessionEventReceiver->OnMessageReceived(packetHeader, payloadHeader, session, std::move(msgBuf), secureSessionManager);
+            mLegacySecureSessionEventReceiver->OnMessageReceived(packetHeader, payloadHeader, session, std::move(msgBuf),
+                                                                 secureSessionManager);
         ExitNow(err = CHIP_NO_ERROR);
     }
 
