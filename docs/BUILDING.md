@@ -94,7 +94,7 @@ restart the RPi:
     sudo btmgmt -i hci0 power on
     
 (note: raspberry pi has a dual mode bluetooth chip. RPi
-or android phones by default tries to connect using a classic mode(BREDR).
+or android phones by default try to connect using a classic mode(BREDR).
 Therefore we must disable bredr in /etc/bluetooth/main.conf or use btmgmt to
 disable bredr as the workaround, we will investigate the better solution in
 issue #5010)
