@@ -161,7 +161,12 @@ static BluezLEAdvertisement1 * BluezAdvertisingCreate(BluezEndpoint * apEndpoint
     bluez_leadvertisement1_set_service_data(adv, serviceData);
     // empty data
 
+    // Setting "Discoverable" to False on the adapter and to True on the advertisement convinces
+    // Bluez to set "BR/EDR Not Supported" flag. Bluez doesn't provide API to do that explicitly
+    // and the flag is necessary to force using LE transport.
     bluez_leadvertisement1_set_discoverable(adv, (apEndpoint->mType & BLUEZ_ADV_TYPE_SCANNABLE) ? TRUE : FALSE);
+    if (apEndpoint->mType & BLUEZ_ADV_TYPE_SCANNABLE)
+        bluez_leadvertisement1_set_discoverable_timeout(adv, UINT16_MAX);
 
     // advertising name corresponding to the PID and object path, for debug purposes
     bluez_leadvertisement1_set_local_name(adv, localName);
@@ -1017,10 +1022,10 @@ static void bluezObjectsSetup(BluezEndpoint * apEndpoint)
     VerifyOrExit(apEndpoint->mpAdapter != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL apEndpoint->mpAdapter in %s", __func__));
     bluez_adapter1_set_powered(apEndpoint->mpAdapter, TRUE);
 
-    // with BLE we are discoverable only when advertising so this can be
-    // set once on init
-    bluez_adapter1_set_discoverable_timeout(apEndpoint->mpAdapter, 0);
-    bluez_adapter1_set_discoverable(apEndpoint->mpAdapter, TRUE);
+    // Setting "Discoverable" to False on the adapter and to True on the advertisement convinces
+    // Bluez to set "BR/EDR Not Supported" flag. Bluez doesn't provide API to do that explicitly
+    // and the flag is necessary to force using LE transport.
+    bluez_adapter1_set_discoverable(apEndpoint->mpAdapter, FALSE);
 
 exit:
     g_list_free_full(objects, g_object_unref);
