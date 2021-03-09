@@ -39,6 +39,8 @@ jobs:
               with:
                   fetch-depth: 0
                   submodules: true
+            - name: Update nRF Connect SDK revision to the currently recommended.
+              run: python3 scripts/setup/nrfconnect/update_ncs.py --update
             # https://github.com/project-chip/connectedhomeip/issues/3100
             # - name: Initialize CodeQL
             #   uses: github/codeql-action/init@v1
