@@ -89,7 +89,8 @@ with other Thread devices in the network.
 
 ## Requirements
 
-The application requires the nRF Connect SDK v1.5.0 to work correctly.
+The application requires a specific revision of the nRF Connect SDK to work correctly.
+See [Setting up the environment](#setting-up-the-environment) for more information.
 
 <a name="supported_devices"></a>
 
@@ -176,8 +177,8 @@ using the following command:
 
         $ git submodule update --init
 
-The example requires the nRF Connect SDK v1.5.0. You can either install it along
-with the related tools directly on your system or use a Docker image that has
+The example requires a specific revision of the nRF Connect SDK.
+You can either install it along with the related tools directly on your system or use a Docker image that has
 the tools pre-installed.
 
 If you are a macOS user, you won't be able to use the Docker container to flash
@@ -220,13 +221,10 @@ To use the Docker container for setup, complete the following steps:
     -   _-e RUNAS=\$(id -u)_ is needed to start the container session as the
         current user instead of root.
 
-4.  Check out or update the nRF Connect SDK to the recommended `v1.5.0` version
-    by running the following command in the Docker container:
+4.  Update the nRF Connect SDK to the most recent supported revision, by running the following command:
 
-         $ setup --ncs v1.5.0
-         /var/ncs repository is empty. Do you wish to check out nRF Connect SDK sources [v1.5.0]? [Y/N] y
-         ...
-         /var/chip repository is initialized, skipping...
+         $ cd /var/chip
+         $ python3 scripts/setup/nrfconnect/update_ncs.py --update
 
 Now you can proceed with the [Building](#building) instruction.
 
@@ -239,23 +237,14 @@ To use the native shell for setup, complete the following steps:
     -   [nRF Command Line Tools](https://www.nordicsemi.com/Software-and-Tools/Development-Tools/nRF-Command-Line-Tools)
     -   [GN meta-build system](https://gn.googlesource.com/gn/)
 
-2.  Depending on whether you have the nRF Connect SDK installed:
+2.  If you do not have the nRF Connect SDK installed, follow the
+    [guide](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/gs_assistant.html#)
+    in the nRF Connect SDK documentation to install the latest stable nRF Connect SDK
+    version. Since command-line tools will be used for building the example,
+    installing SEGGER Embedded Studio is not required.
 
-    -   Follow the
-        [guide](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/gs_assistant.html#)
-        in the nRF Connect SDK documentation to install the nRF Connect SDK
-        v1.5.0. Since command-line tools will be used for building the example,
-        installing SEGGER Embedded Studio is not required.
-
-    -   If you have an older version of the SDK installed, use the following
-        commands to update it to the recommended version. Replace
-        _nrfconnect-dir_ with the path to your nRF Connect SDK installation
-        directory.
-
-               $ cd nrfconnect-dir/nrf
-               $ git fetch origin
-               $ git checkout v1.5.0
-               $ west update
+    If you have the SDK already installed, continue to the next step and update 
+    the nRF Connect SDK after initializing environment variables.
 
 3.  Initialize environment variables referred to by the CHIP and the nRF Connect
     SDK build scripts. Replace _nrfconnect-dir_ with the path to your nRF
@@ -265,6 +254,12 @@ To use the native shell for setup, complete the following steps:
          $ source nrfconnect-dir/zephyr/zephyr-env.sh
          $ export ZEPHYR_TOOLCHAIN_VARIANT=gnuarmemb
          $ export GNUARMEMB_TOOLCHAIN_PATH=toolchain-dir
+
+4.  Update the nRF Connect SDK to the most recent supported revision
+    by running the following command (replace _chip-dir_ with the path to CHIP repository directory):
+
+         $ cd chip-dir
+         $ python3 scripts/setup/nrfconnect/update_ncs.py --update
 
 Now you can proceed with the [Building](#building) instruction.
 
