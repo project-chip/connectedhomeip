@@ -411,7 +411,7 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters &
 
     FullQName operationalServiceName = AllocateQName("_chip", "_tcp", "local");
     FullQName operationalServerName  = AllocateQName(uniqueName, "_chip", "_tcp", "local");
-    FullQName serverName             = AllocateQName(uniqueName, "local");
+    FullQName serverName             = AllocateQName(params.GetHostname(), "local");
 
     if ((operationalServiceName.nameCount == 0) || (operationalServerName.nameCount == 0) || (serverName.nameCount == 0))
     {
@@ -478,7 +478,7 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
 
     FullQName operationalServiceName = AllocateQName(serviceType, "_udp", "local");
     FullQName operationalServerName  = AllocateQName(nameBuffer, serviceType, "_udp", "local");
-    FullQName serverName             = AllocateQName(nameBuffer, "local");
+    FullQName serverName             = AllocateQName(params.GetHostname(), "local");
 
     if ((operationalServiceName.nameCount == 0) || (operationalServerName.nameCount == 0) || (serverName.nameCount == 0))
     {

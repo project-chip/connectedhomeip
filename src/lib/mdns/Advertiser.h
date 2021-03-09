@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <algorithm>
 #include <cstdint>
 
 #include <core/CHIPError.h>
@@ -51,11 +52,37 @@ public:
         return *reinterpret_cast<Derived *>(this);
     }
     bool IsIPv4Enabled() const { return mEnableIPv4; }
+    Derived & SetMac(uint8_t * mac, size_t size)
+    {
+        macSize = std::min(size, kMaxMacSize);
+        memcpy(mMac, mac, macSize);
+        // Fill in the host name here so it's available.
+        size_t idx = 0;
+        for (size_t i = 0; i < macSize; ++i)
+        {
+            if (idx > kMaxHostnameSize - 2)
+            {
+                ChipLogError(Discovery, "Failed to allocate full hostname");
+                break;
+            }
+            idx += snprintf(hostname + idx, 3, "%02X", mac[i]);
+        }
+        return *reinterpret_cast<Derived *>(this);
+    }
+    const uint8_t * GetMac() const { return mMac; }
+    size_t GetMacSize() const { return macSize; }
+    const char * GetHostname() const { return hostname; }
 
 private:
-    uint16_t mPort   = CHIP_PORT;
-    bool mEnableIPv4 = true;
-};
+    static constexpr size_t kMaxMacSize = 8;
+    // 2-byte ascii for 8-byte mac + 1 for null
+    static constexpr size_t kMaxHostnameSize = kMaxMacSize * 2;
+    uint16_t mPort                           = CHIP_PORT;
+    bool mEnableIPv4                         = true;
+    uint8_t mMac[kMaxMacSize]                = {};
+    size_t macSize                           = kMaxMacSize;
+    char hostname[kMaxHostnameSize + 1]      = "000000000000";
+}; // namespace Mdns
 
 /// Defines parameters required for advertising a CHIP node
 /// over mDNS as an 'operationally ready' node.
