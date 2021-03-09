@@ -36,7 +36,10 @@ private:
     friend class GenericDeviceNetworkProvisioningDelegateImpl<DeviceNetworkProvisioningDelegateImpl>;
 
     CHIP_ERROR _ProvisionWiFiNetwork(const char * ssid, const char * passwd);
-    CHIP_ERROR _ProvisionThreadNetwork(DeviceLayer::Internal::DeviceNetworkInfo & threadData) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR _ProvisionThreadNetwork(DeviceLayer::Internal::ThreadOperationalDataset & threadData)
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
 };
 
 } // namespace DeviceLayer

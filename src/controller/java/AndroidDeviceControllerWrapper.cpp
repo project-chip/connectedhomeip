@@ -20,6 +20,7 @@
 
 #include <memory>
 
+#include <support/ThreadOperationalDataset.h>
 using chip::PersistentStorageResultDelegate;
 using chip::Controller::DeviceCommissioner;
 
@@ -212,7 +213,7 @@ void AndroidDeviceControllerWrapper::SendNetworkCredentials(const char * ssid, c
     mCredentialsDelegate->SendNetworkCredentials(ssid, password);
 }
 
-void AndroidDeviceControllerWrapper::SendThreadCredentials(const chip::DeviceLayer::Internal::DeviceNetworkInfo & threadData)
+void AndroidDeviceControllerWrapper::SendThreadCredentials(const chip::DeviceLayer::Internal::ThreadOperationalDataset & threadData)
 {
     if (mCredentialsDelegate == nullptr)
     {
@@ -220,8 +221,15 @@ void AndroidDeviceControllerWrapper::SendThreadCredentials(const chip::DeviceLay
         return;
     }
 
-    ChipLogProgress(Controller, "Sending Thread credentials for channel %u, PAN ID %x...", threadData.ThreadChannel,
-                    threadData.ThreadPANId);
+    const chip::Thread::OperationalDataset & dataset = static_cast<const chip::Thread::OperationalDataset &>(threadData);
+
+    uint16_t channel = chip::Thread::kChannel_NotSpecified;
+    uint16_t panid   = chip::Thread::kPANId_NotSpecified;
+
+    dataset.GetChannel(channel);
+    dataset.GetPanId(panid);
+
+    ChipLogProgress(Controller, "Sending Thread credentials for channel %u, PAN ID %x...", channel, panid);
     mCredentialsDelegate->SendThreadCredentials(threadData);
 }
 

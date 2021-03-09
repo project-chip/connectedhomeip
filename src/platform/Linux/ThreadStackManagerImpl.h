@@ -46,11 +46,9 @@ public:
 
     void _OnPlatformEvent(const ChipDeviceEvent * event);
 
-    CHIP_ERROR _GetThreadProvision(Internal::DeviceNetworkInfo & netInfo, bool includeCredentials);
+    CHIP_ERROR _GetThreadProvision(Internal::ThreadOperationalDataset & netInfo, bool includeCredentials);
 
-    CHIP_ERROR _SetThreadProvision(const Internal::DeviceNetworkInfo & netInfo);
-
-    CHIP_ERROR _SetThreadProvision(const uint8_t * operationalDataset, size_t operationalDatasetLen);
+    CHIP_ERROR _SetThreadProvision(const Internal::ThreadOperationalDataset & netInfo);
 
     void _ErasePersistentInfo();
 
@@ -108,8 +106,7 @@ private:
 
     std::unique_ptr<otbr::DBus::ThreadApiDBus> mThreadApi;
     UniqueDBusConnection mConnection;
-    std::vector<uint8_t> mOperationalDatasetTlv;
-    Internal::DeviceNetworkInfo mNetworkInfo;
+    Internal::ThreadOperationalDataset mNetworkInfo;
     bool mAttached;
     std::thread mDBusEventLoop;
 };

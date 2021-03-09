@@ -85,7 +85,7 @@ public:
     ~NetworkProvisioning();
 
     CHIP_ERROR SendNetworkCredentials(const char * ssid, const char * passwd);
-    CHIP_ERROR SendThreadCredentials(const DeviceLayer::Internal::DeviceNetworkInfo & threadData);
+    CHIP_ERROR SendThreadCredentials(const DeviceLayer::Internal::ThreadOperationalDataset & threadData);
 
     CHIP_ERROR HandleNetworkProvisioningMessage(uint8_t msgType, const System::PacketBufferHandle & msgBuf);
 

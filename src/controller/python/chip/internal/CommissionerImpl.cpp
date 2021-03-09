@@ -19,6 +19,7 @@
 #include <controller/CHIPDeviceController.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/KeyValueStoreManager.h>
+#include <support/ThreadOperationalDataset.h>
 #include <support/logging/CHIPLogging.h>
 
 #include "ChipThreadWork.h"
@@ -147,7 +148,7 @@ public:
         mCredentialsDelegate->SendNetworkCredentials(ssid, password);
     }
 
-    void SetThreadCredentials(const chip::DeviceLayer::Internal::DeviceNetworkInfo & threadData)
+    void SetThreadCredentials(const chip::DeviceLayer::Internal::ThreadOperationalDataset & threadData)
     {
         if (mCredentialsDelegate == nullptr)
         {
@@ -179,29 +180,25 @@ extern "C" void pychip_internal_PairingDelegate_SetWifiCredentials(const char * 
 
 extern "C" CHIP_ERROR pychip_internal_PairingDelegate_SetThreadCredentials(const void * data, uint32_t length)
 {
+    chip::Thread::OperationalDataset threadInfo;
 
     // Openthread is OPAQUE by the spec, however current CHIP stack does not have any
     // validation/support for opaque blobs. As a result, we try to do some
     // pre-validation here
 
-    // TODO: there should be uniform 'BLOBL' support within the thread stack
-    if (length != sizeof(chip::DeviceLayer::Internal::DeviceNetworkInfo))
+    if (length > sizeof(threadInfo.mData))
     {
-        ChipLogError(Controller, "Received invalid thread credential blob. Expected size %u and got %u bytes instead",
-                     sizeof(chip::DeviceLayer::Internal::DeviceNetworkInfo), length);
+        ChipLogError(Controller, "Received invalid thread credential blob. Expected size no more than %u and got %u bytes instead",
+                     sizeof(threadInfo.mData), length);
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    // unsure about alignment so copy into a properly aligned item
-    chip::DeviceLayer::Internal::DeviceNetworkInfo threadInfo;
-    memcpy(&threadInfo, data, sizeof(threadInfo));
+    memcpy(&threadInfo.mData, data, length);
+    threadInfo.mLength = length;
 
-    // TODO: figure out a proper way to validate this or remove validation once
-    // thread credentials are assumed opaque throughout
-    if ((threadInfo.ThreadChannel != chip::DeviceLayer::Internal::kThreadChannel_NotSpecified) &&
-        ((threadInfo.ThreadChannel < 11) || (threadInfo.ThreadChannel > 26)))
+    if (threadInfo.IsCommissioned())
     {
-        ChipLogError(Controller, "Failed to validate thread info: channel %d is not valid", threadInfo.ThreadChannel);
+        ChipLogError(Controller, "Invalid thread info");
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 

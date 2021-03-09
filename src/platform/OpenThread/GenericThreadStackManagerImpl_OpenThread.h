@@ -75,9 +75,8 @@ protected:
 
     bool _IsThreadProvisioned(void);
     bool _IsThreadAttached(void);
-    CHIP_ERROR _GetThreadProvision(DeviceNetworkInfo & netInfo, bool includeCredentials);
-    CHIP_ERROR _SetThreadProvision(const DeviceNetworkInfo & netInfo);
-    CHIP_ERROR _SetThreadProvision(const uint8_t * operationalDataset, size_t operationalDatasetLen);
+    CHIP_ERROR _GetThreadProvision(ThreadOperationalDataset & netInfo, bool includeCredentials);
+    CHIP_ERROR _SetThreadProvision(const ThreadOperationalDataset & netInfo);
     void _ErasePersistentInfo(void);
     ConnectivityManager::ThreadDeviceType _GetThreadDeviceType(void);
     CHIP_ERROR _SetThreadDeviceType(ConnectivityManager::ThreadDeviceType deviceType);

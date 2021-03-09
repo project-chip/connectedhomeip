@@ -87,6 +87,8 @@ static_library("support") {
     "SerializableIntegerSet.h",
     "TimeUtils.cpp",
     "TimeUtils.h",
+    "ThreadOperationalDataset.cpp",
+    "ThreadOperationalDataset.h",
     "UnitTestRegistration.cpp",
     "UnitTestRegistration.h",
     "logging/CHIPLogging.cpp",

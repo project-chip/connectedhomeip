@@ -32,12 +32,11 @@ void ScriptDevicePairingDelegate::SetWifiCredential(const char * ssid, const cha
 }
 
 void ScriptDevicePairingDelegate::SetThreadCredential(uint8_t channel, uint16_t panId,
-                                                      uint8_t (&masterKey)[chip::DeviceLayer::Internal::kThreadMasterKeyLength])
+                                                      uint8_t (&masterKey)[chip::Thread::kSizeMasterKey])
 {
-    mThreadInfo               = {};
-    mThreadInfo.ThreadChannel = channel;
-    mThreadInfo.ThreadPANId   = panId;
-    memcpy(mThreadInfo.ThreadMasterKey, masterKey, sizeof(masterKey));
+    mThreadInfo.SetChannel(channel);
+    mThreadInfo.SetPanId(panId);
+    mThreadInfo.SetMasterKey(masterKey);
     mMode = Mode::Thread;
 }
 

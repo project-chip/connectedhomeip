@@ -34,13 +34,7 @@ constexpr size_t kMaxWiFiSSIDLength = 32;
 constexpr size_t kMaxWiFiKeyLength  = 64;
 
 // ---- Thread-specific Limits ----
-constexpr size_t kMaxThreadNetworkNameLength = 16;
-constexpr size_t kThreadExtendedPANIdLength  = 8;
-constexpr size_t kThreadMeshPrefixLength     = 8;
-constexpr size_t kThreadMasterKeyLength      = 16;
-constexpr size_t kThreadPSKcLength           = 16;
-constexpr size_t kThreadChannel_NotSpecified = UINT8_MAX;
-constexpr size_t kThreadPANId_NotSpecified   = UINT16_MAX;
+constexpr size_t kMaxThreadOperationalDataset = 254;
 
 /**
  * Ids for well-known network provision types.
@@ -72,6 +66,13 @@ enum WiFiAuthSecurityType : int8_t
     kWiFiSecurityType_WPA3MixedEnterprise = 12,
 };
 
+class ThreadOperationalDataset
+{
+public:
+    uint8_t mLength;
+    uint8_t mData[kMaxThreadOperationalDataset];
+};
+
 class DeviceNetworkInfo
 {
 public:
@@ -92,18 +93,6 @@ public:
     WiFiAuthSecurityType WiFiSecurityType; /**< The WiFi security type. */
 
     // ---- Thread-specific Fields ----
-    char ThreadNetworkName[kMaxThreadNetworkNameLength + 1];
-    /**< The Thread network name as a NULL-terminated string. */
-    uint8_t ThreadExtendedPANId[kThreadExtendedPANIdLength];
-    /**< The Thread extended PAN ID. */
-    uint8_t ThreadMeshPrefix[kThreadMeshPrefixLength];
-    /**< The Thread mesh prefix. */
-    uint8_t ThreadMasterKey[kThreadMasterKeyLength];
-    /**< The Thread master key (NOT NULL-terminated). */
-    uint8_t ThreadPSKc[kThreadPSKcLength];
-    /**< The Thread pre-shared commissioner key (NOT NULL-terminated). */
-    uint16_t ThreadPANId;            /**< The 16-bit Thread PAN ID, or kThreadPANId_NotSpecified */
-    uint8_t ThreadChannel;           /**< The Thread channel (currently [11..26]), or kThreadChannel_NotSpecified */
     uint64_t ThreadDatasetTimestamp; /**< Thread active dataset timestamp */
 };
 

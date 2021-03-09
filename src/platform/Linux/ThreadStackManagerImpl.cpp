@@ -25,6 +25,7 @@
 #include "platform/PlatformManager.h"
 #include "platform/ThreadStackManager.h"
 #include "support/CodeUtils.h"
+#include "support/ThreadOperationalDataset.h"
 #include "support/logging/CHIPLogging.h"
 
 #include "dbus/client/thread_api_dbus.hpp"
@@ -161,7 +162,7 @@ void ThreadStackManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
     // isn't much to do in the Chip stack.
 }
 
-CHIP_ERROR ThreadStackManagerImpl::_SetThreadProvision(const Internal::DeviceNetworkInfo & netInfo)
+CHIP_ERROR ThreadStackManagerImpl::_SetThreadProvision(const Internal::ThreadOperationalDataset & netInfo)
 {
     mNetworkInfo = netInfo;
 
@@ -174,28 +175,15 @@ CHIP_ERROR ThreadStackManagerImpl::_SetThreadProvision(const Internal::DeviceNet
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ThreadStackManagerImpl::_SetThreadProvision(const uint8_t * operationalDataset, size_t operationalDatasetLen)
+CHIP_ERROR ThreadStackManagerImpl::_GetThreadProvision(Internal::ThreadOperationalDataset & netInfo, bool includeCredentials)
 {
-    mOperationalDatasetTlv = std::vector<uint8_t>(operationalDataset, operationalDataset + operationalDatasetLen);
-
-    // post an event alerting other subsystems about change in provisioning state
-    ChipDeviceEvent event;
-    event.Type                                           = DeviceEventType::kServiceProvisioningChange;
-    event.ServiceProvisioningChange.IsServiceProvisioned = true;
-    PlatformMgr().PostEvent(&event);
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ThreadStackManagerImpl::_GetThreadProvision(Internal::DeviceNetworkInfo & netInfo, bool includeCredentials)
-{
-    netInfo = mNetworkInfo;
+    netInfo                              = mNetworkInfo;
+    Thread::OperationalDataset & dataset = static_cast<Thread::OperationalDataset &>(netInfo);
 
     if (!includeCredentials)
     {
-        memset(&netInfo.ThreadMasterKey, 0, sizeof(netInfo.ThreadMasterKey));
-        memset(&netInfo.ThreadPSKc, 0, sizeof(netInfo.ThreadPSKc));
-        netInfo.FieldPresent.ThreadPSKc = false;
+        dataset.UnsetMasterKey();
+        dataset.UnsetPSKc();
     }
 
     return CHIP_NO_ERROR;
@@ -203,12 +191,12 @@ CHIP_ERROR ThreadStackManagerImpl::_GetThreadProvision(Internal::DeviceNetworkIn
 
 bool ThreadStackManagerImpl::_IsThreadProvisioned()
 {
-    return mNetworkInfo.ThreadNetworkName[0] != '\0';
+    return reinterpret_cast<Thread::OperationalDataset &>(mNetworkInfo).IsCommissioned();
 }
 
 void ThreadStackManagerImpl::_ErasePersistentInfo()
 {
-    mNetworkInfo = Internal::DeviceNetworkInfo{};
+    reinterpret_cast<Thread::OperationalDataset &>(mNetworkInfo).Clear();
 }
 
 bool ThreadStackManagerImpl::_IsThreadEnabled()
@@ -235,50 +223,17 @@ CHIP_ERROR ThreadStackManagerImpl::_SetThreadEnabled(bool val)
 
     if (val)
     {
-        if (mOperationalDatasetTlv.size() > 0)
+        if (mNetworkInfo.mLength > 0)
         {
-            SuccessOrExit(error = mThreadApi->SetActiveDatasetTlvs(mOperationalDatasetTlv));
-            SuccessOrExit(error = mThreadApi->Attach([](ClientError result) {
-                // ThreadDevcieRoleChangedHandler should take care of this, so we don't emit another event.
-                ChipLogProgress(DeviceLayer, "Thread attach result %d", result);
-            }));
+            std::vector<uint8_t> dataset(mNetworkInfo.mData, mNetworkInfo.mData + mNetworkInfo.mLength);
+
+            SuccessOrExit(error = mThreadApi->SetActiveDatasetTlvs(dataset));
         }
-        else
-        {
-            std::vector<uint8_t> masterkey(std::begin(mNetworkInfo.ThreadMasterKey), std::end(mNetworkInfo.ThreadMasterKey));
-            std::vector<uint8_t> pskc;
-            uint64_t extPanId    = UINT64_MAX;
-            uint32_t channelMask = UINT32_MAX;
 
-            if (mNetworkInfo.FieldPresent.ThreadExtendedPANId)
-            {
-                extPanId = 0;
-                for (size_t i = 0; i < extPanId; i++)
-                {
-                    extPanId <<= CHAR_BIT;
-                    extPanId |= mNetworkInfo.ThreadExtendedPANId[i];
-                }
-            }
-            if (mNetworkInfo.FieldPresent.ThreadPSKc)
-            {
-                pskc = std::vector<uint8_t>(std::begin(mNetworkInfo.ThreadPSKc), std::end(mNetworkInfo.ThreadPSKc));
-            }
-            if (mNetworkInfo.ThreadChannel != Internal::kThreadChannel_NotSpecified)
-            {
-                channelMask = 1 << mNetworkInfo.ThreadChannel;
-            }
-
-            if (mNetworkInfo.FieldPresent.ThreadMeshPrefix)
-            {
-                std::array<uint8_t, Internal::kThreadMeshPrefixLength> prefix;
-
-                std::copy(std::begin(mNetworkInfo.ThreadMeshPrefix), std::end(mNetworkInfo.ThreadMeshPrefix), std::begin(prefix));
-                SuccessOrExit(error = mThreadApi->SetMeshLocalPrefix(prefix));
-            }
-
-            mThreadApi->Attach(mNetworkInfo.ThreadNetworkName, mNetworkInfo.ThreadPANId, extPanId, masterkey, pskc, channelMask,
-                               [](ClientError result) { ChipLogProgress(DeviceLayer, "Thread attach result %d", result); });
-        }
+        SuccessOrExit(error = mThreadApi->Attach([](ClientError result) {
+            // ThreadDevcieRoleChangedHandler should take care of this, so we don't emit another event.
+            ChipLogProgress(DeviceLayer, "Thread attach result %d", result);
+        }));
     }
     else
     {

@@ -221,89 +221,17 @@ exit:
 }
 
 template <class ImplClass>
-CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetThreadProvision(const DeviceNetworkInfo & netInfo)
+CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetThreadProvision(const ThreadOperationalDataset & netInfo)
 {
     otError otErr = OT_ERROR_FAILED;
-    otOperationalDataset newDataset;
+    otOperationalDatasetTlvs tlvs;
 
-    // Form a Thread operational dataset from the given network parameters.
-    memset(&newDataset, 0, sizeof(newDataset));
-
-    if (netInfo.ThreadNetworkName[0] != 0)
-    {
-        strncpy((char *) newDataset.mNetworkName.m8, netInfo.ThreadNetworkName, sizeof(newDataset.mNetworkName.m8));
-        newDataset.mComponents.mIsNetworkNamePresent = true;
-    }
-
-    if (netInfo.FieldPresent.ThreadExtendedPANId)
-    {
-        memcpy(newDataset.mExtendedPanId.m8, netInfo.ThreadExtendedPANId, sizeof(newDataset.mExtendedPanId.m8));
-        newDataset.mComponents.mIsExtendedPanIdPresent = true;
-    }
-
-    if (netInfo.FieldPresent.ThreadMeshPrefix)
-    {
-        memcpy(newDataset.mMeshLocalPrefix.m8, netInfo.ThreadMeshPrefix, sizeof(newDataset.mMeshLocalPrefix.m8));
-        newDataset.mComponents.mIsMeshLocalPrefixPresent = true;
-    }
-
-    memcpy(newDataset.mMasterKey.m8, netInfo.ThreadMasterKey, sizeof(newDataset.mMasterKey.m8));
-    newDataset.mComponents.mIsMasterKeyPresent = true;
-
-    if (netInfo.FieldPresent.ThreadPSKc)
-    {
-        memcpy(newDataset.mPskc.m8, netInfo.ThreadPSKc, sizeof(newDataset.mPskc.m8));
-        newDataset.mComponents.mIsPskcPresent = true;
-    }
-
-    if (netInfo.ThreadPANId != kThreadPANId_NotSpecified)
-    {
-        newDataset.mPanId                      = netInfo.ThreadPANId;
-        newDataset.mComponents.mIsPanIdPresent = true;
-    }
-
-    if (netInfo.ThreadChannel != kThreadChannel_NotSpecified)
-    {
-        newDataset.mChannel                      = netInfo.ThreadChannel;
-        newDataset.mComponents.mIsChannelPresent = true;
-    }
-
-    if (netInfo.ThreadDatasetTimestamp != 0)
-    {
-        newDataset.mActiveTimestamp                      = netInfo.ThreadDatasetTimestamp;
-        newDataset.mComponents.mIsActiveTimestampPresent = true;
-    }
+    tlvs.mLength = netInfo.mLength;
+    memcpy(tlvs.mTlvs, netInfo.mData, netInfo.mLength);
 
     // Set the dataset as the active dataset for the node.
     Impl()->LockThreadStack();
-    otErr = otDatasetSetActive(mOTInst, &newDataset);
-    Impl()->UnlockThreadStack();
-
-    // post an event alerting other subsystems about change in provisioning state
-    ChipDeviceEvent event;
-    event.Type                                           = DeviceEventType::kServiceProvisioningChange;
-    event.ServiceProvisioningChange.IsServiceProvisioned = true;
-    PlatformMgr().PostEvent(&event);
-
-    return MapOpenThreadError(otErr);
-}
-
-template <class ImplClass>
-CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetThreadProvision(const uint8_t * operationalDataset,
-                                                                                    size_t operationalDatasetLen)
-{
-    otError otErr = OT_ERROR_FAILED;
-    otOperationalDatasetTlvs datasetTlv;
-
-    VerifyOrReturnError(operationalDatasetLen <= sizeof(datasetTlv.mTlvs), CHIP_ERROR_MESSAGE_TOO_LONG);
-    // A compile time check to avoid misbehavior if the openthread implementation changed over time.
-    static_assert(sizeof(datasetTlv.mTlvs) <= UINT8_MAX);
-    memcpy(datasetTlv.mTlvs, operationalDataset, operationalDatasetLen);
-    datasetTlv.mLength = static_cast<uint8_t>(operationalDatasetLen);
-
-    // Set the dataset as the active dataset for the node.
-    Impl()->LockThreadStack();
-    otErr = otDatasetSetActiveTlvs(mOTInst, &datasetTlv);
+    otErr = otDatasetSetActiveTlvs(mOTInst, &tlvs);
     Impl()->UnlockThreadStack();
 
     // post an event alerting other subsystems about change in provisioning state

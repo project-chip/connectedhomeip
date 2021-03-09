@@ -121,7 +121,7 @@ public:
 
     //////////// RendezvousDeviceCredentialsDelegate Implementation ///////////////
     void SendNetworkCredentials(const char * ssid, const char * passwd) override;
-    void SendThreadCredentials(const DeviceLayer::Internal::DeviceNetworkInfo & threadData) override;
+    void SendThreadCredentials(const DeviceLayer::Internal::ThreadOperationalDataset & threadData) override;
     void SendOperationalCredentials() override;
 
     //////////// NetworkProvisioningDelegate Implementation ///////////////

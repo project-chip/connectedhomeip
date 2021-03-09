@@ -39,6 +39,7 @@
 #include <support/ErrorStr.h>
 #include <support/ReturnMacros.h>
 #include <support/SafeInt.h>
+#include <support/ThreadOperationalDataset.h>
 #include <support/logging/CHIPLogging.h>
 
 // Choose an approximation of PTHREAD_NULL if pthread.h doesn't define one.
@@ -360,17 +361,36 @@ JNI_METHOD(void, sendThreadCredentials)
 
     VerifyOrReturn(CanCastTo<uint8_t>(channel), ChipLogError(Controller, "sendThreadCredentials() called with invalid Channel"));
     VerifyOrReturn(CanCastTo<uint16_t>(panId), ChipLogError(Controller, "sendThreadCredentials() called with invalid PAN ID"));
-    VerifyOrReturn(xpanIdBytes.size() <= static_cast<jsize>(kThreadExtendedPANIdLength),
+    VerifyOrReturn(xpanIdBytes.size() <= static_cast<jsize>(Thread::kSizeExtendedPanId),
                    ChipLogError(Controller, "sendThreadCredentials() called with invalid XPAN ID"));
-    VerifyOrReturn(masterKeyBytes.size() <= static_cast<jsize>(kThreadMasterKeyLength),
+    VerifyOrReturn(masterKeyBytes.size() <= static_cast<jsize>(Thread::kSizeMasterKey),
                    ChipLogError(Controller, "sendThreadCredentials() called with invalid Master Key"));
 
-    DeviceNetworkInfo threadData                = {};
-    threadData.ThreadChannel                    = channel;
-    threadData.ThreadPANId                      = panId;
-    threadData.FieldPresent.ThreadExtendedPANId = 1;
-    memcpy(threadData.ThreadExtendedPANId, xpanIdBytes.data(), xpanIdBytes.size());
-    memcpy(threadData.ThreadMasterKey, masterKeyBytes.data(), masterKeyBytes.size());
+    Thread::OperationalDataset threadData;
+
+    threadData.SetChannel(channel);
+    threadData.SetPanId(panId);
+
+    // TODO network name is required, need to add UI
+    {
+        char networkName[Thread::kSizeNetworkName + 1];
+
+        sprintf(networkName, "CHIP-%04X", panId);
+        threadData.SetNetworkName(networkName);
+    }
+
+    {
+        const uint8_t(&value)[Thread::kSizeMasterKey] =
+            *reinterpret_cast<const uint8_t(*)[Thread::kSizeMasterKey]>(masterKeyBytes.data());
+
+        threadData.SetMasterKey(value);
+    }
+    {
+        const uint8_t(&value)[Thread::kSizeExtendedPanId] =
+            *reinterpret_cast<const uint8_t(*)[Thread::kSizeExtendedPanId]>(xpanIdBytes.data());
+
+        threadData.SetExtendedPanId(value);
+    }
 
     ScopedPthreadLock lock(&sStackLock);
     AndroidDeviceControllerWrapper::FromJNIHandle(handle)->SendThreadCredentials(threadData);

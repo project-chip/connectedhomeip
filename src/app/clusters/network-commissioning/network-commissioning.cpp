@@ -33,6 +33,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ReturnMacros.h>
 #include <lib/support/SafeInt.h>
+#include <lib/support/ThreadOperationalDataset.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ConnectivityManager.h>
@@ -66,12 +67,6 @@ constexpr uint8_t kMaxWiFiSSIDLen        = 32;
 constexpr uint8_t kMaxWiFiCredentialsLen = 64;
 constexpr uint8_t kMaxNetworks           = 4;
 
-// The temporary network id which will be used by thread networks in CHIP before we have the API for getting extpanid from dataset
-// tlv.
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-constexpr uint8_t kTemporaryThreadNetworkId[] = { 0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef };
-#endif
-
 enum class NetworkType : uint8_t
 {
     kUndefined = 0,
@@ -102,7 +97,7 @@ struct NetworkInfo
     NetworkType mNetworkType;
     union NetworkData
     {
-        ThreadNetworkInfo mThread;
+        Thread::OperationalDataset mThread;
         WiFiNetworkInfo mWiFi;
     } mData;
 };
@@ -120,25 +115,22 @@ EmberAfNetworkCommissioningError OnAddThreadNetworkCommandCallbackInternal(app::
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     EmberAfNetworkCommissioningError err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_BOUNDS_EXCEEDED;
 
+    VerifyOrExit(operationalDatasetLen <= sizeof(kMaxThreadDatasetLen), );
+
     for (size_t i = 0; i < kMaxNetworks; i++)
     {
         if (sNetworks[i].mNetworkType == NetworkType::kUndefined)
         {
-            VerifyOrExit(operationalDatasetLen <= sizeof(ThreadNetworkInfo::mDataset),
-                         err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_OUT_OF_RANGE);
-            memcpy(sNetworks[i].mData.mThread.mDataset, operationalDataset, operationalDatasetLen);
+            Thread::OperationalDataset & dataset = sNetworks[i].mData.mThread;
 
-            using ThreadDatasetLenType = decltype(sNetworks[i].mData.mThread.mDatasetLen);
-            VerifyOrExit(chip::CanCastTo<ThreadDatasetLenType>(operationalDatasetLen),
+            VerifyOrExit(dataset.Init(operationalDataset, static_cast<uint8_t>(operationalDatasetLen)) == CHIP_NO_ERROR,
                          err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_OUT_OF_RANGE);
-            sNetworks[i].mData.mThread.mDatasetLen = static_cast<ThreadDatasetLenType>(operationalDatasetLen);
 
-            // A 64bit id for thread networks, currently, we are missing some API for getting the thread network extpanid from the
-            // dataset tlv.
-            static_assert(sizeof(kTemporaryThreadNetworkId) <= sizeof(sNetworks[i].mNetworkID),
-                          "TemporaryThreadNetworkId too long");
-            memcpy(sNetworks[i].mNetworkID, kTemporaryThreadNetworkId, sizeof(kTemporaryThreadNetworkId));
-            sNetworks[i].mNetworkIDLen = sizeof(kTemporaryThreadNetworkId);
+            static_assert(sizeof(sNetworks[i].mNetworkID) >= Thread::kSizeExtendedPanId,
+                          "Network ID must be larger than Thread extended PAN ID!");
+            SuccessOrExit(
+                dataset.GetExtendedPanId(reinterpret_cast<uint8_t(&)[Thread::kSizeExtendedPanId]>(sNetworks[i].mNetworkID)));
+            sNetworks[i].mNetworkIDLen = sizeof(Thread::kSizeExtendedPanId);
 
             sNetworks[i].mNetworkType = NetworkType::kThread;
             sNetworks[i].mEnabled     = false;
@@ -221,8 +213,7 @@ CHIP_ERROR DoEnableNetwork(NetworkInfo * network)
     case NetworkType::kThread:
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
         ReturnErrorOnFailure(DeviceLayer::ThreadStackMgr().SetThreadEnabled(false));
-        ReturnErrorOnFailure(
-            DeviceLayer::ThreadStackMgr().SetThreadProvision(network->mData.mThread.mDataset, network->mData.mThread.mDatasetLen));
+        ReturnErrorOnFailure(DeviceLayer::ThreadStackMgr().SetThreadProvision(network->mData.mThread));
         ReturnErrorOnFailure(DeviceLayer::ThreadStackMgr().SetThreadEnabled(true));
 #else
         return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;

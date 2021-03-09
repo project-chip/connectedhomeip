@@ -39,6 +39,7 @@ namespace Internal {
 class DeviceNetworkInfo;
 class DeviceControlServer;
 class BLEManagerImpl;
+class ThreadOperationalDataset;
 template <class>
 class GenericPlatformManagerImpl;
 template <class>
@@ -81,8 +82,7 @@ public:
     CHIP_ERROR GetExternalIPv6Address(chip::Inet::IPAddress & addr);
 
     CHIP_ERROR JoinerStart();
-    CHIP_ERROR SetThreadProvision(const Internal::DeviceNetworkInfo & netInfo);
-    CHIP_ERROR SetThreadProvision(const uint8_t * operationalDataset, size_t operationalDatasetLen);
+    CHIP_ERROR SetThreadProvision(const Internal::ThreadOperationalDataset & aDataset);
     CHIP_ERROR SetThreadEnabled(bool val);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
@@ -120,7 +120,7 @@ private:
     bool IsThreadEnabled();
     bool IsThreadProvisioned();
     bool IsThreadAttached();
-    CHIP_ERROR GetThreadProvision(Internal::DeviceNetworkInfo & netInfo, bool includeCredentials);
+    CHIP_ERROR GetThreadProvision(Internal::ThreadOperationalDataset & netInfo, bool includeCredentials);
     void ErasePersistentInfo();
     ConnectivityManager::ThreadDeviceType GetThreadDeviceType();
     CHIP_ERROR SetThreadDeviceType(ConnectivityManager::ThreadDeviceType threadRole);
@@ -257,19 +257,14 @@ inline bool ThreadStackManager::IsThreadAttached()
     return static_cast<ImplClass *>(this)->_IsThreadAttached();
 }
 
-inline CHIP_ERROR ThreadStackManager::GetThreadProvision(Internal::DeviceNetworkInfo & netInfo, bool includeCredentials)
+inline CHIP_ERROR ThreadStackManager::GetThreadProvision(Internal::ThreadOperationalDataset & netInfo, bool includeCredentials)
 {
     return static_cast<ImplClass *>(this)->_GetThreadProvision(netInfo, includeCredentials);
 }
 
-inline CHIP_ERROR ThreadStackManager::SetThreadProvision(const Internal::DeviceNetworkInfo & netInfo)
+inline CHIP_ERROR ThreadStackManager::SetThreadProvision(const Internal::ThreadOperationalDataset & netInfo)
 {
     return static_cast<ImplClass *>(this)->_SetThreadProvision(netInfo);
-}
-
-inline CHIP_ERROR ThreadStackManager::SetThreadProvision(const uint8_t * operationalDataset, size_t operationalDatasetLen)
-{
-    return static_cast<ImplClass *>(this)->_SetThreadProvision(operationalDataset, operationalDatasetLen);
 }
 
 inline void ThreadStackManager::ErasePersistentInfo()
