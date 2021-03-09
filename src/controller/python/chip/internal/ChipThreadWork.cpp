@@ -25,7 +25,6 @@
 
 #include <platform/CHIPDeviceLayer.h>
 
-
 namespace chip {
 namespace python {
 namespace {
