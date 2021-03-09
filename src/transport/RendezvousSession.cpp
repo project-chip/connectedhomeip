@@ -52,6 +52,9 @@ CHIP_ERROR RendezvousSession::Init(const RendezvousParameters & params, Transpor
     VerifyOrReturnError(sessionMgr != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(admin != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mParams.HasSetupPINCode() || mParams.HasPASEVerifier(), CHIP_ERROR_INVALID_ARGUMENT);
+#if CONFIG_NETWORK_LAYER_BLE
+    VerifyOrReturnError(mParams.HasAdvertisementDelegate(), CHIP_ERROR_INVALID_ARGUMENT);
+#endif
 
     mSecureSessionMgr = sessionMgr;
     mAdmin            = admin;
@@ -289,7 +292,10 @@ void RendezvousSession::UpdateState(RendezvousSession::State newState, CHIP_ERRO
             mDelegate->OnRendezvousComplete();
         }
 
-        mParams.GetAdvertisementDelegate()->RendezvousComplete();
+        if (mParams.HasAdvertisementDelegate())
+        {
+            mParams.GetAdvertisementDelegate()->RendezvousComplete();
+        }
 
         // Release the admin, as the rendezvous is complete.
         mAdmin = nullptr;
@@ -305,7 +311,10 @@ void RendezvousSession::UpdateState(RendezvousSession::State newState, CHIP_ERRO
         ReleasePairingSessionHandle();
 
         // Disable rendezvous advertisement
-        mParams.GetAdvertisementDelegate()->StopAdvertisement();
+        if (mParams.HasAdvertisementDelegate())
+        {
+            mParams.GetAdvertisementDelegate()->StopAdvertisement();
+        }
         if (mTransport)
         {
             // Free the transport
