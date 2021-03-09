@@ -19,6 +19,7 @@
 
 #include <app/InteractionModelEngine.h>
 #include <app/server/DataModelHandler.h>
+#include <app/server/EchoHandler.h>
 #include <app/server/RendezvousServer.h>
 #include <app/server/SessionManager.h>
 
@@ -410,8 +411,8 @@ private:
     AppDelegate * mDelegate = nullptr;
 };
 
-#ifdef CHIP_APP_USE_INTERACTION_MODEL
-Messaging::ExchangeManager gExchange;
+#if defined(CHIP_APP_USE_INTERACTION_MODEL) || defined(CHIP_APP_USE_ECHO)
+Messaging::ExchangeManager gExchangeMgr;
 #endif
 ServerCallback gCallbacks;
 SecurePairingUsingTestSecret gTestPairing;
@@ -487,13 +488,21 @@ void InitServer(AppDelegate * delegate)
     err = gSessions.Init(chip::kTestDeviceNodeId, &DeviceLayer::SystemLayer, &gTransports, &gAdminPairings);
     SuccessOrExit(err);
 
-#ifdef CHIP_APP_USE_INTERACTION_MODEL
-    err = gExchange.Init(&gSessions);
-    SuccessOrExit(err);
-    err = chip::app::InteractionModelEngine::GetInstance()->Init(&gExchange);
+#if defined(CHIP_APP_USE_INTERACTION_MODEL) || defined(CHIP_APP_USE_ECHO)
+    err = gExchangeMgr.Init(&gSessions);
     SuccessOrExit(err);
 #else
     gSessions.SetDelegate(&gCallbacks);
+#endif
+
+#if defined(CHIP_APP_USE_INTERACTION_MODEL)
+    err = chip::app::InteractionModelEngine::GetInstance()->Init(&gExchangeMgr);
+    SuccessOrExit(err);
+#endif
+
+#if defined(CHIP_APP_USE_ECHO)
+    err = InitEchoHandler(&gExchangeMgr);
+    SuccessOrExit(err);
 #endif
 
     if (useTestPairing())
