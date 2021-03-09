@@ -60,17 +60,26 @@ namespace Mdns {
 DiscoveryImplPlatform::DiscoveryImplPlatform()
 {
     mCommissionInstanceName = GetRandU64();
-    CHIP_ERROR error        = ChipMdnsInit(HandleMdnsInit, HandleMdnsError, this);
+}
+
+CHIP_ERROR DiscoveryImplPlatform::Start(Inet::InetLayer * inetLayer, uint16_t port)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    if (!mMdnsInitialized)
+    {
+        ReturnErrorOnFailure(ChipMdnsInit(HandleMdnsInit, HandleMdnsError, this));
+        mMdnsInitialized = true;
+    }
+    else
+    {
+        error = ChipMdnsStopPublish();
+    }
 
     if (error != CHIP_NO_ERROR)
     {
         ChipLogError(Discovery, "Failed to initialize platform mdns: %s", ErrorStr(error));
     }
-}
-
-CHIP_ERROR DiscoveryImplPlatform::Start(Inet::InetLayer * inetLayer, uint16_t port)
-{
-    return CHIP_NO_ERROR;
+    return error;
 }
 
 void DiscoveryImplPlatform::HandleMdnsInit(void * context, CHIP_ERROR initError)
@@ -84,6 +93,7 @@ void DiscoveryImplPlatform::HandleMdnsInit(void * context, CHIP_ERROR initError)
     else
     {
         ChipLogError(Discovery, "mDNS initialization failed with %s", chip::ErrorStr(initError));
+        publisher->mMdnsInitialized = false;
     }
 }
 
@@ -129,17 +139,15 @@ CHIP_ERROR DiscoveryImplPlatform::SetupHostname()
 {
     uint8_t mac[6];    // 6 byte wifi mac
     char hostname[13]; // Hostname will be the hex representation of mac.
-    CHIP_ERROR error;
 
-    SuccessOrExit(error = chip::DeviceLayer::ConfigurationMgr().GetPrimaryWiFiMACAddress(mac));
+    ReturnErrorOnFailure(chip::DeviceLayer::ConfigurationMgr().GetPrimaryWiFiMACAddress(mac));
     for (size_t i = 0; i < sizeof(mac); i++)
     {
         snprintf(&hostname[i * 2], sizeof(hostname) - i * 2, "%02X", mac[i]);
     }
-    SuccessOrExit(error = ChipMdnsSetHostname(hostname));
+    ReturnErrorOnFailure(ChipMdnsSetHostname(hostname));
 
-exit:
-    return error;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameters & params)
@@ -152,7 +160,7 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
     TextEntry textEntries[4];
     size_t textEntrySize = 0;
     char shortDiscriminatorSubtype[6];
-    char longDiscriminatorSubtype[7];
+    char longDiscriminatorSubtype[8];
     char vendorSubType[8];
     const char * subTypes[3];
     size_t subTypeSize = 0;

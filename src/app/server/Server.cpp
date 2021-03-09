@@ -541,20 +541,6 @@ void InitServer(AppDelegate * delegate)
 #endif
     }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
-    // TODO: advertise this only when really operational once we support both
-    // operational and commisioning advertising is supported.
-    if (ConfigurationMgr().IsFullyProvisioned())
-    {
-        err = app::Mdns::AdvertiseOperational();
-    }
-    else
-    {
-        err = app::Mdns::AdvertiseCommisioning();
-    }
-    SuccessOrExit(err);
-#endif
-
 exit:
     if (err != CHIP_NO_ERROR)
     {

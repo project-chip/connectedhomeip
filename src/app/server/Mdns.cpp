@@ -22,6 +22,7 @@
 #include <core/Optional.h>
 #include <mdns/Advertiser.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/ConfigurationManager.h>
 #include <support/ReturnMacros.h>
 #include <support/logging/CHIPLogging.h>
 #include <transport/AdminPairingTable.h>
@@ -68,7 +69,6 @@ NodeId GetCurrentNodeId()
 /// Set MDNS operational advertisement
 CHIP_ERROR AdvertiseOperational()
 {
-
     uint64_t fabricId;
 
     if (DeviceLayer::ConfigurationMgr().GetFabricId(fabricId) != CHIP_NO_ERROR)
@@ -133,6 +133,18 @@ CHIP_ERROR AdvertiseCommisioning()
 void StartServer()
 {
     CHIP_ERROR err = chip::Mdns::ServiceAdvertiser::Instance().Start(&chip::DeviceLayer::InetLayer, chip::Mdns::kMdnsPort);
+
+    // TODO: advertise this only when really operational once we support both
+    // operational and commisioning advertising is supported.
+    if (DeviceLayer::ConfigurationMgr().IsFullyProvisioned())
+    {
+        err = app::Mdns::AdvertiseOperational();
+    }
+    else
+    {
+        err = app::Mdns::AdvertiseCommisioning();
+    }
+
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Discovery, "Failed to start mDNS server: %s", chip::ErrorStr(err));
