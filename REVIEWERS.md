@@ -1,4 +1,4 @@
-Poeple from the following groups can be chosen as, and act as required reviewers
+People from the following groups can be chosen as, and act as required reviewers
 on any PR
 
 | Group                                                                             | Company              |
