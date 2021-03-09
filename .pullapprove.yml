@@ -106,7 +106,7 @@ groups:
         reviewers:
             teams: [reviewers-nordic]
         reviews:
-            request: 2
+            request: 0
     shared-reviewers-samsung:
         type: optional
         conditions:
