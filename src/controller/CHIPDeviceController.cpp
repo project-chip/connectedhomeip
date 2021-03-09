@@ -48,6 +48,7 @@
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
+#include <support/ReturnMacros.h>
 #include <support/SafeInt.h>
 #include <support/TimeUtils.h>
 #include <support/logging/CHIPLogging.h>
@@ -178,17 +179,14 @@ exit:
 
 CHIP_ERROR DeviceController::Shutdown()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    VerifyOrExit(mState == State::Initialized, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
 
     ChipLogDetail(Controller, "Shutting down the controller");
 
     mState = State::NotInitialized;
 
 #if CONFIG_DEVICE_LAYER
-    err = DeviceLayer::PlatformMgr().Shutdown();
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(DeviceLayer::PlatformMgr().Shutdown());
 #else
     mSystemLayer->Shutdown();
     mInetLayer->Shutdown();
@@ -219,9 +217,7 @@ CHIP_ERROR DeviceController::Shutdown()
     }
 
     ReleaseAllDevices();
-
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DeviceController::SetUdpListenPort(uint16_t listenPort)
@@ -237,12 +233,10 @@ CHIP_ERROR DeviceController::SetUdpListenPort(uint16_t listenPort)
 
 CHIP_ERROR DeviceController::GetDevice(NodeId deviceId, const SerializedDevice & deviceInfo, Device ** out_device)
 {
-    CHIP_ERROR err  = CHIP_NO_ERROR;
     Device * device = nullptr;
-    uint16_t index  = 0;
 
-    VerifyOrExit(out_device != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
-    index = FindDeviceIndex(deviceId);
+    VerifyOrReturnError(out_device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    uint16_t index = FindDeviceIndex(deviceId);
 
     if (index < kNumMaxActiveDevices)
     {
@@ -250,22 +244,24 @@ CHIP_ERROR DeviceController::GetDevice(NodeId deviceId, const SerializedDevice &
     }
     else
     {
-        VerifyOrExit(mPairedDevices.Contains(deviceId), err = CHIP_ERROR_NOT_CONNECTED);
+        VerifyOrReturnError(mPairedDevices.Contains(deviceId), CHIP_ERROR_NOT_CONNECTED);
 
         index = GetInactiveDeviceIndex();
-        VerifyOrExit(index < kNumMaxActiveDevices, err = CHIP_ERROR_NO_MEMORY);
+        VerifyOrReturnError(index < kNumMaxActiveDevices, CHIP_ERROR_NO_MEMORY);
         device = &mActiveDevices[index];
 
-        err = device->Deserialize(deviceInfo);
-        VerifyOrExit(err == CHIP_NO_ERROR, ReleaseDevice(device));
+        CHIP_ERROR err = device->Deserialize(deviceInfo);
+        if (err != CHIP_NO_ERROR)
+        {
+            ReleaseDevice(device);
+            ReturnErrorOnFailure(err);
+        }
 
         device->Init(mTransportMgr, mSessionManager, mInetLayer, mListenPort, mAdminId);
     }
 
     *out_device = device;
-
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DeviceController::GetDevice(NodeId deviceId, Device ** out_device)
@@ -341,93 +337,62 @@ exit:
 
 CHIP_ERROR DeviceController::ServiceEvents()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    VerifyOrExit(mState == State::Initialized, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
 
 #if CONFIG_DEVICE_LAYER
-    err = DeviceLayer::PlatformMgr().StartEventLoopTask();
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(DeviceLayer::PlatformMgr().StartEventLoopTask());
 #endif // CONFIG_DEVICE_LAYER
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DeviceController::ServiceEventSignal()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    VerifyOrExit(mState == State::Initialized, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
 
 #if CONFIG_DEVICE_LAYER && (CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK)
     DeviceLayer::SystemLayer.WakeSelect();
 #else
-    err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    ReturnErrorOnFailure(CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 #endif // CONFIG_DEVICE_LAYER && (CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK)
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 void DeviceController::OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    uint16_t index = 0;
+    VerifyOrReturn(mState == State::Initialized, ChipLogError(Controller, "OnNewConnection was called in incorrect state"));
 
-    VerifyOrExit(mState == State::Initialized, err = CHIP_ERROR_INCORRECT_STATE);
-
-    index = FindDeviceIndex(mgr->GetPeerConnectionState(session)->GetPeerNodeId());
-    VerifyOrExit(index < kNumMaxActiveDevices, err = CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR);
+    uint16_t index = FindDeviceIndex(mgr->GetPeerConnectionState(session)->GetPeerNodeId());
+    VerifyOrReturn(index < kNumMaxActiveDevices,
+                   ChipLogDetail(Controller, "OnNewConnection was called for unknown device, ignoring it."));
 
     mActiveDevices[index].OnNewConnection(session, mgr);
-
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Controller, "OnNewConnection: Failed to process received message: err %d", err);
-    }
 }
 
 void DeviceController::OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * mgr)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    uint16_t index = 0;
+    VerifyOrReturn(mState == State::Initialized, ChipLogError(Controller, "OnConnectionExpired was called in incorrect state"));
 
-    VerifyOrExit(mState == State::Initialized, err = CHIP_ERROR_INCORRECT_STATE);
-
-    index = FindDeviceIndex(session);
-    VerifyOrExit(index < kNumMaxActiveDevices, err = CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR);
+    uint16_t index = FindDeviceIndex(session);
+    VerifyOrReturn(index < kNumMaxActiveDevices,
+                   ChipLogDetail(Controller, "OnConnectionExpired was called for unknown device, ignoring it."));
 
     mActiveDevices[index].OnConnectionExpired(session, mgr);
-
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Controller, "OnConnectionExpired: Failed to process received message: err %d", err);
-    }
 }
 
 void DeviceController::OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader,
                                          SecureSessionHandle session, System::PacketBufferHandle msgBuf, SecureSessionMgr * mgr)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    uint16_t index = 0;
+    VerifyOrReturn(mState == State::Initialized, ChipLogError(Controller, "OnMessageReceived was called in incorrect state"));
+    VerifyOrReturn(header.GetSourceNodeId().HasValue(),
+                   ChipLogError(Controller, "OnMessageReceived was called for unknown source node"));
 
-    VerifyOrExit(mState == State::Initialized, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(header.GetSourceNodeId().HasValue(), err = CHIP_ERROR_INVALID_ARGUMENT);
-
-    index = FindDeviceIndex(session);
-    VerifyOrExit(index < kNumMaxActiveDevices, err = CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR);
+    uint16_t index = FindDeviceIndex(session);
+    VerifyOrReturn(index < kNumMaxActiveDevices,
+                   ChipLogError(Controller, "OnMessageReceived was called for unknown device object"));
 
     mActiveDevices[index].OnMessageReceived(header, payloadHeader, session, std::move(msgBuf), mgr);
-
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Controller, "OnMessageReceived: Failed to process received message: err %d", err);
-    }
-    return;
 }
 
 uint16_t DeviceController::GetInactiveDeviceIndex()
@@ -540,20 +505,15 @@ CHIP_ERROR DeviceCommissioner::Init(NodeId localDeviceId, PersistentStorageDeleg
                                     DevicePairingDelegate * pairingDelegate, System::Layer * systemLayer,
                                     Inet::InetLayer * inetLayer)
 {
-    CHIP_ERROR err = DeviceController::Init(localDeviceId, storageDelegate, systemLayer, inetLayer);
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(DeviceController::Init(localDeviceId, storageDelegate, systemLayer, inetLayer));
 
     mPairingDelegate = pairingDelegate;
-
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DeviceCommissioner::Shutdown()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    VerifyOrExit(mState == State::Initialized, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
 
     ChipLogDetail(Controller, "Shutting down the commissioner");
 
@@ -566,9 +526,7 @@ CHIP_ERROR DeviceCommissioner::Shutdown()
     }
 
     DeviceController::Shutdown();
-
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParameters & params)
@@ -694,14 +652,11 @@ exit:
 
 CHIP_ERROR DeviceCommissioner::StopPairing(NodeId remoteDeviceId)
 {
-    CHIP_ERROR err  = CHIP_NO_ERROR;
-    Device * device = nullptr;
+    VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mDeviceBeingPaired < kNumMaxActiveDevices, CHIP_ERROR_INCORRECT_STATE);
 
-    VerifyOrExit(mState == State::Initialized, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(mDeviceBeingPaired < kNumMaxActiveDevices, err = CHIP_ERROR_INCORRECT_STATE);
-
-    device = &mActiveDevices[mDeviceBeingPaired];
-    VerifyOrExit(device->GetDeviceId() == remoteDeviceId, err = CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR);
+    Device * device = &mActiveDevices[mDeviceBeingPaired];
+    VerifyOrReturnError(device->GetDeviceId() == remoteDeviceId, CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR);
 
     if (mRendezvousSession != nullptr)
     {
@@ -711,9 +666,7 @@ CHIP_ERROR DeviceCommissioner::StopPairing(NodeId remoteDeviceId)
 
     ReleaseDevice(device);
     mDeviceBeingPaired = kNumMaxActiveDevices;
-
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DeviceCommissioner::UnpairDevice(NodeId remoteDeviceId)
@@ -766,11 +719,9 @@ void DeviceCommissioner::OnRendezvousError(CHIP_ERROR err)
 
 void DeviceCommissioner::OnRendezvousComplete()
 {
-    CHIP_ERROR err  = CHIP_NO_ERROR;
-    Device * device = nullptr;
+    VerifyOrReturn(mDeviceBeingPaired < kNumMaxActiveDevices, OnRendezvousError(CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR));
 
-    VerifyOrExit(mDeviceBeingPaired < kNumMaxActiveDevices, err = CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR);
-    device = &mActiveDevices[mDeviceBeingPaired];
+    Device * device = &mActiveDevices[mDeviceBeingPaired];
     mPairedDevices.Insert(device->GetDeviceId());
     mPairedDevicesUpdated = true;
     // We need to kick the device since we are not a valid secure pairing delegate when using IM.
@@ -789,15 +740,7 @@ void DeviceCommissioner::OnRendezvousComplete()
                           mStorageDelegate->SetKeyValue(key, Uint8::to_const_char(serialized.inner)));
     }
 
-exit:
-    if (err == CHIP_NO_ERROR)
-    {
-        RendezvousCleanup(CHIP_NO_ERROR);
-    }
-    else
-    {
-        OnRendezvousError(err);
-    }
+    RendezvousCleanup(CHIP_NO_ERROR);
 }
 
 void DeviceCommissioner::OnRendezvousStatusUpdate(RendezvousSessionDelegate::Status status, CHIP_ERROR err)
