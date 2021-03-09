@@ -31,6 +31,9 @@
 #include <inet/InetError.h>
 #include <inet/InetLayer.h>
 
+#include <transport/raw/TCP.h>
+#include <transport/raw/UDP.h>
+
 using namespace chip;
 using namespace chip::Shell;
 using namespace chip::System;
@@ -39,6 +42,11 @@ using namespace chip::Inet;
 static chip::Shell::Shell sShellDateSubcommands;
 static chip::Shell::Shell sShellNetworkSubcommands;
 static chip::Shell::Shell sShellSocketSubcommands;
+
+constexpr size_t kMaxTcpActiveConnectionCount = 4;
+constexpr size_t kMaxTcpPendingPackets        = 4;
+
+using TCPImpl = Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>;
 
 int cmd_date_help_iterator(shell_command_t * command, void * arg)
 {
@@ -291,6 +299,44 @@ int cmd_socket_help(int argc, char ** argv)
     return 0;
 }
 
+int cmd_socket_test(int argc, char ** argv)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    INET_ERROR err;
+
+    streamer_t * sout = streamer_get();
+
+    VerifyOrExit(argc == 1, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    IPAddress addr;
+    IPAddress::FromString("127.0.0.1", addr);
+
+    if (strcmp(argv[0], "UDP") == 0)
+    {
+        Transport::UDP socket;
+        err = socket.Init(Transport::UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(addr.Type()));
+    }
+    else if (strcmp(argv[0], "TCP") == 0)
+    {
+        TCPImpl socket;
+        err = socket.Init(Transport::TcpListenParameters(&DeviceLayer::InetLayer).SetAddressType(addr.Type()));
+    }
+    else
+    {
+        streamer_printf(sout, "ERROR: Wrong socket type\r\n");
+        ExitNow(error = CHIP_ERROR_INVALID_ARGUMENT;);
+    }
+
+    if (err != INET_NO_ERROR)
+    {
+        streamer_printf(sout, "ERROR: create %s endpoint failed\r\n", argv[0]);
+        ExitNow(error = err;);
+    }
+
+exit:
+    return error;
+}
+
 static const shell_command_t cmds_date_root = { &cmd_date_dispatch, "date", "Display the current time, or set the system date." };
 
 static const shell_command_t cmds_date[] = { { &cmd_date_set, "set", "Set date/time using 'YYYY-MM-DD HH:MM:SS' format" },
@@ -309,7 +355,8 @@ static const shell_command_t cmds_network[] = { { &cmd_network_interface, "inter
 
 static const shell_command_t cmds_socket_root = { &cmd_socket_dispatch, "socket", "Socket layer commands" };
 
-static const shell_command_t cmds_socket[] = { { &cmd_socket_help, "help", "Display help for each socket subcommands" } };
+static const shell_command_t cmds_socket[] = { { &cmd_socket_test, "test", "Test socket communication" },
+                                               { &cmd_socket_help, "help", "Display help for each socket subcommands" } };
 
 void cmd_mbed_utils_init()
 {
