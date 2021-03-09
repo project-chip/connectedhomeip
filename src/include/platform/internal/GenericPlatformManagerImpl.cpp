@@ -49,6 +49,9 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack()
 
     mMsgLayerWasActive = false;
 
+    // Arrange for CHIP core errors to be translated to text
+    RegisterCHIPLayerErrorFormatter();
+
     // Arrange for Device Layer errors to be translated to text.
     RegisterDeviceLayerErrorFormatter();
 
