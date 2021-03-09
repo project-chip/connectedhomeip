@@ -11,7 +11,7 @@ int socketpair(int family, int type, int proto, int sv[2])
     return mbed_socketpair(family, type, proto, sv);
 }
 
-int close(int sock)
+int close_(int sock)
 {
     return mbed_close(sock);
 }
