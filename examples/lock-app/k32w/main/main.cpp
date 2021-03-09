@@ -26,6 +26,8 @@
 #include <openthread/cli.h>
 #include <openthread/error.h>
 #include <openthread/heap.h>
+#include <openthread/platform/memory.h>
+#include <mbedtls/platform.h>
 
 #include <core/CHIPError.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -42,8 +44,6 @@ using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::Logging;
-
-extern "C" void * pvPortCallocRtos(size_t num, size_t size);
 
 #include <AppTask.h>
 
@@ -64,6 +64,8 @@ extern "C" void main_task(void const * argument)
     {
         (*pFunc)();
     }
+
+    mbedtls_platform_set_calloc_free(otPlatCAlloc, otPlatFree);
 
     /* Used for HW initializations */
     otSysInit(0, NULL);

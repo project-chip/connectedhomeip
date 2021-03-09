@@ -78,3 +78,13 @@ void * pvPortCallocRtos(size_t num, size_t size)
 
     return p;
 }
+
+void *otPlatCAlloc(size_t aNum, size_t aSize)
+{
+    return pvPortCallocRtos(aNum, aSize);
+}
+
+void otPlatFree(void *aPtr)
+{
+    return vPortFree(aPtr);
+}
