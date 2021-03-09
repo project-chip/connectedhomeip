@@ -18,16 +18,17 @@ import("//build_overrides/pigweed.gni")
 import("${build_root}/config/compiler/compiler.gni")
 import("${build_root}/config/target.gni")
 
+if (current_os == "mac") {
+  import("${build_root}/config/mac/mac_sdk.gni")
+}
+
 declare_args() {
   # Enable -Werror. This can be disabled if using a different compiler
   # with unfixed or unsupported wanings.
   treat_warnings_as_errors = true
 }
 
-_is_embedded_arm = current_os != "ios" && current_os != "mac_os" &&
-                   (current_cpu == "arm" || current_cpu == "arm64")
-
-if (_is_embedded_arm) {
+if (current_cpu == "arm" || current_cpu == "arm64") {
   import("${build_root}/config/arm.gni")
 } else if (current_cpu == "x86" || current_cpu == "x86_64") {
   import("${build_root}/config/x86.gni")
@@ -45,7 +46,14 @@ config("debug_default") {
 
 config("abi_default") {
   cflags = []
-  if (_is_embedded_arm) {
+  if (current_os == "mac") {
+    cflags += [
+      "-target",
+      mac_target_triple,
+    ]
+  } else if (current_os == "ios") {
+    # iOS ABI currently set by chip_xcode_build_connector.sh
+  } else if (current_cpu == "arm" || current_cpu == "arm64") {
     if (arm_arch != "") {
       cflags += [ "-march=${arm_arch}" ]
     }
@@ -92,6 +100,7 @@ config("abi_default") {
       ]
     }
   }
+  asmflags = cflags
   ldflags = cflags
 }
 

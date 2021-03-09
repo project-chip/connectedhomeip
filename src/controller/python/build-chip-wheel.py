@@ -39,6 +39,7 @@ parser.add_argument('--build_number', default='0.0', help='configure the chip bu
 parser.add_argument('--build_dir', help='directory to build in')
 parser.add_argument('--dist_dir', help='directory to place distribution in')
 parser.add_argument('--manifest', help='list of files to package')
+parser.add_argument('--plat-name', help='platform name to embed in generated filenames')
 
 args = parser.parse_args()
 
@@ -170,7 +171,9 @@ try:
         options={
             'bdist_wheel':{
                 'universal':False,
-                'dist_dir':distDir         # Place the generated .whl in the dist directory.
+                'dist_dir':distDir,         # Place the generated .whl in the dist directory.
+                'py_limited_api':'cp37',
+                'plat_name':args.plat_name,
             },
             'egg_info':{
                 'egg_base':tmpDir           # Place the .egg-info subdirectory in the tmp directory.

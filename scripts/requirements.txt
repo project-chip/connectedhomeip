@@ -144,7 +144,7 @@ wcwidth==0.2.5
     # via prompt-toolkit
 west==0.9.0
     # via -r requirements.in
-wheel==0.34.2
+wheel==0.36.2
     # via -r requirements.in
 
 # The following packages are considered to be unsafe in a requirements file:
