@@ -123,6 +123,19 @@ try:
     #
     # Build the chip package...
     #
+    packages=[
+            'chip',
+            'chip.configuration',
+            'chip.exceptions',
+            'chip.internal',
+            'chip.logging',
+            'chip.native',
+            'chip.tlv',
+    ]
+
+    if os.path.isdir(os.path.join(tmpDir, 'chip', 'ble')):
+      packages += ['chip.ble']
+      packages += ['chip.ble.commissioning']
 
     # Invoke the setuptools 'bdist_wheel' command to generate a wheel containing
     # the CHIP python packages, shared libraries and scripts.
@@ -140,17 +153,7 @@ try:
             'Programming Language :: Python :: 3',
         ],
         python_requires='>=2.7',
-        packages=[
-            'chip',
-            'chip.ble',
-            'chip.ble.commissioning',
-            'chip.configuration',
-            'chip.exceptions',
-            'chip.internal',
-            'chip.logging',
-            'chip.native',
-            'chip.tlv',
-        ],
+        packages=packages,
         package_dir={
             '':tmpDir,                      # By default, look in the tmp directory for packages/modules to be included.
         },
