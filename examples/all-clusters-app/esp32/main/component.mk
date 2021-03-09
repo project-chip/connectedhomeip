@@ -21,6 +21,7 @@
 
 COMPONENT_DEPENDS := chip QRCode tft spidriver
 
+# The list of src and include dirs must be in sync with that in all-clusters-app/esp32/main/CMakeLists.txt
 COMPONENT_SRCDIRS :=                                                                \
   .                                                                                 \
   ../third_party/connectedhomeip/examples/all-clusters-app/all-clusters-common/gen  \
