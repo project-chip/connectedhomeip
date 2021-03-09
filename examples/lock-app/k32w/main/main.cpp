@@ -22,12 +22,12 @@
 
 #include "openthread/platform/logging.h"
 #include "openthread/platform/uart.h"
+#include <mbedtls/platform.h>
 #include <openthread-system.h>
 #include <openthread/cli.h>
 #include <openthread/error.h>
 #include <openthread/heap.h>
 #include <openthread/platform/memory.h>
-#include <mbedtls/platform.h>
 
 #include <core/CHIPError.h>
 #include <platform/CHIPDeviceLayer.h>
