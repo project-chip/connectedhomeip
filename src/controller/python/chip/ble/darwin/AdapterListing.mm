@@ -43,8 +43,6 @@
         }
     }
     return self.centralManager.state == CBManagerStatePoweredOn;
-    // FIXME: implement
-    return false;
 }
 
 // Start CBCentralManagerDelegate

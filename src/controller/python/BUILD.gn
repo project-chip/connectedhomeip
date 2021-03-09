@@ -61,7 +61,7 @@ shared_library("ChipDeviceCtrl") {
         "chip/ble/darwin/Scanning.mm",
       ]
     } else {
-      print("!!! WARNING: no BLE implementation for the current OS !!!")
+      assert(false, "No BLE implementation available for the current OS.")
     }
   }
 
