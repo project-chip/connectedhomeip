@@ -1,9 +1,10 @@
+#include "net_if.h"
 #include "common.h"
+#include "net_socket.h"
 #include <SocketAddress.h>
 #include <arpa/inet.h>
 #include <ifaddrs.h>
 #include <net/if.h>
-#include <net_if.h>
 #include <sys/ioctl.h>
 #include <sys/socket.h>
 
@@ -15,21 +16,21 @@ struct if_nameindex * mbed_if_nameindex(void)
     NetworkInterface * net_if = NetworkInterface::get_default_instance();
     if (net_if == nullptr)
     {
-        _set_errno(ENOBUFS);
+        set_errno(ENOBUFS);
         return NULL;
     }
 
     name_ptr = net_if->get_interface_name(name_ptr);
     if (name_ptr == NULL)
     {
-        _set_errno(ENOBUFS);
+        set_errno(ENOBUFS);
         return NULL;
     }
 
     struct if_nameindex * net_list = (struct if_nameindex *) calloc((MBED_NET_IF_LIST_SIZE), sizeof(struct if_nameindex));
     if (net_list == NULL)
     {
-        _set_errno(ENOBUFS);
+        set_errno(ENOBUFS);
         return NULL;
     }
 
@@ -38,7 +39,7 @@ struct if_nameindex * mbed_if_nameindex(void)
     net_list[0].if_name = (char *) malloc(IF_NAMESIZE);
     if (net_list[0].if_name == NULL)
     {
-        _set_errno(ENOBUFS);
+        set_errno(ENOBUFS);
         free(net_list);
         return NULL;
     }
@@ -73,14 +74,14 @@ char * mbed_if_indextoname(unsigned int ifindex, char * ifname)
 
     if (index < 0 || index > MBED_MAX_INTERFACES_NUM || ifname == NULL)
     {
-        _set_errno(ENXIO);
+        set_errno(ENXIO);
         return NULL;
     }
 
     struct if_nameindex * net_list = mbed_if_nameindex();
     if (net_list == NULL)
     {
-        _set_errno(ENXIO);
+        set_errno(ENXIO);
         return NULL;
     }
 
@@ -90,7 +91,7 @@ char * mbed_if_indextoname(unsigned int ifindex, char * ifname)
     }
     else
     {
-        _set_errno(ENXIO);
+        set_errno(ENXIO);
     }
 
     mbed_if_freenameindex(net_list);
@@ -103,14 +104,14 @@ unsigned int mbed_if_nametoindex(const char * ifname)
     unsigned int index, ret = 0;
     if (ifname == NULL)
     {
-        _set_errno(ENXIO);
+        set_errno(ENXIO);
         return 0;
     }
 
     struct if_nameindex * net_list = mbed_if_nameindex();
     if (net_list == NULL)
     {
-        _set_errno(ENXIO);
+        set_errno(ENXIO);
         return 0;
     }
 
@@ -141,7 +142,7 @@ int mbed_getifaddrs(struct ifaddrs ** ifap)
 
     if (ifap == NULL)
     {
-        _set_errno(ENOBUFS);
+        set_errno(ENOBUFS);
         return -1;
     }
 
@@ -150,21 +151,21 @@ int mbed_getifaddrs(struct ifaddrs ** ifap)
     NetworkInterface * net_if = NetworkInterface::get_default_instance();
     if (net_if == nullptr)
     {
-        _set_errno(ENETUNREACH);
+        set_errno(ENETUNREACH);
         return -1;
     }
 
     name_ptr = net_if->get_interface_name(name_ptr);
     if (name_ptr == NULL)
     {
-        _set_errno(ENOTTY);
+        set_errno(ENOTTY);
         return -1;
     }
 
     err = net_if->connect();
     if (err != NSAPI_ERROR_OK)
     {
-        _set_errno(ENOTTY);
+        set_errno(ENOTTY);
         return -1;
     }
 
@@ -177,7 +178,7 @@ int mbed_getifaddrs(struct ifaddrs ** ifap)
     tmp = (struct ifaddrs *) calloc(1, sizeof(struct ifaddrs));
     if (tmp == NULL)
     {
-        _set_errno(ENOBUFS);
+        set_errno(ENOBUFS);
         return -1;
     }
 
@@ -189,7 +190,7 @@ int mbed_getifaddrs(struct ifaddrs ** ifap)
     tmp->ifa_name = (char *) malloc(IF_NAMESIZE);
     if (tmp->ifa_name == NULL)
     {
-        _set_errno(ENOBUFS);
+        set_errno(ENOBUFS);
         mbed_freeifaddrs(tmp);
         return -1;
     }
@@ -204,7 +205,7 @@ int mbed_getifaddrs(struct ifaddrs ** ifap)
     tmp->ifa_addr = (struct sockaddr *) malloc(sizeof(struct sockaddr));
     if (tmp->ifa_addr == NULL)
     {
-        _set_errno(ENOBUFS);
+        set_errno(ENOBUFS);
         mbed_freeifaddrs(tmp);
         return -1;
     }
@@ -214,7 +215,7 @@ int mbed_getifaddrs(struct ifaddrs ** ifap)
     tmp->ifa_netmask = (struct sockaddr *) malloc(sizeof(struct sockaddr));
     if (tmp->ifa_netmask == NULL)
     {
-        _set_errno(ENOBUFS);
+        set_errno(ENOBUFS);
         mbed_freeifaddrs(tmp);
         return -1;
     }
@@ -288,7 +289,7 @@ static char * inet_ntop4(const void * src, char * dst, size_t size)
     l = snprintf(tmp, sizeof(tmp), "%u.%u.%u.%u", buf[0], buf[1], buf[2], buf[3]);
     if (l <= 0 || l >= size)
     {
-        _set_errno(ENOSPC);
+        set_errno(ENOSPC);
         return (NULL);
     }
     strlcpy(dst, tmp, size);
@@ -367,7 +368,7 @@ static char * inet_ntop6(const void * src, char * dst, size_t size)
             {
                 if (tp + 1 >= ep)
                 {
-                    _set_errno(ENOSPC);
+                    set_errno(ENOSPC);
                     return (NULL);
                 }
 
@@ -380,7 +381,7 @@ static char * inet_ntop6(const void * src, char * dst, size_t size)
         {
             if (tp + 1 >= ep)
             {
-                _set_errno(ENOSPC);
+                set_errno(ENOSPC);
                 return (NULL);
             }
             *tp++ = ':';
@@ -398,7 +399,7 @@ static char * inet_ntop6(const void * src, char * dst, size_t size)
         advance = snprintf(tp, ep - tp, "%x", words[i]);
         if (advance <= 0 || advance >= ep - tp)
         {
-            _set_errno(ENOSPC);
+            set_errno(ENOSPC);
             return (NULL);
         }
         tp += advance;
@@ -408,14 +409,14 @@ static char * inet_ntop6(const void * src, char * dst, size_t size)
     {
         if (tp + 1 >= ep)
         {
-            _set_errno(ENOSPC);
+            set_errno(ENOSPC);
             return (NULL);
         }
         *tp++ = ':';
     }
     if (tp + 1 >= ep)
     {
-        _set_errno(ENOSPC);
+        set_errno(ENOSPC);
         return (NULL);
     }
     *tp++ = '\0';
@@ -425,7 +426,7 @@ static char * inet_ntop6(const void * src, char * dst, size_t size)
      */
     if ((size_t)(tp - tmp) > size)
     {
-        _set_errno(ENOSPC);
+        set_errno(ENOSPC);
         return (NULL);
     }
     strlcpy(dst, tmp, size);
@@ -441,7 +442,7 @@ char * mbed_inet_ntop(sa_family_t family, const void * src, char * dst, size_t s
     case AF_INET6:
         return (inet_ntop6(src, dst, (size_t) size));
     default:
-        _set_errno(EAFNOSUPPORT);
+        set_errno(EAFNOSUPPORT);
         return (NULL);
     }
 }
@@ -607,7 +608,7 @@ int mbed_inet_pton(sa_family_t family, const char * src, void * dst)
     case AF_INET6:
         return inet_pton6(src, dst);
     default:
-        _set_errno(EAFNOSUPPORT);
+        set_errno(EAFNOSUPPORT);
         return -1;
     }
 }
@@ -618,9 +619,16 @@ int mbed_ioctl(int fd, unsigned long request, void * param)
     switch (request)
     {
     case SIOCGIFFLAGS: {
+        auto * socket = getSocket(fd);
+        if (socket == nullptr)
+        {
+            set_errno(EBADF);
+            ret = -1;
+            break;
+        }
         if (param == NULL)
         {
-            _set_errno(EFAULT);
+            set_errno(EFAULT);
             ret = -1;
             break;
         }
@@ -631,7 +639,7 @@ int mbed_ioctl(int fd, unsigned long request, void * param)
         NetworkInterface * net_if = NetworkInterface::get_default_instance();
         if (net_if == nullptr)
         {
-            _set_errno(ENOTTY);
+            set_errno(ENOTTY);
             ret = -1;
             break;
         }
@@ -639,7 +647,7 @@ int mbed_ioctl(int fd, unsigned long request, void * param)
         err = net_if->connect();
         if (err != NSAPI_ERROR_OK)
         {
-            _set_errno(ENOTTY);
+            set_errno(ENOTTY);
             ret = -1;
             break;
         }
@@ -658,14 +666,14 @@ int mbed_ioctl(int fd, unsigned long request, void * param)
         err = net_if->get_ip_address(&ip);
         if (err != NSAPI_ERROR_OK)
         {
-            _set_errno(ENOTTY);
+            set_errno(ENOTTY);
             ret = -1;
             break;
         }
         err = net_if->get_netmask(&netmask);
         if (err != NSAPI_ERROR_OK)
         {
-            _set_errno(ENOTTY);
+            set_errno(ENOTTY);
             ret = -1;
             break;
         }
@@ -706,7 +714,7 @@ int mbed_ioctl(int fd, unsigned long request, void * param)
     }
 
     default:
-        _set_errno(ENOTTY);
+        set_errno(ENOTTY);
         ret = -1;
     }
     return ret;

@@ -109,7 +109,7 @@ int mbed_close(int sock)
     auto * socket = getSocket(sock);
     if (socket == nullptr)
     {
-        _set_errno(EFAULT);
+        set_errno(EFAULT);
         return -1;
     }
     socket->~Socket();

@@ -8,8 +8,8 @@
 extern "C" {
 #endif
 
-#ifndef _set_errno
-#define _set_errno(err)                                                                                                            \
+#ifndef set_errno
+#define set_errno(err)                                                                                                             \
     do                                                                                                                             \
     {                                                                                                                              \
         if (err)                                                                                                                   \
