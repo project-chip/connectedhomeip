@@ -1,14 +1,11 @@
 #include "common.h"
 #include <net_socket.h>
-
 #define MAX_SOCKET 5
 
 #define TCP_SOCKET SOCK_STREAM
 #define UDP_SOCKET SOCK_DGRAM
 #define SOCKET_NOT_INITIALIZED 0
 #define ERR_NO_MEMORY -1
-#define ERR_OPEN -2
-#define ERR_NO_SOCKET -3
 
 BSDSocket sockets[MAX_SOCKET];
 
@@ -65,7 +62,8 @@ int mbed_socket(int family, int type, int proto)
     int id = findMemForSocket();
     if (id == ERR_NO_MEMORY)
     {
-        return ERR_NO_MEMORY;
+        set_errno(ENOBUFS);
+        return -1;
     }
 
     switch (type)
@@ -76,7 +74,8 @@ int mbed_socket(int family, int type, int proto)
         {
             tcpSocket->~TCPSocket();
             sockets[id].type = SOCKET_NOT_INITIALIZED;
-            return ERR_OPEN;
+            set_errno(EACCES);
+            return -1;
         }
         sockets[id].type = TCP_SOCKET;
     }
@@ -87,7 +86,8 @@ int mbed_socket(int family, int type, int proto)
         {
             udpSocket->~UDPSocket();
             sockets[id].type = SOCKET_NOT_INITIALIZED;
-            return ERR_OPEN;
+            set_errno(EACCES);
+            return -1;
         }
         sockets[id].type = UDP_SOCKET;
     }
@@ -128,7 +128,8 @@ int mbed_bind(int sock, const struct sockaddr * addr, socklen_t addrlen)
     auto * socket = getSocket(sock);
     if (socket == nullptr)
     {
-        return ERR_NO_SOCKET;
+        set_errno(ENOBUFS);
+        return -1;
     }
     SocketAddress sockAddr;
     Sockaddr2Netsocket(&sockAddr, (struct sockaddr *) addr);
@@ -141,7 +142,8 @@ int mbed_connect(int sock, const struct sockaddr * addr, socklen_t addrlen)
     auto * socket = getSocket(sock);
     if (socket == nullptr)
     {
-        return ERR_NO_SOCKET;
+        set_errno(ENOBUFS);
+        return -1;
     }
     SocketAddress sockAddr;
     Sockaddr2Netsocket(&sockAddr, (struct sockaddr *) addr);
@@ -154,7 +156,8 @@ int mbed_listen(int sock, int backlog)
     auto * socket = getSocket(sock);
     if (socket == nullptr)
     {
-        return ERR_NO_SOCKET;
+        set_errno(ENOBUFS);
+        return -1;
     }
 
     return socket->listen(backlog);
@@ -165,7 +168,8 @@ int mbed_accept(int sock, struct sockaddr * addr, socklen_t * addrlen)
     auto * socket = getSocket(sock);
     if (socket == nullptr)
     {
-        return ERR_NO_SOCKET;
+        set_errno(ENOBUFS);
+        return -1;
     }
 
     nsapi_error_t error;
@@ -175,13 +179,15 @@ int mbed_accept(int sock, struct sockaddr * addr, socklen_t * addrlen)
 
     if (&sockets[id].tcpSocket == nullptr)
     {
-        return ERR_NO_SOCKET;
+        set_errno(ENOBUFS);
+        return -1;
     }
     if (sockets[id].tcpSocket.open(NetworkInterface::get_default_instance()) != NSAPI_ERROR_OK)
     {
         sockets[id].tcpSocket.~TCPSocket();
         sockets[id].type = SOCKET_NOT_INITIALIZED;
-        return ERR_OPEN;
+        set_errno(EACCES);
+        return -1;
     }
     sockets[id].type = TCP_SOCKET;
     return id;
@@ -192,7 +198,8 @@ ssize_t mbed_send(int sock, const void * buf, size_t len, int flags)
     auto * socket = getSocket(sock);
     if (socket == nullptr)
     {
-        return ERR_NO_SOCKET;
+        set_errno(ENOBUFS);
+        return -1;
     }
     return socket->send(buf, len);
 }
@@ -202,7 +209,8 @@ ssize_t mbed_recv(int sock, void * buf, size_t max_len, int flags)
     auto * socket = getSocket(sock);
     if (socket == nullptr)
     {
-        return ERR_NO_SOCKET;
+        set_errno(ENOBUFS);
+        return -1;
     }
     return socket->recv(buf, max_len);
 }
@@ -212,7 +220,8 @@ ssize_t mbed_sendto(int sock, const void * buf, size_t len, int flags, const str
     auto * socket = getSocket(sock);
     if (socket == nullptr)
     {
-        return ERR_NO_SOCKET;
+        set_errno(ENOBUFS);
+        return -1;
     }
     SocketAddress sockAddr;
     Sockaddr2Netsocket(&sockAddr, (struct sockaddr *) dest_addr);
@@ -230,7 +239,8 @@ ssize_t mbed_recvfrom(int sock, void * buf, size_t max_len, int flags, struct so
     auto * socket = getSocket(sock);
     if (socket == nullptr)
     {
-        return ERR_NO_SOCKET;
+        set_errno(ENOBUFS);
+        return -1;
     }
     SocketAddress sockAddr;
     Sockaddr2Netsocket(&sockAddr, src_addr);
