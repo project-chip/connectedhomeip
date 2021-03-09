@@ -292,3 +292,8 @@ ssize_t mbed_recvmsg(int socket, struct msghdr * message, int flags)
 {
     return 0;
 }
+
+int mbed_select(int sock, fd_set * readfds, fd_set * writefds, fd_set * exceptfds, struct timeval * timeout)
+{
+    return 0;
+}

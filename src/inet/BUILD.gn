@@ -77,6 +77,7 @@ if (chip_device_platform == "mbed") {
       "${chip_root}/src/platform/mbed/posix/src/inet.cpp",
       "${chip_root}/src/platform/mbed/posix/src/ioctl.cpp",
       "${chip_root}/src/platform/mbed/posix/src/socket.cpp",
+      "${chip_root}/src/platform/mbed/posix/src/select.cpp",
       "${chip_root}/src/platform/mbed/net/src/net_if.cpp",
       "${chip_root}/src/platform/mbed/net/src/net_socket.cpp",
     ]

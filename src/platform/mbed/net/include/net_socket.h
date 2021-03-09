@@ -5,6 +5,7 @@
 #include <netsocket/TCPSocket.h>
 #include <netsocket/UDPSocket.h>
 
+#include <sys/select.h>
 #include <sys/socket.h>
 
 #ifdef __cplusplus
@@ -69,6 +70,8 @@ int mbed_getsockname(int sock, struct sockaddr * addr, socklen_t * addrlen);
 int mbed_getpeername(int sockfd, struct sockaddr * addr, socklen_t * addrlen);
 
 ssize_t mbed_recvmsg(int socket, struct msghdr * message, int flags);
+
+int mbed_select(int sock, fd_set * readfds, fd_set * writefds, fd_set * exceptfds, struct timeval * timeout);
 
 #ifdef __cplusplus
 }
