@@ -54,9 +54,11 @@ def main():
 
   if args.clear_config:
     logging.info('Building a clear configuration')
-    sdk_config = 'sdkconfig_%s.defaults' % args.clear_config
+    sdkconfig = 'sdkconfig_%s.defaults' % args.clear_config
 
-    os.remove(os.path.join(ROOT, 'sdkconfig'))
+    curr_sdkconfig = os.path.join(ROOT, 'sdkconfig')
+    if os.path.exists(curr_sdkconfig):
+      os.remove(curr_sdkconfig)
 
     e.execute('SDKCONFIG_DEFAULTS="{sdkname}" make -j{cpus} -C {example_root} defconfig'.format(
       sdkname=sdkconfig, cpus=os.cpu_count(), example_root = ROOT
