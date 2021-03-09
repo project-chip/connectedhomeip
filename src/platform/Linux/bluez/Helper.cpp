@@ -1552,6 +1552,10 @@ CHIP_ERROR InitBluezBleLayer(bool aIsCentral, char * apBleAddr, BLEAdvConfig & a
         err = ConfigureBluezAdv(aBleAdvConfig, endpoint);
         SuccessOrExit(err);
     }
+    else
+    {
+        endpoint->mAdapterId = aBleAdvConfig.mAdapterId;
+    }
 
     err = MainLoop::Instance().EnsureStarted();
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "Failed to start BLE main loop"));

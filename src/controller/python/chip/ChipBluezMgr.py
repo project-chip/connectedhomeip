@@ -848,7 +848,7 @@ class BluezManager(ChipBleBase):
                 )
             ]
             for i in range(len(adapters)):
-                self.logger.info("adapter %s = %s" % (i, adapters[i].Address))
+                self.logger.info("AdapterName: %s   AdapterAddress: %s" % (adapters[i].path.replace("/org/bluez/", ""), adapters[i].Address))
         except dbus.exceptions.DBusException as ex:
             self.logger.debug(str(ex))
 
@@ -864,7 +864,7 @@ class BluezManager(ChipBleBase):
                 return adapters[0]
             if len(adapters) > 0:
                 for adapter in adapters:
-                    if str(adapter.Address).upper() == str(identifier).upper():
+                    if str(adapter.Address).upper() == str(identifier).upper() or "/org/bluez/{}".format(identifier) == str(adapter.path):
                         return adapter
             self.logger.info(
                 "adapter %s cannot be found, expect the ble mac address" % (identifier)
