@@ -590,11 +590,11 @@ FullQName AdvertiserMinMdns::GetCommisioningTextEntries(const CommissionAdvertis
     char txtVidPid[64];
     if (params.GetProductId().HasValue())
     {
-        sprintf(txtVidPid, "V=%d+%d", params.GetVendorId().Value(), params.GetProductId().Value());
+        sprintf(txtVidPid, "VP=%d+%d", params.GetVendorId().Value(), params.GetProductId().Value());
     }
     else
     {
-        sprintf(txtVidPid, "V=%d", params.GetVendorId().Value());
+        sprintf(txtVidPid, "VP=%d", params.GetVendorId().Value());
     }
 
     char txtPairingInstrHint[128];
