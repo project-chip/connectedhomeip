@@ -354,11 +354,40 @@ CHIP_ERROR TCPBase::ProcessReceivedBuffer(Inet::TCPEndPoint * endPoint, const Pe
             continue;
         }
 
-        // Buffer is incomplete if we reach this point
+        // If we reach this point, the head buffer does not contain a complete message.
+        // We may or may not have a complete message in a buffer chain.
         if (buffer->HasChainedBuffer())
         {
-            buffer->CompactHead();
-            continue;
+            if (messageSize > System::PacketBuffer::kMaxSizeWithoutReserve)
+            {
+                // This message will not fit in a maximum-size buffer.
+                if (messageSize <= buffer->TotalLength())
+                {
+                    // We have the oversize message in the current buffer chain.
+                    // Since it's oversize, it is definitely not a valid CHIP message, so we angrily toss it aside.
+                    buffer->ConsumeHead(messageSize);
+                    err = endPoint->AckReceive(messageSize);
+                    SuccessOrExit(err);
+                    err = CHIP_ERROR_MESSAGE_TOO_LONG;
+                    break;
+                }
+                // If we don't yet have the complete message, proceed along to open the receive window.
+            }
+            else
+            {
+                if (messageSize > buffer->MaxDataLength())
+                {
+                    // The current buffer head is too small for the message. We're gonna need a bigger buf.
+                    System::PacketBufferHandle newHead = System::PacketBufferHandle::NewWithData(
+                        buffer->Start(), buffer->DataLength(), static_cast<uint16_t>(messageSize - buffer->DataLength()));
+                    VerifyOrExit(!newHead.IsNull(), err = CHIP_ERROR_NO_MEMORY);
+                    buffer.Advance();
+                    newHead->AddToEnd(std::move(buffer));
+                    buffer = std::move(newHead);
+                }
+                buffer->CompactHead();
+                continue;
+            }
         }
 
         if (messageSize > 0)
