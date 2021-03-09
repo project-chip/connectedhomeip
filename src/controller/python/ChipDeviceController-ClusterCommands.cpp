@@ -689,6 +689,18 @@ CHIP_ERROR chip_ime_AppendCommand_LevelControl_StopWithOnOff(chip::Controller::D
 }
 // End of Cluster LevelControl
 
+// Cluster LowPower
+CHIP_ERROR chip_ime_AppendCommand_LowPower_Sleep(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                 chip::GroupId ZCLgroupId)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::LowPowerCluster clusterLowPower;
+    (void) ZCLgroupId;
+    clusterLowPower.Associate(device, ZCLendpointId);
+    return clusterLowPower.Sleep(nullptr, nullptr);
+}
+// End of Cluster LowPower
+
 // Cluster MediaPlayback
 CHIP_ERROR chip_ime_AppendCommand_MediaPlayback_FastForwardRequest(chip::Controller::Device * device,
                                                                    chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId)

@@ -369,6 +369,9 @@
 #define ZCL_START_WARNING_COMMAND_ID (0x00)
 #define ZCL_SQUAWK_COMMAND_ID (0x01)
 
+// Commands for cluster: Low Power
+#define ZCL_SLEEP_COMMAND_ID (0x00)
+
 // Commands for cluster: Generic Tunnel
 #define ZCL_MATCH_PROTOCOL_ADDRESS_COMMAND_ID (0x00)
 #define ZCL_MATCH_PROTOCOL_ADDRESS_RESPONSE_COMMAND_ID (0x00)
