@@ -48,6 +48,12 @@ Raspberry Pi Desktop 20.10 (aarch64)**
 >
 >     gn gen out/debug --args='chip_bypass_rendezvous=false'
 
+> If you want to test Echo protocol, please disable Rendezvous and enable Echo
+> handler
+>
+>     gn gen out/debug --args='chip_bypass_rendezvous=true chip_app_use_echo=true'
+>     ninja -C out/debug
+
 -   Prerequisites
 
     1. A Raspberry Pi 4 board
