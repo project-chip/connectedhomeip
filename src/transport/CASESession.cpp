@@ -90,6 +90,7 @@ CHIP_ERROR CASESession::EstablishSession(const Transport::PeerAddress peerAddres
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+    mDelegate = delegate;
     mConnectionState.SetPeerAddress(peerAddress);
     mConnectionState.SetPeerNodeId(peerNodeId);
 
