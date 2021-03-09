@@ -71,11 +71,7 @@ public:
 
     CHIP_ERROR SendMessage(const PacketHeader & header, const PeerAddress & address, System::PacketBufferHandle msgBuf) override
     {
-        // We need to change the peerKeyId to local Key Id to be received by itself.
-        PacketHeader tmpHeader = header;
-
-        tmpHeader.SetEncryptionKeyID(kTestLocalGroupKeyId);
-        HandleMessageReceived(tmpHeader, address, std::move(msgBuf));
+        HandleMessageReceived(header, address, std::move(msgBuf));
 
         return CHIP_NO_ERROR;
     }
