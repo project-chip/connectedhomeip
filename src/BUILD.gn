@@ -28,10 +28,6 @@ config("includes") {
   ]
 
   defines = [ "CHIP_HAVE_CONFIG_H=1" ]
-
-  if (chip_device_platform == "linux" || chip_device_platform == "darwin") {
-    defines += [ "CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE=${chip_enable_ble}" ]
-  }
 }
 
 if (chip_build_tests) {

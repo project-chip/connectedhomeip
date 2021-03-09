@@ -71,6 +71,10 @@ if (chip_device_platform != "none") {
       "OPENTHREAD_CONFIG_ENABLE_TOBLE=false",
     ]
 
+    if (chip_device_platform == "linux" || chip_device_platform == "darwin") {
+      defines += [ "CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE=${chip_enable_ble}" ]
+    }
+
     if (chip_enable_mdns) {
       defines += [ "CHIP_DEVICE_CONFIG_ENABLE_MDNS=1" ]
     }
