@@ -32,23 +32,17 @@ namespace reporting {
 
 EventOptions::EventOptions(void) : mTimestamp(Timestamp::Type::kInvalid), mpEventSchema(nullptr), mUrgent(false) {}
 
-EventOptions::EventOptions(bool aUrgent) :
-    mTimestamp(Timestamp::Type::kInvalid), mpEventSchema(nullptr), mUrgent(aUrgent)
-{}
+EventOptions::EventOptions(bool aUrgent) : mTimestamp(Timestamp::Type::kInvalid), mpEventSchema(nullptr), mUrgent(aUrgent) {}
 
-EventOptions::EventOptions(Timestamp aTimestamp) :
-    mTimestamp(aTimestamp), mpEventSchema(nullptr), mUrgent(false)
-{}
+EventOptions::EventOptions(Timestamp aTimestamp) : mTimestamp(aTimestamp), mpEventSchema(nullptr), mUrgent(false) {}
 
-EventOptions::EventOptions(Timestamp aTimestamp, bool aUrgent) :
-    mTimestamp(aTimestamp), mpEventSchema(nullptr), mUrgent(aUrgent)
-{}
+EventOptions::EventOptions(Timestamp aTimestamp, bool aUrgent) : mTimestamp(aTimestamp), mpEventSchema(nullptr), mUrgent(aUrgent) {}
 
 EventLoadOutContext::EventLoadOutContext(chip::TLV::TLVWriter & aWriter, PriorityLevel aPriority,
                                          chip::EventNumber aStartingEventNumber) :
     mWriter(aWriter),
-    mPriority(aPriority), mStartingEventNumber(aStartingEventNumber), mCurrentSystemTime(Timestamp::Type::kSystem), mCurrentEventNumber(0), mCurrentUTCTime(Timestamp::Type::kUTC),
-    mFirstUtc(true), mFirst(true)
+    mPriority(aPriority), mStartingEventNumber(aStartingEventNumber), mCurrentSystemTime(Timestamp::Type::kSystem),
+    mCurrentEventNumber(0), mCurrentUTCTime(Timestamp::Type::kUTC), mFirstUtc(true), mFirst(true)
 {}
 
 } // namespace reporting

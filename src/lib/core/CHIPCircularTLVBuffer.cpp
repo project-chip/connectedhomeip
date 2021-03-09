@@ -82,7 +82,7 @@ CHIPCircularTLVBuffer::CHIPCircularTLVBuffer(uint8_t * inBuffer, uint32_t inBuff
  */
 CHIPCircularTLVBuffer::CHIPCircularTLVBuffer(uint8_t * inBuffer, uint32_t inBufferLength)
 {
-   Init(inBuffer, inBufferLength);
+    Init(inBuffer, inBufferLength);
 }
 
 /**

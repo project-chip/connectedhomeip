@@ -326,7 +326,8 @@ void LoggingManagement::SkipEvent(EventLoadOutContext * apContext)
     apContext->mCurrentEventNumber++; // Advance the event id without writing anything
 }
 
-void LoggingManagement::CreateLoggingManagement(Messaging::ExchangeManager * apExchangeManager, int aNumBuffers, CircularEventBuffer *apCircularEventBuffer,
+void LoggingManagement::CreateLoggingManagement(Messaging::ExchangeManager * apExchangeManager, int aNumBuffers,
+                                                CircularEventBuffer * apCircularEventBuffer,
                                                 const LogStorageResources * const apLogStorageResources)
 {
 
@@ -347,14 +348,15 @@ void LoggingManagement::DestroyLoggingManagement(void)
     Platform::CriticalSectionExit();
 }
 
-LoggingManagement::LoggingManagement(Messaging::ExchangeManager * apExchangeMgr, int aNumBuffers, CircularEventBuffer *apCircularEventBuffer,
-    const LogStorageResources * const apLogStorageResources)
+LoggingManagement::LoggingManagement(Messaging::ExchangeManager * apExchangeMgr, int aNumBuffers,
+                                     CircularEventBuffer * apCircularEventBuffer,
+                                     const LogStorageResources * const apLogStorageResources)
 {
     Init(apExchangeMgr, aNumBuffers, apCircularEventBuffer, apLogStorageResources);
 }
 
-void LoggingManagement::Init(Messaging::ExchangeManager * apExchangeManager, int aNumBuffers, CircularEventBuffer *apCircularEventBuffer,
-                                     const LogStorageResources * const apLogStorageResources)
+void LoggingManagement::Init(Messaging::ExchangeManager * apExchangeManager, int aNumBuffers,
+                             CircularEventBuffer * apCircularEventBuffer, const LogStorageResources * const apLogStorageResources)
 {
     VerifyOrDie(aNumBuffers > 0);
 
@@ -370,9 +372,9 @@ void LoggingManagement::Init(Messaging::ExchangeManager * apExchangeManager, int
 
         current = &apCircularEventBuffer[bufferIndex];
         current->Init(static_cast<uint8_t *>(apLogStorageResources[bufferIndex].mpBuffer),
-                (uint32_t)(apLogStorageResources[bufferIndex].mBufferSize ), prev, next);
+                      (uint32_t)(apLogStorageResources[bufferIndex].mBufferSize), prev, next);
 
-        prev                  = current;
+        prev                            = current;
         current->mProcessEvictedElement = AlwaysFail;
         current->mAppData               = nullptr;
         current->mPriority              = apLogStorageResources[bufferIndex].mPriority;
@@ -463,7 +465,7 @@ CHIP_ERROR LoggingManagement::CopyAndAdjustDeltaTime(const TLVReader & aReader, 
         if (ctx->mpContext->mFirst) // First event gets a timestamp, subsequent ones get a delta T
         {
             err = ctx->mpWriter->Put(chip::TLV::ContextTag(chip::app::EventDataElement::kCsTag_SystemTimestamp),
-                                    ctx->mpContext->mCurrentSystemTime.mValue);
+                                     ctx->mpContext->mCurrentSystemTime.mValue);
         }
         else
         {
@@ -481,8 +483,8 @@ CHIP_ERROR LoggingManagement::CopyAndAdjustDeltaTime(const TLVReader & aReader, 
     {
         if (ctx->mpContext->mFirst)
         {
-            err =
-                ctx->mpWriter->Put(TLV::ContextTag(chip::app::EventDataElement::kCsTag_Number), ctx->mpContext->mCurrentEventNumber);
+            err = ctx->mpWriter->Put(TLV::ContextTag(chip::app::EventDataElement::kCsTag_Number),
+                                     ctx->mpContext->mCurrentEventNumber);
         }
     }
 
@@ -519,7 +521,7 @@ CHIP_ERROR LoggingManagement::LogEventPrivate(EventLoggingDelegate * apDelegate,
     EventLoadOutContext ctxt = EventLoadOutContext(writer, apOptions->mpEventSchema->mPriority,
                                                    GetPriorityBuffer(apOptions->mpEventSchema->mPriority)->mLastEventNumber);
     Timestamp timestamp(Timestamp::Type::kSystem, System::Timer::GetCurrentEpoch());
-    EventOptions opts        = EventOptions(timestamp);
+    EventOptions opts = EventOptions(timestamp);
 
     // check whether the entry is to be logged or discarded silently
     VerifyOrExit(apOptions->mpEventSchema->mPriority <= GetCurrentPriority(apOptions->mpEventSchema->mClusterId), /* no-op */);
@@ -700,7 +702,7 @@ CHIP_ERROR LoggingManagement::CopyEventsSince(const TLVReader & aReader, size_t 
         VerifyOrExit((err == CHIP_NO_ERROR) || (err == CHIP_END_OF_TLV), loadOutContext->mWriter = checkpoint);
 
         loadOutContext->mCurrentSystemTime.mValue = 0;
-        loadOutContext->mFirst       = false;
+        loadOutContext->mFirst                    = false;
         loadOutContext->mCurrentEventNumber++;
     }
 
@@ -724,7 +726,7 @@ CHIP_ERROR LoggingManagement::FetchEventsSince(TLVWriter & aWriter, PriorityLeve
         buf = buf->mpNext;
     }
 
-    context.mCurrentSystemTime        = buf->mFirstEventSystemTimestamp;
+    context.mCurrentSystemTime  = buf->mFirstEventSystemTimestamp;
     context.mCurrentEventNumber = buf->mFirstEventNumber;
     err                         = GetEventReader(reader, aPriority, &bufWrapper);
     SuccessOrExit(err);
@@ -891,19 +893,20 @@ void LoggingManagement::NotifyEventsDelivered(PriorityLevel aPriority, chip::Eve
 {}
 
 CircularEventBuffer::CircularEventBuffer() :
-        CHIPCircularTLVBuffer(nullptr, 0),
-        mpPrev(nullptr), mpNext(nullptr), mPriority(PriorityLevel::First), mFirstEventNumber(1), mLastEventNumber(0),
-        mFirstEventSystemTimestamp(Timestamp::Type::kSystem, 0), mLastEventSystemTimestamp(Timestamp::Type::kSystem, 0), mpEventNumberCounter(nullptr)
+    CHIPCircularTLVBuffer(nullptr, 0), mpPrev(nullptr), mpNext(nullptr), mPriority(PriorityLevel::First), mFirstEventNumber(1),
+    mLastEventNumber(0), mFirstEventSystemTimestamp(Timestamp::Type::kSystem, 0),
+    mLastEventSystemTimestamp(Timestamp::Type::kSystem, 0), mpEventNumberCounter(nullptr)
 {}
 
-void CircularEventBuffer::Init(uint8_t * apBuffer, uint32_t aBufferLength, CircularEventBuffer * apPrev, CircularEventBuffer * apNext)
+void CircularEventBuffer::Init(uint8_t * apBuffer, uint32_t aBufferLength, CircularEventBuffer * apPrev,
+                               CircularEventBuffer * apNext)
 {
     CHIPCircularTLVBuffer::Init(apBuffer, aBufferLength);
-    mpPrev = apPrev;
-    mpNext = apNext;
-    mPriority = PriorityLevel::First;
+    mpPrev            = apPrev;
+    mpNext            = apNext;
+    mPriority         = PriorityLevel::First;
     mFirstEventNumber = 1;
-    mLastEventNumber = 0;
+    mLastEventNumber  = 0;
     mFirstEventSystemTimestamp.Init(Timestamp::Type::kSystem, 0);
     mLastEventSystemTimestamp.Init(Timestamp::Type::kSystem, 0);
     mpEventNumberCounter = nullptr;

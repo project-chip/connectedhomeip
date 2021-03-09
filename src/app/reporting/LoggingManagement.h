@@ -125,6 +125,7 @@ public:
     CircularEventBuffer * GetNextCircularEventBuffer() { return mpNext; }
 
     virtual ~CircularEventBuffer() = default;
+
 private:
     friend class LoggingManagement;
     friend class CircularEventReader;
@@ -132,11 +133,12 @@ private:
     CircularEventBuffer * mpPrev = nullptr; //< A pointer CircularEventBuffer storing events less important events
     CircularEventBuffer * mpNext = nullptr; //< A pointer CircularEventBuffer storing events more important events
 
-    PriorityLevel mPriority = PriorityLevel::Invalid; //< The buffer is the final bucket for events of this priority.  Events of lesser priority are
+    PriorityLevel mPriority =
+        PriorityLevel::Invalid; //< The buffer is the final bucket for events of this priority.  Events of lesser priority are
     //< dropped when they get bumped out of this buffer
 
     chip::EventNumber mFirstEventNumber = 0; //< First event Number stored in the logging subsystem for this priority
-    chip::EventNumber mLastEventNumber = 0;  //< Last event Number vended for this priority
+    chip::EventNumber mLastEventNumber  = 0; //< Last event Number vended for this priority
 
     Timestamp mFirstEventSystemTimestamp; //< The timestamp of the first event in this buffer
     Timestamp mLastEventSystemTimestamp;  //< The timestamp of the last event in this buffer
@@ -194,8 +196,8 @@ struct LogStorageResources
                             //< counters will not be used for this priority level.
     uint32_t mCounterEpoch; //< The interval used in incrementing persistent counters.  When 0, the persistent counters will not be
                             //< used for this priority level.
-    chip::PersistedCounter *mpCounterStorage; //< application provided storage for persistent counter for this priority level.
-    PriorityLevel mPriority;                  //< Log priority level associated with the resources provided in this structure.
+    chip::PersistedCounter * mpCounterStorage; //< application provided storage for persistent counter for this priority level.
+    PriorityLevel mPriority;                   //< Log priority level associated with the resources provided in this structure.
 };
 
 /**
@@ -233,11 +235,11 @@ public:
      * @param[in] apLogStorageResources  An array of LogStorageResources for each priority level.
      *
      */
-    LoggingManagement(Messaging::ExchangeManager * apExchangeManager, int aNumBuffers, CircularEventBuffer *apCircularEventBuffer,
+    LoggingManagement(Messaging::ExchangeManager * apExchangeManager, int aNumBuffers, CircularEventBuffer * apCircularEventBuffer,
                       const LogStorageResources * const apLogStorageResources);
 
-    void Init(Messaging::ExchangeManager * apExchangeManager, int aNumBuffers, CircularEventBuffer *apCircularEventBuffer,
-                                 const LogStorageResources * const apLogStorageResources);
+    void Init(Messaging::ExchangeManager * apExchangeManager, int aNumBuffers, CircularEventBuffer * apCircularEventBuffer,
+              const LogStorageResources * const apLogStorageResources);
     /**
      * @brief
      *   LoggingManagement default constructor. Provided primarily to make the compiler happy.
@@ -269,7 +271,8 @@ public:
      *
      * @note This function must be called prior to the logging being used.
      */
-    static void CreateLoggingManagement(Messaging::ExchangeManager * apExchangeManager, int aNumBuffers, CircularEventBuffer *apCircularEventBuffer,
+    static void CreateLoggingManagement(Messaging::ExchangeManager * apExchangeManager, int aNumBuffers,
+                                        CircularEventBuffer * apCircularEventBuffer,
                                         const LogStorageResources * const apLogStorageResources);
 
     static void DestroyLoggingManagement(void);
@@ -586,9 +589,9 @@ private:
     CircularEventBuffer * GetPriorityBuffer(PriorityLevel aPriority) const;
 
     // EventBuffer for debug level,
-    CircularEventBuffer * mpEventBuffer = nullptr;
+    CircularEventBuffer * mpEventBuffer        = nullptr;
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
-    LoggingManagementStates mState = LoggingManagementStates::Idle;
+    LoggingManagementStates mState             = LoggingManagementStates::Idle;
     uint32_t mBytesWritten;
 };
 } // namespace reporting
