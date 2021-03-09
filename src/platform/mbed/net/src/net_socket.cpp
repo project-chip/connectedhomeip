@@ -250,12 +250,24 @@ ssize_t mbed_recvfrom(int sock, void * buf, size_t max_len, int flags, struct so
 
 int mbed_getsockopt(int sock, int level, int optname, void * optval, socklen_t * optlen)
 {
-    return 0;
+    auto * socket = getSocket(sock);
+    if (socket == nullptr)
+    {
+        set_errno(ENOBUFS);
+        return -1;
+    }
+    return socket->getsockopt(level, optname, optval, optlen);
 }
 
 int mbed_setsockopt(int sock, int level, int optname, const void * optval, socklen_t optlen)
 {
-    return 0;
+    auto * socket = getSocket(sock);
+    if (socket == nullptr)
+    {
+        set_errno(ENOBUFS);
+        return -1;
+    }
+    return socket->setsockopt(level, optname, optval, optlen);
 }
 
 int mbed_getsockname(int sock, struct sockaddr * addr, socklen_t * addrlen)
@@ -265,7 +277,15 @@ int mbed_getsockname(int sock, struct sockaddr * addr, socklen_t * addrlen)
 
 int mbed_getpeername(int sockfd, struct sockaddr * addr, socklen_t * addrlen)
 {
-    return 0;
+    auto * socket = getSocket(sockfd);
+    if (socket == nullptr)
+    {
+        set_errno(ENOBUFS);
+        return -1;
+    }
+    SocketAddress sockAddr;
+    Sockaddr2Netsocket(&sockAddr, addr);
+    return socket->getpeername(&sockAddr);
 }
 
 ssize_t mbed_recvmsg(int socket, struct msghdr * message, int flags)
