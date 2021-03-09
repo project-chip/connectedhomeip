@@ -31,7 +31,7 @@
 // Include the non-inline definitions for the GenericPlatformManagerImpl<> template,
 // from which the GenericPlatformManagerImpl_POSIX<> template inherits.
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
-#include <platform/Linux/MdnsImpl.h>
+#include "lib/mdns/platform/Mdns.h"
 #endif
 #include <platform/internal/GenericPlatformManagerImpl.cpp>
 
@@ -46,6 +46,15 @@
 #include <unistd.h>
 
 #define DEFAULT_MIN_SLEEP_PERIOD (60 * 60 * 24 * 30) // Month [sec]
+
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
+namespace chip {
+namespace Mdns {
+void UpdateMdnsDataset(fd_set & readFdSet, fd_set & writeFdSet, fd_set & errorFdSet, int & maxFd, timeval & timeout);
+void ProcessMdns(fd_set & readFdSet, fd_set & writeFdSet, fd_set & errorFdSet);
+} // namespace Mdns
+} // namespace chip
+#endif
 
 namespace chip {
 namespace DeviceLayer {

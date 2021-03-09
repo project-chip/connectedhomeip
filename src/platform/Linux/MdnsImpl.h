@@ -158,9 +158,5 @@ private:
     Poller mPoller;
 };
 
-void UpdateMdnsDataset(fd_set & readFdSet, fd_set & writeFdSet, fd_set & errorFdSet, int & maxFd, timeval & timeout);
-
-void ProcessMdns(fd_set & readFdSet, fd_set & writeFdSet, fd_set & errorFdSet);
-
 } // namespace Mdns
 } // namespace chip
