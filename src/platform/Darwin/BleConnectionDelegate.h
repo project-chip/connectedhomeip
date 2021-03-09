@@ -27,6 +27,7 @@ class BleConnectionDelegateImpl : public Ble::BleConnectionDelegate
 {
 public:
     virtual void NewConnection(Ble::BleLayer * bleLayer, void * appState, const uint16_t connDiscriminator);
+    virtual BLE_ERROR CancelConnection();
 };
 
 } // namespace Internal

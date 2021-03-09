@@ -691,6 +691,11 @@ void BLEManagerImpl::NewConnection(BleLayer * bleLayer, void * appState, const u
     PlatformMgr().ScheduleWork(InitiateScan, static_cast<intptr_t>(BleScanState::kScanForDiscriminator));
 }
 
+BLE_ERROR BLEManagerImpl::CancelConnection()
+{
+    return BLE_ERROR_NOT_IMPLEMENTED;
+}
+
 void BLEManagerImpl::NotifyBLEPeripheralRegisterAppComplete(bool aIsSuccess, void * apAppstate)
 {
     ChipDeviceEvent event;

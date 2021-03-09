@@ -39,9 +39,20 @@ namespace Transport {
 
 BLE::~BLE()
 {
+    ClearState();
+}
+
+void BLE::ClearState()
+{
+    if (mBleLayer)
+    {
+        mBleLayer->CancelBleIncompleteConnection();
+        mBleLayer->OnChipBleConnectReceived = nullptr;
+        mBleLayer                           = nullptr;
+    }
+
     if (mBleEndPoint)
     {
-        // Ble endpoint is only non null if ble endpoint is initialized and connected
         mBleEndPoint->Close();
         mBleEndPoint = nullptr;
     }
@@ -63,7 +74,8 @@ CHIP_ERROR BLE::Init(RendezvousSessionDelegate * delegate, const RendezvousParam
 
     if (params.HasDiscriminator())
     {
-        err = DelegateConnection(params.GetDiscriminator());
+        err = mBleLayer->NewBleConnection(reinterpret_cast<void *>(this), params.GetDiscriminator(), OnBleConnectionComplete,
+                                          OnBleConnectionError);
     }
     else if (params.HasConnectionObject())
     {
@@ -90,11 +102,7 @@ CHIP_ERROR BLE::InitInternal(BLE_CONNECTION_OBJECT connObj)
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        if (mBleEndPoint)
-        {
-            mBleEndPoint->Close();
-            mBleEndPoint = nullptr;
-        }
+        ClearState();
     }
     return err;
 }
@@ -121,18 +129,6 @@ void BLE::SetupEvents(Ble::BLEEndPoint * endPoint)
     endPoint->OnMessageReceived  = OnBleEndPointReceive;
     endPoint->OnConnectComplete  = OnBleEndPointConnectionComplete;
     endPoint->OnConnectionClosed = OnBleEndPointConnectionClosed;
-}
-
-CHIP_ERROR BLE::DelegateConnection(const uint16_t connDiscriminator)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    err = mBleLayer->NewBleConnection(reinterpret_cast<void *>(this), connDiscriminator, OnBleConnectionComplete,
-                                      OnBleConnectionError);
-    SuccessOrExit(err);
-
-exit:
-    return err;
 }
 
 CHIP_ERROR BLE::SendMessage(const PacketHeader & header, const Transport::PeerAddress & address, System::PacketBufferHandle msgBuf)
