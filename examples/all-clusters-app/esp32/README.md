@@ -1,6 +1,6 @@
 # CHIP All Clusters Example
 
-A prototype appplication that uses CHIP to setup WiFi on the ESP32 and runs an
+A prototype application that uses CHIP to setup WiFi on the ESP32 and runs an
 Echo Server. This example will evolve as more complex messaging is supported in
 CHIP.
 
