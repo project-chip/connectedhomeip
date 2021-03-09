@@ -108,6 +108,7 @@ void CheckExchangeChannels(nlTestSuite * inSuite, void * inContext)
     auto channelHandle = ctx.GetExchangeManager().EstablishChannel(channelBuilder, &channelDelegate);
     return;
 
+#if 0
     // TODO: complete test when CASESession is completed
     // wait for channel establishment
     ctx.DriveIOUntil(1000, [&] { return channelHandle.GetState() == ChannelState::kReady; });
@@ -128,6 +129,7 @@ void CheckExchangeChannels(nlTestSuite * inSuite, void * inContext)
 
     ec1->Close();
     channelHandle.Release();
+#endif
 }
 
 // Test Suite
