@@ -114,8 +114,7 @@ public:
      * A strongly-message-typed version of SendMessage.
      */
     template <typename MessageType, typename = std::enable_if_t<std::is_enum<MessageType>::value>>
-    CHIP_ERROR SendMessage(MessageType msgType, System::PacketBufferHandle && msgPayload, const SendFlags & sendFlags,
-                           void * msgCtxt = nullptr)
+    CHIP_ERROR SendMessage(MessageType msgType, System::PacketBufferHandle && msgPayload, const SendFlags & sendFlags)
     {
         static_assert(std::is_same<std::underlying_type_t<MessageType>, uint8_t>::value, "Enum is wrong size; cast is not safe");
         return SendMessage(Protocols::MessageTypeTraits<MessageType>::ProtocolId, static_cast<uint8_t>(msgType),
