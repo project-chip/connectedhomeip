@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("${chip_root}/src/ble/ble.gni")
 
 declare_args() {
   # Device platform layer: cc13x2_26x2, darwin, efr32, esp32, external, freertos, linux, nrfconnect, k32w, qpg6100, none.
@@ -41,8 +42,9 @@ declare_args() {
 
   # Enable ble support.
   chip_enable_ble =
-      chip_device_platform == "linux" || chip_device_platform == "darwin" ||
-      chip_device_platform == "cc13x2_26x2"
+       chip_config_network_layer_ble &&
+       (chip_device_platform == "linux" || chip_device_platform == "darwin" ||
+        chip_device_platform == "cc13x2_26x2")
 
   chip_enable_mdns =
       chip_device_platform == "linux" || chip_device_platform == "esp32"

@@ -234,11 +234,10 @@ extern "C" uint32_t pychip_internal_Commissioner_BleConnectForPairing(chip::Cont
     chip::python::ChipMainThreadScheduleAndWait([&]() {
         chip::RendezvousParameters params;
 
-        params.SetDiscriminator(discriminator)
-            .SetSetupPINCode(pinCode)
-            .SetRemoteNodeId(remoteNodeId)
-            .SetBleLayer(chip::DeviceLayer::ConnectivityMgr().GetBleLayer())
-            .SetPeerAddress(chip::Transport::PeerAddress::BLE());
+        params.SetDiscriminator(discriminator).SetSetupPINCode(pinCode).SetRemoteNodeId(remoteNodeId);
+#if CONFIG_NETWORK_LAYER_BLE
+        params.SetBleLayer(chip::DeviceLayer::ConnectivityMgr().GetBleLayer()).SetPeerAddress(chip::Transport::PeerAddress::BLE());
+#endif
 
         err = commissioner->PairDevice(remoteNodeId, params);
     });
