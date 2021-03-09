@@ -17,7 +17,10 @@
  *    limitations under the License.
  */
 
+#include "AppTask.h"
+
 #include <platform/CHIPDeviceLayer.h>
+#include <support/CHIPMem.h>
 #include <support/logging/CHIPLogging.h>
 
 using namespace ::chip;
@@ -26,10 +29,33 @@ using namespace ::chip::DeviceLayer;
 
 int main()
 {
+    int ret = 0;
+
+    ret = chip::Platform::MemoryInit();
+    if (ret != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Platform::MemoryInit() failed");
+        goto exit;
+    }
+
     ChipLogProgress(NotSpecified, "Init CHIP Stack\r\n");
-    int ret = PlatformMgr().InitChipStack();
+    ret = PlatformMgr().InitChipStack();
     if (ret != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified, "PlatformMgr().InitChipStack() failed");
     }
+
+    ChipLogProgress(NotSpecified, "Starting CHIP task");
+    ret = PlatformMgr().StartEventLoopTask();
+    if (ret != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "PlatformMgr().StartEventLoopTask() failed");
+        goto exit;
+    }
+
+    ret = GetAppTask().StartApp();
+
+exit:
+    ChipLogProgress(NotSpecified, "Exited with code %d", ret);
+    return ret;
 }

@@ -29,12 +29,14 @@ add_executable(${APP_TARGET})
 
 target_include_directories(${APP_TARGET} PRIVATE
                            ${CMAKE_CURRENT_SOURCE_DIR}
+                           ${CMAKE_CURRENT_SOURCE_DIR}/main/include/
                            ${APP_ROOT}/lock-common
 )
 
 target_sources(${APP_TARGET} PRIVATE
                ${CMAKE_CURRENT_SOURCE_DIR}/arch.c
                ${CMAKE_CURRENT_SOURCE_DIR}/main/main.cpp
+               ${CMAKE_CURRENT_SOURCE_DIR}/main/AppTask.cpp
                ${APP_ROOT}/lock-common/gen/call-command-handler.cpp
                ${APP_ROOT}/lock-common/gen/callback-stub.cpp
                ${CHIP_ROOT}/src/app/server/DataModelHandler.cpp
