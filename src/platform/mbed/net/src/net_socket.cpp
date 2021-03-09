@@ -60,13 +60,6 @@ int findMemForSocket()
     return id;
 }
 
-int mbed_close(int sock)
-{
-    auto * socket = getSocket(sock);
-    socket->~Socket();
-    sockets[sock].type = SOCKET_NOT_INITIALIZED;
-}
-
 int mbed_socket(int family, int type, int proto)
 {
     int id = findMemForSocket();
