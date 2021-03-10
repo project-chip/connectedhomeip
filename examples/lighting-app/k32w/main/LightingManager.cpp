@@ -50,7 +50,7 @@ int LightingManager::Init()
     mState                = kState_TurnOffCompleted;
     mAutoTurnOnTimerArmed = false;
     mAutoTurnOn           = false;
-    mAutoTurnOnDuration    = 0;
+    mAutoTurnOnDuration   = 0;
 
     return err;
 }
@@ -181,7 +181,7 @@ void LightingManager::TimerEventHandler(TimerHandle_t xTimer)
 void LightingManager::AutoReTurnOnTimerEventHandler(AppEvent * aEvent)
 {
     LightingManager * light = static_cast<LightingManager *>(aEvent->TimerEvent.Context);
-    int32_t actor          = 0;
+    int32_t actor           = 0;
 
     // Make sure auto light timer is still armed.
     if (!light->mAutoTurnOnTimerArmed)
@@ -204,12 +204,12 @@ void LightingManager::ActuatorMovementTimerEventHandler(AppEvent * aEvent)
 
     if (light->mState == kState_TurnOnInitiated)
     {
-        light->mState    = kState_TurnOnCompleted;
+        light->mState   = kState_TurnOnCompleted;
         actionCompleted = TURNON_ACTION;
     }
     else if (light->mState == kState_TurnOffInitiated)
     {
-        light->mState    = kState_TurnOffCompleted;
+        light->mState   = kState_TurnOffCompleted;
         actionCompleted = TURNOFF_ACTION;
     }
 
