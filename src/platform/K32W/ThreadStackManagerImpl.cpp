@@ -91,7 +91,7 @@ extern "C" void otSysEventSignalPending(void)
     portYIELD_FROM_ISR(yieldRequired);
 }
 
-extern "C" void *pvPortCallocRtos(size_t num, size_t size)
+extern "C" void * pvPortCallocRtos(size_t num, size_t size)
 {
     size_t totalAllocSize = (size_t)(num * size);
 
