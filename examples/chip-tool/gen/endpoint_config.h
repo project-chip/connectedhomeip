@@ -55,7 +55,7 @@
 
 #define ZAP_ATTRIBUTE_MASK(mask) ATTRIBUTE_MASK_##mask
 // This is an array of EmberAfAttributeMetadata structures.
-#define GENERATED_ATTRIBUTE_COUNT 11
+#define GENERATED_ATTRIBUTE_COUNT 16
 #define GENERATED_ATTRIBUTES                                                                                                       \
     {                                                                                                                              \
         { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), { (uint8_t *) 3 } }, /* Basic (client): cluster revision */     \
@@ -75,6 +75,9 @@
                 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), { (uint8_t *) 3 }                                         \
             }, /* Level Control (client): cluster revision */                                                                      \
             {                                                                                                                      \
+                0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), { (uint8_t *) 0x0001 }                                    \
+            }, /* General Commissioning (client): cluster revision */                                                              \
+            {                                                                                                                      \
                 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), { (uint8_t *) 3 }                                         \
             }, /* Door Lock (client): cluster revision */                                                                          \
             {                                                                                                                      \
@@ -88,7 +91,19 @@
             }, /* Temperature Measurement (client): cluster revision */                                                            \
             {                                                                                                                      \
                 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), { (uint8_t *) 0x0001 }                                    \
+            }, /* Low Power (client): cluster revision */                                                                          \
+            {                                                                                                                      \
+                0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), { (uint8_t *) 0x0001 }                                    \
+            }, /* Application Basic (client): cluster revision */                                                                  \
+            {                                                                                                                      \
+                0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), { (uint8_t *) 0x0001 }                                    \
             }, /* Binding (client): cluster revision */                                                                            \
+            {                                                                                                                      \
+                0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), { (uint8_t *) 0x0001 }                                    \
+            }, /* Media Playback (client): cluster revision */                                                                     \
+            {                                                                                                                      \
+                0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), { (uint8_t *) 0x0001 }                                    \
+            }, /* Content Launch (client): cluster revision */                                                                     \
     }
 
 // This is an array of EmberAfCluster structures.
@@ -98,7 +113,7 @@
 #define GENERATED_FUNCTION_ARRAYS
 
 #define ZAP_CLUSTER_MASK(mask) CLUSTER_MASK_##mask
-#define GENERATED_CLUSTER_COUNT 11
+#define GENERATED_CLUSTER_COUNT 16
 #define GENERATED_CLUSTERS                                                                                                         \
     {                                                                                                                              \
         { 0x0000, ZAP_ATTRIBUTE_INDEX(0), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL }, /* Endpoint: 1, Cluster: Basic (client) */       \
@@ -112,20 +127,35 @@
                 0x0008, ZAP_ATTRIBUTE_INDEX(5), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                               \
             }, /* Endpoint: 1, Cluster: Level Control (client) */                                                                  \
             {                                                                                                                      \
-                0x0101, ZAP_ATTRIBUTE_INDEX(6), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                               \
+                0x0030, ZAP_ATTRIBUTE_INDEX(6), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                               \
+            }, /* Endpoint: 1, Cluster: General Commissioning (client) */                                                          \
+            {                                                                                                                      \
+                0x0101, ZAP_ATTRIBUTE_INDEX(7), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                               \
             }, /* Endpoint: 1, Cluster: Door Lock (client) */                                                                      \
             {                                                                                                                      \
-                0x0103, ZAP_ATTRIBUTE_INDEX(7), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                               \
+                0x0103, ZAP_ATTRIBUTE_INDEX(8), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                               \
             }, /* Endpoint: 1, Cluster: Barrier Control (client) */                                                                \
             {                                                                                                                      \
-                0x0300, ZAP_ATTRIBUTE_INDEX(8), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                               \
+                0x0300, ZAP_ATTRIBUTE_INDEX(9), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                               \
             }, /* Endpoint: 1, Cluster: Color Control (client) */                                                                  \
             {                                                                                                                      \
-                0x0402, ZAP_ATTRIBUTE_INDEX(9), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                               \
+                0x0402, ZAP_ATTRIBUTE_INDEX(10), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
             }, /* Endpoint: 1, Cluster: Temperature Measurement (client) */                                                        \
             {                                                                                                                      \
-                0xF000, ZAP_ATTRIBUTE_INDEX(10), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+                0x0508, ZAP_ATTRIBUTE_INDEX(11), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+            }, /* Endpoint: 1, Cluster: Low Power (client) */                                                                      \
+            {                                                                                                                      \
+                0x050D, ZAP_ATTRIBUTE_INDEX(12), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+            }, /* Endpoint: 1, Cluster: Application Basic (client) */                                                              \
+            {                                                                                                                      \
+                0xF000, ZAP_ATTRIBUTE_INDEX(13), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
             }, /* Endpoint: 1, Cluster: Binding (client) */                                                                        \
+            {                                                                                                                      \
+                0xF001, ZAP_ATTRIBUTE_INDEX(14), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+            }, /* Endpoint: 1, Cluster: Media Playback (client) */                                                                 \
+            {                                                                                                                      \
+                0xF002, ZAP_ATTRIBUTE_INDEX(15), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+            }, /* Endpoint: 1, Cluster: Content Launch (client) */                                                                 \
     }
 
 #define ZAP_CLUSTER_INDEX(index) ((EmberAfCluster *) (&generatedClusters[index]))
@@ -133,7 +163,7 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 11, 22 },                                                                                          \
+        { ZAP_CLUSTER_INDEX(0), 16, 32 },                                                                                          \
     }
 
 // Largest attribute size is needed for various buffers
@@ -143,7 +173,7 @@
 #define ATTRIBUTE_SINGLETONS_SIZE (0)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (22)
+#define ATTRIBUTE_MAX_SIZE (32)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (1)
@@ -187,11 +217,10 @@
 
 // Array of EmberAfCommandMetadata structs.
 #define ZAP_COMMAND_MASK(mask) COMMAND_MASK_##mask
-#define EMBER_AF_GENERATED_COMMAND_COUNT (105)
+#define EMBER_AF_GENERATED_COMMAND_COUNT (127)
 #define GENERATED_COMMANDS                                                                                                         \
     {                                                                                                                              \
-        { 0x0000, 0x00,                                                                                                            \
-          ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT) }, /* Basic (client): MfgSpecificPing */           \
+        { 0x0000, 0x00, ZAP_COMMAND_MASK(OUTGOING_CLIENT) }, /* Basic (client): MfgSpecificPing */                                 \
             {                                                                                                                      \
                 0x0000, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
             },                                                   /* Basic (client): ResetToFactoryDefaults */                      \
@@ -232,6 +261,13 @@
             { 0x0008, 0x05, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Level Control (client): MoveWithOnOff */                       \
             { 0x0008, 0x06, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Level Control (client): StepWithOnOff */                       \
             { 0x0008, 0x07, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Level Control (client): StopWithOnOff */                       \
+            { 0x0030, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* General Commissioning (client): SetFabric */                   \
+            { 0x0030, 0x01, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* General Commissioning (client): SetFabricResponse */           \
+            { 0x0030, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* General Commissioning (client): ArmFailSafe */                 \
+            { 0x0030, 0x03, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* General Commissioning (client): ArmFailSafeResponse */         \
+            { 0x0030, 0x06, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* General Commissioning (client): CommissioningComplete */       \
+            { 0x0030, 0x07,                                                                                                        \
+              ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* General Commissioning (client): CommissioningCompleteResponse */             \
             { 0x0101, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Door Lock (client): LockDoor */                                \
             { 0x0101, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Door Lock (client): LockDoorResponse */                        \
             { 0x0101, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Door Lock (client): UnlockDoor */                              \
@@ -380,15 +416,31 @@
             {                                                                                                                      \
                 0x0300, 0x4C, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
             },                                                   /* Color Control (client): StepColorTemperature */                \
+            { 0x0508, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Low Power (client): Sleep */                                   \
             { 0xF000, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Binding (client): Bind */                                      \
             { 0xF000, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Binding (client): Unbind */                                    \
+            { 0xF001, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (client): PlayRequest */                        \
+            { 0xF001, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Media Playback (client): Playback */                           \
+            { 0xF001, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (client): PauseRequest */                       \
+            { 0xF001, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (client): StopRequest */                        \
+            { 0xF001, 0x03, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (client): StartOverRequest */                   \
+            { 0xF001, 0x04, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (client): PreviousRequest */                    \
+            { 0xF001, 0x05, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (client): NextRequest */                        \
+            { 0xF001, 0x06, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (client): RewindRequest */                      \
+            { 0xF001, 0x07, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (client): FastForwardRequest */                 \
+            { 0xF001, 0x08, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (client): SkipForwardRequest */                 \
+            { 0xF001, 0x09, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (client): SkipBackwardRequest */                \
+            { 0xF002, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Content Launch (client): LaunchContent */                      \
+            { 0xF002, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Content Launch (client): LaunchContentResponse */              \
+            { 0xF002, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Content Launch (client): LaunchURL */                          \
+            { 0xF002, 0x01, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Content Launch (client): LaunchURLResponse */                  \
     }
 
 // Array of EmberAfManufacturerCodeEntry structures for commands.
 #define GENERATED_COMMAND_MANUFACTURER_CODE_COUNT (1)
 #define GENERATED_COMMAND_MANUFACTURER_CODES                                                                                       \
     {                                                                                                                              \
-        { 0, 0x1002 },                                                                                                             \
+        { 0, 4098 },                                                                                                               \
     }
 
 // This is an array of EmberAfManufacturerCodeEntry structures for clusters.

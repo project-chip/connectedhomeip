@@ -1,6 +1,6 @@
 # CHIP All Clusters Example
 
-A prototype appplication that uses CHIP to setup WiFi on the ESP32 and runs an
+A prototype application that uses CHIP to setup WiFi on the ESP32 and runs an
 Echo Server. This example will evolve as more complex messaging is supported in
 CHIP.
 
@@ -33,13 +33,13 @@ Development Framework and the xtensa-esp32-elf toolchain.
 The VSCode devcontainer has these components pre-installed, so you can skip this
 step. To install these components manually, follow these steps:
 
--   Clone the Espressif ESP-IDF and checkout release/v4.1 branch
+-   Clone the Espressif ESP-IDF and checkout release/v4.2 branch
 
           $ mkdir ${HOME}/tools
           $ cd ${HOME}/tools
           $ git clone https://github.com/espressif/esp-idf.git
           $ cd esp-idf
-          $ git checkout release/v4.1
+          $ git checkout release/v4.2
           $ git submodule update --init
           $ export IDF_PATH=${HOME}/tools/esp-idf
           $ ./install.sh

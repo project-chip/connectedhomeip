@@ -58,7 +58,8 @@
     chip::SetupPayload setupPayload;
 
     [self.lock lock];
-    err = self.cppDevice->OpenPairingWindow(duration, false, 0, setupPayload);
+    err = self.cppDevice->OpenPairingWindow(
+        duration, chip::Controller::Device::PairingWindowOption::kOriginalSetupCode, setupPayload);
     [self.lock unlock];
 
     if (err != CHIP_NO_ERROR) {
@@ -73,27 +74,30 @@
 }
 
 - (NSString *)openPairingWindowWithPIN:(NSTimeInterval)duration
-                         discriminator:(NSInteger)discriminator
+                         discriminator:(NSUInteger)discriminator
+                              setupPIN:(NSUInteger)setupPIN
                                  error:(NSError * __autoreleasing *)error
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    uint16_t u16Descriminator = 0;
+    chip::SetupPayload setupPayload;
 
     if (discriminator > 0xfff) {
-        CHIP_LOG_ERROR("Error: Discriminator %ld is too large. Max value %d", discriminator, 0xfff);
+        CHIP_LOG_ERROR("Error: Discriminator %tu is too large. Max value %d", discriminator, 0xfff);
         if (error) {
             *error = [CHIPError errorForCHIPErrorCode:CHIP_ERROR_INVALID_INTEGER_VALUE];
         }
         return nil;
     } else {
-        u16Descriminator = (uint16_t) discriminator;
+        setupPayload.discriminator = (uint16_t) discriminator;
     }
 
-    chip::SetupPayload setupPayload;
+    setupPIN &= ((1 << chip::kSetupPINCodeFieldLengthInBits) - 1);
+    setupPayload.setUpPINCode = (uint32_t) setupPIN;
 
     [self.lock lock];
-    err = self.cppDevice->OpenPairingWindow(duration, true, u16Descriminator, setupPayload);
+    err = self.cppDevice->OpenPairingWindow(
+        duration, chip::Controller::Device::PairingWindowOption::kTokenWithProvidedPIN, setupPayload);
     [self.lock unlock];
 
     if (err != CHIP_NO_ERROR) {

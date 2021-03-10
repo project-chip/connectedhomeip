@@ -23,6 +23,8 @@ static_library("setup_payload") {
 
   sources = [
     "AdditionalDataPayload.h",
+    "AdditionalDataPayloadGenerator.cpp",
+    "AdditionalDataPayloadGenerator.h",
     "AdditionalDataPayloadParser.cpp",
     "AdditionalDataPayloadParser.h",
     "Base41.cpp",
@@ -44,6 +46,7 @@ static_library("setup_payload") {
   cflags = [ "-Wconversion" ]
 
   public_deps = [
+    "${chip_root}/src/crypto",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
   ]

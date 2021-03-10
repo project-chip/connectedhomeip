@@ -177,7 +177,7 @@ void ShutdownSystemLayer()
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 static void PrintNetworkState()
 {
-    char intfName[10];
+    char intfName[chip::Inet::InterfaceIterator::kMaxIfNameLength];
 
     for (size_t j = 0; j < gNetworkOptions.TapDeviceName.size(); j++)
     {

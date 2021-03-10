@@ -32,6 +32,7 @@
 
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
+#include <support/ReturnMacros.h>
 #include <support/SafeInt.h>
 
 #include <stdarg.h>
@@ -231,6 +232,12 @@ CHIP_ERROR TLVWriter::Put(uint64_t tag, double v)
     } cvt;
     cvt.d = v;
     return WriteElementHead(TLVElementType::FloatingPointNumber64, tag, cvt.u64);
+}
+
+CHIP_ERROR TLVWriter::Put(uint64_t tag, ByteSpan data)
+{
+    VerifyOrReturnError(CanCastTo<uint32_t>(data.size()), CHIP_ERROR_MESSAGE_TOO_LONG);
+    return PutBytes(tag, data.data(), static_cast<uint32_t>(data.size()));
 }
 
 CHIP_ERROR TLVWriter::PutBytes(uint64_t tag, const uint8_t * buf, uint32_t len)

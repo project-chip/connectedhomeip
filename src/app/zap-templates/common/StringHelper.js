@@ -39,6 +39,11 @@ function isString(type)
   return isShortString(type) || isLongString(type);
 }
 
+function isCharString(type)
+{
+  return isString(type) && !isByteString(type);
+}
+
 //
 // Module exports
 //
@@ -46,3 +51,4 @@ exports.isString      = isString;
 exports.isShortString = isShortString;
 exports.isLongString  = isLongString;
 exports.isByteString  = isByteString;
+exports.isCharString  = isCharString;

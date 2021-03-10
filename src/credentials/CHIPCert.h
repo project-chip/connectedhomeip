@@ -39,8 +39,9 @@
 namespace chip {
 namespace Credentials {
 
-const uint32_t kKeyIdentifierLength = 20;
-const uint32_t kChipIdUTF8Length    = 16;
+static constexpr uint32_t kKeyIdentifierLength                 = 20;
+static constexpr uint32_t kChipIdUTF8Length                    = 16;
+static constexpr uint16_t kX509NoWellDefinedExpirationDateYear = 9999;
 
 /** Data Element Tags for the CHIP Certificate
  */
@@ -240,22 +241,22 @@ struct ChipCertificateData
 
     void Clear();
 
-    ChipDN mSubjectDN;                                   /**< Certificate Subject DN. */
-    ChipDN mIssuerDN;                                    /**< Certificate Issuer DN. */
-    CertificateKeyId mSubjectKeyId;                      /**< Certificate Subject public key identifier. */
-    CertificateKeyId mAuthKeyId;                         /**< Certificate Authority public key identifier. */
-    uint16_t mNotBeforeDate;                             /**< Certificate validity: Not Before field. */
-    uint16_t mNotAfterDate;                              /**< Certificate validity: Not After field. */
-    const uint8_t * mPublicKey;                          /**< Pointer to the certificate public key. */
-    uint8_t mPublicKeyLen;                               /**< Certificate public key length. */
-    uint16_t mPubKeyCurveOID;                            /**< Public key Elliptic Curve CHIP OID. */
-    uint16_t mPubKeyAlgoOID;                             /**< Public key algorithm CHIP OID. */
-    uint16_t mSigAlgoOID;                                /**< Certificate signature algorithm CHIP OID. */
-    BitFlags<uint16_t, CertFlags> mCertFlags;            /**< Certificate data flags. */
-    BitFlags<uint16_t, KeyUsageFlags> mKeyUsageFlags;    /**< Certificate key usage extensions flags. */
-    BitFlags<uint8_t, KeyPurposeFlags> mKeyPurposeFlags; /**< Certificate extended key usage extensions flags. */
-    uint8_t mPathLenConstraint;                          /**< Basic constraint: path length. */
-    uint8_t mCertType;                                   /**< Certificate type. */
+    ChipDN mSubjectDN;                          /**< Certificate Subject DN. */
+    ChipDN mIssuerDN;                           /**< Certificate Issuer DN. */
+    CertificateKeyId mSubjectKeyId;             /**< Certificate Subject public key identifier. */
+    CertificateKeyId mAuthKeyId;                /**< Certificate Authority public key identifier. */
+    uint32_t mNotBeforeTime;                    /**< Certificate validity: Not Before field. */
+    uint32_t mNotAfterTime;                     /**< Certificate validity: Not After field. */
+    const uint8_t * mPublicKey;                 /**< Pointer to the certificate public key. */
+    uint8_t mPublicKeyLen;                      /**< Certificate public key length. */
+    uint16_t mPubKeyCurveOID;                   /**< Public key Elliptic Curve CHIP OID. */
+    uint16_t mPubKeyAlgoOID;                    /**< Public key algorithm CHIP OID. */
+    uint16_t mSigAlgoOID;                       /**< Certificate signature algorithm CHIP OID. */
+    BitFlags<CertFlags> mCertFlags;             /**< Certificate data flags. */
+    BitFlags<KeyUsageFlags> mKeyUsageFlags;     /**< Certificate key usage extensions flags. */
+    BitFlags<KeyPurposeFlags> mKeyPurposeFlags; /**< Certificate extended key usage extensions flags. */
+    uint8_t mPathLenConstraint;                 /**< Basic constraint: path length. */
+    uint8_t mCertType;                          /**< Certificate type. */
     struct
     {
         const uint8_t * R; /**< Pointer to the R element of the signature, encoded as ASN.1 DER Integer. */
@@ -274,16 +275,16 @@ struct ChipCertificateData
  */
 struct ValidationContext
 {
-    uint32_t mEffectiveTime;                                 /**< Current time in the CHIP Packed Certificate Time format. */
-    const ChipCertificateData * mTrustAnchor;                /**< Pointer to the Trust Anchor Certificate data structure. */
-    const ChipCertificateData * mSigningCert;                /**< Pointer to the Signing Certificate data structure. */
-    BitFlags<uint16_t, KeyUsageFlags> mRequiredKeyUsages;    /**< Key usage extensions that should be present in the
-                                                                validated certificate. */
-    BitFlags<uint8_t, KeyPurposeFlags> mRequiredKeyPurposes; /**< Extended Key usage extensions that should be present
-                                                                in the validated certificate. */
-    BitFlags<uint8_t, CertValidateFlags> mValidateFlags;     /**< Certificate validation flags, specifying how a certificate
-                                                                should be validated. */
-    uint8_t mRequiredCertType;                               /**< Required certificate type. */
+    uint32_t mEffectiveTime;                        /**< Current CHIP Epoch UTC time. */
+    const ChipCertificateData * mTrustAnchor;       /**< Pointer to the Trust Anchor Certificate data structure. */
+    const ChipCertificateData * mSigningCert;       /**< Pointer to the Signing Certificate data structure. */
+    BitFlags<KeyUsageFlags> mRequiredKeyUsages;     /**< Key usage extensions that should be present in the
+                                                       validated certificate. */
+    BitFlags<KeyPurposeFlags> mRequiredKeyPurposes; /**< Extended Key usage extensions that should be present
+                                                       in the validated certificate. */
+    BitFlags<CertValidateFlags> mValidateFlags;     /**< Certificate validation flags, specifying how a certificate
+                                                       should be validated. */
+    uint8_t mRequiredCertType;                      /**< Required certificate type. */
 
     void Reset();
 };
@@ -349,7 +350,7 @@ public:
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR LoadCert(const uint8_t * chipCert, uint32_t chipCertLen, BitFlags<uint8_t, CertDecodeFlags> decodeFlags);
+    CHIP_ERROR LoadCert(const uint8_t * chipCert, uint32_t chipCertLen, BitFlags<CertDecodeFlags> decodeFlags);
 
     /**
      * @brief Load CHIP certificate into set.
@@ -362,7 +363,7 @@ public:
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR LoadCert(chip::TLV::TLVReader & reader, BitFlags<uint8_t, CertDecodeFlags> decodeFlags);
+    CHIP_ERROR LoadCert(chip::TLV::TLVReader & reader, BitFlags<CertDecodeFlags> decodeFlags);
 
     /**
      * @brief Load CHIP certificates into set.
@@ -376,7 +377,7 @@ public:
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR LoadCerts(const uint8_t * chipCerts, uint32_t chipCertsLen, BitFlags<uint8_t, CertDecodeFlags> decodeFlags);
+    CHIP_ERROR LoadCerts(const uint8_t * chipCerts, uint32_t chipCertsLen, BitFlags<CertDecodeFlags> decodeFlags);
 
     /**
      * @brief Load CHIP certificates into set.
@@ -390,7 +391,7 @@ public:
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR LoadCerts(chip::TLV::TLVReader & reader, BitFlags<uint8_t, CertDecodeFlags> decodeFlags);
+    CHIP_ERROR LoadCerts(chip::TLV::TLVReader & reader, BitFlags<CertDecodeFlags> decodeFlags);
 
     /**
      * @brief Add trusted anchor key to the certificate set.
@@ -504,7 +505,7 @@ private:
      * @return Returns a CHIP_ERROR on validation or other error, CHIP_NO_ERROR otherwise
      **/
     CHIP_ERROR FindValidCert(const ChipDN & subjectDN, const CertificateKeyId & subjectKeyId, ValidationContext & context,
-                             BitFlags<uint8_t, CertValidateFlags> validateFlags, uint8_t depth, ChipCertificateData *& cert);
+                             BitFlags<CertValidateFlags> validateFlags, uint8_t depth, ChipCertificateData *& cert);
 
     /**
      * @brief Validate CHIP certificate.
@@ -517,7 +518,7 @@ private:
      * @return Returns a CHIP_ERROR on validation or other error, CHIP_NO_ERROR otherwise
      **/
     CHIP_ERROR ValidateCert(const ChipCertificateData * cert, ValidationContext & context,
-                            BitFlags<uint8_t, CertValidateFlags> validateFlags, uint8_t depth);
+                            BitFlags<CertValidateFlags> validateFlags, uint8_t depth);
 };
 
 /**
@@ -604,83 +605,31 @@ CHIP_ERROR DetermineCertType(ChipCertificateData & cert);
 
 /**
  * @brief
- *   Convert a certificate date/time (in the form of an ASN.1 universal time structure) into a packed
- *   certificate date/time.
- *
- * @details
- *   Packed certificate date/times provide a compact representation for the time values within a certificate
- *   (notBefore and notAfter) that does not require full calendar math to interpret.
- *
- *   A packed certificate date/time contains the fields of a calendar date/time--i.e. year, month, day, hour,
- *   minute, second--packed into an unsigned integer. The bit representation is organized such that
- *   ordinal comparisons of packed date/time values correspond to the natural ordering of the corresponding
- *   times.  To reduce their size, packed certificate date/times are limited to representing times that are on
- *   or after 2020/01/01 00:00:00.  When housed within a 32-bit unsigned integer, packed certificate
- *   date/times can represent times up to the year 2153.
+ *   Convert a certificate date/time (in the form of an ASN.1 universal time structure) into a CHIP Epoch UTC time.
  *
  * @note
  *   This function makes no attempt to verify the correct range of the input time other than year.
  *   Therefore callers must make sure the supplied values are valid prior to invocation.
  *
- * @param time        The calendar date/time to be converted.
- * @param packedTime  A reference to an integer that will receive packed date/time.
+ * @param asn1Time   The calendar date/time to be converted.
+ * @param epochTime  A reference to an integer that will receive CHIP Epoch UTC time.
  *
  * @retval  #CHIP_NO_ERROR                      If the input time was successfully converted.
  * @retval  #ASN1_ERROR_UNSUPPORTED_ENCODING    If the input time contained a year value that could not
- *                                              be represented in a packed certificate time value.
+ *                                              be represented in a CHIP epoch UTC time value.
  **/
-CHIP_ERROR PackCertTime(const chip::ASN1::ASN1UniversalTime & time, uint32_t & packedTime);
+CHIP_ERROR ASN1ToChipEpochTime(const chip::ASN1::ASN1UniversalTime & asn1Time, uint32_t & epochTime);
 
 /**
  * @brief
- *   Unpack a packed certificate date/time into an ASN.1 universal time structure.
+ *   Convert a CHIP epoch UTC time into an ASN.1 universal time structure.
  *
- * @param packedTime  A packed certificate time to be unpacked.
- * @param time        A reference to an ASN1UniversalTime structure to receive the unpacked date/time.
+ * @param epochTime  A CHIP epoch UTC time to be converted.
+ * @param asn1Time   A reference to an ASN1UniversalTime structure to receive the date/time.
  *
- * @retval  #CHIP_NO_ERROR                      If the input time was successfully unpacked.
+ * @retval  #CHIP_NO_ERROR                      If the input time was successfully converted.
  */
-CHIP_ERROR UnpackCertTime(uint32_t packedTime, chip::ASN1::ASN1UniversalTime & time);
-
-/**
- * @brief
- *   Convert a packed certificate date/time to a packed certificate date.
- *
- * @details
- *   A packed certificate date contains the fields of a calendar date--year, month, day--packed into an
- *   unsigned integer.  The bits are organized such that ordinal comparisons of packed date values
- *   correspond to the natural ordering of the corresponding dates.  To reduce their size, packed
- *   certificate dates are limited to representing dates on or after 2020/01/01.  When housed within
- *   a 16-bit unsigned integer, packed certificate dates can represent dates up to the year 2196.
- *
- * @param packedTime  The packed certificate date/time to be converted.
- *
- * @return A corresponding packed certificate date.
- **/
-uint16_t PackedCertTimeToDate(uint32_t packedTime);
-
-/**
- * @brief
- *   Convert a packed certificate date to a corresponding packed certificate date/time, where
- *   the time portion of the value is set to 00:00:00.
- *
- * @param packedDate  The packed certificate date to be converted.
- *
- * @return  A corresponding packed certificate date/time.
- **/
-uint32_t PackedCertDateToTime(uint16_t packedDate);
-
-/**
- * @brief
- *   Convert the number of seconds since 1970-01-01 00:00:00 UTC to a packed certificate date/time.
- *
- * @param secondsSinceEpoch  Number of seconds since 1970-01-01 00:00:00 UTC.
- *                           Note: this value is compatible with *positive* values
- *                           of the POSIX time_t value, up to the year 2105.
- *
- * @return  A corresponding packed certificate date/time.
- **/
-uint32_t SecondsSinceEpochToPackedCertTime(uint32_t secondsSinceEpoch);
+CHIP_ERROR ChipEpochToASN1Time(uint32_t epochTime, chip::ASN1::ASN1UniversalTime & asn1Time);
 
 /**
  *  @return  True if the OID represents a CHIP-defined X.509 distinguished named attribute.

@@ -21,6 +21,7 @@
 
 PROJECT_NAME := chip-all-clusters-app
 
+# The list of extra component dirs must be in sync with that in all-clusters-app/esp32/CMakeLists.txt
 EXTRA_COMPONENT_DIRS += $(PROJECT_PATH)/third_party/connectedhomeip/config/esp32/components \
                         $(PROJECT_PATH)/../../common/m5stack-tft/repo/components \
                         $(PROJECT_PATH)/../../common/QRCode \

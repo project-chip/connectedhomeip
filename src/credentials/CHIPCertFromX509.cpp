@@ -179,21 +179,25 @@ exit:
 static CHIP_ERROR ConvertValidity(ASN1Reader & reader, TLVWriter & writer)
 {
     CHIP_ERROR err;
-    ASN1UniversalTime notBeforeTime, notAfterTime;
-    uint32_t packedNotBeforeTime, packedNotAfterTime;
+    ASN1UniversalTime asn1Time;
+    uint32_t chipEpochTime;
 
     ASN1_PARSE_ENTER_SEQUENCE
     {
-        ASN1_PARSE_TIME(notBeforeTime);
-        err = PackCertTime(notBeforeTime, packedNotBeforeTime);
-        SuccessOrExit(err);
-        err = writer.Put(ContextTag(kTag_NotBefore), packedNotBeforeTime);
+        ASN1_PARSE_TIME(asn1Time);
+
+        err = ASN1ToChipEpochTime(asn1Time, chipEpochTime);
         SuccessOrExit(err);
 
-        ASN1_PARSE_TIME(notAfterTime);
-        err = PackCertTime(notAfterTime, packedNotAfterTime);
+        err = writer.Put(ContextTag(kTag_NotBefore), chipEpochTime);
         SuccessOrExit(err);
-        err = writer.Put(ContextTag(kTag_NotAfter), packedNotAfterTime);
+
+        ASN1_PARSE_TIME(asn1Time);
+
+        err = ASN1ToChipEpochTime(asn1Time, chipEpochTime);
+        SuccessOrExit(err);
+
+        err = writer.Put(ContextTag(kTag_NotAfter), chipEpochTime);
         SuccessOrExit(err);
     }
     ASN1_EXIT_SEQUENCE;
@@ -359,8 +363,7 @@ static CHIP_ERROR ConvertExtension(ASN1Reader & reader, TLVWriter & writer)
                 VerifyOrExit(keyUsageBits <= UINT16_MAX, err = ASN1_ERROR_INVALID_ENCODING);
 
                 // Check that only supported flags are set.
-                BitFlags<uint16_t, KeyUsageFlags> keyUsageFlags;
-                keyUsageFlags.SetRaw(static_cast<uint16_t>(keyUsageBits));
+                BitFlags<KeyUsageFlags> keyUsageFlags(static_cast<uint16_t>(keyUsageBits));
                 VerifyOrExit(keyUsageFlags.HasOnly(
                                  KeyUsageFlags::kDigitalSignature, KeyUsageFlags::kNonRepudiation, KeyUsageFlags::kKeyEncipherment,
                                  KeyUsageFlags::kDataEncipherment, KeyUsageFlags::kKeyAgreement, KeyUsageFlags::kKeyCertSign,

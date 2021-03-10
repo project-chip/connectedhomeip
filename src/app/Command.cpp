@@ -35,11 +35,10 @@ CHIP_ERROR Command::Init(Messaging::ExchangeManager * apExchangeMgr)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     // Error if already initialized.
-    if (mpExchangeMgr != nullptr)
-        return CHIP_ERROR_INCORRECT_STATE;
+    VerifyOrExit(mpExchangeMgr == nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mpExchangeCtx == nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     mpExchangeMgr = apExchangeMgr;
-    mpExchangeCtx = nullptr;
 
     err = Reset();
     SuccessOrExit(err);
@@ -58,7 +57,7 @@ CHIP_ERROR Command::Reset()
     if (mCommandMessageBuf.IsNull())
     {
         // TODO: Calculate the packet buffer size
-        mCommandMessageBuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
+        mCommandMessageBuf = System::PacketBufferHandle::New(chip::app::kMaxSecureSduLength);
         VerifyOrExit(!mCommandMessageBuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
     }
 
@@ -67,7 +66,7 @@ CHIP_ERROR Command::Reset()
     SuccessOrExit(err);
 
     mInvokeCommandBuilder.CreateCommandListBuilder();
-    MoveToState(kState_Initialized);
+    MoveToState(CommandState::Initialized);
 
 exit:
     ChipLogFunctError(err);
@@ -127,17 +126,14 @@ exit:
 
 void Command::Shutdown()
 {
-    VerifyOrExit(mState != kState_Uninitialized, );
+    VerifyOrExit(mState != CommandState::Uninitialized, );
     mCommandMessageWriter.Reset();
     mCommandMessageBuf = nullptr;
 
-    if (mpExchangeCtx != nullptr)
-    {
-        mpExchangeCtx->Abort();
-        mpExchangeCtx = nullptr;
-    }
+    ClearExistingExchangeContext();
+
     mpExchangeMgr = nullptr;
-    MoveToState(kState_Uninitialized);
+    MoveToState(CommandState::Uninitialized);
 
 exit:
     return;
@@ -145,7 +141,7 @@ exit:
 
 chip::TLV::TLVWriter & Command::CreateCommandDataElementTLVWriter()
 {
-    mCommandDataBuf = chip::System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
+    mCommandDataBuf = chip::System::PacketBufferHandle::New(chip::app::kMaxSecureSduLength);
     if (mCommandDataBuf.IsNull())
     {
         ChipLogDetail(DataManagement, "Unable to allocate packet buffer");
@@ -156,18 +152,10 @@ chip::TLV::TLVWriter & Command::CreateCommandDataElementTLVWriter()
     return mCommandDataWriter;
 }
 
-CHIP_ERROR Command::AddCommand(chip::EndpointId aEndpintId, chip::GroupId aGroupId, chip::ClusterId aClusterId,
-                               chip::CommandId aCommandId, uint8_t aFlags)
+CHIP_ERROR Command::AddCommand(chip::EndpointId aEndpointId, chip::GroupId aGroupId, chip::ClusterId aClusterId,
+                               chip::CommandId aCommandId, BitFlags<CommandPathFlags> aFlags)
 {
-    CommandParams commandParams;
-
-    memset(&commandParams, 0, sizeof(CommandParams));
-
-    commandParams.EndpointId = aEndpintId;
-    commandParams.GroupId    = aGroupId;
-    commandParams.ClusterId  = aClusterId;
-    commandParams.CommandId  = aCommandId;
-    commandParams.Flags      = aFlags;
+    CommandParams commandParams(aEndpointId, aGroupId, aClusterId, aCommandId, aFlags);
 
     return AddCommand(commandParams);
 }
@@ -195,17 +183,17 @@ CHIP_ERROR Command::AddCommand(CommandParams & aCommandParams)
         CommandDataElement::Builder commandDataElement =
             mInvokeCommandBuilder.GetCommandListBuilder().CreateCommandDataElementBuilder();
         CommandPath::Builder commandPath = commandDataElement.CreateCommandPathBuilder();
-        if (aCommandParams.Flags & kCommandPathFlag_EndpointIdValid)
+        if (aCommandParams.Flags.Has(CommandPathFlags::kEndpointIdValid))
         {
             commandPath.EndpointId(aCommandParams.EndpointId);
         }
 
-        if (aCommandParams.Flags & kCommandPathFlag_GroupIdValid)
+        if (aCommandParams.Flags.Has(CommandPathFlags::kGroupIdValid))
         {
             commandPath.GroupId(aCommandParams.GroupId);
         }
 
-        commandPath.NamespacedClusterId(aCommandParams.ClusterId).CommandId(aCommandParams.CommandId).EndOfCommandPath();
+        commandPath.ClusterId(aCommandParams.ClusterId).CommandId(aCommandParams.CommandId).EndOfCommandPath();
 
         err = commandPath.GetError();
         SuccessOrExit(err);
@@ -224,7 +212,7 @@ CHIP_ERROR Command::AddCommand(CommandParams & aCommandParams)
         err = commandDataElement.GetError();
         SuccessOrExit(err);
     }
-    MoveToState(kState_AddCommand);
+    MoveToState(CommandState::AddCommand);
 
 exit:
     mCommandDataBuf = nullptr;
@@ -233,7 +221,7 @@ exit:
 }
 
 CHIP_ERROR Command::AddStatusCode(const uint16_t aGeneralCode, const uint32_t aProtocolId, const uint16_t aProtocolCode,
-                                  const chip::ClusterId aNamespacedClusterId)
+                                  const chip::ClusterId aClusterId)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     StatusElement::Builder statusElementBuilder;
@@ -244,7 +232,7 @@ CHIP_ERROR Command::AddStatusCode(const uint16_t aGeneralCode, const uint32_t aP
     statusElementBuilder.EncodeStatusElement(aGeneralCode, aProtocolId, aProtocolCode, aProtocolCode).EndOfStatusElement();
     err = statusElementBuilder.GetError();
 
-    MoveToState(kState_AddCommand);
+    MoveToState(CommandState::AddCommand);
 
 exit:
     ChipLogFunctError(err);
@@ -283,26 +271,26 @@ exit:
     return err;
 }
 
-#if CHIP_DETAIL_LOGGING
 const char * Command::GetStateStr() const
 {
+#if CHIP_DETAIL_LOGGING
     switch (mState)
     {
-    case kState_Uninitialized:
+    case CommandState::Uninitialized:
         return "Uninitialized";
 
-    case kState_Initialized:
+    case CommandState::Initialized:
         return "Initialized";
 
-    case kState_AddCommand:
+    case CommandState::AddCommand:
         return "AddCommand";
 
-    case kState_Sending:
+    case CommandState::Sending:
         return "Sending";
     }
+#endif // CHIP_DETAIL_LOGGING
     return "N/A";
 }
-#endif // CHIP_DETAIL_LOGGING
 
 void Command::MoveToState(const CommandState aTargetState)
 {
@@ -312,7 +300,7 @@ void Command::MoveToState(const CommandState aTargetState)
 
 void Command::ClearState(void)
 {
-    MoveToState(kState_Uninitialized);
+    MoveToState(CommandState::Uninitialized);
 }
 
 } // namespace app

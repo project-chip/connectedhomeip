@@ -31,6 +31,17 @@
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
 
+#include <support/CHIPMem.h>
+#include <support/CHIPPlatformMemory.h>
+
+#include <openthread/heap.h>
+// Qorvo OpenThread functions
+extern "C" {
+#include "alarm_qorvo.h"
+#include "radio_qorvo.h"
+#include "random_qorvo.h"
+}
+
 namespace chip {
 namespace DeviceLayer {
 
@@ -46,6 +57,11 @@ CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack(void)
 CHIP_ERROR ThreadStackManagerImpl::InitThreadStack(otInstance * otInst)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+
+    // Initialize Low level QPG OpenThread glue
+    qorvoAlarmInit();
+    qorvoRandomInit();
+    qorvoRadioInit();
 
     // Initialize the generic implementation base classes.
     err = GenericThreadStackManagerImpl_FreeRTOS<ThreadStackManagerImpl>::DoInit();

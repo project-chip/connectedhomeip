@@ -18,6 +18,10 @@ static_library("messaging") {
   output_name = "libMessagingLayer"
 
   sources = [
+    "Channel.cpp",
+    "Channel.h",
+    "ChannelContext.cpp",
+    "ChannelContext.h",
     "ErrorCategory.cpp",
     "ErrorCategory.h",
     "ExchangeACL.h",
@@ -27,6 +31,8 @@ static_library("messaging") {
     "ExchangeMgr.cpp",
     "ExchangeMgr.h",
     "Flags.h",
+    "MessageCounterSync.cpp",
+    "MessageCounterSync.h",
     "ReliableMessageContext.cpp",
     "ReliableMessageContext.h",
     "ReliableMessageMgr.cpp",

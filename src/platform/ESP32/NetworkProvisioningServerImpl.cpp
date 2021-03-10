@@ -98,7 +98,7 @@ CHIP_ERROR NetworkProvisioningServerImpl::GetWiFiStationProvision(NetworkInfo & 
 
     netInfo.Reset();
 
-    err = esp_wifi_get_config(ESP_IF_WIFI_STA, &stationConfig);
+    err = esp_wifi_get_config(WIFI_IF_STA, &stationConfig);
     SuccessOrExit(err);
 
     VerifyOrExit(stationConfig.sta.ssid[0] != 0, err = CHIP_ERROR_INCORRECT_STATE);
@@ -173,7 +173,7 @@ CHIP_ERROR NetworkProvisioningServerImpl::SetWiFiStationProvision(const NetworkI
     wifiConfig.sta.sort_method = WIFI_CONNECT_AP_BY_SIGNAL;
 
     // Configure the ESP WiFi interface.
-    err = esp_wifi_set_config(ESP_IF_WIFI_STA, &wifiConfig);
+    err = esp_wifi_set_config(WIFI_IF_STA, &wifiConfig);
     if (err != ESP_OK)
     {
         ChipLogError(DeviceLayer, "esp_wifi_set_config() failed: %s", chip::ErrorStr(err));
@@ -198,7 +198,7 @@ CHIP_ERROR NetworkProvisioningServerImpl::ClearWiFiStationProvision(void)
 
     // Clear the ESP WiFi station configuration.
     memset(&stationConfig, 0, sizeof(stationConfig));
-    esp_wifi_set_config(ESP_IF_WIFI_STA, &stationConfig);
+    esp_wifi_set_config(WIFI_IF_STA, &stationConfig);
 
     // Clear the persisted WiFi station security type.
     ConfigurationMgrImpl().UpdateWiFiStationSecurityType(kWiFiSecurityType_NotSpecified);

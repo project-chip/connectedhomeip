@@ -648,6 +648,32 @@ bool emberAfDiscoverCommandsReceivedResponseCallback(ClusterId clusterId, uint16
     return true;
 }
 
+bool emberAfContentLaunchClusterLaunchContentResponseCallback(uint8_t contentLaunchStatus)
+{
+    ChipLogProgress(Zcl, "LaunchContentResponse:");
+    ChipLogProgress(Zcl, "  contentLaunchStatus: %" PRIu8 "", contentLaunchStatus);
+
+    GET_RESPONSE_CALLBACKS("ContentLaunchClusterLaunchContentResponseCallback");
+
+    Callback::Callback<ContentLaunchClusterLaunchContentResponseCallback> * cb =
+        Callback::Callback<ContentLaunchClusterLaunchContentResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, contentLaunchStatus);
+    return true;
+}
+
+bool emberAfContentLaunchClusterLaunchURLResponseCallback(uint8_t contentLaunchStatus)
+{
+    ChipLogProgress(Zcl, "LaunchURLResponse:");
+    ChipLogProgress(Zcl, "  contentLaunchStatus: %" PRIu8 "", contentLaunchStatus);
+
+    GET_RESPONSE_CALLBACKS("ContentLaunchClusterLaunchURLResponseCallback");
+
+    Callback::Callback<ContentLaunchClusterLaunchURLResponseCallback> * cb =
+        Callback::Callback<ContentLaunchClusterLaunchURLResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, contentLaunchStatus);
+    return true;
+}
+
 bool emberAfDoorLockClusterClearAllPinsResponseCallback(uint8_t status)
 {
     ChipLogProgress(Zcl, "ClearAllPinsResponse:");
@@ -1129,6 +1155,48 @@ bool emberAfDoorLockClusterUnlockWithTimeoutResponseCallback(uint8_t status)
     Callback::Callback<DoorLockClusterUnlockWithTimeoutResponseCallback> * cb =
         Callback::Callback<DoorLockClusterUnlockWithTimeoutResponseCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext);
+    return true;
+}
+
+bool emberAfGeneralCommissioningClusterArmFailSafeResponseCallback(uint8_t errorCode, uint8_t * debugText)
+{
+    ChipLogProgress(Zcl, "ArmFailSafeResponse:");
+    ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
+    ChipLogProgress(Zcl, "  debugText: %s", debugText);
+
+    GET_RESPONSE_CALLBACKS("GeneralCommissioningClusterArmFailSafeResponseCallback");
+
+    Callback::Callback<GeneralCommissioningClusterArmFailSafeResponseCallback> * cb =
+        Callback::Callback<GeneralCommissioningClusterArmFailSafeResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, errorCode, debugText);
+    return true;
+}
+
+bool emberAfGeneralCommissioningClusterCommissioningCompleteResponseCallback(uint8_t errorCode, uint8_t * debugText)
+{
+    ChipLogProgress(Zcl, "CommissioningCompleteResponse:");
+    ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
+    ChipLogProgress(Zcl, "  debugText: %s", debugText);
+
+    GET_RESPONSE_CALLBACKS("GeneralCommissioningClusterCommissioningCompleteResponseCallback");
+
+    Callback::Callback<GeneralCommissioningClusterCommissioningCompleteResponseCallback> * cb =
+        Callback::Callback<GeneralCommissioningClusterCommissioningCompleteResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, errorCode, debugText);
+    return true;
+}
+
+bool emberAfGeneralCommissioningClusterSetFabricResponseCallback(uint8_t errorCode, uint8_t * debugText)
+{
+    ChipLogProgress(Zcl, "SetFabricResponse:");
+    ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
+    ChipLogProgress(Zcl, "  debugText: %s", debugText);
+
+    GET_RESPONSE_CALLBACKS("GeneralCommissioningClusterSetFabricResponseCallback");
+
+    Callback::Callback<GeneralCommissioningClusterSetFabricResponseCallback> * cb =
+        Callback::Callback<GeneralCommissioningClusterSetFabricResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, errorCode, debugText);
     return true;
 }
 

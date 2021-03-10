@@ -155,12 +155,23 @@ bool Command::InitArgument(size_t argIndex, const char * argValue)
 
     case ArgumentType::Number_int8: {
         int8_t * value = reinterpret_cast<int8_t *>(arg.value);
-        std::stringstream ss(argValue);
-        ss >> *value;
 
-        int64_t min     = arg.min;
-        int64_t max     = chip::CanCastTo<int64_t>(arg.max) ? static_cast<int64_t>(arg.max) : INT64_MAX;
-        isValidArgument = (!ss.fail() && ss.eof() && *value >= min && *value <= max);
+        // stringstream treats int8_t as char, which is not what we want here.
+        int16_t tmpValue;
+        std::stringstream ss(argValue);
+        ss >> tmpValue;
+        if (chip::CanCastTo<int8_t>(tmpValue))
+        {
+            *value = static_cast<int8_t>(tmpValue);
+
+            int64_t min     = arg.min;
+            int64_t max     = chip::CanCastTo<int64_t>(arg.max) ? static_cast<int64_t>(arg.max) : INT64_MAX;
+            isValidArgument = (!ss.fail() && ss.eof() && *value >= min && *value <= max);
+        }
+        else
+        {
+            isValidArgument = false;
+        }
         break;
     }
 

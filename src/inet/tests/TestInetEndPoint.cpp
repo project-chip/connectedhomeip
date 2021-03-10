@@ -224,7 +224,7 @@ static void TestInetInterface(nlTestSuite * inSuite, void * inContext)
 {
     InterfaceIterator intIterator;
     InterfaceAddressIterator addrIterator;
-    char intName[20];
+    char intName[chip::Inet::InterfaceIterator::kMaxIfNameLength];
     InterfaceId intId;
     IPAddress addr;
     IPPrefix addrWithPrefix;

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -24,11 +24,10 @@
  *
  */
 
-#include "common.h"
-
 #include <app/CommandHandler.h>
 #include <app/CommandSender.h>
 #include <app/InteractionModelEngine.h>
+#include <app/tests/integration/common.h>
 #include <core/CHIPCore.h>
 #include <platform/CHIPDeviceLayer.h>
 
@@ -91,7 +90,7 @@ CHIP_ERROR SendCommandRequest(void)
                                                         kTestGroupId,    // GroupId
                                                         kTestClusterId,  // ClusterId
                                                         kTestCommandId,  // CommandId
-                                                        (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                                        (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
 
     // Add command data here
 
@@ -120,7 +119,7 @@ CHIP_ERROR SendCommandRequest(void)
     err = gpCommandSender->AddCommand(CommandParams);
     SuccessOrExit(err);
 
-    err = gpCommandSender->SendCommandRequest(chip::kTestDeviceNodeId);
+    err = gpCommandSender->SendCommandRequest(chip::kTestDeviceNodeId, gAdminId);
     SuccessOrExit(err);
 
     if (err == CHIP_NO_ERROR)
@@ -140,14 +139,14 @@ CHIP_ERROR EstablishSecureSession()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    chip::SecurePairingUsingTestSecret * testSecurePairingSecret = chip::Platform::New<chip::SecurePairingUsingTestSecret>(
-        chip::Optional<chip::NodeId>::Value(chip::kTestDeviceNodeId), static_cast<uint16_t>(0), static_cast<uint16_t>(0));
+    chip::SecurePairingUsingTestSecret * testSecurePairingSecret = chip::Platform::New<chip::SecurePairingUsingTestSecret>();
     VerifyOrExit(testSecurePairingSecret != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     // Attempt to connect to the peer.
     err = gSessionManager.NewPairing(chip::Optional<chip::Transport::PeerAddress>::Value(
                                          chip::Transport::PeerAddress::UDP(gDestAddr, CHIP_PORT, INET_NULL_INTERFACEID)),
-                                     chip::kTestDeviceNodeId, testSecurePairingSecret, gAdminId);
+                                     chip::kTestDeviceNodeId, testSecurePairingSecret,
+                                     chip::SecureSessionMgr::PairingDirection::kInitiator, gAdminId);
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -221,7 +220,7 @@ int main(int argc, char * argv[])
     err = gSessionManager.Init(chip::kTestControllerNodeId, &chip::DeviceLayer::SystemLayer, &gTransportManager, &admins);
     SuccessOrExit(err);
 
-    err = gExchangeManager.Init(&gSessionManager);
+    err = gExchangeManager.Init(chip::kTestControllerNodeId, &gTransportManager, &gSessionManager);
     SuccessOrExit(err);
 
     err = chip::app::InteractionModelEngine::GetInstance()->Init(&gExchangeManager);

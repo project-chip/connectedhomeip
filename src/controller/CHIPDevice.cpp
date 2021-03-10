@@ -130,7 +130,7 @@ CHIP_ERROR Device::SendCommands()
     bool loadedSecureSession = false;
     ReturnErrorOnFailure(LoadSecureSessionParametersIfNeeded(loadedSecureSession));
     VerifyOrReturnError(mCommandSender != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    return mCommandSender->SendCommandRequest(mDeviceId);
+    return mCommandSender->SendCommandRequest(mDeviceId, mAdminId);
 }
 
 CHIP_ERROR Device::SendMessage(System::PacketBufferHandle buffer)
@@ -150,16 +150,14 @@ CHIP_ERROR Device::Serialize(SerializedDevice & output)
 
     CHIP_ZERO_AT(serializable);
 
-    memmove(&serializable.mOpsCreds, &mPairing, sizeof(mPairing));
+    serializable.mOpsCreds   = mPairing;
     serializable.mDeviceId   = Encoding::LittleEndian::HostSwap64(mDeviceId);
-    serializable.mDevicePort = Encoding::LittleEndian::HostSwap16(mDevicePort);
+    serializable.mDevicePort = Encoding::LittleEndian::HostSwap16(mDeviceUdpAddress.GetPort());
     serializable.mAdminId    = Encoding::LittleEndian::HostSwap16(mAdminId);
-    VerifyOrExit(
-        CHIP_NO_ERROR ==
-            Inet::GetInterfaceName(mInterface, Uint8::to_char(serializable.mInterfaceName), sizeof(serializable.mInterfaceName)),
-        error = CHIP_ERROR_INTERNAL);
+    SuccessOrExit(error = Inet::GetInterfaceName(mDeviceUdpAddress.GetInterface(), Uint8::to_char(serializable.mInterfaceName),
+                                                 sizeof(serializable.mInterfaceName)));
     static_assert(sizeof(serializable.mDeviceAddr) <= INET6_ADDRSTRLEN, "Size of device address must fit within INET6_ADDRSTRLEN");
-    mDeviceAddr.ToString(Uint8::to_char(serializable.mDeviceAddr), sizeof(serializable.mDeviceAddr));
+    mDeviceUdpAddress.GetIPAddress().ToString(Uint8::to_char(serializable.mDeviceAddr), sizeof(serializable.mDeviceAddr));
 
     serializedLen = chip::Base64Encode(Uint8::to_const_uchar(reinterpret_cast<uint8_t *>(&serializable)),
                                        static_cast<uint16_t>(sizeof(serializable)), Uint8::to_char(output.inner));
@@ -189,32 +187,38 @@ CHIP_ERROR Device::Deserialize(const SerializedDevice & input)
     VerifyOrExit(deserializedLen > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(deserializedLen <= sizeof(serializable), error = CHIP_ERROR_INVALID_ARGUMENT);
 
+    Inet::IPAddress ipAddress;
+    uint16_t port;
+    Inet::InterfaceId interfaceId;
+
     // The second parameter to FromString takes the strlen value. We are subtracting 1
     // from the sizeof(serializable.mDeviceAddr) to account for null termination, since
     // strlen doesn't include null character in the size.
     VerifyOrExit(
-        IPAddress::FromString(Uint8::to_const_char(serializable.mDeviceAddr), sizeof(serializable.mDeviceAddr) - 1, mDeviceAddr),
+        IPAddress::FromString(Uint8::to_const_char(serializable.mDeviceAddr), sizeof(serializable.mDeviceAddr) - 1, ipAddress),
         error = CHIP_ERROR_INVALID_ADDRESS);
 
-    memmove(&mPairing, &serializable.mOpsCreds, sizeof(mPairing));
-    mDeviceId   = Encoding::LittleEndian::HostSwap64(serializable.mDeviceId);
-    mDevicePort = Encoding::LittleEndian::HostSwap16(serializable.mDevicePort);
-    mAdminId    = Encoding::LittleEndian::HostSwap16(serializable.mAdminId);
+    mPairing  = serializable.mOpsCreds;
+    mDeviceId = Encoding::LittleEndian::HostSwap64(serializable.mDeviceId);
+    port      = Encoding::LittleEndian::HostSwap16(serializable.mDevicePort);
+    mAdminId  = Encoding::LittleEndian::HostSwap16(serializable.mAdminId);
 
     // The InterfaceNameToId() API requires initialization of mInterface, and lock/unlock of
     // LwIP stack.
-    mInterface = INET_NULL_INTERFACEID;
+    interfaceId = INET_NULL_INTERFACEID;
     if (serializable.mInterfaceName[0] != '\0')
     {
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
         LOCK_TCPIP_CORE();
 #endif
-        INET_ERROR inetErr = Inet::InterfaceNameToId(Uint8::to_const_char(serializable.mInterfaceName), mInterface);
+        INET_ERROR inetErr = Inet::InterfaceNameToId(Uint8::to_const_char(serializable.mInterfaceName), interfaceId);
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
         UNLOCK_TCPIP_CORE();
 #endif
         VerifyOrExit(CHIP_NO_ERROR == inetErr, error = CHIP_ERROR_INTERNAL);
     }
+
+    mDeviceUdpAddress = Transport::PeerAddress::UDP(ipAddress, port, interfaceId);
 
 exit:
     return error;
@@ -248,7 +252,7 @@ void Device::OnMessageReceived(const PacketHeader & header, const PayloadHeader 
     }
 }
 
-CHIP_ERROR Device::OpenPairingWindow(uint32_t timeout, bool useToken, uint16_t discriminator, SetupPayload & setupPayload)
+CHIP_ERROR Device::OpenPairingWindow(uint32_t timeout, PairingWindowOption option, SetupPayload & setupPayload)
 {
     // TODO: This code is temporary, and must be updated to use the Cluster API.
     // Issue: https://github.com/project-chip/connectedhomeip/issues/4725
@@ -262,12 +266,13 @@ CHIP_ERROR Device::OpenPairingWindow(uint32_t timeout, bool useToken, uint16_t d
 
     ReturnErrorOnFailure(writer.Put(TLV::ProfileTag(writer.ImplicitProfileId, 1), timeout));
 
-    if (useToken)
+    if (option != PairingWindowOption::kOriginalSetupCode)
     {
-        ReturnErrorOnFailure(writer.Put(TLV::ProfileTag(writer.ImplicitProfileId, 2), discriminator));
+        ReturnErrorOnFailure(writer.Put(TLV::ProfileTag(writer.ImplicitProfileId, 2), setupPayload.discriminator));
 
         PASEVerifier verifier;
-        ReturnErrorOnFailure(PASESession::GeneratePASEVerifier(verifier, setupPayload.setUpPINCode));
+        bool randomSetupPIN = (option == PairingWindowOption::kTokenWithRandomPIN);
+        ReturnErrorOnFailure(PASESession::GeneratePASEVerifier(verifier, randomSetupPIN, setupPayload.setUpPINCode));
         ReturnErrorOnFailure(writer.PutBytes(TLV::ProfileTag(writer.ImplicitProfileId, 3),
                                              reinterpret_cast<const uint8_t *>(verifier), sizeof(verifier)));
     }
@@ -283,7 +288,22 @@ CHIP_ERROR Device::OpenPairingWindow(uint32_t timeout, bool useToken, uint16_t d
 
     setupPayload.version               = 1;
     setupPayload.rendezvousInformation = RendezvousInformationFlags::kBLE;
-    setupPayload.discriminator         = discriminator;
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR Device::UpdateAddress(const Transport::PeerAddress & addr)
+{
+    bool didLoad;
+
+    VerifyOrReturnError(addr.GetTransportType() == Transport::Type::kUdp, CHIP_ERROR_INVALID_ADDRESS);
+    ReturnErrorOnFailure(LoadSecureSessionParametersIfNeeded(didLoad));
+
+    Transport::PeerConnectionState * connectionState = mSessionManager->GetPeerConnectionState(mSecureSession);
+    VerifyOrReturnError(connectionState != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    mDeviceUdpAddress = addr;
+    connectionState->SetPeerAddress(addr);
 
     return CHIP_NO_ERROR;
 }
@@ -313,9 +333,8 @@ CHIP_ERROR Device::LoadSecureSessionParameters(ResetTransport resetNeeded)
         SuccessOrExit(err);
     }
 
-    err = mSessionManager->NewPairing(
-        Optional<Transport::PeerAddress>::Value(Transport::PeerAddress::UDP(mDeviceAddr, mDevicePort, mInterface)), mDeviceId,
-        &pairingSession, mAdminId);
+    err = mSessionManager->NewPairing(Optional<Transport::PeerAddress>::Value(mDeviceUdpAddress), mDeviceId, &pairingSession,
+                                      SecureSessionMgr::PairingDirection::kInitiator, mAdminId);
     SuccessOrExit(err);
 
 exit:
@@ -327,11 +346,13 @@ exit:
     return err;
 }
 
-bool Device::GetIpAddress(Inet::IPAddress & addr) const
+bool Device::GetAddress(Inet::IPAddress & addr, uint16_t & port) const
 {
     if (mState == ConnectionState::NotConnected)
         return false;
-    addr = mDeviceAddr;
+
+    addr = mDeviceUdpAddress.GetIPAddress();
+    port = mDeviceUdpAddress.GetPort();
     return true;
 }
 

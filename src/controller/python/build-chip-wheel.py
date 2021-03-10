@@ -39,6 +39,7 @@ parser.add_argument('--build_number', default='0.0', help='configure the chip bu
 parser.add_argument('--build_dir', help='directory to build in')
 parser.add_argument('--dist_dir', help='directory to place distribution in')
 parser.add_argument('--manifest', help='list of files to package')
+parser.add_argument('--plat-name', help='platform name to embed in generated filenames')
 
 args = parser.parse_args()
 
@@ -101,25 +102,42 @@ try:
                 os.path.join(tmpDir, script.installName))
 
     # Define a custom version of the bdist_wheel command that configures the
-    # resultant wheel as platform-specific (i.e. not "pure"). 
+    # resultant wheel as platform-specific (i.e. not "pure").
     class bdist_wheel_override(bdist_wheel):
         def finalize_options(self):
             bdist_wheel.finalize_options(self)
             self.root_is_pure = False
 
-    requiredPackages = []
+    requiredPackages = [
+        "coloredlogs",
+        'construct',
+        'ipython',
+    ]
 
-    requiredPackages.append('ipython')
-    
+    if platform.system() == 'Darwin':
+        requiredPackages.append('pyobjc-framework-corebluetooth')
+
     if platform.system() == 'Linux':
         requiredPackages.append('dbus-python')
-        requiredPackages.append('six')
         requiredPackages.append('pygobject')
-    
+
     #
     # Build the chip package...
     #
-     
+    packages=[
+            'chip',
+            'chip.configuration',
+            'chip.exceptions',
+            'chip.internal',
+            'chip.logging',
+            'chip.native',
+            'chip.tlv',
+    ]
+
+    if os.path.isdir(os.path.join(tmpDir, 'chip', 'ble')):
+      packages += ['chip.ble']
+      packages += ['chip.ble.commissioning']
+
     # Invoke the setuptools 'bdist_wheel' command to generate a wheel containing
     # the CHIP python packages, shared libraries and scripts.
     setup(
@@ -136,12 +154,7 @@ try:
             'Programming Language :: Python :: 3',
         ],
         python_requires='>=2.7',
-        packages=[
-            'chip',
-            'chip.ble',
-            'chip.exceptions',
-            'chip.tlv',
-        ],
+        packages=packages,
         package_dir={
             '':tmpDir,                      # By default, look in the tmp directory for packages/modules to be included.
         },
@@ -158,7 +171,9 @@ try:
         options={
             'bdist_wheel':{
                 'universal':False,
-                'dist_dir':distDir         # Place the generated .whl in the dist directory.
+                'dist_dir':distDir,         # Place the generated .whl in the dist directory.
+                'py_limited_api':'cp37',
+                'plat_name':args.plat_name,
             },
             'egg_info':{
                 'egg_base':tmpDir           # Place the .egg-info subdirectory in the tmp directory.

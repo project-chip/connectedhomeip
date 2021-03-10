@@ -15,7 +15,7 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
-import("${build_root}/chip/tools.gni")
+import("${chip_root}/build/chip/tools.gni")
 
 assert(chip_build_tools)
 
@@ -25,6 +25,7 @@ config("includes") {
 
 executable("chip-tool") {
   sources = [
+    "${chip_root}/src/app/clusters/media-playback-client/media-playback-client.cpp",
     "${chip_root}/src/app/reporting/reporting-default-configuration.cpp",
     "${chip_root}/src/app/reporting/reporting.cpp",
     "${chip_root}/src/app/server/DataModelHandler.cpp",
@@ -55,17 +56,12 @@ executable("chip-tool") {
     "main.cpp",
   ]
 
-  if (is_debug) {
-    defines = [ "BUILD_RELEASE=0" ]
-  } else {
-    defines = [ "BUILD_RELEASE=1" ]
-  }
-
   cflags = [ "-Wconversion" ]
 
   public_deps = [
     "${chip_root}/src/app/server",
     "${chip_root}/src/lib",
+    "${chip_root}/src/platform",
     "${chip_root}/third_party/inipp",
   ]
 

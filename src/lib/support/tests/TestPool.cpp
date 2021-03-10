@@ -32,28 +32,14 @@
 
 namespace chip {
 
-template <typename F>
-void StaticAllocatorBitmap::ForEachActiveObject(F f)
-{
-    for (size_t word = 0; word * kBitChunkSize < Capacity(); ++word)
-    {
-        auto & usage = mUsage[word];
-        auto value   = usage.load(std::memory_order_relaxed);
-        for (size_t offset = 0; offset < kBitChunkSize && offset + word * kBitChunkSize < Capacity(); ++offset)
-        {
-            if ((value & (kBit1 << offset)) != 0)
-            {
-                f(At(word * kBitChunkSize + offset));
-            }
-        }
-    }
-}
-
 template <class T, size_t N>
 size_t GetNumObjectsInUse(BitMapObjectPool<T, N> & pool)
 {
     size_t count = 0;
-    pool.ForEachActiveObject([&count](void *) { ++count; });
+    pool.ForEachActiveObject([&count](void *) {
+        ++count;
+        return true;
+    });
     return count;
 }
 

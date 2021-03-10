@@ -31,6 +31,7 @@ import com.google.chip.chiptool.GenericChipDeviceListener
 import com.google.chip.chiptool.R
 import com.google.chip.chiptool.bluetooth.BluetoothManager
 import com.google.chip.chiptool.setuppayloadscanner.CHIPDeviceInfo
+import com.google.chip.chiptool.util.DeviceIdUtil
 import com.google.chip.chiptool.util.FragmentUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -98,7 +99,10 @@ class DeviceProvisioningFragment : Fragment() {
 
       showMessage(R.string.rendezvous_over_ble_pairing_text)
       deviceController.setCompletionListener(ConnectionCallback())
-      deviceController.beginConnectDeviceBle(gatt, deviceInfo.setupPinCode);
+
+      val deviceId = DeviceIdUtil.getNextAvailableId(requireContext())
+      deviceController.pairDevice(gatt, deviceId, deviceInfo.setupPinCode)
+      DeviceIdUtil.setNextAvailableId(requireContext(), deviceId + 1)
     }
   }
 

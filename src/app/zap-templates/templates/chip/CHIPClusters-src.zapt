@@ -1,7 +1,10 @@
 {{> header}}
 #include "CHIPClusters.h"
 
+#include <cstdint>
+
 #include <app/chip-zcl-zpro-codec-api.h>
+#include <lib/support/Span.h>
 #include <support/ReturnMacros.h>
 
 namespace chip {
@@ -19,10 +22,11 @@ CHIP_ERROR {{asCamelCased clusterName false}}Cluster::{{asCamelCased name false}
 {
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    (void) onCompletion;
+    (void) onSuccessCallback;
+(void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, k{{asCamelCased name false}}CommandId,
-                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer  = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -35,7 +39,7 @@ CHIP_ERROR {{asCamelCased clusterName false}}Cluster::{{asCamelCased name false}
     uint8_t argSeqNumber = 0;
 {{/first}}
     // {{asCamelCased label}}: {{asCamelCased type}}
-{{#if (isString type)}}
+{{#if (isCharString type)}}
     ReturnErrorOnFailure(writer.PutString(TLV::ContextTag(argSeqNumber++), {{asCamelCased label}}));
 {{else}}
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), {{asCamelCased label}}));

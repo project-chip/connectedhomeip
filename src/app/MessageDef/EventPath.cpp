@@ -99,17 +99,17 @@ CHIP_ERROR EventPath::Parser::CheckSchemaValidity() const
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
-        case kCsTag_NamespacedClusterId:
+        case kCsTag_ClusterId:
             // check if this tag has appeared before
-            VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_NamespacedClusterId)), err = CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << kCsTag_NamespacedClusterId);
+            VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_ClusterId)), err = CHIP_ERROR_INVALID_TLV_TAG);
+            TagPresenceMask |= (1 << kCsTag_ClusterId);
             VerifyOrExit(chip::TLV::kTLVType_UnsignedInteger == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
 
 #if CHIP_DETAIL_LOGGING
             {
-                chip::ClusterId namespacedClusterId;
-                reader.Get(namespacedClusterId);
-                PRETTY_PRINT("\tNamespacedClusterId = 0x%" PRIx32 ",", namespacedClusterId);
+                chip::ClusterId clusterId;
+                reader.Get(clusterId);
+                PRETTY_PRINT("\tClusterId = 0x%" PRIx32 ",", clusterId);
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
@@ -139,7 +139,7 @@ CHIP_ERROR EventPath::Parser::CheckSchemaValidity() const
     if (CHIP_END_OF_TLV == err)
     {
         // check for required fields:
-        const uint16_t RequiredFields = (1 << kCsTag_EndpointId) | (1 << kCsTag_NamespacedClusterId);
+        const uint16_t RequiredFields = (1 << kCsTag_EndpointId) | (1 << kCsTag_ClusterId);
 
         if ((TagPresenceMask & RequiredFields) == RequiredFields)
         {
@@ -169,9 +169,9 @@ CHIP_ERROR EventPath::Parser::GetEndpointId(chip::EndpointId * const apEndpointI
     return GetUnsignedInteger(kCsTag_EndpointId, apEndpointID);
 }
 
-CHIP_ERROR EventPath::Parser::GetNamespacedClusterId(chip::ClusterId * const apClusterId) const
+CHIP_ERROR EventPath::Parser::GetClusterId(chip::ClusterId * const apClusterId) const
 {
-    return GetUnsignedInteger(kCsTag_NamespacedClusterId, apClusterId);
+    return GetUnsignedInteger(kCsTag_ClusterId, apClusterId);
 }
 
 CHIP_ERROR EventPath::Parser::GetEventId(chip::EventId * const apEventId) const
@@ -224,12 +224,12 @@ exit:
     return *this;
 }
 
-EventPath::Builder & EventPath::Builder::NamespacedClusterId(const chip::ClusterId aClusterId)
+EventPath::Builder & EventPath::Builder::ClusterId(const chip::ClusterId aClusterId)
 {
     // skip if error has already been set
     SuccessOrExit(mError);
 
-    mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_NamespacedClusterId), aClusterId);
+    mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_ClusterId), aClusterId);
     ChipLogFunctError(mError);
 
 exit:

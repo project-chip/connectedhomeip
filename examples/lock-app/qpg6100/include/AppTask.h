@@ -30,6 +30,7 @@
 #include <ble/BLEEndPoint.h>
 #include <platform/CHIPDeviceLayer.h>
 
+#define APP_NAME "Lock-app"
 class AppTask
 {
 

@@ -46,8 +46,7 @@ chip::Protocols::Echo::EchoServer gEchoServer;
 chip::TransportMgr<chip::Transport::UDP> gUDPManager;
 chip::TransportMgr<chip::Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>> gTCPManager;
 chip::SecureSessionMgr gSessionManager;
-chip::SecurePairingUsingTestSecret gTestPairing(chip::Optional<chip::NodeId>::Value(chip::kUndefinedNodeId),
-                                                static_cast<uint16_t>(0), static_cast<uint16_t>(0));
+chip::SecurePairingUsingTestSecret gTestPairing;
 
 // Callback handler when a CHIP EchoRequest is received.
 void HandleEchoRequestReceived(chip::Messaging::ExchangeContext * ec, chip::System::PacketBufferHandle payload)
@@ -103,13 +102,14 @@ int main(int argc, char * argv[])
         SuccessOrExit(err);
     }
 
-    err = gExchangeManager.Init(&gSessionManager);
+    err = gExchangeManager.Init(chip::kTestDeviceNodeId, &gUDPManager, &gSessionManager);
     SuccessOrExit(err);
 
     err = gEchoServer.Init(&gExchangeManager);
     SuccessOrExit(err);
 
-    err = gSessionManager.NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing, gAdminId);
+    err = gSessionManager.NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing,
+                                     chip::SecureSessionMgr::PairingDirection::kResponder, gAdminId);
     SuccessOrExit(err);
 
     // Arrange to get a callback whenever an Echo Request is received.

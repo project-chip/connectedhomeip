@@ -384,6 +384,14 @@
 #define ZCL_KEEPALIVE_BASE_ATTRIBUTE_ID (0x0000)
 #define ZCL_KEEPALIVE_JITTER_ATTRIBUTE_ID (0x0001)
 
+// Attribute ids for cluster: General Commissioning
+
+// Client attributes
+
+// Server attributes
+#define ZCL_FABRIC_ID_ATTRIBUTE_ID (0x0000)
+#define ZCL_BREADCRUMB_ATTRIBUTE_ID (0x0001)
+
 // Attribute ids for cluster: Shade Configuration
 
 // Client attributes
@@ -1084,6 +1092,19 @@
 
 // Server attributes
 #define ZCL_MAX_DURATION_ATTRIBUTE_ID (0x0000)
+
+// Attribute ids for cluster: Application Basic
+
+// Client attributes
+
+// Server attributes
+#define ZCL_VENDOR_NAME_ATTRIBUTE_ID (0x0000)
+#define ZCL_VENDOR_ID_ATTRIBUTE_ID (0x0001)
+#define ZCL_APPLICATION_NAME_ATTRIBUTE_ID (0x0002)
+#define ZCL_PRODUCT_ID_ATTRIBUTE_ID (0x0003)
+#define ZCL_APPLICATION_ID_ATTRIBUTE_ID (0x0005)
+#define ZCL_CATALOG_VENDOR_ID_ATTRIBUTE_ID (0x0006)
+#define ZCL_APPLICATION_STATUS_ATTRIBUTE_ID (0x0007)
 
 // Attribute ids for cluster: Generic Tunnel
 
@@ -4058,7 +4079,26 @@
 
 // Server attributes
 
+// Attribute ids for cluster: Network Commissioning
+
+// Client attributes
+
+// Server attributes
+
 // Attribute ids for cluster: Binding
+
+// Client attributes
+
+// Server attributes
+
+// Attribute ids for cluster: Media Playback
+
+// Client attributes
+
+// Server attributes
+#define ZCL_CURRENT_STATE_ATTRIBUTE_ID (0x0000)
+
+// Attribute ids for cluster: Content Launch
 
 // Client attributes
 

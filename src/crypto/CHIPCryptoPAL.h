@@ -47,6 +47,9 @@ const size_t kMAX_Point_Length           = kP256_Point_Length;
 const size_t kMAX_Hash_Length            = kSHA256_Hash_Length;
 const size_t kMAX_CSR_Length             = 512;
 
+const size_t kMin_Salt_Length = 8;
+const size_t kMax_Salt_Length = 16;
+
 const size_t kP256_PrivateKey_Length = 32;
 const size_t kP256_PublicKey_Length  = 65;
 
@@ -224,7 +227,7 @@ public:
     virtual const PK & Pubkey() = 0;
 };
 
-struct P256KeypairContext
+struct alignas(size_t) P256KeypairContext
 {
     uint8_t mBytes[kMAX_P256Keypair_Context_Size];
 };
@@ -354,7 +357,7 @@ CHIP_ERROR Hash_SHA256(const uint8_t * data, size_t data_length, uint8_t * out_b
  *        All implementations must check for std::is_trivially_copyable.
  **/
 
-struct HashSHA256OpaqueContext
+struct alignas(size_t) HashSHA256OpaqueContext
 {
     uint8_t mOpaque[kMAX_Hash_SHA256_Context_Size];
 };
@@ -797,7 +800,7 @@ protected:
     uint8_t * Ke;
 };
 
-struct Spake2pOpaqueContext
+struct alignas(size_t) Spake2pOpaqueContext
 {
     uint8_t mOpaque[kMAX_Spake2p_Context_Size];
 };

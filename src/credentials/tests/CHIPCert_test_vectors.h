@@ -28,6 +28,7 @@
 
 #include <asn1/ASN1OID.h>
 #include <core/CHIPConfig.h>
+#include <support/BitFlags.h>
 #include <support/CodeUtils.h>
 
 namespace chip {
@@ -58,11 +59,11 @@ enum class TestCertLoadFlags : uint8_t
     kSetAppDefinedCertType = 0x20,
 };
 
-extern CHIP_ERROR GetTestCert(uint8_t certType, BitFlags<uint8_t, TestCertLoadFlags> certLoadFlags, const uint8_t *& certData,
+extern CHIP_ERROR GetTestCert(uint8_t certType, BitFlags<TestCertLoadFlags> certLoadFlags, const uint8_t *& certData,
                               uint32_t & certDataLen);
 extern const char * GetTestCertName(uint8_t certType);
-extern CHIP_ERROR LoadTestCert(ChipCertificateSet & certSet, uint8_t certType, BitFlags<uint8_t, TestCertLoadFlags> certLoadFlags,
-                               BitFlags<uint8_t, CertDecodeFlags> decodeFlags);
+extern CHIP_ERROR LoadTestCert(ChipCertificateSet & certSet, uint8_t certType, BitFlags<TestCertLoadFlags> certLoadFlags,
+                               BitFlags<CertDecodeFlags> decodeFlags);
 
 extern const uint8_t gTestCerts[];
 extern const size_t gNumTestCerts;

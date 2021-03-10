@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -34,6 +34,9 @@
 #include <transport/SecureSessionMgr.h>
 
 namespace chip {
+
+constexpr uint16_t kMsgCounterChallengeSize = 8; // The size of the message counter synchronization request message.
+
 namespace Messaging {
 
 class ExchangeManager;
@@ -55,6 +58,7 @@ class DLL_EXPORT ExchangeContext : public ReferenceCounted<ExchangeContext, Exch
 {
     friend class ExchangeManager;
     friend class ExchangeContextDeletor;
+    friend class MessageCounterSyncMgr;
 
 public:
     typedef uint32_t Timeout; // Type used to express the timeout in this ExchangeContext, in milliseconds
@@ -94,9 +98,6 @@ public:
      *
      *  @param[in]    sendFlags     Flags set by the application for the CHIP message being sent.
      *
-     *  @param[in]    msgCtxt       A pointer to an application-specific context object to be associated
-     *                              with the message being sent.
-
      *  @retval  #CHIP_ERROR_INVALID_ARGUMENT               if an invalid argument was passed to this SendMessage API.
      *  @retval  #CHIP_ERROR_WRONG_MSG_VERSION_FOR_EXCHANGE if there is a mismatch in the specific send operation and the
      *                                                       CHIP message protocol version that is supported.
@@ -106,19 +107,18 @@ public:
      *  @retval  #CHIP_NO_ERROR                             if the CHIP layer successfully sent the message down to the
      *                                                       network layer.
      */
-    CHIP_ERROR SendMessage(uint16_t protocolId, uint8_t msgType, System::PacketBufferHandle msgPayload, const SendFlags & sendFlags,
-                           void * msgCtxt = nullptr);
+    CHIP_ERROR SendMessage(uint16_t protocolId, uint8_t msgType, System::PacketBufferHandle msgPayload,
+                           const SendFlags & sendFlags);
 
     /**
      * A strongly-message-typed version of SendMessage.
      */
     template <typename MessageType, typename = std::enable_if_t<std::is_enum<MessageType>::value>>
-    CHIP_ERROR SendMessage(MessageType msgType, System::PacketBufferHandle && msgPayload, const SendFlags & sendFlags,
-                           void * msgCtxt = nullptr)
+    CHIP_ERROR SendMessage(MessageType msgType, System::PacketBufferHandle && msgPayload, const SendFlags & sendFlags)
     {
         static_assert(std::is_same<std::underlying_type_t<MessageType>, uint8_t>::value, "Enum is wrong size; cast is not safe");
         return SendMessage(Protocols::MessageTypeTraits<MessageType>::ProtocolId, static_cast<uint8_t>(msgType),
-                           std::move(msgPayload), sendFlags, msgCtxt);
+                           std::move(msgPayload), sendFlags);
     }
 
     /**
@@ -164,6 +164,12 @@ public:
 
     uint16_t GetExchangeId() const { return mExchangeId; }
 
+    void SetChallenge(const uint8_t * value) { memcpy(&mChallenge[0], value, kMsgCounterChallengeSize); }
+
+    const uint8_t * GetChallenge() const { return mChallenge; }
+
+    SecureSessionHandle GetSecureSessionHandle() const { return mSecureSession; }
+
     /*
      * In order to use reference counting (see refCount below) we use a hold/free paradigm where users of the exchange
      * can hold onto it while it's out of their direct control to make sure it isn't closed before everyone's ready.
@@ -195,7 +201,11 @@ private:
     SecureSessionHandle mSecureSession; // The connection state
     uint16_t mExchangeId;               // Assigned exchange ID.
 
-    BitFlags<uint16_t, ExFlagValues> mFlags; // Internal state flags
+    // [TODO: #4711]: this field need to be moved to appState object which implement 'exchange-specific' contextual
+    // actions with a delegate pattern.
+    uint8_t mChallenge[kMsgCounterChallengeSize]; // Challenge number to identify the sychronization request cryptographically.
+
+    BitFlags<ExFlagValues> mFlags; // Internal state flags
 
     /**
      *  Search for an existing exchange that the message applies to.
@@ -212,6 +222,13 @@ private:
     bool MatchExchange(SecureSessionHandle session, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader);
 
     CHIP_ERROR StartResponseTimer();
+
+    /**
+     * A subset of SendMessage functionality that does not perform message
+     * counter sync for group keys.
+     */
+    CHIP_ERROR SendMessageImpl(uint16_t protocolId, uint8_t msgType, System::PacketBufferHandle msgBuf, const SendFlags & sendFlags,
+                               Transport::PeerConnectionState * state = nullptr);
     void CancelResponseTimer();
     static void HandleResponseTimeout(System::Layer * aSystemLayer, void * aAppState, System::Error aError);
 

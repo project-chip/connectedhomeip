@@ -18,7 +18,6 @@ import("common_flags.gni")
 
 config("app_config") {
   include_dirs = [
-    "gen",
     "util",
     ".",
     "${target_gen_dir}/include",

@@ -24,6 +24,12 @@
 #include "enums.h"
 #include <stdint.h>
 
+// Struct for BasicCommissioningInfo
+typedef struct _BasicCommissioningInfo
+{
+    uint32_t FailSafeExpiryLengthMs;
+} EmberAfBasicCommissioningInfo;
+
 // Struct for BlockThreshold
 typedef struct _BlockThreshold
 {
@@ -75,6 +81,21 @@ typedef struct _ConfigureReportingStatusRecord
     uint8_t direction;
     chip::AttributeId attributeId;
 } EmberAfConfigureReportingStatusRecord;
+
+// Struct for ContentLaunchAdditionalInfo
+typedef struct _ContentLaunchAdditionalInfo
+{
+    uint8_t * Name;
+    uint8_t * Value;
+} EmberAfContentLaunchAdditionalInfo;
+
+// Struct for ContentLaunchSearch
+typedef struct _ContentLaunchSearch
+{
+    uint8_t EntitiesList;
+    uint8_t * searchWindowStart;
+    uint8_t * searchWindowEnd;
+} EmberAfContentLaunchSearch;
 
 // Struct for DebtPayload
 typedef struct _DebtPayload
@@ -364,6 +385,12 @@ typedef struct _SpecialDay
     uint8_t dayIdRef;
 } EmberAfSpecialDay;
 
+// Struct for ThreadInterfaceScanResult
+typedef struct _ThreadInterfaceScanResult
+{
+    uint8_t * DiscoveryResponse;
+} EmberAfThreadInterfaceScanResult;
+
 // Struct for TierLabelsPayload
 typedef struct _TierLabelsPayload
 {
@@ -389,6 +416,16 @@ typedef struct _TransferredPhase
     uint16_t energy;
     uint16_t maxActivationDelay;
 } EmberAfTransferredPhase;
+
+// Struct for WiFiInterfaceScanResult
+typedef struct _WiFiInterfaceScanResult
+{
+    uint8_t Security;
+    uint8_t * SSID;
+    uint8_t * BSSID;
+    uint8_t Channel;
+    uint32_t FrequencyBand;
+} EmberAfWiFiInterfaceScanResult;
 
 // Struct for WriteAttributeRecord
 typedef struct _WriteAttributeRecord

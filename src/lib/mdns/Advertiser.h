@@ -150,7 +150,7 @@ public:
     virtual ~ServiceAdvertiser() {}
 
     /// Starts the advertiser. Items 'Advertised' will become visible.
-    /// May be called before OR after Advertise() calls.
+    /// Must be called before Advertise() calls.
     virtual CHIP_ERROR Start(chip::Inet::InetLayer * inetLayer, uint16_t port) = 0;
 
     /// Advertises the CHIP node as an operational node

@@ -181,7 +181,7 @@ CHIP_ERROR ReliableMessageContext::HandleRcvdAck(uint32_t AckMsgId)
     return err;
 }
 
-CHIP_ERROR ReliableMessageContext::HandleNeedsAck(uint32_t MessageId, BitFlags<uint32_t, MessageFlagValues> MsgFlags)
+CHIP_ERROR ReliableMessageContext::HandleNeedsAck(uint32_t MessageId, BitFlags<MessageFlagValues> MsgFlags)
 
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -253,14 +253,14 @@ CHIP_ERROR ReliableMessageContext::SendStandaloneAckMessage()
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Allocate a buffer for the null message
-    System::PacketBufferHandle msgBuf = System::PacketBufferHandle::New(0, CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE);
+    System::PacketBufferHandle msgBuf = MessagePacketBuffer::New(0);
     VerifyOrExit(!msgBuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
     // Send the null message
     if (mExchange != nullptr)
     {
         err = mExchange->SendMessage(Protocols::SecureChannel::MsgType::StandaloneAck, std::move(msgBuf),
-                                     BitFlags<uint16_t, SendMessageFlags>{ SendMessageFlags::kNoAutoRequestAck });
+                                     BitFlags<SendMessageFlags>{ SendMessageFlags::kNoAutoRequestAck });
     }
     else
     {

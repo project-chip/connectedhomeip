@@ -99,12 +99,28 @@ groups:
             teams: [reviewers-google]
         reviews:
             request: 2
+    shared-reviewers-nordic:
+        type: optional
+        conditions:
+            - files.include('*')
+        reviewers:
+            teams: [reviewers-nordic]
+        reviews:
+            request: 0
     shared-reviewers-samsung:
         type: optional
         conditions:
             - files.include('*')
         reviewers:
             teams: [reviewers-samsung]
+        reviews:
+            request: 2
+    shared-reviewers-silabs:
+        type: optional
+        conditions:
+            - files.include('*')
+        reviewers:
+            teams: [reviewers-silabs]
         reviews:
             request: 2
 

@@ -127,24 +127,6 @@ inline bool CompareBinary(SetupPayload & payload, std::string & expectedBinary)
     return (expectedBinary == resultBinary);
 }
 
-inline bool CompareBinaryLength(SetupPayload & payload, size_t expectedTLVLengthInBytes)
-{
-    std::string result;
-    uint8_t optionalInfo[kDefaultBufferSizeInBytes];
-
-    SetupPayload basePayload = GetDefaultPayload();
-    QRCodeSetupPayloadGenerator baseGenerator(basePayload);
-    baseGenerator.payloadBase41Representation(result, optionalInfo, sizeof(optionalInfo));
-    std::string baseBinary = toBinaryRepresentation(result);
-
-    QRCodeSetupPayloadGenerator generator(payload);
-    generator.payloadBase41Representation(result, optionalInfo, sizeof(optionalInfo));
-
-    std::string resultBinary      = toBinaryRepresentation(result);
-    size_t resultTLVLengthInBytes = (resultBinary.size() - baseBinary.size()) / 8;
-    return (expectedTLVLengthInBytes == resultTLVLengthInBytes);
-}
-
 inline bool CheckWriteRead(SetupPayload & inPayload)
 {
     SetupPayload outPayload;

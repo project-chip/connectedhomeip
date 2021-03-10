@@ -33,19 +33,17 @@ public:
 
     bool Accept(QType qType, QClass qClass, FullQName qname) override
     {
-        // resource type is ignored
-        if ((mQueryData.GetType() != QType::ANY) && (mQueryData.GetType() != qType))
+        if (!AcceptableQueryType(qType))
         {
             return false;
         }
 
-        if ((mQueryData.GetClass() != QClass::ANY) && (mQueryData.GetClass() != qClass))
+        if (!AcceptableQueryClass(qClass))
         {
             return false;
         }
 
-        // path must match
-        return mIgnoreNameMatch || (mQueryData.GetName() == qname);
+        return AcceptablePath(qname);
     }
 
     /// Ignore qname matches during Accept calls (if set to true, only qtype and qclass are matched).
@@ -59,9 +57,41 @@ public:
         return *this;
     }
 
+    QueryReplyFilter & SetSendingAdditionalItems(bool additional)
+    {
+        mSendingAdditionalItems = additional;
+        return *this;
+    }
+
 private:
+    bool AcceptableQueryType(QType qType)
+    {
+        if (mSendingAdditionalItems && mQueryData.IsBootAdvertising())
+        {
+            return true;
+        }
+
+        return ((mQueryData.GetType() == QType::ANY) || (mQueryData.GetType() == qType));
+    }
+
+    bool AcceptableQueryClass(QClass qClass)
+    {
+        return ((mQueryData.GetClass() == QClass::ANY) || (mQueryData.GetClass() == qClass));
+    }
+
+    bool AcceptablePath(FullQName qname)
+    {
+        if (mIgnoreNameMatch || mQueryData.IsBootAdvertising())
+        {
+            return true;
+        }
+
+        return (mQueryData.GetName() == qname);
+    }
+
     const QueryData & mQueryData;
-    bool mIgnoreNameMatch = false;
+    bool mIgnoreNameMatch        = false;
+    bool mSendingAdditionalItems = false;
 };
 
 } // namespace Minimal

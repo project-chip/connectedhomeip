@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -64,7 +64,7 @@ namespace {
 using namespace chip::Encoding;
 
 /// size of the fixed portion of the header
-constexpr size_t kFixedUnencryptedHeaderSizeBytes = 10;
+constexpr size_t kFixedUnencryptedHeaderSizeBytes = 8;
 
 /// size of the encrypted portion of the header
 constexpr size_t kEncryptedHeaderSizeBytes = 6;
@@ -189,7 +189,7 @@ CHIP_ERROR PacketHeader::Decode(const uint8_t * const data, uint16_t size, uint1
         mDestinationNodeId.ClearValue();
     }
 
-    err = reader.Read16(&mEncryptionKeyID).Read16(&mPayloadLength).StatusCode();
+    err = reader.Read16(&mEncryptionKeyID).StatusCode();
     SuccessOrExit(err);
 
     octets_read = reader.OctetsRead();
@@ -295,7 +295,6 @@ CHIP_ERROR PacketHeader::Encode(uint8_t * data, uint16_t size, uint16_t * encode
     }
 
     LittleEndian::Write16(p, mEncryptionKeyID);
-    LittleEndian::Write16(p, mPayloadLength);
 
     // Written data size provided to caller on success
     VerifyOrExit(p - data == EncodeSizeBytes(), err = CHIP_ERROR_INTERNAL);
@@ -320,9 +319,9 @@ CHIP_ERROR PacketHeader::EncodeBeforeData(const System::PacketBufferHandle & buf
 
 CHIP_ERROR PayloadHeader::Encode(uint8_t * data, uint16_t size, uint16_t * encode_size) const
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    uint8_t * p    = data;
-    uint8_t header = mExchangeFlags.Raw();
+    CHIP_ERROR err       = CHIP_NO_ERROR;
+    uint8_t * p          = data;
+    const uint8_t header = mExchangeFlags.Raw();
 
     VerifyOrExit(size >= EncodeSizeBytes(), err = CHIP_ERROR_INVALID_ARGUMENT);
 

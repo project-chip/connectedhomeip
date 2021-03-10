@@ -48,59 +48,59 @@ enum
                                 // (in either CHIP or DER form), or to decode the certificates.
 };
 
-static const BitFlags<uint8_t, CertValidateFlags> sIgnoreNotBeforeFlag(CertValidateFlags::kIgnoreNotBefore);
-static const BitFlags<uint8_t, CertValidateFlags> sIgnoreNotAfterFlag(CertValidateFlags::kIgnoreNotAfter);
+static const BitFlags<CertValidateFlags> sIgnoreNotBeforeFlag(CertValidateFlags::kIgnoreNotBefore);
+static const BitFlags<CertValidateFlags> sIgnoreNotAfterFlag(CertValidateFlags::kIgnoreNotAfter);
 
-static const BitFlags<uint8_t, CertDecodeFlags> sNullDecodeFlag;
-static const BitFlags<uint8_t, CertDecodeFlags> sGenTBSHashFlag(CertDecodeFlags::kGenerateTBSHash);
-static const BitFlags<uint8_t, CertDecodeFlags> sTrustAnchorFlag(CertDecodeFlags::kIsTrustAnchor);
+static const BitFlags<CertDecodeFlags> sNullDecodeFlag;
+static const BitFlags<CertDecodeFlags> sGenTBSHashFlag(CertDecodeFlags::kGenerateTBSHash);
+static const BitFlags<CertDecodeFlags> sTrustAnchorFlag(CertDecodeFlags::kIsTrustAnchor);
 
-static const BitFlags<uint8_t, TestCertLoadFlags> sNullLoadFlag;
-static const BitFlags<uint8_t, TestCertLoadFlags> sDerFormFlag(TestCertLoadFlags::kDERForm);
-static const BitFlags<uint8_t, TestCertLoadFlags> sSupIsCAFlag(TestCertLoadFlags::kSuppressIsCA);
-static const BitFlags<uint8_t, TestCertLoadFlags> sSupKeyUsageFlag(TestCertLoadFlags::kSuppressKeyUsage);
-static const BitFlags<uint8_t, TestCertLoadFlags> sSupKeyCertSignFlag(TestCertLoadFlags::kSuppressKeyCertSign);
-static const BitFlags<uint8_t, TestCertLoadFlags> sPathLenZeroFlag(TestCertLoadFlags::kSetPathLenConstZero);
-static const BitFlags<uint8_t, TestCertLoadFlags> sAppDefCertTypeFlag(TestCertLoadFlags::kSetAppDefinedCertType);
+static const BitFlags<TestCertLoadFlags> sNullLoadFlag;
+static const BitFlags<TestCertLoadFlags> sDerFormFlag(TestCertLoadFlags::kDERForm);
+static const BitFlags<TestCertLoadFlags> sSupIsCAFlag(TestCertLoadFlags::kSuppressIsCA);
+static const BitFlags<TestCertLoadFlags> sSupKeyUsageFlag(TestCertLoadFlags::kSuppressKeyUsage);
+static const BitFlags<TestCertLoadFlags> sSupKeyCertSignFlag(TestCertLoadFlags::kSuppressKeyCertSign);
+static const BitFlags<TestCertLoadFlags> sPathLenZeroFlag(TestCertLoadFlags::kSetPathLenConstZero);
+static const BitFlags<TestCertLoadFlags> sAppDefCertTypeFlag(TestCertLoadFlags::kSetAppDefinedCertType);
 
-static const BitFlags<uint8_t, KeyPurposeFlags> sNullKPFlag;
-static const BitFlags<uint8_t, KeyPurposeFlags> sSA(KeyPurposeFlags::kServerAuth);
-static const BitFlags<uint8_t, KeyPurposeFlags> sCA(KeyPurposeFlags::kClientAuth);
-static const BitFlags<uint8_t, KeyPurposeFlags> sCS(KeyPurposeFlags::kCodeSigning);
-static const BitFlags<uint8_t, KeyPurposeFlags> sEP(KeyPurposeFlags::kEmailProtection);
-static const BitFlags<uint8_t, KeyPurposeFlags> sTS(KeyPurposeFlags::kTimeStamping);
-static const BitFlags<uint8_t, KeyPurposeFlags> sOS(KeyPurposeFlags::kOCSPSigning);
-static const BitFlags<uint8_t, KeyPurposeFlags> sSAandCA(sSA.Raw() | sCA.Raw());
-static const BitFlags<uint8_t, KeyPurposeFlags> sSAandCS(sSA.Raw() | sCS.Raw());
-static const BitFlags<uint8_t, KeyPurposeFlags> sSAandEP(sSA.Raw() | sEP.Raw());
-static const BitFlags<uint8_t, KeyPurposeFlags> sSAandTS(sSA.Raw() | sTS.Raw());
+static const BitFlags<KeyPurposeFlags> sNullKPFlag;
+static const BitFlags<KeyPurposeFlags> sSA(KeyPurposeFlags::kServerAuth);
+static const BitFlags<KeyPurposeFlags> sCA(KeyPurposeFlags::kClientAuth);
+static const BitFlags<KeyPurposeFlags> sCS(KeyPurposeFlags::kCodeSigning);
+static const BitFlags<KeyPurposeFlags> sEP(KeyPurposeFlags::kEmailProtection);
+static const BitFlags<KeyPurposeFlags> sTS(KeyPurposeFlags::kTimeStamping);
+static const BitFlags<KeyPurposeFlags> sOS(KeyPurposeFlags::kOCSPSigning);
+static const BitFlags<KeyPurposeFlags> sSAandCA(sSA, sCA);
+static const BitFlags<KeyPurposeFlags> sSAandCS(sSA, sCS);
+static const BitFlags<KeyPurposeFlags> sSAandEP(sSA, sEP);
+static const BitFlags<KeyPurposeFlags> sSAandTS(sSA, sTS);
 
-static const BitFlags<uint16_t, KeyUsageFlags> sNullKUFlag;
-static const BitFlags<uint16_t, KeyUsageFlags> sDS(KeyUsageFlags::kDigitalSignature);
-static const BitFlags<uint16_t, KeyUsageFlags> sNR(KeyUsageFlags::kNonRepudiation);
-static const BitFlags<uint16_t, KeyUsageFlags> sKE(KeyUsageFlags::kKeyEncipherment);
-static const BitFlags<uint16_t, KeyUsageFlags> sDE(KeyUsageFlags::kDataEncipherment);
-static const BitFlags<uint16_t, KeyUsageFlags> sKA(KeyUsageFlags::kKeyAgreement);
-static const BitFlags<uint16_t, KeyUsageFlags> sKC(KeyUsageFlags::kKeyCertSign);
-static const BitFlags<uint16_t, KeyUsageFlags> sCR(KeyUsageFlags::kCRLSign);
-static const BitFlags<uint16_t, KeyUsageFlags> sEO(KeyUsageFlags::kEncipherOnly);
-static const BitFlags<uint16_t, KeyUsageFlags> sDO(KeyUsageFlags::kDecipherOnly);
-static const BitFlags<uint16_t, KeyUsageFlags> sDSandNR(sDS.Raw() | sNR.Raw());
-static const BitFlags<uint16_t, KeyUsageFlags> sDSandKE(sDS.Raw() | sKE.Raw());
-static const BitFlags<uint16_t, KeyUsageFlags> sDSandDE(sDS.Raw() | sDE.Raw());
-static const BitFlags<uint16_t, KeyUsageFlags> sDSandKA(sDS.Raw() | sKA.Raw());
-static const BitFlags<uint16_t, KeyUsageFlags> sDSandKC(sDS.Raw() | sKC.Raw());
-static const BitFlags<uint16_t, KeyUsageFlags> sDSandCR(sDS.Raw() | sCR.Raw());
-static const BitFlags<uint16_t, KeyUsageFlags> sDSandEO(sDS.Raw() | sEO.Raw());
-static const BitFlags<uint16_t, KeyUsageFlags> sDSandDO(sDS.Raw() | sDO.Raw());
-static const BitFlags<uint16_t, KeyUsageFlags> sKCandDS(sKC.Raw() | sDS.Raw());
-static const BitFlags<uint16_t, KeyUsageFlags> sKCandNR(sKC.Raw() | sNR.Raw());
-static const BitFlags<uint16_t, KeyUsageFlags> sKCandKE(sKC.Raw() | sKE.Raw());
-static const BitFlags<uint16_t, KeyUsageFlags> sKCandDE(sKC.Raw() | sDE.Raw());
-static const BitFlags<uint16_t, KeyUsageFlags> sKCandKA(sKC.Raw() | sKA.Raw());
-static const BitFlags<uint16_t, KeyUsageFlags> sKCandCR(sKC.Raw() | sCR.Raw());
-static const BitFlags<uint16_t, KeyUsageFlags> sKCandEO(sKC.Raw() | sEO.Raw());
-static const BitFlags<uint16_t, KeyUsageFlags> sKCandDO(sKC.Raw() | sDO.Raw());
+static const BitFlags<KeyUsageFlags> sNullKUFlag;
+static const BitFlags<KeyUsageFlags> sDS(KeyUsageFlags::kDigitalSignature);
+static const BitFlags<KeyUsageFlags> sNR(KeyUsageFlags::kNonRepudiation);
+static const BitFlags<KeyUsageFlags> sKE(KeyUsageFlags::kKeyEncipherment);
+static const BitFlags<KeyUsageFlags> sDE(KeyUsageFlags::kDataEncipherment);
+static const BitFlags<KeyUsageFlags> sKA(KeyUsageFlags::kKeyAgreement);
+static const BitFlags<KeyUsageFlags> sKC(KeyUsageFlags::kKeyCertSign);
+static const BitFlags<KeyUsageFlags> sCR(KeyUsageFlags::kCRLSign);
+static const BitFlags<KeyUsageFlags> sEO(KeyUsageFlags::kEncipherOnly);
+static const BitFlags<KeyUsageFlags> sDO(KeyUsageFlags::kDecipherOnly);
+static const BitFlags<KeyUsageFlags> sDSandNR(sDS, sNR);
+static const BitFlags<KeyUsageFlags> sDSandKE(sDS, sKE);
+static const BitFlags<KeyUsageFlags> sDSandDE(sDS, sDE);
+static const BitFlags<KeyUsageFlags> sDSandKA(sDS, sKA);
+static const BitFlags<KeyUsageFlags> sDSandKC(sDS, sKC);
+static const BitFlags<KeyUsageFlags> sDSandCR(sDS, sCR);
+static const BitFlags<KeyUsageFlags> sDSandEO(sDS, sEO);
+static const BitFlags<KeyUsageFlags> sDSandDO(sDS, sDO);
+static const BitFlags<KeyUsageFlags> sKCandDS(sKC, sDS);
+static const BitFlags<KeyUsageFlags> sKCandNR(sKC, sNR);
+static const BitFlags<KeyUsageFlags> sKCandKE(sKC, sKE);
+static const BitFlags<KeyUsageFlags> sKCandDE(sKC, sDE);
+static const BitFlags<KeyUsageFlags> sKCandKA(sKC, sKA);
+static const BitFlags<KeyUsageFlags> sKCandCR(sKC, sCR);
+static const BitFlags<KeyUsageFlags> sKCandEO(sKC, sEO);
+static const BitFlags<KeyUsageFlags> sKCandDO(sKC, sDO);
 
 static CHIP_ERROR LoadStandardCerts(ChipCertificateSet & certSet)
 {
@@ -131,7 +131,7 @@ static CHIP_ERROR SetEffectiveTime(ValidationContext & validContext, uint16_t ye
     effectiveTime.Minute = min;
     effectiveTime.Second = sec;
 
-    return PackCertTime(effectiveTime, validContext.mEffectiveTime);
+    return ASN1ToChipEpochTime(effectiveTime, validContext.mEffectiveTime);
 }
 
 static void TestChipCert_ChipToX509(nlTestSuite * inSuite, void * inContext)
@@ -207,8 +207,8 @@ static void TestChipCert_CertValidation(nlTestSuite * inSuite, void * inContext)
         struct
         {
             uint8_t Type;
-            BitFlags<uint8_t, CertDecodeFlags> DecodeFlags;
-            BitFlags<uint8_t, TestCertLoadFlags> LoadFlags;
+            BitFlags<CertDecodeFlags> DecodeFlags;
+            BitFlags<TestCertLoadFlags> LoadFlags;
         } InputCerts[kMaxCertsPerTestCase];
     };
 
@@ -414,28 +414,31 @@ static void TestChipCert_CertValidTime(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_CERT_NOT_VALID_YET);
 
     // 1 second before validity period.
-    err = SetEffectiveTime(validContext, 2020, 10, 14, 23, 59, 59);
+    err = SetEffectiveTime(validContext, 2020, 10, 15, 14, 23, 42);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     err = certSet.ValidateCert(certSet.GetLastCert(), validContext);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_CERT_NOT_VALID_YET);
 
-    // 1st second of 1st day of validity period.
-    // NOTE: the given time is technically outside the stated certificate validity period, which starts mid-day.
-    // However for simplicity's sake, the Chip cert validation algorithm rounds the validity period to whole days.
-    err = SetEffectiveTime(validContext, 2020, 10, 15, 0, 0, 0);
+    // 1st second of validity period.
+    err = SetEffectiveTime(validContext, 2020, 10, 15, 14, 23, 43);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     err = certSet.ValidateCert(certSet.GetLastCert(), validContext);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    // Last second of last day of validity period.
-    // As above, this time is considered valid because of rounding to whole days.
-    err = SetEffectiveTime(validContext, 2040, 10, 15, 23, 59, 59);
+    // Validity period.
+    err = SetEffectiveTime(validContext, 2022, 02, 23, 12, 30, 01);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    err = certSet.ValidateCert(certSet.GetLastCert(), validContext);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    // Last second of validity period.
+    err = SetEffectiveTime(validContext, 2040, 10, 15, 14, 23, 42);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     err = certSet.ValidateCert(certSet.GetLastCert(), validContext);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // 1 second after end of certificate validity period.
-    err = SetEffectiveTime(validContext, 2040, 10, 16, 0, 0, 0);
+    err = SetEffectiveTime(validContext, 2040, 10, 15, 14, 23, 43);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     err = certSet.ValidateCert(certSet.GetLastCert(), validContext);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_CERT_EXPIRED);
@@ -472,8 +475,8 @@ static void TestChipCert_CertUsage(nlTestSuite * inSuite, void * inContext)
     struct UsageTestCase
     {
         uint8_t mCertIndex;
-        BitFlags<uint16_t, KeyUsageFlags> mRequiredKeyUsages;
-        BitFlags<uint8_t, KeyPurposeFlags> mRequiredKeyPurposes;
+        BitFlags<KeyUsageFlags> mRequiredKeyUsages;
+        BitFlags<KeyPurposeFlags> mRequiredKeyPurposes;
         CHIP_ERROR mExpectedResult;
     };
 

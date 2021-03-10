@@ -92,15 +92,6 @@
 #endif
 
 /**
- * CHIP_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE
- *
- * The maximum size (in bytes) of a debug logging message.
- */
-#ifndef CHIP_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE
-#define CHIP_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE 256
-#endif
-
-/**
  * CHIP_DEVICE_CONFIG_ENABLE_FACTORY_PROVISIONING
  *
  * Enable the device factory provisioning feature.
@@ -134,6 +125,16 @@
  */
 #ifndef CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID
 #define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID 9050
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER
+ *
+ * Enables the use of a hard-coded default serial number if none
+ * is found in Chip NV storage.
+ */
+#ifndef CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER
+#define CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER "TEST_SN"
 #endif
 
 /**
@@ -529,6 +530,26 @@
  */
 #ifndef CHIP_DEVICE_CONFIG_ENABLE_JUST_IN_TIME_PROVISIONING
 #define CHIP_DEVICE_CONFIG_ENABLE_JUST_IN_TIME_PROVISIONING 0
+#endif
+
+// -------------------- Service Discovery Configuration -----------------------
+
+/**
+ * CHIP_DEVICE_CONFIG_ENABLE_MDNS
+ *
+ * Enable support to use MDNS for service advertising and discovery in CHIP.
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_MDNS
+#define CHIP_DEVICE_CONFIG_ENABLE_MDNS 0
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+ *
+ * Enable support to DNS-SD SRP client usage for service advertising and discovery in CHIP.
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+#define CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT 0
 #endif
 
 // -------------------- Thread Configuration --------------------
@@ -946,13 +967,4 @@
  */
 #ifndef CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_TIME
 #define CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_TIME __TIME__
-#endif
-
-/**
- * CHIP_ROTATING_DEVICE_ID
- *
- * Sample Rotating Device Id.
- */
-#ifndef CHIP_ROTATING_DEVICE_ID
-#define CHIP_ROTATING_DEVICE_ID "1122334455667788"
 #endif

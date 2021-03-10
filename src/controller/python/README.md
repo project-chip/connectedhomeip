@@ -24,6 +24,10 @@ Follow [BUILDING.md](/docs/BUILDING.md) to setup CHIP on your platform.
 Genrally, once build dependencies are satisfied you can build the `python`
 target.
 
+-   If you are on MacOS BigSur(11.x) set this export before running the script
+    `export MACOSX_DEPLOYMENT_TARGET=10.16` to prevent ".whl is not a supported
+    wheel on this platform." when trying to install it
+
 Use `scripts/build_python.sh` or run something equivalent to:
 
 ```sh
@@ -41,7 +45,7 @@ ninja -C out/python_lib python
 > WHL file.
 
 ```sh
-virtualenv out/python_env --clean
+virtualenv out/python_env --clear
 source out/python_env/bin/activate
 pip install out/python_lib/controller/python/chip*.whl
 ```
@@ -83,6 +87,34 @@ Bring up two virtual ble interface:
 sudo third_party/bluez/repo/emulator/btvirt -L -l2
 ```
 
+You can find the virtual interface by `hciconfig` command:
+
+```
+$ hciconfig
+
+hci2:	Type: Primary  Bus: Virtual
+	BD Address: 00:AA:01:01:00:24  ACL MTU: 192:1  SCO MTU: 0:0
+	UP RUNNING
+	RX bytes:0 acl:95 sco:0 events:205 errors:0
+	TX bytes:2691 acl:95 sco:0 commands:98 errors:0
+
+hci1:	Type: Primary  Bus: Virtual
+	BD Address: 00:AA:01:00:00:23  ACL MTU: 192:1  SCO MTU: 0:0
+	UP RUNNING
+	RX bytes:0 acl:95 sco:0 events:208 errors:0
+	TX bytes:3488 acl:95 sco:0 commands:110 errors:0
+```
+
+Then you can choose the adapter to use in command line arguments of the device
+controller:
+
+For example, add `--bluetooth-adapter=hci2` to use the virtual interface `hci2`
+listed above.
+
+```
+chip-device-ctrl --bluetooth-adapter=hci2
+```
+
 ## Usage / BLE Secure Session Establishment
 
 1. Run CHIP Device Controller
@@ -94,19 +126,13 @@ sudo third_party/bluez/repo/emulator/btvirt -L -l2
 sudo chip-device-ctrl
 ```
 
-2. [WIP][required when there are multiple ble adapters] Select BLE adapter
-   (Linux only)
+or select the bluetooth interface by command line arguments.
 
 ```
-chip-device-ctrl > ble-adapter-print
-2020-11-23 17:41:53,116 ChipBLEMgr   INFO     adapter 0 = DE:AD:BE:EF:00:00
-2020-11-23 17:41:53,116 ChipBLEMgr   INFO     adapter 1 = DE:AD:BE:EF:01:01
-2020-11-23 17:41:53,116 ChipBLEMgr   INFO     adapter 2 = DE:AD:BE:EF:02:02
-
-chip-device-ctrl > ble-adapter-select DE:AD:BE:EF:00:00
+sudo chip-device-ctrl --bluetooth-adapter=hci2
 ```
 
-3. Scan BLE devices
+2. Scan BLE devices
 
 ```
 chip-device-ctrl > ble-scan
@@ -126,7 +152,7 @@ chip-device-ctrl > ble-scan
 Connect to BLE device
 ```
 
-4.  Set wifi credential
+3.  Set wifi credential
 
 > Note: This command will be deprerated after the network provisioning cluster
 > is ready.
@@ -135,10 +161,30 @@ Connect to BLE device
 chip-device-ctrl > set-pairing-wifi-credential TestAP TestPassword
 ```
 
-5.  Connect to device using setup pin code
+4.  Connect to device using setup pin code
 
 ```
 chip-device-ctrl > connect -ble 1383 12345678
+```
+
+## Thread Secure Session provisioning
+
+1. Run CHIP Device Controller
+
+```
+sudo chip-device-ctrl
+```
+
+2. Set Thread credentials
+
+```
+set-pairing-thread-credential <channel> <pan id[HEX]> <master_key>
+```
+
+3. BLE Connect to the device
+
+```
+connect -ble <discriminator> <setup pin code> [<nodeid>]
 ```
 
 ## IP Secure Session Establishment
@@ -162,19 +208,19 @@ chip-device-ctrl > connect -ip <Device IP Address> 12345678
 **`[L]`** = Linux only / **`[D]`** = Deprecated / **`[W]`** = WIP / **`[T]`** =
 For testing
 
-### **`[W][L]`** `ble-adapter-print`
+### **`[L]`** `ble-adapter-print`
 
 Print the available Bluetooth adapters on device. Takes no arguments.
 
 ```
 chip-device-ctrl > ble-adapter-print
-2021-01-19 02:14:16,766 ChipBLEMgr   INFO     adapter 0 = DC:A6:32:9E:2E:A7
+2021-03-04 16:09:40,930 ChipBLEMgr   INFO     AdapterName: hci0   AdapterAddress: 00:AA:01:00:00:23
 ```
 
-### **`[W][L]`** `ble-adapter-select <address>`
+### **`[D]`** `ble-adapter-select <address>`
 
 Select the Bluetooth adapter for device controller, takes adapter MAC address as
-argument.
+argument. This command only affects `ble-scan` command.
 
 ```
 chip-device-ctrl > ble-adapter-select DC:A6:32:9E:2E:A7
@@ -203,15 +249,27 @@ chip-device-ctrl > ble-scan
 2021-01-19 02:27:34,213 ChipBLEMgr   INFO     scanning stopped
 ```
 
-### `connect -ip <address> <SetUpPinCode>`
+### `connect -ip <address> <SetUpPinCode> [<nodeid>]`
 
 Do key exchange and establish a secure session between controller and device
 using IP transport.
 
-### `connect -ble <discriminator> <SetUpPinCode>`
+The node id will be used by controller to distinguish multiple devices. This
+does not match the spec and will be removed later. The nodeid will not be
+persisted by controller / device.
+
+If no nodeid given, a random node id will be used.
+
+### `connect -ble <discriminator> <SetUpPinCode> [<nodeid>]`
 
 Do key exchange and establish a secure session between controller and device
 using BLE transport.
+
+The node id will be used by controller to distinguish multiple devices. This
+does not match the spec and will be removed later. The nodeid will not be
+persisted by controller / device.
+
+If no nodeid given, a random node id will be used.
 
 ### **`[D]`** `set-pairing-wifi-credential <ssid> <password>`
 
