@@ -375,15 +375,26 @@ static void driveIOUntil(unsigned int timeoutMs, std::function<bool(void)> compl
     }
 }
 
+struct ChipSocket
+{
+    ChipSocket() {}
+    ~ChipSocket() {}
+
+    union
+    {
+        TCPImpl tcpSocket;
+        Transport::UDP udpSocket;
+    };
+    Transport::Type type;
+};
+
 int cmd_socket_echo(int argc, char ** argv)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     INET_ERROR err;
     char * payload;
-    uint16_t payload_len;
-    Transport::UDP udp;
-    TCPImpl tcp;
-    Transport::Type socketType;
+    uint16_t payloadLen;
+    ChipSocket sock;
 
     PacketBufferHandle buffer;
     PacketHeader header;
@@ -399,13 +410,17 @@ int cmd_socket_echo(int argc, char ** argv)
 
     if (strcmp(argv[0], "UDP") == 0)
     {
-        socketType = Transport::Type::kUdp;
-        err        = udp.Init(Transport::UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(addr.Type()));
+        new (&sock.udpSocket) Transport::UDP();
+        sock.type = Transport::Type::kUdp;
+
+        err = sock.udpSocket.Init(Transport::UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(addr.Type()));
     }
     else if (strcmp(argv[0], "TCP") == 0)
     {
-        socketType = Transport::Type::kTcp;
-        err        = tcp.Init(Transport::TcpListenParameters(&DeviceLayer::InetLayer).SetAddressType(addr.Type()));
+        new (&sock.tcpSocket) TCPImpl;
+        sock.type = Transport::Type::kTcp;
+
+        err = sock.tcpSocket.Init(Transport::TcpListenParameters(&DeviceLayer::InetLayer).SetAddressType(addr.Type()));
     }
     else
     {
@@ -419,10 +434,10 @@ int cmd_socket_echo(int argc, char ** argv)
         ExitNow(error = err;);
     }
 
-    payload     = argv[1];
-    payload_len = sizeof(payload);
+    payload    = argv[1];
+    payloadLen = sizeof(payload);
 
-    buffer = PacketBufferHandle::NewWithData(payload, payload_len);
+    buffer = PacketBufferHandle::NewWithData(payload, payloadLen);
     if (buffer.IsNull())
     {
         streamer_printf(sout, "ERROR: create payload buffer failed\r\n");
@@ -431,20 +446,27 @@ int cmd_socket_echo(int argc, char ** argv)
 
     gTransportMgrBase.SetSecureSessionMgr((TransportMgrDelegate *) &gSocketTransportMgrDelegate);
     gTransportMgrBase.SetRendezvousSession((TransportMgrDelegate *) &gSocketTransportMgrDelegate);
-    gTransportMgrBase.Init((Transport::Base *) &socket);
+    if (sock.type == Transport::Type::kUdp)
+    {
+        gTransportMgrBase.Init((Transport::Base *) &sock.udpSocket);
+    }
+    else
+    {
+        gTransportMgrBase.Init((Transport::Base *) &sock.tcpSocket);
+    }
 
     header.SetSourceNodeId(kSourceNodeId).SetDestinationNodeId(kDestinationNodeId).SetMessageId(kMessageId);
 
     SocketReceiveHandlerCallCount = 0;
 
     // Should be able to send a message to itself by just calling send.
-    if (socketType == Transport::Type::kUdp)
+    if (sock.type == Transport::Type::kUdp)
     {
-        err = udp.SendMessage(header, Transport::PeerAddress::UDP(addr), std::move(buffer));
+        err = sock.udpSocket.SendMessage(header, Transport::PeerAddress::UDP(addr), std::move(buffer));
     }
     else
     {
-        err = tcp.SendMessage(header, Transport::PeerAddress::TCP(addr), std::move(buffer));
+        err = sock.tcpSocket.SendMessage(header, Transport::PeerAddress::TCP(addr), std::move(buffer));
     }
 
     if (err != INET_NO_ERROR)
@@ -455,11 +477,11 @@ int cmd_socket_echo(int argc, char ** argv)
 
     driveIOUntil(5000 /* ms */, []() { return SocketReceiveHandlerCallCount != 0; });
 
-    if (socketType == Transport::Type::kTcp)
+    if (sock.type == Transport::Type::kTcp)
     {
         // Disconnect and wait for seeing peer close
-        tcp.Disconnect(Transport::PeerAddress::TCP(addr));
-        driveIOUntil(5000 /* ms */, [&tcp]() { return !tcp.HasActiveConnections(); });
+        sock.tcpSocket.Disconnect(Transport::PeerAddress::TCP(addr));
+        driveIOUntil(5000 /* ms */, [&sock]() { return !sock.tcpSocket.HasActiveConnections(); });
     }
 
 exit:
