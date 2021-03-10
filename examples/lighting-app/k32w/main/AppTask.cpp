@@ -517,10 +517,10 @@ void AppTask::ActionCompleted(LightingManager::Action_t aAction)
 void AppTask::PostTurnOnActionRequest(int32_t aActor, LightingManager::Action_t aAction)
 {
     AppEvent event;
-    event.Type             = AppEvent::kEventType_TurnOn;
+    event.Type              = AppEvent::kEventType_TurnOn;
     event.LightEvent.Actor  = aActor;
     event.LightEvent.Action = aAction;
-    event.Handler          = LightActionEventHandler;
+    event.Handler           = LightActionEventHandler;
     PostEvent(&event);
 }
 
