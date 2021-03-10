@@ -1,7 +1,7 @@
 /*
  *
  *    Copyright (c) 2021 Project CHIP Authors
- *    Copyright (c) 2019 Google LLC.
+ *    Copyright (c) 2018 Nest Labs, Inc.
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,35 +19,40 @@
 
 #pragma once
 
-#include "AppEvent.h"
+#include <cstdint>
 
-class AppTask
+struct AppEvent;
+typedef void (*EventHandler)(AppEvent *);
+
+struct AppEvent
 {
-public:
-    int StartApp();
+    enum AppEventTypes
+    {
+        kEventType_Button = 0,
+        kEventType_Timer,
+        kEventType_Lock,
+        kEventType_Install,
+    };
 
-    void PostEvent(AppEvent * aEvent);
+    uint16_t Type;
 
-private:
-    friend AppTask & GetAppTask(void);
+    union
+    {
+        struct
+        {
+            uint8_t ButtonIdx;
+            uint8_t Action;
+        } ButtonEvent;
+        struct
+        {
+            void * Context;
+        } TimerEvent;
+        struct
+        {
+            uint8_t Action;
+            int32_t Actor;
+        } LockEvent;
+    };
 
-    int Init();
-
-    void CancelTimer(void);
-
-    void DispatchEvent(const AppEvent * event);
-
-    static void FunctionTimerEventHandler(AppEvent * aEvent);
-
-    static void TimerEventHandler();
-
-    void StartTimer(uint32_t aTimeoutInMs);
-
-    bool mFunctionTimerActive;
-    static AppTask sAppTask;
+    EventHandler Handler;
 };
-
-inline AppTask & GetAppTask(void)
-{
-    return AppTask::sAppTask;
-}
