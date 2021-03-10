@@ -52,8 +52,6 @@ public:
     // ===== Methods that implement the ConnectivityManager abstract interface.
 
     Ble::BleLayer * _GetBleLayer();
-    void _AddCHIPoBLEConnectionHandler(ConnectivityManager::BleConnectionReceivedFunct handler);
-    void _RemoveCHIPoBLEConnectionHandler();
     ConnectivityManager::CHIPoBLEServiceMode _GetCHIPoBLEServiceMode();
     CHIP_ERROR _SetCHIPoBLEServiceMode(ConnectivityManager::CHIPoBLEServiceMode val);
     bool _IsBLEAdvertisingEnabled();
@@ -77,21 +75,6 @@ template <class ImplClass>
 inline Ble::BleLayer * GenericConnectivityManagerImpl_BLE<ImplClass>::_GetBleLayer()
 {
     return BLEMgr().GetBleLayer();
-}
-
-template <class ImplClass>
-inline void GenericConnectivityManagerImpl_BLE<ImplClass>::_AddCHIPoBLEConnectionHandler(
-    ConnectivityManager::BleConnectionReceivedFunct handler)
-{
-    Ble::BleLayer * bleLayer           = BLEMgr().GetBleLayer();
-    bleLayer->OnChipBleConnectReceived = handler;
-}
-
-template <class ImplClass>
-inline void GenericConnectivityManagerImpl_BLE<ImplClass>::_RemoveCHIPoBLEConnectionHandler()
-{
-    Ble::BleLayer * bleLayer           = BLEMgr().GetBleLayer();
-    bleLayer->OnChipBleConnectReceived = nullptr;
 }
 
 template <class ImplClass>
