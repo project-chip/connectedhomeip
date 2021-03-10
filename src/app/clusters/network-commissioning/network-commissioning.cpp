@@ -19,6 +19,7 @@
 #include "network-commissioning.h"
 
 #include <cstring>
+#include <type_traits>
 
 #include <gen/att-storage.h>
 #include <gen/attribute-id.h>
@@ -31,9 +32,15 @@
 
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ReturnMacros.h>
+#include <lib/support/SafeInt.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ConnectivityManager.h>
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#include <platform/ThreadStackManager.h>
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
+
 #include <transport/NetworkProvisioning.h>
 
 // Include DeviceNetworkProvisioningDelegateImpl for WiFi provisioning.
@@ -54,10 +61,16 @@ namespace clusters {
 namespace NetworkCommissioning {
 
 constexpr uint8_t kMaxNetworkIDLen       = 32;
-constexpr uint8_t kMaxThreadDatasetLen   = 128;
+constexpr uint8_t kMaxThreadDatasetLen   = 254; // As defined in Thread spec.
 constexpr uint8_t kMaxWiFiSSIDLen        = 32;
 constexpr uint8_t kMaxWiFiCredentialsLen = 64;
 constexpr uint8_t kMaxNetworks           = 4;
+
+// The temporary network id which will be used by thread networks in CHIP before we have the API for getting extpanid from dataset
+// tlv.
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+constexpr uint8_t kTemporaryThreadNetworkId[] = { 0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef };
+#endif
 
 enum class NetworkType : uint8_t
 {
@@ -99,20 +112,57 @@ namespace {
 NetworkInfo sNetworks[kMaxNetworks];
 } // namespace
 
-// TODO: We cannot get length of operational dataset here, should be fixed after we have byte string type.
-// Note: The codegen for OCTET_STRING will be implemented later since no other clusters are using OCTET_STRING.
 EmberAfNetworkCommissioningError OnAddThreadNetworkCommandCallbackInternal(app::Command *, EndpointId,
-                                                                           const uint8_t * operationalDataset, uint64_t breadcrumb,
+                                                                           const uint8_t * operationalDataset,
+                                                                           size_t operationalDatasetLen, uint64_t breadcrumb,
                                                                            uint32_t timeoutMs)
 {
-    // TODO: Implement AddThreadNetworkCommand after OCTET_STRING is supported.
-    return EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_NETWORK_NOT_FOUND;
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    EmberAfNetworkCommissioningError err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_BOUNDS_EXCEEDED;
+
+    for (size_t i = 0; i < kMaxNetworks; i++)
+    {
+        if (sNetworks[i].mNetworkType == NetworkType::kUndefined)
+        {
+            VerifyOrExit(operationalDatasetLen <= sizeof(ThreadNetworkInfo::mDataset),
+                         err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_OUT_OF_RANGE);
+            memcpy(sNetworks[i].mData.mThread.mDataset, operationalDataset, operationalDatasetLen);
+
+            using ThreadDatasetLenType = decltype(sNetworks[i].mData.mThread.mDatasetLen);
+            VerifyOrExit(chip::CanCastTo<ThreadDatasetLenType>(operationalDatasetLen),
+                         err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_OUT_OF_RANGE);
+            sNetworks[i].mData.mThread.mDatasetLen = static_cast<ThreadDatasetLenType>(operationalDatasetLen);
+
+            // A 64bit id for thread networks, currently, we are missing some API for getting the thread network extpanid from the
+            // dataset tlv.
+            static_assert(sizeof(kTemporaryThreadNetworkId) <= sizeof(sNetworks[i].mNetworkID),
+                          "TemporaryThreadNetworkId too long");
+            memcpy(sNetworks[i].mNetworkID, kTemporaryThreadNetworkId, sizeof(kTemporaryThreadNetworkId));
+            sNetworks[i].mNetworkIDLen = sizeof(kTemporaryThreadNetworkId);
+
+            sNetworks[i].mNetworkType = NetworkType::kThread;
+            sNetworks[i].mEnabled     = false;
+
+            err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_SUCCESS;
+            break;
+        }
+    }
+
+exit:
+    // TODO: We should encode response command here.
+
+    ChipLogDetail(Zcl, "AddThreadNetwork: %d", err);
+    return err;
+#else
+    // The target does not supports ThreadNetwork. We should not add AddThreadNetwork command in that case then the upper layer will
+    // return "Command not found" error.
+    return EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_UNKNOWN_ERROR;
+#endif
 }
 
-// TODO: We cannot get length of ssid / credentials here, should be fixed after we have byte string type in ZCL codegen.
-// Note: SSID and credentials are not necessarily to be string.
 EmberAfNetworkCommissioningError OnAddWiFiNetworkCommandCallbackInternal(app::Command *, EndpointId, const uint8_t * ssid,
-                                                                         const uint8_t * credentials, uint64_t breadcrumb,
+                                                                         size_t ssidLen, const uint8_t * credentials,
+                                                                         size_t credentialsLen, uint64_t breadcrumb,
                                                                          uint32_t timeoutMs)
 {
     EmberAfNetworkCommissioningError err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_BOUNDS_EXCEEDED;
@@ -121,19 +171,29 @@ EmberAfNetworkCommissioningError OnAddWiFiNetworkCommandCallbackInternal(app::Co
     {
         if (sNetworks[i].mNetworkType == NetworkType::kUndefined)
         {
-            // Assume they are null terminated, see notes above.
-            size_t ssidLen        = strlen(reinterpret_cast<const char *>(ssid));
-            size_t credentialsLen = strlen(reinterpret_cast<const char *>(credentials));
-
-            VerifyOrExit(ssidLen <= kMaxWiFiSSIDLen, err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_BOUNDS_EXCEEDED);
-            VerifyOrExit(credentialsLen <= kMaxWiFiCredentialsLen, err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_BOUNDS_EXCEEDED);
-
+            VerifyOrExit(ssidLen <= sizeof(sNetworks[i].mData.mWiFi.mSSID),
+                         err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_OUT_OF_RANGE);
             memcpy(sNetworks[i].mData.mWiFi.mSSID, ssid, ssidLen);
-            sNetworks[i].mData.mWiFi.mSSIDLen = ssidLen;
+
+            using WiFiSSIDLenType = decltype(sNetworks[i].mData.mWiFi.mSSIDLen);
+            VerifyOrExit(chip::CanCastTo<WiFiSSIDLenType>(ssidLen), err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_OUT_OF_RANGE);
+            sNetworks[i].mData.mWiFi.mSSIDLen = static_cast<WiFiSSIDLenType>(ssidLen);
+
+            VerifyOrExit(credentialsLen <= sizeof(sNetworks[i].mData.mWiFi.mCredentials),
+                         err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_OUT_OF_RANGE);
             memcpy(sNetworks[i].mData.mWiFi.mCredentials, credentials, credentialsLen);
-            sNetworks[i].mData.mWiFi.mCredentialsLen = credentialsLen;
+
+            using WiFiCredentialsLenType = decltype(sNetworks[i].mData.mWiFi.mCredentialsLen);
+            VerifyOrExit(chip::CanCastTo<WiFiCredentialsLenType>(ssidLen),
+                         err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_OUT_OF_RANGE);
+            sNetworks[i].mData.mWiFi.mCredentialsLen = static_cast<WiFiCredentialsLenType>(credentialsLen);
+
+            VerifyOrExit(ssidLen <= sizeof(sNetworks[i].mNetworkID), err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_OUT_OF_RANGE);
             memcpy(sNetworks[i].mNetworkID, sNetworks[i].mData.mWiFi.mSSID, ssidLen);
-            sNetworks[i].mNetworkIDLen = ssidLen;
+
+            using NetworkIDLenType = decltype(sNetworks[i].mNetworkIDLen);
+            VerifyOrExit(chip::CanCastTo<NetworkIDLenType>(ssidLen), err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_OUT_OF_RANGE);
+            sNetworks[i].mNetworkIDLen = static_cast<NetworkIDLenType>(ssidLen);
 
             sNetworks[i].mNetworkType = NetworkType::kWiFi;
             sNetworks[i].mEnabled     = false;
@@ -159,14 +219,23 @@ CHIP_ERROR DoEnableNetwork(NetworkInfo * network)
     switch (network->mNetworkType)
     {
     case NetworkType::kThread:
-        // TODO(#5040): Add support for thread network provisioning.
-        return CHIP_ERROR_NOT_IMPLEMENTED;
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+        ReturnErrorOnFailure(
+            DeviceLayer::ThreadStackMgr().SetThreadProvision(network->mData.mThread.mDataset, network->mData.mThread.mDatasetLen));
+        ReturnErrorOnFailure(DeviceLayer::ThreadStackMgr().SetThreadEnabled(true));
+#else
+        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#endif
+        break;
     case NetworkType::kWiFi:
 #if defined(CHIP_DEVICE_LAYER_TARGET)
     {
+        // TODO: Currently, DeviceNetworkProvisioningDelegateImpl assumes that ssid and credentials are null terminated strings,
+        // which is not correct, this should be changed once we have better method for commissioning wifi networks.
         DeviceLayer::DeviceNetworkProvisioningDelegateImpl deviceDelegate;
-        return deviceDelegate.ProvisionWiFi(reinterpret_cast<const char *>(network->mData.mWiFi.mSSID),
-                                            reinterpret_cast<const char *>(network->mData.mWiFi.mCredentials));
+        ReturnErrorOnFailure(deviceDelegate.ProvisionWiFi(reinterpret_cast<const char *>(network->mData.mWiFi.mSSID),
+                                                          reinterpret_cast<const char *>(network->mData.mWiFi.mCredentials)));
+        break;
     }
 #else
         return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
@@ -183,10 +252,10 @@ CHIP_ERROR DoEnableNetwork(NetworkInfo * network)
 } // namespace
 
 EmberAfNetworkCommissioningError OnEnableNetworkCommandCallbackInternal(app::Command *, EndpointId, const uint8_t * networkID,
-                                                                        uint64_t breadcrumb, uint32_t timeoutMs)
+                                                                        size_t networkIDLen, uint64_t breadcrumb,
+                                                                        uint32_t timeoutMs)
 {
     size_t networkSeq;
-    size_t networkIDLen                  = strlen(reinterpret_cast<const char *>(networkID));
     EmberAfNetworkCommissioningError err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_NETWORK_ID_NOT_FOUND;
 
     for (networkSeq = 0; networkSeq < kMaxNetworks; networkSeq++)
