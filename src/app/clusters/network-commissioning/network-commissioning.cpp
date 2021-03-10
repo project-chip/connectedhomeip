@@ -128,10 +128,10 @@ EmberAfNetworkCommissioningError OnAddThreadNetworkCommandCallbackInternal(app::
                          err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_OUT_OF_RANGE);
             memcpy(sNetworks[i].mData.mThread.mDataset, operationalDataset, operationalDatasetLen);
 
-            VerifyOrExit(chip::CanCastTo<decltype(sNetworks[i].mData.mThread.mDatasetLen)>(operationalDatasetLen),
+            using ThreadDatasetLenType = decltype(sNetworks[i].mData.mThread.mDatasetLen);
+            VerifyOrExit(chip::CanCastTo<ThreadDatasetLenType>(operationalDatasetLen),
                          err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_OUT_OF_RANGE);
-            sNetworks[i].mData.mThread.mDatasetLen =
-                static_cast<decltype(sNetworks[i].mData.mThread.mDatasetLen)>(operationalDatasetLen);
+            sNetworks[i].mData.mThread.mDatasetLen = static_cast<ThreadDatasetLenType>(operationalDatasetLen);
 
             // A 64bit id for thread networks, currently, we are missing some API for getting the thread network extpanid from the
             // dataset tlv.
@@ -175,25 +175,25 @@ EmberAfNetworkCommissioningError OnAddWiFiNetworkCommandCallbackInternal(app::Co
                          err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_OUT_OF_RANGE);
             memcpy(sNetworks[i].mData.mWiFi.mSSID, ssid, ssidLen);
 
-            VerifyOrExit(chip::CanCastTo<decltype(sNetworks[i].mData.mWiFi.mSSIDLen)>(ssidLen),
-                         err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_OUT_OF_RANGE);
-            sNetworks[i].mData.mWiFi.mSSIDLen = static_cast<decltype(sNetworks[i].mData.mWiFi.mSSIDLen)>(ssidLen);
+            using WiFiSSIDLenType = decltype(sNetworks[i].mData.mWiFi.mSSIDLen);
+            VerifyOrExit(chip::CanCastTo<WiFiSSIDLenType>(ssidLen), err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_OUT_OF_RANGE);
+            sNetworks[i].mData.mWiFi.mSSIDLen = static_cast<WiFiSSIDLenType>(ssidLen);
 
             VerifyOrExit(credentialsLen <= sizeof(sNetworks[i].mData.mWiFi.mCredentials),
                          err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_OUT_OF_RANGE);
             memcpy(sNetworks[i].mData.mWiFi.mCredentials, credentials, credentialsLen);
 
-            VerifyOrExit(chip::CanCastTo<decltype(sNetworks[i].mData.mWiFi.mCredentialsLen)>(ssidLen),
+            using WiFiCredentialsLenType = decltype(sNetworks[i].mData.mWiFi.mCredentialsLen);
+            VerifyOrExit(chip::CanCastTo<WiFiCredentialsLenType>(ssidLen),
                          err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_OUT_OF_RANGE);
-            sNetworks[i].mData.mWiFi.mCredentialsLen =
-                static_cast<decltype(sNetworks[i].mData.mWiFi.mCredentialsLen)>(credentialsLen);
+            sNetworks[i].mData.mWiFi.mCredentialsLen = static_cast<WiFiCredentialsLenType>(credentialsLen);
 
             VerifyOrExit(ssidLen <= sizeof(sNetworks[i].mNetworkID), err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_OUT_OF_RANGE);
             memcpy(sNetworks[i].mNetworkID, sNetworks[i].mData.mWiFi.mSSID, ssidLen);
 
-            VerifyOrExit(chip::CanCastTo<decltype(sNetworks[i].mNetworkIDLen)>(ssidLen),
-                         err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_OUT_OF_RANGE);
-            sNetworks[i].mNetworkIDLen = static_cast<decltype(sNetworks[i].mNetworkIDLen)>(ssidLen);
+            using NetworkIDLenType = decltype(sNetworks[i].mNetworkIDLen);
+            VerifyOrExit(chip::CanCastTo<NetworkIDLenType>(ssidLen), err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_OUT_OF_RANGE);
+            sNetworks[i].mNetworkIDLen = static_cast<NetworkIDLenType>(ssidLen);
 
             sNetworks[i].mNetworkType = NetworkType::kWiFi;
             sNetworks[i].mEnabled     = false;
