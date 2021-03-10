@@ -19,8 +19,9 @@ on:
     pull_request:
 
 jobs:
-    build:
+    unit_tests:
         name: Unit / Interation Tests
+        if: github.actor != 'restyled-io'
 
         strategy:
             matrix:

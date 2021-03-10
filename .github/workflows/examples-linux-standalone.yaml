@@ -19,7 +19,7 @@ on:
     pull_request:
 
 jobs:
-    linux-standalone:
+    linux_standalone:
         name: Linux Standalone
 
         env:
@@ -28,6 +28,7 @@ jobs:
             BUILD_ORG: connectedhomeip
 
         runs-on: ubuntu-latest
+        if: github.actor != 'restyled-io'
 
         container:
             image: connectedhomeip/chip-build:latest

@@ -25,6 +25,7 @@ jobs:
             BUILD_TYPE: nrfconnect
 
         runs-on: ubuntu-latest
+        if: github.actor != 'restyled-io'
 
         container:
             image: connectedhomeip/chip-build-nrf-platform:latest

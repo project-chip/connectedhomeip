@@ -19,13 +19,14 @@ on:
     pull_request:
 
 jobs:
-    build:
+    doxygen:
         name: Build Doxygen
         runs-on: ubuntu-20.04
+        if: github.actor != 'restyled-io'
 
         steps:
-            - name: "Print Ref"
-              run: echo ${{github.ref}}
+            - name: "Print Actor"
+              run: echo ${{github.actor}}
             - name: Checkout
               uses: actions/checkout@v2
               with:
