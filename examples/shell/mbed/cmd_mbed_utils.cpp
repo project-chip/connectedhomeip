@@ -31,6 +31,9 @@
 #include <inet/InetError.h>
 #include <inet/InetLayer.h>
 
+#include <transport/TransportMgr.h>
+#include <transport/raw/MessageHeader.h>
+#include <transport/raw/PeerAddress.h>
 #include <transport/raw/TCP.h>
 #include <transport/raw/UDP.h>
 
@@ -45,8 +48,30 @@ static chip::Shell::Shell sShellSocketSubcommands;
 
 constexpr size_t kMaxTcpActiveConnectionCount = 4;
 constexpr size_t kMaxTcpPendingPackets        = 4;
+constexpr NodeId kSourceNodeId                = 123654;
+constexpr NodeId kDestinationNodeId           = 111222333;
+constexpr uint32_t kMessageId                 = 18;
+static int SocketReceiveHandlerCallCount      = 0;
 
 using TCPImpl = Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>;
+
+class SocketTransportMgrDelegate : public TransportMgrDelegate
+{
+public:
+    SocketTransportMgrDelegate() {}
+    ~SocketTransportMgrDelegate() override {}
+
+    void OnMessageReceived(const PacketHeader & header, const Transport::PeerAddress & source,
+                           System::PacketBufferHandle msgBuf) override
+    {
+        char info[Transport::PeerAddress::kMaxToStringSize];
+
+        source.ToString(info, sizeof(info));
+        streamer_printf(streamer_get(), "Received message from %s payload: %s\n\r", info, msgBuf->Start());
+
+        SocketReceiveHandlerCallCount++;
+    }
+};
 
 int cmd_date_help_iterator(shell_command_t * command, void * arg)
 {
@@ -299,27 +324,88 @@ int cmd_socket_help(int argc, char ** argv)
     return 0;
 }
 
-int cmd_socket_test(int argc, char ** argv)
+static void serviceEvents(struct ::timeval & aSleepTime)
+{
+    fd_set readFDs, writeFDs, exceptFDs;
+    int numFDs = 0;
+
+    FD_ZERO(&readFDs);
+    FD_ZERO(&writeFDs);
+    FD_ZERO(&exceptFDs);
+
+    if (DeviceLayer::SystemLayer.State() == System::kLayerState_Initialized)
+        DeviceLayer::SystemLayer.PrepareSelect(numFDs, &readFDs, &writeFDs, &exceptFDs, aSleepTime);
+
+    if (DeviceLayer::InetLayer.State == InetLayer::kState_Initialized)
+        DeviceLayer::InetLayer.PrepareSelect(numFDs, &readFDs, &writeFDs, &exceptFDs, aSleepTime);
+
+    int selectRes = select(numFDs, &readFDs, &writeFDs, &exceptFDs, &aSleepTime);
+    if (selectRes < 0)
+    {
+        return;
+    }
+
+    if (DeviceLayer::SystemLayer.State() == System::kLayerState_Initialized)
+    {
+        DeviceLayer::SystemLayer.HandleSelectResult(selectRes, &readFDs, &writeFDs, &exceptFDs);
+    }
+
+    if (DeviceLayer::InetLayer.State == InetLayer::kState_Initialized)
+    {
+        DeviceLayer::InetLayer.HandleSelectResult(selectRes, &readFDs, &writeFDs, &exceptFDs);
+    }
+}
+
+static void driveIOUntil(unsigned int timeoutMs, std::function<bool(void)> completionFunction)
+{
+    uint64_t mStartTime = DeviceLayer::SystemLayer.GetClock_MonotonicMS();
+    // Set the select timeout to 100ms
+    struct timeval aSleepTime;
+    aSleepTime.tv_sec  = 0;
+    aSleepTime.tv_usec = 100 * 1000;
+
+    while (true)
+    {
+        serviceEvents(aSleepTime); // at least one IO loop is guaranteed
+
+        if (completionFunction() || ((DeviceLayer::SystemLayer.GetClock_MonotonicMS() - mStartTime) >= timeoutMs))
+        {
+            break;
+        }
+    }
+}
+
+int cmd_socket_echo(int argc, char ** argv)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     INET_ERROR err;
+    char * payload;
+    uint16_t payload_len;
+    Transport::UDP udp;
+    TCPImpl tcp;
+    Transport::Type socketType;
+
+    PacketBufferHandle buffer;
+    PacketHeader header;
+
+    TransportMgrBase gTransportMgrBase;
+    SocketTransportMgrDelegate gSocketTransportMgrDelegate;
 
     streamer_t * sout = streamer_get();
-
-    VerifyOrExit(argc == 1, error = CHIP_ERROR_INVALID_ARGUMENT);
-
     IPAddress addr;
     IPAddress::FromString("127.0.0.1", addr);
 
+    VerifyOrExit(argc == 2, error = CHIP_ERROR_INVALID_ARGUMENT);
+
     if (strcmp(argv[0], "UDP") == 0)
     {
-        Transport::UDP socket;
-        err = socket.Init(Transport::UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(addr.Type()));
+        socketType = Transport::Type::kUdp;
+        err        = udp.Init(Transport::UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(addr.Type()));
     }
     else if (strcmp(argv[0], "TCP") == 0)
     {
-        TCPImpl socket;
-        err = socket.Init(Transport::TcpListenParameters(&DeviceLayer::InetLayer).SetAddressType(addr.Type()));
+        socketType = Transport::Type::kTcp;
+        err        = tcp.Init(Transport::TcpListenParameters(&DeviceLayer::InetLayer).SetAddressType(addr.Type()));
     }
     else
     {
@@ -331,6 +417,49 @@ int cmd_socket_test(int argc, char ** argv)
     {
         streamer_printf(sout, "ERROR: create %s endpoint failed\r\n", argv[0]);
         ExitNow(error = err;);
+    }
+
+    payload     = argv[1];
+    payload_len = sizeof(payload);
+
+    buffer = PacketBufferHandle::NewWithData(payload, payload_len);
+    if (buffer.IsNull())
+    {
+        streamer_printf(sout, "ERROR: create payload buffer failed\r\n");
+        ExitNow(error = CHIP_ERROR_INTERNAL;);
+    }
+
+    gTransportMgrBase.SetSecureSessionMgr((TransportMgrDelegate *) &gSocketTransportMgrDelegate);
+    gTransportMgrBase.SetRendezvousSession((TransportMgrDelegate *) &gSocketTransportMgrDelegate);
+    gTransportMgrBase.Init((Transport::Base *) &socket);
+
+    header.SetSourceNodeId(kSourceNodeId).SetDestinationNodeId(kDestinationNodeId).SetMessageId(kMessageId);
+
+    SocketReceiveHandlerCallCount = 0;
+
+    // Should be able to send a message to itself by just calling send.
+    if (socketType == Transport::Type::kUdp)
+    {
+        err = udp.SendMessage(header, Transport::PeerAddress::UDP(addr), std::move(buffer));
+    }
+    else
+    {
+        err = tcp.SendMessage(header, Transport::PeerAddress::TCP(addr), std::move(buffer));
+    }
+
+    if (err != INET_NO_ERROR)
+    {
+        streamer_printf(sout, "ERROR: send socket message failed\r\n");
+        ExitNow(error = err;);
+    }
+
+    driveIOUntil(5000 /* ms */, []() { return SocketReceiveHandlerCallCount != 0; });
+
+    if (socketType == Transport::Type::kTcp)
+    {
+        // Disconnect and wait for seeing peer close
+        tcp.Disconnect(Transport::PeerAddress::TCP(addr));
+        driveIOUntil(5000 /* ms */, [&tcp]() { return !tcp.HasActiveConnections(); });
     }
 
 exit:
@@ -355,8 +484,11 @@ static const shell_command_t cmds_network[] = { { &cmd_network_interface, "inter
 
 static const shell_command_t cmds_socket_root = { &cmd_socket_dispatch, "socket", "Socket layer commands" };
 
-static const shell_command_t cmds_socket[] = { { &cmd_socket_test, "test", "Test socket communication" },
-                                               { &cmd_socket_help, "help", "Display help for each socket subcommands" } };
+static const shell_command_t cmds_socket[] = {
+    { &cmd_socket_echo, "echo",
+      "Echo IP communication test via specific socket. Send message in loopback. Usage: socket echo <type> <message>" },
+    { &cmd_socket_help, "help", "Display help for each socket subcommands" }
+};
 
 void cmd_mbed_utils_init()
 {
