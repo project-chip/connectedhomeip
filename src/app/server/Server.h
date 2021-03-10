@@ -37,6 +37,8 @@ using DemoTransportMgr = chip::TransportMgr<chip::Transport::UDP>;
  */
 void InitServer(AppDelegate * delegate = nullptr);
 
+CHIP_ERROR AddTestPairing();
+
 chip::Transport::AdminPairingTable & GetGlobalAdminPairingTable();
 
 namespace chip {

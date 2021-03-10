@@ -200,11 +200,11 @@ class ChipStack(object):
         # Initialize the chip library
         res = self._ChipStackLib.pychip_Stack_Init()
         if res != 0:
-            raise self._ChipStack.ErrorToException(res)
+            raise self.ErrorToException(res)
 
-        res = self._dmLib.pychip_BLEMgrImpl_ConfigureBle(bluetoothAdapter)
+        res = self._ChipStackLib.pychip_BLEMgrImpl_ConfigureBle(bluetoothAdapter)
         if res != 0:
-            raise self._ChipStack.ErrorToException(res)
+            raise self.ErrorToException(res)
 
     @property
     def defaultLogFunct(self):
@@ -377,5 +377,5 @@ class ChipStack(object):
             self._ChipStackLib.pychip_Stack_SetLogFunct.argtypes = [_LogMessageFunct]
             self._ChipStackLib.pychip_Stack_SetLogFunct.restype = c_uint32
 
-            self._ChipStackLib.pychip_BLEMgrImpl_ConfigureBle = [c_uint32]
-            self._ChipStackLib.pychip_BLEMgrImpl_ConfigureBle = c_uint32
+            self._ChipStackLib.pychip_BLEMgrImpl_ConfigureBle.argtypes = [c_uint32]
+            self._ChipStackLib.pychip_BLEMgrImpl_ConfigureBle.restype = c_uint32

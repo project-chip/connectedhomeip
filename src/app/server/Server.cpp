@@ -65,13 +65,9 @@ constexpr bool isRendezvousBypassed()
 
 constexpr bool useTestPairing()
 {
-#if defined(CHIP_DEVICE_CONFIG_USE_TEST_PAIRING) && CHIP_DEVICE_CONFIG_USE_TEST_PAIRING
-    return true;
-#else
     // Use the test pairing whenever rendezvous is bypassed. Otherwise, there wouldn't be
     // any way to communicate with the device using CHIP protocol.
     return isRendezvousBypassed();
-#endif
 }
 
 class ServerStorageDelegate : public PersistentStorageDelegate
@@ -464,7 +460,6 @@ CHIP_ERROR OpenDefaultPairingWindow(ResetAdmins resetAdmins)
 void InitServer(AppDelegate * delegate)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    Optional<Transport::PeerAddress> peer(Transport::Type::kUndefined);
 
     chip::Platform::MemoryInit();
 
@@ -507,12 +502,7 @@ void InitServer(AppDelegate * delegate)
 
     if (useTestPairing())
     {
-        AdminPairingInfo * adminInfo = gAdminPairings.AssignAdminId(gNextAvailableAdminId);
-        VerifyOrExit(adminInfo != nullptr, err = CHIP_ERROR_NO_MEMORY);
-        adminInfo->SetNodeId(chip::kTestDeviceNodeId);
-        err = gSessions.NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing, SecureSessionMgr::PairingDirection::kResponder,
-                                   gNextAvailableAdminId);
-        SuccessOrExit(err);
+        SuccessOrExit(err = AddTestPairing());
     }
 
     // This flag is used to bypass BLE in the cirque test
@@ -550,6 +540,30 @@ exit:
     {
         ChipLogProgress(AppServer, "Server Listening...");
     }
+}
+
+CHIP_ERROR AddTestPairing()
+{
+    CHIP_ERROR err               = CHIP_NO_ERROR;
+    AdminPairingInfo * adminInfo = nullptr;
+
+    for (const AdminPairingInfo & admin : gAdminPairings)
+        if (admin.IsInitialized() && admin.GetNodeId() == chip::kTestDeviceNodeId)
+            ExitNow();
+
+    adminInfo = gAdminPairings.AssignAdminId(gNextAvailableAdminId);
+    VerifyOrExit(adminInfo != nullptr, err = CHIP_ERROR_NO_MEMORY);
+
+    adminInfo->SetNodeId(chip::kTestDeviceNodeId);
+    SuccessOrExit(err = gSessions.NewPairing(Optional<PeerAddress>{ PeerAddress::Uninitialized() }, chip::kTestControllerNodeId,
+                                             &gTestPairing, SecureSessionMgr::PairingDirection::kResponder, gNextAvailableAdminId));
+    ++gNextAvailableAdminId;
+
+exit:
+    if (err != CHIP_NO_ERROR && adminInfo != nullptr)
+        gAdminPairings.ReleaseAdminId(gNextAvailableAdminId);
+
+    return err;
 }
 
 AdminPairingTable & GetGlobalAdminPairingTable()

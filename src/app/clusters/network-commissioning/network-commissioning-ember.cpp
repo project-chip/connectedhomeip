@@ -44,10 +44,10 @@ size_t ConvertStringToNullTerminated(uint8_t * str)
 bool emberAfNetworkCommissioningClusterAddThreadNetworkCallback(uint8_t * operationalDataset, uint64_t breadcrumb,
                                                                 uint32_t timeoutMs)
 {
-    ConvertStringToNullTerminated(operationalDataset);
+    size_t datasetLen = ConvertStringToNullTerminated(operationalDataset);
 
     EmberAfNetworkCommissioningError err = chip::app::clusters::NetworkCommissioning::OnAddThreadNetworkCommandCallbackInternal(
-        nullptr, emberAfCurrentEndpoint(), operationalDataset, breadcrumb, timeoutMs);
+        nullptr, emberAfCurrentEndpoint(), operationalDataset, datasetLen, breadcrumb, timeoutMs);
     emberAfSendImmediateDefaultResponse(err == EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_SUCCESS ? EMBER_ZCL_STATUS_SUCCESS
                                                                                              : EMBER_ZCL_STATUS_FAILURE);
     return true;
@@ -56,11 +56,11 @@ bool emberAfNetworkCommissioningClusterAddThreadNetworkCallback(uint8_t * operat
 bool emberAfNetworkCommissioningClusterAddWiFiNetworkCallback(uint8_t * ssid, uint8_t * credentials, uint64_t breadcrumb,
                                                               uint32_t timeoutMs)
 {
-    ConvertStringToNullTerminated(ssid);
-    ConvertStringToNullTerminated(credentials);
+    size_t ssidLen        = ConvertStringToNullTerminated(ssid);
+    size_t credentialsLen = ConvertStringToNullTerminated(credentials);
 
     EmberAfNetworkCommissioningError err = chip::app::clusters::NetworkCommissioning::OnAddWiFiNetworkCommandCallbackInternal(
-        nullptr, emberAfCurrentEndpoint(), ssid, credentials, breadcrumb, timeoutMs);
+        nullptr, emberAfCurrentEndpoint(), ssid, ssidLen, credentials, credentialsLen, breadcrumb, timeoutMs);
     emberAfSendImmediateDefaultResponse(err == EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_SUCCESS ? EMBER_ZCL_STATUS_SUCCESS
                                                                                              : EMBER_ZCL_STATUS_FAILURE);
     return true;
@@ -68,10 +68,10 @@ bool emberAfNetworkCommissioningClusterAddWiFiNetworkCallback(uint8_t * ssid, ui
 
 bool emberAfNetworkCommissioningClusterEnableNetworkCallback(uint8_t * networkID, uint64_t breadcrumb, uint32_t timeoutMs)
 {
-    ConvertStringToNullTerminated(networkID);
+    size_t networkIDLen = ConvertStringToNullTerminated(networkID);
 
     EmberAfNetworkCommissioningError err = chip::app::clusters::NetworkCommissioning::OnEnableNetworkCommandCallbackInternal(
-        nullptr, emberAfCurrentEndpoint(), networkID, breadcrumb, timeoutMs);
+        nullptr, emberAfCurrentEndpoint(), networkID, networkIDLen, breadcrumb, timeoutMs);
     emberAfSendImmediateDefaultResponse(err == EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_SUCCESS ? EMBER_ZCL_STATUS_SUCCESS
                                                                                              : EMBER_ZCL_STATUS_FAILURE);
     return true;

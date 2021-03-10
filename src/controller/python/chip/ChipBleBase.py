@@ -30,7 +30,7 @@ import shlex
 class ChipBleBase(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def scan(self, line):
-        """ API to initiatae BLE scanning for -t user_timeout seconds."""
+        """ API to initiate BLE scanning for -t user_timeout seconds."""
         return
 
     @abc.abstractmethod
