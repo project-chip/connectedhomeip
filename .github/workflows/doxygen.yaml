@@ -20,8 +20,7 @@ on:
 
 jobs:
     build:
-        name: Test Build
-        if: github.ref != 'refs/heads/main'
+        name: Build Doxygen
         runs-on: ubuntu-20.04
 
         steps:
@@ -33,21 +32,12 @@ jobs:
                   submodules: true
             - name: Generate
               run: scripts/helpers/doxygen.sh
-    deploy:
-        name: Build & Deploy to GitHub Pages
-        if: github.ref == 'refs/heads/main'
-        runs-on: ubuntu-20.04
-
-        steps:
-            - name: "Print Ref"
-              run: echo ${{github.ref}}
-            - name: Checkout
-              uses: actions/checkout@v2
-              with:
-                  submodules: true
-            - name: Generate
-              run: scripts/helpers/doxygen.sh
-            - name: Deploy
+            - name: Extract branch name
+              shell: bash
+              run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF##*/})"
+              id: extract_branch
+            - name: Deploy if master
+              if: steps.extract_branch.outputs.branch == 'master'
               uses: peaceiris/actions-gh-pages@v3
               with:
                   github_token: ${{ secrets.GITHUB_TOKEN }}
