@@ -48,8 +48,8 @@
 chip::SecureSessionMgr gSessionManager;
 chip::Messaging::ExchangeManager gExchangeManager;
 
-namespace chip{
-namespace app{
+namespace chip {
+namespace app {
 class TestInteractionModel
 {
 public:
@@ -64,7 +64,7 @@ void TestInteractionModel::TestReadClient(nlTestSuite * apSuite, void * apContex
     chip::app::ReadClient readClient;
     chip::System::PacketBufferTLVWriter writer;
     chip::System::PacketBufferHandle buf = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize);
-    err = readClient.Init(&gExchangeManager, nullptr);
+    err                                  = readClient.Init(&gExchangeManager, nullptr);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     err = readClient.SendReadRequest(chip::kTestDeviceNodeId, 0);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -122,8 +122,8 @@ void TestInteractionModel::TestReadHandler(nlTestSuite * apSuite, void * apConte
     readHandler.Shutdown();
 }
 
-}
-}
+} // namespace app
+} // namespace chip
 
 namespace {
 void InitializeChip(nlTestSuite * apSuite)
