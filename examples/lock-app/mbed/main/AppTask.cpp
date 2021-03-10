@@ -17,6 +17,7 @@
  */
 
 #include "AppTask.h"
+#include "BoltLockManager.h"
 
 #include <support/logging/CHIPLogging.h>
 
@@ -37,6 +38,9 @@ int AppTask::Init()
     // TODO: timer period to FACTORY_RESET_CANCEL_WINDOW_TIMEOUT
     StartTimer(50);
 
+    BoltLockMgr().Init();
+    BoltLockMgr().SetCallbacks(ActionInitiated, ActionCompleted);
+
     return 0;
 }
 
@@ -56,6 +60,68 @@ int AppTask::StartApp()
     }
 
     return 0;
+}
+
+void AppTask::LockActionEventHandler(AppEvent * aEvent)
+{
+    BoltLockManager::Action_t action = BoltLockManager::INVALID_ACTION;
+    int32_t actor                    = 0;
+
+    if (aEvent->Type == AppEvent::kEventType_Lock)
+    {
+        action = static_cast<BoltLockManager::Action_t>(aEvent->LockEvent.Action);
+        actor  = aEvent->LockEvent.Actor;
+    }
+    else if (aEvent->Type == AppEvent::kEventType_Button)
+    {
+        action = BoltLockMgr().IsUnlocked() ? BoltLockManager::LOCK_ACTION : BoltLockManager::UNLOCK_ACTION;
+        actor  = AppEvent::kEventType_Button;
+    }
+
+    if (action != BoltLockManager::INVALID_ACTION && !BoltLockMgr().InitiateAction(actor, action))
+        ChipLogProgress(NotSpecified, "Action is already in progress or active.");
+}
+
+void AppTask::ActionInitiated(BoltLockManager::Action_t aAction, int32_t aActor)
+{
+    // If the action has been initiated by the lock, update the bolt lock trait
+    // and start flashing the LEDs rapidly to indicate action initiation.
+    if (aAction == BoltLockManager::LOCK_ACTION)
+    {
+        ChipLogProgress(NotSpecified, "Lock Action has been initiated");
+    }
+    else if (aAction == BoltLockManager::UNLOCK_ACTION)
+    {
+        ChipLogProgress(NotSpecified, "Unlock Action has been initiated");
+    }
+
+    // TODO: LEDWidget
+    // sLockLED.Blink(50, 50);
+}
+
+void AppTask::ActionCompleted(BoltLockManager::Action_t aAction, int32_t aActor)
+{
+    // if the action has been completed by the lock, update the bolt lock trait.
+    // Turn on the lock LED if in a LOCKED state OR
+    // Turn off the lock LED if in an UNLOCKED state.
+    if (aAction == BoltLockManager::LOCK_ACTION)
+    {
+        ChipLogProgress(NotSpecified, "Lock Action has been completed");
+        // TODO: LEDWidget
+        // sLockLED.Set(true);
+    }
+    else if (aAction == BoltLockManager::UNLOCK_ACTION)
+    {
+        ChipLogProgress(NotSpecified, "Unlock Action has been completed");
+        // TODO: LEDWidget
+        // sLockLED.Set(false);
+    }
+
+    if (aActor == AppEvent::kEventType_Button)
+    {
+        // TODO
+        // sAppTask.UpdateClusterState();
+    }
 }
 
 void AppTask::CancelTimer()

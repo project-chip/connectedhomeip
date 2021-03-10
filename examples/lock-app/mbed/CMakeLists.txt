@@ -6,8 +6,6 @@ cmake_minimum_required(VERSION 3.19.0)
 get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../../.. REALPATH)
 get_filename_component(APP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/.. REALPATH)
 
-get_filename_component(LOCK_COMMON ${CHIP_ROOT}/examples/lock-app/lock-common REALPATH)
-
 configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/config.in
     ${CMAKE_CURRENT_BINARY_DIR}/chip_build/config
@@ -37,6 +35,7 @@ target_sources(${APP_TARGET} PRIVATE
                ${CMAKE_CURRENT_SOURCE_DIR}/arch.c
                ${CMAKE_CURRENT_SOURCE_DIR}/main/main.cpp
                ${CMAKE_CURRENT_SOURCE_DIR}/main/AppTask.cpp
+               ${CMAKE_CURRENT_SOURCE_DIR}/main/BoltLockManager.cpp
                ${APP_ROOT}/lock-common/gen/call-command-handler.cpp
                ${APP_ROOT}/lock-common/gen/callback-stub.cpp
                ${CHIP_ROOT}/src/app/server/DataModelHandler.cpp

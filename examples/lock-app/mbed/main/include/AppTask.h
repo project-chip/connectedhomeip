@@ -20,6 +20,7 @@
 #pragma once
 
 #include "AppEvent.h"
+#include "BoltLockManager.h"
 
 class AppTask
 {
@@ -33,11 +34,15 @@ private:
 
     int Init();
 
+    static void ActionInitiated(BoltLockManager::Action_t aAction, int32_t aActor);
+    static void ActionCompleted(BoltLockManager::Action_t aAction, int32_t aActor);
+
     void CancelTimer(void);
 
     void DispatchEvent(const AppEvent * event);
 
     static void FunctionTimerEventHandler(AppEvent * aEvent);
+    static void LockActionEventHandler(AppEvent * aEvent);
 
     static void TimerEventHandler();
 

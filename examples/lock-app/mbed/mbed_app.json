@@ -15,5 +15,11 @@
             "target.network-default-interface-type": "WIFI",
             "target.macros_add" : ["MBEDTLS_SHA1_C"]
         }
+    },
+    "config": {
+        "actuator-movement-period-ms": {
+            "help": "Time it takes in ms for the simulated actuator to move from one state to another.",
+            "value": 2000
+        }
     }
 }
