@@ -101,7 +101,9 @@
 #define HAL_USART1_ENABLE (1)
 #define HAL_USART1_FREQUENCY (1000000UL)
 
+#ifndef HAL_VCOM_ENABLE
 #define HAL_VCOM_ENABLE (1)
+#endif
 
 // $[BTL_BUTTON]
 
