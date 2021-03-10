@@ -135,3 +135,28 @@ extern "C" void otPlatFree(void * aPtr)
 {
     CHIPPlatformMemoryFree(aPtr);
 }
+
+extern "C" __WEAK otError otPlatUartEnable(void)
+{
+    return OT_ERROR_NOT_IMPLEMENTED;
+}
+
+extern "C" __WEAK otError otPlatUartSend(const uint8_t *aBuf, uint16_t aBufLength)
+{
+    return OT_ERROR_NOT_IMPLEMENTED;
+}
+
+extern "C" __WEAK otError otPlatUartFlush(void)
+{
+    return OT_ERROR_NOT_IMPLEMENTED;
+}
+
+extern "C" __WEAK otError otPlatUartDisable(void)
+{
+    return OT_ERROR_NOT_IMPLEMENTED;
+}
+
+extern "C" __WEAK void efr32UartProcess(void)
+{
+    // 
+}
