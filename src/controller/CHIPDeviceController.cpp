@@ -210,6 +210,8 @@ CHIP_ERROR DeviceController::Shutdown()
         mTransportMgr = nullptr;
     }
 
+    mAdmins.ReleaseAdminId(mAdminId);
+
     ReleaseAllDevices();
     return CHIP_NO_ERROR;
 }
