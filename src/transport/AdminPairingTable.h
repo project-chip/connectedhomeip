@@ -194,6 +194,8 @@ public:
     {
         return ConstAdminIterator(mStates, CHIP_CONFIG_MAX_DEVICE_ADMINS, CHIP_CONFIG_MAX_DEVICE_ADMINS);
     }
+    ConstAdminIterator begin() const { return cbegin(); }
+    ConstAdminIterator end() const { return cend(); }
 
 private:
     AdminPairingInfo mStates[CHIP_CONFIG_MAX_DEVICE_ADMINS];
