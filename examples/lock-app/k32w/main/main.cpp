@@ -22,10 +22,10 @@
 
 #include "openthread/platform/logging.h"
 #include "openthread/platform/uart.h"
+#include <mbedtls/platform.h>
 #include <openthread-system.h>
 #include <openthread/cli.h>
 #include <openthread/error.h>
-#include <mbedtls/platform.h>
 
 #include <core/CHIPError.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -52,7 +52,7 @@ extern InitFunc __init_array_end;
 /* needed for FreeRtos Heap 4 */
 uint8_t __attribute__((section(".heap"))) ucHeap[0xF000];
 
-extern "C" void *pvPortCallocRtos(size_t num, size_t size);
+extern "C" void * pvPortCallocRtos(size_t num, size_t size);
 
 extern "C" void main_task(void const * argument)
 {
