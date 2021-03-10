@@ -13,6 +13,7 @@
         "types.xml",
         "general.xml",
         "general-commissioning-cluster.xml",
+        "group-key-mgmt-cluster.xml",
         "ha.xml",
         "ha-devices.xml",
         "cba.xml",
