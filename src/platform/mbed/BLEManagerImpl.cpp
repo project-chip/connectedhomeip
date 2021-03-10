@@ -308,7 +308,7 @@ class GapEventHandler : private mbed::NonCopyable<GapEventHandler>, public ble::
         }
         PlatformMgrImpl().PostEvent(&chip_event);
 
-        ChipLogProgress(DeviceLayer, "BLE connection terminated, mbed-os reason: %d", reason);
+        ChipLogProgress(DeviceLayer, "BLE connection terminated, mbed-os reason: %d", reason.value());
         ChipLogProgress(DeviceLayer, "Current number of connections: %" PRIu16 "/%d", ble_manager.NumConnections(),
                         ble_manager.kMaxConnections);
 
@@ -341,11 +341,11 @@ struct CHIPService : public ble::GattServer::EventHandler
             return CHIP_NO_ERROR;
         }
 
-        mCHIPoBLEChar_RX = new GattCharacteristic(LongUUID_CHIPoBLEChar_RX, nullptr, 0, 0,
+        mCHIPoBLEChar_RX = new GattCharacteristic(LongUUID_CHIPoBLEChar_RX, nullptr, 0, BLE_GATT_MTU_SIZE_DEFAULT,
                                                   GattCharacteristic::BLE_GATT_CHAR_PROPERTIES_WRITE |
                                                       GattCharacteristic::BLE_GATT_CHAR_PROPERTIES_WRITE_WITHOUT_RESPONSE);
 
-        mCHIPoBLEChar_TX = new GattCharacteristic(LongUUID_CHIPoBLEChar_TX, nullptr, 0, 0,
+        mCHIPoBLEChar_TX = new GattCharacteristic(LongUUID_CHIPoBLEChar_TX, nullptr, 0, BLE_GATT_MTU_SIZE_DEFAULT,
                                                   GattCharacteristic::BLE_GATT_CHAR_PROPERTIES_INDICATE |
                                                       GattCharacteristic::BLE_GATT_CHAR_PROPERTIES_NOTIFY);
 
