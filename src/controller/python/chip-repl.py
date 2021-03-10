@@ -62,6 +62,29 @@ device = chip.ble.commissioning.Connect(discriminator=3840, pin=12345678)
 if device.needsNetworkCredentials:
   device.ConnectToWifi("ssid", "password")
 
+######## Thread provisioning ########
+
+import chip.ble.commissioning
+device = chip.ble.commissioning.Connect(discriminator=3840, pin=12345678)
+
+# Thread data is an opaque blob, but it can be build with internal constructs
+# starting from a memset(0) equivalent
+from chip.internal.thread import ThreadDeviceNetworkInfo
+
+data = ThreadDeviceNetworkInfo.parse(b'\\x00'*ThreadDeviceNetworkInfo.sizeof())
+data.ThreadNetworkName = "OpenThread"
+data.ThreadExtendedPANId = b"\\xde\\xad\\x00\\xbe\\xef\\x00\\xca\\xfe"
+data.ThreadMasterKey = b"\\x00\\x11\\x22\\x33\\x44\\x55\\x66\\x77\\x88\\x99\\xAA\\xBB\\xCC\\xDD\\xEE\\xFF"
+data.ThreadPANId = 0xabcd
+data.ThreadChannel = 15
+data.NetworkId = 0
+
+data.FieldPresent.NetworkId = True
+data.FieldPresent.ThreadExtendedPANId = True
+
+
+if device.needsNetworkCredentials:
+  device.ConnectToThread(ThreadDeviceNetworkInfo.build(data))
     '''.strip())
 
 if __name__ == "__main__":
