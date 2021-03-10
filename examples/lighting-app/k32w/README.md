@@ -1,14 +1,14 @@
 # CHIP K32W061 Lighting Example Application
 
-The Project CHIP K32W061 Lighting Example demonstrates how to remotely control a light bulb.
-The light bulb is simulated using one of the LEDs from the expansion board.
-It uses buttons to test turn on/turn off of the light bulb.
-You can use this example as a reference for creating your own application.
+The Project CHIP K32W061 Lighting Example demonstrates how to remotely control a
+light bulb. The light bulb is simulated using one of the LEDs from the expansion
+board. It uses buttons to test turn on/turn off of the light bulb. You can use
+this example as a reference for creating your own application.
 
 The example is based on
 [Project CHIP](https://github.com/project-chip/connectedhomeip) and the NXP K32W
-SDK, and supports remote access and control of a light bulb over a
-low-power, 802.15.4 Thread network.
+SDK, and supports remote access and control of a light bulb over a low-power,
+802.15.4 Thread network.
 
 The example behaves as a Project CHIP accessory, that is a device that can be
 paired into an existing Project CHIP network and can be controlled by this
@@ -34,11 +34,11 @@ network.
 ![K32W061 DK6](../../platform/k32w/doc/images/k32w-dk6.jpg)
 
 The K32W lighting example application provides a working demonstration of a
-light bulb device, built using the Project CHIP codebase and the NXP
-K32W061 SDK. The example supports remote access (e.g.: using CHIP Tool from a
-mobile phone) and control of a light bulb over a low-power, 802.15.4
-Thread network. It is capable of being paired into an existing Project CHIP
-network along with other Project CHIP-enabled devices.
+light bulb device, built using the Project CHIP codebase and the NXP K32W061
+SDK. The example supports remote access (e.g.: using CHIP Tool from a mobile
+phone) and control of a light bulb over a low-power, 802.15.4 Thread network. It
+is capable of being paired into an existing Project CHIP network along with
+other Project CHIP-enabled devices.
 
 The example targets the
 [NXP K32W061 DK6](https://www.nxp.com/products/wireless/thread/k32w061-41-high-performance-secure-and-ultra-low-power-mcu-for-zigbeethread-and-bluetooth-le-5-0-with-built-in-nfc-option:K32W061_41)
@@ -105,8 +105,8 @@ states are depicted:
 **LED D3** shows the state of the simulated light bulb. When the LED is lit the
 light bulb is on; when not lit, the light bulb is off.
 
-**Button SW2** can be used to change the state of the simulated light bulb. This can
-be used to mimic a user manually operating a switch. The button behaves as a
+**Button SW2** can be used to change the state of the simulated light bulb. This
+can be used to mimic a user manually operating a switch. The button behaves as a
 toggle, swapping the state every time it is pressed.
 
 **Button SW3** can be used to reset the device to a default state. Pressing and
@@ -175,8 +175,8 @@ Program the firmware using the official
 [OpenThread Flash Instructions](https://github.com/openthread/openthread/blob/master/examples/platforms/k32w/k32w061/README.md#flash-binaries).
 
 All you have to do is to replace the Openthread binaries from the above
-documentation with _out/debug/chip-k32w061-light-example.bin_ if DK6Programmer is
-used or with _out/debug/chip-k32w061-light-example_ if MCUXpresso is used.
+documentation with _out/debug/chip-k32w061-light-example.bin_ if DK6Programmer
+is used or with _out/debug/chip-k32w061-light-example_ if MCUXpresso is used.
 
 ## Testing the example
 

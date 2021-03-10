@@ -3,8 +3,8 @@
 This article describes how to use
 [CHIPTool](../../src/android/CHIPTool/README.md) for Android smartphones to
 commission an NXP K32W061 DK6 running
-[NXP K32W Lock/Light Example Application](../../examples/lock-light-app/k32w/README.md) onto
-a CHIP-enabled Thread network.
+[NXP K32W Lock/Light Example Application](../../examples/lock-light-app/k32w/README.md)
+onto a CHIP-enabled Thread network.
 
 <hr>
 
@@ -448,8 +448,9 @@ following steps:
    address of the accessory device.
 3. Tap the following buttons to change the lock/light state:
 
-    - _ON_ and _OFF_ buttons lock/turn on and unlock/turn off the door/light bulb, respectively.
+    - _ON_ and _OFF_ buttons lock/turn on and unlock/turn off the door/light
+      bulb, respectively.
     - _TOGGLE_ changes the lock/light state to the opposite.
 
-The _LED D3_ on the device turns on or off based on the changes of the lock/light
-state.
+The _LED D3_ on the device turns on or off based on the changes of the
+lock/light state.
