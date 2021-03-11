@@ -171,7 +171,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
                 CHIP_DEVICE_CONFIG_BLE_APP_TASK_PRIORITY,                         /* Priority at which the task is created. */
                 NULL);                                                            /* Variable to hold the task's data structure. */
 
-    mFlags.ClearAll().Set(Flags::kAdvertisingEnabled, CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART);
+    mFlags = CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART ? kFlag_AdvertisingEnabled : 0;
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
 
 exit:
@@ -315,9 +315,9 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
 
     VerifyOrExit(mServiceMode != ConnectivityManager::kCHIPoBLEServiceMode_NotSupported, err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
-    if (mFlags.Has(Flags::kAdvertisingEnabled) != val)
+    if (GetFlag(mFlags, kFlag_AdvertisingEnabled) != val)
     {
-        mFlags.Set(Flags::kAdvertisingEnabled, val);
+        SetFlag(mFlags, kFlag_AdvertisingEnabled, val);
         PlatformMgr().ScheduleWork(DriveBLEState, 0);
     }
 
@@ -331,9 +331,9 @@ CHIP_ERROR BLEManagerImpl::_SetFastAdvertisingEnabled(bool val)
 
     VerifyOrExit(mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_NotSupported, err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
-    if (mFlags.Has(Flags::kFastAdvertisingEnabled) != val)
+    if (GetFlag(mFlags, kFlag_FastAdvertisingEnabled) != val)
     {
-        mFlags.Set(Flags::kFastAdvertisingEnabled, val);
+        SetFlag(mFlags, kFlag_FastAdvertisingEnabled, val);
         PlatformMgr().ScheduleWork(DriveBLEState, 0);
     }
 
@@ -366,7 +366,7 @@ CHIP_ERROR BLEManagerImpl::_SetDeviceName(const char * deviceName)
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
         strcpy(mDeviceName, deviceName);
-        mFlags.Set(Flags::kDeviceNameSet);
+        SetFlag(mFlags, kFlag_DeviceNameSet, true);
         ChipLogProgress(DeviceLayer, "Setting device name to : \"%s\"", deviceName);
         static_assert(kMaxDeviceNameLength <= UINT16_MAX, "deviceName length might not fit in a uint8_t");
         ret = sl_bt_gatt_server_write_attribute_value(gattdb_device_name, 0, strlen(deviceName), (uint8_t *) deviceName);
@@ -539,14 +539,14 @@ void BLEManagerImpl::DriveBLEState(void)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Check if BLE stack is initialized
-    VerifyOrExit(mFlags.Has(Flags::kEFRBLEStackInitialized), /* */);
+    VerifyOrExit(GetFlag(mFlags, kFlag_EFRBLEStackInitialized), /* */);
 
     // Start advertising if needed...
-    if (mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_Enabled && mFlags.Has(Flags::kAdvertisingEnabled))
+    if (mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_Enabled && GetFlag(mFlags, kFlag_AdvertisingEnabled))
     {
         // Start/re-start advertising if not already started, or if there is a pending change
         // to the advertising configuration.
-        if (!mFlags.HasAny(Flags::kAdvertising, Flags::kRestartAdvertising))
+        if (!GetFlag(mFlags, kFlag_Advertising) || GetFlag(mFlags, kFlag_RestartAdvertising))
         {
             err = StartAdvertising();
             SuccessOrExit(err);
@@ -554,7 +554,7 @@ void BLEManagerImpl::DriveBLEState(void)
     }
 
     // Otherwise, stop advertising if it is enabled.
-    else if (mFlags.Has(Flags::kAdvertising))
+    else if (GetFlag(mFlags, kFlag_Advertising))
     {
         err = StopAdvertising();
         SuccessOrExit(err);
@@ -587,7 +587,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     err = ConfigurationMgr().GetBLEDeviceIdentificationInfo(mDeviceIdInfo);
     SuccessOrExit(err);
 
-    if (!mFlags.Has(Flags::kDeviceNameSet))
+    if (!GetFlag(mFlags, kFlag_DeviceNameSet))
     {
         snprintf(mDeviceName, sizeof(mDeviceName), "%s%04" PRIX32, CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX, (uint32_t) 0);
 
@@ -685,10 +685,10 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     err = ConfigureAdvertisingData();
     SuccessOrExit(err);
 
-    mFlags.Clear(Flags::kRestartAdvertising);
+    ClearFlag(mFlags, kFlag_RestartAdvertising);
 
     interval_min = interval_max =
-        ((numConnectionss == 0 && !ConfigurationMgr().IsPairedToAccount()) || mFlags.Has(Flags::kFastAdvertisingEnabled))
+        ((numConnectionss == 0 && !ConfigurationMgr().IsPairedToAccount()) || GetFlag(mFlags, kFlag_FastAdvertisingEnabled))
         ? CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL
         : CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL;
 
@@ -700,7 +700,7 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 
     if (SL_STATUS_OK == ret)
     {
-        mFlags.Set(Flags::kAdvertising);
+        SetFlag(mFlags, kFlag_Advertising, true);
     }
 
     err = MapBLEError(ret);
@@ -714,9 +714,10 @@ CHIP_ERROR BLEManagerImpl::StopAdvertising(void)
     CHIP_ERROR err = CHIP_NO_ERROR;
     sl_status_t ret;
 
-    if (mFlags.Has(Flags::kAdvertising))
+    if (GetFlag(mFlags, kFlag_Advertising))
     {
-        mFlags.Clear(Flags::kAdvertising).Clear(Flags::kRestartAdvertising);
+        ClearFlag(mFlags, kFlag_Advertising);
+        ClearFlag(mFlags, kFlag_RestartAdvertising);
 
         ret = sl_bt_advertiser_stop(advertising_set_handle);
         sl_bt_advertiser_delete_set(advertising_set_handle);
@@ -753,7 +754,7 @@ void BLEManagerImpl::UpdateMtu(volatile sl_bt_msg_t * evt)
 
 void BLEManagerImpl::HandleBootEvent(void)
 {
-    mFlags.Set(Flags::kEFRBLEStackInitialized);
+    SetFlag(mFlags, kFlag_EFRBLEStackInitialized, true);
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
 }
 
@@ -767,7 +768,7 @@ void BLEManagerImpl::HandleConnectEvent(volatile sl_bt_msg_t * evt)
 
     AddConnection(connHandle, bondingHandle);
 
-    // mFlags.Set(Flags::kRestartAdvertising);
+    // SetFlag(mFlags, kFlag_RestartAdvertising, true);
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
 }
 
@@ -807,7 +808,7 @@ void BLEManagerImpl::HandleConnectionCloseEvent(volatile sl_bt_msg_t * evt)
 
         // Arrange to re-enable connectable advertising in case it was disabled due to the
         // maximum connection limit being reached.
-        mFlags.Set(Flags::kRestartAdvertising);
+        SetFlag(mFlags, kFlag_RestartAdvertising, true);
         PlatformMgr().ScheduleWork(DriveBLEState, 0);
     }
 }

@@ -363,7 +363,8 @@ static CHIP_ERROR ConvertExtension(ASN1Reader & reader, TLVWriter & writer)
                 VerifyOrExit(keyUsageBits <= UINT16_MAX, err = ASN1_ERROR_INVALID_ENCODING);
 
                 // Check that only supported flags are set.
-                BitFlags<KeyUsageFlags> keyUsageFlags(static_cast<uint16_t>(keyUsageBits));
+                BitFlags<uint16_t, KeyUsageFlags> keyUsageFlags;
+                keyUsageFlags.SetRaw(static_cast<uint16_t>(keyUsageBits));
                 VerifyOrExit(keyUsageFlags.HasOnly(
                                  KeyUsageFlags::kDigitalSignature, KeyUsageFlags::kNonRepudiation, KeyUsageFlags::kKeyEncipherment,
                                  KeyUsageFlags::kDataEncipherment, KeyUsageFlags::kKeyAgreement, KeyUsageFlags::kKeyCertSign,

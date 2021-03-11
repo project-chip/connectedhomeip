@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020 Project CHIP Authors
  *    Copyright (c) 2019-2020 Google LLC.
  *    Copyright (c) 2018 Nest Labs, Inc.
  *
@@ -50,14 +50,15 @@ namespace Internal {
 template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_Init()
 {
+    mFlags = 0;
+
     // Cache flags indicating whether the device is currently service provisioned, is a member of a fabric,
     // is paired to an account, and/or provisioned with operational credentials.
-    mFlags.ClearAll()
-        .Set(Flags::kIsServiceProvisioned, Impl()->ConfigValueExists(ImplClass::kConfigKey_ServiceConfig))
-        .Set(Flags::kIsMemberOfFabric, Impl()->ConfigValueExists(ImplClass::kConfigKey_FabricId))
-        .Set(Flags::kIsPairedToAccount, Impl()->ConfigValueExists(ImplClass::kConfigKey_PairedAccountId))
-        .Set(Flags::kOperationalDeviceCredentialsProvisioned,
-             Impl()->ConfigValueExists(ImplClass::kConfigKey_OperationalDeviceCert));
+    SetFlag(mFlags, kFlag_IsServiceProvisioned, Impl()->ConfigValueExists(ImplClass::kConfigKey_ServiceConfig));
+    SetFlag(mFlags, kFlag_IsMemberOfFabric, Impl()->ConfigValueExists(ImplClass::kConfigKey_FabricId));
+    SetFlag(mFlags, kFlag_IsPairedToAccount, Impl()->ConfigValueExists(ImplClass::kConfigKey_PairedAccountId));
+    SetFlag(mFlags, kFlag_OperationalDeviceCredentialsProvisioned,
+            Impl()->ConfigValueExists(ImplClass::kConfigKey_OperationalDeviceCert));
 
 #if CHIP_ENABLE_ROTATING_DEVICE_ID
     mLifetimePersistedCounter.Init(CHIP_CONFIG_LIFETIIME_PERSISTED_COUNTER_KEY);
@@ -523,7 +524,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_ClearOperationalDeviceCr
     Impl()->ClearConfigValue(ImplClass::kConfigKey_OperationalDeviceICACerts);
     Impl()->ClearConfigValue(ImplClass::kConfigKey_OperationalDevicePrivateKey);
 
-    mFlags.Clear(Flags::kOperationalDeviceCredentialsProvisioned);
+    ClearFlag(mFlags, kFlag_OperationalDeviceCredentialsProvisioned);
 
     return CHIP_NO_ERROR;
 }
@@ -531,19 +532,19 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_ClearOperationalDeviceCr
 template <class ImplClass>
 bool GenericConfigurationManagerImpl<ImplClass>::_OperationalDeviceCredentialsProvisioned()
 {
-    return mFlags.Has(Flags::kOperationalDeviceCredentialsProvisioned);
+    return ::chip::GetFlag(mFlags, kFlag_OperationalDeviceCredentialsProvisioned);
 }
 
 template <class ImplClass>
 bool GenericConfigurationManagerImpl<ImplClass>::UseManufacturerCredentialsAsOperational()
 {
-    return mFlags.Has(Flags::kUseManufacturerCredentialsAsOperational);
+    return ::chip::GetFlag(mFlags, kFlag_UseManufacturerCredentialsAsOperational);
 }
 
 template <class ImplClass>
 void GenericConfigurationManagerImpl<ImplClass>::_UseManufacturerCredentialsAsOperational(bool val)
 {
-    mFlags.Set(Flags::kUseManufacturerCredentialsAsOperational, val);
+    SetFlag(mFlags, kFlag_UseManufacturerCredentialsAsOperational, val);
 }
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_JUST_IN_TIME_PROVISIONING
@@ -626,11 +627,11 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreFabricId(uint64_t f
     {
         err = Impl()->WriteConfigValue(ImplClass::kConfigKey_FabricId, fabricId);
         SuccessOrExit(err);
-        mFlags.Set(Flags::kIsMemberOfFabric);
+        SetFlag(mFlags, kFlag_IsMemberOfFabric);
     }
     else
     {
-        mFlags.Clear(Flags::kIsMemberOfFabric);
+        ClearFlag(mFlags, kFlag_IsMemberOfFabric);
         err = Impl()->ClearConfigValue(ImplClass::kConfigKey_FabricId);
         SuccessOrExit(err);
     }
@@ -688,7 +689,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StorePairedAccountId(con
     err = Impl()->WriteConfigValueStr(ImplClass::kConfigKey_PairedAccountId, accountId, accountIdLen);
     SuccessOrExit(err);
 
-    mFlags.Set(Flags::kIsPairedToAccount, (accountId != nullptr && accountIdLen != 0));
+    SetFlag(mFlags, kFlag_IsPairedToAccount, (accountId != nullptr && accountIdLen != 0));
 
 exit:
     return err;
@@ -711,8 +712,8 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreServiceProvisioning
     err = _StorePairedAccountId(accountId, accountIdLen);
     SuccessOrExit(err);
 
-    mFlags.Set(Flags::kIsServiceProvisioned);
-    mFlags.Set(Flags::kIsPairedToAccount, (accountId != nullptr && accountIdLen != 0));
+    SetFlag(mFlags, kFlag_IsServiceProvisioned);
+    SetFlag(mFlags, kFlag_IsPairedToAccount, (accountId != nullptr && accountIdLen != 0));
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -720,8 +721,8 @@ exit:
         Impl()->ClearConfigValue(ImplClass::kConfigKey_ServiceId);
         Impl()->ClearConfigValue(ImplClass::kConfigKey_ServiceConfig);
         Impl()->ClearConfigValue(ImplClass::kConfigKey_PairedAccountId);
-        mFlags.Clear(Flags::kIsServiceProvisioned);
-        mFlags.Clear(Flags::kIsPairedToAccount);
+        ClearFlag(mFlags, kFlag_IsServiceProvisioned);
+        ClearFlag(mFlags, kFlag_IsPairedToAccount);
     }
     return err;
 }
@@ -756,8 +757,8 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_ClearServiceProvisioning
         PlatformMgr().PostEvent(&event);
     }
 
-    mFlags.Clear(Flags::kIsServiceProvisioned);
-    mFlags.Clear(Flags::kIsPairedToAccount);
+    ClearFlag(mFlags, kFlag_IsServiceProvisioned);
+    ClearFlag(mFlags, kFlag_IsPairedToAccount);
 
     return CHIP_NO_ERROR;
 }
@@ -850,19 +851,19 @@ exit:
 template <class ImplClass>
 bool GenericConfigurationManagerImpl<ImplClass>::_IsServiceProvisioned()
 {
-    return mFlags.Has(Flags::kIsServiceProvisioned);
+    return ::chip::GetFlag(mFlags, kFlag_IsServiceProvisioned);
 }
 
 template <class ImplClass>
 bool GenericConfigurationManagerImpl<ImplClass>::_IsMemberOfFabric()
 {
-    return mFlags.Has(Flags::kIsMemberOfFabric);
+    return ::chip::GetFlag(mFlags, kFlag_IsMemberOfFabric);
 }
 
 template <class ImplClass>
 bool GenericConfigurationManagerImpl<ImplClass>::_IsPairedToAccount()
 {
-    return mFlags.Has(Flags::kIsPairedToAccount);
+    return ::chip::GetFlag(mFlags, kFlag_IsPairedToAccount);
 }
 
 template <class ImplClass>

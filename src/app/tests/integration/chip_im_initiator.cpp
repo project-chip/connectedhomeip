@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -90,7 +90,7 @@ CHIP_ERROR SendCommandRequest(void)
                                                         kTestGroupId,    // GroupId
                                                         kTestClusterId,  // ClusterId
                                                         kTestCommandId,  // CommandId
-                                                        (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+                                                        (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
 
     // Add command data here
 

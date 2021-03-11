@@ -69,8 +69,8 @@ CHIP_ERROR BLEManagerImpl::_Init()
     SuccessOrExit(err);
 
     mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
-    mFlags.ClearAll().Set(Flags::kAdvertisingEnabled, CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART && !mIsCentral);
-    mAppState = nullptr;
+    mFlags       = (CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART && !mIsCentral) ? kFlag_AdvertisingEnabled : 0;
+    mAppState    = nullptr;
 
     memset(mDeviceName, 0, sizeof(mDeviceName));
 
@@ -103,9 +103,9 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    if (mFlags.Has(Flags::kAdvertisingEnabled) != val)
+    if (GetFlag(mFlags, kFlag_AdvertisingEnabled) != val)
     {
-        mFlags.Set(Flags::kAdvertisingEnabled, val);
+        SetFlag(mFlags, kFlag_AdvertisingEnabled, val);
     }
 
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
@@ -119,9 +119,9 @@ CHIP_ERROR BLEManagerImpl::_SetFastAdvertisingEnabled(bool val)
 
     VerifyOrExit(mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_NotSupported, err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
-    if (mFlags.Has(Flags::kFastAdvertisingEnabled) != val)
+    if (GetFlag(mFlags, kFlag_FastAdvertisingEnabled) != val)
     {
-        mFlags.Set(Flags::kFastAdvertisingEnabled, val);
+        SetFlag(mFlags, kFlag_FastAdvertisingEnabled, val);
         PlatformMgr().ScheduleWork(DriveBLEState, 0);
     }
 
@@ -150,7 +150,7 @@ CHIP_ERROR BLEManagerImpl::_SetDeviceName(const char * deviceName)
     {
         VerifyOrExit(strlen(deviceName) < kMaxDeviceNameLength, err = CHIP_ERROR_INVALID_ARGUMENT);
         strcpy(mDeviceName, deviceName);
-        mFlags.Set(Flags::kUseCustomDeviceName);
+        SetFlag(mFlags, kFlag_UseCustomDeviceName);
     }
     else
     {
@@ -158,7 +158,7 @@ CHIP_ERROR BLEManagerImpl::_SetDeviceName(const char * deviceName)
         SuccessOrExit(err = ConfigurationMgr().GetSetupDiscriminator(discriminator));
         snprintf(mDeviceName, sizeof(mDeviceName), "%s%04u", CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX, discriminator);
         mDeviceName[kMaxDeviceNameLength] = 0;
-        mFlags.Clear(Flags::kUseCustomDeviceName);
+        ClearFlag(mFlags, kFlag_UseCustomDeviceName);
     }
 
 exit:
@@ -240,13 +240,13 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 #if CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED
         if (ConfigurationMgr().IsFullyProvisioned())
         {
-            mFlags.Clear(Flags::kAdvertisingEnabled);
+            ClearFlag(mFlags, kFlag_AdvertisingEnabled);
             ChipLogProgress(DeviceLayer, "CHIPoBLE advertising disabled because device is fully provisioned");
         }
 #endif // CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED
 
         // Force the advertising configuration to be refreshed to reflect new provisioning state.
-        mFlags.Clear(Flags::kAdvertisingConfigured);
+        ClearFlag(mFlags, kFlag_AdvertisingConfigured);
 
         DriveBLEState();
         break;
@@ -284,35 +284,38 @@ void BLEManagerImpl::HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * apEv
         break;
     case DeviceEventType::kPlatformLinuxBLEPeripheralAdvConfiguredComplete:
         VerifyOrExit(apEvent->Platform.BLEPeripheralAdvConfiguredComplete.mIsSuccess, err = CHIP_ERROR_INCORRECT_STATE);
-        sInstance.mFlags.Set(Flags::kAdvertisingConfigured).Clear(Flags::kControlOpInProgress);
+        SetFlag(sInstance.mFlags, kFlag_AdvertisingConfigured);
+        ClearFlag(sInstance.mFlags, kFlag_ControlOpInProgress);
         controlOpComplete = true;
         ChipLogProgress(DeviceLayer, "CHIPoBLE advertising config complete");
         break;
     case DeviceEventType::kPlatformLinuxBLEPeripheralAdvStartComplete:
         VerifyOrExit(apEvent->Platform.BLEPeripheralAdvStartComplete.mIsSuccess, err = CHIP_ERROR_INCORRECT_STATE);
-        sInstance.mFlags.Clear(Flags::kControlOpInProgress).Clear(Flags::kAdvertisingRefreshNeeded);
+        ClearFlag(sInstance.mFlags, kFlag_ControlOpInProgress);
+        ClearFlag(sInstance.mFlags, kFlag_AdvertisingRefreshNeeded);
 
-        if (!sInstance.mFlags.Has(Flags::kAdvertising))
+        if (!GetFlag(sInstance.mFlags, kFlag_Advertising))
         {
-            sInstance.mFlags.Set(Flags::kAdvertising);
+            SetFlag(sInstance.mFlags, kFlag_Advertising);
         }
 
         break;
     case DeviceEventType::kPlatformLinuxBLEPeripheralAdvStopComplete:
         VerifyOrExit(apEvent->Platform.BLEPeripheralAdvStopComplete.mIsSuccess, err = CHIP_ERROR_INCORRECT_STATE);
 
-        sInstance.mFlags.Clear(Flags::kControlOpInProgress).Clear(Flags::kAdvertisingRefreshNeeded);
+        ClearFlag(sInstance.mFlags, kFlag_ControlOpInProgress);
+        ClearFlag(sInstance.mFlags, kFlag_AdvertisingRefreshNeeded);
 
         // Transition to the not Advertising state...
-        if (sInstance.mFlags.Has(Flags::kAdvertising))
+        if (GetFlag(sInstance.mFlags, kFlag_Advertising))
         {
-            sInstance.mFlags.Clear(Flags::kAdvertising);
+            ClearFlag(sInstance.mFlags, kFlag_Advertising);
             ChipLogProgress(DeviceLayer, "CHIPoBLE advertising stopped");
         }
         break;
     case DeviceEventType::kPlatformLinuxBLEPeripheralRegisterAppComplete:
         VerifyOrExit(apEvent->Platform.BLEPeripheralRegisterAppComplete.mIsSuccess, err = CHIP_ERROR_INCORRECT_STATE);
-        mFlags.Set(Flags::kAppRegistered);
+        SetFlag(mFlags, kFlag_AppRegistered);
         controlOpComplete = true;
         break;
     default:
@@ -324,12 +327,12 @@ exit:
     {
         ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %s", ErrorStr(err));
         mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
-        sInstance.mFlags.Clear(Flags::kControlOpInProgress);
+        ClearFlag(sInstance.mFlags, kFlag_ControlOpInProgress);
     }
 
     if (controlOpComplete)
     {
-        mFlags.Clear(Flags::kControlOpInProgress);
+        ClearFlag(mFlags, kFlag_ControlOpInProgress);
         DriveBLEState();
     }
 }
@@ -539,16 +542,16 @@ void BLEManagerImpl::DriveBLEState()
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Perform any initialization actions that must occur after the Chip task is running.
-    if (!mFlags.Has(Flags::kAsyncInitCompleted))
+    if (!GetFlag(mFlags, kFlag_AsyncInitCompleted))
     {
-        mFlags.Set(Flags::kAsyncInitCompleted);
+        SetFlag(mFlags, kFlag_AsyncInitCompleted);
 
         // If CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED is enabled,
         // disable CHIPoBLE advertising if the device is fully provisioned.
 #if CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED
         if (ConfigurationMgr().IsFullyProvisioned())
         {
-            mFlags.Clear(Flags::kAdvertisingEnabled);
+            ClearFlag(mFlags, kFlag_AdvertisingEnabled);
             ChipLogProgress(DeviceLayer, "CHIPoBLE advertising disabled because device is fully provisioned");
         }
 #endif // CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED
@@ -556,35 +559,35 @@ void BLEManagerImpl::DriveBLEState()
     }
 
     // If there's already a control operation in progress, wait until it completes.
-    VerifyOrExit(!mFlags.Has(Flags::kControlOpInProgress), /* */);
+    VerifyOrExit(!GetFlag(mFlags, kFlag_ControlOpInProgress), /* */);
 
     // Initializes the Bluez BLE layer if needed.
-    if (mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_Enabled && !mFlags.Has(Flags::kBluezBLELayerInitialized))
+    if (mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_Enabled && !GetFlag(mFlags, kFlag_BluezBLELayerInitialized))
     {
         err = InitBluezBleLayer(mIsCentral, nullptr, mBLEAdvConfig, mpEndpoint);
         SuccessOrExit(err);
-        mFlags.Set(Flags::kBluezBLELayerInitialized);
+        SetFlag(mFlags, kFlag_BluezBLELayerInitialized);
     }
 
     // Register the CHIPoBLE application with the Bluez BLE layer if needed.
-    if (!mIsCentral && mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_Enabled && !mFlags.Has(Flags::kAppRegistered))
+    if (!mIsCentral && mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_Enabled && !GetFlag(mFlags, kFlag_AppRegistered))
     {
         err = BluezGattsAppRegister(mpEndpoint);
-        mFlags.Set(Flags::kControlOpInProgress);
+        SetFlag(mFlags, kFlag_ControlOpInProgress);
         ExitNow();
     }
 
     // If the application has enabled CHIPoBLE and BLE advertising...
-    if (mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_Enabled && mFlags.Has(Flags::kAdvertisingEnabled))
+    if (mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_Enabled && GetFlag(mFlags, kFlag_AdvertisingEnabled))
     {
         // Start/re-start advertising if not already advertising, or if the advertising state of the
         // Bluez BLE layer needs to be refreshed.
-        if (!mFlags.HasAny(Flags::kAdvertising, Flags::kAdvertisingRefreshNeeded))
+        if (!GetFlag(mFlags, kFlag_Advertising) || GetFlag(mFlags, kFlag_AdvertisingRefreshNeeded))
         {
             // Configure advertising data if it hasn't been done yet.  This is an asynchronous step which
             // must complete before advertising can be started.  When that happens, this method will
             // be called again, and execution will proceed to the code below.
-            if (!mFlags.Has(Flags::kAdvertisingConfigured))
+            if (!GetFlag(mFlags, kFlag_AdvertisingConfigured))
             {
                 err = BluezAdvertisementSetup(mpEndpoint);
                 ExitNow();
@@ -594,7 +597,7 @@ void BLEManagerImpl::DriveBLEState()
             err = StartBLEAdvertising();
             SuccessOrExit(err);
 
-            sInstance.mFlags.Set(Flags::kAdvertising);
+            SetFlag(sInstance.mFlags, kFlag_Advertising);
             ExitNow();
         }
     }
@@ -602,11 +605,11 @@ void BLEManagerImpl::DriveBLEState()
     // Otherwise stop advertising if needed...
     else
     {
-        if (mFlags.Has(Flags::kAdvertising))
+        if (GetFlag(mFlags, kFlag_Advertising))
         {
             err = StopBLEAdvertising();
             SuccessOrExit(err);
-            mFlags.Set(Flags::kControlOpInProgress);
+            SetFlag(mFlags, kFlag_ControlOpInProgress);
 
             ExitNow();
         }

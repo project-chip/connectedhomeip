@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -93,19 +93,19 @@ private:
 
     // ===== Private members reserved for use by this class only.
 
-    enum class Flags : uint8_t
+    enum
     {
-        kAsyncInitCompleted     = 0x0001, /**< One-time asynchronous initialization actions have been performed. */
-        kAdvertisingEnabled     = 0x0002, /**< The application has enabled CHIPoBLE advertising. */
-        kFastAdvertisingEnabled = 0x0004, /**< The application has enabled fast advertising. */
-        kAdvertising            = 0x0008, /**< The system is currently CHIPoBLE advertising. */
-        kAdvertisingRefreshNeeded =
+        kFlag_AsyncInitCompleted     = 0x0001, /**< One-time asynchronous initialization actions have been performed. */
+        kFlag_AdvertisingEnabled     = 0x0002, /**< The application has enabled CHIPoBLE advertising. */
+        kFlag_FastAdvertisingEnabled = 0x0004, /**< The application has enabled fast advertising. */
+        kFlag_Advertising            = 0x0008, /**< The system is currently CHIPoBLE advertising. */
+        kFlag_AdvertisingRefreshNeeded =
             0x0010, /**< The advertising state/configuration has changed, but the SoftDevice has yet to be updated. */
     };
 
     struct ServiceData;
 
-    BitFlags<Flags> mFlags;
+    uint16_t mFlags;
     uint16_t mGAPConns;
     CHIPoBLEServiceMode mServiceMode;
     bool mSubscribedConns[CONFIG_BT_MAX_CONN];
@@ -182,17 +182,17 @@ inline BLEManager::CHIPoBLEServiceMode BLEManagerImpl::_GetCHIPoBLEServiceMode(v
 
 inline bool BLEManagerImpl::_IsAdvertisingEnabled(void)
 {
-    return mFlags.Has(Flags::kAdvertisingEnabled);
+    return GetFlag(mFlags, kFlag_AdvertisingEnabled);
 }
 
 inline bool BLEManagerImpl::_IsFastAdvertisingEnabled(void)
 {
-    return mFlags.Has(Flags::kFastAdvertisingEnabled);
+    return GetFlag(mFlags, kFlag_FastAdvertisingEnabled);
 }
 
 inline bool BLEManagerImpl::_IsAdvertising(void)
 {
-    return mFlags.Has(Flags::kAdvertising);
+    return GetFlag(mFlags, kFlag_Advertising);
 }
 
 } // namespace Internal
