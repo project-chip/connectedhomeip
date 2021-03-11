@@ -253,6 +253,7 @@ void SendEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     callback.ReceiveHandlerCallCount = 0;
 
     PayloadHeader payloadHeader;
+    PacketHeader packetHeader;
     EncryptedPacketBufferHandle msgBuf;
 
     // Set the exchange ID for this header.
@@ -263,7 +264,7 @@ void SendEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
 
     payloadHeader.SetInitiator(true);
 
-    err = secureSessionMgr.SendMessage(localToRemoteSession, payloadHeader, std::move(buffer), &msgBuf);
+    err = secureSessionMgr.SendMessage(localToRemoteSession, payloadHeader, packetHeader, std::move(buffer), &msgBuf);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     ctx.DriveIOUntil(1000 /* ms */, []() { return callback.ReceiveHandlerCallCount != 0; });
@@ -327,6 +328,7 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     callback.ReceiveHandlerCallCount = 0;
 
     PayloadHeader payloadHeader;
+    PacketHeader packetHeader;
     EncryptedPacketBufferHandle msgBuf;
 
     // Set the exchange ID for this header.
@@ -337,13 +339,11 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
 
     payloadHeader.SetInitiator(true);
 
-    err = secureSessionMgr.SendMessage(localToRemoteSession, payloadHeader, std::move(buffer), &msgBuf);
+    err = secureSessionMgr.SendMessage(localToRemoteSession, payloadHeader, packetHeader, std::move(buffer), &msgBuf);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     ctx.DriveIOUntil(1000 /* ms */, []() { return callback.ReceiveHandlerCallCount != 0; });
     NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 1);
-
-    PacketHeader packetHeader;
 
     // Change Destination Node ID
     EncryptedPacketBufferHandle badDestNodeIdMsg = msgBuf.CloneData();

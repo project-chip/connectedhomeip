@@ -224,8 +224,9 @@ public:
      *   to retransmit it, will be stored in *bufferRetainSlot.
      */
     CHIP_ERROR SendMessage(SecureSessionHandle session, System::PacketBufferHandle && msgBuf);
-    CHIP_ERROR SendMessage(SecureSessionHandle session, PayloadHeader & payloadHeader, System::PacketBufferHandle && msgBuf,
-                           EncryptedPacketBufferHandle * bufferRetainSlot = nullptr);
+    CHIP_ERROR SendMessage(SecureSessionHandle session, PayloadHeader & payloadHeader, System::PacketBufferHandle && msgBuf);
+    CHIP_ERROR SendMessage(SecureSessionHandle session, PayloadHeader & payloadHeader, PacketHeader & packetHeader,
+                           System::PacketBufferHandle && msgBuf, EncryptedPacketBufferHandle * bufferRetainSlot);
     CHIP_ERROR SendEncryptedMessage(SecureSessionHandle session, EncryptedPacketBufferHandle msgBuf,
                                     EncryptedPacketBufferHandle * bufferRetainSlot);
 

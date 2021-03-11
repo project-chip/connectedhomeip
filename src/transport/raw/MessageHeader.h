@@ -77,6 +77,9 @@ enum class InternalFlagValues : uint8_t
 {
     // Header flag indicates that the peer's group key message counter is not synchronized.
     kPeerGroupMsgIdNotSynchronized = 0x01,
+
+    // Header flag indicates that the message buffer should not be freed after sending.
+    kRetainedBuffer = 0x0002,
 };
 
 enum class FlagValues : uint16_t
@@ -155,6 +158,9 @@ public:
         return mInternalFlags.Has(Header::InternalFlagValues::kPeerGroupMsgIdNotSynchronized);
     }
 
+    /** Check if the message buffer should not be freed after sending. */
+    bool IsRetainedBuffer() const { return mInternalFlags.Has(Header::InternalFlagValues::kRetainedBuffer); }
+
     Header::EncryptionType GetEncryptionType() const { return mEncryptionType; }
 
     PacketHeader & SetSecureSessionControlMsg(bool value)
@@ -166,6 +172,12 @@ public:
     PacketHeader & SetPeerGroupMsgIdNotSynchronized(bool value)
     {
         mInternalFlags.Set(Header::InternalFlagValues::kPeerGroupMsgIdNotSynchronized, value);
+        return *this;
+    }
+
+    PacketHeader & SetRetainedBuffer(bool value)
+    {
+        mInternalFlags.Set(Header::InternalFlagValues::kRetainedBuffer, value);
         return *this;
     }
 

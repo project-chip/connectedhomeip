@@ -23,6 +23,7 @@
  */
 #include <transport/raw/UDP.h>
 
+#include <inet/IPEndPointBasis.h>
 #include <support/CodeUtils.h>
 #include <support/ReturnMacros.h>
 #include <support/logging/CHIPLogging.h>
@@ -90,6 +91,8 @@ void UDP::Close()
 
 CHIP_ERROR UDP::SendMessage(const PacketHeader & header, const Transport::PeerAddress & address, System::PacketBufferHandle msgBuf)
 {
+    uint16_t sendFlags = 0;
+
     VerifyOrReturnError(address.GetTransportType() == Type::kUdp, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mState == State::kInitialized, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mUDPEndPoint != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -103,7 +106,12 @@ CHIP_ERROR UDP::SendMessage(const PacketHeader & header, const Transport::PeerAd
 
     ReturnErrorOnFailure(header.EncodeBeforeData(msgBuf));
 
-    return mUDPEndPoint->SendMsg(&addrInfo, std::move(msgBuf));
+    if (header.IsRetainedBuffer())
+    {
+        sendFlags |= Inet::IPEndPointBasis::kSendFlag_RetainBuffer;
+    }
+
+    return mUDPEndPoint->SendMsg(&addrInfo, std::move(msgBuf), sendFlags);
 }
 
 void UDP::OnUdpReceive(Inet::IPEndPointBasis * endPoint, System::PacketBufferHandle buffer, const Inet::IPPacketInfo * pktInfo)
