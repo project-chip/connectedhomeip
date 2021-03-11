@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2018 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -401,7 +401,7 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
     mWiFiAPState                    = kWiFiAPState_NotActive;
     mWiFiStationReconnectIntervalMS = CHIP_DEVICE_CONFIG_WIFI_STATION_RECONNECT_INTERVAL;
     mWiFiAPIdleTimeoutMS            = CHIP_DEVICE_CONFIG_WIFI_AP_IDLE_TIMEOUT;
-    mFlags                          = 0;
+    mFlags.SetRaw(0);
 
     // TODO Initialize the Chip Addressing and Routing Module.
 
@@ -902,10 +902,10 @@ void ConnectivityManagerImpl::DriveAPState(::chip::System::Layer * aLayer, void 
 
 void ConnectivityManagerImpl::UpdateInternetConnectivityState(void)
 {
-    bool haveIPv4Conn = false;
-    bool haveIPv6Conn = false;
-    bool hadIPv4Conn  = GetFlag(mFlags, kFlag_HaveIPv4InternetConnectivity);
-    bool hadIPv6Conn  = GetFlag(mFlags, kFlag_HaveIPv6InternetConnectivity);
+    bool haveIPv4Conn      = false;
+    bool haveIPv6Conn      = false;
+    const bool hadIPv4Conn = mFlags.Has(ConnectivityFlags::kHaveIPv4InternetConnectivity);
+    const bool hadIPv6Conn = mFlags.Has(ConnectivityFlags::kHaveIPv6InternetConnectivity);
     IPAddress addr;
 
     // If the WiFi station is currently in the connected state...
@@ -962,8 +962,8 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState(void)
     if (haveIPv4Conn != hadIPv4Conn || haveIPv6Conn != hadIPv6Conn)
     {
         // Update the current state.
-        SetFlag(mFlags, kFlag_HaveIPv4InternetConnectivity, haveIPv4Conn);
-        SetFlag(mFlags, kFlag_HaveIPv6InternetConnectivity, haveIPv6Conn);
+        mFlags.Set(ConnectivityFlags::kHaveIPv4InternetConnectivity, haveIPv4Conn)
+            .Set(ConnectivityFlags::kHaveIPv6InternetConnectivity, haveIPv6Conn);
 
         // Alert other components of the state change.
         ChipDeviceEvent event;

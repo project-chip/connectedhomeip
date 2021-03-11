@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -95,9 +95,9 @@ enum class FlagValues : uint16_t
 
 };
 
-using Flags         = BitFlags<uint16_t, FlagValues>;
-using ExFlags       = BitFlags<uint8_t, ExFlagValues>;
-using InternalFlags = BitFlags<uint8_t, InternalFlagValues>;
+using Flags         = BitFlags<FlagValues>;
+using ExFlags       = BitFlags<ExFlagValues>;
+using InternalFlags = BitFlags<InternalFlagValues>;
 
 // Header is a 16-bit value of the form
 //  |  4 bit  | 4 bit |8 bit Security Flags|

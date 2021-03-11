@@ -15,16 +15,16 @@
 namespace chip {
 namespace bdx {
 
-enum TransferRole : uint8_t
+enum class TransferRole : uint8_t
 {
-    kRole_Receiver = 0,
-    kRole_Sender   = 1,
+    kReceiver = 0,
+    kSender   = 1,
 };
 
 class DLL_EXPORT TransferSession
 {
 public:
-    enum OutputEventType : uint16_t
+    enum class OutputEventType : uint16_t
     {
         kNone = 0,
         kMsgToSend,
@@ -41,7 +41,7 @@ public:
 
     struct TransferInitData
     {
-        uint8_t TransferCtlFlagsRaw = 0;
+        TransferControlFlags TransferCtlFlags;
 
         uint16_t MaxBlockSize = 0;
         uint64_t StartOffset  = 0;
@@ -70,7 +70,7 @@ public:
 
     struct StatusReportData
     {
-        uint16_t StatusCode;
+        StatusCode statusCode;
     };
 
     struct BlockData
@@ -99,8 +99,8 @@ public:
             StatusReportData statusData;
         };
 
-        OutputEvent() : EventType(kNone) { statusData = { kStatus_None }; }
-        OutputEvent(OutputEventType type) : EventType(type) { statusData = { kStatus_None }; }
+        OutputEvent() : EventType(OutputEventType::kNone) { statusData = { StatusCode::kNone }; }
+        OutputEvent(OutputEventType type) : EventType(type) { statusData = { StatusCode::kNone }; }
 
         static OutputEvent TransferInitEvent(TransferInitData data, System::PacketBufferHandle msg);
         static OutputEvent TransferAcceptEvent(TransferAcceptData data);
@@ -160,7 +160,7 @@ public:
      * @return CHIP_ERROR Result of initialization. May also indicate if the TransferSession object is unable to handle this
      *                    request.
      */
-    CHIP_ERROR WaitForTransfer(TransferRole role, BitFlags<uint8_t, TransferControlFlags> xferControlOpts, uint16_t maxBlockSize,
+    CHIP_ERROR WaitForTransfer(TransferRole role, BitFlags<TransferControlFlags> xferControlOpts, uint16_t maxBlockSize,
                                uint32_t timeoutMs);
 
     /**
@@ -252,7 +252,7 @@ public:
     TransferSession();
 
 private:
-    enum TransferState : uint8_t
+    enum class TransferState : uint8_t
     {
         kUnitialized,
         kAwaitingInitMsg,
@@ -282,23 +282,23 @@ private:
      *   Used when handling a TransferInit message. Determines if there are any compatible Transfer control modes between the two
      *   transfer peers.
      */
-    void ResolveTransferControlOptions(const BitFlags<uint8_t, TransferControlFlags> & proposed);
+    void ResolveTransferControlOptions(const BitFlags<TransferControlFlags> & proposed);
 
     /**
      * @brief
      *   Used when handling an Accept message. Verifies that the chosen control mode is compatible with the orignal supported modes.
      */
-    CHIP_ERROR VerifyProposedMode(const BitFlags<uint8_t, TransferControlFlags> & proposed);
+    CHIP_ERROR VerifyProposedMode(const BitFlags<TransferControlFlags> & proposed);
 
     void PrepareStatusReport(StatusCode code);
     bool IsTransferLengthDefinite();
 
-    OutputEventType mPendingOutput = kNone;
-    TransferState mState           = kUnitialized;
+    OutputEventType mPendingOutput = OutputEventType::kNone;
+    TransferState mState           = TransferState::kUnitialized;
     TransferRole mRole;
 
     // Indicate supported options pre- transfer accept
-    BitFlags<uint8_t, TransferControlFlags> mSuppportedXferOpts;
+    BitFlags<TransferControlFlags> mSuppportedXferOpts;
     uint16_t mMaxSupportedBlockSize = 0;
 
     // Used to govern transfer once it has been accepted
