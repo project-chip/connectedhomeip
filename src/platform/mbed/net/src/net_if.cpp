@@ -11,42 +11,47 @@
 struct if_nameindex * mbed_if_nameindex(void)
 {
     char name[IF_NAMESIZE];
-    char * name_ptr = name;
+    char * name_ptr                = name;
+    unsigned int if_counter        = 0;
+    struct if_nameindex * net_list = NULL;
 
     NetworkInterface * net_if = NetworkInterface::get_default_instance();
     if (net_if == nullptr)
     {
         set_errno(ENOBUFS);
-        return NULL;
+        goto exit;
     }
 
     name_ptr = net_if->get_interface_name(name_ptr);
     if (name_ptr == NULL)
     {
         set_errno(ENOBUFS);
-        return NULL;
+        goto exit;
     }
 
-    struct if_nameindex * net_list = (struct if_nameindex *) calloc((MBED_NET_IF_LIST_SIZE), sizeof(struct if_nameindex));
+    net_list = (struct if_nameindex *) realloc(net_list, (if_counter + 2) * sizeof(struct if_nameindex));
     if (net_list == NULL)
     {
         set_errno(ENOBUFS);
-        return NULL;
+        goto exit;
     }
 
-    memset(net_list, 0, sizeof(struct if_nameindex) * MBED_NET_IF_LIST_SIZE);
+    memset(&net_list[if_counter + 1], 0, sizeof(struct if_nameindex));
 
-    net_list[0].if_name = (char *) malloc(IF_NAMESIZE);
-    if (net_list[0].if_name == NULL)
+    net_list[if_counter].if_name = (char *) malloc(IF_NAMESIZE);
+    if (net_list[if_counter].if_name == NULL)
     {
         set_errno(ENOBUFS);
         free(net_list);
-        return NULL;
+        net_list = NULL;
+        goto exit;
     }
 
-    net_list[0].if_index = 1;
-    strncpy(net_list[0].if_name, name_ptr, IF_NAMESIZE);
+    strncpy(net_list[if_counter].if_name, name_ptr, IF_NAMESIZE);
+    net_list[if_counter].if_index = if_counter + 1;
+    if_counter++;
 
+exit:
     return net_list;
 }
 
@@ -70,62 +75,66 @@ void mbed_if_freenameindex(struct if_nameindex * ptr)
 char * mbed_if_indextoname(unsigned int ifindex, char * ifname)
 {
     char * ret = NULL;
-    int index  = ifindex - 1;
+    struct if_nameindex *net_list, *p;
 
-    if (index < 0 || index > MBED_MAX_INTERFACES_NUM || ifname == NULL)
-    {
-        set_errno(ENXIO);
-        return NULL;
-    }
-
-    struct if_nameindex * net_list = mbed_if_nameindex();
-    if (net_list == NULL)
-    {
-        set_errno(ENXIO);
-        return NULL;
-    }
-
-    if (net_list[index].if_name != NULL)
-    {
-        ret = strncpy(ifname, net_list[index].if_name, IF_NAMESIZE);
-    }
-    else
-    {
-        set_errno(ENXIO);
-    }
-
-    mbed_if_freenameindex(net_list);
-
-    return ret;
-}
-
-unsigned int mbed_if_nametoindex(const char * ifname)
-{
-    unsigned int index, ret = 0;
     if (ifname == NULL)
     {
         set_errno(ENXIO);
-        return 0;
+        goto exit;
     }
 
-    struct if_nameindex * net_list = mbed_if_nameindex();
+    net_list = mbed_if_nameindex();
     if (net_list == NULL)
     {
         set_errno(ENXIO);
-        return 0;
+        goto exit;
     }
 
-    for (index = 0; index < MBED_NET_IF_LIST_SIZE; ++index)
+    for (p = net_list; p->if_name != NULL; p++)
     {
-        if (!strcmp(ifname, net_list[index].if_name))
+        if (p->if_index == ifindex)
         {
-            ret = net_list[index].if_index;
+            ret = strncpy(ifname, p->if_name, IF_NAMESIZE);
             break;
         }
     }
 
     mbed_if_freenameindex(net_list);
 
+exit:
+    return ret;
+}
+
+unsigned int mbed_if_nametoindex(const char * ifname)
+{
+    unsigned int ret = 0;
+    struct if_nameindex *net_list, *p;
+
+    if (ifname == NULL)
+    {
+        set_errno(ENXIO);
+        goto exit;
+    }
+
+    net_list = mbed_if_nameindex();
+    if (net_list == NULL)
+    {
+        set_errno(ENXIO);
+        goto exit;
+    }
+
+    for (p = net_list; p->if_name != NULL; p++)
+    {
+        if (!strcmp(ifname, p->if_name))
+        {
+            ret = p->if_index;
+            break;
+        }
+    }
+
+    mbed_if_freenameindex(net_list);
+
+exit:
     return ret;
 }
 
@@ -619,13 +628,6 @@ int mbed_ioctl(int fd, unsigned long request, void * param)
     switch (request)
     {
     case SIOCGIFFLAGS: {
-        auto * socket = getSocket(fd);
-        if (socket == nullptr)
-        {
-            set_errno(EBADF);
-            ret = -1;
-            break;
-        }
         if (param == NULL)
         {
             set_errno(EFAULT);

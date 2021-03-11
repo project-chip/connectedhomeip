@@ -5,9 +5,6 @@
 #include <byteorder.h>
 #include <sys/socket.h>
 
-#define MBED_MAX_INTERFACES_NUM 1
-#define MBED_NET_IF_LIST_SIZE 2
-
 #ifdef __cplusplus
 extern "C" {
 #endif
