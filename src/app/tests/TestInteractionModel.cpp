@@ -45,18 +45,19 @@ chip::Messaging::ExchangeManager gExchangeManager;
 chip::TransportMgr<chip::Transport::UDP> gTransportManager;
 const chip::Transport::AdminId gAdminId = 0;
 
-namespace chip{
-namespace app{
+namespace chip {
+namespace app {
 class TestInteractionModel
 {
 public:
     static void TestReadClient(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandler(nlTestSuite * apSuite, void * apContext);
+
 private:
-    static void GenerateReportData(nlTestSuite * apSuite, void * apContext, System::PacketBufferHandle &&aPayload);
+    static void GenerateReportData(nlTestSuite * apSuite, void * apContext, System::PacketBufferHandle && aPayload);
 };
 
-void TestInteractionModel::GenerateReportData(nlTestSuite * apSuite, void * apContext, System::PacketBufferHandle &&aPayload)
+void TestInteractionModel::GenerateReportData(nlTestSuite * apSuite, void * apContext, System::PacketBufferHandle && aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::System::PacketBufferTLVWriter writer;
@@ -87,7 +88,7 @@ void TestInteractionModel::TestReadClient(nlTestSuite * apSuite, void * apContex
     chip::app::ReadClient readClient;
 
     chip::System::PacketBufferHandle buf = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize);
-    err = readClient.Init(&gExchangeManager, nullptr);
+    err                                  = readClient.Init(&gExchangeManager, nullptr);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     err = readClient.SendReadRequest(chip::kTestDeviceNodeId, gAdminId);
@@ -107,7 +108,7 @@ void TestInteractionModel::TestReadHandler(nlTestSuite * apSuite, void * apConte
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::app::ReadHandler readHandler;
     chip::System::PacketBufferTLVWriter writer;
-    chip::System::PacketBufferHandle reportDatabuf = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize);
+    chip::System::PacketBufferHandle reportDatabuf  = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize);
     chip::System::PacketBufferHandle readRequestbuf = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize);
     ReadRequest::Builder readRequestBuilder;
     readHandler.Init(&gExchangeManager, nullptr);
@@ -133,8 +134,8 @@ void TestInteractionModel::TestReadHandler(nlTestSuite * apSuite, void * apConte
     readHandler.Shutdown();
 }
 
-}
-}
+} // namespace app
+} // namespace chip
 
 namespace {
 void InitializeChip(nlTestSuite * apSuite)
@@ -153,7 +154,7 @@ void InitializeChip(nlTestSuite * apSuite)
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     err = gTransportManager.Init(
-                chip::Transport::UdpListenParameters(&chip::DeviceLayer::InetLayer).SetAddressType(chip::Inet::kIPAddressType_IPv4));
+        chip::Transport::UdpListenParameters(&chip::DeviceLayer::InetLayer).SetAddressType(chip::Inet::kIPAddressType_IPv4));
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     err = gSessionManager.Init(chip::kTestDeviceNodeId, &chip::DeviceLayer::SystemLayer, &gTransportManager, &admins);
