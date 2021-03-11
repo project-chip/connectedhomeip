@@ -37,7 +37,6 @@ using namespace chip;
 using namespace Shell;
 using namespace Logging;
 
-constexpr uint16_t kEchoClientPort            = CHIP_PORT + 1;
 constexpr size_t kMaxTcpActiveConnectionCount = 4;
 constexpr size_t kMaxTcpPendingPackets        = 4;
 constexpr size_t kNetworkSleepTimeMsecs       = (100 * 1000);
@@ -58,13 +57,8 @@ public:
         mWaitingForEchoResp = false;
         mUsingTCP           = false;
         mUsingCRMP          = true;
+        mEchoPort           = CHIP_PORT;
     }
-
-    uint32_t GetMaxEchoCount() const { return mMaxEchoCount; }
-    void SetMaxEchoCount(uint32_t id) { mMaxEchoCount = id; }
-
-    uint32_t GetEchoInterval() const { return mEchoInterval; }
-    void SetEchoInterval(uint32_t value) { mEchoInterval = value; }
 
     uint64_t GetLastEchoTime() const { return mLastEchoTime; }
     void SetLastEchoTime(uint64_t value) { mLastEchoTime = value; }
@@ -77,6 +71,15 @@ public:
     void SetEchoRespCount(uint64_t value) { mEchoRespCount = value; }
     void IncrementEchoRespCount() { mEchoRespCount++; }
 
+    uint32_t GetMaxEchoCount() const { return mMaxEchoCount; }
+    void SetMaxEchoCount(uint32_t id) { mMaxEchoCount = id; }
+
+    uint32_t GetEchoInterval() const { return mEchoInterval; }
+    void SetEchoInterval(uint32_t value) { mEchoInterval = value; }
+
+    uint16_t GetEchoPort() const { return mEchoPort; }
+    void SetEchoPort(uint16_t value) { mEchoPort = value; }
+
     bool IsWaitingForEchoResp() const { return mWaitingForEchoResp; }
     void SetWaitingForEchoResp(bool value) { mWaitingForEchoResp = value; }
 
@@ -87,12 +90,6 @@ public:
     void SetUsingCRMP(bool value) { mUsingCRMP = value; }
 
 private:
-    // Max value for the number of echo requests sent.
-    uint32_t mMaxEchoCount;
-
-    // The CHIP Echo interval time in milliseconds.
-    uint32_t mEchoInterval;
-
     // The last time a echo request was attempted to be sent.
     uint64_t mLastEchoTime;
 
@@ -101,6 +98,14 @@ private:
 
     // Count of the number of echo responses received.
     uint64_t mEchoRespCount;
+
+    // Max value for the number of echo requests sent.
+    uint32_t mMaxEchoCount;
+
+    // The CHIP Echo interval time in milliseconds.
+    uint32_t mEchoInterval;
+
+    uint16_t mEchoPort;
 
     // True, if the echo client is waiting for an echo response
     // after sending an echo request, false otherwise.
@@ -180,12 +185,12 @@ CHIP_ERROR EstablishSecureSession(streamer_t * stream)
 
     if (gPingArguments.IsUsingTCP())
     {
-        peerAddr = Optional<Transport::PeerAddress>::Value(Transport::PeerAddress::TCP(gDestAddr, CHIP_PORT));
+        peerAddr = Optional<Transport::PeerAddress>::Value(Transport::PeerAddress::TCP(gDestAddr, gPingArguments.GetEchoPort()));
     }
     else
     {
-        peerAddr =
-            Optional<Transport::PeerAddress>::Value(Transport::PeerAddress::UDP(gDestAddr, CHIP_PORT, INET_NULL_INTERFACEID));
+        peerAddr = Optional<Transport::PeerAddress>::Value(
+            Transport::PeerAddress::UDP(gDestAddr, gPingArguments.GetEchoPort(), INET_NULL_INTERFACEID));
     }
 
     // Attempt to connect to the peer.
@@ -276,6 +281,16 @@ void StartPinging(streamer_t * stream, char * destination)
     adminInfo = admins.AssignAdminId(gAdminId, kTestControllerNodeId);
     VerifyOrExit(adminInfo != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
+    err = gTCPManager.Init(Transport::TcpListenParameters(&DeviceLayer::InetLayer)
+                               .SetAddressType(Inet::kIPAddressType_IPv4)
+                               .SetListenPort(gPingArguments.GetEchoPort() + 1));
+    VerifyOrExit(err == CHIP_NO_ERROR, streamer_printf(stream, "Failed to init TCP manager error: %s\r\n", ErrorStr(err)));
+
+    err = gUDPManager.Init(Transport::UdpListenParameters(&DeviceLayer::InetLayer)
+                               .SetAddressType(Inet::kIPAddressType_IPv4)
+                               .SetListenPort(gPingArguments.GetEchoPort() + 1));
+    VerifyOrExit(err == CHIP_NO_ERROR, streamer_printf(stream, "Failed to init UDP manager error: %s\r\n", ErrorStr(err)));
+
     if (gPingArguments.IsUsingTCP())
     {
         err = gSessionManager.Init(kTestControllerNodeId, &DeviceLayer::SystemLayer, &gTCPManager, &admins);
@@ -349,6 +364,7 @@ void PrintUsage(streamer_t * stream)
                     "  -h              print help information\n"
                     "  -u              use UDP (default)\n"
                     "  -t              use TCP\n"
+                    "  -p  <port>      echo server port\n"
                     "  -i  <interval>  ping interval time in seconds\n"
                     "  -c  <count>     stop after <count> replies\n"
                     "  -r  <1|0>       enalbe/disable CRMP\n");
@@ -395,6 +411,17 @@ int cmd_ping(int argc, char ** argv)
             else
             {
                 gPingArguments.SetMaxEchoCount(atol(argv[optIndex]));
+            }
+            break;
+        case 'p':
+            if (++optIndex >= argc || argv[optIndex][0] == '-')
+            {
+                streamer_printf(sout, "Invalid argument specified for -c\n");
+                return -1;
+            }
+            else
+            {
+                gPingArguments.SetEchoPort(atol(argv[optIndex]));
             }
             break;
         case 'r':
@@ -451,21 +478,5 @@ static shell_command_t cmds_ping[] = {
 
 void cmd_ping_init()
 {
-    CHIP_ERROR err    = CHIP_NO_ERROR;
-    streamer_t * sout = streamer_get();
-
-    err = gTCPManager.Init(Transport::TcpListenParameters(&DeviceLayer::InetLayer)
-                               .SetAddressType(Inet::kIPAddressType_IPv4)
-                               .SetListenPort(kEchoClientPort));
-    VerifyOrExit(err == CHIP_NO_ERROR, streamer_printf(sout, "Failed to init TCP manager error: %s\r\n", ErrorStr(err)));
-
-    err = gUDPManager.Init(Transport::UdpListenParameters(&DeviceLayer::InetLayer)
-                               .SetAddressType(Inet::kIPAddressType_IPv4)
-                               .SetListenPort(kEchoClientPort));
-    VerifyOrExit(err == CHIP_NO_ERROR, streamer_printf(sout, "Failed to init UDP manager error: %s\r\n", ErrorStr(err)));
-
     shell_register(cmds_ping, ArraySize(cmds_ping));
-
-exit:
-    return;
 }
