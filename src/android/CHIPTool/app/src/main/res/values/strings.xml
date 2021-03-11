@@ -29,6 +29,7 @@
     <string name="echo_client_btn_text">Echo Client</string>
     <string name="on_off_level_btn_text">Light On/Off &amp; Level Cluster</string>
     <string name="enter_ip_address_hint_text">Enter IP Address (eg. 192.168.10.2)</string>
+    <string name="enter_device_id_hint_text">Enter Device ID</string>
     <string name="echo_input_hint_text">Enter message for device</string>
 
     <string name="send_command_on_btn_text">On</string>

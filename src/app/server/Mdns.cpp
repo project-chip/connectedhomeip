@@ -17,9 +17,12 @@
 
 #include "Mdns.h"
 
+#include <inttypes.h>
+
 #include <core/Optional.h>
 #include <mdns/Advertiser.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/ConfigurationManager.h>
 #include <support/ReturnMacros.h>
 #include <support/logging/CHIPLogging.h>
 #include <transport/AdminPairingTable.h>
@@ -32,8 +35,6 @@ namespace app {
 namespace Mdns {
 
 namespace {
-
-using namespace chip;
 
 NodeId GetCurrentNodeId()
 {
@@ -50,8 +51,9 @@ NodeId GetCurrentNodeId()
     // is sufficient or if we need multi-node-id advertisement. Existing
     // mdns advertises a single node id as parameter.
 
-    // Search for one admin pariing and use its node id.
-    for (auto pairing = GetGlobalAdminPairingTable().cbegin(); pairing != GetGlobalAdminPairingTable().cend(); pairing++)
+    // Search for one admin pairing and use its node id.
+    auto pairing = GetGlobalAdminPairingTable().cbegin();
+    if (pairing != GetGlobalAdminPairingTable().cend())
     {
         ChipLogProgress(Discovery, "Found admin paring for admin %" PRIX64 ", node %" PRIX64, pairing->GetAdminId(),
                         pairing->GetNodeId());
@@ -67,7 +69,6 @@ NodeId GetCurrentNodeId()
 /// Set MDNS operational advertisement
 CHIP_ERROR AdvertiseOperational()
 {
-
     uint64_t fabricId;
 
     if (DeviceLayer::ConfigurationMgr().GetFabricId(fabricId) != CHIP_NO_ERROR)
@@ -132,6 +133,18 @@ CHIP_ERROR AdvertiseCommisioning()
 void StartServer()
 {
     CHIP_ERROR err = chip::Mdns::ServiceAdvertiser::Instance().Start(&chip::DeviceLayer::InetLayer, chip::Mdns::kMdnsPort);
+
+    // TODO: advertise this only when really operational once we support both
+    // operational and commisioning advertising is supported.
+    if (DeviceLayer::ConfigurationMgr().IsFullyProvisioned())
+    {
+        err = app::Mdns::AdvertiseOperational();
+    }
+    else
+    {
+        err = app::Mdns::AdvertiseCommisioning();
+    }
+
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Discovery, "Failed to start mDNS server: %s", chip::ErrorStr(err));

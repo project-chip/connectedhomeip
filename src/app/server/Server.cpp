@@ -19,6 +19,7 @@
 
 #include <app/InteractionModelEngine.h>
 #include <app/server/DataModelHandler.h>
+#include <app/server/EchoHandler.h>
 #include <app/server/RendezvousServer.h>
 #include <app/server/SessionManager.h>
 
@@ -64,13 +65,9 @@ constexpr bool isRendezvousBypassed()
 
 constexpr bool useTestPairing()
 {
-#if defined(CHIP_DEVICE_CONFIG_USE_TEST_PAIRING) && CHIP_DEVICE_CONFIG_USE_TEST_PAIRING
-    return true;
-#else
     // Use the test pairing whenever rendezvous is bypassed. Otherwise, there wouldn't be
     // any way to communicate with the device using CHIP protocol.
     return isRendezvousBypassed();
-#endif
 }
 
 class ServerStorageDelegate : public PersistentStorageDelegate
@@ -410,8 +407,8 @@ private:
     AppDelegate * mDelegate = nullptr;
 };
 
-#ifdef CHIP_APP_USE_INTERACTION_MODEL
-Messaging::ExchangeManager gExchange;
+#if defined(CHIP_APP_USE_INTERACTION_MODEL) || defined(CHIP_APP_USE_ECHO)
+Messaging::ExchangeManager gExchangeMgr;
 #endif
 ServerCallback gCallbacks;
 SecurePairingUsingTestSecret gTestPairing;
@@ -463,7 +460,6 @@ CHIP_ERROR OpenDefaultPairingWindow(ResetAdmins resetAdmins)
 void InitServer(AppDelegate * delegate)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    Optional<Transport::PeerAddress> peer(Transport::Type::kUndefined);
 
     chip::Platform::MemoryInit();
 
@@ -487,23 +483,26 @@ void InitServer(AppDelegate * delegate)
     err = gSessions.Init(chip::kTestDeviceNodeId, &DeviceLayer::SystemLayer, &gTransports, &gAdminPairings);
     SuccessOrExit(err);
 
-#ifdef CHIP_APP_USE_INTERACTION_MODEL
-    err = gExchange.Init(&gSessions);
-    SuccessOrExit(err);
-    err = chip::app::InteractionModelEngine::GetInstance()->Init(&gExchange);
+#if defined(CHIP_APP_USE_INTERACTION_MODEL) || defined(CHIP_APP_USE_ECHO)
+    err = gExchangeMgr.Init(&gSessions);
     SuccessOrExit(err);
 #else
     gSessions.SetDelegate(&gCallbacks);
 #endif
 
+#if defined(CHIP_APP_USE_INTERACTION_MODEL)
+    err = chip::app::InteractionModelEngine::GetInstance()->Init(&gExchangeMgr);
+    SuccessOrExit(err);
+#endif
+
+#if defined(CHIP_APP_USE_ECHO)
+    err = InitEchoHandler(&gExchangeMgr);
+    SuccessOrExit(err);
+#endif
+
     if (useTestPairing())
     {
-        AdminPairingInfo * adminInfo = gAdminPairings.AssignAdminId(gNextAvailableAdminId);
-        VerifyOrExit(adminInfo != nullptr, err = CHIP_ERROR_NO_MEMORY);
-        adminInfo->SetNodeId(chip::kTestDeviceNodeId);
-        err = gSessions.NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing, SecureSessionMgr::PairingDirection::kResponder,
-                                   gNextAvailableAdminId);
-        SuccessOrExit(err);
+        SuccessOrExit(err = AddTestPairing());
     }
 
     // This flag is used to bypass BLE in the cirque test
@@ -532,20 +531,6 @@ void InitServer(AppDelegate * delegate)
 #endif
     }
 
-#if CHIP_ENABLE_MDNS
-    // TODO: advertise this only when really operational once we support both
-    // operational and commisioning advertising is supported.
-    if (ConfigurationMgr().IsFullyProvisioned())
-    {
-        err = app::Mdns::AdvertiseOperational();
-    }
-    else
-    {
-        err = app::Mdns::AdvertiseCommisioning();
-    }
-    SuccessOrExit(err);
-#endif
-
 exit:
     if (err != CHIP_NO_ERROR)
     {
@@ -555,6 +540,30 @@ exit:
     {
         ChipLogProgress(AppServer, "Server Listening...");
     }
+}
+
+CHIP_ERROR AddTestPairing()
+{
+    CHIP_ERROR err               = CHIP_NO_ERROR;
+    AdminPairingInfo * adminInfo = nullptr;
+
+    for (const AdminPairingInfo & admin : gAdminPairings)
+        if (admin.IsInitialized() && admin.GetNodeId() == chip::kTestDeviceNodeId)
+            ExitNow();
+
+    adminInfo = gAdminPairings.AssignAdminId(gNextAvailableAdminId);
+    VerifyOrExit(adminInfo != nullptr, err = CHIP_ERROR_NO_MEMORY);
+
+    adminInfo->SetNodeId(chip::kTestDeviceNodeId);
+    SuccessOrExit(err = gSessions.NewPairing(Optional<PeerAddress>{ PeerAddress::Uninitialized() }, chip::kTestControllerNodeId,
+                                             &gTestPairing, SecureSessionMgr::PairingDirection::kResponder, gNextAvailableAdminId));
+    ++gNextAvailableAdminId;
+
+exit:
+    if (err != CHIP_NO_ERROR && adminInfo != nullptr)
+        gAdminPairings.ReleaseAdminId(gNextAvailableAdminId);
+
+    return err;
 }
 
 AdminPairingTable & GetGlobalAdminPairingTable()

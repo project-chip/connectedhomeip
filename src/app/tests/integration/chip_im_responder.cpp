@@ -24,11 +24,10 @@
  *
  */
 
-#include "common.h"
-
 #include "app/InteractionModelEngine.h"
 #include <app/CommandHandler.h>
 #include <app/CommandSender.h>
+#include <app/tests/integration/common.h>
 #include <core/CHIPCore.h>
 #include <platform/CHIPDeviceLayer.h>
 
@@ -125,7 +124,7 @@ int main(int argc, char * argv[])
     err = gSessionManager.Init(chip::kTestDeviceNodeId, &chip::DeviceLayer::SystemLayer, &gTransportManager, &admins);
     SuccessOrExit(err);
 
-    err = gExchangeManager.Init(&gSessionManager);
+    err = gExchangeManager.Init(chip::kTestDeviceNodeId, &gTransportManager, &gSessionManager);
     SuccessOrExit(err);
 
     err = chip::app::InteractionModelEngine::GetInstance()->Init(&gExchangeManager);

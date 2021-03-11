@@ -615,6 +615,9 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, int32_t err)
     case CHIP_ERROR_IM_MALFORMED_STATUS_CODE:
         desc = "Malformed Interacton Model Status Code";
         break;
+    case CHIP_ERROR_PEER_NODE_NOT_FOUND:
+        desc = "Unable to find the peer node";
+        break;
     }
 #endif // !CHIP_CONFIG_SHORT_ERROR_STR
 

@@ -384,6 +384,14 @@
 #define ZCL_KEEPALIVE_BASE_ATTRIBUTE_ID (0x0000)
 #define ZCL_KEEPALIVE_JITTER_ATTRIBUTE_ID (0x0001)
 
+// Attribute ids for cluster: General Commissioning
+
+// Client attributes
+
+// Server attributes
+#define ZCL_FABRIC_ID_ATTRIBUTE_ID (0x0000)
+#define ZCL_BREADCRUMB_ATTRIBUTE_ID (0x0001)
+
 // Attribute ids for cluster: Shade Configuration
 
 // Client attributes
@@ -1084,6 +1092,12 @@
 
 // Server attributes
 #define ZCL_MAX_DURATION_ATTRIBUTE_ID (0x0000)
+
+// Attribute ids for cluster: Low Power
+
+// Client attributes
+
+// Server attributes
 
 // Attribute ids for cluster: Application Basic
 

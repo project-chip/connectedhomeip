@@ -1,4 +1,5 @@
 pip-tools
+virtualenv
 
 # esp-idf
 pyelftools>=0.22
@@ -13,9 +14,12 @@ pyelftools>=0.22
 requests>=2.24.0
 
 # device controller wheel package
-wheel==0.34.2
+wheel
 dbus-python; sys_platform == 'linux'
 pgi; sys_platform == 'linux'
+pyobjc-core; sys_platform == 'darwin'
+pyobjc-framework-cocoa; sys_platform == 'darwin'
+pyobjc-framework-corebluetooth; sys_platform == 'darwin'
 
 # mobly tests
 portpicker
@@ -23,6 +27,7 @@ mobly
 
 # zephyr
 west>=0.9.0
+intelhex
 
 # happy tests
 lockfile
@@ -30,6 +35,8 @@ psutil >= 5.7.3
 
 # pigweed
 ipython
+appnope; sys_platform == 'darwin'
+appdirs; sys_platform == 'darwin'
 coloredlogs
 watchdog
 protobuf

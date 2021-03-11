@@ -38,11 +38,6 @@ qpg6100_sdk("sdk") {
   ]
 
   defines = []
-  if (is_debug) {
-    defines += [ "BUILD_RELEASE=0" ]
-  } else {
-    defines += [ "BUILD_RELEASE=1" ]
-  }
 }
 
 qpg6100_executable("lighting_app") {

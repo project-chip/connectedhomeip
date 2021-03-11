@@ -120,7 +120,7 @@ namespace chip {
 // Generic min() and max() functions
 //
 template <typename _T>
-inline const _T & min(const _T & a, const _T & b)
+constexpr inline const _T & min(const _T & a, const _T & b)
 {
     if (b < a)
         return b;
@@ -129,7 +129,7 @@ inline const _T & min(const _T & a, const _T & b)
 }
 
 template <typename _T>
-inline const _T & max(const _T & a, const _T & b)
+constexpr inline const _T & max(const _T & a, const _T & b)
 {
     if (a < b)
         return b;

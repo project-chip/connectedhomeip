@@ -95,7 +95,7 @@ using MdnsResolveCallback = void (*)(void * context, MdnsService * result, CHIP_
  */
 using MdnsBrowseCallback = void (*)(void * context, MdnsService * services, size_t servicesSize, CHIP_ERROR error);
 
-using MdnsAsnycReturnCallback = void (*)(void * context, CHIP_ERROR error);
+using MdnsAsyncReturnCallback = void (*)(void * context, CHIP_ERROR error);
 
 /**
  * This function intializes the mdns module
@@ -108,7 +108,7 @@ using MdnsAsnycReturnCallback = void (*)(void * context, CHIP_ERROR error);
  * @retval Error code     The initialization fails
  *
  */
-CHIP_ERROR ChipMdnsInit(MdnsAsnycReturnCallback initCallback, MdnsAsnycReturnCallback errorCallback, void * context);
+CHIP_ERROR ChipMdnsInit(MdnsAsyncReturnCallback initCallback, MdnsAsyncReturnCallback errorCallback, void * context);
 
 /**
  * This function sets the host name for services.

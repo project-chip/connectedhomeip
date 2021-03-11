@@ -50,14 +50,7 @@ efr32_sdk("sdk") {
     "${efr32_project_dir}/include/FreeRTOSConfig.h",
   ]
 
-  defines = []
-  if (is_debug) {
-    defines += [ "BUILD_RELEASE=0" ]
-  } else {
-    defines += [ "BUILD_RELEASE=1" ]
-  }
-
-  defines += [ "BOARD_ID=${efr32_board}" ]
+  defines = [ "BOARD_ID=${efr32_board}" ]
 }
 
 efr32_executable("lock_app") {
@@ -86,11 +79,9 @@ efr32_executable("lock_app") {
   ]
 
   sources = [
-    "${examples_plat_dir}/${efr32_family}/${efr32_board}/init_board.c",
-    "${examples_plat_dir}/${efr32_family}/${efr32_board}/init_mcu.c",
     "${examples_plat_dir}/LEDWidget.cpp",
     "${examples_plat_dir}/Service.cpp",
-    "${examples_plat_dir}/init_otSystem.c",
+    "${examples_plat_dir}/init_efrPlatform.cpp",
     "src/AppTask.cpp",
     "src/BoltLockManager.cpp",
     "src/ButtonHandler.cpp",

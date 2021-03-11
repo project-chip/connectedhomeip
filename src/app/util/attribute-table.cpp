@@ -42,13 +42,12 @@
  ******************************************************************************/
 
 // this file contains all the common includes for clusters in the zcl-util
-#include "common.h"
 
 #include "attribute-storage.h"
 
 // for pulling in defines dealing with EITHER server or client
 #include "af-main.h"
-
+#include "app/util/common.h"
 #include "gen/callback.h"
 
 #ifdef EMBER_AF_PLUGIN_REPORTING

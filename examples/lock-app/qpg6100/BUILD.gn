@@ -36,13 +36,6 @@ qpg6100_sdk("sdk") {
     "${examples_plat_dir}/app/include/Service.h",
     "${examples_plat_dir}/project_include/CHIPProjectConfig.h",
   ]
-
-  defines = []
-  if (is_debug) {
-    defines += [ "BUILD_RELEASE=0" ]
-  } else {
-    defines += [ "BUILD_RELEASE=1" ]
-  }
 }
 
 qpg6100_executable("lock_app") {

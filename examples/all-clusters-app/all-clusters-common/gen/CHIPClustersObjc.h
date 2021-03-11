@@ -368,6 +368,30 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
+ * Cluster General Commissioning
+ *
+ */
+@interface CHIPGeneralCommissioning : CHIPCluster
+
+- (void)armFailSafe:(uint16_t)expiryLengthSeconds
+           breadcrumb:(uint64_t)breadcrumb
+            timeoutMs:(uint32_t)timeoutMs
+    completionHandler:(ResponseHandler)completionHandler;
+- (void)commissioningComplete:(ResponseHandler)completionHandler;
+- (void)setFabric:(NSData *)fabricId
+         fabricSecret:(NSData *)fabricSecret
+           breadcrumb:(uint64_t)breadcrumb
+            timeoutMs:(uint32_t)timeoutMs
+    completionHandler:(ResponseHandler)completionHandler;
+
+- (void)readAttributeFabricId:(ResponseHandler)completionHandler;
+- (void)readAttributeBreadcrumb:(ResponseHandler)completionHandler;
+- (void)writeAttributeBreadcrumb:(uint64_t)value completionHandler:(ResponseHandler)completionHandler;
+- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
+
+@end
+
+/**
  * Cluster Groups
  *
  */
@@ -455,6 +479,18 @@ NS_ASSUME_NONNULL_BEGIN
                                 change:(uint8_t)change
                      completionHandler:(ResponseHandler)completionHandler;
 - (void)reportAttributeCurrentLevel:(ResponseHandler)reportHandler;
+- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
+
+@end
+
+/**
+ * Cluster Low Power
+ *
+ */
+@interface CHIPLowPower : CHIPCluster
+
+- (void)sleep:(ResponseHandler)completionHandler;
+
 - (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
 
 @end

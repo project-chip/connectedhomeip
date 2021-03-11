@@ -17,31 +17,19 @@
 
 #pragma once
 
-#include "core/CHIPError.h"
-#include "inet/InetInterface.h"
-#include "lib/mdns/Advertiser.h"
-#include "lib/mdns/platform/Mdns.h"
-#include "platform/CHIPDeviceConfig.h"
+#include <core/CHIPError.h>
+#include <inet/InetInterface.h>
+#include <lib/mdns/Advertiser.h>
+#include <lib/mdns/Resolver.h>
+#include <lib/mdns/platform/Mdns.h>
+#include <platform/CHIPDeviceConfig.h>
 
 namespace chip {
 namespace Mdns {
 
-class ResolveDelegate
+class DiscoveryImplPlatform : public ServiceAdvertiser, public Resolver
 {
 public:
-    virtual void HandleNodeIdResolve(CHIP_ERROR error, uint64_t nodeId, const MdnsService & address) = 0;
-    virtual ~ResolveDelegate() {}
-};
-
-class DiscoveryImplPlatform : public ServiceAdvertiser
-{
-public:
-    /**
-     * This method initializes the publisher.
-     *
-     */
-    CHIP_ERROR Init();
-
     CHIP_ERROR Start(Inet::InetLayer * inetLayer, uint16_t port) override;
 
     /// Advertises the CHIP node as an operational node
@@ -50,25 +38,16 @@ public:
     /// Advertises the CHIP node as a commisioning/commissionable node
     CHIP_ERROR Advertise(const CommissionAdvertisingParameters & params) override;
 
-    /**
-     * This function stops publishing the device on mDNS.
-     *
-     */
+    /// This function stops publishing the device on mDNS.
     CHIP_ERROR StopPublishDevice();
 
-    /**
-     * This function registers the delegate to handle node id resolve results.
-     *
-     */
-    CHIP_ERROR RegisterResolveDelegate(ResolveDelegate * delegate);
+    /// Registers a resolver delegate if none has been registered before
+    CHIP_ERROR SetResolverDelegate(ResolverDelegate * delegate) override;
 
-    /**
-     * This function resolves a node id to its address.
-     *
-     */
-    CHIP_ERROR ResolveNodeId(uint64_t nodeId, uint64_t fabricId, chip::Inet::IPAddressType type = chip::Inet::kIPAddressType_Any);
+    /// Requests resolution of a node ID to its address
+    CHIP_ERROR ResolveNodeId(uint64_t nodeId, uint64_t fabricId, Inet::IPAddressType type) override;
 
-    static DiscoveryImplPlatform & GetInstance() { return sManager; }
+    static DiscoveryImplPlatform & GetInstance();
 
 private:
     DiscoveryImplPlatform();
@@ -91,8 +70,8 @@ private:
     CommissionAdvertisingParameters mCommissioningdvertisingParams;
     bool mIsCommissionalPublishing = false;
 
-    bool mMdnsInitialized              = false;
-    ResolveDelegate * mResolveDelegate = nullptr;
+    bool mMdnsInitialized                = false;
+    ResolverDelegate * mResolverDelegate = nullptr;
 
     static DiscoveryImplPlatform sManager;
 };

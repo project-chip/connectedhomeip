@@ -156,7 +156,7 @@ struct BluezEndpoint
 
     // map device path to the connection
     GHashTable * mpConnMap;
-    uint32_t mNodeId;
+    uint32_t mAdapterId;
     bool mIsCentral;
     char * mpAdvertisingUUID;
     chip::Ble::ChipBLEDeviceIdentificationInfo mDeviceIdInfo;

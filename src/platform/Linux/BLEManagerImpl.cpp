@@ -171,11 +171,11 @@ uint16_t BLEManagerImpl::_NumConnections()
     return numCons;
 }
 
-CHIP_ERROR BLEManagerImpl::ConfigureBle(uint32_t aNodeId, bool aIsCentral)
+CHIP_ERROR BLEManagerImpl::ConfigureBle(uint32_t aAdapterId, bool aIsCentral)
 {
     CHIP_ERROR err                  = CHIP_NO_ERROR;
     mBLEAdvConfig.mpBleName         = mDeviceName;
-    mBLEAdvConfig.mNodeId           = aNodeId;
+    mBLEAdvConfig.mAdapterId        = aAdapterId;
     mBLEAdvConfig.mMajor            = 1;
     mBLEAdvConfig.mMinor            = 1;
     mBLEAdvConfig.mVendorId         = 1;

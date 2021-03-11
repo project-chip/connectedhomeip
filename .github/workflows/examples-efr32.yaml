@@ -26,6 +26,7 @@ jobs:
             BUILD_TYPE: gn_efr32
 
         runs-on: ubuntu-latest
+        if: github.actor != 'restyled-io'
 
         container:
             image: connectedhomeip/chip-build-efr32:latest

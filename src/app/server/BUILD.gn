@@ -15,10 +15,26 @@
 import("//build_overrides/chip.gni")
 import("${chip_root}/src/app/common_flags.gni")
 
+config("server_config") {
+  defines = []
+
+  if (chip_app_use_interaction_model) {
+    defines += [ "CHIP_APP_USE_INTERACTION_MODEL" ]
+  }
+
+  if (chip_app_use_echo) {
+    defines += [ "CHIP_APP_USE_ECHO" ]
+  }
+
+  include_dirs = [ "." ]
+}
+
 static_library("server") {
   output_name = "libCHIPAppServer"
 
   sources = [
+    "EchoHandler.cpp",
+    "EchoHandler.h",
     "Mdns.cpp",
     "Mdns.h",
     "QRCodeUtil.cpp",
@@ -29,18 +45,15 @@ static_library("server") {
     "Server.h",
   ]
 
+  public_configs = [ ":server_config" ]
+
   public_deps = [
     "${chip_root}/src/app",
     "${chip_root}/src/lib/mdns",
     "${chip_root}/src/messaging",
     "${chip_root}/src/platform",
+    "${chip_root}/src/protocols",
     "${chip_root}/src/setup_payload",
     "${chip_root}/src/transport",
   ]
-
-  defines = []
-
-  if (chip_app_use_interaction_model) {
-    defines += [ "CHIP_APP_USE_INTERACTION_MODEL" ]
-  }
 }

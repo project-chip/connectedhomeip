@@ -43,7 +43,7 @@
 #include "af-event.h"
 #include "af-main.h"
 #include "af.h"
-#include "common.h"
+#include "app/util/common.h"
 
 #include "gen/attribute-id.h"
 #include "gen/attribute-type.h"
@@ -61,6 +61,19 @@
 #endif // EMBER_AF_PLUGIN_REPORTING
 
 using namespace chip;
+
+// Function for Compatibility
+namespace chip {
+namespace app {
+namespace Compatibility {
+bool IMEmberAfSendDefaultResponseWithCallback(EmberAfStatus status);
+bool __attribute__((weak)) IMEmberAfSendDefaultResponseWithCallback(EmberAfStatus status)
+{
+    return false;
+}
+} // namespace Compatibility
+} // namespace app
+} // namespace chip
 
 //------------------------------------------------------------------------------
 // Forward Declarations
@@ -315,7 +328,7 @@ void emberAfStackDown(void)
     // (Issue 77101) Also don't clear the table if the stack has gone down as a
     // a result of losing its parent or some other transient state where a future
     // rejoin is expected to get us back online.
-    if (false
+    if ((false)
         // emberStackIsPerformingRejoin() == false
         // && emberNetworkState() == EMBER_NO_NETWORK
     )
@@ -777,6 +790,12 @@ EmberStatus emberAfSendDefaultResponseWithCallback(const EmberAfClusterCommand *
                                                    EmberAfMessageSentFunction callback)
 {
     uint8_t frameControl;
+
+    if (chip::app::Compatibility::IMEmberAfSendDefaultResponseWithCallback(status))
+    {
+        // If the compatibility can handle this response
+        return EMBER_SUCCESS;
+    }
 
     // Default Response commands are only sent in response to unicast commands.
     if (cmd->type != EMBER_INCOMING_UNICAST && cmd->type != EMBER_INCOMING_UNICAST_REPLY)

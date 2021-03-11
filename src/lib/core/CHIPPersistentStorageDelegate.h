@@ -85,11 +85,24 @@ public:
      *   some duration.
      *
      * @param[in]      key Key to lookup
-     * @param[out]     value Value for the key
-     * @param[in, out] size Input value buffer size, output length of value.
-     *                 The output length could be larger than input value. In
+     * @param[out]     value Value for the key.  This will always be
+     *                 null-terminated if the function succeeds.
+     * @param[in, out] size Input value buffer size, output size of buffer
+     *                 needed to store the value.  Note that due to
+     *                 null-termination this will be 1 bigger than the "length"
+     *                 of the value.
+     *
+     *                 The output size could be larger than input value. In
      *                 such cases, the user should allocate the buffer large
-     *                 enough (>= output length), and call the API again.
+     *                 enough (>= output size), and call the API again.  In this
+     *                 case GetKeyValue will place as many bytes as it can in
+     *                 the buffer and return CHIP_ERROR_NO_MEMORY.
+     *
+     *                 If value is null, the input size is treated as 0.
+     *
+     * @return CHIP_ERROR_KEY_NOT_FOUND there is no value for the given key.
+     * @return CHIP_ERROR_NO_MEMORY if the input buffer is not big enough for
+     *                              the value.
      */
     virtual CHIP_ERROR GetKeyValue(const char * key, char * value, uint16_t & size) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 

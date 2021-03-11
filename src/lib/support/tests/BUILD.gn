@@ -16,7 +16,7 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/nlunit_test.gni")
 
-import("${build_root}/chip/chip_test_suite.gni")
+import("${chip_root}/build/chip/chip_test_suite.gni")
 
 chip_test_suite("tests") {
   output_name = "libSupportTests"
@@ -31,6 +31,7 @@ chip_test_suite("tests") {
     "TestErrorStr.cpp",
     "TestPool.cpp",
     "TestSafeInt.cpp",
+    "TestSafeString.cpp",
     "TestScopedBuffer.cpp",
     "TestSerializableIntegerSet.cpp",
     "TestStringBuilder.cpp",
