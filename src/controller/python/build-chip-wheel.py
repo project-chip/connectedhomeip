@@ -126,6 +126,8 @@ try:
     #
     packages=[
             'chip',
+            'chip.ble',
+            'chip.ble.commissioning',
             'chip.configuration',
             'chip.exceptions',
             'chip.internal',
@@ -133,10 +135,6 @@ try:
             'chip.native',
             'chip.tlv',
     ]
-
-    if os.path.isdir(os.path.join(tmpDir, 'chip', 'ble')):
-      packages += ['chip.ble']
-      packages += ['chip.ble.commissioning']
 
     # Invoke the setuptools 'bdist_wheel' command to generate a wheel containing
     # the CHIP python packages, shared libraries and scripts.
