@@ -23,7 +23,10 @@ nsapi_version_t Inet2Nsapi(int family)
         return NSAPI_UNSPEC;
     }
 }
-
+void msghdr2Netsocket(SocketAddress * dst, struct sockaddr_in * src)
+{
+    dst->set_ip_bytes((const void *) src->sin_addr.s_addr, Inet2Nsapi(src->sin_family));
+}
 void Sockaddr2Netsocket(SocketAddress * dst, struct sockaddr * src)
 {
     sockaddr_in * addr = reinterpret_cast<sockaddr_in *>(src);
@@ -231,7 +234,17 @@ ssize_t mbed_sendto(int sock, const void * buf, size_t len, int flags, const str
 
 ssize_t mbed_sendmsg(int sock, const struct msghdr * message, int flags)
 {
-    return 0;
+    auto * socket = getSocket(sock);
+    if (socket == nullptr)
+    {
+        set_errno(ENOBUFS);
+        return -1;
+    }
+    SocketAddress sockAddr;
+
+    msghdr2Netsocket(&sockAddr, (struct sockaddr_in *) message->msg_name);
+
+    return socket->sendto(sockAddr, (void *) message, sizeof(msghdr));
 }
 
 ssize_t mbed_recvfrom(int sock, void * buf, size_t max_len, int flags, struct sockaddr * src_addr, socklen_t * addrlen)
@@ -290,7 +303,16 @@ int mbed_getpeername(int sockfd, struct sockaddr * addr, socklen_t * addrlen)
 
 ssize_t mbed_recvmsg(int socket, struct msghdr * message, int flags)
 {
-    return 0;
+    auto * sock = getSocket(socket);
+    if (sock == nullptr)
+    {
+        set_errno(ENOBUFS);
+        return -1;
+    }
+    SocketAddress sockAddr;
+    msghdr2Netsocket(&sockAddr, (struct sockaddr_in *) message->msg_name);
+
+    return sock->sendto(sockAddr, (void *) message, sizeof(msghdr));
 }
 
 int mbed_select(int nfds, fd_set * readfds, fd_set * writefds, fd_set * exceptfds, struct timeval * timeout)

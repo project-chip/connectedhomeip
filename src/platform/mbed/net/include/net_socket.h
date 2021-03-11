@@ -5,9 +5,9 @@
 #include <netsocket/TCPSocket.h>
 #include <netsocket/UDPSocket.h>
 
+#include <platform/FileHandle.h>
 #include <sys/select.h>
 #include <sys/socket.h>
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -19,11 +19,14 @@ extern "C" {
 #define ERR_NO_MEMORY -1
 #define ERR_OPEN -2
 #define ERR_NO_SOCKET -3
-struct BSDSocket
+struct BSDSocket : public ::mbed::FileHandle
 {
     BSDSocket() {}
     ~BSDSocket() {}
-
+    ssize_t read(void *, size_t) {}
+    ssize_t write(const void *, size_t) {}
+    off_t seek(off_t offset, int whence = SEEK_SET) {}
+    int close() {}
     union
     {
 
