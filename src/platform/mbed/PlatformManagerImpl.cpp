@@ -5,6 +5,10 @@
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl.cpp>
 
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+#include <lwip/tcpip.h>
+#endif
+
 namespace chip {
 namespace DeviceLayer {
 
@@ -37,6 +41,11 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
         ChipLogError(DeviceLayer, "Trying to reinitialize the stack");
         return CHIP_ERROR_INCORRECT_STATE;
     }
+
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+    // Initialize LwIP.
+    tcpip_init(NULL, NULL);
+#endif
 
     // Call up to the base class _InitChipStack() to perform the bulk of the initialization.
     auto err = GenericPlatformManagerImpl<ImplClass>::_InitChipStack();
