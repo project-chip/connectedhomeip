@@ -48,6 +48,16 @@ private:
 
     void StartTimer(uint32_t aTimeoutInMs);
 
+    enum Function_t
+    {
+        kFunction_NoneSelected   = 0,
+        kFunction_SoftwareUpdate = 0,
+        kFunction_FactoryReset,
+
+        kFunction_Invalid
+    };
+
+    Function_t mFunction;
     bool mFunctionTimerActive;
     static AppTask sAppTask;
 };

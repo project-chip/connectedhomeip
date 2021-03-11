@@ -17,9 +17,21 @@
         }
     },
     "config": {
+        "system-state-led": {
+            "help": "System status LED.",
+            "value": "LED1"
+        },
+        "lock-state-led": {
+            "help": "Lock status LED.",
+            "value": "LED2"
+        },
         "actuator-movement-period-ms": {
             "help": "Time it takes in ms for the simulated actuator to move from one state to another.",
             "value": 2000
+        },
+        "led-active-state": {
+            "help": "GPIO output to turn the LED on.",
+            "value": 0
         }
     }
 }
