@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2019 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -90,14 +90,14 @@ class BLEManagerImpl final : public BLEManager, private BleLayer, private BlePla
 
     // ===== Private members reserved for use by this class only.
 
-    enum
+    enum class Flags : uint16_t
     {
-        kFlag_AdvertisingEnabled     = 0x0001,
-        kFlag_FastAdvertisingEnabled = 0x0002,
-        kFlag_Advertising            = 0x0004,
-        kFlag_RestartAdvertising     = 0x0008,
-        kFlag_EFRBLEStackInitialized = 0x0010,
-        kFlag_DeviceNameSet          = 0x0020,
+        kAdvertisingEnabled     = 0x0001,
+        kFastAdvertisingEnabled = 0x0002,
+        kAdvertising            = 0x0004,
+        kRestartAdvertising     = 0x0008,
+        kEFRBLEStackInitialized = 0x0010,
+        kDeviceNameSet          = 0x0020,
     };
 
     enum
@@ -121,7 +121,7 @@ class BLEManagerImpl final : public BLEManager, private BleLayer, private BlePla
     CHIPoBLEConState mBleConnections[kMaxConnections];
     uint8_t mIndConfId[kMaxConnections];
     CHIPoBLEServiceMode mServiceMode;
-    uint16_t mFlags;
+    BitFlags<Flags> mFlags;
     char mDeviceName[kMaxDeviceNameLength + 1];
     // The advertising set handle allocated from Bluetooth stack.
     uint8_t advertising_set_handle = 0xff;
@@ -182,12 +182,12 @@ inline BLEManager::CHIPoBLEServiceMode BLEManagerImpl::_GetCHIPoBLEServiceMode(v
 
 inline bool BLEManagerImpl::_IsAdvertisingEnabled(void)
 {
-    return GetFlag(mFlags, kFlag_AdvertisingEnabled);
+    return mFlags.Has(Flags::kAdvertisingEnabled);
 }
 
 inline bool BLEManagerImpl::_IsFastAdvertisingEnabled(void)
 {
-    return GetFlag(mFlags, kFlag_FastAdvertisingEnabled);
+    return mFlags.Has(Flags::kFastAdvertisingEnabled);
 }
 
 } // namespace Internal

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2019 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,6 +25,9 @@
 #pragma once
 
 #include <platform/ThreadStackManager.h>
+#include <support/BitFlags.h>
+
+#include <cstdint>
 
 namespace chip {
 namespace DeviceLayer {
@@ -73,13 +76,13 @@ protected:
 private:
     // ===== Private members reserved for use by this class only.
 
-    enum Flags
+    enum class Flags : uint8_t
     {
-        kFlag_HaveServiceConnectivity = 0x01,
-        kFlag_IsApplicationControlled = 0x02
+        kHaveServiceConnectivity = 0x01,
+        kIsApplicationControlled = 0x02
     };
 
-    uint8_t mFlags;
+    BitFlags<Flags> mFlags;
 
     ImplClass * Impl() { return static_cast<ImplClass *>(this); }
 };
@@ -87,7 +90,7 @@ private:
 template <class ImplClass>
 inline void GenericConnectivityManagerImpl_Thread<ImplClass>::_Init()
 {
-    mFlags = 0;
+    mFlags.ClearAll();
 }
 
 template <class ImplClass>
@@ -99,7 +102,7 @@ inline bool GenericConnectivityManagerImpl_Thread<ImplClass>::_IsThreadEnabled()
 template <class ImplClass>
 inline bool GenericConnectivityManagerImpl_Thread<ImplClass>::_IsThreadApplicationControlled()
 {
-    return GetFlag(mFlags, kFlag_IsApplicationControlled);
+    return mFlags.Has(Flags::kIsApplicationControlled);
 }
 
 template <class ImplClass>
@@ -150,7 +153,7 @@ inline CHIP_ERROR GenericConnectivityManagerImpl_Thread<ImplClass>::_SetThreadPo
 template <class ImplClass>
 inline bool GenericConnectivityManagerImpl_Thread<ImplClass>::_HaveServiceConnectivityViaThread()
 {
-    return GetFlag(mFlags, kFlag_HaveServiceConnectivity);
+    return mFlags.Has(Flags::kHaveServiceConnectivity);
 }
 
 } // namespace Internal

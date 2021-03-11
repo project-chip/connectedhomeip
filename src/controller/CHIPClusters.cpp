@@ -114,7 +114,7 @@ CHIP_ERROR BarrierControlCluster::BarrierControlGoToPercent(Callback::Cancelable
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kBarrierControlGoToPercentCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -148,7 +148,7 @@ CHIP_ERROR BarrierControlCluster::BarrierControlStop(Callback::Cancelable * onSu
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kBarrierControlStopCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -227,7 +227,7 @@ CHIP_ERROR BasicCluster::MfgSpecificPing(Callback::Cancelable * onSuccessCallbac
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMfgSpecificPingCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -257,7 +257,7 @@ CHIP_ERROR BasicCluster::ResetToFactoryDefaults(Callback::Cancelable * onSuccess
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kResetToFactoryDefaultsCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -319,7 +319,7 @@ CHIP_ERROR BindingCluster::Bind(Callback::Cancelable * onSuccessCallback, Callba
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kBindCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -360,7 +360,7 @@ CHIP_ERROR BindingCluster::Unbind(Callback::Cancelable * onSuccessCallback, Call
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kUnbindCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -416,7 +416,7 @@ CHIP_ERROR ColorControlCluster::MoveColor(Callback::Cancelable * onSuccessCallba
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveColorCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -458,7 +458,7 @@ CHIP_ERROR ColorControlCluster::MoveColorTemperature(Callback::Cancelable * onSu
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveColorTemperatureCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -502,7 +502,7 @@ CHIP_ERROR ColorControlCluster::MoveHue(Callback::Cancelable * onSuccessCallback
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveHueCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -542,7 +542,7 @@ CHIP_ERROR ColorControlCluster::MoveSaturation(Callback::Cancelable * onSuccessC
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveSaturationCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -583,7 +583,7 @@ CHIP_ERROR ColorControlCluster::MoveToColor(Callback::Cancelable * onSuccessCall
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveToColorCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -626,7 +626,7 @@ CHIP_ERROR ColorControlCluster::MoveToColorTemperature(Callback::Cancelable * on
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveToColorTemperatureCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -667,7 +667,7 @@ CHIP_ERROR ColorControlCluster::MoveToHue(Callback::Cancelable * onSuccessCallba
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveToHueCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -710,7 +710,7 @@ CHIP_ERROR ColorControlCluster::MoveToHueAndSaturation(Callback::Cancelable * on
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveToHueAndSaturationCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -753,7 +753,7 @@ CHIP_ERROR ColorControlCluster::MoveToSaturation(Callback::Cancelable * onSucces
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveToSaturationCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -794,7 +794,7 @@ CHIP_ERROR ColorControlCluster::StepColor(Callback::Cancelable * onSuccessCallba
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kStepColorCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -838,7 +838,7 @@ CHIP_ERROR ColorControlCluster::StepColorTemperature(Callback::Cancelable * onSu
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kStepColorTemperatureCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -886,7 +886,7 @@ CHIP_ERROR ColorControlCluster::StepHue(Callback::Cancelable * onSuccessCallback
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kStepHueCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -929,7 +929,7 @@ CHIP_ERROR ColorControlCluster::StepSaturation(Callback::Cancelable * onSuccessC
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kStepSaturationCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -971,7 +971,7 @@ CHIP_ERROR ColorControlCluster::StopMoveStep(Callback::Cancelable * onSuccessCal
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kStopMoveStepCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -1610,7 +1610,7 @@ CHIP_ERROR ContentLaunchCluster::LaunchContent(Callback::Cancelable * onSuccessC
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kLaunchContentCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -1640,7 +1640,7 @@ CHIP_ERROR ContentLaunchCluster::LaunchURL(Callback::Cancelable * onSuccessCallb
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kLaunchURLCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -1687,7 +1687,7 @@ CHIP_ERROR DoorLockCluster::ClearAllPins(Callback::Cancelable * onSuccessCallbac
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kClearAllPinsCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -1717,7 +1717,7 @@ CHIP_ERROR DoorLockCluster::ClearAllRfids(Callback::Cancelable * onSuccessCallba
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kClearAllRfidsCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -1748,7 +1748,7 @@ CHIP_ERROR DoorLockCluster::ClearHolidaySchedule(Callback::Cancelable * onSucces
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kClearHolidayScheduleCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -1781,7 +1781,7 @@ CHIP_ERROR DoorLockCluster::ClearPin(Callback::Cancelable * onSuccessCallback, C
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kClearPinCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -1814,7 +1814,7 @@ CHIP_ERROR DoorLockCluster::ClearRfid(Callback::Cancelable * onSuccessCallback, 
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kClearRfidCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -1847,7 +1847,7 @@ CHIP_ERROR DoorLockCluster::ClearWeekdaySchedule(Callback::Cancelable * onSucces
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kClearWeekdayScheduleCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -1883,7 +1883,7 @@ CHIP_ERROR DoorLockCluster::ClearYeardaySchedule(Callback::Cancelable * onSucces
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kClearYeardayScheduleCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -1919,7 +1919,7 @@ CHIP_ERROR DoorLockCluster::GetHolidaySchedule(Callback::Cancelable * onSuccessC
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetHolidayScheduleCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -1952,7 +1952,7 @@ CHIP_ERROR DoorLockCluster::GetLogRecord(Callback::Cancelable * onSuccessCallbac
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetLogRecordCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -1985,7 +1985,7 @@ CHIP_ERROR DoorLockCluster::GetPin(Callback::Cancelable * onSuccessCallback, Cal
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetPinCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -2018,7 +2018,7 @@ CHIP_ERROR DoorLockCluster::GetRfid(Callback::Cancelable * onSuccessCallback, Ca
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetRfidCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -2051,7 +2051,7 @@ CHIP_ERROR DoorLockCluster::GetUserType(Callback::Cancelable * onSuccessCallback
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetUserTypeCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -2084,7 +2084,7 @@ CHIP_ERROR DoorLockCluster::GetWeekdaySchedule(Callback::Cancelable * onSuccessC
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetWeekdayScheduleCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -2120,7 +2120,7 @@ CHIP_ERROR DoorLockCluster::GetYeardaySchedule(Callback::Cancelable * onSuccessC
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetYeardayScheduleCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -2155,7 +2155,7 @@ CHIP_ERROR DoorLockCluster::LockDoor(Callback::Cancelable * onSuccessCallback, C
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kLockDoorCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -2189,7 +2189,7 @@ CHIP_ERROR DoorLockCluster::SetHolidaySchedule(Callback::Cancelable * onSuccessC
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kSetHolidayScheduleCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -2229,7 +2229,7 @@ CHIP_ERROR DoorLockCluster::SetPin(Callback::Cancelable * onSuccessCallback, Cal
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kSetPinCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -2269,7 +2269,7 @@ CHIP_ERROR DoorLockCluster::SetRfid(Callback::Cancelable * onSuccessCallback, Ca
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kSetRfidCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -2309,7 +2309,7 @@ CHIP_ERROR DoorLockCluster::SetUserType(Callback::Cancelable * onSuccessCallback
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kSetUserTypeCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -2345,7 +2345,7 @@ CHIP_ERROR DoorLockCluster::SetWeekdaySchedule(Callback::Cancelable * onSuccessC
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kSetWeekdayScheduleCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -2391,7 +2391,7 @@ CHIP_ERROR DoorLockCluster::SetYeardaySchedule(Callback::Cancelable * onSuccessC
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kSetYeardayScheduleCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -2431,7 +2431,7 @@ CHIP_ERROR DoorLockCluster::UnlockDoor(Callback::Cancelable * onSuccessCallback,
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kUnlockDoorCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -2464,7 +2464,7 @@ CHIP_ERROR DoorLockCluster::UnlockWithTimeout(Callback::Cancelable * onSuccessCa
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kUnlockWithTimeoutCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -2556,7 +2556,7 @@ CHIP_ERROR GeneralCommissioningCluster::ArmFailSafe(Callback::Cancelable * onSuc
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kArmFailSafeCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -2594,7 +2594,7 @@ CHIP_ERROR GeneralCommissioningCluster::CommissioningComplete(Callback::Cancelab
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kCommissioningCompleteCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -2626,7 +2626,7 @@ CHIP_ERROR GeneralCommissioningCluster::SetFabric(Callback::Cancelable * onSucce
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kSetFabricCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -2707,7 +2707,7 @@ CHIP_ERROR GroupsCluster::AddGroup(Callback::Cancelable * onSuccessCallback, Cal
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kAddGroupCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -2742,7 +2742,7 @@ CHIP_ERROR GroupsCluster::AddGroupIfIdentifying(Callback::Cancelable * onSuccess
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kAddGroupIfIdentifyingCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -2778,7 +2778,7 @@ CHIP_ERROR GroupsCluster::GetGroupMembership(Callback::Cancelable * onSuccessCal
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetGroupMembershipCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -2813,7 +2813,7 @@ CHIP_ERROR GroupsCluster::RemoveAllGroups(Callback::Cancelable * onSuccessCallba
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kRemoveAllGroupsCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -2844,7 +2844,7 @@ CHIP_ERROR GroupsCluster::RemoveGroup(Callback::Cancelable * onSuccessCallback, 
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kRemoveGroupCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -2877,7 +2877,7 @@ CHIP_ERROR GroupsCluster::ViewGroup(Callback::Cancelable * onSuccessCallback, Ca
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kViewGroupCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -2996,7 +2996,7 @@ CHIP_ERROR IdentifyCluster::Identify(Callback::Cancelable * onSuccessCallback, C
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kIdentifyCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -3028,7 +3028,7 @@ CHIP_ERROR IdentifyCluster::IdentifyQuery(Callback::Cancelable * onSuccessCallba
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kIdentifyQueryCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -3091,7 +3091,7 @@ CHIP_ERROR LevelControlCluster::Move(Callback::Cancelable * onSuccessCallback, C
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -3131,7 +3131,7 @@ CHIP_ERROR LevelControlCluster::MoveToLevel(Callback::Cancelable * onSuccessCall
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveToLevelCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -3172,7 +3172,7 @@ CHIP_ERROR LevelControlCluster::MoveToLevelWithOnOff(Callback::Cancelable * onSu
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveToLevelWithOnOffCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -3208,7 +3208,7 @@ CHIP_ERROR LevelControlCluster::MoveWithOnOff(Callback::Cancelable * onSuccessCa
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveWithOnOffCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -3244,7 +3244,7 @@ CHIP_ERROR LevelControlCluster::Step(Callback::Cancelable * onSuccessCallback, C
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kStepCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -3286,7 +3286,7 @@ CHIP_ERROR LevelControlCluster::StepWithOnOff(Callback::Cancelable * onSuccessCa
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kStepWithOnOffCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -3324,7 +3324,7 @@ CHIP_ERROR LevelControlCluster::Stop(Callback::Cancelable * onSuccessCallback, C
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kStopCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -3358,7 +3358,7 @@ CHIP_ERROR LevelControlCluster::StopWithOnOff(Callback::Cancelable * onSuccessCa
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kStopWithOnOffCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -3475,7 +3475,7 @@ CHIP_ERROR MediaPlaybackCluster::FastForwardRequest(Callback::Cancelable * onSuc
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kFastForwardRequestCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -3505,7 +3505,7 @@ CHIP_ERROR MediaPlaybackCluster::NextRequest(Callback::Cancelable * onSuccessCal
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kNextRequestCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -3535,7 +3535,7 @@ CHIP_ERROR MediaPlaybackCluster::PauseRequest(Callback::Cancelable * onSuccessCa
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kPauseRequestCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -3565,7 +3565,7 @@ CHIP_ERROR MediaPlaybackCluster::PlayRequest(Callback::Cancelable * onSuccessCal
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kPlayRequestCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -3595,7 +3595,7 @@ CHIP_ERROR MediaPlaybackCluster::PreviousRequest(Callback::Cancelable * onSucces
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kPreviousRequestCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -3625,7 +3625,7 @@ CHIP_ERROR MediaPlaybackCluster::RewindRequest(Callback::Cancelable * onSuccessC
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kRewindRequestCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -3656,7 +3656,7 @@ CHIP_ERROR MediaPlaybackCluster::SkipBackwardRequest(Callback::Cancelable * onSu
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kSkipBackwardRequestCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -3687,7 +3687,7 @@ CHIP_ERROR MediaPlaybackCluster::SkipForwardRequest(Callback::Cancelable * onSuc
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kSkipForwardRequestCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -3718,7 +3718,7 @@ CHIP_ERROR MediaPlaybackCluster::StartOverRequest(Callback::Cancelable * onSucce
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kStartOverRequestCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -3748,7 +3748,7 @@ CHIP_ERROR MediaPlaybackCluster::StopRequest(Callback::Cancelable * onSuccessCal
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kStopRequestCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -3805,7 +3805,7 @@ CHIP_ERROR NetworkCommissioningCluster::AddThreadNetwork(Callback::Cancelable * 
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kAddThreadNetworkCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -3844,7 +3844,7 @@ CHIP_ERROR NetworkCommissioningCluster::AddWiFiNetwork(Callback::Cancelable * on
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kAddWiFiNetworkCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -3885,7 +3885,7 @@ CHIP_ERROR NetworkCommissioningCluster::DisableNetwork(Callback::Cancelable * on
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kDisableNetworkCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -3924,7 +3924,7 @@ CHIP_ERROR NetworkCommissioningCluster::EnableNetwork(Callback::Cancelable * onS
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kEnableNetworkCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -3963,7 +3963,7 @@ CHIP_ERROR NetworkCommissioningCluster::GetLastNetworkCommissioningResult(Callba
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetLastNetworkCommissioningResultCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -3998,7 +3998,7 @@ CHIP_ERROR NetworkCommissioningCluster::RemoveNetwork(Callback::Cancelable * onS
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kRemoveNetworkCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -4037,7 +4037,7 @@ CHIP_ERROR NetworkCommissioningCluster::ScanNetworks(Callback::Cancelable * onSu
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kScanNetworksCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -4077,7 +4077,7 @@ CHIP_ERROR NetworkCommissioningCluster::UpdateThreadNetwork(Callback::Cancelable
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kUpdateThreadNetworkCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -4116,7 +4116,7 @@ CHIP_ERROR NetworkCommissioningCluster::UpdateWiFiNetwork(Callback::Cancelable *
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kUpdateWiFiNetworkCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -4172,7 +4172,7 @@ CHIP_ERROR OnOffCluster::Off(Callback::Cancelable * onSuccessCallback, Callback:
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kOffCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -4202,7 +4202,7 @@ CHIP_ERROR OnOffCluster::On(Callback::Cancelable * onSuccessCallback, Callback::
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kOnCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -4232,7 +4232,7 @@ CHIP_ERROR OnOffCluster::Toggle(Callback::Cancelable * onSuccessCallback, Callba
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kToggleCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -4301,7 +4301,7 @@ CHIP_ERROR ScenesCluster::AddScene(Callback::Cancelable * onSuccessCallback, Cal
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kAddSceneCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -4347,7 +4347,7 @@ CHIP_ERROR ScenesCluster::GetSceneMembership(Callback::Cancelable * onSuccessCal
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetSceneMembershipCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -4380,7 +4380,7 @@ CHIP_ERROR ScenesCluster::RecallScene(Callback::Cancelable * onSuccessCallback, 
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kRecallSceneCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -4418,7 +4418,7 @@ CHIP_ERROR ScenesCluster::RemoveAllScenes(Callback::Cancelable * onSuccessCallba
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kRemoveAllScenesCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -4451,7 +4451,7 @@ CHIP_ERROR ScenesCluster::RemoveScene(Callback::Cancelable * onSuccessCallback, 
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kRemoveSceneCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -4486,7 +4486,7 @@ CHIP_ERROR ScenesCluster::StoreScene(Callback::Cancelable * onSuccessCallback, C
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kStoreSceneCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -4521,7 +4521,7 @@ CHIP_ERROR ScenesCluster::ViewScene(Callback::Cancelable * onSuccessCallback, Ca
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kViewSceneCommandId,
-                                              (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand             = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();

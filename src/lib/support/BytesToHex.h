@@ -18,13 +18,15 @@
 #pragma once
 
 #include <core/CHIPError.h>
+#include <support/BitFlags.h>
+
 #include <stdint.h>
 #include <stdlib.h>
 
 namespace chip {
 namespace Encoding {
 
-enum HexFlags : int
+enum class HexFlags : int
 {
     kNone = 0u,
     // Use uppercase A-F if set otherwise, lowercase a-f
@@ -68,7 +70,7 @@ enum HexFlags : int
  * @return CHIP_NO_ERROR on success
  */
 
-CHIP_ERROR BytesToHex(const uint8_t * src_bytes, size_t src_size, char * dest_hex, size_t dest_size_max, HexFlags flags);
+CHIP_ERROR BytesToHex(const uint8_t * src_bytes, size_t src_size, char * dest_hex, size_t dest_size_max, BitFlags<HexFlags> flags);
 
 // Alias for Uppercase option, no null-termination
 inline CHIP_ERROR BytesToUppercaseHexBuffer(const uint8_t * src_bytes, size_t src_size, char * dest_hex_buf, size_t dest_size_max)

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -319,9 +319,9 @@ CHIP_ERROR PacketHeader::EncodeBeforeData(const System::PacketBufferHandle & buf
 
 CHIP_ERROR PayloadHeader::Encode(uint8_t * data, uint16_t size, uint16_t * encode_size) const
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    uint8_t * p    = data;
-    uint8_t header = mExchangeFlags.Raw();
+    CHIP_ERROR err       = CHIP_NO_ERROR;
+    uint8_t * p          = data;
+    const uint8_t header = mExchangeFlags.Raw();
 
     VerifyOrExit(size >= EncodeSizeBytes(), err = CHIP_ERROR_INVALID_ARGUMENT);
 
