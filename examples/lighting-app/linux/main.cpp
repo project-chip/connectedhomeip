@@ -168,7 +168,7 @@ int main(int argc, char * argv[])
 
     chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName(nullptr); // Use default device name (CHIP-XXXX)
 
-#ifdef CONFIG_NETWORK_BLE
+#if CONFIG_NETWORK_LAYER_BLE
     chip::DeviceLayer::Internal::BLEMgrImpl().ConfigureBle(LinuxDeviceOptions::GetInstance().mBleDevice, false);
 #endif
 
