@@ -545,7 +545,7 @@ INET_ERROR UDPEndPoint::SendMsg(const IPPacketInfo * pktInfo, System::PacketBuff
 
     pbuf * msgCopy = NULL;
 
-    if (sendFlags & IPEndPointBasis::kSendFlag_RetainBuffer)
+    if (msg.IsRetained())
     {
         // when retaining a buffer, the caller expects the msg to be
         // unmodified.  LwIP stack will normally prepend the packet
@@ -562,6 +562,10 @@ INET_ERROR UDPEndPoint::SendMsg(const IPPacketInfo * pktInfo, System::PacketBuff
         }
 
         pbuf_chain(msgCopy, System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(msg));
+    }
+    else
+    {
+        msgCopy = System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(msg);
     }
 
     // Lock LwIP stack
@@ -655,10 +659,10 @@ INET_ERROR UDPEndPoint::SendMsg(const IPPacketInfo * pktInfo, System::PacketBuff
     // Unlock LwIP stack
     UNLOCK_TCPIP_CORE();
 
-    if (sendFlags & IPEndPointBasis::kSendFlag_RetainBuffer)
+    if (msg.IsRetained())
     {
-        /* Disconnect the temporary head pbuf from the remaining pbufs in chain */
-        msgCopy->next = NULL;
+        /* Dechains the temporary head pbuf from its succeeding pbufs in the chain */
+        pbuf_dechain(msgCopy);
         pbuf_free(msgCopy);
     }
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP

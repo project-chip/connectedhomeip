@@ -182,17 +182,12 @@ CHIP_ERROR ExchangeContext::SendMessageImpl(uint16_t protocolId, uint8_t msgType
     if (payloadHeader.NeedsAck())
     {
         ReliableMessageMgr::RetransTableEntry * entry = nullptr;
-        PacketHeader packetHeader;
 
         // Add to Table for subsequent sending
         err = mExchangeMgr->GetReliableMessageMgr()->AddToRetransTable(&mReliableMessageContext, &entry);
         SuccessOrExit(err);
 
-        // Set the flag to indicate the buffer is retained after adding the buffer to the retransmission table successfully.
-        packetHeader.SetRetainedBuffer(true);
-
-        err = mExchangeMgr->GetSessionMgr()->SendMessage(mSecureSession, payloadHeader, packetHeader, std::move(msgBuf),
-                                                         &entry->retainedBuf);
+        err = mExchangeMgr->GetSessionMgr()->SendMessage(mSecureSession, payloadHeader, std::move(msgBuf), &entry->retainedBuf);
 
         if (err != CHIP_NO_ERROR)
         {
