@@ -89,11 +89,11 @@ void ReadClient::ClearState(void)
 
 CHIP_ERROR ReadClient::SendReadRequest(NodeId aNodeId, Transport::AdminId aAdminId)
 {
-    CHIP_ERROR err                    = CHIP_NO_ERROR;
-    System::PacketBufferHandle msgBuf = nullptr;
+    CHIP_ERROR err                        = CHIP_NO_ERROR;
+    System::PacketBufferHandle msgBuf     = nullptr;
     EventPathParams * eventPathParamsList = nullptr;
-    size_t aEventPathParamsListSize = 0;
-    size_t eventNumber = 0;
+    size_t aEventPathParamsListSize       = 0;
+    size_t eventNumber                    = 0;
     ChipLogDetail(DataManagement, "Client[%u] [%5.5s]", InteractionModelEngine::GetInstance()->GetReadClientArrayIndex(this),
                   GetStateStr());
     VerifyOrExit(ClientState::Initialized == mState, err = CHIP_ERROR_INCORRECT_STATE);
@@ -115,9 +115,9 @@ CHIP_ERROR ReadClient::SendReadRequest(NodeId aNodeId, Transport::AdminId aAdmin
         err = request.Init(&writer);
         SuccessOrExit(err);
 
-        if (aEventPathParamsListSize != 0 && eventPathParamsList!= nullptr)
+        if (aEventPathParamsListSize != 0 && eventPathParamsList != nullptr)
         {
-            //fill to construct event paths
+            // fill to construct event paths
         }
         request.EndOfReadRequest();
         SuccessOrExit(request.GetError());

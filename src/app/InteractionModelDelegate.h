@@ -54,14 +54,22 @@ public:
      * on the server for optimization purposes
      * @param[out] CHIP_ERROR
      */
-    virtual CHIP_ERROR HandlePathPrepareNeededCallBack(EventPathParams *& aEventPathParamsList, size_t & aEventPathParamsListSize, uint64_t & aEventNumber) { return CHIP_ERROR_NOT_IMPLEMENTED; };
+    virtual CHIP_ERROR HandlePathPrepareNeededCallBack(EventPathParams *& aEventPathParamsList, size_t & aEventPathParamsListSize,
+                                                       uint64_t & aEventNumber)
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    };
     /**
-    * IM notify zcl events can be further processed in app.
-    * @param[in]  apExchangeContext   ExchangeContext managed externally and should not be closed by zcl processing.
-    * @param[in]  aEventPathParamsListSize  EventList tlv reader, upper layer can process event list.
-    * @param[out] CHIP_ERROR
-    */
-    virtual CHIP_ERROR HandleEventStreamReceivedCallBack(Messaging::ExchangeContext * apExchangeContext,  chip::TLV::TLVReader * apReader) { return CHIP_ERROR_NOT_IMPLEMENTED;}
+     * IM notify zcl events can be further processed in app.
+     * @param[in]  apExchangeContext   ExchangeContext managed externally and should not be closed by zcl processing.
+     * @param[in]  aEventPathParamsListSize  EventList tlv reader, upper layer can process event list.
+     * @param[out] CHIP_ERROR
+     */
+    virtual CHIP_ERROR HandleEventStreamReceivedCallBack(Messaging::ExchangeContext * apExchangeContext,
+                                                         chip::TLV::TLVReader * apReader)
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
 
     // IM notify zcl all reports have been processed.
     virtual CHIP_ERROR HandleReportProcessedCallBack() { return CHIP_ERROR_NOT_IMPLEMENTED; }

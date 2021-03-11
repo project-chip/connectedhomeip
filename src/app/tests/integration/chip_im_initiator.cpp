@@ -214,8 +214,16 @@ void HandleReadComplete()
 class MockInteractionModelApp : public chip::app::InteractionModelDelegate
 {
 public:
-    CHIP_ERROR HandlePathPrepareNeededCallBack(chip::app::EventPathParams *& aEventPathParamsList, size_t & aEventPathParamsListSize, uint64_t & aEventNumber) override { return CHIP_NO_ERROR; }
-    CHIP_ERROR HandleEventStreamReceivedCallBack(chip::Messaging::ExchangeContext * apExchangeContext,  chip::TLV::TLVReader * apReader) override { return CHIP_NO_ERROR;}
+    CHIP_ERROR HandlePathPrepareNeededCallBack(chip::app::EventPathParams *& aEventPathParamsList,
+                                               size_t & aEventPathParamsListSize, uint64_t & aEventNumber) override
+    {
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR HandleEventStreamReceivedCallBack(chip::Messaging::ExchangeContext * apExchangeContext,
+                                                 chip::TLV::TLVReader * apReader) override
+    {
+        return CHIP_NO_ERROR;
+    }
     CHIP_ERROR HandleReportProcessedCallBack() override
     {
         HandleReadComplete();
