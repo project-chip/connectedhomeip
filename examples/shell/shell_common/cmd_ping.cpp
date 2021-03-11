@@ -15,9 +15,9 @@
  *    limitations under the License.
  */
 
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <errno.h>
 
 #include <core/CHIPCore.h>
 #include <messaging/ExchangeMgr.h>
