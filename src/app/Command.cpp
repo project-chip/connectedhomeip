@@ -152,10 +152,18 @@ chip::TLV::TLVWriter & Command::CreateCommandDataElementTLVWriter()
     return mCommandDataWriter;
 }
 
-CHIP_ERROR Command::AddCommand(chip::EndpointId aEndpointId, chip::GroupId aGroupId, chip::ClusterId aClusterId,
-                               chip::CommandId aCommandId, BitFlags<CommandPathFlags> aFlags)
+CHIP_ERROR Command::AddCommand(chip::EndpointId aEndpintId, chip::GroupId aGroupId, chip::ClusterId aClusterId,
+                               chip::CommandId aCommandId, uint8_t aFlags)
 {
-    CommandParams commandParams(aEndpointId, aGroupId, aClusterId, aCommandId, aFlags);
+    CommandParams commandParams;
+
+    memset(&commandParams, 0, sizeof(CommandParams));
+
+    commandParams.EndpointId = aEndpintId;
+    commandParams.GroupId    = aGroupId;
+    commandParams.ClusterId  = aClusterId;
+    commandParams.CommandId  = aCommandId;
+    commandParams.Flags      = aFlags;
 
     return AddCommand(commandParams);
 }
@@ -183,12 +191,12 @@ CHIP_ERROR Command::AddCommand(CommandParams & aCommandParams)
         CommandDataElement::Builder commandDataElement =
             mInvokeCommandBuilder.GetCommandListBuilder().CreateCommandDataElementBuilder();
         CommandPath::Builder commandPath = commandDataElement.CreateCommandPathBuilder();
-        if (aCommandParams.Flags.Has(CommandPathFlags::kEndpointIdValid))
+        if (aCommandParams.Flags & kCommandPathFlag_EndpointIdValid)
         {
             commandPath.EndpointId(aCommandParams.EndpointId);
         }
 
-        if (aCommandParams.Flags.Has(CommandPathFlags::kGroupIdValid))
+        if (aCommandParams.Flags & kCommandPathFlag_GroupIdValid)
         {
             commandPath.GroupId(aCommandParams.GroupId);
         }

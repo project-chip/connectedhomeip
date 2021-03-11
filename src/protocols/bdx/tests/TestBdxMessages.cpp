@@ -43,7 +43,8 @@ void TestTransferInitMessage(nlTestSuite * inSuite, void * inContext)
 {
     TransferInit testMsg;
 
-    testMsg.TransferCtlOptions.ClearAll().Set(TransferControlFlags::kReceiverDrive, true);
+    testMsg.TransferCtlOptions.SetRaw(0);
+    testMsg.TransferCtlOptions.Set(kControl_ReceiverDrive, true);
     testMsg.Version = 1;
 
     // Make sure MaxLength is greater than UINT32_MAX to test widerange being set
@@ -68,7 +69,8 @@ void TestSendAcceptMessage(nlTestSuite * inSuite, void * inContext)
     SendAccept testMsg;
 
     testMsg.Version = 1;
-    testMsg.TransferCtlFlags.ClearAll().Set(TransferControlFlags::kReceiverDrive, true);
+    testMsg.TransferCtlFlags.SetRaw(0);
+    testMsg.TransferCtlFlags.Set(kControl_ReceiverDrive, true);
     testMsg.MaxBlockSize = 256;
 
     uint8_t fakeData[5]    = { 7, 6, 5, 4, 3 };
@@ -83,7 +85,8 @@ void TestReceiveAcceptMessage(nlTestSuite * inSuite, void * inContext)
     ReceiveAccept testMsg;
 
     testMsg.Version = 1;
-    testMsg.TransferCtlFlags.ClearAll().Set(TransferControlFlags::kReceiverDrive, true);
+    testMsg.TransferCtlFlags.SetRaw(0);
+    testMsg.TransferCtlFlags.Set(kControl_ReceiverDrive, true);
 
     // Make sure Length is greater than UINT32_MAX to test widerange being set
     testMsg.Length = static_cast<uint64_t>(std::numeric_limits<uint32_t>::max()) + 1;

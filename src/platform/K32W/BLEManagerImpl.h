@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020 Project CHIP Authors
  *    Copyright (c) 2020 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -107,16 +107,15 @@ private:
 
     // ===== Private members reserved for use by this class only.
 
-    enum class Flags : uint8_t
+    enum
     {
-        kAdvertisingEnabled      = 0x0001,
-        kFastAdvertisingEnabled  = 0x0002,
-        kAdvertising             = 0x0004,
-        kRestartAdvertising      = 0x0008,
-        kK32WBLEStackInitialized = 0x0010,
-        kDeviceNameSet           = 0x0020,
+        kFlag_AdvertisingEnabled      = 0x0001,
+        kFlag_FastAdvertisingEnabled  = 0x0002,
+        kFlag_Advertising             = 0x0004,
+        kFlag_RestartAdvertising      = 0x0008,
+        kFlag_K32WBLEStackInitialized = 0x0010,
+        kFlag_DeviceNameSet           = 0x0020,
     };
-    BitFlags<BLEManagerImpl::Flags> mFlags;
 
     enum
     {

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -55,7 +55,7 @@ enum class MessageFlagValues : uint32_t
     kViaEphemeralUDPPort = 0x00040000,
 };
 
-using MessageFlags = BitFlags<MessageFlagValues>;
+using MessageFlags = BitFlags<uint32_t, MessageFlagValues>;
 
 enum class SendMessageFlags : uint16_t
 {
@@ -76,7 +76,7 @@ enum class SendMessageFlags : uint16_t
     kNoAutoRequestAck = 0x0400,
 };
 
-using SendFlags = BitFlags<SendMessageFlags>;
+using SendFlags = BitFlags<uint16_t, SendMessageFlags>;
 
 } // namespace Messaging
 } // namespace chip

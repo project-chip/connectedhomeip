@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,7 +29,6 @@
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <protocols/Protocols.h>
-#include <support/BitFlags.h>
 #include <support/CodeUtils.h>
 #include <support/DLLUtil.h>
 #include <support/logging/CHIPLogging.h>
@@ -60,30 +59,24 @@ public:
         Sending,           //< The invoke command message  has sent out the invoke command
     };
 
-    enum class CommandPathFlags : uint8_t
-    {
-        kEndpointIdValid = 0x01, /**< Set when the EndpointId field is valid */
-        kGroupIdValid    = 0x02, /**< Set when the GroupId field is valid */
-    };
-
     /**
      * Encapsulates arguments to be passed into SendCommand().
      *
      */
     struct CommandParams
     {
-        CommandParams(chip::EndpointId endpointId, chip::GroupId groupId, chip::ClusterId clusterId, chip::CommandId commandId,
-                      const BitFlags<CommandPathFlags> & flags) :
-            EndpointId(endpointId),
-            GroupId(groupId), ClusterId(clusterId), CommandId(commandId), Flags(flags)
-        {}
-
         chip::EndpointId EndpointId;
         chip::GroupId GroupId;
         chip::ClusterId ClusterId;
         chip::CommandId CommandId;
-        BitFlags<CommandPathFlags> Flags;
+        uint8_t Flags;
     };
+
+    enum CommandPathFlags
+    {
+        kCommandPathFlag_EndpointIdValid = 0x0001, /**< Set when the EndpointId field is valid */
+        kCommandPathFlag_GroupIdValid    = 0x0002, /**< Set when the GroupId field is valid */
+    } CommandPathFlags;
 
     /**
      *  Initialize the Command object. Within the lifetime
@@ -117,7 +110,7 @@ public:
 
     chip::TLV::TLVWriter & CreateCommandDataElementTLVWriter();
     CHIP_ERROR AddCommand(chip::EndpointId aEndpintId, chip::GroupId aGroupId, chip::ClusterId aClusterId,
-                          chip::CommandId aCommandId, BitFlags<CommandPathFlags> Flags);
+                          chip::CommandId aCommandId, uint8_t Flags);
     CHIP_ERROR AddCommand(CommandParams & aCommandParams);
     CHIP_ERROR AddStatusCode(const uint16_t aGeneralCode, const uint32_t aProtocolId, const uint16_t aProtocolCode,
                              const chip::ClusterId aClusterId);

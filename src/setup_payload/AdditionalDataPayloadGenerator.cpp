@@ -44,7 +44,7 @@ using namespace chip::Encoding::LittleEndian;
 CHIP_ERROR
 AdditionalDataPayloadGenerator::generateAdditionalDataPayload(uint16_t lifetimeCounter, const char * serialNumberBuffer,
                                                               size_t serialNumberBufferSize, PacketBufferHandle & bufferHandle,
-                                                              BitFlags<AdditionalDataFields> additionalDataFields)
+                                                              BitFlags<uint8_t, AdditionalDataFields> additionalDataFields)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferTLVWriter writer;

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020 Project CHIP Authors
  *    Copyright (c) 2019-2020 Google LLC.
  *    Copyright (c) 2018 Nest Labs, Inc.
  *
@@ -24,8 +24,6 @@
  */
 
 #pragma once
-
-#include <support/BitFlags.h>
 
 #if CHIP_ENABLE_ROTATING_DEVICE_ID
 #include <support/LifetimePersistedCounter.h>
@@ -127,16 +125,16 @@ public:
     void _LogDeviceConfig();
 
 protected:
-    enum class Flags : uint8_t
+    enum
     {
-        kIsServiceProvisioned                    = 0x01,
-        kIsMemberOfFabric                        = 0x02,
-        kIsPairedToAccount                       = 0x04,
-        kOperationalDeviceCredentialsProvisioned = 0x08,
-        kUseManufacturerCredentialsAsOperational = 0x10,
+        kFlag_IsServiceProvisioned                    = 0x01,
+        kFlag_IsMemberOfFabric                        = 0x02,
+        kFlag_IsPairedToAccount                       = 0x04,
+        kFlag_OperationalDeviceCredentialsProvisioned = 0x08,
+        kFlag_UseManufacturerCredentialsAsOperational = 0x10,
     };
 
-    BitFlags<Flags> mFlags;
+    uint8_t mFlags;
 #if CHIP_ENABLE_ROTATING_DEVICE_ID
     chip::LifetimePersistedCounter mLifetimePersistedCounter;
 #endif

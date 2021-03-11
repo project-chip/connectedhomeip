@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020 Project CHIP Authors
  *    Copyright (c) 2019 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -256,18 +256,17 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
 
-BitFlags<Internal::GenericConnectivityManagerImpl_WiFi<ConnectivityManagerImpl>::ConnectivityFlags>
-    ConnectivityManagerImpl::mConnectivityFlag;
+uint16_t ConnectivityManagerImpl::mConnectivityFlag;
 struct GDBusWpaSupplicant ConnectivityManagerImpl::mWpaSupplicant;
 
 bool ConnectivityManagerImpl::_HaveIPv4InternetConnectivity()
 {
-    return mConnectivityFlag.Has(ConnectivityFlags::kHaveIPv4InternetConnectivity);
+    return ((mConnectivityFlag & kFlag_HaveIPv4InternetConnectivity) != 0);
 }
 
 bool ConnectivityManagerImpl::_HaveIPv6InternetConnectivity()
 {
-    return mConnectivityFlag.Has(ConnectivityFlags::kHaveIPv6InternetConnectivity);
+    return ((mConnectivityFlag & kFlag_HaveIPv6InternetConnectivity) != 0);
 }
 
 ConnectivityManager::WiFiStationMode ConnectivityManagerImpl::_GetWiFiStationMode()
@@ -328,8 +327,8 @@ bool ConnectivityManagerImpl::_IsWiFiStationConnected()
     state = wpa_fi_w1_wpa_supplicant1_interface_get_state(mWpaSupplicant.iface);
     if (g_strcmp0(state, "completed") == 0)
     {
-        mConnectivityFlag.Set(ConnectivityFlags::kHaveIPv4InternetConnectivity)
-            .Set(ConnectivityFlags::kHaveIPv6InternetConnectivity);
+        SetFlag(mConnectivityFlag, kFlag_HaveIPv4InternetConnectivity, true);
+        SetFlag(mConnectivityFlag, kFlag_HaveIPv6InternetConnectivity, true);
         ret = true;
     }
 
@@ -621,7 +620,7 @@ void ConnectivityManagerImpl::_OnWpaProxyReady(GObject * source_object, GAsyncRe
 
 void ConnectivityManagerImpl::StartWiFiManagement()
 {
-    mConnectivityFlag.ClearAll();
+    mConnectivityFlag            = 0;
     mWpaSupplicant.state         = GDBusWpaSupplicant::INIT;
     mWpaSupplicant.scanState     = GDBusWpaSupplicant::WIFI_SCANNING_IDLE;
     mWpaSupplicant.proxy         = nullptr;

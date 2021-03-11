@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -203,12 +203,12 @@ private:
         kFlagMsgRcvdFromPeer = 0x0080,
     };
 
-    BitFlags<Flags> mFlags; // Internal state flags
+    BitFlags<uint16_t, Flags> mFlags; // Internal state flags
 
     void Retain();
     void Release();
     CHIP_ERROR HandleRcvdAck(uint32_t AckMsgId);
-    CHIP_ERROR HandleNeedsAck(uint32_t MessageId, BitFlags<MessageFlagValues> Flags);
+    CHIP_ERROR HandleNeedsAck(uint32_t MessageId, BitFlags<uint32_t, MessageFlagValues> Flags);
 
 private:
     friend class ReliableMessageMgr;

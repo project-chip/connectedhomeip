@@ -46,7 +46,7 @@ extern const uint8_t gTestCerts[] = {
 
 extern const size_t gNumTestCerts = sizeof(gTestCerts) / sizeof(gTestCerts[0]);
 
-CHIP_ERROR GetTestCert(uint8_t certType, BitFlags<TestCertLoadFlags> certLoadFlags, const uint8_t *& certData,
+CHIP_ERROR GetTestCert(uint8_t certType, BitFlags<uint8_t, TestCertLoadFlags> certLoadFlags, const uint8_t *& certData,
                        uint32_t & certDataLen)
 {
     CHIP_ERROR err;
@@ -103,8 +103,8 @@ const char * GetTestCertName(uint8_t certType)
     return nullptr;
 }
 
-CHIP_ERROR LoadTestCert(ChipCertificateSet & certSet, uint8_t certType, BitFlags<TestCertLoadFlags> certLoadFlags,
-                        BitFlags<CertDecodeFlags> decodeFlags)
+CHIP_ERROR LoadTestCert(ChipCertificateSet & certSet, uint8_t certType, BitFlags<uint8_t, TestCertLoadFlags> certLoadFlags,
+                        BitFlags<uint8_t, CertDecodeFlags> decodeFlags)
 {
     CHIP_ERROR err;
     ChipCertificateData * cert;

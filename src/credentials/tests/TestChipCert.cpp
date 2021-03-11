@@ -48,59 +48,59 @@ enum
                                 // (in either CHIP or DER form), or to decode the certificates.
 };
 
-static const BitFlags<CertValidateFlags> sIgnoreNotBeforeFlag(CertValidateFlags::kIgnoreNotBefore);
-static const BitFlags<CertValidateFlags> sIgnoreNotAfterFlag(CertValidateFlags::kIgnoreNotAfter);
+static const BitFlags<uint8_t, CertValidateFlags> sIgnoreNotBeforeFlag(CertValidateFlags::kIgnoreNotBefore);
+static const BitFlags<uint8_t, CertValidateFlags> sIgnoreNotAfterFlag(CertValidateFlags::kIgnoreNotAfter);
 
-static const BitFlags<CertDecodeFlags> sNullDecodeFlag;
-static const BitFlags<CertDecodeFlags> sGenTBSHashFlag(CertDecodeFlags::kGenerateTBSHash);
-static const BitFlags<CertDecodeFlags> sTrustAnchorFlag(CertDecodeFlags::kIsTrustAnchor);
+static const BitFlags<uint8_t, CertDecodeFlags> sNullDecodeFlag;
+static const BitFlags<uint8_t, CertDecodeFlags> sGenTBSHashFlag(CertDecodeFlags::kGenerateTBSHash);
+static const BitFlags<uint8_t, CertDecodeFlags> sTrustAnchorFlag(CertDecodeFlags::kIsTrustAnchor);
 
-static const BitFlags<TestCertLoadFlags> sNullLoadFlag;
-static const BitFlags<TestCertLoadFlags> sDerFormFlag(TestCertLoadFlags::kDERForm);
-static const BitFlags<TestCertLoadFlags> sSupIsCAFlag(TestCertLoadFlags::kSuppressIsCA);
-static const BitFlags<TestCertLoadFlags> sSupKeyUsageFlag(TestCertLoadFlags::kSuppressKeyUsage);
-static const BitFlags<TestCertLoadFlags> sSupKeyCertSignFlag(TestCertLoadFlags::kSuppressKeyCertSign);
-static const BitFlags<TestCertLoadFlags> sPathLenZeroFlag(TestCertLoadFlags::kSetPathLenConstZero);
-static const BitFlags<TestCertLoadFlags> sAppDefCertTypeFlag(TestCertLoadFlags::kSetAppDefinedCertType);
+static const BitFlags<uint8_t, TestCertLoadFlags> sNullLoadFlag;
+static const BitFlags<uint8_t, TestCertLoadFlags> sDerFormFlag(TestCertLoadFlags::kDERForm);
+static const BitFlags<uint8_t, TestCertLoadFlags> sSupIsCAFlag(TestCertLoadFlags::kSuppressIsCA);
+static const BitFlags<uint8_t, TestCertLoadFlags> sSupKeyUsageFlag(TestCertLoadFlags::kSuppressKeyUsage);
+static const BitFlags<uint8_t, TestCertLoadFlags> sSupKeyCertSignFlag(TestCertLoadFlags::kSuppressKeyCertSign);
+static const BitFlags<uint8_t, TestCertLoadFlags> sPathLenZeroFlag(TestCertLoadFlags::kSetPathLenConstZero);
+static const BitFlags<uint8_t, TestCertLoadFlags> sAppDefCertTypeFlag(TestCertLoadFlags::kSetAppDefinedCertType);
 
-static const BitFlags<KeyPurposeFlags> sNullKPFlag;
-static const BitFlags<KeyPurposeFlags> sSA(KeyPurposeFlags::kServerAuth);
-static const BitFlags<KeyPurposeFlags> sCA(KeyPurposeFlags::kClientAuth);
-static const BitFlags<KeyPurposeFlags> sCS(KeyPurposeFlags::kCodeSigning);
-static const BitFlags<KeyPurposeFlags> sEP(KeyPurposeFlags::kEmailProtection);
-static const BitFlags<KeyPurposeFlags> sTS(KeyPurposeFlags::kTimeStamping);
-static const BitFlags<KeyPurposeFlags> sOS(KeyPurposeFlags::kOCSPSigning);
-static const BitFlags<KeyPurposeFlags> sSAandCA(sSA, sCA);
-static const BitFlags<KeyPurposeFlags> sSAandCS(sSA, sCS);
-static const BitFlags<KeyPurposeFlags> sSAandEP(sSA, sEP);
-static const BitFlags<KeyPurposeFlags> sSAandTS(sSA, sTS);
+static const BitFlags<uint8_t, KeyPurposeFlags> sNullKPFlag;
+static const BitFlags<uint8_t, KeyPurposeFlags> sSA(KeyPurposeFlags::kServerAuth);
+static const BitFlags<uint8_t, KeyPurposeFlags> sCA(KeyPurposeFlags::kClientAuth);
+static const BitFlags<uint8_t, KeyPurposeFlags> sCS(KeyPurposeFlags::kCodeSigning);
+static const BitFlags<uint8_t, KeyPurposeFlags> sEP(KeyPurposeFlags::kEmailProtection);
+static const BitFlags<uint8_t, KeyPurposeFlags> sTS(KeyPurposeFlags::kTimeStamping);
+static const BitFlags<uint8_t, KeyPurposeFlags> sOS(KeyPurposeFlags::kOCSPSigning);
+static const BitFlags<uint8_t, KeyPurposeFlags> sSAandCA(sSA.Raw() | sCA.Raw());
+static const BitFlags<uint8_t, KeyPurposeFlags> sSAandCS(sSA.Raw() | sCS.Raw());
+static const BitFlags<uint8_t, KeyPurposeFlags> sSAandEP(sSA.Raw() | sEP.Raw());
+static const BitFlags<uint8_t, KeyPurposeFlags> sSAandTS(sSA.Raw() | sTS.Raw());
 
-static const BitFlags<KeyUsageFlags> sNullKUFlag;
-static const BitFlags<KeyUsageFlags> sDS(KeyUsageFlags::kDigitalSignature);
-static const BitFlags<KeyUsageFlags> sNR(KeyUsageFlags::kNonRepudiation);
-static const BitFlags<KeyUsageFlags> sKE(KeyUsageFlags::kKeyEncipherment);
-static const BitFlags<KeyUsageFlags> sDE(KeyUsageFlags::kDataEncipherment);
-static const BitFlags<KeyUsageFlags> sKA(KeyUsageFlags::kKeyAgreement);
-static const BitFlags<KeyUsageFlags> sKC(KeyUsageFlags::kKeyCertSign);
-static const BitFlags<KeyUsageFlags> sCR(KeyUsageFlags::kCRLSign);
-static const BitFlags<KeyUsageFlags> sEO(KeyUsageFlags::kEncipherOnly);
-static const BitFlags<KeyUsageFlags> sDO(KeyUsageFlags::kDecipherOnly);
-static const BitFlags<KeyUsageFlags> sDSandNR(sDS, sNR);
-static const BitFlags<KeyUsageFlags> sDSandKE(sDS, sKE);
-static const BitFlags<KeyUsageFlags> sDSandDE(sDS, sDE);
-static const BitFlags<KeyUsageFlags> sDSandKA(sDS, sKA);
-static const BitFlags<KeyUsageFlags> sDSandKC(sDS, sKC);
-static const BitFlags<KeyUsageFlags> sDSandCR(sDS, sCR);
-static const BitFlags<KeyUsageFlags> sDSandEO(sDS, sEO);
-static const BitFlags<KeyUsageFlags> sDSandDO(sDS, sDO);
-static const BitFlags<KeyUsageFlags> sKCandDS(sKC, sDS);
-static const BitFlags<KeyUsageFlags> sKCandNR(sKC, sNR);
-static const BitFlags<KeyUsageFlags> sKCandKE(sKC, sKE);
-static const BitFlags<KeyUsageFlags> sKCandDE(sKC, sDE);
-static const BitFlags<KeyUsageFlags> sKCandKA(sKC, sKA);
-static const BitFlags<KeyUsageFlags> sKCandCR(sKC, sCR);
-static const BitFlags<KeyUsageFlags> sKCandEO(sKC, sEO);
-static const BitFlags<KeyUsageFlags> sKCandDO(sKC, sDO);
+static const BitFlags<uint16_t, KeyUsageFlags> sNullKUFlag;
+static const BitFlags<uint16_t, KeyUsageFlags> sDS(KeyUsageFlags::kDigitalSignature);
+static const BitFlags<uint16_t, KeyUsageFlags> sNR(KeyUsageFlags::kNonRepudiation);
+static const BitFlags<uint16_t, KeyUsageFlags> sKE(KeyUsageFlags::kKeyEncipherment);
+static const BitFlags<uint16_t, KeyUsageFlags> sDE(KeyUsageFlags::kDataEncipherment);
+static const BitFlags<uint16_t, KeyUsageFlags> sKA(KeyUsageFlags::kKeyAgreement);
+static const BitFlags<uint16_t, KeyUsageFlags> sKC(KeyUsageFlags::kKeyCertSign);
+static const BitFlags<uint16_t, KeyUsageFlags> sCR(KeyUsageFlags::kCRLSign);
+static const BitFlags<uint16_t, KeyUsageFlags> sEO(KeyUsageFlags::kEncipherOnly);
+static const BitFlags<uint16_t, KeyUsageFlags> sDO(KeyUsageFlags::kDecipherOnly);
+static const BitFlags<uint16_t, KeyUsageFlags> sDSandNR(sDS.Raw() | sNR.Raw());
+static const BitFlags<uint16_t, KeyUsageFlags> sDSandKE(sDS.Raw() | sKE.Raw());
+static const BitFlags<uint16_t, KeyUsageFlags> sDSandDE(sDS.Raw() | sDE.Raw());
+static const BitFlags<uint16_t, KeyUsageFlags> sDSandKA(sDS.Raw() | sKA.Raw());
+static const BitFlags<uint16_t, KeyUsageFlags> sDSandKC(sDS.Raw() | sKC.Raw());
+static const BitFlags<uint16_t, KeyUsageFlags> sDSandCR(sDS.Raw() | sCR.Raw());
+static const BitFlags<uint16_t, KeyUsageFlags> sDSandEO(sDS.Raw() | sEO.Raw());
+static const BitFlags<uint16_t, KeyUsageFlags> sDSandDO(sDS.Raw() | sDO.Raw());
+static const BitFlags<uint16_t, KeyUsageFlags> sKCandDS(sKC.Raw() | sDS.Raw());
+static const BitFlags<uint16_t, KeyUsageFlags> sKCandNR(sKC.Raw() | sNR.Raw());
+static const BitFlags<uint16_t, KeyUsageFlags> sKCandKE(sKC.Raw() | sKE.Raw());
+static const BitFlags<uint16_t, KeyUsageFlags> sKCandDE(sKC.Raw() | sDE.Raw());
+static const BitFlags<uint16_t, KeyUsageFlags> sKCandKA(sKC.Raw() | sKA.Raw());
+static const BitFlags<uint16_t, KeyUsageFlags> sKCandCR(sKC.Raw() | sCR.Raw());
+static const BitFlags<uint16_t, KeyUsageFlags> sKCandEO(sKC.Raw() | sEO.Raw());
+static const BitFlags<uint16_t, KeyUsageFlags> sKCandDO(sKC.Raw() | sDO.Raw());
 
 static CHIP_ERROR LoadStandardCerts(ChipCertificateSet & certSet)
 {
@@ -207,8 +207,8 @@ static void TestChipCert_CertValidation(nlTestSuite * inSuite, void * inContext)
         struct
         {
             uint8_t Type;
-            BitFlags<CertDecodeFlags> DecodeFlags;
-            BitFlags<TestCertLoadFlags> LoadFlags;
+            BitFlags<uint8_t, CertDecodeFlags> DecodeFlags;
+            BitFlags<uint8_t, TestCertLoadFlags> LoadFlags;
         } InputCerts[kMaxCertsPerTestCase];
     };
 
@@ -475,8 +475,8 @@ static void TestChipCert_CertUsage(nlTestSuite * inSuite, void * inContext)
     struct UsageTestCase
     {
         uint8_t mCertIndex;
-        BitFlags<KeyUsageFlags> mRequiredKeyUsages;
-        BitFlags<KeyPurposeFlags> mRequiredKeyPurposes;
+        BitFlags<uint16_t, KeyUsageFlags> mRequiredKeyUsages;
+        BitFlags<uint8_t, KeyPurposeFlags> mRequiredKeyPurposes;
         CHIP_ERROR mExpectedResult;
     };
 
