@@ -95,6 +95,9 @@ extern "C" void * pvPortCallocRtos(size_t num, size_t size)
 {
     size_t totalAllocSize = (size_t)(num * size);
 
+    if (size && totalAllocSize / size != num)
+        return nullptr;
+
     void * p = pvPortMalloc(totalAllocSize);
 
     if (p)
