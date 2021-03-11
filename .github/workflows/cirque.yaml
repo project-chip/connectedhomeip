@@ -19,10 +19,11 @@ on:
     pull_request:
 
 jobs:
-    build:
+    cirque:
         name: Cirque
 
         runs-on: ubuntu-latest
+        if: github.actor != 'restyled-io'
 
 # need to run with privilege, which isn't supported by job.XXX.contaner
 #  https://github.com/actions/container-action/issues/2
