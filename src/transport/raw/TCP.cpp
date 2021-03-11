@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -47,13 +47,14 @@ constexpr int kListenBacklogSize = 2;
 /**
  *  Determine if the given buffer contains a complete message
  */
-bool ContainsCompleteMessage(const System::PacketBufferHandle & buffer, uint8_t ** start, uint16_t * size)
+bool ContainsCompleteMessage(const System::PacketBufferHandle & buffer, uint8_t ** start, uint16_t * size, uint16_t * payloadSize)
 {
     bool completeMessage = false;
 
     if (buffer->DataLength() >= kPacketSizeBytes)
     {
         *size           = LittleEndian::Get16(buffer->Start());
+        *payloadSize    = *size + kPacketSizeBytes;
         *start          = buffer->Start() + kPacketSizeBytes;
         completeMessage = (buffer->DataLength() >= *size + kPacketSizeBytes);
     }
@@ -329,8 +330,9 @@ CHIP_ERROR TCPBase::ProcessReceivedBuffer(Inet::TCPEndPoint * endPoint, const Pe
         }
 
         uint8_t * messageData = nullptr;
-        uint16_t messageSize  = 0;
-        if (ContainsCompleteMessage(buffer, &messageData, &messageSize))
+        uint16_t messageSize  = 0; // CHIP message size, excluding length octets.
+        uint16_t payloadSize  = 0; // TCP payload size, including CHIP message length octets.
+        if (ContainsCompleteMessage(buffer, &messageData, &messageSize, &payloadSize))
         {
             // length was read and is not needed anymore
             buffer->ConsumeHead(kPacketSizeBytes);
@@ -349,7 +351,7 @@ CHIP_ERROR TCPBase::ProcessReceivedBuffer(Inet::TCPEndPoint * endPoint, const Pe
             buffer->ConsumeHead(messageSize);
             SuccessOrExit(err);
 
-            err = endPoint->AckReceive(messageSize);
+            err = endPoint->AckReceive(payloadSize);
             SuccessOrExit(err);
             continue;
         }
@@ -358,28 +360,28 @@ CHIP_ERROR TCPBase::ProcessReceivedBuffer(Inet::TCPEndPoint * endPoint, const Pe
         // We may or may not have a complete message in a buffer chain.
         if (buffer->HasChainedBuffer())
         {
-            if (messageSize > System::PacketBuffer::kMaxSizeWithoutReserve)
+            if (payloadSize > System::PacketBuffer::kMaxSizeWithoutReserve)
             {
                 // This message will not fit in a maximum-size buffer.
-                if (messageSize <= buffer->TotalLength())
+                if (payloadSize <= buffer->TotalLength())
                 {
                     // We have the oversize message in the current buffer chain.
                     // Since it's oversize, it is definitely not a valid CHIP message, so we angrily toss it aside.
-                    buffer->ConsumeHead(messageSize);
-                    err = endPoint->AckReceive(messageSize);
+                    buffer.Consume(payloadSize);
+                    err = endPoint->AckReceive(payloadSize);
                     SuccessOrExit(err);
-                    err = CHIP_ERROR_MESSAGE_TOO_LONG;
-                    break;
+                    continue;
                 }
                 // If we don't yet have the complete message, proceed along to open the receive window.
             }
             else
             {
-                if (messageSize > buffer->MaxDataLength())
+                if (payloadSize > buffer->MaxDataLength())
                 {
                     // The current buffer head is too small for the message. We're gonna need a bigger buf.
                     System::PacketBufferHandle newHead = System::PacketBufferHandle::NewWithData(
-                        buffer->Start(), buffer->DataLength(), static_cast<uint16_t>(messageSize - buffer->DataLength()));
+                        buffer->Start(), buffer->DataLength(), static_cast<uint16_t>(payloadSize - buffer->DataLength()),
+                        0 /* reserved size */);
                     VerifyOrExit(!newHead.IsNull(), err = CHIP_ERROR_NO_MEMORY);
                     buffer.Advance();
                     newHead->AddToEnd(std::move(buffer));

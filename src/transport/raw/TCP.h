@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -153,6 +153,8 @@ public:
     void CloseActiveConnections();
 
 private:
+    friend class TCPTest;
+
     /**
      * Find an active connection to the given peer or return nullptr if
      * no active connection exists.
@@ -241,6 +243,7 @@ public:
     TCP() : TCPBase(mConnectionsBuffer, kActiveConnectionsSize, mPendingPackets, kPendingPacketSize) {}
 
 private:
+    friend class TCPTest;
     Inet::TCPEndPoint * mConnectionsBuffer[kActiveConnectionsSize] = { 0 };
     PendingPacket mPendingPackets[kPendingPacketSize];
 };
