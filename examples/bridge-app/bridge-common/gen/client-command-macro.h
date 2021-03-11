@@ -256,15 +256,6 @@
     emberAfFillExternalBuffer(mask, clusterId, ZCL_DISCOVER_ATTRIBUTES_EXTENDED_RESPONSE_COMMAND_ID, "ub", discoveryComplete,      \
                               extendedDiscoverAttributesInfoRecords, extendedDiscoverAttributesInfoRecordsLen);
 
-/** @brief Command description for ResetToFactoryDefaults
- *
- * Command: ResetToFactoryDefaults
- */
-#define emberAfFillCommandBasicClusterResetToFactoryDefaults()                                                                     \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_RESET_TO_FACTORY_DEFAULTS_COMMAND_ID, "", );
-
 /** @brief Command description for Identify
  *
  * Command: Identify
@@ -1795,6 +1786,33 @@
                                   totalNumberOfNonEmptyProxyTableEntries, gpdSrcId, startIndex, gpdIeee, entriesCount, endpoint,   \
                                   proxyTableEntries, proxyTableEntriesLen, index);
 
+/** @brief Command description for StartUp
+ *
+ * Command: StartUp
+ */
+#define emberAfFillCommandBasicClusterStartUp()                                                                                    \
+    emberAfFillExternalBuffer(mask,                                                                                                \
+                                                                                                                                   \
+                              ZCL_START_UP_COMMAND_ID, "", );
+
+/** @brief Command description for ShutDown
+ *
+ * Command: ShutDown
+ */
+#define emberAfFillCommandBasicClusterShutDown()                                                                                   \
+    emberAfFillExternalBuffer(mask,                                                                                                \
+                                                                                                                                   \
+                              ZCL_SHUT_DOWN_COMMAND_ID, "", );
+
+/** @brief Command description for Leave
+ *
+ * Command: Leave
+ */
+#define emberAfFillCommandBasicClusterLeave()                                                                                      \
+    emberAfFillExternalBuffer(mask,                                                                                                \
+                                                                                                                                   \
+                              ZCL_LEAVE_COMMAND_ID, "", );
+
 /** @brief Command description for SetFabric
  *
  * Command: SetFabric
@@ -2963,6 +2981,15 @@
     WDClusterSquawk(squawkInfo) emberAfFillExternalBuffer(mask,                                                                    \
                                                                                                                                    \
                                                           ZCL_SQUAWK_COMMAND_ID, "u", squawkInfo);
+
+/** @brief Command description for Sleep
+ *
+ * Command: Sleep
+ */
+#define emberAfFillCommandLow                                                                                                      \
+    PowerClusterSleep() emberAfFillExternalBuffer(mask,                                                                            \
+                                                                                                                                   \
+                                                  ZCL_SLEEP_COMMAND_ID, "", );
 
 /** @brief Command description for MatchProtocolAddress
  *

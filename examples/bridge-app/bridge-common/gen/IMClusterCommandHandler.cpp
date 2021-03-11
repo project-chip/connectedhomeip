@@ -39,30 +39,6 @@ namespace app {
 
 namespace clusters {
 
-namespace Basic {
-
-void DispatchServerCommand(app::Command * command, CommandId commandId, EndpointId endpointId, TLV::TLVReader & dataTlv)
-{
-    {
-        switch (commandId)
-        {
-        case ZCL_RESET_TO_FACTORY_DEFAULTS_COMMAND_ID: {
-            // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-            emberAfBasicClusterResetToFactoryDefaultsCallback();
-            break;
-        }
-        default: {
-            // Unrecognized command ID, error status will apply.
-            // TODO: Encode response for command not found
-            ChipLogError(Zcl, "Unknown command %" PRIx16 " for cluster %" PRIx16, commandId, ZCL_BASIC_CLUSTER_ID);
-            break;
-        }
-        }
-    }
-}
-
-} // namespace Basic
-
 namespace LevelControl {
 
 void DispatchServerCommand(app::Command * command, CommandId commandId, EndpointId endpointId, TLV::TLVReader & dataTlv)
@@ -373,9 +349,6 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
     Compatibility::SetupEmberAfObjects(apCommandObj, aClusterId, aCommandId, aEndPointId);
     switch (aClusterId)
     {
-    case ZCL_BASIC_CLUSTER_ID:
-        clusters::Basic::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
-        break;
     case ZCL_LEVEL_CONTROL_CLUSTER_ID:
         clusters::LevelControl::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
         break;

@@ -20,9 +20,6 @@
 // Prevent multiple inclusion
 #pragma once
 
-// Definitions for cluster: Basic
-#define ZCL_BASIC_CLUSTER_ID (0x0000)
-
 // Definitions for cluster: Power Configuration
 #define ZCL_POWER_CONFIG_CLUSTER_ID (0x0001)
 
@@ -82,6 +79,9 @@
 
 // Definitions for cluster: Keep-Alive
 #define ZCL_KEEPALIVE_CLUSTER_ID (0x0025)
+
+// Definitions for cluster: Basic
+#define ZCL_BASIC_CLUSTER_ID (0x0028)
 
 // Definitions for cluster: General Commissioning
 #define ZCL_GENERAL_COMMISSIONING_CLUSTER_ID (0x0030)

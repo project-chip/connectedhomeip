@@ -196,12 +196,6 @@ void emberAfTemperatureMeasurementClusterServerTickCallback(chip::EndpointId end
 
 // Cluster Commands Callback
 
-/**
- * @brief Basic Cluster ResetToFactoryDefaults Command callback
- */
-
-bool emberAfBasicClusterResetToFactoryDefaultsCallback();
-
 //
 // Non-Cluster Related Callbacks
 //

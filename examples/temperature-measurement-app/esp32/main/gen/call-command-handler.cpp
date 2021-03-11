@@ -71,7 +71,8 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
         switch (cmd->apsFrame->clusterId)
         {
         case ZCL_BASIC_CLUSTER_ID:
-            result = emberAfBasicClusterServerCommandParse(cmd);
+            // No commands are enabled for cluster Basic
+            result = status(false, true, cmd->mfgSpecific);
             break;
         case ZCL_TEMP_MEASUREMENT_CLUSTER_ID:
             // No commands are enabled for cluster Temperature Measurement
@@ -86,24 +87,3 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
 }
 
 // Cluster specific command parsing
-
-EmberAfStatus emberAfBasicClusterServerCommandParse(EmberAfClusterCommand * cmd)
-{
-    bool wasHandled = false;
-
-    if (!cmd->mfgSpecific)
-    {
-        switch (cmd->commandId)
-        {
-        case ZCL_RESET_TO_FACTORY_DEFAULTS_COMMAND_ID: {
-            wasHandled = emberAfBasicClusterResetToFactoryDefaultsCallback();
-            break;
-        }
-        default: {
-            // Unrecognized command ID, error status will apply.
-            break;
-        }
-        }
-    }
-    return status(wasHandled, true, cmd->mfgSpecific);
-}
