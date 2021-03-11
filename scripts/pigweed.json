@@ -1,7 +1,7 @@
 [
     {
         "path": "gn/gn/${os}-${arch=amd64,arm64}",
-        "tags": ["git_revision:d7cf6238e07f87b51118f9823a1ec024c1f1932b"]
+        "tags": ["git_revision:dfcbc6fed0a8352696f92d67ccad54048ad182b3"]
     },
     {
         "path": "infra/ninja/${os}-${arch=amd64}",
@@ -13,8 +13,8 @@
     },
     {
         "_comment": "TODO(pwbug/93): Package Bazel for Windows.",
-        "path": "pigweed/third_party/bazel/${os=linux,mac}-${arch=amd64}",
-        "tags": ["version:3.2.0"]
+        "path": "fuchsia/third_party/bazel/${os=linux,mac}-${arch=amd64}",
+        "tags": ["version:4.0.0"]
     },
     {
         "path": "pigweed/third_party/bloaty-embedded/${os=linux,mac}-${arch=amd64}",
@@ -62,11 +62,11 @@
     },
     {
         "path": "pigweed/host_tools/${os}-${arch=amd64}",
-        "tags": ["git_revision:01145c97424e9158fd9b96b957176de4bb7e8f0c"]
+        "tags": ["git_revision:88fb8ad8bb62667820181f0e3b7ac30f172117d2"]
     },
     {
-        "path": "infra/goma/client/${os}-${arch=amd64}",
-        "tags": ["git_revision:be1b7f4547023e809b636dc9572c976ccb33dcac"]
+        "path": "infra/rbe/client/${os=linux,windows}-${arch=amd64}",
+        "tags": ["git_revision:3b3042c16accd40f0d3f7e40002f9ad2099cfe94"]
     },
     {
         "path": "fuchsia/third_party/qemu/${os=linux,mac}-${arch}",
