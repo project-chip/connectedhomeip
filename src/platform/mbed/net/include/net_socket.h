@@ -71,7 +71,7 @@ int mbed_getpeername(int sockfd, struct sockaddr * addr, socklen_t * addrlen);
 
 ssize_t mbed_recvmsg(int socket, struct msghdr * message, int flags);
 
-int mbed_select(int sock, fd_set * readfds, fd_set * writefds, fd_set * exceptfds, struct timeval * timeout);
+int mbed_select(int nfds, fd_set * readfds, fd_set * writefds, fd_set * exceptfds, struct timeval * timeout);
 
 #ifdef __cplusplus
 }

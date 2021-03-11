@@ -293,7 +293,26 @@ ssize_t mbed_recvmsg(int socket, struct msghdr * message, int flags)
     return 0;
 }
 
-int mbed_select(int sock, fd_set * readfds, fd_set * writefds, fd_set * exceptfds, struct timeval * timeout)
+int mbed_select(int nfds, fd_set * readfds, fd_set * writefds, fd_set * exceptfds, struct timeval * timeout)
 {
-    return 0;
+    int totalReady = 0;
+
+    // create own fd sets and set to zero
+
+    // if timeout set calculate the end time
+
+    // for (;;)
+    //{
+    // iteratre over the socket array
+
+    // check if socket is read ready -> FD_SET(socket, readfds)
+    // check if socket is write ready -> FD_SET(socket, writefds)
+    // check if exceptional condition on socket has occurred -> FD_SET(socket, exceptfds)
+
+    // if totalReady > 0 or timeout - break the loop
+    //}
+
+    // copy the result form own fd set to pointers
+
+    return totalReady;
 }
