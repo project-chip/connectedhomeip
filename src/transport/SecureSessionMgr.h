@@ -272,6 +272,13 @@ public:
 
     /**
      * @brief
+     *  Shutdown the Secure Session Manager. This terminates this instance
+     *  of the object and reset it's state.
+     */
+    void Shutdown();
+
+    /**
+     * @brief
      *   Set local node ID
      *
      * @param nodeId    Node id for the current node

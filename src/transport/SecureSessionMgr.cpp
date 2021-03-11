@@ -85,6 +85,16 @@ CHIP_ERROR SecureSessionMgr::Init(NodeId localNodeId, System::Layer * systemLaye
     return CHIP_NO_ERROR;
 }
 
+void SecureSessionMgr::Shutdown()
+{
+    mState        = State::kNotReady;
+    mLocalNodeId  = kUndefinedNodeId;
+    mSystemLayer  = nullptr;
+    mTransportMgr = nullptr;
+    mAdmins       = nullptr;
+    mCB           = nullptr;
+}
+
 Transport::Type SecureSessionMgr::GetTransportType(NodeId peerNodeId)
 {
     PeerConnectionState * state = mPeerConnections.FindPeerConnectionState(peerNodeId, nullptr);
