@@ -133,13 +133,16 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
     // TODO Initialize the Chip Addressing and Routing Module.
     _interface = WiFiInterface::get_default_instance();
     _security  = NSAPI_SECURITY_WPA_WPA2;
-    _interface->attach([this](nsapi_event_t event, intptr_t data) {
-        PlatformMgrImpl().mQueue.call([this, event, data] {
-            PlatformMgr().LockChipStack();
-            OnInterfaceEvent(event, data);
-            PlatformMgr().UnlockChipStack();
+    if (_interface)
+    {
+        _interface->attach([this](nsapi_event_t event, intptr_t data) {
+            PlatformMgrImpl().mQueue.call([this, event, data] {
+                PlatformMgr().LockChipStack();
+                OnInterfaceEvent(event, data);
+                PlatformMgr().UnlockChipStack();
+            });
         });
-    });
+    }
     return err;
 }
 
