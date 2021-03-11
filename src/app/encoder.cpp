@@ -104,7 +104,7 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
 | Basic                                                               | 0x0028 |
 | Binding                                                             | 0xF000 |
 | ColorControl                                                        | 0x0300 |
-| ContentLaunch                                                       | 0xF002 |
+| ContentLaunch                                                       | 0x050A |
 | DoorLock                                                            | 0x0101 |
 | GeneralCommissioning                                                | 0x0030 |
 | Groups                                                              | 0x0004 |
@@ -112,7 +112,7 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
 | Identify                                                            | 0x0003 |
 | LevelControl                                                        | 0x0008 |
 | LowPower                                                            | 0x0508 |
-| MediaPlayback                                                       | 0xF001 |
+| MediaPlayback                                                       | 0x0506 |
 | NetworkCommissioning                                                | 0xAAAA |
 | OnOff                                                               | 0x0006 |
 | Scenes                                                              | 0x0005 |
@@ -174,7 +174,7 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
 #define ZCL_STEP_SATURATION_COMMAND_ID (0x05)
 #define ZCL_STOP_MOVE_STEP_COMMAND_ID (0x47)
 
-#define CONTENT_LAUNCH_CLUSTER_ID 0xF002
+#define CONTENT_LAUNCH_CLUSTER_ID 0x050A
 #define ZCL_LAUNCH_CONTENT_COMMAND_ID (0x00)
 #define ZCL_LAUNCH_URL_COMMAND_ID (0x01)
 
@@ -235,7 +235,7 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
 #define LOW_POWER_CLUSTER_ID 0x0508
 #define ZCL_SLEEP_COMMAND_ID (0x00)
 
-#define MEDIA_PLAYBACK_CLUSTER_ID 0xF001
+#define MEDIA_PLAYBACK_CLUSTER_ID 0x0506
 #define ZCL_FAST_FORWARD_REQUEST_COMMAND_ID (0x07)
 #define ZCL_NEXT_REQUEST_COMMAND_ID (0x05)
 #define ZCL_PAUSE_REQUEST_COMMAND_ID (0x01)
@@ -1871,7 +1871,7 @@ PacketBufferHandle encodeColorControlClusterReadClusterRevisionAttribute(uint8_t
 }
 
 /*----------------------------------------------------------------------------*\
-| Cluster ContentLaunch                                               | 0xF002 |
+| Cluster ContentLaunch                                               | 0x050A |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * LaunchContent                                                     |   0x00 |
@@ -3035,7 +3035,7 @@ PacketBufferHandle encodeLowPowerClusterReadClusterRevisionAttribute(uint8_t seq
 }
 
 /*----------------------------------------------------------------------------*\
-| Cluster MediaPlayback                                               | 0xF001 |
+| Cluster MediaPlayback                                               | 0x0506 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * FastForwardRequest                                                |   0x07 |

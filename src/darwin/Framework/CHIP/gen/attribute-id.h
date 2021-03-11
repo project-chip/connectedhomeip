@@ -1092,7 +1092,20 @@
 // Server attributes
 #define ZCL_MAX_DURATION_ATTRIBUTE_ID (0x0000)
 
+// Attribute ids for cluster: Media Playback
+
+// Client attributes
+
+// Server attributes
+#define ZCL_CURRENT_STATE_ATTRIBUTE_ID (0x0000)
+
 // Attribute ids for cluster: Low Power
+
+// Client attributes
+
+// Server attributes
+
+// Attribute ids for cluster: Content Launch
 
 // Client attributes
 
@@ -4091,19 +4104,6 @@
 // Server attributes
 
 // Attribute ids for cluster: Binding
-
-// Client attributes
-
-// Server attributes
-
-// Attribute ids for cluster: Media Playback
-
-// Client attributes
-
-// Server attributes
-#define ZCL_CURRENT_STATE_ATTRIBUTE_ID (0x0000)
-
-// Attribute ids for cluster: Content Launch
 
 // Client attributes
 

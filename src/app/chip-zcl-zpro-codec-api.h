@@ -33,7 +33,7 @@
 | Basic                                                               | 0x0028 |
 | Binding                                                             | 0xF000 |
 | ColorControl                                                        | 0x0300 |
-| ContentLaunch                                                       | 0xF002 |
+| ContentLaunch                                                       | 0x050A |
 | DoorLock                                                            | 0x0101 |
 | GeneralCommissioning                                                | 0x0030 |
 | Groups                                                              | 0x0004 |
@@ -41,7 +41,7 @@
 | Identify                                                            | 0x0003 |
 | LevelControl                                                        | 0x0008 |
 | LowPower                                                            | 0x0508 |
-| MediaPlayback                                                       | 0xF001 |
+| MediaPlayback                                                       | 0x0506 |
 | NetworkCommissioning                                                | 0xAAAA |
 | OnOff                                                               | 0x0006 |
 | Scenes                                                              | 0x0005 |
@@ -1064,7 +1064,7 @@ chip::System::PacketBufferHandle encodeColorControlClusterReadClusterRevisionAtt
                                                                                        chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
-| Cluster ContentLaunch                                               | 0xF002 |
+| Cluster ContentLaunch                                               | 0x050A |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * LaunchContent                                                     |   0x00 |
@@ -1751,7 +1751,7 @@ chip::System::PacketBufferHandle encodeLowPowerClusterReadClusterRevisionAttribu
                                                                                    chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
-| Cluster MediaPlayback                                               | 0xF001 |
+| Cluster MediaPlayback                                               | 0x0506 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * FastForwardRequest                                                |   0x07 |

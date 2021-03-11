@@ -431,14 +431,14 @@ static void OnScenesClusterViewSceneResponse(void * context, uint16_t groupId, u
 | Basic                                                               | 0x0028 |
 | Binding                                                             | 0xF000 |
 | ColorControl                                                        | 0x0300 |
-| ContentLaunch                                                       | 0xF002 |
+| ContentLaunch                                                       | 0x050A |
 | DoorLock                                                            | 0x0101 |
 | GeneralCommissioning                                                | 0x0030 |
 | Groups                                                              | 0x0004 |
 | Identify                                                            | 0x0003 |
 | LevelControl                                                        | 0x0008 |
 | LowPower                                                            | 0x0508 |
-| MediaPlayback                                                       | 0xF001 |
+| MediaPlayback                                                       | 0x0506 |
 | OnOff                                                               | 0x0006 |
 | Scenes                                                              | 0x0005 |
 | TemperatureMeasurement                                              | 0x0402 |
@@ -449,14 +449,14 @@ constexpr chip::ClusterId kBarrierControlClusterId         = 0x0103;
 constexpr chip::ClusterId kBasicClusterId                  = 0x0028;
 constexpr chip::ClusterId kBindingClusterId                = 0xF000;
 constexpr chip::ClusterId kColorControlClusterId           = 0x0300;
-constexpr chip::ClusterId kContentLaunchClusterId          = 0xF002;
+constexpr chip::ClusterId kContentLaunchClusterId          = 0x050A;
 constexpr chip::ClusterId kDoorLockClusterId               = 0x0101;
 constexpr chip::ClusterId kGeneralCommissioningClusterId   = 0x0030;
 constexpr chip::ClusterId kGroupsClusterId                 = 0x0004;
 constexpr chip::ClusterId kIdentifyClusterId               = 0x0003;
 constexpr chip::ClusterId kLevelControlClusterId           = 0x0008;
 constexpr chip::ClusterId kLowPowerClusterId               = 0x0508;
-constexpr chip::ClusterId kMediaPlaybackClusterId          = 0xF001;
+constexpr chip::ClusterId kMediaPlaybackClusterId          = 0x0506;
 constexpr chip::ClusterId kOnOffClusterId                  = 0x0006;
 constexpr chip::ClusterId kScenesClusterId                 = 0x0005;
 constexpr chip::ClusterId kTemperatureMeasurementClusterId = 0x0402;
@@ -4156,7 +4156,7 @@ private:
 };
 
 /*----------------------------------------------------------------------------*\
-| Cluster ContentLaunch                                               | 0xF002 |
+| Cluster ContentLaunch                                               | 0x050A |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * LaunchContent                                                     |   0x00 |
@@ -4176,7 +4176,7 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0xF002) command (0x00) on endpoint %" PRIu16, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x050A) command (0x00) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ContentLaunchCluster cluster;
         cluster.Associate(device, endpointId);
@@ -4201,7 +4201,7 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0xF002) command (0x01) on endpoint %" PRIu16, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x050A) command (0x01) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ContentLaunchCluster cluster;
         cluster.Associate(device, endpointId);
@@ -4253,7 +4253,7 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0xF002) command (0x00) on endpoint %" PRIu16, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x050A) command (0x00) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::ContentLaunchCluster cluster;
         cluster.Associate(device, endpointId);
@@ -6381,7 +6381,7 @@ private:
 };
 
 /*----------------------------------------------------------------------------*\
-| Cluster MediaPlayback                                               | 0xF001 |
+| Cluster MediaPlayback                                               | 0x0506 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * FastForwardRequest                                                |   0x07 |
@@ -6410,7 +6410,7 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0xF001) command (0x07) on endpoint %" PRIu16, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0506) command (0x07) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::MediaPlaybackCluster cluster;
         cluster.Associate(device, endpointId);
@@ -6434,7 +6434,7 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0xF001) command (0x05) on endpoint %" PRIu16, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0506) command (0x05) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::MediaPlaybackCluster cluster;
         cluster.Associate(device, endpointId);
@@ -6458,7 +6458,7 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0xF001) command (0x01) on endpoint %" PRIu16, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0506) command (0x01) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::MediaPlaybackCluster cluster;
         cluster.Associate(device, endpointId);
@@ -6482,7 +6482,7 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0xF001) command (0x00) on endpoint %" PRIu16, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0506) command (0x00) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::MediaPlaybackCluster cluster;
         cluster.Associate(device, endpointId);
@@ -6506,7 +6506,7 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0xF001) command (0x04) on endpoint %" PRIu16, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0506) command (0x04) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::MediaPlaybackCluster cluster;
         cluster.Associate(device, endpointId);
@@ -6530,7 +6530,7 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0xF001) command (0x06) on endpoint %" PRIu16, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0506) command (0x06) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::MediaPlaybackCluster cluster;
         cluster.Associate(device, endpointId);
@@ -6554,7 +6554,7 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0xF001) command (0x09) on endpoint %" PRIu16, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0506) command (0x09) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::MediaPlaybackCluster cluster;
         cluster.Associate(device, endpointId);
@@ -6578,7 +6578,7 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0xF001) command (0x08) on endpoint %" PRIu16, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0506) command (0x08) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::MediaPlaybackCluster cluster;
         cluster.Associate(device, endpointId);
@@ -6602,7 +6602,7 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0xF001) command (0x03) on endpoint %" PRIu16, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0506) command (0x03) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::MediaPlaybackCluster cluster;
         cluster.Associate(device, endpointId);
@@ -6626,7 +6626,7 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0xF001) command (0x02) on endpoint %" PRIu16, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0506) command (0x02) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::MediaPlaybackCluster cluster;
         cluster.Associate(device, endpointId);
@@ -6678,7 +6678,7 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0xF001) command (0x00) on endpoint %" PRIu16, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0506) command (0x00) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::MediaPlaybackCluster cluster;
         cluster.Associate(device, endpointId);
@@ -6706,7 +6706,7 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0xF001) command (0x00) on endpoint %" PRIu16, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0506) command (0x00) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::MediaPlaybackCluster cluster;
         cluster.Associate(device, endpointId);

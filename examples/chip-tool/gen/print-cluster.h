@@ -526,10 +526,22 @@
 #define CHIP_PRINTCLUSTER_IAS_WD_CLUSTER
 #endif
 
+#if defined(ZCL_USING_MEDIA_PLAYBACK_CLUSTER_SERVER) || defined(ZCL_USING_MEDIA_PLAYBACK_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_MEDIA_PLAYBACK_CLUSTER { ZCL_MEDIA_PLAYBACK_CLUSTER_ID, 1286, "Media Playback" },
+#else
+#define CHIP_PRINTCLUSTER_MEDIA_PLAYBACK_CLUSTER
+#endif
+
 #if defined(ZCL_USING_LOW_POWER_CLUSTER_SERVER) || defined(ZCL_USING_LOW_POWER_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_LOW_POWER_CLUSTER { ZCL_LOW_POWER_CLUSTER_ID, 1288, "Low Power" },
 #else
 #define CHIP_PRINTCLUSTER_LOW_POWER_CLUSTER
+#endif
+
+#if defined(ZCL_USING_CONTENT_LAUNCH_CLUSTER_SERVER) || defined(ZCL_USING_CONTENT_LAUNCH_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_CONTENT_LAUNCH_CLUSTER { ZCL_CONTENT_LAUNCH_CLUSTER_ID, 1290, "Content Launch" },
+#else
+#define CHIP_PRINTCLUSTER_CONTENT_LAUNCH_CLUSTER
 #endif
 
 #if defined(ZCL_USING_APPLICATION_BASIC_CLUSTER_SERVER) || defined(ZCL_USING_APPLICATION_BASIC_CLUSTER_CLIENT)
@@ -746,18 +758,6 @@
 #define CHIP_PRINTCLUSTER_BINDING_CLUSTER
 #endif
 
-#if defined(ZCL_USING_MEDIA_PLAYBACK_CLUSTER_SERVER) || defined(ZCL_USING_MEDIA_PLAYBACK_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_MEDIA_PLAYBACK_CLUSTER { ZCL_MEDIA_PLAYBACK_CLUSTER_ID, 61441, "Media Playback" },
-#else
-#define CHIP_PRINTCLUSTER_MEDIA_PLAYBACK_CLUSTER
-#endif
-
-#if defined(ZCL_USING_CONTENT_LAUNCH_CLUSTER_SERVER) || defined(ZCL_USING_CONTENT_LAUNCH_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_CONTENT_LAUNCH_CLUSTER { ZCL_CONTENT_LAUNCH_CLUSTER_ID, 61442, "Content Launch" },
-#else
-#define CHIP_PRINTCLUSTER_CONTENT_LAUNCH_CLUSTER
-#endif
-
 #if defined(ZCL_USING_SAMPLE_MFG_SPECIFIC_CLUSTER_SERVER) || defined(ZCL_USING_SAMPLE_MFG_SPECIFIC_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_SAMPLE_MFG_SPECIFIC_CLUSTER { ZCL_SAMPLE_MFG_SPECIFIC_CLUSTER_ID, 64512, "Sample Mfg Specific Cluster" },
 #else
@@ -863,7 +863,9 @@
     CHIP_PRINTCLUSTER_IAS_ZONE_CLUSTER                                                                                             \
     CHIP_PRINTCLUSTER_IAS_ACE_CLUSTER                                                                                              \
     CHIP_PRINTCLUSTER_IAS_WD_CLUSTER                                                                                               \
+    CHIP_PRINTCLUSTER_MEDIA_PLAYBACK_CLUSTER                                                                                       \
     CHIP_PRINTCLUSTER_LOW_POWER_CLUSTER                                                                                            \
+    CHIP_PRINTCLUSTER_CONTENT_LAUNCH_CLUSTER                                                                                       \
     CHIP_PRINTCLUSTER_APPLICATION_BASIC_CLUSTER                                                                                    \
     CHIP_PRINTCLUSTER_GENERIC_TUNNEL_CLUSTER                                                                                       \
     CHIP_PRINTCLUSTER_BACNET_PROTOCOL_TUNNEL_CLUSTER                                                                               \
@@ -899,8 +901,6 @@
     CHIP_PRINTCLUSTER_ZLL_COMMISSIONING_CLUSTER                                                                                    \
     CHIP_PRINTCLUSTER_NETWORK_COMMISSIONING_CLUSTER                                                                                \
     CHIP_PRINTCLUSTER_BINDING_CLUSTER                                                                                              \
-    CHIP_PRINTCLUSTER_MEDIA_PLAYBACK_CLUSTER                                                                                       \
-    CHIP_PRINTCLUSTER_CONTENT_LAUNCH_CLUSTER                                                                                       \
     CHIP_PRINTCLUSTER_SAMPLE_MFG_SPECIFIC_CLUSTER                                                                                  \
     CHIP_PRINTCLUSTER_SAMPLE_MFG_SPECIFIC_CLUSTER_2                                                                                \
     CHIP_PRINTCLUSTER_OTA_CONFIGURATION_CLUSTER                                                                                    \
