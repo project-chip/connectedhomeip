@@ -1,6 +1,10 @@
 #include "common.h"
 #include <net_socket.h>
+#include <rtos/EventFlags.h>
 #define MAX_SOCKET 5
+
+using namespace mbed;
+using namespace rtos;
 
 #define TCP_SOCKET SOCK_STREAM
 #define UDP_SOCKET SOCK_DGRAM
@@ -318,23 +322,105 @@ ssize_t mbed_recvmsg(int socket, struct msghdr * message, int flags)
 int mbed_select(int nfds, fd_set * readfds, fd_set * writefds, fd_set * exceptfds, struct timeval * timeout)
 {
     int totalReady = 0;
+    FileHandle * fh;
+    short fdEvents    = POLLIN | POLLOUT | POLLERR;
+    uint32_t waitTime = osWaitForever;
+    uint32_t ret;
 
-    // create own fd sets and set to zero
+    EventFlags event;
+    uint32_t eventFlag = 1;
 
-    // if timeout set calculate the end time
+    if (nfds < 0)
+    {
+        set_errno(EINVAL);
+        return -1;
+    }
 
-    // for (;;)
-    //{
-    // iteratre over the socket array
+    if (timeout)
+    {
+        waitTime = (timeout->tv_sec * (uint32_t) 1000) + (timeout->tv_usec / (uint32_t) 1000);
+    }
 
-    // check if socket is read ready -> FD_SET(socket, readfds)
-    // check if socket is write ready -> FD_SET(socket, writefds)
-    // check if exceptional condition on socket has occurred -> FD_SET(socket, exceptfds)
+    for (int fd = 0; fd < nfds; ++fd)
+    {
+        fh = mbed_file_handle(fd);
+        if (fh)
+        {
+            if (fh->poll(fdEvents))
+            {
+                event.set(eventFlag);
+                break;
+            }
+            else
+            {
+                fh->sigio([&event, eventFlag]() { event.set(eventFlag); });
+            }
+        }
+    }
 
-    // if totalReady > 0 or timeout - break the loop
-    //}
+    ret = event.wait_any(eventFlag, waitTime);
+    if (ret & osFlagsError)
+    {
+        set_errno(EINTR);
+        return -1;
+    }
 
-    // copy the result form own fd set to pointers
+    for (int fd = 0; fd < nfds; ++fd)
+    {
+        fh = mbed_file_handle(fd);
+        if (fh)
+        {
+            fdEvents = fh->poll(POLLIN | POLLOUT | POLLERR);
+
+            if (readfds)
+            {
+                if (fdEvents & POLLIN)
+                {
+                    FD_SET(fd, readfds);
+                    totalReady++;
+                }
+                else
+                {
+                    FD_CLR(fd, readfds);
+                }
+            }
+
+            if (writefds)
+            {
+                if (fdEvents & POLLOUT)
+                {
+                    FD_SET(fd, writefds);
+                    totalReady++;
+                }
+                else
+                {
+                    FD_CLR(fd, writefds);
+                }
+            }
+
+            if (exceptfds)
+            {
+                if (fdEvents & POLLERR)
+                {
+                    FD_SET(fd, exceptfds);
+                    totalReady++;
+                }
+                else
+                {
+                    FD_CLR(fd, exceptfds);
+                }
+            }
+        }
+    }
+
+    for (int fd = 0; fd < nfds; ++fd)
+    {
+        fh = mbed_file_handle(fd);
+        if (fh)
+        {
+            fh->sigio(nullptr);
+        }
+    }
 
     return totalReady;
 }
