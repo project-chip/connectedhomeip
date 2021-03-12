@@ -605,14 +605,31 @@ PacketBufferHandle PacketBufferHandle::PopHead()
     return PacketBufferHandle(head);
 }
 
-PacketBufferHandle PacketBufferHandle::CloneData(uint16_t aAdditionalSize, uint16_t aReservedSize)
+PacketBufferHandle PacketBufferHandle::CloneData()
 {
-    if (!mBuffer->Next().IsNull())
+    PacketBufferHandle cloneHead;
+
+    for (PacketBuffer * original = mBuffer; original != nullptr; original = static_cast<PacketBuffer *>(original->next))
     {
-        // We do not clone an entire chain.
-        return PacketBufferHandle();
+        uint16_t originalDataSize = original->MaxDataLength();
+        uint16_t originalReservedSize = original->ReservedSize();
+        PacketBufferHandle clone = PacketBufferHandle::New(originalDataSize, originalReservedSize);
+        clone.mBuffer->tot_len = clone.mBuffer->len = original->len;
+        memcpy(reinterpret_cast<uint8_t *>(clone.mBuffer) + PacketBuffer::kStructureSize,
+               reinterpret_cast<uint8_t *>(original) + PacketBuffer::kStructureSize,
+               originalDataSize + originalReservedSize);
+
+        if (cloneHead.IsNull())
+        {
+            cloneHead = std::move(clone);
+        }
+        else
+        {
+            cloneHead->AddToEnd(std::move(clone));
+        }
     }
-    return NewWithData(mBuffer->Start(), mBuffer->DataLength(), aAdditionalSize, aReservedSize);
+
+    return cloneHead;
 }
 
 } // namespace System
