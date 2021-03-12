@@ -30,6 +30,7 @@
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/SafeInt.h>
+#include <support/ReturnMacros.h>
 
 namespace chip {
 namespace TLV {
@@ -125,81 +126,125 @@ CHIP_ERROR TLVReader::Get(bool & v)
     return CHIP_NO_ERROR;
 }
 
+template<typename int_type>
+static inline bool TLVTypeValid(bool tlv_isSigned, uint64_t val64)
+{
+    return !(tlv_isSigned ^ std::is_signed<int_type>::value) &&
+	    (tlv_isSigned && val64 >> 63) ? CanCastTo<int_type>(-val64) : CanCastTo<int_type>(val64);
+}
+
 CHIP_ERROR TLVReader::Get(int8_t & v)
 {
     uint64_t v64   = 0;
-    CHIP_ERROR err = Get(v64);
-    v              = CastToSigned(static_cast<uint8_t>(v64));
+    bool tlv_isSigned = false;
+
+    CHIP_ERROR err = Get(v64, tlv_isSigned);
+    ReturnErrorCodeIf(!TLVTypeValid<int8_t>(tlv_isSigned, v64), CHIP_ERROR_WRONG_TLV_TYPE);
+    v = CastToSigned(static_cast<uint8_t>(v64));
     return err;
 }
 
 CHIP_ERROR TLVReader::Get(int16_t & v)
 {
     uint64_t v64   = 0;
-    CHIP_ERROR err = Get(v64);
-    v              = CastToSigned(static_cast<uint16_t>(v64));
+    bool tlv_isSigned = false;
+
+    CHIP_ERROR err = Get(v64, tlv_isSigned);
+    ReturnErrorCodeIf(!TLVTypeValid<int16_t>(tlv_isSigned, v64), CHIP_ERROR_WRONG_TLV_TYPE);
+    v = CastToSigned(static_cast<uint16_t>(v64));
     return err;
 }
 
 CHIP_ERROR TLVReader::Get(int32_t & v)
 {
     uint64_t v64   = 0;
-    CHIP_ERROR err = Get(v64);
-    v              = CastToSigned(static_cast<uint32_t>(v64));
+    bool tlv_isSigned = false;
+
+    CHIP_ERROR err = Get(v64, tlv_isSigned);
+    ReturnErrorCodeIf(!TLVTypeValid<int32_t>(tlv_isSigned, v64), CHIP_ERROR_WRONG_TLV_TYPE);
+    v = CastToSigned(static_cast<uint32_t>(v64));
     return err;
 }
 
 CHIP_ERROR TLVReader::Get(int64_t & v)
 {
     uint64_t v64   = 0;
-    CHIP_ERROR err = Get(v64);
-    v              = CastToSigned(v64);
+    bool tlv_isSigned = false;
+
+    CHIP_ERROR err = Get(v64, tlv_isSigned);
+    ReturnErrorCodeIf(!TLVTypeValid<int64_t>(tlv_isSigned, v64), CHIP_ERROR_WRONG_TLV_TYPE);
+    v = CastToSigned(v64);
     return err;
 }
 
 CHIP_ERROR TLVReader::Get(uint8_t & v)
 {
     uint64_t v64   = 0;
-    CHIP_ERROR err = Get(v64);
-    v              = static_cast<uint8_t>(v64);
+    bool tlv_isSigned = false;
+
+    CHIP_ERROR err = Get(v64, tlv_isSigned);
+    ReturnErrorCodeIf(!TLVTypeValid<uint8_t>(tlv_isSigned, v64), CHIP_ERROR_WRONG_TLV_TYPE);
+    v = static_cast<uint8_t>(v64);
     return err;
 }
 
 CHIP_ERROR TLVReader::Get(uint16_t & v)
 {
     uint64_t v64   = 0;
-    CHIP_ERROR err = Get(v64);
-    v              = static_cast<uint16_t>(v64);
+    bool tlv_isSigned = false;
+
+    CHIP_ERROR err = Get(v64, tlv_isSigned);
+    ReturnErrorCodeIf(!TLVTypeValid<uint16_t>(tlv_isSigned, v64), CHIP_ERROR_WRONG_TLV_TYPE);
+    v = static_cast<uint16_t>(v64);
     return err;
 }
 
 CHIP_ERROR TLVReader::Get(uint32_t & v)
 {
     uint64_t v64   = 0;
-    CHIP_ERROR err = Get(v64);
-    v              = static_cast<uint32_t>(v64);
+    bool tlv_isSigned = false;
+
+    CHIP_ERROR err = Get(v64, tlv_isSigned);
+    ReturnErrorCodeIf(!TLVTypeValid<uint32_t>(tlv_isSigned, v64), CHIP_ERROR_WRONG_TLV_TYPE);
+    v = static_cast<uint32_t>(v64);
     return err;
 }
 
 CHIP_ERROR TLVReader::Get(uint64_t & v)
 {
+    bool tlv_isSigned = false;
+
+    CHIP_ERROR err = Get(v, tlv_isSigned);
+    ReturnErrorCodeIf(!TLVTypeValid<uint64_t>(tlv_isSigned, v), CHIP_ERROR_WRONG_TLV_TYPE);
+    return err;
+}
+
+CHIP_ERROR TLVReader::Get(uint64_t & v, bool& isSigned) const
+{
     switch (ElementType())
     {
     case TLVElementType::Int8:
         v = static_cast<uint64_t>(static_cast<int64_t>(CastToSigned(static_cast<uint8_t>(mElemLenOrVal))));
+        isSigned = true;
         break;
     case TLVElementType::Int16:
         v = static_cast<uint64_t>(static_cast<int64_t>(CastToSigned(static_cast<uint16_t>(mElemLenOrVal))));
+        isSigned = true;
         break;
     case TLVElementType::Int32:
         v = static_cast<uint64_t>(static_cast<int64_t>(CastToSigned(static_cast<uint32_t>(mElemLenOrVal))));
+        isSigned = true;
         break;
     case TLVElementType::Int64:
+        v = mElemLenOrVal;
+        isSigned = true;
+        break;
     case TLVElementType::UInt8:
     case TLVElementType::UInt16:
     case TLVElementType::UInt32:
     case TLVElementType::UInt64:
         v = mElemLenOrVal;
+        isSigned = false;
         break;
     default:
         return CHIP_ERROR_WRONG_TLV_TYPE;
