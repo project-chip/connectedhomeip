@@ -301,19 +301,6 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
- * Cluster Content Launch
- *
- */
-@interface CHIPContentLaunch : CHIPCluster
-
-- (void)launchContent:(ResponseHandler)completionHandler;
-- (void)launchURL:(ResponseHandler)completionHandler;
-
-- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
-
-@end
-
-/**
  * Cluster Door Lock
  *
  */
@@ -503,28 +490,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)sleep:(ResponseHandler)completionHandler;
 
-- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
-
-@end
-
-/**
- * Cluster Media Playback
- *
- */
-@interface CHIPMediaPlayback : CHIPCluster
-
-- (void)fastForwardRequest:(ResponseHandler)completionHandler;
-- (void)nextRequest:(ResponseHandler)completionHandler;
-- (void)pauseRequest:(ResponseHandler)completionHandler;
-- (void)playRequest:(ResponseHandler)completionHandler;
-- (void)previousRequest:(ResponseHandler)completionHandler;
-- (void)rewindRequest:(ResponseHandler)completionHandler;
-- (void)skipBackwardRequest:(ResponseHandler)completionHandler;
-- (void)skipForwardRequest:(ResponseHandler)completionHandler;
-- (void)startOverRequest:(ResponseHandler)completionHandler;
-- (void)stopRequest:(ResponseHandler)completionHandler;
-
-- (void)readAttributeCurrentState:(ResponseHandler)completionHandler;
 - (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
 
 @end

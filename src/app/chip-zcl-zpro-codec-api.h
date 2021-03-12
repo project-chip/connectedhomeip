@@ -33,7 +33,6 @@
 | Basic                                                               | 0x0028 |
 | Binding                                                             | 0xF000 |
 | ColorControl                                                        | 0x0300 |
-| ContentLaunch                                                       | 0xF002 |
 | DoorLock                                                            | 0x0101 |
 | GeneralCommissioning                                                | 0x0030 |
 | Groups                                                              | 0x0004 |
@@ -41,7 +40,6 @@
 | Identify                                                            | 0x0003 |
 | LevelControl                                                        | 0x0008 |
 | LowPower                                                            | 0x0508 |
-| MediaPlayback                                                       | 0xF001 |
 | NetworkCommissioning                                                | 0xAAAA |
 | OnOff                                                               | 0x0006 |
 | Scenes                                                              | 0x0005 |
@@ -1064,43 +1062,6 @@ chip::System::PacketBufferHandle encodeColorControlClusterReadClusterRevisionAtt
                                                                                        chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
-| Cluster ContentLaunch                                               | 0xF002 |
-|------------------------------------------------------------------------------|
-| Commands:                                                           |        |
-| * LaunchContent                                                     |   0x00 |
-| * LaunchURL                                                         |   0x01 |
-|------------------------------------------------------------------------------|
-| Attributes:                                                         |        |
-| * ClusterRevision                                                   | 0xFFFD |
-\*----------------------------------------------------------------------------*/
-
-/**
- * @brief
- *    Encode an LaunchContent command for Content Launch server into buffer including the APS frame
- */
-chip::System::PacketBufferHandle encodeContentLaunchClusterLaunchContentCommand(uint8_t seqNum,
-                                                                                chip::EndpointId destinationEndpoint);
-
-/**
- * @brief
- *    Encode an LaunchURL command for Content Launch server into buffer including the APS frame
- */
-chip::System::PacketBufferHandle encodeContentLaunchClusterLaunchURLCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint);
-
-/**
- * @brief
- *    Encode a Content Launch server discover command into buffer including the APS frame
- */
-chip::System::PacketBufferHandle encodeContentLaunchClusterDiscoverAttributes(uint8_t seqNum, chip::EndpointId destinationEndpoint);
-
-/**
- * @brief
- *    Encode a Content Launch server read command for the cluster revision attribute into buffer including the APS frame
- */
-chip::System::PacketBufferHandle encodeContentLaunchClusterReadClusterRevisionAttribute(uint8_t seqNum,
-                                                                                        chip::EndpointId destinationEndpoint);
-
-/*----------------------------------------------------------------------------*\
 | Cluster DoorLock                                                    | 0x0101 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
@@ -1749,113 +1710,6 @@ chip::System::PacketBufferHandle encodeLowPowerClusterDiscoverAttributes(uint8_t
  */
 chip::System::PacketBufferHandle encodeLowPowerClusterReadClusterRevisionAttribute(uint8_t seqNum,
                                                                                    chip::EndpointId destinationEndpoint);
-
-/*----------------------------------------------------------------------------*\
-| Cluster MediaPlayback                                               | 0xF001 |
-|------------------------------------------------------------------------------|
-| Commands:                                                           |        |
-| * FastForwardRequest                                                |   0x07 |
-| * NextRequest                                                       |   0x05 |
-| * PauseRequest                                                      |   0x01 |
-| * PlayRequest                                                       |   0x00 |
-| * PreviousRequest                                                   |   0x04 |
-| * RewindRequest                                                     |   0x06 |
-| * SkipBackwardRequest                                               |   0x09 |
-| * SkipForwardRequest                                                |   0x08 |
-| * StartOverRequest                                                  |   0x03 |
-| * StopRequest                                                       |   0x02 |
-|------------------------------------------------------------------------------|
-| Attributes:                                                         |        |
-| * CurrentState                                                      | 0x0000 |
-| * ClusterRevision                                                   | 0xFFFD |
-\*----------------------------------------------------------------------------*/
-
-/**
- * @brief
- *    Encode an FastForwardRequest command for Media Playback server into buffer including the APS frame
- */
-chip::System::PacketBufferHandle encodeMediaPlaybackClusterFastForwardRequestCommand(uint8_t seqNum,
-                                                                                     chip::EndpointId destinationEndpoint);
-
-/**
- * @brief
- *    Encode an NextRequest command for Media Playback server into buffer including the APS frame
- */
-chip::System::PacketBufferHandle encodeMediaPlaybackClusterNextRequestCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint);
-
-/**
- * @brief
- *    Encode an PauseRequest command for Media Playback server into buffer including the APS frame
- */
-chip::System::PacketBufferHandle encodeMediaPlaybackClusterPauseRequestCommand(uint8_t seqNum,
-                                                                               chip::EndpointId destinationEndpoint);
-
-/**
- * @brief
- *    Encode an PlayRequest command for Media Playback server into buffer including the APS frame
- */
-chip::System::PacketBufferHandle encodeMediaPlaybackClusterPlayRequestCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint);
-
-/**
- * @brief
- *    Encode an PreviousRequest command for Media Playback server into buffer including the APS frame
- */
-chip::System::PacketBufferHandle encodeMediaPlaybackClusterPreviousRequestCommand(uint8_t seqNum,
-                                                                                  chip::EndpointId destinationEndpoint);
-
-/**
- * @brief
- *    Encode an RewindRequest command for Media Playback server into buffer including the APS frame
- */
-chip::System::PacketBufferHandle encodeMediaPlaybackClusterRewindRequestCommand(uint8_t seqNum,
-                                                                                chip::EndpointId destinationEndpoint);
-
-/**
- * @brief
- *    Encode an SkipBackwardRequest command for Media Playback server into buffer including the APS frame
- */
-chip::System::PacketBufferHandle encodeMediaPlaybackClusterSkipBackwardRequestCommand(uint8_t seqNum,
-                                                                                      chip::EndpointId destinationEndpoint);
-
-/**
- * @brief
- *    Encode an SkipForwardRequest command for Media Playback server into buffer including the APS frame
- */
-chip::System::PacketBufferHandle encodeMediaPlaybackClusterSkipForwardRequestCommand(uint8_t seqNum,
-                                                                                     chip::EndpointId destinationEndpoint);
-
-/**
- * @brief
- *    Encode an StartOverRequest command for Media Playback server into buffer including the APS frame
- */
-chip::System::PacketBufferHandle encodeMediaPlaybackClusterStartOverRequestCommand(uint8_t seqNum,
-                                                                                   chip::EndpointId destinationEndpoint);
-
-/**
- * @brief
- *    Encode an StopRequest command for Media Playback server into buffer including the APS frame
- */
-chip::System::PacketBufferHandle encodeMediaPlaybackClusterStopRequestCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint);
-
-/**
- * @brief
- *    Encode a Media Playback server discover command into buffer including the APS frame
- */
-chip::System::PacketBufferHandle encodeMediaPlaybackClusterDiscoverAttributes(uint8_t seqNum, chip::EndpointId destinationEndpoint);
-
-/**
- * @brief
- *    Encode a Media Playback server read command for the current state attribute into buffer including the APS frame
- */
-chip::System::PacketBufferHandle encodeMediaPlaybackClusterReadCurrentStateAttribute(uint8_t seqNum,
-                                                                                     chip::EndpointId destinationEndpoint);
-
-/**
- * @brief
- *    Encode a Media Playback server read command for the cluster revision attribute into buffer including the APS frame
- */
-chip::System::PacketBufferHandle encodeMediaPlaybackClusterReadClusterRevisionAttribute(uint8_t seqNum,
-                                                                                        chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
 | Cluster NetworkCommissioning                                        | 0xAAAA |
