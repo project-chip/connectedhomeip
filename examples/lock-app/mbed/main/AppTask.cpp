@@ -76,12 +76,16 @@ int AppTask::Init()
     sFunctionButton.fall(mbed::callback(this, &AppTask::FunctionButtonPressEventHandler));
     sFunctionButton.rise(mbed::callback(this, &AppTask::FunctionButtonReleaseEventHandler));
 
-    // Timer initialization
-    // TODO: timer period to FACTORY_RESET_CANCEL_WINDOW_TIMEOUT
-    // StartTimer(50);
-
+    // Initialize lock manager
     BoltLockMgr().Init();
     BoltLockMgr().SetCallbacks(ActionInitiated, ActionCompleted);
+
+    // Start BLE advertising if needed
+    if (!CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART)
+    {
+        ChipLogProgress(NotSpecified, "Enabling BLE advertising.");
+        ConnectivityMgr().SetBLEAdvertisingEnabled(true);
+    }
 
     return 0;
 }
