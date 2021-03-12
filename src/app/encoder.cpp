@@ -113,7 +113,7 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
 | LevelControl                                                        | 0x0008 |
 | LowPower                                                            | 0x0508 |
 | MediaPlayback                                                       | 0xF001 |
-| NetworkCommissioning                                                | 0xAAAA |
+| NetworkCommissioning                                                | 0x0031 |
 | OnOff                                                               | 0x0006 |
 | Scenes                                                              | 0x0005 |
 | TemperatureMeasurement                                              | 0x0402 |
@@ -247,7 +247,7 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
 #define ZCL_START_OVER_REQUEST_COMMAND_ID (0x03)
 #define ZCL_STOP_REQUEST_COMMAND_ID (0x02)
 
-#define NETWORK_COMMISSIONING_CLUSTER_ID 0xAAAA
+#define NETWORK_COMMISSIONING_CLUSTER_ID 0x0031
 #define ZCL_ADD_THREAD_NETWORK_COMMAND_ID (0x06)
 #define ZCL_ADD_WI_FI_NETWORK_COMMAND_ID (0x02)
 #define ZCL_DISABLE_NETWORK_COMMAND_ID (0x0E)
@@ -3182,7 +3182,7 @@ PacketBufferHandle encodeMediaPlaybackClusterReadClusterRevisionAttribute(uint8_
 }
 
 /*----------------------------------------------------------------------------*\
-| Cluster NetworkCommissioning                                        | 0xAAAA |
+| Cluster NetworkCommissioning                                        | 0x0031 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * AddThreadNetwork                                                  |   0x06 |
