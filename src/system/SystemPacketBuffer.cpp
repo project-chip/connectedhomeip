@@ -611,13 +611,12 @@ PacketBufferHandle PacketBufferHandle::CloneData()
 
     for (PacketBuffer * original = mBuffer; original != nullptr; original = static_cast<PacketBuffer *>(original->next))
     {
-        uint16_t originalDataSize = original->MaxDataLength();
+        uint16_t originalDataSize     = original->MaxDataLength();
         uint16_t originalReservedSize = original->ReservedSize();
-        PacketBufferHandle clone = PacketBufferHandle::New(originalDataSize, originalReservedSize);
+        PacketBufferHandle clone      = PacketBufferHandle::New(originalDataSize, originalReservedSize);
         clone.mBuffer->tot_len = clone.mBuffer->len = original->len;
         memcpy(reinterpret_cast<uint8_t *>(clone.mBuffer) + PacketBuffer::kStructureSize,
-               reinterpret_cast<uint8_t *>(original) + PacketBuffer::kStructureSize,
-               originalDataSize + originalReservedSize);
+               reinterpret_cast<uint8_t *>(original) + PacketBuffer::kStructureSize, originalDataSize + originalReservedSize);
 
         if (cloneHead.IsNull())
         {
