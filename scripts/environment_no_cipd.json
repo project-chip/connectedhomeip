@@ -1,8 +1,6 @@
 {
-  "virtualenv": {
-    "gn_root": ".",
-    "gn_targets": [
-      ":python_packages.install"
-    ]
-  }
+    "virtualenv": {
+        "gn_root": ".",
+        "gn_targets": [":python_packages.install"]
+    }
 }
