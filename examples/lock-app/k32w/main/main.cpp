@@ -22,10 +22,10 @@
 
 #include "openthread/platform/logging.h"
 #include "openthread/platform/uart.h"
+#include <mbedtls/platform.h>
 #include <openthread-system.h>
 #include <openthread/cli.h>
 #include <openthread/error.h>
-#include <openthread/heap.h>
 
 #include <core/CHIPError.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -43,8 +43,6 @@ using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::Logging;
 
-extern "C" void * pvPortCallocRtos(size_t num, size_t size);
-
 #include <AppTask.h>
 
 typedef void (*InitFunc)(void);
@@ -53,6 +51,8 @@ extern InitFunc __init_array_end;
 
 /* needed for FreeRtos Heap 4 */
 uint8_t __attribute__((section(".heap"))) ucHeap[0xF000];
+
+extern "C" void * pvPortCallocRtos(size_t num, size_t size);
 
 extern "C" void main_task(void const * argument)
 {
@@ -64,6 +64,8 @@ extern "C" void main_task(void const * argument)
     {
         (*pFunc)();
     }
+
+    mbedtls_platform_set_calloc_free(pvPortCallocRtos, vPortFree);
 
     /* Used for HW initializations */
     otSysInit(0, NULL);
