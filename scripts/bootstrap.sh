@@ -66,9 +66,7 @@ EOF
         [ ! -s "$_SETUP_SH" ]; then
         pw_bootstrap --shell-file "$_SETUP_SH" \
             --install-dir "$_PW_ACTUAL_ENVIRONMENT_ROOT" \
-            --virtualenv-requirements "$_CHIP_ROOT/scripts/requirements.txt" \
-            --cipd-package-file "$_CHIP_ROOT/scripts/pigweed.json" \
-            --virtualenv-gn-target "$_CHIP_ROOT#:python_packages.install"
+            --config-file "$_CHIP_ROOT/scripts/environment.json"
         pw_finalize bootstrap "$_SETUP_SH"
     else
         pw_activate
