@@ -436,7 +436,6 @@ typedef struct ip_mreq
 
 int socket(int family, int type, int proto);
 int socketpair(int family, int type, int proto, int sv[2]);
-int close_(int sock);
 int shutdown(int sock, int how);
 int bind(int sock, const struct sockaddr * addr, socklen_t addrlen);
 int connect(int sock, const struct sockaddr * addr, socklen_t addrlen);

@@ -11,11 +11,6 @@ int socketpair(int family, int type, int proto, int sv[2])
     return mbed_socketpair(family, type, proto, sv);
 }
 
-int close_(int sock)
-{
-    return mbed_close(sock);
-}
-
 int shutdown(int sock, int how)
 {
     return mbed_shutdown(sock, how);

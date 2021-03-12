@@ -1,17 +1,68 @@
 #include "common.h"
+#include <mbed_retarget.h>
 #include <net_socket.h>
 #include <rtos/EventFlags.h>
-#define MAX_SOCKET 5
 
 using namespace mbed;
 using namespace rtos;
 
 #define TCP_SOCKET SOCK_STREAM
 #define UDP_SOCKET SOCK_DGRAM
-#define SOCKET_NOT_INITIALIZED 0
-#define ERR_NO_MEMORY -1
+#define SOCKET_NOT_INITIALIZED (-1)
+#define NO_FREE_SOCKET_SLOT (-1)
 
-BSDSocket sockets[MAX_SOCKET];
+static BSDSocket sockets[MBED_NET_SOCKET_MAX_NUMBER];
+
+ssize_t BSDSocket::read(void *, size_t)
+{
+    return 1;
+}
+
+ssize_t BSDSocket::write(const void *, size_t)
+{
+    return 1;
+}
+
+off_t BSDSocket::seek(off_t offset, int whence)
+{
+    return -1;
+}
+
+int BSDSocket::close()
+{
+    switch (type)
+    {
+    case TCP_SOCKET:
+        tcpSocket.~TCPSocket();
+    case UDP_SOCKET:
+        udpSocket.~UDPSocket();
+    }
+
+    type = SOCKET_NOT_INITIALIZED;
+    _cb  = nullptr;
+    fd   = SOCKET_NOT_INITIALIZED;
+}
+
+int BSDSocket::set_blocking(bool blocking)
+{
+    if (blocking)
+    {
+        return -EINVAL;
+    }
+    return 0;
+}
+bool BSDSocket::is_blocking() const
+{
+    return false;
+}
+short BSDSocket::poll(short events) const
+{
+    return POLLIN | POLLOUT;
+}
+void BSDSocket::sigio(Callback<void()> func)
+{
+    _cb = func;
+}
 
 nsapi_version_t Inet2Nsapi(int family)
 {
@@ -37,73 +88,92 @@ void Sockaddr2Netsocket(SocketAddress * dst, struct sockaddr * src)
     dst->set_ip_bytes((const void *) addr->sin_addr.s_addr, Inet2Nsapi(src->sa_family));
 }
 
-Socket * getSocket(int id)
+static Socket * getSocket(int fd)
 {
-    int type = 1;
-    switch (type)
+    Socket * ret       = nullptr;
+    BSDSocket * socket = static_cast<BSDSocket *>(mbed_file_handle(fd));
+
+    if (socket != nullptr)
     {
-    case TCP_SOCKET:
-        return &sockets[id].tcpSocket;
-    case UDP_SOCKET:
-        return &sockets[id].udpSocket;
-    default:
-        return nullptr;
+        switch (socket->type)
+        {
+        case TCP_SOCKET:
+            ret = &socket->tcpSocket;
+        case UDP_SOCKET:
+            ret = &sockets->udpSocket;
+        }
     }
+
+    return ret;
 }
-int findMemForSocket()
+
+int getFreeSocketSlotIndex()
 {
-    int id = ERR_NO_MEMORY;
-    for (int i = 0; i < MAX_SOCKET; i++)
+    int index = NO_FREE_SOCKET_SLOT;
+    for (int i = 0; i < MBED_NET_SOCKET_MAX_NUMBER; i++)
     {
         if (sockets[i].type == SOCKET_NOT_INITIALIZED)
         {
-            id = i;
+            index = i;
             break;
         }
     }
-    return id;
+    return index;
 }
 
 int mbed_socket(int family, int type, int proto)
 {
-    int id = findMemForSocket();
-    if (id == ERR_NO_MEMORY)
+    int fd    = -1;
+    int index = getFreeSocketSlotIndex();
+    if (index == NO_FREE_SOCKET_SLOT)
     {
-        set_errno(ENOBUFS);
+        set_errno(ENOMEM);
         return -1;
     }
+
+    BSDSocket * socket = &sockets[index];
 
     switch (type)
     {
     case TCP_SOCKET: {
-        TCPSocket * tcpSocket = new (&sockets[id].tcpSocket) TCPSocket();
+        TCPSocket * tcpSocket = new (&sockets->tcpSocket) TCPSocket();
         if (tcpSocket->open(NetworkInterface::get_default_instance()) != NSAPI_ERROR_OK)
         {
-            tcpSocket->~TCPSocket();
-            sockets[id].type = SOCKET_NOT_INITIALIZED;
-            set_errno(EACCES);
-            return -1;
+            socket->close();
+            set_errno(EPROTO);
+            return fd;
         }
-        sockets[id].type = TCP_SOCKET;
+        socket->type = TCP_SOCKET;
     }
     break;
     case UDP_SOCKET: {
-        UDPSocket * udpSocket = new (&sockets[id].udpSocket) UDPSocket();
+        UDPSocket * udpSocket = new (&socket->udpSocket) UDPSocket();
         if (udpSocket->open(NetworkInterface::get_default_instance()) != NSAPI_ERROR_OK)
         {
-            udpSocket->~UDPSocket();
-            sockets[id].type = SOCKET_NOT_INITIALIZED;
-            set_errno(EACCES);
-            return -1;
+            socket->close();
+            set_errno(EPROTO);
+            return fd;
         }
-        sockets[id].type = UDP_SOCKET;
+        socket->type = UDP_SOCKET;
     }
     break;
     default:
         break;
     };
 
-    return id;
+    if (socket->type != SOCKET_NOT_INITIALIZED)
+    {
+        socket->fd = bind_to_fd(socket);
+        if (socket->fd < 0)
+        {
+            socket->close();
+            set_errno(EBADFD);
+            return fd;
+        }
+        fd = socket->fd;
+    }
+
+    return fd;
 }
 
 int mbed_socketpair(int family, int type, int proto, int sv[2])
@@ -111,28 +181,14 @@ int mbed_socketpair(int family, int type, int proto, int sv[2])
     return 0;
 }
 
-int mbed_close(int sock)
-{
-    auto * socket = getSocket(sock);
-    if (socket == nullptr)
-    {
-        set_errno(EFAULT);
-        return -1;
-    }
-    socket->~Socket();
-    sockets[sock].type = SOCKET_NOT_INITIALIZED;
-
-    return 0;
-}
-
-int mbed_shutdown(int sock, int how)
+int mbed_shutdown(int fd, int how)
 {
     return 0;
 }
 
-int mbed_bind(int sock, const struct sockaddr * addr, socklen_t addrlen)
+int mbed_bind(int fd, const struct sockaddr * addr, socklen_t addrlen)
 {
-    auto * socket = getSocket(sock);
+    auto * socket = getSocket(fd);
     if (socket == nullptr)
     {
         set_errno(ENOBUFS);
@@ -144,9 +200,9 @@ int mbed_bind(int sock, const struct sockaddr * addr, socklen_t addrlen)
     return socket->bind(sockAddr);
 }
 
-int mbed_connect(int sock, const struct sockaddr * addr, socklen_t addrlen)
+int mbed_connect(int fd, const struct sockaddr * addr, socklen_t addrlen)
 {
-    auto * socket = getSocket(sock);
+    auto * socket = getSocket(fd);
     if (socket == nullptr)
     {
         set_errno(ENOBUFS);
@@ -158,9 +214,9 @@ int mbed_connect(int sock, const struct sockaddr * addr, socklen_t addrlen)
     return socket->connect(sockAddr);
 }
 
-int mbed_listen(int sock, int backlog)
+int mbed_listen(int fd, int backlog)
 {
-    auto * socket = getSocket(sock);
+    auto * socket = getSocket(fd);
     if (socket == nullptr)
     {
         set_errno(ENOBUFS);
@@ -170,39 +226,28 @@ int mbed_listen(int sock, int backlog)
     return socket->listen(backlog);
 }
 
-int mbed_accept(int sock, struct sockaddr * addr, socklen_t * addrlen)
+int mbed_accept(int fd, struct sockaddr * addr, socklen_t * addrlen)
 {
-    auto * socket = getSocket(sock);
+    int retFd     = -1;
+    auto * socket = getSocket(fd);
     if (socket == nullptr)
     {
         set_errno(ENOBUFS);
         return -1;
     }
 
-    nsapi_error_t error;
-    int id                = findMemForSocket();
-    TCPSocket * tcpSocket = new (&sockets[id].tcpSocket) TCPSocket();
-    tcpSocket             = static_cast<TCPSocket *>(socket->accept(&error));
+    retFd = mbed_socket(AF_INET, TCP_SOCKET, 0);
+    if (retFd < 0)
+    {
+        return retFd;
+    }
 
-    if (&sockets[id].tcpSocket == nullptr)
-    {
-        set_errno(ENOBUFS);
-        return -1;
-    }
-    if (sockets[id].tcpSocket.open(NetworkInterface::get_default_instance()) != NSAPI_ERROR_OK)
-    {
-        sockets[id].tcpSocket.~TCPSocket();
-        sockets[id].type = SOCKET_NOT_INITIALIZED;
-        set_errno(EACCES);
-        return -1;
-    }
-    sockets[id].type = TCP_SOCKET;
-    return id;
+    return retFd;
 }
 
-ssize_t mbed_send(int sock, const void * buf, size_t len, int flags)
+ssize_t mbed_send(int fd, const void * buf, size_t len, int flags)
 {
-    auto * socket = getSocket(sock);
+    auto * socket = getSocket(fd);
     if (socket == nullptr)
     {
         set_errno(ENOBUFS);
@@ -211,9 +256,9 @@ ssize_t mbed_send(int sock, const void * buf, size_t len, int flags)
     return socket->send(buf, len);
 }
 
-ssize_t mbed_recv(int sock, void * buf, size_t max_len, int flags)
+ssize_t mbed_recv(int fd, void * buf, size_t max_len, int flags)
 {
-    auto * socket = getSocket(sock);
+    auto * socket = getSocket(fd);
     if (socket == nullptr)
     {
         set_errno(ENOBUFS);
@@ -222,9 +267,9 @@ ssize_t mbed_recv(int sock, void * buf, size_t max_len, int flags)
     return socket->recv(buf, max_len);
 }
 
-ssize_t mbed_sendto(int sock, const void * buf, size_t len, int flags, const struct sockaddr * dest_addr, socklen_t addrlen)
+ssize_t mbed_sendto(int fd, const void * buf, size_t len, int flags, const struct sockaddr * dest_addr, socklen_t addrlen)
 {
-    auto * socket = getSocket(sock);
+    auto * socket = getSocket(fd);
     if (socket == nullptr)
     {
         set_errno(ENOBUFS);
@@ -236,9 +281,9 @@ ssize_t mbed_sendto(int sock, const void * buf, size_t len, int flags, const str
     return socket->sendto(sockAddr, buf, len);
 }
 
-ssize_t mbed_sendmsg(int sock, const struct msghdr * message, int flags)
+ssize_t mbed_sendmsg(int fd, const struct msghdr * message, int flags)
 {
-    auto * socket = getSocket(sock);
+    auto * socket = getSocket(fd);
     if (socket == nullptr)
     {
         set_errno(ENOBUFS);
@@ -251,9 +296,9 @@ ssize_t mbed_sendmsg(int sock, const struct msghdr * message, int flags)
     return socket->sendto(sockAddr, (void *) message, sizeof(msghdr));
 }
 
-ssize_t mbed_recvfrom(int sock, void * buf, size_t max_len, int flags, struct sockaddr * src_addr, socklen_t * addrlen)
+ssize_t mbed_recvfrom(int fd, void * buf, size_t max_len, int flags, struct sockaddr * src_addr, socklen_t * addrlen)
 {
-    auto * socket = getSocket(sock);
+    auto * socket = getSocket(fd);
     if (socket == nullptr)
     {
         set_errno(ENOBUFS);
@@ -265,9 +310,9 @@ ssize_t mbed_recvfrom(int sock, void * buf, size_t max_len, int flags, struct so
     return socket->recvfrom(&sockAddr, buf, max_len);
 }
 
-int mbed_getsockopt(int sock, int level, int optname, void * optval, socklen_t * optlen)
+int mbed_getsockopt(int fd, int level, int optname, void * optval, socklen_t * optlen)
 {
-    auto * socket = getSocket(sock);
+    auto * socket = getSocket(fd);
     if (socket == nullptr)
     {
         set_errno(ENOBUFS);
@@ -276,9 +321,9 @@ int mbed_getsockopt(int sock, int level, int optname, void * optval, socklen_t *
     return socket->getsockopt(level, optname, optval, optlen);
 }
 
-int mbed_setsockopt(int sock, int level, int optname, const void * optval, socklen_t optlen)
+int mbed_setsockopt(int fd, int level, int optname, const void * optval, socklen_t optlen)
 {
-    auto * socket = getSocket(sock);
+    auto * socket = getSocket(fd);
     if (socket == nullptr)
     {
         set_errno(ENOBUFS);
@@ -287,7 +332,7 @@ int mbed_setsockopt(int sock, int level, int optname, const void * optval, sockl
     return socket->setsockopt(level, optname, optval, optlen);
 }
 
-int mbed_getsockname(int sock, struct sockaddr * addr, socklen_t * addrlen)
+int mbed_getsockname(int fd, struct sockaddr * addr, socklen_t * addrlen)
 {
     return 0;
 }
@@ -307,8 +352,8 @@ int mbed_getpeername(int sockfd, struct sockaddr * addr, socklen_t * addrlen)
 
 ssize_t mbed_recvmsg(int socket, struct msghdr * message, int flags)
 {
-    auto * sock = getSocket(socket);
-    if (sock == nullptr)
+    auto * fd = getSocket(socket);
+    if (fd == nullptr)
     {
         set_errno(ENOBUFS);
         return -1;
@@ -316,7 +361,7 @@ ssize_t mbed_recvmsg(int socket, struct msghdr * message, int flags)
     SocketAddress sockAddr;
     msghdr2Netsocket(&sockAddr, (struct sockaddr_in *) message->msg_name);
 
-    return sock->sendto(sockAddr, (void *) message, sizeof(msghdr));
+    return fd->sendto(sockAddr, (void *) message, sizeof(msghdr));
 }
 
 int mbed_select(int nfds, fd_set * readfds, fd_set * writefds, fd_set * exceptfds, struct timeval * timeout)

@@ -1,7 +1,6 @@
 #ifndef MBED_NET_NET_SOCKET_H
 #define MBED_NET_NET_SOCKET_H
 
-#include <netsocket/Socket.h>
 #include <netsocket/TCPSocket.h>
 #include <netsocket/UDPSocket.h>
 
@@ -11,22 +10,22 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-#define MAX_SOCKET 5
 
-#define TCP_SOCKET SOCK_STREAM
-#define UDP_SOCKET SOCK_DGRAM
-#define SOCKET_NOT_INITIALIZED 0
-#define ERR_NO_MEMORY -1
-#define ERR_OPEN -2
-#define ERR_NO_SOCKET -3
+#define MBED_NET_SOCKET_MAX_NUMBER 5
 struct BSDSocket : public ::mbed::FileHandle
 {
     BSDSocket() {}
     ~BSDSocket() {}
-    ssize_t read(void *, size_t) {}
-    ssize_t write(const void *, size_t) {}
-    off_t seek(off_t offset, int whence = SEEK_SET) {}
-    int close() {}
+
+    ssize_t read(void *, size_t) override;
+    ssize_t write(const void *, size_t) override;
+    off_t seek(off_t offset, int whence = SEEK_SET) override;
+    int close() override;
+    int set_blocking(bool blocking) override;
+    bool is_blocking() const override;
+    short poll(short events) const override;
+    void sigio(mbed::Callback<void()> func) override;
+
     union
     {
 
@@ -34,41 +33,39 @@ struct BSDSocket : public ::mbed::FileHandle
         UDPSocket udpSocket;
     };
     int type;
+    mbed::Callback<void()> _cb;
+    int fd;
 };
-
-Socket * getSocket(int id);
 
 int mbed_socket(int family, int type, int proto);
 
 int mbed_socketpair(int family, int type, int proto, int sv[2]);
 
-int mbed_close(int sock);
+int mbed_shutdown(int fd, int how);
 
-int mbed_shutdown(int sock, int how);
+int mbed_bind(int fd, const struct sockaddr * addr, socklen_t addrlen);
 
-int mbed_bind(int sock, const struct sockaddr * addr, socklen_t addrlen);
+int mbed_connect(int fd, const struct sockaddr * addr, socklen_t addrlen);
 
-int mbed_connect(int sock, const struct sockaddr * addr, socklen_t addrlen);
+int mbed_listen(int fd, int backlog);
 
-int mbed_listen(int sock, int backlog);
+int mbed_accept(int fd, struct sockaddr * addr, socklen_t * addrlen);
 
-int mbed_accept(int sock, struct sockaddr * addr, socklen_t * addrlen);
+ssize_t mbed_send(int fd, const void * buf, size_t len, int flags);
 
-ssize_t mbed_send(int sock, const void * buf, size_t len, int flags);
+ssize_t mbed_recv(int fd, void * buf, size_t max_len, int flags);
 
-ssize_t mbed_recv(int sock, void * buf, size_t max_len, int flags);
+ssize_t mbed_sendto(int fd, const void * buf, size_t len, int flags, const struct sockaddr * dest_addr, socklen_t addrlen);
 
-ssize_t mbed_sendto(int sock, const void * buf, size_t len, int flags, const struct sockaddr * dest_addr, socklen_t addrlen);
+ssize_t mbed_sendmsg(int fd, const struct msghdr * message, int flags);
 
-ssize_t mbed_sendmsg(int sock, const struct msghdr * message, int flags);
+ssize_t mbed_recvfrom(int fd, void * buf, size_t max_len, int flags, struct sockaddr * src_addr, socklen_t * addrlen);
 
-ssize_t mbed_recvfrom(int sock, void * buf, size_t max_len, int flags, struct sockaddr * src_addr, socklen_t * addrlen);
+int mbed_getsockopt(int fd, int level, int optname, void * optval, socklen_t * optlen);
 
-int mbed_getsockopt(int sock, int level, int optname, void * optval, socklen_t * optlen);
+int mbed_setsockopt(int fd, int level, int optname, const void * optval, socklen_t optlen);
 
-int mbed_setsockopt(int sock, int level, int optname, const void * optval, socklen_t optlen);
-
-int mbed_getsockname(int sock, struct sockaddr * addr, socklen_t * addrlen);
+int mbed_getsockname(int fd, struct sockaddr * addr, socklen_t * addrlen);
 
 int mbed_getpeername(int sockfd, struct sockaddr * addr, socklen_t * addrlen);
 
