@@ -362,7 +362,7 @@ void GetGatewayIP(char * ip_buf, size_t ip_len)
 
 bool isRendezvousBLE()
 {
-    return static_cast<RendezvousInformationFlags>(CONFIG_RENDEZVOUS_MODE) == RendezvousInformationFlags::kBLE;
+    return CONFIG_RENDEZVOUS_MODE & static_cast<uint16_t>(RendezvousInformationFlags::kBLE);
 }
 
 std::string createSetupPayload()

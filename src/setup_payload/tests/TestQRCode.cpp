@@ -41,16 +41,19 @@ void TestRendezvousFlags(nlTestSuite * inSuite, void * inContext)
     inPayload.rendezvousInformation = RendezvousInformationFlags::kNone;
     NL_TEST_ASSERT(inSuite, CheckWriteRead(inPayload));
 
-    inPayload.rendezvousInformation = RendezvousInformationFlags::kWiFi;
+    inPayload.rendezvousInformation = RendezvousInformationFlags::kSoftAP;
     NL_TEST_ASSERT(inSuite, CheckWriteRead(inPayload));
 
     inPayload.rendezvousInformation = RendezvousInformationFlags::kBLE;
     NL_TEST_ASSERT(inSuite, CheckWriteRead(inPayload));
 
-    inPayload.rendezvousInformation = RendezvousInformationFlags::kThread;
+    inPayload.rendezvousInformation = RendezvousInformationFlags::kOnNetwork;
     NL_TEST_ASSERT(inSuite, CheckWriteRead(inPayload));
 
-    inPayload.rendezvousInformation = RendezvousInformationFlags::kEthernet;
+    inPayload.rendezvousInformation = RendezvousInformationFlags::kSoftAPOnNetwork;
+    NL_TEST_ASSERT(inSuite, CheckWriteRead(inPayload));
+
+    inPayload.rendezvousInformation = RendezvousInformationFlags::kBLEOnNetwork;
     NL_TEST_ASSERT(inSuite, CheckWriteRead(inPayload));
 
     inPayload.rendezvousInformation = RendezvousInformationFlags::kAllMask;

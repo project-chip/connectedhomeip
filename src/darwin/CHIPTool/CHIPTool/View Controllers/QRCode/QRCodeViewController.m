@@ -589,12 +589,13 @@
 - (void)handleRendezVous:(CHIPSetupPayload *)payload
 {
     switch (payload.rendezvousInformation) {
-    case kRendezvousInformationThread:
-    case kRendezvousInformationEthernet:
+    case kRendendezvousInformationOnNetwork:
+    case kRendendezvousInformationSoftAPOnNetwork:
+    case kRendendezvousInformationBLEOnNetwork:
     case kRendezvousInformationAllMask:
         NSLog(@"Rendezvous Unknown");
         break;
-    case kRendezvousInformationWiFi:
+    case kRendezvousInformationSoftAP:
         NSLog(@"Rendezvous Wi-Fi");
         [self handleRendezVousWiFi:[self getNetworkName:payload.discriminator]];
         break;

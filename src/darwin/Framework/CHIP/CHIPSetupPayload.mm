@@ -33,17 +33,20 @@
     case chip::RendezvousInformationFlags::kNone:
         rv = kRendezvousInformationNone;
         break;
-    case chip::RendezvousInformationFlags::kWiFi:
+    case chip::RendezvousInformationFlags::kSoftAP:
         rv = kRendezvousInformationWiFi;
         break;
     case chip::RendezvousInformationFlags::kBLE:
         rv = kRendezvousInformationBLE;
         break;
-    case chip::RendezvousInformationFlags::kThread:
-        rv = kRendezvousInformationThread;
+    case chip::RendezvousInformationFlags::kOnNetwork:
+        rv = kRendezvousInformationOnNetwork;
         break;
-    case chip::RendezvousInformationFlags::kEthernet:
-        rv = kRendezvousInformationEthernet;
+    case chip::RendezvousInformationFlags::kSofAPOnNetwork:
+        rv = kRendezvousInformationSoftAPOnNetwork;
+        break;
+    case chip::RendezvousInformationFlags::kBLEOnNetwork:
+        rv = kRendezvousInformationBLEOnNetwork;
         break;
     case chip::RendezvousInformationFlags::kAllMask:
         rv = kRendezvousInformationAllMask;

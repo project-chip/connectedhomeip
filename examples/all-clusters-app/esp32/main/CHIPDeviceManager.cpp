@@ -63,10 +63,12 @@ CHIP_ERROR CHIPDeviceManager::Init(CHIPDeviceManagerCallbacks * cb)
     switch (static_cast<RendezvousInformationFlags>(CONFIG_RENDEZVOUS_MODE))
     {
     case RendezvousInformationFlags::kBLE:
+    case RendezvousInformationFlags::kBLEOnNetwork:
         ConnectivityMgr().SetBLEAdvertisingEnabled(true);
         break;
 
-    case RendezvousInformationFlags::kWiFi:
+    case RendezvousInformationFlags::kSoftAP:
+    case RendezvousInformationFlags::kSoftAPOnNetwork:
         ConnectivityMgr().SetBLEAdvertisingEnabled(false);
         ConnectivityMgr().SetWiFiAPMode(ConnectivityManager::kWiFiAPMode_Enabled);
         break;
