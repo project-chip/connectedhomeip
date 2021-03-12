@@ -1098,7 +1098,20 @@
 // Server attributes
 #define ZCL_MAX_DURATION_ATTRIBUTE_ID (0x0000)
 
+// Attribute ids for cluster: Media Playback
+
+// Client attributes
+
+// Server attributes
+#define ZCL_CURRENT_STATE_ATTRIBUTE_ID (0x0000)
+
 // Attribute ids for cluster: Low Power
+
+// Client attributes
+
+// Server attributes
+
+// Attribute ids for cluster: Content Launch
 
 // Client attributes
 
@@ -4096,19 +4109,6 @@
 
 // Server attributes
 
-// Attribute ids for cluster: Media Playback
-
-// Client attributes
-
-// Server attributes
-#define ZCL_CURRENT_STATE_ATTRIBUTE_ID (0x0000)
-
-// Attribute ids for cluster: Content Launch
-
-// Client attributes
-
-// Server attributes
-
 // Attribute ids for cluster: Group Key Management
 
 // Client attributes
@@ -4172,3 +4172,4 @@
 #define ZCL_SL_PENDING_NETWORK_UPDATE_CHANNEL_ATTRIBUTE_ID (0x0011)
 #define ZCL_SL_PENDING_NETWORK_UPDATE_PANID_ATTRIBUTE_ID (0x0012)
 #define ZCL_SL_OTA_MAX_OFFLINE_DURATION_ATTRIBUTE_ID (0x0013)
+
