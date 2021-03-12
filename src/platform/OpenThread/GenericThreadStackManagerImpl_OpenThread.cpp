@@ -80,6 +80,19 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnOpenThreadStateChang
     event.ThreadStateChange.NetDataChanged    = (flags & OT_CHANGED_THREAD_NETDATA) != 0;
     event.ThreadStateChange.ChildNodesChanged = (flags & (OT_CHANGED_THREAD_CHILD_ADDED | OT_CHANGED_THREAD_CHILD_REMOVED)) != 0;
     event.ThreadStateChange.OpenThread.Flags  = flags;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+    if (event.ThreadStateChange.AddressChanged)
+    {
+        const otSrpClientHostInfo * hostInfo =
+            otSrpClientGetHostInfo(static_cast<GenericThreadStackManagerImpl_OpenThread *>(context)->Impl()->OTInstance());
+        if (hostInfo && hostInfo->mName)
+        {
+            static_cast<GenericThreadStackManagerImpl_OpenThread *>(context)->Impl()->_SetupSrpHost(hostInfo->mName);
+        }
+    }
+#endif
+
     PlatformMgr().PostEvent(&event);
 }
 
@@ -818,6 +831,15 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetPrimary80215
 };
 
 template <class ImplClass>
+CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetFactoryAssignedEUI64(uint8_t (&buf)[8])
+{
+    otExtAddress extendedAddr;
+    otLinkGetFactoryAssignedIeeeEui64(mOTInst, &extendedAddr);
+    memcpy(buf, extendedAddr.m8, sizeof(extendedAddr.m8));
+    return CHIP_NO_ERROR;
+};
+
+template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetExternalIPv6Address(chip::Inet::IPAddress & addr)
 {
     const otNetifAddress * otAddresses = otIp6GetUnicastAddresses(mOTInst);
@@ -875,7 +897,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::DoInit(otInstanc
     // state change occurs.  Note that we reference the OnOpenThreadStateChange method
     // on the concrete implementation class so that that class can override the default
     // method implementation if it chooses to.
-    otErr = otSetStateChangedCallback(otInst, ImplClass::OnOpenThreadStateChange, NULL);
+    otErr = otSetStateChangedCallback(otInst, ImplClass::OnOpenThreadStateChange, this);
     VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
 
     // Enable automatic assignment of Thread advertised addresses.
@@ -1116,7 +1138,8 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnSrpClientStateChange
 
 template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_AddSrpService(const char * aInstanceName, const char * aName,
-                                                                               uint16_t aPort, uint32_t aLeaseInterval,
+                                                                               uint16_t aPort, chip::Mdns::TextEntry * aTxtEntries,
+                                                                               size_t aTxtEntiresSize, uint32_t aLeaseInterval,
                                                                                uint32_t aKeyLeaseInterval)
 {
     CHIP_ERROR error                         = CHIP_NO_ERROR;
@@ -1157,6 +1180,29 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_AddSrpService(c
     srpService->mService.mName = srpService->mName;
 
     srpService->mService.mPort = aPort;
+
+    // Check if there are some optional text entries to add.
+    if (aTxtEntries && aTxtEntiresSize != 0)
+    {
+        VerifyOrExit(aTxtEntiresSize <= SrpClient::kMaxTxtEntriesNumber, error = CHIP_ERROR_INVALID_LIST_LENGTH);
+
+        srpService->mService.mNumTxtEntries = static_cast<uint8_t>(aTxtEntiresSize);
+
+        for (uint8_t entryId = 0; entryId < aTxtEntiresSize; entryId++)
+        {
+            VerifyOrExit(aTxtEntries[entryId].mDataSize <= SrpClient::kMaxTxtValueSize, error = CHIP_ERROR_BUFFER_TOO_SMALL);
+            VerifyOrExit((strlen(aTxtEntries[entryId].mKey) + 1) <= SrpClient::kMaxTxtKeySize, error = CHIP_ERROR_BUFFER_TOO_SMALL);
+
+            srpService->mTxtEntries[entryId].mValueLength = static_cast<uint8_t>(aTxtEntries[entryId].mDataSize);
+            memcpy(&(srpService->mTxtValueBuffers[entryId][0]), aTxtEntries[entryId].mData, aTxtEntries[entryId].mDataSize);
+            srpService->mTxtEntries[entryId].mValue = &(srpService->mTxtValueBuffers[entryId][0]);
+
+            memcpy(&(srpService->mTxtKeyBuffers[entryId][0]), aTxtEntries[entryId].mKey, strlen(aTxtEntries[entryId].mKey) + 1);
+            srpService->mTxtEntries[entryId].mKey = &(srpService->mTxtKeyBuffers[entryId][0]);
+        }
+
+        srpService->mService.mTxtEntries = srpService->mTxtEntries;
+    }
 
     error = MapOpenThreadError(otSrpClientAddService(mOTInst, &(srpService->mService)));
 
@@ -1214,11 +1260,13 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetupSrpHost(co
     error = MapOpenThreadError(otSrpClientSetHostName(mOTInst, aHostName));
     SuccessOrExit(error);
 
-    error = ThreadStackMgr().GetExternalIPv6Address(hostAddress);
-    SuccessOrExit(error);
-
-    memcpy(&mSrpClient.mHostAddress.mFields.m32, hostAddress.Addr, sizeof(hostAddress.Addr));
-    error = MapOpenThreadError(otSrpClientSetHostAddresses(mOTInst, &mSrpClient.mHostAddress, 1));
+    // Check if device has any external IPv6 assigned. If not, host will be set without IPv6 addresses
+    // and updated later on.
+    if (ThreadStackMgr().GetExternalIPv6Address(hostAddress) == CHIP_NO_ERROR)
+    {
+        memcpy(&mSrpClient.mHostAddress.mFields.m32, hostAddress.Addr, sizeof(hostAddress.Addr));
+        error = MapOpenThreadError(otSrpClientSetHostAddresses(mOTInst, &mSrpClient.mHostAddress, 1));
+    }
 
 exit:
     Impl()->UnlockThreadStack();

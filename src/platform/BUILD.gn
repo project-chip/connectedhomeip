@@ -30,7 +30,7 @@ if (chip_enable_openthread) {
   }
 }
 
-if (chip_device_platform == "linux" && chip_enable_mdns) {
+if (chip_device_platform == "linux" && chip_mdns != "none") {
   pkg_config("avahi_client_config") {
     packages = [ "avahi-client" ]
   }
@@ -75,7 +75,7 @@ if (chip_device_platform != "none") {
       defines += [ "CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE=${chip_enable_ble}" ]
     }
 
-    if (chip_enable_mdns) {
+    if (chip_mdns != "none") {
       defines += [ "CHIP_DEVICE_CONFIG_ENABLE_MDNS=1" ]
     }
 
@@ -241,7 +241,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       "${chip_root}/src:includes",
     ]
 
-    if (chip_enable_mdns) {
+    if (chip_mdns != "none") {
       public_deps += [ "${chip_root}/src/lib/mdns:platform_header" ]
     }
 
@@ -494,7 +494,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "Linux/bluez/Types.h",
       ]
 
-      if (chip_enable_mdns) {
+      if (chip_mdns != "none") {
         sources += [
           "Linux/MdnsImpl.cpp",
           "Linux/MdnsImpl.h",
@@ -593,6 +593,11 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
           "qpg6100/ThreadStackManagerImpl.h",
         ]
       }
+    }
+
+    if (chip_enable_openthread && chip_mdns == "platform" &&
+        chip_device_platform != "linux") {
+      sources += [ "OpenThread/MdnsImpl.cpp" ]
     }
 
     allow_circular_includes_from = [ "${chip_root}/src/lib/support" ]
