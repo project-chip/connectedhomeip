@@ -54,7 +54,7 @@ bool ContainsCompleteMessage(const System::PacketBufferHandle & buffer, uint8_t 
     if (buffer->DataLength() >= kPacketSizeBytes)
     {
         *size           = LittleEndian::Get16(buffer->Start());
-        *payloadSize    = *size + kPacketSizeBytes;
+        *payloadSize    = static_cast<uint16_t>(*size + kPacketSizeBytes);
         *start          = buffer->Start() + kPacketSizeBytes;
         completeMessage = (buffer->DataLength() >= *size + kPacketSizeBytes);
     }
