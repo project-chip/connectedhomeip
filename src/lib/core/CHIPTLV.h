@@ -807,7 +807,7 @@ protected:
     CHIP_ERROR GetElementHeadLength(uint8_t & elemHeadBytes) const;
     TLVElementType ElementType() const;
 
-   CHIP_ERROR Get(uint64_t & v, bool& isSigned) const;
+    CHIP_ERROR Get(uint64_t & v, bool & isSigned) const;
 };
 
 /**

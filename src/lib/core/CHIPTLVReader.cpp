@@ -29,8 +29,8 @@
 #include <core/CHIPTLV.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
-#include <support/SafeInt.h>
 #include <support/ReturnMacros.h>
+#include <support/SafeInt.h>
 
 namespace chip {
 namespace TLV {
@@ -126,16 +126,16 @@ CHIP_ERROR TLVReader::Get(bool & v)
     return CHIP_NO_ERROR;
 }
 
-template<typename int_type>
+template <typename int_type>
 static inline bool TLVTypeValid(bool tlv_isSigned, uint64_t val64)
 {
-    return !(tlv_isSigned ^ std::is_signed<int_type>::value) &&
-	    (tlv_isSigned && val64 >> 63) ? CanCastTo<int_type>(-val64) : CanCastTo<int_type>(val64);
+    return !(tlv_isSigned ^ std::is_signed<int_type>::value) && (tlv_isSigned && val64 >> 63) ? CanCastTo<int_type>(-val64)
+                                                                                              : CanCastTo<int_type>(val64);
 }
 
 CHIP_ERROR TLVReader::Get(int8_t & v)
 {
-    uint64_t v64   = 0;
+    uint64_t v64      = 0;
     bool tlv_isSigned = false;
 
     CHIP_ERROR err = Get(v64, tlv_isSigned);
@@ -146,7 +146,7 @@ CHIP_ERROR TLVReader::Get(int8_t & v)
 
 CHIP_ERROR TLVReader::Get(int16_t & v)
 {
-    uint64_t v64   = 0;
+    uint64_t v64      = 0;
     bool tlv_isSigned = false;
 
     CHIP_ERROR err = Get(v64, tlv_isSigned);
@@ -157,7 +157,7 @@ CHIP_ERROR TLVReader::Get(int16_t & v)
 
 CHIP_ERROR TLVReader::Get(int32_t & v)
 {
-    uint64_t v64   = 0;
+    uint64_t v64      = 0;
     bool tlv_isSigned = false;
 
     CHIP_ERROR err = Get(v64, tlv_isSigned);
@@ -168,7 +168,7 @@ CHIP_ERROR TLVReader::Get(int32_t & v)
 
 CHIP_ERROR TLVReader::Get(int64_t & v)
 {
-    uint64_t v64   = 0;
+    uint64_t v64      = 0;
     bool tlv_isSigned = false;
 
     CHIP_ERROR err = Get(v64, tlv_isSigned);
@@ -179,7 +179,7 @@ CHIP_ERROR TLVReader::Get(int64_t & v)
 
 CHIP_ERROR TLVReader::Get(uint8_t & v)
 {
-    uint64_t v64   = 0;
+    uint64_t v64      = 0;
     bool tlv_isSigned = false;
 
     CHIP_ERROR err = Get(v64, tlv_isSigned);
@@ -190,7 +190,7 @@ CHIP_ERROR TLVReader::Get(uint8_t & v)
 
 CHIP_ERROR TLVReader::Get(uint16_t & v)
 {
-    uint64_t v64   = 0;
+    uint64_t v64      = 0;
     bool tlv_isSigned = false;
 
     CHIP_ERROR err = Get(v64, tlv_isSigned);
@@ -201,7 +201,7 @@ CHIP_ERROR TLVReader::Get(uint16_t & v)
 
 CHIP_ERROR TLVReader::Get(uint32_t & v)
 {
-    uint64_t v64   = 0;
+    uint64_t v64      = 0;
     bool tlv_isSigned = false;
 
     CHIP_ERROR err = Get(v64, tlv_isSigned);
@@ -219,31 +219,31 @@ CHIP_ERROR TLVReader::Get(uint64_t & v)
     return err;
 }
 
-CHIP_ERROR TLVReader::Get(uint64_t & v, bool& isSigned) const
+CHIP_ERROR TLVReader::Get(uint64_t & v, bool & isSigned) const
 {
     switch (ElementType())
     {
     case TLVElementType::Int8:
-        v = static_cast<uint64_t>(static_cast<int64_t>(CastToSigned(static_cast<uint8_t>(mElemLenOrVal))));
+        v        = static_cast<uint64_t>(static_cast<int64_t>(CastToSigned(static_cast<uint8_t>(mElemLenOrVal))));
         isSigned = true;
         break;
     case TLVElementType::Int16:
-        v = static_cast<uint64_t>(static_cast<int64_t>(CastToSigned(static_cast<uint16_t>(mElemLenOrVal))));
+        v        = static_cast<uint64_t>(static_cast<int64_t>(CastToSigned(static_cast<uint16_t>(mElemLenOrVal))));
         isSigned = true;
         break;
     case TLVElementType::Int32:
-        v = static_cast<uint64_t>(static_cast<int64_t>(CastToSigned(static_cast<uint32_t>(mElemLenOrVal))));
+        v        = static_cast<uint64_t>(static_cast<int64_t>(CastToSigned(static_cast<uint32_t>(mElemLenOrVal))));
         isSigned = true;
         break;
     case TLVElementType::Int64:
-        v = mElemLenOrVal;
+        v        = mElemLenOrVal;
         isSigned = true;
         break;
     case TLVElementType::UInt8:
     case TLVElementType::UInt16:
     case TLVElementType::UInt32:
     case TLVElementType::UInt64:
-        v = mElemLenOrVal;
+        v        = mElemLenOrVal;
         isSigned = false;
         break;
     default:
