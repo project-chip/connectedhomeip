@@ -4,6 +4,7 @@
     ],
     "target_overrides": { 
         "*": { 
+            "platform.stdio-baud-rate": 115200,
             "lwip.ipv6-enabled": true,
             "lwip.raw-socket-enabled": true
         },
