@@ -93,7 +93,7 @@ CHIP_ERROR ReadClient::SendReadRequest(NodeId aNodeId, Transport::AdminId aAdmin
     System::PacketBufferHandle msgBuf     = nullptr;
     EventPathParams * eventPathParamsList = nullptr;
     size_t aEventPathParamsListSize       = 0;
-    chip::EventNumber eventNumber                    = 0;
+    chip::EventNumber eventNumber         = 0;
     ChipLogDetail(DataManagement, "Client[%u] [%5.5s]", InteractionModelEngine::GetInstance()->GetReadClientArrayIndex(this),
                   GetStateStr());
     VerifyOrExit(ClientState::Initialized == mState, err = CHIP_ERROR_INCORRECT_STATE);
