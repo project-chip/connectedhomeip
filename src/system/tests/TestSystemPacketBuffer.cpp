@@ -68,12 +68,12 @@ using ::chip::System::pbuf;
 #define OF_LWIP_PBUF(x) (reinterpret_cast<PacketBuffer *>(reinterpret_cast<void *>(x)))
 
 namespace {
-    void ScrambleData(uint8_t * start, uint16_t length)
-    {
-        for (uint16_t i = 0; i < length; ++i)
-            ++start[i];
-    }
+void ScrambleData(uint8_t * start, uint16_t length)
+{
+    for (uint16_t i = 0; i < length; ++i)
+        ++start[i];
 }
+} // namespace
 
 /*
  * An instance of this class created for the test suite.
@@ -1723,7 +1723,7 @@ void PacketBufferTest::CheckHandleCloneData(nlTestSuite * inSuite, void * inCont
     NL_TEST_ASSERT(inSuite, test->mContext == theContext);
 
     uint8_t lPayload[2 * PacketBuffer::kMaxSizeWithoutReserve];
-    for (size_t i = 0; i < sizeof (lPayload); ++i)
+    for (size_t i = 0; i < sizeof(lPayload); ++i)
     {
         lPayload[i] = static_cast<uint8_t>(random());
     }
@@ -1740,11 +1740,11 @@ void PacketBufferTest::CheckHandleCloneData(nlTestSuite * inSuite, void * inCont
             test->PrepareTestBuffer(&config_1);
             test->PrepareTestBuffer(&config_2);
 
-            const uint8_t *payload_1 = lPayload;
+            const uint8_t * payload_1 = lPayload;
             memcpy(config_1.handle->Start(), payload_1, config_1.handle->MaxDataLength());
             config_1.handle->SetDataLength(config_1.handle->MaxDataLength());
 
-            const uint8_t *payload_2 = lPayload + config_1.handle->MaxDataLength();
+            const uint8_t * payload_2 = lPayload + config_1.handle->MaxDataLength();
             memcpy(config_2.handle->Start(), payload_2, config_2.handle->MaxDataLength());
             config_2.handle->SetDataLength(config_2.handle->MaxDataLength());
 
@@ -1764,7 +1764,7 @@ void PacketBufferTest::CheckHandleCloneData(nlTestSuite * inSuite, void * inCont
             // Clone buffer chain.
             config_1.handle->AddToEnd(config_2.handle.Retain());
             NL_TEST_ASSERT(inSuite, config_1.handle->HasChainedBuffer());
-            clone_1 = config_1.handle.CloneData();
+            clone_1                         = config_1.handle.CloneData();
             PacketBufferHandle clone_1_next = clone_1->Next();
             NL_TEST_ASSERT(inSuite, !clone_1.IsNull());
             NL_TEST_ASSERT(inSuite, clone_1->HasChainedBuffer());
@@ -1791,7 +1791,6 @@ void PacketBufferTest::CheckHandleCloneData(nlTestSuite * inSuite, void * inCont
         }
     }
 }
-
 
 void PacketBufferTest::CheckPacketBufferWriter(nlTestSuite * inSuite, void * inContext)
 {
