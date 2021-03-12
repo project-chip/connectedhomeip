@@ -57,23 +57,27 @@ constexpr uint64_t kUndefinedNodeId = 0;
 namespace chip {
 namespace Mdns {
 
-DiscoveryImplPlatform::DiscoveryImplPlatform()
+DiscoveryImplPlatform DiscoveryImplPlatform::sManager;
+
+DiscoveryImplPlatform::DiscoveryImplPlatform() = default;
+
+CHIP_ERROR DiscoveryImplPlatform::Init()
 {
-    mCommissionInstanceName = GetRandU64();
+    if (!mMdnsInitialized)
+    {
+        ReturnErrorOnFailure(ChipMdnsInit(HandleMdnsInit, HandleMdnsError, this));
+        mCommissionInstanceName = GetRandU64();
+        mMdnsInitialized        = true;
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DiscoveryImplPlatform::Start(Inet::InetLayer * inetLayer, uint16_t port)
 {
-    CHIP_ERROR error = CHIP_NO_ERROR;
-    if (!mMdnsInitialized)
-    {
-        ReturnErrorOnFailure(ChipMdnsInit(HandleMdnsInit, HandleMdnsError, this));
-        mMdnsInitialized = true;
-    }
-    else
-    {
-        error = ChipMdnsStopPublish();
-    }
+    ReturnErrorOnFailure(Init());
+
+    CHIP_ERROR error = ChipMdnsStopPublish();
 
     if (error != CHIP_NO_ERROR)
     {
@@ -280,6 +284,8 @@ CHIP_ERROR DiscoveryImplPlatform::SetResolverDelegate(ResolverDelegate * delegat
 
 CHIP_ERROR DiscoveryImplPlatform::ResolveNodeId(uint64_t nodeId, uint64_t fabricId, Inet::IPAddressType type)
 {
+    ReturnErrorOnFailure(Init());
+
     MdnsService service;
 
     snprintf(service.mName, sizeof(service.mName), "%" PRIX64 "-%" PRIX64, nodeId, fabricId);
@@ -357,12 +363,6 @@ void DiscoveryImplPlatform::HandleNodeIdResolve(void * context, MdnsService * re
 
 DiscoveryImplPlatform & DiscoveryImplPlatform::GetInstance()
 {
-    // TODO: Clean Mdns initialization order
-    // Previously sManager was a global object, but DiscoveryImplPlatform constructor calls
-    // platform-specific ChipMdnsInit() which for Linux initializes MdnsAvahi global object
-    // and that may lead to improper initialization, since the order in which global objects'
-    // constructors are called is undefined.
-    static DiscoveryImplPlatform sManager;
     return sManager;
 }
 
