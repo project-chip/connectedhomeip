@@ -24,6 +24,7 @@
 // from unistd.h to avoid a conflicting declaration with the `sleep()` provided
 // by Mbed-OS in mbed_power_mgmt.h.
 #define sleep unistd_sleep
+#include "Server.h"
 #include <platform/CHIPDeviceLayer.h>
 #undef sleep
 
@@ -89,6 +90,10 @@ int AppTask::Init()
 #ifdef MBED_CONF_APP_DEVICE_NAME
     ConnectivityMgr().SetBLEDeviceName(MBED_CONF_APP_DEVICE_NAME);
 #endif
+
+    // Init ZCL Data Model and start server
+    InitServer();
+    ConfigurationMgr().LogDeviceConfig();
 
     return 0;
 }
