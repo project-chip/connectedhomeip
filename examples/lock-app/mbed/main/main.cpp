@@ -31,6 +31,9 @@ int main()
 {
     int ret = 0;
 
+    // note: Make sure to turn the filtering on with CHIP_LOG_FILTERING=1
+    chip::Logging::SetLogFilter(chip::Logging::LogCategory::kLogCategory_Progress);
+
     ret = chip::Platform::MemoryInit();
     if (ret != CHIP_NO_ERROR)
     {
