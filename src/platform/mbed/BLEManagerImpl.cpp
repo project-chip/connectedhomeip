@@ -660,10 +660,8 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 
     if (!GetFlag(mFlags, kFlag_UseCustomDeviceName))
     {
-        // FIXME
-        // uint16_t discriminator;
-        // SuccessOrExit(err = ConfigurationMgr().GetSetupDiscriminator(discriminator));
-        uint16_t discriminator = 0xff;
+        uint16_t discriminator;
+        SuccessOrExit(err = ConfigurationMgr().GetSetupDiscriminator(discriminator));
         memset(mDeviceName, 0, kMaxDeviceNameLength);
         snprintf(mDeviceName, kMaxDeviceNameLength, "%s%04u", CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX, discriminator);
     }
@@ -671,8 +669,7 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     VerifyOrExit(mbed_err == BLE_ERROR_NONE, err = CHIP_ERROR_INTERNAL);
 
     dev_id_info.Init();
-    // FIXME
-    // SuccessOrExit(ConfigurationMgr().GetBLEDeviceIdentificationInfo(dev_id_info));
+    SuccessOrExit(ConfigurationMgr().GetBLEDeviceIdentificationInfo(dev_id_info));
     mbed_err = adv_data_builder.setServiceData(
         ShortUUID_CHIPoBLEService, mbed::make_Span<const uint8_t>(reinterpret_cast<uint8_t *>(&dev_id_info), sizeof dev_id_info));
     VerifyOrExit(mbed_err == BLE_ERROR_NONE, err = CHIP_ERROR_INTERNAL);
