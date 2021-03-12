@@ -1,8 +1,10 @@
 #ifndef MBED_NET_COMMON_H
 #define MBED_NET_COMMON_H
 
+#include <SocketAddress.h>
 #include <errno.h>
-#include <stdlib.h>
+#include <stdio.h>
+#include <sys/socket.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -18,6 +20,9 @@ extern "C" {
         }                                                                                                                          \
     } while (0)
 #endif
+
+int convert_bsd_addr_to_mbed(SocketAddress * out, struct sockaddr * in);
+int convert_mbed_addr_to_bsd(struct sockaddr * out, const SocketAddress * in);
 
 #ifdef __cplusplus
 }

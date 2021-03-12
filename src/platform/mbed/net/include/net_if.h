@@ -1,8 +1,6 @@
 #ifndef MBED_NET_NET_IF_H
 #define MBED_NET_NET_IF_H
 
-#include <NetworkInterface.h>
-#include <byteorder.h>
 #include <sys/socket.h>
 
 #ifdef __cplusplus

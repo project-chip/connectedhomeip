@@ -219,15 +219,16 @@ int cmd_network_interface(int argc, char ** argv)
             streamer_printf(sout, "ERROR: get interface name failed\r\n");
             ExitNow(error = CHIP_ERROR_INTERNAL;);
         }
-        printf("     interface id: %d, interface name: %s, interface state: %s, %s broadcast addr\n", intId, intName,
-               intIterator.IsUp() ? "UP" : "DOWN", intIterator.HasBroadcastAddress() ? "has" : "no");
+        printf("     interface id: %d, interface name: %s, interface state: %s\n", intId, intName,
+               intIterator.IsUp() ? "UP" : "DOWN");
         if (addrIterator.HasCurrent())
         {
             addr = addrIterator.GetAddress();
             addrIterator.GetAddressWithPrefix(addrWithPrefix);
             char addrStr[80];
             addrWithPrefix.IPAddr.ToString(addrStr, sizeof(addrStr));
-            printf("     interface address: %s/%d\n", addrStr, addrWithPrefix.Length);
+            printf("     interface address: %s/%d, %s broadcast addr\n", addrStr, addrWithPrefix.Length,
+                   addrIterator.HasBroadcastAddress() ? "has" : "no");
             addrIterator.Next();
         }
     }

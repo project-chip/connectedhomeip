@@ -1,13 +1,11 @@
 #include "net_if.h"
 #include "common.h"
-#include "net_socket.h"
-#include <SocketAddress.h>
+#include <NetworkInterface.h>
 #include <arpa/inet.h>
 #include <ifaddrs.h>
-#include <net/if.h>
 #include <sys/ioctl.h>
-#include <sys/socket.h>
 
+static int mbed_get_if_flags(unsigned int * flags);
 struct if_nameindex * mbed_if_nameindex(void)
 {
     char name[IF_NAMESIZE];
@@ -145,6 +143,7 @@ int mbed_getifaddrs(struct ifaddrs ** ifap)
     SocketAddress ip;
     SocketAddress netmask;
     nsapi_version_t ipVersion;
+    nsapi_connection_status_t status;
     nsapi_error_t err;
 
     struct ifaddrs * tmp;
@@ -170,19 +169,6 @@ int mbed_getifaddrs(struct ifaddrs ** ifap)
         set_errno(ENOTTY);
         return -1;
     }
-
-    err = net_if->connect();
-    if (err != NSAPI_ERROR_OK)
-    {
-        set_errno(ENOTTY);
-        return -1;
-    }
-
-    net_if->get_ip_address(&ip);
-    ipVersion = ip.get_ip_version();
-    net_if->get_netmask(&netmask);
-
-    net_if->disconnect();
 
     tmp = (struct ifaddrs *) calloc(1, sizeof(struct ifaddrs));
     if (tmp == NULL)
@@ -211,44 +197,38 @@ int mbed_getifaddrs(struct ifaddrs ** ifap)
         strncpy(tmp->ifa_name, name_ptr, IF_NAMESIZE);
     }
 
-    tmp->ifa_addr = (struct sockaddr *) malloc(sizeof(struct sockaddr));
-    if (tmp->ifa_addr == NULL)
+    status = net_if->get_connection_status();
+    if (status == NSAPI_STATUS_LOCAL_UP || status == NSAPI_STATUS_GLOBAL_UP)
     {
-        set_errno(ENOBUFS);
-        mbed_freeifaddrs(tmp);
-        return -1;
-    }
+        net_if->get_ip_address(&ip);
+        ipVersion = ip.get_ip_version();
+        net_if->get_netmask(&netmask);
 
-    memset(tmp->ifa_addr, 0, sizeof(struct sockaddr));
+        tmp->ifa_addr = (struct sockaddr *) malloc(sizeof(struct sockaddr));
+        if (tmp->ifa_addr == NULL)
+        {
+            set_errno(ENOBUFS);
+            mbed_freeifaddrs(tmp);
+            return -1;
+        }
 
-    tmp->ifa_netmask = (struct sockaddr *) malloc(sizeof(struct sockaddr));
-    if (tmp->ifa_netmask == NULL)
-    {
-        set_errno(ENOBUFS);
-        mbed_freeifaddrs(tmp);
-        return -1;
-    }
+        memset(tmp->ifa_addr, 0, sizeof(struct sockaddr));
 
-    memset(tmp->ifa_netmask, 0, sizeof(struct sockaddr));
+        convert_mbed_addr_to_bsd(tmp->ifa_addr, &ip);
 
-    if (ipVersion == NSAPI_IPv4)
-    {
-        tmp->ifa_addr->sa_family    = AF_INET;
-        tmp->ifa_netmask->sa_family = AF_INET;
-        memcpy(&tmp->ifa_addr->data[2], ip.get_ip_bytes(), NSAPI_IPv4_BYTES);
-        memcpy(&tmp->ifa_netmask->data[2], netmask.get_ip_bytes(), NSAPI_IPv4_BYTES);
-    }
-    else if (ipVersion == NSAPI_IPv6)
-    {
-        tmp->ifa_addr->sa_family    = PF_INET6;
-        tmp->ifa_netmask->sa_family = PF_INET6;
-        memcpy(tmp->ifa_addr->data, ip.get_ip_bytes(), NSAPI_IPv6_BYTES);
-        memcpy(tmp->ifa_netmask->data, netmask.get_ip_bytes(), NSAPI_IPv6_BYTES);
-    }
-    else
-    {
-        tmp->ifa_addr->sa_family    = PF_UNSPEC;
-        tmp->ifa_netmask->sa_family = PF_UNSPEC;
+        tmp->ifa_netmask = (struct sockaddr *) malloc(sizeof(struct sockaddr));
+        if (tmp->ifa_netmask == NULL)
+        {
+            set_errno(ENOBUFS);
+            mbed_freeifaddrs(tmp);
+            return -1;
+        }
+
+        memset(tmp->ifa_netmask, 0, sizeof(struct sockaddr));
+
+        convert_mbed_addr_to_bsd(tmp->ifa_netmask, &netmask);
+
+        mbed_get_if_flags(&tmp->ifa_flags);
     }
 
     return 0;
@@ -622,6 +602,82 @@ int mbed_inet_pton(sa_family_t family, const char * src, void * dst)
     }
 }
 
+static bool isBroadcast(SocketAddress ip, SocketAddress netmask)
+{
+    unsigned int bytesNumber = 0;
+    uint8_t *ip_bytes, *netmask_bytes;
+    uint8_t mask, netmask_neg;
+
+    if (ip.get_ip_version() == NSAPI_IPv6)
+    {
+        bytesNumber = NSAPI_IPv6_BYTES;
+    }
+    else
+    {
+        bytesNumber = NSAPI_IPv4_BYTES;
+    }
+
+    ip_bytes      = (uint8_t *) ip.get_ip_bytes();
+    netmask_bytes = (uint8_t *) netmask.get_ip_bytes();
+
+    for (int index = 0; index < bytesNumber; ++index)
+    {
+        netmask_neg = ~(*netmask_bytes);
+        mask        = *ip_bytes & netmask_neg;
+        if (mask && (mask != netmask_neg))
+        {
+            return false;
+        }
+        ip_bytes++;
+        netmask_bytes++;
+    }
+
+    return true;
+}
+
+static int mbed_get_if_flags(unsigned int * flags)
+{
+    int ret = 0;
+    nsapi_error_t err;
+    nsapi_connection_status_t status;
+    SocketAddress ip;
+    SocketAddress netmask;
+    NetworkInterface * net_if;
+
+    net_if = NetworkInterface::get_default_instance();
+    if (net_if == nullptr)
+    {
+        set_errno(ENOTTY);
+        return -1;
+    }
+
+    status = net_if->get_connection_status();
+    if (status == NSAPI_STATUS_LOCAL_UP || status == NSAPI_STATUS_GLOBAL_UP)
+    {
+        *flags |= IFF_UP;
+
+        err = net_if->get_ip_address(&ip);
+        if (err != NSAPI_ERROR_OK)
+        {
+            goto exit;
+        }
+
+        err = net_if->get_netmask(&netmask);
+        if (err != NSAPI_ERROR_OK)
+        {
+            goto exit;
+        }
+
+        if (isBroadcast(ip, netmask))
+        {
+            *flags |= IFF_BROADCAST;
+        }
+    }
+
+exit:
+    return ret;
+}
+
 int mbed_ioctl(int fd, unsigned long request, void * param)
 {
     int ret = 0;
@@ -635,82 +691,10 @@ int mbed_ioctl(int fd, unsigned long request, void * param)
             break;
         }
         struct ifreq * intfData = (struct ifreq *) param;
-        short * flags           = &intfData->ifr_flags;
+        unsigned int * flags    = (unsigned int *) &intfData->ifr_ifru.ifru_flags;
         *flags                  = 0;
-        nsapi_error_t err;
-        NetworkInterface * net_if = NetworkInterface::get_default_instance();
-        if (net_if == nullptr)
-        {
-            set_errno(ENOTTY);
-            ret = -1;
-            break;
-        }
 
-        err = net_if->connect();
-        if (err != NSAPI_ERROR_OK)
-        {
-            set_errno(ENOTTY);
-            ret = -1;
-            break;
-        }
-
-        nsapi_connection_status_t status = net_if->get_connection_status();
-        if (status == NSAPI_STATUS_LOCAL_UP || status == NSAPI_STATUS_GLOBAL_UP)
-        {
-            *flags |= IFF_UP;
-        }
-
-        SocketAddress ip;
-        SocketAddress netmask;
-        bool isBroadcast         = true;
-        unsigned int bytesNumber = 0;
-
-        err = net_if->get_ip_address(&ip);
-        if (err != NSAPI_ERROR_OK)
-        {
-            set_errno(ENOTTY);
-            ret = -1;
-            break;
-        }
-        err = net_if->get_netmask(&netmask);
-        if (err != NSAPI_ERROR_OK)
-        {
-            set_errno(ENOTTY);
-            ret = -1;
-            break;
-        }
-
-        if (netmask.get_ip_version() == NSAPI_IPv6)
-        {
-            bytesNumber = NSAPI_IPv6_BYTES;
-        }
-        else
-        {
-            bytesNumber = NSAPI_IPv4_BYTES;
-        }
-
-        uint8_t * ip_bytes      = (uint8_t *) ip.get_ip_bytes();
-        uint8_t * netmask_bytes = (uint8_t *) netmask.get_ip_bytes();
-        uint8_t mask, netmask_neg;
-        for (int index = 0; index < bytesNumber; ++index)
-        {
-            netmask_neg = ~(*netmask_bytes);
-            mask        = *ip_bytes & netmask_neg;
-            if (mask && (mask != netmask_neg))
-            {
-                isBroadcast = false;
-                break;
-            }
-            ip_bytes++;
-            netmask_bytes++;
-        }
-
-        if (isBroadcast)
-        {
-            *flags |= IFF_BROADCAST;
-        }
-
-        net_if->disconnect();
+        ret = mbed_get_if_flags(flags);
 
         break;
     }
