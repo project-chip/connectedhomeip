@@ -49,6 +49,10 @@
         "factory-reset-cancel-window-timeout": {
             "help": "'function-button' press timeout to cancel a factory reset (in milliseconds). The total 'function-button' press time to have the factory reset actually initiated is equal to 'factory-reset-trigger-timeout' + 'factory-reset-cancel-window-timeout'.",
             "value": 3000
+        },
+        "device-name": {
+            "help": "Name used for BLE advertising.",
+            "value": "\"CHIP-lock\""
         }
     }
 }
