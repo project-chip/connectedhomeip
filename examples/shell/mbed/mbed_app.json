@@ -1,22 +1,22 @@
 {
     "macros" : [
-        "MBEDTLS_USER_CONFIG_FILE=\"chip_mbedtls_config.h\"",
-        "MBED_CONF_LWIP_IPV6_ENABLED=1",
-        "MBED_CONF_LWIP_RAW_SOCKET_ENABLED=1",
-        "MBED_CONF_ISM43362_PROVIDE_DEFAULT=1"
+        "MBEDTLS_USER_CONFIG_FILE=\"chip_mbedtls_config.h\""
     ],
     "target_overrides": { 
         "*": { 
             "lwip.ipv6-enabled": true,
-            "lwip.raw-socket-enabled": true
+            "lwip.raw-socket-enabled": true,
+            "platform.stdio-baud-rate": 115200
         },
         "DISCO_L475VG_IOT01A": {
             "lwip.ipv6-enabled": true,
             "lwip.raw-socket-enabled": true,
-            "target.components_add": ["wifi_ism43362"],
+            "target.components_add": ["wifi_ism43362", "BlueNRG_MS"],
             "ism43362.provide-default": true,
             "target.network-default-interface-type": "WIFI",
-            "target.macros_add" : ["MBEDTLS_SHA1_C"]
+            "target.macros_add" : ["MBEDTLS_SHA1_C"],
+            "target.features_add": ["BLE"],
+            "target.extra_labels_add": ["CORDIO"]
         }
     }
 }

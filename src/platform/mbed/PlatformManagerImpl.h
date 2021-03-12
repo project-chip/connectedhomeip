@@ -70,7 +70,10 @@ private:
     friend PlatformManagerImpl & PlatformMgrImpl(void);
     friend class Internal::BLEManagerImpl;
     friend class ConnectivityManagerImpl;
+    friend class Internal::GapEventHandler;
+    friend class Internal::CHIPService;
 
+    using PlatformManager::PostEvent;
     static PlatformManagerImpl sInstance;
 
     // ===== Members for internal use.
@@ -95,9 +98,17 @@ inline PlatformManager & PlatformMgr(void)
 {
     return PlatformManagerImpl::sInstance;
 }
-inline PlatformManagerImpl & PlatformMgrImpl(void)
+
+/**
+ * Returns the platform-specific implementation of the PlatformManager singleton object.
+ *
+ * chip applications can use this to gain access to features of the PlatformManager
+ * that are specific to the Mbed platform.
+ */
+inline PlatformManagerImpl & PlatformMgrImpl()
 {
     return PlatformManagerImpl::sInstance;
 }
+
 } // namespace DeviceLayer
 } // namespace chip
