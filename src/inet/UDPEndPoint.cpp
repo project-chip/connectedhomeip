@@ -543,29 +543,15 @@ INET_ERROR UDPEndPoint::SendMsg(const IPPacketInfo * pktInfo, System::PacketBuff
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 
-    pbuf * msgCopy = NULL;
-
-    if (msg.IsRetained())
+    if (!msg.HasSoleOwnership())
     {
-        // when retaining a buffer, the caller expects the msg to be
-        // unmodified.  LwIP stack will normally prepend the packet
-        // headers as the packet traverses the UDP/IP/netif layers,
-        // which normally modifies the packet.  We prepend a small
-        // pbuf to the beginning of the pbuf chain, s.t. all headers
-        // are added to the temporary space, just large enough to hold
-        // the transport headers.
-        msgCopy = pbuf_alloc(PBUF_TRANSPORT, 0, PBUF_RAM);
-
-        if (msgCopy == NULL)
-        {
-            return INET_ERROR_NO_MEMORY;
-        }
-
-        pbuf_chain(msgCopy, System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(msg));
-    }
-    else
-    {
-        msgCopy = System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(msg);
+        // when retaining a buffer, the caller expects the msg to be unmodified.
+        // LwIP stack will normally prepend the packet headers as the packet traverses
+        // the UDP/IP/netif layers, which normally modifies the packet. We need to clone
+        // msg into a fresh object in this case, and queues that for transmission, leaving
+        // the original msg available after return.
+        msg = msg.CloneData();
+        VerifyOrExit(!msg.IsNull(), res = INET_ERROR_NO_MEMORY);
     }
 
     // Lock LwIP stack
@@ -601,9 +587,9 @@ INET_ERROR UDPEndPoint::SendMsg(const IPPacketInfo * pktInfo, System::PacketBuff
         }
 
         if (intfId != INET_NULL_INTERFACEID)
-            lwipErr = udp_sendto_if(mUDP, msgCopy, &lwipDestAddr, destPort, intfId);
+            lwipErr = udp_sendto_if(mUDP, System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(msg), &lwipDestAddr, destPort, intfId);
         else
-            lwipErr = udp_sendto(mUDP, msgCopy, &lwipDestAddr, destPort);
+            lwipErr = udp_sendto(mUDP, System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(msg), &lwipDestAddr, destPort);
 
         ip_addr_copy(mUDP->local_ip, boundAddr);
 
@@ -623,9 +609,10 @@ INET_ERROR UDPEndPoint::SendMsg(const IPPacketInfo * pktInfo, System::PacketBuff
             }
 
             if (intfId != INET_NULL_INTERFACEID)
-                lwipErr = udp_sendto_if_ip6(mUDP, msgCopy, &lwipDestAddr, destPort, intfId);
+                lwipErr =
+                    udp_sendto_if_ip6(mUDP, System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(msg), &lwipDestAddr, destPort, intfId);
             else
-                lwipErr = udp_sendto_ip6(mUDP, msgCopy, &lwipDestAddr, destPort);
+                lwipErr = udp_sendto_ip6(mUDP, System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(msg), &lwipDestAddr, destPort);
         }
 
 #if INET_CONFIG_ENABLE_IPV4
@@ -642,9 +629,10 @@ INET_ERROR UDPEndPoint::SendMsg(const IPPacketInfo * pktInfo, System::PacketBuff
             }
 
             if (intfId != INET_NULL_INTERFACEID)
-                lwipErr = udp_sendto_if(mUDP, msgCopy, &lwipDestAddr, destPort, intfId);
+                lwipErr =
+                    udp_sendto_if(mUDP, System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(msg), &lwipDestAddr, destPort, intfId);
             else
-                lwipErr = udp_sendto(mUDP, msgCopy, &lwipDestAddr, destPort);
+                lwipErr = udp_sendto(mUDP, System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(msg), &lwipDestAddr, destPort);
         }
 
         ipX_addr_copy(mUDP->local_ip, boundAddr);
@@ -658,13 +646,6 @@ INET_ERROR UDPEndPoint::SendMsg(const IPPacketInfo * pktInfo, System::PacketBuff
 
     // Unlock LwIP stack
     UNLOCK_TCPIP_CORE();
-
-    if (msg.IsRetained())
-    {
-        /* Dechains the temporary head pbuf from its succeeding pbufs in the chain */
-        pbuf_dechain(msgCopy);
-        pbuf_free(msgCopy);
-    }
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
