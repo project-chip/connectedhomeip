@@ -19,7 +19,7 @@ limitations under the License.
   <cluster>
     <domain>General</domain>
     <name>Media Playback</name>
-    <code>0xF001</code>
+    <code>0x0506</code>
     <define>MEDIA_PLAYBACK_CLUSTER</define>
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
