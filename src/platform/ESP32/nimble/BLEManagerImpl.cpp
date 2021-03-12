@@ -130,6 +130,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
     mRXCharAttrHandle     = 0;
     mTXCharCCCDAttrHandle = 0;
     mFlags.ClearAll().Set(Flags::kAdvertisingEnabled, CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART);
+    mFlags.Set(Flags::kFastAdvertisingEnabled, true);
     mNumGAPCons = 0;
     memset(mCons, 0, sizeof(mCons));
     mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
@@ -174,20 +175,22 @@ exit:
     return err;
 }
 
-CHIP_ERROR BLEManagerImpl::_SetFastAdvertisingEnabled(bool val)
+CHIP_ERROR BLEManagerImpl::_SetAdvertisingMode(BLEAdvertisingMode mode)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    VerifyOrExit(mServiceMode != ConnectivityManager::kCHIPoBLEServiceMode_NotSupported, err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-
-    if (mFlags.Has(Flags::kFastAdvertisingEnabled) != val)
+    switch (mode)
     {
-        mFlags.Set(Flags::kFastAdvertisingEnabled, val);
-        PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    case BLEAdvertisingMode::kFastAdvertising:
+        mFlags.Set(Flags::kFastAdvertisingEnabled, true);
+        break;
+    case BLEAdvertisingMode::kSlowAdvertising:
+        mFlags.Set(Flags::kFastAdvertisingEnabled, false);
+        break;
+    default:
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
-
-exit:
-    return err;
+    mFlags.Set(Flags::kAdvertisingRefreshNeeded);
+    PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR BLEManagerImpl::_GetDeviceName(char * buf, size_t bufSize)
@@ -484,6 +487,7 @@ void BLEManagerImpl::DriveBLEState(void)
             if (mFlags.Has(Flags::kAdvertising))
             {
                 mFlags.Clear(Flags::kAdvertising);
+                mFlags.Set(Flags::kFastAdvertisingEnabled, true);
 
                 ChipLogProgress(DeviceLayer, "CHIPoBLE advertising stopped");
 
@@ -1034,9 +1038,16 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 
     // Advertise in fast mode if not fully provisioned and there are no CHIPoBLE connections, or
     // if the application has expressly requested fast advertising.
-    adv_params.itvl_min = adv_params.itvl_max = (numCons == 0 && !ConfigurationMgr().IsFullyProvisioned())
-        ? CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL
-        : CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL;
+    if ((numCons == 0 && !ConfigurationMgr().IsPairedToAccount()) || mFlags.Has(Flags::kFastAdvertisingEnabled))
+    {
+        adv_params.itvl_min = CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MIN;
+        adv_params.itvl_max = CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MAX;
+    }
+    else
+    {
+        adv_params.itvl_min = CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MIN;
+        adv_params.itvl_max = CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MAX;
+    }
 
     ChipLogProgress(DeviceLayer, "Configuring CHIPoBLE advertising (interval %" PRIu32 " ms, %sconnectable, device name %s)",
                     (((uint32_t) adv_params.itvl_min) * 10) / 16, (connectable) ? "" : "non-", mDeviceName);
