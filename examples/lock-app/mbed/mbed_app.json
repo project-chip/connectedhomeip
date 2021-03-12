@@ -32,6 +32,22 @@
         "led-active-state": {
             "help": "GPIO output to turn the LED on.",
             "value": 0
+        },
+        "lock-button": {
+            "help": "Lock botton pin.",
+            "value": "BUTTON2"
+        },
+        "function-button": {
+            "help": "Function button pin.",
+            "value": "BUTTON1"
+        },
+        "factory-reset-trigger-timeout": {
+            "help": "'function-button' press timeout to trigger a factory reset (in milliseconds).",
+            "value": 3000
+        },
+        "factory-reset-cancel-window-timeout": {
+            "help": "'function-button' press timeout to cancel a factory reset (in milliseconds). The total 'function-button' press time to have the factory reset actually initiated is equal to 'factory-reset-trigger-timeout' + 'factory-reset-cancel-window-timeout'.",
+            "value": 3000
         }
     }
 }

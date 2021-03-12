@@ -35,9 +35,10 @@ void LEDWidget::Invert(void)
 
 void LEDWidget::Set(bool state)
 {
-    mBlinkOnTimeMS  = 0;
-    mBlinkOffTimeMS = 0;
-    mLED            = state ? LED_ACTIVE_STATE : !LED_ACTIVE_STATE;
+    mBlinkOnTimeMS    = 0;
+    mBlinkOffTimeMS   = 0;
+    mLastChangeTimeMS = 0;
+    mLED              = state ? LED_ACTIVE_STATE : !LED_ACTIVE_STATE;
 }
 
 void LEDWidget::Blink(uint32_t changeRateMS)

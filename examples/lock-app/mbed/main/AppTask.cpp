@@ -20,17 +20,35 @@
 #include "BoltLockManager.h"
 #include "LEDWidget.h"
 
+// FIXME: Undefine the `sleep()` function included by the CHIPDeviceLayer.h
+// from unistd.h to avoid a conflicting declaration with the `sleep()` provided
+// by Mbed-OS in mbed_power_mgmt.h.
+#define sleep unistd_sleep
 #include <platform/CHIPDeviceLayer.h>
+#undef sleep
+
 #include <support/logging/CHIPLogging.h>
 
 // mbed-os headers
-#include "drivers/Ticker.h"
+#include "drivers/InterruptIn.h"
+#include "drivers/Timeout.h"
 #include "events/EventQueue.h"
+#include "platform/Callback.h"
+
+#define FACTORY_RESET_TRIGGER_TIMEOUT (MBED_CONF_APP_FACTORY_RESET_TRIGGER_TIMEOUT)
+#define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT (MBED_CONF_APP_FACTORY_RESET_CANCEL_WINDOW_TIMEOUT)
+#define LOCK_BUTTON (MBED_CONF_APP_LOCK_BUTTON)
+#define FUNCTION_BUTTON (MBED_CONF_APP_FUNCTION_BUTTON)
+#define BUTTON_PUSH_EVENT 1
+#define BUTTON_RELEASE_EVENT 0
 
 constexpr uint32_t kPublishServicePeriodUs = 5000000;
 
 static LEDWidget sStatusLED(MBED_CONF_APP_SYSTEM_STATE_LED);
 static LEDWidget sLockLED(MBED_CONF_APP_LOCK_STATE_LED);
+
+static mbed::InterruptIn sLockButton(LOCK_BUTTON);
+static mbed::InterruptIn sFunctionButton(FUNCTION_BUTTON);
 
 static bool sIsThreadProvisioned     = false;
 static bool sIsThreadEnabled         = false;
@@ -39,7 +57,7 @@ static bool sIsPairedToAccount       = false;
 static bool sHaveBLEConnections      = false;
 static bool sHaveServiceConnectivity = false;
 
-static mbed::Ticker sFunctionTimer;
+static mbed::Timeout sFunctionTimer;
 
 // TODO: change EventQueue default event size
 static events::EventQueue sAppEventQueue;
@@ -50,14 +68,17 @@ AppTask AppTask::sAppTask;
 
 int AppTask::Init()
 {
-    mFunctionTimerActive = false;
-
     // Initialize LEDs
     sLockLED.Set(!BoltLockMgr().IsUnlocked());
 
+    // Initialize buttons
+    sLockButton.fall(mbed::callback(this, &AppTask::LockButtonPressEventHandler));
+    sFunctionButton.fall(mbed::callback(this, &AppTask::FunctionButtonPressEventHandler));
+    sFunctionButton.rise(mbed::callback(this, &AppTask::FunctionButtonReleaseEventHandler));
+
     // Timer initialization
     // TODO: timer period to FACTORY_RESET_CANCEL_WINDOW_TIMEOUT
-    StartTimer(50);
+    // StartTimer(50);
 
     BoltLockMgr().Init();
     BoltLockMgr().SetCallbacks(ActionInitiated, ActionCompleted);
@@ -167,6 +188,36 @@ void AppTask::LockActionEventHandler(AppEvent * aEvent)
         ChipLogProgress(NotSpecified, "Action is already in progress or active.");
 }
 
+void AppTask::LockButtonPressEventHandler()
+{
+    AppEvent button_event;
+    button_event.Type               = AppEvent::kEventType_Button;
+    button_event.ButtonEvent.Pin    = LOCK_BUTTON;
+    button_event.ButtonEvent.Action = BUTTON_PUSH_EVENT;
+    button_event.Handler            = LockActionEventHandler;
+    sAppTask.PostEvent(&button_event);
+}
+
+void AppTask::FunctionButtonPressEventHandler()
+{
+    AppEvent button_event;
+    button_event.Type               = AppEvent::kEventType_Button;
+    button_event.ButtonEvent.Pin    = FUNCTION_BUTTON;
+    button_event.ButtonEvent.Action = BUTTON_PUSH_EVENT;
+    button_event.Handler            = FunctionHandler;
+    sAppTask.PostEvent(&button_event);
+}
+
+void AppTask::FunctionButtonReleaseEventHandler()
+{
+    AppEvent button_event;
+    button_event.Type               = AppEvent::kEventType_Button;
+    button_event.ButtonEvent.Pin    = FUNCTION_BUTTON;
+    button_event.ButtonEvent.Action = BUTTON_RELEASE_EVENT;
+    button_event.Handler            = FunctionHandler;
+    sAppTask.PostEvent(&button_event);
+}
+
 void AppTask::ActionInitiated(BoltLockManager::Action_t aAction, int32_t aActor)
 {
     // If the action has been initiated by the lock, update the bolt lock trait
@@ -208,24 +259,14 @@ void AppTask::ActionCompleted(BoltLockManager::Action_t aAction, int32_t aActor)
 
 void AppTask::CancelTimer()
 {
-    if (mFunctionTimerActive)
-    {
-        sFunctionTimer.detach();
-        mFunctionTimerActive = false;
-    }
+    sFunctionTimer.detach();
+    mFunctionTimerActive = false;
 }
 
 void AppTask::StartTimer(uint32_t aTimeoutInMs)
 {
     auto chronoTimeoutMs = std::chrono::duration<uint32_t, std::milli>(aTimeoutInMs);
-
-    if (mFunctionTimerActive)
-    {
-        ChipLogError(NotSpecified, "App timer already started!");
-        CancelTimer();
-    }
-
-    sFunctionTimer.attach(&AppTask::TimerEventHandler, chronoTimeoutMs);
+    sFunctionTimer.attach(mbed::callback(this, &AppTask::TimerEventHandler), chronoTimeoutMs);
     mFunctionTimerActive = true;
 }
 
@@ -250,13 +291,12 @@ void AppTask::DispatchEvent(const AppEvent * aEvent)
     }
 }
 
-// static
 void AppTask::TimerEventHandler()
 {
     AppEvent event;
-    event.Type               = AppEvent::kEventType_Timer;
-    event.TimerEvent.Context = nullptr;
-    event.Handler            = FunctionTimerEventHandler;
+    event.Type = AppEvent::kEventType_Timer;
+    // event.TimerEvent.Context = nullptr;
+    event.Handler = FunctionTimerEventHandler;
     sAppTask.PostEvent(&event);
 }
 
@@ -265,4 +305,76 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
 {
     if (aEvent->Type != AppEvent::kEventType_Timer)
         return;
+
+    // If we reached here, the button was held past FACTORY_RESET_TRIGGER_TIMEOUT, initiate factory reset
+    if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_SoftwareUpdate)
+    {
+        ChipLogProgress(NotSpecified, "Factory Reset Triggered. Release button within %ums to cancel.",
+                        FACTORY_RESET_CANCEL_WINDOW_TIMEOUT);
+
+        // Start timer for FACTORY_RESET_CANCEL_WINDOW_TIMEOUT to allow user to
+        // cancel, if required.
+        sAppTask.StartTimer(FACTORY_RESET_CANCEL_WINDOW_TIMEOUT);
+        sAppTask.mFunction = kFunction_FactoryReset;
+
+        // Turn off all LEDs before starting blink to make sure blink is co-ordinated.
+        sStatusLED.Set(false);
+        sLockLED.Set(false);
+
+        sStatusLED.Blink(500);
+        sLockLED.Blink(500);
+    }
+    else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_FactoryReset)
+    {
+        // Set lock status LED back to show state of lock.
+        sLockLED.Set(!BoltLockMgr().IsUnlocked());
+
+        // Actually trigger Factory Reset
+        ChipLogProgress(NotSpecified, "Factory Reset initiated");
+        sAppTask.mFunction = kFunction_NoneSelected;
+        ConfigurationMgr().InitiateFactoryReset();
+    }
+}
+
+void AppTask::FunctionHandler(AppEvent * aEvent)
+{
+    if (aEvent->ButtonEvent.Pin != FUNCTION_BUTTON)
+        return;
+
+    // To trigger software update: press the FUNCTION_BUTTON button briefly (< FACTORY_RESET_TRIGGER_TIMEOUT)
+    // To initiate factory reset: press the FUNCTION_BUTTON for FACTORY_RESET_TRIGGER_TIMEOUT + FACTORY_RESET_CANCEL_WINDOW_TIMEOUT
+    // All LEDs start blinking after FACTORY_RESET_TRIGGER_TIMEOUT to signal factory reset has been initiated.
+    // To cancel factory reset: release the FUNCTION_BUTTON once all LEDs start blinking within the
+    // FACTORY_RESET_CANCEL_WINDOW_TIMEOUT
+    if (aEvent->ButtonEvent.Action == BUTTON_PUSH_EVENT)
+    {
+        if (!sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_NoneSelected)
+        {
+            sAppTask.StartTimer(FACTORY_RESET_TRIGGER_TIMEOUT);
+
+            sAppTask.mFunction = kFunction_SoftwareUpdate;
+        }
+    }
+    else
+    {
+        // If the button was released before factory reset got initiated, trigger a software update.
+        if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_SoftwareUpdate)
+        {
+            sAppTask.CancelTimer();
+            sAppTask.mFunction = kFunction_NoneSelected;
+            ChipLogError(NotSpecified, "Software Update not supported.");
+        }
+        else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_FactoryReset)
+        {
+            // Set lock status LED back to show state of lock.
+            sLockLED.Set(!BoltLockMgr().IsUnlocked());
+
+            sAppTask.CancelTimer();
+
+            // Change the function to none selected since factory reset has been canceled.
+            sAppTask.mFunction = kFunction_NoneSelected;
+
+            ChipLogProgress(NotSpecified, "Factory Reset has been Canceled");
+        }
+    }
 }

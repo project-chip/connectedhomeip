@@ -40,7 +40,7 @@ struct AppEvent
     {
         struct
         {
-            uint8_t ButtonIdx;
+            int Pin;
             uint8_t Action;
         } ButtonEvent;
         struct

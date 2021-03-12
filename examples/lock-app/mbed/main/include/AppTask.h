@@ -42,9 +42,13 @@ private:
     void DispatchEvent(const AppEvent * event);
 
     static void FunctionTimerEventHandler(AppEvent * aEvent);
+    static void FunctionHandler(AppEvent * aEvent);
     static void LockActionEventHandler(AppEvent * aEvent);
 
-    static void TimerEventHandler();
+    void LockButtonPressEventHandler(void);
+    void FunctionButtonPressEventHandler(void);
+    void FunctionButtonReleaseEventHandler(void);
+    void TimerEventHandler(void);
 
     void StartTimer(uint32_t aTimeoutInMs);
 
