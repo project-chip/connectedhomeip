@@ -806,6 +806,10 @@ protected:
     CHIP_ERROR ReadData(uint8_t * buf, uint32_t len);
     CHIP_ERROR GetElementHeadLength(uint8_t & elemHeadBytes) const;
     TLVElementType ElementType() const;
+
+    template<typename int_type>
+    bool TLVTypeValid(uint64_t val64) const;
+    CHIP_ERROR _Get(uint64_t & v);
 };
 
 /**

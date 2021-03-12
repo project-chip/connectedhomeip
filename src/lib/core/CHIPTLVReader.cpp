@@ -125,63 +125,94 @@ CHIP_ERROR TLVReader::Get(bool & v)
     return CHIP_NO_ERROR;
 }
 
+template<typename int_type>
+bool TLVReader::TLVTypeValid(uint64_t val64) const
+{
+    bool tlv_isSigned = GetType() == kTLVType_SignedInteger;
+
+    return tlv_isSigned == std::is_signed<int_type>::value &&
+           (tlv_isSigned ? CanCastTo<int_type>(CastToSigned(val64)) : CanCastTo<int_type>(val64));
+}
+
 CHIP_ERROR TLVReader::Get(int8_t & v)
 {
     uint64_t v64   = 0;
-    CHIP_ERROR err = Get(v64);
-    v              = CastToSigned(static_cast<uint8_t>(v64));
+
+    CHIP_ERROR err = _Get(v64);
+    ReturnErrorCodeIf(!TLVTypeValid<int8_t>(v64), CHIP_ERROR_WRONG_TLV_TYPE);
+    v = CastToSigned(static_cast<uint8_t>(v64));
     return err;
 }
 
 CHIP_ERROR TLVReader::Get(int16_t & v)
 {
     uint64_t v64   = 0;
-    CHIP_ERROR err = Get(v64);
-    v              = CastToSigned(static_cast<uint16_t>(v64));
+
+    CHIP_ERROR err = _Get(v64);
+    ReturnErrorCodeIf(!TLVTypeValid<int16_t>(v64), CHIP_ERROR_WRONG_TLV_TYPE);
+    v = CastToSigned(static_cast<uint16_t>(v64));
     return err;
 }
 
 CHIP_ERROR TLVReader::Get(int32_t & v)
 {
     uint64_t v64   = 0;
-    CHIP_ERROR err = Get(v64);
-    v              = CastToSigned(static_cast<uint32_t>(v64));
+
+    CHIP_ERROR err = _Get(v64);
+    ReturnErrorCodeIf(!TLVTypeValid<int32_t>(v64), CHIP_ERROR_WRONG_TLV_TYPE);
+    v = CastToSigned(static_cast<uint32_t>(v64));
     return err;
 }
 
 CHIP_ERROR TLVReader::Get(int64_t & v)
 {
     uint64_t v64   = 0;
-    CHIP_ERROR err = Get(v64);
-    v              = CastToSigned(v64);
+
+    CHIP_ERROR err = _Get(v64);
+    ReturnErrorCodeIf(!TLVTypeValid<int64_t>(v64), CHIP_ERROR_WRONG_TLV_TYPE);
+    v = CastToSigned(v64);
     return err;
 }
 
 CHIP_ERROR TLVReader::Get(uint8_t & v)
 {
     uint64_t v64   = 0;
-    CHIP_ERROR err = Get(v64);
-    v              = static_cast<uint8_t>(v64);
+
+    CHIP_ERROR err = _Get(v64);
+    ReturnErrorCodeIf(!TLVTypeValid<uint8_t>(v64), CHIP_ERROR_WRONG_TLV_TYPE);
+    v = static_cast<uint8_t>(v64);
     return err;
 }
 
 CHIP_ERROR TLVReader::Get(uint16_t & v)
 {
     uint64_t v64   = 0;
-    CHIP_ERROR err = Get(v64);
-    v              = static_cast<uint16_t>(v64);
+
+    CHIP_ERROR err = _Get(v64);
+    ReturnErrorCodeIf(!TLVTypeValid<uint16_t>(v64), CHIP_ERROR_WRONG_TLV_TYPE);
+    v = static_cast<uint16_t>(v64);
     return err;
 }
 
 CHIP_ERROR TLVReader::Get(uint32_t & v)
 {
     uint64_t v64   = 0;
-    CHIP_ERROR err = Get(v64);
-    v              = static_cast<uint32_t>(v64);
+
+    CHIP_ERROR err = _Get(v64);
+    ReturnErrorCodeIf(!TLVTypeValid<uint32_t>(v64), CHIP_ERROR_WRONG_TLV_TYPE);
+    v = static_cast<uint32_t>(v64);
     return err;
 }
 
 CHIP_ERROR TLVReader::Get(uint64_t & v)
+{
+    v = 0;
+    CHIP_ERROR err = _Get(v);
+    ReturnErrorCodeIf(!TLVTypeValid<uint64_t>(v), CHIP_ERROR_WRONG_TLV_TYPE);
+    return err;
+}
+
+CHIP_ERROR TLVReader::_Get(uint64_t & v)
 {
     switch (ElementType())
     {
