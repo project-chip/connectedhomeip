@@ -186,7 +186,7 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     CHIP_ERROR err;
 
     const char * deviceName   = bt_get_name();
-    const uint8_t advFlags    = BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR;
+    const uint8_t advFlags    = BT_LE_AD_LIMITED | BT_LE_AD_NO_BREDR;
     bt_le_adv_param advParams = BT_LE_ADV_PARAM_INIT(BT_LE_ADV_OPT_CONNECTABLE | BT_LE_ADV_OPT_ONE_TIME, GetAdvertisingInterval(),
                                                      CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL, nullptr);
 
