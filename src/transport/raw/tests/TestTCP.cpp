@@ -221,7 +221,7 @@ chip::System::PacketBufferHandle PreparePacketBuffers(nlTestSuite * inSuite, con
     uint16_t message_length = header_length;
     for (int i = 0; sizes[i] != 0; ++i)
     {
-        message_length += sizes[i];
+        message_length = static_cast<uint16_t>(message_length + sizes[i]);
     }
 
     const uint16_t headLength             = static_cast<uint16_t>(2 + header_length + sizes[0]);
