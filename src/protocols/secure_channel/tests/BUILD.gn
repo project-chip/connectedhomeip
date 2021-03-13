@@ -1,0 +1,24 @@
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/nlio.gni")
+import("//build_overrides/nlunit_test.gni")
+
+import("${chip_root}/build/chip/chip_test_suite.gni")
+
+chip_test_suite("tests") {
+  output_name = "libSecureChannelTests"
+
+  test_sources = [
+    "TestStatusReport.cpp",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/protocols/secure_channel",
+    "${nlio_root}:nlio",
+    "${nlunit_test_root}:nlunit-test",
+  ]
+
+  cflags = [ "-Wconversion" ]
+}
