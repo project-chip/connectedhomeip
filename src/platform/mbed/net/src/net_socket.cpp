@@ -8,7 +8,7 @@ using namespace rtos;
 
 #define TCP_SOCKET SOCK_STREAM
 #define UDP_SOCKET SOCK_DGRAM
-#define SOCKET_NOT_INITIALIZED (-1)
+#define SOCKET_NOT_INITIALIZED (0)
 #define NO_FREE_SOCKET_SLOT (-1)
 
 static BSDSocket sockets[MBED_NET_SOCKET_MAX_NUMBER];
@@ -51,41 +51,78 @@ int BSDSocket::set_blocking(bool blocking)
     }
     return 0;
 }
+
 bool BSDSocket::is_blocking() const
 {
     return false;
 }
+
 short BSDSocket::poll(short events) const
 {
     return POLLIN | POLLOUT;
 }
+
 void BSDSocket::sigio(Callback<void()> func)
 {
     _cb = func;
 }
 
-nsapi_version_t Inet2Nsapi(int family)
+nsapi_version_t Inet2Nsapi(int family, int & size)
 {
     switch (family)
     {
     case AF_INET:
+        size = 4;
         return NSAPI_IPv4;
         break;
     case AF_INET6:
+        size = 16;
         return NSAPI_IPv6;
         break;
     default:
+        size = 0;
         return NSAPI_UNSPEC;
     }
 }
+
 void msghdr2Netsocket(SocketAddress * dst, struct sockaddr_in * src)
 {
-    dst->set_ip_bytes((const void *) src->sin_addr.s_addr, Inet2Nsapi(src->sin_family));
+    uint8_t adr[16];
+    uint8_t byte;
+    int size;
+
+    nsapi_version_t addr_type = Inet2Nsapi(src->sin_family, size);
+
+    for (int i = 0; i < size; i++)
+    {
+        byte = ((src->sin_addr.s_addr >> (8 * i)) & 0XFF);
+#ifdef LITTLE_ENDIAN
+        adr[i] = byte;
+#else
+        adr[(size - 1) - i] = byte;
+#endif
+    }
+    dst->set_ip_bytes(adr, addr_type);
 }
+
 void Sockaddr2Netsocket(SocketAddress * dst, struct sockaddr * src)
 {
-    sockaddr_in * addr = reinterpret_cast<sockaddr_in *>(src);
-    dst->set_ip_bytes((const void *) addr->sin_addr.s_addr, Inet2Nsapi(src->sa_family));
+    uint8_t adr[16];
+    uint8_t byte;
+    int size;
+    sockaddr_in * addr        = reinterpret_cast<sockaddr_in *>(src);
+    nsapi_version_t addr_type = Inet2Nsapi(src->sa_family, size);
+
+    for (int i = 0; i < size; i++)
+    {
+        byte = ((addr->sin_addr.s_addr >> (8 * i)) & 0XFF);
+#ifdef LITTLE_ENDIAN
+        adr[i] = byte;
+#else
+        adr[(size - 1) - i] = byte;
+#endif
+    }
+    dst->set_ip_bytes(adr, addr_type);
 }
 
 static Socket * getSocket(int fd)
@@ -103,7 +140,6 @@ static Socket * getSocket(int fd)
             ret = &sockets->udpSocket;
         }
     }
-
     return ret;
 }
 
@@ -172,7 +208,6 @@ int mbed_socket(int family, int type, int proto)
         }
         fd = socket->fd;
     }
-
     return fd;
 }
 
