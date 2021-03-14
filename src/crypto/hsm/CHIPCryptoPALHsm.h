@@ -157,7 +157,7 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC_Mac_HSM(const uint8_t * key, size_t key
 /**
  * @brief Init Spake2+ on HSM.
  **/
-CHIP_ERROR Spake2p_Init_HSM(const uint8_t * context, size_t context_len);
+CHIP_ERROR Spake2p_Init_HSM(hsm_pake_context_t * phsm_pake_context, const uint8_t * context, size_t context_len);
 
 #endif //#if ( (ENABLE_HSM_SPAKE_VERIFIER) || (ENABLE_HSM_SPAKE_PROVER) )
 
@@ -166,9 +166,9 @@ CHIP_ERROR Spake2p_Init_HSM(const uint8_t * context, size_t context_len);
 /**
  * @brief Start the Spake2+ process on HSM as a verifier (i.e. an accessory being provisioned).
  **/
-CHIP_ERROR Spake2p_BeginVerifier_HSM(const uint8_t * my_identity, size_t my_identity_len, const uint8_t * peer_identity,
-                                     size_t peer_identity_len, const uint8_t * w0in, size_t w0in_len, const uint8_t * Lin,
-                                     size_t Lin_len);
+CHIP_ERROR Spake2p_BeginVerifier_HSM(hsm_pake_context_t * phsm_pake_context, const uint8_t * my_identity, size_t my_identity_len,
+                                     const uint8_t * peer_identity, size_t peer_identity_len, const uint8_t * w0in, size_t w0in_len,
+                                     const uint8_t * Lin, size_t Lin_len);
 
 #endif //#if ENABLE_HSM_SPAKE_VERIFIER
 
@@ -177,9 +177,9 @@ CHIP_ERROR Spake2p_BeginVerifier_HSM(const uint8_t * my_identity, size_t my_iden
 /**
  * @brief Start the Spake2+ process on HSM as a prover (i.e. a commissioner).
  **/
-CHIP_ERROR Spake2p_BeginProver_HSM(const uint8_t * my_identity, size_t my_identity_len, const uint8_t * peer_identity,
-                                   size_t peer_identity_len, const uint8_t * w0in, size_t w0in_len, const uint8_t * w1in,
-                                   size_t w1in_len);
+CHIP_ERROR Spake2p_BeginProver_HSM(hsm_pake_context_t * phsm_pake_context, const uint8_t * my_identity, size_t my_identity_len,
+                                   const uint8_t * peer_identity, size_t peer_identity_len, const uint8_t * w0in, size_t w0in_len,
+                                   const uint8_t * w1in, size_t w1in_len);
 
 #endif //#if ENABLE_HSM_SPAKE_PROVER
 
@@ -188,24 +188,26 @@ CHIP_ERROR Spake2p_BeginProver_HSM(const uint8_t * my_identity, size_t my_identi
 /**
  * @brief Compute the first round of the protocol on HSM.
  **/
-CHIP_ERROR Spake2p_ComputeRoundOne_HSM(chip::Crypto::CHIP_SPAKE2P_ROLE role, const uint8_t * pab, size_t pab_len, uint8_t * out,
-                                       size_t * out_len);
+CHIP_ERROR Spake2p_ComputeRoundOne_HSM(hsm_pake_context_t * phsm_pake_context, chip::Crypto::CHIP_SPAKE2P_ROLE role,
+                                        const uint8_t * pab, size_t pab_len, uint8_t * out, size_t * out_len);
 
 /**
  * @brief Compute the second round of the protocol on HSM.
  **/
-CHIP_ERROR Spake2p_ComputeRoundTwo_HSM(chip::Crypto::CHIP_SPAKE2P_ROLE role, const uint8_t * in, size_t in_len, uint8_t * out,
-                                       size_t * out_len, uint8_t * pKeyKe, size_t * pkeyKeLen);
+CHIP_ERROR Spake2p_ComputeRoundTwo_HSM(hsm_pake_context_t * phsm_pake_context, chip::Crypto::CHIP_SPAKE2P_ROLE role,
+                                       const uint8_t * in, size_t in_len, uint8_t * out, size_t * out_len,
+                                       uint8_t * pKeyKe, size_t * pkeyKeLen);
 
 /**
  * @brief Confirm that each party computed the same keys using HSM.
  **/
-CHIP_ERROR Spake2p_KeyConfirm_HSM(chip::Crypto::CHIP_SPAKE2P_ROLE role, const uint8_t * in, size_t in_len);
+CHIP_ERROR Spake2p_KeyConfirm_HSM(hsm_pake_context_t * phsm_pake_context, chip::Crypto::CHIP_SPAKE2P_ROLE role,
+                                  const uint8_t * in, size_t in_len);
 
 /**
  * @brief Return the shared secret.
  **/
-void Spake2p_Finish_HSM(chip::Crypto::CHIP_SPAKE2P_ROLE role);
+void Spake2p_Finish_HSM(hsm_pake_context_t * phsm_pake_context);
 
 #endif //#if ( (ENABLE_HSM_SPAKE_VERIFIER) || (ENABLE_HSM_SPAKE_PROVER) )
 

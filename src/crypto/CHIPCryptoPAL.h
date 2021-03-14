@@ -709,6 +709,9 @@ public:
     void * xy;
     void * order;
     void * tempbn;
+#if CHIP_CRYPTO_HSM
+    hsm_pake_context_t hsm_pake_context;
+#endif
 
 protected:
     /**

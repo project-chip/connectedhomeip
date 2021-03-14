@@ -73,4 +73,8 @@
  */
 #define ENABLE_HSM_SPAKE_PROVER 1
 
+#if CHIP_CRYPTO_HSM_NXP
+#include "nxp/CHIPCryptoPALHsm_SE05X.h"
+#endif
+
 #endif //#ifndef _CHIP_CRYPTO_PAL_HSM_CONFIG_H_

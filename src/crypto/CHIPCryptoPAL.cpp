@@ -105,7 +105,7 @@ CHIP_ERROR Spake2p::Init(const uint8_t * context, size_t context_len)
     VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
 
 #if ((CHIP_CRYPTO_HSM) && ((ENABLE_HSM_SPAKE_VERIFIER) || (ENABLE_HSM_SPAKE_PROVER)))
-    error = Spake2p_Init_HSM(context, context_len);
+    error = Spake2p_Init_HSM(&hsm_pake_context, context, context_len);
     VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
 #endif
 
@@ -150,8 +150,8 @@ CHIP_ERROR Spake2p::BeginVerifier(const uint8_t * my_identity, size_t my_identit
     error = FEWrite(w0, w0in_mod, w0in_mod_len);
     VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
 
-    error = Spake2p_BeginVerifier_HSM(my_identity, my_identity_len, peer_identity, peer_identity_len, w0in_mod, w0in_mod_len, Lin,
-                                      Lin_len);
+    error = Spake2p_BeginVerifier_HSM(&hsm_pake_context, my_identity, my_identity_len, peer_identity, peer_identity_len, w0in_mod, w0in_mod_len,
+                                      Lin, Lin_len);
     if (CHIP_NO_ERROR == error)
     {
         state = CHIP_SPAKE2P_STATE::STARTED;
@@ -213,8 +213,8 @@ CHIP_ERROR Spake2p::BeginProver(const uint8_t * my_identity, size_t my_identity_
     error = FEWrite(w1, w1in_mod, w1in_mod_len);
     VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
 
-    error = Spake2p_BeginProver_HSM(my_identity, my_identity_len, peer_identity, peer_identity_len, w0in_mod, w0in_mod_len,
-                                    w1in_mod, w1in_mod_len);
+    error = Spake2p_BeginProver_HSM(&hsm_pake_context, my_identity, my_identity_len, peer_identity, peer_identity_len,
+                                    w0in_mod, w0in_mod_len, w1in_mod, w1in_mod_len);
     if (CHIP_NO_ERROR == error)
     {
         state = CHIP_SPAKE2P_STATE::STARTED;
@@ -271,7 +271,7 @@ CHIP_ERROR Spake2p::ComputeRoundOne(const uint8_t * pab, size_t pab_len, uint8_t
 #endif
 
 #if ((CHIP_CRYPTO_HSM) && ((ENABLE_HSM_SPAKE_VERIFIER) || (ENABLE_HSM_SPAKE_PROVER)))
-    error = Spake2p_ComputeRoundOne_HSM(role, pab, pab_len, out, out_len);
+    error = Spake2p_ComputeRoundOne_HSM(&hsm_pake_context, role, pab, pab_len, out, out_len);
     if (CHIP_NO_ERROR == error)
     {
         state = CHIP_SPAKE2P_STATE::R1;
@@ -346,7 +346,7 @@ CHIP_ERROR Spake2p::ComputeRoundTwo(const uint8_t * in, size_t in_len, uint8_t *
 #endif
 
 #if ((CHIP_CRYPTO_HSM) && ((ENABLE_HSM_SPAKE_VERIFIER) || (ENABLE_HSM_SPAKE_PROVER)))
-    error = Spake2p_ComputeRoundTwo_HSM(role, in, in_len, out, out_len, pKeyKe, &pkeyKeLen);
+    error = Spake2p_ComputeRoundTwo_HSM(&hsm_pake_context, role, in, in_len, out, out_len, pKeyKe, &pkeyKeLen);
     if (CHIP_NO_ERROR == error)
     {
         memcpy((Kae + 16), pKeyKe, pkeyKeLen);
@@ -493,7 +493,7 @@ CHIP_ERROR Spake2p::KeyConfirm(const uint8_t * in, size_t in_len)
 #endif
 
 #if ((CHIP_CRYPTO_HSM) && ((ENABLE_HSM_SPAKE_VERIFIER) || (ENABLE_HSM_SPAKE_PROVER)))
-    error = Spake2p_KeyConfirm_HSM(role, in, in_len);
+    error = Spake2p_KeyConfirm_HSM(&hsm_pake_context, role, in, in_len);
     if (CHIP_NO_ERROR == error)
     {
         state = CHIP_SPAKE2P_STATE::KC;
@@ -528,7 +528,7 @@ sw_rollback:
     error = CHIP_NO_ERROR;
 exit:
 #if ((CHIP_CRYPTO_HSM) && ((ENABLE_HSM_SPAKE_VERIFIER) || (ENABLE_HSM_SPAKE_PROVER)))
-    Spake2p_Finish_HSM(role);
+    Spake2p_Finish_HSM(&hsm_pake_context);
 #endif
     return error;
 }
