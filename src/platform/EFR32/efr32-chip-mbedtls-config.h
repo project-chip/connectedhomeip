@@ -35,6 +35,20 @@
 #include "em_device.h"
 #include "em_se.h"
 
+//#define NO_CRYPTO_ACCELERATION
+#define MBEDTLS_SSL_KEEP_PEER_CERTIFICATE
+#define MBEDTLS_X509_CRL_PARSE_C
+#define MBEDTLS_X509_CSR_PARSE_C
+
+//#include "sl_malloc.h"
+
+// #define MBEDTLS_PLATFORM_FREE_MACRO sl_free
+// #define MBEDTLS_PLATFORM_CALLOC_MACRO sl_calloc
+// #endif
+
+
+///////////////////////////
+
 /**
  * Enable FreeRTOS threading support
  */
@@ -153,6 +167,31 @@
 #define MBEDTLS_ECDSA_SIGN_ALT
 #define MBEDTLS_ECDSA_VERIFY_ALT
 #endif /* EFR32xG21B or curve25519 not enabled */
+
+//#define MBEDTLS_CIPHER_MODE_CTR
+#define MBEDTLS_CIPHER_MODE_CBC
+#define MBEDTLS_CIPHER_MODE_CFB
+// #define MBEDTLS_CIPHER_C
+// #define MBEDTLS_ECP_C
+// #define MBEDTLS_ECP_DP_SECP256R1_ENABLED
+// #define MBEDTLS_ECDH_C
+#define MBEDTLS_ECDH_LEGACY_CONTEXT
+// #define MBEDTLS_ENTROPY_HARDWARE_ALT
+// #define MBEDTLS_MD_C
+// #define MBEDTLS_HKDF_C
+// #define MBEDTLS_BIGNUM_C
+// #define MBEDTLS_ENTROPY_C
+#define MBEDTLS_ENTROPY_FORCE_SHA256
+// #define MBEDTLS_NO_PLATFORM_ENTROPY
+// #define MBEDTLS_CTR_DRBG_C
+// #define MBEDTLS_SHA256_C
+#define MBEDTLS_SHA512_C
+#define MBEDTLS_PSA_CRYPTO_C
+#define MBEDTLS_PSA_CRYPTO_CONFIG
+#define MBEDTLS_PSA_CRYPTO_DRIVERS
+#define MBEDTLS_PSA_CRYPTO_BUILTIN_KEYS
+#define MBEDTLS_PSA_CRYPTO_STORAGE_C
+
 #endif // Familiy Selection
 
 #if defined(MBEDTLS_ECP_ALT) && !defined(MBEDTLS_ECP_RESTARTABLE)
@@ -201,15 +240,19 @@ typedef void mbedtls_ecp_restart_ctx;
 #define MBEDTLS_PEM_WRITE_C
 #define MBEDTLS_PKCS5_C
 
+#include "config-device-acceleration.h"
+//config-sl-crypto-all-acceleration.h
+
+
 #if OPENTHREAD_CONFIG_BORDER_AGENT_ENABLE || OPENTHREAD_CONFIG_COMMISSIONER_ENABLE || OPENTHREAD_CONFIG_COAP_SECURE_API_ENABLE
+#endif
 #define MBEDTLS_SSL_COOKIE_C
 #define MBEDTLS_SSL_SRV_C
-#endif
 
 #if OPENTHREAD_CONFIG_COAP_SECURE_API_ENABLE
+#endif
 #define MBEDTLS_KEY_EXCHANGE_PSK_ENABLED
 #define MBEDTLS_KEY_EXCHANGE_ECDHE_ECDSA_ENABLED
-#endif
 
 #ifdef MBEDTLS_KEY_EXCHANGE_ECDHE_ECDSA_ENABLED
 #define MBEDTLS_BASE64_C
@@ -225,10 +268,10 @@ typedef void mbedtls_ecp_restart_ctx;
 #define MBEDTLS_ECP_MAX_BITS 256        /**< Maximum bit size of groups */
 #define MBEDTLS_ECP_WINDOW_SIZE 2       /**< Maximum window size used */
 #define MBEDTLS_ECP_FIXED_POINT_OPTIM 0 /**< Enable fixed-point speed-up */
-#define MBEDTLS_ENTROPY_MAX_SOURCES 1   /**< Maximum number of sources supported */
+#define MBEDTLS_ENTROPY_MAX_SOURCES 2   /**< Maximum number of sources supported */
 
-#define MBEDTLS_PLATFORM_STD_CALLOC calloc /**< Default allocator to use, can be undefined */
-#define MBEDTLS_PLATFORM_STD_FREE free     /**< Default free to use, can be undefined */
+#define MBEDTLS_PLATFORM_STD_CALLOC sl_calloc /**< Default allocator to use, can be undefined */
+#define MBEDTLS_PLATFORM_STD_FREE sl_free     /**< Default free to use, can be undefined */
 
 #if OPENTHREAD_CONFIG_COAP_SECURE_API_ENABLE
 #define MBEDTLS_SSL_MAX_CONTENT_LEN 900 /**< Maxium fragment length in bytes */
@@ -238,6 +281,4 @@ typedef void mbedtls_ecp_restart_ctx;
 
 #define MBEDTLS_SSL_CIPHERSUITES MBEDTLS_TLS_ECJPAKE_WITH_AES_128_CCM_8
 
-#if defined(MBEDTLS_USER_CONFIG_FILE)
-#include MBEDTLS_USER_CONFIG_FILE
-#endif
+#include "mbedtls/check_config.h"
