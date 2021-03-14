@@ -227,44 +227,6 @@ void HandleEchoResponseReceived(Messaging::ExchangeContext * ec, System::PacketB
                     payload->DataLength(), static_cast<double>(transitTime) / 1000);
 }
 
-void DriveIO(streamer_t * stream)
-{
-    struct timeval sleepTime;
-    fd_set readFDs, writeFDs, exceptFDs;
-    int numFDs = 0;
-    int selectRes;
-
-    sleepTime.tv_sec  = 0;
-    sleepTime.tv_usec = kNetworkSleepTimeMsecs;
-
-    FD_ZERO(&readFDs);
-    FD_ZERO(&writeFDs);
-    FD_ZERO(&exceptFDs);
-
-    if (chip::DeviceLayer::SystemLayer.State() == chip::System::kLayerState_Initialized)
-        chip::DeviceLayer::SystemLayer.PrepareSelect(numFDs, &readFDs, &writeFDs, &exceptFDs, sleepTime);
-
-    if (chip::DeviceLayer::InetLayer.State == chip::Inet::InetLayer::kState_Initialized)
-        chip::DeviceLayer::InetLayer.PrepareSelect(numFDs, &readFDs, &writeFDs, &exceptFDs, sleepTime);
-
-    selectRes = select(numFDs, &readFDs, &writeFDs, &exceptFDs, &sleepTime);
-    if (selectRes < 0)
-    {
-        streamer_printf(stream, "Select failed: %s\n", chip::ErrorStr(chip::System::MapErrorPOSIX(errno)));
-        return;
-    }
-
-    if (chip::DeviceLayer::SystemLayer.State() == chip::System::kLayerState_Initialized)
-    {
-        chip::DeviceLayer::SystemLayer.HandleSelectResult(selectRes, &readFDs, &writeFDs, &exceptFDs);
-    }
-
-    if (chip::DeviceLayer::InetLayer.State == chip::Inet::InetLayer::kState_Initialized)
-    {
-        chip::DeviceLayer::InetLayer.HandleSelectResult(selectRes, &readFDs, &writeFDs, &exceptFDs);
-    }
-}
-
 void StartPinging(streamer_t * stream, char * destination)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -326,6 +288,10 @@ void StartPinging(streamer_t * stream, char * destination)
     for (unsigned int i = 0; i < maxEchoCount; i++)
     {
         err = SendEchoRequest(stream);
+
+        streamer_printf(stream, "yujuan: 324\n");
+        ChipLogDetail(DeviceLayer, "yujuan: StartPinging: PID: %d", gettid());
+
         if (err != CHIP_NO_ERROR)
         {
             streamer_printf(stream, "Send request failed: %s\n", ErrorStr(err));
@@ -335,7 +301,7 @@ void StartPinging(streamer_t * stream, char * destination)
         // Wait for response until the Echo interval.
         while (!EchoIntervalExpired())
         {
-            DriveIO(stream);
+            sleep(1);
         }
 
         // Check if expected response was received.
