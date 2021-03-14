@@ -87,6 +87,8 @@ CHIP_ERROR SecureSessionMgr::Init(NodeId localNodeId, System::Layer * systemLaye
 
 void SecureSessionMgr::Shutdown()
 {
+    CancelExpiryTimer();
+
     mState        = State::kNotReady;
     mLocalNodeId  = kUndefinedNodeId;
     mSystemLayer  = nullptr;
