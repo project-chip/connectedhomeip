@@ -193,7 +193,7 @@ CHIP_ERROR DeviceController::Shutdown()
 
     if (mStorageDelegate != nullptr)
     {
-        mStorageDelegate->SetDelegate(nullptr);
+        mStorageDelegate->SetStorageDelegate(nullptr);
         mStorageDelegate = nullptr;
     }
 
