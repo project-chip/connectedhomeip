@@ -7,7 +7,8 @@
 #include <nlunit-test.h>
 
 #include <core/CHIPTLV.h>
-#include <protocols/common/Constants.h>
+#include <protocols/secure_channel/Constants.h>
+#include <protocols/secure_channel/StatusReport.h>
 #include <support/BufferReader.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
@@ -17,6 +18,7 @@
 
 using namespace ::chip;
 using namespace ::chip::bdx;
+using namespace ::chip::Protocols;
 
 namespace {
 // Use this as a timestamp if not needing to test BDX timeouts.
@@ -127,8 +129,8 @@ void VerifyStatusReport(nlTestSuite * inSuite, void * inContext, const System::P
 
     err = payloadHeader.Decode(msg->Start(), msg->DataLength(), &headerSize);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, payloadHeader.GetProtocolID() == Protocols::kProtocol_Protocol_Common);
-    NL_TEST_ASSERT(inSuite, payloadHeader.GetMessageType() == static_cast<uint8_t>(Protocols::Common::MsgType::StatusReport));
+    NL_TEST_ASSERT(inSuite, payloadHeader.GetProtocolID() == kProtocol_SecureChannel);
+    NL_TEST_ASSERT(inSuite, payloadHeader.GetMessageType() == static_cast<uint8_t>(SecureChannel::MsgType::StatusReport));
     if (headerSize > msg->DataLength())
     {
         NL_TEST_ASSERT(inSuite, false);
@@ -138,8 +140,8 @@ void VerifyStatusReport(nlTestSuite * inSuite, void * inContext, const System::P
     Encoding::LittleEndian::Reader reader(msg->Start(), msg->DataLength());
     err = reader.Skip(headerSize).Read16(&generalCode).Read32(&protocolId).Read16(protocolCode.RawStorage()).StatusCode();
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, generalCode == static_cast<uint16_t>(Protocols::Common::StatusCode::Failure));
-    NL_TEST_ASSERT(inSuite, protocolId == Protocols::kProtocol_BDX);
+    NL_TEST_ASSERT(inSuite, generalCode == static_cast<uint16_t>(SecureChannel::GeneralStatusCode::Failure));
+    NL_TEST_ASSERT(inSuite, protocolId == kProtocol_BDX);
     NL_TEST_ASSERT(inSuite, protocolCode == code);
 }
 

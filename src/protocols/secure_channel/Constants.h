@@ -67,10 +67,42 @@ enum class MsgType : uint8_t
     CASE_SigmaR2  = 0x31,
     CASE_SigmaR3  = 0x32,
     CASE_SigmaErr = 0x3F,
+
+    StatusReport = 0x40,
+};
+
+// Placeholder value for the ProtocolCode field when the GeneralCode is Success or Continue.
+constexpr uint16_t kProtocolCodeSuccess = 0x0000;
+
+// Placeholder value for the ProtocolCode field when there is no additional protocol-specific code to provide more information.
+constexpr uint16_t kProtocolCodeGeneralFailure = 0xFFFF;
+
+/**
+ * Status Report - General Status Codes used to convey protocol-agnostic status info.
+ */
+enum class GeneralStatusCode
+{
+    Success           = 0,  /**< Operation completed successfully. */
+    Failure           = 1,  /**< Generic failure, additional details may be included in the protocol specific status. */
+    BadPrecondition   = 2,  /**< Operation was rejected by the system because the system is in an invalid state. */
+    OutOfRange        = 3,  /**< A value was out of a required range. */
+    BadRequest        = 4,  /**< A request was unrecognized or malformed. */
+    Unsupported       = 5,  /**< An unrecognized or unsupported request was received. */
+    Unexpected        = 6,  /**< A request was not expected at this time. */
+    ResourceExhausted = 7,  /**< Insufficient resources to process the given request. */
+    Busy              = 8,  /**< Device is busy and cannot handle this request at this time. */
+    Timeout           = 9,  /**< A timeout occurred. */
+    Continue          = 10, /**< Context-specific signal to proceed. */
+    Aborted           = 11, /**< Failure, often due to a concurrency error. */
+    InvalidArgument   = 12, /**< An invalid/unsupported argument was provided. */
+    NotFound          = 13, /**< Some requested entity was not found. */
+    AlreadyExists     = 14, /**< The caller attempted to create something that already exists. */
+    PermissionDenied  = 15, /**< Caller does not have sufficient permissions to execute the requested operations. */
+    DataLoss          = 16, /**< Unrecoverable data loss or corruption has occurred. */
 };
 
 /**
- * SecureChannel Protocol Status Codes
+ * Status Report - Status Codes specific only to the SecureChannel Protocol
  */
 enum class StatusCode
 {
