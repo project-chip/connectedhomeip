@@ -29,7 +29,7 @@
 namespace chip {
 namespace Controller {
 
-void PythonPersistentStorageDelegate::SetDelegate(PersistentStorageResultDelegate * delegate)
+void PythonPersistentStorageDelegate::SetStorageDelegate(PersistentStorageResultDelegate * delegate)
 {
     mDelegate = delegate;
 }
