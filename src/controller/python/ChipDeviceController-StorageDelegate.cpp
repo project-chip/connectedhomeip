@@ -43,7 +43,7 @@ void PythonPersistentStorageDelegate::AsyncGetKeyValue(const char * key)
         return;
     }
 
-    mDelegate->OnPertistentStorageValue(key, val->second.c_str());
+    mDelegate->OnPersistentStorageValue(key, val->second.c_str());
 }
 
 CHIP_ERROR PythonPersistentStorageDelegate::SyncGetKeyValue(const char * key, char * value, uint16_t & size)
