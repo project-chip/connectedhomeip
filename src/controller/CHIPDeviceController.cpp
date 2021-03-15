@@ -126,7 +126,7 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, PersistentStorageDelegat
 
     if (mStorageDelegate != nullptr)
     {
-        mStorageDelegate->SetDelegate(this);
+        mStorageDelegate->SetStorageDelegate(this);
     }
 
     mTransportMgr   = chip::Platform::New<DeviceTransportMgr>();

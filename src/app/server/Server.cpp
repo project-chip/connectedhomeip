@@ -72,7 +72,7 @@ constexpr bool useTestPairing()
 
 class ServerStorageDelegate : public PersistentStorageDelegate
 {
-    void SetDelegate(PersistentStorageResultDelegate * delegate) override
+    void SetStorageDelegate(PersistentStorageResultDelegate * delegate) override
     {
         ChipLogError(AppServer, "ServerStorageDelegate does not support async operations");
         chipDie();

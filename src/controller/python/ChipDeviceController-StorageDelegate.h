@@ -36,7 +36,7 @@ class PythonPersistentStorageDelegate : public PersistentStorageDelegate
 {
 public:
     PythonPersistentStorageDelegate() {}
-    void SetDelegate(PersistentStorageResultDelegate * delegate) override;
+    void SetStorageDelegate(PersistentStorageResultDelegate * delegate) override;
     void GetKeyValue(const char * key) override;
     CHIP_ERROR GetKeyValue(const char * key, char * value, uint16_t & size) override;
     void SetKeyValue(const char * key, const char * value) override;

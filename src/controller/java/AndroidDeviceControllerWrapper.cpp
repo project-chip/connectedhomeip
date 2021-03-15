@@ -284,7 +284,7 @@ void AndroidDeviceControllerWrapper::OnMessage(chip::System::PacketBufferHandle 
 
 void AndroidDeviceControllerWrapper::OnStatusChange(void) {}
 
-void AndroidDeviceControllerWrapper::SetDelegate(PersistentStorageResultDelegate * delegate)
+void AndroidDeviceControllerWrapper::SetStorageDelegate(PersistentStorageResultDelegate * delegate)
 {
     mStorageResultDelegate = delegate;
 }

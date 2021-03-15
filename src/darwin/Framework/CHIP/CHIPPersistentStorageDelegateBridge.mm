@@ -39,7 +39,7 @@ void CHIPPersistentStorageDelegateBridge::setFrameworkDelegate(id<CHIPPersistent
     });
 }
 
-void CHIPPersistentStorageDelegateBridge::SetDelegate(chip::PersistentStorageResultDelegate * delegate)
+void CHIPPersistentStorageDelegateBridge::SetStorageDelegate(chip::PersistentStorageResultDelegate * delegate)
 {
     dispatch_async(mWorkQueue, ^{
         if (delegate) {

@@ -53,7 +53,7 @@ exit:
     return err;
 }
 
-void PersistentStorage::SetDelegate(PersistentStorageResultDelegate * delegate) {}
+void PersistentStorage::SetStorageDelegate(PersistentStorageResultDelegate * delegate) {}
 
 void PersistentStorage::GetKeyValue(const char * key) {}
 

@@ -28,7 +28,7 @@ namespace {
 class ServerStorageDelegate : public chip::PersistentStorageDelegate
 {
 public:
-    void SetDelegate(chip::PersistentStorageResultDelegate * delegate) override { mAsyncDelegate = delegate; }
+    void SetStorageDelegate(chip::PersistentStorageResultDelegate * delegate) override { mAsyncDelegate = delegate; }
 
     void GetKeyValue(const char * key) override
     {

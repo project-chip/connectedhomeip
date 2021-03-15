@@ -68,7 +68,7 @@ public:
      *
      * @param[in] delegate The callback object
      */
-    virtual void SetDelegate(PersistentStorageResultDelegate * delegate) = 0;
+    virtual void SetStorageDelegate(PersistentStorageResultDelegate * delegate) = 0;
 
     /**
      * @brief
