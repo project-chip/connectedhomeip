@@ -498,6 +498,31 @@ public:
     }
 
     /**
+     * Add the given packet buffer to the end of the buffer chain, adjusting the total length of each buffer in the chain
+     * accordingly.
+     *
+     *  @note The current packet buffer handle must either be the head of the buffer chain for the lengths to be adjusted properly,
+     *        or be null (in which case it becomes the head).
+     *
+     *  @note Ownership is transferred from the argument to the `next` link at the end of the current chain,
+     *        or to the handle if it's currently null.
+     *
+     *  @param[in] aPacket - the packet buffer to be added to the end of the current chain.
+     */
+    void AddToEnd(PacketBufferHandle && aPacket)
+    {
+        if (IsNull())
+        {
+            mBuffer         = aPacket.mBuffer;
+            aPacket.mBuffer = nullptr;
+        }
+        else
+        {
+            mBuffer->AddToEnd(std::move(aPacket));
+        }
+    }
+
+    /**
      * Consume data in a chain of buffers.
      *
      *  Consume data in a chain of buffers starting with the current buffer and proceeding through the remaining buffers in the

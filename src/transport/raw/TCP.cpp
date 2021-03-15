@@ -32,6 +32,8 @@
 #include <transport/raw/MessageHeader.h>
 
 #include <inttypes.h>
+#include <limits>
+#include <utility>
 
 namespace chip {
 namespace Transport {
@@ -43,29 +45,6 @@ using namespace chip::Encoding;
 constexpr size_t kPacketSizeBytes = 2;
 
 constexpr int kListenBacklogSize = 2;
-
-/**
- *  Determine if the given buffer contains a complete message
- */
-bool ContainsCompleteMessage(const System::PacketBufferHandle & buffer, uint8_t ** start, uint16_t * size, uint16_t * payloadSize)
-{
-    bool completeMessage = false;
-
-    if (buffer->DataLength() >= kPacketSizeBytes)
-    {
-        *size           = LittleEndian::Get16(buffer->Start());
-        *payloadSize    = static_cast<uint16_t>(*size + kPacketSizeBytes);
-        *start          = buffer->Start() + kPacketSizeBytes;
-        completeMessage = (buffer->DataLength() >= *size + kPacketSizeBytes);
-    }
-
-    if (!completeMessage)
-    {
-        *start = nullptr;
-    }
-
-    return completeMessage;
-}
 
 } // namespace
 
@@ -90,10 +69,9 @@ void TCPBase::CloseActiveConnections()
 {
     for (size_t i = 0; i < mActiveConnectionsSize; i++)
     {
-        if (mActiveConnections[i] != nullptr)
+        if (mActiveConnections[i].InUse())
         {
-            mActiveConnections[i]->Free();
-            mActiveConnections[i] = nullptr;
+            mActiveConnections[i].Free();
             mUsedEndPointCount--;
         }
     }
@@ -142,7 +120,7 @@ exit:
     return err;
 }
 
-Inet::TCPEndPoint * TCPBase::FindActiveConnection(const PeerAddress & address)
+TCPBase::ActiveConnectionState * TCPBase::FindActiveConnection(const PeerAddress & address)
 {
     if (address.GetTransportType() != Type::kTcp)
     {
@@ -151,20 +129,32 @@ Inet::TCPEndPoint * TCPBase::FindActiveConnection(const PeerAddress & address)
 
     for (size_t i = 0; i < mActiveConnectionsSize; i++)
     {
-        if (mActiveConnections[i] == nullptr)
+        if (!mActiveConnections[i].InUse())
         {
             continue;
         }
         Inet::IPAddress addr;
         uint16_t port;
-        mActiveConnections[i]->GetPeerInfo(&addr, &port);
+        mActiveConnections[i].mEndPoint->GetPeerInfo(&addr, &port);
 
         if ((addr == address.GetIPAddress()) && (port == address.GetPort()))
         {
-            return mActiveConnections[i];
+            return &mActiveConnections[i];
         }
     }
 
+    return nullptr;
+}
+
+TCPBase::ActiveConnectionState * TCPBase::FindActiveConnection(const Inet::TCPEndPoint * endPoint)
+{
+    for (size_t i = 0; i < mActiveConnectionsSize; i++)
+    {
+        if (mActiveConnections[i].mEndPoint == endPoint)
+        {
+            return &mActiveConnections[i];
+        }
+    }
     return nullptr;
 }
 
@@ -201,11 +191,11 @@ CHIP_ERROR TCPBase::SendMessage(const PacketHeader & header, const Transport::Pe
 
     // Reuse existing connection if one exists, otherwise a new one
     // will be established
-    Inet::TCPEndPoint * endPoint = FindActiveConnection(address);
+    ActiveConnectionState * connection = FindActiveConnection(address);
 
-    if (endPoint != nullptr)
+    if (connection != nullptr)
     {
-        return endPoint->Send(std::move(msgBuf));
+        return connection->mEndPoint->Send(std::move(msgBuf));
     }
     else
     {
@@ -315,105 +305,145 @@ exit:
     return err;
 }
 
-CHIP_ERROR TCPBase::ProcessReceivedBuffer(Inet::TCPEndPoint * endPoint, const PeerAddress & peerAddress,
-                                          System::PacketBufferHandle buffer)
+CHIP_ERROR TCPBase::ActiveConnectionState::AckUnconsumed()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    while (!buffer.IsNull())
+    // Ack the currently received data, so that we can be sent more.
+    uint16_t currentLength = mReceived->TotalLength();
+    if (mAckedNotConsumedLength > currentLength)
     {
-        // when a buffer is empty, it can be released back to the app
-        if (buffer->DataLength() == 0)
+        // This implies that some of mReceived has been consumed without calling AckConsumed().
+        return CHIP_ERROR_INTERNAL;
+    }
+    uint16_t needsAck = static_cast<uint16_t>(currentLength - mAckedNotConsumedLength);
+    if (needsAck != 0)
+    {
+        mAckedNotConsumedLength = currentLength;
+        return mEndPoint->AckReceive(needsAck);
+    }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR TCPBase::ActiveConnectionState::AckConsumed(uint16_t length)
+{
+    if (mAckedNotConsumedLength != 0)
+    {
+        uint16_t ackedLength    = chip::min(mAckedNotConsumedLength, length);
+        length                  = static_cast<uint16_t>(length - ackedLength);
+        mAckedNotConsumedLength = static_cast<uint16_t>(mAckedNotConsumedLength - ackedLength);
+    }
+    if (length != 0)
+    {
+        return mEndPoint->AckReceive(length);
+    }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR TCPBase::ProcessReceivedBuffer(Inet::TCPEndPoint * endPoint, const PeerAddress & peerAddress,
+                                          System::PacketBufferHandle newData)
+{
+    ActiveConnectionState * state = FindActiveConnection(endPoint);
+    VerifyOrReturnError(state != nullptr, CHIP_ERROR_INTERNAL);
+    state->mReceived.AddToEnd(std::move(newData));
+
+    while (!state->mReceived.IsNull())
+    {
+        // Operations that consume data may leave an empty packet buffer. Free these.
+        if (state->mReceived->DataLength() == 0)
         {
-            buffer.FreeHead();
+            state->mReceived.FreeHead();
             continue;
         }
+        // If we reach this point, the head packet buffer contains data.
 
-        uint8_t * messageData = nullptr;
-        uint16_t messageSize  = 0; // CHIP message size, excluding length octets.
-        uint16_t payloadSize  = 0; // TCP payload size, including CHIP message length octets.
-        if (ContainsCompleteMessage(buffer, &messageData, &messageSize, &payloadSize))
+        // If we have previously decided to discard some incoming data, do so, consume at most all of the head packet buffer.
+        if (state->mPendingDiscardLength != 0)
         {
-            // length was read and is not needed anymore
-            buffer->ConsumeHead(kPacketSizeBytes);
+            // We know the minimum here fits in uint16_t because DataLength() does.
+            uint16_t discardLength =
+                static_cast<uint16_t>(chip::min(state->mPendingDiscardLength, static_cast<size_t>(state->mReceived->DataLength())));
+            state->mReceived->ConsumeHead(discardLength);
+            state->mPendingDiscardLength -= discardLength;
+            ReturnErrorOnFailure(state->AckConsumed(discardLength));
+            continue;
+        }
+        // If we reach this point, there is nothing to discard.
 
-            // Sanity checks. These are more like an assert for invariants
-            VerifyOrExit(messageData == buffer->Start(), err = CHIP_ERROR_INTERNAL);
-            VerifyOrExit(buffer->DataLength() >= messageSize, err = CHIP_ERROR_INTERNAL);
+        // If we don't even have enough data yet to get the message size, return to wait for more.
+        if (state->mReceived->DataLength() < kPacketSizeBytes)
+        {
+            return CHIP_NO_ERROR;
+        }
+        // If we reach this point, there is enough data to get the message size.
 
-            // messagesize is always consumed once processed, even on error. This is done
+        // Get the message size, and decide whether the head packet buffer contains a complete message.
+        uint16_t messageSize = LittleEndian::Get16(state->mReceived->Start());
+        bool messageComplete = (state->mReceived->DataLength() - kPacketSizeBytes >= messageSize);
+
+        // If we do have a complete message, process it.
+        if (messageComplete)
+        {
+            state->mReceived->ConsumeHead(kPacketSizeBytes);
+            // messageSize is always consumed once processed, even on error. This is done
             // on purpose:
-            //   - we already consumed the packet size above
             //   - there is no reason to believe that an error would not occur again on the
             //     same parameters (errors are likely not transient)
             //   - this guarantees data is received and progress is made.
-            err = ProcessSingleMessageFromBufferHead(peerAddress, buffer, messageSize);
-            buffer->ConsumeHead(messageSize);
-            SuccessOrExit(err);
-
-            err = endPoint->AckReceive(payloadSize);
-            SuccessOrExit(err);
+            CHIP_ERROR err = ProcessSingleMessageFromBufferHead(peerAddress, state->mReceived, messageSize);
+            state->mReceived->ConsumeHead(messageSize);
+            // The sum here will not overflow since we know all those bytes fit in the packet buffer.
+            ReturnErrorOnFailure(state->AckConsumed(static_cast<uint16_t>(messageSize + kPacketSizeBytes)));
+            ReturnErrorOnFailure(err);
             continue;
         }
-
         // If we reach this point, the head buffer does not contain a complete message.
-        // We may or may not have a complete message in a buffer chain.
-        if (buffer->HasChainedBuffer())
-        {
-            if (payloadSize > System::PacketBuffer::kMaxSizeWithoutReserve)
-            {
-                // This message will not fit in a maximum-size buffer.
-                if (payloadSize <= buffer->TotalLength())
-                {
-                    // We have the oversize message in the current buffer chain.
-                    // Since it's oversize, it is definitely not a valid CHIP message, so we angrily toss it aside.
-                    buffer.Consume(payloadSize);
-                    err = endPoint->AckReceive(payloadSize);
-                    SuccessOrExit(err);
-                    continue;
-                }
-                // If we don't yet have the complete message, proceed along to open the receive window.
-            }
-            else
-            {
-                if (payloadSize > buffer->MaxDataLength())
-                {
-                    // The current buffer head is too small for the message. We're gonna need a bigger buf.
-                    System::PacketBufferHandle newHead = System::PacketBufferHandle::NewWithData(
-                        buffer->Start(), buffer->DataLength(), static_cast<uint16_t>(payloadSize - buffer->DataLength()),
-                        0 /* reserved size */);
-                    VerifyOrExit(!newHead.IsNull(), err = CHIP_ERROR_NO_MEMORY);
-                    buffer.Advance();
-                    newHead->AddToEnd(std::move(buffer));
-                    buffer = std::move(newHead);
-                }
-                buffer->CompactHead();
-                continue;
-            }
-        }
 
-        if (messageSize > 0)
+        // If the message will not fit in a maximum-size buffer, the rest of the stack is unable to handle it,
+        // so discard it.
+        if (messageSize > System::PacketBuffer::kMaxSizeWithoutReserve - kPacketSizeBytes)
         {
-            // Open the receive window just enough to allow the remainder of the message to be received.
-            // This is necessary in the case where the message size exceeds the TCP window size to ensure
-            // the peer has enough window to send us the entire message.
-            uint16_t neededLen = static_cast<uint16_t>(messageSize - buffer->DataLength());
-            err                = endPoint->AckReceive(neededLen);
-            SuccessOrExit(err);
+            state->mPendingDiscardLength = messageSize + kPacketSizeBytes;
+            continue;
         }
+        // If we reach this point, the head buffer does not contain a complete message, but we want it to.
+
+        // Check whether the head buffer can hold the complete message.
+        if (messageSize > state->mReceived->MaxDataLength() - kPacketSizeBytes)
+        {
+            // The current buffer head is too small for the message. We're gonna need a bigger buf.
+            // The cast here is safe because
+            // - the above if condition implies messageSize > 0, and
+            // - we have read the messageSize, so DataLength() >= kPacketSizeBytes,
+            //   so messageSize - DataLength() + kPacketSizeBytes <= messageSize, which fits in uint16_t.
+            uint16_t additionalSize = static_cast<uint16_t>(messageSize - state->mReceived->DataLength() + kPacketSizeBytes);
+            System::PacketBufferHandle newHead = System::PacketBufferHandle::NewWithData(
+                state->mReceived->Start(), state->mReceived->DataLength(), additionalSize, 0 /* reserved size */);
+            if (newHead.IsNull())
+            {
+                // TODO: What? Discard this message? Return and hope we have more memory next time? Close the connection?
+                return CHIP_ERROR_NO_MEMORY;
+            }
+            // Replace the buffer chain head with the new buffer.
+            state->mReceived.Advance();
+            newHead->AddToEnd(std::move(state->mReceived));
+            state->mReceived = std::move(newHead);
+        }
+        // If we reach this point, the head buffer does not contain a complete message, but is large enough.
+
+        // If we have chained buffers, compact them, and continue to check again for a complete message.
+        if (state->mReceived->HasChainedBuffer())
+        {
+            state->mReceived->CompactHead();
+            continue;
+        }
+        // If we reach this point, the sole buffer does not contain a complete message.
+
+        // Since we're waiting for more of a message, ack what we have.
+        ReturnErrorOnFailure(state->AckUnconsumed());
 
         // Buffer is incomplete and we cannot get more data
         break;
     }
-
-exit:
-    if (!buffer.IsNull())
-    {
-        // Incomplete processing will be retried
-        endPoint->PutBackReceivedData(std::move(buffer));
-    }
-
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 void TCPBase::OnTcpReceive(Inet::TCPEndPoint * endPoint, System::PacketBufferHandle buffer)
@@ -430,7 +460,7 @@ void TCPBase::OnTcpReceive(Inet::TCPEndPoint * endPoint, System::PacketBufferHan
     if (err != CHIP_NO_ERROR)
     {
         // Connection could need to be closed at this point
-        ChipLogError(Inet, "Failed to receive TCP message: %s", ErrorStr(err));
+        ChipLogError(Inet, "Failed to handle received TCP message: %s", ErrorStr(err));
     }
 }
 
@@ -488,10 +518,10 @@ void TCPBase::OnConnectionComplete(Inet::TCPEndPoint * endPoint, INET_ERROR inet
         bool connectionStored = false;
         for (size_t i = 0; i < tcp->mActiveConnectionsSize; i++)
         {
-            if (tcp->mActiveConnections[i] == nullptr)
+            if (!tcp->mActiveConnections[i].InUse())
             {
-                tcp->mActiveConnections[i] = endPoint;
-                connectionStored           = true;
+                tcp->mActiveConnections[i].Init(endPoint);
+                connectionStored = true;
                 break;
             }
         }
@@ -514,11 +544,10 @@ void TCPBase::OnConnectionClosed(Inet::TCPEndPoint * endPoint, INET_ERROR err)
 
     for (size_t i = 0; i < tcp->mActiveConnectionsSize; i++)
     {
-        if (tcp->mActiveConnections[i] == endPoint)
+        if (tcp->mActiveConnections[i].mEndPoint == endPoint)
         {
             ChipLogProgress(Inet, "Freeing closed connection.");
-            tcp->mActiveConnections[i]->Free();
-            tcp->mActiveConnections[i] = nullptr;
+            tcp->mActiveConnections[i].Free();
             tcp->mUsedEndPointCount--;
         }
     }
@@ -534,9 +563,9 @@ void TCPBase::OnConnectionReceived(Inet::TCPEndPoint * listenEndPoint, Inet::TCP
         // have space to use one more (even if considering pending connections)
         for (size_t i = 0; i < tcp->mActiveConnectionsSize; i++)
         {
-            if (tcp->mActiveConnections[i] == nullptr)
+            if (!tcp->mActiveConnections[i].InUse())
             {
-                tcp->mActiveConnections[i] = endPoint;
+                tcp->mActiveConnections[i].Init(endPoint);
                 break;
             }
         }
@@ -566,19 +595,18 @@ void TCPBase::Disconnect(const PeerAddress & address)
     // Closes an existing connection
     for (size_t i = 0; i < mActiveConnectionsSize; i++)
     {
-        if (mActiveConnections[i] != nullptr)
+        if (mActiveConnections[i].InUse())
         {
             Inet::IPAddress ipAddress;
             uint16_t port;
 
-            mActiveConnections[i]->GetPeerInfo(&ipAddress, &port);
+            mActiveConnections[i].mEndPoint->GetPeerInfo(&ipAddress, &port);
             if (address == PeerAddress::TCP(ipAddress, port))
             {
                 // NOTE: this leaves the socket in TIME_WAIT.
                 // Calling Abort() would clean it since SO_LINGER would be set to 0,
                 // however this seems not to be useful.
-                mActiveConnections[i]->Free();
-                mActiveConnections[i] = nullptr;
+                mActiveConnections[i].Free();
                 mUsedEndPointCount--;
             }
         }
@@ -591,11 +619,10 @@ void TCPBase::OnPeerClosed(Inet::TCPEndPoint * endPoint)
 
     for (size_t i = 0; i < tcp->mActiveConnectionsSize; i++)
     {
-        if (tcp->mActiveConnections[i] == endPoint)
+        if (tcp->mActiveConnections[i].mEndPoint == endPoint)
         {
             ChipLogProgress(Inet, "Freeing connection: connection closed by peer");
-            tcp->mActiveConnections[i]->Free();
-            tcp->mActiveConnections[i] = nullptr;
+            tcp->mActiveConnections[i].Free();
             tcp->mUsedEndPointCount--;
         }
     }
@@ -605,7 +632,7 @@ bool TCPBase::HasActiveConnections() const
 {
     for (size_t i = 0; i < mActiveConnectionsSize; i++)
     {
-        if (mActiveConnections[i] != nullptr)
+        if (mActiveConnections[i].InUse())
         {
             return true;
         }

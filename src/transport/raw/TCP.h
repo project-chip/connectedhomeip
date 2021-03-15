@@ -33,6 +33,8 @@
 #include <inet/IPEndPointBasis.h>
 #include <inet/InetInterface.h>
 #include <inet/TCPEndPoint.h>
+#include <support/CodeUtils.h>
+#include <support/ReturnMacros.h>
 #include <transport/raw/Base.h>
 
 namespace chip {
@@ -100,13 +102,55 @@ class DLL_EXPORT TCPBase : public Base
         kInitialized = 1, /**< State after class is listening and ready. */
     };
 
+protected:
+    /**
+     *  State for each active connection
+     */
+    struct ActiveConnectionState
+    {
+        void Init(Inet::TCPEndPoint * endPoint)
+        {
+            mEndPoint               = endPoint;
+            mReceived               = nullptr;
+            mPendingDiscardLength   = 0;
+            mAckedNotConsumedLength = 0;
+        }
+
+        void Free()
+        {
+            mEndPoint->Free();
+            mEndPoint               = nullptr;
+            mReceived               = nullptr;
+            mPendingDiscardLength   = 0;
+            mAckedNotConsumedLength = 0;
+        }
+        bool InUse() const { return mEndPoint != nullptr; }
+
+        // Manage acks for fully or partially received messages.
+        CHIP_ERROR AckUnconsumed();
+        CHIP_ERROR AckConsumed(uint16_t length);
+
+        // Associated endpoint.
+        Inet::TCPEndPoint * mEndPoint;
+
+        // Buffers received but not yet consumed.
+        System::PacketBufferHandle mReceived;
+
+        // Length of data not yet received that must be discarded once it arrives.
+        size_t mPendingDiscardLength;
+
+        // Length of data received and acked but not yet consumed.
+        // Manage ONLY by AckConsumed() and AckUnconsumed().
+        uint16_t mAckedNotConsumedLength;
+    };
+
 public:
-    TCPBase(Inet::TCPEndPoint ** activeConnectionsBuffer, size_t bufferSize, PendingPacket * packetBuffers,
+    TCPBase(ActiveConnectionState * activeConnectionsBuffer, size_t bufferSize, PendingPacket * packetBuffers,
             size_t packetsBuffersSize) :
         mActiveConnections(activeConnectionsBuffer),
         mActiveConnectionsSize(bufferSize), mPendingPackets(packetBuffers), mPendingPacketsSize(packetsBuffersSize)
     {
-        std::fill(mActiveConnections, mActiveConnections + mActiveConnectionsSize, nullptr);
+        // activeConnectionsBuffer must be initialized by the caller.
         for (size_t i = 0; i < mPendingPacketsSize; ++i)
         {
             mPendingPackets[i].peerAddress = PeerAddress::Uninitialized();
@@ -159,7 +203,8 @@ private:
      * Find an active connection to the given peer or return nullptr if
      * no active connection exists.
      */
-    Inet::TCPEndPoint * FindActiveConnection(const PeerAddress & addr);
+    ActiveConnectionState * FindActiveConnection(const PeerAddress & addr);
+    ActiveConnectionState * FindActiveConnection(const Inet::TCPEndPoint * endPoint);
 
     /**
      * Sends the specified message once a connection has been established.
@@ -228,7 +273,7 @@ private:
     size_t mUsedEndPointCount = 0;
 
     // Currently active connections
-    Inet::TCPEndPoint ** mActiveConnections;
+    ActiveConnectionState * mActiveConnections;
     const size_t mActiveConnectionsSize;
 
     // Data to be sent when connections succeed
@@ -240,11 +285,17 @@ template <size_t kActiveConnectionsSize, size_t kPendingPacketSize>
 class TCP : public TCPBase
 {
 public:
-    TCP() : TCPBase(mConnectionsBuffer, kActiveConnectionsSize, mPendingPackets, kPendingPacketSize) {}
+    TCP() : TCPBase(mConnectionsBuffer, kActiveConnectionsSize, mPendingPackets, kPendingPacketSize)
+    {
+        for (size_t i = 0; i < kActiveConnectionsSize; ++i)
+        {
+            mConnectionsBuffer[i].Init(nullptr);
+        }
+    }
 
 private:
     friend class TCPTest;
-    Inet::TCPEndPoint * mConnectionsBuffer[kActiveConnectionsSize] = { 0 };
+    TCPBase::ActiveConnectionState mConnectionsBuffer[kActiveConnectionsSize];
     PendingPacket mPendingPackets[kPendingPacketSize];
 };
 

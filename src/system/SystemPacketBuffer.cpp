@@ -266,7 +266,9 @@ void PacketBuffer::AddToEnd(PacketBufferHandle && aPacketHandle)
 
     while (true)
     {
-        lCursor->tot_len = static_cast<uint16_t>(lCursor->tot_len + aPacket->tot_len);
+        uint16_t old_total_length = lCursor->tot_len;
+        lCursor->tot_len          = static_cast<uint16_t>(lCursor->tot_len + aPacket->tot_len);
+        VerifyOrDieWithMsg(lCursor->tot_len >= old_total_length, chipSystemLayer, "buffer chain too large");
         if (lCursor->next == nullptr)
         {
             lCursor->next = aPacket;

@@ -36,6 +36,7 @@
 #include <nlunit-test.h>
 
 #include <errno.h>
+#include <string.h>
 #include <utility>
 
 using namespace chip;
@@ -209,9 +210,9 @@ void CheckMessageTest6(nlTestSuite * inSuite, void * inContext)
 } // namespace
 
 // Generates a packet buffer or a chain of packet buffers for a single message.
-// `sizes[]` is a zero-terminates sequence of packet buffer sizes.
+// `sizes[]` is a zero-terminated sequence of packet buffer sizes.
 // The first (or only) buffer will *additionally* include a total length field and PacketHeader;
-// except for these, the buffer contents is not initialized.
+// except for these, the buffer contents is initialized to zero.
 chip::System::PacketBufferHandle PreparePacketBuffers(nlTestSuite * inSuite, const uint16_t sizes[])
 {
     PacketHeader header;
@@ -223,20 +224,24 @@ chip::System::PacketBufferHandle PreparePacketBuffers(nlTestSuite * inSuite, con
     {
         message_length = static_cast<uint16_t>(message_length + sizes[i]);
     }
+    constexpr uint16_t kPacketSizeBytes = static_cast<uint16_t>(sizeof(uint16_t));
 
-    const uint16_t headLength             = static_cast<uint16_t>(2 + header_length + sizes[0]);
+    const uint16_t headLength             = static_cast<uint16_t>(kPacketSizeBytes + header_length + sizes[0]);
     chip::System::PacketBufferHandle head = chip::System::PacketBufferHandle::New(headLength);
     NL_TEST_ASSERT(inSuite, !head.IsNull());
     chip::Encoding::LittleEndian::Put16(head->Start(), message_length);
     uint16_t header_size;
-    CHIP_ERROR err = header.Encode(head->Start() + 2, head->AvailableDataLength(), &header_size);
+    CHIP_ERROR err = header.Encode(head->Start() + kPacketSizeBytes,
+                                   static_cast<uint16_t>(head->AvailableDataLength() - kPacketSizeBytes), &header_size);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    memset(head->Start() + kPacketSizeBytes + header_size, 0, head->AvailableDataLength() - kPacketSizeBytes - header_size);
     head->SetDataLength(headLength);
 
     for (int i = 1; sizes[i] != 0; ++i)
     {
         chip::System::PacketBufferHandle buffer = chip::System::PacketBufferHandle::New(sizes[i]);
         NL_TEST_ASSERT(inSuite, !buffer.IsNull());
+        memset(head->Start(), 0, head->AvailableDataLength());
         buffer->SetDataLength(sizes[i]);
         head->AddToEnd(std::move(buffer));
     }
@@ -269,8 +274,10 @@ void chip::Transport::TCPTest::CheckProcessReceivedBuffer(nlTestSuite * inSuite,
     expected_lengths = (const uint16_t[]){ sizeof(PAYLOAD) };
     gMockTransportMgrDelegate.SingleMessageTest(tcp, addr);
 
-    Transport::PeerAddress lPeerAddress = Transport::PeerAddress::TCP(addr);
-    Inet::TCPEndPoint * lEndPoint       = tcp.FindActiveConnection(lPeerAddress);
+    Transport::PeerAddress lPeerAddress    = Transport::PeerAddress::TCP(addr);
+    TCPBase::ActiveConnectionState * state = tcp.FindActiveConnection(lPeerAddress);
+    NL_TEST_ASSERT(inSuite, state != nullptr);
+    Inet::TCPEndPoint * lEndPoint = state->mEndPoint;
     NL_TEST_ASSERT(inSuite, lEndPoint != nullptr);
 
     chip::System::PacketBufferHandle buffer;
