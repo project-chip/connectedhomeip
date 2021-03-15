@@ -19,6 +19,7 @@
 #include "AppTask.h"
 #include "BoltLockManager.h"
 #include "LEDWidget.h"
+#include "QRCodeUtil.h"
 
 // FIXME: Undefine the `sleep()` function included by the CHIPDeviceLayer.h
 // from unistd.h to avoid a conflicting declaration with the `sleep()` provided
@@ -94,6 +95,7 @@ int AppTask::Init()
     // Init ZCL Data Model and start server
     InitServer();
     ConfigurationMgr().LogDeviceConfig();
+    PrintQRCode(chip::RendezvousInformationFlags::kBLE);
 
     return 0;
 }
