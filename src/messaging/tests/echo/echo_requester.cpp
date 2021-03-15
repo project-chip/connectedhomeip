@@ -166,6 +166,40 @@ void HandleEchoResponseReceived(chip::Messaging::ExchangeContext * ec, chip::Sys
            static_cast<double>(gEchoRespCount) * 100 / gEchoCount, payload->DataLength(), static_cast<double>(transitTime) / 1000);
 }
 
+void RunPinging()
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    // Create a seperate thread to run CHIP event loop.
+    std::thread chipThread([] { chip::DeviceLayer::PlatformMgr().RunEventLoop(); });
+
+    chipThread.detach();
+
+    // Connection has been established. Now send the EchoRequests.
+    for (unsigned int i = 0; i < kMaxEchoCount; i++)
+    {
+        err = SendEchoRequest();
+        if (err != CHIP_NO_ERROR)
+        {
+            printf("Send request failed: %s\n", chip::ErrorStr(err));
+            break;
+        }
+
+        // Wait for response until the Echo interval.
+        while (!EchoIntervalExpired())
+        {
+            sleep(1);
+        }
+
+        // Check if expected response was received.
+        if (gWaitingForEchoResp)
+        {
+            printf("No response received\n");
+            gWaitingForEchoResp = false;
+        }
+    }
+}
+
 } // namespace
 
 int main(int argc, char * argv[])
@@ -238,29 +272,7 @@ int main(int argc, char * argv[])
     // Arrange to get a callback whenever an Echo Response is received.
     gEchoClient.SetEchoResponseReceived(HandleEchoResponseReceived);
 
-    // Connection has been established. Now send the EchoRequests.
-    for (unsigned int i = 0; i < kMaxEchoCount; i++)
-    {
-        err = SendEchoRequest();
-        if (err != CHIP_NO_ERROR)
-        {
-            printf("Send request failed: %s\n", chip::ErrorStr(err));
-            break;
-        }
-
-        // Wait for response until the Echo interval.
-        while (!EchoIntervalExpired())
-        {
-            DriveIO();
-        }
-
-        // Check if expected response was received.
-        if (gWaitingForEchoResp)
-        {
-            printf("No response received\n");
-            gWaitingForEchoResp = false;
-        }
-    }
+    RunPinging();
 
     gEchoClient.Shutdown();
 
