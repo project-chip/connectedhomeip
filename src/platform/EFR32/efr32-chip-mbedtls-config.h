@@ -40,11 +40,10 @@
 #define MBEDTLS_X509_CRL_PARSE_C
 #define MBEDTLS_X509_CSR_PARSE_C
 
-//#include "sl_malloc.h"
+#include "sl_malloc.h"
 
 // #define MBEDTLS_PLATFORM_FREE_MACRO sl_free
 // #define MBEDTLS_PLATFORM_CALLOC_MACRO sl_calloc
-// #endif
 
 
 ///////////////////////////
@@ -79,7 +78,7 @@
  *
  * See MBEDTLS_AES_C for more information.
  */
-#define MBEDTLS_AES_ALT
+//#define MBEDTLS_AES_ALT
 
 #if defined(EFR32MG12)
 #define MBEDTLS_SHA1_C
@@ -147,25 +146,25 @@
 #endif
 
 #elif defined(EFR32MG21)
-#define MBEDTLS_SHA1_ALT
-#define MBEDTLS_SHA1_PROCESS_ALT
-#define MBEDTLS_SHA256_ALT
-#define MBEDTLS_SHA256_PROCESS_ALT
-#define MBEDTLS_SHA512_ALT
-#define MBEDTLS_SHA512_PROCESS_ALT
+// #define MBEDTLS_SHA1_ALT
+// #define MBEDTLS_SHA1_PROCESS_ALT
+// #define MBEDTLS_SHA256_ALT
+// #define MBEDTLS_SHA256_PROCESS_ALT
+// #define MBEDTLS_SHA512_ALT
+// #define MBEDTLS_SHA512_PROCESS_ALT
 
-#define MBEDTLS_CCM_ALT
-#define MBEDTLS_CMAC_ALT
+// #define MBEDTLS_CCM_ALT
+// #define MBEDTLS_CMAC_ALT
 
 /* Turning on ECC acceleration is dependant on not requiring curve25519 when
  * running on EFR32xG21A devices */
 #if (defined(_SILICON_LABS_SECURITY_FEATURE) && (_SILICON_LABS_SECURITY_FEATURE == _SILICON_LABS_SECURITY_FEATURE_VAULT)) ||       \
     !defined(MBEDTLS_ECP_DP_CURVE25519_ENABLED)
-#define MBEDTLS_ECDH_GEN_PUBLIC_ALT
-#define MBEDTLS_ECDSA_GENKEY_ALT
-#define MBEDTLS_ECDH_COMPUTE_SHARED_ALT
-#define MBEDTLS_ECDSA_SIGN_ALT
-#define MBEDTLS_ECDSA_VERIFY_ALT
+// #define MBEDTLS_ECDH_GEN_PUBLIC_ALT
+// #define MBEDTLS_ECDSA_GENKEY_ALT
+// #define MBEDTLS_ECDH_COMPUTE_SHARED_ALT
+// #define MBEDTLS_ECDSA_SIGN_ALT
+// #define MBEDTLS_ECDSA_VERIFY_ALT
 #endif /* EFR32xG21B or curve25519 not enabled */
 
 //#define MBEDTLS_CIPHER_MODE_CTR
@@ -240,10 +239,6 @@ typedef void mbedtls_ecp_restart_ctx;
 #define MBEDTLS_PEM_WRITE_C
 #define MBEDTLS_PKCS5_C
 
-#include "config-device-acceleration.h"
-//config-sl-crypto-all-acceleration.h
-
-
 #if OPENTHREAD_CONFIG_BORDER_AGENT_ENABLE || OPENTHREAD_CONFIG_COMMISSIONER_ENABLE || OPENTHREAD_CONFIG_COAP_SECURE_API_ENABLE
 #endif
 #define MBEDTLS_SSL_COOKIE_C
@@ -281,4 +276,6 @@ typedef void mbedtls_ecp_restart_ctx;
 
 #define MBEDTLS_SSL_CIPHERSUITES MBEDTLS_TLS_ECJPAKE_WITH_AES_128_CCM_8
 
+#include "config-device-acceleration.h"
+//config-sl-crypto-all-acceleration.h
 #include "mbedtls/check_config.h"
