@@ -37,7 +37,7 @@
 #include "app_config.h"
 
 constexpr uint32_t kFactoryResetTriggerTimeout = 6000;
-constexpr uint8_t kAppEventQueueSize = 10;
+constexpr uint8_t kAppEventQueueSize           = 10;
 
 TimerHandle_t sFunctionTimer; // FreeRTOS app sw timer.
 
