@@ -53,8 +53,6 @@ template <class>
 class GenericThreadStackManagerImpl_OpenThread_LwIP;
 template <class>
 class GenericThreadStackManagerImpl_FreeRTOS;
-template <class>
-class GenericNetworkProvisioningServerImpl;
 } // namespace Internal
 
 /**
@@ -117,8 +115,6 @@ private:
     friend class Internal::GenericThreadStackManagerImpl_OpenThread_LwIP;
     template <class>
     friend class Internal::GenericThreadStackManagerImpl_FreeRTOS;
-    template <class>
-    friend class Internal::GenericNetworkProvisioningServerImpl;
 
     void OnPlatformEvent(const ChipDeviceEvent * event);
     bool IsThreadEnabled();

@@ -41,14 +41,6 @@ namespace DeviceLayer {
 
 class PlatformManagerImpl;
 
-namespace Internal {
-
-class NetworkProvisioningServerImpl;
-template <class ImplClass>
-class GenericNetworkProvisioningServerImpl;
-
-} // namespace Internal
-
 /**
  * Concrete implementation of the ConnectivityManager singleton object for the ESP32 platform.
  */
