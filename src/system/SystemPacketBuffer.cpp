@@ -614,6 +614,10 @@ PacketBufferHandle PacketBufferHandle::CloneData()
         uint16_t originalDataSize     = original->MaxDataLength();
         uint16_t originalReservedSize = original->ReservedSize();
         PacketBufferHandle clone      = PacketBufferHandle::New(originalDataSize, originalReservedSize);
+        if (clone.IsNull())
+        {
+            return PacketBufferHandle();
+        }
         clone.mBuffer->tot_len = clone.mBuffer->len = original->len;
         memcpy(reinterpret_cast<uint8_t *>(clone.mBuffer) + PacketBuffer::kStructureSize,
                reinterpret_cast<uint8_t *>(original) + PacketBuffer::kStructureSize, originalDataSize + originalReservedSize);
