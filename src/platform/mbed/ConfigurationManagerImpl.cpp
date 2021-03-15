@@ -22,11 +22,20 @@
  *          for mbed platforms.
  */
 /* this file behaves like a config.h, comes first */
+
+// FIXME: Undefine the `sleep()` function included by the CHIPDeviceLayer.h
+// from unistd.h to avoid a conflicting declaration with the `sleep()` provided
+// by Mbed-OS in mbed_power_mgmt.h.
+#define sleep unistd_sleep
 #include <platform/internal/CHIPDeviceLayerInternal.h>
+#undef sleep
 
 #include <platform/internal/GenericConfigurationManagerImpl.cpp>
 
 #include <platform/ConfigurationManager.h>
+
+// mbed-os headers
+#include "platform/mbed_power_mgmt.h"
 
 namespace chip {
 namespace DeviceLayer {
@@ -70,7 +79,16 @@ CHIP_ERROR ConfigurationManagerImpl::_WritePersistedStorageValue(::chip::Platfor
 
 void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 {
-    FactoryResetConfig();
+    ChipLogProgress(DeviceLayer, "Performing factory reset");
+    const CHIP_ERROR err = FactoryResetConfig();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "FactoryResetConfig() failed: %s", ErrorStr(err));
+    }
+
+    // Restart the system.
+    ChipLogProgress(DeviceLayer, "System restarting");
+    system_reset();
 }
 
 } // namespace DeviceLayer
