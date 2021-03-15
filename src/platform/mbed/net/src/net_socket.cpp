@@ -67,62 +67,30 @@ void BSDSocket::sigio(Callback<void()> func)
     _cb = func;
 }
 
-nsapi_version_t Inet2Nsapi(int family, int & size)
+nsapi_version_t Inet2Nsapi(int family)
 {
     switch (family)
     {
     case AF_INET:
-        size = 4;
         return NSAPI_IPv4;
         break;
     case AF_INET6:
-        size = 16;
         return NSAPI_IPv6;
         break;
     default:
-        size = 0;
         return NSAPI_UNSPEC;
     }
 }
 
 void msghdr2Netsocket(SocketAddress * dst, struct sockaddr_in * src)
 {
-    uint8_t adr[16];
-    uint8_t byte;
-    int size;
-
-    nsapi_version_t addr_type = Inet2Nsapi(src->sin_family, size);
-
-    for (int i = 0; i < size; i++)
-    {
-        byte = ((src->sin_addr.s_addr >> (8 * i)) & 0XFF);
-#ifdef LITTLE_ENDIAN
-        adr[i] = byte;
-#else
-        adr[(size - 1) - i] = byte;
-#endif
-    }
-    dst->set_ip_bytes(adr, addr_type);
+    dst->set_ip_bytes(src->sin_addr.s4_addr, Inet2Nsapi(src->sin_family));
 }
 
 void Sockaddr2Netsocket(SocketAddress * dst, struct sockaddr * src)
 {
-    uint8_t adr[16];
-    uint8_t byte;
-    int size;
-    sockaddr_in * addr        = reinterpret_cast<sockaddr_in *>(src);
-    nsapi_version_t addr_type = Inet2Nsapi(src->sa_family, size);
-
-    for (int i = 0; i < size; i++)
-    {
-        byte = ((addr->sin_addr.s_addr >> (8 * i)) & 0XFF);
-#ifdef LITTLE_ENDIAN
-        adr[i] = byte;
-#else
-        adr[(size - 1) - i] = byte;
-#endif
-    }
-    dst->set_ip_bytes(adr, addr_type);
+    sockaddr_in * addr = reinterpret_cast<sockaddr_in *>(src);
+    dst->set_ip_bytes(addr->sin_addr.s4_addr, Inet2Nsapi(src->sa_family));
 }
 
 static Socket * getSocket(int fd)
