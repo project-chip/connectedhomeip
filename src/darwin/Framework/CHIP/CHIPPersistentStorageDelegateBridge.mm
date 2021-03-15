@@ -82,7 +82,7 @@ void CHIPPersistentStorageDelegateBridge::SetStorageDelegate(chip::PersistentSto
     });
 }
 
-void CHIPPersistentStorageDelegateBridge::GetKeyValue(const char * key)
+void CHIPPersistentStorageDelegateBridge::AsyncGetKeyValue(const char * key)
 {
     NSString * keyString = [NSString stringWithUTF8String:key];
     dispatch_async(mWorkQueue, ^{
@@ -103,7 +103,7 @@ void CHIPPersistentStorageDelegateBridge::GetKeyValue(const char * key)
     });
 }
 
-CHIP_ERROR CHIPPersistentStorageDelegateBridge::GetKeyValue(const char * key, char * value, uint16_t & size)
+CHIP_ERROR CHIPPersistentStorageDelegateBridge::SyncGetKeyValue(const char * key, char * value, uint16_t & size)
 {
     __block CHIP_ERROR error = CHIP_NO_ERROR;
     NSString * keyString = [NSString stringWithUTF8String:key];
@@ -138,7 +138,7 @@ CHIP_ERROR CHIPPersistentStorageDelegateBridge::GetKeyValue(const char * key, ch
     return error;
 }
 
-void CHIPPersistentStorageDelegateBridge::SetKeyValue(const char * key, const char * value)
+void CHIPPersistentStorageDelegateBridge::AsyncSetKeyValue(const char * key, const char * value)
 {
     NSString * keyString = [NSString stringWithUTF8String:key];
     NSString * valueString = [NSString stringWithUTF8String:value];
@@ -159,7 +159,7 @@ void CHIPPersistentStorageDelegateBridge::SetKeyValue(const char * key, const ch
     });
 }
 
-void CHIPPersistentStorageDelegateBridge::DeleteKeyValue(const char * key)
+void CHIPPersistentStorageDelegateBridge::AsyncDeleteKeyValue(const char * key)
 {
     NSString * keyString = [NSString stringWithUTF8String:key];
     dispatch_async(mWorkQueue, ^{

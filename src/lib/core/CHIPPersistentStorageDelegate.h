@@ -38,7 +38,7 @@ public:
     /**
      * @brief
      *   Called when a value is returned from the storage.
-     *   This is useful for GetKeyValue() API call.
+     *   This is useful for AsyncGetKeyValue() API call.
      *
      * @param[in] key Key for which the value is being returned
      * @param[in] value Value or nullptr if not found.
@@ -76,7 +76,7 @@ public:
      *
      * @param[in] key Key to lookup
      */
-    virtual void GetKeyValue(const char * key) = 0;
+    virtual void AsyncGetKeyValue(const char * key) = 0;
 
     /**
      * @brief
@@ -95,7 +95,7 @@ public:
      *                 The output size could be larger than input value. In
      *                 such cases, the user should allocate the buffer large
      *                 enough (>= output size), and call the API again.  In this
-     *                 case GetKeyValue will place as many bytes as it can in
+     *                 case SyncGetKeyValue will place as many bytes as it can in
      *                 the buffer and return CHIP_ERROR_NO_MEMORY.
      *
      *                 If value is null, the input size is treated as 0.
@@ -104,7 +104,7 @@ public:
      * @return CHIP_ERROR_NO_MEMORY if the input buffer is not big enough for
      *                              the value.
      */
-    virtual CHIP_ERROR GetKeyValue(const char * key, char * value, uint16_t & size) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    virtual CHIP_ERROR SyncGetKeyValue(const char * key, char * value, uint16_t & size) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
     /**
      * @brief
@@ -121,7 +121,7 @@ public:
      *                 such cases, the user should allocate the buffer large
      *                 enough (>= output length), and call the API again.
      */
-    virtual CHIP_ERROR GetKeyValue(const char * key, void * buffer, uint16_t & size) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    virtual CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
     /**
      * @brief
@@ -130,7 +130,7 @@ public:
      * @param[in] key Key to be set
      * @param[in] value Value to be set
      */
-    virtual void SetKeyValue(const char * key, const char * value) = 0;
+    virtual void AsyncSetKeyValue(const char * key, const char * value) = 0;
 
     /**
      * @brief
@@ -140,7 +140,7 @@ public:
      * @param[in] value Value to be set
      * @param[in] size Size of the Value
      */
-    virtual CHIP_ERROR SetKeyValue(const char * key, const void * value, uint16_t size) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    virtual CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
     /**
      * @brief
@@ -148,7 +148,7 @@ public:
      *
      * @param[in] key Key to be deleted
      */
-    virtual void DeleteKeyValue(const char * key) = 0;
+    virtual void AsyncDeleteKeyValue(const char * key) = 0;
 };
 
 } // namespace chip

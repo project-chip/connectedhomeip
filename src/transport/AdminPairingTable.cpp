@@ -37,7 +37,7 @@ CHIP_ERROR AdminPairingInfo::StoreIntoKVS(PersistentStorageDelegate & kvs)
     info.mNodeId = Encoding::LittleEndian::HostSwap64(mNodeId);
     info.mAdmin  = Encoding::LittleEndian::HostSwap16(mAdmin);
 
-    return kvs.SetKeyValue(key, &info, sizeof(info));
+    return kvs.SyncSetKeyValue(key, &info, sizeof(info));
 }
 
 CHIP_ERROR AdminPairingInfo::FetchFromKVS(PersistentStorageDelegate & kvs)
@@ -48,7 +48,7 @@ CHIP_ERROR AdminPairingInfo::FetchFromKVS(PersistentStorageDelegate & kvs)
     StorableAdminPairingInfo info;
 
     uint16_t size = sizeof(info);
-    ReturnErrorOnFailure(kvs.GetKeyValue(key, &info, size));
+    ReturnErrorOnFailure(kvs.SyncGetKeyValue(key, &info, size));
 
     mNodeId    = Encoding::LittleEndian::HostSwap64(info.mNodeId);
     AdminId id = Encoding::LittleEndian::HostSwap16(info.mAdmin);
@@ -62,7 +62,7 @@ CHIP_ERROR AdminPairingInfo::DeleteFromKVS(PersistentStorageDelegate & kvs, Admi
     char key[KeySize()];
     ReturnErrorOnFailure(GenerateKey(id, key, sizeof(key)));
 
-    kvs.DeleteKeyValue(key);
+    kvs.AsyncDeleteKeyValue(key);
     return CHIP_NO_ERROR;
 }
 

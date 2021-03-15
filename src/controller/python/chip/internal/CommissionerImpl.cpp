@@ -30,14 +30,14 @@ class ServerStorageDelegate : public chip::PersistentStorageDelegate
 public:
     void SetStorageDelegate(chip::PersistentStorageResultDelegate * delegate) override { mAsyncDelegate = delegate; }
 
-    void GetKeyValue(const char * key) override
+    void AsyncGetKeyValue(const char * key) override
     {
         // TODO: Async Get/Set are implemented synchronously here.
         // We need to figure out a standard way to implement this - this implementation
         // was based on an example that just returned and that seemed even less useful.
         uint8_t buffer[kMaxKeyValueSize];
         uint16_t bufferSize = sizeof(buffer) - 1;
-        CHIP_ERROR err      = GetKeyValue(key, buffer, bufferSize);
+        CHIP_ERROR err      = SyncGetKeyValue(key, buffer, bufferSize);
 
         if (err == CHIP_NO_ERROR)
         {
@@ -50,10 +50,10 @@ public:
         }
     }
 
-    void SetKeyValue(const char * key, const char * value) override
+    void AsyncSetKeyValue(const char * key, const char * value) override
     {
 
-        CHIP_ERROR err = SetKeyValue(key, value, strlen(value));
+        CHIP_ERROR err = SyncSetKeyValue(key, value, strlen(value));
 
         if (err != CHIP_NO_ERROR)
         {
@@ -62,17 +62,17 @@ public:
     }
 
     CHIP_ERROR
-    GetKeyValue(const char * key, void * buffer, uint16_t & size) override
+    SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override
     {
         return chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Get(key, buffer, size);
     }
 
-    CHIP_ERROR SetKeyValue(const char * key, const void * value, uint16_t size) override
+    CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override
     {
         return chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Put(key, value, size);
     }
 
-    void DeleteKeyValue(const char * key) override { chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Delete(key); }
+    void AsyncDeleteKeyValue(const char * key) override { chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Delete(key); }
 
 private:
     static constexpr size_t kMaxKeyValueSize = 1024;
