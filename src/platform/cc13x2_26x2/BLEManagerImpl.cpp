@@ -1065,7 +1065,7 @@ void BLEManagerImpl::ProcessGapMessage(gapEventHdr_t * pMsg)
         {
             // Stop advertising since there is no room for more connections
             BLEMGR_LOG("BLEMGR: BLE event GAP_LINK_ESTABLISHED_EVENT: MAX connections");
-            sInstance.mFlags.Clear(Flags::kFastAdvertisingEnabled).Clear(Flags::kAdvertisingEnabled.Clear(Flags::kAdvertising);
+            sInstance.mFlags.Clear(Flags::kFastAdvertisingEnabled).Clear(Flags::kAdvertisingEnabled).Clear(Flags::kAdvertising);
         }
 
         /* Stop advertisement timeout timer */

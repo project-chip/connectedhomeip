@@ -263,18 +263,18 @@ private:
     static chipOBleProfileCBs_t CHIPoBLEProfile_CBs;
     static gapBondCBs_t BLEMgr_BondMgrCBs;
 
-    enum
+    enum class Flags : uint16_t
     {
-        kFlag_AdvertisingEnabled     = 0x0001, /* App enabled CHIPoBLE advertising */
-        kFlag_FastAdvertisingEnabled = 0x0002, /* App enabled Fash CHIPoBLE advertising */
-        kFlag_Advertising            = 0x0004, /* TI BLE stack actively advertising */
-        kFlag_BLEStackInitialized    = 0x0008, /* TI BLE Stack GAP Intilization complete */
-        kFlag_BLEStackGATTNameUpdate = 0x0010, /* Trigger TI BLE Stack name update, must be performed prior to adv start */
-        kFlag_BLEStackGATTNameSet    = 0x0020, /* Device name has been set externally*/
+        kAdvertisingEnabled     = 0x0001, /* App enabled CHIPoBLE advertising */
+        kFastAdvertisingEnabled = 0x0002, /* App enabled Fash CHIPoBLE advertising */
+        kAdvertising            = 0x0004, /* TI BLE stack actively advertising */
+        kBLEStackInitialized    = 0x0008, /* TI BLE Stack GAP Intilization complete */
+        kBLEStackGATTNameUpdate = 0x0010, /* Trigger TI BLE Stack name update, must be performed prior to adv start */
+        kBLEStackGATTNameSet    = 0x0020, /* Device name has been set externally*/
 
     };
 
-    uint16_t mFlags;
+    BitFlags<Flags> mFlags;
     CHIPoBLEServiceMode mServiceMode;
     char mDeviceName[GAP_DEVICE_NAME_LEN];
 
