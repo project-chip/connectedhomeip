@@ -89,7 +89,7 @@ void TestReadInteraction::TestReadClient(nlTestSuite * apSuite, void * apContext
     app::ReadClient readClient;
 
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
-    err                                  = readClient.Init(&gExchangeManager, nullptr);
+    err                            = readClient.Init(&gExchangeManager, nullptr);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     err = readClient.SendReadRequest(kTestDeviceNodeId, gAdminId);
