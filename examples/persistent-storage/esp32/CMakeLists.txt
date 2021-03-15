@@ -14,17 +14,13 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-# The following lines of boilerplate have to be in your project's
 # CMakeLists in this exact order for cmake to work correctly
 cmake_minimum_required(VERSION 3.5)
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 
-# The list of extra component dirs must be in sync with that in all-clusters-app/esp32/Makefile
+# The list of extra component dirs must be in sync with that in persistent-storage/esp32/Makefile
 set(EXTRA_COMPONENT_DIRS
     "${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/config/esp32/components"
-    "${CMAKE_CURRENT_LIST_DIR}/../../common/m5stack-tft/repo/components"
-    "${CMAKE_CURRENT_LIST_DIR}/../../common/QRCode"
-    "${CMAKE_CURRENT_LIST_DIR}/../../common/screen-framework"
 )
 
-project(chip-all-clusters-app)
+project(persistent-storage)
