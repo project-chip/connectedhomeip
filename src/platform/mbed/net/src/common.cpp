@@ -12,13 +12,13 @@ int convert_bsd_addr_to_mbed(SocketAddress * out, struct sockaddr * in)
     if (in->sa_family == AF_INET)
     {
         sockaddr_in * addr = reinterpret_cast<sockaddr_in *>(in);
-        out->set_ip_bytes((const void *) &addr->sin_addr, NSAPI_IPv4);
+        out->set_ip_bytes((const void *) addr->sin_addr.s4_addr, NSAPI_IPv4);
         out->set_port(addr->sin_port);
     }
     else if (in->sa_family == AF_INET6)
     {
         sockaddr_in6 * addr = reinterpret_cast<sockaddr_in6 *>(in);
-        out->set_ip_bytes((const void *) &addr->sin6_addr, NSAPI_IPv6);
+        out->set_ip_bytes((const void *) addr->sin6_addr.s6_addr, NSAPI_IPv6);
         out->set_port(addr->sin6_port);
     }
 
