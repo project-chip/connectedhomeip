@@ -189,20 +189,20 @@ CHIP_ERROR Spake2p_BeginProver_HSM(hsm_pake_context_t * phsm_pake_context, const
  * @brief Compute the first round of the protocol on HSM.
  **/
 CHIP_ERROR Spake2p_ComputeRoundOne_HSM(hsm_pake_context_t * phsm_pake_context, chip::Crypto::CHIP_SPAKE2P_ROLE role,
-                                        const uint8_t * pab, size_t pab_len, uint8_t * out, size_t * out_len);
+                                       const uint8_t * pab, size_t pab_len, uint8_t * out, size_t * out_len);
 
 /**
  * @brief Compute the second round of the protocol on HSM.
  **/
 CHIP_ERROR Spake2p_ComputeRoundTwo_HSM(hsm_pake_context_t * phsm_pake_context, chip::Crypto::CHIP_SPAKE2P_ROLE role,
-                                       const uint8_t * in, size_t in_len, uint8_t * out, size_t * out_len,
-                                       uint8_t * pKeyKe, size_t * pkeyKeLen);
+                                       const uint8_t * in, size_t in_len, uint8_t * out, size_t * out_len, uint8_t * pKeyKe,
+                                       size_t * pkeyKeLen);
 
 /**
  * @brief Confirm that each party computed the same keys using HSM.
  **/
-CHIP_ERROR Spake2p_KeyConfirm_HSM(hsm_pake_context_t * phsm_pake_context, chip::Crypto::CHIP_SPAKE2P_ROLE role,
-                                  const uint8_t * in, size_t in_len);
+CHIP_ERROR Spake2p_KeyConfirm_HSM(hsm_pake_context_t * phsm_pake_context, chip::Crypto::CHIP_SPAKE2P_ROLE role, const uint8_t * in,
+                                  size_t in_len);
 
 /**
  * @brief Return the shared secret.
