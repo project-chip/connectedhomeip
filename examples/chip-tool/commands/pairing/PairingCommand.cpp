@@ -77,7 +77,7 @@ CHIP_ERROR PairingCommand::Pair(NodeId remoteId, PeerAddress address)
 CHIP_ERROR PairingCommand::PairWithoutSecurity(NodeId remoteId, PeerAddress address)
 {
     ChipSerializedDevice serializedTestDevice;
-    return mCommissioner.PairTestDeviceWithoutSecurity(remoteId, address.GetIPAddress(), serializedTestDevice, address.GetPort());
+    return mCommissioner.PairTestDeviceWithoutSecurity(remoteId, address, serializedTestDevice);
 }
 
 CHIP_ERROR PairingCommand::Unpair(NodeId remoteId)

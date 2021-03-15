@@ -34,17 +34,14 @@ const uint16_t kMaxRendezvousDiscriminatorValue = 0xFFF;
 class DLL_EXPORT RendezvousAdvertisementDelegate
 {
 public:
-    /**
-     * @brief
-     *   Starts advertisement of the device for rendezvous availability.
-     */
+    /// called to start advertising that rendezvous is possible (commisioning available)
     virtual CHIP_ERROR StartAdvertisement() const { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
-    /**
-     * @brief
-     *   Stops advertisement of the device for rendezvous availability.
-     */
+    /// called when advertisement is not needed for Rendezvous (e.g. got a BLE connection)
     virtual CHIP_ERROR StopAdvertisement() const { return CHIP_ERROR_NOT_IMPLEMENTED; }
+
+    /// Called when a rendezvous operation is complete
+    virtual void RendezvousComplete() const {}
 
     virtual ~RendezvousAdvertisementDelegate() {}
 };
@@ -105,6 +102,8 @@ public:
         return *this;
     }
 
+    bool HasAdvertisementDelegate() const { return mAdvDelegate != nullptr; }
+
     const RendezvousAdvertisementDelegate * GetAdvertisementDelegate() const { return mAdvDelegate; }
 
     RendezvousParameters & SetAdvertisementDelegate(RendezvousAdvertisementDelegate * delegate)
@@ -143,8 +142,7 @@ private:
     PASEVerifier mPASEVerifier;
     bool mHasPASEVerifier = false;
 
-    RendezvousAdvertisementDelegate mDefaultAdvDelegate;
-    RendezvousAdvertisementDelegate * mAdvDelegate = &mDefaultAdvDelegate;
+    RendezvousAdvertisementDelegate * mAdvDelegate = nullptr;
 
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * mBleLayer               = nullptr;

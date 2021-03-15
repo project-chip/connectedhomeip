@@ -84,9 +84,9 @@ Raspberry Pi Desktop 20.10 (aarch64)**
         -   Run Linux Bridge Example App
 
                   $ cd ~/connectedhomeip/examples/bridge-app/linux
-                  $ sudo out/debug/chip-tool-server --ble-device [bluetooth device number]
+                  $ sudo out/debug/chip-bridge-app --ble-device [bluetooth device number]
                   # In this example, the device we want to use is hci1
-                  $ sudo out/debug/chip-tool-server --ble-device 1
+                  $ sudo out/debug/chip-bridge-app --ble-device 1
 
         -   Test the device using ChipDeviceController on your laptop /
             workstation etc.

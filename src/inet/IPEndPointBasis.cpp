@@ -178,7 +178,17 @@ exit:
 #endif // LWIP_IPV4 && LWIP_IGMP
 #endif // INET_CONFIG_ENABLE_IPV4
 
-#if LWIP_IPV6_MLD && LWIP_IPV6_ND && LWIP_IPV6
+// unusual define check for LWIP_IPV6_ND is because espressif fork
+// of LWIP does not define the _ND constant.
+#if LWIP_IPV6_MLD && (!defined(LWIP_IPV6_ND) || LWIP_IPV6_ND) && LWIP_IPV6
+#define HAVE_IPV6_MULTICAST
+#else
+// Within Project CHIP multicast support is highly desirable: used for mDNS
+// as well as group communication.
+#undef HAVE_IPV6_MULTICAST
+#endif
+
+#ifdef HAVE_IPV6_MULTICAST
 static INET_ERROR LwIPIPv6JoinLeaveMulticastGroup(InterfaceId aInterfaceId, const IPAddress & aAddress,
                                                   err_t (*aMethod)(struct netif *, const LWIP_IPV6_ADDR_T *))
 {
@@ -487,11 +497,11 @@ INET_ERROR IPEndPointBasis::JoinMulticastGroup(InterfaceId aInterfaceId, const I
 
     case kIPAddressType_IPv6: {
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-#if LWIP_IPV6_MLD && LWIP_IPV6_ND && LWIP_IPV6
+#ifdef HAVE_IPV6_MULTICAST
         lRetval = LwIPIPv6JoinLeaveMulticastGroup(aInterfaceId, aAddress, mld6_joingroup_netif);
-#else  // LWIP_IPV6_MLD && LWIP_IPV6_ND && LWIP_IPV6
+#else  // HAVE_IPV6_MULTICAST
         lRetval = INET_ERROR_NOT_SUPPORTED;
-#endif // LWIP_IPV6_MLD && LWIP_IPV6_ND && LWIP_IPV6
+#endif // HAVE_IPV6_MULTICAST
         SuccessOrExit(lRetval);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 

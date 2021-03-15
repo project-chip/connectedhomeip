@@ -385,7 +385,7 @@ void NetworkProvisioning::ConnectivityHandler(const DeviceLayer::ChipDeviceEvent
     if (event->Type == DeviceLayer::DeviceEventType::kThreadStateChange && event->ThreadStateChange.AddressChanged)
     {
         Inet::IPAddress addr;
-        SuccessOrExit(DeviceLayer::ThreadStackMgr().GetSlaacIPv6Address(addr));
+        SuccessOrExit(DeviceLayer::ThreadStackMgr().GetExternalIPv6Address(addr));
         (void) session->SendIPAddress(addr);
     }
 #endif

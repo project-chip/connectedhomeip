@@ -42,7 +42,7 @@ CHIP_ERROR SetWiFiStationProvisioning(const char * ssid, const char * key)
     wifiConfig.sta.sort_method = WIFI_CONNECT_AP_BY_SIGNAL;
 
     // Configure the ESP WiFi interface.
-    err = esp_wifi_set_config(ESP_IF_WIFI_STA, &wifiConfig);
+    err = esp_wifi_set_config(WIFI_IF_STA, &wifiConfig);
     if (err != ESP_OK)
     {
         ChipLogError(DeviceLayer, "esp_wifi_set_config() failed: %s", chip::ErrorStr(err));

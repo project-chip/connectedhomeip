@@ -19,6 +19,7 @@
 
 #include <app/InteractionModelEngine.h>
 #include <app/server/DataModelHandler.h>
+#include <app/server/EchoHandler.h>
 #include <app/server/RendezvousServer.h>
 #include <app/server/SessionManager.h>
 
@@ -27,7 +28,6 @@
 #include <inet/IPAddress.h>
 #include <inet/InetError.h>
 #include <inet/InetLayer.h>
-#include <mdns/Advertiser.h>
 #include <messaging/ExchangeMgr.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/KeyValueStoreManager.h>
@@ -39,9 +39,10 @@
 #include <sys/param.h>
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
-#include <transport/AdminPairingTable.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/StorablePeerConnection.h>
+
+#include "Mdns.h"
 
 using namespace ::chip;
 using namespace ::chip::Inet;
@@ -64,13 +65,9 @@ constexpr bool isRendezvousBypassed()
 
 constexpr bool useTestPairing()
 {
-#if defined(CHIP_DEVICE_CONFIG_USE_TEST_PAIRING) && CHIP_DEVICE_CONFIG_USE_TEST_PAIRING
-    return true;
-#else
     // Use the test pairing whenever rendezvous is bypassed. Otherwise, there wouldn't be
     // any way to communicate with the device using CHIP protocol.
     return isRendezvousBypassed();
-#endif
 }
 
 class ServerStorageDelegate : public PersistentStorageDelegate
@@ -268,7 +265,17 @@ public:
         {
             ReturnErrorOnFailure(PersistAdminPairingToKVS(admin, gNextAvailableAdminId));
         }
+
         return CHIP_NO_ERROR;
+    }
+
+    void RendezvousComplete() const override
+    {
+        // Once rendezvous completed, assume we are operational
+        if (app::Mdns::AdvertiseOperational() != CHIP_NO_ERROR)
+        {
+            ChipLogError(Discovery, "Failed to start advertising operational state at rendezvous completion time.");
+        }
     }
 
     void SetDelegate(AppDelegate * delegate) { mDelegate = delegate; }
@@ -400,71 +407,8 @@ private:
     AppDelegate * mDelegate = nullptr;
 };
 
-#if CHIP_ENABLE_MDNS
-
-CHIP_ERROR InitMdns()
-{
-    auto & mdnsAdvertiser = Mdns::ServiceAdvertiser::Instance();
-
-    // TODO: advertise this only when really operational once we support both
-    // operational and commisioning advertising is supported.
-    if (ConfigurationMgr().IsFullyProvisioned())
-    {
-        uint64_t fabricId;
-
-        if (ConfigurationMgr().GetFabricId(fabricId) != CHIP_NO_ERROR)
-        {
-            ChipLogError(Discovery, "Fabric ID not known. Using a default");
-            fabricId = 5544332211;
-        }
-
-        const auto advertiseParameters = Mdns::OperationalAdvertisingParameters()
-                                             .SetFabricId(fabricId)
-                                             .SetNodeId(chip::kTestDeviceNodeId)
-                                             .SetPort(CHIP_PORT)
-                                             .EnableIpV4(true);
-
-        ReturnErrorOnFailure(mdnsAdvertiser.Advertise(advertiseParameters));
-    }
-    else
-    {
-        auto advertiseParameters = Mdns::CommissionAdvertisingParameters().SetPort(CHIP_PORT).EnableIpV4(true);
-
-        uint16_t value;
-        if (ConfigurationMgr().GetVendorId(value) != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(Discovery, "Vendor ID not known");
-        }
-        else
-        {
-            advertiseParameters.SetVendorId(chip::Optional<uint16_t>::Value(value));
-        }
-
-        if (ConfigurationMgr().GetProductId(value) != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(Discovery, "Product ID not known");
-        }
-        else
-        {
-            advertiseParameters.SetProductId(chip::Optional<uint16_t>::Value(value));
-        }
-
-        if (ConfigurationMgr().GetSetupDiscriminator(value) != CHIP_NO_ERROR)
-        {
-            ChipLogError(Discovery, "Setup discriminator not known. Using a default.");
-            value = 840;
-        }
-        advertiseParameters.SetShortDiscriminator(static_cast<uint8_t>(value & 0xFF)).SetLongDiscrimininator(value);
-
-        ReturnErrorOnFailure(mdnsAdvertiser.Advertise(advertiseParameters));
-    }
-
-    return mdnsAdvertiser.Start(&DeviceLayer::InetLayer, chip::Mdns::kMdnsPort);
-}
-#endif
-
-#ifdef CHIP_APP_USE_INTERACTION_MODEL
-Messaging::ExchangeManager gExchange;
+#if defined(CHIP_APP_USE_INTERACTION_MODEL) || defined(CHIP_APP_USE_ECHO)
+Messaging::ExchangeManager gExchangeMgr;
 #endif
 ServerCallback gCallbacks;
 SecurePairingUsingTestSecret gTestPairing;
@@ -516,7 +460,6 @@ CHIP_ERROR OpenDefaultPairingWindow(ResetAdmins resetAdmins)
 void InitServer(AppDelegate * delegate)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    Optional<Transport::PeerAddress> peer(Transport::Type::kUndefined);
 
     chip::Platform::MemoryInit();
 
@@ -540,23 +483,26 @@ void InitServer(AppDelegate * delegate)
     err = gSessions.Init(chip::kTestDeviceNodeId, &DeviceLayer::SystemLayer, &gTransports, &gAdminPairings);
     SuccessOrExit(err);
 
-#ifdef CHIP_APP_USE_INTERACTION_MODEL
-    err = gExchange.Init(&gSessions);
-    SuccessOrExit(err);
-    err = chip::app::InteractionModelEngine::GetInstance()->Init(&gExchange);
+#if defined(CHIP_APP_USE_INTERACTION_MODEL) || defined(CHIP_APP_USE_ECHO)
+    err = gExchangeMgr.Init(&gSessions);
     SuccessOrExit(err);
 #else
     gSessions.SetDelegate(&gCallbacks);
 #endif
 
+#if defined(CHIP_APP_USE_INTERACTION_MODEL)
+    err = chip::app::InteractionModelEngine::GetInstance()->Init(&gExchangeMgr);
+    SuccessOrExit(err);
+#endif
+
+#if defined(CHIP_APP_USE_ECHO)
+    err = InitEchoHandler(&gExchangeMgr);
+    SuccessOrExit(err);
+#endif
+
     if (useTestPairing())
     {
-        AdminPairingInfo * adminInfo = gAdminPairings.AssignAdminId(gNextAvailableAdminId);
-        VerifyOrExit(adminInfo != nullptr, err = CHIP_ERROR_NO_MEMORY);
-        adminInfo->SetNodeId(chip::kTestDeviceNodeId);
-        err = gSessions.NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing, SecureSessionMgr::PairingDirection::kResponder,
-                                   gNextAvailableAdminId);
-        SuccessOrExit(err);
+        SuccessOrExit(err = AddTestPairing());
     }
 
     // This flag is used to bypass BLE in the cirque test
@@ -585,9 +531,9 @@ void InitServer(AppDelegate * delegate)
 #endif
     }
 
-#if CHIP_ENABLE_MDNS
-    err = InitMdns();
-    SuccessOrExit(err);
+// Starting mDNS server only for Thread devices due to problem reported in issue #5076.
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    app::Mdns::StartServer();
 #endif
 
 exit:
@@ -599,4 +545,33 @@ exit:
     {
         ChipLogProgress(AppServer, "Server Listening...");
     }
+}
+
+CHIP_ERROR AddTestPairing()
+{
+    CHIP_ERROR err               = CHIP_NO_ERROR;
+    AdminPairingInfo * adminInfo = nullptr;
+
+    for (const AdminPairingInfo & admin : gAdminPairings)
+        if (admin.IsInitialized() && admin.GetNodeId() == chip::kTestDeviceNodeId)
+            ExitNow();
+
+    adminInfo = gAdminPairings.AssignAdminId(gNextAvailableAdminId);
+    VerifyOrExit(adminInfo != nullptr, err = CHIP_ERROR_NO_MEMORY);
+
+    adminInfo->SetNodeId(chip::kTestDeviceNodeId);
+    SuccessOrExit(err = gSessions.NewPairing(Optional<PeerAddress>{ PeerAddress::Uninitialized() }, chip::kTestControllerNodeId,
+                                             &gTestPairing, SecureSessionMgr::PairingDirection::kResponder, gNextAvailableAdminId));
+    ++gNextAvailableAdminId;
+
+exit:
+    if (err != CHIP_NO_ERROR && adminInfo != nullptr)
+        gAdminPairings.ReleaseAdminId(gNextAvailableAdminId);
+
+    return err;
+}
+
+AdminPairingTable & GetGlobalAdminPairingTable()
+{
+    return gAdminPairings;
 }

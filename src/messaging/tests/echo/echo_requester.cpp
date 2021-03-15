@@ -103,7 +103,7 @@ CHIP_ERROR SendEchoRequest(void)
 
     printf("\nSend echo request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 
-    err = gEchoClient.SendEchoRequest(std::move(payloadBuf));
+    err = gEchoClient.SendEchoRequest(std::move(payloadBuf), chip::Messaging::SendFlags(chip::Messaging::SendMessageFlags::kNone));
 
     if (err == CHIP_NO_ERROR)
     {
@@ -224,7 +224,7 @@ int main(int argc, char * argv[])
         SuccessOrExit(err);
     }
 
-    err = gExchangeManager.Init(&gSessionManager);
+    err = gExchangeManager.Init(chip::kTestControllerNodeId, &gUDPManager, &gSessionManager);
     SuccessOrExit(err);
 
     // Start the CHIP connection to the CHIP echo responder.

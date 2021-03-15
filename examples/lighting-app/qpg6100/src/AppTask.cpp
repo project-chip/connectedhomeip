@@ -219,7 +219,7 @@ void AppTask::LightingActionEventHandler(AppEvent * aEvent)
 void AppTask::ButtonEventHandler(uint8_t btnIdx, bool btnPressed)
 {
     ChipLogProgress(NotSpecified, "ButtonEventHandler %d, %d", btnIdx, btnPressed);
-    if (btnIdx != APP_ON_OFF_BUTTON && btnIdx != APP_FUNCTION_BUTTON)
+    if (btnIdx != APP_ON_OFF_BUTTON && btnIdx != APP_FUNCTION_BUTTON && btnIdx != APP_LEVEL_BUTTON)
     {
         return;
     }
@@ -234,11 +234,16 @@ void AppTask::ButtonEventHandler(uint8_t btnIdx, bool btnPressed)
         button_event.Handler = LightingActionEventHandler;
         sAppTask.PostEvent(&button_event);
     }
-    else if (btnIdx == APP_FUNCTION_BUTTON)
+    else if (btnIdx == APP_LEVEL_BUTTON)
     {
-        // TODO hijacked the function button to change level
         button_event.Type    = AppEvent::kEventType_Level;
         button_event.Handler = LightingActionEventHandler;
+        sAppTask.PostEvent(&button_event);
+    }
+    else if (btnIdx == APP_FUNCTION_BUTTON)
+    {
+        button_event.Type    = AppEvent::kEventType_Level;
+        button_event.Handler = FunctionHandler;
         sAppTask.PostEvent(&button_event);
     }
 }

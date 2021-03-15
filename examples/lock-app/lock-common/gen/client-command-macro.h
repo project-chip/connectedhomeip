@@ -256,15 +256,6 @@
     emberAfFillExternalBuffer(mask, clusterId, ZCL_DISCOVER_ATTRIBUTES_EXTENDED_RESPONSE_COMMAND_ID, "ub", discoveryComplete,      \
                               extendedDiscoverAttributesInfoRecords, extendedDiscoverAttributesInfoRecordsLen);
 
-/** @brief Command description for ResetToFactoryDefaults
- *
- * Command: ResetToFactoryDefaults
- */
-#define emberAfFillCommandBasicClusterResetToFactoryDefaults()                                                                     \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_RESET_TO_FACTORY_DEFAULTS_COMMAND_ID, "", );
-
 /** @brief Command description for Identify
  *
  * Command: Identify
@@ -1795,6 +1786,131 @@
                                   totalNumberOfNonEmptyProxyTableEntries, gpdSrcId, startIndex, gpdIeee, entriesCount, endpoint,   \
                                   proxyTableEntries, proxyTableEntriesLen, index);
 
+/** @brief Command description for StartUp
+ *
+ * Command: StartUp
+ */
+#define emberAfFillCommandBasicClusterStartUp()                                                                                    \
+    emberAfFillExternalBuffer(mask,                                                                                                \
+                                                                                                                                   \
+                              ZCL_START_UP_COMMAND_ID, "", );
+
+/** @brief Command description for ShutDown
+ *
+ * Command: ShutDown
+ */
+#define emberAfFillCommandBasicClusterShutDown()                                                                                   \
+    emberAfFillExternalBuffer(mask,                                                                                                \
+                                                                                                                                   \
+                              ZCL_SHUT_DOWN_COMMAND_ID, "", );
+
+/** @brief Command description for Leave
+ *
+ * Command: Leave
+ */
+#define emberAfFillCommandBasicClusterLeave()                                                                                      \
+    emberAfFillExternalBuffer(mask,                                                                                                \
+                                                                                                                                   \
+                              ZCL_LEAVE_COMMAND_ID, "", );
+
+/** @brief Command description for SetFabric
+ *
+ * Command: SetFabric
+ * @param fabricId OCTET_STRING
+ * @param fabricSecret OCTET_STRING
+ * @param breadcrumb INT64U
+ * @param timeoutMs INT32U
+ */
+#define emberAfFillCommandGeneral                                                                                                  \
+    CommissioningClusterSetFabric(fabricId, fabricSecret, breadcrumb, timeoutMs)                                                   \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_SET_FABRIC_COMMAND_ID, "uuuu", fabricId, fabricSecret, breadcrumb, timeoutMs);
+
+/** @brief Command description for SetFabricResponse
+ *
+ * Command: SetFabricResponse
+ * @param errorCode INT8U
+ * @param debugText CHAR_STRING
+ */
+#define emberAfFillCommandGeneral                                                                                                  \
+    CommissioningClusterSetFabricResponse(errorCode, debugText)                                                                    \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_SET_FABRIC_RESPONSE_COMMAND_ID, "uu", errorCode, debugText);
+
+/** @brief Command description for ArmFailSafe
+ *
+ * Command: ArmFailSafe
+ * @param expiryLengthSeconds INT16U
+ * @param breadcrumb INT64U
+ * @param timeoutMs INT32U
+ */
+#define emberAfFillCommandGeneral                                                                                                  \
+    CommissioningClusterArmFailSafe(expiryLengthSeconds, breadcrumb, timeoutMs)                                                    \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_ARM_FAIL_SAFE_COMMAND_ID, "uuu", expiryLengthSeconds, breadcrumb, timeoutMs);
+
+/** @brief Command description for ArmFailSafeResponse
+ *
+ * Command: ArmFailSafeResponse
+ * @param errorCode INT8U
+ * @param debugText CHAR_STRING
+ */
+#define emberAfFillCommandGeneral                                                                                                  \
+    CommissioningClusterArmFailSafeResponse(errorCode, debugText)                                                                  \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_ARM_FAIL_SAFE_RESPONSE_COMMAND_ID, "uu", errorCode, debugText);
+
+/** @brief Command description for SetRegulatoryConfig
+ *
+ * Command: SetRegulatoryConfig
+ * @param location RegulatoryLocationType
+ * @param countryCode CHAR_STRING
+ * @param breadcrumb INT64U
+ * @param timeoutMs INT32U
+ */
+#define emberAfFillCommandGeneral                                                                                                  \
+    CommissioningClusterSetRegulatoryConfig(location, countryCode, breadcrumb, timeoutMs)                                          \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_SET_REGULATORY_CONFIG_COMMAND_ID, "uuuu", location, countryCode, breadcrumb, timeoutMs);
+
+/** @brief Command description for SetRegulatoryConfigResponse
+ *
+ * Command: SetRegulatoryConfigResponse
+ * @param errorCode INT8U
+ * @param debugText CHAR_STRING
+ */
+#define emberAfFillCommandGeneral                                                                                                  \
+    CommissioningClusterSetRegulatoryConfigResponse(errorCode, debugText)                                                          \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_SET_REGULATORY_CONFIG_RESPONSE_COMMAND_ID, "uu", errorCode, debugText);
+
+/** @brief Command description for CommissioningComplete
+ *
+ * Command: CommissioningComplete
+ */
+#define emberAfFillCommandGeneral                                                                                                  \
+    CommissioningClusterCommissioningComplete() emberAfFillExternalBuffer(mask,                                                    \
+                                                                                                                                   \
+                                                                          ZCL_COMMISSIONING_COMPLETE_COMMAND_ID, "", );
+
+/** @brief Command description for CommissioningCompleteResponse
+ *
+ * Command: CommissioningCompleteResponse
+ * @param errorCode INT8U
+ * @param debugText CHAR_STRING
+ */
+#define emberAfFillCommandGeneral                                                                                                  \
+    CommissioningClusterCommissioningCompleteResponse(errorCode, debugText)                                                        \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_COMMISSIONING_COMPLETE_RESPONSE_COMMAND_ID, "uu", errorCode, debugText);
+
 /** @brief Command description for LockDoor
  *
  * Command: LockDoor
@@ -2865,6 +2981,15 @@
     WDClusterSquawk(squawkInfo) emberAfFillExternalBuffer(mask,                                                                    \
                                                                                                                                    \
                                                           ZCL_SQUAWK_COMMAND_ID, "u", squawkInfo);
+
+/** @brief Command description for Sleep
+ *
+ * Command: Sleep
+ */
+#define emberAfFillCommandLow                                                                                                      \
+    PowerClusterSleep() emberAfFillExternalBuffer(mask,                                                                            \
+                                                                                                                                   \
+                                                  ZCL_SLEEP_COMMAND_ID, "", );
 
 /** @brief Command description for MatchProtocolAddress
  *

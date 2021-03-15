@@ -24,12 +24,6 @@
 // to the "EmberAfClusterName" defined in the ZCL header.
 // The names of clusters that are not present, are removed.
 
-#if defined(ZCL_USING_BASIC_CLUSTER_SERVER) || defined(ZCL_USING_BASIC_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_BASIC_CLUSTER { ZCL_BASIC_CLUSTER_ID, 0, "Basic" },
-#else
-#define CHIP_PRINTCLUSTER_BASIC_CLUSTER
-#endif
-
 #if defined(ZCL_USING_POWER_CONFIG_CLUSTER_SERVER) || defined(ZCL_USING_POWER_CONFIG_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_POWER_CONFIG_CLUSTER { ZCL_POWER_CONFIG_CLUSTER_ID, 1, "Power Configuration" },
 #else
@@ -148,6 +142,18 @@
 #define CHIP_PRINTCLUSTER_KEEPALIVE_CLUSTER { ZCL_KEEPALIVE_CLUSTER_ID, 37, "Keep-Alive" },
 #else
 #define CHIP_PRINTCLUSTER_KEEPALIVE_CLUSTER
+#endif
+
+#if defined(ZCL_USING_BASIC_CLUSTER_SERVER) || defined(ZCL_USING_BASIC_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_BASIC_CLUSTER { ZCL_BASIC_CLUSTER_ID, 40, "Basic" },
+#else
+#define CHIP_PRINTCLUSTER_BASIC_CLUSTER
+#endif
+
+#if defined(ZCL_USING_GENERAL_COMMISSIONING_CLUSTER_SERVER) || defined(ZCL_USING_GENERAL_COMMISSIONING_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_GENERAL_COMMISSIONING_CLUSTER { ZCL_GENERAL_COMMISSIONING_CLUSTER_ID, 48, "General Commissioning" },
+#else
+#define CHIP_PRINTCLUSTER_GENERAL_COMMISSIONING_CLUSTER
 #endif
 
 #if defined(ZCL_USING_SHADE_CONFIG_CLUSTER_SERVER) || defined(ZCL_USING_SHADE_CONFIG_CLUSTER_CLIENT)
@@ -520,6 +526,18 @@
 #define CHIP_PRINTCLUSTER_IAS_WD_CLUSTER
 #endif
 
+#if defined(ZCL_USING_LOW_POWER_CLUSTER_SERVER) || defined(ZCL_USING_LOW_POWER_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_LOW_POWER_CLUSTER { ZCL_LOW_POWER_CLUSTER_ID, 1288, "Low Power" },
+#else
+#define CHIP_PRINTCLUSTER_LOW_POWER_CLUSTER
+#endif
+
+#if defined(ZCL_USING_APPLICATION_BASIC_CLUSTER_SERVER) || defined(ZCL_USING_APPLICATION_BASIC_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_APPLICATION_BASIC_CLUSTER { ZCL_APPLICATION_BASIC_CLUSTER_ID, 1293, "Application Basic" },
+#else
+#define CHIP_PRINTCLUSTER_APPLICATION_BASIC_CLUSTER
+#endif
+
 #if defined(ZCL_USING_GENERIC_TUNNEL_CLUSTER_SERVER) || defined(ZCL_USING_GENERIC_TUNNEL_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_GENERIC_TUNNEL_CLUSTER { ZCL_GENERIC_TUNNEL_CLUSTER_ID, 1536, "Generic Tunnel" },
 #else
@@ -772,7 +790,6 @@
 #endif
 
 #define CLUSTER_IDS_TO_NAMES                                                                                                       \
-    CHIP_PRINTCLUSTER_BASIC_CLUSTER                                                                                                \
     CHIP_PRINTCLUSTER_POWER_CONFIG_CLUSTER                                                                                         \
     CHIP_PRINTCLUSTER_DEVICE_TEMP_CLUSTER                                                                                          \
     CHIP_PRINTCLUSTER_IDENTIFY_CLUSTER                                                                                             \
@@ -793,6 +810,8 @@
     CHIP_PRINTCLUSTER_POLL_CONTROL_CLUSTER                                                                                         \
     CHIP_PRINTCLUSTER_GREEN_POWER_CLUSTER                                                                                          \
     CHIP_PRINTCLUSTER_KEEPALIVE_CLUSTER                                                                                            \
+    CHIP_PRINTCLUSTER_BASIC_CLUSTER                                                                                                \
+    CHIP_PRINTCLUSTER_GENERAL_COMMISSIONING_CLUSTER                                                                                \
     CHIP_PRINTCLUSTER_SHADE_CONFIG_CLUSTER                                                                                         \
     CHIP_PRINTCLUSTER_DOOR_LOCK_CLUSTER                                                                                            \
     CHIP_PRINTCLUSTER_WINDOW_COVERING_CLUSTER                                                                                      \
@@ -844,6 +863,8 @@
     CHIP_PRINTCLUSTER_IAS_ZONE_CLUSTER                                                                                             \
     CHIP_PRINTCLUSTER_IAS_ACE_CLUSTER                                                                                              \
     CHIP_PRINTCLUSTER_IAS_WD_CLUSTER                                                                                               \
+    CHIP_PRINTCLUSTER_LOW_POWER_CLUSTER                                                                                            \
+    CHIP_PRINTCLUSTER_APPLICATION_BASIC_CLUSTER                                                                                    \
     CHIP_PRINTCLUSTER_GENERIC_TUNNEL_CLUSTER                                                                                       \
     CHIP_PRINTCLUSTER_BACNET_PROTOCOL_TUNNEL_CLUSTER                                                                               \
     CHIP_PRINTCLUSTER_11073_PROTOCOL_TUNNEL_CLUSTER                                                                                \

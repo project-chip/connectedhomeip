@@ -51,8 +51,7 @@ const int kManualSetupLongCodeCharLength  = 20;
 const int kManualSetupVendorIdCharLength  = 5;
 const int kManualSetupProductIdCharLength = 5;
 
-const uint8_t kSerialNumberTag               = 128;
-const uint32_t kTag_QRCodeExensionDescriptor = 0x00;
+const uint8_t kSerialNumberTag = 128;
 
 // The largest value of the 12-bit Payload discriminator
 const uint16_t kMaxDiscriminatorValue = 0xFFF;
@@ -138,7 +137,7 @@ public:
     uint8_t version;
     uint16_t vendorID;
     uint16_t productID;
-    uint8_t requiresCustomFlow;
+    bool requiresCustomFlow;
     RendezvousInformationFlags rendezvousInformation;
     uint16_t discriminator;
     uint32_t setUpPINCode;

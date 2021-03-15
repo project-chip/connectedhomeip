@@ -7,8 +7,7 @@
 
 #include <kernel.h>
 #include <logging/log.h>
-
-#include <cstdio>
+#include <sys/cbprintf.h>
 
 LOG_MODULE_REGISTER(chip, LOG_LEVEL_DBG);
 
@@ -36,7 +35,7 @@ void LogV(const char * module, uint8_t category, const char * msg, va_list v)
 {
     char formattedMsg[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
 
-    snprintf(formattedMsg, sizeof(formattedMsg), "%u [%s]", k_uptime_get_32(), module);
+    snprintfcb(formattedMsg, sizeof(formattedMsg), "%u [%s]", k_uptime_get_32(), module);
 
     // -2 to ensure at least one byte available for vsnprintf below.
     formattedMsg[sizeof(formattedMsg) - 2] = 0;
@@ -44,7 +43,7 @@ void LogV(const char * module, uint8_t category, const char * msg, va_list v)
     size_t prefixLen = strlen(formattedMsg);
 
     // Append the log message.
-    vsnprintf(formattedMsg + prefixLen, sizeof(formattedMsg) - prefixLen, msg, v);
+    vsnprintfcb(formattedMsg + prefixLen, sizeof(formattedMsg) - prefixLen, msg, v);
 
     // Invoke the Zephyr logging library to log the message.
     //

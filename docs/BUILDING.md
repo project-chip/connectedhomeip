@@ -43,7 +43,7 @@ On Debian-based Linux distributions such as Ubuntu, these dependencies can be
 satisfied with the following:
 
 ```
-sudo apt-get install git gcc g++ python pkg-config libssl-dev libdbus-1-dev libglib2.0-dev libavahi-client-dev ninja-build python3-venv python3-dev unzip
+sudo apt-get install git gcc g++ python pkg-config libssl-dev libdbus-1-dev libglib2.0-dev libavahi-client-dev ninja-build python3-venv python3-dev python3-pip unzip
 ```
 
 #### How to install prerequisites on macOS
@@ -238,13 +238,14 @@ all of the target instances. For example:
 gn desc out/unified '//src/controller(//build/toolchain/host:linux_x64_clang)'
 ```
 
-Note: Some builds are disabled by default as they need extra SDKs. For example,
-to add the EFR32 examples to the unified build, download the
-[SDK](https://github.com/SiliconLabs/sdk_support) and add the following build
-arguments:
+Note: Some platforms that can be build as part of the unified build require
+downloading additional SDKs. To add these to the build, the location of the SDK
+installation must be provided as a build argument. For example, to add the
+Simplelink cc13x2_26x2 examples to the unified build, install the
+[SDK](https://ti.com/chip_sdk) and add the following build arguments:
 
 ```
-gn gen out/unified --args='target_os="all" enable_efr32_builds=true efr32_sdk_root="/path/to/sdk" efr32_board="BRD4161A"'
+gn gen out/unified --args="target_os=\"all\" enable_ti_simplelink_builds=true ti_simplelink_sdk_root=\"/path/to/sdk\" ti_sysconfig_root=\"/path/to/sysconfig\""
 ```
 
 ### Getting Help
@@ -304,6 +305,17 @@ To find dependency paths:
 
 ```
 gn path out/host //src/transport/tests:tests //src/system
+```
+
+To list useful information for linking against libCHIP:
+
+```
+gn desc out/host //src/lib include_dirs
+gn desc out/host //src/lib defines
+gn desc out/host //src/lib outputs
+
+# everything as JSON
+gn desc out/host //src/lib --format=json
 ```
 
 ## Maintaining CHIP

@@ -224,11 +224,7 @@
 #if USE_RTOS && defined(FSL_RTOS_FREE_RTOS)
 #include "FreeRTOS.h"
 
-extern void * pvPortCallocRtos(size_t num, size_t size); /*Calloc for HEAP3.*/
-
 #define MBEDTLS_PLATFORM_MEMORY
-#define MBEDTLS_PLATFORM_STD_CALLOC pvPortCallocRtos
-#define MBEDTLS_PLATFORM_STD_FREE vPortFree
 
 #endif /* USE_RTOS*/
 /**************************** KSDK end ****************************************/

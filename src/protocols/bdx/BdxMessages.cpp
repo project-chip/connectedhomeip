@@ -42,18 +42,16 @@ using namespace chip::Encoding::LittleEndian;
 // the size of the message (even if the message is incomplete or filled out incorrectly).
 BufferWriter & TransferInit::WriteToBuffer(BufferWriter & aBuffer) const
 {
-    uint8_t proposedTransferCtl = 0;
-    bool widerange = (StartOffset > std::numeric_limits<uint32_t>::max()) || (MaxLength > std::numeric_limits<uint32_t>::max());
+    const BitFlags<TransferControlFlags> proposedTransferCtl(Version & kVersionMask, TransferCtlOptions);
+    const bool widerange =
+        (StartOffset > std::numeric_limits<uint32_t>::max()) || (MaxLength > std::numeric_limits<uint32_t>::max());
 
-    proposedTransferCtl |= Version & kVersionMask;
-    proposedTransferCtl = proposedTransferCtl | TransferCtlOptions.Raw();
+    BitFlags<RangeControlFlags> rangeCtlFlags;
+    rangeCtlFlags.Set(RangeControlFlags::kDefLen, MaxLength > 0);
+    rangeCtlFlags.Set(RangeControlFlags::kStartOffset, StartOffset > 0);
+    rangeCtlFlags.Set(RangeControlFlags::kWiderange, widerange);
 
-    BitFlags<uint8_t, RangeControlFlags> rangeCtlFlags;
-    rangeCtlFlags.Set(kRange_DefLen, MaxLength > 0);
-    rangeCtlFlags.Set(kRange_StartOffset, StartOffset > 0);
-    rangeCtlFlags.Set(kRange_Widerange, widerange);
-
-    aBuffer.Put(proposedTransferCtl);
+    aBuffer.Put(proposedTransferCtl.Raw());
     aBuffer.Put(rangeCtlFlags.Raw());
     aBuffer.Put16(MaxBlockSize);
 
@@ -98,22 +96,20 @@ CHIP_ERROR TransferInit::Parse(System::PacketBufferHandle aBuffer)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     uint8_t proposedTransferCtl;
-    uint8_t rangeCtl;
     uint32_t tmpUint32Value = 0; // Used for reading non-wide length and offset fields
     uint8_t * bufStart      = aBuffer->Start();
     Reader bufReader(bufStart, aBuffer->DataLength());
-    BitFlags<uint8_t, RangeControlFlags> rangeCtlFlags;
+    BitFlags<RangeControlFlags> rangeCtlFlags;
 
-    SuccessOrExit(bufReader.Read8(&proposedTransferCtl).Read8(&rangeCtl).Read16(&MaxBlockSize).StatusCode());
+    SuccessOrExit(bufReader.Read8(&proposedTransferCtl).Read8(rangeCtlFlags.RawStorage()).Read16(&MaxBlockSize).StatusCode());
 
     Version = proposedTransferCtl & kVersionMask;
     TransferCtlOptions.SetRaw(static_cast<uint8_t>(proposedTransferCtl & ~kVersionMask));
-    rangeCtlFlags.SetRaw(rangeCtl);
 
     StartOffset = 0;
-    if (rangeCtlFlags.Has(kRange_StartOffset))
+    if (rangeCtlFlags.Has(RangeControlFlags::kStartOffset))
     {
-        if (rangeCtlFlags.Has(kRange_Widerange))
+        if (rangeCtlFlags.Has(RangeControlFlags::kWiderange))
         {
             SuccessOrExit(bufReader.Read64(&StartOffset).StatusCode());
         }
@@ -125,9 +121,9 @@ CHIP_ERROR TransferInit::Parse(System::PacketBufferHandle aBuffer)
     }
 
     MaxLength = 0;
-    if (rangeCtlFlags.Has(kRange_DefLen))
+    if (rangeCtlFlags.Has(RangeControlFlags::kDefLen))
     {
-        if (rangeCtlFlags.Has(kRange_Widerange))
+        if (rangeCtlFlags.Has(RangeControlFlags::kWiderange))
         {
             SuccessOrExit(bufReader.Read64(&MaxLength).StatusCode());
         }
@@ -189,7 +185,7 @@ bool TransferInit::operator==(const TransferInit & another) const
         metadataMatches = (memcmp(Metadata, another.Metadata, MetadataLength) == 0);
     }
 
-    return ((Version == another.Version) && (TransferCtlOptions.Raw() == another.TransferCtlOptions.Raw()) &&
+    return ((Version == another.Version) && (TransferCtlOptions == another.TransferCtlOptions) &&
             (StartOffset == another.StartOffset) && (MaxLength == another.MaxLength) && (MaxBlockSize == another.MaxBlockSize) &&
             fileDesMatches && metadataMatches);
 }
@@ -198,12 +194,9 @@ bool TransferInit::operator==(const TransferInit & another) const
 // the size of the message (even if the message is incomplete or filled out incorrectly).
 Encoding::LittleEndian::BufferWriter & SendAccept::WriteToBuffer(Encoding::LittleEndian::BufferWriter & aBuffer) const
 {
-    uint8_t transferCtl = 0;
+    const BitFlags<TransferControlFlags> transferCtl(Version & kVersionMask, TransferCtlFlags);
 
-    transferCtl |= Version & kVersionMask;
-    transferCtl = transferCtl | TransferCtlFlags.Raw();
-
-    aBuffer.Put(transferCtl);
+    aBuffer.Put(transferCtl.Raw());
     aBuffer.Put16(MaxBlockSize);
 
     if (Metadata != nullptr)
@@ -266,7 +259,7 @@ bool SendAccept::operator==(const SendAccept & another) const
         metadataMatches = (memcmp(Metadata, another.Metadata, MetadataLength) == 0);
     }
 
-    return ((Version == another.Version) && (TransferCtlFlags.Raw() == another.TransferCtlFlags.Raw()) &&
+    return ((Version == another.Version) && (TransferCtlFlags == another.TransferCtlFlags) &&
             (MaxBlockSize == another.MaxBlockSize) && metadataMatches);
 }
 
@@ -274,18 +267,15 @@ bool SendAccept::operator==(const SendAccept & another) const
 // the size of the message (even if the message is incomplete or filled out incorrectly).
 Encoding::LittleEndian::BufferWriter & ReceiveAccept::WriteToBuffer(Encoding::LittleEndian::BufferWriter & aBuffer) const
 {
-    uint8_t transferCtl = 0;
-    bool widerange      = (StartOffset > std::numeric_limits<uint32_t>::max()) || (Length > std::numeric_limits<uint32_t>::max());
+    const BitFlags<TransferControlFlags> transferCtlFlags(Version & kVersionMask, TransferCtlFlags);
+    const bool widerange = (StartOffset > std::numeric_limits<uint32_t>::max()) || (Length > std::numeric_limits<uint32_t>::max());
 
-    transferCtl |= Version & kVersionMask;
-    transferCtl = transferCtl | TransferCtlFlags.Raw();
+    BitFlags<RangeControlFlags> rangeCtlFlags;
+    rangeCtlFlags.Set(RangeControlFlags::kDefLen, Length > 0);
+    rangeCtlFlags.Set(RangeControlFlags::kStartOffset, StartOffset > 0);
+    rangeCtlFlags.Set(RangeControlFlags::kWiderange, widerange);
 
-    BitFlags<uint8_t, RangeControlFlags> rangeCtlFlags;
-    rangeCtlFlags.Set(kRange_DefLen, Length > 0);
-    rangeCtlFlags.Set(kRange_StartOffset, StartOffset > 0);
-    rangeCtlFlags.Set(kRange_Widerange, widerange);
-
-    aBuffer.Put(transferCtl);
+    aBuffer.Put(transferCtlFlags.Raw());
     aBuffer.Put(rangeCtlFlags.Raw());
     aBuffer.Put16(MaxBlockSize);
 
@@ -324,25 +314,22 @@ CHIP_ERROR ReceiveAccept::Parse(System::PacketBufferHandle aBuffer)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     uint8_t transferCtl     = 0;
-    uint8_t rangeCtl        = 0;
     uint32_t tmpUint32Value = 0; // Used for reading non-wide length and offset fields
     uint8_t * bufStart      = aBuffer->Start();
     Reader bufReader(bufStart, aBuffer->DataLength());
-    BitFlags<uint8_t, RangeControlFlags> rangeCtlFlags;
+    BitFlags<RangeControlFlags> rangeCtlFlags;
 
-    SuccessOrExit(bufReader.Read8(&transferCtl).Read8(&rangeCtl).Read16(&MaxBlockSize).StatusCode());
+    SuccessOrExit(bufReader.Read8(&transferCtl).Read8(rangeCtlFlags.RawStorage()).Read16(&MaxBlockSize).StatusCode());
 
     Version = transferCtl & kVersionMask;
 
     // Only one of these values should be set. It is up to the caller to verify this.
     TransferCtlFlags.SetRaw(static_cast<uint8_t>(transferCtl & ~kVersionMask));
 
-    rangeCtlFlags.SetRaw(rangeCtl);
-
     StartOffset = 0;
-    if (rangeCtlFlags.Has(kRange_StartOffset))
+    if (rangeCtlFlags.Has(RangeControlFlags::kStartOffset))
     {
-        if (rangeCtlFlags.Has(kRange_Widerange))
+        if (rangeCtlFlags.Has(RangeControlFlags::kWiderange))
         {
             SuccessOrExit(bufReader.Read64(&StartOffset).StatusCode());
         }
@@ -354,9 +341,9 @@ CHIP_ERROR ReceiveAccept::Parse(System::PacketBufferHandle aBuffer)
     }
 
     Length = 0;
-    if (rangeCtlFlags.Has(kRange_DefLen))
+    if (rangeCtlFlags.Has(RangeControlFlags::kDefLen))
     {
-        if (rangeCtlFlags.Has(kRange_Widerange))
+        if (rangeCtlFlags.Has(RangeControlFlags::kWiderange))
         {
             SuccessOrExit(bufReader.Read64(&Length).StatusCode());
         }
@@ -406,7 +393,7 @@ bool ReceiveAccept::operator==(const ReceiveAccept & another) const
         metadataMatches = (memcmp(Metadata, another.Metadata, MetadataLength) == 0);
     }
 
-    return ((Version == another.Version) && (TransferCtlFlags.Raw() == another.TransferCtlFlags.Raw()) &&
+    return ((Version == another.Version) && (TransferCtlFlags == another.TransferCtlFlags) &&
             (StartOffset == another.StartOffset) && (MaxBlockSize == another.MaxBlockSize) && (Length == another.Length) &&
             metadataMatches);
 }

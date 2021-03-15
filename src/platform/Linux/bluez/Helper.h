@@ -58,7 +58,7 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-CHIP_ERROR InitBluezBleLayer(bool aIsCentral, char * apBleAddr, BLEAdvConfig & aBleAdvConfig, void *& apEndpoint);
+CHIP_ERROR InitBluezBleLayer(bool aIsCentral, char * apBleAddr, BLEAdvConfig & aBleAdvConfig, BluezEndpoint *& apEndpoint);
 bool BluezRunOnBluezThread(int (*aCallback)(void *), void * apClosure);
 bool SendBluezIndication(BLE_CONNECTION_OBJECT apConn, chip::System::PacketBufferHandle apBuf);
 bool CloseBluezConnection(BLE_CONNECTION_OBJECT apConn);
@@ -73,10 +73,6 @@ bool BluezSendWriteRequest(BLE_CONNECTION_OBJECT apConn, chip::System::PacketBuf
 bool BluezSubscribeCharacteristic(BLE_CONNECTION_OBJECT apConn);
 /// Unsubscribe from the CHIP TX characteristic on the remote peripheral device
 bool BluezUnsubscribeCharacteristic(BLE_CONNECTION_OBJECT apConn);
-
-CHIP_ERROR StartDiscovery(BluezEndpoint * apEndpoint, BluezDiscoveryRequest aRequest = {});
-
-CHIP_ERROR StopDiscovery(BluezEndpoint * apEndpoint);
 
 CHIP_ERROR ConnectDevice(BluezDevice1 * apDevice);
 

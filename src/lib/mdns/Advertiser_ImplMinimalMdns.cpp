@@ -33,12 +33,16 @@
 #include <support/ReturnMacros.h>
 #include <support/StringBuilder.h>
 
+// Enable detailed mDNS logging for received queries
+#undef DETAIL_LOGGING
+
 namespace chip {
 namespace Mdns {
 namespace {
 
 using namespace mdns::Minimal;
 
+#ifdef DETAIL_LOGGING
 const char * ToString(QClass qClass)
 {
     switch (qClass)
@@ -85,6 +89,9 @@ void LogQuery(const QueryData & data)
 
     ChipLogDetail(Discovery, "%s", logString.c_str());
 }
+#else
+void LogQuery(const QueryData & data) {}
+#endif
 
 /// Checks if the current interface is powered on
 /// and not local loopback.
@@ -295,7 +302,7 @@ private:
 
     FullQName GetCommisioningTextEntries(const CommissionAdvertisingParameters & params);
 
-    static constexpr size_t kMaxEndPoints           = 10;
+    static constexpr size_t kMaxEndPoints           = 30;
     static constexpr size_t kMaxRecords             = 16;
     static constexpr size_t kMaxAllocatedResponders = 16;
     static constexpr size_t kMaxAllocatedQNameData  = 8;
@@ -319,7 +326,9 @@ private:
 
 void AdvertiserMinMdns::OnQuery(const BytesRange & data, const chip::Inet::IPPacketInfo * info)
 {
+#ifdef DETAIL_LOGGING
     ChipLogDetail(Discovery, "MinMdns received a query.");
+#endif
 
     mCurrentSource = info;
     if (!ParsePacket(data, this))
@@ -581,11 +590,11 @@ FullQName AdvertiserMinMdns::GetCommisioningTextEntries(const CommissionAdvertis
     char txtVidPid[64];
     if (params.GetProductId().HasValue())
     {
-        sprintf(txtVidPid, "V=%d+%d", params.GetVendorId().Value(), params.GetProductId().Value());
+        sprintf(txtVidPid, "VP=%d+%d", params.GetVendorId().Value(), params.GetProductId().Value());
     }
     else
     {
-        sprintf(txtVidPid, "V=%d", params.GetVendorId().Value());
+        sprintf(txtVidPid, "VP=%d", params.GetVendorId().Value());
     }
 
     char txtPairingInstrHint[128];

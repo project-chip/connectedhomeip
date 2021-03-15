@@ -37,9 +37,7 @@ CHIP_ERROR AdminPairingInfo::StoreIntoKVS(PersistentStorageDelegate & kvs)
     info.mNodeId = Encoding::LittleEndian::HostSwap64(mNodeId);
     info.mAdmin  = Encoding::LittleEndian::HostSwap16(mAdmin);
 
-    VerifyOrReturnError(CanCastTo<uint16_t>(sizeof(info)), CHIP_ERROR_INTERNAL);
-    uint16_t size = static_cast<uint16_t>(sizeof(info));
-    return kvs.SetKeyValue(key, &info, size);
+    return kvs.SetKeyValue(key, &info, sizeof(info));
 }
 
 CHIP_ERROR AdminPairingInfo::FetchFromKVS(PersistentStorageDelegate & kvs)
@@ -49,8 +47,7 @@ CHIP_ERROR AdminPairingInfo::FetchFromKVS(PersistentStorageDelegate & kvs)
 
     StorableAdminPairingInfo info;
 
-    VerifyOrReturnError(CanCastTo<uint16_t>(sizeof(info)), CHIP_ERROR_INTERNAL);
-    uint16_t size = static_cast<uint16_t>(sizeof(info));
+    uint16_t size = sizeof(info);
     ReturnErrorOnFailure(kvs.GetKeyValue(key, &info, size));
 
     mNodeId    = Encoding::LittleEndian::HostSwap64(info.mNodeId);
@@ -136,7 +133,7 @@ void AdminPairingTable::Reset()
 {
     for (size_t i = 0; i < CHIP_CONFIG_MAX_DEVICE_ADMINS; i++)
     {
-        return mStates[i].Reset();
+        mStates[i].Reset();
     }
 }
 

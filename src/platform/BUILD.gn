@@ -17,8 +17,8 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/nlio.gni")
 import("//build_overrides/pigweed.gni")
 
-import("${build_root}/chip/buildconfig_header.gni")
 import("${build_root}/config/linux/pkg_config.gni")
+import("${chip_root}/build/chip/buildconfig_header.gni")
 
 import("device.gni")
 
@@ -30,7 +30,7 @@ if (chip_enable_openthread) {
   }
 }
 
-if (chip_device_platform == "linux" && chip_enable_mdns) {
+if (chip_device_platform == "linux" && chip_mdns != "none") {
   pkg_config("avahi_client_config") {
     packages = [ "avahi-client" ]
   }
@@ -67,10 +67,17 @@ if (chip_device_platform != "none") {
     defines = [
       "CHIP_DEVICE_CONFIG_ENABLE_WPA=${chip_device_config_enable_wpa}",
       "CHIP_ENABLE_OPENTHREAD=${chip_enable_openthread}",
-      "CHIP_ENABLE_MDNS=${chip_enable_mdns}",
       "CHIP_WITH_GIO=${chip_with_gio}",
       "OPENTHREAD_CONFIG_ENABLE_TOBLE=false",
     ]
+
+    if (chip_device_platform == "linux" || chip_device_platform == "darwin") {
+      defines += [ "CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE=${chip_enable_ble}" ]
+    }
+
+    if (chip_mdns != "none") {
+      defines += [ "CHIP_DEVICE_CONFIG_ENABLE_MDNS=1" ]
+    }
 
     if (chip_device_project_config_include != "") {
       defines += [ "CHIP_DEVICE_PROJECT_CONFIG_INCLUDE=${chip_device_project_config_include}" ]
@@ -234,7 +241,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       "${chip_root}/src:includes",
     ]
 
-    if (chip_enable_mdns) {
+    if (chip_mdns != "none") {
       public_deps += [ "${chip_root}/src/lib/mdns:platform_header" ]
     }
 
@@ -478,12 +485,16 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "Linux/SystemTimeSupport.cpp",
         "Linux/bluez/AdapterIterator.cpp",
         "Linux/bluez/AdapterIterator.h",
+        "Linux/bluez/ChipDeviceScanner.cpp",
+        "Linux/bluez/ChipDeviceScanner.h",
         "Linux/bluez/Helper.cpp",
         "Linux/bluez/Helper.h",
+        "Linux/bluez/MainLoop.cpp",
+        "Linux/bluez/MainLoop.h",
         "Linux/bluez/Types.h",
       ]
 
-      if (chip_enable_mdns) {
+      if (chip_mdns != "none") {
         sources += [
           "Linux/MdnsImpl.cpp",
           "Linux/MdnsImpl.h",
@@ -582,6 +593,11 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
           "qpg6100/ThreadStackManagerImpl.h",
         ]
       }
+    }
+
+    if (chip_enable_openthread && chip_mdns == "platform" &&
+        chip_device_platform != "linux") {
+      sources += [ "OpenThread/MdnsImpl.cpp" ]
     }
 
     allow_circular_includes_from = [ "${chip_root}/src/lib/support" ]

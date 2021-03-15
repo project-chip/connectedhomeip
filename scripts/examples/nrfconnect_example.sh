@@ -42,4 +42,4 @@ set -x
 [[ -n $ZEPHYR_BASE ]] && source "$ZEPHYR_BASE/zephyr-env.sh"
 env
 
-west build -b "$BOARD" -d "$APP/nrfconnect/build" "$APP/nrfconnect" -- "$@"
+west build -b "$BOARD" -d "$APP/nrfconnect/build/$BOARD" "$APP/nrfconnect" -- "$@"

@@ -36,12 +36,18 @@ static_library("shell_common") {
     "cmd_device.cpp",
     "cmd_misc.cpp",
     "cmd_otcli.cpp",
+    "cmd_ping.cpp",
   ]
 
   public_deps = [
     "${chip_root}/src/lib",
+    "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/shell",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/platform",
+    "${chip_root}/src/protocols",
     "${chip_root}/src/setup_payload",
+    "${chip_root}/src/system",
   ]
 
   if (chip_enable_openthread &&

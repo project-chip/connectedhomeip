@@ -88,14 +88,13 @@
 // Service discovery library
 //#include "service-discovery.h"
 
-#include "common.h"
-
 // determines the number of in-clusters and out-clusters based on defines
 // in config.h
 #include "af-main.h"
 
 //#include "app/framework/security/af-security.h"
 //#include "app/framework/security/crypto-state.h"
+#include "app/util/common.h"
 #include "attribute-storage.h"
 #include "attribute-table.h"
 #include "config.h"

@@ -358,7 +358,11 @@ void AppTask::StartThreadHandler(AppEvent * aEvent)
     if (aEvent->ButtonEvent.PinNo != THREAD_START_BUTTON)
         return;
 
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    if (AddTestPairing() != CHIP_NO_ERROR)
+    {
+        LOG_ERR("Failed to add test pairing");
+    }
+
     if (!chip::DeviceLayer::ConnectivityMgr().IsThreadProvisioned())
     {
         StartDefaultThreadNetwork();
@@ -368,7 +372,6 @@ void AppTask::StartThreadHandler(AppEvent * aEvent)
     {
         LOG_INF("Device is commissioned to a Thread network.");
     }
-#endif
 }
 
 void AppTask::StartBLEAdvertisementHandler(AppEvent * aEvent)

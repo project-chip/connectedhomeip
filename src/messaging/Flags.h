@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -55,7 +55,7 @@ enum class MessageFlagValues : uint32_t
     kViaEphemeralUDPPort = 0x00040000,
 };
 
-using MessageFlags = BitFlags<uint32_t, MessageFlagValues>;
+using MessageFlags = BitFlags<MessageFlagValues>;
 
 enum class SendMessageFlags : uint16_t
 {
@@ -72,13 +72,11 @@ enum class SendMessageFlags : uint16_t
     kDefaultMulticastSourceAddress = 0x0100,
     /**< Used to indicate that the current message is the initiator of the exchange. */
     kFromInitiator = 0x0200,
-    /**< Used to send a ReliableMessageProtocol message requesting an acknowledgment. */
-    kRequestAck = 0x0400,
     /**< Suppress the auto-request acknowledgment feature when sending a message. */
-    kNoAutoRequestAck = 0x0800,
+    kNoAutoRequestAck = 0x0400,
 };
 
-using SendFlags = BitFlags<uint16_t, SendMessageFlags>;
+using SendFlags = BitFlags<SendMessageFlags>;
 
 } // namespace Messaging
 } // namespace chip

@@ -25,6 +25,7 @@ jobs:
             BUILD_TYPE: gn_qpg6100
 
         runs-on: ubuntu-latest
+        if: github.actor != 'restyled-io'
 
         container:
             image: connectedhomeip/chip-build:latest
@@ -46,6 +47,9 @@ jobs:
             - name: Build example QPG6100 Lock App
               run: scripts/examples/gn_build_example.sh
                    examples/lock-app/qpg6100 out/lock_app_debug
+            - name: Build example QPG6100 Lighting App
+              run: scripts/examples/gn_build_example.sh
+                   examples/lighting-app/qpg6100 out/lighting_app_debug
             - name: Binary artifact suffix
               id: outsuffix
               uses: haya14busa/action-cond@v1.0.0
@@ -61,6 +65,7 @@ jobs:
                       steps.outsuffix.outputs.value }}
                   path: |
                       out/lock_app_debug/chip-qpg6100-lock-example.out
+                      out/lighting_app_debug/chip-qpg6100-lighting-example.out
             - name: Remove third_party binaries for CodeQL Analysis
               run: find out -type d -name "third_party" -exec rm -rf {} +
             - name: Perform CodeQL Analysis

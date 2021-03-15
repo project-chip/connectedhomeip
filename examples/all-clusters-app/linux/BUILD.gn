@@ -15,7 +15,7 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
-import("${build_root}/chip/tools.gni")
+import("${chip_root}/build/chip/tools.gni")
 
 assert(chip_build_tools)
 
@@ -28,14 +28,8 @@ config("includes") {
   ]
 }
 
-executable("all-clusters-server") {
+executable("chip-all-clusters-app") {
   sources = [ "main.cpp" ]
-
-  if (is_debug) {
-    defines = [ "BUILD_RELEASE=0" ]
-  } else {
-    defines = [ "BUILD_RELEASE=1" ]
-  }
 
   public_configs = [ ":includes" ]
 
@@ -48,5 +42,5 @@ executable("all-clusters-server") {
 }
 
 group("linux") {
-  deps = [ ":all-clusters-server" ]
+  deps = [ ":chip-all-clusters-app" ]
 }

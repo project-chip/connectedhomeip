@@ -2,23 +2,29 @@ ARG VERSION=latest
 FROM connectedhomeip/chip-build:${VERSION}
 
 # Compatible Nordic Connect SDK revision.
-ARG NCS_REVISION=v1.4.0
+ARG NCS_REVISION=v1.5.0
 
 # ==================================================
-# Common layers for nRF5 and nRF Connect SDK
+# nRF Connect SDK dependencies
 # ==================================================
 
-# Tools for flashing software on Nordic devices, and accessing device logs
+# Tools for building, flashing and accessing device logs
 RUN set -x \
-    && (mkdir -p /opt/NordicSemiconductor/nRF5_tools && cd /opt/NordicSemiconductor/nRF5_tools \
-    && curl https://www.nordicsemi.com/-/media/Software-and-other-downloads/Desktop-software/nRF-command-line-tools/sw/Versions-10-x-x/10-7-0/nRFCommandLineTools1070Linuxamd64.tar.gz \
+    && apt-get update \
+    && apt-get install --no-install-recommends -fy device-tree-compiler \
+    && (mkdir -p /opt/NordicSemiconductor/nRF5_tools/install && cd /opt/NordicSemiconductor/nRF5_tools/install \
+    && curl https://www.nordicsemi.com/-/media/Software-and-other-downloads/Desktop-software/nRF-command-line-tools/sw/Versions-10-x-x/10-12-1/nRFCommandLineTools10121Linuxamd64.tar.gz \
     | tar zxvf - \
-    && dpkg -i --force-depends JLink_Linux_*.deb \
-    && dpkg -i --force-depends nRF-Command-Line-Tools_*.deb \
-    && tar zxvf nRF-Command-Line-Tools_*.tar.gz) \
-    && rm -rf /opt/NordicSemiconductor/nRF5_tools/*.tar.gz \
-    && rm -rf /opt/NordicSemiconductor/nRF5_tools/*.deb \
+    && cd .. \
+    && tar xvf install/JLink_Linux_V688a_x86_64.tgz \
+    && tar xvf install/nRF-Command-Line-Tools_10_12_1.tar \
+    && rm -rf ./install /var/lib/apt/lists/) \
     && : # last line
+
+ENV NRF5_TOOLS_ROOT=/opt/NordicSemiconductor/nRF5_tools
+ENV PATH=${NRF5_TOOLS_ROOT}/JLink_Linux_V688a_x86_64:${PATH}
+ENV PATH=${NRF5_TOOLS_ROOT}/mergehex:${NRF5_TOOLS_ROOT}/nrfjprog:${PATH}
+ENV LD_LIBRARY_PATH=${NRF5_TOOLS_ROOT}/JLink_Linux_V688a_x86_64:${LD_LIBRARY_PATH}
 
 # GNU ARM Embedded toolchain, cross compiler for various platform builds
 RUN set -x \
@@ -27,31 +33,24 @@ RUN set -x \
     | tar jxvf -) \
     && : # last line
 
-ENV NRF5_TOOLS_ROOT=/opt/NordicSemiconductor/nRF5_tools
 ENV ARM_GCC_INSTALL_ROOT=/opt/ARM-software/gcc-arm-none-eabi-9-2019-q4-major/bin/
 
 # ==================================================
 # nRF Connect SDK
 # ==================================================
 RUN set -x \
-    # Device Tree Compiler 1.4.7
-    && curl -o /tmp/dtc.deb http://archive.ubuntu.com/ubuntu/pool/main/d/device-tree-compiler/device-tree-compiler_1.4.5-3_amd64.deb \
-    && dpkg -i /tmp/dtc.deb \
-    && (mkdir -p /opt/nrfconnect/sdk-nrf && cd /opt/nrfconnect/sdk-nrf \
-    && pip3 install --no-cache-dir setuptools wheel cmake west \
+    && (mkdir -p /opt/NordicSemiconductor/nrfconnect && cd /opt/NordicSemiconductor/nrfconnect \
+    && python3 -m pip install -U --no-cache-dir pip setuptools wheel cmake west \
     && west init -m https://github.com/nrfconnect/sdk-nrf --mr $NCS_REVISION \
     && west update \
-    && pip3 install --no-cache-dir -r zephyr/scripts/requirements.txt \
-    && pip3 install --no-cache-dir -r nrf/scripts/requirements.txt \
-    && pip3 install --no-cache-dir -r bootloader/mcuboot/scripts/requirements.txt) \
-    # Configuration
-    && echo "source /opt/nrfconnect/sdk-nrf/zephyr/zephyr-env.sh" >> ~/.bashrc \
-    # Cleanup
-    && rm -rf /tmp/* \
+    && python3 -m pip install --no-cache-dir -r zephyr/scripts/requirements.txt \
+    && python3 -m pip install --no-cache-dir -r nrf/scripts/requirements.txt \
+    && python3 -m pip install --no-cache-dir -r bootloader/mcuboot/scripts/requirements.txt) \
+    && echo "source /opt/NordicSemiconductor/nrfconnect/zephyr/zephyr-env.sh" >> ~/.bashrc \
     && : # last line
 
 ENV LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8
-ENV ZEPHYR_BASE=/opt/nrfconnect/sdk-nrf/zephyr
+ENV ZEPHYR_BASE=/opt/NordicSemiconductor/nrfconnect/zephyr
 ENV ZEPHYR_TOOLCHAIN_VARIANT=gnuarmemb
 ENV GNUARMEMB_TOOLCHAIN_PATH=/opt/ARM-software/gcc-arm-none-eabi-9-2019-q4-major

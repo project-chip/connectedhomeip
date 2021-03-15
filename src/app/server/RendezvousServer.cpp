@@ -74,9 +74,7 @@ void RendezvousServer::OnRendezvousComplete()
                    ChipLogError(AppServer, "Failed to store the connection state"));
 
     uint16_t nextKeyId = mRendezvousSession.GetNextKeyId();
-    VerifyOrReturn(CanCastTo<uint16_t>(sizeof(nextKeyId)), ChipLogError(AppServer, "Cannot cast the KeyID to uint16_t type"));
-    uint16_t size = static_cast<uint16_t>(sizeof(nextKeyId));
-    mStorage->SetKeyValue(kStorablePeerConnectionCountKey, &nextKeyId, size);
+    mStorage->SetKeyValue(kStorablePeerConnectionCountKey, &nextKeyId, sizeof(nextKeyId));
 }
 
 void RendezvousServer::OnRendezvousStatusUpdate(Status status, CHIP_ERROR err)

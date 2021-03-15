@@ -36,13 +36,6 @@ qpg6100_sdk("sdk") {
     "${examples_plat_dir}/app/include/Service.h",
     "${examples_plat_dir}/project_include/CHIPProjectConfig.h",
   ]
-
-  defines = []
-  if (is_debug) {
-    defines += [ "BUILD_RELEASE=0" ]
-  } else {
-    defines += [ "BUILD_RELEASE=1" ]
-  }
 }
 
 qpg6100_executable("lock_app") {
@@ -71,10 +64,10 @@ qpg6100_executable("lock_app") {
 
   sources = [
     "${examples_plat_dir}/app/Service.cpp",
+    "${examples_plat_dir}/app/main.cpp",
     "src/AppTask.cpp",
     "src/BoltLockManager.cpp",
     "src/ZclCallbacks.cpp",
-    "src/main.cpp",
   ]
 
   output_dir = root_out_dir
