@@ -297,11 +297,6 @@ extern const struct in6_addr in6addr_loopback;
  */
 #define SOL_SOCKET 0xfff /* options for socket level */
 
-/* Socket protocol types (TCP/UDP/RAW) */
-#define SOCK_STREAM 1
-#define SOCK_DGRAM 2
-#define SOCK_RAW 3
-
 /*
  * Option flags per-socket. These must match the SOF_ flags in ip.h (checked in init.c)
  */

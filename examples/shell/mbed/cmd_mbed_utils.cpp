@@ -407,6 +407,8 @@ int cmd_socket_echo(int argc, char ** argv)
     IPAddress addr;
     IPAddress::FromString("127.0.0.1", addr);
 
+    sock.type = Transport::Type::kUndefined;
+
     VerifyOrExit(argc == 2, error = CHIP_ERROR_INVALID_ARGUMENT);
 
     if (strcmp(argv[0], "UDP") == 0)
@@ -432,6 +434,7 @@ int cmd_socket_echo(int argc, char ** argv)
     if (err != INET_NO_ERROR)
     {
         streamer_printf(sout, "ERROR: create %s endpoint failed\r\n", argv[0]);
+        sock.type = Transport::Type::kUndefined;
         ExitNow(error = err;);
     }
 
@@ -486,6 +489,10 @@ int cmd_socket_echo(int argc, char ** argv)
     }
 
 exit:
+    if (sock.type == Transport::Type::kUdp)
+    {
+        sock.udpSocket.Close();
+    }
     return error;
 }
 

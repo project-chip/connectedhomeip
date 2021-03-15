@@ -6,41 +6,102 @@
 using namespace mbed;
 using namespace rtos;
 
-#define TCP_SOCKET SOCK_STREAM
-#define UDP_SOCKET SOCK_DGRAM
-#define SOCKET_NOT_INITIALIZED (0)
+#define SOCKET_NOT_INITIALIZED (-1)
 #define NO_FREE_SOCKET_SLOT (-1)
 
 static BSDSocket sockets[MBED_NET_SOCKET_MAX_NUMBER];
 
-ssize_t BSDSocket::read(void *, size_t)
+BSDSocket::BSDSocket()
 {
-    return 1;
+    fd       = SOCKET_NOT_INITIALIZED;
+    callback = nullptr;
+    flags    = 0;
 }
 
-ssize_t BSDSocket::write(const void *, size_t)
+BSDSocket::~BSDSocket()
 {
-    return 1;
+    close();
 }
 
-off_t BSDSocket::seek(off_t offset, int whence)
+int BSDSocket::open(int type)
 {
-    return -1;
+    InternetSocket * socket;
+    switch (type)
+    {
+    case MBED_TCP_SOCKET: {
+        socket = new (&tcpSocket) TCPSocket();
+    }
+    break;
+    case MBED_UDP_SOCKET: {
+        socket = new (&udpSocket) UDPSocket();
+    }
+    break;
+    default:
+        set_errno(ESOCKTNOSUPPORT);
+        return fd;
+    };
+
+    if (socket->open(NetworkInterface::get_default_instance()) != NSAPI_ERROR_OK)
+    {
+        close();
+        set_errno(ENOBUFS);
+        return fd;
+    }
+
+    this->type = type;
+
+    fd = bind_to_fd(this);
+    if (fd < 0)
+    {
+        close();
+        set_errno(ENFILE);
+        return fd;
+    }
+
+    flags = 0;
+    sigio([&]() {
+        flags = SOCKET_SIGIO_RX | SOCKET_SIGIO_TX;
+        if (callback)
+        {
+            callback();
+        }
+    });
+
+    return fd;
 }
 
 int BSDSocket::close()
 {
     switch (type)
     {
-    case TCP_SOCKET:
+    case MBED_TCP_SOCKET:
         tcpSocket.~TCPSocket();
-    case UDP_SOCKET:
+        break;
+    case MBED_UDP_SOCKET:
         udpSocket.~UDPSocket();
+        break;
     }
 
-    type = SOCKET_NOT_INITIALIZED;
-    _cb  = nullptr;
-    fd   = SOCKET_NOT_INITIALIZED;
+    fd       = SOCKET_NOT_INITIALIZED;
+    callback = nullptr;
+    flags    = 0;
+}
+
+ssize_t BSDSocket::read(void *, size_t)
+{
+    flags &= ~SOCKET_SIGIO_RX;
+    return 1;
+}
+
+ssize_t BSDSocket::write(const void *, size_t)
+{
+    flags &= ~SOCKET_SIGIO_TX;
+    return 1;
+}
+
+off_t BSDSocket::seek(off_t offset, int whence)
+{
+    return -ESPIPE;
 }
 
 int BSDSocket::set_blocking(bool blocking)
@@ -59,12 +120,44 @@ bool BSDSocket::is_blocking() const
 
 short BSDSocket::poll(short events) const
 {
-    return POLLIN | POLLOUT;
+    short ret      = 0;
+    uint32_t state = flags;
+
+    if ((events & POLLIN) && (state & SOCKET_SIGIO_RX))
+    {
+        ret |= POLLIN;
+    }
+
+    if ((events & POLLOUT) && (state & SOCKET_SIGIO_TX))
+    {
+        ret |= POLLOUT;
+    }
+
+    return ret;
 }
 
 void BSDSocket::sigio(Callback<void()> func)
 {
-    _cb = func;
+    callback = func;
+    if (callback && flags)
+    {
+        callback();
+    }
+}
+
+Socket * BSDSocket::getNetSocket()
+{
+    Socket * ret = nullptr;
+    switch (type)
+    {
+    case MBED_TCP_SOCKET:
+        ret = &tcpSocket;
+        break;
+    case MBED_UDP_SOCKET:
+        ret = &udpSocket;
+        break;
+    }
+    return ret;
 }
 
 nsapi_version_t Inet2Nsapi(int family, int & size)
@@ -127,20 +220,14 @@ void Sockaddr2Netsocket(SocketAddress * dst, struct sockaddr * src)
 
 static Socket * getSocket(int fd)
 {
-    Socket * ret       = nullptr;
     BSDSocket * socket = static_cast<BSDSocket *>(mbed_file_handle(fd));
 
-    if (socket != nullptr)
+    if (socket == nullptr)
     {
-        switch (socket->type)
-        {
-        case TCP_SOCKET:
-            ret = &socket->tcpSocket;
-        case UDP_SOCKET:
-            ret = &sockets->udpSocket;
-        }
+        return nullptr;
     }
-    return ret;
+
+    return socket->getNetSocket();
 }
 
 int getFreeSocketSlotIndex()
@@ -148,7 +235,7 @@ int getFreeSocketSlotIndex()
     int index = NO_FREE_SOCKET_SLOT;
     for (int i = 0; i < MBED_NET_SOCKET_MAX_NUMBER; i++)
     {
-        if (sockets[i].type == SOCKET_NOT_INITIALIZED)
+        if (sockets[i].fd == SOCKET_NOT_INITIALIZED)
         {
             index = i;
             break;
@@ -163,52 +250,12 @@ int mbed_socket(int family, int type, int proto)
     int index = getFreeSocketSlotIndex();
     if (index == NO_FREE_SOCKET_SLOT)
     {
-        set_errno(ENOMEM);
+        set_errno(ENOBUFS);
         return -1;
     }
 
     BSDSocket * socket = &sockets[index];
-
-    switch (type)
-    {
-    case TCP_SOCKET: {
-        TCPSocket * tcpSocket = new (&sockets->tcpSocket) TCPSocket();
-        if (tcpSocket->open(NetworkInterface::get_default_instance()) != NSAPI_ERROR_OK)
-        {
-            socket->close();
-            set_errno(EPROTO);
-            return fd;
-        }
-        socket->type = TCP_SOCKET;
-    }
-    break;
-    case UDP_SOCKET: {
-        UDPSocket * udpSocket = new (&socket->udpSocket) UDPSocket();
-        if (udpSocket->open(NetworkInterface::get_default_instance()) != NSAPI_ERROR_OK)
-        {
-            socket->close();
-            set_errno(EPROTO);
-            return fd;
-        }
-        socket->type = UDP_SOCKET;
-    }
-    break;
-    default:
-        break;
-    };
-
-    if (socket->type != SOCKET_NOT_INITIALIZED)
-    {
-        socket->fd = bind_to_fd(socket);
-        if (socket->fd < 0)
-        {
-            socket->close();
-            set_errno(EBADFD);
-            return fd;
-        }
-        fd = socket->fd;
-    }
-    return fd;
+    return socket->open(type);
 }
 
 int mbed_socketpair(int family, int type, int proto, int sv[2])
@@ -271,7 +318,7 @@ int mbed_accept(int fd, struct sockaddr * addr, socklen_t * addrlen)
         return -1;
     }
 
-    retFd = mbed_socket(AF_INET, TCP_SOCKET, 0);
+    retFd = mbed_socket(AF_INET, BSDSocket::MBED_TCP_SOCKET, 0);
     if (retFd < 0)
     {
         return retFd;

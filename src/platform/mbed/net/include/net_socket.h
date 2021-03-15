@@ -7,6 +7,7 @@
 #include <platform/FileHandle.h>
 #include <sys/select.h>
 #include <sys/socket.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -14,9 +15,21 @@ extern "C" {
 #define MBED_NET_SOCKET_MAX_NUMBER 5
 struct BSDSocket : public ::mbed::FileHandle
 {
-    BSDSocket() {}
-    ~BSDSocket() {}
+    enum
+    {
+        SOCKET_SIGIO_RX = 0x01,
+        SOCKET_SIGIO_TX = 0x02
+    };
 
+    enum
+    {
+        MBED_TCP_SOCKET = SOCK_STREAM,
+        MBED_UDP_SOCKET = SOCK_DGRAM
+    };
+    BSDSocket();
+    ~BSDSocket();
+
+    int open(int type);
     ssize_t read(void *, size_t) override;
     ssize_t write(const void *, size_t) override;
     off_t seek(off_t offset, int whence = SEEK_SET) override;
@@ -26,15 +39,18 @@ struct BSDSocket : public ::mbed::FileHandle
     short poll(short events) const override;
     void sigio(mbed::Callback<void()> func) override;
 
+    Socket * getNetSocket();
+
     union
     {
 
         TCPSocket tcpSocket;
         UDPSocket udpSocket;
     };
-    int type;
-    mbed::Callback<void()> _cb;
     int fd;
+    int type;
+    mbed::Callback<void()> callback;
+    uint32_t flags;
 };
 
 int mbed_socket(int family, int type, int proto);
