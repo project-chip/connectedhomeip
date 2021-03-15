@@ -26,6 +26,7 @@
 #include <openthread/cli.h>
 #include <openthread/error.h>
 #include <openthread/heap.h>
+#include <mbedtls/platform.h>
 
 #include <core/CHIPError.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -64,6 +65,8 @@ extern "C" void main_task(void const * argument)
     {
         (*pFunc)();
     }
+
+    mbedtls_platform_set_calloc_free(pvPortCallocRtos, vPortFree);
 
     /* Used for HW initializations */
     otSysInit(0, NULL);
