@@ -42,11 +42,11 @@ public:
         if (err == CHIP_NO_ERROR)
         {
             buffer[bufferSize] = 0;
-            mAsyncDelegate->OnValue(key, reinterpret_cast<const char *>(buffer));
+            mAsyncDelegate->OnPersistentStorageValue(key, reinterpret_cast<const char *>(buffer));
         }
         else
         {
-            mAsyncDelegate->OnStatus(key, chip::PersistentStorageResultDelegate::Operation::kGET, err);
+            mAsyncDelegate->OnPersistentStorageStatus(key, chip::PersistentStorageResultDelegate::Operation::kGET, err);
         }
     }
 
@@ -57,7 +57,7 @@ public:
 
         if (err != CHIP_NO_ERROR)
         {
-            mAsyncDelegate->OnStatus(key, chip::PersistentStorageResultDelegate::Operation::kSET, err);
+            mAsyncDelegate->OnPersistentStorageStatus(key, chip::PersistentStorageResultDelegate::Operation::kSET, err);
         }
     }
 

@@ -485,9 +485,9 @@ exit:
     return err;
 }
 
-void DeviceController::OnValue(const char * key, const char * value) {}
+void DeviceController::OnPersistentStorageValue(const char * key, const char * value) {}
 
-void DeviceController::OnStatus(const char * key, Operation op, CHIP_ERROR err) {}
+void DeviceController::OnPersistentStorageStatus(const char * key, Operation op, CHIP_ERROR err) {}
 
 DeviceCommissioner::DeviceCommissioner()
 {

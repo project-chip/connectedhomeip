@@ -39,11 +39,11 @@ void PythonPersistentStorageDelegate::GetKeyValue(const char * key)
     auto val = mStorage.find(key);
     if (val == mStorage.end())
     {
-        mDelegate->OnStatus(key, PersistentStorageResultDelegate::Operation::kGET, CHIP_ERROR_KEY_NOT_FOUND);
+        mDelegate->OnPersistentStorageStatus(key, PersistentStorageResultDelegate::Operation::kGET, CHIP_ERROR_KEY_NOT_FOUND);
         return;
     }
 
-    mDelegate->OnValue(key, val->second.c_str());
+    mDelegate->OnPertistentStorageValue(key, val->second.c_str());
 }
 
 CHIP_ERROR PythonPersistentStorageDelegate::GetKeyValue(const char * key, char * value, uint16_t & size)
@@ -83,13 +83,13 @@ void PythonPersistentStorageDelegate::SetKeyValue(const char * key, const char *
 {
     mStorage[key] = value;
     ChipLogDetail(Controller, "SetKeyValue: %s=%s", key, value);
-    mDelegate->OnStatus(key, PersistentStorageResultDelegate::Operation::kSET, CHIP_NO_ERROR);
+    mDelegate->OnPersistentStorageStatus(key, PersistentStorageResultDelegate::Operation::kSET, CHIP_NO_ERROR);
 }
 
 void PythonPersistentStorageDelegate::DeleteKeyValue(const char * key)
 {
     mStorage.erase(key);
-    mDelegate->OnStatus(key, PersistentStorageResultDelegate::Operation::kDELETE, CHIP_NO_ERROR);
+    mDelegate->OnPersistentStorageStatus(key, PersistentStorageResultDelegate::Operation::kDELETE, CHIP_NO_ERROR);
 }
 
 } // namespace Controller

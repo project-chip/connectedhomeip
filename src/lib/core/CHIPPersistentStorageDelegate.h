@@ -43,7 +43,7 @@ public:
      * @param[in] key Key for which the value is being returned
      * @param[in] value Value or nullptr if not found.
      */
-    virtual void OnValue(const char * key, const char * value) = 0;
+    virtual void OnPersistentStorageValue(const char * key, const char * value) = 0;
 
     /**
      * @brief
@@ -53,7 +53,7 @@ public:
      * @param[in] op Operation that was being performed on the key
      * @param[in] result CHIP_NO_ERROR or corresponding error code
      */
-    virtual void OnStatus(const char * key, Operation op, CHIP_ERROR result) = 0;
+    virtual void OnPersistentStorageStatus(const char * key, Operation op, CHIP_ERROR result) = 0;
 };
 
 class DLL_EXPORT PersistentStorageDelegate
