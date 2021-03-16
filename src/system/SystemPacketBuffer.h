@@ -380,6 +380,7 @@ private:
 #endif
 
     void AddRef();
+    bool HasSoleOwnership() const { return (this->ref == 1); }
     static void Free(PacketBuffer * aPacket);
     static PacketBuffer * FreeHead(PacketBuffer * aPacket);
 
@@ -473,6 +474,14 @@ public:
      * @return \c true if this PacketBufferHandle is empty; return \c false if it owns a PacketBuffer.
      */
     bool IsNull() const { return mBuffer == nullptr; }
+
+    /**
+     * Test whether the PacketBuffer owned by this PacketBufferHandle has unique ownership.
+     *
+     * @return \c true if the PacketBuffer owned by this PacketBufferHandle is solely owned; return \c false if
+     * it has more than one ownership.
+     */
+    bool HasSoleOwnership() const { return mBuffer->HasSoleOwnership(); }
 
     /**
      *  Detach and return the head of a buffer chain while updating this handle to point to the remaining buffers.

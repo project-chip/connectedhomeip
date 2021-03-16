@@ -543,6 +543,17 @@ INET_ERROR UDPEndPoint::SendMsg(const IPPacketInfo * pktInfo, System::PacketBuff
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 
+    if (!msg.HasSoleOwnership())
+    {
+        // when retaining a buffer, the caller expects the msg to be unmodified.
+        // LwIP stack will normally prepend the packet headers as the packet traverses
+        // the UDP/IP/netif layers, which normally modifies the packet. We need to clone
+        // msg into a fresh object in this case, and queues that for transmission, leaving
+        // the original msg available after return.
+        msg = msg.CloneData();
+        VerifyOrExit(!msg.IsNull(), res = INET_ERROR_NO_MEMORY);
+    }
+
     // Lock LwIP stack
     LOCK_TCPIP_CORE();
 
