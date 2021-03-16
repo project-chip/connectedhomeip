@@ -28,11 +28,11 @@ class MessageCounterManagerInterface
 public:
     virtual ~MessageCounterManagerInterface() {}
 
-    virtual MessageCounter & GetGlobalUnsecureCounter() = 0;
-    virtual MessageCounter & GetGlobalSecureCounter() = 0;
+    virtual MessageCounter & GetGlobalUnsecureCounter()                                     = 0;
+    virtual MessageCounter & GetGlobalSecureCounter()                                       = 0;
     virtual MessageCounter & GetLocalSessionCounter(Transport::PeerConnectionState * state) = 0;
 
-    virtual bool IsSyncCompleted(Transport::PeerConnectionState * state) = 0;
+    virtual bool IsSyncCompleted(Transport::PeerConnectionState * state)                                       = 0;
     virtual CHIP_ERROR VerifyPacket(Transport::PeerConnectionState * state, const PacketHeader & packetHeader) = 0;
 
     /**
@@ -44,13 +44,17 @@ public:
      * Called when sending a message but session message counter is not synced.  It will queue the message and start sync if the
      * sync procedure is not started yet.
      */
-    virtual CHIP_ERROR QueueSendMessageAndStartSync(SecureSessionHandle session, Transport::PeerConnectionState * state, PayloadHeader & payloadHeader, System::PacketBufferHandle msgBuf) = 0;
+    virtual CHIP_ERROR QueueSendMessageAndStartSync(SecureSessionHandle session, Transport::PeerConnectionState * state,
+                                                    PayloadHeader & payloadHeader, System::PacketBufferHandle msgBuf) = 0;
 
     /**
-     * Called when have received a message but session message counter is not synced.  It will queue the message and start sync if the
-     * sync procedure is not started yet.
+     * Called when have received a message but session message counter is not synced.  It will queue the message and start sync if
+     * the sync procedure is not started yet.
      */
-    virtual CHIP_ERROR QueueReceivedMessageAndStartSync(SecureSessionHandle session, Transport::PeerConnectionState * state, const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress, System::PacketBufferHandle msgBuf) = 0;
+    virtual CHIP_ERROR QueueReceivedMessageAndStartSync(SecureSessionHandle session, Transport::PeerConnectionState * state,
+                                                        const PacketHeader & packetHeader,
+                                                        const Transport::PeerAddress & peerAddress,
+                                                        System::PacketBufferHandle msgBuf) = 0;
 };
 
 } // namespace Transport

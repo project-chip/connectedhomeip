@@ -296,7 +296,8 @@ void StartPinging(streamer_t * stream, char * destination)
 
     if (gPingArguments.IsUsingTCP())
     {
-        err = gSessionManager.Init(kTestControllerNodeId, &DeviceLayer::SystemLayer, &gTCPManager, &admins, &gMessageCounterManager);
+        err =
+            gSessionManager.Init(kTestControllerNodeId, &DeviceLayer::SystemLayer, &gTCPManager, &admins, &gMessageCounterManager);
         SuccessOrExit(err);
 
         err = gExchangeManager.Init(kTestControllerNodeId, &gTCPManager, &gSessionManager);
@@ -304,7 +305,8 @@ void StartPinging(streamer_t * stream, char * destination)
     }
     else
     {
-        err = gSessionManager.Init(kTestControllerNodeId, &DeviceLayer::SystemLayer, &gUDPManager, &admins, &gMessageCounterManager);
+        err =
+            gSessionManager.Init(kTestControllerNodeId, &DeviceLayer::SystemLayer, &gUDPManager, &admins, &gMessageCounterManager);
         SuccessOrExit(err);
 
         err = gExchangeManager.Init(kTestControllerNodeId, &gUDPManager, &gSessionManager);

@@ -237,7 +237,9 @@ void CheckAddToReceiveTable(nlTestSuite * inSuite, void * inContext)
 
     PacketHeader packetHeader;
 
-    CHIP_ERROR err = sm.AddToReceiveTable(ctx.GetDestinationNodeId(), packetHeader, Transport::PeerAddress::UDP(ctx.GetAddress(), CHIP_PORT, INET_NULL_INTERFACEID), std::move(buffer));
+    CHIP_ERROR err =
+        sm.AddToReceiveTable(ctx.GetDestinationNodeId(), packetHeader,
+                             Transport::PeerAddress::UDP(ctx.GetAddress(), CHIP_PORT, INET_NULL_INTERFACEID), std::move(buffer));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 

@@ -65,16 +65,17 @@ SecureSessionMgr::~SecureSessionMgr()
 }
 
 CHIP_ERROR SecureSessionMgr::Init(NodeId localNodeId, System::Layer * systemLayer, TransportMgrBase * transportMgr,
-                                  Transport::AdminPairingTable * admins, Transport::MessageCounterManagerInterface * messageCounterSyncManager)
+                                  Transport::AdminPairingTable * admins,
+                                  Transport::MessageCounterManagerInterface * messageCounterSyncManager)
 {
     VerifyOrReturnError(mState == State::kNotReady, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(transportMgr != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    mState        = State::kInitialized;
-    mLocalNodeId  = localNodeId;
-    mSystemLayer  = systemLayer;
-    mTransportMgr = transportMgr;
-    mAdmins       = admins;
+    mState                 = State::kInitialized;
+    mLocalNodeId           = localNodeId;
+    mSystemLayer           = systemLayer;
+    mTransportMgr          = transportMgr;
+    mAdmins                = admins;
     mMessageCounterManager = messageCounterSyncManager;
 
     ChipLogProgress(Inet, "local node id is %llu\n", mLocalNodeId);
@@ -137,7 +138,8 @@ CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHea
     }
     else
     {
-        return SendMessage(session, payloadHeader, unusedPacketHeader, std::move(msgBuf), bufferRetainSlot, EncryptionState::kPayloadIsUnencrypted);
+        return SendMessage(session, payloadHeader, unusedPacketHeader, std::move(msgBuf), bufferRetainSlot,
+                           EncryptionState::kPayloadIsUnencrypted);
     }
 }
 
@@ -198,7 +200,8 @@ CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHea
 
     if (encryptionState == EncryptionState::kPayloadIsUnencrypted)
     {
-        MessageCounter & counter = IsControlMessage(payloadHeader) ? mMessageCounterManager->GetGlobalSecureCounter() : mMessageCounterManager->GetLocalSessionCounter(state);
+        MessageCounter & counter = IsControlMessage(payloadHeader) ? mMessageCounterManager->GetGlobalSecureCounter()
+                                                                   : mMessageCounterManager->GetLocalSessionCounter(state);
         err = SecureMessageCodec::Encode(localNodeId, state, payloadHeader, packetHeader, msgBuf, counter);
         SuccessOrExit(err);
     }
@@ -366,15 +369,21 @@ void SecureSessionMgr::OnMessageReceived(const PacketHeader & packetHeader, cons
         }
         else
         {
-            // TODO: "initial Session Establishment bootstrap" is under specified, use message counter sync protocol for both group and unicast messages
+            // TODO: "initial Session Establishment bootstrap" is under specified, use message counter sync protocol for both group
+            // and unicast messages
             if (!mMessageCounterManager->IsSyncCompleted(state))
             {
                 // Queue and start message sync procedure
-                err = mMessageCounterManager->QueueReceivedMessageAndStartSync({ state->GetPeerNodeId(), state->GetPeerKeyID(), state->GetAdminId() }, state, packetHeader, peerAddress, std::move(msg));
+                err = mMessageCounterManager->QueueReceivedMessageAndStartSync(
+                    { state->GetPeerNodeId(), state->GetPeerKeyID(), state->GetAdminId() }, state, packetHeader, peerAddress,
+                    std::move(msg));
 
                 if (err != CHIP_NO_ERROR)
                 {
-                    ChipLogError(Inet, "Message counter synchronization for received message, failed to QueueReceivedMessageAndStartSync, err = %d", err);
+                    ChipLogError(Inet,
+                                 "Message counter synchronization for received message, failed to "
+                                 "QueueReceivedMessageAndStartSync, err = %d",
+                                 err);
                 }
 
                 return;

@@ -99,7 +99,8 @@ CHIP_ERROR MessageCounterManager::StartSync(SecureSessionHandle session, Transpo
     return err;
 }
 
-CHIP_ERROR MessageCounterManager::QueueSendMessageAndStartSync(SecureSessionHandle session, Transport::PeerConnectionState * state, PayloadHeader & payloadHeader, System::PacketBufferHandle msgBuf)
+CHIP_ERROR MessageCounterManager::QueueSendMessageAndStartSync(SecureSessionHandle session, Transport::PeerConnectionState * state,
+                                                               PayloadHeader & payloadHeader, System::PacketBufferHandle msgBuf)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -113,7 +114,11 @@ CHIP_ERROR MessageCounterManager::QueueSendMessageAndStartSync(SecureSessionHand
     return err;
 }
 
-CHIP_ERROR MessageCounterManager::QueueReceivedMessageAndStartSync(SecureSessionHandle session, Transport::PeerConnectionState * state, const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress, System::PacketBufferHandle msgBuf)
+CHIP_ERROR MessageCounterManager::QueueReceivedMessageAndStartSync(SecureSessionHandle session,
+                                                                   Transport::PeerConnectionState * state,
+                                                                   const PacketHeader & packetHeader,
+                                                                   const Transport::PeerAddress & peerAddress,
+                                                                   System::PacketBufferHandle msgBuf)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -163,7 +168,8 @@ void MessageCounterManager::OnResponseTimeout(Messaging::ExchangeContext * excha
         exchangeContext->Close();
 }
 
-CHIP_ERROR MessageCounterManager::AddToRetransmissionTable(SecureSessionHandle session, NodeId peerNodeId, PayloadHeader & payloadHeader, System::PacketBufferHandle msgBuf)
+CHIP_ERROR MessageCounterManager::AddToRetransmissionTable(SecureSessionHandle session, NodeId peerNodeId,
+                                                           PayloadHeader & payloadHeader, System::PacketBufferHandle msgBuf)
 {
     bool added     = false;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -176,8 +182,8 @@ CHIP_ERROR MessageCounterManager::AddToRetransmissionTable(SecureSessionHandle s
             entry.session       = session;
             entry.peerNodeId    = peerNodeId;
             entry.payloadHeader = payloadHeader;
-            entry.msgBuf          = std::move(msgBuf);
-            added = true;
+            entry.msgBuf        = std::move(msgBuf);
+            added               = true;
 
             break;
         }
@@ -210,8 +216,8 @@ void MessageCounterManager::RetransPendingMessages(NodeId peerNodeId)
         if (entry.peerNodeId == peerNodeId)
         {
             // Retramsmit message.
-            CHIP_ERROR err = secureSessionMgr->SendMessage(entry.session, entry.payloadHeader, std::move(entry.msgBuf));
-            entry.msgBuf = nullptr;
+            CHIP_ERROR err   = secureSessionMgr->SendMessage(entry.session, entry.payloadHeader, std::move(entry.msgBuf));
+            entry.msgBuf     = nullptr;
             entry.peerNodeId = kUndefinedNodeId;
 
             if (err != CHIP_NO_ERROR)
@@ -219,12 +225,12 @@ void MessageCounterManager::RetransPendingMessages(NodeId peerNodeId)
                 ChipLogError(ExchangeManager, "Failed to resend cached group message to node: %d with error:%s", peerNodeId,
                              ErrorStr(err));
             }
-
         }
     }
 }
 
-CHIP_ERROR MessageCounterManager::AddToReceiveTable(NodeId peerNodeId, const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress, System::PacketBufferHandle msgBuf)
+CHIP_ERROR MessageCounterManager::AddToReceiveTable(NodeId peerNodeId, const PacketHeader & packetHeader,
+                                                    const Transport::PeerAddress & peerAddress, System::PacketBufferHandle msgBuf)
 {
     bool added     = false;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -234,11 +240,11 @@ CHIP_ERROR MessageCounterManager::AddToReceiveTable(NodeId peerNodeId, const Pac
         // Entries are in use if they have a message buffer.
         if (entry.peerNodeId == kUndefinedNodeId)
         {
-            entry.peerNodeId    = peerNodeId;
-            entry.packetHeader  = packetHeader;
-            entry.peerAddress   = peerAddress;
-            entry.msgBuf        = std::move(msgBuf);
-            added               = true;
+            entry.peerNodeId   = peerNodeId;
+            entry.packetHeader = packetHeader;
+            entry.peerAddress  = peerAddress;
+            entry.msgBuf       = std::move(msgBuf);
+            added              = true;
 
             break;
         }
@@ -277,7 +283,7 @@ void MessageCounterManager::ProcessPendingMessages(NodeId peerNodeId)
             // HandleGroupMessageReceived() call should really handle this, but
             // just in case it messes up we don't want to get confused about
             // wheter the entry is in use.
-            entry.msgBuf = nullptr;
+            entry.msgBuf     = nullptr;
             entry.peerNodeId = kUndefinedNodeId;
         }
     }
@@ -342,7 +348,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR MessageCounterManager::SendMsgCounterSyncResp(Messaging::ExchangeContext * exchangeContext, SecureSessionHandle session, std::array<uint8_t, kChallengeSize> challenge)
+CHIP_ERROR MessageCounterManager::SendMsgCounterSyncResp(Messaging::ExchangeContext * exchangeContext, SecureSessionHandle session,
+                                                         std::array<uint8_t, kChallengeSize> challenge)
 {
     CHIP_ERROR err                         = CHIP_NO_ERROR;
     Transport::PeerConnectionState * state = nullptr;
@@ -375,7 +382,8 @@ CHIP_ERROR MessageCounterManager::SendMsgCounterSyncResp(Messaging::ExchangeCont
     msgBuf->SetDataLength(kSyncRespMsgSize);
 
     // Send message counter synchronization response message.
-    err = exchangeContext->SendMessage(Protocols::SecureChannel::MsgType::MsgCounterSyncRsp, std::move(msgBuf), Messaging::SendFlags(Messaging::SendMessageFlags::kNoAutoRequestAck));
+    err = exchangeContext->SendMessage(Protocols::SecureChannel::MsgType::MsgCounterSyncRsp, std::move(msgBuf),
+                                       Messaging::SendFlags(Messaging::SendMessageFlags::kNoAutoRequestAck));
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -405,7 +413,8 @@ void MessageCounterManager::HandleMsgCounterSyncReq(Messaging::ExchangeContext *
     memcpy(challenge.data(), req, kChallengeSize);
 
     // Respond with MsgCounterSyncResp
-    err = SendMsgCounterSyncResp(exchangeContext, { packetHeader.GetSourceNodeId().Value(), packetHeader.GetEncryptionKeyID(), 0 }, challenge);
+    err = SendMsgCounterSyncResp(exchangeContext, { packetHeader.GetSourceNodeId().Value(), packetHeader.GetEncryptionKeyID(), 0 },
+                                 challenge);
 
 exit:
     if (err != CHIP_NO_ERROR)

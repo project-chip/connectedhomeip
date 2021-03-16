@@ -294,9 +294,9 @@ private:
     Transport::PeerConnections<CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE> mPeerConnections; // < Active connections to other peers
     State mState;                                                                       // < Initialization state of the object
 
-    SecureSessionMgrDelegate * mCB         = nullptr;
-    TransportMgrBase * mTransportMgr       = nullptr;
-    Transport::AdminPairingTable * mAdmins = nullptr;
+    SecureSessionMgrDelegate * mCB                                     = nullptr;
+    TransportMgrBase * mTransportMgr                                   = nullptr;
+    Transport::AdminPairingTable * mAdmins                             = nullptr;
     Transport::MessageCounterManagerInterface * mMessageCounterManager = nullptr;
 
     CHIP_ERROR SendMessage(SecureSessionHandle session, PayloadHeader & payloadHeader, PacketHeader & packetHeader,
@@ -321,7 +321,8 @@ private:
 
     static bool IsControlMessage(PayloadHeader & payloadHeader)
     {
-        return payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::MsgCounterSyncReq) || payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::MsgCounterSyncRsp);
+        return payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::MsgCounterSyncReq) ||
+            payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::MsgCounterSyncRsp);
     }
 };
 

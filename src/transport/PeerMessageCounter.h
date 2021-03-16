@@ -32,8 +32,8 @@ class PeerMessageCounter
 public:
     static constexpr size_t kChallengeSize = 8;
 
-    PeerMessageCounter() : mStatus(Status::NotSync) { }
-    ~PeerMessageCounter() { }
+    PeerMessageCounter() : mStatus(Status::NotSync) {}
+    ~PeerMessageCounter() {}
 
     void Reset() { mStatus = Status::NotSync; }
 
@@ -43,7 +43,7 @@ public:
 
     void StartSync(std::array<uint8_t, kChallengeSize> challenge)
     {
-        mStatus = Status::SyncInProcess;
+        mStatus                   = Status::SyncInProcess;
         mSyncInProcess.mChallenge = challenge;
     }
 
@@ -51,10 +51,12 @@ public:
 
     CHIP_ERROR VerifyChallenge(uint32_t counter, std::array<uint8_t, kChallengeSize> challenge)
     {
-        if (mStatus != Status::SyncInProcess) return CHIP_ERROR_INCORRECT_STATE;
-        if (mSyncInProcess.mChallenge != challenge) return CHIP_ERROR_INVALID_ARGUMENT;
+        if (mStatus != Status::SyncInProcess)
+            return CHIP_ERROR_INCORRECT_STATE;
+        if (mSyncInProcess.mChallenge != challenge)
+            return CHIP_ERROR_INVALID_ARGUMENT;
 
-        mStatus = Status::Synced;
+        mStatus             = Status::Synced;
         mSynced.mMaxCounter = counter - 1;
         mSynced.mWindow.set();
         return CHIP_NO_ERROR;
@@ -66,38 +68,47 @@ public:
      */
     CHIP_ERROR Verify(uint32_t counter)
     {
-        if (mStatus != Status::Synced) return CHIP_ERROR_INCORRECT_STATE;
+        if (mStatus != Status::Synced)
+            return CHIP_ERROR_INCORRECT_STATE;
 
         uint32_t diff = counter - mSynced.mMaxCounter;
-        if (diff == 0) return CHIP_ERROR_INVALID_ARGUMENT; // duplicated, max counter has already been received
+        if (diff == 0)
+            return CHIP_ERROR_INVALID_ARGUMENT; // duplicated, max counter has already been received
 
         if (diff >= 0x80000000u)
         {
             uint32_t offset = 0xFFFFFFFFu - diff;
-            if (offset >= CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE) return CHIP_ERROR_INVALID_ARGUMENT; // outside valid range
-            if (mSynced.mWindow.test(offset)) return CHIP_ERROR_INVALID_ARGUMENT; // duplicated, in window
+            if (offset >= CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE)
+                return CHIP_ERROR_INVALID_ARGUMENT; // outside valid range
+            if (mSynced.mWindow.test(offset))
+                return CHIP_ERROR_INVALID_ARGUMENT; // duplicated, in window
         }
 
         // advance max counter by `diff`
         mSynced.mMaxCounter = counter;
         mSynced.mWindow <<= diff;
-        if (diff <= CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE) mSynced.mWindow.set(diff - 1); // set bit represents old max counter
+        if (diff <= CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE)
+            mSynced.mWindow.set(diff - 1); // set bit represents old max counter
         return CHIP_NO_ERROR;
     }
 
 private:
-    enum class Status {
+    enum class Status
+    {
         NotSync,
         SyncInProcess,
         Synced,
     } mStatus;
 
-    union {
-        struct {
+    union
+    {
+        struct
+        {
             std::array<uint8_t, kChallengeSize> mChallenge;
         } mSyncInProcess;
 
-        struct {
+        struct
+        {
             /*
              *  Past <--                         --> Future
              *                 MaxCounter

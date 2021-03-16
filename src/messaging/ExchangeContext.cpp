@@ -79,7 +79,7 @@ void ExchangeContext::SetResponseTimeout(Timeout timeout)
 CHIP_ERROR ExchangeContext::SendMessage(uint16_t protocolId, uint8_t msgType, PacketBufferHandle msgBuf,
                                         const SendFlags & sendFlags)
 {
-    CHIP_ERROR err                         = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     PayloadHeader payloadHeader;
     Transport::PeerConnectionState * state = nullptr;
 

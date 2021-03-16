@@ -33,10 +33,12 @@ class ExchangeManager;
 class MessageCounterManager : public Messaging::ExchangeDelegate, public Transport::MessageCounterManagerInterface
 {
 public:
-    static constexpr uint16_t kChallengeSize   = Transport::PeerMessageCounter::kChallengeSize;
-    static constexpr uint16_t kCounterSize     = 4;
-    static constexpr uint16_t kSyncRespMsgSize = kChallengeSize + kCounterSize;  // The size of the message counter synchronization response message.
-    static constexpr uint32_t kSyncTimeout     = 500; // The amount of time(in milliseconds) which a peer is given to respond to a message counter synchronization request.
+    static constexpr uint16_t kChallengeSize = Transport::PeerMessageCounter::kChallengeSize;
+    static constexpr uint16_t kCounterSize   = 4;
+    static constexpr uint16_t kSyncRespMsgSize =
+        kChallengeSize + kCounterSize; // The size of the message counter synchronization response message.
+    static constexpr uint32_t kSyncTimeout =
+        500; // The amount of time(in milliseconds) which a peer is given to respond to a message counter synchronization request.
 
     MessageCounterManager() : mExchangeMgr(nullptr) {}
     ~MessageCounterManager() override {}
@@ -53,8 +55,11 @@ public:
     CHIP_ERROR VerifyPacket(Transport::PeerConnectionState * state, const PacketHeader & packetHeader) override;
 
     CHIP_ERROR StartSync(SecureSessionHandle session, Transport::PeerConnectionState * state) override;
-    CHIP_ERROR QueueSendMessageAndStartSync(SecureSessionHandle session, Transport::PeerConnectionState * state, PayloadHeader & payloadHeader, System::PacketBufferHandle msgBuf) override;
-    CHIP_ERROR QueueReceivedMessageAndStartSync(SecureSessionHandle session, Transport::PeerConnectionState * state, const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress, System::PacketBufferHandle msgBuf) override;
+    CHIP_ERROR QueueSendMessageAndStartSync(SecureSessionHandle session, Transport::PeerConnectionState * state,
+                                            PayloadHeader & payloadHeader, System::PacketBufferHandle msgBuf) override;
+    CHIP_ERROR QueueReceivedMessageAndStartSync(SecureSessionHandle session, Transport::PeerConnectionState * state,
+                                                const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
+                                                System::PacketBufferHandle msgBuf) override;
 
     /**
      * Send peer message counter synchronization request.
@@ -87,7 +92,8 @@ public:
      *  @retval  #CHIP_ERROR_NO_MEMORY If there is no empty slot left in the table for addition.
      *  @retval  #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR AddToRetransmissionTable(SecureSessionHandle session, NodeId peerNodeId, PayloadHeader & payloadHeader, System::PacketBufferHandle msgBuf);
+    CHIP_ERROR AddToRetransmissionTable(SecureSessionHandle session, NodeId peerNodeId, PayloadHeader & payloadHeader,
+                                        System::PacketBufferHandle msgBuf);
 
     /**
      *  Add a CHIP message into the cache table to queue the incoming messages that trigger message counter synchronization
@@ -101,7 +107,8 @@ public:
      *  @retval  #CHIP_ERROR_NO_MEMORY If there is no empty slot left in the table for addition.
      *  @retval  #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR AddToReceiveTable(NodeId peerNodeId, const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress, System::PacketBufferHandle msgBuf);
+    CHIP_ERROR AddToReceiveTable(NodeId peerNodeId, const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
+                                 System::PacketBufferHandle msgBuf);
 
 private:
     GlobalUnencryptedMessageCounter mGlobalUnencryptedMessageCounter;
@@ -161,7 +168,8 @@ private:
 
     CHIP_ERROR NewMsgCounterSyncExchange(SecureSessionHandle session, Messaging::ExchangeContext *& exchangeContext);
 
-    CHIP_ERROR SendMsgCounterSyncResp(Messaging::ExchangeContext * exchangeContext, SecureSessionHandle session, std::array<uint8_t, kChallengeSize> challenge);
+    CHIP_ERROR SendMsgCounterSyncResp(Messaging::ExchangeContext * exchangeContext, SecureSessionHandle session,
+                                      std::array<uint8_t, kChallengeSize> challenge);
 
     void HandleMsgCounterSyncReq(Messaging::ExchangeContext * exchangeContext, const PacketHeader & packetHeader,
                                  System::PacketBufferHandle msgBuf);

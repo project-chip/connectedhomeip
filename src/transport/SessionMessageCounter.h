@@ -42,6 +42,7 @@ public:
 
     MessageCounter & GetLocalMessageCounter() { return mLocalMessageCounter; }
     PeerMessageCounter & GetPeerMessageCounter() { return mPeerMessageCounter; }
+
 private:
     LocalSessionMessageCounter mLocalMessageCounter;
     PeerMessageCounter mPeerMessageCounter;

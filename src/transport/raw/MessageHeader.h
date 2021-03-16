@@ -89,8 +89,8 @@ enum class FlagValues : uint16_t
 
 };
 
-using Flags         = BitFlags<FlagValues>;
-using ExFlags       = BitFlags<ExFlagValues>;
+using Flags   = BitFlags<FlagValues>;
+using ExFlags = BitFlags<ExFlagValues>;
 
 // Header is a 16-bit value of the form
 //  |  4 bit  | 4 bit |8 bit Security Flags|

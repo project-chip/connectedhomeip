@@ -218,7 +218,8 @@ int main(int argc, char * argv[])
                                      .SetListenPort(IM_CLIENT_PORT));
     SuccessOrExit(err);
 
-    err = gSessionManager.Init(chip::kTestControllerNodeId, &chip::DeviceLayer::SystemLayer, &gTransportManager, &admins, &gMessageCounterManager);
+    err = gSessionManager.Init(chip::kTestControllerNodeId, &chip::DeviceLayer::SystemLayer, &gTransportManager, &admins,
+                               &gMessageCounterManager);
     SuccessOrExit(err);
 
     err = gExchangeManager.Init(chip::kTestControllerNodeId, &gTransportManager, &gSessionManager);

@@ -31,14 +31,30 @@ public:
 
     MessageCounter & GetGlobalUnsecureCounter() override { return mGlobalUnencryptedMessageCounter; }
     MessageCounter & GetGlobalSecureCounter() override { return mGlobalEncryptedMessageCounter; }
-    MessageCounter & GetLocalSessionCounter(Transport::PeerConnectionState * state) override { return state->GetSessionMessageCounter().GetLocalMessageCounter(); }
+    MessageCounter & GetLocalSessionCounter(Transport::PeerConnectionState * state) override
+    {
+        return state->GetSessionMessageCounter().GetLocalMessageCounter();
+    }
 
     bool IsSyncCompleted(Transport::PeerConnectionState * state) override { return true; }
-    CHIP_ERROR VerifyPacket(Transport::PeerConnectionState * state, const PacketHeader & packetHeader) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR VerifyPacket(Transport::PeerConnectionState * state, const PacketHeader & packetHeader) override
+    {
+        return CHIP_NO_ERROR;
+    }
 
     CHIP_ERROR StartSync(SecureSessionHandle session, Transport::PeerConnectionState * state) override { return CHIP_NO_ERROR; }
-    CHIP_ERROR QueueSendMessageAndStartSync(SecureSessionHandle session, Transport::PeerConnectionState * state, PayloadHeader & payloadHeader, System::PacketBufferHandle msgBuf) override { return CHIP_NO_ERROR; }
-    CHIP_ERROR QueueReceivedMessageAndStartSync(SecureSessionHandle session, Transport::PeerConnectionState * state, const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress, System::PacketBufferHandle msgBuf) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR QueueSendMessageAndStartSync(SecureSessionHandle session, Transport::PeerConnectionState * state,
+                                            PayloadHeader & payloadHeader, System::PacketBufferHandle msgBuf) override
+    {
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR QueueReceivedMessageAndStartSync(SecureSessionHandle session, Transport::PeerConnectionState * state,
+                                                const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
+                                                System::PacketBufferHandle msgBuf) override
+    {
+        return CHIP_NO_ERROR;
+    }
+
 private:
     GlobalUnencryptedMessageCounter mGlobalUnencryptedMessageCounter;
     GlobalEncryptedMessageCounter mGlobalEncryptedMessageCounter;

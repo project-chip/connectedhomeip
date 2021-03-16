@@ -38,16 +38,19 @@ CHIP_ERROR MessagingContext::Init(nlTestSuite * suite, TransportMgrBase * transp
 
     if (useDummyMessageCounter)
     {
-        ReturnErrorOnFailure(mSecureSessionMgr.Init(GetSourceNodeId(), &GetSystemLayer(), transport, &mAdmins, &mDummyMessageCounterManager));
+        ReturnErrorOnFailure(
+            mSecureSessionMgr.Init(GetSourceNodeId(), &GetSystemLayer(), transport, &mAdmins, &mDummyMessageCounterManager));
     }
     else
     {
-        ReturnErrorOnFailure(mSecureSessionMgr.Init(GetSourceNodeId(), &GetSystemLayer(), transport, &mAdmins, &mMessageCounterManager));
+        ReturnErrorOnFailure(
+            mSecureSessionMgr.Init(GetSourceNodeId(), &GetSystemLayer(), transport, &mAdmins, &mMessageCounterManager));
     }
 
     ReturnErrorOnFailure(mExchangeManager.Init(GetSourceNodeId(), transport, &mSecureSessionMgr));
 
-    if (!useDummyMessageCounter) ReturnErrorOnFailure(mMessageCounterManager.Init(&mExchangeManager));
+    if (!useDummyMessageCounter)
+        ReturnErrorOnFailure(mMessageCounterManager.Init(&mExchangeManager));
 
     ReturnErrorOnFailure(mSecureSessionMgr.NewPairing(mPeer, GetDestinationNodeId(), &mPairingLocalToPeer,
                                                       SecureSessionMgr::PairingDirection::kInitiator, mSrcAdminId));

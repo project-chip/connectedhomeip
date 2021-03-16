@@ -28,7 +28,7 @@
 
 namespace chip {
 
-GlobalUnencryptedMessageCounter::GlobalUnencryptedMessageCounter() : value(GetRandU32()) { }
+GlobalUnencryptedMessageCounter::GlobalUnencryptedMessageCounter() : value(GetRandU32()) {}
 
 CHIP_ERROR GlobalEncryptedMessageCounter::Init()
 {

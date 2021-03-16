@@ -39,7 +39,8 @@ namespace chip {
 class MessageCounter
 {
 public:
-    enum Type : uint8_t {
+    enum Type : uint8_t
+    {
         GlobalUnencrypted,
         GlobalEncrypted,
         Session,
@@ -47,22 +48,24 @@ public:
 
     virtual ~MessageCounter() = 0;
 
-    virtual Type GetType() = 0;
-    virtual void Reset() = 0;
-    virtual uint32_t Value() = 0; /** Get current value */
+    virtual Type GetType()     = 0;
+    virtual void Reset()       = 0;
+    virtual uint32_t Value()   = 0; /** Get current value */
     virtual uint32_t Advance() = 0; /** Advance the counter and get new value */
 };
 
-inline MessageCounter::~MessageCounter() { }
+inline MessageCounter::~MessageCounter() {}
 
 class GlobalUnencryptedMessageCounter : public MessageCounter
 {
 public:
     GlobalUnencryptedMessageCounter();
-    ~GlobalUnencryptedMessageCounter() override { }
+    ~GlobalUnencryptedMessageCounter() override {}
 
     Type GetType() override { return GlobalUnencrypted; }
-    void Reset() override { /* null op */ }
+    void Reset() override
+    { /* null op */
+    }
     uint32_t Value() override { return value; }
     uint32_t Advance() override { return ++value; }
 
@@ -73,12 +76,14 @@ private:
 class GlobalEncryptedMessageCounter : public MessageCounter
 {
 public:
-    GlobalEncryptedMessageCounter() { }
-    ~GlobalEncryptedMessageCounter() override { }
+    GlobalEncryptedMessageCounter() {}
+    ~GlobalEncryptedMessageCounter() override {}
 
     CHIP_ERROR Init();
     Type GetType() override { return GlobalEncrypted; }
-    void Reset() override { /* null op */ }
+    void Reset() override
+    { /* null op */
+    }
     uint32_t Value() override { return persisted.GetValue(); }
     uint32_t Advance() override { return static_cast<uint32_t>(persisted.Advance()); }
 
@@ -89,8 +94,8 @@ private:
 class LocalSessionMessageCounter : public MessageCounter
 {
 public:
-    LocalSessionMessageCounter() : value(0) { }
-    ~LocalSessionMessageCounter() override { }
+    LocalSessionMessageCounter() : value(0) {}
+    ~LocalSessionMessageCounter() override {}
 
     Type GetType() override { return Session; }
     void Reset() override { value = 0; }
