@@ -58,12 +58,12 @@ static LEDWidget sLockLED(MBED_CONF_APP_LOCK_STATE_LED);
 static mbed::InterruptIn sLockButton(LOCK_BUTTON);
 static mbed::InterruptIn sFunctionButton(FUNCTION_BUTTON);
 
-static bool sIsThreadProvisioned     = false;
-static bool sIsThreadEnabled         = false;
-static bool sIsThreadAttached        = false;
-static bool sIsPairedToAccount       = false;
-static bool sHaveBLEConnections      = false;
-static bool sHaveServiceConnectivity = false;
+static bool sIsWiFiStationProvisioned = false;
+static bool sIsWiFiStationEnabled     = false;
+static bool sIsWiFiStationConnected   = false;
+static bool sIsPairedToAccount        = false;
+static bool sHaveBLEConnections       = false;
+static bool sHaveServiceConnectivity  = false;
 
 static mbed::Timeout sFunctionTimer;
 
@@ -98,6 +98,8 @@ int AppTask::Init()
     ConnectivityMgr().SetBLEDeviceName(MBED_CONF_APP_DEVICE_NAME);
 #endif
 
+    chip::DeviceLayer::ConnectivityMgrImpl().StartWiFiManagement();
+
     // Init ZCL Data Model and start server
     InitServer();
     ConfigurationMgr().LogDeviceConfig();
@@ -129,11 +131,11 @@ int AppTask::StartApp()
 
         if (PlatformMgr().TryLockChipStack())
         {
-            sIsThreadProvisioned     = ConnectivityMgr().IsThreadProvisioned();
-            sIsThreadEnabled         = ConnectivityMgr().IsThreadEnabled();
-            sIsThreadAttached        = ConnectivityMgr().IsThreadAttached();
-            sHaveBLEConnections      = (ConnectivityMgr().NumBLEConnections() != 0);
-            sHaveServiceConnectivity = ConnectivityMgr().HaveServiceConnectivity();
+            sIsWiFiStationProvisioned = ConnectivityMgr().IsWiFiStationProvisioned();
+            sIsWiFiStationEnabled     = ConnectivityMgr().IsWiFiStationEnabled();
+            sIsWiFiStationConnected   = ConnectivityMgr().IsWiFiStationConnected();
+            sHaveBLEConnections       = (ConnectivityMgr().NumBLEConnections() != 0);
+            sHaveServiceConnectivity  = ConnectivityMgr().HaveServiceConnectivity();
             PlatformMgr().UnlockChipStack();
         }
 
@@ -159,7 +161,8 @@ int AppTask::StartApp()
             {
                 sStatusLED.Set(true);
             }
-            else if (sIsThreadProvisioned && sIsThreadEnabled && sIsPairedToAccount && (!sIsThreadAttached || !isFullyConnected))
+            else if (sIsWiFiStationProvisioned && sIsWiFiStationEnabled && sIsPairedToAccount &&
+                     (!sIsWiFiStationConnected || !isFullyConnected))
             {
                 sStatusLED.Blink(950, 50);
             }
