@@ -40,8 +40,8 @@ apt-get install -fy \
     wget \
     libdbus-1-dev \
     libmbedtls-dev \
-	python3.8-venv \
-	python3.8-dev
+    python3.8-venv \
+    python3.8-dev
 
 if [[ ! -f 'ci-cache-persistent/openssl/open_ssl_1.1.1f_installed' ]]; then
     mkdir -p ci-cache-persistent/openssl
