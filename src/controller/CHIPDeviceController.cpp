@@ -508,13 +508,22 @@ CHIP_ERROR DeviceCommissioner::Init(NodeId localDeviceId, PersistentStorageDeleg
 {
     ReturnErrorOnFailure(DeviceController::Init(localDeviceId, storageDelegate, systemLayer, inetLayer));
 
-    char keyIDStr[kMaxKeyIDStringSize];
-    uint16_t size  = sizeof(keyIDStr);
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    PERSISTENT_KEY_OP(static_cast<uint64_t>(0), kNextAvailableKeyID, key, err = mStorageDelegate->GetKeyValue(key, keyIDStr, size));
-    if (err != CHIP_NO_ERROR || !ArgParser::ParseInt(keyIDStr, mNextKeyId))
+    if (mStorageDelegate != nullptr)
     {
-        // If the persistent storage didn't have a stored KeyID value
+        char keyIDStr[kMaxKeyIDStringSize];
+        uint16_t size  = sizeof(keyIDStr);
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        PERSISTENT_KEY_OP(static_cast<uint64_t>(0), kNextAvailableKeyID, key,
+                          err = mStorageDelegate->GetKeyValue(key, keyIDStr, size));
+        if (err != CHIP_NO_ERROR || !ArgParser::ParseInt(keyIDStr, mNextKeyId))
+        {
+            // If the persistent storage didn't have a stored KeyID value
+            mNextKeyId = 0;
+        }
+    }
+    else
+    {
+        // If there is no persistent storage
         mNextKeyId = 0;
     }
 
