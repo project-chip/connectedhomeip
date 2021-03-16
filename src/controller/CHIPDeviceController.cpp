@@ -126,7 +126,7 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, PersistentStorageDelegat
 
     if (mStorageDelegate != nullptr)
     {
-        mStorageDelegate->SetDelegate(this);
+        mStorageDelegate->SetStorageDelegate(this);
     }
 
     mTransportMgr   = chip::Platform::New<DeviceTransportMgr>();
@@ -193,7 +193,7 @@ CHIP_ERROR DeviceController::Shutdown()
 
     if (mStorageDelegate != nullptr)
     {
-        mStorageDelegate->SetDelegate(nullptr);
+        mStorageDelegate->SetStorageDelegate(nullptr);
         mStorageDelegate = nullptr;
     }
 
@@ -287,7 +287,7 @@ CHIP_ERROR DeviceController::GetDevice(NodeId deviceId, Device ** out_device)
             VerifyOrExit(buffer != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
             PERSISTENT_KEY_OP(static_cast<uint64_t>(0), kPairedDeviceListKeyPrefix, key,
-                              err = mStorageDelegate->GetKeyValue(key, buffer, size));
+                              err = mStorageDelegate->SyncGetKeyValue(key, buffer, size));
             SuccessOrExit(err);
             VerifyOrExit(size <= max_size, err = CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR);
 
@@ -306,7 +306,7 @@ CHIP_ERROR DeviceController::GetDevice(NodeId deviceId, Device ** out_device)
             uint16_t size = sizeof(deviceInfo.inner);
 
             PERSISTENT_KEY_OP(deviceId, kPairedDeviceKeyPrefix, key,
-                              err = mStorageDelegate->GetKeyValue(key, Uint8::to_char(deviceInfo.inner), size));
+                              err = mStorageDelegate->SyncGetKeyValue(key, Uint8::to_char(deviceInfo.inner), size));
             SuccessOrExit(err);
             VerifyOrExit(size <= sizeof(deviceInfo.inner), err = CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR);
 
@@ -485,9 +485,9 @@ exit:
     return err;
 }
 
-void DeviceController::OnValue(const char * key, const char * value) {}
+void DeviceController::OnPersistentStorageValue(const char * key, const char * value) {}
 
-void DeviceController::OnStatus(const char * key, Operation op, CHIP_ERROR err) {}
+void DeviceController::OnPersistentStorageStatus(const char * key, Operation op, CHIP_ERROR err) {}
 
 DeviceCommissioner::DeviceCommissioner()
 {
@@ -671,7 +671,7 @@ CHIP_ERROR DeviceCommissioner::UnpairDevice(NodeId remoteDeviceId)
 
     if (mStorageDelegate != nullptr)
     {
-        PERSISTENT_KEY_OP(remoteDeviceId, kPairedDeviceKeyPrefix, key, mStorageDelegate->DeleteKeyValue(key));
+        PERSISTENT_KEY_OP(remoteDeviceId, kPairedDeviceKeyPrefix, key, mStorageDelegate->AsyncDeleteKeyValue(key));
     }
 
     mPairedDevices.Remove(remoteDeviceId);
@@ -733,7 +733,7 @@ void DeviceCommissioner::OnRendezvousComplete()
         SerializedDevice serialized;
         device->Serialize(serialized);
         PERSISTENT_KEY_OP(device->GetDeviceId(), kPairedDeviceKeyPrefix, key,
-                          mStorageDelegate->SetKeyValue(key, Uint8::to_const_char(serialized.inner)));
+                          mStorageDelegate->AsyncSetKeyValue(key, Uint8::to_const_char(serialized.inner)));
     }
 
     RendezvousCleanup(CHIP_NO_ERROR);
@@ -796,7 +796,7 @@ void DeviceCommissioner::PersistDeviceList()
             if (value != nullptr && requiredSize <= size)
             {
                 PERSISTENT_KEY_OP(static_cast<uint64_t>(0), kPairedDeviceListKeyPrefix, key,
-                                  mStorageDelegate->SetKeyValue(key, value));
+                                  mStorageDelegate->AsyncSetKeyValue(key, value));
                 mPairedDevicesUpdated = false;
             }
             chip::Platform::MemoryFree(serialized);
