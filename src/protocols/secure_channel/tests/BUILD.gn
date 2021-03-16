@@ -8,9 +8,7 @@ import("${chip_root}/build/chip/chip_test_suite.gni")
 chip_test_suite("tests") {
   output_name = "libSecureChannelTests"
 
-  test_sources = [
-    "TestStatusReport.cpp",
-  ]
+  test_sources = [ "TestStatusReport.cpp" ]
 
   public_deps = [
     "${chip_root}/src/lib/core",
