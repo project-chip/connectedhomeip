@@ -827,7 +827,7 @@ void DeviceCommissioner::PersistDeviceList()
         // TODO: Consider storing value in binary representation instead of converting to string
         char keyIDStr[kMaxKeyIDStringSize];
         snprintf(keyIDStr, sizeof(keyIDStr), "%d", mNextKeyId);
-        PERSISTENT_KEY_OP(static_cast<uint64_t>(0), kNextAvailableKeyID, key, mStorageDelegate->SetKeyValue(key, keyIDStr));
+        mStorageDelegate->SetKeyValue(kNextAvailableKeyID, keyIDStr);
     }
 }
 
