@@ -49,7 +49,7 @@ void CHIPPersistentStorageDelegateBridge::SetStorageDelegate(chip::PersistentSto
                 chip::PersistentStorageResultDelegate * callback = mCallback;
                 if (callback) {
                     dispatch_async(mWorkQueue, ^{
-                        callback->OnPeristentStorageValue([key UTF8String], [value UTF8String]);
+                        callback->OnPersistentStorageValue([key UTF8String], [value UTF8String]);
                     });
                 }
             };
@@ -58,8 +58,8 @@ void CHIPPersistentStorageDelegateBridge::SetStorageDelegate(chip::PersistentSto
                 chip::PersistentStorageResultDelegate * callback = mCallback;
                 if (callback) {
                     dispatch_async(mWorkQueue, ^{
-                        callback->OnPeristentStorageStatus([key UTF8String], chip::PersistentStorageResultDelegate::Operation::kSET,
-                            [CHIPError errorToCHIPErrorCode:status]);
+                        callback->OnPersistentStorageStatus([key UTF8String],
+                            chip::PersistentStorageResultDelegate::Operation::kSET, [CHIPError errorToCHIPErrorCode:status]);
                     });
                 }
             };
@@ -68,7 +68,7 @@ void CHIPPersistentStorageDelegateBridge::SetStorageDelegate(chip::PersistentSto
                 chip::PersistentStorageResultDelegate * callback = mCallback;
                 if (callback) {
                     dispatch_async(mWorkQueue, ^{
-                        callback->OnPeristentStorageStatus([key UTF8String],
+                        callback->OnPersistentStorageStatus([key UTF8String],
                             chip::PersistentStorageResultDelegate::Operation::kDELETE, [CHIPError errorToCHIPErrorCode:status]);
                     });
                 }
