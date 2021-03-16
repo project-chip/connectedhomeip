@@ -4,6 +4,7 @@
 #include <netsocket/TCPSocket.h>
 #include <netsocket/UDPSocket.h>
 
+#include <atomic>
 #include <platform/FileHandle.h>
 #include <sys/select.h>
 #include <sys/socket.h>
@@ -50,7 +51,7 @@ struct BSDSocket : public ::mbed::FileHandle
     int fd;
     int type;
     mbed::Callback<void()> callback;
-    uint32_t flags;
+    std::atomic<uint32_t> flags;
 };
 
 int mbed_socket(int family, int type, int proto);

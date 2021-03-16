@@ -37,10 +37,14 @@
 #include <transport/raw/TCP.h>
 #include <transport/raw/UDP.h>
 
+#include <rtos/EventFlags.h>
+
 using namespace chip;
 using namespace chip::Shell;
 using namespace chip::System;
 using namespace chip::Inet;
+using namespace mbed;
+using namespace rtos;
 
 static chip::Shell::Shell sShellDateSubcommands;
 static chip::Shell::Shell sShellNetworkSubcommands;
@@ -51,7 +55,8 @@ constexpr size_t kMaxTcpPendingPackets        = 4;
 constexpr NodeId kSourceNodeId                = 123654;
 constexpr NodeId kDestinationNodeId           = 111222333;
 constexpr uint32_t kMessageId                 = 18;
-static int SocketReceiveHandlerCallCount      = 0;
+EventFlags socketEvent;
+uint32_t socketMsgReceiveFlag = 1;
 
 using TCPImpl = Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>;
 
@@ -69,7 +74,7 @@ public:
         source.ToString(info, sizeof(info));
         streamer_printf(streamer_get(), "Received message from %s payload: %s\n\r", info, msgBuf->Start());
 
-        SocketReceiveHandlerCallCount++;
+        socketEvent.set(socketMsgReceiveFlag);
     }
 };
 
@@ -325,57 +330,6 @@ int cmd_socket_help(int argc, char ** argv)
     return 0;
 }
 
-static void serviceEvents(struct ::timeval & aSleepTime)
-{
-    fd_set readFDs, writeFDs, exceptFDs;
-    int numFDs = 0;
-
-    FD_ZERO(&readFDs);
-    FD_ZERO(&writeFDs);
-    FD_ZERO(&exceptFDs);
-
-    if (DeviceLayer::SystemLayer.State() == System::kLayerState_Initialized)
-        DeviceLayer::SystemLayer.PrepareSelect(numFDs, &readFDs, &writeFDs, &exceptFDs, aSleepTime);
-
-    if (DeviceLayer::InetLayer.State == InetLayer::kState_Initialized)
-        DeviceLayer::InetLayer.PrepareSelect(numFDs, &readFDs, &writeFDs, &exceptFDs, aSleepTime);
-
-    int selectRes = select(numFDs, &readFDs, &writeFDs, &exceptFDs, &aSleepTime);
-    if (selectRes < 0)
-    {
-        return;
-    }
-
-    if (DeviceLayer::SystemLayer.State() == System::kLayerState_Initialized)
-    {
-        DeviceLayer::SystemLayer.HandleSelectResult(selectRes, &readFDs, &writeFDs, &exceptFDs);
-    }
-
-    if (DeviceLayer::InetLayer.State == InetLayer::kState_Initialized)
-    {
-        DeviceLayer::InetLayer.HandleSelectResult(selectRes, &readFDs, &writeFDs, &exceptFDs);
-    }
-}
-
-static void driveIOUntil(unsigned int timeoutMs, std::function<bool(void)> completionFunction)
-{
-    uint64_t mStartTime = DeviceLayer::SystemLayer.GetClock_MonotonicMS();
-    // Set the select timeout to 100ms
-    struct timeval aSleepTime;
-    aSleepTime.tv_sec  = 0;
-    aSleepTime.tv_usec = 100 * 1000;
-
-    while (true)
-    {
-        serviceEvents(aSleepTime); // at least one IO loop is guaranteed
-
-        if (completionFunction() || ((DeviceLayer::SystemLayer.GetClock_MonotonicMS() - mStartTime) >= timeoutMs))
-        {
-            break;
-        }
-    }
-}
-
 struct ChipSocket
 {
     ChipSocket() {}
@@ -389,6 +343,32 @@ struct ChipSocket
     Transport::Type type;
 };
 
+static int socket_echo_parse_args(char ** argv, ChipSocket & sock, IPAddress & addr, uint16_t & port, char ** payload)
+{
+    if (strcmp(argv[0], "UDP") == 0)
+    {
+        sock.type = Transport::Type::kUdp;
+    }
+    else if (strcmp(argv[0], "TCP") == 0)
+    {
+        sock.type = Transport::Type::kTcp;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    if (IPAddress::FromString(argv[1], addr) == false)
+    {
+        return CHIP_ERROR_INVALID_ADDRESS;
+    }
+
+    port     = atoi(argv[2]);
+    *payload = argv[3];
+
+    return CHIP_NO_ERROR;
+}
+
 int cmd_socket_echo(int argc, char ** argv)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
@@ -396,6 +376,8 @@ int cmd_socket_echo(int argc, char ** argv)
     char * payload;
     uint16_t payloadLen;
     ChipSocket sock;
+    uint16_t port;
+    char addrStr[16];
 
     PacketBufferHandle buffer;
     PacketHeader header;
@@ -405,40 +387,35 @@ int cmd_socket_echo(int argc, char ** argv)
 
     streamer_t * sout = streamer_get();
     IPAddress addr;
-    IPAddress::FromString("127.0.0.1", addr);
 
     sock.type = Transport::Type::kUndefined;
 
-    VerifyOrExit(argc == 2, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(argc == 4, error = CHIP_ERROR_INVALID_ARGUMENT);
 
-    if (strcmp(argv[0], "UDP") == 0)
+    err = socket_echo_parse_args(argv, sock, addr, port, &payload);
+    if (err != INET_NO_ERROR)
+    {
+        streamer_printf(sout, "ERROR: wrong command arguments. Check socket help\r\n");
+        ExitNow(error = err;);
+    }
+
+    if (sock.type == Transport::Type::kUdp)
     {
         new (&sock.udpSocket) Transport::UDP();
-        sock.type = Transport::Type::kUdp;
-
         err = sock.udpSocket.Init(Transport::UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(addr.Type()));
-    }
-    else if (strcmp(argv[0], "TCP") == 0)
-    {
-        new (&sock.tcpSocket) TCPImpl;
-        sock.type = Transport::Type::kTcp;
-
-        err = sock.tcpSocket.Init(Transport::TcpListenParameters(&DeviceLayer::InetLayer).SetAddressType(addr.Type()));
     }
     else
     {
-        streamer_printf(sout, "ERROR: Wrong socket type\r\n");
-        ExitNow(error = CHIP_ERROR_INVALID_ARGUMENT;);
+        new (&sock.tcpSocket) TCPImpl;
+        err = sock.tcpSocket.Init(Transport::TcpListenParameters(&DeviceLayer::InetLayer).SetAddressType(addr.Type()));
     }
 
     if (err != INET_NO_ERROR)
     {
         streamer_printf(sout, "ERROR: create %s endpoint failed\r\n", argv[0]);
-        sock.type = Transport::Type::kUndefined;
         ExitNow(error = err;);
     }
 
-    payload    = argv[1];
     payloadLen = sizeof(payload);
 
     buffer = PacketBufferHandle::NewWithData(payload, payloadLen);
@@ -461,16 +438,17 @@ int cmd_socket_echo(int argc, char ** argv)
 
     header.SetSourceNodeId(kSourceNodeId).SetDestinationNodeId(kDestinationNodeId).SetMessageId(kMessageId);
 
-    SocketReceiveHandlerCallCount = 0;
+    socketEvent.clear();
 
-    // Should be able to send a message to itself by just calling send.
+    streamer_printf(sout, "INFO: send %s message %s to address: %s port: %d\r\n", argv[0], payload,
+                    addr.ToString(addrStr, sizeof(addrStr)), port);
     if (sock.type == Transport::Type::kUdp)
     {
-        err = sock.udpSocket.SendMessage(header, Transport::PeerAddress::UDP(addr), std::move(buffer));
+        err = sock.udpSocket.SendMessage(header, Transport::PeerAddress::UDP(addr, port), std::move(buffer));
     }
     else
     {
-        err = sock.tcpSocket.SendMessage(header, Transport::PeerAddress::TCP(addr), std::move(buffer));
+        err = sock.tcpSocket.SendMessage(header, Transport::PeerAddress::TCP(addr, port), std::move(buffer));
     }
 
     if (err != INET_NO_ERROR)
@@ -479,16 +457,14 @@ int cmd_socket_echo(int argc, char ** argv)
         ExitNow(error = err;);
     }
 
-    driveIOUntil(5000 /* ms */, []() { return SocketReceiveHandlerCallCount != 0; });
-
-    if (sock.type == Transport::Type::kTcp)
-    {
-        // Disconnect and wait for seeing peer close
-        sock.tcpSocket.Disconnect(Transport::PeerAddress::TCP(addr));
-        driveIOUntil(5000 /* ms */, [&sock]() { return !sock.tcpSocket.HasActiveConnections(); });
-    }
+    socketEvent.wait_all(socketMsgReceiveFlag, 5000);
 
 exit:
+    if (sock.type == Transport::Type::kTcp)
+    {
+        sock.tcpSocket.Disconnect(Transport::PeerAddress::TCP(addr));
+    }
+
     if (sock.type == Transport::Type::kUdp)
     {
         sock.udpSocket.Close();
@@ -516,7 +492,7 @@ static const shell_command_t cmds_socket_root = { &cmd_socket_dispatch, "socket"
 
 static const shell_command_t cmds_socket[] = {
     { &cmd_socket_echo, "echo",
-      "Echo IP communication test via specific socket. Send message in loopback. Usage: socket echo <type> <message>" },
+      "Connect and send test message to echo server via specific socket. Usage: socket echo <type> <ip> <port> <message>" },
     { &cmd_socket_help, "help", "Display help for each socket subcommands" }
 };
 
