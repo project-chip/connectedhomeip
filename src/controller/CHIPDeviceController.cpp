@@ -502,28 +502,27 @@ DeviceCommissioner::DeviceCommissioner()
     mPairedDevicesUpdated = false;
 }
 
+CHIP_ERROR LoadKeyId(PersistentStorageDelegate * storageDelegate, uint16_t & out)
+{
+    VerifyOrReturnError(storageDelegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    char keyIDStr[kMaxKeyIDStringSize];
+    uint16_t size = sizeof(keyIDStr);
+    ReturnErrorOnFailure(storageDelegate->GetKeyValue(kNextAvailableKeyID, keyIDStr, size));
+
+    ReturnErrorCodeIf(!ArgParser::ParseInt(keyIDStr, out), CHIP_ERROR_INTERNAL);
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR DeviceCommissioner::Init(NodeId localDeviceId, PersistentStorageDelegate * storageDelegate,
                                     DevicePairingDelegate * pairingDelegate, System::Layer * systemLayer,
                                     Inet::InetLayer * inetLayer)
 {
     ReturnErrorOnFailure(DeviceController::Init(localDeviceId, storageDelegate, systemLayer, inetLayer));
 
-    if (mStorageDelegate != nullptr)
+    if (LoadKeyId(mStorageDelegate, mNextKeyId) != CHIP_NO_ERROR)
     {
-        char keyIDStr[kMaxKeyIDStringSize];
-        uint16_t size  = sizeof(keyIDStr);
-        CHIP_ERROR err = CHIP_NO_ERROR;
-        PERSISTENT_KEY_OP(static_cast<uint64_t>(0), kNextAvailableKeyID, key,
-                          err = mStorageDelegate->GetKeyValue(key, keyIDStr, size));
-        if (err != CHIP_NO_ERROR || !ArgParser::ParseInt(keyIDStr, mNextKeyId))
-        {
-            // If the persistent storage didn't have a stored KeyID value
-            mNextKeyId = 0;
-        }
-    }
-    else
-    {
-        // If there is no persistent storage
         mNextKeyId = 0;
     }
 
@@ -539,12 +538,7 @@ CHIP_ERROR DeviceCommissioner::Shutdown()
 
     PersistDeviceList();
 
-    if (mRendezvousSession != nullptr)
-    {
-        mNextKeyId = mRendezvousSession->GetNextKeyId();
-        chip::Platform::Delete(mRendezvousSession);
-        mRendezvousSession = nullptr;
-    }
+    FreeRendezvousSession();
 
     DeviceController::Shutdown();
     return CHIP_NO_ERROR;
@@ -609,11 +603,9 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         // Delete the current rendezvous session only if a device is not currently being paired.
-        if (mDeviceBeingPaired == kNumMaxActiveDevices && mRendezvousSession != nullptr)
+        if (mDeviceBeingPaired == kNumMaxActiveDevices)
         {
-            mNextKeyId = mRendezvousSession->GetNextKeyId();
-            chip::Platform::Delete(mRendezvousSession);
-            mRendezvousSession = nullptr;
+            FreeRendezvousSession();
         }
 
         if (device != nullptr)
@@ -681,12 +673,7 @@ CHIP_ERROR DeviceCommissioner::StopPairing(NodeId remoteDeviceId)
     Device * device = &mActiveDevices[mDeviceBeingPaired];
     VerifyOrReturnError(device->GetDeviceId() == remoteDeviceId, CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR);
 
-    if (mRendezvousSession != nullptr)
-    {
-        mNextKeyId = mRendezvousSession->GetNextKeyId();
-        chip::Platform::Delete(mRendezvousSession);
-        mRendezvousSession = nullptr;
-    }
+    FreeRendezvousSession();
 
     ReleaseDevice(device);
     mDeviceBeingPaired = kNumMaxActiveDevices;
@@ -709,7 +696,7 @@ CHIP_ERROR DeviceCommissioner::UnpairDevice(NodeId remoteDeviceId)
     return CHIP_NO_ERROR;
 }
 
-void DeviceCommissioner::RendezvousCleanup(CHIP_ERROR status)
+void DeviceCommissioner::FreeRendezvousSession()
 {
     if (mRendezvousSession != nullptr)
     {
@@ -717,6 +704,11 @@ void DeviceCommissioner::RendezvousCleanup(CHIP_ERROR status)
         chip::Platform::Delete(mRendezvousSession);
         mRendezvousSession = nullptr;
     }
+}
+
+void DeviceCommissioner::RendezvousCleanup(CHIP_ERROR status)
+{
+    FreeRendezvousSession();
 
     if (mPairingDelegate != nullptr)
     {

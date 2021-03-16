@@ -338,6 +338,10 @@ private:
 
     void PersistDeviceList();
 
+    void FreeRendezvousSession();
+
+    CHIP_ERROR LoadKeyId(PersistentStorageDelegate * delegate, uint16_t & out);
+
     uint16_t mNextKeyId = 0;
 };
 
