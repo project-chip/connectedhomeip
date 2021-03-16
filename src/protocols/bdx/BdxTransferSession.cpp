@@ -8,7 +8,7 @@
 
 #include <protocols/Protocols.h>
 #include <protocols/bdx/BdxMessages.h>
-#include <protocols/common/Constants.h>
+#include <protocols/secure_channel/Constants.h>
 #include <support/BufferReader.h>
 #include <support/CodeUtils.h>
 #include <support/ReturnMacros.h>
@@ -431,8 +431,8 @@ CHIP_ERROR TransferSession::HandleMessageReceived(System::PacketBufferHandle msg
 
         mTimeoutStartTimeMs = curTimeMs;
     }
-    else if (payloadHeader.GetProtocolID() == Protocols::kProtocol_Protocol_Common &&
-             payloadHeader.GetMessageType() == static_cast<uint8_t>(Protocols::Common::MsgType::StatusReport))
+    else if (payloadHeader.GetProtocolID() == Protocols::kProtocol_SecureChannel &&
+             payloadHeader.GetMessageType() == static_cast<uint8_t>(Protocols::SecureChannel::MsgType::StatusReport))
     {
         err = HandleStatusReportMessage(payloadHeader, std::move(msg));
         SuccessOrExit(err);
@@ -852,7 +852,7 @@ void TransferSession::PrepareStatusReport(StatusCode code)
     Encoding::LittleEndian::PacketBufferWriter bbuf(chip::MessagePacketBuffer::New(kStatusReportMinSize), kStatusReportMinSize);
     VerifyOrReturn(!bbuf.IsNull());
 
-    bbuf.Put16(static_cast<uint16_t>(Protocols::Common::StatusCode::Failure));
+    bbuf.Put16(static_cast<uint16_t>(Protocols::SecureChannel::GeneralStatusCode::Failure));
     bbuf.Put32(Protocols::kProtocol_BDX);
     bbuf.Put16(static_cast<uint16_t>(mStatusReportData.statusCode));
 
@@ -863,7 +863,7 @@ void TransferSession::PrepareStatusReport(StatusCode code)
     }
     else
     {
-        CHIP_ERROR err = AttachHeader(Protocols::Common::MsgType::StatusReport, mPendingMsgHandle);
+        CHIP_ERROR err = AttachHeader(Protocols::SecureChannel::MsgType::StatusReport, mPendingMsgHandle);
         VerifyOrReturn(err == CHIP_NO_ERROR);
 
         mPendingOutput = OutputEventType::kMsgToSend;

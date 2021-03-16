@@ -92,7 +92,7 @@ CHIP_ERROR CommandHandler::ProcessCommandDataElement(CommandDataElement::Parser 
         err = CHIP_NO_ERROR;
         ChipLogDetail(DataManagement, "Add Status code for empty command, cluster Id is %d", clusterId);
         // Todo: Define ProtocolCode for StatusCode.
-        AddStatusCode(COMMON_STATUS_SUCCESS, chip::Protocols::kProtocol_Protocol_Common, 0, clusterId);
+        AddStatusCode(COMMON_STATUS_SUCCESS, chip::Protocols::kProtocol_SecureChannel, 0, clusterId);
     }
     else if (CHIP_NO_ERROR == err)
     {
