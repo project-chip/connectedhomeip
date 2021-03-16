@@ -163,21 +163,25 @@ chip-device-ctrl > set-pairing-wifi-credential TestAP TestPassword
 chip-device-ctrl > connect -ble 1383 12345678
 ```
 
-## Thread Secure Session provisioning
+## Thread provisioning
 
-1. Run CHIP Device Controller
+1. Configure Thread border router. For example, follow
+   [Configuring Thread network on a Linux machine](../../../docs/guides/linux_thread_connectivity.md)
+   instruction to configure OpenThread Border Router on a Linux workstation.
+
+2. Run CHIP Device Controller
 
 ```
 sudo chip-device-ctrl
 ```
 
-2. Set Thread credentials
+3. Set Thread credentials
 
 ```
 set-pairing-thread-credential <channel> <pan id[HEX]> <master_key>
 ```
 
-3. BLE Connect to the device
+4. BLE Connect to the device
 
 ```
 connect -ble <discriminator> <setup pin code> [<nodeid>]
