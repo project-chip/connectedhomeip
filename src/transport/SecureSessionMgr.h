@@ -57,6 +57,9 @@ public:
     Transport::AdminId GetAdminId() const { return mAdmin; }
     void SetAdminId(Transport::AdminId adminId) { mAdmin = adminId; }
 
+    bool IsPeerGroupMsgIdNotSynchronized() const { return mPeerGroupMsgIdNotSynchronized; }
+    void SetPeerGroupMsgIdNotSynchronized(bool value) { mPeerGroupMsgIdNotSynchronized = value; }
+
     bool operator==(const SecureSessionHandle & that) const
     {
         return mPeerNodeId == that.mPeerNodeId && mPeerKeyId == that.mPeerKeyId && mAdmin == that.mAdmin;
@@ -74,6 +77,8 @@ private:
     //       to identify an approach that'll allow looking up the corresponding information for
     //       such sessions.
     Transport::AdminId mAdmin;
+
+    bool mPeerGroupMsgIdNotSynchronized = false;
 };
 
 /**

@@ -233,7 +233,7 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
     UnsolicitedMessageHandler * matchingUMH = nullptr;
     bool sendAckAndCloseExchange            = false;
 
-    if (!IsMsgCounterSyncMessage(payloadHeader) && packetHeader.IsPeerGroupMsgIdNotSynchronized())
+    if (!IsMsgCounterSyncMessage(payloadHeader) && session.IsPeerGroupMsgIdNotSynchronized())
     {
         Transport::PeerConnectionState * state = mSessionMgr->GetPeerConnectionState(session);
         VerifyOrReturn(state != nullptr);
