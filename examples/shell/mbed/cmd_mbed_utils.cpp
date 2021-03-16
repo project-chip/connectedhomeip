@@ -388,13 +388,12 @@ int cmd_socket_echo(int argc, char ** argv)
     streamer_t * sout = streamer_get();
     IPAddress addr;
 
-    sock.type = Transport::Type::kUndefined;
-
     VerifyOrExit(argc == 4, error = CHIP_ERROR_INVALID_ARGUMENT);
 
     err = socket_echo_parse_args(argv, sock, addr, port, &payload);
     if (err != INET_NO_ERROR)
     {
+        sock.type = Transport::Type::kUndefined;
         streamer_printf(sout, "ERROR: wrong command arguments. Check socket help\r\n");
         ExitNow(error = err;);
     }
