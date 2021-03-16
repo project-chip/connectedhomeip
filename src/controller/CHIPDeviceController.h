@@ -337,6 +337,8 @@ private:
     DeviceCommissionerRendezvousAdvertisementDelegate mRendezvousAdvDelegate;
 
     void PersistDeviceList();
+
+    uint16_t mNextKeyId = 0;
 };
 
 } // namespace Controller

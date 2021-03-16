@@ -44,6 +44,7 @@
 #include <core/CHIPCore.h>
 #include <core/CHIPEncoding.h>
 #include <core/CHIPSafeCasts.h>
+#include <support/CHIPArgParser.hpp>
 #include <support/Base64.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
@@ -69,6 +70,10 @@ using namespace chip::Encoding;
 
 constexpr const char kPairedDeviceListKeyPrefix[] = "ListPairedDevices";
 constexpr const char kPairedDeviceKeyPrefix[]     = "PairedDevice";
+constexpr const char kNextAvailableKeyID[]        = "StartKeyID";
+
+// Maximum key ID is 65535 (given it's uint16_t type)
+constexpr uint16_t kMaxKeyIDStringSize = 6;
 
 // This macro generates a key using node ID an key prefix, and performs the given action
 // on that key.
@@ -503,6 +508,17 @@ CHIP_ERROR DeviceCommissioner::Init(NodeId localDeviceId, PersistentStorageDeleg
 {
     ReturnErrorOnFailure(DeviceController::Init(localDeviceId, storageDelegate, systemLayer, inetLayer));
 
+    char keyIDStr[kMaxKeyIDStringSize];
+    uint16_t size = sizeof(keyIDStr);
+    CHIP_ERROR err  = CHIP_NO_ERROR;
+    PERSISTENT_KEY_OP(static_cast<uint64_t>(0), kNextAvailableKeyID, key,
+                        err = mStorageDelegate->GetKeyValue(key, keyIDStr, size));
+    if (err != CHIP_NO_ERROR || !ArgParser::ParseInt(keyIDStr, mNextKeyId))
+    {
+        // If the persistent storage didn't have a stored KeyID value
+        mNextKeyId = 0;
+    }
+
     mPairingDelegate = pairingDelegate;
     return CHIP_NO_ERROR;
 }
@@ -517,6 +533,7 @@ CHIP_ERROR DeviceCommissioner::Shutdown()
 
     if (mRendezvousSession != nullptr)
     {
+        mNextKeyId = mRendezvousSession->GetNextKeyId();
         chip::Platform::Delete(mRendezvousSession);
         mRendezvousSession = nullptr;
     }
@@ -566,6 +583,7 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
     mIsIPRendezvous    = (params.GetPeerAddress().GetTransportType() != Transport::Type::kBle);
     mRendezvousSession = chip::Platform::New<RendezvousSession>(this);
     VerifyOrExit(mRendezvousSession != nullptr, err = CHIP_ERROR_NO_MEMORY);
+    mRendezvousSession->SetNextKeyId(mNextKeyId);
     err = mRendezvousSession->Init(params.SetLocalNodeId(mLocalDeviceId).SetRemoteNodeId(remoteDeviceId), mTransportMgr,
                                    mSessionManager, admin);
     SuccessOrExit(err);
@@ -585,6 +603,7 @@ exit:
         // Delete the current rendezvous session only if a device is not currently being paired.
         if (mDeviceBeingPaired == kNumMaxActiveDevices && mRendezvousSession != nullptr)
         {
+            mNextKeyId = mRendezvousSession->GetNextKeyId();
             chip::Platform::Delete(mRendezvousSession);
             mRendezvousSession = nullptr;
         }
@@ -656,6 +675,7 @@ CHIP_ERROR DeviceCommissioner::StopPairing(NodeId remoteDeviceId)
 
     if (mRendezvousSession != nullptr)
     {
+        mNextKeyId = mRendezvousSession->GetNextKeyId();
         chip::Platform::Delete(mRendezvousSession);
         mRendezvousSession = nullptr;
     }
@@ -685,6 +705,7 @@ void DeviceCommissioner::RendezvousCleanup(CHIP_ERROR status)
 {
     if (mRendezvousSession != nullptr)
     {
+        mNextKeyId = mRendezvousSession->GetNextKeyId();
         chip::Platform::Delete(mRendezvousSession);
         mRendezvousSession = nullptr;
     }
@@ -801,6 +822,11 @@ void DeviceCommissioner::PersistDeviceList()
             }
             chip::Platform::MemoryFree(serialized);
         }
+
+        char keyIDStr[kMaxKeyIDStringSize];
+        snprintf(keyIDStr, sizeof(keyIDStr), "%d", mNextKeyId);
+        PERSISTENT_KEY_OP(static_cast<uint64_t>(0), kNextAvailableKeyID, key,
+                          mStorageDelegate->SetKeyValue(key, keyIDStr));
     }
 }
 
