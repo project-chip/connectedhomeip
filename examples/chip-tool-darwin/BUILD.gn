@@ -20,7 +20,11 @@ import("${chip_root}/build/chip/tools.gni")
 assert(chip_build_tools)
 
 config("includes") {
-  include_dirs = [ ".", "${chip_root}/src/darwin/Framework", "${chip_root}/src/darwin/Framework/CHIP" ]
+  include_dirs = [
+    ".",
+    "${chip_root}/src/darwin/Framework",
+    "${chip_root}/src/darwin/Framework/CHIP",
+  ]
 }
 
 executable("chip-tool-darwin") {
@@ -43,12 +47,12 @@ executable("chip-tool-darwin") {
     "${chip_root}/src/app/util/process-global-message.cpp",
     "${chip_root}/src/app/util/util.cpp",
     "${chip_root}/src/darwin/Framework/CHIP/CHIPDevice.mm",
-    "${chip_root}/src/darwin/Framework/CHIP/CHIPError.mm",
     "${chip_root}/src/darwin/Framework/CHIP/CHIPDeviceController.mm",
     "${chip_root}/src/darwin/Framework/CHIP/CHIPDevicePairingDelegateBridge.mm",
-    "${chip_root}/src/darwin/Framework/CHIP/CHIPQRCodeSetupPayloadParser.mm",
+    "${chip_root}/src/darwin/Framework/CHIP/CHIPError.mm",
     "${chip_root}/src/darwin/Framework/CHIP/CHIPManualSetupPayloadParser.mm",
     "${chip_root}/src/darwin/Framework/CHIP/CHIPPersistentStorageDelegateBridge.mm",
+    "${chip_root}/src/darwin/Framework/CHIP/CHIPQRCodeSetupPayloadParser.mm",
     "${chip_root}/src/darwin/Framework/CHIP/CHIPSetupPayload.mm",
     "${chip_root}/src/darwin/Framework/CHIP/gen/CHIPClientCallbacks.cpp",
     "${chip_root}/src/darwin/Framework/CHIP/gen/CHIPClustersObjc.mm",
@@ -57,8 +61,10 @@ executable("chip-tool-darwin") {
     "main.m",
   ]
 
-
-  cflags = [ "-Wconversion", "-fobjc-arc" ]
+  cflags = [
+    "-Wconversion",
+    "-fobjc-arc",
+  ]
 
   public_deps = [
     "${chip_root}/src/app/server",
