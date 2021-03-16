@@ -140,7 +140,7 @@ void VerifyStatusReport(nlTestSuite * inSuite, void * inContext, const System::P
     Encoding::LittleEndian::Reader reader(msg->Start(), msg->DataLength());
     err = reader.Skip(headerSize).Read16(&generalCode).Read32(&protocolId).Read16(protocolCode.RawStorage()).StatusCode();
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, generalCode == static_cast<uint16_t>(SecureChannel::GeneralStatusCode::Failure));
+    NL_TEST_ASSERT(inSuite, generalCode == static_cast<uint16_t>(SecureChannel::GeneralStatusCode::kFailure));
     NL_TEST_ASSERT(inSuite, protocolId == kProtocol_BDX);
     NL_TEST_ASSERT(inSuite, protocolCode == code);
 }

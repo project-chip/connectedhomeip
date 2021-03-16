@@ -846,7 +846,7 @@ void TransferSession::PrepareStatusReport(StatusCode code)
 {
     mStatusReportData.statusCode = code;
 
-    Protocols::SecureChannel::StatusReport report(static_cast<uint16_t>(Protocols::SecureChannel::GeneralStatusCode::Failure),
+    Protocols::SecureChannel::StatusReport report(static_cast<uint16_t>(Protocols::SecureChannel::GeneralStatusCode::kFailure),
                                                   static_cast<uint32_t>(Protocols::kProtocol_BDX), static_cast<uint16_t>(code));
 
     Encoding::LittleEndian::PacketBufferWriter bbuf(chip::MessagePacketBuffer::New(report.Size()), report.Size());

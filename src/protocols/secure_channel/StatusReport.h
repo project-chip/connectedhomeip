@@ -51,6 +51,8 @@ public:
     /**
      *  Read the contents of a \c PacketBuffer containing a StatusReport message and store the field values in this object.
      *
+     *  @note If there is additional data after the Protocol Code field in the message, it is assumed to be protocol-specific data.
+     *
      *  @note This method assumes that the Header of the message has already been consumed, and that \c PacketBuffer::Start() points
      * to the beginning of the StatusReport data.
      *
