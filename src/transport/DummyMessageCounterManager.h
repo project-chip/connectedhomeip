@@ -46,4 +46,3 @@ private:
 
 } // namespace Transport
 } // namespace chip
-
