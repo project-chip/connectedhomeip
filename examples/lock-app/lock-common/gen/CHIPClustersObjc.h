@@ -34,40 +34,86 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPCluster : NSObject
 
-- (nullable instancetype)initWithDevice:(CHIPDevice *)device
-                               endpoint:(uint8_t)endpoint
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (nullable instancetype)initWithDevice:(CHIPDevice *)device endpoint:(uint8_t)endpoint queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
 
 @end
 
+
+
 /**
  * Cluster Basic
- *
+ *    
  */
 @interface CHIPBasic : CHIPCluster
 
-- (void)readAttributeInteractionModelVersion:(ResponseHandler)completionHandler;
-- (void)readAttributeVendorName:(ResponseHandler)completionHandler;
-- (void)readAttributeVendorID:(ResponseHandler)completionHandler;
-- (void)readAttributeProductName:(ResponseHandler)completionHandler;
-- (void)readAttributeProductID:(ResponseHandler)completionHandler;
-- (void)readAttributeUserLabel:(ResponseHandler)completionHandler;
-- (void)writeAttributeUserLabel:(NSString *)value completionHandler:(ResponseHandler)completionHandler;
-- (void)readAttributeLocation:(ResponseHandler)completionHandler;
-- (void)writeAttributeLocation:(NSString *)value completionHandler:(ResponseHandler)completionHandler;
-- (void)readAttributeHardwareVersion:(ResponseHandler)completionHandler;
-- (void)readAttributeHardwareVersionString:(ResponseHandler)completionHandler;
-- (void)readAttributeSoftwareVersion:(ResponseHandler)completionHandler;
-- (void)readAttributeSoftwareVersionString:(ResponseHandler)completionHandler;
+
+- (void)readAttributeZclVersion:(ResponseHandler)completionHandler;
+- (void)readAttributePowerSource:(ResponseHandler)completionHandler;
 - (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
 
 @end
 
+
+
+/**
+ * Cluster Groups
+ *    
+ */
+@interface CHIPGroups : CHIPCluster
+
+- (void)addGroup:(uint16_t)groupId groupName:(char *)groupName completionHandler:(ResponseHandler)completionHandler;
+- (void)addGroupIfIdentifying:(uint16_t)groupId groupName:(char *)groupName completionHandler:(ResponseHandler)completionHandler;
+- (void)getGroupMembership:(uint8_t)groupCount groupList:(uint16_t)groupList completionHandler:(ResponseHandler)completionHandler;
+- (void)removeAllGroups:(ResponseHandler)completionHandler;
+- (void)removeGroup:(uint16_t)groupId completionHandler:(ResponseHandler)completionHandler;
+- (void)viewGroup:(uint16_t)groupId completionHandler:(ResponseHandler)completionHandler;
+
+- (void)readAttributeNameSupport:(ResponseHandler)completionHandler;
+- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
+
+@end
+
+
+
+/**
+ * Cluster Identify
+ *    
+ */
+@interface CHIPIdentify : CHIPCluster
+
+- (void)identify:(uint16_t)identifyTime completionHandler:(ResponseHandler)completionHandler;
+- (void)identifyQuery:(ResponseHandler)completionHandler;
+
+- (void)readAttributeIdentifyTime:(ResponseHandler)completionHandler;
+- (void)writeAttributeIdentifyTime:(uint16_t)value completionHandler:(ResponseHandler)completionHandler;
+- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
+
+@end
+
+
+
+/**
+ * Cluster Identify
+ *    
+ */
+@interface CHIPIdentify : CHIPCluster
+
+- (void)identify:(uint16_t)identifyTime completionHandler:(ResponseHandler)completionHandler;
+- (void)identifyQuery:(ResponseHandler)completionHandler;
+
+- (void)readAttributeIdentifyTime:(ResponseHandler)completionHandler;
+- (void)writeAttributeIdentifyTime:(uint16_t)value completionHandler:(ResponseHandler)completionHandler;
+- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
+
+@end
+
+
+
 /**
  * Cluster On/off
- *
+ *    
  */
 @interface CHIPOnOff : CHIPCluster
 
@@ -76,13 +122,60 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)toggle:(ResponseHandler)completionHandler;
 
 - (void)readAttributeOnOff:(ResponseHandler)completionHandler;
-- (void)configureAttributeOnOff:(uint16_t)minInterval
-                    maxInterval:(uint16_t)maxInterval
-              completionHandler:(ResponseHandler)completionHandler;
-- (void)reportAttributeOnOff:(ResponseHandler)reportHandler;
+- (void) configureAttributeOnOff:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval completionHandler:(ResponseHandler)completionHandler;
+- (void) reportAttributeOnOff:(ResponseHandler)reportHandler;
 - (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
 
 @end
+
+
+
+/**
+ * Cluster Pump Configuration and Control
+ *    
+ */
+@interface CHIPPumpConfigurationAndControl : CHIPCluster
+
+
+- (void)readAttributeMaxPressure:(ResponseHandler)completionHandler;
+- (void)readAttributeMaxSpeed:(ResponseHandler)completionHandler;
+- (void)readAttributeMaxFlow:(ResponseHandler)completionHandler;
+- (void)readAttributeEffectiveOperationMode:(ResponseHandler)completionHandler;
+- (void)readAttributeEffectiveControlMode:(ResponseHandler)completionHandler;
+- (void)readAttributeCapacity:(ResponseHandler)completionHandler;
+- (void) configureAttributeCapacity:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval change:(int16_t)change completionHandler:(ResponseHandler)completionHandler;
+- (void) reportAttributeCapacity:(ResponseHandler)reportHandler;
+- (void)readAttributeOperationMode:(ResponseHandler)completionHandler;
+- (void)writeAttributeOperationMode:(uint8_t)value completionHandler:(ResponseHandler)completionHandler;
+- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
+
+@end
+
+
+
+/**
+ * Cluster Scenes
+ *    
+ */
+@interface CHIPScenes : CHIPCluster
+
+- (void)addScene:(uint16_t)groupId sceneId:(uint8_t)sceneId transitionTime:(uint16_t)transitionTime sceneName:(char *)sceneName clusterId:(uint16_t)clusterId length:(uint8_t)length value:(uint8_t)value completionHandler:(ResponseHandler)completionHandler;
+- (void)getSceneMembership:(uint16_t)groupId completionHandler:(ResponseHandler)completionHandler;
+- (void)recallScene:(uint16_t)groupId sceneId:(uint8_t)sceneId transitionTime:(uint16_t)transitionTime completionHandler:(ResponseHandler)completionHandler;
+- (void)removeAllScenes:(uint16_t)groupId completionHandler:(ResponseHandler)completionHandler;
+- (void)removeScene:(uint16_t)groupId sceneId:(uint8_t)sceneId completionHandler:(ResponseHandler)completionHandler;
+- (void)storeScene:(uint16_t)groupId sceneId:(uint8_t)sceneId completionHandler:(ResponseHandler)completionHandler;
+- (void)viewScene:(uint16_t)groupId sceneId:(uint8_t)sceneId completionHandler:(ResponseHandler)completionHandler;
+
+- (void)readAttributeSceneCount:(ResponseHandler)completionHandler;
+- (void)readAttributeCurrentScene:(ResponseHandler)completionHandler;
+- (void)readAttributeCurrentGroup:(ResponseHandler)completionHandler;
+- (void)readAttributeSceneValid:(ResponseHandler)completionHandler;
+- (void)readAttributeNameSupport:(ResponseHandler)completionHandler;
+- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
+
+@end
+
 
 NS_ASSUME_NONNULL_END
 

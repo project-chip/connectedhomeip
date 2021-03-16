@@ -29,7 +29,13 @@
 using namespace chip;
 
 EmberAfStatus emberAfBasicClusterServerCommandParse(EmberAfClusterCommand * cmd);
+EmberAfStatus emberAfGroupsClusterServerCommandParse(EmberAfClusterCommand * cmd);
+EmberAfStatus emberAfIdentifyClusterClientCommandParse(EmberAfClusterCommand * cmd);
+EmberAfStatus emberAfIdentifyClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfOnOffClusterServerCommandParse(EmberAfClusterCommand * cmd);
+EmberAfStatus emberAfPumpConfigurationAndControlClusterServerCommandParse(EmberAfClusterCommand * cmd);
+EmberAfStatus emberAfScenesClusterServerCommandParse(EmberAfClusterCommand * cmd);
+
 
 static EmberAfStatus status(bool wasHandled, bool clusterExists, bool mfgSpecific)
 {
@@ -51,6 +57,7 @@ static EmberAfStatus status(bool wasHandled, bool clusterExists, bool mfgSpecifi
     }
 }
 
+
 // Main command parsing controller.
 EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
 {
@@ -60,6 +67,9 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
     {
         switch (cmd->apsFrame->clusterId)
         {
+        case ZCL_IDENTIFY_CLUSTER_ID :
+            result = emberAfIdentifyClusterClientCommandParse(cmd);
+            break;
         default:
             // Unrecognized cluster ID, error status will apply.
             break;
@@ -70,12 +80,25 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
     {
         switch (cmd->apsFrame->clusterId)
         {
-        case ZCL_BASIC_CLUSTER_ID:
+        case ZCL_BASIC_CLUSTER_ID :
             // No commands are enabled for cluster Basic
             result = status(false, true, cmd->mfgSpecific);
             break;
-        case ZCL_ON_OFF_CLUSTER_ID:
+        case ZCL_GROUPS_CLUSTER_ID :
+            result = emberAfGroupsClusterServerCommandParse(cmd);
+            break;
+        case ZCL_IDENTIFY_CLUSTER_ID :
+            result = emberAfIdentifyClusterServerCommandParse(cmd);
+            break;
+        case ZCL_ON_OFF_CLUSTER_ID :
             result = emberAfOnOffClusterServerCommandParse(cmd);
+            break;
+        case ZCL_PUMP_CONFIG_CONTROL_CLUSTER_ID :
+            // No commands are enabled for cluster Pump Configuration and Control
+            result = status(false, true, cmd->mfgSpecific);
+            break;
+        case ZCL_SCENES_CLUSTER_ID :
+            result = emberAfScenesClusterServerCommandParse(cmd);
             break;
         default:
             // Unrecognized cluster ID, error status will apply.
@@ -87,6 +110,170 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
 
 // Cluster specific command parsing
 
+EmberAfStatus emberAfGroupsClusterServerCommandParse(EmberAfClusterCommand * cmd)
+{
+    bool wasHandled = false;
+
+    if (!cmd->mfgSpecific)
+    {
+        switch (cmd->commandId)
+        {
+        case ZCL_ADD_GROUP_COMMAND_ID: {
+        uint16_t payloadOffset = cmd->payloadStartIndex;
+uint16_t groupId;
+uint8_t * groupName;
+
+  if (cmd->bufLen < payloadOffset + 2)
+  {
+    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+  }
+  groupId = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
+  payloadOffset = static_cast<uint16_t>(payloadOffset + 2);
+  if (cmd->bufLen < payloadOffset + 1u)
+  {
+    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+  }
+  groupName = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
+
+wasHandled = emberAfGroupsClusterAddGroupCallback(groupId, groupName);
+            break;
+        }
+        case ZCL_ADD_GROUP_IF_IDENTIFYING_COMMAND_ID: {
+        uint16_t payloadOffset = cmd->payloadStartIndex;
+uint16_t groupId;
+uint8_t * groupName;
+
+  if (cmd->bufLen < payloadOffset + 2)
+  {
+    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+  }
+  groupId = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
+  payloadOffset = static_cast<uint16_t>(payloadOffset + 2);
+  if (cmd->bufLen < payloadOffset + 1u)
+  {
+    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+  }
+  groupName = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
+
+wasHandled = emberAfGroupsClusterAddGroupIfIdentifyingCallback(groupId, groupName);
+            break;
+        }
+        case ZCL_GET_GROUP_MEMBERSHIP_COMMAND_ID: {
+        uint16_t payloadOffset = cmd->payloadStartIndex;
+uint8_t groupCount;
+/* TYPE WARNING: array array defaults to */ uint8_t *  groupList;
+
+  if (cmd->bufLen < payloadOffset + 1)
+  {
+    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+  }
+  groupCount = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+  payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
+  groupList = cmd->buffer + payloadOffset;
+
+wasHandled = emberAfGroupsClusterGetGroupMembershipCallback(groupCount, groupList);
+            break;
+        }
+        case ZCL_REMOVE_ALL_GROUPS_COMMAND_ID: {
+        wasHandled = emberAfGroupsClusterRemoveAllGroupsCallback();
+            break;
+        }
+        case ZCL_REMOVE_GROUP_COMMAND_ID: {
+        uint16_t payloadOffset = cmd->payloadStartIndex;
+uint16_t groupId;
+
+  if (cmd->bufLen < payloadOffset + 2)
+  {
+    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+  }
+  groupId = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
+
+wasHandled = emberAfGroupsClusterRemoveGroupCallback(groupId);
+            break;
+        }
+        case ZCL_VIEW_GROUP_COMMAND_ID: {
+        uint16_t payloadOffset = cmd->payloadStartIndex;
+uint16_t groupId;
+
+  if (cmd->bufLen < payloadOffset + 2)
+  {
+    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+  }
+  groupId = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
+
+wasHandled = emberAfGroupsClusterViewGroupCallback(groupId);
+            break;
+        }
+        default: {
+            // Unrecognized command ID, error status will apply.
+            break;
+        }
+        }
+    }
+    return status(wasHandled, true, cmd->mfgSpecific);
+}
+EmberAfStatus emberAfIdentifyClusterClientCommandParse(EmberAfClusterCommand * cmd)
+{
+    bool wasHandled = false;
+
+    if (!cmd->mfgSpecific)
+    {
+        switch (cmd->commandId)
+        {
+        case ZCL_IDENTIFY_QUERY_RESPONSE_COMMAND_ID: {
+        uint16_t payloadOffset = cmd->payloadStartIndex;
+uint16_t timeout;
+
+  if (cmd->bufLen < payloadOffset + 2)
+  {
+    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+  }
+  timeout = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
+
+wasHandled = emberAfIdentifyClusterIdentifyQueryResponseCallback(timeout);
+            break;
+        }
+        default: {
+            // Unrecognized command ID, error status will apply.
+            break;
+        }
+        }
+    }
+    return status(wasHandled, true, cmd->mfgSpecific);
+}
+EmberAfStatus emberAfIdentifyClusterServerCommandParse(EmberAfClusterCommand * cmd)
+{
+    bool wasHandled = false;
+
+    if (!cmd->mfgSpecific)
+    {
+        switch (cmd->commandId)
+        {
+        case ZCL_IDENTIFY_COMMAND_ID: {
+        uint16_t payloadOffset = cmd->payloadStartIndex;
+uint16_t identifyTime;
+
+  if (cmd->bufLen < payloadOffset + 2)
+  {
+    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+  }
+  identifyTime = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
+
+wasHandled = emberAfIdentifyClusterIdentifyCallback(identifyTime);
+            break;
+        }
+        case ZCL_IDENTIFY_QUERY_COMMAND_ID: {
+        wasHandled = emberAfIdentifyClusterIdentifyQueryCallback();
+            break;
+        }
+        default: {
+            // Unrecognized command ID, error status will apply.
+            break;
+        }
+        }
+    }
+    return status(wasHandled, true, cmd->mfgSpecific);
+}
 EmberAfStatus emberAfOnOffClusterServerCommandParse(EmberAfClusterCommand * cmd)
 {
     bool wasHandled = false;
@@ -96,15 +283,181 @@ EmberAfStatus emberAfOnOffClusterServerCommandParse(EmberAfClusterCommand * cmd)
         switch (cmd->commandId)
         {
         case ZCL_OFF_COMMAND_ID: {
-            wasHandled = emberAfOnOffClusterOffCallback();
+        wasHandled = emberAfOnOffClusterOffCallback();
             break;
         }
         case ZCL_ON_COMMAND_ID: {
-            wasHandled = emberAfOnOffClusterOnCallback();
+        wasHandled = emberAfOnOffClusterOnCallback();
             break;
         }
         case ZCL_TOGGLE_COMMAND_ID: {
-            wasHandled = emberAfOnOffClusterToggleCallback();
+        wasHandled = emberAfOnOffClusterToggleCallback();
+            break;
+        }
+        default: {
+            // Unrecognized command ID, error status will apply.
+            break;
+        }
+        }
+    }
+    return status(wasHandled, true, cmd->mfgSpecific);
+}
+EmberAfStatus emberAfScenesClusterServerCommandParse(EmberAfClusterCommand * cmd)
+{
+    bool wasHandled = false;
+
+    if (!cmd->mfgSpecific)
+    {
+        switch (cmd->commandId)
+        {
+        case ZCL_ADD_SCENE_COMMAND_ID: {
+        uint16_t payloadOffset = cmd->payloadStartIndex;
+uint16_t groupId;
+uint8_t sceneId;
+uint16_t transitionTime;
+uint8_t * sceneName;
+/* TYPE WARNING: array array defaults to */ uint8_t *  extensionFieldSets;
+
+  if (cmd->bufLen < payloadOffset + 2)
+  {
+    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+  }
+  groupId = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
+  payloadOffset = static_cast<uint16_t>(payloadOffset + 2);
+  if (cmd->bufLen < payloadOffset + 1)
+  {
+    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+  }
+  sceneId = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+  payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
+  if (cmd->bufLen < payloadOffset + 2)
+  {
+    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+  }
+  transitionTime = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
+  payloadOffset = static_cast<uint16_t>(payloadOffset + 2);
+  if (cmd->bufLen < payloadOffset + 1u)
+  {
+    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+  }
+  sceneName = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
+  payloadOffset = static_cast<uint16_t>(payloadOffset + emberAfStringLength(sceneName) + 1u);
+  extensionFieldSets = cmd->buffer + payloadOffset;
+
+wasHandled = emberAfScenesClusterAddSceneCallback(groupId, sceneId, transitionTime, sceneName, extensionFieldSets);
+            break;
+        }
+        case ZCL_GET_SCENE_MEMBERSHIP_COMMAND_ID: {
+        uint16_t payloadOffset = cmd->payloadStartIndex;
+uint16_t groupId;
+
+  if (cmd->bufLen < payloadOffset + 2)
+  {
+    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+  }
+  groupId = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
+
+wasHandled = emberAfScenesClusterGetSceneMembershipCallback(groupId);
+            break;
+        }
+        case ZCL_RECALL_SCENE_COMMAND_ID: {
+        uint16_t payloadOffset = cmd->payloadStartIndex;
+uint16_t groupId;
+uint8_t sceneId;
+uint16_t transitionTime;
+
+  if (cmd->bufLen < payloadOffset + 2)
+  {
+    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+  }
+  groupId = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
+  payloadOffset = static_cast<uint16_t>(payloadOffset + 2);
+  if (cmd->bufLen < payloadOffset + 1)
+  {
+    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+  }
+  sceneId = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+  payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
+  if (cmd->bufLen < payloadOffset + 2)
+  {
+    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+  }
+  transitionTime = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
+
+wasHandled = emberAfScenesClusterRecallSceneCallback(groupId, sceneId, transitionTime);
+            break;
+        }
+        case ZCL_REMOVE_ALL_SCENES_COMMAND_ID: {
+        uint16_t payloadOffset = cmd->payloadStartIndex;
+uint16_t groupId;
+
+  if (cmd->bufLen < payloadOffset + 2)
+  {
+    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+  }
+  groupId = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
+
+wasHandled = emberAfScenesClusterRemoveAllScenesCallback(groupId);
+            break;
+        }
+        case ZCL_REMOVE_SCENE_COMMAND_ID: {
+        uint16_t payloadOffset = cmd->payloadStartIndex;
+uint16_t groupId;
+uint8_t sceneId;
+
+  if (cmd->bufLen < payloadOffset + 2)
+  {
+    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+  }
+  groupId = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
+  payloadOffset = static_cast<uint16_t>(payloadOffset + 2);
+  if (cmd->bufLen < payloadOffset + 1)
+  {
+    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+  }
+  sceneId = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+
+wasHandled = emberAfScenesClusterRemoveSceneCallback(groupId, sceneId);
+            break;
+        }
+        case ZCL_STORE_SCENE_COMMAND_ID: {
+        uint16_t payloadOffset = cmd->payloadStartIndex;
+uint16_t groupId;
+uint8_t sceneId;
+
+  if (cmd->bufLen < payloadOffset + 2)
+  {
+    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+  }
+  groupId = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
+  payloadOffset = static_cast<uint16_t>(payloadOffset + 2);
+  if (cmd->bufLen < payloadOffset + 1)
+  {
+    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+  }
+  sceneId = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+
+wasHandled = emberAfScenesClusterStoreSceneCallback(groupId, sceneId);
+            break;
+        }
+        case ZCL_VIEW_SCENE_COMMAND_ID: {
+        uint16_t payloadOffset = cmd->payloadStartIndex;
+uint16_t groupId;
+uint8_t sceneId;
+
+  if (cmd->bufLen < payloadOffset + 2)
+  {
+    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+  }
+  groupId = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
+  payloadOffset = static_cast<uint16_t>(payloadOffset + 2);
+  if (cmd->bufLen < payloadOffset + 1)
+  {
+    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+  }
+  sceneId = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+
+wasHandled = emberAfScenesClusterViewSceneCallback(groupId, sceneId);
             break;
         }
         default: {
