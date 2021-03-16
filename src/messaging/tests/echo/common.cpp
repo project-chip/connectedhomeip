@@ -57,5 +57,5 @@ exit:
 void ShutdownChip(void)
 {
     gExchangeManager.Shutdown();
-    chip::DeviceLayer::SystemLayer.Shutdown();
+    chip::DeviceLayer::PlatformMgr().Shutdown();
 }
