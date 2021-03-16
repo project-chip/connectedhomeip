@@ -544,6 +544,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "mbed/MbedConfig.cpp",
         "mbed/PlatformManagerImpl.cpp",
         "mbed/SystemTimeSupport.cpp",
+        "mbed/MbedEventTimeout.cpp"
       ]
     }
 
