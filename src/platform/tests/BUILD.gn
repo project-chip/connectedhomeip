@@ -33,7 +33,7 @@ if (chip_device_platform != "none") {
     }
 
     if (chip_mdns != "none" && chip_enable_happy_tests &&
-        chip_device_platform == "linux") {
+        (chip_device_platform == "linux" || chip_device_platform == "darwin")) {
       test_sources += [ "TestMdns.cpp" ]
     }
 
