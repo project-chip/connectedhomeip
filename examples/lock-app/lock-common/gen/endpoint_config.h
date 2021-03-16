@@ -20,8 +20,6 @@
 // Prevent multiple inclusion
 #pragma once
 
-
-
 // Default values for the attributes longer than a pointer,
 // in a form of a binary blob
 // Separate block is generated for big-endian and little-endian cases.
@@ -95,7 +93,7 @@
 
 #endif // BIGENDIAN_CPU
 
-#define GENERATED_DEFAULTS_COUNT (0)
+#define GENERATED_DEFAULTS_COUNT (7)
 
 #define ZAP_TYPE(type) ZCL_##type##_ATTRIBUTE_TYPE
 #define ZAP_LONG_DEFAULTS_INDEX(index)                                                                                             \
@@ -117,11 +115,11 @@
 
 // This is an array of EmberAfAttributeMinMaxValue structures.
 #define GENERATED_MIN_MAX_DEFAULT_COUNT 0
-#define GENERATED_MIN_MAX_DEFAULTS { \
-}
+#define GENERATED_MIN_MAX_DEFAULTS                                                                                                 \
+    {                                                                                                                              \
+    }
 
-
-#define ZAP_ATTRIBUTE_MASK(mask) ATTRIBUTE_MASK_ ## mask
+#define ZAP_ATTRIBUTE_MASK(mask) ATTRIBUTE_MASK_##mask
 // This is an array of EmberAfAttributeMetadata structures.
 #define GENERATED_ATTRIBUTE_COUNT 15
 #define GENERATED_ATTRIBUTES                                                                                                       \
@@ -154,7 +152,7 @@
     }
 
 // This is an array of EmberAfCluster structures.
-#define ZAP_ATTRIBUTE_INDEX(index) ((EmberAfAttributeMetadata *)(&generatedAttributes[index]))
+#define ZAP_ATTRIBUTE_INDEX(index) ((EmberAfAttributeMetadata *) (&generatedAttributes[index]))
 
 // Cluster function static arrays
 #define GENERATED_FUNCTION_ARRAYS                                                                                                  \
@@ -194,33 +192,50 @@
 #define ATTRIBUTE_LARGEST (65)
 
 // Total size of singleton attributes
-#define ATTRIBUTE_SINGLETONS_SIZE (4)
+#define ATTRIBUTE_SINGLETONS_SIZE (254)
 
 // Total size of attribute storage
 #define ATTRIBUTE_MAX_SIZE (259)
 
 // Number of fixed endpoints
-#define FIXED_ENDPOINT_COUNT (2)
+#define FIXED_ENDPOINT_COUNT (1)
 
 // Array of endpoints that are supported, the data inside
 // the array is the endpoint number.
-#define FIXED_ENDPOINT_ARRAY { 0x0001, 0x0002 }
+#define FIXED_ENDPOINT_ARRAY                                                                                                       \
+    {                                                                                                                              \
+        0x0001                                                                                                                     \
+    }
 
 // Array of profile ids
-#define FIXED_PROFILE_IDS { 0x0109, 0x0104 }
+#define FIXED_PROFILE_IDS                                                                                                          \
+    {                                                                                                                              \
+        0x0109                                                                                                                     \
+    }
 
 // Array of device ids
-#define FIXED_DEVICE_IDS { 0, 0 }
+#define FIXED_DEVICE_IDS                                                                                                           \
+    {                                                                                                                              \
+        0                                                                                                                          \
+    }
 
 // Array of device versions
-#define FIXED_DEVICE_VERSIONS { 1, 1 }
+#define FIXED_DEVICE_VERSIONS                                                                                                      \
+    {                                                                                                                              \
+        1                                                                                                                          \
+    }
 
 // Array of endpoint types supported on each endpoint
-#define FIXED_ENDPOINT_TYPES { 0, 1 }
+#define FIXED_ENDPOINT_TYPES                                                                                                       \
+    {                                                                                                                              \
+        0                                                                                                                          \
+    }
 
 // Array of networks supported on each endpoint
-#define FIXED_NETWORKS { 0, 1 }
-
+#define FIXED_NETWORKS                                                                                                             \
+    {                                                                                                                              \
+        0                                                                                                                          \
+    }
 
 // Array of EmberAfCommandMetadata structs.
 #define ZAP_COMMAND_MASK(mask) COMMAND_MASK_##mask
@@ -255,31 +270,37 @@
 
 // Array of EmberAfManufacturerCodeEntry structures for commands.
 #define GENERATED_COMMAND_MANUFACTURER_CODE_COUNT (0)
-#define GENERATED_COMMAND_MANUFACTURER_CODES { \
-  { 0x00, 0x00 } \
-}
-
+#define GENERATED_COMMAND_MANUFACTURER_CODES                                                                                       \
+    {                                                                                                                              \
+        {                                                                                                                          \
+            0x00, 0x00                                                                                                             \
+        }                                                                                                                          \
+    }
 
 // This is an array of EmberAfManufacturerCodeEntry structures for clusters.
 #define GENERATED_CLUSTER_MANUFACTURER_CODE_COUNT (0)
-#define GENERATED_CLUSTER_MANUFACTURER_CODES { \
-  { 0x00, 0x00 } \
-}
-
+#define GENERATED_CLUSTER_MANUFACTURER_CODES                                                                                       \
+    {                                                                                                                              \
+        {                                                                                                                          \
+            0x00, 0x00                                                                                                             \
+        }                                                                                                                          \
+    }
 
 // This is an array of EmberAfManufacturerCodeEntry structures for attributes.
 #define GENERATED_ATTRIBUTE_MANUFACTURER_CODE_COUNT (0)
-#define GENERATED_ATTRIBUTE_MANUFACTURER_CODES { \
-  { 0x00, 0x00 } \
-}
-
+#define GENERATED_ATTRIBUTE_MANUFACTURER_CODES                                                                                     \
+    {                                                                                                                              \
+        {                                                                                                                          \
+            0x00, 0x00                                                                                                             \
+        }                                                                                                                          \
+    }
 
 // Array of EmberAfPluginReportingEntry structures.
-#define ZRD(x) EMBER_ZCL_REPORTING_DIRECTION_ ## x
+#define ZRD(x) EMBER_ZCL_REPORTING_DIRECTION_##x
 #define ZAP_REPORT_DIRECTION(x) ZRD(x)
 
 // User options for plugin Reporting
-#define EMBER_AF_PLUGIN_REPORTING_TABLE_SIZE (4)
+#define EMBER_AF_PLUGIN_REPORTING_TABLE_SIZE (1)
 #define EMBER_AF_PLUGIN_REPORTING_ENABLE_GROUP_BOUND_REPORTS
 
 #define EMBER_AF_GENERATED_REPORTING_CONFIG_DEFAULTS_TABLE_SIZE (4)
