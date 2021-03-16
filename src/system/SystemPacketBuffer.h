@@ -598,16 +598,11 @@ public:
                                           uint16_t aReservedSize = PacketBuffer::kDefaultHeaderReserve);
 
     /**
-     * Creates a copy of the data in this packet.
+     * Creates a copy of a packet buffer (or chain).
      *
-     * Does NOT support chained buffers.
-     *
-     *  @param[in]  aAdditionalSize Size of additional application data space after the initial contents.
-     *  @param[in]  aReservedSize   Number of octets to reserve for protocol headers.
-     *
-     * @returns empty handle on allocation failure.
+     * @returns empty handle on allocation failure. Otherwise, the returned buffer has the same sizes and contents as the original.
      */
-    PacketBufferHandle CloneData(uint16_t aAdditionalSize = 0, uint16_t aReservedSize = PacketBuffer::kDefaultHeaderReserve);
+    PacketBufferHandle CloneData();
 
     /**
      * Perform an implementation-defined check on the validity of a PacketBufferHandle.
