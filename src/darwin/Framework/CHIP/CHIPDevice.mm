@@ -57,8 +57,8 @@
 
     chip::SetupPayload setupPayload;
 
-    if (duration > (uint32_t) -1) {
-        CHIP_LOG_ERROR("Error: Duration %tu is too large. Max value %d", duration, (uint32_t) -1);
+    if (duration > UINT32_MAX) {
+        CHIP_LOG_ERROR("Error: Duration %tu is too large. Max value %d", duration, UINT32_MAX);
         if (error) {
             *error = [CHIPError errorForCHIPErrorCode:CHIP_ERROR_INVALID_INTEGER_VALUE];
         }
@@ -90,8 +90,8 @@
 
     chip::SetupPayload setupPayload;
 
-    if (duration > (uint32_t) -1) {
-        CHIP_LOG_ERROR("Error: Duration %tu is too large. Max value %d", duration, (uint32_t) -1);
+    if (duration > UINT32_MAX) {
+        CHIP_LOG_ERROR("Error: Duration %tu is too large. Max value %d", duration, UINT32_MAX);
         if (error) {
             *error = [CHIPError errorForCHIPErrorCode:CHIP_ERROR_INVALID_INTEGER_VALUE];
         }
