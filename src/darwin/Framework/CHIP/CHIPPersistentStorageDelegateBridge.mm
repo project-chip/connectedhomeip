@@ -120,17 +120,21 @@ CHIP_ERROR CHIPPersistentStorageDelegateBridge::SyncGetKeyValue(const char * key
         }
 
         if (valueString != nil) {
-            if (value != nullptr) {
-                size = strlcpy(value, [valueString UTF8String], size);
-                if (size < [valueString length]) {
+            if (([valueString length] + 1) > UINT16_MAX) {
+                error = CHIP_ERROR_BUFFER_TOO_SMALL;
+            } else {
+                if (value != nullptr) {
+                    size = (uint16_t) strlcpy(value, [valueString UTF8String], size);
+                    if (size < [valueString length]) {
+                        error = CHIP_ERROR_NO_MEMORY;
+                    }
+                } else {
+                    size = (uint16_t)[valueString length];
                     error = CHIP_ERROR_NO_MEMORY;
                 }
-            } else {
-                size = [valueString length];
-                error = CHIP_ERROR_NO_MEMORY;
+                // Increment size to account for null termination
+                size += 1;
             }
-            // Increment size to account for null termination
-            size += 1;
         } else {
             error = CHIP_ERROR_KEY_NOT_FOUND;
         }

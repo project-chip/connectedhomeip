@@ -24,8 +24,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CHIPDevice : NSObject
 
-- (BOOL)openPairingWindow:(NSTimeInterval)duration error:(NSError * __autoreleasing *)error;
-- (NSString *)openPairingWindowWithPIN:(NSTimeInterval)duration
+- (BOOL)openPairingWindow:(NSUInteger)duration error:(NSError * __autoreleasing *)error;
+- (NSString *)openPairingWindowWithPIN:(NSUInteger)duration
                          discriminator:(NSUInteger)discriminator
                               setupPIN:(NSUInteger)setupPIN
                                  error:(NSError * __autoreleasing *)error;
