@@ -502,13 +502,14 @@ DeviceCommissioner::DeviceCommissioner()
     mPairedDevicesUpdated = false;
 }
 
-CHIP_ERROR LoadKeyId(PersistentStorageDelegate * storageDelegate, uint16_t & out)
+CHIP_ERROR LoadKeyId(PersistentStorageDelegate * delegate, uint16_t & out)
 {
-    VerifyOrReturnError(storageDelegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
+    // TODO: Consider storing value in binary representation instead of converting to string
     char keyIDStr[kMaxKeyIDStringSize];
     uint16_t size = sizeof(keyIDStr);
-    ReturnErrorOnFailure(storageDelegate->GetKeyValue(kNextAvailableKeyID, keyIDStr, size));
+    ReturnErrorOnFailure(delegate->GetKeyValue(kNextAvailableKeyID, keyIDStr, size));
 
     ReturnErrorCodeIf(!ArgParser::ParseInt(keyIDStr, out), CHIP_ERROR_INTERNAL);
 
@@ -823,6 +824,7 @@ void DeviceCommissioner::PersistDeviceList()
             chip::Platform::MemoryFree(serialized);
         }
 
+        // TODO: Consider storing value in binary representation instead of converting to string
         char keyIDStr[kMaxKeyIDStringSize];
         snprintf(keyIDStr, sizeof(keyIDStr), "%d", mNextKeyId);
         PERSISTENT_KEY_OP(static_cast<uint64_t>(0), kNextAvailableKeyID, key, mStorageDelegate->SetKeyValue(key, keyIDStr));
