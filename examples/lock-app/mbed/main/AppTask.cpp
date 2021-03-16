@@ -31,6 +31,12 @@
 
 #include <support/logging/CHIPLogging.h>
 
+// ZAP -- ZCL Advanced Platform
+#include "attribute-storage.h"
+#include "gen/attribute-id.h"
+#include "gen/attribute-type.h"
+#include "gen/cluster-id.h"
+
 // mbed-os headers
 #include "drivers/InterruptIn.h"
 #include "drivers/Timeout.h"
@@ -266,8 +272,7 @@ void AppTask::ActionCompleted(BoltLockManager::Action_t aAction, int32_t aActor)
 
     if (aActor == AppEvent::kEventType_Button)
     {
-        // TODO
-        // sAppTask.UpdateClusterState();
+        sAppTask.UpdateClusterState();
     }
 }
 
@@ -390,5 +395,18 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
 
             ChipLogProgress(NotSpecified, "Factory Reset has been Canceled");
         }
+    }
+}
+
+void AppTask::UpdateClusterState()
+{
+    uint8_t newValue = !BoltLockMgr().IsUnlocked();
+
+    // write the new on/off value
+    EmberAfStatus status = emberAfWriteAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
+                                                 (uint8_t *) &newValue, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        ChipLogError(NotSpecified, "ZCL update failed: %x", status);
     }
 }

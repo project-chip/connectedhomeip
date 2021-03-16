@@ -38,6 +38,7 @@ target_sources(${APP_TARGET} PRIVATE
                ${CMAKE_CURRENT_SOURCE_DIR}/main/main.cpp
                ${CMAKE_CURRENT_SOURCE_DIR}/main/AppTask.cpp
                ${CMAKE_CURRENT_SOURCE_DIR}/main/BoltLockManager.cpp
+               ${CMAKE_CURRENT_SOURCE_DIR}/main/ZclCallbacks.cpp
                ${APP_ROOT}/lock-common/gen/call-command-handler.cpp
                ${APP_ROOT}/lock-common/gen/callback-stub.cpp
                ${MBED_COMMON}/util/LEDWidget.cpp
