@@ -40,16 +40,31 @@ const int kCustomFlowRequiredFieldLengthInBits       = 1;
 const int kRendezvousInfoFieldLengthInBits           = 8;
 const int kPayloadDiscriminatorFieldLengthInBits     = 12;
 const int kManualSetupDiscriminatorFieldLengthInBits = 4;
-const int kManualSetupDiscriminatorFieldBitMask      = (1 << kManualSetupDiscriminatorFieldLengthInBits) - 1;
-const int kSetupPINCodeFieldLengthInBits             = 27;
-const int kPaddingFieldLengthInBits                  = 5;
+const int kManualSetupDiscriminatorShiftInBits =
+    (kPayloadDiscriminatorFieldLengthInBits - kManualSetupDiscriminatorFieldLengthInBits);
+const int kManualSetupDiscriminatorFieldBitMask       = ((1 << kManualSetupDiscriminatorFieldLengthInBits) - 1);
+const int kManualSetupChunk1DiscriminatorMsbitsPos    = 0;
+const int kManualSetupChunk1DiscriminatorMsbitsLength = 2;
+const int kManualSetupChunk1VidPidPresentBitPos =
+    (kManualSetupChunk1DiscriminatorMsbitsPos + kManualSetupChunk1DiscriminatorMsbitsLength);
+const int kManualSetupChunk2PINCodeLsbitsPos       = 0;
+const int kManualSetupChunk2PINCodeLsbitsLength    = 14;
+const int kManualSetupChunk2DiscriminatorLsbitsPos = (kManualSetupChunk2PINCodeLsbitsPos + kManualSetupChunk2PINCodeLsbitsLength);
+const int kManualSetupChunk2DiscriminatorLsbitsLength = 2;
+const int kManualSetupChunk3PINCodeMsbitsPos          = 0;
+const int kManualSetupChunk3PINCodeMsbitsLength       = 13;
+const int kSetupPINCodeFieldLengthInBits              = 27;
+const int kPaddingFieldLengthInBits                   = 5;
 
 const int kRawVendorTagLengthInBits = 7;
 
-const int kManualSetupShortCodeCharLength = 10;
-const int kManualSetupLongCodeCharLength  = 20;
-const int kManualSetupVendorIdCharLength  = 5;
-const int kManualSetupProductIdCharLength = 5;
+const int kManualSetupShortCodeCharLength  = 10;
+const int kManualSetupLongCodeCharLength   = 20;
+const int kManualSetupCodeChunk1CharLength = 1;
+const int kManualSetupCodeChunk2CharLength = 5;
+const int kManualSetupCodeChunk3CharLength = 4;
+const int kManualSetupVendorIdCharLength   = 5;
+const int kManualSetupProductIdCharLength  = 5;
 
 const uint8_t kSerialNumberTag = 128;
 
