@@ -26,17 +26,11 @@
 /**** Network Section ****/
 #define EMBER_SUPPORTED_NETWORKS (1)
 
-
 #define EMBER_APS_UNICAST_MESSAGE_COUNT 10
 
 /**** Cluster endpoint counts ****/
 #define EMBER_AF_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT (1)
-#define EMBER_AF_GROUPS_CLUSTER_SERVER_ENDPOINT_COUNT (1)
-#define EMBER_AF_IDENTIFY_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
-#define EMBER_AF_IDENTIFY_CLUSTER_SERVER_ENDPOINT_COUNT (1)
-#define EMBER_AF_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT (2)
-#define EMBER_AF_PUMP_CONFIG_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT (2)
-#define EMBER_AF_SCENES_CLUSTER_SERVER_ENDPOINT_COUNT (1)
+#define EMBER_AF_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 
 /**** Cluster Plugins ****/
 
@@ -45,33 +39,7 @@
 #define EMBER_AF_PLUGIN_BASIC_SERVER
 #define EMBER_AF_PLUGIN_BASIC
 
-// Use this macro to check if the server side of the Groups cluster is included
-#define ZCL_USING_GROUPS_CLUSTER_SERVER
-#define EMBER_AF_PLUGIN_GROUPS_SERVER
-#define EMBER_AF_PLUGIN_GROUPS
-
-// Use this macro to check if the client side of the Identify cluster is included
-#define ZCL_USING_IDENTIFY_CLUSTER_CLIENT
-#define EMBER_AF_PLUGIN_IDENTIFY_CLIENT
-
-// Use this macro to check if the server side of the Identify cluster is included
-#define ZCL_USING_IDENTIFY_CLUSTER_SERVER
-#define EMBER_AF_PLUGIN_IDENTIFY_SERVER
-#define EMBER_AF_PLUGIN_IDENTIFY
-
 // Use this macro to check if the server side of the On/off cluster is included
 #define ZCL_USING_ON_OFF_CLUSTER_SERVER
 #define EMBER_AF_PLUGIN_ON_OFF_SERVER
 #define EMBER_AF_PLUGIN_ON_OFF
-
-// Use this macro to check if the server side of the Pump Configuration and Control cluster is included
-#define ZCL_USING_PUMP_CONFIG_CONTROL_CLUSTER_SERVER
-#define EMBER_AF_PLUGIN_PUMP_CONFIGURATION_AND_CONTROL_SERVER
-#define EMBER_AF_PLUGIN_PUMP_CONFIGURATION_AND_CONTROL
-
-// Use this macro to check if the server side of the Scenes cluster is included
-#define ZCL_USING_SCENES_CLUSTER_SERVER
-#define EMBER_AF_PLUGIN_SCENES_SERVER
-#define EMBER_AF_PLUGIN_SCENES
-// User options for server plugin Scenes
-#define EMBER_AF_PLUGIN_SCENES_TABLE_SIZE 3
