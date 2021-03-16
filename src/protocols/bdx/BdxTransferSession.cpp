@@ -17,8 +17,7 @@
 #include <transport/SecureSessionMgr.h>
 
 namespace {
-constexpr uint8_t kBdxVersion         = 0;         ///< The version of this implementation of the BDX spec
-constexpr size_t kStatusReportMinSize = 2 + 4 + 2; ///< 16 bits for GeneralCode, 32 bits for ProtocolId, 16 bits for ProtocolCode
+constexpr uint8_t kBdxVersion = 0; ///< The version of this implementation of the BDX spec
 
 /**
  * @brief
