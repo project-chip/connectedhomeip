@@ -44,8 +44,8 @@
 #include <core/CHIPCore.h>
 #include <core/CHIPEncoding.h>
 #include <core/CHIPSafeCasts.h>
-#include <support/CHIPArgParser.hpp>
 #include <support/Base64.h>
+#include <support/CHIPArgParser.hpp>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
@@ -509,10 +509,9 @@ CHIP_ERROR DeviceCommissioner::Init(NodeId localDeviceId, PersistentStorageDeleg
     ReturnErrorOnFailure(DeviceController::Init(localDeviceId, storageDelegate, systemLayer, inetLayer));
 
     char keyIDStr[kMaxKeyIDStringSize];
-    uint16_t size = sizeof(keyIDStr);
-    CHIP_ERROR err  = CHIP_NO_ERROR;
-    PERSISTENT_KEY_OP(static_cast<uint64_t>(0), kNextAvailableKeyID, key,
-                        err = mStorageDelegate->GetKeyValue(key, keyIDStr, size));
+    uint16_t size  = sizeof(keyIDStr);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    PERSISTENT_KEY_OP(static_cast<uint64_t>(0), kNextAvailableKeyID, key, err = mStorageDelegate->GetKeyValue(key, keyIDStr, size));
     if (err != CHIP_NO_ERROR || !ArgParser::ParseInt(keyIDStr, mNextKeyId))
     {
         // If the persistent storage didn't have a stored KeyID value
@@ -825,8 +824,7 @@ void DeviceCommissioner::PersistDeviceList()
 
         char keyIDStr[kMaxKeyIDStringSize];
         snprintf(keyIDStr, sizeof(keyIDStr), "%d", mNextKeyId);
-        PERSISTENT_KEY_OP(static_cast<uint64_t>(0), kNextAvailableKeyID, key,
-                          mStorageDelegate->SetKeyValue(key, keyIDStr));
+        PERSISTENT_KEY_OP(static_cast<uint64_t>(0), kNextAvailableKeyID, key, mStorageDelegate->SetKeyValue(key, keyIDStr));
     }
 }
 
