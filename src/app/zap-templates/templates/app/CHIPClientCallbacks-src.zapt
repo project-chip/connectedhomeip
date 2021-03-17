@@ -1,5 +1,6 @@
 {{> header}}
 
+{{#if (chip_has_client_clusters)}}
 #include "gen/CHIPClientCallbacks.h"
 
 #include "gen/enums.h"
@@ -648,8 +649,7 @@ bool emberAfDiscoverCommandsReceivedResponseCallback(ClusterId clusterId, uint16
     return true;
 }
 
-{{#all_user_clusters}}
-{{#if (isClient side) }}
+{{#chip_client_clusters}}
 {{#if (user_cluster_has_enabled_command name side)}}
 {{#all_user_cluster_commands}}
 {{#if (isStrEqual clusterName parent.name)}}
@@ -689,8 +689,7 @@ bool emberAf{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}
 {{/if}}
 {{/all_user_cluster_commands}}
 {{/if}}
-{{/if}}
-{{/all_user_clusters}}
+{{/chip_client_clusters}}
 
 bool emberAfReportAttributesCallback(ClusterId clusterId, uint8_t * message, uint16_t messageLen)
 {
@@ -911,3 +910,4 @@ bool emberAfReportAttributesCallback(ClusterId clusterId, uint8_t * message, uin
 
     return true;
 }
+{{/if}}
