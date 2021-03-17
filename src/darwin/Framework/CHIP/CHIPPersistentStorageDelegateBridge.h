@@ -18,11 +18,11 @@
 #import "CHIPPersistentStorageDelegate.h"
 
 #import "CHIPError.h"
-#include <controller/CHIPPersistentStorageDelegate.h>
+#include <core/CHIPPersistentStorageDelegate.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-class CHIPPersistentStorageDelegateBridge : public chip::Controller::PersistentStorageDelegate
+class CHIPPersistentStorageDelegateBridge : public chip::PersistentStorageDelegate
 {
 public:
     CHIPPersistentStorageDelegateBridge();
@@ -30,21 +30,21 @@ public:
 
     void setFrameworkDelegate(id<CHIPPersistentStorageDelegate> delegate, dispatch_queue_t queue);
 
-    void SetDelegate(chip::Controller::PersistentStorageResultDelegate * delegate) override;
+    void SetStorageDelegate(chip::PersistentStorageResultDelegate * delegate) override;
 
-    void GetKeyValue(const char * key) override;
+    void AsyncGetKeyValue(const char * key) override;
 
-    CHIP_ERROR GetKeyValue(const char * key, char * value, uint16_t & size) override;
+    CHIP_ERROR SyncGetKeyValue(const char * key, char * value, uint16_t & size) override;
 
-    void SetKeyValue(const char * key, const char * value) override;
+    void AsyncSetKeyValue(const char * key, const char * value) override;
 
-    void DeleteKeyValue(const char * key) override;
+    void AsyncDeleteKeyValue(const char * key) override;
 
 private:
     id<CHIPPersistentStorageDelegate> mDelegate;
     dispatch_queue_t mQueue;
 
-    chip::Controller::PersistentStorageResultDelegate * mCallback;
+    chip::PersistentStorageResultDelegate * mCallback;
     SendKeyValue mCompletionHandler;
     CHIPSendSetStatus mSetStatusHandler;
     CHIPSendDeleteStatus mDeleteStatusHandler;

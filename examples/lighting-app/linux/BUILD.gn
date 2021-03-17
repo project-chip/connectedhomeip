@@ -12,10 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
-import("${build_root}/chip/tools.gni")
+import("${chip_root}/build/chip/tools.gni")
 import("${chip_root}/src/app/common_flags.gni")
 
 assert(chip_build_tools)
@@ -24,28 +23,16 @@ config("includes") {
   include_dirs = [
     ".",
     "include",
-    "${chip_root}/src/app/util",
-    "${chip_root}/src/app/server",
   ]
 }
 
-executable("chip-tool-server") {
+executable("chip-lighting-app") {
   sources = [
     "LightingManager.cpp",
     "Options.cpp",
     "include/LightingManager.h",
     "main.cpp",
   ]
-
-  if (is_debug) {
-    defines = [ "BUILD_RELEASE=0" ]
-  } else {
-    defines = [ "BUILD_RELEASE=1" ]
-  }
-
-  if (chip_app_use_interaction_model) {
-    defines += [ "CHIP_APP_USE_INTERACTION_MODEL" ]
-  }
 
   public_configs = [ ":includes" ]
 
@@ -58,5 +45,5 @@ executable("chip-tool-server") {
 }
 
 group("linux") {
-  deps = [ ":chip-tool-server" ]
+  deps = [ ":chip-lighting-app" ]
 }

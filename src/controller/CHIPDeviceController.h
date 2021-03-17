@@ -29,8 +29,8 @@
 #pragma once
 
 #include <controller/CHIPDevice.h>
-#include <controller/CHIPPersistentStorageDelegate.h>
 #include <core/CHIPCore.h>
+#include <core/CHIPPersistentStorageDelegate.h>
 #include <core/CHIPTLV.h>
 #include <messaging/ExchangeMgr.h>
 #include <support/DLLUtil.h>
@@ -213,8 +213,8 @@ private:
     void OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * mgr) override;
 
     //////////// PersistentStorageResultDelegate Implementation ///////////////
-    void OnValue(const char * key, const char * value) override;
-    void OnStatus(const char * key, Operation op, CHIP_ERROR err) override;
+    void OnPersistentStorageValue(const char * key, const char * value) override;
+    void OnPersistentStorageStatus(const char * key, Operation op, CHIP_ERROR err) override;
 
     void ReleaseAllDevices();
 
@@ -278,17 +278,11 @@ public:
      *
      * @param[in] remoteDeviceId        The remote device Id.
      * @param[in] params                The Rendezvous connection parameters
-     * @param[in] devicePort            [Optional] The CHIP Device's port, defaults to CHIP_PORT
-     * @param[in] interfaceId           [Optional] The local inet interface to use to communicate with the device.
-     *
-     * @return CHIP_ERROR               The connection status
      */
-    CHIP_ERROR PairDevice(NodeId remoteDeviceId, RendezvousParameters & params, uint16_t devicePort = CHIP_PORT,
-                          Inet::InterfaceId interfaceId = INET_NULL_INTERFACEID);
+    CHIP_ERROR PairDevice(NodeId remoteDeviceId, RendezvousParameters & params);
 
     [[deprecated("Available until Rendezvous is implemented")]] CHIP_ERROR
-    PairTestDeviceWithoutSecurity(NodeId remoteDeviceId, const Inet::IPAddress & deviceAddr, SerializedDevice & serialized,
-                                  uint16_t devicePort = CHIP_PORT, Inet::InterfaceId interfaceId = INET_NULL_INTERFACEID);
+    PairTestDeviceWithoutSecurity(NodeId remoteDeviceId, const Transport::PeerAddress & peerAddress, SerializedDevice & serialized);
 
     /**
      * @brief
@@ -343,6 +337,12 @@ private:
     DeviceCommissionerRendezvousAdvertisementDelegate mRendezvousAdvDelegate;
 
     void PersistDeviceList();
+
+    void FreeRendezvousSession();
+
+    CHIP_ERROR LoadKeyId(PersistentStorageDelegate * delegate, uint16_t & out);
+
+    uint16_t mNextKeyId = 0;
 };
 
 } // namespace Controller

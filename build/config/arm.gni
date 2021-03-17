@@ -14,7 +14,8 @@
 
 import("//build_overrides/build.gni")
 
-if (current_cpu == "arm" || current_cpu == "arm64") {
+if ((current_cpu == "arm" || current_cpu == "arm64") &&
+    (current_os != "mac" && current_os != "ios")) {
   declare_args() {
     # Build file to import for ARM defaults.
     arm_platform_config = ""

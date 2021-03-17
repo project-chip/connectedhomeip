@@ -28,11 +28,25 @@ void ScriptDevicePairingDelegate::SetWifiCredential(const char * ssid, const cha
 {
     strncpy(mWifiSSID, ssid, sizeof(mWifiSSID));
     strncpy(mWifiPassword, password, sizeof(mWifiPassword));
+    mMode = Mode::Wifi;
+}
+
+void ScriptDevicePairingDelegate::SetThreadCredential(uint8_t channel, uint16_t panId,
+                                                      uint8_t (&masterKey)[chip::DeviceLayer::Internal::kThreadMasterKeyLength])
+{
+    mThreadInfo               = {};
+    mThreadInfo.ThreadChannel = channel;
+    mThreadInfo.ThreadPANId   = panId;
+    memcpy(mThreadInfo.ThreadMasterKey, masterKey, sizeof(masterKey));
+    mMode = Mode::Thread;
 }
 
 void ScriptDevicePairingDelegate::OnNetworkCredentialsRequested(RendezvousDeviceCredentialsDelegate * callback)
 {
-    callback->SendNetworkCredentials(mWifiSSID, mWifiPassword);
+    if (mMode == Mode::Wifi)
+        callback->SendNetworkCredentials(mWifiSSID, mWifiPassword);
+    else
+        callback->SendThreadCredentials(mThreadInfo);
 }
 
 void ScriptDevicePairingDelegate::OnOperationalCredentialsRequested(const char * csr, size_t csr_length,

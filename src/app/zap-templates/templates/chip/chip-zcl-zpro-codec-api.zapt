@@ -4,6 +4,7 @@
 #pragma once
 
 #include <app/util/basic-types.h>
+#include <lib/support/Span.h>
 #include <stdint.h>
 #include <system/SystemPacketBuffer.h>
 
@@ -38,7 +39,7 @@ chip::System::PacketBufferHandle encode{{asCamelCased parent.name false}}Cluster
  * @brief
  *    Encode a {{parent.name}} server write command for the {{name}} attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encode{{asCamelCased parent.name false}}ClusterWrite{{asCamelCased name false}}Attribute(uint8_t seqNum, chip::EndpointId destinationEndpoint, {{asUnderlyingZclType type}} {{asCamelCased name}});
+chip::System::PacketBufferHandle encode{{asCamelCased parent.name false}}ClusterWrite{{asCamelCased name false}}Attribute(uint8_t seqNum, chip::EndpointId destinationEndpoint, {{chipType}} {{asCamelCased name}});
 
 {{/if}}
 {{#if (isReportableAttribute)}}

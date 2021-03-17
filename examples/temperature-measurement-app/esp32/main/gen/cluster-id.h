@@ -20,9 +20,6 @@
 // Prevent multiple inclusion
 #pragma once
 
-// Definitions for cluster: Basic
-#define ZCL_BASIC_CLUSTER_ID (0x0000)
-
 // Definitions for cluster: Power Configuration
 #define ZCL_POWER_CONFIG_CLUSTER_ID (0x0001)
 
@@ -82,6 +79,15 @@
 
 // Definitions for cluster: Keep-Alive
 #define ZCL_KEEPALIVE_CLUSTER_ID (0x0025)
+
+// Definitions for cluster: Basic
+#define ZCL_BASIC_CLUSTER_ID (0x0028)
+
+// Definitions for cluster: General Commissioning
+#define ZCL_GENERAL_COMMISSIONING_CLUSTER_ID (0x0030)
+
+// Definitions for cluster: Network Commissioning
+#define ZCL_NETWORK_COMMISSIONING_CLUSTER_ID (0x0031)
 
 // Definitions for cluster: Shade Configuration
 #define ZCL_SHADE_CONFIG_CLUSTER_ID (0x0100)
@@ -236,6 +242,12 @@
 // Definitions for cluster: IAS WD
 #define ZCL_IAS_WD_CLUSTER_ID (0x0502)
 
+// Definitions for cluster: Low Power
+#define ZCL_LOW_POWER_CLUSTER_ID (0x0508)
+
+// Definitions for cluster: Application Basic
+#define ZCL_APPLICATION_BASIC_CLUSTER_ID (0x050D)
+
 // Definitions for cluster: Generic Tunnel
 #define ZCL_GENERIC_TUNNEL_CLUSTER_ID (0x0600)
 
@@ -331,9 +343,6 @@
 
 // Definitions for cluster: ZLL Commissioning
 #define ZCL_ZLL_COMMISSIONING_CLUSTER_ID (0x1000)
-
-// Definitions for cluster: Network Commissioning
-#define ZCL_NETWORK_COMMISSIONING_CLUSTER_ID (0xAAAA)
 
 // Definitions for cluster: Binding
 #define ZCL_BINDING_CLUSTER_ID (0xF000)

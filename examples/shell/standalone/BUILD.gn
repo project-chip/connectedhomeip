@@ -16,7 +16,7 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/openthread.gni")
 
-import("${build_root}/chip/tools.gni")
+import("${chip_root}/build/chip/tools.gni")
 
 assert(chip_build_tools)
 
@@ -30,12 +30,6 @@ executable("chip-shell") {
     "${chip_root}/src/platform",
     "${project_dir}/shell_common:shell_common",
   ]
-
-  if (is_debug) {
-    defines = [ "BUILD_RELEASE=0" ]
-  } else {
-    defines = [ "BUILD_RELEASE=1" ]
-  }
 
   output_dir = root_out_dir
 }

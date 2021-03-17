@@ -57,7 +57,7 @@ CHIP_ERROR ESP32Utils::IsAPEnabled(bool & apEnabled)
 bool ESP32Utils::IsStationProvisioned(void)
 {
     wifi_config_t stationConfig;
-    return (esp_wifi_get_config(ESP_IF_WIFI_STA, &stationConfig) == ERR_OK && stationConfig.sta.ssid[0] != 0);
+    return (esp_wifi_get_config(WIFI_IF_STA, &stationConfig) == ERR_OK && stationConfig.sta.ssid[0] != 0);
 }
 
 CHIP_ERROR ESP32Utils::IsStationConnected(bool & connected)
@@ -234,7 +234,7 @@ CHIP_ERROR ESP32Utils::GetWiFiStationProvision(Internal::DeviceNetworkInfo & net
     CHIP_ERROR err = CHIP_NO_ERROR;
     wifi_config_t stationConfig;
 
-    err = esp_wifi_get_config(ESP_IF_WIFI_STA, &stationConfig);
+    err = esp_wifi_get_config(WIFI_IF_STA, &stationConfig);
     SuccessOrExit(err);
 
     VerifyOrExit(stationConfig.sta.ssid[0] != 0, err = CHIP_ERROR_INCORRECT_STATE);
@@ -290,7 +290,7 @@ CHIP_ERROR ESP32Utils::SetWiFiStationProvision(const Internal::DeviceNetworkInfo
     wifiConfig.sta.sort_method = WIFI_CONNECT_AP_BY_SIGNAL;
 
     // Configure the ESP WiFi interface.
-    err = esp_wifi_set_config(ESP_IF_WIFI_STA, &wifiConfig);
+    err = esp_wifi_set_config(WIFI_IF_STA, &wifiConfig);
     if (err != ESP_OK)
     {
         ChipLogError(DeviceLayer, "esp_wifi_set_config() failed: %s", chip::ErrorStr(err));
@@ -310,7 +310,7 @@ CHIP_ERROR ESP32Utils::ClearWiFiStationProvision(void)
 
     // Clear the ESP WiFi station configuration.
     memset(&stationConfig, 0, sizeof(stationConfig));
-    esp_wifi_set_config(ESP_IF_WIFI_STA, &stationConfig);
+    esp_wifi_set_config(WIFI_IF_STA, &stationConfig);
 
     return err;
 }

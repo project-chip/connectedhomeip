@@ -65,20 +65,24 @@ ExchangeManager::ExchangeManager() : mReliableMessageMgr(mContextPool)
     mState = State::kState_NotInitialized;
 }
 
-CHIP_ERROR ExchangeManager::Init(SecureSessionMgr * sessionMgr)
+CHIP_ERROR ExchangeManager::Init(NodeId localNodeId, TransportMgrBase * transportMgr, SecureSessionMgr * sessionMgr)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     VerifyOrReturnError(mState == State::kState_NotInitialized, err = CHIP_ERROR_INCORRECT_STATE);
 
-    mSessionMgr = sessionMgr;
+    mLocalNodeId  = localNodeId;
+    mTransportMgr = transportMgr;
+    mSessionMgr   = sessionMgr;
 
     mNextExchangeId = GetRandU16();
+    mNextKeyId      = 0;
 
     mContextsInUse = 0;
 
     memset(UMHandlerPool, 0, sizeof(UMHandlerPool));
-    OnExchangeContextChanged = nullptr;
+
+    mTransportMgr->SetRendezvousSession(this);
 
     sessionMgr->SetDelegate(this);
 
@@ -102,8 +106,6 @@ CHIP_ERROR ExchangeManager::Shutdown()
         mSessionMgr->SetDelegate(nullptr);
         mSessionMgr = nullptr;
     }
-
-    OnExchangeContextChanged = nullptr;
 
     mState = State::kState_NotInitialized;
 
@@ -206,6 +208,23 @@ CHIP_ERROR ExchangeManager::UnregisterUMH(uint32_t protocolId, int16_t msgType)
     return CHIP_ERROR_NO_UNSOLICITED_MESSAGE_HANDLER;
 }
 
+bool ExchangeManager::IsMsgCounterSyncMessage(const PayloadHeader & payloadHeader)
+{
+    if (payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::MsgCounterSyncReq) ||
+        payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::MsgCounterSyncRsp))
+    {
+        return true;
+    }
+
+    return false;
+}
+
+void ExchangeManager::HandleGroupMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+                                                 const SecureSessionHandle & session, System::PacketBufferHandle msgBuf)
+{
+    OnMessageReceived(packetHeader, payloadHeader, session, std::move(msgBuf), nullptr);
+}
+
 void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                                         SecureSessionHandle session, System::PacketBufferHandle msgBuf, SecureSessionMgr * msgLayer)
 {
@@ -213,6 +232,35 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
     UnsolicitedMessageHandler * umh         = nullptr;
     UnsolicitedMessageHandler * matchingUMH = nullptr;
     bool sendAckAndCloseExchange            = false;
+
+    if (!IsMsgCounterSyncMessage(payloadHeader) && session.IsPeerGroupMsgIdNotSynchronized())
+    {
+        Transport::PeerConnectionState * state = mSessionMgr->GetPeerConnectionState(session);
+        VerifyOrReturn(state != nullptr);
+
+        // Queue the message as needed for sync with destination node.
+        err = mMessageCounterSyncMgr.AddToReceiveTable(packetHeader, payloadHeader, session, std::move(msgBuf));
+        VerifyOrReturn(err == CHIP_NO_ERROR);
+
+        // Initiate message counter synchronization if no message counter synchronization is in progress.
+        if (!state->IsMsgCounterSyncInProgress())
+        {
+            err = mMessageCounterSyncMgr.SendMsgCounterSyncReq(session);
+        }
+
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(ExchangeManager,
+                         "Message counter synchronization for received message, failed to send synchronization request, err = %d",
+                         err);
+        }
+
+        // After the message that triggers message counter synchronization is stored, and a message counter
+        // synchronization exchange is initiated, we need to return immediately and re-process the original message
+        // when the synchronization is completed.
+
+        return;
+    }
 
     // Search for an existing exchange that the message applies to. If a match is found...
     for (auto & ec : mContextPool)
@@ -305,6 +353,50 @@ exit:
     }
 }
 
+ChannelHandle ExchangeManager::EstablishChannel(const ChannelBuilder & builder, ChannelDelegate * delegate)
+{
+    ChannelContext * channelContext = nullptr;
+
+    // Find an existing Channel matching the builder
+    mChannelContexts.ForEachActiveObject([&](ChannelContext * context) {
+        if (context->MatchesBuilder(builder))
+        {
+            channelContext = context;
+            return false;
+        }
+        return true;
+    });
+
+    if (channelContext == nullptr)
+    {
+        // create a new channel if not found
+        channelContext = mChannelContexts.CreateObject(this);
+        if (channelContext == nullptr)
+            return ChannelHandle{ nullptr };
+        channelContext->Start(builder);
+    }
+    else
+    {
+        channelContext->Retain();
+    }
+
+    ChannelContextHandleAssociation * association = mChannelHandles.CreateObject(channelContext, delegate);
+    channelContext->Release();
+    return ChannelHandle{ association };
+}
+
+void ExchangeManager::OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr)
+{
+    mChannelContexts.ForEachActiveObject([&](ChannelContext * context) {
+        if (context->MatchesSession(session, mgr))
+        {
+            context->OnNewConnection(session);
+            return false;
+        }
+        return true;
+    });
+}
+
 void ExchangeManager::OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * mgr)
 {
     for (auto & ec : mContextPool)
@@ -314,6 +406,50 @@ void ExchangeManager::OnConnectionExpired(SecureSessionHandle session, SecureSes
             ec.Close();
             // Continue iterate because there can be multiple contexts associated with the connection.
         }
+    }
+
+    mChannelContexts.ForEachActiveObject([&](ChannelContext * context) {
+        if (context->MatchesSession(session, mgr))
+        {
+            context->OnConnectionExpired(session);
+            return false;
+        }
+        return true;
+    });
+}
+
+void ExchangeManager::OnMessageReceived(const PacketHeader & header, const Transport::PeerAddress & source,
+                                        System::PacketBufferHandle msgBuf)
+{
+    auto peer = header.GetSourceNodeId();
+    if (!peer.HasValue())
+    {
+        char addrBuffer[Transport::PeerAddress::kMaxToStringSize];
+        source.ToString(addrBuffer, sizeof(addrBuffer));
+        ChipLogError(ExchangeManager, "Unencrypted message from %s is dropped since no source node id in packet header.",
+                     addrBuffer);
+        return;
+    }
+
+    auto node     = peer.Value();
+    auto notFound = mChannelContexts.ForEachActiveObject([&](ChannelContext * context) {
+        if (context->IsCasePairing() && context->MatchNodeId(node))
+        {
+            CHIP_ERROR err = context->HandlePairingMessage(header, source, std::move(msgBuf));
+            if (err != CHIP_NO_ERROR)
+                ChipLogError(ExchangeManager, "HandlePairingMessage error %s from node %llu.", chip::ErrorStr(err), node);
+            return false;
+        }
+        return true;
+    });
+
+    if (notFound)
+    {
+        char addrBuffer[Transport::PeerAddress::kMaxToStringSize];
+        source.ToString(addrBuffer, sizeof(addrBuffer));
+        ChipLogError(ExchangeManager, "Unencrypted message from %s is dropped since no session found for node %llu.", addrBuffer,
+                     node);
+        return;
     }
 }
 

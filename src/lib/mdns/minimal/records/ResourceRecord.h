@@ -31,11 +31,7 @@ namespace Minimal {
 class ResourceRecord
 {
 public:
-    static constexpr uint32_t kTtlHourInSeconds = 3600;
-    static constexpr uint32_t kTtlDayInSeconds  = 24 * kTtlHourInSeconds;
-    static constexpr uint32_t kTtlYearInSeconds = 365 * kTtlDayInSeconds;
-
-    static constexpr uint32_t kDefaultTtl = 10 * kTtlYearInSeconds;
+    static constexpr uint32_t kDefaultTtl = 120; // 2 minutes
 
     virtual ~ResourceRecord() {}
 

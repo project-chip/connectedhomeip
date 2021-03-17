@@ -28,8 +28,8 @@
 	branch = master
 [submodule "pigweed"]
 	path = third_party/pigweed/repo
-	url = https://pigweed.googlesource.com/pigweed/pigweed
-	branch = master
+	url = https://github.com/google/pigweed.git
+	branch = main
 [submodule "openthread"]
 	path = third_party/openthread/repo
 	url = https://github.com/openthread/openthread.git

@@ -21,7 +21,7 @@
 
 #include <jni.h>
 
-#include <controller/CHIPDeviceController_deprecated.h>
+#include <controller/CHIPDeviceController.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 
 /**
@@ -30,12 +30,14 @@
  *
  * Generally it contains the DeviceController class itself, plus any related delegates/callbacks.
  */
-class AndroidDeviceControllerWrapper : public chip::Controller::DevicePairingDelegate
+class AndroidDeviceControllerWrapper : public chip::Controller::DevicePairingDelegate,
+                                       public chip::Controller::DeviceStatusDelegate,
+                                       public chip::PersistentStorageDelegate
 {
 public:
     ~AndroidDeviceControllerWrapper();
 
-    chip::DeviceController::ChipDeviceController * Controller() { return mController.get(); }
+    chip::Controller::DeviceCommissioner * Controller() { return mController.get(); }
     void SetJavaObjectRef(JavaVM * vm, jobject obj);
 
     void SendNetworkCredentials(const char * ssid, const char * password);
@@ -48,6 +50,17 @@ public:
     void OnStatusUpdate(chip::RendezvousSessionDelegate::Status status) override;
     void OnPairingComplete(CHIP_ERROR error) override;
     void OnPairingDeleted(CHIP_ERROR error) override;
+
+    // DeviceStatusDelegate implementation
+    void OnMessage(chip::System::PacketBufferHandle msg) override;
+    void OnStatusChange(void) override;
+
+    // PersistentStorageDelegate implementation
+    void SetStorageDelegate(chip::PersistentStorageResultDelegate * delegate) override;
+    void AsyncGetKeyValue(const char * key) override;
+    CHIP_ERROR SyncGetKeyValue(const char * key, char * value, uint16_t & size) override;
+    void AsyncSetKeyValue(const char * key, const char * value) override;
+    void AsyncDeleteKeyValue(const char * key) override;
 
     jlong ToJNIHandle()
     {
@@ -62,27 +75,22 @@ public:
         return reinterpret_cast<AndroidDeviceControllerWrapper *>(handle);
     }
 
-    static AndroidDeviceControllerWrapper * FromController(chip::DeviceController::ChipDeviceController * controller)
-    {
-        return reinterpret_cast<AndroidDeviceControllerWrapper *>(controller->AppState);
-    }
-
     static AndroidDeviceControllerWrapper * AllocateNew(chip::NodeId nodeId, chip::System::Layer * systemLayer,
                                                         chip::Inet::InetLayer * inetLayer, CHIP_ERROR * errInfoOnFailure);
 
 private:
-    using ChipDeviceControllerPtr = std::unique_ptr<chip::DeviceController::ChipDeviceController>;
+    using ChipDeviceControllerPtr = std::unique_ptr<chip::Controller::DeviceCommissioner>;
 
     ChipDeviceControllerPtr mController;
     chip::RendezvousDeviceCredentialsDelegate * mCredentialsDelegate = nullptr;
+    chip::PersistentStorageResultDelegate * mStorageResultDelegate   = nullptr;
 
     JavaVM * mJavaVM       = nullptr;
     jobject mJavaObjectRef = nullptr;
 
     JNIEnv * GetJavaEnv();
 
-    AndroidDeviceControllerWrapper(ChipDeviceControllerPtr controller) : mController(std::move(controller))
-    {
-        mController->AppState = reinterpret_cast<void *>(this);
-    }
+    jclass GetPersistentStorageClass() { return GetJavaEnv()->FindClass("chip/devicecontroller/PersistentStorage"); }
+
+    AndroidDeviceControllerWrapper(ChipDeviceControllerPtr controller) : mController(std::move(controller)) {}
 };

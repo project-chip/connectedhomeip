@@ -32,6 +32,10 @@ CFLAGS += -Os -DLWIP_IPV6_SCOPES=0
 
 top: all flashing_script
 
+ifeq ($(is_debug),false)
+export SDKCONFIG_DEFAULTS = sdkconfig.optimize.defaults
+endif
+
 include $(IDF_PATH)/make/project.mk
 
 FLASHING_SCRIPT=$(BUILD_DIR_BASE)/$(PROJECT_NAME).flash.py

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2018 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -60,7 +60,7 @@ namespace DeviceLayer {
 namespace Internal {
 
 /**
- * Concrete implementation of the NetworkProvisioningServer singleton object for the ESP32 platform.
+ * Concrete implementation of the BLEManager singleton object for the ESP32 platform.
  */
 class BLEManagerImpl final : public BLEManager,
                              private Ble::BleLayer,
@@ -117,20 +117,20 @@ class BLEManagerImpl final : public BLEManager,
 
     // ===== Private members reserved for use by this class only.
 
-    enum
+    enum class Flags : uint16_t
     {
-        kFlag_AsyncInitCompleted       = 0x0001, /**< One-time asynchronous initialization actions have been performed. */
-        kFlag_ESPBLELayerInitialized   = 0x0002, /**< The ESP BLE layer has been initialized. */
-        kFlag_AppRegistered            = 0x0004, /**< The CHIPoBLE application has been registered with the ESP BLE layer. */
-        kFlag_AttrsRegistered          = 0x0008, /**< The CHIPoBLE GATT attributes have been registered with the ESP BLE layer. */
-        kFlag_GATTServiceStarted       = 0x0010, /**< The CHIPoBLE GATT service has been started. */
-        kFlag_AdvertisingConfigured    = 0x0020, /**< CHIPoBLE advertising has been configured in the ESP BLE layer. */
-        kFlag_Advertising              = 0x0040, /**< The system is currently CHIPoBLE advertising. */
-        kFlag_ControlOpInProgress      = 0x0080, /**< An async control operation has been issued to the ESP BLE layer. */
-        kFlag_AdvertisingEnabled       = 0x0100, /**< The application has enabled CHIPoBLE advertising. */
-        kFlag_FastAdvertisingEnabled   = 0x0200, /**< The application has enabled fast advertising. */
-        kFlag_UseCustomDeviceName      = 0x0400, /**< The application has configured a custom BLE device name. */
-        kFlag_AdvertisingRefreshNeeded = 0x0800, /**< The advertising configuration/state in ESP BLE layer needs to be updated. */
+        kAsyncInitCompleted       = 0x0001, /**< One-time asynchronous initialization actions have been performed. */
+        kESPBLELayerInitialized   = 0x0002, /**< The ESP BLE layer has been initialized. */
+        kAppRegistered            = 0x0004, /**< The CHIPoBLE application has been registered with the ESP BLE layer. */
+        kAttrsRegistered          = 0x0008, /**< The CHIPoBLE GATT attributes have been registered with the ESP BLE layer. */
+        kGATTServiceStarted       = 0x0010, /**< The CHIPoBLE GATT service has been started. */
+        kAdvertisingConfigured    = 0x0020, /**< CHIPoBLE advertising has been configured in the ESP BLE layer. */
+        kAdvertising              = 0x0040, /**< The system is currently CHIPoBLE advertising. */
+        kControlOpInProgress      = 0x0080, /**< An async control operation has been issued to the ESP BLE layer. */
+        kAdvertisingEnabled       = 0x0100, /**< The application has enabled CHIPoBLE advertising. */
+        kFastAdvertisingEnabled   = 0x0200, /**< The application has enabled fast advertising. */
+        kUseCustomDeviceName      = 0x0400, /**< The application has configured a custom BLE device name. */
+        kAdvertisingRefreshNeeded = 0x0800, /**< The advertising configuration/state in ESP BLE layer needs to be updated. */
     };
 
     enum
@@ -183,7 +183,7 @@ class BLEManagerImpl final : public BLEManager,
     uint16_t mRXCharAttrHandle;
     uint16_t mTXCharAttrHandle;
     uint16_t mTXCharCCCDAttrHandle;
-    uint16_t mFlags;
+    BitFlags<Flags> mFlags;
     char mDeviceName[kMaxDeviceNameLength + 1];
 
     void DriveBLEState(void);
@@ -266,17 +266,17 @@ inline BLEManager::CHIPoBLEServiceMode BLEManagerImpl::_GetCHIPoBLEServiceMode(v
 
 inline bool BLEManagerImpl::_IsAdvertisingEnabled(void)
 {
-    return GetFlag(mFlags, kFlag_AdvertisingEnabled);
+    return mFlags.Has(Flags::kAdvertisingEnabled);
 }
 
 inline bool BLEManagerImpl::_IsFastAdvertisingEnabled(void)
 {
-    return GetFlag(mFlags, kFlag_FastAdvertisingEnabled);
+    return mFlags.Has(Flags::kFastAdvertisingEnabled);
 }
 
 inline bool BLEManagerImpl::_IsAdvertising(void)
 {
-    return GetFlag(mFlags, kFlag_Advertising);
+    return mFlags.Has(Flags::kAdvertising);
 }
 
 } // namespace Internal

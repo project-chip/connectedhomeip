@@ -59,7 +59,7 @@ limitations under the License.
         <name>Network Commissioning</name>
         <domain>CHIP</domain>
         <description>TODO</description>
-        <code>0xaaaa</code>
+        <code>0x0031</code>
         <define>NETWORK_COMMISSIONING_CLUSTER</define>
         <client tick="false" init="false">true</client>
         <server tick="false" init="false">true</server>

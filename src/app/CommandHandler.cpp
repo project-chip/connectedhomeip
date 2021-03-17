@@ -42,7 +42,7 @@ void CommandHandler::OnMessageReceived(Messaging::ExchangeContext * ec, const Pa
 
     mpExchangeCtx = ec;
 
-    err = ProcessCommandMessage(std::move(payload), kCommandHandlerId);
+    err = ProcessCommandMessage(std::move(payload), CommandRoleId::HandlerId);
     SuccessOrExit(err);
 
     SendCommandResponse();
@@ -63,7 +63,7 @@ CHIP_ERROR CommandHandler::SendCommandResponse()
                                      Messaging::SendFlags(Messaging::SendMessageFlags::kNone));
     SuccessOrExit(err);
 
-    MoveToState(kState_Sending);
+    MoveToState(CommandState::Sending);
 
 exit:
     Shutdown();
@@ -81,7 +81,7 @@ CHIP_ERROR CommandHandler::ProcessCommandDataElement(CommandDataElement::Parser 
     chip::EndpointId endpointId;
 
     ReturnErrorOnFailure(aCommandElement.GetCommandPath(&commandPath));
-    ReturnErrorOnFailure(commandPath.GetNamespacedClusterId(&clusterId));
+    ReturnErrorOnFailure(commandPath.GetClusterId(&clusterId));
     ReturnErrorOnFailure(commandPath.GetCommandId(&commandId));
     ReturnErrorOnFailure(commandPath.GetEndpointId(&endpointId));
 

@@ -40,15 +40,21 @@
 
 namespace chip {
 
-constexpr uint8_t kKDFSR2Info[]   = "SigmaR2";
-constexpr uint8_t kKDFSR3Info[]   = "SigmaR3";
-constexpr size_t kKDFInfoLength   = sizeof(kKDFSR2Info) - 1;
-constexpr uint8_t kKDFSEInfo[]    = "SessionKeys";
-constexpr size_t kKDFSEInfoLength = sizeof(kKDFSEInfo) - 1;
+// Remove Later
+static P256ECDHDerivedSecret fabricSecret;
 
-constexpr uint8_t kIVSR2[] = "SigmaR2";
-constexpr uint8_t kIVSR3[] = "SigmaR3";
-constexpr size_t kIVLength = sizeof(kIVSR2) - 1;
+constexpr uint8_t kIPKInfo[] = { 0x49, 0x64, 0x65, 0x6e, 0x74, 0x69, 0x74, 0x79, 0x50, 0x72, 0x6f,
+                                 0x74, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x4b, 0x65, 0x79 };
+
+constexpr uint8_t kKDFSR2Info[]   = { 0x53, 0x69, 0x67, 0x6d, 0x61, 0x52, 0x32 };
+constexpr uint8_t kKDFSR3Info[]   = { 0x53, 0x69, 0x67, 0x6d, 0x61, 0x52, 0x33 };
+constexpr size_t kKDFInfoLength   = sizeof(kKDFSR2Info);
+constexpr uint8_t kKDFSEInfo[]    = { 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x4b, 0x65, 0x79, 0x73 };
+constexpr size_t kKDFSEInfoLength = sizeof(kKDFSEInfo);
+
+constexpr uint8_t kIVSR2[] = { 0x4e, 0x43, 0x41, 0x53, 0x45, 0x5f, 0x53, 0x69, 0x67, 0x6d, 0x61, 0x52, 0x32 };
+constexpr uint8_t kIVSR3[] = { 0x4e, 0x43, 0x41, 0x53, 0x45, 0x5f, 0x53, 0x69, 0x67, 0x6d, 0x61, 0x52, 0x33 };
+constexpr size_t kIVLength = sizeof(kIVSR2);
 
 constexpr size_t kTAGSize = 16;
 
@@ -58,6 +64,12 @@ using namespace Credentials;
 CASESession::CASESession()
 {
     mTrustedRootId.mId = nullptr;
+    // dummy initialization REMOVE LATER
+    for (size_t i = 0; i < fabricSecret.Capacity(); i++)
+    {
+        fabricSecret[i] = static_cast<uint8_t>(i);
+    }
+    fabricSecret.SetLength(fabricSecret.Capacity());
 }
 
 CASESession::~CASESession()
@@ -84,123 +96,115 @@ void CASESession::Clear()
 
 CHIP_ERROR CASESession::Serialize(CASESessionSerialized & output)
 {
-    CHIP_ERROR error       = CHIP_NO_ERROR;
     uint16_t serializedLen = 0;
     CASESessionSerializable serializable;
 
-    VerifyOrExit(BASE64_ENCODED_LEN(sizeof(serializable)) <= sizeof(output.inner), error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(BASE64_ENCODED_LEN(sizeof(serializable)) <= sizeof(output.inner), CHIP_ERROR_INVALID_ARGUMENT);
 
-    error = ToSerializable(serializable);
-    SuccessOrExit(error);
+    ReturnErrorOnFailure(ToSerializable(serializable));
 
     serializedLen = chip::Base64Encode(Uint8::to_const_uchar(reinterpret_cast<uint8_t *>(&serializable)),
                                        static_cast<uint16_t>(sizeof(serializable)), Uint8::to_char(output.inner));
-    VerifyOrExit(serializedLen > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(serializedLen < sizeof(output.inner), error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(serializedLen > 0, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(serializedLen < sizeof(output.inner), CHIP_ERROR_INVALID_ARGUMENT);
     output.inner[serializedLen] = '\0';
 
-exit:
-    return error;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CASESession::Deserialize(CASESessionSerialized & input)
 {
-    CHIP_ERROR error = CHIP_NO_ERROR;
     CASESessionSerializable serializable;
     size_t maxlen            = BASE64_ENCODED_LEN(sizeof(serializable));
     size_t len               = strnlen(Uint8::to_char(input.inner), maxlen);
     uint16_t deserializedLen = 0;
 
-    VerifyOrExit(len < sizeof(CASESessionSerialized), error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(CanCastTo<uint16_t>(len), error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(len < sizeof(CASESessionSerialized), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(CanCastTo<uint16_t>(len), CHIP_ERROR_INVALID_ARGUMENT);
 
     memset(&serializable, 0, sizeof(serializable));
     deserializedLen =
         Base64Decode(Uint8::to_const_char(input.inner), static_cast<uint16_t>(len), Uint8::to_uchar((uint8_t *) &serializable));
 
-    VerifyOrExit(deserializedLen > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(deserializedLen <= sizeof(serializable), error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(deserializedLen > 0, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(deserializedLen <= sizeof(serializable), CHIP_ERROR_INVALID_ARGUMENT);
 
-    error = FromSerializable(serializable);
+    ReturnErrorOnFailure(FromSerializable(serializable));
 
-exit:
-    return error;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CASESession::ToSerializable(CASESessionSerializable & serializable)
 {
-    CHIP_ERROR error = CHIP_NO_ERROR;
-
     const NodeId peerNodeId = mConnectionState.GetPeerNodeId();
-    VerifyOrExit(CanCastTo<uint16_t>(mI2RR2IKeyLen), error = CHIP_ERROR_INTERNAL);
-    VerifyOrExit(CanCastTo<uint64_t>(mLocalNodeId), error = CHIP_ERROR_INTERNAL);
-    VerifyOrExit(CanCastTo<uint64_t>(peerNodeId), error = CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(CanCastTo<uint16_t>(mSharedSecret.Length()), CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(CanCastTo<uint16_t>(sizeof(mMessageDigest)), CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(CanCastTo<uint64_t>(mLocalNodeId), CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(CanCastTo<uint64_t>(peerNodeId), CHIP_ERROR_INTERNAL);
 
     memset(&serializable, 0, sizeof(serializable));
-    serializable.mI2RR2IKeyLen    = static_cast<uint16_t>(mI2RR2IKeyLen);
-    serializable.mPairingComplete = (mPairingComplete) ? 1 : 0;
-    serializable.mLocalNodeId     = mLocalNodeId;
-    serializable.mPeerNodeId      = peerNodeId;
-    serializable.mLocalKeyId      = mConnectionState.GetLocalKeyID();
-    serializable.mPeerKeyId       = mConnectionState.GetPeerKeyID();
+    serializable.mSharedSecretLen  = static_cast<uint16_t>(mSharedSecret.Length());
+    serializable.mMessageDigestLen = static_cast<uint16_t>(sizeof(mMessageDigest));
+    serializable.mPairingComplete  = (mPairingComplete) ? 1 : 0;
+    serializable.mLocalNodeId      = mLocalNodeId;
+    serializable.mPeerNodeId       = peerNodeId;
+    serializable.mLocalKeyId       = mConnectionState.GetLocalKeyID();
+    serializable.mPeerKeyId        = mConnectionState.GetPeerKeyID();
 
-    memcpy(serializable.mI2RR2IKey, mI2RR2IKey, mI2RR2IKeyLen);
+    memcpy(serializable.mSharedSecret, mSharedSecret, mSharedSecret.Length());
+    memcpy(serializable.mMessageDigest, mMessageDigest, sizeof(mMessageDigest));
 
-exit:
-    return error;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CASESession::FromSerializable(const CASESessionSerializable & serializable)
 {
-    CHIP_ERROR error = CHIP_NO_ERROR;
-
     mPairingComplete = (serializable.mPairingComplete == 1);
-    mI2RR2IKeyLen    = static_cast<size_t>(serializable.mI2RR2IKeyLen);
+    ReturnErrorOnFailure(mSharedSecret.SetLength(static_cast<size_t>(serializable.mSharedSecretLen)));
 
-    VerifyOrExit(mI2RR2IKeyLen <= sizeof(mI2RR2IKey), error = CHIP_ERROR_INVALID_ARGUMENT);
-    memset(mI2RR2IKey, 0, sizeof(mI2RR2IKey));
-    memcpy(mI2RR2IKey, serializable.mI2RR2IKey, mI2RR2IKeyLen);
+    VerifyOrReturnError(serializable.mMessageDigestLen <= sizeof(mMessageDigest), CHIP_ERROR_INVALID_ARGUMENT);
+
+    memset(mSharedSecret, 0, sizeof(mSharedSecret.Capacity()));
+    memcpy(mSharedSecret, serializable.mSharedSecret, mSharedSecret.Length());
+    memcpy(mMessageDigest, serializable.mMessageDigest, serializable.mMessageDigestLen);
 
     mLocalNodeId = serializable.mLocalNodeId;
     mConnectionState.SetPeerNodeId(serializable.mPeerNodeId);
     mConnectionState.SetLocalKeyID(serializable.mLocalKeyId);
     mConnectionState.SetPeerKeyID(serializable.mPeerKeyId);
 
-exit:
-    return error;
+    return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CASESession::Init(ChipOperationalCredentialSet * chipOperationalCredentialSet, NodeId myNodeId, uint16_t myKeyId,
+CHIP_ERROR CASESession::Init(OperationalCredentialSet * operationalCredentialSet, Optional<NodeId> myNodeId, uint16_t myKeyId,
                              SessionEstablishmentDelegate * delegate)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(operationalCredentialSet->GetCertCount() > 0, CHIP_ERROR_CERT_NOT_FOUND);
 
-    VerifyOrExit(delegate != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(chipOperationalCredentialSet->GetCertCount() > 0, err = CHIP_ERROR_CERT_NOT_FOUND);
+    Clear();
 
-    err = mCommissioningHash.Begin();
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(mCommissioningHash.Begin());
 
     mDelegate    = delegate;
-    mLocalNodeId = myNodeId;
+    mLocalNodeId = myNodeId.ValueOr(kUndefinedNodeId);
     mConnectionState.SetLocalKeyID(myKeyId);
-    mOpCredSet = chipOperationalCredentialSet;
+    mOpCredSet = operationalCredentialSet;
 
     mValidContext.Reset();
     mValidContext.mRequiredKeyUsages.Set(KeyUsageFlags::kDigitalSignature);
     mValidContext.mRequiredKeyPurposes.Set(KeyPurposeFlags::kServerAuth);
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR
-CASESession::WaitForSessionEstablishment(ChipOperationalCredentialSet * chipOperationalCredentialSet, NodeId myNodeId,
+CASESession::WaitForSessionEstablishment(OperationalCredentialSet * operationalCredentialSet, Optional<NodeId> myNodeId,
                                          uint16_t myKeyId, SessionEstablishmentDelegate * delegate)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    err = Init(chipOperationalCredentialSet, myNodeId, myKeyId, delegate);
+    err = Init(operationalCredentialSet, myNodeId, myKeyId, delegate);
     SuccessOrExit(err);
 
     mNextExpectedMsg = Protocols::SecureChannel::MsgType::CASE_SigmaR1;
@@ -218,27 +222,24 @@ CHIP_ERROR CASESession::AttachHeaderAndSend(Protocols::SecureChannel::MsgType ms
 
     payloadHeader.SetMessageType(msgType);
 
-    CHIP_ERROR err = payloadHeader.EncodeBeforeData(msgBuf);
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(payloadHeader.EncodeBeforeData(msgBuf));
 
-    err = mDelegate->SendSessionEstablishmentMessage(PacketHeader()
-                                                         .SetSourceNodeId(mLocalNodeId)
-                                                         .SetDestinationNodeId(mConnectionState.GetPeerNodeId())
-                                                         .SetEncryptionKeyID(mConnectionState.GetLocalKeyID()),
-                                                     mConnectionState.GetPeerAddress(), std::move(msgBuf));
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(mDelegate->SendSessionEstablishmentMessage(PacketHeader()
+                                                                        .SetSourceNodeId(mLocalNodeId)
+                                                                        .SetDestinationNodeId(mConnectionState.GetPeerNodeId())
+                                                                        .SetEncryptionKeyID(mConnectionState.GetLocalKeyID()),
+                                                                    mConnectionState.GetPeerAddress(), std::move(msgBuf)));
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CASESession::EstablishSession(const Transport::PeerAddress peerAddress,
-                                         ChipOperationalCredentialSet * chipOperationalCredentialSet, NodeId myNodeId,
+                                         OperationalCredentialSet * operationalCredentialSet, Optional<NodeId> myNodeId,
                                          NodeId peerNodeId, uint16_t myKeyId, SessionEstablishmentDelegate * delegate)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    err = Init(chipOperationalCredentialSet, myNodeId, myKeyId, delegate);
+    err = Init(operationalCredentialSet, myNodeId, myKeyId, delegate);
     SuccessOrExit(err);
 
     mConnectionState.SetPeerAddress(peerAddress);
@@ -257,21 +258,33 @@ exit:
 
 CHIP_ERROR CASESession::DeriveSecureSession(const uint8_t * info, size_t info_len, SecureSession & session)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    System::PacketBufferHandle msg_salt;
+    uint16_t saltlen;
 
-    VerifyOrExit(mPairingComplete, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(info != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(info_len > 0, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(mPairingComplete, CHIP_ERROR_INCORRECT_STATE);
 
-    err = session.InitFromSecret(mI2RR2IKey, mI2RR2IKeyLen, nullptr, 0, info, info_len);
-    SuccessOrExit(err);
+    // Generate Salt for Encryption keys
+    saltlen = kIPKSize + kSHA256_Hash_Length;
 
-exit:
-    return err;
+    msg_salt = System::PacketBufferHandle::New(saltlen);
+    VerifyOrReturnError(!msg_salt.IsNull(), CHIP_SYSTEM_ERROR_NO_MEMORY);
+    {
+        Encoding::LittleEndian::BufferWriter bbuf(msg_salt->Start(), saltlen);
+        //        bbuf.Put(ipk, ipklen); // placeholder...
+        bbuf.Put(mMessageDigest, sizeof(mMessageDigest));
+
+        VerifyOrReturnError(bbuf.Fit(), CHIP_ERROR_NO_MEMORY);
+    }
+
+    ReturnErrorOnFailure(session.InitFromSecret(mSharedSecret, mSharedSecret.Length(), msg_salt->Start(), saltlen, info, info_len));
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CASESession::SendSigmaR1()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
     uint16_t data_len = static_cast<uint16_t>(kSigmaParamRandomNumberSize + sizeof(uint16_t) +
                                               mOpCredSet->GetCertCount() * kTrustedRootIdSize + kP256_PublicKey_Length);
 
@@ -285,59 +298,48 @@ CHIP_ERROR CASESession::SendSigmaR1()
 
     // Step 1
     // Fill in the random value
-    err = DRBG_get_bytes(msg, kSigmaParamRandomNumberSize);
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(DRBG_get_bytes(msg, kSigmaParamRandomNumberSize));
 
     // Step 4
-    err = mEphemeralKey.Initialize();
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(mEphemeralKey.Initialize());
 
     // Step 5
     // Let's construct the rest of the message using Encoding::LittleEndian::BufferWriter
     {
         uint16_t n_trusted_roots = mOpCredSet->GetCertCount();
         Encoding::LittleEndian::BufferWriter bbuf(&msg[kSigmaParamRandomNumberSize], data_len - kSigmaParamRandomNumberSize);
-        // Step 2
-        // Omitting SessionID here - Mirroring PASESession, which omits SessionID as well
-        // Step 3
+        // Step 2/3
         bbuf.Put16(n_trusted_roots);
         for (uint16_t i = 0; i < n_trusted_roots; ++i)
         {
             bbuf.Put(mOpCredSet->GetTrustedRootId(i)->mId, kTrustedRootIdSize);
         }
         bbuf.Put(mEphemeralKey.Pubkey(), mEphemeralKey.Pubkey().Length());
-        VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_NO_MEMORY);
+        VerifyOrReturnError(bbuf.Fit(), CHIP_ERROR_NO_MEMORY);
     }
 
     msg_R1->SetDataLength(data_len);
 
-    err = mCommissioningHash.AddData(msg_R1->Start(), msg_R1->DataLength());
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(mCommissioningHash.AddData(msg_R1->Start(), msg_R1->DataLength()));
+
+    ReturnErrorOnFailure(ComputeIPK(mConnectionState.GetLocalKeyID(), mIPK, sizeof(mIPK)));
 
     mNextExpectedMsg = Protocols::SecureChannel::MsgType::CASE_SigmaR2;
 
     // Call delegate to send the msg to peer
-    err = AttachHeaderAndSend(Protocols::SecureChannel::MsgType::CASE_SigmaR1, std::move(msg_R1));
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(AttachHeaderAndSend(Protocols::SecureChannel::MsgType::CASE_SigmaR1, std::move(msg_R1)));
 
     ChipLogDetail(Inet, "Sent SigmaR1 msg");
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CASESession::HandleSigmaR1_and_SendSigmaR2(const PacketHeader & header, const System::PacketBufferHandle & msg)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    ReturnErrorOnFailure(HandleSigmaR1(header, msg));
+    ReturnErrorOnFailure(SendSigmaR2());
 
-    err = HandleSigmaR1(header, msg);
-    SuccessOrExit(err);
-
-    err = SendSigmaR2();
-    SuccessOrExit(err);
-
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CASESession::HandleSigmaR1(const PacketHeader & header, const System::PacketBufferHandle & msg)
@@ -347,8 +349,9 @@ CHIP_ERROR CASESession::HandleSigmaR1(const PacketHeader & header, const System:
     const uint8_t * buf   = msg->Start();
     uint16_t buflen       = msg->DataLength();
     uint16_t fixed_buflen = kSigmaParamRandomNumberSize + sizeof(uint16_t) + kTrustedRootIdSize + kP256_PublicKey_Length;
+    uint32_t n_trusted_roots;
 
-    CertificateKeyId trustedRoot[kMaxTrustedRootIds];
+    Encoding::LittleEndian::BufferWriter bbuf(mRemotePubKey, mRemotePubKey.Length());
 
     VerifyOrExit(buf != nullptr, err = CHIP_ERROR_MESSAGE_INCOMPLETE);
     VerifyOrExit(buflen >= fixed_buflen, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
@@ -358,35 +361,15 @@ CHIP_ERROR CASESession::HandleSigmaR1(const PacketHeader & header, const System:
     err = mCommissioningHash.AddData(msg->Start(), msg->DataLength());
     SuccessOrExit(err);
 
-    {
-        // Let's skip the random number portion of the message
-        const uint8_t * msgptr = &buf[kSigmaParamRandomNumberSize];
-        // Omitting SessionID here - Mirroring PASESession, which omits SessionID as well
-        uint32_t n_trusted_roots = chip::Encoding::LittleEndian::Read16(msgptr);
-        // Step 1/2
-        for (uint32_t i = 0; i < n_trusted_roots; ++i)
-        {
-            trustedRoot[i].mId  = msgptr;
-            trustedRoot[i].mLen = kTrustedRootIdSize;
-            msgptr += kTrustedRootIdSize;
-
-            if (mOpCredSet->IsTrustedRootIn(trustedRoot[i]))
-            {
-                mTrustedRootId.mId = reinterpret_cast<const uint8_t *>(chip::Platform::MemoryAlloc(kTrustedRootIdSize));
-                VerifyOrExit(mTrustedRootId.mId != nullptr, err = CHIP_ERROR_NO_MEMORY);
-
-                memcpy(const_cast<uint8_t *>(mTrustedRootId.mId), trustedRoot[i].mId, trustedRoot[i].mLen);
-                mTrustedRootId.mLen = trustedRoot[i].mLen;
-
-                break;
-            }
-        }
-        VerifyOrExit(mTrustedRootId.mId != nullptr, err = CHIP_ERROR_CERT_NOT_TRUSTED);
-        // write public key from message
-        Encoding::LittleEndian::BufferWriter bbuf(&*mRemotePubKey, mRemotePubKey.Length());
-        bbuf.Put(msgptr, kP256_PublicKey_Length);
-        VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_NO_MEMORY);
-    }
+    // Let's skip the random number portion of the message
+    buf += kSigmaParamRandomNumberSize;
+    n_trusted_roots = chip::Encoding::LittleEndian::Read16(buf);
+    // Step 1/2
+    err = FindValidTrustedRoot(&buf, n_trusted_roots);
+    SuccessOrExit(err);
+    // write public key from message
+    bbuf.Put(buf, kP256_PublicKey_Length);
+    VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_NO_MEMORY);
 
     if (header.GetSourceNodeId().HasValue() && mConnectionState.GetPeerNodeId() == kUndefinedNodeId)
     {
@@ -429,15 +412,13 @@ CHIP_ERROR CASESession::SendSigmaR2()
     uint8_t sr2k[kAEADKeySize];
     P256ECDSASignature sigmaR2Signature;
 
-    uint8_t * ipk   = nullptr;
-    uint16_t ipklen = 0;
-
     uint8_t tag[kTAGSize];
 
     saltlen = kIPKSize + kSigmaParamRandomNumberSize + kP256_PublicKey_Length + kSHA256_Hash_Length;
 
     msg_salt = System::PacketBufferHandle::New(saltlen);
     VerifyOrExit(!msg_salt.IsNull(), err = CHIP_SYSTEM_ERROR_NO_MEMORY);
+    msg_salt->SetDataLength(saltlen);
 
     msg_rand = System::PacketBufferHandle::New(kSigmaParamRandomNumberSize);
     VerifyOrExit(!msg_rand.IsNull(), err = CHIP_SYSTEM_ERROR_NO_MEMORY);
@@ -458,28 +439,20 @@ CHIP_ERROR CASESession::SendSigmaR2()
     err = mEphemeralKey.ECDH_derive_secret(mRemotePubKey, mSharedSecret);
     SuccessOrExit(err);
 
+    err = ComputeIPK(mConnectionState.GetLocalKeyID(), mIPK, sizeof(mIPK));
+    SuccessOrExit(err);
+
     // Step 5
-    {
-        uint8_t md[kSHA256_Hash_Length];
-        Encoding::LittleEndian::BufferWriter bbuf(msg_salt->Start(), saltlen);
+    err = ConstructSaltSigmaR2(msg_rand, mEphemeralKey.Pubkey(), mIPK, sizeof(mIPK), msg_salt);
+    SuccessOrExit(err);
 
-        bbuf.Put(ipk, ipklen); // placeholder...
-        bbuf.Put(msg_rand->Start(), kSigmaParamRandomNumberSize);
-        bbuf.Put(mEphemeralKey.Pubkey(), mEphemeralKey.Pubkey().Length());
-        err = mCommissioningHash.Finish(md);
-        SuccessOrExit(err);
-        bbuf.Put(md, kSHA256_Hash_Length);
-
-        VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_NO_MEMORY);
-    }
-
-    msg_salt->SetDataLength(saltlen);
-
-    err = HKDF_SHA256(&*mSharedSecret, mSharedSecret.Length(), msg_salt->Start(), saltlen, kKDFSR2Info, kKDFInfoLength, sr2k,
+    err = HKDF_SHA256(mSharedSecret, mSharedSecret.Length(), msg_salt->Start(), saltlen, kKDFSR2Info, kKDFInfoLength, sr2k,
                       kAEADKeySize);
+    SuccessOrExit(err);
 
     // Step 6
-    msg_r2_signed_len = static_cast<uint16_t>(sizeof(uint16_t) + mOpCredSet->GetDevOpCredLen() + kP256_PublicKey_Length * 2);
+    msg_r2_signed_len =
+        static_cast<uint16_t>(sizeof(uint16_t) + mOpCredSet->GetDevOpCredLen(mTrustedRootId) + kP256_PublicKey_Length * 2);
 
     msg_R2_Signed = System::PacketBufferHandle::New(msg_r2_signed_len);
     VerifyOrExit(!msg_R2_Signed.IsNull(), err = CHIP_SYSTEM_ERROR_NO_MEMORY);
@@ -488,9 +461,9 @@ CHIP_ERROR CASESession::SendSigmaR2()
         Encoding::LittleEndian::BufferWriter bbuf(msg_R2_Signed->Start(), msg_r2_signed_len);
 
         bbuf.Put(mEphemeralKey.Pubkey(), mEphemeralKey.Pubkey().Length());
-        bbuf.Put16(mOpCredSet->GetDevOpCredLen());
-        bbuf.Put(mOpCredSet->GetDevOpCred(), mOpCredSet->GetDevOpCredLen());
-        bbuf.Put(&*mRemotePubKey, mRemotePubKey.Length());
+        bbuf.Put16(mOpCredSet->GetDevOpCredLen(mTrustedRootId));
+        bbuf.Put(mOpCredSet->GetDevOpCred(mTrustedRootId), mOpCredSet->GetDevOpCredLen(mTrustedRootId));
+        bbuf.Put(mRemotePubKey, mRemotePubKey.Length());
 
         VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_NO_MEMORY);
     }
@@ -498,11 +471,11 @@ CHIP_ERROR CASESession::SendSigmaR2()
     msg_R2_Signed->SetDataLength(msg_r2_signed_len);
 
     // Step 7
-    mOpCredSet->SignMsg(msg_R2_Signed->Start(), msg_R2_Signed->DataLength(), sigmaR2Signature);
+    err = mOpCredSet->SignMsg(mTrustedRootId, msg_R2_Signed->Start(), msg_R2_Signed->DataLength(), sigmaR2Signature);
     SuccessOrExit(err);
 
     // Step 8
-    msg_r2_signed_enc_len = sizeof(uint16_t) + mOpCredSet->GetDevOpCredLen() + sigmaR2Signature.Length();
+    msg_r2_signed_enc_len = sizeof(uint16_t) + mOpCredSet->GetDevOpCredLen(mTrustedRootId) + sigmaR2Signature.Length();
 
     msg_R2_Encrypted = System::PacketBufferHandle::New(msg_r2_signed_enc_len);
     VerifyOrExit(!msg_R2_Encrypted.IsNull(), err = CHIP_SYSTEM_ERROR_NO_MEMORY);
@@ -510,9 +483,9 @@ CHIP_ERROR CASESession::SendSigmaR2()
     {
         Encoding::LittleEndian::BufferWriter bbuf(msg_R2_Encrypted->Start(), msg_r2_signed_enc_len);
 
-        bbuf.Put16(mOpCredSet->GetDevOpCredLen());
-        bbuf.Put(mOpCredSet->GetDevOpCred(), mOpCredSet->GetDevOpCredLen());
-        bbuf.Put(&*sigmaR2Signature, sigmaR2Signature.Length());
+        bbuf.Put16(mOpCredSet->GetDevOpCredLen(mTrustedRootId));
+        bbuf.Put(mOpCredSet->GetDevOpCred(mTrustedRootId), mOpCredSet->GetDevOpCredLen(mTrustedRootId));
+        bbuf.Put(sigmaR2Signature, sigmaR2Signature.Length());
 
         VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_NO_MEMORY);
     }
@@ -537,7 +510,6 @@ CHIP_ERROR CASESession::SendSigmaR2()
 
         bbuf.Put(msg_rand->Start(), kSigmaParamRandomNumberSize);
         // Step 2
-        // Omitting SessionID here - Mirroring PASESession, which omits SessionID as well
         bbuf.Put(mTrustedRootId.mId, mTrustedRootId.mLen);
         bbuf.Put(mEphemeralKey.Pubkey(), mEphemeralKey.Pubkey().Length());
         bbuf.Put(msg_R2_Encrypted->Start(), msg_r2_signed_enc_len);
@@ -570,24 +542,18 @@ exit:
 
 CHIP_ERROR CASESession::HandleSigmaR2_and_SendSigmaR3(const PacketHeader & header, const System::PacketBufferHandle & msg)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    ReturnErrorOnFailure(HandleSigmaR2(header, msg));
+    ReturnErrorOnFailure(SendSigmaR3());
 
-    err = HandleSigmaR2(header, msg);
-    SuccessOrExit(err);
-
-    err = SendSigmaR3();
-    SuccessOrExit(err);
-
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CASESession::HandleSigmaR2(const PacketHeader & header, const System::PacketBufferHandle & msg)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    uint8_t * buf = msg->Start();
-    size_t buflen = msg->DataLength();
+    const uint8_t * buf = msg->Start();
+    size_t buflen       = msg->DataLength();
 
     System::PacketBufferHandle msg_salt;
     uint16_t saltlen;
@@ -598,45 +564,34 @@ CHIP_ERROR CASESession::HandleSigmaR2(const PacketHeader & header, const System:
     uint8_t sr2k[kAEADKeySize];
 
     P256ECDSASignature sigmaR2SignedData;
+    size_t sigLen;
 
     P256PublicKey remoteCredential;
 
     const uint8_t * remoteDeviceOpCert;
     uint16_t remoteDeviceOpCertLen;
 
-    uint8_t * remoteDeviceOpCHIPCert = nullptr;
-
     uint8_t * msg_r2_encrypted;
 
-    uint8_t * tag = buf + buflen - kTAGSize;
+    const uint8_t * tag = buf + buflen - kTAGSize;
 
     VerifyOrExit(buf != nullptr, err = CHIP_ERROR_MESSAGE_INCOMPLETE);
 
     ChipLogDetail(Inet, "Received SigmaR2 msg");
 
+    mConnectionState.SetPeerKeyID(header.GetEncryptionKeyID());
+
     // Step 1
+    // skip random part
+    buf += kSigmaParamRandomNumberSize;
+    err = FindValidTrustedRoot(&buf, 1);
+    SuccessOrExit(err);
+
+    // fill in Remote Public Key
     {
-        CertificateKeyId trustedRootId;
-        trustedRootId.mId  = &buf[kSigmaParamRandomNumberSize];
-        trustedRootId.mLen = kTrustedRootIdSize;
-
-        if (mOpCredSet->IsTrustedRootIn(trustedRootId))
-        {
-            mTrustedRootId.mId = reinterpret_cast<const uint8_t *>(chip::Platform::MemoryAlloc(kTrustedRootIdSize));
-            VerifyOrExit(mTrustedRootId.mId != nullptr, err = CHIP_ERROR_NO_MEMORY);
-
-            memcpy(const_cast<uint8_t *>(mTrustedRootId.mId), trustedRootId.mId, trustedRootId.mLen);
-            mTrustedRootId.mLen = trustedRootId.mLen;
-        }
-    }
-    VerifyOrExit(mTrustedRootId.mId != nullptr, err = CHIP_ERROR_CERT_NOT_TRUSTED);
-
-    {
-        // Omitting SessionID here - Mirroring PASESession, which omits SessionID as well
-        const uint8_t * msgptr = &buf[kSigmaParamRandomNumberSize + kTrustedRootIdSize];
-
-        Encoding::LittleEndian::BufferWriter bbuf(&*mRemotePubKey, mRemotePubKey.Length());
-        bbuf.Put(msgptr, mRemotePubKey.Length());
+        Encoding::LittleEndian::BufferWriter bbuf(mRemotePubKey, mRemotePubKey.Length());
+        bbuf.Put(buf, mRemotePubKey.Length());
+        buf += kP256_PublicKey_Length;
 
         VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_NO_MEMORY);
     }
@@ -650,25 +605,15 @@ CHIP_ERROR CASESession::HandleSigmaR2(const PacketHeader & header, const System:
 
     msg_salt = System::PacketBufferHandle::New(saltlen);
     VerifyOrExit(!msg_salt.IsNull(), err = CHIP_SYSTEM_ERROR_NO_MEMORY);
-
-    {
-        const uint8_t * responder_pubkey = &buf[kSigmaParamRandomNumberSize + kTrustedRootIdSize];
-        uint8_t md[kSHA256_Hash_Length];
-        Encoding::LittleEndian::BufferWriter bbuf(msg_salt->Start(), saltlen);
-
-        //        bbuf.Put(ipk, ipklen); // placeholder... TODO
-        bbuf.Put(buf, kSigmaParamRandomNumberSize);
-        bbuf.Put(responder_pubkey, kP256_PublicKey_Length);
-        err = mCommissioningHash.Finish(md);
-        SuccessOrExit(err);
-        bbuf.Put(md, kSHA256_Hash_Length);
-
-        VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_NO_MEMORY);
-    }
-
     msg_salt->SetDataLength(saltlen);
 
-    err = HKDF_SHA256(&*mSharedSecret, mSharedSecret.Length(), msg_salt->Start(), saltlen, kKDFSR2Info, kKDFInfoLength, sr2k,
+    err = ComputeIPK(mConnectionState.GetPeerKeyID(), mRemoteIPK, sizeof(mRemoteIPK));
+    SuccessOrExit(err);
+
+    err = ConstructSaltSigmaR2(msg, mRemotePubKey, mRemoteIPK, sizeof(mRemoteIPK), msg_salt);
+    SuccessOrExit(err);
+
+    err = HKDF_SHA256(mSharedSecret, mSharedSecret.Length(), msg_salt->Start(), saltlen, kKDFSR2Info, kKDFInfoLength, sr2k,
                       kAEADKeySize);
     SuccessOrExit(err);
 
@@ -676,7 +621,7 @@ CHIP_ERROR CASESession::HandleSigmaR2(const PacketHeader & header, const System:
     SuccessOrExit(err);
 
     // Step 4
-    msg_r2_encrypted = &buf[kSigmaParamRandomNumberSize + kTrustedRootIdSize + kP256_PublicKey_Length];
+    msg_r2_encrypted = const_cast<uint8_t *>(buf);
 
     err = AES_CCM_decrypt(msg_r2_encrypted,
                           buflen - kSigmaParamRandomNumberSize - kTrustedRootIdSize - kP256_PublicKey_Length - kTAGSize, nullptr, 0,
@@ -686,90 +631,25 @@ CHIP_ERROR CASESession::HandleSigmaR2(const PacketHeader & header, const System:
     // Step 5
     // Validate responder identity located in msg_r2_encrypted
     // Constructing responder identity
-    {
-        const uint8_t * msgptr = msg_r2_encrypted;
-        ChipCertificateData chipCertData;
-        uint32_t chipcertlen;
-        ChipCertificateData * resultCert = nullptr;
-
-        remoteDeviceOpCertLen = chip::Encoding::LittleEndian::Read16(msgptr);
-        remoteDeviceOpCert    = msgptr;
-
-        Encoding::LittleEndian::BufferWriter bbuf(&*remoteCredential, remoteCredential.Length());
-        // Derive remoteCredential from remoteDeviceOpCert
-        remoteDeviceOpCHIPCert = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(remoteDeviceOpCertLen));
-        VerifyOrExit(remoteDeviceOpCHIPCert != nullptr, err = CHIP_ERROR_NO_MEMORY);
-        err = ConvertX509CertToChipCert(remoteDeviceOpCert, remoteDeviceOpCertLen, remoteDeviceOpCHIPCert, remoteDeviceOpCertLen,
-                                        chipcertlen);
-        SuccessOrExit(err);
-        err = DecodeChipCert(remoteDeviceOpCHIPCert, chipcertlen, chipCertData);
-        SuccessOrExit(err);
-
-        bbuf.Put(chipCertData.mPublicKey, chipCertData.mPublicKeyLen);
-
-        VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_NO_MEMORY);
-
-        // Validate responder identity located in msg_r2_encrypted
-        err = mOpCredSet->FindCertSet(mTrustedRootId)
-                  ->LoadCert(remoteDeviceOpCHIPCert, chipcertlen,
-                             BitFlags<uint8_t, CertDecodeFlags>(CertDecodeFlags::kGenerateTBSHash));
-        SuccessOrExit(err);
-
-        err = SetEffectiveTime();
-        SuccessOrExit(err);
-        // Locate the subject DN and key id that will be used as input the FindValidCert() method.
-        const ChipDN & subjectDN              = chipCertData.mSubjectDN;
-        const CertificateKeyId & subjectKeyId = chipCertData.mSubjectKeyId;
-
-        err = mOpCredSet->FindValidCert(mTrustedRootId, subjectDN, subjectKeyId, mValidContext, resultCert);
-        SuccessOrExit(err);
-    }
+    err = Validate_and_RetrieveResponderID(&buf, remoteCredential, &remoteDeviceOpCert, remoteDeviceOpCertLen);
+    SuccessOrExit(err);
 
     // Step 6 - Construct msg_R2_Signed and validate the signature in msg_r2_encrypted
     msg_r2_signed_len = static_cast<uint16_t>(sizeof(uint16_t) + remoteDeviceOpCertLen + kP256_PublicKey_Length * 2);
 
     msg_R2_Signed = System::PacketBufferHandle::New(msg_r2_signed_len);
     VerifyOrExit(!msg_R2_Signed.IsNull(), err = CHIP_SYSTEM_ERROR_NO_MEMORY);
-
-    {
-        Encoding::LittleEndian::BufferWriter bbuf(msg_R2_Signed->Start(), msg_r2_signed_len);
-
-        bbuf.Put(&*mRemotePubKey, mRemotePubKey.Length());
-        bbuf.Put16(remoteDeviceOpCertLen);
-        bbuf.Put(remoteDeviceOpCert, remoteDeviceOpCertLen);
-        bbuf.Put(mEphemeralKey.Pubkey(), mEphemeralKey.Pubkey().Length());
-
-        VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_NO_MEMORY);
-    }
-
     msg_R2_Signed->SetDataLength(msg_r2_signed_len);
 
-    {
-        const uint8_t * signed_data = &buf[kSigmaParamRandomNumberSize + kTrustedRootIdSize + kP256_PublicKey_Length +
-                                           sizeof(uint16_t) + remoteDeviceOpCertLen];
-        uint16_t signed_data_len =
-            static_cast<uint16_t>(buflen - kSigmaParamRandomNumberSize - kTrustedRootIdSize - kP256_PublicKey_Length -
-                                  sizeof(uint16_t) - remoteDeviceOpCertLen - kTAGSize);
-
-        sigmaR2SignedData.SetLength(signed_data_len);
-        Encoding::LittleEndian::BufferWriter bbuf(&*sigmaR2SignedData, sigmaR2SignedData.Length());
-        bbuf.Put(signed_data, sigmaR2SignedData.Length());
-
-        VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_NO_MEMORY);
-    }
+    sigLen = buflen - kSigmaParamRandomNumberSize - kTrustedRootIdSize - kP256_PublicKey_Length - sizeof(uint16_t) -
+        remoteDeviceOpCertLen - kTAGSize;
+    err = ConstructSignedCredentials(&buf, remoteDeviceOpCert, remoteDeviceOpCertLen, msg_R2_Signed, sigmaR2SignedData, sigLen);
+    SuccessOrExit(err);
 
     err = remoteCredential.ECDSA_validate_msg_signature(msg_R2_Signed->Start(), msg_r2_signed_len, sigmaR2SignedData);
     SuccessOrExit(err);
 
-    mConnectionState.SetPeerKeyID(header.GetEncryptionKeyID());
-
 exit:
-
-    if (remoteDeviceOpCHIPCert != nullptr)
-    {
-        chip::Platform::MemoryFree(remoteDeviceOpCHIPCert);
-    }
-
     if (err == CHIP_ERROR_INVALID_SIGNATURE)
     {
         SendErrorMsg(SigmaErrorType::kInvalidSignature);
@@ -812,25 +692,18 @@ CHIP_ERROR CASESession::SendSigmaR3()
 
     msg_salt = System::PacketBufferHandle::New(saltlen);
     VerifyOrExit(!msg_salt.IsNull(), err = CHIP_SYSTEM_ERROR_NO_MEMORY);
+    msg_salt->SetDataLength(saltlen);
 
-    {
-        uint8_t md[kSHA256_Hash_Length];
-        Encoding::LittleEndian::BufferWriter bbuf(msg_salt->Start(), saltlen);
+    err = ConstructSaltSigmaR3(mIPK, sizeof(mIPK), msg_salt);
+    SuccessOrExit(err);
 
-        // bbuf.Put(ipk, ipklen); // placeholder... TODO
-        err = mCommissioningHash.Finish(md);
-        SuccessOrExit(err);
-        bbuf.Put(md, kSHA256_Hash_Length);
-
-        VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_NO_MEMORY);
-    }
-
-    err = HKDF_SHA256(&*mSharedSecret, mSharedSecret.Length(), msg_salt->Start(), saltlen, kKDFSR3Info, kKDFInfoLength, sr3k,
+    err = HKDF_SHA256(mSharedSecret, mSharedSecret.Length(), msg_salt->Start(), saltlen, kKDFSR3Info, kKDFInfoLength, sr3k,
                       kAEADKeySize);
     SuccessOrExit(err);
 
     // Step 2
-    msg_r3_signed_len = static_cast<uint16_t>(sizeof(uint16_t) + mOpCredSet->GetDevOpCredLen() + kP256_PublicKey_Length * 2);
+    msg_r3_signed_len =
+        static_cast<uint16_t>(sizeof(uint16_t) + mOpCredSet->GetDevOpCredLen(mTrustedRootId) + kP256_PublicKey_Length * 2);
 
     msg_R3_Signed = System::PacketBufferHandle::New(msg_r3_signed_len);
     VerifyOrExit(!msg_R3_Signed.IsNull(), err = CHIP_SYSTEM_ERROR_NO_MEMORY);
@@ -839,9 +712,9 @@ CHIP_ERROR CASESession::SendSigmaR3()
         Encoding::LittleEndian::BufferWriter bbuf(msg_R3_Signed->Start(), msg_r3_signed_len);
 
         bbuf.Put(mEphemeralKey.Pubkey(), mEphemeralKey.Pubkey().Length());
-        bbuf.Put16(mOpCredSet->GetDevOpCredLen());
-        bbuf.Put(mOpCredSet->GetDevOpCred(), mOpCredSet->GetDevOpCredLen());
-        bbuf.Put(&*mRemotePubKey, mRemotePubKey.Length());
+        bbuf.Put16(mOpCredSet->GetDevOpCredLen(mTrustedRootId));
+        bbuf.Put(mOpCredSet->GetDevOpCred(mTrustedRootId), mOpCredSet->GetDevOpCredLen(mTrustedRootId));
+        bbuf.Put(mRemotePubKey, mRemotePubKey.Length());
 
         VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_NO_MEMORY);
     }
@@ -849,12 +722,12 @@ CHIP_ERROR CASESession::SendSigmaR3()
     msg_R3_Signed->SetDataLength(msg_r3_signed_len);
 
     // Step 3
-    err = mOpCredSet->SignMsg(msg_R3_Signed->Start(), msg_R3_Signed->DataLength(), sigmaR3Signature);
+    err = mOpCredSet->SignMsg(mTrustedRootId, msg_R3_Signed->Start(), msg_R3_Signed->DataLength(), sigmaR3Signature);
     SuccessOrExit(err);
 
     // Step 4
-    msg_r3_encrypted_len =
-        static_cast<uint16_t>(sizeof(uint16_t) + mOpCredSet->GetDevOpCredLen() + static_cast<uint16_t>(sigmaR3Signature.Length()));
+    msg_r3_encrypted_len = static_cast<uint16_t>(sizeof(uint16_t) + mOpCredSet->GetDevOpCredLen(mTrustedRootId) +
+                                                 static_cast<uint16_t>(sigmaR3Signature.Length()));
 
     msg_R3_Encrypted = System::PacketBufferHandle::New(msg_r3_encrypted_len);
     VerifyOrExit(!msg_R3_Encrypted.IsNull(), err = CHIP_SYSTEM_ERROR_NO_MEMORY);
@@ -862,9 +735,9 @@ CHIP_ERROR CASESession::SendSigmaR3()
     {
         Encoding::LittleEndian::BufferWriter bbuf(msg_R3_Encrypted->Start(), msg_r3_encrypted_len);
 
-        bbuf.Put16(mOpCredSet->GetDevOpCredLen());
-        bbuf.Put(mOpCredSet->GetDevOpCred(), mOpCredSet->GetDevOpCredLen());
-        bbuf.Put(&*sigmaR3Signature, sigmaR3Signature.Length());
+        bbuf.Put16(mOpCredSet->GetDevOpCredLen(mTrustedRootId));
+        bbuf.Put(mOpCredSet->GetDevOpCred(mTrustedRootId), mOpCredSet->GetDevOpCredLen(mTrustedRootId));
+        bbuf.Put(sigmaR3Signature, sigmaR3Signature.Length());
 
         VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_NO_MEMORY);
     }
@@ -902,21 +775,7 @@ CHIP_ERROR CASESession::SendSigmaR3()
 
     ChipLogDetail(Inet, "Sent SigmaR3 msg");
 
-    // Generate Session Encryption Keys - I2RR2I keys
-    saltlen = kIPKSize + kSHA256_Hash_Length;
-    {
-        uint8_t md[kSHA256_Hash_Length];
-        Encoding::LittleEndian::BufferWriter bbuf(msg_salt->Start(), saltlen);
-        //        bbuf.Put(ipk, ipklen); // placeholder...
-        err = mCommissioningHash.Finish(md);
-        SuccessOrExit(err);
-        bbuf.Put(md, kSHA256_Hash_Length);
-
-        VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_NO_MEMORY);
-    }
-
-    err = HKDF_SHA256(&*mSharedSecret, mSharedSecret.Length(), msg_salt->Start(), saltlen, kKDFSEInfo, kKDFSEInfoLength, mI2RR2IKey,
-                      mI2RR2IKeyLen);
+    err = mCommissioningHash.Finish(mMessageDigest);
     SuccessOrExit(err);
 
     mPairingComplete = true;
@@ -937,19 +796,20 @@ CHIP_ERROR CASESession::HandleSigmaR3(const PacketHeader & header, const System:
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+    const uint8_t * buf = msg->Start();
+
     System::PacketBufferHandle msg_R3_Signed;
     uint16_t msg_r3_signed_len;
 
     uint8_t sr3k[kAEADKeySize];
 
     P256ECDSASignature sigmaR3SignedData;
+    size_t sigLen;
 
     P256PublicKey remoteCredential;
 
     const uint8_t * remoteDeviceOpCert;
     uint16_t remoteDeviceOpCertLen;
-
-    uint8_t * remoteDeviceOpCHIPCert = nullptr;
 
     System::PacketBufferHandle msg_salt;
     uint16_t saltlen;
@@ -965,22 +825,15 @@ CHIP_ERROR CASESession::HandleSigmaR3(const PacketHeader & header, const System:
 
     msg_salt = System::PacketBufferHandle::New(saltlen);
     VerifyOrExit(!msg_salt.IsNull(), err = CHIP_SYSTEM_ERROR_NO_MEMORY);
-
-    {
-        uint8_t md[kSHA256_Hash_Length];
-        Encoding::LittleEndian::BufferWriter bbuf(msg_salt->Start(), saltlen);
-
-        // bbuf.Put(ipk, ipklen); // placeholder... TODO
-        err = mCommissioningHash.Finish(md);
-        SuccessOrExit(err);
-        bbuf.Put(md, kSHA256_Hash_Length);
-
-        VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_NO_MEMORY);
-    }
-
     msg_salt->SetDataLength(saltlen);
 
-    err = HKDF_SHA256(&*mSharedSecret, mSharedSecret.Length(), msg_salt->Start(), saltlen, kKDFSR3Info, kKDFInfoLength, sr3k,
+    err = ComputeIPK(mConnectionState.GetPeerKeyID(), mRemoteIPK, sizeof(mRemoteIPK));
+    SuccessOrExit(err);
+
+    err = ConstructSaltSigmaR3(mRemoteIPK, sizeof(mRemoteIPK), msg_salt);
+    SuccessOrExit(err);
+
+    err = HKDF_SHA256(mSharedSecret, mSharedSecret.Length(), msg_salt->Start(), saltlen, kKDFSR3Info, kKDFInfoLength, sr3k,
                       kAEADKeySize);
     SuccessOrExit(err);
 
@@ -995,73 +848,19 @@ CHIP_ERROR CASESession::HandleSigmaR3(const PacketHeader & header, const System:
     // Step 3
     // Validate initiator identity located in msg->Start()
     // Constructing responder identity
-    {
-        const uint8_t * msgptr = msg->Start();
-        ChipCertificateData chipCertData;
-        uint32_t chipcertlen;
-        ChipCertificateData * resultCert = nullptr;
-
-        remoteDeviceOpCertLen = chip::Encoding::LittleEndian::Read16(msgptr);
-        remoteDeviceOpCert    = msgptr;
-
-        Encoding::LittleEndian::BufferWriter bbuf(&*remoteCredential, remoteCredential.Length());
-        // Derive remoteCredential from remoteDeviceOpCert
-        remoteDeviceOpCHIPCert = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(remoteDeviceOpCertLen));
-        VerifyOrExit(remoteDeviceOpCHIPCert != nullptr, err = CHIP_ERROR_NO_MEMORY);
-        err = ConvertX509CertToChipCert(remoteDeviceOpCert, remoteDeviceOpCertLen, remoteDeviceOpCHIPCert, remoteDeviceOpCertLen,
-                                        chipcertlen);
-        SuccessOrExit(err);
-        err = DecodeChipCert(remoteDeviceOpCHIPCert, chipcertlen, chipCertData);
-        SuccessOrExit(err);
-
-        bbuf.Put(chipCertData.mPublicKey, chipCertData.mPublicKeyLen);
-
-        VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_NO_MEMORY);
-
-        // Validate responder identity located in msg->Start()
-        err = mOpCredSet->FindCertSet(mTrustedRootId)
-                  ->LoadCert(remoteDeviceOpCHIPCert, chipcertlen,
-                             BitFlags<uint8_t, CertDecodeFlags>(CertDecodeFlags::kGenerateTBSHash));
-        SuccessOrExit(err);
-
-        err = SetEffectiveTime();
-        SuccessOrExit(err);
-        // Locate the subject DN and key id that will be used as input the FindValidCert() method.
-        const ChipDN & subjectDN              = chipCertData.mSubjectDN;
-        const CertificateKeyId & subjectKeyId = chipCertData.mSubjectKeyId;
-
-        err = mOpCredSet->FindValidCert(mTrustedRootId, subjectDN, subjectKeyId, mValidContext, resultCert);
-        SuccessOrExit(err);
-    }
+    err = Validate_and_RetrieveResponderID(&buf, remoteCredential, &remoteDeviceOpCert, remoteDeviceOpCertLen);
+    SuccessOrExit(err);
 
     // Step 4
     msg_r3_signed_len = static_cast<uint16_t>(sizeof(uint16_t) + remoteDeviceOpCertLen + kP256_PublicKey_Length * 2);
 
     msg_R3_Signed = System::PacketBufferHandle::New(msg_r3_signed_len);
     VerifyOrExit(!msg_R3_Signed.IsNull(), err = CHIP_SYSTEM_ERROR_NO_MEMORY);
-
-    {
-        Encoding::LittleEndian::BufferWriter bbuf(msg_R3_Signed->Start(), msg_r3_signed_len);
-
-        bbuf.Put(&*mRemotePubKey, mRemotePubKey.Length());
-        bbuf.Put16(remoteDeviceOpCertLen);
-        bbuf.Put(remoteDeviceOpCert, remoteDeviceOpCertLen);
-        bbuf.Put(mEphemeralKey.Pubkey(), mEphemeralKey.Pubkey().Length());
-
-        VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_NO_MEMORY);
-    }
-
     msg_R3_Signed->SetDataLength(msg_r3_signed_len);
 
-    {
-        const uint8_t * msgptr = msg->Start() + sizeof(uint16_t) + remoteDeviceOpCertLen;
-
-        sigmaR3SignedData.SetLength(msg->DataLength() - sizeof(uint16_t) - remoteDeviceOpCertLen - kTAGSize);
-        Encoding::LittleEndian::BufferWriter bbuf(&*sigmaR3SignedData, sigmaR3SignedData.Length());
-        bbuf.Put(msgptr, sigmaR3SignedData.Length());
-
-        VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_NO_MEMORY);
-    }
+    sigLen = msg->DataLength() - sizeof(uint16_t) - remoteDeviceOpCertLen - kTAGSize;
+    err    = ConstructSignedCredentials(&buf, remoteDeviceOpCert, remoteDeviceOpCertLen, msg_R3_Signed, sigmaR3SignedData, sigLen);
+    SuccessOrExit(err);
 
     err = remoteCredential.ECDSA_validate_msg_signature(msg_R3_Signed->Start(), msg_r3_signed_len, sigmaR3SignedData);
     SuccessOrExit(err);
@@ -1070,22 +869,7 @@ CHIP_ERROR CASESession::HandleSigmaR3(const PacketHeader & header, const System:
                  err = CHIP_ERROR_WRONG_NODE_ID);
     VerifyOrExit(header.GetEncryptionKeyID() == mConnectionState.GetPeerKeyID(), err = CHIP_ERROR_INVALID_KEY_ID);
 
-    // Generate Session Encryption Keys - I2RR2I keys
-
-    saltlen = kIPKSize + kSHA256_Hash_Length;
-    {
-        uint8_t md[kSHA256_Hash_Length];
-        Encoding::LittleEndian::BufferWriter bbuf(msg_salt->Start(), saltlen);
-        //        bbuf.Put(ipk, ipklen); // placeholder...
-        err = mCommissioningHash.Finish(md);
-        SuccessOrExit(err);
-        bbuf.Put(md, kSHA256_Hash_Length);
-
-        VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_NO_MEMORY);
-    }
-
-    err = HKDF_SHA256(&*mSharedSecret, mSharedSecret.Length(), msg_salt->Start(), saltlen, kKDFSEInfo, kKDFSEInfoLength, mI2RR2IKey,
-                      mI2RR2IKeyLen);
+    err = mCommissioningHash.Finish(mMessageDigest);
     SuccessOrExit(err);
 
     mPairingComplete = true;
@@ -1094,12 +878,6 @@ CHIP_ERROR CASESession::HandleSigmaR3(const PacketHeader & header, const System:
     mDelegate->OnSessionEstablished();
 
 exit:
-
-    if (remoteDeviceOpCHIPCert != nullptr)
-    {
-        chip::Platform::MemoryFree(remoteDeviceOpCHIPCert);
-    }
-
     if (err == CHIP_ERROR_INVALID_SIGNATURE)
     {
         SendErrorMsg(SigmaErrorType::kInvalidSignature);
@@ -1132,6 +910,146 @@ void CASESession::SendErrorMsg(SigmaErrorType errorCode)
 
 exit:
     Clear();
+}
+
+CHIP_ERROR CASESession::FindValidTrustedRoot(const uint8_t ** msgIterator, uint32_t nTrustedRoots)
+{
+    CertificateKeyId trustedRoot[kMaxTrustedRootIds];
+
+    for (uint32_t i = 0; i < nTrustedRoots; ++i)
+    {
+        trustedRoot[i].mId  = *msgIterator;
+        trustedRoot[i].mLen = kTrustedRootIdSize;
+        *msgIterator += kTrustedRootIdSize;
+
+        if (mOpCredSet->IsTrustedRootIn(trustedRoot[i]))
+        {
+            mTrustedRootId.mId = reinterpret_cast<const uint8_t *>(chip::Platform::MemoryAlloc(kTrustedRootIdSize));
+            VerifyOrReturnError(mTrustedRootId.mId != nullptr, CHIP_ERROR_NO_MEMORY);
+
+            memcpy(const_cast<uint8_t *>(mTrustedRootId.mId), trustedRoot[i].mId, trustedRoot[i].mLen);
+            mTrustedRootId.mLen = trustedRoot[i].mLen;
+
+            break;
+        }
+    }
+    VerifyOrReturnError(mTrustedRootId.mId != nullptr, CHIP_ERROR_CERT_NOT_TRUSTED);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CASESession::ConstructSaltSigmaR2(const System::PacketBufferHandle & rand, const P256PublicKey & pubkey,
+                                             const uint8_t * ipk, size_t ipkLen, System::PacketBufferHandle & salt)
+{
+    uint8_t md[kSHA256_Hash_Length];
+    Encoding::LittleEndian::BufferWriter bbuf(salt->Start(), salt->DataLength());
+
+    bbuf.Put(ipk, ipkLen);
+    bbuf.Put(rand->Start(), kSigmaParamRandomNumberSize);
+    bbuf.Put(pubkey, pubkey.Length());
+    ReturnErrorOnFailure(mCommissioningHash.Finish(md));
+    bbuf.Put(md, kSHA256_Hash_Length);
+
+    VerifyOrReturnError(bbuf.Fit(), CHIP_ERROR_NO_MEMORY);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CASESession::ConstructSaltSigmaR3(const uint8_t * ipk, size_t ipkLen, System::PacketBufferHandle & salt)
+{
+    uint8_t md[kSHA256_Hash_Length];
+    Encoding::LittleEndian::BufferWriter bbuf(salt->Start(), salt->DataLength());
+
+    bbuf.Put(ipk, ipkLen);
+    ReturnErrorOnFailure(mCommissioningHash.Finish(md));
+    bbuf.Put(md, kSHA256_Hash_Length);
+
+    VerifyOrReturnError(bbuf.Fit(), CHIP_ERROR_NO_MEMORY);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CASESession::Validate_and_RetrieveResponderID(const uint8_t ** msgIterator, P256PublicKey & responderID,
+                                                         const uint8_t ** responderOpCert, uint16_t & responderOpCertLen)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    ChipCertificateData chipCertData;
+    uint32_t chipcertlen;
+    ChipCertificateData * resultCert = nullptr;
+    uint8_t * responderOpChipCert    = nullptr;
+
+    responderOpCertLen = chip::Encoding::LittleEndian::Read16(*msgIterator);
+    *responderOpCert   = *msgIterator;
+    *msgIterator += responderOpCertLen;
+
+    Encoding::LittleEndian::BufferWriter bbuf(responderID, responderID.Length());
+    // Derive responder credential
+    responderOpChipCert = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(responderOpCertLen));
+    VerifyOrExit(responderOpChipCert != nullptr, err = CHIP_ERROR_NO_MEMORY);
+    err = ConvertX509CertToChipCert(*responderOpCert, responderOpCertLen, responderOpChipCert, responderOpCertLen, chipcertlen);
+    SuccessOrExit(err);
+    err = DecodeChipCert(responderOpChipCert, chipcertlen, chipCertData);
+    SuccessOrExit(err);
+
+    bbuf.Put(chipCertData.mPublicKey, chipCertData.mPublicKeyLen);
+
+    VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_NO_MEMORY);
+
+    // Validate responder identity located in msg_r2_encrypted
+    err = mOpCredSet->FindCertSet(mTrustedRootId)
+              ->LoadCert(responderOpChipCert, chipcertlen, BitFlags<CertDecodeFlags>(CertDecodeFlags::kGenerateTBSHash));
+    SuccessOrExit(err);
+
+    err = SetEffectiveTime();
+    SuccessOrExit(err);
+    // Locate the subject DN and key id that will be used as input the FindValidCert() method.
+    {
+        const ChipDN & subjectDN              = chipCertData.mSubjectDN;
+        const CertificateKeyId & subjectKeyId = chipCertData.mSubjectKeyId;
+
+        err = mOpCredSet->FindValidCert(mTrustedRootId, subjectDN, subjectKeyId, mValidContext, resultCert);
+        SuccessOrExit(err);
+    }
+
+exit:
+    if (responderOpChipCert != nullptr)
+    {
+        chip::Platform::MemoryFree(responderOpChipCert);
+    }
+
+    return err;
+}
+
+CHIP_ERROR CASESession::ConstructSignedCredentials(const uint8_t ** msgIterator, const uint8_t * responderOpCert,
+                                                   uint16_t responderOpCertLen, System::PacketBufferHandle & signedCredentials,
+                                                   P256ECDSASignature & signature, size_t sigLen)
+{
+    {
+        Encoding::LittleEndian::BufferWriter bbuf(signedCredentials->Start(), signedCredentials->DataLength());
+
+        bbuf.Put(mRemotePubKey, mRemotePubKey.Length());
+        bbuf.Put16(responderOpCertLen);
+        bbuf.Put(responderOpCert, responderOpCertLen);
+        bbuf.Put(mEphemeralKey.Pubkey(), mEphemeralKey.Pubkey().Length());
+
+        VerifyOrReturnError(bbuf.Fit(), CHIP_ERROR_NO_MEMORY);
+    }
+    {
+        signature.SetLength(sigLen);
+        Encoding::LittleEndian::BufferWriter bbuf(signature, signature.Length());
+        bbuf.Put(*msgIterator, signature.Length());
+
+        VerifyOrReturnError(bbuf.Fit(), CHIP_ERROR_NO_MEMORY);
+    }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CASESession::ComputeIPK(const uint16_t sessionID, uint8_t * ipk, size_t ipkLen)
+{
+    ReturnErrorOnFailure(HKDF_SHA256(fabricSecret, fabricSecret.Length(), reinterpret_cast<const uint8_t *>(&sessionID),
+                                     sizeof(sessionID), kIPKInfo, sizeof(kIPKInfo), ipk, ipkLen));
+
+    return CHIP_NO_ERROR;
 }
 
 // PLACEHOLDER... MIGHT REMOVE
@@ -1188,7 +1106,15 @@ CHIP_ERROR CASESession::HandlePeerMessage(const PacketHeader & packetHeader, con
     VerifyOrExit(msgType == mNextExpectedMsg, err = CHIP_ERROR_INVALID_MESSAGE_TYPE);
 
     mConnectionState.SetPeerAddress(peerAddress);
-    VerifyOrExit(mLocalNodeId == packetHeader.GetDestinationNodeId().Value(), err = CHIP_ERROR_WRONG_NODE_ID);
+
+    if (mLocalNodeId == kUndefinedNodeId)
+    {
+        mLocalNodeId = packetHeader.GetDestinationNodeId().ValueOr(kUndefinedNodeId);
+    }
+    else if (packetHeader.GetDestinationNodeId().HasValue())
+    {
+        VerifyOrExit(mLocalNodeId == packetHeader.GetDestinationNodeId().Value(), err = CHIP_ERROR_WRONG_NODE_ID);
+    }
 
     switch (msgType)
     {

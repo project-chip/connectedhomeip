@@ -24,6 +24,12 @@
 #include "enums.h"
 #include <stdint.h>
 
+// Struct for BasicCommissioningInfo
+typedef struct _BasicCommissioningInfo
+{
+    uint32_t FailSafeExpiryLengthMs;
+} EmberAfBasicCommissioningInfo;
+
 // Struct for BlockThreshold
 typedef struct _BlockThreshold
 {

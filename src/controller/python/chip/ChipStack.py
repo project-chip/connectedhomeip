@@ -128,7 +128,7 @@ _LogMessageFunct = CFUNCTYPE(None, c_int64, c_int64, c_char_p, c_uint8, c_char_p
 
 @_singleton
 class ChipStack(object):
-    def __init__(self, installDefaultLogHandler=True):
+    def __init__(self, installDefaultLogHandler=True, bluetoothAdapter=0):
         self.networkLock = Lock()
         self.completeEvent = Event()
         self._ChipStackLib = None
@@ -200,7 +200,11 @@ class ChipStack(object):
         # Initialize the chip library
         res = self._ChipStackLib.pychip_Stack_Init()
         if res != 0:
-            raise self._ChipStack.ErrorToException(res)
+            raise self.ErrorToException(res)
+
+        res = self._ChipStackLib.pychip_BLEMgrImpl_ConfigureBle(bluetoothAdapter)
+        if res != 0:
+            raise self.ErrorToException(res)
 
     @property
     def defaultLogFunct(self):
@@ -372,3 +376,6 @@ class ChipStack(object):
             self._ChipStackLib.pychip_Stack_ErrorToString.restype = c_char_p
             self._ChipStackLib.pychip_Stack_SetLogFunct.argtypes = [_LogMessageFunct]
             self._ChipStackLib.pychip_Stack_SetLogFunct.restype = c_uint32
+
+            self._ChipStackLib.pychip_BLEMgrImpl_ConfigureBle.argtypes = [c_uint32]
+            self._ChipStackLib.pychip_BLEMgrImpl_ConfigureBle.restype = c_uint32

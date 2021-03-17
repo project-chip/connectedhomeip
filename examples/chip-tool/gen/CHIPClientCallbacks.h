@@ -20,6 +20,7 @@
 #pragma once
 
 #include <inttypes.h>
+#include <lib/support/Span.h>
 
 // Global Response Callbacks
 typedef void (*DefaultSuccessCallback)(void * context);
@@ -33,6 +34,7 @@ typedef void (*Int32uAttributeCallback)(void * context, uint32_t value);
 typedef void (*Int32sAttributeCallback)(void * context, int32_t value);
 typedef void (*Int64uAttributeCallback)(void * context, uint64_t value);
 typedef void (*Int64sAttributeCallback)(void * context, int64_t value);
+typedef void (*StringAttributeCallback)(void * context, const chip::ByteSpan value);
 typedef void (*ReadReportingConfigurationReportedCallback)(void * context, uint16_t minInterval, uint16_t maxInterval);
 typedef void (*ReadReportingConfigurationReceivedCallback)(void * context, uint16_t timeout);
 
@@ -70,6 +72,10 @@ typedef void (*DoorLockClusterSetWeekdayScheduleResponseCallback)(void * context
 typedef void (*DoorLockClusterSetYeardayScheduleResponseCallback)(void * context);
 typedef void (*DoorLockClusterUnlockDoorResponseCallback)(void * context);
 typedef void (*DoorLockClusterUnlockWithTimeoutResponseCallback)(void * context);
+typedef void (*GeneralCommissioningClusterArmFailSafeResponseCallback)(void * context, uint8_t errorCode, uint8_t * debugText);
+typedef void (*GeneralCommissioningClusterCommissioningCompleteResponseCallback)(void * context, uint8_t errorCode,
+                                                                                 uint8_t * debugText);
+typedef void (*GeneralCommissioningClusterSetFabricResponseCallback)(void * context, uint8_t errorCode, uint8_t * debugText);
 typedef void (*GroupsClusterAddGroupResponseCallback)(void * context, uint16_t groupId);
 typedef void (*GroupsClusterGetGroupMembershipResponseCallback)(void * context, uint8_t capacity, uint8_t groupCount,
                                                                 /* TYPE WARNING: array array defaults to */ uint8_t * groupList);
