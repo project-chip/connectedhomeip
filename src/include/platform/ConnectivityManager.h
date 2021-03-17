@@ -35,9 +35,6 @@ class BLEEndPoint;
 namespace DeviceLayer {
 
 namespace Internal {
-class NetworkProvisioningServerImpl;
-template <class>
-class GenericNetworkProvisioningServerImpl;
 template <class>
 class GenericPlatformManagerImpl;
 template <class>
@@ -200,9 +197,6 @@ private:
     friend class Internal::GenericPlatformManagerImpl_FreeRTOS;
     template <class>
     friend class Internal::GenericPlatformManagerImpl_POSIX;
-    friend class Internal::NetworkProvisioningServerImpl;
-    template <class>
-    friend class Internal::GenericNetworkProvisioningServerImpl;
 
     CHIP_ERROR Init();
     void OnPlatformEvent(const ChipDeviceEvent * event);
