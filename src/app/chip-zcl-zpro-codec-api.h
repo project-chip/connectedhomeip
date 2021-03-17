@@ -42,7 +42,7 @@
 | LevelControl                                                        | 0x0008 |
 | LowPower                                                            | 0x0508 |
 | MediaPlayback                                                       | 0xF001 |
-| NetworkCommissioning                                                | 0xAAAA |
+| NetworkCommissioning                                                | 0x0031 |
 | OnOff                                                               | 0x0006 |
 | Scenes                                                              | 0x0005 |
 | TemperatureMeasurement                                              | 0x0402 |
@@ -1858,7 +1858,7 @@ chip::System::PacketBufferHandle encodeMediaPlaybackClusterReadClusterRevisionAt
                                                                                         chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
-| Cluster NetworkCommissioning                                        | 0xAAAA |
+| Cluster NetworkCommissioning                                        | 0x0031 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * AddThreadNetwork                                                  |   0x06 |

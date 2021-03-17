@@ -152,7 +152,7 @@
 
 #define ZAP_ATTRIBUTE_MASK(mask) ATTRIBUTE_MASK_##mask
 // This is an array of EmberAfAttributeMetadata structures.
-#define GENERATED_ATTRIBUTE_COUNT 111
+#define GENERATED_ATTRIBUTE_COUNT 112
 #define GENERATED_ATTRIBUTES                                                                                                       \
     {                                                                                                                              \
         { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 2 } }, /* Identify (server): cluster revision */                           \
@@ -206,7 +206,8 @@
             }, /* Basic (server): SoftwareVersion */                                                                               \
             {                                                                                                                      \
                 0x000A, ZAP_TYPE(CHAR_STRING), 64, ZAP_ATTRIBUTE_MASK(SINGLETON), { (uint8_t *) ZAP_LONG_DEFAULTS_INDEX(180) }     \
-            }, /* Basic (server): SoftwareVersionString */                                                                         \
+            },                                                          /* Basic (server): SoftwareVersionString */                \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 0x0001 } }, /* Network Commissioning (server): cluster revision */     \
             {                                                                                                                      \
                 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), { (uint8_t *) 3 }                                         \
             },                                                      /* Door Lock (client): cluster revision */                     \
@@ -319,22 +320,22 @@
             },                                                          /* IAS Zone (server): IAS CIE address */                   \
             { 0x0011, ZAP_TYPE(INT8U), 1, 0, { (uint8_t *) 0xff } },    /* IAS Zone (server): Zone ID */                           \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 0x0001 } }, /* Low Power (server): cluster revision */                 \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 0x0001 } }, /* Application Basic (server): cluster revision */         \
             {                                                                                                                      \
                 0x0000, ZAP_TYPE(OCTET_STRING), 32, 0, { (uint8_t *) ZAP_LONG_DEFAULTS_INDEX(506) }                                \
             },                                                     /* Application Basic (server): vendor name */                   \
             { 0x0001, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 0 } }, /* Application Basic (server): vendor id */                     \
             {                                                                                                                      \
                 0x0002, ZAP_TYPE(OCTET_STRING), 32, 0, { (uint8_t *) ZAP_LONG_DEFAULTS_INDEX(538) }                                \
-            },                                                     /* Application Basic (server): application name */              \
-            { 0x0003, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 0 } }, /* Application Basic (server): product id */                    \
+            },                                                          /* Application Basic (server): application name */         \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 0x0001 } }, /* Application Basic (server): cluster revision */         \
+            { 0x0003, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 0 } },      /* Application Basic (server): product id */               \
             {                                                                                                                      \
                 0x0005, ZAP_TYPE(OCTET_STRING), 32, 0, { (uint8_t *) ZAP_LONG_DEFAULTS_INDEX(570) }                                \
             },                                                          /* Application Basic (server): application id */           \
             { 0x0006, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 0 } },      /* Application Basic (server): catalog vendor id */        \
             { 0x0007, ZAP_TYPE(ENUM8), 1, 0, { (uint8_t *) 0x01 } },    /* Application Basic (server): application satus */        \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 0x0001 } }, /* Media Playback (server): cluster revision */            \
             { 0x0000, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 0 } },      /* Media Playback (server): current state */               \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 0x0001 } }, /* Media Playback (server): cluster revision */            \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 0x0001 } }, /* Content Launch (server): cluster revision */            \
     }
 
@@ -372,7 +373,7 @@
     };
 
 #define ZAP_CLUSTER_MASK(mask) CLUSTER_MASK_##mask
-#define GENERATED_CLUSTER_COUNT 18
+#define GENERATED_CLUSTER_COUNT 19
 #define GENERATED_CLUSTERS                                                                                                         \
     {                                                                                                                              \
         { 0x0003,                                                                                                                  \
@@ -409,50 +410,53 @@
                 0x0028, ZAP_ATTRIBUTE_INDEX(14), 12, 254, ZAP_CLUSTER_MASK(SERVER), NULL                                           \
             }, /* Endpoint: 1, Cluster: Basic (server) */                                                                          \
             {                                                                                                                      \
-                0x0101, ZAP_ATTRIBUTE_INDEX(26), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+                0x0031, ZAP_ATTRIBUTE_INDEX(26), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                              \
+            }, /* Endpoint: 1, Cluster: Network Commissioning (server) */                                                          \
+            {                                                                                                                      \
+                0x0101, ZAP_ATTRIBUTE_INDEX(27), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
             }, /* Endpoint: 1, Cluster: Door Lock (client) */                                                                      \
             { 0x0101,                                                                                                              \
-              ZAP_ATTRIBUTE_INDEX(27),                                                                                             \
+              ZAP_ATTRIBUTE_INDEX(28),                                                                                             \
               4,                                                                                                                   \
               5,                                                                                                                   \
               ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(ATTRIBUTE_CHANGED_FUNCTION),                                             \
               chipFuncArrayDoorLockServer }, /* Endpoint: 1, Cluster: Door Lock (server) */                                        \
             {                                                                                                                      \
-                0x0103, ZAP_ATTRIBUTE_INDEX(31), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+                0x0103, ZAP_ATTRIBUTE_INDEX(32), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
             }, /* Endpoint: 1, Cluster: Barrier Control (client) */                                                                \
             {                                                                                                                      \
-                0x0103, ZAP_ATTRIBUTE_INDEX(32), 5, 7, ZAP_CLUSTER_MASK(SERVER), NULL                                              \
+                0x0103, ZAP_ATTRIBUTE_INDEX(33), 5, 7, ZAP_CLUSTER_MASK(SERVER), NULL                                              \
             }, /* Endpoint: 1, Cluster: Barrier Control (server) */                                                                \
             {                                                                                                                      \
-                0x0300, ZAP_ATTRIBUTE_INDEX(37), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+                0x0300, ZAP_ATTRIBUTE_INDEX(38), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
             }, /* Endpoint: 1, Cluster: Color Control (client) */                                                                  \
             { 0x0300,                                                                                                              \
-              ZAP_ATTRIBUTE_INDEX(38),                                                                                             \
+              ZAP_ATTRIBUTE_INDEX(39),                                                                                             \
               51,                                                                                                                  \
               336,                                                                                                                 \
               ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
               chipFuncArrayColorControlServer }, /* Endpoint: 1, Cluster: Color Control (server) */                                \
             {                                                                                                                      \
-                0x0402, ZAP_ATTRIBUTE_INDEX(89), 4, 8, ZAP_CLUSTER_MASK(SERVER), NULL                                              \
+                0x0402, ZAP_ATTRIBUTE_INDEX(90), 4, 8, ZAP_CLUSTER_MASK(SERVER), NULL                                              \
             }, /* Endpoint: 1, Cluster: Temperature Measurement (server) */                                                        \
             { 0x0500,                                                                                                              \
-              ZAP_ATTRIBUTE_INDEX(93),                                                                                             \
+              ZAP_ATTRIBUTE_INDEX(94),                                                                                             \
               6,                                                                                                                   \
               16,                                                                                                                  \
               ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(PRE_ATTRIBUTE_CHANGED_FUNCTION) |      \
                   ZAP_CLUSTER_MASK(MESSAGE_SENT_FUNCTION),                                                                         \
               chipFuncArrayIasZoneServer }, /* Endpoint: 1, Cluster: IAS Zone (server) */                                          \
             {                                                                                                                      \
-                0x0508, ZAP_ATTRIBUTE_INDEX(99), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                              \
+                0x0508, ZAP_ATTRIBUTE_INDEX(100), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
             }, /* Endpoint: 1, Cluster: Low Power (server) */                                                                      \
             {                                                                                                                      \
-                0x050D, ZAP_ATTRIBUTE_INDEX(100), 8, 105, ZAP_CLUSTER_MASK(SERVER), NULL                                           \
+                0x050D, ZAP_ATTRIBUTE_INDEX(101), 8, 105, ZAP_CLUSTER_MASK(SERVER), NULL                                           \
             }, /* Endpoint: 1, Cluster: Application Basic (server) */                                                              \
             {                                                                                                                      \
-                0xF001, ZAP_ATTRIBUTE_INDEX(108), 2, 4, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
+                0xF001, ZAP_ATTRIBUTE_INDEX(109), 2, 4, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
             }, /* Endpoint: 1, Cluster: Media Playback (server) */                                                                 \
             {                                                                                                                      \
-                0xF002, ZAP_ATTRIBUTE_INDEX(110), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
+                0xF002, ZAP_ATTRIBUTE_INDEX(111), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
             }, /* Endpoint: 1, Cluster: Content Launch (server) */                                                                 \
     }
 
@@ -461,7 +465,7 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 18, 766 },                                                                                         \
+        { ZAP_CLUSTER_INDEX(0), 19, 768 },                                                                                         \
     }
 
 // Largest attribute size is needed for various buffers
@@ -471,7 +475,7 @@
 #define ATTRIBUTE_SINGLETONS_SIZE (254)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (766)
+#define ATTRIBUTE_MAX_SIZE (768)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (1)
@@ -515,7 +519,7 @@
 
 // Array of EmberAfCommandMetadata structs.
 #define ZAP_COMMAND_MASK(mask) COMMAND_MASK_##mask
-#define EMBER_AF_GENERATED_COMMAND_COUNT (141)
+#define EMBER_AF_GENERATED_COMMAND_COUNT (158)
 #define GENERATED_COMMANDS                                                                                                         \
     {                                                                                                                              \
         { 0x0003, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) },     /* Identify (server): Identify */                                 \
@@ -558,6 +562,24 @@
             { 0x0028, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Basic (server): StartUp */                                     \
             { 0x0028, 0x01, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Basic (server): ShutDown */                                    \
             { 0x0028, 0x02, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Basic (server): Leave */                                       \
+            { 0x0031, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Network Commissioning (server): ScanNetworks */                \
+            { 0x0031, 0x01, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Network Commissioning (server): ScanNetworksResponse */        \
+            { 0x0031, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Network Commissioning (server): AddWiFiNetwork */              \
+            { 0x0031, 0x03, ZAP_COMMAND_MASK(OUTGOING_SERVER) }, /* Network Commissioning (server): AddWiFiNetworkResponse */      \
+            { 0x0031, 0x04, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Network Commissioning (server): UpdateWiFiNetwork */           \
+            { 0x0031, 0x05, ZAP_COMMAND_MASK(OUTGOING_SERVER) }, /* Network Commissioning (server): UpdateWiFiNetworkResponse */   \
+            { 0x0031, 0x06, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Network Commissioning (server): AddThreadNetwork */            \
+            { 0x0031, 0x07, ZAP_COMMAND_MASK(OUTGOING_SERVER) }, /* Network Commissioning (server): AddThreadNetworkResponse */    \
+            { 0x0031, 0x08, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Network Commissioning (server): UpdateThreadNetwork */         \
+            { 0x0031, 0x09, ZAP_COMMAND_MASK(OUTGOING_SERVER) }, /* Network Commissioning (server): UpdateThreadNetworkResponse */ \
+            { 0x0031, 0x0A, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Network Commissioning (server): RemoveNetwork */               \
+            { 0x0031, 0x0B, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Network Commissioning (server): RemoveNetworkResponse */       \
+            { 0x0031, 0x0C, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Network Commissioning (server): EnableNetwork */               \
+            { 0x0031, 0x0D, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Network Commissioning (server): EnableNetworkResponse */       \
+            { 0x0031, 0x0E, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Network Commissioning (server): DisableNetwork */              \
+            { 0x0031, 0x0F, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Network Commissioning (server): DisableNetworkResponse */      \
+            { 0x0031, 0x10,                                                                                                        \
+              ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Network Commissioning (server): GetLastNetworkCommissioningResult */         \
             { 0x0101, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Door Lock (client): LockDoor */                                \
             { 0x0101, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Door Lock (client): LockDoorResponse */                        \
             { 0x0101, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Door Lock (server): LockDoor */                                \
