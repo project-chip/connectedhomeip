@@ -431,8 +431,7 @@ CHIP_ERROR TransferSession::HandleMessageReceived(System::PacketBufferHandle msg
 
         mTimeoutStartTimeMs = curTimeMs;
     }
-    else if (payloadHeader.GetProtocolID() == Protocols::kProtocol_SecureChannel &&
-             payloadHeader.GetMessageType() == static_cast<uint8_t>(Protocols::SecureChannel::MsgType::StatusReport))
+    else if (payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::StatusReport))
     {
         err = HandleStatusReportMessage(payloadHeader, std::move(msg));
         SuccessOrExit(err);
@@ -852,7 +851,7 @@ void TransferSession::PrepareStatusReport(StatusCode code)
     Encoding::LittleEndian::PacketBufferWriter bbuf(chip::MessagePacketBuffer::New(kStatusReportMinSize), kStatusReportMinSize);
     VerifyOrReturn(!bbuf.IsNull());
 
-    bbuf.Put16(static_cast<uint16_t>(Protocols::SecureChannel::GeneralStatusCode::Failure));
+    bbuf.Put16(static_cast<uint16_t>(Protocols::SecureChannel::GeneralStatusCode::kFailure));
     bbuf.Put32(Protocols::kProtocol_BDX);
     bbuf.Put16(static_cast<uint16_t>(mStatusReportData.statusCode));
 

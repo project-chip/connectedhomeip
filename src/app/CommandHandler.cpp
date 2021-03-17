@@ -27,7 +27,10 @@
 #include "CommandSender.h"
 #include "InteractionModelEngine.h"
 
+#include <protocols/secure_channel/Constants.h>
 #include <support/ReturnMacros.h>
+
+using GeneralStatusCode = chip::Protocols::SecureChannel::GeneralStatusCode;
 
 namespace chip {
 namespace app {
@@ -91,8 +94,8 @@ CHIP_ERROR CommandHandler::ProcessCommandDataElement(CommandDataElement::Parser 
         // Empty Command, Add status code in invoke command response, notify cluster handler to hand it further.
         err = CHIP_NO_ERROR;
         ChipLogDetail(DataManagement, "Add Status code for empty command, cluster Id is %d", clusterId);
-        // Todo: Define ProtocolCode for StatusCode.
-        AddStatusCode(COMMON_STATUS_SUCCESS, chip::Protocols::kProtocol_SecureChannel, 0, clusterId);
+        AddStatusCode(static_cast<uint16_t>(GeneralStatusCode::kSuccess), Protocols::kProtocol_SecureChannel,
+                      Protocols::SecureChannel::kProtocolCodeSuccess, clusterId);
     }
     else if (CHIP_NO_ERROR == err)
     {

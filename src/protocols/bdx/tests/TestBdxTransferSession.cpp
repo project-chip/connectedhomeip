@@ -127,9 +127,7 @@ void VerifyStatusReport(nlTestSuite * inSuite, void * inContext, const System::P
 
     err = payloadHeader.Decode(msg->Start(), msg->DataLength(), &headerSize);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, payloadHeader.GetProtocolID() == Protocols::kProtocol_SecureChannel);
-    NL_TEST_ASSERT(inSuite,
-                   payloadHeader.GetMessageType() == static_cast<uint8_t>(Protocols::SecureChannel::MsgType::StatusReport));
+    NL_TEST_ASSERT(inSuite, payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::StatusReport));
     if (headerSize > msg->DataLength())
     {
         NL_TEST_ASSERT(inSuite, false);
@@ -139,7 +137,7 @@ void VerifyStatusReport(nlTestSuite * inSuite, void * inContext, const System::P
     Encoding::LittleEndian::Reader reader(msg->Start(), msg->DataLength());
     err = reader.Skip(headerSize).Read16(&generalCode).Read32(&protocolId).Read16(protocolCode.RawStorage()).StatusCode();
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, generalCode == static_cast<uint16_t>(Protocols::SecureChannel::GeneralStatusCode::Failure));
+    NL_TEST_ASSERT(inSuite, generalCode == static_cast<uint16_t>(Protocols::SecureChannel::GeneralStatusCode::kFailure));
     NL_TEST_ASSERT(inSuite, protocolId == Protocols::kProtocol_BDX);
     NL_TEST_ASSERT(inSuite, protocolCode == code);
 }
