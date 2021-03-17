@@ -87,7 +87,8 @@ private:
     char * mSSID;
     char * mPassword;
     const char * mThrdKey;
-    
+    // Thread Provisioning Data
+    chip::DeviceLayer::Internal::DeviceNetworkInfo mThreadInfo = {};
 
     ChipDeviceCommissioner mCommissioner;
 };
