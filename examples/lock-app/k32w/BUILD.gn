@@ -81,7 +81,7 @@ k32w_executable("lock_app") {
 
   output_dir = root_out_dir
 
-  ldscript = "${k32w_platform_dir}/app/ldscripts/chip-k32w061-lock-example.ld"
+  ldscript = "${k32w_platform_dir}/app/ldscripts/chip-k32w061-linker.ld"
 
   ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
 }

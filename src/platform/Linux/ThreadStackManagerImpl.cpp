@@ -441,6 +441,11 @@ exit:
     return OTBR_TO_CHIP_ERROR(error);
 }
 
+CHIP_ERROR ThreadStackManagerImpl::_GetFactoryAssignedEUI64(uint8_t (&buf)[8])
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
 CHIP_ERROR ThreadStackManagerImpl::_GetExternalIPv6Address(chip::Inet::IPAddress & addr)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;

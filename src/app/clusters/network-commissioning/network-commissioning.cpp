@@ -220,6 +220,7 @@ CHIP_ERROR DoEnableNetwork(NetworkInfo * network)
     {
     case NetworkType::kThread:
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+        ReturnErrorOnFailure(DeviceLayer::ThreadStackMgr().SetThreadEnabled(false));
         ReturnErrorOnFailure(
             DeviceLayer::ThreadStackMgr().SetThreadProvision(network->mData.mThread.mDataset, network->mData.mThread.mDatasetLen));
         ReturnErrorOnFailure(DeviceLayer::ThreadStackMgr().SetThreadEnabled(true));

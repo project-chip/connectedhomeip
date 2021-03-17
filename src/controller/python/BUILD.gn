@@ -30,11 +30,6 @@ config("controller_wno_deprecate") {
   cflags = [ "-Wno-deprecated-declarations" ]
 }
 
-config("includes") {
-  include_dirs =
-      [ "${chip_root}/src/controller/CHIPDeviceController_deprecated.h" ]
-}
-
 shared_library("ChipDeviceCtrl") {
   output_name = "_ChipDeviceCtrl"
   output_dir = "${target_out_dir}/chip"

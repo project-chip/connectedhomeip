@@ -3,8 +3,8 @@
 This article describes how to use
 [CHIPTool](../../src/android/CHIPTool/README.md) for Android smartphones to
 commission an NXP K32W061 DK6 running
-[NXP K32W Lock Example Application](../../examples/lock-app/k32w/README.md) onto
-a CHIP-enabled Thread network.
+[NXP K32W Lock/Light Example Application](../../examples/lock-light-app/k32w/README.md)
+onto a CHIP-enabled Thread network.
 
 <hr>
 
@@ -12,7 +12,7 @@ a CHIP-enabled Thread network.
 -   [Requirements](#requirements)
 -   [Building and programming OpenThread RCP firmware](#building-rcp-firmware)
 -   [Configuring PC as Thread Border Router](#configuring-pc)
--   [Building and programming NXP K32W Lock Example Application](#building-example)
+-   [Building and programming NXP K32W Lock/Light Example Application](#building-example)
 -   [Building and installing Android CHIPTool](#building-chiptool)
 -   [Forming a Thread network on the Border Router](#form-thread)
 -   [Preparing accessory device](#preparing-accessory)
@@ -45,7 +45,7 @@ with a spare Wi-Fi card and an
 device.
 
 The following diagram shows the connectivity between network components required
-to allow communication between devices running the CHIPTool and Lock
+to allow communication between devices running the CHIPTool and Lock/Light
 applications:
 
 ![nxp_hw_connectivity](../../examples/platform/k32w/doc/images/nxp_hw_connectivity.JPG)
@@ -306,11 +306,15 @@ To make your PC work as a Thread Border Router, complete the following tasks:
 
 <a name="building-example"></a>
 
-## Building and programming NXP K32W Lock Example Application
+## Building and programming NXP K32W Lock/Light Example Application
 
 See
 [NXP K32W Lock Example Application README](../../examples/lock-app/k32w/README.md)
-to learn how to build and program the example onto an K32W061 DK6.
+to learn how to build and program the lock example onto an K32W061 DK6.
+
+See
+[NXP K32W Light Example Application README](../../examples/lighting-app/k32w/README.md)
+to learn how to build and program the light example onto an K32W061 DK6.
 
 <hr>
 
@@ -442,10 +446,11 @@ following steps:
 
 2. Verify that the text box on the screen is not empty and contains the IPv6
    address of the accessory device.
-3. Tap the following buttons to change the lock state:
+3. Tap the following buttons to change the lock/light state:
 
-    - _ON_ and _OFF_ buttons lock and unlock the door, respectively.
-    - _TOGGLE_ changes the lock state to the opposite.
+    - _ON_ and _OFF_ buttons lock/turn on and unlock/turn off the door/light
+      bulb, respectively.
+    - _TOGGLE_ changes the lock/light state to the opposite.
 
-The _LED D3_ on the device turns on or off based on the changes of the lock
-state.
+The _LED D3_ on the device turns on or off based on the changes of the
+lock/light state.

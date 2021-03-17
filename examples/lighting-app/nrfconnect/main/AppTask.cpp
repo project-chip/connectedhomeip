@@ -383,6 +383,7 @@ void AppTask::StartBLEAdvertisementHandler(AppEvent * aEvent)
         return;
     }
 
+#ifdef CONFIG_CHIP_NFC_COMMISSIONING
     if (!sNFC.IsTagEmulationStarted())
     {
         if (!(GetAppTask().StartNFCTag() < 0))
@@ -398,6 +399,7 @@ void AppTask::StartBLEAdvertisementHandler(AppEvent * aEvent)
     {
         LOG_INF("NFC Tag emulation is already started");
     }
+#endif
 
     if (ConnectivityMgr().IsBLEAdvertisingEnabled())
     {

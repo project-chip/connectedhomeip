@@ -361,14 +361,15 @@ void PrintUsage(streamer_t * stream)
 {
     streamer_printf(stream, "Usage: ping [options] <destination>\n\nOptions:\n");
 
-    streamer_printf(stream,
-                    "  -h              print help information\n"
-                    "  -u              use UDP (default)\n"
-                    "  -t              use TCP\n"
-                    "  -p  <port>      echo server port\n"
-                    "  -i  <interval>  ping interval time in seconds\n"
-                    "  -c  <count>     stop after <count> replies\n"
-                    "  -r  <1|0>       enalbe/disable CRMP\n");
+    // Need to split the help info to prevent overflowing the streamer_printf
+    // buffer (CONSOLE_DEFAULT_MAX_LINE 256)
+    streamer_printf(stream, "  -h              print help information\n");
+    streamer_printf(stream, "  -u              use UDP (default)\n");
+    streamer_printf(stream, "  -t              use TCP\n");
+    streamer_printf(stream, "  -p  <port>      echo server port\n");
+    streamer_printf(stream, "  -i  <interval>  ping interval time in seconds\n");
+    streamer_printf(stream, "  -c  <count>     stop after <count> replies\n");
+    streamer_printf(stream, "  -r  <1|0>       enable or disable CRMP\n");
 }
 
 int cmd_ping(int argc, char ** argv)

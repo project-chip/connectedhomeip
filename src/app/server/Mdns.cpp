@@ -142,7 +142,12 @@ void StartServer()
     }
     else
     {
+// TODO: Thread devices are not able to advertise using mDNS before being provisioned,
+// so configuraton should be added to enable commissioning advertising based on supported
+// Rendezvous methods.
+#if !CHIP_DEVICE_CONFIG_ENABLE_THREAD
         err = app::Mdns::AdvertiseCommisioning();
+#endif
     }
 
     if (err != CHIP_NO_ERROR)

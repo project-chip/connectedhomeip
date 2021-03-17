@@ -32,7 +32,7 @@ if (chip_device_platform != "none") {
       test_sources += [ "TestPlatformMgr.cpp" ]
     }
 
-    if (chip_enable_mdns && chip_enable_happy_tests &&
+    if (chip_mdns != "none" && chip_enable_happy_tests &&
         chip_device_platform == "linux") {
       test_sources += [ "TestMdns.cpp" ]
     }

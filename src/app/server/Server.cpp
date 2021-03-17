@@ -72,35 +72,35 @@ constexpr bool useTestPairing()
 
 class ServerStorageDelegate : public PersistentStorageDelegate
 {
-    void SetDelegate(PersistentStorageResultDelegate * delegate) override
+    void SetStorageDelegate(PersistentStorageResultDelegate * delegate) override
     {
         ChipLogError(AppServer, "ServerStorageDelegate does not support async operations");
         chipDie();
     }
 
-    void GetKeyValue(const char * key) override
+    void AsyncGetKeyValue(const char * key) override
     {
         ChipLogError(AppServer, "ServerStorageDelegate does not support async operations");
         chipDie();
     }
 
-    void SetKeyValue(const char * key, const char * value) override
+    void AsyncSetKeyValue(const char * key, const char * value) override
     {
         ChipLogError(AppServer, "ServerStorageDelegate does not support async operations");
         chipDie();
     }
 
-    CHIP_ERROR GetKeyValue(const char * key, void * buffer, uint16_t & size) override
+    CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override
     {
         return PersistedStorage::KeyValueStoreMgr().Get(key, buffer, size);
     }
 
-    CHIP_ERROR SetKeyValue(const char * key, const void * value, uint16_t size) override
+    CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override
     {
         return PersistedStorage::KeyValueStoreMgr().Put(key, value, size);
     }
 
-    void DeleteKeyValue(const char * key) override { PersistedStorage::KeyValueStoreMgr().Delete(key); }
+    void AsyncDeleteKeyValue(const char * key) override { PersistedStorage::KeyValueStoreMgr().Delete(key); }
 };
 
 ServerStorageDelegate gServerStorage;
@@ -530,6 +530,11 @@ void InitServer(AppDelegate * delegate)
         SuccessOrExit(err = OpenDefaultPairingWindow(ResetAdmins::kYes));
 #endif
     }
+
+// Starting mDNS server only for Thread devices due to problem reported in issue #5076.
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    app::Mdns::StartServer();
+#endif
 
 exit:
     if (err != CHIP_NO_ERROR)

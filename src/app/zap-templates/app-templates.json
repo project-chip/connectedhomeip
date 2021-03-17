@@ -131,12 +131,12 @@
             "output": "IMClusterCommandHandler.cpp"
         },
         {
-            "path": "templates/chip/CHIPClustersObjc.zapt",
+            "path": "templates/app/CHIPClustersObjc.zapt",
             "name": "Objc ZCL API Header",
             "output": "CHIPClustersObjc.h"
         },
         {
-            "path": "templates/chip/CHIPClustersObjc-src.zapt",
+            "path": "templates/app/CHIPClustersObjc-src.zapt",
             "name": "Objc ZCL API",
             "output": "CHIPClustersObjc.mm"
         }
