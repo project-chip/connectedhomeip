@@ -357,6 +357,29 @@ PacketBuffer * PacketBuffer::Consume(uint16_t aConsumeLength)
     return lPacket;
 }
 
+CHIP_ERROR PacketBuffer::Read(uint8_t * aDestination, size_t aLength)
+{
+    PacketBuffer * lPacket = this;
+
+    if (aLength > TotalLength())
+    {
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
+    }
+    while (lPacket != nullptr && aLength > 0)
+    {
+        size_t lLength = lPacket->DataLength();
+        if (aLength < lLength)
+        {
+            lLength = aLength;
+        }
+        memcpy(aDestination, lPacket->payload, lLength);
+        aDestination += lLength;
+        aLength -= lLength;
+        lPacket = lPacket->ChainedBuffer();
+    }
+    return CHIP_NO_ERROR;
+}
+
 bool PacketBuffer::EnsureReservedSize(uint16_t aReservedSize)
 {
     const uint16_t kCurrentReservedSize = this->ReservedSize();

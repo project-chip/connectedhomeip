@@ -35,6 +35,11 @@
 #include <utility>
 
 namespace chip {
+
+namespace Transport {
+class TCPTest;
+};
+
 namespace Inet {
 
 class InetLayer;
@@ -50,6 +55,7 @@ class InetLayer;
 class DLL_EXPORT TCPEndPoint : public EndPointBasis
 {
     friend class InetLayer;
+    friend class ::chip::Transport::TCPTest;
 
 public:
     /** Control switch indicating whether the application is receiving data. */
@@ -302,7 +308,7 @@ public:
      *  received. The operational semantics are undefined if \c len is larger
      *  than the total outstanding unacknowledged received data.
      */
-    INET_ERROR AckReceive(uint16_t len);
+    INET_ERROR AckReceive(size_t len);
 
     /**
      * @brief   Push message text back to the head of the receive queue.

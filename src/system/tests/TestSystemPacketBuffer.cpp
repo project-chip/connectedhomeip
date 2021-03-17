@@ -116,6 +116,7 @@ public:
     static void CheckAlignPayload(nlTestSuite * inSuite, void * inContext);
     static void CheckNext(nlTestSuite * inSuite, void * inContext);
     static void CheckLast(nlTestSuite * inSuite, void * inContext);
+    static void CheckRead(nlTestSuite * inSuite, void * inContext);
     static void CheckAddRef(nlTestSuite * inSuite, void * inContext);
     static void CheckFree(nlTestSuite * inSuite, void * inContext);
     static void CheckFreeHead(nlTestSuite * inSuite, void * inContext);
@@ -1265,6 +1266,66 @@ void PacketBufferTest::CheckLast(nlTestSuite * inSuite, void * inContext)
 }
 
 /**
+ *  Test PacketBuffer::Read() function.
+ */
+void PacketBufferTest::CheckRead(nlTestSuite * inSuite, void * inContext)
+{
+    struct TestContext * const theContext = static_cast<struct TestContext *>(inContext);
+    PacketBufferTest * const test         = theContext->test;
+    NL_TEST_ASSERT(inSuite, test->mContext == theContext);
+
+    uint8_t payloads[2 * kBlockSize] = { 1 };
+    uint8_t result[2 * kBlockSize];
+    for (size_t i = 1; i < sizeof(payloads); ++i)
+    {
+        payloads[i] = static_cast<uint8_t>(random());
+    }
+
+    for (auto & config_1 : test->configurations)
+    {
+        for (auto & config_2 : test->configurations)
+        {
+            if (&config_1 == &config_2)
+            {
+                continue;
+            }
+
+            test->PrepareTestBuffer(&config_1, kAllowHandleReuse);
+            test->PrepareTestBuffer(&config_2, kAllowHandleReuse);
+
+            uint16_t length_1 = config_1.handle->MaxDataLength();
+            uint16_t length_2 = config_2.handle->MaxDataLength();
+            memcpy(config_1.handle->Start(), payloads, length_1);
+            memcpy(config_2.handle->Start(), payloads + length_1, length_2);
+            config_1.handle->SetDataLength(length_1);
+            config_2.handle->SetDataLength(length_2);
+            config_1.handle->AddToEnd(config_2.handle.Retain());
+            NL_TEST_ASSERT(inSuite, config_1.handle->TotalLength() == length_1 + length_2);
+
+            if (length_1 >= 1)
+            {
+                // Check a read that does not span packet buffers.
+                CHIP_ERROR err = config_1.handle->Read(result, 1);
+                NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+                NL_TEST_ASSERT(inSuite, result[0] == payloads[0]);
+            }
+
+            // Check a read that spans packet buffers.
+            CHIP_ERROR err = config_1.handle->Read(result, length_1 + length_2);
+            NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+            NL_TEST_ASSERT(inSuite, memcmp(payloads, result, length_1 + length_2) == 0);
+
+            // Check a read that is too long fails.
+            err = config_1.handle->Read(result, length_1 + length_2 + 1);
+            NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_BUFFER_TOO_SMALL);
+
+            config_1.handle = nullptr;
+            config_2.handle = nullptr;
+        }
+    }
+}
+
+/**
  *  Test PacketBuffer::AddRef() function.
  */
 void PacketBufferTest::CheckAddRef(nlTestSuite * inSuite, void * inContext)
@@ -1846,6 +1907,7 @@ const nlTest sTests[] =
     NL_TEST_DEF("PacketBuffer::AlignPayload",           PacketBufferTest::CheckAlignPayload),
     NL_TEST_DEF("PacketBuffer::Next",                   PacketBufferTest::CheckNext),
     NL_TEST_DEF("PacketBuffer::Last",                   PacketBufferTest::CheckLast),
+    NL_TEST_DEF("PacketBuffer::Read",                   PacketBufferTest::CheckRead),
     NL_TEST_DEF("PacketBuffer::AddRef",                 PacketBufferTest::CheckAddRef),
     NL_TEST_DEF("PacketBuffer::Free",                   PacketBufferTest::CheckFree),
     NL_TEST_DEF("PacketBuffer::FreeHead",               PacketBufferTest::CheckFreeHead),

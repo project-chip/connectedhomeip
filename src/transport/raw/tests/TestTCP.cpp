@@ -219,11 +219,13 @@ chip::System::PacketBufferHandle PreparePacketBuffers(nlTestSuite * inSuite, con
     header.SetSourceNodeId(kSourceNodeId).SetDestinationNodeId(kDestinationNodeId).SetMessageId(kMessageId);
     uint16_t header_length = header.EncodeSizeBytes();
 
-    uint16_t message_length = header_length;
+    size_t total_length = header_length;
     for (int i = 0; sizes[i] != 0; ++i)
     {
-        message_length = static_cast<uint16_t>(message_length + sizes[i]);
+        total_length += sizes[i];
     }
+    uint16_t message_length = static_cast<uint16_t>(total_length);
+    NL_TEST_ASSERT(inSuite, message_length == total_length);
     constexpr uint16_t kPacketSizeBytes = static_cast<uint16_t>(sizeof(uint16_t));
 
     const uint16_t headLength             = static_cast<uint16_t>(kPacketSizeBytes + header_length + sizes[0]);
@@ -274,10 +276,8 @@ void chip::Transport::TCPTest::CheckProcessReceivedBuffer(nlTestSuite * inSuite,
     expected_lengths = (const uint16_t[]){ sizeof(PAYLOAD) };
     gMockTransportMgrDelegate.SingleMessageTest(tcp, addr);
 
-    Transport::PeerAddress lPeerAddress    = Transport::PeerAddress::TCP(addr);
-    TCPBase::ActiveConnectionState * state = tcp.FindActiveConnection(lPeerAddress);
-    NL_TEST_ASSERT(inSuite, state != nullptr);
-    Inet::TCPEndPoint * lEndPoint = state->mEndPoint;
+    Transport::PeerAddress lPeerAddress = Transport::PeerAddress::TCP(addr);
+    Inet::TCPEndPoint * lEndPoint       = tcp.FindActiveConnection(lPeerAddress);
     NL_TEST_ASSERT(inSuite, lEndPoint != nullptr);
 
     chip::System::PacketBufferHandle buffer;
@@ -332,6 +332,11 @@ void chip::Transport::TCPTest::CheckProcessReceivedBuffer(nlTestSuite * inSuite,
 
     gMockTransportMgrDelegate.mReceiveHandlerCallCount = 0;
     err                                                = tcp.ProcessReceivedBuffer(lEndPoint, lPeerAddress, std::move(buffer));
+    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_NO_MEMORY);
+    NL_TEST_ASSERT(inSuite, gMockTransportMgrDelegate.mReceiveHandlerCallCount == 0);
+    // Steal the remaining buffer back from the endpoint.
+    buffer = std::move(lEndPoint->mRcvQueue);
+    err    = tcp.ProcessReceivedBuffer(lEndPoint, lPeerAddress, std::move(buffer));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, gMockTransportMgrDelegate.mReceiveHandlerCallCount == 1);
 
