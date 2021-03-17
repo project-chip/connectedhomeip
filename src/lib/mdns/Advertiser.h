@@ -28,6 +28,10 @@ namespace chip {
 namespace Mdns {
 
 static constexpr uint16_t kMdnsPort = 5353;
+// Need 8 bytes to fit a thread mac.
+static constexpr size_t kMaxMacSize = 8;
+// 2-byte ascii for 8-byte mac + 1 for null
+static constexpr size_t kMaxHostnameSize = kMaxMacSize * 2;
 
 enum class CommssionAdvertiseMode : uint8_t
 {
@@ -74,9 +78,6 @@ public:
     const char * GetHostname() const { return hostname; }
 
 private:
-    static constexpr size_t kMaxMacSize = 8;
-    // 2-byte ascii for 8-byte mac + 1 for null
-    static constexpr size_t kMaxHostnameSize = kMaxMacSize * 2;
     uint16_t mPort                           = CHIP_PORT;
     bool mEnableIPv4                         = true;
     uint8_t mMac[kMaxMacSize]                = {};
