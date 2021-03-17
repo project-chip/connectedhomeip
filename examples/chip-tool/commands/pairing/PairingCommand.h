@@ -35,6 +35,7 @@ public:
     PairingCommand(const char * commandName, PairingMode mode) :
         Command(commandName), mPairingMode(mode), mRemoteAddr{ IPAddress::Any, INET_NULL_INTERFACEID }
     {
+        mThrdKey = "00112233445566778899aabbccddeeff";
         switch (mode)
         {
         case PairingMode::None:
@@ -48,6 +49,9 @@ public:
             AddArgument("password", &mPassword);
             AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode);
             AddArgument("discriminator", 0, 4096, &mDiscriminator);
+            AddArgument("thrdChnl", 0, 15, &mThreadInfo.ThreadChannel);
+            AddArgument("thrdPanId", 0, 0x1234, &mThreadInfo.ThreadPANId);
+            //AddArgument("thrdMkey", (char*)&mThrdKey);
             break;
         case PairingMode::SoftAP:
             AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode);
@@ -82,6 +86,8 @@ private:
     uint32_t mSetupPINCode;
     char * mSSID;
     char * mPassword;
+    const char * mThrdKey;
+    
 
     ChipDeviceCommissioner mCommissioner;
 };
