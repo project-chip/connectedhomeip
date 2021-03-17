@@ -26,7 +26,7 @@ CHIP_ERROR {{asCamelCased clusterName false}}Cluster::{{asCamelCased name false}
 (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, k{{asCamelCased name false}}CommandId,
-                                         (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand = mDevice->GetCommandSender();
 
     TLV::TLVWriter writer  = ZCLcommand->CreateCommandDataElementTLVWriter();
@@ -77,7 +77,7 @@ CHIP_ERROR {{asCamelCased parent.name false}}Cluster::ReadAttribute{{asCamelCase
 }
 
 {{#if (isWritableAttribute)}}
-CHIP_ERROR {{asCamelCased parent.name false}}Cluster::WriteAttribute{{asCamelCased name false}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, {{asUnderlyingZclType type}} value)
+CHIP_ERROR {{asCamelCased parent.name false}}Cluster::WriteAttribute{{asCamelCased name false}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, {{chipType}} value)
 {
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encode{{asCamelCased parent.name false}}ClusterWrite{{asCamelCased name false}}Attribute(seqNum, mEndpoint, value);

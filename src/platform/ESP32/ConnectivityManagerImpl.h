@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2018 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -28,6 +28,7 @@
 #include <platform/internal/GenericConnectivityManagerImpl_NoBLE.h>
 #endif
 #include <platform/internal/GenericConnectivityManagerImpl_NoThread.h>
+#include <support/BitFlags.h>
 
 #include "esp_event.h"
 
@@ -39,14 +40,6 @@ namespace chip {
 namespace DeviceLayer {
 
 class PlatformManagerImpl;
-
-namespace Internal {
-
-class NetworkProvisioningServerImpl;
-template <class ImplClass>
-class GenericNetworkProvisioningServerImpl;
-
-} // namespace Internal
 
 /**
  * Concrete implementation of the ConnectivityManager singleton object for the ESP32 platform.
@@ -67,6 +60,7 @@ class ConnectivityManagerImpl final : public ConnectivityManager,
     friend class ConnectivityManager;
 
 private:
+    using Flags = GenericConnectivityManagerImpl_WiFi::ConnectivityFlags;
     // ===== Members that implement the ConnectivityManager abstract interface.
 
     WiFiStationMode _GetWiFiStationMode(void);
@@ -114,7 +108,7 @@ private:
     WiFiAPState mWiFiAPState;
     uint32_t mWiFiStationReconnectIntervalMS;
     uint32_t mWiFiAPIdleTimeoutMS;
-    uint16_t mFlags;
+    BitFlags<Flags> mFlags;
 
     void DriveStationState(void);
     void OnStationConnected(void);
@@ -172,12 +166,12 @@ inline uint32_t ConnectivityManagerImpl::_GetWiFiAPIdleTimeoutMS(void)
 
 inline bool ConnectivityManagerImpl::_HaveIPv4InternetConnectivity(void)
 {
-    return ::chip::GetFlag(mFlags, kFlag_HaveIPv4InternetConnectivity);
+    return mFlags.Has(Flags::kHaveIPv4InternetConnectivity);
 }
 
 inline bool ConnectivityManagerImpl::_HaveIPv6InternetConnectivity(void)
 {
-    return ::chip::GetFlag(mFlags, kFlag_HaveIPv6InternetConnectivity);
+    return mFlags.Has(Flags::kHaveIPv6InternetConnectivity);
 }
 
 inline bool ConnectivityManagerImpl::_CanStartWiFiScan()

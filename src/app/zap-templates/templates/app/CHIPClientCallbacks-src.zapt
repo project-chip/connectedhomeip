@@ -253,10 +253,6 @@ bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * messag
                 case 0x38: // semi / Semi-precision
                 case 0x39: // single / Single precision
                 case 0x3A: // double / Double precision
-                case 0x41: // octstr / Octet string
-                case 0x42: // string / Character string
-                case 0x43: // octstr16 / Long octet string
-                case 0x44: // string16 / Long character string
                 case 0x48: // array / Array
                 case 0x49: // struct / Structure
                 case 0x50: // set / Set
@@ -267,6 +263,46 @@ bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * messag
                     Callback::Callback<DefaultFailureCallback> * cb = Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
                     cb->mCall(cb->mContext, EMBER_ZCL_STATUS_INVALID_VALUE);
                     return true;
+                }
+
+                case 0x41: // octstr / Octet string
+                case 0x42: // string / Character string
+                {
+                    // Short Strings must contains at least one byte for the length
+                    CHECK_MESSAGE_LENGTH(1);
+                    uint8_t length = chip::Encoding::Read8(message);
+                    ChipLogProgress(Zcl, "  length: 0x%02x", length);
+
+                    // When the length is set to 0xFF, it represents a non-value. In this case the data field is zero length.
+                    if (length == 0xFF)
+                    {
+                        length = 0;
+                    }
+
+                    CHECK_MESSAGE_LENGTH(length);
+                    Callback::Callback<StringAttributeCallback> * cb = Callback::Callback<StringAttributeCallback>::FromCancelable(onSuccessCallback);
+                    cb->mCall(cb->mContext, chip::ByteSpan(message, length));
+                    break;
+                }
+
+                case 0x43: // octstr16 / Long octet string
+                case 0x44: // string16 / Long character string
+                {
+                    // Long Strings must contains at least two bytes for the length
+                    CHECK_MESSAGE_LENGTH(2);
+                    uint16_t length = chip::Encoding::LittleEndian::Read16(message);
+                    ChipLogProgress(Zcl, "  length: 0x%02x", length);
+
+                    // When the length is set to 0xFFFF, it represents a non-value. In this case the data field is zero length.
+                    if (length == 0xFFFF)
+                    {
+                        length = 0;
+                    }
+
+                    CHECK_MESSAGE_LENGTH(length);
+                    Callback::Callback<StringAttributeCallback> * cb = Callback::Callback<StringAttributeCallback>::FromCancelable(onSuccessCallback);
+                    cb->mCall(cb->mContext, chip::ByteSpan(message, length));
+                    break;
                 }
 
                 case 0x08: // data8 / 8-bit data
@@ -704,10 +740,6 @@ bool emberAfReportAttributesCallback(ClusterId clusterId, uint8_t * message, uin
             case 0x38: // semi / Semi-precision
             case 0x39: // single / Single precision
             case 0x3A: // double / Double precision
-            case 0x41: // octstr / Octet string
-            case 0x42: // string / Character string
-            case 0x43: // octstr16 / Long octet string
-            case 0x44: // string16 / Long character string
             case 0x48: // array / Array
             case 0x49: // struct / Structure
             case 0x50: // set / Set
@@ -716,6 +748,46 @@ bool emberAfReportAttributesCallback(ClusterId clusterId, uint8_t * message, uin
             {
                 ChipLogError(Zcl, "attributeType 0x%02x is not supported", attributeType);
                 return true;
+            }
+
+            case 0x41: // octstr / Octet string
+            case 0x42: // string / Character string
+            {
+                // Short Strings must contains at least one byte for the length
+                CHECK_MESSAGE_LENGTH(1);
+                uint8_t length = chip::Encoding::Read8(message);
+                ChipLogProgress(Zcl, "  length: 0x%02x", length);
+
+                // When the length is set to 0xFF, it represents a non-value. In this case the data field is zero length.
+                if (length == 0xFF)
+                {
+                    length = 0;
+                }
+
+                CHECK_MESSAGE_LENGTH(length);
+                Callback::Callback<StringAttributeCallback> * cb = Callback::Callback<StringAttributeCallback>::FromCancelable(onReportCallback);
+                cb->mCall(cb->mContext, chip::ByteSpan(message, length));
+                break;
+            }
+
+            case 0x43: // octstr16 / Long octet string
+            case 0x44: // string16 / Long character string
+            {
+                // Long Strings must contains at least two bytes for the length
+                CHECK_MESSAGE_LENGTH(2);
+                uint16_t length = chip::Encoding::LittleEndian::Read16(message);
+                ChipLogProgress(Zcl, "  length: 0x%02x", length);
+
+                // When the length is set to 0xFFFF, it represents a non-value. In this case the data field is zero length.
+                if (length == 0xFFFF)
+                {
+                    length = 0;
+                }
+
+                CHECK_MESSAGE_LENGTH(length);
+                Callback::Callback<StringAttributeCallback> * cb = Callback::Callback<StringAttributeCallback>::FromCancelable(onReportCallback);
+                cb->mCall(cb->mContext, chip::ByteSpan(message, length));
+                break;
             }
 
             case 0x08: // data8 / 8-bit data

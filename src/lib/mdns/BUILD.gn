@@ -15,11 +15,6 @@
 import("//build_overrides/chip.gni")
 import("${chip_root}/src/platform/device.gni")
 
-declare_args() {
-  # Set up what advertiser to use for mDNS advertisement
-  chip_mdns_advertiser = "minimal"
-}
-
 source_set("platform_header") {
   sources = [ "platform/Mdns.h" ]
 }
@@ -33,24 +28,18 @@ static_library("mdns") {
 
   sources = [ "Advertiser.h" ]
 
-  if (chip_enable_mdns) {
-    _chip_mdns_advertiser = chip_mdns_advertiser
-  } else {
-    _chip_mdns_advertiser = "none"
-  }
-
-  if (_chip_mdns_advertiser == "none") {
+  if (chip_mdns == "none") {
     sources += [
       "Advertiser_ImplNone.cpp",
       "Resolver_ImplNone.cpp",
     ]
-  } else if (_chip_mdns_advertiser == "minimal") {
+  } else if (chip_mdns == "minimal") {
     sources += [
       "Advertiser_ImplMinimalMdns.cpp",
       "Resolver_ImplNone.cpp",
     ]
     public_deps += [ "${chip_root}/src/lib/mdns/minimal" ]
-  } else if (_chip_mdns_advertiser == "platform") {
+  } else if (chip_mdns == "platform") {
     sources += [
       "Discovery_ImplPlatform.cpp",
       "Discovery_ImplPlatform.h",

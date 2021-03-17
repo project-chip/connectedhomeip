@@ -47,7 +47,7 @@ class ChipCluster:
 {{/chip_server_cluster_command_arguments}}
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_{{asCamelCased clusterName false}}_{{asCamelCased name false}}(
-                device, ZCLendpoint, ZCLgroupid{{#chip_server_cluster_command_arguments}}, {{asCamelCased label}}{{#if (isByteString type)}}, len({{asCamelCased label}}){{/if}}{{/chip_server_cluster_command_arguments}}
+                device, ZCLendpoint, ZCLgroupid{{#chip_server_cluster_command_arguments}}, {{asCamelCased label}}{{#if (isString type)}}, len({{asCamelCased label}}){{/if}}{{/chip_server_cluster_command_arguments}}
             )
         )
 
@@ -59,7 +59,7 @@ class ChipCluster:
         # Cluster {{asCamelCased name false}}
 {{#chip_server_cluster_commands}}
         # Cluster {{asCamelCased clusterName false}} Command {{asCamelCased name false}}
-        self._chipLib.chip_ime_AppendCommand_{{asCamelCased clusterName false}}_{{asCamelCased name false}}.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16{{#chip_server_cluster_command_arguments}}{{#if (isByteString type)}}, ctypes.c_char_p, ctypes.c_uint32{{else}}, ctypes.{{asPythonCType chipType}}{{/if}}{{/chip_server_cluster_command_arguments}}]
+        self._chipLib.chip_ime_AppendCommand_{{asCamelCased clusterName false}}_{{asCamelCased name false}}.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16{{#chip_server_cluster_command_arguments}}{{#if (isString type)}}, ctypes.c_char_p, ctypes.c_uint32{{else}}, ctypes.{{asPythonCType chipType}}{{/if}}{{/chip_server_cluster_command_arguments}}]
         self._chipLib.chip_ime_AppendCommand_{{asCamelCased clusterName false}}_{{asCamelCased name false}}.restype = ctypes.c_uint32
 {{/chip_server_cluster_commands}}
 {{/chip_server_clusters}}

@@ -87,16 +87,17 @@ public:
         kState_Error      = 3
     } State_t; // [READ-ONLY] Current state
 
-    enum
+    // Masks for BTP fragment header flag bits.
+    enum class HeaderFlags : uint8_t
     {
-        kHeaderFlag_StartMessage    = 0x01,
-        kHeaderFlag_ContinueMessage = 0x02,
-        kHeaderFlag_EndMessage      = 0x04,
-        kHeaderFlag_FragmentAck     = 0x08,
+        kStartMessage    = 0x01,
+        kContinueMessage = 0x02,
+        kEndMessage      = 0x04,
+        kFragmentAck     = 0x08,
 #if CHIP_ENABLE_CHIPOBLE_TEST
-        kHeaderFlag_CommandMessage = 0x10,
+        kCommandMessage = 0x10,
 #endif
-    }; // Masks for BTP fragment header flag bits.
+    };
 
     static const uint16_t sDefaultFragmentSize;
     static const uint16_t sMaxFragmentSize;
@@ -129,7 +130,10 @@ public:
     inline SequenceNumber_t SetRxPacketSeq(SequenceNumber_t seq) { return (mRxPacketSeq = seq); }
     inline SequenceNumber_t TxPacketSeq() { return mTxPacketSeq; }
     inline SequenceNumber_t RxPacketSeq() { return mRxPacketSeq; }
-    inline bool IsCommandPacket(const PacketBufferHandle & p) { return GetFlag(*(p->Start()), kHeaderFlag_CommandMessage); }
+    inline bool IsCommandPacket(const PacketBufferHandle & p)
+    {
+        return BitFlags<HeaderFlags>(*(p->Start())).Has(HeaderFlags::kCommandMessage);
+    }
     inline void PushPacketTag(const PacketBufferHandle & p, PacketType_t type)
     {
         p->SetStart(p->Start() - sizeof(type));

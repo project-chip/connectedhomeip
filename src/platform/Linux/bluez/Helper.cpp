@@ -1192,7 +1192,7 @@ static void UpdateAdditionalDataCharacteristic(BluezGattCharacteristic1 * charac
     char serialNumber[ConfigurationManager::kMaxSerialNumberLength + 1];
     size_t serialNumberSize  = 0;
     uint16_t lifetimeCounter = 0;
-    BitFlags<uint8_t, AdditionalDataFields> additionalDataFields;
+    BitFlags<AdditionalDataFields> additionalDataFields;
 
 #if CHIP_ENABLE_ROTATING_DEVICE_ID
     err = ConfigurationMgr().GetSerialNumber(serialNumber, sizeof(serialNumber), serialNumberSize);
@@ -1705,7 +1705,7 @@ static gboolean UnsubscribeCharacteristicImpl(BluezConnection * connection)
     VerifyOrExit(connection != nullptr, ChipLogError(DeviceLayer, "BluezConnection is NULL in %s", __func__));
     VerifyOrExit(connection->mpC2 != nullptr, ChipLogError(DeviceLayer, "C2 is NULL in %s", __func__));
 
-    bluez_gatt_characteristic1_call_start_notify(connection->mpC2, nullptr, UnsubscribeCharacteristicDone, connection);
+    bluez_gatt_characteristic1_call_stop_notify(connection->mpC2, nullptr, UnsubscribeCharacteristicDone, connection);
 
 exit:
     return G_SOURCE_REMOVE;

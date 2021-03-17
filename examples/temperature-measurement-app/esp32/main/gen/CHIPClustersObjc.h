@@ -48,10 +48,65 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPBasic : CHIPCluster
 
-- (void)resetToFactoryDefaults:(ResponseHandler)completionHandler;
+- (void)readAttributeInteractionModelVersion:(ResponseHandler)completionHandler;
+- (void)readAttributeVendorName:(ResponseHandler)completionHandler;
+- (void)readAttributeVendorID:(ResponseHandler)completionHandler;
+- (void)readAttributeProductName:(ResponseHandler)completionHandler;
+- (void)readAttributeProductID:(ResponseHandler)completionHandler;
+- (void)readAttributeUserLabel:(ResponseHandler)completionHandler;
+- (void)writeAttributeUserLabel:(NSString *)value completionHandler:(ResponseHandler)completionHandler;
+- (void)readAttributeLocation:(ResponseHandler)completionHandler;
+- (void)writeAttributeLocation:(NSString *)value completionHandler:(ResponseHandler)completionHandler;
+- (void)readAttributeHardwareVersion:(ResponseHandler)completionHandler;
+- (void)readAttributeHardwareVersionString:(ResponseHandler)completionHandler;
+- (void)readAttributeSoftwareVersion:(ResponseHandler)completionHandler;
+- (void)readAttributeSoftwareVersionString:(ResponseHandler)completionHandler;
+- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
 
-- (void)readAttributeZclVersion:(ResponseHandler)completionHandler;
-- (void)readAttributePowerSource:(ResponseHandler)completionHandler;
+@end
+
+/**
+ * Cluster Network Commissioning
+ *
+ */
+@interface CHIPNetworkCommissioning : CHIPCluster
+
+- (void)addThreadNetwork:(NSData *)operationalDataset
+              breadcrumb:(uint64_t)breadcrumb
+               timeoutMs:(uint32_t)timeoutMs
+       completionHandler:(ResponseHandler)completionHandler;
+- (void)addWiFiNetwork:(NSData *)ssid
+           credentials:(NSData *)credentials
+            breadcrumb:(uint64_t)breadcrumb
+             timeoutMs:(uint32_t)timeoutMs
+     completionHandler:(ResponseHandler)completionHandler;
+- (void)disableNetwork:(NSData *)networkID
+            breadcrumb:(uint64_t)breadcrumb
+             timeoutMs:(uint32_t)timeoutMs
+     completionHandler:(ResponseHandler)completionHandler;
+- (void)enableNetwork:(NSData *)networkID
+           breadcrumb:(uint64_t)breadcrumb
+            timeoutMs:(uint32_t)timeoutMs
+    completionHandler:(ResponseHandler)completionHandler;
+- (void)getLastNetworkCommissioningResult:(uint32_t)timeoutMs completionHandler:(ResponseHandler)completionHandler;
+- (void)removeNetwork:(NSData *)networkID
+           breadcrumb:(uint64_t)breadcrumb
+            timeoutMs:(uint32_t)timeoutMs
+    completionHandler:(ResponseHandler)completionHandler;
+- (void)scanNetworks:(NSData *)ssid
+           breadcrumb:(uint64_t)breadcrumb
+            timeoutMs:(uint32_t)timeoutMs
+    completionHandler:(ResponseHandler)completionHandler;
+- (void)updateThreadNetwork:(NSData *)operationalDataset
+                 breadcrumb:(uint64_t)breadcrumb
+                  timeoutMs:(uint32_t)timeoutMs
+          completionHandler:(ResponseHandler)completionHandler;
+- (void)updateWiFiNetwork:(NSData *)ssid
+              credentials:(NSData *)credentials
+               breadcrumb:(uint64_t)breadcrumb
+                timeoutMs:(uint32_t)timeoutMs
+        completionHandler:(ResponseHandler)completionHandler;
+
 - (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
 
 @end

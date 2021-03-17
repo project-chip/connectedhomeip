@@ -30,6 +30,8 @@ namespace Mdns {
 class DiscoveryImplPlatform : public ServiceAdvertiser, public Resolver
 {
 public:
+    CHIP_ERROR Init();
+
     CHIP_ERROR Start(Inet::InetLayer * inetLayer, uint16_t port) override;
 
     /// Advertises the CHIP node as an operational node

@@ -241,22 +241,22 @@ struct ChipCertificateData
 
     void Clear();
 
-    ChipDN mSubjectDN;                                   /**< Certificate Subject DN. */
-    ChipDN mIssuerDN;                                    /**< Certificate Issuer DN. */
-    CertificateKeyId mSubjectKeyId;                      /**< Certificate Subject public key identifier. */
-    CertificateKeyId mAuthKeyId;                         /**< Certificate Authority public key identifier. */
-    uint32_t mNotBeforeTime;                             /**< Certificate validity: Not Before field. */
-    uint32_t mNotAfterTime;                              /**< Certificate validity: Not After field. */
-    const uint8_t * mPublicKey;                          /**< Pointer to the certificate public key. */
-    uint8_t mPublicKeyLen;                               /**< Certificate public key length. */
-    uint16_t mPubKeyCurveOID;                            /**< Public key Elliptic Curve CHIP OID. */
-    uint16_t mPubKeyAlgoOID;                             /**< Public key algorithm CHIP OID. */
-    uint16_t mSigAlgoOID;                                /**< Certificate signature algorithm CHIP OID. */
-    BitFlags<uint16_t, CertFlags> mCertFlags;            /**< Certificate data flags. */
-    BitFlags<uint16_t, KeyUsageFlags> mKeyUsageFlags;    /**< Certificate key usage extensions flags. */
-    BitFlags<uint8_t, KeyPurposeFlags> mKeyPurposeFlags; /**< Certificate extended key usage extensions flags. */
-    uint8_t mPathLenConstraint;                          /**< Basic constraint: path length. */
-    uint8_t mCertType;                                   /**< Certificate type. */
+    ChipDN mSubjectDN;                          /**< Certificate Subject DN. */
+    ChipDN mIssuerDN;                           /**< Certificate Issuer DN. */
+    CertificateKeyId mSubjectKeyId;             /**< Certificate Subject public key identifier. */
+    CertificateKeyId mAuthKeyId;                /**< Certificate Authority public key identifier. */
+    uint32_t mNotBeforeTime;                    /**< Certificate validity: Not Before field. */
+    uint32_t mNotAfterTime;                     /**< Certificate validity: Not After field. */
+    const uint8_t * mPublicKey;                 /**< Pointer to the certificate public key. */
+    uint8_t mPublicKeyLen;                      /**< Certificate public key length. */
+    uint16_t mPubKeyCurveOID;                   /**< Public key Elliptic Curve CHIP OID. */
+    uint16_t mPubKeyAlgoOID;                    /**< Public key algorithm CHIP OID. */
+    uint16_t mSigAlgoOID;                       /**< Certificate signature algorithm CHIP OID. */
+    BitFlags<CertFlags> mCertFlags;             /**< Certificate data flags. */
+    BitFlags<KeyUsageFlags> mKeyUsageFlags;     /**< Certificate key usage extensions flags. */
+    BitFlags<KeyPurposeFlags> mKeyPurposeFlags; /**< Certificate extended key usage extensions flags. */
+    uint8_t mPathLenConstraint;                 /**< Basic constraint: path length. */
+    uint8_t mCertType;                          /**< Certificate type. */
     struct
     {
         const uint8_t * R; /**< Pointer to the R element of the signature, encoded as ASN.1 DER Integer. */
@@ -275,16 +275,16 @@ struct ChipCertificateData
  */
 struct ValidationContext
 {
-    uint32_t mEffectiveTime;                                 /**< Current CHIP Epoch UTC time. */
-    const ChipCertificateData * mTrustAnchor;                /**< Pointer to the Trust Anchor Certificate data structure. */
-    const ChipCertificateData * mSigningCert;                /**< Pointer to the Signing Certificate data structure. */
-    BitFlags<uint16_t, KeyUsageFlags> mRequiredKeyUsages;    /**< Key usage extensions that should be present in the
-                                                                validated certificate. */
-    BitFlags<uint8_t, KeyPurposeFlags> mRequiredKeyPurposes; /**< Extended Key usage extensions that should be present
-                                                                in the validated certificate. */
-    BitFlags<uint8_t, CertValidateFlags> mValidateFlags;     /**< Certificate validation flags, specifying how a certificate
-                                                                should be validated. */
-    uint8_t mRequiredCertType;                               /**< Required certificate type. */
+    uint32_t mEffectiveTime;                        /**< Current CHIP Epoch UTC time. */
+    const ChipCertificateData * mTrustAnchor;       /**< Pointer to the Trust Anchor Certificate data structure. */
+    const ChipCertificateData * mSigningCert;       /**< Pointer to the Signing Certificate data structure. */
+    BitFlags<KeyUsageFlags> mRequiredKeyUsages;     /**< Key usage extensions that should be present in the
+                                                       validated certificate. */
+    BitFlags<KeyPurposeFlags> mRequiredKeyPurposes; /**< Extended Key usage extensions that should be present
+                                                       in the validated certificate. */
+    BitFlags<CertValidateFlags> mValidateFlags;     /**< Certificate validation flags, specifying how a certificate
+                                                       should be validated. */
+    uint8_t mRequiredCertType;                      /**< Required certificate type. */
 
     void Reset();
 };
@@ -350,7 +350,7 @@ public:
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR LoadCert(const uint8_t * chipCert, uint32_t chipCertLen, BitFlags<uint8_t, CertDecodeFlags> decodeFlags);
+    CHIP_ERROR LoadCert(const uint8_t * chipCert, uint32_t chipCertLen, BitFlags<CertDecodeFlags> decodeFlags);
 
     /**
      * @brief Load CHIP certificate into set.
@@ -363,7 +363,7 @@ public:
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR LoadCert(chip::TLV::TLVReader & reader, BitFlags<uint8_t, CertDecodeFlags> decodeFlags);
+    CHIP_ERROR LoadCert(chip::TLV::TLVReader & reader, BitFlags<CertDecodeFlags> decodeFlags);
 
     /**
      * @brief Load CHIP certificates into set.
@@ -377,7 +377,7 @@ public:
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR LoadCerts(const uint8_t * chipCerts, uint32_t chipCertsLen, BitFlags<uint8_t, CertDecodeFlags> decodeFlags);
+    CHIP_ERROR LoadCerts(const uint8_t * chipCerts, uint32_t chipCertsLen, BitFlags<CertDecodeFlags> decodeFlags);
 
     /**
      * @brief Load CHIP certificates into set.
@@ -391,7 +391,7 @@ public:
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR LoadCerts(chip::TLV::TLVReader & reader, BitFlags<uint8_t, CertDecodeFlags> decodeFlags);
+    CHIP_ERROR LoadCerts(chip::TLV::TLVReader & reader, BitFlags<CertDecodeFlags> decodeFlags);
 
     /**
      * @brief Add trusted anchor key to the certificate set.
@@ -505,7 +505,7 @@ private:
      * @return Returns a CHIP_ERROR on validation or other error, CHIP_NO_ERROR otherwise
      **/
     CHIP_ERROR FindValidCert(const ChipDN & subjectDN, const CertificateKeyId & subjectKeyId, ValidationContext & context,
-                             BitFlags<uint8_t, CertValidateFlags> validateFlags, uint8_t depth, ChipCertificateData *& cert);
+                             BitFlags<CertValidateFlags> validateFlags, uint8_t depth, ChipCertificateData *& cert);
 
     /**
      * @brief Validate CHIP certificate.
@@ -518,7 +518,7 @@ private:
      * @return Returns a CHIP_ERROR on validation or other error, CHIP_NO_ERROR otherwise
      **/
     CHIP_ERROR ValidateCert(const ChipCertificateData * cert, ValidationContext & context,
-                            BitFlags<uint8_t, CertValidateFlags> validateFlags, uint8_t depth);
+                            BitFlags<CertValidateFlags> validateFlags, uint8_t depth);
 };
 
 /**
