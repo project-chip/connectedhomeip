@@ -95,8 +95,7 @@ function getClustersAsBlocks(options, side)
 {
   function fn(pkgId)
   {
-      return getClusters.call(this, options, side)
-        .then(clusters => templateUtil.collectBlocks(clusters, options, this))
+    return getClusters.call(this, options, side).then(clusters => templateUtil.collectBlocks(clusters, options, this))
   }
 
   return templateUtil.ensureZclPackageId(this).then(fn.bind(this)).catch(err => console.log(err));
@@ -109,7 +108,7 @@ function getClustersAsBlocks(options, side)
  */
 function chip_server_clusters(options)
 {
-    return getClustersAsBlocks.call(this, options, 'server');
+  return getClustersAsBlocks.call(this, options, 'server');
 }
 
 /**
@@ -118,8 +117,8 @@ function chip_server_clusters(options)
  */
 function chip_has_server_clusters(options)
 {
-    let promise = getClusters.call(this, options, 'server').then(clusters => !!clusters.length);
-    return templateUtil.templatePromise(this.global, promise);
+  let promise = getClusters.call(this, options, 'server').then(clusters => !!clusters.length);
+  return templateUtil.templatePromise(this.global, promise);
 }
 
 /**
@@ -129,7 +128,7 @@ function chip_has_server_clusters(options)
  */
 function chip_client_clusters(options)
 {
-    return getClustersAsBlocks.call(this, options, 'client');
+  return getClustersAsBlocks.call(this, options, 'client');
 }
 
 /**
@@ -138,8 +137,8 @@ function chip_client_clusters(options)
  */
 function chip_has_client_clusters(options)
 {
-    let promise = getClusters.call(this, options, 'client').then(clusters => !!clusters.length);
-    return templateUtil.templatePromise(this.global, promise);
+  let promise = getClusters.call(this, options, 'client').then(clusters => !!clusters.length);
+  return templateUtil.templatePromise(this.global, promise);
 }
 
 /**
@@ -149,7 +148,7 @@ function chip_has_client_clusters(options)
  */
 function chip_clusters(options)
 {
-    return getClustersAsBlocks.call(this, options, 'all');
+  return getClustersAsBlocks.call(this, options, 'all');
 }
 
 /**
@@ -158,8 +157,8 @@ function chip_clusters(options)
  */
 function chip_has_clusters(options)
 {
-    let promise = getClusters.call(this, options, 'client').then(clusters => !!clusters.length);
-    return templateUtil.templatePromise(this.global, promise);
+  let promise = getClusters.call(this, options, 'client').then(clusters => !!clusters.length);
+  return templateUtil.templatePromise(this.global, promise);
 }
 
 /**
