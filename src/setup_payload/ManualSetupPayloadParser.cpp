@@ -135,22 +135,22 @@ CHIP_ERROR ManualSetupPayloadParser::populatePayload(SetupPayload & outPayload)
         return result;
     }
 
-    constexpr uint32_t discriminatorMsbitsMask = (1 << kManualSetupChunk1DiscriminatorMsbitsLength) - 1;
-    constexpr uint32_t discriminatorLsbitsMask = (1 << kManualSetupChunk2DiscriminatorLsbitsLength) - 1;
+    constexpr uint32_t kDiscriminatorMsbitsMask = (1 << kManualSetupChunk1DiscriminatorMsbitsLength) - 1;
+    constexpr uint32_t kDiscriminatorLsbitsMask = (1 << kManualSetupChunk2DiscriminatorLsbitsLength) - 1;
 
-    uint32_t discriminator = ((chunk2 >> kManualSetupChunk2DiscriminatorLsbitsPos) & discriminatorLsbitsMask);
-    discriminator |= ((chunk1 >> kManualSetupChunk1DiscriminatorMsbitsPos) & discriminatorMsbitsMask)
+    uint32_t discriminator = ((chunk2 >> kManualSetupChunk2DiscriminatorLsbitsPos) & kDiscriminatorLsbitsMask);
+    discriminator |= ((chunk1 >> kManualSetupChunk1DiscriminatorMsbitsPos) & kDiscriminatorMsbitsMask)
         << kManualSetupChunk2DiscriminatorLsbitsLength;
 
     // Since manual code only contains upper msbits of discriminator, re-align
-    constexpr int discriminatorShift = (kPayloadDiscriminatorFieldLengthInBits - kManualSetupDiscriminatorFieldLengthInBits);
-    discriminator <<= discriminatorShift;
+    constexpr int kDiscriminatorShift = (kPayloadDiscriminatorFieldLengthInBits - kManualSetupDiscriminatorFieldLengthInBits);
+    discriminator <<= kDiscriminatorShift;
 
-    constexpr uint32_t pincodeMsbitsMask = (1 << kManualSetupChunk3PINCodeMsbitsLength) - 1;
-    constexpr uint32_t pincodeLsbitsMask = (1 << kManualSetupChunk2PINCodeLsbitsLength) - 1;
+    constexpr uint32_t kPincodeMsbitsMask = (1 << kManualSetupChunk3PINCodeMsbitsLength) - 1;
+    constexpr uint32_t kPincodeLsbitsMask = (1 << kManualSetupChunk2PINCodeLsbitsLength) - 1;
 
-    uint32_t setUpPINCode = ((chunk2 >> kManualSetupChunk2PINCodeLsbitsPos) & pincodeLsbitsMask);
-    setUpPINCode |= ((chunk3 >> kManualSetupChunk3PINCodeMsbitsPos) & pincodeMsbitsMask) << kManualSetupChunk2PINCodeLsbitsLength;
+    uint32_t setUpPINCode = ((chunk2 >> kManualSetupChunk2PINCodeLsbitsPos) & kPincodeLsbitsMask);
+    setUpPINCode |= ((chunk3 >> kManualSetupChunk3PINCodeMsbitsPos) & kPincodeMsbitsMask) << kManualSetupChunk2PINCodeLsbitsLength;
 
     if (setUpPINCode == 0)
     {

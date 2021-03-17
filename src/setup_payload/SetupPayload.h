@@ -33,16 +33,13 @@
 namespace chip {
 
 // TODO this should point to the spec
-const int kVersionFieldLengthInBits                  = 3;
-const int kVendorIDFieldLengthInBits                 = 16;
-const int kProductIDFieldLengthInBits                = 16;
-const int kCustomFlowRequiredFieldLengthInBits       = 1;
-const int kRendezvousInfoFieldLengthInBits           = 8;
-const int kPayloadDiscriminatorFieldLengthInBits     = 12;
-const int kManualSetupDiscriminatorFieldLengthInBits = 4;
-const int kManualSetupDiscriminatorShiftInBits =
-    (kPayloadDiscriminatorFieldLengthInBits - kManualSetupDiscriminatorFieldLengthInBits);
-const int kManualSetupDiscriminatorFieldBitMask       = ((1 << kManualSetupDiscriminatorFieldLengthInBits) - 1);
+const int kVersionFieldLengthInBits                   = 3;
+const int kVendorIDFieldLengthInBits                  = 16;
+const int kProductIDFieldLengthInBits                 = 16;
+const int kCustomFlowRequiredFieldLengthInBits        = 1;
+const int kRendezvousInfoFieldLengthInBits            = 8;
+const int kPayloadDiscriminatorFieldLengthInBits      = 12;
+const int kManualSetupDiscriminatorFieldLengthInBits  = 4;
 const int kManualSetupChunk1DiscriminatorMsbitsPos    = 0;
 const int kManualSetupChunk1DiscriminatorMsbitsLength = 2;
 const int kManualSetupChunk1VidPidPresentBitPos =

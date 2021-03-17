@@ -38,15 +38,14 @@ static uint32_t chunk1PayloadRepresentation(const SetupPayload & payload)
      *     - <bit 2> VID/PID present flag
      */
 
-    constexpr int discriminatorShift     = (kPayloadDiscriminatorFieldLengthInBits - kManualSetupDiscriminatorFieldLengthInBits +
-                                        kManualSetupChunk1DiscriminatorMsbitsLength);
-    constexpr uint32_t discriminatorMask = (1 << kManualSetupChunk1DiscriminatorMsbitsLength) - 1;
+    constexpr int kDiscriminatorShift     = (kPayloadDiscriminatorFieldLengthInBits - kManualSetupChunk1DiscriminatorMsbitsLength);
+    constexpr uint32_t kDiscriminatorMask = (1 << kManualSetupChunk1DiscriminatorMsbitsLength) - 1;
 
     static_assert(kManualSetupChunk1VidPidPresentBitPos >=
                       kManualSetupChunk1DiscriminatorMsbitsPos + kManualSetupChunk1DiscriminatorMsbitsLength,
                   "Discriminator won't fit");
 
-    uint32_t discriminatorChunk = (payload.discriminator >> discriminatorShift) & discriminatorMask;
+    uint32_t discriminatorChunk = (payload.discriminator >> kDiscriminatorShift) & kDiscriminatorMask;
     uint32_t vidPidPresentFlag  = payload.requiresCustomFlow ? 1 : 0;
 
     uint32_t result = (discriminatorChunk << kManualSetupChunk1DiscriminatorMsbitsPos) |
@@ -62,13 +61,13 @@ static uint32_t chunk2PayloadRepresentation(const SetupPayload & payload)
      *     - <bits 15..14> Discriminator <bits 9..8>
      */
 
-    constexpr int discriminatorShift     = (kPayloadDiscriminatorFieldLengthInBits - kManualSetupDiscriminatorFieldLengthInBits);
-    constexpr uint32_t discriminatorMask = (1 << kManualSetupChunk2DiscriminatorLsbitsLength) - 1;
-    constexpr uint32_t pincodeMask       = (1 << kManualSetupChunk2PINCodeLsbitsLength) - 1;
+    constexpr int kDiscriminatorShift     = (kPayloadDiscriminatorFieldLengthInBits - kManualSetupDiscriminatorFieldLengthInBits);
+    constexpr uint32_t kDiscriminatorMask = (1 << kManualSetupChunk2DiscriminatorLsbitsLength) - 1;
+    constexpr uint32_t kPincodeMask       = (1 << kManualSetupChunk2PINCodeLsbitsLength) - 1;
 
-    uint32_t discriminatorChunk = (payload.discriminator >> discriminatorShift) & discriminatorMask;
+    uint32_t discriminatorChunk = (payload.discriminator >> kDiscriminatorShift) & kDiscriminatorMask;
 
-    uint32_t result = ((payload.setUpPINCode & pincodeMask) << kManualSetupChunk2PINCodeLsbitsPos) |
+    uint32_t result = ((payload.setUpPINCode & kPincodeMask) << kManualSetupChunk2PINCodeLsbitsPos) |
         (discriminatorChunk << kManualSetupChunk2DiscriminatorLsbitsPos);
 
     return result;
@@ -80,10 +79,10 @@ static uint32_t chunk3PayloadRepresentation(const SetupPayload & payload)
      *     - <bits 12..0> PIN Code <bits 26..14>
      */
 
-    constexpr int pincodeShift     = (kSetupPINCodeFieldLengthInBits - kManualSetupChunk3PINCodeMsbitsLength);
-    constexpr uint32_t pincodeMask = (1 << kManualSetupChunk3PINCodeMsbitsLength) - 1;
+    constexpr int kPincodeShift     = (kSetupPINCodeFieldLengthInBits - kManualSetupChunk3PINCodeMsbitsLength);
+    constexpr uint32_t kPincodeMask = (1 << kManualSetupChunk3PINCodeMsbitsLength) - 1;
 
-    uint32_t result = ((payload.setUpPINCode >> pincodeShift) & pincodeMask) << kManualSetupChunk3PINCodeMsbitsPos;
+    uint32_t result = ((payload.setUpPINCode >> kPincodeShift) & kPincodeMask) << kManualSetupChunk3PINCodeMsbitsPos;
 
     return result;
 }
