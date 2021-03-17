@@ -170,11 +170,6 @@ void RunPinging()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    // Create a seperate thread to run CHIP event loop.
-    std::thread StartEventLoopTask([] { chip::DeviceLayer::PlatformMgr().RunEventLoop(); });
-
-    StartEventLoopTask.detach();
-
     // Connection has been established. Now send the EchoRequests.
     for (unsigned int i = 0; i < kMaxEchoCount; i++)
     {
@@ -233,6 +228,8 @@ int main(int argc, char * argv[])
     }
 
     InitializeChip();
+
+    chip::DeviceLayer::PlatformMgr().StartEventLoopTask();
 
     adminInfo = admins.AssignAdminId(gAdminId, chip::kTestControllerNodeId);
     VerifyOrExit(adminInfo != nullptr, err = CHIP_ERROR_NO_MEMORY);
