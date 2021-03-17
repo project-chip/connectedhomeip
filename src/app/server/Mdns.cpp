@@ -24,6 +24,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ConfigurationManager.h>
 #include <support/ReturnMacros.h>
+#include <support/Span.h>
 #include <support/logging/CHIPLogging.h>
 #include <transport/AdminPairingTable.h>
 #include <transport/PASESession.h>
@@ -65,23 +66,23 @@ NodeId GetCurrentNodeId()
 }
 
 // Requires an 8-byte mac to accommodate thread.
-size_t FillMAC(uint8_t mac[8])
+chip::ByteSpan FillMAC(uint8_t mac[8])
 {
     memset(mac, 0, 8);
     if (DeviceLayer::ConfigurationMgr().GetPrimary802154MACAddress(mac) == CHIP_NO_ERROR)
     {
         ChipLogDetail(Discovery, "Using Thread MAC for hostname.");
-        return 8;
+        return chip::ByteSpan(mac, 8);
     }
     if (DeviceLayer::ConfigurationMgr().GetPrimaryWiFiMACAddress(mac) == CHIP_NO_ERROR)
     {
         ChipLogDetail(Discovery, "Using wifi MAC for hostname");
-        return 6;
+        return chip::ByteSpan(mac, 6);
     }
     ChipLogError(Discovery, "Wifi mac not known. Using a default.");
     uint8_t temp[6] = { 0xEE, 0xAA, 0xBA, 0xDA, 0xBA, 0xD0 };
     memcpy(mac, temp, 6);
-    return 6;
+    return chip::ByteSpan(mac, 6);
 }
 
 } // namespace
@@ -98,12 +99,11 @@ CHIP_ERROR AdvertiseOperational()
     }
 
     uint8_t mac[8];
-    size_t macSize = FillMAC(mac);
 
     const auto advertiseParameters = chip::Mdns::OperationalAdvertisingParameters()
                                          .SetFabricId(fabricId)
                                          .SetNodeId(GetCurrentNodeId())
-                                         .SetMac(mac, macSize)
+                                         .SetMac(FillMAC(mac))
                                          .SetPort(CHIP_PORT)
                                          .EnableIpV4(true);
 
@@ -121,8 +121,7 @@ CHIP_ERROR AdvertiseCommisioning()
     auto advertiseParameters = chip::Mdns::CommissionAdvertisingParameters().SetPort(CHIP_PORT).EnableIpV4(true);
 
     uint8_t mac[8];
-    size_t macSize = FillMAC(mac);
-    advertiseParameters.SetMac(mac, macSize);
+    advertiseParameters.SetMac(FillMAC(mac));
 
     uint16_t value;
     if (DeviceLayer::ConfigurationMgr().GetVendorId(value) != CHIP_NO_ERROR)
