@@ -65,7 +65,8 @@ ExchangeManager::ExchangeManager() : mReliableMessageMgr(mContextPool)
     mState = State::kState_NotInitialized;
 }
 
-CHIP_ERROR ExchangeManager::Init(NodeId localNodeId, TransportMgrBase * transportMgr, SecureSessionMgr * sessionMgr, SecureSessionMgrDelegate * legacySecureSessionEventReceiver)
+CHIP_ERROR ExchangeManager::Init(NodeId localNodeId, TransportMgrBase * transportMgr, SecureSessionMgr * sessionMgr,
+                                 SecureSessionMgrDelegate * legacySecureSessionEventReceiver)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
