@@ -327,6 +327,11 @@ CHIP_ERROR TCPBase::ProcessSingleMessage(const PeerAddress & peerAddress, System
         if (message.IsNull())
         {
             // Either we are out of memory, or the message is too large to allocate.
+            //
+            // TODO: Decide what we are going to do about messages that are too large to handle. Currently we queue the entirety
+            //       of an oversize message before dropping it, which can consume significant memory. If we are going to simply
+            //       skip such messages (vs for instance closing the connection as too broken to continue), then we should have
+            //       a ‘drop’ state to avoid allocating packet buffers for the entire thing.
             buffer.Consume(messageSize);
             return CHIP_ERROR_NO_MEMORY;
         }
