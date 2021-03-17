@@ -2,12 +2,22 @@
 
 #include "platform/internal/CHIPDeviceLayerInternal.h"
 
+#include <inet/InetLayer.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl.cpp>
+
+#include "MbedEventTimeout.h"
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/tcpip.h>
 #endif
+
+#define DEFAULT_MIN_SLEEP_PERIOD (60 * 60 * 24 * 30) // Month [sec]
+
+using namespace ::chip;
+using namespace ::chip::Inet;
+using namespace ::chip::System;
 
 namespace chip {
 namespace DeviceLayer {
@@ -32,9 +42,14 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
         mQueue.~EventQueue();
         new (&mQueue) events::EventQueue(event_size * CHIP_DEVICE_CONFIG_MAX_EVENT_QUEUE_SIZE);
 
+        mQueue.background(
+            [&](int t) { MbedEventTimeout::AttachTimeout([&] { SystemLayer.WakeSelect(); }, std::chrono::milliseconds{ t }); });
+
         // Reinitialize the Mutex
         mChipStackMutex.~Mutex();
         new (&mChipStackMutex) rtos::Mutex();
+
+        mShouldRunEventLoop.store(true, std::memory_order_relaxed);
     }
     else
     {
@@ -84,11 +99,69 @@ void PlatformManagerImpl::_PostEvent(const ChipDeviceEvent * eventPtr)
     }
 }
 
+void PlatformManagerImpl::ProcessDeviceEvents()
+{
+    mQueue.dispatch(0);
+}
+
+void PlatformManagerImpl::SysUpdate()
+{
+    FD_ZERO(&mReadSet);
+    FD_ZERO(&mWriteSet);
+    FD_ZERO(&mErrorSet);
+    mMaxFd = 0;
+
+    // Max out this duration and let CHIP set it appropriately.
+    mNextTimeout.tv_sec  = DEFAULT_MIN_SLEEP_PERIOD;
+    mNextTimeout.tv_usec = 0;
+
+    if (SystemLayer.State() == System::kLayerState_Initialized)
+    {
+        SystemLayer.PrepareSelect(mMaxFd, &mReadSet, &mWriteSet, &mErrorSet, mNextTimeout);
+    }
+
+    if (InetLayer.State == InetLayer::kState_Initialized)
+    {
+        InetLayer.PrepareSelect(mMaxFd, &mReadSet, &mWriteSet, &mErrorSet, mNextTimeout);
+    }
+}
+
+void PlatformManagerImpl::SysProcess()
+{
+    UnlockChipStack();
+    int selectRes = select(mMaxFd + 1, &mReadSet, &mWriteSet, &mErrorSet, &mNextTimeout);
+    LockChipStack();
+
+    if (selectRes < 0)
+    {
+        ChipLogError(DeviceLayer, "select failed: %s\n", ErrorStr(System::MapErrorPOSIX(errno)));
+        return;
+    }
+
+    if (SystemLayer.State() == System::kLayerState_Initialized)
+    {
+        SystemLayer.HandleSelectResult(mMaxFd, &mReadSet, &mWriteSet, &mErrorSet);
+    }
+
+    if (InetLayer.State == InetLayer::kState_Initialized)
+    {
+        InetLayer.HandleSelectResult(mMaxFd, &mReadSet, &mWriteSet, &mErrorSet);
+    }
+
+    ProcessDeviceEvents();
+}
+
 void PlatformManagerImpl::_RunEventLoop()
 {
-    // Note: no reason to lock the chip task here, it is locked by the
-    // event and timer callback
-    mQueue.dispatch_forever();
+    LockChipStack();
+
+    do
+    {
+        SysUpdate();
+        SysProcess();
+    } while (mShouldRunEventLoop.load(std::memory_order_relaxed));
+
+    UnlockChipStack();
 }
 
 CHIP_ERROR PlatformManagerImpl::_StartEventLoopTask()
@@ -109,27 +182,8 @@ exit:
 
 CHIP_ERROR PlatformManagerImpl::_StartChipTimer(int64_t durationMS)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    int event      = 0;
-
-    VerifyOrExit(mInitialized == true, err = CHIP_ERROR_INCORRECT_STATE);
-
-    // HandlePlatformTimer() is supported only when LwIP enabled
-    /*event = mQueue.call_in(std::chrono::milliseconds(durationMS), [this] {
-        LockChipStack();
-        auto err = SystemLayer.HandlePlatformTimer();
-        if (err != CHIP_SYSTEM_NO_ERROR)
-        {
-            ChipLogError(DeviceLayer, "Error handling CHIP timers: %s", ErrorStr(err));
-        }
-        UnlockChipStack();
-    });
-
-    VerifyOrExit(event != 0, err = CHIP_ERROR_NO_MEMORY);
-    */
-
-exit:
-    return err;
+    // Let SystemLayer.PrepareSelect() handle timers.
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR PlatformManagerImpl::_Shutdown()
@@ -139,7 +193,7 @@ CHIP_ERROR PlatformManagerImpl::_Shutdown()
     // If running, break out of the loop
     if (IsLoopActive())
     {
-        mQueue.break_dispatch();
+        mShouldRunEventLoop.store(false, std::memory_order_relaxed);
         mLoopTask.join();
     }
 

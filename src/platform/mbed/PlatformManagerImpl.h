@@ -25,8 +25,10 @@
 #include "events/EventQueue.h"
 #include "rtos/Mutex.h"
 #include "rtos/Thread.h"
+#include <atomic>
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl.h>
+#include <sys/select.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -46,6 +48,13 @@ class PlatformManagerImpl final : public PlatformManager, public Internal::Gener
     friend Internal::GenericPlatformManagerImpl<PlatformManagerImpl>;
 #endif
 
+    // Members for select() loop
+    int mMaxFd;
+    fd_set mReadSet;
+    fd_set mWriteSet;
+    fd_set mErrorSet;
+    timeval mNextTimeout;
+
 public:
     // ===== Platform-specific members that may be accessed directly by the application.
 
@@ -63,6 +72,10 @@ private:
     CHIP_ERROR _StartEventLoopTask();
     CHIP_ERROR _StartChipTimer(int64_t durationMS);
     CHIP_ERROR _Shutdown();
+
+    void SysUpdate();
+    void SysProcess();
+    void ProcessDeviceEvents();
 
     // ===== Members for internal use by the following friends.
 
@@ -86,6 +99,7 @@ private:
     rtos::Mutex mChipStackMutex;
     static const size_t event_size = EVENTS_EVENT_SIZE + sizeof(void *) + sizeof(ChipDeviceEvent *);
     events::EventQueue mQueue      = { event_size * CHIP_DEVICE_CONFIG_MAX_EVENT_QUEUE_SIZE };
+    std::atomic<bool> mShouldRunEventLoop;
 };
 
 /**
