@@ -54,4 +54,4 @@ enum class ResetAdmins
 /**
  * Open the pairing window using default configured parameters.
  */
-CHIP_ERROR OpenDefaultPairingWindow(chip::ResetAdmins resetAdmins);
+CHIP_ERROR OpenDefaultPairingWindow(chip::ResetAdmins resetAdmins, bool onNetwork = false);
