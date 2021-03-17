@@ -78,11 +78,11 @@ public:
     const char * GetHostname() const { return hostname; }
 
 private:
-    uint16_t mPort                           = CHIP_PORT;
-    bool mEnableIPv4                         = true;
-    uint8_t mMac[kMaxMacSize]                = {};
-    size_t macSize                           = kMaxMacSize;
-    char hostname[kMaxHostnameSize + 1]      = "000000000000";
+    uint16_t mPort                      = CHIP_PORT;
+    bool mEnableIPv4                    = true;
+    uint8_t mMac[kMaxMacSize]           = {};
+    size_t macSize                      = kMaxMacSize;
+    char hostname[kMaxHostnameSize + 1] = "000000000000";
 }; // namespace Mdns
 
 /// Defines parameters required for advertising a CHIP node
