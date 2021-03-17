@@ -5,6 +5,7 @@ FROM connectedhomeip/chip-build:${VERSION}
 RUN set -x \
     && apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y wget unzip \
+    && pip3 install pycrypto && pip3 install pycryptodome \
     && rm -rf /var/lib/apt/lists/ \
     && mkdir -p /opt/sdk \
     && cd /opt/sdk \
