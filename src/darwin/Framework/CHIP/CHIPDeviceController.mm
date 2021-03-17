@@ -29,7 +29,6 @@ static const char * const CHIP_CONTROLLER_QUEUE = "com.zigbee.chip.framework.con
 static const char * const CHIP_COMMISSIONER_DEVICE_ID_KEY = "com.zigbee.chip.commissioner.device.id";
 
 static NSString * const kErrorMemoryInit = @"Init Memory failure";
-static NSString * const kErrorCommissionerCreate = @"Init failure while creating a commissioner";
 static NSString * const kErrorCommissionerInit = @"Init failure while initializing a commissioner";
 static NSString * const kErrorPairingInit = @"Init failure while creating a pairing delegate";
 static NSString * const kErrorPersistentStorageInit = @"Init failure while creating a persistent storage delegate";
@@ -38,7 +37,6 @@ static NSString * const kErrorPairDevice = @"Failure while pairing the device";
 static NSString * const kErrorUnpairDevice = @"Failure while unpairing the device";
 static NSString * const kErrorStopPairing = @"Failure while trying to stop the pairing process";
 static NSString * const kErrorGetPairedDevice = @"Failure while trying to retrieve a paired device";
-static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
 
 @interface CHIPDeviceController ()
 
