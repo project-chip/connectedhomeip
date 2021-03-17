@@ -21,8 +21,8 @@
 #include <inet/InetConfig.h>
 #include <transport/AdminPairingTable.h>
 #include <transport/TransportMgr.h>
-#include <transport/raw/UDP.h>
 #include <transport/raw/BLE.h>
+#include <transport/raw/UDP.h>
 
 using DemoTransportMgr = chip::TransportMgr<chip::Transport::UDP
 #if INET_CONFIG_ENABLE_IPV4
