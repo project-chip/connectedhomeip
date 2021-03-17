@@ -45,6 +45,7 @@
 #include <core/CHIPEncoding.h>
 #include <core/CHIPSafeCasts.h>
 #include <support/Base64.h>
+#include <support/CHIPArgParser.hpp>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
@@ -69,6 +70,10 @@ using namespace chip::Encoding;
 
 constexpr const char kPairedDeviceListKeyPrefix[] = "ListPairedDevices";
 constexpr const char kPairedDeviceKeyPrefix[]     = "PairedDevice";
+constexpr const char kNextAvailableKeyID[]        = "StartKeyID";
+
+// Maximum key ID is 65535 (given it's uint16_t type)
+constexpr uint16_t kMaxKeyIDStringSize = 6;
 
 // This macro generates a key using node ID an key prefix, and performs the given action
 // on that key.
@@ -497,11 +502,30 @@ DeviceCommissioner::DeviceCommissioner()
     mPairedDevicesUpdated = false;
 }
 
+CHIP_ERROR DeviceCommissioner::LoadKeyId(PersistentStorageDelegate * delegate, uint16_t & out)
+{
+    VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    // TODO: Consider storing value in binary representation instead of converting to string
+    char keyIDStr[kMaxKeyIDStringSize];
+    uint16_t size = sizeof(keyIDStr);
+    ReturnErrorOnFailure(delegate->SyncGetKeyValue(kNextAvailableKeyID, keyIDStr, size));
+
+    ReturnErrorCodeIf(!ArgParser::ParseInt(keyIDStr, out), CHIP_ERROR_INTERNAL);
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR DeviceCommissioner::Init(NodeId localDeviceId, PersistentStorageDelegate * storageDelegate,
                                     DevicePairingDelegate * pairingDelegate, System::Layer * systemLayer,
                                     Inet::InetLayer * inetLayer)
 {
     ReturnErrorOnFailure(DeviceController::Init(localDeviceId, storageDelegate, systemLayer, inetLayer));
+
+    if (LoadKeyId(mStorageDelegate, mNextKeyId) != CHIP_NO_ERROR)
+    {
+        mNextKeyId = 0;
+    }
 
     mPairingDelegate = pairingDelegate;
     return CHIP_NO_ERROR;
@@ -515,11 +539,7 @@ CHIP_ERROR DeviceCommissioner::Shutdown()
 
     PersistDeviceList();
 
-    if (mRendezvousSession != nullptr)
-    {
-        chip::Platform::Delete(mRendezvousSession);
-        mRendezvousSession = nullptr;
-    }
+    FreeRendezvousSession();
 
     DeviceController::Shutdown();
     return CHIP_NO_ERROR;
@@ -566,6 +586,7 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
     mIsIPRendezvous    = (params.GetPeerAddress().GetTransportType() != Transport::Type::kBle);
     mRendezvousSession = chip::Platform::New<RendezvousSession>(this);
     VerifyOrExit(mRendezvousSession != nullptr, err = CHIP_ERROR_NO_MEMORY);
+    mRendezvousSession->SetNextKeyId(mNextKeyId);
     err = mRendezvousSession->Init(params.SetLocalNodeId(mLocalDeviceId).SetRemoteNodeId(remoteDeviceId), mTransportMgr,
                                    mSessionManager, admin);
     SuccessOrExit(err);
@@ -583,10 +604,9 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         // Delete the current rendezvous session only if a device is not currently being paired.
-        if (mDeviceBeingPaired == kNumMaxActiveDevices && mRendezvousSession != nullptr)
+        if (mDeviceBeingPaired == kNumMaxActiveDevices)
         {
-            chip::Platform::Delete(mRendezvousSession);
-            mRendezvousSession = nullptr;
+            FreeRendezvousSession();
         }
 
         if (device != nullptr)
@@ -654,11 +674,7 @@ CHIP_ERROR DeviceCommissioner::StopPairing(NodeId remoteDeviceId)
     Device * device = &mActiveDevices[mDeviceBeingPaired];
     VerifyOrReturnError(device->GetDeviceId() == remoteDeviceId, CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR);
 
-    if (mRendezvousSession != nullptr)
-    {
-        chip::Platform::Delete(mRendezvousSession);
-        mRendezvousSession = nullptr;
-    }
+    FreeRendezvousSession();
 
     ReleaseDevice(device);
     mDeviceBeingPaired = kNumMaxActiveDevices;
@@ -681,13 +697,19 @@ CHIP_ERROR DeviceCommissioner::UnpairDevice(NodeId remoteDeviceId)
     return CHIP_NO_ERROR;
 }
 
-void DeviceCommissioner::RendezvousCleanup(CHIP_ERROR status)
+void DeviceCommissioner::FreeRendezvousSession()
 {
     if (mRendezvousSession != nullptr)
     {
+        mNextKeyId = mRendezvousSession->GetNextKeyId();
         chip::Platform::Delete(mRendezvousSession);
         mRendezvousSession = nullptr;
     }
+}
+
+void DeviceCommissioner::RendezvousCleanup(CHIP_ERROR status)
+{
+    FreeRendezvousSession();
 
     if (mPairingDelegate != nullptr)
     {
@@ -801,6 +823,11 @@ void DeviceCommissioner::PersistDeviceList()
             }
             chip::Platform::MemoryFree(serialized);
         }
+
+        // TODO: Consider storing value in binary representation instead of converting to string
+        char keyIDStr[kMaxKeyIDStringSize];
+        snprintf(keyIDStr, sizeof(keyIDStr), "%d", mNextKeyId);
+        mStorageDelegate->AsyncSetKeyValue(kNextAvailableKeyID, keyIDStr);
     }
 }
 
