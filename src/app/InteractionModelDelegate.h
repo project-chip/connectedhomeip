@@ -46,13 +46,12 @@ public:
      *                                 It is managed externally and should not be closed by SDK consumer.
      * @param[in]  apEventListReader  TLV reader positioned at the list that contains the events.  The
      *                                implementation of EventStreamReceived is expected to call Next() on the reader to
-     *                                advance it to the first element of the list, then process the elements from beginning to the end
-     *                                The callee is expected to consume all events.
+     *                                advance it to the first element of the list, then process the elements from beginning to the
+     * end The callee is expected to consume all events.
      *
      * @retval  # CHIP_ERROR_NOT_IMPLEMENTED if not implemented
      */
-    virtual CHIP_ERROR EventStreamReceived(Messaging::ExchangeContext * apExchangeContext,
-                                                         TLV::TLVReader * apEventListReader)
+    virtual CHIP_ERROR EventStreamReceived(Messaging::ExchangeContext * apExchangeContext, TLV::TLVReader * apEventListReader)
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }

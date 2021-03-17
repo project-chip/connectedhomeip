@@ -77,10 +77,11 @@ void ReadClient::MoveToState(const ClientState aTargetState)
                   GetStateStr());
 }
 
-CHIP_ERROR ReadClient::SendReadRequest(NodeId aNodeId, Transport::AdminId aAdminId, EventPathParams * apEventPathParamsList, size_t aEventPathParamsListSize)
+CHIP_ERROR ReadClient::SendReadRequest(NodeId aNodeId, Transport::AdminId aAdminId, EventPathParams * apEventPathParamsList,
+                                       size_t aEventPathParamsListSize)
 {
-    CHIP_ERROR err                        = CHIP_NO_ERROR;
-    System::PacketBufferHandle msgBuf     = nullptr;
+    CHIP_ERROR err                    = CHIP_NO_ERROR;
+    System::PacketBufferHandle msgBuf = nullptr;
     ChipLogDetail(DataManagement, "%s: Client[%u] [%5.5s]", __func__,
                   InteractionModelEngine::GetInstance()->GetReadClientArrayIndex(this), GetStateStr());
     VerifyOrExit(ClientState::Initialized == mState, err = CHIP_ERROR_INCORRECT_STATE);
@@ -232,7 +233,7 @@ void ReadClient::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContex
                     apExchangeContext->GetExchangeId());
     ClearExistingExchangeContext();
     MoveToState(ClientState::Initialized);
-    //TODO: Notify the SDK consumer response is timed out.
+    // TODO: Notify the SDK consumer response is timed out.
 }
 }; // namespace app
 }; // namespace chip

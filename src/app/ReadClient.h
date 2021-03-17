@@ -87,7 +87,8 @@ public:
      *  @retval #others fail to send read request
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR SendReadRequest(NodeId aNodeId, Transport::AdminId aAdminId, EventPathParams * apEventPathParamsList, size_t aEventPathParamsListSize);
+    CHIP_ERROR SendReadRequest(NodeId aNodeId, Transport::AdminId aAdminId, EventPathParams * apEventPathParamsList,
+                               size_t aEventPathParamsListSize);
 
     virtual ~ReadClient() = default;
 
@@ -104,7 +105,7 @@ private:
     {
         Uninitialized = 0, //< The client has not been initialized
         Initialized,       //< The client has been initialized and is ready
-        AwaitingResponse,   //< The client has sent out the read request message
+        AwaitingResponse,  //< The client has sent out the read request message
     };
 
     void MoveToState(const ClientState aTargetState);

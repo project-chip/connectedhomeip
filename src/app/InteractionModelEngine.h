@@ -54,7 +54,7 @@ namespace chip {
 namespace app {
 
 constexpr size_t kMaxSecureSduLengthBytes = 1024;
-constexpr uint32_t kImMessageTimeoutMsec = 3000;
+constexpr uint32_t kImMessageTimeoutMsec  = 3000;
 
 /**
  * @class InteractionModelEngine

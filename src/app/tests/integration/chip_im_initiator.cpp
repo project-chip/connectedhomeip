@@ -215,7 +215,7 @@ class MockInteractionModelApp : public chip::app::InteractionModelDelegate
 {
 public:
     CHIP_ERROR EventStreamReceived(chip::Messaging::ExchangeContext * apExchangeContext,
-                                                 chip::TLV::TLVReader * apEventListReader) override
+                                   chip::TLV::TLVReader * apEventListReader) override
     {
         return CHIP_NO_ERROR;
     }
