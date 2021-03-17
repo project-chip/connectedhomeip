@@ -190,7 +190,7 @@ private:
      *
      * @param[in]     peerAddress   The peer the data is coming from.
      * @param[in,out] buffer        The buffer (or chain) containing the message. On entry, the payload points to the message
-     *                              body (after the length). On exit, it points after the message (or is empty, if there is
+     *                              body (after the length). On exit, it points after the message (or buffer is null, if there is
      *                              no other data).
      * @param[in]     messageSize   Size of the single message.
      */

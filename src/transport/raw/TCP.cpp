@@ -277,22 +277,31 @@ CHIP_ERROR TCPBase::ProcessReceivedBuffer(Inet::TCPEndPoint * endPoint, const Pe
     while (!buffer.IsNull())
     {
         uint8_t messageSizeBuf[kPacketSizeBytes];
-        if (buffer->Read(messageSizeBuf, sizeof(messageSizeBuf)) != CHIP_NO_ERROR)
+        if (buffer->Read(messageSizeBuf) != CHIP_NO_ERROR)
         {
             break;
         }
         uint16_t messageSize = LittleEndian::Get16(messageSizeBuf);
-        if (messageSize + kPacketSizeBytes <= buffer->TotalLength())
+        if (messageSize >= (UINT16_MAX - kPacketSizeBytes))
+        {
+            // Trying to accumulate a message this long would make TotalLength() overflow.
+            // TODO: Issue #5438 - Close TCP connection when errors prevent handling messages
+            return CHIP_ERROR_MESSAGE_TOO_LONG;
+        }
+        // The subtraction will not underflow because we successfully read kPacketSizeBytes.
+        if (messageSize <= (buffer->TotalLength() - kPacketSizeBytes))
         {
             // The buffer contains a complete message.
             consumed += messageSize + kPacketSizeBytes;
             buffer.Consume(kPacketSizeBytes);
             err = ProcessSingleMessage(peerAddress, buffer, messageSize);
-            SuccessOrExit(err);
+            if (err != CHIP_NO_ERROR)
+            {
+                break;
+            }
         }
     }
 
-exit:
     // Ack the data consumed.
     endPoint->AckReceive(consumed);
 
@@ -316,8 +325,7 @@ CHIP_ERROR TCPBase::ProcessSingleMessage(const PeerAddress & peerAddress, System
         // In this case, the head packet buffer contains exactly the message.
         // This is common because typical messages fit in a network packet, and are delivered as such.
         // Peel off the head to pass upstream.
-        message = buffer.Retain();
-        buffer.Advance();
+        message = buffer.PopHead();
     }
     else
     {
@@ -328,10 +336,7 @@ CHIP_ERROR TCPBase::ProcessSingleMessage(const PeerAddress & peerAddress, System
         {
             // Either we are out of memory, or the message is too large to allocate.
             //
-            // TODO: Decide what we are going to do about messages that are too large to handle. Currently we queue the entirety
-            //       of an oversize message before dropping it, which can consume significant memory. If we are going to simply
-            //       skip such messages (vs for instance closing the connection as too broken to continue), then we should have
-            //       a ‘drop’ state to avoid allocating packet buffers for the entire thing.
+            // TODO: Issue #5438 - Close TCP connection when errors prevent handling messages
             buffer.Consume(messageSize);
             return CHIP_ERROR_NO_MEMORY;
         }
@@ -343,8 +348,6 @@ CHIP_ERROR TCPBase::ProcessSingleMessage(const PeerAddress & peerAddress, System
     PacketHeader header;
     ReturnErrorOnFailure(header.DecodeAndConsume(message));
 
-    // message receive handler will attempt to free the buffer, however as the buffer may
-    // contain additional data, we retain it to prevent actual free
     HandleMessageReceived(header, peerAddress, std::move(message));
     return CHIP_NO_ERROR;
 }

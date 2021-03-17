@@ -357,24 +357,29 @@ PacketBuffer * PacketBuffer::Consume(uint16_t aConsumeLength)
     return lPacket;
 }
 
-CHIP_ERROR PacketBuffer::Read(uint8_t * aDestination, size_t aLength)
+CHIP_ERROR PacketBuffer::Read(uint8_t * aDestination, size_t aReadLength) const
 {
-    PacketBuffer * lPacket = this;
+    const PacketBuffer * lPacket = this;
 
-    if (aLength > TotalLength())
+    if (aReadLength > TotalLength())
     {
         return CHIP_ERROR_BUFFER_TOO_SMALL;
     }
-    while (lPacket != nullptr && aLength > 0)
+    while (aReadLength > 0)
     {
-        size_t lLength = lPacket->DataLength();
-        if (aLength < lLength)
+        if (lPacket == nullptr)
         {
-            lLength = aLength;
+            // TotalLength() or an individual buffer's DataLength() must have been wrong.
+            return CHIP_ERROR_INTERNAL;
         }
-        memcpy(aDestination, lPacket->payload, lLength);
-        aDestination += lLength;
-        aLength -= lLength;
+        size_t lToReadFromCurrentBuf = lPacket->DataLength();
+        if (aReadLength < lToReadFromCurrentBuf)
+        {
+            lToReadFromCurrentBuf = aReadLength;
+        }
+        memcpy(aDestination, lPacket->Start(), lToReadFromCurrentBuf);
+        aDestination += lToReadFromCurrentBuf;
+        aReadLength -= lToReadFromCurrentBuf;
         lPacket = lPacket->ChainedBuffer();
     }
     return CHIP_NO_ERROR;

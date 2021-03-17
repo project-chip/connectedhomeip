@@ -339,15 +339,21 @@ public:
     CHECK_RETURN_VALUE PacketBufferHandle Last();
 
     /**
-     * Copies data from the payload of a packet buffer. Supports chained buffers.
+     * Copies data from the payloads of a chain of packet buffers until a given amount of data has been copied.
      *
      * @param[in]  buf             Destination buffer; must be at least @a length bytes.
      * @param[in]  length          Destination buffer length.
      *
-     * @retval #CHIP_ERROR_BUFER_TOO_SMALL  If the payload length is less than the requested @a length.
+     * @retval #CHIP_ERROR_BUFFER_TOO_SMALL If the total length of the payloads in the chain is less than the requested @a length.
+     * @retval #CHIP_ERROR_INTERNAL         In case of an inconsistency in the buffer chain.
      * @retval #CHIP_NO_ERROR               If the requested payload has been copied.
      */
-    CHIP_ERROR Read(uint8_t * buf, size_t length);
+    CHIP_ERROR Read(uint8_t * buf, size_t length) const;
+    template <size_t N>
+    inline CHIP_ERROR Read(uint8_t (&buf)[N]) const
+    {
+        return Read(buf, N);
+    }
 
     /**
      * Perform an implementation-defined check on the validity of a PacketBuffer pointer.
