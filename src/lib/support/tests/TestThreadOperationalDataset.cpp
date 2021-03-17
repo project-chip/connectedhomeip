@@ -268,4 +268,3 @@ int TestThreadOperationalDatasetBuilder(void)
 }
 
 CHIP_REGISTER_TEST_SUITE(TestThreadOperationalDatasetBuilder)
-

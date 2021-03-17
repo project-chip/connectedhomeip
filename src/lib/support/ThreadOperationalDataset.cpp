@@ -522,4 +522,3 @@ Tlv * OperationalDataset::MakeRoom(uint8_t aType, size_t aSize)
 
 } // namespace Thread
 } // namespace chip
-
