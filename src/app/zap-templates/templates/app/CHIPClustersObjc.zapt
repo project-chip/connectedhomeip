@@ -1,5 +1,6 @@
 {{> header}}
 
+{{#if (chip_has_client_clusters)}}
 #ifndef CHIP_CLUSTERS_H
 #define CHIP_CLUSTERS_H
 
@@ -23,7 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-{{#chip_clusters}}
+{{#chip_client_clusters}}
 
 
 /**
@@ -53,8 +54,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-{{/chip_clusters}}
+{{/chip_client_clusters}}
 
 NS_ASSUME_NONNULL_END
 
 #endif /* CHIP_CLUSTERS_H */
+{{/if}}
