@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-#ifndef SYS_OPEN_FILE_HANDLE_AS_FILE_DESCRIPTOR_H
-#define SYS_OPEN_FILE_HANDLE_AS_FILE_DESCRIPTOR_H
+#ifndef MBED_NET_OPEN_FILE_HANDLE_AS_FILE_DESCRIPTOR_H
+#define MBED_NET_OPEN_FILE_HANDLE_AS_FILE_DESCRIPTOR_H
 
 #include "platform/FileHandle.h"
 #include <utility>
@@ -67,4 +67,4 @@ int open_fh_as_fd(Args &&... args)
 
 } // namespace mbed
 
-#endif // SYS_OPEN_FILE_HANDLE_AS_FILE_DESCRIPTOR_H
+#endif // MBED_NET_OPEN_FILE_HANDLE_AS_FILE_DESCRIPTOR_H

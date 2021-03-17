@@ -6,6 +6,7 @@
 
 #include <atomic>
 #include <platform/FileHandle.h>
+#include <sys/eventfd.h>
 #include <sys/select.h>
 #include <sys/socket.h>
 
@@ -14,45 +15,6 @@ extern "C" {
 #endif
 
 #define MBED_NET_SOCKET_MAX_NUMBER 5
-struct BSDSocket : public ::mbed::FileHandle
-{
-    enum
-    {
-        SOCKET_SIGIO_RX = 0x01,
-        SOCKET_SIGIO_TX = 0x02
-    };
-
-    enum
-    {
-        MBED_TCP_SOCKET = SOCK_STREAM,
-        MBED_UDP_SOCKET = SOCK_DGRAM
-    };
-    BSDSocket();
-    ~BSDSocket();
-
-    int open(int type);
-    ssize_t read(void *, size_t) override;
-    ssize_t write(const void *, size_t) override;
-    off_t seek(off_t offset, int whence = SEEK_SET) override;
-    int close() override;
-    int set_blocking(bool blocking) override;
-    bool is_blocking() const override;
-    short poll(short events) const override;
-    void sigio(mbed::Callback<void()> func) override;
-
-    Socket * getNetSocket();
-
-    union
-    {
-
-        TCPSocket tcpSocket;
-        UDPSocket udpSocket;
-    };
-    int fd;
-    int type;
-    mbed::Callback<void()> callback;
-    std::atomic<uint32_t> flags;
-};
 
 int mbed_socket(int family, int type, int proto);
 
@@ -89,6 +51,12 @@ int mbed_getpeername(int sockfd, struct sockaddr * addr, socklen_t * addrlen);
 ssize_t mbed_recvmsg(int socket, struct msghdr * message, int flags);
 
 int mbed_select(int nfds, fd_set * readfds, fd_set * writefds, fd_set * exceptfds, struct timeval * timeout);
+
+int mbed_eventfd(unsigned int initval, int flags);
+
+int mbed_eventfd_read(int fd, eventfd_t * value);
+
+int mbed_eventfd_write(int fd, eventfd_t value);
 
 #ifdef __cplusplus
 }

@@ -1,24 +1,17 @@
-#include <net_if.h>
+#include <net_socket.h>
 #include <sys/eventfd.h>
-
-#include "EventFileHandle.h"
-#include "OpenFileHandleAsFileDescriptor.h"
 
 int eventfd(unsigned int initval, int flags)
 {
-    if (initval || flags)
-    {
-        return -1;
-    }
-    return mbed::open_fh_as_fd<mbed::EventFileHandle>();
+    return mbed_eventfd(initval, flags);
 }
 
 int eventfd_read(int fd, eventfd_t * value)
 {
-    return read(fd, value, sizeof(*value));
+    return mbed_eventfd_read(fd, value);
 }
 
 int eventfd_write(int fd, eventfd_t value)
 {
-    return write(fd, &value, sizeof(value));
+    return mbed_eventfd_write(fd, value);
 }

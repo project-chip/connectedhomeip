@@ -1,3 +1,7 @@
+#include "BSDSocket.h"
+#include "EventFileHandle.h"
+#include "FdControlBlock.h"
+#include "OpenFileHandleAsFileDescriptor.h"
 #include "common.h"
 #include <mbed_retarget.h>
 #include <net_socket.h>
@@ -6,159 +10,9 @@
 using namespace mbed;
 using namespace rtos;
 
-#define SOCKET_NOT_INITIALIZED (-1)
 #define NO_FREE_SOCKET_SLOT (-1)
 
 static BSDSocket sockets[MBED_NET_SOCKET_MAX_NUMBER];
-
-BSDSocket::BSDSocket()
-{
-    fd       = SOCKET_NOT_INITIALIZED;
-    callback = nullptr;
-    flags    = 0;
-}
-
-BSDSocket::~BSDSocket()
-{
-    close();
-}
-
-int BSDSocket::open(int type)
-{
-    InternetSocket * socket;
-    switch (type)
-    {
-    case MBED_TCP_SOCKET: {
-        socket = new (&tcpSocket) TCPSocket();
-    }
-    break;
-    case MBED_UDP_SOCKET: {
-        socket = new (&udpSocket) UDPSocket();
-    }
-    break;
-    default:
-        set_errno(ESOCKTNOSUPPORT);
-        return fd;
-    };
-
-    if (socket->open(NetworkInterface::get_default_instance()) != NSAPI_ERROR_OK)
-    {
-        close();
-        set_errno(ENOBUFS);
-        return fd;
-    }
-
-    this->type = type;
-
-    fd = bind_to_fd(this);
-    if (fd < 0)
-    {
-        close();
-        set_errno(ENFILE);
-        return fd;
-    }
-
-    flags = 0;
-    sigio([&]() {
-        flags = SOCKET_SIGIO_RX | SOCKET_SIGIO_TX;
-        if (callback)
-        {
-            callback();
-        }
-    });
-
-    return fd;
-}
-
-int BSDSocket::close()
-{
-    switch (type)
-    {
-    case MBED_TCP_SOCKET:
-        tcpSocket.~TCPSocket();
-        break;
-    case MBED_UDP_SOCKET:
-        udpSocket.~UDPSocket();
-        break;
-    }
-
-    fd       = SOCKET_NOT_INITIALIZED;
-    callback = nullptr;
-    flags    = 0;
-}
-
-ssize_t BSDSocket::read(void *, size_t)
-{
-    flags &= ~SOCKET_SIGIO_RX;
-    return 1;
-}
-
-ssize_t BSDSocket::write(const void *, size_t)
-{
-    flags &= ~SOCKET_SIGIO_TX;
-    return 1;
-}
-
-off_t BSDSocket::seek(off_t offset, int whence)
-{
-    return -ESPIPE;
-}
-
-int BSDSocket::set_blocking(bool blocking)
-{
-    if (blocking)
-    {
-        return -EINVAL;
-    }
-    return 0;
-}
-
-bool BSDSocket::is_blocking() const
-{
-    return false;
-}
-
-short BSDSocket::poll(short events) const
-{
-    short ret      = 0;
-    uint32_t state = flags;
-
-    if ((events & POLLIN) && (state & SOCKET_SIGIO_RX))
-    {
-        ret |= POLLIN;
-    }
-
-    if ((events & POLLOUT) && (state & SOCKET_SIGIO_TX))
-    {
-        ret |= POLLOUT;
-    }
-
-    return ret;
-}
-
-void BSDSocket::sigio(Callback<void()> func)
-{
-    callback = func;
-    if (callback && flags)
-    {
-        callback();
-    }
-}
-
-Socket * BSDSocket::getNetSocket()
-{
-    Socket * ret = nullptr;
-    switch (type)
-    {
-    case MBED_TCP_SOCKET:
-        ret = &tcpSocket;
-        break;
-    case MBED_UDP_SOCKET:
-        ret = &udpSocket;
-        break;
-    }
-    return ret;
-}
 
 nsapi_version_t Inet2Nsapi(int family)
 {
@@ -203,7 +57,7 @@ int getFreeSocketSlotIndex()
     int index = NO_FREE_SOCKET_SLOT;
     for (int i = 0; i < MBED_NET_SOCKET_MAX_NUMBER; i++)
     {
-        if (sockets[i].fd == SOCKET_NOT_INITIALIZED)
+        if (!sockets[i].isSocketOpen())
         {
             index = i;
             break;
@@ -214,7 +68,6 @@ int getFreeSocketSlotIndex()
 
 int mbed_socket(int family, int type, int proto)
 {
-    int fd    = -1;
     int index = getFreeSocketSlotIndex();
     if (index == NO_FREE_SOCKET_SLOT)
     {
@@ -416,106 +269,125 @@ ssize_t mbed_recvmsg(int socket, struct msghdr * message, int flags)
 
 int mbed_select(int nfds, fd_set * readfds, fd_set * writefds, fd_set * exceptfds, struct timeval * timeout)
 {
-    int totalReady = 0;
-    FileHandle * fh;
-    short fdEvents    = POLLIN | POLLOUT | POLLERR;
-    uint32_t waitTime = osWaitForever;
-    uint32_t ret;
-
-    EventFlags event;
-    uint32_t eventFlag = 1;
-
-    if (nfds < 0)
+    // TODO: compute the number of **different** fds, nfds just return the highest fd
+    // in one of the set
+    auto control_blocks = std::unique_ptr<FdControlBlock[]>{ new (std::nothrow) FdControlBlock[FD_SETSIZE] };
+    if (!control_blocks)
     {
-        set_errno(EINVAL);
+        errno = ENOMEM;
         return -1;
     }
+    size_t fd_count = 0;
+    rtos::EventFlags flag;
+    const uint32_t event_flag = 1;
+    int fd_processed          = 0;
 
-    if (timeout)
+    // Convert input into FdControlBlock which are more manageable.
+    for (int i = 0; i < nfds; ++i)
     {
-        waitTime = (timeout->tv_sec * (uint32_t) 1000) + (timeout->tv_usec / (uint32_t) 1000);
-    }
-
-    for (int fd = 0; fd < nfds; ++fd)
-    {
-        fh = mbed_file_handle(fd);
-        if (fh)
+        auto cb = FdControlBlock(i, readfds, writefds, exceptfds);
+        if (cb.handle)
         {
-            if (fh->poll(fdEvents))
-            {
-                event.set(eventFlag);
-                break;
-            }
-            else
-            {
-                fh->sigio([&event, eventFlag]() { event.set(eventFlag); });
-            }
+            control_blocks[fd_count] = cb;
+            ++fd_count;
         }
     }
 
-    ret = event.wait_any(eventFlag, waitTime);
-    if (ret & osFlagsError)
+    // Install handler
+    bool must_wait = true;
+    for (size_t i = 0; i < fd_count; ++i)
     {
-        set_errno(EINTR);
+        auto & cb = control_blocks[i];
+        if (cb.poll())
+        {
+            // One event is set, we don't need to wait to process the FD
+            must_wait = false;
+            break;
+        }
+        else
+        {
+            cb.handle->sigio([&cb, &flag]() {
+                if (cb.poll())
+                {
+                    flag.set(event_flag);
+                }
+            });
+        }
+    }
+
+    // Wait operation
+    if (fd_count && must_wait)
+    {
+        if (!timeout)
+        {
+            // Wait forever
+            flag.wait_any(event_flag);
+        }
+        else if (timeout->tv_sec || timeout->tv_usec)
+        {
+            // wait for the expected
+            rtos::Kernel::Clock::duration_u32 duration{ timeout->tv_sec * 1000 + timeout->tv_usec / 1000 };
+            flag.wait_any_for(event_flag, duration);
+        }
+        else
+        {
+            // No timeout value set and no file descriptor ready, return
+            // immediately, no fd processed
+            return fd_processed;
+        }
+    }
+
+    // Update output file descriptors
+    for (auto & fds : { readfds, writefds, exceptfds })
+    {
+        if (fds)
+        {
+            FD_ZERO(fds);
+        }
+    }
+
+    // Update fds watch and watch list
+    for (size_t i = 0; i < fd_count; ++i)
+    {
+        auto & cb   = control_blocks[i];
+        auto events = cb.poll();
+        if (cb.read && (events & POLLIN))
+        {
+            FD_SET(cb.fd, readfds);
+            ++fd_processed;
+        }
+        if (cb.write && (events & POLLOUT))
+        {
+            FD_SET(cb.fd, writefds);
+            ++fd_processed;
+        }
+        if (cb.err && (events & POLLOUT))
+        {
+            FD_SET(cb.fd, exceptfds);
+            ++fd_processed;
+        }
+        // remove temporary sigio
+        cb.handle->sigio(nullptr);
+    }
+
+    return fd_processed;
+}
+
+int mbed_eventfd(unsigned int initval, int flags)
+{
+    if (initval || flags)
+    {
         return -1;
     }
+    return open_fh_as_fd<EventFileHandle>();
+}
 
-    for (int fd = 0; fd < nfds; ++fd)
-    {
-        fh = mbed_file_handle(fd);
-        if (fh)
-        {
-            fdEvents = fh->poll(POLLIN | POLLOUT | POLLERR);
+int mbed_eventfd_read(int fd, eventfd_t * value)
+{
+    return read(fd, value, sizeof(*value));
+}
 
-            if (readfds)
-            {
-                if (fdEvents & POLLIN)
-                {
-                    FD_SET(fd, readfds);
-                    totalReady++;
-                }
-                else
-                {
-                    FD_CLR(fd, readfds);
-                }
-            }
-
-            if (writefds)
-            {
-                if (fdEvents & POLLOUT)
-                {
-                    FD_SET(fd, writefds);
-                    totalReady++;
-                }
-                else
-                {
-                    FD_CLR(fd, writefds);
-                }
-            }
-
-            if (exceptfds)
-            {
-                if (fdEvents & POLLERR)
-                {
-                    FD_SET(fd, exceptfds);
-                    totalReady++;
-                }
-                else
-                {
-                    FD_CLR(fd, exceptfds);
-                }
-            }
-        }
-    }
-
-    for (int fd = 0; fd < nfds; ++fd)
-    {
-        fh = mbed_file_handle(fd);
-        if (fh)
-        {
-            fh->sigio(nullptr);
-        }
-    }
-
-    return totalReady;
+int mbed_eventfd_write(int fd, eventfd_t value)
+{
+    return write(fd, &value, sizeof(value));
 }
