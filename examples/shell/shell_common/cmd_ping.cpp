@@ -20,9 +20,6 @@
 #include <stdlib.h>
 
 #include <lib/core/CHIPCore.h>
-
-#if CONFIG_DEVICE_LAYER
-
 #include <lib/shell/shell.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ErrorStr.h>
@@ -273,13 +270,13 @@ void StartPinging(streamer_t * stream, char * destination)
     err = gTCPManager.Init(Transport::TcpListenParameters(&DeviceLayer::InetLayer)
                                .SetAddressType(type)
                                .SetListenPort(gPingArguments.GetEchoPort() + 1));
-    VerifyOrExit(err == CHIP_NO_ERROR, streamer_printf(stream, "Failed to init TCP manager error: %s\r\n", ErrorStr(err)));
+    VerifyOrExit(err == CHIP_NO_ERROR, streamer_printf(stream, "Failed to init TCP manager error: %s\n", ErrorStr(err)));
 #endif
 
     err = gUDPManager.Init(Transport::UdpListenParameters(&DeviceLayer::InetLayer)
                                .SetAddressType(type)
                                .SetListenPort(gPingArguments.GetEchoPort() + 1));
-    VerifyOrExit(err == CHIP_NO_ERROR, streamer_printf(stream, "Failed to init UDP manager error: %s\r\n", ErrorStr(err)));
+    VerifyOrExit(err == CHIP_NO_ERROR, streamer_printf(stream, "Failed to init UDP manager error: %s\n", ErrorStr(err)));
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     if (gPingArguments.IsUsingTCP())
@@ -327,6 +324,7 @@ void StartPinging(streamer_t * stream, char * destination)
         // Wait for response until the Echo interval.
         while (!EchoIntervalExpired())
         {
+            // TODO:#5496: Use condition_varible to suspend the current thread and wake it up when response arrive.
             sleep(1);
         }
 
@@ -474,11 +472,7 @@ static shell_command_t cmds_ping[] = {
     { &cmd_ping, "ping", "Using Echo Protocol to measure packet loss across network paths" },
 };
 
-#endif // CONFIG_DEVICE_LAYER
-
 void cmd_ping_init()
 {
-#if CONFIG_DEVICE_LAYER
     shell_register(cmds_ping, ArraySize(cmds_ping));
-#endif // CONFIG_DEVICE_LAYER
 }
