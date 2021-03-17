@@ -353,6 +353,9 @@
 // Definitions for cluster: Content Launch
 #define ZCL_CONTENT_LAUNCH_CLUSTER_ID (0xF002)
 
+// Definitions for cluster: Group Key Management
+#define ZCL_GROUP_KEY_MANAGEMENT_CLUSTER_ID (0xF004)
+
 // Definitions for cluster: Sample Mfg Specific Cluster
 #define ZCL_SAMPLE_MFG_SPECIFIC_CLUSTER_ID (0xFC00)
 
