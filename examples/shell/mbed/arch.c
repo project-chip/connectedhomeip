@@ -43,11 +43,9 @@ uint64_t __atomic_exchange_8(volatile void* ptr, uint64_t val, int memorder) {
 }
 
 
-bool __atomic_compare_exchange_8(volatile void *ptr, void*expected, uint64_t desired, bool weak, int success_memorder, int failure_memorder)
+// Note: Weak version not supported in library, the weak parameter is simply dropped.
+// see https://gcc.gnu.org/wiki/Atomic/GCCMM/LIbrary
+bool __atomic_compare_exchange_8(volatile void *ptr, void*expected, unsigned long long desired, int success_memorder, int failure_memorder)
 {
-    if (weak) {
-        return core_util_atomic_compare_exchange_weak_explicit_u64((volatile uint64_t*)ptr, (uint64_t*)expected, desired, mem_order(success_memorder), mem_order(failure_memorder));
-    } else {
-        return core_util_atomic_cas_explicit_u64((volatile uint64_t*)ptr, (uint64_t*)expected, desired, mem_order(success_memorder), mem_order(failure_memorder));
-    }
+    return core_util_atomic_cas_explicit_u64((volatile uint64_t*)ptr, (uint64_t*)expected, desired, mem_order(success_memorder), mem_order(failure_memorder));
 }
