@@ -11,10 +11,15 @@
         "DISCO_L475VG_IOT01A": {
             "lwip.ipv6-enabled": true,
             "lwip.raw-socket-enabled": true,
-            "target.components_add": ["wifi_ism43362"],
+            "target.components_add": ["wifi_ism43362", "BlueNRG_MS"],
             "ism43362.provide-default": true,
             "target.network-default-interface-type": "WIFI",
-            "target.macros_add" : ["MBEDTLS_SHA1_C"]
+            "target.macros_add" : ["MBEDTLS_SHA1_C"],
+            "target.features_add": ["BLE"],
+            "target.extra_labels_add": ["CORDIO"],
+            "led-active-state": 1,
+            "lock-button": "USER_BUTTON",
+            "function-button": "NC"
         }
     },
     "config": {

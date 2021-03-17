@@ -76,6 +76,12 @@ if("wifi_ism43362" IN_LIST MBED_TARGET_LABELS)
     )
 endif()
 
+if("BlueNRG_MS" IN_LIST MBED_TARGET_LABELS)
+    target_link_libraries(${APP_TARGET}
+            mbed-ble-blue_nrg
+    )
+endif()
+
 target_link_libraries(${APP_TARGET} mbed-os mbed-ble mbed-events mbed-netsocket mbed-storage mbed-storage-kv-global-api mbed-mbedtls mbed-mbedtls-cryptocell310 chip)
 
 mbed_set_post_build(${APP_TARGET})
