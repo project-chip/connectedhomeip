@@ -509,7 +509,7 @@ CHIP_ERROR DeviceCommissioner::LoadKeyId(PersistentStorageDelegate * delegate, u
     // TODO: Consider storing value in binary representation instead of converting to string
     char keyIDStr[kMaxKeyIDStringSize];
     uint16_t size = sizeof(keyIDStr);
-    ReturnErrorOnFailure(delegate->GetKeyValue(kNextAvailableKeyID, keyIDStr, size));
+    ReturnErrorOnFailure(delegate->SyncGetKeyValue(kNextAvailableKeyID, keyIDStr, size));
 
     ReturnErrorCodeIf(!ArgParser::ParseInt(keyIDStr, out), CHIP_ERROR_INTERNAL);
 
@@ -827,7 +827,7 @@ void DeviceCommissioner::PersistDeviceList()
         // TODO: Consider storing value in binary representation instead of converting to string
         char keyIDStr[kMaxKeyIDStringSize];
         snprintf(keyIDStr, sizeof(keyIDStr), "%d", mNextKeyId);
-        mStorageDelegate->SetKeyValue(kNextAvailableKeyID, keyIDStr);
+        mStorageDelegate->AsyncSetKeyValue(kNextAvailableKeyID, keyIDStr);
     }
 }
 
