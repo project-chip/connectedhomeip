@@ -284,9 +284,6 @@ CHIP_ERROR TCPBase::ProcessReceivedBuffer(Inet::TCPEndPoint * endPoint, const Pe
 {
     ActiveConnectionState * state = FindActiveConnection(endPoint);
     VerifyOrReturnError(state != nullptr, CHIP_ERROR_INTERNAL);
-
-    // Ack as we take ownership.
-    endPoint->AckReceive(buffer->TotalLength());
     state->mReceived.AddToEnd(std::move(buffer));
 
     if (state->mDiscardSize != 0)

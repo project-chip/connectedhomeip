@@ -1388,7 +1388,11 @@ void TCPEndPoint::DriveReceiving()
     // with the entire receive queue.
     if (!mRcvQueue.IsNull() && ReceiveEnabled && OnDataReceived != nullptr)
     {
+        // Acknowledgement is done after handling the buffers to allow the
+        // application processing to throttle flow.
+        uint16_t ackLength = mRcvQueue->TotalLength();
         OnDataReceived(this, std::move(mRcvQueue));
+        AckReceive(ackLength);
     }
 
     // If the connection is closing, and the receive queue is now empty, call DoClose() to complete
