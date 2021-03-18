@@ -391,6 +391,12 @@
 #define ZCL_FABRIC_ID_ATTRIBUTE_ID (0x0000)
 #define ZCL_BREADCRUMB_ATTRIBUTE_ID (0x0001)
 
+// Attribute ids for cluster: Network Commissioning
+
+// Client attributes
+
+// Server attributes
+
 // Attribute ids for cluster: Shade Configuration
 
 // Client attributes
@@ -4079,12 +4085,6 @@
 #define ZCL_LAST_MESSAGE_RSSI_ATTRIBUTE_ID (0x011D)
 
 // Attribute ids for cluster: ZLL Commissioning
-
-// Client attributes
-
-// Server attributes
-
-// Attribute ids for cluster: Network Commissioning
 
 // Client attributes
 

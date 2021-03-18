@@ -6,7 +6,7 @@ digraph RendezvousSession
   subgraph cluster_controller {
     label=<<b>Controller</b>>
 
-    ChipDeviceController [shape=record label=<{ChipDeviceController|<font point-size="11">RendezvousSessionDelegate</font>}>, URL="@ref chip::DeviceController::ChipDeviceController"]
+    DeviceCommissioner [shape=record label=<{DeviceCommissioner|<font point-size="11">RendezvousSessionDelegate</font>}>, URL="@ref chip::Controller::DeviceCommissioner"]
   }
 
   # This section represents device-only elements
@@ -29,9 +29,9 @@ digraph RendezvousSession
   # Main relationships
   #############################
   RendezvousParameters [shape=ellipse, URL="@ref chip::RendezvousParameters"]
-  RendezvousParameters -> { ChipDeviceController, RendezvousDeviceDelegate} [arrowhead=none]
+  RendezvousParameters -> { DeviceCommissioner, RendezvousDeviceDelegate} [arrowhead=none]
 
-  {ChipDeviceController, RendezvousDeviceDelegate} -> RendezvousSession
+  {DeviceCommissioner, RendezvousDeviceDelegate} -> RendezvousSession
   RendezvousSession -> TransportBle
   RendezvousSession -> TransportInet [style=dashed, color=gray]
 }
