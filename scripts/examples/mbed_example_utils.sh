@@ -77,5 +77,5 @@ if [[ ! " ${SUPPORTED_PROFILES[@]} " =~ " ${PROFILE} " ]]; then
 fi
 
 echo "############################"
-pyocd flash -t $PYOCD_TARGET $PWD/$APP/mbed/build-$TARGET_BOARD/$PROFILE/chip-mbed-$APP-example.hex
+pyocd flash -t $PYOCD_TARGET -O connect_mode=under-reset $PWD/$APP/mbed/build-$TARGET_BOARD/$PROFILE/chip-mbed-$APP-example.hex
 echo "############################"
