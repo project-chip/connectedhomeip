@@ -44,5 +44,9 @@ jobs:
                 npm run version-stamp
                 npm rebuild canvas --update-binary
                 npm run build-spa
-            - name: Generate
-              run: scripts/tools/zap_generate.sh examples/all-clusters-app/all-clusters-common/all-clusters-app.zap
+            - name: Generate all
+              run: scripts/tools/zap_regen_all.py
+            - name: Check for uncommited changes
+              run: |
+                git add .
+                git diff-index --quiet HEAD --
