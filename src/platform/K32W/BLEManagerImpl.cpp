@@ -62,7 +62,7 @@ namespace {
  * Macros & Constants definitions
  *******************************************************************************/
 /* Timeout of BLE commands */
-#define CHIP_BLE_KW_EVNT_TIMEOUT 300
+#define CHIP_BLE_KW_EVNT_TIMEOUT 1000
 
 /** BLE advertisment state changed */
 #define CHIP_BLE_KW_EVNT_ADV_CHANGED 0x0001
