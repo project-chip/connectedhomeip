@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-#ifndef MBED_OS_NET_SOCKETS_EVENTFILEHANDLE_H
-#define MBED_OS_NET_SOCKETS_EVENTFILEHANDLE_H
+#ifndef MBED_NET_EVENT_FILE_HANDLE_H
+#define MBED_NET_EVENT_FILE_HANDLE_H
 
 #include "platform/FileHandle.h"
 #include <limits>
@@ -172,4 +172,4 @@ private:
 
 } // namespace mbed
 
-#endif // MBED_OS_NET_SOCKETS_EVENTFILEHANDLE_H
+#endif // MBED_NET_EVENT_FILE_HANDLE_H

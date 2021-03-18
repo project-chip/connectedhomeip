@@ -117,34 +117,31 @@ struct BSDSocket : public FileHandle
 
     ssize_t read(void * buffer, size_t size) override
     {
-        // while (true)
-        // {
-        //     auto current = _flags.load();
-        //     auto success = _flags.compare_exchange_weak(current, (current & ~POLLIN));
-        //     if (success)
-        //     {
-        //         break;
-        //     }
-        // }
+        while (true)
+        {
+            auto current = _flags.load();
+            auto success = _flags.compare_exchange_weak(current, (current & ~POLLIN));
+            if (success)
+            {
+                break;
+            }
+        }
 
-        auto current = _flags.load();
-        _flags.store((current & ~POLLIN));
         return 0;
     }
 
     ssize_t write(const void * buffer, size_t size) override
     {
-        // while (true)
-        // {
-        //     auto current = _flags.load();
-        //     auto success = _flags.compare_exchange_weak(current, (current | POLLOUT));
-        //     if (success)
-        //     {
-        //         break;
-        //     }
-        // }
-        auto current = _flags.load();
-        _flags.store((current | POLLOUT));
+        while (true)
+        {
+            auto current = _flags.load();
+            auto success = _flags.compare_exchange_weak(current, (current | POLLOUT));
+            if (success)
+            {
+                break;
+            }
+        }
+        
         return 0;
     }
 

@@ -271,7 +271,7 @@ int mbed_select(int nfds, fd_set * readfds, fd_set * writefds, fd_set * exceptfd
 {
     // TODO: compute the number of **different** fds, nfds just return the highest fd
     // in one of the set
-    auto control_blocks = std::unique_ptr<FdControlBlock[]>{ new (std::nothrow) FdControlBlock[FD_SETSIZE] };
+    auto control_blocks = std::unique_ptr<FdControlBlock[]>{ new (std::nothrow) FdControlBlock[nfds] };
     if (!control_blocks)
     {
         errno = ENOMEM;

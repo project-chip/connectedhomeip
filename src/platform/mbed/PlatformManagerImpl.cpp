@@ -190,10 +190,11 @@ CHIP_ERROR PlatformManagerImpl::_Shutdown()
 {
     LockChipStack();
 
+    mShouldRunEventLoop.store(false, std::memory_order_relaxed);
     // If running, break out of the loop
     if (IsLoopActive())
     {
-        mShouldRunEventLoop.store(false, std::memory_order_relaxed);
+        SystemLayer.WakeSelect();
         mLoopTask.join();
     }
 
