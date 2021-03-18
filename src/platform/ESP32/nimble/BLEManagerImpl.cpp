@@ -557,11 +557,11 @@ CHIP_ERROR BLEManagerImpl::InitESPBleLayer(void)
     nimble_port_init();
 
     /* Initialize the NimBLE host configuration. */
-    ble_hs_cfg.reset_cb        = bleprph_on_reset;
-    ble_hs_cfg.sync_cb         = bleprph_on_sync;
-    ble_hs_cfg.store_status_cb = ble_store_util_status_rr;
-    ble_hs_cfg.sm_bonding = 1;
-    ble_hs_cfg.sm_our_key_dist = BLE_SM_PAIR_KEY_DIST_ENC | BLE_SM_PAIR_KEY_DIST_ID;
+    ble_hs_cfg.reset_cb          = bleprph_on_reset;
+    ble_hs_cfg.sync_cb           = bleprph_on_sync;
+    ble_hs_cfg.store_status_cb   = ble_store_util_status_rr;
+    ble_hs_cfg.sm_bonding        = 1;
+    ble_hs_cfg.sm_our_key_dist   = BLE_SM_PAIR_KEY_DIST_ENC | BLE_SM_PAIR_KEY_DIST_ID;
     ble_hs_cfg.sm_their_key_dist = BLE_SM_PAIR_KEY_DIST_ENC | BLE_SM_PAIR_KEY_DIST_ID;
 
     // Register the CHIPoBLE GATT attributes with the ESP BLE layer if needed.
@@ -1010,7 +1010,8 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     uint8_t own_addr_type = BLE_OWN_ADDR_RANDOM;
 
     ret = ble_hs_pvcy_rpa_config(NIMBLE_HOST_ENABLE_RPA);
-    if (ret != 0) {
+    if (ret != 0)
+    {
         ChipLogError(DeviceLayer, "RPA not set: %d", ret);
         return CHIP_ERROR_INTERNAL;
     }
