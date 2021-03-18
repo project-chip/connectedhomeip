@@ -43,7 +43,6 @@ jobs:
               uses: github/codeql-action/init@v1
               with:
                   languages: "cpp"
-                  queries: +security-and-quality
             - name: Build example QPG6100 Lock App
               run: scripts/examples/gn_build_example.sh
                    examples/lock-app/qpg6100 out/lock_app_debug
