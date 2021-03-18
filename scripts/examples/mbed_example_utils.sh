@@ -25,6 +25,7 @@ SUPPORTED_PROFILES=(release develop debug)
 APP=
 TARGET_BOARD=
 PYOCD_TARGET=
+PYOCD_TARGET_ARGS=
 PROFILE=
 
 for i in "$@"; do
@@ -54,6 +55,7 @@ NRF52840_DK)
 
 DISCO_L475VG_IOT01A)
     PYOCD_TARGET=stm32l475xg
+    PYOCD_TARGET_ARGS="--frequency 4M"
     ;;
 
 *)
@@ -77,5 +79,5 @@ if [[ ! " ${SUPPORTED_PROFILES[@]} " =~ " ${PROFILE} " ]]; then
 fi
 
 echo "############################"
-pyocd flash -t $PYOCD_TARGET -O connect_mode=under-reset $PWD/$APP/mbed/build-$TARGET_BOARD/$PROFILE/chip-mbed-$APP-example.hex
+pyocd flash -t $PYOCD_TARGET -O connect_mode=under-reset $PYOCD_TARGET_ARGS $PWD/$APP/mbed/build-$TARGET_BOARD/$PROFILE/chip-mbed-$APP-example.hex
 echo "############################"
