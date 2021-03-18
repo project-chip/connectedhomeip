@@ -520,6 +520,9 @@ CHIP_ERROR chip_ime_AppendCommand_GeneralCommissioning_SetFabric(chip::Controlle
 }
 // End of Cluster GeneralCommissioning
 
+// Cluster GroupKeyManagement
+// End of Cluster GroupKeyManagement
+
 // Cluster Groups
 CHIP_ERROR chip_ime_AppendCommand_Groups_AddGroup(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
                                                   chip::GroupId ZCLgroupId, uint16_t groupId, const uint8_t * groupName,
