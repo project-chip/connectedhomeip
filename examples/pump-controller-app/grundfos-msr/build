@@ -1,0 +1,7 @@
+#!/bin/sh
+
+export TI_SIMPLELINK_SDK_ROOT=/mnt/c/ti/simplelink_cc13x2_26x2_sdk_4_40_05_02_eng
+export TI_SYSCONFIG_ROOT=/mnt/c/ti/sysconfig_1.7.0_linux
+gn gen out/debug --args="ti_simplelink_sdk_root=\"${TI_SIMPLELINK_SDK_ROOT}\" ti_sysconfig_root=\"${TI_SYSCONFIG_ROOT}\""
+ninja -C out/debug
+objcopy -O ihex out/debug/chip-LP_CC2652R7-pump-example.out out/debug/chip-LP_CC2652R7-pump-example.hex
