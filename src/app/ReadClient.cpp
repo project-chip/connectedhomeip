@@ -80,7 +80,7 @@ void ReadClient::MoveToState(const ClientState aTargetState)
 CHIP_ERROR ReadClient::SendReadRequest(NodeId aNodeId, Transport::AdminId aAdminId, EventPathParams * apEventPathParamsList,
                                        size_t aEventPathParamsListSize)
 {
-    CHIP_ERROR err                    = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferHandle msgBuf;
     ChipLogDetail(DataManagement, "%s: Client[%u] [%5.5s]", __func__,
                   InteractionModelEngine::GetInstance()->GetReadClientArrayIndex(this), GetStateStr());

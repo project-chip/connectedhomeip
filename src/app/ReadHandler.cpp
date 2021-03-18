@@ -50,7 +50,7 @@ void ReadHandler::Shutdown()
 {
     ClearExistingExchangeContext();
     MoveToState(HandlerState::Uninitialized);
-    mpDelegate    = nullptr;
+    mpDelegate = nullptr;
 }
 
 CHIP_ERROR ReadHandler::ClearExistingExchangeContext()
@@ -93,7 +93,7 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle aPayload)
                                      Messaging::SendFlags(Messaging::SendMessageFlags::kNone));
     SuccessOrExit(err);
 
-    //Todo: Once status report support is added, we would shutdown only when there is error or when this is last chunk of report
+    // Todo: Once status report support is added, we would shutdown only when there is error or when this is last chunk of report
 exit:
     Shutdown();
     return err;
