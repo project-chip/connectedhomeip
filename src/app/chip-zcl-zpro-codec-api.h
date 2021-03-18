@@ -36,6 +36,7 @@
 | ContentLaunch                                                       | 0xF002 |
 | DoorLock                                                            | 0x0101 |
 | GeneralCommissioning                                                | 0x0030 |
+| GroupKeyManagement                                                  | 0xF004 |
 | Groups                                                              | 0x0004 |
 | IasZone                                                             | 0x0500 |
 | Identify                                                            | 0x0003 |
@@ -1418,6 +1419,45 @@ chip::System::PacketBufferHandle encodeGeneralCommissioningClusterWriteBreadcrum
  */
 chip::System::PacketBufferHandle
 encodeGeneralCommissioningClusterReadClusterRevisionAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/*----------------------------------------------------------------------------*\
+| Cluster GroupKeyManagement                                          | 0xF004 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * Groups                                                            | 0x0000 |
+| * GroupKeys                                                         | 0x0001 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/**
+ * @brief
+ *    Encode a Group Key Management server discover command into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeGroupKeyManagementClusterDiscoverAttributes(uint8_t seqNum,
+                                                                                   chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Group Key Management server read command for the groups attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeGroupKeyManagementClusterReadGroupsAttribute(uint8_t seqNum,
+                                                                                    chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Group Key Management server read command for the group keys attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeGroupKeyManagementClusterReadGroupKeysAttribute(uint8_t seqNum,
+                                                                                       chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Group Key Management server read command for the cluster revision attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeGroupKeyManagementClusterReadClusterRevisionAttribute(uint8_t seqNum,
+                                                                                             chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
 | Cluster Groups                                                      | 0x0004 |
