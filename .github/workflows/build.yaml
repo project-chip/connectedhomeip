@@ -50,7 +50,7 @@ jobs:
               uses: github/codeql-action/init@v1
               with:
                   languages: "cpp, python"
-                  queries: +security-and-quality
+                  queries: +security
 
             - name: Bootstrap
               run: scripts/build/gn_bootstrap.sh
