@@ -43,6 +43,7 @@
 #include "af-event.h"
 #include "af-main.h"
 #include "af.h"
+#include <app/reporting/reporting.h>
 #include "app/util/common.h"
 
 #include "gen/attribute-id.h"
@@ -56,9 +57,6 @@
 #include <app/clusters/groups-server/groups-server.h>
 #endif // EMBER_AF_PLUGIN_GROUPS_SERVER
 
-#ifdef EMBER_AF_PLUGIN_REPORTING
-#include <app/reporting/reporting.h>
-#endif // EMBER_AF_PLUGIN_REPORTING
 
 using namespace chip;
 
@@ -289,9 +287,9 @@ void emberAfInit(void)
     // initialize event management system
     emAfInitEvents();
 
-#ifdef EMBER_AF_PLUGIN_REPORTING
+    // Initialize the reporting plugin
     emberAfPluginReportingInitCallback();
-#endif
+
 #ifdef EMBER_AF_PLUGIN_TEMPERATURE_MEASUREMENT_SERVER
     emberAfPluginTemperatureMeasurementServerInitCallback();
 #endif
@@ -333,12 +331,10 @@ void emberAfStackDown(void)
         // && emberNetworkState() == EMBER_NO_NETWORK
     )
     {
-#ifdef EMBER_AF_PLUGIN_REPORTING
         // the report table should be cleared when the stack comes down.
         // going to a new network means new report devices should be discovered.
         // if the table isnt cleared the device keeps trying to send messages.
         emberAfClearReportTableCallback();
-#endif // EMBER_AF_PLUGIN_REPORTING
     }
 
     emberAfRegistrationAbortCallback();
