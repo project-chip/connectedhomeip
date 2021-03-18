@@ -161,13 +161,14 @@ CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHea
     VerifyOrExit(admin != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     localNodeId = admin->GetNodeId();
 
+    if (payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::MsgCounterSyncReq) ||
+        payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::MsgCounterSyncRsp))
+    {
+        packetHeader.SetSecureSessionControlMsg(true);
+    }
+
     if (encryptionState == EncryptionState::kPayloadIsUnencrypted)
     {
-        if (payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::MsgCounterSyncReq) ||
-            payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::MsgCounterSyncRsp))
-        {
-            packetHeader.SetSecureSessionControlMsg(true);
-        }
         err = SecureMessageCodec::Encode(localNodeId, state, payloadHeader, packetHeader, msgBuf);
         SuccessOrExit(err);
     }
