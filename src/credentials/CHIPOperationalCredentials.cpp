@@ -185,14 +185,12 @@ CHIP_ERROR OperationalCredentialSet::FindValidCert(const CertificateKeyId & trus
 CHIP_ERROR OperationalCredentialSet::SignMsg(const CertificateKeyId & trustedRootId, const uint8_t * msg, const size_t msg_length,
                                              P256ECDSASignature & out_signature)
 {
-    P256Keypair * keypair = mDeviceOpCredKeypair.at(trustedRootId);
-
-    return keypair->ECDSA_sign_msg(msg, msg_length, out_signature);
+    return mDeviceOpCredKeypair.at(trustedRootId)->ECDSA_sign_msg(msg, msg_length, out_signature);
 }
 
 const CertificateKeyId * OperationalCredentialSet::GetTrustedRootId(uint16_t certSetIndex) const
 {
-    VerifyOrReturnError(certSetIndex >= 0 && certSetIndex <= mOpCredCount, nullptr);
+    VerifyOrReturnError(certSetIndex <= mOpCredCount, nullptr);
 
     const ChipCertificateData * chipCertificateData = mOpCreds[certSetIndex].GetCertSet();
     uint8_t numberCertificates                      = mOpCreds[certSetIndex].GetCertCount();

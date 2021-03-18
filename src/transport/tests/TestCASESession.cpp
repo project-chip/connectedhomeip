@@ -59,7 +59,7 @@ enum
                                 // (in either CHIP or DER form), or to decode the certificates.
 };
 
-class TestSecurePairingDelegate : public SessionEstablishmentDelegate
+class TestCASESecurePairingDelegate : public SessionEstablishmentDelegate
 {
 public:
     CHIP_ERROR SendSessionEstablishmentMessage(const PacketHeader & header, const Transport::PeerAddress & peerAddress,
@@ -81,10 +81,10 @@ public:
     CASESession * peer = nullptr;
 };
 
-void SecurePairingWaitTest(nlTestSuite * inSuite, void * inContext)
+void CASE_SecurePairingWaitTest(nlTestSuite * inSuite, void * inContext)
 {
     // Test all combinations of invalid parameters
-    TestSecurePairingDelegate delegate;
+    TestCASESecurePairingDelegate delegate;
     CASESession pairing;
 
     NL_TEST_ASSERT(inSuite,
@@ -95,10 +95,10 @@ void SecurePairingWaitTest(nlTestSuite * inSuite, void * inContext)
                        CHIP_NO_ERROR);
 }
 
-void SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
+void CASE_SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
 {
     // Test all combinations of invalid parameters
-    TestSecurePairingDelegate delegate;
+    TestCASESecurePairingDelegate delegate;
     CASESession pairing;
 
     NL_TEST_ASSERT(inSuite,
@@ -119,11 +119,11 @@ void SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
                                              Optional<NodeId>::Value(1), 2, 0, &delegate) == CHIP_ERROR_BAD_REQUEST);
 }
 
-void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, CASESession & pairingCommissioner,
-                                      TestSecurePairingDelegate & delegateCommissioner)
+void CASE_SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, CASESession & pairingCommissioner,
+                                           TestCASESecurePairingDelegate & delegateCommissioner)
 {
     // Test all combinations of invalid parameters
-    TestSecurePairingDelegate delegateAccessory;
+    TestCASESecurePairingDelegate delegateAccessory;
     CASESession pairingAccessory;
     CASESessionSerializable serializableCommissioner;
     CASESessionSerializable serializableAccessory;
@@ -151,15 +151,15 @@ void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, C
                           serializableCommissioner.mSharedSecretLen) == 0);
 }
 
-void SecurePairingHandshakeTest(nlTestSuite * inSuite, void * inContext)
+void CASE_SecurePairingHandshakeTest(nlTestSuite * inSuite, void * inContext)
 {
-    TestSecurePairingDelegate delegateCommissioner;
+    TestCASESecurePairingDelegate delegateCommissioner;
     CASESession pairingCommissioner;
-    SecurePairingHandshakeTestCommon(inSuite, inContext, pairingCommissioner, delegateCommissioner);
+    CASE_SecurePairingHandshakeTestCommon(inSuite, inContext, pairingCommissioner, delegateCommissioner);
 }
 
-void SecurePairingDeserialize(nlTestSuite * inSuite, void * inContext, CASESession & pairingCommissioner,
-                              CASESession & deserialized)
+void CASE_SecurePairingDeserialize(nlTestSuite * inSuite, void * inContext, CASESession & pairingCommissioner,
+                                   CASESession & deserialized)
 {
     CASESessionSerialized serialized;
     NL_TEST_ASSERT(inSuite, pairingCommissioner.Serialize(serialized) == CHIP_NO_ERROR);
@@ -173,16 +173,16 @@ void SecurePairingDeserialize(nlTestSuite * inSuite, void * inContext, CASESessi
     NL_TEST_ASSERT(inSuite, strncmp(Uint8::to_char(serialized.inner), Uint8::to_char(serialized2.inner), sizeof(serialized)) == 0);
 }
 
-void SecurePairingSerializeTest(nlTestSuite * inSuite, void * inContext)
+void CASE_SecurePairingSerializeTest(nlTestSuite * inSuite, void * inContext)
 {
-    TestSecurePairingDelegate delegateCommissioner;
+    TestCASESecurePairingDelegate delegateCommissioner;
 
     // Allocate on the heap to avoid stack overflow in some restricted test scenarios (e.g. QEMU)
     auto * testPairingSession1 = chip::Platform::New<CASESession>();
     auto * testPairingSession2 = chip::Platform::New<CASESession>();
 
-    SecurePairingHandshakeTestCommon(inSuite, inContext, *testPairingSession1, delegateCommissioner);
-    SecurePairingDeserialize(inSuite, inContext, *testPairingSession1, *testPairingSession2);
+    CASE_SecurePairingHandshakeTestCommon(inSuite, inContext, *testPairingSession1, delegateCommissioner);
+    CASE_SecurePairingDeserialize(inSuite, inContext, *testPairingSession1, *testPairingSession2);
 
     const uint8_t plain_text[] = { 0x86, 0x74, 0x64, 0xe5, 0x0b, 0xd4, 0x0d, 0x90, 0xe1, 0x17, 0xa3, 0x2d, 0x4b, 0xd4, 0xe1, 0xe6 };
     uint8_t encrypted[64];
@@ -221,10 +221,10 @@ void SecurePairingSerializeTest(nlTestSuite * inSuite, void * inContext)
 // clang-format off
 static const nlTest sTests[] =
 {
-    NL_TEST_DEF("WaitInit",    SecurePairingWaitTest),
-    NL_TEST_DEF("Start",       SecurePairingStartTest),
-    NL_TEST_DEF("Handshake",   SecurePairingHandshakeTest),
-    NL_TEST_DEF("Serialize",   SecurePairingSerializeTest),
+    NL_TEST_DEF("WaitInit",    CASE_SecurePairingWaitTest),
+    NL_TEST_DEF("Start",       CASE_SecurePairingStartTest),
+    NL_TEST_DEF("Handshake",   CASE_SecurePairingHandshakeTest),
+    NL_TEST_DEF("Serialize",   CASE_SecurePairingSerializeTest),
 
     NL_TEST_SENTINEL()
 };
@@ -233,7 +233,7 @@ static const nlTest sTests[] =
 /**
  *  Set up the test suite.
  */
-int TestSecurePairing_Setup(void * inContext)
+int CASE_TestSecurePairing_Setup(void * inContext)
 {
     CHIP_ERROR error;
     CertificateKeyId trustedRootId = { .mId = sTestCert_Root_SubjectKeyId, .mLen = sTestCert_Root_SubjectKeyId_Len };
@@ -310,7 +310,7 @@ exit:
 /**
  *  Tear down the test suite.
  */
-int TestSecurePairing_Teardown(void * inContext)
+int CASE_TestSecurePairing_Teardown(void * inContext)
 {
     commissionerDevOpCred.Release();
     accessoryDevOpCred.Release();
@@ -325,8 +325,8 @@ static nlTestSuite sSuite =
 {
     "Test-CHIP-SecurePairing",
     &sTests[0],
-    TestSecurePairing_Setup,
-    TestSecurePairing_Teardown,
+    CASE_TestSecurePairing_Setup,
+    CASE_TestSecurePairing_Teardown,
 };
 // clang-format on
 
