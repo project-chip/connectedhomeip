@@ -308,10 +308,10 @@ public:
      *  received. The operational semantics are undefined if \c len is larger
      *  than the total outstanding unacknowledged received data.
      */
-    INET_ERROR AckReceive(size_t len);
+    INET_ERROR AckReceive(uint16_t len);
 
     /**
-     * @brief   Push message text back to the head of the receive queue.
+     * @brief   Set the receive queue, for testing.
      *
      * @param[out]  data    Message text to push.
      *
@@ -320,14 +320,9 @@ public:
      *
      * @details
      *  This method may only be called by data reception event handlers to
-     *  put an unacknowledged portion of data back on the receive queue. The
-     *  operational semantics are undefined if the caller is outside the scope
-     *  of a data reception event handler, \c data is not the packet buffer
-     *  provided to the handler, or \c data does not contain the unacknowledged
-     *  portion remaining after the bytes acknowledged by a prior call to the
-     *  <tt>AckReceive(uint16_t len)</tt> method.
+     *  put data on the receive queue for unit test purposes.
      */
-    INET_ERROR PutBackReceivedData(chip::System::PacketBufferHandle data);
+    INET_ERROR SetReceivedDataForTesting(chip::System::PacketBufferHandle data);
 
     /**
      * @brief   Extract the length of the data awaiting first transmit.

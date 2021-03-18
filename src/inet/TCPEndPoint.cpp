@@ -985,14 +985,12 @@ INET_ERROR TCPEndPoint::SetUserTimeout(uint32_t userTimeoutMillis)
     return res;
 }
 
-INET_ERROR TCPEndPoint::AckReceive(size_t len)
+INET_ERROR TCPEndPoint::AckReceive(uint16_t len)
 {
     INET_ERROR res = INET_NO_ERROR;
 
     if (!IsConnected())
-    {
         return INET_ERROR_INCORRECT_STATE;
-    }
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 
@@ -1000,18 +998,9 @@ INET_ERROR TCPEndPoint::AckReceive(size_t len)
     LOCK_TCPIP_CORE();
 
     if (mTCP != NULL)
-    {
-        while (len > UINT16_MAX)
-        {
-            tcp_recved(mTCP, UINT16_MAX);
-            len -= UINT16_MAX;
-        }
-        tcp_recved(mTCP, static_cast<uint16_t>(len));
-    }
+        tcp_recved(mTCP, len);
     else
-    {
         res = INET_ERROR_CONNECTION_ABORTED;
-    }
 
     // Unlock LwIP stack
     UNLOCK_TCPIP_CORE();
@@ -1027,7 +1016,7 @@ INET_ERROR TCPEndPoint::AckReceive(size_t len)
     return res;
 }
 
-INET_ERROR TCPEndPoint::PutBackReceivedData(System::PacketBufferHandle data)
+INET_ERROR TCPEndPoint::SetReceivedDataForTesting(System::PacketBufferHandle data)
 {
     if (!IsConnected())
         return INET_ERROR_INCORRECT_STATE;
