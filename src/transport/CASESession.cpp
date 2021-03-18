@@ -260,6 +260,9 @@ CHIP_ERROR CASESession::DeriveSecureSession(const uint8_t * info, size_t info_le
     System::PacketBufferHandle msg_salt;
     uint16_t saltlen;
 
+    (void) kKDFSEInfo;
+    (void) kKDFSEInfoLength;
+
     VerifyOrReturnError(info != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(info_len > 0, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mPairingComplete, CHIP_ERROR_INCORRECT_STATE);
