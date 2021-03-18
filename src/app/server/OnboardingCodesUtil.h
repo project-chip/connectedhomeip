@@ -19,8 +19,9 @@
 
 #include <setup_payload/SetupPayload.h>
 
-void PrintQRCode(chip::RendezvousInformationFlags rendezvousFlags);
+void PrintOnboardingCodes(chip::RendezvousInformationFlags rendezvousFlags);
 CHIP_ERROR GetQRCode(std::string & QRCode, chip::RendezvousInformationFlags rendezvousFlags);
+CHIP_ERROR GetManualPairingCode(std::string & manualPairingCode, chip::RendezvousInformationFlags rendezvousFlags);
 
 /**
  * Initialize DataModelHandler and start CHIP datamodel server, the server
