@@ -84,7 +84,7 @@ OpenThread RCP firmware is required to allow the PC to communicate with Thread
 devices. Run the commands mentioned in the following steps to build and program
 the RCP firmware onto an K32W061 DK6:
 
-1.  Clone the OpenThread repository into the current directory:
+1.  Clone the OpenThread repository into the current directory (we recommand using commit ced158e65a00dd5394c04548b7b187d3a3f11eef):
 
         $ git clone https://github.com/openthread/openthread.git
 
@@ -122,8 +122,8 @@ To make your PC work as a Thread Border Router, complete the following tasks:
 1.  Set up Thread Border Router package by following steps
     [3,4,5](https://openthread.io/guides/border-router/build) from the official
     documentation. Use NETWORK_MANAGER=0 as the Wi-Fi AP will be set manually at
-    the next step.
-
+    the next step. Also, we recommend using commit
+    83babaf236cad8471be28185d8d4351d37564919 for ot-br-posix repository.
 2.  Configure the Wi-Fi AP
 
     -   Install the required package:
