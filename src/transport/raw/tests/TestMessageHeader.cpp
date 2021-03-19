@@ -50,7 +50,7 @@ void TestPayloadHeaderInitialState(nlTestSuite * inSuite, void * inContext)
 
     NL_TEST_ASSERT(inSuite, header.GetMessageType() == 0);
     NL_TEST_ASSERT(inSuite, header.GetExchangeID() == 0);
-    NL_TEST_ASSERT(inSuite, header.GetProtocolID() == 0);
+    NL_TEST_ASSERT(inSuite, header.GetProtocolID() == static_cast<uint16_t>(Protocols::kProtocol_NotSpecified));
     NL_TEST_ASSERT(inSuite, !header.GetVendorId().HasValue());
 }
 
