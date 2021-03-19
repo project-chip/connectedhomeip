@@ -30,26 +30,6 @@ class ServerStorageDelegate : public chip::PersistentStorageDelegate
 public:
     void SetStorageDelegate(chip::PersistentStorageResultDelegate * delegate) override { mAsyncDelegate = delegate; }
 
-    void AsyncGetKeyValue(const char * key) override
-    {
-        // TODO: Async Get/Set are implemented synchronously here.
-        // We need to figure out a standard way to implement this - this implementation
-        // was based on an example that just returned and that seemed even less useful.
-        uint8_t buffer[kMaxKeyValueSize];
-        uint16_t bufferSize = sizeof(buffer) - 1;
-        CHIP_ERROR err      = SyncGetKeyValue(key, buffer, bufferSize);
-
-        if (err == CHIP_NO_ERROR)
-        {
-            buffer[bufferSize] = 0;
-            mAsyncDelegate->OnPersistentStorageValue(key, reinterpret_cast<const char *>(buffer));
-        }
-        else
-        {
-            mAsyncDelegate->OnPersistentStorageStatus(key, chip::PersistentStorageResultDelegate::Operation::kGET, err);
-        }
-    }
-
     void AsyncSetKeyValue(const char * key, const char * value) override
     {
 

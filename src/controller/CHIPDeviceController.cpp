@@ -510,8 +510,6 @@ exit:
     return err;
 }
 
-void DeviceController::OnPersistentStorageValue(const char * key, const char * value) {}
-
 void DeviceController::OnPersistentStorageStatus(const char * key, Operation op, CHIP_ERROR err) {}
 
 DeviceCommissioner::DeviceCommissioner()

@@ -78,12 +78,6 @@ class ServerStorageDelegate : public PersistentStorageDelegate
         chipDie();
     }
 
-    void AsyncGetKeyValue(const char * key) override
-    {
-        ChipLogError(AppServer, "ServerStorageDelegate does not support async operations");
-        chipDie();
-    }
-
     void AsyncSetKeyValue(const char * key, const char * value) override
     {
         ChipLogError(AppServer, "ServerStorageDelegate does not support async operations");
