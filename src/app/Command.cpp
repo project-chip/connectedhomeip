@@ -31,7 +31,7 @@
 namespace chip {
 namespace app {
 
-CHIP_ERROR Command::Init(Messaging::ExchangeManager * apExchangeMgr)
+CHIP_ERROR Command::Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     // Error if already initialized.
@@ -40,7 +40,7 @@ CHIP_ERROR Command::Init(Messaging::ExchangeManager * apExchangeMgr)
     VerifyOrExit(mpExchangeCtx == nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     mpExchangeMgr = apExchangeMgr;
-
+    mpDelegate    = apDelegate;
     err = Reset();
     SuccessOrExit(err);
 
@@ -134,6 +134,7 @@ void Command::Shutdown()
     ClearExistingExchangeContext();
 
     mpExchangeMgr = nullptr;
+    mpDelegate    = nullptr;
     MoveToState(CommandState::Uninitialized);
 
 exit:

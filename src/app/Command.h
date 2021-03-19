@@ -39,6 +39,7 @@
 #include <app/MessageDef/CommandDataElement.h>
 #include <app/MessageDef/CommandList.h>
 #include <app/MessageDef/InvokeCommand.h>
+#include <app/InteractionModelDelegate.h>
 
 namespace chip {
 namespace app {
@@ -92,13 +93,14 @@ public:
      *  instance.
      *
      *  @param[in]    apExchangeMgr    A pointer to the ExchangeManager object.
+     *  @param[in]    apDelegate       InteractionModelDelegate set by application.
      *
      *  @retval #CHIP_ERROR_INCORRECT_STATE If the state is not equal to
      *          CommandState::NotInitialized.
      *  @retval #CHIP_NO_ERROR On success.
      *
      */
-    CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr);
+    CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate);
 
     /**
      *  Shutdown the CommandSender. This terminates this instance
@@ -147,6 +149,7 @@ protected:
 
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
+    InteractionModelDelegate * mpDelegate      = nullptr;
     chip::System::PacketBufferHandle mCommandMessageBuf;
 
 private:

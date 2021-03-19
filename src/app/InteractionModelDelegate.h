@@ -75,6 +75,17 @@ public:
      */
     virtual CHIP_ERROR ReportError(const ReadClient * apReadClient, CHIP_ERROR aError) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
+    /**
+     * Notification that a Command Send receive Status code embeded in Invoke Command Response
+     * @param[in]  aGeneralCode   Status code defined by the standard
+     * @param[in]  aProtocolId    Protocol Id
+     * @param[in]  aProtocolCode  Detailed error information, protocol-specific.
+     * @param[in]  aClusterId     Cluster identifier
+     * @retval # CHIP_ERROR_NOT_IMPLEMENTED if not implemented
+     */
+    virtual CHIP_ERROR CommandStatus(const uint16_t aGeneralCode, const uint32_t aProtocolId, const uint16_t aProtocolCode,
+                             const chip::ClusterId aClusterId) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+
     virtual ~InteractionModelDelegate() = default;
 };
 

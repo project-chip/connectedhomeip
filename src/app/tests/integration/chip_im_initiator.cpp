@@ -229,6 +229,12 @@ public:
         printf("ReportError with err %d", aError);
         return CHIP_NO_ERROR;
     }
+    CHIP_ERROR CommandStatus(const uint16_t aGeneralCode, const uint32_t aProtocolId, const uint16_t aProtocolCode,
+                             const chip::ClusterId aClusterId) override
+    {
+        printf("CommandStatus with GeneralCode %d, ProtocolId %d, ProtocolCode %d, ClusterId %d", aGeneralCode, aProtocolId, aProtocolCode, aClusterId);
+        return CHIP_NO_ERROR;
+    }
 };
 
 } // namespace
