@@ -31,6 +31,7 @@
 #include <messaging/ExchangeContext.h>
 #include <messaging/MessageCounterSync.h>
 #include <messaging/ReliableMessageMgr.h>
+#include <protocols/Protocols.h>
 #include <support/DLLUtil.h>
 #include <support/Pool.h>
 #include <transport/SecureSessionMgr.h>
@@ -112,7 +113,7 @@ public:
      *                                                             is full and a new one cannot be allocated.
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR RegisterUnsolicitedMessageHandlerForProtocol(uint32_t protocolId, ExchangeDelegate * delegate);
+    CHIP_ERROR RegisterUnsolicitedMessageHandlerForProtocol(Protocols::Id protocolId, ExchangeDelegate * delegate);
 
     /**
      *  Register an unsolicited message handler for a given protocol identifier and message type.
@@ -127,7 +128,7 @@ public:
      *                                                             is full and a new one cannot be allocated.
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR RegisterUnsolicitedMessageHandlerForType(uint32_t protocolId, uint8_t msgType, ExchangeDelegate * delegate);
+    CHIP_ERROR RegisterUnsolicitedMessageHandlerForType(Protocols::Id protocolId, uint8_t msgType, ExchangeDelegate * delegate);
 
     /**
      * A strongly-message-typed version of RegisterUnsolicitedMessageHandlerForType.
@@ -136,7 +137,7 @@ public:
     CHIP_ERROR RegisterUnsolicitedMessageHandlerForType(MessageType msgType, ExchangeDelegate * delegate)
     {
         static_assert(std::is_same<std::underlying_type_t<MessageType>, uint8_t>::value, "Enum is wrong size; cast is not safe");
-        return RegisterUnsolicitedMessageHandlerForType(Protocols::MessageTypeTraits<MessageType>::ProtocolId,
+        return RegisterUnsolicitedMessageHandlerForType(Protocols::MessageTypeTraits<MessageType>::ProtocolId(),
                                                         static_cast<uint8_t>(msgType), delegate);
     }
 
@@ -149,7 +150,7 @@ public:
      *                                                       is not found.
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR UnregisterUnsolicitedMessageHandlerForProtocol(uint32_t protocolId);
+    CHIP_ERROR UnregisterUnsolicitedMessageHandlerForProtocol(Protocols::Id protocolId);
 
     /**
      *  Unregister an unsolicited message handler for a given protocol identifier and message type.
@@ -162,7 +163,7 @@ public:
      *                                                       is not found.
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR UnregisterUnsolicitedMessageHandlerForType(uint32_t protocolId, uint8_t msgType);
+    CHIP_ERROR UnregisterUnsolicitedMessageHandlerForType(Protocols::Id protocolId, uint8_t msgType);
 
     /**
      * A strongly-message-typed version of UnregisterUnsolicitedMessageHandlerForType.
@@ -171,7 +172,7 @@ public:
     CHIP_ERROR UnregisterUnsolicitedMessageHandlerForType(MessageType msgType)
     {
         static_assert(std::is_same<std::underlying_type_t<MessageType>, uint8_t>::value, "Enum is wrong size; cast is not safe");
-        return UnregisterUnsolicitedMessageHandlerForType(Protocols::MessageTypeTraits<MessageType>::ProtocolId,
+        return UnregisterUnsolicitedMessageHandlerForType(Protocols::MessageTypeTraits<MessageType>::ProtocolId(),
                                                           static_cast<uint8_t>(msgType));
     }
 
@@ -230,8 +231,9 @@ private:
 
     struct UnsolicitedMessageHandler
     {
+        UnsolicitedMessageHandler() : ProtocolId(Protocols::NotSpecified) {}
         ExchangeDelegate * Delegate;
-        uint32_t ProtocolId;
+        Protocols::Id ProtocolId;
         int16_t MessageType;
     };
 
@@ -255,8 +257,8 @@ private:
 
     ExchangeContext * AllocContext(uint16_t ExchangeId, SecureSessionHandle session, bool Initiator, ExchangeDelegate * delegate);
 
-    CHIP_ERROR RegisterUMH(uint32_t protocolId, int16_t msgType, ExchangeDelegate * delegate);
-    CHIP_ERROR UnregisterUMH(uint32_t protocolId, int16_t msgType);
+    CHIP_ERROR RegisterUMH(Protocols::Id protocolId, int16_t msgType, ExchangeDelegate * delegate);
+    CHIP_ERROR UnregisterUMH(Protocols::Id protocolId, int16_t msgType);
 
     static bool IsMsgCounterSyncMessage(const PayloadHeader & payloadHeader);
 

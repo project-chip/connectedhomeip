@@ -47,7 +47,7 @@ CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeM
     mpExchangeMgr = apExchangeMgr;
     mpDelegate    = apDelegate;
 
-    err = mpExchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::kProtocol_InteractionModel, this);
+    err = mpExchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::InteractionModel::Id, this);
     SuccessOrExit(err);
 
 exit:

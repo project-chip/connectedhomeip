@@ -125,7 +125,7 @@ public:
     void SendOperationalCredentials() override;
 
     //////////// NetworkProvisioningDelegate Implementation ///////////////
-    CHIP_ERROR SendSecureMessage(Protocols::CHIPProtocolId protocol, uint8_t msgType, System::PacketBufferHandle msgBug) override;
+    CHIP_ERROR SendSecureMessage(Protocols::Id protocol, uint8_t msgType, System::PacketBufferHandle msgBug) override;
     void OnNetworkProvisioningError(CHIP_ERROR error) override;
     void OnNetworkProvisioningComplete() override;
 

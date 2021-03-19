@@ -60,7 +60,7 @@ enum class MsgType : uint8_t
 template <>
 struct MessageTypeTraits<InteractionModel::MsgType>
 {
-    static constexpr uint16_t ProtocolId = chip::Protocols::kProtocol_InteractionModel;
+    static constexpr const Protocols::Id & ProtocolId() { return InteractionModel::Id; }
 };
 
 } // namespace Protocols

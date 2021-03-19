@@ -26,17 +26,19 @@
 
 #pragma once
 
+#include <cstdint>
+
 namespace chip {
 
 //
 // CHIP Vendor Identifiers (16 bits max)
 //
 
-enum ChipVendorId
+enum VendorId : uint16_t
 {
-    kChipVendor_Common       = 0x0000,
-    kChipVendor_NestLabs     = 0x235A,
-    kChipVendor_NotSpecified = 0xFFFF
+    Common       = 0x0000u,
+    NestLabs     = 0x235Au,
+    NotSpecified = 0xFFFFu
 };
 
 } // namespace chip
