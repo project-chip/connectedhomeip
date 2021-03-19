@@ -266,7 +266,9 @@ void PacketBuffer::AddToEnd(PacketBufferHandle && aPacketHandle)
 
     while (true)
     {
-        lCursor->tot_len = static_cast<uint16_t>(lCursor->tot_len + aPacket->tot_len);
+        uint16_t old_total_length = lCursor->tot_len;
+        lCursor->tot_len          = static_cast<uint16_t>(lCursor->tot_len + aPacket->tot_len);
+        VerifyOrDieWithMsg(lCursor->tot_len >= old_total_length, chipSystemLayer, "buffer chain too large");
         if (lCursor->next == nullptr)
         {
             lCursor->next = aPacket;
@@ -353,6 +355,34 @@ PacketBuffer * PacketBuffer::Consume(uint16_t aConsumeLength)
     }
 
     return lPacket;
+}
+
+CHIP_ERROR PacketBuffer::Read(uint8_t * aDestination, size_t aReadLength) const
+{
+    const PacketBuffer * lPacket = this;
+
+    if (aReadLength > TotalLength())
+    {
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
+    }
+    while (aReadLength > 0)
+    {
+        if (lPacket == nullptr)
+        {
+            // TotalLength() or an individual buffer's DataLength() must have been wrong.
+            return CHIP_ERROR_INTERNAL;
+        }
+        size_t lToReadFromCurrentBuf = lPacket->DataLength();
+        if (aReadLength < lToReadFromCurrentBuf)
+        {
+            lToReadFromCurrentBuf = aReadLength;
+        }
+        memcpy(aDestination, lPacket->Start(), lToReadFromCurrentBuf);
+        aDestination += lToReadFromCurrentBuf;
+        aReadLength -= lToReadFromCurrentBuf;
+        lPacket = lPacket->ChainedBuffer();
+    }
+    return CHIP_NO_ERROR;
 }
 
 bool PacketBuffer::EnsureReservedSize(uint16_t aReservedSize)
