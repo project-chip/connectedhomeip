@@ -484,9 +484,72 @@ struct CHIPService : public ble::GattServer::EventHandler
     ble::attribute_handle_t mTxHandle     = 0;
 };
 
+class SecurityManagerEventHandler : private mbed::NonCopyable<SecurityManagerEventHandler>,
+                                    public ble::SecurityManager::EventHandler
+{
+    void pairingRequest(ble::connection_handle_t connectionHandle) override
+    {
+        ChipLogDetail(DeviceLayer, "SM %s, connHandle=%d", __FUNCTION__, connectionHandle);
+        ble::SecurityManager & security_mgr = ble::BLE::Instance().securityManager();
+
+        auto mbed_err = security_mgr.acceptPairingRequest(connectionHandle);
+        if (mbed_err == BLE_ERROR_NONE)
+        {
+            ChipLogProgress(DeviceLayer, "Pairing request authorized.");
+        }
+        else
+        {
+            ChipLogError(DeviceLayer, "Pairing request not authorized, mbed-os err: %d", mbed_err);
+        }
+    }
+
+    void pairingResult(ble::connection_handle_t connectionHandle, SecurityManager::SecurityCompletionStatus_t result) override
+    {
+        ChipLogDetail(DeviceLayer, "SM %s, connHandle=%d", __FUNCTION__, connectionHandle);
+        if (result == SecurityManager::SEC_STATUS_SUCCESS)
+        {
+            ChipLogProgress(DeviceLayer, "Pairing successful.");
+        }
+        else
+        {
+            ChipLogError(DeviceLayer, "Pairing failed, status: 0x%X.", result);
+        }
+    }
+
+    void linkEncryptionResult(ble::connection_handle_t connectionHandle, ble::link_encryption_t result) override
+    {
+        ChipLogDetail(DeviceLayer, "SM %s, connHandle=%d", __FUNCTION__, connectionHandle);
+        if (result == ble::link_encryption_t::NOT_ENCRYPTED)
+        {
+            ChipLogDetail(DeviceLayer, "Link NOT_ENCRYPTED.");
+        }
+        else if (result == ble::link_encryption_t::ENCRYPTION_IN_PROGRESS)
+        {
+            ChipLogDetail(DeviceLayer, "Link ENCRYPTION_IN_PROGRESS.");
+        }
+        else if (result == ble::link_encryption_t::ENCRYPTED)
+        {
+            ChipLogDetail(DeviceLayer, "Link ENCRYPTED.");
+        }
+        else if (result == ble::link_encryption_t::ENCRYPTED_WITH_MITM)
+        {
+            ChipLogDetail(DeviceLayer, "Link ENCRYPTED_WITH_MITM.");
+        }
+        else if (result == ble::link_encryption_t::ENCRYPTED_WITH_SC_AND_MITM)
+        {
+            ChipLogDetail(DeviceLayer, "Link ENCRYPTED_WITH_SC_AND_MITM.");
+        }
+        else
+        {
+            ChipLogDetail(DeviceLayer, "Link encryption status UNKNOWN.");
+        }
+    }
+};
+
 BLEManagerImpl BLEManagerImpl::sInstance;
 static GapEventHandler sMbedGapEventHandler;
 static CHIPService sCHIPService;
+static SecurityManagerEventHandler sSecurityManagerEventHandler;
 
 /* Initialize the mbed-os BLE subsystem. Register the BLE event processing
  * callback to the system event queue. Register the BLE initialization complete
@@ -535,9 +598,25 @@ void BLEManagerImpl::DoBLEProcessing(intptr_t arg)
  */
 void BLEManagerImpl::HandleInitComplete(bool no_error)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err       = CHIP_NO_ERROR;
+    ble_error_t mbed_err = BLE_ERROR_NONE;
+
+    ble::SecurityManager & security_mgr = ble::BLE::Instance().securityManager();
 
     VerifyOrExit(no_error, err = CHIP_ERROR_INTERNAL);
+
+    mbed_err = security_mgr.init(
+        /*bool enableBonding             */ false,
+        /*bool requireMITM               */ true,
+        /*SecurityIOCapabilities_t iocaps*/ SecurityManager::IO_CAPS_NONE,
+        /*const Passkey_t passkey        */ nullptr,
+        /*bool signing                   */ true,
+        /*const char *dbFilepath         */ nullptr);
+    VerifyOrExit(mbed_err == BLE_ERROR_NONE, err = CHIP_ERROR_INTERNAL);
+
+    mbed_err = security_mgr.setPairingRequestAuthorisation(true);
+    VerifyOrExit(mbed_err == BLE_ERROR_NONE, err = CHIP_ERROR_INTERNAL);
+    security_mgr.setSecurityManagerEventHandler(&sSecurityManagerEventHandler);
 
     err = BleLayer::Init(this, this, &SystemLayer);
     SuccessOrExit(err);
@@ -904,7 +983,6 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
     if (UUIDsMatch(charId, &ChipUUID_CHIPoBLEChar_TX))
     {
         att_handle = sCHIPService.getTxHandle();
-        // att_handle = sCHIPService.getTxCCCDHandle();
     }
     else if (UUIDsMatch(charId, &ChipUUID_CHIPoBLEChar_RX))
     {
