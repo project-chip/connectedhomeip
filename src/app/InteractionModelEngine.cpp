@@ -50,6 +50,9 @@ CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeM
     err = mpExchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::InteractionModel::Id, this);
     SuccessOrExit(err);
 
+    mReportingEngine.Init();
+    SuccessOrExit(err);
+
 exit:
     return err;
 }

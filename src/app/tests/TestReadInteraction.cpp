@@ -173,12 +173,12 @@ const nlTest sTests[] =
 
 } // namespace
 
-int TestEventLogging()
+int TestReadInteraction()
 {
     // clang-format off
     nlTestSuite theSuite =
 	{
-        "InteractionMessage",
+        "TestReadInteraction",
         &sTests[0],
         nullptr,
         nullptr
@@ -192,4 +192,4 @@ int TestEventLogging()
     return (nlTestRunnerStats(&theSuite));
 }
 
-CHIP_REGISTER_TEST_SUITE(TestEventLogging)
+CHIP_REGISTER_TEST_SUITE(TestReadInteraction)
