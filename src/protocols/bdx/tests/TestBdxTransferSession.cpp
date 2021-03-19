@@ -137,7 +137,7 @@ void VerifyStatusReport(nlTestSuite * inSuite, void * inContext, const System::P
     SecureChannel::StatusReport report;
     err = report.Parse(std::move(msgCopy));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, report.GetGeneralCode() == static_cast<uint16_t>(SecureChannel::GeneralStatusCode::kFailure));
+    NL_TEST_ASSERT(inSuite, report.GetGeneralCode() == SecureChannel::GeneralStatusCode::kFailure);
     NL_TEST_ASSERT(inSuite, report.GetProtocolId() == kProtocol_BDX);
     NL_TEST_ASSERT(inSuite, report.GetProtocolCode() == static_cast<uint16_t>(code));
 }

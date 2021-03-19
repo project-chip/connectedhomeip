@@ -32,9 +32,9 @@ using namespace chip::Protocols::SecureChannel;
 
 void TestStatusReport_NoData(nlTestSuite * inSuite, void * inContext)
 {
-    uint16_t generalCode  = static_cast<uint16_t>(GeneralStatusCode::kSuccess);
-    uint32_t protocolId   = kProtocol_SecureChannel;
-    uint16_t protocolCode = kProtocolCodeSuccess;
+    GeneralStatusCode generalCode = GeneralStatusCode::kSuccess;
+    uint32_t protocolId           = kProtocol_SecureChannel;
+    uint16_t protocolCode         = kProtocolCodeSuccess;
 
     StatusReport testReport(generalCode, protocolId, protocolCode);
 
@@ -58,7 +58,7 @@ void TestStatusReport_NoData(nlTestSuite * inSuite, void * inContext)
 
 void TestStatusReport_WithData(nlTestSuite * inSuite, void * inContext)
 {
-    uint16_t generalCode               = static_cast<uint16_t>(GeneralStatusCode::kFailure);
+    GeneralStatusCode generalCode      = GeneralStatusCode::kFailure;
     uint32_t protocolId                = kProtocol_SecureChannel;
     uint16_t protocolCode              = static_cast<uint16_t>(StatusCode::InvalidFabricConfig);
     uint8_t data[6]                    = { 42, 19, 3, 1, 3, 0 };

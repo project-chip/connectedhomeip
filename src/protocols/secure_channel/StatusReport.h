@@ -44,7 +44,7 @@ public:
      *  @param protocolId Must specify a ProtocolId which consists of Vendor Id (upper 16 bits) and ProtocolId (lower 16 bits)
      *  @param protocolCode A code defined by the specified protocol which provides more information about the status
      */
-    StatusReport(uint16_t generalCode, uint32_t protocolId, uint16_t protocolCode);
+    StatusReport(GeneralStatusCode generalCode, uint32_t protocolId, uint16_t protocolCode);
 
     //
     /**
@@ -55,7 +55,8 @@ public:
      *  @param protocolCode A code defined by the specified protocol which provides more information about the status
      *  @param protocolData A \c PacketBufferHandle containing the protocol-specific data
      */
-    StatusReport(uint16_t generalCode, uint32_t protocolId, uint16_t protocolCode, System::PacketBufferHandle protocolData);
+    StatusReport(GeneralStatusCode generalCode, uint32_t protocolId, uint16_t protocolCode,
+                 System::PacketBufferHandle protocolData);
 
     /**
      *  Read the contents of a \c PacketBuffer containing a StatusReport message and store the field values in this object.
@@ -86,7 +87,7 @@ public:
      */
     size_t Size() const;
 
-    uint16_t GetGeneralCode() const { return mGeneralCode; }
+    GeneralStatusCode GetGeneralCode() const { return mGeneralCode; }
     uint32_t GetProtocolId() const { return mProtocolId; }
     uint16_t GetProtocolCode() const { return mProtocolCode; }
     System::PacketBufferHandle GetProtocolData() const
@@ -102,9 +103,9 @@ public:
     }
 
 private:
-    uint16_t mGeneralCode  = 0;
-    uint32_t mProtocolId   = 0;
-    uint16_t mProtocolCode = 0;
+    GeneralStatusCode mGeneralCode;
+    uint32_t mProtocolId;
+    uint16_t mProtocolCode;
 
     System::PacketBufferHandle mProtocolData;
 };

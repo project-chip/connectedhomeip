@@ -845,10 +845,11 @@ void TransferSession::PrepareStatusReport(StatusCode code)
 {
     mStatusReportData.statusCode = code;
 
-    Protocols::SecureChannel::StatusReport report(static_cast<uint16_t>(Protocols::SecureChannel::GeneralStatusCode::kFailure),
+    Protocols::SecureChannel::StatusReport report(Protocols::SecureChannel::GeneralStatusCode::kFailure,
                                                   static_cast<uint32_t>(Protocols::kProtocol_BDX), static_cast<uint16_t>(code));
 
-    Encoding::LittleEndian::PacketBufferWriter bbuf(chip::MessagePacketBuffer::New(report.Size()), report.Size());
+    size_t msgSize = report.Size();
+    Encoding::LittleEndian::PacketBufferWriter bbuf(chip::MessagePacketBuffer::New(msgSize), msgSize);
     VerifyOrExit(!bbuf.IsNull(), mPendingOutput = OutputEventType::kInternalError);
 
     report.WriteToBuffer(bbuf);

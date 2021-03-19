@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include <protocols/secure_channel/Constants.h>
 #include <protocols/secure_channel/StatusReport.h>
 
 #include <support/BufferReader.h>
@@ -23,18 +24,20 @@
 #include <support/ReturnMacros.h>
 
 using namespace chip::Encoding;
+using GeneralStatusCode = chip::Protocols::SecureChannel::GeneralStatusCode;
 
 namespace chip {
 namespace Protocols {
 namespace SecureChannel {
 
-StatusReport::StatusReport() : mGeneralCode(0), mProtocolId(0), mProtocolCode(0), mProtocolData(nullptr) {}
+StatusReport::StatusReport() : mGeneralCode(GeneralStatusCode::kSuccess), mProtocolId(0), mProtocolCode(0), mProtocolData(nullptr)
+{}
 
-StatusReport::StatusReport(uint16_t generalCode, uint32_t protocolId, uint16_t protocolCode) :
+StatusReport::StatusReport(GeneralStatusCode generalCode, uint32_t protocolId, uint16_t protocolCode) :
     mGeneralCode(generalCode), mProtocolId(protocolId), mProtocolCode(protocolCode), mProtocolData(nullptr)
 {}
 
-StatusReport::StatusReport(uint16_t generalCode, uint32_t protocolId, uint16_t protocolCode,
+StatusReport::StatusReport(GeneralStatusCode generalCode, uint32_t protocolId, uint16_t protocolCode,
                            System::PacketBufferHandle protocolData) :
     mGeneralCode(generalCode),
     mProtocolId(protocolId), mProtocolCode(protocolCode)
@@ -44,12 +47,15 @@ StatusReport::StatusReport(uint16_t generalCode, uint32_t protocolId, uint16_t p
 
 CHIP_ERROR StatusReport::Parse(System::PacketBufferHandle buf)
 {
+    uint16_t tempGeneralCode = 0;
+
     ReturnErrorCodeIf(buf.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
 
     uint8_t * bufStart = buf->Start();
     LittleEndian::Reader bufReader(bufStart, buf->DataLength());
 
-    ReturnErrorOnFailure(bufReader.Read16(&mGeneralCode).Read32(&mProtocolId).Read16(&mProtocolCode).StatusCode());
+    ReturnErrorOnFailure(bufReader.Read16(&tempGeneralCode).Read32(&mProtocolId).Read16(&mProtocolCode).StatusCode());
+    mGeneralCode = static_cast<GeneralStatusCode>(tempGeneralCode);
 
     // Any data that exists after the required fields is considered protocol-specific data.
     if (bufReader.OctetsRead() < buf->DataLength())
@@ -69,7 +75,7 @@ CHIP_ERROR StatusReport::Parse(System::PacketBufferHandle buf)
 
 Encoding::LittleEndian::BufferWriter & StatusReport::WriteToBuffer(Encoding::LittleEndian::BufferWriter & buf) const
 {
-    buf.Put16(mGeneralCode).Put32(mProtocolId).Put16(mProtocolCode);
+    buf.Put16(static_cast<uint16_t>(mGeneralCode)).Put32(mProtocolId).Put16(mProtocolCode);
     if (!mProtocolData.IsNull())
     {
         buf.Put(mProtocolData->Start(), mProtocolData->DataLength());
