@@ -322,17 +322,9 @@ void RendezvousSession::UpdateState(RendezvousSession::State newState, CHIP_ERRO
             mTransport = nullptr;
         }
 
-        if (CHIP_NO_ERROR != err)
+        if (CHIP_NO_ERROR != err && mDelegate != nullptr)
         {
-            if (mAdmin != nullptr)
-            {
-                mAdmin->Reset();
-            }
-
-            if (mDelegate)
-            {
-                mDelegate->OnRendezvousError(err);
-            }
+            mDelegate->OnRendezvousError(err);
         }
         break;
 

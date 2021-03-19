@@ -30,11 +30,6 @@ config("controller_wno_deprecate") {
   cflags = [ "-Wno-deprecated-declarations" ]
 }
 
-config("includes") {
-  include_dirs =
-      [ "${chip_root}/src/controller/CHIPDeviceController_deprecated.h" ]
-}
-
 shared_library("ChipDeviceCtrl") {
   output_name = "_ChipDeviceCtrl"
   output_dir = "${target_out_dir}/chip"
@@ -100,6 +95,12 @@ pw_python_action("python") {
         "chip/ChipStack.py",
         "chip/ChipUtility.py",
         "chip/__init__.py",
+        "chip/ble/__init__.py",
+        "chip/ble/commissioning/__init__.py",
+        "chip/ble/get_adapters.py",
+        "chip/ble/library_handle.py",
+        "chip/ble/scan_devices.py",
+        "chip/ble/types.py",
         "chip/configuration/__init__.py",
         "chip/exceptions/__init__.py",
         "chip/internal/__init__.py",
@@ -122,22 +123,6 @@ pw_python_action("python") {
       sources = [ "//LICENSE" ]
     },
   ]
-
-  if (chip_enable_ble) {
-    _py_manifest_files += [
-      {
-        src_dir = "."
-        sources = [
-          "chip/ble/__init__.py",
-          "chip/ble/commissioning/__init__.py",
-          "chip/ble/get_adapters.py",
-          "chip/ble/library_handle.py",
-          "chip/ble/scan_devices.py",
-          "chip/ble/types.py",
-        ]
-      },
-    ]
-  }
 
   _py_manifest_file = "${target_gen_dir}/${target_name}.py_manifest.json"
 

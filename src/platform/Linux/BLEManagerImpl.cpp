@@ -579,7 +579,7 @@ void BLEManagerImpl::DriveBLEState()
     {
         // Start/re-start advertising if not already advertising, or if the advertising state of the
         // Bluez BLE layer needs to be refreshed.
-        if (!mFlags.HasAny(Flags::kAdvertising, Flags::kAdvertisingRefreshNeeded))
+        if (!mFlags.Has(Flags::kAdvertising) || mFlags.Has(Flags::kAdvertisingRefreshNeeded))
         {
             // Configure advertising data if it hasn't been done yet.  This is an asynchronous step which
             // must complete before advertising can be started.  When that happens, this method will
@@ -689,6 +689,11 @@ void BLEManagerImpl::NewConnection(BleLayer * bleLayer, void * appState, const u
 
     // Scan initiation performed async, to ensure that the BLE subsystem is initialized.
     PlatformMgr().ScheduleWork(InitiateScan, static_cast<intptr_t>(BleScanState::kScanForDiscriminator));
+}
+
+BLE_ERROR BLEManagerImpl::CancelConnection()
+{
+    return BLE_ERROR_NOT_IMPLEMENTED;
 }
 
 void BLEManagerImpl::NotifyBLEPeripheralRegisterAppComplete(bool aIsSuccess, void * apAppstate)

@@ -46,8 +46,11 @@ declare_args() {
       (chip_device_platform == "linux" || chip_device_platform == "darwin" ||
        chip_device_platform == "cc13x2_26x2")
 
-  chip_enable_mdns =
-      chip_device_platform == "linux" || chip_device_platform == "esp32"
+  if (chip_device_platform == "linux" || chip_device_platform == "esp32") {
+    chip_mdns = "minimal"
+  } else {
+    chip_mdns = "none"
+  }
 }
 
 _chip_device_layer = "none"

@@ -61,8 +61,8 @@ bool CheckGenerator(const SetupPayload & payload, std::string expectedResult)
 SetupPayload GetDefaultPayload()
 {
     SetupPayload payload;
-    payload.setUpPINCode  = 1234;
-    payload.discriminator = 1;
+    payload.setUpPINCode  = 123456780;
+    payload.discriminator = 2560;
 
     return payload;
 }
@@ -71,7 +71,7 @@ void TestDecimalRepresentation_PartialPayload(nlTestSuite * inSuite, void * inCo
 {
     SetupPayload payload = GetDefaultPayload();
 
-    std::string expectedResult = "0000039490";
+    std::string expectedResult = "2361087535";
 
     NL_TEST_ASSERT(inSuite, CheckGenerator(payload, expectedResult));
 }
@@ -81,7 +81,7 @@ void TestDecimalRepresentation_PartialPayload_RequiresCustomFlow(nlTestSuite * i
     SetupPayload payload       = GetDefaultPayload();
     payload.requiresCustomFlow = true;
 
-    std::string expectedResult = "00000394910000000000";
+    std::string expectedResult = "63610875350000000000";
 
     NL_TEST_ASSERT(inSuite, CheckGenerator(payload, expectedResult));
 }
@@ -93,7 +93,7 @@ void TestDecimalRepresentation_FullPayloadWithZeros(nlTestSuite * inSuite, void 
     payload.vendorID           = 1;
     payload.productID          = 1;
 
-    std::string expectedResult = "00000394910000100001";
+    std::string expectedResult = "63610875350000100001";
 
     NL_TEST_ASSERT(inSuite, CheckGenerator(payload, expectedResult));
 }
@@ -105,7 +105,7 @@ void TestDecimalRepresentation_FullPayloadWithoutZeros(nlTestSuite * inSuite, vo
     payload.vendorID           = 45367;
     payload.productID          = 14526;
 
-    std::string expectedResult = "00000394914536714526";
+    std::string expectedResult = "63610875354536714526";
 
     NL_TEST_ASSERT(inSuite, CheckGenerator(payload, expectedResult));
 }
@@ -116,7 +116,7 @@ void TestDecimalRepresentation_FullPayloadWithoutZeros_DoesNotRequireCustomFlow(
     payload.vendorID     = 45367;
     payload.productID    = 14526;
 
-    std::string expectedResult = "0000039490";
+    std::string expectedResult = "2361087535";
 
     NL_TEST_ASSERT(inSuite, CheckGenerator(payload, expectedResult));
 }
@@ -128,6 +128,20 @@ void TestDecimalRepresentation_AllZeros(nlTestSuite * inSuite, void * inContext)
     payload.discriminator = 0;
 
     std::string expectedResult = "";
+
+    NL_TEST_ASSERT(inSuite, CheckGenerator(payload, expectedResult));
+}
+
+void TestDecimalRepresentation_AllOnes(nlTestSuite * inSuite, void * inContext)
+{
+    SetupPayload payload;
+    payload.setUpPINCode       = 0x7FFFFFF;
+    payload.discriminator      = 0xFFF;
+    payload.requiresCustomFlow = true;
+    payload.vendorID           = 65535;
+    payload.productID          = 65535;
+
+    std::string expectedResult = "76553581916553565535";
 
     NL_TEST_ASSERT(inSuite, CheckGenerator(payload, expectedResult));
 }
@@ -156,7 +170,7 @@ void TestGenerateAndParser_ManualSetupCodeWithLongDiscriminator(nlTestSuite * in
 {
     SetupPayload payload       = GetDefaultPayload();
     payload.requiresCustomFlow = false;
-    payload.discriminator      = 0xf1a;
+    payload.discriminator      = 0xa1f;
 
     {
         // Test short 11 digit code
@@ -166,14 +180,14 @@ void TestGenerateAndParser_ManualSetupCodeWithLongDiscriminator(nlTestSuite * in
 
         SetupPayload outPayload;
         CHIP_ERROR err = ManualSetupPayloadParser(result).populatePayload(outPayload);
-        assertPayloadValues(inSuite, err, CHIP_NO_ERROR, outPayload, payload.setUpPINCode, 0xa, payload.vendorID,
+        assertPayloadValues(inSuite, err, CHIP_NO_ERROR, outPayload, payload.setUpPINCode, 0xa00, payload.vendorID,
                             payload.productID);
     }
 
     payload.vendorID           = 1;
     payload.productID          = 1;
     payload.requiresCustomFlow = true;
-    payload.discriminator      = 0xf1b;
+    payload.discriminator      = 0xb1f;
 
     {
         // Test long 21 digit code
@@ -183,7 +197,7 @@ void TestGenerateAndParser_ManualSetupCodeWithLongDiscriminator(nlTestSuite * in
 
         SetupPayload outPayload;
         CHIP_ERROR err = ManualSetupPayloadParser(result).populatePayload(outPayload);
-        assertPayloadValues(inSuite, err, CHIP_NO_ERROR, outPayload, payload.setUpPINCode, 0xb, payload.vendorID,
+        assertPayloadValues(inSuite, err, CHIP_NO_ERROR, outPayload, payload.setUpPINCode, 0xb00, payload.vendorID,
                             payload.productID);
     }
 }
@@ -201,20 +215,20 @@ void TestPayloadParser_FullPayload(nlTestSuite * inSuite, void * inContext)
     SetupPayload payload;
     std::string decimalString;
 
-    decimalString = "00000394914536714526";
+    decimalString = "63610875354536714526";
     decimalString += Verhoeff10::ComputeCheckChar(decimalString.c_str());
     CHIP_ERROR err = ManualSetupPayloadParser(decimalString).populatePayload(payload);
-    assertPayloadValues(inSuite, err, CHIP_NO_ERROR, payload, 1234, 1, 45367, 14526);
+    assertPayloadValues(inSuite, err, CHIP_NO_ERROR, payload, 123456780, 2560, 45367, 14526);
 
-    decimalString = "12393051190456200032";
+    decimalString = "52927623630456200032";
     decimalString += Verhoeff10::ComputeCheckChar(decimalString.c_str());
     err = ManualSetupPayloadParser(decimalString).populatePayload(payload);
-    assertPayloadValues(inSuite, err, CHIP_NO_ERROR, payload, 38728284, 15, 4562, 32);
+    assertPayloadValues(inSuite, err, CHIP_NO_ERROR, payload, 38728284, 1280, 4562, 32);
 
-    decimalString = "00000000350000100001";
+    decimalString = "40000100000000100001";
     decimalString += Verhoeff10::ComputeCheckChar(decimalString.c_str());
     err = ManualSetupPayloadParser(decimalString).populatePayload(payload);
-    assertPayloadValues(inSuite, err, CHIP_NO_ERROR, payload, 1, 1, 1, 1);
+    assertPayloadValues(inSuite, err, CHIP_NO_ERROR, payload, 1, 0, 1, 1);
 }
 
 void TestGenerateAndParser_FullPayload(nlTestSuite * inSuite, void * inContext)
@@ -254,40 +268,40 @@ void TestPayloadParser_PartialPayload(nlTestSuite * inSuite, void * inContext)
     SetupPayload payload;
     std::string decimalString;
 
-    decimalString = "0000039490";
+    decimalString = "2361087535";
     decimalString += Verhoeff10::ComputeCheckChar(decimalString.c_str());
     NL_TEST_ASSERT(inSuite, decimalString.length() == 11);
     err = ManualSetupPayloadParser(decimalString).populatePayload(payload);
-    assertPayloadValues(inSuite, err, CHIP_NO_ERROR, payload, 1234, 1, 0, 0);
+    assertPayloadValues(inSuite, err, CHIP_NO_ERROR, payload, 123456780, 2560, 0, 0);
 
-    decimalString = "0000000034";
+    decimalString = "0000010000";
     decimalString += Verhoeff10::ComputeCheckChar(decimalString.c_str());
     NL_TEST_ASSERT(inSuite, decimalString.length() == 11);
-    err = ManualSetupPayloadParser(decimalString).populatePayload(payload);
-    assertPayloadValues(inSuite, err, CHIP_NO_ERROR, payload, 1, 1, 0, 0);
-
-    decimalString = "00000000330000000000";
-    decimalString += Verhoeff10::ComputeCheckChar(decimalString.c_str());
-    NL_TEST_ASSERT(inSuite, decimalString.length() == 21);
     err = ManualSetupPayloadParser(decimalString).populatePayload(payload);
     assertPayloadValues(inSuite, err, CHIP_NO_ERROR, payload, 1, 0, 0, 0);
 
+    decimalString = "63610875350000000000";
+    decimalString += Verhoeff10::ComputeCheckChar(decimalString.c_str());
+    NL_TEST_ASSERT(inSuite, decimalString.length() == 21);
+    err = ManualSetupPayloadParser(decimalString).populatePayload(payload);
+    assertPayloadValues(inSuite, err, CHIP_NO_ERROR, payload, 123456780, 2560, 0, 0);
+
     // no discriminator (= 0)
-    decimalString = "0000000032";
+    decimalString = "0033407535";
     decimalString += Verhoeff10::ComputeCheckChar(decimalString.c_str());
     NL_TEST_ASSERT(inSuite, decimalString.length() == 11);
     err = ManualSetupPayloadParser(decimalString).populatePayload(payload);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // no vid (= 0)
-    decimalString = "00000000330000014536";
+    decimalString = "63610875350000014526";
     decimalString += Verhoeff10::ComputeCheckChar(decimalString.c_str());
     NL_TEST_ASSERT(inSuite, decimalString.length() == 21);
     err = ManualSetupPayloadParser(decimalString).populatePayload(payload);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // no pid (= 0)
-    decimalString = "00000000332645300000";
+    decimalString = "63610875354536700000";
     decimalString += Verhoeff10::ComputeCheckChar(decimalString.c_str());
     NL_TEST_ASSERT(inSuite, decimalString.length() == 21);
     err = ManualSetupPayloadParser(decimalString).populatePayload(payload);
@@ -321,23 +335,6 @@ void TestLongCodeReadWrite(nlTestSuite * inSuite, void * context)
     ManualSetupPayloadParser(result).populatePayload(outPayload);
 
     NL_TEST_ASSERT(inSuite, inPayload == outPayload);
-}
-
-void TestExtractBits(nlTestSuite * inSuite, void * inContext)
-{
-    uint64_t dest;
-    CHIP_ERROR result = extractBits(5, dest, 2, 1, 3);
-    NL_TEST_ASSERT(inSuite, result == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, dest == 1);
-
-    result = extractBits(4567, dest, 4, 8, 13);
-    NL_TEST_ASSERT(inSuite, result == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, dest == 29);
-
-    NL_TEST_ASSERT(inSuite, extractBits(4567, dest, 4, 18, 13) == CHIP_ERROR_INVALID_STRING_LENGTH);
-    NL_TEST_ASSERT(inSuite, extractBits(4567, dest, 14, 2, 13) == CHIP_ERROR_INVALID_STRING_LENGTH);
-    NL_TEST_ASSERT(inSuite, extractBits(5, dest, 3, 1, 3) == CHIP_ERROR_INVALID_STRING_LENGTH);
-    NL_TEST_ASSERT(inSuite, extractBits(5, dest, 2, 2, 3) == CHIP_ERROR_INVALID_STRING_LENGTH);
 }
 
 void TestPayloadParser_InvalidEntry(nlTestSuite * inSuite, void * inContext)
@@ -381,7 +378,7 @@ void TestPayloadParser_InvalidEntry(nlTestSuite * inSuite, void * inContext)
     assertEmptyPayloadWithError(inSuite, ManualSetupPayloadParser(decimalString).populatePayload(payload),
                                 CHIP_ERROR_INVALID_STRING_LENGTH, payload);
     // no pin code (= 0)
-    decimalString = "0000000016";
+    decimalString = "2327680000";
     decimalString += Verhoeff10::ComputeCheckChar(decimalString.c_str());
     assertEmptyPayloadWithError(inSuite, ManualSetupPayloadParser(decimalString).populatePayload(payload),
                                 CHIP_ERROR_INVALID_ARGUMENT, payload);
@@ -432,12 +429,12 @@ void TestCheckCodeLengthValidity(nlTestSuite * inSuite, void * inContext)
 
 void TestDecimalStringToNumber(nlTestSuite * inSuite, void * inContext)
 {
-    uint64_t number;
+    uint32_t number;
     NL_TEST_ASSERT(inSuite, toNumber("12345", number) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, number == 12345);
 
-    NL_TEST_ASSERT(inSuite, toNumber("01234567890123456789", number) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, number == 1234567890123456789);
+    NL_TEST_ASSERT(inSuite, toNumber("01234567890", number) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, number == 1234567890);
 
     NL_TEST_ASSERT(inSuite, toNumber("00000001", number) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, number == 1);
@@ -451,7 +448,7 @@ void TestDecimalStringToNumber(nlTestSuite * inSuite, void * inContext)
 
 void TestReadCharsFromDecimalString(nlTestSuite * inSuite, void * inContext)
 {
-    uint64_t number;
+    uint32_t number;
     size_t index = 3;
     NL_TEST_ASSERT(inSuite, readDigitsFromDecimalString("12345", index, number, 2) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, number == 45);
@@ -481,36 +478,6 @@ void TestReadCharsFromDecimalString(nlTestSuite * inSuite, void * inContext)
 
     index = 200;
     NL_TEST_ASSERT(inSuite, readDigitsFromDecimalString("6256276377282", index, number, 1) == CHIP_ERROR_INVALID_STRING_LENGTH);
-}
-
-void TestReadBitsFromNumber(nlTestSuite * inSuite, void * inContext)
-{
-    uint64_t number;
-    size_t index = 3;
-    NL_TEST_ASSERT(inSuite, readBitsFromNumber(12345, index, number, 6, 14) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, number == 7);
-
-    index = 0;
-    NL_TEST_ASSERT(inSuite, readBitsFromNumber(12345, index, number, 14, 14) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, number == 12345);
-
-    index = 0;
-    NL_TEST_ASSERT(inSuite, readBitsFromNumber(1, index, number, 1, 14) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, number == 1);
-
-    index = 0;
-    NL_TEST_ASSERT(inSuite, readBitsFromNumber(12345, index, number, 20, 22) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, number == 12345);
-
-    index = 1;
-    NL_TEST_ASSERT(inSuite, readBitsFromNumber(1, index, number, 1, 14) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, number == 0);
-
-    index = 0;
-    NL_TEST_ASSERT(inSuite, readBitsFromNumber(12345, index, number, 15, 14) == CHIP_ERROR_INVALID_STRING_LENGTH);
-
-    index = 14;
-    NL_TEST_ASSERT(inSuite, readBitsFromNumber(12345, index, number, 1, 14) == CHIP_ERROR_INVALID_STRING_LENGTH);
 }
 
 void TestShortCodeCharLengths(nlTestSuite * inSuite, void * inContext)
@@ -544,16 +511,15 @@ const nlTest sTests[] =
     NL_TEST_DEF("Test Decimal Representation - Invalid Payload",                        TestDecimalRepresentation_InvalidPayload),
     NL_TEST_DEF("Test 12 bit discriminator for manual setup code",                      TestGenerateAndParser_ManualSetupCodeWithLongDiscriminator),
     NL_TEST_DEF("Test Decimal Representation - All Zeros",                              TestDecimalRepresentation_AllZeros),
+    NL_TEST_DEF("Test Decimal Representation - All Ones",                               TestDecimalRepresentation_AllOnes),
     NL_TEST_DEF("Parse from Partial Payload",                                           TestPayloadParser_PartialPayload),
     NL_TEST_DEF("Parse from Full Payload",                                              TestPayloadParser_FullPayload),
     NL_TEST_DEF("Test Invalid Entry To QR Code Parser",                                 TestPayloadParser_InvalidEntry),
     NL_TEST_DEF("Test Short Read Write",                                                TestShortCodeReadWrite),
     NL_TEST_DEF("Test Long Read Write",                                                 TestLongCodeReadWrite),
-    NL_TEST_DEF("Test Extract Bits",                                                    TestExtractBits),
     NL_TEST_DEF("Check Decimal String Validity",                                        TestCheckDecimalStringValidity),
     NL_TEST_DEF("Check QR Code Length Validity",                                        TestCheckCodeLengthValidity),
     NL_TEST_DEF("Test Decimal String to Number",                                        TestDecimalStringToNumber),
-    NL_TEST_DEF("Read Bits from Number",                                                TestReadBitsFromNumber),
     NL_TEST_DEF("Test Short Code Character Lengths",                                    TestShortCodeCharLengths),
     NL_TEST_DEF("Test Read Characters from Decimal String",                             TestReadCharsFromDecimalString),
     NL_TEST_DEF("Generate Full Payload and Parse it",                                   TestGenerateAndParser_FullPayload),

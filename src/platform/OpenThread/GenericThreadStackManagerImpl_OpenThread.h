@@ -32,6 +32,8 @@
 #include <openthread/srp_client.h>
 #endif
 
+#include <lib/mdns/platform/Mdns.h>
+
 namespace chip {
 namespace DeviceLayer {
 
@@ -87,13 +89,14 @@ protected:
     CHIP_ERROR _GetAndLogThreadTopologyMinimal(void);
     CHIP_ERROR _GetAndLogThreadTopologyFull(void);
     CHIP_ERROR _GetPrimary802154MACAddress(uint8_t * buf);
+    CHIP_ERROR _GetFactoryAssignedEUI64(uint8_t (&buf)[8]);
     CHIP_ERROR _GetExternalIPv6Address(chip::Inet::IPAddress & addr);
     void _OnWoBLEAdvertisingStart(void);
     void _OnWoBLEAdvertisingStop(void);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
-    CHIP_ERROR _AddSrpService(const char * aInstanceName, const char * aName, uint16_t aPort, uint32_t aLeaseInterval,
-                              uint32_t aKeyLeaseInterval);
+    CHIP_ERROR _AddSrpService(const char * aInstanceName, const char * aName, uint16_t aPort, chip::Mdns::TextEntry * aTxtEntries,
+                              size_t aTxtEntiresSize, uint32_t aLeaseInterval, uint32_t aKeyLeaseInterval);
     CHIP_ERROR _RemoveSrpService(const char * aInstanceName, const char * aName);
     CHIP_ERROR _SetupSrpHost(const char * aHostName);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
@@ -122,12 +125,18 @@ private:
         static constexpr uint8_t kMaxInstanceNameSize = 64;
         static constexpr uint8_t kMaxNameSize         = 16;
         static constexpr uint8_t kMaxHostNameSize     = 32;
+        static constexpr uint8_t kMaxTxtEntriesNumber = 4;
+        static constexpr uint8_t kMaxTxtValueSize     = 255;
+        static constexpr uint8_t kMaxTxtKeySize       = 16;
 
         struct Service
         {
             otSrpClientService mService;
             char mInstanceName[kMaxInstanceNameSize];
             char mName[kMaxNameSize];
+            otDnsTxtEntry mTxtEntries[kMaxTxtEntriesNumber];
+            uint8_t mTxtValueBuffers[kMaxTxtEntriesNumber][kMaxTxtValueSize];
+            char mTxtKeyBuffers[kMaxTxtEntriesNumber][kMaxTxtKeySize];
         };
 
         char mHostName[kMaxHostNameSize];

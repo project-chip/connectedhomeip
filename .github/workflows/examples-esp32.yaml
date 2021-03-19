@@ -27,6 +27,7 @@ jobs:
             BUILD_TYPE: esp32
 
         runs-on: ubuntu-latest
+        if: github.actor != 'restyled-io'
 
         container:
             image: connectedhomeip/chip-build-esp32:latest
@@ -45,7 +46,6 @@ jobs:
               uses: github/codeql-action/init@v1
               with:
                   languages: "cpp, python"
-                  queries: +security-and-quality
             - name: Build example All Clusters App
               run: scripts/examples/esp_example.sh all-clusters-app
             - name: Copy aside build products

@@ -16,11 +16,12 @@
  *    limitations under the License.
  */
 
-#include <app/server/QRCodeUtil.h>
+#include <app/server/OnboardingCodesUtil.h>
 
 #include <inttypes.h>
 
 #include <platform/CHIPDeviceLayer.h>
+#include <setup_payload/ManualSetupPayloadGenerator.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <support/CodeUtils.h>
 #include <support/ScopedBuffer.h>
@@ -29,9 +30,12 @@
 constexpr char qrCodeBaseUrl[]                   = "https://dhrishi.github.io/connectedhomeip/qrcode.html";
 constexpr char specialCharsUnreservedInRfc3986[] = "-._~";
 
-void PrintQRCode(chip::RendezvousInformationFlags rendezvousFlags)
+using namespace ::chip::DeviceLayer;
+
+void PrintOnboardingCodes(chip::RendezvousInformationFlags rendezvousFlags)
 {
     std::string QRCode;
+    std::string manualPairingCode;
 
     if (GetQRCode(QRCode, rendezvousFlags) == CHIP_NO_ERROR)
     {
@@ -39,7 +43,7 @@ void PrintQRCode(chip::RendezvousInformationFlags rendezvousFlags)
         const size_t qrCodeBufferMaxSize = 3 * QRCode.size() + 1;
         qrCodeBuffer.Alloc(qrCodeBufferMaxSize);
 
-        ChipLogProgress(AppServer, "SetupQRCode:  [%s]", QRCode.c_str());
+        ChipLogProgress(AppServer, "SetupQRCode: [%s]", QRCode.c_str());
         if (EncodeQRCodeToUrl(QRCode.c_str(), QRCode.size(), &qrCodeBuffer[0], qrCodeBufferMaxSize) == CHIP_NO_ERROR)
         {
             ChipLogProgress(AppServer, "Copy/paste the below URL in a browser to see the QR Code:");
@@ -50,38 +54,71 @@ void PrintQRCode(chip::RendezvousInformationFlags rendezvousFlags)
     {
         ChipLogError(AppServer, "Getting QR code failed!");
     }
+
+    if (GetManualPairingCode(manualPairingCode, rendezvousFlags) == CHIP_NO_ERROR)
+    {
+        ChipLogProgress(AppServer, "Manual pairing code: [%s]", manualPairingCode.c_str());
+    }
+    else
+    {
+        ChipLogError(AppServer, "Getting manual pairing code failed!");
+    }
+}
+
+static CHIP_ERROR GetSetupPayload(chip::SetupPayload & setupPayload, chip::RendezvousInformationFlags rendezvousFlags)
+{
+    CHIP_ERROR err                     = CHIP_NO_ERROR;
+    setupPayload.version               = 0;
+    setupPayload.rendezvousInformation = rendezvousFlags;
+
+    err = ConfigurationMgr().GetSetupPinCode(setupPayload.setUpPINCode);
+    VerifyOrExit(err == CHIP_NO_ERROR,
+                 ChipLogProgress(AppServer, "ConfigurationMgr().GetSetupPinCode() failed: %s", chip::ErrorStr(err)));
+
+    err = ConfigurationMgr().GetSetupDiscriminator(setupPayload.discriminator);
+    VerifyOrExit(err == CHIP_NO_ERROR,
+                 ChipLogProgress(AppServer, "ConfigurationMgr().GetSetupDiscriminator() failed: %s", chip::ErrorStr(err)));
+
+    err = ConfigurationMgr().GetVendorId(setupPayload.vendorID);
+    VerifyOrExit(err == CHIP_NO_ERROR,
+                 ChipLogProgress(AppServer, "ConfigurationMgr().GetVendorId() failed: %s", chip::ErrorStr(err)));
+
+    err = ConfigurationMgr().GetProductId(setupPayload.productID);
+    VerifyOrExit(err == CHIP_NO_ERROR,
+                 ChipLogProgress(AppServer, "ConfigurationMgr().GetProductId() failed: %s", chip::ErrorStr(err)));
+
+exit:
+    return err;
 }
 
 CHIP_ERROR GetQRCode(std::string & QRCode, chip::RendezvousInformationFlags rendezvousFlags)
 {
-    using namespace ::chip::DeviceLayer;
-
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::SetupPayload payload;
 
-    payload.version               = 1;
-    payload.rendezvousInformation = rendezvousFlags;
-
-    err = ConfigurationMgr().GetSetupPinCode(payload.setUpPINCode);
-    VerifyOrExit(err == CHIP_NO_ERROR,
-                 ChipLogProgress(AppServer, "ConfigurationMgr().GetSetupPinCode() failed: %s", chip::ErrorStr(err)));
-
-    err = ConfigurationMgr().GetSetupDiscriminator(payload.discriminator);
-    VerifyOrExit(err == CHIP_NO_ERROR,
-                 ChipLogProgress(AppServer, "ConfigurationMgr().GetSetupDiscriminator() failed: %s", chip::ErrorStr(err)));
-
-    err = ConfigurationMgr().GetVendorId(payload.vendorID);
-    VerifyOrExit(err == CHIP_NO_ERROR,
-                 ChipLogProgress(AppServer, "ConfigurationMgr().GetVendorId() failed: %s", chip::ErrorStr(err)));
-
-    err = ConfigurationMgr().GetProductId(payload.productID);
-    VerifyOrExit(err == CHIP_NO_ERROR,
-                 ChipLogProgress(AppServer, "ConfigurationMgr().GetProductId() failed: %s", chip::ErrorStr(err)));
+    err = GetSetupPayload(payload, rendezvousFlags);
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogProgress(AppServer, "GetSetupPayload() failed: %s", chip::ErrorStr(err)));
 
     // TODO: Usage of STL will significantly increase the image size, this should be changed to more efficient method for
     // generating payload
     err = chip::QRCodeSetupPayloadGenerator(payload).payloadBase41Representation(QRCode);
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogProgress(AppServer, "Generating QR Code failed: %s", chip::ErrorStr(err)));
+
+exit:
+    return err;
+}
+
+CHIP_ERROR GetManualPairingCode(std::string & manualPairingCode, chip::RendezvousInformationFlags rendezvousFlags)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    chip::SetupPayload payload;
+
+    err = GetSetupPayload(payload, rendezvousFlags);
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogProgress(AppServer, "GetSetupPayload() failed: %s", chip::ErrorStr(err)));
+
+    err = chip::ManualSetupPayloadGenerator(payload).payloadDecimalStringRepresentation(manualPairingCode);
+    VerifyOrExit(err == CHIP_NO_ERROR,
+                 ChipLogProgress(AppServer, "Generating Manual Pairing Code failed: %s", chip::ErrorStr(err)));
 
 exit:
     return err;

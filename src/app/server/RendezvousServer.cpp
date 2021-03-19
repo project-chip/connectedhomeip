@@ -74,7 +74,7 @@ void RendezvousServer::OnRendezvousComplete()
                    ChipLogError(AppServer, "Failed to store the connection state"));
 
     uint16_t nextKeyId = mRendezvousSession.GetNextKeyId();
-    mStorage->SetKeyValue(kStorablePeerConnectionCountKey, &nextKeyId, sizeof(nextKeyId));
+    mStorage->SyncSetKeyValue(kStorablePeerConnectionCountKey, &nextKeyId, sizeof(nextKeyId));
 }
 
 void RendezvousServer::OnRendezvousStatusUpdate(Status status, CHIP_ERROR err)

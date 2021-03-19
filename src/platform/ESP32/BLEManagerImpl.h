@@ -60,7 +60,7 @@ namespace DeviceLayer {
 namespace Internal {
 
 /**
- * Concrete implementation of the NetworkProvisioningServer singleton object for the ESP32 platform.
+ * Concrete implementation of the BLEManager singleton object for the ESP32 platform.
  */
 class BLEManagerImpl final : public BLEManager,
                              private Ble::BleLayer,

@@ -15,40 +15,41 @@
  *    limitations under the License.
  */
 
-const stringShortTypes = [ 'CHAR_STRING', 'OCTET_STRING' ];
-const stringLongTypes  = [ 'LONG_CHAR_STRING', 'LONG_OCTET_STRING' ];
-const stringBytesTypes = [ 'OCTET_STRING', 'LONG_OCTET_STRING' ];
-
-function isShortString(type)
-{
-  return stringShortTypes.includes(type);
-}
-
-function isLongString(type)
-{
-  return stringLongTypes.includes(type);
-}
-
-function isByteString(type)
-{
-  return stringBytesTypes.includes(type);
-}
+const characterStringTypes = [ 'CHAR_STRING', 'LONG_CHAR_STRING' ];
+const octetStringTypes     = [ 'OCTET_STRING', 'LONG_OCTET_STRING' ];
+const stringShortTypes     = [ 'CHAR_STRING', 'OCTET_STRING' ];
+const stringLongTypes      = [ 'LONG_CHAR_STRING', 'LONG_OCTET_STRING' ];
 
 function isString(type)
 {
-  return isShortString(type) || isLongString(type);
+  return isCharString(type) || isOctetString(type);
 }
 
 function isCharString(type)
 {
-  return isString(type) && !isByteString(type);
+  return characterStringTypes.includes(type.toUpperCase());
+}
+
+function isOctetString(type)
+{
+  return octetStringTypes.includes(type.toUpperCase());
+}
+
+function isShortString(type)
+{
+  return stringShortTypes.includes(type.toUpperCase());
+}
+
+function isLongString(type)
+{
+  return stringLongTypes.includes(type.toUpperCase());
 }
 
 //
 // Module exports
 //
 exports.isString      = isString;
+exports.isCharString  = isCharString;
+exports.isOctetString = isOctetString;
 exports.isShortString = isShortString;
 exports.isLongString  = isLongString;
-exports.isByteString  = isByteString;
-exports.isCharString  = isCharString;

@@ -34,6 +34,7 @@ Done
 -   [exit](#exit)
 -   [help](#help)
 -   [otcli](README_OTCLI.md)
+-   [ping](#ping)
 -   [rand](#rand)
 -   [version](#version)
 
@@ -51,6 +52,7 @@ Display a list of all top-level commands supported and a brief description.
   base64          Base64 encode / decode utilities
   device          Device Layer commands
   otcli           Dispatch OpenThread CLI command
+  ping            Using Echo Protocol to measure packet loss across network paths
   exit            Exit the shell application
   help            List out all top level commands
   version         Output the software version

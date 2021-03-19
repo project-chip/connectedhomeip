@@ -518,7 +518,7 @@ CHIP_ERROR MdnsAvahi::Browse(const char * type, MdnsServiceProtocol protocol, ch
                              chip::Inet::InterfaceId interface, MdnsBrowseCallback callback, void * context)
 {
     AvahiServiceBrowser * browser;
-    BrowseContext * browseContext = static_cast<BrowseContext *>(chip::Platform::MemoryAlloc(sizeof(BrowseContext)));
+    BrowseContext * browseContext = chip::Platform::New<BrowseContext>();
     AvahiIfIndex avahiInterface   = static_cast<AvahiIfIndex>(interface);
 
     browseContext->mInstance = this;
@@ -534,7 +534,7 @@ CHIP_ERROR MdnsAvahi::Browse(const char * type, MdnsServiceProtocol protocol, ch
     // Otherwise the browser will be freed in the callback
     if (browser == nullptr)
     {
-        chip::Platform::MemoryFree(browseContext);
+        chip::Platform::Delete(browseContext);
     }
 
     return browser == nullptr ? CHIP_ERROR_INTERNAL : CHIP_NO_ERROR;
@@ -572,7 +572,7 @@ void MdnsAvahi::HandleBrowse(AvahiServiceBrowser * browser, AvahiIfIndex interfa
     case AVAHI_BROWSER_FAILURE:
         context->mCallback(context->mContext, nullptr, 0, CHIP_ERROR_INTERNAL);
         avahi_service_browser_free(browser);
-        chip::Platform::MemoryFree(context);
+        chip::Platform::Delete(context);
         break;
     case AVAHI_BROWSER_NEW:
         ChipLogProgress(DeviceLayer, "Avahi browse: cache new");
@@ -593,7 +593,7 @@ void MdnsAvahi::HandleBrowse(AvahiServiceBrowser * browser, AvahiIfIndex interfa
         ChipLogProgress(DeviceLayer, "Avahi browse: all for now");
         context->mCallback(context->mContext, context->mServices.data(), context->mServices.size(), CHIP_NO_ERROR);
         avahi_service_browser_free(browser);
-        chip::Platform::MemoryFree(context);
+        chip::Platform::Delete(context);
         break;
     case AVAHI_BROWSER_REMOVE:
         ChipLogProgress(DeviceLayer, "Avahi browse: remove");
@@ -616,7 +616,7 @@ CHIP_ERROR MdnsAvahi::Resolve(const char * name, const char * type, MdnsServiceP
 {
     AvahiServiceResolver * resolver;
     AvahiIfIndex avahiInterface     = static_cast<AvahiIfIndex>(interface);
-    ResolveContext * resolveContext = static_cast<ResolveContext *>(chip::Platform::MemoryAlloc(sizeof(ResolveContext)));
+    ResolveContext * resolveContext = chip::Platform::New<ResolveContext>();
     CHIP_ERROR error                = CHIP_NO_ERROR;
 
     resolveContext->mInstance = this;
@@ -633,7 +633,7 @@ CHIP_ERROR MdnsAvahi::Resolve(const char * name, const char * type, MdnsServiceP
     if (resolver == nullptr)
     {
         error = CHIP_ERROR_INTERNAL;
-        chip::Platform::MemoryFree(resolver);
+        chip::Platform::Delete(resolveContext);
     }
 
     return error;
@@ -712,7 +712,7 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
     }
 
     avahi_service_resolver_free(resolver);
-    chip::Platform::MemoryFree(context);
+    chip::Platform::Delete(context);
 }
 
 MdnsAvahi::~MdnsAvahi()

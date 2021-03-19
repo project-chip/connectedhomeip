@@ -199,6 +199,7 @@ protected:
     uint16_t FindDeviceIndex(NodeId id);
     void ReleaseDevice(uint16_t index);
     void ReleaseDeviceById(NodeId remoteDeviceId);
+    CHIP_ERROR InitializePairedDeviceList();
     CHIP_ERROR SetPairedDeviceList(const char * pairedDeviceSerializedSet);
 
     Transport::AdminId mAdminId = 0;
@@ -213,8 +214,8 @@ private:
     void OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * mgr) override;
 
     //////////// PersistentStorageResultDelegate Implementation ///////////////
-    void OnValue(const char * key, const char * value) override;
-    void OnStatus(const char * key, Operation op, CHIP_ERROR err) override;
+    void OnPersistentStorageValue(const char * key, const char * value) override;
+    void OnPersistentStorageStatus(const char * key, Operation op, CHIP_ERROR err) override;
 
     void ReleaseAllDevices();
 
@@ -337,6 +338,12 @@ private:
     DeviceCommissionerRendezvousAdvertisementDelegate mRendezvousAdvDelegate;
 
     void PersistDeviceList();
+
+    void FreeRendezvousSession();
+
+    CHIP_ERROR LoadKeyId(PersistentStorageDelegate * delegate, uint16_t & out);
+
+    uint16_t mNextKeyId = 0;
 };
 
 } // namespace Controller

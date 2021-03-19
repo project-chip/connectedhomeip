@@ -77,7 +77,7 @@ CHIP_ERROR {{asCamelCased parent.name false}}Cluster::ReadAttribute{{asCamelCase
 }
 
 {{#if (isWritableAttribute)}}
-CHIP_ERROR {{asCamelCased parent.name false}}Cluster::WriteAttribute{{asCamelCased name false}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, {{asUnderlyingZclType type}} value)
+CHIP_ERROR {{asCamelCased parent.name false}}Cluster::WriteAttribute{{asCamelCased name false}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, {{chipType}} value)
 {
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encode{{asCamelCased parent.name false}}ClusterWrite{{asCamelCased name false}}Attribute(seqNum, mEndpoint, value);

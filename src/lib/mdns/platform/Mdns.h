@@ -35,9 +35,10 @@
 namespace chip {
 namespace Mdns {
 
-static constexpr uint8_t kMdnsNameMaxSize  = 33;
-static constexpr uint8_t kMdnsTypeMaxSize  = 32;
-static constexpr uint16_t kMdnsTextMaxSize = 64;
+static constexpr uint8_t kMdnsNameMaxSize         = 33;
+static constexpr uint8_t kMdnsProtocolTextMaxSize = 8;
+static constexpr uint8_t kMdnsTypeMaxSize         = 32;
+static constexpr uint16_t kMdnsTextMaxSize        = 64;
 
 enum class MdnsServiceProtocol : uint8_t
 {

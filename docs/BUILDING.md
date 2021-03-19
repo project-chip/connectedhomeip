@@ -43,7 +43,7 @@ On Debian-based Linux distributions such as Ubuntu, these dependencies can be
 satisfied with the following:
 
 ```
-sudo apt-get install git gcc g++ python pkg-config libssl-dev libdbus-1-dev libglib2.0-dev libavahi-client-dev ninja-build python3-venv python3-dev unzip
+sudo apt-get install git gcc g++ python pkg-config libssl-dev libdbus-1-dev libglib2.0-dev libavahi-client-dev ninja-build python3-venv python3-dev python3-pip unzip
 ```
 
 #### How to install prerequisites on macOS
@@ -85,6 +85,38 @@ sudo apt-get install pi-bluetooth
 ```
 
 You need to reboot your RPi after install `pi-bluetooth`.
+
+By default, wpa_supplicant is not allowed to update (overwrite) configuration,
+if you want chip app to be able to store the configuration changes permanently,
+we need to make the following changes.
+
+1. Edit the dbus-fi.w1.wpa_supplicant1.service file to use configuration file
+   instead.
+
+```
+sudo nano /etc/systemd/system/dbus-fi.w1.wpa_supplicant1.service
+```
+
+Change the wpa_supplicant start parameters to:
+
+```
+ExecStart=/sbin/wpa_supplicant -u -s -i wlan0 -c /etc/wpa_supplicant/wpa_supplicant.conf
+```
+
+2. Add the wpa-supplicant configuration file
+
+```
+sudo nano /etc/wpa_supplicant/wpa_supplicant.conf
+```
+
+And add the following content to the file:
+
+```
+ctrl_interface=DIR=/run/wpa_supplicant
+update_config=1
+```
+
+Finally, reboot your RPi.
 
 ### Build Preparation
 

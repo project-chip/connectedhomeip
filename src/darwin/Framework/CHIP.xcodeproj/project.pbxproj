@@ -28,6 +28,7 @@
 		1EC4CE6025CC26E900D7304F /* CHIPClientCallbacks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1EC4CE5C25CC26E900D7304F /* CHIPClientCallbacks.cpp */; };
 		1EC4CE6225CC271B00D7304F /* af-event.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1EC4CE6125CC271B00D7304F /* af-event.cpp */; };
 		1EC4CE6425CC276600D7304F /* CHIPClustersObjc.h in Headers */ = {isa = PBXBuildFile; fileRef = 1EC4CE6325CC276600D7304F /* CHIPClustersObjc.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1ED0B8CC260125E100D19DB5 /* media-playback-client.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1ED0B8CB260125E100D19DB5 /* media-playback-client.cpp */; };
 		2C222AD0255C620600E446B9 /* CHIPDevice.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C222ACE255C620600E446B9 /* CHIPDevice.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		2C222AD1255C620600E446B9 /* CHIPDevice.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2C222ACF255C620600E446B9 /* CHIPDevice.mm */; };
 		2C222ADF255C811800E446B9 /* CHIPDevice_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C222ADE255C811800E446B9 /* CHIPDevice_Internal.h */; };
@@ -87,6 +88,7 @@
 		1EC4CE5C25CC26E900D7304F /* CHIPClientCallbacks.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CHIPClientCallbacks.cpp; path = gen/CHIPClientCallbacks.cpp; sourceTree = "<group>"; };
 		1EC4CE6125CC271B00D7304F /* af-event.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "af-event.cpp"; path = "../../../app/util/af-event.cpp"; sourceTree = "<group>"; };
 		1EC4CE6325CC276600D7304F /* CHIPClustersObjc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CHIPClustersObjc.h; path = gen/CHIPClustersObjc.h; sourceTree = "<group>"; };
+		1ED0B8CB260125E100D19DB5 /* media-playback-client.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "media-playback-client.cpp"; path = "../../../app/clusters/media-playback-client/media-playback-client.cpp"; sourceTree = "<group>"; };
 		2C222ACE255C620600E446B9 /* CHIPDevice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHIPDevice.h; sourceTree = "<group>"; };
 		2C222ACF255C620600E446B9 /* CHIPDevice.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CHIPDevice.mm; sourceTree = "<group>"; };
 		2C222ADE255C811800E446B9 /* CHIPDevice_Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHIPDevice_Internal.h; sourceTree = "<group>"; };
@@ -142,6 +144,7 @@
 		1EC4CE3525CC259700D7304F /* CHIPApp */ = {
 			isa = PBXGroup;
 			children = (
+				1ED0B8CB260125E100D19DB5 /* media-playback-client.cpp */,
 				1EC4CE6125CC271B00D7304F /* af-event.cpp */,
 				1EC4CE4925CC267700D7304F /* af-main-common.cpp */,
 				1EC4CE4125CC267600D7304F /* attribute-size.cpp */,
@@ -404,6 +407,7 @@
 				1EC4CE6225CC271B00D7304F /* af-event.cpp in Sources */,
 				1EC4CE4E25CC267700D7304F /* attribute-size.cpp in Sources */,
 				1EC4CE4D25CC267700D7304F /* process-global-message.cpp in Sources */,
+				1ED0B8CC260125E100D19DB5 /* media-playback-client.cpp in Sources */,
 				1EC4CE5125CC267700D7304F /* message.cpp in Sources */,
 				1EC4CE5D25CC26E900D7304F /* CHIPClustersObjc.mm in Sources */,
 				B2E0D7B3245B0B5C003C5B48 /* CHIPError.mm in Sources */,

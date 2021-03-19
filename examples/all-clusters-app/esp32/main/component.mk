@@ -37,6 +37,7 @@ COMPONENT_SRCDIRS :=                                                            
   ../third_party/connectedhomeip/src/app/clusters/content-launch-server             \
   ../third_party/connectedhomeip/src/app/clusters/low-power-server                  \
   ../third_party/connectedhomeip/src/app/clusters/media-playback-server             \
+  ../third_party/connectedhomeip/src/app/clusters/network-commissioning             \
   ../third_party/connectedhomeip/src/app/clusters/temperature-measurement-server    \
   ../third_party/connectedhomeip/src/app/clusters/scenes                            \
   ../third_party/connectedhomeip/src/app/clusters/basic                             \

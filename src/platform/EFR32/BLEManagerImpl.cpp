@@ -546,7 +546,7 @@ void BLEManagerImpl::DriveBLEState(void)
     {
         // Start/re-start advertising if not already started, or if there is a pending change
         // to the advertising configuration.
-        if (!mFlags.HasAny(Flags::kAdvertising, Flags::kRestartAdvertising))
+        if (!mFlags.Has(Flags::kAdvertising) || mFlags.Has(Flags::kRestartAdvertising))
         {
             err = StartAdvertising();
             SuccessOrExit(err);

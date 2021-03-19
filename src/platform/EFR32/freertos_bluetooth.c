@@ -42,7 +42,7 @@ static volatile sl_bgapi_handler command_handler_func = NULL;
 
 // Bluetooth task
 #ifndef BLUETOOTH_STACK_SIZE
-#define BLUETOOTH_STACK_SIZE (2048)
+#define BLUETOOTH_STACK_SIZE (1024)
 #endif
 static void BluetoothTask(void * p_arg);
 static TaskHandle_t BluetoothTaskHandle = NULL;
@@ -53,7 +53,7 @@ extern uint32_t sli_bt_can_sleep_ticks();
 
 // Linklayer task
 #ifndef LINKLAYER_STACK_SIZE
-#define LINKLAYER_STACK_SIZE (2048)
+#define LINKLAYER_STACK_SIZE (1024)
 #endif
 static void LinklayerTask(void * p_arg);
 static TaskHandle_t LinklayerTaskHandle = NULL;

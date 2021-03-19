@@ -22,7 +22,7 @@
 #include "AppEvent.h"
 #include "LEDWidget.h"
 #include "LightingManager.h"
-#include "QRCodeUtil.h"
+#include "OnboardingCodesUtil.h"
 #include "Server.h"
 #include "Service.h"
 #include "ThreadUtil.h"
@@ -113,7 +113,7 @@ int AppTask::Init()
     // Init ZCL Data Model and start server
     InitServer();
     ConfigurationMgr().LogDeviceConfig();
-    PrintQRCode(chip::RendezvousInformationFlags::kBLE);
+    PrintOnboardingCodes(chip::RendezvousInformationFlags::kBLE);
 
 #ifdef CONFIG_CHIP_NFC_COMMISSIONING
     ret = sNFC.Init(ConnectivityMgr());
@@ -383,6 +383,7 @@ void AppTask::StartBLEAdvertisementHandler(AppEvent * aEvent)
         return;
     }
 
+#ifdef CONFIG_CHIP_NFC_COMMISSIONING
     if (!sNFC.IsTagEmulationStarted())
     {
         if (!(GetAppTask().StartNFCTag() < 0))
@@ -398,6 +399,7 @@ void AppTask::StartBLEAdvertisementHandler(AppEvent * aEvent)
     {
         LOG_INF("NFC Tag emulation is already started");
     }
+#endif
 
     if (ConnectivityMgr().IsBLEAdvertisingEnabled())
     {

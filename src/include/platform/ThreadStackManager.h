@@ -24,6 +24,11 @@
 #pragma once
 
 namespace chip {
+
+namespace Mdns {
+struct TextEntry;
+}
+
 namespace DeviceLayer {
 
 class PlatformManagerImpl;
@@ -48,8 +53,6 @@ template <class>
 class GenericThreadStackManagerImpl_OpenThread_LwIP;
 template <class>
 class GenericThreadStackManagerImpl_FreeRTOS;
-template <class>
-class GenericNetworkProvisioningServerImpl;
 } // namespace Internal
 
 /**
@@ -74,6 +77,7 @@ public:
     CHIP_ERROR GetAndLogThreadTopologyMinimal();
     CHIP_ERROR GetAndLogThreadTopologyFull();
     CHIP_ERROR GetPrimary802154MACAddress(uint8_t * buf);
+    CHIP_ERROR GetFactoryAssignedEUI64(uint8_t (&buf)[8]);
     CHIP_ERROR GetExternalIPv6Address(chip::Inet::IPAddress & addr);
 
     CHIP_ERROR JoinerStart();
@@ -82,8 +86,8 @@ public:
     CHIP_ERROR SetThreadEnabled(bool val);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
-    CHIP_ERROR AddSrpService(const char * aInstanceName, const char * aName, uint16_t aPort, uint32_t aLeaseInterval,
-                             uint32_t aKeyLeaseInterval);
+    CHIP_ERROR AddSrpService(const char * aInstanceName, const char * aName, uint16_t aPort, chip::Mdns::TextEntry * aTxtEntries,
+                             size_t aTxtEntiresSize, uint32_t aLeaseInterval, uint32_t aKeyLeaseInterval);
     CHIP_ERROR RemoveSrpService(const char * aInstanceName, const char * aName);
     CHIP_ERROR SetupSrpHost(const char * aHostName);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
@@ -111,8 +115,6 @@ private:
     friend class Internal::GenericThreadStackManagerImpl_OpenThread_LwIP;
     template <class>
     friend class Internal::GenericThreadStackManagerImpl_FreeRTOS;
-    template <class>
-    friend class Internal::GenericNetworkProvisioningServerImpl;
 
     void OnPlatformEvent(const ChipDeviceEvent * event);
     bool IsThreadEnabled();
@@ -227,9 +229,11 @@ inline CHIP_ERROR ThreadStackManager::SetThreadEnabled(bool val)
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 inline CHIP_ERROR ThreadStackManager::AddSrpService(const char * aInstanceName, const char * aName, uint16_t aPort,
+                                                    chip::Mdns::TextEntry * aTxtEntries, size_t aTxtEntiresSize,
                                                     uint32_t aLeaseInterval = 0, uint32_t aKeyLeaseInterval = 0)
 {
-    return static_cast<ImplClass *>(this)->_AddSrpService(aInstanceName, aName, aPort, aLeaseInterval, aKeyLeaseInterval);
+    return static_cast<ImplClass *>(this)->_AddSrpService(aInstanceName, aName, aPort, aTxtEntries, aTxtEntiresSize, aLeaseInterval,
+                                                          aKeyLeaseInterval);
 }
 
 inline CHIP_ERROR ThreadStackManager::RemoveSrpService(const char * aInstanceName, const char * aName)
@@ -331,6 +335,11 @@ inline CHIP_ERROR ThreadStackManager::GetAndLogThreadTopologyFull()
 inline CHIP_ERROR ThreadStackManager::GetPrimary802154MACAddress(uint8_t * buf)
 {
     return static_cast<ImplClass *>(this)->_GetPrimary802154MACAddress(buf);
+}
+
+inline CHIP_ERROR ThreadStackManager::GetFactoryAssignedEUI64(uint8_t (&buf)[8])
+{
+    return static_cast<ImplClass *>(this)->_GetFactoryAssignedEUI64(buf);
 }
 
 inline CHIP_ERROR ThreadStackManager::GetExternalIPv6Address(chip::Inet::IPAddress & addr)

@@ -154,7 +154,7 @@ void BLEManagerImpl::DriveBLEState()
     {
         // Start/re-start advertising if not already advertising, or if the
         // advertising state needs to be refreshed.
-        if (!mFlags.HasAny(Flags::kAdvertising, Flags::kAdvertisingRefreshNeeded))
+        if (!mFlags.Has(Flags::kAdvertising) || mFlags.Has(Flags::kAdvertisingRefreshNeeded))
         {
             err = StartAdvertising();
             SuccessOrExit(err);
@@ -181,12 +181,14 @@ struct BLEManagerImpl::ServiceData
     ChipBLEDeviceIdentificationInfo deviceIdInfo;
 } __attribute__((packed));
 
+static_assert((CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT / 1000) <= CONFIG_BT_RPA_TIMEOUT,
+              "BLE advertising timeout is too long relative to RPA timeout");
 CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 {
     CHIP_ERROR err;
 
     const char * deviceName   = bt_get_name();
-    const uint8_t advFlags    = BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR;
+    const uint8_t advFlags    = BT_LE_AD_LIMITED | BT_LE_AD_NO_BREDR;
     bt_le_adv_param advParams = BT_LE_ADV_PARAM_INIT(BT_LE_ADV_OPT_CONNECTABLE | BT_LE_ADV_OPT_ONE_TIME, GetAdvertisingInterval(),
                                                      CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL, nullptr);
 
@@ -202,13 +204,19 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     err = ConfigurationMgr().GetBLEDeviceIdentificationInfo(serviceData.deviceIdInfo);
     SuccessOrExit(err);
 
-    // If necessary, inform the ThreadStackManager that CHIPoBLE advertising is about to start.
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     if (!mFlags.Has(Flags::kAdvertising))
     {
+// If necessary, inform the ThreadStackManager that CHIPoBLE advertising is about to start.
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
         ThreadStackMgr().OnCHIPoBLEAdvertisingStart();
-    }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
+
+        // Generate new private BLE address
+        struct bt_le_oob bleOobInfo;
+        err = bt_le_oob_get_local(advParams.id, &bleOobInfo);
+        (void) bleOobInfo;
+        VerifyOrExit(err == CHIP_NO_ERROR, err = MapErrorZephyr(err));
+    }
 
     // Restart advertising
     err = bt_le_adv_stop();

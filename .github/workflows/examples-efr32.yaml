@@ -26,6 +26,7 @@ jobs:
             BUILD_TYPE: gn_efr32
 
         runs-on: ubuntu-latest
+        if: github.actor != 'restyled-io'
 
         container:
             image: connectedhomeip/chip-build-efr32:latest
@@ -43,7 +44,6 @@ jobs:
               uses: github/codeql-action/init@v1
               with:
                   languages: "cpp, python"
-                  queries: +security-and-quality
             - name: Build example EFR32 Lock App for BRD4161A
               run:
                   scripts/examples/gn_efr32_example.sh examples/lock-app/efr32/

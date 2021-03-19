@@ -27,6 +27,10 @@
 #include "CommandHandler.h"
 #include "InteractionModelEngine.h"
 
+#include <protocols/secure_channel/Constants.h>
+
+using GeneralStatusCode = chip::Protocols::SecureChannel::GeneralStatusCode;
+
 namespace chip {
 namespace app {
 
@@ -44,7 +48,7 @@ CHIP_ERROR CommandSender::SendCommandRequest(NodeId aNodeId, Transport::AdminId 
     // TODO: Hard code keyID to 0 to unblock IM end-to-end test. Complete solution is tracked in issue:4451
     mpExchangeCtx = mpExchangeMgr->NewContext({ aNodeId, 0, aAdminId }, this);
     VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
-    mpExchangeCtx->SetResponseTimeout(kImMesssageTimeout);
+    mpExchangeCtx->SetResponseTimeout(kImMessageTimeoutMsec);
 
     err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::InvokeCommandRequest, std::move(mCommandMessageBuf),
                                      Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
@@ -92,7 +96,6 @@ void CommandSender::OnMessageReceived(Messaging::ExchangeContext * apExchangeCon
 
 exit:
     Reset();
-    return;
 }
 
 void CommandSender::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext)
@@ -144,8 +147,8 @@ CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser &
         {
             err = CHIP_NO_ERROR;
             ChipLogDetail(DataManagement, "Add Status code for empty command, cluster Id is %d", clusterId);
-            // Todo: Define protocol code for StatusCode
-            AddStatusCode(0, chip::Protocols::kProtocol_Protocol_Common, 0, clusterId);
+            AddStatusCode(static_cast<uint16_t>(GeneralStatusCode::kSuccess), Protocols::kProtocol_SecureChannel,
+                          Protocols::SecureChannel::kProtocolCodeSuccess, clusterId);
         }
         // TODO(#4503): Should call callbacks of cluster that sends the command.
         DispatchSingleClusterCommand(clusterId, commandId, endpointId, commandDataReader, this);

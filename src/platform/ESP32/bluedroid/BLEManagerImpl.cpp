@@ -471,7 +471,7 @@ void BLEManagerImpl::DriveBLEState(void)
     {
         // Start/re-start advertising if not already advertising, or if the advertising state of the
         // ESP BLE layer needs to be refreshed.
-        if (!mFlags.HasAny(Flags::kAdvertising, Flags::kAdvertisingRefreshNeeded))
+        if (!mFlags.Has(Flags::kAdvertising) || mFlags.Has(Flags::kAdvertisingRefreshNeeded))
         {
             // Configure advertising data if it hasn't been done yet.  This is an asynchronous step which
             // must complete before advertising can be started.  When that happens, this method will

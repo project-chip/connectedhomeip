@@ -202,6 +202,10 @@ chip_gn_arg_bool  ("chip_inet_config_enable_dns_resolver"   CONFIG_CHIP_BUILD_TE
 chip_gn_arg_bool  ("chip_build_libshell"                    CONFIG_CHIP_LIB_SHELL)
 chip_gn_arg_bool  ("chip_build_pw_rpc_lib"                  CONFIG_CHIP_PW_RPC)
 
+if (CONFIG_CHIP_ENABLE_DNSSD_SRP)
+    chip_gn_arg_string("chip_mdns" "platform")
+endif()
+
 if (CHIP_PROJECT_CONFIG)
     chip_gn_arg_string("chip_project_config_include"        ${CHIP_PROJECT_CONFIG})
     chip_gn_arg_string("chip_system_project_config_include" ${CHIP_PROJECT_CONFIG})

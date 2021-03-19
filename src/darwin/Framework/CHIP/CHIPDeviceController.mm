@@ -29,7 +29,6 @@ static const char * const CHIP_CONTROLLER_QUEUE = "com.zigbee.chip.framework.con
 static const char * const CHIP_COMMISSIONER_DEVICE_ID_KEY = "com.zigbee.chip.commissioner.device.id";
 
 static NSString * const kErrorMemoryInit = @"Init Memory failure";
-static NSString * const kErrorCommissionerCreate = @"Init failure while creating a commissioner";
 static NSString * const kErrorCommissionerInit = @"Init failure while initializing a commissioner";
 static NSString * const kErrorPairingInit = @"Init failure while creating a pairing delegate";
 static NSString * const kErrorPersistentStorageInit = @"Init failure while creating a persistent storage delegate";
@@ -167,11 +166,11 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
     uint16_t idStringLen = 32;
     char deviceIdString[idStringLen];
     if (CHIP_NO_ERROR
-        != _persistentStorageDelegateBridge->GetKeyValue(CHIP_COMMISSIONER_DEVICE_ID_KEY, deviceIdString, idStringLen)) {
+        != _persistentStorageDelegateBridge->SyncGetKeyValue(CHIP_COMMISSIONER_DEVICE_ID_KEY, deviceIdString, idStringLen)) {
         _localDeviceId = arc4random();
         _localDeviceId = _localDeviceId << 32 | arc4random();
         CHIP_LOG_ERROR("Assigned %llx node ID to the controller", _localDeviceId);
-        _persistentStorageDelegateBridge->SetKeyValue(
+        _persistentStorageDelegateBridge->AsyncSetKeyValue(
             CHIP_COMMISSIONER_DEVICE_ID_KEY, [[NSString stringWithFormat:@"%llx", _localDeviceId] UTF8String]);
     } else {
         NSScanner * scanner = [NSScanner scannerWithString:[NSString stringWithUTF8String:deviceIdString]];
