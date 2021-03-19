@@ -20,6 +20,8 @@
 #include "callback.h"
 #include "cluster-id.h"
 
+#include <lib/support/Span.h>
+
 using namespace chip;
 
 // Cluster Init Functions
