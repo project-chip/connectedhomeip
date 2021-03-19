@@ -28,17 +28,13 @@ namespace chip {
 namespace app {
 namespace clusters {
 namespace NetworkCommissioning {
-EmberAfNetworkCommissioningError OnAddThreadNetworkCommandCallbackInternal(app::Command *, EndpointId,
-                                                                           const uint8_t * operationalDataset,
-                                                                           size_t operationalDatasetLen, uint64_t breadcrumb,
-                                                                           uint32_t timeoutMs);
-EmberAfNetworkCommissioningError OnAddWiFiNetworkCommandCallbackInternal(app::Command *, EndpointId, const uint8_t * ssid,
-                                                                         size_t ssidLen, const uint8_t * credentials,
-                                                                         size_t credentialsLen, uint64_t breadcrumb,
+EmberAfNetworkCommissioningError OnAddThreadNetworkCommandCallbackInternal(app::Command *, EndpointId, ByteSpan operationalDataset,
+                                                                           uint64_t breadcrumb, uint32_t timeoutMs);
+EmberAfNetworkCommissioningError OnAddWiFiNetworkCommandCallbackInternal(app::Command *, EndpointId, ByteSpan ssid,
+                                                                         ByteSpan credentials, uint64_t breadcrumb,
                                                                          uint32_t timeoutMs);
-EmberAfNetworkCommissioningError OnEnableNetworkCommandCallbackInternal(app::Command *, EndpointId, const uint8_t * networkID,
-                                                                        size_t networkIDLen, uint64_t breadcrumb,
-                                                                        uint32_t timeoutMs);
+EmberAfNetworkCommissioningError OnEnableNetworkCommandCallbackInternal(app::Command *, EndpointId, ByteSpan networkID,
+                                                                        uint64_t breadcrumb, uint32_t timeoutMs);
 } // namespace NetworkCommissioning
 
 } // namespace clusters
