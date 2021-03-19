@@ -27,6 +27,7 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
+#include "core/CHIPCallback.h"
 #include "sdkconfig.h"
 
 #if CONFIG_BT_BLUEDROID_ENABLED
@@ -67,6 +68,10 @@ class BLEManagerImpl final : public BLEManager,
                              private Ble::BlePlatformDelegate,
                              private Ble::BleApplicationDelegate
 {
+public:
+    BLEManagerImpl();
+
+private:
     // Allow the BLEManager interface class to delegate method calls to
     // the implementation methods provided by this class.
     friend BLEManager;
@@ -185,6 +190,12 @@ class BLEManagerImpl final : public BLEManager,
     uint16_t mTXCharCCCDAttrHandle;
     BitFlags<Flags> mFlags;
     char mDeviceName[kMaxDeviceNameLength + 1];
+    uint64_t mAdvertiseStartTime;
+    // TODO: use the macro CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME after PR 5419 is merged
+    static constexpr uint32_t kAdvertiseTimeout     = CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT;
+    static constexpr uint32_t kFastAdvertiseTimeout = 30 * 1000;
+    chip::Callback::Callback<> mAdvertiseTimerCallback;
+    chip::Callback::Callback<> mFastAdvertiseTimerCallback;
 
     void DriveBLEState(void);
     CHIP_ERROR InitESPBleLayer(void);
@@ -229,6 +240,11 @@ class BLEManagerImpl final : public BLEManager,
     static int gatt_svr_chr_access(uint16_t conn_handle, uint16_t attr_handle, struct ble_gatt_access_ctxt * ctxt, void * arg);
 #endif
 
+    static void HandleFastAdvertisementTimer(void * context);
+    void HandleFastAdvertisementTimer();
+    static void HandleAdvertisementTimer(void * context);
+    void HandleAdvertisementTimer();
+
     static void DriveBLEState(intptr_t arg);
 };
 
@@ -263,6 +279,10 @@ inline BLEManager::CHIPoBLEServiceMode BLEManagerImpl::_GetCHIPoBLEServiceMode(v
 {
     return mServiceMode;
 }
+
+inline BLEManagerImpl::BLEManagerImpl() :
+    mAdvertiseTimerCallback(HandleAdvertisementTimer, this), mFastAdvertiseTimerCallback(HandleFastAdvertisementTimer, this)
+{}
 
 inline bool BLEManagerImpl::_IsAdvertisingEnabled(void)
 {
