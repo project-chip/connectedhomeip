@@ -229,6 +229,27 @@ public:
         printf("ReportError with err %d", aError);
         return CHIP_NO_ERROR;
     }
+    CHIP_ERROR CommandResponseStatus(const chip::app::CommandSender * apCommandSender, const uint16_t aGeneralCode,
+                                     const uint32_t aProtocolId, const uint16_t aProtocolCode, const chip::EndpointId aEndpointId,
+                                     const chip::ClusterId aClusterId, const chip::CommandId aCommandId, chip::CommandId aCommandIndex) override
+    {
+        printf(
+            "CommandResponseStatus with GeneralCode %d, ProtocolId %d, ProtocolCode %d, EndpointId %d, ClusterId %d, CommandId %d, CommandIndex %d",
+            aGeneralCode, aProtocolId, aProtocolCode, aEndpointId, aClusterId, aCommandId, aCommandIndex);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR CommandResponseProtocolError(const chip::app::CommandSender * apCommandSender, chip::CommandId aCommandIndex) override
+    {
+        printf("CommandResponseTimeout happens with CommandIndex %d", aCommandIndex);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR CommandResponseTimeout(const chip::app::CommandSender * apCommandSender) override
+    {
+        printf("CommandResponseTimeout happens");
+        return CHIP_NO_ERROR;
+    }
 };
 
 } // namespace

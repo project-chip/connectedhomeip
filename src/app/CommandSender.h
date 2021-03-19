@@ -53,6 +53,8 @@ public:
 
 private:
     CHIP_ERROR ProcessCommandDataElement(CommandDataElement::Parser & aCommandElement) override;
+
+    CommandId mCommandIndex;
 };
 
 } // namespace app
