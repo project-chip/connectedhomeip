@@ -80,6 +80,7 @@ static_library("app") {
     "MessageDef/StatusElement.h",
     "ReadClient.cpp",
     "ReadHandler.cpp",
+    "reporting/ReportingEngine.cpp",
     "decoder.cpp",
     "encoder.cpp",
   ]

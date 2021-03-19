@@ -42,7 +42,7 @@
 namespace {
 // Max value for the number of message request sent.
 constexpr size_t kMaxCommandMessageCount = 3;
-constexpr size_t kMaxReadMessageCount    = 0;
+constexpr size_t kMaxReadMessageCount    = 3;
 
 // The CHIP Message interval time in milliseconds.
 constexpr int32_t gMessageInterval = 1000;

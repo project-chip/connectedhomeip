@@ -43,6 +43,7 @@
 #include <app/InteractionModelDelegate.h>
 #include <app/ReadClient.h>
 #include <app/ReadHandler.h>
+#include <app/reporting/ReportingEngine.h>
 
 #define CHIP_MAX_NUM_COMMAND_HANDLER 1
 #define CHIP_MAX_NUM_COMMAND_SENDER 1
@@ -124,7 +125,9 @@ public:
      */
     uint16_t GetReadClientArrayIndex(const ReadClient * const apReadClient) const;
 
+    reporting::ReportingEngine * GetReportingEngine(void) { return &mReportingEngine; }
 private:
+    friend class reporting::ReportingEngine;
     void OnUnknownMsgType(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
                           const PayloadHeader & aPayloadHeader, System::PacketBufferHandle aPayload);
     void OnInvokeCommandRequest(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
@@ -146,6 +149,7 @@ private:
     CommandSender mCommandSenderObjs[CHIP_MAX_NUM_COMMAND_SENDER];
     ReadClient mReadClients[CHIP_MAX_NUM_READ_CLIENT];
     ReadHandler mReadHandlers[CHIP_MAX_NUM_READ_HANDLER];
+    reporting::ReportingEngine mReportingEngine;
 };
 
 void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId,
