@@ -2085,7 +2085,7 @@ void DispatchServerCommand(app::Command * command, CommandId commandId, Endpoint
         {
         case ZCL_ADD_THREAD_NETWORK_COMMAND_ID: {
             CHIP_ERROR TLVError = CHIP_NO_ERROR;
-            const uint8_t * operationalDataset;
+            chip::ByteSpan operationalDataset;
             uint64_t breadcrumb;
             uint32_t timeoutMs;
 
@@ -2093,9 +2093,12 @@ void DispatchServerCommand(app::Command * command, CommandId commandId, Endpoint
             {
                 switch (TLV::TagNumFromTag(dataTlv.GetTag()))
                 {
-                case 0:
-                    TLVError = dataTlv.GetDataPtr(operationalDataset);
-                    break;
+                case 0: {
+                    const uint8_t * data = nullptr;
+                    TLVError             = dataTlv.GetDataPtr(data);
+                    operationalDataset   = chip::ByteSpan(data, dataTlv.GetLength());
+                }
+                break;
                 case 1:
                     TLVError = dataTlv.Get(breadcrumb);
                     break;
@@ -2114,14 +2117,13 @@ void DispatchServerCommand(app::Command * command, CommandId commandId, Endpoint
                 }
             }
             // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-            emberAfNetworkCommissioningClusterAddThreadNetworkCallback(const_cast<uint8_t *>(operationalDataset), breadcrumb,
-                                                                       timeoutMs);
+            emberAfNetworkCommissioningClusterAddThreadNetworkCallback(operationalDataset, breadcrumb, timeoutMs);
             break;
         }
         case ZCL_ADD_WI_FI_NETWORK_COMMAND_ID: {
             CHIP_ERROR TLVError = CHIP_NO_ERROR;
-            const uint8_t * ssid;
-            const uint8_t * credentials;
+            chip::ByteSpan ssid;
+            chip::ByteSpan credentials;
             uint64_t breadcrumb;
             uint32_t timeoutMs;
 
@@ -2129,12 +2131,18 @@ void DispatchServerCommand(app::Command * command, CommandId commandId, Endpoint
             {
                 switch (TLV::TagNumFromTag(dataTlv.GetTag()))
                 {
-                case 0:
-                    TLVError = dataTlv.GetDataPtr(ssid);
-                    break;
-                case 1:
-                    TLVError = dataTlv.GetDataPtr(credentials);
-                    break;
+                case 0: {
+                    const uint8_t * data = nullptr;
+                    TLVError             = dataTlv.GetDataPtr(data);
+                    ssid                 = chip::ByteSpan(data, dataTlv.GetLength());
+                }
+                break;
+                case 1: {
+                    const uint8_t * data = nullptr;
+                    TLVError             = dataTlv.GetDataPtr(data);
+                    credentials          = chip::ByteSpan(data, dataTlv.GetLength());
+                }
+                break;
                 case 2:
                     TLVError = dataTlv.Get(breadcrumb);
                     break;
@@ -2153,13 +2161,12 @@ void DispatchServerCommand(app::Command * command, CommandId commandId, Endpoint
                 }
             }
             // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-            emberAfNetworkCommissioningClusterAddWiFiNetworkCallback(const_cast<uint8_t *>(ssid),
-                                                                     const_cast<uint8_t *>(credentials), breadcrumb, timeoutMs);
+            emberAfNetworkCommissioningClusterAddWiFiNetworkCallback(ssid, credentials, breadcrumb, timeoutMs);
             break;
         }
         case ZCL_DISABLE_NETWORK_COMMAND_ID: {
             CHIP_ERROR TLVError = CHIP_NO_ERROR;
-            const uint8_t * networkID;
+            chip::ByteSpan networkID;
             uint64_t breadcrumb;
             uint32_t timeoutMs;
 
@@ -2167,9 +2174,12 @@ void DispatchServerCommand(app::Command * command, CommandId commandId, Endpoint
             {
                 switch (TLV::TagNumFromTag(dataTlv.GetTag()))
                 {
-                case 0:
-                    TLVError = dataTlv.GetDataPtr(networkID);
-                    break;
+                case 0: {
+                    const uint8_t * data = nullptr;
+                    TLVError             = dataTlv.GetDataPtr(data);
+                    networkID            = chip::ByteSpan(data, dataTlv.GetLength());
+                }
+                break;
                 case 1:
                     TLVError = dataTlv.Get(breadcrumb);
                     break;
@@ -2188,12 +2198,12 @@ void DispatchServerCommand(app::Command * command, CommandId commandId, Endpoint
                 }
             }
             // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-            emberAfNetworkCommissioningClusterDisableNetworkCallback(const_cast<uint8_t *>(networkID), breadcrumb, timeoutMs);
+            emberAfNetworkCommissioningClusterDisableNetworkCallback(networkID, breadcrumb, timeoutMs);
             break;
         }
         case ZCL_ENABLE_NETWORK_COMMAND_ID: {
             CHIP_ERROR TLVError = CHIP_NO_ERROR;
-            const uint8_t * networkID;
+            chip::ByteSpan networkID;
             uint64_t breadcrumb;
             uint32_t timeoutMs;
 
@@ -2201,9 +2211,12 @@ void DispatchServerCommand(app::Command * command, CommandId commandId, Endpoint
             {
                 switch (TLV::TagNumFromTag(dataTlv.GetTag()))
                 {
-                case 0:
-                    TLVError = dataTlv.GetDataPtr(networkID);
-                    break;
+                case 0: {
+                    const uint8_t * data = nullptr;
+                    TLVError             = dataTlv.GetDataPtr(data);
+                    networkID            = chip::ByteSpan(data, dataTlv.GetLength());
+                }
+                break;
                 case 1:
                     TLVError = dataTlv.Get(breadcrumb);
                     break;
@@ -2222,7 +2235,7 @@ void DispatchServerCommand(app::Command * command, CommandId commandId, Endpoint
                 }
             }
             // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-            emberAfNetworkCommissioningClusterEnableNetworkCallback(const_cast<uint8_t *>(networkID), breadcrumb, timeoutMs);
+            emberAfNetworkCommissioningClusterEnableNetworkCallback(networkID, breadcrumb, timeoutMs);
             break;
         }
         case ZCL_GET_LAST_NETWORK_COMMISSIONING_RESULT_COMMAND_ID: {
@@ -2253,7 +2266,7 @@ void DispatchServerCommand(app::Command * command, CommandId commandId, Endpoint
         }
         case ZCL_REMOVE_NETWORK_COMMAND_ID: {
             CHIP_ERROR TLVError = CHIP_NO_ERROR;
-            const uint8_t * NetworkID;
+            chip::ByteSpan NetworkID;
             uint64_t Breadcrumb;
             uint32_t TimeoutMs;
 
@@ -2261,9 +2274,12 @@ void DispatchServerCommand(app::Command * command, CommandId commandId, Endpoint
             {
                 switch (TLV::TagNumFromTag(dataTlv.GetTag()))
                 {
-                case 0:
-                    TLVError = dataTlv.GetDataPtr(NetworkID);
-                    break;
+                case 0: {
+                    const uint8_t * data = nullptr;
+                    TLVError             = dataTlv.GetDataPtr(data);
+                    NetworkID            = chip::ByteSpan(data, dataTlv.GetLength());
+                }
+                break;
                 case 1:
                     TLVError = dataTlv.Get(Breadcrumb);
                     break;
@@ -2282,12 +2298,12 @@ void DispatchServerCommand(app::Command * command, CommandId commandId, Endpoint
                 }
             }
             // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-            emberAfNetworkCommissioningClusterRemoveNetworkCallback(const_cast<uint8_t *>(NetworkID), Breadcrumb, TimeoutMs);
+            emberAfNetworkCommissioningClusterRemoveNetworkCallback(NetworkID, Breadcrumb, TimeoutMs);
             break;
         }
         case ZCL_SCAN_NETWORKS_COMMAND_ID: {
             CHIP_ERROR TLVError = CHIP_NO_ERROR;
-            const uint8_t * ssid;
+            chip::ByteSpan ssid;
             uint64_t breadcrumb;
             uint32_t timeoutMs;
 
@@ -2295,9 +2311,12 @@ void DispatchServerCommand(app::Command * command, CommandId commandId, Endpoint
             {
                 switch (TLV::TagNumFromTag(dataTlv.GetTag()))
                 {
-                case 0:
-                    TLVError = dataTlv.GetDataPtr(ssid);
-                    break;
+                case 0: {
+                    const uint8_t * data = nullptr;
+                    TLVError             = dataTlv.GetDataPtr(data);
+                    ssid                 = chip::ByteSpan(data, dataTlv.GetLength());
+                }
+                break;
                 case 1:
                     TLVError = dataTlv.Get(breadcrumb);
                     break;
@@ -2316,12 +2335,12 @@ void DispatchServerCommand(app::Command * command, CommandId commandId, Endpoint
                 }
             }
             // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-            emberAfNetworkCommissioningClusterScanNetworksCallback(const_cast<uint8_t *>(ssid), breadcrumb, timeoutMs);
+            emberAfNetworkCommissioningClusterScanNetworksCallback(ssid, breadcrumb, timeoutMs);
             break;
         }
         case ZCL_UPDATE_THREAD_NETWORK_COMMAND_ID: {
             CHIP_ERROR TLVError = CHIP_NO_ERROR;
-            const uint8_t * operationalDataset;
+            chip::ByteSpan operationalDataset;
             uint64_t breadcrumb;
             uint32_t timeoutMs;
 
@@ -2329,9 +2348,12 @@ void DispatchServerCommand(app::Command * command, CommandId commandId, Endpoint
             {
                 switch (TLV::TagNumFromTag(dataTlv.GetTag()))
                 {
-                case 0:
-                    TLVError = dataTlv.GetDataPtr(operationalDataset);
-                    break;
+                case 0: {
+                    const uint8_t * data = nullptr;
+                    TLVError             = dataTlv.GetDataPtr(data);
+                    operationalDataset   = chip::ByteSpan(data, dataTlv.GetLength());
+                }
+                break;
                 case 1:
                     TLVError = dataTlv.Get(breadcrumb);
                     break;
@@ -2350,14 +2372,13 @@ void DispatchServerCommand(app::Command * command, CommandId commandId, Endpoint
                 }
             }
             // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-            emberAfNetworkCommissioningClusterUpdateThreadNetworkCallback(const_cast<uint8_t *>(operationalDataset), breadcrumb,
-                                                                          timeoutMs);
+            emberAfNetworkCommissioningClusterUpdateThreadNetworkCallback(operationalDataset, breadcrumb, timeoutMs);
             break;
         }
         case ZCL_UPDATE_WI_FI_NETWORK_COMMAND_ID: {
             CHIP_ERROR TLVError = CHIP_NO_ERROR;
-            const uint8_t * ssid;
-            const uint8_t * credentials;
+            chip::ByteSpan ssid;
+            chip::ByteSpan credentials;
             uint64_t breadcrumb;
             uint32_t timeoutMs;
 
@@ -2365,12 +2386,18 @@ void DispatchServerCommand(app::Command * command, CommandId commandId, Endpoint
             {
                 switch (TLV::TagNumFromTag(dataTlv.GetTag()))
                 {
-                case 0:
-                    TLVError = dataTlv.GetDataPtr(ssid);
-                    break;
-                case 1:
-                    TLVError = dataTlv.GetDataPtr(credentials);
-                    break;
+                case 0: {
+                    const uint8_t * data = nullptr;
+                    TLVError             = dataTlv.GetDataPtr(data);
+                    ssid                 = chip::ByteSpan(data, dataTlv.GetLength());
+                }
+                break;
+                case 1: {
+                    const uint8_t * data = nullptr;
+                    TLVError             = dataTlv.GetDataPtr(data);
+                    credentials          = chip::ByteSpan(data, dataTlv.GetLength());
+                }
+                break;
                 case 2:
                     TLVError = dataTlv.Get(breadcrumb);
                     break;
@@ -2389,8 +2416,7 @@ void DispatchServerCommand(app::Command * command, CommandId commandId, Endpoint
                 }
             }
             // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-            emberAfNetworkCommissioningClusterUpdateWiFiNetworkCallback(const_cast<uint8_t *>(ssid),
-                                                                        const_cast<uint8_t *>(credentials), breadcrumb, timeoutMs);
+            emberAfNetworkCommissioningClusterUpdateWiFiNetworkCallback(ssid, credentials, breadcrumb, timeoutMs);
             break;
         }
         default: {
