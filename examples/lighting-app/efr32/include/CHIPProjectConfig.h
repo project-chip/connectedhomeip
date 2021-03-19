@@ -147,8 +147,8 @@
 /**
  * CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_TIMEOUT
  *
- * The amount of time in miliseconds after which BLE should change his advertisements 
- * from fast interval to slow interval. 
+ * The amount of time in miliseconds after which BLE should change his advertisements
+ * from fast interval to slow interval.
  *
  * 30000 (30 secondes).
  */

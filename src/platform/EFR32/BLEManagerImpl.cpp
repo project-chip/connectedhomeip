@@ -182,7 +182,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
                                     (void *) this,    // init timer id = ble obj context
                                     BleAdvTimeoutHandler // timer callback handler
     );
-   
+
     mFlags.ClearAll().Set(Flags::kAdvertisingEnabled, CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART);
     mFlags.Set(Flags::kFastAdvertisingEnabled, true);
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
@@ -725,9 +725,9 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     ret = sl_bt_advertiser_start(advertising_set_handle, sl_bt_advertiser_user_data, connectableAdv);
 
     if (SL_STATUS_OK == ret)
-    {   
-        uint32_t BleAdvTimeoutMs = (mFlags.Has(Flags::kFastAdvertisingEnabled) ? 
-                                    CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_TIMEOUT : 
+    {
+        uint32_t BleAdvTimeoutMs = (mFlags.Has(Flags::kFastAdvertisingEnabled) ?
+                                    CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_TIMEOUT :
                                     CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT);
         StartBleAdvTimeoutTimer(BleAdvTimeoutMs);
         mFlags.Set(Flags::kAdvertising);
@@ -1070,17 +1070,17 @@ void BLEManagerImpl::BleAdvTimeoutHandler(TimerHandle_t xTimer)
         ChipLogDetail(DeviceLayer,"bleAdv Timeout : Start slow advertissment");
 
         sInstance.mFlags.Clear(Flags::kFastAdvertisingEnabled);
-        
+
         //stop advertiser, change interval and restart it;
         sl_bt_advertiser_stop(sInstance.advertising_set_handle);
         ret = sl_bt_advertiser_set_timing(sInstance.advertising_set_handle,
                 CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL,
                 CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL, 0 ,0);
-        
+
         err = sInstance.MapBLEError(ret);
         SuccessOrExit(err);
 
-        uint8_t connectableAdv = (sInstance.NumConnections() < kMaxConnections) ? 
+        uint8_t connectableAdv = (sInstance.NumConnections() < kMaxConnections) ?
                                 sl_bt_advertiser_connectable_scannable : sl_bt_advertiser_scannable_non_connectable;
         ret = sl_bt_advertiser_start(sInstance.advertising_set_handle, sl_bt_advertiser_user_data, connectableAdv);
         err = sInstance.MapBLEError(ret);
