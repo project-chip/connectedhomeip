@@ -463,11 +463,11 @@ exit:
     {
         sock.tcpSocket.Disconnect(Transport::PeerAddress::TCP(addr));
     }
-
-    if (sock.type == Transport::Type::kUdp)
+    else if (sock.type == Transport::Type::kUdp)
     {
         sock.udpSocket.Close();
     }
+
     return error;
 }
 

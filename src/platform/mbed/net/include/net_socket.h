@@ -32,13 +32,15 @@ int mbed_accept(int fd, struct sockaddr * addr, socklen_t * addrlen);
 
 ssize_t mbed_send(int fd, const void * buf, size_t len, int flags);
 
-ssize_t mbed_recv(int fd, void * buf, size_t max_len, int flags);
-
 ssize_t mbed_sendto(int fd, const void * buf, size_t len, int flags, const struct sockaddr * dest_addr, socklen_t addrlen);
 
 ssize_t mbed_sendmsg(int fd, const struct msghdr * message, int flags);
 
+ssize_t mbed_recv(int fd, void * buf, size_t max_len, int flags);
+
 ssize_t mbed_recvfrom(int fd, void * buf, size_t max_len, int flags, struct sockaddr * src_addr, socklen_t * addrlen);
+
+ssize_t mbed_recvmsg(int fd, struct msghdr * message, int flags);
 
 int mbed_getsockopt(int fd, int level, int optname, void * optval, socklen_t * optlen);
 
@@ -47,8 +49,6 @@ int mbed_setsockopt(int fd, int level, int optname, const void * optval, socklen
 int mbed_getsockname(int fd, struct sockaddr * addr, socklen_t * addrlen);
 
 int mbed_getpeername(int sockfd, struct sockaddr * addr, socklen_t * addrlen);
-
-ssize_t mbed_recvmsg(int socket, struct msghdr * message, int flags);
 
 int mbed_select(int nfds, fd_set * readfds, fd_set * writefds, fd_set * exceptfds, struct timeval * timeout);
 

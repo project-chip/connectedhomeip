@@ -153,21 +153,18 @@ ssize_t mbed_send(int fd, const void * buf, size_t len, int flags)
     auto * socket = getSocket(fd);
     if (socket == nullptr)
     {
-        set_errno(ENOBUFS);
+        set_errno(EBADF);
         return -1;
     }
-    return socket->send(buf, len);
-}
 
-ssize_t mbed_recv(int fd, void * buf, size_t max_len, int flags)
-{
-    auto * socket = getSocket(fd);
-    if (socket == nullptr)
+    auto ret = socket->send(buf, len);
+    if (ret < 0)
     {
         set_errno(ENOBUFS);
         return -1;
     }
-    return socket->recv(buf, max_len);
+    ::write(fd, NULL, 0);
+    return ret;
 }
 
 ssize_t mbed_sendto(int fd, const void * buf, size_t len, int flags, const struct sockaddr * dest_addr, socklen_t addrlen)
@@ -175,13 +172,20 @@ ssize_t mbed_sendto(int fd, const void * buf, size_t len, int flags, const struc
     auto * socket = getSocket(fd);
     if (socket == nullptr)
     {
-        set_errno(ENOBUFS);
+        set_errno(EBADF);
         return -1;
     }
     SocketAddress sockAddr;
     Sockaddr2Netsocket(&sockAddr, (struct sockaddr *) dest_addr);
 
-    return socket->sendto(sockAddr, buf, len);
+    auto ret = socket->sendto(sockAddr, buf, len);
+    if (ret < 0)
+    {
+        set_errno(ENOBUFS);
+        return -1;
+    }
+    ::write(fd, NULL, 0);
+    return ret;
 }
 
 ssize_t mbed_sendmsg(int fd, const struct msghdr * message, int flags)
@@ -196,7 +200,33 @@ ssize_t mbed_sendmsg(int fd, const struct msghdr * message, int flags)
 
     msghdr2Netsocket(&sockAddr, (struct sockaddr_in *) message->msg_name);
 
-    return socket->sendto(sockAddr, (void *) message, sizeof(msghdr));
+    auto ret = socket->sendto(sockAddr, (void *) message, sizeof(msghdr));
+    if (ret < 0)
+    {
+        set_errno(ENOBUFS);
+        return -1;
+    }
+    ::write(fd, NULL, 0);
+    return ret;
+}
+
+ssize_t mbed_recv(int fd, void * buf, size_t max_len, int flags)
+{
+    auto * socket = getSocket(fd);
+    if (socket == nullptr)
+    {
+        set_errno(EBADF);
+        return -1;
+    }
+
+    auto ret = socket->recv(buf, max_len);
+    if (ret < 0)
+    {
+        set_errno(ENOBUFS);
+        return -1;
+    }
+    ::read(fd, NULL, 0);
+    return ret;
 }
 
 ssize_t mbed_recvfrom(int fd, void * buf, size_t max_len, int flags, struct sockaddr * src_addr, socklen_t * addrlen)
@@ -210,7 +240,35 @@ ssize_t mbed_recvfrom(int fd, void * buf, size_t max_len, int flags, struct sock
     SocketAddress sockAddr;
     Sockaddr2Netsocket(&sockAddr, src_addr);
 
-    return socket->recvfrom(&sockAddr, buf, max_len);
+    auto ret = socket->recvfrom(&sockAddr, buf, max_len);
+    if (ret < 0)
+    {
+        set_errno(ENOBUFS);
+        return -1;
+    }
+    ::read(fd, NULL, 0);
+    return ret;
+}
+
+ssize_t mbed_recvmsg(int fd, struct msghdr * message, int flags)
+{
+    auto * socket = getSocket(fd);
+    if (socket == nullptr)
+    {
+        set_errno(ENOBUFS);
+        return -1;
+    }
+    SocketAddress sockAddr;
+    msghdr2Netsocket(&sockAddr, (struct sockaddr_in *) message->msg_name);
+
+    auto ret = socket->recvfrom(&sockAddr, (void *) message, sizeof(msghdr));
+    if (ret < 0)
+    {
+        set_errno(ENOBUFS);
+        return -1;
+    }
+    ::read(fd, NULL, 0);
+    return ret;
 }
 
 int mbed_getsockopt(int fd, int level, int optname, void * optval, socklen_t * optlen)
@@ -253,24 +311,27 @@ int mbed_getpeername(int sockfd, struct sockaddr * addr, socklen_t * addrlen)
     return socket->getpeername(&sockAddr);
 }
 
-ssize_t mbed_recvmsg(int socket, struct msghdr * message, int flags)
+static int get_max_select_fd(int nfds, fd_set * readfds, fd_set * writefds, fd_set * exceptfds)
 {
-    auto * fd = getSocket(socket);
-    if (fd == nullptr)
-    {
-        set_errno(ENOBUFS);
-        return -1;
-    }
-    SocketAddress sockAddr;
-    msghdr2Netsocket(&sockAddr, (struct sockaddr_in *) message->msg_name);
+    int max;
 
-    return fd->sendto(sockAddr, (void *) message, sizeof(msghdr));
+    max = nfds;
+
+    for (int fd = max; fd < FD_SETSIZE; ++fd)
+    {
+        if (FD_ISSET(fd, readfds) || FD_ISSET(fd, writefds) || FD_ISSET(fd, exceptfds))
+        {
+            max++;
+        }
+    }
+
+    return max;
 }
 
 int mbed_select(int nfds, fd_set * readfds, fd_set * writefds, fd_set * exceptfds, struct timeval * timeout)
 {
-    // TODO: compute the number of **different** fds, nfds just return the highest fd
-    // in one of the set
+    nfds = get_max_select_fd(nfds, readfds, writefds, exceptfds);
+
     auto control_blocks = std::unique_ptr<FdControlBlock[]>{ new (std::nothrow) FdControlBlock[nfds] };
     if (!control_blocks)
     {
