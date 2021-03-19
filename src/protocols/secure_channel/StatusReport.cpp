@@ -15,17 +15,19 @@ namespace chip {
 namespace Protocols {
 namespace SecureChannel {
 
-StatusReport::StatusReport() : mGeneralCode(0), mProtocolId(0), mProtocolCode(0), mProtocolData(nullptr), mProtocolDataLength(0) {}
+StatusReport::StatusReport() : mGeneralCode(0), mProtocolId(0), mProtocolCode(0), mProtocolData(nullptr) {}
 
 StatusReport::StatusReport(uint16_t generalCode, uint32_t protocolId, uint16_t protocolCode) :
-    mGeneralCode(generalCode), mProtocolId(protocolId), mProtocolCode(protocolCode), mProtocolData(nullptr), mProtocolDataLength(0)
+    mGeneralCode(generalCode), mProtocolId(protocolId), mProtocolCode(protocolCode), mProtocolData(nullptr)
 {}
 
-StatusReport::StatusReport(uint16_t generalCode, uint32_t protocolId, uint16_t protocolCode, uint8_t * protocolData,
-                           uint16_t dataLen) :
+StatusReport::StatusReport(uint16_t generalCode, uint32_t protocolId, uint16_t protocolCode,
+                           System::PacketBufferHandle protocolData) :
     mGeneralCode(generalCode),
-    mProtocolId(protocolId), mProtocolCode(protocolCode), mProtocolData(protocolData), mProtocolDataLength(dataLen)
-{}
+    mProtocolId(protocolId), mProtocolCode(protocolCode)
+{
+    mProtocolData = std::move(protocolData);
+}
 
 CHIP_ERROR StatusReport::Parse(System::PacketBufferHandle buf)
 {
@@ -36,17 +38,17 @@ CHIP_ERROR StatusReport::Parse(System::PacketBufferHandle buf)
 
     ReturnErrorOnFailure(bufReader.Read16(&mGeneralCode).Read32(&mProtocolId).Read16(&mProtocolCode).StatusCode());
 
+    // Any data that exists after the required fields is considered protocol-specific data.
     if (bufReader.OctetsRead() < buf->DataLength())
     {
-        mProtocolData       = buf->Start() + bufReader.OctetsRead();
-        mProtocolDataLength = static_cast<uint16_t>(buf->DataLength() - bufReader.OctetsRead());
-        mMsgHandle          = std::move(buf);
+        mProtocolData = System::PacketBufferHandle::NewWithData(buf->Start() + bufReader.OctetsRead(),
+                                                                buf->DataLength() - bufReader.OctetsRead());
+        if (mProtocolData.IsNull())
+            return CHIP_ERROR_NO_MEMORY;
     }
     else
     {
-        mProtocolData       = nullptr;
-        mProtocolDataLength = 0;
-        mMsgHandle          = nullptr;
+        mProtocolData = nullptr;
     }
 
     return CHIP_NO_ERROR;
@@ -55,9 +57,9 @@ CHIP_ERROR StatusReport::Parse(System::PacketBufferHandle buf)
 Encoding::LittleEndian::BufferWriter & StatusReport::WriteToBuffer(Encoding::LittleEndian::BufferWriter & buf) const
 {
     buf.Put16(mGeneralCode).Put32(mProtocolId).Put16(mProtocolCode);
-    if (mProtocolData != nullptr)
+    if (!mProtocolData.IsNull())
     {
-        buf.Put(mProtocolData, mProtocolDataLength);
+        buf.Put(mProtocolData->Start(), mProtocolData->DataLength());
     }
     return buf;
 }

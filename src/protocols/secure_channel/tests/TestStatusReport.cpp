@@ -32,29 +32,27 @@ void TestStatusReport_NoData(nlTestSuite * inSuite, void * inContext)
     System::PacketBufferHandle msgBuf = bbuf.Finalize();
     NL_TEST_ASSERT(inSuite, !msgBuf.IsNull());
 
-    StatusReport report2;
-    CHIP_ERROR err = report2.Parse(std::move(msgBuf));
+    StatusReport reportToParse;
+    CHIP_ERROR err = reportToParse.Parse(std::move(msgBuf));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, report2.GetGeneralCode() == generalCode);
-    NL_TEST_ASSERT(inSuite, report2.GetProtocolId() == protocolId);
-    NL_TEST_ASSERT(inSuite, report2.GetProtocolCode() == protocolCode);
+    NL_TEST_ASSERT(inSuite, reportToParse.GetGeneralCode() == generalCode);
+    NL_TEST_ASSERT(inSuite, reportToParse.GetProtocolId() == protocolId);
+    NL_TEST_ASSERT(inSuite, reportToParse.GetProtocolCode() == protocolCode);
 
-    uint8_t * testData = nullptr;
-    uint16_t dataLen   = 0;
-    report2.GetProtocolData(&testData, dataLen);
-    NL_TEST_ASSERT(inSuite, testData == nullptr);
-    NL_TEST_ASSERT(inSuite, dataLen == 0);
+    System::PacketBufferHandle data = reportToParse.GetProtocolData();
+    NL_TEST_ASSERT(inSuite, data.IsNull());
 }
 
 void TestStatusReport_WithData(nlTestSuite * inSuite, void * inContext)
 {
-    uint16_t generalCode   = static_cast<uint16_t>(GeneralStatusCode::kFailure);
-    uint32_t protocolId    = kProtocol_SecureChannel;
-    uint16_t protocolCode  = static_cast<uint16_t>(StatusCode::InvalidFabricConfig);
-    uint8_t data[6]        = { 42, 19, 3, 1, 3, 0 };
-    const uint16_t dataLen = 6;
+    uint16_t generalCode               = static_cast<uint16_t>(GeneralStatusCode::kFailure);
+    uint32_t protocolId                = kProtocol_SecureChannel;
+    uint16_t protocolCode              = static_cast<uint16_t>(StatusCode::InvalidFabricConfig);
+    uint8_t data[6]                    = { 42, 19, 3, 1, 3, 0 };
+    const uint16_t dataLen             = 6;
+    System::PacketBufferHandle dataBuf = System::PacketBufferHandle::NewWithData(data, dataLen);
 
-    StatusReport testReport(generalCode, protocolId, protocolCode, static_cast<uint8_t *>(data), dataLen);
+    StatusReport testReport(generalCode, protocolId, protocolCode, std::move(dataBuf));
 
     size_t msgSize = testReport.Size();
     Encoding::LittleEndian::PacketBufferWriter bbuf(System::PacketBufferHandle::New(msgSize));
@@ -63,23 +61,21 @@ void TestStatusReport_WithData(nlTestSuite * inSuite, void * inContext)
     System::PacketBufferHandle msgBuf = bbuf.Finalize();
     NL_TEST_ASSERT(inSuite, !msgBuf.IsNull());
 
-    StatusReport report2;
-    CHIP_ERROR err = report2.Parse(std::move(msgBuf));
+    StatusReport reportToParse;
+    CHIP_ERROR err = reportToParse.Parse(std::move(msgBuf));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, report2.GetGeneralCode() == generalCode);
-    NL_TEST_ASSERT(inSuite, report2.GetProtocolId() == protocolId);
-    NL_TEST_ASSERT(inSuite, report2.GetProtocolCode() == protocolCode);
+    NL_TEST_ASSERT(inSuite, reportToParse.GetGeneralCode() == generalCode);
+    NL_TEST_ASSERT(inSuite, reportToParse.GetProtocolId() == protocolId);
+    NL_TEST_ASSERT(inSuite, reportToParse.GetProtocolCode() == protocolCode);
 
-    uint8_t * rcvData   = nullptr;
-    uint16_t rcvDataLen = 0;
-    report2.GetProtocolData(&rcvData, rcvDataLen);
-    if (rcvData == nullptr)
+    System::PacketBufferHandle rcvData = reportToParse.GetProtocolData();
+    if (rcvData.IsNull())
     {
         NL_TEST_ASSERT(inSuite, false);
         return;
     }
-    NL_TEST_ASSERT(inSuite, !memcmp(rcvData, data, rcvDataLen));
-    NL_TEST_ASSERT(inSuite, rcvDataLen = dataLen);
+    NL_TEST_ASSERT(inSuite, rcvData->DataLength() == dataLen);
+    NL_TEST_ASSERT(inSuite, !memcmp(rcvData->Start(), data, dataLen));
 }
 
 void TestBadStatusReport(nlTestSuite * inSuite, void * inContext)

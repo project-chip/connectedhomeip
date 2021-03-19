@@ -37,16 +37,12 @@ public:
     /**
      *  Construct a StatusReport with additional ProtocolData.
      *
-     *  WARNING: The caller MUST ensure that the data referenced by protocolData not be freed before calling \c WriteToBuffer()
-     *      This function will not make a copy of the data.
-     *
      *  @param generalCode Must specify a GeneralCode (see \c GeneralStatusCode )
      *  @param protocolId Must specify a ProtocolId which consists of Vendor Id (upper 16 bits) and ProtocolId (lower 16 bits)
      *  @param protocolCode A code defined by the specified protocol which provides more information about the status
-     *  @param protocolData A pointer to additional (and optional) protocol-specific data
-     *  @param dataLen The length of the additional (and optional) data
+     *  @param protocolData A \c PacketBufferHandle containing the protocol-specific data
      */
-    StatusReport(uint16_t generalCode, uint32_t protocolId, uint16_t protocolCode, uint8_t * protocolData, uint16_t dataLen);
+    StatusReport(uint16_t generalCode, uint32_t protocolId, uint16_t protocolCode, System::PacketBufferHandle protocolData);
 
     /**
      *  Read the contents of a \c PacketBuffer containing a StatusReport message and store the field values in this object.
@@ -54,9 +50,10 @@ public:
      *  @note If there is additional data after the Protocol Code field in the message, it is assumed to be protocol-specific data.
      *
      *  @note This method assumes that the Header of the message has already been consumed, and that \c PacketBuffer::Start() points
-     * to the beginning of the StatusReport data.
+     *  to the beginning of the StatusReport data.
      *
-     *  @param[in] buf A \c PacketBufferHandle containing the StatusReport message. This method will take ownership.
+     *  @param[in] buf A \c PacketBufferHandle containing the StatusReport message. This method will take ownership, and will
+     *                 allocate a new PacketBuffer if any protocol-specific data exists.
      *
      *  @return CHIP_ERROR Return an error if the message is malformed or buf is \c NULL
      */
@@ -79,12 +76,16 @@ public:
     uint16_t GetGeneralCode() const { return mGeneralCode; }
     uint32_t GetProtocolId() const { return mProtocolId; }
     uint16_t GetProtocolCode() const { return mProtocolCode; }
-    void GetProtocolData(uint8_t ** data, uint16_t & length) const
+    System::PacketBufferHandle GetProtocolData() const
     {
-        if (data == nullptr)
-            return;
-        *data  = mProtocolData;
-        length = mProtocolDataLength;
+        if (mProtocolData.IsNull())
+        {
+            return System::PacketBufferHandle(nullptr);
+        }
+        else
+        {
+            return mProtocolData.Retain();
+        }
     }
 
 private:
@@ -92,10 +93,7 @@ private:
     uint32_t mProtocolId   = 0;
     uint16_t mProtocolCode = 0;
 
-    uint8_t * mProtocolData      = nullptr;
-    uint16_t mProtocolDataLength = 0;
-
-    System::PacketBufferHandle mMsgHandle;
+    System::PacketBufferHandle mProtocolData;
 };
 
 } // namespace SecureChannel

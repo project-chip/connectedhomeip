@@ -123,7 +123,7 @@ void VerifyStatusReport(nlTestSuite * inSuite, void * inContext, const System::P
         return;
     }
 
-    System::PacketBufferHandle msgCopy = System::PacketBufferHandle::NewWithData(msg->Start(), msg->DataLength());
+    System::PacketBufferHandle msgCopy = msg.CloneData();
     if (msgCopy.IsNull())
     {
         NL_TEST_ASSERT(inSuite, false);
