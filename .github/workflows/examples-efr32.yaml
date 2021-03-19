@@ -52,6 +52,10 @@ jobs:
               run:
                   scripts/examples/gn_efr32_example.sh
                   examples/lighting-app/efr32/ out/lighting_app_debug BRD4161A
+            - name: Build example EFR32 Window Covering for BRD4161A
+              run:
+                  scripts/examples/gn_efr32_example.sh examples/window-app/efr32/
+                  out/window_app_debug BRD4161A
             - name: Binary artifact suffix
               id: outsuffix
               uses: haya14busa/action-cond@v1.0.0

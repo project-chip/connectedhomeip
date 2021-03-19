@@ -1,6 +1,7 @@
 /*
  *
  *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2018 Nest Labs, Inc.
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,22 +19,33 @@
 
 #pragma once
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+struct AppEvent
+{
+    enum class EventType
+    {
+        None = 0,
+        // Button events
+        ButtonPressed,
+        ButtonReleased,
+        // Window cover events
+        CoverStatusChange,
+        CoverTypeChange,
+        CoverTiltModeChange,
+        CoverLiftUp,
+        CoverLiftDown,
+        CoverTiltUp,
+        CoverTiltDown,
+        CoverOpen,
+        CoverClosed,
+        CoverStart,
+        CoverStop
+    };
 
-#include "AppConfig.h"
-#include "board_features.h"
+    static const char * TypeString(EventType type);
 
-#define MAX_STR_LEN 48
+    AppEvent() = default;
+    AppEvent(EventType type, void * context);
 
-void initLCD(void);
-void * LCDContext();
-int LCD_clear(void * pContext);
-int LCD_drawPixel(void * pContext, int32_t x, int32_t y);
-int LCD_update(void);
-void LCDWriteQRCode(uint8_t * text);
-
-#ifdef __cplusplus
-}
-#endif
+    EventType mType = EventType::None;
+    void * mContext = nullptr;
+};
