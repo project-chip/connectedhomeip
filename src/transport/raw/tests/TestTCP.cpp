@@ -344,27 +344,21 @@ void TestData::Free()
 
 int TestDataCallbackCheck(const uint8_t * message, size_t length, int count, void * data)
 {
-    printf("--> callback %p %zu %d %p\n", message, length, count, data);
     if (data == nullptr)
     {
-        printf(" -> callback data null\n");
         return -1;
     }
     TestData * currentData = static_cast<TestData *>(data) + count;
-    printf(" -> payload %p total=%zu message=%zu\n", currentData->mPayload, currentData->mTotalLength, currentData->mMessageLength);
     if (currentData->mPayload == nullptr)
     {
-        printf(" -> payload null\n");
         return -2;
     }
     if (currentData->mMessageLength != length)
     {
-        printf(" -> length expect %zu got %zu\n", currentData->mMessageLength, length);
         return -3;
     }
     if (memcmp(currentData->mPayload + currentData->mMessageOffset, message, length) != 0)
     {
-        printf(" -> payload mismatch\n");
         return -4;
     }
     return 0;
@@ -393,7 +387,7 @@ void chip::Transport::TCPTest::CheckProcessReceivedBuffer(nlTestSuite * inSuite,
     Inet::TCPEndPoint * lEndPoint = state->mEndPoint;
     NL_TEST_ASSERT(inSuite, lEndPoint != nullptr);
 
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    INET_ERROR err = INET_NO_ERROR;
     TestData testData[2];
     gMockTransportMgrDelegate.SetCallback(TestDataCallbackCheck, testData);
 
@@ -401,14 +395,14 @@ void chip::Transport::TCPTest::CheckProcessReceivedBuffer(nlTestSuite * inSuite,
     gMockTransportMgrDelegate.mReceiveHandlerCallCount = 0;
     NL_TEST_ASSERT(inSuite, testData[0].Init((const uint16_t[]){ 111, 0 }));
     err = tcp.ProcessReceivedBuffer(lEndPoint, lPeerAddress, std::move(testData[0].mHandle));
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, err == INET_NO_ERROR);
     NL_TEST_ASSERT(inSuite, gMockTransportMgrDelegate.mReceiveHandlerCallCount == 1);
 
     // Test a message in a chain of three packet buffers. The message length is split accross buffers.
     gMockTransportMgrDelegate.mReceiveHandlerCallCount = 0;
     NL_TEST_ASSERT(inSuite, testData[0].Init((const uint16_t[]){ 1, 122, 123, 0 }));
     err = tcp.ProcessReceivedBuffer(lEndPoint, lPeerAddress, std::move(testData[0].mHandle));
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, err == INET_NO_ERROR);
     NL_TEST_ASSERT(inSuite, gMockTransportMgrDelegate.mReceiveHandlerCallCount == 1);
 
     // Test two messages in a chain.
@@ -417,7 +411,7 @@ void chip::Transport::TCPTest::CheckProcessReceivedBuffer(nlTestSuite * inSuite,
     NL_TEST_ASSERT(inSuite, testData[1].Init((const uint16_t[]){ 132, 0 }));
     testData[0].mHandle->AddToEnd(std::move(testData[1].mHandle));
     err = tcp.ProcessReceivedBuffer(lEndPoint, lPeerAddress, std::move(testData[0].mHandle));
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, err == INET_NO_ERROR);
     NL_TEST_ASSERT(inSuite, gMockTransportMgrDelegate.mReceiveHandlerCallCount == 2);
 
     // Test a chain of two messages, each a chain.
@@ -426,25 +420,18 @@ void chip::Transport::TCPTest::CheckProcessReceivedBuffer(nlTestSuite * inSuite,
     NL_TEST_ASSERT(inSuite, testData[1].Init((const uint16_t[]){ 143, 144, 0 }));
     testData[0].mHandle->AddToEnd(std::move(testData[1].mHandle));
     err = tcp.ProcessReceivedBuffer(lEndPoint, lPeerAddress, std::move(testData[0].mHandle));
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, err == INET_NO_ERROR);
     NL_TEST_ASSERT(inSuite, gMockTransportMgrDelegate.mReceiveHandlerCallCount == 2);
 
-    // Test a chain that is too large to coalesce into a single packet buffer, followed by a normal message.
-    // We expect to receive only the latter.
+    // Test a message that is too large to coalesce into a single packet buffer.
     gMockTransportMgrDelegate.mReceiveHandlerCallCount = 0;
     gMockTransportMgrDelegate.SetCallback(TestDataCallbackCheck, &testData[1]);
     NL_TEST_ASSERT(inSuite, testData[0].Init((const uint16_t[]){ 51, System::PacketBuffer::kMaxSizeWithoutReserve, 0 }));
-    NL_TEST_ASSERT(inSuite, testData[1].Init((const uint16_t[]){ 153, 154, 0 }));
-    testData[0].mHandle->AddToEnd(std::move(testData[1].mHandle));
-    // Start by sending only the first buffer of the long chain. This should be enough to trigger the error.
+    // Sending only the first buffer of the long chain. This should be enough to trigger the error.
     System::PacketBufferHandle head = testData[0].mHandle.PopHead();
     err                             = tcp.ProcessReceivedBuffer(lEndPoint, lPeerAddress, std::move(head));
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_MESSAGE_TOO_LONG);
+    NL_TEST_ASSERT(inSuite, err == INET_ERROR_INBOUND_MESSAGE_TOO_BIG);
     NL_TEST_ASSERT(inSuite, gMockTransportMgrDelegate.mReceiveHandlerCallCount == 0);
-    // Now send the rest, confirming that the second message arrives.
-    err = tcp.ProcessReceivedBuffer(lEndPoint, lPeerAddress, std::move(testData[0].mHandle));
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, gMockTransportMgrDelegate.mReceiveHandlerCallCount == 1);
 
     gMockTransportMgrDelegate.FinalizeMessageTest(tcp, addr);
 }
