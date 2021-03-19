@@ -778,8 +778,8 @@ void BLEManagerImpl::HandleTXCharCCCDWrite(struct ble_gap_event * gapEvent)
     // whether the client is enabling or disabling indications.
     {
         ChipDeviceEvent event;
-        event.Type                    = (indicationsEnabled || notificationsEnabled) ? DeviceEventType::kCHIPoBLESubscribe
-                                                                                     : DeviceEventType::kCHIPoBLEUnsubscribe;
+        event.Type = (indicationsEnabled || notificationsEnabled) ? DeviceEventType::kCHIPoBLESubscribe
+                                                                  : DeviceEventType::kCHIPoBLEUnsubscribe;
         event.CHIPoBLESubscribe.ConId = gapEvent->subscribe.conn_handle;
         PlatformMgr().PostEvent(&event);
     }
