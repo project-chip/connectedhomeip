@@ -28,15 +28,15 @@
 
 #include <platform/internal/BLEManager.h>
 
+#include "FreeRTOS.h"
 #include "sl_bt_api.h"
 #include "sl_bt_stack_config.h"
 #include "sl_bt_stack_init.h"
+#include "timers.h"
 #include <ble/CHIPBleServiceData.h>
 #include <platform/EFR32/freertos_bluetooth.h>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
-#include "FreeRTOS.h"
-#include "timers.h"
 
 using namespace ::chip;
 using namespace ::chip::Ble;
@@ -176,11 +176,11 @@ CHIP_ERROR BLEManagerImpl::_Init()
                 NULL);                                                            /* Variable to hold the task's data structure. */
 
     // Create FreeRTOS sw timer for BLE timeouts and interval change.
-    sbleAdvTimeoutTimer = xTimerCreate("BleAdvTimer",          // Just a text name, not used by the RTOS kernel
-                                    1,                // == default timer period (mS)
-                                    false,            // no timer reload (==one-shot)
-                                    (void *) this,    // init timer id = ble obj context
-                                    BleAdvTimeoutHandler // timer callback handler
+    sbleAdvTimeoutTimer = xTimerCreate("BleAdvTimer",       // Just a text name, not used by the RTOS kernel
+                                       1,                   // == default timer period (mS)
+                                       false,               // no timer reload (==one-shot)
+                                       (void *) this,       // init timer id = ble obj context
+                                       BleAdvTimeoutHandler // timer callback handler
     );
 
     mFlags.ClearAll().Set(Flags::kAdvertisingEnabled, CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART);
@@ -691,8 +691,8 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 {
     CHIP_ERROR err;
     sl_status_t ret;
-    const uint8_t kResolvableRandomAddrType = 2; //Private resolvable random address type
-    bd_addr unusedBdAddr;   // We can ignore this field when setting random address.
+    const uint8_t kResolvableRandomAddrType = 2; // Private resolvable random address type
+    bd_addr unusedBdAddr;                        // We can ignore this field when setting random address.
     uint32_t interval_min;
     uint32_t interval_max;
     uint16_t numConnectionss = NumConnections();
@@ -703,7 +703,7 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     SuccessOrExit(err);
 
     sl_bt_advertiser_set_random_address(advertising_set_handle, kResolvableRandomAddrType, unusedBdAddr, &unusedBdAddr);
-    (void)unusedBdAddr;
+    (void) unusedBdAddr;
 
     mFlags.Clear(Flags::kRestartAdvertising);
 
@@ -726,9 +726,8 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 
     if (SL_STATUS_OK == ret)
     {
-        uint32_t BleAdvTimeoutMs = (mFlags.Has(Flags::kFastAdvertisingEnabled) ?
-                                    CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_TIMEOUT :
-                                    CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT);
+        uint32_t BleAdvTimeoutMs = (mFlags.Has(Flags::kFastAdvertisingEnabled) ? CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_TIMEOUT
+                                                                               : CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT);
         StartBleAdvTimeoutTimer(BleAdvTimeoutMs);
         mFlags.Set(Flags::kAdvertising);
     }
@@ -1067,31 +1066,30 @@ void BLEManagerImpl::BleAdvTimeoutHandler(TimerHandle_t xTimer)
 
     if (sInstance._IsFastAdvertisingEnabled())
     {
-        ChipLogDetail(DeviceLayer,"bleAdv Timeout : Start slow advertissment");
+        ChipLogDetail(DeviceLayer, "bleAdv Timeout : Start slow advertissment");
 
         sInstance.mFlags.Clear(Flags::kFastAdvertisingEnabled);
 
-        //stop advertiser, change interval and restart it;
+        // stop advertiser, change interval and restart it;
         sl_bt_advertiser_stop(sInstance.advertising_set_handle);
-        ret = sl_bt_advertiser_set_timing(sInstance.advertising_set_handle,
-                CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL,
-                CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL, 0 ,0);
+        ret = sl_bt_advertiser_set_timing(sInstance.advertising_set_handle, CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL,
+                                          CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL, 0, 0);
 
         err = sInstance.MapBLEError(ret);
         SuccessOrExit(err);
 
-        uint8_t connectableAdv = (sInstance.NumConnections() < kMaxConnections) ?
-                                sl_bt_advertiser_connectable_scannable : sl_bt_advertiser_scannable_non_connectable;
+        uint8_t connectableAdv = (sInstance.NumConnections() < kMaxConnections) ? sl_bt_advertiser_connectable_scannable
+                                                                                : sl_bt_advertiser_scannable_non_connectable;
         ret = sl_bt_advertiser_start(sInstance.advertising_set_handle, sl_bt_advertiser_user_data, connectableAdv);
         err = sInstance.MapBLEError(ret);
         SuccessOrExit(err);
 
-        sInstance.StartBleAdvTimeoutTimer(CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT);  // Slow advertise for 15 Minutesß
+        sInstance.StartBleAdvTimeoutTimer(CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT); // Slow advertise for 15 Minutesß
     }
     else if (sInstance._IsAdvertisingEnabled())
     {
         // advertissement expired. we stop advertissing
-        ChipLogDetail(DeviceLayer,"bleAdv Timeout : Stop advertissement");
+        ChipLogDetail(DeviceLayer, "bleAdv Timeout : Stop advertissement");
         sInstance.StopAdvertising();
     }
 
@@ -1122,7 +1120,7 @@ void BLEManagerImpl::StartBleAdvTimeoutTimer(uint32_t aTimeoutInMs)
     // cannot immediately be sent to the timer command queue.
     if (xTimerChangePeriod(sbleAdvTimeoutTimer, aTimeoutInMs / portTICK_PERIOD_MS, 100) != pdPASS)
     {
-         ChipLogError(DeviceLayer, "Failed to start BledAdv timeout timer");
+        ChipLogError(DeviceLayer, "Failed to start BledAdv timeout timer");
     }
 }
 
