@@ -31,8 +31,8 @@ static_library("server") {
   sources = [
     "Mdns.cpp",
     "Mdns.h",
-    "QRCodeUtil.cpp",
-    "QRCodeUtil.h",
+    "OnboardingCodesUtil.cpp",
+    "OnboardingCodesUtil.h",
     "RendezvousServer.cpp",
     "RendezvousServer.h",
     "Server.cpp",

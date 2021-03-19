@@ -21,7 +21,7 @@
 #include "Server.h"
 #include "support/ErrorStr.h"
 
-#include "QRCodeUtil.h"
+#include "OnboardingCodesUtil.h"
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 
@@ -84,7 +84,7 @@ int AppTask::Init()
     InitServer();
 
     // QR code will be used with CHIP Tool
-    PrintQRCode(chip::RendezvousInformationFlags::kBLE);
+    PrintOnboardingCodes(chip::RendezvousInformationFlags::kBLE);
 
     TMR_Init();
 
