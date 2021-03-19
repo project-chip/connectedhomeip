@@ -229,6 +229,19 @@ public:
         printf("ReportError with err %d", aError);
         return CHIP_NO_ERROR;
     }
+    CHIP_ERROR CommandResponseStatus(const chip::app::CommandSender * apCommandSender, const uint16_t aGeneralCode, const uint32_t aProtocolId, const uint16_t aProtocolCode,
+                                     const chip::EndpointId aEndpointId, const chip::ClusterId aClusterId, const chip::CommandId aCommandId) override
+    {
+        printf("CommandResponseStatus with GeneralCode %d, ProtocolId %d, ProtocolCode %d, EndpointId %d, ClusterId %d, CommandId %d", aGeneralCode, aProtocolId,
+               aProtocolCode, aEndpointId, aClusterId, aCommandId);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR CommandResponseError(const chip::app::CommandSender * apCommandSender, CHIP_ERROR aError) override
+    {
+        printf("CommandResponseError with error %d", aError);
+        return CHIP_NO_ERROR;
+    }
 };
 
 } // namespace

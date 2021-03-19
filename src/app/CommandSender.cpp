@@ -103,6 +103,11 @@ void CommandSender::OnResponseTimeout(Messaging::ExchangeContext * apExchangeCon
     ChipLogProgress(DataManagement, "Time out! failed to receive invoke command response from Exchange: %d",
                     apExchangeContext->GetExchangeId());
     Reset();
+
+    if (mpDelegate != nullptr)
+    {
+        mpDelegate->CommandResponseError(this, CHIP_ERROR_TIMEOUT);
+    }
 }
 
 CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser & aCommandElement)
@@ -118,6 +123,18 @@ CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser &
     uint16_t protocolCode = 0;
     StatusElement::Parser statusElementParser;
 
+    err = aCommandElement.GetCommandPath(&commandPath);
+    SuccessOrExit(err);
+
+    err = commandPath.GetClusterId(&clusterId);
+    SuccessOrExit(err);
+
+    err = commandPath.GetCommandId(&commandId);
+    SuccessOrExit(err);
+
+    err = commandPath.GetEndpointId(&endpointId);
+    SuccessOrExit(err);
+
     err = aCommandElement.GetStatusElement(&statusElementParser);
     if (CHIP_NO_ERROR == err)
     {
@@ -127,21 +144,13 @@ CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser &
 
         err = statusElementParser.DecodeStatusElement(&generalCode, &protocolId, &protocolCode, &clusterId);
         SuccessOrExit(err);
+        if (mpDelegate != nullptr)
+        {
+            mpDelegate->CommandResponseStatus(this, generalCode, protocolId, protocolCode, endpointId, clusterId, commandId);
+        }
     }
     else if (CHIP_END_OF_TLV == err)
     {
-        err = aCommandElement.GetCommandPath(&commandPath);
-        SuccessOrExit(err);
-
-        err = commandPath.GetClusterId(&clusterId);
-        SuccessOrExit(err);
-
-        err = commandPath.GetCommandId(&commandId);
-        SuccessOrExit(err);
-
-        err = commandPath.GetEndpointId(&endpointId);
-        SuccessOrExit(err);
-
         err = aCommandElement.GetData(&commandDataReader);
         if (CHIP_END_OF_TLV == err)
         {
@@ -155,6 +164,11 @@ CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser &
     }
 
 exit:
+    ChipLogFunctError(err);
+    if (err != CHIP_NO_ERROR && mpDelegate != nullptr)
+    {
+        mpDelegate->CommandResponseError(this, err);
+    }
     return err;
 }
 

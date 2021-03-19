@@ -30,6 +30,7 @@
 namespace chip {
 namespace app {
 class ReadClient;
+class CommandSender;
 struct EventPathParams;
 
 /**
@@ -74,6 +75,34 @@ public:
      * @retval # CHIP_ERROR_NOT_IMPLEMENTED if not implemented
      */
     virtual CHIP_ERROR ReportError(const ReadClient * apReadClient, CHIP_ERROR aError) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+
+    /**
+     * Notification that a Command Send receive Status code embeded in Invoke Command Response
+     * @param[in]  apCommandSender A current command sender which can identify the command sender to the consumer, particularly during
+     *                             multiple command interactions
+     * @param[in]  aGeneralCode   Status code defined by the standard
+     * @param[in]  aProtocolId    Protocol Id
+     * @param[in]  aProtocolCode  Detailed error information, protocol-specific.
+     * @param[in]  aEndpointId    Endpoint identifier
+     * @param[in]  aClusterId     Cluster identifier
+     * @param[in]  aCommandId     Command identifier
+     * @retval # CHIP_ERROR_NOT_IMPLEMENTED if not implemented
+     */
+    virtual CHIP_ERROR CommandResponseStatus(const CommandSender * apCommandSender, const uint16_t aGeneralCode, const uint32_t aProtocolId, const uint16_t aProtocolCode,
+                                     chip::EndpointId aEndpointId, const chip::ClusterId aClusterId, chip::CommandId aCommandId)
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
+    /**
+     * Notification that a command sender encountered an asynchronous failure.
+     * @param[in]  apCommandSender A current command sender which can identify the command sender to the consumer, particularly during
+     *                             multiple command interactions
+     * @param[in]  aError         A error that could be CHIP_ERROR_TIMEOUT when command sender fails to receive, or other error when
+     *                            fail to process incoming command response.
+     * @retval # CHIP_ERROR_NOT_IMPLEMENTED if not implemented
+     */
+    virtual CHIP_ERROR CommandResponseError(const CommandSender * apCommandSender, CHIP_ERROR aError) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
     virtual ~InteractionModelDelegate() = default;
 };
