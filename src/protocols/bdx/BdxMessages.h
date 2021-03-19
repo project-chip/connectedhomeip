@@ -55,6 +55,7 @@ enum class StatusCode : uint16_t
     kLengthRequired             = 0x0015,
     kBadMessageContents         = 0x0016,
     kBadBlockCounter            = 0x0017,
+    kUnexpectedMessage          = 0x0018,
     kTransferFailedUnknownError = 0x001F,
     kServerBadState             = 0x0020,
     kFailureToSend              = 0x0021,

@@ -524,7 +524,7 @@ void TransferSession::HandleTransferInit(MessageType msgType, System::PacketBuff
     CHIP_ERROR err = CHIP_NO_ERROR;
     TransferInit transferInit;
 
-    VerifyOrExit(mState == TransferState::kAwaitingInitMsg, PrepareStatusReport(StatusCode::kServerBadState));
+    VerifyOrExit(mState == TransferState::kAwaitingInitMsg, PrepareStatusReport(StatusCode::kUnexpectedMessage));
 
     if (mRole == TransferRole::kSender)
     {
@@ -570,8 +570,8 @@ void TransferSession::HandleReceiveAccept(System::PacketBufferHandle msgData)
     CHIP_ERROR err = CHIP_NO_ERROR;
     ReceiveAccept rcvAcceptMsg;
 
-    VerifyOrExit(mRole == TransferRole::kReceiver, PrepareStatusReport(StatusCode::kServerBadState));
-    VerifyOrExit(mState == TransferState::kAwaitingAccept, PrepareStatusReport(StatusCode::kServerBadState));
+    VerifyOrExit(mRole == TransferRole::kReceiver, PrepareStatusReport(StatusCode::kUnexpectedMessage));
+    VerifyOrExit(mState == TransferState::kAwaitingAccept, PrepareStatusReport(StatusCode::kUnexpectedMessage));
 
     err = rcvAcceptMsg.Parse(msgData.Retain());
     VerifyOrExit(err == CHIP_NO_ERROR, PrepareStatusReport(StatusCode::kBadMessageContents));
@@ -608,8 +608,8 @@ void TransferSession::HandleSendAccept(System::PacketBufferHandle msgData)
     CHIP_ERROR err = CHIP_NO_ERROR;
     SendAccept sendAcceptMsg;
 
-    VerifyOrExit(mRole == TransferRole::kSender, PrepareStatusReport(StatusCode::kServerBadState));
-    VerifyOrExit(mState == TransferState::kAwaitingAccept, PrepareStatusReport(StatusCode::kServerBadState));
+    VerifyOrExit(mRole == TransferRole::kSender, PrepareStatusReport(StatusCode::kUnexpectedMessage));
+    VerifyOrExit(mState == TransferState::kAwaitingAccept, PrepareStatusReport(StatusCode::kUnexpectedMessage));
 
     err = sendAcceptMsg.Parse(msgData.Retain());
     VerifyOrExit(err == CHIP_NO_ERROR, PrepareStatusReport(StatusCode::kBadMessageContents));
@@ -644,9 +644,9 @@ void TransferSession::HandleBlockQuery(System::PacketBufferHandle msgData)
     CHIP_ERROR err = CHIP_NO_ERROR;
     BlockQuery query;
 
-    VerifyOrExit(mRole == TransferRole::kSender, PrepareStatusReport(StatusCode::kServerBadState));
-    VerifyOrExit(mState == TransferState::kTransferInProgress, PrepareStatusReport(StatusCode::kServerBadState));
-    VerifyOrExit(mAwaitingResponse, PrepareStatusReport(StatusCode::kServerBadState));
+    VerifyOrExit(mRole == TransferRole::kSender, PrepareStatusReport(StatusCode::kUnexpectedMessage));
+    VerifyOrExit(mState == TransferState::kTransferInProgress, PrepareStatusReport(StatusCode::kUnexpectedMessage));
+    VerifyOrExit(mAwaitingResponse, PrepareStatusReport(StatusCode::kUnexpectedMessage));
 
     err = query.Parse(std::move(msgData));
     VerifyOrExit(err == CHIP_NO_ERROR, PrepareStatusReport(StatusCode::kBadMessageContents));
@@ -667,9 +667,9 @@ void TransferSession::HandleBlock(System::PacketBufferHandle msgData)
     CHIP_ERROR err = CHIP_NO_ERROR;
     Block blockMsg;
 
-    VerifyOrExit(mRole == TransferRole::kReceiver, PrepareStatusReport(StatusCode::kServerBadState));
-    VerifyOrExit(mState == TransferState::kTransferInProgress, PrepareStatusReport(StatusCode::kServerBadState));
-    VerifyOrExit(mAwaitingResponse, PrepareStatusReport(StatusCode::kServerBadState));
+    VerifyOrExit(mRole == TransferRole::kReceiver, PrepareStatusReport(StatusCode::kUnexpectedMessage));
+    VerifyOrExit(mState == TransferState::kTransferInProgress, PrepareStatusReport(StatusCode::kUnexpectedMessage));
+    VerifyOrExit(mAwaitingResponse, PrepareStatusReport(StatusCode::kUnexpectedMessage));
 
     err = blockMsg.Parse(msgData.Retain());
     VerifyOrExit(err == CHIP_NO_ERROR, PrepareStatusReport(StatusCode::kBadMessageContents));
@@ -704,9 +704,9 @@ void TransferSession::HandleBlockEOF(System::PacketBufferHandle msgData)
     CHIP_ERROR err = CHIP_NO_ERROR;
     BlockEOF blockEOFMsg;
 
-    VerifyOrExit(mRole == TransferRole::kReceiver, PrepareStatusReport(StatusCode::kServerBadState));
-    VerifyOrExit(mState == TransferState::kTransferInProgress, PrepareStatusReport(StatusCode::kServerBadState));
-    VerifyOrExit(mAwaitingResponse, PrepareStatusReport(StatusCode::kServerBadState));
+    VerifyOrExit(mRole == TransferRole::kReceiver, PrepareStatusReport(StatusCode::kUnexpectedMessage));
+    VerifyOrExit(mState == TransferState::kTransferInProgress, PrepareStatusReport(StatusCode::kUnexpectedMessage));
+    VerifyOrExit(mAwaitingResponse, PrepareStatusReport(StatusCode::kUnexpectedMessage));
 
     err = blockEOFMsg.Parse(msgData.Retain());
     VerifyOrExit(err == CHIP_NO_ERROR, PrepareStatusReport(StatusCode::kBadMessageContents));
@@ -736,9 +736,9 @@ void TransferSession::HandleBlockAck(System::PacketBufferHandle msgData)
     CHIP_ERROR err = CHIP_NO_ERROR;
     BlockAck ackMsg;
 
-    VerifyOrExit(mRole == TransferRole::kSender, PrepareStatusReport(StatusCode::kServerBadState));
-    VerifyOrExit(mState == TransferState::kTransferInProgress, PrepareStatusReport(StatusCode::kServerBadState));
-    VerifyOrExit(mAwaitingResponse, PrepareStatusReport(StatusCode::kServerBadState));
+    VerifyOrExit(mRole == TransferRole::kSender, PrepareStatusReport(StatusCode::kUnexpectedMessage));
+    VerifyOrExit(mState == TransferState::kTransferInProgress, PrepareStatusReport(StatusCode::kUnexpectedMessage));
+    VerifyOrExit(mAwaitingResponse, PrepareStatusReport(StatusCode::kUnexpectedMessage));
 
     err = ackMsg.Parse(std::move(msgData));
     VerifyOrExit(err == CHIP_NO_ERROR, PrepareStatusReport(StatusCode::kBadMessageContents));
@@ -759,9 +759,9 @@ void TransferSession::HandleBlockAckEOF(System::PacketBufferHandle msgData)
     CHIP_ERROR err = CHIP_NO_ERROR;
     BlockAckEOF ackMsg;
 
-    VerifyOrExit(mRole == TransferRole::kSender, PrepareStatusReport(StatusCode::kServerBadState));
-    VerifyOrExit(mState == TransferState::kAwaitingEOFAck, PrepareStatusReport(StatusCode::kServerBadState));
-    VerifyOrExit(mAwaitingResponse, PrepareStatusReport(StatusCode::kServerBadState));
+    VerifyOrExit(mRole == TransferRole::kSender, PrepareStatusReport(StatusCode::kUnexpectedMessage));
+    VerifyOrExit(mState == TransferState::kAwaitingEOFAck, PrepareStatusReport(StatusCode::kUnexpectedMessage));
+    VerifyOrExit(mAwaitingResponse, PrepareStatusReport(StatusCode::kUnexpectedMessage));
 
     err = ackMsg.Parse(std::move(msgData));
     VerifyOrExit(err == CHIP_NO_ERROR, PrepareStatusReport(StatusCode::kBadMessageContents));
