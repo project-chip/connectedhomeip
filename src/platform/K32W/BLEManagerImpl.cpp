@@ -195,6 +195,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
 
     mFlags.Set(Flags::kK32WBLEStackInitialized);
     mFlags.Set(Flags::kAdvertisingEnabled, CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART ? true : false);
+    mFlags.Set(Flags::kFastAdvertisingEnabled, true);
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
 
 exit:
@@ -218,11 +219,6 @@ uint16_t BLEManagerImpl::_NumConnections(void)
 bool BLEManagerImpl::_IsAdvertisingEnabled(void)
 {
     return mFlags.Has(Flags::kAdvertisingEnabled);
-}
-
-bool BLEManagerImpl::_IsFastAdvertisingEnabled(void)
-{
-    return mFlags.Has(Flags::kFastAdvertisingEnabled);
 }
 
 bool BLEManagerImpl::RemoveConnection(uint8_t connectionHandle)
@@ -317,20 +313,22 @@ exit:
     return err;
 }
 
-CHIP_ERROR BLEManagerImpl::_SetFastAdvertisingEnabled(bool val)
+CHIP_ERROR BLEManagerImpl::_SetAdvertisingMode(BLEAdvertisingMode mode)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    VerifyOrExit(mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_NotSupported, err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-
-    if (mFlags.Has(Flags::kFastAdvertisingEnabled) != val)
+    switch (mode)
     {
-        mFlags.Set(Flags::kFastAdvertisingEnabled, val);
-        PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    case BLEAdvertisingMode::kFastAdvertising:
+        mFlags.Set(Flags::kFastAdvertisingEnabled, true);
+        break;
+    case BLEAdvertisingMode::kSlowAdvertising:
+        mFlags.Set(Flags::kFastAdvertisingEnabled, false);
+        break;
+    default:
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
-
-exit:
-    return err;
+    mFlags.Set(Flags::kRestartAdvertising);
+    PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR BLEManagerImpl::_GetDeviceName(char * buf, size_t bufSize)
@@ -751,7 +749,6 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     uint8_t advPayload[BLEKW_MAX_ADV_DATA_LEN]            = { 0 };
     gapScanResponseData_t scanRsp                         = { 0 };
     gapAdvertisingParameters_t adv_params                 = { 0 };
-    uint16_t advInterval                                  = 0;
     uint8_t chipAdvDataFlags                              = (gLeGeneralDiscoverableMode_c | gBrEdrNotSupported_c);
     uint8_t chipOverBleService[2];
     ChipBLEDeviceIdentificationInfo mDeviceIdInfo = { 0 };
@@ -808,9 +805,16 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     scanRsp.aAdStructures = scan_rsp_data;
 
     /**************** Prepare advertising parameters *************************************/
-    advInterval = ((NumConnections() == 0 && !ConfigurationMgr().IsPairedToAccount()) || mFlags.Has(Flags::kFastAdvertisingEnabled))
-        ? (CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL * 3)
-        : CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL;
+    if ((NumConnections() == 0 && !ConfigurationMgr().IsPairedToAccount()) || mFlags.Has(Flags::kFastAdvertisingEnabled))
+    {
+        adv_params.minInterval = CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MIN;
+        adv_params.maxInterval = CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MAX;
+    }
+    else
+    {
+        adv_params.minInterval = CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MIN;
+        adv_params.maxInterval = CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MAX;
+    }
 
     adv_params.advertisingType = gAdvConnectableUndirected_c;
     adv_params.ownAddressType  = gBleAddrTypePublic_c;
@@ -818,7 +822,6 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     memset(adv_params.peerAddress, 0, gcBleDeviceAddressSize_c);
     adv_params.channelMap   = (gapAdvertisingChannelMapFlags_t)(gAdvChanMapFlag37_c | gAdvChanMapFlag38_c | gAdvChanMapFlag39_c);
     adv_params.filterPolicy = gProcessAll_c;
-    adv_params.minInterval = adv_params.maxInterval = advInterval;
 
     err = blekw_start_advertising(&adv_params, &adv, &scanRsp);
     if (err == BLE_OK)
@@ -850,6 +853,7 @@ CHIP_ERROR BLEManagerImpl::StopAdvertising(void)
     if (mFlags.Has(Flags::kAdvertising))
     {
         mFlags.Clear(Flags::kAdvertising);
+        mFlags.Set(Flags::kFastAdvertisingEnabled, true);
         mFlags.Clear(Flags::kRestartAdvertising);
 
         err = blekw_stop_advertising();
