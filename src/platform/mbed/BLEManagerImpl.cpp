@@ -601,9 +601,16 @@ void BLEManagerImpl::HandleInitComplete(bool no_error)
     CHIP_ERROR err       = CHIP_NO_ERROR;
     ble_error_t mbed_err = BLE_ERROR_NONE;
 
+    ble::Gap & gap                      = ble::BLE::Instance().gap();
     ble::SecurityManager & security_mgr = ble::BLE::Instance().securityManager();
+    ble::own_address_type_t addr_type;
+    ble::address_t addr;
 
     VerifyOrExit(no_error, err = CHIP_ERROR_INTERNAL);
+
+    gap.getAddress(addr_type, addr);
+    ChipLogDetail(DeviceLayer, "Device address: %02X:%02X:%02X:%02X:%02X:%02X", addr[5], addr[4], addr[3], addr[2], addr[1],
+                  addr[0]);
 
     mbed_err = security_mgr.init(
         /*bool enableBonding             */ false,
@@ -718,9 +725,6 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
         : ble::adv_interval_t(CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL);
     // minInterval and maxInterval are equal for CHIP.
     ble::AdvertisingParameters adv_params(adv_type, adv_interval, adv_interval);
-
-    // Change own address type from RANDOM to PUBLIC.
-    adv_params.setOwnAddressType(ble::own_address_type_t::PUBLIC);
 
     // Restart advertising if already active.
     if (gap.isAdvertisingActive(ble::LEGACY_ADVERTISING_HANDLE))
