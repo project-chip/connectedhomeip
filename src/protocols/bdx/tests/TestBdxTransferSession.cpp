@@ -8,10 +8,7 @@
 
 #include <core/CHIPTLV.h>
 #include <protocols/secure_channel/Constants.h>
-<<<<<<< HEAD
 #include <protocols/secure_channel/StatusReport.h>
-=======
->>>>>>> master
 #include <support/BufferReader.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
@@ -117,12 +114,8 @@ void VerifyBdxMessageType(nlTestSuite * inSuite, void * inContext, const System:
 // Helper method for verifying that a PacketBufferHandle contains a valid StatusReport message and contains a specific StatusCode.
 void VerifyStatusReport(nlTestSuite * inSuite, void * inContext, const System::PacketBufferHandle & msg, StatusCode code)
 {
-    CHIP_ERROR err      = CHIP_NO_ERROR;
-    uint16_t headerSize = 0;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     PayloadHeader payloadHeader;
-    uint16_t generalCode = 0;
-    uint32_t protocolId  = 0;
-    BitFlags<StatusCode> protocolCode;
 
     if (msg.IsNull())
     {
@@ -130,31 +123,23 @@ void VerifyStatusReport(nlTestSuite * inSuite, void * inContext, const System::P
         return;
     }
 
-    err = payloadHeader.Decode(msg->Start(), msg->DataLength(), &headerSize);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-<<<<<<< HEAD
-    NL_TEST_ASSERT(inSuite, payloadHeader.GetProtocolID() == kProtocol_SecureChannel);
-    NL_TEST_ASSERT(inSuite, payloadHeader.GetMessageType() == static_cast<uint8_t>(SecureChannel::MsgType::StatusReport));
-=======
-    NL_TEST_ASSERT(inSuite, payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::StatusReport));
->>>>>>> master
-    if (headerSize > msg->DataLength())
+    System::PacketBufferHandle msgCopy = System::PacketBufferHandle::NewWithData(msg->Start(), msg->DataLength());
+    if (msgCopy.IsNull())
     {
         NL_TEST_ASSERT(inSuite, false);
         return;
     }
 
-    Encoding::LittleEndian::Reader reader(msg->Start(), msg->DataLength());
-    err = reader.Skip(headerSize).Read16(&generalCode).Read32(&protocolId).Read16(protocolCode.RawStorage()).StatusCode();
+    err = payloadHeader.DecodeAndConsume(msgCopy);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-<<<<<<< HEAD
-    NL_TEST_ASSERT(inSuite, generalCode == static_cast<uint16_t>(SecureChannel::GeneralStatusCode::kFailure));
-    NL_TEST_ASSERT(inSuite, protocolId == kProtocol_BDX);
-=======
-    NL_TEST_ASSERT(inSuite, generalCode == static_cast<uint16_t>(Protocols::SecureChannel::GeneralStatusCode::kFailure));
-    NL_TEST_ASSERT(inSuite, protocolId == Protocols::kProtocol_BDX);
->>>>>>> master
-    NL_TEST_ASSERT(inSuite, protocolCode == code);
+    NL_TEST_ASSERT(inSuite, payloadHeader.HasMessageType(SecureChannel::MsgType::StatusReport));
+
+    SecureChannel::StatusReport report;
+    err = report.Parse(std::move(msgCopy));
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, report.GetGeneralCode() == static_cast<uint16_t>(SecureChannel::GeneralStatusCode::kFailure));
+    NL_TEST_ASSERT(inSuite, report.GetProtocolId() == kProtocol_BDX);
+    NL_TEST_ASSERT(inSuite, report.GetProtocolCode() == static_cast<uint16_t>(code));
 }
 
 void VerifyNoMoreOutput(nlTestSuite * inSuite, void * inContext, TransferSession & transferSession)
