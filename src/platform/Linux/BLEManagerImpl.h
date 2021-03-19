@@ -52,17 +52,18 @@ struct BLEAdvConfig
     const char * mpAdvertisingUUID;
 };
 
-enum class BleScanState
+enum class BleScanState : uint8_t
 {
     kNotScanning,
     kScanForDiscriminator,
     kScanForAddress,
+    kConnecting,
 };
 
 struct BLEScanConfig
 {
-    // If a active scan for connection is being performed
-    BleScanState bleScanState = BleScanState::kNotScanning;
+    // If an active scan for connection is being performed
+    BleScanState mBleScanState = BleScanState::kNotScanning;
 
     // If scanning by discriminator, what are we scanning for
     uint16_t mDiscriminator = 0;
@@ -93,6 +94,7 @@ public:
 
     // Driven by BlueZ IO
     static void HandleNewConnection(BLE_CONNECTION_OBJECT conId);
+    static void HandleConnectFailed(CHIP_ERROR error);
     static void HandleWriteComplete(BLE_CONNECTION_OBJECT conId);
     static void HandleSubscribeOpComplete(BLE_CONNECTION_OBJECT conId, bool subscribed);
     static void HandleTXCharChanged(BLE_CONNECTION_OBJECT conId, const uint8_t * value, size_t len);
@@ -100,7 +102,6 @@ public:
     static void CHIPoBluez_ConnectionClosed(BLE_CONNECTION_OBJECT user_data);
     static void HandleTXCharCCCDWrite(BLE_CONNECTION_OBJECT user_data);
     static void HandleTXComplete(BLE_CONNECTION_OBJECT user_data);
-    static bool WoBLEz_TimerCb(BLE_CONNECTION_OBJECT user_data);
 
     static void NotifyBLEPeripheralRegisterAppComplete(bool aIsSuccess, void * apAppstate);
     static void NotifyBLEPeripheralAdvConfiguredComplete(bool aIsSuccess, void * apAppstate);
@@ -192,6 +193,7 @@ private:
 
     void InitiateScan(BleScanState scanType);
     static void InitiateScan(intptr_t arg);
+    void CleanScanConfig();
 
     CHIPoBLEServiceMode mServiceMode;
     BLEAdvConfig mBLEAdvConfig;

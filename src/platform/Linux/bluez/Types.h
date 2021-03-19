@@ -164,6 +164,7 @@ struct BluezEndpoint
     uint16_t mDuration; ///< Advertisement interval (in ms).
     bool mIsAdvertising;
     char * mpPeerDevicePath;
+    GCancellable * mpConnectCancellable = nullptr;
 };
 
 struct BluezConnection
