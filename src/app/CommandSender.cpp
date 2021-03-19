@@ -127,7 +127,7 @@ CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser &
 
         err = statusElementParser.DecodeStatusElement(&generalCode, &protocolId, &protocolCode, &clusterId);
         SuccessOrExit(err);
-        if (mpDelegate!= nullptr)
+        if (mpDelegate != nullptr)
         {
             mpDelegate->CommandStatus(generalCode, protocolId, protocolCode, clusterId);
         }

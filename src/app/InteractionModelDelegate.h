@@ -84,7 +84,10 @@ public:
      * @retval # CHIP_ERROR_NOT_IMPLEMENTED if not implemented
      */
     virtual CHIP_ERROR CommandStatus(const uint16_t aGeneralCode, const uint32_t aProtocolId, const uint16_t aProtocolCode,
-                             const chip::ClusterId aClusterId) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+                                     const chip::ClusterId aClusterId)
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
 
     virtual ~InteractionModelDelegate() = default;
 };

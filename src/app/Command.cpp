@@ -41,7 +41,7 @@ CHIP_ERROR Command::Init(Messaging::ExchangeManager * apExchangeMgr, Interaction
 
     mpExchangeMgr = apExchangeMgr;
     mpDelegate    = apDelegate;
-    err = Reset();
+    err           = Reset();
     SuccessOrExit(err);
 
 exit:
