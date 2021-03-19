@@ -507,20 +507,36 @@ menu "CHIP Device Layer"
                 However, due to other data sent in WoBLE advertise packets, the device name
                 may need to be shorter.
 
-        config BLE_FAST_ADVERTISING_INTERVAL
+        config BLE_FAST_ADVERTISING_INTERVAL_MIN
             int "Fast Advertising Interval"
-            default 320
+            default 32
             depends on ENABLE_CHIPOBLE
             help
-                The interval (in units of 0.625ms) at which the device will send BLE advertisements while
+                The minimum interval (in units of 0.625ms) at which the device will send BLE advertisements while
                 in fast advertising mode.
 
-        config BLE_SLOW_ADVERTISING_INTERVAL
-            int "Slow Advertising Interval"
-            default 3200
+        config BLE_FAST_ADVERTISING_INTERVAL_MAX
+            int "Fast Advertising Interval"
+            default 96
             depends on ENABLE_CHIPOBLE
             help
-                The interval (in units of 0.625ms) at which the device will send BLE advertisements while
+                The maximum interval (in units of 0.625ms) at which the device will send BLE advertisements while
+                in fast advertising mode.
+
+        config BLE_SLOW_ADVERTISING_INTERVAL_MIN
+            int "Slow Advertising Interval"
+            default 240
+            depends on ENABLE_CHIPOBLE
+            help
+                The minimum interval (in units of 0.625ms) at which the device will send BLE advertisements while
+                in slow advertising mode.
+
+        config BLE_SLOW_ADVERTISING_INTERVAL_MAX
+            int "Slow Advertising Interval"
+            default 1920
+            depends on ENABLE_CHIPOBLE
+            help
+                The maximum interval (in units of 0.625ms) at which the device will send BLE advertisements while
                 in slow advertising mode.
 
         config CHIPOBLE_SINGLE_CONNECTION
