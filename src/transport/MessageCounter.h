@@ -91,12 +91,14 @@ private:
 #if CONFIG_DEVICE_LAYER
     PersistedCounter persisted;
 #else
-    struct FakePersistedCounter {
+    struct FakePersistedCounter
+    {
         FakePersistedCounter() : value(0) {}
         CHIP_ERROR Init(chip::Platform::PersistedStorage::Key aId, uint32_t aEpoch) { return CHIP_NO_ERROR; }
 
         uint32_t GetValue() { return value; }
         uint32_t Advance() { return ++value; }
+
     private:
         uint32_t value;
     } persisted;

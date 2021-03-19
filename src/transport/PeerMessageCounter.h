@@ -58,7 +58,7 @@ public:
 
         mStatus             = Status::Synced;
         mSynced.mMaxCounter = counter;
-        mSynced.mWindow.set(); // set all bits, deny all packets with counter less than the given counter
+        mSynced.mWindow.set();         // set all bits, deny all packets with counter less than the given counter
         mSynced.mWindow.set(0, false); // expect next packet with counter equal to the given counter
         return CHIP_NO_ERROR;
     }

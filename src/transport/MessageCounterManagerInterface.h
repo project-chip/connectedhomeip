@@ -32,10 +32,10 @@ public:
     virtual MessageCounter & GetGlobalSecureCounter()                                       = 0;
     virtual MessageCounter & GetLocalSessionCounter(Transport::PeerConnectionState * state) = 0;
 
-    virtual bool IsSyncCompleted(Transport::PeerConnectionState * state)                                       = 0;
+    virtual bool IsSyncCompleted(Transport::PeerConnectionState * state) = 0;
 
     virtual CHIP_ERROR VerifyCounter(Transport::PeerConnectionState * state, const PacketHeader & packetHeader) = 0;
-    virtual void CommitCounter(Transport::PeerConnectionState * state, const PacketHeader & packetHeader) = 0;
+    virtual void CommitCounter(Transport::PeerConnectionState * state, const PacketHeader & packetHeader)       = 0;
 
     /**
      * Start sync if the sync procedure is not started yet.
