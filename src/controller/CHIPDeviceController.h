@@ -199,6 +199,7 @@ protected:
     uint16_t FindDeviceIndex(NodeId id);
     void ReleaseDevice(uint16_t index);
     void ReleaseDeviceById(NodeId remoteDeviceId);
+    CHIP_ERROR InitializePairedDeviceList();
     CHIP_ERROR SetPairedDeviceList(const char * pairedDeviceSerializedSet);
 
     Transport::AdminId mAdminId = 0;
