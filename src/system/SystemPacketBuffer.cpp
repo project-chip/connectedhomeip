@@ -127,7 +127,7 @@ constexpr uint16_t kRightSizingThreshold = 16;
 void PacketBufferHandle::InternalRightSize()
 {
     // Require a single buffer with no other references.
-    if ((mBuffer == nullptr) || (mBuffer->next != nullptr) || (mBuffer->ref != 1))
+    if ((mBuffer == nullptr) || mBuffer->HasChainedBuffer() || (mBuffer->ref != 1))
     {
         return;
     }
@@ -230,7 +230,7 @@ void PacketBuffer::SetDataLength(uint16_t aNewLen, PacketBuffer * aChainHead)
     {
         Check(aChainHead);
         aChainHead->tot_len = static_cast<uint16_t>(aChainHead->tot_len + lDelta);
-        aChainHead          = static_cast<PacketBuffer *>(aChainHead->next);
+        aChainHead          = aChainHead->ChainedBuffer();
     }
 }
 
@@ -269,13 +269,13 @@ void PacketBuffer::AddToEnd(PacketBufferHandle && aPacketHandle)
         uint16_t old_total_length = lCursor->tot_len;
         lCursor->tot_len          = static_cast<uint16_t>(lCursor->tot_len + aPacket->tot_len);
         VerifyOrDieWithMsg(lCursor->tot_len >= old_total_length, chipSystemLayer, "buffer chain too large");
-        if (lCursor->next == nullptr)
+        if (!lCursor->HasChainedBuffer())
         {
             lCursor->next = aPacket;
             break;
         }
 
-        lCursor = static_cast<PacketBuffer *>(lCursor->next);
+        lCursor = lCursor->ChainedBuffer();
     }
 #endif // !CHIP_SYSTEM_CONFIG_USE_LWIP
 }
@@ -292,9 +292,9 @@ void PacketBuffer::CompactHead()
 
     uint16_t lAvailLength = this->AvailableDataLength();
 
-    while (lAvailLength > 0 && this->next != nullptr)
+    while (lAvailLength > 0 && HasChainedBuffer())
     {
-        PacketBuffer & lNextPacket = *static_cast<PacketBuffer *>(this->next);
+        PacketBuffer & lNextPacket = *ChainedBuffer();
         VerifyOrDieWithMsg(lNextPacket.ref == 1, chipSystemLayer, "next buffer %p is not exclusive to this chain", &lNextPacket);
 
         uint16_t lMoveLength = lNextPacket.len;
@@ -477,7 +477,7 @@ PacketBufferHandle PacketBufferHandle::New(size_t aAvailableSize, uint16_t aRese
     lPacket = PacketBuffer::sFreeList;
     if (lPacket != nullptr)
     {
-        PacketBuffer::sFreeList = static_cast<PacketBuffer *>(lPacket->next);
+        PacketBuffer::sFreeList = lPacket->ChainedBuffer();
         SYSTEM_STATS_INCREMENT(chip::System::Stats::kSystemLayer_NumPacketBufs);
     }
 
@@ -556,7 +556,7 @@ void PacketBuffer::Free(PacketBuffer * aPacket)
 
     while (aPacket != nullptr)
     {
-        PacketBuffer * lNextPacket = static_cast<PacketBuffer *>(aPacket->next);
+        PacketBuffer * lNextPacket = aPacket->ChainedBuffer();
 
         VerifyOrDieWithMsg(aPacket->ref > 0, chipSystemLayer, "SystemPacketBuffer::Free: aPacket->ref = 0");
 
@@ -615,7 +615,7 @@ void PacketBuffer::Clear()
  */
 PacketBuffer * PacketBuffer::FreeHead(PacketBuffer * aPacket)
 {
-    PacketBuffer * lNextPacket = static_cast<PacketBuffer *>(aPacket->next);
+    PacketBuffer * lNextPacket = aPacket->ChainedBuffer();
     aPacket->next              = nullptr;
     PacketBuffer::Free(aPacket);
     return lNextPacket;
@@ -626,7 +626,7 @@ PacketBufferHandle PacketBufferHandle::PopHead()
     PacketBuffer * head = mBuffer;
 
     // This takes ownership from the `next` link.
-    mBuffer = static_cast<PacketBuffer *>(mBuffer->next);
+    mBuffer = mBuffer->ChainedBuffer();
 
     head->next    = nullptr;
     head->tot_len = head->len;
@@ -639,7 +639,7 @@ PacketBufferHandle PacketBufferHandle::CloneData()
 {
     PacketBufferHandle cloneHead;
 
-    for (PacketBuffer * original = mBuffer; original != nullptr; original = static_cast<PacketBuffer *>(original->next))
+    for (PacketBuffer * original = mBuffer; original != nullptr; original = original->ChainedBuffer())
     {
         uint16_t originalDataSize     = original->MaxDataLength();
         uint16_t originalReservedSize = original->ReservedSize();
