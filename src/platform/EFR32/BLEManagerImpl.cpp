@@ -1064,7 +1064,7 @@ void BLEManagerImpl::BleAdvTimeoutHandler(TimerHandle_t xTimer)
     CHIP_ERROR err;
     sl_status_t ret;
 
-    if (sInstance._IsFastAdvertisingEnabled())
+    if (sInstance.mFlags.Has(Flags::kFastAdvertisingEnabled))
     {
         ChipLogDetail(DeviceLayer, "bleAdv Timeout : Start slow advertissment");
 
