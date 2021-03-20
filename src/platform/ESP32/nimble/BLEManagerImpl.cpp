@@ -34,6 +34,7 @@
 #include <platform/internal/BLEManager.h>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
+#include <system/SystemTimer.h>
 
 #include "esp_log.h"
 #include "esp_nimble_hci.h"
@@ -92,6 +93,10 @@ const ble_uuid128_t UUID_CHIPoBLEChar_TX   = {
 } // unnamed namespace
 
 BLEManagerImpl BLEManagerImpl::sInstance;
+
+BLEManagerImpl::BLEManagerImpl() :
+    mAdvertiseTimerCallback(HandleAdvertisementTimer, this), mFastAdvertiseTimerCallback(HandleFastAdvertisementTimer, this)
+{}
 
 const struct ble_gatt_svc_def BLEManagerImpl::CHIPoBLEGATTAttrs[] = {
     { .type = BLE_GATT_SVC_TYPE_PRIMARY,
@@ -165,14 +170,54 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
 
     VerifyOrExit(mServiceMode != ConnectivityManager::kCHIPoBLEServiceMode_NotSupported, err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
-    if (GetFlag(mFlags, kFlag_AdvertisingEnabled) != val)
+    if (val)
     {
-        SetFlag(mFlags, kFlag_AdvertisingEnabled, val);
-        PlatformMgr().ScheduleWork(DriveBLEState, 0);
+        mAdvertiseStartTime = System::Timer::GetCurrentEpoch();
+        SystemLayer.StartTimer(kAdvertiseTimeout, &mAdvertiseTimerCallback);
+        SystemLayer.StartTimer(kFastAdvertiseTimeout, &mFastAdvertiseTimerCallback);
     }
+
+    SetFlag(mFlags, kFlag_FastAdvertisingEnabled, val);
+    SetFlag(mFlags, kFlag_AdvertisingRefreshNeeded, 1);
+    SetFlag(mFlags, kFlag_AdvertisingEnabled, val);
+    PlatformMgr().ScheduleWork(DriveBLEState, 0);
 
 exit:
     return err;
+}
+
+void BLEManagerImpl::HandleAdvertisementTimer(void * context)
+{
+    static_cast<BLEManagerImpl *>(context)->HandleAdvertisementTimer();
+}
+
+void BLEManagerImpl::HandleAdvertisementTimer()
+{
+    uint64_t currentTimestamp = System::Timer::GetCurrentEpoch();
+
+    if (currentTimestamp - mAdvertiseStartTime >= kAdvertiseTimeout)
+    {
+
+        SetFlag(mFlags, kFlag_AdvertisingEnabled, 0);
+        PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    }
+}
+
+void BLEManagerImpl::HandleFastAdvertisementTimer(void * context)
+{
+    static_cast<BLEManagerImpl *>(context)->HandleFastAdvertisementTimer();
+}
+
+void BLEManagerImpl::HandleFastAdvertisementTimer()
+{
+    uint64_t currentTimestamp = System::Timer::GetCurrentEpoch();
+
+    if (currentTimestamp - mAdvertiseStartTime >= kFastAdvertiseTimeout)
+    {
+        SetFlag(mFlags, kFlag_FastAdvertisingEnabled, 0);
+        SetFlag(mFlags, kFlag_AdvertisingRefreshNeeded, 1);
+        PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    }
 }
 
 CHIP_ERROR BLEManagerImpl::_SetFastAdvertisingEnabled(bool val)

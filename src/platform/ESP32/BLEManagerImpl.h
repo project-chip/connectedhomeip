@@ -31,6 +31,7 @@
 
 #if CONFIG_BT_BLUEDROID_ENABLED
 
+#include "core/CHIPCallback.h"
 #include "esp_bt.h"
 #include "esp_gap_ble_api.h"
 #include "esp_gatts_api.h"
@@ -67,6 +68,10 @@ class BLEManagerImpl final : public BLEManager,
                              private Ble::BlePlatformDelegate,
                              private Ble::BleApplicationDelegate
 {
+public:
+    BLEManagerImpl();
+
+private:
     // Allow the BLEManager interface class to delegate method calls to
     // the implementation methods provided by this class.
     friend BLEManager;
@@ -207,6 +212,17 @@ class BLEManagerImpl final : public BLEManager,
     static void HandleGAPEvent(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t * param);
 
 #elif CONFIG_BT_NIMBLE_ENABLED
+    static constexpr uint32_t kAdvertiseTimeout     = CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT;
+    static constexpr uint32_t kFastAdvertiseTimeout = CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME;
+    uint64_t mAdvertiseStartTime;
+    chip::Callback::Callback<> mAdvertiseTimerCallback;
+    chip::Callback::Callback<> mFastAdvertiseTimerCallback;
+
+    static void HandleFastAdvertisementTimer(void * context);
+    void HandleFastAdvertisementTimer();
+    static void HandleAdvertisementTimer(void * context);
+    void HandleAdvertisementTimer();
+
     void HandleRXCharRead(struct ble_gatt_char_context * param);
     void HandleRXCharWrite(struct ble_gatt_char_context * param);
     void HandleTXCharWrite(struct ble_gatt_char_context * param);
