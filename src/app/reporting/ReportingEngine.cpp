@@ -101,7 +101,7 @@ CHIP_ERROR ReportingEngine::BuildAndSendSingleReportData(ReadHandler * apReadHan
 
 exit:
     ChipLogFunctError(err);
-    if(!mMoreChunkedMessages || err != CHIP_NO_ERROR)
+    if (!mMoreChunkedMessages || err != CHIP_NO_ERROR)
     {
         apReadHandler->Shutdown();
     }

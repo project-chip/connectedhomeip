@@ -126,6 +126,7 @@ public:
     uint16_t GetReadClientArrayIndex(const ReadClient * const apReadClient) const;
 
     reporting::ReportingEngine * GetReportingEngine(void) { return &mReportingEngine; }
+
 private:
     friend class reporting::ReportingEngine;
     void OnUnknownMsgType(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
