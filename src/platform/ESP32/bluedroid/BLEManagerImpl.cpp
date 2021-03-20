@@ -125,6 +125,8 @@ const uint16_t CHIPoBLEGATTAttrCount = sizeof(CHIPoBLEGATTAttrs) / sizeof(CHIPoB
 
 BLEManagerImpl BLEManagerImpl::sInstance;
 
+BLEManagerImpl::BLEManagerImpl() {}
+
 CHIP_ERROR BLEManagerImpl::_Init()
 {
     CHIP_ERROR err;
