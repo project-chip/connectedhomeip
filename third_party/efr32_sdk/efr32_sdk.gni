@@ -221,6 +221,7 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/hardware/kit/common/bsp/bsp_init.c",
       "${efr32_sdk_root}/hardware/kit/common/bsp/bsp_stk.c",
       "${efr32_sdk_root}/hardware/kit/common/bsp/bsp_stk_leds.c",
+      "${efr32_sdk_root}/hardware/kit/common/drivers/retargetserial.c",
       "${efr32_sdk_root}/hardware/kit/common/drivers/udelay.c",
       "${efr32_sdk_root}/platform/bootloader/plugin/security/sha/crypto_sha.c",
       "${efr32_sdk_root}/platform/common/src/sl_slist.c",
