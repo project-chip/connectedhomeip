@@ -201,7 +201,7 @@ static void TestChipCert_MultiOID(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 #if 0
     ChipCertificateSet certSet;
-    ValidationContext validContext;        
+    ValidationContext validContext;
     // Locate the subject DN and key id that will be used as input the FindValidCert() method.
     const ChipDN & subjectDN = certSet.GetCertSet()[testCase.mSubjectCertIndex].mSubjectDN;
     const CertificateKeyId & subjectKeyId = certSet.GetCertSet()[testCase.mSubjectCertIndex].mSubjectKeyId;
