@@ -25,9 +25,11 @@
 #pragma once
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
+#include "FreeRTOS.h"
 #include "gatt_db.h"
 #include "sl_bgapi.h"
 #include "sl_bt_api.h"
+#include "timers.h"
 
 namespace chip {
 namespace DeviceLayer {
@@ -142,10 +144,13 @@ class BLEManagerImpl final : public BLEManager, private BleLayer, private BlePla
     void HandleSoftTimerEvent(volatile sl_bt_msg_t * evt);
     bool RemoveConnection(uint8_t connectionHandle);
     void AddConnection(uint8_t connectionHandle, uint8_t bondingHandle);
+    void StartBleAdvTimeoutTimer(uint32_t aTimeoutInMs);
+    void CancelBleAdvTimeoutTimer(void);
     CHIPoBLEConState * GetConnectionState(uint8_t conId, bool allocate = false);
     uint8_t GetTimerHandle(uint8_t connectionHandle, bool allocate = false);
     static void DriveBLEState(intptr_t arg);
     static void bluetoothStackEventHandler(void * p_arg);
+    static void BleAdvTimeoutHandler(TimerHandle_t xTimer);
 };
 
 /**
