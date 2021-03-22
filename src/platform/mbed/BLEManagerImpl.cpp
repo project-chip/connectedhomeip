@@ -420,6 +420,11 @@ struct CHIPService : public ble::GattServer::EventHandler
     void onDataSent(const GattDataSentCallbackParams & params) override
     {
         ChipLogDetail(DeviceLayer, "GATT %s, connHandle=%d, attHandle=%d", __FUNCTION__, params.connHandle, params.attHandle);
+
+        // FIXME: ACK hack
+#if (defined(MBED_CONF_APP_USE_GATT_INDICATION_ACK_HACK) && (MBED_CONF_APP_USE_GATT_INDICATION_ACK_HACK != 0))
+        onConfirmationReceived(params);
+#endif
     }
 
     void onDataWritten(const GattWriteCallbackParams & params) override
