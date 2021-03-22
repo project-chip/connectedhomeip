@@ -34,7 +34,7 @@ make sure the IDF_PATH has been exported(See the manual setup steps above).
           $ . ./export.sh
           $ cd {path-to-connectedhomeip}
           $ source ./scripts/bootstrap.sh
-          $ source ./scripts/activate.sh 
+          $ source ./scripts/activate.sh
           $ cd {path-to-connectedhomeip-examples}
 
 -   Configuration Options
