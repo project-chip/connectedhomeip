@@ -336,8 +336,8 @@ CHIP_ERROR ChipCertificateSet::AddTrustedKey(uint64_t caId, OID curveOID, const 
 
     cert = new (&mCerts[mCertCount]) ChipCertificateData();
 
-    cert->mSubjectDN.mAttrOID           = kOID_AttributeType_ChipCAId;
-    cert->mSubjectDN.mAttrValue.mChipId = caId;
+    cert->mSubjectDN.Add(kOID_AttributeType_ChipCAId, caId);
+
     cert->mIssuerDN                     = cert->mSubjectDN;
     cert->mPubKeyCurveOID               = curveOID;
     cert->mPublicKey                    = pubKey;
@@ -674,7 +674,7 @@ CHIP_ERROR DetermineCertType(ChipCertificateData & cert)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // If the certificate subject contains a ChipCAId attribute...
-    if (cert.mSubjectDN.mAttrOID == kOID_AttributeType_ChipCAId)
+    if (cert.mSubjectDN.Has(kOID_AttributeType_ChipCAId))
     {
         // Verify the BasicConstraints isCA flag is true.
         VerifyOrExit(cert.mCertFlags.Has(CertFlags::kIsCA), err = CHIP_ERROR_CERT_USAGE_NOT_ALLOWED);
@@ -688,13 +688,13 @@ CHIP_ERROR DetermineCertType(ChipCertificateData & cert)
     }
 
     // If the certificate subject contains a ChipNodeId attribute set the certificate type to Node.
-    else if (cert.mSubjectDN.mAttrOID == kOID_AttributeType_ChipNodeId)
+    else if (cert.mSubjectDN.Has(kOID_AttributeType_ChipNodeId))
     {
         cert.mCertType = kCertType_Node;
     }
 
     // If the certificate subject contains a ChipSoftwarePublisherId attribute set the certificate type to FirmwareSigning.
-    else if (cert.mSubjectDN.mAttrOID == kOID_AttributeType_ChipSoftwarePublisherId)
+    else if (cert.mSubjectDN.Has(kOID_AttributeType_ChipSoftwarePublisherId))
     {
         cert.mCertType = kCertType_FirmwareSigning;
     }
@@ -710,20 +710,99 @@ exit:
 
 bool ChipDN::IsEqual(const ChipDN & other) const
 {
-    if (mAttrOID == kOID_Unknown || mAttrOID == kOID_NotSpecified || mAttrOID != other.mAttrOID)
+    for (int i = 0; i < RDN_NUM; ++i)
     {
-        return false;
-    }
+        if (mAttrOID[i] == kOID_Unknown || mAttrOID[i] == kOID_NotSpecified)
+	    continue;
 
-    if (IsChipIdX509Attr(mAttrOID))
-    {
-        return mAttrValue.mChipId == other.mAttrValue.mChipId;
+        int j = 0;
+        for (; j < RDN_NUM; ++j)
+        {
+	    if (mAttrOID[i] == other.mAttrOID[i])
+                break;
+        }
+
+        if (j == RDN_NUM)
+            continue;
+
+        if (IsChipX509Attr(mAttrOID[i]))
+        {
+            if (mAttrValue[i].mChipId != other.mAttrValue[j].mChipId)
+                return false;
+        }
+        else
+        {
+            if (mAttrValue[i].mString.mLen != other.mAttrValue[j].mString.mLen ||
+                memcmp(
+                    mAttrValue[i].mString.mValue,
+                    other.mAttrValue[j].mString.mValue,
+                    mAttrValue[i].mString.mLen
+                ) != 0
+            ) return false;
+        }
     }
-    else
+    return true;
+}
+
+bool ChipDN::IsEmpty() const
+{
+    int i = 0;
+
+    for (; i < RDN_NUM; ++i)
     {
-        return (mAttrValue.mString.mLen == other.mAttrValue.mString.mLen &&
-                memcmp(mAttrValue.mString.mValue, other.mAttrValue.mString.mValue, mAttrValue.mString.mLen) == 0);
+        if (mAttrOID[i] != chip::ASN1::kOID_NotSpecified)
+        {
+            return false;
+        }
     }
+    return true;
+}
+
+void ChipDN::Clear()
+{
+    int i = 0;
+
+    for (; i < RDN_NUM; ++i)
+    {
+        mAttrOID[i] = chip::ASN1::kOID_NotSpecified;
+    }
+}
+
+void ChipDN::Add(chip::ASN1::OID attrOID, uint64_t chipId)
+{
+    for (int i = 0; i < RDN_NUM; ++i)
+    {
+        if (mAttrOID[i] == chip::ASN1::kOID_NotSpecified || mAttrOID[i] == attrOID)
+        {
+            mAttrOID[i] = attrOID;
+            mAttrValue[i].mChipId = chipId;
+            return;
+	}
+    }
+}
+
+void ChipDN::Add(chip::ASN1::OID attrOID, const uint8_t * strVal, uint32_t strLen)
+{
+    for (int i = 0; i < RDN_NUM; ++i)
+    {
+        if (mAttrOID[i] == chip::ASN1::kOID_NotSpecified || mAttrOID[i] == attrOID)
+        {
+            mAttrOID[i] = attrOID;
+            mAttrValue[i].mString.mValue = strVal;
+            mAttrValue[i].mString.mLen = strLen;
+            return;
+        }
+    }
+}
+
+bool ChipDN::Has(chip::ASN1::OID attrOID) const
+{
+    for (int i = 0; i < RDN_NUM; ++i)
+    {
+        if (mAttrOID[i] == attrOID)
+           return true;
+    }
+    return false;
 }
 
 bool CertificateKeyId::IsEqual(const CertificateKeyId & other) const

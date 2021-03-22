@@ -78,128 +78,115 @@ static CHIP_ERROR DecodeConvertDN(TLVReader & reader, ASN1Writer & writer, ChipD
 
     // Read the first TLV element in the List.  This represents the first RDN in the original ASN.1 DN.
     //
-    // NOTE: Although CHIP certificate encoding allows for DNs containing multiple RDNs, and/or multiple
-    // attributes per RDN, this implementation only supports DNs with a single RDN that contains exactly
-    // one attribute.
-    //
-    err = reader.Next();
-    SuccessOrExit(err);
-
-    // Get the TLV tag, make sure it is a context tag and extract the context tag number.
-    tlvTag = reader.GetTag();
-    VerifyOrExit(IsContextTag(tlvTag), err = CHIP_ERROR_INVALID_TLV_TAG);
-    tlvTagNum = TagNumFromTag(tlvTag);
-
-    // Get the element type.
-    elemType = reader.GetType();
-
-    // Derive the OID of the corresponding ASN.1 attribute from the TLV tag number.
-    // The numeric value of the OID is encoded in the bottom 7 bits of the TLV tag number.
-    // This eliminates the need for a translation table/switch statement but has the
-    // effect of tying the two encodings together.
-    //
-    // NOTE: In the event that the computed OID value is not one that we recognize
-    // (specifically, is not in the table of OIDs defined in ASN1OID.h) then the
-    // macro call below that encodes the attribute's object id (ASN1_ENCODE_OBJECT_ID)
-    // will fail for lack of the OID's encoded representation.  Given this there's no
-    // need to test the validity of the OID here.
-    //
-    attrOID = GetOID(kOIDCategory_AttributeType, static_cast<uint8_t>(tlvTagNum & 0x7f));
-
-    // Save the attribute OID in the caller's DN structure.
-    dn.mAttrOID = attrOID;
-
-    // If the attribute is one of the CHIP-defined X.509 attributes that contains a CHIP id...
-    if (IsChipIdX509Attr(attrOID))
-    {
-        // Verify that the underlying TLV data type is unsigned integer.
-        VerifyOrExit(elemType == kTLVType_UnsignedInteger, err = CHIP_ERROR_WRONG_TLV_TYPE);
-
-        // Read the value of the CHIP id.
-        uint64_t chipId;
-        err = reader.Get(chipId);
-        SuccessOrExit(err);
-
-        // Generate the string representation of the id that will appear in the ASN.1 attribute.
-        // For CHIP ids the string representation is *always* 16 uppercase hex characters.
-        snprintf(reinterpret_cast<char *>(chipIdStr), sizeof(chipIdStr), "%016" PRIX64, chipId);
-        asn1AttrVal    = chipIdStr;
-        asn1AttrValLen = 16;
-
-        // The ASN.1 tag for CHIP id attributes is always UTF8String.
-        asn1Tag = kASN1UniversalTag_UTF8String;
-
-        // Save the CHIP id value in the caller's DN structure.
-        dn.mAttrValue.mChipId = chipId;
-    }
-
-    // Otherwise the attribute is either one of the supported X.509 attributes or a CHIP-defined
-    // attribute that is *not* a CHIP id...
-    else
-    {
-        // Verify that the underlying data type is UTF8 string.
-        VerifyOrExit(elemType == kTLVType_UTF8String, err = CHIP_ERROR_WRONG_TLV_TYPE);
-
-        // Get a pointer the underlying string data, plus its length.
-        err = reader.GetDataPtr(asn1AttrVal);
-        SuccessOrExit(err);
-        asn1AttrValLen = reader.GetLength();
-
-        // Determine the appropriate ASN.1 tag for the DN attribute.
-        // - CHIP-defined attributes are always UTF8Strings.
-        // - DomainComponent is always an IA5String.
-        // - For all other ASN.1 defined attributes, bit 0x80 in the TLV tag value conveys whether the attribute
-        //   is a UTF8String or a PrintableString (in some cases the certificate generator has a choice).
-        if (IsChipX509Attr(attrOID))
-        {
-            asn1Tag = kASN1UniversalTag_UTF8String;
-        }
-        else if (attrOID == kOID_AttributeType_DomainComponent)
-        {
-            asn1Tag = kASN1UniversalTag_IA5String;
-        }
-        else
-        {
-            asn1Tag = (tlvTagNum & 0x80) ? kASN1UniversalTag_PrintableString : kASN1UniversalTag_UTF8String;
-        }
-
-        // Save the string value in the caller's DN structure.
-        dn.mAttrValue.mString.mValue = asn1AttrVal;
-        dn.mAttrValue.mString.mLen   = asn1AttrValLen;
-    }
-
-    // Verify that there are no further elements in the DN.
-    err = reader.VerifyEndOfContainer();
-    SuccessOrExit(err);
-
-    err = reader.ExitContainer(outerContainer);
-    SuccessOrExit(err);
-
-    // Write the ASN.1 representation of the DN...
-
     // RDNSequence ::= SEQUENCE OF RelativeDistinguishedName
     ASN1_START_SEQUENCE
     {
-        // RelativeDistinguishedName ::= SET SIZE (1..MAX) OF AttributeTypeAndValue
-        ASN1_START_SET
+        while ((err = reader.Next()) == CHIP_NO_ERROR)
         {
-            // AttributeTypeAndValue ::= SEQUENCE
-            ASN1_START_SEQUENCE
-            {
-                // type AttributeType
-                // AttributeType ::= OBJECT IDENTIFIER
-                ASN1_ENCODE_OBJECT_ID(attrOID);
+            // Get the TLV tag, make sure it is a context tag and extract the context tag number.
+            tlvTag = reader.GetTag();
+            VerifyOrExit(IsContextTag(tlvTag), err = CHIP_ERROR_INVALID_TLV_TAG);
+            tlvTagNum = TagNumFromTag(tlvTag);
 
-                // value AttributeValue
-                // AttributeValue ::= ANY -- DEFINED BY AttributeType
-                err = writer.PutString(asn1Tag, Uint8::to_const_char(asn1AttrVal), static_cast<uint16_t>(asn1AttrValLen));
+            // Get the element type.
+            elemType = reader.GetType();
+
+            // Derive the OID of the corresponding ASN.1 attribute from the TLV tag number.
+            // The numeric value of the OID is encoded in the bottom 7 bits of the TLV tag number.
+            // This eliminates the need for a translation table/switch statement but has the
+            // effect of tying the two encodings together.
+            //
+            // NOTE: In the event that the computed OID value is not one that we recognize
+            // (specifically, is not in the table of OIDs defined in ASN1OID.h) then the
+            // macro call below that encodes the attribute's object id (ASN1_ENCODE_OBJECT_ID)
+            // will fail for lack of the OID's encoded representation.  Given this there's no
+            // need to test the validity of the OID here.
+            //
+            attrOID = GetOID(kOIDCategory_AttributeType, static_cast<uint8_t>(tlvTagNum & 0x7f));
+
+            // If the attribute is one of the CHIP-defined X.509 attributes that contains a CHIP id...
+            if (IsChipX509Attr(attrOID))
+            {
+                // Verify that the underlying TLV data type is unsigned integer.
+                VerifyOrExit(elemType == kTLVType_UnsignedInteger, err = CHIP_ERROR_WRONG_TLV_TYPE);
+
+                // Read the value of the CHIP id.
+                uint64_t chipId;
+                err = reader.Get(chipId);
                 SuccessOrExit(err);
+
+                // Generate the string representation of the id that will appear in the ASN.1 attribute.
+                // For CHIP ids the string representation is *always* 16 uppercase hex characters.
+                snprintf(reinterpret_cast<char *>(chipIdStr), sizeof(chipIdStr), "%016" PRIX64, chipId);
+                asn1AttrVal    = chipIdStr;
+                asn1AttrValLen = 16;
+
+                // The ASN.1 tag for CHIP id attributes is always UTF8String.
+                asn1Tag = kASN1UniversalTag_UTF8String;
+
+                // Save the CHIP id value in the caller's DN structure.
+                dn.Add(attrOID, chipId);
             }
-            ASN1_END_SEQUENCE;
+
+            // Otherwise the attribute is either one of the supported X.509 attributes or a CHIP-defined
+            // attribute that is *not* a CHIP id...
+            else
+            {
+                // Verify that the underlying data type is UTF8 string.
+                VerifyOrExit(elemType == kTLVType_UTF8String, err = CHIP_ERROR_WRONG_TLV_TYPE);
+
+                // Get a pointer the underlying string data, plus its length.
+                err = reader.GetDataPtr(asn1AttrVal);
+                SuccessOrExit(err);
+                asn1AttrValLen = reader.GetLength();
+
+                // Determine the appropriate ASN.1 tag for the DN attribute.
+                // - CHIP-defined attributes are always UTF8Strings.
+                // - DomainComponent is always an IA5String.
+                // - For all other ASN.1 defined attributes, bit 0x80 in the TLV tag value conveys whether the attribute
+                //   is a UTF8String or a PrintableString (in some cases the certificate generator has a choice).
+                if (IsChipX509Attr(attrOID))
+                {
+                    asn1Tag = kASN1UniversalTag_UTF8String;
+                }
+                else if (attrOID == kOID_AttributeType_DomainComponent)
+                {
+                    asn1Tag = kASN1UniversalTag_IA5String;
+                }
+                else
+                {
+                    asn1Tag = (tlvTagNum & 0x80) ? kASN1UniversalTag_PrintableString : kASN1UniversalTag_UTF8String;
+                }
+
+                // Save the string value in the caller's DN structure.
+                dn.Add(attrOID, asn1AttrVal, asn1AttrValLen);
+            }
+
+            // Write the ASN.1 representation of the DN...
+
+            // RelativeDistinguishedName ::= SET SIZE (1..MAX) OF AttributeTypeAndValue
+            ASN1_START_SET
+            {
+                // AttributeTypeAndValue ::= SEQUENCE
+                ASN1_START_SEQUENCE
+                {
+                    // type AttributeType
+                    // AttributeType ::= OBJECT IDENTIFIER
+                    ASN1_ENCODE_OBJECT_ID(attrOID);
+
+                    // value AttributeValue
+                    // AttributeValue ::= ANY -- DEFINED BY AttributeType
+                    err = writer.PutString(asn1Tag, Uint8::to_const_char(asn1AttrVal), static_cast<uint16_t>(asn1AttrValLen));
+                    SuccessOrExit(err);
+                }
+                ASN1_END_SEQUENCE;
+            }
+            ASN1_END_SET;
         }
-        ASN1_END_SET;
     }
     ASN1_END_SEQUENCE;
+
+    err = reader.ExitContainer(outerContainer);
 
 exit:
     return err;

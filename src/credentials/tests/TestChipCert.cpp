@@ -186,6 +186,30 @@ static void TestChipCert_X509ToChip(nlTestSuite * inSuite, void * inContext)
     }
 }
 
+static void TestChipCert_MultiOID(nlTestSuite * inSuite, void * inContext)
+{
+    CHIP_ERROR err;
+    uint8_t outCertBuf[kTestCertBufSize];
+    uint32_t outCertLen;
+    ChipCertificateData certData;
+
+    err = ConvertX509CertToChipCert(sTestCert_2OIDs_Node01_DER, sTestCert_2OIDs_Node01_DER_Len, outCertBuf, sizeof(outCertBuf), outCertLen);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    err = DecodeChipCert(outCertBuf, outCertLen, certData);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    err = DetermineCertType(certData);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+#if 0
+    ChipCertificateSet certSet;
+    ValidationContext validContext;        
+    // Locate the subject DN and key id that will be used as input the FindValidCert() method.
+    const ChipDN & subjectDN = certSet.GetCertSet()[testCase.mSubjectCertIndex].mSubjectDN;
+    const CertificateKeyId & subjectKeyId = certSet.GetCertSet()[testCase.mSubjectCertIndex].mSubjectKeyId;
+    // Invoke the FindValidCert() method (the method being tested).
+    err = certSet.FindValidCert(subjectDN, subjectKeyId, validContext, resultCert);
+#endif
+}
+
 static void TestChipCert_CertValidation(nlTestSuite * inSuite, void * inContext)
 {
     CHIP_ERROR err;
@@ -646,6 +670,7 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test CHIP Certificate Validation time", TestChipCert_CertValidTime),
     NL_TEST_DEF("Test CHIP Certificate Usage", TestChipCert_CertUsage),
     NL_TEST_DEF("Test CHIP Certificate Type", TestChipCert_CertType),
+    NL_TEST_DEF("Test CHIP Certificate Multiple OIDs", TestChipCert_MultiOID),
     NL_TEST_SENTINEL()
 };
 // clang-format on
