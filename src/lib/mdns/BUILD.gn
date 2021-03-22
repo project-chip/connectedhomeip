@@ -28,8 +28,8 @@ static_library("mdns") {
 
   sources = [
     "Advertiser.h",
-    "Helper.h",
     "Helper.cpp",
+    "Helper.h",
     "Resolver.h",
   ]
 
