@@ -30,6 +30,7 @@ chip_test_suite("tests") {
     "TestCHIPMem.cpp",
     "TestErrorStr.cpp",
     "TestPool.cpp",
+    "TestPrivateHeap.cpp",
     "TestSafeInt.cpp",
     "TestSafeString.cpp",
     "TestScopedBuffer.cpp",
