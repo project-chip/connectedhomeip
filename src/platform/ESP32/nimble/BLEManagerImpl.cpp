@@ -527,8 +527,6 @@ void BLEManagerImpl::bleprph_on_reset(int reason)
 
 void BLEManagerImpl::bleprph_on_sync(void)
 {
-    int rc;
-
     SetFlag(sInstance.mFlags, kFlag_ESPBLELayerInitialized);
     SetFlag(sInstance.mFlags, kFlag_GATTServiceStarted);
     ESP_LOGI(TAG, "BLE host-controller synced");
