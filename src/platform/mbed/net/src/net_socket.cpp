@@ -32,12 +32,14 @@ nsapi_version_t Inet2Nsapi(int family)
 void msghdr2Netsocket(SocketAddress * dst, struct sockaddr_in * src)
 {
     dst->set_ip_bytes(src->sin_addr.s4_addr, Inet2Nsapi(src->sin_family));
+    dst->set_port(ntohs(src->sin_port));
 }
 
 void Sockaddr2Netsocket(SocketAddress * dst, struct sockaddr * src)
 {
     sockaddr_in * addr = reinterpret_cast<sockaddr_in *>(src);
     dst->set_ip_bytes(addr->sin_addr.s4_addr, Inet2Nsapi(src->sa_family));
+    dst->set_port(ntohs(addr->sin_port));
 }
 
 static Socket * getSocket(int fd)
@@ -200,14 +202,28 @@ ssize_t mbed_sendmsg(int fd, const struct msghdr * message, int flags)
 
     msghdr2Netsocket(&sockAddr, (struct sockaddr_in *) message->msg_name);
 
-    auto ret = socket->sendto(sockAddr, (void *) message, sizeof(msghdr));
-    if (ret < 0)
+    ssize_t total = 0;
+    ssize_t written;
+    for (int i = 0; i < message->msg_iovlen; i++)
+    {
+        written = socket->sendto(sockAddr, (void *) message->msg_iov[i].iov_base, message->msg_iov[i].iov_len);
+        if (written < 0)
+        {
+            return written;
+        }
+        total += written;
+        if (written != message->msg_iov[i].iov_len)
+        {
+            return total;
+        }
+    }
+    if (total < 0)
     {
         set_errno(ENOBUFS);
         return -1;
     }
     ::write(fd, NULL, 0);
-    return ret;
+    return total;
 }
 
 ssize_t mbed_recv(int fd, void * buf, size_t max_len, int flags)
@@ -260,15 +276,17 @@ ssize_t mbed_recvmsg(int fd, struct msghdr * message, int flags)
     }
     SocketAddress sockAddr;
     msghdr2Netsocket(&sockAddr, (struct sockaddr_in *) message->msg_name);
+    ssize_t total = 0;
+    ssize_t read  = 0;
 
-    auto ret = socket->recvfrom(&sockAddr, (void *) message, sizeof(msghdr));
-    if (ret < 0)
+    read = socket->recvfrom(&sockAddr, (void *) message->msg_iov, 128);
+    if (read < 0)
     {
         set_errno(ENOBUFS);
         return -1;
     }
     ::read(fd, NULL, 0);
-    return ret;
+    return read;
 }
 
 int mbed_getsockopt(int fd, int level, int optname, void * optval, socklen_t * optlen)
