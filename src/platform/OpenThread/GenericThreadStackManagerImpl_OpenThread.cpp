@@ -1256,9 +1256,13 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetupSrpHost(co
     VerifyOrExit(aHostName, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(strlen(aHostName) < SrpClient::kMaxHostNameSize, error = CHIP_ERROR_INVALID_STRING_LENGTH);
 
-    memcpy(mSrpClient.mHostName, aHostName, strlen(aHostName) + 1);
-    error = MapOpenThreadError(otSrpClientSetHostName(mOTInst, aHostName));
-    SuccessOrExit(error);
+    // Avoid adding the same host name multiple times
+    if (strcmp(mSrpClient.mHostName, aHostName) != 0)
+    {
+        strcpy(mSrpClient.mHostName, aHostName);
+        error = MapOpenThreadError(otSrpClientSetHostName(mOTInst, aHostName));
+        SuccessOrExit(error);
+    }
 
     // Check if device has any external IPv6 assigned. If not, host will be set without IPv6 addresses
     // and updated later on.
