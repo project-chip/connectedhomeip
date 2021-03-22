@@ -39,6 +39,9 @@
 
 #include <rtos/EventFlags.h>
 
+#include <common.h>
+#include <net_socket.h>
+
 using namespace chip;
 using namespace chip::Shell;
 using namespace chip::System;
@@ -471,6 +474,85 @@ exit:
     return error;
 }
 
+int cmd_socket_bsd(int argc, char ** argv)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+
+    streamer_t * sout     = streamer_get();
+    const char hostname[] = "ifconfig.io";
+    SocketAddress address;
+    /* get the host address */
+    printf("\nResolve hostname %s\r\n", hostname);
+    WiFiInterface * _net = WiFiInterface::get_default_instance();
+    int result           = _net->gethostbyname(hostname, &address);
+    if (result != 0)
+    {
+        printf("Error! gethostbyname(%s) returned: %d\r\n", hostname, result);
+        return false;
+    }
+
+    printf("%s address is %s\r\n", hostname, (address.get_ip_address() ? address.get_ip_address() : "None"));
+    address.set_port(htons(80));
+    sockaddr addrs;
+    convert_mbed_addr_to_bsd(&addrs, &address);
+
+    int fd = mbed_socket(1, 1, 0);
+
+    mbed_bind(fd, &addrs, sizeof(sockaddr));
+    mbed_connect(fd, &addrs, sizeof(sockaddr));
+
+    const char buff[] = "GET / HTTP/1.1\r\n"
+                        "Host: ifconfig.io\r\n"
+                        "Connection: close\r\n"
+                        "\r\n";
+
+    nsapi_size_t bytes_to_send       = strlen(buff);
+    nsapi_size_or_error_t bytes_sent = 0;
+
+    printf("\r\nSending message: \r\n%s", buff);
+
+    while (bytes_to_send)
+    {
+
+        bytes_sent = mbed_send(fd, buff + bytes_sent, bytes_to_send, 0);
+        if (bytes_sent < 0)
+        {
+            printf("Error! _socket.send() returned: %d\r\n", bytes_sent);
+            return false;
+        }
+        else
+        {
+            printf("sent %d bytes\r\n", bytes_sent);
+        }
+
+        bytes_to_send -= bytes_sent;
+    }
+
+    printf("Complete message sent\r\n");
+
+    char buf[100];
+    int remaining_bytes = 100;
+    int received_bytes  = 0;
+
+    nsapi_size_or_error_t res = remaining_bytes;
+    while (res > 0 && remaining_bytes > 0)
+    {
+        res = mbed_recv(fd, buf + received_bytes, remaining_bytes, 0);
+        if (res < 0)
+        {
+            printf("Error! _socket.recv() returned: %d\r\n", res);
+            return false;
+        }
+
+        received_bytes += res;
+        remaining_bytes -= res;
+    }
+
+    printf("received %d bytes:\r\n%.*s\r\n\r\n", received_bytes, strstr(buf, "\n") - buf, buf);
+
+exit:
+    return error;
+}
 static const shell_command_t cmds_date_root = { &cmd_date_dispatch, "date", "Display the current time, or set the system date." };
 
 static const shell_command_t cmds_date[] = { { &cmd_date_set, "set", "Set date/time using 'YYYY-MM-DD HH:MM:SS' format" },
@@ -492,6 +574,8 @@ static const shell_command_t cmds_socket_root = { &cmd_socket_dispatch, "socket"
 static const shell_command_t cmds_socket[] = {
     { &cmd_socket_echo, "echo",
       "Connect and send test message to echo server via specific socket. Usage: socket echo <type> <ip> <port> <message>" },
+    { &cmd_socket_bsd, "bsd",
+      "BSD IP communication test via specific socket. Send message in loopback. Usage: socket echo <type> <message>" },
     { &cmd_socket_help, "help", "Display help for each socket subcommands" }
 };
 
