@@ -52,7 +52,7 @@ void TestStatusReport_NoData(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, reportToParse.GetProtocolId() == protocolId);
     NL_TEST_ASSERT(inSuite, reportToParse.GetProtocolCode() == protocolCode);
 
-    System::PacketBufferHandle data = reportToParse.GetProtocolData();
+    const System::PacketBufferHandle & data = reportToParse.GetProtocolData();
     NL_TEST_ASSERT(inSuite, data.IsNull());
 }
 
@@ -81,7 +81,7 @@ void TestStatusReport_WithData(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, reportToParse.GetProtocolId() == protocolId);
     NL_TEST_ASSERT(inSuite, reportToParse.GetProtocolCode() == protocolCode);
 
-    System::PacketBufferHandle rcvData = reportToParse.GetProtocolData();
+    const System::PacketBufferHandle & rcvData = reportToParse.GetProtocolData();
     if (rcvData.IsNull())
     {
         NL_TEST_ASSERT(inSuite, false);

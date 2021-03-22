@@ -23,6 +23,8 @@
 #include <support/CodeUtils.h>
 #include <support/ReturnMacros.h>
 
+#include <type_traits>
+
 using namespace chip::Encoding;
 using GeneralStatusCode = chip::Protocols::SecureChannel::GeneralStatusCode;
 
@@ -40,10 +42,8 @@ StatusReport::StatusReport(GeneralStatusCode generalCode, uint32_t protocolId, u
 StatusReport::StatusReport(GeneralStatusCode generalCode, uint32_t protocolId, uint16_t protocolCode,
                            System::PacketBufferHandle protocolData) :
     mGeneralCode(generalCode),
-    mProtocolId(protocolId), mProtocolCode(protocolCode)
-{
-    mProtocolData = std::move(protocolData);
-}
+    mProtocolId(protocolId), mProtocolCode(protocolCode), mProtocolData(std::move(protocolData))
+{}
 
 CHIP_ERROR StatusReport::Parse(System::PacketBufferHandle buf)
 {
@@ -61,9 +61,12 @@ CHIP_ERROR StatusReport::Parse(System::PacketBufferHandle buf)
     if (bufReader.OctetsRead() < buf->DataLength())
     {
         mProtocolData = System::PacketBufferHandle::NewWithData(buf->Start() + bufReader.OctetsRead(),
-                                                                buf->DataLength() - bufReader.OctetsRead());
+                                                                buf->DataLength() - bufReader.OctetsRead(),
+                                                                /* aAdditionalSize = */ 0, /* aReservedSize = */ 0);
         if (mProtocolData.IsNull())
+        {
             return CHIP_ERROR_NO_MEMORY;
+        }
     }
     else
     {
@@ -75,6 +78,7 @@ CHIP_ERROR StatusReport::Parse(System::PacketBufferHandle buf)
 
 Encoding::LittleEndian::BufferWriter & StatusReport::WriteToBuffer(Encoding::LittleEndian::BufferWriter & buf) const
 {
+    static_assert(std::is_same<std::underlying_type_t<decltype(mGeneralCode)>, uint16_t>::value, "Cast is not safe");
     buf.Put16(static_cast<uint16_t>(mGeneralCode)).Put32(mProtocolId).Put16(mProtocolCode);
     if (!mProtocolData.IsNull())
     {

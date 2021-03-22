@@ -90,17 +90,7 @@ public:
     GeneralStatusCode GetGeneralCode() const { return mGeneralCode; }
     uint32_t GetProtocolId() const { return mProtocolId; }
     uint16_t GetProtocolCode() const { return mProtocolCode; }
-    System::PacketBufferHandle GetProtocolData() const
-    {
-        if (mProtocolData.IsNull())
-        {
-            return System::PacketBufferHandle(nullptr);
-        }
-        else
-        {
-            return mProtocolData.Retain();
-        }
-    }
+    const System::PacketBufferHandle & GetProtocolData() const { return mProtocolData; }
 
 private:
     GeneralStatusCode mGeneralCode;
