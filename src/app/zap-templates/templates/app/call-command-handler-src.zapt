@@ -7,7 +7,7 @@
 #include "callback.h"
 #include "cluster-id.h"
 #include "command-id.h"
-#include "util.h"
+#include "app/util/util.h"
 
 using namespace chip;
 

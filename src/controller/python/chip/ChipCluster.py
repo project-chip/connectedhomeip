@@ -271,6 +271,8 @@ class ChipCluster:
                     "timeoutMs": "int",
                 },
             },
+            "GroupKeyManagement": {
+            },
             "Groups": {
                 "AddGroup": {
                     "groupId": "int",
@@ -1277,6 +1279,7 @@ class ChipCluster:
         # Cluster GeneralCommissioning Command SetFabric
         self._chipLib.chip_ime_AppendCommand_GeneralCommissioning_SetFabric.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint64, ctypes.c_uint32]
         self._chipLib.chip_ime_AppendCommand_GeneralCommissioning_SetFabric.restype = ctypes.c_uint32
+        # Cluster GroupKeyManagement
         # Cluster Groups
         # Cluster Groups Command AddGroup
         self._chipLib.chip_ime_AppendCommand_Groups_AddGroup.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32]

@@ -561,7 +561,7 @@ private:
     Optional<uint16_t> mVendorId;
 
     /// Protocol identifier
-    uint16_t mProtocolID = 0;
+    uint16_t mProtocolID = static_cast<uint16_t>(Protocols::kProtocol_NotSpecified);
 
     /// Bit flag indicators for CHIP Exchange header
     Header::ExFlags mExchangeFlags;

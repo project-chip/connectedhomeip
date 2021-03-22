@@ -1,5 +1,6 @@
 {{> header}}
 
+{{#if (chip_has_client_clusters)}}
 #import <Foundation/Foundation.h>
 
 #import "CHIPDevice.h"
@@ -429,7 +430,7 @@ private:
 @end
 
 
-{{#chip_clusters}}
+{{#chip_client_clusters}}
 
 @interface CHIP{{asCamelCased name false}} ()
 @property (readonly) Controller::{{asCamelCased name false}}Cluster cppCluster;
@@ -576,4 +577,5 @@ private:
 
 @end
 
-{{/chip_clusters}}
+{{/chip_client_clusters}}
+{{/if}}

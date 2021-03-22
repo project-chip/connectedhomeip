@@ -34,6 +34,20 @@
         }                                                                                                                          \
     } while (false)
 
+/// Returns if the expression returns something different than CHIP_NO_ERROR
+///
+/// Use like:
+///   ReturnOnFailure(channel->SendMsg(msg));
+#define ReturnOnFailure(expr)                                                                                                      \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        CHIP_ERROR __err = (expr);                                                                                                 \
+        if (__err != CHIP_NO_ERROR)                                                                                                \
+        {                                                                                                                          \
+            return;                                                                                                                \
+        }                                                                                                                          \
+    } while (false)
+
 /// Returns from the void function if expression evaluates to false
 ///
 /// Use like:

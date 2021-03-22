@@ -46,7 +46,6 @@ jobs:
               uses: github/codeql-action/init@v1
               with:
                   languages: "cpp, python"
-                  queries: +security-and-quality
             - name: Build example All Clusters App
               run: scripts/examples/esp_example.sh all-clusters-app
             - name: Copy aside build products

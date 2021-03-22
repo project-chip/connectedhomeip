@@ -46,7 +46,8 @@ devices is ensured in the following way:
 You need the following hardware and software for this configuration:
 
 -   OpenThread Radio Co-Processor device (for example,
-    [nRF52840 Dongle](https://www.nordicsemi.com/Software-and-tools/Development-Kits/nRF52840-Dongle))
+    [nRF52840 Dongle](https://www.nordicsemi.com/Software-and-tools/Development-Kits/nRF52840-Dongle),
+    [Thunderboard Sense 2](https://www.silabs.com/development-tools/thunderboard/thunderboard-sense-two-kit))
 -   Linux machine with Ubuntu v20.04 or later
 
 <hr>
@@ -60,16 +61,24 @@ The configuration process is composed of the following steps:
 
 ### Configuring OpenThread Radio Co-Processor
 
-Read
-[Configuring OpenThread Radio Co-processor on nRF52840 Dongle](openthread_rcp_nrf_dongle.md)
-to learn how to configure Nordic Semiconductor's
-[nRF52840 Dongle](https://www.nordicsemi.com/Software-and-tools/Development-Kits/nRF52840-Dongle)
-as OpenThread Radio Co-Processor.
+#### On Nordic Hardware
 
-You can replace the nRF52840 Dongle with a variety of development boards from
-different vendors. If you are using a Raspberry Pi as your testing platform, you
-can execute this step on a more powerful Linux machine to shorten the firmware
-build time.
+> Read
+> [Configuring OpenThread Radio Co-processor on nRF52840 Dongle](openthread_rcp_nrf_dongle.md)
+> to learn how to configure Nordic Semiconductor's
+> [nRF52840 Dongle](https://www.nordicsemi.com/Software-and-tools/Development-Kits/nRF52840-Dongle)
+> as OpenThread Radio Co-Processor.
+
+#### On Silicon Labs Hardware
+
+> Please refer to this
+> [guide](https://www.silabs.com/documents/public/application-notes/an1256-using-sl-rcp-with-openthread-border-router.pdf)
+> to configure the OpenThread Radio Co-Processor on the Thunderboard sense 2.
+
+You can replace the nRF52840 Dongle or the Thunderboard with a variety of
+development boards from different vendors. If you are using a Raspberry Pi as
+your testing platform, you can execute this step on a more powerful Linux
+machine to shorten the firmware build time.
 
 ### Configuring OpenThread Border Router
 

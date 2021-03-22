@@ -29,7 +29,6 @@ static const char * const CHIP_CONTROLLER_QUEUE = "com.zigbee.chip.framework.con
 static const char * const CHIP_COMMISSIONER_DEVICE_ID_KEY = "com.zigbee.chip.commissioner.device.id";
 
 static NSString * const kErrorMemoryInit = @"Init Memory failure";
-static NSString * const kErrorCommissionerCreate = @"Init failure while creating a commissioner";
 static NSString * const kErrorCommissionerInit = @"Init failure while initializing a commissioner";
 static NSString * const kErrorPairingInit = @"Init failure while creating a pairing delegate";
 static NSString * const kErrorPersistentStorageInit = @"Init failure while creating a persistent storage delegate";
@@ -190,8 +189,12 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
     dispatch_sync(_chipWorkQueue, ^{
         chip::RendezvousParameters params
             = chip::RendezvousParameters().SetSetupPINCode(setupPINCode).SetDiscriminator(discriminator);
-        CHIP_ERROR err = self.cppCommissioner->PairDevice(deviceID, params);
-        success = ![self checkForError:err logMsg:kErrorPairDevice error:error];
+        CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
+
+        if ([self _isRunning]) {
+            errorCode = self.cppCommissioner->PairDevice(deviceID, params);
+        }
+        success = ![self checkForError:errorCode logMsg:kErrorPairDevice error:error];
     });
 
     return success;
