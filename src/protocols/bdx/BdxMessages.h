@@ -57,7 +57,6 @@ enum class StatusCode : uint16_t
     kBadBlockCounter            = 0x0017,
     kUnexpectedMessage          = 0x0018,
     kTransferFailedUnknownError = 0x001F,
-    kServerBadState             = 0x0020,
     kFailureToSend              = 0x0021,
     kTransferMethodNotSupported = 0x0050,
     kFileDesignatorUnknown      = 0x0051,

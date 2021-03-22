@@ -528,11 +528,11 @@ void TransferSession::HandleTransferInit(MessageType msgType, System::PacketBuff
 
     if (mRole == TransferRole::kSender)
     {
-        VerifyOrExit(msgType == MessageType::ReceiveInit, PrepareStatusReport(StatusCode::kServerBadState));
+        VerifyOrExit(msgType == MessageType::ReceiveInit, PrepareStatusReport(StatusCode::kUnexpectedMessage));
     }
     else
     {
-        VerifyOrExit(msgType == MessageType::SendInit, PrepareStatusReport(StatusCode::kServerBadState));
+        VerifyOrExit(msgType == MessageType::SendInit, PrepareStatusReport(StatusCode::kUnexpectedMessage));
     }
 
     err = transferInit.Parse(msgData.Retain());
