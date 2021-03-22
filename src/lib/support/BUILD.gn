@@ -81,7 +81,6 @@ static_library("support") {
     "Pool.h",
     "RandUtils.cpp",
     "RandUtils.h",
-    "ReturnMacros.h",
     "SafeInt.h",
     "SerializableIntegerSet.cpp",
     "SerializableIntegerSet.h",

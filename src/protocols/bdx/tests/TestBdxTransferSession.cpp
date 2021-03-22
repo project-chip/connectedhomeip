@@ -11,7 +11,6 @@
 #include <support/BufferReader.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
-#include <support/ReturnMacros.h>
 #include <support/UnitTestRegistration.h>
 #include <system/SystemPacketBuffer.h>
 

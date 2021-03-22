@@ -29,7 +29,6 @@
 #include <core/CHIPTLV.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
-#include <support/ReturnMacros.h>
 #include <support/SafeInt.h>
 
 namespace chip {

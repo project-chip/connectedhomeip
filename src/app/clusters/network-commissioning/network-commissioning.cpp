@@ -31,7 +31,6 @@
 #include <util/af.h>
 
 #include <lib/support/CodeUtils.h>
-#include <lib/support/ReturnMacros.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/Span.h>
 #include <lib/support/logging/CHIPLogging.h>

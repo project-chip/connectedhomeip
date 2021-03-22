@@ -19,7 +19,6 @@
 
 #include "QueryReplyFilter.h"
 
-#include <support/ReturnMacros.h>
 #include <system/SystemClock.h>
 
 #define RETURN_IF_ERROR(err)                                                                                                       \

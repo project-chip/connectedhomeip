@@ -25,7 +25,6 @@
 #include <core/CHIPEncoding.h>
 #include <support/BufferWriter.h>
 #include <support/CodeUtils.h>
-#include <support/ReturnMacros.h>
 #include <transport/SecureSession.h>
 #include <transport/raw/MessageHeader.h>
 
