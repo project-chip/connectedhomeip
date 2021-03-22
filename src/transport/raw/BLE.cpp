@@ -36,12 +36,12 @@ using namespace chip::System;
 namespace chip {
 namespace Transport {
 
-BLE::~BLE()
+BLEBase::~BLEBase()
 {
     ClearState();
 }
 
-void BLE::ClearState()
+void BLEBase::ClearState()
 {
     if (mBleLayer)
     {
@@ -57,13 +57,13 @@ void BLE::ClearState()
     }
 }
 
-CHIP_ERROR BLE::Init(const BleListenParameters & params)
+CHIP_ERROR BLEBase::Init(const BleListenParameters & param)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
-    BleLayer * bleLayer = params.GetBleLayer();
+    BleLayer * bleLayer = param.GetBleLayer();
 
     VerifyOrExit(mState == State::kNotReady, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(bleLayer, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(bleLayer != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     mBleLayer                           = bleLayer;
     mBleLayer->mBleTransport            = this;
@@ -77,7 +77,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR BLE::SetEndPoint(Ble::BLEEndPoint * endPoint)
+CHIP_ERROR BLEBase::SetEndPoint(Ble::BLEEndPoint * endPoint)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -93,20 +93,19 @@ exit:
     return err;
 }
 
-void BLE::SetupEvents(Ble::BLEEndPoint * endPoint)
+void BLEBase::SetupEvents(Ble::BLEEndPoint * endPoint)
 {
     endPoint->mAppState = reinterpret_cast<void *>(this);
 }
 
-CHIP_ERROR BLE::SendMessage(const PacketHeader & header, const Transport::PeerAddress & address, System::PacketBufferHandle msgBuf)
+CHIP_ERROR BLEBase::SendMessage(const PacketHeader & header, const Transport::PeerAddress & address,
+                                System::PacketBufferHandle msgBuf)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    ReturnErrorCodeIf(address.GetTransportType() != Type::kBle, CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorCodeIf(mState == State::kNotReady, CHIP_ERROR_INCORRECT_STATE);
+    // ReturnErrorCodeIf(mBleEndPoint == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    VerifyOrExit(address.GetTransportType() == Type::kBle, err = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(mState != State::kInitialized, err = CHIP_ERROR_INCORRECT_STATE);
-
-    err = header.EncodeBeforeData(msgBuf);
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(header.EncodeBeforeData(msgBuf));
 
     if (mState == State::kConnected)
     {
@@ -120,7 +119,7 @@ CHIP_ERROR BLE::SendMessage(const PacketHeader & header, const Transport::PeerAd
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR BLE::SendAfterConnect(System::PacketBufferHandle msg)
+CHIP_ERROR BLEBase::SendAfterConnect(System::PacketBufferHandle msg)
 {
     // This will initiate a connection to the specified peer
     CHIP_ERROR err = CHIP_ERROR_NO_MEMORY;
@@ -142,9 +141,10 @@ CHIP_ERROR BLE::SendAfterConnect(System::PacketBufferHandle msg)
     return err;
 }
 
-void BLE::OnBleConnectionComplete(Ble::BLEEndPoint * endpoint)
+void BLEBase::OnBleConnectionComplete(Ble::BLEEndPoint * endpoint)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+    ChipLogDetail(Inet, "BleConnectionComplete");
 
     mBleEndPoint = endpoint;
 
@@ -165,12 +165,12 @@ exit:
     }
 }
 
-void BLE::OnBleConnectionError(BLE_ERROR err)
+void BLEBase::OnBleConnectionError(BLE_ERROR err)
 {
     ChipLogDetail(Inet, "BleConnection Error: %s", ErrorStr(err));
 }
 
-void BLE::OnBleEndPointMessageReceived(BLEEndPoint * endPoint, PacketBufferHandle buffer)
+void BLEBase::OnEndPointMessageReceived(BLEEndPoint * endPoint, PacketBufferHandle buffer)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -186,7 +186,7 @@ exit:
     }
 }
 
-void BLE::OnBleEndPointConnectComplete(BLEEndPoint * endPoint, BLE_ERROR err)
+void BLEBase::OnEndPointConnectComplete(BLEEndPoint * endPoint, BLE_ERROR err)
 {
     mState = State::kConnected;
 
@@ -207,15 +207,14 @@ void BLE::OnBleEndPointConnectComplete(BLEEndPoint * endPoint, BLE_ERROR err)
     }
 }
 
-void BLE::OnBleEndPointConnectionClosed(BLEEndPoint * endPoint, BLE_ERROR err)
+void BLEBase::OnEndPointConnectionClosed(BLEEndPoint * endPoint, BLE_ERROR err)
 {
     mState = State::kInitialized;
 }
 
-void BLE::OnNewConnection(BLEEndPoint * endPoint)
+void BLEBase::OnNewConnection(BLEEndPoint * endPoint)
 {
-    BLE * ble      = reinterpret_cast<BLE *>(endPoint->mAppState);
-    CHIP_ERROR err = ble->SetEndPoint(endPoint);
+    CHIP_ERROR err = endPoint->mBleTransport->SetEndPoint(endPoint);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Ble, "Transport::BLE Init failure: %s", ErrorStr(err));
