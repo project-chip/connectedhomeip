@@ -246,16 +246,9 @@ void StartPinging(streamer_t * stream, char * destination)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    Inet::IPAddressType type;
     Transport::AdminPairingTable admins;
     Transport::AdminPairingInfo * adminInfo = nullptr;
     uint32_t maxEchoCount                   = 0;
-
-#if INET_CONFIG_ENABLE_IPV4
-    type = Inet::kIPAddressType_IPv4;
-#else
-    type = Inet::kIPAddressType_IPv6;
-#endif
 
     if (!Inet::IPAddress::FromString(destination, gDestAddr))
     {
@@ -268,13 +261,13 @@ void StartPinging(streamer_t * stream, char * destination)
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     err = gTCPManager.Init(Transport::TcpListenParameters(&DeviceLayer::InetLayer)
-                               .SetAddressType(type)
+                               .SetAddressType(gDestAddr.Type())
                                .SetListenPort(gPingArguments.GetEchoPort() + 1));
     VerifyOrExit(err == CHIP_NO_ERROR, streamer_printf(stream, "Failed to init TCP manager error: %s\n", ErrorStr(err)));
 #endif
 
     err = gUDPManager.Init(Transport::UdpListenParameters(&DeviceLayer::InetLayer)
-                               .SetAddressType(type)
+                               .SetAddressType(gDestAddr.Type())
                                .SetListenPort(gPingArguments.GetEchoPort() + 1));
     VerifyOrExit(err == CHIP_NO_ERROR, streamer_printf(stream, "Failed to init UDP manager error: %s\n", ErrorStr(err)));
 
