@@ -28,6 +28,19 @@ class Listen : public ReportingCommand
 public:
     Listen() : ReportingCommand("listen") {}
 
+    ~Listen()
+    {
+        delete onReportColorControlCurrentHueCallback;
+        delete onReportColorControlCurrentSaturationCallback;
+        delete onReportColorControlCurrentXCallback;
+        delete onReportColorControlCurrentYCallback;
+        delete onReportColorControlColorTemperatureCallback;
+        delete onReportDoorLockLockStateCallback;
+        delete onReportLevelControlCurrentLevelCallback;
+        delete onReportOnOffOnOffCallback;
+        delete onReportTemperatureMeasurementMeasuredValueCallback;
+    }
+
     void AddReportCallbacks(uint8_t endpointId) override
     {
         chip::app::CHIPDeviceCallbacksMgr & callbacksMgr = chip::app::CHIPDeviceCallbacksMgr::GetInstance();
