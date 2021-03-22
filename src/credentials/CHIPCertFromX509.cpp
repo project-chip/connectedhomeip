@@ -117,7 +117,7 @@ static CHIP_ERROR ConvertDistinguishedName(ASN1Reader & reader, TLVWriter & writ
                                  err = ASN1_ERROR_UNSUPPORTED_ENCODING);
 
                     // CHIP id attributes must be UTF8Strings.
-                    if (IsChipIdX509Attr(attrOID))
+                    if (IsChipX509Attr(attrOID))
                     {
                         VerifyOrExit(reader.GetTag() == kASN1UniversalTag_UTF8String, err = ASN1_ERROR_INVALID_ENCODING);
                     }
@@ -131,7 +131,7 @@ static CHIP_ERROR ConvertDistinguishedName(ASN1Reader & reader, TLVWriter & writ
                     }
 
                     // If the attribute is a CHIP-defined attribute that contains a 64-bit CHIP id...
-                    if (IsChipIdX509Attr(attrOID))
+                    if (IsChipX509Attr(attrOID))
                     {
                         // Parse the attribute string into a 64-bit CHIP id.
                         uint64_t chipId;

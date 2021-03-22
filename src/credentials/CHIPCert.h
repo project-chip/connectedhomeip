@@ -182,6 +182,8 @@ enum
     kNullCertTime = 0
 };
 
+#define RDN_NUM 2
+
 /**
  *  @struct ChipDN
  *
@@ -195,15 +197,18 @@ struct ChipDN
         uint64_t mChipId; /**< CHIP specific DN attribute value. */
         struct
         {
-            const uint8_t * mValue; /**< Pointer to the DN attribute value. */
-            uint32_t mLen;          /**< DN attribute length. */
-        } mString;                  /**< DN attribute structure when encoded as a string. */
-    } mAttrValue;                   /**< DN attribute value union: string or unsigned integer. */
-    chip::ASN1::OID mAttrOID;       /**< DN attribute CHIP OID. */
+            const uint8_t * mValue;    /**< Pointer to the DN attribute value. */
+            uint32_t mLen;             /**< DN attribute length. */
+        } mString;                     /**< DN attribute structure when encoded as a string. */
+    } mAttrValue[RDN_NUM];             /**< DN attribute value union: string or unsigned integer. */
+    chip::ASN1::OID mAttrOID[RDN_NUM]; /**< DN attribute CHIP OID. */
 
     bool IsEqual(const ChipDN & other) const;
-    bool IsEmpty() const { return mAttrOID == chip::ASN1::kOID_NotSpecified; }
-    void Clear() { mAttrOID = chip::ASN1::kOID_NotSpecified; }
+    bool IsEmpty() const;
+    void Clear();
+    void Add(chip::ASN1::OID attrOID, uint64_t chipId);
+    void Add(chip::ASN1::OID attrOID, const uint8_t * strVal, uint32_t strLen);
+    bool Has(chip::ASN1::OID attrOID) const;
 };
 
 /**
