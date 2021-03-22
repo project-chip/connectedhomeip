@@ -338,7 +338,7 @@ public:
 
         // TODO: This code is temporary, and must be updated to use the Cluster API.
         // Issue: https://github.com/project-chip/connectedhomeip/issues/4725
-        if (payloadHeader.GetProtocolID() == chip::Protocols::kProtocol_ServiceProvisioning)
+        if (payloadHeader.HasProtocol(chip::Protocols::ServiceProvisioning::Id))
         {
             CHIP_ERROR err = CHIP_NO_ERROR;
             uint32_t timeout;
@@ -348,7 +348,7 @@ public:
             ChipLogProgress(AppServer, "Received service provisioning message. Treating it as OpenPairingWindow request");
             chip::System::PacketBufferTLVReader reader;
             reader.Init(std::move(buffer));
-            reader.ImplicitProfileId = chip::Protocols::kProtocol_ServiceProvisioning;
+            reader.ImplicitProfileId = chip::Protocols::ServiceProvisioning::Id.ToTLVProfileId();
 
             SuccessOrExit(reader.Next(kTLVType_UnsignedInteger, TLV::ProfileTag(reader.ImplicitProfileId, 1)));
             SuccessOrExit(reader.Get(timeout));

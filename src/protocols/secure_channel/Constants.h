@@ -116,7 +116,7 @@ enum class StatusCode
 template <>
 struct MessageTypeTraits<SecureChannel::MsgType>
 {
-    static constexpr uint16_t ProtocolId = chip::Protocols::kProtocol_SecureChannel;
+    static constexpr const Protocols::Id & ProtocolId() { return SecureChannel::Id; }
 };
 
 } // namespace Protocols

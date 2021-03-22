@@ -262,7 +262,7 @@ CHIP_ERROR Device::OpenPairingWindow(uint32_t timeout, PairingWindowOption optio
     System::PacketBufferTLVWriter writer;
 
     writer.Init(std::move(buf));
-    writer.ImplicitProfileId = chip::Protocols::kProtocol_ServiceProvisioning;
+    writer.ImplicitProfileId = chip::Protocols::ServiceProvisioning::Id.ToTLVProfileId();
 
     ReturnErrorOnFailure(writer.Put(TLV::ProfileTag(writer.ImplicitProfileId, 1), timeout));
 
@@ -282,7 +282,7 @@ CHIP_ERROR Device::OpenPairingWindow(uint32_t timeout, PairingWindowOption optio
 
     PayloadHeader header;
 
-    header.SetMessageType(chip::Protocols::kProtocol_ServiceProvisioning, 0);
+    header.SetMessageType(chip::Protocols::ServiceProvisioning::Id, 0);
 
     ReturnErrorOnFailure(SendMessage(std::move(outBuffer), header));
 
