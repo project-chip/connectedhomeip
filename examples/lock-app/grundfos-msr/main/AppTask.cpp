@@ -28,7 +28,7 @@
 #include <support/CHIPMem.h>
 #include <support/CHIPPlatformMemory.h>
 
-#include "QRCodeUtil.h"
+#include "OnboardingCodesUtil.h"
 
 #include "DataModelHandler.h"
 
@@ -180,7 +180,7 @@ int AppTask::Init()
     ConfigurationMgr().LogDeviceConfig();
 
     // QR code will be used with CHIP Tool
-    PrintQRCode(chip::RendezvousInformationFlags::kBLE);
+    PrintOnboardingCodes(chip::RendezvousInformationFlags::kBLE);
 
     return 0;
 }
