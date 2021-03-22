@@ -19,6 +19,7 @@
 
 #include <inttypes.h>
 
+#include "Helper.h"
 #include "lib/core/CHIPSafeCasts.h"
 #include "lib/mdns/platform/Mdns.h"
 #include "lib/support/ReturnMacros.h"
@@ -271,8 +272,8 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const OperationalAdvertisingParamete
 
     mOperationalAdvertisingParams = params;
     // TODO: There may be multilple device/fabrid ids after multi-admin.
-    snprintf(service.mName, sizeof(service.mName), "%08X%08X-%08X%08X", (uint32_t)(params.GetNodeId() >> 32),
-             (uint32_t)(params.GetNodeId()), (uint32_t)(params.GetFabricId() >> 32), (uint32_t)(params.GetFabricId()));
+
+    ReturnErrorOnFailure(MakeServiceName(service.mName, sizeof(service.mName), params.GetFabricId(), params.GetNodeId()));
     strncpy(service.mType, "_chip", sizeof(service.mType));
     service.mProtocol      = MdnsServiceProtocol::kMdnsProtocolTcp;
     service.mPort          = CHIP_PORT;
@@ -305,7 +306,7 @@ CHIP_ERROR DiscoveryImplPlatform::ResolveNodeId(uint64_t nodeId, uint64_t fabric
 
     MdnsService service;
 
-    snprintf(service.mName, sizeof(service.mName), "%" PRIX64 "-%" PRIX64, nodeId, fabricId);
+    ReturnErrorOnFailure(MakeServiceName(service.mName, sizeof(service.mName), fabricId, nodeId));
     strncpy(service.mType, "_chip", sizeof(service.mType));
     service.mProtocol    = MdnsServiceProtocol::kMdnsProtocolTcp;
     service.mAddressType = type;
