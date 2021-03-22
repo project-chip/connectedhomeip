@@ -23,12 +23,14 @@
 // ---- Lock Example App Config ----
 
 #define RESET_BUTTON 1
-#define LOCK_BUTTON 2
-#define JOIN_BUTTON 3
+#define LOCK_BUTTON  2
+#define JOIN_BUTTON  3
+#define BLE_BUTTON   4
 
 #define RESET_BUTTON_PUSH 1
-#define LOCK_BUTTON_PUSH 2
-#define JOIN_BUTTON_PUSH 3
+#define LOCK_BUTTON_PUSH  2
+#define JOIN_BUTTON_PUSH  3
+#define BLE_BUTTON_PUSH   4
 
 #define APP_BUTTON_PUSH 1
 
