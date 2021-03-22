@@ -1728,8 +1728,7 @@ struct ConnectParams
     BluezEndpoint * mEndpoint;
 };
 
-static void
-ConnectDeviceDone(GObject * aObject, GAsyncResult * aResult, gpointer)
+static void ConnectDeviceDone(GObject * aObject, GAsyncResult * aResult, gpointer)
 {
     BluezDevice1 * device = BLUEZ_DEVICE1(aObject);
     GError * error        = nullptr;
