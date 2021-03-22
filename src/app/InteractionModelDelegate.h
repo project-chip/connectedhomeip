@@ -86,12 +86,14 @@ public:
      * @param[in]  aEndpointId    Endpoint identifier
      * @param[in]  aClusterId     Cluster identifier
      * @param[in]  aCommandId     Command identifier
-     * @param[in]  aCommandIndex  Current processing command index which can identify command if there exists multiple commands with same command Id
+     * @param[in]  aCommandIndex  Current processing command index which can identify command if there exists multiple commands with
+     * same command Id
      * @retval # CHIP_ERROR_NOT_IMPLEMENTED if not implemented
      */
     virtual CHIP_ERROR CommandResponseStatus(const CommandSender * apCommandSender, const uint16_t aGeneralCode,
                                              const uint32_t aProtocolId, const uint16_t aProtocolCode, chip::EndpointId aEndpointId,
-                                             const chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::CommandId aCommandIndex)
+                                             const chip::ClusterId aClusterId, chip::CommandId aCommandId,
+                                             chip::CommandId aCommandIndex)
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
@@ -115,10 +117,7 @@ public:
      * during multiple command interactions
      * @retval # CHIP_ERROR_NOT_IMPLEMENTED if not implemented
      */
-    virtual CHIP_ERROR CommandResponseTimeout(const CommandSender * apCommandSender)
-    {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
+    virtual CHIP_ERROR CommandResponseTimeout(const CommandSender * apCommandSender) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
     virtual ~InteractionModelDelegate() = default;
 };

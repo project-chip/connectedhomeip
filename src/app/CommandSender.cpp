@@ -148,7 +148,8 @@ CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser &
         SuccessOrExit(err);
         if (mpDelegate != nullptr)
         {
-            mpDelegate->CommandResponseStatus(this, generalCode, protocolId, protocolCode, endpointId, clusterId, commandId, mCommandIndex);
+            mpDelegate->CommandResponseStatus(this, generalCode, protocolId, protocolCode, endpointId, clusterId, commandId,
+                                              mCommandIndex);
         }
     }
     else if (CHIP_END_OF_TLV == err)
