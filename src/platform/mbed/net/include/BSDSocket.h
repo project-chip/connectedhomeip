@@ -78,7 +78,7 @@ struct BSDSocket : public FileHandle
 
             if (!(current & POLLIN))
             {
-                current |= POLLOUT;
+                current |= POLLIN;
             }
             _flags.store(current);
             if (_callback)
@@ -86,6 +86,8 @@ struct BSDSocket : public FileHandle
                 _callback();
             }
         });
+
+        socket->set_blocking(false);
 
         _fd = bind_to_fd(this);
         if (_fd < 0)
@@ -113,6 +115,10 @@ struct BSDSocket : public FileHandle
         _fd       = -1;
         _callback = nullptr;
         _flags.store(0);
+        if (socketName)
+        {
+            delete socketName;
+        }
     }
 
     ssize_t read(void * buffer, size_t size) override
@@ -191,7 +197,7 @@ struct BSDSocket : public FileHandle
         return ret;
     }
 
-    SocketAddress bound_socket;
+    SocketAddress * socketName = nullptr;
 
 private:
     union

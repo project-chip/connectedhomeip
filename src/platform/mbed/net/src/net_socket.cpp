@@ -133,16 +133,42 @@ int mbed_shutdown(int fd, int how)
 
 int mbed_bind(int fd, const struct sockaddr * addr, socklen_t addrlen)
 {
-    auto * socket = getSocket(fd);
+    auto * socket = getBSDSocket(fd);
     if (socket == nullptr)
     {
-        set_errno(ENOBUFS);
+        set_errno(EBADF);
         return -1;
     }
-    SocketAddress sockAddr;
-    Sockaddr2Netsocket(&sockAddr, (struct sockaddr *) addr);
 
-    return socket->bind(sockAddr);
+    if (addr == nullptr)
+    {
+        set_errno(EINVAL);
+        return -1;
+    }
+
+    if (socket->socketName != nullptr)
+    {
+        set_errno(EINVAL);
+        return -1;
+    }
+
+    SocketAddress sockAddr;
+    if (convert_bsd_addr_to_mbed(&sockAddr, (struct sockaddr *) addr))
+    {
+        set_errno(EINVAL);
+        return -1;
+    }
+
+    auto ret = socket->getNetSocket()->bind(sockAddr);
+    if ((ret != NSAPI_ERROR_OK) && (ret != NSAPI_ERROR_UNSUPPORTED))
+    {
+        set_errno(EINVAL);
+        return -1;
+    }
+
+    socket->socketName = new SocketAddress(sockAddr);
+
+    return 0;
 }
 
 int mbed_connect(int fd, const struct sockaddr * addr, socklen_t addrlen)
@@ -366,13 +392,13 @@ int mbed_getsockname(int fd, struct sockaddr * addr, socklen_t * addrlen)
         return -1;
     }
 
-    if (addrlen < 0)
+    if (socket->socketName == nullptr)
     {
         set_errno(EINVAL);
         return -1;
     }
 
-    if (socket->bound_socket.get_ip_version() == NSAPI_IPv4)
+    if (socket->socketName->get_ip_version() == NSAPI_IPv4)
     {
         if (*addrlen < sizeof(sockaddr_in))
         {
@@ -381,7 +407,7 @@ int mbed_getsockname(int fd, struct sockaddr * addr, socklen_t * addrlen)
             return -1;
         }
     }
-    else if (socket->bound_socket.get_ip_version() == NSAPI_IPv6)
+    else if (socket->socketName->get_ip_version() == NSAPI_IPv6)
     {
         if (*addrlen < sizeof(sockaddr_in6))
         {
@@ -391,7 +417,7 @@ int mbed_getsockname(int fd, struct sockaddr * addr, socklen_t * addrlen)
         }
     }
 
-    if (convert_mbed_addr_to_bsd(addr, &socket->bound_socket) < 0)
+    if (convert_mbed_addr_to_bsd(addr, socket->socketName) < 0)
     {
         set_errno(ENOBUFS);
         return -1;
