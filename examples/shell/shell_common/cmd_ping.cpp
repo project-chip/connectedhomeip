@@ -56,6 +56,7 @@ public:
         mLastEchoTime       = 0;
         mEchoCount          = 0;
         mEchoRespCount      = 0;
+        mEchoReqSize        = 32;
         mWaitingForEchoResp = false;
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
         mUsingTCP = false;
@@ -81,6 +82,9 @@ public:
     uint32_t GetEchoInterval() const { return mEchoInterval; }
     void SetEchoInterval(uint32_t value) { mEchoInterval = value; }
 
+    uint32_t GetEchoReqSize() const { return mEchoReqSize; }
+    void SetEchoReqSize(uint32_t value) { mEchoReqSize = value; }
+
     uint16_t GetEchoPort() const { return mEchoPort; }
     void SetEchoPort(uint16_t value) { mEchoPort = value; }
 
@@ -104,6 +108,9 @@ private:
 
     // Count of the number of echo responses received.
     uint64_t mEchoRespCount;
+
+    // The CHIP Echo request payload size in bytes.
+    uint32_t mEchoReqSize;
 
     // Max value for the number of echo requests sent.
     uint32_t mMaxEchoCount;
@@ -150,10 +157,11 @@ CHIP_ERROR SendEchoRequest(streamer_t * stream)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     Messaging::SendFlags sendFlags;
-    const char kRequestFormat[] = "Echo Message %" PRIu64 "\n";
+    uint32_t size                   = gPingArguments.GetEchoReqSize();
+    const char kRequestFormat[size] = "Echo Message %" PRIu64 "\n";
     char requestData[(sizeof kRequestFormat) + kDecimalDigitsForUint64];
     snprintf(requestData, sizeof requestData, kRequestFormat, gPingArguments.GetEchoCount());
-    System::PacketBufferHandle payloadBuf = MessagePacketBuffer::NewWithData(requestData, strlen(requestData));
+    System::PacketBufferHandle payloadBuf = MessagePacketBuffer::NewWithData(requestData, size);
 
     if (gPingArguments.IsUsingCRMP())
     {
@@ -172,7 +180,8 @@ CHIP_ERROR SendEchoRequest(streamer_t * stream)
 
     gPingArguments.SetLastEchoTime(System::Timer::GetCurrentEpoch());
 
-    streamer_printf(stream, "\nSend echo request message to Node: %" PRIu64 "\n", kTestDeviceNodeId);
+    streamer_printf(stream, "\nSend echo request message with payload size: %d bytes to Node: %" PRIu64 "\n", size,
+                    kTestDeviceNodeId);
 
     err = gEchoClient.SendEchoRequest(std::move(payloadBuf), sendFlags);
 
@@ -355,6 +364,7 @@ void PrintUsage(streamer_t * stream)
     streamer_printf(stream, "  -i  <interval>  ping interval time in seconds\n");
     streamer_printf(stream, "  -c  <count>     stop after <count> replies\n");
     streamer_printf(stream, "  -r  <1|0>       enable or disable CRMP\n");
+    streamer_printf(stream, "  -s  <size>      payload size in bytes\n");
 }
 
 int cmd_ping(int argc, char ** argv)
@@ -411,6 +421,17 @@ int cmd_ping(int argc, char ** argv)
             else
             {
                 gPingArguments.SetEchoPort(atol(argv[optIndex]));
+            }
+            break;
+        case 's':
+            if (++optIndex >= argc || argv[optIndex][0] == '-')
+            {
+                streamer_printf(sout, "Invalid argument specified for -s\n");
+                return -1;
+            }
+            else
+            {
+                gPingArguments.SetEchoReqSize(atol(argv[optIndex]));
             }
             break;
         case 'r':
