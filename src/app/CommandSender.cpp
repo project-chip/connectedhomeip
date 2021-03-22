@@ -147,7 +147,7 @@ CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser &
         {
             err = CHIP_NO_ERROR;
             ChipLogDetail(DataManagement, "Add Status code for empty command, cluster Id is %d", clusterId);
-            AddStatusCode(static_cast<uint16_t>(GeneralStatusCode::kSuccess), Protocols::kProtocol_SecureChannel,
+            AddStatusCode(static_cast<uint16_t>(GeneralStatusCode::kSuccess), Protocols::SecureChannel::Id,
                           Protocols::SecureChannel::kProtocolCodeSuccess, clusterId);
         }
         // TODO(#4503): Should call callbacks of cluster that sends the command.

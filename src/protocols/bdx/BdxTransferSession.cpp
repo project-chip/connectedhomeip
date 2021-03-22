@@ -42,7 +42,7 @@ CHIP_ERROR WriteToPacketBuffer(const ::chip::bdx::BdxMessage & msgStruct, ::chip
 
 // We could make this whole method a template, but it's probably smaller code to
 // share the implementation across all message types.
-CHIP_ERROR AttachHeader(uint16_t protocolId, uint8_t msgType, ::chip::System::PacketBufferHandle & msgBuf)
+CHIP_ERROR AttachHeader(chip::Protocols::Id protocolId, uint8_t msgType, ::chip::System::PacketBufferHandle & msgBuf)
 {
     ::chip::PayloadHeader payloadHeader;
 
@@ -58,7 +58,7 @@ exit:
 template <typename MessageType>
 inline CHIP_ERROR AttachHeader(MessageType msgType, ::chip::System::PacketBufferHandle & msgBuf)
 {
-    return AttachHeader(chip::Protocols::MessageTypeTraits<MessageType>::ProtocolId, static_cast<uint8_t>(msgType), msgBuf);
+    return AttachHeader(chip::Protocols::MessageTypeTraits<MessageType>::ProtocolId(), static_cast<uint8_t>(msgType), msgBuf);
 }
 } // anonymous namespace
 
@@ -424,7 +424,7 @@ CHIP_ERROR TransferSession::HandleMessageReceived(System::PacketBufferHandle msg
     err = payloadHeader.DecodeAndConsume(msg);
     SuccessOrExit(err);
 
-    if (payloadHeader.GetProtocolID() == Protocols::kProtocol_BDX)
+    if (payloadHeader.HasProtocol(Protocols::BDX::Id))
     {
         err = HandleBdxMessage(payloadHeader, std::move(msg));
         SuccessOrExit(err);
@@ -509,7 +509,7 @@ CHIP_ERROR TransferSession::HandleStatusReportMessage(PayloadHeader & header, Sy
     uint16_t protocolCode = 0;
     Encoding::LittleEndian::Reader reader(msg->Start(), msg->DataLength());
     ReturnErrorOnFailure(reader.Read16(&generalCode).Read32(&protocolId).Read16(&protocolCode).StatusCode());
-    VerifyOrReturnError((protocolId == Protocols::kProtocol_BDX), CHIP_ERROR_INVALID_MESSAGE_TYPE);
+    VerifyOrReturnError((protocolId == Protocols::BDX::Id.ToFullyQualifiedSpecForm()), CHIP_ERROR_INVALID_MESSAGE_TYPE);
 
     mStatusReportData.statusCode = static_cast<StatusCode>(protocolCode);
 
@@ -852,7 +852,7 @@ void TransferSession::PrepareStatusReport(StatusCode code)
     VerifyOrReturn(!bbuf.IsNull());
 
     bbuf.Put16(static_cast<uint16_t>(Protocols::SecureChannel::GeneralStatusCode::kFailure));
-    bbuf.Put32(Protocols::kProtocol_BDX);
+    bbuf.Put32(Protocols::BDX::Id.ToFullyQualifiedSpecForm());
     bbuf.Put16(static_cast<uint16_t>(mStatusReportData.statusCode));
 
     mPendingMsgHandle = bbuf.Finalize();

@@ -154,7 +154,7 @@ private:
 template <>
 struct MessageTypeTraits<Echo::MsgType>
 {
-    static constexpr uint16_t ProtocolId = chip::Protocols::kProtocol_Echo;
+    static constexpr const Protocols::Id & ProtocolId() { return Echo::Id; }
 };
 
 } // namespace Protocols

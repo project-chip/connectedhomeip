@@ -117,23 +117,23 @@ ExchangeContext * ExchangeManager::NewContext(SecureSessionHandle session, Excha
     return AllocContext(mNextExchangeId++, session, true, delegate);
 }
 
-CHIP_ERROR ExchangeManager::RegisterUnsolicitedMessageHandlerForProtocol(uint32_t protocolId, ExchangeDelegate * delegate)
+CHIP_ERROR ExchangeManager::RegisterUnsolicitedMessageHandlerForProtocol(Protocols::Id protocolId, ExchangeDelegate * delegate)
 {
     return RegisterUMH(protocolId, kAnyMessageType, delegate);
 }
 
-CHIP_ERROR ExchangeManager::RegisterUnsolicitedMessageHandlerForType(uint32_t protocolId, uint8_t msgType,
+CHIP_ERROR ExchangeManager::RegisterUnsolicitedMessageHandlerForType(Protocols::Id protocolId, uint8_t msgType,
                                                                      ExchangeDelegate * delegate)
 {
     return RegisterUMH(protocolId, static_cast<int16_t>(msgType), delegate);
 }
 
-CHIP_ERROR ExchangeManager::UnregisterUnsolicitedMessageHandlerForProtocol(uint32_t protocolId)
+CHIP_ERROR ExchangeManager::UnregisterUnsolicitedMessageHandlerForProtocol(Protocols::Id protocolId)
 {
     return UnregisterUMH(protocolId, kAnyMessageType);
 }
 
-CHIP_ERROR ExchangeManager::UnregisterUnsolicitedMessageHandlerForType(uint32_t protocolId, uint8_t msgType)
+CHIP_ERROR ExchangeManager::UnregisterUnsolicitedMessageHandlerForType(Protocols::Id protocolId, uint8_t msgType)
 {
     return UnregisterUMH(protocolId, static_cast<int16_t>(msgType));
 }
@@ -160,7 +160,7 @@ ExchangeContext * ExchangeManager::AllocContext(uint16_t ExchangeId, SecureSessi
     return nullptr;
 }
 
-CHIP_ERROR ExchangeManager::RegisterUMH(uint32_t protocolId, int16_t msgType, ExchangeDelegate * delegate)
+CHIP_ERROR ExchangeManager::RegisterUMH(Protocols::Id protocolId, int16_t msgType, ExchangeDelegate * delegate)
 {
     UnsolicitedMessageHandler * umh      = UMHandlerPool;
     UnsolicitedMessageHandler * selected = nullptr;
@@ -191,7 +191,7 @@ CHIP_ERROR ExchangeManager::RegisterUMH(uint32_t protocolId, int16_t msgType, Ex
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ExchangeManager::UnregisterUMH(uint32_t protocolId, int16_t msgType)
+CHIP_ERROR ExchangeManager::UnregisterUMH(Protocols::Id protocolId, int16_t msgType)
 {
     UnsolicitedMessageHandler * umh = UMHandlerPool;
 
@@ -294,7 +294,7 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
 
         for (int i = 0; i < CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS; i++, umh++)
         {
-            if (umh->Delegate != nullptr && umh->ProtocolId == payloadHeader.GetProtocolID())
+            if (umh->Delegate != nullptr && payloadHeader.HasProtocol(umh->ProtocolId))
             {
                 if (umh->MessageType == payloadHeader.GetMessageType())
                 {
