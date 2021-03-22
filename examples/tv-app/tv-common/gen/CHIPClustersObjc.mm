@@ -430,7 +430,7 @@ private:
         {
             return nil;
         }
-    
+
         CHIP_ERROR err = cppCluster->Associate([device internalDevice], endpoint);
         if (err != CHIP_NO_ERROR) {
             return nil;
@@ -3266,4 +3266,3 @@ private:
 
 
 @end
-

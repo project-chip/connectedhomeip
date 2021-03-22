@@ -4326,4 +4326,3 @@ PacketBufferHandle encodeTemperatureMeasurementClusterReadClusterRevisionAttribu
        .Put16(0xFFFD);
     COMMAND_FOOTER();
 }
-
