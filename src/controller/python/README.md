@@ -166,7 +166,7 @@ chip-device-ctrl > connect -ble 1383 12345678
 ## Thread provisioning
 
 1. Configure Thread border router. For example, follow
-   [Configuring Thread network on a Linux machine](../../../docs/guides/linux_thread_connectivity.md)
+   [Setup OpenThread Border Router on Raspberry Pi / ubuntu](../../../docs/guides/openthread_border_router_pi.md)
    instruction to configure OpenThread Border Router on a Linux workstation.
 
 2. Run CHIP Device Controller
