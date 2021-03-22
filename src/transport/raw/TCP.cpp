@@ -282,11 +282,11 @@ exit:
     return err;
 }
 
-INET_ERROR TCPBase::ProcessReceivedBuffer(Inet::TCPEndPoint * endPoint, const PeerAddress & peerAddress,
+CHIP_ERROR TCPBase::ProcessReceivedBuffer(Inet::TCPEndPoint * endPoint, const PeerAddress & peerAddress,
                                           System::PacketBufferHandle buffer)
 {
     ActiveConnectionState * state = FindActiveConnection(endPoint);
-    VerifyOrReturnError(state != nullptr, INET_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(state != nullptr, CHIP_ERROR_INTERNAL);
     state->mReceived.AddToEnd(std::move(buffer));
 
     while (!state->mReceived.IsNull())
@@ -306,22 +306,22 @@ INET_ERROR TCPBase::ProcessReceivedBuffer(Inet::TCPEndPoint * endPoint, const Pe
         if (messageSize >= kMaxMessageSize)
         {
             // This message is too long for upper layers.
-            return INET_ERROR_INBOUND_MESSAGE_TOO_BIG;
+            return CHIP_ERROR_MESSAGE_TOO_LONG;
         }
         // The subtraction will not underflow because we successfully read kPacketSizeBytes.
         if (messageSize > (state->mReceived->TotalLength() - kPacketSizeBytes))
         {
             // We have not yet received the complete message.
-            return INET_NO_ERROR;
+            return CHIP_NO_ERROR;
         }
         state->mReceived.Consume(kPacketSizeBytes);
         ReturnErrorOnFailure(ProcessSingleMessage(peerAddress, state, messageSize));
     }
 
-    return INET_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
-INET_ERROR TCPBase::ProcessSingleMessage(const PeerAddress & peerAddress, ActiveConnectionState * state, uint16_t messageSize)
+CHIP_ERROR TCPBase::ProcessSingleMessage(const PeerAddress & peerAddress, ActiveConnectionState * state, uint16_t messageSize)
 {
     // We enter with `state->mReceived` containing at least one full message, perhaps in a chain.
     // `state->mReceived->Start()` currently points to the message data.
@@ -343,7 +343,7 @@ INET_ERROR TCPBase::ProcessSingleMessage(const PeerAddress & peerAddress, Active
         message = System::PacketBufferHandle::New(messageSize, 0);
         if (message.IsNull())
         {
-            return INET_ERROR_NO_MEMORY;
+            return CHIP_ERROR_NO_MEMORY;
         }
         CHIP_ERROR err = state->mReceived->Read(message->Start(), messageSize);
         state->mReceived.Consume(messageSize);
@@ -355,7 +355,7 @@ INET_ERROR TCPBase::ProcessSingleMessage(const PeerAddress & peerAddress, Active
     ReturnErrorOnFailure(header.DecodeAndConsume(message));
 
     HandleMessageReceived(header, peerAddress, std::move(message));
-    return INET_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 INET_ERROR TCPBase::OnTcpReceive(Inet::TCPEndPoint * endPoint, System::PacketBufferHandle buffer)
@@ -367,14 +367,15 @@ INET_ERROR TCPBase::OnTcpReceive(Inet::TCPEndPoint * endPoint, System::PacketBuf
     PeerAddress peerAddress = PeerAddress::TCP(ipAddress, port);
 
     TCPBase * tcp  = reinterpret_cast<TCPBase *>(endPoint->AppState);
-    INET_ERROR err = tcp->ProcessReceivedBuffer(endPoint, peerAddress, std::move(buffer));
+    CHIP_ERROR err = tcp->ProcessReceivedBuffer(endPoint, peerAddress, std::move(buffer));
 
-    if (err != INET_NO_ERROR)
+    if (err != CHIP_NO_ERROR)
     {
         // Connection could need to be closed at this point
         ChipLogError(Inet, "Failed to accept received TCP message: %s", ErrorStr(err));
+        return INET_ERROR_UNEXPECTED_EVENT;
     }
-    return err;
+    return INET_NO_ERROR;
 }
 
 void TCPBase::OnConnectionComplete(Inet::TCPEndPoint * endPoint, INET_ERROR inetErr)
