@@ -1057,13 +1057,6 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     memset(&adv_params, 0, sizeof(adv_params));
     uint8_t own_addr_type = BLE_OWN_ADDR_RANDOM;
 
-    ret = ble_hs_pvcy_rpa_config(NIMBLE_HOST_ENABLE_RPA);
-    if (ret != 0)
-    {
-        ChipLogError(DeviceLayer, "RPA not set: %d", ret);
-        return CHIP_ERROR_INTERNAL;
-    }
-
     adv_params.disc_mode = BLE_GAP_DISC_MODE_GEN;
 
     // Inform the ThreadStackManager that CHIPoBLE advertising is about to start.
@@ -1080,9 +1073,9 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     bool connectable     = (numCons < kMaxConnections);
     adv_params.conn_mode = connectable ? BLE_GAP_CONN_MODE_UND : BLE_GAP_CONN_MODE_NON;
 
-    // Advertise in fast mode if not fully provisioned and there are no CHIPoBLE connections, or
-    // if the application has expressly requested fast advertising.
-    if ((numCons == 0 && !ConfigurationMgr().IsPairedToAccount()) || mFlags.Has(Flags::kFastAdvertisingEnabled))
+    // Advertise in fast mode if it is connectable advertisement and
+    // the application has expressly requested fast advertising.
+    if (connectable && mFlags.Has(Flags::kFastAdvertisingEnabled))
     {
         adv_params.itvl_min = CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MIN;
         adv_params.itvl_max = CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MAX;
@@ -1097,10 +1090,9 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
                     (((uint32_t) adv_params.itvl_min) * 10) / 16, (connectable) ? "" : "non-", mDeviceName);
 
     {
-        ret = ble_gap_adv_start(own_addr_type, NULL, BLE_HS_FOREVER, &adv_params, ble_svr_gap_event, NULL);
-        if (ret == BLE_HS_EALREADY)
+        if (ble_gap_adv_active())
         {
-            /* This error code indicates that the advertising is already active. Stop and restart with the new parameters */
+            /* Advertising is already active. Stop and restart with the new parameters */
             ChipLogProgress(DeviceLayer, "Device already advertising, stop active advertisement and restart");
             ret = ble_gap_adv_stop();
             if (ret != 0)
@@ -1108,11 +1100,17 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
                 ChipLogError(DeviceLayer, "ble_gap_adv_stop() failed: %d, cannot restart", ret);
                 return CHIP_ERROR_INTERNAL;
             }
-            else
+        }
+        else
+        {
+            ret = ble_hs_pvcy_rpa_config(NIMBLE_HOST_ENABLE_RPA);
+            if (ret != 0)
             {
-                ret = ble_gap_adv_start(own_addr_type, NULL, BLE_HS_FOREVER, &adv_params, ble_svr_gap_event, NULL);
+                ChipLogError(DeviceLayer, "RPA not set: %d", ret);
+                return CHIP_ERROR_INTERNAL;
             }
         }
+        ret = ble_gap_adv_start(own_addr_type, NULL, BLE_HS_FOREVER, &adv_params, ble_svr_gap_event, NULL);
 
         if (ret == 0)
         {
