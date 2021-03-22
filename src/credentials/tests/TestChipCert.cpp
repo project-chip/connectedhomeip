@@ -193,7 +193,8 @@ static void TestChipCert_MultiOID(nlTestSuite * inSuite, void * inContext)
     uint32_t outCertLen;
     ChipCertificateData certData;
 
-    err = ConvertX509CertToChipCert(sTestCert_2OIDs_Node01_DER, sTestCert_2OIDs_Node01_DER_Len, outCertBuf, sizeof(outCertBuf), outCertLen);
+    err = ConvertX509CertToChipCert(sTestCert_2OIDs_Node01_DER, sTestCert_2OIDs_Node01_DER_Len, outCertBuf, sizeof(outCertBuf),
+                                    outCertLen);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     err = DecodeChipCert(outCertBuf, outCertLen, certData);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
