@@ -2233,4 +2233,3 @@ chip::System::PacketBufferHandle encodeWakeOnLanClusterReadWakeOnLanMacAddressAt
  *    Encode a Wake on LAN server read command for the cluster revision attribute into buffer including the APS frame
  */
 chip::System::PacketBufferHandle encodeWakeOnLanClusterReadClusterRevisionAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
-

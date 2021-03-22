@@ -44,7 +44,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Application Basic
- *    
+ *
  */
 @interface CHIPApplicationBasic : CHIPCluster
 
@@ -64,7 +64,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Application Launcher
- *    
+ *
  */
 @interface CHIPApplicationLauncher : CHIPCluster
 
@@ -79,7 +79,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Audio Output
- *    
+ *
  */
 @interface CHIPAudioOutput : CHIPCluster
 
@@ -95,7 +95,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Barrier Control
- *    
+ *
  */
 @interface CHIPBarrierControl : CHIPCluster
 
@@ -114,7 +114,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Basic
- *    
+ *
  */
 @interface CHIPBasic : CHIPCluster
 
@@ -141,7 +141,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Binding
- *    
+ *
  */
 @interface CHIPBinding : CHIPCluster
 
@@ -156,7 +156,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Color Control
- *    
+ *
  */
 @interface CHIPColorControl : CHIPCluster
 
@@ -256,7 +256,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Content Launch
- *    
+ *
  */
 @interface CHIPContentLaunch : CHIPCluster
 
@@ -271,7 +271,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Door Lock
- *    
+ *
  */
 @interface CHIPDoorLock : CHIPCluster
 
@@ -312,7 +312,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster General Commissioning
- *    
+ *
  */
 @interface CHIPGeneralCommissioning : CHIPCluster
 
@@ -331,7 +331,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Groups
- *    
+ *
  */
 @interface CHIPGroups : CHIPCluster
 
@@ -351,7 +351,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Identify
- *    
+ *
  */
 @interface CHIPIdentify : CHIPCluster
 
@@ -368,7 +368,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Keypad Input
- *    
+ *
  */
 @interface CHIPKeypadInput : CHIPCluster
 
@@ -382,7 +382,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Level Control
- *    
+ *
  */
 @interface CHIPLevelControl : CHIPCluster
 
@@ -406,7 +406,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Low Power
- *    
+ *
  */
 @interface CHIPLowPower : CHIPCluster
 
@@ -420,7 +420,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Media Input
- *    
+ *
  */
 @interface CHIPMediaInput : CHIPCluster
 
@@ -438,7 +438,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Media Playback
- *    
+ *
  */
 @interface CHIPMediaPlayback : CHIPCluster
 
@@ -462,7 +462,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster On/off
- *    
+ *
  */
 @interface CHIPOnOff : CHIPCluster
 
@@ -481,7 +481,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Scenes
- *    
+ *
  */
 @interface CHIPScenes : CHIPCluster
 
@@ -506,7 +506,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster TV Channel
- *    
+ *
  */
 @interface CHIPTvChannel : CHIPCluster
 
@@ -525,7 +525,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Target Navigator
- *    
+ *
  */
 @interface CHIPTargetNavigator : CHIPCluster
 
@@ -540,7 +540,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Temperature Measurement
- *    
+ *
  */
 @interface CHIPTemperatureMeasurement : CHIPCluster
 
@@ -558,7 +558,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Wake on LAN
- *    
+ *
  */
 @interface CHIPWakeOnLan : CHIPCluster
 

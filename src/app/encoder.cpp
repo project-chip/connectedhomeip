@@ -5236,4 +5236,3 @@ PacketBufferHandle encodeWakeOnLanClusterReadClusterRevisionAttribute(uint8_t se
        .Put16(0xFFFD);
     COMMAND_FOOTER();
 }
-
