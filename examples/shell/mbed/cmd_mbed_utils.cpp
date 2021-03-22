@@ -470,6 +470,100 @@ exit:
     {
         sock.udpSocket.Close();
     }
+    return error;
+}
+
+int cmd_socket_tcp(int argc, char ** argv)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    INET_ERROR err;
+    char addrStr[16];
+    ChipSocket sock;
+    uint16_t port = 80;
+    PacketHeader header;
+    IPAddress addr;
+    streamer_t * sout    = streamer_get();
+    const char payload[] = "GET / HTTP/1.1\r\n"
+                           "Host: ifconfig.io\r\n"
+                           "Connection: close\r\n"
+                           "\r\n";
+
+    uint16_t payloadLen = sizeof(payload);
+
+    PacketBufferHandle buffer = PacketBufferHandle::NewWithData(payload, payloadLen);
+    if (buffer.IsNull())
+    {
+        streamer_printf(sout, "ERROR: create payload buffer failed\r\n");
+        return false;
+    }
+
+    //******************************to be replaced********************************************************
+
+    const char hostname[] = "ifconfig.io";
+    SocketAddress address;
+    /* get the host address */
+    printf("\nResolve hostname %s\r\n", hostname);
+    WiFiInterface * _net = WiFiInterface::get_default_instance();
+    int result           = _net->gethostbyname(hostname, &address);
+    if (result != 0)
+    {
+        printf("Error! gethostbyname(%s) returned: %d\r\n", hostname, result);
+        return false;
+    }
+
+    printf("%s address is %s\r\n", hostname, (address.get_ip_address() ? address.get_ip_address() : "None"));
+    address.set_port(htons(80));
+
+    IPAddress::FromString(address.get_ip_address(), addr);
+    //**************************************************************************************
+
+    new (&sock.tcpSocket) TCPImpl;
+    err = sock.tcpSocket.Init(Transport::TcpListenParameters(&DeviceLayer::InetLayer).SetAddressType(addr.Type()));
+
+    if (err != INET_NO_ERROR)
+    {
+        streamer_printf(sout, "ERROR: create %s endpoint failed\r\n", argv[0]);
+        return error;
+    }
+    TransportMgrBase gTransportMgrBase;
+    SocketTransportMgrDelegate gSocketTransportMgrDelegate;
+    gTransportMgrBase.SetSecureSessionMgr((TransportMgrDelegate *) &gSocketTransportMgrDelegate);
+    gTransportMgrBase.SetRendezvousSession((TransportMgrDelegate *) &gSocketTransportMgrDelegate);
+    gTransportMgrBase.Init((Transport::Base *) &sock.tcpSocket);
+    header.SetSourceNodeId(kSourceNodeId).SetDestinationNodeId(kDestinationNodeId).SetMessageId(kMessageId);
+
+    err = sock.tcpSocket.SendMessage(header, Transport::PeerAddress::TCP(addr, port), std::move(buffer));
+
+    if (err != INET_NO_ERROR)
+    {
+        streamer_printf(sout, "ERROR: send socket message failed\r\n");
+        //  ExitNow(error = err;);
+        return error;
+    }
+    streamer_printf(sout, "INFO: send %s message %s to address: %s port: %d\r\n", argv[0], payload,
+                    addr.ToString(addrStr, sizeof(addrStr)), port);
+
+    socketEvent.clear();
+
+    char buf[100];
+    int remaining_bytes = 100;
+    int received_bytes  = 0;
+
+    nsapi_size_or_error_t res = remaining_bytes;
+    while (res > 0 && remaining_bytes > 0)
+    {
+        res = mbed_recv(0, buf + received_bytes, remaining_bytes, 0);
+        if (res < 0)
+        {
+            printf("Error! _socket.recv() returned: %d\r\n", res);
+            return false;
+        }
+
+        received_bytes += res;
+        remaining_bytes -= res;
+    }
+
+    printf("received %d bytes:\r\n%.*s\r\n\r\n", received_bytes, strstr(buf, "\n") - buf, buf);
 
     return error;
 }
@@ -576,6 +670,9 @@ static const shell_command_t cmds_socket[] = {
       "Connect and send test message to echo server via specific socket. Usage: socket echo <type> <ip> <port> <message>" },
     { &cmd_socket_bsd, "bsd",
       "BSD IP communication test via specific socket. Send message in loopback. Usage: socket echo <type> <message>" },
+    { &cmd_socket_tcp, "tcp",
+      "BSD IP communication test via specific socket. Send message in loopback. Usage: socket echo <type> <message>" },
+
     { &cmd_socket_help, "help", "Display help for each socket subcommands" }
 };
 
