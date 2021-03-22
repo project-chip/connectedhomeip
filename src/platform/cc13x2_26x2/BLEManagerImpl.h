@@ -271,7 +271,6 @@ private:
         kBLEStackGATTNameUpdate   = 0x0010, /* Trigger TI BLE Stack name update, must be performed prior to adv start */
         kBLEStackGATTNameSet      = 0x0020, /* Device name has been set externally*/
         kAdvertisingRefreshNeeded = 0x0040, /* Advertising settings changed and it should be restarted */
-
     };
 
     BitFlags<Flags> mFlags;
