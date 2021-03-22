@@ -259,6 +259,9 @@ CHIP_ERROR ReliableMessageContext::SendStandaloneAckMessage()
     // Send the null message
     if (mExchange != nullptr)
     {
+#if !defined(NDEBUG)
+        ChipLogProgress(ExchangeManager, "Sending solitary ack for MsgId:%08" PRIX32, mPendingPeerAckId);
+#endif
         err = mExchange->SendMessage(Protocols::SecureChannel::MsgType::StandaloneAck, std::move(msgBuf),
                                      BitFlags<SendMessageFlags>{ SendMessageFlags::kNoAutoRequestAck });
     }
