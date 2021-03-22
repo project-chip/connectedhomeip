@@ -29,6 +29,7 @@
 #include <mbedtls/threading.h>
 
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/KeyValueStoreManager.h>
 #include <support/CHIPMem.h>
 #include <support/CHIPPlatformMemory.h>
 
@@ -107,6 +108,7 @@ int main(void)
 
     // Init Chip memory management before the stack
     chip::Platform::MemoryInit();
+    chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init();
 
     ret = PlatformMgr().InitChipStack();
     if (ret != CHIP_NO_ERROR)

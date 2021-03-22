@@ -51,15 +51,15 @@ public:
     // ===== Members that define the internal interface of the BLEManager
 
     using CHIPoBLEServiceMode = ConnectivityManager::CHIPoBLEServiceMode;
+    using BLEAdvertisingMode  = ConnectivityManager::BLEAdvertisingMode;
 
     CHIP_ERROR Init();
     CHIPoBLEServiceMode GetCHIPoBLEServiceMode();
     CHIP_ERROR SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val);
     bool IsAdvertisingEnabled();
     CHIP_ERROR SetAdvertisingEnabled(bool val);
-    bool IsFastAdvertisingEnabled();
-    CHIP_ERROR SetFastAdvertisingEnabled(bool val);
     bool IsAdvertising();
+    CHIP_ERROR SetAdvertisingMode(BLEAdvertisingMode mode);
     CHIP_ERROR GetDeviceName(char * buf, size_t bufSize);
     CHIP_ERROR SetDeviceName(const char * deviceName);
     uint16_t NumConnections();
@@ -136,19 +136,14 @@ inline CHIP_ERROR BLEManager::SetAdvertisingEnabled(bool val)
     return static_cast<ImplClass *>(this)->_SetAdvertisingEnabled(val);
 }
 
-inline bool BLEManager::IsFastAdvertisingEnabled()
-{
-    return static_cast<ImplClass *>(this)->_IsFastAdvertisingEnabled();
-}
-
-inline CHIP_ERROR BLEManager::SetFastAdvertisingEnabled(bool val)
-{
-    return static_cast<ImplClass *>(this)->_SetFastAdvertisingEnabled(val);
-}
-
 inline bool BLEManager::IsAdvertising()
 {
     return static_cast<ImplClass *>(this)->_IsAdvertising();
+}
+
+inline CHIP_ERROR BLEManager::SetAdvertisingMode(BLEAdvertisingMode mode)
+{
+    return static_cast<ImplClass *>(this)->_SetAdvertisingMode(mode);
 }
 
 inline CHIP_ERROR BLEManager::GetDeviceName(char * buf, size_t bufSize)

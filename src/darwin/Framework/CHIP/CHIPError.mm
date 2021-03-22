@@ -17,6 +17,7 @@
 
 #import "CHIPError.h"
 
+#import <app/util/af-enums.h>
 #import <core/CHIPError.h>
 #import <inet/InetError.h>
 
@@ -51,6 +52,11 @@ NSString * const CHIPErrorDomain = @"CHIPErrorDomain";
         return [NSError errorWithDomain:CHIPErrorDomain
                                    code:CHIPErrorCodeIntegrityCheckFailed
                                userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Integrity check failed.", nil) }];
+    case EMBER_ZCL_STATUS_DUPLICATE_EXISTS:
+        return [NSError
+            errorWithDomain:CHIPErrorDomain
+                       code:CHIPErrorCodeDuplicateExists
+                   userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"A Duplicate entry or setting exists.", nil) }];
     case CHIP_NO_ERROR:
         return [NSError errorWithDomain:CHIPErrorDomain
                                    code:CHIPSuccess
@@ -58,7 +64,10 @@ NSString * const CHIPErrorDomain = @"CHIPErrorDomain";
     default:
         return [NSError errorWithDomain:CHIPErrorDomain
                                    code:CHIPErrorCodeUndefinedError
-                               userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Undefined error.", nil) }];
+                               userInfo:@{
+                                   NSLocalizedDescriptionKey :
+                                       [NSString stringWithFormat:NSLocalizedString(@"Undefined error:%d.", nil), errorCode]
+                               }];
         ;
     }
 }
@@ -70,6 +79,8 @@ NSString * const CHIPErrorDomain = @"CHIPErrorDomain";
     }
 
     switch (error.code) {
+    case CHIPErrorCodeDuplicateExists:
+        return EMBER_ZCL_STATUS_DUPLICATE_EXISTS;
     case CHIPErrorCodeInvalidStringLength:
         return CHIP_ERROR_INVALID_STRING_LENGTH;
     case CHIPErrorCodeInvalidIntegerValue:

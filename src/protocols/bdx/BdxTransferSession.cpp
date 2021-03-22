@@ -16,6 +16,8 @@
 #include <system/SystemPacketBuffer.h>
 #include <transport/SecureSessionMgr.h>
 
+#include <type_traits>
+
 namespace {
 constexpr uint8_t kBdxVersion = 0; ///< The version of this implementation of the BDX spec
 
@@ -42,7 +44,7 @@ CHIP_ERROR WriteToPacketBuffer(const ::chip::bdx::BdxMessage & msgStruct, ::chip
 
 // We could make this whole method a template, but it's probably smaller code to
 // share the implementation across all message types.
-CHIP_ERROR AttachHeader(uint16_t protocolId, uint8_t msgType, ::chip::System::PacketBufferHandle & msgBuf)
+CHIP_ERROR AttachHeader(chip::Protocols::Id protocolId, uint8_t msgType, ::chip::System::PacketBufferHandle & msgBuf)
 {
     ::chip::PayloadHeader payloadHeader;
 
@@ -58,7 +60,7 @@ exit:
 template <typename MessageType>
 inline CHIP_ERROR AttachHeader(MessageType msgType, ::chip::System::PacketBufferHandle & msgBuf)
 {
-    return AttachHeader(chip::Protocols::MessageTypeTraits<MessageType>::ProtocolId, static_cast<uint8_t>(msgType), msgBuf);
+    return AttachHeader(chip::Protocols::MessageTypeTraits<MessageType>::ProtocolId(), static_cast<uint8_t>(msgType), msgBuf);
 }
 } // anonymous namespace
 
@@ -424,7 +426,7 @@ CHIP_ERROR TransferSession::HandleMessageReceived(System::PacketBufferHandle msg
     err = payloadHeader.DecodeAndConsume(msg);
     SuccessOrExit(err);
 
-    if (payloadHeader.GetProtocolID() == Protocols::kProtocol_BDX)
+    if (payloadHeader.HasProtocol(Protocols::BDX::Id))
     {
         err = HandleBdxMessage(payloadHeader, std::move(msg));
         SuccessOrExit(err);
@@ -506,7 +508,7 @@ CHIP_ERROR TransferSession::HandleStatusReportMessage(PayloadHeader & header, Sy
 
     Protocols::SecureChannel::StatusReport report;
     ReturnErrorOnFailure(report.Parse(std::move(msg)));
-    VerifyOrReturnError((report.GetProtocolId() == Protocols::kProtocol_BDX), CHIP_ERROR_INVALID_MESSAGE_TYPE);
+    VerifyOrReturnError((report.GetProtocolId() == Protocols::BDX::Id.ToFullyQualifiedSpecForm()), CHIP_ERROR_INVALID_MESSAGE_TYPE);
 
     mStatusReportData.statusCode = static_cast<StatusCode>(report.GetProtocolCode());
 
@@ -843,11 +845,12 @@ CHIP_ERROR TransferSession::VerifyProposedMode(const BitFlags<TransferControlFla
 
 void TransferSession::PrepareStatusReport(StatusCode code)
 {
+    static_assert(std::is_same<std::underlying_type_t<decltype(code)>, uint16_t>::value, "Cast is not safe");
+
     mStatusReportData.statusCode = code;
 
     Protocols::SecureChannel::StatusReport report(Protocols::SecureChannel::GeneralStatusCode::kFailure,
-                                                  static_cast<uint32_t>(Protocols::kProtocol_BDX), static_cast<uint16_t>(code));
-
+                                                  Protocols::BDX::Id.ToFullyQualifiedSpecForm(), static_cast<uint16_t>(code));
     size_t msgSize = report.Size();
     Encoding::LittleEndian::PacketBufferWriter bbuf(chip::MessagePacketBuffer::New(msgSize), msgSize);
     VerifyOrExit(!bbuf.IsNull(), mPendingOutput = OutputEventType::kInternalError);

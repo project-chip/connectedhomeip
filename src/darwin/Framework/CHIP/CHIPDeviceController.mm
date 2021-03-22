@@ -189,8 +189,12 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
     dispatch_sync(_chipWorkQueue, ^{
         chip::RendezvousParameters params
             = chip::RendezvousParameters().SetSetupPINCode(setupPINCode).SetDiscriminator(discriminator);
-        CHIP_ERROR err = self.cppCommissioner->PairDevice(deviceID, params);
-        success = ![self checkForError:err logMsg:kErrorPairDevice error:error];
+        CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
+
+        if ([self _isRunning]) {
+            errorCode = self.cppCommissioner->PairDevice(deviceID, params);
+        }
+        success = ![self checkForError:errorCode logMsg:kErrorPairDevice error:error];
     });
 
     return success;

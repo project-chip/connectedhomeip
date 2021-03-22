@@ -286,7 +286,7 @@ namespace Protocols {
 template <>
 struct MessageTypeTraits<bdx::MessageType>
 {
-    static constexpr uint16_t ProtocolId = chip::Protocols::kProtocol_BDX;
+    static constexpr const Protocols::Id & ProtocolId() { return BDX::Id; }
 };
 } // namespace Protocols
 

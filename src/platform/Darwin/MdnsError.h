@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2014-2017 Nest Labs, Inc.
+ *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,29 +15,14 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      This file defines chip vendor identifiers.
- *
- *      Vendor identifiers are assigned and administered by CHIP.
- *
- */
-
-#pragma once
-
-#include <cstdint>
+#include "MdnsImpl.h"
 
 namespace chip {
+namespace Mdns {
+namespace Error {
 
-//
-// CHIP Vendor Identifiers (16 bits max)
-//
+const char * ToString(DNSServiceErrorType errorCode);
 
-enum VendorId : uint16_t
-{
-    Common       = 0x0000u,
-    NestLabs     = 0x235Au,
-    NotSpecified = 0xFFFFu
-};
-
+} // namespace Error
+} // namespace Mdns
 } // namespace chip

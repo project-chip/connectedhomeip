@@ -25,9 +25,11 @@
 #pragma once
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
+#include "FreeRTOS.h"
 #include "gatt_db.h"
 #include "sl_bgapi.h"
 #include "sl_bt_api.h"
+#include "timers.h"
 
 namespace chip {
 namespace DeviceLayer {
@@ -51,9 +53,8 @@ class BLEManagerImpl final : public BLEManager, private BleLayer, private BlePla
     CHIP_ERROR _SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val);
     bool _IsAdvertisingEnabled(void);
     CHIP_ERROR _SetAdvertisingEnabled(bool val);
-    bool _IsFastAdvertisingEnabled(void);
-    CHIP_ERROR _SetFastAdvertisingEnabled(bool val);
     bool _IsAdvertising(void);
+    CHIP_ERROR _SetAdvertisingMode(BLEAdvertisingMode mode);
     CHIP_ERROR _GetDeviceName(char * buf, size_t bufSize);
     CHIP_ERROR _SetDeviceName(const char * deviceName);
     uint16_t _NumConnections(void);
@@ -142,10 +143,13 @@ class BLEManagerImpl final : public BLEManager, private BleLayer, private BlePla
     void HandleSoftTimerEvent(volatile sl_bt_msg_t * evt);
     bool RemoveConnection(uint8_t connectionHandle);
     void AddConnection(uint8_t connectionHandle, uint8_t bondingHandle);
+    void StartBleAdvTimeoutTimer(uint32_t aTimeoutInMs);
+    void CancelBleAdvTimeoutTimer(void);
     CHIPoBLEConState * GetConnectionState(uint8_t conId, bool allocate = false);
     uint8_t GetTimerHandle(uint8_t connectionHandle, bool allocate = false);
     static void DriveBLEState(intptr_t arg);
     static void bluetoothStackEventHandler(void * p_arg);
+    static void BleAdvTimeoutHandler(TimerHandle_t xTimer);
 };
 
 /**
@@ -183,11 +187,6 @@ inline BLEManager::CHIPoBLEServiceMode BLEManagerImpl::_GetCHIPoBLEServiceMode(v
 inline bool BLEManagerImpl::_IsAdvertisingEnabled(void)
 {
     return mFlags.Has(Flags::kAdvertisingEnabled);
-}
-
-inline bool BLEManagerImpl::_IsFastAdvertisingEnabled(void)
-{
-    return mFlags.Has(Flags::kFastAdvertisingEnabled);
 }
 
 } // namespace Internal
