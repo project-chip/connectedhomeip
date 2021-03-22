@@ -141,7 +141,7 @@ struct BSDSocket : public FileHandle
                 break;
             }
         }
-        
+
         return 0;
     }
 
@@ -190,6 +190,8 @@ struct BSDSocket : public FileHandle
         }
         return ret;
     }
+
+    SocketAddress bound_socket;
 
 private:
     union

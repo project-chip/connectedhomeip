@@ -40,6 +40,18 @@ void Sockaddr2Netsocket(SocketAddress * dst, struct sockaddr * src)
     dst->set_ip_bytes(addr->sin_addr.s4_addr, Inet2Nsapi(src->sa_family));
 }
 
+static BSDSocket * getBSDSocket(int fd)
+{
+    BSDSocket * socket = static_cast<BSDSocket *>(mbed_file_handle(fd));
+
+    if (socket == nullptr)
+    {
+        return nullptr;
+    }
+
+    return socket;
+}
+
 static Socket * getSocket(int fd)
 {
     BSDSocket * socket = static_cast<BSDSocket *>(mbed_file_handle(fd));
@@ -81,11 +93,39 @@ int mbed_socket(int family, int type, int proto)
 
 int mbed_socketpair(int family, int type, int proto, int sv[2])
 {
-    return 0;
+    set_errno(EAFNOSUPPORT);
+    return -1;
 }
 
 int mbed_shutdown(int fd, int how)
 {
+    auto * socket = getBSDSocket(fd);
+    if (socket == nullptr)
+    {
+        set_errno(EBADF);
+        return -1;
+    }
+
+    if (how != SHUT_RD && how != SHUT_WR && how != SHUT_RDWR)
+    {
+        set_errno(EINVAL);
+        return -1;
+    }
+
+    switch (how)
+    {
+    case SHUT_RD:
+        socket->enable_input(false);
+        break;
+    case SHUT_WR:
+        socket->enable_output(false);
+        break;
+    case SHUT_RDWR:
+        socket->enable_input(false);
+        socket->enable_output(false);
+        break;
+    }
+
     return 0;
 }
 
@@ -295,6 +335,50 @@ int mbed_setsockopt(int fd, int level, int optname, const void * optval, socklen
 
 int mbed_getsockname(int fd, struct sockaddr * addr, socklen_t * addrlen)
 {
+    auto * socket = getBSDSocket(fd);
+    if (socket == nullptr)
+    {
+        set_errno(EBADF);
+        return -1;
+    }
+
+    if (addr == nullptr || addrlen == nullptr)
+    {
+        set_errno(EFAULT);
+        return -1;
+    }
+
+    if (addrlen < 0)
+    {
+        set_errno(EINVAL);
+        return -1;
+    }
+
+    if (socket->bound_socket.get_ip_version() == NSAPI_IPv4)
+    {
+        if (*addrlen < sizeof(sockaddr_in))
+        {
+            *addrlen = sizeof(sockaddr_in);
+            set_errno(ENOBUFS);
+            return -1;
+        }
+    }
+    else if (socket->bound_socket.get_ip_version() == NSAPI_IPv6)
+    {
+        if (*addrlen < sizeof(sockaddr_in6))
+        {
+            *addrlen = sizeof(sockaddr_in6);
+            set_errno(ENOBUFS);
+            return -1;
+        }
+    }
+
+    if (convert_mbed_addr_to_bsd(addr, &socket->bound_socket) < 0)
+    {
+        set_errno(ENOBUFS);
+        return -1;
+    }
+
     return 0;
 }
 

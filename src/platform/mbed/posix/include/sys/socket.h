@@ -354,6 +354,9 @@ struct linger
 #define O_RDWR (O_RDONLY | O_WRONLY)
 #endif
 
+/*
+ * shutdown() how options
+ */
 #define SHUT_RD 0
 #define SHUT_WR 1
 #define SHUT_RDWR 2
