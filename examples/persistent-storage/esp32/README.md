@@ -70,7 +70,7 @@ To download and install packages run bootstrap.sh
         $ source ./scripts/activate.sh
         $ cd {path-to-connectedhomeip-examples}
 
-If packages are already installed then simply activate it. 
+If packages are already installed then simply activate it.
 
         $ cd ${HOME}/tools/esp-idf
         $ . ./export.sh
