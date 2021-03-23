@@ -73,6 +73,20 @@ public:
      */
     chip::TLV::TLVWriter * GetWriter() { return mpWriter; };
 
+    /**
+     * Checkpoint the current tlv state into a TLVWriter
+     *
+     * @param[out] aPoint A writer to checkpoint the state of the TLV writer into.
+     */
+    void Checkpoint(chip::TLV::TLVWriter & aPoint) { aPoint = *mpWriter; };
+
+    /**
+     * Rollback the request state into the checkpointed TLVWriter
+     *
+     * @param[in] aPoint A writer to that captured the state at some point in the past
+     */
+    void Rollback(chip::TLV::TLVWriter & aPoint) { *mpWriter = aPoint; }
+
 protected:
     CHIP_ERROR mError;
     chip::TLV::TLVWriter * mpWriter;

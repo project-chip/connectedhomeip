@@ -1151,6 +1151,41 @@ void ReadRequestTest(nlTestSuite * apSuite, void * apContext)
     ParseReadRequest(apSuite, reader);
 }
 
+void CheckPointRolllbackTest(nlTestSuite * apSuite, void * apContext)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    size_t NumDataElement = 0;
+    chip::System::PacketBufferTLVWriter writer;
+    chip::System::PacketBufferTLVReader reader;
+    AttributeDataList::Parser attributeDataListParser;
+    chip::TLV::TLVWriter checkpoint;
+    writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
+    AttributeDataList::Builder attributeDataListBuilder;
+    attributeDataListBuilder.Init(&writer);
+
+    attributeDataListBuilder.Checkpoint(checkpoint);
+    //BuildAttributeDataList would encode one attribute element
+    BuildAttributeDataList(apSuite, attributeDataListBuilder);
+    attributeDataListBuilder.Rollback(checkpoint);
+
+    chip::System::PacketBufferHandle buf;
+    err = writer.Finalize(&buf);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    reader.Init(std::move(buf));
+    err = reader.Next();
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    err = attributeDataListParser.Init(reader);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    while (CHIP_NO_ERROR == (err = reader.Next()))
+    {
+        ++NumDataElement;
+    }
+    NL_TEST_ASSERT(apSuite, NumDataElement == 0);
+}
+
 /**
  *   Test Suite. It lists all the test functions.
  */
@@ -1176,6 +1211,7 @@ const nlTest sTests[] =
                 NL_TEST_DEF("ReportDataTest", ReportDataTest),
                 NL_TEST_DEF("InvokeCommandTest", InvokeCommandTest),
                 NL_TEST_DEF("ReadRequestTest", ReadRequestTest),
+                NL_TEST_DEF("CheckPointRolllbackTest", CheckPointRolllbackTest),
                 NL_TEST_SENTINEL()
         };
 // clang-format on
