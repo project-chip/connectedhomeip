@@ -231,7 +231,7 @@ private:
 
     struct UnsolicitedMessageHandler
     {
-        UnsolicitedMessageHandler() : ProtocolId(Protocols::NotSpecified) {}
+        UnsolicitedMessageHandler() : Delegate(nullptr), ProtocolId(Protocols::NotSpecified) {}
         ExchangeDelegate * Delegate;
         Protocols::Id ProtocolId;
         int16_t MessageType;
