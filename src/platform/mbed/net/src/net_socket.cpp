@@ -146,7 +146,7 @@ int mbed_bind(int fd, const struct sockaddr * addr, socklen_t addrlen)
         return -1;
     }
 
-    if (socket->socketName != nullptr)
+    if (socket->socketName)
     {
         set_errno(EINVAL);
         return -1;
@@ -166,7 +166,7 @@ int mbed_bind(int fd, const struct sockaddr * addr, socklen_t addrlen)
         return -1;
     }
 
-    socket->socketName = new SocketAddress(sockAddr);
+    socket->socketName = sockAddr;
 
     return 0;
 }
@@ -408,13 +408,13 @@ int mbed_getsockname(int fd, struct sockaddr * addr, socklen_t * addrlen)
         return -1;
     }
 
-    if (socket->socketName == nullptr)
+    if (socket->socketName)
     {
         set_errno(EINVAL);
         return -1;
     }
 
-    if (socket->socketName->get_ip_version() == NSAPI_IPv4)
+    if (socket->socketName.get_ip_version() == NSAPI_IPv4)
     {
         if (*addrlen < sizeof(sockaddr_in))
         {
@@ -423,7 +423,7 @@ int mbed_getsockname(int fd, struct sockaddr * addr, socklen_t * addrlen)
             return -1;
         }
     }
-    else if (socket->socketName->get_ip_version() == NSAPI_IPv6)
+    else if (socket->socketName.get_ip_version() == NSAPI_IPv6)
     {
         if (*addrlen < sizeof(sockaddr_in6))
         {
@@ -433,7 +433,7 @@ int mbed_getsockname(int fd, struct sockaddr * addr, socklen_t * addrlen)
         }
     }
 
-    if (convert_mbed_addr_to_bsd(addr, socket->socketName) < 0)
+    if (convert_mbed_addr_to_bsd(addr, &socket->socketName) < 0)
     {
         set_errno(ENOBUFS);
         return -1;

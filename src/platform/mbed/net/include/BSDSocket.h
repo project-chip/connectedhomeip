@@ -117,7 +117,7 @@ struct BSDSocket : public FileHandle
         _flags.store(0);
         if (socketName)
         {
-            delete socketName;
+            socketName.set_ip_bytes(nullptr, NSAPI_UNSPEC);
         }
     }
 
@@ -197,7 +197,7 @@ struct BSDSocket : public FileHandle
         return ret;
     }
 
-    SocketAddress * socketName = nullptr;
+    SocketAddress socketName;
 
 private:
     union
