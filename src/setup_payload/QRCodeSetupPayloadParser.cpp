@@ -36,7 +36,6 @@
 #include <protocols/Protocols.h>
 #include <support/CodeUtils.h>
 #include <support/RandUtils.h>
-#include <support/ReturnMacros.h>
 #include <support/SafeInt.h>
 #include <support/ScopedBuffer.h>
 

@@ -34,7 +34,6 @@
 #include <setup_payload/SetupPayload.h>
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
-#include <support/ReturnMacros.h>
 #include <support/logging/CHIPLogging.h>
 #include <sys/param.h>
 #include <system/SystemPacketBuffer.h>

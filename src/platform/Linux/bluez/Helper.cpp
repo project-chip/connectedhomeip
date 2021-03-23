@@ -67,7 +67,6 @@
 
 #include <platform/Linux/BLEManagerImpl.h>
 #include <support/CodeUtils.h>
-#include <support/ReturnMacros.h>
 #include <system/TLVPacketBufferBackingStore.h>
 
 #include "BluezObjectIterator.h"

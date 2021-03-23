@@ -157,6 +157,128 @@ constexpr inline const _T & max(const _T & a, const _T & b)
 #define IgnoreUnusedVariable(aVariable) ((void) (aVariable))
 
 /**
+ *  @def ReturnErrorOnFailure(expr)
+ *
+ *  @brief
+ *    Returns the error code if the expression returns something different
+ *    than CHIP_NO_ERROR.
+ *
+ *  Example usage:
+ *
+ *  @code
+ *    ReturnErrorOnFailure(channel->SendMsg(msg));
+ *  @endcode
+ *
+ *  @param[in]  expr        A scalar expression to be evaluated against CHIP_NO_ERROR.
+ */
+#define ReturnErrorOnFailure(expr)                                                                                                 \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        CHIP_ERROR __err = (expr);                                                                                                 \
+        if (__err != CHIP_NO_ERROR)                                                                                                \
+        {                                                                                                                          \
+            return __err;                                                                                                          \
+        }                                                                                                                          \
+    } while (false)
+
+/**
+ *  @def ReturnOnFailure(expr)
+ *
+ *  @brief
+ *    Returns if the expression returns something different than CHIP_NO_ERROR
+ *
+ *  Example usage:
+ *
+ *  @code
+ *    ReturnOnFailure(channel->SendMsg(msg));
+ *  @endcode
+ *
+ *  @param[in]  expr        A scalar expression to be evaluated against CHIP_NO_ERROR.
+ */
+#define ReturnOnFailure(expr)                                                                                                      \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        CHIP_ERROR __err = (expr);                                                                                                 \
+        if (__err != CHIP_NO_ERROR)                                                                                                \
+        {                                                                                                                          \
+            return;                                                                                                                \
+        }                                                                                                                          \
+    } while (false)
+
+/**
+ *  @def VerifyOrReturn(expr, ...)
+ *
+ *  @brief
+ *    Returns from the void function if expression evaluates to false
+ *
+ *  Example usage:
+ *
+ * @code
+ *    VerifyOrReturn(param != nullptr, LogError("param is nullptr"));
+ *  @endcode
+ *
+ *  @param[in]  expr        A Boolean expression to be evaluated.
+ */
+#define VerifyOrReturn(expr, ...)                                                                                                  \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        if (!(expr))                                                                                                               \
+        {                                                                                                                          \
+            __VA_ARGS__;                                                                                                           \
+            return;                                                                                                                \
+        }                                                                                                                          \
+    } while (false)
+
+/**
+ *  @def VerifyOrReturnError(expr, code)
+ *
+ *  @brief
+ *    Returns a specified error code if expression evaluates to false
+ *
+ *  Example usage:
+ *
+ *  @code
+ *    VerifyOrReturnError(param != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+ *  @endcode
+ *
+ *  @param[in]  expr        A Boolean expression to be evaluated.
+ *  @param[in]  code        A value to return if @a expr is false.
+ */
+#define VerifyOrReturnError(expr, code)                                                                                            \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        if (!(expr))                                                                                                               \
+        {                                                                                                                          \
+            return code;                                                                                                           \
+        }                                                                                                                          \
+    } while (false)
+
+/**
+ *  @def ReturnErrorCodeIf(expr, code)
+ *
+ *  @brief
+ *    Returns a specified error code if expression evaluates to true
+ *
+ *  Example usage:
+ *
+ *  @code
+ *    ReturnErrorCodeIf(state == kInitialized, CHIP_NO_ERROR);
+ *    ReturnErrorCodeIf(state == kInitialized, CHIP_ERROR_INVALID_STATE);
+ *  @endcode
+ *
+ *  @param[in]  expr        A Boolean expression to be evaluated.
+ *  @param[in]  code        A value to return if @a expr is false.
+ */
+#define ReturnErrorCodeIf(expr, code)                                                                                              \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        if (expr)                                                                                                                  \
+        {                                                                                                                          \
+            return code;                                                                                                           \
+        }                                                                                                                          \
+    } while (false)
+
+/**
  *  @def SuccessOrExit(aStatus)
  *
  *  @brief
