@@ -126,6 +126,12 @@
 #define CHIP_PRINTCLUSTER_APPLIANCE_CONTROL_CLUSTER
 #endif
 
+#if defined(ZCL_USING_DESCRIPTOR_CLUSTER_SERVER) || defined(ZCL_USING_DESCRIPTOR_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_DESCRIPTOR_CLUSTER { ZCL_DESCRIPTOR_CLUSTER_ID, 29, "Descriptor" },
+#else
+#define CHIP_PRINTCLUSTER_DESCRIPTOR_CLUSTER
+#endif
+
 #if defined(ZCL_USING_POLL_CONTROL_CLUSTER_SERVER) || defined(ZCL_USING_POLL_CONTROL_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_POLL_CONTROL_CLUSTER { ZCL_POLL_CONTROL_CLUSTER_ID, 32, "Poll Control" },
 #else
@@ -532,10 +538,22 @@
 #define CHIP_PRINTCLUSTER_IAS_WD_CLUSTER
 #endif
 
+#if defined(ZCL_USING_MEDIA_PLAYBACK_CLUSTER_SERVER) || defined(ZCL_USING_MEDIA_PLAYBACK_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_MEDIA_PLAYBACK_CLUSTER { ZCL_MEDIA_PLAYBACK_CLUSTER_ID, 1286, "Media Playback" },
+#else
+#define CHIP_PRINTCLUSTER_MEDIA_PLAYBACK_CLUSTER
+#endif
+
 #if defined(ZCL_USING_LOW_POWER_CLUSTER_SERVER) || defined(ZCL_USING_LOW_POWER_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_LOW_POWER_CLUSTER { ZCL_LOW_POWER_CLUSTER_ID, 1288, "Low Power" },
 #else
 #define CHIP_PRINTCLUSTER_LOW_POWER_CLUSTER
+#endif
+
+#if defined(ZCL_USING_CONTENT_LAUNCH_CLUSTER_SERVER) || defined(ZCL_USING_CONTENT_LAUNCH_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_CONTENT_LAUNCH_CLUSTER { ZCL_CONTENT_LAUNCH_CLUSTER_ID, 1290, "Content Launch" },
+#else
+#define CHIP_PRINTCLUSTER_CONTENT_LAUNCH_CLUSTER
 #endif
 
 #if defined(ZCL_USING_APPLICATION_BASIC_CLUSTER_SERVER) || defined(ZCL_USING_APPLICATION_BASIC_CLUSTER_CLIENT)
@@ -746,18 +764,6 @@
 #define CHIP_PRINTCLUSTER_BINDING_CLUSTER
 #endif
 
-#if defined(ZCL_USING_MEDIA_PLAYBACK_CLUSTER_SERVER) || defined(ZCL_USING_MEDIA_PLAYBACK_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_MEDIA_PLAYBACK_CLUSTER { ZCL_MEDIA_PLAYBACK_CLUSTER_ID, 61441, "Media Playback" },
-#else
-#define CHIP_PRINTCLUSTER_MEDIA_PLAYBACK_CLUSTER
-#endif
-
-#if defined(ZCL_USING_CONTENT_LAUNCH_CLUSTER_SERVER) || defined(ZCL_USING_CONTENT_LAUNCH_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_CONTENT_LAUNCH_CLUSTER { ZCL_CONTENT_LAUNCH_CLUSTER_ID, 61442, "Content Launch" },
-#else
-#define CHIP_PRINTCLUSTER_CONTENT_LAUNCH_CLUSTER
-#endif
-
 #if defined(ZCL_USING_GROUP_KEY_MANAGEMENT_CLUSTER_SERVER) || defined(ZCL_USING_GROUP_KEY_MANAGEMENT_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_GROUP_KEY_MANAGEMENT_CLUSTER { ZCL_GROUP_KEY_MANAGEMENT_CLUSTER_ID, 61444, "Group Key Management" },
 #else
@@ -813,6 +819,7 @@
     CHIP_PRINTCLUSTER_OTA_BOOTLOAD_CLUSTER                                                                                         \
     CHIP_PRINTCLUSTER_POWER_PROFILE_CLUSTER                                                                                        \
     CHIP_PRINTCLUSTER_APPLIANCE_CONTROL_CLUSTER                                                                                    \
+    CHIP_PRINTCLUSTER_DESCRIPTOR_CLUSTER                                                                                           \
     CHIP_PRINTCLUSTER_POLL_CONTROL_CLUSTER                                                                                         \
     CHIP_PRINTCLUSTER_GREEN_POWER_CLUSTER                                                                                          \
     CHIP_PRINTCLUSTER_KEEPALIVE_CLUSTER                                                                                            \
@@ -870,7 +877,9 @@
     CHIP_PRINTCLUSTER_IAS_ZONE_CLUSTER                                                                                             \
     CHIP_PRINTCLUSTER_IAS_ACE_CLUSTER                                                                                              \
     CHIP_PRINTCLUSTER_IAS_WD_CLUSTER                                                                                               \
+    CHIP_PRINTCLUSTER_MEDIA_PLAYBACK_CLUSTER                                                                                       \
     CHIP_PRINTCLUSTER_LOW_POWER_CLUSTER                                                                                            \
+    CHIP_PRINTCLUSTER_CONTENT_LAUNCH_CLUSTER                                                                                       \
     CHIP_PRINTCLUSTER_APPLICATION_BASIC_CLUSTER                                                                                    \
     CHIP_PRINTCLUSTER_GENERIC_TUNNEL_CLUSTER                                                                                       \
     CHIP_PRINTCLUSTER_BACNET_PROTOCOL_TUNNEL_CLUSTER                                                                               \
@@ -905,8 +914,6 @@
     CHIP_PRINTCLUSTER_DIAGNOSTICS_CLUSTER                                                                                          \
     CHIP_PRINTCLUSTER_ZLL_COMMISSIONING_CLUSTER                                                                                    \
     CHIP_PRINTCLUSTER_BINDING_CLUSTER                                                                                              \
-    CHIP_PRINTCLUSTER_MEDIA_PLAYBACK_CLUSTER                                                                                       \
-    CHIP_PRINTCLUSTER_CONTENT_LAUNCH_CLUSTER                                                                                       \
     CHIP_PRINTCLUSTER_GROUP_KEY_MANAGEMENT_CLUSTER                                                                                 \
     CHIP_PRINTCLUSTER_SAMPLE_MFG_SPECIFIC_CLUSTER                                                                                  \
     CHIP_PRINTCLUSTER_SAMPLE_MFG_SPECIFIC_CLUSTER_2                                                                                \
