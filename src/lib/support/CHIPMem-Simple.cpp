@@ -64,7 +64,10 @@ void * MemoryCalloc(size_t num, size_t size)
     }
 
     void * result = MemoryAlloc(total);
-    memset(result, 0, total);
+    if (result != nullptr)
+    {
+        memset(result, 0, total);
+    }
     return result;
 }
 
