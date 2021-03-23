@@ -136,6 +136,11 @@ public:
         {{/chip_server_cluster_command_arguments}}
         ModelCommand::AddArguments();
     }
+    ~{{asCamelCased clusterName false}}{{asCamelCased name false}}()
+    {
+      delete onSuccessCallback;
+      delete onFailureCallback;
+    }
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -175,6 +180,12 @@ public:
         ModelCommand::AddArguments();
     }
 
+    ~Discover{{asCamelCased name false}}Attributes()
+    {
+      delete onSuccessCallback;
+      delete onFailureCallback;
+    }
+
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster ({{asHex parent.code 4}}) command (0x0C) on endpoint %" PRIu16, endpointId);
@@ -200,6 +211,12 @@ public:
     {
         AddArgument("attr-name", "{{asDelimitedCommand (asCamelCased name)}}");
         ModelCommand::AddArguments();
+    }
+
+    ~Read{{asCamelCased parent.name false}}{{asCamelCased name false}}()
+    {
+      delete onSuccessCallback;
+      delete onFailureCallback;
     }
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
@@ -229,6 +246,12 @@ public:
         AddArgument("attr-value", {{asTypeMinValue type}}, {{asTypeMaxValue type}}, &mValue);
         {{/if}}
         ModelCommand::AddArguments();
+    }
+
+    ~Write{{asCamelCased parent.name false}}{{asCamelCased name false}}()
+    {
+      delete onSuccessCallback;
+      delete onFailureCallback;
     }
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
@@ -264,6 +287,13 @@ public:
         AddArgument("change", {{asTypeMinValue type}}, {{asTypeMaxValue type}}, &mChange);
         {{/unless}}
         ModelCommand::AddArguments();
+    }
+
+    ~Report{{asCamelCased parent.name false}}{{asCamelCased name false}}()
+    {
+      delete onSuccessCallback;
+      delete onFailureCallback;
+      delete onReportCallback;
     }
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
