@@ -431,19 +431,21 @@ public:
     /**
      * @brief   Type of data reception event handling function.
      *
-     * @param[in]   endPoint    The TCP endpoint associated with the event.
-     * @param[in]   data        The data received.
+     * @param[in]   endPoint        The TCP endpoint associated with the event.
+     * @param[in]   data            The data received.
+     *
+     * @retval      INET_NO_ERROR   If the received data can be handled by higher layers.
+     * @retval      other           If the received data can not be used, and higher layers will not see it.
      *
      * @details
      *  Provide a function of this type to the \c OnDataReceived delegate
      *  member to process data reception events on \c endPoint where \c data
      *  is the message text received.
      *
-     *  A data reception event handler must acknowledge data processed using
-     *  the \c AckReceive method. The \c Free method on the data buffer must
-     *  also be invoked unless the \c PutBackReceivedData is used instead.
+     *  If this function returns an error, the connection will be closed, since higher layers
+     *  are not able to process the data for a better response.
      */
-    typedef void (*OnDataReceivedFunct)(TCPEndPoint * endPoint, chip::System::PacketBufferHandle data);
+    typedef INET_ERROR (*OnDataReceivedFunct)(TCPEndPoint * endPoint, chip::System::PacketBufferHandle data);
 
     /**
      * The endpoint's message text reception event handling function delegate.
