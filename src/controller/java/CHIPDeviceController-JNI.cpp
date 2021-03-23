@@ -345,7 +345,10 @@ JNI_METHOD(void, sendWiFiCredentials)(JNIEnv * env, jobject self, jlong handle, 
     JniUtfString passwordStr(env, password);
 
     ChipLogProgress(Controller, "Sending Wi-Fi credentials for: %s", ssidStr.c_str());
-    AndroidDeviceControllerWrapper::FromJNIHandle(handle)->SendNetworkCredentials(ssidStr.c_str(), passwordStr.c_str());
+    {
+        ScopedPthreadLock lock(&sStackLock);
+        AndroidDeviceControllerWrapper::FromJNIHandle(handle)->SendNetworkCredentials(ssidStr.c_str(), passwordStr.c_str());
+    }
 }
 
 JNI_METHOD(void, sendThreadCredentials)
