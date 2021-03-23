@@ -2089,3 +2089,44 @@ encodeTemperatureMeasurementClusterReadMaxMeasuredValueAttribute(uint8_t seqNum,
  */
 chip::System::PacketBufferHandle
 encodeTemperatureMeasurementClusterReadClusterRevisionAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+
+/*----------------------------------------------------------------------------*\
+| Cluster PumpConfigurationAndControl                                 | 0x0200 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * MeasuredValue                                                     | 0x0000 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/**
+ * @brief
+ *    Encode a Pump Controller server discover command into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodePumpConfigurationAndControlClusterDiscoverAttributes(uint8_t seqNum,
+                                                                                       chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Pump Controller server read command for the measured value attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodePumpConfigurationAndControlClusterReadMeasuredValueAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Pump Controller server configure report command for the measured value attribute into buffer including the
+ * APS frame
+ */
+chip::System::PacketBufferHandle
+encodePumpConfigurationAndControlClusterConfigureMeasuredValueAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                   uint16_t minInterval, uint16_t maxInterval, int16_t change);
+
+/**
+ * @brief
+ *    Encode a Pump Controller server read command for the cluster revision attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodePumpConfigurationAndControlClusterReadClusterRevisionAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
