@@ -83,7 +83,6 @@ static_library("support") {
     "PrivateHeap.h",
     "RandUtils.cpp",
     "RandUtils.h",
-    "ReturnMacros.h",
     "SafeInt.h",
     "SerializableIntegerSet.cpp",
     "SerializableIntegerSet.h",

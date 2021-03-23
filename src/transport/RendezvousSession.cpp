@@ -22,7 +22,6 @@
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
-#include <support/ReturnMacros.h>
 #include <support/SafeInt.h>
 #include <transport/RendezvousSession.h>
 #include <transport/SecureMessageCodec.h>

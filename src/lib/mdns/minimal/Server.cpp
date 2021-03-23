@@ -21,7 +21,6 @@
 #include <utility>
 
 #include <mdns/minimal/core/DnsHeader.h>
-#include <support/ReturnMacros.h>
 
 namespace mdns {
 namespace Minimal {

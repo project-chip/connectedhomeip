@@ -32,7 +32,6 @@
 #include <core/CHIPKeyIds.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <support/CodeUtils.h>
-#include <support/ReturnMacros.h>
 #include <support/SafeInt.h>
 #include <support/logging/CHIPLogging.h>
 #include <transport/AdminPairingTable.h>
