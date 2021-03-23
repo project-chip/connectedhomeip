@@ -42,7 +42,7 @@ using namespace Logging;
 constexpr size_t kMaxTcpActiveConnectionCount = 4;
 constexpr size_t kMaxTcpPendingPackets        = 4;
 #endif
-constexpr size_t kMaxPayloadSize         = 1280;
+constexpr size_t kMaxPayloadSize = 1280;
 
 namespace {
 
