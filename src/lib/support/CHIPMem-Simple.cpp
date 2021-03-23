@@ -18,6 +18,8 @@
 #include "CHIPMem.h"
 #include "PrivateHeap.h"
 
+#include <string.h>
+
 #include <support/CodeUtils.h>
 
 namespace {
@@ -53,7 +55,17 @@ void * MemoryAlloc(size_t size)
 
 void * MemoryCalloc(size_t num, size_t size)
 {
-    return MemoryAlloc(num * size);
+    size_t total = num * size;
+
+    // check is for multiplication overflow
+    if (size != total / num)
+    {
+        return nullptr;
+    }
+
+    void * result = MemoryAlloc(total);
+    memset(result, 0, total);
+    return result;
 }
 
 void * MemoryRealloc(void * p, size_t size)
@@ -74,3 +86,4 @@ void MemoryFree(void * p)
     }
     PrivateHeapFree(p);
 }
+P
