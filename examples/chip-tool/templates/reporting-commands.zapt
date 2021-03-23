@@ -13,6 +13,17 @@ public:
     Listen() : ReportingCommand("listen")
     {
     }
+
+    ~Listen()
+    {
+{{#chip_clusters}}
+{{#chip_server_cluster_attributes}}
+{{#if (isReportableAttribute)}}
+    delete onReport{{asCamelCased parent.name false}}{{asCamelCased name false}}Callback;
+{{/if}}
+{{/chip_server_cluster_attributes}}
+{{/chip_clusters}}
+    }
     
     void AddReportCallbacks(uint8_t endpointId) override
     {
