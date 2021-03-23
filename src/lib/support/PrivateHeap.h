@@ -38,6 +38,12 @@ void * PrivateHeapAlloc(void * heap, size_t size);
 // Marks the specified block as free
 void PrivateHeapFree(void * ptr);
 
+// Reallocate a block to a new size
+// Special arguments:
+//    - null ptr value represents an Alloc
+//    - zero size represents a Free
+void * PrivateHeapRealloc(void * heap, void * ptr, size_t size);
+
 void PrivateHeapDump(void * ptr);
 
 #ifdef __cplusplus
