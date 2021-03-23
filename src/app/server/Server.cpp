@@ -136,7 +136,8 @@ CHIP_ERROR RestoreAllAdminPairingsFromKVS(AdminPairingTable & adminPairings, Adm
         }
         else
         {
-            ChipLogProgress(AppServer, "Found admin pairing for %d, node ID %llu", admin->GetAdminId(), admin->GetNodeId());
+            ChipLogProgress(AppServer, "Found admin pairing for %d, node ID 0x%08" PRIx32 "%08" PRIx32, admin->GetAdminId(),
+                            static_cast<uint32_t>(admin->GetNodeId() >> 32), static_cast<uint32_t>(admin->GetNodeId()));
         }
     }
 
@@ -172,7 +173,9 @@ static CHIP_ERROR RestoreAllSessionsFromKVS(SecureSessionMgr & sessionMgr, Rende
         {
             connection.GetPASESession(session);
 
-            ChipLogProgress(AppServer, "Fetched the session information: from %llu", session->PeerConnection().GetPeerNodeId());
+            ChipLogProgress(AppServer, "Fetched the session information: from 0x%08" PRIx32 "%08" PRIx32,
+                            static_cast<uint32_t>(session->PeerConnection().GetPeerNodeId() >> 32),
+                            static_cast<uint32_t>(session->PeerConnection().GetPeerNodeId()));
             sessionMgr.NewPairing(Optional<Transport::PeerAddress>::Value(session->PeerConnection().GetPeerAddress()),
                                   session->PeerConnection().GetPeerNodeId(), session,
                                   SecureSessionMgr::PairingDirection::kResponder, connection.GetAdminId(), nullptr);
@@ -321,8 +324,7 @@ public:
     void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, SecureSessionHandle session,
                            System::PacketBufferHandle buffer, SecureSessionMgr * mgr) override
     {
-        auto state            = mgr->GetPeerConnectionState(session);
-        const size_t data_len = buffer->DataLength();
+        auto state = mgr->GetPeerConnectionState(session);
         char src_addr[PeerAddress::kMaxToStringSize];
 
         // as soon as a client connects, assume it is connected
@@ -333,7 +335,7 @@ public:
 
         state->GetPeerAddress().ToString(src_addr);
 
-        ChipLogProgress(AppServer, "Packet received from %s: %zu bytes", src_addr, static_cast<size_t>(data_len));
+        ChipLogProgress(AppServer, "Packet received from %s: %u bytes", src_addr, buffer->DataLength());
 
         // TODO: This code is temporary, and must be updated to use the Cluster API.
         // Issue: https://github.com/project-chip/connectedhomeip/issues/4725

@@ -75,7 +75,8 @@ CHIP_ERROR SecureSessionMgr::Init(NodeId localNodeId, System::Layer * systemLaye
     mTransportMgr = transportMgr;
     mAdmins       = admins;
 
-    ChipLogProgress(Inet, "local node id is %llu\n", mLocalNodeId);
+    ChipLogProgress(Inet, "local node id is 0x%08" PRIx32 "%08" PRIx32, static_cast<uint32_t>(mLocalNodeId >> 32),
+                    static_cast<uint32_t>(mLocalNodeId));
 
     ScheduleExpiryTimer();
 
@@ -199,7 +200,11 @@ CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHea
         encryptedMsg.mMsgId = packetHeader.GetMessageId();
     }
 
-    ChipLogProgress(Inet, "Sending msg from %llu to %llu", localNodeId, state->GetPeerNodeId());
+    ChipLogProgress(Inet, "Sending msg from 0x%08" PRIx32 "%08" PRIx32 "to 0x%08" PRIx32 "%08" PRIx32, 
+                    static_cast<uint32_t>(localNodeId >> 32),
+                    static_cast<uint32_t>(localNodeId),
+                    static_cast<uint32_t>(state->GetPeerNodeId() >> 32),
+                    static_cast<uint32_t>(state->GetPeerNodeId()));
 
     if (state->GetTransport() != nullptr)
     {
@@ -250,9 +255,10 @@ CHIP_ERROR SecureSessionMgr::NewPairing(const Optional<Transport::PeerAddress> &
             state, [this](const Transport::PeerConnectionState & state1) { HandleConnectionExpired(state1); });
     }
 
-    ChipLogDetail(Inet, "New pairing for device %llu, key %d!!", peerNodeId, peerKeyId);
-
-    state = nullptr;
+    ChipLogDetail(Inet, "New pairing for device 0x%08" PRIx32 "%08" PRIx32 ", key %d!!", 
+                  static_cast<uint32_t>(peerNodeId >> 32),
+                  static_cast<uint32_t>(peerNodeId), peerKeyId);
+        state = nullptr;
     ReturnErrorOnFailure(
         mPeerConnections.CreateNewPeerConnectionState(Optional<NodeId>::Value(peerNodeId), peerKeyId, localKeyId, &state));
 
