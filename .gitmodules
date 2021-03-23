@@ -70,3 +70,7 @@
 	path = third_party/freertos/repo
 	url = https://github.com/FreeRTOS/FreeRTOS-Kernel.git
 	branch = V10.3.1-kernel-only
+[submodule "mbed-os"]
+	path = third_party/mbed-os/repo
+	url = https://github.com/ARMmbed/mbed-os.git
+	branch = feature-chip
