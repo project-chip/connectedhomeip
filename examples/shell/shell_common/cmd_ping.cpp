@@ -42,7 +42,7 @@ using namespace Logging;
 constexpr size_t kMaxTcpActiveConnectionCount = 4;
 constexpr size_t kMaxTcpPendingPackets        = 4;
 #endif
-constexpr size_t kDecimalDigitsForUint64 = 20;
+constexpr size_t kMaxPayloadSize         = 1280;
 
 namespace {
 
@@ -157,11 +157,19 @@ CHIP_ERROR SendEchoRequest(streamer_t * stream)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     Messaging::SendFlags sendFlags;
-    uint32_t size                   = gPingArguments.GetEchoReqSize();
-    const char kRequestFormat[size] = "Echo Message %" PRIu64 "\n";
-    char requestData[(sizeof kRequestFormat) + kDecimalDigitsForUint64];
-    snprintf(requestData, sizeof requestData, kRequestFormat, gPingArguments.GetEchoCount());
-    System::PacketBufferHandle payloadBuf = MessagePacketBuffer::NewWithData(requestData, size);
+    System::PacketBufferHandle payloadBuf;
+    char * requestData = nullptr;
+
+    uint32_t size = gPingArguments.GetEchoReqSize();
+    VerifyOrExit(size <= kMaxPayloadSize, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+
+    requestData = static_cast<char *>(chip::Platform::MemoryAlloc(size));
+    VerifyOrExit(requestData != nullptr, err = CHIP_ERROR_NO_MEMORY);
+
+    snprintf(requestData, size, "Echo Message %" PRIu64 "\n", gPingArguments.GetEchoCount());
+
+    payloadBuf = MessagePacketBuffer::NewWithData(requestData, size);
+    VerifyOrExit(!payloadBuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
     if (gPingArguments.IsUsingCRMP())
     {
@@ -170,12 +178,6 @@ CHIP_ERROR SendEchoRequest(streamer_t * stream)
     else
     {
         sendFlags.Set(Messaging::SendMessageFlags::kNoAutoRequestAck);
-    }
-
-    if (payloadBuf.IsNull())
-    {
-        streamer_printf(stream, "Unable to allocate packet buffer\n");
-        return CHIP_ERROR_NO_MEMORY;
     }
 
     gPingArguments.SetLastEchoTime(System::Timer::GetCurrentEpoch());
@@ -190,7 +192,14 @@ CHIP_ERROR SendEchoRequest(streamer_t * stream)
         gPingArguments.SetWaitingForEchoResp(true);
         gPingArguments.IncrementEchoCount();
     }
-    else
+
+exit:
+    if (requestData != nullptr)
+    {
+        chip::Platform::MemoryFree(requestData);
+    }
+
+    if (err != CHIP_NO_ERROR)
     {
         streamer_printf(stream, "Send echo request failed, err: %s\n", ErrorStr(err));
     }
