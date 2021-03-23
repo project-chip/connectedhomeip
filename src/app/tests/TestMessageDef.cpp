@@ -1153,7 +1153,7 @@ void ReadRequestTest(nlTestSuite * apSuite, void * apContext)
 
 void CheckPointRolllbackTest(nlTestSuite * apSuite, void * apContext)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err        = CHIP_NO_ERROR;
     size_t NumDataElement = 0;
     chip::System::PacketBufferTLVWriter writer;
     chip::System::PacketBufferTLVReader reader;
@@ -1164,7 +1164,7 @@ void CheckPointRolllbackTest(nlTestSuite * apSuite, void * apContext)
     attributeDataListBuilder.Init(&writer);
 
     attributeDataListBuilder.Checkpoint(checkpoint);
-    //BuildAttributeDataList would encode one attribute element
+    // BuildAttributeDataList would encode one attribute element
     BuildAttributeDataList(apSuite, attributeDataListBuilder);
     attributeDataListBuilder.Rollback(checkpoint);
 
