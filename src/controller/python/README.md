@@ -229,13 +229,14 @@ chip-device-ctrl > ble-adapter-select DC:A6:32:9E:2E:A7
 
 ### **`[D]`** `ble-scan [-t <timeout>] [identifier]`
 
-*Deprecated, use `discover ble` instead*
+_Deprecated, use `discover ble` instead_
 
 Alias for `discover ble`
 
 ### `discover [ble|mdns]`
 
-Start device discovery procedure for searching valid CHIP devices over BLE or mDNS.
+Start device discovery procedure for searching valid CHIP devices over BLE or
+mDNS.
 
 ```
 chip-device-ctrl > discover ble
