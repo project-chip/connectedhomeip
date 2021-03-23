@@ -81,7 +81,10 @@ CHIP_ERROR ExchangeManager::Init(NodeId localNodeId, TransportMgrBase * transpor
 
     for (auto & handler : UMHandlerPool)
     {
-        handler = {};
+        // Mark all handlers as unallocated.  This handles both initial
+        // initialization and the case when the consumer shuts us down and
+        // then re-initializes without removing registered handlers.
+        handler.Delegate = nullptr;
     }
 
     mTransportMgr->SetRendezvousSession(this);
