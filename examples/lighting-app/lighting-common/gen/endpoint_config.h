@@ -318,8 +318,6 @@
 #define ZRD(x) EMBER_ZCL_REPORTING_DIRECTION_##x
 #define ZAP_REPORT_DIRECTION(x) ZRD(x)
 
-// Use this macro to check if Reporting plugin is included
-#define EMBER_AF_PLUGIN_REPORTING
 // User options for plugin Reporting
 #define EMBER_AF_PLUGIN_REPORTING_TABLE_SIZE (2)
 #define EMBER_AF_PLUGIN_REPORTING_ENABLE_GROUP_BOUND_REPORTS

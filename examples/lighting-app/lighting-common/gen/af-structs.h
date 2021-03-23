@@ -118,6 +118,13 @@ typedef struct _DeviceInformationRecord
     uint8_t sort;
 } EmberAfDeviceInformationRecord;
 
+// Struct for DeviceType
+typedef struct _DeviceType
+{
+    chip::DeviceTypeId type;
+    uint16_t revision;
+} EmberAfDeviceType;
+
 // Struct for DiscoverAttributesInfoRecord
 typedef struct _DiscoverAttributesInfoRecord
 {
