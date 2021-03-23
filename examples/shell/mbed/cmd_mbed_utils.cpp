@@ -73,9 +73,11 @@ public:
                            System::PacketBufferHandle msgBuf) override
     {
         char info[Transport::PeerAddress::kMaxToStringSize];
+        char msg[msgBuf->DataLength() + 1] = { 0 };
 
         source.ToString(info, sizeof(info));
-        streamer_printf(streamer_get(), "Received message from %s payload: %s\n\r", info, msgBuf->Start());
+        strncpy(msg, (char *) msgBuf->Start(), msgBuf->DataLength());
+        streamer_printf(streamer_get(), "Received message \"%s\" from %s\n\r", msg, info);
 
         socketEvent.set(socketMsgReceiveFlag);
     }
@@ -346,7 +348,7 @@ struct ChipSocket
     Transport::Type type;
 };
 
-static int socket_echo_parse_args(char ** argv, ChipSocket & sock, IPAddress & addr, uint16_t & port, char ** payload)
+static int socket_echo_parse_args(char ** argv, ChipSocket & sock, IPAddress & addr, uint16_t & port, char ** msg)
 {
     if (strcmp(argv[0], "UDP") == 0)
     {
@@ -366,8 +368,8 @@ static int socket_echo_parse_args(char ** argv, ChipSocket & sock, IPAddress & a
         return CHIP_ERROR_INVALID_ADDRESS;
     }
 
-    port     = atoi(argv[2]);
-    *payload = argv[3];
+    port = atoi(argv[2]);
+    *msg = argv[3];
 
     return CHIP_NO_ERROR;
 }
@@ -376,8 +378,8 @@ int cmd_socket_echo(int argc, char ** argv)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     INET_ERROR err;
-    char * payload;
-    uint16_t payloadLen;
+    char * msg;
+    uint16_t msgLen;
     ChipSocket sock;
     uint16_t port;
     char addrStr[16];
@@ -391,9 +393,9 @@ int cmd_socket_echo(int argc, char ** argv)
     streamer_t * sout = streamer_get();
     IPAddress addr;
 
-    VerifyOrExit(argc == 4, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(argc > 3, error = CHIP_ERROR_INVALID_ARGUMENT);
 
-    err = socket_echo_parse_args(argv, sock, addr, port, &payload);
+    err = socket_echo_parse_args(argv, sock, addr, port, &msg);
     if (err != INET_NO_ERROR)
     {
         sock.type = Transport::Type::kUndefined;
@@ -418,9 +420,9 @@ int cmd_socket_echo(int argc, char ** argv)
         ExitNow(error = err;);
     }
 
-    payloadLen = sizeof(payload);
+    msgLen = strlen(msg);
 
-    buffer = PacketBufferHandle::NewWithData(payload, payloadLen);
+    buffer = PacketBufferHandle::NewWithData(msg, msgLen);
     if (buffer.IsNull())
     {
         streamer_printf(sout, "ERROR: create payload buffer failed\r\n");
@@ -442,7 +444,7 @@ int cmd_socket_echo(int argc, char ** argv)
 
     socketEvent.clear();
 
-    streamer_printf(sout, "INFO: send %s message %s to address: %s port: %d\r\n", argv[0], payload,
+    streamer_printf(sout, "INFO: send %s message %s to address: %s port: %d\r\n", argv[0], msg,
                     addr.ToString(addrStr, sizeof(addrStr)), port);
     if (sock.type == Transport::Type::kUdp)
     {
@@ -459,7 +461,11 @@ int cmd_socket_echo(int argc, char ** argv)
         ExitNow(error = err;);
     }
 
-    socketEvent.wait_all(socketMsgReceiveFlag, 5000);
+    if (socketEvent.wait_all(socketMsgReceiveFlag, 5000) & osFlagsError)
+    {
+        streamer_printf(sout, "ERROR: socket message does not received\r\n");
+        error = CHIP_ERROR_TIMEOUT;
+    }
 
 exit:
     if (sock.type == Transport::Type::kTcp)
@@ -667,7 +673,8 @@ static const shell_command_t cmds_socket_root = { &cmd_socket_dispatch, "socket"
 
 static const shell_command_t cmds_socket[] = {
     { &cmd_socket_echo, "echo",
-      "Connect and send test message to echo server via specific socket. Usage: socket echo <type> <ip> <port> <message>" },
+      "Connect and send test message to echo server via specific socket. Usage: socket echo <type> <ip> <port> <message>, example: "
+      "socket echo TCP 127.0.0.1 7 Hello" },
     { &cmd_socket_bsd, "bsd",
       "BSD IP communication test via specific socket. Send message in loopback. Usage: socket echo <type> <message>" },
     { &cmd_socket_tcp, "tcp",

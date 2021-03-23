@@ -337,20 +337,36 @@ ssize_t mbed_recvmsg(int fd, struct msghdr * message, int flags)
     auto * socket = getSocket(fd);
     if (socket == nullptr)
     {
-        set_errno(ENOBUFS);
+        set_errno(EBADF);
+        return -1;
+    }
+
+    if (message == nullptr)
+    {
+        set_errno(EINVAL);
         return -1;
     }
     SocketAddress sockAddr;
-    msghdr2Netsocket(&sockAddr, (struct sockaddr_in *) message->msg_name);
     ssize_t total = 0;
     ssize_t read  = 0;
 
-    read = socket->recvfrom(&sockAddr, (void *) message->msg_iov, 128);
-    if (read < 0)
+    for (size_t i = 0; i < message->msg_iovlen; i++)
     {
-        set_errno(ENOBUFS);
+        read = socket->recvfrom(&sockAddr, (void *) message->msg_iov[i].iov_base, message->msg_iov[i].iov_len);
+        if (read < 0)
+        {
+            set_errno(EAGAIN);
+            return -1;
+        }
+        total += read;
+    }
+
+    if (convert_mbed_addr_to_bsd((sockaddr *) message->msg_name, &sockAddr))
+    {
+        set_errno(EINVAL);
         return -1;
     }
+
     ::read(fd, NULL, 0);
     return read;
 }
