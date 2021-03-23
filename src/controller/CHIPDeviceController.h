@@ -32,6 +32,7 @@
 #include <core/CHIPCore.h>
 #include <core/CHIPPersistentStorageDelegate.h>
 #include <core/CHIPTLV.h>
+#include <lib/mdns/Discovery_ImplPlatform.h>
 #include <messaging/ExchangeMgr.h>
 #include <support/DLLUtil.h>
 #include <support/SerializableIntegerSet.h>
@@ -41,7 +42,6 @@
 #include <transport/SecureSessionMgr.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/UDP.h>
-#include <lib/mdns/Discovery_ImplPlatform.h>
 
 namespace chip {
 
