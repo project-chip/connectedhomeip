@@ -21,6 +21,7 @@
 
 #include "lib/core/CHIPSafeCasts.h"
 #include "lib/mdns/platform/Mdns.h"
+#include "lib/support/ReturnMacros.h"
 #include "lib/support/logging/CHIPLogging.h"
 #include "platform/CHIPDeviceConfig.h"
 #include "platform/CHIPDeviceLayer.h"

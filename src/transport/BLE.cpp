@@ -24,7 +24,9 @@
 
 #include <transport/BLE.h>
 
-#include <support/CodeUtils.h>
+#include <support/ErrorMacros.h>
+#include <support/ErrorStr.h>
+#include <support/ReturnMacros.h>
 #include <support/logging/CHIPLogging.h>
 #include <transport/raw/MessageHeader.h>
 

@@ -34,7 +34,6 @@
 
 #include <platform/ConnectivityManager.h>
 #include <platform/internal/BLEManager.h>
-#include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 
 #include <lwip/dns.h>

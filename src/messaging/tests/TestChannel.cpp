@@ -30,7 +30,6 @@
 #include <messaging/tests/MessagingContext.h>
 #include <protocols/Protocols.h>
 #include <support/CHIPMem.h>
-#include <support/CodeUtils.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/TransportMgr.h>
 

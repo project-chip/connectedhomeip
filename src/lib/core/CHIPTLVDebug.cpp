@@ -34,7 +34,8 @@
 #include <core/CHIPTLV.h>
 #include <core/CHIPTLVDebug.hpp>
 #include <core/CHIPTLVUtilities.hpp>
-#include <support/CodeUtils.h>
+#include <support/ErrorMacros.h>
+#include <support/ReturnMacros.h>
 #include <support/logging/CHIPLogging.h>
 
 namespace chip {

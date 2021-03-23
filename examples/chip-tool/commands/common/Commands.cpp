@@ -28,7 +28,8 @@
 #endif
 
 #include <support/CHIPMem.h>
-#include <support/CodeUtils.h>
+#include <support/ErrorMacros.h>
+#include <support/ErrorStr.h>
 
 void Commands::Register(const char * clusterName, commands_list commandsList)
 {

@@ -20,6 +20,7 @@
 #include <app/server/AppDelegate.h>
 #include <core/CHIPPersistentStorageDelegate.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <support/ReturnMacros.h>
 #include <transport/RendezvousSession.h>
 
 namespace chip {

@@ -35,6 +35,7 @@
 #include <openthread/platform/entropy.h>
 
 #include <support/CHIPPlatformMemory.h>
+#include <support/ErrorMacros.h>
 
 namespace chip {
 namespace DeviceLayer {

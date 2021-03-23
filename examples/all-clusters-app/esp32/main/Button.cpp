@@ -30,7 +30,7 @@
 
 #include "Button.h"
 #include <platform/CHIPDeviceLayer.h>
-#include <support/CodeUtils.h>
+#include <support/ErrorMacros.h>
 
 extern const char * TAG;
 

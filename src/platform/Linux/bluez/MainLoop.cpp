@@ -20,7 +20,8 @@
 
 #include <errno.h>
 #include <pthread.h>
-#include <support/CodeUtils.h>
+#include <support/DieMacros.h>
+#include <support/ErrorMacros.h>
 #include <support/logging/CHIPLogging.h>
 
 namespace chip {

@@ -42,6 +42,7 @@
 #include <inet/IPAddress.h>
 #include <inet/InetArgParser.h>
 #include <support/CHIPArgParser.hpp>
+#include <support/ErrorMacros.h>
 #include <system/SystemTimer.h>
 
 #include "TestInetCommon.h"

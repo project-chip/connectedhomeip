@@ -29,6 +29,7 @@
 #include <inet/InetLayerEvents.h>
 
 #include <support/CodeUtils.h>
+#include <support/DieMacros.h>
 
 #include <string.h>
 

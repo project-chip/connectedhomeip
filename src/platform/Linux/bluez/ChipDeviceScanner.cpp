@@ -25,6 +25,7 @@
 
 #include <errno.h>
 #include <pthread.h>
+#include <support/ReturnMacros.h>
 #include <support/logging/CHIPLogging.h>
 
 namespace chip {

@@ -31,7 +31,7 @@
 #include <stdio.h>
 
 #include <core/CHIPCore.h>
-#include <support/CodeUtils.h>
+#include <support/ErrorStr.h>
 
 namespace chip {
 

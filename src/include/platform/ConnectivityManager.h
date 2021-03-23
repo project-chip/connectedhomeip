@@ -23,8 +23,6 @@
 
 #pragma once
 
-#include <support/CodeUtils.h>
-
 namespace chip {
 
 namespace Ble {

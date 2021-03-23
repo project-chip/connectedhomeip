@@ -24,11 +24,13 @@
 
 #pragma once
 
+#include <core/CHIPError.h>
 #include <protocols/Protocols.h>
 #include <support/BitFlags.h>
 #include <support/BufferWriter.h>
 #include <support/CodeUtils.h>
 #include <system/SystemPacketBuffer.h>
+
 namespace chip {
 namespace bdx {
 

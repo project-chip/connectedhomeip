@@ -28,6 +28,8 @@
 #include <app/util/util.h>
 #include <core/CHIPError.h>
 #include <support/CHIPMem.h>
+#include <support/ErrorMacros.h>
+#include <support/ErrorStr.h>
 #include <support/RandUtils.h>
 
 #include "Server.h"

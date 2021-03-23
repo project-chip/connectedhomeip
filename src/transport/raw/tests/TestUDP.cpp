@@ -24,7 +24,6 @@
 #include "NetworkTestHelpers.h"
 
 #include <core/CHIPCore.h>
-#include <support/CodeUtils.h>
 #include <support/UnitTestRegistration.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/UDP.h>

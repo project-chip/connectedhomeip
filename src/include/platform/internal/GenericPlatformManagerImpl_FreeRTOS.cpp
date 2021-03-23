@@ -28,6 +28,9 @@
 #include <platform/PlatformManager.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.h>
+#include <support/DieMacros.h>
+#include <support/ErrorMacros.h>
+#include <support/ErrorStr.h>
 
 // Include the non-inline definitions for the GenericPlatformManagerImpl<> template,
 // from which the GenericPlatformManagerImpl_FreeRTOS<> template inherits.

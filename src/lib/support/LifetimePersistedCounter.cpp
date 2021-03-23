@@ -18,7 +18,7 @@
 #include "LifetimePersistedCounter.h"
 
 #include <platform/PersistedStorage.h>
-#include <support/CodeUtils.h>
+#include <support/ErrorMacros.h>
 #include <support/logging/CHIPLogging.h>
 
 #include <stdlib.h>

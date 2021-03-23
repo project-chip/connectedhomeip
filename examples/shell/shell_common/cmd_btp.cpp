@@ -29,6 +29,7 @@
 #include <support/CHIPArgParser.hpp>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
+#include <support/ErrorMacros.h>
 
 using namespace chip;
 using namespace chip::Shell;

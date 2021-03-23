@@ -22,7 +22,7 @@
  *      the PeerConnections class within the transport layer
  *
  */
-#include <support/CodeUtils.h>
+#include <support/DieMacros.h>
 #include <support/ErrorStr.h>
 #include <support/UnitTestRegistration.h>
 #include <transport/PeerConnections.h>

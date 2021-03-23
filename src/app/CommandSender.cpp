@@ -28,6 +28,9 @@
 #include "InteractionModelEngine.h"
 
 #include <protocols/secure_channel/Constants.h>
+#include <support/DieMacros.h>
+#include <support/ErrorMacros.h>
+#include <support/ErrorStr.h>
 
 using GeneralStatusCode = chip::Protocols::SecureChannel::GeneralStatusCode;
 

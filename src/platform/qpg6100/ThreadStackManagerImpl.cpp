@@ -33,6 +33,7 @@
 
 #include <support/CHIPMem.h>
 #include <support/CHIPPlatformMemory.h>
+#include <support/ErrorMacros.h>
 
 #include <openthread/heap.h>
 // Qorvo OpenThread functions

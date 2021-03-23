@@ -20,7 +20,6 @@
 #include <lib/core/CHIPCore.h>
 #include <lib/support/Base64.h>
 #include <lib/support/CHIPArgParser.hpp>
-#include <lib/support/CodeUtils.h>
 #include <lib/support/RandUtils.h>
 #include <support/logging/CHIPLogging.h>
 

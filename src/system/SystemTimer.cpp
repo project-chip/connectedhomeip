@@ -36,7 +36,8 @@
 #include <system/SystemFaultInjection.h>
 #include <system/SystemLayer.h>
 
-#include <support/CodeUtils.h>
+#include <support/DieMacros.h>
+#include <support/ErrorMacros.h>
 
 /*******************************************************************************
  * Timer state

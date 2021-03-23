@@ -28,7 +28,7 @@
 
 #include "nvs.h"
 #include "nvs_flash.h"
-#include <support/CodeUtils.h>
+#include <support/ErrorMacros.h>
 
 namespace chip {
 namespace DeviceLayer {

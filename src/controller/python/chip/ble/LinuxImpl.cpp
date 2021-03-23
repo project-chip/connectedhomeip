@@ -4,6 +4,7 @@
 #include <platform/Linux/bluez/MainLoop.h>
 #include <platform/internal/BLEManager.h>
 #include <support/CHIPMem.h>
+#include <support/ReturnMacros.h>
 
 using namespace chip::DeviceLayer::Internal;
 

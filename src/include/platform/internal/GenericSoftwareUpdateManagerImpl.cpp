@@ -34,10 +34,12 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/GenericSoftwareUpdateManagerImpl.h>
 
+#include <support/ErrorMacros.h>
 #include <support/FibonacciUtils.h>
 #include <support/RandUtils.h>
 
 #include <support/CodeUtils.h>
+#include <support/ErrorMacros.h>
 #include <support/logging/CHIPLogging.h>
 
 namespace chip {

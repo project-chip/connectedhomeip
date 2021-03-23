@@ -26,7 +26,6 @@
 #include "CHIPLogging.h"
 
 #include <core/CHIPCore.h>
-#include <support/CodeUtils.h>
 #include <support/DLLUtil.h>
 
 #include <stdarg.h>

@@ -27,7 +27,7 @@
 #include <core/CHIPCore.h>
 #include <protocols/Protocols.h>
 #include <protocols/echo/Echo.h>
-#include <support/CodeUtils.h>
+#include <support/ReturnMacros.h>
 #include <support/UnitTestRegistration.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/TransportMgr.h>

@@ -23,6 +23,7 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 
+#include <support/ErrorMacros.h>
 #include <support/SafeInt.h>
 #include <support/logging/CHIPLogging.h>
 

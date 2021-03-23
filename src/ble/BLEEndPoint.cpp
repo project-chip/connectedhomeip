@@ -39,6 +39,7 @@
 #include <support/BitFlags.h>
 #include <support/CHIPFaultInjection.h>
 #include <support/CodeUtils.h>
+#include <support/ErrorMacros.h>
 #include <support/logging/CHIPLogging.h>
 
 #include <ble/BLEEndPoint.h>

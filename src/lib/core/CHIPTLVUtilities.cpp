@@ -25,7 +25,7 @@
 
 #include <core/CHIPTLVDebug.hpp>
 #include <core/CHIPTLVUtilities.hpp>
-#include <support/CodeUtils.h>
+#include <support/ErrorMacros.h>
 
 namespace chip {
 

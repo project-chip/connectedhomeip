@@ -29,7 +29,6 @@
 #include <asn1/ASN1OID.h>
 #include <core/CHIPConfig.h>
 #include <support/BitFlags.h>
-#include <support/CodeUtils.h>
 
 namespace chip {
 namespace TestCerts {

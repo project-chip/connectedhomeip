@@ -27,7 +27,7 @@
 #include <core/CHIPTLV.h>
 #include <credentials/CHIPCert.h>
 #include <support/CHIPMem.h>
-#include <support/CodeUtils.h>
+#include <support/ErrorMacros.h>
 #include <support/ErrorStr.h>
 #include <support/UnitTestRegistration.h>
 
