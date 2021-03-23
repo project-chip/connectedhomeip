@@ -26,7 +26,6 @@
 /**** Network Section ****/
 #define EMBER_SUPPORTED_NETWORKS (1)
 
-
 #define EMBER_APS_UNICAST_MESSAGE_COUNT 10
 
 /**** Cluster endpoint counts ****/
@@ -44,7 +43,6 @@
 #define EMBER_AF_LOW_POWER_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_MEDIA_PLAYBACK_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_ON_OFF_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
-#define EMBER_AF_PUMP_CONFIG_CONTROL_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_SCENES_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_TEMP_MEASUREMENT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 
@@ -105,10 +103,6 @@
 // Use this macro to check if the client side of the On/off cluster is included
 #define ZCL_USING_ON_OFF_CLUSTER_CLIENT
 #define EMBER_AF_PLUGIN_ON_OFF_CLIENT
-
-// Use this macro to check if the client side of the Pump Configuration and Control cluster is included
-#define ZCL_USING_PUMP_CONFIG_CONTROL_CLUSTER_CLIENT
-#define EMBER_AF_PLUGIN_PUMP_CONFIGURATION_AND_CONTROL_CLIENT
 
 // Use this macro to check if the client side of the Scenes cluster is included
 #define ZCL_USING_SCENES_CLUSTER_CLIENT

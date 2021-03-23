@@ -17,7 +17,7 @@ cmake_minimum_required(VERSION 3.13.1)
 
 get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/third_party/connectedhomeip REALPATH)
 get_filename_component(NRFCONNECT_COMMON ${CHIP_ROOT}/examples/platform/nrfconnect REALPATH)
-get_filename_component(LOCK_COMMON ${CHIP_ROOT}/examples/lock-app/lock-common REALPATH)
+get_filename_component(PUMP_COMMON ${CHIP_ROOT}/examples/pump-app/pump-common REALPATH)
 
 include(${CHIP_ROOT}/config/nrfconnect/app/check-nrfconnect-version.cmake)
 
@@ -28,11 +28,11 @@ find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
 
 target_compile_options(app PRIVATE -Werror)
 
-project(chip-nrfconnect-lock-example)
+project(chip-nrfconnect-pump-example)
 
 target_include_directories(app PRIVATE 
                            main/include 
-                           ${LOCK_COMMON} 
+                           ${PUMP_COMMON} 
                            ${NRFCONNECT_COMMON}/util/include 
                            ${NRFCONNECT_COMMON}/app/include)
 
@@ -41,8 +41,8 @@ target_sources(app PRIVATE
                main/PumpManager.cpp
                main/main.cpp
                main/ZclCallbacks.cpp
-               ${LOCK_COMMON}/gen/call-command-handler.cpp
-               ${LOCK_COMMON}/gen/callback-stub.cpp
+               ${PUMP_COMMON}/gen/call-command-handler.cpp
+               ${PUMP_COMMON}/gen/callback-stub.cpp
                ${NRFCONNECT_COMMON}/util/LEDWidget.cpp
                ${NRFCONNECT_COMMON}/util/NFCWidget.cpp
                ${NRFCONNECT_COMMON}/util/ThreadUtil.cpp

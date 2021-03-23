@@ -77,10 +77,19 @@ void emberAfOnOffClusterInitCallback(EndpointId endpoint)
     ChipLogProgress(Zcl, "%s: %d", __FUNCTION__, endpoint);
 }
 
-
 bool emberAfGetEndpointInfoCallback(chip::EndpointId endpoint, uint8_t * returnNetworkIndex, EmberAfEndpointInfoStruct * returnEndpointInfo)
 {
     ChipLogProgress(Zcl, "%s: %d", __FUNCTION__, endpoint);
+
+    //*returnNetworkIndex = 0;
+
+    returnEndpointInfo->deviceId = 45;
+    returnEndpointInfo->endpoint = endpoint;
+    returnEndpointInfo->clusterCount = 2;
+    returnEndpointInfo->clusters[0].clusterId = 0x0006;
+    returnEndpointInfo->clusters[0].server = true;    
+    returnEndpointInfo->clusters[1].clusterId = 0x0200;
+    returnEndpointInfo->clusters[1].server = true;    
     return false;
 }
 
