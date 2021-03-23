@@ -16,7 +16,9 @@
 #    limitations under the License.
 #
 
-cd "$(dirname "$0")/../../examples"
+cd "$(dirname "$0")"/../..
+CHIP_ROOT=$PWD
+cd "$CHIP_ROOT"/examples
 
 SUPPORTED_TOOLCHAIN=(GCC_ARM ARM)
 SUPPORTED_TARGET_BOARD=(DISCO_L475VG_IOT01A NRF52840_DK)
@@ -80,8 +82,11 @@ pwd
 BUILD_DIRECTORY="$APP"/mbed/build-"$TARGET_BOARD"/"$PROFILE"/
 MBED_CONFIG_PATH="$APP"/mbed/cmake_build/"$TARGET_BOARD"/develop/"$TOOLCHAIN"/
 
-# Create symlink to /opt/mbed-os directory
-ln -sfT $MBED_OS_PATH "${APP}/mbed/mbed-os"
+# Override Mbed OS path to development directory
+MBED_OS_PATH="$CHIP_ROOT"/third_party/mbed-os/repo
+
+# Create symlink to mbed-os directory
+ln -sfTr $MBED_OS_PATH "${APP}/mbed/mbed-os"
 
 # Generate config file for selected target, toolchain and hardware
 mbed-tools configure -t "$TOOLCHAIN" -m "$TARGET_BOARD" -p "$APP"/mbed/
