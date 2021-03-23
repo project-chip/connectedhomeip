@@ -24,7 +24,6 @@
 
 #include <platform/CHIPDeviceLayer.h>
 #include <support/CHIPMem.h>
-#include <support/ReturnMacros.h>
 #include <support/SafeInt.h>
 #include <support/logging/CHIPLogging.h>
 
