@@ -632,12 +632,12 @@ void BLEEndPoint::QueueTx(PacketBufferHandle && data, PacketType_t type)
     if (mSendQueue.IsNull())
     {
         mSendQueue = std::move(data);
-        ChipLogDebugBleEndPoint(Ble, "%s: Set data as new mSendQueue %p, type %d", __FUNCTION__, mSendQueue, type);
+        ChipLogDebugBleEndPoint(Ble, "%s: Set data as new mSendQueue %p, type %d", __FUNCTION__, mSendQueue->Start(), type);
     }
     else
     {
         mSendQueue->AddToEnd(std::move(data));
-        ChipLogDebugBleEndPoint(Ble, "%s: Append data to mSendQueue %p, type %d", __FUNCTION__, mSendQueue, type);
+        ChipLogDebugBleEndPoint(Ble, "%s: Append data to mSendQueue %p, type %d", __FUNCTION__, mSendQueue->Start(), type);
     }
 
     QueueTxUnlock();
@@ -993,7 +993,7 @@ BLE_ERROR BLEEndPoint::DriveSending()
     {
 #ifdef CHIP_BLE_END_POINT_DEBUG_LOGGING_ENABLED
         if (mRemoteReceiveWindowSize <= BTP_WINDOW_NO_ACK_SEND_THRESHOLD &&
-            !mTimerStateFlags.Has(TimerStateFlag::kSendAckTimerRunning) && mAckToSend == NULL)
+            !mTimerStateFlags.Has(TimerStateFlag::kSendAckTimerRunning) && mAckToSend.IsNull())
         {
             ChipLogDebugBleEndPoint(Ble, "NO SEND: receive window almost closed, and no ack to send");
         }
