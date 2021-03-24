@@ -50,6 +50,8 @@ CHIP_PORT = 11097
 
 CIRQUE_URL = "http://localhost:5000"
 
+TEST_EXTPANID = "fedcba9876543210"
+
 
 class TestPythonController(CHIPVirtualHome):
     def __init__(self, device_config):
@@ -89,6 +91,11 @@ class TestPythonController(CHIPVirtualHome):
             reply = self.execute_device_cmd(device_id, 'ot-ctl state')
             roles.add(reply['output'].split()[0])
         self.assertTrue('leader' in roles)
+
+        # Check if the device is attached to the correct thread network.
+        for device_id in server_ids:
+            reply = self.execute_device_cmd(device_id, 'ot-ctl extpanid')
+            self.assertEqual(reply['output'].split()[0].strip(), TEST_EXTPANID)
 
         for device_id in server_ids:
             self.logger.info("checking device log for {}".format(

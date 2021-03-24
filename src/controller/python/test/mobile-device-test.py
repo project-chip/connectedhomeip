@@ -94,7 +94,8 @@ class MobileDeviceTests():
             self.logger.exception("Failed to send AddThreadNetwork command")
             return False
         # TODO: ZCLSend should be synchronous, currently, IM does not pass IM status response to upper layer.
-        time.sleep(1)
+        time.sleep(2)
+        self.logger.info("Send EnableNetwork command to device {}".format(nodeid))
         try:
             self.devCtrl.ZCLSend("NetworkCommissioning", "EnableNetwork", nodeid, 1, 0, {
                 "networkID": bytes.fromhex(TEST_THREAD_NETWORK_ID),
