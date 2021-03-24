@@ -26,6 +26,18 @@
 namespace {
 
 void * gPrivateHeap = nullptr;
+
+#if CHIP_SYSTEM_CONFIG_NO_LOCKING
+
+class HeapLocked
+{
+public:
+    HeapLocked() {}
+    ~HeapLocked() {}
+};
+
+#else
+
 chip::System::Mutex gHeapLock;
 
 class HeapLocked
@@ -34,6 +46,7 @@ public:
     HeapLocked() { gHeapLock.Lock(); }
     ~HeapLocked() { gHeapLock.Unlock(); }
 };
+#endif
 
 } // namespace
 
@@ -45,7 +58,11 @@ CHIP_ERROR MemoryInit(void * buf, size_t bufSize)
     PrivateHeapInit(buf, bufSize);
     gPrivateHeap = buf;
 
+#if CHIP_SYSTEM_CONFIG_NO_LOCKING
+    return CHIP_NO_ERROR;
+#else
     return chip::System::Mutex::Init(gHeapLock);
+#endif
 }
 
 void MemoryShutdown()
