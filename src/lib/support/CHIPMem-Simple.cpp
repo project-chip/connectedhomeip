@@ -53,7 +53,7 @@ public:
 
 } // namespace
 
-CHIP_ERROR MemoryInit(void * buf, size_t bufSize)
+CHIP_ERROR MemoryAllocatorInit(void * buf, size_t bufSize)
 {
     ReturnErrorCodeIf(buf == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorCodeIf(gPrivateHeap != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -68,7 +68,7 @@ CHIP_ERROR MemoryInit(void * buf, size_t bufSize)
 #endif
 }
 
-void MemoryShutdown()
+void MemoryAllocatorShutdown()
 {
     gPrivateHeap = nullptr;
 }
