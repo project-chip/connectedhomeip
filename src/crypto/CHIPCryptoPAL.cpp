@@ -150,8 +150,8 @@ CHIP_ERROR Spake2p::BeginVerifier(const uint8_t * my_identity, size_t my_identit
     error = FEWrite(w0, w0in_mod, w0in_mod_len);
     VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
 
-    error = Spake2p_BeginVerifier_HSM(&hsm_pake_context, my_identity, my_identity_len, peer_identity, peer_identity_len, w0in_mod, w0in_mod_len,
-                                      Lin, Lin_len);
+    error = Spake2p_BeginVerifier_HSM(&hsm_pake_context, my_identity, my_identity_len, peer_identity, peer_identity_len, w0in_mod,
+                                      w0in_mod_len, Lin, Lin_len);
     if (CHIP_NO_ERROR == error)
     {
         state = CHIP_SPAKE2P_STATE::STARTED;
@@ -213,8 +213,8 @@ CHIP_ERROR Spake2p::BeginProver(const uint8_t * my_identity, size_t my_identity_
     error = FEWrite(w1, w1in_mod, w1in_mod_len);
     VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
 
-    error = Spake2p_BeginProver_HSM(&hsm_pake_context, my_identity, my_identity_len, peer_identity, peer_identity_len,
-                                    w0in_mod, w0in_mod_len, w1in_mod, w1in_mod_len);
+    error = Spake2p_BeginProver_HSM(&hsm_pake_context, my_identity, my_identity_len, peer_identity, peer_identity_len, w0in_mod,
+                                    w0in_mod_len, w1in_mod, w1in_mod_len);
     if (CHIP_NO_ERROR == error)
     {
         state = CHIP_SPAKE2P_STATE::STARTED;

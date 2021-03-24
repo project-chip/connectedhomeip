@@ -291,12 +291,12 @@ void AndroidDeviceControllerWrapper::SetDelegate(PersistentStorageResultDelegate
 
 void AndroidDeviceControllerWrapper::GetKeyValue(const char * key)
 {
-    jstring keyString   = NULL;
-    jstring valueString = NULL;
-    const char * valueChars   = nullptr;
-    CHIP_ERROR err      = CHIP_NO_ERROR;
-    jclass storageCls   = GetPersistentStorageClass();
-    jmethodID method    = GetJavaEnv()->GetStaticMethodID(storageCls, "getKeyValue", "(Ljava/lang/String;)Ljava/lang/String;");
+    jstring keyString       = NULL;
+    jstring valueString     = NULL;
+    const char * valueChars = nullptr;
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    jclass storageCls       = GetPersistentStorageClass();
+    jmethodID method        = GetJavaEnv()->GetStaticMethodID(storageCls, "getKeyValue", "(Ljava/lang/String;)Ljava/lang/String;");
 
     GetJavaEnv()->ExceptionClear();
 
@@ -313,7 +313,8 @@ void AndroidDeviceControllerWrapper::GetKeyValue(const char * key)
 
 exit:
     GetJavaEnv()->ExceptionClear();
-    if (valueChars != nullptr) {
+    if (valueChars != nullptr)
+    {
         GetJavaEnv()->ReleaseStringUTFChars(valueString, valueChars);
     }
     GetJavaEnv()->DeleteLocalRef(keyString);
@@ -322,12 +323,12 @@ exit:
 
 CHIP_ERROR AndroidDeviceControllerWrapper::GetKeyValue(const char * key, char * value, uint16_t & size)
 {
-    jstring keyString   = NULL;
-    jstring valueString = NULL;
-    const char * valueChars   = nullptr;
-    CHIP_ERROR err      = CHIP_NO_ERROR;
-    jclass storageCls   = GetPersistentStorageClass();
-    jmethodID method    = GetJavaEnv()->GetStaticMethodID(storageCls, "getKeyValue", "(Ljava/lang/String;)Ljava/lang/String;");
+    jstring keyString       = NULL;
+    jstring valueString     = NULL;
+    const char * valueChars = nullptr;
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    jclass storageCls       = GetPersistentStorageClass();
+    jmethodID method        = GetJavaEnv()->GetStaticMethodID(storageCls, "getKeyValue", "(Ljava/lang/String;)Ljava/lang/String;");
 
     GetJavaEnv()->ExceptionClear();
 
@@ -341,7 +342,7 @@ CHIP_ERROR AndroidDeviceControllerWrapper::GetKeyValue(const char * key, char * 
         if (value != nullptr)
         {
             valueChars = GetJavaEnv()->GetStringUTFChars(valueString, 0);
-            size = strlcpy(value, GetJavaEnv()->GetStringUTFChars(valueString, 0), size);
+            size       = strlcpy(value, GetJavaEnv()->GetStringUTFChars(valueString, 0), size);
         }
         else
         {
@@ -357,7 +358,8 @@ CHIP_ERROR AndroidDeviceControllerWrapper::GetKeyValue(const char * key, char * 
 
 exit:
     GetJavaEnv()->ExceptionClear();
-    if (valueChars != nullptr) {
+    if (valueChars != nullptr)
+    {
         GetJavaEnv()->ReleaseStringUTFChars(valueString, valueChars);
     }
     GetJavaEnv()->DeleteLocalRef(keyString);

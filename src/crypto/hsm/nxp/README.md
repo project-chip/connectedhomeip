@@ -71,7 +71,7 @@ smcom=\"t1oi2c\" chip_with_se05x=1
 
 ## Known Limitations:
 
--       AES CCM currently not supported in SE05X integration layer.
+-         AES CCM currently not supported in SE05X integration layer.
 
 -   The SE05X integration layer is not thread safe.
 

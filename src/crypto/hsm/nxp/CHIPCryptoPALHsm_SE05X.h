@@ -24,22 +24,21 @@
 #ifndef _CHIP_CRYPTO_PAL_HSM_SE05X_H_
 #define _CHIP_CRYPTO_PAL_HSM_SE05x_H_
 
-
 #include <fsl_sss_se05x_apis.h>
-
 
 #if ((ENABLE_HSM_SPAKE_VERIFIER) || (ENABLE_HSM_SPAKE_PROVER))
 
-typedef struct hsm_pake_context_s {
-// NXP-SE
-// To store the context
-// Context is calculated as SHA256("Const String" || PBKDFParamRequest || PBKDFParamResponse). So context is always 32 bytes.
-// But test vectors can pass any context. So keeping the buffer as 128 bytes.
-uint8_t spake_context[128];//= { 0, };
-size_t spake_context_len;// = 0;
-SE05x_CryptoObjectID_t spake_objId;
+typedef struct hsm_pake_context_s
+{
+    // NXP-SE
+    // To store the context
+    // Context is calculated as SHA256("Const String" || PBKDFParamRequest || PBKDFParamResponse). So context is always 32 bytes.
+    // But test vectors can pass any context. So keeping the buffer as 128 bytes.
+    uint8_t spake_context[128]; //= { 0, };
+    size_t spake_context_len;   // = 0;
+    SE05x_CryptoObjectID_t spake_objId;
 
-}hsm_pake_context_t;
+} hsm_pake_context_t;
 #endif
 
 #endif /*_CHIP_CRYPTO_PAL_HSM_SE05x_H_*/
