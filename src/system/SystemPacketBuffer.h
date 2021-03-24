@@ -653,7 +653,7 @@ public:
      *
      * @returns empty handle on allocation failure. Otherwise, the returned buffer has the same sizes and contents as the original.
      */
-    PacketBufferHandle CloneData();
+    PacketBufferHandle CloneData() const;
 
     /**
      * Perform an implementation-defined check on the validity of a PacketBufferHandle.

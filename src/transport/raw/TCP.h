@@ -34,7 +34,6 @@
 #include <inet/InetInterface.h>
 #include <inet/TCPEndPoint.h>
 #include <support/CodeUtils.h>
-#include <support/ReturnMacros.h>
 #include <transport/raw/Base.h>
 
 namespace chip {
@@ -110,17 +109,15 @@ protected:
     {
         void Init(Inet::TCPEndPoint * endPoint)
         {
-            mEndPoint    = endPoint;
-            mReceived    = nullptr;
-            mDiscardSize = 0;
+            mEndPoint = endPoint;
+            mReceived = nullptr;
         }
 
         void Free()
         {
             mEndPoint->Free();
-            mEndPoint    = nullptr;
-            mReceived    = nullptr;
-            mDiscardSize = 0;
+            mEndPoint = nullptr;
+            mReceived = nullptr;
         }
         bool InUse() const { return mEndPoint != nullptr; }
 
@@ -129,23 +126,6 @@ protected:
 
         // Buffers received but not yet consumed.
         System::PacketBufferHandle mReceived;
-
-        // Length of incoming data that must be discard to resynchronize.
-        // TODO: This can be removed once issue #5438 guarantees that the
-        //       connection is closed on any error.
-        uint16_t mDiscardSize;
-        CHIP_ERROR Discard()
-        {
-            VerifyOrReturnError((mDiscardSize != 0) && !mReceived.IsNull(), CHIP_NO_ERROR);
-            uint16_t initialLength = mReceived->TotalLength();
-            mReceived.Consume(mDiscardSize);
-            uint16_t remainingLength = mReceived.IsNull() ? 0 : mReceived->TotalLength();
-            VerifyOrReturnError(remainingLength <= initialLength, CHIP_ERROR_INTERNAL);
-            uint16_t discardedLength = static_cast<uint16_t>(initialLength - remainingLength);
-            VerifyOrReturnError(discardedLength <= mDiscardSize, CHIP_ERROR_INTERNAL);
-            mDiscardSize = static_cast<uint16_t>(mDiscardSize - discardedLength);
-            return CHIP_NO_ERROR;
-        }
     };
 
 public:
@@ -247,7 +227,7 @@ private:
 
     // Callback handler for TCPEndPoint. TCP message receive handler.
     // @see TCPEndpoint::OnDataReceivedFunct
-    static void OnTcpReceive(Inet::TCPEndPoint * endPoint, System::PacketBufferHandle buffer);
+    static INET_ERROR OnTcpReceive(Inet::TCPEndPoint * endPoint, System::PacketBufferHandle buffer);
 
     // Callback handler for TCPEndPoint. Called when a connection has been completed.
     // @see TCPEndpoint::OnConnectCompleteFunct

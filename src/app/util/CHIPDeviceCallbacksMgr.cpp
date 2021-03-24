@@ -28,7 +28,6 @@
 
 #include <core/CHIPCore.h>
 #include <inttypes.h>
-#include <support/ReturnMacros.h>
 
 namespace {
 struct ResponseCallbackInfo

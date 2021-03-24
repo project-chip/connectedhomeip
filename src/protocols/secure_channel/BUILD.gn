@@ -1,0 +1,18 @@
+import("//build_overrides/chip.gni")
+
+static_library("secure_channel") {
+  output_name = "libSecureChannel"
+
+  sources = [
+    "StatusReport.cpp",
+    "StatusReport.h",
+  ]
+
+  cflags = [ "-Wconversion" ]
+
+  public_deps = [
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/system",
+  ]
+}

@@ -28,7 +28,6 @@
 #include "InteractionModelEngine.h"
 
 #include <protocols/secure_channel/Constants.h>
-#include <support/ReturnMacros.h>
 
 using GeneralStatusCode = chip::Protocols::SecureChannel::GeneralStatusCode;
 
@@ -94,7 +93,7 @@ CHIP_ERROR CommandHandler::ProcessCommandDataElement(CommandDataElement::Parser 
         // Empty Command, Add status code in invoke command response, notify cluster handler to hand it further.
         err = CHIP_NO_ERROR;
         ChipLogDetail(DataManagement, "Add Status code for empty command, cluster Id is %d", clusterId);
-        AddStatusCode(static_cast<uint16_t>(GeneralStatusCode::kSuccess), Protocols::kProtocol_SecureChannel,
+        AddStatusCode(static_cast<uint16_t>(GeneralStatusCode::kSuccess), Protocols::SecureChannel::Id,
                       Protocols::SecureChannel::kProtocolCodeSuccess, clusterId);
     }
     else if (CHIP_NO_ERROR == err)

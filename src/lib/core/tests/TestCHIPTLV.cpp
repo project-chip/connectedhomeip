@@ -36,7 +36,6 @@
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/RandUtils.h>
-#include <support/ReturnMacros.h>
 #include <support/ScopedBuffer.h>
 #include <support/UnitTestRegistration.h>
 

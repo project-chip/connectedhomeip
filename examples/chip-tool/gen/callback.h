@@ -79,14 +79,6 @@ void emberAfBindingClusterInitCallback(chip::EndpointId endpoint);
  */
 void emberAfColorControlClusterInitCallback(chip::EndpointId endpoint);
 
-/** @brief Content Launch Cluster Init
- *
- * Cluster Init
- *
- * @param endpoint    Endpoint that is being initialized
- */
-void emberAfContentLaunchClusterInitCallback(chip::EndpointId endpoint);
-
 /** @brief Door Lock Cluster Init
  *
  * Cluster Init
@@ -134,14 +126,6 @@ void emberAfLevelControlClusterInitCallback(chip::EndpointId endpoint);
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfLowPowerClusterInitCallback(chip::EndpointId endpoint);
-
-/** @brief Media Playback Cluster Init
- *
- * Cluster Init
- *
- * @param endpoint    Endpoint that is being initialized
- */
-void emberAfMediaPlaybackClusterInitCallback(chip::EndpointId endpoint);
 
 /** @brief On/off Cluster Init
  *
@@ -518,76 +502,6 @@ EmberAfStatus emberAfColorControlClusterClientPreAttributeChangedCallback(chip::
  * @param endpoint  Endpoint that is being served
  */
 void emberAfColorControlClusterClientTickCallback(chip::EndpointId endpoint);
-
-//
-// Content Launch Cluster client
-//
-
-/** @brief Content Launch Cluster Client Init
- *
- * Client Init
- *
- * @param endpoint    Endpoint that is being initialized
- */
-void emberAfContentLaunchClusterClientInitCallback(chip::EndpointId endpoint);
-
-/** @brief Content Launch Cluster Client Attribute Changed
- *
- * Client Attribute Changed
- *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
- */
-void emberAfContentLaunchClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/** @brief Content Launch Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfContentLaunchClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                   chip::AttributeId attributeId,
-                                                                                   uint16_t manufacturerCode);
-
-/** @brief Content Launch Cluster Client Message Sent
- *
- * Client Message Sent
- *
- * @param type               The type of message sent
- * @param indexOrDestination The destination or address to which the message was sent
- * @param apsFrame           The APS frame for the message
- * @param msgLen             The length of the message
- * @param message            The message that was sent
- * @param status             The status of the sent message
- */
-void emberAfContentLaunchClusterClientMessageSentCallback(EmberOutgoingMessageType type, uint64_t indexOrDestination,
-                                                          EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                          EmberStatus status);
-
-/** @brief Content Launch Cluster Client Pre Attribute Changed
- *
- * client Pre Attribute Changed
- *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
- * @param attributeType Attribute type
- * @param size          Attribute size
- * @param value         Attribute value
- */
-EmberAfStatus emberAfContentLaunchClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                           EmberAfAttributeType attributeType, uint8_t size,
-                                                                           uint8_t * value);
-
-/** @brief Content Launch Cluster Client Tick
- *
- * client Tick
- *
- * @param endpoint  Endpoint that is being served
- */
-void emberAfContentLaunchClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
 // Door Lock Cluster client
@@ -1011,76 +925,6 @@ EmberAfStatus emberAfLowPowerClusterClientPreAttributeChangedCallback(chip::Endp
 void emberAfLowPowerClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
-// Media Playback Cluster client
-//
-
-/** @brief Media Playback Cluster Client Init
- *
- * Client Init
- *
- * @param endpoint    Endpoint that is being initialized
- */
-void emberAfMediaPlaybackClusterClientInitCallback(chip::EndpointId endpoint);
-
-/** @brief Media Playback Cluster Client Attribute Changed
- *
- * Client Attribute Changed
- *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
- */
-void emberAfMediaPlaybackClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/** @brief Media Playback Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfMediaPlaybackClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                   chip::AttributeId attributeId,
-                                                                                   uint16_t manufacturerCode);
-
-/** @brief Media Playback Cluster Client Message Sent
- *
- * Client Message Sent
- *
- * @param type               The type of message sent
- * @param indexOrDestination The destination or address to which the message was sent
- * @param apsFrame           The APS frame for the message
- * @param msgLen             The length of the message
- * @param message            The message that was sent
- * @param status             The status of the sent message
- */
-void emberAfMediaPlaybackClusterClientMessageSentCallback(EmberOutgoingMessageType type, uint64_t indexOrDestination,
-                                                          EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                          EmberStatus status);
-
-/** @brief Media Playback Cluster Client Pre Attribute Changed
- *
- * client Pre Attribute Changed
- *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
- * @param attributeType Attribute type
- * @param size          Attribute size
- * @param value         Attribute value
- */
-EmberAfStatus emberAfMediaPlaybackClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                           EmberAfAttributeType attributeType, uint8_t size,
-                                                                           uint8_t * value);
-
-/** @brief Media Playback Cluster Client Tick
- *
- * client Tick
- *
- * @param endpoint  Endpoint that is being served
- */
-void emberAfMediaPlaybackClusterClientTickCallback(chip::EndpointId endpoint);
-
-//
 // On/off Cluster client
 //
 
@@ -1290,20 +1134,6 @@ EmberAfStatus emberAfTemperatureMeasurementClusterClientPreAttributeChangedCallb
 void emberAfTemperatureMeasurementClusterClientTickCallback(chip::EndpointId endpoint);
 
 // Cluster Commands Callback
-
-/**
- * @brief Content Launch Cluster LaunchContentResponse Command callback
- * @param contentLaunchStatus
- */
-
-bool emberAfContentLaunchClusterLaunchContentResponseCallback(uint8_t contentLaunchStatus);
-
-/**
- * @brief Content Launch Cluster LaunchURLResponse Command callback
- * @param contentLaunchStatus
- */
-
-bool emberAfContentLaunchClusterLaunchURLResponseCallback(uint8_t contentLaunchStatus);
 
 /**
  * @brief Door Lock Cluster ClearAllPinsResponse Command callback
@@ -1564,12 +1394,6 @@ bool emberAfGroupsClusterViewGroupResponseCallback(uint8_t status, uint16_t grou
  */
 
 bool emberAfIdentifyClusterIdentifyQueryResponseCallback(uint16_t timeout);
-
-/**
- * @brief Media Playback Cluster Playback Command callback
- */
-
-bool emberAfMediaPlaybackClusterPlaybackCallback();
 
 /**
  * @brief Scenes Cluster AddSceneResponse Command callback
