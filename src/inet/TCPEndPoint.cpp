@@ -1391,7 +1391,12 @@ void TCPEndPoint::DriveReceiving()
         // Acknowledgement is done after handling the buffers to allow the
         // application processing to throttle flow.
         uint16_t ackLength = mRcvQueue->TotalLength();
-        OnDataReceived(this, std::move(mRcvQueue));
+        INET_ERROR err     = OnDataReceived(this, std::move(mRcvQueue));
+        if (err != INET_NO_ERROR)
+        {
+            DoClose(err, false);
+            return;
+        }
         AckReceive(ackLength);
     }
 

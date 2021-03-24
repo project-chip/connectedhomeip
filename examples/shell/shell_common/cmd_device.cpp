@@ -962,8 +962,10 @@ void cmd_device_init()
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     streamer_printf(sout, "Init Thread stack\r\n");
-    error = ThreadStackMgr().InitThreadStack();
-    VerifyOrExit(error == CHIP_NO_ERROR, streamer_printf(sout, "ThreadStackMgr().InitThreadStack() failed\r\n"));
+    if (ThreadStackMgr().InitThreadStack() != CHIP_NO_ERROR)
+    {
+        streamer_printf(sout, "ThreadStackMgr().InitThreadStack() failed\r\n");
+    }
 #endif
 
     // Starting Platform Manager Event Loop;

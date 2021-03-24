@@ -595,7 +595,7 @@ static void HandleTCPConnectionClosed(TCPEndPoint * aEndPoint, INET_ERROR aError
 
 static void HandleTCPDataSent(TCPEndPoint * aEndPoint, uint16_t len) {}
 
-static void HandleTCPDataReceived(TCPEndPoint * aEndPoint, PacketBufferHandle aBuffer)
+static INET_ERROR HandleTCPDataReceived(TCPEndPoint * aEndPoint, PacketBufferHandle aBuffer)
 {
     const uint32_t lFirstValueReceived = sTestState.mStats.mReceive.mActual;
     const uint8_t lFirstValue          = uint8_t(lFirstValueReceived);
@@ -638,6 +638,7 @@ exit:
     {
         SetStatusFailed(sTestState.mStatus);
     }
+    return lStatus;
 }
 
 static void HandleTCPAcceptError(TCPEndPoint * aEndPoint, INET_ERROR aError)

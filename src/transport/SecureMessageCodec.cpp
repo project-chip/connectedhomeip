@@ -26,7 +26,6 @@
  */
 
 #include <support/CodeUtils.h>
-#include <support/ReturnMacros.h>
 #include <support/SafeInt.h>
 #include <transport/SecureMessageCodec.h>
 

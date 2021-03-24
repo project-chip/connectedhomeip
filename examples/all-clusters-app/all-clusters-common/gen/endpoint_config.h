@@ -319,7 +319,7 @@
 
 #define ZAP_ATTRIBUTE_MASK(mask) ATTRIBUTE_MASK_##mask
 // This is an array of EmberAfAttributeMetadata structures.
-#define GENERATED_ATTRIBUTE_COUNT 130
+#define GENERATED_ATTRIBUTE_COUNT 127
 #define GENERATED_ATTRIBUTES                                                                                                       \
     {                                                                                                                              \
         { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(2) }, /* Identify (server): cluster revision */                       \
@@ -457,16 +457,13 @@
             { 0x0001, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },                 /* Application Basic (server): vendor id */   \
             { 0x0002, ZAP_TYPE(OCTET_STRING), 32, 0,                                                                               \
               ZAP_LONG_DEFAULTS_INDEX(554) },                               /* Application Basic (server): application name */     \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* Application Basic (server): cluster revision */     \
             { 0x0003, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },        /* Application Basic (server): product id */           \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* Application Basic (server): cluster revision */     \
             { 0x0005, ZAP_TYPE(OCTET_STRING), 32, 0,                                                                               \
               ZAP_LONG_DEFAULTS_INDEX(586) },                                  /* Application Basic (server): application id */    \
             { 0x0006, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },           /* Application Basic (server): catalog vendor id */ \
             { 0x0007, ZAP_TYPE(ENUM8), 1, 0, ZAP_SIMPLE_DEFAULT(0x01) },       /* Application Basic (server): application satus */ \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },    /* Binding (server): cluster revision */            \
-            { 0x0000, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },           /* Media Playback (server): current state */        \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },    /* Media Playback (server): cluster revision */     \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },    /* Content Launch (server): cluster revision */     \
             { 0x0000, ZAP_TYPE(ARRAY), 254, 0, ZAP_LONG_DEFAULTS_INDEX(618) }, /* Group Key Management (server): groups */         \
             { 0x0001, ZAP_TYPE(ARRAY), 254, 0, ZAP_LONG_DEFAULTS_INDEX(872) }, /* Group Key Management (server): group keys */     \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* Group Key Management (server): cluster revision */  \
@@ -530,7 +527,7 @@
     };
 
 #define ZAP_CLUSTER_MASK(mask) CLUSTER_MASK_##mask
-#define GENERATED_CLUSTER_COUNT 21
+#define GENERATED_CLUSTER_COUNT 19
 #define GENERATED_CLUSTERS                                                                                                         \
     {                                                                                                                              \
         { 0x0003,                                                                                                                  \
@@ -607,22 +604,16 @@
                 0xF000, ZAP_ATTRIBUTE_INDEX(109), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
             }, /* Endpoint: 1, Cluster: Binding (server) */                                                                        \
             {                                                                                                                      \
-                0xF001, ZAP_ATTRIBUTE_INDEX(110), 2, 4, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
-            }, /* Endpoint: 1, Cluster: Media Playback (server) */                                                                 \
-            {                                                                                                                      \
-                0xF002, ZAP_ATTRIBUTE_INDEX(112), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
-            }, /* Endpoint: 1, Cluster: Content Launch (server) */                                                                 \
-            {                                                                                                                      \
-                0xF004, ZAP_ATTRIBUTE_INDEX(113), 3, 510, ZAP_CLUSTER_MASK(SERVER), NULL                                           \
+                0xF004, ZAP_ATTRIBUTE_INDEX(110), 3, 510, ZAP_CLUSTER_MASK(SERVER), NULL                                           \
             }, /* Endpoint: 1, Cluster: Group Key Management (server) */                                                           \
             { 0x0006,                                                                                                              \
-              ZAP_ATTRIBUTE_INDEX(116),                                                                                            \
+              ZAP_ATTRIBUTE_INDEX(113),                                                                                            \
               2,                                                                                                                   \
               3,                                                                                                                   \
               ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
               chipFuncArrayOnOffServer }, /* Endpoint: 2, Cluster: On/off (server) */                                              \
             {                                                                                                                      \
-                0x0028, ZAP_ATTRIBUTE_INDEX(118), 12, 254, ZAP_CLUSTER_MASK(SERVER), NULL                                          \
+                0x0028, ZAP_ATTRIBUTE_INDEX(115), 12, 254, ZAP_CLUSTER_MASK(SERVER), NULL                                          \
             }, /* Endpoint: 2, Cluster: Basic (server) */                                                                          \
     }
 
@@ -631,7 +622,7 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 19, 1292 }, { ZAP_CLUSTER_INDEX(19), 2, 257 },                                                     \
+        { ZAP_CLUSTER_INDEX(0), 17, 1286 }, { ZAP_CLUSTER_INDEX(17), 2, 257 },                                                     \
     }
 
 // Largest attribute size is needed for various buffers
@@ -641,7 +632,7 @@
 #define ATTRIBUTE_SINGLETONS_SIZE (508)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (1549)
+#define ATTRIBUTE_MAX_SIZE (1543)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (2)
@@ -685,7 +676,7 @@
 
 // Array of EmberAfCommandMetadata structs.
 #define ZAP_COMMAND_MASK(mask) COMMAND_MASK_##mask
-#define EMBER_AF_GENERATED_COMMAND_COUNT (132)
+#define EMBER_AF_GENERATED_COMMAND_COUNT (117)
 #define GENERATED_COMMANDS                                                                                                         \
     {                                                                                                                              \
         { 0x0003, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) },     /* Identify (server): Identify */                                 \
@@ -855,21 +846,6 @@
             { 0x0508, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Low Power (server): Sleep */                                   \
             { 0xF000, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Binding (server): Bind */                                      \
             { 0xF000, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Binding (server): Unbind */                                    \
-            { 0xF001, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (server): PlayRequest */                        \
-            { 0xF001, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Media Playback (server): Playback */                           \
-            { 0xF001, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (server): PauseRequest */                       \
-            { 0xF001, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (server): StopRequest */                        \
-            { 0xF001, 0x03, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (server): StartOverRequest */                   \
-            { 0xF001, 0x04, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (server): PreviousRequest */                    \
-            { 0xF001, 0x05, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (server): NextRequest */                        \
-            { 0xF001, 0x06, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (server): RewindRequest */                      \
-            { 0xF001, 0x07, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (server): FastForwardRequest */                 \
-            { 0xF001, 0x08, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (server): SkipForwardRequest */                 \
-            { 0xF001, 0x09, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (server): SkipBackwardRequest */                \
-            { 0xF002, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Content Launch (server): LaunchContent */                      \
-            { 0xF002, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Content Launch (server): LaunchContentResponse */              \
-            { 0xF002, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Content Launch (server): LaunchURL */                          \
-            { 0xF002, 0x01, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Content Launch (server): LaunchURLResponse */                  \
     }
 
 // Array of EmberAfManufacturerCodeEntry structures for commands.

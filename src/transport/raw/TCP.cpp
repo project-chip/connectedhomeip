@@ -27,7 +27,6 @@
 
 #include <core/CHIPEncoding.h>
 #include <support/CodeUtils.h>
-#include <support/ReturnMacros.h>
 #include <support/logging/CHIPLogging.h>
 #include <transport/raw/MessageHeader.h>
 
@@ -41,6 +40,9 @@ using namespace chip::Encoding;
 
 // Packets start with a 16-bit size
 constexpr size_t kPacketSizeBytes = 2;
+
+// TODO: Actual limit may be lower (spec issue #2119)
+constexpr uint16_t kMaxMessageSize = static_cast<uint16_t>(System::PacketBuffer::kMaxSizeWithoutReserve - kPacketSizeBytes);
 
 constexpr int kListenBacklogSize = 2;
 
@@ -286,15 +288,6 @@ CHIP_ERROR TCPBase::ProcessReceivedBuffer(Inet::TCPEndPoint * endPoint, const Pe
     VerifyOrReturnError(state != nullptr, CHIP_ERROR_INTERNAL);
     state->mReceived.AddToEnd(std::move(buffer));
 
-    if (state->mDiscardSize != 0)
-    {
-        CHIP_ERROR err = state->Discard();
-        if ((err != CHIP_NO_ERROR) || (state->mDiscardSize != 0))
-        {
-            return err;
-        }
-    }
-
     while (!state->mReceived.IsNull())
     {
         uint8_t messageSizeBuf[kPacketSizeBytes];
@@ -309,13 +302,9 @@ CHIP_ERROR TCPBase::ProcessReceivedBuffer(Inet::TCPEndPoint * endPoint, const Pe
             return err;
         }
         uint16_t messageSize = LittleEndian::Get16(messageSizeBuf);
-        if (messageSize >= System::PacketBuffer::kMaxSizeWithoutReserve)
+        if (messageSize >= kMaxMessageSize)
         {
-            // This message is too long for upper layers, which require a contiguous buffer.
-            // TODO: Actual limit may be lower (spec issue #2119)
-            state->mReceived.Consume(kPacketSizeBytes);
-            state->mDiscardSize = messageSize;
-            ReturnErrorOnFailure(state->Discard());
+            // This message is too long for upper layers.
             return CHIP_ERROR_MESSAGE_TOO_LONG;
         }
         // The subtraction will not underflow because we successfully read kPacketSizeBytes.
@@ -368,7 +357,7 @@ CHIP_ERROR TCPBase::ProcessSingleMessage(const PeerAddress & peerAddress, Active
     return CHIP_NO_ERROR;
 }
 
-void TCPBase::OnTcpReceive(Inet::TCPEndPoint * endPoint, System::PacketBufferHandle buffer)
+INET_ERROR TCPBase::OnTcpReceive(Inet::TCPEndPoint * endPoint, System::PacketBufferHandle buffer)
 {
     Inet::IPAddress ipAddress;
     uint16_t port;
@@ -382,8 +371,10 @@ void TCPBase::OnTcpReceive(Inet::TCPEndPoint * endPoint, System::PacketBufferHan
     if (err != CHIP_NO_ERROR)
     {
         // Connection could need to be closed at this point
-        ChipLogError(Inet, "Failed to handle received TCP message: %s", ErrorStr(err));
+        ChipLogError(Inet, "Failed to accept received TCP message: %s", ErrorStr(err));
+        return INET_ERROR_UNEXPECTED_EVENT;
     }
+    return INET_NO_ERROR;
 }
 
 void TCPBase::OnConnectionComplete(Inet::TCPEndPoint * endPoint, INET_ERROR inetErr)
