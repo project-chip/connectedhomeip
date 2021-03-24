@@ -37,6 +37,7 @@ jobs:
             image: connectedhomeip/chip-build-android:latest
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
+                - "/tmp/output_binaries:/tmp/output_binaries"
 
         steps:
             - name: Checkout
@@ -53,3 +54,27 @@ jobs:
                   yes | "$ANDROID_HOME"/tools/bin/sdkmanager --licenses
                   cd src/android/CHIPTool
                   ./gradlew build
+            - name: Binary artifact suffix
+              id: outsuffix
+              uses: haya14busa/action-cond@v1.0.0
+              with:
+                  cond: ${{ github.event.pull_request.number == '' }}
+                  if_true: "${{ github.sha }}"
+                  if_false: "pull-${{ github.event.pull_request.number }}"
+            - name: Copy aside build products
+              run: |
+                  mkdir -p /tmp/output_binaries/
+                  cp src/android/CHIPTool/app/build/outputs/apk/debug/app-debug.apk /tmp/output_binaries/
+                  cp src/android/CHIPTool/app/build/outputs/apk/release/app-release-unsigned.apk /tmp/output_binaries/app-release.apk
+            - name: Uploading Debug binary
+              uses: actions/upload-artifact@v1
+              with:
+                  name:
+                      chiptool-debug-${{ env.BUILD_TYPE }}-${{ steps.outsuffix.outputs.value }}.apk
+                  path: /tmp/output_binaries/app-debug.apk
+            - name: Uploading Release binary
+              uses: actions/upload-artifact@v1
+              with:
+                  name:
+                      chiptool-release-${{ env.BUILD_TYPE }}-${{ steps.outsuffix.outputs.value }}.apk
+                  path: /tmp/output_binaries/app-release.apk
