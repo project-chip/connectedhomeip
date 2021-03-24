@@ -19,7 +19,7 @@
 cmake_minimum_required(VERSION 3.5)
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 
-# The list of extra component dirs must be in sync with that in all-clusters-app/esp32/Makefile
+# The list of extra component dirs must be in sync with that in temperature-measurement-app/esp32/Makefile
 set(EXTRA_COMPONENT_DIRS
     "${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/config/esp32/components"
     "${CMAKE_CURRENT_LIST_DIR}/../../common/m5stack-tft/repo/components"
@@ -27,6 +27,6 @@ set(EXTRA_COMPONENT_DIRS
     "${CMAKE_CURRENT_LIST_DIR}/../../common/screen-framework"
 )
 
-project(chip-all-clusters-app)
+project(chip-temperature-measurement-app)
 idf_build_set_property(CXX_COMPILE_OPTIONS "-std=c++14;-Os;-DLWIP_IPV6_SCOPES=0;-DCHIP_HAVE_CONFIG_H" APPEND)
 idf_build_set_property(C_COMPILE_OPTIONS "-Os;-DLWIP_IPV6_SCOPES=0" APPEND)
