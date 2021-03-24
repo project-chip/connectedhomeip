@@ -255,7 +255,7 @@
                 "debugServerPath": "pyocd-gdbserver",
                 "debugServerArgs": "-t stm32l475xg"
             }
-        }, // drago
+        },
         {
             "name": "Lock-app Mbed Example Debug [remote]",
             "type": "cppdbg",
@@ -367,7 +367,7 @@
                 "MIMode": "gdb",
                 "MIDebuggerPath": "arm-none-eabi-gdb",
                 "debugServerPath": "pyocd-gdbserver",
-                "debugServerArgs": "-t nrf52840"
+                "debugServerArgs": "-t nrf52840 -O connect_mode=under-reset"
             }
         },
         {
@@ -425,7 +425,7 @@
                 "MIMode": "gdb",
                 "MIDebuggerPath": "arm-none-eabi-gdb",
                 "debugServerPath": "pyocd-gdbserver",
-                "debugServerArgs": "-t stm32l475xg"
+                "debugServerArgs": "-t stm32l475xg -O connect_mode=under-reset -f 4000000"
             }
         }
     ],
