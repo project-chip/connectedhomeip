@@ -23,6 +23,9 @@
 #include <support/CodeUtils.h>
 #include <system/SystemMutex.h>
 
+namespace chip {
+namespace Platform {
+
 namespace {
 
 void * gPrivateHeap = nullptr;
@@ -122,3 +125,6 @@ void MemoryFree(void * p)
     }
     PrivateHeapFree(p);
 }
+
+} // namespace Platform
+} // namespace chip
