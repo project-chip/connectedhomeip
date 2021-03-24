@@ -55,8 +55,6 @@ public:
     void AsyncDeleteKeyValue(const char * key) override { chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Delete(key); }
 
 private:
-    static constexpr size_t kMaxKeyValueSize = 1024;
-
     chip::PersistentStorageResultDelegate * mAsyncDelegate = nullptr;
 };
 
