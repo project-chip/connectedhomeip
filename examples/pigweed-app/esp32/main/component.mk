@@ -54,7 +54,7 @@ COMPONENT_ADD_INCLUDEDIRS += ../third_party/connectedhomeip/third_party/pigweed/
 							../third_party/connectedhomeip/third_party/nanopb/repo                                  \
 							../../../platform/esp32/pw_sys_io/public 				\
 							../../../common/pigweed									\
-							../build/chip/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/protos \
+							../build/chip/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/protos.proto_library/nanopb_rpc
 							../../../../src/lib/support    \
 
 COMPONENT_EXTRA_INCLUDES := ${IDF_PATH}/components/freertos/include/freertos/      \
