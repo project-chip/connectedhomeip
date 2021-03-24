@@ -49,7 +49,7 @@ void init()
 int putString(const char * buffer, size_t size)
 {
     xSemaphoreTake(esp_log_mutex, portMAX_DELAY);
- 
+
     assert(sWriteBufferPos < kWriteBufferSize);
 
     for (size_t i = 0; i < size; ++i)
