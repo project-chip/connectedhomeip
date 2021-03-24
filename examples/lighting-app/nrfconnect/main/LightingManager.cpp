@@ -28,19 +28,19 @@ LOG_MODULE_DECLARE(app);
 
 LightingManager LightingManager::sLight;
 
-int LightingManager::Init(const char * pwmDeviceName, uint32_t pwmChannel)
+int LightingManager::Init(const device * pwmDevice, uint32_t pwmChannel)
 {
     // We use a gpioPin instead of a LEDWidget here because we want to use PWM
     // and other features instead of just on/off.
 
     mState      = kState_On;
     mLevel      = kMaxLevel;
-    mPwmDevice  = device_get_binding(pwmDeviceName);
+    mPwmDevice  = pwmDevice;
     mPwmChannel = pwmChannel;
 
-    if (!mPwmDevice)
+    if (!device_is_ready(mPwmDevice))
     {
-        LOG_ERR("Cannot find PWM device %s", log_strdup(pwmDeviceName));
+        LOG_ERR("PWM device %s is not ready", mPwmDevice->name);
         return -ENODEV;
     }
 
