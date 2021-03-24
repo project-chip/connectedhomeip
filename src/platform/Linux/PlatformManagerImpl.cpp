@@ -31,8 +31,6 @@
 
 #include <thread>
 
-#include "MdnsImpl.h"
-
 #include <arpa/inet.h>
 #include <linux/netlink.h>
 #include <linux/rtnetlink.h>
