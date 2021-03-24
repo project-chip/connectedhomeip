@@ -21,21 +21,31 @@
 #include <string.h>
 
 #include <support/CodeUtils.h>
+#include <system/SystemMutex.h>
 
 namespace {
 
 void * gPrivateHeap = nullptr;
+chip::System::Mutex gHeapLock;
+
+class HeapLocked
+{
+public:
+    HeapLocked() { gHeapLock.Lock(); }
+    ~HeapLocked() { gHeapLock.Unlock(); }
+};
 
 } // namespace
 
 CHIP_ERROR MemoryInit(void * buf, size_t bufSize)
 {
     ReturnErrorCodeIf(buf == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorCodeIf(gPrivateHeap != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     PrivateHeapInit(buf, bufSize);
     gPrivateHeap = buf;
 
-    return CHIP_NO_ERROR;
+    return chip::System::Mutex::Init(gHeapLock)
 }
 
 void MemoryShutdown()
@@ -45,6 +55,8 @@ void MemoryShutdown()
 
 void * MemoryAlloc(size_t size)
 {
+    HeapLocked lock;
+
     if (gPrivateHeap == nullptr)
     {
         return nullptr;
@@ -73,6 +85,8 @@ void * MemoryCalloc(size_t num, size_t size)
 
 void * MemoryRealloc(void * p, size_t size)
 {
+    HeapLocked lock;
+
     if (gPrivateHeap == nullptr)
     {
         return nullptr;
@@ -83,6 +97,8 @@ void * MemoryRealloc(void * p, size_t size)
 
 void MemoryFree(void * p)
 {
+    HeapLocked lock;
+
     if (gPrivateHeap == nullptr)
     {
         return;
