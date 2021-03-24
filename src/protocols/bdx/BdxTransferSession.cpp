@@ -9,14 +9,16 @@
 #include <protocols/Protocols.h>
 #include <protocols/bdx/BdxMessages.h>
 #include <protocols/secure_channel/Constants.h>
+#include <protocols/secure_channel/StatusReport.h>
 #include <support/BufferReader.h>
 #include <support/CodeUtils.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/SecureSessionMgr.h>
 
+#include <type_traits>
+
 namespace {
-constexpr uint8_t kBdxVersion         = 0;         ///< The version of this implementation of the BDX spec
-constexpr size_t kStatusReportMinSize = 2 + 4 + 2; ///< 16 bits for GeneralCode, 32 bits for ProtocolId, 16 bits for ProtocolCode
+constexpr uint8_t kBdxVersion = 0; ///< The version of this implementation of the BDX spec
 
 /**
  * @brief
@@ -503,14 +505,11 @@ CHIP_ERROR TransferSession::HandleStatusReportMessage(PayloadHeader & header, Sy
     mState            = TransferState::kErrorState;
     mAwaitingResponse = false;
 
-    uint16_t generalCode  = 0;
-    uint32_t protocolId   = 0;
-    uint16_t protocolCode = 0;
-    Encoding::LittleEndian::Reader reader(msg->Start(), msg->DataLength());
-    ReturnErrorOnFailure(reader.Read16(&generalCode).Read32(&protocolId).Read16(&protocolCode).StatusCode());
-    VerifyOrReturnError((protocolId == Protocols::BDX::Id.ToFullyQualifiedSpecForm()), CHIP_ERROR_INVALID_MESSAGE_TYPE);
+    Protocols::SecureChannel::StatusReport report;
+    ReturnErrorOnFailure(report.Parse(std::move(msg)));
+    VerifyOrReturnError((report.GetProtocolId() == Protocols::BDX::Id.ToFullyQualifiedSpecForm()), CHIP_ERROR_INVALID_MESSAGE_TYPE);
 
-    mStatusReportData.statusCode = static_cast<StatusCode>(protocolCode);
+    mStatusReportData.statusCode = static_cast<StatusCode>(report.GetProtocolCode());
 
     mPendingOutput = OutputEventType::kStatusReceived;
 
@@ -845,15 +844,17 @@ CHIP_ERROR TransferSession::VerifyProposedMode(const BitFlags<TransferControlFla
 
 void TransferSession::PrepareStatusReport(StatusCode code)
 {
+    static_assert(std::is_same<std::underlying_type_t<decltype(code)>, uint16_t>::value, "Cast is not safe");
+
     mStatusReportData.statusCode = code;
 
-    Encoding::LittleEndian::PacketBufferWriter bbuf(chip::MessagePacketBuffer::New(kStatusReportMinSize), kStatusReportMinSize);
-    VerifyOrReturn(!bbuf.IsNull());
+    Protocols::SecureChannel::StatusReport report(Protocols::SecureChannel::GeneralStatusCode::kFailure,
+                                                  Protocols::BDX::Id.ToFullyQualifiedSpecForm(), static_cast<uint16_t>(code));
+    size_t msgSize = report.Size();
+    Encoding::LittleEndian::PacketBufferWriter bbuf(chip::MessagePacketBuffer::New(msgSize), msgSize);
+    VerifyOrExit(!bbuf.IsNull(), mPendingOutput = OutputEventType::kInternalError);
 
-    bbuf.Put16(static_cast<uint16_t>(Protocols::SecureChannel::GeneralStatusCode::kFailure));
-    bbuf.Put32(Protocols::BDX::Id.ToFullyQualifiedSpecForm());
-    bbuf.Put16(static_cast<uint16_t>(mStatusReportData.statusCode));
-
+    report.WriteToBuffer(bbuf);
     mPendingMsgHandle = bbuf.Finalize();
     if (mPendingMsgHandle.IsNull())
     {
@@ -862,11 +863,11 @@ void TransferSession::PrepareStatusReport(StatusCode code)
     else
     {
         CHIP_ERROR err = AttachHeader(Protocols::SecureChannel::MsgType::StatusReport, mPendingMsgHandle);
-        VerifyOrReturn(err == CHIP_NO_ERROR);
-
+        VerifyOrExit(err == CHIP_NO_ERROR, mPendingOutput = OutputEventType::kInternalError);
         mPendingOutput = OutputEventType::kMsgToSend;
     }
 
+exit:
     mState            = TransferState::kErrorState;
     mAwaitingResponse = false; // Prevent triggering timeout
 }
