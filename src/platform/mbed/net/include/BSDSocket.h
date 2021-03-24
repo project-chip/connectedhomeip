@@ -197,6 +197,8 @@ struct BSDSocket : public FileHandle
         return ret;
     }
 
+    int getSocketType() { return _type; }
+
     SocketAddress socketName;
 
 private:
