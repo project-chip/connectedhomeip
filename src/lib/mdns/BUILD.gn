@@ -28,9 +28,9 @@ static_library("mdns") {
 
   sources = [
     "Advertiser.h",
+    "Resolver.h",
     "ServiceNaming.cpp",
     "ServiceNaming.h",
-    "Resolver.h",
   ]
 
   if (chip_mdns == "none") {
