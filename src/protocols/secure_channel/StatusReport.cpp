@@ -21,7 +21,6 @@
 
 #include <support/BufferReader.h>
 #include <support/CodeUtils.h>
-#include <support/ReturnMacros.h>
 
 #include <type_traits>
 
