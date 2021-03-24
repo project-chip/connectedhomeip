@@ -33,6 +33,3 @@ chip_inet_config_enable_tcp_endpoint = true
 chip_inet_config_enable_udp_endpoint = true
 
 custom_toolchain = "//third_party/connectedhomeip/config/esp32/toolchain:esp32"
-
-# DO NOT SUBMIT
-chip_config_memory_management = "simple"
