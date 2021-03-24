@@ -37,14 +37,14 @@ int convert_mbed_addr_to_bsd(struct sockaddr * out, const SocketAddress * in)
     {
         sockaddr_in * addr = reinterpret_cast<sockaddr_in *>(out);
         addr->sin_family   = AF_INET;
-        addr->sin_port     = in->get_port();
+        addr->sin_port     = htons(in->get_port());
         memcpy(&addr->sin_addr, in->get_ip_bytes(), NSAPI_IPv4_BYTES);
     }
     else if (verison == NSAPI_IPv6)
     {
         sockaddr_in6 * addr = reinterpret_cast<sockaddr_in6 *>(out);
         addr->sin6_family   = AF_INET;
-        addr->sin6_port     = in->get_port();
+        addr->sin6_port     = htons(in->get_port());
         memcpy(&addr->sin6_addr, in->get_ip_bytes(), NSAPI_IPv6_BYTES);
     }
     else
