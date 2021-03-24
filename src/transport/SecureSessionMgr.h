@@ -331,7 +331,8 @@ private:
 
     MessageCounter & GetSendCounterForPacket(PayloadHeader & payloadHeader, Transport::PeerConnectionState & state)
     {
-        if (IsControlMessage(payloadHeader)) {
+        if (IsControlMessage(payloadHeader))
+        {
             return mGlobalEncryptedMessageCounter;
         }
         else

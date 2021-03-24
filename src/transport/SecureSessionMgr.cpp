@@ -125,7 +125,8 @@ CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHea
     state = GetPeerConnectionState(session);
     VerifyOrReturnError(state != nullptr, CHIP_ERROR_NOT_CONNECTED);
 
-    if (!IsControlMessage(payloadHeader) && !mMessageCounterManager->IsSyncCompleted(state->GetSessionMessageCounter().GetPeerMessageCounter()))
+    if (!IsControlMessage(payloadHeader) &&
+        !mMessageCounterManager->IsSyncCompleted(state->GetSessionMessageCounter().GetPeerMessageCounter()))
     {
         if (bufferRetainSlot != nullptr)
         {
@@ -202,7 +203,7 @@ CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHea
     if (encryptionState == EncryptionState::kPayloadIsUnencrypted)
     {
         MessageCounter & counter = GetSendCounterForPacket(payloadHeader, *state);
-        err = SecureMessageCodec::Encode(localNodeId, state, payloadHeader, packetHeader, msgBuf, counter);
+        err                      = SecureMessageCodec::Encode(localNodeId, state, payloadHeader, packetHeader, msgBuf, counter);
         SuccessOrExit(err);
     }
 

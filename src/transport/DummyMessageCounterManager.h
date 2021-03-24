@@ -30,10 +30,7 @@ public:
     ~DummyMessageCounterManager() override {}
 
     bool IsSyncCompleted(PeerMessageCounter & counter) override { return true; }
-    CHIP_ERROR VerifyCounter(PeerMessageCounter & counter, const PacketHeader & packetHeader) override
-    {
-        return CHIP_NO_ERROR;
-    }
+    CHIP_ERROR VerifyCounter(PeerMessageCounter & counter, const PacketHeader & packetHeader) override { return CHIP_NO_ERROR; }
     void CommitCounter(PeerMessageCounter & counter, const PacketHeader & packetHeader) override {}
 
     CHIP_ERROR StartSync(SecureSessionHandle session, Transport::PeerConnectionState * state) override { return CHIP_NO_ERROR; }

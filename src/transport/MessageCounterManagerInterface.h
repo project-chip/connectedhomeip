@@ -28,9 +28,9 @@ class MessageCounterManagerInterface
 public:
     virtual ~MessageCounterManagerInterface() {}
 
-    virtual bool IsSyncCompleted(PeerMessageCounter & counter) = 0;
+    virtual bool IsSyncCompleted(PeerMessageCounter & counter)                                        = 0;
     virtual CHIP_ERROR VerifyCounter(PeerMessageCounter & counter, const PacketHeader & packetHeader) = 0;
-    virtual void CommitCounter(PeerMessageCounter & counter, const PacketHeader & packetHeader) = 0;
+    virtual void CommitCounter(PeerMessageCounter & counter, const PacketHeader & packetHeader)       = 0;
 
     /**
      * Start sync if the sync procedure is not started yet.
