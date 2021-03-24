@@ -452,7 +452,14 @@ int mbed_getpeername(int sockfd, struct sockaddr * addr, socklen_t * addrlen)
     }
     SocketAddress sockAddr;
     Sockaddr2Netsocket(&sockAddr, addr);
-    return socket->getpeername(&sockAddr);
+    auto result = socket->getpeername(&sockAddr);
+    if (result < 0)
+    {
+        set_errno(ENOTSOCK);
+        return -1;
+    }
+    convert_mbed_addr_to_bsd(addr, &sockAddr);
+    return result;
 }
 
 static int get_max_select_fd(int nfds, fd_set * readfds, fd_set * writefds, fd_set * exceptfds)
