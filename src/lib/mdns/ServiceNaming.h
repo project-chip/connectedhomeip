@@ -18,6 +18,7 @@
 #pragma once
 
 #include <core/CHIPError.h>
+#include <support/Span.h>
 
 #include <cstddef>
 #include <cstdint>
@@ -26,6 +27,7 @@ namespace chip {
 namespace Mdns {
 
 CHIP_ERROR MakeInstanceName(char * buffer, size_t bufferLen, uint64_t fabricId, uint64_t nodeId);
+CHIP_ERROR MakeHostName(char * buffer, size_t bufferLen, chip::ByteSpan macOrEui64);
 
 } // namespace Mdns
 } // namespace chip

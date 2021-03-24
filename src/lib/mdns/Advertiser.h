@@ -31,8 +31,6 @@ namespace Mdns {
 static constexpr uint16_t kMdnsPort = 5353;
 // Need 8 bytes to fit a thread mac.
 static constexpr size_t kMaxMacSize = 8;
-// 2-byte ascii for 8-byte mac.
-static constexpr size_t kMaxHostnameSize = kMaxMacSize * 2;
 
 enum class CommssionAdvertiseMode : uint8_t
 {
@@ -61,29 +59,15 @@ public:
     {
         mMac = chip::ByteSpan(mMacStorage, std::min(mac.size(), kMaxMacSize));
         memcpy(mMacStorage, mac.data(), mMac.size());
-        // Fill in the host name here so it's available.
-        size_t idx = 0;
-        for (size_t i = 0; i < mMac.size(); ++i)
-        {
-            if (idx > kMaxHostnameSize - 2)
-            {
-                ChipLogError(Discovery, "Failed to allocate full hostname");
-                break;
-            }
-            idx += snprintf(mHostname + idx, 3, "%02X", mac.data()[i]);
-        }
         return *reinterpret_cast<Derived *>(this);
     }
     const chip::ByteSpan GetMac() const { return mMac; }
-    const char * GetHostname() const { return mHostname; }
 
 private:
     uint16_t mPort                   = CHIP_PORT;
     bool mEnableIPv4                 = true;
     uint8_t mMacStorage[kMaxMacSize] = {};
     chip::ByteSpan mMac              = chip::ByteSpan(mMacStorage, kMaxMacSize);
-    // Add 1 for the end nullptr.
-    char mHostname[kMaxHostnameSize + 1] = "000000000000";
 }; // namespace Mdns
 
 /// Defines parameters required for advertising a CHIP node

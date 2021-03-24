@@ -140,6 +140,23 @@ exit:
 }
 #endif
 
+CHIP_ERROR DiscoveryImplPlatform::SetupHostname(chip::ByteSpan macOrEui64)
+{
+    char nameBuffer[17];
+    CHIP_ERROR error = MakeHostName(nameBuffer, sizeof(nameBuffer), macOrEui64);
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(Discovery, "Failed to create mdns hostname: %s", ErrorStr(error));
+        return error;
+    }
+    error = ChipMdnsSetHostname(nameBuffer);
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(Discovery, "Failed to setup mdns hostname: %s", ErrorStr(error));
+        return error;
+    }
+}
+
 CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameters & params)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
@@ -163,12 +180,9 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
     {
         return CHIP_ERROR_INCORRECT_STATE;
     }
-    error = ChipMdnsSetHostname(params.GetHostname());
-    if (error != CHIP_NO_ERROR)
-    {
-        ChipLogError(Discovery, "Failed to setup mdns hostname: %s", ErrorStr(error));
-        return error;
-    }
+
+    ReturnErrorOnFailure(SetupHostname(params.GetMac()));
+
     snprintf(service.mName, sizeof(service.mName), "%016" PRIX64, mCommissionInstanceName);
     if (params.GetCommissionAdvertiseMode() == CommssionAdvertiseMode::kCommissioning)
     {
@@ -245,15 +259,10 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const OperationalAdvertisingParamete
     MdnsService service;
     CHIP_ERROR error = CHIP_NO_ERROR;
 
-    error = ChipMdnsSetHostname(params.GetHostname());
-    if (error != CHIP_NO_ERROR)
-    {
-        ChipLogError(Discovery, "Failed to setup mdns hostname: %s", ErrorStr(error));
-        return error;
-    }
-
     mOperationalAdvertisingParams = params;
     // TODO: There may be multilple device/fabrid ids after multi-admin.
+
+    ReturnErrorOnFailure(SetupHostname(params.GetMac()));
 
     ReturnErrorOnFailure(MakeInstanceName(service.mName, sizeof(service.mName), params.GetFabricId(), params.GetNodeId()));
     strncpy(service.mType, "_chip", sizeof(service.mType));
