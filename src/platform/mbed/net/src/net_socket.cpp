@@ -321,6 +321,7 @@ ssize_t mbed_send(int fd, const void * buf, size_t len, int flags)
         default:
             set_errno(ENOBUFS);
         }
+        return -1;
     }
     ::write(fd, NULL, 0);
     return ret;
@@ -366,6 +367,7 @@ ssize_t mbed_sendto(int fd, const void * buf, size_t len, int flags, const struc
         default:
             set_errno(ENOBUFS);
         }
+        return -1;
     }
     ::write(fd, NULL, 0);
     return ret;
@@ -411,6 +413,7 @@ ssize_t mbed_sendmsg(int fd, const struct msghdr * message, int flags)
             default:
                 set_errno(ENOBUFS);
             }
+            return -1;
         }
         total += ret;
     }
@@ -448,6 +451,7 @@ ssize_t mbed_recv(int fd, void * buf, size_t max_len, int flags)
         default:
             set_errno(ENOBUFS);
         }
+        return -1;
     }
     ::read(fd, NULL, 0);
     return ret;
@@ -484,6 +488,7 @@ ssize_t mbed_recvfrom(int fd, void * buf, size_t max_len, int flags, struct sock
         default:
             set_errno(ENOBUFS);
         }
+        return -1;
     }
     ::read(fd, NULL, 0);
 
@@ -515,27 +520,39 @@ ssize_t mbed_recvmsg(int fd, struct msghdr * message, int flags)
     }
     SocketAddress sockAddr;
     ssize_t total = 0;
-    ssize_t read  = 0;
 
     for (size_t i = 0; i < message->msg_iovlen; i++)
     {
-        read = socket->recvfrom(&sockAddr, (void *) message->msg_iov[i].iov_base, message->msg_iov[i].iov_len);
-        if (read < 0)
+        auto ret = socket->recvfrom(&sockAddr, (void *) message->msg_iov[i].iov_base, message->msg_iov[i].iov_len);
+        if (ret < 0)
         {
-            set_errno(EIO);
+            switch (ret)
+            {
+            case NSAPI_ERROR_NO_SOCKET:
+                set_errno(ENOTSOCK);
+                break;
+            case NSAPI_ERROR_WOULD_BLOCK:
+                set_errno(EWOULDBLOCK);
+                break;
+            default:
+                set_errno(ENOBUFS);
+            }
             return -1;
         }
-        total += read;
+        total += ret;
     }
 
-    if (convert_mbed_addr_to_bsd((sockaddr *) message->msg_name, &sockAddr))
+    if (message->msg_name != nullptr)
     {
-        set_errno(EINVAL);
-        return -1;
+        if (convert_mbed_addr_to_bsd((sockaddr *) message->msg_name, &sockAddr))
+        {
+            set_errno(EINVAL);
+            return -1;
+        }
     }
 
     ::read(fd, NULL, 0);
-    return read;
+    return total;
 }
 
 int mbed_getsockopt(int fd, int level, int optname, void * optval, socklen_t * optlen)
@@ -571,7 +588,7 @@ int mbed_getsockname(int fd, struct sockaddr * addr, socklen_t * addrlen)
 
     if (addr == nullptr || addrlen == nullptr)
     {
-        set_errno(EFAULT);
+        set_errno(EINVAL);
         return -1;
     }
 
@@ -611,22 +628,39 @@ int mbed_getsockname(int fd, struct sockaddr * addr, socklen_t * addrlen)
 
 int mbed_getpeername(int sockfd, struct sockaddr * addr, socklen_t * addrlen)
 {
+    SocketAddress sockAddr;
     auto * socket = getSocket(sockfd);
     if (socket == nullptr)
     {
-        set_errno(ENOBUFS);
+        set_errno(EBADF);
         return -1;
     }
-    SocketAddress sockAddr;
-    Sockaddr2Netsocket(&sockAddr, addr);
-    auto result = socket->getpeername(&sockAddr);
-    if (result < 0)
+
+    if (addr == nullptr || addrlen == nullptr)
     {
-        set_errno(ENOTSOCK);
+        set_errno(EINVAL);
+        return -1;
+    }
+
+    auto ret = socket->getpeername(&sockAddr);
+    if (ret < 0)
+    {
+        switch (ret)
+        {
+        case NSAPI_ERROR_NO_SOCKET:
+            set_errno(ENOTSOCK);
+            break;
+        case NSAPI_ERROR_NO_CONNECTION:
+            set_errno(ENOTCONN);
+            break;
+        default:
+            set_errno(ENOBUFS);
+        }
+
         return -1;
     }
     convert_mbed_addr_to_bsd(addr, &sockAddr);
-    return result;
+    return 0;
 }
 
 static int get_max_select_fd(int nfds, fd_set * readfds, fd_set * writefds, fd_set * exceptfds)
