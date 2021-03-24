@@ -23,7 +23,6 @@
 #include <mdns/Advertiser.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ConfigurationManager.h>
-#include <support/ReturnMacros.h>
 #include <support/Span.h>
 #include <support/logging/CHIPLogging.h>
 #include <transport/AdminPairingTable.h>

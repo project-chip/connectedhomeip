@@ -70,6 +70,37 @@ function asPutCastType(zclType)
   }
 }
 
+function getEnabledClustersForSide(clusters, side)
+{
+  clusters = clusters.filter(cluster => cluster.enabled == 1);
+
+  if (side == 'all') {
+    return clusters;
+  }
+
+  return clusters.filter(cluster => cluster.side == side);
+}
+
+function getClusters(options, side)
+{
+  const db        = this.global.db;
+  const sessionId = this.global.sessionId;
+
+  return queryImpexp.exportendPointTypeIds(db, sessionId)
+      .then(endpointTypes => zclQuery.exportAllClustersDetailsFromEndpointTypes(db, endpointTypes))
+      .then(clusters => getEnabledClustersForSide(clusters, side));
+}
+
+function getClustersAsBlocks(options, side)
+{
+  function fn(pkgId)
+  {
+    return getClusters.call(this, options, side).then(clusters => templateUtil.collectBlocks(clusters, options, this))
+  }
+
+  return templateUtil.ensureZclPackageId(this).then(fn.bind(this)).catch(err => console.log(err));
+}
+
 /**
  * Creates block iterator over the enabled server side clusters
  *
@@ -77,22 +108,57 @@ function asPutCastType(zclType)
  */
 function chip_server_clusters(options)
 {
-  const db = this.global.db;
-
-  return queryImpexp.exportendPointTypeIds(db, this.global.sessionId)
-      .then(endpointTypes => { return zclQuery.exportAllClustersDetailsFromEndpointTypes(db, endpointTypes) })
-      .then(clusters => clusters.filter(cluster => cluster.enabled == 1 && cluster.side == 'server'))
-      .then(clusters => templateUtil.collectBlocks(clusters, options, this))
+  return getClustersAsBlocks.call(this, options, 'server');
 }
 
+/**
+ * Check if there is any enabled server clusters
+ *
+ */
+function chip_has_server_clusters(options)
+{
+  let promise = getClusters.call(this, options, 'server').then(clusters => !!clusters.length);
+  return templateUtil.templatePromise(this.global, promise);
+}
+
+/**
+ * Creates block iterator over client side enabled clusters
+ *
+ * @param {*} options
+ */
+function chip_client_clusters(options)
+{
+  return getClustersAsBlocks.call(this, options, 'client');
+}
+
+/**
+ * Check if there is any enabled client clusters
+ *
+ */
+function chip_has_client_clusters(options)
+{
+  let promise = getClusters.call(this, options, 'client').then(clusters => !!clusters.length);
+  return templateUtil.templatePromise(this.global, promise);
+}
+
+/**
+ * Creates block iterator over enabled clusters
+ *
+ * @param {*} options
+ */
 function chip_clusters(options)
 {
-  const db = this.global.db;
+  return getClustersAsBlocks.call(this, options, 'all');
+}
 
-  return queryImpexp.exportendPointTypeIds(db, this.global.sessionId)
-      .then(endpointTypes => { return zclQuery.exportAllClustersDetailsFromEndpointTypes(db, endpointTypes) })
-      .then(clusters => clusters.filter(cluster => cluster.enabled == 1))
-      .then(clusters => templateUtil.collectBlocks(clusters, options, this))
+/**
+ * Check if there is any enabled clusters
+ *
+ */
+function chip_has_clusters(options)
+{
+  let promise = getClusters.call(this, options, 'client').then(clusters => !!clusters.length);
+  return templateUtil.templatePromise(this.global, promise);
 }
 
 /**
@@ -561,7 +627,11 @@ function isStrEndsWith(str, substr)
 // Module exports
 //
 exports.chip_clusters                         = chip_clusters;
+exports.chip_has_clusters                     = chip_has_clusters;
+exports.chip_client_clusters                  = chip_client_clusters;
+exports.chip_has_client_clusters              = chip_has_client_clusters;
 exports.chip_server_clusters                  = chip_server_clusters;
+exports.chip_has_server_clusters              = chip_has_server_clusters;
 exports.chip_server_cluster_commands          = chip_server_cluster_commands;
 exports.chip_server_cluster_command_arguments = chip_server_cluster_command_arguments
 exports.asBasicType                           = ChipTypesHelper.asBasicType;

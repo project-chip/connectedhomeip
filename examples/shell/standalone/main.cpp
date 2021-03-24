@@ -45,10 +45,7 @@ int main()
     cmd_device_init();
     cmd_btp_init();
     cmd_otcli_init();
-
-#ifndef CHIP_DEVICE_CONFIG_DISABLE_SHELL_PING
     cmd_ping_init();
-#endif
 
     shell_task(nullptr);
     return 0;

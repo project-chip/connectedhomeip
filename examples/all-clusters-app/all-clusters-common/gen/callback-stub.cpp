@@ -20,6 +20,8 @@
 #include "callback.h"
 #include "cluster-id.h"
 
+#include <lib/support/Span.h>
+
 using namespace chip;
 
 // Cluster Init Functions
@@ -42,14 +44,14 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_COLOR_CONTROL_CLUSTER_ID:
         emberAfColorControlClusterInitCallback(endpoint);
         break;
-    case ZCL_CONTENT_LAUNCH_CLUSTER_ID:
-        emberAfContentLaunchClusterInitCallback(endpoint);
-        break;
     case ZCL_DOOR_LOCK_CLUSTER_ID:
         emberAfDoorLockClusterInitCallback(endpoint);
         break;
     case ZCL_GENERAL_COMMISSIONING_CLUSTER_ID:
         emberAfGeneralCommissioningClusterInitCallback(endpoint);
+        break;
+    case ZCL_GROUP_KEY_MANAGEMENT_CLUSTER_ID:
+        emberAfGroupKeyManagementClusterInitCallback(endpoint);
         break;
     case ZCL_GROUPS_CLUSTER_ID:
         emberAfGroupsClusterInitCallback(endpoint);
@@ -65,9 +67,6 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
         break;
     case ZCL_LOW_POWER_CLUSTER_ID:
         emberAfLowPowerClusterInitCallback(endpoint);
-        break;
-    case ZCL_MEDIA_PLAYBACK_CLUSTER_ID:
-        emberAfMediaPlaybackClusterInitCallback(endpoint);
         break;
     case ZCL_NETWORK_COMMISSIONING_CLUSTER_ID:
         emberAfNetworkCommissioningClusterInitCallback(endpoint);
@@ -112,17 +111,17 @@ void __attribute__((weak)) emberAfColorControlClusterInitCallback(EndpointId end
     // To prevent warning
     (void) endpoint;
 }
-void __attribute__((weak)) emberAfContentLaunchClusterInitCallback(EndpointId endpoint)
-{
-    // To prevent warning
-    (void) endpoint;
-}
 void __attribute__((weak)) emberAfDoorLockClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;
 }
 void __attribute__((weak)) emberAfGeneralCommissioningClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfGroupKeyManagementClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;
@@ -148,11 +147,6 @@ void __attribute__((weak)) emberAfLevelControlClusterInitCallback(EndpointId end
     (void) endpoint;
 }
 void __attribute__((weak)) emberAfLowPowerClusterInitCallback(EndpointId endpoint)
-{
-    // To prevent warning
-    (void) endpoint;
-}
-void __attribute__((weak)) emberAfMediaPlaybackClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;

@@ -1,7 +1,11 @@
 {{#if (zcl_command_arguments_count this.id)}}
 uint16_t payloadOffset = cmd->payloadStartIndex;
 {{#zcl_command_arguments}}
+{{#if (isOctetString type)}}
+chip::ByteSpan {{asSymbol label}};
+{{else}}
 {{asUnderlyingZclType type}} {{asSymbol label}};
+{{/if}}
 {{/zcl_command_arguments}}
 
 {{#zcl_command_arguments}}
@@ -18,11 +22,18 @@ if ({{presentIf}})
   }
   {{#if (isSigned type)}}
   {{asSymbol label}} = static_cast<{{asUnderlyingZclType type}}>(emberAfGet{{asReadType type}}(cmd->buffer, payloadOffset, cmd->bufLen));
+  {{else if (isOctetString type)}}
+  {
+  uint8_t * rawData = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
+  {{asSymbol label}} = chip::ByteSpan(rawData + {{asReadTypeLength type}}, emberAf{{asReadType type}}Length(rawData));
+  }
   {{else}}
   {{asSymbol label}} = emberAfGet{{asReadType type}}(cmd->buffer, payloadOffset, cmd->bufLen);
   {{/if}}
   {{#unless (isLastElement index count)}}
-  {{#if (isString type)}}
+  {{#if (isOctetString type)}}
+  payloadOffset = static_cast<uint16_t>(payloadOffset + {{asSymbol label}}.size() + {{asReadTypeLength type}});
+  {{else if (isString type)}}
   payloadOffset = static_cast<uint16_t>(payloadOffset + emberAf{{asReadType type}}Length({{asSymbol label}}) + {{asReadTypeLength type}});
   {{else}}
   payloadOffset = static_cast<uint16_t>(payloadOffset + {{asReadTypeLength type}});

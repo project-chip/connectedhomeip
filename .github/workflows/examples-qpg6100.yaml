@@ -39,11 +39,10 @@ jobs:
               with:
                   fetch-depth: 0
                   submodules: true
-            - name: Initialize CodeQL
-              uses: github/codeql-action/init@v1
-              with:
-                  languages: "cpp"
-                  queries: +security-and-quality
+#             - name: Initialize CodeQL
+#               uses: github/codeql-action/init@v1
+#               with:
+#                   languages: "cpp"
             - name: Build example QPG6100 Lock App
               run: scripts/examples/gn_build_example.sh
                    examples/lock-app/qpg6100 out/lock_app_debug
@@ -68,6 +67,6 @@ jobs:
                       out/lighting_app_debug/chip-qpg6100-lighting-example.out
             - name: Remove third_party binaries for CodeQL Analysis
               run: find out -type d -name "third_party" -exec rm -rf {} +
-            - name: Perform CodeQL Analysis
-              if: ${{ github.event_name == 'push' }}
-              uses: github/codeql-action/analyze@v1
+#             - name: Perform CodeQL Analysis
+#               if: ${{ github.event_name == 'push' }}
+#               uses: github/codeql-action/analyze@v1

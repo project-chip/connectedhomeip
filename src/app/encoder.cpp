@@ -104,15 +104,14 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
 | Basic                                                               | 0x0028 |
 | Binding                                                             | 0xF000 |
 | ColorControl                                                        | 0x0300 |
-| ContentLaunch                                                       | 0xF002 |
 | DoorLock                                                            | 0x0101 |
 | GeneralCommissioning                                                | 0x0030 |
+| GroupKeyManagement                                                  | 0xF004 |
 | Groups                                                              | 0x0004 |
 | IasZone                                                             | 0x0500 |
 | Identify                                                            | 0x0003 |
 | LevelControl                                                        | 0x0008 |
 | LowPower                                                            | 0x0508 |
-| MediaPlayback                                                       | 0xF001 |
 | NetworkCommissioning                                                | 0x0031 |
 | OnOff                                                               | 0x0006 |
 | Scenes                                                              | 0x0005 |
@@ -174,10 +173,6 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
 #define ZCL_STEP_SATURATION_COMMAND_ID (0x05)
 #define ZCL_STOP_MOVE_STEP_COMMAND_ID (0x47)
 
-#define CONTENT_LAUNCH_CLUSTER_ID 0xF002
-#define ZCL_LAUNCH_CONTENT_COMMAND_ID (0x00)
-#define ZCL_LAUNCH_URL_COMMAND_ID (0x01)
-
 #define DOOR_LOCK_CLUSTER_ID 0x0101
 #define ZCL_CLEAR_ALL_PINS_COMMAND_ID (0x08)
 #define ZCL_CLEAR_ALL_RFIDS_COMMAND_ID (0x19)
@@ -208,6 +203,8 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
 #define ZCL_COMMISSIONING_COMPLETE_COMMAND_ID (0x06)
 #define ZCL_SET_FABRIC_COMMAND_ID (0x00)
 
+#define GROUP_KEY_MANAGEMENT_CLUSTER_ID 0xF004
+
 #define GROUPS_CLUSTER_ID 0x0004
 #define ZCL_ADD_GROUP_COMMAND_ID (0x00)
 #define ZCL_ADD_GROUP_IF_IDENTIFYING_COMMAND_ID (0x05)
@@ -234,18 +231,6 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
 
 #define LOW_POWER_CLUSTER_ID 0x0508
 #define ZCL_SLEEP_COMMAND_ID (0x00)
-
-#define MEDIA_PLAYBACK_CLUSTER_ID 0xF001
-#define ZCL_FAST_FORWARD_REQUEST_COMMAND_ID (0x07)
-#define ZCL_NEXT_REQUEST_COMMAND_ID (0x05)
-#define ZCL_PAUSE_REQUEST_COMMAND_ID (0x01)
-#define ZCL_PLAY_REQUEST_COMMAND_ID (0x00)
-#define ZCL_PREVIOUS_REQUEST_COMMAND_ID (0x04)
-#define ZCL_REWIND_REQUEST_COMMAND_ID (0x06)
-#define ZCL_SKIP_BACKWARD_REQUEST_COMMAND_ID (0x09)
-#define ZCL_SKIP_FORWARD_REQUEST_COMMAND_ID (0x08)
-#define ZCL_START_OVER_REQUEST_COMMAND_ID (0x03)
-#define ZCL_STOP_REQUEST_COMMAND_ID (0x02)
 
 #define NETWORK_COMMISSIONING_CLUSTER_ID 0x0031
 #define ZCL_ADD_THREAD_NETWORK_COMMAND_ID (0x06)
@@ -1871,54 +1856,6 @@ PacketBufferHandle encodeColorControlClusterReadClusterRevisionAttribute(uint8_t
 }
 
 /*----------------------------------------------------------------------------*\
-| Cluster ContentLaunch                                               | 0xF002 |
-|------------------------------------------------------------------------------|
-| Commands:                                                           |        |
-| * LaunchContent                                                     |   0x00 |
-| * LaunchURL                                                         |   0x01 |
-|------------------------------------------------------------------------------|
-| Attributes:                                                         |        |
-| * ClusterRevision                                                   | 0xFFFD |
-\*----------------------------------------------------------------------------*/
-
-/*
- * Command LaunchContent
- */
-PacketBufferHandle encodeContentLaunchClusterLaunchContentCommand(uint8_t seqNum, EndpointId destinationEndpoint)
-{
-    COMMAND_HEADER("LaunchContent", CONTENT_LAUNCH_CLUSTER_ID);
-    buf.Put8(kFrameControlClusterSpecificCommand).Put8(seqNum).Put8(ZCL_LAUNCH_CONTENT_COMMAND_ID);
-    COMMAND_FOOTER();
-}
-
-/*
- * Command LaunchURL
- */
-PacketBufferHandle encodeContentLaunchClusterLaunchURLCommand(uint8_t seqNum, EndpointId destinationEndpoint)
-{
-    COMMAND_HEADER("LaunchURL", CONTENT_LAUNCH_CLUSTER_ID);
-    buf.Put8(kFrameControlClusterSpecificCommand).Put8(seqNum).Put8(ZCL_LAUNCH_URL_COMMAND_ID);
-    COMMAND_FOOTER();
-}
-
-PacketBufferHandle encodeContentLaunchClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
-{
-    COMMAND_HEADER("DiscoverContentLaunchAttributes", CONTENT_LAUNCH_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
-    COMMAND_FOOTER();
-}
-
-/*
- * Attribute ClusterRevision
- */
-PacketBufferHandle encodeContentLaunchClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
-{
-    COMMAND_HEADER("ReadContentLaunchClusterRevision", CONTENT_LAUNCH_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
-    COMMAND_FOOTER();
-}
-
-/*----------------------------------------------------------------------------*\
 | Cluster DoorLock                                                    | 0x0101 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
@@ -2507,6 +2444,54 @@ PacketBufferHandle encodeGeneralCommissioningClusterReadClusterRevisionAttribute
 }
 
 /*----------------------------------------------------------------------------*\
+| Cluster GroupKeyManagement                                          | 0xF004 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * Groups                                                            | 0x0000 |
+| * GroupKeys                                                         | 0x0001 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+PacketBufferHandle encodeGroupKeyManagementClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("DiscoverGroupKeyManagementAttributes", GROUP_KEY_MANAGEMENT_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute Groups
+ */
+PacketBufferHandle encodeGroupKeyManagementClusterReadGroupsAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadGroupKeyManagementGroups", GROUP_KEY_MANAGEMENT_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0000);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute GroupKeys
+ */
+PacketBufferHandle encodeGroupKeyManagementClusterReadGroupKeysAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadGroupKeyManagementGroupKeys", GROUP_KEY_MANAGEMENT_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0001);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute ClusterRevision
+ */
+PacketBufferHandle encodeGroupKeyManagementClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadGroupKeyManagementClusterRevision", GROUP_KEY_MANAGEMENT_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    COMMAND_FOOTER();
+}
+
+/*----------------------------------------------------------------------------*\
 | Cluster Groups                                                      | 0x0004 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
@@ -3030,153 +3015,6 @@ PacketBufferHandle encodeLowPowerClusterDiscoverAttributes(uint8_t seqNum, Endpo
 PacketBufferHandle encodeLowPowerClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadLowPowerClusterRevision", LOW_POWER_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
-    COMMAND_FOOTER();
-}
-
-/*----------------------------------------------------------------------------*\
-| Cluster MediaPlayback                                               | 0xF001 |
-|------------------------------------------------------------------------------|
-| Commands:                                                           |        |
-| * FastForwardRequest                                                |   0x07 |
-| * NextRequest                                                       |   0x05 |
-| * PauseRequest                                                      |   0x01 |
-| * PlayRequest                                                       |   0x00 |
-| * PreviousRequest                                                   |   0x04 |
-| * RewindRequest                                                     |   0x06 |
-| * SkipBackwardRequest                                               |   0x09 |
-| * SkipForwardRequest                                                |   0x08 |
-| * StartOverRequest                                                  |   0x03 |
-| * StopRequest                                                       |   0x02 |
-|------------------------------------------------------------------------------|
-| Attributes:                                                         |        |
-| * CurrentState                                                      | 0x0000 |
-| * ClusterRevision                                                   | 0xFFFD |
-\*----------------------------------------------------------------------------*/
-
-/*
- * Command FastForwardRequest
- */
-PacketBufferHandle encodeMediaPlaybackClusterFastForwardRequestCommand(uint8_t seqNum, EndpointId destinationEndpoint)
-{
-    COMMAND_HEADER("FastForwardRequest", MEDIA_PLAYBACK_CLUSTER_ID);
-    buf.Put8(kFrameControlClusterSpecificCommand).Put8(seqNum).Put8(ZCL_FAST_FORWARD_REQUEST_COMMAND_ID);
-    COMMAND_FOOTER();
-}
-
-/*
- * Command NextRequest
- */
-PacketBufferHandle encodeMediaPlaybackClusterNextRequestCommand(uint8_t seqNum, EndpointId destinationEndpoint)
-{
-    COMMAND_HEADER("NextRequest", MEDIA_PLAYBACK_CLUSTER_ID);
-    buf.Put8(kFrameControlClusterSpecificCommand).Put8(seqNum).Put8(ZCL_NEXT_REQUEST_COMMAND_ID);
-    COMMAND_FOOTER();
-}
-
-/*
- * Command PauseRequest
- */
-PacketBufferHandle encodeMediaPlaybackClusterPauseRequestCommand(uint8_t seqNum, EndpointId destinationEndpoint)
-{
-    COMMAND_HEADER("PauseRequest", MEDIA_PLAYBACK_CLUSTER_ID);
-    buf.Put8(kFrameControlClusterSpecificCommand).Put8(seqNum).Put8(ZCL_PAUSE_REQUEST_COMMAND_ID);
-    COMMAND_FOOTER();
-}
-
-/*
- * Command PlayRequest
- */
-PacketBufferHandle encodeMediaPlaybackClusterPlayRequestCommand(uint8_t seqNum, EndpointId destinationEndpoint)
-{
-    COMMAND_HEADER("PlayRequest", MEDIA_PLAYBACK_CLUSTER_ID);
-    buf.Put8(kFrameControlClusterSpecificCommand).Put8(seqNum).Put8(ZCL_PLAY_REQUEST_COMMAND_ID);
-    COMMAND_FOOTER();
-}
-
-/*
- * Command PreviousRequest
- */
-PacketBufferHandle encodeMediaPlaybackClusterPreviousRequestCommand(uint8_t seqNum, EndpointId destinationEndpoint)
-{
-    COMMAND_HEADER("PreviousRequest", MEDIA_PLAYBACK_CLUSTER_ID);
-    buf.Put8(kFrameControlClusterSpecificCommand).Put8(seqNum).Put8(ZCL_PREVIOUS_REQUEST_COMMAND_ID);
-    COMMAND_FOOTER();
-}
-
-/*
- * Command RewindRequest
- */
-PacketBufferHandle encodeMediaPlaybackClusterRewindRequestCommand(uint8_t seqNum, EndpointId destinationEndpoint)
-{
-    COMMAND_HEADER("RewindRequest", MEDIA_PLAYBACK_CLUSTER_ID);
-    buf.Put8(kFrameControlClusterSpecificCommand).Put8(seqNum).Put8(ZCL_REWIND_REQUEST_COMMAND_ID);
-    COMMAND_FOOTER();
-}
-
-/*
- * Command SkipBackwardRequest
- */
-PacketBufferHandle encodeMediaPlaybackClusterSkipBackwardRequestCommand(uint8_t seqNum, EndpointId destinationEndpoint)
-{
-    COMMAND_HEADER("SkipBackwardRequest", MEDIA_PLAYBACK_CLUSTER_ID);
-    buf.Put8(kFrameControlClusterSpecificCommand).Put8(seqNum).Put8(ZCL_SKIP_BACKWARD_REQUEST_COMMAND_ID);
-    COMMAND_FOOTER();
-}
-
-/*
- * Command SkipForwardRequest
- */
-PacketBufferHandle encodeMediaPlaybackClusterSkipForwardRequestCommand(uint8_t seqNum, EndpointId destinationEndpoint)
-{
-    COMMAND_HEADER("SkipForwardRequest", MEDIA_PLAYBACK_CLUSTER_ID);
-    buf.Put8(kFrameControlClusterSpecificCommand).Put8(seqNum).Put8(ZCL_SKIP_FORWARD_REQUEST_COMMAND_ID);
-    COMMAND_FOOTER();
-}
-
-/*
- * Command StartOverRequest
- */
-PacketBufferHandle encodeMediaPlaybackClusterStartOverRequestCommand(uint8_t seqNum, EndpointId destinationEndpoint)
-{
-    COMMAND_HEADER("StartOverRequest", MEDIA_PLAYBACK_CLUSTER_ID);
-    buf.Put8(kFrameControlClusterSpecificCommand).Put8(seqNum).Put8(ZCL_START_OVER_REQUEST_COMMAND_ID);
-    COMMAND_FOOTER();
-}
-
-/*
- * Command StopRequest
- */
-PacketBufferHandle encodeMediaPlaybackClusterStopRequestCommand(uint8_t seqNum, EndpointId destinationEndpoint)
-{
-    COMMAND_HEADER("StopRequest", MEDIA_PLAYBACK_CLUSTER_ID);
-    buf.Put8(kFrameControlClusterSpecificCommand).Put8(seqNum).Put8(ZCL_STOP_REQUEST_COMMAND_ID);
-    COMMAND_FOOTER();
-}
-
-PacketBufferHandle encodeMediaPlaybackClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
-{
-    COMMAND_HEADER("DiscoverMediaPlaybackAttributes", MEDIA_PLAYBACK_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
-    COMMAND_FOOTER();
-}
-
-/*
- * Attribute CurrentState
- */
-PacketBufferHandle encodeMediaPlaybackClusterReadCurrentStateAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
-{
-    COMMAND_HEADER("ReadMediaPlaybackCurrentState", MEDIA_PLAYBACK_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0000);
-    COMMAND_FOOTER();
-}
-
-/*
- * Attribute ClusterRevision
- */
-PacketBufferHandle encodeMediaPlaybackClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
-{
-    COMMAND_HEADER("ReadMediaPlaybackClusterRevision", MEDIA_PLAYBACK_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
     COMMAND_FOOTER();
 }

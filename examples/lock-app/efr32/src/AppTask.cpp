@@ -23,7 +23,7 @@
 #include "ButtonHandler.h"
 #include "DataModelHandler.h"
 #include "LEDWidget.h"
-#include "QRCodeUtil.h"
+#include "OnboardingCodesUtil.h"
 #include "Server.h"
 #include "Service.h"
 #include "attribute-storage.h"
@@ -145,7 +145,7 @@ int AppTask::Init()
         EFR32_LOG("Getting QR code failed!");
     }
 #else
-    PrintQRCode(chip::RendezvousInformationFlags::kBLE);
+    PrintOnboardingCodes(chip::RendezvousInformationFlags::kBLE);
 #endif
 
     return err;

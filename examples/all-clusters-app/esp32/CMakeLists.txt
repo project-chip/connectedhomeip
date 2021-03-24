@@ -14,11 +14,6 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-#
-# This is a project Makefile. It is assumed the directory this Makefile resides in is a
-# project subdirectory.
-#
-
 # The following lines of boilerplate have to be in your project's
 # CMakeLists in this exact order for cmake to work correctly
 cmake_minimum_required(VERSION 3.5)
@@ -33,3 +28,5 @@ set(EXTRA_COMPONENT_DIRS
 )
 
 project(chip-all-clusters-app)
+idf_build_set_property(CXX_COMPILE_OPTIONS "-std=c++14;-Os;-DLWIP_IPV6_SCOPES=0;-DCHIP_HAVE_CONFIG_H" APPEND)
+idf_build_set_property(C_COMPILE_OPTIONS "-Os;-DLWIP_IPV6_SCOPES=0" APPEND)

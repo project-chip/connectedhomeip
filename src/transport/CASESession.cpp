@@ -33,7 +33,6 @@
 #include <protocols/Protocols.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
-#include <support/ReturnMacros.h>
 #include <support/SafeInt.h>
 #include <transport/SecureSessionMgr.h>
 
@@ -357,7 +356,7 @@ CHIP_ERROR CASESession::HandlePeerMessage(const PacketHeader & packetHeader, con
     err = payloadHeader.DecodeAndConsume(msg);
     SuccessOrExit(err);
 
-    VerifyOrExit(payloadHeader.GetProtocolID() == Protocols::kProtocol_SecureChannel, err = CHIP_ERROR_INVALID_MESSAGE_TYPE);
+    VerifyOrExit(payloadHeader.HasProtocol(Protocols::SecureChannel::Id), err = CHIP_ERROR_INVALID_MESSAGE_TYPE);
 
     msgType = static_cast<Protocols::SecureChannel::MsgType>(payloadHeader.GetMessageType());
     VerifyOrExit(msgType == mNextExpectedMsg, err = CHIP_ERROR_INVALID_MESSAGE_TYPE);

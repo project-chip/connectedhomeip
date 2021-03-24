@@ -52,17 +52,18 @@ struct BLEAdvConfig
     const char * mpAdvertisingUUID;
 };
 
-enum class BleScanState
+enum class BleScanState : uint8_t
 {
     kNotScanning,
     kScanForDiscriminator,
     kScanForAddress,
+    kConnecting,
 };
 
 struct BLEScanConfig
 {
-    // If a active scan for connection is being performed
-    BleScanState bleScanState = BleScanState::kNotScanning;
+    // If an active scan for connection is being performed
+    BleScanState mBleScanState = BleScanState::kNotScanning;
 
     // If scanning by discriminator, what are we scanning for
     uint16_t mDiscriminator = 0;
@@ -93,6 +94,7 @@ public:
 
     // Driven by BlueZ IO
     static void HandleNewConnection(BLE_CONNECTION_OBJECT conId);
+    static void HandleConnectFailed(CHIP_ERROR error);
     static void HandleWriteComplete(BLE_CONNECTION_OBJECT conId);
     static void HandleSubscribeOpComplete(BLE_CONNECTION_OBJECT conId, bool subscribed);
     static void HandleTXCharChanged(BLE_CONNECTION_OBJECT conId, const uint8_t * value, size_t len);
@@ -100,7 +102,6 @@ public:
     static void CHIPoBluez_ConnectionClosed(BLE_CONNECTION_OBJECT user_data);
     static void HandleTXCharCCCDWrite(BLE_CONNECTION_OBJECT user_data);
     static void HandleTXComplete(BLE_CONNECTION_OBJECT user_data);
-    static bool WoBLEz_TimerCb(BLE_CONNECTION_OBJECT user_data);
 
     static void NotifyBLEPeripheralRegisterAppComplete(bool aIsSuccess, void * apAppstate);
     static void NotifyBLEPeripheralAdvConfiguredComplete(bool aIsSuccess, void * apAppstate);
@@ -115,9 +116,8 @@ private:
     CHIP_ERROR _SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val);
     bool _IsAdvertisingEnabled();
     CHIP_ERROR _SetAdvertisingEnabled(bool val);
-    bool _IsFastAdvertisingEnabled();
-    CHIP_ERROR _SetFastAdvertisingEnabled(bool val);
     bool _IsAdvertising();
+    CHIP_ERROR _SetAdvertisingMode(BLEAdvertisingMode mode);
     CHIP_ERROR _GetDeviceName(char * buf, size_t bufSize);
     CHIP_ERROR _SetDeviceName(const char * deviceName);
     uint16_t _NumConnections();
@@ -150,6 +150,7 @@ private:
     // ===== Members that implement virtual methods on BleConnectionDelegate.
 
     void NewConnection(BleLayer * bleLayer, void * appState, uint16_t connDiscriminator) override;
+    BLE_ERROR CancelConnection() override;
 
     // ===== Members that implement virtual methods on ChipDeviceScannerDelegate
     void OnDeviceScanned(BluezDevice1 * device, const chip::Ble::ChipBLEDeviceIdentificationInfo & info) override;
@@ -192,6 +193,7 @@ private:
 
     void InitiateScan(BleScanState scanType);
     static void InitiateScan(intptr_t arg);
+    void CleanScanConfig();
 
     CHIPoBLEServiceMode mServiceMode;
     BLEAdvConfig mBLEAdvConfig;
@@ -238,11 +240,6 @@ inline BLEManager::CHIPoBLEServiceMode BLEManagerImpl::_GetCHIPoBLEServiceMode()
 inline bool BLEManagerImpl::_IsAdvertisingEnabled()
 {
     return mFlags.Has(Flags::kAdvertisingEnabled);
-}
-
-inline bool BLEManagerImpl::_IsFastAdvertisingEnabled()
-{
-    return mFlags.Has(Flags::kFastAdvertisingEnabled);
 }
 
 inline bool BLEManagerImpl::_IsAdvertising()

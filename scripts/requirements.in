@@ -2,13 +2,18 @@ pip-tools
 virtualenv
 
 # esp-idf
-pyelftools>=0.22
+setuptools>=21
 click>=5.0
 pyserial>=3.0
 future>=0.15.2
-cryptography>=3.2
+cryptography>=2.1.4
 pyparsing>=2.0.3,<2.4.0
 pyelftools>=0.22
+gdbgui==0.13.2.0
+pygdbmi<=0.9.0.2
+reedsolo>=1.5.3,<=1.5.4
+bitstring>=3.1.6
+ecdsa>=0.16.0
 
 # cirque tests
 requests>=2.24.0
@@ -35,8 +40,8 @@ psutil >= 5.7.3
 
 # pigweed
 ipython
-appnope; sys_platform == 'darwin'
-appdirs; sys_platform == 'darwin'
+appnope
+appdirs
 coloredlogs
 watchdog
 protobuf

@@ -75,8 +75,9 @@ public:
         return reinterpret_cast<AndroidDeviceControllerWrapper *>(handle);
     }
 
-    static AndroidDeviceControllerWrapper * AllocateNew(chip::NodeId nodeId, chip::System::Layer * systemLayer,
-                                                        chip::Inet::InetLayer * inetLayer, CHIP_ERROR * errInfoOnFailure);
+    static AndroidDeviceControllerWrapper * AllocateNew(JavaVM * vm, jobject deviceControllerObj, chip::NodeId nodeId,
+                                                        chip::System::Layer * systemLayer, chip::Inet::InetLayer * inetLayer,
+                                                        CHIP_ERROR * errInfoOnFailure);
 
 private:
     using ChipDeviceControllerPtr = std::unique_ptr<chip::Controller::DeviceCommissioner>;

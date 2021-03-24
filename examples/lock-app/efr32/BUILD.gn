@@ -28,6 +28,7 @@ examples_plat_dir = "${chip_root}/examples/platform/efr32"
 declare_args() {
   # Dump memory usage at link time.
   chip_print_memory_usage = false
+  setupPinCode = 73141520
 }
 
 show_qr_code = true
@@ -50,7 +51,10 @@ efr32_sdk("sdk") {
     "${efr32_project_dir}/include/FreeRTOSConfig.h",
   ]
 
-  defines = [ "BOARD_ID=${efr32_board}" ]
+  defines = [
+    "BOARD_ID=${efr32_board}",
+    "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE=${setupPinCode}",
+  ]
 }
 
 efr32_executable("lock_app") {
