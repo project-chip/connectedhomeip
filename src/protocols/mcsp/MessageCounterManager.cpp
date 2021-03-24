@@ -60,34 +60,19 @@ void MessageCounterManager::Shutdown()
     }
 }
 
-MessageCounter & MessageCounterManager::GetGlobalUnsecureCounter()
+bool MessageCounterManager::IsSyncCompleted(Transport::PeerMessageCounter & counter)
 {
-    return mGlobalUnencryptedMessageCounter;
+    return counter.IsSyncCompleted();
 }
 
-MessageCounter & MessageCounterManager::GetGlobalSecureCounter()
+CHIP_ERROR MessageCounterManager::VerifyCounter(Transport::PeerMessageCounter & counter, const PacketHeader & packetHeader)
 {
-    return mGlobalEncryptedMessageCounter;
+    return counter.Verify(packetHeader.GetMessageId());
 }
 
-MessageCounter & MessageCounterManager::GetLocalSessionCounter(Transport::PeerConnectionState * state)
+void MessageCounterManager::CommitCounter(Transport::PeerMessageCounter & counter, const PacketHeader & packetHeader)
 {
-    return state->GetSessionMessageCounter().GetLocalMessageCounter();
-}
-
-bool MessageCounterManager::IsSyncCompleted(Transport::PeerConnectionState * state)
-{
-    return state->GetSessionMessageCounter().GetPeerMessageCounter().IsSyncCompleted();
-}
-
-CHIP_ERROR MessageCounterManager::VerifyCounter(Transport::PeerConnectionState * state, const PacketHeader & packetHeader)
-{
-    return state->GetSessionMessageCounter().GetPeerMessageCounter().Verify(packetHeader.GetMessageId());
-}
-
-void MessageCounterManager::CommitCounter(Transport::PeerConnectionState * state, const PacketHeader & packetHeader)
-{
-    state->GetSessionMessageCounter().GetPeerMessageCounter().Commit(packetHeader.GetMessageId());
+    counter.Commit(packetHeader.GetMessageId());
 }
 
 CHIP_ERROR MessageCounterManager::StartSync(SecureSessionHandle session, Transport::PeerConnectionState * state)

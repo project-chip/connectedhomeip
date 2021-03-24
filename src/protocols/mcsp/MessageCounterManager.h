@@ -48,13 +48,9 @@ public:
     void Shutdown();
 
     // Implement MessageCounterManagerInterface
-    MessageCounter & GetGlobalUnsecureCounter() override;
-    MessageCounter & GetGlobalSecureCounter() override;
-    MessageCounter & GetLocalSessionCounter(Transport::PeerConnectionState * state) override;
-
-    bool IsSyncCompleted(Transport::PeerConnectionState * state) override;
-    CHIP_ERROR VerifyCounter(Transport::PeerConnectionState * state, const PacketHeader & packetHeader) override;
-    void CommitCounter(Transport::PeerConnectionState * state, const PacketHeader & packetHeader) override;
+    bool IsSyncCompleted(Transport::PeerMessageCounter & counter) override;
+    CHIP_ERROR VerifyCounter(Transport::PeerMessageCounter & counter, const PacketHeader & packetHeader) override;
+    void CommitCounter(Transport::PeerMessageCounter & counter, const PacketHeader & packetHeader) override;
 
     CHIP_ERROR StartSync(SecureSessionHandle session, Transport::PeerConnectionState * state) override;
     CHIP_ERROR QueueSendMessageAndStartSync(SecureSessionHandle session, Transport::PeerConnectionState * state,
@@ -113,9 +109,6 @@ public:
                                  System::PacketBufferHandle msgBuf);
 
 private:
-    GlobalUnencryptedMessageCounter mGlobalUnencryptedMessageCounter;
-    GlobalEncryptedMessageCounter mGlobalEncryptedMessageCounter;
-
     /**
      *  @class RetransTableEntry
      *

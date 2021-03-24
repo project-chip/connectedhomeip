@@ -29,19 +29,12 @@ class DummyMessageCounterManager : public MessageCounterManagerInterface
 public:
     ~DummyMessageCounterManager() override {}
 
-    MessageCounter & GetGlobalUnsecureCounter() override { return mGlobalUnencryptedMessageCounter; }
-    MessageCounter & GetGlobalSecureCounter() override { return mGlobalEncryptedMessageCounter; }
-    MessageCounter & GetLocalSessionCounter(Transport::PeerConnectionState * state) override
-    {
-        return state->GetSessionMessageCounter().GetLocalMessageCounter();
-    }
-
-    bool IsSyncCompleted(Transport::PeerConnectionState * state) override { return true; }
-    CHIP_ERROR VerifyCounter(Transport::PeerConnectionState * state, const PacketHeader & packetHeader) override
+    bool IsSyncCompleted(PeerMessageCounter & counter) override { return true; }
+    CHIP_ERROR VerifyCounter(PeerMessageCounter & counter, const PacketHeader & packetHeader) override
     {
         return CHIP_NO_ERROR;
     }
-    void CommitCounter(Transport::PeerConnectionState * state, const PacketHeader & packetHeader) override {}
+    void CommitCounter(PeerMessageCounter & counter, const PacketHeader & packetHeader) override {}
 
     CHIP_ERROR StartSync(SecureSessionHandle session, Transport::PeerConnectionState * state) override { return CHIP_NO_ERROR; }
     CHIP_ERROR QueueSendMessageAndStartSync(SecureSessionHandle session, Transport::PeerConnectionState * state,

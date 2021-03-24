@@ -300,6 +300,9 @@ private:
     Transport::AdminPairingTable * mAdmins                             = nullptr;
     Transport::MessageCounterManagerInterface * mMessageCounterManager = nullptr;
 
+    GlobalUnencryptedMessageCounter mGlobalUnencryptedMessageCounter;
+    GlobalEncryptedMessageCounter mGlobalEncryptedMessageCounter;
+
     CHIP_ERROR SendMessage(SecureSessionHandle session, PayloadHeader & payloadHeader, PacketHeader & packetHeader,
                            System::PacketBufferHandle msgBuf, EncryptedPacketBufferHandle * bufferRetainSlot,
                            EncryptionState encryptionState);
@@ -324,6 +327,17 @@ private:
     {
         return payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::MsgCounterSyncReq) ||
             payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::MsgCounterSyncRsp);
+    }
+
+    MessageCounter & GetSendCounterForPacket(PayloadHeader & payloadHeader, Transport::PeerConnectionState & state)
+    {
+        if (IsControlMessage(payloadHeader)) {
+            return mGlobalEncryptedMessageCounter;
+        }
+        else
+        {
+            return state.GetSessionMessageCounter().GetLocalMessageCounter();
+        }
     }
 };
 

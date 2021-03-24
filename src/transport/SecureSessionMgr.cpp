@@ -125,7 +125,7 @@ CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHea
     state = GetPeerConnectionState(session);
     VerifyOrReturnError(state != nullptr, CHIP_ERROR_NOT_CONNECTED);
 
-    if (!IsControlMessage(payloadHeader) && !mMessageCounterManager->IsSyncCompleted(state))
+    if (!IsControlMessage(payloadHeader) && !mMessageCounterManager->IsSyncCompleted(state->GetSessionMessageCounter().GetPeerMessageCounter()))
     {
         if (bufferRetainSlot != nullptr)
         {
@@ -201,8 +201,7 @@ CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHea
 
     if (encryptionState == EncryptionState::kPayloadIsUnencrypted)
     {
-        MessageCounter & counter = IsControlMessage(payloadHeader) ? mMessageCounterManager->GetGlobalSecureCounter()
-                                                                   : mMessageCounterManager->GetLocalSessionCounter(state);
+        MessageCounter & counter = GetSendCounterForPacket(payloadHeader, *state);
         err = SecureMessageCodec::Encode(localNodeId, state, payloadHeader, packetHeader, msgBuf, counter);
         SuccessOrExit(err);
     }
@@ -372,7 +371,7 @@ void SecureSessionMgr::OnMessageReceived(const PacketHeader & packetHeader, cons
         {
             // TODO: "initial Session Establishment bootstrap" is under specified, use message counter sync protocol for both group
             // and unicast messages
-            if (!mMessageCounterManager->IsSyncCompleted(state))
+            if (!mMessageCounterManager->IsSyncCompleted(state->GetSessionMessageCounter().GetPeerMessageCounter()))
             {
                 // Queue and start message sync procedure
                 err = mMessageCounterManager->QueueReceivedMessageAndStartSync(
@@ -390,7 +389,7 @@ void SecureSessionMgr::OnMessageReceived(const PacketHeader & packetHeader, cons
                 return;
             }
 
-            err = mMessageCounterManager->VerifyCounter(state, packetHeader);
+            err = mMessageCounterManager->VerifyCounter(state->GetSessionMessageCounter().GetPeerMessageCounter(), packetHeader);
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(Inet, "Message counter verify failed, err = %d", err);
@@ -420,7 +419,7 @@ void SecureSessionMgr::OnMessageReceived(const PacketHeader & packetHeader, cons
         }
         else
         {
-            mMessageCounterManager->CommitCounter(state, packetHeader);
+            mMessageCounterManager->CommitCounter(state->GetSessionMessageCounter().GetPeerMessageCounter(), packetHeader);
         }
     }
 
