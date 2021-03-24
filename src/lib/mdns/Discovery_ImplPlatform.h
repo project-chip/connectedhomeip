@@ -59,7 +59,6 @@ private:
 
     CHIP_ERROR PublishUnprovisionedDevice(chip::Inet::IPAddressType addressType, chip::Inet::InterfaceId interface);
     CHIP_ERROR PublishProvisionedDevice(chip::Inet::IPAddressType addressType, chip::Inet::InterfaceId interface);
-    CHIP_ERROR SetupHostname();
 
     static void HandleNodeIdResolve(void * context, MdnsService * result, CHIP_ERROR error);
     static void HandleMdnsInit(void * context, CHIP_ERROR initError);
