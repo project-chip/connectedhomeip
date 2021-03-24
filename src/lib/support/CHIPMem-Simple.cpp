@@ -45,7 +45,7 @@ CHIP_ERROR MemoryInit(void * buf, size_t bufSize)
     PrivateHeapInit(buf, bufSize);
     gPrivateHeap = buf;
 
-    return chip::System::Mutex::Init(gHeapLock)
+    return chip::System::Mutex::Init(gHeapLock);
 }
 
 void MemoryShutdown()
