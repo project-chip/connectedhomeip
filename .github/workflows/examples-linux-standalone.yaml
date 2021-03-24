@@ -28,7 +28,7 @@ jobs:
             BUILD_ORG: connectedhomeip
 
         runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io'
+        if: github.actor != 'restyled-io[bot]'
 
         container:
             image: connectedhomeip/chip-build:latest

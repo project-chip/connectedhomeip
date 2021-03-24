@@ -23,7 +23,7 @@ jobs:
         name: ZAP templates generation
 
         runs-on: ubuntu-18.04
-        if: github.actor != 'restyled-io'
+        if: github.actor != 'restyled-io[bot]'
 
         steps:
             - name: Checkout
