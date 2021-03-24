@@ -71,7 +71,7 @@ public:
      *  @retval #CHIP_NO_ERROR On success.
      *
      */
-    CHIP_ERROR Init(NodeId localNodeId, TransportMgrBase * transportMgr, SecureSessionMgr * sessionMgr);
+    CHIP_ERROR Init(SecureSessionMgr * sessionMgr);
 
     /**
      *  Shutdown the ExchangeManager. This terminates this instance
@@ -210,7 +210,6 @@ public:
     void IncrementContextsInUse();
     void DecrementContextsInUse();
 
-    TransportMgrBase * GetTransportManager() const { return mTransportMgr; }
     SecureSessionMgr * GetSessionMgr() const { return mSessionMgr; }
 
     ReliableMessageMgr * GetReliableMessageMgr() { return &mReliableMessageMgr; };
@@ -218,7 +217,6 @@ public:
     MessageCounterSyncMgr * GetMessageCounterSyncMgr() { return &mMessageCounterSyncMgr; };
     Transport::AdminId GetAdminId() { return mAdminId; }
 
-    NodeId GetLocalNodeId() { return mLocalNodeId; }
     uint16_t GetNextKeyId() { return ++mNextKeyId; }
     size_t GetContextsInUse() const { return mContextsInUse; }
 
@@ -237,11 +235,9 @@ private:
         int16_t MessageType;
     };
 
-    NodeId mLocalNodeId; // < Id of the current node
     uint16_t mNextExchangeId;
     uint16_t mNextKeyId;
     State mState;
-    TransportMgrBase * mTransportMgr;
     SecureSessionMgr * mSessionMgr;
     ReliableMessageMgr mReliableMessageMgr;
     MessageCounterSyncMgr mMessageCounterSyncMgr;

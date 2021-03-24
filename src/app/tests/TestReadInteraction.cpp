@@ -147,10 +147,10 @@ void InitializeChip(nlTestSuite * apSuite)
     err = chip::Platform::MemoryInit();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    err = chip::gSessionManager.Init(chip::kTestDeviceNodeId, nullptr, nullptr, &admins);
+    err = chip::gSessionManager.Init(chip::kTestDeviceNodeId, nullptr, &chip::gTransportManager, &admins);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    err = chip::gExchangeManager.Init(chip::kTestDeviceNodeId, &chip::gTransportManager, &chip::gSessionManager);
+    err = chip::gExchangeManager.Init(&chip::gSessionManager);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 }
 
