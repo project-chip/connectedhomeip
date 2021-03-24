@@ -132,14 +132,20 @@ static uint32_t computeStringHash(uint8_t * data, uint8_t length)
 }
 
 #ifdef EZSP_HOST
+#if REPORT_TABLE_SIZE != 0
 static EmberAfPluginReportingEntry table[REPORT_TABLE_SIZE];
+#endif
 void emAfPluginReportingGetEntry(uint8_t index, EmberAfPluginReportingEntry * result)
 {
+#if REPORT_TABLE_SIZE != 0
     memmove(result, &table[index], sizeof(EmberAfPluginReportingEntry));
+#endif
 }
 void emAfPluginReportingSetEntry(uint8_t index, EmberAfPluginReportingEntry * value)
 {
+#if REPORT_TABLE_SIZE != 0
     memmove(&table[index], value, sizeof(EmberAfPluginReportingEntry));
+#endif
 }
 #else
 void emAfPluginReportingGetEntry(uint8_t index, EmberAfPluginReportingEntry * result)
