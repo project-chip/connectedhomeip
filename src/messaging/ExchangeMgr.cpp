@@ -82,7 +82,7 @@ CHIP_ERROR ExchangeManager::Init(SecureSessionMgr * sessionMgr)
         // Mark all handlers as unallocated.  This handles both initial
         // initialization and the case when the consumer shuts us down and
         // then re-initializes without removing registered handlers.
-        handler.Delegate = nullptr;
+        handler.Reset();
     }
 
     mSessionMgr->GetTransportManager()->SetRendezvousSession(this);
@@ -170,12 +170,12 @@ CHIP_ERROR ExchangeManager::RegisterUMH(Protocols::Id protocolId, int16_t msgTyp
 
     for (int i = 0; i < CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS; i++, umh++)
     {
-        if (umh->Delegate == nullptr)
+        if (!umh->IsInUse())
         {
             if (selected == nullptr)
                 selected = umh;
         }
-        else if (umh->ProtocolId == protocolId && umh->MessageType == msgType)
+        else if (umh->Matches(protocolId, msgType))
         {
             umh->Delegate = delegate;
             return CHIP_NO_ERROR;
@@ -200,9 +200,9 @@ CHIP_ERROR ExchangeManager::UnregisterUMH(Protocols::Id protocolId, int16_t msgT
 
     for (int i = 0; i < CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS; i++, umh++)
     {
-        if (umh->Delegate != nullptr && umh->ProtocolId == protocolId && umh->MessageType == msgType)
+        if (umh->IsInUse() && umh->Matches(protocolId, msgType))
         {
-            umh->Delegate = nullptr;
+            umh->Reset();
             SYSTEM_STATS_DECREMENT(chip::System::Stats::kExchangeMgr_NumUMHandlers);
             return CHIP_NO_ERROR;
         }
@@ -297,7 +297,7 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
 
         for (int i = 0; i < CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS; i++, umh++)
         {
-            if (umh->Delegate != nullptr && payloadHeader.HasProtocol(umh->ProtocolId))
+            if (umh->IsInUse() && payloadHeader.HasProtocol(umh->ProtocolId))
             {
                 if (umh->MessageType == payloadHeader.GetMessageType())
                 {
