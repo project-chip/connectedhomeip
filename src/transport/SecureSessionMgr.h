@@ -288,7 +288,9 @@ public:
      *
      * @param nodeId    Node id for the current node
      */
-    void SetLocalNodeID(NodeId nodeId) { mLocalNodeId = nodeId; }
+    void SetLocalNodeId(NodeId nodeId) { mLocalNodeId = nodeId; }
+
+    NodeId GetLocalNodeId() { return mLocalNodeId; }
 
     /**
      * @brief
@@ -297,6 +299,8 @@ public:
      *   peer node does not exist.
      */
     Transport::Type GetTransportType(NodeId peerNodeId);
+
+    TransportMgrBase * GetTransportManager() const { return mTransportMgr; }
 
 protected:
     /**

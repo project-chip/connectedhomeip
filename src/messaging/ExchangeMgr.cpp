@@ -64,15 +64,13 @@ ExchangeManager::ExchangeManager() : mReliableMessageMgr(mContextPool)
     mState = State::kState_NotInitialized;
 }
 
-CHIP_ERROR ExchangeManager::Init(NodeId localNodeId, TransportMgrBase * transportMgr, SecureSessionMgr * sessionMgr)
+CHIP_ERROR ExchangeManager::Init(SecureSessionMgr * sessionMgr)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     VerifyOrReturnError(mState == State::kState_NotInitialized, err = CHIP_ERROR_INCORRECT_STATE);
 
-    mLocalNodeId  = localNodeId;
-    mTransportMgr = transportMgr;
-    mSessionMgr   = sessionMgr;
+    mSessionMgr = sessionMgr;
 
     mNextExchangeId = GetRandU16();
     mNextKeyId      = 0;
@@ -87,7 +85,7 @@ CHIP_ERROR ExchangeManager::Init(NodeId localNodeId, TransportMgrBase * transpor
         handler.Delegate = nullptr;
     }
 
-    mTransportMgr->SetRendezvousSession(this);
+    mSessionMgr->GetTransportManager()->SetRendezvousSession(this);
 
     sessionMgr->SetDelegate(this);
 
