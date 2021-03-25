@@ -867,7 +867,7 @@
       "endpointTypeIndex": 0,
       "profileId": 260,
       "endpointId": 1,
-      "networkId": 1
+      "networkId": 0
     }
   ]
 }

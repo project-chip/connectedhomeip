@@ -81,7 +81,7 @@ bool emberAfGetEndpointInfoCallback(chip::EndpointId endpoint, uint8_t * returnN
 {
     ChipLogProgress(Zcl, "%s: %d", __FUNCTION__, endpoint);
 
-    //*returnNetworkIndex = 0;
+    /**returnNetworkIndex = 0;
 
     returnEndpointInfo->deviceId = 45;
     returnEndpointInfo->endpoint = endpoint;
@@ -89,7 +89,7 @@ bool emberAfGetEndpointInfoCallback(chip::EndpointId endpoint, uint8_t * returnN
     returnEndpointInfo->clusters[0].clusterId = 0x0006;
     returnEndpointInfo->clusters[0].server = true;    
     returnEndpointInfo->clusters[1].clusterId = 0x0200;
-    returnEndpointInfo->clusters[1].server = true;    
+    returnEndpointInfo->clusters[1].server = true;    */
     return false;
 }
 
