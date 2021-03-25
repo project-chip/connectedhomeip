@@ -157,7 +157,7 @@ CHIP_ERROR ExchangeContext::SendMessageImpl(Protocols::Id protocolId, uint8_t ms
         mReliableMessageContext.SetAckPending(false);
 
 #if !defined(NDEBUG)
-        if (!sendFlags.Has(SendMessageFlags::kNoAutoRequestAck))
+        if (!sendFlags.Has(SendMessageFlags::kStandaloneAck))
         {
             ChipLogProgress(ExchangeManager, "Piggybacking Ack for MsgId:%08" PRIX32 " with msg",
                             mReliableMessageContext.mPendingPeerAckId);

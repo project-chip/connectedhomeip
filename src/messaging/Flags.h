@@ -64,6 +64,8 @@ enum class SendMessageFlags : uint16_t
     kAutoRetrans = 0x0001,
     /**< Used to indicate that a response is expected within a specified timeout. */
     kExpectResponse = 0x0002,
+    /**< Used to indicate that the message is a Standalone Ack message. */
+    kStandaloneAck = 0x0004,
     /**< Used to indicate that the source node ID in the message header can be reused. */
     kReuseSourceId = 0x0020,
     /**< Used to indicate that the message is already encoded. */
