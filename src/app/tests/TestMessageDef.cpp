@@ -1163,17 +1163,17 @@ void CheckPointRollbackTest(nlTestSuite * apSuite, void * apContext)
     AttributeDataList::Builder attributeDataListBuilder;
     attributeDataListBuilder.Init(&writer);
 
-    //encode one attribute element
+    // encode one attribute element
     AttributeDataElement::Builder attributeDataElementBuilder1 = attributeDataListBuilder.CreateAttributeDataElementBuilder();
     NL_TEST_ASSERT(apSuite, attributeDataListBuilder.GetError() == CHIP_NO_ERROR);
     BuildAttributeDataElement(apSuite, attributeDataElementBuilder1);
-    //checkpoint
+    // checkpoint
     attributeDataListBuilder.Checkpoint(checkpoint);
-    //encode another attribute element
+    // encode another attribute element
     AttributeDataElement::Builder attributeDataElementBuilder2 = attributeDataListBuilder.CreateAttributeDataElementBuilder();
     NL_TEST_ASSERT(apSuite, attributeDataListBuilder.GetError() == CHIP_NO_ERROR);
     BuildAttributeDataElement(apSuite, attributeDataElementBuilder2);
-    //rollback to previous checkpoint
+    // rollback to previous checkpoint
     attributeDataListBuilder.Rollback(checkpoint);
 
     attributeDataListBuilder.EndOfAttributeDataList();
