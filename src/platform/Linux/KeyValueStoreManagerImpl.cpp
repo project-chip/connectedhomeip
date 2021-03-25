@@ -49,17 +49,20 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
     err = mStorage.ReadValueBin(key, nullptr, 0, read_size);
     if (err == CHIP_ERROR_KEY_NOT_FOUND)
     {
-        ExitNow(err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+        return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
+    }
+    else if (err != CHIP_NO_ERROR)
+    {
+        return err;
     }
 
     uint8_t buf[read_size];
-    err = mStorage.ReadValueBin(key, buf, read_size, read_size);
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(mStorage.ReadValueBin(key, buf, read_size, read_size));
 
     // Copy data into value buffer
     if (!value)
     {
-        ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
     copy_size = std::min(value_size, read_size - offset_bytes);
     if (read_bytes_size)
@@ -67,9 +70,6 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
         *read_bytes_size = copy_size;
     }
     ::memcpy(value, buf + offset_bytes, copy_size);
-
-exit:
-    return err;
 }
 
 CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, size_t value_size)
