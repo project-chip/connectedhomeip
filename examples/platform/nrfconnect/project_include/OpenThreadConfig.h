@@ -23,6 +23,3 @@
 #include "openthread-core-zephyr-config.h"
 
 // Project-specific settings
-
-#undef OPENTHREAD_CONFIG_NUM_MESSAGE_BUFFERS
-#define OPENTHREAD_CONFIG_NUM_MESSAGE_BUFFERS 64

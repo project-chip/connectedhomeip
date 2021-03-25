@@ -17,7 +17,6 @@
 #
 
 # Run bootstrap and activate to set up e.g. Pigweed correctly
-source "$(dirname "$0")/../../scripts/bootstrap.sh"
 source "$(dirname "$0")/../../scripts/activate.sh"
 
 cd "$(dirname "$0")/../../examples"

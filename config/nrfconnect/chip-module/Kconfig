@@ -97,7 +97,7 @@ config CHIP_ENABLE_RENDEZVOUS_BYPASS
 
 config CHIP_ENABLE_DNSSD_SRP
 	bool "Enable support for service registration"
-	default n
+	default y
 	imply OPENTHREAD_ECDSA
 	imply OPENTHREAD_SRP_CLIENT
 	help
