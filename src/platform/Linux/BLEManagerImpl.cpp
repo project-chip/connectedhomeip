@@ -47,7 +47,7 @@ namespace Internal {
 namespace {
 
 static constexpr unsigned kNewConnectionScanTimeoutMs = 10000;
-static constexpr unsigned kConnectTimeoutMs           = 5000;
+static constexpr unsigned kConnectTimeoutMs           = 10000;
 
 const ChipBleUUID ChipUUID_CHIPoBLEChar_RX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F,
                                                  0x9D, 0x11 } };
@@ -278,14 +278,15 @@ void BLEManagerImpl::HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * apEv
     case DeviceEventType::kPlatformLinuxBLECentralConnected:
         if (mBLEScanConfig.mBleScanState == BleScanState::kConnecting)
         {
-            OnConnectionComplete(mBLEScanConfig.mAppState, apEvent->Platform.BLECentralConnected.mConnection);
+            BleConnectionDelegate::OnConnectionComplete(mBLEScanConfig.mAppState,
+                                                        apEvent->Platform.BLECentralConnected.mConnection);
             CleanScanConfig();
         }
         break;
     case DeviceEventType::kPlatformLinuxBLECentralConnectFailed:
         if (mBLEScanConfig.mBleScanState == BleScanState::kConnecting)
         {
-            OnConnectionError(mBLEScanConfig.mAppState, apEvent->Platform.BLECentralConnectFailed.mError);
+            BleConnectionDelegate::OnConnectionError(mBLEScanConfig.mAppState, apEvent->Platform.BLECentralConnectFailed.mError);
             CleanScanConfig();
         }
         break;

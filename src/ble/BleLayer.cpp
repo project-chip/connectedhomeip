@@ -64,7 +64,6 @@
 
 #include <core/CHIPEncoding.h>
 #include <support/CodeUtils.h>
-#include <support/ReturnMacros.h>
 #include <support/logging/CHIPLogging.h>
 
 // Magic values expected in first 2 bytes of valid BLE transport capabilities request or response:

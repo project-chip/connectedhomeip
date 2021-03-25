@@ -143,7 +143,10 @@ CHIP_ERROR RendezvousSession::SendSecureMessage(Protocols::Id protocol, uint8_t 
     return mSecureSessionMgr->SendMessage(*mPairingSessionHandle, payloadHeader, std::move(msgBuf));
 }
 
-void RendezvousSession::OnSessionEstablishmentError(CHIP_ERROR err) {}
+void RendezvousSession::OnSessionEstablishmentError(CHIP_ERROR err)
+{
+    OnRendezvousError(err);
+}
 
 void RendezvousSession::OnSessionEstablished()
 {
