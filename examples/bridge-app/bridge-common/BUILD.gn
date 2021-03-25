@@ -45,6 +45,7 @@ source_set("bridge-common") {
     "${chip_root}/src/app/util/process-cluster-message.cpp",
     "${chip_root}/src/app/util/process-global-message.cpp",
     "${chip_root}/src/app/util/util.cpp",
+    "gen/attribute-size.cpp",
     "gen/call-command-handler.cpp",
     "gen/callback-stub.cpp",
   ]

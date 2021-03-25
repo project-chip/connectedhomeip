@@ -51,6 +51,7 @@ executable("chip-tool") {
     "commands/reporting/ReportingCommand.cpp",
     "config/PersistentStorage.cpp",
     "gen/CHIPClientCallbacks.cpp",
+    "gen/attribute-size.cpp",
     "gen/call-command-handler.cpp",
     "gen/callback-stub.cpp",
     "main.cpp",
