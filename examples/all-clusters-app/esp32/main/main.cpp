@@ -403,7 +403,7 @@ std::string createSetupPayload()
     }
 
     SetupPayload payload;
-    payload.version               = 1;
+    payload.version               = 0;
     payload.discriminator         = discriminator;
     payload.setUpPINCode          = setupPINCode;
     payload.rendezvousInformation = static_cast<RendezvousInformationFlags>(CONFIG_RENDEZVOUS_MODE);
