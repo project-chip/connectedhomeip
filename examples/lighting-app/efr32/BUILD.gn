@@ -17,10 +17,11 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/efr32_sdk.gni")
 import("//build_overrides/pigweed.gni")
 
-import("$dir_pw_protobuf_compiler/proto.gni")
 import("${build_root}/config/defaults.gni")
 import("${efr32_sdk_build_root}/efr32_executable.gni")
 import("${efr32_sdk_build_root}/efr32_sdk.gni")
+
+import("${chip_root}/examples/lighting-app/lighting-common/lighting.gni")
 
 assert(current_os == "freertos")
 
@@ -30,7 +31,6 @@ examples_plat_dir = "${chip_root}/examples/platform/efr32"
 declare_args() {
   # Dump memory usage at link time.
   chip_print_memory_usage = false
-  enable_pw_rpc = false
   setupPinCode = 73141520
 }
 
@@ -52,6 +52,7 @@ efr32_sdk("sdk") {
   sources = [
     "${efr32_project_dir}/include/CHIPProjectConfig.h",
     "${efr32_project_dir}/include/FreeRTOSConfig.h",
+    "${efr32_sdk_root}/hardware/kit/common/drivers/retargetserial.c"
   ]
 
   defines = [
@@ -64,13 +65,6 @@ efr32_sdk("sdk") {
       "HAL_VCOM_ENABLE = 1",
       "PW_RPC_ENABLED",
     ]
-  }
-}
-
-if (enable_pw_rpc) {
-  pw_proto_library("pw_light_service_proto") {
-    sources = [ "${chip_root}/examples/lighting-app/lighting-common/pigweed_lighting.proto" ]
-    inputs = [ "${chip_root}/examples/lighting-app/lighting-common/pigweed_lighting.options" ]
   }
 }
 
@@ -118,36 +112,18 @@ efr32_executable("lighting_app") {
 
   if (enable_pw_rpc) {
     public_deps += [
-      ":pw_light_service_proto.nanopb_rpc",
       "$dir_pw_assert",
       "$dir_pw_checksum",
+      "$dir_pw_stream",
+      "$dir_pw_sys_io",
       "${chip_root}/config/efr32/lib/pw_rpc:pw_rpc",
+      "${chip_root}/examples/lighting-app/lighting-common:lighting_service.nanopb_rpc",
       "${examples_plat_dir}/pw_sys_io:pw_sys_io_efr32",
     ]
 
     include_dirs += [
-      "${examples_plat_dir}/pw_sys_io/public",
-      "${dir_pigweed}/pw_sys_io/public",
-      "${dir_pigweed}/pw_span/public_overrides",
-      "${dir_pigweed}/pw_span/public",
-      "${dir_pigweed}/pw_polyfill/public",
-      "${dir_pigweed}/pw_polyfill/standard_library_public",
-      "${dir_pigweed}/pw_polyfill/public_overrides",
-      "${dir_pigweed}/pw_status/public",
-      "${dir_pigweed}/pw_stream/public",
-      "${dir_pigweed}/pw_preprocessor/public",
-      "${dir_pigweed}/pw_rpc/public",
-      "${dir_pigweed}/pw_rpc/nanopb/public",
-      "${dir_pigweed}/pw_rpc/raw/public",
-      "${dir_pigweed}/pw_rpc/system_server/public",
-      "${dir_pigweed}/pw_protobuf/public",
-      "${dir_pigweed}/pw_result/public",
-      "${dir_pigweed}/pw_varint/public",
-      "${chip_root}/third_party/nanopb/repo",
-      "${chip_root}/src/lib/support",
       "${chip_root}/examples/common",
       "${chip_root}/examples/common/pigweed/efr32",
-      "out/debug/gen/pw_light_service_proto/third_party/connectedhomeip/examples/lighting-app/lighting-common",
     ]
 
     sources += [
