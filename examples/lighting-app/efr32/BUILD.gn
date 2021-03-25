@@ -148,7 +148,7 @@ efr32_executable("lighting_app") {
 
     sources += [
       "${chip_root}/examples/common/pigweed/RpcService.cpp",
-      "${chip_root}/examples/common/pigweed/efr32/PigeedLoggerMutex.cpp",
+      "${chip_root}/examples/common/pigweed/efr32/PigweedLoggerMutex.cpp",
       "${examples_plat_dir}/PigweedLogger.cpp",
       "${examples_plat_dir}/uart.c",
       "src/Rpc.cpp",
