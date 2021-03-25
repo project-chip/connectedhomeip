@@ -310,9 +310,12 @@ CHIP_ERROR AndroidDeviceControllerWrapper::SyncGetKeyValue(const char * key, cha
     if (valueString != NULL)
     {
         size_t stringLength = GetJavaEnv()->GetStringUTFLength(valueString);
-        if (stringLength > UINT16_MAX - 1) {
+        if (stringLength > UINT16_MAX - 1)
+        {
             err = CHIP_ERROR_BUFFER_TOO_SMALL;
-        } else {
+        }
+        else
+        {
             if (value != nullptr)
             {
                 valueChars = GetJavaEnv()->GetStringUTFChars(valueString, 0);
@@ -325,7 +328,7 @@ CHIP_ERROR AndroidDeviceControllerWrapper::SyncGetKeyValue(const char * key, cha
             else
             {
                 size = stringLength;
-                err = CHIP_ERROR_NO_MEMORY;
+                err  = CHIP_ERROR_NO_MEMORY;
             }
             // Increment size to account for null termination
             size += 1;
