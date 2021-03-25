@@ -10,6 +10,7 @@
         "low-power-cluster.xml",
         "custom-types.xml",
         "chip-devices.xml",
+        "descriptor-cluster.xml",
         "types.xml",
         "general.xml",
         "general-commissioning-cluster.xml",

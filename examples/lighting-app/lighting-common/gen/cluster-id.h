@@ -71,6 +71,9 @@
 // Definitions for cluster: Appliance Control
 #define ZCL_APPLIANCE_CONTROL_CLUSTER_ID (0x001B)
 
+// Definitions for cluster: Descriptor
+#define ZCL_DESCRIPTOR_CLUSTER_ID (0x001D)
+
 // Definitions for cluster: Poll Control
 #define ZCL_POLL_CONTROL_CLUSTER_ID (0x0020)
 
@@ -242,8 +245,14 @@
 // Definitions for cluster: IAS WD
 #define ZCL_IAS_WD_CLUSTER_ID (0x0502)
 
+// Definitions for cluster: Media Playback
+#define ZCL_MEDIA_PLAYBACK_CLUSTER_ID (0x0506)
+
 // Definitions for cluster: Low Power
 #define ZCL_LOW_POWER_CLUSTER_ID (0x0508)
+
+// Definitions for cluster: Content Launch
+#define ZCL_CONTENT_LAUNCH_CLUSTER_ID (0x050A)
 
 // Definitions for cluster: Application Basic
 #define ZCL_APPLICATION_BASIC_CLUSTER_ID (0x050D)
@@ -346,12 +355,6 @@
 
 // Definitions for cluster: Binding
 #define ZCL_BINDING_CLUSTER_ID (0xF000)
-
-// Definitions for cluster: Media Playback
-#define ZCL_MEDIA_PLAYBACK_CLUSTER_ID (0xF001)
-
-// Definitions for cluster: Content Launch
-#define ZCL_CONTENT_LAUNCH_CLUSTER_ID (0xF002)
 
 // Definitions for cluster: Group Key Management
 #define ZCL_GROUP_KEY_MANAGEMENT_CLUSTER_ID (0xF004)
