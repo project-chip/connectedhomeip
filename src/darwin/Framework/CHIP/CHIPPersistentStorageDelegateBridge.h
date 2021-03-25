@@ -32,8 +32,6 @@ public:
 
     void SetStorageDelegate(chip::PersistentStorageResultDelegate * delegate) override;
 
-    void AsyncGetKeyValue(const char * key) override;
-
     CHIP_ERROR SyncGetKeyValue(const char * key, char * value, uint16_t & size) override;
 
     void AsyncSetKeyValue(const char * key, const char * value) override;
@@ -45,7 +43,6 @@ private:
     dispatch_queue_t mQueue;
 
     chip::PersistentStorageResultDelegate * mCallback;
-    SendKeyValue mCompletionHandler;
     CHIPSendSetStatus mSetStatusHandler;
     CHIPSendDeleteStatus mDeleteStatusHandler;
     NSUserDefaults * mDefaultPersistentStorage;

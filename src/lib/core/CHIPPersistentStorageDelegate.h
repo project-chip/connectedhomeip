@@ -37,16 +37,6 @@ public:
 
     /**
      * @brief
-     *   Called when a value is returned from the storage.
-     *   This is useful for AsyncGetKeyValue() API call.
-     *
-     * @param[in] key Key for which the value is being returned
-     * @param[in] value Value or nullptr if not found.
-     */
-    virtual void OnPersistentStorageValue(const char * key, const char * value) = 0;
-
-    /**
-     * @brief
      *   Called on completion of an operation in PersistentStorageDelegate API
      *
      * @param[in] key Key for which the status is being returned
@@ -69,14 +59,6 @@ public:
      * @param[in] delegate The callback object
      */
     virtual void SetStorageDelegate(PersistentStorageResultDelegate * delegate) = 0;
-
-    /**
-     * @brief
-     *   Lookup the key and call delegate object with it's stringified value
-     *
-     * @param[in] key Key to lookup
-     */
-    virtual void AsyncGetKeyValue(const char * key) = 0;
 
     /**
      * @brief

@@ -214,7 +214,6 @@ private:
     void OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * mgr) override;
 
     //////////// PersistentStorageResultDelegate Implementation ///////////////
-    void OnPersistentStorageValue(const char * key, const char * value) override;
     void OnPersistentStorageStatus(const char * key, Operation op, CHIP_ERROR err) override;
 
     void ReleaseAllDevices();
