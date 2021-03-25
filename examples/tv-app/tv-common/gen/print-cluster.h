@@ -126,6 +126,12 @@
 #define CHIP_PRINTCLUSTER_APPLIANCE_CONTROL_CLUSTER
 #endif
 
+#if defined(ZCL_USING_DESCRIPTOR_CLUSTER_SERVER) || defined(ZCL_USING_DESCRIPTOR_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_DESCRIPTOR_CLUSTER { ZCL_DESCRIPTOR_CLUSTER_ID, 29, "Descriptor" },
+#else
+#define CHIP_PRINTCLUSTER_DESCRIPTOR_CLUSTER
+#endif
+
 #if defined(ZCL_USING_POLL_CONTROL_CLUSTER_SERVER) || defined(ZCL_USING_POLL_CONTROL_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_POLL_CONTROL_CLUSTER { ZCL_POLL_CONTROL_CLUSTER_ID, 32, "Poll Control" },
 #else
@@ -813,6 +819,7 @@
     CHIP_PRINTCLUSTER_OTA_BOOTLOAD_CLUSTER                                                                                         \
     CHIP_PRINTCLUSTER_POWER_PROFILE_CLUSTER                                                                                        \
     CHIP_PRINTCLUSTER_APPLIANCE_CONTROL_CLUSTER                                                                                    \
+    CHIP_PRINTCLUSTER_DESCRIPTOR_CLUSTER                                                                                           \
     CHIP_PRINTCLUSTER_POLL_CONTROL_CLUSTER                                                                                         \
     CHIP_PRINTCLUSTER_GREEN_POWER_CLUSTER                                                                                          \
     CHIP_PRINTCLUSTER_KEEPALIVE_CLUSTER                                                                                            \
