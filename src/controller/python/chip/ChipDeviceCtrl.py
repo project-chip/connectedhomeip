@@ -170,8 +170,19 @@ class ChipDeviceController(object):
 
         self._Cluster.SendCommand(device, cluster, command, endpoint, groupid, args)
 
+    def ZCLReadAttribute(self, cluster, attribute, nodeid, endpoint, groupid):
+        device = c_void_p(None)
+        self._ChipStack.Call(
+            lambda: self._dmLib.pychip_GetDeviceByNodeId(self.devCtrl, nodeid, pointer(device))
+        )
+
+        self._Cluster.ReadAttribute(device, cluster, attribute, endpoint, groupid)
+
     def ZCLCommandList(self):
         return self._Cluster.ListClusterCommands()
+
+    def ZCLAttributeList(self):
+        return self._Cluster.ListClusterAttributes()
 
     def SetLogFilter(self, category):
         if category < 0 or category > pow(2, 8):

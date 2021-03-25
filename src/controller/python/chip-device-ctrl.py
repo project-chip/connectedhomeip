@@ -175,6 +175,7 @@ class DeviceMgrCmd(Cmd):
         "connect",
         "resolve",
         "zcl",
+        "zclread",
 
         "set-pairing-wifi-credential",
         "set-pairing-thread-credential",
@@ -458,6 +459,33 @@ class DeviceMgrCmd(Cmd):
                 self.do_help("zcl")
         except exceptions.ChipStackException as ex:
             print("An exception occurred during process ZCL command:")
+            print(str(ex))
+        except Exception as ex:
+            print("An exception occurred during processing input:")
+            print(str(ex))
+
+    def do_zclread(self, line):
+        """
+        To read ZCL attribute:
+        zclread <cluster> <attribute> <nodeid> <endpoint> <groupid>
+        """
+        try:
+            args = shlex.split(line)
+            all_attrs = self.devCtrl.ZCLAttributeList()
+            if len(args) == 1 and args[0] == '?':
+                print('\n'.join(all_attrs.keys()))
+            elif len(args) == 2 and args[0] == '?':
+                if args[1] not in all_attrs:
+                    raise exceptions.UnknownCluster(args[1])
+                print('\n'.join(all_attrs.get(args[1])))
+            elif len(args) == 5:
+                if args[0] not in all_attrs:
+                    raise exceptions.UnknownCluster(args[0])
+                self.devCtrl.ZCLReadAttribute(args[0], args[1], int(args[2]), int(args[3]), int(args[4]))
+            else:
+                self.do_help("zclread")
+        except exceptions.ChipStackException as ex:
+            print("An exception occurred during reading ZCL attribute:")
             print(str(ex))
         except Exception as ex:
             print("An exception occurred during processing input:")
