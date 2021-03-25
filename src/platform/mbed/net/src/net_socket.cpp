@@ -194,7 +194,7 @@ int mbed_connect(int fd, const struct sockaddr * addr, socklen_t addrlen)
     }
 
     auto ret = socket->connect(sockAddr);
-    if (ret != NSAPI_ERROR_OK)
+    if ((ret != NSAPI_ERROR_OK) && (ret != NSAPI_ERROR_UNSUPPORTED))
     {
         switch (ret)
         {
@@ -214,7 +214,10 @@ int mbed_connect(int fd, const struct sockaddr * addr, socklen_t addrlen)
         return -1;
     }
 
-    return 0;
+    ::write(fd, NULL, 0);
+
+    set_errno(119);
+    return -1;
 }
 
 int mbed_listen(int fd, int backlog)
@@ -239,7 +242,7 @@ int mbed_listen(int fd, int backlog)
     }
 
     auto ret = socket->getNetSocket()->listen(backlog);
-    if (ret != NSAPI_ERROR_OK)
+    if ((ret != NSAPI_ERROR_OK) && (ret != NSAPI_ERROR_UNSUPPORTED))
     {
         set_errno(EIO);
         return -1;
@@ -274,7 +277,7 @@ int mbed_accept(int fd, struct sockaddr * addr, socklen_t * addrlen)
     }
 
     // retSock = socket->getNetSocket().accept(&error);
-    // if (error != NSAPI_ERROR_OK)
+    // if ((ret != NSAPI_ERROR_OK) && (ret != NSAPI_ERROR_UNSUPPORTED))
     // {
     //     set_errno(ENOBUFS);
     //     return -1;
@@ -560,10 +563,32 @@ int mbed_getsockopt(int fd, int level, int optname, void * optval, socklen_t * o
     auto * socket = getSocket(fd);
     if (socket == nullptr)
     {
-        set_errno(ENOBUFS);
+        set_errno(EBADF);
         return -1;
     }
-    return socket->getsockopt(level, optname, optval, optlen);
+
+    auto ret = socket->getsockopt(level, optname, optval, optlen);
+    if (ret < 0)
+    {
+        switch (ret)
+        {
+        case NSAPI_ERROR_NO_SOCKET:
+            set_errno(ENOTSOCK);
+            break;
+        case NSAPI_ERROR_UNSUPPORTED:
+            if ((optname == SO_ERROR) || (optval != nullptr))
+            {
+                *(int *) optval = 0;
+                return 0;
+            }
+            set_errno(ENOPROTOOPT);
+            break;
+        default:
+            set_errno(ENOBUFS);
+        }
+        return -1;
+    }
+    return 0;
 }
 
 int mbed_setsockopt(int fd, int level, int optname, const void * optval, socklen_t optlen)
@@ -571,10 +596,27 @@ int mbed_setsockopt(int fd, int level, int optname, const void * optval, socklen
     auto * socket = getSocket(fd);
     if (socket == nullptr)
     {
-        set_errno(ENOBUFS);
+        set_errno(EBADF);
         return -1;
     }
-    return socket->setsockopt(level, optname, optval, optlen);
+
+    auto ret = socket->setsockopt(level, optname, optval, optlen);
+    if (ret < 0)
+    {
+        switch (ret)
+        {
+        case NSAPI_ERROR_NO_SOCKET:
+            set_errno(ENOTSOCK);
+            break;
+        case NSAPI_ERROR_UNSUPPORTED:
+            set_errno(ENOPROTOOPT);
+            break;
+        default:
+            set_errno(ENOBUFS);
+        }
+        return -1;
+    }
+    return 0;
 }
 
 int mbed_getsockname(int fd, struct sockaddr * addr, socklen_t * addrlen)
@@ -774,7 +816,7 @@ int mbed_select(int nfds, fd_set * readfds, fd_set * writefds, fd_set * exceptfd
             FD_SET(cb.fd, writefds);
             ++fd_processed;
         }
-        if (cb.err && (events & POLLOUT))
+        if (cb.err && (events & POLLERR))
         {
             FD_SET(cb.fd, exceptfds);
             ++fd_processed;

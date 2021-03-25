@@ -53,8 +53,8 @@ static chip::Shell::Shell sShellDateSubcommands;
 static chip::Shell::Shell sShellNetworkSubcommands;
 static chip::Shell::Shell sShellSocketSubcommands;
 
-constexpr size_t kMaxTcpActiveConnectionCount = 4;
-constexpr size_t kMaxTcpPendingPackets        = 4;
+constexpr size_t kMaxTcpActiveConnectionCount = 2;
+constexpr size_t kMaxTcpPendingPackets        = 2;
 constexpr NodeId kSourceNodeId                = 123654;
 constexpr NodeId kDestinationNodeId           = 111222333;
 constexpr uint32_t kMessageId                 = 18;
