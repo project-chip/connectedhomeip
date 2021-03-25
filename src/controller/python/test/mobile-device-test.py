@@ -93,7 +93,7 @@ class MobileDeviceTests():
         except Exception as ex:
             self.logger.exception("Failed to send AddThreadNetwork command")
             return False
-        # TODO: ZCLSend should be synchronous, currently, IM does not pass IM status response to upper layer.
+        # TODO(#5096,#5590): ZCLSend should be synchronous, currently, IM does not pass IM status response to upper layer.
         time.sleep(2)
         self.logger.info("Send EnableNetwork command to device {}".format(nodeid))
         try:
@@ -104,8 +104,10 @@ class MobileDeviceTests():
         except Exception as ex:
             self.logger.exception("Failed to send EnableNetwork command")
             return False
-        # Wait for thread network join
-        time.sleep(45)
+        # Wait for thread network join, 15s is the timeout we used in setting up
+        # thread network in cirque tests.
+        # TODO(#5096,#5619): Waiting for EnableNetworkResponse command here.
+        time.sleep(15)
         return True
 
     def TestOnOffCluster(self, nodeid: int):
