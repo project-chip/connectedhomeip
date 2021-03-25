@@ -278,14 +278,14 @@ void BLEManagerImpl::HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * apEv
     case DeviceEventType::kPlatformLinuxBLECentralConnected:
         if (mBLEScanConfig.mBleScanState == BleScanState::kConnecting)
         {
-            OnConnectionComplete(mBLEScanConfig.mAppState, apEvent->Platform.BLECentralConnected.mConnection);
+            BleConnectionDelegate::OnConnectionComplete(mBLEScanConfig.mAppState, apEvent->Platform.BLECentralConnected.mConnection);
             CleanScanConfig();
         }
         break;
     case DeviceEventType::kPlatformLinuxBLECentralConnectFailed:
         if (mBLEScanConfig.mBleScanState == BleScanState::kConnecting)
         {
-            OnConnectionError(mBLEScanConfig.mAppState, apEvent->Platform.BLECentralConnectFailed.mError);
+            BleConnectionDelegate::OnConnectionError(mBLEScanConfig.mAppState, apEvent->Platform.BLECentralConnectFailed.mError);
             CleanScanConfig();
         }
         break;
