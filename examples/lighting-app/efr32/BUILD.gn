@@ -52,7 +52,7 @@ efr32_sdk("sdk") {
   sources = [
     "${efr32_project_dir}/include/CHIPProjectConfig.h",
     "${efr32_project_dir}/include/FreeRTOSConfig.h",
-    "${efr32_sdk_root}/hardware/kit/common/drivers/retargetserial.c"
+    "${efr32_sdk_root}/hardware/kit/common/drivers/retargetserial.c",
   ]
 
   defines = [
