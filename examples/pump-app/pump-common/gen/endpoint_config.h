@@ -148,7 +148,7 @@ const EmberAfGenericClusterFunction chipFuncArrayOnOffServer[] = {\
 #define FIXED_ENDPOINT_TYPES { 0 }
 
 // Array of networks supported on each endpoint
-#define FIXED_NETWORKS { 1 }
+#define FIXED_NETWORKS { 0 }
 
 
 // Array of EmberAfCommandMetadata structs.

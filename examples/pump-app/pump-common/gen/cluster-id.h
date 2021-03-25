@@ -109,6 +109,10 @@
 #define ZCL_GENERAL_COMMISSIONING_CLUSTER_ID (0x0030)
 
 
+// Definitions for cluster: Network Commissioning
+#define ZCL_NETWORK_COMMISSIONING_CLUSTER_ID (0x0031)
+
+
 // Definitions for cluster: Shade Configuration
 #define ZCL_SHADE_CONFIG_CLUSTER_ID (0x0100)
 
@@ -447,10 +451,6 @@
 
 // Definitions for cluster: ZLL Commissioning
 #define ZCL_ZLL_COMMISSIONING_CLUSTER_ID (0x1000)
-
-
-// Definitions for cluster: Network Commissioning
-#define ZCL_NETWORK_COMMISSIONING_CLUSTER_ID (0xAAAA)
 
 
 // Definitions for cluster: Binding
