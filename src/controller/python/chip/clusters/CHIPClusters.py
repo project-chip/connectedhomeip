@@ -20,20 +20,20 @@
 '''
 
 import ctypes
-from .ChipStack import *
-from .exceptions import *
+from chip.ChipStack import *
+from chip.exceptions import *
 
 '''
 TODO(#4511): This file only sends cluster commands, should add more functions.
 '''
 
-__all__ = ["ChipCluster"]
+__all__ = ["ChipClusters"]
 
-class ChipCluster:
+class ChipClusters:
     def __init__(self, chipstack):
         self._ChipStack = chipstack
 
-    def ListClusters(self):
+    def ListClusterCommands(self):
         return {
             "ApplicationBasic": {
             },

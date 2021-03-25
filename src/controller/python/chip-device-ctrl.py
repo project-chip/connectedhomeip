@@ -431,13 +431,13 @@ class DeviceMgrCmd(Cmd):
         """
         try:
             args = shlex.split(line)
+            all_commands = self.devCtrl.ZCLCommandList()
             if len(args) == 1 and args[0] == '?':
-                print(self.devCtrl.ZCLList().keys())
+                print('\n'.join(all_commands.keys()))
             elif len(args) == 2 and args[0] == '?':
-                cluster = self.devCtrl.ZCLList().get(args[1], None)
-                if not cluster:
+                if args[1] not in all_commands:
                     raise exceptions.UnknownCluster(args[1])
-                for commands in cluster.items():
+                for commands in all_commands.get(args[1]).items():
                     args = ", ".join(["{}: {}".format(argName, argType)
                                       for argName, argType in commands[1].items()])
                     print(commands[0])
@@ -446,10 +446,9 @@ class DeviceMgrCmd(Cmd):
                     else:
                         print("  <no arguments>")
             elif len(args) > 4:
-                cluster = self.devCtrl.ZCLList().get(args[0], None)
-                if not cluster:
+                if args[0] not in all_commands:
                     raise exceptions.UnknownCluster(args[0])
-                command = cluster.get(args[1], None)
+                command = all_commands.get(args[0]).get(args[1], None)
                 # When command takes no arguments, (not command) is True
                 if command == None:
                     raise exceptions.UnknownCommand(args[0], args[1])

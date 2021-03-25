@@ -31,7 +31,7 @@ import time
 from threading import Thread
 from ctypes import *
 from .ChipStack import *
-from .ChipCluster import *
+from .clusters.CHIPClusters import *
 import enum
 
 
@@ -84,7 +84,7 @@ class ChipDeviceController(object):
         self.addressUpdater = addressUpdater
         self._ChipStack.devCtrl = devCtrl
 
-        self._Cluster = ChipCluster(self._ChipStack)
+        self._Cluster = ChipClusters(self._ChipStack)
         self._Cluster.InitLib(self._dmLib)
 
         def HandleKeyExchangeComplete(err):
@@ -170,8 +170,8 @@ class ChipDeviceController(object):
 
         self._Cluster.SendCommand(device, cluster, command, endpoint, groupid, args)
 
-    def ZCLList(self):
-        return self._Cluster.ListClusters()
+    def ZCLCommandList(self):
+        return self._Cluster.ListClusterCommands()
 
     def SetLogFilter(self, category):
         if category < 0 or category > pow(2, 8):
