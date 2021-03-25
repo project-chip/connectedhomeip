@@ -36,6 +36,7 @@
 #include <controller/CHIPDeviceController.h>
 #include <jni.h>
 #include <platform/KeyValueStoreManager.h>
+#include <protocols/Protocols.h>
 #include <pthread.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
@@ -466,7 +467,7 @@ JNI_METHOD(void, sendMessage)(JNIEnv * env, jobject self, jlong handle, jlong de
         }
         else
         {
-            err = chipDevice->SendMessage(std::move(buffer));
+            err = chipDevice->SendMessage(Protocols::DeviceManagement::Id, 0, std::move(buffer));
         }
     }
 
@@ -524,7 +525,7 @@ JNI_METHOD(void, sendCommand)(JNIEnv * env, jobject self, jlong handle, jlong de
         }
         else
         {
-            err = chipDevice->SendMessage(std::move(buffer));
+            err = chipDevice->SendMessage(Protocols::DeviceManagement::Id, 0, std::move(buffer));
         }
     }
 

@@ -40,6 +40,7 @@
 #include <core/CHIPCore.h>
 #include <core/CHIPEncoding.h>
 #include <core/CHIPSafeCasts.h>
+#include <protocols/Protocols.h>
 #include <support/Base64.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
@@ -54,47 +55,6 @@ using namespace chip::Callback;
 
 namespace chip {
 namespace Controller {
-
-CHIP_ERROR Device::SendMessage(System::PacketBufferHandle buffer, PayloadHeader & payloadHeader)
-{
-    System::PacketBufferHandle resend;
-    bool loadedSecureSession = false;
-
-    VerifyOrReturnError(mSessionManager != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(!buffer.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
-
-    ReturnErrorOnFailure(LoadSecureSessionParametersIfNeeded(loadedSecureSession));
-
-    if (!loadedSecureSession)
-    {
-        // Secure connection already existed
-        // Hold on to the buffer, in case session resumption and resend is needed
-        // Cloning data, instead of increasing the ref count, as the original
-        // buffer might get modified by lower layers before the send fails. So,
-        // that buffer cannot be used for resends.
-        resend = buffer.CloneData();
-    }
-
-    CHIP_ERROR err = mSessionManager->SendMessage(mSecureSession, payloadHeader, std::move(buffer));
-
-    buffer = nullptr;
-    ChipLogDetail(Controller, "SendMessage returned %s", ErrorStr(err));
-
-    // The send could fail due to network timeouts (e.g. broken pipe)
-    // Try session resumption if needed
-    if (err != CHIP_NO_ERROR && !resend.IsNull() && mState == ConnectionState::SecureConnected)
-    {
-        mState = ConnectionState::NotConnected;
-
-        ReturnErrorOnFailure(LoadSecureSessionParameters(ResetTransport::kYes));
-
-        err = mSessionManager->SendMessage(mSecureSession, std::move(resend));
-        ChipLogDetail(Controller, "Re-SendMessage returned %d", err);
-        ReturnErrorOnFailure(err);
-    }
-
-    return CHIP_NO_ERROR;
-}
 
 CHIP_ERROR Device::LoadSecureSessionParametersIfNeeded(bool & didLoad)
 {
@@ -132,10 +92,56 @@ CHIP_ERROR Device::SendCommands()
     return mCommandSender->SendCommandRequest(mDeviceId, mAdminId);
 }
 
-CHIP_ERROR Device::SendMessage(System::PacketBufferHandle buffer)
+CHIP_ERROR Device::SendMessage(Protocols::Id protocolId, uint8_t msgType, System::PacketBufferHandle buffer)
 {
-    PayloadHeader unusedHeader;
-    return SendMessage(std::move(buffer), unusedHeader);
+    System::PacketBufferHandle resend;
+    bool loadedSecureSession = false;
+
+    VerifyOrReturnError(!buffer.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    ReturnErrorOnFailure(LoadSecureSessionParametersIfNeeded(loadedSecureSession));
+
+    Messaging::ExchangeContext * exchange = mExchangeMgr->NewContext(mSecureSession, nullptr);
+    VerifyOrReturnError(exchange != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    if (!loadedSecureSession)
+    {
+        // Secure connection already existed
+        // Hold on to the buffer, in case session resumption and resend is needed
+        // Cloning data, instead of increasing the ref count, as the original
+        // buffer might get modified by lower layers before the send fails. So,
+        // that buffer cannot be used for resends.
+        resend = buffer.CloneData();
+    }
+
+    CHIP_ERROR err =
+        exchange->SendMessage(protocolId, msgType, std::move(buffer), Messaging::SendFlags(Messaging::SendMessageFlags::kNone));
+
+    buffer = nullptr;
+    ChipLogDetail(Controller, "SendMessage returned %s", ErrorStr(err));
+
+    // The send could fail due to network timeouts (e.g. broken pipe)
+    // Try session resumption if needed
+    if (err != CHIP_NO_ERROR && !resend.IsNull() && mState == ConnectionState::SecureConnected)
+    {
+        Messaging::SendFlags sendFlags;
+
+        mState = ConnectionState::NotConnected;
+
+        ReturnErrorOnFailure(LoadSecureSessionParameters(ResetTransport::kYes));
+
+        sendFlags.Set(Messaging::SendMessageFlags::kFromInitiator, true).Set(Messaging::SendMessageFlags::kNoAutoRequestAck, true);
+        err = exchange->SendMessage(protocolId, msgType, std::move(resend), sendFlags);
+        ChipLogDetail(Controller, "Re-SendMessage returned %d", err);
+        ReturnErrorOnFailure(err);
+    }
+
+    if (exchange != nullptr)
+    {
+        exchange->Close();
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR Device::Serialize(SerializedDevice & output)
@@ -223,20 +229,19 @@ exit:
     return error;
 }
 
-void Device::OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr)
+void Device::OnNewConnection(SecureSessionHandle session)
 {
     mState         = ConnectionState::SecureConnected;
     mSecureSession = session;
 }
 
-void Device::OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * mgr)
+void Device::OnConnectionExpired(SecureSessionHandle session)
 {
     mState         = ConnectionState::NotConnected;
     mSecureSession = SecureSessionHandle{};
 }
 
-void Device::OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, SecureSessionHandle session,
-                               System::PacketBufferHandle msgBuf, SecureSessionMgr * mgr)
+void Device::OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, System::PacketBufferHandle msgBuf)
 {
     if (mState == ConnectionState::SecureConnected)
     {
@@ -279,11 +284,7 @@ CHIP_ERROR Device::OpenPairingWindow(uint32_t timeout, PairingWindowOption optio
     System::PacketBufferHandle outBuffer;
     ReturnErrorOnFailure(writer.Finalize(&outBuffer));
 
-    PayloadHeader header;
-
-    header.SetMessageType(chip::Protocols::ServiceProvisioning::Id, 0);
-
-    ReturnErrorOnFailure(SendMessage(std::move(outBuffer), header));
+    ReturnErrorOnFailure(SendMessage(Protocols::ServiceProvisioning::Id, 0, std::move(outBuffer)));
 
     setupPayload.version               = 0;
     setupPayload.rendezvousInformation = RendezvousInformationFlags(RendezvousInformationFlag::kBLE);

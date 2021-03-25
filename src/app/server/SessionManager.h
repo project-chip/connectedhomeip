@@ -17,8 +17,10 @@
 
 #pragma once
 
+#include <messaging/ExchangeMgr.h>
 #include <transport/SecureSessionMgr.h>
 
 namespace chip {
 SecureSessionMgr & SessionManager();
+Messaging::ExchangeManager & ExchangeManager();
 } // namespace chip

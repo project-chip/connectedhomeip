@@ -79,6 +79,7 @@ CHIP_STANDARD_PROTOCOL(InteractionModel, 0x0005)    // Interaction Model Protoco
 CHIP_STANDARD_PROTOCOL(FabricProvisioning, 0x0006)  // Fabric Provisioning Protocol
 CHIP_STANDARD_PROTOCOL(ServiceProvisioning, 0x0007) // Service Provisioning Protocol
 CHIP_STANDARD_PROTOCOL(OpCredentials, 0x0008)       // Operational Credentials
+CHIP_STANDARD_PROTOCOL(DeviceManagement, 0x0009)    // Device DeviceManagement Protocol
 
 #undef CHIP_STANDARD_PROTOCOL
 

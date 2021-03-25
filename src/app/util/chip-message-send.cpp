@@ -24,6 +24,9 @@
 
 #include <assert.h>
 #include <inet/InetLayer.h>
+#include <messaging/ExchangeContext.h>
+#include <messaging/ExchangeMgr.h>
+#include <protocols/Protocols.h>
 #include <support/logging/CHIPLogging.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/raw/MessageHeader.h>
@@ -37,7 +40,8 @@ using namespace chip;
 // https://github.com/project-chip/connectedhomeip/issues/2566 tracks that API.
 namespace chip {
 extern SecureSessionMgr & SessionManager();
-}
+extern Messaging::ExchangeManager & ExchangeManager();
+} // namespace chip
 
 EmberStatus chipSendUnicast(NodeId destination, EmberApsFrame * apsFrame, uint16_t messageLength, uint8_t * message)
 {
@@ -75,7 +79,19 @@ EmberStatus chipSendUnicast(NodeId destination, EmberApsFrame * apsFrame, uint16
     buffer->SetDataLength(dataLength);
 
     // TODO: temprary create a handle from node id, will be fix in PR 3602
-    CHIP_ERROR err = SessionManager().SendMessage({ destination, Transport::kAnyKeyId, 0 }, std::move(buffer));
+    Messaging::ExchangeContext * exchange = ExchangeManager().NewContext({ destination, Transport::kAnyKeyId, 0 }, nullptr);
+    if (exchange == nullptr)
+    {
+        return EMBER_DELIVERY_FAILED;
+    }
+
+    Messaging::SendFlags sendFlags;
+
+    sendFlags.Set(Messaging::SendMessageFlags::kFromInitiator, true).Set(Messaging::SendMessageFlags::kNoAutoRequestAck, true);
+    CHIP_ERROR err = exchange->SendMessage(Protocols::DeviceManagement::Id, 0, std::move(buffer), sendFlags);
+
+    exchange->Close();
+
     if (err != CHIP_NO_ERROR)
     {
         // FIXME: Figure out better translations between our error types?
