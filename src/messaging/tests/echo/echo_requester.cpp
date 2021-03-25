@@ -255,7 +255,7 @@ int main(int argc, char * argv[])
         SuccessOrExit(err);
     }
 
-    err = gExchangeManager.Init(chip::kTestControllerNodeId, &gUDPManager, &gSessionManager);
+    err = gExchangeManager.Init(&gSessionManager);
     SuccessOrExit(err);
 
     // Start the CHIP connection to the CHIP echo responder.

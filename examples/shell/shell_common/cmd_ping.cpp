@@ -277,7 +277,7 @@ void StartPinging(streamer_t * stream, char * destination)
         err = gSessionManager.Init(kTestControllerNodeId, &DeviceLayer::SystemLayer, &gTCPManager, &admins);
         SuccessOrExit(err);
 
-        err = gExchangeManager.Init(kTestControllerNodeId, &gTCPManager, &gSessionManager);
+        err = gExchangeManager.Init(&gSessionManager);
         SuccessOrExit(err);
     }
     else
@@ -286,7 +286,7 @@ void StartPinging(streamer_t * stream, char * destination)
         err = gSessionManager.Init(kTestControllerNodeId, &DeviceLayer::SystemLayer, &gUDPManager, &admins);
         SuccessOrExit(err);
 
-        err = gExchangeManager.Init(kTestControllerNodeId, &gUDPManager, &gSessionManager);
+        err = gExchangeManager.Init(&gSessionManager);
         SuccessOrExit(err);
     }
 

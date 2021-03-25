@@ -404,7 +404,7 @@ CHIP_ERROR RendezvousSession::HandleSecureMessage(const PacketHeader & packetHea
         ChipLogProgress(Ble, "Received rendezvous message for %llu", packetHeader.GetDestinationNodeId().Value());
         mAdmin->SetNodeId(packetHeader.GetDestinationNodeId().Value());
         mParams.SetLocalNodeId(packetHeader.GetDestinationNodeId().Value());
-        mSecureSessionMgr->SetLocalNodeID(packetHeader.GetDestinationNodeId().Value());
+        mSecureSessionMgr->SetLocalNodeId(packetHeader.GetDestinationNodeId().Value());
     }
 
     if (packetHeader.GetSourceNodeId().HasValue() && !mParams.HasRemoteNodeId())
