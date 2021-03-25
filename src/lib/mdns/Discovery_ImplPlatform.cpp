@@ -155,6 +155,7 @@ CHIP_ERROR DiscoveryImplPlatform::SetupHostname(chip::ByteSpan macOrEui64)
         ChipLogError(Discovery, "Failed to setup mdns hostname: %s", ErrorStr(error));
         return error;
     }
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameters & params)
