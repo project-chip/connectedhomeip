@@ -50,6 +50,7 @@ executable("chip-tool") {
     "commands/payload/SetupPayloadParseCommand.cpp",
     "commands/reporting/ReportingCommand.cpp",
     "config/PersistentStorage.cpp",
+    "gen/attribute-size.cpp",
     "gen/CHIPClientCallbacks.cpp",
     "gen/call-command-handler.cpp",
     "gen/callback-stub.cpp",

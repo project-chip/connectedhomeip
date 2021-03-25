@@ -54,6 +54,7 @@ executable("chip-tool-darwin") {
     "${chip_root}/src/darwin/Framework/CHIP/CHIPPersistentStorageDelegateBridge.mm",
     "${chip_root}/src/darwin/Framework/CHIP/CHIPQRCodeSetupPayloadParser.mm",
     "${chip_root}/src/darwin/Framework/CHIP/CHIPSetupPayload.mm",
+    "${chip_root}/src/darwin/Framework/CHIP/gen/attribute-size.cpp",
     "${chip_root}/src/darwin/Framework/CHIP/gen/CHIPClientCallbacks.cpp",
     "${chip_root}/src/darwin/Framework/CHIP/gen/CHIPClustersObjc.mm",
     "${chip_root}/src/darwin/Framework/CHIP/gen/call-command-handler.cpp",
