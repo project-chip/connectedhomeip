@@ -442,8 +442,8 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & header, const Trans
         {
             CHIP_ERROR err = context->HandlePairingMessage(header, source, std::move(msgBuf));
             if (err != CHIP_NO_ERROR)
-                ChipLogError(ExchangeManager, "HandlePairingMessage error %s from node 0x%08" PRIx32 "%08" PRIx32 ".", chip::ErrorStr(err),
-                             static_cast<uint32_t>(node >> 32), static_cast<uint32_t>(node));
+                ChipLogError(ExchangeManager, "HandlePairingMessage error %s from node 0x%08" PRIx32 "%08" PRIx32 ".",
+                             chip::ErrorStr(err), static_cast<uint32_t>(node >> 32), static_cast<uint32_t>(node));
             return false;
         }
         return true;
@@ -453,7 +453,8 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & header, const Trans
     {
         char addrBuffer[Transport::PeerAddress::kMaxToStringSize];
         source.ToString(addrBuffer, sizeof(addrBuffer));
-        ChipLogError(ExchangeManager, "Unencrypted message from %s is dropped since no session found for node 0x%08" PRIx32 "%08" PRIx32 ".",
+        ChipLogError(ExchangeManager,
+                     "Unencrypted message from %s is dropped since no session found for node 0x%08" PRIx32 "%08" PRIx32 ".",
                      addrBuffer, static_cast<uint32_t>(node >> 32), static_cast<uint32_t>(node));
         return;
     }
