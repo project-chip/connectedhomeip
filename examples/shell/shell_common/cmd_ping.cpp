@@ -19,13 +19,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <core/CHIPCore.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/shell/shell.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/ErrorStr.h>
 #include <messaging/ExchangeMgr.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/echo/Echo.h>
-#include <shell/shell.h>
-#include <support/CodeUtils.h>
-#include <support/ErrorStr.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/PASESession.h>
 #include <transport/SecureSessionMgr.h>
@@ -38,10 +38,11 @@ using namespace chip;
 using namespace Shell;
 using namespace Logging;
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
 constexpr size_t kMaxTcpActiveConnectionCount = 4;
 constexpr size_t kMaxTcpPendingPackets        = 4;
-constexpr size_t kNetworkSleepTimeMsecs       = (100 * 1000);
-constexpr size_t kDecimalDigitsForUint64      = 20;
+#endif
+constexpr size_t kDecimalDigitsForUint64 = 20;
 
 namespace {
 
@@ -56,9 +57,11 @@ public:
         mEchoCount          = 0;
         mEchoRespCount      = 0;
         mWaitingForEchoResp = false;
-        mUsingTCP           = false;
-        mUsingCRMP          = true;
-        mEchoPort           = CHIP_PORT;
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+        mUsingTCP = false;
+#endif
+        mUsingCRMP = true;
+        mEchoPort  = CHIP_PORT;
     }
 
     uint64_t GetLastEchoTime() const { return mLastEchoTime; }
@@ -84,8 +87,10 @@ public:
     bool IsWaitingForEchoResp() const { return mWaitingForEchoResp; }
     void SetWaitingForEchoResp(bool value) { mWaitingForEchoResp = value; }
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
     bool IsUsingTCP() const { return mUsingTCP; }
     void SetUsingTCP(bool value) { mUsingTCP = value; }
+#endif
 
     bool IsUsingCRMP() const { return mUsingCRMP; }
     void SetUsingCRMP(bool value) { mUsingCRMP = value; }
@@ -112,15 +117,23 @@ private:
     // after sending an echo request, false otherwise.
     bool mWaitingForEchoResp;
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
     bool mUsingTCP;
+#endif
+
     bool mUsingCRMP;
 } gPingArguments;
 
 constexpr Transport::AdminId gAdminId = 0;
 
 Protocols::Echo::EchoClient gEchoClient;
+
 TransportMgr<Transport::UDP> gUDPManager;
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
 TransportMgr<Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>> gTCPManager;
+#endif
+
 Messaging::ExchangeManager gExchangeManager;
 SecureSessionMgr gSessionManager;
 Inet::IPAddress gDestAddr;
@@ -184,11 +197,13 @@ CHIP_ERROR EstablishSecureSession(streamer_t * stream)
     SecurePairingUsingTestSecret * testSecurePairingSecret = chip::Platform::New<SecurePairingUsingTestSecret>();
     VerifyOrExit(testSecurePairingSecret != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
     if (gPingArguments.IsUsingTCP())
     {
         peerAddr = Optional<Transport::PeerAddress>::Value(Transport::PeerAddress::TCP(gDestAddr, gPingArguments.GetEchoPort()));
     }
     else
+#endif
     {
         peerAddr = Optional<Transport::PeerAddress>::Value(
             Transport::PeerAddress::UDP(gDestAddr, gPingArguments.GetEchoPort(), INET_NULL_INTERFACEID));
@@ -227,44 +242,6 @@ void HandleEchoResponseReceived(Messaging::ExchangeContext * ec, System::PacketB
                     payload->DataLength(), static_cast<double>(transitTime) / 1000);
 }
 
-void DriveIO(streamer_t * stream)
-{
-    struct timeval sleepTime;
-    fd_set readFDs, writeFDs, exceptFDs;
-    int numFDs = 0;
-    int selectRes;
-
-    sleepTime.tv_sec  = 0;
-    sleepTime.tv_usec = kNetworkSleepTimeMsecs;
-
-    FD_ZERO(&readFDs);
-    FD_ZERO(&writeFDs);
-    FD_ZERO(&exceptFDs);
-
-    if (chip::DeviceLayer::SystemLayer.State() == chip::System::kLayerState_Initialized)
-        chip::DeviceLayer::SystemLayer.PrepareSelect(numFDs, &readFDs, &writeFDs, &exceptFDs, sleepTime);
-
-    if (chip::DeviceLayer::InetLayer.State == chip::Inet::InetLayer::kState_Initialized)
-        chip::DeviceLayer::InetLayer.PrepareSelect(numFDs, &readFDs, &writeFDs, &exceptFDs, sleepTime);
-
-    selectRes = select(numFDs, &readFDs, &writeFDs, &exceptFDs, &sleepTime);
-    if (selectRes < 0)
-    {
-        streamer_printf(stream, "Select failed: %s\n", chip::ErrorStr(chip::System::MapErrorPOSIX(errno)));
-        return;
-    }
-
-    if (chip::DeviceLayer::SystemLayer.State() == chip::System::kLayerState_Initialized)
-    {
-        chip::DeviceLayer::SystemLayer.HandleSelectResult(selectRes, &readFDs, &writeFDs, &exceptFDs);
-    }
-
-    if (chip::DeviceLayer::InetLayer.State == chip::Inet::InetLayer::kState_Initialized)
-    {
-        chip::DeviceLayer::InetLayer.HandleSelectResult(selectRes, &readFDs, &writeFDs, &exceptFDs);
-    }
-}
-
 void StartPinging(streamer_t * stream, char * destination)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -282,16 +259,19 @@ void StartPinging(streamer_t * stream, char * destination)
     adminInfo = admins.AssignAdminId(gAdminId, kTestControllerNodeId);
     VerifyOrExit(adminInfo != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
     err = gTCPManager.Init(Transport::TcpListenParameters(&DeviceLayer::InetLayer)
-                               .SetAddressType(Inet::kIPAddressType_IPv4)
+                               .SetAddressType(gDestAddr.Type())
                                .SetListenPort(gPingArguments.GetEchoPort() + 1));
-    VerifyOrExit(err == CHIP_NO_ERROR, streamer_printf(stream, "Failed to init TCP manager error: %s\r\n", ErrorStr(err)));
+    VerifyOrExit(err == CHIP_NO_ERROR, streamer_printf(stream, "Failed to init TCP manager error: %s\n", ErrorStr(err)));
+#endif
 
     err = gUDPManager.Init(Transport::UdpListenParameters(&DeviceLayer::InetLayer)
-                               .SetAddressType(Inet::kIPAddressType_IPv4)
+                               .SetAddressType(gDestAddr.Type())
                                .SetListenPort(gPingArguments.GetEchoPort() + 1));
-    VerifyOrExit(err == CHIP_NO_ERROR, streamer_printf(stream, "Failed to init UDP manager error: %s\r\n", ErrorStr(err)));
+    VerifyOrExit(err == CHIP_NO_ERROR, streamer_printf(stream, "Failed to init UDP manager error: %s\n", ErrorStr(err)));
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
     if (gPingArguments.IsUsingTCP())
     {
         err = gSessionManager.Init(kTestControllerNodeId, &DeviceLayer::SystemLayer, &gTCPManager, &admins);
@@ -301,6 +281,7 @@ void StartPinging(streamer_t * stream, char * destination)
         SuccessOrExit(err);
     }
     else
+#endif
     {
         err = gSessionManager.Init(kTestControllerNodeId, &DeviceLayer::SystemLayer, &gUDPManager, &admins);
         SuccessOrExit(err);
@@ -326,6 +307,7 @@ void StartPinging(streamer_t * stream, char * destination)
     for (unsigned int i = 0; i < maxEchoCount; i++)
     {
         err = SendEchoRequest(stream);
+
         if (err != CHIP_NO_ERROR)
         {
             streamer_printf(stream, "Send request failed: %s\n", ErrorStr(err));
@@ -335,7 +317,8 @@ void StartPinging(streamer_t * stream, char * destination)
         // Wait for response until the Echo interval.
         while (!EchoIntervalExpired())
         {
-            DriveIO(stream);
+            // TODO:#5496: Use condition_varible to suspend the current thread and wake it up when response arrive.
+            sleep(1);
         }
 
         // Check if expected response was received.
@@ -361,14 +344,17 @@ void PrintUsage(streamer_t * stream)
 {
     streamer_printf(stream, "Usage: ping [options] <destination>\n\nOptions:\n");
 
-    streamer_printf(stream,
-                    "  -h              print help information\n"
-                    "  -u              use UDP (default)\n"
-                    "  -t              use TCP\n"
-                    "  -p  <port>      echo server port\n"
-                    "  -i  <interval>  ping interval time in seconds\n"
-                    "  -c  <count>     stop after <count> replies\n"
-                    "  -r  <1|0>       enalbe/disable CRMP\n");
+    // Need to split the help info to prevent overflowing the streamer_printf
+    // buffer (CONSOLE_DEFAULT_MAX_LINE 256)
+    streamer_printf(stream, "  -h              print help information\n");
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    streamer_printf(stream, "  -u              use UDP (default)\n");
+    streamer_printf(stream, "  -t              use TCP\n");
+#endif
+    streamer_printf(stream, "  -p  <port>      echo server port\n");
+    streamer_printf(stream, "  -i  <interval>  ping interval time in seconds\n");
+    streamer_printf(stream, "  -c  <count>     stop after <count> replies\n");
+    streamer_printf(stream, "  -r  <1|0>       enable or disable CRMP\n");
 }
 
 int cmd_ping(int argc, char ** argv)
@@ -386,12 +372,14 @@ int cmd_ping(int argc, char ** argv)
         case 'h':
             PrintUsage(sout);
             return 0;
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
         case 'u':
             gPingArguments.SetUsingTCP(false);
             break;
         case 't':
             gPingArguments.SetUsingTCP(true);
             break;
+#endif
         case 'i':
             if (++optIndex >= argc || argv[optIndex][0] == '-')
             {

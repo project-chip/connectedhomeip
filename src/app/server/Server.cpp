@@ -34,7 +34,6 @@
 #include <setup_payload/SetupPayload.h>
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
-#include <support/ReturnMacros.h>
 #include <support/logging/CHIPLogging.h>
 #include <sys/param.h>
 #include <system/SystemPacketBuffer.h>
@@ -72,35 +71,29 @@ constexpr bool useTestPairing()
 
 class ServerStorageDelegate : public PersistentStorageDelegate
 {
-    void SetDelegate(PersistentStorageResultDelegate * delegate) override
+    void SetStorageDelegate(PersistentStorageResultDelegate * delegate) override
     {
         ChipLogError(AppServer, "ServerStorageDelegate does not support async operations");
         chipDie();
     }
 
-    void GetKeyValue(const char * key) override
+    void AsyncSetKeyValue(const char * key, const char * value) override
     {
         ChipLogError(AppServer, "ServerStorageDelegate does not support async operations");
         chipDie();
     }
 
-    void SetKeyValue(const char * key, const char * value) override
-    {
-        ChipLogError(AppServer, "ServerStorageDelegate does not support async operations");
-        chipDie();
-    }
-
-    CHIP_ERROR GetKeyValue(const char * key, void * buffer, uint16_t & size) override
+    CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override
     {
         return PersistedStorage::KeyValueStoreMgr().Get(key, buffer, size);
     }
 
-    CHIP_ERROR SetKeyValue(const char * key, const void * value, uint16_t size) override
+    CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override
     {
         return PersistedStorage::KeyValueStoreMgr().Put(key, value, size);
     }
 
-    void DeleteKeyValue(const char * key) override { PersistedStorage::KeyValueStoreMgr().Delete(key); }
+    void AsyncDeleteKeyValue(const char * key) override { PersistedStorage::KeyValueStoreMgr().Delete(key); }
 };
 
 ServerStorageDelegate gServerStorage;
@@ -338,7 +331,7 @@ public:
 
         // TODO: This code is temporary, and must be updated to use the Cluster API.
         // Issue: https://github.com/project-chip/connectedhomeip/issues/4725
-        if (payloadHeader.GetProtocolID() == chip::Protocols::kProtocol_ServiceProvisioning)
+        if (payloadHeader.HasProtocol(chip::Protocols::ServiceProvisioning::Id))
         {
             CHIP_ERROR err = CHIP_NO_ERROR;
             uint32_t timeout;
@@ -348,7 +341,7 @@ public:
             ChipLogProgress(AppServer, "Received service provisioning message. Treating it as OpenPairingWindow request");
             chip::System::PacketBufferTLVReader reader;
             reader.Init(std::move(buffer));
-            reader.ImplicitProfileId = chip::Protocols::kProtocol_ServiceProvisioning;
+            reader.ImplicitProfileId = chip::Protocols::ServiceProvisioning::Id.ToTLVProfileId();
 
             SuccessOrExit(reader.Next(kTLVType_UnsignedInteger, TLV::ProfileTag(reader.ImplicitProfileId, 1)));
             SuccessOrExit(reader.Get(timeout));

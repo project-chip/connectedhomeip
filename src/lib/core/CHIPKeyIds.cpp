@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2016-2017 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -182,13 +182,12 @@ uint32_t ChipKeyId::UpdateEpochKeyId(uint32_t keyId, uint32_t epochKeyId)
  */
 bool ChipKeyId::IsValidKeyId(uint32_t keyId)
 {
-    bool retval;
     unsigned int usedBits = kMask_KeyType;
 
     switch (GetType(keyId))
     {
     case kType_None:
-        ExitNow(retval = false);
+        return false;
     case kType_General:
     case kType_Session:
         usedBits |= kMask_KeyNumber;
@@ -224,19 +223,16 @@ bool ChipKeyId::IsValidKeyId(uint32_t keyId)
         usedBits |= kMask_GroupLocalNumber;
         break;
     default:
-        ExitNow(retval = false);
+        return false;
     }
 
     if (IncorporatesRootKey(keyId))
     {
         uint32_t rootKeyId = GetRootKeyId(keyId);
-        VerifyOrExit(rootKeyId == kFabricRootKey || rootKeyId == kClientRootKey || rootKeyId == kServiceRootKey, retval = false);
+        VerifyOrReturnError(rootKeyId == kFabricRootKey || rootKeyId == kClientRootKey || rootKeyId == kServiceRootKey, false);
     }
 
-    retval = (keyId & ~usedBits) == 0;
-
-exit:
-    return retval;
+    return (keyId & ~usedBits) == 0;
 }
 
 /**

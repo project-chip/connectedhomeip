@@ -39,7 +39,9 @@
 #define CHIP_DEVICE_CONFIG_ENABLE_TEST_DEVICE_IDENTITY 34
 
 // Use a default pairing code if one hasn't been provisioned in flash.
+#ifndef CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE 12345678
+#endif
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR 0xF00
 
 // For convenience, Chip Security Test Mode can be enabled and the
@@ -54,16 +56,16 @@
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID
  *
- * 0xE100: Google's Vendor Id.
+ * 0x235A: Chip's Vendor Id.
  */
-#define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID 0xE100
+#define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID 0x235A
 
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID
  *
- * 0xFE00: SDK Sample Light Resource
+ * 0x534C: EFR32 lighting-app
  */
-#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0xFD00
+#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x534C
 
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_REVISION
@@ -121,3 +123,43 @@
  * A size, in bytes, of the individual debug event logging buffer.
  */
 #define CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE (512)
+
+/**
+ * CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL
+ *
+ * The interval (in units of 0.625ms) at which the device will send BLE advertisements while
+ * in fast advertising mode.
+ *
+ * 40 (25ms).
+ */
+#define CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL 40
+
+/**
+ * CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL
+ *
+ * The interval (in units of 0.625ms) at which the device will send BLE advertisements while
+ * in slow advertisement mode.
+ *
+ * 800 (500ms).
+ */
+#define CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL 800
+
+/**
+ * CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_TIMEOUT
+ *
+ * The amount of time in miliseconds after which BLE should change his advertisements
+ * from fast interval to slow interval.
+ *
+ * 30000 (30 secondes).
+ */
+#define CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_TIMEOUT (30 * 1000)
+
+/**
+ * CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT
+ *
+ * The amount of time in miliseconds after which BLE advertisement should be disabled, counting
+ * from the moment of slow advertisement commencement.
+ *
+ * Defaults to 9000000 (15 minutes).
+ */
+#define CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT (15 * 60 * 1000)

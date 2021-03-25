@@ -29,8 +29,6 @@ static_library("controller") {
     "CHIPDevice.h",
     "CHIPDeviceController.cpp",
     "CHIPDeviceController.h",
-    "CHIPDeviceController_deprecated.cpp",
-    "CHIPDeviceController_deprecated.h",
     "DeviceAddressUpdater.cpp",
     "DeviceAddressUpdater.h",
   ]

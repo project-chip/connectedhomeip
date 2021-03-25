@@ -149,9 +149,9 @@ CHIP_ERROR ChipCertificateSet::LoadCert(const uint8_t * chipCert, uint32_t chipC
     TLVReader reader;
 
     reader.Init(chipCert, chipCertLen);
-    reader.ImplicitProfileId = kProtocol_OpCredentials;
+    reader.ImplicitProfileId = Protocols::OpCredentials::Id.ToTLVProfileId();
 
-    err = reader.Next(kTLVType_Structure, ProfileTag(kProtocol_OpCredentials, kTag_ChipCertificate));
+    err = reader.Next(kTLVType_Structure, ProfileTag(Protocols::OpCredentials::Id.ToTLVProfileId(), kTag_ChipCertificate));
     SuccessOrExit(err);
 
     err = LoadCert(reader, decodeFlags);
@@ -254,7 +254,7 @@ CHIP_ERROR ChipCertificateSet::LoadCerts(const uint8_t * chipCerts, uint32_t chi
     uint64_t tag;
 
     reader.Init(chipCerts, chipCertsLen);
-    reader.ImplicitProfileId = kProtocol_OpCredentials;
+    reader.ImplicitProfileId = Protocols::OpCredentials::Id.ToTLVProfileId();
 
     err = reader.Next();
     SuccessOrExit(err);
@@ -262,9 +262,10 @@ CHIP_ERROR ChipCertificateSet::LoadCerts(const uint8_t * chipCerts, uint32_t chi
     type = reader.GetType();
     tag  = reader.GetTag();
 
-    VerifyOrExit((type == kTLVType_Structure && tag == ProfileTag(kProtocol_OpCredentials, kTag_ChipCertificate)) ||
-                     (type == kTLVType_Array && tag == ProfileTag(kProtocol_OpCredentials, kTag_ChipCertificateArray)),
-                 err = CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
+    VerifyOrExit(
+        (type == kTLVType_Structure && tag == ProfileTag(Protocols::OpCredentials::Id.ToTLVProfileId(), kTag_ChipCertificate)) ||
+            (type == kTLVType_Array && tag == ProfileTag(Protocols::OpCredentials::Id.ToTLVProfileId(), kTag_ChipCertificateArray)),
+        err = CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
 
     err = LoadCerts(reader, decodeFlags);
 

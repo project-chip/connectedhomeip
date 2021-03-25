@@ -548,7 +548,7 @@ void HandleTCPConnectionComplete(TCPEndPoint * aEndPoint, INET_ERROR aError)
         printf("TCP connection established to %s:%u\n", lPeerAddressBuffer, lPeerPort);
 
         if (sTCPIPEndPoint->PendingReceiveLength() == 0)
-            sTCPIPEndPoint->PutBackReceivedData(nullptr);
+            sTCPIPEndPoint->SetReceivedDataForTesting(nullptr);
 
         sTCPIPEndPoint->DisableReceive();
         sTCPIPEndPoint->EnableKeepAlive(10, 100);
@@ -595,7 +595,7 @@ static void HandleTCPConnectionClosed(TCPEndPoint * aEndPoint, INET_ERROR aError
 
 static void HandleTCPDataSent(TCPEndPoint * aEndPoint, uint16_t len) {}
 
-static void HandleTCPDataReceived(TCPEndPoint * aEndPoint, PacketBufferHandle aBuffer)
+static INET_ERROR HandleTCPDataReceived(TCPEndPoint * aEndPoint, PacketBufferHandle aBuffer)
 {
     const uint32_t lFirstValueReceived = sTestState.mStats.mReceive.mActual;
     const uint8_t lFirstValue          = uint8_t(lFirstValueReceived);
@@ -614,7 +614,7 @@ static void HandleTCPDataReceived(TCPEndPoint * aEndPoint, PacketBufferHandle aB
 
     if (aEndPoint->State != TCPEndPoint::kState_Connected)
     {
-        lStatus = aEndPoint->PutBackReceivedData(std::move(aBuffer));
+        lStatus = aEndPoint->SetReceivedDataForTesting(std::move(aBuffer));
         INET_FAIL_ERROR(lStatus, "TCPEndPoint::PutBackReceivedData failed");
         goto exit;
     }
@@ -638,6 +638,7 @@ exit:
     {
         SetStatusFailed(sTestState.mStatus);
     }
+    return lStatus;
 }
 
 static void HandleTCPAcceptError(TCPEndPoint * aEndPoint, INET_ERROR aError)

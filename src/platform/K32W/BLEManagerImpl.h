@@ -52,7 +52,7 @@ namespace Internal {
 using namespace chip::Ble;
 
 /**
- * Concrete implementation of the NetworkProvisioningServer singleton object for the K32W platforms.
+ * Concrete implementation of the BLEManager singleton object for the K32W platforms.
  */
 class BLEManagerImpl final : public BLEManager, private BleLayer, private BlePlatformDelegate, private BleApplicationDelegate
 {
@@ -68,9 +68,8 @@ private:
     CHIP_ERROR _SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val);
     bool _IsAdvertisingEnabled(void);
     CHIP_ERROR _SetAdvertisingEnabled(bool val);
-    bool _IsFastAdvertisingEnabled(void);
-    CHIP_ERROR _SetFastAdvertisingEnabled(bool val);
     bool _IsAdvertising(void);
+    CHIP_ERROR _SetAdvertisingMode(BLEAdvertisingMode mode);
     CHIP_ERROR _GetDeviceName(char * buf, size_t bufSize);
     CHIP_ERROR _SetDeviceName(const char * deviceName);
     uint16_t _NumConnections(void);

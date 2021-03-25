@@ -392,27 +392,67 @@
 #endif
 
 /**
- * CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL
+ * CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MIN
  *
- * The interval (in units of 0.625ms) at which the device will send BLE advertisements while
- * in fast advertising mode.
+ * The minimum interval (in units of 0.625ms) at which the device will send BLE advertisements while
+ * in fast advertising mode. The minimum interval should be less and not equal to the
+ * CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MAX.
  *
- * Defaults to 320 (200ms).
+ * Defaults to 32 (20 ms).
  */
-#ifndef CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL
-#define CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL 320
+#ifndef CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MIN
+#define CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MIN 32
 #endif
 
 /**
- * CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL
+ * CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MAX
  *
- * The interval (in units of 0.625ms) at which the device will send BLE advertisements while
- * in slow advertisement mode.
+ * The maximum interval (in units of 0.625ms) at which the device will send BLE advertisements while
+ * in fast advertising mode. The maximum interval should be greater and not equal to the
+ * CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MIN.
  *
- * Defaults to 3200 (20000ms).
+ * Defaults to 96 (60 ms).
  */
-#ifndef CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL
-#define CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL 3200
+#ifndef CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MAX
+#define CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MAX 96
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MIN
+ *
+ * The minimum interval (in units of 0.625ms) at which the device will send BLE advertisements while
+ * in slow advertising mode. The minimum interval should be greater and not equal to the
+ * CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MAX.
+ *
+ * Defaults to 240 (150 ms).
+ */
+#ifndef CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MIN
+#define CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MIN 240
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MAX
+ *
+ * The maximum interval (in units of 0.625ms) at which the device will send BLE advertisements while
+ * in slow advertising mode. The maximum interval should be greater and not equal to the
+ * CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MIN.
+ *
+ * Defaults to 1920 (1200 ms).
+ */
+#ifndef CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MAX
+#define CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MAX 1920
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME
+ *
+ * The amount of time in miliseconds after which BLE advertisement should be switched from the fast
+ * advertising to the slow advertising, counting from the moment of advertisement commencement.
+ *
+ * Defaults to 30000 (30 seconds).
+ */
+#ifndef CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME
+#define CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME 30000
 #endif
 
 /**

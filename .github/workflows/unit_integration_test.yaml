@@ -21,7 +21,7 @@ on:
 jobs:
     unit_tests:
         name: Unit / Interation Tests
-        if: github.actor != 'restyled-io'
+        if: github.actor != 'restyled-io[bot]'
 
         strategy:
             matrix:

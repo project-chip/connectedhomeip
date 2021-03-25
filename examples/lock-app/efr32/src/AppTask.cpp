@@ -23,7 +23,7 @@
 #include "ButtonHandler.h"
 #include "DataModelHandler.h"
 #include "LEDWidget.h"
-#include "QRCodeUtil.h"
+#include "OnboardingCodesUtil.h"
 #include "Server.h"
 #include "Service.h"
 #include "attribute-storage.h"
@@ -47,7 +47,7 @@
 
 #define FACTORY_RESET_TRIGGER_TIMEOUT 3000
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
-#define APP_TASK_STACK_SIZE (4096)
+#define APP_TASK_STACK_SIZE (2048)
 #define APP_TASK_PRIORITY 2
 #define APP_EVENT_QUEUE_SIZE 10
 
@@ -145,7 +145,7 @@ int AppTask::Init()
         EFR32_LOG("Getting QR code failed!");
     }
 #else
-    PrintQRCode(chip::RendezvousInformationFlags::kBLE);
+    PrintOnboardingCodes(chip::RendezvousInformationFlags::kBLE);
 #endif
 
     return err;

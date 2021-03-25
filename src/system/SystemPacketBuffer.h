@@ -339,6 +339,23 @@ public:
     CHECK_RETURN_VALUE PacketBufferHandle Last();
 
     /**
+     * Copies data from the payloads of a chain of packet buffers until a given amount of data has been copied.
+     *
+     * @param[in]  buf             Destination buffer; must be at least @a length bytes.
+     * @param[in]  length          Destination buffer length.
+     *
+     * @retval #CHIP_ERROR_BUFFER_TOO_SMALL If the total length of the payloads in the chain is less than the requested @a length.
+     * @retval #CHIP_ERROR_INTERNAL         In case of an inconsistency in the buffer chain.
+     * @retval #CHIP_NO_ERROR               If the requested payload has been copied.
+     */
+    CHIP_ERROR Read(uint8_t * buf, size_t length) const;
+    template <size_t N>
+    inline CHIP_ERROR Read(uint8_t (&buf)[N]) const
+    {
+        return Read(buf, N);
+    }
+
+    /**
      * Perform an implementation-defined check on the validity of a PacketBuffer pointer.
      *
      * Unless enabled by #CHIP_CONFIG_MEMORY_DEBUG_CHECKS == 1, this function does nothing.
@@ -380,6 +397,7 @@ private:
 #endif
 
     void AddRef();
+    bool HasSoleOwnership() const { return (this->ref == 1); }
     static void Free(PacketBuffer * aPacket);
     static PacketBuffer * FreeHead(PacketBuffer * aPacket);
 
@@ -475,6 +493,14 @@ public:
     bool IsNull() const { return mBuffer == nullptr; }
 
     /**
+     * Test whether the PacketBuffer owned by this PacketBufferHandle has unique ownership.
+     *
+     * @return \c true if the PacketBuffer owned by this PacketBufferHandle is solely owned; return \c false if
+     * it has more than one ownership.
+     */
+    bool HasSoleOwnership() const { return mBuffer->HasSoleOwnership(); }
+
+    /**
      *  Detach and return the head of a buffer chain while updating this handle to point to the remaining buffers.
      *  The current buffer must be the head of the chain.
      *
@@ -495,6 +521,31 @@ public:
     {
         // `PacketBuffer::FreeHead()` frees the current head; this takes ownership from the `next` link.
         mBuffer = PacketBuffer::FreeHead(mBuffer);
+    }
+
+    /**
+     * Add the given packet buffer to the end of the buffer chain, adjusting the total length of each buffer in the chain
+     * accordingly.
+     *
+     *  @note The current packet buffer handle must either be the head of the buffer chain for the lengths to be adjusted properly,
+     *        or be null (in which case it becomes the head).
+     *
+     *  @note Ownership is transferred from the argument to the `next` link at the end of the current chain,
+     *        or to the handle if it's currently null.
+     *
+     *  @param[in] aPacket - the packet buffer to be added to the end of the current chain.
+     */
+    void AddToEnd(PacketBufferHandle && aPacket)
+    {
+        if (IsNull())
+        {
+            mBuffer         = aPacket.mBuffer;
+            aPacket.mBuffer = nullptr;
+        }
+        else
+        {
+            mBuffer->AddToEnd(std::move(aPacket));
+        }
     }
 
     /**
@@ -598,16 +649,11 @@ public:
                                           uint16_t aReservedSize = PacketBuffer::kDefaultHeaderReserve);
 
     /**
-     * Creates a copy of the data in this packet.
+     * Creates a copy of a packet buffer (or chain).
      *
-     * Does NOT support chained buffers.
-     *
-     *  @param[in]  aAdditionalSize Size of additional application data space after the initial contents.
-     *  @param[in]  aReservedSize   Number of octets to reserve for protocol headers.
-     *
-     * @returns empty handle on allocation failure.
+     * @returns empty handle on allocation failure. Otherwise, the returned buffer has the same sizes and contents as the original.
      */
-    PacketBufferHandle CloneData(uint16_t aAdditionalSize = 0, uint16_t aReservedSize = PacketBuffer::kDefaultHeaderReserve);
+    PacketBufferHandle CloneData() const;
 
     /**
      * Perform an implementation-defined check on the validity of a PacketBufferHandle.

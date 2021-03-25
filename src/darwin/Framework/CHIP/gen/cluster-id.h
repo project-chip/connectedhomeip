@@ -86,6 +86,9 @@
 // Definitions for cluster: General Commissioning
 #define ZCL_GENERAL_COMMISSIONING_CLUSTER_ID (0x0030)
 
+// Definitions for cluster: Network Commissioning
+#define ZCL_NETWORK_COMMISSIONING_CLUSTER_ID (0x0031)
+
 // Definitions for cluster: Shade Configuration
 #define ZCL_SHADE_CONFIG_CLUSTER_ID (0x0100)
 
@@ -239,8 +242,14 @@
 // Definitions for cluster: IAS WD
 #define ZCL_IAS_WD_CLUSTER_ID (0x0502)
 
+// Definitions for cluster: Media Playback
+#define ZCL_MEDIA_PLAYBACK_CLUSTER_ID (0x0506)
+
 // Definitions for cluster: Low Power
 #define ZCL_LOW_POWER_CLUSTER_ID (0x0508)
+
+// Definitions for cluster: Content Launch
+#define ZCL_CONTENT_LAUNCH_CLUSTER_ID (0x050A)
 
 // Definitions for cluster: Application Basic
 #define ZCL_APPLICATION_BASIC_CLUSTER_ID (0x050D)
@@ -341,17 +350,11 @@
 // Definitions for cluster: ZLL Commissioning
 #define ZCL_ZLL_COMMISSIONING_CLUSTER_ID (0x1000)
 
-// Definitions for cluster: Network Commissioning
-#define ZCL_NETWORK_COMMISSIONING_CLUSTER_ID (0xAAAA)
-
 // Definitions for cluster: Binding
 #define ZCL_BINDING_CLUSTER_ID (0xF000)
 
-// Definitions for cluster: Media Playback
-#define ZCL_MEDIA_PLAYBACK_CLUSTER_ID (0xF001)
-
-// Definitions for cluster: Content Launch
-#define ZCL_CONTENT_LAUNCH_CLUSTER_ID (0xF002)
+// Definitions for cluster: Group Key Management
+#define ZCL_GROUP_KEY_MANAGEMENT_CLUSTER_ID (0xF004)
 
 // Definitions for cluster: Sample Mfg Specific Cluster
 #define ZCL_SAMPLE_MFG_SPECIFIC_CLUSTER_ID (0xFC00)

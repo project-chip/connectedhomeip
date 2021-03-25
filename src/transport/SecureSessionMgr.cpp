@@ -32,7 +32,6 @@
 #include <core/CHIPKeyIds.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <support/CodeUtils.h>
-#include <support/ReturnMacros.h>
 #include <support/SafeInt.h>
 #include <support/logging/CHIPLogging.h>
 #include <transport/AdminPairingTable.h>
@@ -87,6 +86,8 @@ CHIP_ERROR SecureSessionMgr::Init(NodeId localNodeId, System::Layer * systemLaye
 
 void SecureSessionMgr::Shutdown()
 {
+    CancelExpiryTimer();
+
     mState        = State::kNotReady;
     mLocalNodeId  = kUndefinedNodeId;
     mSystemLayer  = nullptr;
@@ -327,6 +328,7 @@ void SecureSessionMgr::OnMessageReceived(const PacketHeader & packetHeader, cons
     PacketBufferHandle origMsg;
     PayloadHeader payloadHeader;
 
+    bool peerGroupMsgIdNotSynchronized  = false;
     Transport::AdminPairingInfo * admin = nullptr;
 
     VerifyOrExit(!msg.IsNull(), ChipLogError(Inet, "Secure transport received NULL packet, discarding"));
@@ -375,14 +377,17 @@ void SecureSessionMgr::OnMessageReceived(const PacketHeader & packetHeader, cons
         // For all group messages, Set flag if peer group key message counter is not synchronized.
         if (ChipKeyId::IsAppGroupKey(packetHeader.GetEncryptionKeyID()))
         {
-            const_cast<PacketHeader &>(packetHeader).SetPeerGroupMsgIdNotSynchronized(true);
+            peerGroupMsgIdNotSynchronized = true;
         }
     }
 
     if (mCB != nullptr)
     {
-        mCB->OnMessageReceived(packetHeader, payloadHeader, { state->GetPeerNodeId(), state->GetPeerKeyID(), state->GetAdminId() },
-                               std::move(msg), this);
+        SecureSessionHandle session(state->GetPeerNodeId(), state->GetPeerKeyID(), state->GetAdminId());
+
+        session.SetPeerGroupMsgIdNotSynchronized(peerGroupMsgIdNotSynchronized);
+
+        mCB->OnMessageReceived(packetHeader, payloadHeader, session, std::move(msg), this);
     }
 
 exit:

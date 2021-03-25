@@ -31,8 +31,8 @@
 #include <util/af.h>
 
 #include <lib/support/CodeUtils.h>
-#include <lib/support/ReturnMacros.h>
 #include <lib/support/SafeInt.h>
+#include <lib/support/Span.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ConnectivityManager.h>
@@ -112,10 +112,8 @@ namespace {
 NetworkInfo sNetworks[kMaxNetworks];
 } // namespace
 
-EmberAfNetworkCommissioningError OnAddThreadNetworkCommandCallbackInternal(app::Command *, EndpointId,
-                                                                           const uint8_t * operationalDataset,
-                                                                           size_t operationalDatasetLen, uint64_t breadcrumb,
-                                                                           uint32_t timeoutMs)
+EmberAfNetworkCommissioningError OnAddThreadNetworkCommandCallbackInternal(app::Command *, EndpointId, ByteSpan operationalDataset,
+                                                                           uint64_t breadcrumb, uint32_t timeoutMs)
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     EmberAfNetworkCommissioningError err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_BOUNDS_EXCEEDED;
@@ -124,14 +122,14 @@ EmberAfNetworkCommissioningError OnAddThreadNetworkCommandCallbackInternal(app::
     {
         if (sNetworks[i].mNetworkType == NetworkType::kUndefined)
         {
-            VerifyOrExit(operationalDatasetLen <= sizeof(ThreadNetworkInfo::mDataset),
+            VerifyOrExit(operationalDataset.size() <= sizeof(ThreadNetworkInfo::mDataset),
                          err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_OUT_OF_RANGE);
-            memcpy(sNetworks[i].mData.mThread.mDataset, operationalDataset, operationalDatasetLen);
+            memcpy(sNetworks[i].mData.mThread.mDataset, operationalDataset.data(), operationalDataset.size());
 
             using ThreadDatasetLenType = decltype(sNetworks[i].mData.mThread.mDatasetLen);
-            VerifyOrExit(chip::CanCastTo<ThreadDatasetLenType>(operationalDatasetLen),
+            VerifyOrExit(chip::CanCastTo<ThreadDatasetLenType>(operationalDataset.size()),
                          err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_OUT_OF_RANGE);
-            sNetworks[i].mData.mThread.mDatasetLen = static_cast<ThreadDatasetLenType>(operationalDatasetLen);
+            sNetworks[i].mData.mThread.mDatasetLen = static_cast<ThreadDatasetLenType>(operationalDataset.size());
 
             // A 64bit id for thread networks, currently, we are missing some API for getting the thread network extpanid from the
             // dataset tlv.
@@ -160,9 +158,8 @@ exit:
 #endif
 }
 
-EmberAfNetworkCommissioningError OnAddWiFiNetworkCommandCallbackInternal(app::Command *, EndpointId, const uint8_t * ssid,
-                                                                         size_t ssidLen, const uint8_t * credentials,
-                                                                         size_t credentialsLen, uint64_t breadcrumb,
+EmberAfNetworkCommissioningError OnAddWiFiNetworkCommandCallbackInternal(app::Command *, EndpointId, ByteSpan ssid,
+                                                                         ByteSpan credentials, uint64_t breadcrumb,
                                                                          uint32_t timeoutMs)
 {
     EmberAfNetworkCommissioningError err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_BOUNDS_EXCEEDED;
@@ -171,29 +168,29 @@ EmberAfNetworkCommissioningError OnAddWiFiNetworkCommandCallbackInternal(app::Co
     {
         if (sNetworks[i].mNetworkType == NetworkType::kUndefined)
         {
-            VerifyOrExit(ssidLen <= sizeof(sNetworks[i].mData.mWiFi.mSSID),
+            VerifyOrExit(ssid.size() <= sizeof(sNetworks[i].mData.mWiFi.mSSID),
                          err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_OUT_OF_RANGE);
-            memcpy(sNetworks[i].mData.mWiFi.mSSID, ssid, ssidLen);
+            memcpy(sNetworks[i].mData.mWiFi.mSSID, ssid.data(), ssid.size());
 
             using WiFiSSIDLenType = decltype(sNetworks[i].mData.mWiFi.mSSIDLen);
-            VerifyOrExit(chip::CanCastTo<WiFiSSIDLenType>(ssidLen), err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_OUT_OF_RANGE);
-            sNetworks[i].mData.mWiFi.mSSIDLen = static_cast<WiFiSSIDLenType>(ssidLen);
+            VerifyOrExit(chip::CanCastTo<WiFiSSIDLenType>(ssid.size()), err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_OUT_OF_RANGE);
+            sNetworks[i].mData.mWiFi.mSSIDLen = static_cast<WiFiSSIDLenType>(ssid.size());
 
-            VerifyOrExit(credentialsLen <= sizeof(sNetworks[i].mData.mWiFi.mCredentials),
+            VerifyOrExit(credentials.size() <= sizeof(sNetworks[i].mData.mWiFi.mCredentials),
                          err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_OUT_OF_RANGE);
-            memcpy(sNetworks[i].mData.mWiFi.mCredentials, credentials, credentialsLen);
+            memcpy(sNetworks[i].mData.mWiFi.mCredentials, credentials.data(), credentials.size());
 
             using WiFiCredentialsLenType = decltype(sNetworks[i].mData.mWiFi.mCredentialsLen);
-            VerifyOrExit(chip::CanCastTo<WiFiCredentialsLenType>(ssidLen),
+            VerifyOrExit(chip::CanCastTo<WiFiCredentialsLenType>(ssid.size()),
                          err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_OUT_OF_RANGE);
-            sNetworks[i].mData.mWiFi.mCredentialsLen = static_cast<WiFiCredentialsLenType>(credentialsLen);
+            sNetworks[i].mData.mWiFi.mCredentialsLen = static_cast<WiFiCredentialsLenType>(credentials.size());
 
-            VerifyOrExit(ssidLen <= sizeof(sNetworks[i].mNetworkID), err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_OUT_OF_RANGE);
-            memcpy(sNetworks[i].mNetworkID, sNetworks[i].mData.mWiFi.mSSID, ssidLen);
+            VerifyOrExit(ssid.size() <= sizeof(sNetworks[i].mNetworkID), err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_OUT_OF_RANGE);
+            memcpy(sNetworks[i].mNetworkID, sNetworks[i].mData.mWiFi.mSSID, ssid.size());
 
             using NetworkIDLenType = decltype(sNetworks[i].mNetworkIDLen);
-            VerifyOrExit(chip::CanCastTo<NetworkIDLenType>(ssidLen), err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_OUT_OF_RANGE);
-            sNetworks[i].mNetworkIDLen = static_cast<NetworkIDLenType>(ssidLen);
+            VerifyOrExit(chip::CanCastTo<NetworkIDLenType>(ssid.size()), err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_OUT_OF_RANGE);
+            sNetworks[i].mNetworkIDLen = static_cast<NetworkIDLenType>(ssid.size());
 
             sNetworks[i].mNetworkType = NetworkType::kWiFi;
             sNetworks[i].mEnabled     = false;
@@ -220,6 +217,7 @@ CHIP_ERROR DoEnableNetwork(NetworkInfo * network)
     {
     case NetworkType::kThread:
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+        ReturnErrorOnFailure(DeviceLayer::ThreadStackMgr().SetThreadEnabled(false));
         ReturnErrorOnFailure(
             DeviceLayer::ThreadStackMgr().SetThreadProvision(network->mData.mThread.mDataset, network->mData.mThread.mDatasetLen));
         ReturnErrorOnFailure(DeviceLayer::ThreadStackMgr().SetThreadEnabled(true));
@@ -251,17 +249,17 @@ CHIP_ERROR DoEnableNetwork(NetworkInfo * network)
 }
 } // namespace
 
-EmberAfNetworkCommissioningError OnEnableNetworkCommandCallbackInternal(app::Command *, EndpointId, const uint8_t * networkID,
-                                                                        size_t networkIDLen, uint64_t breadcrumb,
-                                                                        uint32_t timeoutMs)
+EmberAfNetworkCommissioningError OnEnableNetworkCommandCallbackInternal(app::Command *, EndpointId, ByteSpan networkID,
+                                                                        uint64_t breadcrumb, uint32_t timeoutMs)
 {
     size_t networkSeq;
     EmberAfNetworkCommissioningError err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_NETWORK_ID_NOT_FOUND;
 
     for (networkSeq = 0; networkSeq < kMaxNetworks; networkSeq++)
     {
-        if (sNetworks[networkSeq].mNetworkIDLen == networkIDLen && sNetworks[networkSeq].mNetworkType != NetworkType::kUndefined &&
-            memcmp(sNetworks[networkSeq].mNetworkID, networkID, networkIDLen) == 0)
+        if (sNetworks[networkSeq].mNetworkIDLen == networkID.size() &&
+            sNetworks[networkSeq].mNetworkType != NetworkType::kUndefined &&
+            memcmp(sNetworks[networkSeq].mNetworkID, networkID.data(), networkID.size()) == 0)
         {
             // TODO: Currently, we cannot figure out the detailed error from network provisioning on DeviceLayer, we should
             // implement this in device layer.

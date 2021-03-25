@@ -23,15 +23,16 @@ FOUNDATION_EXPORT NSErrorDomain const CHIPErrorDomain;
 typedef int32_t CHIP_ERROR;
 
 typedef NS_ERROR_ENUM(CHIPErrorDomain, CHIPErrorCode) {
-    CHIPErrorCodeUndefinedError = 0,
-    CHIPErrorCodeInvalidStringLength = 1,
-    CHIPErrorCodeInvalidIntegerValue = 2,
-    CHIPErrorCodeInvalidArgument = 3,
-    CHIPErrorCodeInvalidMessageLength = 4,
-    CHIPErrorCodeInvalidState = 5,
-    CHIPErrorCodeWrongAddressType = 6,
-    CHIPErrorCodeIntegrityCheckFailed = 7,
-    CHIPSuccess = 8,
+    CHIPSuccess = 0,
+    CHIPErrorCodeUndefinedError = 1,
+    CHIPErrorCodeInvalidStringLength = 2,
+    CHIPErrorCodeInvalidIntegerValue = 3,
+    CHIPErrorCodeInvalidArgument = 4,
+    CHIPErrorCodeInvalidMessageLength = 5,
+    CHIPErrorCodeInvalidState = 6,
+    CHIPErrorCodeWrongAddressType = 7,
+    CHIPErrorCodeIntegrityCheckFailed = 8,
+    CHIPErrorCodeDuplicateExists = 9,
 };
 
 @interface CHIPError : NSObject

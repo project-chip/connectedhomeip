@@ -97,20 +97,22 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/middleware/glib",
       "${efr32_sdk_root}/platform/middleware/glib/glib",
       "${efr32_sdk_root}/platform/middleware/glib/dmd",
+      "${efr32_sdk_root}/platform/base/hal/plugin/psstore",
+      "${efr32_sdk_root}/platform/base/hal/plugin/antenna",
       "${efr32_sdk_root}/hardware/kit/config",
       "${efr32_sdk_root}/util/silicon_labs/silabs_core/graphics",
       "${efr32_sdk_root}/util/third_party/crypto/mbedtls/include",
       "${efr32_sdk_root}/util/third_party/crypto/mbedtls/include/mbedtls",
       "${efr32_sdk_root}/util/third_party/crypto/mbedtls/library",
-      "${efr32_sdk_root}/platform/base/hal/plugin/psstore",
-      "${efr32_sdk_root}/util/third_party/crypto/sl_component/sl_protocol_crypto/src",
+      "${efr32_sdk_root}/util/third_party/crypto/sl_component/sl_alt/include",
+
+      #"${efr32_sdk_root}/util/third_party/crypto/sl_component/sl_protocol_crypto/src",
       "${efr32_sdk_root}/util/third_party/crypto/sl_component/sl_mbedtls_support/inc",
-      "${efr32_sdk_root}/platform/base/hal/plugin/antenna",
+      "${efr32_sdk_root}/util/third_party/crypto/sl_component/sl_mbedtls_support/inc/configs",
       "${efr32_sdk_root}/util/third_party/crypto/sl_component/sl_psa_driver/inc",
       "${efr32_sdk_root}/util/third_party/crypto/sl_component/se_manager/inc",
       "${efr32_sdk_root}/util/silicon_labs/silabs_core/memory_manager",
       "${efr32_sdk_root}/platform/bootloader",
-      "${mbedtls_root}/repo/include",
     ]
 
     if (efr32_board == "BRD4166A") {
@@ -185,7 +187,6 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/util/third_party/freertos/Source/portable/GCC/ARM_CM3",
         "${efr32_sdk_root}/platform/radio/rail_lib/plugin/pa-conversions/efr32xg21/config",
         "${efr32_sdk_root}/util/third_party/crypto/sl_component/se_manager/src",
-        "${efr32_sdk_root}/util/third_party/crypto/sl_component/sl_alt/include",
       ]
 
       libs += [
@@ -268,6 +269,7 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/service/sleeptimer/src/sl_sleeptimer.c",
       "${efr32_sdk_root}/platform/service/sleeptimer/src/sl_sleeptimer_hal_rtcc.c",
       "${efr32_sdk_root}/protocol/bluetooth/src/sl_bt_mbedtls_context.c",
+      "${efr32_sdk_root}/util/silicon_labs/silabs_core/memory_manager/sl_malloc.c",
       "${efr32_sdk_root}/util/third_party/crypto/mbedtls/library/aes.c",
       "${efr32_sdk_root}/util/third_party/crypto/mbedtls/library/aesni.c",
       "${efr32_sdk_root}/util/third_party/crypto/mbedtls/library/arc4.c",
@@ -295,6 +297,7 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/util/third_party/crypto/mbedtls/library/entropy_poll.c",
       "${efr32_sdk_root}/util/third_party/crypto/mbedtls/library/error.c",
       "${efr32_sdk_root}/util/third_party/crypto/mbedtls/library/gcm.c",
+      "${efr32_sdk_root}/util/third_party/crypto/mbedtls/library/hkdf.c",
       "${efr32_sdk_root}/util/third_party/crypto/mbedtls/library/hmac_drbg.c",
       "${efr32_sdk_root}/util/third_party/crypto/mbedtls/library/md.c",
       "${efr32_sdk_root}/util/third_party/crypto/mbedtls/library/md5.c",
@@ -307,6 +310,7 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/util/third_party/crypto/mbedtls/library/pkparse.c",
       "${efr32_sdk_root}/util/third_party/crypto/mbedtls/library/pkwrite.c",
       "${efr32_sdk_root}/util/third_party/crypto/mbedtls/library/platform.c",
+      "${efr32_sdk_root}/util/third_party/crypto/mbedtls/library/platform_util.c",
       "${efr32_sdk_root}/util/third_party/crypto/mbedtls/library/ripemd160.c",
       "${efr32_sdk_root}/util/third_party/crypto/mbedtls/library/rsa.c",
       "${efr32_sdk_root}/util/third_party/crypto/mbedtls/library/rsa_internal.c",
@@ -328,6 +332,7 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/util/third_party/crypto/mbedtls/library/x509.c",
       "${efr32_sdk_root}/util/third_party/crypto/mbedtls/library/x509_create.c",
       "${efr32_sdk_root}/util/third_party/crypto/mbedtls/library/x509_crl.c",
+      "${efr32_sdk_root}/util/third_party/crypto/mbedtls/library/x509_crt.c",
       "${efr32_sdk_root}/util/third_party/crypto/mbedtls/library/x509_csr.c",
       "${efr32_sdk_root}/util/third_party/crypto/mbedtls/library/x509write_crt.c",
       "${efr32_sdk_root}/util/third_party/crypto/mbedtls/library/x509write_csr.c",
@@ -343,6 +348,7 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/util/third_party/crypto/sl_component/sl_protocol_crypto/src/sli_protocol_crypto_radioaes.c",
       "${efr32_sdk_root}/util/third_party/crypto/sl_component/sl_psa_driver/src/crypto_management.c",
       "${efr32_sdk_root}/util/third_party/crypto/sl_component/sl_psa_driver/src/sli_crypto_transparent_driver_hash.c",
+      "${efr32_sdk_root}/util/third_party/crypto/sl_component/sl_psa_driver/src/sli_se_driver_signature.c",
       "${efr32_sdk_root}/util/third_party/freertos/Source/croutine.c",
       "${efr32_sdk_root}/util/third_party/freertos/Source/event_groups.c",
       "${efr32_sdk_root}/util/third_party/freertos/Source/include/FreeRTOS.h",
@@ -351,8 +357,6 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/util/third_party/freertos/Source/queue.c",
       "${efr32_sdk_root}/util/third_party/freertos/Source/tasks.c",
       "${efr32_sdk_root}/util/third_party/freertos/Source/timers.c",
-      "${mbedtls_root}/repo/library/hkdf.c",
-      "${mbedtls_root}/repo/library/platform_util.c",
     ]
 
     if (defined(enable_fem)) {
@@ -392,9 +396,11 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/util/third_party/crypto/sl_component/se_manager/src/sl_se_manager_hash.c",
         "${efr32_sdk_root}/util/third_party/crypto/sl_component/se_manager/src/sl_se_manager_key_derivation.c",
         "${efr32_sdk_root}/util/third_party/crypto/sl_component/se_manager/src/sl_se_manager_key_handling.c",
+        "${efr32_sdk_root}/util/third_party/crypto/sl_component/se_manager/src/sl_se_manager_signature.c",
         "${efr32_sdk_root}/util/third_party/crypto/sl_component/sl_alt/source/sl_se_management.c",
         "${efr32_sdk_root}/util/third_party/crypto/sl_component/sl_mbedtls_support/src/se_aes.c",
         "${efr32_sdk_root}/util/third_party/crypto/sl_component/sl_mbedtls_support/src/se_ccm.c",
+        "${efr32_sdk_root}/util/third_party/crypto/sl_component/sl_mbedtls_support/src/se_jpake.c",
         "${efr32_sdk_root}/util/third_party/crypto/sl_component/sl_protocol_crypto/src/sli_radioaes_management.c",
         "${efr32_sdk_root}/util/third_party/crypto/sl_component/sl_psa_driver/src/sli_se_driver_key_derivation.c",
         "${efr32_sdk_root}/util/third_party/crypto/sl_component/sl_psa_driver/src/sli_se_driver_key_management.c",

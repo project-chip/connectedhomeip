@@ -28,7 +28,7 @@ jobs:
             BUILD_ORG: connectedhomeip
 
         runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io'
+        if: github.actor != 'restyled-io[bot]'
 
         container:
             image: connectedhomeip/chip-build:latest
@@ -43,11 +43,10 @@ jobs:
               with:
                   fetch-depth: 0
                   submodules: true
-            - name: Initialize CodeQL
-              uses: github/codeql-action/init@v1
-              with:
-                  languages: "cpp, python"
-                  queries: +security-and-quality
+#             - name: Initialize CodeQL
+#               uses: github/codeql-action/init@v1
+#               with:
+#                   languages: "cpp, python"
             - name: Bootstrap
               run: scripts/build/gn_bootstrap.sh
             - name: Build example Standalone Echo Client
@@ -89,6 +88,6 @@ jobs:
               run: find out -type d -name "dbus" -exec rm -rf {} +
             - name: Remove gen binaries for CodeQL Analysis
               run: find out -type d -name "gen" -exec rm -rf {} +
-            - name: Perform CodeQL Analysis
-              if: ${{ github.event_name == 'push' }}
-              uses: github/codeql-action/analyze@v1
+#             - name: Perform CodeQL Analysis
+#               if: ${{ github.event_name == 'push' }}
+#               uses: github/codeql-action/analyze@v1

@@ -35,11 +35,11 @@
 #include <core/CHIPEncoding.h>
 #include <core/CHIPSafeCasts.h>
 #include <protocols/Protocols.h>
+#include <protocols/secure_channel/Constants.h>
 #include <setup_payload/SetupPayload.h>
 #include <support/BufferWriter.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
-#include <support/ReturnMacros.h>
 #include <support/SafeInt.h>
 #include <transport/SecureSessionMgr.h>
 
@@ -789,8 +789,7 @@ CHIP_ERROR PASESession::HandlePeerMessage(const PacketHeader & packetHeader, con
     err = payloadHeader.DecodeAndConsume(msg);
     SuccessOrExit(err);
 
-    VerifyOrExit(payloadHeader.GetProtocolID() == Protocols::kProtocol_SecureChannel, err = CHIP_ERROR_INVALID_MESSAGE_TYPE);
-    VerifyOrExit(payloadHeader.GetMessageType() == (uint8_t) mNextExpectedMsg, err = CHIP_ERROR_INVALID_MESSAGE_TYPE);
+    VerifyOrExit(payloadHeader.HasMessageType(mNextExpectedMsg), err = CHIP_ERROR_INVALID_MESSAGE_TYPE);
 
     mConnectionState.SetPeerAddress(peerAddress);
 

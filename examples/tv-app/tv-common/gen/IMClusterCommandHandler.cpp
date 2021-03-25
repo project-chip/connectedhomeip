@@ -21,11 +21,11 @@
 #include <cstdint>
 
 #include "af-structs.h"
+#include "app/util/util.h"
 #include "call-command-handler.h"
 #include "callback.h"
 #include "cluster-id.h"
 #include "command-id.h"
-#include "util.h"
 
 #include <app/InteractionModelEngine.h>
 
@@ -678,35 +678,6 @@ void DispatchServerCommand(app::Command * command, CommandId commandId, Endpoint
 }
 
 } // namespace ColorControl
-
-namespace ContentLaunch {
-
-void DispatchServerCommand(app::Command * command, CommandId commandId, EndpointId endpointId, TLV::TLVReader & dataTlv)
-{
-    {
-        switch (commandId)
-        {
-        case ZCL_LAUNCH_CONTENT_COMMAND_ID: {
-            // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-            emberAfContentLaunchClusterLaunchContentCallback();
-            break;
-        }
-        case ZCL_LAUNCH_URL_COMMAND_ID: {
-            // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-            emberAfContentLaunchClusterLaunchURLCallback();
-            break;
-        }
-        default: {
-            // Unrecognized command ID, error status will apply.
-            // TODO: Encode response for command not found
-            ChipLogError(Zcl, "Unknown command %" PRIx16 " for cluster %" PRIx16, commandId, ZCL_CONTENT_LAUNCH_CLUSTER_ID);
-            break;
-        }
-        }
-    }
-}
-
-} // namespace ContentLaunch
 
 namespace DoorLock {
 
@@ -2007,74 +1978,360 @@ void DispatchServerCommand(app::Command * command, CommandId commandId, Endpoint
 
 } // namespace LowPower
 
-namespace MediaPlayback {
+namespace NetworkCommissioning {
 
 void DispatchServerCommand(app::Command * command, CommandId commandId, EndpointId endpointId, TLV::TLVReader & dataTlv)
 {
     {
         switch (commandId)
         {
-        case ZCL_FAST_FORWARD_REQUEST_COMMAND_ID: {
+        case ZCL_ADD_THREAD_NETWORK_COMMAND_ID: {
+            CHIP_ERROR TLVError = CHIP_NO_ERROR;
+            chip::ByteSpan operationalDataset;
+            uint64_t breadcrumb;
+            uint32_t timeoutMs;
+
+            while ((TLVError = dataTlv.Next()) == CHIP_NO_ERROR)
+            {
+                switch (TLV::TagNumFromTag(dataTlv.GetTag()))
+                {
+                case 0: {
+                    const uint8_t * data = nullptr;
+                    TLVError             = dataTlv.GetDataPtr(data);
+                    operationalDataset   = chip::ByteSpan(data, dataTlv.GetLength());
+                }
+                break;
+                case 1:
+                    TLVError = dataTlv.Get(breadcrumb);
+                    break;
+                case 2:
+                    TLVError = dataTlv.Get(timeoutMs);
+                    break;
+                default:
+                    // Unsupported tag, ignore it.
+                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
+                    break;
+                }
+                if (TLVError != CHIP_NO_ERROR)
+                {
+                    ChipLogProgress(Zcl, "Failed to decode TLV data with tag %" PRIx32 ": %" PRId32,
+                                    TLV::TagNumFromTag(dataTlv.GetTag()), TLVError);
+                }
+            }
             // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-            emberAfMediaPlaybackClusterFastForwardRequestCallback();
+            emberAfNetworkCommissioningClusterAddThreadNetworkCallback(operationalDataset, breadcrumb, timeoutMs);
             break;
         }
-        case ZCL_NEXT_REQUEST_COMMAND_ID: {
+        case ZCL_ADD_WI_FI_NETWORK_COMMAND_ID: {
+            CHIP_ERROR TLVError = CHIP_NO_ERROR;
+            chip::ByteSpan ssid;
+            chip::ByteSpan credentials;
+            uint64_t breadcrumb;
+            uint32_t timeoutMs;
+
+            while ((TLVError = dataTlv.Next()) == CHIP_NO_ERROR)
+            {
+                switch (TLV::TagNumFromTag(dataTlv.GetTag()))
+                {
+                case 0: {
+                    const uint8_t * data = nullptr;
+                    TLVError             = dataTlv.GetDataPtr(data);
+                    ssid                 = chip::ByteSpan(data, dataTlv.GetLength());
+                }
+                break;
+                case 1: {
+                    const uint8_t * data = nullptr;
+                    TLVError             = dataTlv.GetDataPtr(data);
+                    credentials          = chip::ByteSpan(data, dataTlv.GetLength());
+                }
+                break;
+                case 2:
+                    TLVError = dataTlv.Get(breadcrumb);
+                    break;
+                case 3:
+                    TLVError = dataTlv.Get(timeoutMs);
+                    break;
+                default:
+                    // Unsupported tag, ignore it.
+                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
+                    break;
+                }
+                if (TLVError != CHIP_NO_ERROR)
+                {
+                    ChipLogProgress(Zcl, "Failed to decode TLV data with tag %" PRIx32 ": %" PRId32,
+                                    TLV::TagNumFromTag(dataTlv.GetTag()), TLVError);
+                }
+            }
             // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-            emberAfMediaPlaybackClusterNextRequestCallback();
+            emberAfNetworkCommissioningClusterAddWiFiNetworkCallback(ssid, credentials, breadcrumb, timeoutMs);
             break;
         }
-        case ZCL_PAUSE_REQUEST_COMMAND_ID: {
+        case ZCL_DISABLE_NETWORK_COMMAND_ID: {
+            CHIP_ERROR TLVError = CHIP_NO_ERROR;
+            chip::ByteSpan networkID;
+            uint64_t breadcrumb;
+            uint32_t timeoutMs;
+
+            while ((TLVError = dataTlv.Next()) == CHIP_NO_ERROR)
+            {
+                switch (TLV::TagNumFromTag(dataTlv.GetTag()))
+                {
+                case 0: {
+                    const uint8_t * data = nullptr;
+                    TLVError             = dataTlv.GetDataPtr(data);
+                    networkID            = chip::ByteSpan(data, dataTlv.GetLength());
+                }
+                break;
+                case 1:
+                    TLVError = dataTlv.Get(breadcrumb);
+                    break;
+                case 2:
+                    TLVError = dataTlv.Get(timeoutMs);
+                    break;
+                default:
+                    // Unsupported tag, ignore it.
+                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
+                    break;
+                }
+                if (TLVError != CHIP_NO_ERROR)
+                {
+                    ChipLogProgress(Zcl, "Failed to decode TLV data with tag %" PRIx32 ": %" PRId32,
+                                    TLV::TagNumFromTag(dataTlv.GetTag()), TLVError);
+                }
+            }
             // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-            emberAfMediaPlaybackClusterPauseRequestCallback();
+            emberAfNetworkCommissioningClusterDisableNetworkCallback(networkID, breadcrumb, timeoutMs);
             break;
         }
-        case ZCL_PLAY_REQUEST_COMMAND_ID: {
+        case ZCL_ENABLE_NETWORK_COMMAND_ID: {
+            CHIP_ERROR TLVError = CHIP_NO_ERROR;
+            chip::ByteSpan networkID;
+            uint64_t breadcrumb;
+            uint32_t timeoutMs;
+
+            while ((TLVError = dataTlv.Next()) == CHIP_NO_ERROR)
+            {
+                switch (TLV::TagNumFromTag(dataTlv.GetTag()))
+                {
+                case 0: {
+                    const uint8_t * data = nullptr;
+                    TLVError             = dataTlv.GetDataPtr(data);
+                    networkID            = chip::ByteSpan(data, dataTlv.GetLength());
+                }
+                break;
+                case 1:
+                    TLVError = dataTlv.Get(breadcrumb);
+                    break;
+                case 2:
+                    TLVError = dataTlv.Get(timeoutMs);
+                    break;
+                default:
+                    // Unsupported tag, ignore it.
+                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
+                    break;
+                }
+                if (TLVError != CHIP_NO_ERROR)
+                {
+                    ChipLogProgress(Zcl, "Failed to decode TLV data with tag %" PRIx32 ": %" PRId32,
+                                    TLV::TagNumFromTag(dataTlv.GetTag()), TLVError);
+                }
+            }
             // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-            emberAfMediaPlaybackClusterPlayRequestCallback();
+            emberAfNetworkCommissioningClusterEnableNetworkCallback(networkID, breadcrumb, timeoutMs);
             break;
         }
-        case ZCL_PREVIOUS_REQUEST_COMMAND_ID: {
+        case ZCL_GET_LAST_NETWORK_COMMISSIONING_RESULT_COMMAND_ID: {
+            CHIP_ERROR TLVError = CHIP_NO_ERROR;
+            uint32_t timeoutMs;
+
+            while ((TLVError = dataTlv.Next()) == CHIP_NO_ERROR)
+            {
+                switch (TLV::TagNumFromTag(dataTlv.GetTag()))
+                {
+                case 0:
+                    TLVError = dataTlv.Get(timeoutMs);
+                    break;
+                default:
+                    // Unsupported tag, ignore it.
+                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
+                    break;
+                }
+                if (TLVError != CHIP_NO_ERROR)
+                {
+                    ChipLogProgress(Zcl, "Failed to decode TLV data with tag %" PRIx32 ": %" PRId32,
+                                    TLV::TagNumFromTag(dataTlv.GetTag()), TLVError);
+                }
+            }
             // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-            emberAfMediaPlaybackClusterPreviousRequestCallback();
+            emberAfNetworkCommissioningClusterGetLastNetworkCommissioningResultCallback(timeoutMs);
             break;
         }
-        case ZCL_REWIND_REQUEST_COMMAND_ID: {
+        case ZCL_REMOVE_NETWORK_COMMAND_ID: {
+            CHIP_ERROR TLVError = CHIP_NO_ERROR;
+            chip::ByteSpan NetworkID;
+            uint64_t Breadcrumb;
+            uint32_t TimeoutMs;
+
+            while ((TLVError = dataTlv.Next()) == CHIP_NO_ERROR)
+            {
+                switch (TLV::TagNumFromTag(dataTlv.GetTag()))
+                {
+                case 0: {
+                    const uint8_t * data = nullptr;
+                    TLVError             = dataTlv.GetDataPtr(data);
+                    NetworkID            = chip::ByteSpan(data, dataTlv.GetLength());
+                }
+                break;
+                case 1:
+                    TLVError = dataTlv.Get(Breadcrumb);
+                    break;
+                case 2:
+                    TLVError = dataTlv.Get(TimeoutMs);
+                    break;
+                default:
+                    // Unsupported tag, ignore it.
+                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
+                    break;
+                }
+                if (TLVError != CHIP_NO_ERROR)
+                {
+                    ChipLogProgress(Zcl, "Failed to decode TLV data with tag %" PRIx32 ": %" PRId32,
+                                    TLV::TagNumFromTag(dataTlv.GetTag()), TLVError);
+                }
+            }
             // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-            emberAfMediaPlaybackClusterRewindRequestCallback();
+            emberAfNetworkCommissioningClusterRemoveNetworkCallback(NetworkID, Breadcrumb, TimeoutMs);
             break;
         }
-        case ZCL_SKIP_BACKWARD_REQUEST_COMMAND_ID: {
+        case ZCL_SCAN_NETWORKS_COMMAND_ID: {
+            CHIP_ERROR TLVError = CHIP_NO_ERROR;
+            chip::ByteSpan ssid;
+            uint64_t breadcrumb;
+            uint32_t timeoutMs;
+
+            while ((TLVError = dataTlv.Next()) == CHIP_NO_ERROR)
+            {
+                switch (TLV::TagNumFromTag(dataTlv.GetTag()))
+                {
+                case 0: {
+                    const uint8_t * data = nullptr;
+                    TLVError             = dataTlv.GetDataPtr(data);
+                    ssid                 = chip::ByteSpan(data, dataTlv.GetLength());
+                }
+                break;
+                case 1:
+                    TLVError = dataTlv.Get(breadcrumb);
+                    break;
+                case 2:
+                    TLVError = dataTlv.Get(timeoutMs);
+                    break;
+                default:
+                    // Unsupported tag, ignore it.
+                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
+                    break;
+                }
+                if (TLVError != CHIP_NO_ERROR)
+                {
+                    ChipLogProgress(Zcl, "Failed to decode TLV data with tag %" PRIx32 ": %" PRId32,
+                                    TLV::TagNumFromTag(dataTlv.GetTag()), TLVError);
+                }
+            }
             // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-            emberAfMediaPlaybackClusterSkipBackwardRequestCallback();
+            emberAfNetworkCommissioningClusterScanNetworksCallback(ssid, breadcrumb, timeoutMs);
             break;
         }
-        case ZCL_SKIP_FORWARD_REQUEST_COMMAND_ID: {
+        case ZCL_UPDATE_THREAD_NETWORK_COMMAND_ID: {
+            CHIP_ERROR TLVError = CHIP_NO_ERROR;
+            chip::ByteSpan operationalDataset;
+            uint64_t breadcrumb;
+            uint32_t timeoutMs;
+
+            while ((TLVError = dataTlv.Next()) == CHIP_NO_ERROR)
+            {
+                switch (TLV::TagNumFromTag(dataTlv.GetTag()))
+                {
+                case 0: {
+                    const uint8_t * data = nullptr;
+                    TLVError             = dataTlv.GetDataPtr(data);
+                    operationalDataset   = chip::ByteSpan(data, dataTlv.GetLength());
+                }
+                break;
+                case 1:
+                    TLVError = dataTlv.Get(breadcrumb);
+                    break;
+                case 2:
+                    TLVError = dataTlv.Get(timeoutMs);
+                    break;
+                default:
+                    // Unsupported tag, ignore it.
+                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
+                    break;
+                }
+                if (TLVError != CHIP_NO_ERROR)
+                {
+                    ChipLogProgress(Zcl, "Failed to decode TLV data with tag %" PRIx32 ": %" PRId32,
+                                    TLV::TagNumFromTag(dataTlv.GetTag()), TLVError);
+                }
+            }
             // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-            emberAfMediaPlaybackClusterSkipForwardRequestCallback();
+            emberAfNetworkCommissioningClusterUpdateThreadNetworkCallback(operationalDataset, breadcrumb, timeoutMs);
             break;
         }
-        case ZCL_START_OVER_REQUEST_COMMAND_ID: {
+        case ZCL_UPDATE_WI_FI_NETWORK_COMMAND_ID: {
+            CHIP_ERROR TLVError = CHIP_NO_ERROR;
+            chip::ByteSpan ssid;
+            chip::ByteSpan credentials;
+            uint64_t breadcrumb;
+            uint32_t timeoutMs;
+
+            while ((TLVError = dataTlv.Next()) == CHIP_NO_ERROR)
+            {
+                switch (TLV::TagNumFromTag(dataTlv.GetTag()))
+                {
+                case 0: {
+                    const uint8_t * data = nullptr;
+                    TLVError             = dataTlv.GetDataPtr(data);
+                    ssid                 = chip::ByteSpan(data, dataTlv.GetLength());
+                }
+                break;
+                case 1: {
+                    const uint8_t * data = nullptr;
+                    TLVError             = dataTlv.GetDataPtr(data);
+                    credentials          = chip::ByteSpan(data, dataTlv.GetLength());
+                }
+                break;
+                case 2:
+                    TLVError = dataTlv.Get(breadcrumb);
+                    break;
+                case 3:
+                    TLVError = dataTlv.Get(timeoutMs);
+                    break;
+                default:
+                    // Unsupported tag, ignore it.
+                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
+                    break;
+                }
+                if (TLVError != CHIP_NO_ERROR)
+                {
+                    ChipLogProgress(Zcl, "Failed to decode TLV data with tag %" PRIx32 ": %" PRId32,
+                                    TLV::TagNumFromTag(dataTlv.GetTag()), TLVError);
+                }
+            }
             // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-            emberAfMediaPlaybackClusterStartOverRequestCallback();
-            break;
-        }
-        case ZCL_STOP_REQUEST_COMMAND_ID: {
-            // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-            emberAfMediaPlaybackClusterStopRequestCallback();
+            emberAfNetworkCommissioningClusterUpdateWiFiNetworkCallback(ssid, credentials, breadcrumb, timeoutMs);
             break;
         }
         default: {
             // Unrecognized command ID, error status will apply.
             // TODO: Encode response for command not found
-            ChipLogError(Zcl, "Unknown command %" PRIx16 " for cluster %" PRIx16, commandId, ZCL_MEDIA_PLAYBACK_CLUSTER_ID);
+            ChipLogError(Zcl, "Unknown command %" PRIx16 " for cluster %" PRIx16, commandId, ZCL_NETWORK_COMMISSIONING_CLUSTER_ID);
             break;
         }
         }
     }
 }
 
-} // namespace MediaPlayback
+} // namespace NetworkCommissioning
 
 namespace OnOff {
 
@@ -2365,9 +2622,6 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
     case ZCL_COLOR_CONTROL_CLUSTER_ID:
         clusters::ColorControl::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
         break;
-    case ZCL_CONTENT_LAUNCH_CLUSTER_ID:
-        clusters::ContentLaunch::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
-        break;
     case ZCL_DOOR_LOCK_CLUSTER_ID:
         clusters::DoorLock::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
         break;
@@ -2386,8 +2640,8 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
     case ZCL_LOW_POWER_CLUSTER_ID:
         clusters::LowPower::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
         break;
-    case ZCL_MEDIA_PLAYBACK_CLUSTER_ID:
-        clusters::MediaPlayback::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
+    case ZCL_NETWORK_COMMISSIONING_CLUSTER_ID:
+        clusters::NetworkCommissioning::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
         break;
     case ZCL_ON_OFF_CLUSTER_ID:
         clusters::OnOff::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);

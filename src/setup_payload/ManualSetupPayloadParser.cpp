@@ -63,21 +63,9 @@ static CHIP_ERROR checkCodeLengthValidity(const std::string & decimalString, boo
     return CHIP_NO_ERROR;
 }
 
-// Extract n bits starting at index i and store it in dest
-static CHIP_ERROR extractBits(uint32_t number, uint64_t & dest, size_t index, size_t numberBits, size_t maxBits)
+static CHIP_ERROR toNumber(const std::string & decimalString, uint32_t & dest)
 {
-    if ((index + numberBits) > maxBits)
-    {
-        ChipLogError(SetupPayload, "Number %lu maxBits %zu index %zu n %zu", number, maxBits, index, numberBits);
-        return CHIP_ERROR_INVALID_STRING_LENGTH;
-    }
-    dest = (((1 << numberBits) - 1) & (number >> index));
-    return CHIP_NO_ERROR;
-}
-
-static CHIP_ERROR toNumber(const std::string & decimalString, uint64_t & dest)
-{
-    uint64_t number = 0;
+    uint32_t number = 0;
     for (char c : decimalString)
     {
         if (!isdigit(c))
@@ -86,14 +74,14 @@ static CHIP_ERROR toNumber(const std::string & decimalString, uint64_t & dest)
             return CHIP_ERROR_INVALID_INTEGER_VALUE;
         }
         number *= 10;
-        number += static_cast<uint64_t>(c - '0');
+        number += static_cast<uint32_t>(c - '0');
     }
     dest = number;
     return CHIP_NO_ERROR;
 }
 
 // Populate numberOfChars into dest from decimalString starting at startIndex (least significant digit = left-most digit)
-static CHIP_ERROR readDigitsFromDecimalString(const std::string & decimalString, size_t & index, uint64_t & dest,
+static CHIP_ERROR readDigitsFromDecimalString(const std::string & decimalString, size_t & index, uint32_t & dest,
                                               size_t numberOfCharsToRead)
 {
     if (decimalString.length() < numberOfCharsToRead || (numberOfCharsToRead + index > decimalString.length()))
@@ -105,21 +93,6 @@ static CHIP_ERROR readDigitsFromDecimalString(const std::string & decimalString,
     std::string decimalSubstring = decimalString.substr(index, numberOfCharsToRead);
     index += numberOfCharsToRead;
     return toNumber(decimalSubstring, dest);
-}
-
-// Populate numberOfBits into dest from number starting at startIndex (LSB = right-most bit)
-static CHIP_ERROR readBitsFromNumber(uint32_t number, size_t & index, uint64_t & dest, size_t numberOfBitsToRead, size_t maxBits)
-{
-    uint64_t bits     = 0;
-    CHIP_ERROR result = extractBits(number, bits, index, numberOfBitsToRead, maxBits);
-    if (result != CHIP_NO_ERROR)
-    {
-        return result;
-    }
-
-    index += numberOfBitsToRead;
-    dest = bits;
-    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ManualSetupPayloadParser::populatePayload(SetupPayload & outPayload)
@@ -135,44 +108,50 @@ CHIP_ERROR ManualSetupPayloadParser::populatePayload(SetupPayload & outPayload)
     }
 
     size_t stringOffset = 0;
-    uint64_t shortCode;
-    result = readDigitsFromDecimalString(representationWithoutCheckDigit, stringOffset, shortCode, kManualSetupShortCodeCharLength);
+    uint32_t chunk1, chunk2, chunk3;
+
+    result = readDigitsFromDecimalString(representationWithoutCheckDigit, stringOffset, chunk1, kManualSetupCodeChunk1CharLength);
     if (result != CHIP_NO_ERROR)
     {
         return result;
     }
 
-    if (!CanCastTo<uint32_t>(shortCode))
+    result = readDigitsFromDecimalString(representationWithoutCheckDigit, stringOffset, chunk2, kManualSetupCodeChunk2CharLength);
+    if (result != CHIP_NO_ERROR)
     {
-        // Our attempts to extract discriminators and whatnot won't work right.
-        return CHIP_ERROR_INVALID_INTEGER_VALUE;
+        return result;
     }
 
-    bool isLongCode = (shortCode & 1) == 1;
+    result = readDigitsFromDecimalString(representationWithoutCheckDigit, stringOffset, chunk3, kManualSetupCodeChunk3CharLength);
+    if (result != CHIP_NO_ERROR)
+    {
+        return result;
+    }
+
+    bool isLongCode = ((chunk1 >> kManualSetupChunk1VidPidPresentBitPos) & 1) == 1;
     result          = checkCodeLengthValidity(representationWithoutCheckDigit, isLongCode);
     if (result != CHIP_NO_ERROR)
     {
         return result;
     }
 
-    size_t numberOffset = 1;
-    uint64_t setUpPINCode;
-    size_t maxShortCodeBitsLength = 1 + kSetupPINCodeFieldLengthInBits + kManualSetupDiscriminatorFieldLengthInBits;
+    constexpr uint32_t kDiscriminatorMsbitsMask = (1 << kManualSetupChunk1DiscriminatorMsbitsLength) - 1;
+    constexpr uint32_t kDiscriminatorLsbitsMask = (1 << kManualSetupChunk2DiscriminatorLsbitsLength) - 1;
 
-    uint64_t discriminator;
-    result = readBitsFromNumber(static_cast<uint32_t>(shortCode), numberOffset, discriminator,
-                                kManualSetupDiscriminatorFieldLengthInBits, maxShortCodeBitsLength);
-    if (result != CHIP_NO_ERROR)
-    {
-        return result;
-    }
+    uint32_t discriminator = ((chunk2 >> kManualSetupChunk2DiscriminatorLsbitsPos) & kDiscriminatorLsbitsMask);
+    discriminator |= ((chunk1 >> kManualSetupChunk1DiscriminatorMsbitsPos) & kDiscriminatorMsbitsMask)
+        << kManualSetupChunk2DiscriminatorLsbitsLength;
 
-    result = readBitsFromNumber(static_cast<uint32_t>(shortCode), numberOffset, setUpPINCode, kSetupPINCodeFieldLengthInBits,
-                                maxShortCodeBitsLength);
-    if (result != CHIP_NO_ERROR)
-    {
-        return result;
-    }
+    // Since manual code only contains upper msbits of discriminator, re-align
+    constexpr int kDiscriminatorShift = (kPayloadDiscriminatorFieldLengthInBits - kManualSetupDiscriminatorFieldLengthInBits);
+    discriminator <<= kDiscriminatorShift;
+
+    constexpr uint32_t kPincodeMsbitsMask = (1 << kManualSetupChunk3PINCodeMsbitsLength) - 1;
+    constexpr uint32_t kPincodeLsbitsMask = (1 << kManualSetupChunk2PINCodeLsbitsLength) - 1;
+
+    uint32_t setUpPINCode = ((chunk2 >> kManualSetupChunk2PINCodeLsbitsPos) & kPincodeLsbitsMask);
+    setUpPINCode |= ((chunk3 >> kManualSetupChunk3PINCodeMsbitsPos) & kPincodeMsbitsMask) << kManualSetupChunk2PINCodeLsbitsLength;
+
     if (setUpPINCode == 0)
     {
         ChipLogError(SetupPayload, "Failed decoding base10. SetUpPINCode was 0.");
@@ -181,7 +160,7 @@ CHIP_ERROR ManualSetupPayloadParser::populatePayload(SetupPayload & outPayload)
 
     if (isLongCode)
     {
-        uint64_t vendorID;
+        uint32_t vendorID;
         result =
             readDigitsFromDecimalString(representationWithoutCheckDigit, stringOffset, vendorID, kManualSetupVendorIdCharLength);
         if (result != CHIP_NO_ERROR)
@@ -189,7 +168,7 @@ CHIP_ERROR ManualSetupPayloadParser::populatePayload(SetupPayload & outPayload)
             return result;
         }
 
-        uint64_t productID;
+        uint32_t productID;
         result =
             readDigitsFromDecimalString(representationWithoutCheckDigit, stringOffset, productID, kManualSetupProductIdCharLength);
         if (result != CHIP_NO_ERROR)

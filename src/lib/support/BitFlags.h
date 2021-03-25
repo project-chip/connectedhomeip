@@ -46,7 +46,7 @@ public:
     static_assert(sizeof(StorageType) >= sizeof(FlagsEnum), "All flags should fit in the storage type");
     using IntegerType = StorageType;
 
-    BitFlags() : mValue(0) {}
+    constexpr BitFlags() : mValue(0) {}
     BitFlags(const BitFlags & other) = default;
     BitFlags & operator=(const BitFlags &) = default;
 
@@ -81,7 +81,7 @@ public:
      *
      * @param flag      Typed flag(s) to set. Any flags not in @a v are unaffected.
      */
-    BitFlags & Set(FlagsEnum flag)
+    constexpr BitFlags & Set(FlagsEnum flag)
     {
         mValue |= static_cast<IntegerType>(flag);
         return *this;
@@ -93,7 +93,7 @@ public:
      * @param flag      Typed flag(s) to set or clear. Any flags not in @a flag are unaffected.
      * @param isSet     If true, set the flag; if false, clear it.
      */
-    BitFlags & Set(FlagsEnum flag, bool isSet) { return isSet ? Set(flag) : Clear(flag); }
+    constexpr BitFlags & Set(FlagsEnum flag, bool isSet) { return isSet ? Set(flag) : Clear(flag); }
 
     /**
      * Clear flag(s).
@@ -111,7 +111,7 @@ public:
      *
      * @param flag  Typed flag(s) to clear. Any flags not in @a flag are unaffected.
      */
-    BitFlags & Clear(FlagsEnum flag)
+    constexpr BitFlags & Clear(FlagsEnum flag)
     {
         mValue &= static_cast<IntegerType>(~static_cast<IntegerType>(flag));
         return *this;

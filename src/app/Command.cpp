@@ -35,6 +35,7 @@ CHIP_ERROR Command::Init(Messaging::ExchangeManager * apExchangeMgr)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     // Error if already initialized.
+    VerifyOrExit(apExchangeMgr != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mpExchangeMgr == nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mpExchangeCtx == nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
@@ -57,7 +58,7 @@ CHIP_ERROR Command::Reset()
     if (mCommandMessageBuf.IsNull())
     {
         // TODO: Calculate the packet buffer size
-        mCommandMessageBuf = System::PacketBufferHandle::New(chip::app::kMaxSecureSduLength);
+        mCommandMessageBuf = System::PacketBufferHandle::New(chip::app::kMaxSecureSduLengthBytes);
         VerifyOrExit(!mCommandMessageBuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
     }
 
@@ -141,7 +142,7 @@ exit:
 
 chip::TLV::TLVWriter & Command::CreateCommandDataElementTLVWriter()
 {
-    mCommandDataBuf = chip::System::PacketBufferHandle::New(chip::app::kMaxSecureSduLength);
+    mCommandDataBuf = chip::System::PacketBufferHandle::New(chip::app::kMaxSecureSduLengthBytes);
     if (mCommandDataBuf.IsNull())
     {
         ChipLogDetail(DataManagement, "Unable to allocate packet buffer");
@@ -220,7 +221,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR Command::AddStatusCode(const uint16_t aGeneralCode, const uint32_t aProtocolId, const uint16_t aProtocolCode,
+CHIP_ERROR Command::AddStatusCode(const uint16_t aGeneralCode, Protocols::Id aProtocolId, const uint16_t aProtocolCode,
                                   const chip::ClusterId aClusterId)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -229,7 +230,8 @@ CHIP_ERROR Command::AddStatusCode(const uint16_t aGeneralCode, const uint32_t aP
     err = statusElementBuilder.Init(mInvokeCommandBuilder.GetWriter());
     SuccessOrExit(err);
 
-    statusElementBuilder.EncodeStatusElement(aGeneralCode, aProtocolId, aProtocolCode, aProtocolCode).EndOfStatusElement();
+    statusElementBuilder.EncodeStatusElement(aGeneralCode, aProtocolId.ToFullyQualifiedSpecForm(), aProtocolCode, aProtocolCode)
+        .EndOfStatusElement();
     err = statusElementBuilder.GetError();
 
     MoveToState(CommandState::AddCommand);

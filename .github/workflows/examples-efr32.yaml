@@ -26,7 +26,7 @@ jobs:
             BUILD_TYPE: gn_efr32
 
         runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io'
+        if: github.actor != 'restyled-io[bot]'
 
         container:
             image: connectedhomeip/chip-build-efr32:latest
@@ -40,11 +40,10 @@ jobs:
               with:
                   fetch-depth: 0
                   submodules: true
-            - name: Initialize CodeQL
-              uses: github/codeql-action/init@v1
-              with:
-                  languages: "cpp, python"
-                  queries: +security-and-quality
+#             - name: Initialize CodeQL
+#               uses: github/codeql-action/init@v1
+#               with:
+#                   languages: "cpp, python"
             - name: Build example EFR32 Lock App for BRD4161A
               run:
                   scripts/examples/gn_efr32_example.sh examples/lock-app/efr32/
@@ -73,6 +72,6 @@ jobs:
               run: find out -type d -name "third_party" -exec rm -rf {} +
             - name: Remove SiliconLabs binaries for CodeQL Analysis
               run: find out -type d -name "SiliconLabs" -exec rm -rf {} +
-            - name: Perform CodeQL Analysis
-              if: ${{ github.event_name == 'push' }}
-              uses: github/codeql-action/analyze@v1
+#             - name: Perform CodeQL Analysis
+#               if: ${{ github.event_name == 'push' }}
+#               uses: github/codeql-action/analyze@v1

@@ -56,11 +56,10 @@ public:
     void OnStatusChange(void) override;
 
     // PersistentStorageDelegate implementation
-    void SetDelegate(chip::PersistentStorageResultDelegate * delegate) override;
-    void GetKeyValue(const char * key) override;
-    CHIP_ERROR GetKeyValue(const char * key, char * value, uint16_t & size) override;
-    void SetKeyValue(const char * key, const char * value) override;
-    void DeleteKeyValue(const char * key) override;
+    void SetStorageDelegate(chip::PersistentStorageResultDelegate * delegate) override;
+    CHIP_ERROR SyncGetKeyValue(const char * key, char * value, uint16_t & size) override;
+    void AsyncSetKeyValue(const char * key, const char * value) override;
+    void AsyncDeleteKeyValue(const char * key) override;
 
     jlong ToJNIHandle()
     {
@@ -75,8 +74,9 @@ public:
         return reinterpret_cast<AndroidDeviceControllerWrapper *>(handle);
     }
 
-    static AndroidDeviceControllerWrapper * AllocateNew(chip::NodeId nodeId, chip::System::Layer * systemLayer,
-                                                        chip::Inet::InetLayer * inetLayer, CHIP_ERROR * errInfoOnFailure);
+    static AndroidDeviceControllerWrapper * AllocateNew(JavaVM * vm, jobject deviceControllerObj, chip::NodeId nodeId,
+                                                        chip::System::Layer * systemLayer, chip::Inet::InetLayer * inetLayer,
+                                                        CHIP_ERROR * errInfoOnFailure);
 
 private:
     using ChipDeviceControllerPtr = std::unique_ptr<chip::Controller::DeviceCommissioner>;

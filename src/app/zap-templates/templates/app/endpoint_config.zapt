@@ -21,6 +21,8 @@
 #define ZAP_TYPE(type) ZCL_ ## type ## _ATTRIBUTE_TYPE
 #define ZAP_LONG_DEFAULTS_INDEX(index) {(uint8_t*)(&generatedDefaults[index])}
 #define ZAP_MIN_MAX_DEFAULTS_INDEX(index) {(uint8_t*)(&minMaxDefault[index])}
+#define ZAP_EMPTY_DEFAULT() {(uint8_t*) 0}
+#define ZAP_SIMPLE_DEFAULT(x) {(uint8_t *) x}
 
 // This is an array of EmberAfAttributeMinMaxValue structures.
 #define GENERATED_MIN_MAX_DEFAULT_COUNT {{endpoint_attribute_min_max_count}}
@@ -101,13 +103,9 @@
 #define ZRD(x) EMBER_ZCL_REPORTING_DIRECTION_ ## x
 #define ZAP_REPORT_DIRECTION(x) ZRD(x)
 
-{{#if (endpoint_reporting_config_default_count)}}
-// Use this macro to check if Reporting plugin is included
-#define EMBER_AF_PLUGIN_REPORTING
 // User options for plugin Reporting
 #define EMBER_AF_PLUGIN_REPORTING_TABLE_SIZE ({{endpoint_reporting_config_default_count}})
 #define EMBER_AF_PLUGIN_REPORTING_ENABLE_GROUP_BOUND_REPORTS
-{{/if}}
 
 #define EMBER_AF_GENERATED_REPORTING_CONFIG_DEFAULTS_TABLE_SIZE ({{endpoint_reporting_config_default_count}})
 #define EMBER_AF_GENERATED_REPORTING_CONFIG_DEFAULTS {{endpoint_reporting_config_defaults}}

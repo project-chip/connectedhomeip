@@ -35,9 +35,6 @@ class BLEEndPoint;
 namespace DeviceLayer {
 
 namespace Internal {
-class NetworkProvisioningServerImpl;
-template <class>
-class GenericNetworkProvisioningServerImpl;
 template <class>
 class GenericPlatformManagerImpl;
 template <class>
@@ -118,6 +115,12 @@ public:
         kThreadDeviceType_SleepyEndDevice  = 4,
     };
 
+    enum BLEAdvertisingMode
+    {
+        kFastAdvertising = 0,
+        kSlowAdvertising = 1,
+    };
+
     struct ThreadPollingConfig;
 
     // WiFi station methods
@@ -170,9 +173,8 @@ public:
     CHIP_ERROR SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val);
     bool IsBLEAdvertisingEnabled();
     CHIP_ERROR SetBLEAdvertisingEnabled(bool val);
-    bool IsBLEFastAdvertisingEnabled();
-    CHIP_ERROR SetBLEFastAdvertisingEnabled(bool val);
     bool IsBLEAdvertising();
+    CHIP_ERROR SetBLEAdvertisingMode(BLEAdvertisingMode mode);
     CHIP_ERROR GetBLEDeviceName(char * buf, size_t bufSize);
     CHIP_ERROR SetBLEDeviceName(const char * deviceName);
     uint16_t NumBLEConnections();
@@ -200,9 +202,6 @@ private:
     friend class Internal::GenericPlatformManagerImpl_FreeRTOS;
     template <class>
     friend class Internal::GenericPlatformManagerImpl_POSIX;
-    friend class Internal::NetworkProvisioningServerImpl;
-    template <class>
-    friend class Internal::GenericNetworkProvisioningServerImpl;
 
     CHIP_ERROR Init();
     void OnPlatformEvent(const ChipDeviceEvent * event);
@@ -464,19 +463,14 @@ inline CHIP_ERROR ConnectivityManager::SetBLEAdvertisingEnabled(bool val)
     return static_cast<ImplClass *>(this)->_SetBLEAdvertisingEnabled(val);
 }
 
-inline bool ConnectivityManager::IsBLEFastAdvertisingEnabled()
-{
-    return static_cast<ImplClass *>(this)->_IsBLEFastAdvertisingEnabled();
-}
-
-inline CHIP_ERROR ConnectivityManager::SetBLEFastAdvertisingEnabled(bool val)
-{
-    return static_cast<ImplClass *>(this)->_SetBLEFastAdvertisingEnabled(val);
-}
-
 inline bool ConnectivityManager::IsBLEAdvertising()
 {
     return static_cast<ImplClass *>(this)->_IsBLEAdvertising();
+}
+
+inline CHIP_ERROR ConnectivityManager::SetBLEAdvertisingMode(BLEAdvertisingMode mode)
+{
+    return static_cast<ImplClass *>(this)->_SetBLEAdvertisingMode(mode);
 }
 
 inline CHIP_ERROR ConnectivityManager::GetBLEDeviceName(char * buf, size_t bufSize)

@@ -391,6 +391,12 @@
 #define ZCL_FABRIC_ID_ATTRIBUTE_ID (0x0000)
 #define ZCL_BREADCRUMB_ATTRIBUTE_ID (0x0001)
 
+// Attribute ids for cluster: Network Commissioning
+
+// Client attributes
+
+// Server attributes
+
 // Attribute ids for cluster: Shade Configuration
 
 // Client attributes
@@ -4084,12 +4090,6 @@
 
 // Server attributes
 
-// Attribute ids for cluster: Network Commissioning
-
-// Client attributes
-
-// Server attributes
-
 // Attribute ids for cluster: Binding
 
 // Client attributes
@@ -4108,6 +4108,14 @@
 // Client attributes
 
 // Server attributes
+
+// Attribute ids for cluster: Group Key Management
+
+// Client attributes
+
+// Server attributes
+#define ZCL_GROUPS_ATTRIBUTE_ID (0x0000)
+#define ZCL_GROUPKEYS_ATTRIBUTE_ID (0x0001)
 
 // Attribute ids for cluster: Sample Mfg Specific Cluster
 

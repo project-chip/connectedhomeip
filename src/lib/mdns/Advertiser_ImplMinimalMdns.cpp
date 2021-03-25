@@ -20,6 +20,7 @@
 #include <inttypes.h>
 #include <stdio.h>
 
+#include "ServiceNaming.h"
 #include <mdns/minimal/ResponseSender.h>
 #include <mdns/minimal/Server.h>
 #include <mdns/minimal/core/FlatAllocatedQName.h>
@@ -30,7 +31,6 @@
 #include <mdns/minimal/responders/Txt.h>
 #include <support/CHIPMem.h>
 #include <support/RandUtils.h>
-#include <support/ReturnMacros.h>
 #include <support/StringBuilder.h>
 
 // Enable detailed mDNS logging for received queries
@@ -402,12 +402,7 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters &
     char uniqueName[64] = "";
 
     /// need to set server name
-    size_t len = snprintf(uniqueName, sizeof(uniqueName), "%" PRIX64 "-%" PRIX64, params.GetFabricId(), params.GetNodeId());
-    if (len >= sizeof(uniqueName))
-    {
-        ChipLogError(Discovery, "Failed to allocate QNames.");
-        return CHIP_ERROR_NO_MEMORY;
-    }
+    ReturnErrorOnFailure(MakeInstanceName(uniqueName, sizeof(uniqueName), params.GetFabricId(), params.GetNodeId()));
 
     FullQName operationalServiceName = AllocateQName("_chip", "_tcp", "local");
     FullQName operationalServerName  = AllocateQName(uniqueName, "_chip", "_tcp", "local");
