@@ -211,18 +211,21 @@ exit:
 }
 
 namespace {
-CHIP_ERROR DoEnableNetwork(NetworkInfo * network)
+void DoEnableNetwork(intptr_t networkInfoPtr)
 {
+    CHIP_ERROR err        = CHIP_NO_ERROR;
+    NetworkInfo * network = reinterpret_cast<NetworkInfo *>(networkInfoPtr);
+
     switch (network->mNetworkType)
     {
     case NetworkType::kThread:
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-        ReturnErrorOnFailure(DeviceLayer::ThreadStackMgr().SetThreadEnabled(false));
-        ReturnErrorOnFailure(
-            DeviceLayer::ThreadStackMgr().SetThreadProvision(network->mData.mThread.mDataset, network->mData.mThread.mDatasetLen));
-        ReturnErrorOnFailure(DeviceLayer::ThreadStackMgr().SetThreadEnabled(true));
+        SuccessOrExit(err = DeviceLayer::ThreadStackMgr().SetThreadEnabled(false));
+        SuccessOrExit(err = DeviceLayer::ThreadStackMgr().SetThreadProvision(network->mData.mThread.mDataset,
+                                                                             network->mData.mThread.mDatasetLen));
+        SuccessOrExit(err = DeviceLayer::ThreadStackMgr().SetThreadEnabled(true));
 #else
-        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+        ExitNow(err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 #endif
         break;
     case NetworkType::kWiFi:
@@ -231,21 +234,28 @@ CHIP_ERROR DoEnableNetwork(NetworkInfo * network)
         // TODO: Currently, DeviceNetworkProvisioningDelegateImpl assumes that ssid and credentials are null terminated strings,
         // which is not correct, this should be changed once we have better method for commissioning wifi networks.
         DeviceLayer::DeviceNetworkProvisioningDelegateImpl deviceDelegate;
-        ReturnErrorOnFailure(deviceDelegate.ProvisionWiFi(reinterpret_cast<const char *>(network->mData.mWiFi.mSSID),
-                                                          reinterpret_cast<const char *>(network->mData.mWiFi.mCredentials)));
+        SuccessOrExit(err = deviceDelegate.ProvisionWiFi(reinterpret_cast<const char *>(network->mData.mWiFi.mSSID),
+                                                         reinterpret_cast<const char *>(network->mData.mWiFi.mCredentials)));
         break;
     }
 #else
-        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+        ExitNow(err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 #endif
     break;
     case NetworkType::kEthernet:
     case NetworkType::kUndefined:
     default:
-        return CHIP_ERROR_NOT_IMPLEMENTED;
+        ExitNow(err = CHIP_ERROR_NOT_IMPLEMENTED);
     }
     network->mEnabled = true;
-    return CHIP_NO_ERROR;
+    ChipLogError(Zcl, "Enable network successfully", err);
+
+exit:
+    // TODO: We should encode response command here.
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "Failed to enable network: %d", err);
+    }
 }
 } // namespace
 
@@ -263,12 +273,10 @@ EmberAfNetworkCommissioningError OnEnableNetworkCommandCallbackInternal(app::Com
         {
             // TODO: Currently, we cannot figure out the detailed error from network provisioning on DeviceLayer, we should
             // implement this in device layer.
-            VerifyOrExit(DoEnableNetwork(&sNetworks[networkSeq]) == CHIP_NO_ERROR,
-                         err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_UNKNOWN_ERROR);
+            chip::DeviceLayer::PlatformMgr().ScheduleWork(DoEnableNetwork, reinterpret_cast<intptr_t>(&sNetworks[networkSeq]));
             ExitNow(err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_SUCCESS);
         }
     }
-    // TODO: We should encode response command here.
 exit:
     return err;
 }
