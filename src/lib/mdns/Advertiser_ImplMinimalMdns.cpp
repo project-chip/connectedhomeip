@@ -405,7 +405,7 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters &
     ReturnErrorOnFailure(MakeInstanceName(nameBuffer, sizeof(nameBuffer), params.GetFabricId(), params.GetNodeId()));
 
     FullQName operationalServiceName = AllocateQName("_chip", "_tcp", "local");
-    FullQName operationalServerName  = AllocateQName(nameBuffer, "_chip", "_tcp", "local");
+    FullQName operationalServerName  = AllocateQName(name, "_chip", "_tcp", "local");
 
     ReturnErrorOnFailure(MakeHostName(nameBuffer, sizeof(nameBuffer), params.GetMac()));
     FullQName serverName = AllocateQName(nameBuffer, "local");
