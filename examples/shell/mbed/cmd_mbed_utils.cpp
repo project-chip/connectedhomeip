@@ -470,11 +470,11 @@ int cmd_socket_echo(int argc, char ** argv)
 exit:
     if (sock.type == Transport::Type::kTcp)
     {
-        sock.tcpSocket.Disconnect(Transport::PeerAddress::TCP(addr));
+        sock.tcpSocket.~TCP();
     }
     else if (sock.type == Transport::Type::kUdp)
     {
-        sock.udpSocket.Close();
+        sock.udpSocket.~UDP();
     }
     return error;
 }
