@@ -47,11 +47,12 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
     // use a local buffer to read the entire object, which allows partial and
     // offset reads.
     err = mStorage.ReadValueBin(key, nullptr, 0, read_size);
-    uint8_t buf[read_size];
     if (err == CHIP_ERROR_KEY_NOT_FOUND)
     {
         ExitNow(err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
     }
+
+    uint8_t buf[read_size];
     err = mStorage.ReadValueBin(key, buf, read_size, read_size);
     SuccessOrExit(err);
 
