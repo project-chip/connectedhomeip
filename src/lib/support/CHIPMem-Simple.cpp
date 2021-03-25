@@ -89,7 +89,7 @@ void * MemoryCalloc(size_t num, size_t size)
 {
     size_t total = num * size;
 
-    // check is for multiplication overflow
+    // check for multiplication overflow
     if (size != total / num)
     {
         return nullptr;

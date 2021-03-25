@@ -322,7 +322,7 @@ void Realloc(nlTestSuite * inSuite, void * inContext)
     p1 = allocator.HeapRealloc(p2, 16); // reallocation does not change block size
     NL_TEST_ASSERT(inSuite, p1 == p2);
 
-    p3 = allocator.HeapAlloc(48); // Heap still insufficient heap for this
+    p3 = allocator.HeapAlloc(48); // still insufficient heap for this
     NL_TEST_ASSERT(inSuite, p3 == nullptr);
 
     p2 = allocator.HeapRealloc(p1, 48); // insufficient heap, will free all
