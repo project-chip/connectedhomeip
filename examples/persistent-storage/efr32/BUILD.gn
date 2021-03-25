@@ -66,6 +66,7 @@ efr32_executable("persistent_storage") {
   sources = [
     "${efr32_project_dir}/../KeyValueStorageTest.cpp",
     "${examples_plat_dir}/init_efrPlatform.cpp",
+    "${examples_plat_dir}/uart.c",
     "main.cpp",
   ]
 

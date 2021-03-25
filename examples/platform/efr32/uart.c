@@ -25,17 +25,14 @@
 #include "AppConfig.h"
 #include <string.h>
 
-#if !defined(min)
-#define min(A,B) ( (A) < (B) ? (A):(B))
+#if !defined(MIN)
+#define MIN(A,B) ( (A) < (B) ? (A):(B))
 #endif
 
 DEFINE_BUF_QUEUE(EMDRV_UARTDRV_MAX_CONCURRENT_RX_BUFS, sUartRxQueue);
 DEFINE_BUF_QUEUE(EMDRV_UARTDRV_MAX_CONCURRENT_TX_BUFS, sUartTxQueue);
 
-static UARTDRV_HandleData_t sUartHandleData;
-static UARTDRV_Handle_t sUartHandle = &sUartHandleData;
-
-typedef struct ReceiveFifo_t
+typedef struct
 {
     // The data buffer
     uint8_t *pBuffer;
@@ -45,21 +42,27 @@ typedef struct ReceiveFifo_t
     volatile uint16_t Tail;
     // Maxium size of data that can be hold in buffer before overwriting
     uint16_t MaxSize;
-} ReceiveFifo_t;
+} Fifo_t;
 
-#define MAX_BUFFER_SIZE 128
+#define UART_CONSOLE_ERR -1 // Negative value in case of UART Console action failed. Triggers a failure for PW_RPC
+#define MAX_BUFFER_SIZE 256
+#define MAX_DMA_BUFFER_SIZE (MAX_BUFFER_SIZE/2)
 // In order to reduce the probability of data loss during the dmaFull callback handler we use
 // two duplicate receive buffers so we can always have one "active" receive queue.
-static uint8_t sRxDmaBuffer[MAX_BUFFER_SIZE];
-static uint8_t sRxDmaBuffer2[MAX_BUFFER_SIZE];
-static uint8_t sRxFifoBuffer[MAX_BUFFER_SIZE];
-static uint16_t lastCount;
-static ReceiveFifo_t sReceiveFifo;
+static uint8_t sRxDmaBuffer[MAX_DMA_BUFFER_SIZE];
+static uint8_t sRxDmaBuffer2[MAX_DMA_BUFFER_SIZE];
+static uint16_t lastCount;  // Nb of bytes already processed from the active dmaBuffer
 
-//static void UART_tx_callback(UARTDRV_Handle_t handle, Ecode_t transferStatus, uint8_t *data, UARTDRV_Count_t transferCount);
+// Rx buffer for the receive Fifo
+static uint8_t sRxFifoBuffer[MAX_BUFFER_SIZE];
+static Fifo_t sReceiveFifo;
+
+static UARTDRV_HandleData_t sUartHandleData;
+static UARTDRV_Handle_t sUartHandle = &sUartHandleData;
+
 static void UART_rx_callback(UARTDRV_Handle_t handle, Ecode_t transferStatus, uint8_t *data, UARTDRV_Count_t transferCount);
 
-static bool InitFifo(ReceiveFifo_t *fifo, uint8_t* pDataBuffer, uint16_t bufferSize)
+static bool InitFifo(Fifo_t *fifo, uint8_t* pDataBuffer, uint16_t bufferSize)
 {
     if (fifo == NULL || pDataBuffer == NULL)
     {
@@ -73,7 +76,12 @@ static bool InitFifo(ReceiveFifo_t *fifo, uint8_t* pDataBuffer, uint16_t bufferS
     return true;
 }
 
-static uint16_t AvailableDataCount(ReceiveFifo_t *fifo)
+/*
+*   @brief Get the amount of unprocessed bytes in the fifo buffer
+*   @param Ptr to the fifo
+*   @return Nb of "unread" bytes available in the fifo
+*/
+static uint16_t AvailableDataCount(Fifo_t *fifo)
 {
     uint16_t size = 0;
     
@@ -87,12 +95,21 @@ static uint16_t AvailableDataCount(ReceiveFifo_t *fifo)
     return size;
 }
 
-static uint16_t RemainingSpace(ReceiveFifo_t *fifo)
+/*
+*   @brief Get the available space in the fifo buffer to insert new data
+*   @param Ptr to the fifo
+*   @return Nb of free bytes left in te buffer 
+*/
+static uint16_t RemainingSpace(Fifo_t *fifo)
 {
     return fifo->MaxSize - AvailableDataCount(fifo);
 }
 
-static void WriteToFifo(ReceiveFifo_t *fifo, uint8_t* pDataToWrite, uint16_t SizeToWrite)
+/*
+*   @brief Write data in the fifo as a circular buffer
+*   @param Ptr to the fifo, ptr of the data to write, nb of bytes to write
+*/
+static void WriteToFifo(Fifo_t *fifo, uint8_t* pDataToWrite, uint16_t SizeToWrite)
 {
     assert(fifo);
     assert(pDataToWrite);
@@ -118,13 +135,18 @@ static void WriteToFifo(ReceiveFifo_t *fifo, uint8_t* pDataToWrite, uint16_t Siz
     }
 }
 
-static uint8_t RetrieveFromFifo(ReceiveFifo_t *fifo, uint8_t* pData, uint16_t SizeToRead)
+/*
+*   @brief Write data in the fifo as a circular buffer
+*   @param Ptr to the fifo, ptr to contain the data to process, nb of bytes to pull from the fifo
+*   @return Nb of bytes that were retrieved.
+*/
+static uint8_t RetrieveFromFifo(Fifo_t *fifo, uint8_t* pData, uint16_t SizeToRead)
 {
     assert(fifo);
     assert(pData);
     assert(SizeToRead <= fifo->MaxSize);
 
-    uint16_t ReadSize =  min(SizeToRead, AvailableDataCount(fifo));
+    uint16_t ReadSize =  MIN(SizeToRead, AvailableDataCount(fifo));
     uint16_t nBytesBeforWrap = (fifo->MaxSize - fifo->Head);
 
     if (ReadSize > nBytesBeforWrap)
@@ -142,6 +164,12 @@ static uint8_t RetrieveFromFifo(ReceiveFifo_t *fifo, uint8_t* pData, uint16_t Si
     return ReadSize;
 }
 
+/*
+*   @brief Init the the UART for serial communication, Start DMA reception
+*          and init Fifo to handle the received data from this uart 
+*
+*   @Note This UART is used for pigweed rpc
+*/
 void uartConsoleInit(void)
 {
     UARTDRV_Init_t uartInit = {
@@ -172,22 +200,18 @@ void uartConsoleInit(void)
 #endif
     };
 
+    // Init a fifo for the data received on the uart
     InitFifo(&sReceiveFifo , sRxFifoBuffer, MAX_BUFFER_SIZE);
 
     UARTDRV_InitUart(sUartHandle, &uartInit);
-    UARTDRV_Receive(sUartHandle, sRxDmaBuffer, MAX_BUFFER_SIZE, UART_rx_callback);
-    UARTDRV_Receive(sUartHandle, sRxDmaBuffer2, MAX_BUFFER_SIZE, UART_rx_callback);
+    // Activate 2 dma queues to always have one active 
+    UARTDRV_Receive(sUartHandle, sRxDmaBuffer, MAX_DMA_BUFFER_SIZE, UART_rx_callback);
+    UARTDRV_Receive(sUartHandle, sRxDmaBuffer2, MAX_DMA_BUFFER_SIZE, UART_rx_callback);
 }
 
-// static void UART_tx_callback(UARTDRV_Handle_t handle, Ecode_t transferStatus, uint8_t *data, UARTDRV_Count_t transferCount)
-// {
-//     (void)handle;
-//     (void)transferStatus;
-//     (void)data;
-//     (void)transferCount;
-// }
-
-// Callback triggered when UARTDRV DMA has received data
+/*
+*   @brief Callback triggered when a UARTDRV DMA buffer is full
+*/
 static void UART_rx_callback(UARTDRV_Handle_t handle,
                              Ecode_t transferStatus,
                              uint8_t *data,
@@ -205,33 +229,47 @@ static void UART_rx_callback(UARTDRV_Handle_t handle,
     UARTDRV_Receive(sUartHandle, data, transferCount, UART_rx_callback);
 }
 
+/*
+*   @brief Read the data available from the console Uart
+*   @param Buffer that contains the data to write, number bytes to write.
+*   @return Amount of bytes written or ERROR (-1)
+*/
 int16_t uartConsoleWrite(const char * Buf, uint16_t BufLength)
 {
     if (Buf == NULL || BufLength < 1)
     {
-        return -1;
+        return UART_CONSOLE_ERR;
     }
 
+    // Use of ForceTransmit here. Transmit with DMA was causing errors with PW_RPC
+    // TODO Use DMA and find/fix what causes the issue with PW
     if (UARTDRV_ForceTransmit(sUartHandle, (uint8_t *) Buf, BufLength) == ECODE_EMDRV_UARTDRV_OK)
     {
         return BufLength;
     }
     
-    return -1;
+    return UART_CONSOLE_ERR;
 }
 
-int16_t uartConsoleRead(char * Buf, uint16_t BufLength)
+
+/*
+*   @brief Read the data available from the console Uart
+*   @param Buffer for the data to be read, number bytes to read.
+*   @return Amount of bytes that was read from the rx fifo or ERROR (-1)
+*/
+int16_t uartConsoleRead(char * Buf, uint16_t NbBytesToRead)
 {
     uint8_t *       data;
     UARTDRV_Count_t count, remaining;
     
-    if (Buf == NULL || BufLength < 1)
+    if (Buf == NULL || NbBytesToRead < 1)
     {
-        return -1;
+        return UART_CONSOLE_ERR;
     }
 
-    if (BufLength > AvailableDataCount(&sReceiveFifo) )
+    if (NbBytesToRead > AvailableDataCount(&sReceiveFifo) )
     {
+        // Not enough data available in the fifo for the read size request
         // If there is data available in dma buffer, get it now.
         CORE_ATOMIC_SECTION(UARTDRV_GetReceiveStatus(sUartHandle, &data, &count, &remaining);
             if (count > lastCount) 
@@ -241,5 +279,5 @@ int16_t uartConsoleRead(char * Buf, uint16_t BufLength)
             })
     }
 
-    return (int16_t)RetrieveFromFifo(&sReceiveFifo, (uint8_t*)Buf, BufLength);
+    return (int16_t)RetrieveFromFifo(&sReceiveFifo, (uint8_t*)Buf, NbBytesToRead);
 }
