@@ -17,8 +17,8 @@
 
 #include <messaging/tests/MessagingContext.h>
 
+#include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
-#include <support/ReturnMacros.h>
 
 namespace chip {
 namespace Test {

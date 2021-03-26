@@ -29,7 +29,7 @@
 
 #include <core/CHIPEncoding.h>
 #include <platform/Darwin/PosixConfig.h>
-#include <support/ErrorMacros.h>
+#include <support/CodeUtils.h>
 
 namespace chip {
 namespace DeviceLayer {

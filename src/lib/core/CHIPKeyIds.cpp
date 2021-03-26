@@ -24,7 +24,7 @@
 #include "CHIPKeyIds.h"
 
 #include <core/CHIPCore.h>
-#include <support/ReturnMacros.h>
+#include <support/CodeUtils.h>
 
 namespace chip {
 

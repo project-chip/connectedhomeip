@@ -29,7 +29,7 @@
 
 #include <ble/CHIPBleServiceData.h>
 #include <platform/internal/BLEManager.h>
-#include <support/ErrorMacros.h>
+#include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 
 #include <logging/log.h>

@@ -28,6 +28,7 @@
 #include "../gen/cluster-id.h"
 #include "esp_heap_caps.h"
 #include "esp_log.h"
+#include <support/CodeUtils.h>
 
 static const char * TAG = "echo-devicecallbacks";
 

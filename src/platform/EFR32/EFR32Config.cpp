@@ -28,7 +28,6 @@
 
 #include <core/CHIPEncoding.h>
 #include <platform/internal/testing/ConfigUnitTest.h>
-#include <support/ErrorMacros.h>
 
 #include "FreeRTOS.h"
 #include "nvm3.h"

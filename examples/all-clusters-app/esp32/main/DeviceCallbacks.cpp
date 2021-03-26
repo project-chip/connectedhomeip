@@ -36,7 +36,7 @@
 #include <app/util/basic-types.h>
 #include <app/util/util.h>
 #include <lib/mdns/Advertiser.h>
-#include <support/ErrorMacros.h>
+#include <support/CodeUtils.h>
 
 static const char * TAG = "app-devicecallbacks";
 

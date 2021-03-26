@@ -56,7 +56,6 @@
 #include <support/BitFlags.h>
 #include <support/CHIPMem.h>
 #include <support/CHIPMemString.h>
-#include <support/ErrorMacros.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #include <cassert>
@@ -69,8 +68,7 @@
 #include <utility>
 
 #include <platform/Linux/BLEManagerImpl.h>
-#include <support/ErrorMacros.h>
-#include <support/ReturnMacros.h>
+#include <support/CodeUtils.h>
 #include <system/TLVPacketBufferBackingStore.h>
 
 #include "BluezObjectIterator.h"

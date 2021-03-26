@@ -33,8 +33,7 @@
 #include <platform/internal/GenericPlatformManagerImpl.h>
 
 #include <support/CHIPMem.h>
-#include <support/ErrorMacros.h>
-#include <support/ErrorStr.h>
+#include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 
 namespace chip {

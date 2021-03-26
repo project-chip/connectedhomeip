@@ -28,7 +28,6 @@
 #include <core/CHIPCore.h>
 #include <core/CHIPTLVDebug.hpp>
 #include <platform/CHIPDeviceLayer.h>
-#include <support/ErrorMacros.h>
 #include <support/ErrorStr.h>
 
 // The ExchangeManager global object.

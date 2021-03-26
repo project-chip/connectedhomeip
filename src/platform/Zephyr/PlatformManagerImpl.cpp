@@ -26,7 +26,6 @@
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_Zephyr.cpp>
 
-#include <support/ErrorMacros.h>
 #include <support/logging/CHIPLogging.h>
 
 namespace chip {

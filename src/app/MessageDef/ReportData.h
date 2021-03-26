@@ -28,6 +28,7 @@
 
 #include <core/CHIPCore.h>
 #include <core/CHIPTLV.h>
+#include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 #include <util/basic-types.h>
 

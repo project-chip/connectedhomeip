@@ -37,7 +37,7 @@
 #include <core/CHIPTLV.h>
 #include <credentials/CHIPCert.h>
 #include <protocols/Protocols.h>
-#include <support/ErrorMacros.h>
+#include <support/CodeUtils.h>
 
 namespace chip {
 namespace Credentials {

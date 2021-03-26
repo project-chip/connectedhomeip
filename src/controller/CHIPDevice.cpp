@@ -42,9 +42,8 @@
 #include <core/CHIPSafeCasts.h>
 #include <support/Base64.h>
 #include <support/CHIPMem.h>
-#include <support/ErrorMacros.h>
+#include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
-#include <support/ReturnMacros.h>
 #include <support/SafeInt.h>
 #include <support/logging/CHIPLogging.h>
 #include <system/TLVPacketBufferBackingStore.h>

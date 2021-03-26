@@ -31,8 +31,7 @@
 #include <core/CHIPEncoding.h>
 
 #include <support/CHIPMem.h>
-#include <support/ErrorMacros.h>
-#include <support/ReturnMacros.h>
+#include <support/CodeUtils.h>
 #include <support/SafeInt.h>
 
 #include <stdarg.h>

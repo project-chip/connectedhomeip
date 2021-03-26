@@ -19,9 +19,7 @@
 
 #include <app/server/SessionManager.h>
 #include <core/CHIPError.h>
-#include <support/ErrorMacros.h>
-#include <support/ErrorStr.h>
-#include <support/ReturnMacros.h>
+#include <support/CodeUtils.h>
 #include <support/SafeInt.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/StorablePeerConnection.h>

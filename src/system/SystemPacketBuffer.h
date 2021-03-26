@@ -29,7 +29,6 @@
 #include <system/SystemConfig.h>
 
 // Include dependent headers
-#include <core/CHIPError.h>
 #include <support/BufferWriter.h>
 #include <support/CodeUtils.h>
 #include <support/DLLUtil.h>

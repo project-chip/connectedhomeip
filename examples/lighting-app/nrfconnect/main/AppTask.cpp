@@ -40,7 +40,6 @@
 
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
-#include <support/ErrorMacros.h>
 #include <support/ErrorStr.h>
 #include <system/SystemClock.h>
 

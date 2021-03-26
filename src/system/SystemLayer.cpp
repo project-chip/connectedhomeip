@@ -34,10 +34,8 @@
 
 // Include additional CHIP headers
 #include <support/CHIPMem.h>
+#include <support/CodeUtils.h>
 #include <support/DLLUtil.h>
-#include <support/DieMacros.h>
-#include <support/ErrorMacros.h>
-#include <support/ErrorStr.h>
 #include <support/logging/CHIPLogging.h>
 
 // Include system and language headers

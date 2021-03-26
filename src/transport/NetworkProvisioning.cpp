@@ -19,7 +19,7 @@
 #include <core/CHIPSafeCasts.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 #include <protocols/Protocols.h>
-#include <support/ErrorMacros.h>
+#include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
 #include <support/SafeInt.h>
 #include <transport/NetworkProvisioning.h>

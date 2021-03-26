@@ -30,9 +30,7 @@
 #include <messaging/MessageCounterSync.h>
 #include <protocols/Protocols.h>
 #include <support/BufferWriter.h>
-#include <support/ErrorMacros.h>
-#include <support/ErrorStr.h>
-#include <support/ReturnMacros.h>
+#include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 
 namespace chip {

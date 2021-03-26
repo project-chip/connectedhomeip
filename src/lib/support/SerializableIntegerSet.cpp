@@ -19,7 +19,6 @@
 #include "SerializableIntegerSet.h"
 
 #include <core/CHIPEncoding.h>
-#include <support/ErrorMacros.h>
 
 namespace chip {
 

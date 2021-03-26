@@ -26,6 +26,7 @@
 #include <core/CHIPCore.h>
 #include <core/CHIPEncoding.h>
 #include <support/CHIPMem.h>
+#include <support/CodeUtils.h>
 #include <support/UnitTestRegistration.h>
 #include <system/SystemLayer.h>
 #include <system/SystemObject.h>

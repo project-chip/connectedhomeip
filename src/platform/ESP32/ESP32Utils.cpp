@@ -25,7 +25,7 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <platform/ESP32/ESP32Utils.h>
-#include <support/ErrorMacros.h>
+#include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
 #include <support/logging/CHIPLogging.h>
 

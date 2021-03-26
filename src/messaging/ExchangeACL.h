@@ -18,7 +18,6 @@
 #pragma once
 
 #include <app/util/basic-types.h>
-#include <support/ReturnMacros.h>
 #include <transport/AdminPairingTable.h>
 
 namespace chip {

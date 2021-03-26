@@ -33,7 +33,7 @@
 #include <platform/internal/FactoryProvisioning.cpp>
 #endif // CHIP_DEVICE_CONFIG_ENABLE_FACTORY_PROVISIONING
 
-#include <support/ErrorMacros.h>
+#include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 
 #include <power/reboot.h>

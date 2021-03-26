@@ -19,8 +19,6 @@
 #include "DeviceAddressUpdater.h"
 
 #include <controller/CHIPDeviceController.h>
-#include <support/ErrorMacros.h>
-#include <support/ReturnMacros.h>
 
 namespace chip {
 namespace Controller {

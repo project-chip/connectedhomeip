@@ -28,7 +28,7 @@
 #include <app/util/basic-types.h>
 #include <setup_payload/SetupPayload.h>
 #include <support/CHIPMem.h>
-#include <support/ErrorMacros.h>
+#include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
 
 using namespace ::chip;

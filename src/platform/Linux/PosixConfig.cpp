@@ -30,8 +30,7 @@
 #include <core/CHIPEncoding.h>
 #include <platform/Linux/CHIPLinuxStorage.h>
 #include <platform/Linux/PosixConfig.h>
-#include <support/ErrorMacros.h>
-#include <support/ErrorStr.h>
+#include <support/CodeUtils.h>
 
 namespace chip {
 namespace DeviceLayer {

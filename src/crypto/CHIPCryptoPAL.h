@@ -28,7 +28,7 @@
 #endif
 
 #include <core/CHIPError.h>
-#include <support/ErrorMacros.h>
+#include <support/CodeUtils.h>
 
 #include <stddef.h>
 #include <string.h>

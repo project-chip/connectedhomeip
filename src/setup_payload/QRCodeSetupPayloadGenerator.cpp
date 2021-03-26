@@ -32,7 +32,6 @@
 #include <core/CHIPTLVUtilities.hpp>
 #include <protocols/Protocols.h>
 #include <support/CodeUtils.h>
-#include <support/ErrorMacros.h>
 #include <support/RandUtils.h>
 
 #include <stdlib.h>

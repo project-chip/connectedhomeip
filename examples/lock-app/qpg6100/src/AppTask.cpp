@@ -39,9 +39,7 @@
 using namespace chip::TLV;
 using namespace chip::DeviceLayer;
 
-#include <core/CHIPError.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <support/ErrorStr.h>
 #if CHIP_ENABLE_OPENTHREAD
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>

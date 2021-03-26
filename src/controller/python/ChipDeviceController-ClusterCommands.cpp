@@ -22,7 +22,6 @@
 #include <app/CommandSender.h>
 #include <app/InteractionModelEngine.h>
 #include <lib/support/Span.h>
-#include <support/ReturnMacros.h>
 
 #include <controller/CHIPClusters.h>
 #include <controller/CHIPDevice.h>

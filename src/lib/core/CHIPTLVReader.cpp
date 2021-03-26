@@ -28,10 +28,8 @@
 #include <core/CHIPEncoding.h>
 #include <core/CHIPTLV.h>
 #include <support/CHIPMem.h>
-#include <support/ErrorMacros.h>
-#include <support/ReturnMacros.h>
+#include <support/CodeUtils.h>
 #include <support/SafeInt.h>
-#include <support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace TLV {

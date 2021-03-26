@@ -28,6 +28,7 @@
 #include <transport/SecureSession.h>
 
 #include <stdarg.h>
+#include <support/CodeUtils.h>
 #include <support/UnitTestRegistration.h>
 
 using namespace chip;

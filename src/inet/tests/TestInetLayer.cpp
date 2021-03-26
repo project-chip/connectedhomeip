@@ -39,8 +39,6 @@
 
 #include <inet/InetArgParser.h>
 #include <support/CodeUtils.h>
-#include <support/ErrorMacros.h>
-#include <support/ErrorStr.h>
 
 #include <system/SystemTimer.h>
 

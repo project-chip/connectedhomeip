@@ -36,7 +36,6 @@
 
 #include <support/BufferReader.h>
 #include <support/CodeUtils.h>
-#include <support/ErrorMacros.h>
 #include <support/logging/CHIPLogging.h>
 
 // Define below to enable extremely verbose BLE-specific debug logging.

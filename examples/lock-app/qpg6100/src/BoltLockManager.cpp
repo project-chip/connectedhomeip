@@ -22,7 +22,6 @@
 #include "AppConfig.h"
 #include "AppTask.h"
 #include <FreeRTOS.h>
-#include <support/logging/CHIPLogging.h>
 
 BoltLockManager BoltLockManager::sLock;
 

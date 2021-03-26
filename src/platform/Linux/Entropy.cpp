@@ -23,7 +23,6 @@
  */
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <support/ErrorMacros.h>
 #include <support/crypto/CHIPRNG.h>
 
 using namespace ::chip;
