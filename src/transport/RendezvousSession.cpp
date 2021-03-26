@@ -22,7 +22,6 @@
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
-#include <support/ReturnMacros.h>
 #include <support/SafeInt.h>
 #include <transport/RendezvousSession.h>
 #include <transport/SecureMessageCodec.h>
@@ -155,13 +154,12 @@ CHIP_ERROR RendezvousSession::SendSessionEstablishmentMessage(const PacketHeader
     }
 }
 
-CHIP_ERROR RendezvousSession::SendSecureMessage(Protocols::CHIPProtocolId protocol, uint8_t msgType,
-                                                System::PacketBufferHandle msgBuf)
+CHIP_ERROR RendezvousSession::SendSecureMessage(Protocols::Id protocol, uint8_t msgType, System::PacketBufferHandle msgBuf)
 {
     VerifyOrReturnError(mPairingSessionHandle != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     PayloadHeader payloadHeader;
-    payloadHeader.SetMessageType(static_cast<uint16_t>(protocol), msgType);
+    payloadHeader.SetMessageType(protocol, msgType);
 
     return mSecureSessionMgr->SendMessage(*mPairingSessionHandle, payloadHeader, std::move(msgBuf));
 }
@@ -415,7 +413,7 @@ CHIP_ERROR RendezvousSession::HandleSecureMessage(const PacketHeader & packetHea
         mParams.SetRemoteNodeId(packetHeader.GetSourceNodeId().Value());
     }
 
-    if (payloadHeader.GetProtocolID() == Protocols::kProtocol_NetworkProvisioning)
+    if (payloadHeader.HasProtocol(Protocols::NetworkProvisioning::Id))
     {
         ReturnErrorOnFailure(mNetworkProvision.HandleNetworkProvisioningMessage(payloadHeader.GetMessageType(), msgBuf));
     }

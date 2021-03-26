@@ -30,7 +30,6 @@
 #include <mdns/minimal/responders/Txt.h>
 #include <support/CHIPMem.h>
 #include <support/RandUtils.h>
-#include <support/ReturnMacros.h>
 #include <support/StringBuilder.h>
 
 // Enable detailed mDNS logging for received queries

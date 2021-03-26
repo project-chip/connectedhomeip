@@ -24,6 +24,8 @@
 #include "af-types.h"
 #include "basic-types.h"
 
+#include <lib/support/Span.h>
+
 /** @brief Cluster Init
  *
  * This function is called when a specific cluster is initialized. It gives the
@@ -279,7 +281,7 @@ void emberAfOnOffClusterServerTickCallback(chip::EndpointId endpoint);
  * @param timeoutMs
  */
 
-bool emberAfNetworkCommissioningClusterAddThreadNetworkCallback(uint8_t * operationalDataset, uint64_t breadcrumb,
+bool emberAfNetworkCommissioningClusterAddThreadNetworkCallback(chip::ByteSpan operationalDataset, uint64_t breadcrumb,
                                                                 uint32_t timeoutMs);
 
 /**
@@ -290,7 +292,7 @@ bool emberAfNetworkCommissioningClusterAddThreadNetworkCallback(uint8_t * operat
  * @param timeoutMs
  */
 
-bool emberAfNetworkCommissioningClusterAddWiFiNetworkCallback(uint8_t * ssid, uint8_t * credentials, uint64_t breadcrumb,
+bool emberAfNetworkCommissioningClusterAddWiFiNetworkCallback(chip::ByteSpan ssid, chip::ByteSpan credentials, uint64_t breadcrumb,
                                                               uint32_t timeoutMs);
 
 /**
@@ -300,7 +302,7 @@ bool emberAfNetworkCommissioningClusterAddWiFiNetworkCallback(uint8_t * ssid, ui
  * @param timeoutMs
  */
 
-bool emberAfNetworkCommissioningClusterDisableNetworkCallback(uint8_t * networkID, uint64_t breadcrumb, uint32_t timeoutMs);
+bool emberAfNetworkCommissioningClusterDisableNetworkCallback(chip::ByteSpan networkID, uint64_t breadcrumb, uint32_t timeoutMs);
 
 /**
  * @brief Network Commissioning Cluster EnableNetwork Command callback
@@ -309,7 +311,7 @@ bool emberAfNetworkCommissioningClusterDisableNetworkCallback(uint8_t * networkI
  * @param timeoutMs
  */
 
-bool emberAfNetworkCommissioningClusterEnableNetworkCallback(uint8_t * networkID, uint64_t breadcrumb, uint32_t timeoutMs);
+bool emberAfNetworkCommissioningClusterEnableNetworkCallback(chip::ByteSpan networkID, uint64_t breadcrumb, uint32_t timeoutMs);
 
 /**
  * @brief Network Commissioning Cluster GetLastNetworkCommissioningResult Command callback
@@ -325,7 +327,7 @@ bool emberAfNetworkCommissioningClusterGetLastNetworkCommissioningResultCallback
  * @param timeoutMs
  */
 
-bool emberAfNetworkCommissioningClusterRemoveNetworkCallback(uint8_t * NetworkID, uint64_t Breadcrumb, uint32_t TimeoutMs);
+bool emberAfNetworkCommissioningClusterRemoveNetworkCallback(chip::ByteSpan NetworkID, uint64_t Breadcrumb, uint32_t TimeoutMs);
 
 /**
  * @brief Network Commissioning Cluster ScanNetworks Command callback
@@ -334,7 +336,7 @@ bool emberAfNetworkCommissioningClusterRemoveNetworkCallback(uint8_t * NetworkID
  * @param timeoutMs
  */
 
-bool emberAfNetworkCommissioningClusterScanNetworksCallback(uint8_t * ssid, uint64_t breadcrumb, uint32_t timeoutMs);
+bool emberAfNetworkCommissioningClusterScanNetworksCallback(chip::ByteSpan ssid, uint64_t breadcrumb, uint32_t timeoutMs);
 
 /**
  * @brief Network Commissioning Cluster UpdateThreadNetwork Command callback
@@ -343,7 +345,7 @@ bool emberAfNetworkCommissioningClusterScanNetworksCallback(uint8_t * ssid, uint
  * @param timeoutMs
  */
 
-bool emberAfNetworkCommissioningClusterUpdateThreadNetworkCallback(uint8_t * operationalDataset, uint64_t breadcrumb,
+bool emberAfNetworkCommissioningClusterUpdateThreadNetworkCallback(chip::ByteSpan operationalDataset, uint64_t breadcrumb,
                                                                    uint32_t timeoutMs);
 
 /**
@@ -354,8 +356,8 @@ bool emberAfNetworkCommissioningClusterUpdateThreadNetworkCallback(uint8_t * ope
  * @param timeoutMs
  */
 
-bool emberAfNetworkCommissioningClusterUpdateWiFiNetworkCallback(uint8_t * ssid, uint8_t * credentials, uint64_t breadcrumb,
-                                                                 uint32_t timeoutMs);
+bool emberAfNetworkCommissioningClusterUpdateWiFiNetworkCallback(chip::ByteSpan ssid, chip::ByteSpan credentials,
+                                                                 uint64_t breadcrumb, uint32_t timeoutMs);
 
 /**
  * @brief On/off Cluster Off Command callback

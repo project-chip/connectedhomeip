@@ -172,6 +172,24 @@ typedef struct _GroupInformationRecord {
   uint8_t groupType;
 } EmberAfGroupInformationRecord;
 
+// Struct for GroupKeys
+typedef struct _GroupKeys
+{
+    uint16_t VendorId;
+    uint16_t GroupKeyIndex;
+    /* TYPE WARNING: array array defaults to */ uint8_t * GroupKeyRoot;
+    uint64_t GroupKeyEpochStartTime;
+    uint8_t GroupKeySecurityPolicy;
+} EmberAfGroupKeys;
+
+// Struct for GroupState
+typedef struct _GroupState
+{
+    uint16_t VendorId;
+    uint16_t VendorGroupId;
+    uint16_t GroupKeySetIndex;
+} EmberAfGroupState;
+
 // Struct for IasAceZoneStatusResult
 typedef struct _IasAceZoneStatusResult {
   uint8_t zoneId;

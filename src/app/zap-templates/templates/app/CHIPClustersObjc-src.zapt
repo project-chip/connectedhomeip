@@ -1,5 +1,6 @@
 {{> header}}
 
+{{#if (chip_has_client_clusters)}}
 #import <Foundation/Foundation.h>
 
 #import "CHIPDevice.h"
@@ -57,7 +58,7 @@ public:
         CHIPDefaultFailureCallbackBridge * callback = reinterpret_cast<CHIPDefaultFailureCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
-                NSError* error = [NSError errorWithDomain:CHIPErrorDomain code:status userInfo:@{NSLocalizedDescriptionKey:@""}];
+                NSError * error = [CHIPError errorForCHIPErrorCode:status];
                 callback->mHandler(error, nil);
                 callback->Cancel();
                 delete callback;
@@ -411,7 +412,7 @@ private:
         {
             return nil;
         }
-    
+
         CHIP_ERROR err = cppCluster->Associate([device internalDevice], endpoint);
         if (err != CHIP_NO_ERROR) {
             return nil;
@@ -429,7 +430,7 @@ private:
 @end
 
 
-{{#chip_clusters}}
+{{#chip_client_clusters}}
 
 @interface CHIP{{asCamelCased name false}} ()
 @property (readonly) Controller::{{asCamelCased name false}}Cluster cppCluster;
@@ -576,4 +577,5 @@ private:
 
 @end
 
-{{/chip_clusters}}
+{{/chip_client_clusters}}
+{{/if}}

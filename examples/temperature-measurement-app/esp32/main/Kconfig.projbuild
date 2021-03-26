@@ -37,7 +37,7 @@ menu "Demo"
 
     choice
       prompt "Rendezvous Mode"
-      default RENDEZVOUS_MODE_WIFI
+      default RENDEZVOUS_MODE_BLE
       help
           Specifies the Rendezvous mode of the peripheral.
 

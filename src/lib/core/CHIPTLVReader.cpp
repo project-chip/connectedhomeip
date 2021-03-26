@@ -798,7 +798,6 @@ CHIP_ERROR TLVReader::EnsureData(CHIP_ERROR noDataErr)
  */
 CHIP_ERROR TLVReader::GetElementHeadLength(uint8_t & elemHeadBytes) const
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     uint8_t tagBytes;
     uint8_t valOrLenBytes;
     TLVTagControl tagControl;
@@ -806,7 +805,7 @@ CHIP_ERROR TLVReader::GetElementHeadLength(uint8_t & elemHeadBytes) const
     TLVElementType elemType = ElementType();
 
     // Verify element is of valid TLVType.
-    VerifyOrExit(IsValidTLVType(elemType), err = CHIP_ERROR_INVALID_TLV_ELEMENT);
+    VerifyOrReturnError(IsValidTLVType(elemType), CHIP_ERROR_INVALID_TLV_ELEMENT);
 
     // Extract the tag control from the control byte.
     tagControl = static_cast<TLVTagControl>(mControlByte & kTLVTagControlMask);
@@ -824,11 +823,10 @@ CHIP_ERROR TLVReader::GetElementHeadLength(uint8_t & elemHeadBytes) const
     // control byte, the tag bytes (if present), the length bytes (if present),
     // and for elements that don't have a length (e.g. integers), the value
     // bytes.
-    VerifyOrExit(CanCastTo<uint8_t>(1 + tagBytes + valOrLenBytes), err = CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(CanCastTo<uint8_t>(1 + tagBytes + valOrLenBytes), CHIP_ERROR_INTERNAL);
     elemHeadBytes = static_cast<uint8_t>(1 + tagBytes + valOrLenBytes);
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 /**

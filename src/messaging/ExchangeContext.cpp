@@ -76,7 +76,7 @@ void ExchangeContext::SetResponseTimeout(Timeout timeout)
     mResponseTimeout = timeout;
 }
 
-CHIP_ERROR ExchangeContext::SendMessage(uint16_t protocolId, uint8_t msgType, PacketBufferHandle msgBuf,
+CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgType, PacketBufferHandle msgBuf,
                                         const SendFlags & sendFlags)
 {
     CHIP_ERROR err                         = CHIP_NO_ERROR;
@@ -111,7 +111,7 @@ CHIP_ERROR ExchangeContext::SendMessage(uint16_t protocolId, uint8_t msgType, Pa
     return err;
 }
 
-CHIP_ERROR ExchangeContext::SendMessageImpl(uint16_t protocolId, uint8_t msgType, PacketBufferHandle msgBuf,
+CHIP_ERROR ExchangeContext::SendMessageImpl(Protocols::Id protocolId, uint8_t msgType, PacketBufferHandle msgBuf,
                                             const SendFlags & sendFlags, Transport::PeerConnectionState * state)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;

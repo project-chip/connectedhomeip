@@ -32,15 +32,14 @@ constexpr ClusterId kBarrierControlClusterId         = 0x0103;
 constexpr ClusterId kBasicClusterId                  = 0x0028;
 constexpr ClusterId kBindingClusterId                = 0xF000;
 constexpr ClusterId kColorControlClusterId           = 0x0300;
-constexpr ClusterId kContentLaunchClusterId          = 0xF002;
 constexpr ClusterId kDoorLockClusterId               = 0x0101;
 constexpr ClusterId kGeneralCommissioningClusterId   = 0x0030;
+constexpr ClusterId kGroupKeyManagementClusterId     = 0xF004;
 constexpr ClusterId kGroupsClusterId                 = 0x0004;
 constexpr ClusterId kIasZoneClusterId                = 0x0500;
 constexpr ClusterId kIdentifyClusterId               = 0x0003;
 constexpr ClusterId kLevelControlClusterId           = 0x0008;
 constexpr ClusterId kLowPowerClusterId               = 0x0508;
-constexpr ClusterId kMediaPlaybackClusterId          = 0xF001;
 constexpr ClusterId kNetworkCommissioningClusterId   = 0x0031;
 constexpr ClusterId kOnOffClusterId                  = 0x0006;
 constexpr ClusterId kScenesClusterId                 = 0x0005;
@@ -306,25 +305,6 @@ private:
     static constexpr CommandId kStopMoveStepCommandId           = 0x47;
 };
 
-class DLL_EXPORT ContentLaunchCluster : public ClusterBase
-{
-public:
-    ContentLaunchCluster() : ClusterBase(kContentLaunchClusterId) {}
-    ~ContentLaunchCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR LaunchContent(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR LaunchURL(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-
-    // Cluster Attributes
-    CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-
-private:
-    static constexpr CommandId kLaunchContentCommandId = 0x00;
-    static constexpr CommandId kLaunchURLCommandId     = 0x01;
-};
-
 class DLL_EXPORT DoorLockCluster : public ClusterBase
 {
 public:
@@ -432,6 +412,19 @@ private:
     static constexpr CommandId kArmFailSafeCommandId           = 0x02;
     static constexpr CommandId kCommissioningCompleteCommandId = 0x06;
     static constexpr CommandId kSetFabricCommandId             = 0x00;
+};
+
+class DLL_EXPORT GroupKeyManagementCluster : public ClusterBase
+{
+public:
+    GroupKeyManagementCluster() : ClusterBase(kGroupKeyManagementClusterId) {}
+    ~GroupKeyManagementCluster() {}
+
+    // Cluster Attributes
+    CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeGroups(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeGroupKeys(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 };
 
 class DLL_EXPORT GroupsCluster : public ClusterBase
@@ -562,42 +555,6 @@ public:
 
 private:
     static constexpr CommandId kSleepCommandId = 0x00;
-};
-
-class DLL_EXPORT MediaPlaybackCluster : public ClusterBase
-{
-public:
-    MediaPlaybackCluster() : ClusterBase(kMediaPlaybackClusterId) {}
-    ~MediaPlaybackCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR FastForwardRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR NextRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR PauseRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR PlayRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR PreviousRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR RewindRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR SkipBackwardRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR SkipForwardRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR StartOverRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR StopRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-
-    // Cluster Attributes
-    CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR ReadAttributeCurrentState(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-
-private:
-    static constexpr CommandId kFastForwardRequestCommandId  = 0x07;
-    static constexpr CommandId kNextRequestCommandId         = 0x05;
-    static constexpr CommandId kPauseRequestCommandId        = 0x01;
-    static constexpr CommandId kPlayRequestCommandId         = 0x00;
-    static constexpr CommandId kPreviousRequestCommandId     = 0x04;
-    static constexpr CommandId kRewindRequestCommandId       = 0x06;
-    static constexpr CommandId kSkipBackwardRequestCommandId = 0x09;
-    static constexpr CommandId kSkipForwardRequestCommandId  = 0x08;
-    static constexpr CommandId kStartOverRequestCommandId    = 0x03;
-    static constexpr CommandId kStopRequestCommandId         = 0x02;
 };
 
 class DLL_EXPORT NetworkCommissioningCluster : public ClusterBase

@@ -114,6 +114,7 @@ CHIP_ERROR BLEManagerImpl::_Init(void)
     RegisterAssertCback(AssertHandler);
 
     mFlags.ClearAll().Set(Flags::kAdvertisingEnabled, CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART);
+    mFlags.Set(Flags::kFastAdvertisingEnabled, true);
 
     mServiceMode             = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
     OnChipBleConnectReceived = HandleIncomingBleConnection;
@@ -149,22 +150,23 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
     return DriveBLEState();
 }
 
-bool BLEManagerImpl::_IsFastAdvertisingEnabled(void)
-{
-    return mFlags.Has(Flags::kFastAdvertisingEnabled);
-}
-
-CHIP_ERROR BLEManagerImpl::_SetFastAdvertisingEnabled(bool val)
+CHIP_ERROR BLEManagerImpl::_SetAdvertisingMode(BLEAdvertisingMode mode)
 {
     CHIP_ERROR ret = CHIP_NO_ERROR;
 
-    if (!mFlags.Has(Flags::kFastAdvertisingEnabled))
+    switch (mode)
     {
-        mFlags.Set(Flags::kFastAdvertisingEnabled, val);
-
-        /* Send event to process state change request */
-        ret = DriveBLEState();
+    case BLEAdvertisingMode::kFastAdvertising:
+        mFlags.Set(Flags::kFastAdvertisingEnabled, true);
+        break;
+    case BLEAdvertisingMode::kSlowAdvertising:
+        mFlags.Set(Flags::kFastAdvertisingEnabled, false);
+        break;
+    default:
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
+    mFlags.Set(Flags::kAdvertisingRefreshNeeded);
+    ret = DriveBLEState();
     return ret;
 }
 
@@ -409,7 +411,7 @@ void BLEManagerImpl::AdvInit(void)
     ConfigurationMgr().GetBLEDeviceIdentificationInfo(mDeviceIdInfo);
 
     // Verify device name was not already set
-    if (!sInstance.mFlags.Has(Flags::kBLEStackGATTNameSet))
+    if (!mFlags.Has(Flags::kBLEStackGATTNameSet))
     {
         /* Default device name is CHIP-<DISCRIMINATOR> */
         deviceDiscriminator = mDeviceIdInfo.GetDeviceDiscriminator();
@@ -758,15 +760,13 @@ void BLEManagerImpl::ProcessEvtHdrMsg(QueuedEvt_t * pMsg)
             /* Advertising flag set, either advertising or fast adv is enabled: Do nothing  */
             /* Advertising flag not set, neither advertising nor fast adv is enabled: do nothing */
             /* Advertising flag not set, either advertising or fast adv is enabled: Turn on */
-            if (!sInstance.mFlags.Has(Flags::kAdvertising))
+            if (!mFlags.Has(Flags::kAdvertising))
             {
                 BLEMGR_LOG("BLEMGR: BLE Process Application Message: Not advertising");
 
-                if (sInstance.mFlags.Has(Flags::kAdvertisingEnabled))
+                if (mFlags.Has(Flags::kAdvertisingEnabled))
                 {
-                    sInstance.mFlags.Clear(Flags::kFastAdvertisingEnabled);
 
-                    BLEMGR_LOG("BLEMGR: BLE Process Application Message: Slow Advertising Enabled");
 // Send notification to thread manager that CHIPoBLE advertising is starting
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
                     ThreadStackMgr().OnCHIPoBLEAdvertisingStart();
@@ -777,43 +777,49 @@ void BLEManagerImpl::ProcessEvtHdrMsg(QueuedEvt_t * pMsg)
 
                     assert(status == SUCCESS);
 
-                    // Start advertisement timer
-                    Util_startClock(&sInstance.clkAdvTimeout);
+                    mFlags.Set(Flags::kAdvertising);
 
-                    sInstance.mFlags.Set(Flags::kAdvertising);
-                }
-                else if (sInstance.mFlags.Has(Flags::kFastAdvertisingEnabled))
-                {
-                    sInstance.mFlags.Clear(Flags::kAdvertisingEnabled);
+                    if (mFlags.Has(Flags::kFastAdvertisingEnabled))
+                    {
+                        BLEMGR_LOG("BLEMGR: BLE Process Application Message: Fast Advertising Enabled");
+                    }
+                    else
+                    {
+                        BLEMGR_LOG("BLEMGR: BLE Process Application Message: Slow Advertising Enabled");
 
-                    BLEMGR_LOG("BLEMGR: BLE Process Application Message: Fast Advertising Enabled");
-
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-                    ThreadStackMgr().OnCHIPoBLEAdvertisingStart();
-#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
-
-                    // Enable legacy advertising for set #1
-                    status = (bStatus_t) GapAdv_enable(sInstance.advHandleLegacy, GAP_ADV_ENABLE_OPTIONS_USE_MAX, 0);
-                    assert(status == SUCCESS);
-                    sInstance.mFlags.Set(Flags::kAdvertising);
+                        // Start advertisement timer
+                        Util_startClock(&sInstance.clkAdvTimeout);
+                    }
                 }
             }
             /* Advertising flag set, neither advertising nor fast adv is enabled: Turn off*/
-            else if (!sInstance.mFlags.Has(Flags::kAdvertisingEnabled) && !sInstance.mFlags.Has(Flags::kFastAdvertisingEnabled))
+            else if (!mFlags.Has(Flags::kAdvertisingEnabled) && !mFlags.Has(Flags::kFastAdvertisingEnabled))
             {
                 BLEMGR_LOG("BLEMGR: BLE Process Application Message: Advertising disables");
 
                 // Stop advertising
                 GapAdv_disable(sInstance.advHandleLegacy);
-                sInstance.mFlags.Clear(Flags::kAdvertising);
+                mFlags.Clear(Flags::kAdvertising);
+                mFlags.Set(Flags::kFastAdvertisingEnabled, true);
 
                 Util_stopClock(&sInstance.clkAdvTimeout);
             }
+            /* Other case is that advertising is already working, but should be restarted, as its settings changed */
+            else if (mFlags.Has(Flags::kAdvertisingRefreshNeeded))
+            {
+                mFlags.Clear(Flags::kAdvertisingRefreshNeeded);
+                GapAdv_disable(sInstance.advHandleLegacy);
+
+                // Enable legacy advertising for set #1
+                status = (bStatus_t) GapAdv_enable(sInstance.advHandleLegacy, GAP_ADV_ENABLE_OPTIONS_USE_MAX, 0);
+                assert(status == SUCCESS);
+                mFlags.Set(Flags::kAdvertising);
+            }
         }
 
-        if (sInstance.mFlags.Has(Flags::kBLEStackGATTNameUpdate))
+        if (mFlags.Has(Flags::kBLEStackGATTNameUpdate))
         {
-            sInstance.mFlags.Clear(Flags::kBLEStackGATTNameUpdate);
+            mFlags.Clear(Flags::kBLEStackGATTNameUpdate);
             // Indicate that Device name has been set externally
             mFlags.Set(Flags::kBLEStackGATTNameSet);
 
@@ -1025,7 +1031,7 @@ void BLEManagerImpl::ProcessGapMessage(gapEventHdr_t * pMsg)
 
             AdvInit();
 
-            sInstance.mFlags.Set(Flags::kBLEStackInitialized);
+            mFlags.Set(Flags::kBLEStackInitialized);
 
             /* Trigger post-initialization state update */
             DriveBLEState();
@@ -1059,13 +1065,14 @@ void BLEManagerImpl::ProcessGapMessage(gapEventHdr_t * pMsg)
         if (numActive < MAX_NUM_BLE_CONNS)
         {
             // Start advertising since there is room for more connections. Advertisements stop automatically following connection.
-            sInstance.mFlags.Clear(Flags::kAdvertising);
+            mFlags.Clear(Flags::kAdvertising);
         }
         else
         {
             // Stop advertising since there is no room for more connections
             BLEMGR_LOG("BLEMGR: BLE event GAP_LINK_ESTABLISHED_EVENT: MAX connections");
-            sInstance.mFlags.Clear(Flags::kFastAdvertisingEnabled).Clear(Flags::kAdvertisingEnabled).Clear(Flags::kAdvertising);
+            mFlags.Clear(Flags::kAdvertisingEnabled).Clear(Flags::kAdvertising);
+            mFlags.Set(Flags::kFastAdvertisingEnabled, true);
         }
 
         /* Stop advertisement timeout timer */
@@ -1690,6 +1697,7 @@ void BLEManagerImpl::AdvTimeoutHandler(uintptr_t arg)
         BLEMGR_LOG("BLEMGR: AdvTimeoutHandler ble adv 15 minute timeout");
 
         sInstance.mFlags.Clear(Flags::kAdvertisingEnabled);
+        sInstance.mFlags.Set(Flags::kFastAdvertisingEnabled, true);
 
         /* Send event to process state change request */
         DriveBLEState();

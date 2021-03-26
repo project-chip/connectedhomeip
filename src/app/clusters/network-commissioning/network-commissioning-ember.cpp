@@ -29,49 +29,32 @@
 #include <gen/enums.h>
 #include <util/af.h>
 
-namespace {
-// TODO: The network commissioning clusters uses lots of OCTET_STRING type arguments, we need to fix this by some byte buffer
-// containers.
-size_t ConvertStringToNullTerminated(uint8_t * str)
-{
-    uint8_t len = str[0];
-    memmove(str, str + 1, len);
-    str[len] = 0;
-    return len;
-}
-} // namespace
+using namespace chip;
 
-bool emberAfNetworkCommissioningClusterAddThreadNetworkCallback(uint8_t * operationalDataset, uint64_t breadcrumb,
+bool emberAfNetworkCommissioningClusterAddThreadNetworkCallback(ByteSpan operationalDataset, uint64_t breadcrumb,
                                                                 uint32_t timeoutMs)
 {
-    size_t datasetLen = ConvertStringToNullTerminated(operationalDataset);
-
     EmberAfNetworkCommissioningError err = chip::app::clusters::NetworkCommissioning::OnAddThreadNetworkCommandCallbackInternal(
-        nullptr, emberAfCurrentEndpoint(), operationalDataset, datasetLen, breadcrumb, timeoutMs);
+        nullptr, emberAfCurrentEndpoint(), operationalDataset, breadcrumb, timeoutMs);
     emberAfSendImmediateDefaultResponse(err == EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_SUCCESS ? EMBER_ZCL_STATUS_SUCCESS
                                                                                              : EMBER_ZCL_STATUS_FAILURE);
     return true;
 }
 
-bool emberAfNetworkCommissioningClusterAddWiFiNetworkCallback(uint8_t * ssid, uint8_t * credentials, uint64_t breadcrumb,
+bool emberAfNetworkCommissioningClusterAddWiFiNetworkCallback(ByteSpan ssid, ByteSpan credentials, uint64_t breadcrumb,
                                                               uint32_t timeoutMs)
 {
-    size_t ssidLen        = ConvertStringToNullTerminated(ssid);
-    size_t credentialsLen = ConvertStringToNullTerminated(credentials);
-
     EmberAfNetworkCommissioningError err = chip::app::clusters::NetworkCommissioning::OnAddWiFiNetworkCommandCallbackInternal(
-        nullptr, emberAfCurrentEndpoint(), ssid, ssidLen, credentials, credentialsLen, breadcrumb, timeoutMs);
+        nullptr, emberAfCurrentEndpoint(), ssid, credentials, breadcrumb, timeoutMs);
     emberAfSendImmediateDefaultResponse(err == EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_SUCCESS ? EMBER_ZCL_STATUS_SUCCESS
                                                                                              : EMBER_ZCL_STATUS_FAILURE);
     return true;
 }
 
-bool emberAfNetworkCommissioningClusterEnableNetworkCallback(uint8_t * networkID, uint64_t breadcrumb, uint32_t timeoutMs)
+bool emberAfNetworkCommissioningClusterEnableNetworkCallback(ByteSpan networkID, uint64_t breadcrumb, uint32_t timeoutMs)
 {
-    size_t networkIDLen = ConvertStringToNullTerminated(networkID);
-
     EmberAfNetworkCommissioningError err = chip::app::clusters::NetworkCommissioning::OnEnableNetworkCommandCallbackInternal(
-        nullptr, emberAfCurrentEndpoint(), networkID, networkIDLen, breadcrumb, timeoutMs);
+        nullptr, emberAfCurrentEndpoint(), networkID, breadcrumb, timeoutMs);
     emberAfSendImmediateDefaultResponse(err == EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_SUCCESS ? EMBER_ZCL_STATUS_SUCCESS
                                                                                              : EMBER_ZCL_STATUS_FAILURE);
     return true;
@@ -80,7 +63,7 @@ bool emberAfNetworkCommissioningClusterEnableNetworkCallback(uint8_t * networkID
 // TODO: The following commands needed to be implemented.
 // These commands are not implemented thus not handled yet, return false so ember will return a error.
 
-bool emberAfNetworkCommissioningClusterDisableNetworkCallback(uint8_t * networkID, uint64_t breadcrumb, uint32_t timeoutMs)
+bool emberAfNetworkCommissioningClusterDisableNetworkCallback(ByteSpan networkID, uint64_t breadcrumb, uint32_t timeoutMs)
 {
     return false;
 }
@@ -90,22 +73,22 @@ bool emberAfNetworkCommissioningClusterGetLastNetworkCommissioningResultCallback
     return false;
 }
 
-bool emberAfNetworkCommissioningClusterRemoveNetworkCallback(uint8_t * NetworkID, uint64_t Breadcrumb, uint32_t TimeoutMs)
+bool emberAfNetworkCommissioningClusterRemoveNetworkCallback(ByteSpan NetworkID, uint64_t Breadcrumb, uint32_t TimeoutMs)
 {
     return false;
 }
 
-bool emberAfNetworkCommissioningClusterScanNetworksCallback(uint8_t * ssid, uint64_t breadcrumb, uint32_t timeoutMs)
+bool emberAfNetworkCommissioningClusterScanNetworksCallback(ByteSpan ssid, uint64_t breadcrumb, uint32_t timeoutMs)
 {
     return false;
 }
-bool emberAfNetworkCommissioningClusterUpdateThreadNetworkCallback(uint8_t * operationalDataset, uint64_t breadcrumb,
+bool emberAfNetworkCommissioningClusterUpdateThreadNetworkCallback(ByteSpan operationalDataset, uint64_t breadcrumb,
                                                                    uint32_t timeoutMs)
 {
     return false;
 }
 
-bool emberAfNetworkCommissioningClusterUpdateWiFiNetworkCallback(uint8_t * ssid, uint8_t * credentials, uint64_t breadcrumb,
+bool emberAfNetworkCommissioningClusterUpdateWiFiNetworkCallback(ByteSpan ssid, ByteSpan credentials, uint64_t breadcrumb,
                                                                  uint32_t timeoutMs)
 {
     return false;

@@ -368,6 +368,23 @@ exit:
     return err;
 }
 
+BLE_ERROR BleLayer::CancelBleIncompleteConnection()
+{
+    BLE_ERROR err = BLE_NO_ERROR;
+
+    VerifyOrExit(mState == kState_Initialized, err = BLE_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mConnectionDelegate != nullptr, err = BLE_ERROR_INCORRECT_STATE);
+
+    err = mConnectionDelegate->CancelConnection();
+    if (err == BLE_ERROR_NOT_IMPLEMENTED)
+    {
+        ChipLogError(Ble, "BleConnectionDelegate::CancelConnection is not implemented.");
+    }
+
+exit:
+    return err;
+}
+
 BLE_ERROR BleLayer::NewBleEndPoint(BLEEndPoint ** retEndPoint, BLE_CONNECTION_OBJECT connObj, BleRole role, bool autoClose)
 {
     *retEndPoint = nullptr;

@@ -78,6 +78,8 @@ static_library("app") {
     "MessageDef/ReportData.h",
     "MessageDef/StatusElement.cpp",
     "MessageDef/StatusElement.h",
+    "ReadClient.cpp",
+    "ReadHandler.cpp",
     "decoder.cpp",
     "encoder.cpp",
   ]

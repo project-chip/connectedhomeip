@@ -210,9 +210,8 @@ private:
     CHIP_ERROR _SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val);
     bool _IsAdvertisingEnabled(void);
     CHIP_ERROR _SetAdvertisingEnabled(bool val);
-    bool _IsFastAdvertisingEnabled(void);
-    CHIP_ERROR _SetFastAdvertisingEnabled(bool val);
     bool _IsAdvertising(void);
+    CHIP_ERROR _SetAdvertisingMode(BLEAdvertisingMode mode);
     CHIP_ERROR _GetDeviceName(char * buf, size_t bufSize);
     CHIP_ERROR _SetDeviceName(const char * deviceName);
     uint16_t _NumConnections(void);
@@ -265,13 +264,13 @@ private:
 
     enum class Flags : uint16_t
     {
-        kAdvertisingEnabled     = 0x0001, /* App enabled CHIPoBLE advertising */
-        kFastAdvertisingEnabled = 0x0002, /* App enabled Fash CHIPoBLE advertising */
-        kAdvertising            = 0x0004, /* TI BLE stack actively advertising */
-        kBLEStackInitialized    = 0x0008, /* TI BLE Stack GAP Intilization complete */
-        kBLEStackGATTNameUpdate = 0x0010, /* Trigger TI BLE Stack name update, must be performed prior to adv start */
-        kBLEStackGATTNameSet    = 0x0020, /* Device name has been set externally*/
-
+        kAdvertisingEnabled       = 0x0001, /* App enabled CHIPoBLE advertising */
+        kFastAdvertisingEnabled   = 0x0002, /* App enabled Fash CHIPoBLE advertising */
+        kAdvertising              = 0x0004, /* TI BLE stack actively advertising */
+        kBLEStackInitialized      = 0x0008, /* TI BLE Stack GAP Intilization complete */
+        kBLEStackGATTNameUpdate   = 0x0010, /* Trigger TI BLE Stack name update, must be performed prior to adv start */
+        kBLEStackGATTNameSet      = 0x0020, /* Device name has been set externally*/
+        kAdvertisingRefreshNeeded = 0x0040, /* Advertising settings changed and it should be restarted */
     };
 
     BitFlags<Flags> mFlags;

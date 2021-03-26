@@ -1329,6 +1329,13 @@ typedef enum {
   EMBER_ZCL_GP_TRANSLATION_TABLE_UPDATE_ACTION_RESERVED = 24,
 } EmberAfGpTranslationTableUpdateAction;
 
+// Enum for GroupKeySecurityPolicy
+typedef enum
+{
+    EMBER_ZCL_GROUP_KEY_SECURITY_POLICY_STANDARD    = 0,
+    EMBER_ZCL_GROUP_KEY_SECURITY_POLICY_LOW_LATENCY = 1,
+} EmberAfGroupKeySecurityPolicy;
+
 // Enum for HeatAndCoolingSpecificAlarmGroups
 typedef enum {
   EMBER_ZCL_HEAT_AND_COOLING_SPECIFIC_ALARM_GROUPS_INLET_TEMPERATURE_SENSOR_FAULT = 80,

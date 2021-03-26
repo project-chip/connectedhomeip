@@ -51,6 +51,8 @@ using otbr::DBus::NeighborInfo;
         }                                                                                                                          \
     } while (0)
 
+constexpr int kDBusConnectionPollingTimeoutMS = 10;
+
 namespace chip {
 namespace DeviceLayer {
 
@@ -66,8 +68,7 @@ CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack()
     DBusConnection * dispatchConnection;
 
     dbus_error_init(&dbusError);
-    mConnection = UniqueDBusConnection(dbus_bus_get(DBUS_BUS_SYSTEM, &dbusError));
-    VerifyOrExit(dbus_bus_register(mConnection.get(), &dbusError), error = ClientError::ERROR_DBUS);
+    mConnection = UniqueDBusConnection(dbus_bus_get_private(DBUS_BUS_SYSTEM, &dbusError));
 
     VerifyOrExit(mConnection != nullptr, error = ClientError::ERROR_DBUS);
     mThreadApi = std::unique_ptr<otbr::DBus::ThreadApiDBus>(new otbr::DBus::ThreadApiDBus(mConnection.get()));
@@ -81,7 +82,10 @@ CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack()
     mDBusEventLoop     = std::thread([dispatchConnection]() {
         while (true)
         {
-            dbus_connection_read_write_dispatch(dispatchConnection, -1);
+            // The dbus_connection_read_write will lock the connection until new message comes or timeout.
+            // This will block ot-br-posix APIs. Set timeout to 10ms so it can work.
+            // TODO: we should have a global event loop for dbus to take care of this.
+            dbus_connection_read_write_dispatch(dispatchConnection, kDBusConnectionPollingTimeoutMS);
         }
     });
     mDBusEventLoop.detach();
