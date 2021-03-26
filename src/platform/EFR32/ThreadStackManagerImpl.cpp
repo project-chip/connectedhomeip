@@ -126,7 +126,6 @@ extern "C" void otSysEventSignalPending(void)
     portYIELD_FROM_ISR(yieldRequired);
 }
 
-
 extern "C" void * otPlatCAlloc(size_t aNum, size_t aSize)
 {
     return CHIPPlatformMemoryCalloc(aNum, aSize);

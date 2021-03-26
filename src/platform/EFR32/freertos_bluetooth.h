@@ -47,7 +47,6 @@ extern volatile TaskHandle_t LinklayerTaskHandle;
 extern volatile TaskHandle_t BluetoothTaskHandle;
 extern volatile TaskHandle_t BluetoothEventTaskHandle;
 
-
 // Function prototype for initializing Bluetooth stack.
 typedef sl_status_t (*bluetooth_stack_init_func)();
 

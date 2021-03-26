@@ -16,7 +16,6 @@
  *    limitations under the License.
  */
 
-
 /*
  *
  *    Copyright (c) 2020-2021 Project CHIP Authors
@@ -52,8 +51,8 @@
 
 #include <atomic>
 #include <cstdio>
-#include <stdlib.h>
 #include <cstring>
+#include <stdlib.h>
 
 #if CHIP_CONFIG_MEMORY_MGMT_PLATFORM
 
@@ -61,15 +60,14 @@ extern "C" void memMonitoringTrackAlloc(void * ptr, size_t size);
 extern "C" void memMonitoringTrackFree(void * ptr, size_t size);
 
 #ifndef trackAlloc
-#define trackAlloc( pvAddress, uiSize ) memMonitoringTrackAlloc(pvAddress, uiSize)
+#define trackAlloc(pvAddress, uiSize) memMonitoringTrackAlloc(pvAddress, uiSize)
 #endif
 #ifndef trackFree
-#define trackFree( pvAddress, uiSize ) memMonitoringTrackFree( pvAddress, uiSize )
+#define trackFree(pvAddress, uiSize) memMonitoringTrackFree(pvAddress, uiSize)
 #endif
 
 namespace chip {
 namespace Platform {
-
 
 #define VERIFY_INITIALIZED() VerifyInitialized(__func__)
 
@@ -144,7 +142,6 @@ void MemoryFree(void * p)
 {
     trackFree(p, 0);
     sl_free(p);
-
 }
 
 bool MemoryInternalCheckPointer(const void * p, size_t min_size)
@@ -155,51 +152,45 @@ bool MemoryInternalCheckPointer(const void * p, size_t min_size)
 } // namespace Platform
 } // namespace chip
 
-extern "C" void *pvPortMalloc( size_t xWantedSize )
+extern "C" void * pvPortMalloc(size_t xWantedSize)
 {
-void *pvReturn;
+    void * pvReturn;
 
-	vTaskSuspendAll();
-	{
-		pvReturn = sl_malloc( xWantedSize );
-		trackAlloc( pvReturn, xWantedSize );
-	}
-	( void ) xTaskResumeAll();
+    vTaskSuspendAll();
+    {
+        pvReturn = sl_malloc(xWantedSize);
+        trackAlloc(pvReturn, xWantedSize);
+    }
+    (void) xTaskResumeAll();
 
-	#if( configUSE_MALLOC_FAILED_HOOK == 1 )
-	{
-		if( pvReturn == NULL )
-		{
-			extern void vApplicationMallocFailedHook( void );
-			vApplicationMallocFailedHook();
-		}
-	}
-	#endif
+#if (configUSE_MALLOC_FAILED_HOOK == 1)
+    {
+        if (pvReturn == NULL)
+        {
+            extern void vApplicationMallocFailedHook(void);
+            vApplicationMallocFailedHook();
+        }
+    }
+#endif
 
-	return pvReturn;
+    return pvReturn;
 }
 
-extern "C"  void vPortFree( void *pv )
+extern "C" void vPortFree(void * pv)
 {
-	if( pv )
-	{
-		vTaskSuspendAll();
-		{
+    if (pv)
+    {
+        vTaskSuspendAll();
+        {
             trackFree(pv, 0);
-			sl_free( pv );
-		}
-		( void ) xTaskResumeAll();
-	}
+            sl_free(pv);
+        }
+        (void) xTaskResumeAll();
+    }
 }
 
-extern "C" __WEAK void memMonitoringTrackAlloc(void * ptr, size_t size)
-{
+extern "C" __WEAK void memMonitoringTrackAlloc(void * ptr, size_t size) {}
 
-}
-
-extern "C" __WEAK void memMonitoringTrackFree(void * ptr, size_t size)
-{
-
-}
+extern "C" __WEAK void memMonitoringTrackFree(void * ptr, size_t size) {}
 
 #endif // CHIP_CONFIG_MEMORY_MGMT_PLATFORM

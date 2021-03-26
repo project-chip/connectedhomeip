@@ -64,7 +64,7 @@ static bool sIsThreadEnabled         = false;
 static bool sHaveBLEConnections      = false;
 static bool sHaveServiceConnectivity = false;
 
-StackType_t appStack[APP_TASK_STACK_SIZE/sizeof(StackType_t)];
+StackType_t appStack[APP_TASK_STACK_SIZE / sizeof(StackType_t)];
 StaticTask_t appTaskStruct;
 
 using namespace chip::TLV;
@@ -84,7 +84,8 @@ int AppTask::StartAppTask()
     }
 
     // Start App task.
-    sAppTaskHandle = xTaskCreateStatic(AppTaskMain, APP_TASK_NAME, APP_TASK_STACK_SIZE / sizeof(StackType_t), NULL, 1, appStack, &appTaskStruct);
+    sAppTaskHandle =
+        xTaskCreateStatic(AppTaskMain, APP_TASK_NAME, APP_TASK_STACK_SIZE / sizeof(StackType_t), NULL, 1, appStack, &appTaskStruct);
     if (sAppTaskHandle != NULL)
     {
         err = CHIP_NO_ERROR;

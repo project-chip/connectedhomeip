@@ -21,17 +21,15 @@
 #ifdef HEAP_MONITORING
 #include "FreeRTOS.h"
 
-#define MONITORING_STACK_SIZE_byte  1024
+#define MONITORING_STACK_SIZE_byte 1024
 
 class MemMonitoring
 {
 public:
-
-   static void startHeapMonitoring();
+    static void startHeapMonitoring();
 
 private:
     static void HeapMonitoring(void * pvParameter);
-
 };
 
 #endif

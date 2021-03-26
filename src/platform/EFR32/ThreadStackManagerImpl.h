@@ -75,7 +75,6 @@ public:
     void _OnCHIPoBLEAdvertisingStart(void);
     void _OnCHIPoBLEAdvertisingStop(void);
 
-
 private:
     // ===== Methods that implement the ThreadStackManager abstract interface.
 

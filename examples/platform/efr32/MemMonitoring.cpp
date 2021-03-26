@@ -20,22 +20,24 @@
 
 #include "AppConfig.h"
 #include "FreeRTOS.h"
-#include <platform/EFR32/freertos_bluetooth.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/EFR32/freertos_bluetooth.h>
 
-static StackType_t monitoringStack[MONITORING_STACK_SIZE_byte/sizeof(StackType_t)];
+static StackType_t monitoringStack[MONITORING_STACK_SIZE_byte / sizeof(StackType_t)];
 static StaticTask_t monitoringTaskStruct;
 
-size_t nbAllocSuccess = 0;
-size_t nbFreeSuccess = 0;
+size_t nbAllocSuccess        = 0;
+size_t nbFreeSuccess         = 0;
 size_t largestBlockAllocated = 0;
 
 void MemMonitoring::startHeapMonitoring()
 {
-    xTaskCreateStatic(HeapMonitoring, "Monitoring", MONITORING_STACK_SIZE_byte/sizeof(StackType_t), NULL, 1, monitoringStack, &monitoringTaskStruct);
+    xTaskCreateStatic(HeapMonitoring, "Monitoring", MONITORING_STACK_SIZE_byte / sizeof(StackType_t), NULL, 1, monitoringStack,
+                      &monitoringTaskStruct);
 }
 
-void MemMonitoring::HeapMonitoring(void * pvParameter) {
+void MemMonitoring::HeapMonitoring(void * pvParameter)
+{
 
     UBaseType_t appTaskValue;
     UBaseType_t bleEventTaskValue;
@@ -46,49 +48,49 @@ void MemMonitoring::HeapMonitoring(void * pvParameter) {
     UBaseType_t lwipTaskValue;
 
     TaskHandle_t eventLoopHandleStruct = xTaskGetHandle(CHIP_DEVICE_CONFIG_CHIP_TASK_NAME);
-    TaskHandle_t lwipHandle = xTaskGetHandle(TCPIP_THREAD_NAME);
-    TaskHandle_t otTaskHandle = xTaskGetHandle(CHIP_DEVICE_CONFIG_THREAD_TASK_NAME);
-    TaskHandle_t appTaskHandle = xTaskGetHandle(APP_TASK_NAME);
+    TaskHandle_t lwipHandle            = xTaskGetHandle(TCPIP_THREAD_NAME);
+    TaskHandle_t otTaskHandle          = xTaskGetHandle(CHIP_DEVICE_CONFIG_THREAD_TASK_NAME);
+    TaskHandle_t appTaskHandle         = xTaskGetHandle(APP_TASK_NAME);
 
-    while (1) {
+    while (1)
+    {
         // Print Heap Usage
 
-
-        //Get Task Stats
-        appTaskValue = uxTaskGetStackHighWaterMark(appTaskHandle);
-        bleEventTaskValue = uxTaskGetStackHighWaterMark(BluetoothEventTaskHandle);
-        bleTaskValue = uxTaskGetStackHighWaterMark(BluetoothTaskHandle);
-        linkLayerTaskValue = uxTaskGetStackHighWaterMark(LinklayerTaskHandle);
+        // Get Task Stats
+        appTaskValue        = uxTaskGetStackHighWaterMark(appTaskHandle);
+        bleEventTaskValue   = uxTaskGetStackHighWaterMark(BluetoothEventTaskHandle);
+        bleTaskValue        = uxTaskGetStackHighWaterMark(BluetoothTaskHandle);
+        linkLayerTaskValue  = uxTaskGetStackHighWaterMark(LinklayerTaskHandle);
         openThreadTaskValue = uxTaskGetStackHighWaterMark(otTaskHandle);
-        eventLoopTaskValue = uxTaskGetStackHighWaterMark(eventLoopHandleStruct);
-        lwipTaskValue = uxTaskGetStackHighWaterMark(lwipHandle);
+        eventLoopTaskValue  = uxTaskGetStackHighWaterMark(eventLoopHandleStruct);
+        lwipTaskValue       = uxTaskGetStackHighWaterMark(lwipHandle);
 
         EFR32_LOG("=============================");
         EFR32_LOG("     ");
-        EFR32_LOG("Largest Block allocated              0x%x",   largestBlockAllocated);
-        EFR32_LOG("Number Of Successful Alloc           0x%x",   nbAllocSuccess);
-        EFR32_LOG("Number Of Successful Frees           0x%x",   nbFreeSuccess);
+        EFR32_LOG("Largest Block allocated              0x%x", largestBlockAllocated);
+        EFR32_LOG("Number Of Successful Alloc           0x%x", nbAllocSuccess);
+        EFR32_LOG("Number Of Successful Frees           0x%x", nbFreeSuccess);
         EFR32_LOG("     ");
-        EFR32_LOG("App Task most bytes ever Free         0x%x",   (appTaskValue * 4));
-        EFR32_LOG("BLE Event most bytes ever Free        0x%x",   (bleEventTaskValue * 4));
-        EFR32_LOG("BLE Stack most bytes ever Free        0x%x",   (bleTaskValue * 4));
-        EFR32_LOG("Link Layer Task most bytes ever Free  0x%x",   (linkLayerTaskValue * 4));
-        EFR32_LOG("OpenThread Task most bytes ever Free  0x%x",   (openThreadTaskValue * 4));
-        EFR32_LOG("Event Loop Task most bytes ever Free  0x%x",   (eventLoopTaskValue * 4));
-        EFR32_LOG("LWIP Task most bytes ever Free        0x%x",   (lwipTaskValue * 4));
+        EFR32_LOG("App Task most bytes ever Free         0x%x", (appTaskValue * 4));
+        EFR32_LOG("BLE Event most bytes ever Free        0x%x", (bleEventTaskValue * 4));
+        EFR32_LOG("BLE Stack most bytes ever Free        0x%x", (bleTaskValue * 4));
+        EFR32_LOG("Link Layer Task most bytes ever Free  0x%x", (linkLayerTaskValue * 4));
+        EFR32_LOG("OpenThread Task most bytes ever Free  0x%x", (openThreadTaskValue * 4));
+        EFR32_LOG("Event Loop Task most bytes ever Free  0x%x", (eventLoopTaskValue * 4));
+        EFR32_LOG("LWIP Task most bytes ever Free        0x%x", (lwipTaskValue * 4));
         EFR32_LOG("     ");
         EFR32_LOG("=============================");
         vTaskDelay(pdMS_TO_TICKS(5000));
     }
-
 }
-
 
 extern "C" void memMonitoringTrackAlloc(void * ptr, size_t size)
 {
-    if (ptr != NULL) {
+    if (ptr != NULL)
+    {
         nbAllocSuccess++;
-        if (largestBlockAllocated < size) {
+        if (largestBlockAllocated < size)
+        {
             largestBlockAllocated = size;
         }
     }

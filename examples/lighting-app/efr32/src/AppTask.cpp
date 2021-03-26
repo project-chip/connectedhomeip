@@ -33,7 +33,6 @@
 #include "lcd.h"
 #include "qrcodegen.h"
 
-
 #include <assert.h>
 
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
@@ -71,7 +70,7 @@ static bool sHaveServiceConnectivity = false;
 uint8_t sAppEventQueueBuffer[APP_EVENT_QUEUE_SIZE * sizeof(AppEvent)];
 StaticQueue_t sAppEventQueueStruct;
 
-StackType_t appStack[APP_TASK_STACK_SIZE/sizeof(StackType_t)];
+StackType_t appStack[APP_TASK_STACK_SIZE / sizeof(StackType_t)];
 StaticTask_t appTaskStruct;
 
 using namespace chip::TLV;
@@ -91,7 +90,8 @@ int AppTask::StartAppTask()
     }
 
     // Start App task.
-    sAppTaskHandle = xTaskCreateStatic(AppTaskMain, APP_TASK_NAME, APP_TASK_STACK_SIZE / sizeof(StackType_t), NULL, 1, appStack, &appTaskStruct);
+    sAppTaskHandle =
+        xTaskCreateStatic(AppTaskMain, APP_TASK_NAME, APP_TASK_STACK_SIZE / sizeof(StackType_t), NULL, 1, appStack, &appTaskStruct);
     if (sAppTaskHandle != NULL)
     {
         err = CHIP_NO_ERROR;
@@ -503,7 +503,9 @@ void AppTask::PostEvent(const AppEvent * aEvent)
         {
             EFR32_LOG("Failed to post event to app task event queue");
         }
-    } else {
+    }
+    else
+    {
         EFR32_LOG("Event Queue is NULL should never happen");
     }
 }

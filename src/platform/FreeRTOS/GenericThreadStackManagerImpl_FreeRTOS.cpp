@@ -43,7 +43,7 @@ template class GenericThreadStackManagerImpl_FreeRTOS<ThreadStackManagerImpl>;
 template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_FreeRTOS<ImplClass>::DoInit(void)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err   = CHIP_NO_ERROR;
     mThreadStackLock = xSemaphoreCreateMutex();
 
     if (mThreadStackLock == NULL)
@@ -67,16 +67,17 @@ CHIP_ERROR GenericThreadStackManagerImpl_FreeRTOS<ImplClass>::_StartThreadTask(v
     }
 #if defined(CHIP_CONFIG_FREERTOS_USE_STATIC_TASK) && CHIP_CONFIG_FREERTOS_USE_STATIC_TASK
     mThreadTask = xTaskCreateStatic(ThreadTaskMain, CHIP_DEVICE_CONFIG_THREAD_TASK_NAME,
-                      CHIP_DEVICE_CONFIG_THREAD_TASK_STACK_SIZE / sizeof(StackType_t), this,
-                      CHIP_DEVICE_CONFIG_THREAD_TASK_PRIORITY, mThreadStack, &mThreadTaskStruct);
+                                    CHIP_DEVICE_CONFIG_THREAD_TASK_STACK_SIZE / sizeof(StackType_t), this,
+                                    CHIP_DEVICE_CONFIG_THREAD_TASK_PRIORITY, mThreadStack, &mThreadTaskStruct);
 
 #else
     xTaskCreate(ThreadTaskMain, CHIP_DEVICE_CONFIG_THREAD_TASK_NAME,
-                      CHIP_DEVICE_CONFIG_THREAD_TASK_STACK_SIZE / sizeof(StackType_t), this,
-                      CHIP_DEVICE_CONFIG_THREAD_TASK_PRIORITY, &mThreadTask);
+                CHIP_DEVICE_CONFIG_THREAD_TASK_STACK_SIZE / sizeof(StackType_t), this, CHIP_DEVICE_CONFIG_THREAD_TASK_PRIORITY,
+                &mThreadTask);
 #endif
 
-    if (mThreadTask == NULL) {
+    if (mThreadTask == NULL)
+    {
         return CHIP_ERROR_NO_MEMORY;
     }
     return CHIP_NO_ERROR;
