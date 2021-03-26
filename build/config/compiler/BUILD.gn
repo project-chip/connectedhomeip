@@ -258,6 +258,9 @@ declare_args() {
   # Enable memory sanitizer
   is_msan = false
 
+  # enable undefined behavior sanitizer
+  is_ubsan = false
+
   # Exit on sanitize error. Generally standard libraries may get errors
   # so not stopping on the first error is often useful
   is_sanitize_fatal = true
@@ -280,6 +283,18 @@ config("sanitize_memory") {
   ldflags = cflags
 }
 
+config("sanitize_undefined_behavior") {
+  cflags = [
+    "-fvisibility=hidden",
+    "-fsanitize=undefined",
+    "-fsanitize=float-divide-by-zero",
+    "-fsanitize=unsigned-integer-overflow",
+    "-fsanitize=implicit-conversion",
+    "-fsanitize=nullability",
+  ]
+  ldflags = cflags
+}
+
 config("sanitize_recover_all") {
   cflags = [ "-fsanitize-recover=all" ]
   ldflags = cflags
@@ -294,6 +309,10 @@ config("sanitize_default") {
 
   if (is_msan) {
     configs += [ ":sanitize_memory" ]
+  }
+
+  if (is_ubsan) {
+    configs += [ ":sanitize_undefined_behavior" ]
   }
 
   if (!is_sanitize_fatal) {
