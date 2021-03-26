@@ -140,7 +140,7 @@ extern "C" void otPlatFree(void * aPtr)
 /**
  * @brief Openthread UART implementation for the CLI is conflicting
  *        with the UART implemented for Pigweed RPC as they use the same UART port
- *        
+ *
  *        We now only build the uart as implemented in
  *        connectedhomeip/examples/platform/efr32/uart.c
  *        and remap OT functions to use our uart api.
