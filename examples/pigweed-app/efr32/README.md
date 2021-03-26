@@ -31,9 +31,11 @@ following features are available:
 ## Building the Example Application
 
 -   Download or clone the
-    [sdk_support](https://github.com/SiliconLabs/sdk_support) from GitHub $ git
+    [sdk_support](https://github.com/SiliconLabs/sdk_support) from GitHub
+    $ git
     clone https://github.com/SiliconLabs/sdk_support.git and export the path
-    with : $ export EFR32_SDK_ROOT=<Path to cloned git repo>
+    with : $
+    export EFR32_SDK_ROOT=<Path to cloned git repo>
 
 -   Download the
     [Simplicity Commander](https://www.silabs.com/mcu/programming-options)
