@@ -537,7 +537,7 @@ int cmd_socket_tcp(int argc, char ** argv)
     gTransportMgrBase.SetRendezvousSession((TransportMgrDelegate *) &gSocketTransportMgrDelegate);
     gTransportMgrBase.Init((Transport::Base *) &sock.tcpSocket);
     header.SetSourceNodeId(kSourceNodeId).SetDestinationNodeId(kDestinationNodeId).SetMessageId(kMessageId);
-
+    socketEvent.clear();
     err = sock.tcpSocket.SendMessage(header, Transport::PeerAddress::TCP(addr, port), std::move(buffer));
 
     if (err != INET_NO_ERROR)
@@ -549,27 +549,13 @@ int cmd_socket_tcp(int argc, char ** argv)
     streamer_printf(sout, "INFO: send %s message %s to address: %s port: %d\r\n", argv[0], payload,
                     addr.ToString(addrStr, sizeof(addrStr)), port);
 
-    socketEvent.clear();
-
-    char buf[100];
-    int remaining_bytes = 100;
-    int received_bytes  = 0;
-
-    nsapi_size_or_error_t res = remaining_bytes;
-    while (res > 0 && remaining_bytes > 0)
+    if (socketEvent.wait_all(socketMsgReceiveFlag, 5000) & osFlagsError)
     {
-        res = mbed_recv(0, buf + received_bytes, remaining_bytes, 0);
-        if (res < 0)
-        {
-            printf("Error! _socket.recv() returned: %d\r\n", res);
-            return false;
-        }
-
-        received_bytes += res;
-        remaining_bytes -= res;
+        streamer_printf(sout, "ERROR: socket message does not received\r\n");
+        error = CHIP_ERROR_TIMEOUT;
     }
 
-    printf("received %d bytes:\r\n%.*s\r\n\r\n", received_bytes, strstr(buf, "\n") - buf, buf);
+    sock.tcpSocket.Disconnect(Transport::PeerAddress::TCP(addr));
 
     return error;
 }
