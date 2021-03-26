@@ -205,7 +205,8 @@ AttributePathHandle ClusterSchemaEngine::GetNextChild(AttributePathHandle aParen
 
     // Starting from 1 root path handle after the child node that's been passed in, iterate till we find the next child belonging to
     // aParentId.
-    for (pathHandleIndex = (uint32_t) aChildHandle - 1U; pathHandleIndex < mSchema.mNumAttributePathHandleEntries; pathHandleIndex++)
+    for (pathHandleIndex = (uint32_t) aChildHandle - 1U; pathHandleIndex < mSchema.mNumAttributePathHandleEntries;
+         pathHandleIndex++)
     {
         if (mSchema.mpAttributeHandleTable[pathHandleIndex].mParentHandle == aParentHandle)
         {
