@@ -20,6 +20,7 @@
 #include <inet/tests/TestInetCommon.h>
 
 #include <support/CHIPMem.h>
+#include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
 
 namespace chip {

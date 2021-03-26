@@ -30,8 +30,7 @@
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <support/DieMacros.h>
-#include <support/ErrorMacros.h>
+#include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 
 namespace chip {

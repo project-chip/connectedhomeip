@@ -31,10 +31,8 @@
 
 #pragma once
 
-#include <nlassert.h>
-
-#include <core/CHIPError.h>
 #include <support/Base64.h>
+#include <support/CodeUtils.h>
 
 // BASE64_ENCODED_LEN doesn't account for null termination of the string.
 // So, we are adding 1 extra byte to the size requirement.

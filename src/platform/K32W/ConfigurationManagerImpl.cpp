@@ -29,8 +29,6 @@
 #include <platform/ConfigurationManager.h>
 #include <platform/K32W/K32WConfig.h>
 #include <platform/internal/GenericConfigurationManagerImpl.cpp>
-#include <support/ErrorStr.h>
-#include <support/logging/CHIPLogging.h>
 
 #include "fsl_reset.h"
 

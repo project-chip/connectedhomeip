@@ -43,8 +43,6 @@
 //
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <support/DieMacros.h>
-#include <support/ErrorMacros.h>
 #include <support/crypto/CHIPRNG.h>
 
 #include <openthread/platform/random.h>

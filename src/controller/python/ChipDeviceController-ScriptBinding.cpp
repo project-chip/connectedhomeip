@@ -50,10 +50,8 @@
 #include <controller/DeviceAddressUpdater.h>
 #include <mdns/Resolver.h>
 #include <support/CHIPMem.h>
+#include <support/CodeUtils.h>
 #include <support/DLLUtil.h>
-#include <support/ErrorMacros.h>
-#include <support/ErrorStr.h>
-#include <support/ReturnMacros.h>
 #include <support/logging/CHIPLogging.h>
 
 using namespace chip;

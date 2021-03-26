@@ -27,7 +27,7 @@
 
 #pragma once
 
-#include <support/ErrorMacros.h>
+#include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 #include <transport/TransportMgrBase.h>
 #include <transport/raw/Base.h>

@@ -26,6 +26,7 @@
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 // Include additional CHIP headers
+#include <support/CodeUtils.h>
 
 // Include system and language headers
 #include <errno.h>

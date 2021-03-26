@@ -35,8 +35,7 @@
 #include "timers.h"
 #include <ble/CHIPBleServiceData.h>
 #include <platform/EFR32/freertos_bluetooth.h>
-#include <support/ErrorMacros.h>
-#include <support/ErrorStr.h>
+#include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 
 using namespace ::chip;

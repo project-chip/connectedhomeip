@@ -33,7 +33,7 @@
 #include "InetFaultInjection.h"
 #include <inet/InetLayer.h>
 
-#include <support/ErrorMacros.h>
+#include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 #include <system/SystemFaultInjection.h>
 

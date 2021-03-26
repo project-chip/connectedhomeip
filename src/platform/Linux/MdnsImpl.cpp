@@ -26,8 +26,7 @@
 #include <netinet/in.h>
 
 #include "support/CHIPMem.h"
-#include "support/DieMacros.h"
-#include "support/ErrorMacros.h"
+#include "support/CodeUtils.h"
 
 using chip::Mdns::kMdnsTypeMaxSize;
 using chip::Mdns::MdnsServiceProtocol;

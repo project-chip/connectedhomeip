@@ -24,7 +24,7 @@
 
 #include "platform/PlatformManager.h"
 #include "platform/ThreadStackManager.h"
-#include "support/ErrorMacros.h"
+#include "support/CodeUtils.h"
 #include "support/logging/CHIPLogging.h"
 
 #include "dbus/client/thread_api_dbus.hpp"

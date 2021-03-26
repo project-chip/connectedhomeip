@@ -26,7 +26,7 @@
 
 #pragma once
 
-#include <support/ErrorMacros.h>
+#include <support/CodeUtils.h>
 
 // Local variable names used by utility macros.
 

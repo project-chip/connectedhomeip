@@ -31,7 +31,7 @@
 #include <core/CHIPTLVData.hpp>
 #include <core/CHIPTLVUtilities.hpp>
 #include <protocols/Protocols.h>
-#include <support/ErrorMacros.h>
+#include <support/CodeUtils.h>
 
 namespace chip {
 

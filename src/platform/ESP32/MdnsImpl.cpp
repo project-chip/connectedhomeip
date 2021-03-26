@@ -24,7 +24,7 @@
 
 #include "platform/CHIPDeviceLayer.h"
 #include "support/CHIPMem.h"
-#include "support/ErrorMacros.h"
+#include "support/CodeUtils.h"
 #include "support/logging/CHIPLogging.h"
 
 namespace {

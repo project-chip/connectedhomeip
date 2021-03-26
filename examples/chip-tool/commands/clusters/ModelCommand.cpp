@@ -18,9 +18,6 @@
 
 #include "ModelCommand.h"
 
-#include <core/CHIPError.h>
-#include <support/ErrorStr.h>
-
 #include <inttypes.h>
 
 using namespace ::chip;

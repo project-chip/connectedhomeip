@@ -27,7 +27,7 @@
 
 #include <platform/ESP32/ESP32Utils.h>
 #include <platform/internal/BLEManager.h>
-#include <support/ErrorMacros.h>
+#include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 
 #include "esp_event.h"

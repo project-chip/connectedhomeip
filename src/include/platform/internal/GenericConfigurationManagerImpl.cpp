@@ -32,9 +32,8 @@
 #include <platform/internal/GenericConfigurationManagerImpl.h>
 #include <support/Base64.h>
 #include <support/CHIPMem.h>
-#include <support/ErrorMacros.h>
+#include <support/CodeUtils.h>
 #include <support/ScopedBuffer.h>
-#include <support/logging/CHIPLogging.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <platform/ThreadStackManager.h>

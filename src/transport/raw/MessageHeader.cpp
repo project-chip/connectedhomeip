@@ -31,8 +31,7 @@
 
 #include <core/CHIPError.h>
 #include <support/BufferReader.h>
-#include <support/ErrorMacros.h>
-#include <support/ReturnMacros.h>
+#include <support/CodeUtils.h>
 
 /**********************************************
  * Header format (little endian):

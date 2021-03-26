@@ -20,7 +20,7 @@
 #pragma once
 
 #include <core/CHIPCore.h>
-#include <support/DieMacros.h>
+#include <support/CodeUtils.h>
 
 namespace chip {
 namespace DeviceLayer {

@@ -39,8 +39,7 @@
 #include <setup_payload/SetupPayload.h>
 #include <support/BufferWriter.h>
 #include <support/CHIPMem.h>
-#include <support/ErrorMacros.h>
-#include <support/ReturnMacros.h>
+#include <support/CodeUtils.h>
 #include <support/SafeInt.h>
 #include <transport/SecureSessionMgr.h>
 

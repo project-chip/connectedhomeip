@@ -19,7 +19,6 @@
 
 #if CHIP_ENABLE_OPENTHREAD
 #include <platform/ThreadStackManager.h>
-#include <support/ErrorMacros.h>
 #endif
 
 namespace chip {

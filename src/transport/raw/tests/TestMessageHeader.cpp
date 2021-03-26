@@ -23,6 +23,7 @@
  *
  */
 #include <protocols/Protocols.h>
+#include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
 #include <support/UnitTestRegistration.h>
 #include <transport/raw/MessageHeader.h>

@@ -35,11 +35,9 @@
 #pragma once
 
 #include <core/CHIPConfig.h>
-#include <support/ErrorStr.h>
 
 #include <platform/logging/LogV.h>
 
-#include <support/ErrorStr.h>
 #include <support/logging/Constants.h>
 
 #include <stdarg.h>

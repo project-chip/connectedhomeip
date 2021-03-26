@@ -27,7 +27,7 @@
 #include <core/CHIPTLV.h>
 #include <core/CHIPTLVData.hpp>
 #include <core/CHIPTLVUtilities.hpp>
-#include <support/ErrorMacros.h>
+#include <support/CodeUtils.h>
 #include <support/RandUtils.h>
 #include <utility>
 

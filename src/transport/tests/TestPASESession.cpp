@@ -28,6 +28,7 @@
 #include <core/CHIPSafeCasts.h>
 #include <stdarg.h>
 #include <support/CHIPMem.h>
+#include <support/CodeUtils.h>
 #include <support/UnitTestRegistration.h>
 #include <transport/PASESession.h>
 

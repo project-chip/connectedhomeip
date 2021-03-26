@@ -33,8 +33,6 @@
 #include <stdlib.h>
 #include <support/BufferWriter.h>
 #include <support/CHIPMem.h>
-#include <support/ErrorMacros.h>
-#include <support/logging/CHIPLogging.h>
 
 using namespace chip;
 using namespace chip::System;

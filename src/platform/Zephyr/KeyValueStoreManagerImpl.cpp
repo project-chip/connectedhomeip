@@ -22,8 +22,7 @@
  */
 
 #include <platform/KeyValueStoreManager.h>
-#include <support/DieMacros.h>
-#include <support/ReturnMacros.h>
+#include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 
 #include <logging/log.h>

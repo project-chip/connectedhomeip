@@ -28,8 +28,6 @@
 
 #include <platform/ConfigurationManager.h>
 #include <platform/EFR32/EFR32Config.h>
-#include <support/ErrorStr.h>
-#include <support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace DeviceLayer {

@@ -25,8 +25,6 @@
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/ErrorMacros.h>
-#include <lib/support/ErrorStr.h>
 #include <platform/CHIPDeviceLayer.h>
 #if CHIP_ENABLE_OPENTHREAD
 #include <platform/ThreadStackManager.h>

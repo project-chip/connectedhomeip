@@ -30,7 +30,7 @@
 #include <messaging/ReliableMessageContext.h>
 #include <support/BitFlags.h>
 #include <support/CHIPFaultInjection.h>
-#include <support/DieMacros.h>
+#include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 
 namespace chip {

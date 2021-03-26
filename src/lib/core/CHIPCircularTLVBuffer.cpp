@@ -36,7 +36,7 @@
 #include <core/CHIPEncoding.h>
 #include <core/CHIPTLV.h>
 
-#include <support/ReturnMacros.h>
+#include <support/CodeUtils.h>
 
 #include <stdint.h>
 

@@ -27,7 +27,7 @@
 
 #include <core/CHIPEncoding.h>
 #include <platform/internal/testing/ConfigUnitTest.h>
-#include <support/ErrorMacros.h>
+#include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 
 #include "FreeRTOS.h"

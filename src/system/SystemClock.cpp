@@ -42,7 +42,7 @@
 // common private
 #include "SystemLayerPrivate.h"
 
-#include <support/DieMacros.h>
+#include <support/CodeUtils.h>
 #include <system/SystemError.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS

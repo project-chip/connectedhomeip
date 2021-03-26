@@ -30,6 +30,7 @@
 
 #include <nlunit-test.h>
 #include <support/CHIPMem.h>
+#include <support/CodeUtils.h>
 #include <support/UnitTestRegistration.h>
 
 #include <platform/CHIPDeviceLayer.h>

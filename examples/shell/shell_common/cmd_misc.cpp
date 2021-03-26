@@ -22,7 +22,6 @@
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/RandUtils.h>
-#include <lib/support/logging/CHIPLogging.h>
 
 #include <inttypes.h>
 #include <stdarg.h>

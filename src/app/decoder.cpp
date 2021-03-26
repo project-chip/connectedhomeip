@@ -25,9 +25,9 @@
 #include <app/chip-zcl-zpro-codec.h>
 #include <app/message-reader.h>
 #include <lib/core/CHIPError.h>
+#include <lib/support/CodeUtils.h>
 #include <stdio.h>
 #include <string.h>
-#include <support/ErrorMacros.h>
 #include <support/logging/CHIPLogging.h>
 
 extern "C" {

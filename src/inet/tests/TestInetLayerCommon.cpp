@@ -35,8 +35,7 @@
 
 #include <inet/InetLayer.h>
 
-#include <support/ErrorMacros.h>
-#include <support/ErrorStr.h>
+#include <support/CodeUtils.h>
 
 #include "TestInetCommon.h"
 

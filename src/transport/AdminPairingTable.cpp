@@ -19,11 +19,8 @@
  * @brief Defines a table of admins that have provisioned the device.
  */
 
-#include <cstdio>
-
 #include <core/CHIPEncoding.h>
 #include <support/CHIPMem.h>
-#include <support/ReturnMacros.h>
 #include <support/SafeInt.h>
 #include <transport/AdminPairingTable.h>
 

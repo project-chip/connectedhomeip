@@ -23,10 +23,8 @@
 
 #pragma once
 
-#include <cstddef>
-#include <utility>
-
 #include <support/CodeUtils.h>
+#include <utility>
 
 namespace chip {
 

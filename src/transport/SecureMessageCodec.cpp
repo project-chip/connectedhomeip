@@ -25,9 +25,8 @@
  *
  */
 
-#include <support/ReturnMacros.h>
+#include <support/CodeUtils.h>
 #include <support/SafeInt.h>
-#include <support/logging/CHIPLogging.h>
 #include <transport/SecureMessageCodec.h>
 
 // Maximum length of application data that can be encrypted as one block.

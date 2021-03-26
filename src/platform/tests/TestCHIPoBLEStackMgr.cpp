@@ -19,6 +19,7 @@
 #include <assert.h>
 #include <memory>
 #include <support/CHIPMem.h>
+#include <support/CodeUtils.h>
 #include <support/UnitTestRegistration.h>
 
 #include "platform/PlatformManager.h"
