@@ -136,7 +136,6 @@ extern "C" void otPlatFree(void * aPtr)
     CHIPPlatformMemoryFree(aPtr);
 }
 
-
 /**
  * @brief Openthread UART implementation for the CLI is conflicting
  *        with the UART implemented for Pigweed RPC as they use the same UART port
@@ -162,12 +161,12 @@ extern "C" __WEAK otError otPlatUartEnable(void)
 #endif
 }
 
-extern "C" __WEAK otError otPlatUartSend(const uint8_t *aBuf, uint16_t aBufLength)
+extern "C" __WEAK otError otPlatUartSend(const uint8_t * aBuf, uint16_t aBufLength)
 {
 #ifdef PW_RPC_ENABLED
     return OT_ERROR_NOT_IMPLEMENTED;
 #else
-    if (uartConsoleWrite((const char*)aBuf, aBufLength) > 0)
+    if (uartConsoleWrite((const char *) aBuf, aBufLength) > 0)
     {
         otPlatUartSendDone();
         return OT_ERROR_NONE;
@@ -179,12 +178,12 @@ extern "C" __WEAK otError otPlatUartSend(const uint8_t *aBuf, uint16_t aBufLengt
 extern "C" __WEAK void efr32UartProcess(void)
 {
 #ifndef PW_RPC_ENABLED
-    uint8_t tempBuf[128] = {0};
-    //will read the data available up t 128bytes
-    uint16_t count = uartConsoleRead((char*)tempBuf, 128);
+    uint8_t tempBuf[128] = { 0 };
+    // will read the data available up t 128bytes
+    uint16_t count = uartConsoleRead((char *) tempBuf, 128);
     if (count > 0)
     {
-        //ot process Received data for CLI cmds
+        // ot process Received data for CLI cmds
         otPlatUartReceived(tempBuf, count);
     }
 #endif
