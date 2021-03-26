@@ -179,7 +179,7 @@ extern "C" __WEAK void efr32UartProcess(void)
 {
 #ifndef PW_RPC_ENABLED
     uint8_t tempBuf[128] = { 0 };
-    // will read the data available up t 128bytes
+    // will read the data available up to 128bytes
     uint16_t count = uartConsoleRead((char *) tempBuf, 128);
     if (count > 0)
     {
