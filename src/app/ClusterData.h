@@ -113,9 +113,9 @@ public:
     {
         chip::ClusterId mClusterId;                   //< The ID of the Cluster.
         const AttributeInfo * mpAttributeHandleTable; //< A pointer to the schema handle table, which provides parent info and
-                                                      //context < tags for each schema handle.
-        uint32_t mNumAttributePathHandleEntries; //< The number of schema handles in this Cluster.
-        uint32_t mTreeDepth;                     //< The max depth of this schema.
+                                                      // context < tags for each schema handle.
+        uint32_t mNumAttributePathHandleEntries;      //< The number of schema handles in this Cluster.
+        uint32_t mTreeDepth;                          //< The max depth of this schema.
     };
 
     /* While Clusters can have deep nested structures (which can include dictionaries), consumer SDK is only expected to provide
