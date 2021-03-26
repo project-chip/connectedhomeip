@@ -356,6 +356,12 @@
 // Definitions for cluster: Binding
 #define ZCL_BINDING_CLUSTER_ID (0xF000)
 
+// Definitions for cluster: Media Playback
+#define ZCL_MEDIA_PLAYBACK_CLUSTER_ID (0xF001)
+
+// Definitions for cluster: Content Launch
+#define ZCL_CONTENT_LAUNCH_CLUSTER_ID (0xF002)
+
 // Definitions for cluster: Group Key Management
 #define ZCL_GROUP_KEY_MANAGEMENT_CLUSTER_ID (0xF004)
 

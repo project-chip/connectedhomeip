@@ -108,7 +108,20 @@ void PairingCommand::OnStatusUpdate(RendezvousSessionDelegate::Status status)
 void PairingCommand::OnNetworkCredentialsRequested(RendezvousDeviceCredentialsDelegate * callback)
 {
     ChipLogProgress(chipTool, "OnNetworkCredentialsRequested");
-    callback->SendNetworkCredentials(mSSID, mPassword);
+    if (strcmp(mSSID,"."))
+    {
+        callback->SendNetworkCredentials(mSSID, mPassword);                                                                                                                                                                                                   
+    }
+    else
+    {
+        const char *pos = mThrdKey;
+        for (size_t count = 0; count < sizeof(mThreadInfo.ThreadMasterKey)/sizeof (*mThreadInfo.ThreadMasterKey); count++)
+        {
+            sscanf(pos, "%2hhx", &mThreadInfo.ThreadMasterKey[count]);
+            pos += 2;
+        }
+        callback->SendThreadCredentials(mThreadInfo);
+    }
 }
 
 void PairingCommand::OnOperationalCredentialsRequested(const char * csr, size_t csr_length,

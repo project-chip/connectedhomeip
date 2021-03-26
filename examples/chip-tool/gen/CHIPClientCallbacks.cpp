@@ -686,6 +686,32 @@ bool emberAfDiscoverCommandsReceivedResponseCallback(ClusterId clusterId, uint16
     return true;
 }
 
+bool emberAfContentLaunchClusterLaunchContentResponseCallback(uint8_t contentLaunchStatus)
+{
+    ChipLogProgress(Zcl, "LaunchContentResponse:");
+    ChipLogProgress(Zcl, "  contentLaunchStatus: %" PRIu8 "", contentLaunchStatus);
+
+    GET_RESPONSE_CALLBACKS("ContentLaunchClusterLaunchContentResponseCallback");
+
+    Callback::Callback<ContentLaunchClusterLaunchContentResponseCallback> * cb =
+        Callback::Callback<ContentLaunchClusterLaunchContentResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, contentLaunchStatus);
+    return true;
+}
+
+bool emberAfContentLaunchClusterLaunchURLResponseCallback(uint8_t contentLaunchStatus)
+{
+    ChipLogProgress(Zcl, "LaunchURLResponse:");
+    ChipLogProgress(Zcl, "  contentLaunchStatus: %" PRIu8 "", contentLaunchStatus);
+
+    GET_RESPONSE_CALLBACKS("ContentLaunchClusterLaunchURLResponseCallback");
+
+    Callback::Callback<ContentLaunchClusterLaunchURLResponseCallback> * cb =
+        Callback::Callback<ContentLaunchClusterLaunchURLResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, contentLaunchStatus);
+    return true;
+}
+
 bool emberAfDoorLockClusterClearAllPinsResponseCallback(uint8_t status)
 {
     ChipLogProgress(Zcl, "ClearAllPinsResponse:");
