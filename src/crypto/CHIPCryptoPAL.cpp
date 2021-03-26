@@ -22,7 +22,7 @@
 
 #include "CHIPCryptoPAL.h"
 #include <string.h>
-#include <support/CodeUtils.h>
+#include <support/ErrorMacros.h>
 
 namespace chip {
 namespace Crypto {

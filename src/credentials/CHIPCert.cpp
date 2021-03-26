@@ -39,7 +39,7 @@
 #include <credentials/CHIPCert.h>
 #include <protocols/Protocols.h>
 #include <support/CHIPMem.h>
-#include <support/CodeUtils.h>
+#include <support/ErrorMacros.h>
 #include <support/TimeUtils.h>
 
 namespace chip {

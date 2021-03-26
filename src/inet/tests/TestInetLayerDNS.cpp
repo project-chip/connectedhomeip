@@ -37,7 +37,7 @@
 #include <CHIPVersion.h>
 
 #include <inet/InetLayer.h>
-#include <support/CodeUtils.h>
+#include <support/ErrorStr.h>
 #include <support/UnitTestRegistration.h>
 
 #include <system/SystemClock.h>

@@ -31,6 +31,7 @@
 #include <type_traits>
 
 #include <core/CHIPCore.h>
+#include <support/ErrorMacros.h>
 #include <support/SafeInt.h>
 
 #include "TimeUtils.h"

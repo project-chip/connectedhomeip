@@ -37,7 +37,7 @@
 #include <core/CHIPCore.h>
 #include <core/CHIPEncoding.h>
 #include <core/CHIPTLV.h>
-#include <support/CodeUtils.h>
+#include <support/ReturnMacros.h>
 
 namespace chip {
 namespace ASN1 {

@@ -38,8 +38,8 @@
 #include <core/CHIPTLV.h>
 #include <credentials/CHIPCert.h>
 #include <protocols/Protocols.h>
-#include <support/CodeUtils.h>
 #include <support/DLLUtil.h>
+#include <support/ErrorMacros.h>
 
 namespace chip {
 namespace Credentials {

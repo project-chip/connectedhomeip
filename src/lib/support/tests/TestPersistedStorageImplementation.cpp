@@ -38,7 +38,7 @@
 #include <platform/PersistedStorage.h>
 #include <support/Base64.h>
 #include <support/CHIPArgParser.hpp>
-#include <support/CodeUtils.h>
+#include <support/ErrorMacros.h>
 
 #include "TestPersistedStorageImplementation.h"
 

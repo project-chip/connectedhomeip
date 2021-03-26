@@ -34,7 +34,6 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <support/Base64.h>
 #include <support/CHIPMem.h>
-#include <support/CodeUtils.h>
 #include <support/ScopedBuffer.h>
 #include <support/logging/CHIPLogging.h>
 

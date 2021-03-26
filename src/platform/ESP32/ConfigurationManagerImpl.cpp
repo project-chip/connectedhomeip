@@ -29,7 +29,7 @@
 #include <platform/ConfigurationManager.h>
 #include <platform/ESP32/ESP32Config.h>
 #include <platform/internal/GenericConfigurationManagerImpl.cpp>
-#include <support/CodeUtils.h>
+#include <support/ErrorMacros.h>
 
 #include "esp_wifi.h"
 #include "nvs.h"

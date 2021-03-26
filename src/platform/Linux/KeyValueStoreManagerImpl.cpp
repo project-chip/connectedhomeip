@@ -27,7 +27,7 @@
 #include <string.h>
 
 #include <platform/Linux/CHIPLinuxStorage.h>
-#include <support/CodeUtils.h>
+#include <support/ErrorMacros.h>
 #include <support/logging/CHIPLogging.h>
 
 namespace chip {

@@ -12,6 +12,8 @@
 #include <protocols/secure_channel/StatusReport.h>
 #include <support/BufferReader.h>
 #include <support/CodeUtils.h>
+#include <support/ErrorMacros.h>
+#include <support/ReturnMacros.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/SecureSessionMgr.h>
 

@@ -45,7 +45,6 @@
 
 #include <inet/IPPrefix.h>
 
-#include <support/CodeUtils.h>
 #include <support/UnitTestRegistration.h>
 
 using namespace chip;

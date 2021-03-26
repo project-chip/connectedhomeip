@@ -16,6 +16,7 @@
  */
 
 #include <core/CHIPEncoding.h>
+#include <support/ReturnMacros.h>
 #include <support/SafeInt.h>
 #include <transport/StorablePeerConnection.h>
 

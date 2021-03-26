@@ -32,7 +32,8 @@
 #include <core/CHIPSafeCasts.h>
 #include <protocols/Protocols.h>
 #include <support/CHIPMem.h>
-#include <support/CodeUtils.h>
+#include <support/ErrorMacros.h>
+#include <support/ReturnMacros.h>
 #include <support/SafeInt.h>
 #include <transport/SecureSessionMgr.h>
 

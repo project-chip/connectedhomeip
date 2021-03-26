@@ -30,7 +30,7 @@
 #include <lib/shell/shell.h>
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CHIPMem.h>
-#include <lib/support/CodeUtils.h>
+#include <lib/support/ErrorMacros.h>
 #include <platform/ThreadStackManager.h>
 
 #if CHIP_TARGET_STYLE_EMBEDDED

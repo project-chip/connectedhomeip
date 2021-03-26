@@ -35,7 +35,6 @@
 #include <vector>
 
 #include <support/CHIPMem.h>
-#include <support/CodeUtils.h>
 #include <support/UnitTestRegistration.h>
 #include <system/SystemPacketBuffer.h>
 

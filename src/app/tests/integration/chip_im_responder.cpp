@@ -33,6 +33,7 @@
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <support/ErrorMacros.h>
 #include <support/ErrorStr.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/PASESession.h>

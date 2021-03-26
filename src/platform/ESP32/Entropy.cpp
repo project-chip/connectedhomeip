@@ -25,6 +25,7 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include <support/ErrorMacros.h>
 #include <support/crypto/CHIPRNG.h>
 
 #include "esp_log.h"

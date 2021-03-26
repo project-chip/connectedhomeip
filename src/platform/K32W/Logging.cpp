@@ -4,7 +4,7 @@
 
 #include <core/CHIPConfig.h>
 #include <platform/CHIPDeviceConfig.h>
-#include <src/lib/support/CodeUtils.h>
+#include <support/DieMacros.h>
 #include <support/logging/Constants.h>
 
 #include <cstring>

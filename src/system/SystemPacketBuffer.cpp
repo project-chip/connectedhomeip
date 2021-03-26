@@ -35,7 +35,7 @@
 #include "SystemLayerPrivate.h"
 
 // Include local headers
-#include <support/CodeUtils.h>
+#include <support/DieMacros.h>
 #include <support/SafeInt.h>
 #include <support/logging/CHIPLogging.h>
 #include <system/SystemFaultInjection.h>
@@ -57,6 +57,7 @@
 
 #if CHIP_SYSTEM_PACKETBUFFER_STORE == CHIP_SYSTEM_PACKETBUFFER_STORE_CHIP_HEAP
 #include <support/CHIPMem.h>
+#include <support/DieMacros.h>
 #endif
 
 namespace chip {

@@ -32,7 +32,7 @@
 #include <messaging/ReliableMessageMgr.h>
 #include <protocols/Protocols.h>
 #include <protocols/secure_channel/Constants.h>
-#include <support/CodeUtils.h>
+#include <support/ErrorMacros.h>
 
 namespace chip {
 namespace Messaging {

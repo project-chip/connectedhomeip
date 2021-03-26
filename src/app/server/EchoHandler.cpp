@@ -23,6 +23,7 @@
 #include <app/server/EchoHandler.h>
 
 #include <protocols/echo/Echo.h>
+#include <support/ErrorMacros.h>
 #include <support/ErrorStr.h>
 
 namespace {

@@ -31,7 +31,7 @@
 #include <platform/ESP32/ESP32Utils.h>
 #include <support/CHIPMem.h>
 #include <support/CHIPMemString.h>
-#include <support/CodeUtils.h>
+#include <support/ErrorMacros.h>
 #include <support/logging/CHIPLogging.h>
 
 #include "nvs.h"

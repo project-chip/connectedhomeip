@@ -37,7 +37,6 @@
 #include <string.h>
 
 #include <inet/InetError.h>
-#include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
 #include <support/UnitTestRegistration.h>
 

@@ -23,7 +23,8 @@
  */
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <support/CodeUtils.h>
+#include <support/ErrorMacros.h>
+#include <support/ErrorStr.h>
 
 namespace chip {
 namespace DeviceLayer {

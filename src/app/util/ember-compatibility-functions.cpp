@@ -26,7 +26,6 @@
 #include <app/Command.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLV.h>
-#include <lib/support/CodeUtils.h>
 #include <util/util.h>
 
 namespace chip {

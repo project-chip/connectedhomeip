@@ -25,6 +25,8 @@
 
 #include "Echo.h"
 
+#include <support/DieMacros.h>
+
 namespace chip {
 namespace Protocols {
 namespace Echo {

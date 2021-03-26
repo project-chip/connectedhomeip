@@ -40,7 +40,7 @@
 
 #include <core/CHIPSafeCasts.h>
 #include <support/BufferWriter.h>
-#include <support/CodeUtils.h>
+#include <support/ErrorMacros.h>
 #include <support/SafeInt.h>
 #include <support/SafePointerCast.h>
 #include <support/logging/CHIPLogging.h>

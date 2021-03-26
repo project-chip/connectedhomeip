@@ -32,7 +32,6 @@
 #include <core/CHIPVendorIdentifiers.hpp>
 #include <platform/cc13x2_26x2/CC13X2_26X2Config.h>
 
-#include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 
 #pragma GCC diagnostic push

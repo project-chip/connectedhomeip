@@ -20,7 +20,9 @@
 
 #include <app/server/DataModelHandler.h>
 #include <controller/CHIPDeviceController.h>
+#include <core/CHIPError.h>
 #include <inet/InetInterface.h>
+#include <support/ErrorStr.h>
 #include <support/logging/CHIPLogging.h>
 
 #include <atomic>

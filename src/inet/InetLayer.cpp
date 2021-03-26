@@ -50,7 +50,7 @@
 
 #include <system/SystemTimer.h>
 
-#include <support/CodeUtils.h>
+#include <support/ErrorMacros.h>
 #include <support/logging/CHIPLogging.h>
 
 #include <errno.h>

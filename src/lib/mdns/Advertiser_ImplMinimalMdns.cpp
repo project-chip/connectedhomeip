@@ -30,8 +30,11 @@
 #include <mdns/minimal/responders/Srv.h>
 #include <mdns/minimal/responders/Txt.h>
 #include <support/CHIPMem.h>
+#include <support/ErrorStr.h>
 #include <support/RandUtils.h>
+#include <support/ReturnMacros.h>
 #include <support/StringBuilder.h>
+#include <support/logging/CHIPLogging.h>
 
 // Enable detailed mDNS logging for received queries
 #undef DETAIL_LOGGING

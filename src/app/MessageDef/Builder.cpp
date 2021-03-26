@@ -27,6 +27,9 @@
 #include <stdarg.h>
 #include <stdio.h>
 
+#include <support/ErrorMacros.h>
+#include <support/ErrorStr.h>
+
 using namespace chip;
 using namespace chip::TLV;
 

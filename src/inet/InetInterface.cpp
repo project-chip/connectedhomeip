@@ -33,8 +33,8 @@
 #include "InetLayerEvents.h"
 
 #include <support/CHIPMemString.h>
-#include <support/CodeUtils.h>
 #include <support/DLLUtil.h>
+#include <support/ErrorMacros.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/netif.h>

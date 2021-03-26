@@ -20,6 +20,7 @@
 
 #include <core/CHIPError.h>
 #include <support/CHIPMem.h>
+#include <support/ErrorMacros.h>
 
 #include "KeyValueStorageTest.h"
 #include <platform/KeyValueStoreManager.h>

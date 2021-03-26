@@ -19,6 +19,7 @@
 #include <controller/CHIPDeviceController.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/KeyValueStoreManager.h>
+#include <support/ErrorStr.h>
 #include <support/logging/CHIPLogging.h>
 
 #include "ChipThreadWork.h"

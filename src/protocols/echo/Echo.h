@@ -30,7 +30,6 @@
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <protocols/Protocols.h>
-#include <support/CodeUtils.h>
 #include <support/DLLUtil.h>
 #include <support/logging/CHIPLogging.h>
 

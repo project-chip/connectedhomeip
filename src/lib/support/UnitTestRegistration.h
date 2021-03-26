@@ -18,7 +18,7 @@
 #pragma once
 
 #include <core/CHIPError.h>
-#include <support/CodeUtils.h>
+#include <support/DieMacros.h>
 
 /**
  * @def CHIP_REGISTER_TEST_SUITE(FUNCTION)

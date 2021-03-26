@@ -25,7 +25,6 @@
 #pragma once
 
 #include <platform/ConnectivityManager.h>
-#include <support/CodeUtils.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 

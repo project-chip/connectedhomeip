@@ -37,7 +37,9 @@
 #include <inet/InetLayer.h>
 
 #include <support/CodeUtils.h>
+#include <support/ErrorMacros.h>
 #include <support/SafeInt.h>
+#include <support/logging/CHIPLogging.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #if INET_CONFIG_ENABLE_IPV4

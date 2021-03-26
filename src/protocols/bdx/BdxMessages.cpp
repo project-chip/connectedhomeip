@@ -25,7 +25,7 @@
 
 #include <support/BufferReader.h>
 #include <support/BufferWriter.h>
-#include <support/CodeUtils.h>
+#include <support/ErrorMacros.h>
 
 #include <limits>
 #include <utility>

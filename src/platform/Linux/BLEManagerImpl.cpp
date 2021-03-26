@@ -26,7 +26,8 @@
 #include <ble/CHIPBleServiceData.h>
 #include <new>
 #include <platform/internal/BLEManager.h>
-#include <support/CodeUtils.h>
+#include <support/ErrorMacros.h>
+#include <support/ErrorStr.h>
 #include <support/SafeInt.h>
 
 #include <cassert>

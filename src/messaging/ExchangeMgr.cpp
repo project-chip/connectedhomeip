@@ -39,8 +39,10 @@
 #include <messaging/ExchangeMgr.h>
 #include <protocols/Protocols.h>
 #include <support/CHIPFaultInjection.h>
-#include <support/CodeUtils.h>
+#include <support/ErrorMacros.h>
+#include <support/ErrorStr.h>
 #include <support/RandUtils.h>
+#include <support/ReturnMacros.h>
 #include <support/logging/CHIPLogging.h>
 
 using namespace chip::Encoding;

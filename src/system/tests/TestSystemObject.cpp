@@ -37,7 +37,6 @@
 
 #include <system/SystemLayer.h>
 
-#include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
 #include <support/UnitTestRegistration.h>
 

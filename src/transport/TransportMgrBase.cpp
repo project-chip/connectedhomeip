@@ -16,7 +16,6 @@
 
 #include <transport/TransportMgrBase.h>
 
-#include <support/CodeUtils.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/Base.h>
 

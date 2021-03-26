@@ -47,8 +47,9 @@
 #include <support/Base64.h>
 #include <support/CHIPArgParser.hpp>
 #include <support/CHIPMem.h>
-#include <support/CodeUtils.h>
+#include <support/ErrorMacros.h>
 #include <support/ErrorStr.h>
+#include <support/ReturnMacros.h>
 #include <support/SafeInt.h>
 #include <support/TimeUtils.h>
 #include <support/logging/CHIPLogging.h>

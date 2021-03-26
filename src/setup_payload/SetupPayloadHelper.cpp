@@ -22,7 +22,7 @@
 #include <fstream>
 #include <utility>
 
-#include <support/CodeUtils.h>
+#include <support/ErrorMacros.h>
 #include <support/logging/CHIPLogging.h>
 
 using namespace chip;

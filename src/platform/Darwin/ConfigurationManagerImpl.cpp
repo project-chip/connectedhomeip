@@ -30,7 +30,7 @@
 #include <platform/Darwin/PosixConfig.h>
 #include <platform/internal/GenericConfigurationManagerImpl.cpp>
 
-#include <support/CodeUtils.h>
+#include <support/ErrorMacros.h>
 #include <support/logging/CHIPLogging.h>
 
 namespace chip {

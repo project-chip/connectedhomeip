@@ -18,7 +18,7 @@
 
 #include "PrivateHeap.h"
 
-#include <support/CodeUtils.h>
+#include <support/DieMacros.h>
 #include <support/logging/CHIPLogging.h>
 
 namespace {

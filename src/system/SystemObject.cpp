@@ -29,7 +29,7 @@
 #include "SystemLayerPrivate.h"
 
 // Include local headers
-#include <support/CodeUtils.h>
+#include <support/DieMacros.h>
 #include <system/SystemLayer.h>
 
 // Include local headers

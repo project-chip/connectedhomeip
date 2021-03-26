@@ -34,10 +34,12 @@
 #include <core/CHIPTLVData.hpp>
 #include <core/CHIPTLVUtilities.hpp>
 #include <protocols/Protocols.h>
-#include <support/CodeUtils.h>
+#include <support/ErrorMacros.h>
 #include <support/RandUtils.h>
+#include <support/ReturnMacros.h>
 #include <support/SafeInt.h>
 #include <support/ScopedBuffer.h>
+#include <support/logging/CHIPLogging.h>
 
 namespace chip {
 

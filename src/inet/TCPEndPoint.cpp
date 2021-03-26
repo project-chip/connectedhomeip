@@ -37,7 +37,8 @@
 #include "InetFaultInjection.h"
 #include <inet/InetLayer.h>
 
-#include <support/CodeUtils.h>
+#include <support/DieMacros.h>
+#include <support/ErrorMacros.h>
 #include <support/SafeInt.h>
 #include <support/logging/CHIPLogging.h>
 #include <system/SystemFaultInjection.h>
