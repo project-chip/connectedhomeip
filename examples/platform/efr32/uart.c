@@ -84,7 +84,7 @@ static bool InitFifo(Fifo_t *fifo, uint8_t* pDataBuffer, uint16_t bufferSize)
 static uint16_t AvailableDataCount(Fifo_t *fifo)
 {
     uint16_t size = 0;
-    
+
     // if equal there is no data return 0 directly
     if (fifo->Tail != fifo->Head)
     {
@@ -98,7 +98,7 @@ static uint16_t AvailableDataCount(Fifo_t *fifo)
 /*
 *   @brief Get the available space in the fifo buffer to insert new data
 *   @param Ptr to the fifo
-*   @return Nb of free bytes left in te buffer 
+*   @return Nb of free bytes left in te buffer
 */
 static uint16_t RemainingSpace(Fifo_t *fifo)
 {
@@ -122,7 +122,7 @@ static void WriteToFifo(Fifo_t *fifo, uint8_t* pDataToWrite, uint16_t SizeToWrit
         if (SizeToWrite > nBytesBeforWrap)
         {
             // The number of bytes to write is bigger than the remaining bytes
-            // in the buffer, we have to wrap around 
+            // in the buffer, we have to wrap around
             memcpy(fifo->pBuffer + fifo->Tail, pDataToWrite, nBytesBeforWrap);
             memcpy(fifo->pBuffer, pDataToWrite + nBytesBeforWrap, SizeToWrite - nBytesBeforWrap);
         }
@@ -166,7 +166,7 @@ static uint8_t RetrieveFromFifo(Fifo_t *fifo, uint8_t* pData, uint16_t SizeToRea
 
 /*
 *   @brief Init the the UART for serial communication, Start DMA reception
-*          and init Fifo to handle the received data from this uart 
+*          and init Fifo to handle the received data from this uart
 *
 *   @Note This UART is used for pigweed rpc
 */
@@ -204,7 +204,7 @@ void uartConsoleInit(void)
     InitFifo(&sReceiveFifo , sRxFifoBuffer, MAX_BUFFER_SIZE);
 
     UARTDRV_InitUart(sUartHandle, &uartInit);
-    // Activate 2 dma queues to always have one active 
+    // Activate 2 dma queues to always have one active
     UARTDRV_Receive(sUartHandle, sRxDmaBuffer, MAX_DMA_BUFFER_SIZE, UART_rx_callback);
     UARTDRV_Receive(sUartHandle, sRxDmaBuffer2, MAX_DMA_BUFFER_SIZE, UART_rx_callback);
 }
@@ -247,7 +247,7 @@ int16_t uartConsoleWrite(const char * Buf, uint16_t BufLength)
     {
         return BufLength;
     }
-    
+
     return UART_CONSOLE_ERR;
 }
 
@@ -261,7 +261,7 @@ int16_t uartConsoleRead(char * Buf, uint16_t NbBytesToRead)
 {
     uint8_t *       data;
     UARTDRV_Count_t count, remaining;
-    
+
     if (Buf == NULL || NbBytesToRead < 1)
     {
         return UART_CONSOLE_ERR;
@@ -272,7 +272,7 @@ int16_t uartConsoleRead(char * Buf, uint16_t NbBytesToRead)
         // Not enough data available in the fifo for the read size request
         // If there is data available in dma buffer, get it now.
         CORE_ATOMIC_SECTION(UARTDRV_GetReceiveStatus(sUartHandle, &data, &count, &remaining);
-            if (count > lastCount) 
+            if (count > lastCount)
             {
                 WriteToFifo(&sReceiveFifo, data + lastCount, count - lastCount);
                 lastCount = count;
