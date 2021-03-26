@@ -104,7 +104,7 @@ efr32_executable("lock_app") {
 
   if (enable_heap_monitoring) {
     defines += [ "HEAP_MONITORING" ]
-    sources += ["${examples_plat_dir}/MemMonitoring.cpp",]
+    sources += [ "${examples_plat_dir}/MemMonitoring.cpp" ]
   }
 
   if (efr32_family == "efr32mg12") {

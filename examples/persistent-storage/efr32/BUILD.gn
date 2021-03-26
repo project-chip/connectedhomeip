@@ -41,7 +41,10 @@ efr32_sdk("sdk") {
     "${efr32_project_dir}/include/FreeRTOSConfig.h",
   ]
 
-  defines = [ "BOARD_ID=${efr32_board}", "SL_HEAP_SIZE=(10 * 1024)" ]
+  defines = [
+    "BOARD_ID=${efr32_board}",
+    "SL_HEAP_SIZE=(10 * 1024)",
+  ]
 }
 
 efr32_executable("persistent_storage") {
