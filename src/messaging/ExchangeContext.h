@@ -42,6 +42,7 @@ namespace Messaging {
 
 class ExchangeManager;
 class ExchangeContext;
+class ExchangeTransport;
 
 class ExchangeContextDeletor
 {
@@ -137,7 +138,7 @@ public:
      *                                                       protocol layer.
      */
     CHIP_ERROR HandleMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                             System::PacketBufferHandle msgBuf);
+                             const Transport::PeerAddress & peerAddress, System::PacketBufferHandle msgBuf);
 
     ExchangeDelegate * GetDelegate() const { return mDelegate; }
     void SetDelegate(ExchangeDelegate * delegate) { mDelegate = delegate; }
@@ -146,6 +147,8 @@ public:
     ExchangeManager * GetExchangeMgr() const { return mExchangeMgr; }
 
     ReliableMessageContext * GetReliableMessageContext() { return &mReliableMessageContext; };
+
+    const ExchangeTransport * GetTransport() const { return mTransport; }
 
     ExchangeACL * GetExchangeACL(Transport::AdminPairingTable & table)
     {
@@ -186,6 +189,8 @@ public:
 
     void SetResponseTimeout(Timeout timeout);
 
+    const Transport::PeerAddress & GetPeerAddress() const { return mPeerAddress; }
+
 private:
     enum class ExFlagValues : uint16_t
     {
@@ -198,6 +203,9 @@ private:
     ExchangeDelegate * mDelegate   = nullptr;
     ExchangeManager * mExchangeMgr = nullptr;
     ExchangeACL * mExchangeACL     = nullptr;
+    ExchangeTransport * mTransport = nullptr;
+
+    Transport::PeerAddress mPeerAddress;
 
     SecureSessionHandle mSecureSession; // The connection state
     uint16_t mExchangeId;               // Assigned exchange ID.

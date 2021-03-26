@@ -26,11 +26,11 @@
 
 #include <core/CHIPCore.h>
 #include <core/CHIPSafeCasts.h>
+#include <protocols/secure_channel/PASESession.h>
 #include <stdarg.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/UnitTestRegistration.h>
-#include <transport/PASESession.h>
 
 using namespace chip;
 

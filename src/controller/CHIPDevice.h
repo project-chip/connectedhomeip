@@ -32,10 +32,10 @@
 #include <app/util/basic-types.h>
 #include <core/CHIPCallback.h>
 #include <core/CHIPCore.h>
+#include <protocols/secure_channel/PASESession.h>
 #include <setup_payload/SetupPayload.h>
 #include <support/Base64.h>
 #include <support/DLLUtil.h>
-#include <transport/PASESession.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/MessageHeader.h>
@@ -57,9 +57,11 @@ using DeviceTransportMgr = TransportMgr<Transport::UDP /* IPv6 */
 
 struct ControllerDeviceInitParams
 {
-    DeviceTransportMgr * transportMgr = nullptr;
-    SecureSessionMgr * sessionMgr     = nullptr;
-    Inet::InetLayer * inetLayer       = nullptr;
+    DeviceTransportMgr * transportMgr        = nullptr;
+    SecureSessionMgr * sessionMgr            = nullptr;
+    Inet::InetLayer * inetLayer              = nullptr;
+    Messaging::ExchangeManager * exchangeMgr = nullptr;
+    Messaging::ExchangeDelegate * delegate   = nullptr;
 };
 
 class DLL_EXPORT Device
@@ -101,6 +103,7 @@ public:
      * @return CHIP_ERROR   CHIP_NO_ERROR on success, or corresponding error
      */
     CHIP_ERROR SendMessage(System::PacketBufferHandle message);
+    CHIP_ERROR SendMessage(System::PacketBufferHandle message, PayloadHeader & payloadHeader);
 
     /**
      * @brief
@@ -153,11 +156,13 @@ public:
      */
     void Init(ControllerDeviceInitParams params, uint16_t listenPort, Transport::AdminId admin)
     {
-        mTransportMgr   = params.transportMgr;
-        mSessionManager = params.sessionMgr;
-        mInetLayer      = params.inetLayer;
-        mListenPort     = listenPort;
-        mAdminId        = admin;
+        mTransportMgr     = params.transportMgr;
+        mSessionManager   = params.sessionMgr;
+        mInetLayer        = params.inetLayer;
+        mExchangeManager  = params.exchangeMgr;
+        mExchangeDelegate = params.delegate;
+        mListenPort       = listenPort;
+        mAdminId          = admin;
     }
 
     /**
@@ -237,12 +242,9 @@ public:
      *
      * @param[in] header        Reference to common packet header of the received message
      * @param[in] payloadHeader Reference to payload header in the message
-     * @param[in] session       A handle to the secure session
      * @param[in] msgBuf        The message buffer
-     * @param[in] mgr           Pointer to secure session manager which received the message
      */
-    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, SecureSessionHandle session,
-                           System::PacketBufferHandle msgBuf, SecureSessionMgr * mgr);
+    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, System::PacketBufferHandle msgBuf);
 
     /**
      * @brief
@@ -344,6 +346,9 @@ private:
 
     app::CommandSender * mCommandSender = nullptr;
 
+    Messaging::ExchangeManager * mExchangeManager   = nullptr;
+    Messaging::ExchangeDelegate * mExchangeDelegate = nullptr;
+
     SecureSessionHandle mSecureSession = {};
 
     uint8_t mSequenceNumber = 0;
@@ -369,8 +374,6 @@ private:
      * @param[out] didLoad   Were the secure session params loaded by the call to this function.
      */
     CHIP_ERROR LoadSecureSessionParametersIfNeeded(bool & didLoad);
-
-    CHIP_ERROR SendMessage(System::PacketBufferHandle message, PayloadHeader & payloadHeader);
 
     uint16_t mListenPort;
 

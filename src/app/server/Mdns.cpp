@@ -23,10 +23,10 @@
 #include <mdns/Advertiser.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ConfigurationManager.h>
+#include <protocols/secure_channel/PASESession.h>
 #include <support/Span.h>
 #include <support/logging/CHIPLogging.h>
 #include <transport/AdminPairingTable.h>
-#include <transport/PASESession.h>
 
 #include "Server.h"
 

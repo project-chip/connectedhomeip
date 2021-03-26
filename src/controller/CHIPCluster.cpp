@@ -49,10 +49,13 @@ CHIP_ERROR ClusterBase::SendCommand(uint8_t seqNum, chip::System::PacketBufferHa
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+    PayloadHeader header;
+
     VerifyOrExit(mDevice != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(!payload.IsNull(), err = CHIP_ERROR_INTERNAL);
 
-    err = mDevice->SendMessage(std::move(payload));
+    header.SetMessageType(Protocols::InteractionModel::MsgType::WriteRequest);
+    err = mDevice->SendMessage(std::move(payload), header);
     SuccessOrExit(err);
 
     if (onSuccessCallback != nullptr || onFailureCallback != nullptr)

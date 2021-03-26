@@ -60,6 +60,8 @@ CHIP_ERROR Device::SendMessage(System::PacketBufferHandle buffer, PayloadHeader 
     System::PacketBufferHandle resend;
     bool loadedSecureSession = false;
 
+    VerifyOrReturnError(mExchangeManager != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mExchangeDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mSessionManager != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(!buffer.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -75,7 +77,12 @@ CHIP_ERROR Device::SendMessage(System::PacketBufferHandle buffer, PayloadHeader 
         resend = buffer.CloneData();
     }
 
-    CHIP_ERROR err = mSessionManager->SendMessage(mSecureSession, payloadHeader, std::move(buffer));
+    Messaging::ExchangeContext * ctxt = mExchangeManager->NewContext(mSecureSession, mExchangeDelegate);
+    VerifyOrReturnError(ctxt != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    CHIP_ERROR err = ctxt->SendMessage(payloadHeader.GetProtocolID(), payloadHeader.GetMessageType(), std::move(buffer),
+                                       Messaging::SendMessageFlags::kNoAutoRequestAck);
+    ctxt->Release();
 
     buffer = nullptr;
     ChipLogDetail(Controller, "SendMessage returned %d", err);
@@ -86,14 +93,19 @@ CHIP_ERROR Device::SendMessage(System::PacketBufferHandle buffer, PayloadHeader 
     {
         mState = ConnectionState::NotConnected;
 
-        ReturnErrorOnFailure(LoadSecureSessionParameters(ResetTransport::kYes));
+        err = LoadSecureSessionParameters(ResetTransport::kYes);
+        SuccessOrExit(err);
 
-        err = mSessionManager->SendMessage(mSecureSession, std::move(resend));
+        ctxt = mExchangeManager->NewContext(mSecureSession, mExchangeDelegate);
+        err  = ctxt->SendMessage(Protocols::InteractionModel::MsgType::WriteRequest, std::move(resend),
+                                Messaging::SendMessageFlags::kNoAutoRequestAck);
+        ctxt->Release();
         ChipLogDetail(Controller, "Re-SendMessage returned %d", err);
-        ReturnErrorOnFailure(err);
+        SuccessOrExit(err);
     }
 
-    return CHIP_NO_ERROR;
+exit:
+    return err;
 }
 
 CHIP_ERROR Device::LoadSecureSessionParametersIfNeeded(bool & didLoad)
@@ -235,8 +247,7 @@ void Device::OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr *
     mSecureSession = SecureSessionHandle{};
 }
 
-void Device::OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, SecureSessionHandle session,
-                               System::PacketBufferHandle msgBuf, SecureSessionMgr * mgr)
+void Device::OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, System::PacketBufferHandle msgBuf)
 {
     if (mState == ConnectionState::SecureConnected)
     {
@@ -335,6 +346,11 @@ CHIP_ERROR Device::LoadSecureSessionParameters(ResetTransport resetNeeded)
     err = mSessionManager->NewPairing(Optional<Transport::PeerAddress>::Value(mDeviceUdpAddress), mDeviceId, &pairingSession,
                                       SecureSessionMgr::PairingDirection::kInitiator, mAdminId);
     SuccessOrExit(err);
+
+    err = mSessionManager->GetSessionHandle(mDeviceId, pairingSession.GetPeerKeyId(), mSecureSession);
+    SuccessOrExit(err);
+
+    mState = ConnectionState::SecureConnected;
 
 exit:
 

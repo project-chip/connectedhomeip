@@ -23,7 +23,11 @@
 
 #pragma once
 
+#include <messaging/ApplicationExchangeTransport.h>
+#include <messaging/ExchangeTransport.h>
+#include <support/CHIPMem.h>
 #include <system/SystemPacketBuffer.h>
+#include <transport/SecureSessionMgr.h>
 #include <transport/raw/MessageHeader.h>
 
 namespace chip {
@@ -72,6 +76,21 @@ public:
      *  @param[in]    ec            A pointer to the ExchangeContext object.
      */
     virtual void OnExchangeClosing(ExchangeContext * ec) {}
+
+    virtual ExchangeTransport * AllocTransport(ReliableMessageMgr * rmMgr, SecureSessionMgr * sessionMgr)
+    {
+        ApplicationExchangeTransport * transport = chip::Platform::New<Messaging::ApplicationExchangeTransport>();
+        transport->Init(rmMgr, sessionMgr);
+        return transport;
+    }
+
+    virtual void ReleaseTransport(ExchangeTransport * transport)
+    {
+        if (transport != nullptr)
+        {
+            chip::Platform::Delete(transport);
+        }
+    };
 };
 
 } // namespace Messaging

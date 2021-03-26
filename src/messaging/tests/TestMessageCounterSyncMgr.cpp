@@ -82,7 +82,8 @@ class TestExchangeMgr : public SecureSessionMgrDelegate
 {
 public:
     void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, SecureSessionHandle session,
-                           System::PacketBufferHandle msgBuf, SecureSessionMgr * mgr) override
+                           const Transport::PeerAddress & source, System::PacketBufferHandle msgBuf,
+                           SecureSessionMgr * mgr) override
     {
         NL_TEST_ASSERT(mSuite, header.GetSourceNodeId() == Optional<NodeId>::Value(kSourceNodeId));
         NL_TEST_ASSERT(mSuite, header.GetDestinationNodeId() == Optional<NodeId>::Value(kDestinationNodeId));
@@ -198,7 +199,7 @@ void CheckReceiveMsgCounterSyncReq(nlTestSuite * inSuite, void * inContext)
                                                    SecureSessionMgr::PairingDirection::kResponder, 1);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    SecureSessionHandle session(kDestinationNodeId, 0x4000, 0);
+    SecureSessionHandle session(kDestinationNodeId, kTestPeerGroupKeyId, 0);
 
     err = sm->SendMsgCounterSyncReq(session);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);

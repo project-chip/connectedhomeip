@@ -19,6 +19,7 @@
 
 #include <app/server/AppDelegate.h>
 #include <inet/InetConfig.h>
+#include <messaging/ExchangeMgr.h>
 #include <transport/AdminPairingTable.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/UDP.h>
@@ -48,6 +49,8 @@ enum class ResetAdmins
     kYes,
     kNo,
 };
+
+extern Messaging::ExchangeManager & ExchangeManager();
 
 } // namespace chip
 

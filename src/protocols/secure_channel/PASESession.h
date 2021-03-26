@@ -27,9 +27,14 @@
 #pragma once
 
 #include <crypto/CHIPCryptoPAL.h>
+#include <messaging/ExchangeContext.h>
+#include <messaging/ExchangeDelegate.h>
+#include <messaging/ExchangeTransport.h>
 #include <protocols/secure_channel/Constants.h>
+#include <protocols/secure_channel/SessionEstablishmentTransport.h>
 #include <support/Base64.h>
 #include <system/SystemPacketBuffer.h>
+#include <transport/PairingSession.h>
 #include <transport/PeerConnectionState.h>
 #include <transport/SecureSession.h>
 #include <transport/SessionEstablishmentDelegate.h>
@@ -60,7 +65,7 @@ struct PASESessionSerializable
 
 typedef uint8_t PASEVerifier[2][kSpake2p_WS_Length];
 
-class DLL_EXPORT PASESession
+class DLL_EXPORT PASESession : public Messaging::ExchangeDelegate, public PairingSession
 {
 public:
     PASESession();
@@ -85,7 +90,8 @@ public:
      * @return CHIP_ERROR     The result of initialization
      */
     CHIP_ERROR WaitForPairing(uint32_t mySetUpPINCode, uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen,
-                              uint16_t myKeyId, SessionEstablishmentDelegate * delegate);
+                              uint16_t myKeyId, Messaging::ExchangeManager * exchangeMgr,
+                              Messaging::SessionEstablishmentTransport * transport, SessionEstablishmentDelegate * delegate);
 
     /**
      * @brief
@@ -97,7 +103,8 @@ public:
      *
      * @return CHIP_ERROR     The result of initialization
      */
-    CHIP_ERROR WaitForPairing(const PASEVerifier & verifier, uint16_t myKeyId, SessionEstablishmentDelegate * delegate);
+    CHIP_ERROR WaitForPairing(const PASEVerifier & verifier, uint16_t myKeyId, Messaging::ExchangeManager * exchangeMgr,
+                              Messaging::SessionEstablishmentTransport * transport, SessionEstablishmentDelegate * delegate);
 
     /**
      * @brief
@@ -111,6 +118,7 @@ public:
      * @return CHIP_ERROR      The result of initialization
      */
     CHIP_ERROR Pair(const Transport::PeerAddress peerAddress, uint32_t peerSetUpPINCode, uint16_t myKeyId,
+                    Messaging::ExchangeManager * exchangeMgr, Messaging::SessionEstablishmentTransport * transport,
                     SessionEstablishmentDelegate * delegate);
 
     /**
@@ -125,6 +133,7 @@ public:
      * @return CHIP_ERROR      The result of initialization
      */
     CHIP_ERROR Pair(const Transport::PeerAddress peerAddress, const PASEVerifier & verifier, uint16_t myKeyId,
+                    Messaging::ExchangeManager * exchangeMgr, Messaging::SessionEstablishmentTransport * transport,
                     SessionEstablishmentDelegate * delegate);
 
     /**
@@ -150,7 +159,7 @@ public:
      *                    initialized once pairing is complete
      * @return CHIP_ERROR The result of session derivation
      */
-    CHIP_ERROR DeriveSecureSession(const uint8_t * info, size_t info_len, SecureSession & session);
+    CHIP_ERROR DeriveSecureSession(const uint8_t * info, size_t info_len, SecureSession & session) override;
 
     /**
      * @brief
@@ -170,7 +179,7 @@ public:
      *
      * @return uint16_t The associated peer key id
      */
-    uint16_t GetPeerKeyId() { return mConnectionState.GetPeerKeyID(); }
+    uint16_t GetPeerKeyId() override { return mConnectionState.GetPeerKeyID(); }
 
     /**
      * @brief
@@ -178,7 +187,11 @@ public:
      *
      * @return uint16_t The assocated local key id
      */
-    uint16_t GetLocalKeyId() { return mConnectionState.GetLocalKeyID(); }
+    uint16_t GetLocalKeyId() override { return mConnectionState.GetLocalKeyID(); }
+
+    const char * GetI2RSessionInfo() const override { return kSpake2pI2RSessionInfo; }
+
+    const char * GetR2ISessionInfo() const override { return kSpake2pR2ISessionInfo; }
 
     Transport::PeerConnectionState & PeerConnection() { return mConnectionState; }
 
@@ -210,6 +223,16 @@ public:
      **/
     void Clear();
 
+    //// ExchangeDelegate Implementation ////
+    void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+                           System::PacketBufferHandle payload) override;
+    void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
+    Messaging::ExchangeTransport * AllocTransport(Messaging::ReliableMessageMgr * rmMgr, SecureSessionMgr * sessionMgr) override
+    {
+        return mTransport;
+    }
+    void ReleaseTransport(Messaging::ExchangeTransport * transport) override {}
+
 private:
     enum Spake2pErrorType : uint8_t
     {
@@ -217,7 +240,8 @@ private:
         kUnexpected             = 0xff,
     };
 
-    CHIP_ERROR Init(uint16_t myKeyId, uint32_t setupCode, SessionEstablishmentDelegate * delegate);
+    CHIP_ERROR Init(uint16_t myKeyId, uint32_t setupCode, Messaging::ExchangeManager * exchangeMgr,
+                    Messaging::SessionEstablishmentTransport * transport, SessionEstablishmentDelegate * delegate);
 
     static CHIP_ERROR ComputePASEVerifier(uint32_t mySetUpPINCode, uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen,
                                           PASEVerifier & verifier);
@@ -261,6 +285,9 @@ private:
     uint16_t mSaltLength     = 0;
     uint8_t * mSalt          = nullptr;
 
+    Messaging::ExchangeContext * mExchangeCtxt            = nullptr;
+    Messaging::ExchangeManager * mExchangeMgr             = nullptr;
+    Messaging::SessionEstablishmentTransport * mTransport = nullptr;
     struct Spake2pErrorMsg
     {
         Spake2pErrorType error;

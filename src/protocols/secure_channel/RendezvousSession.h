@@ -23,12 +23,14 @@
 #pragma once
 
 #include <core/CHIPCore.h>
+#include <messaging/ExchangeMgr.h>
 #include <protocols/Protocols.h>
+#include <protocols/secure_channel/NetworkProvisioning.h>
+#include <protocols/secure_channel/PASESession.h>
+#include <protocols/secure_channel/RendezvousParameters.h>
+#include <protocols/secure_channel/SessionEstablishmentTransport.h>
 #include <support/BufferWriter.h>
 #include <transport/AdminPairingTable.h>
-#include <transport/NetworkProvisioning.h>
-#include <transport/PASESession.h>
-#include <transport/RendezvousParameters.h>
 #include <transport/RendezvousSessionDelegate.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/MessageHeader.h>
@@ -92,8 +94,8 @@ public:
      * @param admin        Pointer to a device administrator info that will be filled up on successful pairing
      * @ return CHIP_ERROR  The result of the initialization
      */
-    CHIP_ERROR Init(const RendezvousParameters & params, TransportMgrBase * transportMgr, SecureSessionMgr * sessionMgr,
-                    Transport::AdminPairingInfo * admin);
+    CHIP_ERROR Init(const RendezvousParameters & params, Messaging::ExchangeManager * exchangeManager,
+                    TransportMgrBase * transportMgr, SecureSessionMgr * sessionMgr, Transport::AdminPairingInfo * admin);
 
     /**
      * @brief
@@ -107,17 +109,12 @@ public:
     Optional<NodeId> GetRemoteNodeId() const { return mParams.GetRemoteNodeId(); }
 
     //////////// SessionEstablishmentDelegate Implementation ///////////////
-    CHIP_ERROR SendSessionEstablishmentMessage(const PacketHeader & header, const Transport::PeerAddress & peerAddress,
-                                               System::PacketBufferHandle msgBuf) override;
-    void OnSessionEstablishmentError(CHIP_ERROR err) override;
     void OnSessionEstablished() override;
 
     //////////// RendezvousSessionDelegate Implementation ///////////////
     void OnRendezvousConnectionOpened() override;
     void OnRendezvousConnectionClosed() override;
     void OnRendezvousError(CHIP_ERROR err) override;
-    void OnRendezvousMessageReceived(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
-                                     System::PacketBufferHandle buffer) override;
 
     //////////// RendezvousDeviceCredentialsDelegate Implementation ///////////////
     void SendNetworkCredentials(const char * ssid, const char * passwd) override;
@@ -125,7 +122,6 @@ public:
     void SendOperationalCredentials() override;
 
     //////////// NetworkProvisioningDelegate Implementation ///////////////
-    CHIP_ERROR SendSecureMessage(Protocols::Id protocol, uint8_t msgType, System::PacketBufferHandle msgBug) override;
     void OnNetworkProvisioningError(CHIP_ERROR error) override;
     void OnNetworkProvisioningComplete() override;
 
@@ -148,10 +144,7 @@ public:
     void SetNextKeyId(uint16_t id) { mNextKeyId = id; }
 
 private:
-    CHIP_ERROR HandlePairingMessage(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
-                                    System::PacketBufferHandle msgBuf);
     CHIP_ERROR Pair(uint32_t setupPINCode);
-    CHIP_ERROR Pair(const PASEVerifier & verifier);
     CHIP_ERROR WaitForPairing(uint32_t setupPINCode);
     CHIP_ERROR WaitForPairing(const PASEVerifier & verifier);
 
@@ -165,9 +158,12 @@ private:
     NetworkProvisioning mNetworkProvision;
     Transport::PeerAddress mPeerAddress; // Current peer address we are doing rendezvous with.
     TransportMgrBase * mTransportMgr;
-    uint16_t mNextKeyId                         = 0;
-    SecureSessionMgr * mSecureSessionMgr        = nullptr;
-    SecureSessionHandle * mPairingSessionHandle = nullptr;
+    uint16_t mNextKeyId                           = 0;
+    SecureSessionMgr * mSecureSessionMgr          = nullptr;
+    SecureSessionHandle * mPairingSessionHandle   = nullptr;
+    Messaging::ExchangeManager * mExchangeManager = nullptr;
+
+    Messaging::SessionEstablishmentTransport mExchangeTransport;
 
     Transport::AdminPairingInfo * mAdmin = nullptr;
 

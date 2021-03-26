@@ -24,6 +24,7 @@
 #include <app/server/EchoHandler.h>
 #include <app/server/RendezvousServer.h>
 #include <app/server/SessionManager.h>
+#include <app/server/StorablePeerConnection.h>
 
 #include <ble/BLEEndPoint.h>
 #include <core/CHIPPersistentStorageDelegate.h>
@@ -41,7 +42,6 @@
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
 #include <transport/SecureSessionMgr.h>
-#include <transport/StorablePeerConnection.h>
 
 #include "Mdns.h"
 
@@ -290,6 +290,7 @@ private:
 DemoTransportMgr gTransports;
 SecureSessionMgr gSessions;
 RendezvousServer gRendezvousServer;
+Messaging::ExchangeManager gExchangeMgr;
 
 ServerRendezvousAdvertisementDelegate gAdvDelegate;
 
@@ -313,27 +314,21 @@ static CHIP_ERROR OpenPairingWindowUsingVerifier(uint16_t discriminator, PASEVer
     VerifyOrReturnError(adminInfo != nullptr, CHIP_ERROR_NO_MEMORY);
     gNextAvailableAdminId++;
 
-    return gRendezvousServer.WaitForPairing(std::move(params), &gTransports, &gSessions, adminInfo);
+    return gRendezvousServer.WaitForPairing(std::move(params), &gExchangeMgr, &gTransports, &gSessions, adminInfo);
 }
 
-class ServerCallback : public SecureSessionMgrDelegate
+class ServerCallback : public Messaging::ExchangeDelegate
 {
 public:
-    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, SecureSessionHandle session,
-                           System::PacketBufferHandle buffer, SecureSessionMgr * mgr) override
+    void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & header, const PayloadHeader & payloadHeader,
+                           System::PacketBufferHandle buffer) override
     {
-        auto state = mgr->GetPeerConnectionState(session);
-        char src_addr[PeerAddress::kMaxToStringSize];
 
         // as soon as a client connects, assume it is connected
         VerifyOrExit(!buffer.IsNull(), ChipLogProgress(AppServer, "Received data but couldn't process it..."));
         VerifyOrExit(header.GetSourceNodeId().HasValue(), ChipLogProgress(AppServer, "Unknown source for received message"));
 
-        VerifyOrExit(state->GetPeerNodeId() != kUndefinedNodeId, ChipLogProgress(AppServer, "Unknown source for received message"));
-
-        state->GetPeerAddress().ToString(src_addr);
-
-        ChipLogProgress(AppServer, "Packet received from %s: %u bytes", src_addr, buffer->DataLength());
+        ChipLogProgress(AppServer, "Packet received: %u bytes", buffer->DataLength());
 
         // TODO: This code is temporary, and must be updated to use the Cluster API.
         // Issue: https://github.com/project-chip/connectedhomeip/issues/4725
@@ -383,22 +378,14 @@ public:
             HandleDataModelMessage(header.GetSourceNodeId().Value(), std::move(buffer));
         }
 
-    exit:;
-    }
-
-    void OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source, SecureSessionMgr * mgr) override
-    {
-        ChipLogProgress(AppServer, "Packet received error: %s", ErrorStr(error));
-        if (mDelegate != nullptr)
+    exit:
+        if (ec != nullptr)
         {
-            mDelegate->OnReceiveError();
+            ec->Release();
         }
     }
 
-    void OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr) override
-    {
-        ChipLogProgress(AppServer, "Received a new connection.");
-    }
+    void OnResponseTimeout(Messaging::ExchangeContext * ec) override {}
 
     void SetDelegate(AppDelegate * delegate) { mDelegate = delegate; }
 
@@ -406,9 +393,6 @@ private:
     AppDelegate * mDelegate = nullptr;
 };
 
-#if CHIP_ENABLE_INTERACTION_MODEL || defined(CHIP_APP_USE_ECHO)
-Messaging::ExchangeManager gExchangeMgr;
-#endif
 ServerCallback gCallbacks;
 SecurePairingUsingTestSecret gTestPairing;
 
@@ -417,6 +401,11 @@ SecurePairingUsingTestSecret gTestPairing;
 SecureSessionMgr & chip::SessionManager()
 {
     return gSessions;
+}
+
+Messaging::ExchangeManager & chip::ExchangeManager()
+{
+    return gExchangeMgr;
 }
 
 CHIP_ERROR OpenDefaultPairingWindow(ResetAdmins resetAdmins)
@@ -451,7 +440,7 @@ CHIP_ERROR OpenDefaultPairingWindow(ResetAdmins resetAdmins)
     VerifyOrReturnError(adminInfo != nullptr, CHIP_ERROR_NO_MEMORY);
     gNextAvailableAdminId++;
 
-    return gRendezvousServer.WaitForPairing(std::move(params), &gTransports, &gSessions, adminInfo);
+    return gRendezvousServer.WaitForPairing(std::move(params), &gExchangeMgr, &gTransports, &gSessions, adminInfo);
 }
 
 // The function will initialize datamodel handler and then start the server
@@ -482,15 +471,18 @@ void InitServer(AppDelegate * delegate)
     err = gSessions.Init(chip::kTestDeviceNodeId, &DeviceLayer::SystemLayer, &gTransports, &gAdminPairings);
     SuccessOrExit(err);
 
-#if CHIP_ENABLE_INTERACTION_MODEL || defined(CHIP_APP_USE_ECHO)
     err = gExchangeMgr.Init(&gSessions);
     SuccessOrExit(err);
-#else
-    gSessions.SetDelegate(&gCallbacks);
-#endif
 
-#if CHIP_ENABLE_INTERACTION_MODEL
+#if CHIP_ENABLE_INTERACTION_MODEL || defined(CHIP_APP_USE_ECHO)
     err = chip::app::InteractionModelEngine::GetInstance()->Init(&gExchangeMgr, nullptr);
+    SuccessOrExit(err);
+#else
+    err = gExchangeMgr.RegisterUnsolicitedMessageHandlerForProtocol(Protocols::InteractionModel::Id, &gCallbacks);
+    SuccessOrExit(err);
+
+    // TODO: This is needed for time being, as ServiceProvisioning is used for opening pairing window.
+    err = gExchangeMgr.RegisterUnsolicitedMessageHandlerForProtocol(Protocols::ServiceProvisioning::Id, &gCallbacks);
     SuccessOrExit(err);
 #endif
 

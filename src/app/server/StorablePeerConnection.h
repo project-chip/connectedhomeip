@@ -18,7 +18,7 @@
 #pragma once
 
 #include <core/CHIPPersistentStorageDelegate.h>
-#include <transport/PASESession.h>
+#include <protocols/secure_channel/PASESession.h>
 
 namespace chip {
 

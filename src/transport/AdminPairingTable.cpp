@@ -119,6 +119,8 @@ AdminPairingInfo * AdminPairingTable::FindAdmin(AdminId adminId)
 {
     for (size_t i = 0; i < CHIP_CONFIG_MAX_DEVICE_ADMINS; i++)
     {
+        ChipLogProgress(Inet, "AdminPairingTable::FindAdmin %d, current %d, %d", adminId, mStates[i].IsInitialized(),
+                        mStates[i].GetAdminId());
         if (mStates[i].IsInitialized() && mStates[i].GetAdminId() == adminId)
         {
             return &mStates[i];

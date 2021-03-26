@@ -33,7 +33,7 @@
 #include <support/CodeUtils.h>
 #include <support/DLLUtil.h>
 #include <transport/AdminPairingTable.h>
-#include <transport/PASESession.h>
+#include <transport/PairingSession.h>
 #include <transport/PeerConnections.h>
 #include <transport/SecureSession.h>
 #include <transport/TransportMgr.h>
@@ -166,11 +166,13 @@ public:
      * @param packetHeader  The message header
      * @param payloadHeader The payload header
      * @param session       The handle to the secure session
+     * @param source        The sender's address
      * @param msgBuf        The received message
      * @param mgr           A pointer to the SecureSessionMgr
      */
     virtual void OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                                   SecureSessionHandle session, System::PacketBufferHandle msgBuf, SecureSessionMgr * mgr)
+                                   SecureSessionHandle session, const Transport::PeerAddress & source,
+                                   System::PacketBufferHandle msgBuf, SecureSessionMgr * mgr)
     {}
 
     /**
@@ -236,6 +238,8 @@ public:
 
     Transport::PeerConnectionState * GetPeerConnectionState(SecureSessionHandle session);
 
+    CHIP_ERROR GetSessionHandle(NodeId peerNodeId, uint16_t peerKeyId, SecureSessionHandle & session);
+
     /**
      * @brief
      *   Set the callback object.
@@ -254,7 +258,7 @@ public:
      *   establishes the security keys for secure communication with the
      *   peer node.
      */
-    CHIP_ERROR NewPairing(const Optional<Transport::PeerAddress> & peerAddr, NodeId peerNodeId, PASESession * pairing,
+    CHIP_ERROR NewPairing(const Optional<Transport::PeerAddress> & peerAddr, NodeId peerNodeId, PairingSession * pairing,
                           PairingDirection direction, Transport::AdminId admin, Transport::Base * transport = nullptr);
 
     /**
@@ -358,6 +362,11 @@ private:
      * Callback for timer expiry check
      */
     static void ExpiryTimerCallback(System::Layer * layer, void * param, System::Error error);
+
+    void SecureMessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
+                               System::PacketBufferHandle msg);
+    void MessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
+                         System::PacketBufferHandle msg);
 };
 
 namespace MessagePacketBuffer {

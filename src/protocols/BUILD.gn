@@ -21,6 +21,15 @@ static_library("protocols") {
     "echo/Echo.h",
     "echo/EchoClient.cpp",
     "echo/EchoServer.cpp",
+    "secure_channel/NetworkProvisioning.cpp",
+    "secure_channel/NetworkProvisioning.h",
+    "secure_channel/PASESession.cpp",
+    "secure_channel/PASESession.h",
+    "secure_channel/RendezvousParameters.h",
+    "secure_channel/RendezvousSession.cpp",
+    "secure_channel/RendezvousSession.h",
+    "secure_channel/SessionEstablishmentTransport.cpp",
+    "secure_channel/SessionEstablishmentTransport.h",
   ]
 
   cflags = [ "-Wconversion" ]

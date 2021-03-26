@@ -76,7 +76,7 @@ public:
     AccessControlList & GetACL() { return mACL; }
     void SetACL(const AccessControlList & acl) { mACL = acl; }
 
-    bool IsInitialized() const { return (mNodeId != kUndefinedNodeId && mAdmin != kUndefinedAdminId); }
+    bool IsInitialized() const { return (/*mNodeId != kUndefinedNodeId &&*/ mAdmin != kUndefinedAdminId); }
 
     /**
      *  Reset the state to a completely uninitialized status.

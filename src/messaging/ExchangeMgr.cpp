@@ -85,8 +85,6 @@ CHIP_ERROR ExchangeManager::Init(SecureSessionMgr * sessionMgr)
         handler.Reset();
     }
 
-    mSessionMgr->GetTransportManager()->SetRendezvousSession(this);
-
     sessionMgr->SetDelegate(this);
 
     mReliableMessageMgr.Init(sessionMgr->SystemLayer(), sessionMgr);
@@ -225,11 +223,12 @@ bool ExchangeManager::IsMsgCounterSyncMessage(const PayloadHeader & payloadHeade
 void ExchangeManager::HandleGroupMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                                                  const SecureSessionHandle & session, System::PacketBufferHandle msgBuf)
 {
-    OnMessageReceived(packetHeader, payloadHeader, session, std::move(msgBuf), nullptr);
+    OnMessageReceived(packetHeader, payloadHeader, session, Transport::PeerAddress::Uninitialized(), std::move(msgBuf), nullptr);
 }
 
 void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                                        SecureSessionHandle session, System::PacketBufferHandle msgBuf, SecureSessionMgr * msgLayer)
+                                        SecureSessionHandle session, const Transport::PeerAddress & source,
+                                        System::PacketBufferHandle msgBuf, SecureSessionMgr * msgLayer)
 {
     CHIP_ERROR err                          = CHIP_NO_ERROR;
     UnsolicitedMessageHandler * umh         = nullptr;
@@ -278,7 +277,7 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
             }
 
             // Matched ExchangeContext; send to message handler.
-            ec.HandleMessage(packetHeader, payloadHeader, std::move(msgBuf));
+            ec.HandleMessage(packetHeader, payloadHeader, source, std::move(msgBuf));
 
             ExitNow(err = CHIP_NO_ERROR);
         }
@@ -330,6 +329,7 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
         {
             // If rcvd msg is from initiator then this exchange is created as not Initiator.
             // If rcvd msg is not from initiator then this exchange is created as Initiator.
+            // TODO: Figure out which channel to use for the received message
             ec = AllocContext(payloadHeader.GetExchangeID(), session, !payloadHeader.IsInitiator(), nullptr);
         }
         else
@@ -342,7 +342,7 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
         ChipLogProgress(ExchangeManager, "ec pos: %d, id: %d, Delegate: 0x%x", ec - mContextPool.begin(), ec->GetExchangeId(),
                         ec->GetDelegate());
 
-        ec->HandleMessage(packetHeader, payloadHeader, std::move(msgBuf));
+        ec->HandleMessage(packetHeader, payloadHeader, source, std::move(msgBuf));
 
         // Close exchange if it was created only to send ack for a duplicate message.
         if (sendAckAndCloseExchange)

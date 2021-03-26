@@ -33,10 +33,10 @@
 #include <core/CHIPPersistentStorageDelegate.h>
 #include <core/CHIPTLV.h>
 #include <messaging/ExchangeMgr.h>
+#include <protocols/secure_channel/RendezvousSession.h>
 #include <support/DLLUtil.h>
 #include <support/SerializableIntegerSet.h>
 #include <transport/AdminPairingTable.h>
-#include <transport/RendezvousSession.h>
 #include <transport/RendezvousSessionDelegate.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/TransportMgr.h>
@@ -113,7 +113,7 @@ public:
  *   and device pairing information for individual devices). Alternatively, this class can retrieve the
  *   relevant information when the application tries to communicate with the device
  */
-class DLL_EXPORT DeviceController : public SecureSessionMgrDelegate, public PersistentStorageResultDelegate
+class DLL_EXPORT DeviceController : public Messaging::ExchangeDelegate, public PersistentStorageResultDelegate
 {
 public:
     DeviceController();
@@ -217,12 +217,10 @@ protected:
     Transport::AdminPairingTable mAdmins;
 
 private:
-    //////////// SecureSessionMgrDelegate Implementation ///////////////
-    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, SecureSessionHandle session,
-                           System::PacketBufferHandle msgBuf, SecureSessionMgr * mgr) override;
-
-    void OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr) override;
-    void OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * mgr) override;
+    //////////// ExchangeDelegate Implementation ///////////////
+    void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & header, const PayloadHeader & payloadHeader,
+                           System::PacketBufferHandle msgBuf) override;
+    void OnResponseTimeout(Messaging::ExchangeContext * ec) override {}
 
     //////////// PersistentStorageResultDelegate Implementation ///////////////
     void OnPersistentStorageStatus(const char * key, Operation op, CHIP_ERROR err) override;
