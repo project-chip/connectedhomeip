@@ -259,7 +259,6 @@ public:
      */
     AttributePathHandle GetNextChild(AttributePathHandle aParentId, AttributePathHandle aChildHandle) const;
 
-
     /**
      * Returns the cluster id of the associated Cluster.
      *
