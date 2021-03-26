@@ -328,7 +328,7 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
 
     // If we reached here, the button was held past FACTORY_RESET_TRIGGER_TIMEOUT,
     // initiate factory reset
-    if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_StartThread)
+    if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_StartBleAdv)
     {
         EFR32_LOG("Factory Reset Triggered. Release button within %ums to cancel.", FACTORY_RESET_CANCEL_WINDOW_TIMEOUT);
 
@@ -373,29 +373,28 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
         if (!sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_NoneSelected)
         {
             sAppTask.StartTimer(FACTORY_RESET_TRIGGER_TIMEOUT);
-            sAppTask.mFunction = kFunction_StartThread;
+            sAppTask.mFunction = kFunction_StartBleAdv;
         }
     }
     else
     {
-        // If the button was released before factory reset got initiated, start Thread Network
-        if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_StartThread)
+        // If the button was released before factory reset got initiated, start BLE advertissement in fast mode
+        if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_StartBleAdv)
         {
             sAppTask.CancelTimer();
             sAppTask.mFunction = kFunction_NoneSelected;
-#if CHIP_ENABLE_OPENTHREAD
-            if (!chip::DeviceLayer::ConnectivityMgr().IsThreadProvisioned())
+
+            if (!ConnectivityMgr().IsThreadProvisioned())
             {
-                StartDefaultThreadNetwork();
-                EFR32_LOG("Device is not commissioned to a Thread network. Starting with the default configuration.");
+                // Enable BLE advertisements
+                ConnectivityMgr().SetBLEAdvertisingEnabled(true);
+                // Set with fast Advertissing.
+                ConnectivityMgr().SetBLEAdvertisingMode(ConnectivityMgr().kFastAdvertising);
             }
             else
             {
-                EFR32_LOG("Device is commissioned to a Thread network.");
+                EFR32_LOG("Network is already provisioned, Ble advertissement not enabled");
             }
-#else
-            EFR32_LOG("Thread is not defined.");
-#endif
         }
         else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_FactoryReset)
         {
