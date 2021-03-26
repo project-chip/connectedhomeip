@@ -75,6 +75,10 @@ if (chip_device_platform != "none") {
       defines += [ "CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE=${chip_enable_ble}" ]
     }
 
+    if (chip_enable_nfc) {
+      defines += [ "CHIP_DEVICE_CONFIG_ENABLE_NFC=1" ]
+    }
+
     if (chip_mdns != "none") {
       defines += [ "CHIP_DEVICE_CONFIG_ENABLE_MDNS=1" ]
     }
@@ -551,6 +555,13 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
           "OpenThread/OpenThreadUtils.cpp",
           "Zephyr/ThreadStackManagerImpl.cpp",
           "nrfconnect/ThreadStackManagerImpl.h",
+        ]
+      }
+
+      if (chip_enable_nfc) {
+        sources += [
+          "Zephyr/NFCManagerImpl.cpp",
+          "nrfconnect/NFCManagerImpl.h",
         ]
       }
     } else if (chip_device_platform == "qpg6100") {
