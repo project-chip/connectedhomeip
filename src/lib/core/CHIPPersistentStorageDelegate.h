@@ -85,6 +85,8 @@ public:
      * @return CHIP_ERROR_KEY_NOT_FOUND there is no value for the given key.
      * @return CHIP_ERROR_NO_MEMORY if the input buffer is not big enough for
      *                              the value.
+     * @return CHIP_ERROR_BUFFER_TOO_SMALL if the value's size is too large to
+     *                                     be expressed as a uint16_t.
      */
     virtual CHIP_ERROR SyncGetKeyValue(const char * key, char * value, uint16_t & size) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
