@@ -55,11 +55,12 @@ BufferWriter & BufferWriter::Put(uint8_t c)
 
 LittleEndian::BufferWriter & LittleEndian::BufferWriter::EndianPut(uint64_t x, size_t size)
 {
-    while (size-- > 0)
+    while (size > 0)
     {
         uint8_t c = x & 0xff;
         Put(c);
         x >>= 8;
+        size--;
     }
     return *this;
 }
