@@ -38,6 +38,9 @@ if (chip_link_tests) {
       output_dir = _test_output_dir
     }
 
+    group(_test_name + "_lib") {
+    }
+
     pw_python_action(_test_name + "_run") {
       deps = [ ":${_test_name}" ]
       inputs = [ pw_unit_test_AUTOMATIC_RUNNER ]

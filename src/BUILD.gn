@@ -20,6 +20,11 @@ import("${chip_root}/src/ble/ble.gni")
 import("${chip_root}/src/lwip/lwip.gni")
 import("${chip_root}/src/platform/device.gni")
 
+declare_args() {
+  # Build monolithic test library.
+  chip_monolithic_tests = false
+}
+
 config("includes") {
   include_dirs = [
     "include",
@@ -42,19 +47,24 @@ if (chip_build_tests) {
       "${chip_root}/src/lib/asn1/tests",
       "${chip_root}/src/lib/core/tests",
       "${chip_root}/src/lib/mdns/minimal/core/tests",
-      "${chip_root}/src/lib/mdns/minimal/records/tests",
       "${chip_root}/src/lib/mdns/minimal/responders/tests",
       "${chip_root}/src/lib/mdns/minimal/tests",
       "${chip_root}/src/lib/support/tests",
       "${chip_root}/src/messaging/tests",
       "${chip_root}/src/protocols/bdx/tests",
       "${chip_root}/src/protocols/secure_channel/tests",
-      "${chip_root}/src/setup_payload/tests",
       "${chip_root}/src/system/tests",
       "${chip_root}/src/transport/raw/tests",
       "${chip_root}/src/transport/retransmit/tests",
       "${chip_root}/src/transport/tests",
     ]
+
+    if (current_os != "zephyr") {
+      deps += [
+        "${chip_root}/src/lib/mdns/minimal/records/tests",
+        "${chip_root}/src/setup_payload/tests",
+      ]
+    }
 
     if (chip_device_platform != "none") {
       deps += [ "${chip_root}/src/lib/mdns/minimal/tests" ]
@@ -74,6 +84,12 @@ if (chip_build_tests) {
 
     if (current_os != "zephyr" && chip_device_platform != "esp32") {
       deps += [ "${chip_root}/src/lib/shell/tests" ]
+    }
+
+    if (chip_monolithic_tests) {
+      build_monolithic_library = true
+      output_name = "libCHIP_tests"
+      output_dir = "${root_out_dir}/lib"
     }
   }
 
