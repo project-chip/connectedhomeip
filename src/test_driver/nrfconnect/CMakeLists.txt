@@ -47,29 +47,11 @@ set(CHIP_CFLAGS
 )
 
 set(CHIP_TESTS
-    # TODO: this list is hard to maintain manually (and currently incomplete).
-    # An automated way that includes figuring out dependencies would be much better
-    -lAppTests
-    -lASN1Tests
-    -lBleLayerTests
-    -lChipCryptoTests
-    -lCoreTests
-    -lInetLayerTests
-    -lMessagingLayerTests
-    -lPlatformTests
-    # TODO: raw transport tests fail by running out of TCP/UDP endpoints
-    # -lRawTransportTests
-    -lRetransmitTests
-    -lSupportTests
-    -lSystemLayerTests
-    -lTransportLayerTests
+    -lCHIP_tests
 )
 
 set(CHIP_LIBRARIES
     -lCHIP
-    -lInetTestHelpers
-    -lNetworkTestHelpers
-    -lnlunit-test
     ${CHIP_TESTS}
 )
 
