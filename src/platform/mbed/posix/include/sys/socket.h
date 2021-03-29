@@ -405,12 +405,12 @@ struct ifreq
 };
 
 /* Flags we can use with send and recv. */
-#define MSG_PEEK 0x01
-#define MSG_WAITALL 0x02
-#define MSG_OOB 0x04
+//#define MSG_PEEK 0x01
+//#define MSG_WAITALL 0x02
+//#define MSG_OOB 0x04
 #define MSG_DONTWAIT 0x08
-#define MSG_MORE 0x10
-#define MSG_NOSIGNAL 0x20
+//#define MSG_MORE 0x10
+//#define MSG_NOSIGNAL 0x20
 
 #if !defined(iovec)
 struct iovec

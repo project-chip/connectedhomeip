@@ -14,34 +14,6 @@ using namespace rtos;
 
 static BSDSocket sockets[MBED_NET_SOCKET_MAX_NUMBER];
 
-nsapi_version_t Inet2Nsapi(int family)
-{
-    switch (family)
-    {
-    case AF_INET:
-        return NSAPI_IPv4;
-        break;
-    case AF_INET6:
-        return NSAPI_IPv6;
-        break;
-    default:
-        return NSAPI_UNSPEC;
-    }
-}
-
-void msghdr2Netsocket(SocketAddress * dst, struct sockaddr_in * src)
-{
-    dst->set_ip_bytes(src->sin_addr.s4_addr, Inet2Nsapi(src->sin_family));
-    dst->set_port(ntohs(src->sin_port));
-}
-
-void Sockaddr2Netsocket(SocketAddress * dst, struct sockaddr * src)
-{
-    sockaddr_in * addr = reinterpret_cast<sockaddr_in *>(src);
-    dst->set_ip_bytes(addr->sin_addr.s4_addr, Inet2Nsapi(src->sa_family));
-    dst->set_port(ntohs(addr->sin_port));
-}
-
 static BSDSocket * getBSDSocket(int fd)
 {
     BSDSocket * socket = static_cast<BSDSocket *>(mbed_file_handle(fd));
@@ -299,20 +271,33 @@ int mbed_accept(int fd, struct sockaddr * addr, socklen_t * addrlen)
 
 ssize_t mbed_send(int fd, const void * buf, size_t len, int flags)
 {
-    auto * socket = getSocket(fd);
+    ssize_t ret;
+    bool blockingState;
+    auto * socket = getBSDSocket(fd);
     if (socket == nullptr)
     {
         set_errno(EBADF);
         return -1;
     }
 
-    if (buf == nullptr || len < 0)
+    if (buf == nullptr)
     {
         set_errno(EINVAL);
         return -1;
     }
 
-    auto ret = socket->send(buf, len);
+    if (!socket->is_output_enable())
+    {
+        return 0;
+    }
+
+    if (flags & MSG_DONTWAIT)
+    {
+        blockingState = socket->is_blocking();
+        socket->set_blocking(false);
+    }
+
+    ret = socket->getNetSocket()->send(buf, len);
     if (ret < 0)
     {
         switch (ret)
@@ -329,27 +314,49 @@ ssize_t mbed_send(int fd, const void * buf, size_t len, int flags)
         default:
             set_errno(ENOBUFS);
         }
-        return -1;
+        ret = -1;
     }
-    ::write(fd, NULL, 0);
+    else
+    {
+        socket->write(NULL, 0);
+    }
+
+    if (flags & MSG_DONTWAIT)
+    {
+        socket->set_blocking(blockingState);
+    }
+
     return ret;
 }
 
 ssize_t mbed_sendto(int fd, const void * buf, size_t len, int flags, const struct sockaddr * dest_addr, socklen_t addrlen)
 {
+    ssize_t ret;
+    bool blockingState;
     SocketAddress sockAddr;
 
-    auto * socket = getSocket(fd);
+    auto * socket = getBSDSocket(fd);
     if (socket == nullptr)
     {
-        set_errno(ENOBUFS);
+        set_errno(EBADF);
         return -1;
     }
 
-    if (buf == nullptr || len < 0)
+    if (buf == nullptr)
     {
         set_errno(EINVAL);
         return -1;
+    }
+
+    if (!socket->is_output_enable())
+    {
+        return 0;
+    }
+
+    if (flags & MSG_DONTWAIT)
+    {
+        blockingState = socket->is_blocking();
+        socket->set_blocking(false);
     }
 
     if (dest_addr != nullptr)
@@ -361,7 +368,7 @@ ssize_t mbed_sendto(int fd, const void * buf, size_t len, int flags, const struc
         }
     }
 
-    auto ret = socket->sendto(sockAddr, buf, len);
+    ret = socket->getNetSocket()->sendto(sockAddr, buf, len);
     if (ret < 0)
     {
         switch (ret)
@@ -375,15 +382,29 @@ ssize_t mbed_sendto(int fd, const void * buf, size_t len, int flags, const struc
         default:
             set_errno(ENOBUFS);
         }
-        return -1;
+        ret = -1;
     }
-    ::write(fd, NULL, 0);
+    else
+    {
+        socket->write(NULL, 0);
+    }
+
+    if (flags & MSG_DONTWAIT)
+    {
+        socket->set_blocking(blockingState);
+    }
+
     return ret;
 }
 
 ssize_t mbed_sendmsg(int fd, const struct msghdr * message, int flags)
 {
-    auto * socket = getSocket(fd);
+    ssize_t ret;
+    bool blockingState;
+    SocketAddress sockAddr;
+    ssize_t total = 0;
+
+    auto * socket = getBSDSocket(fd);
     if (socket == nullptr)
     {
         set_errno(EBADF);
@@ -396,8 +417,16 @@ ssize_t mbed_sendmsg(int fd, const struct msghdr * message, int flags)
         return -1;
     }
 
-    SocketAddress sockAddr;
-    ssize_t total = 0;
+    if (!socket->is_output_enable())
+    {
+        return 0;
+    }
+
+    if (flags & MSG_DONTWAIT)
+    {
+        blockingState = socket->is_blocking();
+        socket->set_blocking(false);
+    }
 
     if (convert_bsd_addr_to_mbed(&sockAddr, (struct sockaddr *) message->msg_name) < 0)
     {
@@ -407,7 +436,7 @@ ssize_t mbed_sendmsg(int fd, const struct msghdr * message, int flags)
 
     for (size_t i = 0; i < message->msg_iovlen; i++)
     {
-        auto ret = socket->sendto(sockAddr, (void *) message->msg_iov[i].iov_base, message->msg_iov[i].iov_len);
+        ret = socket->getNetSocket()->sendto(sockAddr, (void *) message->msg_iov[i].iov_base, message->msg_iov[i].iov_len);
         if (ret < 0)
         {
             switch (ret)
@@ -421,31 +450,52 @@ ssize_t mbed_sendmsg(int fd, const struct msghdr * message, int flags)
             default:
                 set_errno(ENOBUFS);
             }
-            return -1;
+            total = -1;
+            break;
         }
         total += ret;
     }
 
-    ::write(fd, NULL, 0);
+    socket->write(NULL, 0);
+
+    if (flags & MSG_DONTWAIT)
+    {
+        socket->set_blocking(blockingState);
+    }
+
     return total;
 }
 
 ssize_t mbed_recv(int fd, void * buf, size_t max_len, int flags)
 {
-    auto * socket = getSocket(fd);
+    ssize_t ret;
+    bool blockingState;
+
+    auto * socket = getBSDSocket(fd);
     if (socket == nullptr)
     {
         set_errno(EBADF);
         return -1;
     }
 
-    if (buf == nullptr || max_len < 0)
+    if (buf == nullptr)
     {
         set_errno(EINVAL);
         return -1;
     }
 
-    auto ret = socket->recv(buf, max_len);
+    if (!socket->is_input_enable())
+    {
+        return 0;
+    }
+
+    if (flags & MSG_DONTWAIT)
+    {
+        blockingState = socket->is_blocking();
+        socket->set_blocking(false);
+    }
+
+    ret = socket->getNetSocket()->recv(buf, max_len);
     if (ret < 0)
     {
         switch (ret)
@@ -459,30 +509,52 @@ ssize_t mbed_recv(int fd, void * buf, size_t max_len, int flags)
         default:
             set_errno(ENOBUFS);
         }
-        return -1;
+        ret = -1;
     }
-    ::read(fd, NULL, 0);
+    else
+    {
+        socket->read(NULL, 0);
+    }
+
+    if (flags & MSG_DONTWAIT)
+    {
+        socket->set_blocking(blockingState);
+    }
+
     return ret;
 }
 
 ssize_t mbed_recvfrom(int fd, void * buf, size_t max_len, int flags, struct sockaddr * src_addr, socklen_t * addrlen)
 {
+    ssize_t ret;
+    bool blockingState;
     SocketAddress sockAddr;
 
-    auto * socket = getSocket(fd);
+    auto * socket = getBSDSocket(fd);
     if (socket == nullptr)
     {
-        set_errno(ENOBUFS);
+        set_errno(EBADF);
         return -1;
     }
 
-    if (buf == nullptr || max_len < 0)
+    if (buf == nullptr)
     {
         set_errno(EINVAL);
         return -1;
     }
 
-    auto ret = socket->recvfrom(&sockAddr, buf, max_len);
+    if (!socket->is_input_enable())
+    {
+        return 0;
+    }
+
+    if (flags & MSG_DONTWAIT)
+    {
+        blockingState = socket->is_blocking();
+        socket->set_blocking(false);
+    }
+
+    ret = socket->getNetSocket()->recvfrom(&sockAddr, buf, max_len);
     if (ret < 0)
     {
         switch (ret)
@@ -496,17 +568,24 @@ ssize_t mbed_recvfrom(int fd, void * buf, size_t max_len, int flags, struct sock
         default:
             set_errno(ENOBUFS);
         }
-        return -1;
+        ret = -1;
     }
-    ::read(fd, NULL, 0);
-
-    if (src_addr != nullptr)
+    else
     {
-        if (convert_mbed_addr_to_bsd(src_addr, &sockAddr))
+        socket->read(NULL, 0);
+        if (src_addr != nullptr)
         {
-            set_errno(EINVAL);
-            return -1;
+            if (convert_mbed_addr_to_bsd(src_addr, &sockAddr))
+            {
+                set_errno(EINVAL);
+                ret = -1;
+            }
         }
+    }
+
+    if (flags & MSG_DONTWAIT)
+    {
+        socket->set_blocking(blockingState);
     }
 
     return ret;
@@ -514,7 +593,11 @@ ssize_t mbed_recvfrom(int fd, void * buf, size_t max_len, int flags, struct sock
 
 ssize_t mbed_recvmsg(int fd, struct msghdr * message, int flags)
 {
-    auto * socket = getSocket(fd);
+    bool blockingState;
+    SocketAddress sockAddr;
+    ssize_t total = 0;
+
+    auto * socket = getBSDSocket(fd);
     if (socket == nullptr)
     {
         set_errno(EBADF);
@@ -526,12 +609,21 @@ ssize_t mbed_recvmsg(int fd, struct msghdr * message, int flags)
         set_errno(EINVAL);
         return -1;
     }
-    SocketAddress sockAddr;
-    ssize_t total = 0;
+
+    if (!socket->is_input_enable())
+    {
+        return 0;
+    }
+
+    if (flags & MSG_DONTWAIT)
+    {
+        blockingState = socket->is_blocking();
+        socket->set_blocking(false);
+    }
 
     for (size_t i = 0; i < message->msg_iovlen; i++)
     {
-        auto ret = socket->recvfrom(&sockAddr, (void *) message->msg_iov[i].iov_base, message->msg_iov[i].iov_len);
+        auto ret = socket->getNetSocket()->recvfrom(&sockAddr, (void *) message->msg_iov[i].iov_base, message->msg_iov[i].iov_len);
         if (ret < 0)
         {
             switch (ret)
@@ -545,21 +637,31 @@ ssize_t mbed_recvmsg(int fd, struct msghdr * message, int flags)
             default:
                 set_errno(ENOBUFS);
             }
-            return -1;
+            total = -1;
+            break;
         }
         total += ret;
     }
 
-    if (message->msg_name != nullptr)
+    socket->read(NULL, 0);
+
+    if (total != -1)
     {
-        if (convert_mbed_addr_to_bsd((sockaddr *) message->msg_name, &sockAddr))
+        if (message->msg_name != nullptr)
         {
-            set_errno(EINVAL);
-            return -1;
+            if (convert_mbed_addr_to_bsd((sockaddr *) message->msg_name, &sockAddr))
+            {
+                set_errno(EINVAL);
+                total = -1;
+            }
         }
     }
 
-    ::read(fd, NULL, 0);
+    if (flags & MSG_DONTWAIT)
+    {
+        socket->set_blocking(blockingState);
+    }
+
     return total;
 }
 

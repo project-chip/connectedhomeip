@@ -156,10 +156,36 @@ struct BSDSocket : public FileHandle
     int set_blocking(bool blocking) override
     {
         _blocking = blocking;
+        switch (_type)
+        {
+        case MBED_TCP_SOCKET: {
+            tcpSocket.set_blocking(_blocking);
+        }
+        break;
+        case MBED_UDP_SOCKET: {
+            udpSocket.set_blocking(_blocking);
+        }
+        }
         return 0;
     }
 
     bool is_blocking() const override { return _blocking; }
+
+    int enable_input(bool enabled) override
+    {
+        _inputEnable = enabled;
+        return 0;
+    }
+
+    bool is_input_enable() { return _inputEnable; }
+
+    int enable_output(bool enabled) override
+    {
+        _outputEnable = enabled;
+        return 0;
+    }
+
+    bool is_output_enable() { return _outputEnable; }
 
     short poll(short events) const override
     {
@@ -212,6 +238,8 @@ private:
     // mstd::atomic<counter_type> _flags = { 0 };
     std::atomic<flags_type> _flags = { 0 };
     bool _blocking                 = false;
+    bool _inputEnable              = true;
+    bool _outputEnable             = true;
 };
 
 } // namespace mbed
