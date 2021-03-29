@@ -230,8 +230,21 @@ private:
     struct UnsolicitedMessageHandler
     {
         UnsolicitedMessageHandler() : ProtocolId(Protocols::NotSpecified) {}
+
+        constexpr void Reset() { Delegate = nullptr; }
+        constexpr bool IsInUse() const { return Delegate != nullptr; }
+        // Matches() only returns a sensible value if IsInUse() is true.
+        constexpr bool Matches(Protocols::Id aProtocolId, int16_t aMessageType) const
+        {
+            return ProtocolId == aProtocolId && MessageType == aMessageType;
+        }
+
         ExchangeDelegate * Delegate;
         Protocols::Id ProtocolId;
+        // Message types are normally 8-bit unsigned ints, but we use
+        // kAnyMessageType, which is negative, to represent a wildcard handler,
+        // so need a type that can store both that and all valid message type
+        // values.
         int16_t MessageType;
     };
 
