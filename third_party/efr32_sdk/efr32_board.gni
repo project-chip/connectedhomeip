@@ -57,6 +57,9 @@ if (efr32_board == "BRD4304A") {
 } else if (efr32_board == "BRD4180A") {
   efr32_family = "efr32mg21"
   efr32_mcu = "EFR32MG21A020F1024IM32"
+} else if (efr32_board == "BRD4308A") {
+  efr32_family = "efr32mg21"
+  efr32_mcu = "EFR32MG21A020F1024IM32"
 } else {
   print(
       "Please provide a valid value for EFR32_BOARD env variable (currently supported BRD4304A, BRD4161A, BRD4166A, BRD4170A or BRD4180A)")
