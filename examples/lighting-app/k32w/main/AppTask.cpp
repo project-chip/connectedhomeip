@@ -212,8 +212,7 @@ void AppTask::AppTaskMain(void * pvParameter)
 
 void AppTask::ButtonEventHandler(uint8_t pin_no, uint8_t button_action)
 {
-	if ((pin_no != RESET_BUTTON) && (pin_no != LIGHT_BUTTON) &&
-	    (pin_no != JOIN_BUTTON) && (pin_no != BLE_BUTTON))
+    if ((pin_no != RESET_BUTTON) && (pin_no != LIGHT_BUTTON) && (pin_no != JOIN_BUTTON) && (pin_no != BLE_BUTTON))
     {
         return;
     }
@@ -482,7 +481,7 @@ void AppTask::BleHandler(AppEvent * aEvent)
 
         if (OpenDefaultPairingWindow(chip::ResetAdmins::kNo) == CHIP_NO_ERROR)
         {
-		K32W_LOG("Started BLE Advertising!");
+            K32W_LOG("Started BLE Advertising!");
         }
         else
         {

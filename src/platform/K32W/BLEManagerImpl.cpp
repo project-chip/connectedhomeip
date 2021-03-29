@@ -151,7 +151,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
     err = BleLayer::Init(this, this, &SystemLayer);
     SuccessOrExit(err);
 
-    (void)RNG_Init();
+    (void) RNG_Init();
     RNG_SetPseudoRandomNoSeed(NULL);
 
     /* Initialization of message wait events -
@@ -208,11 +208,11 @@ CHIP_ERROR BLEManagerImpl::_Init()
 
     // Create FreeRTOS sw timer for BLE timeouts and interval change.
     sbleAdvTimeoutTimer = xTimerCreate("BleAdvTimer",       // Just a text name, not used by the RTOS kernel
-                                        1,                   // == default timer period (mS)
-                                        false,               // no timer reload (==one-shot)
-                                        (void *) this,       // init timer id = ble obj context
-                                        BleAdvTimeoutHandler // timer callback handler
-										);
+                                       1,                   // == default timer period (mS)
+                                       false,               // no timer reload (==one-shot)
+                                       (void *) this,       // init timer id = ble obj context
+                                       BleAdvTimeoutHandler // timer callback handler
+    );
     VerifyOrExit(sbleAdvTimeoutTimer != NULL, err = CHIP_ERROR_INCORRECT_STATE);
 exit:
     return err;
@@ -700,15 +700,14 @@ BLEManagerImpl::ble_err_t BLEManagerImpl::blekw_start_advertising(gapAdvertising
     OSA_EventClear(event_msg, (CHIP_BLE_KW_EVNT_ADV_CHANGED | CHIP_BLE_KW_EVNT_ADV_FAILED));
 
     if (gBleSuccess_c != Gap_CreateRandomDeviceAddress(NULL, NULL))
-	{
-		return BLE_E_SET_ADV_PARAMS;
-	}
+    {
+        return BLE_E_SET_ADV_PARAMS;
+    }
 
-	if (OSA_EventWait(event_msg, CHIP_BLE_KW_EVNT_RND_ADDR_SET, FALSE,
-					  CHIP_BLE_KW_EVNT_TIMEOUT, &event_mask) != osaStatus_Success)
-	{
-		return BLE_E_ADV_PARAMS_FAILED;
-	}
+    if (OSA_EventWait(event_msg, CHIP_BLE_KW_EVNT_RND_ADDR_SET, FALSE, CHIP_BLE_KW_EVNT_TIMEOUT, &event_mask) != osaStatus_Success)
+    {
+        return BLE_E_ADV_PARAMS_FAILED;
+    }
 
     /* Start the advertising */
     if (Gap_StartAdvertising(blekw_gap_advertising_cb, blekw_gap_connection_cb) != gBleSuccess_c)
@@ -770,7 +769,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     ble_err_t err;
     CHIP_ERROR chipErr;
     uint16_t discriminator;
-    uint16_t advInterval = 0;
+    uint16_t advInterval                                  = 0;
     gapAdvertisingData_t adv                              = { 0 };
     gapAdStructure_t adv_data[BLEKW_ADV_MAX_NO]           = { 0 };
     gapAdStructure_t scan_rsp_data[BLEKW_SCAN_RSP_MAX_NO] = { 0 };
@@ -835,17 +834,17 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     /**************** Prepare advertising parameters *************************************/
     if (mFlags.Has(Flags::kFastAdvertisingEnabled))
     {
-    	advInterval = CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MAX;
+        advInterval = CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MAX;
     }
     else
     {
-    	advInterval = CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MAX;
+        advInterval = CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MAX;
     }
 
     adv_params.minInterval = adv_params.maxInterval = advInterval;
-    adv_params.advertisingType = gAdvConnectableUndirected_c;
-    adv_params.ownAddressType  = gBleAddrTypePublic_c;
-    adv_params.peerAddressType = gBleAddrTypePublic_c;
+    adv_params.advertisingType                      = gAdvConnectableUndirected_c;
+    adv_params.ownAddressType                       = gBleAddrTypePublic_c;
+    adv_params.peerAddressType                      = gBleAddrTypePublic_c;
     memset(adv_params.peerAddress, 0, gcBleDeviceAddressSize_c);
     adv_params.channelMap   = (gapAdvertisingChannelMapFlags_t)(gAdvChanMapFlag37_c | gAdvChanMapFlag38_c | gAdvChanMapFlag39_c);
     adv_params.filterPolicy = gProcessAll_c;
@@ -867,18 +866,18 @@ exit:
 
 CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 {
-	uint32_t bleAdvTimeoutMs = 0;
+    uint32_t bleAdvTimeoutMs = 0;
 
     mFlags.Set(Flags::kAdvertising);
     mFlags.Clear(Flags::kRestartAdvertising);
 
     if (mFlags.Has(Flags::kFastAdvertisingEnabled))
     {
-    	bleAdvTimeoutMs = CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_TIMEOUT;
+        bleAdvTimeoutMs = CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_TIMEOUT;
     }
     else
     {
-    	bleAdvTimeoutMs = CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT;
+        bleAdvTimeoutMs = CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT;
     }
     StartBleAdvTimeoutTimer(bleAdvTimeoutMs);
 
@@ -1195,7 +1194,7 @@ void BLEManagerImpl::blekw_generic_cb(gapGenericEvent_t * pGenericEvent)
         break;
 
     case gRandomAddressReady_c:
-	Gap_SetRandomAddress(pGenericEvent->eventData.addrReady.aAddress);
+        Gap_SetRandomAddress(pGenericEvent->eventData.addrReady.aAddress);
         break;
 
     case gRandomAddressSet_c:
