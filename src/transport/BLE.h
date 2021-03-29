@@ -65,6 +65,7 @@ public:
      *
      * @param delegate          the delegate that will receive BLE events
      * @param transportDelegate the delegate object to receive incoming messages
+     * @param bleLayer          the instance of BleLayer to use
      * @param discriminator     device advertisement discriminator
      * @param connObj           BLE connection object
      */

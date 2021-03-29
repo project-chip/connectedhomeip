@@ -85,6 +85,8 @@ public:
      * @param salt            Salt to be used for SPAKE2P opertation
      * @param saltLen         Length of salt
      * @param myKeyId         Key ID to be assigned to the secure session on the peer node
+     * @param exchangeMgr     The instance of exchange manager to create exchange contexts
+     * @param transport       The instance of message transport to send and receive messages to peer node
      * @param delegate        Callback object
      *
      * @return CHIP_ERROR     The result of initialization
@@ -99,6 +101,8 @@ public:
      *
      * @param verifier        PASE verifier to be used for SPAKE2P pairing
      * @param myKeyId         Key ID to be assigned to the secure session on the peer node
+     * @param exchangeMgr     The instance of exchange manager to create exchange contexts
+     * @param transport       The instance of message transport to send and receive messages to peer node
      * @param delegate        Callback object
      *
      * @return CHIP_ERROR     The result of initialization
@@ -113,6 +117,8 @@ public:
      * @param peerAddress      Address of peer to pair
      * @param peerSetUpPINCode Setup PIN code of the peer device
      * @param myKeyId          Key ID to be assigned to the secure session on the peer node
+     * @param exchangeMgr      The instance of exchange manager to create exchange contexts
+     * @param transport        The instance of message transport to send and receive messages to peer node
      * @param delegate         Callback object
      *
      * @return CHIP_ERROR      The result of initialization
@@ -128,6 +134,8 @@ public:
      * @param peerAddress      Address of peer to pair
      * @param verifier         PASE verifier to be used for SPAKE2P pairing
      * @param myKeyId          Key ID to be assigned to the secure session on the peer node
+     * @param exchangeMgr      The instance of exchange manager to create exchange contexts
+     * @param transport        The instance of message transport to send and receive messages to peer node
      * @param delegate         Callback object
      *
      * @return CHIP_ERROR      The result of initialization

@@ -152,6 +152,8 @@ public:
      *
      * @param[in] params       Wrapper object for transport manager etc.
      * @param[in] listenPort   Port on which controller is listening (typically CHIP_PORT)
+     * @param[in] exchangeMgr  The instance of exchange manager that can dispense exchange contexts
+     * @param[in] delegate     The instance of exchange delegate to use while creating exchange contexts
      * @param[in] admin        Local administrator that's initializing this device object
      */
     void Init(ControllerDeviceInitParams params, uint16_t listenPort, Transport::AdminId admin)
@@ -180,6 +182,8 @@ public:
      * @param[in] listenPort   Port on which controller is listening (typically CHIP_PORT)
      * @param[in] deviceId     Node ID of the device
      * @param[in] peerAddress  The location of the peer. MUST be of type Transport::Type::kUdp
+     * @param[in] exchangeMgr  The instance of exchange manager that can dispense exchange contexts
+     * @param[in] delegate     The instance of exchange delegate to use while creating exchange contexts
      * @param[in] admin        Local administrator that's initializing this device object
      */
     void Init(ControllerDeviceInitParams params, uint16_t listenPort, NodeId deviceId, const Transport::PeerAddress & peerAddress,

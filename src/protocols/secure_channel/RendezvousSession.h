@@ -88,10 +88,11 @@ public:
      * @brief
      *  Initialize the underlying transport using the RendezvousParameters passed in the constructor.
      *
-     * @param params       The RendezvousParameters
-     * @param transportMgr The transport to use
-     * @param sessionMgr   Pointer to secure session manager
-     * @param admin        Pointer to a device administrator info that will be filled up on successful pairing
+     * @param params          The RendezvousParameters
+     * @param exchangeManager The instance of exchange manager to create exchange contexts
+     * @param transportMgr    The transport to use
+     * @param sessionMgr      Pointer to secure session manager
+     * @param admin           Pointer to a device administrator info that will be filled up on successful pairing
      * @ return CHIP_ERROR  The result of the initialization
      */
     CHIP_ERROR Init(const RendezvousParameters & params, Messaging::ExchangeManager * exchangeManager,

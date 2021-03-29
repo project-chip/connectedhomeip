@@ -130,6 +130,8 @@ public:
      *
      *  @param[in]    payloadHeader A reference to the PayloadHeader object.
      *
+     *  @param[in]    peerAddress   The address of the sender
+     *
      *  @param[in]    msgBuf        A handle to the packet buffer holding the CHIP message.
      *
      *  @retval  #CHIP_ERROR_INVALID_ARGUMENT               if an invalid argument was passed to this HandleMessage API.
