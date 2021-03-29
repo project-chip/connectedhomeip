@@ -422,24 +422,26 @@ static void OnScenesClusterViewSceneResponse(void * context, uint16_t groupId, u
 | LevelControl                                                        | 0x0008 |
 | LowPower                                                            | 0x0508 |
 | OnOff                                                               | 0x0006 |
+| PumpConfigurationAndControl                                         | 0x0200 |
 | Scenes                                                              | 0x0005 |
 | TemperatureMeasurement                                              | 0x0402 |
 \*----------------------------------------------------------------------------*/
 
-constexpr chip::ClusterId kApplicationBasicClusterId       = 0x050D;
-constexpr chip::ClusterId kBarrierControlClusterId         = 0x0103;
-constexpr chip::ClusterId kBasicClusterId                  = 0x0028;
-constexpr chip::ClusterId kBindingClusterId                = 0xF000;
-constexpr chip::ClusterId kColorControlClusterId           = 0x0300;
-constexpr chip::ClusterId kDoorLockClusterId               = 0x0101;
-constexpr chip::ClusterId kGeneralCommissioningClusterId   = 0x0030;
-constexpr chip::ClusterId kGroupsClusterId                 = 0x0004;
-constexpr chip::ClusterId kIdentifyClusterId               = 0x0003;
-constexpr chip::ClusterId kLevelControlClusterId           = 0x0008;
-constexpr chip::ClusterId kLowPowerClusterId               = 0x0508;
-constexpr chip::ClusterId kOnOffClusterId                  = 0x0006;
-constexpr chip::ClusterId kScenesClusterId                 = 0x0005;
-constexpr chip::ClusterId kTemperatureMeasurementClusterId = 0x0402;
+constexpr chip::ClusterId kApplicationBasicClusterId            = 0x050D;
+constexpr chip::ClusterId kBarrierControlClusterId              = 0x0103;
+constexpr chip::ClusterId kBasicClusterId                       = 0x0028;
+constexpr chip::ClusterId kBindingClusterId                     = 0xF000;
+constexpr chip::ClusterId kColorControlClusterId                = 0x0300;
+constexpr chip::ClusterId kDoorLockClusterId                    = 0x0101;
+constexpr chip::ClusterId kGeneralCommissioningClusterId        = 0x0030;
+constexpr chip::ClusterId kGroupsClusterId                      = 0x0004;
+constexpr chip::ClusterId kIdentifyClusterId                    = 0x0003;
+constexpr chip::ClusterId kLevelControlClusterId                = 0x0008;
+constexpr chip::ClusterId kLowPowerClusterId                    = 0x0508;
+constexpr chip::ClusterId kOnOffClusterId                       = 0x0006;
+constexpr chip::ClusterId kPumpConfigurationAndControlClusterId = 0x0200;
+constexpr chip::ClusterId kScenesClusterId                      = 0x0005;
+constexpr chip::ClusterId kTemperatureMeasurementClusterId      = 0x0402;
 
 /*----------------------------------------------------------------------------*\
 | Cluster ApplicationBasic                                            | 0x050D |
@@ -7566,6 +7568,405 @@ private:
 };
 
 /*----------------------------------------------------------------------------*\
+| Cluster PumpConfigurationAndControl                                 | 0x0200 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * MaxPressure                                                       | 0x0000 |
+| * MaxSpeed                                                          | 0x0001 |
+| * MaxFlow                                                           | 0x0002 |
+| * EffectiveOperationMode                                            | 0x0011 |
+| * EffectiveControlMode                                              | 0x0012 |
+| * Capacity                                                          | 0x0013 |
+| * OperationMode                                                     | 0x0020 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Discover Attributes
+ */
+class DiscoverPumpConfigurationAndControlAttributes : public ModelCommand
+{
+public:
+    DiscoverPumpConfigurationAndControlAttributes() : ModelCommand("discover") { ModelCommand::AddArguments(); }
+
+    ~DiscoverPumpConfigurationAndControlAttributes()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000) command (0x0C) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::PumpConfigurationAndControlCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.DiscoverAttributes(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute MaxPressure
+ */
+class ReadPumpConfigurationAndControlMaxPressure : public ModelCommand
+{
+public:
+    ReadPumpConfigurationAndControlMaxPressure() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "max-pressure");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadPumpConfigurationAndControlMaxPressure()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0200) command (0x00) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::PumpConfigurationAndControlCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeMaxPressure(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int16sAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute MaxSpeed
+ */
+class ReadPumpConfigurationAndControlMaxSpeed : public ModelCommand
+{
+public:
+    ReadPumpConfigurationAndControlMaxSpeed() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "max-speed");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadPumpConfigurationAndControlMaxSpeed()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0200) command (0x00) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::PumpConfigurationAndControlCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeMaxSpeed(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute MaxFlow
+ */
+class ReadPumpConfigurationAndControlMaxFlow : public ModelCommand
+{
+public:
+    ReadPumpConfigurationAndControlMaxFlow() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "max-flow");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadPumpConfigurationAndControlMaxFlow()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0200) command (0x00) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::PumpConfigurationAndControlCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeMaxFlow(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute EffectiveOperationMode
+ */
+class ReadPumpConfigurationAndControlEffectiveOperationMode : public ModelCommand
+{
+public:
+    ReadPumpConfigurationAndControlEffectiveOperationMode() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "effective-operation-mode");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadPumpConfigurationAndControlEffectiveOperationMode()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0200) command (0x00) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::PumpConfigurationAndControlCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeEffectiveOperationMode(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute EffectiveControlMode
+ */
+class ReadPumpConfigurationAndControlEffectiveControlMode : public ModelCommand
+{
+public:
+    ReadPumpConfigurationAndControlEffectiveControlMode() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "effective-control-mode");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadPumpConfigurationAndControlEffectiveControlMode()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0200) command (0x00) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::PumpConfigurationAndControlCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeEffectiveControlMode(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute Capacity
+ */
+class ReadPumpConfigurationAndControlCapacity : public ModelCommand
+{
+public:
+    ReadPumpConfigurationAndControlCapacity() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "capacity");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadPumpConfigurationAndControlCapacity()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0200) command (0x00) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::PumpConfigurationAndControlCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeCapacity(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int16sAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+class ReportPumpConfigurationAndControlCapacity : public ModelCommand
+{
+public:
+    ReportPumpConfigurationAndControlCapacity() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "capacity");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("change", INT16_MIN, INT16_MAX, &mChange);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportPumpConfigurationAndControlCapacity()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+        delete onReportCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0200) command (0x06) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::PumpConfigurationAndControlCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        CHIP_ERROR err = cluster.ReportAttributeCapacity(onReportCallback->Cancel());
+        if (err != CHIP_NO_ERROR)
+        {
+            return err;
+        }
+
+        return cluster.ConfigureAttributeCapacity(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
+                                                  mMaxInterval, mChange);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    chip::Callback::Callback<Int16sAttributeCallback> * onReportCallback =
+        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    int16_t mChange;
+};
+
+/*
+ * Attribute OperationMode
+ */
+class ReadPumpConfigurationAndControlOperationMode : public ModelCommand
+{
+public:
+    ReadPumpConfigurationAndControlOperationMode() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "operation-mode");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadPumpConfigurationAndControlOperationMode()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0200) command (0x00) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::PumpConfigurationAndControlCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeOperationMode(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+class WritePumpConfigurationAndControlOperationMode : public ModelCommand
+{
+public:
+    WritePumpConfigurationAndControlOperationMode() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "operation-mode");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WritePumpConfigurationAndControlOperationMode()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0200) command (0x01) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::PumpConfigurationAndControlCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttributeOperationMode(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mValue);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    uint8_t mValue;
+};
+
+/*
+ * Attribute ClusterRevision
+ */
+class ReadPumpConfigurationAndControlClusterRevision : public ModelCommand
+{
+public:
+    ReadPumpConfigurationAndControlClusterRevision() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "cluster-revision");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadPumpConfigurationAndControlClusterRevision()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0200) command (0x00) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::PumpConfigurationAndControlCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*----------------------------------------------------------------------------*\
 | Cluster Scenes                                                      | 0x0005 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
@@ -8310,141 +8711,6 @@ private:
 };
 
 /*----------------------------------------------------------------------------*\
-| Cluster PumpConfigurationAndControl                                 | 0x0304 |
-|------------------------------------------------------------------------------|
-| Commands:                                                           |        |
-|------------------------------------------------------------------------------|
-| Attributes:                                                         |        |
-| * MeasuredValue                                                     | 0x0000 |
-| * MinMeasuredValue                                                  | 0x0001 |
-| * MaxMeasuredValue                                                  | 0x0002 |
-| * ClusterRevision                                                   | 0xFFFD |
-\*----------------------------------------------------------------------------*/
-
-/*
- * Discover Attributes
- */
-class DiscoverPumpConfigurationAndControlAttributes : public ModelCommand
-{
-public:
-    DiscoverPumpConfigurationAndControlAttributes() : ModelCommand("discover") { ModelCommand::AddArguments(); }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000) command (0x0C) on endpoint %" PRIu16, endpointId);
-
-        chip::Controller::PumpConfigurationAndControlCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.DiscoverAttributes(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
-    }
-
-private:
-    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
-        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-};
-
-/*
- * Attribute MeasuredValue
- */
-class ReadPumpConfigurationAndControlMeasuredValue : public ModelCommand
-{
-public:
-    ReadPumpConfigurationAndControlMeasuredValue() : ModelCommand("read")
-    {
-        AddArgument("attr-name", "measured-value");
-        ModelCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0402) command (0x00) on endpoint %" PRIu16, endpointId);
-
-        chip::Controller::PumpConfigurationAndControlCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeMeasuredValue(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
-    }
-
-private:
-    chip::Callback::Callback<Int16sAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-};
-
-class ReportPumpConfigurationAndControlMeasuredValue : public ModelCommand
-{
-public:
-    ReportPumpConfigurationAndControlMeasuredValue() : ModelCommand("report")
-    {
-        AddArgument("attr-name", "measured-value");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("change", INT16_MIN, INT16_MAX, &mChange);
-        ModelCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0402) command (0x06) on endpoint %" PRIu16, endpointId);
-
-        chip::Controller::PumpConfigurationAndControlCluster cluster;
-        cluster.Associate(device, endpointId);
-
-        CHIP_ERROR err = cluster.ReportAttributeMeasuredValue(onReportCallback->Cancel());
-        if (err != CHIP_NO_ERROR)
-        {
-            return err;
-        }
-
-        return cluster.ConfigureAttributeMeasuredValue(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
-                                                       mMaxInterval, mChange);
-    }
-
-private:
-    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
-        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    chip::Callback::Callback<Int16sAttributeCallback> * onReportCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    uint16_t mMinInterval;
-    uint16_t mMaxInterval;
-    int16_t mChange;
-};
-
-
-/*
- * Attribute ClusterRevision
- */
-class ReadPumpConfigurationAndControlClusterRevision : public ModelCommand
-{
-public:
-    ReadPumpConfigurationAndControlClusterRevision() : ModelCommand("read")
-    {
-        AddArgument("attr-name", "cluster-revision");
-        ModelCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0402) command (0x00) on endpoint %" PRIu16, endpointId);
-
-        chip::Controller::PumpConfigurationAndControlCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
-    }
-
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-};
-
-
-/*----------------------------------------------------------------------------*\
 | Register all Clusters commands                                               |
 \*----------------------------------------------------------------------------*/
 void registerClusterApplicationBasic(Commands & commands)
@@ -8735,6 +9001,26 @@ void registerClusterOnOff(Commands & commands)
 
     commands.Register(clusterName, clusterCommands);
 }
+void registerClusterPumpConfigurationAndControl(Commands & commands)
+{
+    const char * clusterName = "PumpConfigurationAndControl";
+
+    commands_list clusterCommands = {
+        make_unique<DiscoverPumpConfigurationAndControlAttributes>(),
+        make_unique<ReadPumpConfigurationAndControlMaxPressure>(),
+        make_unique<ReadPumpConfigurationAndControlMaxSpeed>(),
+        make_unique<ReadPumpConfigurationAndControlMaxFlow>(),
+        make_unique<ReadPumpConfigurationAndControlEffectiveOperationMode>(),
+        make_unique<ReadPumpConfigurationAndControlEffectiveControlMode>(),
+        make_unique<ReadPumpConfigurationAndControlCapacity>(),
+        make_unique<ReportPumpConfigurationAndControlCapacity>(),
+        make_unique<ReadPumpConfigurationAndControlOperationMode>(),
+        make_unique<WritePumpConfigurationAndControlOperationMode>(),
+        make_unique<ReadPumpConfigurationAndControlClusterRevision>(),
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
 void registerClusterScenes(Commands & commands)
 {
     const char * clusterName = "Scenes";
@@ -8762,18 +9048,6 @@ void registerClusterTemperatureMeasurement(Commands & commands)
     commands.Register(clusterName, clusterCommands);
 }
 
-void registerClusterPumpController(Commands & commands)
-{
-    const char * clusterName = "PumpConfigurationAndControl";
-
-    commands_list clusterCommands = {
-        make_unique<DiscoverPumpConfigurationAndControlAttributes>(),   make_unique<ReadPumpConfigurationAndControlMeasuredValue>(),
-        make_unique<ReportPumpConfigurationAndControlMeasuredValue>(),  make_unique<ReadPumpConfigurationAndControlClusterRevision>(),
-    };
-
-    commands.Register(clusterName, clusterCommands);
-}
-
 void registerClusters(Commands & commands)
 {
     registerClusterApplicationBasic(commands);
@@ -8788,7 +9062,7 @@ void registerClusters(Commands & commands)
     registerClusterLevelControl(commands);
     registerClusterLowPower(commands);
     registerClusterOnOff(commands);
+    registerClusterPumpConfigurationAndControl(commands);
     registerClusterScenes(commands);
     registerClusterTemperatureMeasurement(commands);
-    registerClusterPumpController(commands);
 }

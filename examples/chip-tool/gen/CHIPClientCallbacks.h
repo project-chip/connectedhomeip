@@ -39,8 +39,6 @@ typedef void (*ReadReportingConfigurationReportedCallback)(void * context, uint1
 typedef void (*ReadReportingConfigurationReceivedCallback)(void * context, uint16_t timeout);
 
 // Cluster Specific Response Callbacks
-typedef void (*ContentLaunchClusterLaunchContentResponseCallback)(void * context, uint8_t contentLaunchStatus);
-typedef void (*ContentLaunchClusterLaunchURLResponseCallback)(void * context, uint8_t contentLaunchStatus);
 typedef void (*DoorLockClusterClearAllPinsResponseCallback)(void * context);
 typedef void (*DoorLockClusterClearAllRfidsResponseCallback)(void * context);
 typedef void (*DoorLockClusterClearHolidayScheduleResponseCallback)(void * context);
