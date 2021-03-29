@@ -87,7 +87,7 @@ EmberStatus chipSendUnicast(NodeId destination, EmberApsFrame * apsFrame, uint16
 
     Messaging::SendFlags sendFlags;
 
-    sendFlags.Set(Messaging::SendMessageFlags::kFromInitiator, true).Set(Messaging::SendMessageFlags::kNoAutoRequestAck, true);
+    sendFlags.Set(Messaging::SendMessageFlags::kFromInitiator).Set(Messaging::SendMessageFlags::kNoAutoRequestAck);
     CHIP_ERROR err = exchange->SendMessage(Protocols::DeviceManagement::Id, 0, std::move(buffer), sendFlags);
 
     exchange->Close();
