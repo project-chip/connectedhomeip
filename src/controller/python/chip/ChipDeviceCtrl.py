@@ -33,6 +33,7 @@ from ctypes import *
 from .ChipStack import *
 from .clusters.CHIPClusters import *
 from .interaction_model import delegate as im
+from .exceptions import *
 import enum
 
 

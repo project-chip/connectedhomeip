@@ -37,6 +37,7 @@ CIRQUE_TESTS=(
     "EchoTest"
     "InteractionModelTest"
     "OnOffClusterTest"
+    "MobileDeviceTest"
 )
 
 BOLD_GREEN_TEXT="\033[1;32m"
