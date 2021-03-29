@@ -68,11 +68,13 @@ NodeId GetCurrentNodeId()
 chip::ByteSpan FillMAC(uint8_t mac[8])
 {
     memset(mac, 0, 8);
-    if (DeviceLayer::ConfigurationMgr().GetPrimary802154MACAddress(mac) == CHIP_NO_ERROR)
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    if (chip::DeviceLayer::ThreadStackMgr().GetFactoryAssignedEUI64(mac) == CHIP_NO_ERROR)
     {
         ChipLogDetail(Discovery, "Using Thread MAC for hostname.");
         return chip::ByteSpan(mac, 8);
     }
+#endif
     if (DeviceLayer::ConfigurationMgr().GetPrimaryWiFiMACAddress(mac) == CHIP_NO_ERROR)
     {
         ChipLogDetail(Discovery, "Using wifi MAC for hostname");
