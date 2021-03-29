@@ -31,9 +31,11 @@ following features are available:
 ## Building the Example Application
 
 -   Download or clone the
-    [sdk_support](https://github.com/SiliconLabs/sdk_support) from GitHub $ git
+    [sdk_support](https://github.com/SiliconLabs/sdk_support) from GitHub
+    $ git
     clone https://github.com/SiliconLabs/sdk_support.git and export the path
-    with : $ export EFR32_SDK_ROOT=<Path to cloned git repo>
+    with : $
+    export EFR32_SDK_ROOT=<Path to cloned git repo>
 
 -   Download the
     [Simplicity Commander](https://www.silabs.com/mcu/programming-options)
@@ -48,11 +50,9 @@ following features are available:
 
 -   Install some additional tools(likely already present for CHIP developers):
 
-#Linux
-           sudo apt-get install git libwebkitgtk-1.0-0 ninja-build
+#Linux sudo apt-get install git libwebkitgtk-1.0-0 ninja-build
 
-#Mac OS X
-           brew install ninja
+#Mac OS X brew install ninja
 
 -   Supported hardware:
 

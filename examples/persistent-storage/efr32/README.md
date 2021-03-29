@@ -53,11 +53,9 @@ defines = [
 
 -   Install some additional tools(likely already present for CHIP developers):
 
-#Linux
-           $ sudo apt-get install git libwebkitgtk-1.0-0 ninja-build
+#Linux \$ sudo apt-get install git libwebkitgtk-1.0-0 ninja-build
 
-#Mac OS X
-           $ brew install ninja
+#Mac OS X \$ brew install ninja
 
 -   Supported hardware:
 
