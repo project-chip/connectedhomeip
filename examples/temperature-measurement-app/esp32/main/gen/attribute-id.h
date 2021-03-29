@@ -311,6 +311,16 @@
 #define ZCL_FINISH_TIME_ATTRIBUTE_ID (0x0001)
 #define ZCL_REMAINING_TIME_ATTRIBUTE_ID (0x0002)
 
+// Attribute ids for cluster: Descriptor
+
+// Client attributes
+
+// Server attributes
+#define ZCL_DEVICE_LIST_ATTRIBUTE_ID (0x0000)
+#define ZCL_SERVER_LIST_ATTRIBUTE_ID (0x0001)
+#define ZCL_CLIENT_LIST_ATTRIBUTE_ID (0x0002)
+#define ZCL_PARTS_LIST_ATTRIBUTE_ID (0x0003)
+
 // Attribute ids for cluster: Poll Control
 
 // Client attributes
@@ -1098,7 +1108,20 @@
 // Server attributes
 #define ZCL_MAX_DURATION_ATTRIBUTE_ID (0x0000)
 
+// Attribute ids for cluster: Media Playback
+
+// Client attributes
+
+// Server attributes
+#define ZCL_CURRENT_STATE_ATTRIBUTE_ID (0x0000)
+
 // Attribute ids for cluster: Low Power
+
+// Client attributes
+
+// Server attributes
+
+// Attribute ids for cluster: Content Launch
 
 // Client attributes
 
@@ -4091,19 +4114,6 @@
 // Server attributes
 
 // Attribute ids for cluster: Binding
-
-// Client attributes
-
-// Server attributes
-
-// Attribute ids for cluster: Media Playback
-
-// Client attributes
-
-// Server attributes
-#define ZCL_CURRENT_STATE_ATTRIBUTE_ID (0x0000)
-
-// Attribute ids for cluster: Content Launch
 
 // Client attributes
 

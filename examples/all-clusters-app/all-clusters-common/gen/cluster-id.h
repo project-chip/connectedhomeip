@@ -71,6 +71,9 @@
 // Definitions for cluster: Appliance Control
 #define ZCL_APPLIANCE_CONTROL_CLUSTER_ID (0x001B)
 
+// Definitions for cluster: Descriptor
+#define ZCL_DESCRIPTOR_CLUSTER_ID (0x001D)
+
 // Definitions for cluster: Poll Control
 #define ZCL_POLL_CONTROL_CLUSTER_ID (0x0020)
 

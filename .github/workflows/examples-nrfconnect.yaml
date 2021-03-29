@@ -41,7 +41,7 @@ jobs:
                   fetch-depth: 0
                   submodules: true
             - name: Update nRF Connect SDK revision to the currently recommended.
-              run: python3 scripts/setup/nrfconnect/update_ncs.py --update
+              run: scripts/run_in_build_env.sh "python3 scripts/setup/nrfconnect/update_ncs.py --update"
             # https://github.com/project-chip/connectedhomeip/issues/3100
             # - name: Initialize CodeQL
             #   uses: github/codeql-action/init@v1
@@ -64,7 +64,7 @@ jobs:
               run: scripts/examples/nrfconnect_example.sh shell nrf5340dk_nrf5340_cpuapp
             - name: Run unit tests for Zephyr native_posix_64 platform
               run:
-                  scripts/tests/nrfconnect_native_posix_tests.sh native_posix_64
+                  scripts/run_in_build_env.sh "scripts/tests/nrfconnect_native_posix_tests.sh native_posix_64"
             - name: Copy aside build products
               run: |
                   mkdir -p /tmp/output_binaries/$BUILD_TYPE-build

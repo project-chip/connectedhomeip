@@ -43,14 +43,14 @@
             "output": "src/app/encoder.cpp"
         },
         {
-            "path": "templates/chip/python-ChipDeviceController-ClusterCommands.zapt",
-            "name": "CHIP ZCL API for CPython",
-            "output": "src/controller/python/ChipDeviceController-ClusterCommands.cpp"
+            "path": "templates/chip/python-CHIPClusters-cpp.zapt",
+            "name": "CHIP ZCL API for Python (native code)",
+            "output": "src/controller/python/chip/clusters/CHIPClusters.cpp"
         },
         {
-            "path": "templates/chip/python-chip-ChipCluster.zapt",
+            "path": "templates/chip/python-CHIPClusters-py.zapt",
             "name": "CHIP ZCL API for Python",
-            "output": "src/controller/python/chip/ChipCluster.py"
+            "output": "src/controller/python/chip/clusters/CHIPClusters.py"
         }
     ]
 }
