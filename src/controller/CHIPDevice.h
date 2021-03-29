@@ -98,7 +98,7 @@ public:
      *   Send the provided message to the device
      *
      * @param[in] protocolId  The protocol identifier of the CHIP message to be sent.
-     * @param[in] msgType     The message type of the corresponding protocol.
+     * @param[in] msgType     The message type of the message to be sent.  Must be a valid message type for protocolId.
      * @param[in] message     The message to be sent.
      *
      * @return CHIP_ERROR   CHIP_NO_ERROR on success, or corresponding error
