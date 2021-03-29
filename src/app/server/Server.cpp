@@ -66,6 +66,8 @@ constexpr bool useTestPairing()
 {
     // Use the test pairing whenever rendezvous is bypassed. Otherwise, there wouldn't be
     // any way to communicate with the device using CHIP protocol.
+    // This is used to bypass BLE in the cirque test.
+    // Only in the cirque test this is enabled with --args='bypass_rendezvous=true'.
     return isRendezvousBypassed();
 }
 
@@ -495,14 +497,8 @@ void InitServer(AppDelegate * delegate)
 
     if (useTestPairing())
     {
-        SuccessOrExit(err = AddTestPairing());
-    }
-
-    // This flag is used to bypass BLE in the cirque test
-    // Only in the cirque test this is enabled with --args='bypass_rendezvous=true'
-    if (isRendezvousBypassed())
-    {
         ChipLogProgress(AppServer, "Rendezvous and secure pairing skipped");
+        SuccessOrExit(err = AddTestPairing());
     }
     else if (DeviceLayer::ConnectivityMgr().IsWiFiStationProvisioned() || DeviceLayer::ConnectivityMgr().IsThreadProvisioned())
     {
