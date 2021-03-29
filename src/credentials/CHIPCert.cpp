@@ -336,14 +336,14 @@ CHIP_ERROR ChipCertificateSet::AddTrustedKey(uint64_t caId, OID curveOID, const 
 
     cert->mSubjectDN.Add(kOID_AttributeType_ChipCAId, caId);
 
-    cert->mIssuerDN                     = cert->mSubjectDN;
-    cert->mPubKeyCurveOID               = curveOID;
-    cert->mPublicKey                    = pubKey;
-    cert->mPublicKeyLen                 = pubKeyLen;
-    cert->mSubjectKeyId.mId             = pubKeyId;
-    cert->mSubjectKeyId.mLen            = pubKeyIdLen;
-    cert->mAuthKeyId                    = cert->mSubjectKeyId;
-    cert->mCertType                     = kCertType_CA;
+    cert->mIssuerDN          = cert->mSubjectDN;
+    cert->mPubKeyCurveOID    = curveOID;
+    cert->mPublicKey         = pubKey;
+    cert->mPublicKeyLen      = pubKeyLen;
+    cert->mSubjectKeyId.mId  = pubKeyId;
+    cert->mSubjectKeyId.mLen = pubKeyIdLen;
+    cert->mAuthKeyId         = cert->mSubjectKeyId;
+    cert->mCertType          = kCertType_CA;
 
     cert->mCertFlags.Set(CertFlags::kExtPresent_BasicConstraints);
     cert->mCertFlags.Set(CertFlags::kExtPresent_KeyUsage);
@@ -711,17 +711,17 @@ bool ChipDN::IsEqual(const ChipDN & other) const
 
     if (mAttrOID[0] == chip::ASN1::kOID_AttributeType_ChipNodeId)
         return other.mAttrOID[0] == chip::ASN1::kOID_AttributeType_ChipNodeId &&
-               mAttrValue[0].mChipId == other.mAttrValue[0].mChipId;
+            mAttrValue[0].mChipId == other.mAttrValue[0].mChipId;
 
     for (int i = 1; i < RDN_NUM; ++i)
     {
         if (mAttrOID[i] == kOID_Unknown || mAttrOID[i] == kOID_NotSpecified)
-	    continue;
+            continue;
 
         int j = 1;
         for (; j < RDN_NUM; ++j)
         {
-	    if (mAttrOID[i] == other.mAttrOID[j])
+            if (mAttrOID[i] == other.mAttrOID[j])
                 break;
         }
 
@@ -736,12 +736,8 @@ bool ChipDN::IsEqual(const ChipDN & other) const
         else
         {
             if (mAttrValue[i].mString.mLen != other.mAttrValue[j].mString.mLen ||
-                memcmp(
-                    mAttrValue[i].mString.mValue,
-                    other.mAttrValue[j].mString.mValue,
-                    mAttrValue[i].mString.mLen
-                ) != 0
-            ) return false;
+                memcmp(mAttrValue[i].mString.mValue, other.mAttrValue[j].mString.mValue, mAttrValue[i].mString.mLen) != 0)
+                return false;
         }
     }
     return true;
@@ -775,7 +771,7 @@ void ChipDN::Add(chip::ASN1::OID attrOID, uint64_t chipId)
 {
     if (attrOID == chip::ASN1::kOID_AttributeType_ChipNodeId)
     {
-        mAttrOID[0] = attrOID;
+        mAttrOID[0]           = attrOID;
         mAttrValue[0].mChipId = chipId;
         return;
     }
@@ -784,10 +780,10 @@ void ChipDN::Add(chip::ASN1::OID attrOID, uint64_t chipId)
     {
         if (mAttrOID[i] == chip::ASN1::kOID_NotSpecified || mAttrOID[i] == attrOID)
         {
-            mAttrOID[i] = attrOID;
+            mAttrOID[i]           = attrOID;
             mAttrValue[i].mChipId = chipId;
             return;
-	}
+        }
     }
 }
 
@@ -797,9 +793,9 @@ void ChipDN::Add(chip::ASN1::OID attrOID, const uint8_t * strVal, uint32_t strLe
     {
         if (mAttrOID[i] == chip::ASN1::kOID_NotSpecified || mAttrOID[i] == attrOID)
         {
-            mAttrOID[i] = attrOID;
+            mAttrOID[i]                  = attrOID;
             mAttrValue[i].mString.mValue = strVal;
-            mAttrValue[i].mString.mLen = strLen;
+            mAttrValue[i].mString.mLen   = strLen;
             return;
         }
     }
