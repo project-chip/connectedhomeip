@@ -22,7 +22,7 @@
 #include "PigweedLoggerMutex.h"
 #include "pigweed/RpcService.h"
 
-#include "pigweed_lighting.rpc.pb.h"
+#include "lighting_service/pigweed_lighting.rpc.pb.h"
 #include "pw_hdlc/rpc_channel.h"
 #include "pw_hdlc/rpc_packets.h"
 #include "pw_rpc/server.h"
