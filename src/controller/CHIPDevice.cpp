@@ -130,7 +130,7 @@ CHIP_ERROR Device::SendMessage(Protocols::Id protocolId, uint8_t msgType, System
 
         ReturnErrorOnFailure(LoadSecureSessionParameters(ResetTransport::kYes));
 
-        sendFlags.Set(Messaging::SendMessageFlags::kFromInitiator, true).Set(Messaging::SendMessageFlags::kNoAutoRequestAck, true);
+        sendFlags.Set(Messaging::SendMessageFlags::kFromInitiator).Set(Messaging::SendMessageFlags::kNoAutoRequestAck);
         err = exchange->SendMessage(protocolId, msgType, std::move(resend), sendFlags);
         ChipLogDetail(Controller, "Re-SendMessage returned %d", err);
         ReturnErrorOnFailure(err);
