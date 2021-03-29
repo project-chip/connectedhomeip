@@ -54,9 +54,6 @@ void MemMonitoring::HeapMonitoring(void * pvParameter)
 
     while (1)
     {
-        // Print Heap Usage
-
-        // Get Task Stats
         appTaskValue        = uxTaskGetStackHighWaterMark(appTaskHandle);
         bleEventTaskValue   = uxTaskGetStackHighWaterMark(BluetoothEventTaskHandle);
         bleTaskValue        = uxTaskGetStackHighWaterMark(BluetoothTaskHandle);
