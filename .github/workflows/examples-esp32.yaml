@@ -27,7 +27,7 @@ jobs:
             BUILD_TYPE: esp32
 
         runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io'
+        if: github.actor != 'restyled-io[bot]'
 
         container:
             image: connectedhomeip/chip-build-esp32:latest

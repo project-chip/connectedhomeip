@@ -635,7 +635,7 @@ PacketBufferHandle PacketBufferHandle::PopHead()
     return PacketBufferHandle(head);
 }
 
-PacketBufferHandle PacketBufferHandle::CloneData()
+PacketBufferHandle PacketBufferHandle::CloneData() const
 {
     PacketBufferHandle cloneHead;
 

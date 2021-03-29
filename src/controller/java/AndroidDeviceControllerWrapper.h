@@ -57,7 +57,6 @@ public:
 
     // PersistentStorageDelegate implementation
     void SetStorageDelegate(chip::PersistentStorageResultDelegate * delegate) override;
-    void AsyncGetKeyValue(const char * key) override;
     CHIP_ERROR SyncGetKeyValue(const char * key, char * value, uint16_t & size) override;
     void AsyncSetKeyValue(const char * key, const char * value) override;
     void AsyncDeleteKeyValue(const char * key) override;

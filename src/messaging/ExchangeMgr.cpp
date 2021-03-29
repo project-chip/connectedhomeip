@@ -64,15 +64,13 @@ ExchangeManager::ExchangeManager() : mReliableMessageMgr(mContextPool)
     mState = State::kState_NotInitialized;
 }
 
-CHIP_ERROR ExchangeManager::Init(NodeId localNodeId, TransportMgrBase * transportMgr, SecureSessionMgr * sessionMgr)
+CHIP_ERROR ExchangeManager::Init(SecureSessionMgr * sessionMgr)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     VerifyOrReturnError(mState == State::kState_NotInitialized, err = CHIP_ERROR_INCORRECT_STATE);
 
-    mLocalNodeId  = localNodeId;
-    mTransportMgr = transportMgr;
-    mSessionMgr   = sessionMgr;
+    mSessionMgr = sessionMgr;
 
     mNextExchangeId = GetRandU16();
     mNextKeyId      = 0;
@@ -81,10 +79,13 @@ CHIP_ERROR ExchangeManager::Init(NodeId localNodeId, TransportMgrBase * transpor
 
     for (auto & handler : UMHandlerPool)
     {
-        handler = {};
+        // Mark all handlers as unallocated.  This handles both initial
+        // initialization and the case when the consumer shuts us down and
+        // then re-initializes without removing registered handlers.
+        handler.Reset();
     }
 
-    mTransportMgr->SetRendezvousSession(this);
+    mSessionMgr->GetTransportManager()->SetRendezvousSession(this);
 
     sessionMgr->SetDelegate(this);
 
@@ -169,12 +170,12 @@ CHIP_ERROR ExchangeManager::RegisterUMH(Protocols::Id protocolId, int16_t msgTyp
 
     for (int i = 0; i < CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS; i++, umh++)
     {
-        if (umh->Delegate == nullptr)
+        if (!umh->IsInUse())
         {
             if (selected == nullptr)
                 selected = umh;
         }
-        else if (umh->ProtocolId == protocolId && umh->MessageType == msgType)
+        else if (umh->Matches(protocolId, msgType))
         {
             umh->Delegate = delegate;
             return CHIP_NO_ERROR;
@@ -199,9 +200,9 @@ CHIP_ERROR ExchangeManager::UnregisterUMH(Protocols::Id protocolId, int16_t msgT
 
     for (int i = 0; i < CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS; i++, umh++)
     {
-        if (umh->Delegate != nullptr && umh->ProtocolId == protocolId && umh->MessageType == msgType)
+        if (umh->IsInUse() && umh->Matches(protocolId, msgType))
         {
-            umh->Delegate = nullptr;
+            umh->Reset();
             SYSTEM_STATS_DECREMENT(chip::System::Stats::kExchangeMgr_NumUMHandlers);
             return CHIP_NO_ERROR;
         }
@@ -296,7 +297,7 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
 
         for (int i = 0; i < CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS; i++, umh++)
         {
-            if (umh->Delegate != nullptr && payloadHeader.HasProtocol(umh->ProtocolId))
+            if (umh->IsInUse() && payloadHeader.HasProtocol(umh->ProtocolId))
             {
                 if (umh->MessageType == payloadHeader.GetMessageType())
                 {
@@ -439,7 +440,8 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & header, const Trans
         {
             CHIP_ERROR err = context->HandlePairingMessage(header, source, std::move(msgBuf));
             if (err != CHIP_NO_ERROR)
-                ChipLogError(ExchangeManager, "HandlePairingMessage error %s from node %llu.", chip::ErrorStr(err), node);
+                ChipLogError(ExchangeManager, "HandlePairingMessage error %s from node 0x%08" PRIx32 "%08" PRIx32 ".",
+                             chip::ErrorStr(err), static_cast<uint32_t>(node >> 32), static_cast<uint32_t>(node));
             return false;
         }
         return true;
@@ -449,8 +451,9 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & header, const Trans
     {
         char addrBuffer[Transport::PeerAddress::kMaxToStringSize];
         source.ToString(addrBuffer, sizeof(addrBuffer));
-        ChipLogError(ExchangeManager, "Unencrypted message from %s is dropped since no session found for node %llu.", addrBuffer,
-                     node);
+        ChipLogError(ExchangeManager,
+                     "Unencrypted message from %s is dropped since no session found for node 0x%08" PRIx32 "%08" PRIx32 ".",
+                     addrBuffer, static_cast<uint32_t>(node >> 32), static_cast<uint32_t>(node));
         return;
     }
 }

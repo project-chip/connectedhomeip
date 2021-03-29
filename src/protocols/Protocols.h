@@ -37,7 +37,10 @@ class Id
 public:
     constexpr Id(VendorId aVendorId, uint16_t aProtocolId) : mVendorId(aVendorId), mProtocolId(aProtocolId) {}
 
-    constexpr bool operator==(const Id & aOther) { return mVendorId == aOther.mVendorId && mProtocolId == aOther.mProtocolId; }
+    constexpr bool operator==(const Id & aOther) const
+    {
+        return mVendorId == aOther.mVendorId && mProtocolId == aOther.mProtocolId;
+    }
 
     // Convert the Protocols::Id to a TLV profile id.
     // NOTE: We may want to change the TLV reader/writer to take Protocols::Id

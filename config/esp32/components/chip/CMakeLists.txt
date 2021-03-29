@@ -32,11 +32,6 @@ endif()
 idf_component_register(SRCS chip.c chip.cpp
                        PRIV_REQUIRES freertos lwip bt mdns mbedtls)
 
-# Override some build specifications
-set_property(TARGET ${COMPONENT_LIB} PROPERTY CXX_STANDARD 14)
-set(CMAKE_BUILD_TYPE MinSizeRel)
-target_compile_options(${COMPONENT_LIB} PRIVATE "-DLWIP_IPV6_SCOPES=0" "-DCHIP_HAVE_CONFIG_H")
-
 # Prepare initial args file (lacking compile flags)
 # This will be saved as args.gn.in
 set(chip_gn_args "import(\"//args.gni\")\n")
@@ -52,10 +47,10 @@ chip_gn_arg_append("esp32_cpu"             "\"esp32\"")
 
 if(CONFIG_ENABLE_PW_RPC)
     chip_gn_arg_append("chip_build_pw_rpc_lib"              "true")
-    chip_gn_arg_append("pw_log_BACKEND"                     "true")
-    chip_gn_arg_append("pw_assert_BACKEND"                  "true")
-    chip_gn_arg_append("pw_sys_io_BACKEND"                  "true")
-    chip_gn_arg_append("dir_pw_third_party_nanopb"          "true")
+    chip_gn_arg_append("pw_log_BACKEND"                     "\"//third_party/connectedhomeip/third_party/pigweed/repo/pw_log_basic\"")
+    chip_gn_arg_append("pw_assert_BACKEND"                  "\"//third_party/connectedhomeip/third_party/pigweed/repo/pw_assert_log\"")
+    chip_gn_arg_append("pw_sys_io_BACKEND"                  "\"//third_party/connectedhomeip/examples/platform/esp32/pw_sys_io:pw_sys_io_esp32\"")
+    chip_gn_arg_append("dir_pw_third_party_nanopb"          "\"//third_party/connectedhomeip/third_party/nanopb/repo\"")
 endif()
 
 set(args_gn_input "${CMAKE_CURRENT_BINARY_DIR}/args.gn.in")
@@ -109,7 +104,7 @@ externalproject_add(
     chip_gn
     SOURCE_DIR              ${CHIP_ROOT}
     BINARY_DIR              ${CMAKE_CURRENT_BINARY_DIR}
-    CONFIGURE_COMMAND       gn --root=${GN_ROOT_TARGET} gen --check --fail-on-unused-args ${CMAKE_CURRENT_BINARY_DIR}
+    CONFIGURE_COMMAND       ${GN_EXECUTABLE} --root=${GN_ROOT_TARGET} gen --check --fail-on-unused-args ${CMAKE_CURRENT_BINARY_DIR}
     BUILD_COMMAND           ninja
     INSTALL_COMMAND         ""
     BUILD_BYPRODUCTS        ${CHIP_LIBRARIES}
@@ -138,7 +133,6 @@ target_include_directories(${COMPONENT_LIB} INTERFACE
     "${CMAKE_CURRENT_BINARY_DIR}/gen/include"
 )
 
-idf_component_get_property(bt_lib bt COMPONENT_LIB)
 idf_component_get_property(esp32_mbedtls_lib esp32_mbedtls COMPONENT_LIB)
 
 set(chip_libraries "-lCHIP")
@@ -147,10 +141,14 @@ if(CONFIG_ENABLE_PW_RPC)
     list(APPEND chip_libraries "-lPwRpc")
 endif()
 
+if(CONFIG_BT_ENABLED)
+    idf_component_get_property(bt_lib bt COMPONENT_LIB)
+    list(APPEND chip_libraries $<TARGET_FILE:${bt_lib}> -lbtdm_app)
+endif()
+
 target_link_libraries(${COMPONENT_LIB} INTERFACE "-L${CMAKE_CURRENT_BINARY_DIR}/lib")
 target_link_libraries(${COMPONENT_LIB} INTERFACE -Wl,--start-group 
                                                 ${chip_libraries}
-                                                $<TARGET_FILE:${bt_lib}> -lbtdm_app 
                                                 $<TARGET_FILE:mbedcrypto> $<TARGET_FILE:${esp32_mbedtls_lib}> 
                                                 -Wl,--end-group)
 

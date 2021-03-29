@@ -291,38 +291,6 @@ void AndroidDeviceControllerWrapper::SetStorageDelegate(PersistentStorageResultD
     mStorageResultDelegate = delegate;
 }
 
-void AndroidDeviceControllerWrapper::AsyncGetKeyValue(const char * key)
-{
-    jstring keyString       = NULL;
-    jstring valueString     = NULL;
-    const char * valueChars = nullptr;
-    CHIP_ERROR err          = CHIP_NO_ERROR;
-    jclass storageCls       = GetPersistentStorageClass();
-    jmethodID method        = GetJavaEnv()->GetStaticMethodID(storageCls, "getKeyValue", "(Ljava/lang/String;)Ljava/lang/String;");
-
-    GetJavaEnv()->ExceptionClear();
-
-    err = N2J_NewStringUTF(GetJavaEnv(), key, keyString);
-    SuccessOrExit(err);
-
-    valueString = (jstring) GetJavaEnv()->CallStaticObjectMethod(storageCls, method, keyString);
-
-    if (mStorageResultDelegate)
-    {
-        valueChars = GetJavaEnv()->GetStringUTFChars(valueString, 0);
-        mStorageResultDelegate->OnPersistentStorageValue(key, valueChars);
-    }
-
-exit:
-    GetJavaEnv()->ExceptionClear();
-    if (valueChars != nullptr)
-    {
-        GetJavaEnv()->ReleaseStringUTFChars(valueString, valueChars);
-    }
-    GetJavaEnv()->DeleteLocalRef(keyString);
-    GetJavaEnv()->DeleteLocalRef(valueString);
-}
-
 CHIP_ERROR AndroidDeviceControllerWrapper::SyncGetKeyValue(const char * key, char * value, uint16_t & size)
 {
     jstring keyString       = NULL;
@@ -341,17 +309,30 @@ CHIP_ERROR AndroidDeviceControllerWrapper::SyncGetKeyValue(const char * key, cha
 
     if (valueString != NULL)
     {
-        if (value != nullptr)
+        size_t stringLength = GetJavaEnv()->GetStringUTFLength(valueString);
+        if (stringLength > UINT16_MAX - 1)
         {
-            valueChars = GetJavaEnv()->GetStringUTFChars(valueString, 0);
-            size       = strlcpy(value, GetJavaEnv()->GetStringUTFChars(valueString, 0), size);
+            err = CHIP_ERROR_BUFFER_TOO_SMALL;
         }
         else
         {
-            size = GetJavaEnv()->GetStringUTFLength(valueString);
+            if (value != nullptr)
+            {
+                valueChars = GetJavaEnv()->GetStringUTFChars(valueString, 0);
+                size       = strlcpy(value, valueChars, size);
+                if (size < stringLength)
+                {
+                    err = CHIP_ERROR_NO_MEMORY;
+                }
+            }
+            else
+            {
+                size = stringLength;
+                err  = CHIP_ERROR_NO_MEMORY;
+            }
+            // Increment size to account for null termination
+            size += 1;
         }
-        // Increment size to account for null termination
-        size += 1;
     }
     else
     {

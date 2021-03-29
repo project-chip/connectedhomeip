@@ -19,7 +19,7 @@ limitations under the License.
   <cluster>
     <domain>General</domain>
     <name>Content Launch</name>
-    <code>0xF002</code>
+    <code>0x050a</code>
     <define>CONTENT_LAUNCH_CLUSTER</define>
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>

@@ -122,7 +122,7 @@ CHIP_ERROR PrintQRCodeContent()
     err = ConfigurationMgr().GetProductId(productId);
     SuccessOrExit(err);
 
-    payload.version       = 1;
+    payload.version       = 0;
     payload.vendorID      = vendorId;
     payload.productID     = productId;
     payload.setUpPINCode  = setUpPINCode;
