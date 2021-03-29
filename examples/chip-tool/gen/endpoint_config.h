@@ -149,7 +149,7 @@
     }
 
 // Largest attribute size is needed for various buffers
-#define ATTRIBUTE_LARGEST (3)
+#define ATTRIBUTE_LARGEST (2)
 
 // Total size of singleton attributes
 #define ATTRIBUTE_SINGLETONS_SIZE (2)
