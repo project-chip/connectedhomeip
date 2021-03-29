@@ -1,4 +1,4 @@
-# CHIP EFR32 Pigweed Example Application
+#CHIP EFR32 Pigweed Example Application
 
 The EFR32 example demonstrates the usage of Pigweed module functionalities in an
 application.
@@ -31,11 +31,9 @@ following features are available:
 ## Building the Example Application
 
 -   Download or clone the
-    [sdk_support](https://github.com/SiliconLabs/sdk_support) from GitHub
-    $ git
+    [sdk_support](https://github.com/SiliconLabs/sdk_support) from GitHub $ git
     clone https://github.com/SiliconLabs/sdk_support.git and export the path
-    with : $
-    export EFR32_SDK_ROOT=<Path to cloned git repo>
+    with : $ export EFR32_SDK_ROOT=<Path to cloned git repo>
 
 -   Download the
     [Simplicity Commander](https://www.silabs.com/mcu/programming-options)
@@ -50,10 +48,10 @@ following features are available:
 
 -   Install some additional tools(likely already present for CHIP developers):
 
-           # Linux
+#Linux
            sudo apt-get install git libwebkitgtk-1.0-0 ninja-build
 
-           # Mac OS X
+#Mac OS X
            brew install ninja
 
 -   Supported hardware:
@@ -125,9 +123,9 @@ following features are available:
 
 ## Memory settings
 
-While most of the RAM usage in CHIP is static allowing easier debugging and
+While most of the RAM usage in CHIP is static, allowing easier debugging and
 optimization with symbols analysis, we still need some HEAP for the crypto and
-OpenThread. Size of the HEAP can be modify by changing the value of
+OpenThread. Size of the HEAP can be modified by changing the value of the
 `SL_STACK_SIZE` define inside of the BUILD.gn file of this example. Please take
 note that a HEAP size smaller than 5k can and will cause a Mbedtls failure
 during the BLE rendez-vous.

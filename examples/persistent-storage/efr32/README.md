@@ -1,4 +1,4 @@
-# CHIP EFR32 Persistent Storage Example
+#CHIP EFR32 Persistent Storage Example
 
 An example testing and demonstrating the key value storage API.
 
@@ -53,10 +53,10 @@ defines = [
 
 -   Install some additional tools(likely already present for CHIP developers):
 
-           # Linux
+#Linux
            $ sudo apt-get install git libwebkitgtk-1.0-0 ninja-build
 
-           # Mac OS X
+#Mac OS X
            $ brew install ninja
 
 -   Supported hardware:
@@ -158,9 +158,9 @@ combination with JLinkRTTClient as follows:
 
 ## Memory settings
 
-While most of the RAM usage in CHIP is static allowing easier debugging and
+While most of the RAM usage in CHIP is static, allowing easier debugging and
 optimization with symbols analysis, we still need some HEAP for the crypto and
-OpenThread. Size of the HEAP can be modify by changing the value of
+OpenThread. Size of the HEAP can be modified by changing the value of the
 `SL_STACK_SIZE` define inside of the BUILD.gn file of this example. Please take
 note that a HEAP size smaller than 5k can and will cause a Mbedtls failure
 during the BLE rendez-vous.

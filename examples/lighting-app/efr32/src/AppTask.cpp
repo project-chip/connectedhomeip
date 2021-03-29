@@ -40,6 +40,8 @@
 
 #include <platform/EFR32/freertos_bluetooth.h>
 
+#include <lib/support/CodeUtils.h>
+
 #include <platform/CHIPDeviceLayer.h>
 #if CHIP_ENABLE_OPENTHREAD
 #include <platform/EFR32/ThreadStackManagerImpl.h>
@@ -90,8 +92,7 @@ int AppTask::StartAppTask()
     }
 
     // Start App task.
-    sAppTaskHandle =
-        xTaskCreateStatic(AppTaskMain, APP_TASK_NAME, APP_TASK_STACK_SIZE / sizeof(StackType_t), NULL, 1, appStack, &appTaskStruct);
+    sAppTaskHandle = xTaskCreateStatic(AppTaskMain, APP_TASK_NAME, ArraySize(appStack), NULL, 1, appStack, &appTaskStruct);
     if (sAppTaskHandle != NULL)
     {
         err = CHIP_NO_ERROR;

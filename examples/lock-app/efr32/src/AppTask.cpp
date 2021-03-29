@@ -35,6 +35,8 @@
 
 #include <assert.h>
 
+#include <lib/support/CodeUtils.h>
+
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
@@ -84,8 +86,7 @@ int AppTask::StartAppTask()
     }
 
     // Start App task.
-    sAppTaskHandle =
-        xTaskCreateStatic(AppTaskMain, APP_TASK_NAME, APP_TASK_STACK_SIZE / sizeof(StackType_t), NULL, 1, appStack, &appTaskStruct);
+    sAppTaskHandle = xTaskCreateStatic(AppTaskMain, APP_TASK_NAME, ArraySize(appStack), NULL, 1, appStack, &appTaskStruct);
     if (sAppTaskHandle != NULL)
     {
         err = CHIP_NO_ERROR;

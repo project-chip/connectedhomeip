@@ -171,14 +171,14 @@ CHIP_ERROR BLEManagerImpl::_Init()
     VerifyOrExit(ret == bg_err_success, err = MapBLEError(ret));
 
     // Create the Bluetooth Application task
-    BluetoothEventTaskHandle = xTaskCreateStatic(
-        bluetoothStackEventHandler,                                       /* Function that implements the task. */
-        CHIP_DEVICE_CONFIG_BLE_APP_TASK_NAME,                             /* Text name for the task. */
-        CHIP_DEVICE_CONFIG_BLE_APP_TASK_STACK_SIZE / sizeof(StackType_t), /* Number of indexes in the xStack array. */
-        this,                                                             /* Parameter passed into the task. */
-        CHIP_DEVICE_CONFIG_BLE_APP_TASK_PRIORITY,                         /* Priority at which the task is created. */
-        bluetoothEventStack,                                              /* Pointer to task heap */
-        &bluetoothEventTaskStruct);                                       /* Variable that holds the task struct */
+    BluetoothEventTaskHandle =
+        xTaskCreateStatic(bluetoothStackEventHandler,               /* Function that implements the task. */
+                          CHIP_DEVICE_CONFIG_BLE_APP_TASK_NAME,     /* Text name for the task. */
+                          ArraySize(bluetoothEventStack),           /* Number of indexes in the xStack array. */
+                          this,                                     /* Parameter passed into the task. */
+                          CHIP_DEVICE_CONFIG_BLE_APP_TASK_PRIORITY, /* Priority at which the task is created. */
+                          bluetoothEventStack,                      /* Pointer to task heap */
+                          &bluetoothEventTaskStruct);               /* Variable that holds the task struct */
 
     // Create FreeRTOS sw timer for BLE timeouts and interval change.
     sbleAdvTimeoutTimer = xTimerCreate("BleAdvTimer",       // Just a text name, not used by the RTOS kernel
