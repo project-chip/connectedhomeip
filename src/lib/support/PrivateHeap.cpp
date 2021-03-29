@@ -295,7 +295,8 @@ void * PrivateHeapRealloc(void * heap, void * ptr, size_t size)
     void * largerCopy = PrivateHeapAlloc(heap, size);
     if (largerCopy == nullptr)
     {
-        PrivateHeapFree(ptr);
+        // NOTE: original is left untouched (not freed) to match realloc() libc
+        // functionality
         return nullptr;
     }
 

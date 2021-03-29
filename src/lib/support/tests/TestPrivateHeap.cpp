@@ -325,8 +325,13 @@ void Realloc(nlTestSuite * inSuite, void * inContext)
     p3 = allocator.HeapAlloc(48); // still insufficient heap for this
     NL_TEST_ASSERT(inSuite, p3 == nullptr);
 
-    p2 = allocator.HeapRealloc(p1, 48); // insufficient heap, will free all
+    p2 = allocator.HeapRealloc(p1, 48); // insufficient heap, p1 is NOT freed
     NL_TEST_ASSERT(inSuite, p2 == nullptr);
+
+    p2 = allocator.HeapRealloc(p1, 48); // Repeat the test to ensure p1 is not freed
+    NL_TEST_ASSERT(inSuite, p2 == nullptr);
+
+    allocator.HeapFree(p1);
 
     p3 = allocator.HeapAlloc(48); // above free should have made sufficient space
     NL_TEST_ASSERT(inSuite, p3 != nullptr);
