@@ -19,10 +19,11 @@ through an `Flasher` instance, or operations according to a command line.
 For `Flasher`, see the class documentation. For the parse_command()
 interface or standalone execution:
 
-usage: nrf5_firmware_utils.py [-h] [--verbose] [--erase] [--application FILE]
-                              [--verify_application] [--reset] [--skip_reset]
-                              [--nrfjprog FILE] [--snr SERIAL]
-                              [--family FAMILY]
+usage: nrfconnect_firmware_utils.py [-h] [--verbose] [--erase]
+                                    [--application FILE]
+                                    [--verify_application] [--reset]
+                                    [--skip_reset] [--nrfjprog FILE]
+                                    [--snr SERIAL] [--family FAMILY]
 
 Flash NRF5 device
 
@@ -99,25 +100,6 @@ NRF5_OPTIONS = {
             },
         },
     },
-
-    # Action control options specify operations that Flasher.action() or
-    # the function interface flash_command() will perform.
-    'operations': {
-        'softdevice': {
-            'help': 'Softdevice image file name',
-            'default': None,
-            'argparse': {
-                'metavar': 'FILE'
-            },
-        },
-        'skip_softdevice': {
-            'help': 'Do not flash softdevice even if softdevice is set',
-            'default': False,
-            'argparse': {
-                'action': 'store_true'
-            },
-        },
-    }
 }
 
 
@@ -160,17 +142,6 @@ class Flasher(firmware_utils.Flasher):
             if self.erase().err:
                 return self
 
-        softdevice = self.optional_file(self.option.softdevice)
-        if softdevice and not self.option.skip_softdevice:
-            if self.verify(softdevice).err:
-                if self.err == errno.ENOENT:
-                    return self
-                if self.flash(softdevice).err:
-                    return self
-                if self.option.verify_application:
-                    if self.verify(softdevice).err:
-                        return self
-
         application = self.optional_file(self.option.application)
         if application:
             if self.flash(application).err:
@@ -196,7 +167,7 @@ class Nrf5Platform:
       self.flasher.flash_command([os.getcwd()])
 
 def verify_platform_args(platform_args):
-    required_args = ['application', 'softdevice']
+    required_args = ['application']
     for r in required_args:
         if not r in platform_args:
             raise ValueError("Required argument %s missing" % r)
