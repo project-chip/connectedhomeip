@@ -240,8 +240,7 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR CommandResponseProtocolError(const chip::app::CommandSender * apCommandSender,
-                                            uint8_t aCommandIndex) override
+    CHIP_ERROR CommandResponseProtocolError(const chip::app::CommandSender * apCommandSender, uint8_t aCommandIndex) override
     {
         printf("CommandResponseProtocolError happens with CommandIndex %d", aCommandIndex);
         return CHIP_NO_ERROR;

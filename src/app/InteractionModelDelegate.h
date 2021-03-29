@@ -92,14 +92,14 @@ public:
      */
     virtual CHIP_ERROR CommandResponseStatus(const CommandSender * apCommandSender, const uint16_t aGeneralCode,
                                              const uint32_t aProtocolId, const uint16_t aProtocolCode, chip::EndpointId aEndpointId,
-                                             const chip::ClusterId aClusterId, chip::CommandId aCommandId,
-                                             uint8_t aCommandIndex)
+                                             const chip::ClusterId aClusterId, chip::CommandId aCommandId, uint8_t aCommandIndex)
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 
     /**
-     * Notification that a Command Send has received an Invoke Command Response and fails to process a command data element in that command response
+     * Notification that a Command Send has received an Invoke Command Response and fails to process a command data element in that
+     * command response
      * @param[in]  apCommandSender A current command sender which can identify the command sender to the consumer, particularly
      * during multiple command interactions
      * @param[in]  aCommandIndex  Current processing command index which can identify failed command
