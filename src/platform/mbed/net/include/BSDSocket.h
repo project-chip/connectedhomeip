@@ -155,14 +155,11 @@ struct BSDSocket : public FileHandle
 
     int set_blocking(bool blocking) override
     {
-        if (blocking)
-        {
-            return -EINVAL;
-        }
+        _blocking = blocking;
         return 0;
     }
 
-    bool is_blocking() const override { return false; }
+    bool is_blocking() const override { return _blocking; }
 
     short poll(short events) const override
     {
@@ -214,6 +211,7 @@ private:
     // FIXME
     // mstd::atomic<counter_type> _flags = { 0 };
     std::atomic<flags_type> _flags = { 0 };
+    bool _blocking                 = false;
 };
 
 } // namespace mbed

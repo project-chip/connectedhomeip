@@ -173,7 +173,7 @@ int mbed_bind(int fd, const struct sockaddr * addr, socklen_t addrlen)
 
 int mbed_connect(int fd, const struct sockaddr * addr, socklen_t addrlen)
 {
-    auto * socket = getSocket(fd);
+    auto * socket = getBSDSocket(fd);
     if (socket == nullptr)
     {
         set_errno(EBADF);
@@ -193,7 +193,7 @@ int mbed_connect(int fd, const struct sockaddr * addr, socklen_t addrlen)
         return -1;
     }
 
-    auto ret = socket->connect(sockAddr);
+    auto ret = socket->getNetSocket()->connect(sockAddr);
     if ((ret != NSAPI_ERROR_OK) && (ret != NSAPI_ERROR_UNSUPPORTED))
     {
         switch (ret)
@@ -216,8 +216,13 @@ int mbed_connect(int fd, const struct sockaddr * addr, socklen_t addrlen)
 
     ::write(fd, NULL, 0);
 
-    set_errno(119);
-    return -1;
+    if (!socket->is_blocking())
+    {
+        set_errno(119);
+        return -1;
+    }
+
+    return 0;
 }
 
 int mbed_listen(int fd, int backlog)
