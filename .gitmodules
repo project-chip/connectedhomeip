@@ -82,3 +82,7 @@
 	path = third_party/mbed-os/repo
 	url = https://github.com/ARMmbed/mbed-os.git
 	branch = feature-chip
+[submodule "wifi-ism43362"]
+	path = third_party/wifi-ism43362/repo
+	url = https://github.com/ARMmbed/wifi-ism43362.git
+	branch = master
