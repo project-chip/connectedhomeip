@@ -58,8 +58,9 @@ devices.
 ### Bluetooth LE Advertising
 
 In this example, to commission the device onto a Project CHIP network, it must
-be discoverable over Bluetooth LE. For security reasons, you must start Bluetooth
-LE advertising manually after powering up the device by pressing Button USERINTERFACE.
+be discoverable over Bluetooth LE. For security reasons, you must start
+Bluetooth LE advertising manually after powering up the device by pressing
+Button USERINTERFACE.
 
 ### Bluetooth LE Rendezvous
 
