@@ -20,6 +20,8 @@
 #include "callback.h"
 #include "cluster-id.h"
 
+#include <lib/support/Span.h>
+
 using namespace chip;
 
 // Cluster Init Functions
@@ -39,9 +41,6 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_COLOR_CONTROL_CLUSTER_ID:
         emberAfColorControlClusterInitCallback(endpoint);
         break;
-    case ZCL_CONTENT_LAUNCH_CLUSTER_ID:
-        emberAfContentLaunchClusterInitCallback(endpoint);
-        break;
     case ZCL_DOOR_LOCK_CLUSTER_ID:
         emberAfDoorLockClusterInitCallback(endpoint);
         break;
@@ -57,8 +56,11 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_LEVEL_CONTROL_CLUSTER_ID:
         emberAfLevelControlClusterInitCallback(endpoint);
         break;
-    case ZCL_MEDIA_PLAYBACK_CLUSTER_ID:
-        emberAfMediaPlaybackClusterInitCallback(endpoint);
+    case ZCL_LOW_POWER_CLUSTER_ID:
+        emberAfLowPowerClusterInitCallback(endpoint);
+        break;
+    case ZCL_NETWORK_COMMISSIONING_CLUSTER_ID:
+        emberAfNetworkCommissioningClusterInitCallback(endpoint);
         break;
     case ZCL_ON_OFF_CLUSTER_ID:
         emberAfOnOffClusterInitCallback(endpoint);
@@ -95,11 +97,6 @@ void __attribute__((weak)) emberAfColorControlClusterInitCallback(EndpointId end
     // To prevent warning
     (void) endpoint;
 }
-void __attribute__((weak)) emberAfContentLaunchClusterInitCallback(EndpointId endpoint)
-{
-    // To prevent warning
-    (void) endpoint;
-}
 void __attribute__((weak)) emberAfDoorLockClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
@@ -125,7 +122,12 @@ void __attribute__((weak)) emberAfLevelControlClusterInitCallback(EndpointId end
     // To prevent warning
     (void) endpoint;
 }
-void __attribute__((weak)) emberAfMediaPlaybackClusterInitCallback(EndpointId endpoint)
+void __attribute__((weak)) emberAfLowPowerClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfNetworkCommissioningClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;

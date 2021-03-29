@@ -20,7 +20,7 @@
 #include "AppConfig.h"
 #include "BoltLockManager.h"
 #include "LEDWidget.h"
-#include "QRCodeUtil.h"
+#include "OnboardingCodesUtil.h"
 #include "Server.h"
 #include "Service.h"
 #include "ThreadUtil.h"
@@ -105,7 +105,7 @@ int AppTask::Init()
     // Init ZCL Data Model and start server
     InitServer();
     ConfigurationMgr().LogDeviceConfig();
-    PrintQRCode(chip::RendezvousInformationFlags::kBLE);
+    PrintOnboardingCodes(chip::RendezvousInformationFlags::kBLE);
 
 #ifdef CONFIG_CHIP_NFC_COMMISSIONING
     ret = sNFC.Init(ConnectivityMgr());
@@ -358,7 +358,11 @@ void AppTask::StartThreadHandler(AppEvent * aEvent)
     if (aEvent->ButtonEvent.PinNo != THREAD_START_BUTTON)
         return;
 
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    if (AddTestPairing() != CHIP_NO_ERROR)
+    {
+        LOG_ERR("Failed to add test pairing");
+    }
+
     if (!chip::DeviceLayer::ConnectivityMgr().IsThreadProvisioned())
     {
         StartDefaultThreadNetwork();
@@ -368,7 +372,6 @@ void AppTask::StartThreadHandler(AppEvent * aEvent)
     {
         LOG_INF("Device is commissioned to a Thread network.");
     }
-#endif
 }
 
 void AppTask::StartBLEAdvertisementHandler(AppEvent * aEvent)
@@ -420,10 +423,13 @@ void AppTask::ThreadProvisioningHandler(const ChipDeviceEvent * event, intptr_t 
     ARG_UNUSED(arg);
     if ((event->Type == DeviceEventType::kServiceProvisioningChange) && ConnectivityMgr().IsThreadProvisioned())
     {
-        const int result = sNFC.StopTagEmulation();
-        if (result)
+        if (sNFC.IsTagEmulationStarted())
         {
-            LOG_ERR("Stopping NFC Tag emulation failed");
+            const int result = sNFC.StopTagEmulation();
+            if (result)
+            {
+                LOG_ERR("Stopping NFC Tag emulation failed");
+            }
         }
     }
 }

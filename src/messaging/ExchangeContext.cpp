@@ -49,11 +49,11 @@ using namespace chip::System;
 namespace chip {
 namespace Messaging {
 
-static void DefaultOnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, uint32_t protocolId, uint8_t msgType,
-                                     PacketBufferHandle payload)
+static void DefaultOnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, Protocols::Id protocolId,
+                                     uint8_t msgType, PacketBufferHandle payload)
 {
-    ChipLogError(ExchangeManager, "Dropping unexpected message %08" PRIX32 ":%d %04" PRIX16 " MsgId:%08" PRIX32, protocolId,
-                 msgType, ec->GetExchangeId(), packetHeader.GetMessageId());
+    ChipLogError(ExchangeManager, "Dropping unexpected message %08" PRIX32 ":%d %04" PRIX16 " MsgId:%08" PRIX32,
+                 protocolId.ToFullyQualifiedSpecForm(), msgType, ec->GetExchangeId(), packetHeader.GetMessageId());
 }
 
 bool ExchangeContext::IsInitiator() const
@@ -76,7 +76,7 @@ void ExchangeContext::SetResponseTimeout(Timeout timeout)
     mResponseTimeout = timeout;
 }
 
-CHIP_ERROR ExchangeContext::SendMessage(uint16_t protocolId, uint8_t msgType, PacketBufferHandle msgBuf,
+CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgType, PacketBufferHandle msgBuf,
                                         const SendFlags & sendFlags)
 {
     CHIP_ERROR err                         = CHIP_NO_ERROR;
@@ -111,7 +111,7 @@ CHIP_ERROR ExchangeContext::SendMessage(uint16_t protocolId, uint8_t msgType, Pa
     return err;
 }
 
-CHIP_ERROR ExchangeContext::SendMessageImpl(uint16_t protocolId, uint8_t msgType, PacketBufferHandle msgBuf,
+CHIP_ERROR ExchangeContext::SendMessageImpl(Protocols::Id protocolId, uint8_t msgType, PacketBufferHandle msgBuf,
                                             const SendFlags & sendFlags, Transport::PeerConnectionState * state)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -405,20 +405,16 @@ void ExchangeContext::HandleResponseTimeout(System::Layer * aSystemLayer, void *
 CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                                           PacketBufferHandle msgBuf)
 {
-    CHIP_ERROR err      = CHIP_NO_ERROR;
-    uint32_t messageId  = 0;
-    uint16_t protocolId = 0;
-    uint8_t messageType = 0;
+    CHIP_ERROR err           = CHIP_NO_ERROR;
+    uint32_t messageId       = packetHeader.GetMessageId();
+    Protocols::Id protocolId = payloadHeader.GetProtocolID();
+    uint8_t messageType      = payloadHeader.GetMessageType();
 
     // We hold a reference to the ExchangeContext here to
     // guard against Close() calls(decrementing the reference
     // count) by the protocol before the CHIP Exchange
     // layer has completed its work on the ExchangeContext.
     Retain();
-
-    messageId   = packetHeader.GetMessageId();
-    protocolId  = payloadHeader.GetProtocolID();
-    messageType = payloadHeader.GetMessageType();
 
     if (payloadHeader.IsAckMsg())
     {

@@ -14,6 +14,9 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
+#include <inttypes.h>
+
 #include <transport/RendezvousSession.h>
 
 #include <core/CHIPEncoding.h>
@@ -22,7 +25,6 @@
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
-#include <support/ReturnMacros.h>
 #include <support/SafeInt.h>
 #include <transport/RendezvousSession.h>
 #include <transport/SecureMessageCodec.h>
@@ -52,6 +54,9 @@ CHIP_ERROR RendezvousSession::Init(const RendezvousParameters & params, Transpor
     VerifyOrReturnError(sessionMgr != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(admin != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mParams.HasSetupPINCode() || mParams.HasPASEVerifier(), CHIP_ERROR_INVALID_ARGUMENT);
+#if CONFIG_NETWORK_LAYER_BLE
+    VerifyOrReturnError(mParams.HasAdvertisementDelegate(), CHIP_ERROR_INVALID_ARGUMENT);
+#endif
 
     mSecureSessionMgr = sessionMgr;
     mAdmin            = admin;
@@ -152,13 +157,12 @@ CHIP_ERROR RendezvousSession::SendSessionEstablishmentMessage(const PacketHeader
     }
 }
 
-CHIP_ERROR RendezvousSession::SendSecureMessage(Protocols::CHIPProtocolId protocol, uint8_t msgType,
-                                                System::PacketBufferHandle msgBuf)
+CHIP_ERROR RendezvousSession::SendSecureMessage(Protocols::Id protocol, uint8_t msgType, System::PacketBufferHandle msgBuf)
 {
     VerifyOrReturnError(mPairingSessionHandle != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     PayloadHeader payloadHeader;
-    payloadHeader.SetMessageType(static_cast<uint16_t>(protocol), msgType);
+    payloadHeader.SetMessageType(protocol, msgType);
 
     return mSecureSessionMgr->SendMessage(*mPairingSessionHandle, payloadHeader, std::move(msgBuf));
 }
@@ -289,7 +293,10 @@ void RendezvousSession::UpdateState(RendezvousSession::State newState, CHIP_ERRO
             mDelegate->OnRendezvousComplete();
         }
 
-        mParams.GetAdvertisementDelegate()->RendezvousComplete();
+        if (mParams.HasAdvertisementDelegate())
+        {
+            mParams.GetAdvertisementDelegate()->RendezvousComplete();
+        }
 
         // Release the admin, as the rendezvous is complete.
         mAdmin = nullptr;
@@ -305,7 +312,10 @@ void RendezvousSession::UpdateState(RendezvousSession::State newState, CHIP_ERRO
         ReleasePairingSessionHandle();
 
         // Disable rendezvous advertisement
-        mParams.GetAdvertisementDelegate()->StopAdvertisement();
+        if (mParams.HasAdvertisementDelegate())
+        {
+            mParams.GetAdvertisementDelegate()->StopAdvertisement();
+        }
         if (mTransport)
         {
             // Free the transport
@@ -313,17 +323,9 @@ void RendezvousSession::UpdateState(RendezvousSession::State newState, CHIP_ERRO
             mTransport = nullptr;
         }
 
-        if (CHIP_NO_ERROR != err)
+        if (CHIP_NO_ERROR != err && mDelegate != nullptr)
         {
-            if (mAdmin != nullptr)
-            {
-                mAdmin->Reset();
-            }
-
-            if (mDelegate)
-            {
-                mDelegate->OnRendezvousError(err);
-            }
+            mDelegate->OnRendezvousError(err);
         }
         break;
 
@@ -352,8 +354,10 @@ void RendezvousSession::OnRendezvousMessageReceived(const PacketHeader & packetH
         // already know the local node id).
         if (packetHeader.GetDestinationNodeId().HasValue())
         {
-            ChipLogProgress(Ble, "Received pairing message for %llu", packetHeader.GetDestinationNodeId().Value());
-            mAdmin->SetNodeId(packetHeader.GetDestinationNodeId().Value());
+            NodeId destNodeId = packetHeader.GetDestinationNodeId().Value();
+            ChipLogProgress(Ble, "Received pairing message for 0x%08" PRIx32 "%08" PRIx32, static_cast<uint32_t>(destNodeId >> 32),
+                            static_cast<uint32_t>(destNodeId));
+            mAdmin->SetNodeId(destNodeId);
         }
 
         err = HandlePairingMessage(packetHeader, peerAddress, std::move(msgBuf));
@@ -402,19 +406,23 @@ CHIP_ERROR RendezvousSession::HandleSecureMessage(const PacketHeader & packetHea
     // Use the node IDs from the packet header only after it's successfully decrypted
     if (packetHeader.GetDestinationNodeId().HasValue() && !mParams.HasLocalNodeId())
     {
-        ChipLogProgress(Ble, "Received rendezvous message for %llu", packetHeader.GetDestinationNodeId().Value());
-        mAdmin->SetNodeId(packetHeader.GetDestinationNodeId().Value());
-        mParams.SetLocalNodeId(packetHeader.GetDestinationNodeId().Value());
-        mSecureSessionMgr->SetLocalNodeID(packetHeader.GetDestinationNodeId().Value());
+        NodeId destNodeId = packetHeader.GetDestinationNodeId().Value();
+        ChipLogProgress(Ble, "Received rendezvous message for 0x%08" PRIx32 "%08" PRIx32, static_cast<uint32_t>(destNodeId >> 32),
+                        static_cast<uint32_t>(destNodeId));
+        mAdmin->SetNodeId(destNodeId);
+        mParams.SetLocalNodeId(destNodeId);
+        mSecureSessionMgr->SetLocalNodeId(destNodeId);
     }
 
     if (packetHeader.GetSourceNodeId().HasValue() && !mParams.HasRemoteNodeId())
     {
-        ChipLogProgress(Ble, "Received rendezvous message from %llu", packetHeader.GetSourceNodeId().Value());
-        mParams.SetRemoteNodeId(packetHeader.GetSourceNodeId().Value());
+        NodeId sourceNodeId = packetHeader.GetSourceNodeId().Value();
+        ChipLogProgress(Ble, "Received rendezvous message from  0x%08" PRIx32 "%08" PRIx32,
+                        static_cast<uint32_t>(sourceNodeId >> 32), static_cast<uint32_t>(sourceNodeId));
+        mParams.SetRemoteNodeId(sourceNodeId);
     }
 
-    if (payloadHeader.GetProtocolID() == Protocols::kProtocol_NetworkProvisioning)
+    if (payloadHeader.HasProtocol(Protocols::NetworkProvisioning::Id))
     {
         ReturnErrorOnFailure(mNetworkProvision.HandleNetworkProvisioningMessage(payloadHeader.GetMessageType(), msgBuf));
     }

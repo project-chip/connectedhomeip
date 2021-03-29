@@ -196,11 +196,16 @@ chip_gn_arg_bool  ("is_debug"                               CONFIG_DEBUG)
 chip_gn_arg_bool  ("chip_enable_openthread"                 CONFIG_NET_L2_OPENTHREAD)
 chip_gn_arg_bool  ("chip_inet_config_enable_ipv4"           CONFIG_NET_IPV4)
 chip_gn_arg_bool  ("chip_build_tests"                       CONFIG_CHIP_BUILD_TESTS)
+chip_gn_arg_bool  ("chip_monolithic_tests"                  CONFIG_CHIP_BUILD_TESTS)
 chip_gn_arg_bool  ("chip_inet_config_enable_raw_endpoint"   CONFIG_CHIP_BUILD_TESTS)
 chip_gn_arg_bool  ("chip_inet_config_enable_tcp_endpoint"   CONFIG_CHIP_BUILD_TESTS)
 chip_gn_arg_bool  ("chip_inet_config_enable_dns_resolver"   CONFIG_CHIP_BUILD_TESTS)
 chip_gn_arg_bool  ("chip_build_libshell"                    CONFIG_CHIP_LIB_SHELL)
 chip_gn_arg_bool  ("chip_build_pw_rpc_lib"                  CONFIG_CHIP_PW_RPC)
+
+if (CONFIG_CHIP_ENABLE_DNSSD_SRP)
+    chip_gn_arg_string("chip_mdns" "platform")
+endif()
 
 if (CHIP_PROJECT_CONFIG)
     chip_gn_arg_string("chip_project_config_include"        ${CHIP_PROJECT_CONFIG})
@@ -228,6 +233,7 @@ ExternalProject_Add(
                                 --root-target=${GN_ROOT_TARGET}
                                 --dotfile=${GN_ROOT_TARGET}/.gn
                                 --script-executable=${Python3_EXECUTABLE}
+                                --export-compile-commands
                                 gen --check --fail-on-unused-args ${CMAKE_CURRENT_BINARY_DIR}
     BUILD_COMMAND           ninja
     INSTALL_COMMAND         ""

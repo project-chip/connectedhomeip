@@ -22,6 +22,7 @@
 
 #pragma once
 
+#include <protocols/Protocols.h>
 #include <system/SystemPacketBuffer.h>
 
 namespace chip {
@@ -72,7 +73,7 @@ public:
      *  @retval  #CHIP_ERROR_NO_MEMORY If there is no empty slot left in the table for addition.
      *  @retval  #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR AddToRetransmissionTable(uint16_t protocolId, uint8_t msgType, const SendFlags & sendFlags,
+    CHIP_ERROR AddToRetransmissionTable(Protocols::Id protocolId, uint8_t msgType, const SendFlags & sendFlags,
                                         System::PacketBufferHandle msgBuf, Messaging::ExchangeContext * exchangeContext);
 
     /**
@@ -103,11 +104,12 @@ private:
      */
     struct RetransTableEntry
     {
+        RetransTableEntry() : protocolId(Protocols::NotSpecified) {}
         ExchangeContext * exchangeContext; /**< The ExchangeContext for the stored CHIP message.
                                                 Non-null if and only if this entry is in use. */
         System::PacketBufferHandle msgBuf; /**< A handle to the PacketBuffer object holding the CHIP message. */
         SendFlags sendFlags;               /**< Flags set by the application for the CHIP message being sent. */
-        uint16_t protocolId;               /**< The protocol identifier of the CHIP message to be sent. */
+        Protocols::Id protocolId;          /**< The protocol identifier of the CHIP message to be sent. */
         uint8_t msgType;                   /**< The message type of the CHIP message to be sent. */
     };
 

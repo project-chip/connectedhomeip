@@ -31,7 +31,6 @@
 #include <protocols/Protocols.h>
 #include <support/BufferWriter.h>
 #include <support/CodeUtils.h>
-#include <support/ReturnMacros.h>
 #include <support/logging/CHIPLogging.h>
 
 namespace chip {
@@ -45,7 +44,7 @@ CHIP_ERROR MessageCounterSyncMgr::Init(Messaging::ExchangeManager * exchangeMgr)
     mExchangeMgr = exchangeMgr;
 
     // Register to receive unsolicited Secure Channel Request messages from the exchange manager.
-    err = mExchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::kProtocol_SecureChannel, this);
+    err = mExchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::SecureChannel::Id, this);
 
     ReturnErrorOnFailure(err);
 
@@ -56,7 +55,7 @@ void MessageCounterSyncMgr::Shutdown()
 {
     if (mExchangeMgr != nullptr)
     {
-        mExchangeMgr->UnregisterUnsolicitedMessageHandlerForProtocol(Protocols::kProtocol_SecureChannel);
+        mExchangeMgr->UnregisterUnsolicitedMessageHandlerForProtocol(Protocols::SecureChannel::Id);
         mExchangeMgr = nullptr;
     }
 }
@@ -93,7 +92,7 @@ void MessageCounterSyncMgr::OnResponseTimeout(Messaging::ExchangeContext * excha
         exchangeContext->Close();
 }
 
-CHIP_ERROR MessageCounterSyncMgr::AddToRetransmissionTable(uint16_t protocolId, uint8_t msgType, const SendFlags & sendFlags,
+CHIP_ERROR MessageCounterSyncMgr::AddToRetransmissionTable(Protocols::Id protocolId, uint8_t msgType, const SendFlags & sendFlags,
                                                            System::PacketBufferHandle msgBuf,
                                                            Messaging::ExchangeContext * exchangeContext)
 {
@@ -269,7 +268,7 @@ CHIP_ERROR MessageCounterSyncMgr::SendMsgCounterSyncReq(SecureSessionHandle sess
     exchangeContext->SetResponseTimeout(kMsgCounterSyncTimeout);
 
     // Send the message counter synchronization request in a Secure Channel Protocol::MsgCounterSyncReq message.
-    err = exchangeContext->SendMessageImpl(Protocols::kProtocol_SecureChannel,
+    err = exchangeContext->SendMessageImpl(Protocols::SecureChannel::Id,
                                            static_cast<uint8_t>(Protocols::SecureChannel::MsgType::MsgCounterSyncReq),
                                            std::move(msgBuf), sendFlags);
     SuccessOrExit(err);
@@ -318,7 +317,7 @@ CHIP_ERROR MessageCounterSyncMgr::SendMsgCounterSyncResp(Messaging::ExchangeCont
     msgBuf->SetDataLength(kMsgCounterSyncRespMsgSize);
 
     // Send message counter synchronization response message.
-    err = exchangeContext->SendMessageImpl(Protocols::kProtocol_SecureChannel,
+    err = exchangeContext->SendMessageImpl(Protocols::SecureChannel::Id,
                                            static_cast<uint8_t>(Protocols::SecureChannel::MsgType::MsgCounterSyncRsp),
                                            std::move(msgBuf), Messaging::SendFlags(Messaging::SendMessageFlags::kNoAutoRequestAck));
 

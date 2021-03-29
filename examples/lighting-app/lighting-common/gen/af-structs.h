@@ -118,6 +118,13 @@ typedef struct _DeviceInformationRecord
     uint8_t sort;
 } EmberAfDeviceInformationRecord;
 
+// Struct for DeviceType
+typedef struct _DeviceType
+{
+    chip::DeviceTypeId type;
+    uint16_t revision;
+} EmberAfDeviceType;
+
 // Struct for DiscoverAttributesInfoRecord
 typedef struct _DiscoverAttributesInfoRecord
 {
@@ -189,6 +196,24 @@ typedef struct _GroupInformationRecord
     chip::GroupId groupId;
     uint8_t groupType;
 } EmberAfGroupInformationRecord;
+
+// Struct for GroupKeys
+typedef struct _GroupKeys
+{
+    uint16_t VendorId;
+    uint16_t GroupKeyIndex;
+    /* TYPE WARNING: array array defaults to */ uint8_t * GroupKeyRoot;
+    uint64_t GroupKeyEpochStartTime;
+    uint8_t GroupKeySecurityPolicy;
+} EmberAfGroupKeys;
+
+// Struct for GroupState
+typedef struct _GroupState
+{
+    uint16_t VendorId;
+    uint16_t VendorGroupId;
+    uint16_t GroupKeySetIndex;
+} EmberAfGroupState;
 
 // Struct for IasAceZoneStatusResult
 typedef struct _IasAceZoneStatusResult

@@ -87,14 +87,14 @@ public:
     /**
      * Send an echo request to a CHIP node.
      *
-     * @param nodeId        The destination's nodeId
      * @param payload       A PacketBufferHandle with the payload.
+     * @param sendFlags     Flags set by the application for the CHIP message being sent.
      *
      * @return CHIP_ERROR_NO_MEMORY if no ExchangeContext is available.
      *         Other CHIP_ERROR codes as returned by the lower layers.
      *
      */
-    CHIP_ERROR SendEchoRequest(System::PacketBufferHandle && payload);
+    CHIP_ERROR SendEchoRequest(System::PacketBufferHandle && payload, const Messaging::SendFlags & sendFlags);
 
 private:
     Messaging::ExchangeManager * mExchangeMgr = nullptr;
@@ -154,7 +154,7 @@ private:
 template <>
 struct MessageTypeTraits<Echo::MsgType>
 {
-    static constexpr uint16_t ProtocolId = chip::Protocols::kProtocol_Echo;
+    static constexpr const Protocols::Id & ProtocolId() { return Echo::Id; }
 };
 
 } // namespace Protocols

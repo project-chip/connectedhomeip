@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2019-2020 Google LLC.
  *    Copyright (c) 2018 Nest Labs, Inc.
  *
@@ -50,15 +50,14 @@ namespace Internal {
 template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_Init()
 {
-    mFlags = 0;
-
     // Cache flags indicating whether the device is currently service provisioned, is a member of a fabric,
     // is paired to an account, and/or provisioned with operational credentials.
-    SetFlag(mFlags, kFlag_IsServiceProvisioned, Impl()->ConfigValueExists(ImplClass::kConfigKey_ServiceConfig));
-    SetFlag(mFlags, kFlag_IsMemberOfFabric, Impl()->ConfigValueExists(ImplClass::kConfigKey_FabricId));
-    SetFlag(mFlags, kFlag_IsPairedToAccount, Impl()->ConfigValueExists(ImplClass::kConfigKey_PairedAccountId));
-    SetFlag(mFlags, kFlag_OperationalDeviceCredentialsProvisioned,
-            Impl()->ConfigValueExists(ImplClass::kConfigKey_OperationalDeviceCert));
+    mFlags.ClearAll()
+        .Set(Flags::kIsServiceProvisioned, Impl()->ConfigValueExists(ImplClass::kConfigKey_ServiceConfig))
+        .Set(Flags::kIsMemberOfFabric, Impl()->ConfigValueExists(ImplClass::kConfigKey_FabricId))
+        .Set(Flags::kIsPairedToAccount, Impl()->ConfigValueExists(ImplClass::kConfigKey_PairedAccountId))
+        .Set(Flags::kOperationalDeviceCredentialsProvisioned,
+             Impl()->ConfigValueExists(ImplClass::kConfigKey_OperationalDeviceCert));
 
 #if CHIP_ENABLE_ROTATING_DEVICE_ID
     mLifetimePersistedCounter.Init(CHIP_CONFIG_LIFETIIME_PERSISTED_COUNTER_KEY);
@@ -524,7 +523,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_ClearOperationalDeviceCr
     Impl()->ClearConfigValue(ImplClass::kConfigKey_OperationalDeviceICACerts);
     Impl()->ClearConfigValue(ImplClass::kConfigKey_OperationalDevicePrivateKey);
 
-    ClearFlag(mFlags, kFlag_OperationalDeviceCredentialsProvisioned);
+    mFlags.Clear(Flags::kOperationalDeviceCredentialsProvisioned);
 
     return CHIP_NO_ERROR;
 }
@@ -532,19 +531,19 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_ClearOperationalDeviceCr
 template <class ImplClass>
 bool GenericConfigurationManagerImpl<ImplClass>::_OperationalDeviceCredentialsProvisioned()
 {
-    return ::chip::GetFlag(mFlags, kFlag_OperationalDeviceCredentialsProvisioned);
+    return mFlags.Has(Flags::kOperationalDeviceCredentialsProvisioned);
 }
 
 template <class ImplClass>
 bool GenericConfigurationManagerImpl<ImplClass>::UseManufacturerCredentialsAsOperational()
 {
-    return ::chip::GetFlag(mFlags, kFlag_UseManufacturerCredentialsAsOperational);
+    return mFlags.Has(Flags::kUseManufacturerCredentialsAsOperational);
 }
 
 template <class ImplClass>
 void GenericConfigurationManagerImpl<ImplClass>::_UseManufacturerCredentialsAsOperational(bool val)
 {
-    SetFlag(mFlags, kFlag_UseManufacturerCredentialsAsOperational, val);
+    mFlags.Set(Flags::kUseManufacturerCredentialsAsOperational, val);
 }
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_JUST_IN_TIME_PROVISIONING
@@ -627,11 +626,11 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreFabricId(uint64_t f
     {
         err = Impl()->WriteConfigValue(ImplClass::kConfigKey_FabricId, fabricId);
         SuccessOrExit(err);
-        SetFlag(mFlags, kFlag_IsMemberOfFabric);
+        mFlags.Set(Flags::kIsMemberOfFabric);
     }
     else
     {
-        ClearFlag(mFlags, kFlag_IsMemberOfFabric);
+        mFlags.Clear(Flags::kIsMemberOfFabric);
         err = Impl()->ClearConfigValue(ImplClass::kConfigKey_FabricId);
         SuccessOrExit(err);
     }
@@ -689,7 +688,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StorePairedAccountId(con
     err = Impl()->WriteConfigValueStr(ImplClass::kConfigKey_PairedAccountId, accountId, accountIdLen);
     SuccessOrExit(err);
 
-    SetFlag(mFlags, kFlag_IsPairedToAccount, (accountId != nullptr && accountIdLen != 0));
+    mFlags.Set(Flags::kIsPairedToAccount, (accountId != nullptr && accountIdLen != 0));
 
 exit:
     return err;
@@ -712,8 +711,8 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreServiceProvisioning
     err = _StorePairedAccountId(accountId, accountIdLen);
     SuccessOrExit(err);
 
-    SetFlag(mFlags, kFlag_IsServiceProvisioned);
-    SetFlag(mFlags, kFlag_IsPairedToAccount, (accountId != nullptr && accountIdLen != 0));
+    mFlags.Set(Flags::kIsServiceProvisioned);
+    mFlags.Set(Flags::kIsPairedToAccount, (accountId != nullptr && accountIdLen != 0));
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -721,8 +720,8 @@ exit:
         Impl()->ClearConfigValue(ImplClass::kConfigKey_ServiceId);
         Impl()->ClearConfigValue(ImplClass::kConfigKey_ServiceConfig);
         Impl()->ClearConfigValue(ImplClass::kConfigKey_PairedAccountId);
-        ClearFlag(mFlags, kFlag_IsServiceProvisioned);
-        ClearFlag(mFlags, kFlag_IsPairedToAccount);
+        mFlags.Clear(Flags::kIsServiceProvisioned);
+        mFlags.Clear(Flags::kIsPairedToAccount);
     }
     return err;
 }
@@ -757,8 +756,8 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_ClearServiceProvisioning
         PlatformMgr().PostEvent(&event);
     }
 
-    ClearFlag(mFlags, kFlag_IsServiceProvisioned);
-    ClearFlag(mFlags, kFlag_IsPairedToAccount);
+    mFlags.Clear(Flags::kIsServiceProvisioned);
+    mFlags.Clear(Flags::kIsPairedToAccount);
 
     return CHIP_NO_ERROR;
 }
@@ -830,20 +829,6 @@ GenericConfigurationManagerImpl<ImplClass>::_GetBLEDeviceIdentificationInfo(Ble:
     SuccessOrExit(err);
     deviceIdInfo.SetDeviceDiscriminator(discriminator);
 
-    // TODO: Update when CHIP service/fabric provision is implemented
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-    deviceIdInfo.PairingStatus = ThreadStackMgr().IsThreadAttached()
-        ? Ble::ChipBLEDeviceIdentificationInfo::kPairingStatus_Paired
-        : Ble::ChipBLEDeviceIdentificationInfo::kPairingStatus_Unpaired;
-#elif CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
-    deviceIdInfo.PairingStatus = ConnectivityMgr().IsWiFiStationConnected()
-        ? Ble::ChipBLEDeviceIdentificationInfo::kPairingStatus_Paired
-        : Ble::ChipBLEDeviceIdentificationInfo::kPairingStatus_Unpaired;
-#else
-    deviceIdInfo.PairingStatus = Impl()->_IsPairedToAccount() ? Ble::ChipBLEDeviceIdentificationInfo::kPairingStatus_Paired
-                                                              : Ble::ChipBLEDeviceIdentificationInfo::kPairingStatus_Unpaired;
-#endif
-
 exit:
     return err;
 }
@@ -851,19 +836,19 @@ exit:
 template <class ImplClass>
 bool GenericConfigurationManagerImpl<ImplClass>::_IsServiceProvisioned()
 {
-    return ::chip::GetFlag(mFlags, kFlag_IsServiceProvisioned);
+    return mFlags.Has(Flags::kIsServiceProvisioned);
 }
 
 template <class ImplClass>
 bool GenericConfigurationManagerImpl<ImplClass>::_IsMemberOfFabric()
 {
-    return ::chip::GetFlag(mFlags, kFlag_IsMemberOfFabric);
+    return mFlags.Has(Flags::kIsMemberOfFabric);
 }
 
 template <class ImplClass>
 bool GenericConfigurationManagerImpl<ImplClass>::_IsPairedToAccount()
 {
-    return ::chip::GetFlag(mFlags, kFlag_IsPairedToAccount);
+    return mFlags.Has(Flags::kIsPairedToAccount);
 }
 
 template <class ImplClass>

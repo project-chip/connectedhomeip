@@ -83,10 +83,20 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPBasic : CHIPCluster
 
 - (void)mfgSpecificPing:(ResponseHandler)completionHandler;
-- (void)resetToFactoryDefaults:(ResponseHandler)completionHandler;
 
-- (void)readAttributeZclVersion:(ResponseHandler)completionHandler;
-- (void)readAttributePowerSource:(ResponseHandler)completionHandler;
+- (void)readAttributeInteractionModelVersion:(ResponseHandler)completionHandler;
+- (void)readAttributeVendorName:(ResponseHandler)completionHandler;
+- (void)readAttributeVendorID:(ResponseHandler)completionHandler;
+- (void)readAttributeProductName:(ResponseHandler)completionHandler;
+- (void)readAttributeProductID:(ResponseHandler)completionHandler;
+- (void)readAttributeUserLabel:(ResponseHandler)completionHandler;
+- (void)writeAttributeUserLabel:(NSString *)value completionHandler:(ResponseHandler)completionHandler;
+- (void)readAttributeLocation:(ResponseHandler)completionHandler;
+- (void)writeAttributeLocation:(NSString *)value completionHandler:(ResponseHandler)completionHandler;
+- (void)readAttributeHardwareVersion:(ResponseHandler)completionHandler;
+- (void)readAttributeHardwareVersionString:(ResponseHandler)completionHandler;
+- (void)readAttributeSoftwareVersion:(ResponseHandler)completionHandler;
+- (void)readAttributeSoftwareVersionString:(ResponseHandler)completionHandler;
 - (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
 
 @end
@@ -291,19 +301,6 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
- * Cluster Content Launch
- *
- */
-@interface CHIPContentLaunch : CHIPCluster
-
-- (void)launchContent:(ResponseHandler)completionHandler;
-- (void)launchURL:(ResponseHandler)completionHandler;
-
-- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
-
-@end
-
-/**
  * Cluster Door Lock
  *
  */
@@ -323,7 +320,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)getUserType:(uint16_t)userId completionHandler:(ResponseHandler)completionHandler;
 - (void)getWeekdaySchedule:(uint8_t)scheduleId userId:(uint16_t)userId completionHandler:(ResponseHandler)completionHandler;
 - (void)getYeardaySchedule:(uint8_t)scheduleId userId:(uint16_t)userId completionHandler:(ResponseHandler)completionHandler;
-- (void)lockDoor:(char *)pin completionHandler:(ResponseHandler)completionHandler;
+- (void)lockDoor:(NSString *)pin completionHandler:(ResponseHandler)completionHandler;
 - (void)setHolidaySchedule:(uint8_t)scheduleId
                 localStartTime:(uint32_t)localStartTime
                   localEndTime:(uint32_t)localEndTime
@@ -332,12 +329,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)setPin:(uint16_t)userId
            userStatus:(uint8_t)userStatus
              userType:(uint8_t)userType
-                  pin:(char *)pin
+                  pin:(NSString *)pin
     completionHandler:(ResponseHandler)completionHandler;
 - (void)setRfid:(uint16_t)userId
            userStatus:(uint8_t)userStatus
              userType:(uint8_t)userType
-                   id:(char *)id
+                   id:(NSString *)id
     completionHandler:(ResponseHandler)completionHandler;
 - (void)setUserType:(uint16_t)userId userType:(uint8_t)userType completionHandler:(ResponseHandler)completionHandler;
 - (void)setWeekdaySchedule:(uint8_t)scheduleId
@@ -353,8 +350,8 @@ NS_ASSUME_NONNULL_BEGIN
             localStartTime:(uint32_t)localStartTime
               localEndTime:(uint32_t)localEndTime
          completionHandler:(ResponseHandler)completionHandler;
-- (void)unlockDoor:(char *)pin completionHandler:(ResponseHandler)completionHandler;
-- (void)unlockWithTimeout:(uint16_t)timeoutInSeconds pin:(char *)pin completionHandler:(ResponseHandler)completionHandler;
+- (void)unlockDoor:(NSString *)pin completionHandler:(ResponseHandler)completionHandler;
+- (void)unlockWithTimeout:(uint16_t)timeoutInSeconds pin:(NSString *)pin completionHandler:(ResponseHandler)completionHandler;
 
 - (void)readAttributeLockState:(ResponseHandler)completionHandler;
 - (void)configureAttributeLockState:(uint16_t)minInterval
@@ -397,8 +394,10 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPGroups : CHIPCluster
 
-- (void)addGroup:(uint16_t)groupId groupName:(char *)groupName completionHandler:(ResponseHandler)completionHandler;
-- (void)addGroupIfIdentifying:(uint16_t)groupId groupName:(char *)groupName completionHandler:(ResponseHandler)completionHandler;
+- (void)addGroup:(uint16_t)groupId groupName:(NSString *)groupName completionHandler:(ResponseHandler)completionHandler;
+- (void)addGroupIfIdentifying:(uint16_t)groupId
+                    groupName:(NSString *)groupName
+            completionHandler:(ResponseHandler)completionHandler;
 - (void)getGroupMembership:(uint8_t)groupCount groupList:(uint16_t)groupList completionHandler:(ResponseHandler)completionHandler;
 - (void)removeAllGroups:(ResponseHandler)completionHandler;
 - (void)removeGroup:(uint16_t)groupId completionHandler:(ResponseHandler)completionHandler;
@@ -468,23 +467,13 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
- * Cluster Media Playback
+ * Cluster Low Power
  *
  */
-@interface CHIPMediaPlayback : CHIPCluster
+@interface CHIPLowPower : CHIPCluster
 
-- (void)fastForwardRequest:(ResponseHandler)completionHandler;
-- (void)nextRequest:(ResponseHandler)completionHandler;
-- (void)pauseRequest:(ResponseHandler)completionHandler;
-- (void)playRequest:(ResponseHandler)completionHandler;
-- (void)previousRequest:(ResponseHandler)completionHandler;
-- (void)rewindRequest:(ResponseHandler)completionHandler;
-- (void)skipBackwardRequest:(ResponseHandler)completionHandler;
-- (void)skipForwardRequest:(ResponseHandler)completionHandler;
-- (void)startOverRequest:(ResponseHandler)completionHandler;
-- (void)stopRequest:(ResponseHandler)completionHandler;
+- (void)sleep:(ResponseHandler)completionHandler;
 
-- (void)readAttributeCurrentState:(ResponseHandler)completionHandler;
 - (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
 
 @end
@@ -517,7 +506,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)addScene:(uint16_t)groupId
               sceneId:(uint8_t)sceneId
        transitionTime:(uint16_t)transitionTime
-            sceneName:(char *)sceneName
+            sceneName:(NSString *)sceneName
             clusterId:(uint16_t)clusterId
                length:(uint8_t)length
                 value:(uint8_t)value

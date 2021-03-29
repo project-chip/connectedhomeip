@@ -17,10 +17,12 @@
 
 #include "Mdns.h"
 
+#include <inttypes.h>
+
 #include <core/Optional.h>
 #include <mdns/Advertiser.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <support/ReturnMacros.h>
+#include <platform/ConfigurationManager.h>
 #include <support/logging/CHIPLogging.h>
 #include <transport/AdminPairingTable.h>
 #include <transport/PASESession.h>
@@ -66,7 +68,6 @@ NodeId GetCurrentNodeId()
 /// Set MDNS operational advertisement
 CHIP_ERROR AdvertiseOperational()
 {
-
     uint64_t fabricId;
 
     if (DeviceLayer::ConfigurationMgr().GetFabricId(fabricId) != CHIP_NO_ERROR)
@@ -131,6 +132,23 @@ CHIP_ERROR AdvertiseCommisioning()
 void StartServer()
 {
     CHIP_ERROR err = chip::Mdns::ServiceAdvertiser::Instance().Start(&chip::DeviceLayer::InetLayer, chip::Mdns::kMdnsPort);
+
+    // TODO: advertise this only when really operational once we support both
+    // operational and commisioning advertising is supported.
+    if (DeviceLayer::ConfigurationMgr().IsFullyProvisioned())
+    {
+        err = app::Mdns::AdvertiseOperational();
+    }
+    else
+    {
+// TODO: Thread devices are not able to advertise using mDNS before being provisioned,
+// so configuraton should be added to enable commissioning advertising based on supported
+// Rendezvous methods.
+#if !CHIP_DEVICE_CONFIG_ENABLE_THREAD
+        err = app::Mdns::AdvertiseCommisioning();
+#endif
+    }
+
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Discovery, "Failed to start mDNS server: %s", chip::ErrorStr(err));

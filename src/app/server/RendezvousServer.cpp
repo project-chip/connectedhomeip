@@ -20,7 +20,6 @@
 #include <app/server/SessionManager.h>
 #include <core/CHIPError.h>
 #include <support/CodeUtils.h>
-#include <support/ReturnMacros.h>
 #include <support/SafeInt.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/StorablePeerConnection.h>
@@ -74,7 +73,7 @@ void RendezvousServer::OnRendezvousComplete()
                    ChipLogError(AppServer, "Failed to store the connection state"));
 
     uint16_t nextKeyId = mRendezvousSession.GetNextKeyId();
-    mStorage->SetKeyValue(kStorablePeerConnectionCountKey, &nextKeyId, sizeof(nextKeyId));
+    mStorage->SyncSetKeyValue(kStorablePeerConnectionCountKey, &nextKeyId, sizeof(nextKeyId));
 }
 
 void RendezvousServer::OnRendezvousStatusUpdate(Status status, CHIP_ERROR err)

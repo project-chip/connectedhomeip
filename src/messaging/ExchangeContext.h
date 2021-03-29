@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@
 #include <messaging/ExchangeDelegate.h>
 #include <messaging/Flags.h>
 #include <messaging/ReliableMessageContext.h>
+#include <protocols/Protocols.h>
 #include <support/BitFlags.h>
 #include <support/DLLUtil.h>
 #include <system/SystemTimer.h>
@@ -107,18 +108,17 @@ public:
      *  @retval  #CHIP_NO_ERROR                             if the CHIP layer successfully sent the message down to the
      *                                                       network layer.
      */
-    CHIP_ERROR SendMessage(uint16_t protocolId, uint8_t msgType, System::PacketBufferHandle msgPayload,
+    CHIP_ERROR SendMessage(Protocols::Id protocolId, uint8_t msgType, System::PacketBufferHandle msgPayload,
                            const SendFlags & sendFlags);
 
     /**
      * A strongly-message-typed version of SendMessage.
      */
     template <typename MessageType, typename = std::enable_if_t<std::is_enum<MessageType>::value>>
-    CHIP_ERROR SendMessage(MessageType msgType, System::PacketBufferHandle && msgPayload, const SendFlags & sendFlags,
-                           void * msgCtxt = nullptr)
+    CHIP_ERROR SendMessage(MessageType msgType, System::PacketBufferHandle && msgPayload, const SendFlags & sendFlags)
     {
         static_assert(std::is_same<std::underlying_type_t<MessageType>, uint8_t>::value, "Enum is wrong size; cast is not safe");
-        return SendMessage(Protocols::MessageTypeTraits<MessageType>::ProtocolId, static_cast<uint8_t>(msgType),
+        return SendMessage(Protocols::MessageTypeTraits<MessageType>::ProtocolId(), static_cast<uint8_t>(msgType),
                            std::move(msgPayload), sendFlags);
     }
 
@@ -206,7 +206,7 @@ private:
     // actions with a delegate pattern.
     uint8_t mChallenge[kMsgCounterChallengeSize]; // Challenge number to identify the sychronization request cryptographically.
 
-    BitFlags<uint16_t, ExFlagValues> mFlags; // Internal state flags
+    BitFlags<ExFlagValues> mFlags; // Internal state flags
 
     /**
      *  Search for an existing exchange that the message applies to.
@@ -228,8 +228,8 @@ private:
      * A subset of SendMessage functionality that does not perform message
      * counter sync for group keys.
      */
-    CHIP_ERROR SendMessageImpl(uint16_t protocolId, uint8_t msgType, System::PacketBufferHandle msgBuf, const SendFlags & sendFlags,
-                               Transport::PeerConnectionState * state = nullptr);
+    CHIP_ERROR SendMessageImpl(Protocols::Id protocolId, uint8_t msgType, System::PacketBufferHandle msgBuf,
+                               const SendFlags & sendFlags, Transport::PeerConnectionState * state = nullptr);
     void CancelResponseTimer();
     static void HandleResponseTimeout(System::Layer * aSystemLayer, void * aAppState, System::Error aError);
 

@@ -20,6 +20,8 @@
 #include "callback.h"
 #include "cluster-id.h"
 
+#include <lib/support/Span.h>
+
 using namespace chip;
 
 // Cluster Init Functions
@@ -27,6 +29,9 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
 {
     switch (clusterId)
     {
+    case ZCL_BASIC_CLUSTER_ID:
+        emberAfBasicClusterInitCallback(endpoint);
+        break;
     case ZCL_LEVEL_CONTROL_CLUSTER_ID:
         emberAfLevelControlClusterInitCallback(endpoint);
         break;
@@ -42,6 +47,11 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     }
 }
 
+void __attribute__((weak)) emberAfBasicClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
 void __attribute__((weak)) emberAfLevelControlClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning

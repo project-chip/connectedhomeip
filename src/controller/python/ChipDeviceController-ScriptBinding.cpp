@@ -52,7 +52,6 @@
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/DLLUtil.h>
-#include <support/ReturnMacros.h>
 #include <support/logging/CHIPLogging.h>
 
 using namespace chip;
@@ -78,7 +77,6 @@ chip::NodeId kRemoteDeviceId       = chip::kTestDeviceNodeId;
 
 extern "C" {
 CHIP_ERROR pychip_DeviceController_NewDeviceController(chip::Controller::DeviceCommissioner ** outDevCtrl,
-                                                       chip::Controller::DeviceAddressUpdater ** outAddressUpdater,
                                                        chip::NodeId localDeviceId);
 CHIP_ERROR pychip_DeviceController_DeleteDeviceController(chip::Controller::DeviceCommissioner * devCtrl,
                                                           chip::Controller::DeviceAddressUpdater * addressUpdater);
@@ -122,10 +120,12 @@ void pychip_Stack_SetLogFunct(LogMessageFunct logFunct);
 
 CHIP_ERROR pychip_GetDeviceByNodeId(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeId,
                                     chip::Controller::Device ** device);
+
+// CHIP Stack objects
+CHIP_ERROR pychip_BLEMgrImpl_ConfigureBle(uint32_t bluetoothAdapterId);
 }
 
 CHIP_ERROR pychip_DeviceController_NewDeviceController(chip::Controller::DeviceCommissioner ** outDevCtrl,
-                                                       chip::Controller::DeviceAddressUpdater ** outAddressUpdater,
                                                        chip::NodeId localDeviceId)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -141,13 +141,17 @@ CHIP_ERROR pychip_DeviceController_NewDeviceController(chip::Controller::DeviceC
     SuccessOrExit(err = (*outDevCtrl)->ServiceEvents());
 
 exit:
-    if (err != CHIP_NO_ERROR && *outAddressUpdater != NULL)
-    {
-        delete *outAddressUpdater;
-        *outAddressUpdater = NULL;
-    }
-
     return err;
+}
+
+CHIP_ERROR pychip_BLEMgrImpl_ConfigureBle(uint32_t bluetoothAdapterId)
+{
+#if CHIP_DEVICE_LAYER_TARGET_LINUX && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+    // By default, Linux device is configured as a BLE peripheral while the controller needs a BLE central.
+    ReturnErrorOnFailure(
+        DeviceLayer::Internal::BLEMgrImpl().ConfigureBle(/* BLE adapter ID */ bluetoothAdapterId, /* BLE central */ true));
+#endif
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR pychip_DeviceController_DeleteDeviceController(chip::Controller::DeviceCommissioner * devCtrl,
@@ -345,6 +349,7 @@ const char * pychip_Stack_StatusReportToString(uint32_t profileId, uint16_t stat
 CHIP_ERROR pychip_GetDeviceByNodeId(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeId,
                                     chip::Controller::Device ** device)
 {
+    VerifyOrReturnError(devCtrl != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     return devCtrl->GetDevice(nodeId, device);
 }
 

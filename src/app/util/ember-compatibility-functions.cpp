@@ -73,7 +73,7 @@ bool IMEmberAfSendDefaultResponseWithCallback(EmberAfStatus status)
                                                              0, // GroupId
                                                              imCompatibilityEmberApsFrame.clusterId,
                                                              imCompatibilityEmberAfCluster.commandId,
-                                                             (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+                                                             (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
 
     chip::TLV::TLVType dummyType = chip::TLV::kTLVType_NotSpecified;
     chip::TLV::TLVWriter writer  = currentCommandObject->CreateCommandDataElementTLVWriter();

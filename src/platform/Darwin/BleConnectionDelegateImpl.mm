@@ -58,14 +58,24 @@ constexpr uint64_t kScanningTimeoutInSeconds = 60;
 namespace chip {
 namespace DeviceLayer {
     namespace Internal {
+        BleConnection * ble;
+
         void BleConnectionDelegateImpl::NewConnection(Ble::BleLayer * bleLayer, void * appState, const uint16_t deviceDiscriminator)
         {
             ChipLogProgress(Ble, "%s", __FUNCTION__);
-            BleConnection * ble = [[BleConnection alloc] initWithDiscriminator:deviceDiscriminator];
+            ble = [[BleConnection alloc] initWithDiscriminator:deviceDiscriminator];
             [ble setBleLayer:bleLayer];
             ble.appState = appState;
             ble.onConnectionComplete = OnConnectionComplete;
             ble.onConnectionError = OnConnectionError;
+        }
+
+        BLE_ERROR BleConnectionDelegateImpl::CancelConnection()
+        {
+            ChipLogProgress(Ble, "%s", __FUNCTION__);
+            [ble stop];
+            ble = nil;
+            return BLE_NO_ERROR;
         }
     } // namespace Internal
 } // namespace DeviceLayer
@@ -160,8 +170,9 @@ namespace DeviceLayer {
 - (BOOL)checkDiscriminator:(uint16_t)discriminator
 {
     // If the setup discriminator is only 4 bits, only match the lower 4 from the BLE advertisement
-    if (_deviceDiscriminator <= chip::kManualSetupDiscriminatorFieldBitMask) {
-        return _deviceDiscriminator == (discriminator & chip::kManualSetupDiscriminatorFieldBitMask);
+    constexpr uint16_t kManualSetupDiscriminatorFieldBitMask = (1 << chip::kManualSetupDiscriminatorFieldLengthInBits) - 1;
+    if (_deviceDiscriminator <= kManualSetupDiscriminatorFieldBitMask) {
+        return _deviceDiscriminator == (discriminator & kManualSetupDiscriminatorFieldBitMask);
     } else {
         // else compare the entire thing
         return _deviceDiscriminator == discriminator;
@@ -292,7 +303,6 @@ namespace DeviceLayer {
 
 - (void)stop
 {
-    dispatch_source_cancel(_timer);
     [self stopScanning];
     [self disconnect];
     _centralManager = nil;
@@ -313,7 +323,7 @@ namespace DeviceLayer {
     if (!_centralManager) {
         return;
     }
-
+    dispatch_source_cancel(_timer);
     [_centralManager stopScan];
 }
 

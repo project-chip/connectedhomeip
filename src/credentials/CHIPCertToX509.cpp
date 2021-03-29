@@ -382,7 +382,6 @@ static CHIP_ERROR DecodeConvertKeyUsageExtension(TLVReader & reader, ASN1Writer 
 {
     CHIP_ERROR err;
     uint64_t keyUsageBits;
-    BitFlags<uint16_t, KeyUsageFlags> keyUsageFlags;
 
     certData.mCertFlags.Set(CertFlags::kExtPresent_KeyUsage);
 
@@ -395,16 +394,18 @@ static CHIP_ERROR DecodeConvertKeyUsageExtension(TLVReader & reader, ASN1Writer 
 
     VerifyOrExit(keyUsageBits <= UINT16_MAX, err = CHIP_ERROR_UNSUPPORTED_CERT_FORMAT);
 
-    keyUsageFlags.SetRaw(static_cast<uint16_t>(keyUsageBits));
-    VerifyOrExit(keyUsageFlags.HasOnly(KeyUsageFlags::kDigitalSignature, KeyUsageFlags::kNonRepudiation,
-                                       KeyUsageFlags::kKeyEncipherment, KeyUsageFlags::kDataEncipherment,
-                                       KeyUsageFlags::kKeyAgreement, KeyUsageFlags::kKeyCertSign, KeyUsageFlags::kCRLSign,
-                                       KeyUsageFlags::kEncipherOnly, KeyUsageFlags::kEncipherOnly),
-                 err = CHIP_ERROR_UNSUPPORTED_CERT_FORMAT);
+    {
+        BitFlags<KeyUsageFlags> keyUsageFlags(static_cast<uint16_t>(keyUsageBits));
+        VerifyOrExit(keyUsageFlags.HasOnly(KeyUsageFlags::kDigitalSignature, KeyUsageFlags::kNonRepudiation,
+                                           KeyUsageFlags::kKeyEncipherment, KeyUsageFlags::kDataEncipherment,
+                                           KeyUsageFlags::kKeyAgreement, KeyUsageFlags::kKeyCertSign, KeyUsageFlags::kCRLSign,
+                                           KeyUsageFlags::kEncipherOnly, KeyUsageFlags::kEncipherOnly),
+                     err = CHIP_ERROR_UNSUPPORTED_CERT_FORMAT);
 
-    ASN1_ENCODE_BIT_STRING(static_cast<uint16_t>(keyUsageBits));
+        ASN1_ENCODE_BIT_STRING(static_cast<uint16_t>(keyUsageBits));
 
-    certData.mKeyUsageFlags = keyUsageFlags;
+        certData.mKeyUsageFlags = keyUsageFlags;
+    }
 
 exit:
     return err;
@@ -832,7 +833,7 @@ static CHIP_ERROR DecodeConvertCert(TLVReader & reader, ASN1Writer & writer, Chi
     }
     VerifyOrExit(reader.GetType() == kTLVType_Structure, err = CHIP_ERROR_WRONG_TLV_TYPE);
     tag = reader.GetTag();
-    VerifyOrExit(tag == ProfileTag(kProtocol_OpCredentials, kTag_ChipCertificate) || tag == AnonymousTag,
+    VerifyOrExit(tag == ProfileTag(Protocols::OpCredentials::Id.ToTLVProfileId(), kTag_ChipCertificate) || tag == AnonymousTag,
                  err = CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
 
     err = reader.EnterContainer(containerType);

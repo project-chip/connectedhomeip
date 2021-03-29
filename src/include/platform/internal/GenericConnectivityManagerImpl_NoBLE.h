@@ -53,15 +53,12 @@ public:
     // ===== Methods that implement the ConnectivityManager abstract interface.
 
     Ble::BleLayer * _GetBleLayer(void);
-    void _AddCHIPoBLEConnectionHandler(ConnectivityManager::BleConnectionReceivedFunct handler);
-    void _RemoveCHIPoBLEConnectionHandler(void);
     ConnectivityManager::CHIPoBLEServiceMode _GetCHIPoBLEServiceMode(void);
     CHIP_ERROR _SetCHIPoBLEServiceMode(ConnectivityManager::CHIPoBLEServiceMode val);
     bool _IsBLEAdvertisingEnabled(void);
     CHIP_ERROR _SetBLEAdvertisingEnabled(bool val);
-    bool _IsBLEFastAdvertisingEnabled(void);
-    CHIP_ERROR _SetBLEFastAdvertisingEnabled(bool val);
     bool _IsBLEAdvertising(void);
+    CHIP_ERROR _SetBLEAdvertisingMode(ConnectivityManager::BLEAdvertisingMode mode);
     CHIP_ERROR _GetBLEDeviceName(char * buf, size_t bufSize);
     CHIP_ERROR _SetBLEDeviceName(const char * deviceName);
     uint16_t _NumBLEConnections(void);
@@ -76,15 +73,6 @@ inline Ble::BleLayer * GenericConnectivityManagerImpl_NoBLE<ImplClass>::_GetBleL
 {
     return nullptr;
 }
-
-template <class ImplClass>
-inline void GenericConnectivityManagerImpl_NoBLE<ImplClass>::_AddCHIPoBLEConnectionHandler(
-    ConnectivityManager::BleConnectionReceivedFunct handler)
-{}
-
-template <class ImplClass>
-inline void GenericConnectivityManagerImpl_NoBLE<ImplClass>::_RemoveCHIPoBLEConnectionHandler(void)
-{}
 
 template <class ImplClass>
 inline ConnectivityManager::CHIPoBLEServiceMode GenericConnectivityManagerImpl_NoBLE<ImplClass>::_GetCHIPoBLEServiceMode(void)
@@ -112,21 +100,16 @@ inline CHIP_ERROR GenericConnectivityManagerImpl_NoBLE<ImplClass>::_SetBLEAdvert
 }
 
 template <class ImplClass>
-inline bool GenericConnectivityManagerImpl_NoBLE<ImplClass>::_IsBLEFastAdvertisingEnabled(void)
-{
-    return false;
-}
-
-template <class ImplClass>
-inline CHIP_ERROR GenericConnectivityManagerImpl_NoBLE<ImplClass>::_SetBLEFastAdvertisingEnabled(bool val)
-{
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-
-template <class ImplClass>
 inline bool GenericConnectivityManagerImpl_NoBLE<ImplClass>::_IsBLEAdvertising(void)
 {
     return false;
+}
+
+template <class ImplClass>
+inline CHIP_ERROR
+GenericConnectivityManagerImpl_NoBLE<ImplClass>::_SetBLEAdvertisingMode(ConnectivityManager::BLEAdvertisingMode mode)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 template <class ImplClass>

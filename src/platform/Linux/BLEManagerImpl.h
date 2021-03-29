@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -52,17 +52,18 @@ struct BLEAdvConfig
     const char * mpAdvertisingUUID;
 };
 
-enum class BleScanState
+enum class BleScanState : uint8_t
 {
     kNotScanning,
     kScanForDiscriminator,
     kScanForAddress,
+    kConnecting,
 };
 
 struct BLEScanConfig
 {
-    // If a active scan for connection is being performed
-    BleScanState bleScanState = BleScanState::kNotScanning;
+    // If an active scan for connection is being performed
+    BleScanState mBleScanState = BleScanState::kNotScanning;
 
     // If scanning by discriminator, what are we scanning for
     uint16_t mDiscriminator = 0;
@@ -93,6 +94,7 @@ public:
 
     // Driven by BlueZ IO
     static void HandleNewConnection(BLE_CONNECTION_OBJECT conId);
+    static void HandleConnectFailed(CHIP_ERROR error);
     static void HandleWriteComplete(BLE_CONNECTION_OBJECT conId);
     static void HandleSubscribeOpComplete(BLE_CONNECTION_OBJECT conId, bool subscribed);
     static void HandleTXCharChanged(BLE_CONNECTION_OBJECT conId, const uint8_t * value, size_t len);
@@ -100,7 +102,6 @@ public:
     static void CHIPoBluez_ConnectionClosed(BLE_CONNECTION_OBJECT user_data);
     static void HandleTXCharCCCDWrite(BLE_CONNECTION_OBJECT user_data);
     static void HandleTXComplete(BLE_CONNECTION_OBJECT user_data);
-    static bool WoBLEz_TimerCb(BLE_CONNECTION_OBJECT user_data);
 
     static void NotifyBLEPeripheralRegisterAppComplete(bool aIsSuccess, void * apAppstate);
     static void NotifyBLEPeripheralAdvConfiguredComplete(bool aIsSuccess, void * apAppstate);
@@ -115,9 +116,8 @@ private:
     CHIP_ERROR _SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val);
     bool _IsAdvertisingEnabled();
     CHIP_ERROR _SetAdvertisingEnabled(bool val);
-    bool _IsFastAdvertisingEnabled();
-    CHIP_ERROR _SetFastAdvertisingEnabled(bool val);
     bool _IsAdvertising();
+    CHIP_ERROR _SetAdvertisingMode(BLEAdvertisingMode mode);
     CHIP_ERROR _GetDeviceName(char * buf, size_t bufSize);
     CHIP_ERROR _SetDeviceName(const char * deviceName);
     uint16_t _NumConnections();
@@ -150,6 +150,7 @@ private:
     // ===== Members that implement virtual methods on BleConnectionDelegate.
 
     void NewConnection(BleLayer * bleLayer, void * appState, uint16_t connDiscriminator) override;
+    BLE_ERROR CancelConnection() override;
 
     // ===== Members that implement virtual methods on ChipDeviceScannerDelegate
     void OnDeviceScanned(BluezDevice1 * device, const chip::Ble::ChipBLEDeviceIdentificationInfo & info) override;
@@ -163,18 +164,18 @@ private:
     static BLEManagerImpl sInstance;
 
     // ===== Private members reserved for use by this class only.
-    enum
+    enum class Flags : uint16_t
     {
-        kFlag_AsyncInitCompleted       = 0x0001, /**< One-time asynchronous initialization actions have been performed. */
-        kFlag_BluezBLELayerInitialized = 0x0002, /**< The Bluez layer has been initialized. */
-        kFlag_AppRegistered            = 0x0004, /**< The CHIPoBLE application has been registered with the Bluez layer. */
-        kFlag_AdvertisingConfigured    = 0x0008, /**< CHIPoBLE advertising has been configured in the Bluez layer. */
-        kFlag_Advertising              = 0x0010, /**< The system is currently CHIPoBLE advertising. */
-        kFlag_ControlOpInProgress      = 0x0020, /**< An async control operation has been issued to the ESP BLE layer. */
-        kFlag_AdvertisingEnabled       = 0x0040, /**< The application has enabled CHIPoBLE advertising. */
-        kFlag_FastAdvertisingEnabled   = 0x0080, /**< The application has enabled fast advertising. */
-        kFlag_UseCustomDeviceName      = 0x0100, /**< The application has configured a custom BLE device name. */
-        kFlag_AdvertisingRefreshNeeded = 0x0200, /**< The advertising configuration/state in BLE layer needs to be updated. */
+        kAsyncInitCompleted       = 0x0001, /**< One-time asynchronous initialization actions have been performed. */
+        kBluezBLELayerInitialized = 0x0002, /**< The Bluez layer has been initialized. */
+        kAppRegistered            = 0x0004, /**< The CHIPoBLE application has been registered with the Bluez layer. */
+        kAdvertisingConfigured    = 0x0008, /**< CHIPoBLE advertising has been configured in the Bluez layer. */
+        kAdvertising              = 0x0010, /**< The system is currently CHIPoBLE advertising. */
+        kControlOpInProgress      = 0x0020, /**< An async control operation has been issued to the ESP BLE layer. */
+        kAdvertisingEnabled       = 0x0040, /**< The application has enabled CHIPoBLE advertising. */
+        kFastAdvertisingEnabled   = 0x0080, /**< The application has enabled fast advertising. */
+        kUseCustomDeviceName      = 0x0100, /**< The application has configured a custom BLE device name. */
+        kAdvertisingRefreshNeeded = 0x0200, /**< The advertising configuration/state in BLE layer needs to be updated. */
     };
 
     enum
@@ -192,11 +193,12 @@ private:
 
     void InitiateScan(BleScanState scanType);
     static void InitiateScan(intptr_t arg);
+    void CleanScanConfig();
 
     CHIPoBLEServiceMode mServiceMode;
     BLEAdvConfig mBLEAdvConfig;
     BLEScanConfig mBLEScanConfig;
-    uint16_t mFlags;
+    BitFlags<Flags> mFlags;
     char mDeviceName[kMaxDeviceNameLength + 1];
     bool mIsCentral            = false;
     BluezEndpoint * mpEndpoint = nullptr;
@@ -237,17 +239,12 @@ inline BLEManager::CHIPoBLEServiceMode BLEManagerImpl::_GetCHIPoBLEServiceMode()
 
 inline bool BLEManagerImpl::_IsAdvertisingEnabled()
 {
-    return GetFlag(mFlags, kFlag_AdvertisingEnabled);
-}
-
-inline bool BLEManagerImpl::_IsFastAdvertisingEnabled()
-{
-    return GetFlag(mFlags, kFlag_FastAdvertisingEnabled);
+    return mFlags.Has(Flags::kAdvertisingEnabled);
 }
 
 inline bool BLEManagerImpl::_IsAdvertising()
 {
-    return GetFlag(mFlags, kFlag_Advertising);
+    return mFlags.Has(Flags::kAdvertising);
 }
 
 } // namespace Internal

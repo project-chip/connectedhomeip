@@ -28,55 +28,33 @@ namespace {
 class ServerStorageDelegate : public chip::PersistentStorageDelegate
 {
 public:
-    void SetDelegate(chip::PersistentStorageResultDelegate * delegate) override { mAsyncDelegate = delegate; }
+    void SetStorageDelegate(chip::PersistentStorageResultDelegate * delegate) override { mAsyncDelegate = delegate; }
 
-    void GetKeyValue(const char * key) override
-    {
-        // TODO: Async Get/Set are implemented synchronously here.
-        // We need to figure out a standard way to implement this - this implementation
-        // was based on an example that just returned and that seemed even less useful.
-        uint8_t buffer[kMaxKeyValueSize];
-        uint16_t bufferSize = sizeof(buffer) - 1;
-        CHIP_ERROR err      = GetKeyValue(key, buffer, bufferSize);
-
-        if (err == CHIP_NO_ERROR)
-        {
-            buffer[bufferSize] = 0;
-            mAsyncDelegate->OnValue(key, reinterpret_cast<const char *>(buffer));
-        }
-        else
-        {
-            mAsyncDelegate->OnStatus(key, chip::PersistentStorageResultDelegate::Operation::kGET, err);
-        }
-    }
-
-    void SetKeyValue(const char * key, const char * value) override
+    void AsyncSetKeyValue(const char * key, const char * value) override
     {
 
-        CHIP_ERROR err = SetKeyValue(key, value, strlen(value));
+        CHIP_ERROR err = SyncSetKeyValue(key, value, strlen(value));
 
         if (err != CHIP_NO_ERROR)
         {
-            mAsyncDelegate->OnStatus(key, chip::PersistentStorageResultDelegate::Operation::kSET, err);
+            mAsyncDelegate->OnPersistentStorageStatus(key, chip::PersistentStorageResultDelegate::Operation::kSET, err);
         }
     }
 
     CHIP_ERROR
-    GetKeyValue(const char * key, void * buffer, uint16_t & size) override
+    SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override
     {
         return chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Get(key, buffer, size);
     }
 
-    CHIP_ERROR SetKeyValue(const char * key, const void * value, uint16_t size) override
+    CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override
     {
         return chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Put(key, value, size);
     }
 
-    void DeleteKeyValue(const char * key) override { chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Delete(key); }
+    void AsyncDeleteKeyValue(const char * key) override { chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Delete(key); }
 
 private:
-    static constexpr size_t kMaxKeyValueSize = 1024;
-
     chip::PersistentStorageResultDelegate * mAsyncDelegate = nullptr;
 };
 
@@ -144,9 +122,18 @@ public:
             return;
         }
 
-        mWifiSsid     = ssid;
-        mWifiPassword = password;
-        mCredentialsDelegate->SendNetworkCredentials(mWifiSsid.c_str(), mWifiPassword.c_str());
+        mCredentialsDelegate->SendNetworkCredentials(ssid, password);
+    }
+
+    void SetThreadCredentials(const chip::DeviceLayer::Internal::DeviceNetworkInfo & threadData)
+    {
+        if (mCredentialsDelegate == nullptr)
+        {
+            ChipLogError(Controller, "Thread credentials received before delegate available.");
+            return;
+        }
+
+        mCredentialsDelegate->SendThreadCredentials(threadData);
     }
 
 private:
@@ -156,10 +143,6 @@ private:
 
     /// Delegate is set during request callbacks
     chip::RendezvousDeviceCredentialsDelegate * mCredentialsDelegate = nullptr;
-
-    // Copy of wifi credentials, to allow them to be used by callbacks
-    std::string mWifiSsid;
-    std::string mWifiPassword;
 };
 
 ServerStorageDelegate gServerStorage;
@@ -167,9 +150,42 @@ ScriptDevicePairingDelegate gPairingDelegate;
 
 } // namespace
 
-extern "C" void pychip_internal_PairingDelegate_SetNetworkCredentials(const char * ssid, const char * password)
+extern "C" void pychip_internal_PairingDelegate_SetWifiCredentials(const char * ssid, const char * password)
 {
     chip::python::ChipMainThreadScheduleAndWait([&]() { gPairingDelegate.SetWifiCredentials(ssid, password); });
+}
+
+extern "C" CHIP_ERROR pychip_internal_PairingDelegate_SetThreadCredentials(const void * data, uint32_t length)
+{
+
+    // Openthread is OPAQUE by the spec, however current CHIP stack does not have any
+    // validation/support for opaque blobs. As a result, we try to do some
+    // pre-validation here
+
+    // TODO: there should be uniform 'BLOBL' support within the thread stack
+    if (length != sizeof(chip::DeviceLayer::Internal::DeviceNetworkInfo))
+    {
+        ChipLogError(Controller, "Received invalid thread credential blob. Expected size %u and got %u bytes instead",
+                     sizeof(chip::DeviceLayer::Internal::DeviceNetworkInfo), length);
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    // unsure about alignment so copy into a properly aligned item
+    chip::DeviceLayer::Internal::DeviceNetworkInfo threadInfo;
+    memcpy(&threadInfo, data, sizeof(threadInfo));
+
+    // TODO: figure out a proper way to validate this or remove validation once
+    // thread credentials are assumed opaque throughout
+    if ((threadInfo.ThreadChannel != chip::DeviceLayer::Internal::kThreadChannel_NotSpecified) &&
+        ((threadInfo.ThreadChannel < 11) || (threadInfo.ThreadChannel > 26)))
+    {
+        ChipLogError(Controller, "Failed to validate thread info: channel %d is not valid", threadInfo.ThreadChannel);
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    chip::python::ChipMainThreadScheduleAndWait([&]() { gPairingDelegate.SetThreadCredentials(threadInfo); });
+
+    return CHIP_NO_ERROR;
 }
 
 extern "C" void pychip_internal_PairingDelegate_SetNetworkCredentialsRequestedCallback(
@@ -234,11 +250,10 @@ extern "C" uint32_t pychip_internal_Commissioner_BleConnectForPairing(chip::Cont
     chip::python::ChipMainThreadScheduleAndWait([&]() {
         chip::RendezvousParameters params;
 
-        params.SetDiscriminator(discriminator)
-            .SetSetupPINCode(pinCode)
-            .SetRemoteNodeId(remoteNodeId)
-            .SetBleLayer(chip::DeviceLayer::ConnectivityMgr().GetBleLayer())
-            .SetPeerAddress(chip::Transport::PeerAddress::BLE());
+        params.SetDiscriminator(discriminator).SetSetupPINCode(pinCode).SetRemoteNodeId(remoteNodeId);
+#if CONFIG_NETWORK_LAYER_BLE
+        params.SetBleLayer(chip::DeviceLayer::ConnectivityMgr().GetBleLayer()).SetPeerAddress(chip::Transport::PeerAddress::BLE());
+#endif
 
         err = commissioner->PairDevice(remoteNodeId, params);
     });

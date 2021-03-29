@@ -41,7 +41,6 @@
 #include <support/CHIPFaultInjection.h>
 #include <support/CodeUtils.h>
 #include <support/RandUtils.h>
-#include <support/ReturnMacros.h>
 #include <support/logging/CHIPLogging.h>
 
 using namespace chip::Encoding;
@@ -74,11 +73,19 @@ CHIP_ERROR ExchangeManager::Init(SecureSessionMgr * sessionMgr)
     mSessionMgr = sessionMgr;
 
     mNextExchangeId = GetRandU16();
+    mNextKeyId      = 0;
 
     mContextsInUse = 0;
 
-    memset(UMHandlerPool, 0, sizeof(UMHandlerPool));
-    OnExchangeContextChanged = nullptr;
+    for (auto & handler : UMHandlerPool)
+    {
+        // Mark all handlers as unallocated.  This handles both initial
+        // initialization and the case when the consumer shuts us down and
+        // then re-initializes without removing registered handlers.
+        handler.Reset();
+    }
+
+    mSessionMgr->GetTransportManager()->SetRendezvousSession(this);
 
     sessionMgr->SetDelegate(this);
 
@@ -103,8 +110,6 @@ CHIP_ERROR ExchangeManager::Shutdown()
         mSessionMgr = nullptr;
     }
 
-    OnExchangeContextChanged = nullptr;
-
     mState = State::kState_NotInitialized;
 
     return CHIP_NO_ERROR;
@@ -115,23 +120,23 @@ ExchangeContext * ExchangeManager::NewContext(SecureSessionHandle session, Excha
     return AllocContext(mNextExchangeId++, session, true, delegate);
 }
 
-CHIP_ERROR ExchangeManager::RegisterUnsolicitedMessageHandlerForProtocol(uint32_t protocolId, ExchangeDelegate * delegate)
+CHIP_ERROR ExchangeManager::RegisterUnsolicitedMessageHandlerForProtocol(Protocols::Id protocolId, ExchangeDelegate * delegate)
 {
     return RegisterUMH(protocolId, kAnyMessageType, delegate);
 }
 
-CHIP_ERROR ExchangeManager::RegisterUnsolicitedMessageHandlerForType(uint32_t protocolId, uint8_t msgType,
+CHIP_ERROR ExchangeManager::RegisterUnsolicitedMessageHandlerForType(Protocols::Id protocolId, uint8_t msgType,
                                                                      ExchangeDelegate * delegate)
 {
     return RegisterUMH(protocolId, static_cast<int16_t>(msgType), delegate);
 }
 
-CHIP_ERROR ExchangeManager::UnregisterUnsolicitedMessageHandlerForProtocol(uint32_t protocolId)
+CHIP_ERROR ExchangeManager::UnregisterUnsolicitedMessageHandlerForProtocol(Protocols::Id protocolId)
 {
     return UnregisterUMH(protocolId, kAnyMessageType);
 }
 
-CHIP_ERROR ExchangeManager::UnregisterUnsolicitedMessageHandlerForType(uint32_t protocolId, uint8_t msgType)
+CHIP_ERROR ExchangeManager::UnregisterUnsolicitedMessageHandlerForType(Protocols::Id protocolId, uint8_t msgType)
 {
     return UnregisterUMH(protocolId, static_cast<int16_t>(msgType));
 }
@@ -158,19 +163,19 @@ ExchangeContext * ExchangeManager::AllocContext(uint16_t ExchangeId, SecureSessi
     return nullptr;
 }
 
-CHIP_ERROR ExchangeManager::RegisterUMH(uint32_t protocolId, int16_t msgType, ExchangeDelegate * delegate)
+CHIP_ERROR ExchangeManager::RegisterUMH(Protocols::Id protocolId, int16_t msgType, ExchangeDelegate * delegate)
 {
     UnsolicitedMessageHandler * umh      = UMHandlerPool;
     UnsolicitedMessageHandler * selected = nullptr;
 
     for (int i = 0; i < CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS; i++, umh++)
     {
-        if (umh->Delegate == nullptr)
+        if (!umh->IsInUse())
         {
             if (selected == nullptr)
                 selected = umh;
         }
-        else if (umh->ProtocolId == protocolId && umh->MessageType == msgType)
+        else if (umh->Matches(protocolId, msgType))
         {
             umh->Delegate = delegate;
             return CHIP_NO_ERROR;
@@ -189,15 +194,15 @@ CHIP_ERROR ExchangeManager::RegisterUMH(uint32_t protocolId, int16_t msgType, Ex
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ExchangeManager::UnregisterUMH(uint32_t protocolId, int16_t msgType)
+CHIP_ERROR ExchangeManager::UnregisterUMH(Protocols::Id protocolId, int16_t msgType)
 {
     UnsolicitedMessageHandler * umh = UMHandlerPool;
 
     for (int i = 0; i < CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS; i++, umh++)
     {
-        if (umh->Delegate != nullptr && umh->ProtocolId == protocolId && umh->MessageType == msgType)
+        if (umh->IsInUse() && umh->Matches(protocolId, msgType))
         {
-            umh->Delegate = nullptr;
+            umh->Reset();
             SYSTEM_STATS_DECREMENT(chip::System::Stats::kExchangeMgr_NumUMHandlers);
             return CHIP_NO_ERROR;
         }
@@ -231,7 +236,7 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
     UnsolicitedMessageHandler * matchingUMH = nullptr;
     bool sendAckAndCloseExchange            = false;
 
-    if (!IsMsgCounterSyncMessage(payloadHeader) && packetHeader.IsPeerGroupMsgIdNotSynchronized())
+    if (!IsMsgCounterSyncMessage(payloadHeader) && session.IsPeerGroupMsgIdNotSynchronized())
     {
         Transport::PeerConnectionState * state = mSessionMgr->GetPeerConnectionState(session);
         VerifyOrReturn(state != nullptr);
@@ -292,7 +297,7 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
 
         for (int i = 0; i < CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS; i++, umh++)
         {
-            if (umh->Delegate != nullptr && umh->ProtocolId == payloadHeader.GetProtocolID())
+            if (umh->IsInUse() && payloadHeader.HasProtocol(umh->ProtocolId))
             {
                 if (umh->MessageType == payloadHeader.GetMessageType())
                 {
@@ -351,6 +356,50 @@ exit:
     }
 }
 
+ChannelHandle ExchangeManager::EstablishChannel(const ChannelBuilder & builder, ChannelDelegate * delegate)
+{
+    ChannelContext * channelContext = nullptr;
+
+    // Find an existing Channel matching the builder
+    mChannelContexts.ForEachActiveObject([&](ChannelContext * context) {
+        if (context->MatchesBuilder(builder))
+        {
+            channelContext = context;
+            return false;
+        }
+        return true;
+    });
+
+    if (channelContext == nullptr)
+    {
+        // create a new channel if not found
+        channelContext = mChannelContexts.CreateObject(this);
+        if (channelContext == nullptr)
+            return ChannelHandle{ nullptr };
+        channelContext->Start(builder);
+    }
+    else
+    {
+        channelContext->Retain();
+    }
+
+    ChannelContextHandleAssociation * association = mChannelHandles.CreateObject(channelContext, delegate);
+    channelContext->Release();
+    return ChannelHandle{ association };
+}
+
+void ExchangeManager::OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr)
+{
+    mChannelContexts.ForEachActiveObject([&](ChannelContext * context) {
+        if (context->MatchesSession(session, mgr))
+        {
+            context->OnNewConnection(session);
+            return false;
+        }
+        return true;
+    });
+}
+
 void ExchangeManager::OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * mgr)
 {
     for (auto & ec : mContextPool)
@@ -360,6 +409,52 @@ void ExchangeManager::OnConnectionExpired(SecureSessionHandle session, SecureSes
             ec.Close();
             // Continue iterate because there can be multiple contexts associated with the connection.
         }
+    }
+
+    mChannelContexts.ForEachActiveObject([&](ChannelContext * context) {
+        if (context->MatchesSession(session, mgr))
+        {
+            context->OnConnectionExpired(session);
+            return false;
+        }
+        return true;
+    });
+}
+
+void ExchangeManager::OnMessageReceived(const PacketHeader & header, const Transport::PeerAddress & source,
+                                        System::PacketBufferHandle msgBuf)
+{
+    auto peer = header.GetSourceNodeId();
+    if (!peer.HasValue())
+    {
+        char addrBuffer[Transport::PeerAddress::kMaxToStringSize];
+        source.ToString(addrBuffer, sizeof(addrBuffer));
+        ChipLogError(ExchangeManager, "Unencrypted message from %s is dropped since no source node id in packet header.",
+                     addrBuffer);
+        return;
+    }
+
+    auto node     = peer.Value();
+    auto notFound = mChannelContexts.ForEachActiveObject([&](ChannelContext * context) {
+        if (context->IsCasePairing() && context->MatchNodeId(node))
+        {
+            CHIP_ERROR err = context->HandlePairingMessage(header, source, std::move(msgBuf));
+            if (err != CHIP_NO_ERROR)
+                ChipLogError(ExchangeManager, "HandlePairingMessage error %s from node 0x%08" PRIx32 "%08" PRIx32 ".",
+                             chip::ErrorStr(err), static_cast<uint32_t>(node >> 32), static_cast<uint32_t>(node));
+            return false;
+        }
+        return true;
+    });
+
+    if (notFound)
+    {
+        char addrBuffer[Transport::PeerAddress::kMaxToStringSize];
+        source.ToString(addrBuffer, sizeof(addrBuffer));
+        ChipLogError(ExchangeManager,
+                     "Unencrypted message from %s is dropped since no session found for node 0x%08" PRIx32 "%08" PRIx32 ".",
+                     addrBuffer, static_cast<uint32_t>(node >> 32), static_cast<uint32_t>(node));
+        return;
     }
 }
 

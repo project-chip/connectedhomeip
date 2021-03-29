@@ -101,7 +101,7 @@ declare -a args=(
 
 [[ $CONFIGURATION != Debug* ]] && args+='is_debug=true'
 
-[[ $PLATFORM_FAMILY_NAME == iOS || $PLATFORM_FAMILY_NAME == watchOS || $PLATFORM_FAMILY_NAME == tvOS ]] && {
+[[ $PLATFORM_FAMILY_NAME != macOS ]] && {
     args+=(
         'target_os="ios"'
         'import("//config/ios/args.gni")'

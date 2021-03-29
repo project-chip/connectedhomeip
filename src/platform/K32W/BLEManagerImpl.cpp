@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2020 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -62,7 +62,7 @@ namespace {
  * Macros & Constants definitions
  *******************************************************************************/
 /* Timeout of BLE commands */
-#define CHIP_BLE_KW_EVNT_TIMEOUT 300
+#define CHIP_BLE_KW_EVNT_TIMEOUT 1000
 
 /** BLE advertisment state changed */
 #define CHIP_BLE_KW_EVNT_ADV_CHANGED 0x0001
@@ -119,7 +119,6 @@ EventGroupHandle_t bleAppTaskLoopEvent;
 
 /* keep the device ID of the connected peer */
 uint8_t device_id;
-uint16_t mFlags;
 
 const uint8_t ShortUUID_CHIPoBLEService[]  = { 0xAF, 0xFE };
 const ChipBleUUID ChipUUID_CHIPoBLEChar_RX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F,
@@ -140,7 +139,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
     mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
 
     // Check if BLE stack is initialized
-    VerifyOrExit(!GetFlag(mFlags, kFlag_K32WBLEStackInitialized), err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(!mFlags.Has(Flags::kK32WBLEStackInitialized), err = CHIP_ERROR_INCORRECT_STATE);
 
     // Initialize the Chip BleLayer.
     err = BleLayer::Init(this, this, &SystemLayer);
@@ -194,8 +193,9 @@ CHIP_ERROR BLEManagerImpl::_Init()
 
     GattServer_RegisterHandlesForWriteNotifications(1, attChipRxHandle);
 
-    SetFlag(mFlags, kFlag_K32WBLEStackInitialized, true);
-    SetFlag(mFlags, kFlag_AdvertisingEnabled, CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART ? true : false);
+    mFlags.Set(Flags::kK32WBLEStackInitialized);
+    mFlags.Set(Flags::kAdvertisingEnabled, CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART ? true : false);
+    mFlags.Set(Flags::kFastAdvertisingEnabled, true);
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
 
 exit:
@@ -218,12 +218,7 @@ uint16_t BLEManagerImpl::_NumConnections(void)
 
 bool BLEManagerImpl::_IsAdvertisingEnabled(void)
 {
-    return GetFlag(mFlags, kFlag_AdvertisingEnabled);
-}
-
-bool BLEManagerImpl::_IsFastAdvertisingEnabled(void)
-{
-    return GetFlag(mFlags, kFlag_FastAdvertisingEnabled);
+    return mFlags.Has(Flags::kAdvertisingEnabled);
 }
 
 bool BLEManagerImpl::RemoveConnection(uint8_t connectionHandle)
@@ -308,9 +303,9 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
 
     VerifyOrExit(mServiceMode != ConnectivityManager::kCHIPoBLEServiceMode_NotSupported, err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
-    if (GetFlag(mFlags, kFlag_AdvertisingEnabled) != val)
+    if (mFlags.Has(Flags::kAdvertisingEnabled) != val)
     {
-        SetFlag(mFlags, kFlag_AdvertisingEnabled, val);
+        mFlags.Set(Flags::kAdvertisingEnabled, val);
         PlatformMgr().ScheduleWork(DriveBLEState, 0);
     }
 
@@ -318,20 +313,22 @@ exit:
     return err;
 }
 
-CHIP_ERROR BLEManagerImpl::_SetFastAdvertisingEnabled(bool val)
+CHIP_ERROR BLEManagerImpl::_SetAdvertisingMode(BLEAdvertisingMode mode)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    VerifyOrExit(mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_NotSupported, err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-
-    if (GetFlag(mFlags, kFlag_FastAdvertisingEnabled) != val)
+    switch (mode)
     {
-        SetFlag(mFlags, kFlag_FastAdvertisingEnabled, val);
-        PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    case BLEAdvertisingMode::kFastAdvertising:
+        mFlags.Set(Flags::kFastAdvertisingEnabled, true);
+        break;
+    case BLEAdvertisingMode::kSlowAdvertising:
+        mFlags.Set(Flags::kFastAdvertisingEnabled, false);
+        break;
+    default:
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
-
-exit:
-    return err;
+    mFlags.Set(Flags::kRestartAdvertising);
+    PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR BLEManagerImpl::_GetDeviceName(char * buf, size_t bufSize)
@@ -358,13 +355,13 @@ CHIP_ERROR BLEManagerImpl::_SetDeviceName(const char * deviceName)
         }
         memset(mDeviceName, 0, kMaxDeviceNameLength);
         strcpy(mDeviceName, deviceName);
-        SetFlag(mFlags, kFlag_DeviceNameSet, true);
+        mFlags.Set(Flags::kDeviceNameSet);
         ChipLogProgress(DeviceLayer, "Setting device name to : \"%s\"", deviceName);
     }
     else
     {
         mDeviceName[0] = 0;
-        SetFlag(mFlags, kFlag_DeviceNameSet, false);
+        mFlags.Clear(Flags::kDeviceNameSet);
     }
 
     return CHIP_NO_ERROR;
@@ -403,7 +400,7 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
     case DeviceEventType::kServiceProvisioningChange:
         ChipLogProgress(DeviceLayer, "_OnPlatformEvent kServiceProvisioningChange");
 
-        ClearFlag(mFlags, kFlag_AdvertisingEnabled);
+        mFlags.Clear(Flags::kAdvertisingEnabled);
         PlatformMgr().ScheduleWork(DriveBLEState, 0);
         break;
 #endif // CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED
@@ -752,7 +749,6 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     uint8_t advPayload[BLEKW_MAX_ADV_DATA_LEN]            = { 0 };
     gapScanResponseData_t scanRsp                         = { 0 };
     gapAdvertisingParameters_t adv_params                 = { 0 };
-    uint16_t advInterval                                  = 0;
     uint8_t chipAdvDataFlags                              = (gLeGeneralDiscoverableMode_c | gBrEdrNotSupported_c);
     uint8_t chipOverBleService[2];
     ChipBLEDeviceIdentificationInfo mDeviceIdInfo = { 0 };
@@ -764,7 +760,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
         return chipErr;
     }
 
-    if (!GetFlag(mFlags, kFlag_DeviceNameSet))
+    if (!mFlags.Has(Flags::kDeviceNameSet))
     {
         memset(mDeviceName, 0, kMaxDeviceNameLength);
         snprintf(mDeviceName, kMaxDeviceNameLength, "%s%04u", CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX, discriminator);
@@ -809,10 +805,16 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     scanRsp.aAdStructures = scan_rsp_data;
 
     /**************** Prepare advertising parameters *************************************/
-    advInterval =
-        ((NumConnections() == 0 && !ConfigurationMgr().IsPairedToAccount()) || GetFlag(mFlags, kFlag_FastAdvertisingEnabled))
-        ? (CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL * 3)
-        : CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL;
+    if ((NumConnections() == 0 && !ConfigurationMgr().IsPairedToAccount()) || mFlags.Has(Flags::kFastAdvertisingEnabled))
+    {
+        adv_params.minInterval = CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MIN;
+        adv_params.maxInterval = CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MAX;
+    }
+    else
+    {
+        adv_params.minInterval = CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MIN;
+        adv_params.maxInterval = CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MAX;
+    }
 
     adv_params.advertisingType = gAdvConnectableUndirected_c;
     adv_params.ownAddressType  = gBleAddrTypePublic_c;
@@ -820,7 +822,6 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     memset(adv_params.peerAddress, 0, gcBleDeviceAddressSize_c);
     adv_params.channelMap   = (gapAdvertisingChannelMapFlags_t)(gAdvChanMapFlag37_c | gAdvChanMapFlag38_c | gAdvChanMapFlag39_c);
     adv_params.filterPolicy = gProcessAll_c;
-    adv_params.minInterval = adv_params.maxInterval = advInterval;
 
     err = blekw_start_advertising(&adv_params, &adv, &scanRsp);
     if (err == BLE_OK)
@@ -839,8 +840,8 @@ exit:
 
 CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 {
-    SetFlag(mFlags, kFlag_Advertising, true);
-    ClearFlag(mFlags, kFlag_RestartAdvertising);
+    mFlags.Set(Flags::kAdvertising);
+    mFlags.Clear(Flags::kRestartAdvertising);
 
     return ConfigureAdvertisingData();
 }
@@ -849,10 +850,11 @@ CHIP_ERROR BLEManagerImpl::StopAdvertising(void)
 {
     ble_err_t err;
 
-    if (GetFlag(mFlags, kFlag_Advertising))
+    if (mFlags.Has(Flags::kAdvertising))
     {
-        ClearFlag(mFlags, kFlag_Advertising);
-        ClearFlag(mFlags, kFlag_RestartAdvertising);
+        mFlags.Clear(Flags::kAdvertising);
+        mFlags.Set(Flags::kFastAdvertisingEnabled, true);
+        mFlags.Clear(Flags::kRestartAdvertising);
 
         err = blekw_stop_advertising();
         if (err != BLE_OK)
@@ -869,29 +871,29 @@ void BLEManagerImpl::DriveBLEState(void)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Check if BLE stack is initialized
-    VerifyOrExit(GetFlag(mFlags, kFlag_K32WBLEStackInitialized), /* */);
+    VerifyOrExit(mFlags.Has(Flags::kK32WBLEStackInitialized), /* */);
 
 #if CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED
     if (ConfigurationMgr().IsFullyProvisioned())
     {
-        ClearFlag(mFlags, kFlag_AdvertisingEnabled);
+        mFlags.Clear(Flags::kAdvertisingEnabled);
         ChipLogProgress(DeviceLayer, "CHIPoBLE advertising disabled because device is fully provisioned");
     }
 #endif // CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED
 
     // Start advertising if needed...
-    if (mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_Enabled && GetFlag(mFlags, kFlag_AdvertisingEnabled))
+    if (mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_Enabled && mFlags.Has(Flags::kAdvertisingEnabled))
     {
         // Start/re-start advertising if not already started, or if there is a pending change
         // to the advertising configuration.
-        if (!GetFlag(mFlags, kFlag_Advertising) || GetFlag(mFlags, kFlag_RestartAdvertising))
+        if (!mFlags.Has(Flags::kAdvertising) || mFlags.Has(Flags::kRestartAdvertising))
         {
             err = StartAdvertising();
             SuccessOrExit(err);
         }
     }
     // Otherwise, stop advertising if it is enabled.
-    else if (GetFlag(mFlags, kFlag_Advertising))
+    else if (mFlags.Has(Flags::kAdvertising))
     {
         err = StopAdvertising();
         SuccessOrExit(err);
@@ -977,7 +979,7 @@ void BLEManagerImpl::HandleConnectEvent(blekw_msg_t * msg)
     device_id = device_id_loc;
     blekw_start_connection_timeout();
     sInstance.AddConnection(device_id_loc);
-    SetFlag(mFlags, kFlag_RestartAdvertising, true);
+    mFlags.Set(Flags::kRestartAdvertising);
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
 }
 
@@ -994,7 +996,7 @@ void BLEManagerImpl::HandleConnectionCloseEvent(blekw_msg_t * msg)
         event.CHIPoBLEConnectionError.Reason = BLE_ERROR_REMOTE_DEVICE_DISCONNECTED;
 
         PlatformMgr().PostEvent(&event);
-        SetFlag(mFlags, kFlag_RestartAdvertising, true);
+        mFlags.Set(Flags::kRestartAdvertising);
         PlatformMgr().ScheduleWork(DriveBLEState, 0);
     }
 }

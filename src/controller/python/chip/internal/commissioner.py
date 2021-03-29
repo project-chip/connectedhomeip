@@ -26,6 +26,9 @@ import ctypes
 class Commissioner_p(ctypes.c_void_p):
     pass
 
+class ThreadBlob_p(ctypes.c_void_p):
+    pass
+
 @NetworkCredentialsRequested
 def OnNetworkCredentialsRequested():
     GetCommissioner()._OnNetworkCredentialsRequested()
@@ -78,13 +81,27 @@ class Commissioner:
 
         self.pairing_state = PairingState.PAIRING
     
-    def PairSendWifiCredentials(self, ssid, password):
+    def PairSendWifiCredentials(self, ssid: str, password: str):
         """Send wifi credentials to the actively connected device."""
 
         if self.pairing_state != PairingState.NEEDS_NETCREDS:
             raise Exception("Not in a state requiring network credentials")
 
-        self._handle.pychip_internal_PairingDelegate_SetNetworkCredentials(c_char_p(ssid.encode('utf8')), c_char_p(password.encode('utf8')))
+        self._handle.pychip_internal_PairingDelegate_SetWifiCredentials(c_char_p(ssid.encode('utf8')), c_char_p(password.encode('utf8')))
+
+    def PairSendThreadCredentials(self, threadBlob: bytes):
+        """Send thread credentials. Thread credentials is an opaque blob from the API perspective."""
+
+        if self.pairing_state != PairingState.NEEDS_NETCREDS:
+            raise Exception("Not in a state requiring network credentials")
+
+        if type(threadBlob) != bytes:
+            raise Exception("Thread credentials MUST be of type bytes")
+
+        result = self._handle.pychip_internal_PairingDelegate_SetThreadCredentials(threadBlob, len(threadBlob))
+
+        if result != 0: 
+            raise Exception("Failed to send thread credentials. CHIP Error code %d" % result)
 
 
     def Unpair(self, remoteDeviceId: int):
@@ -120,7 +137,8 @@ def _SetNativeCallSignatues(handle: ctypes.CDLL):
     setter.Set('pychip_internal_PairingDelegate_SetNetworkCredentialsRequestedCallback', None, [NetworkCredentialsRequested])
     setter.Set('pychip_internal_PairingDelegate_SetOperationalCredentialsRequestedCallback', None, [OperationalCredentialsRequested])
     setter.Set('pychip_internal_PairingDelegate_SetPairingCompleteCallback', None, [PairingComplete])
-    setter.Set('pychip_internal_PairingDelegate_SetNetworkCredentials', None, [c_char_p, c_char_p])
+    setter.Set('pychip_internal_PairingDelegate_SetWifiCredentials', None, [c_char_p, c_char_p])
+    setter.Set('pychip_internal_PairingDelegate_SetThreadCredentials', c_uint32, [ThreadBlob_p, c_uint32])
 
 
 commissionerSingleton: Optional[Commissioner] = None

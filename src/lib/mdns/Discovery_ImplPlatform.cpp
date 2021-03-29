@@ -19,9 +19,9 @@
 
 #include <inttypes.h>
 
+#include "ServiceNaming.h"
 #include "lib/core/CHIPSafeCasts.h"
 #include "lib/mdns/platform/Mdns.h"
-#include "lib/support/ReturnMacros.h"
 #include "lib/support/logging/CHIPLogging.h"
 #include "platform/CHIPDeviceConfig.h"
 #include "platform/CHIPDeviceLayer.h"
@@ -57,20 +57,40 @@ constexpr uint64_t kUndefinedNodeId = 0;
 namespace chip {
 namespace Mdns {
 
-DiscoveryImplPlatform::DiscoveryImplPlatform()
+DiscoveryImplPlatform DiscoveryImplPlatform::sManager;
+
+DiscoveryImplPlatform::DiscoveryImplPlatform() = default;
+
+CHIP_ERROR DiscoveryImplPlatform::Init()
 {
-    mCommissionInstanceName = GetRandU64();
-    CHIP_ERROR error        = ChipMdnsInit(HandleMdnsInit, HandleMdnsError, this);
+    if (!mMdnsInitialized)
+    {
+        ReturnErrorOnFailure(ChipMdnsInit(HandleMdnsInit, HandleMdnsError, this));
+        mCommissionInstanceName = GetRandU64();
+        mMdnsInitialized        = true;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DiscoveryImplPlatform::Start(Inet::InetLayer * inetLayer, uint16_t port)
+{
+    ReturnErrorOnFailure(Init());
+
+    CHIP_ERROR error = ChipMdnsStopPublish();
 
     if (error != CHIP_NO_ERROR)
     {
         ChipLogError(Discovery, "Failed to initialize platform mdns: %s", ErrorStr(error));
     }
-}
 
-CHIP_ERROR DiscoveryImplPlatform::Start(Inet::InetLayer * inetLayer, uint16_t port)
-{
-    return CHIP_NO_ERROR;
+    error = SetupHostname();
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(Discovery, "Failed to setup mdns hostname: %s", ErrorStr(error));
+    }
+
+    return error;
 }
 
 void DiscoveryImplPlatform::HandleMdnsInit(void * context, CHIP_ERROR initError)
@@ -84,6 +104,7 @@ void DiscoveryImplPlatform::HandleMdnsInit(void * context, CHIP_ERROR initError)
     else
     {
         ChipLogError(Discovery, "mDNS initialization failed with %s", chip::ErrorStr(initError));
+        publisher->mMdnsInitialized = false;
     }
 }
 
@@ -127,19 +148,26 @@ exit:
 
 CHIP_ERROR DiscoveryImplPlatform::SetupHostname()
 {
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    static char hostname[17]; // Hostname is 64-bit EUI-64 expressed as a 16-character hexadecimal string.
+    uint8_t eui64[8];
+    chip::DeviceLayer::ThreadStackMgr().GetFactoryAssignedEUI64(eui64);
+    snprintf(hostname, sizeof(hostname), "%02X%02X%02X%02X%02X%02X%02X%02X", eui64[0], eui64[1], eui64[2], eui64[3], eui64[4],
+             eui64[5], eui64[6], eui64[7]);
+#else
     uint8_t mac[6];    // 6 byte wifi mac
     char hostname[13]; // Hostname will be the hex representation of mac.
-    CHIP_ERROR error;
 
-    SuccessOrExit(error = chip::DeviceLayer::ConfigurationMgr().GetPrimaryWiFiMACAddress(mac));
+    ReturnErrorOnFailure(chip::DeviceLayer::ConfigurationMgr().GetPrimaryWiFiMACAddress(mac));
     for (size_t i = 0; i < sizeof(mac); i++)
     {
         snprintf(&hostname[i * 2], sizeof(hostname) - i * 2, "%02X", mac[i]);
     }
-    SuccessOrExit(error = ChipMdnsSetHostname(hostname));
+#endif
 
-exit:
-    return error;
+    ReturnErrorOnFailure(ChipMdnsSetHostname(hostname));
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameters & params)
@@ -152,7 +180,7 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
     TextEntry textEntries[4];
     size_t textEntrySize = 0;
     char shortDiscriminatorSubtype[6];
-    char longDiscriminatorSubtype[7];
+    char longDiscriminatorSubtype[8];
     char vendorSubType[8];
     const char * subTypes[3];
     size_t subTypeSize = 0;
@@ -243,7 +271,8 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const OperationalAdvertisingParamete
 
     mOperationalAdvertisingParams = params;
     // TODO: There may be multilple device/fabrid ids after multi-admin.
-    snprintf(service.mName, sizeof(service.mName), "%" PRIX64 "-%" PRIX64, params.GetNodeId(), params.GetFabricId());
+
+    ReturnErrorOnFailure(MakeInstanceName(service.mName, sizeof(service.mName), params.GetFabricId(), params.GetNodeId()));
     strncpy(service.mType, "_chip", sizeof(service.mType));
     service.mProtocol      = MdnsServiceProtocol::kMdnsProtocolTcp;
     service.mPort          = CHIP_PORT;
@@ -272,9 +301,11 @@ CHIP_ERROR DiscoveryImplPlatform::SetResolverDelegate(ResolverDelegate * delegat
 
 CHIP_ERROR DiscoveryImplPlatform::ResolveNodeId(uint64_t nodeId, uint64_t fabricId, Inet::IPAddressType type)
 {
+    ReturnErrorOnFailure(Init());
+
     MdnsService service;
 
-    snprintf(service.mName, sizeof(service.mName), "%" PRIX64 "-%" PRIX64, nodeId, fabricId);
+    ReturnErrorOnFailure(MakeInstanceName(service.mName, sizeof(service.mName), fabricId, nodeId));
     strncpy(service.mType, "_chip", sizeof(service.mType));
     service.mProtocol    = MdnsServiceProtocol::kMdnsProtocolTcp;
     service.mAddressType = type;
@@ -349,12 +380,6 @@ void DiscoveryImplPlatform::HandleNodeIdResolve(void * context, MdnsService * re
 
 DiscoveryImplPlatform & DiscoveryImplPlatform::GetInstance()
 {
-    // TODO: Clean Mdns initialization order
-    // Previously sManager was a global object, but DiscoveryImplPlatform constructor calls
-    // platform-specific ChipMdnsInit() which for Linux initializes MdnsAvahi global object
-    // and that may lead to improper initialization, since the order in which global objects'
-    // constructors are called is undefined.
-    static DiscoveryImplPlatform sManager;
     return sManager;
 }
 

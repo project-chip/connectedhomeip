@@ -363,8 +363,7 @@ static CHIP_ERROR ConvertExtension(ASN1Reader & reader, TLVWriter & writer)
                 VerifyOrExit(keyUsageBits <= UINT16_MAX, err = ASN1_ERROR_INVALID_ENCODING);
 
                 // Check that only supported flags are set.
-                BitFlags<uint16_t, KeyUsageFlags> keyUsageFlags;
-                keyUsageFlags.SetRaw(static_cast<uint16_t>(keyUsageBits));
+                BitFlags<KeyUsageFlags> keyUsageFlags(static_cast<uint16_t>(keyUsageBits));
                 VerifyOrExit(keyUsageFlags.HasOnly(
                                  KeyUsageFlags::kDigitalSignature, KeyUsageFlags::kNonRepudiation, KeyUsageFlags::kKeyEncipherment,
                                  KeyUsageFlags::kDataEncipherment, KeyUsageFlags::kKeyAgreement, KeyUsageFlags::kKeyCertSign,
@@ -506,7 +505,8 @@ static CHIP_ERROR ConvertCertificate(ASN1Reader & reader, TLVWriter & writer)
     OID sigAlgoOID;
     TLVType containerType;
 
-    err = writer.StartContainer(ProfileTag(kProtocol_OpCredentials, kTag_ChipCertificate), kTLVType_Structure, containerType);
+    err = writer.StartContainer(ProfileTag(Protocols::OpCredentials::Id.ToTLVProfileId(), kTag_ChipCertificate), kTLVType_Structure,
+                                containerType);
     SuccessOrExit(err);
 
     // Certificate ::= SEQUENCE

@@ -20,6 +20,7 @@
 #pragma once
 
 #include <inttypes.h>
+#include <lib/support/Span.h>
 
 // Global Response Callbacks
 typedef void (*DefaultSuccessCallback)(void * context);
@@ -33,12 +34,11 @@ typedef void (*Int32uAttributeCallback)(void * context, uint32_t value);
 typedef void (*Int32sAttributeCallback)(void * context, int32_t value);
 typedef void (*Int64uAttributeCallback)(void * context, uint64_t value);
 typedef void (*Int64sAttributeCallback)(void * context, int64_t value);
+typedef void (*StringAttributeCallback)(void * context, const chip::ByteSpan value);
 typedef void (*ReadReportingConfigurationReportedCallback)(void * context, uint16_t minInterval, uint16_t maxInterval);
 typedef void (*ReadReportingConfigurationReceivedCallback)(void * context, uint16_t timeout);
 
 // Cluster Specific Response Callbacks
-typedef void (*ContentLaunchClusterLaunchContentResponseCallback)(void * context, uint8_t contentLaunchStatus);
-typedef void (*ContentLaunchClusterLaunchURLResponseCallback)(void * context, uint8_t contentLaunchStatus);
 typedef void (*DoorLockClusterClearAllPinsResponseCallback)(void * context);
 typedef void (*DoorLockClusterClearAllRfidsResponseCallback)(void * context);
 typedef void (*DoorLockClusterClearHolidayScheduleResponseCallback)(void * context);
@@ -80,7 +80,6 @@ typedef void (*GroupsClusterGetGroupMembershipResponseCallback)(void * context, 
 typedef void (*GroupsClusterRemoveGroupResponseCallback)(void * context, uint16_t groupId);
 typedef void (*GroupsClusterViewGroupResponseCallback)(void * context, uint16_t groupId, uint8_t * groupName);
 typedef void (*IdentifyClusterIdentifyQueryResponseCallback)(void * context, uint16_t timeout);
-typedef void (*MediaPlaybackClusterPlaybackCallback)(void * context);
 typedef void (*ScenesClusterAddSceneResponseCallback)(void * context, uint16_t groupId, uint8_t sceneId);
 typedef void (*ScenesClusterGetSceneMembershipResponseCallback)(void * context, uint8_t capacity, uint16_t groupId,
                                                                 uint8_t sceneCount,

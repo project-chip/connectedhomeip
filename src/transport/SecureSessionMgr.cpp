@@ -32,7 +32,6 @@
 #include <core/CHIPKeyIds.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <support/CodeUtils.h>
-#include <support/ReturnMacros.h>
 #include <support/SafeInt.h>
 #include <support/logging/CHIPLogging.h>
 #include <transport/AdminPairingTable.h>
@@ -76,13 +75,26 @@ CHIP_ERROR SecureSessionMgr::Init(NodeId localNodeId, System::Layer * systemLaye
     mTransportMgr = transportMgr;
     mAdmins       = admins;
 
-    ChipLogProgress(Inet, "local node id is %llu\n", mLocalNodeId);
+    ChipLogProgress(Inet, "local node id is 0x%08" PRIx32 "%08" PRIx32, static_cast<uint32_t>(mLocalNodeId >> 32),
+                    static_cast<uint32_t>(mLocalNodeId));
 
     ScheduleExpiryTimer();
 
     mTransportMgr->SetSecureSessionMgr(this);
 
     return CHIP_NO_ERROR;
+}
+
+void SecureSessionMgr::Shutdown()
+{
+    CancelExpiryTimer();
+
+    mState        = State::kNotReady;
+    mLocalNodeId  = kUndefinedNodeId;
+    mSystemLayer  = nullptr;
+    mTransportMgr = nullptr;
+    mAdmins       = nullptr;
+    mCB           = nullptr;
 }
 
 Transport::Type SecureSessionMgr::GetTransportType(NodeId peerNodeId)
@@ -188,7 +200,9 @@ CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHea
         encryptedMsg.mMsgId = packetHeader.GetMessageId();
     }
 
-    ChipLogProgress(Inet, "Sending msg from %llu to %llu", localNodeId, state->GetPeerNodeId());
+    ChipLogProgress(Inet, "Sending msg from 0x%08" PRIx32 "%08" PRIx32 "to 0x%08" PRIx32 "%08" PRIx32,
+                    static_cast<uint32_t>(localNodeId >> 32), static_cast<uint32_t>(localNodeId),
+                    static_cast<uint32_t>(state->GetPeerNodeId() >> 32), static_cast<uint32_t>(state->GetPeerNodeId()));
 
     if (state->GetTransport() != nullptr)
     {
@@ -239,8 +253,8 @@ CHIP_ERROR SecureSessionMgr::NewPairing(const Optional<Transport::PeerAddress> &
             state, [this](const Transport::PeerConnectionState & state1) { HandleConnectionExpired(state1); });
     }
 
-    ChipLogDetail(Inet, "New pairing for device %llu, key %d!!", peerNodeId, peerKeyId);
-
+    ChipLogDetail(Inet, "New pairing for device 0x%08" PRIx32 "%08" PRIx32 ", key %d!!", static_cast<uint32_t>(peerNodeId >> 32),
+                  static_cast<uint32_t>(peerNodeId), peerKeyId);
     state = nullptr;
     ReturnErrorOnFailure(
         mPeerConnections.CreateNewPeerConnectionState(Optional<NodeId>::Value(peerNodeId), peerKeyId, localKeyId, &state));
@@ -310,14 +324,15 @@ void SecureSessionMgr::CancelExpiryTimer()
 void SecureSessionMgr::OnMessageReceived(const PacketHeader & packetHeader, const PeerAddress & peerAddress,
                                          System::PacketBufferHandle msg)
 {
-    CHIP_ERROR err    = CHIP_NO_ERROR;
-    NodeId destNodeId = packetHeader.GetDestinationNodeId().ValueOr(kUndefinedNodeId);
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
-    // Find the connection which matches src node ID, dest node ID, and peer encryption key
-    PeerConnectionState * state = mPeerConnections.FindPeerConnectionState(packetHeader.GetSourceNodeId(), destNodeId, mAdmins,
-                                                                           packetHeader.GetEncryptionKeyID(), nullptr);
+    PeerConnectionState * state = mPeerConnections.FindPeerConnectionState(packetHeader.GetEncryptionKeyID(), nullptr);
+
     PacketBufferHandle origMsg;
     PayloadHeader payloadHeader;
+
+    bool peerGroupMsgIdNotSynchronized  = false;
+    Transport::AdminPairingInfo * admin = nullptr;
 
     VerifyOrExit(!msg.IsNull(), ChipLogError(Inet, "Secure transport received NULL packet, discarding"));
 
@@ -327,6 +342,14 @@ void SecureSessionMgr::OnMessageReceived(const PacketHeader & packetHeader, cons
         ExitNow(err = CHIP_ERROR_KEY_NOT_FOUND_FROM_PEER);
     }
 
+    admin = mAdmins->FindAdmin(state->GetAdminId());
+    VerifyOrExit(admin != nullptr, ChipLogError(Inet, "Secure transport received packet for unknown admin pairing, discarding"));
+    if (packetHeader.GetDestinationNodeId().HasValue())
+    {
+        VerifyOrExit(
+            admin->GetNodeId() == packetHeader.GetDestinationNodeId().Value(),
+            ChipLogError(Inet, "Secure transport received message, but destination node ID doesn't match our node ID, discarding"));
+    }
     mPeerConnections.MarkConnectionActive(state);
 
     // Decode the message
@@ -357,14 +380,17 @@ void SecureSessionMgr::OnMessageReceived(const PacketHeader & packetHeader, cons
         // For all group messages, Set flag if peer group key message counter is not synchronized.
         if (ChipKeyId::IsAppGroupKey(packetHeader.GetEncryptionKeyID()))
         {
-            const_cast<PacketHeader &>(packetHeader).SetPeerGroupMsgIdNotSynchronized(true);
+            peerGroupMsgIdNotSynchronized = true;
         }
     }
 
     if (mCB != nullptr)
     {
-        mCB->OnMessageReceived(packetHeader, payloadHeader, { state->GetPeerNodeId(), state->GetPeerKeyID(), state->GetAdminId() },
-                               std::move(msg), this);
+        SecureSessionHandle session(state->GetPeerNodeId(), state->GetPeerKeyID(), state->GetAdminId());
+
+        session.SetPeerGroupMsgIdNotSynchronized(peerGroupMsgIdNotSynchronized);
+
+        mCB->OnMessageReceived(packetHeader, payloadHeader, session, std::move(msg), this);
     }
 
 exit:

@@ -22,13 +22,12 @@ import("${chip_root}/build/chip/tools.gni")
 import("${chip_root}/src/platform/device.gni")
 import("${dir_pw_unit_test}/test.gni")
 
-config("controller_wno_deprecate") {
-  cflags = [ "-Wno-deprecated-declarations" ]
+if (current_os == "mac") {
+  import("${build_root}/config/mac/mac_sdk.gni")
 }
 
-config("includes") {
-  include_dirs =
-      [ "${chip_root}/src/controller/CHIPDeviceController_deprecated.h" ]
+config("controller_wno_deprecate") {
+  cflags = [ "-Wno-deprecated-declarations" ]
 }
 
 shared_library("ChipDeviceCtrl") {
@@ -37,7 +36,6 @@ shared_library("ChipDeviceCtrl") {
   include_dirs = [ "." ]
 
   sources = [
-    "ChipDeviceController-ClusterCommands.cpp",
     "ChipDeviceController-ScriptBinding.cpp",
     "ChipDeviceController-ScriptDeviceAddressUpdateDelegate.cpp",
     "ChipDeviceController-ScriptDeviceAddressUpdateDelegate.h",
@@ -45,6 +43,7 @@ shared_library("ChipDeviceCtrl") {
     "ChipDeviceController-ScriptDevicePairingDelegate.h",
     "ChipDeviceController-StorageDelegate.cpp",
     "ChipDeviceController-StorageDelegate.h",
+    "chip/clusters/CHIPClusters.cpp",
     "chip/internal/ChipThreadWork.cpp",
     "chip/internal/ChipThreadWork.h",
     "chip/internal/CommissionerImpl.cpp",
@@ -52,8 +51,17 @@ shared_library("ChipDeviceCtrl") {
     "chip/native/StackInit.cpp",
   ]
 
-  if (current_os == "linux" && chip_enable_ble) {
-    sources += [ "chip/ble/LinuxImpl.cpp" ]
+  if (chip_enable_ble) {
+    if (current_os == "linux") {
+      sources += [ "chip/ble/LinuxImpl.cpp" ]
+    } else if (current_os == "mac") {
+      sources += [
+        "chip/ble/darwin/AdapterListing.mm",
+        "chip/ble/darwin/Scanning.mm",
+      ]
+    } else {
+      assert(false, "No BLE implementation available for the current OS.")
+    }
   }
 
   public_deps = [
@@ -81,16 +89,23 @@ pw_python_action("python") {
         "chip/ChipBleBase.py",
         "chip/ChipBleUtility.py",
         "chip/ChipBluezMgr.py",
-        "chip/ChipCluster.py",
         "chip/ChipCoreBluetoothMgr.py",
         "chip/ChipDeviceCtrl.py",
         "chip/ChipStack.py",
         "chip/ChipUtility.py",
         "chip/__init__.py",
+        "chip/ble/__init__.py",
+        "chip/ble/commissioning/__init__.py",
+        "chip/ble/get_adapters.py",
+        "chip/ble/library_handle.py",
+        "chip/ble/scan_devices.py",
+        "chip/ble/types.py",
+        "chip/clusters/CHIPClusters.py",
         "chip/configuration/__init__.py",
         "chip/exceptions/__init__.py",
         "chip/internal/__init__.py",
         "chip/internal/commissioner.py",
+        "chip/internal/thread.py",
         "chip/internal/types.py",
         "chip/logging/__init__.py",
         "chip/logging/library_handle.py",
@@ -108,22 +123,6 @@ pw_python_action("python") {
       sources = [ "//LICENSE" ]
     },
   ]
-
-  if (chip_enable_ble) {
-    _py_manifest_files += [
-      {
-        src_dir = "."
-        sources = [
-          "chip/ble/__init__.py",
-          "chip/ble/commissioning/__init__.py",
-          "chip/ble/get_adapters.py",
-          "chip/ble/library_handle.py",
-          "chip/ble/scan_devices.py",
-          "chip/ble/types.py",
-        ]
-      },
-    ]
-  }
 
   _py_manifest_file = "${target_gen_dir}/${target_name}.py_manifest.json"
 
@@ -148,6 +147,24 @@ pw_python_action("python") {
 
   _dist_dir = "${root_out_dir}/controller/python"
 
+  if (current_cpu == "x64") {
+    cpu_tag = "x86_64"
+  } else if (current_cpu == "arm64") {
+    cpu_tag = "aarch64"
+  } else {
+    cpu_tag = current_cpu
+  }
+
+  if (current_os == "mac") {
+    platform_tag = "macosx_" + string_replace(mac_deployment_target, ".", "_")
+  } else {
+    platform_tag = current_os
+  }
+
+  platform_tag = platform_tag + "_" + cpu_tag
+
+  tags = "cp37-abi3-" + platform_tag
+
   args = [
     "--package_name",
     "chip",
@@ -159,15 +176,12 @@ pw_python_action("python") {
     rebase_path(_dist_dir, root_build_dir),
     "--manifest",
     rebase_path(_py_manifest_file, root_build_dir),
+    "--plat-name",
+    platform_tag,
   ]
 
   public_deps = [ ":ChipDeviceCtrl" ]
 
-  pythontags = exec_script("${chip_root}/build/chip/python_gen_tags.py",
-                           [],
-                           "list lines",
-                           [])
-  pythontagsStr = string_join("", pythontags)
-  output_name = "chip-0.0-$pythontagsStr.whl"
+  output_name = "chip-0.0-${tags}.whl"
   outputs = [ "${_dist_dir}/$output_name" ]
 }

@@ -5,13 +5,13 @@
     android:orientation="vertical">
 
     <EditText
-        android:id="@+id/ipAddressEd"
+        android:id="@+id/deviceIdEd"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
         android:inputType="text"
         android:textSize="20sp"
-        android:hint="@string/enter_ip_address_hint_text"/>
+        android:hint="@string/enter_device_id_hint_text"/>
 
     <EditText
         android:id="@+id/inputTextEd"

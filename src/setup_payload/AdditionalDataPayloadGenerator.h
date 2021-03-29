@@ -71,7 +71,7 @@ public:
      */
     CHIP_ERROR generateAdditionalDataPayload(uint16_t lifetimeCounter, const char * serialNumberBuffer,
                                              size_t serialNumberBufferSize, chip::System::PacketBufferHandle & bufferHandle,
-                                             BitFlags<uint8_t, AdditionalDataFields> additionalDataFields);
+                                             BitFlags<AdditionalDataFields> additionalDataFields);
     // Generate Device Rotating ID
     /**
      * Generate additional data payload (i.e. TLV encoded).

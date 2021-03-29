@@ -15,10 +15,13 @@
  *    limitations under the License.
  */
 
+#include <inttypes.h>
+
 #include <app/server/Server.h>
 
 #include <app/InteractionModelEngine.h>
 #include <app/server/DataModelHandler.h>
+#include <app/server/EchoHandler.h>
 #include <app/server/RendezvousServer.h>
 #include <app/server/SessionManager.h>
 
@@ -33,7 +36,6 @@
 #include <setup_payload/SetupPayload.h>
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
-#include <support/ReturnMacros.h>
 #include <support/logging/CHIPLogging.h>
 #include <sys/param.h>
 #include <system/SystemPacketBuffer.h>
@@ -64,46 +66,38 @@ constexpr bool isRendezvousBypassed()
 
 constexpr bool useTestPairing()
 {
-#if defined(CHIP_DEVICE_CONFIG_USE_TEST_PAIRING) && CHIP_DEVICE_CONFIG_USE_TEST_PAIRING
-    return true;
-#else
     // Use the test pairing whenever rendezvous is bypassed. Otherwise, there wouldn't be
     // any way to communicate with the device using CHIP protocol.
+    // This is used to bypass BLE in the cirque test.
+    // Only in the cirque test this is enabled with --args='bypass_rendezvous=true'.
     return isRendezvousBypassed();
-#endif
 }
 
 class ServerStorageDelegate : public PersistentStorageDelegate
 {
-    void SetDelegate(PersistentStorageResultDelegate * delegate) override
+    void SetStorageDelegate(PersistentStorageResultDelegate * delegate) override
     {
         ChipLogError(AppServer, "ServerStorageDelegate does not support async operations");
         chipDie();
     }
 
-    void GetKeyValue(const char * key) override
+    void AsyncSetKeyValue(const char * key, const char * value) override
     {
         ChipLogError(AppServer, "ServerStorageDelegate does not support async operations");
         chipDie();
     }
 
-    void SetKeyValue(const char * key, const char * value) override
-    {
-        ChipLogError(AppServer, "ServerStorageDelegate does not support async operations");
-        chipDie();
-    }
-
-    CHIP_ERROR GetKeyValue(const char * key, void * buffer, uint16_t & size) override
+    CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override
     {
         return PersistedStorage::KeyValueStoreMgr().Get(key, buffer, size);
     }
 
-    CHIP_ERROR SetKeyValue(const char * key, const void * value, uint16_t size) override
+    CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override
     {
         return PersistedStorage::KeyValueStoreMgr().Put(key, value, size);
     }
 
-    void DeleteKeyValue(const char * key) override { PersistedStorage::KeyValueStoreMgr().Delete(key); }
+    void AsyncDeleteKeyValue(const char * key) override { PersistedStorage::KeyValueStoreMgr().Delete(key); }
 };
 
 ServerStorageDelegate gServerStorage;
@@ -140,7 +134,8 @@ CHIP_ERROR RestoreAllAdminPairingsFromKVS(AdminPairingTable & adminPairings, Adm
         }
         else
         {
-            ChipLogProgress(AppServer, "Found admin pairing for %d, node ID %llu", admin->GetAdminId(), admin->GetNodeId());
+            ChipLogProgress(AppServer, "Found admin pairing for %d, node ID 0x%08" PRIx32 "%08" PRIx32, admin->GetAdminId(),
+                            static_cast<uint32_t>(admin->GetNodeId() >> 32), static_cast<uint32_t>(admin->GetNodeId()));
         }
     }
 
@@ -176,7 +171,9 @@ static CHIP_ERROR RestoreAllSessionsFromKVS(SecureSessionMgr & sessionMgr, Rende
         {
             connection.GetPASESession(session);
 
-            ChipLogProgress(AppServer, "Fetched the session information: from %llu", session->PeerConnection().GetPeerNodeId());
+            ChipLogProgress(AppServer, "Fetched the session information: from 0x%08" PRIx32 "%08" PRIx32,
+                            static_cast<uint32_t>(session->PeerConnection().GetPeerNodeId() >> 32),
+                            static_cast<uint32_t>(session->PeerConnection().GetPeerNodeId()));
             sessionMgr.NewPairing(Optional<Transport::PeerAddress>::Value(session->PeerConnection().GetPeerAddress()),
                                   session->PeerConnection().GetPeerNodeId(), session,
                                   SecureSessionMgr::PairingDirection::kResponder, connection.GetAdminId(), nullptr);
@@ -325,8 +322,7 @@ public:
     void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, SecureSessionHandle session,
                            System::PacketBufferHandle buffer, SecureSessionMgr * mgr) override
     {
-        auto state            = mgr->GetPeerConnectionState(session);
-        const size_t data_len = buffer->DataLength();
+        auto state = mgr->GetPeerConnectionState(session);
         char src_addr[PeerAddress::kMaxToStringSize];
 
         // as soon as a client connects, assume it is connected
@@ -337,11 +333,11 @@ public:
 
         state->GetPeerAddress().ToString(src_addr);
 
-        ChipLogProgress(AppServer, "Packet received from %s: %zu bytes", src_addr, static_cast<size_t>(data_len));
+        ChipLogProgress(AppServer, "Packet received from %s: %u bytes", src_addr, buffer->DataLength());
 
         // TODO: This code is temporary, and must be updated to use the Cluster API.
         // Issue: https://github.com/project-chip/connectedhomeip/issues/4725
-        if (payloadHeader.GetProtocolID() == chip::Protocols::kProtocol_ServiceProvisioning)
+        if (payloadHeader.HasProtocol(chip::Protocols::ServiceProvisioning::Id))
         {
             CHIP_ERROR err = CHIP_NO_ERROR;
             uint32_t timeout;
@@ -351,7 +347,7 @@ public:
             ChipLogProgress(AppServer, "Received service provisioning message. Treating it as OpenPairingWindow request");
             chip::System::PacketBufferTLVReader reader;
             reader.Init(std::move(buffer));
-            reader.ImplicitProfileId = chip::Protocols::kProtocol_ServiceProvisioning;
+            reader.ImplicitProfileId = chip::Protocols::ServiceProvisioning::Id.ToTLVProfileId();
 
             SuccessOrExit(reader.Next(kTLVType_UnsignedInteger, TLV::ProfileTag(reader.ImplicitProfileId, 1)));
             SuccessOrExit(reader.Get(timeout));
@@ -410,8 +406,8 @@ private:
     AppDelegate * mDelegate = nullptr;
 };
 
-#ifdef CHIP_APP_USE_INTERACTION_MODEL
-Messaging::ExchangeManager gExchange;
+#if defined(CHIP_APP_USE_INTERACTION_MODEL) || defined(CHIP_APP_USE_ECHO)
+Messaging::ExchangeManager gExchangeMgr;
 #endif
 ServerCallback gCallbacks;
 SecurePairingUsingTestSecret gTestPairing;
@@ -463,7 +459,6 @@ CHIP_ERROR OpenDefaultPairingWindow(ResetAdmins resetAdmins)
 void InitServer(AppDelegate * delegate)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    Optional<Transport::PeerAddress> peer(Transport::Type::kUndefined);
 
     chip::Platform::MemoryInit();
 
@@ -487,30 +482,27 @@ void InitServer(AppDelegate * delegate)
     err = gSessions.Init(chip::kTestDeviceNodeId, &DeviceLayer::SystemLayer, &gTransports, &gAdminPairings);
     SuccessOrExit(err);
 
-#ifdef CHIP_APP_USE_INTERACTION_MODEL
-    err = gExchange.Init(&gSessions);
-    SuccessOrExit(err);
-    err = chip::app::InteractionModelEngine::GetInstance()->Init(&gExchange);
+#if defined(CHIP_APP_USE_INTERACTION_MODEL) || defined(CHIP_APP_USE_ECHO)
+    err = gExchangeMgr.Init(&gSessions);
     SuccessOrExit(err);
 #else
     gSessions.SetDelegate(&gCallbacks);
 #endif
 
+#if defined(CHIP_APP_USE_INTERACTION_MODEL)
+    err = chip::app::InteractionModelEngine::GetInstance()->Init(&gExchangeMgr);
+    SuccessOrExit(err);
+#endif
+
+#if defined(CHIP_APP_USE_ECHO)
+    err = InitEchoHandler(&gExchangeMgr);
+    SuccessOrExit(err);
+#endif
+
     if (useTestPairing())
     {
-        AdminPairingInfo * adminInfo = gAdminPairings.AssignAdminId(gNextAvailableAdminId);
-        VerifyOrExit(adminInfo != nullptr, err = CHIP_ERROR_NO_MEMORY);
-        adminInfo->SetNodeId(chip::kTestDeviceNodeId);
-        err = gSessions.NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing, SecureSessionMgr::PairingDirection::kResponder,
-                                   gNextAvailableAdminId);
-        SuccessOrExit(err);
-    }
-
-    // This flag is used to bypass BLE in the cirque test
-    // Only in the cirque test this is enabled with --args='bypass_rendezvous=true'
-    if (isRendezvousBypassed())
-    {
         ChipLogProgress(AppServer, "Rendezvous and secure pairing skipped");
+        SuccessOrExit(err = AddTestPairing());
     }
     else if (DeviceLayer::ConnectivityMgr().IsWiFiStationProvisioned() || DeviceLayer::ConnectivityMgr().IsThreadProvisioned())
     {
@@ -532,18 +524,9 @@ void InitServer(AppDelegate * delegate)
 #endif
     }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
-    // TODO: advertise this only when really operational once we support both
-    // operational and commisioning advertising is supported.
-    if (ConfigurationMgr().IsFullyProvisioned())
-    {
-        err = app::Mdns::AdvertiseOperational();
-    }
-    else
-    {
-        err = app::Mdns::AdvertiseCommisioning();
-    }
-    SuccessOrExit(err);
+// Starting mDNS server only for Thread devices due to problem reported in issue #5076.
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    app::Mdns::StartServer();
 #endif
 
 exit:
@@ -555,6 +538,30 @@ exit:
     {
         ChipLogProgress(AppServer, "Server Listening...");
     }
+}
+
+CHIP_ERROR AddTestPairing()
+{
+    CHIP_ERROR err               = CHIP_NO_ERROR;
+    AdminPairingInfo * adminInfo = nullptr;
+
+    for (const AdminPairingInfo & admin : gAdminPairings)
+        if (admin.IsInitialized() && admin.GetNodeId() == chip::kTestDeviceNodeId)
+            ExitNow();
+
+    adminInfo = gAdminPairings.AssignAdminId(gNextAvailableAdminId);
+    VerifyOrExit(adminInfo != nullptr, err = CHIP_ERROR_NO_MEMORY);
+
+    adminInfo->SetNodeId(chip::kTestDeviceNodeId);
+    SuccessOrExit(err = gSessions.NewPairing(Optional<PeerAddress>{ PeerAddress::Uninitialized() }, chip::kTestControllerNodeId,
+                                             &gTestPairing, SecureSessionMgr::PairingDirection::kResponder, gNextAvailableAdminId));
+    ++gNextAvailableAdminId;
+
+exit:
+    if (err != CHIP_NO_ERROR && adminInfo != nullptr)
+        gAdminPairings.ReleaseAdminId(gNextAvailableAdminId);
+
+    return err;
 }
 
 AdminPairingTable & GetGlobalAdminPairingTable()

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2019 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -55,7 +55,7 @@ void GenericConnectivityManagerImpl_Thread<ImplClass>::_OnPlatformEvent(const Ch
 template <class ImplClass>
 ConnectivityManager::ThreadMode GenericConnectivityManagerImpl_Thread<ImplClass>::_GetThreadMode()
 {
-    if (GetFlag(mFlags, kFlag_IsApplicationControlled))
+    if (mFlags.Has(Flags::kIsApplicationControlled))
     {
         return ConnectivityManager::kThreadMode_ApplicationControlled;
     }
@@ -75,11 +75,11 @@ CHIP_ERROR GenericConnectivityManagerImpl_Thread<ImplClass>::_SetThreadMode(Conn
 
     if (val == ConnectivityManager::kThreadMode_ApplicationControlled)
     {
-        SetFlag(mFlags, kFlag_IsApplicationControlled);
+        mFlags.Set(Flags::kIsApplicationControlled);
     }
     else
     {
-        ClearFlag(mFlags, kFlag_IsApplicationControlled);
+        mFlags.Clear(Flags::kIsApplicationControlled);
 
         err = ThreadStackMgrImpl().SetThreadEnabled(val == ConnectivityManager::kThreadMode_Enabled);
         SuccessOrExit(err);
@@ -92,15 +92,15 @@ exit:
 template <class ImplClass>
 void GenericConnectivityManagerImpl_Thread<ImplClass>::UpdateServiceConnectivity()
 {
-    bool haveServiceConnectivity = false;
+    constexpr bool haveServiceConnectivity = false;
 
     // If service connectivity via Thread has changed, post an event signaling the change.
-    if (GetFlag(mFlags, kFlag_HaveServiceConnectivity) != haveServiceConnectivity)
+    if (mFlags.Has(Flags::kHaveServiceConnectivity) != haveServiceConnectivity)
     {
         ChipLogProgress(DeviceLayer, "ConnectivityManager: Service connectivity via Thread %s",
                         (haveServiceConnectivity) ? "ESTABLISHED" : "LOST");
 
-        SetFlag(mFlags, kFlag_HaveServiceConnectivity, haveServiceConnectivity);
+        mFlags.Set(Flags::kHaveServiceConnectivity, haveServiceConnectivity);
 
         {
             ChipDeviceEvent event;

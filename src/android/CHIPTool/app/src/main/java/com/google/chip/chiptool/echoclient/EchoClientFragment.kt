@@ -27,8 +27,10 @@ import chip.devicecontroller.ChipDeviceController
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.GenericChipDeviceListener
 import com.google.chip.chiptool.R
+import com.google.chip.chiptool.util.DeviceIdUtil
 import kotlinx.android.synthetic.main.echo_client_fragment.*
 import kotlinx.android.synthetic.main.echo_client_fragment.view.*
+import kotlinx.android.synthetic.main.on_off_client_fragment.deviceIdEd
 
 /** Sends echo messages to the CHIP device. */
 class EchoClientFragment : Fragment() {
@@ -46,8 +48,13 @@ class EchoClientFragment : Fragment() {
 
       inputTextEd.hint = requireContext().getString(R.string.echo_input_hint_text)
 
-      sendCommandBtn.setOnClickListener { onSendCommandClick() }
+      sendCommandBtn.setOnClickListener { sendEcho() }
     }
+  }
+
+  override fun onStart() {
+    super.onStart()
+    deviceIdEd.setText(DeviceIdUtil.getLastDeviceId(requireContext()).toString())
   }
 
   inner class ChipControllerCallback : GenericChipDeviceListener() {
@@ -72,22 +79,12 @@ class EchoClientFragment : Fragment() {
     }
   }
 
-  private fun onSendCommandClick() {
-    if (deviceController.isConnected) {
-      sendEcho()
-    } else {
-      commandStatusTv.text = requireContext().getString(R.string.echo_status_connecting)
-      deviceController.disconnectDevice()
-      deviceController.beginConnectDevice(ipAddressEd.text.toString())
-    }
-  }
-
   private fun sendEcho() {
     commandStatusTv.text = requireContext().getString(R.string.echo_status_sending_message)
 
     val echoEditTextContents = inputTextEd.text.toString()
     val echoText = if (echoEditTextContents.isEmpty()) DEFAULT_ECHO_MSG else echoEditTextContents
-    deviceController.beginSendMessage(echoText)
+    deviceController.sendMessage(deviceIdEd.text.toString().toInt(), echoText)
   }
 
   companion object {
