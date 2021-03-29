@@ -56,7 +56,7 @@ template("chip_test_group") {
     data_deps = invoker.deps
 
     if (_build_monolithic_library) {
-      deps += [":${_lib_target_name}"]
+      deps += [ ":${_lib_target_name}" ]
     }
   }
 
