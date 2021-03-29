@@ -85,10 +85,16 @@ EmberStatus chipSendUnicast(NodeId destination, EmberApsFrame * apsFrame, uint16
         return EMBER_DELIVERY_FAILED;
     }
 
+    // TODO(#5675): This code is temporary, and must be updated to use the IM API. Currenlty, we use a temporary Protocol
+    // TempZCL to carry over legacy ZCL messages, use an ephemeral exchange to send message and use its unsolicited message
+    // handler to receive messages. We need to set flag kFromInitiator to allow receiver to deliver message to corresponding
+    // unsolicited message handler, and we also need to set flag kNoAutoRequestAck since there is no persistent exchange to
+    // receive the ack message. This logic need to be deleted after we converting all legacy ZCL messages to IM messages.
+
     Messaging::SendFlags sendFlags;
 
     sendFlags.Set(Messaging::SendMessageFlags::kFromInitiator).Set(Messaging::SendMessageFlags::kNoAutoRequestAck);
-    CHIP_ERROR err = exchange->SendMessage(Protocols::DeviceManagement::Id, 0, std::move(buffer), sendFlags);
+    CHIP_ERROR err = exchange->SendMessage(Protocols::TempZCL::Id, 0, std::move(buffer), sendFlags);
 
     exchange->Close();
 

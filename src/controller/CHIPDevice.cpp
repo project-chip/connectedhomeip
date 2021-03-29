@@ -56,6 +56,62 @@ using namespace chip::Callback;
 namespace chip {
 namespace Controller {
 
+CHIP_ERROR Device::SendMessage(Protocols::Id protocolId, uint8_t msgType, System::PacketBufferHandle buffer)
+{
+    System::PacketBufferHandle resend;
+    bool loadedSecureSession = false;
+    Messaging::SendFlags sendFlags;
+
+    VerifyOrReturnError(!buffer.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    ReturnErrorOnFailure(LoadSecureSessionParametersIfNeeded(loadedSecureSession));
+
+    Messaging::ExchangeContext * exchange = mExchangeMgr->NewContext(mSecureSession, nullptr);
+    VerifyOrReturnError(exchange != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    if (!loadedSecureSession)
+    {
+        // Secure connection already existed
+        // Hold on to the buffer, in case session resumption and resend is needed
+        // Cloning data, instead of increasing the ref count, as the original
+        // buffer might get modified by lower layers before the send fails. So,
+        // that buffer cannot be used for resends.
+        resend = buffer.CloneData();
+    }
+
+    // TODO(#5675): This code is temporary, and must be updated to use the IM API. Currenlty, we use a temporary Protocol
+    // TempZCL to carry over legacy ZCL messages, use an ephemeral exchange to send message and use its unsolicited message
+    // handler to receive messages. We need to set flag kFromInitiator to allow receiver to deliver message to corresponding
+    // unsolicited message handler, and we also need to set flag kNoAutoRequestAck since there is no persistent exchange to
+    // receive the ack message. This logic need to be deleted after we converting all legacy ZCL messages to IM messages.
+    sendFlags.Set(Messaging::SendMessageFlags::kFromInitiator).Set(Messaging::SendMessageFlags::kNoAutoRequestAck);
+
+    CHIP_ERROR err = exchange->SendMessage(protocolId, msgType, std::move(buffer), sendFlags);
+
+    buffer = nullptr;
+    ChipLogDetail(Controller, "SendMessage returned %s", ErrorStr(err));
+
+    // The send could fail due to network timeouts (e.g. broken pipe)
+    // Try session resumption if needed
+    if (err != CHIP_NO_ERROR && !resend.IsNull() && mState == ConnectionState::SecureConnected)
+    {
+        mState = ConnectionState::NotConnected;
+
+        ReturnErrorOnFailure(LoadSecureSessionParameters(ResetTransport::kYes));
+
+        err = exchange->SendMessage(protocolId, msgType, std::move(resend), sendFlags);
+        ChipLogDetail(Controller, "Re-SendMessage returned %d", err);
+        ReturnErrorOnFailure(err);
+    }
+
+    if (exchange != nullptr)
+    {
+        exchange->Close();
+    }
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR Device::LoadSecureSessionParametersIfNeeded(bool & didLoad)
 {
     didLoad = false;
@@ -90,58 +146,6 @@ CHIP_ERROR Device::SendCommands()
     ReturnErrorOnFailure(LoadSecureSessionParametersIfNeeded(loadedSecureSession));
     VerifyOrReturnError(mCommandSender != nullptr, CHIP_ERROR_INCORRECT_STATE);
     return mCommandSender->SendCommandRequest(mDeviceId, mAdminId);
-}
-
-CHIP_ERROR Device::SendMessage(Protocols::Id protocolId, uint8_t msgType, System::PacketBufferHandle buffer)
-{
-    System::PacketBufferHandle resend;
-    bool loadedSecureSession = false;
-
-    VerifyOrReturnError(!buffer.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
-
-    ReturnErrorOnFailure(LoadSecureSessionParametersIfNeeded(loadedSecureSession));
-
-    Messaging::ExchangeContext * exchange = mExchangeMgr->NewContext(mSecureSession, nullptr);
-    VerifyOrReturnError(exchange != nullptr, CHIP_ERROR_NO_MEMORY);
-
-    if (!loadedSecureSession)
-    {
-        // Secure connection already existed
-        // Hold on to the buffer, in case session resumption and resend is needed
-        // Cloning data, instead of increasing the ref count, as the original
-        // buffer might get modified by lower layers before the send fails. So,
-        // that buffer cannot be used for resends.
-        resend = buffer.CloneData();
-    }
-
-    CHIP_ERROR err =
-        exchange->SendMessage(protocolId, msgType, std::move(buffer), Messaging::SendFlags(Messaging::SendMessageFlags::kNone));
-
-    buffer = nullptr;
-    ChipLogDetail(Controller, "SendMessage returned %s", ErrorStr(err));
-
-    // The send could fail due to network timeouts (e.g. broken pipe)
-    // Try session resumption if needed
-    if (err != CHIP_NO_ERROR && !resend.IsNull() && mState == ConnectionState::SecureConnected)
-    {
-        Messaging::SendFlags sendFlags;
-
-        mState = ConnectionState::NotConnected;
-
-        ReturnErrorOnFailure(LoadSecureSessionParameters(ResetTransport::kYes));
-
-        sendFlags.Set(Messaging::SendMessageFlags::kFromInitiator).Set(Messaging::SendMessageFlags::kNoAutoRequestAck);
-        err = exchange->SendMessage(protocolId, msgType, std::move(resend), sendFlags);
-        ChipLogDetail(Controller, "Re-SendMessage returned %d", err);
-        ReturnErrorOnFailure(err);
-    }
-
-    if (exchange != nullptr)
-    {
-        exchange->Close();
-    }
-
-    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR Device::Serialize(SerializedDevice & output)

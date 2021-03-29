@@ -163,7 +163,7 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, ControllerInitParams par
     err = mExchangeMgr->Init(mSessionMgr);
     SuccessOrExit(err);
 
-    err = mExchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::DeviceManagement::Id, this);
+    err = mExchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::TempZCL::Id, this);
     SuccessOrExit(err);
 
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
@@ -203,6 +203,15 @@ CHIP_ERROR DeviceController::Shutdown()
 
     mSystemLayer = nullptr;
     mInetLayer   = nullptr;
+
+    chip::Platform::Delete(mExchangeMgr);
+    mExchangeMgr = nullptr;
+
+    chip::Platform::Delete(mSessionMgr);
+    mSessionMgr = nullptr;
+
+    chip::Platform::Delete(mTransportMgr);
+    mTransportMgr = nullptr;
 
     if (mStorageDelegate != nullptr)
     {

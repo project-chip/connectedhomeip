@@ -467,7 +467,7 @@ JNI_METHOD(void, sendMessage)(JNIEnv * env, jobject self, jlong handle, jlong de
         }
         else
         {
-            err = chipDevice->SendMessage(Protocols::DeviceManagement::Id, 0, std::move(buffer));
+            err = chipDevice->SendMessage(Protocols::TempZCL::Id, 0, std::move(buffer));
         }
     }
 
@@ -525,7 +525,7 @@ JNI_METHOD(void, sendCommand)(JNIEnv * env, jobject self, jlong handle, jlong de
         }
         else
         {
-            err = chipDevice->SendMessage(Protocols::DeviceManagement::Id, 0, std::move(buffer));
+            err = chipDevice->SendMessage(Protocols::TempZCL::Id, 0, std::move(buffer));
         }
     }
 

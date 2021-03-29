@@ -19,7 +19,9 @@
 
 #include <app/server/AppDelegate.h>
 #include <inet/InetConfig.h>
+#include <messaging/ExchangeMgr.h>
 #include <transport/AdminPairingTable.h>
+#include <transport/SecureSessionMgr.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/UDP.h>
 
@@ -54,6 +56,9 @@ enum class PairingWindowAdvertisement
     kBle,
     kMdns,
 };
+
+SecureSessionMgr & SessionManager();
+Messaging::ExchangeManager & ExchangeManager();
 
 } // namespace chip
 

@@ -160,7 +160,6 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
 
     TransportMgr<LoopbackTransport> transportMgr;
     SecureSessionMgr secureSessionMgr;
-    PayloadHeader payloadHeader;
 
     err = transportMgr.Init("LOOPBACK");
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -193,6 +192,14 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
 
     // Should be able to send a message to itself by just calling send.
     callback.ReceiveHandlerCallCount = 0;
+
+    PayloadHeader payloadHeader;
+
+    // Set the exchange ID for this header.
+    payloadHeader.SetExchangeID(0);
+
+    // Set the protocol ID and message type for this header.
+    payloadHeader.SetMessageType(chip::Protocols::Echo::MsgType::EchoRequest);
 
     err = secureSessionMgr.SendMessage(localToRemoteSession, payloadHeader, std::move(buffer));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);

@@ -47,7 +47,7 @@ public:
 
     /**
      * @brief
-     *   Called when a new connection is closing
+     *   Called when a connection is closing
      *
      * @param session   The handle to the secure session
      * @param mgr       A pointer to the ExchangeManager

@@ -23,7 +23,6 @@
 #include <app/server/DataModelHandler.h>
 #include <app/server/EchoHandler.h>
 #include <app/server/RendezvousServer.h>
-#include <app/server/SessionManager.h>
 
 #include <ble/BLEEndPoint.h>
 #include <core/CHIPPersistentStorageDelegate.h>
@@ -328,8 +327,6 @@ public:
     void OnMessageReceived(Messaging::ExchangeContext * exchangeContext, const PacketHeader & packetHeader,
                            const PayloadHeader & payloadHeader, System::PacketBufferHandle buffer) override
     {
-        const size_t data_len = buffer->DataLength();
-
         // as soon as a client connects, assume it is connected
         VerifyOrExit(!buffer.IsNull(), ChipLogError(AppServer, "Received data but couldn't process it..."));
         VerifyOrExit(packetHeader.GetSourceNodeId().HasValue(), ChipLogError(AppServer, "Unknown source for received message"));
@@ -339,8 +336,8 @@ public:
         VerifyOrExit(packetHeader.GetSourceNodeId().Value() != kUndefinedNodeId,
                      ChipLogError(AppServer, "Unknown source for received message"));
 
-        ChipLogProgress(AppServer, "Packet received from Node:%x: %zu bytes", packetHeader.GetSourceNodeId().Value(),
-                        static_cast<size_t>(data_len));
+        ChipLogProgress(AppServer, "Packet received from Node:%x: %u bytes", packetHeader.GetSourceNodeId().Value(),
+                        buffer->DataLength());
 
         // TODO: This code is temporary, and must be updated to use the Cluster API.
         // Issue: https://github.com/project-chip/connectedhomeip/issues/4725
@@ -537,7 +534,7 @@ void InitServer(AppDelegate * delegate)
     gCallbacks.SetSessionMgr(&gSessions);
 
     // Register to receive unsolicited Device Management messages from the exchange manager.
-    err = gExchangeMgr.RegisterUnsolicitedMessageHandlerForProtocol(Protocols::DeviceManagement::Id, &gCallbacks);
+    err = gExchangeMgr.RegisterUnsolicitedMessageHandlerForProtocol(Protocols::TempZCL::Id, &gCallbacks);
     VerifyOrExit(err == CHIP_NO_ERROR, err = CHIP_ERROR_NO_UNSOLICITED_MESSAGE_HANDLER);
 
     // Register to receive unsolicited Service Provisioning messages from the exchange manager.
