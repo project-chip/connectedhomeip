@@ -27,10 +27,12 @@
 #include "common.h"
 #include <core/CHIPCore.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <protocols/message_counter/MessageCounterManager.h>
 #include <support/ErrorStr.h>
 
 // The ExchangeManager global object.
 chip::Messaging::ExchangeManager gExchangeManager;
+chip::message_counter::MessageCounterManager gMessageCounterManager;
 
 void InitializeChip(void)
 {
