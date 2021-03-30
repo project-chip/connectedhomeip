@@ -27,24 +27,24 @@
 namespace chip {
 namespace Controller {
 
-constexpr ClusterId kApplicationBasicClusterId       = 0x050D;
-constexpr ClusterId kBarrierControlClusterId         = 0x0103;
-constexpr ClusterId kBasicClusterId                  = 0x0028;
-constexpr ClusterId kBindingClusterId                = 0xF000;
-constexpr ClusterId kColorControlClusterId           = 0x0300;
-constexpr ClusterId kDoorLockClusterId               = 0x0101;
-constexpr ClusterId kGeneralCommissioningClusterId   = 0x0030;
-constexpr ClusterId kGroupKeyManagementClusterId     = 0xF004;
-constexpr ClusterId kGroupsClusterId                 = 0x0004;
-constexpr ClusterId kIasZoneClusterId                = 0x0500;
-constexpr ClusterId kIdentifyClusterId               = 0x0003;
-constexpr ClusterId kLevelControlClusterId           = 0x0008;
-constexpr ClusterId kLowPowerClusterId               = 0x0508;
-constexpr ClusterId kNetworkCommissioningClusterId   = 0x0031;
-constexpr ClusterId kOnOffClusterId                  = 0x0006;
-constexpr ClusterId kScenesClusterId                 = 0x0005;
-constexpr ClusterId kTemperatureMeasurementClusterId = 0x0402;
+constexpr ClusterId kApplicationBasicClusterId            = 0x050D;
+constexpr ClusterId kBarrierControlClusterId              = 0x0103;
+constexpr ClusterId kBasicClusterId                       = 0x0028;
+constexpr ClusterId kBindingClusterId                     = 0xF000;
+constexpr ClusterId kColorControlClusterId                = 0x0300;
+constexpr ClusterId kDoorLockClusterId                    = 0x0101;
+constexpr ClusterId kGeneralCommissioningClusterId        = 0x0030;
+constexpr ClusterId kGroupKeyManagementClusterId          = 0xF004;
+constexpr ClusterId kGroupsClusterId                      = 0x0004;
+constexpr ClusterId kIasZoneClusterId                     = 0x0500;
+constexpr ClusterId kIdentifyClusterId                    = 0x0003;
+constexpr ClusterId kLevelControlClusterId                = 0x0008;
+constexpr ClusterId kLowPowerClusterId                    = 0x0508;
+constexpr ClusterId kNetworkCommissioningClusterId        = 0x0031;
+constexpr ClusterId kOnOffClusterId                       = 0x0006;
 constexpr ClusterId kPumpConfigurationAndControlClusterId = 0x0200;
+constexpr ClusterId kScenesClusterId                      = 0x0005;
+constexpr ClusterId kTemperatureMeasurementClusterId      = 0x0402;
 
 class DLL_EXPORT ApplicationBasicCluster : public ClusterBase
 {
@@ -624,6 +624,31 @@ private:
     static constexpr CommandId kToggleCommandId = 0x02;
 };
 
+class DLL_EXPORT PumpConfigurationAndControlCluster : public ClusterBase
+{
+public:
+    PumpConfigurationAndControlCluster() : ClusterBase(kPumpConfigurationAndControlClusterId) {}
+    ~PumpConfigurationAndControlCluster() {}
+
+    // Cluster Attributes
+    CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeMaxPressure(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeMaxSpeed(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeMaxFlow(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeEffectiveOperationMode(Callback::Cancelable * onSuccessCallback,
+                                                   Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeEffectiveControlMode(Callback::Cancelable * onSuccessCallback,
+                                                 Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeCapacity(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeOperationMode(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR WriteAttributeOperationMode(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                           uint8_t value);
+    CHIP_ERROR ConfigureAttributeCapacity(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                          uint16_t minInterval, uint16_t maxInterval, int16_t change);
+    CHIP_ERROR ReportAttributeCapacity(Callback::Cancelable * onReportCallback);
+};
+
 class DLL_EXPORT ScenesCluster : public ClusterBase
 {
 public:
@@ -677,21 +702,6 @@ public:
     CHIP_ERROR ReadAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeMinMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeMaxMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR ConfigureAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                               uint16_t minInterval, uint16_t maxInterval, int16_t change);
-    CHIP_ERROR ReportAttributeMeasuredValue(Callback::Cancelable * onReportCallback);
-};
-
-class DLL_EXPORT PumpConfigurationAndControlCluster : public ClusterBase
-{
-public:
-    PumpConfigurationAndControlCluster() : ClusterBase(kPumpConfigurationAndControlClusterId) {}
-    ~PumpConfigurationAndControlCluster() {}
-
-    // Cluster Attributes
-    CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR ReadAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ConfigureAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                                uint16_t minInterval, uint16_t maxInterval, int16_t change);
