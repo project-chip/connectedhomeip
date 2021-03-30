@@ -229,9 +229,9 @@ int mbed_listen(int fd, int backlog)
 
 int mbed_accept(int fd, struct sockaddr * addr, socklen_t * addrlen)
 {
-    // nsapi_error_t error;
-    // TCPSocket * retSock = nullptr;
-    int retFd;
+    nsapi_error_t error;
+    Socket * newSocket = nullptr;
+    int retFd, index;
 
     auto * socket = getBSDSocket(fd);
     if (socket == nullptr)
@@ -252,20 +252,22 @@ int mbed_accept(int fd, struct sockaddr * addr, socklen_t * addrlen)
         return -1;
     }
 
-    // retSock = socket->getNetSocket().accept(&error);
-    // if ((ret != NSAPI_ERROR_OK) && (ret != NSAPI_ERROR_UNSUPPORTED))
-    // {
-    //     set_errno(ENOBUFS);
-    //     return -1;
-    // }
-
-    retFd = mbed_socket(AF_INET, BSDSocket::MBED_TCP_SOCKET, 0);
-    if (retFd < 0)
+    newSocket = socket->getNetSocket()->accept(&error);
+    if ((error != NSAPI_ERROR_OK) && (error != NSAPI_ERROR_UNSUPPORTED))
     {
-        return retFd;
+        set_errno(ENOBUFS);
+        return -1;
     }
 
-    return retFd;
+    index = getFreeSocketSlotIndex();
+    if (index == NO_FREE_SOCKET_SLOT)
+    {
+        delete newSocket;
+        set_errno(ENOBUFS);
+        return -1;
+    }
+
+    return sockets[index].open(BSDSocket::MBED_TCP_SOCKET, (InternetSocket *) newSocket);
 }
 
 ssize_t mbed_send(int fd, const void * buf, size_t len, int flags)
