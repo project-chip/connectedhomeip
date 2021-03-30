@@ -27,27 +27,58 @@
 namespace chip {
 namespace Controller {
 
+constexpr ClusterId kAccountLoginClusterId                = 0x050E;
 constexpr ClusterId kApplicationBasicClusterId            = 0x050D;
+constexpr ClusterId kApplicationLauncherClusterId         = 0x050C;
+constexpr ClusterId kAudioOutputClusterId                 = 0x050B;
 constexpr ClusterId kBarrierControlClusterId              = 0x0103;
 constexpr ClusterId kBasicClusterId                       = 0x0028;
 constexpr ClusterId kBindingClusterId                     = 0xF000;
 constexpr ClusterId kColorControlClusterId                = 0x0300;
+constexpr ClusterId kContentLaunchClusterId               = 0x050A;
 constexpr ClusterId kDescriptorClusterId                  = 0x001D;
 constexpr ClusterId kDoorLockClusterId                    = 0x0101;
 constexpr ClusterId kGeneralCommissioningClusterId        = 0x0030;
 constexpr ClusterId kGroupKeyManagementClusterId          = 0xF004;
 constexpr ClusterId kGroupsClusterId                      = 0x0004;
 constexpr ClusterId kIdentifyClusterId                    = 0x0003;
+constexpr ClusterId kKeypadInputClusterId                 = 0x0509;
 constexpr ClusterId kLevelControlClusterId                = 0x0008;
 constexpr ClusterId kLowPowerClusterId                    = 0x0508;
+constexpr ClusterId kMediaInputClusterId                  = 0x0507;
+constexpr ClusterId kMediaPlaybackClusterId               = 0x0506;
 constexpr ClusterId kNetworkCommissioningClusterId        = 0x0031;
 constexpr ClusterId kOnOffClusterId                       = 0x0006;
 constexpr ClusterId kOperationalCredentialsClusterId      = 0x003E;
 constexpr ClusterId kPumpConfigurationAndControlClusterId = 0x0200;
 constexpr ClusterId kScenesClusterId                      = 0x0005;
 constexpr ClusterId kSwitchClusterId                      = 0x003B;
+constexpr ClusterId kTvChannelClusterId                   = 0x0504;
+constexpr ClusterId kTargetNavigatorClusterId             = 0x0505;
 constexpr ClusterId kTemperatureMeasurementClusterId      = 0x0402;
 constexpr ClusterId kThermostatClusterId                  = 0x0201;
+constexpr ClusterId kWakeOnLanClusterId                   = 0x0503;
+
+class DLL_EXPORT AccountLoginCluster : public ClusterBase
+{
+public:
+    AccountLoginCluster() : ClusterBase(kAccountLoginClusterId) {}
+    ~AccountLoginCluster() {}
+
+    // Cluster Commands
+    CHIP_ERROR GetSetupPIN(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                           chip::ByteSpan tempAccountIdentifier);
+    CHIP_ERROR Login(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                     chip::ByteSpan tempAccountIdentifier, chip::ByteSpan setupPIN);
+
+    // Cluster Attributes
+    CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+
+private:
+    static constexpr CommandId kGetSetupPINCommandId = 0x00;
+    static constexpr CommandId kLoginCommandId       = 0x01;
+};
 
 class DLL_EXPORT ApplicationBasicCluster : public ClusterBase
 {
@@ -65,6 +96,47 @@ public:
     CHIP_ERROR ReadAttributeCatalogVendorId(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeApplicationSatus(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+};
+
+class DLL_EXPORT ApplicationLauncherCluster : public ClusterBase
+{
+public:
+    ApplicationLauncherCluster() : ClusterBase(kApplicationLauncherClusterId) {}
+    ~ApplicationLauncherCluster() {}
+
+    // Cluster Commands
+    CHIP_ERROR LaunchApp(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, chip::ByteSpan data,
+                         uint16_t catalogVendorId, chip::ByteSpan applicationId);
+
+    // Cluster Attributes
+    CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeApplicationLauncherList(Callback::Cancelable * onSuccessCallback,
+                                                    Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+
+private:
+    static constexpr CommandId kLaunchAppCommandId = 0x00;
+};
+
+class DLL_EXPORT AudioOutputCluster : public ClusterBase
+{
+public:
+    AudioOutputCluster() : ClusterBase(kAudioOutputClusterId) {}
+    ~AudioOutputCluster() {}
+
+    // Cluster Commands
+    CHIP_ERROR RenameOutput(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t index,
+                            chip::ByteSpan name);
+    CHIP_ERROR SelectOutput(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t index);
+
+    // Cluster Attributes
+    CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeAudioOutputList(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+
+private:
+    static constexpr CommandId kRenameOutputCommandId = 0x01;
+    static constexpr CommandId kSelectOutputCommandId = 0x00;
 };
 
 class DLL_EXPORT BarrierControlCluster : public ClusterBase
@@ -316,6 +388,30 @@ private:
     static constexpr CommandId kStopMoveStepCommandId           = 0x47;
 };
 
+class DLL_EXPORT ContentLaunchCluster : public ClusterBase
+{
+public:
+    ContentLaunchCluster() : ClusterBase(kContentLaunchClusterId) {}
+    ~ContentLaunchCluster() {}
+
+    // Cluster Commands
+    CHIP_ERROR LaunchContent(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t autoPlay,
+                             chip::ByteSpan data);
+    CHIP_ERROR LaunchURL(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                         chip::ByteSpan contentURL, chip::ByteSpan displayString);
+
+    // Cluster Attributes
+    CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeAcceptsHeaderList(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeSupportedStreamingTypes(Callback::Cancelable * onSuccessCallback,
+                                                    Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+
+private:
+    static constexpr CommandId kLaunchContentCommandId = 0x00;
+    static constexpr CommandId kLaunchURLCommandId     = 0x01;
+};
+
 class DLL_EXPORT DescriptorCluster : public ClusterBase
 {
 public:
@@ -506,6 +602,23 @@ private:
     static constexpr CommandId kIdentifyQueryCommandId = 0x01;
 };
 
+class DLL_EXPORT KeypadInputCluster : public ClusterBase
+{
+public:
+    KeypadInputCluster() : ClusterBase(kKeypadInputClusterId) {}
+    ~KeypadInputCluster() {}
+
+    // Cluster Commands
+    CHIP_ERROR SendKey(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t keyCode);
+
+    // Cluster Attributes
+    CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+
+private:
+    static constexpr CommandId kSendKeyCommandId = 0x00;
+};
+
 class DLL_EXPORT LevelControlCluster : public ClusterBase
 {
 public:
@@ -563,6 +676,70 @@ public:
 
 private:
     static constexpr CommandId kSleepCommandId = 0x00;
+};
+
+class DLL_EXPORT MediaInputCluster : public ClusterBase
+{
+public:
+    MediaInputCluster() : ClusterBase(kMediaInputClusterId) {}
+    ~MediaInputCluster() {}
+
+    // Cluster Commands
+    CHIP_ERROR HideInputStatus(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR RenameInput(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t index,
+                           chip::ByteSpan name);
+    CHIP_ERROR SelectInput(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t index);
+    CHIP_ERROR ShowInputStatus(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+
+    // Cluster Attributes
+    CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeMediaInputList(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+
+private:
+    static constexpr CommandId kHideInputStatusCommandId = 0x02;
+    static constexpr CommandId kRenameInputCommandId     = 0x03;
+    static constexpr CommandId kSelectInputCommandId     = 0x00;
+    static constexpr CommandId kShowInputStatusCommandId = 0x01;
+};
+
+class DLL_EXPORT MediaPlaybackCluster : public ClusterBase
+{
+public:
+    MediaPlaybackCluster() : ClusterBase(kMediaPlaybackClusterId) {}
+    ~MediaPlaybackCluster() {}
+
+    // Cluster Commands
+    CHIP_ERROR MediaFastForward(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR MediaNext(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR MediaPause(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR MediaPlay(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR MediaPrevious(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR MediaRewind(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR MediaSkipBackward(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                 uint64_t deltaPositionMilliseconds);
+    CHIP_ERROR MediaSkipForward(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                uint64_t deltaPositionMilliseconds);
+    CHIP_ERROR MediaSkipSeek(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint64_t position);
+    CHIP_ERROR MediaStartOver(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR MediaStop(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+
+    // Cluster Attributes
+    CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+
+private:
+    static constexpr CommandId kMediaFastForwardCommandId  = 0x07;
+    static constexpr CommandId kMediaNextCommandId         = 0x05;
+    static constexpr CommandId kMediaPauseCommandId        = 0x01;
+    static constexpr CommandId kMediaPlayCommandId         = 0x00;
+    static constexpr CommandId kMediaPreviousCommandId     = 0x04;
+    static constexpr CommandId kMediaRewindCommandId       = 0x06;
+    static constexpr CommandId kMediaSkipBackwardCommandId = 0x09;
+    static constexpr CommandId kMediaSkipForwardCommandId  = 0x08;
+    static constexpr CommandId kMediaSkipSeekCommandId     = 0x0A;
+    static constexpr CommandId kMediaStartOverCommandId    = 0x03;
+    static constexpr CommandId kMediaStopCommandId         = 0x02;
 };
 
 class DLL_EXPORT NetworkCommissioningCluster : public ClusterBase
@@ -739,6 +916,51 @@ public:
     CHIP_ERROR ReportAttributeCurrentPosition(Callback::Cancelable * onReportCallback);
 };
 
+class DLL_EXPORT TvChannelCluster : public ClusterBase
+{
+public:
+    TvChannelCluster() : ClusterBase(kTvChannelClusterId) {}
+    ~TvChannelCluster() {}
+
+    // Cluster Commands
+    CHIP_ERROR ChangeChannel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                             chip::ByteSpan match);
+    CHIP_ERROR ChangeChannelByNumber(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                     uint16_t majorNumber, uint16_t minorNumber);
+    CHIP_ERROR SkipChannel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t count);
+
+    // Cluster Attributes
+    CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeTvChannelList(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeTvChannelLineup(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeCurrentTvChannel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+
+private:
+    static constexpr CommandId kChangeChannelCommandId         = 0x00;
+    static constexpr CommandId kChangeChannelByNumberCommandId = 0x01;
+    static constexpr CommandId kSkipChannelCommandId           = 0x02;
+};
+
+class DLL_EXPORT TargetNavigatorCluster : public ClusterBase
+{
+public:
+    TargetNavigatorCluster() : ClusterBase(kTargetNavigatorClusterId) {}
+    ~TargetNavigatorCluster() {}
+
+    // Cluster Commands
+    CHIP_ERROR NavigateTarget(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t target,
+                              chip::ByteSpan data);
+
+    // Cluster Attributes
+    CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeTargetNavigatorList(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+
+private:
+    static constexpr CommandId kNavigateTargetCommandId = 0x00;
+};
+
 class DLL_EXPORT TemperatureMeasurementCluster : public ClusterBase
 {
 public:
@@ -803,6 +1025,18 @@ private:
     static constexpr CommandId kGetWeeklyScheduleCommandId   = 0x02;
     static constexpr CommandId kSetWeeklyScheduleCommandId   = 0x01;
     static constexpr CommandId kSetpointRaiseLowerCommandId  = 0x00;
+};
+
+class DLL_EXPORT WakeOnLanCluster : public ClusterBase
+{
+public:
+    WakeOnLanCluster() : ClusterBase(kWakeOnLanClusterId) {}
+    ~WakeOnLanCluster() {}
+
+    // Cluster Attributes
+    CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeWakeOnLanMacAddress(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 };
 
 } // namespace Controller
