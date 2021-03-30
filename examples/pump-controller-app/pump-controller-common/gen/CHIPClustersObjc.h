@@ -34,17 +34,17 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPCluster : NSObject
 
-- (nullable instancetype)initWithDevice:(CHIPDevice *)device endpoint:(uint8_t)endpoint queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (nullable instancetype)initWithDevice:(CHIPDevice *)device
+                               endpoint:(uint8_t)endpoint
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
 
 @end
 
-
-
 /**
  * Cluster Identify
- *    
+ *
  */
 @interface CHIPIdentify : CHIPCluster
 
@@ -56,29 +56,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
 
 @end
-
-
-
-/**
- * Cluster Identify
- *    
- */
-@interface CHIPIdentify : CHIPCluster
-
-- (void)identify:(uint16_t)identifyTime completionHandler:(ResponseHandler)completionHandler;
-- (void)identifyQuery:(ResponseHandler)completionHandler;
-
-- (void)readAttributeIdentifyTime:(ResponseHandler)completionHandler;
-- (void)writeAttributeIdentifyTime:(uint16_t)value completionHandler:(ResponseHandler)completionHandler;
-- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
-
-@end
-
-
 
 /**
  * Cluster On/off
- *    
+ *
  */
 @interface CHIPOnOff : CHIPCluster
 
@@ -87,20 +68,19 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)toggle:(ResponseHandler)completionHandler;
 
 - (void)readAttributeOnOff:(ResponseHandler)completionHandler;
-- (void) configureAttributeOnOff:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval completionHandler:(ResponseHandler)completionHandler;
-- (void) reportAttributeOnOff:(ResponseHandler)reportHandler;
+- (void)configureAttributeOnOff:(uint16_t)minInterval
+                    maxInterval:(uint16_t)maxInterval
+              completionHandler:(ResponseHandler)completionHandler;
+- (void)reportAttributeOnOff:(ResponseHandler)reportHandler;
 - (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
 
 @end
 
-
-
 /**
  * Cluster Pump Configuration and Control
- *    
+ *
  */
 @interface CHIPPumpConfigurationAndControl : CHIPCluster
-
 
 - (void)readAttributeMaxPressure:(ResponseHandler)completionHandler;
 - (void)readAttributeMaxSpeed:(ResponseHandler)completionHandler;
@@ -108,14 +88,16 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeEffectiveOperationMode:(ResponseHandler)completionHandler;
 - (void)readAttributeEffectiveControlMode:(ResponseHandler)completionHandler;
 - (void)readAttributeCapacity:(ResponseHandler)completionHandler;
-- (void) configureAttributeCapacity:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval change:(int16_t)change completionHandler:(ResponseHandler)completionHandler;
-- (void) reportAttributeCapacity:(ResponseHandler)reportHandler;
+- (void)configureAttributeCapacity:(uint16_t)minInterval
+                       maxInterval:(uint16_t)maxInterval
+                            change:(int16_t)change
+                 completionHandler:(ResponseHandler)completionHandler;
+- (void)reportAttributeCapacity:(ResponseHandler)reportHandler;
 - (void)readAttributeOperationMode:(ResponseHandler)completionHandler;
 - (void)writeAttributeOperationMode:(uint8_t)value completionHandler:(ResponseHandler)completionHandler;
 - (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
 
 @end
-
 
 NS_ASSUME_NONNULL_END
 
