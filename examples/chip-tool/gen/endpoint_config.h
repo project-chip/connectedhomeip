@@ -63,7 +63,7 @@
 
 #define ZAP_ATTRIBUTE_MASK(mask) ATTRIBUTE_MASK_##mask
 // This is an array of EmberAfAttributeMetadata structures.
-#define GENERATED_ATTRIBUTE_COUNT 18
+#define GENERATED_ATTRIBUTE_COUNT 28
 #define GENERATED_ATTRIBUTES                                                                                                       \
     {                                                                                                                              \
         { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT),                                                                 \
@@ -95,9 +95,29 @@
             { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT),                                                             \
               ZAP_SIMPLE_DEFAULT(3) }, /* Temperature Measurement (client): cluster revision */                                    \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT),                                                             \
+              ZAP_SIMPLE_DEFAULT(0x0001) }, /* Wake on LAN (client): cluster revision */                                           \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT),                                                             \
+              ZAP_SIMPLE_DEFAULT(0x0001) }, /* TV Channel (client): cluster revision */                                            \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT),                                                             \
+              ZAP_SIMPLE_DEFAULT(0x0001) }, /* Target Navigator (client): cluster revision */                                      \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT),                                                             \
+              ZAP_SIMPLE_DEFAULT(0x0001) }, /* Media Playback (client): cluster revision */                                        \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT),                                                             \
+              ZAP_SIMPLE_DEFAULT(0x0001) }, /* Media Input (client): cluster revision */                                           \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT),                                                             \
               ZAP_SIMPLE_DEFAULT(0x0001) }, /* Low Power (client): cluster revision */                                             \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT),                                                             \
+              ZAP_SIMPLE_DEFAULT(0x0001) }, /* Keypad Input (client): cluster revision */                                          \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT),                                                             \
+              ZAP_SIMPLE_DEFAULT(0x0001) }, /* Content Launch (client): cluster revision */                                        \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT),                                                             \
+              ZAP_SIMPLE_DEFAULT(0x0001) }, /* Audio Output (client): cluster revision */                                          \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT),                                                             \
+              ZAP_SIMPLE_DEFAULT(0x0001) }, /* Application Launcher (client): cluster revision */                                  \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT),                                                             \
               ZAP_SIMPLE_DEFAULT(0x0001) }, /* Application Basic (client): cluster revision */                                     \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT),                                                             \
+              ZAP_SIMPLE_DEFAULT(0x0001) }, /* Account Login (client): cluster revision */                                         \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT),                                                             \
               ZAP_SIMPLE_DEFAULT(0x0001) }, /* Binding (client): cluster revision */                                               \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT),                                                             \
@@ -111,7 +131,7 @@
 #define GENERATED_FUNCTION_ARRAYS
 
 #define ZAP_CLUSTER_MASK(mask) CLUSTER_MASK_##mask
-#define GENERATED_CLUSTER_COUNT 18
+#define GENERATED_CLUSTER_COUNT 28
 #define GENERATED_CLUSTERS                                                                                                         \
     {                                                                                                                              \
         { 0x0003, ZAP_ATTRIBUTE_INDEX(0), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL }, /* Endpoint: 1, Cluster: Identify (client) */    \
@@ -147,16 +167,46 @@
                 0x0402, ZAP_ATTRIBUTE_INDEX(13), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
             }, /* Endpoint: 1, Cluster: Temperature Measurement (client) */                                                        \
             {                                                                                                                      \
-                0x0508, ZAP_ATTRIBUTE_INDEX(14), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+                0x0503, ZAP_ATTRIBUTE_INDEX(14), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+            }, /* Endpoint: 1, Cluster: Wake on LAN (client) */                                                                    \
+            {                                                                                                                      \
+                0x0504, ZAP_ATTRIBUTE_INDEX(15), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+            }, /* Endpoint: 1, Cluster: TV Channel (client) */                                                                     \
+            {                                                                                                                      \
+                0x0505, ZAP_ATTRIBUTE_INDEX(16), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+            }, /* Endpoint: 1, Cluster: Target Navigator (client) */                                                               \
+            {                                                                                                                      \
+                0x0506, ZAP_ATTRIBUTE_INDEX(17), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+            }, /* Endpoint: 1, Cluster: Media Playback (client) */                                                                 \
+            {                                                                                                                      \
+                0x0507, ZAP_ATTRIBUTE_INDEX(18), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+            }, /* Endpoint: 1, Cluster: Media Input (client) */                                                                    \
+            {                                                                                                                      \
+                0x0508, ZAP_ATTRIBUTE_INDEX(19), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
             }, /* Endpoint: 1, Cluster: Low Power (client) */                                                                      \
             {                                                                                                                      \
-                0x050D, ZAP_ATTRIBUTE_INDEX(15), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+                0x0509, ZAP_ATTRIBUTE_INDEX(20), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+            }, /* Endpoint: 1, Cluster: Keypad Input (client) */                                                                   \
+            {                                                                                                                      \
+                0x050A, ZAP_ATTRIBUTE_INDEX(21), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+            }, /* Endpoint: 1, Cluster: Content Launch (client) */                                                                 \
+            {                                                                                                                      \
+                0x050B, ZAP_ATTRIBUTE_INDEX(22), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+            }, /* Endpoint: 1, Cluster: Audio Output (client) */                                                                   \
+            {                                                                                                                      \
+                0x050C, ZAP_ATTRIBUTE_INDEX(23), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+            }, /* Endpoint: 1, Cluster: Application Launcher (client) */                                                           \
+            {                                                                                                                      \
+                0x050D, ZAP_ATTRIBUTE_INDEX(24), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
             }, /* Endpoint: 1, Cluster: Application Basic (client) */                                                              \
             {                                                                                                                      \
-                0xF000, ZAP_ATTRIBUTE_INDEX(16), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+                0x050E, ZAP_ATTRIBUTE_INDEX(25), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+            }, /* Endpoint: 1, Cluster: Account Login (client) */                                                                  \
+            {                                                                                                                      \
+                0xF000, ZAP_ATTRIBUTE_INDEX(26), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
             }, /* Endpoint: 1, Cluster: Binding (client) */                                                                        \
             {                                                                                                                      \
-                0xF004, ZAP_ATTRIBUTE_INDEX(17), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+                0xF004, ZAP_ATTRIBUTE_INDEX(27), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
             }, /* Endpoint: 1, Cluster: Group Key Management (client) */                                                           \
     }
 
@@ -165,7 +215,7 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 18, 36 },                                                                                          \
+        { ZAP_CLUSTER_INDEX(0), 28, 56 },                                                                                          \
     }
 
 // Largest attribute size is needed for various buffers
@@ -175,7 +225,7 @@
 #define ATTRIBUTE_SINGLETONS_SIZE (2)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (36)
+#define ATTRIBUTE_MAX_SIZE (56)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (1)
@@ -219,7 +269,7 @@
 
 // Array of EmberAfCommandMetadata structs.
 #define ZAP_COMMAND_MASK(mask) COMMAND_MASK_##mask
-#define EMBER_AF_GENERATED_COMMAND_COUNT (138)
+#define EMBER_AF_GENERATED_COMMAND_COUNT (183)
 #define GENERATED_COMMANDS                                                                                                         \
     {                                                                                                                              \
         { 0x0003, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) },     /* Identify (client): Identify */                                 \
@@ -443,7 +493,52 @@
             {                                                                                                                      \
                 0x0300, 0x4C, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
             },                                                   /* Color Control (client): StepColorTemperature */                \
+            { 0x0504, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* TV Channel (client): ChangeChannel */                          \
+            { 0x0504, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* TV Channel (client): ChangeChannelResponse */                  \
+            { 0x0504, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* TV Channel (client): ChangeChannelByNumber */                  \
+            { 0x0504, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* TV Channel (client): SkipChannel */                            \
+            { 0x0505, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Target Navigator (client): NavigateTarget */                   \
+            { 0x0505, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Target Navigator (client): NavigateTargetResponse */           \
+            { 0x0506, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (client): MediaPlay */                          \
+            { 0x0506, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Media Playback (client): MediaPlayResponse */                  \
+            { 0x0506, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (client): MediaPause */                         \
+            { 0x0506, 0x01, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Media Playback (client): MediaPauseResponse */                 \
+            { 0x0506, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (client): MediaStop */                          \
+            { 0x0506, 0x02, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Media Playback (client): MediaStopResponse */                  \
+            { 0x0506, 0x03, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (client): MediaStartOver */                     \
+            { 0x0506, 0x03, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Media Playback (client): MediaStartOverResponse */             \
+            { 0x0506, 0x04, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (client): MediaPrevious */                      \
+            { 0x0506, 0x04, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Media Playback (client): MediaPreviousResponse */              \
+            { 0x0506, 0x05, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (client): MediaNext */                          \
+            { 0x0506, 0x05, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Media Playback (client): MediaNextResponse */                  \
+            { 0x0506, 0x06, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (client): MediaRewind */                        \
+            { 0x0506, 0x06, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Media Playback (client): MediaRewindResponse */                \
+            { 0x0506, 0x07, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (client): MediaFastForward */                   \
+            { 0x0506, 0x07, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Media Playback (client): MediaFastForwardResponse */           \
+            { 0x0506, 0x08, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (client): MediaSkipForward */                   \
+            { 0x0506, 0x08, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Media Playback (client): MediaSkipForwardResponse */           \
+            { 0x0506, 0x09, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (client): MediaSkipBackward */                  \
+            { 0x0506, 0x09, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Media Playback (client): MediaSkipBackwardResponse */          \
+            { 0x0506, 0x0A, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (client): MediaSkipSeek */                      \
+            { 0x0506, 0x0A, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Media Playback (client): MediaSkipSeekResponse */              \
+            { 0x0507, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Input (client): SelectInput */                           \
+            { 0x0507, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Input (client): ShowInputStatus */                       \
+            { 0x0507, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Input (client): HideInputStatus */                       \
+            { 0x0507, 0x03, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Input (client): RenameInput */                           \
             { 0x0508, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Low Power (client): Sleep */                                   \
+            { 0x0509, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Keypad Input (client): SendKey */                              \
+            { 0x0509, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Keypad Input (client): SendKeyResponse */                      \
+            { 0x050A, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Content Launch (client): LaunchContent */                      \
+            { 0x050A, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Content Launch (client): LaunchContentResponse */              \
+            { 0x050A, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Content Launch (client): LaunchURL */                          \
+            { 0x050A, 0x01, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Content Launch (client): LaunchURLResponse */                  \
+            { 0x050B, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Audio Output (client): SelectOutput */                         \
+            { 0x050B, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Audio Output (client): RenameOutput */                         \
+            { 0x050C, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Application Launcher (client): LaunchApp */                    \
+            { 0x050C, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Application Launcher (client): LaunchAppResponse */            \
+            { 0x050E, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Account Login (client): GetSetupPIN */                         \
+            { 0x050E, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Account Login (client): GetSetupPINResponse */                 \
+            { 0x050E, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Account Login (client): Login */                               \
             { 0xF000, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Binding (client): Bind */                                      \
             { 0xF000, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Binding (client): Unbind */                                    \
     }

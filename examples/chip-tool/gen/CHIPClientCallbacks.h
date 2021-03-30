@@ -40,6 +40,10 @@ typedef void (*ReadReportingConfigurationReportedCallback)(void * context, uint1
 typedef void (*ReadReportingConfigurationReceivedCallback)(void * context, uint16_t timeout);
 
 // Cluster Specific Response Callbacks
+typedef void (*AccountLoginClusterGetSetupPINResponseCallback)(void * context, uint8_t * setupPIN);
+typedef void (*ApplicationLauncherClusterLaunchAppResponseCallback)(void * context, uint8_t * data);
+typedef void (*ContentLaunchClusterLaunchContentResponseCallback)(void * context, uint8_t * data, uint8_t contentLaunchStatus);
+typedef void (*ContentLaunchClusterLaunchURLResponseCallback)(void * context, uint8_t * data, uint8_t contentLaunchStatus);
 typedef void (*DoorLockClusterClearAllPinsResponseCallback)(void * context);
 typedef void (*DoorLockClusterClearAllRfidsResponseCallback)(void * context);
 typedef void (*DoorLockClusterClearHolidayScheduleResponseCallback)(void * context);
@@ -81,6 +85,18 @@ typedef void (*GroupsClusterGetGroupMembershipResponseCallback)(void * context, 
 typedef void (*GroupsClusterRemoveGroupResponseCallback)(void * context, uint16_t groupId);
 typedef void (*GroupsClusterViewGroupResponseCallback)(void * context, uint16_t groupId, uint8_t * groupName);
 typedef void (*IdentifyClusterIdentifyQueryResponseCallback)(void * context, uint16_t timeout);
+typedef void (*KeypadInputClusterSendKeyResponseCallback)(void * context);
+typedef void (*MediaPlaybackClusterMediaFastForwardResponseCallback)(void * context, uint8_t mediaPlaybackStatus);
+typedef void (*MediaPlaybackClusterMediaNextResponseCallback)(void * context, uint8_t mediaPlaybackStatus);
+typedef void (*MediaPlaybackClusterMediaPauseResponseCallback)(void * context, uint8_t mediaPlaybackStatus);
+typedef void (*MediaPlaybackClusterMediaPlayResponseCallback)(void * context, uint8_t mediaPlaybackStatus);
+typedef void (*MediaPlaybackClusterMediaPreviousResponseCallback)(void * context, uint8_t mediaPlaybackStatus);
+typedef void (*MediaPlaybackClusterMediaRewindResponseCallback)(void * context, uint8_t mediaPlaybackStatus);
+typedef void (*MediaPlaybackClusterMediaSkipBackwardResponseCallback)(void * context, uint8_t mediaPlaybackStatus);
+typedef void (*MediaPlaybackClusterMediaSkipForwardResponseCallback)(void * context, uint8_t mediaPlaybackStatus);
+typedef void (*MediaPlaybackClusterMediaSkipSeekResponseCallback)(void * context, uint8_t mediaPlaybackStatus);
+typedef void (*MediaPlaybackClusterMediaStartOverResponseCallback)(void * context, uint8_t mediaPlaybackStatus);
+typedef void (*MediaPlaybackClusterMediaStopResponseCallback)(void * context, uint8_t mediaPlaybackStatus);
 typedef void (*NetworkCommissioningClusterAddThreadNetworkResponseCallback)(void * context, uint8_t errorCode, uint8_t * debugText);
 typedef void (*NetworkCommissioningClusterAddWiFiNetworkResponseCallback)(void * context, uint8_t errorCode, uint8_t * debugText);
 typedef void (*NetworkCommissioningClusterDisableNetworkResponseCallback)(void * context, uint8_t errorCode, uint8_t * debugText);
@@ -103,6 +119,10 @@ typedef void (*ScenesClusterStoreSceneResponseCallback)(void * context, uint16_t
 typedef void (*ScenesClusterViewSceneResponseCallback)(void * context, uint16_t groupId, uint8_t sceneId, uint16_t transitionTime,
                                                        uint8_t * sceneName,
                                                        /* TYPE WARNING: array array defaults to */ uint8_t * extensionFieldSets);
+typedef void (*TvChannelClusterChangeChannelResponseCallback)(void * context,
+                                                              /* TYPE WARNING: array array defaults to */ uint8_t * ChannelMatch,
+                                                              uint8_t ErrorType);
+typedef void (*TargetNavigatorClusterNavigateTargetResponseCallback)(void * context, uint8_t * data);
 typedef void (*ThermostatClusterCurrentWeeklyScheduleCallback)(void * context, uint8_t numberOfTransitionsForSequence,
                                                                uint8_t dayOfWeekForSequence, uint8_t modeForSequence,
                                                                /* TYPE WARNING: array array defaults to */ uint8_t * payload);

@@ -23,7 +23,9 @@ limitations under the License.
     <define>MEDIA_INPUT_CLUSTER</define>
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
+    <!-- TODO: Add feature map once it is supported -->
     <description>This cluster provides an interface for controlling the Input Selector on a media device such as a TV.</description>
+    <!-- TODO: Convert this to list once it is supported -->
     <attribute side="server" code="0x0000" define="MEDIA_INPUT_LIST" type="OCTET_STRING" length="32" writable="false" optional="false">media input list</attribute>
     <attribute side="server" code="0x0001" define="MEDIA_INPUT_CURRENT_INPUT" type="INT8U" min="0x00" max="0xFF" writable="false" default="0x00" optional="true">current media input</attribute>
 
@@ -49,10 +51,10 @@ limitations under the License.
   </cluster>
 
   <struct name="MediaInputInfo">
-    <item name="Index" type="INT8U"/>
-    <item name="InputType" type="MediaInputType"/>
-    <item name="Name" type="CHAR_STRING"/>
-    <item name="Description" type="CHAR_STRING"/>
+    <item name="index" type="INT8U"/>
+    <item name="inputType" type="MediaInputType"/>
+    <item name="name" type="CHAR_STRING"/>
+    <item name="description" type="CHAR_STRING"/>
   </struct>
 
   <enum name="MediaInputType" type="ENUM8">
