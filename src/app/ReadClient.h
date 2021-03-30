@@ -101,9 +101,9 @@ private:
 
     virtual ~ReadClient() = default;
 
-    void OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
+    void OnMessageReceived(Messaging::ExchangeHandle apExchangeContext, const PacketHeader & aPacketHeader,
                            const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload) override;
-    void OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext) override;
+    void OnResponseTimeout(Messaging::ExchangeHandle apExchangeContext) override;
 
     /**
      *  Check if current read client is being used
@@ -119,7 +119,7 @@ private:
     const char * GetStateStr() const;
 
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
-    Messaging::ExchangeContext * mpExchangeCtx = nullptr;
+    Messaging::ExchangeHandle mpExchangeCtx;
     InteractionModelDelegate * mpDelegate      = nullptr;
     ClientState mState                         = ClientState::Uninitialized;
 };

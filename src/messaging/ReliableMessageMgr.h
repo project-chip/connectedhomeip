@@ -60,7 +60,7 @@ public:
     {
         RetransTableEntry();
 
-        ReliableMessageContext * rc;             /**< The context for the stored CHIP message. */
+        ExchangeHandle ec;             /**< The context for the stored CHIP message. */
         EncryptedPacketBufferHandle retainedBuf; /**< The packet buffer holding the CHIP message. */
         uint16_t nextRetransTimeTick;            /**< A counter representing the next retransmission time for the message. */
         uint8_t sendCount;                       /**< A counter representing the number of times the message has been sent. */
@@ -115,7 +115,7 @@ public:
      *  @retval  #CHIP_ERROR_RETRANS_TABLE_FULL If there is no empty slot left in the table for addition.
      *  @retval  #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR AddToRetransTable(ReliableMessageContext * rc, RetransTableEntry ** rEntry);
+    CHIP_ERROR AddToRetransTable(ExchangeHandle exchangeContext, RetransTableEntry ** rEntry);
 
     /**
      *  Start retranmisttion of cached encryped packet for current entry.
@@ -135,7 +135,7 @@ public:
      *
      *  @retval  #CHIP_NO_ERROR On success.
      */
-    void PauseRetransmision(ReliableMessageContext * rc, uint32_t PauseTimeMillis);
+    void PauseRetransmision(ExchangeHandle exchangeContext, uint32_t PauseTimeMillis);
 
     /**
      *  Re-start retranmisttion of cached encryped packets for the given ReliableMessageContext.
@@ -144,7 +144,7 @@ public:
      *
      *  @retval  #CHIP_NO_ERROR On success.
      */
-    void ResumeRetransmision(ReliableMessageContext * rc);
+    void ResumeRetransmision(ExchangeHandle exchangeContext);
 
     /**
      *  Iterate through active exchange contexts and retrans table entries. Clear the entry matching
@@ -156,7 +156,7 @@ public:
      *
      *  @retval  #CHIP_NO_ERROR On success.
      */
-    bool CheckAndRemRetransTable(ReliableMessageContext * rc, uint32_t msgId);
+    bool CheckAndRemRetransTable(ExchangeHandle exchangeContext, uint32_t msgId);
 
     /**
      *  Send the specified entry from the retransmission table.
@@ -173,7 +173,7 @@ public:
      *  @param[in]    rc    A pointer to the ExchangeContext object.
      *
      */
-    void ClearRetransTable(ReliableMessageContext * rc);
+    void ClearRetransTable(ExchangeHandle exchangeContext);
 
     /**
      *  Clear an entry in the retransmission table.
@@ -182,16 +182,6 @@ public:
      *
      */
     void ClearRetransTable(RetransTableEntry & rEntry);
-
-    /**
-     *  Fail entries matching a specified ExchangeContext.
-     *
-     *  @param[in]    rc    A pointer to the ExchangeContext object.
-     *
-     *  @param[in]    err   The error for failing table entries.
-     *
-     */
-    void FailRetransTableEntries(ReliableMessageContext * rc, CHIP_ERROR err);
 
     /**
      * Iterate through active exchange contexts and retrans table entries.

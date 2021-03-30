@@ -290,9 +290,9 @@ protected:
 
 private:
     //////////// ExchangeDelegate Implementation ///////////////
-    void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+    void OnMessageReceived(Messaging::ExchangeHandle ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                            System::PacketBufferHandle && msgBuf) override;
-    void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
+    void OnResponseTimeout(Messaging::ExchangeHandle ec) override;
 
     //////////// ExchangeMgrDelegate Implementation ///////////////
     void OnNewConnection(SecureSessionHandle session, Messaging::ExchangeManager * mgr) override;

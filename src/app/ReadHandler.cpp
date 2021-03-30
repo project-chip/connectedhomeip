@@ -34,8 +34,7 @@ CHIP_ERROR ReadHandler::Init(InteractionModelDelegate * apDelegate)
     CHIP_ERROR err = CHIP_NO_ERROR;
     // Error if already initialized.
     VerifyOrExit(apDelegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(mpExchangeCtx == nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    mpExchangeCtx              = nullptr;
+    VerifyOrExit(!mpExchangeCtx.HasValue(), err = CHIP_ERROR_INCORRECT_STATE);
     mpDelegate                 = apDelegate;
     mSuppressResponse          = true;
     mpAttributeClusterInfoList = nullptr;
@@ -62,16 +61,16 @@ void ReadHandler::Shutdown()
 
 CHIP_ERROR ReadHandler::AbortExistingExchangeContext()
 {
-    if (mpExchangeCtx != nullptr)
+    if (mpExchangeCtx.HasValue())
     {
         mpExchangeCtx->Abort();
-        mpExchangeCtx = nullptr;
+        mpExchangeCtx.Release();
     }
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ReadHandler::OnReadRequest(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload)
+CHIP_ERROR ReadHandler::OnReadRequest(Messaging::ExchangeHandle apExchangeContext, System::PacketBufferHandle && aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferHandle response;
@@ -93,7 +92,7 @@ exit:
 CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mpExchangeCtx.HasValue(), err = CHIP_ERROR_INCORRECT_STATE);
 
     err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReportData, std::move(aPayload));
 exit:

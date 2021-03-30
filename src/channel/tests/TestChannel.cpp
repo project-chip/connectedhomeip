@@ -71,13 +71,13 @@ TransportMgr<LoopbackTransport> gTransportMgr;
 class MockAppDelegate : public ExchangeDelegate
 {
 public:
-    void OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+    void OnMessageReceived(ExchangeHandle ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                            System::PacketBufferHandle && buffer) override
     {
         IsOnMessageReceivedCalled = true;
     }
 
-    void OnResponseTimeout(ExchangeContext * ec) override {}
+    void OnResponseTimeout(ExchangeHandle ec) override {}
 
     bool IsOnMessageReceivedCalled = false;
 };
@@ -118,7 +118,7 @@ void CheckExchangeChannels(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, channelHandle.GetState() == ChannelState::kReady);
 
     MockAppDelegate mockAppDelegate;
-    ExchangeContext * ec1 = channelHandle.NewExchange(&mockAppDelegate);
+    ExchangeHandle ec1 = channelHandle.NewExchange(&mockAppDelegate);
 
     // send a malicious packet
     ec1->SendMessage(0x0001, 0x0002, System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize));

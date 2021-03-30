@@ -109,7 +109,7 @@ public:
      *         exchange context has been assigned or the context
      *         has been released.
      */
-    Messaging::ExchangeContext * GetExchangeContext() const { return mpExchangeCtx; }
+    const Messaging::ExchangeHandle GetExchangeContext() const { return mpExchangeCtx; }
 
     CHIP_ERROR Reset();
 
@@ -128,7 +128,7 @@ protected:
 
     InvokeCommand::Builder mInvokeCommandBuilder;
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
-    Messaging::ExchangeContext * mpExchangeCtx = nullptr;
+    Messaging::ExchangeHandle mpExchangeCtx;
     InteractionModelDelegate * mpDelegate      = nullptr;
     chip::System::PacketBufferHandle mCommandMessageBuf;
     uint8_t mCommandIndex = 0;

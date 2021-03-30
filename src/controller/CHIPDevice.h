@@ -258,13 +258,13 @@ public:
      * @param[in] payloadHeader Reference to payload header in the message
      * @param[in] msgBuf        The message buffer
      */
-    void OnMessageReceived(Messaging::ExchangeContext * exchange, const PacketHeader & header, const PayloadHeader & payloadHeader,
+    void OnMessageReceived(Messaging::ExchangeHandle exchange, const PacketHeader & header, const PayloadHeader & payloadHeader,
                            System::PacketBufferHandle && msgBuf) override;
 
     /**
      * @brief ExchangeDelegate implementation of OnResponseTimeout.
      */
-    void OnResponseTimeout(Messaging::ExchangeContext * exchange) override;
+    void OnResponseTimeout(Messaging::ExchangeHandle exchange) override;
 
     /**
      * @brief

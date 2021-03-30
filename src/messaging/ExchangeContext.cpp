@@ -49,7 +49,7 @@ using namespace chip::System;
 namespace chip {
 namespace Messaging {
 
-static void DefaultOnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, Protocols::Id protocolId,
+static void DefaultOnMessageReceived(ExchangeHandle ec, const PacketHeader & packetHeader, Protocols::Id protocolId,
                                      uint8_t msgType, PacketBufferHandle && payload)
 {
     ChipLogError(ExchangeManager, "Dropping unexpected message %08" PRIX32 ":%d %04" PRIX16 " MsgId:%08" PRIX32,
@@ -87,10 +87,7 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
     // Don't let method get called on a freed object.
     VerifyOrDie(mExchangeMgr != nullptr && GetReferenceCount() > 0);
 
-    // we hold the exchange context here in case the entity that
-    // originally generated it tries to close it as a result of
-    // an error arising below. at the end, we have to close it.
-    Retain();
+    ExchangeHandle ec(this);
 
     bool reliableTransmissionRequested = true;
 
@@ -121,7 +118,7 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
         }
     }
 
-    err = mDispatch->SendMessage(mSecureSession, mExchangeId, IsInitiator(), GetReliableMessageContext(),
+    err = mDispatch->SendMessage(mSecureSession, mExchangeId, IsInitiator(), ExchangeHandle(this),
                                  reliableTransmissionRequested, protocolId, msgType, std::move(msgBuf));
 
 exit:
@@ -130,13 +127,6 @@ exit:
         CancelResponseTimer();
         SetResponseExpected(false);
     }
-
-    // Release the reference to the exchange context acquired above. Under normal circumstances
-    // this will merely decrement the reference count, without actually freeing the exchange context.
-    // However if one of the function calls in this method resulted in a callback to the protocol,
-    // the protocol may have released its reference, resulting in the exchange context actually
-    // being freed here.
-    Release();
 
     return err;
 }
@@ -160,7 +150,7 @@ void ExchangeContext::DoClose(bool clearRetransTable)
     // needs to clear the CRMP retransmission table immediately.
     if (clearRetransTable)
     {
-        mExchangeMgr->GetReliableMessageMgr()->ClearRetransTable(static_cast<ReliableMessageContext *>(this));
+        mExchangeMgr->GetReliableMessageMgr()->ClearRetransTable(ExchangeHandle(this));
     }
 
     // Cancel the response timer.
@@ -183,7 +173,6 @@ void ExchangeContext::Close()
 #endif
 
     DoClose(false);
-    Release();
 }
 /**
  *  Abort the Exchange context immediately and release all
@@ -200,7 +189,6 @@ void ExchangeContext::Abort()
 #endif
 
     DoClose(true);
-    Release();
 }
 
 void ExchangeContextDeletor::Release(ExchangeContext * ec)
@@ -326,10 +314,9 @@ void ExchangeContext::CancelResponseTimer()
 
 void ExchangeContext::HandleResponseTimeout(System::Layer * aSystemLayer, void * aAppState, System::Error aError)
 {
-    ExchangeContext * ec = reinterpret_cast<ExchangeContext *>(aAppState);
+    if (aAppState == nullptr) return;
 
-    if (ec == nullptr)
-        return;
+    ExchangeHandle ec(reinterpret_cast<ExchangeContext *>(aAppState));
 
     // NOTE: we don't set mResponseExpected to false here because the response could still arrive. If the user
     // wants to never receive the response, they must close the exchange context.
@@ -348,10 +335,10 @@ CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, con
     // guard against Close() calls(decrementing the reference
     // count) by the protocol before the CHIP Exchange
     // layer has completed its work on the ExchangeContext.
-    Retain();
+    ExchangeHandle ec(this);
 
     CHIP_ERROR err =
-        mDispatch->OnMessageReceived(payloadHeader, packetHeader.GetMessageId(), peerAddress, GetReliableMessageContext());
+        mDispatch->OnMessageReceived(payloadHeader, packetHeader.GetMessageId(), peerAddress, ExchangeHandle(this));
     SuccessOrExit(err);
 
     // The SecureChannel::StandaloneAck message type is only used for CRMP; do not pass such messages to the application layer.
@@ -369,20 +356,15 @@ CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, con
 
     if (mDelegate != nullptr)
     {
-        mDelegate->OnMessageReceived(this, packetHeader, payloadHeader, std::move(msgBuf));
+        mDelegate->OnMessageReceived(ExchangeHandle(this), packetHeader, payloadHeader, std::move(msgBuf));
     }
     else
     {
-        DefaultOnMessageReceived(this, packetHeader, payloadHeader.GetProtocolID(), payloadHeader.GetMessageType(),
+        DefaultOnMessageReceived(ExchangeHandle(this), packetHeader, payloadHeader.GetProtocolID(), payloadHeader.GetMessageType(),
                                  std::move(msgBuf));
     }
 
 exit:
-    // Release the reference to the ExchangeContext that was held at the beginning of this function.
-    // This call should also do the needful of closing the ExchangeContext if the protocol has
-    // already made a prior call to Close().
-    Release();
-
     return err;
 }
 

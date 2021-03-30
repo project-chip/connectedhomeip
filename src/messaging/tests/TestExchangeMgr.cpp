@@ -77,14 +77,14 @@ TransportMgr<LoopbackTransport> gTransportMgr;
 class MockAppDelegate : public ExchangeDelegate
 {
 public:
-    void OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+    void OnMessageReceived(ExchangeHandle ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                            System::PacketBufferHandle && buffer) override
     {
         IsOnMessageReceivedCalled = true;
         ec->Close();
     }
 
-    void OnResponseTimeout(ExchangeContext * ec) override {}
+    void OnResponseTimeout(ExchangeHandle ec) override {}
 
     bool IsOnMessageReceivedCalled = false;
 };
@@ -94,8 +94,8 @@ void CheckNewContextTest(nlTestSuite * inSuite, void * inContext)
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
     MockAppDelegate mockAppDelegate;
-    ExchangeContext * ec1 = ctx.NewExchangeToLocal(&mockAppDelegate);
-    NL_TEST_ASSERT(inSuite, ec1 != nullptr);
+    ExchangeHandle ec1 = ctx.NewExchangeToLocal(&mockAppDelegate);
+    NL_TEST_ASSERT(inSuite, ec1.HasValue());
     NL_TEST_ASSERT(inSuite, ec1->IsInitiator() == true);
     NL_TEST_ASSERT(inSuite, ec1->GetExchangeId() != 0);
     auto sessionPeerToLocal = ctx.GetSecureSessionManager().GetPeerConnectionState(ec1->GetSecureSession());
@@ -103,8 +103,8 @@ void CheckNewContextTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, sessionPeerToLocal->GetPeerKeyID() == ctx.GetLocalKeyId());
     NL_TEST_ASSERT(inSuite, ec1->GetDelegate() == &mockAppDelegate);
 
-    ExchangeContext * ec2 = ctx.NewExchangeToPeer(&mockAppDelegate);
-    NL_TEST_ASSERT(inSuite, ec2 != nullptr);
+    ExchangeHandle ec2 = ctx.NewExchangeToPeer(&mockAppDelegate);
+    NL_TEST_ASSERT(inSuite, ec2.HasValue());
     NL_TEST_ASSERT(inSuite, ec2->GetExchangeId() > ec1->GetExchangeId());
     auto sessionLocalToPeer = ctx.GetSecureSessionManager().GetPeerConnectionState(ec2->GetSecureSession());
     NL_TEST_ASSERT(inSuite, sessionLocalToPeer->GetPeerNodeId() == ctx.GetDestinationNodeId());
@@ -148,7 +148,7 @@ void CheckExchangeMessages(nlTestSuite * inSuite, void * inContext)
 
     // create solicited exchange
     MockAppDelegate mockSolicitedAppDelegate;
-    ExchangeContext * ec1 = ctx.NewExchangeToPeer(&mockSolicitedAppDelegate);
+    ExchangeHandle ec1 = ctx.NewExchangeToPeer(&mockSolicitedAppDelegate);
 
     // create unsolicited exchange
     MockAppDelegate mockUnsolicitedAppDelegate;

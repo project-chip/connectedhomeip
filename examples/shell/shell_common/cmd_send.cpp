@@ -40,7 +40,7 @@ using namespace Logging;
 
 namespace {
 
-Messaging::ExchangeContext * gExchangeCtx = nullptr;
+Messaging::ExchangeHandle gExchangeCtx;
 
 class SendArguments
 {
@@ -100,7 +100,7 @@ private:
 class MockAppDelegate : public Messaging::ExchangeDelegate
 {
 public:
-    void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+    void OnMessageReceived(Messaging::ExchangeHandle ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                            System::PacketBufferHandle && buffer) override
     {
         uint32_t respTime    = System::Timer::GetCurrentEpoch();
@@ -111,16 +111,16 @@ public:
                         static_cast<double>(transitTime) / 1000);
 
         gExchangeCtx->Close();
-        gExchangeCtx = nullptr;
+        gExchangeCtx.Release();
     }
 
-    void OnResponseTimeout(Messaging::ExchangeContext * ec) override
+    void OnResponseTimeout(Messaging::ExchangeHandle ec) override
     {
         streamer_t * sout = streamer_get();
         streamer_printf(sout, "No response received\n");
 
         gExchangeCtx->Close();
-        gExchangeCtx = nullptr;
+        gExchangeCtx.Release();
     }
 } gMockAppDelegate;
 
@@ -135,15 +135,15 @@ CHIP_ERROR SendMessage(streamer_t * stream)
 
     // Discard any existing exchange context. Effectively we can only have one exchange with
     // a single node at any one time.
-    if (gExchangeCtx != nullptr)
+    if (gExchangeCtx.HasValue())
     {
         gExchangeCtx->Abort();
-        gExchangeCtx = nullptr;
+        gExchangeCtx.Release();
     }
 
     // Create a new exchange context.
     gExchangeCtx = gExchangeManager.NewContext({ kTestDeviceNodeId, 0, gAdminId }, &gMockAppDelegate);
-    VerifyOrExit(gExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
+    VerifyOrExit(gExchangeCtx.HasValue(), err = CHIP_ERROR_NO_MEMORY);
 
     size = gSendArguments.GetPayloadSize();
     VerifyOrExit(size <= kMaxPayloadSize, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
@@ -177,7 +177,7 @@ CHIP_ERROR SendMessage(streamer_t * stream)
     if (err != CHIP_NO_ERROR)
     {
         gExchangeCtx->Abort();
-        gExchangeCtx = nullptr;
+        gExchangeCtx.Release();
     }
 
 exit:

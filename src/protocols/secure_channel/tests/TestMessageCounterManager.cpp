@@ -73,14 +73,14 @@ const char PAYLOAD[] = "Hello!";
 class MockAppDelegate : public ExchangeDelegate
 {
 public:
-    void OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+    void OnMessageReceived(ExchangeHandle ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                            System::PacketBufferHandle && msgBuf) override
     {
         ++ReceiveHandlerCallCount;
         ec->Close();
     }
 
-    void OnResponseTimeout(ExchangeContext * ec) override {}
+    void OnResponseTimeout(ExchangeHandle ec) override {}
 
     int ReceiveHandlerCallCount = 0;
 };
@@ -123,8 +123,8 @@ void CheckReceiveMessage(nlTestSuite * inSuite, void * inContext)
     System::PacketBufferHandle msgBuf = MessagePacketBuffer::NewWithData(PAYLOAD, payload_len);
     NL_TEST_ASSERT(inSuite, !msgBuf.IsNull());
 
-    Messaging::ExchangeContext * ec = ctx.NewExchangeToPeer(nullptr);
-    NL_TEST_ASSERT(inSuite, ec != nullptr);
+    Messaging::ExchangeHandle ec = ctx.NewExchangeToPeer(nullptr);
+    NL_TEST_ASSERT(inSuite, ec.HasValue());
 
     err = ec->SendMessage(chip::Protocols::Echo::MsgType::EchoRequest, std::move(msgBuf),
                           Messaging::SendFlags{ Messaging::SendMessageFlags::kNoAutoRequestAck });

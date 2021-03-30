@@ -49,7 +49,7 @@ chip::SecureSessionMgr gSessionManager;
 chip::SecurePairingUsingTestSecret gTestPairing;
 
 // Callback handler when a CHIP EchoRequest is received.
-void HandleEchoRequestReceived(chip::Messaging::ExchangeContext * ec, chip::System::PacketBufferHandle && payload)
+void HandleEchoRequestReceived(chip::Messaging::ExchangeHandle ec, chip::System::PacketBufferHandle && payload)
 {
     printf("Echo Request, len=%u ... sending response.\n", payload->DataLength());
 }

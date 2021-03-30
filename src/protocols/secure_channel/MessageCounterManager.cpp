@@ -85,7 +85,7 @@ CHIP_ERROR MessageCounterManager::QueueReceivedMessageAndStartSync(const PacketH
     return CHIP_NO_ERROR;
 }
 
-void MessageCounterManager::OnMessageReceived(Messaging::ExchangeContext * exchangeContext, const PacketHeader & packetHeader,
+void MessageCounterManager::OnMessageReceived(Messaging::ExchangeHandle exchangeContext, const PacketHeader & packetHeader,
                                               const PayloadHeader & payloadHeader, System::PacketBufferHandle && msgBuf)
 {
     if (payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::MsgCounterSyncReq))
@@ -98,7 +98,7 @@ void MessageCounterManager::OnMessageReceived(Messaging::ExchangeContext * excha
     }
 }
 
-void MessageCounterManager::OnResponseTimeout(Messaging::ExchangeContext * exchangeContext)
+void MessageCounterManager::OnResponseTimeout(Messaging::ExchangeHandle exchangeContext)
 {
     Transport::PeerConnectionState * state =
         mExchangeMgr->GetSessionMgr()->GetPeerConnectionState(exchangeContext->GetSecureSession());
@@ -178,12 +178,12 @@ CHIP_ERROR MessageCounterManager::SendMsgCounterSyncReq(SecureSessionHandle sess
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    Messaging::ExchangeContext * exchangeContext = nullptr;
+    Messaging::ExchangeHandle exchangeContext;
     System::PacketBufferHandle msgBuf;
     Messaging::SendFlags sendFlags;
 
     exchangeContext = mExchangeMgr->NewContext(session, this);
-    VerifyOrExit(exchangeContext != nullptr, err = CHIP_ERROR_NO_MEMORY);
+    VerifyOrExit(exchangeContext.HasValue(), err = CHIP_ERROR_NO_MEMORY);
 
     msgBuf = MessagePacketBuffer::New(kChallengeSize);
     VerifyOrExit(!msgBuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
@@ -215,7 +215,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR MessageCounterManager::SendMsgCounterSyncResp(Messaging::ExchangeContext * exchangeContext,
+CHIP_ERROR MessageCounterManager::SendMsgCounterSyncResp(Messaging::ExchangeHandle exchangeContext,
                                                          FixedByteSpan<kChallengeSize> challenge)
 {
     CHIP_ERROR err                         = CHIP_NO_ERROR;
@@ -253,7 +253,7 @@ exit:
     return err;
 }
 
-void MessageCounterManager::HandleMsgCounterSyncReq(Messaging::ExchangeContext * exchangeContext, const PacketHeader & packetHeader,
+void MessageCounterManager::HandleMsgCounterSyncReq(Messaging::ExchangeHandle exchangeContext, const PacketHeader & packetHeader,
                                                     System::PacketBufferHandle && msgBuf)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -280,7 +280,7 @@ exit:
     return;
 }
 
-void MessageCounterManager::HandleMsgCounterSyncResp(Messaging::ExchangeContext * exchangeContext,
+void MessageCounterManager::HandleMsgCounterSyncResp(Messaging::ExchangeHandle exchangeContext,
                                                      const PacketHeader & packetHeader, System::PacketBufferHandle && msgBuf)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;

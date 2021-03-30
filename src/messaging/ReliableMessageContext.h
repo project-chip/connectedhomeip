@@ -31,6 +31,7 @@
 #include <core/CHIPError.h>
 #include <inet/InetLayer.h>
 #include <lib/core/ReferenceCounted.h>
+#include <messaging/ExchangeHandle.h>
 #include <support/DLLUtil.h>
 #include <system/SystemLayer.h>
 #include <transport/raw/MessageHeader.h>
@@ -224,10 +225,8 @@ protected:
     BitFlags<Flags> mFlags; // Internal state flags
 
 private:
-    void RetainContext();
-    void ReleaseContext();
-    CHIP_ERROR HandleRcvdAck(uint32_t AckMsgId);
-    CHIP_ERROR HandleNeedsAck(uint32_t MessageId, BitFlags<MessageFlagValues> Flags);
+    CHIP_ERROR HandleRcvdAck(ExchangeHandle exchangeContext, uint32_t AckMsgId);
+    CHIP_ERROR HandleNeedsAck(ExchangeHandle exchangeContext, uint32_t MessageId, BitFlags<MessageFlagValues> Flags);
     ExchangeContext * GetExchangeContext();
     ReliableMessageMgr * GetReliableMessageMgr();
 

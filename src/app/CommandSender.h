@@ -58,9 +58,9 @@ private:
     // ExchangeDelegate interface implementation.  Private so people won't
     // accidentally call it on us when we're not being treated as an actual
     // ExchangeDelegate.
-    void OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
+    void OnMessageReceived(Messaging::ExchangeHandle apExchangeContext, const PacketHeader & aPacketHeader,
                            const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload) override;
-    void OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext) override;
+    void OnResponseTimeout(Messaging::ExchangeHandle apExchangeContext) override;
 
     CHIP_ERROR ProcessCommandDataElement(CommandDataElement::Parser & aCommandElement) override;
 };

@@ -24,6 +24,7 @@
 #pragma once
 
 #include <messaging/ApplicationExchangeDispatch.h>
+#include <messaging/ExchangeHandle.h>
 #include <messaging/ExchangeMessageDispatch.h>
 #include <support/CHIPMem.h>
 #include <system/SystemPacketBuffer.h>
@@ -56,7 +57,7 @@ public:
      *  @param[in]    payloadHeader A reference to the PayloadHeader object.
      *  @param[in]    payload       A handle to the PacketBuffer object holding the message payload.
      */
-    virtual void OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+    virtual void OnMessageReceived(ExchangeHandle ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                                    System::PacketBufferHandle && payload) = 0;
 
     /**
@@ -66,7 +67,7 @@ public:
      *
      *  @param[in]    ec            A pointer to the ExchangeContext object.
      */
-    virtual void OnResponseTimeout(ExchangeContext * ec) = 0;
+    virtual void OnResponseTimeout(ExchangeHandle ec) = 0;
 
     /**
      * @brief

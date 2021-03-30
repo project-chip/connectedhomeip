@@ -123,7 +123,7 @@ public:
      * @return CHIP_ERROR      The result of initialization
      */
     CHIP_ERROR Pair(const Transport::PeerAddress peerAddress, uint32_t peerSetUpPINCode, uint16_t myKeyId,
-                    Messaging::ExchangeContext * exchangeCtxt, SessionEstablishmentDelegate * delegate);
+                    Messaging::ExchangeHandle exchangeCtxt, SessionEstablishmentDelegate * delegate);
 
     /**
      * @brief
@@ -216,7 +216,7 @@ public:
      *  @param[in]    payloadHeader A reference to the PayloadHeader object.
      *  @param[in]    payload       A handle to the PacketBuffer object holding the message payload.
      */
-    void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+    void OnMessageReceived(Messaging::ExchangeHandle ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                            System::PacketBufferHandle && payload) override;
 
     /**
@@ -226,7 +226,7 @@ public:
      *
      *  @param[in]    ec            A pointer to the ExchangeContext object.
      */
-    void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
+    void OnResponseTimeout(Messaging::ExchangeHandle ec) override;
 
     Messaging::ExchangeMessageDispatch * GetMessageDispatch(Messaging::ReliableMessageMgr * rmMgr,
                                                             SecureSessionMgr * sessionMgr) override
@@ -243,7 +243,7 @@ private:
 
     CHIP_ERROR Init(uint16_t myKeyId, uint32_t setupCode, SessionEstablishmentDelegate * delegate);
 
-    CHIP_ERROR ValidateReceivedMessage(Messaging::ExchangeContext * exchange, const PacketHeader & packetHeader,
+    CHIP_ERROR ValidateReceivedMessage(Messaging::ExchangeHandle exchange, const PacketHeader & packetHeader,
                                        const PayloadHeader & payloadHeader, System::PacketBufferHandle && msg);
 
     static CHIP_ERROR ComputePASEVerifier(uint32_t mySetUpPINCode, uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen,
@@ -291,7 +291,7 @@ private:
     uint16_t mSaltLength     = 0;
     uint8_t * mSalt          = nullptr;
 
-    Messaging::ExchangeContext * mExchangeCtxt = nullptr;
+    Messaging::ExchangeHandle mExchangeCtxt;
 
     SessionEstablishmentExchangeDispatch mMessageDispatch;
 

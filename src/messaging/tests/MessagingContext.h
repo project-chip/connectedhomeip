@@ -79,8 +79,8 @@ public:
     SecureSessionHandle GetSessionLocalToPeer();
     SecureSessionHandle GetSessionPeerToLocal();
 
-    Messaging::ExchangeContext * NewExchangeToPeer(Messaging::ExchangeDelegate * delegate);
-    Messaging::ExchangeContext * NewExchangeToLocal(Messaging::ExchangeDelegate * delegate);
+    Messaging::ExchangeHandle NewExchangeToPeer(Messaging::ExchangeDelegate * delegate);
+    Messaging::ExchangeHandle NewExchangeToLocal(Messaging::ExchangeDelegate * delegate);
 
     Credentials::OperationalCredentialSet & GetOperationalCredentialSet() { return mOperationalCredentialSet; }
 

@@ -99,7 +99,7 @@ public:
      *  @return   A pointer to the created ExchangeContext object On success. Otherwise NULL if no object
      *            can be allocated or is available.
      */
-    ExchangeContext * NewContext(SecureSessionHandle session, ExchangeDelegate * delegate);
+    ExchangeHandle NewContext(SecureSessionHandle session, ExchangeDelegate * delegate);
 
     void ReleaseContext(ExchangeContext * ec) { mContextPool.ReleaseObject(ec); }
 

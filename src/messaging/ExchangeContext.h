@@ -54,7 +54,7 @@ public:
  *    It defines methods for encoding and communicating CHIP messages within an ExchangeContext
  *    over various transport mechanisms, for example, TCP, UDP, or CHIP Reliable Messaging.
  */
-class DLL_EXPORT ExchangeContext : public ReliableMessageContext, public ReferenceCounted<ExchangeContext, ExchangeContextDeletor>
+class DLL_EXPORT ExchangeContext : public ReliableMessageContext, public ReferenceCounted<ExchangeContext, ExchangeContextDeletor, 0>
 {
     friend class ExchangeManager;
     friend class ExchangeContextDeletor;
@@ -133,7 +133,7 @@ public:
 
     ExchangeManager * GetExchangeMgr() const { return mExchangeMgr; }
 
-    ReliableMessageContext * GetReliableMessageContext() { return static_cast<ReliableMessageContext *>(this); };
+    ReliableMessageContext & GetReliableMessageContext() { return *static_cast<ReliableMessageContext *>(this); };
 
     ExchangeMessageDispatch * GetMessageDispatch() { return mDispatch; }
 
@@ -155,11 +155,6 @@ public:
 
     uint16_t GetExchangeId() const { return mExchangeId; }
 
-    /*
-     * In order to use reference counting (see refCount below) we use a hold/free paradigm where users of the exchange
-     * can hold onto it while it's out of their direct control to make sure it isn't closed before everyone's ready.
-     * A customized version of reference counting is used since there are some extra stuff to do within Release.
-     */
     void Close();
     void Abort();
 

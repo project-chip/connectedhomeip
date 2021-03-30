@@ -47,10 +47,10 @@ CHIP_ERROR SessionEstablishmentExchangeDispatch::SendMessageImpl(SecureSessionHa
 
 CHIP_ERROR SessionEstablishmentExchangeDispatch::OnMessageReceived(const PayloadHeader & payloadHeader, uint32_t messageId,
                                                                    const Transport::PeerAddress & peerAddress,
-                                                                   ReliableMessageContext * reliableMessageContext)
+                                                                   ExchangeHandle exchangeContext)
 {
     mPeerAddress = peerAddress;
-    return ExchangeMessageDispatch::OnMessageReceived(payloadHeader, messageId, peerAddress, reliableMessageContext);
+    return ExchangeMessageDispatch::OnMessageReceived(payloadHeader, messageId, peerAddress, exchangeContext);
 }
 
 bool SessionEstablishmentExchangeDispatch::MessagePermitted(uint16_t protocol, uint8_t type)

@@ -28,6 +28,7 @@
 #include <lib/core/ReferenceCounted.h>
 #include <lib/mdns/platform/Mdns.h>
 #include <lib/support/Variant.h>
+#include <messaging/ExchangeHandle.h>
 #include <protocols/secure_channel/CASESession.h>
 #include <transport/PeerConnectionState.h>
 #include <transport/SecureSessionMgr.h>
@@ -90,7 +91,7 @@ public:
      *
      * @pre GetState() == ChannelState::kReady
      */
-    ExchangeContext * NewExchange(ExchangeDelegate * delegate);
+    ExchangeHandle NewExchange(ExchangeDelegate * delegate);
 
     ChannelState GetState() const { return mState; }
 

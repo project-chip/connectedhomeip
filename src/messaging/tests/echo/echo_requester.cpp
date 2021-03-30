@@ -154,7 +154,7 @@ exit:
     return err;
 }
 
-void HandleEchoResponseReceived(chip::Messaging::ExchangeContext * ec, chip::System::PacketBufferHandle && payload)
+void HandleEchoResponseReceived(chip::Messaging::ExchangeHandle ec, chip::System::PacketBufferHandle && payload)
 {
     uint32_t respTime    = chip::System::Timer::GetCurrentEpoch();
     uint32_t transitTime = respTime - gLastEchoTime;

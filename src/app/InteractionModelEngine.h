@@ -27,6 +27,7 @@
 
 #include <app/MessageDef/ReportData.h>
 #include <core/CHIPCore.h>
+#include <messaging/ExchangeHandle.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
@@ -136,19 +137,19 @@ public:
 
 private:
     friend class reporting::Engine;
-    void OnUnknownMsgType(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
+    void OnUnknownMsgType(Messaging::ExchangeHandle apExchangeContext, const PacketHeader & aPacketHeader,
                           const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
-    void OnInvokeCommandRequest(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
+    void OnInvokeCommandRequest(Messaging::ExchangeHandle apExchangeContext, const PacketHeader & aPacketHeader,
                                 const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
-    void OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
+    void OnMessageReceived(Messaging::ExchangeHandle apExchangeContext, const PacketHeader & aPacketHeader,
                            const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
-    void OnResponseTimeout(Messaging::ExchangeContext * ec);
+    void OnResponseTimeout(Messaging::ExchangeHandle ec);
 
     /**
      * Called when Interaction Model receives a Read Request message.  Errors processing
      * the Read Request are handled entirely within this function.
      */
-    void OnReadRequest(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
+    void OnReadRequest(Messaging::ExchangeHandle apExchangeContext, const PacketHeader & aPacketHeader,
                        const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
 
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;

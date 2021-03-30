@@ -53,7 +53,7 @@ void EchoServer::Shutdown()
     }
 }
 
-void EchoServer::OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
+void EchoServer::OnMessageReceived(Messaging::ExchangeHandle ec, const PacketHeader & packetHeader,
                                    const PayloadHeader & payloadHeader, System::PacketBufferHandle && payload)
 {
     System::PacketBufferHandle response;
@@ -84,7 +84,7 @@ void EchoServer::OnMessageReceived(Messaging::ExchangeContext * ec, const Packet
     ec->SendMessage(MsgType::EchoResponse, std::move(response));
 
     // Discard the exchange context.
-    ec->Close();
+    ec.Release();
 }
 
 } // namespace Echo

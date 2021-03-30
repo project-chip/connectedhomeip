@@ -41,7 +41,7 @@
  * @param[in] message The message to send after the APS frame.
  * @param[in] sendFlags The SendFlags needed, if any.
  */
-EmberStatus chipSendUnicast(chip::Messaging::ExchangeContext * exchange, EmberApsFrame * apsFrame, uint16_t messageLength,
+EmberStatus chipSendUnicast(chip::Messaging::ExchangeHandle exchange, EmberApsFrame * apsFrame, uint16_t messageLength,
                             uint8_t * message, chip::Messaging::SendFlags sendFlags = chip::Messaging::SendFlags());
 
 /**

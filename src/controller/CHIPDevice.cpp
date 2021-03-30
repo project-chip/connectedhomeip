@@ -66,8 +66,8 @@ CHIP_ERROR Device::SendMessage(Protocols::Id protocolId, uint8_t msgType, System
 
     ReturnErrorOnFailure(LoadSecureSessionParametersIfNeeded(loadedSecureSession));
 
-    Messaging::ExchangeContext * exchange = mExchangeMgr->NewContext(mSecureSession, nullptr);
-    VerifyOrReturnError(exchange != nullptr, CHIP_ERROR_NO_MEMORY);
+    Messaging::ExchangeHandle exchange = mExchangeMgr->NewContext(mSecureSession, nullptr);
+    VerifyOrReturnError(exchange.HasValue(), CHIP_ERROR_NO_MEMORY);
 
     if (!loadedSecureSession)
     {
@@ -270,7 +270,7 @@ void Device::OnConnectionExpired(SecureSessionHandle session)
     mSecureSession = SecureSessionHandle{};
 }
 
-void Device::OnMessageReceived(Messaging::ExchangeContext * exchange, const PacketHeader & header,
+void Device::OnMessageReceived(Messaging::ExchangeHandle exchange, const PacketHeader & header,
                                const PayloadHeader & payloadHeader, System::PacketBufferHandle && msgBuf)
 {
     if (mState == ConnectionState::SecureConnected)
@@ -287,7 +287,7 @@ void Device::OnMessageReceived(Messaging::ExchangeContext * exchange, const Pack
     exchange->Close();
 }
 
-void Device::OnResponseTimeout(Messaging::ExchangeContext * ec)
+void Device::OnResponseTimeout(Messaging::ExchangeHandle ec)
 {
     ec->Close();
 }
@@ -403,8 +403,8 @@ bool Device::GetAddress(Inet::IPAddress & addr, uint16_t & port) const
 
 CHIP_ERROR Device::EstablishCASESession()
 {
-    Messaging::ExchangeContext * exchange = mExchangeMgr->NewContext(SecureSessionHandle(), &mCASESession);
-    VerifyOrReturnError(exchange != nullptr, CHIP_ERROR_INTERNAL);
+    Messaging::ExchangeHandle exchange = mExchangeMgr->NewContext(SecureSessionHandle(), &mCASESession);
+    VerifyOrReturnError(exchange.HasValue(), CHIP_ERROR_INTERNAL);
 
     ReturnErrorOnFailure(mCASESession.MessageDispatch().Init(mSessionManager->GetTransportManager()));
     mCASESession.MessageDispatch().SetPeerAddress(mDeviceAddress);

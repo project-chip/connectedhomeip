@@ -101,18 +101,18 @@ private:
 
     void ProcessPendingMessages(NodeId peerNodeId);
 
-    CHIP_ERROR SendMsgCounterSyncResp(Messaging::ExchangeContext * exchangeContext, FixedByteSpan<kChallengeSize> challenge);
+    CHIP_ERROR SendMsgCounterSyncResp(Messaging::ExchangeHandle exchangeContext, FixedByteSpan<kChallengeSize> challenge);
 
-    void HandleMsgCounterSyncReq(Messaging::ExchangeContext * exchangeContext, const PacketHeader & packetHeader,
+    void HandleMsgCounterSyncReq(Messaging::ExchangeHandle exchangeContext, const PacketHeader & packetHeader,
                                  System::PacketBufferHandle && msgBuf);
 
-    void HandleMsgCounterSyncResp(Messaging::ExchangeContext * exchangeContext, const PacketHeader & packetHeader,
+    void HandleMsgCounterSyncResp(Messaging::ExchangeHandle exchangeContext, const PacketHeader & packetHeader,
                                   System::PacketBufferHandle && msgBuf);
 
-    void OnMessageReceived(Messaging::ExchangeContext * exchangeContext, const PacketHeader & packetHeader,
+    void OnMessageReceived(Messaging::ExchangeHandle exchangeContext, const PacketHeader & packetHeader,
                            const PayloadHeader & payloadHeader, System::PacketBufferHandle && payload) override;
 
-    void OnResponseTimeout(Messaging::ExchangeContext * exchangeContext) override;
+    void OnResponseTimeout(Messaging::ExchangeHandle exchangeContext) override;
 };
 
 } // namespace secure_channel

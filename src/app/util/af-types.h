@@ -435,6 +435,7 @@ typedef struct
  */
 struct EmberAfClusterCommand
 {
+    EmberAfClusterCommand() : source() {}
     chip::NodeId SourceNodeId() const { return source->GetSecureSession().GetPeerNodeId(); }
 
     /**
@@ -442,7 +443,7 @@ struct EmberAfClusterCommand
      */
     EmberApsFrame * apsFrame;
     EmberIncomingMessageType type;
-    chip::Messaging::ExchangeContext * source;
+    chip::Messaging::ExchangeHandle source;
     uint8_t * buffer;
     uint16_t bufLen;
     bool clusterSpecific;
@@ -1305,8 +1306,8 @@ public:
     struct VariantViaExchange
     {
         static constexpr const std::size_t VariantId = 8;
-        explicit VariantViaExchange(Messaging::ExchangeContext * exchangeContext) : mExchangeContext(exchangeContext) {}
-        Messaging::ExchangeContext * mExchangeContext;
+        explicit VariantViaExchange(Messaging::ExchangeHandle exchangeContext) : mExchangeContext(exchangeContext) {}
+        Messaging::ExchangeHandle mExchangeContext;
     };
 
     MessageSendDestination(MessageSendDestination & that)       = default;
@@ -1327,7 +1328,7 @@ public:
         return MessageSendDestination(VariantMulticastWithAlias(groupId));
     }
 
-    static MessageSendDestination ViaExchange(Messaging::ExchangeContext * exchangeContext)
+    static MessageSendDestination ViaExchange(Messaging::ExchangeHandle exchangeContext)
     {
         return MessageSendDestination(VariantViaExchange(exchangeContext));
     }

@@ -76,13 +76,13 @@ public:
 class MockAppDelegate : public ExchangeDelegate
 {
 public:
-    void OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+    void OnMessageReceived(ExchangeHandle ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                            System::PacketBufferHandle && buffer) override
     {
         ec->Close();
     }
 
-    void OnResponseTimeout(ExchangeContext * ec) override {}
+    void OnResponseTimeout(ExchangeHandle ec) override {}
 };
 
 void SecurePairingWaitTest(nlTestSuite * inSuite, void * inContext)
@@ -107,10 +107,10 @@ void SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
     PASESession pairing;
 
     NL_TEST_ASSERT(inSuite, pairing.MessageDispatch().Init(&gTransportMgr) == CHIP_NO_ERROR);
-    ExchangeContext * context = ctx.NewExchangeToLocal(&pairing);
+    ExchangeHandle context = ctx.NewExchangeToLocal(&pairing);
 
     NL_TEST_ASSERT(inSuite,
-                   pairing.Pair(Transport::PeerAddress(Transport::Type::kBle), 1234, 0, nullptr, nullptr) != CHIP_NO_ERROR);
+                   pairing.Pair(Transport::PeerAddress(Transport::Type::kBle), 1234, 0, ExchangeHandle(), nullptr) != CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite,
                    pairing.Pair(Transport::PeerAddress(Transport::Type::kBle), 1234, 0, context, &delegate) == CHIP_NO_ERROR);
 
@@ -121,7 +121,7 @@ void SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
 
     PASESession pairing1;
     NL_TEST_ASSERT(inSuite, pairing1.MessageDispatch().Init(&gTransportMgr) == CHIP_NO_ERROR);
-    ExchangeContext * context1 = ctx.NewExchangeToLocal(&pairing1);
+    ExchangeHandle context1 = ctx.NewExchangeToLocal(&pairing1);
     NL_TEST_ASSERT(inSuite,
                    pairing1.Pair(Transport::PeerAddress(Transport::Type::kBle), 1234, 0, context1, &delegate) ==
                        CHIP_ERROR_BAD_REQUEST);
@@ -145,7 +145,7 @@ void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, P
                    ctx.GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(
                        Protocols::SecureChannel::MsgType::PBKDFParamRequest, &pairingAccessory) == CHIP_NO_ERROR);
 
-    ExchangeContext * contextCommissioner = ctx.NewExchangeToLocal(&pairingCommissioner);
+    ExchangeHandle contextCommissioner = ctx.NewExchangeToLocal(&pairingCommissioner);
 
     NL_TEST_ASSERT(inSuite,
                    pairingAccessory.WaitForPairing(1234, 500, (const uint8_t *) "saltSALT", 8, 0, &delegateAccessory) ==

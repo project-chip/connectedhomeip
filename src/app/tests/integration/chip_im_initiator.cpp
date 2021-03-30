@@ -244,7 +244,7 @@ void HandleReadComplete()
 class MockInteractionModelApp : public chip::app::InteractionModelDelegate
 {
 public:
-    CHIP_ERROR EventStreamReceived(const chip::Messaging::ExchangeContext * apExchangeContext,
+    CHIP_ERROR EventStreamReceived(const chip::Messaging::ExchangeHandle apExchangeContext,
                                    chip::TLV::TLVReader * apEventListReader) override
     {
         return CHIP_NO_ERROR;

@@ -139,7 +139,7 @@ CHIP_ERROR InteractionModelEngine::NewReadClient(ReadClient ** const apReadClien
     return err;
 }
 
-void InteractionModelEngine::OnUnknownMsgType(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
+void InteractionModelEngine::OnUnknownMsgType(Messaging::ExchangeHandle apExchangeContext, const PacketHeader & aPacketHeader,
                                               const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -151,18 +151,12 @@ void InteractionModelEngine::OnUnknownMsgType(Messaging::ExchangeContext * apExc
     // SuccessOrExit(err);
 
     apExchangeContext->Close();
-    apExchangeContext = nullptr;
+    apExchangeContext.Release();
 
     ChipLogFunctError(err);
-
-    // Todo: Fix the below check after the above status report is implemented.
-    if (nullptr != apExchangeContext)
-    {
-        apExchangeContext->Abort();
-    }
 }
 
-void InteractionModelEngine::OnInvokeCommandRequest(Messaging::ExchangeContext * apExchangeContext,
+void InteractionModelEngine::OnInvokeCommandRequest(Messaging::ExchangeHandle apExchangeContext,
                                                     const PacketHeader & aPacketHeader, const PayloadHeader & aPayloadHeader,
                                                     System::PacketBufferHandle && aPayload)
 {
@@ -175,7 +169,7 @@ void InteractionModelEngine::OnInvokeCommandRequest(Messaging::ExchangeContext *
             err = commandHandler.Init(mpExchangeMgr, mpDelegate);
             SuccessOrExit(err);
             commandHandler.OnMessageReceived(apExchangeContext, aPacketHeader, aPayloadHeader, std::move(aPayload));
-            apExchangeContext = nullptr;
+            apExchangeContext.Release();
             break;
         }
     }
@@ -183,13 +177,13 @@ void InteractionModelEngine::OnInvokeCommandRequest(Messaging::ExchangeContext *
 exit:
     ChipLogFunctError(err);
 
-    if (nullptr != apExchangeContext)
+    if (apExchangeContext.HasValue())
     {
         apExchangeContext->Abort();
     }
 }
 
-void InteractionModelEngine::OnReadRequest(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
+void InteractionModelEngine::OnReadRequest(Messaging::ExchangeHandle apExchangeContext, const PacketHeader & aPacketHeader,
                                            const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -204,7 +198,7 @@ void InteractionModelEngine::OnReadRequest(Messaging::ExchangeContext * apExchan
             SuccessOrExit(err);
             err = readHandler.OnReadRequest(apExchangeContext, std::move(aPayload));
             SuccessOrExit(err);
-            apExchangeContext = nullptr;
+            apExchangeContext.Release();
             break;
         }
     }
@@ -212,13 +206,13 @@ void InteractionModelEngine::OnReadRequest(Messaging::ExchangeContext * apExchan
 exit:
     ChipLogFunctError(err);
 
-    if (nullptr != apExchangeContext)
+    if (apExchangeContext.HasValue())
     {
         apExchangeContext->Abort();
     }
 }
 
-void InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
+void InteractionModelEngine::OnMessageReceived(Messaging::ExchangeHandle apExchangeContext, const PacketHeader & aPacketHeader,
                                                const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
 {
     if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::InvokeCommandRequest))
@@ -236,7 +230,7 @@ void InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext * apEx
     }
 }
 
-void InteractionModelEngine::OnResponseTimeout(Messaging::ExchangeContext * ec)
+void InteractionModelEngine::OnResponseTimeout(Messaging::ExchangeHandle ec)
 {
     ChipLogProgress(DataManagement, "Time out! failed to receive echo response from Exchange: %d", ec->GetExchangeId());
 }

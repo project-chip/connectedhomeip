@@ -111,7 +111,7 @@ public:
      * @return CHIP_ERROR      The result of initialization
      */
     CHIP_ERROR EstablishSession(const Transport::PeerAddress peerAddress, OperationalCredentialSet * operationalCredentialSet,
-                                NodeId peerNodeId, uint16_t myKeyId, Messaging::ExchangeContext * exchangeCtxt,
+                                NodeId peerNodeId, uint16_t myKeyId, Messaging::ExchangeHandle exchangeCtxt,
                                 SessionEstablishmentDelegate * delegate);
 
     /**
@@ -179,9 +179,9 @@ public:
     SessionEstablishmentExchangeDispatch & MessageDispatch() { return mMessageDispatch; }
 
     //// ExchangeDelegate Implementation ////
-    void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+    void OnMessageReceived(Messaging::ExchangeHandle ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                            System::PacketBufferHandle && payload) override;
-    void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
+    void OnResponseTimeout(Messaging::ExchangeHandle ec) override;
     Messaging::ExchangeMessageDispatch * GetMessageDispatch(Messaging::ReliableMessageMgr * rmMgr,
                                                             SecureSessionMgr * sessionMgr) override
     {
@@ -231,7 +231,7 @@ private:
 
     void Clear();
 
-    CHIP_ERROR ValidateReceivedMessage(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
+    CHIP_ERROR ValidateReceivedMessage(Messaging::ExchangeHandle ec, const PacketHeader & packetHeader,
                                        const PayloadHeader & payloadHeader, System::PacketBufferHandle & msg);
 
     SessionEstablishmentDelegate * mDelegate = nullptr;
@@ -250,7 +250,7 @@ private:
     uint8_t mIPK[kIPKSize];
     uint8_t mRemoteIPK[kIPKSize];
 
-    Messaging::ExchangeContext * mExchangeCtxt = nullptr;
+    Messaging::ExchangeHandle mExchangeCtxt;
     SessionEstablishmentExchangeDispatch mMessageDispatch;
 
     struct SigmaErrorMsg

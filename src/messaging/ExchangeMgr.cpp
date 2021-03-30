@@ -114,9 +114,9 @@ CHIP_ERROR ExchangeManager::Shutdown()
     return CHIP_NO_ERROR;
 }
 
-ExchangeContext * ExchangeManager::NewContext(SecureSessionHandle session, ExchangeDelegate * delegate)
+ExchangeHandle ExchangeManager::NewContext(SecureSessionHandle session, ExchangeDelegate * delegate)
 {
-    return mContextPool.CreateObject(this, mNextExchangeId++, session, true, delegate);
+    return ExchangeHandle(mContextPool.CreateObject(this, mNextExchangeId++, session, true, delegate));
 }
 
 CHIP_ERROR ExchangeManager::RegisterUnsolicitedMessageHandlerForProtocol(Protocols::Id protocolId, ExchangeDelegate * delegate)
@@ -264,21 +264,14 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
     // If we found a handler or we need to create a new exchange context (EC).
     if (matchingUMH != nullptr || sendAckAndCloseExchange)
     {
-        ExchangeContext * ec = nullptr;
-
-        if (sendAckAndCloseExchange)
-        {
             // If rcvd msg is from initiator then this exchange is created as not Initiator.
             // If rcvd msg is not from initiator then this exchange is created as Initiator.
             // TODO: Figure out which channel to use for the received message
-            ec = mContextPool.CreateObject(this, payloadHeader.GetExchangeID(), session, !payloadHeader.IsInitiator(), nullptr);
-        }
-        else
-        {
-            ec = mContextPool.CreateObject(this, payloadHeader.GetExchangeID(), session, false, matchingUMH->Delegate);
-        }
+        ExchangeHandle ec(mContextPool.CreateObject(this, payloadHeader.GetExchangeID(), session,
+                sendAckAndCloseExchange && !payloadHeader.IsInitiator(),
+                sendAckAndCloseExchange ? nullptr : matchingUMH->Delegate));
 
-        VerifyOrExit(ec != nullptr, err = CHIP_ERROR_NO_MEMORY);
+        VerifyOrExit(ec.HasValue(), err = CHIP_ERROR_NO_MEMORY);
 
         ChipLogDetail(ExchangeManager, "ec id: %d, Delegate: 0x%x", ec->GetExchangeId(), ec->GetDelegate());
 

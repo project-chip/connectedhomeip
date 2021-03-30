@@ -25,6 +25,7 @@
 
 #include <lib/core/ReferenceCounted.h>
 #include <transport/SecureSessionMgr.h>
+#include <messaging/ExchangeHandle.h>
 
 namespace chip {
 namespace Messaging {
@@ -45,7 +46,7 @@ public:
     }
 
     CHIP_ERROR SendMessage(SecureSessionHandle session, uint16_t exchangeId, bool isInitiator,
-                           ReliableMessageContext * reliableMessageContext, bool isReliableTransmission, Protocols::Id protocol,
+                           ExchangeHandle exchangeContext, bool isReliableTransmission, Protocols::Id protocol,
                            uint8_t type, System::PacketBufferHandle && message);
 
     virtual CHIP_ERROR ResendMessage(SecureSessionHandle session, EncryptedPacketBufferHandle && message,
@@ -56,7 +57,7 @@ public:
 
     virtual CHIP_ERROR OnMessageReceived(const PayloadHeader & payloadHeader, uint32_t messageId,
                                          const Transport::PeerAddress & peerAddress,
-                                         ReliableMessageContext * reliableMessageContext);
+                                         ExchangeHandle exchangeContext);
 
 protected:
     virtual bool MessagePermitted(uint16_t protocol, uint8_t type) = 0;

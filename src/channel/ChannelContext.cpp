@@ -35,7 +35,7 @@ void ChannelContext::Start(const ChannelBuilder & builder)
     EnterPreparingState(builder);
 }
 
-ExchangeContext * ChannelContext::NewExchange(ExchangeDelegate * delegate)
+ExchangeHandle ChannelContext::NewExchange(ExchangeDelegate * delegate)
 {
     assert(GetState() == ChannelState::kReady);
     return mExchangeManager->NewContext(GetReadyVars().mSession, delegate);
@@ -258,8 +258,8 @@ void ChannelContext::EnterCasePairingState()
     auto & prepare              = GetPrepareVars();
     prepare.mCasePairingSession = Platform::New<CASESession>();
 
-    ExchangeContext * ctxt = mExchangeManager->NewContext(SecureSessionHandle(), prepare.mCasePairingSession);
-    VerifyOrReturn(ctxt != nullptr);
+    ExchangeHandle ctxt = mExchangeManager->NewContext(SecureSessionHandle(), prepare.mCasePairingSession);
+    VerifyOrReturn(ctxt.HasValue());
 
     // TODO: currently only supports IP/UDP paring
     Transport::PeerAddress addr;

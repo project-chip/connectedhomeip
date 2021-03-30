@@ -49,9 +49,9 @@ CHIP_ERROR CASEServer::ListenForSessionEstablishment(Messaging::ExchangeManager 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CASEServer::InitCASEHandshake(Messaging::ExchangeContext * ec)
+CHIP_ERROR CASEServer::InitCASEHandshake(Messaging::ExchangeHandle ec)
 {
-    ReturnErrorCodeIf(ec == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorCodeIf(!ec.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
 
     // TODO - Use PK of the root CA for the initiator to figure out the admin.
     mAdminId = ec->GetSecureSession().GetAdminId();
@@ -76,10 +76,10 @@ CHIP_ERROR CASEServer::InitCASEHandshake(Messaging::ExchangeContext * ec)
     return CHIP_NO_ERROR;
 }
 
-void CASEServer::OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
+void CASEServer::OnMessageReceived(Messaging::ExchangeHandle ec, const PacketHeader & packetHeader,
                                    const PayloadHeader & payloadHeader, System::PacketBufferHandle && payload)
 {
-    ChipLogProgress(Inet, "CASE Server received SigmaR1 message. Starting handshake. EC %p", ec);
+    ChipLogProgress(Inet, "CASE Server received SigmaR1 message. Starting handshake. EC %d", ec->GetExchangeId());
     ReturnOnFailure(InitCASEHandshake(ec));
 
     mPairingSession.OnMessageReceived(ec, packetHeader, payloadHeader, std::move(payload));

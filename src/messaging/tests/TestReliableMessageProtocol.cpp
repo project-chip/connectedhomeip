@@ -91,13 +91,13 @@ OutgoingTransport gLoopback;
 class MockAppDelegate : public ExchangeDelegate
 {
 public:
-    void OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+    void OnMessageReceived(ExchangeHandle ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                            System::PacketBufferHandle && buffer) override
     {
         IsOnMessageReceivedCalled = true;
     }
 
-    void OnResponseTimeout(ExchangeContext * ec) override {}
+    void OnResponseTimeout(ExchangeHandle ec) override {}
 
     bool IsOnMessageReceivedCalled = false;
 };
@@ -119,43 +119,17 @@ void CheckAddClearRetrans(nlTestSuite * inSuite, void * inContext)
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
     MockAppDelegate mockAppDelegate;
-    ExchangeContext * exchange = ctx.NewExchangeToPeer(&mockAppDelegate);
-    NL_TEST_ASSERT(inSuite, exchange != nullptr);
+    ExchangeHandle exchange = ctx.NewExchangeToPeer(&mockAppDelegate);
+    NL_TEST_ASSERT(inSuite, exchange.HasValue());
 
     ReliableMessageMgr * rm     = ctx.GetExchangeManager().GetReliableMessageMgr();
-    ReliableMessageContext * rc = exchange->GetReliableMessageContext();
     NL_TEST_ASSERT(inSuite, rm != nullptr);
-    NL_TEST_ASSERT(inSuite, rc != nullptr);
 
     ReliableMessageMgr::RetransTableEntry * entry;
 
-    rm->AddToRetransTable(rc, &entry);
+    rm->AddToRetransTable(exchange, &entry);
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
     rm->ClearRetransTable(*entry);
-    NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
-
-    exchange->Close();
-}
-
-void CheckFailRetrans(nlTestSuite * inSuite, void * inContext)
-{
-    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
-
-    ctx.GetInetLayer().SystemLayer()->Init(nullptr);
-
-    MockAppDelegate mockAppDelegate;
-    ExchangeContext * exchange = ctx.NewExchangeToPeer(&mockAppDelegate);
-    NL_TEST_ASSERT(inSuite, exchange != nullptr);
-
-    ReliableMessageMgr * rm     = ctx.GetExchangeManager().GetReliableMessageMgr();
-    ReliableMessageContext * rc = exchange->GetReliableMessageContext();
-    NL_TEST_ASSERT(inSuite, rm != nullptr);
-    NL_TEST_ASSERT(inSuite, rc != nullptr);
-
-    ReliableMessageMgr::RetransTableEntry * entry;
-    rm->AddToRetransTable(rc, &entry);
-    NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
-    rm->FailRetransTableEntries(rc, CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
 
     exchange->Close();
@@ -174,15 +148,14 @@ void CheckResendApplicationMessage(nlTestSuite * inSuite, void * inContext)
 
     MockAppDelegate mockSender;
     // TODO: temporarily create a SecureSessionHandle from node id, will be fix in PR 3602
-    ExchangeContext * exchange = ctx.NewExchangeToPeer(&mockSender);
-    NL_TEST_ASSERT(inSuite, exchange != nullptr);
+    ExchangeHandle exchange = ctx.NewExchangeToPeer(&mockSender);
+    NL_TEST_ASSERT(inSuite, exchange.HasValue());
 
     ReliableMessageMgr * rm     = ctx.GetExchangeManager().GetReliableMessageMgr();
-    ReliableMessageContext * rc = exchange->GetReliableMessageContext();
+    ReliableMessageContext & rc = exchange->GetReliableMessageContext();
     NL_TEST_ASSERT(inSuite, rm != nullptr);
-    NL_TEST_ASSERT(inSuite, rc != nullptr);
 
-    rc->SetConfig({
+    rc.SetConfig({
         1, // CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRY_INTERVAL
         1, // CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRY_INTERVAL
     });
@@ -222,8 +195,7 @@ void CheckResendApplicationMessage(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 2);
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
 
-    rm->ClearRetransTable(rc);
-    exchange->Close();
+    rm->ClearRetransTable(exchange);
 }
 
 void CheckCloseExchangeAndResendApplicationMessage(nlTestSuite * inSuite, void * inContext)
@@ -238,16 +210,14 @@ void CheckCloseExchangeAndResendApplicationMessage(nlTestSuite * inSuite, void *
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     MockAppDelegate mockSender;
-    // TODO: temporarily create a SecureSessionHandle from node id, will be fixed in PR 3602
-    ExchangeContext * exchange = ctx.NewExchangeToPeer(&mockSender);
-    NL_TEST_ASSERT(inSuite, exchange != nullptr);
+    ExchangeHandle exchange = ctx.NewExchangeToPeer(&mockSender);
+    NL_TEST_ASSERT(inSuite, exchange.HasValue());
 
     ReliableMessageMgr * rm     = ctx.GetExchangeManager().GetReliableMessageMgr();
-    ReliableMessageContext * rc = exchange->GetReliableMessageContext();
+    ReliableMessageContext & rc = exchange->GetReliableMessageContext();
     NL_TEST_ASSERT(inSuite, rm != nullptr);
-    NL_TEST_ASSERT(inSuite, rc != nullptr);
 
-    rc->SetConfig({
+    rc.SetConfig({
         1, // CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRY_INTERVAL
         1, // CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRY_INTERVAL
     });
@@ -288,7 +258,7 @@ void CheckCloseExchangeAndResendApplicationMessage(nlTestSuite * inSuite, void *
     NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 2);
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
 
-    rm->ClearRetransTable(rc);
+    rm->ClearRetransTable(exchange);
 }
 
 void CheckSendStandaloneAckMessage(nlTestSuite * inSuite, void * inContext)
@@ -298,15 +268,14 @@ void CheckSendStandaloneAckMessage(nlTestSuite * inSuite, void * inContext)
     ctx.GetInetLayer().SystemLayer()->Init(nullptr);
 
     MockAppDelegate mockAppDelegate;
-    ExchangeContext * exchange = ctx.NewExchangeToPeer(&mockAppDelegate);
-    NL_TEST_ASSERT(inSuite, exchange != nullptr);
+    ExchangeHandle exchange = ctx.NewExchangeToPeer(&mockAppDelegate);
+    NL_TEST_ASSERT(inSuite, exchange.HasValue());
 
     ReliableMessageMgr * rm     = ctx.GetExchangeManager().GetReliableMessageMgr();
-    ReliableMessageContext * rc = exchange->GetReliableMessageContext();
+    ReliableMessageContext & rc = exchange->GetReliableMessageContext();
     NL_TEST_ASSERT(inSuite, rm != nullptr);
-    NL_TEST_ASSERT(inSuite, rc != nullptr);
 
-    NL_TEST_ASSERT(inSuite, rc->SendStandaloneAckMessage() == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, rc.SendStandaloneAckMessage() == CHIP_NO_ERROR);
 
     exchange->Close();
 }
@@ -320,7 +289,6 @@ void CheckSendStandaloneAckMessage(nlTestSuite * inSuite, void * inContext)
 const nlTest sTests[] =
 {
     NL_TEST_DEF("Test ReliableMessageMgr::CheckAddClearRetrans", CheckAddClearRetrans),
-    NL_TEST_DEF("Test ReliableMessageMgr::CheckFailRetrans", CheckFailRetrans),
     NL_TEST_DEF("Test ReliableMessageMgr::CheckResendApplicationMessage", CheckResendApplicationMessage),
     NL_TEST_DEF("Test ReliableMessageMgr::CheckCloseExchangeAndResendApplicationMessage", CheckCloseExchangeAndResendApplicationMessage),
     NL_TEST_DEF("Test ReliableMessageMgr::CheckSendStandaloneAckMessage", CheckSendStandaloneAckMessage),

@@ -58,7 +58,7 @@ CHIP_ERROR CommandSender::SendCommandRequest(NodeId aNodeId, Transport::AdminId 
     {
         mpExchangeCtx = mpExchangeMgr->NewContext(*secureSession, this);
     }
-    VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
+    VerifyOrExit(mpExchangeCtx.HasValue(), err = CHIP_ERROR_NO_MEMORY);
     mpExchangeCtx->SetResponseTimeout(kImMessageTimeoutMsec);
 
     err = mpExchangeCtx->SendMessage(
@@ -77,7 +77,7 @@ exit:
     return err;
 }
 
-void CommandSender::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
+void CommandSender::OnMessageReceived(Messaging::ExchangeHandle apExchangeContext, const PacketHeader & aPacketHeader,
                                       const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -95,7 +95,7 @@ exit:
     // Close the exchange cleanly so that the ExchangeManager will send an ack for the message we just received.
     // This needs to be done before the Reset() call, because Reset() aborts mpExchangeCtx if its not null.
     mpExchangeCtx->Close();
-    mpExchangeCtx = nullptr;
+    mpExchangeCtx.Release();
 
     if (mpDelegate != nullptr)
     {
@@ -112,7 +112,7 @@ exit:
     Shutdown();
 }
 
-void CommandSender::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext)
+void CommandSender::OnResponseTimeout(Messaging::ExchangeHandle apExchangeContext)
 {
     ChipLogProgress(DataManagement, "Time out! failed to receive invoke command response from Exchange: %d",
                     apExchangeContext->GetExchangeId());

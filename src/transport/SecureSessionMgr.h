@@ -63,6 +63,8 @@ public:
 
     uint32_t GetMsgId() const;
 
+    bool IsNull() { return System::PacketBufferHandle::IsNull(); }
+
     /**
      * Creates a copy of the data in this packet.
      *

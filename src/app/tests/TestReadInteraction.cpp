@@ -136,7 +136,7 @@ void TestReadInteraction::TestReadHandler(nlTestSuite * apSuite, void * apContex
     err = writer.Finalize(&readRequestbuf);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    err = readHandler.OnReadRequest(nullptr, std::move(readRequestbuf));
+    err = readHandler.OnReadRequest(Messaging::ExchangeHandle(), std::move(readRequestbuf));
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 }
 

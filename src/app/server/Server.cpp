@@ -315,7 +315,7 @@ static CHIP_ERROR OpenPairingWindowUsingVerifier(uint16_t discriminator, PASEVer
 class ServerCallback : public ExchangeDelegate
 {
 public:
-    void OnMessageReceived(Messaging::ExchangeContext * exchangeContext, const PacketHeader & packetHeader,
+    void OnMessageReceived(Messaging::ExchangeHandle exchangeContext, const PacketHeader & packetHeader,
                            const PayloadHeader & payloadHeader, System::PacketBufferHandle && buffer) override
     {
         // as soon as a client connects, assume it is connected
@@ -382,7 +382,7 @@ public:
         exchangeContext->Close();
     }
 
-    void OnResponseTimeout(ExchangeContext * ec) override
+    void OnResponseTimeout(ExchangeHandle ec) override
     {
         ChipLogProgress(AppServer, "Failed to receive response");
         if (mDelegate != nullptr)

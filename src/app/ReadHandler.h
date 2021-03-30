@@ -83,7 +83,7 @@ public:
      *  @retval #CHIP_NO_ERROR On success.
      *
      */
-    CHIP_ERROR OnReadRequest(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload);
+    CHIP_ERROR OnReadRequest(Messaging::ExchangeHandle apExchangeContext, System::PacketBufferHandle && aPayload);
 
     /**
      *  Send ReportData to initiator
@@ -130,7 +130,7 @@ private:
     const char * GetStateStr() const;
     CHIP_ERROR AbortExistingExchangeContext();
 
-    Messaging::ExchangeContext * mpExchangeCtx = nullptr;
+    Messaging::ExchangeHandle mpExchangeCtx;
     InteractionModelDelegate * mpDelegate      = nullptr;
 
     // Don't need the response for report data if true

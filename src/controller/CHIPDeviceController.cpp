@@ -525,7 +525,7 @@ CHIP_ERROR DeviceController::ServiceEventSignal()
     return CHIP_NO_ERROR;
 }
 
-void DeviceController::OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
+void DeviceController::OnMessageReceived(Messaging::ExchangeHandle ec, const PacketHeader & packetHeader,
                                          const PayloadHeader & payloadHeader, System::PacketBufferHandle && msgBuf)
 {
     uint16_t index;
@@ -549,9 +549,9 @@ exit:
     }
 }
 
-void DeviceController::OnResponseTimeout(Messaging::ExchangeContext * ec)
+void DeviceController::OnResponseTimeout(Messaging::ExchangeHandle ec)
 {
-    ChipLogProgress(Controller, "Time out! failed to receive response from Exchange: %p", ec);
+    ChipLogProgress(Controller, "Time out! failed to receive response from Exchange: %d", ec->GetExchangeId());
 }
 
 void DeviceController::OnNewConnection(SecureSessionHandle session, Messaging::ExchangeManager * mgr)
@@ -829,7 +829,7 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
     Device * device                    = nullptr;
     Transport::PeerAddress peerAddress = Transport::PeerAddress::UDP(Inet::IPAddress::Any);
 
-    Messaging::ExchangeContext * exchangeCtxt = nullptr;
+    Messaging::ExchangeHandle exchangeCtxt;
 
     Transport::AdminPairingInfo * admin = mAdmins.FindAdminWithId(mAdminId);
 
@@ -897,7 +897,7 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
     }
 #endif
     exchangeCtxt = mExchangeMgr->NewContext(SecureSessionHandle(), &mPairingSession);
-    VerifyOrExit(exchangeCtxt != nullptr, err = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(exchangeCtxt.HasValue(), err = CHIP_ERROR_INTERNAL);
 
     err = mPairingSession.Pair(params.GetPeerAddress(), params.GetSetupPINCode(), mNextKeyId++, exchangeCtxt, this);
     // Immediately persist the updted mNextKeyID value

@@ -45,9 +45,9 @@ public:
     void OnSessionEstablished() override;
 
     //// ExchangeDelegate Implementation ////
-    void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+    void OnMessageReceived(Messaging::ExchangeHandle ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                            System::PacketBufferHandle && payload) override;
-    void OnResponseTimeout(Messaging::ExchangeContext * ec) override {}
+    void OnResponseTimeout(Messaging::ExchangeHandle ec) override {}
     Messaging::ExchangeMessageDispatch * GetMessageDispatch(Messaging::ReliableMessageMgr * reliableMessageManager,
                                                             SecureSessionMgr * sessionMgr) override
     {
@@ -68,7 +68,7 @@ private:
     Credentials::OperationalCredentialSet mCredentials;
     Credentials::CertificateKeyId mRootKeyId;
 
-    CHIP_ERROR InitCASEHandshake(Messaging::ExchangeContext * ec);
+    CHIP_ERROR InitCASEHandshake(Messaging::ExchangeHandle ec);
 
     void Cleanup();
 };

@@ -104,10 +104,10 @@ void PASESession::Clear()
 
 void PASESession::CloseExchange()
 {
-    if (mExchangeCtxt != nullptr)
+    if (mExchangeCtxt.HasValue())
     {
         mExchangeCtxt->Close();
-        mExchangeCtxt = nullptr;
+        mExchangeCtxt.Release();
     }
 }
 
@@ -301,9 +301,9 @@ CHIP_ERROR PASESession::WaitForPairing(const PASEVerifier & verifier, uint16_t m
 }
 
 CHIP_ERROR PASESession::Pair(const Transport::PeerAddress peerAddress, uint32_t peerSetUpPINCode, uint16_t myKeyId,
-                             Messaging::ExchangeContext * exchangeCtxt, SessionEstablishmentDelegate * delegate)
+                             Messaging::ExchangeHandle exchangeCtxt, SessionEstablishmentDelegate * delegate)
 {
-    ReturnErrorCodeIf(exchangeCtxt == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorCodeIf(!exchangeCtxt.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
     CHIP_ERROR err = Init(myKeyId, peerSetUpPINCode, delegate);
     SuccessOrExit(err);
 
@@ -323,10 +323,10 @@ exit:
     return err;
 }
 
-void PASESession::OnResponseTimeout(ExchangeContext * ec)
+void PASESession::OnResponseTimeout(ExchangeHandle ec)
 {
-    VerifyOrReturn(ec != nullptr, ChipLogError(SecureChannel, "PASESession::OnResponseTimeout was called by null exchange"));
-    VerifyOrReturn(mExchangeCtxt == nullptr || mExchangeCtxt == ec,
+    VerifyOrReturn(ec.HasValue(), ChipLogError(SecureChannel, "PASESession::OnResponseTimeout was called by null exchange"));
+    VerifyOrReturn(!mExchangeCtxt.HasValue() || mExchangeCtxt == ec,
                    ChipLogError(SecureChannel, "PASESession::OnResponseTimeout exchange doesn't match"));
     ChipLogError(SecureChannel, "PASESession timed out while waiting for a response from the peer. Expected message type was %d",
                  mNextExpectedMsg);
@@ -751,15 +751,15 @@ CHIP_ERROR PASESession::HandleErrorMsg(const System::PacketBufferHandle & msg)
     return err;
 }
 
-CHIP_ERROR PASESession::ValidateReceivedMessage(ExchangeContext * exchange, const PacketHeader & packetHeader,
+CHIP_ERROR PASESession::ValidateReceivedMessage(ExchangeHandle exchange, const PacketHeader & packetHeader,
                                                 const PayloadHeader & payloadHeader, System::PacketBufferHandle && msg)
 {
-    VerifyOrReturnError(exchange != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(exchange.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
 
     // mExchangeCtxt can be nullptr if this is the first message (PBKDFParamRequest) received by PASESession
     // via UnsolicitedMessageHandler. The exchange context is allocated by exchange manager and provided
     // to the handler (PASESession object).
-    if (mExchangeCtxt != nullptr)
+    if (mExchangeCtxt.HasValue())
     {
         if (mExchangeCtxt != exchange)
         {
@@ -782,7 +782,7 @@ CHIP_ERROR PASESession::ValidateReceivedMessage(ExchangeContext * exchange, cons
     return CHIP_NO_ERROR;
 }
 
-void PASESession::OnMessageReceived(ExchangeContext * exchange, const PacketHeader & packetHeader,
+void PASESession::OnMessageReceived(ExchangeHandle exchange, const PacketHeader & packetHeader,
                                     const PayloadHeader & payloadHeader, System::PacketBufferHandle && msg)
 {
     CHIP_ERROR err = ValidateReceivedMessage(exchange, packetHeader, payloadHeader, std::move(msg));

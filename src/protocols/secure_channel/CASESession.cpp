@@ -103,10 +103,10 @@ void CASESession::Clear()
         mTrustedRootId.mId = nullptr;
     }
 
-    if (mExchangeCtxt != nullptr)
+    if (mExchangeCtxt.HasValue())
     {
         mExchangeCtxt->Close();
-        mExchangeCtxt = nullptr;
+        mExchangeCtxt.Release();
     }
 }
 
@@ -227,11 +227,11 @@ CASESession::ListenForSessionEstablishment(OperationalCredentialSet * operationa
 
 CHIP_ERROR CASESession::EstablishSession(const Transport::PeerAddress peerAddress,
                                          OperationalCredentialSet * operationalCredentialSet, NodeId peerNodeId, uint16_t myKeyId,
-                                         ExchangeContext * exchangeCtxt, SessionEstablishmentDelegate * delegate)
+                                         ExchangeHandle exchangeCtxt, SessionEstablishmentDelegate * delegate)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    ReturnErrorCodeIf(exchangeCtxt == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorCodeIf(!exchangeCtxt.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
 
     err = Init(operationalCredentialSet, myKeyId, delegate);
 
@@ -255,9 +255,9 @@ exit:
     return err;
 }
 
-void CASESession::OnResponseTimeout(ExchangeContext * ec)
+void CASESession::OnResponseTimeout(ExchangeHandle ec)
 {
-    VerifyOrReturn(ec != nullptr, ChipLogError(Inet, "CASESession::OnResponseTimeout was called by null exchange"));
+    VerifyOrReturn(ec.HasValue(), ChipLogError(Inet, "CASESession::OnResponseTimeout was called by null exchange"));
     VerifyOrReturn(mExchangeCtxt == ec, ChipLogError(Inet, "CASESession::OnResponseTimeout exchange doesn't match"));
     ChipLogError(Inet, "CASESession timed out while waiting for a response from the peer. Expected message type was %d",
                  mNextExpectedMsg);
@@ -1109,15 +1109,15 @@ exit:
     Clear();
 }
 
-CHIP_ERROR CASESession::ValidateReceivedMessage(ExchangeContext * ec, const PacketHeader & packetHeader,
+CHIP_ERROR CASESession::ValidateReceivedMessage(ExchangeHandle ec, const PacketHeader & packetHeader,
                                                 const PayloadHeader & payloadHeader, System::PacketBufferHandle & msg)
 {
-    VerifyOrReturnError(ec != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(ec.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
 
     // mExchangeCtxt can be nullptr if this is the first message (CASE_SigmaR1) received by CASESession
     // via UnsolicitedMessageHandler. The exchange context is allocated by exchange manager and provided
     // to the handler (CASESession object).
-    if (mExchangeCtxt != nullptr)
+    if (mExchangeCtxt.HasValue())
     {
         if (mExchangeCtxt != ec)
         {
@@ -1153,7 +1153,7 @@ CHIP_ERROR CASESession::ValidateReceivedMessage(ExchangeContext * ec, const Pack
     return CHIP_NO_ERROR;
 }
 
-void CASESession::OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+void CASESession::OnMessageReceived(ExchangeHandle ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                                     System::PacketBufferHandle && msg)
 {
     CHIP_ERROR err = ValidateReceivedMessage(ec, packetHeader, payloadHeader, msg);

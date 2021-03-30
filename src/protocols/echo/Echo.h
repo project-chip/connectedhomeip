@@ -47,7 +47,7 @@ enum class MsgType : uint8_t
     EchoResponse = 0x02
 };
 
-using EchoFunct = void (*)(Messaging::ExchangeContext * ec, System::PacketBufferHandle && payload);
+using EchoFunct = void (*)(Messaging::ExchangeHandle ec, System::PacketBufferHandle && payload);
 
 class DLL_EXPORT EchoClient : public Messaging::ExchangeDelegate
 {
@@ -99,13 +99,13 @@ public:
 
 private:
     Messaging::ExchangeManager * mExchangeMgr = nullptr;
-    Messaging::ExchangeContext * mExchangeCtx = nullptr;
+    Messaging::ExchangeHandle mExchangeCtx;
     EchoFunct OnEchoResponseReceived          = nullptr;
     SecureSessionHandle mSecureSession;
 
-    void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+    void OnMessageReceived(Messaging::ExchangeHandle ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                            System::PacketBufferHandle && payload) override;
-    void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
+    void OnResponseTimeout(Messaging::ExchangeHandle ec) override;
 };
 
 class DLL_EXPORT EchoServer : public Messaging::ExchangeDelegate
@@ -145,9 +145,9 @@ private:
     Messaging::ExchangeManager * mExchangeMgr = nullptr;
     EchoFunct OnEchoRequestReceived           = nullptr;
 
-    void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+    void OnMessageReceived(Messaging::ExchangeHandle ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                            System::PacketBufferHandle && payload) override;
-    void OnResponseTimeout(Messaging::ExchangeContext * ec) override {}
+    void OnResponseTimeout(Messaging::ExchangeHandle ec) override {}
 };
 
 } // namespace Echo

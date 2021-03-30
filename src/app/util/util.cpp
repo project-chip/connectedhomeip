@@ -493,7 +493,7 @@ static bool dispatchZclMessage(EmberAfClusterCommand * cmd)
 }
 
 bool emberAfProcessMessageIntoZclCmd(EmberApsFrame * apsFrame, EmberIncomingMessageType type, uint8_t * message,
-                                     uint16_t messageLength, Messaging::ExchangeContext * exchange, InterPanHeader * interPanHeader,
+                                     uint16_t messageLength, Messaging::ExchangeHandle exchange, InterPanHeader * interPanHeader,
                                      EmberAfClusterCommand * returnCmd)
 {
     uint8_t minLength =
@@ -539,7 +539,7 @@ bool emberAfProcessMessageIntoZclCmd(EmberApsFrame * apsFrame, EmberIncomingMess
 
 // a single call to process global and cluster-specific messages and callbacks.
 bool emberAfProcessMessage(EmberApsFrame * apsFrame, EmberIncomingMessageType type, uint8_t * message, uint16_t msgLen,
-                           Messaging::ExchangeContext * exchange, InterPanHeader * interPanHeader)
+                           Messaging::ExchangeHandle exchange, InterPanHeader * interPanHeader)
 {
     bool msgHandled = false;
     // reset/reinitialize curCmd
@@ -703,7 +703,7 @@ void emAfApplyDisableDefaultResponse(uint8_t * frame_control)
     }
 }
 
-static bool isBroadcastDestination(Messaging::ExchangeContext * responseDestination)
+static bool isBroadcastDestination(Messaging::ExchangeHandle responseDestination)
 {
     // TODO: Will need to actually figure out how to test for this!
     return false;

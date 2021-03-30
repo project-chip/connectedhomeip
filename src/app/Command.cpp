@@ -216,10 +216,10 @@ CHIP_ERROR Command::AbortExistingExchangeContext()
 {
     // Discard any existing exchange context. Effectively we can only have one Echo exchange with
     // a single node at any one time.
-    if (mpExchangeCtx != nullptr)
+    if (mpExchangeCtx.HasValue())
     {
         mpExchangeCtx->Abort();
-        mpExchangeCtx = nullptr;
+        mpExchangeCtx.Release();
     }
 
     return CHIP_NO_ERROR;

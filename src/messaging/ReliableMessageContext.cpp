@@ -42,15 +42,6 @@ ReliableMessageContext::ReliableMessageContext() :
     mConfig(gDefaultReliableMessageProtocolConfig), mNextAckTimeTick(0), mPendingPeerAckId(0)
 {}
 
-void ReliableMessageContext::RetainContext()
-{
-    GetExchangeContext()->Retain();
-}
-
-void ReliableMessageContext::ReleaseContext()
-{
-    GetExchangeContext()->Release();
-}
 
 bool ReliableMessageContext::AutoRequestAck() const
 {
@@ -165,12 +156,12 @@ uint64_t ReliableMessageContext::GetActiveRetransmitTimeoutTick()
  *  @retval  #CHIP_NO_ERROR                             if the context was removed.
  *
  */
-CHIP_ERROR ReliableMessageContext::HandleRcvdAck(uint32_t AckMsgId)
+CHIP_ERROR ReliableMessageContext::HandleRcvdAck(ExchangeHandle exchangeContext, uint32_t AckMsgId)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Msg is an Ack; Check Retrans Table and remove message context
-    if (!GetReliableMessageMgr()->CheckAndRemRetransTable(this, AckMsgId))
+    if (!GetReliableMessageMgr()->CheckAndRemRetransTable(exchangeContext, AckMsgId))
     {
 #if !defined(NDEBUG)
         ChipLogError(ExchangeManager, "CHIP MsgId:%08" PRIX32 " not in RetransTable", AckMsgId);
@@ -188,7 +179,7 @@ CHIP_ERROR ReliableMessageContext::HandleRcvdAck(uint32_t AckMsgId)
     return err;
 }
 
-CHIP_ERROR ReliableMessageContext::HandleNeedsAck(uint32_t MessageId, BitFlags<MessageFlagValues> MsgFlags)
+CHIP_ERROR ReliableMessageContext::HandleNeedsAck(ExchangeHandle exchangeContext, uint32_t MessageId, BitFlags<MessageFlagValues> MsgFlags)
 
 {
     CHIP_ERROR err = CHIP_NO_ERROR;

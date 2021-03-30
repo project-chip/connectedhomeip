@@ -168,7 +168,7 @@ CHIP_ERROR ReadClient::SendReadRequest(NodeId aNodeId, Transport::AdminId aAdmin
     }
 
     mpExchangeCtx = mpExchangeMgr->NewContext({ aNodeId, 0, aAdminId }, this);
-    VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
+    VerifyOrExit(mpExchangeCtx.HasValue(), err = CHIP_ERROR_NO_MEMORY);
     mpExchangeCtx->SetResponseTimeout(kImMessageTimeoutMsec);
 
     err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReadRequest, std::move(msgBuf),
@@ -187,7 +187,7 @@ exit:
     return err;
 }
 
-void ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
+void ReadClient::OnMessageReceived(Messaging::ExchangeHandle apExchangeContext, const PacketHeader & aPacketHeader,
                                    const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -202,7 +202,7 @@ exit:
 
     // Close the exchange cleanly so that the ExchangeManager will send an ack for the message we just received.
     mpExchangeCtx->Close();
-    mpExchangeCtx = nullptr;
+    mpExchangeCtx.Release();
     MoveToState(ClientState::Initialized);
 
     if (mpDelegate != nullptr)
@@ -222,10 +222,10 @@ exit:
 
 CHIP_ERROR ReadClient::AbortExistingExchangeContext()
 {
-    if (mpExchangeCtx != nullptr)
+    if (mpExchangeCtx.HasValue())
     {
         mpExchangeCtx->Abort();
-        mpExchangeCtx = nullptr;
+        mpExchangeCtx.Release();
     }
 
     return CHIP_NO_ERROR;
@@ -311,7 +311,7 @@ exit:
     return err;
 }
 
-void ReadClient::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext)
+void ReadClient::OnResponseTimeout(Messaging::ExchangeHandle apExchangeContext)
 {
     ChipLogProgress(DataManagement, "Time out! failed to receive report data from Exchange: %d",
                     apExchangeContext->GetExchangeId());

@@ -38,17 +38,16 @@ CHIP_ERROR EchoClient::Init(Messaging::ExchangeManager * exchangeMgr, SecureSess
     mExchangeMgr           = exchangeMgr;
     mSecureSession         = session;
     OnEchoResponseReceived = nullptr;
-    mExchangeCtx           = nullptr;
 
     return CHIP_NO_ERROR;
 }
 
 void EchoClient::Shutdown()
 {
-    if (mExchangeCtx != nullptr)
+    if (mExchangeCtx.HasValue())
     {
         mExchangeCtx->Abort();
-        mExchangeCtx = nullptr;
+        mExchangeCtx.Release();
     }
 
     OnEchoResponseReceived = nullptr;
@@ -61,15 +60,15 @@ CHIP_ERROR EchoClient::SendEchoRequest(System::PacketBufferHandle && payload, co
 
     // Discard any existing exchange context. Effectively we can only have one Echo exchange with
     // a single node at any one time.
-    if (mExchangeCtx != nullptr)
+    if (mExchangeCtx.HasValue())
     {
         mExchangeCtx->Abort();
-        mExchangeCtx = nullptr;
+        mExchangeCtx.Release();
     }
 
     // Create a new exchange context.
     mExchangeCtx = mExchangeMgr->NewContext(mSecureSession, this);
-    if (mExchangeCtx == nullptr)
+    if (!mExchangeCtx.HasValue())
     {
         return CHIP_ERROR_NO_MEMORY;
     }
@@ -80,13 +79,13 @@ CHIP_ERROR EchoClient::SendEchoRequest(System::PacketBufferHandle && payload, co
     if (err != CHIP_NO_ERROR)
     {
         mExchangeCtx->Abort();
-        mExchangeCtx = nullptr;
+        mExchangeCtx.Release();
     }
 
     return err;
 }
 
-void EchoClient::OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
+void EchoClient::OnMessageReceived(Messaging::ExchangeHandle ec, const PacketHeader & packetHeader,
                                    const PayloadHeader & payloadHeader, System::PacketBufferHandle && payload)
 {
     // Assert that the exchange context matches the client's current context.
@@ -99,8 +98,8 @@ void EchoClient::OnMessageReceived(Messaging::ExchangeContext * ec, const Packet
     // If not, close the exchange and free the payload.
     if (!payloadHeader.HasMessageType(MsgType::EchoResponse))
     {
-        ec->Close();
-        mExchangeCtx = nullptr;
+        ec.Release();
+        mExchangeCtx.Release();
         return;
     }
 
@@ -109,7 +108,7 @@ void EchoClient::OnMessageReceived(Messaging::ExchangeContext * ec, const Packet
     // because we no longer care whether the echo request message has been
     // acknowledged at the transport layer.
     mExchangeCtx->Abort();
-    mExchangeCtx = nullptr;
+    mExchangeCtx.Release();
 
     // Call the registered OnEchoResponseReceived handler, if any.
     if (OnEchoResponseReceived != nullptr)
@@ -118,9 +117,9 @@ void EchoClient::OnMessageReceived(Messaging::ExchangeContext * ec, const Packet
     }
 }
 
-void EchoClient::OnResponseTimeout(Messaging::ExchangeContext * ec)
+void EchoClient::OnResponseTimeout(Messaging::ExchangeHandle ec)
 {
-    ChipLogProgress(Echo, "Time out! failed to receive echo response from Exchange: %p", ec);
+    ChipLogProgress(Echo, "Time out! failed to receive echo response from Exchange: %d", ec->GetExchangeId());
 }
 
 } // namespace Echo

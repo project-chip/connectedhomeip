@@ -43,16 +43,16 @@ namespace chip {
 //       Delete this class when Device::SendMessage() is obsoleted.
 class DeviceExchangeDelegate : public Messaging::ExchangeDelegate
 {
-    void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+    void OnMessageReceived(Messaging::ExchangeHandle ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                            System::PacketBufferHandle && payload) override
     {}
-    void OnResponseTimeout(Messaging::ExchangeContext * ec) override {}
+    void OnResponseTimeout(Messaging::ExchangeHandle ec) override {}
 };
 
 extern Messaging::ExchangeManager * ExchangeManager();
 } // namespace chip
 
-EmberStatus chipSendUnicast(Messaging::ExchangeContext * exchange, EmberApsFrame * apsFrame, uint16_t messageLength,
+EmberStatus chipSendUnicast(Messaging::ExchangeHandle exchange, EmberApsFrame * apsFrame, uint16_t messageLength,
                             uint8_t * message, Messaging::SendFlags sendFlags)
 {
     uint16_t frameSize           = encodeApsFrame(nullptr, 0, apsFrame);
@@ -108,8 +108,8 @@ EmberStatus chipSendUnicast(NodeId destination, EmberApsFrame * apsFrame, uint16
         return EMBER_DELIVERY_FAILED;
     }
 
-    Messaging::ExchangeContext * exchange = exchangeMgr->NewContext({ destination, Transport::kAnyKeyId, 0 }, nullptr);
-    if (exchange == nullptr)
+    Messaging::ExchangeHandle exchange = exchangeMgr->NewContext({ destination, Transport::kAnyKeyId, 0 }, nullptr);
+    if (!exchange.HasValue())
     {
         return EMBER_DELIVERY_FAILED;
     }

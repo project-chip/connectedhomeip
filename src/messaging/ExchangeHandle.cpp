@@ -15,34 +15,43 @@
  *    limitations under the License.
  */
 
-#include <channel/Channel.h>
-#include <channel/ChannelContext.h>
-#include <channel/Manager.h>
+#include <messaging/ExchangeHandle.h>
+
 #include <messaging/ExchangeMgr.h>
 
 namespace chip {
 namespace Messaging {
 
-ChannelState ChannelHandle::GetState() const
+ExchangeHandle::ExchangeHandle(ExchangeContext * context) : mContext(context)
 {
-    if (mAssociation == nullptr)
-        return ChannelState::kNone;
-    return mAssociation->mChannelContext->GetState();
+    if (mContext != nullptr) mContext->Retain();
 }
 
-ExchangeHandle ChannelHandle::NewExchange(ExchangeDelegate * delegate)
+ExchangeHandle::ExchangeHandle(const ExchangeHandle & that) : mContext(that.mContext)
 {
-    assert(mAssociation != nullptr);
-    return mAssociation->mChannelContext->NewExchange(delegate);
+    if (mContext != nullptr) mContext->Retain();
 }
 
-void ChannelHandle::Release()
+ExchangeHandle::~ExchangeHandle()
 {
-    if (mAssociation == nullptr)
-        return;
+    if (mContext != nullptr) mContext->Release();
+}
 
-    mAssociation->mChannelContext->mChannelManager->ReleaseChannelHandle(mAssociation);
-    mAssociation = nullptr;
+ExchangeHandle & ExchangeHandle::operator=(const ExchangeHandle & that)
+{
+    if (this == &that) return *this;
+    mContext = that.mContext;
+    if (mContext != nullptr) mContext->Retain();
+    return *this;
+}
+
+void ExchangeHandle::Release()
+{
+    if (mContext != nullptr)
+    {
+        mContext->Release();
+        mContext = nullptr;
+    }
 }
 
 } // namespace Messaging

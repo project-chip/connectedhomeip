@@ -45,6 +45,7 @@
 
 #include <credentials/CHIPOperationalCredentials.h>
 #include <inet/IPAddress.h>
+#include <messaging/ExchangeHandle.h>
 #include <transport/raw/MessageHeader.h>
 
 namespace chip {
@@ -187,7 +188,7 @@ public:
      *
      * @pre GetState() == ChannelState::kReady
      */
-    ExchangeContext * NewExchange(ExchangeDelegate * delegate);
+    ExchangeHandle NewExchange(ExchangeDelegate * delegate);
 
     void Release();
 
