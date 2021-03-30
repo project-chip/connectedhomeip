@@ -30,6 +30,7 @@
 namespace chip {
 namespace app {
 class ReadClient;
+class CommandSender;
 struct EventPathParams;
 
 /**
@@ -74,6 +75,48 @@ public:
      * @retval # CHIP_ERROR_NOT_IMPLEMENTED if not implemented
      */
     virtual CHIP_ERROR ReportError(const ReadClient * apReadClient, CHIP_ERROR aError) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+
+    /**
+     * Notification that a Command Send has received an Invoke Command Response containing a status code.
+     * @param[in]  apCommandSender A current command sender which can identify the command sender to the consumer, particularly
+     * during multiple command interactions
+     * @param[in]  aGeneralCode   Status code defined by the standard
+     * @param[in]  aProtocolId    Protocol Id
+     * @param[in]  aProtocolCode  Detailed error information, protocol-specific.
+     * @param[in]  aEndpointId    Endpoint identifier
+     * @param[in]  aClusterId     Cluster identifier
+     * @param[in]  aCommandId     Command identifier
+     * @param[in]  aCommandIndex  Current processing command index which can identify command if there exists multiple commands with
+     * same command Id
+     * @retval # CHIP_ERROR_NOT_IMPLEMENTED if not implemented
+     */
+    virtual CHIP_ERROR CommandResponseStatus(const CommandSender * apCommandSender, const uint16_t aGeneralCode,
+                                             const uint32_t aProtocolId, const uint16_t aProtocolCode, chip::EndpointId aEndpointId,
+                                             const chip::ClusterId aClusterId, chip::CommandId aCommandId, uint8_t aCommandIndex)
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
+    /**
+     * Notification that a Command Send has received an Invoke Command Response and fails to process a command data element in that
+     * command response
+     * @param[in]  apCommandSender A current command sender which can identify the command sender to the consumer, particularly
+     * during multiple command interactions
+     * @param[in]  aCommandIndex  Current processing command index which can identify failed command
+     * @retval # CHIP_ERROR_NOT_IMPLEMENTED if not implemented
+     */
+    virtual CHIP_ERROR CommandResponseProtocolError(const CommandSender * apCommandSender, uint8_t aCommandIndex)
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
+    /**
+     * Notification that a command sender encountered an asynchronous failure.
+     * @param[in]  apCommandSender A current command sender which can identify the command sender to the consumer, particularly
+     * during multiple command interactions
+     * @retval # CHIP_ERROR_NOT_IMPLEMENTED if not implemented
+     */
+    virtual CHIP_ERROR CommandResponseTimeout(const CommandSender * apCommandSender) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
     virtual ~InteractionModelDelegate() = default;
 };
