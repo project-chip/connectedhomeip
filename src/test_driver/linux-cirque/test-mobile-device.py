@@ -75,7 +75,21 @@ class TestPythonController(CHIPVirtualHome):
         time.sleep(5)
         for device_id in server_ids:
             # Clear default Thread network commissioning data
-            reply = self.execute_device_cmd(device_id, 'ot-ctl factoryreset')
+            self.logger.info("Resetting thread network on {}".format(
+                self.get_device_pretty_id(device_id)))
+            self.execute_device_cmd(device_id, 'ot-ctl factoryreset')
+            resetResult = False
+            for i in range(10):
+                # We can only check the status of ot-agent by query its state.
+                reply = self.execute_device_cmd(device_id, 'ot-ctl state')
+                if self.sequenceMatch(reply['output'], ('disabled',)):
+                    self.logger.info("Finished resetting Thread network on {}".format(
+                        self.get_device_pretty_id(device_id)))
+                    resetResult = True
+                    break
+                time.sleep(1)
+            self.assertTrue(resetResult, "Failed to do factoryreset thread network on {}.".format(
+                self.get_device_pretty_id(device_id)))
 
         req_device_id = req_ids[0]
 
