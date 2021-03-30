@@ -20,104 +20,145 @@
 // Prevent multiple inclusion
 #pragma once
 
-
-
 // Default values for the attributes longer than a pointer,
 // in a form of a binary blob
 // Separate block is generated for big-endian and little-endian cases.
 #if BIGENDIAN_CPU
-#define GENERATED_DEFAULTS { \
-}
-
+#define GENERATED_DEFAULTS                                                                                                         \
+    {                                                                                                                              \
+    }
 
 #else // !BIGENDIAN_CPU
-#define GENERATED_DEFAULTS { \
-}
+#define GENERATED_DEFAULTS                                                                                                         \
+    {                                                                                                                              \
+    }
 
 #endif // BIGENDIAN_CPU
 
 #define GENERATED_DEFAULTS_COUNT (0)
 
-#define ZAP_TYPE(type) ZCL_ ## type ## _ATTRIBUTE_TYPE
-#define ZAP_LONG_DEFAULTS_INDEX(index) {(uint8_t*)(&generatedDefaults[index])}
-#define ZAP_MIN_MAX_DEFAULTS_INDEX(index) {(uint8_t*)(&minMaxDefault[index])}
+#define ZAP_TYPE(type) ZCL_##type##_ATTRIBUTE_TYPE
+#define ZAP_LONG_DEFAULTS_INDEX(index)                                                                                             \
+    {                                                                                                                              \
+        (uint8_t *) (&generatedDefaults[index])                                                                                    \
+    }
+#define ZAP_MIN_MAX_DEFAULTS_INDEX(index)                                                                                          \
+    {                                                                                                                              \
+        (uint8_t *) (&minMaxDefault[index])                                                                                        \
+    }
+#define ZAP_EMPTY_DEFAULT()                                                                                                        \
+    {                                                                                                                              \
+        (uint8_t *) 0                                                                                                              \
+    }
+#define ZAP_SIMPLE_DEFAULT(x)                                                                                                      \
+    {                                                                                                                              \
+        (uint8_t *) x                                                                                                              \
+    }
 
 // This is an array of EmberAfAttributeMinMaxValue structures.
 #define GENERATED_MIN_MAX_DEFAULT_COUNT 0
-#define GENERATED_MIN_MAX_DEFAULTS { \
-}
+#define GENERATED_MIN_MAX_DEFAULTS                                                                                                 \
+    {                                                                                                                              \
+    }
 
-
-#define ZAP_ATTRIBUTE_MASK(mask) ATTRIBUTE_MASK_ ## mask
+#define ZAP_ATTRIBUTE_MASK(mask) ATTRIBUTE_MASK_##mask
 // This is an array of EmberAfAttributeMetadata structures.
 #define GENERATED_ATTRIBUTE_COUNT 21
-#define GENERATED_ATTRIBUTES { \
-  { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), { (uint8_t *) 2 } }, /* Identify (client): cluster revision */  \
-  { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 2 } }, /* Identify (server): cluster revision */  \
-  { 0x0000, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(WRITABLE), { (uint8_t *) 0x0000 } }, /* Identify (server): identify time */  \
-  { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 3 } }, /* Groups (server): cluster revision */  \
-  { 0x0000, ZAP_TYPE(BITMAP8), 1, 0, { (uint8_t *) 0 } }, /* Groups (server): name support */  \
-  { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 3 } }, /* Scenes (server): cluster revision */  \
-  { 0x0000, ZAP_TYPE(INT8U), 1, 0, { (uint8_t *) 0x00 } }, /* Scenes (server): scene count */  \
-  { 0x0001, ZAP_TYPE(INT8U), 1, 0, { (uint8_t *) 0x00 } }, /* Scenes (server): current scene */  \
-  { 0x0002, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 0x0000 } }, /* Scenes (server): current group */  \
-  { 0x0003, ZAP_TYPE(BOOLEAN), 1, 0, { (uint8_t *) 0x00 } }, /* Scenes (server): scene valid */  \
-  { 0x0004, ZAP_TYPE(BITMAP8), 1, 0, { (uint8_t *) 0 } }, /* Scenes (server): name support */  \
-  { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 2 } }, /* On/off (server): cluster revision */  \
-  { 0x0000, ZAP_TYPE(BOOLEAN), 1, 0, { (uint8_t *) 0x00 } }, /* On/off (server): on/off */  \
-  { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 0x0001 } }, /* Pump Configuration and Control (server): cluster revision */  \
-  { 0x0000, ZAP_TYPE(INT16S), 2, 0, { (uint8_t *) 0 } }, /* Pump Configuration and Control (server): max pressure */  \
-  { 0x0001, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 0 } }, /* Pump Configuration and Control (server): max speed */  \
-  { 0x0002, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 0 } }, /* Pump Configuration and Control (server): max flow */  \
-  { 0x0011, ZAP_TYPE(ENUM8), 1, 0, { (uint8_t *) 0 } }, /* Pump Configuration and Control (server): effective operation mode */  \
-  { 0x0012, ZAP_TYPE(ENUM8), 1, 0, { (uint8_t *) 0 } }, /* Pump Configuration and Control (server): effective control mode */  \
-  { 0x0013, ZAP_TYPE(INT16S), 2, 0, { (uint8_t *) 0 } }, /* Pump Configuration and Control (server): capacity */  \
-  { 0x0020, ZAP_TYPE(ENUM8), 1, ZAP_ATTRIBUTE_MASK(WRITABLE), { (uint8_t *) 0x00 } }, /* Pump Configuration and Control (server): operation mode */  \
-}
-
+#define GENERATED_ATTRIBUTES                                                                                                       \
+    {                                                                                                                              \
+        { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), { (uint8_t *) 2 } }, /* Identify (client): cluster revision */  \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 2 } },                      /* Identify (server): cluster revision */  \
+            {                                                                                                                      \
+                0x0000, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(WRITABLE), { (uint8_t *) 0x0000 }                                  \
+            },                                                          /* Identify (server): identify time */                     \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 3 } },      /* Groups (server): cluster revision */                    \
+            { 0x0000, ZAP_TYPE(BITMAP8), 1, 0, { (uint8_t *) 0 } },     /* Groups (server): name support */                        \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 3 } },      /* Scenes (server): cluster revision */                    \
+            { 0x0000, ZAP_TYPE(INT8U), 1, 0, { (uint8_t *) 0x00 } },    /* Scenes (server): scene count */                         \
+            { 0x0001, ZAP_TYPE(INT8U), 1, 0, { (uint8_t *) 0x00 } },    /* Scenes (server): current scene */                       \
+            { 0x0002, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 0x0000 } }, /* Scenes (server): current group */                       \
+            { 0x0003, ZAP_TYPE(BOOLEAN), 1, 0, { (uint8_t *) 0x00 } },  /* Scenes (server): scene valid */                         \
+            { 0x0004, ZAP_TYPE(BITMAP8), 1, 0, { (uint8_t *) 0 } },     /* Scenes (server): name support */                        \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 2 } },      /* On/off (server): cluster revision */                    \
+            { 0x0000, ZAP_TYPE(BOOLEAN), 1, 0, { (uint8_t *) 0x00 } },  /* On/off (server): on/off */                              \
+            {                                                                                                                      \
+                0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 0x0001 }                                                             \
+            },                                                     /* Pump Configuration and Control (server): cluster revision */ \
+            { 0x0000, ZAP_TYPE(INT16S), 2, 0, { (uint8_t *) 0 } }, /* Pump Configuration and Control (server): max pressure */     \
+            { 0x0001, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 0 } }, /* Pump Configuration and Control (server): max speed */        \
+            { 0x0002, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 0 } }, /* Pump Configuration and Control (server): max flow */         \
+            {                                                                                                                      \
+                0x0011, ZAP_TYPE(ENUM8), 1, 0, { (uint8_t *) 0 }                                                                   \
+            }, /* Pump Configuration and Control (server): effective operation mode */                                             \
+            {                                                                                                                      \
+                0x0012, ZAP_TYPE(ENUM8), 1, 0, { (uint8_t *) 0 }                                                                   \
+            }, /* Pump Configuration and Control (server): effective control mode */                                               \
+            { 0x0013, ZAP_TYPE(INT16S), 2, 0, { (uint8_t *) 0 } }, /* Pump Configuration and Control (server): capacity */         \
+            {                                                                                                                      \
+                0x0020, ZAP_TYPE(ENUM8), 1, ZAP_ATTRIBUTE_MASK(WRITABLE), { (uint8_t *) 0x00 }                                     \
+            }, /* Pump Configuration and Control (server): operation mode */                                                       \
+    }
 
 // This is an array of EmberAfCluster structures.
-#define ZAP_ATTRIBUTE_INDEX(index) ((EmberAfAttributeMetadata *)(&generatedAttributes[index]))
+#define ZAP_ATTRIBUTE_INDEX(index) ((EmberAfAttributeMetadata *) (&generatedAttributes[index]))
 
 // Cluster function static arrays
-#define GENERATED_FUNCTION_ARRAYS   \
-const EmberAfGenericClusterFunction chipFuncArrayIdentifyServer[] = {\
-  (EmberAfGenericClusterFunction) emberAfIdentifyClusterServerInitCallback,\
-  (EmberAfGenericClusterFunction) emberAfIdentifyClusterServerAttributeChangedCallback,\
-};\
-const EmberAfGenericClusterFunction chipFuncArrayGroupsServer[] = {\
-  (EmberAfGenericClusterFunction) emberAfGroupsClusterServerInitCallback,\
-};\
-const EmberAfGenericClusterFunction chipFuncArrayScenesServer[] = {\
-  (EmberAfGenericClusterFunction) emberAfScenesClusterServerInitCallback,\
-};\
-const EmberAfGenericClusterFunction chipFuncArrayOnOffServer[] = {\
-  (EmberAfGenericClusterFunction) emberAfOnOffClusterServerInitCallback,\
-};\
+#define GENERATED_FUNCTION_ARRAYS                                                                                                  \
+    const EmberAfGenericClusterFunction chipFuncArrayIdentifyServer[] = {                                                          \
+        (EmberAfGenericClusterFunction) emberAfIdentifyClusterServerInitCallback,                                                  \
+        (EmberAfGenericClusterFunction) emberAfIdentifyClusterServerAttributeChangedCallback,                                      \
+    };                                                                                                                             \
+    const EmberAfGenericClusterFunction chipFuncArrayGroupsServer[] = {                                                            \
+        (EmberAfGenericClusterFunction) emberAfGroupsClusterServerInitCallback,                                                    \
+    };                                                                                                                             \
+    const EmberAfGenericClusterFunction chipFuncArrayScenesServer[] = {                                                            \
+        (EmberAfGenericClusterFunction) emberAfScenesClusterServerInitCallback,                                                    \
+    };                                                                                                                             \
+    const EmberAfGenericClusterFunction chipFuncArrayOnOffServer[] = {                                                             \
+        (EmberAfGenericClusterFunction) emberAfOnOffClusterServerInitCallback,                                                     \
+    };
 
-
-
-#define ZAP_CLUSTER_MASK(mask) CLUSTER_MASK_ ## mask
+#define ZAP_CLUSTER_MASK(mask) CLUSTER_MASK_##mask
 #define GENERATED_CLUSTER_COUNT 6
-#define GENERATED_CLUSTERS { \
-  { 0x0003, ZAP_ATTRIBUTE_INDEX(0), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL }, /* Endpoint: 1, Cluster: Identify (client) */ \
-  { 0x0003, ZAP_ATTRIBUTE_INDEX(1), 2, 4, ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(ATTRIBUTE_CHANGED_FUNCTION), chipFuncArrayIdentifyServer }, /* Endpoint: 1, Cluster: Identify (server) */ \
-  { 0x0004, ZAP_ATTRIBUTE_INDEX(3), 2, 3, ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), chipFuncArrayGroupsServer }, /* Endpoint: 1, Cluster: Groups (server) */ \
-  { 0x0005, ZAP_ATTRIBUTE_INDEX(5), 6, 8, ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), chipFuncArrayScenesServer }, /* Endpoint: 1, Cluster: Scenes (server) */ \
-  { 0x0006, ZAP_ATTRIBUTE_INDEX(11), 2, 3, ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), chipFuncArrayOnOffServer }, /* Endpoint: 1, Cluster: On/off (server) */ \
-  { 0x0200, ZAP_ATTRIBUTE_INDEX(13), 8, 13, ZAP_CLUSTER_MASK(SERVER), NULL }, /* Endpoint: 1, Cluster: Pump Configuration and Control (server) */ \
-}
+#define GENERATED_CLUSTERS                                                                                                         \
+    {                                                                                                                              \
+        { 0x0003, ZAP_ATTRIBUTE_INDEX(0), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL }, /* Endpoint: 1, Cluster: Identify (client) */    \
+            { 0x0003,                                                                                                              \
+              ZAP_ATTRIBUTE_INDEX(1),                                                                                              \
+              2,                                                                                                                   \
+              4,                                                                                                                   \
+              ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(ATTRIBUTE_CHANGED_FUNCTION),           \
+              chipFuncArrayIdentifyServer }, /* Endpoint: 1, Cluster: Identify (server) */                                         \
+            { 0x0004,                                                                                                              \
+              ZAP_ATTRIBUTE_INDEX(3),                                                                                              \
+              2,                                                                                                                   \
+              3,                                                                                                                   \
+              ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
+              chipFuncArrayGroupsServer }, /* Endpoint: 1, Cluster: Groups (server) */                                             \
+            { 0x0005,                                                                                                              \
+              ZAP_ATTRIBUTE_INDEX(5),                                                                                              \
+              6,                                                                                                                   \
+              8,                                                                                                                   \
+              ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
+              chipFuncArrayScenesServer }, /* Endpoint: 1, Cluster: Scenes (server) */                                             \
+            { 0x0006,                                                                                                              \
+              ZAP_ATTRIBUTE_INDEX(11),                                                                                             \
+              2,                                                                                                                   \
+              3,                                                                                                                   \
+              ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
+              chipFuncArrayOnOffServer }, /* Endpoint: 1, Cluster: On/off (server) */                                              \
+            {                                                                                                                      \
+                0x0200, ZAP_ATTRIBUTE_INDEX(13), 8, 13, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
+            }, /* Endpoint: 1, Cluster: Pump Configuration and Control (server) */                                                 \
+    }
 
-
-#define ZAP_CLUSTER_INDEX(index) ((EmberAfCluster*)(&generatedClusters[index]))
-
+#define ZAP_CLUSTER_INDEX(index) ((EmberAfCluster *) (&generatedClusters[index]))
 
 // This is an array of EmberAfEndpointType structures.
-#define GENERATED_ENDPOINT_TYPES { \
-  { ZAP_CLUSTER_INDEX(0), 6, 33 }, \
-}
-
-
+#define GENERATED_ENDPOINT_TYPES                                                                                                   \
+    {                                                                                                                              \
+        { ZAP_CLUSTER_INDEX(0), 6, 33 },                                                                                           \
+    }
 
 // Largest attribute size is needed for various buffers
 #define ATTRIBUTE_LARGEST (2)
@@ -133,98 +174,122 @@ const EmberAfGenericClusterFunction chipFuncArrayOnOffServer[] = {\
 
 // Array of endpoints that are supported, the data inside
 // the array is the endpoint number.
-#define FIXED_ENDPOINT_ARRAY { 0x0001 }
+#define FIXED_ENDPOINT_ARRAY                                                                                                       \
+    {                                                                                                                              \
+        0x0001                                                                                                                     \
+    }
 
 // Array of profile ids
-#define FIXED_PROFILE_IDS { 0x0104 }
+#define FIXED_PROFILE_IDS                                                                                                          \
+    {                                                                                                                              \
+        0x0104                                                                                                                     \
+    }
 
 // Array of device ids
-#define FIXED_DEVICE_IDS { 0 }
+#define FIXED_DEVICE_IDS                                                                                                           \
+    {                                                                                                                              \
+        0                                                                                                                          \
+    }
 
 // Array of device versions
-#define FIXED_DEVICE_VERSIONS { 1 }
+#define FIXED_DEVICE_VERSIONS                                                                                                      \
+    {                                                                                                                              \
+        1                                                                                                                          \
+    }
 
 // Array of endpoint types supported on each endpoint
-#define FIXED_ENDPOINT_TYPES { 0 }
+#define FIXED_ENDPOINT_TYPES                                                                                                       \
+    {                                                                                                                              \
+        0                                                                                                                          \
+    }
 
 // Array of networks supported on each endpoint
-#define FIXED_NETWORKS { 0 }
-
+#define FIXED_NETWORKS                                                                                                             \
+    {                                                                                                                              \
+        0                                                                                                                          \
+    }
 
 // Array of EmberAfCommandMetadata structs.
-#define ZAP_COMMAND_MASK(mask) COMMAND_MASK_ ## mask
+#define ZAP_COMMAND_MASK(mask) COMMAND_MASK_##mask
 #define EMBER_AF_GENERATED_COMMAND_COUNT (32)
-#define GENERATED_COMMANDS { \
-  { 0x0003, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Identify (client): Identify */ \
-  { 0x0003, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Identify (client): IdentifyQueryResponse */ \
-  { 0x0003, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Identify (server): Identify */ \
-  { 0x0003, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Identify (server): IdentifyQueryResponse */ \
-  { 0x0003, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Identify (client): IdentifyQuery */ \
-  { 0x0003, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Identify (server): IdentifyQuery */ \
-  { 0x0004, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Groups (server): AddGroup */ \
-  { 0x0004, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Groups (server): AddGroupResponse */ \
-  { 0x0004, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Groups (server): ViewGroup */ \
-  { 0x0004, 0x01, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Groups (server): ViewGroupResponse */ \
-  { 0x0004, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Groups (server): GetGroupMembership */ \
-  { 0x0004, 0x02, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Groups (server): GetGroupMembershipResponse */ \
-  { 0x0004, 0x03, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Groups (server): RemoveGroup */ \
-  { 0x0004, 0x03, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Groups (server): RemoveGroupResponse */ \
-  { 0x0004, 0x04, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Groups (server): RemoveAllGroups */ \
-  { 0x0004, 0x05, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Groups (server): AddGroupIfIdentifying */ \
-  { 0x0005, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Scenes (server): AddScene */ \
-  { 0x0005, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Scenes (server): AddSceneResponse */ \
-  { 0x0005, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Scenes (server): ViewScene */ \
-  { 0x0005, 0x01, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Scenes (server): ViewSceneResponse */ \
-  { 0x0005, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Scenes (server): RemoveScene */ \
-  { 0x0005, 0x02, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Scenes (server): RemoveSceneResponse */ \
-  { 0x0005, 0x03, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Scenes (server): RemoveAllScenes */ \
-  { 0x0005, 0x03, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Scenes (server): RemoveAllScenesResponse */ \
-  { 0x0005, 0x04, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Scenes (server): StoreScene */ \
-  { 0x0005, 0x04, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Scenes (server): StoreSceneResponse */ \
-  { 0x0005, 0x05, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Scenes (server): RecallScene */ \
-  { 0x0005, 0x06, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Scenes (server): GetSceneMembership */ \
-  { 0x0005, 0x06, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Scenes (server): GetSceneMembershipResponse */ \
-  { 0x0006, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* On/off (server): Off */ \
-  { 0x0006, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* On/off (server): On */ \
-  { 0x0006, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* On/off (server): Toggle */ \
-}
-
+#define GENERATED_COMMANDS                                                                                                         \
+    {                                                                                                                              \
+        { 0x0003, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) },     /* Identify (client): Identify */                                 \
+            { 0x0003, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Identify (client): IdentifyQueryResponse */                    \
+            { 0x0003, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Identify (server): Identify */                                 \
+            { 0x0003, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Identify (server): IdentifyQueryResponse */                    \
+            { 0x0003, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Identify (client): IdentifyQuery */                            \
+            { 0x0003, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Identify (server): IdentifyQuery */                            \
+            { 0x0004, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Groups (server): AddGroup */                                   \
+            { 0x0004, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Groups (server): AddGroupResponse */                           \
+            { 0x0004, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Groups (server): ViewGroup */                                  \
+            { 0x0004, 0x01, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Groups (server): ViewGroupResponse */                          \
+            { 0x0004, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Groups (server): GetGroupMembership */                         \
+            { 0x0004, 0x02, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Groups (server): GetGroupMembershipResponse */                 \
+            { 0x0004, 0x03, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Groups (server): RemoveGroup */                                \
+            { 0x0004, 0x03, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Groups (server): RemoveGroupResponse */                        \
+            { 0x0004, 0x04, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Groups (server): RemoveAllGroups */                            \
+            { 0x0004, 0x05, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Groups (server): AddGroupIfIdentifying */                      \
+            { 0x0005, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Scenes (server): AddScene */                                   \
+            { 0x0005, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Scenes (server): AddSceneResponse */                           \
+            { 0x0005, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Scenes (server): ViewScene */                                  \
+            { 0x0005, 0x01, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Scenes (server): ViewSceneResponse */                          \
+            { 0x0005, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Scenes (server): RemoveScene */                                \
+            { 0x0005, 0x02, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Scenes (server): RemoveSceneResponse */                        \
+            { 0x0005, 0x03, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Scenes (server): RemoveAllScenes */                            \
+            { 0x0005, 0x03, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Scenes (server): RemoveAllScenesResponse */                    \
+            { 0x0005, 0x04, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Scenes (server): StoreScene */                                 \
+            { 0x0005, 0x04, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Scenes (server): StoreSceneResponse */                         \
+            { 0x0005, 0x05, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Scenes (server): RecallScene */                                \
+            { 0x0005, 0x06, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Scenes (server): GetSceneMembership */                         \
+            { 0x0005, 0x06, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Scenes (server): GetSceneMembershipResponse */                 \
+            { 0x0006, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* On/off (server): Off */                                        \
+            { 0x0006, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* On/off (server): On */                                         \
+            { 0x0006, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* On/off (server): Toggle */                                     \
+    }
 
 // Array of EmberAfManufacturerCodeEntry structures for commands.
 #define GENERATED_COMMAND_MANUFACTURER_CODE_COUNT (0)
-#define GENERATED_COMMAND_MANUFACTURER_CODES { \
-  { 0x00, 0x00 } \
-}
-
+#define GENERATED_COMMAND_MANUFACTURER_CODES                                                                                       \
+    {                                                                                                                              \
+        {                                                                                                                          \
+            0x00, 0x00                                                                                                             \
+        }                                                                                                                          \
+    }
 
 // This is an array of EmberAfManufacturerCodeEntry structures for clusters.
 #define GENERATED_CLUSTER_MANUFACTURER_CODE_COUNT (0)
-#define GENERATED_CLUSTER_MANUFACTURER_CODES { \
-  { 0x00, 0x00 } \
-}
-
+#define GENERATED_CLUSTER_MANUFACTURER_CODES                                                                                       \
+    {                                                                                                                              \
+        {                                                                                                                          \
+            0x00, 0x00                                                                                                             \
+        }                                                                                                                          \
+    }
 
 // This is an array of EmberAfManufacturerCodeEntry structures for attributes.
 #define GENERATED_ATTRIBUTE_MANUFACTURER_CODE_COUNT (0)
-#define GENERATED_ATTRIBUTE_MANUFACTURER_CODES { \
-  { 0x00, 0x00 } \
-}
-
+#define GENERATED_ATTRIBUTE_MANUFACTURER_CODES                                                                                     \
+    {                                                                                                                              \
+        {                                                                                                                          \
+            0x00, 0x00                                                                                                             \
+        }                                                                                                                          \
+    }
 
 // Array of EmberAfPluginReportingEntry structures.
-#define ZRD(x) EMBER_ZCL_REPORTING_DIRECTION_ ## x
+#define ZRD(x) EMBER_ZCL_REPORTING_DIRECTION_##x
 #define ZAP_REPORT_DIRECTION(x) ZRD(x)
 
-// Use this macro to check if Reporting plugin is included
-#define EMBER_AF_PLUGIN_REPORTING
 // User options for plugin Reporting
 #define EMBER_AF_PLUGIN_REPORTING_TABLE_SIZE (2)
 #define EMBER_AF_PLUGIN_REPORTING_ENABLE_GROUP_BOUND_REPORTS
 
 #define EMBER_AF_GENERATED_REPORTING_CONFIG_DEFAULTS_TABLE_SIZE (2)
-#define EMBER_AF_GENERATED_REPORTING_CONFIG_DEFAULTS { \
-  { ZAP_REPORT_DIRECTION(REPORTED), 0x0001, 0x0006, 0x0000, ZAP_CLUSTER_MASK(SERVER), 0x0000, {{ 0, 65344, 0 }} }, /* Reporting for cluster: "On/off", attribute: "on/off". side: server */ \
-  { ZAP_REPORT_DIRECTION(REPORTED), 0x0001, 0x0200, 0x0013, ZAP_CLUSTER_MASK(SERVER), 0x0000, {{ 0, 65344, 0 }} }, /* Reporting for cluster: "Pump Configuration and Control", attribute: "capacity". side: server */ \
-}
-
-
+#define EMBER_AF_GENERATED_REPORTING_CONFIG_DEFAULTS                                                                               \
+    {                                                                                                                              \
+        {                                                                                                                          \
+            ZAP_REPORT_DIRECTION(REPORTED), 0x0001, 0x0006, 0x0000, ZAP_CLUSTER_MASK(SERVER), 0x0000, { { 0, 65344, 0 } }          \
+        }, /* Reporting for cluster: "On/off", attribute: "on/off". side: server */                                                \
+            {                                                                                                                      \
+                ZAP_REPORT_DIRECTION(REPORTED), 0x0001, 0x0200, 0x0013, ZAP_CLUSTER_MASK(SERVER), 0x0000, { { 0, 65344, 0 } }      \
+            }, /* Reporting for cluster: "Pump Configuration and Control", attribute: "capacity". side: server */                  \
+    }
