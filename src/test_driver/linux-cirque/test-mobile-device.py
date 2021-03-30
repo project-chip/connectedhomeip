@@ -93,7 +93,7 @@ class TestPythonController(CHIPVirtualHome):
 
         req_device_id = req_ids[0]
 
-        command = "catchsegv python3 /usr/bin/mobile-device-test.py -t 75 -a {}".format(ethernet_ip)
+        command = "gdb -return-child-result -q -ex run -ex bt --args python3 /usr/bin/mobile-device-test.py -t 75 -a {}".format(ethernet_ip)
         ret = self.execute_device_cmd(req_device_id, command)
 
         self.assertEqual(ret['return_code'], '0',
