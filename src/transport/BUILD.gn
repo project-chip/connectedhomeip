@@ -22,8 +22,11 @@ static_library("transport") {
   sources = [
     "AdminPairingTable.cpp",
     "AdminPairingTable.h",
+    "MessageCounter.cpp",
+    "MessageCounter.h",
     "PeerConnectionState.h",
     "PeerConnections.h",
+    "PeerMessageCounter.h",
     "RendezvousSessionDelegate.h",
     "SecureMessageCodec.cpp",
     "SecureMessageCodec.h",
