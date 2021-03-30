@@ -39,25 +39,31 @@ struct BSDSocket : public FileHandle
     BSDSocket(){};
     ~BSDSocket(){};
 
-    int open(int type)
+    int open(int type, InternetSocket * socket = nullptr)
     {
-        InternetSocket * socket;
-        switch (type)
+        if (socket != nullptr)
         {
-        case MBED_TCP_SOCKET: {
-            socket = new (&tcpSocket) TCPSocket();
+            _socket = socket;
         }
-        break;
-        case MBED_UDP_SOCKET: {
-            socket = new (&udpSocket) UDPSocket();
+        else
+        {
+            switch (type)
+            {
+            case MBED_TCP_SOCKET: {
+                _socket = new TCPSocket();
+            }
+            break;
+            case MBED_UDP_SOCKET: {
+                _socket = new UDPSocket();
+            }
+            break;
+            default:
+                set_errno(ESOCKTNOSUPPORT);
+                return -1;
+            };
         }
-        break;
-        default:
-            set_errno(ESOCKTNOSUPPORT);
-            return -1;
-        };
 
-        if (socket->open(NetworkInterface::get_default_instance()) != NSAPI_ERROR_OK)
+        if (_socket->open(NetworkInterface::get_default_instance()) != NSAPI_ERROR_OK)
         {
             close();
             set_errno(ENOBUFS);
@@ -67,7 +73,7 @@ struct BSDSocket : public FileHandle
         _type = type;
 
         _flags.store(0);
-        socket->sigio([&]() {
+        _socket->sigio([&]() {
             auto current = _flags.load();
             if (current & POLLOUT)
             {
@@ -85,7 +91,7 @@ struct BSDSocket : public FileHandle
             }
         });
 
-        socket->set_blocking(false);
+        _socket->set_blocking(true);
 
         _fd = bind_to_fd(this);
         if (_fd < 0)
@@ -100,15 +106,7 @@ struct BSDSocket : public FileHandle
 
     int close() override
     {
-        switch (_type)
-        {
-        case MBED_TCP_SOCKET:
-            tcpSocket.~TCPSocket();
-            break;
-        case MBED_UDP_SOCKET:
-            udpSocket.~UDPSocket();
-            break;
-        }
+        delete _socket;
 
         _fd       = -1;
         _callback = nullptr;
@@ -154,16 +152,7 @@ struct BSDSocket : public FileHandle
     int set_blocking(bool blocking) override
     {
         _blocking = blocking;
-        switch (_type)
-        {
-        case MBED_TCP_SOCKET: {
-            tcpSocket.set_blocking(_blocking);
-        }
-        break;
-        case MBED_UDP_SOCKET: {
-            udpSocket.set_blocking(_blocking);
-        }
-        }
+        _socket->set_blocking(_blocking);
         return 0;
     }
 
@@ -203,39 +192,21 @@ struct BSDSocket : public FileHandle
 
     bool isSocketOpen() { return _fd >= 0; }
 
-    Socket * getNetSocket()
-    {
-        Socket * ret = nullptr;
-        switch (_type)
-        {
-        case MBED_TCP_SOCKET:
-            ret = &tcpSocket;
-            break;
-        case MBED_UDP_SOCKET:
-            ret = &udpSocket;
-            break;
-        }
-        return ret;
-    }
+    InternetSocket * getNetSocket() { return _socket; }
 
     int getSocketType() { return _type; }
 
     SocketAddress socketName;
 
 private:
-    union
-    {
-
-        TCPSocket tcpSocket;
-        UDPSocket udpSocket;
-    };
+    InternetSocket * _socket;
     int _fd = -1;
     int _type;
     Callback<void()> _callback = nullptr;
     // FIXME
     // mstd::atomic<counter_type> _flags = { 0 };
     std::atomic<flags_type> _flags = { 0 };
-    bool _blocking                 = false;
+    bool _blocking                 = true;
     bool _inputEnable              = true;
     bool _outputEnable             = true;
 };

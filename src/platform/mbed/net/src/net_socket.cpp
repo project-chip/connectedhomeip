@@ -188,7 +188,8 @@ int mbed_connect(int fd, const struct sockaddr * addr, socklen_t addrlen)
 
     socket->write(NULL, 0);
 
-    if (!socket->is_blocking())
+    // FIXME - change to !socket->is_blocking() after fix fcntl() from mbed_retarget
+    if (socket->is_blocking())
     {
         set_errno(EINPROGRESS);
         return -1;
