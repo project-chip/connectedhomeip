@@ -68,10 +68,7 @@ source_set("tv-common") {
 
   deps = [ "${chip_root}/src/lib" ]
 
-
-  public_deps = [
-    "${chip_root}/third_party/inipp",
-  ]
+  public_deps = [ "${chip_root}/third_party/inipp" ]
 
   public_configs = [ ":includes" ]
 }

@@ -29,11 +29,11 @@ config("includes") {
 }
 
 executable("chip-tv-app") {
-  sources = [ 
-    "main.cpp",
+  sources = [
     "include/application-basic/ApplicationBasicManager.cpp",
     "include/application-basic/ApplicationBasicManager.h",
-    "include/endpoint-configuration/EndpointConfiguration.h"
+    "include/endpoint-configuration/EndpointConfiguration.h",
+    "main.cpp",
   ]
 
   public_configs = [ ":includes" ]
