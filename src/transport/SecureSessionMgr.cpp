@@ -31,6 +31,7 @@
 
 #include <core/CHIPKeyIds.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <protocols/secure_channel/Constants.h>
 #include <support/CodeUtils.h>
 #include <support/SafeInt.h>
 #include <support/logging/CHIPLogging.h>
@@ -169,6 +170,12 @@ CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHea
     admin = mAdmins->FindAdmin(state->GetAdminId());
     VerifyOrExit(admin != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     localNodeId = admin->GetNodeId();
+
+    if (payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::MsgCounterSyncReq) ||
+        payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::MsgCounterSyncRsp))
+    {
+        packetHeader.SetSecureSessionControlMsg(true);
+    }
 
     if (encryptionState == EncryptionState::kPayloadIsUnencrypted)
     {
