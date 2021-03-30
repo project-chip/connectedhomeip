@@ -98,6 +98,7 @@ efr32_executable("lighting_app") {
     "${examples_plat_dir}/LEDWidget.cpp",
     "${examples_plat_dir}/Service.cpp",
     "${examples_plat_dir}/init_efrPlatform.cpp",
+    "${examples_plat_dir}/uart.c",
     "src/AppTask.cpp",
     "src/ButtonHandler.cpp",
     "src/LightingManager.cpp",
@@ -131,7 +132,6 @@ efr32_executable("lighting_app") {
       "${chip_root}/examples/common/pigweed/RpcService.cpp",
       "${chip_root}/examples/common/pigweed/efr32/PigweedLoggerMutex.cpp",
       "${examples_plat_dir}/PigweedLogger.cpp",
-      "${examples_plat_dir}/uart.c",
       "src/Rpc.cpp",
     ]
   }

@@ -285,7 +285,7 @@ combination with JLinkRTTClient as follows:
     the example by UART using the RPC LightingService. Call the following
     command in your terminal
 
-    `python -m pw_hdlc.rpc_console --device /dev/tty.<SERIALDEVICE> -b 115200 /<CHIP_ROOT>/examples/lighting-app/lighting-common/pigweed_lighting.proto -o /<YourFolder>/pw_log.out`
+    `python -m pw_hdlc.rpc_console --device /dev/tty.<SERIALDEVICE> -b 115200 /<CHIP_ROOT>/examples/lighting-app/lighting-common/lighting_service/pigweed_lighting.proto -o /<YourFolder>/pw_log.out`
 
 -   Then you can simulate a button press or realease using the following command
     where : idx = 0 or 1 for Button PB0 or PB1 action = 0 for PRESSED, 1 for
