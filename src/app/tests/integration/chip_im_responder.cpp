@@ -122,7 +122,7 @@ int main(int argc, char * argv[])
     err = gSessionManager.Init(chip::kTestDeviceNodeId, &chip::DeviceLayer::SystemLayer, &gTransportManager, &admins);
     SuccessOrExit(err);
 
-    err = gExchangeManager.Init(chip::kTestDeviceNodeId, &gTransportManager, &gSessionManager);
+    err = gExchangeManager.Init(&gSessionManager);
     SuccessOrExit(err);
 
     err = chip::app::InteractionModelEngine::GetInstance()->Init(&gExchangeManager, nullptr);

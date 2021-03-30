@@ -423,10 +423,13 @@ void AppTask::ThreadProvisioningHandler(const ChipDeviceEvent * event, intptr_t 
     ARG_UNUSED(arg);
     if ((event->Type == DeviceEventType::kServiceProvisioningChange) && ConnectivityMgr().IsThreadProvisioned())
     {
-        const int result = sNFC.StopTagEmulation();
-        if (result)
+        if (sNFC.IsTagEmulationStarted())
         {
-            LOG_ERR("Stopping NFC Tag emulation failed");
+            const int result = sNFC.StopTagEmulation();
+            if (result)
+            {
+                LOG_ERR("Stopping NFC Tag emulation failed");
+            }
         }
     }
 }

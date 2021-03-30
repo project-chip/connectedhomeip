@@ -39,36 +39,35 @@ KeyValueStoreManagerImpl KeyValueStoreManagerImpl::sInstance;
 CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t value_size, size_t * read_bytes_size,
                                           size_t offset_bytes)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     size_t read_size;
-    size_t copy_size;
+
+    // Copy data into value buffer
+    VerifyOrReturnError(value != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     // On linux read first without a buffer which returns the size, and then
     // use a local buffer to read the entire object, which allows partial and
     // offset reads.
-    err = mStorage.ReadValueBin(key, nullptr, 0, read_size);
-    uint8_t buf[read_size];
+    CHIP_ERROR err = mStorage.ReadValueBin(key, nullptr, 0, read_size);
     if (err == CHIP_ERROR_KEY_NOT_FOUND)
     {
-        ExitNow(err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+        return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
     }
-    err = mStorage.ReadValueBin(key, buf, read_size, read_size);
-    SuccessOrExit(err);
-
-    // Copy data into value buffer
-    if (!value)
+    else if (err != CHIP_NO_ERROR)
     {
-        ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
+        return err;
     }
-    copy_size = std::min(value_size, read_size - offset_bytes);
-    if (read_bytes_size)
+
+    uint8_t buf[read_size];
+    ReturnErrorOnFailure(mStorage.ReadValueBin(key, buf, read_size, read_size));
+
+    size_t copy_size = std::min(value_size, read_size - offset_bytes);
+    if (read_bytes_size != nullptr)
     {
         *read_bytes_size = copy_size;
     }
     ::memcpy(value, buf + offset_bytes, copy_size);
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, size_t value_size)

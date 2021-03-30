@@ -37,16 +37,6 @@ public:
 
     /**
      * @brief
-     *   Called when a value is returned from the storage.
-     *   This is useful for AsyncGetKeyValue() API call.
-     *
-     * @param[in] key Key for which the value is being returned
-     * @param[in] value Value or nullptr if not found.
-     */
-    virtual void OnPersistentStorageValue(const char * key, const char * value) = 0;
-
-    /**
-     * @brief
      *   Called on completion of an operation in PersistentStorageDelegate API
      *
      * @param[in] key Key for which the status is being returned
@@ -69,14 +59,6 @@ public:
      * @param[in] delegate The callback object
      */
     virtual void SetStorageDelegate(PersistentStorageResultDelegate * delegate) = 0;
-
-    /**
-     * @brief
-     *   Lookup the key and call delegate object with it's stringified value
-     *
-     * @param[in] key Key to lookup
-     */
-    virtual void AsyncGetKeyValue(const char * key) = 0;
 
     /**
      * @brief
@@ -103,6 +85,8 @@ public:
      * @return CHIP_ERROR_KEY_NOT_FOUND there is no value for the given key.
      * @return CHIP_ERROR_NO_MEMORY if the input buffer is not big enough for
      *                              the value.
+     * @return CHIP_ERROR_BUFFER_TOO_SMALL if the value's size is too large to
+     *                                     be expressed as a uint16_t.
      */
     virtual CHIP_ERROR SyncGetKeyValue(const char * key, char * value, uint16_t & size) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 

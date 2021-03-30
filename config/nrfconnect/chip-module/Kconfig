@@ -89,15 +89,9 @@ config CHIP_NFC_COMMISSIONING
 	help
 	  Enables NFC commissioning by sharing onboarding payload in NFC tag.
 
-config CHIP_ENABLE_RENDEZVOUS_BYPASS
-	bool "Enable Rendezvous bypass"
-	default n
-	help
-	  Enables bypassing rendezvous for the test purposes.
-
 config CHIP_ENABLE_DNSSD_SRP
 	bool "Enable support for service registration"
-	default n
+	default y
 	imply OPENTHREAD_ECDSA
 	imply OPENTHREAD_SRP_CLIENT
 	help

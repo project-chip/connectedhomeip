@@ -26,7 +26,12 @@ static_library("mdns") {
     "${chip_root}/src/lib/support",
   ]
 
-  sources = [ "Advertiser.h" ]
+  sources = [
+    "Advertiser.h",
+    "Resolver.h",
+    "ServiceNaming.cpp",
+    "ServiceNaming.h",
+  ]
 
   if (chip_mdns == "none") {
     sources += [

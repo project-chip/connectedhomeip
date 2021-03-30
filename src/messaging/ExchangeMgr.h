@@ -71,7 +71,7 @@ public:
      *  @retval #CHIP_NO_ERROR On success.
      *
      */
-    CHIP_ERROR Init(NodeId localNodeId, TransportMgrBase * transportMgr, SecureSessionMgr * sessionMgr);
+    CHIP_ERROR Init(SecureSessionMgr * sessionMgr);
 
     /**
      *  Shutdown the ExchangeManager. This terminates this instance
@@ -210,7 +210,6 @@ public:
     void IncrementContextsInUse();
     void DecrementContextsInUse();
 
-    TransportMgrBase * GetTransportManager() const { return mTransportMgr; }
     SecureSessionMgr * GetSessionMgr() const { return mSessionMgr; }
 
     ReliableMessageMgr * GetReliableMessageMgr() { return &mReliableMessageMgr; };
@@ -218,7 +217,6 @@ public:
     MessageCounterSyncMgr * GetMessageCounterSyncMgr() { return &mMessageCounterSyncMgr; };
     Transport::AdminId GetAdminId() { return mAdminId; }
 
-    NodeId GetLocalNodeId() { return mLocalNodeId; }
     uint16_t GetNextKeyId() { return ++mNextKeyId; }
     size_t GetContextsInUse() const { return mContextsInUse; }
 
@@ -232,16 +230,27 @@ private:
     struct UnsolicitedMessageHandler
     {
         UnsolicitedMessageHandler() : ProtocolId(Protocols::NotSpecified) {}
+
+        constexpr void Reset() { Delegate = nullptr; }
+        constexpr bool IsInUse() const { return Delegate != nullptr; }
+        // Matches() only returns a sensible value if IsInUse() is true.
+        constexpr bool Matches(Protocols::Id aProtocolId, int16_t aMessageType) const
+        {
+            return ProtocolId == aProtocolId && MessageType == aMessageType;
+        }
+
         ExchangeDelegate * Delegate;
         Protocols::Id ProtocolId;
+        // Message types are normally 8-bit unsigned ints, but we use
+        // kAnyMessageType, which is negative, to represent a wildcard handler,
+        // so need a type that can store both that and all valid message type
+        // values.
         int16_t MessageType;
     };
 
-    NodeId mLocalNodeId; // < Id of the current node
     uint16_t mNextExchangeId;
     uint16_t mNextKeyId;
     State mState;
-    TransportMgrBase * mTransportMgr;
     SecureSessionMgr * mSessionMgr;
     ReliableMessageMgr mReliableMessageMgr;
     MessageCounterSyncMgr mMessageCounterSyncMgr;

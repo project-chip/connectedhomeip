@@ -325,27 +325,14 @@ public:
     constexpr PayloadHeader() { SetProtocol(Protocols::NotSpecified); }
     PayloadHeader & operator=(const PayloadHeader &) = default;
 
-    /**
-     * Gets the vendor id in the current message.
-     *
-     * NOTE: the vendor id is optional and may be missing.
-     */
-    const Optional<uint16_t> & GetVendorId() const { return mVendorId; }
-
     /** Get the Session ID from this header. */
     uint16_t GetExchangeID() const { return mExchangeID; }
 
     /** Get the Protocol ID from this header. */
-    // TODO: We should probably get rid of GetProtocolId and the
-    // current form of the mVendorId accessors.
-    uint16_t GetProtocolID() const { return mProtocolID; }
+    Protocols::Id GetProtocolID() const { return mProtocolID; }
 
     /** Check whether the header has a given protocol */
-    bool HasProtocol(Protocols::Id protocol) const
-    {
-        static_assert(std::is_same<std::underlying_type_t<VendorId>, uint16_t>::value, "Wrong type for VendorId");
-        return mProtocolID == protocol.GetProtocolId() && mVendorId.ValueOr(VendorId::Common) == protocol.GetVendorId();
-    }
+    bool HasProtocol(Protocols::Id protocol) const { return mProtocolID == protocol; }
 
     /** Get the secure msg type from this header. */
     uint8_t GetMessageType() const { return mMessageType; }
@@ -365,33 +352,6 @@ public:
      * NOTE: the Acknowledged Message Counter is optional and may be missing.
      */
     const Optional<uint32_t> & GetAckId() const { return mAckId; }
-
-    /** Set the vendor id for this header. */
-    PayloadHeader & SetVendorId(uint16_t id)
-    {
-        mVendorId.SetValue(id);
-        mExchangeFlags.Set(Header::ExFlagValues::kExchangeFlag_VendorIdPresent);
-
-        return *this;
-    }
-
-    /** Set the vendor id for this header. */
-    constexpr PayloadHeader & SetVendorId(Optional<uint16_t> id)
-    {
-        mVendorId = id;
-        mExchangeFlags.Set(Header::ExFlagValues::kExchangeFlag_VendorIdPresent, id.HasValue());
-
-        return *this;
-    }
-
-    /** Clear the vendor id for this header. */
-    constexpr PayloadHeader & ClearVendorId()
-    {
-        mVendorId.ClearValue();
-        mExchangeFlags.Clear(Header::ExFlagValues::kExchangeFlag_VendorIdPresent);
-
-        return *this;
-    }
 
     /**
      * Set the message type for this header.  This requires setting the protocol
@@ -562,16 +522,11 @@ public:
 private:
     constexpr void SetProtocol(Protocols::Id protocol)
     {
-        if (protocol.GetVendorId() == VendorId::Common)
-        {
-            ClearVendorId();
-        }
-        else
-        {
-            SetVendorId(protocol.GetVendorId());
-        }
-        mProtocolID = protocol.GetProtocolId();
+        mExchangeFlags.Set(Header::ExFlagValues::kExchangeFlag_VendorIdPresent, protocol.GetVendorId() != VendorId::Common);
+        mProtocolID = protocol;
     }
+
+    constexpr bool HaveVendorId() const { return mExchangeFlags.Has(Header::ExFlagValues::kExchangeFlag_VendorIdPresent); }
 
     /// Packet type (application data, security control packets, e.g. pairing,
     /// configuration, rekey etc)
@@ -580,11 +535,8 @@ private:
     /// Security session identifier
     uint16_t mExchangeID = 0;
 
-    /// Vendor identifier
-    Optional<uint16_t> mVendorId;
-
     /// Protocol identifier
-    uint16_t mProtocolID = 0xFFFF;
+    Protocols::Id mProtocolID = Protocols::NotSpecified;
 
     /// Bit flag indicators for CHIP Exchange header
     Header::ExFlags mExchangeFlags;

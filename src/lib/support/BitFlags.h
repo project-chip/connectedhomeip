@@ -132,7 +132,7 @@ public:
      * @param flag      Flag(s) to test.
      * @returns         True if any flag in @a flag is set, otherwise false.
      */
-    bool Has(FlagsEnum flag) const { return (mValue & static_cast<IntegerType>(flag)) != 0; }
+    constexpr bool Has(FlagsEnum flag) const { return (mValue & static_cast<IntegerType>(flag)) != 0; }
 
     /**
      * Check that no flags outside the arguments are set.
