@@ -32,8 +32,9 @@
 
 #include "Server.h"
 
-#include <cassert>
-#include <iostream>
+#include <support/ErrorStr.h>
+
+#include "include/application-basic/ApplicationBasicManager.h"
 
 using namespace chip;
 using namespace chip::Inet;
@@ -59,6 +60,8 @@ int main(int argc, char * argv[])
 
     err = chip::DeviceLayer::PlatformMgr().InitChipStack();
     SuccessOrExit(err);
+
+    ApplicationBasicManager().Init();
 
     // Init ZCL Data Model and CHIP App Server
     InitServer();
