@@ -31,8 +31,8 @@ extern "C" {
 
 #include "sl_bt_api.h"
 
-#define BLE_STACK_TASK_NAME     "BLE_STACK"
-#define BLE_LINK_TASK_NAME      "BLE_LINK"
+#define BLE_STACK_TASK_NAME "BLE_STACK"
+#define BLE_LINK_TASK_NAME "BLE_LINK"
 
 // Bluetooth event flag group
 extern EventGroupHandle_t bluetooth_event_flags;
