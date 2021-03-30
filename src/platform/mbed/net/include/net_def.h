@@ -2,7 +2,9 @@
 #define MBED_NET_NET_DEF_H
 
 #include <byteorder.h>
+#include <errno.h>
 #include <netsocket/nsapi_types.h>
+#include <platform/mbed_retarget.h>
 
 #ifdef __cplusplus
 extern "C" {

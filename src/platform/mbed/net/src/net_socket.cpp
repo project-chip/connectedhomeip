@@ -2,10 +2,10 @@
 #include "EventFileHandle.h"
 #include "FdControlBlock.h"
 #include "OpenFileHandleAsFileDescriptor.h"
-#include "common.h"
-#include <mbed_retarget.h>
 #include <net_socket.h>
 #include <rtos/EventFlags.h>
+
+#include "common.h"
 
 using namespace mbed;
 using namespace rtos;
@@ -186,11 +186,11 @@ int mbed_connect(int fd, const struct sockaddr * addr, socklen_t addrlen)
         return -1;
     }
 
-    ::write(fd, NULL, 0);
+    socket->write(NULL, 0);
 
     if (!socket->is_blocking())
     {
-        set_errno(119);
+        set_errno(EINPROGRESS);
         return -1;
     }
 

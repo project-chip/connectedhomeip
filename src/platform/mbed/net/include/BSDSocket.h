@@ -25,8 +25,6 @@
 #include "OpenFileHandleAsFileDescriptor.h"
 #include "common.h"
 #include <atomic>
-#include <platform/FileHandle.h>
-#include <sys/socket.h>
 
 namespace mbed {
 

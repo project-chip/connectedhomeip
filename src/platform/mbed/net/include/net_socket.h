@@ -1,13 +1,7 @@
 #ifndef MBED_NET_NET_SOCKET_H
 #define MBED_NET_NET_SOCKET_H
 
-#include <netsocket/TCPSocket.h>
-#include <netsocket/UDPSocket.h>
-
-#include <atomic>
-#include <platform/FileHandle.h>
 #include <sys/eventfd.h>
-#include <sys/select.h>
 #include <sys/socket.h>
 
 #ifdef __cplusplus

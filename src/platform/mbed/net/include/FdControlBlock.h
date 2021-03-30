@@ -19,10 +19,8 @@
 #define MBED_NET_FD_CONTROL_BLOCK_H
 
 #include "platform/FileHandle.h"
-#include "platform/mbed_retarget.h"
 #include "rtos/EventFlags.h"
 #include <memory>
-#include <sys/select.h>
 
 namespace mbed {
 

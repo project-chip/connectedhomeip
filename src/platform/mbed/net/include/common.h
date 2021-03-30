@@ -2,8 +2,6 @@
 #define MBED_NET_COMMON_H
 
 #include <SocketAddress.h>
-#include <errno.h>
-#include <stdio.h>
 #include <sys/socket.h>
 
 #ifdef __cplusplus
