@@ -63,6 +63,29 @@ uint32_t socketMsgReceiveFlag = 1;
 
 using TCPImpl = Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>;
 
+void OnTcpMessageSent(Inet::TCPEndPoint * endPoint, uint16_t Length)
+{
+    streamer_printf(streamer_get(), "OnTcpMessageSent \n");
+}
+
+void OnTcpMessageReceived(Inet::TCPEndPoint * endPoint, System::PacketBufferHandle buffer)
+{
+    streamer_t * sout = streamer_get();
+    streamer_printf(sout, "OnTcpMessageReceived \n");
+    char data[buffer->DataLength() + 1] = { 0 };
+    strncpy(data, (char *) buffer->Start(), buffer->DataLength());
+    streamer_printf(sout, "Received message \"%s\"\n\r", data);
+    socketEvent.set(socketMsgReceiveFlag);
+}
+void OnConnectionCompleted(Inet::TCPEndPoint * endPoint, INET_ERROR error)
+{
+    streamer_printf(streamer_get(), "OnConnectionCompleted \n");
+}
+void OnConnectionClosed(Inet::TCPEndPoint * endPoint, INET_ERROR error)
+{
+    streamer_printf(streamer_get(), "OnConnectionClosed \n");
+}
+
 class SocketTransportMgrDelegate : public TransportMgrDelegate
 {
 public:
@@ -482,12 +505,10 @@ exit:
 int cmd_socket_tcp(int argc, char ** argv)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
-    INET_ERROR err;
     char addrStr[16];
-    ChipSocket sock;
     uint16_t port = 80;
-    PacketHeader header;
     IPAddress addr;
+
     streamer_t * sout    = streamer_get();
     const char payload[] = "GET / HTTP/1.1\r\n"
                            "Host: ifconfig.io\r\n"
@@ -518,45 +539,35 @@ int cmd_socket_tcp(int argc, char ** argv)
     }
 
     printf("%s address is %s\r\n", hostname, (address.get_ip_address() ? address.get_ip_address() : "None"));
-    address.set_port(htons(80));
 
     IPAddress::FromString(address.get_ip_address(), addr);
     //**************************************************************************************
 
-    new (&sock.tcpSocket) TCPImpl;
-    err = sock.tcpSocket.Init(Transport::TcpListenParameters(&DeviceLayer::InetLayer).SetAddressType(addr.Type()));
+    Inet::TCPEndPoint * endPoint;
+    chip::Transport::TcpListenParameters params(&chip::DeviceLayer::InetLayer);
+    error = params.GetInetLayer()->NewTCPEndPoint(&endPoint);
+    if (error != 0)
+        streamer_printf(sout, "ERROR: TCP endpoint not created %d\r\n", error);
 
-    if (err != INET_NO_ERROR)
-    {
-        streamer_printf(sout, "ERROR: create %s endpoint failed\r\n", argv[0]);
-        return error;
-    }
-    TransportMgrBase gTransportMgrBase;
-    SocketTransportMgrDelegate gSocketTransportMgrDelegate;
-    gTransportMgrBase.SetSecureSessionMgr((TransportMgrDelegate *) &gSocketTransportMgrDelegate);
-    gTransportMgrBase.SetRendezvousSession((TransportMgrDelegate *) &gSocketTransportMgrDelegate);
-    gTransportMgrBase.Init((Transport::Base *) &sock.tcpSocket);
-    header.SetSourceNodeId(kSourceNodeId).SetDestinationNodeId(kDestinationNodeId).SetMessageId(kMessageId);
-    socketEvent.clear();
-    err = sock.tcpSocket.SendMessage(header, Transport::PeerAddress::TCP(addr, port), std::move(buffer));
+    endPoint->OnDataSent         = OnTcpMessageSent;
+    endPoint->OnDataReceived     = OnTcpMessageReceived;
+    endPoint->OnConnectComplete  = OnConnectionCompleted;
+    endPoint->OnConnectionClosed = OnConnectionClosed;
 
-    if (err != INET_NO_ERROR)
-    {
-        streamer_printf(sout, "ERROR: send socket message failed\r\n");
-        //  ExitNow(error = err;);
-        return error;
-    }
-    streamer_printf(sout, "INFO: send %s message %s to address: %s port: %d\r\n", argv[0], payload,
-                    addr.ToString(addrStr, sizeof(addrStr)), port);
+    error = endPoint->Connect(addr, port, 0);
+    if (error != 0)
+        streamer_printf(sout, "ERROR: TCP connect error %d \r\n", error);
+
+    error = endPoint->Send(std::move(buffer));
+    if (error != 0)
+        streamer_printf(sout, "ERROR: TCP send error %d \r\n", error);
 
     if (socketEvent.wait_all(socketMsgReceiveFlag, 5000) & osFlagsError)
     {
         streamer_printf(sout, "ERROR: socket message does not received\r\n");
         error = CHIP_ERROR_TIMEOUT;
     }
-
-    sock.tcpSocket.Disconnect(Transport::PeerAddress::TCP(addr));
-
+    endPoint->Close();
     return error;
 }
 
