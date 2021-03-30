@@ -20,11 +20,11 @@
 #include <stdint.h>
 
 #include "af-structs.h"
+#include "app/util/util.h"
 #include "call-command-handler.h"
 #include "callback.h"
 #include "cluster-id.h"
 #include "command-id.h"
-#include "util.h"
 
 using namespace chip;
 
@@ -32,7 +32,6 @@ EmberAfStatus emberAfIdentifyClusterClientCommandParse(EmberAfClusterCommand * c
 EmberAfStatus emberAfIdentifyClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfOnOffClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfPumpConfigurationAndControlClusterClientCommandParse(EmberAfClusterCommand * cmd);
-
 
 static EmberAfStatus status(bool wasHandled, bool clusterExists, bool mfgSpecific)
 {
@@ -54,7 +53,6 @@ static EmberAfStatus status(bool wasHandled, bool clusterExists, bool mfgSpecifi
     }
 }
 
-
 // Main command parsing controller.
 EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
 {
@@ -64,14 +62,14 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
     {
         switch (cmd->apsFrame->clusterId)
         {
-        case ZCL_IDENTIFY_CLUSTER_ID :
+        case ZCL_IDENTIFY_CLUSTER_ID:
             result = emberAfIdentifyClusterClientCommandParse(cmd);
             break;
-        case ZCL_ON_OFF_CLUSTER_ID :
+        case ZCL_ON_OFF_CLUSTER_ID:
             // No commands are enabled for cluster On/off
             result = status(false, true, cmd->mfgSpecific);
             break;
-        case ZCL_PUMP_CONFIG_CONTROL_CLUSTER_ID :
+        case ZCL_PUMP_CONFIG_CONTROL_CLUSTER_ID:
             // No commands are enabled for cluster Pump Configuration and Control
             result = status(false, true, cmd->mfgSpecific);
             break;
@@ -85,7 +83,7 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
     {
         switch (cmd->apsFrame->clusterId)
         {
-        case ZCL_IDENTIFY_CLUSTER_ID :
+        case ZCL_IDENTIFY_CLUSTER_ID:
             result = emberAfIdentifyClusterServerCommandParse(cmd);
             break;
         default:
@@ -107,16 +105,16 @@ EmberAfStatus emberAfIdentifyClusterClientCommandParse(EmberAfClusterCommand * c
         switch (cmd->commandId)
         {
         case ZCL_IDENTIFY_QUERY_RESPONSE_COMMAND_ID: {
-        uint16_t payloadOffset = cmd->payloadStartIndex;
-uint16_t timeout;
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint16_t timeout;
 
-  if (cmd->bufLen < payloadOffset + 2)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  timeout = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
+            if (cmd->bufLen < payloadOffset + 2)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            timeout = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-wasHandled = emberAfIdentifyClusterIdentifyQueryResponseCallback(timeout);
+            wasHandled = emberAfIdentifyClusterIdentifyQueryResponseCallback(timeout);
             break;
         }
         default: {
@@ -136,20 +134,20 @@ EmberAfStatus emberAfIdentifyClusterServerCommandParse(EmberAfClusterCommand * c
         switch (cmd->commandId)
         {
         case ZCL_IDENTIFY_COMMAND_ID: {
-        uint16_t payloadOffset = cmd->payloadStartIndex;
-uint16_t identifyTime;
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint16_t identifyTime;
 
-  if (cmd->bufLen < payloadOffset + 2)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  identifyTime = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
+            if (cmd->bufLen < payloadOffset + 2)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            identifyTime = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-wasHandled = emberAfIdentifyClusterIdentifyCallback(identifyTime);
+            wasHandled = emberAfIdentifyClusterIdentifyCallback(identifyTime);
             break;
         }
         case ZCL_IDENTIFY_QUERY_COMMAND_ID: {
-        wasHandled = emberAfIdentifyClusterIdentifyQueryCallback();
+            wasHandled = emberAfIdentifyClusterIdentifyQueryCallback();
             break;
         }
         default: {
