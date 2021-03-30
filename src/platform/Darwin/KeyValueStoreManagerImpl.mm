@@ -131,25 +131,27 @@ namespace DeviceLayer {
         {
             ReturnErrorCodeIf(gContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
             ReturnErrorCodeIf(fileName == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-
-            // make sure the path is relative
-            while (fileName[0] == '/') {
-                fileName++;
-            }
             ReturnErrorCodeIf(fileName[0] == '\0', CHIP_ERROR_INVALID_ARGUMENT);
 
-            NSURL * documentsDirectory = [NSFileManager.defaultManager URLForDirectory:NSDocumentDirectory
-                                                                              inDomain:NSUserDomainMask
-                                                                     appropriateForURL:nil
-                                                                                create:YES
-                                                                                 error:nil];
-            if (documentsDirectory == nullptr) {
-                ChipLogError(DeviceLayer, "Failed to get documents directory.");
-                return CHIP_ERROR_INTERNAL;
-            }
-            ChipLogProgress(DeviceLayer, "Found user documents directory: %s", [[documentsDirectory absoluteString] UTF8String]);
+            NSURL *url = nullptr;
+            
+            // relative paths are relative to Documents folder
+            if (fileName[0] != '/') {
+              NSURL * documentsDirectory = [NSFileManager.defaultManager URLForDirectory:NSDocumentDirectory
+                                                                                inDomain:NSUserDomainMask
+                                                                       appropriateForURL:nil
+                                                                                  create:YES
+                                                                                   error:nil];
+              if (documentsDirectory == nullptr) {
+                  ChipLogError(DeviceLayer, "Failed to get documents directory.");
+                  return CHIP_ERROR_INTERNAL;
+              }
+              ChipLogProgress(DeviceLayer, "Found user documents directory: %s", [[documentsDirectory absoluteString] UTF8String]);
 
-            NSURL * url = [NSURL URLWithString:[NSString stringWithUTF8String:fileName] relativeToURL:documentsDirectory];
+              url = [NSURL URLWithString:[NSString stringWithUTF8String:fileName] relativeToURL:documentsDirectory];
+            } else {
+              url = [NSURL URLWithString: [NSString stringWithUTF8String: fileName]];
+            }
             ReturnErrorCodeIf(url == nullptr, CHIP_ERROR_NO_MEMORY);
 
             ChipLogProgress(DeviceLayer, "KVS will be written to: %s", [[url absoluteString] UTF8String]);

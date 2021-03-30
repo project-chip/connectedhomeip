@@ -167,6 +167,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
   config("platform_config") {
     if (chip_device_platform == "darwin") {
       frameworks = [
+        "CoreData.framework",
         "CoreFoundation.framework",
         "CoreBluetooth.framework",
         "Foundation.framework",
@@ -308,6 +309,8 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "Darwin/ConnectivityManagerImpl.cpp",
         "Darwin/ConnectivityManagerImpl.h",
         "Darwin/InetPlatformConfig.h",
+        "Darwin/KeyValueStoreManagerImpl.h",
+        "Darwin/KeyValueStoreManagerImpl.mm",
         "Darwin/Logging.cpp",
         "Darwin/MdnsError.cpp",
         "Darwin/MdnsError.h",
@@ -318,11 +321,6 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "Darwin/PosixConfig.cpp",
         "Darwin/PosixConfig.h",
         "Darwin/SystemPlatformConfig.h",
-      ]
-
-      sources += [
-        "Darwin/KeyValueStoreManagerImpl.cpp",
-        "Darwin/KeyValueStoreManagerImpl.h",
       ]
 
       if (chip_enable_ble) {
