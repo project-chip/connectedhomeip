@@ -211,8 +211,8 @@
 /** @brief Command description for DefaultResponse
  *
  * Command: DefaultResponse
- * @param commandId INT8U 
- * @param status Status 
+ * @param commandId INT8U
+ * @param status Status
  */
 #define emberAfFillCommandGlobalDefaultResponse(clusterId, \
   commandId, \
@@ -230,8 +230,8 @@
 /** @brief Command description for DiscoverAttributes
  *
  * Command: DiscoverAttributes
- * @param startId ATTRIBUTE_ID 
- * @param maxAttributeIds INT8U 
+ * @param startId ATTRIBUTE_ID
+ * @param maxAttributeIds INT8U
  */
 #define emberAfFillCommandGlobalDiscoverAttributes(clusterId, \
   startId, \
@@ -249,7 +249,7 @@
 /** @brief Command description for DiscoverAttributesResponse
  *
  * Command: DiscoverAttributesResponse
- * @param discoveryComplete INT8U 
+ * @param discoveryComplete INT8U
  * @param discoverAttributesInfoRecords DiscoverAttributesInfoRecord []
  * @param discoverAttributesInfoRecordsLen int
  */
@@ -320,8 +320,8 @@
 /** @brief Command description for DiscoverCommandsReceived
  *
  * Command: DiscoverCommandsReceived
- * @param startCommandId INT8U 
- * @param maxCommandIds INT8U 
+ * @param startCommandId INT8U
+ * @param maxCommandIds INT8U
  */
 #define emberAfFillCommandGlobalDiscoverCommandsReceived(clusterId, \
   startCommandId, \
@@ -339,7 +339,7 @@
 /** @brief Command description for DiscoverCommandsReceivedResponse
  *
  * Command: DiscoverCommandsReceivedResponse
- * @param discoveryComplete INT8U 
+ * @param discoveryComplete INT8U
  * @param commandIds INT8U []
  * @param commandIdsLen int
  */
@@ -359,8 +359,8 @@
 /** @brief Command description for DiscoverCommandsGenerated
  *
  * Command: DiscoverCommandsGenerated
- * @param startCommandId INT8U 
- * @param maxCommandIds INT8U 
+ * @param startCommandId INT8U
+ * @param maxCommandIds INT8U
  */
 #define emberAfFillCommandGlobalDiscoverCommandsGenerated(clusterId, \
   startCommandId, \
@@ -378,7 +378,7 @@
 /** @brief Command description for DiscoverCommandsGeneratedResponse
  *
  * Command: DiscoverCommandsGeneratedResponse
- * @param discoveryComplete INT8U 
+ * @param discoveryComplete INT8U
  * @param commandIds INT8U []
  * @param commandIdsLen int
  */
@@ -398,8 +398,8 @@
 /** @brief Command description for DiscoverAttributesExtended
  *
  * Command: DiscoverAttributesExtended
- * @param startId ATTRIBUTE_ID 
- * @param maxAttributeIds INT8U 
+ * @param startId ATTRIBUTE_ID
+ * @param maxAttributeIds INT8U
  */
 #define emberAfFillCommandGlobalDiscoverAttributesExtended(clusterId, \
   startId, \
@@ -417,7 +417,7 @@
 /** @brief Command description for DiscoverAttributesExtendedResponse
  *
  * Command: DiscoverAttributesExtendedResponse
- * @param discoveryComplete INT8U 
+ * @param discoveryComplete INT8U
  * @param extendedDiscoverAttributesInfoRecords ExtendedDiscoverAttributesInfoRecord []
  * @param extendedDiscoverAttributesInfoRecordsLen int
  */
@@ -437,8 +437,8 @@
 /** @brief Command description for Identify
  *
  * Command: Identify
- * @param identifyTime INT16U 
- * @param timeout INT16U 
+ * @param identifyTime INT16U
+ * @param timeout INT16U
  */
 #define emberAfFillCommandIdentifyClusterIdentify( \
   identifyTime, \
@@ -469,7 +469,7 @@
 /** @brief Command description for EZModeInvoke
  *
  * Command: EZModeInvoke
- * @param action BITMAP8 
+ * @param action BITMAP8
  */
 #define emberAfFillCommandIdentifyClusterEZModeInvoke( \
   action \
@@ -485,8 +485,8 @@
 /** @brief Command description for UpdateCommissionState
  *
  * Command: UpdateCommissionState
- * @param action ENUM8 
- * @param commissionStateMask BITMAP8 
+ * @param action ENUM8
+ * @param commissionStateMask BITMAP8
  */
 #define emberAfFillCommandIdentifyClusterUpdateCommissionState( \
   action, \
@@ -504,8 +504,8 @@
 /** @brief Command description for TriggerEffect
  *
  * Command: TriggerEffect
- * @param effectId IdentifyEffectIdentifier 
- * @param effectVariant IdentifyEffectVariant 
+ * @param effectId IdentifyEffectIdentifier
+ * @param effectVariant IdentifyEffectVariant
  */
 #define emberAfFillCommandIdentifyClusterTriggerEffect( \
   effectId, \
@@ -523,10 +523,10 @@
 /** @brief Command description for AddGroup
  *
  * Command: AddGroup
- * @param groupId INT16U 
- * @param status Status 
- * @param groupName CHAR_STRING 
- * @param groupId INT16U 
+ * @param groupId INT16U
+ * @param status Status
+ * @param groupName CHAR_STRING
+ * @param groupId INT16U
  */
 #define emberAfFillCommandGroupsClusterAddGroup( \
   groupId, \
@@ -548,10 +548,10 @@
 /** @brief Command description for ViewGroup
  *
  * Command: ViewGroup
- * @param groupId INT16U 
- * @param status Status 
- * @param groupId INT16U 
- * @param groupName CHAR_STRING 
+ * @param groupId INT16U
+ * @param status Status
+ * @param groupId INT16U
+ * @param groupName CHAR_STRING
  */
 #define emberAfFillCommandGroupsClusterViewGroup( \
   groupId, \
@@ -573,11 +573,11 @@
 /** @brief Command description for GetGroupMembership
  *
  * Command: GetGroupMembership
- * @param groupCount INT8U 
- * @param capacity INT8U 
+ * @param groupCount INT8U
+ * @param capacity INT8U
  * @param groupList INT16U []
  * @param groupListLen int
- * @param groupCount INT8U 
+ * @param groupCount INT8U
  * @param groupList INT16U []
  * @param groupListLen int
  */
@@ -603,9 +603,9 @@
 /** @brief Command description for RemoveGroup
  *
  * Command: RemoveGroup
- * @param groupId INT16U 
- * @param status Status 
- * @param groupId INT16U 
+ * @param groupId INT16U
+ * @param status Status
+ * @param groupId INT16U
  */
 #define emberAfFillCommandGroupsClusterRemoveGroup( \
   groupId, \
@@ -638,8 +638,8 @@
 /** @brief Command description for AddGroupIfIdentifying
  *
  * Command: AddGroupIfIdentifying
- * @param groupId INT16U 
- * @param groupName CHAR_STRING 
+ * @param groupId INT16U
+ * @param groupName CHAR_STRING
  */
 #define emberAfFillCommandGroupsClusterAddGroupIfIdentifying( \
   groupId, \
@@ -657,13 +657,13 @@
 /** @brief Command description for AddScene
  *
  * Command: AddScene
- * @param groupId INT16U 
- * @param status Status 
- * @param sceneId INT8U 
- * @param groupId INT16U 
- * @param transitionTime INT16U 
- * @param sceneId INT8U 
- * @param sceneName CHAR_STRING 
+ * @param groupId INT16U
+ * @param status Status
+ * @param sceneId INT8U
+ * @param groupId INT16U
+ * @param transitionTime INT16U
+ * @param sceneId INT8U
+ * @param sceneName CHAR_STRING
  * @param extensionFieldSets SceneExtensionFieldSet []
  * @param extensionFieldSetsLen int
  */
@@ -695,13 +695,13 @@
 /** @brief Command description for ViewScene
  *
  * Command: ViewScene
- * @param groupId INT16U 
- * @param status Status 
- * @param sceneId INT8U 
- * @param groupId INT16U 
- * @param sceneId INT8U 
- * @param transitionTime INT16U 
- * @param sceneName CHAR_STRING 
+ * @param groupId INT16U
+ * @param status Status
+ * @param sceneId INT8U
+ * @param groupId INT16U
+ * @param sceneId INT8U
+ * @param transitionTime INT16U
+ * @param sceneName CHAR_STRING
  * @param extensionFieldSets SceneExtensionFieldSet []
  * @param extensionFieldSetsLen int
  */
@@ -733,11 +733,11 @@
 /** @brief Command description for RemoveScene
  *
  * Command: RemoveScene
- * @param groupId INT16U 
- * @param status Status 
- * @param sceneId INT8U 
- * @param groupId INT16U 
- * @param sceneId INT8U 
+ * @param groupId INT16U
+ * @param status Status
+ * @param sceneId INT8U
+ * @param groupId INT16U
+ * @param sceneId INT8U
  */
 #define emberAfFillCommandScenesClusterRemoveScene( \
   groupId, \
@@ -761,9 +761,9 @@
 /** @brief Command description for RemoveAllScenes
  *
  * Command: RemoveAllScenes
- * @param groupId INT16U 
- * @param status Status 
- * @param groupId INT16U 
+ * @param groupId INT16U
+ * @param status Status
+ * @param groupId INT16U
  */
 #define emberAfFillCommandScenesClusterRemoveAllScenes( \
   groupId, \
@@ -783,11 +783,11 @@
 /** @brief Command description for StoreScene
  *
  * Command: StoreScene
- * @param groupId INT16U 
- * @param status Status 
- * @param sceneId INT8U 
- * @param groupId INT16U 
- * @param sceneId INT8U 
+ * @param groupId INT16U
+ * @param status Status
+ * @param sceneId INT8U
+ * @param groupId INT16U
+ * @param sceneId INT8U
  */
 #define emberAfFillCommandScenesClusterStoreScene( \
   groupId, \
@@ -811,9 +811,9 @@
 /** @brief Command description for RecallScene
  *
  * Command: RecallScene
- * @param groupId INT16U 
- * @param sceneId INT8U 
- * @param transitionTime INT16U 
+ * @param groupId INT16U
+ * @param sceneId INT8U
+ * @param transitionTime INT16U
  */
 #define emberAfFillCommandScenesClusterRecallScene( \
   groupId, \
@@ -833,11 +833,11 @@
 /** @brief Command description for GetSceneMembership
  *
  * Command: GetSceneMembership
- * @param groupId INT16U 
- * @param status Status 
- * @param capacity INT8U 
- * @param groupId INT16U 
- * @param sceneCount INT8U 
+ * @param groupId INT16U
+ * @param status Status
+ * @param capacity INT8U
+ * @param groupId INT16U
+ * @param sceneCount INT8U
  * @param sceneList INT8U []
  * @param sceneListLen int
  */
@@ -865,13 +865,13 @@
 /** @brief Command description for EnhancedAddScene
  *
  * Command: EnhancedAddScene
- * @param groupId INT16U 
- * @param status Status 
- * @param sceneId INT8U 
- * @param groupId INT16U 
- * @param transitionTime INT16U 
- * @param sceneId INT8U 
- * @param sceneName CHAR_STRING 
+ * @param groupId INT16U
+ * @param status Status
+ * @param sceneId INT8U
+ * @param groupId INT16U
+ * @param transitionTime INT16U
+ * @param sceneId INT8U
+ * @param sceneName CHAR_STRING
  * @param extensionFieldSets SceneExtensionFieldSet []
  * @param extensionFieldSetsLen int
  */
@@ -903,13 +903,13 @@
 /** @brief Command description for EnhancedViewScene
  *
  * Command: EnhancedViewScene
- * @param groupId INT16U 
- * @param status Status 
- * @param sceneId INT8U 
- * @param groupId INT16U 
- * @param sceneId INT8U 
- * @param transitionTime INT16U 
- * @param sceneName CHAR_STRING 
+ * @param groupId INT16U
+ * @param status Status
+ * @param sceneId INT8U
+ * @param groupId INT16U
+ * @param sceneId INT8U
+ * @param transitionTime INT16U
+ * @param sceneName CHAR_STRING
  * @param extensionFieldSets SceneExtensionFieldSet []
  * @param extensionFieldSetsLen int
  */
@@ -941,14 +941,14 @@
 /** @brief Command description for CopyScene
  *
  * Command: CopyScene
- * @param mode ScenesCopyMode 
- * @param status Status 
- * @param groupIdFrom INT16U 
- * @param groupIdFrom INT16U 
- * @param sceneIdFrom INT8U 
- * @param sceneIdFrom INT8U 
- * @param groupIdTo INT16U 
- * @param sceneIdTo INT8U 
+ * @param mode ScenesCopyMode
+ * @param status Status
+ * @param groupIdFrom INT16U
+ * @param groupIdFrom INT16U
+ * @param sceneIdFrom INT8U
+ * @param sceneIdFrom INT8U
+ * @param groupIdTo INT16U
+ * @param sceneIdTo INT8U
  */
 #define emberAfFillCommandScenesClusterCopyScene( \
   mode, \
@@ -1017,8 +1017,8 @@
 /** @brief Command description for OffWithEffect
  *
  * Command: OffWithEffect
- * @param effectId OnOffEffectIdentifier 
- * @param effectVariant ENUM8 
+ * @param effectId OnOffEffectIdentifier
+ * @param effectVariant ENUM8
  */
 #define emberAfFillCommandOn/offClusterOffWithEffect( \
   effectId, \
@@ -1049,9 +1049,9 @@
 /** @brief Command description for OnWithTimedOff
  *
  * Command: OnWithTimedOff
- * @param onOffControl OnOffControl 
- * @param onTime INT16U 
- * @param offWaitTime INT16U 
+ * @param onOffControl OnOffControl
+ * @param onTime INT16U
+ * @param offWaitTime INT16U
  */
 #define emberAfFillCommandOn/offClusterOnWithTimedOff( \
   onOffControl, \
@@ -1071,10 +1071,10 @@
 /** @brief Command description for MoveToLevel
  *
  * Command: MoveToLevel
- * @param level INT8U 
- * @param transitionTime INT16U 
- * @param optionMask BITMAP8 
- * @param optionOverride BITMAP8 
+ * @param level INT8U
+ * @param transitionTime INT16U
+ * @param optionMask BITMAP8
+ * @param optionOverride BITMAP8
  */
 #define emberAfFillCommandLevel ControlClusterMoveToLevel( \
   level, \
@@ -1096,10 +1096,10 @@
 /** @brief Command description for Move
  *
  * Command: Move
- * @param moveMode MoveMode 
- * @param rate INT8U 
- * @param optionMask BITMAP8 
- * @param optionOverride BITMAP8 
+ * @param moveMode MoveMode
+ * @param rate INT8U
+ * @param optionMask BITMAP8
+ * @param optionOverride BITMAP8
  */
 #define emberAfFillCommandLevel ControlClusterMove( \
   moveMode, \
@@ -1121,11 +1121,11 @@
 /** @brief Command description for Step
  *
  * Command: Step
- * @param stepMode StepMode 
- * @param stepSize INT8U 
- * @param transitionTime INT16U 
- * @param optionMask BITMAP8 
- * @param optionOverride BITMAP8 
+ * @param stepMode StepMode
+ * @param stepSize INT8U
+ * @param transitionTime INT16U
+ * @param optionMask BITMAP8
+ * @param optionOverride BITMAP8
  */
 #define emberAfFillCommandLevel ControlClusterStep( \
   stepMode, \
@@ -1149,8 +1149,8 @@
 /** @brief Command description for Stop
  *
  * Command: Stop
- * @param optionMask BITMAP8 
- * @param optionOverride BITMAP8 
+ * @param optionMask BITMAP8
+ * @param optionOverride BITMAP8
  */
 #define emberAfFillCommandLevel ControlClusterStop( \
   optionMask, \
@@ -1168,8 +1168,8 @@
 /** @brief Command description for MoveToLevelWithOnOff
  *
  * Command: MoveToLevelWithOnOff
- * @param level INT8U 
- * @param transitionTime INT16U 
+ * @param level INT8U
+ * @param transitionTime INT16U
  */
 #define emberAfFillCommandLevel ControlClusterMoveToLevelWithOnOff( \
   level, \
@@ -1187,8 +1187,8 @@
 /** @brief Command description for MoveWithOnOff
  *
  * Command: MoveWithOnOff
- * @param moveMode MoveMode 
- * @param rate INT8U 
+ * @param moveMode MoveMode
+ * @param rate INT8U
  */
 #define emberAfFillCommandLevel ControlClusterMoveWithOnOff( \
   moveMode, \
@@ -1206,9 +1206,9 @@
 /** @brief Command description for StepWithOnOff
  *
  * Command: StepWithOnOff
- * @param stepMode StepMode 
- * @param stepSize INT8U 
- * @param transitionTime INT16U 
+ * @param stepMode StepMode
+ * @param stepSize INT8U
+ * @param transitionTime INT16U
  */
 #define emberAfFillCommandLevel ControlClusterStepWithOnOff( \
   stepMode, \
@@ -1241,10 +1241,10 @@
 /** @brief Command description for ResetAlarm
  *
  * Command: ResetAlarm
- * @param alarmCode ENUM8 
- * @param alarmCode ENUM8 
- * @param clusterId CLUSTER_ID 
- * @param clusterId CLUSTER_ID 
+ * @param alarmCode ENUM8
+ * @param alarmCode ENUM8
+ * @param clusterId CLUSTER_ID
+ * @param clusterId CLUSTER_ID
  */
 #define emberAfFillCommandAlarmsClusterResetAlarm( \
   alarmCode, \
@@ -1266,10 +1266,10 @@
 /** @brief Command description for ResetAllAlarms
  *
  * Command: ResetAllAlarms
- * @param status Status 
- * @param alarmCode ENUM8 
- * @param clusterId CLUSTER_ID 
- * @param timeStamp INT32U 
+ * @param status Status
+ * @param alarmCode ENUM8
+ * @param clusterId CLUSTER_ID
+ * @param timeStamp INT32U
  */
 #define emberAfFillCommandAlarmsClusterResetAllAlarms( \
   status, \
@@ -1317,17 +1317,17 @@
 /** @brief Command description for SetAbsoluteLocation
  *
  * Command: SetAbsoluteLocation
- * @param coordinate1 INT16S 
- * @param status Status 
- * @param coordinate2 INT16S 
- * @param power INT16S 
- * @param coordinate3 INT16S 
- * @param pathLossExponent INT16U 
- * @param power INT16S 
- * @param calculationPeriod INT16U 
- * @param pathLossExponent INT16U 
- * @param numberRssiMeasurements INT8U 
- * @param reportingPeriod INT16U 
+ * @param coordinate1 INT16S
+ * @param status Status
+ * @param coordinate2 INT16S
+ * @param power INT16S
+ * @param coordinate3 INT16S
+ * @param pathLossExponent INT16U
+ * @param power INT16S
+ * @param calculationPeriod INT16U
+ * @param pathLossExponent INT16U
+ * @param numberRssiMeasurements INT8U
+ * @param reportingPeriod INT16U
  */
 #define emberAfFillCommandRSSI LocationClusterSetAbsoluteLocation( \
   coordinate1, \
@@ -1363,21 +1363,21 @@
 /** @brief Command description for SetDeviceConfiguration
  *
  * Command: SetDeviceConfiguration
- * @param power INT16S 
- * @param status Status 
- * @param pathLossExponent INT16U 
- * @param locationType LocationType 
- * @param calculationPeriod INT16U 
- * @param coordinate1 INT16S 
- * @param numberRssiMeasurements INT8U 
- * @param coordinate2 INT16S 
- * @param reportingPeriod INT16U 
- * @param coordinate3 INT16S 
- * @param power INT16S 
- * @param pathLossExponent INT16U 
- * @param locationMethod LocationMethod 
- * @param qualityMeasure INT8U 
- * @param locationAge INT16U 
+ * @param power INT16S
+ * @param status Status
+ * @param pathLossExponent INT16U
+ * @param locationType LocationType
+ * @param calculationPeriod INT16U
+ * @param coordinate1 INT16S
+ * @param numberRssiMeasurements INT8U
+ * @param coordinate2 INT16S
+ * @param reportingPeriod INT16U
+ * @param coordinate3 INT16S
+ * @param power INT16S
+ * @param pathLossExponent INT16U
+ * @param locationMethod LocationMethod
+ * @param qualityMeasure INT8U
+ * @param locationAge INT16U
  */
 #define emberAfFillCommandRSSI LocationClusterSetDeviceConfiguration( \
   power, \
@@ -1421,16 +1421,16 @@
 /** @brief Command description for GetDeviceConfiguration
  *
  * Command: GetDeviceConfiguration
- * @param targetAddress IEEE_ADDRESS 
- * @param locationType LocationType 
- * @param coordinate1 INT16S 
- * @param coordinate2 INT16S 
- * @param coordinate3 INT16S 
- * @param power INT16S 
- * @param pathLossExponent INT16U 
- * @param locationMethod LocationMethod 
- * @param qualityMeasure INT8U 
- * @param locationAge INT16U 
+ * @param targetAddress IEEE_ADDRESS
+ * @param locationType LocationType
+ * @param coordinate1 INT16S
+ * @param coordinate2 INT16S
+ * @param coordinate3 INT16S
+ * @param power INT16S
+ * @param pathLossExponent INT16U
+ * @param locationMethod LocationMethod
+ * @param qualityMeasure INT8U
+ * @param locationAge INT16U
  */
 #define emberAfFillCommandRSSI LocationClusterGetDeviceConfiguration( \
   targetAddress, \
@@ -1464,15 +1464,15 @@
 /** @brief Command description for GetLocationData
  *
  * Command: GetLocationData
- * @param flags GetLocationDataFlags 
- * @param locationType LocationType 
- * @param numberResponses INT8U 
- * @param coordinate1 INT16S 
- * @param targetAddress IEEE_ADDRESS 
- * @param coordinate2 INT16S 
- * @param coordinate3 INT16S 
- * @param qualityMeasure INT8U 
- * @param locationAge INT16U 
+ * @param flags GetLocationDataFlags
+ * @param locationType LocationType
+ * @param numberResponses INT8U
+ * @param coordinate1 INT16S
+ * @param targetAddress IEEE_ADDRESS
+ * @param coordinate2 INT16S
+ * @param coordinate3 INT16S
+ * @param qualityMeasure INT8U
+ * @param locationAge INT16U
  */
 #define emberAfFillCommandRSSI LocationClusterGetLocationData( \
   flags, \
@@ -1504,13 +1504,13 @@
 /** @brief Command description for RssiResponse
  *
  * Command: RssiResponse
- * @param replyingDevice IEEE_ADDRESS 
- * @param locationType LocationType 
- * @param coordinate1 INT16S 
- * @param coordinate2 INT16S 
- * @param coordinate3 INT16S 
- * @param rssi INT8S 
- * @param numberRssiMeasurements INT8U 
+ * @param replyingDevice IEEE_ADDRESS
+ * @param locationType LocationType
+ * @param coordinate1 INT16S
+ * @param coordinate2 INT16S
+ * @param coordinate3 INT16S
+ * @param rssi INT8S
+ * @param numberRssiMeasurements INT8U
  */
 #define emberAfFillCommandRSSI LocationClusterRssiResponse( \
   replyingDevice, \
@@ -1538,9 +1538,9 @@
 /** @brief Command description for RssiRequest
  *
  * Command: RssiRequest
- * @param targetAddress IEEE_ADDRESS 
- * @param numberRssiMeasurements INT8U 
- * @param calculationPeriod INT16U 
+ * @param targetAddress IEEE_ADDRESS
+ * @param numberRssiMeasurements INT8U
+ * @param calculationPeriod INT16U
  */
 #define emberAfFillCommandRSSI LocationClusterRssiRequest( \
   targetAddress, \
@@ -1560,14 +1560,14 @@
 /** @brief Command description for AnchorNodeAnnounce
  *
  * Command: AnchorNodeAnnounce
- * @param anchorNodeIeeeAddress IEEE_ADDRESS 
- * @param measuringDevice IEEE_ADDRESS 
- * @param coordinate1 INT16S 
- * @param neighbors INT8U 
- * @param coordinate2 INT16S 
+ * @param anchorNodeIeeeAddress IEEE_ADDRESS
+ * @param measuringDevice IEEE_ADDRESS
+ * @param coordinate1 INT16S
+ * @param neighbors INT8U
+ * @param coordinate2 INT16S
  * @param neighborsInfo NeighborInfo []
  * @param neighborsInfoLen int
- * @param coordinate3 INT16S 
+ * @param coordinate3 INT16S
  */
 #define emberAfFillCommandRSSI LocationClusterAnchorNodeAnnounce( \
   anchorNodeIeeeAddress, \
@@ -1595,7 +1595,7 @@
 /** @brief Command description for RequestOwnLocation
  *
  * Command: RequestOwnLocation
- * @param blindNode IEEE_ADDRESS 
+ * @param blindNode IEEE_ADDRESS
  */
 #define emberAfFillCommandRSSI LocationClusterRequestOwnLocation( \
   blindNode \
@@ -1611,10 +1611,10 @@
 /** @brief Command description for RestartDevice
  *
  * Command: RestartDevice
- * @param options RestartOptions 
- * @param status ENUM8 
- * @param delay INT8U 
- * @param jitter INT8U 
+ * @param options RestartOptions
+ * @param status ENUM8
+ * @param delay INT8U
+ * @param jitter INT8U
  */
 #define emberAfFillCommandCommissioningClusterRestartDevice( \
   options, \
@@ -1636,9 +1636,9 @@
 /** @brief Command description for SaveStartupParameters
  *
  * Command: SaveStartupParameters
- * @param options BITMAP8 
- * @param status ENUM8 
- * @param index INT8U 
+ * @param options BITMAP8
+ * @param status ENUM8
+ * @param index INT8U
  */
 #define emberAfFillCommandCommissioningClusterSaveStartupParameters( \
   options, \
@@ -1658,9 +1658,9 @@
 /** @brief Command description for RestoreStartupParameters
  *
  * Command: RestoreStartupParameters
- * @param options BITMAP8 
- * @param status ENUM8 
- * @param index INT8U 
+ * @param options BITMAP8
+ * @param status ENUM8
+ * @param index INT8U
  */
 #define emberAfFillCommandCommissioningClusterRestoreStartupParameters( \
   options, \
@@ -1680,9 +1680,9 @@
 /** @brief Command description for ResetStartupParameters
  *
  * Command: ResetStartupParameters
- * @param options ResetOptions 
- * @param status ENUM8 
- * @param index INT8U 
+ * @param options ResetOptions
+ * @param status ENUM8
+ * @param index INT8U
  */
 #define emberAfFillCommandCommissioningClusterResetStartupParameters( \
   options, \
@@ -1702,8 +1702,8 @@
 /** @brief Command description for TransferPartitionedFrame
  *
  * Command: TransferPartitionedFrame
- * @param fragmentationOptions BITMAP8 
- * @param ackOptions BITMAP8 
+ * @param fragmentationOptions BITMAP8
+ * @param ackOptions BITMAP8
  * @param partitionedIndicatorAndFrame INT8U []
  * @param partitionedIndicatorAndFrameLen int
  * @param firstFrameIdAndNackList INT8U []
@@ -1729,8 +1729,8 @@
 /** @brief Command description for ReadHandshakeParam
  *
  * Command: ReadHandshakeParam
- * @param partitionedClusterId CLUSTER_ID 
- * @param partitionedClusterId CLUSTER_ID 
+ * @param partitionedClusterId CLUSTER_ID
+ * @param partitionedClusterId CLUSTER_ID
  * @param attributeList ATTRIBUTE_ID []
  * @param attributeListLen int
  * @param readAttributeStatusRecords ReadAttributeStatusRecord []
@@ -1756,7 +1756,7 @@
 /** @brief Command description for WriteHandshakeParam
  *
  * Command: WriteHandshakeParam
- * @param partitionedClusterId CLUSTER_ID 
+ * @param partitionedClusterId CLUSTER_ID
  * @param writeAttributeRecords WriteAttributeRecord []
  * @param writeAttributeRecordsLen int
  */
@@ -1776,11 +1776,11 @@
 /** @brief Command description for ImageNotify
  *
  * Command: ImageNotify
- * @param payloadType ENUM8 
- * @param queryJitter INT8U 
- * @param manufacturerId INT16U 
- * @param imageType INT16U 
- * @param newFileVersion INT32U 
+ * @param payloadType ENUM8
+ * @param queryJitter INT8U
+ * @param manufacturerId INT16U
+ * @param imageType INT16U
+ * @param newFileVersion INT32U
  */
 #define emberAfFillCommandOver the Air BootloadingClusterImageNotify( \
   payloadType, \
@@ -1804,11 +1804,11 @@
 /** @brief Command description for QueryNextImageRequest
  *
  * Command: QueryNextImageRequest
- * @param fieldControl INT8U 
- * @param manufacturerId INT16U 
- * @param imageType INT16U 
- * @param currentFileVersion INT32U 
- * @param hardwareVersion INT16U 
+ * @param fieldControl INT8U
+ * @param manufacturerId INT16U
+ * @param imageType INT16U
+ * @param currentFileVersion INT32U
+ * @param hardwareVersion INT16U
  */
 #define emberAfFillCommandOver the Air BootloadingClusterQueryNextImageRequest( \
   fieldControl, \
@@ -1832,11 +1832,11 @@
 /** @brief Command description for QueryNextImageResponse
  *
  * Command: QueryNextImageResponse
- * @param status Status 
- * @param manufacturerId INT16U 
- * @param imageType INT16U 
- * @param fileVersion INT32U 
- * @param imageSize INT32U 
+ * @param status Status
+ * @param manufacturerId INT16U
+ * @param imageType INT16U
+ * @param fileVersion INT32U
+ * @param imageSize INT32U
  */
 #define emberAfFillCommandOver the Air BootloadingClusterQueryNextImageResponse( \
   status, \
@@ -1860,13 +1860,13 @@
 /** @brief Command description for ImageBlockRequest
  *
  * Command: ImageBlockRequest
- * @param fieldControl INT8U 
- * @param manufacturerId INT16U 
- * @param imageType INT16U 
- * @param fileVersion INT32U 
- * @param fileOffset INT32U 
- * @param maxDataSize INT8U 
- * @param requestNodeAddress IEEE_ADDRESS 
+ * @param fieldControl INT8U
+ * @param manufacturerId INT16U
+ * @param imageType INT16U
+ * @param fileVersion INT32U
+ * @param fileOffset INT32U
+ * @param maxDataSize INT8U
+ * @param requestNodeAddress IEEE_ADDRESS
  */
 #define emberAfFillCommandOver the Air BootloadingClusterImageBlockRequest( \
   fieldControl, \
@@ -1894,15 +1894,15 @@
 /** @brief Command description for ImagePageRequest
  *
  * Command: ImagePageRequest
- * @param fieldControl INT8U 
- * @param manufacturerId INT16U 
- * @param imageType INT16U 
- * @param fileVersion INT32U 
- * @param fileOffset INT32U 
- * @param maxDataSize INT8U 
- * @param pageSize INT16U 
- * @param responseSpacing INT16U 
- * @param requestNodeAddress IEEE_ADDRESS 
+ * @param fieldControl INT8U
+ * @param manufacturerId INT16U
+ * @param imageType INT16U
+ * @param fileVersion INT32U
+ * @param fileOffset INT32U
+ * @param maxDataSize INT8U
+ * @param pageSize INT16U
+ * @param responseSpacing INT16U
+ * @param requestNodeAddress IEEE_ADDRESS
  */
 #define emberAfFillCommandOver the Air BootloadingClusterImagePageRequest( \
   fieldControl, \
@@ -1934,12 +1934,12 @@
 /** @brief Command description for ImageBlockResponse
  *
  * Command: ImageBlockResponse
- * @param status Status 
- * @param manufacturerId INT16U 
- * @param imageType INT16U 
- * @param fileVersion INT32U 
- * @param fileOffset INT32U 
- * @param dataSize INT8U 
+ * @param status Status
+ * @param manufacturerId INT16U
+ * @param imageType INT16U
+ * @param fileVersion INT32U
+ * @param fileOffset INT32U
+ * @param dataSize INT8U
  * @param imageData INT8U []
  * @param imageDataLen int
  */
@@ -1969,10 +1969,10 @@
 /** @brief Command description for UpgradeEndRequest
  *
  * Command: UpgradeEndRequest
- * @param status Status 
- * @param manufacturerId INT16U 
- * @param imageType INT16U 
- * @param fileVersion INT32U 
+ * @param status Status
+ * @param manufacturerId INT16U
+ * @param imageType INT16U
+ * @param fileVersion INT32U
  */
 #define emberAfFillCommandOver the Air BootloadingClusterUpgradeEndRequest( \
   status, \
@@ -1994,11 +1994,11 @@
 /** @brief Command description for UpgradeEndResponse
  *
  * Command: UpgradeEndResponse
- * @param manufacturerId INT16U 
- * @param imageType INT16U 
- * @param fileVersion INT32U 
- * @param currentTime UTC_TIME 
- * @param upgradeTime UTC_TIME 
+ * @param manufacturerId INT16U
+ * @param imageType INT16U
+ * @param fileVersion INT32U
+ * @param currentTime UTC_TIME
+ * @param upgradeTime UTC_TIME
  */
 #define emberAfFillCommandOver the Air BootloadingClusterUpgradeEndResponse( \
   manufacturerId, \
@@ -2022,11 +2022,11 @@
 /** @brief Command description for QuerySpecificFileRequest
  *
  * Command: QuerySpecificFileRequest
- * @param requestNodeAddress IEEE_ADDRESS 
- * @param manufacturerId INT16U 
- * @param imageType INT16U 
- * @param fileVersion INT32U 
- * @param currentZigbeeStackVersion INT16U 
+ * @param requestNodeAddress IEEE_ADDRESS
+ * @param manufacturerId INT16U
+ * @param imageType INT16U
+ * @param fileVersion INT32U
+ * @param currentZigbeeStackVersion INT16U
  */
 #define emberAfFillCommandOver the Air BootloadingClusterQuerySpecificFileRequest( \
   requestNodeAddress, \
@@ -2050,11 +2050,11 @@
 /** @brief Command description for QuerySpecificFileResponse
  *
  * Command: QuerySpecificFileResponse
- * @param status Status 
- * @param manufacturerId INT16U 
- * @param imageType INT16U 
- * @param fileVersion INT32U 
- * @param imageSize INT32U 
+ * @param status Status
+ * @param manufacturerId INT16U
+ * @param imageType INT16U
+ * @param fileVersion INT32U
+ * @param imageSize INT32U
  */
 #define emberAfFillCommandOver the Air BootloadingClusterQuerySpecificFileResponse( \
   status, \
@@ -2078,10 +2078,10 @@
 /** @brief Command description for PowerProfileRequest
  *
  * Command: PowerProfileRequest
- * @param powerProfileId INT8U 
- * @param totalProfileNum INT8U 
- * @param powerProfileId INT8U 
- * @param numOfTransferredPhases INT8U 
+ * @param powerProfileId INT8U
+ * @param totalProfileNum INT8U
+ * @param powerProfileId INT8U
+ * @param numOfTransferredPhases INT8U
  * @param transferredPhases TransferredPhase []
  * @param transferredPhasesLen int
  */
@@ -2107,9 +2107,9 @@
 /** @brief Command description for PowerProfileStateRequest
  *
  * Command: PowerProfileStateRequest
- * @param totalProfileNum INT8U 
- * @param powerProfileId INT8U 
- * @param numOfTransferredPhases INT8U 
+ * @param totalProfileNum INT8U
+ * @param powerProfileId INT8U
+ * @param numOfTransferredPhases INT8U
  * @param transferredPhases TransferredPhase []
  * @param transferredPhasesLen int
  */
@@ -2133,13 +2133,13 @@
 /** @brief Command description for GetPowerProfilePriceResponse
  *
  * Command: GetPowerProfilePriceResponse
- * @param powerProfileId INT8U 
- * @param powerProfileCount INT8U 
- * @param currency INT16U 
+ * @param powerProfileId INT8U
+ * @param powerProfileCount INT8U
+ * @param currency INT16U
  * @param powerProfileRecords PowerProfileRecord []
  * @param powerProfileRecordsLen int
- * @param price INT32U 
- * @param priceTrailingDigit INT8U 
+ * @param price INT32U
+ * @param priceTrailingDigit INT8U
  */
 #define emberAfFillCommandPower ProfileClusterGetPowerProfilePriceResponse( \
   powerProfileId, \
@@ -2165,10 +2165,10 @@
 /** @brief Command description for GetOverallSchedulePriceResponse
  *
  * Command: GetOverallSchedulePriceResponse
- * @param currency INT16U 
- * @param powerProfileId INT8U 
- * @param price INT32U 
- * @param priceTrailingDigit INT8U 
+ * @param currency INT16U
+ * @param powerProfileId INT8U
+ * @param price INT32U
+ * @param priceTrailingDigit INT8U
  */
 #define emberAfFillCommandPower ProfileClusterGetOverallSchedulePriceResponse( \
   currency, \
@@ -2190,9 +2190,9 @@
 /** @brief Command description for EnergyPhasesScheduleNotification
  *
  * Command: EnergyPhasesScheduleNotification
- * @param powerProfileId INT8U 
- * @param powerProfileCount INT8U 
- * @param numOfScheduledPhases INT8U 
+ * @param powerProfileId INT8U
+ * @param powerProfileCount INT8U
+ * @param numOfScheduledPhases INT8U
  * @param powerProfileRecords PowerProfileRecord []
  * @param powerProfileRecordsLen int
  * @param scheduledPhases ScheduledPhase []
@@ -2220,8 +2220,8 @@
 /** @brief Command description for GetOverallSchedulePrice
  *
  * Command: GetOverallSchedulePrice
- * @param powerProfileId INT8U 
- * @param numOfScheduledPhases INT8U 
+ * @param powerProfileId INT8U
+ * @param numOfScheduledPhases INT8U
  * @param scheduledPhases ScheduledPhase []
  * @param scheduledPhasesLen int
  */
@@ -2243,8 +2243,8 @@
 /** @brief Command description for PowerProfileScheduleConstraintsRequest
  *
  * Command: PowerProfileScheduleConstraintsRequest
- * @param powerProfileId INT8U 
- * @param powerProfileId INT8U 
+ * @param powerProfileId INT8U
+ * @param powerProfileId INT8U
  */
 #define emberAfFillCommandPower ProfileClusterPowerProfileScheduleConstraintsRequest( \
   powerProfileId, \
@@ -2262,9 +2262,9 @@
 /** @brief Command description for EnergyPhasesScheduleStateRequest
  *
  * Command: EnergyPhasesScheduleStateRequest
- * @param powerProfileId INT8U 
- * @param powerProfileId INT8U 
- * @param numOfScheduledPhases INT8U 
+ * @param powerProfileId INT8U
+ * @param powerProfileId INT8U
+ * @param numOfScheduledPhases INT8U
  * @param scheduledPhases ScheduledPhase []
  * @param scheduledPhasesLen int
  */
@@ -2288,14 +2288,14 @@
 /** @brief Command description for GetPowerProfilePriceExtendedResponse
  *
  * Command: GetPowerProfilePriceExtendedResponse
- * @param powerProfileId INT8U 
- * @param powerProfileId INT8U 
- * @param currency INT16U 
- * @param numOfScheduledPhases INT8U 
- * @param price INT32U 
+ * @param powerProfileId INT8U
+ * @param powerProfileId INT8U
+ * @param currency INT16U
+ * @param numOfScheduledPhases INT8U
+ * @param price INT32U
  * @param scheduledPhases ScheduledPhase []
  * @param scheduledPhasesLen int
- * @param priceTrailingDigit INT8U 
+ * @param priceTrailingDigit INT8U
  */
 #define emberAfFillCommandPower ProfileClusterGetPowerProfilePriceExtendedResponse( \
   powerProfileId, \
@@ -2323,9 +2323,9 @@
 /** @brief Command description for PowerProfileScheduleConstraintsNotification
  *
  * Command: PowerProfileScheduleConstraintsNotification
- * @param powerProfileId INT8U 
- * @param startAfter INT16U 
- * @param stopBefore INT16U 
+ * @param powerProfileId INT8U
+ * @param startAfter INT16U
+ * @param stopBefore INT16U
  */
 #define emberAfFillCommandPower ProfileClusterPowerProfileScheduleConstraintsNotification( \
   powerProfileId, \
@@ -2345,9 +2345,9 @@
 /** @brief Command description for PowerProfileScheduleConstraintsResponse
  *
  * Command: PowerProfileScheduleConstraintsResponse
- * @param powerProfileId INT8U 
- * @param startAfter INT16U 
- * @param stopBefore INT16U 
+ * @param powerProfileId INT8U
+ * @param startAfter INT16U
+ * @param stopBefore INT16U
  */
 #define emberAfFillCommandPower ProfileClusterPowerProfileScheduleConstraintsResponse( \
   powerProfileId, \
@@ -2367,9 +2367,9 @@
 /** @brief Command description for GetPowerProfilePriceExtended
  *
  * Command: GetPowerProfilePriceExtended
- * @param options BITMAP8 
- * @param powerProfileId INT8U 
- * @param powerProfileStartTime INT16U 
+ * @param options BITMAP8
+ * @param powerProfileId INT8U
+ * @param powerProfileStartTime INT16U
  */
 #define emberAfFillCommandPower ProfileClusterGetPowerProfilePriceExtended( \
   options, \
@@ -2389,10 +2389,10 @@
 /** @brief Command description for ExecutionOfACommand
  *
  * Command: ExecutionOfACommand
- * @param commandId CommandIdentification 
- * @param applianceStatus ApplianceStatus 
- * @param remoteEnableFlagsAndDeviceStatus2 RemoteEnableFlagsAndDeviceStatus2 
- * @param applianceStatus2 INT24U 
+ * @param commandId CommandIdentification
+ * @param applianceStatus ApplianceStatus
+ * @param remoteEnableFlagsAndDeviceStatus2 RemoteEnableFlagsAndDeviceStatus2
+ * @param applianceStatus2 INT24U
  */
 #define emberAfFillCommandAppliance ControlClusterExecutionOfACommand( \
   commandId, \
@@ -2414,9 +2414,9 @@
 /** @brief Command description for SignalState
  *
  * Command: SignalState
- * @param applianceStatus ApplianceStatus 
- * @param remoteEnableFlagsAndDeviceStatus2 RemoteEnableFlagsAndDeviceStatus2 
- * @param applianceStatus2 INT24U 
+ * @param applianceStatus ApplianceStatus
+ * @param remoteEnableFlagsAndDeviceStatus2 RemoteEnableFlagsAndDeviceStatus2
+ * @param applianceStatus2 INT24U
  */
 #define emberAfFillCommandAppliance ControlClusterSignalState( \
   applianceStatus, \
@@ -2436,8 +2436,8 @@
 /** @brief Command description for WriteFunctions
  *
  * Command: WriteFunctions
- * @param functionId INT16U 
- * @param functionDataType ENUM8 
+ * @param functionId INT16U
+ * @param functionDataType ENUM8
  * @param functionData INT8U []
  * @param functionDataLen int
  */
@@ -2485,7 +2485,7 @@
 /** @brief Command description for OverloadWarning
  *
  * Command: OverloadWarning
- * @param warningEvent WarningEvent 
+ * @param warningEvent WarningEvent
  */
 #define emberAfFillCommandAppliance ControlClusterOverloadWarning( \
   warningEvent \
@@ -2501,8 +2501,8 @@
 /** @brief Command description for CheckIn
  *
  * Command: CheckIn
- * @param startFastPolling BOOLEAN 
- * @param fastPollTimeout INT16U 
+ * @param startFastPolling BOOLEAN
+ * @param fastPollTimeout INT16U
  */
 #define emberAfFillCommandPoll ControlClusterCheckIn( \
   startFastPolling, \
@@ -2533,7 +2533,7 @@
 /** @brief Command description for SetLongPollInterval
  *
  * Command: SetLongPollInterval
- * @param newLongPollInterval INT32U 
+ * @param newLongPollInterval INT32U
  */
 #define emberAfFillCommandPoll ControlClusterSetLongPollInterval( \
   newLongPollInterval \
@@ -2549,7 +2549,7 @@
 /** @brief Command description for SetShortPollInterval
  *
  * Command: SetShortPollInterval
- * @param newShortPollInterval INT16U 
+ * @param newShortPollInterval INT16U
  */
 #define emberAfFillCommandPoll ControlClusterSetShortPollInterval( \
   newShortPollInterval \
@@ -2565,20 +2565,20 @@
 /** @brief Command description for GpNotification
  *
  * Command: GpNotification
- * @param options GpNotificationOption 
- * @param options GpNotificationResponseOption 
- * @param gpdSrcId INT32U 
- * @param gpdSrcId INT32U 
- * @param gpdIeee IEEE_ADDRESS 
- * @param gpdIeee IEEE_ADDRESS 
- * @param gpdEndpoint INT8U 
- * @param endpoint INT8U 
- * @param gpdSecurityFrameCounter INT32U 
- * @param gpdSecurityFrameCounter INT32U 
- * @param gpdCommandId INT8U 
- * @param gpdCommandPayload OCTET_STRING 
- * @param gppShortAddress INT16U 
- * @param gppDistance INT8U 
+ * @param options GpNotificationOption
+ * @param options GpNotificationResponseOption
+ * @param gpdSrcId INT32U
+ * @param gpdSrcId INT32U
+ * @param gpdIeee IEEE_ADDRESS
+ * @param gpdIeee IEEE_ADDRESS
+ * @param gpdEndpoint INT8U
+ * @param endpoint INT8U
+ * @param gpdSecurityFrameCounter INT32U
+ * @param gpdSecurityFrameCounter INT32U
+ * @param gpdCommandId INT8U
+ * @param gpdCommandPayload OCTET_STRING
+ * @param gppShortAddress INT16U
+ * @param gppDistance INT8U
  */
 #define emberAfFillCommandGreen PowerClusterGpNotification( \
   options, \
@@ -2620,22 +2620,22 @@
 /** @brief Command description for GpPairingSearch
  *
  * Command: GpPairingSearch
- * @param options GpPairingSearchOption 
- * @param options GpPairingOption 
- * @param gpdSrcId INT32U 
- * @param gpdSrcId INT32U 
- * @param gpdIeee IEEE_ADDRESS 
- * @param gpdIeee IEEE_ADDRESS 
- * @param endpoint INT8U 
- * @param endpoint INT8U 
- * @param sinkIeeeAddress IEEE_ADDRESS 
- * @param sinkNwkAddress INT16U 
- * @param sinkGroupId INT16U 
- * @param deviceId GpDeviceId 
- * @param gpdSecurityFrameCounter INT32U 
- * @param gpdKey SECURITY_KEY 
- * @param assignedAlias INT16U 
- * @param groupcastRadius INT8U 
+ * @param options GpPairingSearchOption
+ * @param options GpPairingOption
+ * @param gpdSrcId INT32U
+ * @param gpdSrcId INT32U
+ * @param gpdIeee IEEE_ADDRESS
+ * @param gpdIeee IEEE_ADDRESS
+ * @param endpoint INT8U
+ * @param endpoint INT8U
+ * @param sinkIeeeAddress IEEE_ADDRESS
+ * @param sinkNwkAddress INT16U
+ * @param sinkGroupId INT16U
+ * @param deviceId GpDeviceId
+ * @param gpdSecurityFrameCounter INT32U
+ * @param gpdKey SECURITY_KEY
+ * @param assignedAlias INT16U
+ * @param groupcastRadius INT8U
  */
 #define emberAfFillCommandGreen PowerClusterGpPairingSearch( \
   options, \
@@ -2681,9 +2681,9 @@
 /** @brief Command description for GpProxyCommissioningMode
  *
  * Command: GpProxyCommissioningMode
- * @param options GpProxyCommissioningModeOption 
- * @param commissioningWindow INT16U 
- * @param channel INT8U 
+ * @param options GpProxyCommissioningModeOption
+ * @param commissioningWindow INT16U
+ * @param channel INT8U
  */
 #define emberAfFillCommandGreen PowerClusterGpProxyCommissioningMode( \
   options, \
@@ -2703,13 +2703,13 @@
 /** @brief Command description for GpTunnelingStop
  *
  * Command: GpTunnelingStop
- * @param options GpTunnelingStopOption 
- * @param gpdSrcId INT32U 
- * @param gpdIeee IEEE_ADDRESS 
- * @param endpoint INT8U 
- * @param gpdSecurityFrameCounter INT32U 
- * @param gppShortAddress INT16U 
- * @param gppDistance INT8S 
+ * @param options GpTunnelingStopOption
+ * @param gpdSrcId INT32U
+ * @param gpdIeee IEEE_ADDRESS
+ * @param endpoint INT8U
+ * @param gpdSecurityFrameCounter INT32U
+ * @param gppShortAddress INT16U
+ * @param gppDistance INT8S
  */
 #define emberAfFillCommandGreen PowerClusterGpTunnelingStop( \
   options, \
@@ -2737,16 +2737,16 @@
 /** @brief Command description for GpCommissioningNotification
  *
  * Command: GpCommissioningNotification
- * @param options GpCommissioningNotificationOption 
- * @param gpdSrcId INT32U 
- * @param gpdIeee IEEE_ADDRESS 
- * @param endpoint INT8U 
- * @param gpdSecurityFrameCounter INT32U 
- * @param gpdCommandId INT8U 
- * @param gpdCommandPayload OCTET_STRING 
- * @param gppShortAddress INT16U 
- * @param gppLink INT8U 
- * @param mic INT32U 
+ * @param options GpCommissioningNotificationOption
+ * @param gpdSrcId INT32U
+ * @param gpdIeee IEEE_ADDRESS
+ * @param endpoint INT8U
+ * @param gpdSecurityFrameCounter INT32U
+ * @param gpdCommandId INT8U
+ * @param gpdCommandPayload OCTET_STRING
+ * @param gppShortAddress INT16U
+ * @param gppLink INT8U
+ * @param mic INT32U
  */
 #define emberAfFillCommandGreen PowerClusterGpCommissioningNotification( \
   options, \
@@ -2780,10 +2780,10 @@
 /** @brief Command description for GpSinkCommissioningMode
  *
  * Command: GpSinkCommissioningMode
- * @param options GpSinkCommissioningModeOptions 
- * @param gpmAddrForSecurity INT16U 
- * @param gpmAddrForPairing INT16U 
- * @param sinkEndpoint INT8U 
+ * @param options GpSinkCommissioningModeOptions
+ * @param gpmAddrForSecurity INT16U
+ * @param gpmAddrForPairing INT16U
+ * @param sinkEndpoint INT8U
  */
 #define emberAfFillCommandGreen PowerClusterGpSinkCommissioningMode( \
   options, \
@@ -2805,14 +2805,14 @@
 /** @brief Command description for GpResponse
  *
  * Command: GpResponse
- * @param options GpResponseOption 
- * @param tempMasterShortAddress INT16U 
- * @param tempMasterTxChannel BITMAP8 
- * @param gpdSrcId INT32U 
- * @param gpdIeee IEEE_ADDRESS 
- * @param endpoint INT8U 
- * @param gpdCommandId INT8U 
- * @param gpdCommandPayload OCTET_STRING 
+ * @param options GpResponseOption
+ * @param tempMasterShortAddress INT16U
+ * @param tempMasterTxChannel BITMAP8
+ * @param gpdSrcId INT32U
+ * @param gpdIeee IEEE_ADDRESS
+ * @param endpoint INT8U
+ * @param gpdCommandId INT8U
+ * @param gpdCommandPayload OCTET_STRING
  */
 #define emberAfFillCommandGreen PowerClusterGpResponse( \
   options, \
@@ -2842,10 +2842,10 @@
 /** @brief Command description for GpTranslationTableUpdate
  *
  * Command: GpTranslationTableUpdate
- * @param options GpTranslationTableUpdateOption 
- * @param gpdSrcId INT32U 
- * @param gpdIeee IEEE_ADDRESS 
- * @param endpoint INT8U 
+ * @param options GpTranslationTableUpdateOption
+ * @param gpdSrcId INT32U
+ * @param gpdIeee IEEE_ADDRESS
+ * @param endpoint INT8U
  * @param translations GpTranslationTableUpdateTranslation []
  * @param translationsLen int
  */
@@ -2871,12 +2871,12 @@
 /** @brief Command description for GpTranslationTableRequest
  *
  * Command: GpTranslationTableRequest
- * @param startIndex INT8U 
- * @param status GpTranslationTableResponseStatus 
- * @param options GpTranslationTableResponseOption 
- * @param totalNumberOfEntries INT8U 
- * @param startIndex INT8U 
- * @param entriesCount INT8U 
+ * @param startIndex INT8U
+ * @param status GpTranslationTableResponseStatus
+ * @param options GpTranslationTableResponseOption
+ * @param totalNumberOfEntries INT8U
+ * @param startIndex INT8U
+ * @param entriesCount INT8U
  * @param translationTableList INT8U []
  * @param translationTableListLen int
  */
@@ -2906,39 +2906,39 @@
 /** @brief Command description for GpPairingConfiguration
  *
  * Command: GpPairingConfiguration
- * @param actions GpPairingConfigurationActions 
- * @param options GpPairingConfigurationOption 
- * @param gpdSrcId INT32U 
- * @param gpdIeee IEEE_ADDRESS 
- * @param endpoint INT8U 
- * @param deviceId INT8U 
- * @param groupListCount INT8U 
+ * @param actions GpPairingConfigurationActions
+ * @param options GpPairingConfigurationOption
+ * @param gpdSrcId INT32U
+ * @param gpdIeee IEEE_ADDRESS
+ * @param endpoint INT8U
+ * @param deviceId INT8U
+ * @param groupListCount INT8U
  * @param groupList GpPairingConfigurationGroupList []
  * @param groupListLen int
- * @param gpdAssignedAlias INT16U 
- * @param groupcastRadius INT8U 
- * @param securityOptions INT8U 
- * @param gpdSecurityFrameCounter INT32U 
- * @param gpdSecurityKey SECURITY_KEY 
- * @param numberOfPairedEndpoints INT8U 
+ * @param gpdAssignedAlias INT16U
+ * @param groupcastRadius INT8U
+ * @param securityOptions INT8U
+ * @param gpdSecurityFrameCounter INT32U
+ * @param gpdSecurityKey SECURITY_KEY
+ * @param numberOfPairedEndpoints INT8U
  * @param pairedEndpoints INT8U []
  * @param pairedEndpointsLen int
- * @param applicationInformation GpApplicationInformation 
- * @param manufacturerId INT16U 
- * @param modeId INT16U 
- * @param numberOfGpdCommands INT8U 
+ * @param applicationInformation GpApplicationInformation
+ * @param manufacturerId INT16U
+ * @param modeId INT16U
+ * @param numberOfGpdCommands INT8U
  * @param gpdCommandIdList INT8U []
  * @param gpdCommandIdListLen int
- * @param clusterIdListCount INT8U 
+ * @param clusterIdListCount INT8U
  * @param clusterListServer INT16U []
  * @param clusterListServerLen int
  * @param clusterListClient INT16U []
  * @param clusterListClientLen int
- * @param switchInformationLength INT8U 
- * @param switchConfiguration INT8U 
- * @param currentContactStatus INT8U 
- * @param totalNumberOfReports INT8U 
- * @param numberOfReports INT8U 
+ * @param switchInformationLength INT8U
+ * @param switchConfiguration INT8U
+ * @param currentContactStatus INT8U
+ * @param totalNumberOfReports INT8U
+ * @param numberOfReports INT8U
  * @param reportDescriptor INT8U []
  * @param reportDescriptorLen int
  */
@@ -3012,15 +3012,15 @@
 /** @brief Command description for GpSinkTableRequest
  *
  * Command: GpSinkTableRequest
- * @param options GpSinkTableRequestOptions 
- * @param status ENUM8 
- * @param gpdSrcId INT32U 
- * @param totalNumberofNonEmptySinkTableEntries INT8U 
- * @param gpdIeee INT64U 
- * @param startIndex INT8U 
- * @param endpoint INT8U 
- * @param sinkTableEntriesCount INT8U 
- * @param index INT8U 
+ * @param options GpSinkTableRequestOptions
+ * @param status ENUM8
+ * @param gpdSrcId INT32U
+ * @param totalNumberofNonEmptySinkTableEntries INT8U
+ * @param gpdIeee INT64U
+ * @param startIndex INT8U
+ * @param endpoint INT8U
+ * @param sinkTableEntriesCount INT8U
+ * @param index INT8U
  * @param sinkTableEntries INT8U []
  * @param sinkTableEntriesLen int
  */
@@ -3056,17 +3056,17 @@
 /** @brief Command description for GpProxyTableResponse
  *
  * Command: GpProxyTableResponse
- * @param status GpProxyTableResponseStatus 
- * @param options GpProxyTableRequestOptions 
- * @param totalNumberOfNonEmptyProxyTableEntries INT8U 
- * @param gpdSrcId INT32U 
- * @param startIndex INT8U 
- * @param gpdIeee INT64U 
- * @param entriesCount INT8U 
- * @param endpoint INT8U 
+ * @param status GpProxyTableResponseStatus
+ * @param options GpProxyTableRequestOptions
+ * @param totalNumberOfNonEmptyProxyTableEntries INT8U
+ * @param gpdSrcId INT32U
+ * @param startIndex INT8U
+ * @param gpdIeee INT64U
+ * @param entriesCount INT8U
+ * @param endpoint INT8U
  * @param proxyTableEntries INT8U []
  * @param proxyTableEntriesLen int
- * @param index INT8U 
+ * @param index INT8U
  */
 #define emberAfFillCommandGreen PowerClusterGpProxyTableResponse( \
   status, \
@@ -3139,10 +3139,10 @@
 /** @brief Command description for SetFabric
  *
  * Command: SetFabric
- * @param fabricId OCTET_STRING 
- * @param fabricSecret OCTET_STRING 
- * @param breadcrumb INT64U 
- * @param timeoutMs INT32U 
+ * @param fabricId OCTET_STRING
+ * @param fabricSecret OCTET_STRING
+ * @param breadcrumb INT64U
+ * @param timeoutMs INT32U
  */
 #define emberAfFillCommandGeneral CommissioningClusterSetFabric( \
   fabricId, \
@@ -3164,8 +3164,8 @@
 /** @brief Command description for SetFabricResponse
  *
  * Command: SetFabricResponse
- * @param errorCode INT8U 
- * @param debugText CHAR_STRING 
+ * @param errorCode INT8U
+ * @param debugText CHAR_STRING
  */
 #define emberAfFillCommandGeneral CommissioningClusterSetFabricResponse( \
   errorCode, \
@@ -3183,9 +3183,9 @@
 /** @brief Command description for ArmFailSafe
  *
  * Command: ArmFailSafe
- * @param expiryLengthSeconds INT16U 
- * @param breadcrumb INT64U 
- * @param timeoutMs INT32U 
+ * @param expiryLengthSeconds INT16U
+ * @param breadcrumb INT64U
+ * @param timeoutMs INT32U
  */
 #define emberAfFillCommandGeneral CommissioningClusterArmFailSafe( \
   expiryLengthSeconds, \
@@ -3205,8 +3205,8 @@
 /** @brief Command description for ArmFailSafeResponse
  *
  * Command: ArmFailSafeResponse
- * @param errorCode INT8U 
- * @param debugText CHAR_STRING 
+ * @param errorCode INT8U
+ * @param debugText CHAR_STRING
  */
 #define emberAfFillCommandGeneral CommissioningClusterArmFailSafeResponse( \
   errorCode, \
@@ -3224,10 +3224,10 @@
 /** @brief Command description for SetRegulatoryConfig
  *
  * Command: SetRegulatoryConfig
- * @param location RegulatoryLocationType 
- * @param countryCode CHAR_STRING 
- * @param breadcrumb INT64U 
- * @param timeoutMs INT32U 
+ * @param location RegulatoryLocationType
+ * @param countryCode CHAR_STRING
+ * @param breadcrumb INT64U
+ * @param timeoutMs INT32U
  */
 #define emberAfFillCommandGeneral CommissioningClusterSetRegulatoryConfig( \
   location, \
@@ -3249,8 +3249,8 @@
 /** @brief Command description for SetRegulatoryConfigResponse
  *
  * Command: SetRegulatoryConfigResponse
- * @param errorCode INT8U 
- * @param debugText CHAR_STRING 
+ * @param errorCode INT8U
+ * @param debugText CHAR_STRING
  */
 #define emberAfFillCommandGeneral CommissioningClusterSetRegulatoryConfigResponse( \
   errorCode, \
@@ -3281,8 +3281,8 @@
 /** @brief Command description for CommissioningCompleteResponse
  *
  * Command: CommissioningCompleteResponse
- * @param errorCode INT8U 
- * @param debugText CHAR_STRING 
+ * @param errorCode INT8U
+ * @param debugText CHAR_STRING
  */
 #define emberAfFillCommandGeneral CommissioningClusterCommissioningCompleteResponse( \
   errorCode, \
@@ -3300,9 +3300,9 @@
 /** @brief Command description for ScanNetworks
  *
  * Command: ScanNetworks
- * @param ssid OCTET_STRING 
- * @param breadcrumb INT64U 
- * @param timeoutMs INT32U 
+ * @param ssid OCTET_STRING
+ * @param breadcrumb INT64U
+ * @param timeoutMs INT32U
  */
 #define emberAfFillCommandNetwork CommissioningClusterScanNetworks( \
   ssid, \
@@ -3322,8 +3322,8 @@
 /** @brief Command description for ScanNetworksResponse
  *
  * Command: ScanNetworksResponse
- * @param errorCode INT8U 
- * @param debugText CHAR_STRING 
+ * @param errorCode INT8U
+ * @param debugText CHAR_STRING
  * @param wifiScanResults WiFiInterfaceScanResult []
  * @param wifiScanResultsLen int
  * @param threadScanResults ThreadInterfaceScanResult []
@@ -3349,10 +3349,10 @@
 /** @brief Command description for AddWiFiNetwork
  *
  * Command: AddWiFiNetwork
- * @param ssid OCTET_STRING 
- * @param credentials OCTET_STRING 
- * @param breadcrumb INT64U 
- * @param timeoutMs INT32U 
+ * @param ssid OCTET_STRING
+ * @param credentials OCTET_STRING
+ * @param breadcrumb INT64U
+ * @param timeoutMs INT32U
  */
 #define emberAfFillCommandNetwork CommissioningClusterAddWiFiNetwork( \
   ssid, \
@@ -3374,8 +3374,8 @@
 /** @brief Command description for AddWiFiNetworkResponse
  *
  * Command: AddWiFiNetworkResponse
- * @param errorCode INT8U 
- * @param debugText CHAR_STRING 
+ * @param errorCode INT8U
+ * @param debugText CHAR_STRING
  */
 #define emberAfFillCommandNetwork CommissioningClusterAddWiFiNetworkResponse( \
   errorCode, \
@@ -3393,10 +3393,10 @@
 /** @brief Command description for UpdateWiFiNetwork
  *
  * Command: UpdateWiFiNetwork
- * @param ssid OCTET_STRING 
- * @param credentials OCTET_STRING 
- * @param breadcrumb INT64U 
- * @param timeoutMs INT32U 
+ * @param ssid OCTET_STRING
+ * @param credentials OCTET_STRING
+ * @param breadcrumb INT64U
+ * @param timeoutMs INT32U
  */
 #define emberAfFillCommandNetwork CommissioningClusterUpdateWiFiNetwork( \
   ssid, \
@@ -3418,8 +3418,8 @@
 /** @brief Command description for UpdateWiFiNetworkResponse
  *
  * Command: UpdateWiFiNetworkResponse
- * @param errorCode INT8U 
- * @param debugText CHAR_STRING 
+ * @param errorCode INT8U
+ * @param debugText CHAR_STRING
  */
 #define emberAfFillCommandNetwork CommissioningClusterUpdateWiFiNetworkResponse( \
   errorCode, \
@@ -3437,9 +3437,9 @@
 /** @brief Command description for AddThreadNetwork
  *
  * Command: AddThreadNetwork
- * @param operationalDataset OCTET_STRING 
- * @param breadcrumb INT64U 
- * @param timeoutMs INT32U 
+ * @param operationalDataset OCTET_STRING
+ * @param breadcrumb INT64U
+ * @param timeoutMs INT32U
  */
 #define emberAfFillCommandNetwork CommissioningClusterAddThreadNetwork( \
   operationalDataset, \
@@ -3459,8 +3459,8 @@
 /** @brief Command description for AddThreadNetworkResponse
  *
  * Command: AddThreadNetworkResponse
- * @param errorCode INT8U 
- * @param debugText CHAR_STRING 
+ * @param errorCode INT8U
+ * @param debugText CHAR_STRING
  */
 #define emberAfFillCommandNetwork CommissioningClusterAddThreadNetworkResponse( \
   errorCode, \
@@ -3478,9 +3478,9 @@
 /** @brief Command description for UpdateThreadNetwork
  *
  * Command: UpdateThreadNetwork
- * @param operationalDataset OCTET_STRING 
- * @param breadcrumb INT64U 
- * @param timeoutMs INT32U 
+ * @param operationalDataset OCTET_STRING
+ * @param breadcrumb INT64U
+ * @param timeoutMs INT32U
  */
 #define emberAfFillCommandNetwork CommissioningClusterUpdateThreadNetwork( \
   operationalDataset, \
@@ -3500,8 +3500,8 @@
 /** @brief Command description for UpdateThreadNetworkResponse
  *
  * Command: UpdateThreadNetworkResponse
- * @param errorCode INT8U 
- * @param debugText CHAR_STRING 
+ * @param errorCode INT8U
+ * @param debugText CHAR_STRING
  */
 #define emberAfFillCommandNetwork CommissioningClusterUpdateThreadNetworkResponse( \
   errorCode, \
@@ -3519,9 +3519,9 @@
 /** @brief Command description for RemoveNetwork
  *
  * Command: RemoveNetwork
- * @param NetworkID OCTET_STRING 
- * @param Breadcrumb INT64U 
- * @param TimeoutMs INT32U 
+ * @param NetworkID OCTET_STRING
+ * @param Breadcrumb INT64U
+ * @param TimeoutMs INT32U
  */
 #define emberAfFillCommandNetwork CommissioningClusterRemoveNetwork( \
   NetworkID, \
@@ -3541,8 +3541,8 @@
 /** @brief Command description for RemoveNetworkResponse
  *
  * Command: RemoveNetworkResponse
- * @param errorCode INT8U 
- * @param debugText CHAR_STRING 
+ * @param errorCode INT8U
+ * @param debugText CHAR_STRING
  */
 #define emberAfFillCommandNetwork CommissioningClusterRemoveNetworkResponse( \
   errorCode, \
@@ -3560,9 +3560,9 @@
 /** @brief Command description for EnableNetwork
  *
  * Command: EnableNetwork
- * @param networkID OCTET_STRING 
- * @param breadcrumb INT64U 
- * @param timeoutMs INT32U 
+ * @param networkID OCTET_STRING
+ * @param breadcrumb INT64U
+ * @param timeoutMs INT32U
  */
 #define emberAfFillCommandNetwork CommissioningClusterEnableNetwork( \
   networkID, \
@@ -3582,8 +3582,8 @@
 /** @brief Command description for EnableNetworkResponse
  *
  * Command: EnableNetworkResponse
- * @param errorCode INT8U 
- * @param debugText CHAR_STRING 
+ * @param errorCode INT8U
+ * @param debugText CHAR_STRING
  */
 #define emberAfFillCommandNetwork CommissioningClusterEnableNetworkResponse( \
   errorCode, \
@@ -3601,9 +3601,9 @@
 /** @brief Command description for DisableNetwork
  *
  * Command: DisableNetwork
- * @param networkID OCTET_STRING 
- * @param breadcrumb INT64U 
- * @param timeoutMs INT32U 
+ * @param networkID OCTET_STRING
+ * @param breadcrumb INT64U
+ * @param timeoutMs INT32U
  */
 #define emberAfFillCommandNetwork CommissioningClusterDisableNetwork( \
   networkID, \
@@ -3623,8 +3623,8 @@
 /** @brief Command description for DisableNetworkResponse
  *
  * Command: DisableNetworkResponse
- * @param errorCode INT8U 
- * @param debugText CHAR_STRING 
+ * @param errorCode INT8U
+ * @param debugText CHAR_STRING
  */
 #define emberAfFillCommandNetwork CommissioningClusterDisableNetworkResponse( \
   errorCode, \
@@ -3642,7 +3642,7 @@
 /** @brief Command description for GetLastNetworkCommissioningResult
  *
  * Command: GetLastNetworkCommissioningResult
- * @param timeoutMs INT32U 
+ * @param timeoutMs INT32U
  */
 #define emberAfFillCommandNetwork CommissioningClusterGetLastNetworkCommissioningResult( \
   timeoutMs \
@@ -3658,8 +3658,8 @@
 /** @brief Command description for LockDoor
  *
  * Command: LockDoor
- * @param PIN CHAR_STRING 
- * @param status INT8U 
+ * @param PIN CHAR_STRING
+ * @param status INT8U
  */
 #define emberAfFillCommandDoor LockClusterLockDoor( \
   PIN, \
@@ -3677,8 +3677,8 @@
 /** @brief Command description for UnlockDoor
  *
  * Command: UnlockDoor
- * @param PIN CHAR_STRING 
- * @param status INT8U 
+ * @param PIN CHAR_STRING
+ * @param status INT8U
  */
 #define emberAfFillCommandDoor LockClusterUnlockDoor( \
   PIN, \
@@ -3696,8 +3696,8 @@
 /** @brief Command description for Toggle
  *
  * Command: Toggle
- * @param pin CHAR_STRING 
- * @param status INT8U 
+ * @param pin CHAR_STRING
+ * @param status INT8U
  */
 #define emberAfFillCommandDoor LockClusterToggle( \
   pin, \
@@ -3715,9 +3715,9 @@
 /** @brief Command description for UnlockWithTimeout
  *
  * Command: UnlockWithTimeout
- * @param timeoutInSeconds INT16U 
- * @param status INT8U 
- * @param pin CHAR_STRING 
+ * @param timeoutInSeconds INT16U
+ * @param status INT8U
+ * @param pin CHAR_STRING
  */
 #define emberAfFillCommandDoor LockClusterUnlockWithTimeout( \
   timeoutInSeconds, \
@@ -3737,14 +3737,14 @@
 /** @brief Command description for GetLogRecord
  *
  * Command: GetLogRecord
- * @param logIndex INT16U 
- * @param logEntryId INT16U 
- * @param timestamp INT32U 
- * @param eventType ENUM8 
- * @param source INT8U 
- * @param eventIdOrAlarmCode INT8U 
- * @param userId INT16U 
- * @param pin CHAR_STRING 
+ * @param logIndex INT16U
+ * @param logEntryId INT16U
+ * @param timestamp INT32U
+ * @param eventType ENUM8
+ * @param source INT8U
+ * @param eventIdOrAlarmCode INT8U
+ * @param userId INT16U
+ * @param pin CHAR_STRING
  */
 #define emberAfFillCommandDoor LockClusterGetLogRecord( \
   logIndex, \
@@ -3774,11 +3774,11 @@
 /** @brief Command description for SetPin
  *
  * Command: SetPin
- * @param userId INT16U 
- * @param status DoorLockSetPinOrIdStatus 
- * @param userStatus DoorLockUserStatus 
- * @param userType DoorLockUserType 
- * @param pin CHAR_STRING 
+ * @param userId INT16U
+ * @param status DoorLockSetPinOrIdStatus
+ * @param userStatus DoorLockUserStatus
+ * @param userType DoorLockUserType
+ * @param pin CHAR_STRING
  */
 #define emberAfFillCommandDoor LockClusterSetPin( \
   userId, \
@@ -3802,11 +3802,11 @@
 /** @brief Command description for GetPin
  *
  * Command: GetPin
- * @param userId INT16U 
- * @param userId INT16U 
- * @param userStatus DoorLockUserStatus 
- * @param userType DoorLockUserType 
- * @param pin CHAR_STRING 
+ * @param userId INT16U
+ * @param userId INT16U
+ * @param userStatus DoorLockUserStatus
+ * @param userType DoorLockUserType
+ * @param pin CHAR_STRING
  */
 #define emberAfFillCommandDoor LockClusterGetPin( \
   userId, \
@@ -3830,8 +3830,8 @@
 /** @brief Command description for ClearPin
  *
  * Command: ClearPin
- * @param userId INT16U 
- * @param status INT8U 
+ * @param userId INT16U
+ * @param status INT8U
  */
 #define emberAfFillCommandDoor LockClusterClearPin( \
   userId, \
@@ -3849,7 +3849,7 @@
 /** @brief Command description for ClearAllPins
  *
  * Command: ClearAllPins
- * @param status INT8U 
+ * @param status INT8U
  */
 #define emberAfFillCommandDoor LockClusterClearAllPins( \
   status \
@@ -3865,9 +3865,9 @@
 /** @brief Command description for SetUserStatus
  *
  * Command: SetUserStatus
- * @param userId INT16U 
- * @param status INT8U 
- * @param userStatus INT8U 
+ * @param userId INT16U
+ * @param status INT8U
+ * @param userStatus INT8U
  */
 #define emberAfFillCommandDoor LockClusterSetUserStatus( \
   userId, \
@@ -3887,9 +3887,9 @@
 /** @brief Command description for GetUserStatus
  *
  * Command: GetUserStatus
- * @param userId INT16U 
- * @param userId INT16U 
- * @param status INT8U 
+ * @param userId INT16U
+ * @param userId INT16U
+ * @param status INT8U
  */
 #define emberAfFillCommandDoor LockClusterGetUserStatus( \
   userId, \
@@ -3909,14 +3909,14 @@
 /** @brief Command description for SetWeekdaySchedule
  *
  * Command: SetWeekdaySchedule
- * @param scheduleId INT8U 
- * @param status INT8U 
- * @param userId INT16U 
- * @param daysMask DoorLockDayOfWeek 
- * @param startHour INT8U 
- * @param startMinute INT8U 
- * @param endHour INT8U 
- * @param endMinute INT8U 
+ * @param scheduleId INT8U
+ * @param status INT8U
+ * @param userId INT16U
+ * @param daysMask DoorLockDayOfWeek
+ * @param startHour INT8U
+ * @param startMinute INT8U
+ * @param endHour INT8U
+ * @param endMinute INT8U
  */
 #define emberAfFillCommandDoor LockClusterSetWeekdaySchedule( \
   scheduleId, \
@@ -3946,16 +3946,16 @@
 /** @brief Command description for GetWeekdaySchedule
  *
  * Command: GetWeekdaySchedule
- * @param scheduleId INT8U 
- * @param scheduleId INT8U 
- * @param userId INT16U 
- * @param userId INT16U 
- * @param status INT8U 
- * @param daysMask INT8U 
- * @param startHour INT8U 
- * @param startMinute INT8U 
- * @param endHour INT8U 
- * @param endMinute INT8U 
+ * @param scheduleId INT8U
+ * @param scheduleId INT8U
+ * @param userId INT16U
+ * @param userId INT16U
+ * @param status INT8U
+ * @param daysMask INT8U
+ * @param startHour INT8U
+ * @param startMinute INT8U
+ * @param endHour INT8U
+ * @param endMinute INT8U
  */
 #define emberAfFillCommandDoor LockClusterGetWeekdaySchedule( \
   scheduleId, \
@@ -3989,9 +3989,9 @@
 /** @brief Command description for ClearWeekdaySchedule
  *
  * Command: ClearWeekdaySchedule
- * @param scheduleId INT8U 
- * @param status INT8U 
- * @param userId INT16U 
+ * @param scheduleId INT8U
+ * @param status INT8U
+ * @param userId INT16U
  */
 #define emberAfFillCommandDoor LockClusterClearWeekdaySchedule( \
   scheduleId, \
@@ -4011,11 +4011,11 @@
 /** @brief Command description for SetYeardaySchedule
  *
  * Command: SetYeardaySchedule
- * @param scheduleId INT8U 
- * @param status INT8U 
- * @param userId INT16U 
- * @param localStartTime INT32U 
- * @param localEndTime INT32U 
+ * @param scheduleId INT8U
+ * @param status INT8U
+ * @param userId INT16U
+ * @param localStartTime INT32U
+ * @param localEndTime INT32U
  */
 #define emberAfFillCommandDoor LockClusterSetYeardaySchedule( \
   scheduleId, \
@@ -4039,13 +4039,13 @@
 /** @brief Command description for GetYeardaySchedule
  *
  * Command: GetYeardaySchedule
- * @param scheduleId INT8U 
- * @param scheduleId INT8U 
- * @param userId INT16U 
- * @param userId INT16U 
- * @param status INT8U 
- * @param localStartTime INT32U 
- * @param localEndTime INT32U 
+ * @param scheduleId INT8U
+ * @param scheduleId INT8U
+ * @param userId INT16U
+ * @param userId INT16U
+ * @param status INT8U
+ * @param localStartTime INT32U
+ * @param localEndTime INT32U
  */
 #define emberAfFillCommandDoor LockClusterGetYeardaySchedule( \
   scheduleId, \
@@ -4073,9 +4073,9 @@
 /** @brief Command description for ClearYeardaySchedule
  *
  * Command: ClearYeardaySchedule
- * @param scheduleId INT8U 
- * @param status INT8U 
- * @param userId INT16U 
+ * @param scheduleId INT8U
+ * @param status INT8U
+ * @param userId INT16U
  */
 #define emberAfFillCommandDoor LockClusterClearYeardaySchedule( \
   scheduleId, \
@@ -4095,11 +4095,11 @@
 /** @brief Command description for SetHolidaySchedule
  *
  * Command: SetHolidaySchedule
- * @param scheduleId INT8U 
- * @param status INT8U 
- * @param localStartTime INT32U 
- * @param localEndTime INT32U 
- * @param operatingModeDuringHoliday ENUM8 
+ * @param scheduleId INT8U
+ * @param status INT8U
+ * @param localStartTime INT32U
+ * @param localEndTime INT32U
+ * @param operatingModeDuringHoliday ENUM8
  */
 #define emberAfFillCommandDoor LockClusterSetHolidaySchedule( \
   scheduleId, \
@@ -4123,12 +4123,12 @@
 /** @brief Command description for GetHolidaySchedule
  *
  * Command: GetHolidaySchedule
- * @param scheduleId INT8U 
- * @param scheduleId INT8U 
- * @param status INT8U 
- * @param localStartTime INT32U 
- * @param localEndTime INT32U 
- * @param operatingModeDuringHoliday ENUM8 
+ * @param scheduleId INT8U
+ * @param scheduleId INT8U
+ * @param status INT8U
+ * @param localStartTime INT32U
+ * @param localEndTime INT32U
+ * @param operatingModeDuringHoliday ENUM8
  */
 #define emberAfFillCommandDoor LockClusterGetHolidaySchedule( \
   scheduleId, \
@@ -4154,8 +4154,8 @@
 /** @brief Command description for ClearHolidaySchedule
  *
  * Command: ClearHolidaySchedule
- * @param scheduleId INT8U 
- * @param status INT8U 
+ * @param scheduleId INT8U
+ * @param status INT8U
  */
 #define emberAfFillCommandDoor LockClusterClearHolidaySchedule( \
   scheduleId, \
@@ -4173,9 +4173,9 @@
 /** @brief Command description for SetUserType
  *
  * Command: SetUserType
- * @param userId INT16U 
- * @param status INT8U 
- * @param userType DoorLockUserType 
+ * @param userId INT16U
+ * @param status INT8U
+ * @param userType DoorLockUserType
  */
 #define emberAfFillCommandDoor LockClusterSetUserType( \
   userId, \
@@ -4195,9 +4195,9 @@
 /** @brief Command description for GetUserType
  *
  * Command: GetUserType
- * @param userId INT16U 
- * @param userId INT16U 
- * @param userType DoorLockUserType 
+ * @param userId INT16U
+ * @param userId INT16U
+ * @param userType DoorLockUserType
  */
 #define emberAfFillCommandDoor LockClusterGetUserType( \
   userId, \
@@ -4217,11 +4217,11 @@
 /** @brief Command description for SetRfid
  *
  * Command: SetRfid
- * @param userId INT16U 
- * @param status DoorLockSetPinOrIdStatus 
- * @param userStatus DoorLockUserStatus 
- * @param userType DoorLockUserType 
- * @param id CHAR_STRING 
+ * @param userId INT16U
+ * @param status DoorLockSetPinOrIdStatus
+ * @param userStatus DoorLockUserStatus
+ * @param userType DoorLockUserType
+ * @param id CHAR_STRING
  */
 #define emberAfFillCommandDoor LockClusterSetRfid( \
   userId, \
@@ -4245,11 +4245,11 @@
 /** @brief Command description for GetRfid
  *
  * Command: GetRfid
- * @param userId INT16U 
- * @param userId INT16U 
- * @param userStatus DoorLockUserStatus 
- * @param userType DoorLockUserType 
- * @param rfid CHAR_STRING 
+ * @param userId INT16U
+ * @param userId INT16U
+ * @param userStatus DoorLockUserStatus
+ * @param userType DoorLockUserType
+ * @param rfid CHAR_STRING
  */
 #define emberAfFillCommandDoor LockClusterGetRfid( \
   userId, \
@@ -4273,8 +4273,8 @@
 /** @brief Command description for ClearRfid
  *
  * Command: ClearRfid
- * @param userId INT16U 
- * @param status INT8U 
+ * @param userId INT16U
+ * @param status INT8U
  */
 #define emberAfFillCommandDoor LockClusterClearRfid( \
   userId, \
@@ -4292,7 +4292,7 @@
 /** @brief Command description for ClearAllRfids
  *
  * Command: ClearAllRfids
- * @param status INT8U 
+ * @param status INT8U
  */
 #define emberAfFillCommandDoor LockClusterClearAllRfids( \
   status \
@@ -4308,12 +4308,12 @@
 /** @brief Command description for OperationEventNotification
  *
  * Command: OperationEventNotification
- * @param source INT8U 
- * @param eventCode DoorLockOperationEventCode 
- * @param userId INT16U 
- * @param pin CHAR_STRING 
- * @param timeStamp INT32U 
- * @param data CHAR_STRING 
+ * @param source INT8U
+ * @param eventCode DoorLockOperationEventCode
+ * @param userId INT16U
+ * @param pin CHAR_STRING
+ * @param timeStamp INT32U
+ * @param data CHAR_STRING
  */
 #define emberAfFillCommandDoor LockClusterOperationEventNotification( \
   source, \
@@ -4339,14 +4339,14 @@
 /** @brief Command description for ProgrammingEventNotification
  *
  * Command: ProgrammingEventNotification
- * @param source INT8U 
- * @param eventCode DoorLockProgrammingEventCode 
- * @param userId INT16U 
- * @param pin CHAR_STRING 
- * @param userType DoorLockUserType 
- * @param userStatus DoorLockUserStatus 
- * @param timeStamp INT32U 
- * @param data CHAR_STRING 
+ * @param source INT8U
+ * @param eventCode DoorLockProgrammingEventCode
+ * @param userId INT16U
+ * @param pin CHAR_STRING
+ * @param userType DoorLockUserType
+ * @param userStatus DoorLockUserStatus
+ * @param timeStamp INT32U
+ * @param data CHAR_STRING
  */
 #define emberAfFillCommandDoor LockClusterProgrammingEventNotification( \
   source, \
@@ -4415,7 +4415,7 @@
 /** @brief Command description for WindowCoveringGoToLiftValue
  *
  * Command: WindowCoveringGoToLiftValue
- * @param liftValue INT16U 
+ * @param liftValue INT16U
  */
 #define emberAfFillCommandWindow CoveringClusterWindowCoveringGoToLiftValue( \
   liftValue \
@@ -4431,7 +4431,7 @@
 /** @brief Command description for WindowCoveringGoToLiftPercentage
  *
  * Command: WindowCoveringGoToLiftPercentage
- * @param percentageLiftValue INT8U 
+ * @param percentageLiftValue INT8U
  */
 #define emberAfFillCommandWindow CoveringClusterWindowCoveringGoToLiftPercentage( \
   percentageLiftValue \
@@ -4447,7 +4447,7 @@
 /** @brief Command description for WindowCoveringGoToTiltValue
  *
  * Command: WindowCoveringGoToTiltValue
- * @param tiltValue INT16U 
+ * @param tiltValue INT16U
  */
 #define emberAfFillCommandWindow CoveringClusterWindowCoveringGoToTiltValue( \
   tiltValue \
@@ -4463,7 +4463,7 @@
 /** @brief Command description for WindowCoveringGoToTiltPercentage
  *
  * Command: WindowCoveringGoToTiltPercentage
- * @param percentageTiltValue INT8U 
+ * @param percentageTiltValue INT8U
  */
 #define emberAfFillCommandWindow CoveringClusterWindowCoveringGoToTiltPercentage( \
   percentageTiltValue \
@@ -4479,7 +4479,7 @@
 /** @brief Command description for BarrierControlGoToPercent
  *
  * Command: BarrierControlGoToPercent
- * @param percentOpen INT8U 
+ * @param percentOpen INT8U
  */
 #define emberAfFillCommandBarrier ControlClusterBarrierControlGoToPercent( \
   percentOpen \
@@ -4508,11 +4508,11 @@
 /** @brief Command description for SetpointRaiseLower
  *
  * Command: SetpointRaiseLower
- * @param mode SetpointAdjustMode 
- * @param numberOfTransitionsForSequence ENUM8 
- * @param amount INT8S 
- * @param dayOfWeekForSequence DayOfWeek 
- * @param modeForSequence ModeForSequence 
+ * @param mode SetpointAdjustMode
+ * @param numberOfTransitionsForSequence ENUM8
+ * @param amount INT8S
+ * @param dayOfWeekForSequence DayOfWeek
+ * @param modeForSequence ModeForSequence
  * @param payload INT8U []
  * @param payloadLen int
  */
@@ -4540,17 +4540,17 @@
 /** @brief Command description for SetWeeklySchedule
  *
  * Command: SetWeeklySchedule
- * @param numberOfTransitionsForSequence ENUM8 
- * @param timeOfDay INT16U 
- * @param dayOfWeekForSequence DayOfWeek 
- * @param relayStatus BITMAP16 
- * @param modeForSequence ModeForSequence 
- * @param localTemperature INT16S 
+ * @param numberOfTransitionsForSequence ENUM8
+ * @param timeOfDay INT16U
+ * @param dayOfWeekForSequence DayOfWeek
+ * @param relayStatus BITMAP16
+ * @param modeForSequence ModeForSequence
+ * @param localTemperature INT16S
  * @param payload INT8U []
  * @param payloadLen int
- * @param humidityInPercentage INT8U 
- * @param setpoint INT16S 
- * @param unreadEntries INT16U 
+ * @param humidityInPercentage INT8U
+ * @param setpoint INT16S
+ * @param unreadEntries INT16U
  */
 #define emberAfFillCommandThermostatClusterSetWeeklySchedule( \
   numberOfTransitionsForSequence, \
@@ -4584,8 +4584,8 @@
 /** @brief Command description for GetWeeklySchedule
  *
  * Command: GetWeeklySchedule
- * @param daysToReturn DayOfWeek 
- * @param modeToReturn ModeForSequence 
+ * @param daysToReturn DayOfWeek
+ * @param modeToReturn ModeForSequence
  */
 #define emberAfFillCommandThermostatClusterGetWeeklySchedule( \
   daysToReturn, \
@@ -4629,11 +4629,11 @@
 /** @brief Command description for MoveToHue
  *
  * Command: MoveToHue
- * @param hue INT8U 
- * @param direction HueDirection 
- * @param transitionTime INT16U 
- * @param optionsMask BITMAP8 
- * @param optionsOverride BITMAP8 
+ * @param hue INT8U
+ * @param direction HueDirection
+ * @param transitionTime INT16U
+ * @param optionsMask BITMAP8
+ * @param optionsOverride BITMAP8
  */
 #define emberAfFillCommandColor ControlClusterMoveToHue( \
   hue, \
@@ -4657,10 +4657,10 @@
 /** @brief Command description for MoveHue
  *
  * Command: MoveHue
- * @param moveMode HueMoveMode 
- * @param rate INT8U 
- * @param optionsMask BITMAP8 
- * @param optionsOverride BITMAP8 
+ * @param moveMode HueMoveMode
+ * @param rate INT8U
+ * @param optionsMask BITMAP8
+ * @param optionsOverride BITMAP8
  */
 #define emberAfFillCommandColor ControlClusterMoveHue( \
   moveMode, \
@@ -4682,11 +4682,11 @@
 /** @brief Command description for StepHue
  *
  * Command: StepHue
- * @param stepMode HueStepMode 
- * @param stepSize INT8U 
- * @param transitionTime INT8U 
- * @param optionsMask BITMAP8 
- * @param optionsOverride BITMAP8 
+ * @param stepMode HueStepMode
+ * @param stepSize INT8U
+ * @param transitionTime INT8U
+ * @param optionsMask BITMAP8
+ * @param optionsOverride BITMAP8
  */
 #define emberAfFillCommandColor ControlClusterStepHue( \
   stepMode, \
@@ -4710,10 +4710,10 @@
 /** @brief Command description for MoveToSaturation
  *
  * Command: MoveToSaturation
- * @param saturation INT8U 
- * @param transitionTime INT16U 
- * @param optionsMask BITMAP8 
- * @param optionsOverride BITMAP8 
+ * @param saturation INT8U
+ * @param transitionTime INT16U
+ * @param optionsMask BITMAP8
+ * @param optionsOverride BITMAP8
  */
 #define emberAfFillCommandColor ControlClusterMoveToSaturation( \
   saturation, \
@@ -4735,10 +4735,10 @@
 /** @brief Command description for MoveSaturation
  *
  * Command: MoveSaturation
- * @param moveMode SaturationMoveMode 
- * @param rate INT8U 
- * @param optionsMask BITMAP8 
- * @param optionsOverride BITMAP8 
+ * @param moveMode SaturationMoveMode
+ * @param rate INT8U
+ * @param optionsMask BITMAP8
+ * @param optionsOverride BITMAP8
  */
 #define emberAfFillCommandColor ControlClusterMoveSaturation( \
   moveMode, \
@@ -4760,11 +4760,11 @@
 /** @brief Command description for StepSaturation
  *
  * Command: StepSaturation
- * @param stepMode SaturationStepMode 
- * @param stepSize INT8U 
- * @param transitionTime INT8U 
- * @param optionsMask BITMAP8 
- * @param optionsOverride BITMAP8 
+ * @param stepMode SaturationStepMode
+ * @param stepSize INT8U
+ * @param transitionTime INT8U
+ * @param optionsMask BITMAP8
+ * @param optionsOverride BITMAP8
  */
 #define emberAfFillCommandColor ControlClusterStepSaturation( \
   stepMode, \
@@ -4788,11 +4788,11 @@
 /** @brief Command description for MoveToHueAndSaturation
  *
  * Command: MoveToHueAndSaturation
- * @param hue INT8U 
- * @param saturation INT8U 
- * @param transitionTime INT16U 
- * @param optionsMask BITMAP8 
- * @param optionsOverride BITMAP8 
+ * @param hue INT8U
+ * @param saturation INT8U
+ * @param transitionTime INT16U
+ * @param optionsMask BITMAP8
+ * @param optionsOverride BITMAP8
  */
 #define emberAfFillCommandColor ControlClusterMoveToHueAndSaturation( \
   hue, \
@@ -4816,11 +4816,11 @@
 /** @brief Command description for MoveToColor
  *
  * Command: MoveToColor
- * @param colorX INT16U 
- * @param colorY INT16U 
- * @param transitionTime INT16U 
- * @param optionsMask BITMAP8 
- * @param optionsOverride BITMAP8 
+ * @param colorX INT16U
+ * @param colorY INT16U
+ * @param transitionTime INT16U
+ * @param optionsMask BITMAP8
+ * @param optionsOverride BITMAP8
  */
 #define emberAfFillCommandColor ControlClusterMoveToColor( \
   colorX, \
@@ -4844,10 +4844,10 @@
 /** @brief Command description for MoveColor
  *
  * Command: MoveColor
- * @param rateX INT16S 
- * @param rateY INT16S 
- * @param optionsMask BITMAP8 
- * @param optionsOverride BITMAP8 
+ * @param rateX INT16S
+ * @param rateY INT16S
+ * @param optionsMask BITMAP8
+ * @param optionsOverride BITMAP8
  */
 #define emberAfFillCommandColor ControlClusterMoveColor( \
   rateX, \
@@ -4869,11 +4869,11 @@
 /** @brief Command description for StepColor
  *
  * Command: StepColor
- * @param stepX INT16S 
- * @param stepY INT16S 
- * @param transitionTime INT16U 
- * @param optionsMask BITMAP8 
- * @param optionsOverride BITMAP8 
+ * @param stepX INT16S
+ * @param stepY INT16S
+ * @param transitionTime INT16U
+ * @param optionsMask BITMAP8
+ * @param optionsOverride BITMAP8
  */
 #define emberAfFillCommandColor ControlClusterStepColor( \
   stepX, \
@@ -4897,10 +4897,10 @@
 /** @brief Command description for MoveToColorTemperature
  *
  * Command: MoveToColorTemperature
- * @param colorTemperature INT16U 
- * @param transitionTime INT16U 
- * @param optionsMask BITMAP8 
- * @param optionsOverride BITMAP8 
+ * @param colorTemperature INT16U
+ * @param transitionTime INT16U
+ * @param optionsMask BITMAP8
+ * @param optionsOverride BITMAP8
  */
 #define emberAfFillCommandColor ControlClusterMoveToColorTemperature( \
   colorTemperature, \
@@ -4922,9 +4922,9 @@
 /** @brief Command description for EnhancedMoveToHue
  *
  * Command: EnhancedMoveToHue
- * @param enhancedHue INT16U 
- * @param direction HueDirection 
- * @param transitionTime INT16U 
+ * @param enhancedHue INT16U
+ * @param direction HueDirection
+ * @param transitionTime INT16U
  */
 #define emberAfFillCommandColor ControlClusterEnhancedMoveToHue( \
   enhancedHue, \
@@ -4944,8 +4944,8 @@
 /** @brief Command description for EnhancedMoveHue
  *
  * Command: EnhancedMoveHue
- * @param moveMode HueMoveMode 
- * @param rate INT16U 
+ * @param moveMode HueMoveMode
+ * @param rate INT16U
  */
 #define emberAfFillCommandColor ControlClusterEnhancedMoveHue( \
   moveMode, \
@@ -4963,9 +4963,9 @@
 /** @brief Command description for EnhancedStepHue
  *
  * Command: EnhancedStepHue
- * @param stepMode HueStepMode 
- * @param stepSize INT16U 
- * @param transitionTime INT16U 
+ * @param stepMode HueStepMode
+ * @param stepSize INT16U
+ * @param transitionTime INT16U
  */
 #define emberAfFillCommandColor ControlClusterEnhancedStepHue( \
   stepMode, \
@@ -4985,9 +4985,9 @@
 /** @brief Command description for EnhancedMoveToHueAndSaturation
  *
  * Command: EnhancedMoveToHueAndSaturation
- * @param enhancedHue INT16U 
- * @param saturation INT8U 
- * @param transitionTime INT16U 
+ * @param enhancedHue INT16U
+ * @param saturation INT8U
+ * @param transitionTime INT16U
  */
 #define emberAfFillCommandColor ControlClusterEnhancedMoveToHueAndSaturation( \
   enhancedHue, \
@@ -5007,11 +5007,11 @@
 /** @brief Command description for ColorLoopSet
  *
  * Command: ColorLoopSet
- * @param updateFlags ColorLoopUpdateFlags 
- * @param action ColorLoopAction 
- * @param direction ColorLoopDirection 
- * @param time INT16U 
- * @param startHue INT16U 
+ * @param updateFlags ColorLoopUpdateFlags
+ * @param action ColorLoopAction
+ * @param direction ColorLoopDirection
+ * @param time INT16U
+ * @param startHue INT16U
  */
 #define emberAfFillCommandColor ControlClusterColorLoopSet( \
   updateFlags, \
@@ -5035,8 +5035,8 @@
 /** @brief Command description for StopMoveStep
  *
  * Command: StopMoveStep
- * @param optionsMask BITMAP8 
- * @param optionsOverride BITMAP8 
+ * @param optionsMask BITMAP8
+ * @param optionsOverride BITMAP8
  */
 #define emberAfFillCommandColor ControlClusterStopMoveStep( \
   optionsMask, \
@@ -5054,12 +5054,12 @@
 /** @brief Command description for MoveColorTemperature
  *
  * Command: MoveColorTemperature
- * @param moveMode HueMoveMode 
- * @param rate INT16U 
- * @param colorTemperatureMinimum INT16U 
- * @param colorTemperatureMaximum INT16U 
- * @param optionsMask BITMAP8 
- * @param optionsOverride BITMAP8 
+ * @param moveMode HueMoveMode
+ * @param rate INT16U
+ * @param colorTemperatureMinimum INT16U
+ * @param colorTemperatureMaximum INT16U
+ * @param optionsMask BITMAP8
+ * @param optionsOverride BITMAP8
  */
 #define emberAfFillCommandColor ControlClusterMoveColorTemperature( \
   moveMode, \
@@ -5085,13 +5085,13 @@
 /** @brief Command description for StepColorTemperature
  *
  * Command: StepColorTemperature
- * @param stepMode HueStepMode 
- * @param stepSize INT16U 
- * @param transitionTime INT16U 
- * @param colorTemperatureMinimum INT16U 
- * @param colorTemperatureMaximum INT16U 
- * @param optionsMask BITMAP8 
- * @param optionsOverride BITMAP8 
+ * @param stepMode HueStepMode
+ * @param stepSize INT16U
+ * @param transitionTime INT16U
+ * @param colorTemperatureMinimum INT16U
+ * @param colorTemperatureMaximum INT16U
+ * @param optionsMask BITMAP8
+ * @param optionsOverride BITMAP8
  */
 #define emberAfFillCommandColor ControlClusterStepColorTemperature( \
   stepMode, \
@@ -5119,12 +5119,12 @@
 /** @brief Command description for ZoneEnrollResponse
  *
  * Command: ZoneEnrollResponse
- * @param enrollResponseCode IasEnrollResponseCode 
- * @param zoneStatus IasZoneStatus 
- * @param zoneId INT8U 
- * @param extendedStatus BITMAP8 
- * @param zoneId INT8U 
- * @param delay INT16U 
+ * @param enrollResponseCode IasEnrollResponseCode
+ * @param zoneStatus IasZoneStatus
+ * @param zoneId INT8U
+ * @param extendedStatus BITMAP8
+ * @param zoneId INT8U
+ * @param delay INT16U
  */
 #define emberAfFillCommandIAS ZoneClusterZoneEnrollResponse( \
   enrollResponseCode, \
@@ -5150,8 +5150,8 @@
 /** @brief Command description for InitiateNormalOperationMode
  *
  * Command: InitiateNormalOperationMode
- * @param zoneType IasZoneType 
- * @param manufacturerCode INT16U 
+ * @param zoneType IasZoneType
+ * @param manufacturerCode INT16U
  */
 #define emberAfFillCommandIAS ZoneClusterInitiateNormalOperationMode( \
   zoneType, \
@@ -5169,8 +5169,8 @@
 /** @brief Command description for InitiateNormalOperationModeResponse
  *
  * Command: InitiateNormalOperationModeResponse
- * @param testModeDuration INT8U 
- * @param currentZoneSensitivityLevel INT8U 
+ * @param testModeDuration INT8U
+ * @param currentZoneSensitivityLevel INT8U
  */
 #define emberAfFillCommandIAS ZoneClusterInitiateNormalOperationModeResponse( \
   testModeDuration, \
@@ -5201,10 +5201,10 @@
 /** @brief Command description for Arm
  *
  * Command: Arm
- * @param armMode IasAceArmMode 
- * @param armNotification IasAceArmNotification 
- * @param armDisarmCode CHAR_STRING 
- * @param zoneId INT8U 
+ * @param armMode IasAceArmMode
+ * @param armNotification IasAceArmNotification
+ * @param armDisarmCode CHAR_STRING
+ * @param zoneId INT8U
  */
 #define emberAfFillCommandIAS ACEClusterArm( \
   armMode, \
@@ -5226,26 +5226,26 @@
 /** @brief Command description for Bypass
  *
  * Command: Bypass
- * @param numberOfZones INT8U 
- * @param section0 BITMAP16 
+ * @param numberOfZones INT8U
+ * @param section0 BITMAP16
  * @param zoneIds INT8U []
  * @param zoneIdsLen int
- * @param section1 BITMAP16 
- * @param armDisarmCode CHAR_STRING 
- * @param section2 BITMAP16 
- * @param section3 BITMAP16 
- * @param section4 BITMAP16 
- * @param section5 BITMAP16 
- * @param section6 BITMAP16 
- * @param section7 BITMAP16 
- * @param section8 BITMAP16 
- * @param section9 BITMAP16 
- * @param section10 BITMAP16 
- * @param section11 BITMAP16 
- * @param section12 BITMAP16 
- * @param section13 BITMAP16 
- * @param section14 BITMAP16 
- * @param section15 BITMAP16 
+ * @param section1 BITMAP16
+ * @param armDisarmCode CHAR_STRING
+ * @param section2 BITMAP16
+ * @param section3 BITMAP16
+ * @param section4 BITMAP16
+ * @param section5 BITMAP16
+ * @param section6 BITMAP16
+ * @param section7 BITMAP16
+ * @param section8 BITMAP16
+ * @param section9 BITMAP16
+ * @param section10 BITMAP16
+ * @param section11 BITMAP16
+ * @param section12 BITMAP16
+ * @param section13 BITMAP16
+ * @param section14 BITMAP16
+ * @param section15 BITMAP16
  */
 #define emberAfFillCommandIAS ACEClusterBypass( \
   numberOfZones, \
@@ -5297,10 +5297,10 @@
 /** @brief Command description for Emergency
  *
  * Command: Emergency
- * @param zoneId INT8U 
- * @param zoneType IasZoneType 
- * @param ieeeAddress IEEE_ADDRESS 
- * @param zoneLabel CHAR_STRING 
+ * @param zoneId INT8U
+ * @param zoneType IasZoneType
+ * @param ieeeAddress IEEE_ADDRESS
+ * @param zoneLabel CHAR_STRING
  */
 #define emberAfFillCommandIAS ACEClusterEmergency( \
   zoneId, \
@@ -5322,10 +5322,10 @@
 /** @brief Command description for Fire
  *
  * Command: Fire
- * @param zoneId INT8U 
- * @param zoneStatus ENUM16 
- * @param audibleNotification IasAceAudibleNotification 
- * @param zoneLabel CHAR_STRING 
+ * @param zoneId INT8U
+ * @param zoneStatus ENUM16
+ * @param audibleNotification IasAceAudibleNotification
+ * @param zoneLabel CHAR_STRING
  */
 #define emberAfFillCommandIAS ACEClusterFire( \
   zoneId, \
@@ -5347,10 +5347,10 @@
 /** @brief Command description for Panic
  *
  * Command: Panic
- * @param panelStatus IasAcePanelStatus 
- * @param secondsRemaining INT8U 
- * @param audibleNotification IasAceAudibleNotification 
- * @param alarmStatus IasAceAlarmStatus 
+ * @param panelStatus IasAcePanelStatus
+ * @param secondsRemaining INT8U
+ * @param audibleNotification IasAceAudibleNotification
+ * @param alarmStatus IasAceAlarmStatus
  */
 #define emberAfFillCommandIAS ACEClusterPanic( \
   panelStatus, \
@@ -5372,10 +5372,10 @@
 /** @brief Command description for GetZoneIdMap
  *
  * Command: GetZoneIdMap
- * @param panelStatus IasAcePanelStatus 
- * @param secondsRemaining INT8U 
- * @param audibleNotification IasAceAudibleNotification 
- * @param alarmStatus IasAceAlarmStatus 
+ * @param panelStatus IasAcePanelStatus
+ * @param secondsRemaining INT8U
+ * @param audibleNotification IasAceAudibleNotification
+ * @param alarmStatus IasAceAlarmStatus
  */
 #define emberAfFillCommandIAS ACEClusterGetZoneIdMap( \
   panelStatus, \
@@ -5397,8 +5397,8 @@
 /** @brief Command description for GetZoneInformation
  *
  * Command: GetZoneInformation
- * @param zoneId INT8U 
- * @param numberOfZones INT8U 
+ * @param zoneId INT8U
+ * @param numberOfZones INT8U
  * @param zoneIds INT8U []
  * @param zoneIdsLen int
  */
@@ -5420,7 +5420,7 @@
 /** @brief Command description for GetPanelStatus
  *
  * Command: GetPanelStatus
- * @param numberOfZones INT8U 
+ * @param numberOfZones INT8U
  * @param bypassResult IasAceBypassResult []
  * @param bypassResultLen int
  */
@@ -5440,8 +5440,8 @@
 /** @brief Command description for GetBypassedZoneList
  *
  * Command: GetBypassedZoneList
- * @param zoneStatusComplete BOOLEAN 
- * @param numberOfZones INT8U 
+ * @param zoneStatusComplete BOOLEAN
+ * @param numberOfZones INT8U
  * @param zoneStatusResult IasAceZoneStatusResult []
  * @param zoneStatusResultLen int
  */
@@ -5463,10 +5463,10 @@
 /** @brief Command description for GetZoneStatus
  *
  * Command: GetZoneStatus
- * @param startingZoneId INT8U 
- * @param maxNumberOfZoneIds INT8U 
- * @param zoneStatusMaskFlag BOOLEAN 
- * @param zoneStatusMask BITMAP16 
+ * @param startingZoneId INT8U
+ * @param maxNumberOfZoneIds INT8U
+ * @param zoneStatusMaskFlag BOOLEAN
+ * @param zoneStatusMask BITMAP16
  */
 #define emberAfFillCommandIAS ACEClusterGetZoneStatus( \
   startingZoneId, \
@@ -5488,10 +5488,10 @@
 /** @brief Command description for StartWarning
  *
  * Command: StartWarning
- * @param warningInfo WarningInfo 
- * @param warningDuration INT16U 
- * @param strobeDutyCycle INT8U 
- * @param strobeLevel ENUM8 
+ * @param warningInfo WarningInfo
+ * @param warningDuration INT16U
+ * @param strobeDutyCycle INT8U
+ * @param strobeLevel ENUM8
  */
 #define emberAfFillCommandIAS WDClusterStartWarning( \
   warningInfo, \
@@ -5513,7 +5513,7 @@
 /** @brief Command description for Squawk
  *
  * Command: Squawk
- * @param squawkInfo SquawkInfo 
+ * @param squawkInfo SquawkInfo
  */
 #define emberAfFillCommandIAS WDClusterSquawk( \
   squawkInfo \
@@ -5672,7 +5672,7 @@
 /** @brief Command description for LaunchContent
  *
  * Command: LaunchContent
- * @param contentLaunchStatus ContentLaunchStatus 
+ * @param contentLaunchStatus ContentLaunchStatus
  */
 #define emberAfFillCommandContent LaunchClusterLaunchContent( \
   contentLaunchStatus \
@@ -5688,7 +5688,7 @@
 /** @brief Command description for LaunchURL
  *
  * Command: LaunchURL
- * @param contentLaunchStatus ContentLaunchStatus 
+ * @param contentLaunchStatus ContentLaunchStatus
  */
 #define emberAfFillCommandContent LaunchClusterLaunchURL( \
   contentLaunchStatus \
@@ -5704,9 +5704,9 @@
 /** @brief Command description for MatchProtocolAddress
  *
  * Command: MatchProtocolAddress
- * @param protocolAddress OCTET_STRING 
- * @param deviceIeeeAddress IEEE_ADDRESS 
- * @param protocolAddress OCTET_STRING 
+ * @param protocolAddress OCTET_STRING
+ * @param deviceIeeeAddress IEEE_ADDRESS
+ * @param protocolAddress OCTET_STRING
  */
 #define emberAfFillCommandGeneric TunnelClusterMatchProtocolAddress( \
   protocolAddress, \
@@ -5726,7 +5726,7 @@
 /** @brief Command description for AdvertiseProtocolAddress
  *
  * Command: AdvertiseProtocolAddress
- * @param protocolAddress OCTET_STRING 
+ * @param protocolAddress OCTET_STRING
  */
 #define emberAfFillCommandGeneric TunnelClusterAdvertiseProtocolAddress( \
   protocolAddress \
@@ -5759,7 +5759,7 @@
 /** @brief Command description for TransferAPDU
  *
  * Command: TransferAPDU
- * @param apdu OCTET_STRING 
+ * @param apdu OCTET_STRING
  */
 #define emberAfFillCommand11073 Protocol TunnelClusterTransferAPDU( \
   apdu \
@@ -5775,10 +5775,10 @@
 /** @brief Command description for ConnectRequest
  *
  * Command: ConnectRequest
- * @param connectControl 11073ConnectRequestConnectControl 
- * @param idleTimeout INT16U 
- * @param managerTarget IEEE_ADDRESS 
- * @param managerEndpoint INT8U 
+ * @param connectControl 11073ConnectRequestConnectControl
+ * @param idleTimeout INT16U
+ * @param managerTarget IEEE_ADDRESS
+ * @param managerEndpoint INT8U
  */
 #define emberAfFillCommand11073 Protocol TunnelClusterConnectRequest( \
   connectControl, \
@@ -5800,7 +5800,7 @@
 /** @brief Command description for DisconnectRequest
  *
  * Command: DisconnectRequest
- * @param managerIEEEAddress IEEE_ADDRESS 
+ * @param managerIEEEAddress IEEE_ADDRESS
  */
 #define emberAfFillCommand11073 Protocol TunnelClusterDisconnectRequest( \
   managerIEEEAddress \
@@ -5816,7 +5816,7 @@
 /** @brief Command description for ConnectStatusNotification
  *
  * Command: ConnectStatusNotification
- * @param connectStatus 11073TunnelConnectionStatus 
+ * @param connectStatus 11073TunnelConnectionStatus
  */
 #define emberAfFillCommand11073 Protocol TunnelClusterConnectStatusNotification( \
   connectStatus \
@@ -5832,7 +5832,7 @@
 /** @brief Command description for TransferApdu
  *
  * Command: TransferApdu
- * @param apdu OCTET_STRING 
+ * @param apdu OCTET_STRING
  */
 #define emberAfFillCommandISO 7816 Protocol TunnelClusterTransferApdu( \
   apdu \
@@ -5874,31 +5874,31 @@
 /** @brief Command description for PublishPrice
  *
  * Command: PublishPrice
- * @param providerId INT32U 
- * @param commandOptions AmiCommandOptions 
- * @param rateLabel OCTET_STRING 
- * @param issuerEventId INT32U 
- * @param currentTime UTC_TIME 
- * @param unitOfMeasure AmiUnitOfMeasure 
- * @param currency INT16U 
- * @param priceTrailingDigitAndPriceTier PriceTrailingDigitAndPriceTier 
- * @param numberOfPriceTiersAndRegisterTier PriceNumberOfPriceTiersAndRegisterTier 
- * @param startTime UTC_TIME 
- * @param durationInMinutes INT16U 
- * @param price INT32U 
- * @param priceRatio INT8U 
- * @param generationPrice INT32U 
- * @param generationPriceRatio INT8U 
- * @param alternateCostDelivered INT32U 
- * @param alternateCostUnit AlternateCostUnit 
- * @param alternateCostTrailingDigit AlternateCostTrailingDigit 
- * @param numberOfBlockThresholds INT8U 
- * @param priceControl PriceControlMask 
- * @param numberOfGenerationTiers INT8U 
- * @param generationTier GenerationTier 
- * @param extendedNumberOfPriceTiers ExtendedNumberOfPriceTiers 
- * @param extendedPriceTier ExtendedPriceTier 
- * @param extendedRegisterTier ExtendedRegisterTier 
+ * @param providerId INT32U
+ * @param commandOptions AmiCommandOptions
+ * @param rateLabel OCTET_STRING
+ * @param issuerEventId INT32U
+ * @param currentTime UTC_TIME
+ * @param unitOfMeasure AmiUnitOfMeasure
+ * @param currency INT16U
+ * @param priceTrailingDigitAndPriceTier PriceTrailingDigitAndPriceTier
+ * @param numberOfPriceTiersAndRegisterTier PriceNumberOfPriceTiersAndRegisterTier
+ * @param startTime UTC_TIME
+ * @param durationInMinutes INT16U
+ * @param price INT32U
+ * @param priceRatio INT8U
+ * @param generationPrice INT32U
+ * @param generationPriceRatio INT8U
+ * @param alternateCostDelivered INT32U
+ * @param alternateCostUnit AlternateCostUnit
+ * @param alternateCostTrailingDigit AlternateCostTrailingDigit
+ * @param numberOfBlockThresholds INT8U
+ * @param priceControl PriceControlMask
+ * @param numberOfGenerationTiers INT8U
+ * @param generationTier GenerationTier
+ * @param extendedNumberOfPriceTiers ExtendedNumberOfPriceTiers
+ * @param extendedPriceTier ExtendedPriceTier
+ * @param extendedRegisterTier ExtendedRegisterTier
  */
 #define emberAfFillCommandPriceClusterPublishPrice( \
   providerId, \
@@ -5962,16 +5962,16 @@
 /** @brief Command description for PublishBlockPeriod
  *
  * Command: PublishBlockPeriod
- * @param providerId INT32U 
- * @param startTime UTC_TIME 
- * @param issuerEventId INT32U 
- * @param numberOfEvents INT8U 
- * @param blockPeriodStartTime UTC_TIME 
- * @param blockPeriodDuration INT24U 
- * @param blockPeriodControl BlockPeriodControl 
- * @param blockPeriodDurationType BlockPeriodDurationType 
- * @param tariffType TariffType 
- * @param tariffResolutionPeriod TariffResolutionPeriod 
+ * @param providerId INT32U
+ * @param startTime UTC_TIME
+ * @param issuerEventId INT32U
+ * @param numberOfEvents INT8U
+ * @param blockPeriodStartTime UTC_TIME
+ * @param blockPeriodDuration INT24U
+ * @param blockPeriodControl BlockPeriodControl
+ * @param blockPeriodDurationType BlockPeriodDurationType
+ * @param tariffType TariffType
+ * @param tariffResolutionPeriod TariffResolutionPeriod
  */
 #define emberAfFillCommandPriceClusterPublishBlockPeriod( \
   providerId, \
@@ -6005,14 +6005,14 @@
 /** @brief Command description for PublishConversionFactor
  *
  * Command: PublishConversionFactor
- * @param issuerEventId INT32U 
- * @param providerId INT32U 
- * @param startTime UTC_TIME 
- * @param issuerEventId INT32U 
- * @param conversionFactor INT32U 
- * @param priceAckTime UTC_TIME 
- * @param conversionFactorTrailingDigit ConversionFactorTrailingDigit 
- * @param control PriceControlMask 
+ * @param issuerEventId INT32U
+ * @param providerId INT32U
+ * @param startTime UTC_TIME
+ * @param issuerEventId INT32U
+ * @param conversionFactor INT32U
+ * @param priceAckTime UTC_TIME
+ * @param conversionFactorTrailingDigit ConversionFactorTrailingDigit
+ * @param control PriceControlMask
  */
 #define emberAfFillCommandPriceClusterPublishConversionFactor( \
   issuerEventId, \
@@ -6042,14 +6042,14 @@
 /** @brief Command description for PublishCalorificValue
  *
  * Command: PublishCalorificValue
- * @param issuerEventId INT32U 
- * @param startTime UTC_TIME 
- * @param startTime UTC_TIME 
- * @param numberOfEvents INT8U 
- * @param calorificValue INT32U 
- * @param tariffType TariffType 
- * @param calorificValueUnit CalorificValueUnit 
- * @param calorificValueTrailingDigit CalorificValueTrailingDigit 
+ * @param issuerEventId INT32U
+ * @param startTime UTC_TIME
+ * @param startTime UTC_TIME
+ * @param numberOfEvents INT8U
+ * @param calorificValue INT32U
+ * @param tariffType TariffType
+ * @param calorificValueUnit CalorificValueUnit
+ * @param calorificValueTrailingDigit CalorificValueTrailingDigit
  */
 #define emberAfFillCommandPriceClusterPublishCalorificValue( \
   issuerEventId, \
@@ -6079,24 +6079,24 @@
 /** @brief Command description for PublishTariffInformation
  *
  * Command: PublishTariffInformation
- * @param providerId INT32U 
- * @param earliestStartTime UTC_TIME 
- * @param issuerEventId INT32U 
- * @param minIssuerEventId INT32U 
- * @param issuerTariffId INT32U 
- * @param numberOfCommands INT8U 
- * @param startTime UTC_TIME 
- * @param tariffTypeChargingScheme TariffTypeChargingScheme 
- * @param tariffLabel OCTET_STRING 
- * @param numberOfPriceTiersInUse INT8U 
- * @param numberOfBlockThresholdsInUse INT8U 
- * @param unitOfMeasure AmiUnitOfMeasure 
- * @param currency INT16U 
- * @param priceTrailingDigit PriceTrailingDigit 
- * @param standingCharge INT32U 
- * @param tierBlockMode TierBlockMode 
- * @param blockThresholdMultiplier INT24U 
- * @param blockThresholdDivisor INT24U 
+ * @param providerId INT32U
+ * @param earliestStartTime UTC_TIME
+ * @param issuerEventId INT32U
+ * @param minIssuerEventId INT32U
+ * @param issuerTariffId INT32U
+ * @param numberOfCommands INT8U
+ * @param startTime UTC_TIME
+ * @param tariffTypeChargingScheme TariffTypeChargingScheme
+ * @param tariffLabel OCTET_STRING
+ * @param numberOfPriceTiersInUse INT8U
+ * @param numberOfBlockThresholdsInUse INT8U
+ * @param unitOfMeasure AmiUnitOfMeasure
+ * @param currency INT16U
+ * @param priceTrailingDigit PriceTrailingDigit
+ * @param standingCharge INT32U
+ * @param tierBlockMode TierBlockMode
+ * @param blockThresholdMultiplier INT24U
+ * @param blockThresholdDivisor INT24U
  */
 #define emberAfFillCommandPriceClusterPublishTariffInformation( \
   providerId, \
@@ -6146,16 +6146,16 @@
 /** @brief Command description for PublishPriceMatrix
  *
  * Command: PublishPriceMatrix
- * @param providerId INT32U 
- * @param earliestStartTime UTC_TIME 
- * @param issuerEventId INT32U 
- * @param minIssuerEventId INT32U 
- * @param startTime UTC_TIME 
- * @param numberOfCommands INT8U 
- * @param issuerTariffId INT32U 
- * @param commandIndex INT8U 
- * @param numberOfCommands INT8U 
- * @param subPayloadControl PriceMatrixSubPayloadControl 
+ * @param providerId INT32U
+ * @param earliestStartTime UTC_TIME
+ * @param issuerEventId INT32U
+ * @param minIssuerEventId INT32U
+ * @param startTime UTC_TIME
+ * @param numberOfCommands INT8U
+ * @param issuerTariffId INT32U
+ * @param commandIndex INT8U
+ * @param numberOfCommands INT8U
+ * @param subPayloadControl PriceMatrixSubPayloadControl
  * @param payload PriceMatrixSubPayload []
  * @param payloadLen int
  */
@@ -6193,17 +6193,17 @@
 /** @brief Command description for PublishBlockThresholds
  *
  * Command: PublishBlockThresholds
- * @param providerId INT32U 
- * @param earliestStartTime UTC_TIME 
- * @param issuerEventId INT32U 
- * @param minIssuerEventId INT32U 
- * @param startTime UTC_TIME 
- * @param numberOfCommands INT8U 
- * @param issuerTariffId INT32U 
- * @param tariffType TariffType 
- * @param commandIndex INT8U 
- * @param numberOfCommands INT8U 
- * @param subPayloadControl BlockThresholdSubPayloadControl 
+ * @param providerId INT32U
+ * @param earliestStartTime UTC_TIME
+ * @param issuerEventId INT32U
+ * @param minIssuerEventId INT32U
+ * @param startTime UTC_TIME
+ * @param numberOfCommands INT8U
+ * @param issuerTariffId INT32U
+ * @param tariffType TariffType
+ * @param commandIndex INT8U
+ * @param numberOfCommands INT8U
+ * @param subPayloadControl BlockThresholdSubPayloadControl
  * @param payload BlockThresholdSubPayload []
  * @param payloadLen int
  */
@@ -6243,14 +6243,14 @@
 /** @brief Command description for PublishCO2Value
  *
  * Command: PublishCO2Value
- * @param providerId INT32U 
- * @param issuerTariffId INT32U 
- * @param issuerEventId INT32U 
- * @param startTime UTC_TIME 
- * @param tariffType TariffType 
- * @param cO2Value INT32U 
- * @param cO2ValueUnit CO2Unit 
- * @param cO2ValueTrailingDigit CO2TrailingDigit 
+ * @param providerId INT32U
+ * @param issuerTariffId INT32U
+ * @param issuerEventId INT32U
+ * @param startTime UTC_TIME
+ * @param tariffType TariffType
+ * @param cO2Value INT32U
+ * @param cO2ValueUnit CO2Unit
+ * @param cO2ValueTrailingDigit CO2TrailingDigit
  */
 #define emberAfFillCommandPriceClusterPublishCO2Value( \
   providerId, \
@@ -6280,13 +6280,13 @@
 /** @brief Command description for PublishTierLabels
  *
  * Command: PublishTierLabels
- * @param providerId INT32U 
- * @param issuerTariffId INT32U 
- * @param issuerEventId INT32U 
- * @param issuerTariffId INT32U 
- * @param commandIndex INT8U 
- * @param numberOfCommands INT8U 
- * @param numberOfLabels INT8U 
+ * @param providerId INT32U
+ * @param issuerTariffId INT32U
+ * @param issuerEventId INT32U
+ * @param issuerTariffId INT32U
+ * @param commandIndex INT8U
+ * @param numberOfCommands INT8U
+ * @param numberOfLabels INT8U
  * @param tierLabelsPayload INT8U []
  * @param tierLabelsPayloadLen int
  */
@@ -6318,16 +6318,16 @@
 /** @brief Command description for PublishBillingPeriod
  *
  * Command: PublishBillingPeriod
- * @param providerId INT32U 
- * @param earliestStartTime UTC_TIME 
- * @param issuerEventId INT32U 
- * @param minIssuerEventId INT32U 
- * @param billingPeriodStartTime UTC_TIME 
- * @param numberOfCommands INT8U 
- * @param billingPeriodDuration BillingPeriodDuration 
- * @param tariffType TariffType 
- * @param billingPeriodDurationType BillingPeriodDurationType 
- * @param tariffType TariffType 
+ * @param providerId INT32U
+ * @param earliestStartTime UTC_TIME
+ * @param issuerEventId INT32U
+ * @param minIssuerEventId INT32U
+ * @param billingPeriodStartTime UTC_TIME
+ * @param numberOfCommands INT8U
+ * @param billingPeriodDuration BillingPeriodDuration
+ * @param tariffType TariffType
+ * @param billingPeriodDurationType BillingPeriodDurationType
+ * @param tariffType TariffType
  */
 #define emberAfFillCommandPriceClusterPublishBillingPeriod( \
   providerId, \
@@ -6361,16 +6361,16 @@
 /** @brief Command description for PublishConsolidatedBill
  *
  * Command: PublishConsolidatedBill
- * @param providerId INT32U 
- * @param issuerTariffId INT32U 
- * @param issuerEventId INT32U 
- * @param billingPeriodStartTime UTC_TIME 
- * @param billingPeriodDuration BillingPeriodDuration 
- * @param billingPeriodDurationType BillingPeriodDurationType 
- * @param tariffType TariffType 
- * @param consolidatedBill INT32U 
- * @param currency INT16U 
- * @param billTrailingDigit BillTrailingDigit 
+ * @param providerId INT32U
+ * @param issuerTariffId INT32U
+ * @param issuerEventId INT32U
+ * @param billingPeriodStartTime UTC_TIME
+ * @param billingPeriodDuration BillingPeriodDuration
+ * @param billingPeriodDurationType BillingPeriodDurationType
+ * @param tariffType TariffType
+ * @param consolidatedBill INT32U
+ * @param currency INT16U
+ * @param billTrailingDigit BillTrailingDigit
  */
 #define emberAfFillCommandPriceClusterPublishConsolidatedBill( \
   providerId, \
@@ -6404,17 +6404,17 @@
 /** @brief Command description for PublishCppEvent
  *
  * Command: PublishCppEvent
- * @param providerId INT32U 
- * @param earliestStartTime UTC_TIME 
- * @param issuerEventId INT32U 
- * @param minIssuerEventId INT32U 
- * @param startTime UTC_TIME 
- * @param numberOfCommands INT8U 
- * @param durationInMinutes INT16U 
- * @param tariffType TariffType 
- * @param tariffType TariffType 
- * @param cppPriceTier CppPriceTier 
- * @param cppAuth PublishCppEventCppAuth 
+ * @param providerId INT32U
+ * @param earliestStartTime UTC_TIME
+ * @param issuerEventId INT32U
+ * @param minIssuerEventId INT32U
+ * @param startTime UTC_TIME
+ * @param numberOfCommands INT8U
+ * @param durationInMinutes INT16U
+ * @param tariffType TariffType
+ * @param tariffType TariffType
+ * @param cppPriceTier CppPriceTier
+ * @param cppAuth PublishCppEventCppAuth
  */
 #define emberAfFillCommandPriceClusterPublishCppEvent( \
   providerId, \
@@ -6450,18 +6450,18 @@
 /** @brief Command description for PublishCreditPayment
  *
  * Command: PublishCreditPayment
- * @param providerId INT32U 
- * @param earliestStartTime UTC_TIME 
- * @param issuerEventId INT32U 
- * @param minIssuerEventId INT32U 
- * @param creditPaymentDueDate UTC_TIME 
- * @param numberOfCommands INT8U 
- * @param creditPaymentOverDueAmount INT32U 
- * @param tariffType TariffType 
- * @param creditPaymentStatus CreditPaymentStatus 
- * @param creditPayment INT32U 
- * @param creditPaymentDate UTC_TIME 
- * @param creditPaymentRef OCTET_STRING 
+ * @param providerId INT32U
+ * @param earliestStartTime UTC_TIME
+ * @param issuerEventId INT32U
+ * @param minIssuerEventId INT32U
+ * @param creditPaymentDueDate UTC_TIME
+ * @param numberOfCommands INT8U
+ * @param creditPaymentOverDueAmount INT32U
+ * @param tariffType TariffType
+ * @param creditPaymentStatus CreditPaymentStatus
+ * @param creditPayment INT32U
+ * @param creditPaymentDate UTC_TIME
+ * @param creditPaymentRef OCTET_STRING
  */
 #define emberAfFillCommandPriceClusterPublishCreditPayment( \
   providerId, \
@@ -6499,16 +6499,16 @@
 /** @brief Command description for PublishCurrencyConversion
  *
  * Command: PublishCurrencyConversion
- * @param providerId INT32U 
- * @param issuerEventId INT32U 
- * @param issuerEventId INT32U 
- * @param cppAuth CppEventResponseCppAuth 
- * @param startTime UTC_TIME 
- * @param oldCurrency INT16U 
- * @param newCurrency INT16U 
- * @param conversionFactor INT32U 
- * @param conversionFactorTrailingDigit ConversionFactorTrailingDigit 
- * @param currencyChangeControlFlags CurrencyChangeControl 
+ * @param providerId INT32U
+ * @param issuerEventId INT32U
+ * @param issuerEventId INT32U
+ * @param cppAuth CppEventResponseCppAuth
+ * @param startTime UTC_TIME
+ * @param oldCurrency INT16U
+ * @param newCurrency INT16U
+ * @param conversionFactor INT32U
+ * @param conversionFactorTrailingDigit ConversionFactorTrailingDigit
+ * @param currencyChangeControlFlags CurrencyChangeControl
  */
 #define emberAfFillCommandPriceClusterPublishCurrencyConversion( \
   providerId, \
@@ -6542,11 +6542,11 @@
 /** @brief Command description for CancelTariff
  *
  * Command: CancelTariff
- * @param providerId INT32U 
- * @param latestEndTime UTC_TIME 
- * @param issuerTariffId INT32U 
- * @param numberOfRecords INT8U 
- * @param tariffType TariffType 
+ * @param providerId INT32U
+ * @param latestEndTime UTC_TIME
+ * @param issuerTariffId INT32U
+ * @param numberOfRecords INT8U
+ * @param tariffType TariffType
  */
 #define emberAfFillCommandPriceClusterCancelTariff( \
   providerId, \
@@ -6596,30 +6596,30 @@
 /** @brief Command description for LoadControlEvent
  *
  * Command: LoadControlEvent
- * @param issuerEventId INT32U 
- * @param issuerEventId INT32U 
- * @param deviceClass AmiDeviceClass 
- * @param eventStatus AmiEventStatus 
- * @param utilityEnrollmentGroup INT8U 
- * @param eventStatusTime UTC_TIME 
- * @param startTime UTC_TIME 
- * @param criticalityLevelApplied AmiCriticalityLevel 
- * @param durationInMinutes INT16U 
- * @param coolingTemperatureSetPointApplied INT16U 
- * @param criticalityLevel AmiCriticalityLevel 
- * @param heatingTemperatureSetPointApplied INT16U 
- * @param coolingTemperatureOffset INT8U 
- * @param averageLoadAdjustmentPercentageApplied INT8S 
- * @param heatingTemperatureOffset INT8U 
- * @param dutyCycleApplied INT8U 
- * @param coolingTemperatureSetPoint INT16S 
- * @param eventControl AmiEventControl 
- * @param heatingTemperatureSetPoint INT16S 
- * @param signatureType SignatureType 
- * @param averageLoadAdjustmentPercentage INT8S 
- * @param signature Signature 
- * @param dutyCycle INT8U 
- * @param eventControl AmiEventControl 
+ * @param issuerEventId INT32U
+ * @param issuerEventId INT32U
+ * @param deviceClass AmiDeviceClass
+ * @param eventStatus AmiEventStatus
+ * @param utilityEnrollmentGroup INT8U
+ * @param eventStatusTime UTC_TIME
+ * @param startTime UTC_TIME
+ * @param criticalityLevelApplied AmiCriticalityLevel
+ * @param durationInMinutes INT16U
+ * @param coolingTemperatureSetPointApplied INT16U
+ * @param criticalityLevel AmiCriticalityLevel
+ * @param heatingTemperatureSetPointApplied INT16U
+ * @param coolingTemperatureOffset INT8U
+ * @param averageLoadAdjustmentPercentageApplied INT8S
+ * @param heatingTemperatureOffset INT8U
+ * @param dutyCycleApplied INT8U
+ * @param coolingTemperatureSetPoint INT16S
+ * @param eventControl AmiEventControl
+ * @param heatingTemperatureSetPoint INT16S
+ * @param signatureType SignatureType
+ * @param averageLoadAdjustmentPercentage INT8S
+ * @param signature Signature
+ * @param dutyCycle INT8U
+ * @param eventControl AmiEventControl
  */
 #define emberAfFillCommandDemand Response and Load ControlClusterLoadControlEvent( \
   issuerEventId, \
@@ -6681,14 +6681,14 @@
 /** @brief Command description for CancelLoadControlEvent
  *
  * Command: CancelLoadControlEvent
- * @param issuerEventId INT32U 
- * @param startTime UTC_TIME 
- * @param deviceClass AmiDeviceClass 
- * @param numberOfEvents INT8U 
- * @param utilityEnrollmentGroup INT8U 
- * @param issuerEventId INT32U 
- * @param cancelControl AmiCancelControl 
- * @param effectiveTime UTC_TIME 
+ * @param issuerEventId INT32U
+ * @param startTime UTC_TIME
+ * @param deviceClass AmiDeviceClass
+ * @param numberOfEvents INT8U
+ * @param utilityEnrollmentGroup INT8U
+ * @param issuerEventId INT32U
+ * @param cancelControl AmiCancelControl
+ * @param effectiveTime UTC_TIME
  */
 #define emberAfFillCommandDemand Response and Load ControlClusterCancelLoadControlEvent( \
   issuerEventId, \
@@ -6718,7 +6718,7 @@
 /** @brief Command description for CancelAllLoadControlEvents
  *
  * Command: CancelAllLoadControlEvents
- * @param cancelControl AmiCancelControl 
+ * @param cancelControl AmiCancelControl
  */
 #define emberAfFillCommandDemand Response and Load ControlClusterCancelAllLoadControlEvents( \
   cancelControl \
@@ -6734,13 +6734,13 @@
 /** @brief Command description for GetProfileResponse
  *
  * Command: GetProfileResponse
- * @param endTime UTC_TIME 
- * @param intervalChannel AmiIntervalChannel 
- * @param status AmiGetProfileStatus 
- * @param endTime UTC_TIME 
- * @param profileIntervalPeriod AmiIntervalPeriod 
- * @param numberOfPeriods INT8U 
- * @param numberOfPeriodsDelivered INT8U 
+ * @param endTime UTC_TIME
+ * @param intervalChannel AmiIntervalChannel
+ * @param status AmiGetProfileStatus
+ * @param endTime UTC_TIME
+ * @param profileIntervalPeriod AmiIntervalPeriod
+ * @param numberOfPeriods INT8U
+ * @param numberOfPeriodsDelivered INT8U
  * @param intervals INT24U []
  * @param intervalsLen int
  */
@@ -6772,7 +6772,7 @@
 /** @brief Command description for RequestMirror
  *
  * Command: RequestMirror
- * @param endpointId INT16U 
+ * @param endpointId INT16U
  */
 #define emberAfFillCommandSimple MeteringClusterRequestMirror( \
   endpointId \
@@ -6788,7 +6788,7 @@
 /** @brief Command description for RemoveMirror
  *
  * Command: RemoveMirror
- * @param endpointId INT16U 
+ * @param endpointId INT16U
  */
 #define emberAfFillCommandSimple MeteringClusterRemoveMirror( \
   endpointId \
@@ -6804,10 +6804,10 @@
 /** @brief Command description for RequestFastPollModeResponse
  *
  * Command: RequestFastPollModeResponse
- * @param appliedUpdatePeriod INT8U 
- * @param fastPollUpdatePeriod INT8U 
- * @param fastPollModeEndtime UTC_TIME 
- * @param duration INT8U 
+ * @param appliedUpdatePeriod INT8U
+ * @param fastPollUpdatePeriod INT8U
+ * @param fastPollModeEndtime UTC_TIME
+ * @param duration INT8U
  */
 #define emberAfFillCommandSimple MeteringClusterRequestFastPollModeResponse( \
   appliedUpdatePeriod, \
@@ -6829,12 +6829,12 @@
 /** @brief Command description for ScheduleSnapshotResponse
  *
  * Command: ScheduleSnapshotResponse
- * @param issuerEventId INT32U 
- * @param issuerEventId INT32U 
+ * @param issuerEventId INT32U
+ * @param issuerEventId INT32U
  * @param snapshotResponsePayload SnapshotResponsePayload []
  * @param snapshotResponsePayloadLen int
- * @param commandIndex INT8U 
- * @param commandCount INT8U 
+ * @param commandIndex INT8U
+ * @param commandCount INT8U
  * @param snapshotSchedulePayload SnapshotSchedulePayload []
  * @param snapshotSchedulePayloadLen int
  */
@@ -6862,9 +6862,9 @@
 /** @brief Command description for TakeSnapshotResponse
  *
  * Command: TakeSnapshotResponse
- * @param snapshotId INT32U 
- * @param snapshotCause SnapshotCause 
- * @param snapshotConfirmation SnapshotConfirmation 
+ * @param snapshotId INT32U
+ * @param snapshotCause SnapshotCause
+ * @param snapshotConfirmation SnapshotConfirmation
  */
 #define emberAfFillCommandSimple MeteringClusterTakeSnapshotResponse( \
   snapshotId, \
@@ -6884,17 +6884,17 @@
 /** @brief Command description for PublishSnapshot
  *
  * Command: PublishSnapshot
- * @param snapshotId INT32U 
- * @param earliestStartTime UTC_TIME 
- * @param snapshotTime UTC_TIME 
- * @param latestEndTime UTC_TIME 
- * @param totalSnapshotsFound INT8U 
- * @param snapshotOffset INT8U 
- * @param commandIndex INT8U 
- * @param snapshotCause SnapshotCause 
- * @param totalCommands INT8U 
- * @param snapshotCause SnapshotCause 
- * @param snapshotPayloadType SnapshotPayloadType 
+ * @param snapshotId INT32U
+ * @param earliestStartTime UTC_TIME
+ * @param snapshotTime UTC_TIME
+ * @param latestEndTime UTC_TIME
+ * @param totalSnapshotsFound INT8U
+ * @param snapshotOffset INT8U
+ * @param commandIndex INT8U
+ * @param snapshotCause SnapshotCause
+ * @param totalCommands INT8U
+ * @param snapshotCause SnapshotCause
+ * @param snapshotPayloadType SnapshotPayloadType
  * @param snapshotPayload INT8U []
  * @param snapshotPayloadLen int
  */
@@ -6934,16 +6934,16 @@
 /** @brief Command description for GetSampledDataResponse
  *
  * Command: GetSampledDataResponse
- * @param sampleId INT16U 
- * @param issuerEventId INT32U 
- * @param sampleStartTime UTC_TIME 
- * @param startSamplingTime UTC_TIME 
- * @param sampleType SampleType 
- * @param sampleType SampleType 
- * @param sampleRequestInterval INT16U 
- * @param sampleRequestInterval INT16U 
- * @param numberOfSamples INT16U 
- * @param maxNumberOfSamples INT16U 
+ * @param sampleId INT16U
+ * @param issuerEventId INT32U
+ * @param sampleStartTime UTC_TIME
+ * @param startSamplingTime UTC_TIME
+ * @param sampleType SampleType
+ * @param sampleType SampleType
+ * @param sampleRequestInterval INT16U
+ * @param sampleRequestInterval INT16U
+ * @param numberOfSamples INT16U
+ * @param maxNumberOfSamples INT16U
  * @param samples INT24U []
  * @param samplesLen int
  */
@@ -6981,14 +6981,14 @@
 /** @brief Command description for ConfigureMirror
  *
  * Command: ConfigureMirror
- * @param issuerEventId INT32U 
- * @param sampleId INT16U 
- * @param reportingInterval INT24U 
- * @param earliestSampleTime UTC_TIME 
- * @param mirrorNotificationReporting BOOLEAN 
- * @param sampleType SampleType 
- * @param notificationScheme INT8U 
- * @param numberOfSamples INT16U 
+ * @param issuerEventId INT32U
+ * @param sampleId INT16U
+ * @param reportingInterval INT24U
+ * @param earliestSampleTime UTC_TIME
+ * @param mirrorNotificationReporting BOOLEAN
+ * @param sampleType SampleType
+ * @param notificationScheme INT8U
+ * @param numberOfSamples INT16U
  */
 #define emberAfFillCommandSimple MeteringClusterConfigureMirror( \
   issuerEventId, \
@@ -7018,12 +7018,12 @@
 /** @brief Command description for ConfigureNotificationScheme
  *
  * Command: ConfigureNotificationScheme
- * @param issuerEventId INT32U 
- * @param notificationScheme INT8U 
- * @param notificationScheme INT8U 
+ * @param issuerEventId INT32U
+ * @param notificationScheme INT8U
+ * @param notificationScheme INT8U
  * @param notificationFlags BITMAP32 []
  * @param notificationFlagsLen int
- * @param notificationFlagOrder BITMAP32 
+ * @param notificationFlagOrder BITMAP32
  */
 #define emberAfFillCommandSimple MeteringClusterConfigureNotificationScheme( \
   issuerEventId, \
@@ -7047,14 +7047,14 @@
 /** @brief Command description for ConfigureNotificationFlags
  *
  * Command: ConfigureNotificationFlags
- * @param issuerEventId INT32U 
- * @param providerId INT32U 
- * @param notificationScheme INT8U 
- * @param issuerEventId INT32U 
- * @param notificationFlagAttributeId INT16U 
- * @param clusterId INT16U 
- * @param manufacturerCode INT16U 
- * @param numberOfCommands INT8U 
+ * @param issuerEventId INT32U
+ * @param providerId INT32U
+ * @param notificationScheme INT8U
+ * @param issuerEventId INT32U
+ * @param notificationFlagAttributeId INT16U
+ * @param clusterId INT16U
+ * @param manufacturerCode INT16U
+ * @param numberOfCommands INT8U
  * @param commandIds INT8U []
  * @param commandIdsLen int
  */
@@ -7088,15 +7088,15 @@
 /** @brief Command description for GetNotifiedMessage
  *
  * Command: GetNotifiedMessage
- * @param notificationScheme INT8U 
- * @param providerId INT32U 
- * @param notificationFlagAttributeId INT16U 
- * @param issuerEventId INT32U 
- * @param notificationFlagsN BITMAP32 
- * @param requestDateTime UTC_TIME 
- * @param implementationDateTime UTC_TIME 
- * @param proposedSupplyStatus MeteringSupplyStatus 
- * @param supplyControlBits SupplyControlBits 
+ * @param notificationScheme INT8U
+ * @param providerId INT32U
+ * @param notificationFlagAttributeId INT16U
+ * @param issuerEventId INT32U
+ * @param notificationFlagsN BITMAP32
+ * @param requestDateTime UTC_TIME
+ * @param implementationDateTime UTC_TIME
+ * @param proposedSupplyStatus MeteringSupplyStatus
+ * @param supplyControlBits SupplyControlBits
  */
 #define emberAfFillCommandSimple MeteringClusterGetNotifiedMessage( \
   notificationScheme, \
@@ -7128,11 +7128,11 @@
 /** @brief Command description for SupplyStatusResponse
  *
  * Command: SupplyStatusResponse
- * @param providerId INT32U 
- * @param proposedSupplyStatus ProposedSupplyStatus 
- * @param issuerEventId INT32U 
- * @param implementationDateTime UTC_TIME 
- * @param supplyStatus MeteringSupplyStatus 
+ * @param providerId INT32U
+ * @param proposedSupplyStatus ProposedSupplyStatus
+ * @param issuerEventId INT32U
+ * @param implementationDateTime UTC_TIME
+ * @param supplyStatus MeteringSupplyStatus
  */
 #define emberAfFillCommandSimple MeteringClusterSupplyStatusResponse( \
   providerId, \
@@ -7156,12 +7156,12 @@
 /** @brief Command description for StartSamplingResponse
  *
  * Command: StartSamplingResponse
- * @param sampleId INT16U 
- * @param issuerEventId INT32U 
- * @param supplyTamperState SupplyStatus 
- * @param supplyDepletionState SupplyStatus 
- * @param supplyUncontrolledFlowState SupplyStatus 
- * @param loadLimitSupplyState SupplyStatus 
+ * @param sampleId INT16U
+ * @param issuerEventId INT32U
+ * @param supplyTamperState SupplyStatus
+ * @param supplyDepletionState SupplyStatus
+ * @param supplyUncontrolledFlowState SupplyStatus
+ * @param loadLimitSupplyState SupplyStatus
  */
 #define emberAfFillCommandSimple MeteringClusterStartSamplingResponse( \
   sampleId, \
@@ -7187,14 +7187,14 @@
 /** @brief Command description for SetUncontrolledFlowThreshold
  *
  * Command: SetUncontrolledFlowThreshold
- * @param providerId INT32U 
- * @param issuerEventId INT32U 
- * @param uncontrolledFlowThreshold INT16U 
- * @param unitOfMeasure AmiUnitOfMeasure 
- * @param multiplier INT16U 
- * @param divisor INT16U 
- * @param stabilisationPeriod INT8U 
- * @param measurementPeriod INT16U 
+ * @param providerId INT32U
+ * @param issuerEventId INT32U
+ * @param uncontrolledFlowThreshold INT16U
+ * @param unitOfMeasure AmiUnitOfMeasure
+ * @param multiplier INT16U
+ * @param divisor INT16U
+ * @param stabilisationPeriod INT8U
+ * @param measurementPeriod INT16U
  */
 #define emberAfFillCommandSimple MeteringClusterSetUncontrolledFlowThreshold( \
   providerId, \
@@ -7224,12 +7224,12 @@
 /** @brief Command description for GetLastMessage
  *
  * Command: GetLastMessage
- * @param messageId INT32U 
- * @param messageControl MessagingControlMask 
- * @param startTime UTC_TIME 
- * @param durationInMinutes INT16U 
- * @param message CHAR_STRING 
- * @param optionalExtendedMessageControl MessagingExtendedControlMask 
+ * @param messageId INT32U
+ * @param messageControl MessagingControlMask
+ * @param startTime UTC_TIME
+ * @param durationInMinutes INT16U
+ * @param message CHAR_STRING
+ * @param optionalExtendedMessageControl MessagingExtendedControlMask
  */
 #define emberAfFillCommandMessagingClusterGetLastMessage( \
   messageId, \
@@ -7255,12 +7255,12 @@
 /** @brief Command description for CancelMessage
  *
  * Command: CancelMessage
- * @param messageId INT32U 
- * @param messageId INT32U 
- * @param messageControl MessagingControlMask 
- * @param confirmationTime UTC_TIME 
- * @param messageConfirmationControl BITMAP8 
- * @param messageResponse OCTET_STRING 
+ * @param messageId INT32U
+ * @param messageId INT32U
+ * @param messageControl MessagingControlMask
+ * @param confirmationTime UTC_TIME
+ * @param messageConfirmationControl BITMAP8
+ * @param messageResponse OCTET_STRING
  */
 #define emberAfFillCommandMessagingClusterCancelMessage( \
   messageId, \
@@ -7286,13 +7286,13 @@
 /** @brief Command description for DisplayProtectedMessage
  *
  * Command: DisplayProtectedMessage
- * @param messageId INT32U 
- * @param earliestImplementationTime UTC_TIME 
- * @param messageControl MessagingControlMask 
- * @param startTime UTC_TIME 
- * @param durationInMinutes INT16U 
- * @param message CHAR_STRING 
- * @param optionalExtendedMessageControl MessagingExtendedControlMask 
+ * @param messageId INT32U
+ * @param earliestImplementationTime UTC_TIME
+ * @param messageControl MessagingControlMask
+ * @param startTime UTC_TIME
+ * @param durationInMinutes INT16U
+ * @param message CHAR_STRING
+ * @param optionalExtendedMessageControl MessagingExtendedControlMask
  */
 #define emberAfFillCommandMessagingClusterDisplayProtectedMessage( \
   messageId, \
@@ -7320,7 +7320,7 @@
 /** @brief Command description for CancelAllMessages
  *
  * Command: CancelAllMessages
- * @param implementationDateTime UTC_TIME 
+ * @param implementationDateTime UTC_TIME
  */
 #define emberAfFillCommandMessagingClusterCancelAllMessages( \
   implementationDateTime \
@@ -7336,13 +7336,13 @@
 /** @brief Command description for RequestTunnel
  *
  * Command: RequestTunnel
- * @param protocolId INT8U 
- * @param tunnelId INT16U 
- * @param manufacturerCode INT16U 
- * @param tunnelStatus TunnelingTunnelStatus 
- * @param flowControlSupport BOOLEAN 
- * @param maximumIncomingTransferSize INT16U 
- * @param maximumIncomingTransferSize INT16U 
+ * @param protocolId INT8U
+ * @param tunnelId INT16U
+ * @param manufacturerCode INT16U
+ * @param tunnelStatus TunnelingTunnelStatus
+ * @param flowControlSupport BOOLEAN
+ * @param maximumIncomingTransferSize INT16U
+ * @param maximumIncomingTransferSize INT16U
  */
 #define emberAfFillCommandTunnelingClusterRequestTunnel( \
   protocolId, \
@@ -7370,8 +7370,8 @@
 /** @brief Command description for CloseTunnel
  *
  * Command: CloseTunnel
- * @param tunnelId INT16U 
- * @param tunnelId INT16U 
+ * @param tunnelId INT16U
+ * @param tunnelId INT16U
  * @param data INT8U []
  * @param dataLen int
  */
@@ -7393,11 +7393,11 @@
 /** @brief Command description for TransferDataClientToServer
  *
  * Command: TransferDataClientToServer
- * @param tunnelId INT16U 
- * @param tunnelId INT16U 
+ * @param tunnelId INT16U
+ * @param tunnelId INT16U
  * @param data INT8U []
  * @param dataLen int
- * @param transferDataStatus TunnelingTransferDataStatus 
+ * @param transferDataStatus TunnelingTransferDataStatus
  */
 #define emberAfFillCommandTunnelingClusterTransferDataClientToServer( \
   tunnelId, \
@@ -7419,10 +7419,10 @@
 /** @brief Command description for TransferDataErrorClientToServer
  *
  * Command: TransferDataErrorClientToServer
- * @param tunnelId INT16U 
- * @param tunnelId INT16U 
- * @param transferDataStatus TunnelingTransferDataStatus 
- * @param numberOfBytesLeft INT16U 
+ * @param tunnelId INT16U
+ * @param tunnelId INT16U
+ * @param transferDataStatus TunnelingTransferDataStatus
+ * @param numberOfBytesLeft INT16U
  */
 #define emberAfFillCommandTunnelingClusterTransferDataErrorClientToServer( \
   tunnelId, \
@@ -7444,10 +7444,10 @@
 /** @brief Command description for AckTransferDataClientToServer
  *
  * Command: AckTransferDataClientToServer
- * @param tunnelId INT16U 
- * @param tunnelId INT16U 
- * @param numberOfBytesLeft INT16U 
- * @param numberOfOctetsLeft INT16U 
+ * @param tunnelId INT16U
+ * @param tunnelId INT16U
+ * @param numberOfBytesLeft INT16U
+ * @param numberOfOctetsLeft INT16U
  */
 #define emberAfFillCommandTunnelingClusterAckTransferDataClientToServer( \
   tunnelId, \
@@ -7469,10 +7469,10 @@
 /** @brief Command description for ReadyDataClientToServer
  *
  * Command: ReadyDataClientToServer
- * @param tunnelId INT16U 
- * @param protocolListComplete BOOLEAN 
- * @param numberOfOctetsLeft INT16U 
- * @param protocolCount INT8U 
+ * @param tunnelId INT16U
+ * @param protocolListComplete BOOLEAN
+ * @param numberOfOctetsLeft INT16U
+ * @param protocolCount INT8U
  * @param protocolList Protocol []
  * @param protocolListLen int
  */
@@ -7498,8 +7498,8 @@
 /** @brief Command description for GetSupportedTunnelProtocols
  *
  * Command: GetSupportedTunnelProtocols
- * @param protocolOffset INT8U 
- * @param tunnelId INT16U 
+ * @param protocolOffset INT8U
+ * @param tunnelId INT16U
  */
 #define emberAfFillCommandTunnelingClusterGetSupportedTunnelProtocols( \
   protocolOffset, \
@@ -7517,8 +7517,8 @@
 /** @brief Command description for SelectAvailableEmergencyCredit
  *
  * Command: SelectAvailableEmergencyCredit
- * @param commandIssueDateTime UTC_TIME 
- * @param originatingDevice OriginatingDevice 
+ * @param commandIssueDateTime UTC_TIME
+ * @param originatingDevice OriginatingDevice
  */
 #define emberAfFillCommandPrepaymentClusterSelectAvailableEmergencyCredit( \
   commandIssueDateTime, \
@@ -7536,13 +7536,13 @@
 /** @brief Command description for PublishPrepaySnapshot
  *
  * Command: PublishPrepaySnapshot
- * @param snapshotId INT32U 
- * @param snapshotTime UTC_TIME 
- * @param totalSnapshotsFound INT8U 
- * @param commandIndex INT8U 
- * @param totalNumberOfCommands INT8U 
- * @param snapshotCause PrepaySnapshotPayloadCause 
- * @param snapshotPayloadType PrepaySnapshotPayloadType 
+ * @param snapshotId INT32U
+ * @param snapshotTime UTC_TIME
+ * @param totalSnapshotsFound INT8U
+ * @param commandIndex INT8U
+ * @param totalNumberOfCommands INT8U
+ * @param snapshotCause PrepaySnapshotPayloadCause
+ * @param snapshotPayloadType PrepaySnapshotPayloadType
  * @param snapshotPayload INT8U []
  * @param snapshotPayloadLen int
  */
@@ -7574,20 +7574,20 @@
 /** @brief Command description for ChangeDebt
  *
  * Command: ChangeDebt
- * @param issuerEventId INT32U 
- * @param friendlyCredit FriendlyCredit 
- * @param debtLabel OCTET_STRING 
- * @param friendlyCreditCalendarId INT32U 
- * @param debtAmount INT32U 
- * @param emergencyCreditLimit INT32U 
- * @param debtRecoveryMethod DebtRecoveryMethod 
- * @param emergencyCreditThreshold INT32U 
- * @param debtAmountType DebtAmountType 
- * @param debtRecoveryStartTime UTC_TIME 
- * @param debtRecoveryCollectionTime INT16U 
- * @param debtRecoveryFrequency DebtRecoveryFrequency 
- * @param debtRecoveryAmount INT32U 
- * @param debtRecoveryBalancePercentage INT16U 
+ * @param issuerEventId INT32U
+ * @param friendlyCredit FriendlyCredit
+ * @param debtLabel OCTET_STRING
+ * @param friendlyCreditCalendarId INT32U
+ * @param debtAmount INT32U
+ * @param emergencyCreditLimit INT32U
+ * @param debtRecoveryMethod DebtRecoveryMethod
+ * @param emergencyCreditThreshold INT32U
+ * @param debtAmountType DebtAmountType
+ * @param debtRecoveryStartTime UTC_TIME
+ * @param debtRecoveryCollectionTime INT16U
+ * @param debtRecoveryFrequency DebtRecoveryFrequency
+ * @param debtRecoveryAmount INT32U
+ * @param debtRecoveryBalancePercentage INT16U
  */
 #define emberAfFillCommandPrepaymentClusterChangeDebt( \
   issuerEventId, \
@@ -7629,14 +7629,14 @@
 /** @brief Command description for EmergencyCreditSetup
  *
  * Command: EmergencyCreditSetup
- * @param issuerEventId INT32U 
- * @param resultType ResultType 
- * @param startTime UTC_TIME 
- * @param topUpValue INT32U 
- * @param emergencyCreditLimit INT32U 
- * @param sourceOfTopUp OriginatingDevice 
- * @param emergencyCreditThreshold INT32U 
- * @param creditRemaining INT32U 
+ * @param issuerEventId INT32U
+ * @param resultType ResultType
+ * @param startTime UTC_TIME
+ * @param topUpValue INT32U
+ * @param emergencyCreditLimit INT32U
+ * @param sourceOfTopUp OriginatingDevice
+ * @param emergencyCreditThreshold INT32U
+ * @param creditRemaining INT32U
  */
 #define emberAfFillCommandPrepaymentClusterEmergencyCreditSetup( \
   issuerEventId, \
@@ -7666,8 +7666,8 @@
 /** @brief Command description for ConsumerTopUp
  *
  * Command: ConsumerTopUp
- * @param originatingDevice OriginatingDevice 
- * @param topUpCode OCTET_STRING 
+ * @param originatingDevice OriginatingDevice
+ * @param topUpCode OCTET_STRING
  */
 #define emberAfFillCommandPrepaymentClusterConsumerTopUp( \
   originatingDevice, \
@@ -7685,14 +7685,14 @@
 /** @brief Command description for CreditAdjustment
  *
  * Command: CreditAdjustment
- * @param issuerEventId INT32U 
- * @param commandIndex INT8U 
- * @param startTime UTC_TIME 
- * @param totalNumberOfCommands INT8U 
- * @param creditAdjustmentType CreditAdjustmentType 
+ * @param issuerEventId INT32U
+ * @param commandIndex INT8U
+ * @param startTime UTC_TIME
+ * @param totalNumberOfCommands INT8U
+ * @param creditAdjustmentType CreditAdjustmentType
  * @param topUpPayload TopUpPayload []
  * @param topUpPayloadLen int
- * @param creditAdjustmentValue INT32U 
+ * @param creditAdjustmentValue INT32U
  */
 #define emberAfFillCommandPrepaymentClusterCreditAdjustment( \
   issuerEventId, \
@@ -7720,15 +7720,15 @@
 /** @brief Command description for ChangePaymentMode
  *
  * Command: ChangePaymentMode
- * @param providerId INT32U 
- * @param commandIndex INT8U 
- * @param issuerEventId INT32U 
- * @param totalNumberOfCommands INT8U 
- * @param implementationDateTime UTC_TIME 
+ * @param providerId INT32U
+ * @param commandIndex INT8U
+ * @param issuerEventId INT32U
+ * @param totalNumberOfCommands INT8U
+ * @param implementationDateTime UTC_TIME
  * @param debtPayload DebtPayload []
  * @param debtPayloadLen int
- * @param proposedPaymentControlConfiguration PaymentControlConfiguration 
- * @param cutOffValue INT32U 
+ * @param proposedPaymentControlConfiguration PaymentControlConfiguration
+ * @param cutOffValue INT32U
  */
 #define emberAfFillCommandPrepaymentClusterChangePaymentMode( \
   providerId, \
@@ -7758,10 +7758,10 @@
 /** @brief Command description for GetPrepaySnapshot
  *
  * Command: GetPrepaySnapshot
- * @param earliestStartTime UTC_TIME 
- * @param latestEndTime UTC_TIME 
- * @param snapshotOffset INT8U 
- * @param snapshotCause PrepaySnapshotPayloadCause 
+ * @param earliestStartTime UTC_TIME
+ * @param latestEndTime UTC_TIME
+ * @param snapshotOffset INT8U
+ * @param snapshotCause PrepaySnapshotPayloadCause
  */
 #define emberAfFillCommandPrepaymentClusterGetPrepaySnapshot( \
   earliestStartTime, \
@@ -7783,8 +7783,8 @@
 /** @brief Command description for GetTopUpLog
  *
  * Command: GetTopUpLog
- * @param latestEndTime UTC_TIME 
- * @param numberOfRecords INT8U 
+ * @param latestEndTime UTC_TIME
+ * @param numberOfRecords INT8U
  */
 #define emberAfFillCommandPrepaymentClusterGetTopUpLog( \
   latestEndTime, \
@@ -7802,7 +7802,7 @@
 /** @brief Command description for SetLowCreditWarningLevel
  *
  * Command: SetLowCreditWarningLevel
- * @param lowCreditWarningLevel INT32U 
+ * @param lowCreditWarningLevel INT32U
  */
 #define emberAfFillCommandPrepaymentClusterSetLowCreditWarningLevel( \
   lowCreditWarningLevel \
@@ -7818,9 +7818,9 @@
 /** @brief Command description for GetDebtRepaymentLog
  *
  * Command: GetDebtRepaymentLog
- * @param latestEndTime UTC_TIME 
- * @param numberOfDebts INT8U 
- * @param debtType RepaymentDebtType 
+ * @param latestEndTime UTC_TIME
+ * @param numberOfDebts INT8U
+ * @param debtType RepaymentDebtType
  */
 #define emberAfFillCommandPrepaymentClusterGetDebtRepaymentLog( \
   latestEndTime, \
@@ -7840,11 +7840,11 @@
 /** @brief Command description for SetMaximumCreditLimit
  *
  * Command: SetMaximumCreditLimit
- * @param providerId INT32U 
- * @param issuerEventId INT32U 
- * @param implementationDateTime UTC_TIME 
- * @param maximumCreditLevel INT32U 
- * @param maximumCreditPerTopUp INT32U 
+ * @param providerId INT32U
+ * @param issuerEventId INT32U
+ * @param implementationDateTime UTC_TIME
+ * @param maximumCreditLevel INT32U
+ * @param maximumCreditPerTopUp INT32U
  */
 #define emberAfFillCommandPrepaymentClusterSetMaximumCreditLimit( \
   providerId, \
@@ -7868,10 +7868,10 @@
 /** @brief Command description for SetOverallDebtCap
  *
  * Command: SetOverallDebtCap
- * @param providerId INT32U 
- * @param issuerEventId INT32U 
- * @param implementationDateTime UTC_TIME 
- * @param overallDebtCap INT32U 
+ * @param providerId INT32U
+ * @param issuerEventId INT32U
+ * @param implementationDateTime UTC_TIME
+ * @param overallDebtCap INT32U
  */
 #define emberAfFillCommandPrepaymentClusterSetOverallDebtCap( \
   providerId, \
@@ -7893,19 +7893,19 @@
 /** @brief Command description for ReportEventStatus
  *
  * Command: ReportEventStatus
- * @param issuerEventId INT32U 
- * @param issuerEventId INT32U 
- * @param eventStatus AmiEventStatus 
- * @param deviceClass AmiDeviceClass 
- * @param eventStatusTime UTC_TIME 
- * @param utilityEnrollmentGroup INT8U 
- * @param criticalityLevelApplied AmiCriticalityLevel 
- * @param actionRequired INT8U 
- * @param coolingTemperatureSetPointApplied INT16U 
- * @param heatingTemperatureSetPointApplied INT16U 
- * @param averageLoadAdjustmentPercentageApplied INT8S 
- * @param dutyCycleApplied INT8U 
- * @param eventControl AmiEventControl 
+ * @param issuerEventId INT32U
+ * @param issuerEventId INT32U
+ * @param eventStatus AmiEventStatus
+ * @param deviceClass AmiDeviceClass
+ * @param eventStatusTime UTC_TIME
+ * @param utilityEnrollmentGroup INT8U
+ * @param criticalityLevelApplied AmiCriticalityLevel
+ * @param actionRequired INT8U
+ * @param coolingTemperatureSetPointApplied INT16U
+ * @param heatingTemperatureSetPointApplied INT16U
+ * @param averageLoadAdjustmentPercentageApplied INT8S
+ * @param dutyCycleApplied INT8U
+ * @param eventControl AmiEventControl
  */
 #define emberAfFillCommandEnergy ManagementClusterReportEventStatus( \
   issuerEventId, \
@@ -7945,21 +7945,21 @@
 /** @brief Command description for PublishCalendar
  *
  * Command: PublishCalendar
- * @param providerId INT32U 
- * @param earliestStartTime UTC_TIME 
- * @param issuerEventId INT32U 
- * @param minIssuerEventId INT32U 
- * @param issuerCalendarId INT32U 
- * @param numberOfCalendars INT8U 
- * @param startTime UTC_TIME 
- * @param calendarType CalendarType 
- * @param calendarType CalendarType 
- * @param providerId INT32U 
- * @param calendarTimeReference CalendarTimeReference 
- * @param calendarName OCTET_STRING 
- * @param numberOfSeasons INT8U 
- * @param numberOfWeekProfiles INT8U 
- * @param numberOfDayProfiles INT8U 
+ * @param providerId INT32U
+ * @param earliestStartTime UTC_TIME
+ * @param issuerEventId INT32U
+ * @param minIssuerEventId INT32U
+ * @param issuerCalendarId INT32U
+ * @param numberOfCalendars INT8U
+ * @param startTime UTC_TIME
+ * @param calendarType CalendarType
+ * @param calendarType CalendarType
+ * @param providerId INT32U
+ * @param calendarTimeReference CalendarTimeReference
+ * @param calendarName OCTET_STRING
+ * @param numberOfSeasons INT8U
+ * @param numberOfWeekProfiles INT8U
+ * @param numberOfDayProfiles INT8U
  */
 #define emberAfFillCommandCalendarClusterPublishCalendar( \
   providerId, \
@@ -8003,18 +8003,18 @@
 /** @brief Command description for PublishDayProfile
  *
  * Command: PublishDayProfile
- * @param providerId INT32U 
- * @param providerId INT32U 
- * @param issuerEventId INT32U 
- * @param issuerCalendarId INT32U 
- * @param issuerCalendarId INT32U 
- * @param startDayId INT8U 
- * @param dayId INT8U 
- * @param numberOfDays INT8U 
- * @param totalNumberOfScheduleEntries INT8U 
- * @param commandIndex INT8U 
- * @param totalNumberOfCommands INT8U 
- * @param calendarType CalendarType 
+ * @param providerId INT32U
+ * @param providerId INT32U
+ * @param issuerEventId INT32U
+ * @param issuerCalendarId INT32U
+ * @param issuerCalendarId INT32U
+ * @param startDayId INT8U
+ * @param dayId INT8U
+ * @param numberOfDays INT8U
+ * @param totalNumberOfScheduleEntries INT8U
+ * @param commandIndex INT8U
+ * @param totalNumberOfCommands INT8U
+ * @param calendarType CalendarType
  * @param dayScheduleEntries ScheduleEntry []
  * @param dayScheduleEntriesLen int
  */
@@ -8056,21 +8056,21 @@
 /** @brief Command description for PublishWeekProfile
  *
  * Command: PublishWeekProfile
- * @param providerId INT32U 
- * @param providerId INT32U 
- * @param issuerEventId INT32U 
- * @param issuerCalendarId INT32U 
- * @param issuerCalendarId INT32U 
- * @param startWeekId INT8U 
- * @param weekId INT8U 
- * @param numberOfWeeks INT8U 
- * @param dayIdRefMonday INT8U 
- * @param dayIdRefTuesday INT8U 
- * @param dayIdRefWednesday INT8U 
- * @param dayIdRefThursday INT8U 
- * @param dayIdRefFriday INT8U 
- * @param dayIdRefSaturday INT8U 
- * @param dayIdRefSunday INT8U 
+ * @param providerId INT32U
+ * @param providerId INT32U
+ * @param issuerEventId INT32U
+ * @param issuerCalendarId INT32U
+ * @param issuerCalendarId INT32U
+ * @param startWeekId INT8U
+ * @param weekId INT8U
+ * @param numberOfWeeks INT8U
+ * @param dayIdRefMonday INT8U
+ * @param dayIdRefTuesday INT8U
+ * @param dayIdRefWednesday INT8U
+ * @param dayIdRefThursday INT8U
+ * @param dayIdRefFriday INT8U
+ * @param dayIdRefSaturday INT8U
+ * @param dayIdRefSunday INT8U
  */
 #define emberAfFillCommandCalendarClusterPublishWeekProfile( \
   providerId, \
@@ -8114,13 +8114,13 @@
 /** @brief Command description for PublishSeasons
  *
  * Command: PublishSeasons
- * @param providerId INT32U 
- * @param providerId INT32U 
- * @param issuerEventId INT32U 
- * @param issuerCalendarId INT32U 
- * @param issuerCalendarId INT32U 
- * @param commandIndex INT8U 
- * @param totalNumberOfCommands INT8U 
+ * @param providerId INT32U
+ * @param providerId INT32U
+ * @param issuerEventId INT32U
+ * @param issuerCalendarId INT32U
+ * @param issuerCalendarId INT32U
+ * @param commandIndex INT8U
+ * @param totalNumberOfCommands INT8U
  * @param seasonEntries SeasonEntry []
  * @param seasonEntriesLen int
  */
@@ -8152,19 +8152,19 @@
 /** @brief Command description for PublishSpecialDays
  *
  * Command: PublishSpecialDays
- * @param providerId INT32U 
- * @param startTime UTC_TIME 
- * @param issuerEventId INT32U 
- * @param numberOfEvents INT8U 
- * @param issuerCalendarId INT32U 
- * @param calendarType CalendarType 
- * @param startTime UTC_TIME 
- * @param providerId INT32U 
- * @param calendarType CalendarType 
- * @param issuerCalendarId INT32U 
- * @param totalNumberOfSpecialDays INT8U 
- * @param commandIndex INT8U 
- * @param totalNumberOfCommands INT8U 
+ * @param providerId INT32U
+ * @param startTime UTC_TIME
+ * @param issuerEventId INT32U
+ * @param numberOfEvents INT8U
+ * @param issuerCalendarId INT32U
+ * @param calendarType CalendarType
+ * @param startTime UTC_TIME
+ * @param providerId INT32U
+ * @param calendarType CalendarType
+ * @param issuerCalendarId INT32U
+ * @param totalNumberOfSpecialDays INT8U
+ * @param commandIndex INT8U
+ * @param totalNumberOfCommands INT8U
  * @param specialDayEntries SpecialDay []
  * @param specialDayEntriesLen int
  */
@@ -8208,9 +8208,9 @@
 /** @brief Command description for GetCalendarCancellation
  *
  * Command: GetCalendarCancellation
- * @param providerId INT32U 
- * @param issuerCalendarId INT32U 
- * @param calendarType CalendarType 
+ * @param providerId INT32U
+ * @param issuerCalendarId INT32U
+ * @param calendarType CalendarType
  */
 #define emberAfFillCommandCalendarClusterGetCalendarCancellation( \
   providerId, \
@@ -8230,11 +8230,11 @@
 /** @brief Command description for GetChangeOfTenancy
  *
  * Command: GetChangeOfTenancy
- * @param providerId INT32U 
- * @param issuerEventId INT32U 
- * @param tariffType TariffType 
- * @param implementationDateTime UTC_TIME 
- * @param proposedTenancyChangeControl ProposedChangeControl 
+ * @param providerId INT32U
+ * @param issuerEventId INT32U
+ * @param tariffType TariffType
+ * @param implementationDateTime UTC_TIME
+ * @param proposedTenancyChangeControl ProposedChangeControl
  */
 #define emberAfFillCommandDevice ManagementClusterGetChangeOfTenancy( \
   providerId, \
@@ -8258,14 +8258,14 @@
 /** @brief Command description for GetChangeOfSupplier
  *
  * Command: GetChangeOfSupplier
- * @param currentProviderId INT32U 
- * @param issuerEventId INT32U 
- * @param tariffType TariffType 
- * @param proposedProviderId INT32U 
- * @param providerChangeImplementationTime UTC_TIME 
- * @param providerChangeControl ProposedChangeControl 
- * @param proposedProviderName OCTET_STRING 
- * @param proposedProviderContactDetails OCTET_STRING 
+ * @param currentProviderId INT32U
+ * @param issuerEventId INT32U
+ * @param tariffType TariffType
+ * @param proposedProviderId INT32U
+ * @param providerChangeImplementationTime UTC_TIME
+ * @param providerChangeControl ProposedChangeControl
+ * @param proposedProviderName OCTET_STRING
+ * @param proposedProviderContactDetails OCTET_STRING
  */
 #define emberAfFillCommandDevice ManagementClusterGetChangeOfSupplier( \
   currentProviderId, \
@@ -8295,12 +8295,12 @@
 /** @brief Command description for RequestNewPassword
  *
  * Command: RequestNewPassword
- * @param passwordType PasswordType 
- * @param issuerEventId INT32U 
- * @param implementationDateTime UTC_TIME 
- * @param durationInMinutes INT16U 
- * @param passwordType PasswordType 
- * @param password OCTET_STRING 
+ * @param passwordType PasswordType
+ * @param issuerEventId INT32U
+ * @param implementationDateTime UTC_TIME
+ * @param durationInMinutes INT16U
+ * @param passwordType PasswordType
+ * @param password OCTET_STRING
  */
 #define emberAfFillCommandDevice ManagementClusterRequestNewPassword( \
   passwordType, \
@@ -8326,10 +8326,10 @@
 /** @brief Command description for GetSiteId
  *
  * Command: GetSiteId
- * @param issuerEventId INT32U 
- * @param siteIdTime UTC_TIME 
- * @param providerId INT32U 
- * @param siteId OCTET_STRING 
+ * @param issuerEventId INT32U
+ * @param siteIdTime UTC_TIME
+ * @param providerId INT32U
+ * @param siteId OCTET_STRING
  */
 #define emberAfFillCommandDevice ManagementClusterGetSiteId( \
   issuerEventId, \
@@ -8351,14 +8351,14 @@
 /** @brief Command description for ReportEventConfiguration
  *
  * Command: ReportEventConfiguration
- * @param commandIndex INT8U 
- * @param issuerEventId INT32U 
- * @param totalCommands INT8U 
- * @param startDateTime UTC_TIME 
+ * @param commandIndex INT8U
+ * @param issuerEventId INT32U
+ * @param totalCommands INT8U
+ * @param startDateTime UTC_TIME
  * @param eventConfigurationPayload EventConfigurationPayload []
  * @param eventConfigurationPayloadLen int
- * @param eventConfiguration EventConfiguration 
- * @param configurationControl EventConfigurationControl 
+ * @param eventConfiguration EventConfiguration
+ * @param configurationControl EventConfigurationControl
  * @param eventConfigurationPayload INT8U []
  * @param eventConfigurationPayloadLen int
  */
@@ -8390,7 +8390,7 @@
 /** @brief Command description for GetCIN
  *
  * Command: GetCIN
- * @param eventId INT16U 
+ * @param eventId INT16U
  */
 #define emberAfFillCommandDevice ManagementClusterGetCIN( \
   eventId \
@@ -8406,10 +8406,10 @@
 /** @brief Command description for UpdateCIN
  *
  * Command: UpdateCIN
- * @param issuerEventId INT32U 
- * @param implementationTime UTC_TIME 
- * @param providerId INT32U 
- * @param customerIdNumber OCTET_STRING 
+ * @param issuerEventId INT32U
+ * @param implementationTime UTC_TIME
+ * @param providerId INT32U
+ * @param customerIdNumber OCTET_STRING
  */
 #define emberAfFillCommandDevice ManagementClusterUpdateCIN( \
   issuerEventId, \
@@ -8431,17 +8431,17 @@
 /** @brief Command description for GetEventLog
  *
  * Command: GetEventLog
- * @param eventControlLogId EventControlLogId 
- * @param logId EventLogId 
- * @param eventId INT16U 
- * @param eventId INT16U 
- * @param startTime UTC_TIME 
- * @param eventTime UTC_TIME 
- * @param endTime UTC_TIME 
- * @param eventControl EventActionControl 
- * @param numberOfEvents INT8U 
- * @param eventData OCTET_STRING 
- * @param eventOffset INT16U 
+ * @param eventControlLogId EventControlLogId
+ * @param logId EventLogId
+ * @param eventId INT16U
+ * @param eventId INT16U
+ * @param startTime UTC_TIME
+ * @param eventTime UTC_TIME
+ * @param endTime UTC_TIME
+ * @param eventControl EventActionControl
+ * @param numberOfEvents INT8U
+ * @param eventData OCTET_STRING
+ * @param eventOffset INT16U
  */
 #define emberAfFillCommandEventsClusterGetEventLog( \
   eventControlLogId, \
@@ -8477,11 +8477,11 @@
 /** @brief Command description for ClearEventLogRequest
  *
  * Command: ClearEventLogRequest
- * @param logId EventLogId 
- * @param totalNumberOfEvents INT16U 
- * @param commandIndex INT8U 
- * @param totalCommands INT8U 
- * @param logPayloadControl NumberOfEventsLogPayloadControl 
+ * @param logId EventLogId
+ * @param totalNumberOfEvents INT16U
+ * @param commandIndex INT8U
+ * @param totalCommands INT8U
+ * @param logPayloadControl NumberOfEventsLogPayloadControl
  * @param logPayload EventLogPayload []
  * @param logPayloadLen int
  */
@@ -8509,7 +8509,7 @@
 /** @brief Command description for ClearEventLogResponse
  *
  * Command: ClearEventLogResponse
- * @param clearedEventsLogs ClearedEventsLogs 
+ * @param clearedEventsLogs ClearedEventsLogs
  */
 #define emberAfFillCommandEventsClusterClearEventLogResponse( \
   clearedEventsLogs \
@@ -8525,12 +8525,12 @@
 /** @brief Command description for PairingResponse
  *
  * Command: PairingResponse
- * @param pairingInformationVersion INT32U 
- * @param localPairingInformationVersion INT32U 
- * @param totalNumberOfDevices INT8U 
- * @param eui64OfRequestingDevice IEEE_ADDRESS 
- * @param commandIndex INT8U 
- * @param totalNumberOfCommands INT8U 
+ * @param pairingInformationVersion INT32U
+ * @param localPairingInformationVersion INT32U
+ * @param totalNumberOfDevices INT8U
+ * @param eui64OfRequestingDevice IEEE_ADDRESS
+ * @param commandIndex INT8U
+ * @param totalNumberOfCommands INT8U
  * @param eui64s IEEE_ADDRESS []
  * @param eui64sLen int
  */
@@ -8560,7 +8560,7 @@
 /** @brief Command description for GetSuspendZclMessagesStatus
  *
  * Command: GetSuspendZclMessagesStatus
- * @param period INT8U 
+ * @param period INT8U
  */
 #define emberAfFillCommandSub-GHzClusterGetSuspendZclMessagesStatus( \
   period \
@@ -8576,14 +8576,14 @@
 /** @brief Command description for InitiateKeyEstablishmentRequest
  *
  * Command: InitiateKeyEstablishmentRequest
- * @param keyEstablishmentSuite BITMAP16 
- * @param requestedKeyEstablishmentSuite BITMAP16 
- * @param ephemeralDataGenerateTime INT8U 
- * @param ephemeralDataGenerateTime INT8U 
- * @param confirmKeyGenerateTime INT8U 
- * @param confirmKeyGenerateTime INT8U 
- * @param identity Identity 
- * @param identity Identity 
+ * @param keyEstablishmentSuite BITMAP16
+ * @param requestedKeyEstablishmentSuite BITMAP16
+ * @param ephemeralDataGenerateTime INT8U
+ * @param ephemeralDataGenerateTime INT8U
+ * @param confirmKeyGenerateTime INT8U
+ * @param confirmKeyGenerateTime INT8U
+ * @param identity Identity
+ * @param identity Identity
  */
 #define emberAfFillCommandKey EstablishmentClusterInitiateKeyEstablishmentRequest( \
   keyEstablishmentSuite, \
@@ -8613,8 +8613,8 @@
 /** @brief Command description for EphemeralDataRequest
  *
  * Command: EphemeralDataRequest
- * @param ephemeralData EphemeralData 
- * @param ephemeralData EphemeralData 
+ * @param ephemeralData EphemeralData
+ * @param ephemeralData EphemeralData
  */
 #define emberAfFillCommandKey EstablishmentClusterEphemeralDataRequest( \
   ephemeralData, \
@@ -8632,8 +8632,8 @@
 /** @brief Command description for ConfirmKeyDataRequest
  *
  * Command: ConfirmKeyDataRequest
- * @param secureMessageAuthenticationCode Smac 
- * @param secureMessageAuthenticationCode Smac 
+ * @param secureMessageAuthenticationCode Smac
+ * @param secureMessageAuthenticationCode Smac
  */
 #define emberAfFillCommandKey EstablishmentClusterConfirmKeyDataRequest( \
   secureMessageAuthenticationCode, \
@@ -8651,9 +8651,9 @@
 /** @brief Command description for TerminateKeyEstablishment
  *
  * Command: TerminateKeyEstablishment
- * @param statusCode AmiKeyEstablishmentStatus 
- * @param waitTime INT8U 
- * @param keyEstablishmentSuite BITMAP16 
+ * @param statusCode AmiKeyEstablishmentStatus
+ * @param waitTime INT8U
+ * @param keyEstablishmentSuite BITMAP16
  */
 #define emberAfFillCommandKey EstablishmentClusterTerminateKeyEstablishment( \
   statusCode, \
@@ -8673,9 +8673,9 @@
 /** @brief Command description for RequestInformation
  *
  * Command: RequestInformation
- * @param inquiryId ENUM8 
- * @param number INT8U 
- * @param dataTypeId BITMAP8 
+ * @param inquiryId ENUM8
+ * @param number INT8U
+ * @param dataTypeId BITMAP8
  * @param buffer INT8U []
  * @param bufferLen int
  * @param requestInformationPayload INT8U []
@@ -8724,7 +8724,7 @@
 /** @brief Command description for SendPreference
  *
  * Command: SendPreference
- * @param preferenceType INT16U 
+ * @param preferenceType INT16U
  * @param statusFeedbackList Status []
  * @param statusFeedbackListLen int
  * @param preferencePayload INT8U []
@@ -8748,8 +8748,8 @@
 /** @brief Command description for ServerRequestPreference
  *
  * Command: ServerRequestPreference
- * @param statusFeedback Status 
- * @param preferenceType INT16U 
+ * @param statusFeedback Status
+ * @param preferenceType INT16U
  * @param preferencePayload INT8U []
  * @param preferencePayloadLen int
  */
@@ -8771,10 +8771,10 @@
 /** @brief Command description for Update
  *
  * Command: Update
- * @param accessControl ENUM8 
+ * @param accessControl ENUM8
  * @param statusFeedbackList Status []
  * @param statusFeedbackListLen int
- * @param option BITMAP8 
+ * @param option BITMAP8
  * @param contents INT8U []
  * @param contentsLen int
  */
@@ -8798,7 +8798,7 @@
 /** @brief Command description for Delete
  *
  * Command: Delete
- * @param deletionOptions BITMAP8 
+ * @param deletionOptions BITMAP8
  * @param notificationList Notification []
  * @param notificationListLen int
  * @param contentIds INT16U []
@@ -8822,7 +8822,7 @@
 /** @brief Command description for ConfigureNodeDescription
  *
  * Command: ConfigureNodeDescription
- * @param description CHAR_STRING 
+ * @param description CHAR_STRING
  * @param notificationList Notification []
  * @param notificationListLen int
  */
@@ -8842,7 +8842,7 @@
 /** @brief Command description for ConfigureDeliveryEnable
  *
  * Command: ConfigureDeliveryEnable
- * @param enable BOOLEAN 
+ * @param enable BOOLEAN
  */
 #define emberAfFillCommandInformationClusterConfigureDeliveryEnable( \
   enable \
@@ -8858,7 +8858,7 @@
 /** @brief Command description for ConfigurePushInformationTimer
  *
  * Command: ConfigurePushInformationTimer
- * @param timer INT32U 
+ * @param timer INT32U
  */
 #define emberAfFillCommandInformationClusterConfigurePushInformationTimer( \
   timer \
@@ -8874,7 +8874,7 @@
 /** @brief Command description for ConfigureSetRootId
  *
  * Command: ConfigureSetRootId
- * @param rootId INT16U 
+ * @param rootId INT16U
  */
 #define emberAfFillCommandInformationClusterConfigureSetRootId( \
   rootId \
@@ -8890,8 +8890,8 @@
 /** @brief Command description for ReadFileRequest
  *
  * Command: ReadFileRequest
- * @param fileIndex INT16U 
- * @param writeOptions BITMAP8 
+ * @param fileIndex INT16U
+ * @param writeOptions BITMAP8
  * @param fileStartPositionAndRequestedOctetCount INT8U []
  * @param fileStartPositionAndRequestedOctetCountLen int
  * @param fileSize INT8U []
@@ -8917,12 +8917,12 @@
 /** @brief Command description for ReadRecordRequest
  *
  * Command: ReadRecordRequest
- * @param fileIndex INT16U 
- * @param fileIndex INT16U 
+ * @param fileIndex INT16U
+ * @param fileIndex INT16U
  * @param fileStartRecordAndRequestedRecordCount INT8U []
  * @param fileStartRecordAndRequestedRecordCountLen int
- * @param fileStartPosition INT32U 
- * @param octetCount INT32U 
+ * @param fileStartPosition INT32U
+ * @param octetCount INT32U
  */
 #define emberAfFillCommandData SharingClusterReadRecordRequest( \
   fileIndex, \
@@ -8946,12 +8946,12 @@
 /** @brief Command description for WriteFileResponse
  *
  * Command: WriteFileResponse
- * @param status ENUM8 
- * @param fileIndex INT16U 
+ * @param status ENUM8
+ * @param fileIndex INT16U
  * @param fileIndex INT8U []
  * @param fileIndexLen int
- * @param fileStartRecord INT16U 
- * @param recordCount INT16U 
+ * @param fileStartRecord INT16U
+ * @param recordCount INT16U
  */
 #define emberAfFillCommandData SharingClusterWriteFileResponse( \
   status, \
@@ -8975,7 +8975,7 @@
 /** @brief Command description for FileTransmission
  *
  * Command: FileTransmission
- * @param transmitOptions BITMAP8 
+ * @param transmitOptions BITMAP8
  * @param buffer INT8U []
  * @param bufferLen int
  */
@@ -8995,7 +8995,7 @@
 /** @brief Command description for RecordTransmission
  *
  * Command: RecordTransmission
- * @param transmitOptions BITMAP8 
+ * @param transmitOptions BITMAP8
  * @param buffer INT8U []
  * @param bufferLen int
  */
@@ -9015,11 +9015,11 @@
 /** @brief Command description for SearchGame
  *
  * Command: SearchGame
- * @param specificGame ENUM8 
- * @param gameId INT16U 
- * @param gameId INT16U 
- * @param gameMaster BOOLEAN 
- * @param listOfGame CHAR_STRING 
+ * @param specificGame ENUM8
+ * @param gameId INT16U
+ * @param gameId INT16U
+ * @param gameMaster BOOLEAN
+ * @param listOfGame CHAR_STRING
  */
 #define emberAfFillCommandGamingClusterSearchGame( \
   specificGame, \
@@ -9043,12 +9043,12 @@
 /** @brief Command description for JoinGame
  *
  * Command: JoinGame
- * @param gameId INT16U 
- * @param commandId INT8U 
- * @param joinAsMaster BOOLEAN 
- * @param status BITMAP8 
- * @param nameOfGame CHAR_STRING 
- * @param message CHAR_STRING 
+ * @param gameId INT16U
+ * @param commandId INT8U
+ * @param joinAsMaster BOOLEAN
+ * @param status BITMAP8
+ * @param nameOfGame CHAR_STRING
+ * @param message CHAR_STRING
  */
 #define emberAfFillCommandGamingClusterJoinGame( \
   gameId, \
@@ -9152,7 +9152,7 @@
 /** @brief Command description for ActionControl
  *
  * Command: ActionControl
- * @param actions BITMAP32 
+ * @param actions BITMAP32
  */
 #define emberAfFillCommandGamingClusterActionControl( \
   actions \
@@ -9181,12 +9181,12 @@
 /** @brief Command description for PathCreation
  *
  * Command: PathCreation
- * @param originatorAddress DATA16 
- * @param originatorAddress DATA16 
- * @param destinationAddress DATA16 
- * @param destinationAddress DATA16 
- * @param dataRate INT8U 
- * @param dataRate INT8U 
+ * @param originatorAddress DATA16
+ * @param originatorAddress DATA16
+ * @param destinationAddress DATA16
+ * @param destinationAddress DATA16
+ * @param dataRate INT8U
+ * @param dataRate INT8U
  */
 #define emberAfFillCommandData Rate ControlClusterPathCreation( \
   originatorAddress, \
@@ -9212,9 +9212,9 @@
 /** @brief Command description for DataRateNotification
  *
  * Command: DataRateNotification
- * @param originatorAddress DATA16 
- * @param destinationAddress DATA16 
- * @param dataRate INT8U 
+ * @param originatorAddress DATA16
+ * @param destinationAddress DATA16
+ * @param dataRate INT8U
  */
 #define emberAfFillCommandData Rate ControlClusterDataRateNotification( \
   originatorAddress, \
@@ -9234,8 +9234,8 @@
 /** @brief Command description for PathDeletion
  *
  * Command: PathDeletion
- * @param originatorAddress DATA16 
- * @param destinationAddress DATA16 
+ * @param originatorAddress DATA16
+ * @param destinationAddress DATA16
  */
 #define emberAfFillCommandData Rate ControlClusterPathDeletion( \
   originatorAddress, \
@@ -9253,13 +9253,13 @@
 /** @brief Command description for EstablishmentRequest
  *
  * Command: EstablishmentRequest
- * @param flag BITMAP8 
- * @param ackNack ENUM8 
- * @param codecType ENUM8 
- * @param codecType ENUM8 
- * @param sampFreq ENUM8 
- * @param codecRate ENUM8 
- * @param serviceType ENUM8 
+ * @param flag BITMAP8
+ * @param ackNack ENUM8
+ * @param codecType ENUM8
+ * @param codecType ENUM8
+ * @param sampFreq ENUM8
+ * @param codecRate ENUM8
+ * @param serviceType ENUM8
  * @param buffer INT8U []
  * @param bufferLen int
  */
@@ -9293,8 +9293,8 @@
  * Command: VoiceTransmission
  * @param voiceData INT8U []
  * @param voiceDataLen int
- * @param sequenceNumber INT8U 
- * @param errorFlag ENUM8 
+ * @param sequenceNumber INT8U
+ * @param errorFlag ENUM8
  */
 #define emberAfFillCommandVoice over ZigBeeClusterVoiceTransmission( \
   voiceData, voiceDataLen, \
@@ -9314,7 +9314,7 @@
 /** @brief Command description for VoiceTransmissionCompletion
  *
  * Command: VoiceTransmissionCompletion
- * @param controlType ENUM8 
+ * @param controlType ENUM8
  */
 #define emberAfFillCommandVoice over ZigBeeClusterVoiceTransmissionCompletion( \
   controlType \
@@ -9330,7 +9330,7 @@
 /** @brief Command description for ControlResponse
  *
  * Command: ControlResponse
- * @param ackNack ENUM8 
+ * @param ackNack ENUM8
  */
 #define emberAfFillCommandVoice over ZigBeeClusterControlResponse( \
   ackNack \
@@ -9346,11 +9346,11 @@
 /** @brief Command description for JoinChatRequest
  *
  * Command: JoinChatRequest
- * @param uid INT16U 
- * @param status ENUM8 
- * @param nickname CHAR_STRING 
- * @param cid INT16U 
- * @param cid INT16U 
+ * @param uid INT16U
+ * @param status ENUM8
+ * @param nickname CHAR_STRING
+ * @param cid INT16U
+ * @param cid INT16U
  */
 #define emberAfFillCommandChattingClusterJoinChatRequest( \
   uid, \
@@ -9374,10 +9374,10 @@
 /** @brief Command description for LeaveChatRequest
  *
  * Command: LeaveChatRequest
- * @param cid INT16U 
- * @param status ENUM8 
- * @param uid INT16U 
- * @param cid INT16U 
+ * @param cid INT16U
+ * @param status ENUM8
+ * @param uid INT16U
+ * @param cid INT16U
  * @param chatParticipantList ChatParticipant []
  * @param chatParticipantListLen int
  */
@@ -9403,9 +9403,9 @@
 /** @brief Command description for SearchChatRequest
  *
  * Command: SearchChatRequest
- * @param cid INT16U 
- * @param uid INT16U 
- * @param nickname CHAR_STRING 
+ * @param cid INT16U
+ * @param uid INT16U
+ * @param nickname CHAR_STRING
  */
 #define emberAfFillCommandChattingClusterSearchChatRequest( \
   cid, \
@@ -9425,11 +9425,11 @@
 /** @brief Command description for SwitchChairmanResponse
  *
  * Command: SwitchChairmanResponse
- * @param cid INT16U 
- * @param cid INT16U 
- * @param uid INT16U 
- * @param uid INT16U 
- * @param nickname CHAR_STRING 
+ * @param cid INT16U
+ * @param cid INT16U
+ * @param uid INT16U
+ * @param uid INT16U
+ * @param nickname CHAR_STRING
  */
 #define emberAfFillCommandChattingClusterSwitchChairmanResponse( \
   cid, \
@@ -9453,12 +9453,12 @@
 /** @brief Command description for StartChatRequest
  *
  * Command: StartChatRequest
- * @param name CHAR_STRING 
- * @param options BITMAP8 
- * @param uid INT16U 
+ * @param name CHAR_STRING
+ * @param options BITMAP8
+ * @param uid INT16U
  * @param chatRoomList ChatRoom []
  * @param chatRoomListLen int
- * @param nickname CHAR_STRING 
+ * @param nickname CHAR_STRING
  */
 #define emberAfFillCommandChattingClusterStartChatRequest( \
   name, \
@@ -9482,12 +9482,12 @@
 /** @brief Command description for ChatMessage
  *
  * Command: ChatMessage
- * @param destinationUid INT16U 
- * @param cid INT16U 
- * @param sourceUid INT16U 
- * @param cid INT16U 
- * @param nickname CHAR_STRING 
- * @param message CHAR_STRING 
+ * @param destinationUid INT16U
+ * @param cid INT16U
+ * @param sourceUid INT16U
+ * @param cid INT16U
+ * @param nickname CHAR_STRING
+ * @param message CHAR_STRING
  */
 #define emberAfFillCommandChattingClusterChatMessage( \
   destinationUid, \
@@ -9513,9 +9513,9 @@
 /** @brief Command description for GetNodeInformationRequest
  *
  * Command: GetNodeInformationRequest
- * @param cid INT16U 
- * @param cid INT16U 
- * @param uid INT16U 
+ * @param cid INT16U
+ * @param cid INT16U
+ * @param uid INT16U
  * @param nodeInformationList NodeInformation []
  * @param nodeInformationListLen int
  */
@@ -9539,10 +9539,10 @@
 /** @brief Command description for SwitchChairmanNotification
  *
  * Command: SwitchChairmanNotification
- * @param cid INT16U 
- * @param uid INT16U 
- * @param address DATA16 
- * @param endpoint INT8U 
+ * @param cid INT16U
+ * @param uid INT16U
+ * @param address DATA16
+ * @param endpoint INT8U
  */
 #define emberAfFillCommandChattingClusterSwitchChairmanNotification( \
   cid, \
@@ -9564,9 +9564,9 @@
 /** @brief Command description for GetNodeInformationResponse
  *
  * Command: GetNodeInformationResponse
- * @param status ENUM8 
- * @param cid INT16U 
- * @param uid INT16U 
+ * @param status ENUM8
+ * @param cid INT16U
+ * @param uid INT16U
  * @param addressEndpointAndNickname INT8U []
  * @param addressEndpointAndNicknameLen int
  */
@@ -9590,17 +9590,17 @@
 /** @brief Command description for BuyRequest
  *
  * Command: BuyRequest
- * @param userId OCTET_STRING 
- * @param serialNumber OCTET_STRING 
- * @param userType INT16U 
- * @param currency INT32U 
- * @param serviceId INT16U 
- * @param priceTrailingDigit INT8U 
- * @param goodId OCTET_STRING 
- * @param price INT32U 
- * @param timestamp OCTET_STRING 
- * @param transId INT16U 
- * @param transStatus ENUM8 
+ * @param userId OCTET_STRING
+ * @param serialNumber OCTET_STRING
+ * @param userType INT16U
+ * @param currency INT32U
+ * @param serviceId INT16U
+ * @param priceTrailingDigit INT8U
+ * @param goodId OCTET_STRING
+ * @param price INT32U
+ * @param timestamp OCTET_STRING
+ * @param transId INT16U
+ * @param transStatus ENUM8
  */
 #define emberAfFillCommandPaymentClusterBuyRequest( \
   userId, \
@@ -9636,15 +9636,15 @@
 /** @brief Command description for AcceptPayment
  *
  * Command: AcceptPayment
- * @param userId OCTET_STRING 
- * @param serialNumber OCTET_STRING 
- * @param userType INT16U 
- * @param currency INT32U 
- * @param serviceId INT16U 
- * @param priceTrailingDigit INT8U 
- * @param goodId OCTET_STRING 
- * @param price INT32U 
- * @param timestamp OCTET_STRING 
+ * @param userId OCTET_STRING
+ * @param serialNumber OCTET_STRING
+ * @param userType INT16U
+ * @param currency INT32U
+ * @param serviceId INT16U
+ * @param priceTrailingDigit INT8U
+ * @param goodId OCTET_STRING
+ * @param price INT32U
+ * @param timestamp OCTET_STRING
  */
 #define emberAfFillCommandPaymentClusterAcceptPayment( \
   userId, \
@@ -9676,11 +9676,11 @@
 /** @brief Command description for PaymentConfirm
  *
  * Command: PaymentConfirm
- * @param serialNumber OCTET_STRING 
- * @param serialNumber OCTET_STRING 
- * @param transId INT16U 
- * @param status ENUM8 
- * @param transStatus ENUM8 
+ * @param serialNumber OCTET_STRING
+ * @param serialNumber OCTET_STRING
+ * @param transId INT16U
+ * @param status ENUM8
+ * @param transStatus ENUM8
  */
 #define emberAfFillCommandPaymentClusterPaymentConfirm( \
   serialNumber, \
@@ -9704,12 +9704,12 @@
 /** @brief Command description for Subscribe
  *
  * Command: Subscribe
- * @param userId OCTET_STRING 
- * @param userId OCTET_STRING 
- * @param serviceId INT16U 
- * @param serviceId INT16U 
- * @param serviceProviderId INT16U 
- * @param serviceProviderId INT16U 
+ * @param userId OCTET_STRING
+ * @param userId OCTET_STRING
+ * @param serviceId INT16U
+ * @param serviceId INT16U
+ * @param serviceProviderId INT16U
+ * @param serviceProviderId INT16U
  */
 #define emberAfFillCommandBillingClusterSubscribe( \
   userId, \
@@ -9735,14 +9735,14 @@
 /** @brief Command description for Unsubscribe
  *
  * Command: Unsubscribe
- * @param userId OCTET_STRING 
- * @param userId OCTET_STRING 
- * @param serviceId INT16U 
- * @param serviceId INT16U 
- * @param serviceProviderId INT16U 
- * @param serviceProviderId INT16U 
- * @param timestamp OCTET_STRING 
- * @param duration INT16U 
+ * @param userId OCTET_STRING
+ * @param userId OCTET_STRING
+ * @param serviceId INT16U
+ * @param serviceId INT16U
+ * @param serviceProviderId INT16U
+ * @param serviceProviderId INT16U
+ * @param timestamp OCTET_STRING
+ * @param duration INT16U
  */
 #define emberAfFillCommandBillingClusterUnsubscribe( \
   userId, \
@@ -9772,9 +9772,9 @@
 /** @brief Command description for StartBillingSession
  *
  * Command: StartBillingSession
- * @param userId OCTET_STRING 
- * @param serviceId INT16U 
- * @param serviceProviderId INT16U 
+ * @param userId OCTET_STRING
+ * @param serviceId INT16U
+ * @param serviceProviderId INT16U
  */
 #define emberAfFillCommandBillingClusterStartBillingSession( \
   userId, \
@@ -9794,9 +9794,9 @@
 /** @brief Command description for StopBillingSession
  *
  * Command: StopBillingSession
- * @param userId OCTET_STRING 
- * @param serviceId INT16U 
- * @param serviceProviderId INT16U 
+ * @param userId OCTET_STRING
+ * @param serviceId INT16U
+ * @param serviceProviderId INT16U
  */
 #define emberAfFillCommandBillingClusterStopBillingSession( \
   userId, \
@@ -9816,8 +9816,8 @@
 /** @brief Command description for BillStatusNotification
  *
  * Command: BillStatusNotification
- * @param userId OCTET_STRING 
- * @param status ENUM8 
+ * @param userId OCTET_STRING
+ * @param status ENUM8
  */
 #define emberAfFillCommandBillingClusterBillStatusNotification( \
   userId, \
@@ -9835,9 +9835,9 @@
 /** @brief Command description for SessionKeepAlive
  *
  * Command: SessionKeepAlive
- * @param userId OCTET_STRING 
- * @param serviceId INT16U 
- * @param serviceProviderId INT16U 
+ * @param userId OCTET_STRING
+ * @param serviceId INT16U
+ * @param serviceProviderId INT16U
  */
 #define emberAfFillCommandBillingClusterSessionKeepAlive( \
   userId, \
@@ -9857,7 +9857,7 @@
 /** @brief Command description for GetAlerts
  *
  * Command: GetAlerts
- * @param alertsCount AlertCount 
+ * @param alertsCount AlertCount
  * @param alertStructures AlertStructure []
  * @param alertStructuresLen int
  */
@@ -9877,7 +9877,7 @@
 /** @brief Command description for AlertsNotification
  *
  * Command: AlertsNotification
- * @param alertsCount AlertCount 
+ * @param alertsCount AlertCount
  * @param alertStructures AlertStructure []
  * @param alertStructuresLen int
  */
@@ -9897,8 +9897,8 @@
 /** @brief Command description for EventsNotification
  *
  * Command: EventsNotification
- * @param eventHeader INT8U 
- * @param eventId EventIdentification 
+ * @param eventHeader INT8U
+ * @param eventId EventIdentification
  */
 #define emberAfFillCommandAppliance Events and AlertClusterEventsNotification( \
   eventHeader, \
@@ -9916,10 +9916,10 @@
 /** @brief Command description for LogNotification
  *
  * Command: LogNotification
- * @param timeStamp TIME_OF_DAY 
- * @param logId INT32U 
- * @param logId INT32U 
- * @param logLength INT32U 
+ * @param timeStamp TIME_OF_DAY
+ * @param logId INT32U
+ * @param logId INT32U
+ * @param logLength INT32U
  * @param logPayload INT8U []
  * @param logPayloadLen int
  */
@@ -9945,9 +9945,9 @@
 /** @brief Command description for LogQueueRequest
  *
  * Command: LogQueueRequest
- * @param timeStamp TIME_OF_DAY 
- * @param logId INT32U 
- * @param logLength INT32U 
+ * @param timeStamp TIME_OF_DAY
+ * @param logId INT32U
+ * @param logLength INT32U
  * @param logPayload INT8U []
  * @param logPayloadLen int
  */
@@ -9971,7 +9971,7 @@
 /** @brief Command description for LogQueueResponse
  *
  * Command: LogQueueResponse
- * @param logQueueSize INT8U 
+ * @param logQueueSize INT8U
  * @param logIds INT32U []
  * @param logIdsLen int
  */
@@ -9991,7 +9991,7 @@
 /** @brief Command description for StatisticsAvailable
  *
  * Command: StatisticsAvailable
- * @param logQueueSize INT8U 
+ * @param logQueueSize INT8U
  * @param logIds INT32U []
  * @param logIdsLen int
  */
@@ -10011,9 +10011,9 @@
 /** @brief Command description for GetProfileInfoCommand
  *
  * Command: GetProfileInfoCommand
- * @param profileCount INT8U 
- * @param profileIntervalPeriod ENUM8 
- * @param maxNumberOfIntervals INT8U 
+ * @param profileCount INT8U
+ * @param profileIntervalPeriod ENUM8
+ * @param maxNumberOfIntervals INT8U
  * @param listOfAttributes INT16U []
  * @param listOfAttributesLen int
  */
@@ -10037,14 +10037,14 @@
 /** @brief Command description for GetMeasurementProfileResponseCommand
  *
  * Command: GetMeasurementProfileResponseCommand
- * @param startTime INT32U 
- * @param attributeId INT16U 
- * @param status ENUM8 
- * @param startTime INT32U 
- * @param profileIntervalPeriod ENUM8 
- * @param numberOfIntervals ENUM8 
- * @param numberOfIntervalsDelivered INT8U 
- * @param attributeId INT16U 
+ * @param startTime INT32U
+ * @param attributeId INT16U
+ * @param status ENUM8
+ * @param startTime INT32U
+ * @param profileIntervalPeriod ENUM8
+ * @param numberOfIntervals ENUM8
+ * @param numberOfIntervalsDelivered INT8U
+ * @param attributeId INT16U
  * @param intervals INT8U []
  * @param intervalsLen int
  */
@@ -10078,9 +10078,9 @@
 /** @brief Command description for ScanRequest
  *
  * Command: ScanRequest
- * @param transaction INT32U 
- * @param zigbeeInformation ZigbeeInformation 
- * @param zllInformation ZllInformation 
+ * @param transaction INT32U
+ * @param zigbeeInformation ZigbeeInformation
+ * @param zllInformation ZllInformation
  */
 #define emberAfFillCommandZLL CommissioningClusterScanRequest( \
   transaction, \
@@ -10100,24 +10100,24 @@
 /** @brief Command description for ScanResponse
  *
  * Command: ScanResponse
- * @param transaction INT32U 
- * @param rssiCorrection INT8U 
- * @param zigbeeInformation ZigbeeInformation 
- * @param zllInformation ZllInformation 
- * @param keyBitmask KeyBitmask 
- * @param responseId INT32U 
- * @param extendedPanId IEEE_ADDRESS 
- * @param networkUpdateId INT8U 
- * @param logicalChannel INT8U 
- * @param panId INT16U 
- * @param networkAddress INT16U 
- * @param numberOfSubDevices INT8U 
- * @param totalGroupIds INT8U 
- * @param endpointId INT8U 
- * @param profileId INT16U 
- * @param deviceId INT16U 
- * @param version INT8U 
- * @param groupIdCount INT8U 
+ * @param transaction INT32U
+ * @param rssiCorrection INT8U
+ * @param zigbeeInformation ZigbeeInformation
+ * @param zllInformation ZllInformation
+ * @param keyBitmask KeyBitmask
+ * @param responseId INT32U
+ * @param extendedPanId IEEE_ADDRESS
+ * @param networkUpdateId INT8U
+ * @param logicalChannel INT8U
+ * @param panId INT16U
+ * @param networkAddress INT16U
+ * @param numberOfSubDevices INT8U
+ * @param totalGroupIds INT8U
+ * @param endpointId INT8U
+ * @param profileId INT16U
+ * @param deviceId INT16U
+ * @param version INT8U
+ * @param groupIdCount INT8U
  */
 #define emberAfFillCommandZLL CommissioningClusterScanResponse( \
   transaction, \
@@ -10167,8 +10167,8 @@
 /** @brief Command description for DeviceInformationRequest
  *
  * Command: DeviceInformationRequest
- * @param transaction INT32U 
- * @param startIndex INT8U 
+ * @param transaction INT32U
+ * @param startIndex INT8U
  */
 #define emberAfFillCommandZLL CommissioningClusterDeviceInformationRequest( \
   transaction, \
@@ -10186,10 +10186,10 @@
 /** @brief Command description for DeviceInformationResponse
  *
  * Command: DeviceInformationResponse
- * @param transaction INT32U 
- * @param numberOfSubDevices INT8U 
- * @param startIndex INT8U 
- * @param deviceInformationRecordCount INT8U 
+ * @param transaction INT32U
+ * @param numberOfSubDevices INT8U
+ * @param startIndex INT8U
+ * @param deviceInformationRecordCount INT8U
  * @param deviceInformationRecordList DeviceInformationRecord []
  * @param deviceInformationRecordListLen int
  */
@@ -10215,8 +10215,8 @@
 /** @brief Command description for IdentifyRequest
  *
  * Command: IdentifyRequest
- * @param transaction INT32U 
- * @param identifyDuration INT16U 
+ * @param transaction INT32U
+ * @param identifyDuration INT16U
  */
 #define emberAfFillCommandZLL CommissioningClusterIdentifyRequest( \
   transaction, \
@@ -10234,7 +10234,7 @@
 /** @brief Command description for ResetToFactoryNewRequest
  *
  * Command: ResetToFactoryNewRequest
- * @param transaction INT32U 
+ * @param transaction INT32U
  */
 #define emberAfFillCommandZLL CommissioningClusterResetToFactoryNewRequest( \
   transaction \
@@ -10250,21 +10250,21 @@
 /** @brief Command description for NetworkStartRequest
  *
  * Command: NetworkStartRequest
- * @param transaction INT32U 
- * @param extendedPanId IEEE_ADDRESS 
- * @param keyIndex KeyIndex 
- * @param encryptedNetworkKey SECURITY_KEY 
- * @param logicalChannel INT8U 
- * @param panId INT16U 
- * @param networkAddress INT16U 
- * @param groupIdentifiersBegin INT16U 
- * @param groupIdentifiersEnd INT16U 
- * @param freeNetworkAddressRangeBegin INT16U 
- * @param freeNetworkAddressRangeEnd INT16U 
- * @param freeGroupIdentifierRangeBegin INT16U 
- * @param freeGroupIdentifierRangeEnd INT16U 
- * @param initiatorIeeeAddress IEEE_ADDRESS 
- * @param initiatorNetworkAddress INT16U 
+ * @param transaction INT32U
+ * @param extendedPanId IEEE_ADDRESS
+ * @param keyIndex KeyIndex
+ * @param encryptedNetworkKey SECURITY_KEY
+ * @param logicalChannel INT8U
+ * @param panId INT16U
+ * @param networkAddress INT16U
+ * @param groupIdentifiersBegin INT16U
+ * @param groupIdentifiersEnd INT16U
+ * @param freeNetworkAddressRangeBegin INT16U
+ * @param freeNetworkAddressRangeEnd INT16U
+ * @param freeGroupIdentifierRangeBegin INT16U
+ * @param freeGroupIdentifierRangeEnd INT16U
+ * @param initiatorIeeeAddress IEEE_ADDRESS
+ * @param initiatorNetworkAddress INT16U
  */
 #define emberAfFillCommandZLL CommissioningClusterNetworkStartRequest( \
   transaction, \
@@ -10308,12 +10308,12 @@
 /** @brief Command description for NetworkStartResponse
  *
  * Command: NetworkStartResponse
- * @param transaction INT32U 
- * @param status ZllStatus 
- * @param extendedPanId IEEE_ADDRESS 
- * @param networkUpdateId INT8U 
- * @param logicalChannel INT8U 
- * @param panId INT16U 
+ * @param transaction INT32U
+ * @param status ZllStatus
+ * @param extendedPanId IEEE_ADDRESS
+ * @param networkUpdateId INT8U
+ * @param logicalChannel INT8U
+ * @param panId INT16U
  */
 #define emberAfFillCommandZLL CommissioningClusterNetworkStartResponse( \
   transaction, \
@@ -10339,20 +10339,20 @@
 /** @brief Command description for NetworkJoinRouterRequest
  *
  * Command: NetworkJoinRouterRequest
- * @param transaction INT32U 
- * @param extendedPanId IEEE_ADDRESS 
- * @param keyIndex KeyIndex 
- * @param encryptedNetworkKey SECURITY_KEY 
- * @param networkUpdateId INT8U 
- * @param logicalChannel INT8U 
- * @param panId INT16U 
- * @param networkAddress INT16U 
- * @param groupIdentifiersBegin INT16U 
- * @param groupIdentifiersEnd INT16U 
- * @param freeNetworkAddressRangeBegin INT16U 
- * @param freeNetworkAddressRangeEnd INT16U 
- * @param freeGroupIdentifierRangeBegin INT16U 
- * @param freeGroupIdentifierRangeEnd INT16U 
+ * @param transaction INT32U
+ * @param extendedPanId IEEE_ADDRESS
+ * @param keyIndex KeyIndex
+ * @param encryptedNetworkKey SECURITY_KEY
+ * @param networkUpdateId INT8U
+ * @param logicalChannel INT8U
+ * @param panId INT16U
+ * @param networkAddress INT16U
+ * @param groupIdentifiersBegin INT16U
+ * @param groupIdentifiersEnd INT16U
+ * @param freeNetworkAddressRangeBegin INT16U
+ * @param freeNetworkAddressRangeEnd INT16U
+ * @param freeGroupIdentifierRangeBegin INT16U
+ * @param freeGroupIdentifierRangeEnd INT16U
  */
 #define emberAfFillCommandZLL CommissioningClusterNetworkJoinRouterRequest( \
   transaction, \
@@ -10394,8 +10394,8 @@
 /** @brief Command description for NetworkJoinRouterResponse
  *
  * Command: NetworkJoinRouterResponse
- * @param transaction INT32U 
- * @param status ZllStatus 
+ * @param transaction INT32U
+ * @param status ZllStatus
  */
 #define emberAfFillCommandZLL CommissioningClusterNetworkJoinRouterResponse( \
   transaction, \
@@ -10413,20 +10413,20 @@
 /** @brief Command description for NetworkJoinEndDeviceRequest
  *
  * Command: NetworkJoinEndDeviceRequest
- * @param transaction INT32U 
- * @param extendedPanId IEEE_ADDRESS 
- * @param keyIndex KeyIndex 
- * @param encryptedNetworkKey SECURITY_KEY 
- * @param networkUpdateId INT8U 
- * @param logicalChannel INT8U 
- * @param panId INT16U 
- * @param networkAddress INT16U 
- * @param groupIdentifiersBegin INT16U 
- * @param groupIdentifiersEnd INT16U 
- * @param freeNetworkAddressRangeBegin INT16U 
- * @param freeNetworkAddressRangeEnd INT16U 
- * @param freeGroupIdentifierRangeBegin INT16U 
- * @param freeGroupIdentifierRangeEnd INT16U 
+ * @param transaction INT32U
+ * @param extendedPanId IEEE_ADDRESS
+ * @param keyIndex KeyIndex
+ * @param encryptedNetworkKey SECURITY_KEY
+ * @param networkUpdateId INT8U
+ * @param logicalChannel INT8U
+ * @param panId INT16U
+ * @param networkAddress INT16U
+ * @param groupIdentifiersBegin INT16U
+ * @param groupIdentifiersEnd INT16U
+ * @param freeNetworkAddressRangeBegin INT16U
+ * @param freeNetworkAddressRangeEnd INT16U
+ * @param freeGroupIdentifierRangeBegin INT16U
+ * @param freeGroupIdentifierRangeEnd INT16U
  */
 #define emberAfFillCommandZLL CommissioningClusterNetworkJoinEndDeviceRequest( \
   transaction, \
@@ -10468,8 +10468,8 @@
 /** @brief Command description for NetworkJoinEndDeviceResponse
  *
  * Command: NetworkJoinEndDeviceResponse
- * @param transaction INT32U 
- * @param status ZllStatus 
+ * @param transaction INT32U
+ * @param status ZllStatus
  */
 #define emberAfFillCommandZLL CommissioningClusterNetworkJoinEndDeviceResponse( \
   transaction, \
@@ -10487,12 +10487,12 @@
 /** @brief Command description for NetworkUpdateRequest
  *
  * Command: NetworkUpdateRequest
- * @param transaction INT32U 
- * @param extendedPanId IEEE_ADDRESS 
- * @param networkUpdateId INT8U 
- * @param logicalChannel INT8U 
- * @param panId INT16U 
- * @param networkAddress INT16U 
+ * @param transaction INT32U
+ * @param extendedPanId IEEE_ADDRESS
+ * @param networkUpdateId INT8U
+ * @param logicalChannel INT8U
+ * @param panId INT16U
+ * @param networkAddress INT16U
  */
 #define emberAfFillCommandZLL CommissioningClusterNetworkUpdateRequest( \
   transaction, \
@@ -10518,12 +10518,12 @@
 /** @brief Command description for EndpointInformation
  *
  * Command: EndpointInformation
- * @param ieeeAddress IEEE_ADDRESS 
- * @param networkAddress INT16U 
- * @param endpointId INT8U 
- * @param profileId INT16U 
- * @param deviceId INT16U 
- * @param version INT8U 
+ * @param ieeeAddress IEEE_ADDRESS
+ * @param networkAddress INT16U
+ * @param endpointId INT8U
+ * @param profileId INT16U
+ * @param deviceId INT16U
+ * @param version INT8U
  */
 #define emberAfFillCommandZLL CommissioningClusterEndpointInformation( \
   ieeeAddress, \
@@ -10549,10 +10549,10 @@
 /** @brief Command description for GetGroupIdentifiersRequest
  *
  * Command: GetGroupIdentifiersRequest
- * @param startIndex INT8U 
- * @param total INT8U 
- * @param startIndex INT8U 
- * @param count INT8U 
+ * @param startIndex INT8U
+ * @param total INT8U
+ * @param startIndex INT8U
+ * @param count INT8U
  * @param groupInformationRecordList GroupInformationRecord []
  * @param groupInformationRecordListLen int
  */
@@ -10578,10 +10578,10 @@
 /** @brief Command description for GetEndpointListRequest
  *
  * Command: GetEndpointListRequest
- * @param startIndex INT8U 
- * @param total INT8U 
- * @param startIndex INT8U 
- * @param count INT8U 
+ * @param startIndex INT8U
+ * @param total INT8U
+ * @param startIndex INT8U
+ * @param count INT8U
  * @param endpointInformationRecordList EndpointInformationRecord []
  * @param endpointInformationRecordListLen int
  */
@@ -10607,10 +10607,10 @@
 /** @brief Command description for Bind
  *
  * Command: Bind
- * @param nodeId NODE_ID 
- * @param groupId GROUP_ID 
- * @param endpointId ENDPOINT_ID 
- * @param clusterId CLUSTER_ID 
+ * @param nodeId NODE_ID
+ * @param groupId GROUP_ID
+ * @param endpointId ENDPOINT_ID
+ * @param clusterId CLUSTER_ID
  */
 #define emberAfFillCommandBindingClusterBind( \
   nodeId, \
@@ -10632,10 +10632,10 @@
 /** @brief Command description for Unbind
  *
  * Command: Unbind
- * @param nodeId NODE_ID 
- * @param groupId GROUP_ID 
- * @param endpointId ENDPOINT_ID 
- * @param clusterId CLUSTER_ID 
+ * @param nodeId NODE_ID
+ * @param groupId GROUP_ID
+ * @param endpointId ENDPOINT_ID
+ * @param clusterId CLUSTER_ID
  */
 #define emberAfFillCommandBindingClusterUnbind( \
   nodeId, \
@@ -10657,8 +10657,8 @@
 /** @brief Command description for CommandOne
  *
  * Command: CommandOne
- * @param argOne INT8U 
- * @param argOne INT8U 
+ * @param argOne INT8U
+ * @param argOne INT8U
  */
 #define emberAfFillCommandSample Mfg Specific ClusterClusterCommandOne( \
   argOne, \
@@ -10676,10 +10676,10 @@
 /** @brief Command description for SetToken
  *
  * Command: SetToken
- * @param token INT16U 
- * @param token INT16U 
- * @param data OCTET_STRING 
- * @param data OCTET_STRING 
+ * @param token INT16U
+ * @param token INT16U
+ * @param data OCTET_STRING
+ * @param data OCTET_STRING
  */
 #define emberAfFillCommandConfiguration ClusterClusterSetToken( \
   token, \
@@ -10714,7 +10714,7 @@
 /** @brief Command description for ReadTokens
  *
  * Command: ReadTokens
- * @param token INT16U 
+ * @param token INT16U
  */
 #define emberAfFillCommandConfiguration ClusterClusterReadTokens( \
   token \
@@ -10730,7 +10730,7 @@
 /** @brief Command description for UnlockTokens
  *
  * Command: UnlockTokens
- * @param data OCTET_STRING 
+ * @param data OCTET_STRING
  */
 #define emberAfFillCommandConfiguration ClusterClusterUnlockTokens( \
   data \
@@ -10746,9 +10746,9 @@
 /** @brief Command description for stream
  *
  * Command: stream
- * @param channel INT8U 
- * @param power INT8S 
- * @param time INT16U 
+ * @param channel INT8U
+ * @param power INT8S
+ * @param time INT16U
  */
 #define emberAfFillCommandMFGLIB ClusterClusterstream( \
   channel, \
@@ -10768,9 +10768,9 @@
 /** @brief Command description for tone
  *
  * Command: tone
- * @param channel INT8U 
- * @param power INT8S 
- * @param time INT16U 
+ * @param channel INT8U
+ * @param power INT8S
+ * @param time INT16U
  */
 #define emberAfFillCommandMFGLIB ClusterClustertone( \
   channel, \
@@ -10790,9 +10790,9 @@
 /** @brief Command description for rxMode
  *
  * Command: rxMode
- * @param channel INT8U 
- * @param power INT8S 
- * @param time INT16U 
+ * @param channel INT8U
+ * @param power INT8S
+ * @param time INT16U
  */
 #define emberAfFillCommandMFGLIB ClusterClusterrxMode( \
   channel, \
@@ -10812,11 +10812,11 @@
 /** @brief Command description for EnableApsLinkKeyAuthorization
  *
  * Command: EnableApsLinkKeyAuthorization
- * @param numberExemptClusters INT8U 
- * @param clusterId CLUSTER_ID 
+ * @param numberExemptClusters INT8U
+ * @param clusterId CLUSTER_ID
  * @param clusterId CLUSTER_ID []
  * @param clusterIdLen int
- * @param apsLinkKeyAuthStatus BOOLEAN 
+ * @param apsLinkKeyAuthStatus BOOLEAN
  */
 #define emberAfFillCommandSL Works With All HubsClusterEnableApsLinkKeyAuthorization( \
   numberExemptClusters, \
@@ -10838,12 +10838,12 @@
 /** @brief Command description for DisableApsLinkKeyAuthorization
  *
  * Command: DisableApsLinkKeyAuthorization
- * @param numberExemptClusters INT8U 
- * @param powerNotificationReason WwahPowerNotificationReason 
+ * @param numberExemptClusters INT8U
+ * @param powerNotificationReason WwahPowerNotificationReason
  * @param clusterId CLUSTER_ID []
  * @param clusterIdLen int
- * @param manufacturerId INT16U 
- * @param manufacturerReasonLength INT8U 
+ * @param manufacturerId INT16U
+ * @param manufacturerReasonLength INT8U
  * @param manufacturerReason INT8U []
  * @param manufacturerReasonLen int
  */
@@ -10871,10 +10871,10 @@
 /** @brief Command description for ApsLinkKeyAuthorizationQuery
  *
  * Command: ApsLinkKeyAuthorizationQuery
- * @param clusterId CLUSTER_ID 
- * @param powerNotificationReason WwahPowerNotificationReason 
- * @param manufacturerId INT16U 
- * @param manufacturerReasonLength INT8U 
+ * @param clusterId CLUSTER_ID
+ * @param powerNotificationReason WwahPowerNotificationReason
+ * @param manufacturerId INT16U
+ * @param manufacturerReasonLength INT8U
  * @param manufacturerReason INT8U []
  * @param manufacturerReasonLen int
  */
@@ -10900,8 +10900,8 @@
 /** @brief Command description for RequestNewApsLinkKey
  *
  * Command: RequestNewApsLinkKey
- * @param deviceEui64 IEEE_ADDRESS 
- * @param deviceShort INT16U 
+ * @param deviceEui64 IEEE_ADDRESS
+ * @param deviceShort INT16U
  */
 #define emberAfFillCommandSL Works With All HubsClusterRequestNewApsLinkKey( \
   deviceEui64, \
@@ -10919,13 +10919,13 @@
 /** @brief Command description for EnableWwahAppEventRetryAlgorithm
  *
  * Command: EnableWwahAppEventRetryAlgorithm
- * @param firstBackoffTimeSeconds INT8U 
- * @param numberExemptClusters INT8U 
- * @param backoffSeqCommonRatio INT8U 
+ * @param firstBackoffTimeSeconds INT8U
+ * @param numberExemptClusters INT8U
+ * @param backoffSeqCommonRatio INT8U
  * @param clusterId CLUSTER_ID []
  * @param clusterIdLen int
- * @param maxBackoffTimeSeconds INT32U 
- * @param maxRedeliveryAttempts INT8U 
+ * @param maxBackoffTimeSeconds INT32U
+ * @param maxRedeliveryAttempts INT8U
  */
 #define emberAfFillCommandSL Works With All HubsClusterEnableWwahAppEventRetryAlgorithm( \
   firstBackoffTimeSeconds, \
@@ -10951,10 +10951,10 @@
 /** @brief Command description for DisableWwahAppEventRetryAlgorithm
  *
  * Command: DisableWwahAppEventRetryAlgorithm
- * @param currentPowerMode INT32U 
- * @param availablePowerSources INT32U 
- * @param currentPowerSource INT32U 
- * @param currentPowerSourceLevel INT32U 
+ * @param currentPowerMode INT32U
+ * @param availablePowerSources INT32U
+ * @param currentPowerSource INT32U
+ * @param currentPowerSourceLevel INT32U
  */
 #define emberAfFillCommandSL Works With All HubsClusterDisableWwahAppEventRetryAlgorithm( \
   currentPowerMode, \
@@ -10976,8 +10976,8 @@
 /** @brief Command description for RequestTime
  *
  * Command: RequestTime
- * @param debugReportId INT8U 
- * @param debugReportSize INT32U 
+ * @param debugReportId INT8U
+ * @param debugReportSize INT32U
  */
 #define emberAfFillCommandSL Works With All HubsClusterRequestTime( \
   debugReportId, \
@@ -10995,14 +10995,14 @@
 /** @brief Command description for EnableWwahRejoinAlgorithm
  *
  * Command: EnableWwahRejoinAlgorithm
- * @param fastRejoinTimeoutSeconds INT16U 
- * @param debugReportId INT8U 
- * @param durationBetweenRejoinsSeconds INT16U 
+ * @param fastRejoinTimeoutSeconds INT16U
+ * @param debugReportId INT8U
+ * @param durationBetweenRejoinsSeconds INT16U
  * @param debugReportData INT8U []
  * @param debugReportDataLen int
- * @param fastRejoinFirstBackoffSeconds INT16U 
- * @param maxBackoffTimeSeconds INT16U 
- * @param maxBackoffIterations INT16U 
+ * @param fastRejoinFirstBackoffSeconds INT16U
+ * @param maxBackoffTimeSeconds INT16U
+ * @param maxBackoffIterations INT16U
  */
 #define emberAfFillCommandSL Works With All HubsClusterEnableWwahRejoinAlgorithm( \
   fastRejoinTimeoutSeconds, \
@@ -11030,7 +11030,7 @@
 /** @brief Command description for DisableWwahRejoinAlgorithm
  *
  * Command: DisableWwahRejoinAlgorithm
- * @param numberOfClusters INT8U 
+ * @param numberOfClusters INT8U
  * @param clusterId CLUSTER_ID []
  * @param clusterIdLen int
  */
@@ -11050,8 +11050,8 @@
 /** @brief Command description for SetIasZoneEnrollmentMethod
  *
  * Command: SetIasZoneEnrollmentMethod
- * @param enrollmentMode WwahIasZoneEnrollmentMode 
- * @param numberOfBeacons INT8U 
+ * @param enrollmentMode WwahIasZoneEnrollmentMode
+ * @param numberOfBeacons INT8U
  * @param beacon WwahBeaconSurvey []
  * @param beaconLen int
  */
@@ -11086,7 +11086,7 @@
 /** @brief Command description for EnablePeriodicRouterCheckIns
  *
  * Command: EnablePeriodicRouterCheckIns
- * @param checkInInterval INT16U 
+ * @param checkInInterval INT16U
  */
 #define emberAfFillCommandSL Works With All HubsClusterEnablePeriodicRouterCheckIns( \
   checkInInterval \
@@ -11115,7 +11115,7 @@
 /** @brief Command description for SetMacPollFailureWaitTime
  *
  * Command: SetMacPollFailureWaitTime
- * @param waitTime INT8U 
+ * @param waitTime INT8U
  */
 #define emberAfFillCommandSL Works With All HubsClusterSetMacPollFailureWaitTime( \
   waitTime \
@@ -11131,8 +11131,8 @@
 /** @brief Command description for SetPendingNetworkUpdate
  *
  * Command: SetPendingNetworkUpdate
- * @param channel INT8U 
- * @param panId INT16U 
+ * @param channel INT8U
+ * @param panId INT16U
  */
 #define emberAfFillCommandSL Works With All HubsClusterSetPendingNetworkUpdate( \
   channel, \
@@ -11150,7 +11150,7 @@
 /** @brief Command description for RequireApsAcksOnUnicasts
  *
  * Command: RequireApsAcksOnUnicasts
- * @param numberExemptClusters INT8U 
+ * @param numberExemptClusters INT8U
  * @param clusterId CLUSTER_ID []
  * @param clusterIdLen int
  */
@@ -11196,7 +11196,7 @@
 /** @brief Command description for DebugReportQuery
  *
  * Command: DebugReportQuery
- * @param debugReportId INT8U 
+ * @param debugReportId INT8U
  */
 #define emberAfFillCommandSL Works With All HubsClusterDebugReportQuery( \
   debugReportId \
@@ -11212,7 +11212,7 @@
 /** @brief Command description for SurveyBeacons
  *
  * Command: SurveyBeacons
- * @param standardBeacons BOOLEAN 
+ * @param standardBeacons BOOLEAN
  */
 #define emberAfFillCommandSL Works With All HubsClusterSurveyBeacons( \
   standardBeacons \
@@ -11358,7 +11358,7 @@
 /** @brief Command description for UseTrustCenterForClusterServer
  *
  * Command: UseTrustCenterForClusterServer
- * @param numberOfClusters INT8U 
+ * @param numberOfClusters INT8U
  * @param clusterId CLUSTER_ID []
  * @param clusterIdLen int
  */
@@ -11391,8 +11391,8 @@
 /** @brief Command description for UseTrustCenterForClusterServerResponse
  *
  * Command: UseTrustCenterForClusterServerResponse
- * @param status Status 
- * @param clusterStatusLength INT8U 
+ * @param status Status
+ * @param clusterStatusLength INT8U
  * @param clusterStatus WwahClusterStatusToUseTC []
  * @param clusterStatusLen int
  */
