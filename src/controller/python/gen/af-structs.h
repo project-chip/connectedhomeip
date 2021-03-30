@@ -34,9 +34,9 @@ typedef struct _ApplicationLauncherApp
 // Struct for AudioOutputInfo
 typedef struct _AudioOutputInfo
 {
-    uint8_t Index;
-    uint8_t OutputType;
-    uint8_t * Name;
+    uint8_t index;
+    uint8_t outputType;
+    uint8_t * name;
 } EmberAfAudioOutputInfo;
 
 // Struct for BasicCommissioningInfo
@@ -100,17 +100,44 @@ typedef struct _ConfigureReportingStatusRecord
 // Struct for ContentLaunchAdditionalInfo
 typedef struct _ContentLaunchAdditionalInfo
 {
-    uint8_t * Name;
-    uint8_t * Value;
+    uint8_t * name;
+    uint8_t * value;
 } EmberAfContentLaunchAdditionalInfo;
 
-// Struct for ContentLaunchSearch
-typedef struct _ContentLaunchSearch
+// Struct for ContentLaunchBrandingInformation
+typedef struct _ContentLaunchBrandingInformation
 {
-    uint8_t EntitiesList;
-    uint8_t * searchWindowStart;
-    uint8_t * searchWindowEnd;
-} EmberAfContentLaunchSearch;
+    uint8_t * providerName;
+    uint8_t background;
+    uint8_t logo;
+    uint8_t progressBar;
+    uint8_t splash;
+    uint8_t waterMark;
+} EmberAfContentLaunchBrandingInformation;
+
+// Struct for ContentLaunchDimension
+typedef struct _ContentLaunchDimension
+{
+    uint8_t * width;
+    uint8_t * height;
+    uint8_t metric;
+} EmberAfContentLaunchDimension;
+
+// Struct for ContentLaunchParamater
+typedef struct _ContentLaunchParamater
+{
+    uint8_t Type;
+    uint8_t * Value;
+    /* TYPE WARNING: array array defaults to */ uint8_t * ExternalIDList;
+} EmberAfContentLaunchParamater;
+
+// Struct for ContentLaunchStyleInformation
+typedef struct _ContentLaunchStyleInformation
+{
+    uint8_t * imageUrl;
+    uint8_t * color;
+    uint8_t size;
+} EmberAfContentLaunchStyleInformation;
 
 // Struct for DebtPayload
 typedef struct _DebtPayload
@@ -244,11 +271,18 @@ typedef uint8_t EmberAfIdentity;
 // Struct for MediaInputInfo
 typedef struct _MediaInputInfo
 {
-    uint8_t Index;
-    uint8_t InputType;
-    uint8_t * Name;
-    uint8_t * Description;
+    uint8_t index;
+    uint8_t inputType;
+    uint8_t * name;
+    uint8_t * description;
 } EmberAfMediaInputInfo;
+
+// Struct for MediaPlaybackPosition
+typedef struct _MediaPlaybackPosition
+{
+    uint64_t updatedAt;
+    uint64_t position;
+} EmberAfMediaPlaybackPosition;
 
 // Struct for NavigateTargetTargetInfo
 typedef struct _NavigateTargetTargetInfo
@@ -476,20 +510,20 @@ typedef struct _TransferredPhase
 // Struct for TvChannelInfo
 typedef struct _TvChannelInfo
 {
-    uint16_t MajorNumber;
-    uint16_t MinorNumber;
-    uint8_t * Name;
-    uint8_t * CallSign;
-    uint8_t * AffiliateCallSign;
+    uint16_t majorNumber;
+    uint16_t minorNumber;
+    uint8_t * name;
+    uint8_t * callSign;
+    uint8_t * affiliateCallSign;
 } EmberAfTvChannelInfo;
 
 // Struct for TvChannelLineupInfo
 typedef struct _TvChannelLineupInfo
 {
-    uint8_t * OperatorName;
-    uint8_t * LineupName;
-    uint8_t * PostalCode;
-    uint8_t LineupInfoType;
+    uint8_t * operatorName;
+    uint8_t * lineupName;
+    uint8_t * postalCode;
+    uint8_t lineupInfoType;
 } EmberAfTvChannelLineupInfo;
 
 // Struct for WiFiInterfaceScanResult

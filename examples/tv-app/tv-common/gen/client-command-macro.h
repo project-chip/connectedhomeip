@@ -3251,95 +3251,126 @@
                                                                                                                                    \
                                   ZCL_NAVIGATE_TARGET_COMMAND_ID, "uuuu", target, status, data, data);
 
-/** @brief Command description for PlayRequest
+/** @brief Command description for MediaPlay
  *
- * Command: PlayRequest
+ * Command: MediaPlay
+ * @param mediaPlaybackStatus MediaPlaybackStatus
  */
 #define emberAfFillCommandMedia                                                                                                    \
-    PlaybackClusterPlayRequest() emberAfFillExternalBuffer(mask,                                                                   \
+    PlaybackClusterMediaPlay(mediaPlaybackStatus) emberAfFillExternalBuffer(mask,                                                  \
                                                                                                                                    \
-                                                           ZCL_PLAY_REQUEST_COMMAND_ID, "", );
+                                                                            ZCL_MEDIA_PLAY_COMMAND_ID, "u", mediaPlaybackStatus);
 
-/** @brief Command description for PauseRequest
+/** @brief Command description for MediaPause
  *
- * Command: PauseRequest
+ * Command: MediaPause
+ * @param mediaPlaybackStatus MediaPlaybackStatus
  */
 #define emberAfFillCommandMedia                                                                                                    \
-    PlaybackClusterPauseRequest() emberAfFillExternalBuffer(mask,                                                                  \
+    PlaybackClusterMediaPause(mediaPlaybackStatus)                                                                                 \
+        emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-                                                            ZCL_PAUSE_REQUEST_COMMAND_ID, "", );
+                                  ZCL_MEDIA_PAUSE_COMMAND_ID, "u", mediaPlaybackStatus);
 
-/** @brief Command description for StopRequest
+/** @brief Command description for MediaStop
  *
- * Command: StopRequest
+ * Command: MediaStop
+ * @param mediaPlaybackStatus MediaPlaybackStatus
  */
 #define emberAfFillCommandMedia                                                                                                    \
-    PlaybackClusterStopRequest() emberAfFillExternalBuffer(mask,                                                                   \
+    PlaybackClusterMediaStop(mediaPlaybackStatus) emberAfFillExternalBuffer(mask,                                                  \
                                                                                                                                    \
-                                                           ZCL_STOP_REQUEST_COMMAND_ID, "", );
+                                                                            ZCL_MEDIA_STOP_COMMAND_ID, "u", mediaPlaybackStatus);
 
-/** @brief Command description for StartOverRequest
+/** @brief Command description for MediaStartOver
  *
- * Command: StartOverRequest
+ * Command: MediaStartOver
+ * @param mediaPlaybackStatus MediaPlaybackStatus
  */
 #define emberAfFillCommandMedia                                                                                                    \
-    PlaybackClusterStartOverRequest() emberAfFillExternalBuffer(mask,                                                              \
+    PlaybackClusterMediaStartOver(mediaPlaybackStatus)                                                                             \
+        emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-                                                                ZCL_START_OVER_REQUEST_COMMAND_ID, "", );
+                                  ZCL_MEDIA_START_OVER_COMMAND_ID, "u", mediaPlaybackStatus);
 
-/** @brief Command description for PreviousRequest
+/** @brief Command description for MediaPrevious
  *
- * Command: PreviousRequest
+ * Command: MediaPrevious
+ * @param mediaPlaybackStatus MediaPlaybackStatus
  */
 #define emberAfFillCommandMedia                                                                                                    \
-    PlaybackClusterPreviousRequest() emberAfFillExternalBuffer(mask,                                                               \
+    PlaybackClusterMediaPrevious(mediaPlaybackStatus)                                                                              \
+        emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-                                                               ZCL_PREVIOUS_REQUEST_COMMAND_ID, "", );
+                                  ZCL_MEDIA_PREVIOUS_COMMAND_ID, "u", mediaPlaybackStatus);
 
-/** @brief Command description for NextRequest
+/** @brief Command description for MediaNext
  *
- * Command: NextRequest
+ * Command: MediaNext
+ * @param mediaPlaybackStatus MediaPlaybackStatus
  */
 #define emberAfFillCommandMedia                                                                                                    \
-    PlaybackClusterNextRequest() emberAfFillExternalBuffer(mask,                                                                   \
+    PlaybackClusterMediaNext(mediaPlaybackStatus) emberAfFillExternalBuffer(mask,                                                  \
                                                                                                                                    \
-                                                           ZCL_NEXT_REQUEST_COMMAND_ID, "", );
+                                                                            ZCL_MEDIA_NEXT_COMMAND_ID, "u", mediaPlaybackStatus);
 
-/** @brief Command description for RewindRequest
+/** @brief Command description for MediaRewind
  *
- * Command: RewindRequest
+ * Command: MediaRewind
+ * @param mediaPlaybackStatus MediaPlaybackStatus
  */
 #define emberAfFillCommandMedia                                                                                                    \
-    PlaybackClusterRewindRequest() emberAfFillExternalBuffer(mask,                                                                 \
+    PlaybackClusterMediaRewind(mediaPlaybackStatus)                                                                                \
+        emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-                                                             ZCL_REWIND_REQUEST_COMMAND_ID, "", );
+                                  ZCL_MEDIA_REWIND_COMMAND_ID, "u", mediaPlaybackStatus);
 
-/** @brief Command description for FastForwardRequest
+/** @brief Command description for MediaFastForward
  *
- * Command: FastForwardRequest
+ * Command: MediaFastForward
+ * @param mediaPlaybackStatus MediaPlaybackStatus
  */
 #define emberAfFillCommandMedia                                                                                                    \
-    PlaybackClusterFastForwardRequest() emberAfFillExternalBuffer(mask,                                                            \
+    PlaybackClusterMediaFastForward(mediaPlaybackStatus)                                                                           \
+        emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-                                                                  ZCL_FAST_FORWARD_REQUEST_COMMAND_ID, "", );
+                                  ZCL_MEDIA_FAST_FORWARD_COMMAND_ID, "u", mediaPlaybackStatus);
 
-/** @brief Command description for SkipForwardRequest
+/** @brief Command description for MediaSkipForward
  *
- * Command: SkipForwardRequest
+ * Command: MediaSkipForward
+ * @param deltaPositionMilliseconds INT64U
+ * @param mediaPlaybackStatus MediaPlaybackStatus
  */
 #define emberAfFillCommandMedia                                                                                                    \
-    PlaybackClusterSkipForwardRequest() emberAfFillExternalBuffer(mask,                                                            \
+    PlaybackClusterMediaSkipForward(deltaPositionMilliseconds, mediaPlaybackStatus)                                                \
+        emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-                                                                  ZCL_SKIP_FORWARD_REQUEST_COMMAND_ID, "", );
+                                  ZCL_MEDIA_SKIP_FORWARD_COMMAND_ID, "uu", deltaPositionMilliseconds, mediaPlaybackStatus);
 
-/** @brief Command description for SkipBackwardRequest
+/** @brief Command description for MediaSkipBackward
  *
- * Command: SkipBackwardRequest
+ * Command: MediaSkipBackward
+ * @param deltaPositionMilliseconds INT64U
+ * @param mediaPlaybackStatus MediaPlaybackStatus
  */
 #define emberAfFillCommandMedia                                                                                                    \
-    PlaybackClusterSkipBackwardRequest() emberAfFillExternalBuffer(mask,                                                           \
+    PlaybackClusterMediaSkipBackward(deltaPositionMilliseconds, mediaPlaybackStatus)                                               \
+        emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-                                                                   ZCL_SKIP_BACKWARD_REQUEST_COMMAND_ID, "", );
+                                  ZCL_MEDIA_SKIP_BACKWARD_COMMAND_ID, "uu", deltaPositionMilliseconds, mediaPlaybackStatus);
+
+/** @brief Command description for MediaSkipSeek
+ *
+ * Command: MediaSkipSeek
+ * @param position INT64U
+ * @param mediaPlaybackStatus MediaPlaybackStatus
+ */
+#define emberAfFillCommandMedia                                                                                                    \
+    PlaybackClusterMediaSkipSeek(position, mediaPlaybackStatus)                                                                    \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_MEDIA_SKIP_SEEK_COMMAND_ID, "uu", position, mediaPlaybackStatus);
 
 /** @brief Command description for SelectInput
  *
@@ -3392,7 +3423,7 @@
 /** @brief Command description for SendKey
  *
  * Command: SendKey
- * @param keyCode INT8U
+ * @param keyCode KeypadInputCecKeyCode
  * @param status KeypadInputStatus
  */
 #define emberAfFillCommandKeypad                                                                                                   \
@@ -3403,23 +3434,30 @@
 /** @brief Command description for LaunchContent
  *
  * Command: LaunchContent
+ * @param autoPlay BOOLEAN
+ * @param data CHAR_STRING
+ * @param data CHAR_STRING
  * @param contentLaunchStatus ContentLaunchStatus
  */
 #define emberAfFillCommandContent                                                                                                  \
-    LaunchClusterLaunchContent(contentLaunchStatus)                                                                                \
+    LaunchClusterLaunchContent(autoPlay, data, data, contentLaunchStatus)                                                          \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-                                  ZCL_LAUNCH_CONTENT_COMMAND_ID, "u", contentLaunchStatus);
+                                  ZCL_LAUNCH_CONTENT_COMMAND_ID, "uuuu", autoPlay, data, data, contentLaunchStatus);
 
 /** @brief Command description for LaunchURL
  *
  * Command: LaunchURL
+ * @param contentURL CHAR_STRING
+ * @param data CHAR_STRING
+ * @param displayString CHAR_STRING
  * @param contentLaunchStatus ContentLaunchStatus
  */
 #define emberAfFillCommandContent                                                                                                  \
-    LaunchClusterLaunchURL(contentLaunchStatus) emberAfFillExternalBuffer(mask,                                                    \
+    LaunchClusterLaunchURL(contentURL, data, displayString, contentLaunchStatus)                                                   \
+        emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-                                                                          ZCL_LAUNCH_URL_COMMAND_ID, "u", contentLaunchStatus);
+                                  ZCL_LAUNCH_URL_COMMAND_ID, "uuuu", contentURL, data, displayString, contentLaunchStatus);
 
 /** @brief Command description for SelectOutput
  *
@@ -3445,17 +3483,17 @@
 /** @brief Command description for LaunchApp
  *
  * Command: LaunchApp
+ * @param data CHAR_STRING
+ * @param status ApplicationLauncherStatus
  * @param application ApplicationLauncherApp []
  * @param applicationLen int
- * @param status ApplicationLauncherStatus
- * @param data CHAR_STRING
  * @param data CHAR_STRING
  */
 #define emberAfFillCommandApplication                                                                                              \
-    LauncherClusterLaunchApp(application, applicationLen, status, data, data)                                                      \
+    LauncherClusterLaunchApp(data, status, application, applicationLen, data)                                                      \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-                                  ZCL_LAUNCH_APP_COMMAND_ID, "buuu", application, applicationLen, status, data, data);
+                                  ZCL_LAUNCH_APP_COMMAND_ID, "uubu", data, status, application, applicationLen, data);
 
 /** @brief Command description for GetSetupPIN
  *

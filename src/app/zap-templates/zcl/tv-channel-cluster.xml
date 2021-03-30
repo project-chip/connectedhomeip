@@ -23,16 +23,19 @@ limitations under the License.
     <define>TV_CHANNEL_CLUSTER</define>
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
+    <!-- TODO: Add feature map once it is supported -->
     <description>This cluster provides an interface for controlling the current TV Channel on a device.</description>
+    <!-- TODO: Convert this to list once it is supported -->
     <attribute side="server" code="0x0000" define="TV_CHANNEL_LIST" type="OCTET_STRING" length="32" writable="false" optional="false">tv channel list</attribute>
+    <!-- TODO: Covert this to stuct one it is supported -->
     <attribute side="server" code="0x0001" define="TV_CHANNEL_LINEUP" type="OCTET_STRING" length="32" writable="false" optional="false">tv channel lineup</attribute>
+    <!-- TODO: Covert this to stuct one it is supported -->
     <attribute side="server" code="0x0002" define="TV_CHANNEL_CURRENT_CHANNEL" type="OCTET_STRING" length="32" writable="false" optional="false">current tv channel</attribute>
 
     <command source="client" code="0x00" name="ChangeChannel" optional="false">
       <description>Change the channel on the TV to the channel case-insensitive exact matching the value passed as an argument. </description>
       <arg name="match" type="CHAR_STRING"/>
     </command>
-
 
     <command source="client" code="0x01" name="ChangeChannelByNumber" optional="false">
       <description>Change the channel on the TV to the channel with the given Number in the ChannelList attribute.</description>
@@ -54,18 +57,18 @@ limitations under the License.
   </cluster>
 
   <struct name="TvChannelInfo">
-    <item name="MajorNumber" type="INT16U"/>
-    <item name="MinorNumber" type="INT16U"/>
-    <item name="Name" type="CHAR_STRING"/>
-    <item name="CallSign" type="CHAR_STRING"/>
-    <item name="AffiliateCallSign" type="CHAR_STRING"/>
+    <item name="majorNumber" type="INT16U"/>
+    <item name="minorNumber" type="INT16U"/>
+    <item name="name" type="CHAR_STRING"/>
+    <item name="callSign" type="CHAR_STRING"/>
+    <item name="affiliateCallSign" type="CHAR_STRING"/>
   </struct>
 
   <struct name="TvChannelLineupInfo">
-    <item name="OperatorName" type="CHAR_STRING"/>
-    <item name="LineupName" type="CHAR_STRING"/>
-    <item name="PostalCode" type="CHAR_STRING"/>
-    <item name="LineupInfoType" type="TvChannelLineupInfoType"/>
+    <item name="operatorName" type="CHAR_STRING"/>
+    <item name="lineupName" type="CHAR_STRING"/>
+    <item name="postalCode" type="CHAR_STRING"/>
+    <item name="lineupInfoType" type="TvChannelLineupInfoType"/>
   </struct>
 
   <enum name="TvChannelLineupInfoType" type="ENUM8">
