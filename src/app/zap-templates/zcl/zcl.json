@@ -34,6 +34,7 @@
         "zll-devices.xml",
         "ta.xml",
         "ta-devices.xml",
+        "tv-device-types.xml",
         "hc.xml",
         "hc-devices.xml",
         "green-power.xml",
