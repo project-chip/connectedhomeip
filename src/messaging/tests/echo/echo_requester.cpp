@@ -241,7 +241,8 @@ int main(int argc, char * argv[])
                                    .SetListenPort(ECHO_CLIENT_PORT));
         SuccessOrExit(err);
 
-        err = gSessionManager.Init(chip::kTestControllerNodeId, &chip::DeviceLayer::SystemLayer, &gTCPManager, &admins);
+        err = gSessionManager.Init(chip::kTestControllerNodeId, &chip::DeviceLayer::SystemLayer, &gTCPManager, &admins,
+                                   &gMessageCounterManager);
         SuccessOrExit(err);
     }
     else
@@ -251,7 +252,8 @@ int main(int argc, char * argv[])
                                    .SetListenPort(ECHO_CLIENT_PORT));
         SuccessOrExit(err);
 
-        err = gSessionManager.Init(chip::kTestControllerNodeId, &chip::DeviceLayer::SystemLayer, &gUDPManager, &admins);
+        err = gSessionManager.Init(chip::kTestControllerNodeId, &chip::DeviceLayer::SystemLayer, &gUDPManager, &admins,
+                                   &gMessageCounterManager);
         SuccessOrExit(err);
     }
 
