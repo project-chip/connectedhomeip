@@ -186,10 +186,9 @@ int mbed_connect(int fd, const struct sockaddr * addr, socklen_t addrlen)
         return -1;
     }
 
-    socket->write(NULL, 0);
-
     if (!socket->is_blocking())
     {
+        socket->write(NULL, 0);
         set_errno(EINPROGRESS);
         return -1;
     }
