@@ -15,8 +15,7 @@
 name: Doxygen
 
 on:
-    push:
-    pull_request:
+    tag:
 
 jobs:
     doxygen:
