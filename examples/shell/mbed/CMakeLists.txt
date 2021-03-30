@@ -36,7 +36,6 @@ target_sources(${APP_TARGET} PRIVATE
     ${APP_ROOT}/shell_common/cmd_otcli.cpp
     ${APP_ROOT}/shell_common/cmd_btp.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/cmd_mbed_utils.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/arch.c
     ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
 )
 
