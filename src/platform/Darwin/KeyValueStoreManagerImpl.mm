@@ -134,7 +134,7 @@ namespace DeviceLayer {
             ReturnErrorCodeIf(fileName[0] == '\0', CHIP_ERROR_INVALID_ARGUMENT);
 
             NSURL *url = nullptr;
-            
+
             // relative paths are relative to Documents folder
             if (fileName[0] != '/') {
               NSURL * documentsDirectory = [NSFileManager.defaultManager URLForDirectory:NSDocumentDirectory
