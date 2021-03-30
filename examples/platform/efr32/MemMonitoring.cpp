@@ -51,13 +51,16 @@ void MemMonitoring::HeapMonitoring(void * pvParameter)
     TaskHandle_t lwipHandle            = xTaskGetHandle(TCPIP_THREAD_NAME);
     TaskHandle_t otTaskHandle          = xTaskGetHandle(CHIP_DEVICE_CONFIG_THREAD_TASK_NAME);
     TaskHandle_t appTaskHandle         = xTaskGetHandle(APP_TASK_NAME);
+    TaskHandle_t bleStackTaskHandle    = xTaskGetHandle(BLE_STACK_TASK_NAME);
+    TaskHandle_t bleLinkTaskHandle     = xTaskGetHandle(BLE_LINK_TASK_NAME);
+    TaskHandle_t bleEventTaskHandle    = xTaskGetHandle(CHIP_DEVICE_CONFIG_BLE_APP_TASK_NAME);
 
     while (1)
     {
         appTaskValue        = uxTaskGetStackHighWaterMark(appTaskHandle);
-        bleEventTaskValue   = uxTaskGetStackHighWaterMark(BluetoothEventTaskHandle);
-        bleTaskValue        = uxTaskGetStackHighWaterMark(BluetoothTaskHandle);
-        linkLayerTaskValue  = uxTaskGetStackHighWaterMark(LinklayerTaskHandle);
+        bleEventTaskValue   = uxTaskGetStackHighWaterMark(bleEventTaskHandle);
+        bleTaskValue        = uxTaskGetStackHighWaterMark(bleStackTaskHandle);
+        linkLayerTaskValue  = uxTaskGetStackHighWaterMark(bleLinkTaskHandle);
         openThreadTaskValue = uxTaskGetStackHighWaterMark(otTaskHandle);
         eventLoopTaskValue  = uxTaskGetStackHighWaterMark(eventLoopHandleStruct);
         lwipTaskValue       = uxTaskGetStackHighWaterMark(lwipHandle);

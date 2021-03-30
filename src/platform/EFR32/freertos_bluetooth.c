@@ -45,8 +45,7 @@ static volatile sl_bgapi_handler command_handler_func = NULL;
 #define BLUETOOTH_STACK_SIZE (1024)
 #endif
 static void BluetoothTask(void * p_arg);
-volatile TaskHandle_t BluetoothTaskHandle = NULL;
-volatile TaskHandle_t BluetoothEventTaskHandle;
+static TaskHandle_t BluetoothTaskHandle = NULL;
 
 StackType_t bluetoothStack[BLUETOOTH_STACK_SIZE / sizeof(StackType_t)];
 StaticTask_t bluetoothTaskStruct;
@@ -60,7 +59,7 @@ extern uint32_t sli_bt_can_sleep_ticks();
 #define LINKLAYER_STACK_SIZE (1024)
 #endif
 static void LinklayerTask(void * p_arg);
-volatile TaskHandle_t LinklayerTaskHandle = NULL;
+static TaskHandle_t LinklayerTaskHandle = NULL;
 StackType_t linkLayerStack[LINKLAYER_STACK_SIZE / sizeof(StackType_t)];
 StaticTask_t linkLayerTaskStruct;
 StaticSemaphore_t bluetoothMutexStruct;
@@ -87,7 +86,7 @@ sl_status_t bluetooth_start(UBaseType_t ll_priority, UBaseType_t stack_priority,
         // create tasks for Bluetooth host stack
         BluetoothTaskHandle =
             xTaskCreateStatic(BluetoothTask,                              /* Function that implements the task. */
-                              "Bluetooth Task",                           /* Text name for the task. */
+                              BLE_STACK_TASK_NAME,                        /* Text name for the task. */
                               BLUETOOTH_STACK_SIZE / sizeof(StackType_t), /* Number of indexes in the xStack array. */
                               NULL,                                       /* Parameter passed into the task. */
                               stack_priority,                             /* Priority at which the task is created. */
@@ -97,7 +96,7 @@ sl_status_t bluetooth_start(UBaseType_t ll_priority, UBaseType_t stack_priority,
         // create tasks for Linklayer
         LinklayerTaskHandle =
             xTaskCreateStatic(LinklayerTask,                              /* Function that implements the task. */
-                              "Linklayer Task",                           /* Text name for the task. */
+                              BLE_LINK_TASK_NAME,                         /* Text name for the task. */
                               LINKLAYER_STACK_SIZE / sizeof(StackType_t), /* Number of indexes in the xStack array. */
                               NULL,                                       /* Parameter passed into the task. */
                               ll_priority,                                /* Priority at which the task is created. */

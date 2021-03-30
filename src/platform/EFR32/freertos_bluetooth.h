@@ -31,6 +31,9 @@ extern "C" {
 
 #include "sl_bt_api.h"
 
+#define BLE_STACK_TASK_NAME     "BLE_STACK"
+#define BLE_LINK_TASK_NAME      "BLE_LINK"
+
 // Bluetooth event flag group
 extern EventGroupHandle_t bluetooth_event_flags;
 // Bluetooth event flag definitions
@@ -43,9 +46,6 @@ extern EventGroupHandle_t bluetooth_event_flags;
 
 // Bluetooth event data pointer
 extern volatile sl_bt_msg_t * bluetooth_evt;
-extern volatile TaskHandle_t LinklayerTaskHandle;
-extern volatile TaskHandle_t BluetoothTaskHandle;
-extern volatile TaskHandle_t BluetoothEventTaskHandle;
 
 // Function prototype for initializing Bluetooth stack.
 typedef sl_status_t (*bluetooth_stack_init_func)();
