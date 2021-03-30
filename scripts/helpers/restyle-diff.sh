@@ -41,6 +41,17 @@ restyle-paths() {
 cd "$CHIP_ROOT"
 declare -a paths=()
 
-readarray -t paths < <(git diff --ignore-submodules --name-only "${1:-master}")
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    (git diff --ignore-submodules --name-only "${1:-master}") >./paths.txt
+
+    paths=()
+    while IFS= read -r line; do
+        paths+=("$line")
+    done <./paths.txt
+
+    rm ./paths.txt
+else
+    readarray -t paths < <(git diff --ignore-submodules --name-only "${1:-master}")
+fi
 
 restyle-paths "${paths[@]}"
