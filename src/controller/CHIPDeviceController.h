@@ -229,6 +229,7 @@ protected:
     DeviceTransportMgr * mTransportMgr;
     SecureSessionMgr * mSessionMgr;
     Messaging::ExchangeManager * mExchangeMgr;
+    Transport::MessageCounterManagerInterface * mMessageCounterManager;
     PersistentStorageDelegate * mStorageDelegate;
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
     DeviceAddressUpdateDelegate * mDeviceAddressUpdateDelegate = nullptr;

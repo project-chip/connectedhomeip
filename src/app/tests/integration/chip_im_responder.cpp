@@ -35,6 +35,7 @@
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <protocols/message_counter/MessageCounterManager.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <support/ErrorStr.h>
 #include <system/SystemPacketBuffer.h>
@@ -125,6 +126,7 @@ namespace {
 chip::TransportMgr<chip::Transport::UDP> gTransportManager;
 chip::SecureSessionMgr gSessionManager;
 chip::SecurePairingUsingTestSecret gTestPairing;
+chip::message_counter::MessageCounterManager gMessageCounterManager;
 LivenessEventGenerator gLivenessGenerator;
 
 uint8_t gDebugEventBuffer[2048];
@@ -162,7 +164,8 @@ int main(int argc, char * argv[])
         chip::Transport::UdpListenParameters(&chip::DeviceLayer::InetLayer).SetAddressType(chip::Inet::kIPAddressType_IPv4));
     SuccessOrExit(err);
 
-    err = gSessionManager.Init(chip::kTestDeviceNodeId, &chip::DeviceLayer::SystemLayer, &gTransportManager, &admins);
+    err = gSessionManager.Init(chip::kTestDeviceNodeId, &chip::DeviceLayer::SystemLayer, &gTransportManager, &admins,
+                               &gMessageCounterManager);
     SuccessOrExit(err);
 
     err = gExchangeManager.Init(&gSessionManager);
