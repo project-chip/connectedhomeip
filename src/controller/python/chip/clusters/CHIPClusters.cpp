@@ -1768,6 +1768,86 @@ CHIP_ERROR chip_ime_ReadAttribute_OnOff_ClusterRevision(chip::Controller::Device
 }
 
 // End of Cluster OnOff
+// Cluster PumpConfigurationAndControl
+
+CHIP_ERROR chip_ime_ReadAttribute_PumpConfigurationAndControl_MaxPressure(chip::Controller::Device * device,
+                                                                          chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::PumpConfigurationAndControlCluster cluster;
+    (void) ZCLgroupId;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeMaxPressure(nullptr, nullptr);
+}
+CHIP_ERROR chip_ime_ReadAttribute_PumpConfigurationAndControl_MaxSpeed(chip::Controller::Device * device,
+                                                                       chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::PumpConfigurationAndControlCluster cluster;
+    (void) ZCLgroupId;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeMaxSpeed(nullptr, nullptr);
+}
+CHIP_ERROR chip_ime_ReadAttribute_PumpConfigurationAndControl_MaxFlow(chip::Controller::Device * device,
+                                                                      chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::PumpConfigurationAndControlCluster cluster;
+    (void) ZCLgroupId;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeMaxFlow(nullptr, nullptr);
+}
+CHIP_ERROR chip_ime_ReadAttribute_PumpConfigurationAndControl_EffectiveOperationMode(chip::Controller::Device * device,
+                                                                                     chip::EndpointId ZCLendpointId,
+                                                                                     chip::GroupId ZCLgroupId)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::PumpConfigurationAndControlCluster cluster;
+    (void) ZCLgroupId;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeEffectiveOperationMode(nullptr, nullptr);
+}
+CHIP_ERROR chip_ime_ReadAttribute_PumpConfigurationAndControl_EffectiveControlMode(chip::Controller::Device * device,
+                                                                                   chip::EndpointId ZCLendpointId,
+                                                                                   chip::GroupId ZCLgroupId)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::PumpConfigurationAndControlCluster cluster;
+    (void) ZCLgroupId;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeEffectiveControlMode(nullptr, nullptr);
+}
+CHIP_ERROR chip_ime_ReadAttribute_PumpConfigurationAndControl_Capacity(chip::Controller::Device * device,
+                                                                       chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::PumpConfigurationAndControlCluster cluster;
+    (void) ZCLgroupId;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeCapacity(nullptr, nullptr);
+}
+CHIP_ERROR chip_ime_ReadAttribute_PumpConfigurationAndControl_OperationMode(chip::Controller::Device * device,
+                                                                            chip::EndpointId ZCLendpointId,
+                                                                            chip::GroupId ZCLgroupId)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::PumpConfigurationAndControlCluster cluster;
+    (void) ZCLgroupId;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeOperationMode(nullptr, nullptr);
+}
+CHIP_ERROR chip_ime_ReadAttribute_PumpConfigurationAndControl_ClusterRevision(chip::Controller::Device * device,
+                                                                              chip::EndpointId ZCLendpointId,
+                                                                              chip::GroupId ZCLgroupId)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::PumpConfigurationAndControlCluster cluster;
+    (void) ZCLgroupId;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeClusterRevision(nullptr, nullptr);
+}
+
+// End of Cluster PumpConfigurationAndControl
 // Cluster Scenes
 
 CHIP_ERROR chip_ime_AppendCommand_Scenes_AddScene(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
