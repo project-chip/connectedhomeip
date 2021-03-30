@@ -65,7 +65,7 @@ NodeId GetCurrentNodeId()
 }
 
 // Requires an 8-byte mac to accommodate thread.
-chip::ByteSpan FillMAC(uint8_t mac[8])
+chip::ByteSpan FillMAC(uint8_t (&mac)[8])
 {
     memset(mac, 0, 8);
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
