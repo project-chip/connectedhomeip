@@ -32,8 +32,6 @@ chip_data_model("tv-common") {
     "identify",
     "identify-client",
     "level-control",
-    "low-power-server",
-    "media-playback-server",
     "network-commissioning",
     "on-off-server",
     "scenes",

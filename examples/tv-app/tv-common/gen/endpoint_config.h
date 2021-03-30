@@ -26,85 +26,124 @@
 #if BIGENDIAN_CPU
 #define GENERATED_DEFAULTS                                                                                                         \
     {                                                                                                                              \
-        /* 0 - Default for cluster: "General Commissioning", attribute: "FabricId". side: server, big-endian */                    \
-        1, 'o', 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                                \
+        /* 0 - Default for cluster: "Wake on LAN", attribute: "wake on lan mac address". side: server, big-endian */               \
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,    \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                \
                                                                                                                                    \
-            /* 8 - Default for cluster: "General Commissioning", attribute: "Breadcrumb". side: server, big-endian */              \
+            /* 32 - Default for cluster: "TV Channel", attribute: "tv channel list". side: server, big-endian */                   \
+            1, 'o', 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,    \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                \
+                                                                                                                                   \
+            /* 64 - Default for cluster: "TV Channel", attribute: "tv channel lineup". side: server, big-endian */                 \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
+                                                                                                                                   \
+            /* 96 - Default for cluster: "Target Navigator", attribute: "target navigator list". side: server, big-endian */       \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
+                                                                                                                                   \
+            /* 128 - Default for cluster: "Media Playback", attribute: "start time". side: server, big-endian */                   \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF,                                                                        \
+                                                                                                                                   \
+            /* 136 - Default for cluster: "Media Playback", attribute: "duration". side: server, big-endian */                     \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 16 - Default for cluster: "Application Basic", attribute: "vendor name". side: server, big-endian */                \
+            /* 144 - Default for cluster: "Media Playback", attribute: "updated at". side: server, big-endian */                   \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
+                                                                                                                                   \
+            /* 152 - Default for cluster: "Media Playback", attribute: "posistion". side: server, big-endian */                    \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
+                                                                                                                                   \
+            /* 160 - Default for cluster: "Media Playback", attribute: "playback speed". side: server, big-endian */               \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
+                                                                                                                                   \
+            /* 168 - Default for cluster: "Media Playback", attribute: "seek range end". side: server, big-endian */               \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
+                                                                                                                                   \
+            /* 176 - Default for cluster: "Media Playback", attribute: "seek range start". side: server, big-endian */             \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
+                                                                                                                                   \
+            /* 184 - Default for cluster: "Media Input", attribute: "media input list". side: server, big-endian */                \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
-            /* 48 - Default for cluster: "Application Basic", attribute: "application name". side: server, big-endian */           \
+            /* 216 - Default for cluster: "Content Launch", attribute: "accepts header list". side: server, big-endian */          \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
-            /* 80 - Default for cluster: "Application Basic", attribute: "application id". side: server, big-endian */             \
+            /* 248 - Default for cluster: "Application Launcher", attribute: "application launcher list". side: server, big-endian \
+             */                                                                                                                    \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
-            /* 112 - Default for cluster: "Application Basic", attribute: "vendor name". side: server, big-endian */               \
+            /* 280 - Default for cluster: "Audio Output", attribute: "audio output list". side: server, big-endian */              \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
-            /* 144 - Default for cluster: "Application Basic", attribute: "application name". side: server, big-endian */          \
+            /* 312 - Default for cluster: "Media Playback", attribute: "start time". side: server, big-endian */                   \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF,                                                                        \
+                                                                                                                                   \
+            /* 320 - Default for cluster: "Media Playback", attribute: "duration". side: server, big-endian */                     \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
+                                                                                                                                   \
+            /* 328 - Default for cluster: "Media Playback", attribute: "updated at". side: server, big-endian */                   \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
+                                                                                                                                   \
+            /* 336 - Default for cluster: "Media Playback", attribute: "posistion". side: server, big-endian */                    \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
+                                                                                                                                   \
+            /* 344 - Default for cluster: "Media Playback", attribute: "playback speed". side: server, big-endian */               \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
+                                                                                                                                   \
+            /* 352 - Default for cluster: "Media Playback", attribute: "seek range end". side: server, big-endian */               \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
+                                                                                                                                   \
+            /* 360 - Default for cluster: "Media Playback", attribute: "seek range start". side: server, big-endian */             \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
+                                                                                                                                   \
+            /* 368 - Default for cluster: "Application Basic", attribute: "vendor name". side: server, big-endian */               \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
-            /* 176 - Default for cluster: "Application Basic", attribute: "application id". side: server, big-endian */            \
+            /* 400 - Default for cluster: "Application Basic", attribute: "application name". side: server, big-endian */          \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
-            /* 208 - Default for cluster: "Application Basic", attribute: "vendor name". side: server, big-endian */               \
+            /* 432 - Default for cluster: "Application Basic", attribute: "application id". side: server, big-endian */            \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
-            /* 240 - Default for cluster: "Application Basic", attribute: "application name". side: server, big-endian */          \
+            /* 464 - Default for cluster: "Application Basic", attribute: "vendor name". side: server, big-endian */               \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
-            /* 272 - Default for cluster: "Application Basic", attribute: "application id". side: server, big-endian */            \
+            /* 496 - Default for cluster: "Application Basic", attribute: "application name". side: server, big-endian */          \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
-            /* 304 - Default for cluster: "Basic", attribute: "VendorName". side: server, big-endian */                            \
+            /* 528 - Default for cluster: "Application Basic", attribute: "application id". side: server, big-endian */            \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
-            /* 336 - Default for cluster: "Basic", attribute: "ProductName". side: server, big-endian */                           \
+            /* 560 - Default for cluster: "Application Basic", attribute: "vendor name". side: server, big-endian */               \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
-            /* 368 - Default for cluster: "Basic", attribute: "UserLabel". side: server, big-endian */                             \
+            /* 592 - Default for cluster: "Application Basic", attribute: "application name". side: server, big-endian */          \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
-            /* 400 - Default for cluster: "Basic", attribute: "Location". side: server, big-endian */                              \
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                        \
+            /* 624 - Default for cluster: "Application Basic", attribute: "application id". side: server, big-endian */            \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
-            /* 416 - Default for cluster: "Basic", attribute: "HardwareVersionString". side: server, big-endian */                 \
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                              \
-                                                                                                                                   \
-            /* 480 - Default for cluster: "Basic", attribute: "SoftwareVersion". side: server, big-endian */                       \
-            0x00, 0x00, 0x00, 0x00,                                                                                                \
-                                                                                                                                   \
-            /* 484 - Default for cluster: "Basic", attribute: "SoftwareVersionString". side: server, big-endian */                 \
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                              \
-                                                                                                                                   \
-            /* 548 - Default for cluster: "General Commissioning", attribute: "FabricId". side: server, big-endian */              \
+            /* 656 - Default for cluster: "General Commissioning", attribute: "FabricId". side: server, big-endian */              \
             1, 'o', 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                            \
                                                                                                                                    \
-            /* 556 - Default for cluster: "General Commissioning", attribute: "Breadcrumb". side: server, big-endian */            \
+            /* 664 - Default for cluster: "General Commissioning", attribute: "Breadcrumb". side: server, big-endian */            \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 564 - Default for cluster: "Color Control", attribute: "compensation text". side: server, big-endian */             \
+            /* 672 - Default for cluster: "Color Control", attribute: "compensation text". side: server, big-endian */             \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
@@ -120,22 +159,22 @@
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                              \
                                                                                                                                    \
-            /* 818 - Default for cluster: "IAS Zone", attribute: "IAS CIE address". side: server, big-endian */                    \
+            /* 926 - Default for cluster: "IAS Zone", attribute: "IAS CIE address". side: server, big-endian */                    \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 826 - Default for cluster: "Application Basic", attribute: "vendor name". side: server, big-endian */               \
+            /* 934 - Default for cluster: "Application Basic", attribute: "vendor name". side: server, big-endian */               \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
-            /* 858 - Default for cluster: "Application Basic", attribute: "application name". side: server, big-endian */          \
+            /* 966 - Default for cluster: "Application Basic", attribute: "application name". side: server, big-endian */          \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
-            /* 890 - Default for cluster: "Application Basic", attribute: "application id". side: server, big-endian */            \
+            /* 998 - Default for cluster: "Application Basic", attribute: "application id". side: server, big-endian */            \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
-            /* 922 - Default for cluster: "Group Key Management", attribute: "groups". side: server, big-endian */                 \
+            /* 1030 - Default for cluster: "Group Key Management", attribute: "groups". side: server, big-endian */                \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
@@ -151,7 +190,7 @@
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                              \
                                                                                                                                    \
-            /* 1176 - Default for cluster: "Group Key Management", attribute: "group keys". side: server, big-endian */            \
+            /* 1284 - Default for cluster: "Group Key Management", attribute: "group keys". side: server, big-endian */            \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
@@ -171,85 +210,124 @@
 #else // !BIGENDIAN_CPU
 #define GENERATED_DEFAULTS                                                                                                         \
     {                                                                                                                              \
-        /* 0 - Default for cluster: "General Commissioning", attribute: "FabricId". side: server, little-endian */                 \
-        1, 'o', 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                                \
+        /* 0 - Default for cluster: "Wake on LAN", attribute: "wake on lan mac address". side: server, little-endian */            \
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,    \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                \
                                                                                                                                    \
-            /* 8 - Default for cluster: "General Commissioning", attribute: "Breadcrumb". side: server, little-endian */           \
+            /* 32 - Default for cluster: "TV Channel", attribute: "tv channel list". side: server, little-endian */                \
+            1, 'o', 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,    \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                \
+                                                                                                                                   \
+            /* 64 - Default for cluster: "TV Channel", attribute: "tv channel lineup". side: server, little-endian */              \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
+                                                                                                                                   \
+            /* 96 - Default for cluster: "Target Navigator", attribute: "target navigator list". side: server, little-endian */    \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
+                                                                                                                                   \
+            /* 128 - Default for cluster: "Media Playback", attribute: "start time". side: server, little-endian */                \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF,                                                                        \
+                                                                                                                                   \
+            /* 136 - Default for cluster: "Media Playback", attribute: "duration". side: server, little-endian */                  \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 16 - Default for cluster: "Application Basic", attribute: "vendor name". side: server, little-endian */             \
+            /* 144 - Default for cluster: "Media Playback", attribute: "updated at". side: server, little-endian */                \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
+                                                                                                                                   \
+            /* 152 - Default for cluster: "Media Playback", attribute: "posistion". side: server, little-endian */                 \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
+                                                                                                                                   \
+            /* 160 - Default for cluster: "Media Playback", attribute: "playback speed". side: server, little-endian */            \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
+                                                                                                                                   \
+            /* 168 - Default for cluster: "Media Playback", attribute: "seek range end". side: server, little-endian */            \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
+                                                                                                                                   \
+            /* 176 - Default for cluster: "Media Playback", attribute: "seek range start". side: server, little-endian */          \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
+                                                                                                                                   \
+            /* 184 - Default for cluster: "Media Input", attribute: "media input list". side: server, little-endian */             \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
-            /* 48 - Default for cluster: "Application Basic", attribute: "application name". side: server, little-endian */        \
+            /* 216 - Default for cluster: "Content Launch", attribute: "accepts header list". side: server, little-endian */       \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
-            /* 80 - Default for cluster: "Application Basic", attribute: "application id". side: server, little-endian */          \
+            /* 248 - Default for cluster: "Application Launcher", attribute: "application launcher list". side: server,            \
+               little-endian */                                                                                                    \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
-            /* 112 - Default for cluster: "Application Basic", attribute: "vendor name". side: server, little-endian */            \
+            /* 280 - Default for cluster: "Audio Output", attribute: "audio output list". side: server, little-endian */           \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
-            /* 144 - Default for cluster: "Application Basic", attribute: "application name". side: server, little-endian */       \
+            /* 312 - Default for cluster: "Media Playback", attribute: "start time". side: server, little-endian */                \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF,                                                                        \
+                                                                                                                                   \
+            /* 320 - Default for cluster: "Media Playback", attribute: "duration". side: server, little-endian */                  \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
+                                                                                                                                   \
+            /* 328 - Default for cluster: "Media Playback", attribute: "updated at". side: server, little-endian */                \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
+                                                                                                                                   \
+            /* 336 - Default for cluster: "Media Playback", attribute: "posistion". side: server, little-endian */                 \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
+                                                                                                                                   \
+            /* 344 - Default for cluster: "Media Playback", attribute: "playback speed". side: server, little-endian */            \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
+                                                                                                                                   \
+            /* 352 - Default for cluster: "Media Playback", attribute: "seek range end". side: server, little-endian */            \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
+                                                                                                                                   \
+            /* 360 - Default for cluster: "Media Playback", attribute: "seek range start". side: server, little-endian */          \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
+                                                                                                                                   \
+            /* 368 - Default for cluster: "Application Basic", attribute: "vendor name". side: server, little-endian */            \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
-            /* 176 - Default for cluster: "Application Basic", attribute: "application id". side: server, little-endian */         \
+            /* 400 - Default for cluster: "Application Basic", attribute: "application name". side: server, little-endian */       \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
-            /* 208 - Default for cluster: "Application Basic", attribute: "vendor name". side: server, little-endian */            \
+            /* 432 - Default for cluster: "Application Basic", attribute: "application id". side: server, little-endian */         \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
-            /* 240 - Default for cluster: "Application Basic", attribute: "application name". side: server, little-endian */       \
+            /* 464 - Default for cluster: "Application Basic", attribute: "vendor name". side: server, little-endian */            \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
-            /* 272 - Default for cluster: "Application Basic", attribute: "application id". side: server, little-endian */         \
+            /* 496 - Default for cluster: "Application Basic", attribute: "application name". side: server, little-endian */       \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
-            /* 304 - Default for cluster: "Basic", attribute: "VendorName". side: server, little-endian */                         \
+            /* 528 - Default for cluster: "Application Basic", attribute: "application id". side: server, little-endian */         \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
-            /* 336 - Default for cluster: "Basic", attribute: "ProductName". side: server, little-endian */                        \
+            /* 560 - Default for cluster: "Application Basic", attribute: "vendor name". side: server, little-endian */            \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
-            /* 368 - Default for cluster: "Basic", attribute: "UserLabel". side: server, little-endian */                          \
+            /* 592 - Default for cluster: "Application Basic", attribute: "application name". side: server, little-endian */       \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
-            /* 400 - Default for cluster: "Basic", attribute: "Location". side: server, little-endian */                           \
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                        \
+            /* 624 - Default for cluster: "Application Basic", attribute: "application id". side: server, little-endian */         \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
-            /* 416 - Default for cluster: "Basic", attribute: "HardwareVersionString". side: server, little-endian */              \
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                              \
-                                                                                                                                   \
-            /* 480 - Default for cluster: "Basic", attribute: "SoftwareVersion". side: server, little-endian */                    \
-            0x00, 0x00, 0x00, 0x00,                                                                                                \
-                                                                                                                                   \
-            /* 484 - Default for cluster: "Basic", attribute: "SoftwareVersionString". side: server, little-endian */              \
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                              \
-                                                                                                                                   \
-            /* 548 - Default for cluster: "General Commissioning", attribute: "FabricId". side: server, little-endian */           \
+            /* 656 - Default for cluster: "General Commissioning", attribute: "FabricId". side: server, little-endian */           \
             1, 'o', 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                            \
                                                                                                                                    \
-            /* 556 - Default for cluster: "General Commissioning", attribute: "Breadcrumb". side: server, little-endian */         \
+            /* 664 - Default for cluster: "General Commissioning", attribute: "Breadcrumb". side: server, little-endian */         \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 564 - Default for cluster: "Color Control", attribute: "compensation text". side: server, little-endian */          \
+            /* 672 - Default for cluster: "Color Control", attribute: "compensation text". side: server, little-endian */          \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
@@ -265,22 +343,22 @@
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                              \
                                                                                                                                    \
-            /* 818 - Default for cluster: "IAS Zone", attribute: "IAS CIE address". side: server, little-endian */                 \
+            /* 926 - Default for cluster: "IAS Zone", attribute: "IAS CIE address". side: server, little-endian */                 \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 826 - Default for cluster: "Application Basic", attribute: "vendor name". side: server, little-endian */            \
+            /* 934 - Default for cluster: "Application Basic", attribute: "vendor name". side: server, little-endian */            \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
-            /* 858 - Default for cluster: "Application Basic", attribute: "application name". side: server, little-endian */       \
+            /* 966 - Default for cluster: "Application Basic", attribute: "application name". side: server, little-endian */       \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
-            /* 890 - Default for cluster: "Application Basic", attribute: "application id". side: server, little-endian */         \
+            /* 998 - Default for cluster: "Application Basic", attribute: "application id". side: server, little-endian */         \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
-            /* 922 - Default for cluster: "Group Key Management", attribute: "groups". side: server, little-endian */              \
+            /* 1030 - Default for cluster: "Group Key Management", attribute: "groups". side: server, little-endian */             \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
@@ -296,7 +374,7 @@
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                              \
                                                                                                                                    \
-            /* 1176 - Default for cluster: "Group Key Management", attribute: "group keys". side: server, little-endian */         \
+            /* 1284 - Default for cluster: "Group Key Management", attribute: "group keys". side: server, little-endian */         \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
@@ -315,7 +393,7 @@
 
 #endif // BIGENDIAN_CPU
 
-#define GENERATED_DEFAULTS_COUNT (27)
+#define GENERATED_DEFAULTS_COUNT (40)
 
 #define ZAP_TYPE(type) ZCL_##type##_ATTRIBUTE_TYPE
 #define ZAP_LONG_DEFAULTS_INDEX(index)                                                                                             \
@@ -343,56 +421,10 @@
 
 #define ZAP_ATTRIBUTE_MASK(mask) ATTRIBUTE_MASK_##mask
 // This is an array of EmberAfAttributeMetadata structures.
-#define GENERATED_ATTRIBUTE_COUNT 152
+#define GENERATED_ATTRIBUTE_COUNT 196
 #define GENERATED_ATTRIBUTES                                                                                                       \
     {                                                                                                                              \
-        { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(2) },                /* On/off (server): cluster revision */          \
-            { 0x0000, ZAP_TYPE(BOOLEAN), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },        /* On/off (server): on/off */                    \
-            { 0x0000, ZAP_TYPE(OCTET_STRING), 8, 0, ZAP_LONG_DEFAULTS_INDEX(0) }, /* General Commissioning (server): FabricId */   \
-            { 0x0001, ZAP_TYPE(INT64U), 8, ZAP_ATTRIBUTE_MASK(WRITABLE),                                                           \
-              ZAP_LONG_DEFAULTS_INDEX(8) },                                 /* General Commissioning (server): Breadcrumb */       \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* General Commissioning (server): cluster revision */ \
-            { 0x0000, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },        /* Media Playback (server): current state */           \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* Media Playback (server): cluster revision */        \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* Low Power (server): cluster revision */             \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* Content Launch (server): cluster revision */        \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(2) },      /* On/off (server): cluster revision */                \
-            { 0x0000, ZAP_TYPE(BOOLEAN), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },  /* On/off (server): on/off */                          \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(3) },      /* Level Control (server): cluster revision */         \
-            { 0x0000, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },    /* Level Control (server): current level */            \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* Content Launch (server): cluster revision */        \
-            { 0x0000, ZAP_TYPE(CHAR_STRING), 32, 0, ZAP_LONG_DEFAULTS_INDEX(16) }, /* Application Basic (server): vendor name */   \
-            { 0x0001, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },               /* Application Basic (server): vendor id */     \
-            { 0x0002, ZAP_TYPE(CHAR_STRING), 32, 0,                                                                                \
-              ZAP_LONG_DEFAULTS_INDEX(48) },                                /* Application Basic (server): application name */     \
-            { 0x0003, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },        /* Application Basic (server): product id */           \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* Application Basic (server): cluster revision */     \
-            { 0x0005, ZAP_TYPE(CHAR_STRING), 32, 0,                                                                                \
-              ZAP_LONG_DEFAULTS_INDEX(80) },                             /* Application Basic (server): application id */          \
-            { 0x0006, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },     /* Application Basic (server): catalog vendor id */       \
-            { 0x0007, ZAP_TYPE(ENUM8), 1, 0, ZAP_SIMPLE_DEFAULT(0x01) }, /* Application Basic (server): application satus */       \
-            { 0x0000, ZAP_TYPE(CHAR_STRING), 32, 0, ZAP_LONG_DEFAULTS_INDEX(112) }, /* Application Basic (server): vendor name */  \
-            { 0x0001, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },                /* Application Basic (server): vendor id */    \
-            { 0x0002, ZAP_TYPE(CHAR_STRING), 32, 0,                                                                                \
-              ZAP_LONG_DEFAULTS_INDEX(144) },                               /* Application Basic (server): application name */     \
-            { 0x0003, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },        /* Application Basic (server): product id */           \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* Application Basic (server): cluster revision */     \
-            { 0x0005, ZAP_TYPE(CHAR_STRING), 32, 0,                                                                                \
-              ZAP_LONG_DEFAULTS_INDEX(176) },                               /* Application Basic (server): application id */       \
-            { 0x0006, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },        /* Application Basic (server): catalog vendor id */    \
-            { 0x0007, ZAP_TYPE(ENUM8), 1, 0, ZAP_SIMPLE_DEFAULT(0x01) },    /* Application Basic (server): application satus */    \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* Content Launch (server): cluster revision */        \
-            { 0x0000, ZAP_TYPE(CHAR_STRING), 32, 0, ZAP_LONG_DEFAULTS_INDEX(208) }, /* Application Basic (server): vendor name */  \
-            { 0x0001, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },                /* Application Basic (server): vendor id */    \
-            { 0x0002, ZAP_TYPE(CHAR_STRING), 32, 0,                                                                                \
-              ZAP_LONG_DEFAULTS_INDEX(240) },                               /* Application Basic (server): application name */     \
-            { 0x0003, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },        /* Application Basic (server): product id */           \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* Application Basic (server): cluster revision */     \
-            { 0x0005, ZAP_TYPE(CHAR_STRING), 32, 0,                                                                                \
-              ZAP_LONG_DEFAULTS_INDEX(272) },                            /* Application Basic (server): application id */          \
-            { 0x0006, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },     /* Application Basic (server): catalog vendor id */       \
-            { 0x0007, ZAP_TYPE(ENUM8), 1, 0, ZAP_SIMPLE_DEFAULT(0x01) }, /* Application Basic (server): application satus */       \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(2) },   /* Identify (server): cluster revision */                 \
+        { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(2) }, /* Identify (server): cluster revision */                       \
             { 0x0000, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(WRITABLE),                                                           \
               ZAP_SIMPLE_DEFAULT(0x0000) },                                 /* Identify (server): identify time */                 \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(3) },      /* Groups (server): cluster revision */                \
@@ -407,42 +439,138 @@
             { 0x0000, ZAP_TYPE(BOOLEAN), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },  /* On/off (server): on/off */                          \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(3) },      /* Level Control (server): cluster revision */         \
             { 0x0000, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },    /* Level Control (server): current level */            \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(SINGLETON),                                                          \
-              ZAP_SIMPLE_DEFAULT(3) }, /* Basic (server): cluster revision */                                                      \
-            { 0x0000, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(SINGLETON),                                                          \
-              ZAP_EMPTY_DEFAULT() }, /* Basic (server): InteractionModelVersion */                                                 \
-            { 0x0001, ZAP_TYPE(CHAR_STRING), 32, ZAP_ATTRIBUTE_MASK(SINGLETON),                                                    \
-              ZAP_LONG_DEFAULTS_INDEX(304) },                                                    /* Basic (server): VendorName */  \
-            { 0x0002, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(SINGLETON), ZAP_EMPTY_DEFAULT() }, /* Basic (server): VendorID */    \
-            { 0x0003, ZAP_TYPE(CHAR_STRING), 32, ZAP_ATTRIBUTE_MASK(SINGLETON),                                                    \
-              ZAP_LONG_DEFAULTS_INDEX(336) },                                                    /* Basic (server): ProductName */ \
-            { 0x0004, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(SINGLETON), ZAP_EMPTY_DEFAULT() }, /* Basic (server): ProductID */   \
-            { 0x0005, ZAP_TYPE(CHAR_STRING), 32, ZAP_ATTRIBUTE_MASK(SINGLETON) | ZAP_ATTRIBUTE_MASK(WRITABLE),                     \
-              ZAP_LONG_DEFAULTS_INDEX(368) }, /* Basic (server): UserLabel */                                                      \
-            { 0x0006, ZAP_TYPE(CHAR_STRING), 16, ZAP_ATTRIBUTE_MASK(SINGLETON) | ZAP_ATTRIBUTE_MASK(WRITABLE),                     \
-              ZAP_LONG_DEFAULTS_INDEX(400) }, /* Basic (server): Location */                                                       \
-            { 0x0007, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(SINGLETON),                                                          \
-              ZAP_SIMPLE_DEFAULT(0x00) }, /* Basic (server): HardwareVersion */                                                    \
-            { 0x0008, ZAP_TYPE(CHAR_STRING), 64, ZAP_ATTRIBUTE_MASK(SINGLETON),                                                    \
-              ZAP_LONG_DEFAULTS_INDEX(416) }, /* Basic (server): HardwareVersionString */                                          \
-            { 0x0009, ZAP_TYPE(INT32U), 4, ZAP_ATTRIBUTE_MASK(SINGLETON),                                                          \
-              ZAP_LONG_DEFAULTS_INDEX(480) }, /* Basic (server): SoftwareVersion */                                                \
-            { 0x000A, ZAP_TYPE(CHAR_STRING), 64, ZAP_ATTRIBUTE_MASK(SINGLETON),                                                    \
-              ZAP_LONG_DEFAULTS_INDEX(484) },                                       /* Basic (server): SoftwareVersionString */    \
-            { 0x0000, ZAP_TYPE(OCTET_STRING), 8, 0, ZAP_LONG_DEFAULTS_INDEX(548) }, /* General Commissioning (server): FabricId */ \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* General Commissioning (server): cluster revision */ \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(3) },      /* Color Control (server): cluster revision */         \
+            { 0x0003, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x616B) }, /* Color Control (server): current x */                \
+            { 0x0004, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x607D) }, /* Color Control (server): current y */                \
+            { 0x000F, ZAP_TYPE(BITMAP8), 1, ZAP_ATTRIBUTE_MASK(WRITABLE),                                                          \
+              ZAP_SIMPLE_DEFAULT(0x00) }, /* Color Control (server): color control options */                                      \
+            { 0x400D, ZAP_TYPE(INT16U), 2, 0,                                                                                      \
+              ZAP_EMPTY_DEFAULT() }, /* Color Control (server): couple color temp to level min-mireds */                           \
+            { 0x4010, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(WRITABLE),                                                           \
+              ZAP_EMPTY_DEFAULT() }, /* Color Control (server): start up color temperature mireds */                               \
+            { 0x0000, ZAP_TYPE(CHAR_STRING), 32, 0,                                                                                \
+              ZAP_LONG_DEFAULTS_INDEX(0) },                                 /* Wake on LAN (server): wake on lan mac address */    \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* Wake on LAN (server): cluster revision */           \
+            { 0x0000, ZAP_TYPE(OCTET_STRING), 32, 0, ZAP_LONG_DEFAULTS_INDEX(32) }, /* TV Channel (server): tv channel list */     \
+            { 0x0001, ZAP_TYPE(OCTET_STRING), 32, 0, ZAP_LONG_DEFAULTS_INDEX(64) }, /* TV Channel (server): tv channel lineup */   \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },         /* TV Channel (server): cluster revision */    \
+            { 0x0000, ZAP_TYPE(OCTET_STRING), 32, 0,                                                                               \
+              ZAP_LONG_DEFAULTS_INDEX(96) },                                /* Target Navigator (server): target navigator list */ \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* Target Navigator (server): cluster revision */      \
+            { 0x0000, ZAP_TYPE(ENUM8), 1, 0, ZAP_EMPTY_DEFAULT() },         /* Media Playback (server): playback state */          \
+            { 0x0001, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(128) }, /* Media Playback (server): start time */            \
+            { 0x0002, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(136) }, /* Media Playback (server): duration */              \
+            { 0x0003, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(144) }, /* Media Playback (server): updated at */            \
+            { 0x0004, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(152) }, /* Media Playback (server): posistion */             \
+            { 0x0005, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(160) }, /* Media Playback (server): playback speed */        \
+            { 0x0006, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(168) }, /* Media Playback (server): seek range end */        \
+            { 0x0007, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(176) }, /* Media Playback (server): seek range start */      \
+            { 0x0000, ZAP_TYPE(OCTET_STRING), 32, 0, ZAP_LONG_DEFAULTS_INDEX(184) }, /* Media Input (server): media input list */  \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },          /* Media Input (server): cluster revision */  \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },          /* Low Power (server): cluster revision */    \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },          /* Keypad Input (server): cluster revision */ \
+            { 0x0000, ZAP_TYPE(OCTET_STRING), 32, 0,                                                                               \
+              ZAP_LONG_DEFAULTS_INDEX(216) },                               /* Content Launch (server): accepts header list */     \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* Content Launch (server): cluster revision */        \
+            { 0x0000, ZAP_TYPE(OCTET_STRING), 32, 0,                                                                               \
+              ZAP_LONG_DEFAULTS_INDEX(248) }, /* Application Launcher (server): application launcher list */                       \
+            { 0x0001, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },    /* Application Launcher (server): catalog vendor id */ \
+            { 0x0002, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },    /* Application Launcher (server): application id */    \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* Application Launcher (server): cluster revision */  \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(2) },      /* On/off (server): cluster revision */                \
+            { 0x0000, ZAP_TYPE(BOOLEAN), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },  /* On/off (server): on/off */                          \
+            { 0x0000, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },    /* Level Control (server): current level */            \
+            { 0x0000, ZAP_TYPE(OCTET_STRING), 32, 0,                                                                               \
+              ZAP_LONG_DEFAULTS_INDEX(280) },                                 /* Audio Output (server): audio output list */       \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },   /* Audio Output (server): cluster revision */        \
+            { 0x0000, ZAP_TYPE(ENUM8), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },      /* Media Playback (server): playback state */        \
+            { 0x0001, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(312) }, /* Media Playback (server): start time */            \
+            { 0x0002, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(320) }, /* Media Playback (server): duration */              \
+            { 0x0003, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(328) }, /* Media Playback (server): updated at */            \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },   /* Media Playback (server): cluster revision */      \
+            { 0x0004, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(336) }, /* Media Playback (server): posistion */             \
+            { 0x0005, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(344) }, /* Media Playback (server): playback speed */        \
+            { 0x0006, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(352) }, /* Media Playback (server): seek range end */        \
+            { 0x0007, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(360) }, /* Media Playback (server): seek range start */      \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },   /* Content Launch (server): cluster revision */      \
+            { 0x0000, ZAP_TYPE(CHAR_STRING), 32, 0, ZAP_LONG_DEFAULTS_INDEX(368) }, /* Application Basic (server): vendor name */  \
+            { 0x0001, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },                /* Application Basic (server): vendor id */    \
+            { 0x0002, ZAP_TYPE(CHAR_STRING), 32, 0,                                                                                \
+              ZAP_LONG_DEFAULTS_INDEX(400) },                               /* Application Basic (server): application name */     \
+            { 0x0003, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },        /* Application Basic (server): product id */           \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* Application Basic (server): cluster revision */     \
+            { 0x0005, ZAP_TYPE(CHAR_STRING), 32, 0,                                                                                \
+              ZAP_LONG_DEFAULTS_INDEX(432) },                               /* Application Basic (server): application id */       \
+            { 0x0006, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },        /* Application Basic (server): catalog vendor id */    \
+            { 0x0007, ZAP_TYPE(ENUM8), 1, 0, ZAP_SIMPLE_DEFAULT(0x01) },    /* Application Basic (server): application satus */    \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* Account Login (server): cluster revision */         \
+            { 0x0000, ZAP_TYPE(CHAR_STRING), 32, 0, ZAP_LONG_DEFAULTS_INDEX(464) }, /* Application Basic (server): vendor name */  \
+            { 0x0001, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },                /* Application Basic (server): vendor id */    \
+            { 0x0002, ZAP_TYPE(CHAR_STRING), 32, 0,                                                                                \
+              ZAP_LONG_DEFAULTS_INDEX(496) },                               /* Application Basic (server): application name */     \
+            { 0x0003, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },        /* Application Basic (server): product id */           \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* Application Basic (server): cluster revision */     \
+            { 0x0005, ZAP_TYPE(CHAR_STRING), 32, 0,                                                                                \
+              ZAP_LONG_DEFAULTS_INDEX(528) },                               /* Application Basic (server): application id */       \
+            { 0x0006, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },        /* Application Basic (server): catalog vendor id */    \
+            { 0x0007, ZAP_TYPE(ENUM8), 1, 0, ZAP_SIMPLE_DEFAULT(0x01) },    /* Application Basic (server): application satus */    \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* Content Launch (server): cluster revision */        \
+            { 0x0000, ZAP_TYPE(CHAR_STRING), 32, 0, ZAP_LONG_DEFAULTS_INDEX(560) }, /* Application Basic (server): vendor name */  \
+            { 0x0001, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },                /* Application Basic (server): vendor id */    \
+            { 0x0002, ZAP_TYPE(CHAR_STRING), 32, 0,                                                                                \
+              ZAP_LONG_DEFAULTS_INDEX(592) },                               /* Application Basic (server): application name */     \
+            { 0x0003, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },        /* Application Basic (server): product id */           \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* Application Basic (server): cluster revision */     \
+            { 0x0005, ZAP_TYPE(CHAR_STRING), 32, 0,                                                                                \
+              ZAP_LONG_DEFAULTS_INDEX(624) },                            /* Application Basic (server): application id */          \
+            { 0x0006, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },     /* Application Basic (server): catalog vendor id */       \
+            { 0x0007, ZAP_TYPE(ENUM8), 1, 0, ZAP_SIMPLE_DEFAULT(0x01) }, /* Application Basic (server): application satus */       \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT),                                                             \
+              ZAP_SIMPLE_DEFAULT(2) },                                 /* Identify (client): cluster revision */                   \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(2) }, /* Identify (server): cluster revision */                   \
+            { 0x0000, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(WRITABLE),                                                           \
+              ZAP_SIMPLE_DEFAULT(0x0000) }, /* Identify (server): identify time */                                                 \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT),                                                             \
+              ZAP_SIMPLE_DEFAULT(3) },                                 /* Groups (client): cluster revision */                     \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(3) }, /* Groups (server): cluster revision */                     \
+            { 0x0000, ZAP_TYPE(BITMAP8), 1, 0, ZAP_EMPTY_DEFAULT() },  /* Groups (server): name support */                         \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT),                                                             \
+              ZAP_SIMPLE_DEFAULT(3) },                                      /* Scenes (client): cluster revision */                \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(3) },      /* Scenes (server): cluster revision */                \
+            { 0x0000, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },    /* Scenes (server): scene count */                     \
+            { 0x0001, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },    /* Scenes (server): current scene */                   \
+            { 0x0002, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0000) }, /* Scenes (server): current group */                   \
+            { 0x0003, ZAP_TYPE(BOOLEAN), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },  /* Scenes (server): scene valid */                     \
+            { 0x0004, ZAP_TYPE(BITMAP8), 1, 0, ZAP_EMPTY_DEFAULT() },       /* Scenes (server): name support */                    \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT),                                                             \
+              ZAP_SIMPLE_DEFAULT(2) },                                     /* On/off (client): cluster revision */                 \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(2) },     /* On/off (server): cluster revision */                 \
+            { 0x0000, ZAP_TYPE(BOOLEAN), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) }, /* On/off (server): on/off */                           \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT),                                                             \
+              ZAP_SIMPLE_DEFAULT(3) },                                              /* Level Control (client): cluster revision */ \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(3) },              /* Level Control (server): cluster revision */ \
+            { 0x0000, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },            /* Level Control (server): current level */    \
+            { 0x0000, ZAP_TYPE(OCTET_STRING), 8, 0, ZAP_LONG_DEFAULTS_INDEX(656) }, /* General Commissioning (server): FabricId */ \
             { 0x0001, ZAP_TYPE(INT64U), 8, ZAP_ATTRIBUTE_MASK(WRITABLE),                                                           \
-              ZAP_LONG_DEFAULTS_INDEX(556) },                               /* General Commissioning (server): Breadcrumb */       \
+              ZAP_LONG_DEFAULTS_INDEX(664) },                               /* General Commissioning (server): Breadcrumb */       \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* General Commissioning (server): cluster revision */ \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* Network Commissioning (server): cluster revision */ \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(3) },      /* Door Lock (server): cluster revision */             \
-            { 0x0000, ZAP_TYPE(ENUM8), 1, 0, ZAP_EMPTY_DEFAULT() },         /* Door Lock (server): lock state */                   \
-            { 0x0001, ZAP_TYPE(ENUM8), 1, 0, ZAP_EMPTY_DEFAULT() },         /* Door Lock (server): lock type */                    \
-            { 0x0002, ZAP_TYPE(BOOLEAN), 1, 0, ZAP_EMPTY_DEFAULT() },       /* Door Lock (server): actuator enabled */             \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT),                                                             \
+              ZAP_SIMPLE_DEFAULT(3) },                                 /* Door Lock (client): cluster revision */                  \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(3) }, /* Door Lock (server): cluster revision */                  \
+            { 0x0000, ZAP_TYPE(ENUM8), 1, 0, ZAP_EMPTY_DEFAULT() },    /* Door Lock (server): lock state */                        \
+            { 0x0001, ZAP_TYPE(ENUM8), 1, 0, ZAP_EMPTY_DEFAULT() },    /* Door Lock (server): lock type */                         \
+            { 0x0002, ZAP_TYPE(BOOLEAN), 1, 0, ZAP_EMPTY_DEFAULT() },  /* Door Lock (server): actuator enabled */                  \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT),                                                             \
+              ZAP_SIMPLE_DEFAULT(0x0001) },                                 /* Barrier Control (client): cluster revision */       \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* Barrier Control (server): cluster revision */       \
             { 0x0001, ZAP_TYPE(ENUM8), 1, 0, ZAP_EMPTY_DEFAULT() },         /* Barrier Control (server): barrier moving state */   \
             { 0x0002, ZAP_TYPE(BITMAP16), 2, 0, ZAP_EMPTY_DEFAULT() },      /* Barrier Control (server): barrier safety status */  \
             { 0x0003, ZAP_TYPE(BITMAP8), 1, 0, ZAP_EMPTY_DEFAULT() },       /* Barrier Control (server): barrier capabilities */   \
             { 0x000A, ZAP_TYPE(INT8U), 1, 0, ZAP_EMPTY_DEFAULT() },         /* Barrier Control (server): barrier position */       \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT),                                                             \
+              ZAP_SIMPLE_DEFAULT(3) },                                      /* Color Control (client): cluster revision */         \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(3) },      /* Color Control (server): cluster revision */         \
             { 0x0000, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },    /* Color Control (server): current hue */              \
             { 0x0001, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },    /* Color Control (server): current saturation */       \
@@ -451,7 +579,7 @@
             { 0x0004, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x607D) }, /* Color Control (server): current y */                \
             { 0x0005, ZAP_TYPE(ENUM8), 1, 0, ZAP_EMPTY_DEFAULT() },         /* Color Control (server): drift compensation */       \
             { 0x0006, ZAP_TYPE(CHAR_STRING), 254, 0,                                                                               \
-              ZAP_LONG_DEFAULTS_INDEX(564) },                               /* Color Control (server): compensation text */        \
+              ZAP_LONG_DEFAULTS_INDEX(672) },                               /* Color Control (server): compensation text */        \
             { 0x0007, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x00FA) }, /* Color Control (server): color temperature */        \
             { 0x0008, ZAP_TYPE(ENUM8), 1, 0, ZAP_SIMPLE_DEFAULT(0x01) },    /* Color Control (server): color mode */               \
             { 0x000F, ZAP_TYPE(BITMAP8), 1, ZAP_ATTRIBUTE_MASK(WRITABLE),                                                          \
@@ -520,22 +648,22 @@
             { 0x0001, ZAP_TYPE(ENUM16), 2, 0, ZAP_EMPTY_DEFAULT() },          /* IAS Zone (server): zone type */                   \
             { 0x0002, ZAP_TYPE(BITMAP16), 2, 0, ZAP_SIMPLE_DEFAULT(0x0000) }, /* IAS Zone (server): zone status */                 \
             { 0x0010, ZAP_TYPE(IEEE_ADDRESS), 8, ZAP_ATTRIBUTE_MASK(WRITABLE),                                                     \
-              ZAP_LONG_DEFAULTS_INDEX(818) },                                       /* IAS Zone (server): IAS CIE address */       \
+              ZAP_LONG_DEFAULTS_INDEX(926) },                                       /* IAS Zone (server): IAS CIE address */       \
             { 0x0011, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(0xff) },            /* IAS Zone (server): Zone ID */               \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },         /* Low Power (server): cluster revision */     \
-            { 0x0000, ZAP_TYPE(CHAR_STRING), 32, 0, ZAP_LONG_DEFAULTS_INDEX(826) }, /* Application Basic (server): vendor name */  \
+            { 0x0000, ZAP_TYPE(CHAR_STRING), 32, 0, ZAP_LONG_DEFAULTS_INDEX(934) }, /* Application Basic (server): vendor name */  \
             { 0x0001, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },                /* Application Basic (server): vendor id */    \
             { 0x0002, ZAP_TYPE(CHAR_STRING), 32, 0,                                                                                \
-              ZAP_LONG_DEFAULTS_INDEX(858) },                               /* Application Basic (server): application name */     \
+              ZAP_LONG_DEFAULTS_INDEX(966) },                               /* Application Basic (server): application name */     \
             { 0x0003, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },        /* Application Basic (server): product id */           \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* Application Basic (server): cluster revision */     \
             { 0x0005, ZAP_TYPE(CHAR_STRING), 32, 0,                                                                                \
-              ZAP_LONG_DEFAULTS_INDEX(890) },                                  /* Application Basic (server): application id */    \
-            { 0x0006, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },           /* Application Basic (server): catalog vendor id */ \
-            { 0x0007, ZAP_TYPE(ENUM8), 1, 0, ZAP_SIMPLE_DEFAULT(0x01) },       /* Application Basic (server): application satus */ \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },    /* Binding (server): cluster revision */            \
-            { 0x0000, ZAP_TYPE(ARRAY), 254, 0, ZAP_LONG_DEFAULTS_INDEX(922) }, /* Group Key Management (server): groups */         \
-            { 0x0001, ZAP_TYPE(ARRAY), 254, 0, ZAP_LONG_DEFAULTS_INDEX(1176) }, /* Group Key Management (server): group keys */    \
+              ZAP_LONG_DEFAULTS_INDEX(998) },                               /* Application Basic (server): application id */       \
+            { 0x0006, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },        /* Application Basic (server): catalog vendor id */    \
+            { 0x0007, ZAP_TYPE(ENUM8), 1, 0, ZAP_SIMPLE_DEFAULT(0x01) },    /* Application Basic (server): application satus */    \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* Binding (server): cluster revision */               \
+            { 0x0000, ZAP_TYPE(ARRAY), 254, 0, ZAP_LONG_DEFAULTS_INDEX(1030) }, /* Group Key Management (server): groups */        \
+            { 0x0001, ZAP_TYPE(ARRAY), 254, 0, ZAP_LONG_DEFAULTS_INDEX(1284) }, /* Group Key Management (server): group keys */    \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* Group Key Management (server): cluster revision */  \
     }
 
@@ -544,12 +672,6 @@
 
 // Cluster function static arrays
 #define GENERATED_FUNCTION_ARRAYS                                                                                                  \
-    const EmberAfGenericClusterFunction chipFuncArrayOnOffServer[] = {                                                             \
-        (EmberAfGenericClusterFunction) emberAfOnOffClusterServerInitCallback,                                                     \
-    };                                                                                                                             \
-    const EmberAfGenericClusterFunction chipFuncArrayLevelControlServer[] = {                                                      \
-        (EmberAfGenericClusterFunction) emberAfLevelControlClusterServerInitCallback,                                              \
-    };                                                                                                                             \
     const EmberAfGenericClusterFunction chipFuncArrayIdentifyServer[] = {                                                          \
         (EmberAfGenericClusterFunction) emberAfIdentifyClusterServerInitCallback,                                                  \
         (EmberAfGenericClusterFunction) emberAfIdentifyClusterServerAttributeChangedCallback,                                      \
@@ -560,14 +682,17 @@
     const EmberAfGenericClusterFunction chipFuncArrayScenesServer[] = {                                                            \
         (EmberAfGenericClusterFunction) emberAfScenesClusterServerInitCallback,                                                    \
     };                                                                                                                             \
-    const EmberAfGenericClusterFunction chipFuncArrayBasicServer[] = {                                                             \
-        (EmberAfGenericClusterFunction) emberAfBasicClusterServerInitCallback,                                                     \
+    const EmberAfGenericClusterFunction chipFuncArrayOnOffServer[] = {                                                             \
+        (EmberAfGenericClusterFunction) emberAfOnOffClusterServerInitCallback,                                                     \
     };                                                                                                                             \
-    const EmberAfGenericClusterFunction chipFuncArrayDoorLockServer[] = {                                                          \
-        (EmberAfGenericClusterFunction) emberAfDoorLockClusterServerAttributeChangedCallback,                                      \
+    const EmberAfGenericClusterFunction chipFuncArrayLevelControlServer[] = {                                                      \
+        (EmberAfGenericClusterFunction) emberAfLevelControlClusterServerInitCallback,                                              \
     };                                                                                                                             \
     const EmberAfGenericClusterFunction chipFuncArrayColorControlServer[] = {                                                      \
         (EmberAfGenericClusterFunction) emberAfColorControlClusterServerInitCallback,                                              \
+    };                                                                                                                             \
+    const EmberAfGenericClusterFunction chipFuncArrayDoorLockServer[] = {                                                          \
+        (EmberAfGenericClusterFunction) emberAfDoorLockClusterServerAttributeChangedCallback,                                      \
     };                                                                                                                             \
     const EmberAfGenericClusterFunction chipFuncArrayIasZoneServer[] = {                                                           \
         (EmberAfGenericClusterFunction) emberAfIasZoneClusterServerInitCallback,                                                   \
@@ -576,135 +701,204 @@
     };
 
 #define ZAP_CLUSTER_MASK(mask) CLUSTER_MASK_##mask
-#define GENERATED_CLUSTER_COUNT 29
+#define GENERATED_CLUSTER_COUNT 50
 #define GENERATED_CLUSTERS                                                                                                         \
     {                                                                                                                              \
-        {                                                                                                                          \
-            0x0006,                                                                                                                \
-            ZAP_ATTRIBUTE_INDEX(0),                                                                                                \
-            2,                                                                                                                     \
-            3,                                                                                                                     \
-            ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                            \
-            chipFuncArrayOnOffServer                                                                                               \
-        }, /* Endpoint: 1, Cluster: On/off (server) */                                                                             \
-            {                                                                                                                      \
-                0x0030, ZAP_ATTRIBUTE_INDEX(2), 3, 18, ZAP_CLUSTER_MASK(SERVER), NULL                                              \
-            }, /* Endpoint: 1, Cluster: General Commissioning (server) */                                                          \
-            {                                                                                                                      \
-                0x0506, ZAP_ATTRIBUTE_INDEX(5), 2, 4, ZAP_CLUSTER_MASK(SERVER), NULL                                               \
-            }, /* Endpoint: 1, Cluster: Media Playback (server) */                                                                 \
-            {                                                                                                                      \
-                0x0508, ZAP_ATTRIBUTE_INDEX(7), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                               \
-            }, /* Endpoint: 1, Cluster: Low Power (server) */                                                                      \
-            {                                                                                                                      \
-                0x050A, ZAP_ATTRIBUTE_INDEX(8), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                               \
-            }, /* Endpoint: 1, Cluster: Content Launch (server) */                                                                 \
-            { 0x0006,                                                                                                              \
-              ZAP_ATTRIBUTE_INDEX(9),                                                                                              \
-              2,                                                                                                                   \
-              3,                                                                                                                   \
-              ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
-              chipFuncArrayOnOffServer }, /* Endpoint: 2, Cluster: On/off (server) */                                              \
-            { 0x0008,                                                                                                              \
-              ZAP_ATTRIBUTE_INDEX(11),                                                                                             \
-              2,                                                                                                                   \
-              3,                                                                                                                   \
-              ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
-              chipFuncArrayLevelControlServer }, /* Endpoint: 2, Cluster: Level Control (server) */                                \
-            {                                                                                                                      \
-                0x050A, ZAP_ATTRIBUTE_INDEX(13), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                              \
-            }, /* Endpoint: 3, Cluster: Content Launch (server) */                                                                 \
-            {                                                                                                                      \
-                0x050D, ZAP_ATTRIBUTE_INDEX(14), 8, 105, ZAP_CLUSTER_MASK(SERVER), NULL                                            \
-            }, /* Endpoint: 3, Cluster: Application Basic (server) */                                                              \
-            {                                                                                                                      \
-                0x050D, ZAP_ATTRIBUTE_INDEX(22), 8, 105, ZAP_CLUSTER_MASK(SERVER), NULL                                            \
-            }, /* Endpoint: 4, Cluster: Application Basic (server) */                                                              \
-            {                                                                                                                      \
-                0x050A, ZAP_ATTRIBUTE_INDEX(30), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                              \
-            }, /* Endpoint: 5, Cluster: Content Launch (server) */                                                                 \
-            {                                                                                                                      \
-                0x050D, ZAP_ATTRIBUTE_INDEX(31), 8, 105, ZAP_CLUSTER_MASK(SERVER), NULL                                            \
-            }, /* Endpoint: 5, Cluster: Application Basic (server) */                                                              \
-            { 0x0003,                                                                                                              \
-              ZAP_ATTRIBUTE_INDEX(39),                                                                                             \
-              2,                                                                                                                   \
-              4,                                                                                                                   \
-              ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(ATTRIBUTE_CHANGED_FUNCTION),           \
-              chipFuncArrayIdentifyServer }, /* Endpoint: 6, Cluster: Identify (server) */                                         \
+        { 0x0003,                                                                                                                  \
+          ZAP_ATTRIBUTE_INDEX(0),                                                                                                  \
+          2,                                                                                                                       \
+          4,                                                                                                                       \
+          ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(ATTRIBUTE_CHANGED_FUNCTION),               \
+          chipFuncArrayIdentifyServer }, /* Endpoint: 0, Cluster: Identify (server) */                                             \
             { 0x0004,                                                                                                              \
-              ZAP_ATTRIBUTE_INDEX(41),                                                                                             \
+              ZAP_ATTRIBUTE_INDEX(2),                                                                                              \
               2,                                                                                                                   \
               3,                                                                                                                   \
               ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
-              chipFuncArrayGroupsServer }, /* Endpoint: 6, Cluster: Groups (server) */                                             \
+              chipFuncArrayGroupsServer }, /* Endpoint: 0, Cluster: Groups (server) */                                             \
             { 0x0005,                                                                                                              \
-              ZAP_ATTRIBUTE_INDEX(43),                                                                                             \
+              ZAP_ATTRIBUTE_INDEX(4),                                                                                              \
               6,                                                                                                                   \
               8,                                                                                                                   \
               ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
-              chipFuncArrayScenesServer }, /* Endpoint: 6, Cluster: Scenes (server) */                                             \
+              chipFuncArrayScenesServer }, /* Endpoint: 0, Cluster: Scenes (server) */                                             \
             { 0x0006,                                                                                                              \
-              ZAP_ATTRIBUTE_INDEX(49),                                                                                             \
+              ZAP_ATTRIBUTE_INDEX(10),                                                                                             \
               2,                                                                                                                   \
               3,                                                                                                                   \
               ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
-              chipFuncArrayOnOffServer }, /* Endpoint: 6, Cluster: On/off (server) */                                              \
+              chipFuncArrayOnOffServer }, /* Endpoint: 0, Cluster: On/off (server) */                                              \
             { 0x0008,                                                                                                              \
-              ZAP_ATTRIBUTE_INDEX(51),                                                                                             \
+              ZAP_ATTRIBUTE_INDEX(12),                                                                                             \
               2,                                                                                                                   \
               3,                                                                                                                   \
               ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
-              chipFuncArrayLevelControlServer }, /* Endpoint: 6, Cluster: Level Control (server) */                                \
-            { 0x0028,                                                                                                              \
-              ZAP_ATTRIBUTE_INDEX(53),                                                                                             \
-              12,                                                                                                                  \
-              254,                                                                                                                 \
+              chipFuncArrayLevelControlServer }, /* Endpoint: 0, Cluster: Level Control (server) */                                \
+            {                                                                                                                      \
+                0x0030, ZAP_ATTRIBUTE_INDEX(14), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                              \
+            }, /* Endpoint: 0, Cluster: General Commissioning (server) */                                                          \
+            { 0x0300,                                                                                                              \
+              ZAP_ATTRIBUTE_INDEX(15),                                                                                             \
+              6,                                                                                                                   \
+              11,                                                                                                                  \
               ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
-              chipFuncArrayBasicServer }, /* Endpoint: 6, Cluster: Basic (server) */                                               \
+              chipFuncArrayColorControlServer }, /* Endpoint: 0, Cluster: Color Control (server) */                                \
             {                                                                                                                      \
-                0x0030, ZAP_ATTRIBUTE_INDEX(65), 3, 18, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
-            }, /* Endpoint: 6, Cluster: General Commissioning (server) */                                                          \
+                0x0503, ZAP_ATTRIBUTE_INDEX(21), 2, 34, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
+            }, /* Endpoint: 0, Cluster: Wake on LAN (server) */                                                                    \
             {                                                                                                                      \
-                0x0031, ZAP_ATTRIBUTE_INDEX(68), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                              \
-            }, /* Endpoint: 6, Cluster: Network Commissioning (server) */                                                          \
+                0x0504, ZAP_ATTRIBUTE_INDEX(23), 3, 66, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
+            }, /* Endpoint: 0, Cluster: TV Channel (server) */                                                                     \
+            {                                                                                                                      \
+                0x0505, ZAP_ATTRIBUTE_INDEX(26), 2, 34, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
+            }, /* Endpoint: 0, Cluster: Target Navigator (server) */                                                               \
+            {                                                                                                                      \
+                0x0506, ZAP_ATTRIBUTE_INDEX(28), 8, 57, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
+            }, /* Endpoint: 0, Cluster: Media Playback (server) */                                                                 \
+            {                                                                                                                      \
+                0x0507, ZAP_ATTRIBUTE_INDEX(36), 2, 34, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
+            }, /* Endpoint: 0, Cluster: Media Input (server) */                                                                    \
+            {                                                                                                                      \
+                0x0508, ZAP_ATTRIBUTE_INDEX(38), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                              \
+            }, /* Endpoint: 0, Cluster: Low Power (server) */                                                                      \
+            {                                                                                                                      \
+                0x0509, ZAP_ATTRIBUTE_INDEX(39), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                              \
+            }, /* Endpoint: 0, Cluster: Keypad Input (server) */                                                                   \
+            {                                                                                                                      \
+                0x050A, ZAP_ATTRIBUTE_INDEX(40), 2, 34, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
+            }, /* Endpoint: 0, Cluster: Content Launch (server) */                                                                 \
+            {                                                                                                                      \
+                0x050C, ZAP_ATTRIBUTE_INDEX(42), 4, 36, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
+            }, /* Endpoint: 0, Cluster: Application Launcher (server) */                                                           \
+            { 0x0006,                                                                                                              \
+              ZAP_ATTRIBUTE_INDEX(46),                                                                                             \
+              2,                                                                                                                   \
+              3,                                                                                                                   \
+              ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
+              chipFuncArrayOnOffServer }, /* Endpoint: 1, Cluster: On/off (server) */                                              \
+            { 0x0008,                                                                                                              \
+              ZAP_ATTRIBUTE_INDEX(48),                                                                                             \
+              1,                                                                                                                   \
+              1,                                                                                                                   \
+              ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
+              chipFuncArrayLevelControlServer }, /* Endpoint: 1, Cluster: Level Control (server) */                                \
+            {                                                                                                                      \
+                0x050B, ZAP_ATTRIBUTE_INDEX(49), 2, 34, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
+            }, /* Endpoint: 1, Cluster: Audio Output (server) */                                                                   \
+            {                                                                                                                      \
+                0x0506, ZAP_ATTRIBUTE_INDEX(51), 9, 59, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
+            }, /* Endpoint: 2, Cluster: Media Playback (server) */                                                                 \
+            {                                                                                                                      \
+                0x050A, ZAP_ATTRIBUTE_INDEX(60), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                              \
+            }, /* Endpoint: 2, Cluster: Content Launch (server) */                                                                 \
+            {                                                                                                                      \
+                0x050D, ZAP_ATTRIBUTE_INDEX(61), 8, 105, ZAP_CLUSTER_MASK(SERVER), NULL                                            \
+            }, /* Endpoint: 2, Cluster: Application Basic (server) */                                                              \
+            {                                                                                                                      \
+                0x050E, ZAP_ATTRIBUTE_INDEX(69), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                              \
+            }, /* Endpoint: 2, Cluster: Account Login (server) */                                                                  \
+            {                                                                                                                      \
+                0x050D, ZAP_ATTRIBUTE_INDEX(70), 8, 105, ZAP_CLUSTER_MASK(SERVER), NULL                                            \
+            }, /* Endpoint: 3, Cluster: Application Basic (server) */                                                              \
+            {                                                                                                                      \
+                0x050A, ZAP_ATTRIBUTE_INDEX(78), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                              \
+            }, /* Endpoint: 4, Cluster: Content Launch (server) */                                                                 \
+            {                                                                                                                      \
+                0x050D, ZAP_ATTRIBUTE_INDEX(79), 8, 105, ZAP_CLUSTER_MASK(SERVER), NULL                                            \
+            }, /* Endpoint: 4, Cluster: Application Basic (server) */                                                              \
+            {                                                                                                                      \
+                0x0003, ZAP_ATTRIBUTE_INDEX(87), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+            }, /* Endpoint: 5, Cluster: Identify (client) */                                                                       \
+            { 0x0003,                                                                                                              \
+              ZAP_ATTRIBUTE_INDEX(88),                                                                                             \
+              2,                                                                                                                   \
+              4,                                                                                                                   \
+              ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(ATTRIBUTE_CHANGED_FUNCTION),           \
+              chipFuncArrayIdentifyServer }, /* Endpoint: 5, Cluster: Identify (server) */                                         \
+            { 0x0004, ZAP_ATTRIBUTE_INDEX(90), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL }, /* Endpoint: 5, Cluster: Groups (client) */ \
+            { 0x0004,                                                                                                              \
+              ZAP_ATTRIBUTE_INDEX(91),                                                                                             \
+              2,                                                                                                                   \
+              3,                                                                                                                   \
+              ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
+              chipFuncArrayGroupsServer },                                             /* Endpoint: 5, Cluster: Groups (server) */ \
+            { 0x0005, ZAP_ATTRIBUTE_INDEX(93), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL }, /* Endpoint: 5, Cluster: Scenes (client) */ \
+            { 0x0005,                                                                                                              \
+              ZAP_ATTRIBUTE_INDEX(94),                                                                                             \
+              6,                                                                                                                   \
+              8,                                                                                                                   \
+              ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
+              chipFuncArrayScenesServer }, /* Endpoint: 5, Cluster: Scenes (server) */                                             \
+            {                                                                                                                      \
+                0x0006, ZAP_ATTRIBUTE_INDEX(100), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                             \
+            }, /* Endpoint: 5, Cluster: On/off (client) */                                                                         \
+            { 0x0006,                                                                                                              \
+              ZAP_ATTRIBUTE_INDEX(101),                                                                                            \
+              2,                                                                                                                   \
+              3,                                                                                                                   \
+              ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
+              chipFuncArrayOnOffServer }, /* Endpoint: 5, Cluster: On/off (server) */                                              \
+            {                                                                                                                      \
+                0x0008, ZAP_ATTRIBUTE_INDEX(103), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                             \
+            }, /* Endpoint: 5, Cluster: Level Control (client) */                                                                  \
+            { 0x0008,                                                                                                              \
+              ZAP_ATTRIBUTE_INDEX(104),                                                                                            \
+              2,                                                                                                                   \
+              3,                                                                                                                   \
+              ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
+              chipFuncArrayLevelControlServer }, /* Endpoint: 5, Cluster: Level Control (server) */                                \
+            {                                                                                                                      \
+                0x0030, ZAP_ATTRIBUTE_INDEX(106), 3, 18, ZAP_CLUSTER_MASK(SERVER), NULL                                            \
+            }, /* Endpoint: 5, Cluster: General Commissioning (server) */                                                          \
+            {                                                                                                                      \
+                0x0031, ZAP_ATTRIBUTE_INDEX(109), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
+            }, /* Endpoint: 5, Cluster: Network Commissioning (server) */                                                          \
+            {                                                                                                                      \
+                0x0101, ZAP_ATTRIBUTE_INDEX(110), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                             \
+            }, /* Endpoint: 5, Cluster: Door Lock (client) */                                                                      \
             { 0x0101,                                                                                                              \
-              ZAP_ATTRIBUTE_INDEX(69),                                                                                             \
+              ZAP_ATTRIBUTE_INDEX(111),                                                                                            \
               4,                                                                                                                   \
               5,                                                                                                                   \
               ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(ATTRIBUTE_CHANGED_FUNCTION),                                             \
-              chipFuncArrayDoorLockServer }, /* Endpoint: 6, Cluster: Door Lock (server) */                                        \
+              chipFuncArrayDoorLockServer }, /* Endpoint: 5, Cluster: Door Lock (server) */                                        \
             {                                                                                                                      \
-                0x0103, ZAP_ATTRIBUTE_INDEX(73), 5, 7, ZAP_CLUSTER_MASK(SERVER), NULL                                              \
-            }, /* Endpoint: 6, Cluster: Barrier Control (server) */                                                                \
+                0x0103, ZAP_ATTRIBUTE_INDEX(115), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                             \
+            }, /* Endpoint: 5, Cluster: Barrier Control (client) */                                                                \
+            {                                                                                                                      \
+                0x0103, ZAP_ATTRIBUTE_INDEX(116), 5, 7, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
+            }, /* Endpoint: 5, Cluster: Barrier Control (server) */                                                                \
+            {                                                                                                                      \
+                0x0300, ZAP_ATTRIBUTE_INDEX(121), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                             \
+            }, /* Endpoint: 5, Cluster: Color Control (client) */                                                                  \
             { 0x0300,                                                                                                              \
-              ZAP_ATTRIBUTE_INDEX(78),                                                                                             \
+              ZAP_ATTRIBUTE_INDEX(122),                                                                                            \
               51,                                                                                                                  \
               336,                                                                                                                 \
               ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
-              chipFuncArrayColorControlServer }, /* Endpoint: 6, Cluster: Color Control (server) */                                \
+              chipFuncArrayColorControlServer }, /* Endpoint: 5, Cluster: Color Control (server) */                                \
             {                                                                                                                      \
-                0x0402, ZAP_ATTRIBUTE_INDEX(129), 4, 8, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
-            }, /* Endpoint: 6, Cluster: Temperature Measurement (server) */                                                        \
+                0x0402, ZAP_ATTRIBUTE_INDEX(173), 4, 8, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
+            }, /* Endpoint: 5, Cluster: Temperature Measurement (server) */                                                        \
             { 0x0500,                                                                                                              \
-              ZAP_ATTRIBUTE_INDEX(133),                                                                                            \
+              ZAP_ATTRIBUTE_INDEX(177),                                                                                            \
               6,                                                                                                                   \
               16,                                                                                                                  \
               ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(PRE_ATTRIBUTE_CHANGED_FUNCTION) |      \
                   ZAP_CLUSTER_MASK(MESSAGE_SENT_FUNCTION),                                                                         \
-              chipFuncArrayIasZoneServer }, /* Endpoint: 6, Cluster: IAS Zone (server) */                                          \
+              chipFuncArrayIasZoneServer }, /* Endpoint: 5, Cluster: IAS Zone (server) */                                          \
             {                                                                                                                      \
-                0x0508, ZAP_ATTRIBUTE_INDEX(139), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
-            }, /* Endpoint: 6, Cluster: Low Power (server) */                                                                      \
+                0x0508, ZAP_ATTRIBUTE_INDEX(183), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
+            }, /* Endpoint: 5, Cluster: Low Power (server) */                                                                      \
             {                                                                                                                      \
-                0x050D, ZAP_ATTRIBUTE_INDEX(140), 8, 105, ZAP_CLUSTER_MASK(SERVER), NULL                                           \
-            }, /* Endpoint: 6, Cluster: Application Basic (server) */                                                              \
+                0x050D, ZAP_ATTRIBUTE_INDEX(184), 8, 105, ZAP_CLUSTER_MASK(SERVER), NULL                                           \
+            }, /* Endpoint: 5, Cluster: Application Basic (server) */                                                              \
             {                                                                                                                      \
-                0xF000, ZAP_ATTRIBUTE_INDEX(148), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
-            }, /* Endpoint: 6, Cluster: Binding (server) */                                                                        \
+                0xF000, ZAP_ATTRIBUTE_INDEX(192), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
+            }, /* Endpoint: 5, Cluster: Binding (server) */                                                                        \
             {                                                                                                                      \
-                0xF004, ZAP_ATTRIBUTE_INDEX(149), 3, 510, ZAP_CLUSTER_MASK(SERVER), NULL                                           \
-            }, /* Endpoint: 6, Cluster: Group Key Management (server) */                                                           \
+                0xF004, ZAP_ATTRIBUTE_INDEX(193), 3, 510, ZAP_CLUSTER_MASK(SERVER), NULL                                           \
+            }, /* Endpoint: 5, Cluster: Group Key Management (server) */                                                           \
     }
 
 #define ZAP_CLUSTER_INDEX(index) ((EmberAfCluster *) (&generatedClusters[index]))
@@ -712,18 +906,18 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 5, 29 }, { ZAP_CLUSTER_INDEX(5), 2, 6 }, { ZAP_CLUSTER_INDEX(7), 2, 107 },                         \
-            { ZAP_CLUSTER_INDEX(9), 1, 105 }, { ZAP_CLUSTER_INDEX(10), 2, 107 }, { ZAP_CLUSTER_INDEX(12), 17, 1286 },              \
+        { ZAP_CLUSTER_INDEX(0), 16, 333 }, { ZAP_CLUSTER_INDEX(16), 3, 38 }, { ZAP_CLUSTER_INDEX(19), 4, 168 },                    \
+            { ZAP_CLUSTER_INDEX(23), 1, 105 }, { ZAP_CLUSTER_INDEX(24), 2, 107 }, { ZAP_CLUSTER_INDEX(26), 24, 1048 },             \
     }
 
 // Largest attribute size is needed for various buffers
 #define ATTRIBUTE_LARGEST (255)
 
 // Total size of singleton attributes
-#define ATTRIBUTE_SINGLETONS_SIZE (254)
+#define ATTRIBUTE_SINGLETONS_SIZE (0)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (1640)
+#define ATTRIBUTE_MAX_SIZE (1799)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (6)
@@ -732,7 +926,7 @@
 // the array is the endpoint number.
 #define FIXED_ENDPOINT_ARRAY                                                                                                       \
     {                                                                                                                              \
-        0x0001, 0x0002, 0x0003, 0x0004, 0x0005, 0x0006                                                                             \
+        0x0000, 0x0001, 0x0002, 0x0003, 0x0004, 0x0005                                                                             \
     }
 
 // Array of profile ids
@@ -767,65 +961,131 @@
 
 // Array of EmberAfCommandMetadata structs.
 #define ZAP_COMMAND_MASK(mask) COMMAND_MASK_##mask
-#define EMBER_AF_GENERATED_COMMAND_COUNT (145)
+#define EMBER_AF_GENERATED_COMMAND_COUNT (308)
 #define GENERATED_COMMANDS                                                                                                         \
     {                                                                                                                              \
-        { 0x0003, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) },     /* Identify (server): Identify */                                 \
+        { 0x0003, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) },     /* Identify (client): Identify */                                 \
+            { 0x0003, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Identify (client): IdentifyQueryResponse */                    \
+            { 0x0003, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Identify (server): Identify */                                 \
+            { 0x0003, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Identify (server): Identify */                                 \
             { 0x0003, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Identify (server): IdentifyQueryResponse */                    \
+            { 0x0003, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Identify (server): IdentifyQueryResponse */                    \
+            { 0x0003, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Identify (client): IdentifyQuery */                            \
             { 0x0003, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Identify (server): IdentifyQuery */                            \
+            { 0x0003, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Identify (server): IdentifyQuery */                            \
+            { 0x0004, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Groups (client): AddGroup */                                   \
+            { 0x0004, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Groups (client): AddGroupResponse */                           \
+            { 0x0004, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Groups (server): AddGroup */                                   \
             { 0x0004, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Groups (server): AddGroup */                                   \
             { 0x0004, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Groups (server): AddGroupResponse */                           \
+            { 0x0004, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Groups (server): AddGroupResponse */                           \
+            { 0x0004, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Groups (client): ViewGroup */                                  \
+            { 0x0004, 0x01, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Groups (client): ViewGroupResponse */                          \
+            { 0x0004, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Groups (server): ViewGroup */                                  \
             { 0x0004, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Groups (server): ViewGroup */                                  \
             { 0x0004, 0x01, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Groups (server): ViewGroupResponse */                          \
+            { 0x0004, 0x01, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Groups (server): ViewGroupResponse */                          \
+            { 0x0004, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Groups (client): GetGroupMembership */                         \
+            { 0x0004, 0x02, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Groups (client): GetGroupMembershipResponse */                 \
+            { 0x0004, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Groups (server): GetGroupMembership */                         \
             { 0x0004, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Groups (server): GetGroupMembership */                         \
             { 0x0004, 0x02, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Groups (server): GetGroupMembershipResponse */                 \
+            { 0x0004, 0x02, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Groups (server): GetGroupMembershipResponse */                 \
+            { 0x0004, 0x03, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Groups (client): RemoveGroup */                                \
+            { 0x0004, 0x03, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Groups (client): RemoveGroupResponse */                        \
+            { 0x0004, 0x03, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Groups (server): RemoveGroup */                                \
             { 0x0004, 0x03, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Groups (server): RemoveGroup */                                \
             { 0x0004, 0x03, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Groups (server): RemoveGroupResponse */                        \
+            { 0x0004, 0x03, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Groups (server): RemoveGroupResponse */                        \
+            { 0x0004, 0x04, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Groups (client): RemoveAllGroups */                            \
             { 0x0004, 0x04, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Groups (server): RemoveAllGroups */                            \
+            { 0x0004, 0x04, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Groups (server): RemoveAllGroups */                            \
+            { 0x0004, 0x05, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Groups (client): AddGroupIfIdentifying */                      \
             { 0x0004, 0x05, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Groups (server): AddGroupIfIdentifying */                      \
+            { 0x0004, 0x05, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Groups (server): AddGroupIfIdentifying */                      \
+            { 0x0005, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Scenes (client): AddScene */                                   \
+            { 0x0005, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Scenes (client): AddSceneResponse */                           \
+            { 0x0005, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Scenes (server): AddScene */                                   \
             { 0x0005, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Scenes (server): AddScene */                                   \
             { 0x0005, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Scenes (server): AddSceneResponse */                           \
+            { 0x0005, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Scenes (server): AddSceneResponse */                           \
+            { 0x0005, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Scenes (client): ViewScene */                                  \
+            { 0x0005, 0x01, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Scenes (client): ViewSceneResponse */                          \
+            { 0x0005, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Scenes (server): ViewScene */                                  \
             { 0x0005, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Scenes (server): ViewScene */                                  \
             { 0x0005, 0x01, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Scenes (server): ViewSceneResponse */                          \
+            { 0x0005, 0x01, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Scenes (server): ViewSceneResponse */                          \
+            { 0x0005, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Scenes (client): RemoveScene */                                \
+            { 0x0005, 0x02, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Scenes (client): RemoveSceneResponse */                        \
+            { 0x0005, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Scenes (server): RemoveScene */                                \
             { 0x0005, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Scenes (server): RemoveScene */                                \
             { 0x0005, 0x02, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Scenes (server): RemoveSceneResponse */                        \
+            { 0x0005, 0x02, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Scenes (server): RemoveSceneResponse */                        \
+            { 0x0005, 0x03, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Scenes (client): RemoveAllScenes */                            \
+            { 0x0005, 0x03, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Scenes (client): RemoveAllScenesResponse */                    \
+            { 0x0005, 0x03, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Scenes (server): RemoveAllScenes */                            \
             { 0x0005, 0x03, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Scenes (server): RemoveAllScenes */                            \
             { 0x0005, 0x03, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Scenes (server): RemoveAllScenesResponse */                    \
+            { 0x0005, 0x03, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Scenes (server): RemoveAllScenesResponse */                    \
+            { 0x0005, 0x04, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Scenes (client): StoreScene */                                 \
+            { 0x0005, 0x04, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Scenes (client): StoreSceneResponse */                         \
+            { 0x0005, 0x04, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Scenes (server): StoreScene */                                 \
             { 0x0005, 0x04, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Scenes (server): StoreScene */                                 \
             { 0x0005, 0x04, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Scenes (server): StoreSceneResponse */                         \
+            { 0x0005, 0x04, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Scenes (server): StoreSceneResponse */                         \
+            { 0x0005, 0x05, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Scenes (client): RecallScene */                                \
             { 0x0005, 0x05, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Scenes (server): RecallScene */                                \
+            { 0x0005, 0x05, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Scenes (server): RecallScene */                                \
+            { 0x0005, 0x06, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Scenes (client): GetSceneMembership */                         \
+            { 0x0005, 0x06, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Scenes (client): GetSceneMembershipResponse */                 \
+            { 0x0005, 0x06, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Scenes (server): GetSceneMembership */                         \
             { 0x0005, 0x06, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Scenes (server): GetSceneMembership */                         \
             { 0x0005, 0x06, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Scenes (server): GetSceneMembershipResponse */                 \
+            { 0x0005, 0x06, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Scenes (server): GetSceneMembershipResponse */                 \
+            { 0x0006, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* On/off (client): Off */                                        \
             { 0x0006, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* On/off (server): Off */                                        \
             { 0x0006, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* On/off (server): Off */                                        \
             { 0x0006, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* On/off (server): Off */                                        \
+            { 0x0006, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* On/off (client): On */                                         \
             { 0x0006, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* On/off (server): On */                                         \
             { 0x0006, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* On/off (server): On */                                         \
             { 0x0006, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* On/off (server): On */                                         \
+            { 0x0006, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* On/off (client): Toggle */                                     \
             { 0x0006, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* On/off (server): Toggle */                                     \
             { 0x0006, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* On/off (server): Toggle */                                     \
             { 0x0006, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* On/off (server): Toggle */                                     \
+            { 0x0008, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Level Control (client): MoveToLevel */                         \
             { 0x0008, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Level Control (server): MoveToLevel */                         \
             { 0x0008, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Level Control (server): MoveToLevel */                         \
+            { 0x0008, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Level Control (server): MoveToLevel */                         \
+            { 0x0008, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Level Control (client): Move */                                \
             { 0x0008, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Level Control (server): Move */                                \
             { 0x0008, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Level Control (server): Move */                                \
+            { 0x0008, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Level Control (server): Move */                                \
+            { 0x0008, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Level Control (client): Step */                                \
             { 0x0008, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Level Control (server): Step */                                \
             { 0x0008, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Level Control (server): Step */                                \
+            { 0x0008, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Level Control (server): Step */                                \
+            { 0x0008, 0x03, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Level Control (client): Stop */                                \
             { 0x0008, 0x03, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Level Control (server): Stop */                                \
             { 0x0008, 0x03, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Level Control (server): Stop */                                \
+            { 0x0008, 0x03, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Level Control (server): Stop */                                \
+            { 0x0008, 0x04, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Level Control (client): MoveToLevelWithOnOff */                \
             { 0x0008, 0x04, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Level Control (server): MoveToLevelWithOnOff */                \
             { 0x0008, 0x04, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Level Control (server): MoveToLevelWithOnOff */                \
+            { 0x0008, 0x04, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Level Control (server): MoveToLevelWithOnOff */                \
+            { 0x0008, 0x05, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Level Control (client): MoveWithOnOff */                       \
             { 0x0008, 0x05, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Level Control (server): MoveWithOnOff */                       \
             { 0x0008, 0x05, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Level Control (server): MoveWithOnOff */                       \
+            { 0x0008, 0x05, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Level Control (server): MoveWithOnOff */                       \
+            { 0x0008, 0x06, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Level Control (client): StepWithOnOff */                       \
             { 0x0008, 0x06, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Level Control (server): StepWithOnOff */                       \
             { 0x0008, 0x06, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Level Control (server): StepWithOnOff */                       \
+            { 0x0008, 0x06, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Level Control (server): StepWithOnOff */                       \
+            { 0x0008, 0x07, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Level Control (client): StopWithOnOff */                       \
             { 0x0008, 0x07, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Level Control (server): StopWithOnOff */                       \
             { 0x0008, 0x07, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Level Control (server): StopWithOnOff */                       \
-            { 0x0028, 0x00,                                                                                                        \
-              ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER) }, /* Basic (server): MfgSpecificPing */       \
-            { 0x0028, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) },                       /* Basic (server): StartUp */               \
-            { 0x0028, 0x01, ZAP_COMMAND_MASK(INCOMING_CLIENT) },                       /* Basic (server): ShutDown */              \
-            { 0x0028, 0x02, ZAP_COMMAND_MASK(INCOMING_CLIENT) },                       /* Basic (server): Leave */                 \
+            { 0x0008, 0x07, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Level Control (server): StopWithOnOff */                       \
             { 0x0030, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* General Commissioning (server): ArmFailSafe */                 \
             { 0x0030, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* General Commissioning (server): ArmFailSafe */                 \
             { 0x0030, 0x01, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* General Commissioning (server): ArmFailSafeResponse */         \
@@ -851,111 +1111,248 @@
             { 0x0031, 0x0F, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Network Commissioning (server): DisableNetworkResponse */      \
             { 0x0031, 0x10,                                                                                                        \
               ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Network Commissioning (server): GetLastNetworkCommissioningResult */         \
+            { 0x0101, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Door Lock (client): LockDoor */                                \
+            { 0x0101, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Door Lock (client): LockDoorResponse */                        \
             { 0x0101, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Door Lock (server): LockDoor */                                \
             { 0x0101, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Door Lock (server): LockDoorResponse */                        \
+            { 0x0101, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Door Lock (client): UnlockDoor */                              \
+            { 0x0101, 0x01, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Door Lock (client): UnlockDoorResponse */                      \
             { 0x0101, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Door Lock (server): UnlockDoor */                              \
             { 0x0101, 0x01, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Door Lock (server): UnlockDoorResponse */                      \
             { 0x0101, 0x03,                                                                                                        \
+              ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT) }, /* Door Lock (client): UnlockWithTimeout */ \
+            { 0x0101, 0x03,                                                                                                        \
               ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER) }, /* Door Lock (server): UnlockWithTimeout */ \
+            { 0x0101, 0x04,                                                                                                        \
+              ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT) }, /* Door Lock (client): GetLogRecord */      \
             { 0x0101, 0x04,                                                                                                        \
               ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER) }, /* Door Lock (server): GetLogRecord */      \
             { 0x0101, 0x05,                                                                                                        \
+              ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT) }, /* Door Lock (client): SetPin */            \
+            { 0x0101, 0x05,                                                                                                        \
               ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER) }, /* Door Lock (server): SetPin */            \
+            { 0x0101, 0x06,                                                                                                        \
+              ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT) }, /* Door Lock (client): GetPin */            \
             { 0x0101, 0x06,                                                                                                        \
               ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER) }, /* Door Lock (server): GetPin */            \
             { 0x0101, 0x07,                                                                                                        \
+              ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT) }, /* Door Lock (client): ClearPin */          \
+            { 0x0101, 0x07,                                                                                                        \
               ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER) }, /* Door Lock (server): ClearPin */          \
             { 0x0101, 0x08,                                                                                                        \
+              ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT) }, /* Door Lock (client): ClearAllPins */      \
+            { 0x0101, 0x08,                                                                                                        \
               ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER) }, /* Door Lock (server): ClearAllPins */      \
+            {                                                                                                                      \
+                0x0101, 0x0B, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
+            }, /* Door Lock (client): SetWeekdaySchedule */                                                                        \
             {                                                                                                                      \
                 0x0101, 0x0B, ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER)                                \
             }, /* Door Lock (server): SetWeekdaySchedule */                                                                        \
             {                                                                                                                      \
+                0x0101, 0x0C, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
+            }, /* Door Lock (client): GetWeekdaySchedule */                                                                        \
+            {                                                                                                                      \
                 0x0101, 0x0C, ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER)                                \
             }, /* Door Lock (server): GetWeekdaySchedule */                                                                        \
+            {                                                                                                                      \
+                0x0101, 0x0D, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
+            }, /* Door Lock (client): ClearWeekdaySchedule */                                                                      \
             {                                                                                                                      \
                 0x0101, 0x0D, ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER)                                \
             }, /* Door Lock (server): ClearWeekdaySchedule */                                                                      \
             {                                                                                                                      \
+                0x0101, 0x0E, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
+            }, /* Door Lock (client): SetYeardaySchedule */                                                                        \
+            {                                                                                                                      \
                 0x0101, 0x0E, ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER)                                \
             }, /* Door Lock (server): SetYeardaySchedule */                                                                        \
+            {                                                                                                                      \
+                0x0101, 0x0F, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
+            }, /* Door Lock (client): GetYeardaySchedule */                                                                        \
             {                                                                                                                      \
                 0x0101, 0x0F, ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER)                                \
             }, /* Door Lock (server): GetYeardaySchedule */                                                                        \
             {                                                                                                                      \
+                0x0101, 0x10, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
+            }, /* Door Lock (client): ClearYeardaySchedule */                                                                      \
+            {                                                                                                                      \
                 0x0101, 0x10, ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER)                                \
             }, /* Door Lock (server): ClearYeardaySchedule */                                                                      \
+            {                                                                                                                      \
+                0x0101, 0x11, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
+            }, /* Door Lock (client): SetHolidaySchedule */                                                                        \
             {                                                                                                                      \
                 0x0101, 0x11, ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER)                                \
             }, /* Door Lock (server): SetHolidaySchedule */                                                                        \
             {                                                                                                                      \
+                0x0101, 0x12, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
+            }, /* Door Lock (client): GetHolidaySchedule */                                                                        \
+            {                                                                                                                      \
                 0x0101, 0x12, ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER)                                \
             }, /* Door Lock (server): GetHolidaySchedule */                                                                        \
+            {                                                                                                                      \
+                0x0101, 0x13, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
+            }, /* Door Lock (client): ClearHolidaySchedule */                                                                      \
             {                                                                                                                      \
                 0x0101, 0x13, ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER)                                \
             }, /* Door Lock (server): ClearHolidaySchedule */                                                                      \
             { 0x0101, 0x14,                                                                                                        \
+              ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT) }, /* Door Lock (client): SetUserType */       \
+            { 0x0101, 0x14,                                                                                                        \
               ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER) }, /* Door Lock (server): SetUserType */       \
+            { 0x0101, 0x15,                                                                                                        \
+              ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT) }, /* Door Lock (client): GetUserType */       \
             { 0x0101, 0x15,                                                                                                        \
               ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER) }, /* Door Lock (server): GetUserType */       \
             { 0x0101, 0x16,                                                                                                        \
+              ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT) }, /* Door Lock (client): SetRfid */           \
+            { 0x0101, 0x16,                                                                                                        \
               ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER) }, /* Door Lock (server): SetRfid */           \
+            { 0x0101, 0x17,                                                                                                        \
+              ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT) }, /* Door Lock (client): GetRfid */           \
             { 0x0101, 0x17,                                                                                                        \
               ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER) }, /* Door Lock (server): GetRfid */           \
             { 0x0101, 0x18,                                                                                                        \
+              ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT) }, /* Door Lock (client): ClearRfid */         \
+            { 0x0101, 0x18,                                                                                                        \
               ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER) }, /* Door Lock (server): ClearRfid */         \
             { 0x0101, 0x19,                                                                                                        \
+              ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT) }, /* Door Lock (client): ClearAllRfids */     \
+            { 0x0101, 0x19,                                                                                                        \
               ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER) }, /* Door Lock (server): ClearAllRfids */     \
+            { 0x0103, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Barrier Control (client): BarrierControlGoToPercent */         \
             { 0x0103, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Barrier Control (server): BarrierControlGoToPercent */         \
+            { 0x0103, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Barrier Control (client): BarrierControlStop */                \
             { 0x0103, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Barrier Control (server): BarrierControlStop */                \
+            { 0x0300, 0x00,                                                                                                        \
+              ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT) }, /* Color Control (client): MoveToHue */     \
             { 0x0300, 0x00,                                                                                                        \
               ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER) }, /* Color Control (server): MoveToHue */     \
             { 0x0300, 0x01,                                                                                                        \
+              ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT) }, /* Color Control (client): MoveHue */       \
+            { 0x0300, 0x01,                                                                                                        \
               ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER) }, /* Color Control (server): MoveHue */       \
             { 0x0300, 0x02,                                                                                                        \
+              ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT) }, /* Color Control (client): StepHue */       \
+            { 0x0300, 0x02,                                                                                                        \
               ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER) }, /* Color Control (server): StepHue */       \
+            {                                                                                                                      \
+                0x0300, 0x03, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
+            }, /* Color Control (client): MoveToSaturation */                                                                      \
             {                                                                                                                      \
                 0x0300, 0x03, ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER)                                \
             }, /* Color Control (server): MoveToSaturation */                                                                      \
             {                                                                                                                      \
+                0x0300, 0x04, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
+            }, /* Color Control (client): MoveSaturation */                                                                        \
+            {                                                                                                                      \
                 0x0300, 0x04, ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER)                                \
             }, /* Color Control (server): MoveSaturation */                                                                        \
+            {                                                                                                                      \
+                0x0300, 0x05, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
+            }, /* Color Control (client): StepSaturation */                                                                        \
             {                                                                                                                      \
                 0x0300, 0x05, ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER)                                \
             }, /* Color Control (server): StepSaturation */                                                                        \
             {                                                                                                                      \
+                0x0300, 0x06, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
+            }, /* Color Control (client): MoveToHueAndSaturation */                                                                \
+            {                                                                                                                      \
                 0x0300, 0x06, ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER)                                \
             },                                                   /* Color Control (server): MoveToHueAndSaturation */              \
+            { 0x0300, 0x07, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Color Control (client): MoveToColor */                         \
             { 0x0300, 0x07, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Color Control (server): MoveToColor */                         \
+            { 0x0300, 0x07, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Color Control (server): MoveToColor */                         \
+            { 0x0300, 0x08, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Color Control (client): MoveColor */                           \
             { 0x0300, 0x08, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Color Control (server): MoveColor */                           \
+            { 0x0300, 0x08, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Color Control (server): MoveColor */                           \
+            { 0x0300, 0x09, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Color Control (client): StepColor */                           \
             { 0x0300, 0x09, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Color Control (server): StepColor */                           \
+            { 0x0300, 0x09, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Color Control (server): StepColor */                           \
+            {                                                                                                                      \
+                0x0300, 0x0A, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
+            }, /* Color Control (client): MoveToColorTemperature */                                                                \
             {                                                                                                                      \
                 0x0300, 0x0A, ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER)                                \
             }, /* Color Control (server): MoveToColorTemperature */                                                                \
             { 0x0300, 0x47,                                                                                                        \
+              ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT) }, /* Color Control (client): StopMoveStep */  \
+            { 0x0300, 0x47,                                                                                                        \
               ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER) }, /* Color Control (server): StopMoveStep */  \
+            {                                                                                                                      \
+                0x0300, 0x4B, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
+            }, /* Color Control (client): MoveColorTemperature */                                                                  \
             {                                                                                                                      \
                 0x0300, 0x4B, ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER)                                \
             }, /* Color Control (server): MoveColorTemperature */                                                                  \
+            {                                                                                                                      \
+                0x0300, 0x4C, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
+            }, /* Color Control (client): StepColorTemperature */                                                                  \
             {                                                                                                                      \
                 0x0300, 0x4C, ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER)                                \
             },                                                   /* Color Control (server): StepColorTemperature */                \
             { 0x0500, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* IAS Zone (server): ZoneEnrollResponse */                       \
             { 0x0500, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* IAS Zone (server): ZoneStatusChangeNotification */             \
             { 0x0500, 0x01, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* IAS Zone (server): ZoneEnrollRequest */                        \
-            { 0x0506, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (server): PlayRequest */                        \
-            { 0x0506, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Media Playback (server): Playback */                           \
-            { 0x0506, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (server): PauseRequest */                       \
-            { 0x0506, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (server): StopRequest */                        \
-            { 0x0506, 0x03, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (server): StartOverRequest */                   \
-            { 0x0506, 0x04, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (server): PreviousRequest */                    \
-            { 0x0506, 0x05, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (server): NextRequest */                        \
-            { 0x0506, 0x06, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (server): RewindRequest */                      \
-            { 0x0506, 0x07, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (server): FastForwardRequest */                 \
-            { 0x0506, 0x08, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (server): SkipForwardRequest */                 \
-            { 0x0506, 0x09, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (server): SkipBackwardRequest */                \
+            { 0x0504, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* TV Channel (server): ChangeChannel */                          \
+            { 0x0504, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* TV Channel (server): ChangeChannelResponse */                  \
+            { 0x0504, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* TV Channel (server): ChangeChannelByNumber */                  \
+            { 0x0504, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* TV Channel (server): SkipChannel */                            \
+            { 0x0505, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Target Navigator (server): NavigateTarget */                   \
+            { 0x0505, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Target Navigator (server): NavigateTargetResponse */           \
+            { 0x0506, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (server): MediaPlay */                          \
+            { 0x0506, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (server): MediaPlay */                          \
+            { 0x0506, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Media Playback (server): MediaPlayResponse */                  \
+            { 0x0506, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Media Playback (server): MediaPlayResponse */                  \
+            { 0x0506, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (server): MediaPause */                         \
+            { 0x0506, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (server): MediaPause */                         \
+            { 0x0506, 0x01, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Media Playback (server): MediaPauseResponse */                 \
+            { 0x0506, 0x01, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Media Playback (server): MediaPauseResponse */                 \
+            { 0x0506, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (server): MediaStop */                          \
+            { 0x0506, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (server): MediaStop */                          \
+            { 0x0506, 0x02, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Media Playback (server): MediaStopResponse */                  \
+            { 0x0506, 0x02, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Media Playback (server): MediaStopResponse */                  \
+            { 0x0506, 0x03, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (server): MediaStartOver */                     \
+            { 0x0506, 0x03, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (server): MediaStartOver */                     \
+            { 0x0506, 0x03, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Media Playback (server): MediaStartOverResponse */             \
+            { 0x0506, 0x03, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Media Playback (server): MediaStartOverResponse */             \
+            { 0x0506, 0x04, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (server): MediaPrevious */                      \
+            { 0x0506, 0x04, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (server): MediaPrevious */                      \
+            { 0x0506, 0x04, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Media Playback (server): MediaPreviousResponse */              \
+            { 0x0506, 0x04, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Media Playback (server): MediaPreviousResponse */              \
+            { 0x0506, 0x05, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (server): MediaNext */                          \
+            { 0x0506, 0x05, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (server): MediaNext */                          \
+            { 0x0506, 0x05, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Media Playback (server): MediaNextResponse */                  \
+            { 0x0506, 0x05, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Media Playback (server): MediaNextResponse */                  \
+            { 0x0506, 0x06, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (server): MediaRewind */                        \
+            { 0x0506, 0x06, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (server): MediaRewind */                        \
+            { 0x0506, 0x06, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Media Playback (server): MediaRewindResponse */                \
+            { 0x0506, 0x06, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Media Playback (server): MediaRewindResponse */                \
+            { 0x0506, 0x07, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (server): MediaFastForward */                   \
+            { 0x0506, 0x07, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (server): MediaFastForward */                   \
+            { 0x0506, 0x07, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Media Playback (server): MediaFastForwardResponse */           \
+            { 0x0506, 0x07, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Media Playback (server): MediaFastForwardResponse */           \
+            { 0x0506, 0x08, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (server): MediaSkipForward */                   \
+            { 0x0506, 0x08, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (server): MediaSkipForward */                   \
+            { 0x0506, 0x08, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Media Playback (server): MediaSkipForwardResponse */           \
+            { 0x0506, 0x08, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Media Playback (server): MediaSkipForwardResponse */           \
+            { 0x0506, 0x09, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (server): MediaSkipBackward */                  \
+            { 0x0506, 0x09, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (server): MediaSkipBackward */                  \
+            { 0x0506, 0x09, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Media Playback (server): MediaSkipBackwardResponse */          \
+            { 0x0506, 0x09, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Media Playback (server): MediaSkipBackwardResponse */          \
+            { 0x0506, 0x0A, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (server): MediaSkipSeek */                      \
+            { 0x0506, 0x0A, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Playback (server): MediaSkipSeek */                      \
+            { 0x0506, 0x0A, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Media Playback (server): MediaSkipSeekResponse */              \
+            { 0x0506, 0x0A, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Media Playback (server): MediaSkipSeekResponse */              \
+            { 0x0507, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Input (server): SelectInput */                           \
+            { 0x0507, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Input (server): ShowInputStatus */                       \
+            { 0x0507, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Input (server): HideInputStatus */                       \
+            { 0x0507, 0x03, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Media Input (server): RenameInput */                           \
             { 0x0508, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Low Power (server): Sleep */                                   \
             { 0x0508, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Low Power (server): Sleep */                                   \
+            { 0x0509, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Keypad Input (server): SendKey */                              \
+            { 0x0509, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Keypad Input (server): SendKeyResponse */                      \
             { 0x050A, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Content Launch (server): LaunchContent */                      \
             { 0x050A, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Content Launch (server): LaunchContent */                      \
             { 0x050A, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Content Launch (server): LaunchContent */                      \
@@ -968,15 +1365,24 @@
             { 0x050A, 0x01, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Content Launch (server): LaunchURLResponse */                  \
             { 0x050A, 0x01, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Content Launch (server): LaunchURLResponse */                  \
             { 0x050A, 0x01, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Content Launch (server): LaunchURLResponse */                  \
+            { 0x050B, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Audio Output (server): SelectOutput */                         \
+            { 0x050B, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Audio Output (server): RenameOutput */                         \
+            { 0x050C, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Application Launcher (server): LaunchApp */                    \
+            { 0x050C, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Application Launcher (server): LaunchAppResponse */            \
+            { 0x050E, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Account Login (server): GetSetupPIN */                         \
+            { 0x050E, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Account Login (server): GetSetupPINResponse */                 \
+            { 0x050E, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Account Login (server): Login */                               \
             { 0xF000, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Binding (server): Bind */                                      \
             { 0xF000, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Binding (server): Unbind */                                    \
     }
 
 // Array of EmberAfManufacturerCodeEntry structures for commands.
-#define GENERATED_COMMAND_MANUFACTURER_CODE_COUNT (1)
+#define GENERATED_COMMAND_MANUFACTURER_CODE_COUNT (0)
 #define GENERATED_COMMAND_MANUFACTURER_CODES                                                                                       \
     {                                                                                                                              \
-        { 51, 4098 },                                                                                                              \
+        {                                                                                                                          \
+            0x00, 0x00                                                                                                             \
+        }                                                                                                                          \
     }
 
 // This is an array of EmberAfManufacturerCodeEntry structures for clusters.
@@ -1002,25 +1408,34 @@
 #define ZAP_REPORT_DIRECTION(x) ZRD(x)
 
 // User options for plugin Reporting
-#define EMBER_AF_PLUGIN_REPORTING_TABLE_SIZE (5)
+#define EMBER_AF_PLUGIN_REPORTING_TABLE_SIZE (8)
 #define EMBER_AF_PLUGIN_REPORTING_ENABLE_GROUP_BOUND_REPORTS
 
-#define EMBER_AF_GENERATED_REPORTING_CONFIG_DEFAULTS_TABLE_SIZE (5)
+#define EMBER_AF_GENERATED_REPORTING_CONFIG_DEFAULTS_TABLE_SIZE (8)
 #define EMBER_AF_GENERATED_REPORTING_CONFIG_DEFAULTS                                                                               \
     {                                                                                                                              \
         {                                                                                                                          \
-            ZAP_REPORT_DIRECTION(REPORTED), 0x0001, 0x0006, 0x0000, ZAP_CLUSTER_MASK(SERVER), 0x0000, { { 0, 65344, 0 } }          \
+            ZAP_REPORT_DIRECTION(REPORTED), 0x0000, 0x0006, 0x0000, ZAP_CLUSTER_MASK(SERVER), 0x0000, { { 0, 65344, 0 } }          \
         }, /* Reporting for cluster: "On/off", attribute: "on/off". side: server */                                                \
             {                                                                                                                      \
-                ZAP_REPORT_DIRECTION(REPORTED), 0x0002, 0x0006, 0x0000, ZAP_CLUSTER_MASK(SERVER), 0x0000, { { 0, 65344, 0 } }      \
-            }, /* Reporting for cluster: "On/off", attribute: "on/off". side: server */                                            \
-            {                                                                                                                      \
-                ZAP_REPORT_DIRECTION(REPORTED), 0x0002, 0x0008, 0x0000, ZAP_CLUSTER_MASK(SERVER), 0x0000, { { 0, 65344, 0 } }      \
+                ZAP_REPORT_DIRECTION(REPORTED), 0x0000, 0x0008, 0x0000, ZAP_CLUSTER_MASK(SERVER), 0x0000, { { 0, 65344, 0 } }      \
             }, /* Reporting for cluster: "Level Control", attribute: "current level". side: server */                              \
             {                                                                                                                      \
-                ZAP_REPORT_DIRECTION(REPORTED), 0x0006, 0x0101, 0x0000, ZAP_CLUSTER_MASK(SERVER), 0x0000, { { 0, 65344, 0 } }      \
+                ZAP_REPORT_DIRECTION(REPORTED), 0x0000, 0x0300, 0x0003, ZAP_CLUSTER_MASK(SERVER), 0x0000, { { 0, 65344, 0 } }      \
+            }, /* Reporting for cluster: "Color Control", attribute: "current x". side: server */                                  \
+            {                                                                                                                      \
+                ZAP_REPORT_DIRECTION(REPORTED), 0x0000, 0x0300, 0x0004, ZAP_CLUSTER_MASK(SERVER), 0x0000, { { 0, 65344, 0 } }      \
+            }, /* Reporting for cluster: "Color Control", attribute: "current y". side: server */                                  \
+            {                                                                                                                      \
+                ZAP_REPORT_DIRECTION(REPORTED), 0x0001, 0x0006, 0x0000, ZAP_CLUSTER_MASK(SERVER), 0x0000, { { 0, 65344, 0 } }      \
+            }, /* Reporting for cluster: "On/off", attribute: "on/off". side: server */                                            \
+            {                                                                                                                      \
+                ZAP_REPORT_DIRECTION(REPORTED), 0x0001, 0x0008, 0x0000, ZAP_CLUSTER_MASK(SERVER), 0x0000, { { 0, 65344, 0 } }      \
+            }, /* Reporting for cluster: "Level Control", attribute: "current level". side: server */                              \
+            {                                                                                                                      \
+                ZAP_REPORT_DIRECTION(REPORTED), 0x0005, 0x0101, 0x0000, ZAP_CLUSTER_MASK(SERVER), 0x0000, { { 0, 65344, 0 } }      \
             }, /* Reporting for cluster: "Door Lock", attribute: "lock state". side: server */                                     \
             {                                                                                                                      \
-                ZAP_REPORT_DIRECTION(REPORTED), 0x0006, 0x0402, 0x0000, ZAP_CLUSTER_MASK(SERVER), 0x0000, { { 0, 65344, 0 } }      \
+                ZAP_REPORT_DIRECTION(REPORTED), 0x0005, 0x0402, 0x0000, ZAP_CLUSTER_MASK(SERVER), 0x0000, { { 0, 65344, 0 } }      \
             }, /* Reporting for cluster: "Temperature Measurement", attribute: "measured value". side: server */                   \
     }

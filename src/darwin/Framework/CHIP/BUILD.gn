@@ -66,7 +66,6 @@ static_library("framework") {
 
 chip_data_model("darwin_data_model") {
   cluster_sources = [
-    "media-playback-client",
     "network-commissioning",
   ]
 
