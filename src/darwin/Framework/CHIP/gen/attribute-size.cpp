@@ -44,8 +44,7 @@ void copyListMember(uint8_t * dest, uint8_t * src, bool write, uint16_t * offset
     *offset = static_cast<uint16_t>(*offset + length);
 }
 
-uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, bool write, uint8_t * dest, uint8_t * src,
-                         int32_t index)
+uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, bool write, uint8_t * dest, uint8_t * src, int32_t index)
 {
     if (index == -1)
     {
@@ -58,12 +57,12 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
         if (write)
         {
             // src is a pointer to native-endian uint16_t, dest is pointer to buffer that should hold little-endian value
-            emberAfCopyInt16u(dest, 0, *reinterpret_cast<uint16_t *>(src));
+            emberAfCopyInt16u(dest, 0, *reinterpret_cast<uint16_t*>(src));
         }
         else
         {
             // src is pointer to buffer holding little-endian value, dest is a pointer to native-endian uint16_t
-            *reinterpret_cast<uint16_t *>(dest) = emberAfGetInt16u(src, 0, kSizeLengthInBytes);
+            *reinterpret_cast<uint16_t*>(dest) = emberAfGetInt16u(src, 0, kSizeLengthInBytes);
         }
         return kSizeLengthInBytes;
     }
