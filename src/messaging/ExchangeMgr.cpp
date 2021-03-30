@@ -104,6 +104,14 @@ CHIP_ERROR ExchangeManager::Shutdown()
     mMessageCounterSyncMgr.Shutdown();
     mReliableMessageMgr.Shutdown();
 
+    for (auto & ec : mContextPool)
+    {
+        if (ec.GetReferenceCount() > 0)
+        {
+            ec.Abort();
+        }
+    }
+
     if (mSessionMgr != nullptr)
     {
         mSessionMgr->SetDelegate(nullptr);
