@@ -19,7 +19,7 @@
 
 #include "LightingManager.h"
 
-#include <iostream>
+#include <cstdio>
 
 LightingManager LightingManager::sLight;
 
@@ -49,13 +49,13 @@ bool LightingManager::InitiateAction(Action_t aAction)
     switch (aAction)
     {
     case ON_ACTION:
-        std::cout << "LightingManager::InitiateAction(ON_ACTION)" << std::endl;
+        printf("LightingManager::InitiateAction(ON_ACTION)");
         break;
     case OFF_ACTION:
-        std::cout << "LightingManager::InitiateAction(OFF_ACTION)" << std::endl;
+        printf("LightingManager::InitiateAction(OFF_ACTION)");
         break;
     default:
-        std::cout << "LightingManager::InitiateAction(unknown)" << std::endl;
+        printf("LightingManager::InitiateAction(unknown)");
         break;
     }
 

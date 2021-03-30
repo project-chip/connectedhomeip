@@ -18,6 +18,8 @@
 
 #include "PrivateHeap.h"
 
+#include <string.h>
+
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 
@@ -265,6 +267,43 @@ extern "C" void PrivateHeapFree(void * ptr)
             other->checksum  = ComputeHeapBlockChecksum(other);
         }
     }
+}
+
+void * PrivateHeapRealloc(void * heap, void * ptr, size_t size)
+{
+    if (ptr == nullptr)
+    {
+        return PrivateHeapAlloc(heap, size);
+    }
+
+    if (size == 0)
+    {
+        PrivateHeapFree(ptr);
+        return nullptr;
+    }
+
+    PrivateHeapBlockHeader * header =
+        reinterpret_cast<PrivateHeapBlockHeader *>(static_cast<char *>(ptr) - sizeof(PrivateHeapBlockHeader));
+
+    ValidateHeader(header);
+
+    if (header->nextBytes >= size)
+    {
+        return ptr; // no reallocation needed
+    }
+
+    void * largerCopy = PrivateHeapAlloc(heap, size);
+    if (largerCopy == nullptr)
+    {
+        // NOTE: original is left untouched (not freed) to match realloc() libc
+        // functionality
+        return nullptr;
+    }
+
+    memcpy(largerCopy, ptr, header->nextBytes);
+    PrivateHeapFree(ptr);
+
+    return largerCopy;
 }
 
 extern "C" void PrivateHeapDump(void * top)

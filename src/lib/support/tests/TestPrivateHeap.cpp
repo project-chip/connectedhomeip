@@ -38,6 +38,7 @@ public:
     PrivateHeapAllocator() { PrivateHeapInit(mHeap.buffer, kSize); }
     void * HeapAlloc(size_t size) { return PrivateHeapAlloc(mHeap.buffer, size); }
     void HeapFree(void * buffer) { PrivateHeapFree(buffer); }
+    void * HeapRealloc(void * buffer, size_t size) { return PrivateHeapRealloc(mHeap.buffer, buffer, size); }
 
 private:
     struct alignas(kPrivateHeapAllocationAlignment)
@@ -264,6 +265,79 @@ void BackwardFreeAndRealloc(nlTestSuite * inSuite, void * inContext)
     allocator.HeapFree(ptrs[kNumBlocks - 1]);
 }
 
+// Fills the data with a known pattern
+void FillKnownPattern(void * buffer, size_t size, uint8_t start)
+{
+    uint8_t * p = static_cast<uint8_t *>(buffer);
+    size_t cnt  = start;
+    while (cnt++ < size)
+    {
+        uint8_t value = static_cast<uint8_t>(cnt * 31 + 7);
+        *p            = value;
+    }
+}
+
+// checks if the specified buffer has the given pattern in it
+bool IsKnownPattern(void * buffer, size_t size, uint8_t start)
+{
+    uint8_t * p = static_cast<uint8_t *>(buffer);
+    size_t cnt  = start;
+    while (cnt++ < size)
+    {
+        uint8_t value = static_cast<uint8_t>(cnt * 31 + 7);
+        if (*p != value)
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+void Realloc(nlTestSuite * inSuite, void * inContext)
+{
+    PrivateHeapAllocator<6 * 16> allocator;
+
+    void * p1 = allocator.HeapRealloc(nullptr, 16); // malloc basically
+    NL_TEST_ASSERT(inSuite, p1 != nullptr);
+
+    FillKnownPattern(p1, 16, 11);
+
+    void * p2 = allocator.HeapRealloc(p1, 8); // resize, should fit
+    NL_TEST_ASSERT(inSuite, p1 == p2);
+    NL_TEST_ASSERT(inSuite, IsKnownPattern(p1, 8, 11));
+
+    p2 = allocator.HeapRealloc(p1, 16); // resize, should fit
+    NL_TEST_ASSERT(inSuite, p1 == p2);
+    NL_TEST_ASSERT(inSuite, IsKnownPattern(p2, 8, 11)); // only 8 bytes are guaranteed
+
+    FillKnownPattern(p1, 16, 33);
+    p2 = allocator.HeapRealloc(p1, 32); // resize, does not fit. This frees p1
+    NL_TEST_ASSERT(inSuite, p2 != nullptr);
+    NL_TEST_ASSERT(inSuite, p2 != p1); // new reallocation occured
+    NL_TEST_ASSERT(inSuite, IsKnownPattern(p2, 16, 33));
+
+    void * p3 = allocator.HeapAlloc(48); // insufficient heap for this
+    NL_TEST_ASSERT(inSuite, p3 == nullptr);
+
+    p1 = allocator.HeapRealloc(p2, 16); // reallocation does not change block size
+    NL_TEST_ASSERT(inSuite, p1 == p2);
+
+    p3 = allocator.HeapAlloc(48); // still insufficient heap for this
+    NL_TEST_ASSERT(inSuite, p3 == nullptr);
+
+    p2 = allocator.HeapRealloc(p1, 48); // insufficient heap, p1 is NOT freed
+    NL_TEST_ASSERT(inSuite, p2 == nullptr);
+
+    p2 = allocator.HeapRealloc(p1, 48); // Repeat the test to ensure p1 is not freed
+    NL_TEST_ASSERT(inSuite, p2 == nullptr);
+
+    allocator.HeapFree(p1);
+
+    p3 = allocator.HeapAlloc(48); // above free should have made sufficient space
+    NL_TEST_ASSERT(inSuite, p3 != nullptr);
+    allocator.HeapFree(p3);
+}
+
 const nlTest sTests[] = {
     NL_TEST_DEF("SingleHeapAllocAndFree", SingleHeapAllocAndFree),     //
     NL_TEST_DEF("SplitHeapAllocAndFree", SplitHeapAllocAndFree),       //
@@ -273,6 +347,7 @@ const nlTest sTests[] = {
     NL_TEST_DEF("MultipleMerge", MultipleMerge),                       //
     NL_TEST_DEF("ForwardFreeAndRealloc", ForwardFreeAndRealloc),       //
     NL_TEST_DEF("BackwardFreeAndRealloc", BackwardFreeAndRealloc),     //
+    NL_TEST_DEF("Realloc", Realloc),                                   //
     NL_TEST_SENTINEL()                                                 //
 };
 
