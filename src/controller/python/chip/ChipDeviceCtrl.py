@@ -32,7 +32,6 @@ from threading import Thread
 from ctypes import *
 from .ChipStack import *
 from .clusters.CHIPClusters import *
-from .exceptions import *
 import enum
 
 
@@ -165,12 +164,9 @@ class ChipDeviceController(object):
 
     def ZCLSend(self, cluster, command, nodeid, endpoint, groupid, args):
         device = c_void_p(None)
-        error = self._ChipStack.Call(
+        self._ChipStack.Call(
             lambda: self._dmLib.pychip_GetDeviceByNodeId(self.devCtrl, nodeid, pointer(device))
         )
-
-        if error != 0:
-            raise ChipStackError(error)
 
         self._Cluster.SendCommand(device, cluster, command, endpoint, groupid, args)
 
