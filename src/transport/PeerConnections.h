@@ -221,9 +221,6 @@ public:
 
         for (; iter < &mStates[kMaxConnectionCount]; iter++)
         {
-            ChipLogProgress(Inet, "FindPeerConnectionState(%d, %llu): found %d, %d, %d, %llu", peerKeyId,
-                            nodeId.ValueOr(kUndefinedNodeId), iter->IsInitialized(), iter->GetPeerKeyID(), iter->GetAdminId(),
-                            iter->GetPeerNodeId());
             if (!iter->IsInitialized())
             {
                 continue;
@@ -264,8 +261,6 @@ public:
 
         for (; iter < &mStates[kMaxConnectionCount]; iter++)
         {
-            ChipLogProgress(Inet, "FindPeerConnectionState(%d): found %d, %d %d", keyId, iter->IsInitialized(),
-                            iter->GetLocalKeyID(), iter->GetAdminId());
             if (!iter->IsInitialized())
             {
                 continue;

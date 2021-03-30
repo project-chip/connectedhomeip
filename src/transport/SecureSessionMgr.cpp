@@ -170,14 +170,6 @@ CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHea
     VerifyOrExit(admin != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     localNodeId = admin->GetNodeId();
 
-    // TODO: Move this logic out of SecureSessionMgr
-    /*
-            if (payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::MsgCounterSyncReq) ||
-                payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::MsgCounterSyncRsp))
-            {
-                packetHeader.SetSecureSessionControlMsg(true);
-            }
-    */
     if (encryptionState == EncryptionState::kPayloadIsUnencrypted)
     {
         err = SecureMessageCodec::Encode(localNodeId, state, payloadHeader, packetHeader, msgBuf);
@@ -257,11 +249,6 @@ CHIP_ERROR SecureSessionMgr::NewPairing(const Optional<Transport::PeerAddress> &
     uint16_t localKeyId         = pairing->GetLocalKeyId();
     PeerConnectionState * state = mPeerConnections.FindPeerConnectionState(Optional<NodeId>::Value(peerNodeId), peerKeyId, nullptr);
 
-    ChipLogProgress(Inet, "SecureSessionMgr::NewPairing found current state %p", state);
-    if (state)
-    {
-        ChipLogProgress(Inet, "State has admin ID %d, looking for %d", state->GetAdminId(), admin);
-    }
     // Find any existing connection with the same node and key ID
     if (state && (state->GetAdminId() == Transport::kUndefinedAdminId || state->GetAdminId() == admin))
     {
@@ -289,7 +276,6 @@ CHIP_ERROR SecureSessionMgr::NewPairing(const Optional<Transport::PeerAddress> &
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    ChipLogProgress(Inet, "SecureSessionMgr::NewPairing new state %p", state);
     if (state != nullptr)
     {
         switch (direction)
@@ -318,11 +304,8 @@ CHIP_ERROR SecureSessionMgr::NewPairing(const Optional<Transport::PeerAddress> &
             return CHIP_ERROR_INVALID_ARGUMENT;
         };
 
-        ChipLogProgress(Inet, "SecureSessionMgr::NewPairing successful. callback %p", mCB);
         if (mCB != nullptr)
         {
-            ChipLogProgress(Inet, "SecureSessionMgr::NewPairing successful. session %llu, %d, %d", state->GetPeerNodeId(),
-                            state->GetPeerKeyID(), admin);
             mCB->OnNewConnection({ state->GetPeerNodeId(), state->GetPeerKeyID(), admin }, this);
         }
     }
