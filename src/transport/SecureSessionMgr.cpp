@@ -71,16 +71,18 @@ SecureSessionMgr::~SecureSessionMgr()
 }
 
 CHIP_ERROR SecureSessionMgr::Init(NodeId localNodeId, System::Layer * systemLayer, TransportMgrBase * transportMgr,
-                                  Transport::AdminPairingTable * admins)
+                                  Transport::AdminPairingTable * admins,
+                                  Transport::MessageCounterManagerInterface * messageCounterManager)
 {
     VerifyOrReturnError(mState == State::kNotReady, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(transportMgr != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    mState        = State::kInitialized;
-    mLocalNodeId  = localNodeId;
-    mSystemLayer  = systemLayer;
-    mTransportMgr = transportMgr;
-    mAdmins       = admins;
+    mState                 = State::kInitialized;
+    mLocalNodeId           = localNodeId;
+    mSystemLayer           = systemLayer;
+    mTransportMgr          = transportMgr;
+    mAdmins                = admins;
+    mMessageCounterManager = messageCounterManager;
 
     ChipLogProgress(Inet, "local node id is 0x%08" PRIx32 "%08" PRIx32, static_cast<uint32_t>(mLocalNodeId >> 32),
                     static_cast<uint32_t>(mLocalNodeId));
@@ -119,9 +121,29 @@ Transport::Type SecureSessionMgr::GetTransportType(NodeId peerNodeId)
 CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHeader & payloadHeader,
                                          System::PacketBufferHandle && msgBuf, EncryptedPacketBufferHandle * bufferRetainSlot)
 {
+    PeerConnectionState * state = nullptr;
     PacketHeader unusedPacketHeader;
-    return SendMessage(session, payloadHeader, unusedPacketHeader, std::move(msgBuf), bufferRetainSlot,
-                       EncryptionState::kPayloadIsUnencrypted);
+
+    state = GetPeerConnectionState(session);
+    VerifyOrReturnError(state != nullptr, CHIP_ERROR_NOT_CONNECTED);
+
+    if (!IsControlMessage(payloadHeader) && !state->GetSessionMessageCounter().GetPeerMessageCounter().IsSyncCompleted())
+    {
+        if (bufferRetainSlot != nullptr)
+        {
+            // If CRMP is enabled, skip queuing the message to avoid meltdown. (Check TCP meltdown for details)
+            return mMessageCounterManager->StartSync(session, state);
+        }
+        else
+        {
+            return mMessageCounterManager->QueueSendMessageAndStartSync(session, state, payloadHeader, std::move(msgBuf));
+        }
+    }
+    else
+    {
+        return SendMessage(session, payloadHeader, unusedPacketHeader, std::move(msgBuf), bufferRetainSlot,
+                           EncryptionState::kPayloadIsUnencrypted);
+    }
 }
 
 CHIP_ERROR SecureSessionMgr::SendEncryptedMessage(SecureSessionHandle session, EncryptedPacketBufferHandle msgBuf,
@@ -174,15 +196,15 @@ CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHea
     VerifyOrExit(admin != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     localNodeId = admin->GetNodeId();
 
-    if (payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::MsgCounterSyncReq) ||
-        payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::MsgCounterSyncRsp))
+    if (IsControlMessage(payloadHeader))
     {
         packetHeader.SetSecureSessionControlMsg(true);
     }
 
     if (encryptionState == EncryptionState::kPayloadIsUnencrypted)
     {
-        err = SecureMessageCodec::Encode(localNodeId, state, payloadHeader, packetHeader, msgBuf);
+        MessageCounter & counter = GetSendCounterForPacket(payloadHeader, *state);
+        err                      = SecureMessageCodec::Encode(localNodeId, state, payloadHeader, packetHeader, msgBuf, counter);
         SuccessOrExit(err);
     }
 
@@ -384,6 +406,44 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
         ExitNow(err = CHIP_ERROR_KEY_NOT_FOUND_FROM_PEER);
     }
 
+    if (packetHeader.GetFlags().Has(Header::FlagValues::kSecure))
+    {
+        // Verify message counter
+        if (packetHeader.GetFlags().Has(Header::FlagValues::kSecureSessionControlMessage))
+        {
+            // TODO: control message counter is not implemented yet
+        }
+        else
+        {
+            // TODO: "initial Session Establishment bootstrap" is under specified, use message counter sync protocol for both group
+            // and unicast messages
+            if (!state->GetSessionMessageCounter().GetPeerMessageCounter().IsSyncCompleted())
+            {
+                // Queue and start message sync procedure
+                err = mMessageCounterManager->QueueReceivedMessageAndStartSync(
+                    { state->GetPeerNodeId(), state->GetPeerKeyID(), state->GetAdminId() }, state, packetHeader, peerAddress,
+                    std::move(msg));
+
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Inet,
+                                 "Message counter synchronization for received message, failed to "
+                                 "QueueReceivedMessageAndStartSync, err = %d",
+                                 err);
+                }
+
+                return;
+            }
+
+            err = state->GetSessionMessageCounter().GetPeerMessageCounter().Verify(packetHeader.GetMessageId());
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Inet, "Message counter verify failed, err = %d", err);
+                return;
+            }
+        }
+    }
+
     admin = mAdmins->FindAdmin(state->GetAdminId());
     VerifyOrExit(admin != nullptr,
                  ChipLogError(Inet, "Secure transport received packet for unknown admin (%p, %d) pairing, discarding", state,
@@ -396,30 +456,20 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
     }
     mPeerConnections.MarkConnectionActive(state);
 
-    if (!packetHeader.IsSecureSessionControlMsg() && !state->IsPeerMsgCounterSynced() &&
-        ChipKeyId::IsAppGroupKey(packetHeader.GetEncryptionKeyID()))
-    {
-        // Queue the message as needed for sync with destination node.
-        if (mCB != nullptr)
-        {
-            // We should encode the packetHeader into the buffer before storing the buffer into the queue.
-            // The encoded packetHeader needs to be peeled off during re-processing after the peer message
-            // counter is synced.
-            ReturnOnFailure(packetHeader.EncodeBeforeData(msg));
-            err = mCB->QueueReceivedMessageAndSync(state, std::move(msg));
-            VerifyOrReturn(err == CHIP_NO_ERROR);
-        }
-
-        // After the message that triggers message counter synchronization is stored, and a message counter
-        // synchronization exchange is initiated, we need to return immediately and re-process the original message
-        // when the synchronization is completed.
-
-        return;
-    }
-
     // Decode the message
-    VerifyOrExit(CHIP_NO_ERROR == SecureMessageCodec::Decode(state, payloadHeader, packetHeader, msg),
-                 ChipLogError(Inet, "Secure transport received message, but failed to decode it, discarding"));
+    VerifyOrReturn(CHIP_NO_ERROR == SecureMessageCodec::Decode(state, payloadHeader, packetHeader, msg));
+
+    if (packetHeader.GetFlags().Has(Header::FlagValues::kSecure))
+    {
+        if (packetHeader.GetFlags().Has(Header::FlagValues::kSecureSessionControlMessage))
+        {
+            // TODO: control message counter is not implemented yet
+        }
+        else
+        {
+            state->GetSessionMessageCounter().GetPeerMessageCounter().Commit(packetHeader.GetMessageId());
+        }
+    }
 
     if (packetHeader.GetSourceNodeId().HasValue())
     {
@@ -440,16 +490,6 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
     if (state->GetPeerAddress() != peerAddress)
     {
         state->SetPeerAddress(peerAddress);
-    }
-
-    if (!state->IsPeerMsgCounterSynced())
-    {
-        // For all control messages, the first authenticated message counter from an unsynchronized peer is trusted
-        // and used to seed subsequent message counter based replay protection.
-        if (packetHeader.IsSecureSessionControlMsg())
-        {
-            state->SetPeerMessageIndex(packetHeader.GetMessageId());
-        }
     }
 
     if (mCB != nullptr)

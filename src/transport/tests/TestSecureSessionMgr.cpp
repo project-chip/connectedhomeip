@@ -27,6 +27,7 @@
 #include <core/CHIPCore.h>
 #include <protocols/Protocols.h>
 #include <protocols/echo/Echo.h>
+#include <protocols/message_counter/MessageCounterManager.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <support/CodeUtils.h>
 #include <support/UnitTestRegistration.h>
@@ -120,6 +121,10 @@ public:
 
     void OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr) override
     {
+        // Preset the MessageCounter
+        Transport::PeerConnectionState * state = mgr->GetPeerConnectionState(session);
+        state->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(1);
+
         if (NewConnectionHandlerCallCount == 0)
             mRemoteToLocalSession = session;
         if (NewConnectionHandlerCallCount == 1)
@@ -145,6 +150,8 @@ void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext)
 
     TransportMgr<LoopbackTransport> transportMgr;
     SecureSessionMgr secureSessionMgr;
+    message_counter::MessageCounterManager gMessageCounterManager;
+
     CHIP_ERROR err;
 
     ctx.GetInetLayer().SystemLayer()->Init(nullptr);
@@ -153,7 +160,7 @@ void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     Transport::AdminPairingTable admins;
-    err = secureSessionMgr.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer(), &transportMgr, &admins);
+    err = secureSessionMgr.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer(), &transportMgr, &admins, &gMessageCounterManager);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
@@ -176,12 +183,13 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
 
     TransportMgr<LoopbackTransport> transportMgr;
     SecureSessionMgr secureSessionMgr;
+    message_counter::MessageCounterManager gMessageCounterManager;
 
     err = transportMgr.Init("LOOPBACK");
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     Transport::AdminPairingTable admins;
-    err = secureSessionMgr.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer(), &transportMgr, &admins);
+    err = secureSessionMgr.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer(), &transportMgr, &admins, &gMessageCounterManager);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     callback.mSuite = inSuite;
@@ -220,8 +228,6 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
     err = secureSessionMgr.SendMessage(localToRemoteSession, payloadHeader, std::move(buffer));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    ctx.DriveIOUntil(1000 /* ms */, []() { return callback.ReceiveHandlerCallCount != 0; });
-
     NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 1);
 
     // Let's send the max sized message and make sure it is received
@@ -232,8 +238,6 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
 
     err = secureSessionMgr.SendMessage(localToRemoteSession, payloadHeader, std::move(large_buffer));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    ctx.DriveIOUntil(1000 /* ms */, []() { return callback.ReceiveHandlerCallCount != 0; });
 
     NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 2);
 
@@ -268,12 +272,13 @@ void SendEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
 
     TransportMgr<OutgoingTransport> transportMgr;
     SecureSessionMgr secureSessionMgr;
+    message_counter::MessageCounterManager gMessageCounterManager;
 
     err = transportMgr.Init("LOOPBACK");
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     Transport::AdminPairingTable admins;
-    err = secureSessionMgr.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer(), &transportMgr, &admins);
+    err = secureSessionMgr.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer(), &transportMgr, &admins, &gMessageCounterManager);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     callback.mSuite = inSuite;
@@ -315,13 +320,15 @@ void SendEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     err = secureSessionMgr.SendMessage(localToRemoteSession, payloadHeader, std::move(buffer), &msgBuf);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    ctx.DriveIOUntil(1000 /* ms */, []() { return callback.ReceiveHandlerCallCount != 0; });
+    // Reset receive side message counter, or duplicated message will be denied.
+    Transport::PeerConnectionState * state = secureSessionMgr.GetPeerConnectionState(callback.mRemoteToLocalSession);
+    state->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(1);
+
     NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 1);
 
     err = secureSessionMgr.SendEncryptedMessage(localToRemoteSession, std::move(msgBuf), nullptr);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    ctx.DriveIOUntil(1000 /* ms */, []() { return callback.ReceiveHandlerCallCount != 1; });
     NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 2);
 }
 
@@ -344,12 +351,13 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
 
     TransportMgr<OutgoingTransport> transportMgr;
     SecureSessionMgr secureSessionMgr;
+    message_counter::MessageCounterManager gMessageCounterManager;
 
     err = transportMgr.Init("LOOPBACK");
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     Transport::AdminPairingTable admins;
-    err = secureSessionMgr.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer(), &transportMgr, &admins);
+    err = secureSessionMgr.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer(), &transportMgr, &admins, &gMessageCounterManager);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     callback.mSuite = inSuite;
@@ -391,8 +399,12 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     err = secureSessionMgr.SendMessage(localToRemoteSession, payloadHeader, std::move(buffer), &msgBuf);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    ctx.DriveIOUntil(1000 /* ms */, []() { return callback.ReceiveHandlerCallCount != 0; });
     NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 1);
+
+    /* -------------------------------------------------------------------------------------------*/
+    // Reset receive side message counter, or duplicated message will be denied.
+    Transport::PeerConnectionState * state = secureSessionMgr.GetPeerConnectionState(callback.mRemoteToLocalSession);
+    state->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(1);
 
     PacketHeader packetHeader;
 
@@ -407,9 +419,10 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     err = secureSessionMgr.SendEncryptedMessage(localToRemoteSession, std::move(badDestNodeIdMsg), nullptr);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    ctx.DriveIOUntil(1000 /* ms */, []() { return callback.ReceiveHandlerCallCount != 1; });
-
     NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 1);
+
+    /* -------------------------------------------------------------------------------------------*/
+    state->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(1);
 
     // Change Source Node ID
     EncryptedPacketBufferHandle badSrcNodeIdMsg = msgBuf.CloneData();
@@ -421,9 +434,10 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     err = secureSessionMgr.SendEncryptedMessage(localToRemoteSession, std::move(badSrcNodeIdMsg), nullptr);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    ctx.DriveIOUntil(1000 /* ms */, []() { return callback.ReceiveHandlerCallCount != 1; });
-
     NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 1);
+
+    /* -------------------------------------------------------------------------------------------*/
+    state->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(1);
 
     // Change Message ID
     EncryptedPacketBufferHandle badMessageIdMsg = msgBuf.CloneData();
@@ -436,9 +450,10 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     err = secureSessionMgr.SendEncryptedMessage(localToRemoteSession, std::move(badMessageIdMsg), nullptr);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    ctx.DriveIOUntil(1000 /* ms */, []() { return callback.ReceiveHandlerCallCount != 1; });
-
     NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 1);
+
+    /* -------------------------------------------------------------------------------------------*/
+    state->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(1);
 
     // Change Key ID
     EncryptedPacketBufferHandle badKeyIdMsg = msgBuf.CloneData();
@@ -451,7 +466,8 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     err = secureSessionMgr.SendEncryptedMessage(localToRemoteSession, std::move(badKeyIdMsg), nullptr);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    ctx.DriveIOUntil(1000 /* ms */, []() { return callback.ReceiveHandlerCallCount != 1; });
+    /* -------------------------------------------------------------------------------------------*/
+    state->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(1);
 
     NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 1);
 
@@ -459,7 +475,6 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     err = secureSessionMgr.SendEncryptedMessage(localToRemoteSession, std::move(msgBuf), nullptr);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    ctx.DriveIOUntil(1000 /* ms */, []() { return callback.ReceiveHandlerCallCount != 1; });
     NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 2);
 }
 
