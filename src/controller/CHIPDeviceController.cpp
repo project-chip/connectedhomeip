@@ -46,6 +46,7 @@
 #include <core/CHIPSafeCasts.h>
 #include <messaging/ExchangeContext.h>
 #include <setup_payload/QRCodeSetupPayloadParser.h>
+#include <protocols/message_counter/MessageCounterManager.h>
 #include <support/Base64.h>
 #include <support/CHIPArgParser.hpp>
 #include <support/CHIPMem.h>
@@ -127,7 +128,8 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, ControllerInitParams par
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    Transport::AdminPairingInfo * admin = nullptr;
+    message_counter::MessageCounterManager * messageCounterManager = nullptr;
+    Transport::AdminPairingInfo * admin                            = nullptr;
 
     VerifyOrExit(mState == State::NotInitialized, err = CHIP_ERROR_INCORRECT_STATE);
 
@@ -165,6 +167,8 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, ControllerInitParams par
     mTransportMgr = chip::Platform::New<DeviceTransportMgr>();
     mSessionMgr   = chip::Platform::New<SecureSessionMgr>();
     mExchangeMgr  = chip::Platform::New<Messaging::ExchangeManager>();
+    messageCounterManager  = chip::Platform::New<message_counter::MessageCounterManager>();
+    mMessageCounterManager = messageCounterManager;
 
     err = mTransportMgr->Init(
         Transport::UdpListenParameters(mInetLayer).SetAddressType(Inet::kIPAddressType_IPv6).SetListenPort(mListenPort)
@@ -182,10 +186,13 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, ControllerInitParams par
     admin = mAdmins.AssignAdminId(mAdminId, localDeviceId);
     VerifyOrExit(admin != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
-    err = mSessionMgr->Init(localDeviceId, mSystemLayer, mTransportMgr, &mAdmins);
+    err = mSessionMgr->Init(localDeviceId, mSystemLayer, mTransportMgr, &mAdmins, mMessageCounterManager);
     SuccessOrExit(err);
 
     err = mExchangeMgr->Init(mSessionMgr);
+    SuccessOrExit(err);
+
+    err = messageCounterManager->Init(mExchangeMgr);
     SuccessOrExit(err);
 
     err = mExchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::TempZCL::Id, this);
@@ -246,6 +253,12 @@ CHIP_ERROR DeviceController::Shutdown()
     mSystemLayer     = nullptr;
     mInetLayer       = nullptr;
     mStorageDelegate = nullptr;
+
+    if (mMessageCounterManager != nullptr)
+    {
+        chip::Platform::Delete(mMessageCounterManager);
+        mMessageCounterManager = nullptr;
+    }
 
     if (mExchangeMgr != nullptr)
     {

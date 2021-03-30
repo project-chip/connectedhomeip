@@ -247,6 +247,7 @@ protected:
     DeviceTransportMgr * mTransportMgr;
     SecureSessionMgr * mSessionMgr;
     Messaging::ExchangeManager * mExchangeMgr;
+    Transport::MessageCounterManagerInterface * mMessageCounterManager;
     PersistentStorageDelegate * mStorageDelegate;
     DeviceControllerInteractionModelDelegate * mDefaultIMDelegate;
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS

@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2021 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,26 +12,30 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
+import("//build_overrides/nlio.gni")
+import("//build_overrides/nlunit_test.gni")
 
-static_library("protocols") {
-  output_name = "libChipProtocols"
+import("${chip_root}/build/chip/chip_test_suite.gni")
 
-  sources = [
-    "echo/Echo.h",
-    "echo/EchoClient.cpp",
-    "echo/EchoServer.cpp",
-    "message_counter/MessageCounterManager.cpp",
-    "message_counter/MessageCounterManager.h",
-  ]
+chip_test_suite("tests") {
+  output_name = "libMessageCounterManagerTests"
+
+  test_sources = [ "TestMessageCounterManager.cpp" ]
 
   cflags = [ "-Wconversion" ]
 
   public_deps = [
+    "${chip_root}/src/inet/tests:helpers",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging",
-    "${chip_root}/src/protocols/bdx",
-    "${chip_root}/src/protocols/secure_channel",
+    "${chip_root}/src/messaging/tests:helpers",
+    "${chip_root}/src/protocols",
+    "${chip_root}/src/transport",
+    "${chip_root}/src/transport/raw/tests:helpers",
+    "${nlio_root}:nlio",
+    "${nlunit_test_root}:nlunit-test",
   ]
 }
