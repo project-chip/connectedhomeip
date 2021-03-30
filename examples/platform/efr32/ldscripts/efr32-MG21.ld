@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 /***************************************************************************//**
- * Linker script for Silicon Labs EFR32MG12P devices
+ * Linker script for Silicon Labs EFR32MG21 devices
  * @version 5.7.2
  *******************************************************************************
  * # License
@@ -47,8 +47,8 @@
 
 MEMORY
 {
-  FLASH (rx) : ORIGIN = 0x00000000, LENGTH = 1048576
-  RAM (rwx)  : ORIGIN = 0x20000000, LENGTH = 262144
+  FLASH (rx) : ORIGIN = 0x00000000, LENGTH = 1048576 - 8192  /* 8K is reserved at top of flash on MG21 */
+  RAM (rwx)  : ORIGIN = 0x20000000, LENGTH = 98304
 }
 
 /* Linker script to place sections and symbol values. Should be used together
@@ -101,8 +101,8 @@ SECTIONS
     KEEP(*(.fini))
 
     KEEP(*(.application_properties))
-	  KEEP(*(.gecko_configuration))
-	  KEEP(*(.xo_configuration))
+	KEEP(*(.gecko_configuration))
+	KEEP(*(.xo_configuration))
     KEEP(*(.gatt_header))
     KEEP(*(.gatt_data))
 
@@ -178,9 +178,9 @@ SECTIONS
   __etext = .;
 
   /*******************************************************************/
-  /* Define flash block for BLE-simee & chip-nvm3                    */
+  /* Define flash block for BLE-simee & CHIP-nvm3                    */
   /* simee: 9000H (36k) bytes for BLE nvm3                           */
-  /* chipNvm3_section: 4000H (16k) bytes for chip nvm3.              */
+  /* chipNvm3_section: 4000H (16k) bytes for CHIP nvm3.              */
   /* 8K is reserved for OpenThread's NVM which is mapped directly at */
   /* the top of flash                                                */
   /*******************************************************************/
@@ -203,7 +203,7 @@ SECTIONS
 
   /* Set NVM to end of FLASH */
   __nvm3Base = LENGTH(FLASH) - SIZEOF(.nvm_dummy) + (__nvm3_dummy_simee - __nvm3_dummy_begin);
-  __chipNvm3Base = LENGTH(FLASH) - SIZEOF(.nvm_dummy) + (__nvm3_dummy_chip - __nvm3_dummy_begin);
+  __nvm3ChipBase = LENGTH(FLASH) - SIZEOF(.nvm_dummy) + (__nvm3_dummy_chip - __nvm3_dummy_begin);
 
 
   /*******************************************************************/
@@ -261,6 +261,7 @@ SECTIONS
     __end__ = .;
     end = __end__;
     _end = __end__;
+    KEEP(*(.heap*))
     __HeapLimit = .;
   } > RAM
 

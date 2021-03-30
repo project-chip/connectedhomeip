@@ -1,4 +1,4 @@
-# CHIP EFR32 Lock Example
+#CHIP EFR32 Lock Example
 
 An example showing the use of CHIP on the Silicon Labs EFR32 MG12.
 
@@ -50,11 +50,9 @@ Silicon Labs platform.
 
 -   Install some additional tools(likely already present for CHIP developers):
 
-           # Linux
-           $ sudo apt-get install git libwebkitgtk-1.0-0 ninja-build
+#Linux \$ sudo apt-get install git libwebkitgtk-1.0-0 ninja-build
 
-           # Mac OS X
-           $ brew install ninja
+#Mac OS X \$ brew install ninja
 
 -   Supported hardware:
 
@@ -257,11 +255,25 @@ combination with JLinkRTTClient as follows:
     need to add a static ipv6 addresses on both device and then an ipv6 route to
     the border router on your PC
 
-          # On Border Router :
-          $ sudo ip addr add dev <Network interface> 2002::2/64
+#On Border Router: \$ sudo ip addr add dev <Network interface> 2002::2/64
 
-          # On PC (Linux) :
-          $ sudo ip addr add dev <Network interface> 2002::1/64
+#On PC(Linux): \$ sudo ip addr add dev <Network interface> 2002::1/64
 
-          # Add Ipv6 route on PC (Linux)
-          $ sudo ip route add <Thread global ipv6 prefix>/64 via 2002::2
+#Add Ipv6 route on PC(Linux) \$ sudo ip route add <Thread global ipv6 prefix>/64
+via 2002::2
+
+## Memory settings
+
+While most of the RAM usage in CHIP is static, allowing easier debugging and
+optimization with symbols analysis, we still need some HEAP for the crypto and
+OpenThread. Size of the HEAP can be modified by changing the value of the
+`SL_STACK_SIZE` define inside of the BUILD.gn file of this example. Please take
+note that a HEAP size smaller than 5k can and will cause a Mbedtls failure
+during the BLE rendez-vous.
+
+To track memory usage you can set `enable_heap_monitoring = true` either in the
+BUILD.gn file or pass it as a build argument to gn. This will print on the RTT
+console the RAM usage of each individual task and the number of Memory
+allocation and Free. While this is not extensive monitoring you're welcome to
+modify `examples/platform/efr32/MemMonitoring.cpp` to add your own memory
+tracking code inside the `trackAlloc` and `trackFree` function

@@ -67,7 +67,7 @@ namespace {
 #define TIMER_MS_2_TIMERTICK(ms) ((TIMER_CLK_FREQ * ms) / 1000)
 #define TIMER_S_2_TIMERTICK(s) (TIMER_CLK_FREQ * s)
 
-#define BLE_MAX_BUFFER_SIZE (3150)
+#define BLE_MAX_BUFFER_SIZE (3076)
 #define BLE_MAX_ADVERTISERS (1)
 #define BLE_CONFIG_MAX_PERIODIC_ADVERTISING_SYNC (0)
 #define BLE_CONFIG_MAX_SOFTWARE_TIMERS (4)
@@ -81,6 +81,10 @@ TimerHandle_t sbleAdvTimeoutTimer; // FreeRTOS sw timer.
 /* Bluetooth stack configuration parameters (see "UG136: Silicon Labs Bluetooth C Application Developer's Guide" for
  * details on each parameter) */
 static sl_bt_configuration_t config;
+
+StackType_t bluetoothEventStack[CHIP_DEVICE_CONFIG_BLE_APP_TASK_STACK_SIZE / sizeof(StackType_t)];
+StaticTask_t bluetoothEventTaskStruct;
+static TaskHandle_t BluetoothEventTaskHandle;
 
 const uint8_t UUID_CHIPoBLEService[]       = { 0xFB, 0x34, 0x9B, 0x5F, 0x80, 0x00, 0x00, 0x80,
                                          0x00, 0x10, 0x00, 0x00, 0xAF, 0xFE, 0x00, 0x00 };
@@ -168,12 +172,14 @@ CHIP_ERROR BLEManagerImpl::_Init()
     VerifyOrExit(ret == bg_err_success, err = MapBLEError(ret));
 
     // Create the Bluetooth Application task
-    xTaskCreate(bluetoothStackEventHandler,                                       /* Function that implements the task. */
-                CHIP_DEVICE_CONFIG_BLE_APP_TASK_NAME,                             /* Text name for the task. */
-                CHIP_DEVICE_CONFIG_BLE_APP_TASK_STACK_SIZE / sizeof(StackType_t), /* Number of indexes in the xStack array. */
-                this,                                                             /* Parameter passed into the task. */
-                CHIP_DEVICE_CONFIG_BLE_APP_TASK_PRIORITY,                         /* Priority at which the task is created. */
-                NULL);                                                            /* Variable to hold the task's data structure. */
+    BluetoothEventTaskHandle =
+        xTaskCreateStatic(bluetoothStackEventHandler,               /* Function that implements the task. */
+                          CHIP_DEVICE_CONFIG_BLE_APP_TASK_NAME,     /* Text name for the task. */
+                          ArraySize(bluetoothEventStack),           /* Number of indexes in the xStack array. */
+                          this,                                     /* Parameter passed into the task. */
+                          CHIP_DEVICE_CONFIG_BLE_APP_TASK_PRIORITY, /* Priority at which the task is created. */
+                          bluetoothEventStack,                      /* Pointer to task heap */
+                          &bluetoothEventTaskStruct);               /* Variable that holds the task struct */
 
     // Create FreeRTOS sw timer for BLE timeouts and interval change.
     sbleAdvTimeoutTimer = xTimerCreate("BleAdvTimer",       // Just a text name, not used by the RTOS kernel

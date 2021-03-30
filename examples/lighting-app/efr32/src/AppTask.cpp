@@ -38,6 +38,10 @@
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
+#include <platform/EFR32/freertos_bluetooth.h>
+
+#include <lib/support/CodeUtils.h>
+
 #include <platform/CHIPDeviceLayer.h>
 #if CHIP_ENABLE_OPENTHREAD
 #include <platform/EFR32/ThreadStackManagerImpl.h>
@@ -47,24 +51,31 @@
 
 #define FACTORY_RESET_TRIGGER_TIMEOUT 3000
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
-#define APP_TASK_STACK_SIZE (2048)
+#define APP_TASK_STACK_SIZE (1536)
 #define APP_TASK_PRIORITY 2
 #define APP_EVENT_QUEUE_SIZE 10
 #define EXAMPLE_VENDOR_ID 0xcafe
+namespace {
 
 TimerHandle_t sFunctionTimer; // FreeRTOS app sw timer.
 
-static TaskHandle_t sAppTaskHandle;
-static QueueHandle_t sAppEventQueue;
+TaskHandle_t sAppTaskHandle;
+QueueHandle_t sAppEventQueue;
 
-static LEDWidget sStatusLED;
-static LEDWidget sLightLED;
+LEDWidget sStatusLED;
+LEDWidget sLightLED;
 
-static bool sIsThreadProvisioned     = false;
-static bool sIsThreadEnabled         = false;
-static bool sHaveBLEConnections      = false;
-static bool sHaveServiceConnectivity = false;
+bool sIsThreadProvisioned     = false;
+bool sIsThreadEnabled         = false;
+bool sHaveBLEConnections      = false;
+bool sHaveServiceConnectivity = false;
 
+uint8_t sAppEventQueueBuffer[APP_EVENT_QUEUE_SIZE * sizeof(AppEvent)];
+StaticQueue_t sAppEventQueueStruct;
+
+StackType_t appStack[APP_TASK_STACK_SIZE / sizeof(StackType_t)];
+StaticTask_t appTaskStruct;
+} // namespace
 using namespace chip::TLV;
 using namespace ::chip::DeviceLayer;
 
@@ -74,7 +85,7 @@ int AppTask::StartAppTask()
 {
     int err = CHIP_ERROR_MAX;
 
-    sAppEventQueue = xQueueCreate(APP_EVENT_QUEUE_SIZE, sizeof(AppEvent));
+    sAppEventQueue = xQueueCreateStatic(APP_EVENT_QUEUE_SIZE, sizeof(AppEvent), sAppEventQueueBuffer, &sAppEventQueueStruct);
     if (sAppEventQueue == NULL)
     {
         EFR32_LOG("Failed to allocate app event queue");
@@ -82,11 +93,11 @@ int AppTask::StartAppTask()
     }
 
     // Start App task.
-    if (xTaskCreate(AppTaskMain, "APP", APP_TASK_STACK_SIZE / sizeof(StackType_t), NULL, 1, &sAppTaskHandle) == pdPASS)
+    sAppTaskHandle = xTaskCreateStatic(AppTaskMain, APP_TASK_NAME, ArraySize(appStack), NULL, 1, appStack, &appTaskStruct);
+    if (sAppTaskHandle != NULL)
     {
         err = CHIP_NO_ERROR;
     }
-
     return err;
 }
 
@@ -494,6 +505,10 @@ void AppTask::PostEvent(const AppEvent * aEvent)
         {
             EFR32_LOG("Failed to post event to app task event queue");
         }
+    }
+    else
+    {
+        EFR32_LOG("Event Queue is NULL should never happen");
     }
 }
 
