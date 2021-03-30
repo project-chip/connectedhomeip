@@ -743,7 +743,7 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     // Inform the ThreadStackManager that CHIPoBLE advertising is about to start.
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     ThreadStackMgr().OnCHIPoBLEAdvertisingStart();
-#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD 
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
     advertParams.own_addr_type = BLE_ADDR_TYPE_RANDOM;
 
     // Advertise connectable if we haven't reached the maximum number of connections.
