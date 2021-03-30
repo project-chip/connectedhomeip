@@ -49,10 +49,10 @@ static void TestMemAlloc_Malloc(nlTestSuite * inSuite, void * inContext)
     char * p3 = nullptr;
 
     // Verify long-term allocation
-    p1 = static_cast<char *>(MemoryAlloc(64, true));
+    p1 = static_cast<char *>(MemoryAlloc(64));
     NL_TEST_ASSERT(inSuite, p1 != nullptr);
 
-    p2 = static_cast<char *>(MemoryAlloc(256, true));
+    p2 = static_cast<char *>(MemoryAlloc(256));
     NL_TEST_ASSERT(inSuite, p2 != nullptr);
 
     chip::Platform::MemoryFree(p1);
@@ -86,7 +86,7 @@ static void TestMemAlloc_Calloc(nlTestSuite * inSuite, void * inContext)
 
 static void TestMemAlloc_Realloc(nlTestSuite * inSuite, void * inContext)
 {
-    char * pa = static_cast<char *>(MemoryAlloc(128, true));
+    char * pa = static_cast<char *>(MemoryAlloc(128));
     NL_TEST_ASSERT(inSuite, pa != nullptr);
 
     char * pb = static_cast<char *>(MemoryRealloc(pa, 256));
