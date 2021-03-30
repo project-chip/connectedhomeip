@@ -311,6 +311,16 @@
 #define ZCL_FINISH_TIME_ATTRIBUTE_ID (0x0001)
 #define ZCL_REMAINING_TIME_ATTRIBUTE_ID (0x0002)
 
+// Attribute ids for cluster: Descriptor
+
+// Client attributes
+
+// Server attributes
+#define ZCL_DEVICE_LIST_ATTRIBUTE_ID (0x0000)
+#define ZCL_SERVER_LIST_ATTRIBUTE_ID (0x0001)
+#define ZCL_CLIENT_LIST_ATTRIBUTE_ID (0x0002)
+#define ZCL_PARTS_LIST_ATTRIBUTE_ID (0x0003)
+
 // Attribute ids for cluster: Poll Control
 
 // Client attributes
@@ -1098,7 +1108,20 @@
 // Server attributes
 #define ZCL_MAX_DURATION_ATTRIBUTE_ID (0x0000)
 
+// Attribute ids for cluster: Media Playback
+
+// Client attributes
+
+// Server attributes
+#define ZCL_CURRENT_STATE_ATTRIBUTE_ID (0x0000)
+
 // Attribute ids for cluster: Low Power
+
+// Client attributes
+
+// Server attributes
+
+// Attribute ids for cluster: Content Launch
 
 // Client attributes
 
@@ -4096,18 +4119,13 @@
 
 // Server attributes
 
-// Attribute ids for cluster: Media Playback
+// Attribute ids for cluster: Group Key Management
 
 // Client attributes
 
 // Server attributes
-#define ZCL_CURRENT_STATE_ATTRIBUTE_ID (0x0000)
-
-// Attribute ids for cluster: Content Launch
-
-// Client attributes
-
-// Server attributes
+#define ZCL_GROUPS_ATTRIBUTE_ID (0x0000)
+#define ZCL_GROUPKEYS_ATTRIBUTE_ID (0x0001)
 
 // Attribute ids for cluster: Sample Mfg Specific Cluster
 
@@ -4164,4 +4182,3 @@
 #define ZCL_SL_PENDING_NETWORK_UPDATE_CHANNEL_ATTRIBUTE_ID (0x0011)
 #define ZCL_SL_PENDING_NETWORK_UPDATE_PANID_ATTRIBUTE_ID (0x0012)
 #define ZCL_SL_OTA_MAX_OFFLINE_DURATION_ATTRIBUTE_ID (0x0013)
-
